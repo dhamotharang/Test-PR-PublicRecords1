@@ -3,8 +3,8 @@ IMPORT KEL011 AS KEL;
 IMPORT E_Customer,E_Email,E_Person,E_Person_Email FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_Email := MODULE
-  SHARED __EE733522 := E_Person_Email.__Result;
-  SHARED __IDX_Person_Email_Emailof__Filtered := __EE733522(__NN(__EE733522.Emailof_));
+  SHARED __EE826602 := E_Person_Email.__Result;
+  SHARED __IDX_Person_Email_Emailof__Filtered := __EE826602(__NN(__EE826602.Emailof_));
   SHARED IDX_Person_Email_Emailof__Layout := RECORD
     E_Email.Typ Emailof_;
     __IDX_Person_Email_Emailof__Filtered._r_Customer_;
@@ -16,7 +16,7 @@ EXPORT B_Person_Email := MODULE
   SHARED IDX_Person_Email_Emailof__Projected := PROJECT(__IDX_Person_Email_Emailof__Filtered,TRANSFORM(IDX_Person_Email_Emailof__Layout,SELF.Emailof_:=__T(LEFT.Emailof_),SELF:=LEFT));
   EXPORT IDX_Person_Email_Emailof_ := INDEX(IDX_Person_Email_Emailof__Projected,{Emailof_},{IDX_Person_Email_Emailof__Projected},'~key::KEL::KELOtto::Person_Email::Emailof_');
   EXPORT IDX_Person_Email_Emailof__Build := BUILD(IDX_Person_Email_Emailof_,OVERWRITE);
-  EXPORT __ST733524_Layout := RECORDOF(IDX_Person_Email_Emailof_);
+  EXPORT __ST826604_Layout := RECORDOF(IDX_Person_Email_Emailof_);
   EXPORT IDX_Person_Email_Emailof__Wrapped := PROJECT(IDX_Person_Email_Emailof_,TRANSFORM(E_Person_Email.Layout,SELF.Emailof_ := __CN(LEFT.Emailof_),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Person_Email_Emailof__Build);
 END;

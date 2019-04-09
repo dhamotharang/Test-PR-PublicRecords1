@@ -259,6 +259,9 @@ import Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,cens
         self.score    := intformat(l.temp_DID_score, 3, 1);
         self.bdid 	  := if (L.bdid = 0, '', intformat(L.bdid,12,1));
         self.best_ssn := l.ssn;
+					//DF-24056 initialize new CCPA fields 
+					self.global_sid :=0;
+					self.record_sid := 0;				
         self 					:= l;
 			end;
 

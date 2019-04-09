@@ -23,7 +23,7 @@ module
 			export Deltabase := count(nothor(FileServices.SuperFileContents(Filenames().Base.Deltabase.Built))) > 0;
 			export AddressCache := count(nothor(FileServices.SuperFileContents(Filenames().Base.AddressCache.Built))) > 0;
 			export Main := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.Built))) > 0;
-			export MainFather := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.Father))) > 0;
+			export MainQA := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.QA))) > 0;
 			export Pii := count(nothor(FileServices.SuperFileContents(Filenames().Base.Pii.Built))) > 0;
 		end;
 	end;

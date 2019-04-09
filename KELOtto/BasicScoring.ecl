@@ -5,18 +5,20 @@
 	
   EXPORT PersonStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'score_,cluster_score_,event_count_,' + 
-                        '_nas__summary_,_nap__summary_,_subjectssncount_,_ssnfoundforlexid_,subject_ssn_count_,stolen_identity_index_,synthetic_identity_index_,manipulated_identity_index_,vulnerable_victim_index_,friendlyfraud_index_,suspicious_activity_index_,all_high_risk_death_prior_to_all_events_,all_max_deceased_to_event_diff_,death_prior_to_all_events_,deceased_,deceased_event_percent_,deceased_match_,high_risk_death_prior_to_all_events_,in_customer_population_,max_deceased_to_event_diff_,no_lex_id_,id_ssn_identity_count_max_,no_lex_id_gt22_,' + 
+                        'nas9_flag_,_nas__summary_,_nap__summary_,_subjectssncount_,_ssnfoundforlexid_,subject_ssn_count_,stolen_identity_index_,synthetic_identity_index_,manipulated_identity_index_,vulnerable_victim_index_,friendlyfraud_index_,suspicious_activity_index_,all_high_risk_death_prior_to_all_events_,all_max_deceased_to_event_diff_,death_prior_to_all_events_,deceased_,deceased_event_percent_,deceased_match_,high_risk_death_prior_to_all_events_,in_customer_population_,max_deceased_to_event_diff_,no_lex_id_,id_ssn_identity_count_max_,no_lex_id_gt22_,' + 
                         'cl_high_risk_routing_count_,cl_no_lex_id_gt22_count_,cl_death_prior_to_all_events_identity_count_,cl_high_risk_death_prior_to_all_events_identity_count_,cl_event_count_,cl_identity_count_,cl_nas9_identity_count_,cl_nap3_identity_count_,cl_address_count_,cl_identity_event_avg_,cl_identity_count_percentile_,cl_event_count_percentile_,cl_impact_weight_,kr_high_risk_flag_,kr_medium_risk_flag_,' +
                         '_cvi_,_v2__sourcerisklevel_,_v2__assocsuspicousidentitiescount_,_v2__assoccreditbureauonlycount_,_v2__inputaddrageoldest_,_v2__inputaddrdwelltype_,_v2__divssnidentitycountnew_,' + 
                         'hri03_flag_,hri06_flag_,hri07_flag_,hri08_flag_,hri11_flag_,hri12_flag_,hri14_flag_,hri15_flag_,hri19_flag_,hri25_flag_,hri26_flag_,hri27_flag_,hri28_flag_,hri29_flag_,hri30_flag_,hri31_flag_,hri37_flag_,hri38_flag_,hri41_flag_,hri48_flag_,hri50_flag_,hri51_flag_,hri52_flag_,hri71_flag_,hri83_flag_,hri90_flag_,hri_cl_flag_,hri_co_flag_,hri_dd_flag_,hri_df_flag_,hri_iv_flag_,hri_it_flag_,hri_mi_flag_,hri_mo_flag_,hri_ms_flag_,hri_nf_flag_,hri_pa_flag_,hri_po_flag_,hri_va_flag_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'kr_high_risk_routing_,cl_active30_identity_count_,cl_active7_identity_count_,currently_incarcerated_flag_,fraud_offenses_flag_,associated_with_incarcerated_flag_,associated_with_fraud_offenses_flag_,safe_flag_,contributor_safe_flag_,' +
+                        'kr_id10000_flag_,kr_id10001_flag_,kr_id10002_flag_,kr_id10003_flag_,kr_id10004_flag_,kr_id10005_flag_,kr_id10006_flag_,kr_id10007_flag_,kr_id11000_flag_,kr_id11001_flag_,kr_id11002_flag_,kr_id11003_flag_,kr_id11004_flag_,kr_id11005_flag_,kr_id11006_flag_,kr_id11007_flag_,kr_id11008_flag_,kr_id11009_flag_,kr_id11010_flag_,kr_id11011_flag_,kr_id11012_flag_,kr_id11013_flag_,kr_id11014_flag_,kr_id11015_flag_,kr_id11016_flag_,kr_id11017_flag_,kr_id11018_flag_,kr_id11019_flag_,kr_id12000_flag_,kr_id12001_flag_,kr_id12002_flag_,kr_id12003_flag_,kr_id12004_flag_,kr_id12006_flag_,kr_id12007_flag_,kr_id13000_flag_,kr_id13001_flag_,kr_id13002_flag_,kr_id13003_flag_,kr_id13005_flag_,kr_id13006_flag_,kr_id13007_flag_,kr_id14000_flag_,kr_id14001_flag_,' +
                         'cl_ip_high_risk_identity_count_,cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_');
 
   SHARED AddressStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Address.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'identity_count_,score_,event_count_,' +
                         'all_deceased_match_person_count_,all_deceased_match_person_percent_,all_deceased_person_count_,all_deceased_person_percent_,all_high_frequency_flag_,all_high_risk_death_prior_to_all_events_person_count_,all_high_risk_death_prior_to_all_events_person_percent_,all_high_risk_death_prior_to_all_events_person_percent_flag_,all_person_count_,cl_event_count_,cl_event_count_percentile_,cl_identity_count_,cl_identity_count_percentile_,cl_impact_weight_,cluster_score_,deceased_match_person_percent_,deceased_person_count_,deceased_person_percent_,high_frequency_flag_,in_customer_population_,kr_high_risk_flag_,kr_medium_risk_flag_,source_customer_count_,_addresscmra_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
+                        'kr_addr300_flag_,kr_addr301_flag_,kr_addr302_flag_,kr_addr303_flag_,' +
 												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
                         ) : PERSIST('~temp::deleteme42');
   
@@ -24,12 +26,14 @@
                         'cluster_score_, event_count_, identity_count_, score_, source_customer_count_,cl_event_count_,cl_identity_count_,' + 
 	                      'hri06_flag_,hri26_flag_,hri29_flag_,hri38_flag_,hri71_flag_,hri_it_flag_,hri_mi_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
+                        'kr_ssn100_flag_,kr_ssn101_flag_,' +
 												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
 												) : PERSIST('~temp::deleteme47');
 
   EXPORT EmailStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Email.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
+                        'kr_eml500_flag_,kr_eml501_flag_,kr_eml502_flag_,kr_eml590_flag_,kr_eml591_flag_,kr_eml592_flag_,kr_eml593_flag_,' +
 												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
 												) : PERSIST('~temp::deleteme44');
   
@@ -37,6 +41,7 @@
                         'phone_number_,_is_cell_phone_,cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,' + 
                         'hri07_flag_,hri08_flag_,hri15_flag_,hri27_flag_,hri31_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,'+ 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
+                        'kr_phn400_flag_,kr_phn401_flag_,kr_phn402_flag_,' +
 												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
                         ) : PERSIST('~temp::deleteme45');
 
@@ -46,6 +51,7 @@
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_,' +
                         'ip_not_us_,ip_vpn_,ip_high_risk_city_,ip_hosted_,ip_tor_,' +
+                        'kr_ip600_flag_,kr_ip601_flag_,kr_ip602_flag_,kr_ip603_flag_,kr_ip604_flag_,kr_ip605_flag_,kr_ip1000_flag_,kr_ip1001_flag_,' +
                         'cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_'
 												) : PERSIST('~temp::deleteme48');
 

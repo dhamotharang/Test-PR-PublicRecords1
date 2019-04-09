@@ -21,8 +21,8 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 						 or (cnt=4 and L.EFX_SECADR+L.EFX_SECCTY+L.EFX_SECSTAT+L.EFX_SECZIP = '')
 			       or (cnt=4 and L.EFX_SECADR+L.EFX_SECCTY+L.EFX_SECSTAT+L.EFX_SECZIP = 
 						 L.EFX_ADDRESS+L.EFX_CITY+L.EFX_STATE+L.EFX_ZIPCODE)
-						 or (L.EFX_ID = 'EFX_ID'))
-		
+						 or (L.EFX_ID = 'EFX_ID'))		
+						 
         isPoBox := REGEXFIND('PO BOX|P.O. BOX|P O BOX|P M B [0-9]+ BOX |P OBOX|PB BOX|PCS [0-9]+ BOX |PFC [0-9]+ BOX |PMB [0-9]+ BOX |PMB BOX|PO MBOX|PO OFFICE BOX|POM BOX|PONBOX|POO BOX|POP BOX|POST BOX|POST OFFICEBOX|POSTAGE BOX|POSTAL BOX|POSTBOX|POSTXBOX|POTBOX|PPP BOX|PSC [0-9]+ BOX|UAM BOX|UCSF BOX|UNIT [0-9]+ BOX',
        				              L.EFX_ADDRESS,NOCASE);		
 		
@@ -134,7 +134,7 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 
 		Equifax_Business_Data.Layouts.Base tPreProcess(Equifax_Business_Data.Layouts.Base L) := TRANSFORM
 
-			date_created := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.EFX_DATE_CREATED);
+			date_first_seen := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.Record_Update_Refresh_Date);
 			
 			SELF.EFX_ID := ut.CleanSpacesAndUpper(L.EFX_ID);
 			
@@ -347,13 +347,8 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 																								
 			SELF.EFX_DATE_CREATED := ut.CleanSpacesAndUpper(L.EFX_DATE_CREATED);
 			SELF.process_date                       := STD.Date.CurrentDate(TRUE);
-			
- 		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_created)
-			                                              AND date_created[1..4] >= '2001' 
-																										AND date_created[1..4] <= SELF.process_date[1..4],(UNSIGNED4)date_created, 0);
-			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_created)
-			                                              AND date_created[1..4] >= '2001' 
-																										AND date_created[1..4] <= SELF.process_date[1..4],(UNSIGNED4)date_created, 0);
+ 		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
+			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
 			SELF.dt_vendor_first_reported						:= IF(_validate.date.fIsValid(pversion[1..8]), (UNSIGNED4)pversion[1..8], 0);
 			SELF.dt_vendor_last_reported						:= IF(_validate.date.fIsValid(pversion[1..8]), (UNSIGNED4)pversion[1..8], 0);
 			

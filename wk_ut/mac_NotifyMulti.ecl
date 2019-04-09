@@ -1,4 +1,4 @@
-import tools,_control,ut;
+﻿import tools,_control,ut;
 /*
 
   wait for multiple wuids to finish(completed,failed or aborted).  All have to finish before this will notify the master workunit
@@ -27,10 +27,10 @@ functionmacro
   dnormset      := normalize(dataset([{''}],{string junk}),count(pSetWorkunits),transform({string wuid},self.wuid := pSetWorkunits[counter]))(wuid != '');
   dGetWuidsInfo := project(dnormset,transform({string wuid,string state,string realstate,string realstate2,string realjobname,string jobname,string total_thor_time,string timestamp},
     self.wuid             := left.wuid;
-    self.state            := trim(wk_ut.get_WUInfo(left.wuid).State_nofail,left,right);
+    self.state            := trim(wk_ut.get_State(left.wuid),left,right);
     self.realstate        := if(self.state[1..6] = 'failed' ,'failed' ,self.state);
-    self.realstate2       := if(trim(wk_ut.get_WUInfo(left.wuid).State_nofail,left,right)[1..6] = 'failed' ,'failed' ,trim(wk_ut.get_WUInfo(left.wuid).State_nofail,left,right));//do it twice to make sure
-    self.realjobname      := trim(wk_ut.get_WUInfo(left.wuid).JobName_nofail);
+    self.realstate2       := if(trim(wk_ut.get_State(left.wuid),left,right)[1..6] = 'failed' ,'failed' ,trim(wk_ut.get_State(left.wuid),left,right));//do it twice to make sure
+    self.realjobname      := trim(wk_ut.get_Jobname(left.wuid));
     self.jobname          := if(self.realjobname = ''  ,left.wuid  ,self.realjobname + ' (' + left.wuid + ')');
     self.total_thor_time  := wk_ut.get_TotalTime(left.wuid,,true);  
     self.timestamp        := wk_ut.getTimeDate();

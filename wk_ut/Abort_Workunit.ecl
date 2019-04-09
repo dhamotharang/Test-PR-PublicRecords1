@@ -1,11 +1,2 @@
-EXPORT Abort_Workunit(
-
-  string wuid
-
-) :=
-function
-  dme := dataset([{wuid}],layouts.WuidItems);
-  
-  return do_WUAction(dme,'Abort');
-
-end;
+﻿import Workman;
+EXPORT Abort_Workunit := Workman.Abort_Workunit;

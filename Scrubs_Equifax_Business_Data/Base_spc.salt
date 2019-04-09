@@ -12,6 +12,8 @@ FIELDTYPE:invalid_zero_integer:ENUM(0|)
 FIELDTYPE:invalid_record_type:ENUM(C|H)
 FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_numeric > 0)
 FIELDTYPE:invalid_numeric_or_blank:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank > 0)
+FIELDTYPE:invalid_county:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_numeric > 0,3)
+FIELDTYPE:invalid_alpha:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_alpha > 0,4)
 FIELDTYPE:invalid_percentage:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_range_numeric>0,0,100)
 FIELDTYPE:invalid_direction:ENUM(E|N|S|W|NE|NW|SE|SW|)
 FIELDTYPE:invalid_cart:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_alphanum>0,4)
@@ -77,6 +79,7 @@ FIELDTYPE:invalid_mrkt_totalscore:CUSTOM(Scrubs_Equifax_Business_Data.Functions.
 FIELDTYPE:invalid_public:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_public>0)
 FIELDTYPE:invalid_statec:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_statec>0)
 FIELDTYPE:invalid_stkexc:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_stkexc>0)
+
 
 //--------------------------------------------------------------- 
 //FIELDS TO SCRUB -- Commented out fields are not being scrubbed
@@ -190,7 +193,8 @@ FIELD:EFX_ID:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:EFX_CITY:TYPE(STRING75):LIKE(invalid_mandatory):0,0
 FIELD:EFX_REGION:0,0
 FIELD:EFX_CTRYNAME:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-FIELD:EFX_COUNTYNM:0,0
+FIELD:EFX_COUNTYNM:TYPE(STRING100):LIKE(invalid_alpha):0,0
+FIELD:EFX_COUNTY:TYPE(STRING3):LIKE(invalid_county):0,0
 FIELD:EFX_CMSADESC:0,0
 FIELD:EFX_SOHO:TYPE(STRING1):LIKE(invalid_yes_blank):0,0
 FIELD:EFX_BIZ:TYPE(STRING1):LIKE(invalid_yes_blank):0,0
