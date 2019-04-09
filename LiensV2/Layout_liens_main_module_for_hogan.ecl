@@ -68,6 +68,6 @@ BOOLEAN	CaseLinkID_Prop_Flag	:=	FALSE;
 string7   AgencyID;
 unsigned4 global_sid;
 unsigned8 record_sid;
-String    Agency_id_src;
+String    AgencyID_src;
 end;
 end;
