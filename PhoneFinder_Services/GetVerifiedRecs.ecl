@@ -35,21 +35,17 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
 
   SHARED matchPhoneActive($.Layouts.PhoneFinder.IdentitySlim L) := 
   FUNCTION
-      
-    today := (STRING) STD.Date.Today();   
+    today := STD.Date.Today();   
 
-    sDateFirstSeen := (STRING)L.dt_first_seen;
-    sDateLastSeen  := (STRING)L.dt_last_seen;
-      
-    timeWithPrimaryPhone := (STRING) ut.DaysApart(sDateFirstSeen, sDateLastSeen);
-    dateLastSeenFromToday := (STRING) ut.DaysApart(today, sDateLastSeen);
-    dateFirstSeenFromToday := (STRING) ut.DaysApart(today, sDateFirstSeen);
+    timeWithPrimaryPhone   := STD.Date.DaysBetween(L.dt_first_seen, L.dt_last_seen);
+    dateLastSeenFromToday  := STD.Date.DaysBetween(L.dt_last_seen, today);
+    dateFirstSeenFromToday := STD.Date.DaysBetween(L.dt_first_seen, today);
                           
-    dateFirstSeenOk := ~vmod.useDateFirstSeenVerify OR (INTEGER) dateFirstSeenFromToday > vmod.dateFirstSeenThreshold;                      
-    dateLastSeenOk := ~vmod.useDateLastSeenVerify OR (INTEGER) dateLastSeenFromToday > vmod.dateLastSeenThreshold;        
-    lengthOfTimeOk := ~vmod.useLengthOfTimeVerify OR (INTEGER) timeWithPrimaryPhone > vmod.lengthOfTimeThreshold; 
+    dateFirstSeenOk := ~vmod.useDateFirstSeenVerify OR dateFirstSeenFromToday > vmod.dateFirstSeenThreshold;                      
+    dateLastSeenOk  := ~vmod.useDateLastSeenVerify OR dateLastSeenFromToday > vmod.dateLastSeenThreshold;        
+    lengthOfTimeOk  := ~vmod.useLengthOfTimeVerify OR timeWithPrimaryPhone > vmod.lengthOfTimeThreshold; 
                           
-    isPhoneActive := dateLastSeenOk AND dateFirstSeenOk AND lengthOfTimeOk;
+    isPhoneActive := (vmod.useDateFirstSeenVerify OR vmod.useDateLastSeenVerify OR vmod.useLengthOfTimeVerify) AND dateLastSeenOk AND dateFirstSeenOk AND lengthOfTimeOk;
 
     RETURN isPhoneActive;   
         
@@ -87,19 +83,18 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
 
   SHARED matchPhoneActiveBatch($.Layouts.PhoneFinder.IdentityIesp L) := 
   FUNCTION
-      
-    today := (STRING) STD.Date.Today();   
+    today := STD.Date.Today();   
 
-    sDateFirstSeen := iesp.ECL2ESP.DateToString(L.FirstSeenWithPrimaryPhone);
-    sDateLastSeen := iesp.ECL2ESP.DateToString(L.LastSeenWithPrimaryPhone);
+    sDateFirstSeen := iesp.ECL2ESP.DateToInteger(L.FirstSeenWithPrimaryPhone);
+    sDateLastSeen := iesp.ECL2ESP.DateToInteger(L.LastSeenWithPrimaryPhone);
       
-    timeWithPrimaryPhone := (STRING) ut.DaysApart(sDateFirstSeen, sDateLastSeen);
-    dateLastSeenFromToday := (STRING) ut.DaysApart(today, sDateLastSeen);
-    dateFirstSeenFromToday := (STRING) ut.DaysApart(today, sDateFirstSeen);
+    timeWithPrimaryPhone   := STD.Date.DaysBetween(sDateFirstSeen, sDateLastSeen);
+    dateLastSeenFromToday  := STD.Date.DaysBetween(sDateLastSeen, today);
+    dateFirstSeenFromToday := STD.Date.DaysBetween(sDateFirstSeen, today);
                           
-    dateFirstSeenOk := ~vmod.useDateFirstSeenVerify OR (INTEGER) dateFirstSeenFromToday > vmod.dateFirstSeenThreshold;                      
-    dateLastSeenOk := ~vmod.useDateLastSeenVerify OR (INTEGER) dateLastSeenFromToday > vmod.dateLastSeenThreshold;        
-    lengthOfTimeOk := ~vmod.useLengthOfTimeVerify OR (INTEGER) timeWithPrimaryPhone > vmod.lengthOfTimeThreshold; 
+    dateFirstSeenOk := ~vmod.useDateFirstSeenVerify OR dateFirstSeenFromToday > vmod.dateFirstSeenThreshold;                      
+    dateLastSeenOk  := ~vmod.useDateLastSeenVerify OR dateLastSeenFromToday > vmod.dateLastSeenThreshold;        
+    lengthOfTimeOk  := ~vmod.useLengthOfTimeVerify OR timeWithPrimaryPhone > vmod.lengthOfTimeThreshold; 
                           
     isPhoneActive := dateLastSeenOk AND dateFirstSeenOk AND lengthOfTimeOk;
 

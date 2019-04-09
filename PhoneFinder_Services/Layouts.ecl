@@ -105,7 +105,7 @@ MODULE
 		END;
 		
 		EXPORT SpoofHistory :=
-		RECORD		
+		RECORD
 			STRING1 PhoneOrigin;
 			STRING8 EventDate;
 		END;
@@ -153,6 +153,8 @@ MODULE
 		// Phone finder common layout with carrier information	
 		EXPORT Final :=
 		RECORD
+			// Batch input fields
+			BatchInAppendDID                                  batch_in;
 			STRING20                                          acctno;
 			UNSIGNED8                                         seq;
 			UNSIGNED6                                         did;
@@ -165,8 +167,7 @@ MODULE
 			STRING8                                           dt_last_seen;
 			STRING25	                                        append_phone_type;
 			STRING10                                          phone;
-			STRING2	                                          phoneState;		
-			UNSIGNED1																					                    serviceType;
+			STRING2	                                          phoneState;
 			STRING9                                           ssn;
 			STRING2                                           SSNMatch;
 			UNSIGNED4                                         dob;
@@ -190,7 +191,7 @@ MODULE
 			STRING5                                           county_code;
 			STRING18                                          county_name;
 			STRING1                                           tnt;
-			STRING40																				                     	primary_address_type;			 
+			STRING40																				  primary_address_type;			 
 			STRING120                                         listed_name;
 			STRING120                                         listed_name_targus;
 			STRING10                                          listed_phone;
@@ -212,6 +213,7 @@ MODULE
 			STRING                                            ssc_description;
 			BOOLEAN                                           telcordia_only;
 			BOOLEAN                                           isPrimaryPhone;
+			BOOLEAN                                           isPrimaryIdentity;
 			UNSIGNED1                                         phone_source;
 			// Fields pertaining only to waterfall process
 			STRING8                                           matchcodes;
@@ -227,33 +229,31 @@ MODULE
 			STRING15                                          Encrypted_Experian_PIN;
 			// QSent phone detail fields
 			Doxie_Raw.PhonesPlus_Layouts.t_RealTimePhone_Ext1 RealTimePhone_Ext;
-			// Batch input fields
-			BatchInAppendDID                                  batch_in;
-			Porting;
+      Porting;
 			SpoofingData;
 			OneTimePassword;
-			STRING4 PhoneRiskIndicator;
-			BOOLEAN OTPRIFailed;
-			DATASET(Alert) Alerts;
+			STRING4                                               PhoneRiskIndicator;
+			BOOLEAN                                               OTPRIFailed;
+			DATASET(Alert)                                        Alerts;
 			DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) AlertIndicators;
-			DATASET({STRING17 InquiryDate})									InquiryDates;		
-			UNSIGNED RecordsReturned;
-			BOOLEAN PhoneOwnershipIndicator;
-			STRING rec_source;
-			STRING15 CallForwardingIndicator;
-			STRING imsi_seensince;
-			STRING8 imsi_changedate;
-			STRING8 imsi_ActivationDate;
-			INTEGER imsi_changedthis_time;
-			INTEGER iccid_changedthis_time;
-			STRING iccid_seensince;
-			STRING imei_seensince;
-			STRING8 imei_changedate;
-			INTEGER imei_changedthis_time;
-			INTEGER loststolen;
-			STRING8 loststolen_date;
-      BOOLEAN is_verified;
-      STRING100 verification_desc;
+			DATASET({STRING17 InquiryDate})									      InquiryDates;		
+			UNSIGNED                                              RecordsReturned;
+			BOOLEAN                                               PhoneOwnershipIndicator;
+			STRING                                                rec_source;
+			STRING15                                              CallForwardingIndicator;
+			STRING                                                imsi_seensince;
+			STRING8                                               imsi_changedate;
+			STRING8                                               imsi_ActivationDate;
+			INTEGER                                               imsi_changedthis_time;
+			INTEGER                                               iccid_changedthis_time;
+			STRING                                                iccid_seensince;
+			STRING                                                imei_seensince;
+			STRING8                                               imei_changedate;
+			INTEGER                                               imei_changedthis_time;
+			INTEGER                                               loststolen;
+			STRING8                                               loststolen_date;
+      BOOLEAN                                               is_verified;
+      STRING100                                             verification_desc;
 		END;
 		
 		EXPORT ExcludePhones :=

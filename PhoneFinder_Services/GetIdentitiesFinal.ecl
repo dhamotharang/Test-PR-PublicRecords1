@@ -2,12 +2,11 @@ IMPORT $, iesp, Phones, STD, ut;
 
 EXPORT GetIdentitiesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                           DATASET($.Layouts.BatchInAppendDID)  dInBestInfo,
-                          $.iParam.ReportParams                inMod,
-                          BOOLEAN                              isPhoneSearch) :=
+                          $.iParam.ReportParams                inMod) :=
 FUNCTION
   today := (STRING)Std.Date.Today();
 
-  dIdentitySlim := PROJECT(dSearchResults((lname != '' OR listed_name != '') AND typeflag != Phones.Constants.TypeFlag.DataSource_PV),
+  dIdentitySlim := PROJECT(dSearchResults,
                             TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
                                       SELF.dt_first_seen := MAP(LENGTH(TRIM(LEFT.dt_first_seen)) = 8 => (INTEGER)LEFT.dt_first_seen,
                                                                 LENGTH(TRIM(LEFT.dt_first_seen)) = 6 => (INTEGER)(LEFT.dt_first_seen + '01'),
@@ -18,7 +17,8 @@ FUNCTION
                                       SELF               := LEFT,
                                       SELF               := []));
   
-  
+  dIdentitySlimFiltered := dIdentitySlim((lname != '' OR listed_name != '') AND typeflag != Phones.Constants.TypeFlag.DataSource_PV);
+
   // Rollup
   $.Layouts.PhoneFinder.IdentitySlim tIdentityRollup($.Layouts.PhoneFinder.IdentitySlim le, $.Layouts.PhoneFinder.IdentitySlim ri) :=
   TRANSFORM
@@ -28,26 +28,36 @@ FUNCTION
     SELF                         := le;
   END;
 
-  dDIDSort   := SORT(dIdentitySlim(did != 0),
+  dDIDSort   := SORT(dIdentitySlimFiltered(did != 0),
                       acctno, did, IF(PhoneOwnershipIndicator, 0, 1), IF(typeflag != Phones.Constants.TypeFlag.DataSource_PV, 0, 1),
-                      -dt_last_seen, IF(prim_name != '', 0, 1), IF(zip != '', 0, 1));
+                      -dt_last_seen, IF(prim_name != '', 0, 1), IF(zip != '', 0, 1), RECORD);
   
   dDIDRollUp := ROLLUP(dDIDSort, tIdentityRollup(LEFT, RIGHT), acctno, did);
   
-  dNoDIDSort   := SORT(dIdentitySlim(did = 0), acctno, IF(PhoneOwnershipIndicator, 0, 1), -dt_last_seen, IF(prim_name != '', 0, 1), IF(zip != '', 0, 1), dt_first_seen, RECORD);
+  dNoDIDSort   := SORT(dIdentitySlimFiltered(did = 0), acctno, IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(prim_name != '', 0, 1), IF(zip != '', 0, 1), dt_first_seen, RECORD);
   dNoDIDRollup := ROLLUP(dNoDIDSort, tIdentityRollup(LEFT, RIGHT), EXCEPT phone, phone_source, penalt, vendor_id, src, typeflag, dt_first_seen, dt_last_seen);
   
   // Combine and dedup the data
   dIdentities := dDIDRollUp & dNoDIDRollup;
   
   // Depending on the type of search, restrict the number of records to the max counts
-  vMaxCount := IF(isPhoneSearch, iesp.Constants.Phone_Finder.MaxIdentities, iesp.Constants.Phone_Finder.MaxPhoneHistory);
+  vMaxCount := IF(~inMod.IsPrimarySearchPII, iesp.Constants.Phone_Finder.MaxIdentities, iesp.Constants.Phone_Finder.MaxPhoneHistory);
   
   dIdentityTopn := DEDUP(SORT(dIdentities, acctno, IF(did != 0, 0, 1), penalt, IF(PhoneOwnershipIndicator, 0, 1), -dt_last_seen, dt_first_seen, phone_source), acctno, KEEP(vMaxCount));
   
   // Verification logic - ONLY for Phone search
   vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);
+  
+  // Need this for calculation of phone verification if no identities present
+  dOtherRecs := JOIN( dIdentitySlim,
+                      dIdentityTopn,
+                      LEFT.acctno = RIGHT.acctno,
+                      TRANSFORM(LEFT),
+                      LEFT ONLY);
+  
+  dIdentityRecs := IF(inMod.VerifyPhoneIsActive, dIdentityTopn + dOtherRecs, dIdentityTopn);
 
+  // Input criteria
   $.Layouts.BatchIn input2Match($.Layouts.BatchInAppendDID pInput) := TRANSFORM
     SELF.z4    := pInput.zip4;
     SELF.phone := '';
@@ -56,7 +66,7 @@ FUNCTION
 
   dFormat2BatchIn := PROJECT(dInBestInfo, input2Match(LEFT));
 
-	dVerifiedIdentity := $.GetVerifiedRecs(vmod).verify(dIdentityTopn, dFormat2BatchIn);
+	dVerifiedIdentity := $.GetVerifiedRecs(vmod).verify(dIdentityRecs, dFormat2BatchIn);
     
 	doVerify := ~(inMod.IsPrimarySearchPII) AND (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
   
@@ -97,13 +107,16 @@ FUNCTION
                             LEFT OUTER,
                             LIMIT(0), KEEP(1));
 
-  dIdentitiesFinal := IF(isPhoneSearch, dIdentitiesInfo, dIdentityBestInfo);
+  dIdentitiesFinal := IF(~inMod.IsPrimarySearchPII, dIdentitiesInfo, dIdentityBestInfo);
 
   #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitySlim, NAMED('dIdentitySlim'));
+    OUTPUT(dIdentitySlimFiltered, NAMED('dIdentitySlimFiltered'));
     OUTPUT(dDIDRollUp, NAMED('dIdentityDIDRollUp'));
     OUTPUT(dNoDIDRollUp, NAMED('dIdentityNoDIDRollUp'));
     OUTPUT(dIdentityTopn, NAMED('dIdentityTopn'));
+    IF(inMod.VerifyPhoneIsActive, OUTPUT(dOtherRecs, NAMED('dOtherRecs')));
+    OUTPUT(dIdentityRecs, NAMED('dIdentityRecs'));
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'));
   #END		
   

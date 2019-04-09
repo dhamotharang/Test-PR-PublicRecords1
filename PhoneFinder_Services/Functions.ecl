@@ -581,7 +581,7 @@ MODULE
 	FUNCTIONMACRO
 		IMPORT std, ut;
 		lpf := PhoneFinder_Services.Layouts;
-		today:= (STRING)Std.Date.Today();
+		today:= Std.Date.Today();
 		dPhoneSlim := PROJECT(dIn(phone != ''),
 													TRANSFORM(lpf.PhoneFinder.PhoneSlim,
 																		SELF.orig_phone  := LEFT.batch_in.homephone,
@@ -640,10 +640,10 @@ MODULE
 			SELF.DateFirstSeen := iesp.ECL2ESP.toDate(pInput.dt_first_seen);
 			SELF.DateLastSeen  := iesp.ECL2ESP.toDate(pInput.dt_last_seen);
 			SELF.MonthsWithPhone := IF(pInput.dt_first_seen != 0 AND pInput.dt_last_seen != 0,
-															(STRING)ROUND(ut.DaysApart(((STRING)pInput.dt_last_seen)[1..6]+'01',((STRING)pInput.dt_first_seen)[1..6]+'01')/(365/12)),
+															(STRING)STD.Date.MonthsBetween(pInput.dt_first_seen, pInput.dt_last_seen),
 															'');
 			SELF.MonthsSinceLastSeen := IF(pInput.dt_last_seen != 0,
-															(STRING)ROUND(ut.DaysApart((today)[1..6]+'01',((STRING)pInput.dt_last_seen)[1..6]+'01')/(365/12)),
+															(STRING)STD.Date.MonthsBetween(pInput.dt_last_seen, today),
 															'');
 			SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;												
 			SELF.CallForwardingIndicator          := pInput.CallForwardingIndicator;
@@ -665,7 +665,7 @@ MODULE
 	// Identity info
 	EXPORT GetIdentityInfo(DATASET(lFinal) dIn,BOOLEAN isPhoneSearch) :=
 	FUNCTION
-		today:= (STRING)Std.Date.Today();
+		today:= Std.Date.Today();
 		dIdentitySlim := PROJECT(dIn((lname != '' or listed_name != '') and typeflag != Phones.Constants.TypeFlag.DataSource_PV),
 															TRANSFORM(lIdentitySlim,
 																				SELF.dt_first_seen := IF(LENGTH(TRIM(LEFT.dt_first_seen)) = 8,
@@ -679,7 +679,7 @@ MODULE
 		lIdentitySlim tIdentityRollup(lIdentitySlim le,lIdentitySlim ri) :=
 		TRANSFORM
 			SELF.dt_first_seen := ut.Min2(le.dt_first_seen, ri.dt_first_seen);
-			SELF.dt_last_seen  := IF(le.dt_last_seen <= (INTEGER)today and le.dt_last_seen >= ri.dt_last_seen,
+			SELF.dt_last_seen  := IF(le.dt_last_seen <= today and le.dt_last_seen >= ri.dt_last_seen,
 																le.dt_last_seen,
 																ri.dt_last_seen);
 			SELF.PhoneOwnershipIndicator := le.PhoneOwnershipIndicator or ri.PhoneOwnershipIndicator;												
@@ -730,10 +730,10 @@ MODULE
 			SELF.FirstSeenWithPrimaryPhone         := iesp.ECL2ESP.toDate(pInput.dt_first_seen);
 			SELF.LastSeenWithPrimaryPhone          := iesp.ECL2ESP.toDate(pInput.dt_last_seen);
 			SELF.TimeWithPrimaryPhone              := IF(pInput.dt_first_seen != 0 and pInput.dt_last_seen != 0,
-																								(STRING)ROUND(ut.DaysApart(((STRING)pInput.dt_last_seen)[1..6]+'01',((STRING)pInput.dt_first_seen)[1..6]+'01')/(365/12)),
+																								(STRING)STD.Date.MonthsBetween(pInput.dt_first_seen, pInput.dt_last_seen),
 																										'');
 			SELF.TimeSinceLastSeenWithPrimaryPhone := IF(pInput.dt_last_seen != 0,
-																									(STRING)ROUND(ut.DaysApart((today)[1..6]+'01',((STRING)pInput.dt_last_seen)[1..6]+'01')/(365/12)),
+																									(STRING)STD.Date.MonthsBetween(pInput.dt_last_seen, today),
 																										'');
 			SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
 			SELF                                   := pInput;
@@ -762,6 +762,9 @@ MODULE
     // Identities section
     iesp.phonefinder.t_PhoneIdentityInfo tFormat2IespIdentity(lFinal pInput) :=
     TRANSFORM
+      dt_first_seen := (INTEGER)pInput.dt_first_seen;
+      dt_last_seen  := (INTEGER)pInput.dt_last_seen;
+
       vFullName      := IF( pInput.fname != '' or pInput.lname != '',
                             Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
                             pInput.listed_name);
@@ -786,20 +789,21 @@ MODULE
                                                                         vCityStZip);
       SELF.PrimaryAddressType								 := pInput.primary_address_type;																				
       SELF.RecordType												 := pInput.TNT;																				
-      SELF.FirstSeenWithPrimaryPhone         := iesp.ECL2ESP.toDatestring8(pInput.dt_first_seen);
-      SELF.LastSeenWithPrimaryPhone          := iesp.ECL2ESP.toDatestring8(pInput.dt_last_seen);
-      SELF.TimeWithPrimaryPhone              := IF((INTEGER)pInput.dt_first_seen != 0 and (INTEGER)pInput.dt_last_seen != 0,
-                                                    (STRING)ROUND(ut.DaysApart(pInput.dt_last_seen[1..6] + '01', pInput.dt_first_seen[1..6] + '01')/(365/12)),
+      SELF.FirstSeenWithPrimaryPhone         := iesp.ECL2ESP.toDate(dt_first_seen);
+      SELF.LastSeenWithPrimaryPhone          := iesp.ECL2ESP.toDate(dt_last_seen);
+      SELF.TimeWithPrimaryPhone              := IF(dt_first_seen != 0 AND dt_last_seen != 0,
+                                                    (STRING)STD.Date.MonthsBetween(dt_first_seen, dt_last_seen),
                                                     '');
-      SELF.TimeSinceLastSeenWithPrimaryPhone := IF((INTEGER)pInput.dt_last_seen != 0,
-                                                    (STRING)ROUND(ut.DaysApart((today)[1..6] + '01', pInput.dt_last_seen[1..6] + '01')/(365/12)),
+      SELF.TimeSinceLastSeenWithPrimaryPhone := IF(dt_last_seen != 0,
+                                                    (STRING)STD.Date.MonthsBetween(dt_last_seen, today),
                                                     '');
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
       SELF                                   := pInput;
     END;
 
-    dIdentitiesIesp := PROJECT(SORT(dIn(fname != '' OR lname != '' OR listed_name != ''), IF(PhoneOwnershipIndicator, 0, 1), IF(did != 0, 0, 1), -(INTEGER)dt_last_seen),
-                                tFormat2IespIdentity(LEFT));
+    dIdentities := IF(inMod.isPrimarySearchPII, dIn(isPrimaryIdentity), dIn);
+
+    dIdentitiesIesp := PROJECT(dIdentities(fname != '' OR lname != '' OR listed_name != ''), tFormat2IespIdentity(LEFT));
 
     // Primary phone section
     iesp.phonefinder.t_PhoneFinderDetailedInfo tFormat2IespPrimaryPhone(lFinal pInput) :=
@@ -815,11 +819,12 @@ MODULE
 			Phone_Status                          := pInput.PhoneStatus;
 			SELF.ActivationDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));			
 			SELF.DisconnectDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
-			SELF.PortingHistory                   := PROJECT(pInput.PortingHistory,
-                                                        TRANSFORM(iesp.phonefinder.t_PortingHistory,
-                                                                  SELF.PortStartDate := iesp.ECL2ESP.toDate(LEFT.PortStartDate),
-                                                                  SELF.PortEndDate   := iesp.ECL2ESP.toDate(LEFT.PortEndDate),
-                                                                  SELF               := LEFT));			
+			SELF.PortingHistory                   := CHOOSEN(PROJECT(pInput.PortingHistory,
+                                                                TRANSFORM(iesp.phonefinder.t_PortingHistory,
+                                                                          SELF.PortStartDate := iesp.ECL2ESP.toDate(LEFT.PortStartDate),
+                                                                          SELF.PortEndDate   := iesp.ECL2ESP.toDate(LEFT.PortEndDate),
+                                                                          SELF               := LEFT)),
+                                                        iesp.Constants.Phone_Finder.MaxPorts);
 			SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
@@ -834,23 +839,25 @@ MODULE
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
                                                                   SELF.FirstSpoofedDate 	:= iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
                                                                   SELF.LastSpoofedDate  	:= iesp.ECL2ESP.toDate(LEFT.LastSpoofedDate),
-                                                                  SELF:=LEFT));		
+                                                                  SELF:=LEFT));
 			SELF.SpoofingData.FirstEventSpoofedDate := iesp.ECL2ESP.toDate(pInput.FirstEventSpoofedDate);																																				
 			SELF.SpoofingData.LastEventSpoofedDate  := iesp.ECL2ESP.toDate(pInput.LastEventSpoofedDate);																																				
 			SELF.SpoofingData.TotalSpoofedCount 	  := pInput.TotalSpoofedCount;
-			SELF.SpoofingData.SpoofingHistory	 		  := PROJECT(pInput.SpoofingHistory,
-                                                          TRANSFORM(iesp.phonefinder.t_SpoofHistory,
-                                                                    SELF.EventDate := iesp.ECL2ESP.toDatestring8(LEFT.EventDate),
-                                                                    SELF           := LEFT));	
+			SELF.SpoofingData.SpoofingHistory	 		  := CHOOSEN(PROJECT(pInput.SpoofingHistory,
+                                                                  TRANSFORM(iesp.phonefinder.t_SpoofHistory,
+                                                                            SELF.EventDate := iesp.ECL2ESP.toDatestring8(LEFT.EventDate),
+                                                                            SELF           := LEFT)),
+                                                          iesp.Constants.Phone_Finder.MaxSpoofs);
 			SELF.OneTimePassword.FirstOTPDate			:= iesp.ECL2ESP.toDate(pInput.FirstOTPDate);
 			SELF.OneTimePassword.LastOTPDate			:= iesp.ECL2ESP.toDate(pInput.LastOTPDate);
 			SELF.OneTimePassword.OTP							:= pInput.OTP;
 			SELF.OneTimePassword.OTPCount					:= pInput.OTPCount;
 			SELF.OneTimePassword.LastOTPStatus		:= pInput.LastOTPStatus;
-			SELF.OneTimePassword.OTPHistory	 			:= PROJECT(pInput.OTPHistory,
-                                                        TRANSFORM(iesp.phonefinder.t_OTPHistory,
-                                                                  SELF.EventDate := iesp.ECL2ESP.toDatestring8(LEFT.EventDate),
-                                                                  SELF           := LEFT));
+			SELF.OneTimePassword.OTPHistory	 			:= CHOOSEN(PROJECT(pInput.OTPHistory,
+                                                                TRANSFORM(iesp.phonefinder.t_OTPHistory,
+                                                                          SELF.EventDate := iesp.ECL2ESP.toDatestring8(LEFT.EventDate),
+                                                                          SELF           := LEFT)),
+                                                        iesp.Constants.Phone_Finder.MaxOTPs);
 			SELF.PhoneStatus                      := Phone_Status;
 			SELF.MSA                              := pInput.RealTimePhone_Ext.MetroStatAreaCode;
 			SELF.CMSA                             := pInput.RealTimePhone_Ext.ConsMetroStatAreaCode;
@@ -897,6 +904,9 @@ MODULE
     // Other phones
     iesp.phonefinder.t_PhoneFinderInfo tFormat2IespOtherPhones(lFinal pInput) :=
     TRANSFORM
+      dt_first_seen := (INTEGER)pInput.dt_first_seen;
+      dt_last_seen  := (INTEGER)pInput.dt_last_seen;
+
       SELF.Number                  := pInput.phone;
 			SELF._Type                   := pInput.coc_description;
 			SELF.Carrier                 := pInput.carrier_name;
@@ -913,13 +923,13 @@ MODULE
                                                               pInput.unit_desig,pInput.sec_range,
                                                               pInput.city_name,pInput.st,pInput.zip,
                                                               pInput.zip4,pInput.county_name);
-			SELF.DateFirstSeen           := iesp.ECL2ESP.toDatestring8(pInput.dt_first_seen);
-			SELF.DateLastSeen            := iesp.ECL2ESP.toDatestring8(pInput.dt_last_seen);
-			SELF.MonthsWithPhone         := IF((INTEGER)pInput.dt_first_seen != 0 AND (INTEGER)pInput.dt_last_seen != 0,
-                                        (STRING)ROUND(ut.DaysApart(pInput.dt_last_seen[1..6]+'01',pInput.dt_first_seen[1..6]+'01')/(365/12)),
+			SELF.DateFirstSeen           := iesp.ECL2ESP.toDate(dt_first_seen);
+			SELF.DateLastSeen            := iesp.ECL2ESP.toDate(dt_last_seen);
+			SELF.MonthsWithPhone         := IF(dt_first_seen != 0 AND dt_last_seen != 0,
+                                        (STRING)STD.Date.MonthsBetween(dt_first_seen, dt_last_seen),
                                         '');
-			SELF.MonthsSinceLastSeen     := IF( (INTEGER)pInput.dt_last_seen != 0,
-															            (STRING)ROUND(ut.DaysApart((today)[1..6]+'01',pInput.dt_last_seen[1..6]+'01')/(365/12)),
+			SELF.MonthsSinceLastSeen     := IF( dt_last_seen != 0,
+															            (STRING)STD.Date.MonthsBetween(dt_last_seen, today),
 															            '');
 			SELF.PhoneOwnershipIndicator := pInput.PhoneOwnershipIndicator;												
 			SELF.CallForwardingIndicator := pInput.CallForwardingIndicator;
@@ -937,16 +947,17 @@ MODULE
     iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
     TRANSFORM
       // Check if the IF statement is needed
-      SELF.Identities          := IF(inMod.isPrimarySearchPII, DATASET(dIdentitiesIesp[1]), dIdentitiesIesp);
-      SELF.PrimaryPhoneDetails := dPrimaryPhoneIesp[1];
+      SELF.Identities          := CHOOSEN(dIdentitiesIesp, iesp.Constants.Phone_Finder.MaxIdentities);
+      SELF.PrimaryPhoneDetails := IF(EXISTS(dPrimaryPhoneIesp), dPrimaryPhoneIesp[1]);
       SELF.PhonesHistory       := IF(inMod.isPrimarySearchPII,
-                                      PROJECT(dIdentitiesIesp[2..],
-                                              TRANSFORM(iesp.phonefinder.t_PhoneFinderHistory,
-                                                        SELF.Address   := LEFT.RecentAddress,
-                                                        SELF.FirstSeen := LEFT.FirstSeenWithPrimaryPhone,
-                                                        SELF.LastSeen  := LEFT.LastSeenWithPrimaryPhone,
-                                                        SELF           := LEFT)));
-      SELF.OtherPhones         := IF(inMod.isPrimarySearchPII, dOtherPhonesIesp);
+                                      CHOOSEN(PROJECT(dIdentitiesIesp,
+                                                      TRANSFORM(iesp.phonefinder.t_PhoneFinderHistory,
+                                                                SELF.Address   := LEFT.RecentAddress,
+                                                                SELF.FirstSeen := LEFT.FirstSeenWithPrimaryPhone,
+                                                                SELF.LastSeen  := LEFT.LastSeenWithPrimaryPhone,
+                                                                SELF           := LEFT)),
+                                              iesp.Constants.Phone_Finder.MaxOtherPhones));
+      SELF.OtherPhones         := IF(inMod.isPrimarySearchPII, CHOOSEN(dOtherPhonesIesp, iesp.Constants.Phone_Finder.MaxPhoneHistory));
     END;
     
     dFormat2PhoneFinderSearch := DATASET([tFormat2PhoneFinderSearch()]);
@@ -955,7 +966,7 @@ MODULE
     #IF(PhoneFinder_Services.Constants.Debug.Main)
       OUTPUT(dIdentitiesIesp, NAMED('dIdentitiesIesp'));
       OUTPUT(dPrimaryPhoneIesp, NAMED('dPrimaryPhoneIesp'));
-      OUTPUT(dOtherPhonesIesp, NAMED('dOtherPhonesIesp'));
+      IF(inMod.isPrimarySearchPII, OUTPUT(dOtherPhonesIesp, NAMED('dOtherPhonesIesp')));
     #END
 
 		RETURN dFormat2PhoneFinderSearch;
