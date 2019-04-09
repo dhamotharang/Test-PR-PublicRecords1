@@ -1,4 +1,4 @@
-﻿import VersionControl,_Control;
+﻿import VersionControl,_Control,std;
 
 export Spray(string ver) := module
 
@@ -12,7 +12,7 @@ export load := DATASET([
  	,'3775'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_load_' + ver    
  	,[{'~thor_data400::in::FCRA::ExperianCred_load'}]    
- 	,'thor400_66'
+ 	,std.system.job.target()
 	,ver
 	,'S[0-9]{3}'
  	}
@@ -25,10 +25,9 @@ export Updates := DATASET([
  	,'3775'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_updates_' + ver
  	,[{'~thor_data400::in::FCRA::ExperianCred_updates'}]    
- 	,'thor400_66'
+ 	,std.system.job.target()
 	,ver
-	,'S[0-9]{3}'
- 	}
+	,'S[0-9]{3}' 	}
 ], VersionControl.Layout_Sprays.Info);
 
 export Deletes := DATASET([
@@ -38,7 +37,7 @@ export Deletes := DATASET([
  	,'101'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_deletes_' + ver    
  	,[{'~thor_data400::in::FCRA::ExperianCred_deletes'}]    
- 	,'thor400_66'
+ 	,std.system.job.target()
 	,ver
  	}
 ], VersionControl.Layout_Sprays.Info);
@@ -50,7 +49,7 @@ export Deceased := DATASET([
  	,'101'                                                             
  	,'~thor_data400::in::FCRA::ExperianCred_deceased_' + ver    
  	,[{'~thor_data400::in::FCRA::ExperianCred_deceased'}]    
- 	,'thor400_66'
+ 	,std.system.job.target()
 	,ver
  	}
 ], VersionControl.Layout_Sprays.Info);

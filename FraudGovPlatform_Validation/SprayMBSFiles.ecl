@@ -1,4 +1,4 @@
-﻿import tools, _control,lib_thorlib, FraudShared, FraudGovPlatform, Scrubs_MBS;
+﻿import tools, _control,lib_thorlib, FraudShared, FraudGovPlatform, Scrubs_MBS, ut;
 
 export SprayMBSFiles(
 	 string pversion
@@ -10,9 +10,9 @@ function
 	pMBSFDNServerIP := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 	pMBSFDNDirectory := IF (_control.ThisEnvironment.Name <> 'Prod_Thor', Constants.FDNMBSLandingZonePathBase_dev, Constants.FDNMBSLandingZonePathBase_prod);
 	pFilenameMBSmarketAppend := '*fdn_market*txt';
-	yesterday_date := (unsigned)pVersion[1..8] - 1;
+	yesterday_date := (unsigned) ut.date_math(pVersion[1..8], -1);
 	pFilenameMBSFdnCCID := 'mbsi_fdn_accounts_' + (string)yesterday_date + '*';
-	pFilenameMBSFdnHHID := '*hhid_fdn_accounts.txt';
+	pFilenameMBSFdnHHID := '*hhid_fdn_accounts.csv';
 	pGroupName := thorlib.group();
 	pIsTesting := false;
 	pOverwrite :=  true;
