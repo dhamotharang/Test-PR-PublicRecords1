@@ -311,6 +311,7 @@ MODULE
 			STRING1   typeflag;
 			STRING10  orig_phone;
 			STRING10  phone;
+			STRING2	  phone_state;
 			STRING60  carrier_name;
 			STRING50  phone_region_city;
 			STRING2   phone_region_st;

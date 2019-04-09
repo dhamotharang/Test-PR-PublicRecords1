@@ -8,6 +8,7 @@ FUNCTION
   dPhoneSlim := PROJECT(dSearchResults(phone != ''),
                         TRANSFORM($.Layouts.PhoneFinder.PhoneSlim,
                                   SELF.orig_phone    := LEFT.batch_in.homephone,
+                                  SELF.phone_state   := LEFT.phoneState,
                                   SELF.ListingType   := $.Functions.GetListingType( LEFT.RealTimePhone_Ext.ListingType,
                                                                                     LEFT.listing_type_bus,
                                                                                     LEFT.listing_type_gov,

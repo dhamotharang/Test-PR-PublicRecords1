@@ -88,7 +88,7 @@ FUNCTION
                                 26 => EXISTS(pInput.SpoofingHistory(phoneOrigin = $.Constants.SpoofPhoneOrigin.DESTINATION AND STD.Date.DaysBetween((UNSIGNED)EventDate, currentDate) <= le.Threshold)),
                                 27 => EXISTS(pInput.SpoofingHistory(phoneOrigin = $.Constants.SpoofPhoneOrigin.SPOOFED AND STD.Date.DaysBetween((UNSIGNED)EventDate, currentDate) <= le.Threshold)),
                                 28 => pInput.deceased = 'Y',
-                                29 => pInput.st<> '' AND pInput.PhoneState <> pInput.st,
+                                29 => pInput.st <> '' AND pInput.PhoneState <> pInput.st,
                                 30 => COUNT(pInput.InquiryDates(STD.Date.DaysBetween((UNSIGNED)inquiryDate, currentDate) <= le.Threshold)) + pInput.RecordsReturned >= MAX(le.ThresholdA, $.Constants.InquiryDayLimit),
                                 31 => pInput.CallForwardingIndicator = $.Functions.CallForwardingDesc(1),
                                 32 => dt_first_seen = 0,
