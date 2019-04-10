@@ -54,7 +54,6 @@ EXPORT IParam := MODULE
 		EXPORT boolean OFAC;
 		EXPORT boolean	IncludeTargus;	
 		EXPORT boolean IncludeTargus3220;
-		EXPORT boolean ln_branded_value;
 		EXPORT unsigned1 RedFlag_version;		
 		EXPORT unsigned actualIIDVersion;
 		EXPORT	unsigned3 history_date;			
@@ -132,7 +131,6 @@ EXPORT IParam := MODULE
 			EXPORT boolean OFAC := FraudGovPlatform_Services.Constants.ofac;
 			EXPORT boolean	IncludeTargus := TRUE	: STORED('Targus');	
 			EXPORT boolean IncludeTargus3220 := FALSE : STORED('IncludeTargusE3220');
-			EXPORT boolean ln_branded_value := FALSE : STORED('LnBranded');
 			EXPORT unsigned1 RedFlag_version := 1 : STORED('RedFlag_version');		
 			EXPORT	unsigned3 history_date := 999999 : STORED('HistoryDateYYYYMM');			
 			EXPORT string3 NameInputOrder := '' : STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser

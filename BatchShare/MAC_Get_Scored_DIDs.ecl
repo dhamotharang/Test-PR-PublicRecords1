@@ -3,7 +3,7 @@
 //You also need to pass in a standard restriction interface including the score threshold.
 //This Macro expects the input acctno to be an integer, so run MAC_SequenceInput before this macro
 EXPORT MAC_Get_Scored_DIDs(ds_in_batch,in_mod,usePhone=false,phone_Field='phoneno') := FUNCTIONMACRO
-	IMPORT DidVille,AutoStandardI,BatchDatasets,ut;
+	IMPORT DidVille,BatchDatasets;
 	
 	DidVille.Layout_Did_OutBatch prepare_layout(RECORDOF(ds_in_batch) l) := TRANSFORM
 		 SELF.seq 		:= (UNSIGNED)l.acctno;
