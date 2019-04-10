@@ -7,7 +7,7 @@ END;
 
 EXPORT fDeprecate_Fields_Hunting_Fishing(DATASET(hunt_rec) pHuntFish) := FUNCTION
         
-     // DF- - Blank out fields in FCRA file thor_data400::key::override::fcra::hunting_fishing::qa::ffid
+     // DF-22645 - Blank out fields in FCRA file thor_data400::key::override::fcra::hunting_fishing::qa::ffid
      fields_to_clear  := 'ace_fips_st,active_other,active_status,agecat,antelope,anterless,archery,bear,' +
                       'biggame,bighorn,blind,bonus,buffalo,combosuper,cougar,crewmemeber,' +
                       'day1,day14to15,day3,day7,dayfiller,deer,disabled,drawing,' +

@@ -13,6 +13,5 @@ FCRA.Mac_Replace_Records(kf,dailyds_thrive,persistent_record_id,replaceds);
 replaceds_dep := FCRA.fDeprecate_Fields_Thrive(replaceds);  //Field deprecation 
 
 export thrive := index(replaceds_dep,{flag_file_id}, {replaceds_dep},
-// export thrive := index(replaceds,{flag_file_id}, {replaceds_dep},
 	keyname_prefix + 'Thrive::qa::ffid', OPT);
 END;
