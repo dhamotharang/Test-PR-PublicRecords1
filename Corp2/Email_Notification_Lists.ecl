@@ -3,10 +3,10 @@ export Email_Notification_Lists :=
 module
 	shared emailaddressep := if(Corp2.IsTesting, ',', ';');
 	
-	export all_hands := 'michael.gould@lexisnexis.com' 						
+	export all_hands := 'kevin.reeder@lexisnexisrisk.com' 						
 											+ emailaddressep +	'julie.ellison@lexisnexisrisk.com' 		
 											+ emailaddressep +	'julianne.franzer@lexisnexisrisk.com' 
-											+ emailaddressep +  'kevin.reeder@lexisnexisrisk.com'
+											+ emailaddressep +  'gregory.rose@lexisnexisrisk.com'
 											+ emailaddressep +  'audra.mireles@lexisnexisrisk.com'
 											+ emailaddressep +  'saritha.myana@lexisnexisrisk.com'
 											+ emailaddressep +  'rosemary.murphy@lexisnexisrisk.com'
@@ -36,7 +36,7 @@ module
 		
 	export Scrubs := 
 		if(Flags.IsTesting
-			,'julianne.franzer@lexisnexis.com' + emailaddressep + _control.MyInfo.EmailAddressNotify
+			,'julianne.franzer@lexisnexisrisk.com' + emailaddressep + _control.MyInfo.EmailAddressNotify
 			,allScrubs
 		);		
 	
