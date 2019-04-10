@@ -198,4 +198,6 @@ EXPORT Layout_Basefile := record
 	unsigned1  record_type;
 	string1		history_flag:='';
 	AID.Common.xAID		RawAID;
+	unsigned4 global_sid;
+  unsigned8 record_sid; 
 end;

@@ -45,7 +45,6 @@ built := sequential(
 						,FileServices.ClearSuperFile(Superfile_List.Source_delete_File, true)
 					,FileServices.FinishSuperFileTransaction()
 					,DEL_EXT_FILE
-					,Orbit3.Proc_Orbit3_CreateBuild_npf('Credit Header',ver)
 					);
 
 return built;

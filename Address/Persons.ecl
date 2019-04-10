@@ -55,7 +55,7 @@ shared rgxFMML := '^' + rgxBasic + ' +([A-Z]+) +([A-Z]+) +('  + rgxLast +  ')$';
 shared rgxFMiMiL := '^' + rgxBasic + ' +([A-Z]) +([A-Z]) +('  + rgxLast +  ')$';
 shared rgxLFMiM := '^' + rgxBasic + ' +([A-Z]+) +([A-Z]) +'  + rgxBasic +  '$';
 shared rgxLFMiMi := '^(' + rgxLast + ') +([A-Z]+) +([A-Z] +[A-Z])$';
-shared rgxFMMLS := '^' + rgxBasic + ' +([A-Z]+) +[A-Z]+ +('  + rgxLast +  ') +' + rgxSuffix + '$';
+shared rgxFMMLS := '^' + rgxBasic + ' +([A-Z]+) +([A-Z]+) +('  + rgxLast +  ') +' + rgxSuffix + '$';
 
 shared rgxLFcMi := '^(' + rgxLast + ') +([A-Z]+) *, *([A-Z])$';
 
@@ -860,7 +860,7 @@ export boolean IsLastNameEx(string name) := MAP(
 	REGEXFIND('[A-Z](ITO|ELLI|ANO|ONA|TINI|ACCI|ETTO|COLA|ENCIO|ENZO|ENTO|ETTI|AGNI|ISTA|UCCI|UZZO|DELLA)$',name) AND NOT NameTester.IsFirstName(name) => true,	// possible italian name
 	REGEXFIND('[B-DF-HJ-NP-TVWXZ]{7,}',name) => false,	// consecutive consonants
 	name[1] = 'O' AND NameTester.IsLastName(name[2..]) => true,
-	NameTester.IsLastName(REGEXFIND('^(O|DU|VAN|DE|DI)([A-Z]{2,})$',name,2)) => true,
+	NameTester.IsLastName(REGEXFIND('^(O|DU|VAN|DE|DI)([A-Z]{2,})$',name,2)) AND name <> 'DEBORAH' => true,
 	//name[1..2] = 'MC' AND IsLastName(name[3..]) => true,
 	REGEXFIND('^(MAC|MC)[A-Z]{2,}$',name) => true,		// scottish prefixes
 	//REGEXFIND('[B-DF-HJ-NP-TVWXZ](A|E|I|O)$',name) AND NOT IsFirstName(name) => true,	// possible name ending
@@ -1324,8 +1324,8 @@ shared string1 GetNameOrderFMiL(string rgx, string s, integer2 posf1, integer2 p
 				InvalidLastName(REGEXFIND(rgx, s, posl1)) => 'L',
 				InvalidLastName(REGEXFIND(rgx, s, posl2)) => 'F',
 				//LENGTH(REGEXFIND(rgx, s, posl1)) = 1 => 'F',
-				segs in ['FL','BL','FB','FX','FF','XL','BF','XB'] => 'F',
-				segs in ['LF','LB','XF'] => 'L',
+				segs in ['FL','BL','FB','FX','FF','XL','XB'] => 'F',
+				segs in ['LF','LB','XF'] => 'L',		//,'BF' leads to too many name reversals
 				segs = 'LX' => IF(NameTester.IsLoPctFirstName(REGEXFIND(rgx, s, posf1)), 'F', 'L'), 
 				clue in ['l','L'] => 'L',	// LL XX BX BB
 				'F'		// LL XX BX BB
@@ -1339,6 +1339,7 @@ shared string1 GetNameOrderFMiL(string rgx, string s, integer2 posf1, integer2 p
 				IsLastNameExOrHyphenated(REGEXFIND(rgx, s, posl2)) => 'L',
 				'F'*/
 			);
+
 END;
 		
 shared string1 GetNameOrderFL(string rgx, string s, integer2 posf1, integer2 posf2, 
@@ -1447,6 +1448,12 @@ shared string CompoundName(string rgx, string s, integer part1, integer part2) :
 			 name1 + ' ' + name2, name1),LEFT,RIGHT);
 END;
 
+shared string CompoundName2(string rgx, string s, integer part1, integer part2) := FUNCTION
+	name1 := TRIM(REGEXFIND(rgx, s, part1),left,right);
+	name2 := TRIM(REGEXFIND(rgx, s, part2),left,right);
+	RETURN TRIM(name1 + ' ' + name2,LEFT,RIGHT);
+END;
+
 firstPartOnly(string s) := s;
 //		IF(REGEXFIND(' ', TRIM(s,LEFT,RIGHT)),
 //				REGEXFIND('^([A-Z\'-]+)', s, 1), s);
@@ -1516,10 +1523,10 @@ shared string65 FormatNameFLS(string rgx, string name, integer fn, integer lnm, 
 	FilterLName(REGEXFIND(rgx, name, lnm)) +
 	(string5)genToAlpha(TRIM(REGEXFIND(rgx, name, sn),LEFT,RIGHT));
 
-shared string65 FormatNameFML(string rgx, string name, integer fn, integer mn, integer lnm) := 
+shared string65 FormatNameFML(string rgx, string name, integer fn, integer mn, integer lnm, string1 initial='') := 
 	(string20)TRIM(REGEXFIND(rgx, name, fn),LEFT,RIGHT) +
 	(string20)FilterMName(TRIM(REGEXFIND(rgx, name, mn),LEFT,RIGHT)) +
-	FilterLName(REGEXFIND(rgx, name, lnm)) +
+	(string20)TRIM(initial+FilterLName(REGEXFIND(rgx, name, lnm)),left,right) +
 	blank5;
 	
 shared string65 GetFormatNameFML(string rgx, string s, integer fn, integer mn, integer lnm, string1 clue='U') := 
@@ -1587,9 +1594,15 @@ shared string65 FormatNameFMML(string rgx, string name, integer fn, integer mn, 
 	blank5;
 END;
 
-shared string65 FormatNameFMLS(string rgx, string name, integer fn, integer mn, integer lnm, integer sn) := 
+shared string65 FormatNameFMLS(string rgx, string name, integer fn, integer mn, integer lnm, integer sn, string1 initial='') := 
 	(string20)REGEXFIND(rgx, name, fn) +
 	(string20)FilterMName(REGEXFIND(rgx, name, mn)) +
+	(string20)TRIM(initial+FilterLName(REGEXFIND(rgx, name, lnm)),left,right) +
+	(string5)genToAlpha(REGEXFIND(rgx, name, sn));
+	
+shared string65 FormatNameFMMLS(string rgx, string name, integer fn, integer mn, integer mn2, integer lnm, integer sn) := 
+	(string20)REGEXFIND(rgx, name, fn) +
+	(string20)CompoundName2(rgx, name, mn, mn2) +
 	FilterLName(REGEXFIND(rgx, name, lnm)) +
 	(string5)genToAlpha(REGEXFIND(rgx, name, sn));
 	
@@ -1664,18 +1677,28 @@ export string70 FormatName(string s, NameFormat fmt = 0, string1 clue='U') := FU
 									)),
 			NameFormat.FMiMiL =>	IF(IsSureSuffix(REGEXFIND(rgxFMiMiL, s, 1)),
 														FormatNameFMLS(rgxFMiMiL, s, 2, 3, 4, 1),
-														FormatNameFML(rgxFMiMiL, s, 1, 2, 4)),
+															IF(TRIM(REGEXFIND(rgxFMiMiL, s, 3)) = 'O',
+																FormatNameFML(rgxFMiMiL, s, 1, 2, 4, 'O'),
+																FormatNameFML(rgxFMiMiL, s, 1, 2, 4)
+															)
+														),
 			NameFormat.LFMiMi =>	FormatNameFML(rgxLFMiMi,s, 4, 5, 1),
 			NameFormat.LFMiM =>		CASE(GetNameOrderFML(rgxLFMiM, s, 1, 2, 4, 1, 'U', 2, 4),
-										'F' => FormatNameFML(rgxLFMiM, s, 1, 3, 4),
+										'F' => IF(TRIM(REGEXFIND(rgxLFMiM, s, 3))='O',
+														FormatNameFML(rgxLFMiM, s, 1, 2, 4, 'O'),
+														FormatNameFML(rgxLFMiM, s, 1, 2, 4)
+													),
 										'L' => FormatNameFML(rgxLFMiM, s, 2, 4, 1),
 										'U' => FormatNameFML(rgxLFMiM, s, 4, 1, 2),
 										FormatNameFML(rgxLFMiM,s, 1, 3, 4)
 									),
-			NameFormat.FMML =>	IF(REGEXFIND(rgxFMML, s, 1)='O',
-														FormatNameFMLL(rgxFMML, s, 3, 4, 1, 2),
+			NameFormat.FMML =>	IF(TRIM(REGEXFIND(rgxFMML, s, 3))='O',
+														FormatNameFML(rgxFMML, s, 1, 2, 4, 'O'),
 														FormatNameFMML(rgxFMML, s, 1, 2, 3, 4)),
-			NameFormat.FMMLS =>		FormatNameFMLS(rgxFMMLS, s, 1, 2, 3, 6),
+			NameFormat.FMMLS =>	IF(TRIM(REGEXFIND(rgxFMMLS, s, 3))='O',
+														FormatNameFMLS(rgxFMMLS, s, 1, 2, 4, 7, 'O'),
+														FormatNameFMMLS(rgxFMMLS, s, 1, 2, 3, 4, 7)
+													),
 			NameFormat.FMSL =>		FormatNameFMLS(rgxFMSL, s, 1, 2, 4, 3),
 			NameFormat.LFiMi =>		FormatNameFML(rgxLFiMi, s, 4, 5, 1),
 			NameFormat.LFMi =>		CASE(GetNameOrderLFMi(rgxLFMi, s, 4, 1),
@@ -1866,7 +1889,7 @@ export string70 FormatName1(string s, NameFormat fmt = 0, string1 clue='U') := F
 			NameFormat.FLaFM =>		FormatNameFL(rgxFLaFM, s, 1, 2),
 			NameFormat.FSaFL =>		FormatNameFLS(rgxFSaFL, s, 1, 5, 2),
 			NameFormat.FMLaFML  =>	FormatNameFML(rgxFMLaFML, s, 1, 2, 3),
-			NameFormat.FMLaFML2  =>	CASE(GetNameOrderFML(rgxFMLcFML, s, 1, 3, 3, 1, 'U', 2, 3),
+			NameFormat.FMLaFML2  =>	CASE(GetNameOrderFML(rgxFMLaFML2, s, 1, 3, 3, 1, 'U', 2, 3),
 																'F' => FormatNameFML(rgxFMLaFML2, s, 1, 2, 3),
 																'L' => FormatNameFML(rgxFMLaFML2, s, 2, 3, 1),
 																'U' => FormatNameFML(rgxFMLaFML2, s, 3, 1, 2),
@@ -2045,7 +2068,7 @@ export string70 FormatName2(string s, NameFormat fmt = 0) := FUNCTION
 			NameFormat.FLaFM =>		FormatNameFML(rgxFLaFM, s, 6, 8, 2),
 			NameFormat.FSaFL =>		FormatNameFL(rgxFSaFL, s, 4, 5),
 			NameFormat.FMLaFML  =>	FormatNameFML(rgxFMLaFML, s, 7, 8, 3),
-			NameFormat.FMLaFML2  =>	CASE(GetNameOrderFML(rgxFMLcFML, s, 7, 8, 9, 7, 'U', 8, 9),
+			NameFormat.FMLaFML2  =>	CASE(GetNameOrderFML(rgxFMLaFML2, s, 7, 8, 9, 7, 'U', 8, 9),
 																'F' => FormatNameFML(rgxFMLaFML2, s, 7, 8, 9),
 																'L' => FormatNameFML(rgxFMLaFML2, s, 8, 9, 7),
 																'U' => FormatNameFML(rgxFMLaFML2, s, 9, 7, 8),
@@ -2366,11 +2389,12 @@ export boolean ValidDualName(string s, integer2 format) := FUNCTION
 	fname2 := TRIM(fullname[76..95]);
 	lname := TRIM(fullname[46..65]);
 	lname2 := TRIM(fullname[116..135]);
-/*	segs := ExtractNameTypes4(rgxFaFML, s, 1, 4, 5, 6);
-	ord := GetNameOrderNNaNN(segs);
-OUTPUT('Format: ' + WhichFormat(format));
+//	segs := ExtractNameTypes4(rgxFaFML, s, 1, 4, 5, 6);
+//	ord := GetNameOrderNNaNN(segs);
+/*OUTPUT('Format: ' + WhichFormat(format));
+OUTPUT('Fullname: ' + fullname);
 OUTPUT('ValidDualName: fname ' + fname + ' lname ' + lname + ' name2: ' + fname2 + ' * ' + lname2);
-OUTPUT('segs ' + segs + ' order ' + ord);
+//OUTPUT('segs ' + segs + ' order ' + ord);
 OUTPUT(NameTester.IsFirstName(FName) OR NameTester.IsFirstName(FName2) 
 				OR IsLastNameConfirmed(LName));*/
 	return MAP (

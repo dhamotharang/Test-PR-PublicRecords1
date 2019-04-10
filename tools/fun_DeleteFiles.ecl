@@ -1,4 +1,4 @@
-/*2015-09-24T21:56:10Z (lbentley_prod)
+﻿/*2015-09-24T21:56:10Z (lbentley_prod)
 C:\Users\bentlela\AppData\Roaming\HPCC Systems\eclide\lbentley_prod\prod_run_build\tools\fun_DeleteFiles\2015-09-24T21_56_10Z.ecl
 */
 ////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ Tools.fun_DeleteFiles(
 ////////////////////////////////////////////////////////////////////////////
 #option ('globalAutoHoist', false);	// added because of bug 28526
 #option('maxLength', 131072); 				// have to increase for the remote directory child datasets
-import ut,wk_ut;
+import ut,wk_ut,WsDFU;
 
 export fun_DeleteFiles(
 	 string			pOwner							= ''		// regex to filter the file owner
@@ -158,14 +158,15 @@ function
   // ------------------------
   // -- examine skews
   // ------------------------
+  lay_dfuparts := recordof(WsDFU.GetFileParts());
   
-  add_Skews := project(largest,transform({recordof(largest),dataset(wk_ut.get_DFUInfo().Parts_Lay) DfuPartsInfo },
+  add_Skews := project(largest,transform({recordof(largest),dataset(lay_dfuparts) DfuPartsInfo },
      self               := left                                       ;
-     self.DfuPartsInfo  := wk_ut.get_DFUInfo('~' + left.name).parts_  ;
+     self.DfuPartsInfo  := WsDFU.GetFileParts('~' + left.name)  ;
   ));
   
- lay_skews := {largest.name,largest.sizepretty,largest.realsize,largest.realsize_,wk_ut.get_DFUInfo().Parts_Lay.diff_avg_,wk_ut.get_DFUInfo().Parts_Lay.minskew,wk_ut.get_DFUInfo().Parts_Lay.maxskew,wk_ut.get_DFUInfo().Parts_Lay.partsize_,wk_ut.get_DFUInfo().Parts_Lay.avg_part_size_  
-  ,recordof(largest) -name - sizepretty - realsize - realsize_ or wk_ut.get_DFUInfo().Parts_Lay - diff_avg_ - minskew - maxskew - partsize_ - avg_part_size_}  ;
+ lay_skews := {largest.name,largest.sizepretty,largest.realsize,largest.realsize_,lay_dfuparts.diff_avg_,lay_dfuparts.minskew,lay_dfuparts.maxskew,lay_dfuparts.partsize_,lay_dfuparts.avg_part_size_  
+  ,recordof(largest) -name - sizepretty - realsize - realsize_ or lay_dfuparts - diff_avg_ - minskew - maxskew - partsize_ - avg_part_size_}  ;
   
   
   add_skews_norm := normalize(add_skews,left.DfuPartsInfo,transform(lay_skews,self := left, self := right));

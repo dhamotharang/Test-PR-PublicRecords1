@@ -1,4 +1,4 @@
-export Mac_Is_Business_Parsed(inFile, 
+﻿export Mac_Is_Business_Parsed(inFile, 
 		outFile, 
 		fname='fname',mname='mname',lname='lname',suffix='name_suffix',
 		fullname='fullname',
@@ -39,6 +39,7 @@ The remaining fields are documented in Address.Mac_Is_Business
 
 ******************************************************************/
 import nid;
+
 #UNIQUENAME(nosuffix)
 %nosuffix% := IF(#TEXT(suffix) = '\'\'', true, false);
 
@@ -90,7 +91,7 @@ import nid;
 #ELSE
 							,suffix),
 #END
-							%new_layout%);
+							%new_layout%) : DEPRECATED( 'Mac_Is_Business_Parsed is deprecated. Use Nid.fn_CleanParsedNames or Nid.Mac_CleanParsedNames with option V2' );
 
 ENDMACRO;
 

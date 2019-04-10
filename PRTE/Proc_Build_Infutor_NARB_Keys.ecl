@@ -165,6 +165,8 @@ export Proc_Build_Infutor_NARB_Keys(STRING pIndexVersion) := function
 		UNSIGNED8 ace_aid;
 	  STRING100 prep_address_line1;
 	  STRING50  prep_address_line_last;
+		UNSIGNED4 global_sid;
+	  UNSIGNED8 record_sid; 
 		INTEGER1  fp;
 	end;
 
@@ -176,7 +178,7 @@ export Proc_Build_Infutor_NARB_Keys(STRING pIndexVersion) := function
 	return	sequential(	
 								build(linkid_IN, update),
 								
-								PRTE.UpdateVersion('InfutorNARBKeys',				   			//	Package name
+								PRTE.UpdateVersion('Infutor_NARBKeys',				   		//	Package name
 																pIndexVersion,											//	Package version
 																_control.MyInfo.EmailAddressNormal,	//	Who to email with specifics
 																 'B',																//	B = Boca, A = Alpharetta

@@ -17,7 +17,7 @@ AddressDataSet := PRTE2.AddressCleaner(ds_file,
 	 
 	 
 DS_Prof_Lic_out	:=	Project(AddressDataSet,
-Transform(Layouts.Layout_file_prof_license_in,
+Transform(Layouts.Layout_out,
 
 self.license_number := left.orig_license_number;																
 																		
@@ -64,12 +64,19 @@ self.proxid	:= vLinkingIds.proxid;
 self.seleid	:= vLinkingIds.seleid;
 self.orgid	:= vLinkingIds.orgid;
 self.ultid	:= vLinkingIds.ultid;	
-
+self.global_sid:=0;
+self.record_sid:=0;
 self:=LEFT; 
 self:=[];
 ));
 
-df_prof_lic_old := PROJECT(files.DS_prolicv2_IN(cust_name = ''), layouts.Layout_file_prof_license_in);
+df_prof_lic_old := PROJECT(files.DS_prolicv2_IN(cust_name = ''),
+Transform (layouts.Layout_out,
+self.global_sid:=0;
+self.record_sid:=0;
+self:=left;
+));
+
 df_prof_lic := df_prof_lic_old + DS_Prof_Lic_out;
 
 PromoteSupers.MAC_SF_BuildProcess(df_prof_lic,constants.prolicv2_base, writefile);

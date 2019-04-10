@@ -95,6 +95,7 @@ module
 		self.phone_risk_code := if(left.event_entity_1 = 'PHONE', left.event_type_1, '') ;
 		self.ip_address_fraud_code := if(left.event_entity_1 = 'IP_ADDRESS', left.event_type_1, '') ;
 		self.transaction_id := left.Transaction_ID_Number;
+		self.Drivers_License := left.drivers_license_number;
 		self.investigation_referral_case_id  := left.Case_ID;
 		self.additional_address.Street_1 := left.mailing_street_1; 
 		self.additional_address.Street_2 := '';

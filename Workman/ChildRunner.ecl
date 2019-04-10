@@ -66,6 +66,7 @@ functionmacro
   #UNIQUENAME(NumMaxIterations)
   #UNIQUENAME(NumMinIterations)
   #UNIQUENAME(StartIteration  )
+  #UNIQUENAME(WATCHER_POLLING_FREQUENCY  )
 
   #IF(trim(#TEXT(pNumMaxIterations))  = '')
     #SET(NumMaxIterations ,-1)
@@ -154,7 +155,7 @@ functionmacro
 
   // -- figure out start iteration #
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
-  ds_previous_builds                 := ds_output_superfile(version < pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
+  ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
@@ -209,9 +210,16 @@ functionmacro
                     );
 
 //use child wuid so it doesn't reevaluate it and create another workunit
+  #IF(pOnlyCompile = false)
+    #SET(WATCHER_POLLING_FREQUENCY  ,pPollingFrequency)
+  #ELSE
+    #SET(WATCHER_POLLING_FREQUENCY  ,'1') //when compiling, set it to every minute to speed testing up
+  #END
+
+    
   createwatcherworkunit := WorkMan.CreateWuid_Raw(
        '#workunit(\'name\',\'---WorkMan.mac_Watcher--- for wuid: ' + Iteration_Wuid_result + ', ' + if(pBuildName != '' , pBuildName ,'') +  ', version: ' + pversion + ' iteration: ' + Iteration + '\');\n'       
-     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + pPollingFrequency + '\',\'' + localesp + '\');'
+     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\');'
     ,watchercluster
     ,localesp
     ,

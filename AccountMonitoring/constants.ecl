@@ -1,8 +1,8 @@
-﻿IMPORT AccountMonitoring, lib_thorlib, Data_Services;
+﻿IMPORT AccountMonitoring, lib_thorlib, Data_Services, STD;
 
 EXPORT constants := MODULE
 	// The file cluster name
-	EXPORT STRING SPRAY_GROUPNAME  := lib_thorlib.thorlib.cluster();
+	EXPORT STRING SPRAY_GROUPNAME  := STD.System.Thorlib.Group();
 	EXPORT STRING DATA_LOCATION 	 := IF(SPRAY_GROUPNAME in ['thor400_30','thor400_20','thor400_44','thor400_198_a','thor400_198_eclcc'],
 																			 '~', 							// thor400_30 and thor400_20
 																			 Data_Services.foreign_prod); 	// thorwatch and thor_10_219 
