@@ -12,14 +12,15 @@ EXPORT fn_Skip_Modules (
 	boolean SkipDashboardsBuild = false,
 	boolean SkipMBS = false,
 	boolean SkipDeltabase = false,
-	boolean SkipContributory = false,
 	boolean SkipScrubs = false,
 	boolean SkipRefreshHeader = false,
 	boolean SkipRefreshAddresses = false,
 	boolean SkipGarbageCollector = false
 ) := FUNCTION 
 
-	d:=dataset([{	SkipBaseBuild,
+	d:=dataset([{
+				SkipInputBuild,
+				SkipBaseBuild,
 				SkipBaseRollback, 
 				SkipKeysBuild, 
 				SkipNACBuild,
@@ -30,7 +31,6 @@ EXPORT fn_Skip_Modules (
 				SkipDashboardsBuild,
 				SkipMBS,
 				SkipDeltabase,
-				SkipContributory,
 				SkipScrubs,
 				SkipRefreshHeader,
 				SkipRefreshAddresses,

@@ -524,7 +524,6 @@ EXPORT Layouts := MODULE
 
 			boolean SkipMBS;
 			boolean SkipDeltabase;
-			boolean SkipContributory;
 			boolean SkipScrubs;
 			boolean SkipRefreshHeader;
 			boolean SkipRefreshAddresses;

@@ -17,17 +17,13 @@ module
 	shared Main_Built := FraudShared.Files().Base.Main.Built;
 	
 	// Vars
-	export Test_Build := Mac_TestBuild(pversion);
-	export Test_RecordID := Mac_TestRecordID(pversion);
-	export Test_RinID := Mac_TestRinID(pversion);	
 	shared pBaseMainBuilt := File_keybuild(Main_Built);	
 	shared pRunProd := False; // Default to Cert. Refreshs the RIN Analytics Dashboard in CERT/PROD 
 	shared pUseProdData := True; // Default to prod data. The data used to refresh the RIN Analytics Dashboard
 
 	// Skip Modules if they are no enabled	
-	shared SkipInputPortion := SkipModules[1].SkipInputBuild;
-	shared SkipBasePortion := SkipModules[1].SkipBaseBuild;
-	shared SkipBaseRollback := SkipModules[1].SkipBaseRollback;
+	shared SkipInputBuild := SkipModules[1].SkipInputBuild;
+	shared SkipBaseBuild := SkipModules[1].SkipBaseBuild;	
 	shared SkipKeysPortion := SkipModules[1].SkipKeysBuild;
 	shared SkipNACBuild := SkipModules[1].SkipNACBuild;
 	shared SkipInquiryLogsBuild := SkipModules[1].SkipInquiryLogsBuild;
@@ -37,7 +33,6 @@ module
 	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild;
 	shared SkipMBS := SkipModules[1].SkipMBS;
 	shared SkipDeltabase := SkipModules[1].SkipDeltabase;
-	shared SkipContributory := SkipModules[1].SkipContributory;
 	shared SkipScrubs := SkipModules[1].SkipScrubs;
 	shared SkipRefreshHeader := SkipModules[1].SkipRefreshHeader;
 	shared SkipRefreshAddresses := SkipModules[1].SkipRefreshAddresses;
@@ -47,14 +42,11 @@ module
 	export Run_MBS			:= if(SkipMBS = false,FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] ));
 	export Run_Scrubs		:= if(SkipScrubs = false,Build_Scrubs(pversion,SkipModules));
 	export Run_Deltabase 	:= if(SkipDeltabase = false, FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion));
-	export Run_NAC 			:= if(SkipNACBuild = false, FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion));
-	export Run_Prepped		:= if(SkipContributory = false, FraudGovPlatform_Validation.SprayAndQualifyInput(pversion));
+	export Run_NAC 			:= if(SkipNACBuild = false, FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion[1..8]));
 
-	export Run_Inputs 	:= if(SkipInputPortion=false,Build_Input(pversion, MBS_File).All);	
-	export Run_Base 	:= if(SkipBasePortion=false,Build_Base(pversion, MBS_File).All);
+	export Run_Inputs 	:= if(SkipInputBuild = false,Build_Input(pversion, MBS_File).All);	
+	export Run_Base 	:= if(SkipBaseBuild = false,Build_Base(pversion, MBS_File).All);
 	export Run_GarbageCollector := if(SkipGarbageCollector = false,Garbage_Collector.Run);
-	// --
-	export Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
 	// --
 	export Run_Autokeys := FraudShared.Build_AutoKeys(pversion, pBaseMainBuilt);
 	export Add_Demo := if(_Flags.UseDemoData, STD.File.AddSuperFile(FraudShared.Filenames().Base.Main.Built, Filenames().Input.DemoData.Sprayed));
@@ -65,7 +57,6 @@ module
 	export Run_Dashboards := if(SkipDashboardsBuild=false,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData));
 	export Set_Version := FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion;
 
-	export promote_sprayed_files := promote(pversion).promote_sprayed_files;
 	
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	
@@ -73,7 +64,6 @@ module
 		 Create_Supers
 		,Run_Inputs
 		,Run_Base
-		,if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed', promote_sprayed_files)
 	);
 	
 	export keys_portion := sequential(
@@ -103,9 +93,7 @@ module
 
 	export Build_Fraudgov_Keys :=
 	if(tools.fun_IsValidVersion(pversion),
-		 if(SkipKeysPortion=false and Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',  
-			  keys_portion 
-			, Run_Rollback ),
+		keys_portion,
 		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys'));
 	
 	
