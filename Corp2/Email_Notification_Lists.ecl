@@ -25,7 +25,7 @@ module
 											
 	export all_Sprays :=  'kevin.reeder@lexisnexisrisk.com'
 											+ emailaddressep + 'Gregory.Rose@lexisnexisrisk.com'
-											+ _control.MyInfo.EmailAddressNotify; 
+											+ emailaddressep + _control.MyInfo.EmailAddressNotify; 
 							
 											
 	export BuildSuccess := 
