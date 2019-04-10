@@ -22,6 +22,12 @@ module
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
 											;
 											
+											
+	export all_Sprays :=  'kevin.reeder@lexisnexisrisk.com'
+											+ emailaddressep + 'Gregory.Rose@lexisnexisrisk.com'
+											+ _control.MyInfo.EmailAddressNotify; 
+							
+											
 	export BuildSuccess := 
 		if(Flags.IsTesting
 			,_control.MyInfo.EmailAddressNotify
@@ -43,7 +49,7 @@ module
 	export Spray := 
 		if(Flags.IsTesting
 			,_control.MyInfo.EmailAddressNotify
-			,_control.MyInfo.EmailAddressNotify
+			,all_Sprays
 		);
 	
 	export Roxie := 
