@@ -5,7 +5,17 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 
 	// The top most folder in the Account Monitoring structure
 	SHARED base_template := AccountMonitoring.constants.filename_cluster + 'base::Account_Monitoring::' + TRIM(AccountMonitoring.constants.pseudo_ext(pseudo_environment));
-
+	// The file name and location of the base, update, archive and remote Portfolio files
+	
+  EXPORT monitor := MODULE
+		SHARED monitor_template(string var) := base_template + 'monitor::' + var;
+		EXPORT base            := monitor_template('base');
+		// EXPORT update          := portfolio_template('update');
+		// EXPORT archive         := portfolio_template('archive');
+		// EXPORT super           := portfolio_template('super');
+		// EXPORT remote          := 'portfolio.txt';
+	END;
+  
 	// The file name and location of the base, update, archive and remote Portfolio files
 	EXPORT portfolio := MODULE
 	
