@@ -28,8 +28,11 @@ module
 		filename := ut.CleanSpacesAndUpper(l.fn);
 		
 		self.FileName := filename;		
-		
-		fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
+			
+		fn := map(	
+					regexfind('MSH',filename,nocase) => ['20995369', 'FL', 'S', 'S', 'MSH', trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]), trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]),'',''],
+					StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true )
+		);
 
 		Customer_Account_Number := StringLib.StringFindReplace(fn[1],'FRAUDGOV::IN::','');
 		Customer_State := fn[2];
@@ -40,7 +43,7 @@ module
 		FileTime := fn[7];
 		MemberID := fn[8];
 		InstanceID := fn[9];
-
+		
 		self.Customer_Account_Number := Customer_Account_Number;
 		self.Customer_State := Customer_State;
 		self.Customer_Agency_Vertical_Type := Customer_Agency_Vertical_Type;

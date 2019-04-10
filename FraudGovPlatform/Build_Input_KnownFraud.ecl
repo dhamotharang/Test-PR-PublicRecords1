@@ -25,8 +25,11 @@ module
 		filename := ut.CleanSpacesAndUpper(l.fn);
 		
 		self.FileName := filename;	
+		fn := map(	
+					regexfind('msh',filename,nocase) => ['20995369', 'FL', 'S', 'S', 'MSH', trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]), trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]),'',''],
+					StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true )
+		);
 		
-		fn := STD.Str.SplitWords( STD.Str.FindReplace(l.fn,'.dat',''), '_' );
 		
 		Customer_Account_Number := STD.Str.FindReplace(fn[1],'FRAUDGOV::IN::','');
 		Customer_State := fn[2];
