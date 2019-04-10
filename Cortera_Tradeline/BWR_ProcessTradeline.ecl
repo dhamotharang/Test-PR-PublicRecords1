@@ -18,5 +18,7 @@ SEQUENTIAL(
 	cortera_Tradeline.promote().PromoteBase(lfn),
 	cortera_tradeline.BuildKeys(version),
   OUTPUT(ingested.StandardStats(), ALL, NAMED('StandardStats')),
-	stats1, stats2
+	stats1, stats2,
+	cortera_tradeline.UpdateDops(version),
+	cortera_tradeline.CreateOrbitEntry(version)
 	);

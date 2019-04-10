@@ -272,6 +272,8 @@
 		export string TRADE_UNION					:= '22';
 		export string PORT							:= '23';
 		export string VESSEL						:= '24';
+		export string CRIME_TERROR				:= '25';
+		export string NONCONVICTION_TERROR				:= '26';
 	end;
 
 	export numSubCategory := module
@@ -1106,6 +1108,15 @@
 		export string KEYWORD_EU_PCW								:= '794';
 		export string KEYWORD_DKFSAPEP							:= '795';
 		export string KEYWORD_RUFTS_GA							:= '796';
+		export string KEYWORD_MINEFI_TB							:= '797';
+		export string KEYWORD_LIFMA									:= '798';
+		export string KEYWORD_ZANTRS								:= '799';
+		export string KEYWORD_USDA									:= '800';
+		export string KEYWORD_TRL_WC								:= '801';
+		export string KEYWORD_CAPTA_561							:= '802';
+		export string KEYWORD_PSPMA_LFL							:= '803';
+		export string KEYWORD_NLPOL									:= '804';
+		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

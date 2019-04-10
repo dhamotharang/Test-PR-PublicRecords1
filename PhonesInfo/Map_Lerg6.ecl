@@ -1,6 +1,8 @@
-﻿IMPORT Mdr, Std, Ut;
+﻿IMPORT dx_PhonesInfo, Mdr, Std, Ut;
 
 	//DF-23660: Create Lerg6 Keybuild
+	//DF-24140: Lerg6 Layout Change
+	//DF-24397: Create Dx-Prefixed Keys
 
 	////////////////////////////////////////////////////////////////////////////////
 	//Input Files
@@ -11,7 +13,9 @@
 	////////////////////////////////////////////////////////////////////////////////
 	//Reformat Monthly Files to Common Layout
 	////////////////////////////////////////////////////////////////////////////////
-	PhonesInfo.Layout_Lerg.lerg6Main ccTr(ds_monthly l):= transform
+	dx_PhonesInfo.Layouts.lerg6Main ccTr(ds_monthly l):= transform
+		
+		self.source							:= mdr.sourceTools.src_Phones_Lerg6;
 		
 		//Pull Date From Filename
 			trFName			:= trim(l.filename, left, right);
@@ -248,6 +252,32 @@
 																	if(l.eff_date <>'' and l.status in ['D','M'], false,						//FALSE: Record has eff_date<>'' and status not 'D' or 'M'
 																	true)); 																												//TRUE:  Record found in the latest update; Record may have (eff_date='') or (eff_date<>'' and status='E' and eff_date < dt_last_reported)
 																																																			
+		self.os1								:= '';
+		self.os2								:= '';
+		self.os3								:= '';
+		self.os4								:= '';
+		self.os5								:= '';
+		self.os6								:= '';
+		self.os7								:= '';
+		self.os8								:= '';
+		self.os9								:= '';
+		self.os10								:= '';
+		self.os11								:= '';
+		self.os12								:= '';
+		self.os13								:= '';
+		self.os14								:= '';
+		self.os15								:= '';
+		self.os16								:= '';
+		self.os17								:= '';
+		self.os18								:= '';
+		self.os19								:= '';
+		self.os20								:= '';
+		self.os21								:= '';
+		self.os22								:= '';
+		self.os23								:= '';
+		self.os24								:= '';
+		self.os25								:= '';
+		self.notes							:= '';	
 		self.record_sid					:= 0;
 		self.global_sid					:= 0;
 		self										:= l;
@@ -262,7 +292,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	//Update Dates by Comparing Current Records with Previous Base
 	////////////////////////////////////////////////////////////////////////////////
-	PhonesInfo.Layout_Lerg.lerg6Main updTr(pCC_Curr l, ds_base r) := transform
+	dx_PhonesInfo.Layouts.lerg6Main updTr(pCC_Curr l, ds_base r) := transform
 		self.dt_first_reported 	:= (string)ut.min2((unsigned)l.dt_first_reported, (unsigned)r.dt_first_reported);
 		self.dt_last_reported 	:= (string)max((unsigned)l.dt_last_reported, (unsigned)r.dt_last_reported);	
 		self.dt_start						:= (string)ut.min2((unsigned)l.dt_start, (unsigned)r.dt_start);	
@@ -284,7 +314,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	//Set Existing Base Records Not Found in Current File to FALSE
 	////////////////////////////////////////////////////////////////////////////////
-	PhonesInfo.Layout_Lerg.lerg6Main remTr(ds_base l, pCC r) := transform
+	dx_PhonesInfo.Layouts.lerg6Main remTr(ds_base l, pCC r) := transform
 		self.is_current 				:= false;
 		self.dt_end					  	:= latestFileDate;
 		self 										:= l;
@@ -305,7 +335,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	//Set Effective Date Records Found in Latest Monthly File to FALSE
 	////////////////////////////////////////////////////////////////////////////////
-	PhonesInfo.Layout_Lerg.lerg6Main effTr(pCC_NonCurr l) := transform
+	dx_PhonesInfo.Layouts.lerg6Main effTr(pCC_NonCurr l) := transform
 		self.is_current 				:= false;
 		self.dt_end					  	:= latestFileDate;
 		self 										:= l;
@@ -326,7 +356,7 @@
 	///////////////////////////////////////////////////////////////////////////////
 	aggrSrt				:= sort(ddAllRec, ocn, npa, nxx, block_id, switch, aocn, sha_indicator, status, eff_date, dt_start, -dt_last_reported, local);
 	
-	PhonesInfo.Layout_Lerg.lerg6Main roll(aggrSrt l, aggrSrt r) := transform
+	dx_PhonesInfo.Layouts.lerg6Main roll(aggrSrt l, aggrSrt r) := transform
 		self.dt_first_reported	:= (string)ut.min2((unsigned)l.dt_first_reported, (unsigned)r.dt_first_reported);
 		self.dt_last_reported		:= (string)max((unsigned)l.dt_last_reported, (unsigned)r.dt_last_reported);
 		self.dt_end							:= if((string)min((unsigned)l.dt_end, (unsigned)r.dt_end)='0',
@@ -351,7 +381,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	//Append Record ID
 	////////////////////////////////////////////////////////////////////////////////	
-	PhonesInfo.Layout_Lerg.lerg6Main addRecTr(aggrRoll l):= TRANSFORM
+	dx_PhonesInfo.Layouts.lerg6Main addRecTr(aggrRoll l):= TRANSFORM
 		self.record_sid					:=  hash64(mdr.sourceTools.src_Phones_Lerg6 + l.ocn + l.npa + l.nxx + l.block_id + l.switch + l.aocn + l.sha_indicator + l.status + l.eff_date + l.dt_start);
 		self 	                	:= l;
 	END;

@@ -14,13 +14,17 @@
 		// ],BIPV2.ManualSuppression.inRec2)),ALL);					
 		
 /* -- To remove candidates from the Suppression file using rcid. -- */
-// BIPV2.ManualSuppression.removeCandidates(DATASET([
-    // {163052000}
-		// ],BIPV2.ManualSuppression.inRec));					
+buildVersion := '20190206';
+BIPV2.ManualSuppression.removeCandidates(DATASET([
+    {82957356270}
+		],BIPV2.ManualSuppression.inRec),buildVersion);					
 
-/* -- To add candidates to the Suppression file using rcid -- */
+// /* -- To add candidates to the Suppression file using rcid -- */
+// buildVersion := '20190206';
 // BIPV2.ManualSuppression.addCandidates(DATASET([
-    // {163052000}
-		// ],BIPV2.ManualSuppression.inRec));					
+    // {82957356270}],BIPV2.ManualSuppression.inRec),buildVersion);					
+
+/* -- To View Current Suppressions -- */
+// BIPV2.ManualSuppression.viewSuppressionList();		
 		
-		// 407	407q
+//407

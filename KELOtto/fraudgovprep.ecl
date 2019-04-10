@@ -1,5 +1,6 @@
 ﻿IMPORT KELOtto;
 IMPORT AppendBankDetails;
+IMPORT FraudGovPlatform;
 
 /*
   This is specifically for prepping transactions for KEL. 
@@ -17,5 +18,19 @@ HighFreqAddr := JOIN(KELOtto.fraudgov, HighFreqAddrTable, LEFT.clean_address.pri
 FraudGovWithBank1 := AppendBankDetails.macAppendBankDetails(HighFreqAddr, bank_routing_number_1, 'bank1');
 FraudGovWithBank := AppendBankDetails.macAppendBankDetails(FraudGovWithBank1, bank_routing_number_2, 'bank2');
 
+// Deceased.
+FraudGovWithDeceased := JOIN(FraudGovWithBank, KELOtto.PersonDeceased, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
 
-EXPORT fraudgovprep := PROJECT(FraudGovWithBank, TRANSFORM({RECORDOF(LEFT) - UID}, SELF := LEFT));
+// CIID
+FraudGovWithCIID := JOIN(FraudGovWithDeceased, KELOtto.PersonCIID, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+
+// FraudPoint
+FraudGovWithFraudpoint := JOIN(FraudGovWithCIID, KELOtto.PersonFraudPoint, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+
+// IP Metadata
+FraudGovWithIPMetadata := JOIN(FraudGovWithFraudpoint, KELOtto.PersonIPMetadata, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+
+// Crim
+FraudGovWithCrim := JOIN(FraudGovWithIPMetadata, KELOtto.PersonCrim, LEFT.record_id = RIGHT.record_id, LEFT OUTER, KEEP(1), HASH);
+
+EXPORT FraudGovPrep := PROJECT(FraudGovWithCrim, TRANSFORM({RECORDOF(LEFT) - UID}, SELF := LEFT));

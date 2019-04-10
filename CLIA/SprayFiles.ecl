@@ -1,4 +1,4 @@
-IMPORT _Control, tools;
+﻿IMPORT _Control, tools;
 
 EXPORT SprayFiles(STRING	pServerIP									= _Control.IPAddress.bctlpedata11,
 	                STRING	pDirectory								= '/data/data_build_4/CLIA/data',
@@ -57,7 +57,7 @@ EXPORT SprayFiles(STRING	pServerIP									= _Control.IPAddress.bctlpedata11,
 	// MAC_FilesToSpray(pFilenameMicroscopy,    Filenames(pversion).Input.Microscopy,    FileToSprayMicroscopy);
 	// MAC_FilesToSpray(pFilenameWaiver,        Filenames(pversion).Input.Waiver,        FileToSprayWaiver);
 	
-	MAC_FilesToSpray_Fixed(pFilenameAllFromCD, Filenames(pversion).Input.Main, 274, FileToSprayMain);
+	MAC_FilesToSpray_Fixed(pFilenameAllFromCD, Filenames(pversion).Input.Main, 322, FileToSprayMain);
 
 	SprayTheFile(DATASET(tools.Layout_Sprays.Info) FileToSpray) :=
 		tools.fun_Spray(FileToSpray, , , pOverwrite, pReplicate, TRUE, pIsTesting, ,

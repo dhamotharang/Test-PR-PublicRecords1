@@ -1,5 +1,9 @@
-﻿IMPORT RoxieKeyBuild,AutoKeyB2,PRTE,_control, autokeyb,Business_Header_SS,business_header,ut,corp2,doxie,address,corp2_services, PRTE2_Common;
-EXPORT proc_build_keys(string filedate) := FUNCTION
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, strata;
+
+EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
+
+is_running_in_prod 		:= PRTE2_Common.Constants.is_running_in_prod;
+doDOPS 								:= is_running_in_prod AND NOT skipDOPS;
 
  RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.key_did,
    Constants.key_prefix + '@version@::did',
@@ -60,6 +64,16 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_email_payload_FCRA,
 	move_qa_key_payload_FCRA);
 	
 	build_autokeys 	:= Keys.autokeys(filedate);
+	
+	//---------- making DOPS optional and only in PROD build -------------------------------													
+		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 		:= PRTE.UpdateVersion('EmailDataV2Keys',filedate,notifyEmail,'B','N','N');
+    //FCRA keys not yet active		
+		//updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_EmailDataKeys',filedate,notifyEmail,'B','F','N');
+		PerformUpdateOrNot 	:= IF(doDOPS,sequential(updatedops),NoUpdate);
+//--------------------------------------------------------------------------------------
+
 	buildKey	:=	sequential(
 												build_key_did,
 												build_key_FCRA_did,
@@ -76,7 +90,9 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_email_payload_FCRA,
 												move_qa_key_email_address,
 												move_qa_key_payload,
 												move_qa_key_payload_FCRA,
-												build_autokeys
+												build_autokeys,
+												Remove_auto_payload,
+												PerformUpdateOrNot
 												);	
 
 return	buildKey;

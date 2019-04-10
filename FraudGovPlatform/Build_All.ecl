@@ -12,7 +12,7 @@ export Build_All(
 module
 
 	// Load Files Once
-	shared SkipModules := Files().OutputF.SkipModules;
+	shared SkipModules := Files().Flags.SkipModules;
 	shared MBS_File := FraudShared.Files().Input.MBS.sprayed;
 	shared Main_Built := FraudShared.Files().Base.Main.Built;
 	
@@ -28,18 +28,30 @@ module
 	shared SkipBasePortion := SkipModules[1].SkipBaseBuild;
 	shared SkipBaseRollback := SkipModules[1].SkipBaseRollback;
 	shared SkipKeysPortion := SkipModules[1].SkipKeysBuild;
+	shared SkipNACBuild := SkipModules[1].SkipNACBuild;
+	shared SkipInquiryLogsBuild := SkipModules[1].SkipInquiryLogsBuild;
 	shared SkipPiiBuild := SkipModules[1].SkipPiiBuild;
 	shared SkipKelBuild := SkipModules[1].SkipKelBuild;
 	shared SkipOrbitBuild := SkipModules[1].SkipOrbitBuild;
 	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild;
+	shared SkipMBS := SkipModules[1].SkipMBS;
+	shared SkipDeltabase := SkipModules[1].SkipDeltabase;
+	shared SkipContributory := SkipModules[1].SkipContributory;
+	shared SkipScrubs := SkipModules[1].SkipScrubs;
+	shared SkipRefreshHeader := SkipModules[1].SkipRefreshHeader;
+	shared SkipRefreshAddresses := SkipModules[1].SkipRefreshAddresses;
+	shared SkipGarbageCollector := SkipModules[1].SkipGarbageCollector;
 
 	// Modules
-	export Run_MBS := FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] );
-	export Run_Scrubs := Build_Scrubs(pversion,SkipModules);
-	export Run_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion);
-	export Run_Inputs := Build_Input(pversion, MBS_File, SkipModules).All;	
-	export Run_Base := Build_Base(pversion, MBS_File).All;
-	export Run_GarbageCollector := Garbage_Collector.Run;
+	export Run_MBS			:= if(SkipMBS = false,FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] ));
+	export Run_Scrubs		:= if(SkipScrubs = false,Build_Scrubs(pversion,SkipModules));
+	export Run_Deltabase 	:= if(SkipDeltabase = false, FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion));
+	export Run_NAC 			:= if(SkipNACBuild = false, FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion));
+	export Run_Prepped		:= if(SkipContributory = false, FraudGovPlatform_Validation.SprayAndQualifyInput(pversion));
+
+	export Run_Inputs 	:= Build_Input(pversion, MBS_File).All;	
+	export Run_Base 	:= Build_Base(pversion, MBS_File).All;
+	export Run_GarbageCollector := if(SkipGarbageCollector = false,Garbage_Collector.Run);
 	// --
 	export Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
 	// --
@@ -58,16 +70,9 @@ module
 	
 	export base_portion := sequential(
 		 Create_Supers
-		// Spray MBS
-		,Run_MBS
-		// Spray Deltabase
-		,Run_Deltabase
-		// Clean Inputs
 		,Run_Inputs
-		// RUn MBS Scrubs
-		,Run_Scrubs	
-		// Build Base
 		,Run_Base
+		,if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed', promote_sprayed_files)
 	);
 	
 	export keys_portion := sequential(
@@ -92,30 +97,24 @@ module
 		 	
 	export Build_FraudGov_Base := 
 	if(tools.fun_IsValidVersion(pversion),
-		if(SkipBasePortion=false, base_portion),
-		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base')
-	);
+		if(SkipBasePortion=false, 
+			  base_portion
+			, output('Skipping FraudGovPlatform.Build_Base')),
+		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base'));
 
 	export Build_Fraudgov_Keys :=
 	if(tools.fun_IsValidVersion(pversion),
-		if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',
-			sequential(
-				// If Base is valid then Build Keys
-				  if(SkipKeysPortion=false, 
-					keys_portion)
-				, promote_sprayed_files
-			),
-			// else Rollback Base file
-			Run_Rollback)
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys')
-	);
+		 if(SkipKeysPortion=false and Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',  
+			  keys_portion 
+			, Run_Rollback ),
+		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys'));
+	
 	
 	export All :=
 	if(tools.fun_IsValidVersion(pversion),
 		 sequential(
-			if(SkipBasePortion=false, base_portion),
-		 	if(SkipKeysPortion=false, keys_portion))
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.All')
-	);
+			Build_FraudGov_Base,
+		 	Build_Fraudgov_Keys )
+		,output('No Valid version parameter passed, skipping FraudGovPlatform.All'));
 		
 end;

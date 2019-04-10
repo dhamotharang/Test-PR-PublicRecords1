@@ -21,17 +21,17 @@ EXPORT proc_build_base_ingest(STRING pversion) := FUNCTION
 	new_base							:= ingestMod.AllRecords_NoTag;
 
 	//Map OKC major to ASL college_major and new_college_major
-	okc_college_major 		:= OKC_Student_List.File_College_Major_Mapping_In;
+	// okc_college_major 		:= OKC_Student_List.File_College_Major_Mapping_In;
 
-	OKC_Student_List.Layout_Base.base fnPopulateCollegeMajor(new_base L, okc_college_major R) := TRANSFORM
-		SELF.COLLEGE_MAJOR 	:= R.MAJOR_CODE;
-		SELF.NEW_COLLEGE_MAJOR := R.NEW_MAJOR_CODE;
-		SELF := L;
-	END;
-	new_base_college_major:= JOIN(new_base, okc_college_major,
-																TRIM(LEFT.Major)=ut.CleanSpacesAndUpper(RIGHT.MAJOR),
-																fnPopulateCollegeMajor(LEFT,RIGHT),
-																LEFT OUTER, LOOKUP);
+	// OKC_Student_List.Layout_Base.base fnPopulateCollegeMajor(new_base L, okc_college_major R) := TRANSFORM
+		// SELF.COLLEGE_MAJOR 	:= R.MAJOR_CODE;
+		// SELF.NEW_COLLEGE_MAJOR := R.NEW_MAJOR_CODE;
+		// SELF := L;
+	// END;
+	// new_base_college_major:= JOIN(new_base, okc_college_major,
+																// TRIM(LEFT.Major)=ut.CleanSpacesAndUpper(RIGHT.MAJOR),
+																// fnPopulateCollegeMajor(LEFT,RIGHT),
+																// LEFT OUTER, LOOKUP);
 
 	//Add college metedata
 	OKC_Student_List.Layout_Base.base	tAddCollegeMetadata(Layout_Base.base pLeft, American_Student_list.layout_college_metadata_lkp pLkp)
@@ -46,7 +46,7 @@ EXPORT proc_build_base_ingest(STRING pversion) := FUNCTION
 				self.tier2						:=	pLkp.tierv20;
 				self									:=	pLeft;
 			END;
-	new_base_college_metadata:=	JOIN(new_base_college_major, American_Student_list.file_college_metadata_lkp, 
+	new_base_college_metadata:=	JOIN(new_base, American_Student_list.file_college_metadata_lkp, 
 																	 StringLib.StringCleanSpaces(LEFT.COLLEGE_NAME) != '' AND StringLib.StringCleanSpaces(LEFT.COLLEGE_NAME) = StringLib.StringCleanSpaces(RIGHT.asl_matchkey_cn), 
 																	 tAddCollegeMetadata(left,right), LEFT OUTER, LOOKUP);
 

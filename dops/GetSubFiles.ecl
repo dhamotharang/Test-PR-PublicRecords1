@@ -1,4 +1,5 @@
-﻿EXPORT GetSubFiles(string superfilename, string esp) := function
+﻿import ut;
+EXPORT GetSubFiles(string superfilename, string esp) := function
 
 
 	rSuperfileListRequest := record
@@ -19,6 +20,7 @@
 											,rSuperfileListRequest
 											,dataset(rSuperfileListResponse)
 											,xpath('SuperfileListResponse')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 	
 	rNormRecs := record

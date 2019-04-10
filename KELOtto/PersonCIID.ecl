@@ -182,21 +182,16 @@ newr := RECORD
   unsigned8 record_id;
   unsigned6 fdn_file_info_id;
   STRING Hri;
+  integer1 relativeaddressmatch;
  END;
 
-BankAccountDLRiskTestSet := [899999998929,899999998994,899999998641,899999998535,899999998020,899999998131,899999999639,899999999174,899999999256,899999999449,899999999221,899999998936,899999998390,899999998866,899999998686,899999999011,899999999326,899999998561,899999998905,899999999111,899999999925,899999999914,899999998064,899999998214,899999998074,899999998069,899999999053,899999999223,899999998058,899999999585,899999998924,899999998455,899999999176,899999998386,899999998776,899999999693,899999998471,899999999560,899999999795,899999998157,899999999675,899999999306,899999999160,899999999560,899999999560,899999999291,899999999313,899999998938,899999998783,899999998140];
-
-PersonCIIDAttr1 := PROJECT(PULL(FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.CIID.built), 
+PersonCIIDAttr := PROJECT(PULL(FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.CIID.built), 
               TRANSFORM(newr, self.did := (UNSIGNED8)left.did, 
-							SELF.Hri := TRIM(LEFT.hri_1) + '|' + TRIM(LEFT.hri_2) + '|' + TRIM(LEFT.hri_3) + '|' + TRIM(LEFT.hri_4) + '|' + TRIM(LEFT.hri_5) + '|' + TRIM(LEFT.hri_6) + '|' + TRIM(LEFT.hri_7) + '|' + TRIM(LEFT.hri_8) + '|' + TRIM(LEFT.hri_9) + '|' + TRIM(LEFT.hri_10) + '|' + TRIM(LEFT.hri_11) + '|' + TRIM(LEFT.hri_12) + '|' + TRIM(LEFT.hri_13) + '|' + TRIM(LEFT.hri_14) + '|' + TRIM(LEFT.hri_15) + '|' + TRIM(LEFT.hri_16) + '|' + TRIM(LEFT.hri_17) + '|' + TRIM(LEFT.hri_18) + '|' + TRIM(LEFT.hri_19) + '|' + TRIM(LEFT.hri_20);
+              // This project to simplify KEL by being able to use the CONTAINS
+							SELF.Hri := '|' + TRIM(LEFT.hri_1) + '|' + TRIM(LEFT.hri_2) + '|' + TRIM(LEFT.hri_3) + '|' + TRIM(LEFT.hri_4) + '|' + TRIM(LEFT.hri_5) + '|' + TRIM(LEFT.hri_6) + '|' + TRIM(LEFT.hri_7) + '|' + TRIM(LEFT.hri_8) + '|' + TRIM(LEFT.hri_9) + '|' + TRIM(LEFT.hri_10) + '|' + TRIM(LEFT.hri_11) + '|' + TRIM(LEFT.hri_12) + '|' + TRIM(LEFT.hri_13) + '|' + TRIM(LEFT.hri_14) + '|' + TRIM(LEFT.hri_15) + '|' + TRIM(LEFT.hri_16) + '|' + TRIM(LEFT.hri_17) + '|' + TRIM(LEFT.hri_18) + '|' + TRIM(LEFT.hri_19) + '|' + TRIM(LEFT.hri_20) + '|';
               // take this out after testing this is just for force known risk for dl for testing!!!
               //MAP((INTEGER)LEFT.did in BankAccountDLRiskTestSet => '|DF|45',''),
 							SELF := LEFT));
 
-PersonCIIDAttr := JOIN(PersonCIIDAttr1, KELOtto.fraudgov, left.record_id=right.record_id, 
-              TRANSFORM({RECORDOF(LEFT), UNSIGNED8 OttoAddressId}, 
-              SELF.OttoAddressId := HASH32(RIGHT.address_1, RIGHT.address_2),
-              SELF := LEFT), KEEP(1), HASH);
-
-EXPORT PersonCIID := JOIN(KELOtto.CustomerLexId, PersonCIIDAttr, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));
+EXPORT PersonCIID := PersonCIIDAttr;
 

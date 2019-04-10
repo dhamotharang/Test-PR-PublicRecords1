@@ -24,26 +24,23 @@ module
 		
 	DeltabaseUpdate	:=	project(inDeltabaseUpdate,tPrep(left));
 	
-	MBS_Layout := Record
-		FraudShared.Layouts.Input.MBS;
-		unsigned1 Deltabase := 0;
-	end;
-	MBS_Deltabase	:= project(MBS_Sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left))(Deltabase = 1);
+	MBS_Deltabase	:= MBS_Sprayed(status = 1 and regexfind('DELTA', fdn_file_code, nocase));
 
-	DeltabaseSource := join(	DeltabaseUpdate,
-						MBS_Deltabase, 
-						left.Customer_Account_Number = (string)right.gc_id
-						,TRANSFORM(FraudGovPlatform.Layouts.Base.Deltabase,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
+	DeltabaseSource := join(
+		DeltabaseUpdate,
+		MBS_Deltabase, 
+		left.Customer_Account_Number = (string)right.gc_id,
+		TRANSFORM(FraudGovPlatform.Layouts.Base.Deltabase,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
 
-  // Rollup Update and previous base 
+  // Rollup Update and previous base
   
-	Pcombined := If(UpdateDeltabase , inBaseDeltabase + DeltabaseSource , inBaseDeltabase); 
-	pDataset_Dist := distribute(Pcombined, source_rec_id);
-	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date, -did, -clean_address.err_stat,local);
+	Pcombined := If(UpdateDeltabase , inBaseDeltabase + DeltabaseSource , DeltabaseSource); 
+	pDataset_Dist := distribute(Pcombined, InqLog_ID);
+	pDataset_sort := sort(pDataset_Dist , InqLog_ID, -process_date, -did, -clean_address.err_stat,local);
 
 	
 	Layouts.Base.Deltabase RollupUpdate(Layouts.Base.Deltabase l, Layouts.Base.Deltabase r) := 
-	transform
+	transform 
 		SELF.dt_first_seen := ut.EarliestDate(l.dt_first_seen	,r.dt_first_seen); 
 		SELF.dt_last_seen := max(l.dt_last_seen,r.dt_last_seen);
 		SELF.dt_vendor_last_reported := max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
@@ -55,9 +52,9 @@ module
 	end;
 
 	pDataset_rollup := rollup( pDataset_sort
-		,RollupUpdate(left, right)
-		,source_rec_id ,local);
-	
+        ,RollupUpdate(left, right)
+        ,InqLog_ID ,local);
+
 	tools.mac_WriteFile(Filenames(pversion).Base.Deltabase.New,pDataset_rollup,Build_Base_File);
 
 // Return

@@ -1,4 +1,4 @@
-import ut, header, std;
+﻿import ut, header, std;
 
 export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions_Ex(NAC_v2.Layout_Base2_ex l, NAC_v2.Layout_Base2_Ex r,
 						unsigned1 priority_, set of string1 matchset) := transform, SKIP(l.PrepRecSeq=r.PrepRecSeq)
@@ -49,13 +49,13 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions_Ex(NAC_v2.Layout_
 								or l.lname=r.LastName,'W','')))
 
 					+if((unsigned)l.Clean_ssn>0 and (unsigned)r.Clean_ssn>0 and l.Clean_ssn=r.Clean_ssn,'S',
-						if((unsigned)l.Clean_ssn>0 and (unsigned)r.Clean_ssn>0 and ssn_value(l.Clean_ssn,r.Clean_ssn) > -1,'P',''))
+						if((unsigned)l.Clean_ssn>0 and (unsigned)r.Clean_ssn>0 and ssn_value(l.Clean_ssn,r.Clean_ssn) > 0,'P',''))
 
 					+if((unsigned)l.clean_dob>0 and	(unsigned)r.clean_dob>0 and	l.clean_dob=r.clean_dob,'D',
 								//dob_near(l.clean_dob, r.clean_dob),
 						if(gens_ok(l.name_suffix,l.clean_dob,r.name_suffix,r.clean_dob) and
 									(unsigned)l.clean_dob>0 and	(unsigned)r.clean_dob>0 and
-									(header.sig_near_dob(l.clean_dob,r.clean_dob) or header.date_value(l.clean_dob,r.clean_dob) > 0),'B',''))
+									(header.sig_near_dob(l.clean_dob,r.clean_dob) or header.date_value(l.clean_dob,r.clean_dob) > 1),'B',''))
 
 					+if(l.prim_name<>'' and	r.prim_name<>'' and	l.prim_name=r.prim_name and	l.prim_range=r.prim_range,'A','')
 

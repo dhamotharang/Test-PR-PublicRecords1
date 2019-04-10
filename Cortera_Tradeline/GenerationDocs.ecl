@@ -6,7 +6,7 @@ MODULE:Cortera_Tradeline
 FILENAME:Tradeline_Base
 // Uncomment up to NINES for internal or external adl
 // IDFIELD:EXISTS:<NameOfIDField>
-RIDFIELD:rid:GENERATE
+RIDFIELD:record_sid:GENERATE
 // RECORDS:<NumberOfRecordsInDataFile>
 RECORDS:1000000
 // POPULATION:<ExpectedNumberOfEntitiesInDataFile>

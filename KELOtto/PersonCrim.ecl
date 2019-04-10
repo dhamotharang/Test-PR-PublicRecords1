@@ -20,4 +20,5 @@ PersonCrimPrep := PROJECT(PersonCrimPrep1,
           => 1, 0), 
           SELF := LEFT));
 
-EXPORT PersonCrim  := JOIN(KELOtto.CustomerLexId, PersonCrimPrep, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));
+EXPORT PersonCrim  := PersonCrimPrep;
+//EXPORT PersonCrim  := JOIN(KELOtto.CustomerLexId, PersonCrimPrep, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));

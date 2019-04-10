@@ -2,7 +2,7 @@
 
 EXPORT BuildSCRUBSReport(
 	string filedate=(string)std.date.today(),
-	dataset(FraudGovPlatform.Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules,
+	dataset(FraudGovPlatform.Layouts.Flags.SkipModules) pSkipModules = FraudGovPlatform.Files().Flags.SkipModules,
 	string emailList=''
 ) := FUNCTION
 

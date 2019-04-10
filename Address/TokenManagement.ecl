@@ -1,4 +1,4 @@
-export TokenManagement := MODULE
+﻿export TokenManagement := MODULE
 
 export string32 TerminateToken(string32 s) := BEGINC++
 #option pure
@@ -70,7 +70,7 @@ export set of string32 TokenSet(string s, integer4 n) := BEGINC++
 			if (len < 32)
 			{
 				temp[j++] = s[i];
-				++len;		// word length
+			  ++len;		// word length
 			}
 
 			endtoken = false;
@@ -95,7 +95,7 @@ export set of string32 TokenSet(string s, integer4 n) := BEGINC++
 	__lenResult = 32 * n;
 	__result = temp;
 
-ENDC++ : DEPRECATED('Do not use');
+ENDC++ : DEPRECATED('Use Address.WordSplit');
 /*
 export SET OF STRING32 SortSet(SET OF STRING32 list) := BEGINC++
 #option pure

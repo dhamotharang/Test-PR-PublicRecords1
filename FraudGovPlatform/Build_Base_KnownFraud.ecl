@@ -14,8 +14,8 @@ module
 		self.process_date := (unsigned) l.ProcessDate, 
 		self.dt_first_seen := (unsigned) l.ProcessDate; 
 		self.dt_last_seen := (unsigned) l.ProcessDate;
-		self.dt_vendor_last_reported := (unsigned) l.ProcessDate; 
-		self.dt_vendor_first_reported := (unsigned) l.ProcessDate; 
+		self.dt_vendor_last_reported := (unsigned) l.FileDate; 
+		self.dt_vendor_first_reported := (unsigned) l.FileDate; 
 		self.source_rec_id := l.unique_id;
 		self.current := 'C' ; 
 		self := l; 
@@ -29,15 +29,13 @@ module
 							left.Customer_Account_Number =(string)right.gc_id
 							AND left.file_type = right.file_type
 							AND left.ind_type = right.ind_type
-							AND (( left.source_input = 'KNFD' 			and	right.confidence_that_activity_was_deceitful != 3 )
-								OR	( left.source_input = 'SAFELIST' 	and	right.confidence_that_activity_was_deceitful = 3 ))	
-							AND	left.customer_State 	= right.Customer_State
-							AND	left.Customer_County 	= right.Customer_County
-							AND	left.Customer_Agency_Vertical_Type = right.Customer_Vertical,										
+							AND (( left.source_input = 'KNFD' and right.confidence_that_activity_was_deceitful != 3 )
+								OR	( left.source_input = 'SAFELIST' and right.confidence_that_activity_was_deceitful  = 3 ))	
+							AND	left.customer_State = right.Customer_State,
 							TRANSFORM(Layouts.Base.KnownFraud,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
 
   // Rollup Update and previous base 
-	Pcombined := If(UpdateKnownFraud , inBaseKnownFraud + KnownFraudSource , inBaseKnownFraud); 	
+	Pcombined := If(UpdateKnownFraud , inBaseKnownFraud + KnownFraudSource , KnownFraudSource); 	
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
 	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date, -did, -clean_address.err_stat ,local);
 			
@@ -54,8 +52,8 @@ module
 	end;
 
 	pDataset_rollup := rollup( pDataset_sort
-		,RollupUpdate(left, right)
-		,source_rec_id, local);
+        ,RollupUpdate(left, right)
+        ,Source,source_rec_id, local);
 
 	tools.mac_WriteFile(Filenames(pversion).Base.KnownFraud.New,pDataset_rollup,Build_Base_File);
 

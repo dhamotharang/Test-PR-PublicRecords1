@@ -1,6 +1,8 @@
 ﻿import ut,roxiekeybuild,promotesupers;
 
-export Proc_FCRAacceptSK_toQA(string filedate, boolean pFastHeader=false) := function
+export Proc_FCRAacceptSK_toQA(string filedate, boolean pFastHeader=false,boolean isInc=false) := function
+
+boolean isFull:=~isInc;
 
 roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::fcra::header','Q',out1,2);
 roxiekeybuild.MAC_SK_Move_v2('~thor_data400::key::fcra::hdr_apt_bldgs','Q',out2,2)
@@ -24,7 +26,7 @@ all_keys := sequential(
 
 											,out7
 											,out8
-											,out9
+											,if(isFull,out9)
 											,out10
 											,out11
 											);

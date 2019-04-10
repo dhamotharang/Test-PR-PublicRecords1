@@ -25,7 +25,12 @@ function
 
   myurl := 'http://' + pESp + ':8010/FileSpray';
   myesp := pESp;
+
+  import ut,Workman;
   
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   soap_results := SOAPCALL(
      myurl
     ,'Rename'
@@ -35,6 +40,18 @@ function
     ,literal
   );
 
-  return soap_results;
+  soap_results_remote := SOAPCALL(
+     myurl
+    ,'Rename'
+    ,RenameInRecord
+    ,dataset(RenameOutRecord)
+    ,xpath('RenameResponse')
+    ,literal
+   %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,soap_results  ,soap_results_remote);
+  
+  return returnresult;
   
 end;

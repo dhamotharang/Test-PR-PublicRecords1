@@ -1,5 +1,8 @@
 ﻿IMPORT Data_Services, Doxie;
 
+//DF-23660: Lerg6 Build Process
+//DF-24140: Lerg6 Layout Change
+
 inFile 	:= PhonesInfo.File_Lerg.Lerg6Main;
 	
 EXPORT Key_Phones_Lerg6 := index(inFile

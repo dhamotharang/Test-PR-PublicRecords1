@@ -46,6 +46,7 @@ retval := sequential(
 													idops_update,													//DF-16616
 													orbit_update,
 													new_records_sample_for_qa,
+													CopyKey2Alpha('thor_data400::key::vina::vin_qa'),
 													//move the new file to processed
 													FileServices.clearsuperfile(processedSuperFile),
 													FileServices.addsuperfile(processedSuperFile,'~thor_data400::in::vintelligence::vin',,true),

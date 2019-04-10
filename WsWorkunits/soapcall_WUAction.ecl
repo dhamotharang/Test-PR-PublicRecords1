@@ -100,6 +100,11 @@ function
 
   esp				:= pesp + ':8010';
 
+  import ut,Workman;
+  
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   results := SOAPCALL(
     'http://' + esp + '/WsWorkunits?ver_=1.48'
     // 'http://' + esp + '/WsWorkunits'
@@ -113,6 +118,22 @@ function
     ,TIMELIMIT(pTimeLimit)
   );
   
-  return results;
+  results_remote := SOAPCALL(
+    'http://' + esp + '/WsWorkunits?ver_=1.48'
+    // 'http://' + esp + '/WsWorkunits'
+    ,'WUAction'
+    ,WUActionRequest_Record
+    ,dataset(WUActionResponse_Record)
+    // ,heading('<WUInfoRequest>','</WUInfoRequest>')
+    ,xpath('WUActionResponse')
+    ,RETRY(pRetryCount)
+    ,TIMEOUT(pTimeOut)
+    ,TIMELIMIT(pTimeLimit)
+    %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,results  ,results_remote);
+  
+  return returnresult;
   
 end;

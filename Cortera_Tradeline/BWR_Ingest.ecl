@@ -6,8 +6,8 @@ IMPORT Cortera_Tradeline,SALT311;
 //Set incremental to TRUE to run an incremental ingest mode
 MyDelta := DATASET([],Cortera_Tradeline.Layout_Tradeline_Base);
 ingestMod := Cortera_Tradeline.Ingest(FALSE, MyDelta);
-f_AllRecords := '~temp::rid::Cortera_Tradeline::ingest::AllRecords';
-f_ActiveRecords := '~temp::rid::Cortera_Tradeline::ingest::ActiveRecords';
+f_AllRecords := '~temp::record_sid::Cortera_Tradeline::ingest::AllRecords';
+f_ActiveRecords := '~temp::record_sid::Cortera_Tradeline::ingest::ActiveRecords';
 O := OUTPUT(ingestMod.AllRecords_Notag,,f_AllRecords,COMPRESSED,OVERWRITE); // Remove _Notag to keep 'what happened' byte
 N_U := OUTPUT(ingestMod.NewRecords_Notag+ingestMod.UpdatedRecords_Notag,,f_ActiveRecords,COMPRESSED,OVERWRITE); // Remove _Notag to keep 'what happened' byte
 PARALLEL(

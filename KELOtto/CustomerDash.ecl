@@ -19,7 +19,9 @@
     PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0(event_count_ > 1000), TRANSFORM(ExlusionRecord, SELF := LEFT));
 
   //topclusters
-  OttoFullGraph := KELOtto.KelFiles.FullCluster; //DATASET('~foreign::10.173.44.105::gov::otto::fullgraph', RECORDOF(KELOtto.KelFiles.FullCluster), THOR); 
+  OttoFullGraph := KELOtto.KelFiles.FullCluster(in_customer_population_ = 1 AND safe_flag_ = 0); //DATASET('~foreign::10.173.44.105::gov::otto::fullgraph', RECORDOF(KELOtto.KelFiles.FullCluster), THOR); 
+
+
   
   //exclude high frequence clusters.
   tempFullCluster := JOIN(OttoFullGraph, HighFrequencyExclusionList, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, LEFT ONLY, LOOKUP);

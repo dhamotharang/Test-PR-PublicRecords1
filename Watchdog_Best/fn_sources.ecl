@@ -1,0 +1,1 @@
+﻿EXPORT fn_sources(string src) := Watchdog_Best.mod_sources.src2bmap(src);

@@ -5,7 +5,7 @@ EXPORT Key_LinkIds := MODULE
   // DEFINE THE INDEX
 	shared superfile_name		:= $.keynames().LinkIds.QA;
 	
-	shared Base				:= $.Files.Base;
+	shared Base				:= $.Files.Base(status<>'D');
 	
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	export Key := k;

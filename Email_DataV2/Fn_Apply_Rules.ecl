@@ -12,8 +12,11 @@ EXPORT Fn_Apply_Rules (dataset(recordof(Layouts.Base_BIP)) email_in) := FUNCTION
 	//Set Death rule flag
 	setDODFlag	:= Email_DataV2.Fn_SetDODRule(setEmailFlags);
 	
+	//Validate Email from lookup table
+	setEmailStatus := Email_DataV2.Fn_EmailEventStatus(setDODFlag);
+	
 	//Translate rules to bitmap
-	Email_DataV2.Layouts.Base_BIP t_flag_rules(setDODFlag L) := TRANSFORM
+	Email_DataV2.Layouts.Base_BIP t_flag_rules(setEmailStatus L) := TRANSFORM
 		Invalid_domain_ext	:= IF(L.append_is_valid_domain_ext = FALSE,
 															dx_Email.Translation_Codes.rules_bitmap_code('invalid_domain_ext'),0);
 		Missing_domain_ext	:= IF(STD.Str.FindCount(L.clean_email,  '.') = 0,
@@ -32,13 +35,14 @@ EXPORT Fn_Apply_Rules (dataset(recordof(Layouts.Base_BIP)) email_in) := FUNCTION
 															dx_Email.Translation_Codes.rules_bitmap_code('invalid_email'),0));
 		DOD_B4_Email				:= IF(L.IsDeath,
 															dx_Email.Translation_Codes.rules_bitmap_code('dod_b4_email'),0);
-		// Invalid_account			:= IF(L.InvalidAccount,
-															// dx_Email.Translation_Codes.rules_bitmap_code('invalid_account'),0); //waiting for BV lookup to determine this
-		Invalid_account			:= 0;
+		Invalid_account			:= IF(L.InvalidAccount,
+															dx_Email.Translation_Codes.rules_bitmap_code('invalid_account'),0); //Use BV lookup to determine this
 		Profane_email				:= IF(Entiera.fn_profanity(L.clean_email),
 															dx_Email.Translation_Codes.rules_bitmap_code('includes_profanity'),0);
-		disposable_address	:= 0;  //rule will be determined by BV lookup - future use
-		role_address				:= 0;		//rule will be determined by BV lookup - future use
+		disposable_address	:= IF(L.disposable,
+															dx_Email.Translation_Codes.rules_bitmap_code('disposable_address'),0);  //rule determined by BV lookup
+		role_address				:= IF(L.role,
+															dx_Email.Translation_Codes.rules_bitmap_code('role_address'),0);	//rule determined by BV lookup
 															
 		SELF.rules 					:= L.rules |
 													Invalid_domain_ext |

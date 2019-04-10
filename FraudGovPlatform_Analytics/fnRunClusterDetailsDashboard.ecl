@@ -18,13 +18,11 @@
 	//Files used to create the dashboard
 	inputLogicalGraphFilename 										:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.ClusterDetailsDashboard.Filenames(useProdData).InputLogicalGraph, '::', '%3A%3A');
 	inputLogicalEntityStatsFilename 							:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.ClusterDetailsDashboard.Filenames(useProdData).InputLogicalEntityStats, '::', '%3A%3A');
-	inputLogicalPersonEventsFilename 							:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.ClusterDetailsDashboard.Filenames(useProdData).InputLogicalPersonEvents, '::', '%3A%3A');
 	inputLogicalPersonAssociationsStatsFilename 	:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.ClusterDetailsDashboard.Filenames(useProdData).InputLogicalPersonAssociationsStats, '::', '%3A%3A');
 	inputLogicalPersonAssociationsDetailsFilename	:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.ClusterDetailsDashboard.Filenames(useProdData).InputLogicalPersonAssociationsDetails, '::', '%3A%3A');
 
 	fileNames	:= '&InputLogicalGraphFilename='+inputLogicalGraphFilename
 		+'&InputLogicalEntityStatsFilename='+inputLogicalEntityStatsFilename
-		+ '&InputLogicalPersonEventsFilename=' + inputLogicalPersonEventsFilename
 		+ '&InputLogicalPersonAssociationsStatsFilename=' + inputLogicalPersonAssociationsStatsFilename
 		+ '&InputLogicalPersonAssociationsDetailsFilename=' + inputLogicalPersonAssociationsDetailsFilename;
 
