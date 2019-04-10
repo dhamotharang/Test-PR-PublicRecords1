@@ -10,7 +10,7 @@ export t_SocioIndicatorsOptions := record
 	boolean IncludeReadmissionScore {xpath('IncludeReadmissionScore')};
 	boolean IncludeHealthAttributesV3 {xpath('IncludeHealthAttributesV3')};
 	boolean IncludeMedicationAdherenceScore {xpath('IncludeMedicationAdherenceScore')};
-	// boolean IncludeMotivationScore {xpath('IncludeMotivationScore')};
+	boolean IncludeMotivationScore {xpath('IncludeMotivationScore')};
 end;
 		
 export t_Admission := record

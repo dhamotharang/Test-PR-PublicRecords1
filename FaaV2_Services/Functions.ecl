@@ -67,7 +67,6 @@ export Functions := module
    			Self.Registrant.Address := iesp.ECL2ESP.setAddress(l.aircraft.prim_name, l.aircraft.prim_range, l.aircraft.predir, l.aircraft.postdir, l.aircraft.addr_suffix,
    			                              l.aircraft.unit_desig, l.aircraft.sec_range, l.aircraft.v_city_name,
    																		l.aircraft.st, l.aircraft.zip, l.aircraft.z4, l.county_name),
-   			self.Registrant.Address.StateCityZip := '', 
    			self.AircraftInfo.ManufacturerName := l.aircraft.aircraft_mfr_name,
    			self.AircraftInfo.ModelName := l.aircraft.model_name,
    			self.AircraftInfo.SerialNumber := l.aircraft.serial_number,

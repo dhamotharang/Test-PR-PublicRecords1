@@ -617,7 +617,7 @@ EXPORT Constants := MODULE
 	end;
 
 	// BridgerXG5 Gateway
-	export GWBRIDGER := MODULE
+	export GWBRIDGER := MODULE  // Keep below values in sync with SLR to avoid data loss.
 		export unsigned MaxList := 50;
 		export unsigned MaxItem := 1024;
 	end;
@@ -1572,8 +1572,8 @@ EXPORT Constants := MODULE
 	END;
 
 	// Smartlinx Search Core Constants
-	export SLR := module
-		export MaxList		:= 10;
+	export SLR := module    // Keep values in sync with GWBRIDGER to avoid data loss
+		export MaxList		:= 50;
 		export MaxItem 		:= 1024;
 	end;
 	

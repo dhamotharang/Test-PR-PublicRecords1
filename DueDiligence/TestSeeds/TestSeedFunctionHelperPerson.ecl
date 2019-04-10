@@ -553,5 +553,59 @@ EXPORT TestSeedFunctionHelperPerson := MODULE
                                                                     DueDiligence.Common.createNVPair('PerBusAssociations_Flag', LEFT.PerBusAssociations_Flag);));
 
     END;
+    
+    EXPORT GetPersonAttributesNotFound := FUNCTION
+    
+        STRING10 INVALID_INDIVIDUAL_FLAGS := 'FFFFFFFFFF';
+        STRING2 INVALID_INDIVIDUAL_SCORE := '-1';
+        STRING2 NOT_CURRENTLY_IMPLEMENTED := DueDiligence.Constants.EMPTY;
+    
+        RETURN DATASET([TRANSFORM(iesp.duediligenceshared.t_DDRAttributeGroup,
+                                        SELF.name := DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3;
+                                        SELF.attributes := DueDiligence.Common.createNVPair('PerAssetOwnProperty', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerAssetOwnAircraft', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerAssetOwnWatercraft', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerAssetOwnVehicle', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerAccessToFundsIncome', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerAccessToFundsProperty', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerGeographic', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerMobility', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('PerStateLegalEvent', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerFederalLegalEvent', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('PerCivilLegalEvent', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('PerOffenseType', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerAgeRange', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerIdentityRisk', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('PerUSResidency', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerMatchLevel', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerAssociates', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('PerEmploymentIndustry', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('PerProfLicense', INVALID_INDIVIDUAL_SCORE) +
+                                                            DueDiligence.Common.createNVPair('PerBusAssociations', INVALID_INDIVIDUAL_SCORE);
+                                                            
+                                        SELF.attributeLevelHits := DueDiligence.Common.createNVPair('PerAssetOwnProperty_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerAssetOwnAircraft_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerAssetOwnWatercraft_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerAssetOwnVehicle_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerAccessToFundsIncome_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerAccessToFundsProperty_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerGeographic_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerMobility_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('PerStateLegalEvent_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerFederalLegalEvent_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('PerCivilLegalEvent_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('PerOffenseType_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerAgeRange_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerIdentityRisk_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('PerUSResidency_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerMatchLevel_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerAssociates_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('PerEmploymentIndustry_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('PerProfLicense_Flag', INVALID_INDIVIDUAL_FLAGS) +
+                                                                    DueDiligence.Common.createNVPair('PerBusAssociations_Flag', INVALID_INDIVIDUAL_FLAGS);)])[1];
+        
+    END;
 
 END;

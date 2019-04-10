@@ -1,0 +1,5 @@
+testcompositionrun_err.log
+Plugin AppendNewDataIndicator passed compliance check
+
+testcompositionrun_info.log
+Monitoring WU W20180906-123451(HIPIE_BCTLWXCARMIGJX_HIPIE_Plugins.AppendNewDataIndicator.AppendNewDataIndicator_testcmp_CarmigJX) to completion.

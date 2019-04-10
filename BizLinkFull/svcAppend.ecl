@@ -1,4 +1,4 @@
-﻿export svcAppend := macro
+﻿export svcAppend() := macro
 	import BIPV2;
 	import BIPV2_Best;
 

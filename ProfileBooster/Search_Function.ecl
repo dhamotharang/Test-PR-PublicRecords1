@@ -1427,7 +1427,19 @@ prop_common_distr := distribute(prop_common, did);
                                       DATASET([],ProfileBooster.Layouts.Layout_PB_BatchOut)),
                         withBankingExperiance);
 #END                        
-                      
+
+//Blank out the fields calculated outside of getAttributes for any minors
+ProfileBooster.Layouts.Layout_PB_BatchOut Blank_minors(ProfileBooster.Layouts.Layout_PB_BatchOut le) := TRANSFORM
+  isMinor := le.attributes.version1.ProspectAge = '0'; //is zero if is a minor
+  self.attributes.version1.prospectestimatedincomerange := if(isMinor, '-1', le.attributes.version1.prospectestimatedincomerange);
+  self.attributes.version1.prospectbankingexperience := if(isMinor, '-1', le.attributes.version1.prospectbankingexperience);
+  self.attributes.version1.hhestimatedincomerange := if(isMinor, '-1', le.attributes.version1.hhestimatedincomerange);
+  self := le;
+END;
+
+
+
+Final := PROJECT(with_mover_model, Blank_minors(left));                   
      
 // output(p_address,,'~dvstemp::out::property_thor_testing_inputs::p_address_' + thorlib.wuid());
 // output(ids_only,,'~dvstemp::out::property_thor_testing_inputs::ids_only_' + thorlib.wuid());
@@ -1505,7 +1517,7 @@ prop_common_distr := distribute(prop_common, did);
 	 //output( withBankingExperiance, named('withBankingExperiance'));
 /* ********************/
 
-return with_mover_model;	
+return Final;	
 
 
 END;

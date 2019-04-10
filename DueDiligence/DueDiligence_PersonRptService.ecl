@@ -20,7 +20,7 @@ EXPORT DueDiligence_PersonRptService := MACRO
     cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequest(validRequest));
 
 
-    //********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
+    //********************************************************PERSON REPORT LOGIC HERE**********************************************************
     DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
 
     consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, DD_SSNMask, includeReport, displayAttributeText, debugIndicator, busOptions, busLinkingOptions);
@@ -31,17 +31,24 @@ EXPORT DueDiligence_PersonRptService := MACRO
     final_actual := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
                                                                   DueDiligence.Constants.STRING_TRUE, indIndex, indIndexHits, requestedVersion,
                                                                   optionsIn.AdditionalInput);
-                                                                  
-    final_testSeeds := DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName).GetPersonReportSeeds;
+    
+    
+    
+    
+    //********************************************************PERSON TEST SEED LOGIC HERE**********************************************************
+    final_testSeeds := DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName, optionsIn.AdditionalInput).GetPersonReportSeeds;
 
     final := IF(executeTestSeeds, final_testSeeds, final_actual);
 
 
+
     output(final, NAMED('Results')); //This is the customer facing output    
 
-    IF(debugIndicator, output(cleanData, NAMED('cleanData')));                         //This is for debug mode 	
-    IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
-    IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode 
+
+
+    IF(debugIndicator, output(cleanData, NAMED('cleanData')));
+    IF(debugIndicator, output(wseq, NAMED('wseq')));
+    IF(intermediates, output(consumerResults, NAMED('indResults')));
     IF(debugIndicator, output(DD_SSNMask, NAMED('DD_SSNMask'))); 
 
 	

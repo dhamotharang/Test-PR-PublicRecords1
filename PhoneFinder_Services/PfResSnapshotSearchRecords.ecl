@@ -68,6 +68,7 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
     SELF.PrimaryPhone.TotalSpoofedCount := r.spoof_count;
     SELF.PrimaryPhone.LastSpoofDate := iesp.ECL2ESP.toDate((UNSIGNED)(r.last_spoof_date));
     SELF.PrimaryPhone.PhoneForwarded := r.phone_forwarded;
+    SELF.PrimaryPhone.CarrierName := r.carrier;
     SELF := [];
   END;
   
@@ -190,6 +191,7 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
                                  TRANSFORM(iesp.phonefindertransactionsearch.t_phonefindertransactionsearchrecord,
                                  SELF.PrimaryPhone.RiskIndicators := CHOOSEN(SORT(PROJECT(ROWS(RIGHT),iesp.phonefindertransactionsearch.t_PhoneRiskIndicators), RiskId, Level, Category), iesp.Constants.PfResSnapshot.MaxRIs),
                                  SELF             := LEFT));
+
 
   return SORT(dNormPrimaryRIs, CompanyId, TransactionDate.Year, TransactionDate.Month, TransactionDate.Day, UserId, ProductCode, ReferenceCode, TransactionId);
 END;

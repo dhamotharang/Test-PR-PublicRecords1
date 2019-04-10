@@ -69,6 +69,17 @@ EXPORT Healthcare_SocioEconomic_Functions_Core := Module
 	((-0.00000092 * POWER(age,3)) + (0.00005444 * POWER(age,2)) + (0.00173714 * age) + 0.68144918));
 	return Age_Gender_PDC_Rate;
 	end;
+
+	export calc_AG_Pred_Mot(REAL8 age_in, INTEGER female) := function
+	REAL8 AG_Pred_Mot := MAX(0, 
+							MIN(200, 55.90873 
+								+ (18.26601 * (FEMALE))
+								+ (0.7748944 * (age_in))
+								+ ((-7.65616E-03)*POWER(age_in,2))
+								+ ((7.154178E-05)*POWER(age_in,3))
+								));
+	return AG_Pred_Mot;
+	end;
 	
 	export crosswalkState(String inState) := function
 		clnState := trim(STD.Str.ToUpperCase(inState),left,right);

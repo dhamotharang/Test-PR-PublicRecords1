@@ -116,8 +116,8 @@ export IParam := module
       //data-access part:
       EXPORT unsigned1 GLBPurpose := mod.glb;
       EXPORT unsigned1 DPPAPurpose := mod.dppa;
-      EXPORT string DataPermissionMask := mod.DataRestrictionMask;
-      EXPORT string DataRestrictionMask := mod.DataPermissionMask;
+      EXPORT string DataPermissionMask := mod.DataPermissionMask;
+      EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
       EXPORT string5 IndustryClass := mod.industry_class;
       EXPORT string32 ApplicationType := mod.application_type;
       EXPORT boolean IncludeMinors := mod.show_minors;
@@ -144,8 +144,8 @@ export IParam := module
       //data-access part:
       EXPORT unsigned1 glb := mod.GLBPurpose;
       EXPORT unsigned1 dppa := mod.DPPAPurpose;
-      EXPORT string DataPermissionMask := mod.DataRestrictionMask;
-      EXPORT string DataRestrictionMask := mod.DataPermissionMask;
+      EXPORT string DataPermissionMask := mod.DataPermissionMask;
+      EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
       EXPORT string5 industry_class := mod.IndustryClass;
       EXPORT string32 application_type := mod.ApplicationType;
       EXPORT boolean show_minors := mod.IncludeMinors OR (mod.GLBPurpose = 2);

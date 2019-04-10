@@ -1,4 +1,4 @@
-﻿Import Models;
+﻿﻿Import Models;
 Import Profilebooster;
 Import iesp;
 
@@ -64,6 +64,8 @@ EXPORT Layouts_Healthcare_RT_Service := module
 			Boolean SubscribedToReadmissionScore := Healthcare_Constants_RT_Service.CFG_False;
 			Boolean SubscribedToHealthAttributesV3 := Healthcare_Constants_RT_Service.CFG_False;
 			Boolean SubscribedToMedicationAdherenceScore := Healthcare_Constants_RT_Service.CFG_False;
+			Boolean SubscribedToMotivationScore := Healthcare_Constants_RT_Service.CFG_False;
+			
 			//Attribute group suppression settings
 			Boolean SuppressAccident := Healthcare_Constants_RT_Service.CFG_False;
 			Boolean SuppressAddressStability := Healthcare_Constants_RT_Service.CFG_False;
@@ -92,7 +94,6 @@ EXPORT Layouts_Healthcare_RT_Service := module
 			Boolean SuppressSubprimeRequests := Healthcare_Constants_RT_Service.CFG_False;
 
 			//The thresholds for Socio Readmission Category Calculation are set to default values here
-			//TODO: Cange it to 4 decimal places
 			DECIMAL7_4 ReadmissionScore_Category_5_High	:= 100 ;
 			DECIMAL7_4 ReadmissionScore_Category_5_Low	:= 34.8015 ;
 			DECIMAL7_4 ReadmissionScore_Category_4_High	:= 34.8014 ;
@@ -114,6 +115,17 @@ EXPORT Layouts_Healthcare_RT_Service := module
 			DECIMAL7_4 MedicationAdherenceScore_Category_2_Low	:= 74.2271 ;
 			DECIMAL7_4 MedicationAdherenceScore_Category_1_High	:= 100 ;
 			DECIMAL7_4 MedicationAdherenceScore_Category_1_Low	:= 79.9235 ;
+
+			DECIMAL7_4 MotivationScore_Category_5_High	:= 37.5323 ;
+			DECIMAL7_4 MotivationScore_Category_5_Low	:= 0 ;
+			DECIMAL7_4 MotivationScore_Category_4_High	:= 64.3456 ;
+			DECIMAL7_4 MotivationScore_Category_4_Low	:= 37.5324 ;
+			DECIMAL7_4 MotivationScore_Category_3_High	:= 74.2270 ;
+			DECIMAL7_4 MotivationScore_Category_3_Low	:= 64.3457 ;
+			DECIMAL7_4 MotivationScore_Category_2_High	:= 79.9234 ;
+			DECIMAL7_4 MotivationScore_Category_2_Low	:= 74.2271 ;
+			DECIMAL7_4 MotivationScore_Category_1_High	:= 100 ;
+			DECIMAL7_4 MotivationScore_Category_1_Low	:= 79.9235 ;
 	end;
 
 	EXPORT transactionLog := RECORD			

@@ -94,7 +94,7 @@
 
 import AutoStandardI,iesp,ut, Address;
 export SearchService := macro
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		#stored('PhoneticMatch','true');
 
     //get xml input 

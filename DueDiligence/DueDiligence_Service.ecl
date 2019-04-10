@@ -88,18 +88,32 @@ EXPORT DueDiligence_Service := MACRO
       sortProducts := SORT(allProducts, Result.UniqueID, Result.BusinessID);
 
 
-      final := ROLLUP(sortProducts,
-                      LEFT.Result.inputEcho.productRequestType = RIGHT.Result.inputEcho.productRequestType,
-                      TRANSFORM(requestResponseLayout,
-                                SELF.Result.PersonLexIDMatch := DueDiligence.Common.firstNonZeroNumber(Result.PersonLexIDMatch);
-                                SELF.Result.BusinessLexIDMatch := DueDiligence.Common.firstNonZeroNumber(Result.BusinessLexIDMatch);
-                                SELF.Result.AttributeGroup.Attributes :=  LEFT.Result.AttributeGroup.Attributes + RIGHT.Result.AttributeGroup.Attributes;
-                                SELF.Result.AttributeGroup.AttributeLevelHits := LEFT.Result.AttributeGroup.AttributeLevelHits + RIGHT.Result.AttributeGroup.AttributeLevelHits;
-                                SELF.Result.AttributeGroup.Name := DueDiligence.Common.firstPopulatedString(Result.AttributeGroup.Name);
-                                SELF.Result.CitizenshipResults.CitizenshipScore := DueDiligence.Common.firstPopulatedString(Result.CitizenshipResults.CitizenshipScore);
-                                SELF.Result.CitizenshipResults.CitizenshipAttributes := LEFT.Result.CitizenshipResults.CitizenshipAttributes + RIGHT.Result.CitizenshipResults.CitizenshipAttributes;
-                                SELF := LEFT;));
+      final_actual := ROLLUP(sortProducts,
+                              LEFT.Result.inputEcho.productRequestType = RIGHT.Result.inputEcho.productRequestType,
+                              TRANSFORM(requestResponseLayout,
+                                        SELF.Result.PersonLexIDMatch := DueDiligence.Common.firstNonZeroNumber(Result.PersonLexIDMatch);
+                                        SELF.Result.BusinessLexIDMatch := DueDiligence.Common.firstNonZeroNumber(Result.BusinessLexIDMatch);
+                                        SELF.Result.AttributeGroup.Attributes :=  LEFT.Result.AttributeGroup.Attributes + RIGHT.Result.AttributeGroup.Attributes;
+                                        SELF.Result.AttributeGroup.AttributeLevelHits := LEFT.Result.AttributeGroup.AttributeLevelHits + RIGHT.Result.AttributeGroup.AttributeLevelHits;
+                                        SELF.Result.AttributeGroup.Name := DueDiligence.Common.firstPopulatedString(Result.AttributeGroup.Name);
+                                        SELF.Result.CitizenshipResults.CitizenshipScore := DueDiligence.Common.firstPopulatedString(Result.CitizenshipResults.CitizenshipScore);
+                                        SELF.Result.CitizenshipResults.CitizenshipAttributes := LEFT.Result.CitizenshipResults.CitizenshipAttributes + RIGHT.Result.CitizenshipResults.CitizenshipAttributes;
+                                        SELF := LEFT;));
 
+      
+      
+      //********************************************************PERSON TEST SEED LOGIC HERE**********************************************************
+      final_testSeeds := CASE(reqProduct,
+                              DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY => DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName, optionsIn.AdditionalInput).GetPersonAttributeSeeds);
+
+
+
+
+
+
+
+      final := MAP(executeTestSeeds AND reqProduct = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY => final_testSeeds,
+                    final_actual);
 
 
 

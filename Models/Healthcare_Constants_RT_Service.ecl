@@ -1,4 +1,4 @@
-﻿EXPORT Healthcare_Constants_RT_Service := MODULE
+﻿﻿EXPORT Healthcare_Constants_RT_Service := MODULE
 	
 	Export CFG_False := false;
 	Export CFG_True := true;
@@ -12,6 +12,7 @@
 	Export CFG_MBS_SubscribedToReadmissionScore := 'SubscribedToReadmissionScore';
 	Export CFG_MBS_SubscribedToHealthAttributesV3 := 'SubscribedToHealthAttributesV3';
 	Export CFG_MBS_SubscribedToMedicationAdherenceScore := 'SubscribedToMedicationAdherenceScore';
+	Export CFG_MBS_SubscribedToMotivationScore := 'SubscribedToMotivationScore';
 
 	// Error Messages Section
 	Export InvalidInput_Code := 303;
@@ -19,6 +20,7 @@
 	Export AttributesSubFailMessage := 'HEALTH ATTRIBUTESV3 IS NOT SUBSCRIBED. ';
 	Export ReadmissionSubFailMessage := 'READMISSION RISK SCORE IS NOT SUBSCRIBED. ';
 	Export MedicationAdherenceSubFailMessage := 'MEDICATION ADHERENCE SCORE IS NOT SUBSCRIBED. ';
+	Export MotivationSubFailMessage := 'MOTIVATION SCORE IS NOT SUBSCRIBED. ';	
 	Export SubInvalidRequest := 'INVALID REQUEST. ';
 	Export INTEGER Name_First_Rej_Code := 8;
 	Export Name_First_Rej_Message := 'INVALID OR BLANK FIRST NAME';
@@ -128,6 +130,28 @@
 	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_2_Low	:= 74.2271 ;
 	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_1_High	:= 100 ;
 	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_1_Low	:= 79.9235 ;
+
+	Export CFG_MBS_MotivationScore_Category_5_High := 'MotivationScore_Category_5_High';
+	Export CFG_MBS_MotivationScore_Category_5_Low := 'MotivationScore_Category_5_Low';
+	Export CFG_MBS_MotivationScore_Category_4_High := 'MotivationScore_Category_4_High';
+	Export CFG_MBS_MotivationScore_Category_4_Low := 'MotivationScore_Category_4_Low';
+	Export CFG_MBS_MotivationScore_Category_3_High := 'MotivationScore_Category_3_High';
+	Export CFG_MBS_MotivationScore_Category_3_Low := 'MotivationScore_Category_3_Low';
+	Export CFG_MBS_MotivationScore_Category_2_High := 'MotivationScore_Category_2_High';
+	Export CFG_MBS_MotivationScore_Category_2_Low := 'MotivationScore_Category_2_Low';
+	Export CFG_MBS_MotivationScore_Category_1_High := 'MotivationScore_Category_1_High';
+	Export CFG_MBS_MotivationScore_Category_1_Low := 'MotivationScore_Category_1_Low';
+
+	Export	DECIMAL7_4 val_MotivationScore_Category_5_High	:= 20.6416 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_5_Low	:= 0 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_4_High	:= 27.7633 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_4_Low	:= 20.6417 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_3_High	:= 34.4366 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_3_Low	:= 27.7634 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_2_High	:= 41.6533 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_2_Low	:= 34.4367 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_1_High	:= 100 ;
+	Export	DECIMAL7_4 val_MotivationScore_Category_1_Low	:= 41.6534 ;
 
 	Export usage_GLB_Value := '06';
 

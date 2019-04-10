@@ -1,5 +1,5 @@
 ﻿import tools,bipv2_proxid,bipv2_proxid_mj6,BizLinkFull,BIPV2_Best,BIPV2_Relative,TopBusiness_BIPV2,BIPV2_Seleid_Relative,bipv2_lgid3,BIPv2_HRCHY;
-
+ 
 EXPORT keynames(
 
    string   pversion              = ''
@@ -18,6 +18,7 @@ module
 
   //weekly keys
 	export contact_linkids           := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::contact_linkids'            ,pversion    );
+	export contact_title_linkids     := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::contact_title_linkids'      ,pversion    );
 	export directories_linkids       := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::directories_linkids'        ,pversion    );
 
   //misc keys
@@ -50,6 +51,7 @@ module
     + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).match_candidates_debug.dall_filenames
     + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).specificities_debug   .dall_filenames
     + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).match_sample_debug    .dall_filenames
+    + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).attribute_matches     .dall_filenames
     + BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
     // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
@@ -60,6 +62,7 @@ module
   export BIPV2WeeklyKeys := 
       directories_linkids         .dall_filenames
     + contact_linkids             .dall_filenames
+    + contact_title_linkids       .dall_filenames
       ;
   
   export BIPV2DatalandKeys := BIPV2FullKeys;
