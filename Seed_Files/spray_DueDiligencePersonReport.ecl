@@ -12,7 +12,7 @@ EXPORT spray_DueDiligencePersonReport(string filedate,
 
 	setupSuperFiles(STRING keyname) := FUNCTION
 
-		sfile := '~thor_data400::base::testseed_' + keyname;
+		sfile := '~thor_data400::base::dueDiligencePersonReport_testseed_' + keyname;
 		RETURN SEQUENTIAL(
 							FileServices.StartSuperFileTransaction(),
 							IF(FileServices.FileExists(sfile),FileServices.ClearSuperFile(sfile,true),FileServices.CreateSuperFile(sfile)),
@@ -21,7 +21,7 @@ EXPORT spray_DueDiligencePersonReport(string filedate,
 	END;
 	
 	flfile(string pkeyword) := '~thor_data400::in::testseed::' + filedate + '::duediligencepersonreport::' + pkeyword;
-  fsfile(string pkeyword) := '~thor_data400::base::testseed_' + pkeyword;
+  fsfile(string pkeyword) := '~thor_data400::base::dueDiligencePersonReport_testseed_' + pkeyword;
 	
 	spry_raw:=DATASET([
 		 {pServer,pDir,'DueDiligencePersonReport_testseeds_BestInfo.csv'							,0 ,flfile('BestInfo'			),[{fsfile('BestInfo'			)}],pGroupName,filedate,'','VARIABLE'}

@@ -52,9 +52,8 @@ Set_record_id:=[59386231,59812325,78505368,82750428,13496281,64149144,74043112,3
 
 Set_did:=[002629302069,001031210303,000076333661,000963314432,000802723589,002125424642,002125424642,002125424642,000961280782,000025768453,001448074974,000191818949,002178624198,000198045101,013977886612,002516994105,002516994105,001611240365,000684209386,000562804374,000562804374,002745971775];
 
-
 // filter out spurious transactions in the future.
-fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and  (record_id in Set_record_id OR did % 100 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did OR classification_Activity.Confidence_that_activity_was_deceitful_id = 3));
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today() and did != 1);// and  (record_id in Set_record_id OR did % 10000 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or HASH32(ip_address) % 1000 = 1 or bank_account_number_1 != '' or drivers_license != '' or did in set_did OR classification_Activity.Confidence_that_activity_was_deceitful_id = 3));
 
 final := DISTRIBUTE(fraudgov_dataset);
 

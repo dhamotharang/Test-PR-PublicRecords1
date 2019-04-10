@@ -1,4 +1,4 @@
-import tools,_control,ut,wk_ut;
+﻿import tools,_control,ut,wk_ut;
 
 export mac_Watcher(
 
@@ -19,7 +19,7 @@ functionmacro
   emails          := pNotifyEmails;
   watchworkunit   := pWorkunit;
 
-  getstate      := trim(wk_ut.get_WUInfo(watchworkunit).State_nofail,left,right); //use nofail because even if soapcall fails, don't want to fail this workunit.  Just try again according to cronfreq
+  getstate      := trim(wk_ut.get_State(watchworkunit),left,right); //use nofail because even if soapcall fails, don't want to fail this workunit.  Just try again according to cronfreq
   realstate     := if(getstate[1..6] = 'failed' ,'failed' ,getstate);
   // realjobname   := trim(wk_ut.get_Jobname(watchworkunit));
   // jobname       := if(realjobname = ''  ,watchworkunit  ,realjobname + ' (' + watchworkunit + ')');

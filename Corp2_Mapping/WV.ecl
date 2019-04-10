@@ -1,4 +1,4 @@
-Import _Control, Corp2, Corp2_Raw_WV, Scrubs, Scrubs_Corp2_Mapping_WV_Main, Tools, UT, VersionControl, Std, _validate ;
+﻿Import _Control, Corp2, Corp2_Raw_WV, Scrubs, Scrubs_Corp2_Mapping_WV_Main, Tools, UT, VersionControl, Std, _validate ;
 
 Export WV 	:= Module
 
@@ -89,8 +89,9 @@ Export WV 	:= Module
 			self.corp_for_profit_ind              := map(corp2.t2u(input.BusinessClass)='P' =>'Y',
 																									 corp2.t2u(input.BusinessClass)='N'	=>'N',
 																									 '');
-			self.corp_termination_date   					:= If(corp2.t2u(input.businesstype) not in ['LLC', 'LLP'] ,Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate, '');								 
-			self.Corp_Termination_Cd	          	:= map(corp2.t2u(input.businesstype)  in ['LLC', 'LLP']=>'',
+			self.corp_termination_date   					:= If(corp2.t2u(input.businesstype) not in ['LLC', 'LLP','TMO'] ,Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate, '');								 
+			self.corp_trademark_expiration_date 	:= If(corp2.t2u(input.businesstype) = 'TMO',Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate, '');								 
+  		self.Corp_Termination_Cd	          	:= map(corp2.t2u(input.businesstype)  in ['LLC', 'LLP','TMO']=>'',
 																									 corp2.t2u(input.TerminationReason) in ['0','D','S','O','Y','`']=>'', //Per CI : 'No code descriptions - leave blank'
 																									 corp2.t2u(input.TerminationReason)
 																									);																				
@@ -99,12 +100,13 @@ Export WV 	:= Module
 			self.corp_status_Cd	          				:= map(corp2.t2u(input.businesstype)  in ['LLC', 'LLP']=>'',
 																									 corp2.t2u(input.TerminationReason) in ['0','D','S','O','Y','`']=>'', //Per CI : 'No code descriptions - leave blank'
 																									 corp2.t2u(input.TerminationReason)
-																									);																				
-			self.corp_status_Desc 								:= Corp2_Raw_WV.Functions.fGetTerminationDesc(self.corp_status_Cd);
-			self.corp_status_Comment              := Corp2_Raw_WV.Functions.fGetStatusDesc(self.Corp_Termination_Cd);//overload
-			Self.corp_term_exist_cd 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP'] and Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate<>'', 'D','');
-			Self.corp_term_exist_exp 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP'] ,Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate,'');
-			Self.corp_term_exist_desc 				    := If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP'] and Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate<>'','EXPIRATION DATE','');
+																									 );
+			self.corp_status_Desc 								:= if(((ut.date_slashed_mmddyyyy_to_yyyymmdd(input.TerminationDate) > ut.GetDate) OR trim(input.TerminationDate,left,right) = '') AND
+			                                              corp2.t2u(input.TerminationReason) in ['X',''], 'ACTIVE', 'NOT ACTIVE');
+			self.corp_status_Comment              := if(corp2.t2u(input.businesstype) <> 'TMO',Corp2_Raw_WV.Functions.fGetStatusDesc(self.Corp_Termination_Cd),'');//overload
+			Self.corp_term_exist_cd 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP', 'TMO'] and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate<>'', 'D','');
+			Self.corp_term_exist_exp 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP', 'TMO'],Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate,'');
+			Self.corp_term_exist_desc 				    := If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP', 'TMO'] and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate<>'','EXPIRATION DATE','');
 			self.corp_address1_line1							:= if(corp2.t2u(input.ContactType)in address1_type_list,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.street1,input.street2,input.City,input.stateProvince,input.zipCode).AddressLine1,'');
 			self.corp_address1_line2				 			:= if(corp2.t2u(input.ContactType)in address1_type_list,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.street1,input.street2,input.City,input.stateProvince,input.zipCode).AddressLine2,'');
 			self.corp_address1_line3				  		:= if(corp2.t2u(input.ContactType)in address1_type_list,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.street1,input.street2,input.City,input.stateProvince,input.zipCode).AddressLine3,'');
@@ -293,27 +295,33 @@ Export WV 	:= Module
 			self.corp_orig_sos_charter_nbr		 := corp2.t2u(input.record_did);
 			self.corp_legal_name             	 := Corp2_Mapping.fCleanBusinessName(state_origin ,state_desc,input.DBAname).BusinessName; 
 			self.corp_inc_state                := state_origin;
-			self.corp_ln_name_type_cd          := map(corp2.t2u(input.DBAType)='TN'=>'04',
-																								corp2.t2u(input.DBAType)='TM'=>'03',
-																								corp2.t2u(input.DBAType)='FDB'=>'F',																								
-																								corp2.t2u(input.DBAType) in ['FDA','F','FD','TMO']=>'', //Per CI : 'FDA','F' -No code descriptions - leave blank
+			self.corp_ln_name_type_cd          := map(corp2.t2u(input.DBAType) = 'TN'                    => '04',
+			                                          corp2.t2u(input.DBAType) = 'FTN'                   => 'FN',
+																								corp2.t2u(input.DBAType) = 'GTN'                   => 'GN',
+																								corp2.t2u(input.DBAType) = 'STN'                   => 'SN',
+																								corp2.t2u(input.DBAType) = 'TM'                    => '03',
+																								corp2.t2u(input.DBAType) = 'FDB'                   => 'F',
+																								corp2.t2u(input.DBAType) in ['FDA','F','FD','TMO'] => '', //Per CI : 'FDA','F' -No code descriptions - leave blank
 																								corp2.t2u(input.DBAType)
 																								);
-			self.corp_ln_name_type_desc        := map(corp2.t2u(input.DBAType)='TN'=>'TRADENAME',
-																								corp2.t2u(input.DBAType)='TM'=>'TRADEMARK',
-																								corp2.t2u(input.DBAType)='FDB'=>'FICTITIOUS NAME',																								
-																								corp2.t2u(input.DBAType)in ['FDA','F','FD','TMO']=>'',
+			self.corp_ln_name_type_desc        := map(corp2.t2u(input.DBAType) = 'TN'                    => 'TRADENAME',
+			                                          corp2.t2u(input.DBAType) = 'FTN'                   => 'FICTITIOUS TRADENAME',
+																								corp2.t2u(input.DBAType) = 'GTN'                   => 'GENERAL PARTNER TRADENAME',
+																								corp2.t2u(input.DBAType) = 'STN'                   => 'SOLE PROPRIETOR TRADENAME',
+																								corp2.t2u(input.DBAType) = 'TM'                    => 'TRADEMARK',
+																								corp2.t2u(input.DBAType) = 'FDB'                   => 'FICTITIOUS NAME',	
+																								corp2.t2u(input.DBAType) in ['FDA','F','FD','TMO'] => '',
 																								'');
 			self.corp_foreign_domestic_ind     := if(corp2.t2u(input.DBAType)= 'FDB','F','');
-			self.Corp_Name_Effective_Date    	 := if(corp2.t2u(input.DBAType)in['FDB','TN'],Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate,'');
+			self.Corp_Name_Effective_Date    	 := if(corp2.t2u(input.DBAType)in['FDB','TN','FTN','GTN','STN'],Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate,'');
 			self.Corp_Name_Status_Desc				 := map(corp2.t2u(input.DBAType)= 'FDB' and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate<>'' => 'DATE FOREIGN DBA TERMINATES: '+ Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate,																							
-																							  corp2.t2u(input.DBAType)='TN' and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate<>'' => 'DATE FOREIGN TRADENAME TERMINATES: '+ Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate,
+																							  corp2.t2u(input.DBAType) in ['TN','FTN','GTN','STN'] and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate<>'' => 'DATE TRADENAME TERMINATES: '+ Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate,
 																							'');
-			self.Corp_Trademark_Expiration_Date:= if(corp2.t2u(input.DBAType)='TM',Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate,'');
+			self.Corp_Trademark_Expiration_Date:= if(corp2.t2u(input.DBAType) in ['TM','TMO'],Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate,'');
 			self.Corp_Trademark_Filing_Date    := if(corp2.t2u(input.DBAType)='TM',Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate,'');
 			self.Corp_Trademark_Logo           := if(corp2.t2u(input.DBAType)='TM',corp2.t2u(input.DBAname),'');	
 			self.corp_status_date              := Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate;
-   		self.corp_status_desc              := if(trim(self.corp_status_date)<>'','TERMINATED',''); 
+   		self.corp_status_desc              := if(trim(self.corp_status_date)<>'','TERMINATED',''); 		
 			self.Corp_Termination_date         := Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate;
 			self.Corp_Termination_desc				 := if(trim(self.Corp_Termination_date)<>'','TERMINATED',''); 
 			self.corp_filing_date    	 				 := if(corp2.t2u(input.DBAType)in ['TM','TN','FDB'],Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').pastDate,'');
@@ -530,14 +538,24 @@ Export WV 	:= Module
 		ds_stock  := project(ds_corporations, wv_stockTransform(left))(corp2.t2u(stock_authorized_nbr + stock_par_value + stock_tax_capital)<>'') ;
 		mapStock  := dedup(sort(distribute(ds_stock,hash(corp_key)),record,local),record,local) ;
 
-		mapMain		:= dedup(sort(distribute(mapDissolutions  + 
-																			 mapCont 					+ 
-																			 mapDBA 					+ 
-																			 mapSubsidiaries  + 
-																			 mapNamechanges
-																			 ,hash(corp_key)
-																			 ),
+		MapCorpRecs:= dedup(sort(distribute( mapDissolutions  + 
+																				 mapCont 					+ 
+																				 mapDBA 					+ 
+																				 mapSubsidiaries  + 
+																				 mapNamechanges
+																				 ,hash(corp_key)
+																				 ),
 												record,local),record,local): independent;
+												
+		Corp2_Mapping.LayoutsCommon.Main legalNameFix_Trans(Corp2_Mapping.LayoutsCommon.Main  l):= transform
+			
+			self.corp_legal_name :=if(Corp2_Mapping.fSpecialChars(l.corp_legal_name)='FOUND', Corp2_Raw_WV.Functions.fix_ForeignChar(l.corp_legal_name), l.corp_legal_name);
+			self								 :=l;
+			
+		end;
+		
+		legalNameFix          := project(MapCorpRecs, legalNameFix_Trans(left)) ;
+		MapMain 							:= dedup(sort(distribute(legalNameFix,hash(corp_key)),record,local),record,local) : independent;		
 																	 
 		mapEvents	:= dedup(sort(distribute(mapEvent1 + 
 																			 mapEvent2,hash(corp_key)
@@ -711,7 +729,7 @@ Export WV 	:= Module
 											);
 											
 		//Validating the filedate entered is within 30 days										 
-		isFileDateValid := if((string)Std.Date.Today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);										 
+		isFileDateValid := if((string)Std.Date.Today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
 		result		 			:= if(isFileDateValid
 													,run_Main 
 													,sequential(Corp2_Mapping.Send_Email( state_origin,filedate).InvalidFileDateParm

@@ -56,6 +56,10 @@ function
 	end;
   
 
+  import ut,Workman;
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   esp				:= pesp + ':8010';
   dsoap_results := SOAPCALL(
     'http://' + esp + '/WsDfu?ver_=1.31'
@@ -66,6 +70,18 @@ function
     ,timeout(1200)  //max 20 minutes
   );
   
-  return dsoap_results  ;
+  dsoap_results_remote := SOAPCALL(
+    'http://' + esp + '/WsDfu?ver_=1.31'
+    ,'DFUArrayAction'
+    ,DFUArrayActionRequest_Record
+    ,dataset(DFUArrayActionResponse_Record)
+    ,xpath('DFUArrayActionResponse')
+    ,timeout(1200)  //max 20 minutes
+    %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,dsoap_results  ,dsoap_results_remote);
+
+  return returnresult  ;
 
 end;

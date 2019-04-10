@@ -1,4 +1,4 @@
-import  ut,lib_date,data_services,STD;
+﻿import  ut,lib_date,data_services,STD;
 
  file_in_defendant_arrests_raw   :=  dataset(data_services.foreign_prod+ 'thor_200::in::crim::hd::arrest_defendant',
 								layout_in_defendant,
@@ -15,7 +15,13 @@ file_in_defendant_CW  := dataset(data_services.foreign_prod+'thor_200::in::crim:
 
 proj_def_cw           := Project(file_in_defendant_CW,transform(hygenics_crim.layout_in_defendant,self.sourcename := trim(left.sourcename)+'_CW'; self := left;));
 
-c := a+b+proj_def_cw;
+file_in_defendant_IE  := dataset(data_services.foreign_prod+'thor_200::in::crim::hd::arrest_defendant_ie', hygenics_crim.layout_in_defendant,
+														CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(4096)))
+														(stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID' and nametype<>'B' and name not in ['UNKNOWN', 'RESTRICTED', 'EXPUNGED', 'EXPUNGED EXPUNGED', 'NONAME'] and regexfind('[0-9][0-9]+', name[1..2], 0)='') ;
+
+proj_def_IE           := Project(file_in_defendant_IE,transform(hygenics_crim.layout_in_defendant,self.sourcename := trim(left.sourcename)+'_IE'; self := left;));
+
+c := a+b+proj_def_cw+proj_def_IE;
 
 //Added 60 Day Restriction to INDIANA Sourced Data///////////////////////////////////////////////////////////////////
 

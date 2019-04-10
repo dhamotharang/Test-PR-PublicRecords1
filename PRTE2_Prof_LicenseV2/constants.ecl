@@ -1,7 +1,9 @@
 ﻿import _control, data_services;
 
 export constants := module
-	EXPORT prolicv2_base := data_services.foreign_prod + 'prte::base::prolicv2';
+	//EXPORT prolicv2_base := data_services.foreign_prod + 'prte::base::prolicv2';
+	EXPORT prolicv2_base := '~prte::base::prolicv2';
+	
 	EXPORT KeyName_prolicv2 := 	'~prte::key::prolicv2::';
 	EXPORT ak_keyname := KeyName_prolicv2 +'@version@::autokey::';
 	EXPORT ak_logical(string filedate) := KeyName_prolicv2 + filedate + '::autokey::';

@@ -135,7 +135,7 @@
   EXPORT AreaRisk := RECORD
     BOOLEAN hifca;
     BOOLEAN hidta;
-    STRING5 crimeIdex;
+    STRING5 crimeIndex;
   END;
   
   EXPORT CountyCityRisk := RECORD

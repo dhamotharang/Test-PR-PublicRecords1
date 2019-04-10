@@ -5,16 +5,16 @@ EXPORT fraudgovInfo(
 ):= 
 module
 	
-		SHARED fn := filenames().OutputF.FraudgovInfoFn;
+		SHARED fn := filenames().Flags.FraudgovInfoFn;
 
-		SHARED fi_d := dataset(fn,FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec,flat,opt);
+		SHARED fi_d := dataset(fn,FraudGovPlatform.Layouts.Flags.FraudgovInfoRec,flat,opt);
 		EXPORT PreviousVersion := if(fi_d[1].PreviousVersion != '', fi_d[1].PreviousVersion, pVersion);
 		EXPORT CurrentStatus := fi_d[1].Status;
 		SHARED IsNew 	:= if(nothor(fileservices.fileExists(fn)), PreviousVersion <> pVersion or CurrentStatus <> pStatus, true);
 
 
 		PromoteSupers.MAC_SF_BuildProcess(
-				dataset([{PreviousVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
+				dataset([{PreviousVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.Flags.FraudgovInfoRec), 
 				fn,
 				WriteFile,
 				2
@@ -24,7 +24,7 @@ module
 		EXPORT postNewStatus := if(	IsNew,WriteFile);
 
 		PromoteSupers.MAC_SF_BuildProcess(
-				dataset([{pVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.OutputF.FraudgovInfoRec), 
+				dataset([{pVersion, pVersion, pStatus}],FraudGovPlatform.Layouts.Flags.FraudgovInfoRec), 
 				fn,
 				WritePreviousVersion,
 				2
