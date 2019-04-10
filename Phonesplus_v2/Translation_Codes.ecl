@@ -55,7 +55,7 @@ export source_bitmap_code(string source = '')  := map(
 													source =  mdr.sourceTools.src_thrive_pd				          => ut.bit_set(0,45),
 													source =  mdr.sourceTools.src_AlloyMedia_Consumer	      => ut.bit_set(0,46),
 													source =  mdr.sourceTools.src_Link2Tek	                => ut.bit_set(0,47),
-													source =  mdr.sourceTools.src_NeustarWireless           => ut.bit_set(0,49), //Jira DF-24336
+													source =  mdr.sourceTools.src_NeustarWireless           => ut.bit_set(0,48), //Jira DF-24336
 													0); //Max 64 sources
 
 //-----Bit map translation for EQ											
