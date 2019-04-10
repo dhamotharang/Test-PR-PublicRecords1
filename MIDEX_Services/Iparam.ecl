@@ -121,6 +121,9 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN  isLicenseOnlyReport := FALSE; // defaulting to false so other services (Midex Comp Report & 
                                                   // Relationship Identifier Report) calling the 
                                                   // MIDEX_Services.LicenseReport_Records attribute are not impacted
+    EXPORT BOOLEAN  includeLicRptsFromNMLS := TRUE; // defaulting to TRUE so the comp report can return multiple 
+                                                    // license reports with the same/associated NMLS id and 
+                                                    // is not impacted by this change.
   END;
 
   
