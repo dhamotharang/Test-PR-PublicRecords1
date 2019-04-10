@@ -3,7 +3,6 @@
 EXPORT Verify_Deprecated_Keys := FUNCTION
 
   RETURN PARALLEL(
-  
      // DF-22645 - Show counts of blanked out fields in thor_data400::key::override::fcra::thrive::qa::ffid
      OUTPUT(strata.macf_pops(Overrides.Keys.Thrive,,,,,,FALSE,['phone_work','phone_home','phone_cell',
                               'monthsemployed','own_home','is_military','drvlic_state','monthsatbank','ip','yrsthere','besttime',
@@ -138,21 +137,17 @@ EXPORT Verify_Deprecated_Keys := FUNCTION
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircraft::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_aircraft_ffid,,,,,,FALSE,['ace_fips_st','certification',
 															 'compname','country','fract_owner','last_action_date','orig_county',
-															 'region','status_code','title','type_registrant']),named('overrides_aircraft_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircrafts::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.aircraft,,,,,,FALSE,['ace_fips_st','certification',
 															 'compname','country','fract_owner','last_action_date','orig_county',
-															 'region','status_code','title','type_registrant']),named('overrides_faa_aircraft_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircraft_details::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.aircraft_details,,,,,,FALSE,['aircraft_category_code',
 															 'aircraft_cruising_speed','aircraft_weight','amateur_certification_code',
-															 'lf','number_of_engines','number_of_seats']),named('overrides_faa_aircraft_details_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircraft_engine::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.aircraft_engine,,,,,,FALSE,['fuel_consumed','lf']),named('overrides_faa_engine_info_deprecation_stats'))
 		 // Show counts of blanked out fields in thor_data400::key::override::fcra::pilot_certificate::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.airmen_cert,,,,,,FALSE,['ratings']),named('overrides_faa_airmen_certs_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::pilot_registration::qa::ffid
-		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.airmen_reg,,,,,,FALSE,['ace_fips_st','country','region','title']),named('overrides_faa_airmen_reg_deprecation_stats'))
 
 
 		 //Gong
@@ -168,7 +163,6 @@ EXPORT Verify_Deprecated_Keys := FUNCTION
 		 ,OUTPUT(strata.macf_pops(FCRA.key_Override_liensv2_party_ffid,,,,,,FALSE,
 															['phone','tax_id']),named('overrides_liens_party_fcra_deprecation_stats'))
 
-		 //Marriage and Divorce
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_marriage.marriage_main,,,,,,FALSE,['divorce_docket_volume','divorce_filing_dt',
 															 'filing_subtype','grounds_for_divorce','marriage_docket_volume','marriage_duration','marriage_duration_cd',
 															 'marriage_filing_dt','number_of_children','place_of_marriage','type_of_ceremony']),named('overrides_mdv2_main_fcra_deprecation_stats'))
@@ -341,6 +335,7 @@ EXPORT Verify_Deprecated_Keys := FUNCTION
 															 'watercraft_color_2_description','watercraft_hp_1','watercraft_hp_2','watercraft_hp_3',
 															 'watercraft_name','watercraft_number_of_engines','watercraft_status_code','watercraft_status_description',
 															 'watercraft_toilet_code','watercraft_toilet_description','watercraft_weight','watercraft_width']))
+
   );
 
 END;
