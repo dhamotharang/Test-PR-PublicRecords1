@@ -4,21 +4,21 @@ module
 	shared emailaddressep := if(Corp2.IsTesting, ',', ';');
 	
 	export all_hands := 'michael.gould@lexisnexis.com' 						
-											+ emailaddressep +	'julie.ellison@lexisnexis.com' 		
-											+ emailaddressep +	'julianne.franzer@lexisnexis.com' 
-											+ emailaddressep +  'kevin.reeder@lexisnexis.com'
-											+ emailaddressep +  'audra.mireles@lexisnexis.com'
-											+ emailaddressep +  'saritha.myana@lexisnexis.com'
-											+ emailaddressep +  'rosemary.murphy@lexisnexis.com'
-											+ emailaddressep +  'lucinda.sibille@lexisnexis.com'
+											+ emailaddressep +	'julie.ellison@lexisnexisrisk.com' 		
+											+ emailaddressep +	'julianne.franzer@lexisnexisrisk.com' 
+											+ emailaddressep +  'kevin.reeder@lexisnexisrisk.com'
+											+ emailaddressep +  'audra.mireles@lexisnexisrisk.com'
+											+ emailaddressep +  'saritha.myana@lexisnexisrisk.com'
+											+ emailaddressep +  'rosemary.murphy@lexisnexisrisk.com'
+											+ emailaddressep +  'lucinda.sibille@lexisnexisrisk.com'
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
 											;
 											
-	export allScrubs := 'julianne.franzer@lexisnexis.com' 						
-											+ emailaddressep +	'michael.gould@lexisnexis.com'
-											+ emailaddressep +  'kevin.reeder@lexisnexis.com'
-											+ emailaddressep +	'julie.ellison@lexisnexis.com' 		
-											+ emailaddressep +	'rosemary.murphy@lexisnexis.com' 
+	export allScrubs := 'julianne.franzer@lexisnexis.com' 		
+											+ emailaddressep +  'kevin.reeder@lexisnexisrisk.com'
+											+ emailaddressep +	'Gregory.Rose@lexisnexisrisk.com'
+											+ emailaddressep +	'julie.ellison@lexisnexisrisk.com' 		
+											+ emailaddressep +	'rosemary.murphy@lexisnexisrisk.com' 
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
 											;
 											
