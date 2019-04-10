@@ -35,9 +35,12 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
              LEFT.nmlsid = RIGHT.nmlsid,
              TRANSFORM(MIDEX_Services.Layouts.rec_NMLSWithDBAs,
                        SELF.NMLSId   := LEFT.NMLSId,
-                       SELF.DBANames := LEFT.DBANames + RIGHT.DBANames ));
+                       SELF.DBANames := LEFT.DBANames + RIGHT.DBANames));
       
-    ds_Profreport_ids  := DEDUP(SORT(ds_AllRidsNmlsDbas.MariRids + in_mod.MariRidNumbers, mari_rid), mari_rid);
+    ds_Profreport_ids  := IF(in_mod.includeLicRptsFromNMLS,
+                             DEDUP(SORT(ds_AllRidsNmlsDbas.MariRids + in_mod.MariRidNumbers, mari_rid), mari_rid),
+                             in_mod.MariRidNumbers);
+                             
 		ds_Sanctreport_ids := in_mod.MidexReportNumbers;
     
     // Get Non Public Sanction report(s)
