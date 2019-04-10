@@ -137,18 +137,22 @@ EXPORT Verify_Deprecated_Keys := FUNCTION
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircraft::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_aircraft_ffid,,,,,,FALSE,['ace_fips_st','certification',
 															 'compname','country','fract_owner','last_action_date','orig_county',
+                                   'region','status_code','title','type_registrant']),named('overrides_faa_aircraft_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircrafts::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.aircraft,,,,,,FALSE,['ace_fips_st','certification',
 															 'compname','country','fract_owner','last_action_date','orig_county',
+                                   'region','status_code','title','type_registrant']),named('overrides_faa_aircrafts_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircraft_details::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.aircraft_details,,,,,,FALSE,['aircraft_category_code',
 															 'aircraft_cruising_speed','aircraft_weight','amateur_certification_code',
+                                   'lf','number_of_engines','number_of_seats']),named('overrides_faa_aircraft_info_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::aircraft_engine::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.aircraft_engine,,,,,,FALSE,['fuel_consumed','lf']),named('overrides_faa_engine_info_deprecation_stats'))
 		 // Show counts of blanked out fields in thor_data400::key::override::fcra::pilot_certificate::qa::ffid
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.airmen_cert,,,,,,FALSE,['ratings']),named('overrides_faa_airmen_certs_deprecation_stats'))
 		 //Show counts of blanked out fields in thor_data400::key::override::fcra::pilot_registration::qa::ffid
-
+		 ,OUTPUT(strata.macf_pops(FCRA.key_override_faa.airmen_reg,,,,,,FALSE,['ace_fips_st','country',
+                                   'region','title']),named('overrides_faa_airmen_reg_deprecation_stats'))
 
 		 //Gong
 		 ,OUTPUT(strata.macf_pops(FCRA.Key_Override_Gong_FFID,,,,,,FALSE,
@@ -162,7 +166,7 @@ EXPORT Verify_Deprecated_Keys := FUNCTION
 														   'legal_lot','sherrif_indc','tax_code','vendor_entry_date']),named('overrides_liens_main_fcra_deprecation_stats'))
 		 ,OUTPUT(strata.macf_pops(FCRA.key_Override_liensv2_party_ffid,,,,,,FALSE,
 															['phone','tax_id']),named('overrides_liens_party_fcra_deprecation_stats'))
-
+		 //Marriage and Divorce
 		 ,OUTPUT(strata.macf_pops(FCRA.key_override_marriage.marriage_main,,,,,,FALSE,['divorce_docket_volume','divorce_filing_dt',
 															 'filing_subtype','grounds_for_divorce','marriage_docket_volume','marriage_duration','marriage_duration_cd',
 															 'marriage_filing_dt','number_of_children','place_of_marriage','type_of_ceremony']),named('overrides_mdv2_main_fcra_deprecation_stats'))
