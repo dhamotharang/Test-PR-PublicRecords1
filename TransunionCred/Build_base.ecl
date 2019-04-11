@@ -1,12 +1,10 @@
 ﻿IMPORT  address, ut, header_slimsort, did_add, didville,AID,std;
 
-export Build_base(string ver) := module 
+export Build_base(string ver, boolean IsFullUpdate = false) := module 
 
-#IF (IsFullUpdate = false)
-	TrnUn_credit := Files.update_in;
-#ELSE
-	TrnUn_credit := Files.load_in;
-#END
+TrnUn_credit_full := Files.load_in;
+TrnUn_credit_delta := Files.update_in;
+
 setValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
 string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
 																							,SuffixIn in ['2','ND'] => 'II'
@@ -21,7 +19,8 @@ string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
 																							,'');
 
 //Normalize current name, alias, aka and former name
-Layouts.base t_norm_name (TrnUn_credit L, INTEGER C):= TRANSFORM
+//TRANSFORM FOR FULL AS THE INPUT LAYOUT IS DIFFERENT
+Layouts.base t_norm_name_full (TrnUn_credit_full L, INTEGER C):= TRANSFORM
 	SELF.Prepped_rec_type         := CHOOSE(C,'A','B','C','D') + l.Record_Type[2];
 	current_name                  := trim(StringLib.StringCleanSpaces(trim(L.Last_Name)
 																+','+L.First_Name
@@ -57,7 +56,47 @@ Layouts.base t_norm_name (TrnUn_credit L, INTEGER C):= TRANSFORM
 	SELF                          := [];
 END;
 
-norm_names0 := NORMALIZE(TrnUn_credit, 4, t_norm_name(LEFT, COUNTER))(length(stringlib.stringfilterout(Prepped_name,' ,'))>0);
+//TRANSFORM FOR DELTA AS THE INPUT LAYOUT IS DIFFERENT
+Layouts.base t_norm_name_delta (TrnUn_credit_delta L, INTEGER C):= TRANSFORM
+	SELF.Prepped_rec_type         := CHOOSE(C,'A','B','C','D') + l.Record_Type[2];
+	current_name                  := trim(StringLib.StringCleanSpaces(trim(L.Last_Name)
+																+','+L.First_Name
+																+' '+L.Middle_Name
+																+' '+fGetSuffix(L.name_suffix_)));
+	SELF.Prepped_Name             := CHOOSE(C,current_name,L.AKA1,L.AKA2,L.AKA3);
+	SELF.Prepped_addr1            := trim(StringLib.StringCleanSpaces(L.House_Number
+																+' '+L.Street_Direction
+																+' '+L.Street_Name
+																+' '+L.Street_Type
+																+' '+L.Street_Post_Direction
+																+' '+L.Unit_Type
+																+' '+L.Unit_Number));
+	SELF.Prepped_addr2            := trim(StringLib.StringCleanSpaces(	trim(L.Cty) + if(L.Cty <> '',',','')
+																+ ' '+ L.State
+																+ ' '+ L.Zip_Code
+																),left,right);
+
+	self.dt_first_seen            := CHOOSE(C,(unsigned)l.date_address_reported,0,0,0);
+	self.dt_last_seen             := if(self.Prepped_rec_type='A1',(unsigned)ver,0);
+	self.dt_vendor_first_reported := (unsigned)ver;
+	self.dt_vendor_last_reported  := (unsigned)ver;
+	valid_dob                     := if((unsigned)l.Date_of_Birth between 18000101 and (unsigned)(STRING8)Std.Date.Today()
+																				,(unsigned)l.Date_of_Birth
+																				,0);
+	valid_ssn                     := if((unsigned)l.Ssn > 0,l.Ssn, '');
+	SELF.clean_ssn                := valid_ssn;
+	SELF.clean_dob                := if(l.Date_of_Birth_Estimated_Ind='E',0,valid_dob);
+	self.clean_phone              := if((integer)l.phone=0,'',l.phone);
+	SELF.IsCurrent                := self.Prepped_rec_type='A1';
+	SELF.IsUpdating               := true;
+	SELF                          := L;
+	SELF                          := [];
+END;
+
+norm_names0_full := NORMALIZE(TrnUn_credit_full, 4, t_norm_name_full(LEFT, COUNTER))(length(stringlib.stringfilterout(Prepped_name,' ,'))>0);
+norm_names0_delta := NORMALIZE(TrnUn_credit_delta, 4, t_norm_name_delta(LEFT, COUNTER))(length(stringlib.stringfilterout(Prepped_name,' ,'))>0);
+
+norm_names0 := if(IsFullUpdate, norm_names0_full, norm_names0_delta);
 
 names1:=dedup(table(norm_names0,{Prepped_name ,title,fname,mname,lname,name_suffix,string3 name_score:=''}),record,all);
 
@@ -113,31 +152,30 @@ preprocess := project(norm_names,tr_addr(left)):persist('~thor_data400::persist:
 
 cur_base_d := distribute(project(Files.Base, transform(recordof(Files.Base), self.did := 0, self := left)), hash(Party_ID));
 
-#IF (IsFullUpdate = false)
-	cur_update_d := dedup(distribute(preprocess, hash(Party_ID)),Party_ID,all,local);
+cur_update_d := dedup(distribute(preprocess, hash(Party_ID)),Party_ID,all,local);
 
-	apply_updates := join(cur_base_d, cur_update_d
-									,left.Party_ID = right.Party_ID
-							,transform(Layouts.base
-								,self.IsCurrent	:= if(left.Party_ID=right.Party_ID and left.Prepped_rec_type='A1',false,left.IsCurrent)
-								,self           := left)
-							,left outer
-							,local);
+apply_updates := join(cur_base_d, cur_update_d
+                                ,left.Party_ID = right.Party_ID
+                        ,transform(Layouts.base
+                            ,self.IsCurrent	:= if(left.Party_ID=right.Party_ID and left.Prepped_rec_type='A1',false,left.IsCurrent)
+                            ,self           := left)
+                        ,left outer
+                        ,local);
 
-	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
-												,preprocess
-												,preprocess + apply_updates);
+base_and_update_delta := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
+                                            ,preprocess
+                                            ,preprocess + apply_updates);
 
-#ELSE
-	reset_cur_base := project(cur_base_d, transform(Layouts.base
-											,self.IsCurrent  := false
-											,self.IsUpdating := false
-											,self := left));
+reset_cur_base := project(cur_base_d, transform(Layouts.base
+                                        ,self.IsCurrent  := false
+                                        ,self.IsUpdating := false
+                                        ,self := left));
 
-	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
-											 ,preprocess
-											 ,preprocess + reset_cur_base);
-#END
+base_and_update_full := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
+                                         ,preprocess
+                                         ,preprocess + reset_cur_base);
+                                             
+base_and_update := if(IsFullUpdate, base_and_update_full, base_and_update_delta); 
 
 TN_ready := base_and_update;
 //-----------------------------------------------------------------

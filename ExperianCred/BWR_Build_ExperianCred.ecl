@@ -1,4 +1,4 @@
-export BWR_Build_ExperianCred (version) := MACRO
+﻿export BWR_Build_ExperianCred (version) := MACRO
 #workunit('protect',true);
 #workunit('name','Yogurt:ExperianCred ' + version);
 #workunit('priority','high');
@@ -9,8 +9,9 @@ export BWR_Build_ExperianCred (version) := MACRO
 #OPTION('multiplePersistInstances',FALSE);
 
 
+IsFullUpdate := false;// need to determine the build type
 
-DoBuild := ExperianCred.Build_All(version);
+DoBuild := ExperianCred.Build_All(version,IsFullUpdate);
 
 SampleRecs := choosen(sort(ExperianCred.Files.Base_File_Out,record),1000);
 					
