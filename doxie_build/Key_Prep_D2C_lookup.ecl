@@ -20,7 +20,7 @@ export Key_Prep_D2C_lookup() := function
  f_phonesplus := Phonesplus_v2.File_phonesplus_base(did > 0, current_rec);
  ut.mac_suppress_by_phonetype(f_phonesplus,cellphone,state,_fphonesplus_cell,true,did);
  _keybuild_phonesplus_base := f_phonesplus(cellphone<>'');
- ph := _keybuild_phonesplus_base(vendor not in D2C.Constants.PhonesPlusRestrictedSources);
+ ph := _keybuild_phonesplus_base(vendor not in D2C.Constants.PhonesPlusV2RestrictedSources);
 
  doxie_build.Layout_D2C_Lookup from_ph(ph le) := transform
   self.did := le.did;

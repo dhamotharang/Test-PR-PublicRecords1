@@ -1,4 +1,4 @@
-IMPORT infoUSA, did_add, ut, header_slimSORT, didville, business_header,business_header_ss, address,watchdog,mdr,AID,lib_stringlib,idl_header,bipv2, PromoteSupers;
+﻿IMPORT infoUSA, did_add, ut, header_slimSORT, didville, business_header,business_header_ss, address,watchdog,mdr,AID,lib_stringlib,idl_header,bipv2, PromoteSupers;
 
 layout_deadco_temp 
 	:= RECORD
@@ -255,6 +255,9 @@ Layout_deadco_Base_AID Tran_did_bdid_all(layout_deadco_temp pLeft,layout_deadco_
 		self.UltID		 := pRight.UltID;
 		self.UltScore	 := pRight.UltScore;
 		self.UltWeight := pRight.UltWeight;
+		self.global_sid := 0;
+		self.record_sid := 0;
+
 		self			     := pLeft;
 	END;
 

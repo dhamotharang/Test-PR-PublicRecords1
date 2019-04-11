@@ -1,10 +1,13 @@
-﻿import doxie, Tools, BIPV2, VersionControl;
+﻿import doxie, Tools, BIPV2, dx_Equifax_Business_Data, RoxieKeyBuild;
 
 export Build_Keys(string pversion) :=
 module
 
-	VersionControl.macBuildNewLogicalKeyWithName(Equifax_Business_Data.Key_LinkIds.Key,	Equifax_Business_Data.keynames(pversion,false).LinkIds.New, BuildLinkIdsKey);
-
+  RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_Equifax_Business_Data.Key_LinkIds.Key
+																						 ,Equifax_Business_Data.Files().Base.Built
+																						 ,dx_Equifax_Business_Data.keynames().LinkIds.QA
+																						 ,dx_Equifax_Business_Data.keynames(pversion,false).LinkIds.New
+																						 ,BuildLinkIdsKey);  
 	export full_build :=
 	
 	sequential(

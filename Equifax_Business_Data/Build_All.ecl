@@ -23,9 +23,7 @@ function
 		,Scrubs.ScrubsPlus('Equifax_Business_Data','Scrubs_Equifax_Business_Data','Scrubs_Equifax_Business_Data_Base', 'Base', pversion,Equifax_Business_Data.Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Equifax_Business_Data.Build_Strata(pversion	,pOverwrite,,,	pIsTesting)
 		,Equifax_Business_Data.Promote().Inputfiles.using2used
-		,Equifax_Business_Data.Promote().Buildfiles.Built2QA
-		//for future use
-		// ,BIPStats(pversion) 
+		,Equifax_Business_Data.Promote().Buildfiles.Built2QA		
 		,Equifax_Business_Data.QA_Records()
 	// ) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	) : success(Send_Emails(pversion,,not pIsTesting).buildsuccess), 
