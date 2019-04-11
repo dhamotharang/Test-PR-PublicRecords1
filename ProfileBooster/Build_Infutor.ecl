@@ -1,4 +1,4 @@
-﻿import MarketingAttributes, Infutor_NARC, RiskWise, Risk_Indicators, Watchdog;
+import MarketingAttributes, Infutor_NARC, RiskWise, Risk_Indicators, Watchdog;
 
 export Build_Infutor := function
 
@@ -9,9 +9,7 @@ export Build_Infutor := function
 																self.DID 						:= left.DID,
 																self.marital_status := stringlib.stringtouppercase(left.orig_married),
 																self.gender 				:= stringlib.stringtouppercase(left.orig_gender), 
-																self.dob						:= left.clean_DOB,
-																self.global_sid     := left.global_sid,
-																self.record_sid     := left.record_sid),
+																self.dob						:= left.clean_DOB),
 											local);
 											
 	return dedup(wInfutor,record,all);
