@@ -13,22 +13,22 @@ import iesp, Risk_Indicators, Fingerprint, ut, Gateway;
 export BSSXG5GatewayCall (DATASET(Layouts.BridgerSearchInput) indata,
 													DATASET (Gateway.Layouts.Config) gateways)  := FUNCTION
 
-SHARED MinScore := 95;
-SHARED MaxReturnRecs := 500;
-SHARED WCFullDBName := 'WorldCompliance - Full.BDF';
+MinScore := 95;
+MaxReturnRecs := 500;
+WCFullDBName := 'WorldCompliance - Full.BDF';
 //  the ';' is added to the end as not to get false positives, In each group id there is only one value ID in the SearchCriteria values.  group id="5" name="Source",  value id refers to the name of the source
 // structure of the SearchCriteria value is,  group id, value id; group id2, value id2; group id3, value id3;........
-SHARED OFACEvadersIds := '5,10274;';   //name="US-OFAC Foreign Sanctions Evaders List"
-SHARED OFACPalestinianIds := '5,901;';   //name="US-U.S. OFAC - Palestinian Legislative Council List"
-SHARED OFACPart561Ids := '5,1314;';   //name="US-U.S. OFAC - Part 561 List"
-SHARED OFACParastatalIds := '5,759;';   //name="US-U.S. Office of Foreign Asset Control (OFAC) - Parastatal Entities of Iraq"
-SHARED OFACSDNIds := '5,6;';   //name="US-U.S. Office of Foreign Asset Control (OFAC) - SDN List" 
-SHARED SortResultsByScore := TRUE;
-SHARED GenerateResultsOnName := TRUE;
-SHARED IncludeAddrinScoreLift := TRUE;
-SHARED DOBToleranceYrs := 2;  //AML req
+OFACEvadersIds := '5,10274;';   //name="US-OFAC Foreign Sanctions Evaders List"
+OFACPalestinianIds := '5,901;';   //name="US-U.S. OFAC - Palestinian Legislative Council List"
+OFACPart561Ids := '5,1314;';   //name="US-U.S. OFAC - Part 561 List"
+OFACParastatalIds := '5,759;';   //name="US-U.S. Office of Foreign Asset Control (OFAC) - Parastatal Entities of Iraq"
+OFACSDNIds := '5,6;';   //name="US-U.S. Office of Foreign Asset Control (OFAC) - SDN List" 
+SortResultsByScore := TRUE;
+GenerateResultsOnName := TRUE;
+IncludeAddrinScoreLift := TRUE;
+DOBToleranceYrs := 2;  //AML req
 
-SHARED OFACSources := [		'US-OFAC Foreign Sanctions Evaders List', 
+				OFACSources := [		'US-OFAC Foreign Sanctions Evaders List', 
 														'US-U.S. OFAC - Palestinian Legislative Council List', 
 														'US-U.S. OFAC - Part 561 List', 
 														'US-U.S. Office of Foreign Asset Control (OFAC) - Parastatal Entities of Iraq', 

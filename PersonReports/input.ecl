@@ -439,46 +439,8 @@ EXPORT input := MODULE
     export unsigned1 max_relatives := 11;
   end;
 
-  export _sources := INTERFACE (personal, include, versions)
+  export _sources := INTERFACE (_report, include, versions)
   end;
-
-
-  export _smartlinxreport := INTERFACE (_main, include, providers, _sources,criminal, liens, bankruptcy, watercrafts)
-    // define defaults for those just declared
-    //export boolean include_bpsaddress      := true;
-		export boolean include_BlankDOD := true;
-    export unsigned1 max_relatives := 100;
-    //export boolean include_residents := true;
-    export boolean use_bestaka_ra := false;
-    export boolean include_relativeaddresses := true; // if include relatives, then addresses must be included
-    export unsigned1 bankruptcy_version := 2;
-    export unsigned1 crimrecords_version := 2;
-    export unsigned1 dea_version := 2;
-    export unsigned1 dl_version := 2;
-    export unsigned1 liensjudgments_version := 2;
-    export unsigned1 phonesplus_version := 2;
-    export unsigned1 proflicense_version := 2;
-    export unsigned1 property_version := 2;
-    export unsigned1 ucc_version := 2;
-    export unsigned1 vehicles_version := 2;
-    export unsigned1 voters_version := 2;
-    export boolean include_nonresidents_phones := false;
-		export boolean smart_rollup := true;
-		export unsigned1 neighborhoods := 1;
-    export unsigned1 neighbors_per_address := 20;
-    export unsigned1 neighbors_per_na := 2;
-		export boolean sort_deeds_by_ownership := true; //sets property ownership flag that is needed for determining Current/Prior
-  end;
-
-/*
-  // default options for comp report; only those absolutely NOT provided by ESP must be defined here.
-  //TODO: check appropriate values
-  export default_options_crs := module (_compoptions)
-    export boolean include_bpsaddress        := true;
-    export boolean include_merchantvessels := false;
-    export unsigned1 max_relatives := 11;
-  end;
-*/
 
 
   // For the future needs (I'd like to have a set of simple interfaces with well-defined default values)

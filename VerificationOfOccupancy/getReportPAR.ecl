@@ -29,10 +29,10 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 	// * Utilizing the default values that SmartLinx has in place.    *
 	// ****************************************************************
 	paramTemp := MODULE
-    EXPORT UNSIGNED1 GLBPurpose := GLBPurpose;
-    EXPORT UNSIGNED1 DPPAPurpose := DPPAPurpose;
+    EXPORT UNSIGNED1 glb := GLBPurpose;
+    EXPORT UNSIGNED1 dppa := DPPAPurpose;
     EXPORT BOOLEAN ln_branded := FALSE;
-    EXPORT STRING6 ssn_mask := 'NONE';
+    EXPORT STRING ssn_mask := 'NONE';
     EXPORT UNSIGNED1 score_threshold := 10;
     EXPORT BOOLEAN legacy_verified := FALSE;
     EXPORT BOOLEAN include_BlankDOD := FALSE;
@@ -71,10 +71,12 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
     EXPORT BOOLEAN include_relativeaddresses := TRUE;
 		EXPORT UNSIGNED1 neighborhoods := 1;
     EXPORT UNSIGNED1 neighbors_per_address := 20;
-		EXPORT BOOLEAN includeHRI := TRUE;
+		EXPORT BOOLEAN includeHRI := TRUE; //there's no such field in the _SmartLinxReport, meant to be include_hri?
   END;
-	param := MODULE (PROJECT(paramTemp, PersonReports.Input._SmartLinxReport, OPT)) END;
+	param := MODULE (PROJECT(paramTemp, PersonReports.IParam._SmartLinxReport, OPT)) END;
 	
+  old_param := PersonReports.IParam.ConvertToOldSmartLinx (param);
+
 	// ****************************************************************
 	// *        Gather Best Person Data - Use SmartLinx Logic         *
 	// *             (PersonReports.SmartLinxReport)                  *
@@ -131,7 +133,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 
   //Get best rec info to pass to SSN and phones searches
   dids := project (best_rec_DOD, doxie.layout_references);
-  persMod := module (project (param, personreports.input.personal, opt)) end;
+  persMod := module (project (old_param, personreports.input.personal)) end;
 	pers := PersonReports.Person_records (dids, persMod, IsFCRA);
  	best_rec_esdl :=       pers.bestrecs_esdl[1]; 
 	best_rec :=            pers.bestrecs[1];

@@ -45,7 +45,7 @@ EXPORT fn_smart_getAddrMetadata := MODULE
 		SELF.LookedUp := TRUE;
 	END;
 
-	EXPORT addresses(DATASET(iesp.smartlinxreport.t_SLRAddressBpsSeq) addresses, BOOLEAN doBadSecRange = FALSE, PersonReports.input._smartlinxreport param) := FUNCTION
+	EXPORT addresses(DATASET(iesp.smartlinxreport.t_SLRAddressBpsSeq) addresses, BOOLEAN doBadSecRange = FALSE, PersonReports.IParam._smartlinxreport param) := FUNCTION
 		
 		tmpLayout := RECORD(iesp.smartlinxreport.t_SLRAddressSeq AND NOT [addressCDS,Phones])
 			STRING20 acctno;

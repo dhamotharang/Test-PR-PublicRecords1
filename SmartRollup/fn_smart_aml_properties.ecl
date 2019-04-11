@@ -9,7 +9,7 @@
 */
 import iesp, PersonReports, ut;
 EXPORT fn_smart_aml_properties(dataset(iesp.smartlinxreport.t_SLRPropertyAssessmentDeedsRecord) inProps,
-																PersonReports.input._smartlinxreport inParam) := FUNCTION
+																PersonReports.IParam._smartlinxreport inParam) := FUNCTION
 	
 	prop_layout := RECORD
 		STRING8 unique_prop_id;
