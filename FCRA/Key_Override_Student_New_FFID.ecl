@@ -29,10 +29,9 @@ EXPORT Key_Override_Student_New_FFID := FUNCTION
   ds_proj_recs := project(replaceds, proj_recs(left) );
 
 	//DF-2458 blank out specified fields in thor_data400::key::override::fcra::student::qa::ffid
-	// ut.MAC_CLEAR_FIELDS(ds_proj_recs, ds_proj_recs_cleared, American_Student_List.Constants.fields_to_clear);
+	ut.MAC_CLEAR_FIELDS(ds_proj_recs, ds_proj_recs_cleared, American_Student_List.Constants.fields_to_clear);
 	
-	// asl_ffid := index(ds_proj_recs_cleared, {flag_file_id}, {ds_proj_recs_cleared}, keyname_prefix + 'ffid', OPT);
-	asl_ffid := index(ds_proj_recs, {flag_file_id}, {ds_proj_recs}, keyname_prefix + 'ffid', OPT);
+	asl_ffid := index(ds_proj_recs_cleared, {flag_file_id}, {ds_proj_recs_cleared}, keyname_prefix + 'ffid', OPT);
 	
 	RETURN asl_ffid;
 	

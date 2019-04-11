@@ -15,9 +15,9 @@ export Key(string pversion = '',boolean pUseProd = false) := module
 	END;
 
 	shared ref_diags_9_and_10 := DATASET('~thor::base::qa::std_icd_diag_codes_reference_data', {layout_diags, UNSIGNED8 __fpos {virtual(fileposition)}}, THOR, OPT);
-	export REF_ICD_10_DIAGS_FILTERED := ref_diags_9_and_10(icd_version<>'9' AND type_of_code = '1' AND termination_dt > (string)Std.Date.Today());
+	export REF_ICD_10_DIAGS_FILTERED := ref_diags_9_and_10(icd_version<>'9' AND type_of_code = '1');
 
 	shared ref_icd10_base				:= REF_ICD_10_DIAGS_FILTERED;
 
-	tools.mac_FilesIndex('ref_icd10_base,{diag_cd},{diag_cd, desc_short}'	,Keyname(pversion,pUseProd).ref_icd10_diag_code,ref_icd10_key);
+	tools.mac_FilesIndex('ref_icd10_base,{diag_cd},{diag_cd, desc_short, effective_dt, termination_dt}'	,Keyname(pversion,pUseProd).ref_icd10_diag_code,ref_icd10);
 end;
