@@ -125,7 +125,7 @@ EXPORT Raw_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:spons_dfe_loc_forgn_prov_st:TYPE(STRING22):LIKE(invalid_alphablank):0,0\n'
     + 'FIELD:spons_dfe_loc_foreign_cntry:TYPE(STRING2):LIKE(invalid_alphablank):0,0\n'
     + 'FIELD:spons_dfe_loc_forgn_postal_cd:TYPE(STRING22):LIKE(invalid_alpha_numeric_blank):0,0\n'
-    + 'FIELD:spons_dfe_ein:TYPE(STRING9):0,0\n'
+    + 'FIELD:spons_dfe_ein:TYPE(STRING9):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:spons_dfe_phone_num:TYPE(STRING10):LIKE(invalid_phone):0,0\n'
     + 'FIELD:business_code:TYPE(STRING6):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:admin_name:TYPE(STRING70):LIKE(invalid_name):0,0\n'
