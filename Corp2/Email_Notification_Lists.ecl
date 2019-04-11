@@ -3,24 +3,30 @@ export Email_Notification_Lists :=
 module
 	shared emailaddressep := if(Corp2.IsTesting, ',', ';');
 	
-	export all_hands := 'michael.gould@lexisnexis.com' 						
-											+ emailaddressep +	'julie.ellison@lexisnexis.com' 		
-											+ emailaddressep +	'julianne.franzer@lexisnexis.com' 
-											+ emailaddressep +  'kevin.reeder@lexisnexis.com'
-											+ emailaddressep +  'audra.mireles@lexisnexis.com'
-											+ emailaddressep +  'saritha.myana@lexisnexis.com'
-											+ emailaddressep +  'rosemary.murphy@lexisnexis.com'
-											+ emailaddressep +  'lucinda.sibille@lexisnexis.com'
+	export all_hands := 'kevin.reeder@lexisnexisrisk.com' 						
+											+ emailaddressep +	'julie.ellison@lexisnexisrisk.com' 		
+											+ emailaddressep +	'julianne.franzer@lexisnexisrisk.com' 
+											+ emailaddressep +  'gregory.rose@lexisnexisrisk.com'
+											+ emailaddressep +  'audra.mireles@lexisnexisrisk.com'
+											+ emailaddressep +  'saritha.myana@lexisnexisrisk.com'
+											+ emailaddressep +  'rosemary.murphy@lexisnexisrisk.com'
+											+ emailaddressep +  'lucinda.sibille@lexisnexisrisk.com'
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
 											;
 											
-	export allScrubs := 'julianne.franzer@lexisnexis.com' 						
-											+ emailaddressep +	'michael.gould@lexisnexis.com'
-											+ emailaddressep +  'kevin.reeder@lexisnexis.com'
-											+ emailaddressep +	'julie.ellison@lexisnexis.com' 		
-											+ emailaddressep +	'rosemary.murphy@lexisnexis.com' 
+	export allScrubs := 'julianne.franzer@lexisnexis.com' 		
+											+ emailaddressep +  'kevin.reeder@lexisnexisrisk.com'
+											+ emailaddressep +	'Gregory.Rose@lexisnexisrisk.com'
+											+ emailaddressep +	'julie.ellison@lexisnexisrisk.com' 		
+											+ emailaddressep +	'rosemary.murphy@lexisnexisrisk.com' 
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
 											;
+											
+											
+	export all_Sprays :=  'kevin.reeder@lexisnexisrisk.com'
+											+ emailaddressep + 'Gregory.Rose@lexisnexisrisk.com'
+											+ emailaddressep + _control.MyInfo.EmailAddressNotify; 
+							
 											
 	export BuildSuccess := 
 		if(Flags.IsTesting
@@ -36,14 +42,14 @@ module
 		
 	export Scrubs := 
 		if(Flags.IsTesting
-			,'julianne.franzer@lexisnexis.com' + emailaddressep + _control.MyInfo.EmailAddressNotify
+			,'julianne.franzer@lexisnexisrisk.com' + emailaddressep + _control.MyInfo.EmailAddressNotify
 			,allScrubs
 		);		
 	
 	export Spray := 
 		if(Flags.IsTesting
 			,_control.MyInfo.EmailAddressNotify
-			,_control.MyInfo.EmailAddressNotify
+			,all_Sprays
 		);
 	
 	export Roxie := 
