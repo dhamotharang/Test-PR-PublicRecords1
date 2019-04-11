@@ -148,4 +148,16 @@ EXPORT Constants := MODULE
 			MDR.sourceTools.src_Targus_White_pages
 ];
 
+
+EXPORT PhonesPlusV2RestrictedSources := [
+		mdr.sourceTools.src_Targus_White_Pages, mdr.sourceTools.src_Equifax, mdr.sourceTools.src_Utilities,
+		mdr.sourceTools.src_LnPropV2_Fares_Asrs, mdr.sourceTools.src_Voters_v2, mdr.sourceTools.src_Util_Work_Phone,
+		mdr.sourceTools.src_Professional_License, mdr.sourceTools.src_Certegy, mdr.sourceTools.src_KY_Watercraft,
+		mdr.sourceTools.src_VA_Watercraft, mdr.sourceTools.src_NC_Watercraft, mdr.sourceTools.src_TUCS_Ptrack,
+		mdr.sourceTools.src_MD_Watercraft, mdr.sourceTools.src_MO_Veh, mdr.sourceTools.src_MO_DL,
+		mdr.sourceTools.src_MO_Experian_Veh, mdr.sourceTools.src_Experian_Credit_Header, mdr.sourceTools.src_MO_Watercraft,
+		mdr.sourceTools.src_Wired_Assets_Royalty, mdr.sourceTools.src_Wired_Assets_Owned, mdr.sourceTools.src_ZUtil_Work_Phone,
+		mdr.sourceTools.src_ZUtilities, mdr.sourceTools.src_InquiryAcclogs, mdr.sourceTools.src_TU_CreditHeader
+        ];
+
 END;
