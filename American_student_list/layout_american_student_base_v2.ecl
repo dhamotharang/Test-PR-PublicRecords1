@@ -1,4 +1,4 @@
-IMPORT AID;
+﻿IMPORT AID;
 export layout_american_student_base_v2 := record
 
 	integer8        KEY;
@@ -97,5 +97,7 @@ export layout_american_student_base_v2 := record
 	STRING5					CollegeID := '';
 	STRING4					CollegeUpdate := '';
 	string2					source := '';
-
+	//CCPA-7 Add 2 new fields for CCPA
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 end;
