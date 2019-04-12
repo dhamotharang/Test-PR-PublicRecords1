@@ -109,10 +109,10 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
   //The used to be taken from STORED, but using getBatchParams for picklist caused a duplicated STORED error.
   in_ssn_mask := batch_params.ssn_mask;
 
- //Search for Bk records by party. Leave input as is to maintain expected results.
- //Picklist used to be utlized here, however it was determined that it's redundant and not needed.
- //This is due to the batch services running ADL Best on the input PRIOR to sending the query to this service.
- //Since picklist is changing to DidVille it would run the same lexID resolution logic twice if done within roxie.
+  //Search for Bk records by party. Leave input as is to maintain expected results.
+  //Picklist used to be utlized here, however it was determined that it's redundant and not needed.
+  //This is due to the batch services running ADL Best on the input PRIOR to sending the query to this service.
+  //Since picklist is changing to DidVille it would run the same lexID resolution logic twice if done within roxie.
   ds_batch := BatchServices.Bankruptcy_BatchService_Records.search(ds_batch_in,
     party_types,
     isFCRA,
@@ -123,7 +123,7 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
     BIPSkipMatch,
     suppress_withdrawn_bankruptcy);
 
-  //Get results with matching inquiry and result dids (exluding 0), and populate the inquiry_lexID.
+  //Get results with matching inquiry and result dids (excluding 0), and populate the inquiry_lexID.
   ds_batch_validated_lexID := JOIN(ds_batch, ds_batch_in,
     RIGHT.did > 0 AND LEFT.acctno = RIGHT.acctno AND (UNSIGNED6)LEFT.debtor_did = RIGHT.did,
     TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF.inquiry_lexID := (STRING)RIGHT.did, SELF := LEFT),
