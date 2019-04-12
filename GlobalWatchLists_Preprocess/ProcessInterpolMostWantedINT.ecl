@@ -1,4 +1,4 @@
-import std, address, bo_address, ut;
+﻿import std, address, bo_address, ut;
 
 EXPORT ProcessInterpolMostWantedINT := FUNCTION
 
@@ -53,7 +53,19 @@ EXPORT ProcessInterpolMostWantedINT := FUNCTION
 																			 + if(TRIM(L.Original_Language_09, left, right) <> '', ', ' + TRIM(L.Original_Language_09), '')
 																			 + if(TRIM(L.Original_Language_10, left, right) <> '', ', ' + TRIM(L.Original_Language_10), '')
 																		,'');
-		self.Original_DOB 				:= if(TRIM(L.Original_DOB_01, left, right) = '00000000', '', TRIM(L.Original_DOB_01, left, right));
+		fmtsin := [   '%Y/%m/%d'   ];
+
+          fmtout := '%Y%m%d';
+
+		self.Original_DOB 				:=  if(TRIM(L.Original_DOB_01, left, right) = '00000000' ,            '', 
+		                                                                          STD.Date.ConvertDateFormatMultiple(TRIM(L.Original_DOB_01, left, right),fmtsin,fmtout) 
+										                  );
+																			
+	     self.Original_Crimes                := if (  STD.Str.Find ( TRIM(L.Original_Crimes, left, right),'\\n' ) <> 0  , 
+			                                                                           STD.Str.FilterOut ( TRIM(L.Original_Crimes, left, right),'\\n'), 
+																	TRIM(L.Original_Crimes, left, right) 
+													  );
+															
 		self.Original_POBs 				:= if(TRIM(L.Original_POB_01, left, right) <> ''
 																	or	TRIM(L.Original_POB_02, left, right) <> ''
 																	or	TRIM(L.Original_POB_03, left, right) <> ''
