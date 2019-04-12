@@ -1,4 +1,4 @@
-﻿	IMPORT AID,Address;
+	IMPORT AID,Address;
 
 	EXPORT layouts := MODULE
 	
@@ -193,9 +193,6 @@ export base	:=record
  string2 	src;
  AID.Common.xAID		RawAID;
  UNSIGNED6 LexHHID 					:= 0;
- //Added for CCPA-10
- UNSIGNED4 global_sid;
- UNSIGNED8 record_sid;
  end;
 	
 END;
