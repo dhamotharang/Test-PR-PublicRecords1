@@ -1,4 +1,4 @@
-﻿IMPORT PublicRecords_KEL, STD;
+﻿IMPORT PublicRecords_KEL, Risk_Indicators, STD;
 
 EXPORT fn_make_settings_dataset(PublicRecords_KEL.Interface_BWR_Settings Settings)
 				:= FUNCTION
@@ -36,19 +36,19 @@ EXPORT fn_make_settings_dataset(PublicRecords_KEL.Interface_BWR_Settings Setting
 		{'Username: ' + STD.System.Job.User()},
 		{'Permissible Purpose: ' + PermissiblePurpose_output},
 		{'Data Restriction Mask Settings: ' + Settings.Data_Restriction_Mask},
-		{'DRMFares: ' + IF(Settings.Data_Restriction_Mask[1] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
-		{'DRMExperian: ' + IF(Settings.Data_Restriction_Mask[6] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
-		{'DRMTransUnion: ' + IF(Settings.Data_Restriction_Mask[10] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
-		{'DRMAdvo: ' + IF(Settings.Data_Restriction_Mask[12] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
-		{'DRMExperianFCRA: ' + IF(Settings.Data_Restriction_Mask[14] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
-		{'DRMCortera: ' + IF(Settings.Data_Restriction_Mask[42] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
-		{'DRMExperianEBR: ' + IF(Settings.Data_Restriction_Mask[3] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
+		{'DRMFares: ' + IF(Settings.Data_Restriction_Mask[Risk_Indicators.iid_constants.posFaresRestriction] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
+		{'DRMExperian: ' + IF(Settings.Data_Restriction_Mask[Risk_Indicators.iid_constants.posExperianRestriction] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
+		{'DRMTransUnion: ' + IF(Settings.Data_Restriction_Mask[Risk_Indicators.iid_constants.posTransUnionRestriction] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
+		{'DRMAdvo: ' + IF(Settings.Data_Restriction_Mask[Risk_Indicators.iid_constants.posADVORestriction] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
+		{'DRMExperianFCRA: ' + IF(Settings.Data_Restriction_Mask[Risk_Indicators.iid_constants.posExperianFCRARestriction] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
+		{'DRMCortera: ' + IF(Settings.Data_Restriction_Mask[Risk_Indicators.iid_constants.posCortera] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
+		{'DRMExperianEBR: ' + IF(Settings.Data_Restriction_Mask[Risk_Indicators.iid_constants.posExperianEBR] IN PermittedSet, 'Not Restricted 0', 'Restricted 1')},
 		{'Data Permission Mask Settings: ' + Settings.Data_Permission_Mask},
-		{'DPMSSN: ' + IF(Settings.Data_Permission_Mask[10] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
-		{'DPMFDN: ' + IF(Settings.Data_Permission_Mask[11] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
-		{'DPMDL: ' + IF(Settings.Data_Permission_Mask[13] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
-		{'DPMSBFE: ' + IF(Settings.Data_Permission_Mask[12] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
-		{'DPMTargus: ' + IF(Settings.Data_Permission_Mask[2] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
+		{'DPMSSN: ' + IF(Settings.Data_Permission_Mask[Risk_Indicators.iid_constants.posSSADeathMasterPermission] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
+		{'DPMFDN: ' + IF(Settings.Data_Permission_Mask[Risk_Indicators.iid_constants.posFDNcftfPermission] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
+		{'DPMDL: ' + IF(Settings.Data_Permission_Mask[Risk_Indicators.iid_constants.InsuranceDLPermission] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
+		{'DPMSBFE: ' + IF(Settings.Data_Permission_Mask[Risk_Indicators.iid_constants.posSBFEPermission] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
+		{'DPMTargus: ' + IF(Settings.Data_Permission_Mask[Risk_Indicators.iid_constants.posTargusPermission] IN RestrictedSet, 'Not Permitted 0', 'Permitted 1')},
 		{IF(Settings.GLBAPurpose = 0, 'GLBA: Not Permitted 0', 'GLBA: Permitted ' + (STRING)Settings.GLBAPurpose)},
 		{IF(Settings.DPPAPurpose = 0, 'DPPA: Not Permitted 0', 'DPPA: Permitted ' + (STRING)Settings.DPPAPurpose)},
 		{'Override Experian Restriction: ' + IF(Settings.Override_Experian_Restriction, 'TRUE', 'FALSE')},

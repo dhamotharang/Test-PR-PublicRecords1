@@ -24,14 +24,14 @@ EXPORT E_Person_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
   SHARED __Mapping := 'subject(Subject_:0),phonenumber(Phone_Number_:0),confidencescore(Confidence_Score_:0),personscore(Person_Score_:0),namescore(Name_Score_:0),bestnamematchflag(Best_Name_Match_Flag_:0),latestphoneownerflag(Latest_Phone_Owner_Flag_:0),activephoneflag(Active_Phone_Flag_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'did(Subject_:0),phone(Phone_Number_:0),confidencescore(Confidence_Score_:0),personscore(Person_Score_:0),namescore(Name_Score_:0),bestnamematchflag(Best_Name_Match_Flag_:0),latestphoneownerflag(Latest_Phone_Owner_Flag_:0),activephoneflag(Active_Phone_Flag_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule)';
+  SHARED __Mapping0 := 'did(Subject_:0),phone(Phone_Number_:0),confidencescore(Confidence_Score_:0),personscore(Person_Score_:0),namescore(Name_Score_:0),bestnamematchflag(Best_Name_Match_Flag_:0),latestphoneownerflag(Latest_Phone_Owner_Flag_:0),activephoneflag(Active_Phone_Flag_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),DPMBitmap(__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Header,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Header),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)did != 0 AND (UNSIGNED)phone != 0);
   SHARED __d0_Prefiltered := __d0_KELfiltered;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   SHARED Date_First_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping1 := 'did(Subject_:0),phone(Phone_Number_:0),confidencescore(Confidence_Score_:0),personscore(Person_Score_:0),namescore(Name_Score_:0),bestnamematchflag(Best_Name_Match_Flag_:0),latestphoneownerflag(Latest_Phone_Owner_Flag_:0),activephoneflag(Active_Phone_Flag_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_1Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule)';
+  SHARED __Mapping1 := 'did(Subject_:0),phone(Phone_Number_:0),confidencescore(Confidence_Score_:0),personscore(Person_Score_:0),namescore(Name_Score_:0),bestnamematchflag(Best_Name_Match_Flag_:0),latestphoneownerflag(Latest_Phone_Owner_Flag_:0),activephoneflag(Active_Phone_Flag_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_1Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),DPMBitmap(__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Header_Quick__Key_Did,TRANSFORM(RECORDOF(__in.Dataset_Header_Quick__Key_Did),SELF:=RIGHT));
   EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0 AND (UNSIGNED)phone != 0);
   SHARED __d1_Prefiltered := __d1_KELfiltered;

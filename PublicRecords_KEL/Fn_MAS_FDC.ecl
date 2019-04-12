@@ -1,13 +1,24 @@
-﻿IMPORT BankruptcyV3, Doxie, Doxie_Files, Header_Quick;
+﻿IMPORT BankruptcyV3, Doxie, Doxie_Files, Header_Quick, BIPV2, Cortera_Tradeline, MDR, Header;
 
 EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input,
 									PublicRecords_KEL.Interface_Options Options,
 									DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) BusinessInput = DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII)
 									) := FUNCTION
 
-	Layouts_FDC := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
-	Common := PublicRecords_KEL.ECL_Functions.Common(Options);
-	
+	Layouts_FDC     := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
+	Common          := PublicRecords_KEL.ECL_Functions.Common(Options);
+	CFG_File        := PublicRecords_KEL.CFG_Compile;
+	NotRegulated    := FALSE;
+	BlankString     := '';
+	SetDPMBitmap    := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.SetValue;
+
+	// Records from GLB sources might NOT be GLBA Regulated depending on if they are older than GLBA Laws
+	PreGLBRegulatedRecord(STRING Source_Column, UNSIGNED3 Date_Last_Seen_Column, UNSIGNED3 Date_First_Seen_Column) := 
+				Source_Column IN MDR.SourceTools.set_GLB AND Header.isPreGLB_LIB(Date_Last_Seen_Column, Date_First_Seen_Column, Source_Column, '00000000000000000000000000000000000000000000000000');
+
+	// Additionally records from certain states are not allowed to be used unless we have a DPPA in a specific set of values
+	GetDPPAState(STRING Source_Column) := MDR.SourceTools.DPPAOriginState(Source_Column);
+
 	// Data cleaning functions needed to get raw data ready for KEL
 	Doxie_Files__Key_Offenders_Src(STRING data_type) := CASE(data_type,
 				'1' => 'DC',
@@ -16,12 +27,18 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					'');
 					
 	// Now put together the FDC bundle				
-	Input_FDC := PROJECT(Input, TRANSFORM(Layouts_FDC.Layout_FDC,
-					SELF.InputUIDAppend := LEFT.InputUIDAppend,
-					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := []));
-					
-	Input_FDC_Filtered := Input_FDC(LexIDAppend > 0);				
+	Input_FDC := JOIN(Input, BusinessInput, 
+						LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend, 
+						TRANSFORM(Layouts_FDC.Layout_FDC,
+						SELF.InputUIDAppend := LEFT.InputUIDAppend,
+						SELF.LexIDAppend := LEFT.LexIDAppend,
+						SELF.BusInputUIDAppend := RIGHT.BusInputUIDAppend,
+						SELF.LexIDBusExtendedFamilyAppend := RIGHT.LexIDBusExtendedFamilyAppend,
+						SELF.LexIDBusLegalFamilyAppend := RIGHT.LexIDBusLegalFamilyAppend,
+						SELF.LexIDBusLegalEntityAppend := RIGHT.LexIDBusLegalEntityAppend,
+						SELF := []), FULL OUTER );
+	Input_FDC_Filtered := Input_FDC((LexIDBusExtendedFamilyAppend > 0 and LexIDBusLegalFamilyAppend > 0 and LexIDBusLegalEntityAppend > 0) or LexIDAppend > 0);	
+		
 
 	// Doxie.Key_FCRA_Header/Doxie.Key_Header. FCRA/NonFCRA have the same layout.
 	Doxie__Key_Header := IF(Options.IsFCRA, Doxie.Key_FCRA_Header, Doxie.Key_Header);
@@ -31,9 +48,10 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_Doxie__Key_Header,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PreGLBRegulatedRecord(RIGHT.Src, RIGHT.dt_nonglb_last_seen, RIGHT.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := GetDPPAState(RIGHT.src), KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie__Key_Header));
 
 					
@@ -52,9 +70,10 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_Header_Quick__Key_Did,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PreGLBRegulatedRecord(RIGHT.Src, RIGHT.dt_nonglb_last_seen, RIGHT.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := GetDPPAState(RIGHT.Src), KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Header_Quick__Key_Did));
 
 					
@@ -74,9 +93,11 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.src := MDR.sourceTools.src_Accurint_DOC,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_DOC, FCRA_Restricted := TRUE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm));
 		
 	// Doxie_Files.Key_BocaShell_Crim_FCRA contains a child dataset so we need to add an extra step and NORMALIZE it before adding to the FDC bundle.
@@ -97,12 +118,16 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 		JOIN(Input_FDC_Filtered, Doxie_Files.Key_Offenders(Options.isFCRA),
 				KEYED(LEFT.LexIDAppend = (UNSIGNED)RIGHT.sdid),
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenders,
+					_src := Doxie_Files__Key_Offenders_Src(RIGHT.data_type);
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF.src := Doxie_Files__Key_Offenders_Src(RIGHT.data_type),
+					SELF.fcra_date := IF( Options.isFCRA = TRUE, RIGHT.fcra_date, '' ), // populate only if using the FCRA key
+					SELF.data_type := IF( Options.isFCRA = TRUE, RIGHT.data_type, '' ), // populate only if using the FCRA key
+					SELF.src := _src,
+					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Offenders));
 
 					
@@ -121,9 +146,11 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.Src := MDR.sourceTools.src_Accurint_Crim_Court,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_Crim_Court, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses));
 					
 	With_Doxie_files__Key_Court_Offenses := DENORMALIZE(With_Doxie_Files__Key_Offenders, Doxie_files__Key_Court_Offenses_Records,
@@ -141,9 +168,11 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenses,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.Src := MDR.sourceTools.src_Accurint_DOC,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_DOC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT, 
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Offenses));
 					
 	With_Doxie_Files__Key_Offenses := DENORMALIZE(With_Doxie_files__Key_Court_Offenses, Doxie_Files__Key_Offenses_Records,
@@ -158,11 +187,14 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 			JOIN(Input_FDC_Filtered, Doxie_Files.Key_Offenders_Risk,
 				KEYED(LEFT.LexIDAppend = RIGHT.sdid),
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenders_Risk,
+					_src := Doxie_Files__Key_Offenders_Src(RIGHT.data_type);
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.src := _src,
+					SELF.DPMBitmap := SetDPMBitmap( Source := _src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Offenders_Risk));
 		
 	With_Doxie_Files__Key_Offenders_Risk := DENORMALIZE(With_Doxie_Files__Key_Offenses, Doxie_Files__Key_Offenders_Risk_Records,
@@ -180,9 +212,11 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Punishment,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.Src := MDR.sourceTools.src_Accurint_DOC,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Accurint_DOC, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Punishment));
 		
 	With_Doxie_Files__Key_Punishment := DENORMALIZE(With_Doxie_Files__Key_Offenders_Risk, Doxie_Files__Key_Punishment_Records,
@@ -204,7 +238,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF.LexIDAppend := LEFT.LexIDAppend,
 					SELF := RIGHT, 
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 			DATASET([], Layouts_FDC.Layout_Bankruptcy__Key_did));
 
 	// BankruptcyV3.key_bankruptcyv3_search_full_bip has a parameter to say if FCRA or nonFCRA - same file layout		
@@ -217,9 +251,11 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.Src := MDR.sourceTools.src_Bankruptcy,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Bankruptcy, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 			DATASET([], Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search));
 
 	// Left Only join to the Bankruptcy Withdrawn key to remove all Withdrawn records.
@@ -244,6 +280,63 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 						SELF := LEFT,
 						SELF := []));	
 
-	RETURN With_Bankruptcy;
+/*************************************************Business Header ******************************************************/
+	Business_Header_Key_Linking := if(Common.DoFDCJoin_Business_Files__Business__Key_BH_Linking_Ids,
+		Join(Input_FDC_Filtered, BIPV2.Key_BH_Linking_Ids.key,
+				KEYED(
+				LEFT.LexIDBusExtendedFamilyAppend = RIGHT.ultid and 
+				LEFT.LexIDBusLegalFamilyAppend = RIGHT.orgid and
+				LEFT.LexIDBusLegalEntityAppend = RIGHT.seleid),
+				TRANSFORM(Layouts_FDC.Layout_BIPV2__Key_BH_Linking_Ids,
+					SELF.BusInputUIDAppend := LEFT.BusInputUIDAppend,
+					SELF.LexIDBusExtendedFamilyAppend := LEFT.LexIDBusExtendedFamilyAppend,
+					SELF.LexIDBusLegalFamilyAppend := LEFT.LexIDBusLegalFamilyAppend,
+					SELF.LexIDBusLegalEntityAppend := LEFT.LexIDBusLegalEntityAppend,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.Source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PreGLBRegulatedRecord(RIGHT.Source, 0, RIGHT.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := GetDPPAState(RIGHT.source), KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 	
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Business_Header_LIMIT)),
+		DATASET([], Layouts_FDC.Layout_BIPV2__Key_BH_Linking_Ids));
+		
+	With_Business_Header_Key_Linking := DENORMALIZE(With_Bankruptcy, Business_Header_Key_Linking,
+			LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend AND 
+			LEFT.LexIDBusExtendedFamilyAppend = RIGHT.LexIDBusExtendedFamilyAppend AND 
+			LEFT.LexIDBusLegalFamilyAppend = RIGHT.LexIDBusLegalFamilyAppend AND 
+			LEFT.LexIDBusLegalEntityAppend = RIGHT.LexIDBusLegalEntityAppend, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_BIPV2__Key_BH_Linking_Ids := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));
+
+/*************************************************Tradeline ******************************************************/
+	Tradeline_Key_LinkIds := if(Common.DoFDCJoin_Tradeline_Files__Tradeline__Key_LinkIds,
+		Join(Input_FDC_Filtered, Cortera_Tradeline.Key_LinkIds.Key,
+				KEYED(
+				LEFT.LexIDBusExtendedFamilyAppend = RIGHT.ultid and 
+				LEFT.LexIDBusLegalFamilyAppend = RIGHT.orgid and				
+				LEFT.LexIDBusLegalEntityAppend = RIGHT.seleid),
+				TRANSFORM(Layouts_FDC.Layout_Cortera_Tradeline__Key_LinkIds,
+					SELF.BusInputUIDAppend := LEFT.BusInputUIDAppend,
+					SELF.LexIDBusExtendedFamilyAppend := LEFT.LexIDBusExtendedFamilyAppend,
+					SELF.LexIDBusLegalFamilyAppend := LEFT.LexIDBusLegalFamilyAppend,
+					SELF.LexIDBusLegalEntityAppend := LEFT.LexIDBusLegalEntityAppend,
+ 					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.Source, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 	
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.CORTERA_TRADELINE_LIMIT)),
+		DATASET([], Layouts_FDC.Layout_Cortera_Tradeline__Key_LinkIds));
+		
+	With_Tradeline_Key_LinkIds := DENORMALIZE(With_Business_Header_Key_Linking, Tradeline_Key_LinkIds,
+			LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend AND 
+			LEFT.LexIDBusExtendedFamilyAppend = RIGHT.LexIDBusExtendedFamilyAppend AND 
+			LEFT.LexIDBusLegalFamilyAppend = RIGHT.LexIDBusLegalFamilyAppend AND 			
+			LEFT.LexIDBusLegalEntityAppend = RIGHT.LexIDBusLegalEntityAppend, GROUP,
+			TRANSFORM(Layouts_FDC.Layout_FDC,
+					SELF.Dataset_Cortera_Tradeline__Key_LinkIds := ROWS(RIGHT),
+					SELF := LEFT,
+					SELF := []));
+
+	RETURN With_Tradeline_Key_LinkIds;
+
 
 END;

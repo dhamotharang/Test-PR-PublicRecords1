@@ -24,7 +24,8 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 		'DataPermissionMask',
 		'GLBA_Purpose',
 		'DPPA_Purpose',
-		'IsMarketing'
+		'IsMarketing',
+		'AllowedSources'
   ));
 
   // Read interface params
@@ -42,6 +43,10 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 	BOOLEAN BIPAppend_Include_AuthRep := FALSE : STORED('BIPAppendIncludeAuthRep');
 	BOOLEAN BIPAppend_No_ReAppend := FALSE : STORED('BIPAppendNoReAppend');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
+	STRING AllowedSources := '' : STORED('AllowedSources');
+  
+	BOOLEAN Allow_DNBDMI := STD.Str.Find( AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1 ) > 0; // When TRUE this will unmask DNB DMI data - NO CUSTOMERS CAN USE THIS, FOR RESEARCH PURPOSES ONLY
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
@@ -53,14 +58,17 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 		EXPORT BOOLEAN ExcludeConsumerShell := Exclude_Consumer_Shell;
 		EXPORT BOOLEAN OutputMasterResults := Output_Master_Results;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
+		EXPORT STRING Allowed_Sources := AllowedSources;
 		EXPORT UNSIGNED8 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
 			DataRestrictionMask, 
 			DataPermissionMask, 
 			GLBA, 
 			DPPA, 
-			FALSE, /* IsFCRA */ 
+			FALSE, /* IsFCRA */
 			Is_Marketing, 
-			'' /* Allowed_Sources */ = Business_Risk_BIP.Constants.AllowDNBDMI, 
+			Allow_DNBDMI, 
+			OverrideExperianRestriction,
 			PublicRecords_KEL.CFG_Compile);
 		
 		// BIP Append Options
@@ -81,7 +89,7 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA,
 			SELF := LEFT));
-
-  OUTPUT( FinalResults, NAMED('Results') );
+	
+	OUTPUT( FinalResults, NAMED('Results') );
 
 ENDMACRO;

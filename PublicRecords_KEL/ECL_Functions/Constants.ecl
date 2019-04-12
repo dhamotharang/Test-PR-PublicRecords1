@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk_BIP, MDR;
+﻿IMPORT Business_Risk_BIP, MDR, STD;
 
 /*
 -99999: No LexID or input needed is not populated
@@ -14,6 +14,8 @@ EXPORT Constants := MODULE
   EXPORT INTEGER NO_DATA_FOUND_INT := -99998;
   
   EXPORT INTEGER DEFAULT_JOIN_LIMIT := 2000;
+  EXPORT INTEGER BUSINESS_HEADER_LIMIT := 25000;
+  EXPORT INTEGER CORTERA_TRADELINE_LIMIT := 25000;
   
   // This is the set of explicitly Allowed Sources for use within the Analytic Library.  If a record doesn't belong to one of these sources, it will be blocked from usage
   // TODO: KS-1968 - Define the set of ALLOWED_SOURCES.
@@ -27,5 +29,11 @@ EXPORT Constants := MODULE
 	MDR.SourceTools.set_Marketing_FBN + 
 	MDR.SourceTools.set_Marketing_Header + 
 	MDR.SourceTools.set_Marketing_Restricted;
+	
+	EXPORT VALIDATE_YEAR_RANGE_LOW_DOB := 1800;
+	EXPORT VALIDATE_YEAR_RANGE_HIGH_DOB := ((INTEGER)(((STRING8)STD.Date.Today())[1..4]) + 100);
+	
+	EXPORT VALIDATE_YEAR_RANGE_LOW_ARCHIVEDATE := ((INTEGER)(((STRING8)STD.Date.Today())[1..4]) - 120);
+	EXPORT VALIDATE_YEAR_RANGE_HIGH_ARCHIVEDATE := (INTEGER)(((STRING8)STD.Date.Today())[1..4]);		
 END;
 

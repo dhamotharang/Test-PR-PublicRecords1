@@ -23,7 +23,6 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.InputWorkPhoneEcho := le.InputWorkPhoneEcho;
 		SELF.InputEmailEcho := le.InputEmailEcho; 
 		SELF.InputArchiveDateEcho := le.InputArchiveDateEcho;
-		SELF.InputArchiveDateClean := le.InputArchiveDateEcho; 
 		SELF.InputSSNEcho := le.InputSSNEcho;
 		SELF.InputDOBEcho := le.InputDOBEcho;
 		SELF.InputDLEcho := le.InputDLEcho;
@@ -37,13 +36,21 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		cleaned_phone10   := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.InputHomePhoneEcho);
 		cleaned_workphone := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.InputWorkPhoneEcho);
 		cleaned_SSN       := PublicRecords_KEL.ECL_Functions.Fn_Clean_SSN(le.InputSSNEcho);
-		DOB_dates         := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.InputDOBEcho);
+		DOB_dates         := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.InputDOBEcho, 
+															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_DOB, 
+															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_DOB);
 		cleaned_DOB       := DOB_dates[1];
 		cleaned_name      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Name_Roxie(le.InputFirstNameEcho, le.InputMiddleNameEcho, le.InputLastNameEcho);
   
+		cleaned_archivedate := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.InputArchiveDateEcho, 
+															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_ARCHIVEDATE, 
+															PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_ARCHIVEDATE,
+															SetDefault := TRUE /*if no date was input, set to current date/time*/)[1];
+
+		// Cleaned Archive Date
+		SELF.InputArchiveDateClean := cleaned_archivedate.ValidPortion_01 + cleaned_archivedate.TimeStamp; 
+
 		NameNotPopulated := IF(le.InputFirstNameEcho = '' AND le.InputMiddleNameEcho = '' AND le.InputLastNameEcho = '', '', le.InputLastNameEcho);
-	
-		                 
 		/*
 		// We need to revisit this logic below. InputCleanMiddleName may be populated after
 		// cleaning if the input firstname contains both the firstname and the middlename.

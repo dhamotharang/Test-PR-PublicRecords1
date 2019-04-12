@@ -11,6 +11,10 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				cleaned_email			:= PublicRecords_KEL.ECL_Functions.Fn_Clean_Email(le.BusInputEmailEcho);
 				cleaned_phone10		:= PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.BusInputPhoneEcho);
 				cleaned_TIN				:= PublicRecords_KEL.ECL_Functions.Fn_Clean_SSN(le.BusInputTINEcho);
+				cleaned_archivedate := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.BusInputArchiveDateEcho, 
+																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_LOW_ARCHIVEDATE, 
+																																						PublicRecords_KEL.ECL_Functions.Constants.VALIDATE_YEAR_RANGE_HIGH_ARCHIVEDATE,
+																																						SetDefault := TRUE /*if no date was input, set to current date/time*/)[1];
 
 				// Input Echo perserved
 				SELF.InputLexIDBusExtendedFamilyEcho := le.InputLexIDBusExtendedFamilyEcho;
@@ -33,6 +37,9 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				SELF.BusInputNAICSCodeEcho := le.BusInputNAICSCodeEcho;
 				SELF.BusInputArchiveDateEcho := le.BusInputArchiveDateEcho;
 
+				// Cleaned Archive Date
+				SELF.BusInputArchiveDateClean := cleaned_archivedate.ValidPortion_01 + cleaned_archivedate.TimeStamp; 
+				
 				// Cleaned address
 				SELF.BusInputPrimRangeClean			 := cleaned_Addr.prim_range;
 				SELF.BusInputPreDirClean				 := cleaned_Addr.predir;

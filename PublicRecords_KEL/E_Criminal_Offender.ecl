@@ -37,8 +37,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED __d0_Trim := PROJECT(__in.Dataset_Doxie_Files__Key_Offenses,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.offender_key)));
   SHARED __d1_Trim := PROJECT(__in.Dataset_Doxie_Files__Key_Court_Offenses,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.offender_key)));
   SHARED __d2_Trim := PROJECT(__in.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.offender_key)));
-  SHARED __d3_Trim := PROJECT(__in.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.offender_key)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim + __d3_Trim;
+  EXPORT __All_Trim := __d0_Trim + __d1_Trim + __d2_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -49,10 +48,9 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(UID),offender_key(Offender_Key_:\'\'),sourcefile(Source_File_:\'\'),sourcestate(Source_State_:\'\'),citizenship(Citizenship_:\'\'),haircolor(Hair_Color_:\'\'),eyecolor(Eye_Color_:\'\'),skincolor(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),status(Status_:\'\'),currentincarceratedflag(Current_Incarcerated_Flag_:\'\'),currentparoleflag(Current_Parole_Flag_:\'\'),currentprobationflag(Current_Probation_Flag_:\'\'),datatype(Data_Type_:0),datasource(Data_Source_:\'\'),num_of_counts(Number_Of_Offense_Counts_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'UID(UID),offender_key(Offender_Key_:\'\'),sourcefile(Source_File_:\'\'),sourcestate(Source_State_:\'\'),citizenship(Citizenship_:\'\'),haircolor(Hair_Color_:\'\'),eyecolor(Eye_Color_:\'\'),skincolor(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),status(Status_:\'\'),currentincarceratedflag(Current_Incarcerated_Flag_:\'\'),currentparoleflag(Current_Parole_Flag_:\'\'),currentprobationflag(Current_Probation_Flag_:\'\'),datatype(Data_Type_:0),datasource(Data_Source_:\'\'),num_of_counts(Number_Of_Offense_Counts_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('DC');
-    SELF.__Permits := CFG_Compile.Permit_FCRA;
     SELF := __r;
   END;
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenses,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenses),SELF:=RIGHT));
@@ -64,11 +62,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
-  SHARED __Mapping1 := 'UID(UID),offender_key(Offender_Key_:\'\'),sourcefile(Source_File_:\'\'),sourcestate(Source_State_:\'\'),citizenship(Citizenship_:\'\'),haircolor(Hair_Color_:\'\'),eyecolor(Eye_Color_:\'\'),skincolor(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),status(Status_:\'\'),currentincarceratedflag(Current_Incarcerated_Flag_:\'\'),currentparoleflag(Current_Parole_Flag_:\'\'),currentprobationflag(Current_Probation_Flag_:\'\'),datatype(Data_Type_:0),datasource(Data_Source_:\'\'),num_of_counts(Number_Of_Offense_Counts_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_FCRA;
-    SELF := __r;
-  END;
+  SHARED __Mapping1 := 'UID(UID),offender_key(Offender_Key_:\'\'),sourcefile(Source_File_:\'\'),sourcestate(Source_State_:\'\'),citizenship(Citizenship_:\'\'),haircolor(Hair_Color_:\'\'),eyecolor(Eye_Color_:\'\'),skincolor(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),status(Status_:\'\'),currentincarceratedflag(Current_Incarcerated_Flag_:\'\'),currentparoleflag(Current_Parole_Flag_:\'\'),currentprobationflag(Current_Probation_Flag_:\'\'),datatype(Data_Type_:0),datasource(Data_Source_:\'\'),num_of_counts(Number_Of_Offense_Counts_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Court_Offenses,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Court_Offenses),SELF:=RIGHT));
   SHARED __d1_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Doxie_Files__Key_Court_Offenses);
@@ -77,36 +71,18 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED __d1_UID_Mapped := JOIN(__d1_Norm,Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid := __d1_UID_Mapped(UID = 0);
   SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1),__Mapping1_Transform(LEFT)));
-  SHARED __Mapping2 := 'UID(UID),offender_key(Offender_Key_:\'\'),source_file(Source_File_:\'\'),orig_state(Source_State_:\'\'),citizenship(Citizenship_:\'\'),hair_color_desc(Hair_Color_:\'\'),eye_color_desc(Eye_Color_:\'\'),skin_color_desc(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),party_status_desc(Status_:\'\'),curr_incar_flag(Current_Incarcerated_Flag_:\'\'),curr_parole_flag(Current_Parole_Flag_:\'\'),curr_probation_flag(Current_Probation_Flag_:\'\'),data_type(Data_Type_:0),datasource(Data_Source_:\'\'),numberofoffensecounts(Number_Of_Offense_Counts_:0),src(Source_:\'\'),fcra_date(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED InLayout __Mapping2_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_FCRA;
-    SELF := __r;
-  END;
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1));
+  SHARED __Mapping2 := 'UID(UID),offender_key(Offender_Key_:\'\'),source_file(Source_File_:\'\'),orig_state(Source_State_:\'\'),citizenship(Citizenship_:\'\'),hair_color_desc(Hair_Color_:\'\'),eye_color_desc(Eye_Color_:\'\'),skin_color_desc(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),party_status_desc(Status_:\'\'),curr_incar_flag(Current_Incarcerated_Flag_:\'\'),curr_parole_flag(Current_Parole_Flag_:\'\'),curr_probation_flag(Current_Probation_Flag_:\'\'),data_type(Data_Type_:0),datasource(Data_Source_:\'\'),numberofoffensecounts(Number_Of_Offense_Counts_:0),src(Source_:\'\'),fcra_date(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
   SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
   SHARED __d2_Out := RECORD
     RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Doxie_Files__Key_Offenders);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d2_UID_Mapped := JOIN(__d2_Norm,Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d2_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_1_Invalid := __d2_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid := __d2_UID_Mapped(UID = 0);
   SHARED __d2_Prefiltered := __d2_UID_Mapped(UID <> 0);
-  SHARED __d2 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2),__Mapping2_Transform(LEFT)));
-  SHARED __Mapping3 := 'UID(UID),offender_key(Offender_Key_:\'\'),source_file(Source_File_:\'\'),orig_state(Source_State_:\'\'),citizenship(Citizenship_:\'\'),hair_color_desc(Hair_Color_:\'\'),eye_color_desc(Eye_Color_:\'\'),skin_color_desc(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),party_status_desc(Status_:\'\'),curr_incar_flag(Current_Incarcerated_Flag_:\'\'),curr_parole_flag(Current_Parole_Flag_:\'\'),curr_probation_flag(Current_Probation_Flag_:\'\'),data_type(Data_Type_:0),datasource(Data_Source_:\'\'),numberofoffensecounts(Number_Of_Offense_Counts_:0),src(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED InLayout __Mapping3_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
-    SELF := __r;
-  END;
-  SHARED __d3_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
-  SHARED __d3_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Doxie_Files__Key_Offenders);
-    KEL.typ.uid UID := 0;
-  END;
-  SHARED __d3_UID_Mapped := JOIN(__d3_Norm,Lookup,TRIM((STRING)LEFT.offender_key) = RIGHT.KeyVal,TRANSFORM(__d3_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_2_Invalid := __d3_UID_Mapped(UID = 0);
-  SHARED __d3_Prefiltered := __d3_UID_Mapped(UID <> 0);
-  SHARED __d3 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3),__Mapping3_Transform(LEFT)));
-  EXPORT InData := __d0 + __d1 + __d2 + __d3;
+  SHARED __d2 := __SourceFilter(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2));
+  EXPORT InData := __d0 + __d1 + __d2;
   EXPORT Sources_Layout := RECORD
     KEL.typ.nstr Source_File_;
     KEL.typ.nint Data_Type_;
@@ -191,7 +167,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   EXPORT Skin_Color__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Skin_Color_);
   EXPORT Height__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Height_);
   EXPORT Weight__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Weight_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_2_Invalid),COUNT(Offender_Key__SingleValue_Invalid),COUNT(Citizenship__SingleValue_Invalid),COUNT(Hair_Color__SingleValue_Invalid),COUNT(Eye_Color__SingleValue_Invalid),COUNT(Skin_Color__SingleValue_Invalid),COUNT(Height__SingleValue_Invalid),COUNT(Weight__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_2_Invalid,KEL.typ.int Offender_Key__SingleValue_Invalid,KEL.typ.int Citizenship__SingleValue_Invalid,KEL.typ.int Hair_Color__SingleValue_Invalid,KEL.typ.int Eye_Color__SingleValue_Invalid,KEL.typ.int Skin_Color__SingleValue_Invalid,KEL.typ.int Height__SingleValue_Invalid,KEL.typ.int Weight__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid),COUNT(Offender_Key__SingleValue_Invalid),COUNT(Citizenship__SingleValue_Invalid),COUNT(Hair_Color__SingleValue_Invalid),COUNT(Eye_Color__SingleValue_Invalid),COUNT(Skin_Color__SingleValue_Invalid),COUNT(Height__SingleValue_Invalid),COUNT(Weight__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Court_Offenses_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid,KEL.typ.int Offender_Key__SingleValue_Invalid,KEL.typ.int Citizenship__SingleValue_Invalid,KEL.typ.int Hair_Color__SingleValue_Invalid,KEL.typ.int Eye_Color__SingleValue_Invalid,KEL.typ.int Skin_Color__SingleValue_Invalid,KEL.typ.int Height__SingleValue_Invalid,KEL.typ.int Weight__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenses_Invalid),COUNT(__d0)},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','offender_key',COUNT(__d0(__NL(Offender_Key_))),COUNT(__d0(__NN(Offender_Key_)))},
@@ -232,7 +208,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d1(__NL(Source_))),COUNT(__d1(__NN(Source_)))},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_1_Invalid),COUNT(__d2)},
+    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_Invalid),COUNT(__d2)},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','offender_key',COUNT(__d2(__NL(Offender_Key_))),COUNT(__d2(__NN(Offender_Key_)))},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source_file',COUNT(__d2(__NL(Source_File_))),COUNT(__d2(__NN(Source_File_)))},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_state',COUNT(__d2(__NL(Source_State_))),COUNT(__d2(__NN(Source_State_)))},
@@ -251,26 +227,6 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NumberOfOffenseCounts',COUNT(__d2(__NL(Number_Of_Offense_Counts_))),COUNT(__d2(__NN(Number_Of_Offense_Counts_)))},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d2(__NL(Source_))),COUNT(__d2(__NN(Source_)))},
     {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie_Files__Key_Offenders_2_Invalid),COUNT(__d3)},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','offender_key',COUNT(__d3(__NL(Offender_Key_))),COUNT(__d3(__NN(Offender_Key_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','source_file',COUNT(__d3(__NL(Source_File_))),COUNT(__d3(__NN(Source_File_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','orig_state',COUNT(__d3(__NL(Source_State_))),COUNT(__d3(__NN(Source_State_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','citizenship',COUNT(__d3(__NL(Citizenship_))),COUNT(__d3(__NN(Citizenship_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','hair_color_desc',COUNT(__d3(__NL(Hair_Color_))),COUNT(__d3(__NN(Hair_Color_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','eye_color_desc',COUNT(__d3(__NL(Eye_Color_))),COUNT(__d3(__NN(Eye_Color_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','skin_color_desc',COUNT(__d3(__NL(Skin_Color_))),COUNT(__d3(__NN(Skin_Color_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','height',COUNT(__d3(__NL(Height_))),COUNT(__d3(__NN(Height_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','weight',COUNT(__d3(__NL(Weight_))),COUNT(__d3(__NN(Weight_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','party_status_desc',COUNT(__d3(__NL(Status_))),COUNT(__d3(__NN(Status_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','curr_incar_flag',COUNT(__d3(__NL(Current_Incarcerated_Flag_))),COUNT(__d3(__NN(Current_Incarcerated_Flag_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','curr_parole_flag',COUNT(__d3(__NL(Current_Parole_Flag_))),COUNT(__d3(__NN(Current_Parole_Flag_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','curr_probation_flag',COUNT(__d3(__NL(Current_Probation_Flag_))),COUNT(__d3(__NN(Current_Probation_Flag_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','data_type',COUNT(__d3(__NL(Data_Type_))),COUNT(__d3(__NN(Data_Type_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','datasource',COUNT(__d3(__NL(Data_Source_))),COUNT(__d3(__NN(Data_Source_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NumberOfOffenseCounts',COUNT(__d3(__NL(Number_Of_Offense_Counts_))),COUNT(__d3(__NN(Number_Of_Offense_Counts_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d3(__NL(Source_))),COUNT(__d3(__NN(Source_)))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d3(Date_First_Seen_=0)),COUNT(__d3(Date_First_Seen_!=0))},
-    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d3(Date_Last_Seen_=0)),COUNT(__d3(Date_Last_Seen_!=0))}]
+    {'CriminalOffender','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
