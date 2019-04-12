@@ -210,6 +210,7 @@ SmallBusinessAnalyticsRequest XML:
 &lt;/lnsmallbusiness.smallbusiness_bip_serviceRequest&gt;
 </pre>
 */
+//#option ('optimizelevel', 0); // do not release this option to prod !!!! it is usefull during deployment 
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
 IMPORT Address, Business_Risk_BIP, Cortera, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Indicators, Risk_Reporting, RiskWise,
@@ -580,7 +581,8 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
                               AppendBestsFromLexIDs := SBA_20_Request
 																														);
 
-	SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
+	 SBA_Results_Temp := PROJECT( SBA_Results_Temp_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
+
 	
 	#if(Models.LIB_BusinessRisk_Models().TurnOnValidation) // If TRUE, output the model results directly
 		
