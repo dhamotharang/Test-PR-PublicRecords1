@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP, models, STD, ut;
+﻿IMPORT Business_Risk_BIP, models, STD, ut;
 
 todays_date := (STRING)STD.Date.Today ();
 
@@ -111,8 +111,8 @@ EXPORT rcSet(Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = FALSE, STRING
 		
 	SHARED hri_nam_alt := 
 		IF( useSBFE, 
-			IF( pop_bus_altname = 1 AND ver_altnm_src_count <= 0, 1, 0 ),
-			IF( pop_bus_altname = 1 AND ver_altnm_src_count <= 0 AND sbfe_altnm_input_mth_since_fs <= 0, 1, 0 )
+			IF( pop_bus_altname = 1 AND ver_altnm_src_count <= 0 AND sbfe_altnm_input_mth_since_fs <= 0, 1, 0 ),
+			IF( pop_bus_altname = 1 AND ver_altnm_src_count <= 0, 1, 0 )
 		);
 
 	// =================================================================
@@ -148,7 +148,7 @@ EXPORT rcSet(Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = FALSE, STRING
 	EXPORT isCode17 := hri_none;
 	
 	// Unable to verify business name on business records, but alternate business name found in business records.
-	EXPORT isCode18 := NOT hri_nam AND hri_nam_prm = 1 AND hri_nam_alt = 0;
+	EXPORT isCode18 := NOT hri_nam AND hri_nam_prm = 1 AND hri_nam_alt = 0 AND pop_bus_altname = 1;
 	
 	// Unable to verify business name on business records.
 	EXPORT isCode19 := hri_nam AND NOT isCode17;
