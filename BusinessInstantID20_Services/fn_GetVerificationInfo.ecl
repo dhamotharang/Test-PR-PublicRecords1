@@ -199,14 +199,59 @@
 				// Gain some extra lift from Business Shell verification indicators.
 				BusinessInstantID20_Services.Layouts.VerificationTempLayout xfm_AddShellData( layout_temp le, Business_Risk_BIP.Layouts.Shell ri ) := 
 					TRANSFORM
-						ver_name_src_count   := ri.Verification.NameMatchSourceCount;
-						ver_altnm_src_count  := ri.Verification.AltNameMatchSourceCount;
-						ver_addr_src_count   := ri.Verification.AddrVerificationSourceCount; 
-						ver_phn_src_count    := ri.Verification.PhoneMatchSourceCount;
-						ver_phn_src_id_count := ri.Verification.PhoneMatchSourceCountID;
-						ver_fein_src_count   := ri.Verification.FEINMatchSourceCount;
-
-						sbfe_name_input_mth_since_ls  := ri.SBFE.SBFENameMatchMonthsLastSeen;
+						ver_name_src_count          := ri.Verification.NameMatchSourceCount;
+						ver_altnm_src_count         := ri.Verification.AltNameMatchSourceCount;
+						ver_addr_src_count          := ri.Verification.AddrVerificationSourceCount; 
+						ver_phn_src_count           := ri.Verification.PhoneMatchSourceCount;
+						ver_phn_src_id_count        := ri.Verification.PhoneMatchSourceCountID;
+						ver_fein_src_count          := ri.Verification.FEINMatchSourceCount;
+            fein_input_contradictory_in := ri.Verification.FEINAddrNameMismatch;
+            cons_record_match_name      := ri.Business_To_Person_Link.BusAddrPersonNameOverlap;
+            cons_record_match_altnm		  := ri.Business_To_Person_Link.BusAddrPersonAltNameOverlap;
+            cons_record_match_addr      := ri.Business_To_Person_Link.BusFEINPersonAddrOverlap;
+            ver_cons_index := MAP(
+                (cons_record_match_name = '2' OR cons_record_match_altnm = '2') AND cons_record_match_addr = '2' => '|NAT|',
+                cons_record_match_name = '2' OR cons_record_match_altnm = '2'                                 	 => '|NA |',
+                cons_record_match_addr = '2'                                 																		 => '| AT|',
+                cons_record_match_addr = '1'                                																	   => '|  T|',
+                cons_record_match_name = '1' OR cons_record_match_altnm = '1'																		 => '| A |',
+                                                                                                                    '|   |');
+            _fein_input_contradictory_in := MAP(
+                fein_input_contradictory_in = '1' => '|NAT|',
+                fein_input_contradictory_in = '2' => '| AT|',
+                fein_input_contradictory_in = '3' => '|N T|',
+                fein_input_contradictory_in = '4' => '|  T|',
+                                                     '|   |');
+            e2b_rep1_name_on_file         := ri.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile;
+            e2b_rep1_idsearch_name        := ri.Business_To_Executive_Link.AR2BRep1NameBusHeaderLexID;
+            e2b_rep1_paw_match            := ri.Business_To_Executive_Link.AR2BBusPAWRep1;
+            e2b_rep1_match_bus_file_addr  := ri.Business_To_Executive_Link.BusExecLinkAuthRepAddrBusAddr;
+            e2b_rep1_match_bus_file_fein  := ri.Business_To_Executive_Link.BusExecLinkAuthRepSSNBusFEIN;
+            sbfe_e2b_rep1_name_on_file    := ri.SBFE.SBFEBusExecLinkRep1NameonFile;
+            fein                          := ri.input_echo.fein;
+            rep_ssn                       := ri.input_echo.rep_ssn;
+            BOOLEAN _e2b_rep1_name                   := e2b_rep1_name_on_file = '3' OR e2b_rep1_idsearch_name = '1' OR e2b_rep1_paw_match = '2' OR (Options.useSBFE AND sbfe_e2b_rep1_name_on_file = '3');
+            BOOLEAN _e2b_rep1_match_bus_file_addr    := e2b_rep1_match_bus_file_addr = '1';
+            BOOLEAN _e2b_rep1_match_bus_in_fein      := TRIM((STRING)fein, ALL) != '' AND TRIM((STRING)rep_ssn, ALL) != '' AND TRIM((STRING)fein, ALL) = TRIM((STRING)rep_ssn, ALL);
+            BOOLEAN _e2b_rep1_match_bus_file_fein    := _e2b_rep1_match_bus_in_fein = TRUE AND e2b_rep1_match_bus_file_fein = '1';
+            STRING1 _e2b_rep1_name_fl                := IF(_e2b_rep1_name, 'N', ' ');
+            STRING1 _e2b_rep1_match_bus_file_addr_fl := IF(_e2b_rep1_match_bus_file_addr, 'A', ' ');
+            STRING1 _e2b_rep1_match_bus_file_fein_fl := IF(_e2b_rep1_match_bus_file_fein, 'T', ' ');
+            rep_bus_match := '|' + _e2b_rep1_name_fl + _e2b_rep1_match_bus_file_addr_fl + _e2b_rep1_match_bus_file_fein_fl + '|';
+            isCode523 := _fein_input_contradictory_in = '|NAT|';
+            isCode418 := _fein_input_contradictory_in = '|N T|' AND (ver_cons_index IN ['|NAT|', '|NA |', '| AT|']);
+            isCode416 := _fein_input_contradictory_in = '| AT|' AND (ver_cons_index IN ['|NAT|', '|NA |']);
+            isCode404 := _fein_input_contradictory_in = '|N T|' AND (rep_bus_match IN ['|NAT|', '|NA |']);
+            isCode402 := _fein_input_contradictory_in = '| AT|' AND (rep_bus_match IN ['|NAT|', '|NA |', '|N T|']);
+            isCode324 := _fein_input_contradictory_in = '|N T|';
+            isCode322 := _fein_input_contradictory_in = '| AT|';
+            isCode124 := _fein_input_contradictory_in = '|  T|';
+            
+            isFeinNameMatch    := isCode523 OR isCode418 OR isCode416 OR isCode404 OR isCode324;
+            isFeinAddressMatch := isCode523 OR isCode418 OR isCode416 OR isCode402 OR isCode322;
+            isFeinTinMatch     := isCode523 OR isCode418 OR isCode416 OR isCode404 OR isCode402 OR isCode324 OR isCode322 OR isCode124;
+                                                     
+            sbfe_name_input_mth_since_ls  := ri.SBFE.SBFENameMatchMonthsLastSeen;
 						sbfe_altnm_input_mth_since_ls := ri.SBFE.SBFEAltNameMatchMonthsLastSeen;
 						sbfe_addr_input_mth_since_ls  := ri.SBFE.SBFEAddrMatchMonthsLastSeen;
 						sbfe_phn_input_mth_since_ls   := ri.SBFE.SBFEPhoneMatchMonthsLastSeen;
@@ -217,20 +262,20 @@
 						ver_add   := (INTEGER)ver_addr_src_count  > 0 OR (Options.useSBFE AND (INTEGER)sbfe_addr_input_mth_since_ls >= 0);
 						ver_phn   := (INTEGER)ver_phn_src_count   > 0 OR (Options.useSBFE AND (INTEGER)sbfe_phn_input_mth_since_ls  >= 0) OR (INTEGER)ver_phn_src_id_count > 0;
 						ver_tin   := (INTEGER)ver_fein_src_count  > 0 OR (Options.useSBFE AND (INTEGER)sbfe_fein_input_mth_since_ls >= 0);
-
-						// Since the Business Shell doesn't provide CompanyNames, Addresses, or other data, fill in 
+            
+            // Since the Business Shell doesn't provide CompanyNames, Addresses, or other data, fill in 
 						// these data from the original input if this product coundn't find the Business in the 
 						// Business Header, but the Business Shell found it in other sources.
 						_CompanyName    := TRIM( IF( ver_nam   AND TRIM(le.CompanyName)    = '', le.origCompanyName   , le.CompanyName ) );
 						_AltCompanyName := TRIM( IF( ver_altnm AND TRIM(le.AltCompanyName) = '', le.origAltCompanyName, le.AltCompanyName ) );
 						
-						SELF.CompanyName   := _CompanyName;
-						SELF.AltCompanyName:= _AltCompanyName;
-						SELF.StreetAddress := IF( ver_add AND TRIM(le.StreetAddress) = ''   , le.origStreetAddress , le.StreetAddress );
-						SELF.City          := IF( ver_add AND TRIM(le.City) = ''            , le.origCity          , le.City );
-						SELF.State         := IF( ver_add AND TRIM(le.State) = ''           , le.origState         , le.State );
-						SELF.Zip5          := IF( ver_add AND TRIM(le.Zip5) = ''            , le.origZip5          , le.Zip5 );
-						SELF.FEIN          := IF( ver_tin AND TRIM(le.FEIN) = ''            , le.origFEIN          , le.FEIN );
+						SELF.CompanyName   := IF(isFeinNameMatch AND _CompanyName='',le.origCompanyName,_CompanyName);
+						SELF.AltCompanyName:= IF(isFeinNameMatch AND _AltCompanyName='',le.origAltCompanyName,_AltCompanyName);
+						SELF.StreetAddress := IF((isFeinAddressMatch AND TRIM(le.StreetAddress)='') OR (ver_add AND TRIM(le.StreetAddress) = ''), le.origStreetAddress , le.StreetAddress );
+						SELF.City          := IF((isFeinAddressMatch AND TRIM(le.City)='') OR (ver_add AND TRIM(le.City) = ''), le.origCity          , le.City );
+						SELF.State         := IF((isFeinAddressMatch AND TRIM(le.State)='') OR (ver_add AND TRIM(le.State) = ''), le.origState         , le.State );
+						SELF.Zip5          := IF((isFeinAddressMatch AND TRIM(le.Zip5)='') OR (ver_add AND TRIM(le.Zip5) = ''), le.origZip5          , le.Zip5 );
+						SELF.FEIN          := IF((isFeinTinMatch AND TRIM(le.FEIN)='') OR (ver_tin AND TRIM(le.FEIN) = ''), le.origFEIN          , le.FEIN );
 						SELF.Phone10       := IF( ver_phn AND TRIM(le.Phone10) = ''         , le.origPhone10       , le.Phone10 );		
 
 						SELF := le;
@@ -247,7 +292,7 @@
 					);
 				
 				// DEBUGs...:
-				// OUTPUT( ds_OriginalInput, NAMED('__OriginalInput') );
+				// OUTPUT( ds_CleanedInput, NAMED('__OriginalInput') );
 				// OUTPUT( ds_BusinessHeaderSlimDeduped, NAMED('BusinessHeaderSlimDeduped') );
 				// OUTPUT( ds_Matching, NAMED('Matching') );
 				// OUTPUT( ds_MatchingRolled, NAMED('MatchingRolled') );
