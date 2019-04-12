@@ -94,6 +94,11 @@ function
 
   esp				:= pesp + ':8010';	//oss is 242,infiniband is '10.241.3.242'
 
+  import ut,Workman;
+
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   soap_results := SOAPCALL(
     'http://' + esp + '/WsDfu?ver_=1.48'
     ,'DFUInfo'
@@ -102,7 +107,18 @@ function
     ,xpath('DFUInfoResponse')
   );
   
-  return soap_results;
+  soap_results_remote := SOAPCALL(
+    'http://' + esp + '/WsDfu?ver_=1.48'
+    ,'DFUInfo'
+    ,DFUInfoRequest
+    ,dataset(DFUInfoOutRecord)
+    ,xpath('DFUInfoResponse')
+    %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,soap_results  ,soap_results_remote);
+
+  return returnresult;
 		
 /*  
   export layout := DFUInfo()[1].Ecl;

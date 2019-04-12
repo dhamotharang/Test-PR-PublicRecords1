@@ -11,6 +11,8 @@ EXPORT files := MODULE
 	EXPORT base_disp_actions  := DATASET (Constants.base_prefix_name + 'disciplinary_actions', Layouts.disp_action, THOR);
 	EXPORT base_indiv_detail  := DATASET (Constants.base_prefix_name + 'individual_detail', Layouts.indv_detail, THOR);
 	EXPORT base_reg_actions   := DATASET (Constants.base_prefix_name + 'regulatory_actions', Layouts.reg_action, THOR);
+	
+	Export base_search_did:=base_Search(did!=0);
 
 
 // AutoKeys Files
@@ -33,6 +35,7 @@ Export dsDisciplinary := project(base_disp_actions, layouts.layout_disciplinary)
 Export dsDetail 			:= project(base_indiv_detail, {base_indiv_detail} - [cust_name,bug_num]);
 Export dsRegulatory 	:= project(base_reg_actions, {base_reg_actions} - [cust_name,bug_num]);
 Export dsSearch 			:= project(base_search, {base_search} - [enh_did_src,link_ssn,link_fein,link_inc_date,cust_name,bug_num,link_dob,req]);
+Export dsSearch_did:=dsSearch(did!=0);
 
 
 layouts.slim_ssn  	xformTIN(recordof(dsSearch) L, integer cnt) := transform

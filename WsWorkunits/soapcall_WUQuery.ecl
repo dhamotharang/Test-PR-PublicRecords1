@@ -79,6 +79,11 @@ function
 
   esp				:= pesp + ':8010';
 
+  import ut,Workman;
+  
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   dsoap_results := SOAPCALL(
     'http://' + esp + '/WsWorkunits?ver_=1.48'
     // 'http://' + esp + '/WsWorkunits'
@@ -89,6 +94,19 @@ function
     ,xpath('WUQueryResponse')
   );
   
-  return if(WsWorkunits.Is_Valid_Wuid(pWuid)  ,dsoap_results  ,dataset([],WUQueryResponse_Record));
+  dsoap_results_remote := SOAPCALL(
+    'http://' + esp + '/WsWorkunits?ver_=1.48'
+    // 'http://' + esp + '/WsWorkunits'
+    ,'WUQuery'
+    ,WUQueryRequest_Record
+    ,dataset(WUQueryResponse_Record)
+    // ,heading('<WUInfoRequest>','</WUInfoRequest>')
+    ,xpath('WUQueryResponse')
+    %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,dsoap_results  ,dsoap_results_remote);
+
+  return if(WsWorkunits.Is_Valid_Wuid(pWuid)  ,returnresult  ,dataset([],WUQueryResponse_Record));
 
 end;

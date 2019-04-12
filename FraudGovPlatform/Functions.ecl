@@ -13,7 +13,8 @@ EXPORT Functions :=  MODULE
 						 
 	FUNCTION 
 
-		MBS_CVD_Rec := DEDUP(TABLE(pBaseFile,{Customer_ID, Source}),ALL);	
+		dBaseFile := distribute(pBaseFile):persist('~fraudgov::backup::dBaseFile');
+		MBS_CVD_Rec := DEDUP(TABLE(dBaseFile,{Customer_ID, Source}),ALL);	
 
 		MBS_Layout := RECORD
 			string12 			Customer_ID;
@@ -65,7 +66,7 @@ EXPORT Functions :=  MODULE
 			self := left;
 		));	
 
-		JCVD := join (pBaseFile , MBS_CVD_T , trim(StringLib.StringToUppercase(left.Customer_ID),left,right) = trim(StringLib.StringToUppercase(right.Customer_ID),left,right)
+		JCVD := join (dBaseFile , MBS_CVD_T , trim(StringLib.StringToUppercase(left.Customer_ID),left,right) = trim(StringLib.StringToUppercase(right.Customer_ID),left,right)
 															 and  trim(StringLib.StringToUppercase(left.Source),left,right) = trim(StringLib.StringToUppercase(right.Source) ,left,right) ,
 								transform (FraudShared.Layouts.Base.Main ,
 										is_delta := regexfind('DELTA', left.source, nocase);
@@ -103,11 +104,12 @@ EXPORT Functions :=  MODULE
 										self.classification_Entity.role := right.classification_Entity.role; 
 										self.classification_Entity.Evidence := right.classification_Entity.Evidence; 
 										self.classification_Entity.investigated_count := right.classification_Entity.investigated_count; 
-										self:= left ) , left outer , lookup );
+										self:= left ) , left outer , lookup ):Persist('~fraudgov::backup::MBS_CVD_T');
 
 	  MBSPrimary := FraudShared.Files().Input.MBS.Sprayed; 
 		
-		JMbs  := join (JCVD , MBSPrimary(status = 1) , trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
+		JMbs  := join (JCVD , MBSPrimary(status = 1) , 
+		trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
 
 					transform (FraudShared.Layouts.Base.Main , 								 
 
@@ -152,7 +154,7 @@ EXPORT Functions :=  MODULE
 										self.classification_Entity.Entity_sub_type_id                                          := right.Entity_sub_type;
 										self.classification_Entity.role_id                                                     := right.role;
 										self.classification_Entity.Evidence_id                                                 := right.Evidence;
-										self:= left ) , left outer , lookup ); 
+										self:= left ) , left outer , lookup ):Persist('~fraudgov::backup::JMbs');
 		 
 		return JMbs;
 		

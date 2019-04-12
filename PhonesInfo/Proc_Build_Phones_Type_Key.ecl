@@ -1,5 +1,7 @@
-﻿import _control, Dops, Doxie, PromoteSupers, RoxieKeyBuild, Std, Ut, Orbit3;
+﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, Std, Ut, Orbit3;
 
+	//DF-24397: Create Dx-Prefixed Keys
+	
 EXPORT Proc_Build_Phones_Type_Key(string version):= function
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -20,7 +22,8 @@ EXPORT Proc_Build_Phones_Type_Key(string version):= function
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Build Phones Type Key//////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhonesInfo.Key_Phones_Type
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhonesInfo.Key_Phones_Type
+																							,PhonesInfo.File_Phones_Type.Main
 																							,'~thor_data400::key::phones_type'
 																							,'~thor_data400::key::'+version+'::phones_type'
 																							,bkPhonesTransaction
