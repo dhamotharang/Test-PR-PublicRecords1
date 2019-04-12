@@ -9,7 +9,7 @@ EXPORT SprayAndQualifyDeltabase(
 dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pDeltabaseRootDir + version[1..8], 'delta_identity.txt')):INDEPENDENT;
 dsFileListSorted := SORT(dsFileList,modified);
 fname_temp	:=dsFileListSorted[1].Name:independent;
-fname	:='delta_identity_'+version[1..8]+'.txt';
+fname	:='delta_'+version[1..8]+'.txt';
 
 UpSt:=stringlib.stringtouppercase(fname[1..2]);
 UpType := 'Deltabase';

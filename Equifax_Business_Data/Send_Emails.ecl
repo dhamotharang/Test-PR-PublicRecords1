@@ -1,4 +1,4 @@
-﻿IMPORT tools;
+﻿IMPORT tools, dx_Equifax_Business_Data;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 
@@ -6,7 +6,7 @@ EXPORT Send_Emails(
 	 STRING								pversion
 	,BOOLEAN							pUseOtherEnvironment 		= FALSE
 	,BOOLEAN							pShouldUpdateRoxiePage	= FALSE   
-	,DATASET(lay_builds)	pBuildFilenames					= Equifax_Business_Data.keynames(pversion,pUseOtherEnvironment).dAll_filenames
+	,DATASET(lay_builds)	pBuildFilenames					= dx_Equifax_Business_Data.keynames(pversion,pUseOtherEnvironment).dAll_filenames
 	,STRING								pEmailList							= Equifax_Business_Data.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).BuildSuccess
 	,STRING								pRoxieEmailList					= Equifax_Business_Data.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).Roxie
 	,STRING								pBuildName							= Equifax_Business_Data._Constants().Name
