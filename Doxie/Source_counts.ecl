@@ -1,4 +1,4 @@
-import doxie,doxie_raw,doxie_crs,ut,Header;
+﻿import doxie,doxie_raw,doxie_crs,ut,Header;
 
 export Source_counts (dataset (doxie.layout_references) dids) := function
 
@@ -129,7 +129,7 @@ outRec combineChildResults(outRec L, outRec R) := transform
 	self.finder_child := (L.finder_child + R.finder_child);
 	self.phone_child := (L.phone_child + R.phone_child);
 	self.targ_child := IF(not is_knowx1,(L.targ_child + R.targ_child));
-	self.phonesPlus_child := IF(not is_knowx1,(L.phonesPlus_child  + R.phonesPlus_child ));
+	self.phonesPlus_child := L.phonesPlus_child  + R.phonesPlus_child;
 	self.FBNv2_child := (L.FBNv2_child + R.FBNv2_child);
 	self.DOC_people_child := L.DOC_people_child + R.DOC_people_child;
 	self.DOCv2_child := L.DOCv2_child + R.DOCv2_child;
