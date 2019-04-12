@@ -4,7 +4,7 @@ export MAC_GlbClean_Header(infile,outfile, batch = false, IsFCRA = false, modAcc
 import mdr, ut, doxie, suppress, header, codes;
 
 #uniquename(isUtility)
-%isUtility% := modAccess.industry_class = 'UTILI';
+%isUtility% := modAccess.isUtility();
 
 #uniquename(appType)
 %appType% := modAccess.application_type;

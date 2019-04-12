@@ -361,7 +361,7 @@ ModelName := StringLib.StringToLowerCase( ModelIn );
 
 boolean OFAC := true;	// used in cviScore override, FlexID has been hardcoded to TRUE, so I am doing that here now
 
-isUtility := StringLib.StringToUpperCase(IndustryClassVal)='UTILI';
+isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(IndustryClassVal));
 DobRadiusUse := if(UseDobFilter,DobRadius,-1);
 NumReasons := if(IncludeAllRiskIndicators, 20, risk_indicators.iid_constants.DefaultNumCodes);
 DOBMatchOptions := dataset([{DOBMatchType, DOBMatchYearRadius}], risk_indicators.layouts.Layout_DOB_Match_Options);

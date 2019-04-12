@@ -348,7 +348,7 @@ cleanIn := project(batchinseq_temp, into_in(left));
 
 
 // set variables for passing to bocashell function fcra
-boolean   isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+boolean   isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 boolean 	require2ele := AlternateModel in ['ex23','ex89'];
 unsigned1 dppa := 0;	// not needed for FCRA
 unsigned1 glba := 0;	// not needed for FCRA

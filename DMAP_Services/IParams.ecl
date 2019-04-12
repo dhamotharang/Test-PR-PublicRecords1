@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, ut, suppress;
+﻿IMPORT AutoStandardI, Doxie, suppress;
 
 gm:= AutoStandardI.GlobalModule();
 
@@ -30,9 +30,9 @@ EXPORT IParams := MODULE
 			EXPORT UNSIGNED1 DPPA:= AutoStandardI.InterfaceTranslator.DPPA_Purpose.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.DPPA_Purpose.params));	
 			EXPORT BOOLEAN probation_override_value:= AutoStandardI.InterfaceTranslator.probation_override_value.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.probation_override_value.params));
 			EXPORT STRING5 industry_class:= AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.industry_class_val.params));
-			EXPORT BOOLEAN isUtility:=  ut.IndustryClass.Is_Utility;
-			EXPORT BOOLEAN glb_ok:= ut.glb_ok(GLBA);
-			EXPORT BOOLEAN dppa_ok:= ut.dppa_ok(DPPA);
+			EXPORT BOOLEAN isUtility:=  Doxie.Compliance.isUtilityRestricted(industry_class);
+			EXPORT BOOLEAN glb_ok:= Doxie.Compliance.glb_ok(GLBA);
+			EXPORT BOOLEAN dppa_ok:= Doxie.Compliance.dppa_ok(DPPA);
 		END;	
 	 
 	 RETURN in_mod;

@@ -1,4 +1,4 @@
-﻿IMPORT AutoKey, BBB2, BIPV2, Business_Risk, Business_Risk_BIP, CalBus, Data_Services, FBNv2, GovData, IRS5500, MDR, PAW, Phones, Phonesplus_v2, Risk_Indicators, UT, UtilFile, YellowPages;
+﻿IMPORT AutoKey, BBB2, BIPV2, Business_Risk, Business_Risk_BIP, CalBus, Data_Services, Doxie, FBNv2, GovData, IRS5500, MDR, PAW, Phones, Phonesplus_v2, Risk_Indicators, UT, UtilFile, YellowPages;
 
 EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -388,7 +388,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	
 	// ---------------- Utility Data ---------------------
-	UtilRaw := IF(Options.IndustryClass <> 'UTILI', UtilFile.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	UtilRaw := IF(~Doxie.Compliance.isUtilityRestricted(Options.IndustryClass), UtilFile.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

@@ -265,14 +265,14 @@ end;
 prep := PROJECT(d,into(LEFT));
 
 
-iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI', ln_branded_value, ofac_only,
+iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only,
 	suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists, from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius,
 	bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowcellphones,
 	exactMatchLevel,DataRestriction,CustomDataFilter,in_DataPermission:=DataPermission
 );//check parameters here
 
 
-clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI', ln_branded_value, false, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, false, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
 
 
 business_risk.Layout_Input into_input(d L) := transform

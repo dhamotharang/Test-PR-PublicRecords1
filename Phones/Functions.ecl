@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2_Company_Names,DidVille,Drivers,MDR,Phones,Phonesplus_v2,STD,ut, D2C;
+﻿IMPORT BIPV2_Company_Names,DidVille,Drivers,MDR,Phones,Phonesplus_v2,STD,ut, D2C, Doxie;
 
 EXPORT Functions :=
 MODULE
@@ -61,7 +61,7 @@ MODULE
 			     and Drivers.state_dppa_ok(state,dppa_purpose,src))
 
        // Utility data that might be restricted via input Industry_Class value
-       OR (src in MDR.sourceTools.set_Utilities and industry_class = 'UTILI')
+       OR (src in MDR.sourceTools.set_Utilities and Doxie.Compliance.isUtilityRestricted(industry_class))
 
        //Sources that might be restricted via DataRestrictionMask
 			 // Instead of trying to re-create some of the coding in AutoStandardI.DataRestrictionI,

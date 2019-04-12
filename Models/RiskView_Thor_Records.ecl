@@ -1,4 +1,4 @@
-﻿import _Control, address, aid, risk_indicators, models, riskwise, ut, fcra_opt_out, gateway, FFD;
+﻿import _Control, address, aid, Doxie, risk_indicators, models, riskwise, ut, fcra_opt_out, gateway, FFD, STD;
 onThor := _Control.Environment.OnThor;
 
 // This code is adapted from Models.RiskView_Batch_Service for use of scripts running RiskView v4 on thor.
@@ -276,7 +276,7 @@ cleanIn_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT));
 #END
 
 // set variables for passing to bocashell function fcra
-boolean   isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+boolean   isUtility := Doxie.compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 boolean 	require2ele := AlternateModel in ['ex23','ex89'];
 unsigned1 dppa := 0;	// not needed for FCRA
 unsigned1 glba := 0;	// not needed for FCRA

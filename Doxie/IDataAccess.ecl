@@ -45,7 +45,7 @@ EXPORT IDataAccess := INTERFACE
 
   EXPORT boolean isConsumer () := industry_class = 'CNSMR';
   EXPORT boolean isDirectMarketing () := industry_class = 'DRMKT';
-  EXPORT boolean isUtility () := industry_class = 'UTILI';  // should we look for 'DRMKT' here as well?
+  EXPORT boolean isUtility () := industry_class = 'UTILI' OR isDirectMarketing(); // indicates restriction of utility sources 
 
   // restrictions based on data restriction mask flags
   EXPORT boolean isPreGLBRestricted () := $.compliance.isPreGLBRestricted (DataRestrictionMask);

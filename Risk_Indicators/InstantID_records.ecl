@@ -1,4 +1,4 @@
-﻿import address, ADVO, Business_Header_SS, models, riskwise, ut, USPIS_HotList, codes, Suppress, AutoStandardI, seed_files, iesp,
+﻿import address, ADVO, Business_Header_SS, Doxie, models, riskwise, ut, USPIS_HotList, codes, Suppress, AutoStandardI, seed_files, iesp,
 			 IntlIID, YellowPages, gateway, Royalty, MDR, census_data, OFAC_XG5, Risk_Reporting, STD, Inquiry_AccLogs, STD;
 // NOTE! If you make any logic changes here, please change also BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs.
 
@@ -72,7 +72,7 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
 unsigned1 DPPA_Purpose := 0 					: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := 8 						: stored('GLBPurpose');
 STRING5 industry_class_val := '' 			: stored('IndustryClass');
-	isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+	isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 unsigned3 history_date := 999999 			: stored('HistoryDateYYYYMM');
 string20	historyDateTimeStamp := '' : stored('historyDateTimeStamp');  // new for shell 5.0
 boolean IsPOBoxCompliant := false 		: stored('PoBoxCompliance');

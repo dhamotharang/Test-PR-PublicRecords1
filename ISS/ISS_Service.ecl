@@ -297,7 +297,7 @@ export ISS_Service := MACRO
 
 	// set variables for passing to bocashell function fcra
 	boolean 	 isFCRA					:= false;
-	boolean   isUtility := 			userIn.industryClass = 'UTILI';
+	boolean   isUtility := Doxie.Compliance.isUtilityRestricted(userIn.industryClass);
 	boolean   require2ele         := false;
 	boolean   isLn                := false; // not needed anymore
 	boolean	 no_rel 					:= false;

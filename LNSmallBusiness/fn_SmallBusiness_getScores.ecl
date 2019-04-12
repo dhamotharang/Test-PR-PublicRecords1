@@ -1,4 +1,4 @@
-﻿IMPORT Address, BusinessCredit_Services, Business_Risk_BIP, Gateway, iesp, Models, Risk_Indicators, Riskwise, ut;
+﻿IMPORT Address, BusinessCredit_Services, Business_Risk_BIP, Doxie, Gateway, iesp, Models, Risk_Indicators, Riskwise, STD, ut;
 
 EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shell_Input, 
                                    Business_Risk_BIP.LIB_Business_Shell_LIBIN options, 
@@ -19,7 +19,7 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 		Gateways            := Gateway.Constants.void_gateway;
 		DPPA_Purpose        := options.DPPA_Purpose;
 		GLBA_Purpose        := options.GLBA_Purpose;
-		IsUtility           := StringLib.StringToUpperCase(options.IndustryClass) = 'UTILI';
+		IsUtility           := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(options.IndustryClass));
 		IncludeRel          := TRUE;
 		IncludeDL           := TRUE;
 		IncludeVeh          := TRUE;

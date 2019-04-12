@@ -39,7 +39,7 @@ MODULE
 																				AllowLeadingLnameMatch := AutoKey.skipSetTools(daily_autokey_skipset).AddZipL, 
 																				AllowFallBack := AllowGongFallBack, AllowLooseSuffixMatch:=false));
 	shared DailyUtil := 
-		IF(include_dailies AND modAccess.industry_class<>'UTILI' and ~is_knowx and glb_ok /* glb_ok is redundant here, because the underlying attributes apply glb. But it should perform better, since we avoid an additional call. */,
+		IF(include_dailies AND ~modAccess.isUtility() and ~is_knowx and glb_ok /* glb_ok is redundant here, because the underlying attributes apply glb. But it should perform better, since we avoid an additional call. */,
 			 IF(DoSearch, 
 					doxie.Fetch_Utility_Daily(d,dppa_purpose,glb_purpose,industry_class_value,allow_wildcard,daily_autokey_skipset,ApplyBpsFilter),
 					Doxie_Raw.Util_Daily_Raw(d,0,dppa_purpose,glb_purpose,industry_class_value)));

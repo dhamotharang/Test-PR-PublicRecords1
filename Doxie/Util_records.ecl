@@ -187,6 +187,6 @@ EXPORT Util_records (DATASET(doxie.layout_references) ds_dids_in,
   // OUTPUT (crs_util_sorted, NAMED('crs_util_sorted')); 
   // OUTPUT (return_Data, NAMED('return_Data'));
 
-  RETURN IF(industry_class_val <> 'UTILI' AND glb_ok, return_Data);
+  RETURN IF(~Doxie.Compliance.isUtilityRestricted(industry_class_val) AND glb_ok, return_Data);
 
 END;

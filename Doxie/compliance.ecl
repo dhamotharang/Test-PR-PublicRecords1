@@ -184,4 +184,7 @@ EXPORT compliance := MODULE
     restrictedSet := ['0',''];
     EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
 
+    // to exclude utility sources:
+    EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';
+
 END;

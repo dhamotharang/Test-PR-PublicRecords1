@@ -75,7 +75,7 @@ EXPORT PAR_Search_Service() := MACRO
 	DPPA 									:= (unsigned1)userIn.DLPurpose;
 	GLBA 									:= (unsigned1)userIn.GLBPurpose;
 	industry_class_val 		:= (string)userIn.IndustryClass;
-	isUtility 						:= StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+	isUtility 						:= Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 
 	fullname 							:= trim(search.name.full);
 	cleanname 						:= address.CleanPerson73( fullname );

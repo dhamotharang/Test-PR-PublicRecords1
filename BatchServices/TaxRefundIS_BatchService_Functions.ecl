@@ -1,4 +1,4 @@
-﻿import Autokey_batch, Address, AddrBest, AutoStandardI, 
+﻿import Autokey_batch, Address, AddrBest, AutoStandardI, Doxie,
 Didville, CriminalRecords_BatchService, risk_indicators, riskwise,
 ut, iesp, NID, BatchShare, Models, STD, gateway, BatchServices;
 
@@ -489,7 +489,7 @@ export TaxRefundIS_BatchService_Functions := MODULE
       prep := PROJECT(f,into(LEFT));
       
       ciid_recs := risk_indicators.InstantID_Function(prep, gateways_in, DPPA_Purpose, GLB_Purpose, 
-                    industry_class_value='UTILI', ln_branded_value, ofac_only, suppressNearDups, 
+                    Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only, suppressNearDups, 
                     require2ele, fromBiid, isFCRA, ExcludeWatchLists,FALSE,ofac_version,include_ofac,
                     include_additional_watchlists,Global_WatchList_Threshold,dob_radius_use,
                     bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, 

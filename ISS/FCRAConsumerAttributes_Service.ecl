@@ -278,7 +278,7 @@ export FCRAConsumerAttributes_Service := MACRO
 	boolean 	isFCRA							:= true;
 	unsigned1 dppa                := 0; // not needed for FCRA
 	unsigned1 glba                := 0; // not needed for FCRA
-	boolean   isUtility 					:= userIn.industryClass = 'UTILI';
+	boolean   isUtility 					:= Doxie.Compliance.isUtilityRestricted(userIn.industryClass);
 	boolean   require2ele         := false;
 	boolean   isLn                := false; // not needed anymore
 	boolean   doRelatives         := false;

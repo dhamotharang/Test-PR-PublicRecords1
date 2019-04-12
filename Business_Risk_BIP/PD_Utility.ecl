@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, UtilFile, MDR;
+IMPORT BIPV2, Business_Risk_BIP, Doxie, UtilFile, MDR;
 
 EXPORT PD_Utility(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound, 
 									DATASET(BIPV2.IDlayouts.l_xlink_ids2) kFetchLinkIDs, 
@@ -8,7 +8,7 @@ EXPORT PD_Utility(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 									SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	// ---------------- Utility Data ---------------------
-	UtilRaw := IF(Options.IndustryClass <> 'UTILI', UtilFile.Key_LinkIds.kFetch2(kFetchLinkIDs,
+	UtilRaw := IF(~Doxie.Compliance.isUtilityRestricted(Options.IndustryClass), UtilFile.Key_LinkIds.kFetch2(kFetchLinkIDs,
 																						 kFetchLinkSearchLevel,
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

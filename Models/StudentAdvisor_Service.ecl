@@ -223,12 +223,12 @@ end;
 prep := PROJECT(d,into(left,counter));
 
 
-iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI', ln_branded_value, ofac_only,
+iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only,
 	suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists, from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius,
 	in_DataRestriction := DataRestriction, in_DataPermission := DataPermission
 );//check parameters here
 
-clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI', ln_branded_value, false, false, true, true,
+clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, false, false, true, true,
 DataRestriction := DataRestriction, DataPermission := DataPermission);// set some to false?
 
 ret := Models.FD9607_1_0(clam, ofacSearching, isStudent, addtl_watchlists);

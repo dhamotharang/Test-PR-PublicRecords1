@@ -26,10 +26,10 @@ end;
 
 #uniquename(get_by_did)
 %prec% %get_by_did%(%qsent_did_key% l) := transform
-	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~ut.glb_ok(glb_purpose) => skip,
-	                          l.glb_dppa_flag in ['D','B'] and ~(ut.dppa_ok(dppa_purpose) and 
+	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~Doxie.Compliance.glb_ok(glb_purpose) => skip,
+	                          l.glb_dppa_flag in ['D','B'] and ~(Doxie.Compliance.dppa_ok(dppa_purpose) and 
 						 drivers.state_dppa_ok(l.origstate,dppa_purpose,'')) => skip,
-						 l.glb_dppa_flag='U' and industry_class_value='UTILI' => skip,
+						 l.glb_dppa_flag='U' and Doxie.Compliance.isUtilityRestricted(industry_class_value) => skip,
 						 l.glb_dppa_flag);
 	self.listed_name := %makelistedname%(l.company, l.origname);
 	self := l;
@@ -52,10 +52,10 @@ end;
 					    
 #uniquename(get_by_fdid)							    
 %prec% %get_by_fdid%(%qsent_fdid_key% l) := transform
-	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~ut.glb_ok(glb_purpose) => skip,
-	                          l.glb_dppa_flag in ['D','B'] and ~(ut.dppa_ok(dppa_purpose) and 
+	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~Doxie.Compliance.glb_ok(glb_purpose) => skip,
+	                          l.glb_dppa_flag in ['D','B'] and ~(Doxie.Compliance.dppa_ok(dppa_purpose) and 
 						 drivers.state_dppa_ok(l.origstate,dppa_purpose,'')) => skip,
-						 l.glb_dppa_flag='U' and industry_class_value='UTILI' => skip,
+						 l.glb_dppa_flag='U' and Doxie.Compliance.isUtilityRestricted(industry_class_value) => skip,
 						 l.glb_dppa_flag);
 	self.listed_name := %makelistedname%(l.company, l.origname);
 	self := l;

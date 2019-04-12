@@ -153,7 +153,7 @@ export FcraInsurView_Service := MACRO
 	isCalifornia  := FALSE;//InPersonApplication or exists(settings(isCalifornia));
 	bsVersion := 4; // return bsversion defaults to 1 / but can be passed in.
 	// set variables for passing to bocashell function fcra
-	boolean   isUtility := StringLib.StringToUpperCase(IndustryClass) = 'UTILI';
+	boolean   isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(IndustryClass));
 	boolean   require2ele := false;
 	boolean   isLn := false; // not needed anymore
 	boolean   doRelatives := false;

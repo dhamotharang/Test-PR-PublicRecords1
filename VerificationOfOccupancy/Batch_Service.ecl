@@ -1,4 +1,4 @@
-IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI;
+IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI, Doxie, STD;
 
 EXPORT Batch_Service() := FUNCTION
 
@@ -17,7 +17,7 @@ EXPORT Batch_Service() := FUNCTION
 	string9   AttributesVersionRequest	:= ''  : stored('AttributesVersionRequest'); 
 	boolean   IncludeModel     					:= false  : stored('IncludeModel');
 	
-	isUtility := StringLib.StringToUpperCase(IndustryClassVal)='UTILI'; 
+	isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(IndustryClassVal)); 
 
 	VOO_wseq := project( batch_in, transform( VerificationOfOccupancy.Layouts.Layout_VOOIn, self.seq := counter, self := left, self := [] ) );
 
