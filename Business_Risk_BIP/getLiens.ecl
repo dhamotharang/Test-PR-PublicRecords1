@@ -6,7 +6,7 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	UCase := StringLib.StringToUpperCase;
-	BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
+	BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 	
 	// --------------- Judgments and Liens ----------------
 	

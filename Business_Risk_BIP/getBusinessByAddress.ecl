@@ -72,7 +72,7 @@ EXPORT getBusinessByAddress(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	
 	tempVerificationLayout verifyAddresses(Shell le, BusinessHeaderAddress ri) := TRANSFORM
-		BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
+		BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 		TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, le.Clean_Input.HistoryDate);
 		SELF.TodaysDate := TodaysDate;
 		
