@@ -1,52 +1,4 @@
-﻿/*--SOAP--
-<message name="BocaShell" wuTimeout="300000">
-	<part name="AccountNumber" type="xsd:string"/>
-	<part name="FirstName" type="xsd:string"/>
-	<part name="MiddleName" type="xsd:string"/>
-	<part name="LastName" type="xsd:string"/>
-	<part name="NameSuffix" type="xsd:string"/>
-	<part name="StreetAddress" type="xsd:string"/>
-	<part name="City" type="xsd:string"/>
-	<part name="State" type="xsd:string"/>
-	<part name="Zip" type="xsd:string"/>
-	<part name="Country" type="xsd:string"/>
-	<part name="SSN" type="xsd:string"/>
-	<part name="DateOfBirth" type="xsd:string"/>
-	<part name="Age" type="xsd:unsignedInt"/>
-	<part name="DLNumber" type="xsd:string"/>
-	<part name="DLState" type="xsd:string"/>
-	<part name="Email" type="xsd:string"/>
-	<part name="IPAddress" type="xsd:string"/>
-	<part name="HomePhone" type="xsd:string"/>
-	<part name="WorkPhone" type="xsd:string"/>
-	<part name="EmployerName" type="xsd:string"/>
-	<part name="FormerName" type="xsd:string"/>
-	<part name="DPPAPurpose" type="xsd:byte"/>
-	<part name="GLBPurpose" type="xsd:byte"/> 
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="IndustryClass" type="xsd:string"/>
-	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
-	<part name="historyDateTimeStamp" type="xsd:string"/>
-	<part name="ExcludeRelatives" type = 'xsd:boolean'/>
-	<part name="BSVersion" type = 'xsd:integer'/>
-	<part name="IncludeScore" type = "xsd:boolean"/>
-	<part name="ADL_Based_Shell" type="xsd:boolean"/>
-	<part name="RemoveFares" type="xsd:boolean"/>
-	<part name="LeadIntegrityMode" type="xsd:boolean"/>
-	<part name="DID" type="xsd:string"/>
-	<part name="LastSeenThreshold" type="xsd:string"/>
-	<part name="RetainInputDID" type="xsd:boolean"/>
-	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
-	<part name="OFACversion" type="xsd:unsignedInt"/>
-	<part name="IncludeOfac" type="xsd:boolean"/>
-	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
-	<part name="RemoveQuickHeader" type="xsd:boolean"/> 
-	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
- </message>
-*/
-
-import ut, riskwise, risk_indicators, AutoStandardI;
+﻿import ut, riskwise, risk_indicators, AutoStandardI;
 
 export Boca_Shell := MACRO
 
@@ -225,7 +177,9 @@ gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := map(bsversion >= 50 and stringlib.StringToLowerCase(trim(le.servicename))in[Gateway.Constants.ServiceName.InsurancePhoneHeader, Gateway.Constants.ServiceName.DeltaInquiry] => le.url, // insurance phones gateway allowed if shell version 50 or higher
+	self.url := map(
+  bsversion >= 55 and stringlib.StringToLowerCase(trim(le.servicename)) = Gateway.Constants.ServiceName.ThreatMetrix => le.url, // TMX allowed for shell 5.5 and higher
+  bsversion >= 50 and stringlib.StringToLowerCase(trim(le.servicename))in[Gateway.Constants.ServiceName.InsurancePhoneHeader, Gateway.Constants.ServiceName.DeltaInquiry] => le.url, // insurance phones gateway allowed if shell version 50 or higher
                  le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
                   '');
           
@@ -324,14 +278,114 @@ adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 																		nugen,
 																		DataRestriction:=DataRestriction, 
 																		DataPermission:=DataPermission);
-																		
 
-final := if(ADL_Based_Shell, adl_based_ret, ret);
+final_temp := if(ADL_Based_Shell, adl_based_ret, ret);																		
 
+
+// TMX attributes are built with KEL shell 6.0 in mind, so we are going to clean the inputs the same way they are cleaning the inputs in the KEL shell prior to sending request to TMX gateway
+PublicRecords_KEL.ECL_Functions.Input_Layout_Slim into_raw_dataset(rec le) := transform  
+  SELF.InputUIDAppend := le.seq;
+	self.historydate := if(historyDateTimeStamp<>'',historyDateTimeStamp[1..6], (string)history_date);
+	self.LexID := did_value; 
+  self.account := (string)le.seq;
+	self.firstname := fname_val;
+	self.middlename := mname_val;
+	self.lastname := lname_val;
+	SELF.streetAddress := addr1_val;
+	SELF.city := city_val;
+	SELF.state := state_val;
+	SELF.zip := zip_value;
+	self.homephone := phone_value;
+	self.ssn := ssn_value;
+	self.dateofbirth := dob_value;	
+	self.WorkPhone := wphone_value;
+	SELF.dlnumber := dl_number_value;
+	SELF.dlstate := dl_state_value;
+	SELF.email := email_value;
+  self := [];
+end;
+raw_slim := PROJECT(d,into_raw_dataset(LEFT));													
+              
+// Echo input
+InputEcho := PublicRecords_KEL.ECL_Functions.Fn_InputEcho_Roxie( raw_slim );	
+
+// Clean input
+cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho );
+TMX_input := Risk_indicators.prep_for_TMX(cleanInput, 'LNRS_testMerchantName', 'LNRS_testMerchantID' ); // TODO:  when plugging TMX gateway into a product query instead of the shell, need to pass the CompanyName and CompanyID through to the gateway
+NoPIIPersistence := true;  // TODO:  when plugging TMX into a product query, set NoPIIPersistence to false.  set to TRUE in shell processing because they are not live customer transactions
+TMX_results := Risk_Indicators.getThreatMetrix(TMX_input, gateways, NoPIIPersistence);  
+
+// output(raw_slim, named('raw_slim'));
+// output(InputEcho, named('InputEcho'));
+// output(cleanInput, named('KEL_Shell_cleaned_input'));
+// output(iid_prep, named('iid_prep'));
+// output(TMX_input, named('TMX_input'));
+// output(TMX_results, named('TMX_results'));
+
+final55 := join(final_temp, TMX_results, left.seq=right.seq,
+  transform(risk_indicators.Layout_Boca_Shell, 
+  self.ThreatMetrix := right, 
+  // stubbing these in here.  they will need to be populated here after the TMX gateway call instead of inside getAllBocaShellModels
+  self.FD_scores.digital_insight_score := '';
+	self.FD_scores.digital_insight_reason1 := '';
+	self.FD_scores.digital_insight_reason2 := '';
+  self.FD_scores.digital_insight_reason3 := '';
+  self.FD_scores.digital_insight_reason4 := '';
+  self.FD_scores.digital_insight_reason5 := '';
+  self.FD_scores.digital_insight_reason6 := '';
+  self := left), left outer);
+  
+final := if(bsversion>=55, group(final55, seq), final_temp);   
 output(final,NAMED('Results'))
 
 
 ENDMACRO;
 
-// risk_indicators.Boca_Shell();
+/*--SOAP--
+<message name="BocaShell" wuTimeout="300000">
+	<part name="AccountNumber" type="xsd:string"/>
+	<part name="FirstName" type="xsd:string"/>
+	<part name="MiddleName" type="xsd:string"/>
+	<part name="LastName" type="xsd:string"/>
+	<part name="NameSuffix" type="xsd:string"/>
+	<part name="StreetAddress" type="xsd:string"/>
+	<part name="City" type="xsd:string"/>
+	<part name="State" type="xsd:string"/>
+	<part name="Zip" type="xsd:string"/>
+	<part name="Country" type="xsd:string"/>
+	<part name="SSN" type="xsd:string"/>
+	<part name="DateOfBirth" type="xsd:string"/>
+	<part name="Age" type="xsd:unsignedInt"/>
+	<part name="DLNumber" type="xsd:string"/>
+	<part name="DLState" type="xsd:string"/>
+	<part name="Email" type="xsd:string"/>
+	<part name="IPAddress" type="xsd:string"/>
+	<part name="HomePhone" type="xsd:string"/>
+	<part name="WorkPhone" type="xsd:string"/>
+	<part name="EmployerName" type="xsd:string"/>
+	<part name="FormerName" type="xsd:string"/>
+	<part name="DPPAPurpose" type="xsd:byte"/>
+	<part name="GLBPurpose" type="xsd:byte"/> 
+	<part name="DataRestrictionMask" type="xsd:string"/>
+	<part name="DataPermissionMask" type="xsd:string"/>
+	<part name="IndustryClass" type="xsd:string"/>
+	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
+	<part name="historyDateTimeStamp" type="xsd:string"/>
+	<part name="ExcludeRelatives" type = 'xsd:boolean'/>
+	<part name="BSVersion" type = 'xsd:integer'/>
+	<part name="IncludeScore" type = "xsd:boolean"/>
+	<part name="ADL_Based_Shell" type="xsd:boolean"/>
+	<part name="RemoveFares" type="xsd:boolean"/>
+	<part name="LeadIntegrityMode" type="xsd:boolean"/>
+	<part name="DID" type="xsd:string"/>
+	<part name="LastSeenThreshold" type="xsd:string"/>
+	<part name="RetainInputDID" type="xsd:boolean"/>
+	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
+	<part name="OFACversion" type="xsd:unsignedInt"/>
+	<part name="IncludeOfac" type="xsd:boolean"/>
+	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
+	<part name="RemoveQuickHeader" type="xsd:boolean"/> 
+	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
+ </message>
+*/
 
