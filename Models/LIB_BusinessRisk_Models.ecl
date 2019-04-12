@@ -1,10 +1,8 @@
-﻿/*2016-01-25T19:36:17Z (laura Weiner_prod)
-Pass boca shell into SBBM model
-*/
+﻿
 // This MODULE EXPORTs all of our BusinessRisk model calls.  By doing this, each library 
 // can request a specific module and thus only those models are compiled.
 
-IMPORT Business_Risk_BIP, Models, Risk_Indicators, RiskView;
+IMPORT Business_Risk_BIP, Models, Risk_Indicators, RiskView,UT ;
 
 // Including these blank defaults for retrieving the sets of Valid Models without having 
 // to pass in Business Shell or Arguments. This way when creating a new model we only need 
@@ -28,7 +26,7 @@ EXPORT LIB_BusinessRisk_Models(
 
 	
 	
-	 EXPORT ValidatingModel := Models.BBFM1808_1_0(bocaShell,busShell); // Change this to the model you are trying to validate	
+	 EXPORT ValidatingModel := Models.BOFM1812_1_0(busShell); // Change this to the model you are trying to validate	
 
 	// The calcIndex function returns the 'billing_index' given the report_option
 	// value. billing_index is needed by batch.  it is passed to the ESP logging
@@ -59,6 +57,7 @@ EXPORT LIB_BusinessRisk_Models(
 									{'SLBO1809_0_0', 'SLBO1809_0_0', 8, '0-999'}, //not blended
                   //V101 attributes is 9
                   {'BBFM1808_1_0', 'BBFM1808_1_0', 10, '0-999'}, //blended , based 
+                  {'BOFM1812_1_0', 'BOFM1812_1_0', 11, '0-999'}, //not blended 
 								// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 									{'SBBM9999_9'  , 'SBBM9999_9'  , 0             , '0-999'},
 									{'SBOM9999_9'  , 'SBOM9999_9'  , 0             , '0-999'}
@@ -78,6 +77,7 @@ EXPORT LIB_BusinessRisk_Models(
 											'BBFM1808_1_0' => UNGROUP(Models.BBFM1808_1_0(bocaShell,busShell)),
 											'SLBO1702_0_2' => UNGROUP(Models.SLBO1702_0_2(busShell)),
 											'SLBO1809_0_0' => UNGROUP(Models.SLBO1809_0_0(busShell)),
+                      'BOFM1812_1_0' => UNGROUP(Models.BOFM1812_1_0(busShell)),
 											// ----------------------------------------------------------------------------------
 											// --------------------------------- CUSTOM MODELS ----------------------------------
 

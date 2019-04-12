@@ -2,7 +2,8 @@
 
 EXPORT BB_Warningcodes ( GROUPED DATASET(risk_indicators.Layout_Boca_Shell) clam,
                            GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell,	
-                          INTEGER num_reasons = 4
+                          INTEGER num_reasons = 4,
+                          BOOLEAN business_only = False
                           ) := FUNCTION
   
 
@@ -23,7 +24,7 @@ end;
 
 busshellplusclam := join ( busShell ,clam,
 left.seq = right.seq,
-transform (businessplus_layout, self.busShell := left, self.clam :=right),atmost (1));
+transform (businessplus_layout, self.busShell := left, self.clam :=right),atmost (1),left outer);
 
 
 
@@ -1325,6 +1326,8 @@ ds_WCCodes :=
 			], { STRING4 wccode }
 		);
 
+
+
 	getWCPriority(STRING4 wc) := 
 		CASE(TRIM(wc),	
 			'10P' =>  1, '11B' =>  2, '12B' =>  3, '13B' =>  4, '14B' =>  5, '15P' =>  6, '16P' =>  7, '17P' =>  8, '18P' =>  9, '19P' => 10, 
@@ -1436,9 +1439,11 @@ ds_WCCodes :=
 				
 			END;
 			
+   ds_BOWCCodes := ds_WCCodes(wccode[3] = 'B'); // Business only warning code 
+      
 			ds_RiskIndicators := 
-				PROJECT(
-					ds_WCCodes,
+				PROJECT(         
+					if ( business_only, ds_BOWCCodes, ds_WCCodes),
 					TRANSFORM( layout_RiskIndicators_temp,
 						SELF.risk_indicator_code     := LEFT.wccode;
 						SELF.is_risk_indicator       := getWhetherRiskIndicator(LEFT.wccode);
@@ -1509,13 +1514,14 @@ TopWarningCodes := PROJECT(ds_TopRiskIndicators, TRANSFORM(HRILayout,
               ));
               
               
-                   
+
+
+ 
                     bbfm_wc1 := TopWarningCodes[1].hri;
                     bbfm_wc2 := TopWarningCodes[2].hri;
                     bbfm_wc3 := TopWarningCodes[3].hri;
                     bbfm_wc4 := TopWarningCodes[4].hri;
                     
-
 
 
 
