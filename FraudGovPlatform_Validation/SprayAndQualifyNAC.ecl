@@ -1,8 +1,11 @@
 ﻿IMPORT FraudGovPlatform,ut, lib_fileservices;
 EXPORT SprayAndQualifyNAC( string pversion ) := FUNCTION
 
+	// DateSearch := ut.date_math(pVersion[1..8], -1);
+	DateSearch := pVersion[1..8];
+
 	sf := FraudGovPlatform.Filenames().Sprayed.NAC;
-	DateSearch := ut.date_math(pVersion[1..8], -1);
+	
 	FS:=fileservices;
 	
 	d := nothor(FS.LogicalFileList( 'nac::for_msh::fl_msh_'+DateSearch+'*.dat', TRUE, FALSE));

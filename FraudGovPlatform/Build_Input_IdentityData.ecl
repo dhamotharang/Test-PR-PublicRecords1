@@ -28,9 +28,27 @@ module
 		filename := ut.CleanSpacesAndUpper(l.fn);
 		
 		self.FileName := filename;		
-			
+		st := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '::', true )[3][1..2];
+
 		fn := map(	
-					regexfind('MSH',filename,nocase) => ['20995369', 'FL', 'S', 'S', 'MSH', trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]), trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]),'',''],
+					regexfind('MSH',filename,nocase) => [(string)MBS_Mappings( contribution_source = 'NAC' and file_type = 3 and customer_state = st)[1].Customer_Account_Number, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 3 and customer_state = st)[1].Customer_State, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 3 and customer_state = st)[1].Customer_Agency_Vertical_Type, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 3 and customer_state = st)[1].Customer_Program; 
+														 'MSH', 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]), 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]),
+														 '',
+														 ''],
+					regexfind('inquirylogs',filename,nocase) => [(string)MBS_Mappings( contribution_source = 'RDP' and file_type = 3 and customer_state = st)[1].Customer_Account_Number, 
+														 MBS_Mappings( contribution_source = 'RDP' and file_type = 3 and customer_state = st)[1].Customer_State, 
+														 MBS_Mappings( contribution_source = 'RDP' and file_type = 3 and customer_state = st)[1].Customer_Agency_Vertical_Type, 
+														 MBS_Mappings( contribution_source = 'RDP' and file_type = 3 and customer_state = st)[1].Customer_Program; 
+														 'RDP', 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]), 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]),
+														 '',
+														 ''],														 
 					StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true )
 		);
 

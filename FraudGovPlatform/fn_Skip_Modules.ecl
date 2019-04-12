@@ -2,6 +2,7 @@
 EXPORT fn_Skip_Modules (
 	boolean SkipInputBuild = false,
 	boolean SkipBaseBuild = false,
+	boolean SkipMainBuild = false,
 	boolean SkipBaseRollback = false,
 	boolean SkipKeysBuild = false,
 	boolean SkipNACBuild = false,
@@ -21,6 +22,7 @@ EXPORT fn_Skip_Modules (
 	d:=dataset([{
 				SkipInputBuild,
 				SkipBaseBuild,
+				SkipMainBuild,
 				SkipBaseRollback, 
 				SkipKeysBuild, 
 				SkipNACBuild,

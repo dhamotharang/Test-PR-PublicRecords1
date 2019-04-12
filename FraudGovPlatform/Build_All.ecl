@@ -23,8 +23,9 @@ module
 
 	// Skip Modules if they are no enabled	
 	shared SkipInputBuild := SkipModules[1].SkipInputBuild;
-	shared SkipBaseBuild := SkipModules[1].SkipBaseBuild;	
-	shared SkipKeysPortion := SkipModules[1].SkipKeysBuild;
+	shared SkipBaseBuild := SkipModules[1].SkipBaseBuild;
+	shared SkipMainBuild := SkipModules[1].SkipMainBuild;	
+	shared SkipKeysBuild := SkipModules[1].SkipKeysBuild;
 	shared SkipNACBuild := SkipModules[1].SkipNACBuild;
 	shared SkipInquiryLogsBuild := SkipModules[1].SkipInquiryLogsBuild;
 	shared SkipPiiBuild := SkipModules[1].SkipPiiBuild;
@@ -42,15 +43,18 @@ module
 	export Run_MBS			:= if(SkipMBS = false,FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] ));
 	export Run_Scrubs		:= if(SkipScrubs = false,Build_Scrubs(pversion,SkipModules));
 	export Run_Deltabase 	:= if(SkipDeltabase = false, FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion));
-	export Run_NAC 			:= if(SkipNACBuild = false, FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion[1..8]));
+	export Run_NAC 			:= if(SkipNACBuild = false, FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion));
+	export Run_InquiryLogs	:= if(SkipInquiryLogsBuild = false, FraudGovPlatform_Validation.SprayAndQualifyInquiryLogs(pversion));
 
 	export Run_Inputs 	:= if(SkipInputBuild = false,Build_Input(pversion, MBS_File).All);	
 	export Run_Base 	:= if(SkipBaseBuild = false,Build_Base(pversion, MBS_File).All);
+	export Run_Main		:= if(SkipMainBuild = false,Build_Main(pversion).All);
+	// --
 	export Run_GarbageCollector := if(SkipGarbageCollector = false,Garbage_Collector.Run);
 	// --
 	export Run_Autokeys := FraudShared.Build_AutoKeys(pversion, pBaseMainBuilt);
-	export Add_Demo := if(_Flags.UseDemoData, STD.File.AddSuperFile(FraudShared.Filenames().Base.Main.Built, Filenames().Input.DemoData.Sprayed));
-	export Run_Keys := sequential(FraudShared.Build_Keys( pversion, pBaseMainBuilt).All, Add_Demo, Run_Autokeys);
+	export Add_Demo := if(_Flags.UseDemoData,Append_DemoData(pversion));
+	export Run_Keys := if(SkipKeysBuild = false, sequential(FraudShared.Build_Keys( pversion, pBaseMainBuilt).All, Add_Demo, Run_Autokeys));
 	export Run_SoapAppends := if(SkipPiiBuild=false,FraudGovPlatform.Build_Base_Pii(pversion).All);
 	export Run_Kel := if(SkipKelBuild=false,FraudGovPlatform.Build_Kel(pversion).All);
 	export Run_Orbit := if(SkipOrbitBuild=false, Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)); //Create Orbit Builds
@@ -64,6 +68,7 @@ module
 		 Create_Supers
 		,Run_Inputs
 		,Run_Base
+		,Run_Main
 	);
 	
 	export keys_portion := sequential(

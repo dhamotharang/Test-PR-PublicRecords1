@@ -302,6 +302,18 @@ EXPORT Functions :=  MODULE
 		RETURN ind_type_prod_v;
 	END;
 
+	EXPORT customer_program_fn(unsigned6 ind_type) := function
+		import _Control;
+		customer_program := map(
+											 ind_type = 1014 => 'S',
+											 ind_type = 1024 => 'M',
+											 ind_type = 1029 => 'U',
+											 ind_type = 1312 => 'N',
+											 ''
+											);
+		RETURN customer_program;
+	END;
+
 	EXPORT new_addresses(pInputFile) := 
 	FUNCTIONMACRO		
 			IMPORT address;
