@@ -6,17 +6,39 @@ EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinde
 
 MODULE
    
-   SHARED Ph_wireless := dPhoneRecs(phone <> '' AND typeflag != Phones.Constants.TypeFlag.DataSource_PV AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
+   SHARED Ph_Wireless := dPhoneRecs(phone <> '' AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
-   // for phone search, we are sending upto 10 different identities per acct, by picking recent ones.
-   Ph_wireless_ddp := DEDUP(SORT(Ph_wireless, acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
-   SHARED PhoneSrch_wireless := TOPN(GROUP(SORT(Ph_wireless_ddp(phone = batch_in.homephone), acctno,  -dt_last_seen, dt_first_seen, seq), acctno), 10, acctno);
-                                  
+   Ph_Wireless_Ddp := DEDUP(SORT(Ph_Wireless(phone = batch_in.homephone), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
+                                      
+   // when   NameAddressInfo is true and no name addr resolved in a phone search, pass a fake a name and addr to get zumigo identity info.  
+   
+   Non_Blank_NameAddrPhones := Ph_Wireless_Ddp(fname <> '' AND lname <> '' AND city_name <> '' AND st <> '' AND zip <>'');
+   
+   Only_BlankAcct := JOIN(Ph_Wireless_Ddp, Non_Blank_NameAddrPhones, LEFT.acctno = RIGHT.acctno, LEFT ONLY);
+    
+   NeedFakeRecs := inMod.IncludeNameAddressInfo AND EXISTS(Only_BlankAcct);
+  
+   PhoneFinder_Services.Layouts.PhoneFinder.Final fake_fillin(PhoneFinder_Services.Layouts.PhoneFinder.Final l) := TRANSFORM
+        
+        SELF.phone :=  l.phone;
+        SELF.fname :=  'John';
+        SELF.lname := 'Doe';
+        SELF.city_name := 'Atlanta';
+        SELF.st := 'GA';
+        SELF.zip := '30092';
+        SELF := l;                                        
+                                                                                                                                                                                                                            
+      END;
+      
+   BlankAcct_w_FakeNameAddr := IF(NeedFakeRecs,  PROJECT(Only_BlankAcct, fake_fillin(LEFT)), Only_BlankAcct); 
+  
+  // for phone search, we are sending upto 10 different identities per acct, by picking recent ones.
+  SHARED PhoneSrch_wireless := TOPN(GROUP(SORT(Non_Blank_NameAddrPhones + BlankAcct_w_FakeNameAddr, acctno,  -dt_last_seen, dt_first_seen, seq), acctno), 10, acctno);
   
   // for pii search, sending in one primary wireless phone , if available, else one other phone per acct
   // sorting other phones(non primary) by score and dates 
     
-   PII_wireless_pre := DEDUP(SORT(Ph_wireless(batch_in.homephone = ''), acctno, IF(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
+   PII_wireless_pre := DEDUP(SORT(Ph_Wireless(batch_in.homephone = ''), acctno, IF(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
      
      // sending in best identities name/addr to first wireless phone 
    PhoneFinder_Services.Layouts.PhoneFinder.Final in_addr(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
@@ -98,7 +120,6 @@ MODULE
   
      EXPORT DATASET(Gateway.Layouts.Config) gateways := dGateways(Gateway.Configuration.IsZumigoIdentity(servicename));
    END; 
-    
 
    Zumigo_Response := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, inMod.GLBPurpose, inMod.DPPAPurpose,,,,FALSE,FALSE);
    // getting zumigo error-free response
@@ -106,6 +127,7 @@ MODULE
    SHARED today := STD.Date.Today();
    // identity resolved from zumigo nameaddrinfo option & not resolved in PF search logic
    Zum_PhoneOwner := JOIN(dPhoneRecs, DEDUP(SORT(Zumigo_Hist,acctno),acctno),
+                           LEFT.acctno = RIGHT.acctno AND 
                            LEFT.DID = RIGHT.LEXID,
                            TRANSFORM(Phones.Layouts.ZumigoIdentity.zOut, SELF := RIGHT),
                            RIGHT ONLY);
@@ -183,6 +205,7 @@ MODULE
    Zumigo_GLI_Combined := PROJECT(GROUP(SORT(PFIdentified_Owners + ZumIdentified_Owners,acctno), acctno), TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
                                                                           SELF.seq := COUNTER,
                                                                           SELF := LEFT));                    
+ 
 
   
   EXPORT Zumigo_GLI := UNGROUP(Zumigo_GLI_Combined);

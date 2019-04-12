@@ -72,7 +72,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	END;
 	zumValidationRequest := ROLLUP(validNameAddrRequests,GROUP, rollInput(LEFT,ROWS(LEFT))); // a single call for each phone across all accounts		
 	zumNonValidationRequest := PROJECT(DEDUP(SORT(dsZumigoRequest, phone), phone), TRANSFORM(iesp.zumigo_identity.t_ZIdIdentitySearch,SELF.MobileDeviceNumber:=LEFT.phone,SELF:=[]));
-	zumIn := IF(nameAddrRequested,zumValidationRequest,zumNonValidationRequest);									
+	zumIn := IF(nameAddrRequested AND EXISTS(zumValidationRequest),zumValidationRequest,zumNonValidationRequest);									
 	//Call to Zumigo gateway
 	zumOut:=Gateway.Soapcall_ZumigoIdentity(zumIn,inMod,doxie.DataPermission.use_ZumigoIdentity);
 	

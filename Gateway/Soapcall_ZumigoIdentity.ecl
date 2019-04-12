@@ -21,7 +21,9 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
 		SELF.Options.ClientId:=IF(Phones.Constants.Debug.Testing, Phones.Constants.Debug.InternalTestClientID,
 																  Phones.Constants.GatewayValues.ClientIDPrefix+trim(inMod.useCase)+'_'+trim(inMod.productCode)+inMod.billingId);
 		//Note that Zumigo does not permit NameAddressInfo without NameAddressValidation
-		SELF.Options.NameAddressValidation	:= inMod.NameAddressValidation OR inMod.NameAddressInfo;
+    // Call NameAddrValidation only when there is name and address in the input
+		SELF.Options.NameAddressValidation	:= (inMod.NameAddressValidation OR inMod.NameAddressInfo) AND 
+                                            (EXISTS(l.NameAddrValidation.NameList) OR EXISTS(l.NameAddrValidation.AddressList));
 		SELF.Options.NameAddressInfo		:= inMod.NameAddressInfo;
 		SELF.Options.AccountInfo			:= inMod.AccountInfo;
 		SELF.Options.AccountStatusInfo		:= inMod.AccountStatusInfo;
@@ -41,7 +43,6 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
 		SELF := l;
 		SELF := [];
 	END;
-
 	iesp.zumigo_identity.t_ZumigoIdentityResponseEx tErrX(iesp.zumigo_identity.t_ZIdIdentitySearch l) := TRANSFORM
 		SELF.response._header.Status := FAILCODE;
 		SELF.response._header.Message := FAILMESSAGE;
@@ -65,5 +66,6 @@ EXPORT Soapcall_ZumigoIdentity(DATASET(iesp.zumigo_identity.t_ZIdIdentitySearch)
  	#IF(Phones.Constants.Debug.Zumigo)								
    		OUTPUT(outf,NAMED('zumigoSoapResults'));	
    	#END;
+    
 	RETURN outf;   
 END;
