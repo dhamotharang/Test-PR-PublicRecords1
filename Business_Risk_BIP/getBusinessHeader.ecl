@@ -6,7 +6,7 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 												 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 	
 	// --------------- Business Header Build Date ----------------
-	BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
+	BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 	
 	// --------------- Business Shell Versioning logic ----------------
 	calculateValueFor := Business_Risk_BIP.mod_BusinessShellVersionLogic(Options);

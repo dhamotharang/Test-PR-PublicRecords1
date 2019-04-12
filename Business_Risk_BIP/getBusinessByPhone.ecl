@@ -60,7 +60,7 @@ EXPORT getBusinessByPhone(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	
 	tempVerificationLayout verifyPhones(Shell le, BusinessHeaderPhone ri) := TRANSFORM
-		BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
+		BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 		TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, le.Clean_Input.HistoryDate);
 		NoScoreValue 				:= 255;
 		PhonePopulated			:= (INTEGER)le.Clean_Input.Phone10 > 0 AND (INTEGER)ri.Company_Phone > 0;
