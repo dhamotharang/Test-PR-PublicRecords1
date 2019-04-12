@@ -1,4 +1,4 @@
-﻿Import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
+Import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 	Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, STD;
 	
 	EXPORT Update_Base (string filedate, boolean pUseProd = false) := function
@@ -7,9 +7,6 @@
 
 	Layouts.base hist(layouts.base L, C):= TRANSFORM
 		SELF.record_type	:= 'H';
-		//added for CCPA
-		SELF.global_sid   := 0;
-		SELF.record_sid   := 0;
 		SELF							:= L;
 	END;
 
