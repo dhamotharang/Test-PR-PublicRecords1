@@ -1,5 +1,5 @@
-﻿import Address, AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp, 
-       IntlIID, Models, Risk_Indicators, Riskwise, Royalty, Seed_Files, Suppress, ut;
+﻿import Address, AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp, Doxie,
+       IntlIID, Models, Risk_Indicators, Riskwise, Royalty, Seed_Files, Suppress, STD, ut;
 
 // The following function obtains Consumer InstantID data for the Authorized Reps passed in. 
 // Logic is basically copied-n-pasted straight from Risk_Indicators.InstantID_records, but
@@ -84,7 +84,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			unsigned1 DPPA_Purpose        := Options.DPPA_Purpose;
 			unsigned1 GLB_Purpose         := Options.GLBA_Purpose;
 			STRING5 industry_class_val    := Options.IndustryClass;
-				isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+				isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 
 			unsigned6	_HistoryDate         := 999999 : STORED('HistoryDate'); // Reads everything from YYYYMM to YYYYMMDDTTTT
 

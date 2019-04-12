@@ -520,7 +520,7 @@ unsigned8 BSOptions :=
 								if(EnableEmergingID, Risk_Indicators.iid_constants.BSOptions.EnableEmergingID,0);	//Invokes additional DID append logic
 
 
-ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI', ln_branded_value, ofac_only, suppressNearDups, 
+ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, ofac_only, suppressNearDups, 
 									require2ele, fromBiid, isFCRA, runExcludeWatchLists ,FALSE,ofc_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,dob_radius_use,
 									bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, DataRestriction, CustomDataFilter, 
 									IncludeDLverification, watchlists_request, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold,
@@ -859,7 +859,7 @@ Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(
 InsuranceRoyalties 	:= if(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetBatchRoyaltiesByAcctno(formed_pre, acctno, insurance_dl_used, TRUE));
 
 // this section is all to include the fraud scores if the boolean is set to true
-	clam := risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI', ln_branded_value,  
+	clam := risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value,  
 					true, false, false, true, bsversion, DataRestriction := DataRestriction, DataPermission := DataPermission);
 
 	ip_prep := project( fs, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );

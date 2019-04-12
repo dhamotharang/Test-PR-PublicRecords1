@@ -239,7 +239,7 @@ unsigned3 LastSeenThreshold := if(LastSeenThresholdIn=0, lastSeenThreshold_defau
 
 isFCRA := false;
 ln_branded := false;
-isUtility := industry_class_value = 'UTILI';
+isUtility := Doxie.Compliance.isUtilityRestricted(industry_class_value);
 ofac_only := true;
 suppressNearDups := false;
 require2ele := false;
@@ -294,7 +294,7 @@ prep := risk_indicators.InstantID_Function(iid_prep,
 																						in_LastSeenThreshold := LastSeenThreshold,
 																						in_dataPermission:=DataPermission);
 													
-ret := risk_indicators.Boca_Shell_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI',false, ~no_rel, true, true, true, bsversion, doScore, 
+ret := risk_indicators.Boca_Shell_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value),false, ~no_rel, true, true, true, bsversion, doScore, 
 										nugen := nugen, filter_out_fares := RemoveFares, DataRestriction:=DataRestriction,BSOptions := BSOptions, DataPermission:=DataPermission);
 
 adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,

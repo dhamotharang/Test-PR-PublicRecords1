@@ -1,4 +1,4 @@
-﻿IMPORT Address, Gateway, Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT, STD;
+﻿IMPORT Address, Gateway, Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT, STD, Doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (DATASET(Phone_Shell.Layout_Phone_Shell.Input) Input,
 																																							 DATASET(Gateway.Layouts.Config) Gateways = DATASET([], Gateway.Layouts.Config),
@@ -185,7 +185,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	 ************************************************************************ */
 	nugen               := TRUE;
 	from_IT1O           := FALSE;
-	isUtility           := IF(StringLib.StringToUpperCase(TRIM(IndustryClass, ALL)) = 'UTILI', TRUE, FALSE);
+	isUtility           := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(TRIM(IndustryClass, ALL)));
 	isFCRA              := FALSE;
 	ln_branded          := FALSE;
 	from_biid           := FALSE;

@@ -268,7 +268,7 @@ export ConsumerAttributes_Service := MACRO
 	test_prep := PROJECT(wseq, into_test_prep(LEFT));
 
 	boolean 	 isFCRA							:= false;
-	boolean   isUtility 					:= userIn.industryClass = 'UTILI';
+	boolean   isUtility 					:= Doxie.Compliance.isUtilityRestricted(userIn.industryClass);
 	boolean   require2ele         := false;
 	boolean   isLn                := false; // not needed anymore
 	boolean	 	no_rel 							:= false;

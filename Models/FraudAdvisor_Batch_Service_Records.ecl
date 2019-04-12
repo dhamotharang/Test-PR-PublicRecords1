@@ -1,4 +1,4 @@
-﻿import  address, risk_indicators, models, riskwise, ut, Gateway, Royalty, Easi;
+﻿import  address, Doxie, risk_indicators, models, riskwise, ut, Gateway, Royalty, Easi, STD;
 
 
 
@@ -16,7 +16,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
     string   requestedattributegroups := StringLib.StringToLowerCase(args.requestedattributegroups);
 		
 		string	model_name 	:= StringLib.StringToLowerCase(args.ModelName_in);
-		boolean	isUtility 	:= StringLib.StringToUpperCase(args.industry_class_val) = 'UTILI';
+		boolean	isUtility 	:= Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(args.industry_class_val));
 
 		fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2'];
 		fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; // FP3 Flagship models

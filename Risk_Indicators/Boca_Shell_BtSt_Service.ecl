@@ -203,7 +203,7 @@ string20 DeviceProvider4_value := ''       	: stored('DeviceProvider4');
 string TypeOfOrder_value := risk_indicators.iid_constants.PhysicalOrder : stored('TypeOfOrder');
 
 
-boolean   isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+boolean   isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 gateways_in := Gateway.Configuration.Get();
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform

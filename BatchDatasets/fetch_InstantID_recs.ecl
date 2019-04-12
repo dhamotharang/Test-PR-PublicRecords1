@@ -73,7 +73,7 @@ EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr
 		
 		ciid_recs := 
 				risk_indicators.InstantID_Function(prep, gateways_in, in_mod.dppa, in_mod.glb, 
-				in_mod.industry_class='UTILI', ln_branded_value, ofac_only, suppressNearDups, require2ele, 
+				in_mod.isUtility(), ln_branded_value, ofac_only, suppressNearDups, require2ele, 
 				fromBiid, isFCRA, ExclWatchLists, in_from_IT1O, ofac_version, incl_ofac, incl_addl_watchlists, 
 				Global_WatchList_Threshold, dob_radius_use, bsversion, runSSNCodes, runBestAddrCheck, 
 				runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, 

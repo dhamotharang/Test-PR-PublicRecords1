@@ -9,7 +9,7 @@ Text In Open Window
  * - LexID (DID):: Source: UtilDID																				*
  ************************************************************************ */
 
-IMPORT Phone_Shell, Risk_Indicators, RiskWise, UT, Utilfile, STD;
+IMPORT Phone_Shell, Risk_Indicators, RiskWise, UT, Utilfile, STD, Doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 PhoneRestrictionMask, STRING30 IndustryClass) := FUNCTION
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getUtility(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Utilfile.Key_DID ri) := TRANSFORM
@@ -54,7 +54,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DA
 	END;
 	
 	byDID := JOIN(Input, Utilfile.Key_DID, LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_DID) AND 
-																					UT.PermissionTools.GLB.OK(GLBPurpose) AND StringLib.StringToUpperCase(TRIM(IndustryClass)) <> 'UTILI' AND
+																					UT.PermissionTools.GLB.OK(GLBPurpose) AND ~Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(TRIM(IndustryClass))) AND
 																					((INTEGER)RIGHT.phone <> 0 OR (INTEGER)RIGHT.work_phone <> 0),
 																							getUtility(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 

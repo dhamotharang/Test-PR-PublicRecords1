@@ -242,7 +242,7 @@ unsigned1 GLB_Purpose := 8          : stored('GLBPurpose');
 boolean   isFCRA      := false;
 boolean   glb_ok 	:= Risk_Indicators.iid_constants.glb_ok(GLB_Purpose, isFCRA);
 string5   industry_class_val := ''  : stored('IndustryClass');
-boolean   inIsUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+boolean   inIsUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 unsigned3 history_date := 999999 		: stored('HistoryDateYYYYMM');
 string20	historyDateTimeStamp := '' : stored('historyDateTimeStamp');
 boolean   in_ofac_only := true 			: stored('OfacOnly');

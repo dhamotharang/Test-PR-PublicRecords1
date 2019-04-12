@@ -1,4 +1,4 @@
-﻿IMPORT risk_indicators, Risk_Reporting, address, ut, fcra_opt_out, gateway, RiskView, iesp, riskwisefcra, Inquiry_AccLogs, Business_Risk_BIP, STD;
+﻿IMPORT risk_indicators, Risk_Reporting, address, Doxie, ut, fcra_opt_out, gateway, RiskView, iesp, riskwisefcra, Inquiry_AccLogs, Business_Risk_BIP, STD;
 
 VALIDATING := false;
 
@@ -341,7 +341,7 @@ VALIDATING := false;
 
 
 	// set variables for passing to bocashell function fcra
-	boolean   isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+	boolean   isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 	boolean   require2ele := force2Ele;
 	unsigned1 dppa := 0; // not needed for FCRA
 	unsigned1 glba := 0; // not needed for FCRA

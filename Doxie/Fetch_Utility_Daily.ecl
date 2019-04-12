@@ -53,6 +53,6 @@ Census_Data.MAC_Fips2County_Keyed(all_fetched,st,county,county_name,countied)
 
 glb_ok := ut.PermissionTools.glb.ok(glb_purpose);
 
-return IF(industry_class_value<>'UTILI' and glb_ok, countied);
+return IF(~Doxie.Compliance.isUtilityRestricted(industry_class_value) and glb_ok, countied);
 
 END;

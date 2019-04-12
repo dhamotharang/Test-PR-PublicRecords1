@@ -1,4 +1,4 @@
-﻿import iesp, risk_indicators, codes, doxie, riskwiseFCRA, FCRA, suppress, riskwise, Consumerstatement, Address, Royalty, MDR, gateway, FFD;
+﻿import iesp, risk_indicators, codes, doxie, riskwiseFCRA, FCRA, suppress, riskwise, Consumerstatement, Address, Royalty, MDR, gateway, FFD, STD;
 
 EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportBy in_rec,
 												  ConsumerProfile_Services.IParam.options in_param,
@@ -29,7 +29,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	//Copied from Models.RiskView_Records
 	unsigned1 dppa := 0; // not needed for FCRA
 	unsigned1 glba := 0; // not needed for FCRA
-	boolean   isUtility := StringLib.StringToUpperCase(in_param.industry_class) = 'UTILI';
+	boolean   isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(in_param.industry_class));
 	boolean   isLn := false; // not needed anymore
 	boolean   require2ele := false;// twb what is correct force2Ele;
 	boolean   doRelatives := false;
