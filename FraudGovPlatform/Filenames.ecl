@@ -90,6 +90,7 @@ module
 	// -- Config Filenames
 	//////////////////////////////////////////////////////////////////
 	export CustomerSettings := FraudGov_Prefix('config') + 'CustomerSettings';
+	export CustomerMappings := FraudGov_Prefix('config') + 'CustomerMappings';
 
 	export Flags := module
 		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
