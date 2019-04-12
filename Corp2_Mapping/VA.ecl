@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping, corp2_raw_va, scrubs, scrubs_corp2_mapping_va_event,
+﻿IMPORT corp2, corp2_mapping, corp2_raw_va, scrubs, scrubs_corp2_mapping_va_event,
 			 scrubs_corp2_mapping_va_main, scrubs_corp2_mapping_va_stock, std,
 			 tools, ut, versioncontrol;
 
@@ -1191,15 +1191,13 @@ EXPORT VA := MODULE;
 
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_VA Report' //subject
 																																 ,'Scrubs CorpEvent_VA Report' //body
 																																 ,(DATA)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpVAEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																 );
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 OR

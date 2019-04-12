@@ -255,15 +255,13 @@
 		AR_ScrubsWithExamples 	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_TN_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp_TN_AR').CompareToProfile_with_Examples;
 		AR_ScrubsAlert				 	:= AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	 		:= Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					 		:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.spray
+		AR_MailFile					 		:= FileServices.SendEmailAttachData(Corp2.Email_Notification_Lists.AttachedList
 																															 ,'Scrubs CorpAR_TN Report' //subject
 																															 ,'Scrubs CorpAR_TN Report' //body
 																															 ,(data)AR_ScrubsAttachment
 																															 ,'text/csv'
 																															 ,'CorpTNARScrubsReport.csv'
-																															 ,
-																															 ,
-																															 ,Corp2.Email_Notification_Lists.spray);
+																													);
 
 		AR_Badrecords				 		:= AR_N.ExpandedInFile(	
 																									 corp_key_Invalid							  			<> 0 or

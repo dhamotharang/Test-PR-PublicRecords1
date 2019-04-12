@@ -1,4 +1,4 @@
-import corp2, corp2_Mapping, corp2_raw_mn, scrubs, scrubs_corp2_Mapping_mn_event,
+﻿import corp2, corp2_Mapping, corp2_raw_mn, scrubs, scrubs_corp2_Mapping_mn_event,
 			 scrubs_corp2_Mapping_mn_main, scrubs_corp2_Mapping_mn_stock, std,
 			 tools, versioncontrol, ut;
 
@@ -424,15 +424,13 @@ export MN := MODULE;
 
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_MN Report' //subject
 																																 ,'Scrubs CorpEvent_MN Report' //body
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMNEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																														);
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or
