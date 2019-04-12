@@ -8,6 +8,13 @@ EXPORT E_Address_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Transaction_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.nstr Secondary_Range_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
     KEL.typ.nbool Is_Owner_Address_;
     KEL.typ.nbool Is_Seller_Address_;
     KEL.typ.nbool Is_Property_Address_;
@@ -19,7 +26,7 @@ EXPORT E_Address_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'Transaction_(Transaction_:0),Location_(Location_:0),isowneraddress(Is_Owner_Address_),isselleraddress(Is_Seller_Address_),ispropertyaddress(Is_Property_Address_),isborroweraddress(Is_Borrower_Address_),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'Transaction_(Transaction_:0),Location_(Location_:0),primaryrange(Primary_Range_:\'\'),predirectional(Predirectional_:\'\'),primaryname(Primary_Name_:\'\'),suffix(Suffix_:\'\'),postdirectional(Postdirectional_:\'\'),secondaryrange(Secondary_Range_:\'\'),zip5(Z_I_P5_:0),isowneraddress(Is_Owner_Address_),isselleraddress(Is_Seller_Address_),ispropertyaddress(Is_Property_Address_),isborroweraddress(Is_Borrower_Address_),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __d0_Transaction__Layout := RECORD
     RECORDOF(__in);
     KEL.typ.uid Transaction_;
@@ -42,6 +49,13 @@ EXPORT E_Address_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Transaction_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
+    KEL.typ.nstr Secondary_Range_;
     KEL.typ.nbool Is_Owner_Address_;
     KEL.typ.nbool Is_Seller_Address_;
     KEL.typ.nbool Is_Property_Address_;
@@ -51,7 +65,7 @@ EXPORT E_Address_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Transaction_,Location_,Is_Owner_Address_,Is_Seller_Address_,Is_Property_Address_,Is_Borrower_Address_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Transaction_,Location_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,Is_Owner_Address_,Is_Seller_Address_,Is_Property_Address_,Is_Borrower_Address_,ALL));
   Address_Property_Group := __PostFilter;
   Layout Address_Property__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
@@ -70,10 +84,18 @@ EXPORT E_Address_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Transaction__Orphan := JOIN(InData(__NN(Transaction_)),E_Property(__in,__cfg).__Result,__EEQP(LEFT.Transaction_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(Transaction__Orphan),COUNT(Location__Orphan)}],{KEL.typ.int Transaction__Orphan,KEL.typ.int Location__Orphan});
+  EXPORT Z_I_P5__Orphan := JOIN(InData(__NN(Z_I_P5_)),E_Zip_Code(__in,__cfg).__Result,__EEQP(LEFT.Z_I_P5_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT SanityCheck := DATASET([{COUNT(Transaction__Orphan),COUNT(Location__Orphan),COUNT(Z_I_P5__Orphan)}],{KEL.typ.int Transaction__Orphan,KEL.typ.int Location__Orphan,KEL.typ.int Z_I_P5__Orphan});
   EXPORT NullCounts := DATASET([
     {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Transaction',COUNT(__d0(__NL(Transaction_))),COUNT(__d0(__NN(Transaction_)))},
     {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Location',COUNT(__d0(__NL(Location_))),COUNT(__d0(__NN(Location_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryRange',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Predirectional',COUNT(__d0(__NL(Predirectional_))),COUNT(__d0(__NN(Predirectional_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryName',COUNT(__d0(__NL(Primary_Name_))),COUNT(__d0(__NN(Primary_Name_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Suffix',COUNT(__d0(__NL(Suffix_))),COUNT(__d0(__NN(Suffix_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Postdirectional',COUNT(__d0(__NL(Postdirectional_))),COUNT(__d0(__NN(Postdirectional_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SecondaryRange',COUNT(__d0(__NL(Secondary_Range_))),COUNT(__d0(__NN(Secondary_Range_)))},
+    {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ZIP5',COUNT(__d0(__NL(Z_I_P5_))),COUNT(__d0(__NN(Z_I_P5_)))},
     {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsOwnerAddress',COUNT(__d0(__NL(Is_Owner_Address_))),COUNT(__d0(__NN(Is_Owner_Address_)))},
     {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsSellerAddress',COUNT(__d0(__NL(Is_Seller_Address_))),COUNT(__d0(__NN(Is_Seller_Address_)))},
     {'AddressProperty','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsPropertyAddress',COUNT(__d0(__NL(Is_Property_Address_))),COUNT(__d0(__NN(Is_Property_Address_)))},

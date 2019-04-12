@@ -7,7 +7,14 @@ EXPORT E_Education_Student_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDC
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Education().Typ) Edu_;
-    KEL.typ.ntyp(E_Address().Typ) Uni_Location_;
+    KEL.typ.ntyp(E_Address().Typ) Location_;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.nstr Secondary_Range_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -15,13 +22,13 @@ EXPORT E_Education_Student_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDC
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'edu(Edu_:0),Uni_Location_(Uni_Location_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED __d0_Uni_Location__Layout := RECORD
+  SHARED __Mapping := 'edu(Edu_:0),Location_(Location_:0),primaryrange(Primary_Range_:\'\'),predirectional(Predirectional_:\'\'),primaryname(Primary_Name_:\'\'),suffix(Suffix_:\'\'),postdirectional(Postdirectional_:\'\'),secondaryrange(Secondary_Range_:\'\'),zip5(Z_I_P5_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __d0_Location__Layout := RECORD
     RECORDOF(__in);
-    KEL.typ.uid Uni_Location_;
+    KEL.typ.uid Location_;
   END;
-  SHARED __d0_Uni_Location__Mapped := JOIN(__in,E_Address(__in,__cfg).Lookup,TRIM((STRING)LEFT.PrimaryRange) + '|' + TRIM((STRING)LEFT.Predirectional) + '|' + TRIM((STRING)LEFT.PrimaryName) + '|' + TRIM((STRING)LEFT.Postdirectional) + '|' + TRIM((STRING)LEFT.Suffix) + '|' + TRIM((STRING)LEFT.ZIP5) + '|' + TRIM((STRING)LEFT.SecondaryRange) = RIGHT.KeyVal,TRANSFORM(__d0_Uni_Location__Layout,SELF.Uni_Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
-  SHARED __d0_Prefiltered := __d0_Uni_Location__Mapped;
+  SHARED __d0_Location__Mapped := JOIN(__in,E_Address(__in,__cfg).Lookup,TRIM((STRING)LEFT.PrimaryRange) + '|' + TRIM((STRING)LEFT.Predirectional) + '|' + TRIM((STRING)LEFT.PrimaryName) + '|' + TRIM((STRING)LEFT.Postdirectional) + '|' + TRIM((STRING)LEFT.Suffix) + '|' + TRIM((STRING)LEFT.ZIP5) + '|' + TRIM((STRING)LEFT.SecondaryRange) = RIGHT.KeyVal,TRANSFORM(__d0_Location__Layout,SELF.Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Prefiltered := __d0_Location__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
@@ -32,13 +39,20 @@ EXPORT E_Education_Student_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDC
   END;
   EXPORT Layout := RECORD
     KEL.typ.ntyp(E_Education().Typ) Edu_;
-    KEL.typ.ntyp(E_Address().Typ) Uni_Location_;
+    KEL.typ.ntyp(E_Address().Typ) Location_;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
+    KEL.typ.nstr Secondary_Range_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Edu_,Uni_Location_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Edu_,Location_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,ALL));
   Education_Student_Address_Group := __PostFilter;
   Layout Education_Student_Address__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
@@ -56,11 +70,19 @@ EXPORT E_Education_Student_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDC
   EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Edu__Orphan := JOIN(InData(__NN(Edu_)),E_Education(__in,__cfg).__Result,__EEQP(LEFT.Edu_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Uni_Location__Orphan := JOIN(InData(__NN(Uni_Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Uni_Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(Edu__Orphan),COUNT(Uni_Location__Orphan)}],{KEL.typ.int Edu__Orphan,KEL.typ.int Uni_Location__Orphan});
+  EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Z_I_P5__Orphan := JOIN(InData(__NN(Z_I_P5_)),E_Zip_Code(__in,__cfg).__Result,__EEQP(LEFT.Z_I_P5_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT SanityCheck := DATASET([{COUNT(Edu__Orphan),COUNT(Location__Orphan),COUNT(Z_I_P5__Orphan)}],{KEL.typ.int Edu__Orphan,KEL.typ.int Location__Orphan,KEL.typ.int Z_I_P5__Orphan});
   EXPORT NullCounts := DATASET([
     {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Edu',COUNT(__d0(__NL(Edu_))),COUNT(__d0(__NN(Edu_)))},
-    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UniLocation',COUNT(__d0(__NL(Uni_Location_))),COUNT(__d0(__NN(Uni_Location_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Location',COUNT(__d0(__NL(Location_))),COUNT(__d0(__NN(Location_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryRange',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Predirectional',COUNT(__d0(__NL(Predirectional_))),COUNT(__d0(__NN(Predirectional_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryName',COUNT(__d0(__NL(Primary_Name_))),COUNT(__d0(__NN(Primary_Name_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Suffix',COUNT(__d0(__NL(Suffix_))),COUNT(__d0(__NN(Suffix_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Postdirectional',COUNT(__d0(__NL(Postdirectional_))),COUNT(__d0(__NN(Postdirectional_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SecondaryRange',COUNT(__d0(__NL(Secondary_Range_))),COUNT(__d0(__NN(Secondary_Range_)))},
+    {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ZIP5',COUNT(__d0(__NL(Z_I_P5_))),COUNT(__d0(__NN(Z_I_P5_)))},
     {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'EducationStudentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]

@@ -7,22 +7,27 @@ RoxieIP := RiskWise.shortcuts.Dev156;
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
 
-/* Data Setting 	FCRA 	
-DRMFares = 1 //FARES - bit 1
-DRMExperian =	1 - //FARES bit 6
+/* Data Setting 	NonFCRA 	
+DRMFares = 0 //FARES - bit 1
+DRMExperian =	0 - //FARES bit 6
 DRMTransUnion =	0 //TCH - bit 10
 DRMADVO =	0 //ADVO bit 12
-DRMExperianFCRA =	1 //ECHF bit 14
+DRMExperianFCRA =	0 //ECHF bit 14
+DRMCortera = 0 // Cortera Header and Tradelines Bit 42
+DRMExperianEBR/Bus = 1 // Experian EBR Bit 3
 DPMSSN =	0 //use_DeathMasterSSAUpdates - bit 10
 DPMFDN =	0 //use_FDNContributoryData - bit 11
 DPMDL =	0 //use_InsuranceDLData - bit 13
+DPMDNBDMI = 0
+DPMSBFE = 0 // SBFE - Bit 12 in Data Permission Mask
 GLBA 	= 1 
-DPPA 	= 1 
+DPPA 	= 3 
 */
 GLBA := 1;
-DPPA := 1;
-DataPermissionMask := '0000000000000'; 
-DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
+DPPA := 3;
+// Bit counter:         12345678901234567890123456789012345678901234567890
+DataPermissionMask  := '00000000000000000000000000000000000000000000000000'; 
+DataRestrictionMask := '00100000000000000000000000000000000000000000000000'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
 historyDate := '0';
@@ -56,7 +61,7 @@ eyeball := 120;
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~AFA::BusinessPop_KS1832'+ ThorLib.wuid() ;
+OutputFile := '~calbrecht::Tradline_Roxie_100K_Current_Business_04052019_KS-1394_KS-1395_'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
@@ -174,7 +179,8 @@ END;
 inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
-inDataReady := PROJECT(inDataRecs(AccountNumber != 'AccountNumber'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
+// inDataReady := PROJECT(inDataRecs(AccountNumber NOT IN ['Account', 'SBFEExtract2016_0013010111WBD0101_3439841667_003']), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
+inDataReady := PROJECT(inDataRecs(AccountNumber != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
 	SELF.ArchiveDate := IF(historyDate = '0', LEFT.ArchiveDate, (STRING)HistoryDate);
 	SELF := LEFT, 
 	// SELF := [] 
@@ -199,6 +205,7 @@ soapLayout := RECORD
 	BOOLEAN BIPAppendPrimForce;
 	BOOLEAN BIPAppendReAppend;
 	BOOLEAN BIPAppendIncludeAuthRep;
+  BOOLEAN OverrideExperianRestriction;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -244,6 +251,7 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
 	SELF.GLBA_Purpose := Settings.GLBAPurpose;
 	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.OverrideExperianRestriction := Settings.Override_Experian_Restriction;
 	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.ExcludeConsumerShell := Exclude_Consumer_Shell;

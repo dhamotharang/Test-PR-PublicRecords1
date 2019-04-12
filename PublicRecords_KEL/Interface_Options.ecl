@@ -60,6 +60,7 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeVehicle := TRUE;
 	EXPORT BOOLEAN IncludeWatercraft := TRUE;
 	EXPORT BOOLEAN IncludeZipCode := TRUE;
+	EXPORT BOOLEAN IncludeTradeline := TRUE;
 	
 	// Performance options to turn ON/OFF ASSOCIATIONS in during FDC build. 
 	// By default, we'll check if their related ENTITIES are needed.
@@ -115,4 +116,5 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN IncludeWatercraftAddress := IncludeWatercraft AND IncludeAddress;
 	EXPORT BOOLEAN IncludeWatercraftOwner := IncludeWatercraft AND IncludePerson;
 	EXPORT BOOLEAN IncludeZipCodePerson := IncludeZipCode AND IncludePerson;
+	EXPORT BOOLEAN IncludeTradelineBusiness := IncludeBusiness AND IncludeTradeline;
 END;	

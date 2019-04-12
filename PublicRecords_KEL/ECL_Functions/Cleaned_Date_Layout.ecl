@@ -17,4 +17,5 @@
 	BOOLEAN  DateValid; 
 	STRING8  ValidPortion_00; 
 	STRING8  ValidPortion_01; 
+	STRING20  TimeStamp;	
 END;
