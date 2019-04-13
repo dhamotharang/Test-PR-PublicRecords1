@@ -69,8 +69,8 @@ EXPORT _proc_empid_down(
 	shared linking	        := parallel(saltmod.DoAllAgain/*, possibleMatches*/);
 		
 	/* ---------------------- SALT Output -------------------------------- */
-	shared updateBuilding   (string fname=f_out(iter)) := _files_empid_down.updateBuilding  (fname);
-	export updateSuperfiles (string fname=f_out(iter)) := _files_empid_down.updateSuperfiles(fname);
+  shared last_empid_iter  := '~' + nothor(std.file.superfilecontents(_files_empid_down.FILE_BUILDING)[1].name);
+	export updateSuperfiles (string fname=last_empid_iter) := _files_empid_down.updateSuperfiles(fname);
 	
 	/* ---------------------- SALT History ------------------------------- */
 	shared updateLinkHist   	  := _files_empid_down.updateLinkHist(f_hist(iter));
@@ -84,6 +84,7 @@ EXPORT _proc_empid_down(
   import BIPV2_QA_Tool;
   export Empid_Down_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,empid ,Build_Date  ,iter  ,BIPV2_Empid_down.Config.MatchThreshold ,'BIPV2_Empid_Down');
 
+	shared updateBuilding   (string fname=f_out(iter)) := _files_empid_down.updateBuilding  (fname);
 	export runIter := sequential(linking, outputReviewSamples, updateBuilding(),Empid_Down_iteration_stats/*, updateLinkHist*/)
 		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'EmpID_Down')),
 			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'EmpID_Down'));

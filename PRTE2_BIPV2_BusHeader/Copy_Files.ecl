@@ -11,18 +11,17 @@ END;
 
 EXPORT fnCopyFromProd(STRING current_version, string dest_cluster) := FUNCTION
 
+ CopyFiles1(data_services.foreign_prod + 'prte::key::proxid::bipv2_proxid::protected::specificities_debug','~prte::key::proxid::bipv2_proxid::' + current_version + '::specificities_debug',dest_cluster); 
 
-CopyFiles1(data_services.foreign_prod + 'prte::key::proxid::bipv2_proxid::protected::specificities_debug','~prte::key::proxid::bipv2_proxid::' + current_version + '::specificities_debug',dest_cluster); 
+ CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2_lgid3::protected::specificities_debug','~prte::key::bipv2_lgid3::' + current_version + '::specificities_debug',dest_cluster); 
 
-CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2_lgid3::protected::specificities_debug','~prte::key::bipv2_lgid3::' + current_version + '::specificities_debug',dest_cluster); 
+ CopyFiles1(data_services.foreign_prod + 'prte::key::proxid::bipv2_proxid::protected::match_candidates_debug','~prte::key::proxid::bipv2_proxid::' + current_version + '::match_candidates_debug',dest_cluster); 
 
-CopyFiles1(data_services.foreign_prod + 'prte::key::proxid::bipv2_proxid::protected::match_candidates_debug','~prte::key::proxid::bipv2_proxid::' + current_version + '::match_candidates_debug',dest_cluster); 
+ CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2_seleid_relative::protected::specificities','~prte::key::bipv2_seleid_relative::' + current_version + '::specificities',dest_cluster); 
 
+ CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2_seleid_relative::protected::match_candidates','~prte::key::bipv2_seleid_relative::' + current_version + '::match_candidates',dest_cluster); 
 
-CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2_seleid_relative::protected::specificities','~prte::key::bipv2_seleid_relative::' + current_version + '::specificities',dest_cluster); 
-
-CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2_seleid_relative::protected::match_candidates','~prte::key::bipv2_seleid_relative::' + current_version + '::match_candidates',dest_cluster); 
-
+ CopyFiles1(data_services.foreign_prod + 'prte::key::bipv2::business_header::protected::contact_title_linkids','~prte::key::bipv2::business_header::' + current_version + '::contact_title_linkids',dest_cluster); 
  
  
 RETURN 'Success';	

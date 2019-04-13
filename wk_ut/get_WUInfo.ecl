@@ -3,13 +3,19 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 export get_WUInfo(
 
-   string pWorkunitID = ''
-  ,string pesp        = _Constants.localEsp
+   pWorkunitID = '\'\''
+  ,pesp        = 'wk_ut._Constants.localEsp'
 ) :=
-module
-
-
-  export WUInfo     := Workman.get_WUInfo (pWorkunitID,pesp);
-  export FilesRead  := wk_ut.get_FilesRead(pWorkunitID,pesp);
+functionmacro
   
-end;
+  return
+  module
+
+    import Workman,wk_ut;
+
+    export WUInfo     := Workman.get_WUInfo (pWorkunitID,pesp);
+    export FilesRead  := wk_ut.get_FilesRead(pWorkunitID,pesp);
+    
+  end;
+
+endmacro;

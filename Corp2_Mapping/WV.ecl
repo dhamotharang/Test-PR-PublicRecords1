@@ -538,14 +538,24 @@ Export WV 	:= Module
 		ds_stock  := project(ds_corporations, wv_stockTransform(left))(corp2.t2u(stock_authorized_nbr + stock_par_value + stock_tax_capital)<>'') ;
 		mapStock  := dedup(sort(distribute(ds_stock,hash(corp_key)),record,local),record,local) ;
 
-		mapMain		:= dedup(sort(distribute(mapDissolutions  + 
-																			 mapCont 					+ 
-																			 mapDBA 					+ 
-																			 mapSubsidiaries  + 
-																			 mapNamechanges
-																			 ,hash(corp_key)
-																			 ),
+		MapCorpRecs:= dedup(sort(distribute( mapDissolutions  + 
+																				 mapCont 					+ 
+																				 mapDBA 					+ 
+																				 mapSubsidiaries  + 
+																				 mapNamechanges
+																				 ,hash(corp_key)
+																				 ),
 												record,local),record,local): independent;
+												
+		Corp2_Mapping.LayoutsCommon.Main legalNameFix_Trans(Corp2_Mapping.LayoutsCommon.Main  l):= transform
+			
+			self.corp_legal_name :=if(Corp2_Mapping.fSpecialChars(l.corp_legal_name)='FOUND', Corp2_Raw_WV.Functions.fix_ForeignChar(l.corp_legal_name), l.corp_legal_name);
+			self								 :=l;
+			
+		end;
+		
+		legalNameFix          := project(MapCorpRecs, legalNameFix_Trans(left)) ;
+		MapMain 							:= dedup(sort(distribute(legalNameFix,hash(corp_key)),record,local),record,local) : independent;		
 																	 
 		mapEvents	:= dedup(sort(distribute(mapEvent1 + 
 																			 mapEvent2,hash(corp_key)

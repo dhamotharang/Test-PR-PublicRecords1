@@ -641,16 +641,13 @@ Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset()
   AR_ScrubsWithExamples  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_AR','ScrubsAlerts', AR_OrbitStats, version,'Corp2_'+state_origin+'_AR').CompareToProfile_with_Examples;
 	AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 	AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-	AR_MailFile					   := FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+	AR_MailFile					   := FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_MO Report' //subject
 																															,'Scrubs CorpAR_MO Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'CorpMOARScrubsReport.csv'
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray
-																													);
+																															);
 
 	AR_BadRecords 			:= AR_T.ExpandedInFile(ar_type_invalid <> 0);	
 	AR_GoodRecords			:= AR_T.ExpandedInFile(ar_type_invalid	= 0);	

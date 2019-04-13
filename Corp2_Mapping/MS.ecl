@@ -1,4 +1,4 @@
-import _Validate, Corp2_Raw_MS, Scrubs, Scrubs_Corp2_mapping_MS_Main, Scrubs_Corp2_mapping_MS_Event, Scrubs_Corp2_mapping_MS_Stock, Corp2, tools, std, UT, versioncontrol;
+﻿import _Validate, Corp2_Raw_MS, Scrubs, Scrubs_Corp2_mapping_MS_Main, Scrubs_Corp2_mapping_MS_Event, Scrubs_Corp2_mapping_MS_Stock, Corp2, tools, std, UT, versioncontrol;
  
 export MS := module;  
  	
@@ -663,16 +663,13 @@ export MS := module;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_MS Report' //subject
 																																	 ,'Scrubs CorpMain_MS Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpMSMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																	);		
 																																 
 		Main_BadRecords := Main_T.ExpandedInFile(	dt_vendor_first_reported_invalid	   <> 0 or 
 																							dt_vendor_last_reported_invalid	     <> 0 or 

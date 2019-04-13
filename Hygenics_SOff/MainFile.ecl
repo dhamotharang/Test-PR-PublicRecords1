@@ -352,7 +352,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='495742312' and l.did=1033147214) or
 									(l.ssn_appended='503703386' and l.did=2246670267) or
 									(l.ssn_appended='119926570' and l.did=79982138483) or
-									(l.ssn_appended='584621400' and l.did=2232356551),
+									(l.ssn_appended='584621400' and l.did=2232356551) or
+									(l.ssn_appended='401358777' and l.did=1034909614),
 								'',
 								l.ssn_appended);
 		self.did			:= if((l.ssn_appended='353561176' and l.did=2275932305) or 
@@ -370,7 +371,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='495742312' and l.did=1033147214) or
 									(l.ssn_appended='503703386' and l.did=2246670267) or
 									(l.ssn_appended='119926570' and l.did=79982138483) or
-									(l.ssn_appended='584621400' and l.did=2232356551),
+									(l.ssn_appended='584621400' and l.did=2232356551) or
+									(l.ssn_appended='401358777' and l.did=1034909614),
 
 								0,
 								l.did);
@@ -389,7 +391,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='495742312' and l.did=1033147214) or
 									(l.ssn_appended='503703386' and l.did=2246670267) or
 									(l.ssn_appended='119926570' and l.did=79982138483) or
-									(l.ssn_appended='584621400' and l.did=2232356551),
+									(l.ssn_appended='584621400' and l.did=2232356551) or
+									(l.ssn_appended='401358777' and l.did=1034909614),
 
 								0,
 								l.score);
@@ -505,4 +508,7 @@ dedupedOffender:= dedup(sortedOffender,
                            curr_incar_flag ,   curr_parole_flag ,   curr_probation_flag ,	 fcra_conviction_flag ,	 fcra_traffic_flag ,	 fcra_date ,	 fcra_date_type ,
 	                         conviction_override_date ,	 conviction_override_date_type ,	 offense_score ,local): persist('Persist::Crim_offender_persistentID1');
 
-export MainFile := dedupedOffender;
+uniquePID := dedup(sort(dedupedOffender,offender_persistent_id,-score,-did,-ssn_appended,name_type,-image_link), offender_persistent_id) :persist('Persist::Crim_offender_persistentID1_unique');
+
+
+export MainFile := uniquePID;
