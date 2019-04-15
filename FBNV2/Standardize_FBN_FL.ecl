@@ -22,6 +22,7 @@ module
 					self.FIC_OWNER_DOC_NUM 				:= trim(l.FIC_OWNERS[c].FIC_OWNER_DOC_NUM);
 					self.FIC_OWNER_NAME 	  	 		:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_NAME));
 					self.FIC_OWNER_NAME_FORMAT  	:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_NAME_FORMAT));
+					
 					self.FIC_OWNER_ADDR 	  		 	:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_ADDR));
 					self.FIC_OWNER_CITY 	  		 	:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_CITY));
 					self.FIC_OWNER_STATE   		 		:= stringlib.stringtouppercase(trim(l.FIC_OWNERS[c].FIC_OWNER_STATE));
@@ -121,7 +122,9 @@ module
 			
 			VersionControl.macBuildNewLogicalFile(logicalfile_filing	,PrepFilings	,filing_out		,false,,pOverwrite);		
 	
-			mapped_Filing 	:= 	sequential(filing_out);
+			mapped_Filing 	:= 	sequential(filing_out)
+			
+														 : persist('~thor_data400::mappedfiling::fbnv2::fl::filing',SINGLE);
 			source					:= 'FILING';
 			superfilename 	:= FBNV2.Get_Update_SupperFilename(source);
 			Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
