@@ -123,7 +123,6 @@ alertRec:= RECORD
 	PhoneFinder_Services.Layouts.PhoneFinder.alert rollCategory(alertRec l, DATASET(alertRec) allRows) :=TRANSFORM
 		SELF.flag := l.flag;
 		SELF.messages := PROJECT(allRows,TRANSFORM(iesp.share.t_StringArrayItem, SELF.value := LEFT.messages));
-		SELF.AlertIndicators 	:= PROJECT(allRows,TRANSFORM(iesp.phonefinder.t_PhoneFinderAlertIndicator, SELF := LEFT));
 	END;
 	alertResults := ROLLUP(GROUP(SORT(dsAlert.Alerts,flag),flag), GROUP, rollCategory(LEFT,ROWS(LEFT)));
 
@@ -134,6 +133,7 @@ alertRec:= RECORD
 	//Add risk results and alerts to Primary phone.
 	PrimaryPhoneUpd := PROJECT(SubjectPhone,TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
 																										SELF.Alerts 					 := alertResults,
+                                                    SELF.AlertIndicators   := PROJECT(dsAlert.Alerts,TRANSFORM(iesp.phonefinder.t_PhoneFinderAlertIndicator, SELF := LEFT));
 																										SELF.PhoneRiskIndicator:=Constants.RiskIndicator[risk.indicator],
 																										SELF.OTPRIFailed			 :=risk.OTPRIFailed,
 																										SELF:=LEFT));
