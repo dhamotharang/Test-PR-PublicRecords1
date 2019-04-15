@@ -1,4 +1,4 @@
-import Risk_Indicators, Models, iesp, doxie, ut, mdr, drivers, header, riskwise,Relationship;
+import doxie, mdr, drivers, dx_header, riskwise, Relationship;
 
 EXPORT getScore(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) VOO_attr,
 								DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOO_shell, 
@@ -212,13 +212,15 @@ dk := choosen(doxie.key_max_dt_last_seen, 1);
 hdrBuildDate01 := ((string)dk[1].max_date_last_seen)[1..6];
 
 //get all DIDs associated with our target input address
-VerificationOfOccupancy.Layouts.Layout_VOOShell getDIDs(VOO_shell le, doxie.Key_Header_Address ri) := TRANSFORM
+Key_Header_Address := dx_header.key_header_address();
+
+VerificationOfOccupancy.Layouts.Layout_VOOShell getDIDs(VOO_shell le, Key_Header_Address ri) := TRANSFORM
 	SELF.infer_own_targetDID 			:= ri.DID;
 	SELF.infer_own_current 				:= trim((string)ri.dt_last_seen) >= hdrBuildDate01 OR ri.dt_last_seen >= le.historydate; // Need to make sure our "current" calculation still works in history mode
 	SELF 													:= le;
 END;
 
-targetDIDs := join(VOO_shell, doxie.Key_Header_Address,
+targetDIDs := join(VOO_shell, Key_Header_Address,
 												keyed(left.prim_name = right.prim_name) and
 												keyed(left.z5 = right.zip) and
 												keyed(left.prim_range = right.prim_range) and
@@ -229,7 +231,7 @@ targetDIDs := join(VOO_shell, doxie.Key_Header_Address,
 												glb_ok AND
 												(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 												(~mdr.Source_is_DPPA(RIGHT.src) OR 
-													(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))),
+													(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 								getDIDs(LEFT,RIGHT), left outer, ATMOST(riskwise.max_atmost));
 
 //keep only those DIDs that are currently updating for the target address

@@ -2,7 +2,7 @@
 // Several assumptions are made to simplify the code that requires this function to only be called for XML transactions.
 
 IMPORT AddrBest, Address, AutoStandardI, Codes, DeathV2_Services, DidVille, 
-       Drivers, Doxie, Email_Data, Gong, Header, Header_Quick, IESP, MDR, 
+       Drivers, Doxie, Email_Data, Gong, Header, dx_header, Header_Quick, IESP, MDR, 
 			 PersonReports, Risk_Indicators, RiskWise, SmartRollup, Targus, UT, Utilfile, 
 			 VerificationOfOccupancy, Relationship, std;
 
@@ -320,7 +320,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 									GLB_Ok AND
 									(~MDR.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 									(~MDR.Source_is_DPPA(RIGHT.src) OR 
-										(DPPA_Ok AND Drivers.State_DPPA_Ok(Header.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))), 
+										(DPPA_Ok AND Drivers.State_DPPA_Ok(dx_header.functions.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))), 
 									getReportHeader(LEFT, RIGHT), KEEP(200), ATMOST(RiskWise.max_atmost));
 
 	reportQHeader := JOIN(ShellResults, PersonQuickHeaderKey,		
@@ -341,7 +341,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 									GLB_Ok AND
 									(~MDR.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 									(	~MDR.Source_is_DPPA(RIGHT.src) OR 
-										(DPPA_Ok AND Drivers.State_DPPA_Ok(Header.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))), 
+										(DPPA_Ok AND Drivers.State_DPPA_Ok(dx_header.functions.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))), 
 									getReportQuickHeader(LEFT, RIGHT), KEEP(200), ATMOST(RiskWise.max_atmost));
 	
 	combinedReportHeader := SORT(UNGROUP(reportHeader + reportQHeader), SourceType, -DateLastSeen, DateFirstSeen) ((INTEGER)DateFirstSeen > 0 AND (INTEGER)DateLastSeen > 0);
@@ -575,7 +575,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 	// * Gather Supporting Records - Identities Associated with Input *
 	// * (Target) Property.                                           *
 	// ****************************************************************
-	HeaderAddressKey := Doxie.Key_Header_Address;
+	HeaderAddressKey := dx_header.key_header_address();
 	
 	VerificationOfOccupancy.Layouts.SupportingRecordsAddr getSupportingAddr(ShellResults le, HeaderAddressKey ri) := TRANSFORM
 		SELF.FName := ri.FName;
@@ -594,7 +594,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 																			glb_ok AND
 																			(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 																			(	~mdr.Source_is_DPPA(RIGHT.src) OR 
-																			(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src), DPPAPurpose ,RIGHT.src))), 
+																			(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src), DPPAPurpose ,RIGHT.src))), 
 															getSupportingAddr(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(RiskWise.max_atmost));
 															
 	SupportingAddrSorted := SORT(UNGROUP(supportingAddrTemp), FName, LName, LexID, DateFirstSeen, -DateLastSeen);

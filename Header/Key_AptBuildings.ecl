@@ -1,5 +1,3 @@
-﻿import doxie, data_services;
+﻿IMPORT dx_header;
 
-df := header.ApartmentBuildings;
-
-export Key_AptBuildings := index(df,{prim_range, prim_name, zip, suffix, predir}, {apt_cnt, did_cnt}, data_services.data_location.prefix() + 'thor_data400::key::hdr_apt_bldgs_' + doxie.Version_SuperKey);
+EXPORT Key_AptBuildings := dx_header.Key_AptBuildings();

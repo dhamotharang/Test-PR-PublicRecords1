@@ -1,7 +1,7 @@
-﻿IMPORT census_data,location_services,AddressReport_Services,doxie_cbrs,ut, suppress,
-			 DriversV2_Services,VehicleV2_Services,Doxie_Raw,LiensV2_Services,header,Gong,
-			 BankruptcyV2_Services,doxie, iesp, AutoStandardI,Address,LN_PropertyV2_Services,
-			 BIPV2, hunting_fishing_services, STD, VehicleV2;
+﻿IMPORT census_data, location_services, AddressReport_Services, doxie_cbrs, ut, suppress,
+			 DriversV2_Services, VehicleV2_Services, Doxie_Raw, LiensV2_Services, header, Gong,
+			 BankruptcyV2_Services, doxie, iesp, AutoStandardI, Address, LN_PropertyV2_Services,
+			 BIPV2, hunting_fishing_services, STD, VehicleV2, dx_header;
 
 EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 															boolean IsFCRA = false):=function
@@ -37,7 +37,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	//**************************************
 
-	res_key:=doxie.Key_Header_Address;
+	res_key:=dx_header.Key_Header_Address();
 
 	typeof(res_key) get_Res(srchrec l, res_key R) :=TRANSFORM
 		SELF := R;
@@ -57,7 +57,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 															Res_final_all(sec_range=split_addr.sec_range));
 
 	IF(COUNT(dedup(sort(recs,DID),DID))>MAX(AddressReport_Services.constants.MaxResidents,AddressReport_Services.constants.MaxProperties),FAIL(203,doxie.ErrorCodes(203)));
-	headerRecs 								:= project(recs, TRANSFORM(header.Layout_Header,self:=left,self:=[]));			 
+	headerRecs 								:= project(recs, TRANSFORM(dx_header.layout_header,self:=left,self:=[]));			 
 
   //Some values are not provided in the input module; until that, has to make this call:
   mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))

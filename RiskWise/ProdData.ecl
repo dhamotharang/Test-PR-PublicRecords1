@@ -63,7 +63,7 @@
  </message>
 */
 
-import AutoStandardI, ut, address, riskwise, risk_indicators,AutoStandardI, didville,gong,
+import AutoStandardI, ut, address, riskwise, risk_indicators, didville,gong,
 			 ln_propertyv2,business_risk,paw,driversv2,certegy,inquiry_acclogs,email_data,yellowpages,
 			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,avm_v2,utilfile,liensv2,business_header, 
 			 _Control, watercraft, AlloyMedia_student_list, American_student_list, doxie_files,  
@@ -405,7 +405,7 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 
 	isFCRA := false;
 	
-	address_hierarchy_recs := choosen(header.key_addr_hist(isFCRA)(keyed(s_did=searchdid)), 200);
+	address_hierarchy_recs := choosen(dx_header.key_addr_hist()(keyed(s_did=searchdid)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;	
 	
 	gong_recs := choosen(gong.Key_History_did(keyed(l_did=searchdid) and searchdid!=0), max_recs);
@@ -652,12 +652,13 @@ gateways := project(gateways_in, gw_switch(left));
 	addr_recs := riskwise.getDirsByAddr(project(indata, transform(risk_indicators.Layouts.layout_input_plus_overrides, self := left)),isFCRA,glb,BSOptions);
 	if(in_addr!='' and (include_all_files=true or include_gong_and_targus=true), output(addr_recs, named('dirs_addr_recs')) );	
 	
-	hdr_addr := join(indata, doxie.Key_Header_Address, 
+  Key_Header_Address := dx_header.Key_Header_Address();
+	hdr_addr := join(indata, Key_Header_Address, 
 						keyed(left.prim_name=right.prim_name) and
 						keyed(left.z5=right.zip) and keyed(right.prim_range=left.prim_range) and
 						left.predir=right.predir and left.postdir=right.postdir and
 						left.sec_range=right.sec_range,
-						transform(recordof(doxie.Key_Header_Address), self := right), atmost(riskwise.max_atmost), keep(500));
+						transform(dx_header.layouts.i_header_address, self := right), atmost(riskwise.max_atmost), keep(500));
 	if(in_addr!='' and (include_all_files=true or include_header=true), output(hdr_addr, named('header_by_address')) );
 
 	pcnsr := join(indata, daybatchpcnsr.Key_PCNSR_Address,

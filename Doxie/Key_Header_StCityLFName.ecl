@@ -1,18 +1,3 @@
-import autokey, header, data_services;
-t := header.Prepped_For_Keys;
+IMPORT dx_header;
 
-autokey.MAC_CityStName(t,fname,mname,lname,
-						ssn,
-						dob,
-						phone,
-						prim_name,prim_range,st,city_name,zip,sec_range,
-						states,
-						lname1,lname2,lname3,
-						city1,city2,city3,
-						rel_fname1,rel_fname2,rel_fname3,
-						lookups,
-						did,
-						data_services.data_location.prefix() + 'thor_data400::key::header.st.city.fname.lname',
-						k)
-						
-export Key_Header_StCityLFName := k;
+EXPORT Key_Header_StCityLFName := dx_header.key_StCityLFName();

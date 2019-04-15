@@ -1,5 +1,5 @@
-IMPORT Autokey,AutokeyB2,AddressReport_Services,VehicleV2,AutoStandardI,doxie,Address,doxie_raw,ut,iesp,
-			 LN_PropertyV2,DriversV2,business_header_ss,gong,Location_Services,VehicleV2_Services,DriversV2_Services;
+IMPORT AutoStandardI,dx_header,Address,doxie_raw,iesp,
+			 LN_PropertyV2,gong,Location_Services,VehicleV2_Services,DriversV2_Services;
 
 types := Gong.Constants.PTYPE;
 EXPORT CountService_Records ( input.params param,
@@ -71,7 +71,7 @@ EXPORT CountService_Records ( input.params param,
 //*************************************//
 // Residents
 //*************************************//
-		res_key:=doxie.Key_Header_Address;
+		res_key:=dx_header.key_header_address();
 
 		typeof(res_key) get_Res(srchrec l, res_key R) :=TRANSFORM
 			SELF := R;

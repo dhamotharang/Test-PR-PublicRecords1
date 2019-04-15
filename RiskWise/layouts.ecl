@@ -1,18 +1,6 @@
-﻿/*2016-05-21T00:50:26Z (Kevin Huls)
-RQ-12730: Emerging Identities
-*/
-/*2016-05-18T19:05:55Z (Kevin Huls)
-RQ-12730: Emerging Identities
-*/
-IMPORT Risk_Indicators, doxie;
+﻿IMPORT Risk_Indicators;
 
 export layouts := module 
-
-export header_temp := record
-	string shell_converted_source;
-	string address_type;  // flag to tell whether the address is input, current, or previous
-	recordof(doxie.Key_Header);
-end;
 
 export layout_cdci := record
 	unsigned4 seq := 0;
