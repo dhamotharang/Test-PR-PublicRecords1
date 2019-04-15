@@ -1,4 +1,4 @@
-import didville, Address, AutoStandardI, ut, Std, iesp;
+﻿import didville, Address, ut, Std, iesp;
 	
 	export dataset(MemberPoint.Layouts.BestExtended) getBest
 																								(dataset(MemberPoint.Layouts.BatchInter) BatchInter, 
@@ -36,17 +36,10 @@ import didville, Address, AutoStandardI, ut, Std, iesp;
 			end; 
 			
 		BestBatch := project(BatchInter,xformInterToBest(left));
-		p := module(AutoStandardI.PermissionI_Tools.params)
-			export boolean AllowAll := false;
-			export boolean AllowGLB := false;
-			export boolean AllowDPPA := false;
-			export unsigned1 DPPAPurpose := BParams.DPPAPurpose;
-			export unsigned1 GLBPurpose := BParams.GLBPurpose;
-			export boolean IncludeMinors := false;
-		END;
-		
-		GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(BParams.GLBPurpose);
-    STRING5 industryClass := BParams.IndustryClass;
+
+		GLB := BParams.isValidGLB();
+    
+    STRING5 industryClass := BParams.industry_class;
 		STRING120 appends:= Std.Str.ToUpperCase(BParams.Appends);
 		UNSIGNED2 appendThreshold:= (UNSIGNED2)BParams.AppendThreshold;
 		BOOLEAN deduped:= BParams.Deduped;
@@ -66,11 +59,11 @@ import didville, Address, AutoStandardI, ut, Std, iesp;
 																											livingsits_flag := true,
 																											hhidplus_value := false,
 																											edabest_value := true,
-																											glb_purpose_value := BParams.GLBPurpose,
+																											glb_purpose_value := BParams.glb,
 																											include_minors := false,
 																											LMaxScores := DidVille.MaxScores.MMax,
 																											UseNonBlankKey := FALSE,
-																											appType := BParams.ApplicationType,
+																											appType := BParams.application_type,
 																											IndustryClass_val := industryClass);
 		// join back the email
 				

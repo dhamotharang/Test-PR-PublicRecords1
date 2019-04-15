@@ -4,7 +4,7 @@
 
 	export IParam := module
 		
-		export BatchParams := interface (BatchShare.IParam.BatchParams)			
+		export BatchParams := interface (BatchShare.IParam.BatchParamsV2)			
 			export string1 AddressConfidenceThreshold := MPD.AddressConfidenceThreshold ;
 			export string	DeceasedMatchCodes := MPD.DeceasedMatchCodes;
 			export boolean IncludeAddress := MPD.IncludeAddress;
@@ -13,7 +13,7 @@
 			export boolean IncludeGender := MPD.IncludeGender;
 			export boolean IncludePhone := MPD.IncludePhone;
 			export boolean IncludeSSN := MPD.IncludeSSN;
-			EXPORT STRING5 IndustryClass := MPD.IndustryClass;
+			EXPORT STRING5 industry_class := MPD.IndustryClass;
 			export string25 Phones_Score_Model := MPD.Phones_Score_Model;
 			export string1 PhonesReturnCutoff := MPD.PhonesReturnCutoff;
 			EXPORT BOOLEAN ReturnDetailedRoyalties := MPD.ReturnDetailedRoyalties;
@@ -107,7 +107,7 @@
 		//	 The module parameter should be passed along to the underlying attributes.
 		// **************************************************************************************			
 		export getBatchParams():= FUNCTION
-			base_params := BatchShare.IParam.getBatchParams();
+			base_params := BatchShare.IParam.getBatchParamsV2();
 			// project the base params to read shared parameters from store.
 			in_mod := MODULE(project(base_params, BatchParams, opt))
 				export string1	AddressConfidenceThreshold := MPD.AddressConfidenceThreshold  : stored('AddressConfidenceThreshold');
@@ -118,7 +118,7 @@
 				export boolean IncludeGender := MPD.IncludeGender  : stored('IncludeGender');
 				export boolean IncludePhone := MPD.IncludePhone  : stored('IncludePhone');
 				export boolean IncludeSSN := MPD.IncludeSSN  : stored('IncludeSSN');
-				EXPORT STRING5 IndustryClass := MPD.IndustryClass : STORED('IndustryClass');
+				EXPORT STRING5 industry_class := MPD.IndustryClass : STORED('IndustryClass');
 				EXPORT STRING25 Phones_Score_Model := MPD.Phones_Score_Model:STORED('Phone_Score_Model');
 				export string1 PhonesReturnCutoff := MPD.PhonesReturnCutoff:STORED('PhonesReturnCutoff');
 				EXPORT BOOLEAN ReturnDetailedRoyalties := MPD.ReturnDetailedRoyalties:STORED('ReturnDetailedRoyalties');

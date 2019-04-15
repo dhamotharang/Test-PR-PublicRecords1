@@ -1,4 +1,4 @@
-IMPORT AutoKey, doxie, Gateway, Gong, Header, MDR, MemberPoint, Phones, phonesplus_batch, Phonesplus_v2, Risk_Indicators, ut;
+﻿IMPORT AutoKey, doxie, Gateway, Gong, Header, MDR, MemberPoint, Phones, phonesplus_batch, Phonesplus_v2, Risk_Indicators, ut, BatchShare;
 
 	EXPORT PhoneLookup := MODULE
 	
@@ -8,9 +8,8 @@ IMPORT AutoKey, doxie, Gateway, Gong, Header, MDR, MemberPoint, Phones, phonespl
 																							SELF.phoneno:= LEFT.primary_phone_number,
 																							SELF:= LEFT));			
 
-			// ppOptions:= MODULE(PROJECT(options, phonesplus_batch.options.IOptions))END;
-			ppOptions:= PROJECT(options, phonesplus_batch.options.IOptions, OPT);
-			
+      mod_batch := BatchShare.IParam.ConvertToLegacy(options);
+      ppOptions:= PROJECT(mod_batch, phonesplus_batch.options.IOptions, OPT);
 			ppResult:= phonesplus_batch.phonesplus_reverse_batch_records(ppRecs, ppOptions);
 			lookupResult:= ppResult.Results;
 			RETURN lookupResult;

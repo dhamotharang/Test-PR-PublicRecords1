@@ -1,10 +1,12 @@
-IMPORT BatchShare, MemberPoint, Phones, progressive_phone;
+﻿IMPORT BatchShare, MemberPoint, Phones, progressive_phone;
 
 	EXPORT ConnectedPhones := MODULE
 	
 		// Internal: Return/filter set of disconnected phones (member point)
 		SHARED SET OF STRING10 getDisconnectedPhones(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)recsIn, MemberPoint.IParam.BatchParams optsIn):= FUNCTION
-			opts := MODULE(PROJECT(optsIn, Phones.IParam.PhoneAttributes.BatchParams, OPT))
+
+      mod_batch := BatchShare.IParam.ConvertToLegacy(optsIn);
+			opts := MODULE(PROJECT(mod_batch, Phones.IParam.PhoneAttributes.BatchParams, OPT))
 				EXPORT BOOLEAN return_current:= TRUE;
 				EXPORT BOOLEAN include_temp_susp_reactivate:= FALSE;
 			END;
