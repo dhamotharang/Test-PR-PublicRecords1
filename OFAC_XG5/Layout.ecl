@@ -1,4 +1,4 @@
-IMPORT IESP;
+﻿IMPORT IESP;
 
 export Layout := module
 
@@ -39,7 +39,7 @@ EXPORT SearchResultsSlimmed := record
 	string WarningMessage ;
 	string SearchTime ;
 	string WriteTime;
-	string ResponseFullName;
+	unicode ResponseFullName;
 	dataset(iesp.WsSearchCore.t_ResultEntityRecord) EntityRecords;
 	
 end;
@@ -51,12 +51,12 @@ EXPORT  EntityMatch := record  //not a dataset - only one record per match
 	string EntityCountry;
 	string EntityDate;
 	string EntityGender; //values['None','Unknown','Female','Male','']
-	string EntityNameFull;
-	string EntityNameTitle;
-	string EntityNameFirst;
-	string EntityNameMiddle ;
-	string EntityNameLast;
-	string EntityNameGeneration ;
+	unicode EntityNameFull;
+	unicode EntityNameTitle;
+	unicode EntityNameFirst;
+	unicode EntityNameMiddle ;
+	unicode EntityNameLast;
+	unicode EntityNameGeneration ;
 	string EntityNotes ;
 	string EntityNumber ;
 	string EntityPartyKey ;
@@ -66,7 +66,7 @@ EXPORT  EntityMatch := record  //not a dataset - only one record per match
 	string EntityUniqueID;
 	string SearchCriteria ;
 	boolean MatchRealert;
-	string EntityName;
+	unicode EntityName;
 	integer EntityOffset;
 	integer8 EntityPrevResultID ;
 	real EntitymatchScore;
@@ -109,12 +109,12 @@ END;
 
 EXPORT AKAMatches := record //(t_InputName)
 
-  string FullName;
-	string Title;
-	string FirstName;
-	string MiddleName;
-	string LastName;
-	string Generation;
+  unicode FullName;
+	unicode Title;
+	unicode FirstName;
+	unicode MiddleName;
+	unicode LastName;
+	unicode Generation;
 	unsigned8 akaID;
 	unsigned8 akaType;
 	string AKATypeDesc;
@@ -127,7 +127,7 @@ EXPORT AKABestMatches := record
 	integer EntitySeq;
   unsigned1 BestID;
   real BestScore;
-	string BestName;
+	unicode BestName;
 	AKAMatches;
 END;
 
@@ -262,7 +262,7 @@ EXPORT NormEntityRecord := Record
    integer BlockID ;
 	 integer EntitySeq;
 	 string searchType;
-	 string OrigFullName;
+	 unicode OrigFullName;
 	 integer CountMatches;
 	 integer Countcodes;
 	 integer CountCities;
@@ -284,7 +284,7 @@ EXPORT ResponseRec := record  // did not break out Gender tags as they are not u
 	integer blockid;
 	integer EntitySeq;
 	string errormessage;
-	string ResponseFullName;
+	unicode ResponseFullName;
 	dataset(AddressMatches) AddrRec;
 	dataset(AKABestMatches) AKARec;
 	dataset(ResultMatchFile) FileRec;

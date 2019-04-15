@@ -506,8 +506,8 @@ export Layout_Output := RECORD
 	STRING60 watchlist_table := '';
 	STRING10 watchlist_record_number := '';
 	STRING120 watchlist_program :='';
-	STRING20 watchlist_fname := '';
-	STRING20 watchlist_lname := '';
+	UNICODE20 watchlist_fname := '';
+	UNICODE20 watchlist_lname := '';
 	STRING50 watchlist_address := '';
 	// parsed watchlist address
 	STRING10 WatchlistPrimRange := '';
@@ -521,7 +521,7 @@ export Layout_Output := RECORD
 	STRING2 watchlist_state := '';
 	STRING9 watchlist_zip := '';
 	STRING30 watchlist_contry := '';
-	STRING50 watchlist_entity_name := '';
+	UNICODE50 watchlist_entity_name := '';
 	INTEGER watchlist_num_with_name := 0;
 	
 	STRING30 wphonename := '';

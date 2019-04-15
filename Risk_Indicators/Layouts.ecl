@@ -30,8 +30,8 @@ export layout_watchlists := record
 	STRING60 Watchlist_Table;
 	STRING120 Watchlist_Program;
 	STRING10 Watchlist_Record_Number;
-	STRING20 Watchlist_fname;
-	STRING20 Watchlist_lname;
+	UNICODE20 Watchlist_fname;
+	UNICODE20 Watchlist_lname;
 	STRING65 Watchlist_address;
 	// parsed watchlist address
 	STRING10 WatchlistPrimRange;
@@ -45,7 +45,7 @@ export layout_watchlists := record
 	STRING2 Watchlist_state;
 	STRING5 Watchlist_zip;
 	STRING30 Watchlist_contry;
-	STRING200 Watchlist_Entity_Name;
+	UNICODE200 Watchlist_Entity_Name;
 end;
 
 export layout_watchlists_plus_seq := record

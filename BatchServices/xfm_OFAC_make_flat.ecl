@@ -1,4 +1,4 @@
-
+﻿
 IMPORT BatchServices, Doxie, Patriot, ut;
 
 SHARED m_Remarks(Patriot.layout_batch_out l) := 
@@ -130,7 +130,7 @@ EXPORT BatchServices.layout_OFAC_Batch_out xfm_OFAC_make_flat(Patriot.layout_bat
 	
 		SELF.acctno              := l.acctno;
 		SELF.Name                := IF( l.name_unparsed != '', l.name_unparsed, TRIM(l.name_last) + ', ' + TRIM(l.name_first) + ' ' + TRIM(l.name_middle) );
-		SELF.Alt_Names           := l.orig_pty_name;
+		SELF.Alt_Names           := (string)l.orig_pty_name;
 		SELF.Address             := a.us_address;
 		SELF.USA_StreetAddress   := a.addr;
 		SELF.USA_City            := a.city;

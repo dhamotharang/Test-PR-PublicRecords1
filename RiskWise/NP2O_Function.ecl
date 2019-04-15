@@ -207,13 +207,13 @@ working_layout format_out(ret le, indata ri) := TRANSFORM
 	self.hriskalertnum := if(doOutput, if(OFAC and le.watchlist_table <> '' , if(tribcode in ['np80','np81','np82'], le.Watchlist_Record_Number, 
 																																																if(le.watchlist_record_number[1..3]='OSC', le.watchlist_record_number[4..10], 
 																																																																					 le.watchlist_record_number[5..10])), ''), '');
-	self.alertfirst := if(doOutput, if(OFAC, le.Watchlist_fname, ''), '');
-	self.alertlast := if(doOutput, if(OFAC, le.Watchlist_lname, ''), '');
+	self.alertfirst := if(doOutput, if(OFAC, (string)le.Watchlist_fname, ''), '');
+	self.alertlast := if(doOutput, if(OFAC, (string)le.Watchlist_lname, ''), '');
 	self.alertaddr := if(doOutput, if(OFAC, le.Watchlist_address, ''), '');
 	self.alertcity := if(doOutput, if(OFAC, le.Watchlist_city, ''), '');
 	self.alertstate := if(doOutput, if(OFAC, le.Watchlist_state, ''), '');
 	self.alertzip := if(doOutput, if(OFAC, le.Watchlist_zip, ''), '');
-	self.alertentity := if(doOutput, if(OFAC, le.Watchlist_Entity_Name, ''), '');
+	self.alertentity := if(doOutput, if(OFAC, (string)le.Watchlist_Entity_Name, ''), '');
 	self.verlast := if(le.socsverlevel in [2,5,7,8,9,11,12] OR le.phoneverlevel in [2,5,7,8,9,11,12], le.combo_last, '');
 	self.veraddr := if(le.socsverlevel in [3,5,6,8,10,11,12] OR le.phoneverlevel in [3,5,6,8,10,11,12], Risk_Indicators.MOD_AddressClean.street_address('',le.combo_prim_range,le.combo_predir,le.combo_prim_name,
 																										   le.combo_suffix,le.combo_postdir,le.combo_unit_desig,

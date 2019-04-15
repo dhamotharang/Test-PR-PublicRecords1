@@ -1,4 +1,4 @@
-import iesp, patriot, lib_stringlib;
+﻿import iesp, patriot, lib_stringlib;
 
 EXPORT FormatXG5_Response (DATASET(OFAC_XG5.Layout.ResponseRec) responseXG5)
 													:= FUNCTION
@@ -145,7 +145,7 @@ END;
  AKAsRec :=  RECORD
   integer blockid;
 	integer EntitySeq;
-  STRING350 akaname;
+  UNICODE350 akaname;
 	STRING5 score;
 END;
 

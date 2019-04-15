@@ -76,7 +76,7 @@ EXPORT Transforms := MODULE
 		SELF.Score := l.score;
 		SELF.PartyKey := l.pty_key;
 		SELF.Source := l.source;
-		SELF.OriginalPartyName := l.orig_pty_name;
+		SELF.OriginalPartyName := (string)l.orig_pty_name;
 		SELF.BlockedCountry := l.blocked_country;		
 		
 		SELF.Addresses := ROW({CHOOSE(c, l.addr_1, l.addr_2, l.addr_3, l.addr_4, l.addr_5, l.addr_6,

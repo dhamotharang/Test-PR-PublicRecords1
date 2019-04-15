@@ -1,4 +1,4 @@
-import iesp, Risk_Indicators, Fingerprint, ut, Gateway;
+﻿import iesp, Risk_Indicators, Fingerprint, ut, Gateway;
 
 
 /* -- need to all be migrated...
@@ -143,9 +143,9 @@ entityDetailsRecord	breakoutentity(iesp.WsSearchCore.t_ResultMatch le) := TRANSF
 	self.notes := le.Entity.EntityDetails.Notes[1..4000];
 	self.reason   := if(trim(le.entity.EntityUniqueID) = '', '', le.Entity.EntityDetails.reason);
 	self.SearchCriteria := if(trim(le.entity.EntityUniqueID) = '', '', le.Entity.SearchCriteria);
-	self.fullname := le.Entity.EntityDetails.Name.full;
+	self.fullname := (string)le.Entity.EntityDetails.Name.full;
 	self.score := (string)le.entity.Score;
-	self.bestname := le.Name.Best;
+	self.bestname := (string)le.Name.Best;
 	// dcnt := count(le.Descriptions);
 	// self.descriptioncount := (string)dcnt;
 	//self.descriptions := project(le.Descriptions, descx(left));

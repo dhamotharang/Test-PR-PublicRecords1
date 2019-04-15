@@ -1,4 +1,4 @@
-IMPORT IntlIID, Risk_Indicators, riskwise, iesp, ut, gateway;
+﻿IMPORT IntlIID, Risk_Indicators, riskwise, iesp, ut, gateway;
 
 EXPORT Functions := MODULE
 
@@ -947,14 +947,14 @@ EXPORT Functions := MODULE
 		extWLRec toExtWatchList(risk_indicators.layouts.layout_watchlists L,INTEGER seq) := TRANSFORM
 			SELF.table := L.watchlist_table;
 			SELF.recordnumber := L.watchlist_record_number;
-			SELF.name.first := stringlib.stringtouppercase(L.watchlist_fname);
-			SELF.name.last := stringlib.stringtouppercase(L.watchlist_lname);
+			SELF.name.first := stringlib.stringtouppercase((string)L.watchlist_fname);
+			SELF.name.last := stringlib.stringtouppercase((string)L.watchlist_lname);
 			SELF.address.streetaddress1 := stringlib.stringtouppercase(L.watchlist_address);
 			SELF.address.state := stringlib.stringtouppercase(L.watchlist_state);
 			SELF.address.city := stringlib.stringtouppercase(L.watchlist_city);
 			SELF.address.zip5 := L.watchlist_zip;
 			SELF.country := stringlib.stringtouppercase(L.watchlist_contry);
-			SELF.entityname := stringlib.stringtouppercase(L.watchlist_entity_name);
+			SELF.entityname := stringlib.stringtouppercase((string)L.watchlist_entity_name);
 			SELF.sequence := seq;
 			SELF.isCode32 := Risk_Indicators.rcSet.isCode32(L.watchlist_table,L.watchlist_record_number);
 			SELF.isCodeWL := Risk_Indicators.rcSet.isCodeWL(L.watchlist_table,L.watchlist_record_number);

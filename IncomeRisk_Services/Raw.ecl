@@ -1,4 +1,4 @@
-import  IncomeRisk_Services,iesp,business_risk, ut, PersonReports, doxie, autoheaderi, Gateway;
+﻿import  IncomeRisk_Services,iesp,business_risk, ut, PersonReports, doxie, autoheaderi, Gateway;
 
 export raw := module
 	  
@@ -331,12 +331,12 @@ export raw := module
         self.RecordNumber        := (string) choose(C,l.watchlist_Record_Number,l.watchlist_Record_Number_2,l.watchlist_Record_Number_3,
 					                               l.watchlist_Record_Number_4, l.watchlist_Record_Number_5, 
 																				 l.watchlist_Record_Number_6,l.watchlist_Record_Number_7);																						       
-        self.Name.First				 	 := choose(C, l.repwatchlist_fname,l.watchlist_fname_2, 
-						                                       l.watchlist_fname_3, l.watchlist_fname_4, l.watchlist_fname_5,
-																									  l.watchlist_fname_6, l.watchlist_fname_7); 
-				self.Name.Last           := choose(C, l.repwatchlist_lname,l.watchlist_lname_2, l.watchlist_lname_3,
-						                                       l.watchlist_lname_4, l.watchlist_lname_5,
-																									 l.watchlist_lname_6, l.watchlist_lname_7);						                            													           																	 										  
+        self.Name.First				 	 := choose(C, (string)l.repwatchlist_fname,(string)l.watchlist_fname_2, 
+						                                       (string)l.watchlist_fname_3, (string)l.watchlist_fname_4, (string)l.watchlist_fname_5,
+																									  (string)l.watchlist_fname_6, (string)l.watchlist_fname_7); 
+				self.Name.Last           := choose(C, (string)l.repwatchlist_lname,(string)l.watchlist_lname_2, (string)l.watchlist_lname_3,
+						                                       (string)l.watchlist_lname_4, (string)l.watchlist_lname_5,
+																									 (string)l.watchlist_lname_6, (string)l.watchlist_lname_7);						                            													           																	 										  
 				self.Address.StreetAddress1 := choose(C, l.watchlist_address, l.watchlist_address_2,l.watchlist_address_3, l.watchlist_address_4, 
 						                                     l.watchlist_address_5, l.watchlist_address_6, l.watchlist_address_7);												           
 				self.Address.City        := choose(C, l.watchlist_city, l.watchlist_city_2,l.watchlist_city_3, l.watchlist_city_4, 
@@ -347,8 +347,8 @@ export raw := module
 						                                  l.watchlist_zip_5, l.watchlist_zip_6, l.watchlist_zip_7);						       		 
 			  Self.Country             := choose(C, l.watchlist_country, l.watchlist_country_2, l.watchlist_country_3, l.watchlist_country_4,
 							                                l.watchlist_country_5, l.watchlist_country_6, l.watchlist_country_7);
-				Self.EntityName          := choose(C, l.watchlist_cmpy, l.watchlist_cmpy_2, l.watchlist_cmpy_3, l.watchlist_cmpy_4,
-							                                l.watchlist_cmpy_5, l.watchlist_cmpy_6, l.watchlist_cmpy_7);
+				Self.EntityName          := choose(C, (string)l.watchlist_cmpy, (string)l.watchlist_cmpy_2, (string)l.watchlist_cmpy_3, (string)l.watchlist_cmpy_4,
+							                                (string)l.watchlist_cmpy_5, (string)l.watchlist_cmpy_6, (string)l.watchlist_cmpy_7);
 				Self.Sequence            :=  (integer) choose(C, l.RepWatchlist_seq_1, l.RepWatchlist_seq_2, l.RepWatchlist_seq_3, l.RepWatchlist_seq_4,
 							                               l.RepWatchlist_seq_5, l.RepWatchlist_seq_6, l.RepWatchlist_seq_7);																						 
 				self := [];

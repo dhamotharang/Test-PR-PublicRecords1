@@ -1,4 +1,4 @@
-// for the different names for the subject perform a name search in the GlobalWatchlist data
+﻿// for the different names for the subject perform a name search in the GlobalWatchlist data
 import patriot, doxie, iesp;
 
 export CompPatriotSearch := function
@@ -24,9 +24,9 @@ export CompPatriotSearch := function
 iesp.globalwatchlist.t_GlobalWatchListSearchRecord gw_trans(a l) := transform 
 		self.PartyKey := l.pty_key;
 		self.datasource := l.source;
-		self.partyName := l.orig_pty_name;
+		self.partyName := (string)l.orig_pty_name;
 		self.maxmatchscore := (real8)l.score;
-		self.blockedcountry := l.blocked_country;
+		self.blockedcountry := (string)l.blocked_country;
 		self.recordtype := l.record_type;
     iesp.globalwatchlist.t_GlobalWatchListSearchAddress 
 				addr_trans1(Patriot.layout_search_out.address le):= transform
@@ -36,7 +36,7 @@ iesp.globalwatchlist.t_GlobalWatchListSearchRecord gw_trans(a l) := transform
 		end;
 
 		self.addresses := choosen(project(l.addresses,addr_trans1(left)),iesp.constants.Patriot.MaxAddresses);
-		self.akas := choosen(project(l.akas,transform(iesp.globalwatchlist.t_GlobalWatchListSearchAKA,self.partyname := left.orig_pty_name,self.MatchScore := (real8)left.score)),iesp.constants.Patriot.MaxAkas);
+		self.akas := choosen(project(l.akas,transform(iesp.globalwatchlist.t_GlobalWatchListSearchAKA,self.partyname := (string)left.orig_pty_name,self.MatchScore := (real8)left.score)),iesp.constants.Patriot.MaxAkas);
 		self.Remarks := choosen(project(l.remarks,transform(iesp.share.t_stringarrayitem,self.value := left.remark_v)),iesp.constants.Patriot.MaxRemarks); // dataset of remarks
 		self := l;
 	end;
