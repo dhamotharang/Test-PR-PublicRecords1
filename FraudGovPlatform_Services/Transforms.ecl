@@ -433,5 +433,23 @@ EXPORT Transforms := MODULE
 																											(STRING)FraudGovPlatform_Services.Utilities.Yesterday)[1..8] + '000000');
 
 				END;
+				
+		EXPORT FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_w_knownfraud(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw  L,
+																																				  FraudGovPlatform_Services.Layouts.KnownFrauds_rec R) := TRANSFORM
+
+			SELF.childRecs_KnownFrauds_raw := PROJECT(R, TRANSFORM(FraudGovPlatform_Services.Layouts.KnownFrauds_rec, SELF := LEFT));
+			SELF := L;
+			SELF := [];
+		END;
+				
+		EXPORT FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_w_velocities(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L,
+																																				   DATASET(FraudGovPlatform_Services.Layouts.velocities) R) := TRANSFORM
+			SELF.LexID := L.batchin_rec.did;
+			SELF.identity_resolved := IF(L.batchin_rec.did <> 0 , 'Y', 'N');			
+			SELF.batchin_rec := L;
+			SELF.childRecs_Velocities := R;
+			SELF := L; 
+			SELF := [];
+		END;
 	
 END;
