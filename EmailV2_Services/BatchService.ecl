@@ -8,6 +8,8 @@
   <part name="IndustryClass" type="xsd:string"/>
   <part name="DOBMask" type="xsd:string"/>
   <part name="SSNMask" type="xsd:string"/>
+  <part name="ResellerType" type="xsd:string"/>
+  <part name="IntendedUse" type="xsd:string"/>
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="Max_Results_Per_Acct" type="xsd:unsignedInt"/>  
   <part name="MaxResults" type="xsd:unsignedInt"/>
@@ -39,6 +41,8 @@ IMPORT AutoheaderV2, AutoKeyI, BatchShare, EmailV2_Services, Royalty;
                      'IndustryClass' , 
                      'DOBMask',
                      'SSNMask',  
+                     'ResellerType',  
+                     'IntendedUse',  
                      'batch_in', 
                      'MaxResults', 
                      'Max_Results_Per_Acct', 
