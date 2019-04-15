@@ -20,7 +20,6 @@ export t_EmailFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	integer ReturnCount {xpath('ReturnCount')};
 	integer StartingRecord {xpath('StartingRecord')};
 	string SearchType {xpath('SearchType')}; //values['EAA','EIA','EIC','']
-	string RestrictedUseCase {xpath('RestrictedUseCase')};
 	string EmailQualityRulesMask {xpath('EmailQualityRulesMask')};
 	boolean IncludeNoLexIdMatch {xpath('IncludeNoLexIdMatch')};
 	boolean IncludeHistoricData {xpath('IncludeHistoricData')};

@@ -23,6 +23,8 @@ EXPORT compliance := MODULE
       EXPORT string ssn_mask := ssn_mask_value;
       EXPORT unsigned1 dl_mask :=  dl_mask_val;
       EXPORT unsigned1 dob_mask := dob_mask_value;
+      EXPORT unsigned1 reseller_type := ^.reseller_type;
+      EXPORT unsigned1 intended_use := ^.intended_use;
     END;
     RETURN access;
   ENDMACRO;
@@ -47,6 +49,8 @@ EXPORT compliance := MODULE
       EXPORT string ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
       EXPORT unsigned1 dl_mask :=  AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.dl_mask_val.params));
       EXPORT unsigned1 dob_mask := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params));
+      EXPORT unsigned1 reseller_type := AutoStandardI.InterfaceTranslator.reseller_type_value.val(project(gm,AutoStandardI.InterfaceTranslator.reseller_type_value.params));;
+      EXPORT unsigned1 intended_use := AutoStandardI.InterfaceTranslator.intended_use_value.val(project(gm,AutoStandardI.InterfaceTranslator.intended_use_value.params));
     END;
     RETURN access;
   ENDMACRO;

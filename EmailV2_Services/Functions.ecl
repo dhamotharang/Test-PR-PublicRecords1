@@ -10,11 +10,11 @@ EXPORT Functions := MODULE
     fltrd_historic_recs := batch_in(in_mod.IncludeHistoricData OR is_current);  
     
     // filter by source, make sure data restrictions are enforced
-    // currently there is no restrictions of direct to consumer email sources
     restrict_DataMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase);
     
-    restrict_reseller := in_mod.isConsumer() OR  // data restriction indicators for reseller still needs to be clarified
+    restrict_reseller := in_mod.isResellerAccount() OR in_mod.isConsumer() OR // direct to consumer is subset of re-sellers 
                          $.Constants.RestrictedUseCase.isReseller(in_mod.RestrictedUseCase);
+
     fltrd_reseller_recs := IF(restrict_reseller,
                              JOIN(fltrd_historic_recs,Codes.Key_Codes_V3,KEYED(RIGHT.file_name = $.Constants.EMAIL_SOURCES) AND 
                                                           KEYED(RIGHT.field_name = $.Constants.RestrictedUseCase.Reseller) AND

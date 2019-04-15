@@ -308,7 +308,11 @@ EXPORT ECL2ESP := MODULE
 		  string10 DeathMasterPurpose := global(xml_in).DeathMasterPurpose;
 		  #stored('DeathMasterPurpose', DeathMasterPurpose);	
 			
-    // test data
+    string in_reseller_type := global(xml_in).ResellerType;
+    unsigned1 reseller_account_type := if (in_reseller_type = '', 0, (unsigned1) in_reseller_type); 
+    #stored('ResellerType', reseller_account_type);
+
+   // test data
     #stored ('TestDataEnabled', xml_in.TestDataEnabled);
     #stored ('TestDataTableName', xml_in.TestDataTableName);
     return output (dataset ([],{integer x}), named('__internal__'), extend);
@@ -350,6 +354,10 @@ EXPORT ECL2ESP := MODULE
     #stored ('phoneticmatch', UsePhonetics);
     boolean StrictMatch := global(tag_searchex).StrictMatch;  //def=false
     #stored ('StrictMatch', StrictMatch);
+    string in_usecase := global(tag_searchex).IntendedUse;
+    unsigned1 IntendedUse := if (in_usecase = '', 0, (unsigned1) in_usecase); 
+    #stored('IntendedUse', IntendedUse);
+
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   END;
   
