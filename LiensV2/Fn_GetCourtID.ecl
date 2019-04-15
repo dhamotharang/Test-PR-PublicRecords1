@@ -42,10 +42,10 @@ rMainWCourtIDs t_court_id1(dMainWCourtidBF l) := transform
  self.courtId_derived   := ValidCourtid;
  STRING7 courtId_lookup := HG_Court(TRIM(L.agency,left,right));
  self.courtId_lookup    := courtId_lookup;
- self.courtId     := MAP( ValidCourtid <> '' => ValidCourtid,
-                          courtId_lookup = L.courtId_Backfill => courtId_lookup,
-													L.courtId_Backfill ='' and courtId_lookup <> '' => courtId_lookup,
-																'');                                       
+ self.courtId           := MAP(ValidCourtid <> '' => ValidCourtid,
+                               courtId_lookup = L.courtId_Backfill and L.courtId_Backfill <> ''=> courtId_lookup,
+													     courtId_lookup <> '' => courtId_lookup,
+															 '');
  self := l;
  end;
 
