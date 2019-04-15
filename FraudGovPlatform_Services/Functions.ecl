@@ -433,14 +433,9 @@ EXPORT Functions := MODULE
 											SELF := []),
 									LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
 
-		ds_payload_recs := FraudGovPlatform_Services.fn_GetPayloadRecords(ds_rids, fraud_platform);
+		ds_payload_recs := FraudGovPlatform_Services.fn_GetPayloadRecords(ds_rids, batch_params, fraud_platform:= fraud_platform);
 
-		// *** No filtering in FraudGov
-		ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_payload_recs);
-		
-		ds_FilterThruMBS := FraudShared_Services.FilterThruMBS(ds_recs_pulled, batch_params.GlobalCompanyId, batch_params.IndustryType, batch_params.ProductCode, DATASET([],iesp.frauddefensenetwork.t_FDNIndType), DATASET([],iesp.frauddefensenetwork.t_FDNFileType), fraud_platform);
-
-		ds_payload_recs_sorted := SORT(ds_FilterThruMBS, did, -event_date, record);
+		ds_payload_recs_sorted := SORT(ds_payload_recs, did, -event_date, record);
 
 		FraudShared_Services.Layouts.Raw_Payload_rec xformRollup(FraudShared_Services.Layouts.Raw_Payload_rec L, FraudShared_Services.Layouts.Raw_Payload_rec R) := transform
 				//We wanted to keep the record which has good address, instead of first non blank address...
@@ -726,15 +721,10 @@ EXPORT Functions := MODULE
 														SELF := RIGHT),
 													LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 
-		//this is a temporary fix and will be resolved when analytics data sharing is corrected in KEL BUILD.
-		//Leaving the SORT dedup after the fix will not effect the results since the fix will result in NO duplicates in KEL Index.
-		ds_clusterdetails_dedup := DEDUP(SORT(ds_clusterdetails, entity_context_uid_, tree_uid_, -__recordcount),
-																 entity_context_uid_, tree_uid_);		
-
 		// output(ds_entityNameUID, named('ds_entityNameUID____getClusterDetails')); 
 		// output(ds_clusterdetails, named('ds_clusterdetails____getClusterDetails'));
 		// output(ds_clusterdetails_dedup, named('ds_clusterdetails_dedup____getClusterDetails'));
-		RETURN ds_clusterdetails_dedup;											 
+		RETURN ds_clusterdetails;											 
 	ENDMACRO;	
 	
 	EXPORT getAssociatedAddresses (DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_payload) := FUNCTION

@@ -9,35 +9,53 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		SHARED FraudGovKelConst_ := FraudGovConst_.KEL_ENTITY_TYPE;
 		SHARED FraudGovFragConst_ := FraudGovConst_.Fragment_Types;
 		SHARED File_Type_Const := FraudGovConst_.PayloadFileTypeEnum;		
-		                
-		SHARED ds_batch := FraudGovPlatform_Services.BatchRecords(ds_in, batch_params).ds_results_report;
 		
-		SHARED all_knownfrauds := FraudGovPlatform_Services.Functions.getKnownFrauds(ds_batch);
-		SHARED fdn_knownfrauds := all_knownfrauds(event_type = FraudShared_Services.Constants.Platform.FDN);
-		
-		SHARED ds_batch_w_ExternalServices := FraudGovPlatform_Services.BatchRecords(ds_in, batch_params).ds_reportFromBatchServices;
-		SHARED ds_realtime_tmp := mod_RealTimeScoring(ds_batch_w_ExternalServices, batch_params);
+		SHARED ds_batch_w_ExternalServices := IF(~batch_params.IsOnline OR batch_params.UseAllSearchFields,
+																						FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_in, batch_params),
+																						PROJECT(ds_in,TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw,
+																																				SELF.batchin_rec := LEFT,
+																																				SELF := [])
+																									)
+																						);
+																						
+		SHARED ds_realtime_tmp := FraudGovPlatform_Services.mod_RealTimeScoring(ds_batch_w_ExternalServices, batch_params);
 		
 		SHARED ds_indicatorAttributes_realtime_raw := ds_realtime_tmp.WeightedResult;
 		SHARED ds_scoreBreakdown_realtime_raw := ds_realtime_tmp.ScoreBreakdownAggregate;
 		SHARED ds_realtimeScore_raw := ds_realtime_tmp.ds_w_realTimeScore;
 		
-		/*  Getting all the known frauds */
-		knownfraud_temp_rec := RECORD
-				INTEGER KnownRiskCount := COUNT(GROUP);
-				DATASET(iesp.share.t_StringArrayItem) KnownRiskReasons := PROJECT(all_knownfrauds, TRANSFORM({iesp.share.t_StringArrayItem}, SELF.value := LEFT.known_risk_reason));
-		END;
-
-		SHARED all_knownfrauds_slimmed := TABLE(all_knownfrauds, knownfraud_temp_rec);
-		SHARED all_knownfrauds_final := PROJECT(all_knownfrauds_slimmed, 
-																			TRANSFORM(iesp.fraudgovreport.t_FraudGovKnownRisk,
-																				SELF.KnownRiskCount := LEFT.KnownRiskCount,
-																				SELF.KnownRiskReasons := CHOOSEN(LEFT.KnownRiskReasons, batch_params.MaxKnownFrauds)));
+		
 
 		/* For A Element that's passed as input to report service. */
-		ds_payload := FraudGovPlatform_Services.BatchRecords(ds_in, batch_params).ds_payload;
+		SHARED ds_payload := FraudGovPlatform_Services.Raw_Records(ds_in, batch_params);
+		
+		
+		ds_payload_KNFD := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.KnownFraud); 
+		ds_reportKnownFrauds := FraudGovPlatform_Services.Functions.getKnownFraudRecs(ds_in, batch_params, ds_payload_KNFD);
 
-		ds_batch_in_extended := PROJECT(ds_in, FraudShared_Services.Layouts.BatchInExtended_rec);
+		//**
+		//** Velocities goes here
+		//**
+		ds_payload_IDDT := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity);
+		ds_Velocities := FraudGovPlatform_Services.Functions.getVelocityRecs(ds_in, batch_params, ds_payload_IDDT);
+
+		//**
+		//** Assemble the pieces
+		//**
+		
+
+		ds_w_known_frauds := JOIN(ds_batch_w_ExternalServices, ds_reportKnownFrauds,
+														LEFT.acctno = RIGHT.acctno,
+														FraudGovPlatform_Services.Transforms.xfm_w_knownfraud(LEFT,RIGHT),
+														LEFT OUTER);
+														
+		SHARED ds_w_velocities := DENORMALIZE(ds_w_known_frauds, ds_Velocities, 
+																						LEFT.acctno = RIGHT.acctno,
+																						GROUP,
+																						FraudGovPlatform_Services.Transforms.xfm_w_velocities(LEFT, ROWS(RIGHT)),
+																						LEFT OUTER);
+																				
+		SHARED ds_batch_in_extended := PROJECT(ds_in, FraudShared_Services.Layouts.BatchInExtended_rec);
 		
 		ds_fragment_recs_w_value := FraudGovPlatform_Services.Functions.GetFragmentRecs(ds_batch_in_extended, ds_payload, batch_params);
 
@@ -51,23 +69,48 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 
 		ds_fragment_recs_sorted := SORT(ds_fragment_recs_w_value, fragment_value, fragment, file_type, -date);
 		ds_fragment_recs_grouped := GROUP(ds_fragment_recs_sorted, fragment_value, fragment);
-		ds_fragment_recs_rolled := ROLLUP(ds_fragment_recs_grouped, GROUP, do_Rollup(LEFT, ROWS(LEFT)));
+		
+		SHARED ds_fragment_recs_rolled := ROLLUP(ds_fragment_recs_grouped, GROUP, do_Rollup(LEFT, ROWS(LEFT)));
 	
-		ds_entityNameUID := FraudGovPlatform_Services.Utilities.getAnalyticsUID(ds_fragment_recs_rolled);
+		SHARED ds_entityNameUID := FraudGovPlatform_Services.Utilities.getAnalyticsUID(ds_fragment_recs_rolled);
 
+		/* Returning Element or Identity Score and related clusters and related identities. */
+		SHARED ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
+
+		/* Getting the element and identity socre where Identity or Element is center of their cluster. */
+		SHARED ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
+		
+		SHARED ds_api_results_w_scores := JOIN(ds_w_velocities, ds_cluster_recs_scores(entity_name=FraudGovFragConst_.PERSON_FRAGMENT), 
+																LEFT.acctno = RIGHT.acctno,
+																	TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw, 
+																		SELF.risk_score := RIGHT.Score_,
+																		SELF.risk_level := FraudGovPlatform_Services.Utilities.GetRiskLevel(RIGHT.Score_),
+																		SELF := LEFT),
+																		LEFT OUTER
+																);
+																
+		SHARED all_knownfrauds := FraudGovPlatform_Services.Functions.getKnownFrauds(ds_api_results_w_scores);
+		SHARED fdn_knownfrauds := all_knownfrauds(event_type = FraudShared_Services.Constants.Platform.FDN);
+		
+		/*  Getting all the known frauds */
+		knownfraud_temp_rec := RECORD
+				INTEGER KnownRiskCount := COUNT(GROUP);
+				DATASET(iesp.share.t_StringArrayItem) KnownRiskReasons := PROJECT(all_knownfrauds, TRANSFORM({iesp.share.t_StringArrayItem}, SELF.value := LEFT.known_risk_reason));
+		END;
+
+		SHARED all_knownfrauds_slimmed := TABLE(all_knownfrauds, knownfraud_temp_rec);
+		SHARED all_knownfrauds_final := PROJECT(all_knownfrauds_slimmed, 
+																			TRANSFORM(iesp.fraudgovreport.t_FraudGovKnownRisk,
+																				SELF.KnownRiskCount := LEFT.KnownRiskCount,
+																				SELF.KnownRiskReasons := CHOOSEN(LEFT.KnownRiskReasons, batch_params.MaxKnownFrauds)));
+																				
 		ds_delta_recentActivity := FraudGovPlatform_Services.mod_Deltabase_Functions(batch_params).getDeltabaseReportRecords(ds_batch_in_extended);
 
-		ds_recentTransactions_sorted := IF(batch_params.IsOnline AND batch_params.UseAllSearchFields,
+		SHARED ds_recentTransactions_sorted := IF(batch_params.IsOnline AND batch_params.UseAllSearchFields,
 																	SORT(ds_delta_recentActivity(UniqueId = (STRING)ds_in[1].did),-eventDate.year, -eventDate.Month, -eventDate.day),
 																	SORT(ds_delta_recentActivity,-eventDate.year, -eventDate.Month, -eventDate.day));
 
-		numOfDeltabaseTransactions := COUNT(ds_recentTransactions_sorted);	
-
-		/* Returning Element or Identity Score and related clusters and related identities. */
-		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
-
-		/* Getting the element and identity socre where Identity or Element is center of their cluster. */
-		ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
+		SHARED numOfDeltabaseTransactions := COUNT(ds_recentTransactions_sorted);	
 		
 		ds_ElementcardDetail_w_score := JOIN(ds_fragment_recs_rolled, ds_cluster_recs_scores,
 																			LEFT.fragment = RIGHT.entity_name AND
@@ -160,7 +203,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		
 		IsRealTime := IF(batch_params.IsOnline, 
 										batch_params.UseAllSearchFields, 
-										ds_batch[1].identity_resolved = 'Y' AND NOT EXISTS(ds_contributoryBest) AND 
+										ds_api_results_w_scores[1].identity_resolved = 'Y' AND NOT EXISTS(ds_contributoryBest) AND 
 										(ds_ElementcardDetail_w_score[1].ScoreDetails.ElementType = FraudGovConst_.Fragment_Types.PERSON_FRAGMENT
 										OR ds_ElementcardDetail_w_score[1].ScoreDetails.ElementType = ''));
 		/*
@@ -227,32 +270,32 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 
 		/* Transforming the report response, by assembling all the pieces together */
 		iesp.fraudgovreport.t_FraudGovRecord xform_response() := TRANSFORM
-			SELF.RiskScore := IF(~IsRealTime, ds_batch[1].risk_score, ds_realtimeScore_raw[1].risk_score);
-			SELF.RiskLevel := IF(~IsRealTime, ds_batch[1].risk_level, ds_realtimeScore_raw[1].risk_level);
-			SELF.IdentityResolved := IF(~IsRealTime,ds_batch[1].identity_resolved,FraudGovConst_.IDENTITY_RESOLVED_REALTIME);
-			SELF.LexID := ds_batch[1].lexid;
+			SELF.RiskScore := IF(~IsRealTime, ds_api_results_w_scores[1].risk_score, ds_realtimeScore_raw[1].risk_score);
+			SELF.RiskLevel := IF(~IsRealTime, ds_api_results_w_scores[1].risk_level, ds_realtimeScore_raw[1].risk_level);
+			SELF.IdentityResolved := IF(~IsRealTime,ds_api_results_w_scores[1].identity_resolved,FraudGovConst_.IDENTITY_RESOLVED_REALTIME);
+			SELF.LexID := ds_api_results_w_scores[1].lexid;
 
 			SELF.Deceased := IF(~batch_params.IsOnline, 
-													ROW(FraudGovPlatform_Services.Transforms.xform_deceased(ds_batch.childRecs_Death[1])), 
+													ROW(FraudGovPlatform_Services.Transforms.xform_deceased(ds_api_results_w_scores.childRecs_Death[1])), 
 													ROW([], iesp.fraudgovreport.t_FraudGovDeceased));
 			
 			SELF.Criminals :=	IF(~batch_params.IsOnline,
-													PROJECT(CHOOSEN(ds_batch.childRecs_Criminal, batch_params.MaxCriminals),
+													PROJECT(CHOOSEN(ds_api_results_w_scores.childRecs_Criminal, batch_params.MaxCriminals),
 																		FraudGovPlatform_Services.Transforms.xform_criminal(LEFT, COUNTER)),
 													DATASET([], iesp.fraudgovreport.t_FraudGovCriminal));
 
 			SELF.RedFlags := IF(~batch_params.IsOnline,
-												PROJECT(CHOOSEN(ds_batch.childRecs_RedFlag, batch_params.MaxRedFlags), 
+												PROJECT(CHOOSEN(ds_api_results_w_scores.childRecs_RedFlag, batch_params.MaxRedFlags), 
 																	FraudGovPlatform_Services.Transforms.xform_red_flag(LEFT)),
 												DATASET([], iesp.fraudgovreport.t_FraudGovRedFlag));
 													
 			SELF.GlobalWatchlists := IF(~batch_params.IsOnline, 
-																	PROJECT(CHOOSEN(ds_batch.childRecs_Patriot, batch_params.MaxGlobalWatchlists),
+																	PROJECT(CHOOSEN(ds_api_results_w_scores.childRecs_Patriot, batch_params.MaxGlobalWatchlists),
 																					FraudGovPlatform_Services.Transforms.xform_global_watchlist(LEFT, COUNTER)),
 																	DATASET([], iesp.fraudgovreport.t_FraudGovGlobalWatchlist));
 																															
 			SELF.Velocities :=	IF(~batch_params.IsOnline, 
-														PROJECT(CHOOSEN(ds_batch.childRecs_velocities, batch_params.MaxVelocities), 
+														PROJECT(CHOOSEN(ds_api_results_w_scores.childRecs_velocities, batch_params.MaxVelocities), 
 																		FraudGovPlatform_Services.Transforms.xform_velocities(LEFT)),
 														DATASET([], iesp.fraudgovreport.t_FraudGovVelocity));
 			
@@ -303,7 +346,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		
 		// output(batch_params,named('batch_params'));
 		// output(ds_in,named('ds_in'));
-		// output(ds_delta_recentActivity,named('ds_delta_recentActivity'));
+		// output(ds_w_velocities,named('ds_w_velocities'));
 		// output(ds_recentTransactions_sorted,named('ds_recentTransactions_sorted'));
 		// output(ds_realtimeEventScore,named('ds_realtimeEventScore'));
 		// output(ds_realtimeScore_raw,named('ds_realtimeScore'));
