@@ -239,7 +239,7 @@ EXPORT Layouts := MODULE
 		END;
 	
 		EXPORT validate_record := record
-			string8		reported_date	:= '';
+			string75	reported_date	:= '';
 			string20	lexid	:= '';
 			string100	raw_full_name	:= '';
 			string25 	raw_First_name	:= '';
@@ -485,6 +485,8 @@ EXPORT Layouts := MODULE
 	EXPORT CustomerSettings := record 
 		string20 	Customer_Account_Number;
 		string2 	Customer_State;
+		string 		Customer_Agency_Vertical_Type;
+		string1 	Customer_Program;
 		unsigned3 	file_type;
 		unsigned6 	ind_type;
 		boolean 	Anonymize_Data;
@@ -494,6 +496,12 @@ EXPORT Layouts := MODULE
 		unsigned6 	fdn_file_info_id;
 	end;
 
+
+	EXPORT CustomerMappings := RECORD
+		unsigned6	fdn_file_info_id;
+		string20	contribution_source;
+		string		contribution_gc_id;
+	END;
 	export Flags := module
 
 		export FraudgovInfoRec := RECORD
@@ -508,7 +516,9 @@ EXPORT Layouts := MODULE
 		
 		export SkipModules := RECORD
 			//General Processes
+			boolean SkipInputBuild;
 			boolean SkipBaseBuild;
+			boolean SkipMainBuild;
 			boolean SkipBaseRollback;
 			boolean SkipKeysBuild;
 			//Sub-processes
@@ -518,6 +528,14 @@ EXPORT Layouts := MODULE
 			boolean SkipKelBuild;
 			boolean SkipOrbitBuild;
 			boolean SkipDashboardsBuild;
+
+			boolean SkipMBS;
+			boolean SkipDeltabase;
+			boolean SkipScrubs;
+			boolean SkipRefreshHeader;
+			boolean SkipRefreshAddresses;
+			boolean SkipGarbageCollector;
+
 		END;
 
 		export SkipValidationByGCID	 := RECORD
