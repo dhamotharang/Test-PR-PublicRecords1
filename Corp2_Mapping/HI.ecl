@@ -1,4 +1,4 @@
-import corp2,corp2_mapping,corp2_raw_hi,scrubs,scrubs_corp2_mapping_hi_ar,
+﻿import corp2,corp2_mapping,corp2_raw_hi,scrubs,scrubs_corp2_mapping_hi_ar,
 			 scrubs_corp2_mapping_hi_event,scrubs_corp2_mapping_hi_main,scrubs_corp2_mapping_hi_stock,
 			 std,tools,ut,versioncontrol; 			 
 
@@ -615,15 +615,13 @@ export HI := MODULE
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_HI Report' //subject
 																															,'Scrubs CorpAR_HI Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'Corp'+state_origin+'ARScrubsReport.csv'																															
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																														);
 
 		AR_BadRecords				 := AR_N.ExpandedInFile(
 																								corp_key_Invalid							  			<> 0 or

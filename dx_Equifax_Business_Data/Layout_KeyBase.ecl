@@ -1,4 +1,4 @@
-﻿IMPORT Address, AID, BIPV2;
+﻿IMPORT Address, BIPV2;
 
 EXPORT Layout_KeyBase := RECORD
     STRING6    										source                            := '';

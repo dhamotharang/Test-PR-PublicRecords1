@@ -15,7 +15,7 @@ module
 	export	string		VRulesLandingZonePathBase	:=	'/data/otto/velocityrules/';
 	
 	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dev';
-	export	string 		MBSLandingZonePathBase_prod	:='/data/super_credit/fraudgov/in/mbs/prod';
+	export	string 		MBSLandingZonePathBase_prod	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
 	
 	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in/mbs/dev';
 	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in/mbs/prod';

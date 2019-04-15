@@ -1,12 +1,8 @@
 ﻿IMPORT  address, ut, header_slimsort, did_add, didville,AID,_validate,NID;
 
-export Build_base(string ver) := module
+export Build_base(string ver, boolean IsFullUpdate = false) := module
 
-#IF (IsFullUpdate = true)
-	Exprn_credit := Files.load_in;
-#ELSE
-	Exprn_credit := Files.update_in;
-#END
+Exprn_credit := if(IsFullUpdate, Files.load_in, Files.update_in);
 // Prepped_rec_type[1]:
 // 0=current name
 // 1=former name1
@@ -246,44 +242,40 @@ preprocess2 := distribute(preprocess1,hash(EXPERIAN_ENCRYPTED_PIN));
 preprocess  := dedup(preprocess2,record,except prepped_rec_type,all,local):persist('~thor_data400::persist::FCRA_ExperianCred_clean');
 
 
-#IF (IsFullUpdate = true)
+base_and_update_full := preprocess;
 
-	base_and_update := preprocess;
+cur_base_d   := distribute(project(Files.Base, transform(Layouts.base, self.did := 0, self := left)), hash(EXPERIAN_ENCRYPTED_PIN));
+cur_update_d := dedup(distribute(preprocess, hash(EXPERIAN_ENCRYPTED_PIN)),record,all,local);
+cur_deletes_d := dedup(distribute(Files.Deletes_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
+cur_deceased_d := dedup(distribute(Files.Deceased_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
 
-#ELSE
+apply_updates := join(cur_base_d, dedup(cur_update_d,EXPERIAN_ENCRYPTED_PIN,all,local)
+                                    ,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
+                                    ,left only
+                                    ,local)
+                                    +
+                                    cur_update_d
+                                    ;
 
-	cur_base_d   := distribute(project(Files.Base, transform(Layouts.base, self.did := 0, self := left)), hash(EXPERIAN_ENCRYPTED_PIN));
-	cur_update_d := dedup(distribute(preprocess, hash(EXPERIAN_ENCRYPTED_PIN)),record,all,local);
-	cur_deletes_d := dedup(distribute(Files.Deletes_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
-	cur_deceased_d := dedup(distribute(Files.Deceased_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
+apply_deletes := join(distribute(apply_updates,hash(EXPERIAN_ENCRYPTED_PIN)), cur_deletes_d
+                                ,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
+                        ,transform(Layouts.base
+                            ,self.IsDelete := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN,true,left.IsDelete)
+                            ,self:= left)
+                        ,left outer
+                        ,local);
 
-	apply_updates := join(cur_base_d, dedup(cur_update_d,EXPERIAN_ENCRYPTED_PIN,all,local)
-										,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
-										,left only
-										,local)
-										+
-										cur_update_d
-										;
+apply_deceased := join(apply_deletes, cur_deceased_d
+                                ,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
+                        ,transform(Layouts.base
+                            ,self.IsDeceased := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN and left.Prepped_rec_type<>'400',true,left.IsDeceased)
+                            ,self:= left)
+                        ,left outer
+                        ,local);
 
-	apply_deletes := join(distribute(apply_updates,hash(EXPERIAN_ENCRYPTED_PIN)), cur_deletes_d
-									,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
-							,transform(Layouts.base
-								,self.IsDelete := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN,true,left.IsDelete)
-								,self:= left)
-							,left outer
-							,local);
+base_and_update_delta := apply_deceased;
 
-	apply_deceased := join(apply_deletes, cur_deceased_d
-									,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
-							,transform(Layouts.base
-								,self.IsDeceased := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN and left.Prepped_rec_type<>'400',true,left.IsDeceased)
-								,self:= left)
-							,left outer
-							,local);
-
-	base_and_update := apply_deceased;
-
-#END
+base_and_update := if(IsFullUpdate, base_and_update_full, base_and_update_delta);
 
 EN_ready := base_and_update;
 //-----------------------------------------------------------------
