@@ -360,6 +360,7 @@ MODULE
 																		SELF.PortingCode	 := LEFT.PortingCode,
 																		SELF.PortingHistory:= LEFT.PortingHistory,
 																		SELF             	 := LEFT.RealTimePhone_Ext,
+                                    SELF.phone_state   := '',
 																		SELF             	 := LEFT));
 		
 		//creates a more consistent output by matching the logic in GetIdentityInfo
@@ -594,6 +595,7 @@ MODULE
 																		SELF.dt_last_seen  := (UNSIGNED4)LEFT.dt_last_seen,
 																		SELF.PortingCode   := LEFT.PortingCode,
 																		SELF             	 := LEFT.RealTimePhone_Ext,
+                                    SELF.phone_state   := '',
 																		SELF             	 := LEFT));
 		
 		dPhoneSort := SORT(dPhoneSlim(typeflag != Phones.Constants.TypeFlag.DataSource_PV),acctno,phone);
