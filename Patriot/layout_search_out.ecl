@@ -1,4 +1,4 @@
-export layout_search_out := MODULE
+﻿export layout_search_out := MODULE
 
 export address :=
 RECORD
@@ -22,7 +22,7 @@ END;
 
 export aka :=
 RECORD
-	STRING350 orig_pty_name;
+	UNICODE350 orig_pty_name;
 	STRING5 score;
 END;
 
@@ -31,9 +31,9 @@ RECORD
 	STRING5 score;
 	STRING20 pty_key;
 	STRING60 source;
-	STRING350 orig_pty_name;
+	UNICODE350 orig_pty_name;
 	STRING1 record_type := '';
-	STRING100 blocked_country;
+	UNICODE100 blocked_country;
 	DATASET(aka) AKAs {MAXCOUNT(10)};
 	DATASET(address) Addresses {MAXCOUNT(10)};
 	DATASET(remark) Remarks {MAXCOUNT(30)};

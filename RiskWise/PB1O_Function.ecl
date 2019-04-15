@@ -246,13 +246,13 @@ xlayout filloutput(biid_results le, indata rt) := transform
 	self.cmpyyear := '';  // not populated in st. cloud	
 	self.cmpyhriskalerttable := if(le.watchlist_table!='', 'OFC', '');
 	self.cmpyhriskalertnum := if(le.watchlist_table='', '', le.watchlist_record_number[5..10]);
-	self.cmpyalertfirst := le.watchlist_fname;
-	self.cmpyalertlast := le.watchlist_lname;
+	self.cmpyalertfirst := (string)le.watchlist_fname;
+	self.cmpyalertlast := (string)le.watchlist_lname;
 	self.cmpyalertaddr := le.watchlist_address;
 	self.cmpyalertcity := le.watchlist_city;
 	self.cmpyalertstate := le.watchlist_state;
 	self.cmpyalertzip := le.watchlist_zip;
-	self.cmpyalertentity := le.watchlist_cmpy;
+	self.cmpyalertentity := (string)le.watchlist_cmpy;
 	self.socsverlevel := le.RepNAS_Score;
 	self.phoneverlevel := le.RepNAP_Score;
 	self.authreplinkflag := '';  // could use AR2BI here, but in st. cloud, it isn't populated, so we need to leave it blank
@@ -303,13 +303,13 @@ xlayout filloutput(biid_results le, indata rt) := transform
 	self.dist5 := if(le.dist_homeaddr_busphone=9999, '',(string)le.dist_homeaddr_busphone);
 	self.hriskalerttable := if(le.repwatchlist_table!='', 'OFC', '');
 	self.hriskalertnum := if(le.repwatchlist_table='', '', le.repwatchlist_record_number[5..10]);
-	self.alertfirst := le.repwatchlist_fname;
-	self.alertlast := le.repwatchlist_lname;
+	self.alertfirst := (string)le.repwatchlist_fname;
+	self.alertlast := (string)le.repwatchlist_lname;
 	self.alertaddr := le.repwatchlist_address;
 	self.alertcity := le.repwatchlist_city;
 	self.alertstate := le.repwatchlist_state;
 	self.alertzip := le.repwatchlist_zip;
-	self.alertentity := le.repwatchlist_entity_name;
+	self.alertentity := (string)le.repwatchlist_entity_name;
 	
 	self.rep_ris := RiskWise.Bus_patriotReasonCodes(self, le, 6, ofac); 	
 	self.reason9 := self.rep_ris[1].hri;	

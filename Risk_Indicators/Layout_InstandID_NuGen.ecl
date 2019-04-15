@@ -103,8 +103,8 @@ RECORD, MAXLENGTH(24100)
 	STRING60 Watchlist_Table;
 	STRING120 Watchlist_Program;
 	STRING10 Watchlist_Record_Number;
-	STRING20 Watchlist_fname;
-	STRING20 Watchlist_lname;
+	UNICODE20 Watchlist_fname;
+	UNICODE20 Watchlist_lname;
 	STRING65 Watchlist_address;
 	// parsed watchlist address
 	STRING10 WatchlistPrimRange;
@@ -118,7 +118,7 @@ RECORD, MAXLENGTH(24100)
 	STRING2 Watchlist_state;
 	STRING5 Watchlist_zip;
 	STRING30 Watchlist_contry;
-	STRING200 Watchlist_Entity_Name;
+	UNICODE200 Watchlist_Entity_Name;
 	DATASET(Models.layouts.Layout_Model_IID) models {maxcount(3)};
 	riskwise.layouts.red_flags_online_layout Red_Flags;
 	UNSIGNED1 RecordCount;

@@ -292,13 +292,13 @@ RiskWise.Layout_NPTO format_out(Risk_Indicators.Layout_Output le) := TRANSFORM
 									
 	self.hriskalerttable := if(le.watchlist_table<>'', 'OFC', '');
 	self.hriskalertnum := if(le.watchlist_table<>'' , le.Watchlist_Record_Number[5..10], '');
-	self.alertfirst := le.Watchlist_fname;
-	self.alertlast := le.Watchlist_lname;
+	self.alertfirst := (string)le.Watchlist_fname;
+	self.alertlast := (string)le.Watchlist_lname;
 	self.alertaddr := le.Watchlist_address;
 	self.alertcity := le.Watchlist_city;
 	self.alertstate := le.Watchlist_state;
 	self.alertzip := le.Watchlist_zip;
-	self.alertentity := le.Watchlist_Entity_Name;
+	self.alertentity := (string)le.Watchlist_Entity_Name;
 	
 	verlast := if(le.socsverlevel in [2,5,7,8,9,11,12] OR le.phoneverlevel in [2,5,7,8,9,11,12], le.combo_last, '');
 	veraddr := if(le.socsverlevel in [3,5,6,8,10,11,12] OR le.phoneverlevel in [3,5,6,8,10,11,12], 

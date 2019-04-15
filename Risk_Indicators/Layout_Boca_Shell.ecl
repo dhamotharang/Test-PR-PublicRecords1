@@ -439,15 +439,15 @@ RECORD
 	
 	STRING60 watchlist_table := '';
 	STRING10 watchlist_record_number := '';
-	STRING20 watchlist_fname := '';
-	STRING20 watchlist_lname := '';
+	UNICODE20 watchlist_fname := '';
+	UNICODE20 watchlist_lname := '';	
 	STRING50 watchlist_address := '';
 	STRING30 watchlist_city := '';
 	STRING2 watchlist_state := '';
 	STRING9 watchlist_zip := '';
 	BOOLEAN watchlistHit := false;
 
-	STRING50 watchlist_entity_name := '';
+	UNICODE50 watchlist_entity_name := '';
 	
 	STRING30 wphonename := '';
 	STRING50 wphoneaddr := '';

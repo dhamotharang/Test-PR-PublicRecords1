@@ -5,6 +5,15 @@
 import iesp; 
 
 export businessinstantid20 := MODULE
+
+export t_UnicodeName := record
+	unicode62 Full {xpath('Full')}; // Xsd type: string
+	unicode20 First {xpath('First')}; // Xsd type: string
+	unicode20 Middle {xpath('Middle')}; // Xsd type: string
+	unicode20 Last {xpath('Last')}; // Xsd type: string
+	unicode5 Suffix {xpath('Suffix')}; // Xsd type: string
+	unicode3 Prefix {xpath('Prefix')}; // Xsd type: string
+end;
 			
 export t_BIID20Company := record
 	string100 CompanyName {xpath('CompanyName')};
@@ -147,11 +156,11 @@ export t_BIID20WatchList := record
 	string60 Table {xpath('Table')};
 	string50 Program {xpath('Program')};
 	string30 RecordNumber {xpath('RecordNumber')};
-	string120 CompanyName {xpath('CompanyName')};
-	iesp.share.t_Name Name {xpath('Name')};
+	unicode120 CompanyName {xpath('CompanyName')};
+	t_UnicodeName Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
 	string30 Country {xpath('Country')};
-	string120 EntityName {xpath('EntityName')};
+	unicode120 EntityName {xpath('EntityName')};
 	string4 Sequence {xpath('Sequence')};
 end;
 		
