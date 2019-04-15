@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, Risk_Indicators, std, Models, MDR, header;
+﻿IMPORT DueDiligence, Risk_Indicators, std, Models, MDR, dx_header;
 
 EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -8,7 +8,6 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
   MAX_SCORE  := 999;
   COMMA      := '  ,';
   MODIFIER   := 'ie';
-  isFCRA     := false;
   DAYSINYEAR := 365.25;
   MOSINYEAR  := 12;  
   
@@ -226,7 +225,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF := [];));
                                 
   //***Select only records that match.
-  Temp_addr_hist := JOIN(Indicators, header.key_addr_hist(isFCRA),      
+  Temp_addr_hist := JOIN(Indicators, dx_header.key_addr_hist(),      
                            KEYED(LEFT.lexID = RIGHT.s_did), 
                            TRANSFORM({unsigned4 seq, unsigned6 LexID_temp, unsigned8 dob_temp, unsigned8 address_first_seen_date, unsigned3 address_history_seq, unsigned3 age;},
                                     SELF.seq                  := LEFT.seq;

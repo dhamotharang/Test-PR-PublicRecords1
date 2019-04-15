@@ -3,7 +3,7 @@
       impacting all the attributes that use that layout.
 */
 
-IMPORT Address, Autokey_batch, didville, doxie, header, NID, risk_indicators, Suppress, ut, 
+IMPORT Address, Autokey_batch, didville, doxie, header, dx_header, NID, risk_indicators, Suppress, ut, 
        VehicleV2, VehicleV2_Services, MDR;
 
 EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
@@ -184,12 +184,11 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
   //     NOTE: The coding below was cloned from the first part of BatchServices.Residents_Records
 	//     to get hdr recs directly from the header address key file.
  	
-	ds_keyhdraddr := doxie.Key_Header_Address;
-	layout_kha    := recordof(ds_keyhdraddr);
-	layout_header := header.Layout_Header;
+	ds_keyhdraddr := dx_header.Key_Header_Address();
+	layout_kha    := recordof(ds_keyhdraddr);// ... or dx_header.layouts.i_addr_hist;
 	layout_hdr_wacctno := record
 	  layout_batch_in.acctno;
-	  layout_header; //needed for use by Header.MAC_GlbClean_Header
+	  dx_header.layout_header; //needed for use by Header.MAC_GlbClean_Header
 	end;
 	
 	layout_hdr_wacctno xform_kha(layout_batch_in l, layout_kha r) := TRANSFORM
@@ -240,7 +239,7 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 
  	layout_hdr_recs_clnd hdr_rec_xform(layout_hdr_recs_clnd l, layout_hdr_recs_clnd r) := transform
 	  // accumulate the date range info
-		self.dt_last_seen  := ut.max2(r.dt_last_seen,l.dt_last_seen);
+		self.dt_last_seen  := MAX(r.dt_last_seen,l.dt_last_seen);
 		self.dt_first_seen := ut.min2(r.dt_first_seen,l.dt_first_seen); 
    	self               := l;
 		self               := []; 

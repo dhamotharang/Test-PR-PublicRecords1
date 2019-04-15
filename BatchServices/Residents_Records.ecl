@@ -1,4 +1,4 @@
-IMPORT DOXIE, AutoStandardI, header, ut;
+IMPORT doxie, AutoStandardI, header, dx_header, ut;
 
 rec_batch_in := BatchServices.Layouts.Resident.cln_batch_in;
 rec_batch_out := BatchServices.Layouts.Resident.batch_out;
@@ -12,10 +12,9 @@ export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interface
 // MultiUnitSearch is used by Best Address reverse search only
 	boolean MultiUnitSearch := in_mod.MultiUnitSearch;
 
-	res_key:=doxie.Key_Header_Address;
-	rec_hl := header.Layout_Header and not [lname,fname,mname,name_suffix,dob,dt_first_seen,dt_last_seen];
+	res_key:=dx_header.key_header_address();
 	Res_rec := record
-	  rec_hl;
+	  dx_header.layout_header and not [lname,fname,mname,name_suffix,dob,dt_first_seen,dt_last_seen];
 		rec_batch_out;
 	end;
 	

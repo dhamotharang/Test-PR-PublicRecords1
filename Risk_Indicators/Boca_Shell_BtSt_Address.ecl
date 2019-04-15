@@ -9,17 +9,17 @@ Common Addrs Shared Distance - btst_addr_dists_in_common - Total linear distance
 Common Addrs Unique Num States - btst_addr_states_in_common - Number of unique states found for common addresses
 */
 
-import Risk_Indicators, header, address, ut, RiskWise, doxie;
+import Risk_Indicators, dx_header, address, ut, RiskWise, doxie;
 
 export Boca_Shell_BtSt_Address(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input,
 	unsigned1 dppa, unsigned1 glb, string50 DataRestriction=Risk_Indicators.iid_constants.default_DataRestriction,
 	unsigned1 BSversion = 50) := FUNCTION
 
-	isFCRA := false;
+	//isFCRA := false;
 	input_unGrp := ungroup(input);
 	AddrHist := record
 		unsigned seq;
-		recordof(header.key_addr_hist(false));
+		dx_header.layouts.i_addr_hist;
 		integer unverified_addr_count := 0;
 		integer trusted_sources_count := 0;
 		integer occupancy_status := 0;		
@@ -81,7 +81,7 @@ export Boca_Shell_BtSt_Address(grouped dataset(Risk_Indicators.layout_ciid_btst_
 	// header_build_date := (unsigned)(dk[1].max_date_last_seen[1..6]);
 	
 	with_addr_history := join(btst_input, 
-	header.key_addr_hist(isFCRA), 
+	dx_header.key_addr_hist(), 
 	left.did<>0 and 
 	right.address_history_seq<>0 and  // ignore the bad fragments with address_history_seq=0
 	keyed(left.did=right.s_did) and right.date_first_seen < left.historydate, 

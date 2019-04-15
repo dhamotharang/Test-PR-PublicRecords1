@@ -1,4 +1,5 @@
-﻿IMPORT Address, AutoKey, BIPV2, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, Drivers, Gong, Header, MDR, Phones, Phonesplus_v2, Risk_Indicators, STD, Suppress, UT, Relationship;
+﻿IMPORT Address, AutoKey, BIPV2, Business_Risk, Data_Services, Business_Risk_BIP, DID_Add, Doxie, Drivers, Gong, dx_header,
+       MDR, Phones, Phonesplus_v2, Risk_Indicators, STD, Suppress, UT, Relationship;
 
 EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -144,8 +145,9 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DATASET({UNSIGNED6 LexID}) LexIDs;
 		DATASET({UNSIGNED4 Seq, BOOLEAN Rep1AddrMatched, BOOLEAN Rep2AddrMatched, BOOLEAN Rep3AddrMatched, BOOLEAN Rep4AddrMatched, BOOLEAN Rep5AddrMatched, STRING20 FName, STRING20 LName}) RepNames;
 	END;
-		
-	tempConsumerHeaderAddrAttributes getConsumerHeaderAddrAttributes(ShellSearchLayout le, Doxie.Key_Header_Address ri) := TRANSFORM
+
+  key_header_address := dx_header.key_header_address();	
+	tempConsumerHeaderAddrAttributes getConsumerHeaderAddrAttributes(ShellSearchLayout le, key_header_address ri) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.HistoryDate := le.HistoryDate;
 		SELF.Dt_First_Seen := ri.Dt_First_Seen;
@@ -211,7 +213,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	
 	
-	ConsumerHeaderAddrRaw := JOIN(ShellSearchRecords, Doxie.Key_Header_Address, 
+	ConsumerHeaderAddrRaw := JOIN(ShellSearchRecords, key_header_address, 
 																		(TRIM(LEFT.Prim_Name) <> '' AND TRIM(LEFT.Zip5) <> '' AND
 																		KEYED(LEFT.Prim_Name = RIGHT.prim_name AND LEFT.Zip5 = RIGHT.zip AND LEFT.Prim_Range = RIGHT.prim_range) AND
 																		LEFT.PreDir = RIGHT.predir AND LEFT.PostDir = RIGHT.postdir AND
@@ -220,7 +222,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																		ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
 																		RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND
 																		(MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-																			(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(Header.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+																			(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
 																		Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderAddrAttributes(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	
@@ -533,7 +535,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																			ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
 																			RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND
 																			(MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-																				(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(Header.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+																				(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
 																			Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	getConsumerHeaderDID(LEFT, RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	
@@ -1005,7 +1007,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
 																	RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND
 																	(MDR.Source_is_DPPA(RIGHT.src) = FALSE OR
-																		(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(Header.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
+																		(Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE /*isFCRA*/) AND Drivers.State_DPPA_OK(dx_header.functions.TranslateSource(RIGHT.src), Options.DPPA_Purpose, RIGHT.src))) AND
 																	Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st) = FALSE,
 																	TRANSFORM({UNSIGNED4 Seq, UNSIGNED3 HistoryDate, RECORDOF(RIGHT)}, SELF.Seq := LEFT.Seq, SELF.HistoryDate := LEFT.HistoryDate, SELF := RIGHT),
 																	ATMOST(Business_Risk_BIP.Constants.Limit_Default));

@@ -1,4 +1,5 @@
-import AutoStandardI,Census_data,codes,doxie,DriversV2,gong,iesp,lib_date,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR;
+import AutoStandardI,Census_data,codes,doxie,DriversV2,gong,iesp,lib_date,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR,
+       dx_header;
 
 gm :=  AutoStandardI.GlobalModule();
 
@@ -727,7 +728,7 @@ export Functions := module
 		// *** First use the appropriate current address parts to get all the key header 
 		// address records for the current address from the 
 		// thor_data400::key::header_address_qa file.
-		key_hdr_addr_recs := doxie.Key_Header_Address(
+		key_hdr_addr_recs := dx_header.Key_Header_Address()(
 		                                      keyed(current_prim_name = prim_name and
 		                                            current_zip = zip and 
 		                                            current_prim_range = prim_range and

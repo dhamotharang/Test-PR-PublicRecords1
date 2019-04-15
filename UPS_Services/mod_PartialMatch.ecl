@@ -1,4 +1,4 @@
-import doxie, AutoStandardI, ut, NID;
+import doxie, AutoStandardI, ut, NID, dx_header;
 
 export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 
@@ -416,7 +416,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 
 	export StreetZip := MODULE
 	// key has: prim_name, zip, prim_range, sec_range....lname
-		idx := doxie.key_header_address;
+		idx := dx_header.key_header_address();
 		raw_recs := idx(KEYED(prim_name = inPrimName) AND
 										KEYED(zip = (QSTRING) inZip5) AND
 										KEYED(prim_range = inPrimRange) AND
@@ -470,7 +470,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	
 	export StreetZipName := MODULE
 		idx_name := doxie.Key_Header_StreetZipName;
-		idx_noname := doxie.Key_Header_Address;
+		idx_noname := dx_header.key_header_address();
 
 		// if we have city and state inputs, we can build a set of zip codes for
 		// that city/state.  This set should be a superset of what is already in

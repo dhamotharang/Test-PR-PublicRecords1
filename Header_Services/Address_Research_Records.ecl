@@ -1,11 +1,11 @@
-import doxie, header, census_data, gong, risk_indicators;
+import dx_header, census_data, gong, risk_indicators;
 
 string5 zip_code_val := '' : stored('Zip');
 string3 addr_type_val := '' : stored('ResidenceType'); 
 integer4 dt_fr_val := 0 : stored('DateFrom');
 integer4 dt_to_val := 999999 : stored('DateTo');
 
-addr_rsch_key := doxie.key_header_address_research;
+addr_rsch_key := dx_header.key_address_research();
 census_key := census_data.Key_Smart_Jury;
 gong_addr_key := gong.key_address_current;
 areacode_change_key := risk_indicators.Key_AreaCode_Change_plus;

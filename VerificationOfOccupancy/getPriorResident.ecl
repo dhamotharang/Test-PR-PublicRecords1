@@ -1,4 +1,4 @@
-import Risk_Indicators, ut, LN_PropertyV2, RiskWise, doxie, header_quick, MDR, drivers, header, inquiry_acclogs;
+import Risk_Indicators, ut, RiskWise, doxie, header_quick, MDR, drivers, dx_header, inquiry_acclogs;
 
 EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
 																		string50 DataRestrictionMask, 
@@ -15,7 +15,9 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 // ******************************************************************************************************************************
 
 //get all DIDs associated with our target input address
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getDIDs(VOOShell le, doxie.Key_Header_Address ri) := TRANSFORM
+  Key_Header_Address := dx_header.key_header_address();
+
+	VerificationOfOccupancy.Layouts.Layout_VOOShell getDIDs(VOOShell le, Key_Header_Address ri) := TRANSFORM
 		SELF.prior_res_DID 							:= ri.DID;
 		SELF.prior_res_dt_first_seen 		:= ri.dt_first_seen;
 		SELF.prior_res_dt_last_seen 		:= ri.dt_last_seen;
@@ -25,7 +27,7 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 		SELF 														:= le;
 	END;
 	
-	resDIDs := join(VOOShell, doxie.Key_Header_Address,
+	resDIDs := join(VOOShell, Key_Header_Address,
 													keyed(left.prim_name = right.prim_name) and
 													keyed(left.z5 = right.zip) and
 													keyed(left.prim_range = right.prim_range) and
@@ -35,7 +37,7 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 													glb_ok AND
 													(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 													(~mdr.Source_is_DPPA(RIGHT.src) OR 
-														(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))),
+														(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 									getDIDs(LEFT,RIGHT), left outer, ATMOST(5000));
 
 //no need to keep all records, keep only the most recent for each "prior resident" DID
@@ -59,7 +61,7 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 									glb_ok AND
 									(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 									(~mdr.Source_is_DPPA(RIGHT.src) OR 
-										(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))),
+										(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 									getHHIDs(LEFT,RIGHT), left outer, KEEP(1), ATMOST(riskwise.max_atmost));  //just apply HHID to the 1 record we are joining
 
 //of all prior residents at this address, keep just the most recent
@@ -157,7 +159,7 @@ endmacro;
 									glb_ok AND
 									(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 									(~mdr.Source_is_DPPA(RIGHT.src) OR 
-										(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))) AND
+										(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))) AND
 									(RIGHT.dt_last_seen > LEFT.prior_res_dt_last_seen) AND  //we only want addresses newer than the target address
 									(left.prim_name <> right.prim_name or  //if address matches the target address, skip it - we only want if newer
 									 left.z5 <> right.zip or
@@ -179,7 +181,7 @@ endmacro;
 									glb_ok AND
 									(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 									(~mdr.Source_is_DPPA(RIGHT.src) OR 
-										(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))) AND
+										(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))) AND
 									(RIGHT.dt_last_seen > LEFT.prior_res_dt_last_seen) AND  //we only want addresses newer than the target address
 									(left.prim_name <> right.prim_name or  //skip the target address
 									 left.z5 <> right.zip or

@@ -1,4 +1,4 @@
-import address, address_attributes, addrfraud, ADVO, didville, doxie, header, infutor, ln_propertyv2, models, risk_indicators, riskwise, ut;
+import address_attributes, addrfraud, ADVO, dx_header, ln_propertyv2, riskwise, ut;
 
 export functions := MODULE
 	//shared
@@ -26,10 +26,10 @@ export functions := MODULE
 		Return finalDMS;
 	End;
 
-	export AddrToDID( dataset(header.layout_header) head, boolean ByGeoBlk = true ) := FUNCTION
+	export AddrToDID( dataset(dx_header.layout_header) head, boolean ByGeoBlk = true ) := FUNCTION
 		dist := distribute( head, hash32( st, county, geo_blk ) );
 		
-		header.layout_header slimdown( dist le ) := TRANSFORM
+		dx_header.layout_header slimdown( dist le ) := TRANSFORM
 			// we're calculating by geo block, so blank out the specific address components.
 			self.prim_range := if( ByGeoBlk, '', le.prim_range );
 			self.predir     := if( ByGeoBlk, '', le.predir     );
@@ -43,7 +43,7 @@ export functions := MODULE
 		slim := project( dist, slimdown(left), local );
 		
 		// rollup on people		
-		header.layout_header dateRoll( header.layout_header le, header.layout_header ri ) := TRANSFORM
+		dx_header.layout_header dateRoll( dx_header.layout_header le, dx_header.layout_header ri ) := TRANSFORM
 			self.dt_last_seen  := max(le.dt_last_seen,  ri.dt_last_seen);
 			self.dt_first_seen := min(le.dt_first_seen, ri.dt_first_seen);
 			self := le;
@@ -433,14 +433,14 @@ export functions := MODULE
 			getADVO(left, right), Left Outer, keep(1));
 
 		// Append the ADL and SSN counts to the table- lookup by address key
-		hdr_addr := join(Address_in, doxie.Key_Header_Address, 
+		hdr_addr := join(Address_in, dx_header.key_header_address(), 
 				keyed(left.prim_name=right.prim_name) and
 				keyed(left.zip=right.zip) and keyed(right.prim_range=left.prim_range) and
 				left.predir=right.predir and left.postdir=right.postdir and
 				left.sec_range=right.sec_range and
 				right.dt_last_seen[1..4] = ut.GetDate[1..4] and
 				right.ssn <> '',
-				transform(recordof(doxie.Key_Header_Address), self := right), atmost(riskwise.max_atmost), keep(100));
+				transform(RIGHT), atmost(riskwise.max_atmost), keep(100));
 
 		hdr_addr_ssn := dedup(sort(hdr_addr, ssn), ssn); 
 
