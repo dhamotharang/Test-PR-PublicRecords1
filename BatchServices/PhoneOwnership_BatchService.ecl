@@ -63,10 +63,13 @@ EXPORT PhoneOwnership_BatchService(useCannedRecs = 'false') :=
 		dBatchRoyalties := SORT(Royalties, acctno);
 		dBatchZumigoResults := SORT(ZumigoResults, acctno);
 		
-		RoyaltySet := Royalty.GetBatchRoyalties(dBatchRoyalties, batch_params.ReturnDetailedRoyalties);		
+		RoyaltySet := Royalty.GetBatchRoyalties(dBatchRoyalties, batch_params.ReturnDetailedRoyalties);	
+		
+		// RQ-15243 Layout mismatch not capturing Zumigo history records
+		Zumigo_log_records := DATASET([{dBatchZumigoResults(source = Phones.Constants.GatewayValues.ZumigoIdentity)}], Phones.Layouts.ZumigoIdentity.zDeltabaseLog);
 			
 		OUTPUT(dBatchResults,  NAMED('Results') );		
 		OUTPUT(RoyaltySet,  NAMED('RoyaltySet') );		
-		OUTPUT(dBatchZumigoResults(source = Phones.Constants.GatewayValues.ZumigoIdentity),NAMED('LOG_delta__phonefinder_delta__phones__gateway'));
+		OUTPUT(Zumigo_log_records,NAMED('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
 				
 	ENDMACRO;	
