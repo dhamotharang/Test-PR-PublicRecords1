@@ -2,8 +2,7 @@
 
 export Build_base(string ver, boolean IsFullUpdate = false) := module 
 
-TrnUn_credit_full := Files.load_in;
-TrnUn_credit_delta := Files.update_in;
+TrnUn_credit := if(IsFullUpdate,Files.load_in,  project(Files.update_in, transform(TransunionCred.Layouts.load, self.cr := '';, self := left;)));
 
 setValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
 string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
@@ -19,8 +18,7 @@ string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
 																							,'');
 
 //Normalize current name, alias, aka and former name
-//TRANSFORM FOR FULL AS THE INPUT LAYOUT IS DIFFERENT
-Layouts.base t_norm_name_full (TrnUn_credit_full L, INTEGER C):= TRANSFORM
+Layouts.base t_norm_name (TrnUn_credit L, INTEGER C):= TRANSFORM
 	SELF.Prepped_rec_type         := CHOOSE(C,'A','B','C','D') + l.Record_Type[2];
 	current_name                  := trim(StringLib.StringCleanSpaces(trim(L.Last_Name)
 																+','+L.First_Name
@@ -56,47 +54,7 @@ Layouts.base t_norm_name_full (TrnUn_credit_full L, INTEGER C):= TRANSFORM
 	SELF                          := [];
 END;
 
-//TRANSFORM FOR DELTA AS THE INPUT LAYOUT IS DIFFERENT
-Layouts.base t_norm_name_delta (TrnUn_credit_delta L, INTEGER C):= TRANSFORM
-	SELF.Prepped_rec_type         := CHOOSE(C,'A','B','C','D') + l.Record_Type[2];
-	current_name                  := trim(StringLib.StringCleanSpaces(trim(L.Last_Name)
-																+','+L.First_Name
-																+' '+L.Middle_Name
-																+' '+fGetSuffix(L.name_suffix_)));
-	SELF.Prepped_Name             := CHOOSE(C,current_name,L.AKA1,L.AKA2,L.AKA3);
-	SELF.Prepped_addr1            := trim(StringLib.StringCleanSpaces(L.House_Number
-																+' '+L.Street_Direction
-																+' '+L.Street_Name
-																+' '+L.Street_Type
-																+' '+L.Street_Post_Direction
-																+' '+L.Unit_Type
-																+' '+L.Unit_Number));
-	SELF.Prepped_addr2            := trim(StringLib.StringCleanSpaces(	trim(L.Cty) + if(L.Cty <> '',',','')
-																+ ' '+ L.State
-																+ ' '+ L.Zip_Code
-																),left,right);
-
-	self.dt_first_seen            := CHOOSE(C,(unsigned)l.date_address_reported,0,0,0);
-	self.dt_last_seen             := if(self.Prepped_rec_type='A1',(unsigned)ver,0);
-	self.dt_vendor_first_reported := (unsigned)ver;
-	self.dt_vendor_last_reported  := (unsigned)ver;
-	valid_dob                     := if((unsigned)l.Date_of_Birth between 18000101 and (unsigned)(STRING8)Std.Date.Today()
-																				,(unsigned)l.Date_of_Birth
-																				,0);
-	valid_ssn                     := if((unsigned)l.Ssn > 0,l.Ssn, '');
-	SELF.clean_ssn                := valid_ssn;
-	SELF.clean_dob                := if(l.Date_of_Birth_Estimated_Ind='E',0,valid_dob);
-	self.clean_phone              := if((integer)l.phone=0,'',l.phone);
-	SELF.IsCurrent                := self.Prepped_rec_type='A1';
-	SELF.IsUpdating               := true;
-	SELF                          := L;
-	SELF                          := [];
-END;
-
-norm_names0_full := NORMALIZE(TrnUn_credit_full, 4, t_norm_name_full(LEFT, COUNTER))(length(stringlib.stringfilterout(Prepped_name,' ,'))>0);
-norm_names0_delta := NORMALIZE(TrnUn_credit_delta, 4, t_norm_name_delta(LEFT, COUNTER))(length(stringlib.stringfilterout(Prepped_name,' ,'))>0);
-
-norm_names0 := if(IsFullUpdate, norm_names0_full, norm_names0_delta);
+norm_names0 := NORMALIZE(TrnUn_credit, 4, t_norm_name(LEFT, COUNTER))(length(stringlib.stringfilterout(Prepped_name,' ,'))>0);
 
 names1:=dedup(table(norm_names0,{Prepped_name ,title,fname,mname,lname,name_suffix,string3 name_score:=''}),record,all);
 
