@@ -110,9 +110,9 @@ module
 		// Build Dashboards
 		,Run_Dashboards
 		// Delete / Archive temp & unused files.
-		,Run_GarbageCollector		
+		//,Run_GarbageCollector		
 		// Complete and set version
-		,Set_Version	
+		//,Set_Version	
 					
 	) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);	
 		 	
