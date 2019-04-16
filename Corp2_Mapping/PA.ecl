@@ -499,16 +499,13 @@ export PA := MODULE;
 		
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Event_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpEvent_PA Report' //subject
 																																	 ,'Scrubs CorpEvent_PA Report' //body
 																																	 ,(data)Event_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpPAEventScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																	 );		
 																																 
 		Event_BadRecords := Event_T.ExpandedInFile(	corp_key_invalid  		         <> 0 or
 																								event_filing_cd_invalid		     <> 0 );	

@@ -561,15 +561,13 @@ export NV := module
 
 		Event_ScrubsAlert						:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment			:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpEvent_NV Report' //subject
 																																	 ,'Scrubs CorpEvent_NV Report' //body
 																																	 ,(data)Event_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpNVEventScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Event_Badrecords				 		:= Event_N.ExpandedInFile(	
 																												  corp_key_Invalid							  			<> 0 or
@@ -643,15 +641,13 @@ export NV := module
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_NV Report' //subject
 																																 ,'Scrubs CorpMain_NV Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpNVMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Main_Badrecords					:= Main_N.ExpandedInFile(	
 																										 dt_vendor_first_reported_Invalid 			<> 0 or
@@ -776,15 +772,13 @@ export NV := module
 
 		Stock_ScrubsAlert						:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment			:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);
-		Stock_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Stock_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpStock_NV Report' //subject
 																																	 ,'Scrubs CorpStock_NV Report' //body
 																																	 ,(data)Stock_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpNVEventScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray);
+																																	);
 
 		Stock_Badrecords						:= Stock_N.ExpandedInFile(	
 																													corp_key_Invalid							  			<> 0 or

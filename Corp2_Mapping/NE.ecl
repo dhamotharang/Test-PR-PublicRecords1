@@ -536,16 +536,13 @@ EXPORT NE  := MODULE;
 		
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_MailFile						:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpEvent_NE Report' //subject
 																																	 ,'Scrubs CorpEvent_NE Report' //body
 																																	 ,(data)Event_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpNEEventScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																	);
 
 		Event_BadRecords		:= event_N.ExpandedInFile(corp_key_Invalid    						<> 0 or
 																									corp_vendor_Invalid 					  <> 0 or

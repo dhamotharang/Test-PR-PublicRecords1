@@ -396,15 +396,13 @@ export SC := MODULE;
 		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').CompareToProfile_with_Examples;
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_SC Report' //subject
 																																	 ,'Scrubs CorpMain_SC Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpSCMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray);
+																																	);
 
 		Main_BadRecords						:= Main_N.ExpandedInFile(dt_vendor_first_reported_Invalid 			<> 0 or
 																											 dt_vendor_last_reported_Invalid 				<> 0 or
