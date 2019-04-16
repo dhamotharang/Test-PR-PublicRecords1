@@ -1219,6 +1219,7 @@
 				trim(kword, left, right) = 'PSPMA-LFL' =>SubGroup_Constants.numKeywordsID.KEYWORD_PSPMA_LFL,
 				trim(kword, left, right) = 'NLPOL' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLPOL,
 				trim(kword, left, right) = 'NLDNB' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLDNB,
+				trim(kword, left, right) = 'ZA-FICTFS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZA_FICTFS,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
