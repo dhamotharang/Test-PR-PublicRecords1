@@ -171,7 +171,7 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   self.fl_crash_children                  := IF (~IsFCRA, global(flcr));
   self.nod_children                       := IF (check_cond, if(not doxie.DataRestriction.Fares, global(nod)));
   self.foreclosure_children               := IF (check_cond, if(not doxie.DataRestriction.Fares, global(frcl)));
-  self.phonesplus_children                := choosen(phpl, con.max_phonesplus);
+  self.phonesplus_children                := IF (~IsFCRA,choosen(phpl, con.max_phonesplus)); 
   self.premium_phone_children             := IF (check_cond, choosen(prph, con.max_phonesplus));
   self.Email_children                     := IF (~ISFCRA, global(email));
 
