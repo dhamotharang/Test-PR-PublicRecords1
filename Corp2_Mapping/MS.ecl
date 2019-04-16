@@ -788,16 +788,13 @@ export MS := module;
 		
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Event_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpEvent_MS Report' //subject
 																																	 ,'Scrubs CorpEvent_MS Report' //body
 																																	 ,(data)Event_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpMSEventScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																);		
 																																 
 		Event_BadRecords := Event_T.ExpandedInFile(	corp_key_invalid  		         <> 0 or
 																								Event_Filing_Desc_invalid 		 <> 0 );	
@@ -852,16 +849,13 @@ export MS := module;
 		
 		Stock_ScrubsAlert					:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment		:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);
-		Stock_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Stock_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpStock_MS Report' //subject
 																																	 ,'Scrubs CorpStock_MS Report' //body
 																																	 ,(data)Stock_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpMSStockScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );		
+																																	);		
 																																 
 		Stock_BadRecords := Stock_T.ExpandedInFile(	corp_key_invalid  	  <> 0 or
 																								Stock_class_invalid 	<> 0 );	
