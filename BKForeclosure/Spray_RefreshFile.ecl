@@ -9,7 +9,7 @@ EXPORT Spray_refreshFile(STRING filedate, STRING	pServerIP	= IF(_control.thisenv
 
 SHARED filepath_nod       := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Refresh/NOD/';
 SHARED filepath_reo       := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Refresh/REO/';
-SHARED group_name	        := 'thor400_dev01';
+SHARED group_name	        := STD.System.Thorlib.Group ( );
 SHARED fn_nod_Orph        := '*_NOD_Orphan_Refresh_*.txt';
 SHARED fn_nod_Ref         := '*_NOD_Refresh_*.txt';
 SHARED fn_reo_Orph        := '*_REO_Orphan_Refresh_*.txt';
