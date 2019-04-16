@@ -1,6 +1,6 @@
 ﻿import  address, ut, header_slimsort, did_add, didville,watchdog, ExperianCred, _validate;
 
-export Build_base(string ver) := module
+export Build_base(string ver, boolean IsFullUpdate = false) := module
 
 name_clean := Files.Cashed_Names_File;
 addr_clean := Files.Cashed_Address_File;
@@ -143,7 +143,6 @@ experian_clean_update:= delete_bad_names ((unsigned)name_score > 50 and st in va
 
 cur_base_d   := distribute(project(Files.Base_File_Out, transform(recordof(Files.Base_File_Out), self.did := 0, self := left)), hash(Encrypted_Experian_PIN));
 
-#IF (IsFullUpdate = false)
 cur_update_d := dedup(sort(distribute(experian_clean_update, hash(Encrypted_Experian_PIN)),Encrypted_Experian_PIN, local),Encrypted_Experian_PIN, local);
 
 Layouts.Layout_Out t_apply_updates (cur_base_d le, cur_update_d ri) := transform
@@ -162,22 +161,20 @@ apply_updates := join(cur_base_d,
 					  local);
 
 
-base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base_File)) = 0, 
+base_and_update_delta := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base_File)) = 0, 
 					  experian_clean_update,  
 					  experian_clean_update + apply_updates);
 
-#ELSE
 reset_cur_base := project(cur_base_d , transform(Layouts.Layout_Out,
 										self.current_rec_flag	:= 0,
 										self.current_experian_pin := 0,
-										self := left));
-		
+										self := left));	
 
-
-base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base_File)) = 0, 
+base_and_update_full := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base_File)) = 0, 
                    experian_clean_update,
-									 experian_clean_update + reset_cur_base);
-#END
+				   experian_clean_update + reset_cur_base);
+
+base_and_update := if(IsFullUpdate, base_and_update_full, base_and_update_delta);
 
 //-----------------------------------------------------------------
 //DID base file------ Temporately Disabled to same machine time 
@@ -297,16 +294,15 @@ Layouts.Layout_Out t_apply_deletes(Experian_base_d1 le, Experian_del_dedp ri) :=
 	SELF := le;
 end;
 
-#IF (IsFullUpdate = false)
-apply_deletes := join(Experian_base_d1, 
+deletes_delta := join(Experian_base_d1, 
 						 Experian_del_dedp,
 						 left.Encrypted_Experian_PIN = right.Encrypted_Experian_PIN,
 						 t_apply_deletes(left, right),
 						 left outer,
 						 local);
-#ELSE
-apply_deletes := ExperianCred_base;
-#END
+deletes_full := ExperianCred_base;
+
+apply_deletes := if(IsFullUpdate, deletes_full, deletes_delta);
 						 
 //-----------------------------------------------------------------
 //Append Deceased File
@@ -367,18 +363,17 @@ reset_dt_last_seen   := join (distribute(apply_deceased, hash(Encrypted_Experian
 															 left outer,
 															 local);			
 			   
-#IF (IsFullUpdate = false)
 //Delete records from base where suppression code is in the list of codes to be deleted
-Apply_Delete_codes := join(distribute(reset_dt_last_seen, hash(Encrypted_Experian_PIN)),
+Delete_codes_delta := join(distribute(reset_dt_last_seen, hash(Encrypted_Experian_PIN)),
                     distribute(Experian_del((unsigned)Suppression_Code in experiancred.Delete_Suppression_Codes), hash(Encrypted_Experian_PIN)),
 					left.Encrypted_Experian_PIN = right.Encrypted_Experian_PIN,
 					transform(Layouts.Layout_Out, self := left),
 					left only,
 					local);
 					
-#ELSE
-Apply_Delete_codes := reset_dt_last_seen;
-#END					 
+Delete_codes_full := reset_dt_last_seen;
+
+Apply_Delete_codes := if(IsFullUpdate, Delete_codes_full, Delete_codes_delta);				 
 
 export All := apply_delete_codes;
 
