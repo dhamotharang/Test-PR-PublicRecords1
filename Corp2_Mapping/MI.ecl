@@ -612,7 +612,7 @@ export MI := module
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMIEventScrubsReport.csv'
-																																 ;
+																																);
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or
@@ -690,7 +690,7 @@ export MI := module
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMIMainScrubsReport.csv'
-																																;
+																																);
 
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or
@@ -809,7 +809,7 @@ export MI := module
 																																 ,(data)Stock_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMIEventScrubsReport.csv'
-																													;
+																													);
 
 		Stock_BadRecords					:= Stock_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or

@@ -611,7 +611,7 @@ export MA := MODULE
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMAMainScrubsReport.csv'
-																																;
+																																);
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or
 																											 dt_vendor_last_reported_Invalid 				<> 0 or
