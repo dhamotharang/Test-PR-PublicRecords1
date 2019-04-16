@@ -1,4 +1,5 @@
 ﻿IMPORT BKForeclosure,ut,STD;
+#option('multiplePersistInstances',FALSE);
 
 EXPORT Normalize_Nod(DATASET(Layout_BK.Base_Nod_ext) ds_nod) := FUNCTION	
 

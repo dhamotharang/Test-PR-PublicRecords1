@@ -1,4 +1,5 @@
 ﻿IMPORT BKForeclosure;//, Scrubs_BKForeclosure_Nod, Scrubs_BKForeclosure_Reo;
+#option('multiplePersistInstances',FALSE);
 
 EXPORT Build_Base(STRING filedate) := MODULE
 SHARED superfile_Nod  := '~thor_data400::base::BKForeclosure::Nod';

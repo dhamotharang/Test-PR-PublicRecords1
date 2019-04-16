@@ -1,4 +1,5 @@
 ﻿IMPORT BKForeclosure, ut, address, DID_Add, NID, AID, AID_Support, std, BIPV2;
+#option('multiplePersistInstances',FALSE);
 #CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 #STORED('did_add_force','thor');
 
