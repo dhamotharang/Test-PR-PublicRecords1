@@ -77,16 +77,15 @@ EXPORT CRON_SoapAppends_Controller:=if(d=0,Go,noGo);
 Go:=sequential(
 						 CRON_DeltabaseInputPrepSchedule
 						,CRON_InputPrepSchedule
-//						,CRON_InquiryLogsInputPrepSchedule
+						,CRON_InquiryLogsInputPrepSchedule
 						,CRON_MBSInputPrepSchedule
-//						,CRON_NACInputPrepSchedule
+						,CRON_NACInputPrepSchedule
 						,CRON_Base_Schedule
 						);
 EXPORT Schedules := Go;
 
 Go:=sequential(
 						 CRON_Keys_Controller
-//						,CRON_SoapAppends_Controller
 						,true
 						);
 EXPORT Controllers := Go;
