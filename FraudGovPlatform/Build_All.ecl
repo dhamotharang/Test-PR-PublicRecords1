@@ -38,6 +38,7 @@ module
 	shared SkipRefreshHeader := SkipModules[1].SkipRefreshHeader;
 	shared SkipRefreshAddresses := SkipModules[1].SkipRefreshAddresses;
 	shared SkipGarbageCollector := SkipModules[1].SkipGarbageCollector;
+	shared SkipBaseRollback := SkipModules[1].SkipBaseRollback;
 
 	// Modules
 	export Run_MBS			:= if(SkipMBS = false,FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] ));
@@ -49,6 +50,30 @@ module
 	export Run_Inputs 	:= if(SkipInputBuild = false,Build_Input(pversion, MBS_File).All);	
 	export Run_Base 	:= if(SkipBaseBuild = false,Build_Base(pversion, MBS_File).All);
 	export Run_Main		:= if(SkipMainBuild = false,Build_Main(pversion).All);
+
+	// Test and promote Main
+	export Test_Build := Mac_TestBuild(pversion):independent;
+	export Test_RecordID := Mac_TestRecordID(pversion):independent;
+	export Test_RinID := Mac_TestRinID(pversion):independent;
+
+	export Promote_Base := Promote(pversion).promote_base;
+	export promote_sprayed_files := promote(pversion).promote_sprayed_files;
+	export postNewStatus := FraudgovInfo(pversion,'Base_Completed').postNewStatus;
+	//export notify_Base_Completed := notify('Base_Completed','*');
+	export Run_Rollback := if(SkipBaseRollback = false, Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
+
+	export Publish_Base 
+	:= if( 
+		Test_Build = 'Passed' and Test_RecordID = 'Passed' and 	Test_RinID = 'Passed', 
+			sequential(
+				Promote_Base,
+				promote_sprayed_files,
+				postNewStatus,
+				//notify_Base_Completed
+				),
+			Run_Rollback);
+
+
 	// --
 	export Run_GarbageCollector := if(SkipGarbageCollector = false,Garbage_Collector.Run);
 	// --
@@ -61,7 +86,6 @@ module
 	export Run_Dashboards := if(SkipDashboardsBuild=false,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData));
 	export Set_Version := FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion;
 
-	
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	
 	export base_portion := sequential(
@@ -69,6 +93,7 @@ module
 		,Run_Inputs
 		,Run_Base
 		,Run_Main
+		,Publish_Base
 	);
 	
 	export keys_portion := sequential(
@@ -85,9 +110,9 @@ module
 		// Build Dashboards
 		,Run_Dashboards
 		// Delete / Archive temp & unused files.
-		,Run_GarbageCollector		
+		//,Run_GarbageCollector		
 		// Complete and set version
-		,Set_Version	
+		//,Set_Version	
 					
 	) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);	
 		 	
@@ -97,7 +122,11 @@ module
 		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base'));
 
 	export Build_Fraudgov_Keys :=
-	if(tools.fun_IsValidVersion(pversion),
+	if(tools.fun_IsValidVersion(pversion)  
+		and SkipMainBuild = false 
+		and Test_Build = 'Passed' 
+		and Test_RecordID = 'Passed' 
+		and Test_RinID = 'Passed',
 		keys_portion,
 		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys'));
 	
