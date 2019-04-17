@@ -122,12 +122,12 @@ FUNCTION
 
     tblLevelCnt := TABLE(dIterateRIs, rLevelCnt_Layout, Level, LevelCount, FEW);
 
-    SELF.AlertIndicators   := PROJECT(dIterateRIs,
+    SELF.AlertIndicators   := PROJECT(dIterateRIs(Category != ''),
                                       TRANSFORM(iesp.phonefinder.t_PhoneFinderAlertIndicator,
                                                 SELF.Flag     := LEFT.Category,
                                                 SELF.Messages := LEFT.RiskDescription,
                                                 SELF          := LEFT));
-    SELF.Alerts             := ROLLUP(GROUP(SORT(dIterateRIs, Category), Category),
+    SELF.Alerts             := ROLLUP(GROUP(SORT(dIterateRIs(Category != ''), Category), Category),
                                       GROUP,
                                       TRANSFORM($.Layouts.PhoneFinder.Alert,
                                                 SELF.flag     := LEFT.Category,

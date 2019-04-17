@@ -467,7 +467,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 	MetadataResults:= IF(displayPRI,dPhoneInfowPRI,dPhoneInfoUpdate_OTP);
 	
   #IF(PhoneFinder_Services.Constants.Debug.PhoneMetadata)
-    OUTPUT(inMod.ReturnOTPInfo,NAMED('ReturnOTPInfo'));
     OUTPUT(dInRecs,NAMED('dInRecs'));
     OUTPUT(dInBestInfo,NAMED('dInBestInfo'));
    	OUTPUT(dSearchRecs,NAMED('dSearchRecs_metadata'));
