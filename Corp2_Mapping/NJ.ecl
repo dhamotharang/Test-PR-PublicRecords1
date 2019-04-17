@@ -1,4 +1,4 @@
-Import ut, std, corp2, tools, versioncontrol, Scrubs, Corp2_Raw_NJ, Scrubs_Corp2_Mapping_NJ_Main;
+﻿Import ut, std, corp2, tools, versioncontrol, Scrubs, Corp2_Raw_NJ, Scrubs_Corp2_Mapping_NJ_Main;
 
 export NJ := MODULE 
 
@@ -101,16 +101,13 @@ export Update(string fileDate, string version, boolean pShouldSpray = _Dataset()
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_NJ Report' //subject
 																																	 ,'Scrubs CorpMain_NJ Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpNJMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																);
 																															
 		Main_BadRecords := Main_N.ExpandedInFile(	dt_vendor_first_reported_invalid	   <> 0 or
 																							dt_vendor_last_reported_invalid		   <> 0 or

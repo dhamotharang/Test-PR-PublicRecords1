@@ -1,4 +1,4 @@
-import address,corp2,corp2_mapping,corp2_raw_il,lib_stringlib,scrubs,scrubs_corp2_mapping_il_ar,
+﻿import address,corp2,corp2_mapping,corp2_raw_il,lib_stringlib,scrubs,scrubs_corp2_mapping_il_ar,
 			 scrubs_corp2_mapping_il_event,scrubs_corp2_mapping_il_main,scrubs_corp2_mapping_il_stock,
 			 std,tools,ut,versioncontrol; 			 
 			 
@@ -420,15 +420,13 @@ export IL := MODULE;
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_'+uc_runtype+'_IL Report' //subject
 																															,'Scrubs CorpAR_'+uc_runtype+'_IL Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'Corp'+uc_runtype+'ILARScrubsReport.csv'																															
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																															);
 
 		AR_BadRecords				 := AR_N.ExpandedInFile(	
 																								corp_key_Invalid							  			<> 0 or

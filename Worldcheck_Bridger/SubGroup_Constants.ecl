@@ -1117,6 +1117,7 @@
 		export string KEYWORD_PSPMA_LFL							:= '803';
 		export string KEYWORD_NLPOL									:= '804';
 		export string KEYWORD_NLDNB									:= '805';
+		export string KEYWORD_ZA_FICTFS							:= '806';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
