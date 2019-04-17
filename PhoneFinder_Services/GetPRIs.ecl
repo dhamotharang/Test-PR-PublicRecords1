@@ -62,7 +62,7 @@ FUNCTION
                                         SELF.zip4              := LEFT.zip4,
                                         SELF.county_code       := LEFT.county_code,
                                         SELF.county_name       := LEFT.county_name,
-                                        SELF.listed_name       := RIGHT.ListingName,
+                                        SELF.listed_name       := IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name),
                                         SELF.phoneState        := RIGHT.phone_state,
                                         SELF.listing_type_res  := IF(STD.Str.Find(RIGHT.ListingType, 'RESIDENTIAL') > 0, 'R', ''),
                                         SELF.listing_type_bus  := IF(STD.Str.Find(RIGHT.ListingType, 'BUSINESS') > 0, 'B', ''),
