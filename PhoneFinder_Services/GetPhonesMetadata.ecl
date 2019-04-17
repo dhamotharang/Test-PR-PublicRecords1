@@ -311,11 +311,13 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 															LIMIT(PhoneFinder_Services.Constants.MetadataLimit,SKIP));
 									
 	dOTPPhones := DEDUP(SORT(UNGROUP(dOTP + IF(EXISTS(subjectInfo) AND inMod.UseDeltabase,dDeltaOTPwSubject)),   //combine results
-																acctno, did, phone, -event_date, transaction_id),acctno, did, phone, event_date, transaction_id); 	
-	dedupOTPs := 	SORT(DEDUP(SORT(dOTPPhones, acctno, did, phone, otp_id,
+																acctno, phone, -event_date, transaction_id),acctno, phone, event_date, transaction_id);
+  
+	dedupOTPs := 	SORT(DEDUP(SORT(dOTPPhones, acctno, phone, otp_id,
 															STD.Str.ToLowerCase(function_name) NOT IN PhoneFinder_Services.Constants.OTPVerifyTransactions,-verify_passed),
-															acctno, did, phone, otp_id),
-											acctno, did, phone,-event_date);														
+															acctno, phone, otp_id),
+											acctno, phone,-event_date);
+  
 	dsOTPHistory := PROJECT(dedupOTPs,TRANSFORM({PhoneFinder_Services.Layouts.SubjectPhone,PhoneFinder_Services.Layouts.PhoneFinder.OTPs}, 
 																									SELF.OTPStatus:= IF(STD.Str.ToLowerCase(LEFT.function_name) IN PhoneFinder_Services.Constants.OTPVerifyTransactions,
 																																			LEFT.verify_passed,FALSE), 
@@ -323,7 +325,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 	//select necessary fields
 	OTPRec := RECORD
 			dOTPPhones.acctno;
-			dOTPPhones.did;
 			dOTPPhones.phone;
 			BOOLEAN OTP := dOTPPhones.transaction_id <> '';
 			UNSIGNED4 OTPCount := COUNT(GROUP,dOTPPhones.transaction_id<>'');
@@ -332,7 +333,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 			BOOLEAN LastOTPStatus := IF(STD.Str.ToLowerCase(dOTPPhones.function_name) IN PhoneFinder_Services.Constants.OTPVerifyTransactions,
 																					dOTPPhones.verify_passed, FALSE);	
 	END;
-	dvalidOTP:= TABLE(GROUP(dedupOTPs,acctno, did, phone),OTPRec);	
+	dvalidOTP:= TABLE(GROUP(dedupOTPs,acctno, phone),OTPRec);	
 		
 	{OTPRec, PhoneFinder_Services.Layouts.PhoneFinder.OneTimePassword} getOTPHistory (dvalidOTP l, DATASET(RECORDOF(dsOTPHistory)) r) := TRANSFORM
 			SELF.OTPHistory := PROJECT(r, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.OTPs, SELF:=LEFT));
@@ -341,7 +342,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		
 	dvalidOTPwHistory := DENORMALIZE(dvalidOTP,dsOTPHistory,
 															LEFT.acctno	= RIGHT.acctno AND
-															LEFT.did		= RIGHT.did AND
 															LEFT.phone 	= RIGHT.phone,
 															GROUP,
 															getOTPHistory(LEFT,ROWS(RIGHT)));
@@ -361,7 +361,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		
 	dPhoneInfowOTP		:= JOIN(dPhoneInfoUpdate_Spoofing,dvalidOTPwHistory,
 															LEFT.acctno	= RIGHT.acctno AND
-															LEFT.did		= RIGHT.did AND
 															LEFT.phone 	= RIGHT.phone,
 															mergeOTP(LEFT,RIGHT),
 															LEFT OUTER, KEEP(1),
@@ -468,6 +467,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 	MetadataResults:= IF(displayPRI,dPhoneInfowPRI,dPhoneInfoUpdate_OTP);
 	
   #IF(PhoneFinder_Services.Constants.Debug.PhoneMetadata)
+    OUTPUT(inMod.ReturnOTPInfo,NAMED('ReturnOTPInfo'));
     OUTPUT(dInRecs,NAMED('dInRecs'));
     OUTPUT(dInBestInfo,NAMED('dInBestInfo'));
    	OUTPUT(dSearchRecs,NAMED('dSearchRecs_metadata'));
@@ -492,9 +492,10 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		// OUTPUT(dOTP,NAMED('dOTPIndex'));
 		// OUTPUT(dDeltaOTPwSubject,NAMED('dDeltaOTPwSubject'));
 		// OUTPUT(dOTPPhones,NAMED('dOTPPhones'));
-		// OUTPUT(dedupOTPs,NAMED('dedupOTPs'));
-		// OUTPUT(dvalidOTP,NAMED('dvalidOTP'));
-		// OUTPUT(dvalidOTPwHistory,NAMED('dvalidOTPwHistory'));
+		OUTPUT(dedupOTPs,NAMED('dedupOTPs'));
+		OUTPUT(dsOTPHistory,NAMED('dsOTPHistory'));
+		OUTPUT(dvalidOTP,NAMED('dvalidOTP'));
+		OUTPUT(dvalidOTPwHistory,NAMED('dvalidOTPwHistory'));
 		OUTPUT(dPhoneInfowOTP,NAMED('dPhoneInfowOTP'));
 		OUTPUT(dPhoneInfoUpdate_OTP,NAMED('dPhoneInfoUpdate_OTP'));
 		IF(displayPRI, OUTPUT(drolledMetadataRecs,NAMED('rolledMetadataRecs')));
