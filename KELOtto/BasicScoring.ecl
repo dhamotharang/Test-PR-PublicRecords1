@@ -217,7 +217,7 @@
   END;
 
   FinalRec := RECORD
-   RECORDOF(ScoredGraphPrep1) AND NOT [event_count_]; // Remove these fields to keep the layout consistent with previous version for roxie/esp
+   RECORDOF(ScoredGraphPrep1) AND NOT [event_count_,identity_count_]; // Remove these fields to keep the layout consistent with previous version for roxie/esp
    DATASET(FlagsRec) Flags;
   END;
        
@@ -239,7 +239,8 @@
                                                       {'abbreviated_bankname_', (STRING)LEFT.abbreviated_bankname_},
                                                       {'in_customer_population_', (STRING)LEFT.in_customer_population_},
                                                       {'contributor_safe_flag_', (STRING)LEFT.contributor_safe_flag_},
-                                                      {'safe_flag_', (STRING)LEFT.safe_flag_}
+                                                      {'safe_flag_', (STRING)LEFT.safe_flag_},
+                                                      {'identity_count_', (STRING)LEFT.identity_count_}
 																											], FlagsRec)(Value <> '');
 															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
 				

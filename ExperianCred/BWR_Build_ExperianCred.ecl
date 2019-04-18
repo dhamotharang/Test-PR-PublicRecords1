@@ -3,11 +3,13 @@
 #workunit('name','Yogurt:ExperianCred ' + version);
 #workunit('priority','high');
 #workunit('priority',10);
+
 #OPTION('multiplePersistInstances',FALSE);
 
-import std;
 
-DoBuild := ExperianCred.Build_All(version);
+IsFullUpdate := false;// need to determine the build type
+
+DoBuild := ExperianCred.Build_All(version,IsFullUpdate);
 
 SampleRecs := choosen(sort(ExperianCred.Files.Base_File_Out,record),1000);
 					

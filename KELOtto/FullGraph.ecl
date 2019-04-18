@@ -14,10 +14,11 @@ Temporary collection of attributes to add. These should be woven back into the g
    UNSIGNED industry_type_;
    STRING Entity_Context_uid_;
    UNSIGNED event_count_;
+   UNSIGNED identity_count_;
   END;
 
   AdditionalAttributes := 
-    PROJECT(KELOtto.Q__show_Customer_Person.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
+    PROJECT(KELOtto.Q__show_Customer_Person.Res0, TRANSFORM(AdditionalAttributesRecord, SELF.identity_count_ := 1, SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Address.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Social_Security_Number.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Email.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
@@ -413,11 +414,13 @@ ElementCountAggregation := DISTRIBUTE(TABLE(FullGraphPrep8(entity_type_ != 1), {
 // Join the element count back to each entity within all the trees.
 FullGraphElementCount1 := JOIN(FullGraphPrep8, ElementCountAggregation, LEFT.source_customer_ = RIGHT.source_customer_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_, TRANSFORM(RECORDOF(LEFT), SELF.cl_element_count_ := RIGHT.cl_element_count_, SELF := LEFT), LEFT OUTER, LOCAL);
 
+
 FullGraphElementCount := JOIN(FullGraphElementCount1, AdditionalAttributes, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 
    TRANSFORM({
                RECORDOF(LEFT),
-               RIGHT.event_count_
+               RIGHT.event_count_,
+               RIGHT.identity_count_
              },
-              SELF.event_count_ := RIGHT.event_count_, SELF := LEFT), LEFT OUTER, HASH) : PERSIST('~fraudgov::deleteme101');
+              SELF.event_count_ := RIGHT.event_count_, SELF.identity_count_ := RIGHT.identity_count_, SELF := LEFT), LEFT OUTER, HASH) : PERSIST('~fraudgov::deleteme101');
 
 EXPORT FullGraph := FullGraphElementCount;

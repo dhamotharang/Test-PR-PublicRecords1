@@ -1,8 +1,8 @@
-﻿import std,WsWorkunits;
+﻿import std,WsWorkunits,Workman;
 
 EXPORT get_FilesRead(
    pWorkunitID = '\'\''
-  ,pesp        = '_Config.LocalEsp'
+  ,pesp        = 'Workman._Config.LocalEsp'
   ,pUseGlobal  = 'true'
 ) :=
 functionmacro
@@ -11,7 +11,7 @@ functionmacro
   
   #IF(pUseGlobal = true and pesp in Workman._Config.LocalEsps)
     returnresult := global(nothor(STD.System.Workunit.WorkunitFilesRead(pWorkunitID)),few);
-  #ELSIF(pUseGlobal = false and pesp in _Config.LocalEsps)
+  #ELSIF(pUseGlobal = false and pesp in Workman._Config.LocalEsps)
     returnresult := STD.System.Workunit.WorkunitFilesRead(pWorkunitID);
   #ELSE
     returnresult := WsWorkunits.get_FilesRead            (pWorkunitID,pesp,pUseGlobal);

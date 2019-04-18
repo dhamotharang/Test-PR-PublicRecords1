@@ -27,7 +27,8 @@ export Updates := DATASET([
  	,[{'~thor_data400::in::FCRA::ExperianCred_updates'}]    
  	,std.system.job.target()
 	,ver
-	,'S[0-9]{3}' 	}
+	,'S[0-9]{3}'
+ 	}
 ], VersionControl.Layout_Sprays.Info);
 
 export Deletes := DATASET([
