@@ -265,8 +265,8 @@ ret := CASE(state,
 				    (dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND ((dl_trim[7]>='A' AND dl_trim[7]<='Z') OR
 						dl_trim[7]='*') AND (INTEGER)(dl_trim[8..9])=(100-(INTEGER)(dob[3..4])) AND (dl_trim[10]='*' OR (dl_trim[10]>='A' AND dl_trim[10]<='Z') OR
 						IsAllNumeric(dl_trim[10])) AND (((dl_trim[11]>='A' AND dl_trim[11]<='Z') OR (dl_trim[12]>='A' AND dl_trim[12]<='Z')) OR IsAllNumeric(dl_trim[11])))
-            OR (LENGTH(StringLib.StringFilter(StringLib.StringToUpperCase(dl_trim[1..12]), 'BCDFGHJKLMNPRSTWXYZ1234567890'))=12 AND dl_trim[1..3]='WDL') => '0',
-				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND (dl_trim[7]>='A' AND dl_trim[7]<='Z'
+            OR (LENGTH(StringLib.StringFilter(StringLib.StringToUpperCase(dl_trim[1..12] ), 'BCDFGHJKLMNPRSTWXYZ1234567890'))=12 AND dl_trim[1..3]='WDL' AND dl_len=12) => '0',
+            dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND (dl_trim[7]>='A' AND dl_trim[7]<='Z'
             OR
 						dl_trim[7]='*') AND (INTEGER)(dl_trim[8..9])=(100-(INTEGER)(dob[3..4])) => '12',
 				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND ((dl_trim[7]>='A' AND dl_trim[7]<='Z') OR dl_trim[7]='*') => '5',
