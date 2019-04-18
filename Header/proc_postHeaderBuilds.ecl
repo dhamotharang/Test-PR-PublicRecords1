@@ -111,6 +111,7 @@ export proc_postHeaderBuilds := module
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
                                             ,parallel(make_hhid	,make_fcra_hhid)
+                                            ,Doxie.Proc_Header_Relatives_v3_keys_dx(header.version_build)
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)

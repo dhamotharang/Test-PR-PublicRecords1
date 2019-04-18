@@ -23,11 +23,22 @@ module
 	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l, integer cnt) := transform
 
 		filename := ut.CleanSpacesAndUpper(l.fn);
-		
+		st := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '::', true )[3][1..2];
 		self.FileName := filename;	
+		fn := map(	
+					regexfind('MSH',filename,nocase) => [(string)MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_Account_Number, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_State, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_Agency_Vertical_Type, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_Program; 
+														 'MSH', 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]), 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]),
+														 '',
+														 ''],
+					StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true )
+		);
 		
-		fn := STD.Str.SplitWords( STD.Str.FindReplace(l.fn,'.dat',''), '_' );
-		
+
 		Customer_Account_Number := STD.Str.FindReplace(fn[1],'FRAUDGOV::IN::','');
 		Customer_State := fn[2];
 		Customer_Agency_Vertical_Type := fn[3]; // ignore

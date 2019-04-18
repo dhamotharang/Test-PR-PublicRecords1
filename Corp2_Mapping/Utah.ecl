@@ -1,4 +1,4 @@
-Import _Control, Corp2, Corp2_Raw_UT, Scrubs, Scrubs_Corp2_Mapping_UT_Main, Tools, UT, VersionControl, std ,lib_stringlib;
+﻿Import _Control, Corp2, Corp2_Raw_UT, Scrubs, Scrubs_Corp2_Mapping_UT_Main, Tools, UT, VersionControl, std ,lib_stringlib;
 Export Utah 	:= Module
 
 	Export Update(String filedate, string version, boolean pShouldSpray = Corp2_mapping._Dataset().bShouldSpray, boolean pOverwrite = false,pUseProd = Tools._Constants.IsDataland) := Function
@@ -288,15 +288,13 @@ Export Utah 	:= Module
 		
 		Main_ScrubsAlert				:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment		:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile						:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_MailFile						:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs Corp_UT Report' //subject
 																																 ,'Scrubs Corp_UT Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpUTMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																														);
 
 		Main_BadRecords					:= N.ExpandedInFile(dt_vendor_first_reported_Invalid 			<>0 or
 																								dt_vendor_last_reported_Invalid 			<>0 or
