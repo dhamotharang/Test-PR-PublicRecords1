@@ -11,7 +11,7 @@ module
 
 	empty := dataset([], FraudShared.Layouts.Base.Main);
 
-	QA_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudShared.Filenames().Base.Main.QA )) > 0, FraudShared.Files().Base.Main.QA,empty);
+	QA_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudGovPlatform.Filenames().Base.Main_Anon.QA )) > 0, FraudGovPlatform.Files().Base.Main_Anon.QA,empty);
 	Demo_Data	:= if(nothor(STD.File.GetSuperFileSubCount( Filenames().Input.DemoData.Sprayed )) > 0, Files().Input.DemoData.Sprayed,empty);
 
 	QABaseAndDemo := if(_Flags.UseDemoData, QA_Data + Demo_Data, QA_Data);
@@ -109,7 +109,9 @@ module
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
-		,Build_Base_File_Anonymized
+		,sequential(
+				Build_Base_File_Anonymized,
+				Promote(pversion).buildfiles.New2Built)
 		,output('No Valid version parameter passed, skipping Build_Base_Anonymized atribute')
 	);
 end;

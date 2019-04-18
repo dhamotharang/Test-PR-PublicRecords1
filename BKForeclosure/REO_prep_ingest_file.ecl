@@ -1,7 +1,17 @@
-IMPORT ut, lib_StringLib;
-fIn_Raw_Reo   := BKForeclosure.File_BK_Foreclosure.Reo_File;
+﻿IMPORT BKForeclosure, MDR, ut;
 
-BKForeclosure.Layout_BK.reo CleanTrimReo(fIn_Raw_Reo L, seqNum) := TRANSFORM
+EXPORT REO_prep_ingest_file := FUNCTION
+
+  //Project to base layout for ingest
+	fIn_Raw_Reo   := BKForeclosure.File_BK_Foreclosure.Reo_File;
+
+BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(fIn_Raw_Reo L, seqNum) := TRANSFORM
+	SELF.DATE_FIRST_SEEN						:= thorlib.wuid()[2..9];
+	SELF.DATE_LAST_SEEN							:= thorlib.wuid()[2..9];
+	SELF.DATE_VENDOR_FIRST_REPORTED := L.ln_filedate;
+	SELF.DATE_VENDOR_LAST_REPORTED	:= L.ln_filedate;
+	SELF.PROCESS_DATE						 := thorlib.wuid()[2..9];
+	SELF.src  									 := mdr.sourceTools.src_BKFS_Reo;
 	SELF.foreclosure_id					 :=	IF(L.APN <> '',
 																		 StringLib.StringFindReplace(TRIM(L.APN,LEFT,RIGHT) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', ''),
 																		 StringLib.StringFindReplace('FC' + INTFORMAT(seqNum, 8, 1) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', '')																
@@ -103,8 +113,17 @@ BKForeclosure.Layout_BK.reo CleanTrimReo(fIn_Raw_Reo L, seqNum) := TRANSFORM
 	SELF.equity_credit_line      := L.equity_credit_line;
 	SELF.reo_flag                := L.reo_flag;
 	SELF.DistressedSaleFlag      := L.DistressedSaleFlag;
-	SELF.delete_flag             := ut.CleanSpacesAndUpper(L.delete_flag);
-	self := L;
+	SELF := L;
+	SELF := [];
 END;
 
-EXPORT File_Reo_Clean_In := project(fIn_Raw_Reo,CleanTrimReo(left,counter));
+ Reo_Clean_In := project(fIn_Raw_Reo,CleanTrimReo(left,counter));
+ 
+RETURN Reo_Clean_in;
+
+END;
+	
+
+	
+
+	

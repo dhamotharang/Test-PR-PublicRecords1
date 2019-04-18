@@ -1,7 +1,17 @@
-IMPORT ut, lib_StringLib;
+﻿IMPORT BKForeclosure, MDR, ut;
+
+EXPORT NOD_prep_ingest_file := FUNCTION
+
+	  //Project to base layout for ingest
 fIn_Raw_Nod   := BKForeclosure.File_BK_Foreclosure.Nod_File;
 
-BKForeclosure.Layout_BK.nod CleanTrimNod(fIn_Raw_Nod L, seqNum) := TRANSFORM
+BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(fIn_Raw_Nod L, seqNum) := TRANSFORM
+	SELF.DATE_FIRST_SEEN						:= thorlib.wuid()[2..9];
+	SELF.DATE_LAST_SEEN							:= thorlib.wuid()[2..9];
+	SELF.DATE_VENDOR_FIRST_REPORTED := L.ln_filedate;
+	SELF.DATE_VENDOR_LAST_REPORTED	:= L.ln_filedate;
+	SELF.PROCESS_DATE						 := thorlib.wuid()[2..9];
+	SELF.src  									 := mdr.sourceTools.src_BKFS_Nod;
 	SELF.foreclosure_id					 :=	IF(L.APN <> '',
 																		 StringLib.StringFindReplace(TRIM(L.APN,LEFT,RIGHT) + TRIM(L.borrower1_lname,LEFT,RIGHT) + TRIM(L.borrower1_fname,LEFT,RIGHT), ' ', ''),
 																		 StringLib.StringFindReplace('FC' + INTFORMAT(seqNum, 8, 1) + TRIM(L.borrower1_lname,LEFT,RIGHT) + TRIM(L.borrower1_fname,LEFT,RIGHT), ' ', '')																
@@ -85,8 +95,12 @@ BKForeclosure.Layout_BK.nod CleanTrimNod(fIn_Raw_Nod L, seqNum) := TRANSFORM
 	SELF.deed_pid            := L.deed_pid;
 	SELF.lps_internal_pid    := ut.CleanSpacesAndUpper(L.lps_internal_pid);
 	SELF.nod_source          := ut.CleanSpacesAndUpper(L.nod_source);
-	SELF.delete_flag         := ut.CleanSpacesAndUpper(L.delete_flag);
-  self := L;
+	SELF := L;
+	SELF := [];
 END;
 
-EXPORT File_Nod_Clean_In := PROJECT(fIn_Raw_Nod,CleanTrimNod(LEFT,COUNTER));
+Nod_Clean_In := PROJECT(fIn_Raw_Nod,CleanTrimNod(LEFT,COUNTER));
+
+RETURN Nod_Clean_In;
+
+END;

@@ -1,4 +1,4 @@
-import address,corp2,corp2_raw_il,scrubs,scrubs_corp2_mapping_il_lp_ar,scrubs_corp2_mapping_il_lp_main,std,ut,versioncontrol,tools;
+﻿import address,corp2,corp2_raw_il,scrubs,scrubs_corp2_mapping_il_lp_ar,scrubs_corp2_mapping_il_lp_main,std,ut,versioncontrol,tools;
 
 export IL_LP := module 
 
@@ -320,15 +320,13 @@ export IL_LP := module
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_LP_IL Report' //subject
 																															,'Scrubs CorpAR_LP_IL Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'CorpLPILARScrubsReport.csv'																															
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																															);
 
 		AR_BadRecords				 := AR_N.ExpandedInFile(	
 																								corp_key_Invalid							  			<> 0 or
@@ -402,15 +400,13 @@ export IL_LP := module
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_LP_IL Report' //subject
 																																 ,'Scrubs CorpMain_LP_IL Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpLPILMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 																																 
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or

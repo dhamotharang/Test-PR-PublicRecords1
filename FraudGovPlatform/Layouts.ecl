@@ -496,6 +496,12 @@ EXPORT Layouts := MODULE
 		unsigned6 	fdn_file_info_id;
 	end;
 
+
+	EXPORT CustomerMappings := RECORD
+		unsigned6	fdn_file_info_id;
+		string20	contribution_source;
+		string		contribution_gc_id;
+	END;
 	export Flags := module
 
 		export FraudgovInfoRec := RECORD
@@ -510,7 +516,9 @@ EXPORT Layouts := MODULE
 		
 		export SkipModules := RECORD
 			//General Processes
+			boolean SkipInputBuild;
 			boolean SkipBaseBuild;
+			boolean SkipMainBuild;
 			boolean SkipBaseRollback;
 			boolean SkipKeysBuild;
 			//Sub-processes
@@ -523,7 +531,6 @@ EXPORT Layouts := MODULE
 
 			boolean SkipMBS;
 			boolean SkipDeltabase;
-			boolean SkipContributory;
 			boolean SkipScrubs;
 			boolean SkipRefreshHeader;
 			boolean SkipRefreshAddresses;

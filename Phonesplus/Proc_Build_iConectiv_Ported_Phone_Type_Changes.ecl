@@ -6,7 +6,7 @@
 				//- Records where the phone type changed from Landline-to-Cell or Cell-to-Landline (All history).
 				//- Records where the phone type changed from Landline-to-Cell and is_current.
 
-EXPORT Proc_Build_iConectiv_Ported_Phone_Type_Changes(string version) := FUNCTION
+EXPORT Proc_Build_iConectiv_Ported_Phone_Type_Changes(string pversion) := FUNCTION
 
 	inFile 			:= Cellphone.Map_iConectiv_Ported_Phone_Type_Changes;	
 
@@ -20,7 +20,7 @@ EXPORT Proc_Build_iConectiv_Ported_Phone_Type_Changes(string version) := FUNCTIO
 	reformiH		:= project(inFile(keep_rec='Y'), Phonesplus_v2.Layout_Neustar_History); 					//iConectiv History
 
 	//Build iConectiv Port History Base
-	buildBaseiH	:= output(reformiH,,'~thor_data400::base::neustar_history_' + version, __compressed__);
+	buildBaseiH	:= output(reformiH,,'~thor_data400::base::neustar_history_' + pversion, __compressed__);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//Reformat to Prexisting Neustar Cellphone Layout////////////////////////////////////////////
@@ -33,7 +33,7 @@ EXPORT Proc_Build_iConectiv_Ported_Phone_Type_Changes(string version) := FUNCTIO
 	reformiC 		:= project(inFile(keep_rec='Y' and is_land_to_cell and is_current), ncTr(left)); //iConectiv Cellphones
 
 	//Build iConectiv Cellphones
-	buildBaseiC	:= output(reformiC,,'~thor_data400::base::neustarupdate_' + version, __compressed__);
+	buildBaseiC	:= output(reformiC,,'~thor_data400::base::neustarupdate_' + pversion, __compressed__);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Clear Delete Files//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,13 +50,13 @@ EXPORT Proc_Build_iConectiv_Ported_Phone_Type_Changes(string version) := FUNCTIO
 																								'~thor_data400::base::neustar_history_father',
 																								'~thor_data400::base::neustar_history_grandfather',
 																								'~thor_data400::base::neustar_history_delete'], 
-																								'~thor_data400::base::neustar_history_' + version, true);						
+																								'~thor_data400::base::neustar_history_' + pversion, true);						
 
 	moveiCell		:= STD.File.PromoteSuperFileList(['~thor_data400::base::neustarupdate',
 																								'~thor_data400::base::neustarupdate_father',
 																								'~thor_data400::base::neustarupdate_grandfather',
 																								'~thor_data400::base::neustarupdate_delete'], 
-																								'~thor_data400::base::neustarupdate_' + version, true);						
+																								'~thor_data400::base::neustarupdate_' + pversion, true);						
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Output Results///////////////////////////////////////////////////////////////////////////////////////////////////////
