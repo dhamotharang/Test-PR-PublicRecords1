@@ -78,6 +78,8 @@ export Assorted_Layouts := MODULE
 		unsigned6 ProviderId;
 		unsigned6 sanc_id;
 		UNSIGNED6	npi;
+		unsigned4 global_sid;
+    unsigned8 record_sid;
 	END;
 
 	Export Layout_Search1 := record

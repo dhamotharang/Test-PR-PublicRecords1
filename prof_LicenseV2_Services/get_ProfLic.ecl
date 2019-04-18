@@ -3,17 +3,9 @@ IMPORT STD, Prof_LicenseV2, doxie_files, doxie, Ingenix_NatlProf, suppress, code
 doxie.MAC_Header_Field_Declare()
 mod_access := doxie.compliance.GetGlobalDataAccessModule();
 
-search_layout := RECORD (prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen)
-                   unsigned4 global_sid;
-                   unsigned8 record_sid;
-                 END;
+search_layout := prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen;
+Search_layout_plus:= prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen_and_license_number;
 
-Search_layout_plus:= RECORD (prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen_and_license_number)
-                       unsigned4 global_sid;
-                       unsigned8 record_sid;
-                     END;
-
-report_layout:= prof_LicenseV2_Services.Assorted_Layouts.Layout_report;	
 
 Search_layout_x := RECORD(Search_layout)
 	STRING6	SANC_UPIN;	// sanc_key.SANC_UPIN
@@ -307,7 +299,7 @@ EXPORT get_ProfLic(dataset(prof_LicenseV2_Services.Layout_Search_Ids_Prolic) Pro
 //OUTPUT (search_res, NAMED ('search_res'));
 	EXPORT search := search_res;
 
-
+	report_layout := prof_LicenseV2_Services.Assorted_Layouts.Layout_report;	
 	Report_layout get_base_fields_prolic_report(Prof_key r):= transform
 		self.source_st_decoded := codes.GENERAL.state_long(r.source_st);
 		self.uniqueid := (string17) ('PL' + trim((string15)r.prolic_seq_id));
@@ -318,20 +310,29 @@ EXPORT get_ProfLic(dataset(prof_LicenseV2_Services.Layout_Search_Ids_Prolic) Pro
 			MAP(race = 'W' => 'White',
 				race = 'B' => 'African American',
 				race = 'H' => 'Hispanic',
-				'Unknown'));
+				'Unknown'));	
 		self := r;
 		self := [];
 	END;
-	prolics_report := dedup(sort(join(prolic_Ids, prof_key
+	prolics_report_a := dedup(sort(join(prolic_Ids, prof_key
 							,keyed(left.prolic_seq_id = right.prolic_seq_id)
 							,get_base_fields_prolic_report(right),limit(1000,skip),keep(100)),record, -date_last_seen),record, except 
 							date_last_seen,uniqueid,prolic_seq_id);
+
+	// fabricate source and record ids
+  prolics_report := PROJECT (prolics_report_a, TRANSFORM (Report_layout,
+                                         SELF.global_sid := COUNTER % 4;
+                                         SELF.record_sid := 220000 + COUNTER;
+                                         SELF := LEFT));
+
 	Suppress.MAC_Suppress(prolics_report,pull_dids,application_type_value,Suppress.Constants.LinkTypes.DID,DID);
 	Suppress.MAC_Suppress(pull_dids,pull_ssns,application_type_value,Suppress.Constants.LinkTypes.SSN,best_ssn);
 	doxie.MAC_PruneOldSSNs(pull_ssns, prolics_report_pruned, best_ssn, did);
-	suppress.mac_mask(prolics_report_pruned, report_res, best_ssn, blank, true, false);
+	suppress.mac_mask(prolics_report_pruned, report_masked, best_ssn, blank, true, false);
+	report_res := suppress.MAC_SuppressSource (report_masked, mod_access);
+  doxie.compliance.logSoldToSources (report_res, mod_access);
 	 
-	
+	//OUTPUT (prolics_report, NAMED ('prolics_report'));
 	EXPORT report := report_res;
 	
 

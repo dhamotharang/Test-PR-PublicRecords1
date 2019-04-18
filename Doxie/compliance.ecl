@@ -26,6 +26,8 @@ EXPORT compliance := MODULE
       EXPORT string ssn_mask := ssn_mask_value;
       EXPORT unsigned1 dl_mask :=  dl_mask_val;
       EXPORT unsigned1 dob_mask := dob_mask_value;
+      EXPORT string transaction_id := if(gm.TransactionID <> '', gm.TransactionID, gm.BatchUID); 
+      EXPORT unsigned6 global_company_id := gm.GlobalCompanyId; // mbs gcid
     END;
     RETURN access;
   ENDMACRO;
@@ -53,6 +55,8 @@ EXPORT compliance := MODULE
       EXPORT string ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
       EXPORT unsigned1 dl_mask :=  AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.dl_mask_val.params));
       EXPORT unsigned1 dob_mask := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params));
+      EXPORT string transaction_id := if(gm.TransactionID <> '', gm.TransactionID, gm.BatchUID); 
+      EXPORT unsigned6 global_company_id := gm.GlobalCompanyId;
     END;
     RETURN access;
   ENDMACRO;
@@ -194,7 +198,7 @@ EXPORT compliance := MODULE
       doxie.log.logSoldToSources(ds_in, mod_access, did_field);   
     ENDMACRO;
 
-    EXPORT logSoldToTransaction(mod_access, env_flag = Data_Services.data_env.iNonFCRA) := FUNCTIONMACRO
+    EXPORT logSoldToTransaction(mod_access, env_flag = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
       RETURN doxie.log.logSoldToTransaction(mod_access, env_flag);
     ENDMACRO;
 

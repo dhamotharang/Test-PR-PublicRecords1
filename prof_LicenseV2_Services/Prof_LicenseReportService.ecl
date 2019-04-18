@@ -102,6 +102,10 @@ export Prof_LicenseReportService := MACRO
 	Sanc_r := Sanc_raw+Sanc_gap;
 	Sanc_Filter := if (tempmod.Sanc_id>0,Sanc_r(sanc_id=(string)tempmod.Sanc_id),Sanc_r);
  	
+
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	IF (exists(Prolic_r), doxie.compliance.logSoldToTransaction(mod_access)); 
+
   //ids_Sanc
 	output(Prolic_r,named('Proflic_Results'));
 	output(Provider_r,named('Provider_Results'));
