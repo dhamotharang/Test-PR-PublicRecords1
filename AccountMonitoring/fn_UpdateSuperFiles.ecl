@@ -35,6 +35,7 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
       STRING250 MonitorSuperFile;
       STRING250 RoxieSuperFile;
       STRING250 LogicalFile;
+      BOOLEAN LogicalFileExists;
       BOOLEAN FirstInstance;
    end;
    
@@ -46,6 +47,7 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
       STRING250 MonitorSuperFile;
        STRING250 RoxieSuperFile;
       DATASET(LogicalFile_layout) LogicalFiles;
+      BOOLEAN AllLogicalFileExists;
    end;
         
 // Roxie Super key name vs Monitoring Superkey name
@@ -69,8 +71,44 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
                                     self.MonitorSuperFile := left.MonitorSuperFile,
                                     self.RoxieSuperFile := left.RoxieSuperFile,
                                     self.LogicalFile := right.subfile,
+                                    self.LogicalFileExists := true, // assume all exists
                                     self.FirstInstance := false,
                                   ));
+     
+     
+     global_newSuperfileLink   := newSuperfileLink;
+
+     newSuperfileLinkCheckLogical   :=  nothor(PROJECT(global_newSuperfileLink,
+                                                 TRANSFORM(superfile_logicalfile_flat_layout,
+                                                         SELF.LogicalFileExists := STD.File.FileExists(left.LogicalFile),
+                                                         SELF := left))) : INDEPENDENT;
+
+
+
+
+     
+/*      does_it_exist(dataset(superfile_logicalfile_flat_layout) oneDS) := FUNCTION
+        update_action := apply(oneDS,
+         				 evaluate(STD.File.FileExists(logicalFile))
+              );
+         				RETURN nothor(update_action);
+         		END;
+        
+        newSuperfileLinkCheckLogical :=  PROJECT(global_newSuperfileLink,
+                                                    TRANSFORM(recordof(newSuperfileLink), //superfile_logicalfile_flat_layout,
+                                                            filename := does_it_exist(dataset([{left}],superfile_logicalfile_flat_layout)); 
+                                                            SELF.LogicalFileExists := ;
+                                                            SELF := left;
+                                                            ));
+*/
+
+
+
+
+
+
+                                  
+                                  
 /*                             DATASET([{'batchr3::monitor::header_qa','~batchr3::base::account_monitoring::header::'+strToday,false}],
                                       superfile_logicalfile_flat_layout);    
 */
@@ -88,7 +126,7 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
    CGM_monitor_dset := SuperFile_ro_mo;
                       
    
-   CGM_LogicalFiles := newSuperfileLink;
+   CGM_LogicalFiles := newSuperfileLinkCheckLogical; //newSuperfileLink; //newSuperfileLinkCheckLogical;
    
    CGM_LogicalFilesGroup := GROUP(CGM_LogicalFiles,MonitorSuperFile);
    
@@ -96,6 +134,7 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
    	SELF.MonitorSuperFile := L.MonitorSuperFile;
     SELF.RoxieSuperFile := L.RoxieSuperFile;
    	SELF.LogicalFiles := PROJECT(AllRows,TRANSFORM(LogicalFile_layout,SELF := LEFT));
+   SELF.AllLogicalFileExists := min(l.LogicalFileExists,  min( AllRows,AllRows.LogicalFileExists));
    END;
    
    CGM_LogicalFilesFinal2 := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
@@ -132,7 +171,19 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
    end;
    
    updateMonitorFiles(DATASET(superfile_logicalfile_Rollup_layout) inFiles, STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
-/*    		add_logicals(STRING SuperFileName, DATASET(LogicalFile_layout) LogicalFiles) := FUNCTION
+    
+/*      check_logicals(DATASET(LogicalFile_layout) LogicalFiles) := FUNCTION
+            				check_result := APPLY(LogicalFiles,
+                                   STD.File.FileExists(logicalFile),
+            														);
+            				RETURN check_result;
+            		END;
+*/
+
+          
+
+    
+    		add_logicals(STRING SuperFileName, DATASET(LogicalFile_layout) LogicalFiles) := FUNCTION
       				update_action := APPLY(LogicalFiles,
                              if(STD.File.FileExists(logicalFile),
       														SEQUENTIAL(
@@ -142,9 +193,10 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
       														 )));
       				RETURN update_action;
       		END;
-*/
+
    		
    		update_action := APPLY(inFiles,
+                     if(AllLogicalFileExists,
    											SEQUENTIAL(
    														 STD.File.StartSuperFileTransaction()
    														,IF(NOT STD.File.SuperfileExists(TRIM(stem_name+monitorsuperfile)+'_qa'),STD.File.CreateSuperFile(TRIM(stem_name+monitorsuperfile)+'_qa'))
@@ -153,11 +205,12 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
    														,STD.File.ClearSuperFile(TRIM(stem_name+monitorsuperfile)+'_father',FALSE/*delete_subfile*/) // Remove all files from super
    														,STD.File.AddSuperFile(TRIM(stem_name+monitorsuperfile)+'_father',TRIM(stem_name+monitorsuperfile)+'_qa',,TRUE/*copy_file_contents*/)
    														,STD.File.ClearSuperFile(TRIM(stem_name+monitorsuperfile)+'_qa',FALSE/*delete_subfile*/)
-                           ,STD.File.AddSuperFile(TRIM(stem_name+monitorsuperfile)+'_qa','~'+RoxieSuperFile)   
-   														,STD.File.FinishSuperFileTransaction()		
-   														//,add_logicals(TRIM(stem_name+monitorsuperfile)+'_qa',inFiles.logicalFiles)
-   												));
-   		output(stem_name,named('stem_name'));
+                           //,STD.File.AddSuperFile(TRIM(stem_name+monitorsuperfile)+'_qa','~'+RoxieSuperFile) 
+                           ,STD.File.FinishSuperFileTransaction()
+                           ,add_logicals(TRIM(stem_name+monitorsuperfile)+'_qa',inFiles.logicalFiles))
+                    // ,STD.System.Log.addWorkunitWarning(TRIM(stem_name+monitorsuperfile)+'_qa' and TRIM(stem_name+monitorsuperfile)+'_father were not created',1)      
+                      ));
+   		//output(stem_name,named(stem_name));
    		return NOTHOR(update_action);		
    END;
    
