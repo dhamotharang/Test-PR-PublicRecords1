@@ -62,7 +62,7 @@ FUNCTION
                                         SELF.zip4              := LEFT.zip4,
                                         SELF.county_code       := LEFT.county_code,
                                         SELF.county_name       := LEFT.county_name,
-                                        SELF.listed_name       := RIGHT.ListingName,
+                                        SELF.listed_name       := IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name),
                                         SELF.phoneState        := RIGHT.phone_state,
                                         SELF.listing_type_res  := IF(STD.Str.Find(RIGHT.ListingType, 'RESIDENTIAL') > 0, 'R', ''),
                                         SELF.listing_type_bus  := IF(STD.Str.Find(RIGHT.ListingType, 'BUSINESS') > 0, 'B', ''),
@@ -96,18 +96,23 @@ FUNCTION
   dOtherIdentities := dPrepIdentityForRI(~isPrimaryIdentity);
 
   // Other phones
-  dPrepOtherPhonesForRIs := PROJECT(dOtherPhoneInfo,
-                                    TRANSFORM($.Layouts.PhoneFinder.Final,
-                                              SELF.isPrimaryPhone    := FALSE,
-                                              SELF.dt_first_seen     := (STRING)LEFT.dt_first_seen,
-                                              SELF.dt_last_seen      := (STRING)LEFT.dt_last_seen,
-                                              SELF.listed_name       := LEFT.ListingName,
-                                              SELF.phoneState        := LEFT.phone_state,
-                                              SELF.listing_type_res  := IF(STD.Str.Find(LEFT.ListingType, 'RESIDENTIAL') > 0, 'R', ''),
-                                              SELF.listing_type_bus  := IF(STD.Str.Find(LEFT.ListingType, 'BUSINESS') > 0, 'B', ''),
-                                              SELF.listing_type_gov  := IF(STD.Str.Find(LEFT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
-                                              SELF.RealTimePhone_Ext := LEFT,
-                                              SELF := LEFT, SELF := []));
+  // Other phones would only exist for a PII search. Hence, we can blindly assign the deceased indicator just using the acctno
+  dPrepOtherPhonesForRIs := JOIN( dOtherPhoneInfo,
+                                  dPrimaryForRIs,
+                                  LEFT.acctno = RIGHT.acctno,
+                                  TRANSFORM($.Layouts.PhoneFinder.Final,
+                                            SELF.isPrimaryPhone    := FALSE,
+                                            SELF.deceased          := RIGHT.deceased,
+                                            SELF.dt_first_seen     := (STRING)LEFT.dt_first_seen,
+                                            SELF.dt_last_seen      := (STRING)LEFT.dt_last_seen,
+                                            SELF.listed_name       := LEFT.ListingName,
+                                            SELF.phoneState        := LEFT.phone_state,
+                                            SELF.listing_type_res  := IF(STD.Str.Find(LEFT.ListingType, 'RESIDENTIAL') > 0, 'R', ''),
+                                            SELF.listing_type_bus  := IF(STD.Str.Find(LEFT.ListingType, 'BUSINESS') > 0, 'B', ''),
+                                            SELF.listing_type_gov  := IF(STD.Str.Find(LEFT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
+                                            SELF.RealTimePhone_Ext := LEFT,
+                                            SELF := LEFT, SELF := []),
+                                    LIMIT(0), KEEP(1));
 
   // Send primary and other phones for RI calculation
   dPrepForRIs := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);

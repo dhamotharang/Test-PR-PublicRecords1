@@ -161,7 +161,6 @@ FUNCTION
 
 	dPhoneMetadataWPorting := JOIN(dSearchRecs0, dPortedRolled, 
                                   LEFT.acctno	= RIGHT.acctno AND
-                                  LEFT.did = RIGHT.did AND
                                   LEFT.phone 	= RIGHT.phone, 
                                   UpdatePhoneInfo(LEFT, RIGHT), 
                                   LEFT OUTER, KEEP(1), 
