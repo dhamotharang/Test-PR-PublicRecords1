@@ -26,6 +26,10 @@ EXPORT IDataAccess := INTERFACE
   EXPORT string ssn_mask := suppress.constants.ssn_mask_type.ALL; // FIRST5, LAST4, NONE (string6?)
   EXPORT unsigned1 dl_mask := 1; // means, do mask
   EXPORT unsigned1 dob_mask := suppress.constants.dateMask.ALL;
+
+  //ccpa restrictions/logging
+  EXPORT string transaction_id := ''; // esp transaction id or batch uid
+  EXPORT unsigned6 global_company_id := 0; // mbs gcid
   
 
   // --------------------------------------------------------------------------------------------

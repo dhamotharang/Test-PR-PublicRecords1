@@ -27,6 +27,9 @@ export PL_Batch_Service(useCannedRecs = 'false') := MACRO
 		
 		ut.mac_TrimFields(Pre_result, 'Pre_result', result);
 		
+		mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+		IF (exists(result), doxie.compliance.logSoldToTransaction(mod_access));
+
 		OUTPUT(result, NAMED('RESULTS'));		
 	
 	
