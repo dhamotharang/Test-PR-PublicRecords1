@@ -3,8 +3,7 @@ MODULE:DunnData_email
 FILENAME:DunnData_email
 
 RIDFIELD:RCID:GENERATE
-INGESTFILE:DunnData_update:NAMED(DunnData_email.prep_ingest_file)
-
+INGESTFILE:DunnData_update:NAMED(DunnData_email.prep_ingest_file) 
 
 FIELD:dtmatch:TYPE(STRING32):0,0
 FIELD:email:TYPE(STRING60):0,0

@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','DunnData_email.BWR_Ingest - Ingest - SALT V3.11.4');
+#workunit('name','DunnData_email.BWR_Ingest - Ingest - SALT V3.11.6');
 IMPORT DunnData_email,SALT311;
 //If you are not ingesting as part of a header build you can use the below;
 //Set incremental to TRUE to run an incremental ingest mode
