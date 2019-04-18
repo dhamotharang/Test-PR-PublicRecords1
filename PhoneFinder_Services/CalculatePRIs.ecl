@@ -66,7 +66,7 @@ FUNCTION
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
                                 -1 => pInput.phone = '',
-                                0  => pInput.fname = '' AND pInput.lname = '' AND pInput.listed_name = '' AND pInput.prim_name = '' AND pInput.batch_in.homephone <> '',
+                                0  => pInput.fname = '' AND pInput.lname = '' AND pInput.listed_name = '' AND pInput.prim_name = '' AND pInput.phone <> '',
                                 1  => pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
                                 2  => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
                                 3  => dt_last_seen <> 0 AND STD.Date.DaysBetween(dt_last_seen, currentDate) > le.Threshold,
@@ -122,12 +122,12 @@ FUNCTION
 
     tblLevelCnt := TABLE(dIterateRIs, rLevelCnt_Layout, Level, LevelCount, FEW);
 
-    SELF.AlertIndicators   := PROJECT(dIterateRIs,
+    SELF.AlertIndicators   := PROJECT(dIterateRIs(Category != ''),
                                       TRANSFORM(iesp.phonefinder.t_PhoneFinderAlertIndicator,
                                                 SELF.Flag     := LEFT.Category,
                                                 SELF.Messages := LEFT.RiskDescription,
                                                 SELF          := LEFT));
-    SELF.Alerts             := ROLLUP(GROUP(SORT(dIterateRIs, Category), Category),
+    SELF.Alerts             := ROLLUP(GROUP(SORT(dIterateRIs(Category != ''), Category), Category),
                                       GROUP,
                                       TRANSFORM($.Layouts.PhoneFinder.Alert,
                                                 SELF.flag     := LEFT.Category,

@@ -136,6 +136,7 @@ MODULE
     OUTPUT(dPIISearch, NAMED('dPIISearch'));
     OUTPUT(dInBest, NAMED('dInBest'));
     OUTPUT(dSearchRecs, NAMED('dSearchRecs'));
+    OUTPUT(dSubjectInfo, NAMED('dSubjectInfo'));
     OUTPUT(dPorted_Phones, NAMED('dPorted_Phones'));
     OUTPUT(dZum_final, NAMED('dZum_final'));
     OUTPUT(dPhoneMetadataResults, NAMED('dPhoneMetadataResults'));
