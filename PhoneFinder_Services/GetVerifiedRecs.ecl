@@ -37,9 +37,9 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
   FUNCTION
     today := STD.Date.Today();   
 
-    timeWithPrimaryPhone   := STD.Date.DaysBetween(L.dt_first_seen, L.dt_last_seen);
-    dateLastSeenFromToday  := STD.Date.DaysBetween(L.dt_last_seen, today);
-    dateFirstSeenFromToday := STD.Date.DaysBetween(L.dt_first_seen, today);
+    timeWithPrimaryPhone   := IF(L.dt_first_seen != 0 AND L.dt_last_seen != 0, STD.Date.DaysBetween(L.dt_first_seen, L.dt_last_seen), 0);
+    dateLastSeenFromToday  := IF(L.dt_last_seen != 0, STD.Date.DaysBetween(L.dt_last_seen, today), 0);
+    dateFirstSeenFromToday := IF(L.dt_first_seen != 0, STD.Date.DaysBetween(L.dt_first_seen, today), 0);
                           
     dateFirstSeenOk := ~vmod.useDateFirstSeenVerify OR dateFirstSeenFromToday > vmod.dateFirstSeenThreshold;                      
     dateLastSeenOk  := ~vmod.useDateLastSeenVerify OR dateLastSeenFromToday > vmod.dateLastSeenThreshold;        
