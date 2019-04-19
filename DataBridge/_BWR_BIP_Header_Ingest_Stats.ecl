@@ -1,6 +1,6 @@
 ﻿
 #workunit('name','DataBridge.BIPStats');
 
-pversion		:=	'20180411';
+pversion		:=	'20190411';
 
 DataBridge.BIPStats(pversion);

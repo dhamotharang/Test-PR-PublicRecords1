@@ -14,8 +14,7 @@ EXPORT Standardize_NameAddr := MODULE
 
 		NID.Mac_CleanParsedNames(PROJECT(sendRecs, DataBridge.Layouts.Base) 
 																		,NID_output
-																		,Name_First,Name_Middle_Initial,Name_Last,Suffix
-																		,includeInRepository:=false);	
+																		,Name_First,Name_Middle_Initial,Name_Last,Suffix);
 		
 		DataBridge.Layouts.Base tCleanPers(NID_output L) := TRANSFORM
 			SELF.title		    := if(L.nameType in ['P','D'], L.cln_title,  '');
