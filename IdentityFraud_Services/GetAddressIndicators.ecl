@@ -1,8 +1,8 @@
-IMPORT iesp, doxie, USPIS_HotList, Advo, header, ut, risk_indicators;
+IMPORT $, iesp, doxie, USPIS_HotList, Advo, header, ut, risk_indicators;
 
 header_rec := IdentityFraud_Services.layouts.slim_header;
 
-adv := Constants.RiskCodes.Address; //Volassis, aka ADVO
+adv := $.Constants.RiskCodes.Address; //Volassis, aka ADVO
 
 // ADVO HRI codes by residency type (maybe, not needed)
 integer AdvoCodeByAddressType (string1 cd) := MAP (
@@ -36,7 +36,7 @@ integer GetAdvoCode (string1 addr_cd, string1 delivery_cd) := function
 end;
 
 
-EXPORT layouts.address_did_rec GetAddressIndicators (
+EXPORT $.layouts.address_did_rec GetAddressIndicators (
   dataset (header_rec) header_ext,
 	dataset (IdentityFraud_Services.layouts.id_fraud_attributes) fraud_indices,
   IdentityFraud_Services.IParam._identityfraudreport param
@@ -51,11 +51,11 @@ EXPORT layouts.address_did_rec GetAddressIndicators (
   addr_slim_rec := record
     header_rec and not [rid, src, phone, fname, mname, lname, name_suffix, 
                         county, valid_ssn, hhid, count];
-    dataset (src_rec) sources {maxcount (Constants.MAX_SAME_ADDRESS)}; 
+    dataset (src_rec) sources {maxcount ($.Constants.MAX_SAME_ADDRESS)}; 
   end;
 
   address_hri_rec := record (addr_slim_rec)
-    dataset (risk_indicators.layout_desc) hri_address {maxcount(param.max_hri)} := dataset([], risk_indicators.layout_desc);
+    dataset (risk_indicators.layout_desc) hri_address {maxcount($.Constants.MAX_HRI)} := dataset([], risk_indicators.layout_desc);
   end;  
 
   // addresses; using person-report style (already rolled up) could be better, 
@@ -90,7 +90,7 @@ EXPORT layouts.address_did_rec GetAddressIndicators (
   ENDMACRO;
 
   addr_slim_rec RollSameAddreses (addr_slim_rec L, addr_slim_rec R) := transform
-    Self.sources := choosen (L.sources + R.sources, Constants.MAX_SAME_ADDRESS);
+    Self.sources := choosen (L.sources + R.sources, $.Constants.MAX_SAME_ADDRESS);
     // ... and the rest is about the same as in doxie/tra_address_rollup
     Self.dt_first_seen := if (R.dt_first_seen = 0 or (L.dt_first_seen < R.dt_first_seen  and L.dt_first_seen>0), L.dt_first_seen, R.dt_first_seen);
     self.dt_last_seen := if (L.dt_last_seen > R.dt_last_seen, L.dt_last_seen, R.dt_last_seen);
@@ -129,7 +129,7 @@ EXPORT layouts.address_did_rec GetAddressIndicators (
 	// Add address fraud indicators
 	address_hri_rec tAddrFraudInd(header_address_hri le,fraud_indices ri) :=
 	transform
-		ri_addr_fraud := if(ri.DivAddrSuspIdentityCountNew,row({Constants.RiskCodes.Address.MULTIPLE,'FRAUD_IND'},risk_indicators.layout_desc));
+		ri_addr_fraud := if(ri.DivAddrSuspIdentityCountNew,row({$.Constants.RiskCodes.Address.MULTIPLE,'FRAUD_IND'},risk_indicators.layout_desc));
 		
 	  self.hri_address := le.hri_address + ri_addr_fraud;
 		self             := le;
@@ -182,10 +182,10 @@ EXPORT layouts.address_did_rec GetAddressIndicators (
   // (conditionally) attach USPIS indicators
   layouts.address_did_rec AppendUSPISIndicators (layouts.address_did_rec L, USPIS_HotList.key_addr_search_zip R) := transform
     boolean is_matched := (R.zip != '');
-    string _text := if (is_matched, if (R.comments != '', R.comments, Constants.USPIS_INDICATOR_TEXT), '');
+    string _text := if (is_matched, if (R.comments != '', R.comments, $.Constants.USPIS_INDICATOR_TEXT), '');
     string formatted_date :=  R.dt_last_reported[5..6] + '/' + R.dt_last_reported[7..8] + '/' +R.dt_last_reported[1..4] ;
     string _date := if (R.dt_last_reported != '', ' reported on ' + formatted_date, '');
-    uspis_ri := Functions.GetRiskIndicator (Constants.RiskCodes.Address.USPIS, _text + _date);
+    uspis_ri := Functions.GetRiskIndicator ($.Constants.RiskCodes.Address.USPIS, _text + _date);
     Self.RiskIndicators := choosen (L.RiskIndicators + if (is_matched, uspis_ri), iesp.Constants.IFR.MaxIndicators);
     Self := L;
   end;

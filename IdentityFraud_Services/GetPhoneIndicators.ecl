@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, ut, Risk_Indicators, moxie_phonesplus_server;
+IMPORT $, doxie, iesp, Risk_Indicators, moxie_phonesplus_server;
 
 ifr := iesp.identityfraudreport;
 
@@ -34,7 +34,7 @@ EXPORT GetPhoneIndicators (
     doxie.key_header.listed_name;
 
     boolean is_phonesplus; // to differentiate Gong from PhonesPlus
-    DATASET(Risk_Indicators.Layout_Desc) hri_Phone {maxcount (param.max_hri)} := dataset ([], Risk_Indicators.Layout_Desc);
+    DATASET(Risk_Indicators.Layout_Desc) hri_Phone {maxcount ($.Constants.MAX_HRI)} := dataset ([], Risk_Indicators.Layout_Desc);
   end;
 
 
@@ -60,8 +60,8 @@ EXPORT GetPhoneIndicators (
                                         ,// integer dcp_value = 5
                                         false, //do not include PhonesPlus phones
                                         param.score_threshold,
-                                        param.glbpurpose,
-                                        param.dppapurpose);
+                                        param.glb,
+                                        param.dppa);
 
   // TODO: check whether Append_Gong can bring phones at completely different addresses,
   // then I will have to make an extra join with best records here
@@ -110,8 +110,8 @@ EXPORT GetPhoneIndicators (
             project (bestrecs, doxie.layout_references),
             iesp.Constants.BR.MaxPhonesPlus, 
             param.score_threshold,
-            param.glbpurpose,
-            param.dppapurpose,, TRUE).w_timezoneSeenDt; //isRoxie
+            param.glb,
+            param.dppa,, TRUE).w_timezoneSeenDt; //isRoxie
 
   pp_rec := recordof (phplRecs);
  
@@ -214,7 +214,7 @@ EXPORT GetPhoneIndicators (
     
     // take previously calculated RIs
     all_inds := project (L.hri_phone, Functions.TransformRiskIndicators (Left));
-    selected_inds := choosen (sort (all_inds, -all_inds.Rank), Constants.MAX_PHONES_INDICATORS);
+    selected_inds := choosen (sort (all_inds, -all_inds.Rank), $.Constants.MAX_PHONES_INDICATORS);
     Self.RiskIndicators := if (exists (L.hri_phone), selected_inds);
   end;
 

@@ -1,5 +1,4 @@
-﻿IMPORT IdentityFraud_Services, PersonReports, doxie, iesp, Codes, header, doxie_crs, 
-          doxie_raw, ContactCard, ut, person_models, suppress;
+IMPORT IdentityFraud_Services, doxie, iesp, Codes, header, doxie_raw, ut, suppress;
 
 ifr := iesp.identityfraudreport;
 NLR := IdentityFraud_Services.Constants.RiskCodes.NLR;
@@ -14,7 +13,7 @@ out_rec := iesp.identityfraudreport.t_IdentityFraudReportResponse;
 EXPORT IdentityFraudReport (
   dataset (doxie.layout_references) input_dids,
   IdentityFraud_Services.IParam._identityfraudreport param,
-  boolean IsFCRA = false, string50 DataPermission) := MODULE
+  boolean IsFCRA = false) := MODULE
 
   // In case input DID was found through the search, different customers may want a different degree of match,
   // so we will need to evaluate the input using penalty.
@@ -24,24 +23,7 @@ EXPORT IdentityFraudReport (
   // cannot use doxie/header_records_byDID: it fails at a certain limit on number of records, and here I may have
   // dozens of DIDs
 
-  // Inherit missing values from the global module; it is safer in case new fields added to the IDataAccess interface.
-  // Can't project from {input} because of different type of ssn_mask (string vs. string6);
-  shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
-    EXPORT unsigned1 glb := param.glbpurpose;
-    EXPORT unsigned1 dppa := param.dppapurpose;
-    EXPORT string DataPermissionMask := DataPermission; 
-    EXPORT string DataRestrictionMask := param.DataRestrictionMask;
-    EXPORT boolean ln_branded := FALSE;       //hardcoded for mod_header_records call
-    EXPORT boolean probation_override := param.probation_override;
-    EXPORT string5 industry_class := '';      //hardcoded for mod_header_records call
-    EXPORT string32 application_type := param.applicationtype;
-    EXPORT boolean no_scrub := FALSE;         //hardcoded for mod_header_records call
-    EXPORT unsigned3 date_threshold := 0;            //hardcoded for mod_header_records call
-    EXPORT string ssn_mask := param.ssn_mask;
-    EXPORT unsigned1 dl_mask := IF (param.mask_dl, 1, 0);
-    export unsigned1 dob_mask := param.dob_mask;
-  END;
-
+  shared mod_access := MODULE (PROJECT (param, doxie.IDataAccess)) END;
 
  shared header_obj := doxie.mod_header_records (
                      false, true, false, //DoSearch, include dailies, allow_wildcard
@@ -137,7 +119,7 @@ EXPORT IdentityFraudReport (
 
 
 	// Get the fraud point indices for the subject
-	dFraudRiskIndices	:=	IdentityFraud_Services.Functions.GetIdentityFraudRiskIndices(dids,best_all_pre,param,isFCRA,DataPermission);
+	dFraudRiskIndices	:=	IdentityFraud_Services.Functions.GetIdentityFraudRiskIndices(dids,best_all_pre,param,isFCRA,param.DataPermissionMask);
 
   // ========================================================================
   // get all header records for all "participants" and categorize sources
@@ -564,7 +546,7 @@ EXPORT IdentityFraudReport (
 		Self.AssociatedData.EmailAddresses	:=	project(email_recs_norm,ifr.t_IFREmail);
 		
     // Primary Identity section
-    a_dls := IdentityFraud_Services.Functions.GetBestDLInfo (best_subj[1].dl_number, subj_did, project (param, PersonReports.input.permissions));
+    a_dls := IdentityFraud_Services.Functions.GetBestDLInfo (best_subj[1].dl_number, subj_did, mod_access);
 
     // Finish postponed calculations for subject: SSNs, certain aggregated indicators;
     // unfortunately I have to convert codes back into integer (!)

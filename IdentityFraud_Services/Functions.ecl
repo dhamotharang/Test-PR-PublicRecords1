@@ -1,5 +1,5 @@
-IMPORT	Address, DriversV2, EmailService, iesp, doxie, AutoStandardI, PersonReports, ut, 
-	Risk_Indicators, Header, suppress, models, codes,Gateway, Royalty;
+IMPORT	Address, DriversV2, EmailService, iesp, doxie, ut, 
+	Risk_Indicators, Header, suppress, models, Gateway, Royalty, STD;
 
 ifr := iesp.identityfraudreport;
 
@@ -60,7 +60,7 @@ EXPORT Functions := MODULE
   // Depending on whether I fetch it by DIDs or "best" DL, can produce one or more records. 
   // Current implementation assumes fetching by DL, which can be changed easily
   dl_out_rec := iesp.identityfraudreport.t_IFRDriverLicense;
-  export dataset (dl_out_rec) GetBestDLInfo (string24 dl_num, unsigned6 in_did, PersonReports.input.permissions param) := function
+  export dataset (dl_out_rec) GetBestDLInfo (string24 dl_num, unsigned6 in_did, doxie.IDataAccess param) := function
     // did-method: I could simply call DriversV2_Services.DLReportService_records,
     //             but there's certain overhead in this call (not a huge one, though, but anyway).
     // fetched_dls := JOIN (dids, DriversV2.Key_DL_DID,
@@ -71,14 +71,13 @@ EXPORT Functions := MODULE
     fetched_dls := LIMIT (DriversV2.Key_DL_Number (keyed (s_dl = dl_num), did = in_did), Constants.MAX_DL_RECORDS, KEYED, SKIP);
 
     // TODO: should we consider "privacy_flag" (haven't seen any application of it anywhere at all)
-		Suppress.MAC_Suppress(fetched_dls,pull_dids,param.applicationtype,Suppress.Constants.LinkTypes.DID,did);
-		Suppress.MAC_Suppress(pull_dids,pull_ssns,param.applicationtype,Suppress.Constants.LinkTypes.SSN,ssn);
+		Suppress.MAC_Suppress(fetched_dls,pull_dids,param.application_type,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(pull_dids,pull_ssns,param.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
     Doxie.MAC_PruneOldSSNs (pull_ssns, pruned_ssns, ssn, did);
   
     // don't want to make a wrapper call to ut@PermissionTools
-    PermTools := AutoStandardI.PermissionI_Tools.val(project(param,AutoStandardI.PermissionI_Tools.params));
-    dl_glb  := pruned_ssns (PermTools.GLB.minorOK (ut.GetAgeI (dob))); // pull minors
-    dl_cleaned := dl_glb (PermTools.dppa.state_ok (orig_state, param.DPPAPurpose,, source_code)); //pull by DPPA
+    dl_glb  := pruned_ssns (doxie.compliance.minor_ok (ut.Age (dob), param.show_minors)); // pull minors
+    dl_cleaned := dl_glb (param.isValidDPPAState (orig_state, , source_code)); //pull by DPPA
 
     // Pick dates from "best license", prefering: government over Certegy, current over historical
     src := dl_cleaned.source_code;
@@ -423,7 +422,7 @@ EXPORT Functions := MODULE
     out_rec mask (out_rec L) := transform
       // DL and DOB masking for primary identity (SSN is done later)
       dl_num := L.PrimaryIdentity.DriverLicense.Number;
-      Self.PrimaryIdentity.DriverLicense.Number := if (param.mask_dl, suppress.dl_mask (dl_num), dl_num);
+      Self.PrimaryIdentity.DriverLicense.Number := if (param.dl_mask = 1, suppress.dl_mask (dl_num), dl_num);
       Self.PrimaryIdentity.DOBInfo.DOB  := if (do_mask_dob, iesp.ECL2ESP.ApplyDateMask (L.PrimaryIdentity.DOBInfo.DOB, param.dob_mask), L.PrimaryIdentity.DOBInfo.DOB);
       Self.PrimaryIdentity.DOBInfo.DOB2 := if (do_mask_dob, iesp.ECL2ESP.ApplyDateStringMask (L.PrimaryIdentity.DOBInfo.DOB2, param.dob_mask), L.PrimaryIdentity.DOBInfo.DOB2);
 
@@ -495,7 +494,7 @@ EXPORT Functions := MODULE
 			self.z5								:=	pInput.zip;
 			self.phone10					:=	pInput.phone;
 			self.dob							:=	(string)pInput.dob;
-			self.age							:=	if(pInput.age	=	0	and	pInput.dob	!=	0,(STRING3)ut.GetAgeI(pInput.dob),(string3)pInput.age);
+			self.age							:=	if(pInput.age	=	0	and	pInput.dob	!=	0,(STRING3)ut.Age(pInput.dob),(string3)pInput.age);
 			self.historydate			:=	999999;
 			self									:=	pInput;
 			self									:=	[];
@@ -534,7 +533,7 @@ EXPORT Functions := MODULE
 		// InstantID function
 		dIID	:=	risk_indicators.InstantID_Function(	dFormat2IIDIn,
 																									dGateways,
-																									iParam.DPPAPurpose,iParam.GLBPurpose,
+																									iParam.dppa,iParam.glb,
 																									isUtility,isLn, 
 																									ofac_only,
 																									suppressNearDups,require2Ele,from_biid,
@@ -553,7 +552,7 @@ EXPORT Functions := MODULE
 		// BocaShell function
 		dBocaShell	:=	Risk_Indicators.Boca_Shell_Function(	dIID,
 																													dGateways,
-																													iParam.DPPAPurpose,iParam.GLBPurpose,
+																													iParam.dppa,iParam.glb,
 																													isUtility,isLn,  
 																													doRelatives,doDL,doVehicle,doDerogs,
 																													bsVersion,
@@ -712,7 +711,7 @@ EXPORT Functions := MODULE
 			end;
 			
 			self.datefirstseen	:=	iesp.ECL2ESP.toDateYM((integer)min(ri((integer)date_first_seen	>	0),date_first_seen));
-			self.datelastseen		:=	iesp.ECL2ESP.toDateYM((integer)max(ri(date_last_seen	<=	ut.GetDate),date_last_seen));
+			self.datelastseen		:=	iesp.ECL2ESP.toDateYM((integer)max(ri(date_last_seen	<=	(string)STD.Date.Today()),date_last_seen));
 			self.sourcecount		:=	if(param.count_by_source,count(dedup(ri,src,all)),count(dedup(ri,_type,all)));
 			self.sources				:=	rollup(dEmailSrcDedup,group,tSourceRollup(left,rows(left)));
 			self								:=	le;

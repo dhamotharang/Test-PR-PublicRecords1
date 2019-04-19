@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, Codes, ut, Suppress, header, header_quick, risk_indicators;
+IMPORT doxie, iesp, Suppress, header, header_quick, risk_indicators;
 
 header_rec := IdentityFraud_Services.layouts.slim_header;
 
@@ -13,7 +13,7 @@ EXPORT layouts.ssn_did_rec GetSSNIndicators (
     unsigned3 ssn_issue_early := 0;
     unsigned3 ssn_issue_last := 0;
     string2  ssn_issue_place := '';
-    dataset (risk_indicators.layout_desc) hri_ssn {maxcount(param.max_hri)} := dataset([], risk_indicators.layout_desc);
+    dataset (risk_indicators.layout_desc) hri_ssn {maxcount(Constants.MAX_HRI)} := dataset([], risk_indicators.layout_desc);
   end;  
 
   ssn_hri_rec ToSSNHRI (header_rec L) := transform
