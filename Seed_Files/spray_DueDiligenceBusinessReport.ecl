@@ -1,7 +1,7 @@
 ﻿/*******************************************************************************************************************
  Spray 20 test seed data files onto THOR from bctlpedata12 /data/hds_2/duediligence_report_test_seed/filedate
 ********************************************************************************************************************/
-IMPORT _Control, FileServices, STD, tools, Versioncontrol;
+IMPORT _Control, STD, tools, Versioncontrol;
 
 
 EXPORT spray_DueDiligenceBusinessReport(string filedate,
