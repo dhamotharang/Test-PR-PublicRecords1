@@ -139,14 +139,6 @@ export ToEdina_55( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 		// new shell 2.5 fields
 		self.isFCRA := if(isFCRA,'1','0');
 		
-		//blank out new Cross Industry score and reason codes until fixes to the model are in - 12/6/2017
-		self.rv_scores.crossindv5 := '';
-		self.rv_scores.reason1cv5 := '';
-		self.rv_scores.reason2cv5 := '';
-		self.rv_scores.reason3cv5 := '';
-		self.rv_scores.reason4cv5 := '';
-		self.rv_scores.reason5cv5 := '';
-
 		self.rv_scores := if( isFCRA, le.rv_scores); // riskview not populated in non-fcra
 		self.fd_scores := if(~isFCRA, le.fd_scores); // fraud defender not populated in fcra
 		////////////
@@ -551,46 +543,56 @@ export ToEdina_55( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.velocity_counters.adls_per_curraddr_current := le.best_flags.adls_per_curraddr_curr; 
 	self.velocity_counters.ssns_per_curraddr_current := le.best_flags.ssns_per_curraddr_curr;  
 	self.velocity_counters.phones_per_curraddr_current := le.best_flags.phones_per_curraddr_curr; 
-	self.velocity_counters.adls_per_bestphone_current := le.best_flags.adls_per_bestphone_curr; 
+	// self.velocity_counters.adls_per_bestphone_current := le.best_flags.adls_per_bestphone_curr; 
 	self.velocity_counters.adls_per_bestssn_created_6months := le.best_flags.adls_per_bestssn_c6;	
 	self.velocity_counters.addrs_per_bestssn_created_6months := le.best_flags.addrs_per_bestssn_c6; 
 	self.velocity_counters.adls_per_curraddr_created_6months := le.best_flags.adls_per_curraddr_c6;
 	self.velocity_counters.ssns_per_curraddr_created_6months := le.best_flags.ssns_per_curraddr_c6; 
 	self.velocity_counters.phones_per_curraddr_created_6months := le.best_flags.phones_per_curraddr_c6;  
-	self.velocity_counters.adls_per_bestphone_created_6months := le.best_flags.adls_per_bestphone_c6;
+	// self.velocity_counters.adls_per_bestphone_created_6months := le.best_flags.adls_per_bestphone_c6;
 	self.acc_logs := le.best_flags; // transfer the rest of the best_flags into the acc_logs section, everything in risk_indicators.layouts.layout_best_pii_inquiries
 
 	//New for 5.3
 	self.corr_risk_summary.corrssnname_sources := le.header_summary.corrssnname_sources;
 	self.corr_risk_summary.corrssnname_firstseen := le.header_summary.corrssnname_firstseen;
 	self.corr_risk_summary.corrssnname_lastseen := le.header_summary.corrssnname_lastseen;
+	// self.corr_risk_summary.corrssnname_source_cnt := le.header_summary.corrssnname_source_cnt;
 	self.corr_risk_summary.corrssnaddr_sources := le.header_summary.corrssnaddr_sources;
 	self.corr_risk_summary.corrssnaddr_firstseen := le.header_summary.corrssnaddr_firstseen;
 	self.corr_risk_summary.corrssnaddr_lastseen := le.header_summary.corrssnaddr_lastseen;
+	// self.corr_risk_summary.corrssnaddr_source_cnt := le.header_summary.corrssnaddr_source_cnt;
 	self.corr_risk_summary.corraddrname_sources := le.header_summary.corraddrname_sources;
 	self.corr_risk_summary.corraddrname_firstseen := le.header_summary.corraddrname_firstseen;
 	self.corr_risk_summary.corraddrname_lastseen := le.header_summary.corraddrname_lastseen;
+	// self.corr_risk_summary.corraddrname_source_cnt := le.header_summary.corraddrname_source_cnt;
 	self.corr_risk_summary.corraddrphone_sources := le.header_summary.corraddrphone_sources;
 	self.corr_risk_summary.corraddrphone_firstseen := le.header_summary.corraddrphone_firstseen;
 	self.corr_risk_summary.corraddrphone_lastseen := le.header_summary.corraddrphone_lastseen;
+	// self.corr_risk_summary.corraddrphone_source_cnt := le.header_summary.corraddrphone_source_cnt;
 	self.corr_risk_summary.corrphonelastname_sources := le.header_summary.corrphonelastname_sources;
 	self.corr_risk_summary.corrphonelastname_firstseen := le.header_summary.corrphonelastname_firstseen;
 	self.corr_risk_summary.corrphonelastname_lastseen := le.header_summary.corrphonelastname_lastseen;
+	// self.corr_risk_summary.corrphonelastname_source_cnt := le.header_summary.corrphonelastname_source_cnt;
 	self.corr_risk_summary.corrnamedob_sources := le.header_summary.corrnamedob_sources;
 	self.corr_risk_summary.corrnamedob_firstseen := le.header_summary.corrnamedob_firstseen;
 	self.corr_risk_summary.corrnamedob_lastseen := le.header_summary.corrnamedob_lastseen;
+	// self.corr_risk_summary.corrnamedob_source_cnt := le.header_summary.corrnamedob_source_cnt;
 	self.corr_risk_summary.corraddrdob_sources := le.header_summary.corraddrdob_sources;
 	self.corr_risk_summary.corraddrdob_firstseen := le.header_summary.corraddrdob_firstseen;
 	self.corr_risk_summary.corraddrdob_lastseen := le.header_summary.corraddrdob_lastseen;
+	// self.corr_risk_summary.corraddrdob_source_cnt := le.header_summary.corraddrdob_source_cnt;
 	self.corr_risk_summary.corrssndob_sources := le.header_summary.corrssndob_sources;
 	self.corr_risk_summary.corrssndob_firstseen := le.header_summary.corrssndob_firstseen;
 	self.corr_risk_summary.corrssndob_lastseen := le.header_summary.corrssndob_lastseen;
+	// self.corr_risk_summary.corrssndob_source_cnt := le.header_summary.corrssndob_source_cnt;
 	self.corr_risk_summary.corrssnphone_sources := le.header_summary.corrssnphone_sources;
 	self.corr_risk_summary.corrssnphone_firstseen := le.header_summary.corrssnphone_firstseen;
 	self.corr_risk_summary.corrssnphone_lastseen := le.header_summary.corrssnphone_lastseen;
+	// self.corr_risk_summary.corrssnphone_source_cnt := le.header_summary.corrssnphone_source_cnt;
 	self.corr_risk_summary.corrdobphone_sources := le.header_summary.corrdobphone_sources;
 	self.corr_risk_summary.corrdobphone_firstseen := le.header_summary.corrdobphone_firstseen;
 	self.corr_risk_summary.corrdobphone_lastseen := le.header_summary.corrdobphone_lastseen;
+	// self.corr_risk_summary.corrdobphone_source_cnt := le.header_summary.corrdobphone_source_cnt;
 	
 	self.credit_derived_perf.acc_logs_collection_count12_6mos				:= le.acc_logs.collection.count12_6mos;
 	self.credit_derived_perf.acc_logs_collection_count12_12mos			:= le.acc_logs.collection.count12_12mos; 
@@ -628,13 +630,22 @@ export ToEdina_55( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.bus_addr_only_curr										:= le.Address_Verification.bus_addr_only_curr;
 	self.bus_addr_only												:= le.Address_Verification.bus_addr_only;
 	
-	self.bus_property_owned_total							:= le.Address_Verification.bus_owned.property_total;
-	self.bus_property_owned_assess_total			:= le.Address_Verification.bus_owned.property_owned_assessed_total;
-	self.bus_property_owned_assess_count			:= le.Address_Verification.bus_owned.property_owned_assessed_count;
-	self.bus_property_sold_total							:= le.Address_Verification.bus_sold.property_total;
-	self.bus_property_sold_assess_total				:= le.Address_Verification.bus_sold.property_owned_assessed_total;
-	self.bus_property_sold_assess_count				:= le.Address_Verification.bus_sold.property_owned_assessed_count;
+	self.Address_Verification.bus_property_owned_total						:= le.Address_Verification.bus_owned.property_total;
+	self.Address_Verification.bus_property_owned_assess_total			:= le.Address_Verification.bus_owned.property_owned_assessed_total;
+	self.Address_Verification.bus_property_owned_assess_count			:= le.Address_Verification.bus_owned.property_owned_assessed_count;
+	self.Address_Verification.bus_property_sold_total							:= le.Address_Verification.bus_sold.property_total;
+	self.Address_Verification.bus_property_sold_assess_total			:= le.Address_Verification.bus_sold.property_owned_assessed_total;
+	self.Address_Verification.bus_property_sold_assess_count			:= le.Address_Verification.bus_sold.property_owned_assessed_count;
 
+  self.bus_SOS_filings_peradl                   := le.BIP_Header.bus_SOS_filings_peradl;
+  self.bus_active_SOS_filings_peradl            := le.BIP_Header.bus_active_SOS_filings_peradl;
+  self.bus_sos_filings_not_instate              := le.BIP_Header54.bus_sos_filings_not_instate;
+  self.bus_ucc_count                            := le.BIP_Header54.bus_ucc_count;
+  self.bus_ucc_active_count                     := le.BIP_Header54.bus_ucc_active_count;
+  self.acc_logs.bus_inq_count12                 := le.BIP_Header54.bus_inq_count12;
+  self.acc_logs.bus_inq_credit_count12          := le.BIP_Header54.bus_inq_credit_count12;
+  self.acc_logs.bus_inq_highriskcredit_count12  := le.BIP_Header54.bus_inq_highriskcredit_count12;
+  self.acc_logs.bus_inq_other_count12           := le.BIP_Header54.bus_inq_other_count12;
 	self := le;
 
 	end;

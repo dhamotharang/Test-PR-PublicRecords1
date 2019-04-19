@@ -57,7 +57,7 @@ Layout_inq_PII_corroboration := RECORD
 	integer	inq_corrnameaddrphnssn_adl	;
 END;
 
-export layout_best_pii_inquiries := record
+layout_best_pii_inquiries := record
 	unsigned2 inq_perbestssn := 0;
 	unsigned2 inq_adlsperbestssn := 0;
 	unsigned2 inq_lnamesperbestssn := 0;
@@ -1327,7 +1327,7 @@ Layout_credit_derived_perf := RECORD
 
 END;
 
-export layout_best_pii_flags := record
+layout_best_pii_flags := record
 	string2 input_fname_isbestmatch := '';
 	string2 input_lname_isbestmatch := '';
 	string2 input_ssn_isbestmatch := '';
@@ -1338,7 +1338,7 @@ export layout_best_pii_flags := record
 	string1 best_ssn_valid := '';
 end;
 
-export layout_BIP_Header_info := record
+layout_BIP_Header_info := record
 	integer 	bus_seleids_peradl := 0;
 	integer 	bus_gold_seleids_peradl := 0;
 	integer 	bus_active_seleids_peradl := 0;
@@ -1350,7 +1350,7 @@ export layout_BIP_Header_info := record
 	integer 	bus_header_build_date := 0;
 end;
 
-export layout_BIP_Header_info_54 := record
+layout_BIP_Header_info_54 := record
 	integer     bus_ver_sources_total := 0;
 	qstring100 	bus_ver_sources := '';
 	qstring200 	bus_ver_sources_first_seen := '';
