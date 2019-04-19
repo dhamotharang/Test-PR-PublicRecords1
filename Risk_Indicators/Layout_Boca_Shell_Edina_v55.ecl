@@ -1385,7 +1385,7 @@ export layout_BIP_Header_info_54 := record
 	qstring200 	bus_phone_ver_sources_last_seen		 := '';
 end;
 
-export Layout_Boca_Shell_Edina_v54 := RECORD
+export Layout_Boca_Shell_Edina_v55 := RECORD
 	#if(includeADLFields)
 	risk_indicators.iid_constants.adl_based_modeling_flags;
 	#end
