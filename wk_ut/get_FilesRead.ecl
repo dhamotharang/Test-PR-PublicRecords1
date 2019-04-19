@@ -5,7 +5,7 @@ EXPORT get_FilesRead(
   ,pUseGlobal  = 'true'
 ) :=
 functionmacro
- 
+ import Workman;
  return Workman.get_FilesRead(pWorkunitID,pesp,pUseGlobal);
  
 endmacro;

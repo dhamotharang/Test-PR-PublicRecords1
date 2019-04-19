@@ -26,7 +26,7 @@ BuildAll:= sequential
 			 	BuildLogger.BuildStart(false),
 				BuildLogger.PrepStart(false),
 	  		Phonesplus_v2.Spray_Telcordia(tversion);  
-				Phonesplus.spray_NeustarInputFile(pversion),     		
+				Phonesplus.Proc_Build_iConectiv_Ported_Phone_Type_Changes(pversion),
 				addHeaderKeyBuilding,
 				BuildLogger.PrepEnd(false),
 				BuildLogger.BaseStart(false),
@@ -45,6 +45,7 @@ BuildAll:= sequential
 				BuildLogger.KeyEnd(false),
 				BuildLogger.PostStart(false),
 				phonesplus_dops_update,
+				phonesplus_v2.Proc_build_Promonitor_extract,
 				Phonesplus_v2.Proc_Build_Surname_File(pversion),
 				Phonesplus_v2.Fn_Extract_LeadsEnhancementforDeathofInsured(pversion),	
 	parallel
