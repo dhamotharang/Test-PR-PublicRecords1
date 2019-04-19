@@ -160,7 +160,7 @@
 	
 		tempLayout roll(aggrTrans_s l, aggrTrans_s r) := transform
 			self.dt_first_seen := ut.min2((unsigned)l.dt_first_seen, (unsigned)r.dt_first_seen);
-			self.dt_last_seen  := ut.max2((unsigned)l.dt_last_seen,(unsigned)r.dt_last_seen);
+			self.dt_last_seen  := max((unsigned)l.dt_last_seen,(unsigned)r.dt_last_seen);
 			self 							 := r;
 		end;
 

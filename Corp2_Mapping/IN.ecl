@@ -367,16 +367,13 @@ export IN := MODULE;
 	
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_IN Report' //subject
 																																	 ,'Scrubs CorpMain_IN Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpINMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																	);
 																													 
 		EXPORT Main_BadRecords			:= Main_N.ExpandedInFile(dt_vendor_first_reported_Invalid 			<> 0 or
 																													dt_vendor_last_reported_Invalid 			<> 0 or

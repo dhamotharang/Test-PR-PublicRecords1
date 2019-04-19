@@ -7,8 +7,6 @@ export Rollback(
 	string	Test_RinID
 )  :=
 module
-	shared SkipModules := Files().Flags.SkipModules;
-	shared SkipBaseRollback := SkipModules[1].SkipBaseRollback;
 
 	Shared PreviousVersion := if(pversion	= 	'', FraudGovInfo().PreviousVersion,pversion);
 
@@ -88,7 +86,7 @@ module
 	
 	Export All := 	
 		sequential( 
-			if(SkipBaseRollback = false,All_Files) , 	
+			//All_Files , 	
 			FraudGovPlatform_Validation.Send_Email
 			(	pversion, 
 				build_status := Test_Build, 
