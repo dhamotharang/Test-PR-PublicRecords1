@@ -1,7 +1,7 @@
 // Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
-IMPORT Foreclosure_Services,PersonReports,doxie, doxie_crs,ATF_Services, iesp, 
+IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp, 
       AutoStandardI, ut, American_Student_Services,  
-			LIB_WORD, SmartRollup, FCRA, LN_PropertyV2_Services, PersonReports;
+			SmartRollup, FCRA, LN_PropertyV2_Services;
 iespOut := iesp.smartlinxreport;			
 out_rec := record(iespOut.t_SmartlinxReportIndividual)
     dataset(iesp.share.t_CodeMap) Messages;
@@ -190,7 +190,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
     boolean IsSubjectOwned;
     unsigned4 srt_date;
   end;
-  msearch := module (project (old_param, input.dummy_search, opt)) end; // msearch will fill in all the defaults (mainly, search), which I don't ever have when running a report
+  msearch := module (project (old_param, $.input.dummy_search, opt)) end; // msearch will fill in all the defaults (mainly, search), which I don't ever have when running a report
   added_in_mod   := project(msearch, foreclosure_services.raw.params);
 	nod            := Foreclosure_Services.Raw.REPORT_VIEW.by_did(dids,added_in_mod,true);
 	s_nod          := if (param.include_properties and not doxie.DataRestriction.Fares,nod,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
@@ -199,7 +199,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_fore         := if (param.include_properties and not doxie.DataRestriction.Fares,fore,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
 	s_fore_count   := count(s_fore);
 	p_fore         := CHOOSEN (s_fore, iesp.constants.SMART.MaxForeclosures);
-	propMod        := PersonReports.property_records (dids, module (project (old_param, input.property)) end, IsFCRA, ds_flags);  //should set flag for Current or Prior owner
+	propMod        := PersonReports.property_records (dids, module (project (old_param, $.input.property)) end, IsFCRA, ds_flags);  //should set flag for Current or Prior owner
 	propUnderLimit := (not excessive_property) and (count(propMod.property_v2) <= iesp.constants.SMART.MaxUnRolledRecords);
 	allPropV2      := if (param.include_properties and propUnderLimit, project(propMod.property_v2,iesp.property.t_PropertyReport2Record),dataset([],iesp.property.t_PropertyReport2Record)); //used for other business assoc
 	alldeed        := if (param.include_properties and propUnderLimit, project(propMod.prop_deeds_all,iesp.propdeed.t_DeedReportRecord),dataset([],iesp.propdeed.t_DeedReportRecord));
@@ -217,7 +217,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	
 
 	// OTHER PROPERTY SECTION 
-	emails      := IF (param.include_email,  PersonReports.email_records(dids, module (project (old_param, input.emails)) end, IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
+	emails      := IF (param.include_email,  PersonReports.email_records(dids, module (project (old_param, $.input.emails)) end, IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
 	s_emails    := SmartRollup.fn_smart_rollup_email(emails);  //count children since rows are per source
 	s_emails_count := count(s_emails);
 	p_emails      := choosen (s_emails, iesp.Constants.SMART.MaxEmails);	
