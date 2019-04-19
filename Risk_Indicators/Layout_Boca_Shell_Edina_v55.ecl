@@ -57,6 +57,23 @@ Layout_inq_PII_corroboration := RECORD
 	integer	inq_corrnameaddrphnssn_adl	;
 END;
 
+export layout_best_pii_inquiries := record
+	unsigned2 inq_perbestssn := 0;
+	unsigned2 inq_adlsperbestssn := 0;
+	unsigned2 inq_lnamesperbestssn := 0;
+	unsigned2 inq_addrsperbestssn := 0;
+	unsigned2 inq_dobsperbestssn := 0;
+	unsigned2 inq_percurraddr := 0;
+	unsigned2 inq_adlspercurraddr := 0;
+	unsigned2 inq_lnamespercurraddr := 0;
+	unsigned2 inq_ssnspercurraddr := 0;
+	unsigned2 inq_curraddr_ver_count := 0;
+	unsigned2 inq_bestfname_ver_count := 0;
+	unsigned2 inq_bestlname_ver_count := 0;
+	unsigned2 inq_bestssn_ver_count := 0;
+	unsigned2 inq_bestdob_ver_count := 0;
+end;
+
 layout_inquiries_edina := RECORD
 	string8 first_log_date;
 	string8 last_log_date;
@@ -81,6 +98,10 @@ layout_inquiries_edina := RECORD
 	layout_counts retailPayments;// new for shell 5.0
 	layout_counts StudentLoans;// new for shell 5.0
 	layout_counts Utilities;// new for shell 5.0
+  integer3 bus_inq_count12 := 0;  //new for 5.4
+  integer3 bus_inq_credit_count12 := 0;  //new for 5.4
+  integer3 bus_inq_highriskcredit_count12 := 0;  //new for 5.4
+  integer3 bus_inq_other_count12 := 0;  //new for 5.4
 	
    unsigned2 inquiryperadl;
 		unsigned2	inq_peradl_count_day	;
@@ -231,7 +252,7 @@ layout_inquiries_edina := RECORD
 		string8 om_first_seen_date;
 		string8 om_last_seen_date;
 	
-		risk_indicators.layouts.layout_best_pii_inquiries;
+		layout_best_pii_inquiries;
 		
 		Layout_inq_PII_corroboration; //     inq_PII_corroboration; //new for 5.3
 		
@@ -508,7 +529,13 @@ END;
 
 Layout_Applicant_Property_Values_edina := RECORD
 	Layout_Property_Value_edina 	owned;
+	integer bus_property_owned_total;
+	integer bus_property_owned_assess_total;
+	integer bus_property_owned_assess_count;
 	Layout_Property_Value_edina 	sold;
+	integer bus_property_sold_total;
+	integer bus_property_sold_assess_total;
+	integer bus_property_sold_assess_count;
 	Layout_Property_Value_edina_ambig 	ambiguous;
 END;
 
@@ -724,7 +751,6 @@ Layout_ADL_Information := RECORD
 	unsigned1 phones_per_addr_current;
 	unsigned1 phones_per_curraddr_current; // from best_flags section
 	unsigned1 adls_per_phone_current; 
-	unsigned1 adls_per_bestphone_current; // from best_flags section
 	unsigned1 ssns_per_adl_created_6months;
 	unsigned1 addrs_per_adl_created_6months;
 	unsigned1 phones_per_adl_created_6months;
@@ -740,7 +766,6 @@ Layout_ADL_Information := RECORD
 	unsigned1 phones_per_addr_created_6months;
 	unsigned1 phones_per_curraddr_created_6months;  // from best_flags section
 	unsigned1 adls_per_phone_created_6months;
-	unsigned1 adls_per_bestphone_created_6months;// from best_flags section
 	unsigned1 dl_addrs_per_adl;
 	unsigned1 vo_addrs_per_adl;
 	unsigned1 pl_addrs_per_adl;
@@ -1088,6 +1113,7 @@ Layout_Derogs_edina := RECORD
 	unsigned	liens_rel_total_amount	;
 	
 	layout_liens Liens;
+	// risk_indicators.Layouts_Derog_Info.LNJ_attrs LnJ_attributes;  // new JuLi fields for 5.2
 	UNSIGNED1 criminal_count;
 	UNSIGNED4 last_criminal_date;
 	UNSIGNED1 felony_count;
@@ -1219,39 +1245,65 @@ layout_pii_stability := record
 	string15	link_max_weight_element	;
 	string15	link_min_weight_element	;
 end;
-
+/* Exclude VOO attributes from the Edina shell layout until they are approved for release...
+// slimmed down version of VOO attributes they were interested in for MS-39
+Layout_VOOAttributes := RECORD
+	String2 	AddressReportingHistoryIndex;
+	String2 	AddressSearchHistoryIndex;
+	String2 	AddressUtilityHistoryIndex;
+	String2 	AddressOwnershipHistoryIndex;
+	String2 	AddressPropertyTypeIndex;
+	String2 	RelativesConfirmingAddressIndex;
+	String2 	AddressOwnerMailingAddressIndex;
+	String2 	PriorAddressMoveIndex;
+	String2 	PriorResidentMoveIndex;
+	String2 	OccupancyOverride;
+	String2 	InferredOwnershipTypeIndex;
+	String5   OtherOwnedPropertyProximity;
+END;
+*/
 Layout_corr_risk_summary := RECORD
 		//these fields added in BS 5.3 and are based off of converted source code versus the raw source code
 	string50   corrssnname_sources;
 	qstring200 corrssnname_firstseen;
 	qstring200 corrssnname_lastseen;
+	// string100	 corrssnname_source_cnt;
 	string50   corrssnaddr_sources;
 	qstring200 corrssnaddr_firstseen;
 	qstring200 corrssnaddr_lastseen;
+	// string100	 corrssnaddr_source_cnt;
 	string50   corraddrname_sources;
 	qstring200 corraddrname_firstseen;
 	qstring200 corraddrname_lastseen;
+	// string100	 corraddrname_source_cnt;
 	string50   corraddrphone_sources;
 	qstring200 corraddrphone_firstseen;
 	qstring200 corraddrphone_lastseen;
+	// string100	 corraddrphone_source_cnt;
 	string50   corrphonelastname_sources;
 	qstring200 corrphonelastname_firstseen;
 	qstring200 corrphonelastname_lastseen;
+	// string100	 corrphonelastname_source_cnt;
 	string50   corrnamedob_sources;
 	qstring200 corrnamedob_firstseen;
 	qstring200 corrnamedob_lastseen;
+	// string100	 corrnamedob_source_cnt;
 	string50   corraddrdob_sources;
 	qstring200 corraddrdob_firstseen;
 	qstring200 corraddrdob_lastseen;
+	// string100	 corraddrdob_source_cnt;
 	string50   corrssndob_sources;
 	qstring200 corrssndob_firstseen;
 	qstring200 corrssndob_lastseen;
+	// string100	 corrssndob_source_cnt;
 	string50   corrssnphone_sources;
 	qstring200 corrssnphone_firstseen;
 	qstring200 corrssnphone_lastseen;
+	// string100	 corrssnphone_source_cnt;
 	string50   corrdobphone_sources;
 	qstring200 corrdobphone_firstseen;
 	qstring200 corrdobphone_lastseen;
+	// string100	 corrdobphone_source_cnt;
 END;
 
 //new for BS 5.3 - these count fields must be defined as integer due to returning -1 in them when the offset archive date ends up being invalid or when DID is not found
@@ -1283,8 +1335,57 @@ Layout_credit_derived_perf := RECORD
 
 END;
 
+export layout_best_pii_flags := record
+	string2 input_fname_isbestmatch := '';
+	string2 input_lname_isbestmatch := '';
+	string2 input_ssn_isbestmatch := '';
+	string1 curraddr_hriskaddrflag := '';
+	string8 best_ssn_dod := '';
+	string1 best_ssn_decsflag := '';
+	string1 best_ssn_ssndobflag := '';
+	string1 best_ssn_valid := '';
+end;
 
-export Layout_Boca_Shell_Edina_v55 := RECORD
+export layout_BIP_Header_info := record
+	integer 	bus_seleids_peradl := 0;
+	integer 	bus_gold_seleids_peradl := 0;
+	integer 	bus_active_seleids_peradl := 0;
+	integer 	bus_inactive_seleids_peradl := 0;
+	integer 	bus_defunct_seleids_peradl := 0;
+	integer 	bus_gold_seleid_first_seen := 0;
+	integer 	bus_header_first_seen := 0;
+	integer 	bus_header_last_seen := 0;
+	integer 	bus_header_build_date := 0;
+end;
+
+export layout_BIP_Header_info_54 := record
+	integer     bus_ver_sources_total := 0;
+	qstring100 	bus_ver_sources := '';
+	qstring200 	bus_ver_sources_first_seen := '';
+	qstring200 	bus_ver_sources_last_seen := '';
+	integer    	bus_fname_ver_sources_total := 0;
+	qstring100 	bus_fname_ver_sources := '';
+	qstring200 	bus_fname_ver_sources_first_seen := '';
+	qstring200 	bus_fname_ver_sources_last_seen := '';
+	integer    	bus_lname_ver_sources_total := 0;
+	qstring100 	bus_lname_ver_sources := '';
+	qstring200 	bus_lname_ver_sources_first_seen := '';
+	qstring200 	bus_lname_ver_sources_last_seen := '';
+	integer    	bus_addr_ver_sources_total := 0;
+	qstring100 	bus_addr_ver_sources := '';
+	qstring200 	bus_addr_ver_sources_first_seen	 := '';
+	qstring200 	bus_addr_ver_sources_last_seen		 := '';
+	integer    	bus_ssn_ver_sources_total		 := 0;
+	qstring100 	bus_ssn_ver_sources		 := '';
+	qstring200 	bus_ssn_ver_sources_first_seen		 := '';
+	qstring200 	bus_ssn_ver_sources_last_seen		 := '';
+	integer   	 bus_phone_ver_sources_total		 := 0;
+	qstring100 	bus_phone_ver_sources		 := '';
+	qstring200 	bus_phone_ver_sources_first_seen		 := '';
+	qstring200 	bus_phone_ver_sources_last_seen		 := '';
+end;
+
+export Layout_Boca_Shell_Edina_v54 := RECORD
 	#if(includeADLFields)
 	risk_indicators.iid_constants.adl_based_modeling_flags;
 	#end
@@ -1306,17 +1407,17 @@ export Layout_Boca_Shell_Edina_v55 := RECORD
 	integer source_profile_index; 				
 	header_verification_summary 														header_summary;
 	Layout_corr_risk_summary         												corr_risk_summary; 
-  risk_indicators.layouts.layout_best_pii_flags						best_pii_flags;
+  layout_best_pii_flags						                        best_pii_flags;
 	Layout_Available_Sources 																Available_Sources;
 	integer	bus_addr_only_curr;
 	integer	bus_addr_only;
-	Risk_Indicators.Layouts.layout_BIP_Header_info 					BIP_Header;
-	integer bus_property_owned_total;
-	integer bus_property_owned_assess_total;
-	integer bus_property_owned_assess_count;
-	integer bus_property_sold_total;
-	integer bus_property_sold_assess_total;
-	integer bus_property_sold_assess_count;
+	layout_BIP_Header_info 					                        BIP_Header;
+  layout_BIP_Header_info_54                 					    BIP_Header54;
+	integer bus_SOS_filings_peradl := 0;
+	integer bus_active_SOS_filings_peradl := 0;
+  integer3 bus_sos_filings_not_instate := 0;
+  integer3 bus_ucc_count := 0;
+  integer3 bus_ucc_active_count := 0;
 	Layout_Input_Validation 																Input_Validation;
 	Layout_Name_Verification 																Name_Verification;
 	Layout_Utility																					Utility;
@@ -1351,6 +1452,7 @@ export Layout_Boca_Shell_Edina_v55 := RECORD
 	Layout_FD_Scores																				FD_Scores;
 	Risk_Indicators.Layouts.layout_Equifax_FraudFlags 			Eqfx_FraudFlags;
 
+	
 	string1 wealth_indicator;
 	string8 input_dob_age;
 	string1 dobmatchlevel;
@@ -1370,12 +1472,9 @@ export Layout_Boca_Shell_Edina_v55 := RECORD
 	Layout_credit_derived_perf       												credit_derived_perf; 
 	string20	historyDateTimeStamp := '';  
 	STRING200 errorcode;
-	Risk_Indicators.Layouts.layout_BIP_Header_info_54 -bus_seleID_match					BIP_Header54;
 
+	// Layout_VOOAttributes             VOO_attributes; 
+
+	
 END;
-
-
-
- 
-
 
