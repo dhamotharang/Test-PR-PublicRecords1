@@ -7,8 +7,8 @@ myprevfile := ''; // THOR file containing previous data (can be empty)
 mystatsfile := ''; // output file name
  
 // New and (optionally) previous versions of data
-dsNew := DATASET(mynewfile, Scrubs_Vendor_Src.Bankruptcy_Layout_Bankruptcy, THOR);
-dsPrev := DATASET(myprevfile, Scrubs_Vendor_Src.Bankruptcy_Layout_Bankruptcy, THOR);
+dsNew := DATASET(mynewfile, Scrubs_Vendor_Src.Bankruptcy_Layout_Vendor_Src, THOR);
+dsPrev := DATASET(myprevfile, Scrubs_Vendor_Src.Bankruptcy_Layout_Vendor_Src, THOR);
  
 hygieneStats := Scrubs_Vendor_Src.Bankruptcy_hygiene(dsNew).StandardStats();
 scrubsStats := Scrubs_Vendor_Src.Bankruptcy_Scrubs.StandardStats(dsNew);

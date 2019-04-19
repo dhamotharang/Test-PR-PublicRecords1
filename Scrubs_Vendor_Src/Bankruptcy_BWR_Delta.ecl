@@ -2,8 +2,8 @@
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','Scrubs_Vendor_Src.Bankruptcy_BWR_Delta - Finding the Delta of Two Files - SALT V3.11.6');
 IMPORT Scrubs_Vendor_Src,SALT311;
-FilePrev := DATASET([], Bankruptcy_Layout_Bankruptcy);
-FileNew := DATASET([], Bankruptcy_Layout_Bankruptcy);
+FilePrev := DATASET([], Bankruptcy_Layout_Vendor_Src);
+FileNew := DATASET([], Bankruptcy_Layout_Vendor_Src);
 d := Scrubs_Vendor_Src.Bankruptcy_Delta(FilePrev, FileNew); // Instantiate delta module
 PARALLEL(OUTPUT(d.DifferenceSummary, NAMED('Summary'), ALL),
          // The below outputs some of the differences; you may wish to send this to a file for investigation

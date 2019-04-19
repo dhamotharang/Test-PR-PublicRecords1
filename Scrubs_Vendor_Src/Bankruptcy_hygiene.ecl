@@ -1,5 +1,5 @@
 ﻿IMPORT SALT311,STD;
-EXPORT Bankruptcy_hygiene(dataset(Bankruptcy_layout_Bankruptcy) h) := MODULE
+EXPORT Bankruptcy_hygiene(dataset(Bankruptcy_layout_Vendor_Src) h) := MODULE
  
 //A simple summary record
 EXPORT Summary(SALT311.Str30Type  txt) := FUNCTION
@@ -126,7 +126,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := Bankruptcy_Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_lncourtcode','Invalid_court_code','Invalid_court_name','Invalid_address1','Invalid_address2','Invalid_city','Invalid_state','Invalid_zip','Invalid_phone');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'lncourtcode','court_code','court_name','address1','address2','city','state','zip','phone');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,Bankruptcy_Fields.InValidMessage_lncourtcode(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_court_code(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_court_name(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_address1(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_address2(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_city(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_state(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_zip(TotalErrors.ErrorNum),Bankruptcy_Fields.InValidMessage_phone(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;

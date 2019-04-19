@@ -2,7 +2,7 @@
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','Scrubs_Vendor_Src.Bankruptcy_BWR_Scrubs - Checking field validity in a file - SALT V3.11.6');
 IMPORT Scrubs_Vendor_Src,SALT311;
-infile := Scrubs_Vendor_Src.Bankruptcy_In_Bankruptcy;
+infile := Scrubs_Vendor_Src.Bankruptcy_In_Vendor_Src;
 mod_scrubs := Scrubs_Vendor_Src.Bankruptcy_Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);

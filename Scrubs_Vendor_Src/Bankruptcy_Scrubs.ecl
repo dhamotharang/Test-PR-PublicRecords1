@@ -8,7 +8,7 @@ EXPORT Bankruptcy_Scrubs := MODULE
   EXPORT NumFieldsWithRules := 9;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
-  EXPORT Expanded_Layout := RECORD(Bankruptcy_Layout_Bankruptcy)
+  EXPORT Expanded_Layout := RECORD(Bankruptcy_Layout_Vendor_Src)
     UNSIGNED1 lncourtcode_Invalid;
     UNSIGNED1 court_code_Invalid;
     UNSIGNED1 court_name_Invalid;
@@ -19,10 +19,10 @@ EXPORT Bankruptcy_Scrubs := MODULE
     UNSIGNED1 zip_Invalid;
     UNSIGNED1 phone_Invalid;
   END;
-  EXPORT  Bitmap_Layout := RECORD(Bankruptcy_Layout_Bankruptcy)
+  EXPORT  Bitmap_Layout := RECORD(Bankruptcy_Layout_Vendor_Src)
     UNSIGNED8 ScrubsBits1;
   END;
-EXPORT FromNone(DATASET(Bankruptcy_Layout_Bankruptcy) h) := MODULE
+EXPORT FromNone(DATASET(Bankruptcy_Layout_Vendor_Src) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
     SELF.lncourtcode_Invalid := Bankruptcy_Fields.InValid_lncourtcode((SALT311.StrType)le.lncourtcode);
     SELF.court_code_Invalid := Bankruptcy_Fields.InValid_court_code((SALT311.StrType)le.court_code);
@@ -36,7 +36,7 @@ EXPORT FromNone(DATASET(Bankruptcy_Layout_Bankruptcy) h) := MODULE
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
-  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Bankruptcy_Layout_Bankruptcy);
+  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Bankruptcy_Layout_Vendor_Src);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.lncourtcode_Invalid << 0 ) + ( le.court_code_Invalid << 1 ) + ( le.court_name_Invalid << 2 ) + ( le.address1_Invalid << 3 ) + ( le.address2_Invalid << 4 ) + ( le.city_Invalid << 5 ) + ( le.state_Invalid << 6 ) + ( le.zip_Invalid << 7 ) + ( le.phone_Invalid << 8 );
     SELF := le;
@@ -45,7 +45,7 @@ EXPORT FromNone(DATASET(Bankruptcy_Layout_Bankruptcy) h) := MODULE
 END;
 // Module to use if you already have a scrubs bitmap you wish to expand or compare
 EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
-  EXPORT Infile := PROJECT(h,Bankruptcy_Layout_Bankruptcy);
+  EXPORT Infile := PROJECT(h,Bankruptcy_Layout_Vendor_Src);
   Expanded_Layout into(h le) := TRANSFORM
     SELF.lncourtcode_Invalid := (le.ScrubsBits1 >> 0) & 1;
     SELF.court_code_Invalid := (le.ScrubsBits1 >> 1) & 1;
@@ -111,29 +111,29 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.zip_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.phone_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'lncourtcode','court_code','court_name','address1','address2','city','state','zip','phone','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'Invalid_lncourtcode','Invalid_court_code','Invalid_court_name','Invalid_address1','Invalid_address2','Invalid_city','Invalid_state','Invalid_zip','Invalid_phone','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'lncourtcode','court_code','court_name','address1','address2','city','state','zip','phone','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.lncourtcode,(SALT311.StrType)le.court_code,(SALT311.StrType)le.court_name,(SALT311.StrType)le.address1,(SALT311.StrType)le.address2,(SALT311.StrType)le.city,(SALT311.StrType)le.state,(SALT311.StrType)le.zip,(SALT311.StrType)le.phone,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,9,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
-  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Bankruptcy_Layout_Bankruptcy) prevDS = DATASET([], Bankruptcy_Layout_Bankruptcy), STRING10 Src='UNK'):= FUNCTION
+  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Bankruptcy_Layout_Vendor_Src) prevDS = DATASET([], Bankruptcy_Layout_Vendor_Src), STRING10 Src='UNK'):= FUNCTION
   // field error stats
     SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'lncourtcode:Invalid_lncourtcode:ALLOW'
-          ,'court_code:Invalid_court_code:ALLOW'
-          ,'court_name:Invalid_court_name:ALLOW'
-          ,'address1:Invalid_address1:ALLOW'
-          ,'address2:Invalid_address2:ALLOW'
-          ,'city:Invalid_city:ALLOW'
-          ,'state:Invalid_state:ALLOW'
-          ,'zip:Invalid_zip:ALLOW'
-          ,'phone:Invalid_phone:ALLOW'
+          ,'lncourtcode:lncourtcode:ALLOW'
+          ,'court_code:court_code:ALLOW'
+          ,'court_name:court_name:ALLOW'
+          ,'address1:address1:ALLOW'
+          ,'address2:address2:ALLOW'
+          ,'city:city:ALLOW'
+          ,'state:state:ALLOW'
+          ,'zip:zip:ALLOW'
+          ,'phone:phone:ALLOW'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -212,7 +212,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldErrorStats := IF(examples>0,j,SummaryInfo);
  
     // field population stats
-    mod_hygiene := Bankruptcy_hygiene(PROJECT(h, Bankruptcy_Layout_Bankruptcy));
+    mod_hygiene := Bankruptcy_hygiene(PROJECT(h, Bankruptcy_Layout_Vendor_Src));
     hygiene_summaryStats := mod_hygiene.Summary('');
     getFieldTypeText(infield) := FUNCTIONMACRO
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
@@ -268,7 +268,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     END;
     TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
  
-    mod_Delta := Bankruptcy_Delta(prevDS, PROJECT(h, Bankruptcy_Layout_Bankruptcy));
+    mod_Delta := Bankruptcy_Delta(prevDS, PROJECT(h, Bankruptcy_Layout_Vendor_Src));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
     DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),9,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
@@ -281,7 +281,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
 END;
  
-EXPORT StandardStats(DATASET(Bankruptcy_Layout_Bankruptcy) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
+EXPORT StandardStats(DATASET(Bankruptcy_Layout_Vendor_Src) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
   myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
