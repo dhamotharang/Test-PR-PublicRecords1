@@ -7,8 +7,6 @@ export MyInfo
   module
 	export	string	UserID				:=	'petrvl01';
 	export	string	Password			:=	'Petras1987';
-	export	string	UserID				:=	'UserID';
-	export	string	Password			:=	'p@ssword';
 	export	string	Name				:=	'No Body';
 	export	string	EmailAddressNormal	:=	'vlad.petrokas@lexisnexisrisk.com';
 	export	string	EmailAddressNotify	:=	'vlad.petrokas@lexisnexisrisk.com';
