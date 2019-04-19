@@ -61,10 +61,12 @@ dataset(layout_filing_status) filing_status;
 	STRING50 RMSID_old							:=	'';
 	BOOLEAN		CaseLinkID_Prop_Flag	:=	FALSE;
 //DF-24061	
+string10  orig_rmsid;
 string7   AgencyID;
+String1   AgencyID_src;
 unsigned4 global_sid;
 unsigned8 record_sid;
-string10  orig_rmsid;
+
 	
 end;
 end;	

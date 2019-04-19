@@ -1,4 +1,4 @@
-import liensv2, Doxie,Data_Services, ut;
+﻿import liensv2, Doxie,Data_Services, ut;
 
 /* add integer did field */
 d := table(LiensV2.File_Liens_Party_BIPV2, {Liensv2.File_Liens_Party_BIPV2, idid := (integer8)did});
@@ -22,7 +22,11 @@ rLayout_liens_party_BIPV2_without_LinkFlags	:=	RECORD
 		xadl2_distance,
 		xadl2_matches,
 		xadl2_matches_desc
-	]
+	];
+ string10 	orig_rmsid;
+ unsigned4	global_sid;
+ unsigned8	record_sid;
+
 END;
 
 rLayout_liens_party_BIPV2_without_LinkFlags tformat(liensv2.Layout_liens_party_SSN_BIPV2 L) := transform
