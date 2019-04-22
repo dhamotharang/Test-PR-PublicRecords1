@@ -1,6 +1,7 @@
 ﻿import _Control;
 
-EVERY_DAY_AT_6AM := '0 11 * * *';
+EVERY_DAY_AT_6PM := '0 23 * * *';
+
 ThorName	:=		IF(_control.ThisEnvironment.Name		<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
 lECL1 :=
@@ -29,4 +30,4 @@ lECL1 :=
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov InquiryLogs Input Prep Schedule');
 
-_Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_6AM));
+_Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_6PM));

@@ -1218,6 +1218,11 @@
 				trim(kword, left, right) = 'CAPTA-561' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAPTA_561,
 				trim(kword, left, right) = 'PSPMA-LFL' =>SubGroup_Constants.numKeywordsID.KEYWORD_PSPMA_LFL,
 				trim(kword, left, right) = 'NLPOL' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLPOL,
+				trim(kword, left, right) = 'NLDNB' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLDNB,
+				trim(kword, left, right) = 'ZA-FICTFS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZA_FICTFS,
+				trim(kword, left, right) = 'DKDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKDPA,
+				trim(kword, left, right) = 'NLDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLDPA,
+				trim(kword, left, right) = 'NODPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NODPA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

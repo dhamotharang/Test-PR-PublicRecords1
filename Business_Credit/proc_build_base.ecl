@@ -32,12 +32,12 @@ EXPORT	proc_build_base(STRING	pVersion	,
 	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.memberSpecific.new		,dMemberSpecific		,Build_MemberSpecific_File		,TRUE);
   VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.releasedate.new				,dReleaseDate				,Build_ReleaseDate_File				,TRUE);
 	
-	//	SBFE Best Key Base Files
-	// SHARED	dHrchyBase		:=	PROJECT(BIPV2_Best_SBFE.CommonBase.DS_SBFE_CLEAN,BIPV2.CommonBase.Layout);
-	// SHARED	pInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Proxid;
-	// SHARED	sInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Seleid;
-	// SHARED	dBestSBFEFile	:=	BIPV2_Best.fn_Prep_for_Base(pInBase,sInbase,,,dHrchyBase);
-  // VersionControl.macBuildNewLogicalFile(BIPV2_Best_SBFE.Filenames(pVersion).Base.bipv2_best.new	,dBestSBFEFile	,Build_SBFEBest_File	,TRUE);
+		// SBFE Best Key Base Files
+	SHARED	dHrchyBase		:=	PROJECT(BIPV2_Best_SBFE.CommonBase.DS_SBFE_CLEAN,BIPV2.CommonBase.Layout);
+	SHARED	pInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Proxid;
+	SHARED	sInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Seleid;
+	SHARED	dBestSBFEFile	:=	BIPV2_Best.fn_Prep_for_Base(pInBase,sInbase,,,dHrchyBase);
+  VersionControl.macBuildNewLogicalFile(BIPV2_Best_SBFE.Filenames(pVersion).Base.bipv2_best.new	,dBestSBFEFile	,Build_SBFEBest_File	,TRUE);
                                                                                       
 	EXPORT	full_build	:=
 				SEQUENTIAL(
@@ -70,13 +70,13 @@ EXPORT	proc_build_base(STRING	pVersion	,
 					,Promote(pversion, 'out').buildfiles.New2Built
 					,Promote(pversion, 'out').buildfiles.Built2QA
 						// Build SBFE Best Key Base Files.  Only build the base files during a Full Build.
-					// ,IF(pBuildType	<>	Constants().buildType.Daily,
-						// SEQUENTIAL(
-							// Build_SBFEBest_File
-							// ,BIPV2_Best_Proxid.Keys(pInBase).BuildData
-							// ,BIPV2_Best_SBFE.Promote(pVersion).buildfiles.New2Built
-						// )
-					// )
+					,IF(pBuildType	<>	Constants().buildType.Daily,
+						SEQUENTIAL(
+							Build_SBFEBest_File
+							,BIPV2_Best_Proxid.Keys(pInBase).BuildData
+							,BIPV2_Best_SBFE.Promote(pVersion).buildfiles.New2Built
+						)
+					)
 				);
 
 	EXPORT	ALL	:=

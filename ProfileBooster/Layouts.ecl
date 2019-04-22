@@ -208,6 +208,9 @@ EXPORT Layout_Infutor := RECORD
 	string1 	marital_status;
 	string1 	gender;
 	string8		dob;
+	//Added for CCPA-10
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
 END;
 
 EXPORT Layout_PB_Slim := RECORD
