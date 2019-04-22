@@ -1,6 +1,6 @@
 ﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck;
 
-export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',string leMailTargetScoring='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com') := function
+export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',string leMailTargetScoring='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com') := function
 
 	
 	versionCheck := if(filedate[1..6] = ut.GetDate[1..6] and (header.Sourcedata_month.v_version[1..6] = filedate[1..6] or header.Sourcedata_month.v_eq_as_of_date[1..6] = filedate[1..6]),
@@ -14,9 +14,9 @@ export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lex
 //	RoxieKeyBuild.Mac_Daily_Email_Local('QUICK HEADER','SUCC',filedate,send_succ_msg,leMailTarget);
 	RoxieKeyBuild.Mac_Daily_Email_Local('QUICK HEADER','FAIL see workunit:'+workunit,filedate,send_fail_msg,leMailTarget);
 	
-	dops_FCRA_QH	:= roxiekeybuild.updateversion('FCRA_QuickHeaderKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'F');
-	dops_QH       := roxiekeybuild.updateversion('QuickHeaderKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'N');
-	dops_SS       := roxiekeybuild.updateversion('QHsourceKeys',filedate,'michael.gould@lexisnexis.com,jose.bello@lexisnexis.com',,'N');
+	dops_FCRA_QH	:= roxiekeybuild.updateversion('FCRA_QuickHeaderKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'F');
+	dops_QH       := roxiekeybuild.updateversion('QuickHeaderKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'N');
+	dops_SS       := roxiekeybuild.updateversion('QHsourceKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'N');
 	
 // Update Orbit with the correct entries in build in progress mode.
 

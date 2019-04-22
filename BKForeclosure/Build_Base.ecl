@@ -1,61 +1,52 @@
-IMPORT BKForeclosure,Scrubs_BKForeclosure_Nod;
+﻿IMPORT BKForeclosure;//, Scrubs_BKForeclosure_Nod, Scrubs_BKForeclosure_Reo;
+#option('multiplePersistInstances',FALSE);
+
 EXPORT Build_Base(STRING filedate) := MODULE
-SHARED superfile_Nod  := '~thor_data400::base::BKForeclosure_Nod';
-SHARED superfile_Reo  := '~thor_data400::base::BKForeclosure_Reo';
+SHARED superfile_Nod  := '~thor_data400::base::BKForeclosure::Nod';
+SHARED superfile_Reo  := '~thor_data400::base::BKForeclosure::Reo';
         // Build base file for Nod
-        File_Nod       := BKForeclosure.File_Nod_Clean_in(TRIM(delete_flag) <> 'DELETE');
-				oinFile_Nod    := OUTPUT(File_Nod,NAMED('inFile_Nod'));
-        Norm_Nod       := Normalize_Nod(File_Nod);
-				oNorm_Nod      := OUTPUT(Norm_Nod,NAMED('Norm_Nod'));
-        Clean_Name_Nod := fClean_Name.nod(Norm_Nod);
-				oCln_Name_Nod  := OUTPUT(Clean_Name_Nod,NAMED('Cln_Name_Nod'));
-        Clean_Addr_Nod := fClean_Address.cln_nod(Clean_Name_Nod);
-				oCln_Addr_Nod  := OUTPUT(Clean_Addr_Nod,NAMED('Cln_Addr_Nod'));
-        Append_ID_Nod  := Append_IDs.Append_nod(Clean_Addr_Nod);
-				oAppend_Nod    := OUTPUT(Append_ID_Nod,NAMED('Append_Nod'));
-        Std_Nod        := fStandardizedCode.StandardizedNod(Append_ID_Nod);
-				d_base_nod     := OUTPUT(Std_Nod,,'~thor_data400::base::bkforeclosure::nod::'+filedate,OVERWRITE);		
-        AddToSuperfile_Nod(STRING filedate) := FUNCTION
-	                     RETURN 	
-			                      FileServices.AddSuperFile(superfile_Nod, '~thor_data400::base::bkforeclosure::nod::'+filedate);
-                       END;					
-EXPORT  BaseNod        := SEQUENTIAL(oinFile_Nod
-                                    ,oNorm_Nod
-																		,oCln_Name_Nod
-																		,oCln_Addr_Nod
-																		,oAppend_Nod
-                                    ,d_base_nod
-																		,AddToSuperfile_Nod(filedate)
+				CountNodIn		 := OUTPUT(COUNT(BKForeclosure.File_BK_Foreclosure.Nod_File),NAMED('Total_NOD_in'));
+        NODBaseDelFlag := BKForeclosure.fSetDelFlag.NOD(BKForeclosure.File_BK_Foreclosure.fNod);
+				NODIngestPrep	 := BKForeclosure.NOD_prep_ingest_file;
+				IngestNOD			 := BKForeclosure.NOD_Ingest(,,NodBaseDelFlag,NODIngestPrep);
+				NewNodBase		 := IngestNod.AllRecords_NoTag : PERSIST('~thor_data400::in::BKForeclosure::Ingest_Nod');
+        Norm_Nod       := Normalize_Nod(NewNodBase(Delete_Flag <> 'DELETE'));
+        Clean_Nod 		 := ClnName_address_NOD(Norm_Nod);
+        Append_ID_Nod  := Append_IDs.Append_nod(Clean_Nod);
+        DeNorm_Nod     := Denorm_NOD(NewNodBase, Append_ID_Nod);
+				CountDelNod_out:= OUTPUT(COUNT(DeNorm_Nod(Delete_Flag = 'DELETE')),NAMED('TotalDel_NOD_out')); //True Deletes
+				CountNod_out	 := OUTPUT(COUNT(DeNorm_Nod(Delete_Flag <> 'DELETE')),NAMED('Total_NOD_out'));
+        PromoteSupers.Mac_SF_BuildProcess(DeNorm_Nod,'~thor_data400::base::bkforeclosure::nod',build_nod_base,3,,true);
+ 					
+EXPORT  BaseNod        := SEQUENTIAL(CountNodIn
+                                    ,build_nod_base
+																		,CountDelNod_out
+																		,CountNod_out
 																		// ,BKForeclosure.Strata_Population_Stats_Nod(filedate)
-                                    ,func_move_file.MoveFile('in::bkforeclosure::nod_infile','using','used')
+																		//,Scrubs_BKForeclosure_Nod;
 																		 );
 
         //Build base file for Reo
-        File_Reo       := BKForeclosure.File_Reo_Clean_in(TRIM(delete_flag) <> 'DELETE');
-				oinFile_Reo    := OUTPUT(File_Reo,NAMED('inFile_Reo'));
-        Norm_Reo       := Normalize_Reo(File_Reo);
-				oNorm_Reo      := OUTPUT(Norm_Reo,NAMED('Norm_Reo'));
-        Clean_Name_Reo := fClean_Name.reo(Norm_Reo);
-				oCln_Name_Reo  := OUTPUT(Clean_Name_Reo,NAMED('Cln_Name_Reo'));
-        Clean_Addr_Reo := fClean_Address.cln_reo(Clean_Name_Reo);
-				oCln_Addr_Reo  := OUTPUT(Clean_Addr_Reo,NAMED('Cln_Addr_Reo'));
-	      Append_ID_Reo  := Append_IDs.Append_reo(Clean_Addr_Reo);
-				oAppend_REO    := OUTPUT(Append_ID_Reo,NAMED('Append_Reo'));
-        Std_Reo        := fStandardizedCode.StandardizedReo(Append_ID_Reo);
-			  d_base_reo     := OUTPUT(Std_Reo,,'~thor_data400::base::BKForeclosure::reo::'+filedate,OVERWRITE);	
-        AddToSuperfile_Reo(STRING filedate) := FUNCTION
-	                     RETURN 	
-			                      FileServices.AddSuperFile(superfile_reo, '~thor_data400::base::bkforeclosure::reo::'+filedate);
-                       END;					
- EXPORT BaseReo        := SEQUENTIAL(oinFile_Reo
-                                    ,oNorm_Reo
-																		,oCln_Name_Reo
-																		,oCln_Addr_Reo
-																		,oAppend_REO
-                                    ,d_base_reo
-																		,AddToSuperfile_Reo(filedate)
+				CountReoIn		 := OUTPUT(COUNT(BKForeclosure.File_BK_Foreclosure.Reo_File),NAMED('Total_REO_in'));
+        ReoBaseDelFlag := BKForeclosure.fSetDelFlag.REO(BKForeclosure.File_BK_Foreclosure.fReo);
+				REOIngestPrep	 := BKForeclosure.REO_prep_ingest_file;
+				IngestREO			 := BKForeclosure.REO_Ingest(,,ReoBaseDelFlag,REOIngestPrep);
+				NewReoBase		 := IngestReo.AllRecords_NoTag : PERSIST('~thor_data400::in::BKForeclosure::Ingest_Reo');
+        Norm_Reo       := Normalize_Reo(NewReoBase(Delete_Flag <> 'DELETE'));
+        Clean_Reo 		 := ClnName_address_REO(Norm_Reo);
+        Append_ID_Reo  := Append_IDs.Append_reo(Clean_Reo);
+        DeNorm_Reo     := Denorm_REO(NewReoBase, Append_ID_Reo);
+				CountDelReo_out:= OUTPUT(COUNT(DeNorm_Reo(Delete_Flag = 'DELETE')),NAMED('TotalDel_REO_out')); //True Deletes
+				CountReo_out	 := OUTPUT(COUNT(DeNorm_Reo(Delete_Flag <> 'DELETE')),NAMED('Total_REO_out'));
+        PromoteSupers.Mac_SF_BuildProcess(DeNorm_Reo,'~thor_data400::base::bkforeclosure::reo',build_reo_base,3,,true);
+				
+ EXPORT BaseReo        := SEQUENTIAL(ReoBaseDelFlag
+                                    ,CountDel_Reo_in
+                                    ,build_reo_base
+																		,CountDelReo_out
+																		,CountReo_out
 																		// ,BKForeclosure.Strata_Population_Stats_Reo(filedate)
-                                    ,func_move_file.MoveFile('in::bkforeclosure::reo_infile','using','used')
+																		//,Scrubs_BKForeclosure_Reo;
 																		);
 
 END;
