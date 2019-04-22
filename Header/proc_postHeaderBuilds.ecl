@@ -3,7 +3,7 @@ import Scrubs_HeaderSlimSortSrc_Monthly;
 import Scrubs_FileRelative_Monthly;
 import Scrubs_Headers_Monthly;
 
-export proc_postHeaderBuilds := module
+export proc_postHeaderBuilds(string8 pBldVer = '') := module
 
 		
 		shared elist_owners 				:=   'gabriel.marcan@lexisnexisrisk.com'
@@ -154,8 +154,8 @@ export proc_postHeaderBuilds := module
 
 		// ******************************************************************************************** //
 		
-		#stored ('buildname', 'PersonHeader'   ); 
-		#stored ('version'  , header.version_build); 
+		#stored ('buildname', 'PersonHeader'   );		        
+        BldVer := if(pBldVer <> '', pBldVer, header.version_build);
 		
 		step:=Header.version_build+' Move header_raw and source keys to prod';
 		
@@ -163,37 +163,35 @@ export proc_postHeaderBuilds := module
 		failed:=step+' failed';
 		wl:=nothor(WorkunitServices.WorkunitList('',jobname:='y*quick*'))(state in ['blocked','running','wait']);
 		export finalize := sequential(
-                                            header.LogBuild.single('Started :'+step)
-                                            ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                            ,if(exists(wl),fail('QUICK HEADER is running'))
-                                            ,checkLinkingVersion(header.version_build)
-                                            ,header.Proc_AcceptSK_toQA(header.version_build)
-                                            ,nothor(Header.move_header_raw_to_prod())
-                                            ,Header.Proc_Copy_From_Alpha.MoveToQA
-                                            ,header.Proc_Accept_SRC_toQA()
-                                            ,notify('build_property_full','*')
-                                            ,header.LogBuild.single('Completed :'+step)
-                                            )
-                                            :success(header.msg(cmpltd,elist_owners).good)
-                                            ,failure(header.msg(failed,elist_owners).bad)
-                                            ;
-
+                            header.LogBuild.single('Started :'+step)
+                            ,if(BldVer<>fn[sub..sub+7],fail('Header base does not match version'))
+                            ,if(exists(wl),fail('QUICK HEADER is running'))
+                            ,checkLinkingVersion(BldVer)
+                            ,header.Proc_AcceptSK_toQA(BldVer)
+                            ,nothor(Header.move_header_raw_to_prod())
+                            ,Header.Proc_Copy_From_Alpha.MoveToQA
+                            ,header.Proc_Accept_SRC_toQA()
+                            ,notify('build_property_full','*')
+                            ,header.LogBuild.single('Completed :'+step)
+                            )
+                            :success(header.msg(cmpltd,elist_owners).good)
+                            ,failure(header.msg(failed,elist_owners).bad)
+                            ;
 
 		// ******************************************************************************************** //
 		
 		#stored ('buildname', 'PersonHeader'   ); 
-		#stored ('version'  , header.version_build); 
+		BldVer := if(pBldVer <> '', pBldVer, header.version_build);
 		
-		// step:='Yogurt:'+Header.version_build+' FCRA Header and keys';
 		step:=Header.version_build+' FCRA Header and keys';
 		
         cmpltd:=step+' completed';
 		failed:=step+' failed';
 		export FCRAheader := sequential(
                                         header.LogBuild.single('Started :'+step)
-                                        ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                        ,checkLinkingVersion(header.version_build)
-                                        ,Doxie.Proc_FCRA_Doxie_keys_All(,,header.version_build)
+                                        ,if(BldVer<>fn[sub..sub+7],fail('Header base does not match version'))
+                                        ,checkLinkingVersion(BldVer)
+                                        ,Doxie.Proc_FCRA_Doxie_keys_All(,,BldVer)
                                         ,header.LogBuild.single('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_fcra).good)
@@ -204,18 +202,17 @@ export proc_postHeaderBuilds := module
 		// ******************************************************************************************** //
 		
 		#stored ('buildname', 'PersonHeader'   ); 
-		#stored ('version'  , header.version_build); 
-		
-		// step:='Yogurt:'+Header.version_build+' PowerSearch Keys';
+		BldVer := if(pBldVer <> '', pBldVer, header.version_build);
+        
 		step:=Header.version_build+' PowerSearch Keys';
 		
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
 		export booleanSrch := sequential(
                                             header.LogBuild.single('Started :'+step)
-                                            ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                            ,checkLinkingVersion(header.version_build)
-                                            ,Text_FragV1.Build_PowerSearch_Keys(Header.version_build)
+                                            ,if(BldVer<>fn[sub..sub+7],fail('Header base does not match version'))
+                                            ,checkLinkingVersion(BldVer)
+                                            ,Text_FragV1.Build_PowerSearch_Keys(BldVer)
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)

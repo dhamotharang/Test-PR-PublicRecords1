@@ -9,9 +9,9 @@ dlog(string bld_cmp_nm):=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,
 sf_name := '~thor_data400::out::header_post_move_status';
 update_status(unsigned2 new_status) := Header.LogBuildStatus(sf_name,build_version,new_status).Write;
 
-step1:=Header.proc_postHeaderBuilds.finalize;
-step2:=Header.proc_postHeaderBuilds.FCRAheader;
-step3:=Header.proc_postHeaderBuilds.booleanSrch;
+step1:=Header.proc_postHeaderBuilds(build_version).finalize;
+step2:=Header.proc_postHeaderBuilds(build_version).FCRAheader;
+step3:=Header.proc_postHeaderBuilds(build_version).booleanSrch;
 
 return sequential(
              header._config.setup_build
