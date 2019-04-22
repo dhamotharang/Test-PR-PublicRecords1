@@ -18,7 +18,7 @@ pplus_sources :=
 				 Map_Thrive_as_Phonesplus +
 				 Map_AlloyMedia_as_Phonesplus +
 				 Map_NVerified_as_Phonesplus +
-				 Map_NeustarWireless_as_Phonesplus 
+				 Map_NeustarWireless_as_Phonesplus //Jira: DF-24336
 				 ;
 
 pplus_royalty := Map_WiredAssets_as_Phonesplus(false);	
@@ -87,8 +87,11 @@ Apply_Rules := Fn_Apply_Rules(Apply_EDA_History);
 //-------Propagate Rules--------------------------------------------------------------------
 Propagate_rules := Fn_Propagate_Rules(Apply_Rules);
 
+//Append Neustar Wireless Rules - Jira: DF-24336
+Neustar_Wireless_Rules_Appended := fn_Append_Neustar_Wireless_Rules(Propagate_rules);
+
 //-------Place cellphones with DID  where current above the line doesn't have one 
-Add_dids := Fn_Add_Cellphone_Did(Propagate_rules);
+Add_dids := Fn_Add_Cellphone_Did(Neustar_Wireless_Rules_Appended);
 
 //-------Propagate Rules Again---------------------------------------------------------------
 Propagate_rules2 := Phonesplus_v2.Fn_Propagate_Rules(Add_dids);

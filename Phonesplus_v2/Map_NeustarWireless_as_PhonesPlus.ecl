@@ -99,45 +99,6 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.phone7_hhid_key := hashmd5(input.phone[4..10] + input.did);
 	self.cleanaid := input.aceaid;
 	self.current_rec := input.current_rec;
-  //rules start
-	verified_rule	:= MAP
-									( input.verified = 'A' => Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-A'),
-										input.verified = 'B' => Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-B'),
-										input.verified = 'C' => Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-C'),
-										input.verified = 'D' => Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-D'),
-										input.verified = 'E' => Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-E'),
-										0b);
-
-	activity_status_rule := MAP
-													(	input.activity_status= 'A1' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A1'),
-														input.activity_status= 'A2' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A2'),
-														input.activity_status= 'A3' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A3'),
-														input.activity_status= 'A4' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A4'),
-														input.activity_status= 'A5' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A5'),
-														input.activity_status= 'A6' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A6'),
-														input.activity_status= 'A7' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A7'),
-														input.activity_status= 'I1' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I1'),
-														input.activity_status= 'I2' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I2'),
-														input.activity_status= 'I3' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I3'),
-														input.activity_status= 'I4' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I4'),
-														input.activity_status= 'I5' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I5'),
-														input.activity_status= 'I6' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I6'),
-														input.activity_status= 'I7' => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I7'),
-														input.activity_status= 'U'  => Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-U'),
-														0b);
-
-	prepaid_rule := MAP 
-									( input.prepaid= 'Y' => Translation_Codes.rules_bitmap_code('NeustarWireless-Prepaid-Y'),
-										input.prepaid= 'N' => Translation_Codes.rules_bitmap_code('NeustarWireless-Prepaid-N'),
-										0b);
-
-	cord_cutter_rule := MAP									
-											( input.cord_cutter= 'Y' => Translation_Codes.rules_bitmap_code('NeustarWireless-Cord-Cutter-Y'),
-												input.cord_cutter= 'N' => Translation_Codes.rules_bitmap_code('NeustarWireless-Cord-Cutter-N'),
-												0b);	
-	
-	self.rules := verified_rule | activity_status_rule | prepaid_rule | cord_cutter_rule;
-	//rules end
 	self := input;
 end;
 
