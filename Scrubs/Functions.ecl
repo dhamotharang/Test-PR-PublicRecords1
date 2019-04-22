@@ -57,6 +57,13 @@ EXPORT Functions := MODULE
               Stringlib.StringFilterOut(alpha, 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
   END;
   
+  //****************************************************************************
+  //fn_alpha_optional: 	returns true if only populated with letters or empty
+  //****************************************************************************
+  EXPORT fn_alpha_optional(STRING alpha, UNSIGNED1 size = 0) := FUNCTION
+    RETURN IF(LENGTH(TRIM(alpha, ALL)) IN [0,size] AND Stringlib.StringFilterOut(alpha, 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
+  END;
+
 	//********************************************************************************
 	//fn_ASCII_printable:  returns true if all the characters are valid ASCII chars
 	//********************************************************************************
@@ -148,22 +155,23 @@ EXPORT Functions := MODULE
 
   //*******************************************************************************
   //fn_past_yyyymmdd: 	Returns true if valid past date. If the can_be_zero parameter
-  //                   is set to 'T' (TRUE) then the sDate can be zero.
+  //                   is set to TRUE then the sDate can be zero.
   //*******************************************************************************
-  EXPORT fn_past_yyyymmdd(STRING sDate, STRING can_be_zero = 'F') := FUNCTION 
+  EXPORT fn_past_yyyymmdd(STRING sDate, BOOLEAN can_be_zero = FALSE) := FUNCTION 
     clean_date  := TRIM(sDate, ALL);
     isValidDate := IF(LENGTH(clean_date) = 8, fn_valid_pastDate(clean_date) > 0, FALSE); 
-    RETURN IF((can_be_zero = 'T' AND sDate = '0') OR isValidDate, 1, 0);
+    RETURN IF((can_be_zero AND sDate = '0') OR isValidDate, 1, 0);
   END;
   
 	//****************************************************************************
 	//fn_general_yyyymmdd: returns true or false based upon whether or not there is
-	//                     a valid date (can be future date).
+	//                     a valid date (can be future date). If the can_be_zero
+  //                     parameter is set to TRUE then the sDate can be zero.
 	//****************************************************************************
-	EXPORT fn_general_yyyymmdd(STRING sDate, STRING can_be_zero = 'F') := FUNCTION
+	EXPORT fn_general_yyyymmdd(STRING sDate, BOOLEAN can_be_zero = FALSE) := FUNCTION
 		clean_date  := TRIM(sDate, ALL);
 		isValidDate := IF(LENGTH(clean_date) = 8, fn_valid_GeneralDate(clean_date) > 0, FALSE);
-		RETURN IF((can_be_zero = 'T' AND sDate = '0') OR isValidDate, 1, 0);
+		RETURN IF((can_be_zero AND sDate = '0') OR isValidDate, 1, 0);
 	END;
 
   //*******************************************************************************
@@ -263,8 +271,8 @@ EXPORT Functions := MODULE
   //                 a valid state abbreviation.  If the can_be_empty parameter
   //                 is set to 'T' (TRUE) then the code can be empty.
   //****************************************************************************
-  EXPORT fn_verify_state(STRING code, STRING can_be_empty = 'F') := FUNCTION    
-    RETURN IF((can_be_empty = 'T' AND code = '') OR LENGTH(Codes.St2Name(code)) > 0, 1, 0);
+  EXPORT fn_verify_state(STRING code, BOOLEAN can_be_empty = FALSE) := FUNCTION    
+    RETURN IF((can_be_empty AND code = '') OR LENGTH(Codes.St2Name(code)) > 0, 1, 0);
   END;
 
   //****************************************************************************
@@ -299,9 +307,9 @@ EXPORT Functions := MODULE
   //                  phone #.  If the can_be_empty parameter is set to
   //                  'T' (TRUE) then the phone number can be empty.
   //****************************************************************************
-	 EXPORT fn_verify_phone(STRING phone, STRING can_be_empty = 'F') := FUNCTION    
+	 EXPORT fn_verify_phone(STRING phone, BOOLEAN can_be_empty = FALSE) := FUNCTION    
     clean_phone := TRIM(phone, ALL);
-    RETURN IF((can_be_empty = 'T' AND clean_phone = '') OR ut.CleanPhone(clean_phone) != '', 1, 0);
+    RETURN IF((can_be_empty AND clean_phone = '') OR ut.CleanPhone(clean_phone) != '', 1, 0);
   END;
 
   //****************************************************************************
