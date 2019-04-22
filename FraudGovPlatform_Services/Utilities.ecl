@@ -91,8 +91,8 @@ EXPORT Utilities := MODULE
 																			Fragment_Types_const.PERSON_FRAGMENT => Entity_Type_Identifier._LEXID + LEFT.entity_value,
 																			Fragment_Types_const.PHONE_FRAGMENT => Entity_Type_Identifier._PHONENO + LEFT.entity_value,
 																			Fragment_Types_const.SSN_FRAGMENT => Entity_Type_Identifier._SSN +  LEFT.entity_value,
-																			//Calculating the tree_uid for the physical address value. Calculation is '_09'+HASH(address_1,address_2)
-																			Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => Entity_Type_Identifier._PHYSICAL_ADDRESS + HASH32(regexfind('(.*)@@@(.*)$',LEFT.entity_value,1),regexfind('(.*)@@@(.*)$',LEFT.entity_value,2)),
+																			//Calculating the tree_uid for the physical address value. Calculation is '_09'+HASH(address_1|address_2)
+																			Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => Entity_Type_Identifier._PHYSICAL_ADDRESS + HASH32(regexfind('(.*)@@@(.*)$',LEFT.entity_value,1) + '|' + regexfind('(.*)@@@(.*)$',LEFT.entity_value,2)),
 																			Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => Entity_Type_Identifier._BANKACCOUNT + HASH32(regexfind('(.*)@@@(.*)$',LEFT.entity_value,1) + '|' + regexfind('(.*)@@@(.*)$',LEFT.entity_value,2)),
 																			Fragment_Types_const.EMAIL_FRAGMENT => Entity_Type_Identifier._EMAIL + HASH32(LEFT.entity_value),
 																			'');
