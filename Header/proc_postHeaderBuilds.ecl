@@ -80,12 +80,12 @@ export proc_postHeaderBuilds(string8 pBldVer = '') := module
 		export XADLkeys := sequential(
                                          header.LogBuild.single('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                        ,Header.Proc_Copy_From_Alpha.Copy
+                                        ,Header.Proc_Copy_From_Alpha().Copy
                                         ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
                                         ,build_slimsorts
-                                        ,Header.Proc_Copy_From_Alpha.CopyOthers
+                                        ,Header.Proc_Copy_From_Alpha().CopyOthers
                                         ,Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(header.version_build)
                                         ,header.LogBuild.single('Completed :'+step)
                                         )
@@ -169,7 +169,7 @@ export proc_postHeaderBuilds(string8 pBldVer = '') := module
                             ,checkLinkingVersion(BldVer)
                             ,header.Proc_AcceptSK_toQA(BldVer)
                             ,nothor(Header.move_header_raw_to_prod())
-                            ,Header.Proc_Copy_From_Alpha.MoveToQA
+                            ,Header.Proc_Copy_From_Alpha(BldVer).MoveToQA
                             ,header.Proc_Accept_SRC_toQA()
                             ,notify('build_property_full','*')
                             ,header.LogBuild.single('Completed :'+step)
