@@ -1,15 +1,17 @@
-﻿import _control, PromoteSupers, Roxiekeybuild, Std, ut;
-
-EXPORT Proc_Build_Lerg6_Key(string version) := FUNCTION
+﻿IMPORT _control, dx_PhonesInfo, PromoteSupers, Roxiekeybuild, Std, ut;
 
 	//DF-24166: Split Lerg6 Build
+	//DF-24397: Create Dx-Prefixed Keys
+
+EXPORT Proc_Build_Lerg6_Key(string version) := FUNCTION
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Build Lerg6 Key////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		//Create Lerg6 Key
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhonesInfo.Key_Phones_Lerg6
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhonesInfo.Key_Phones_Lerg6
+																							 ,PhonesInfo.File_Lerg.Lerg6Main
 																							 ,'~thor_data400::key::phones_lerg6'
 																							 ,'~thor_data400::key::'+version+'::phones_lerg6'
 																							 ,bkPhonesLerg6

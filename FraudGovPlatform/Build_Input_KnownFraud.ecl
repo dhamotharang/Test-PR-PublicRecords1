@@ -2,21 +2,18 @@
 EXPORT Build_Input_KnownFraud(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
-	,dataset(Layouts.Flags.SkipModules) pSkipModules = FraudGovPlatform.Files().Flags.SkipModules
 	,dataset(Layouts.Input.KnownFraud) KnownFraud_Sprayed =  files().Input.KnownFraud.sprayed	
 	,dataset(Layouts.Input.KnownFraud) ByPassed_KnownFraud_Sprayed = files().Input.ByPassed_KnownFraud.sprayed	
 	,dataset(Layouts.CustomerSettings) pCustomerSettings = files().CustomerSettings
 ) :=
 module
-
-	shared SkipNACBuild := pSkipModules[1].SkipNACBuild;
 	
 	inKnownFraudUpdate := 	
 			if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.KnownFraud)) > 0,
 				Files(pversion).Sprayed.KnownFraud, 
 				dataset([],{string75 fn { virtual(logicalfilename)}, FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 			)    											
-		+ 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and SkipNACBuild = false, 
+		+ 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0, 
 				Build_Prepped_NAC(pversion).NACKNFDUpdate,
 				dataset([],{string75 fn { virtual(logicalfilename)}, FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 			);
@@ -26,11 +23,22 @@ module
 	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l, integer cnt) := transform
 
 		filename := ut.CleanSpacesAndUpper(l.fn);
-		
+		st := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '::', true )[3][1..2];
 		self.FileName := filename;	
+		fn := map(	
+					regexfind('MSH',filename,nocase) => [(string)MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_Account_Number, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_State, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_Agency_Vertical_Type, 
+														 MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_Program; 
+														 'MSH', 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]), 
+														 trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]),
+														 '',
+														 ''],
+					StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true )
+		);
 		
-		fn := STD.Str.SplitWords( STD.Str.FindReplace(l.fn,'.dat',''), '_' );
-		
+
 		Customer_Account_Number := STD.Str.FindReplace(fn[1],'FRAUDGOV::IN::','');
 		Customer_State := fn[2];
 		Customer_Agency_Vertical_Type := fn[3]; // ignore
@@ -113,11 +121,26 @@ module
 			or 	reported_date = ''
 			or 	reported_time = ''
 			or 	reported_by = ''
-			or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
-			or 	((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
-			or 	(Street_1='' and City='' and State='' and Zip='')
+			// https://jira.rsi.lexisnexis.com/browse/GRP-203
+			// 26/Oct/17 Sundeep Commented:
+			// lets say we have name and address only but no ssn, dl, lexid, the entire record will be in the payload keys but not in the ssn key, dl key, or the lexid key.
+			// The only records that we can truly discard are the ones that dont have a name, address, and any identifying information. 
+			// If we get an inquiry with only an IP address and nothing else, we will still keep that inquiry.			
+			//
+			or (
+					(	raw_Full_Name = '' and 
+						(raw_First_name = '' or raw_Last_Name='') and 
+						(Street_1='' and City='' and State='' and Zip='')
+					) and (
+						(SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and 
+						(Drivers_License_Number='' and Drivers_License_State='') and
+						LexID = 0
+					) and 
+					//DOB = '' and ??
+					IP_Address = ''
+			)		
 		);
-			
+
 
 	//Exclude Errors
 	shared ByPassed_records := NotInMbs + f1_errors;

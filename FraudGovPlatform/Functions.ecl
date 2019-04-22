@@ -297,9 +297,23 @@ EXPORT Functions :=  MODULE
 											 customer_program = 'M' => 1024,
 											 customer_program = 'U' => 1029,
 											 customer_program = 'N' => 1312,
+											 customer_program = 'D' => 1049,											 
 											 0
 											);
 		RETURN ind_type_prod_v;
+	END;
+
+	EXPORT customer_program_fn(unsigned6 ind_type) := function
+		import _Control;
+		customer_program := map(
+											 ind_type = 1014 => 'S',
+											 ind_type = 1024 => 'M',
+											 ind_type = 1029 => 'U',
+											 ind_type = 1312 => 'N',
+											 ind_type = 1049 => 'D',
+											 ''
+											);
+		RETURN customer_program;
 	END;
 
 	EXPORT new_addresses(pInputFile) := 

@@ -51,9 +51,9 @@ EXPORT proc_powid_down(
 	shared saltMod 	:= BIPv2_powid_down.Proc_Iterate(iter, input, f_out(''));
 	shared linking	:= parallel(saltmod.DoAllAgain, possibleMatches);
 		
-	/* ---------------------- SALT Output -------------------------------- */
-	shared updateBuilding(string fname=f_out(iter)) := BIPv2_Files.files_powid_down.updateBuilding(fname);
-	export updateSuperfiles(string fname=f_out(iter)) := BIPv2_Files.files_powid_down.updateSuperfiles(fname);
+	/* ---------------------- SALT PostProcess Output -------------------------------- */
+  shared last_powid_iter  := '~' + nothor(std.file.superfilecontents(BIPv2_Files.files_powid_down.FILE_BUILDING)[1].name);
+	export updateSuperfiles(string fname=last_powid_iter) := BIPv2_Files.files_powid_down.updateSuperfiles(fname);
 	
 	/* ---------------------- SALT History ------------------------------- */
 	shared updateLinkHist   	:= BIPv2_Files.files_powid_down.updateLinkHist(f_hist(iter));
@@ -67,6 +67,7 @@ EXPORT proc_powid_down(
   import BIPV2_QA_Tool;
   export POWID_Down_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,POWID ,bipv2.KeySuffix  ,iter  ,BIPV2_powid_down.Config.MatchThreshold ,'BIPV2_POWID_Down');
 
+	shared updateBuilding(string fname=f_out(iter)) := BIPv2_Files.files_powid_down.updateBuilding(fname);
 	export runIter := sequential(linking, outputReviewSamples, updateBuilding(), updateLinkHist,POWID_Down_iteration_stats)
 		: SUCCESS(mod_email.SendSuccessEmail(,'BIPv2', , 'POWID_Down')),
 			FAILURE(mod_email.SendFailureEmail(,'BIPv2', failmessage, 'POWID_Down'));

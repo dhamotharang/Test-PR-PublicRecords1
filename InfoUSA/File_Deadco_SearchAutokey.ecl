@@ -1,4 +1,4 @@
-import standard, ut, doxie; 
+﻿import standard, ut, doxie; 
 
 dbase := file_deadco_base;
 
@@ -11,6 +11,9 @@ rec := record
   Standard.L_Address.base addr;
   unsigned1 zero := 0;
   unsigned6 fdid := 0;
+	//Added for DF-24528
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
 end;
 
 rec tra(dbase l) := transform

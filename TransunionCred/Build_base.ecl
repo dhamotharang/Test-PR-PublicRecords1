@@ -1,12 +1,9 @@
 ﻿IMPORT  address, ut, header_slimsort, did_add, didville,AID,std;
 
-export Build_base(string ver) := module 
+export Build_base(string ver, boolean IsFullUpdate = false) := module 
 
-#IF (IsFullUpdate = false)
-	TrnUn_credit := Files.update_in;
-#ELSE
-	TrnUn_credit := Files.load_in;
-#END
+TrnUn_credit := if(IsFullUpdate,Files.load_in,  project(Files.update_in, transform(TransunionCred.Layouts.load, self.cr := '';, self := left;)));
+
 setValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
 string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
 																							,SuffixIn in ['2','ND'] => 'II'
@@ -113,31 +110,30 @@ preprocess := project(norm_names,tr_addr(left)):persist('~thor_data400::persist:
 
 cur_base_d := distribute(project(Files.Base, transform(recordof(Files.Base), self.did := 0, self := left)), hash(Party_ID));
 
-#IF (IsFullUpdate = false)
-	cur_update_d := dedup(distribute(preprocess, hash(Party_ID)),Party_ID,all,local);
+cur_update_d := dedup(distribute(preprocess, hash(Party_ID)),Party_ID,all,local);
 
-	apply_updates := join(cur_base_d, cur_update_d
-									,left.Party_ID = right.Party_ID
-							,transform(Layouts.base
-								,self.IsCurrent	:= if(left.Party_ID=right.Party_ID and left.Prepped_rec_type='A1',false,left.IsCurrent)
-								,self           := left)
-							,left outer
-							,local);
+apply_updates := join(cur_base_d, cur_update_d
+                                ,left.Party_ID = right.Party_ID
+                        ,transform(Layouts.base
+                            ,self.IsCurrent	:= if(left.Party_ID=right.Party_ID and left.Prepped_rec_type='A1',false,left.IsCurrent)
+                            ,self           := left)
+                        ,left outer
+                        ,local);
 
-	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
-												,preprocess
-												,preprocess + apply_updates);
+base_and_update_delta := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
+                                            ,preprocess
+                                            ,preprocess + apply_updates);
 
-#ELSE
-	reset_cur_base := project(cur_base_d, transform(Layouts.base
-											,self.IsCurrent  := false
-											,self.IsUpdating := false
-											,self := left));
+reset_cur_base := project(cur_base_d, transform(Layouts.base
+                                        ,self.IsCurrent  := false
+                                        ,self.IsUpdating := false
+                                        ,self := left));
 
-	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
-											 ,preprocess
-											 ,preprocess + reset_cur_base);
-#END
+base_and_update_full := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
+                                         ,preprocess
+                                         ,preprocess + reset_cur_base);
+                                             
+base_and_update := if(IsFullUpdate, base_and_update_full, base_and_update_delta); 
 
 TN_ready := base_and_update;
 //-----------------------------------------------------------------
