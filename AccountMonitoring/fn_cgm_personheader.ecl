@@ -43,7 +43,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
    																LOCAL);		
    		
 
-		temp_joins_dedup := DEDUP(SORT(DISTRIBUTE(temp_join_did,HASH64(pid,rid)),pid,rid,ssn,dob,local),pid,rid,ssn,dob,local);
+		temp_joins_dedup := DEDUP(SORT(DISTRIBUTE(temp_join_did,HASH64(pid,rid)),pid,rid,did,ssn,dob,local),pid,rid,did,ssn,dob,local);
 	 
 	 	// Create hash value on monitored fields. 
 		temp_unrolled_hashes := 
