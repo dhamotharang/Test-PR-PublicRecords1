@@ -1,4 +1,4 @@
-IMPORT ut,SALT32;
+﻿IMPORT SALT37;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Scrubs := MODULE
  
@@ -53,49 +53,49 @@ EXPORT Input_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(Input_Layout_Infogroup) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.occupation_id_Invalid := Input_Fields.InValid_occupation_id((SALT32.StrType)le.occupation_id);
-    SELF.first_name_Invalid := Input_Fields.InValid_first_name((SALT32.StrType)le.first_name);
-    SELF.middle_name_Invalid := Input_Fields.InValid_middle_name((SALT32.StrType)le.middle_name);
-    SELF.last_name_Invalid := Input_Fields.InValid_last_name((SALT32.StrType)le.last_name);
-    SELF.suffix_Invalid := Input_Fields.InValid_suffix((SALT32.StrType)le.suffix);
-    SELF.address_Invalid := Input_Fields.InValid_address((SALT32.StrType)le.address);
-    SELF.predir_Invalid := Input_Fields.InValid_predir((SALT32.StrType)le.predir);
-    SELF.addr_suffix_Invalid := Input_Fields.InValid_addr_suffix((SALT32.StrType)le.addr_suffix);
-    SELF.postdir_Invalid := Input_Fields.InValid_postdir((SALT32.StrType)le.postdir);
-    SELF.unit_type_Invalid := Input_Fields.InValid_unit_type((SALT32.StrType)le.unit_type);
-    SELF.city_Invalid := Input_Fields.InValid_city((SALT32.StrType)le.city);
-    SELF.state_Invalid := Input_Fields.InValid_state((SALT32.StrType)le.state);
-    SELF.zip_Invalid := Input_Fields.InValid_zip((SALT32.StrType)le.zip);
-    SELF.zip4_Invalid := Input_Fields.InValid_zip4((SALT32.StrType)le.zip4);
-    SELF.bar_Invalid := Input_Fields.InValid_bar((SALT32.StrType)le.bar);
-    SELF.ace_rec_type_Invalid := Input_Fields.InValid_ace_rec_type((SALT32.StrType)le.ace_rec_type);
-    SELF.cart_Invalid := Input_Fields.InValid_cart((SALT32.StrType)le.cart);
-    SELF.census_state_code_Invalid := Input_Fields.InValid_census_state_code((SALT32.StrType)le.census_state_code);
-    SELF.census_county_code_Invalid := Input_Fields.InValid_census_county_code((SALT32.StrType)le.census_county_code);
-    SELF.county_code_desc_Invalid := Input_Fields.InValid_county_code_desc((SALT32.StrType)le.county_code_desc);
-    SELF.census_tract_Invalid := Input_Fields.InValid_census_tract((SALT32.StrType)le.census_tract);
-    SELF.census_block_group_Invalid := Input_Fields.InValid_census_block_group((SALT32.StrType)le.census_block_group);
-    SELF.match_code_Invalid := Input_Fields.InValid_match_code((SALT32.StrType)le.match_code);
-    SELF.latitude_Invalid := Input_Fields.InValid_latitude((SALT32.StrType)le.latitude);
-    SELF.longitude_Invalid := Input_Fields.InValid_longitude((SALT32.StrType)le.longitude);
-    SELF.mail_score_Invalid := Input_Fields.InValid_mail_score((SALT32.StrType)le.mail_score);
-    SELF.residential_business_ind_Invalid := Input_Fields.InValid_residential_business_ind((SALT32.StrType)le.residential_business_ind);
-    SELF.family_id_Invalid := Input_Fields.InValid_family_id((SALT32.StrType)le.family_id);
-    SELF.individual_id_Invalid := Input_Fields.InValid_individual_id((SALT32.StrType)le.individual_id);
-    SELF.industry_title_Invalid := Input_Fields.InValid_industry_title((SALT32.StrType)le.industry_title);
-    SELF.occupation_title_Invalid := Input_Fields.InValid_occupation_title((SALT32.StrType)le.occupation_title);
-    SELF.specialty_title_Invalid := Input_Fields.InValid_specialty_title((SALT32.StrType)le.specialty_title);
-    SELF.sic_code_Invalid := Input_Fields.InValid_sic_code((SALT32.StrType)le.sic_code);
-    SELF.naics_group_Invalid := Input_Fields.InValid_naics_group((SALT32.StrType)le.naics_group);
-    SELF.license_state_Invalid := Input_Fields.InValid_license_state((SALT32.StrType)le.license_state);
-    SELF.license_id_Invalid := Input_Fields.InValid_license_id((SALT32.StrType)le.license_id);
-    SELF.license_number_Invalid := Input_Fields.InValid_license_number((SALT32.StrType)le.license_number);
-    SELF.exp_date_Invalid := Input_Fields.InValid_exp_date((SALT32.StrType)le.exp_date);
-    SELF.status_code_Invalid := Input_Fields.InValid_status_code((SALT32.StrType)le.status_code);
-    SELF.effective_date_Invalid := Input_Fields.InValid_effective_date((SALT32.StrType)le.effective_date);
-    SELF.add_date_Invalid := Input_Fields.InValid_add_date((SALT32.StrType)le.add_date);
-    SELF.change_date_Invalid := Input_Fields.InValid_change_date((SALT32.StrType)le.change_date);
-    SELF.year_licensed_Invalid := Input_Fields.InValid_year_licensed((SALT32.StrType)le.year_licensed);
+    SELF.occupation_id_Invalid := Input_Fields.InValid_occupation_id((SALT37.StrType)le.occupation_id);
+    SELF.first_name_Invalid := Input_Fields.InValid_first_name((SALT37.StrType)le.first_name);
+    SELF.middle_name_Invalid := Input_Fields.InValid_middle_name((SALT37.StrType)le.middle_name);
+    SELF.last_name_Invalid := Input_Fields.InValid_last_name((SALT37.StrType)le.last_name);
+    SELF.suffix_Invalid := Input_Fields.InValid_suffix((SALT37.StrType)le.suffix);
+    SELF.address_Invalid := Input_Fields.InValid_address((SALT37.StrType)le.address);
+    SELF.predir_Invalid := Input_Fields.InValid_predir((SALT37.StrType)le.predir);
+    SELF.addr_suffix_Invalid := Input_Fields.InValid_addr_suffix((SALT37.StrType)le.addr_suffix);
+    SELF.postdir_Invalid := Input_Fields.InValid_postdir((SALT37.StrType)le.postdir);
+    SELF.unit_type_Invalid := Input_Fields.InValid_unit_type((SALT37.StrType)le.unit_type);
+    SELF.city_Invalid := Input_Fields.InValid_city((SALT37.StrType)le.city);
+    SELF.state_Invalid := Input_Fields.InValid_state((SALT37.StrType)le.state);
+    SELF.zip_Invalid := Input_Fields.InValid_zip((SALT37.StrType)le.zip);
+    SELF.zip4_Invalid := Input_Fields.InValid_zip4((SALT37.StrType)le.zip4);
+    SELF.bar_Invalid := Input_Fields.InValid_bar((SALT37.StrType)le.bar);
+    SELF.ace_rec_type_Invalid := Input_Fields.InValid_ace_rec_type((SALT37.StrType)le.ace_rec_type);
+    SELF.cart_Invalid := Input_Fields.InValid_cart((SALT37.StrType)le.cart);
+    SELF.census_state_code_Invalid := Input_Fields.InValid_census_state_code((SALT37.StrType)le.census_state_code);
+    SELF.census_county_code_Invalid := Input_Fields.InValid_census_county_code((SALT37.StrType)le.census_county_code);
+    SELF.county_code_desc_Invalid := Input_Fields.InValid_county_code_desc((SALT37.StrType)le.county_code_desc);
+    SELF.census_tract_Invalid := Input_Fields.InValid_census_tract((SALT37.StrType)le.census_tract);
+    SELF.census_block_group_Invalid := Input_Fields.InValid_census_block_group((SALT37.StrType)le.census_block_group);
+    SELF.match_code_Invalid := Input_Fields.InValid_match_code((SALT37.StrType)le.match_code);
+    SELF.latitude_Invalid := Input_Fields.InValid_latitude((SALT37.StrType)le.latitude);
+    SELF.longitude_Invalid := Input_Fields.InValid_longitude((SALT37.StrType)le.longitude);
+    SELF.mail_score_Invalid := Input_Fields.InValid_mail_score((SALT37.StrType)le.mail_score);
+    SELF.residential_business_ind_Invalid := Input_Fields.InValid_residential_business_ind((SALT37.StrType)le.residential_business_ind);
+    SELF.family_id_Invalid := Input_Fields.InValid_family_id((SALT37.StrType)le.family_id);
+    SELF.individual_id_Invalid := Input_Fields.InValid_individual_id((SALT37.StrType)le.individual_id);
+    SELF.industry_title_Invalid := Input_Fields.InValid_industry_title((SALT37.StrType)le.industry_title);
+    SELF.occupation_title_Invalid := Input_Fields.InValid_occupation_title((SALT37.StrType)le.occupation_title);
+    SELF.specialty_title_Invalid := Input_Fields.InValid_specialty_title((SALT37.StrType)le.specialty_title);
+    SELF.sic_code_Invalid := Input_Fields.InValid_sic_code((SALT37.StrType)le.sic_code);
+    SELF.naics_group_Invalid := Input_Fields.InValid_naics_group((SALT37.StrType)le.naics_group);
+    SELF.license_state_Invalid := Input_Fields.InValid_license_state((SALT37.StrType)le.license_state);
+    SELF.license_id_Invalid := Input_Fields.InValid_license_id((SALT37.StrType)le.license_id);
+    SELF.license_number_Invalid := Input_Fields.InValid_license_number((SALT37.StrType)le.license_number);
+    SELF.exp_date_Invalid := Input_Fields.InValid_exp_date((SALT37.StrType)le.exp_date);
+    SELF.status_code_Invalid := Input_Fields.InValid_status_code((SALT37.StrType)le.status_code);
+    SELF.effective_date_Invalid := Input_Fields.InValid_effective_date((SALT37.StrType)le.effective_date);
+    SELF.add_date_Invalid := Input_Fields.InValid_add_date((SALT37.StrType)le.add_date);
+    SELF.change_date_Invalid := Input_Fields.InValid_change_date((SALT37.StrType)le.change_date);
+    SELF.year_licensed_Invalid := Input_Fields.InValid_year_licensed((SALT37.StrType)le.year_licensed);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -229,8 +229,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT32.StrType ErrorMessage;
-    SALT32.StrType FieldContents;
+    SALT37.StrType ErrorMessage;
+    SALT37.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -282,14 +282,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.year_licensed_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'occupation_id','first_name','middle_name','last_name','suffix','address','predir','addr_suffix','postdir','unit_type','city','state','zip','zip4','bar','ace_rec_type','cart','census_state_code','census_county_code','county_code_desc','census_tract','census_block_group','match_code','latitude','longitude','mail_score','residential_business_ind','family_id','individual_id','industry_title','occupation_title','specialty_title','sic_code','naics_group','license_state','license_id','license_number','exp_date','status_code','effective_date','add_date','change_date','year_licensed','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_numeric','invalid_first_name','invalid_alphaspacehyphenquote','invalid_last_name','invalid_suffix','invalid_address','invalid_alpha','invalid_alpha','invalid_alpha','invalid_unit_type','invalid_alphanumericspacehyphen','invalid_alpha','invalid_numeric','invalid_numeric','invalid_numeric','invalid_ace_rec_type','invalid_alphanumeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_numeric','invalid_match_code','invalid_numeric','invalid_numeric','invalid_alphanumeric','invalid_residential_business_ind','invalid_numeric','invalid_numeric','invalid_alphaspacecommaslash','invalid_occupational_title','invalid_alphaspacecommaslashhyphenparenampquote','invalid_numeric','invalid_numeric','invalid_license_state','invalid_numeric','invalid_license_number','invalid_date','invalid_status_code','invalid_past_date','invalid_past_date','invalid_past_date','invalid_numeric','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT32.StrType)le.occupation_id,(SALT32.StrType)le.first_name,(SALT32.StrType)le.middle_name,(SALT32.StrType)le.last_name,(SALT32.StrType)le.suffix,(SALT32.StrType)le.address,(SALT32.StrType)le.predir,(SALT32.StrType)le.addr_suffix,(SALT32.StrType)le.postdir,(SALT32.StrType)le.unit_type,(SALT32.StrType)le.city,(SALT32.StrType)le.state,(SALT32.StrType)le.zip,(SALT32.StrType)le.zip4,(SALT32.StrType)le.bar,(SALT32.StrType)le.ace_rec_type,(SALT32.StrType)le.cart,(SALT32.StrType)le.census_state_code,(SALT32.StrType)le.census_county_code,(SALT32.StrType)le.county_code_desc,(SALT32.StrType)le.census_tract,(SALT32.StrType)le.census_block_group,(SALT32.StrType)le.match_code,(SALT32.StrType)le.latitude,(SALT32.StrType)le.longitude,(SALT32.StrType)le.mail_score,(SALT32.StrType)le.residential_business_ind,(SALT32.StrType)le.family_id,(SALT32.StrType)le.individual_id,(SALT32.StrType)le.industry_title,(SALT32.StrType)le.occupation_title,(SALT32.StrType)le.specialty_title,(SALT32.StrType)le.sic_code,(SALT32.StrType)le.naics_group,(SALT32.StrType)le.license_state,(SALT32.StrType)le.license_id,(SALT32.StrType)le.license_number,(SALT32.StrType)le.exp_date,(SALT32.StrType)le.status_code,(SALT32.StrType)le.effective_date,(SALT32.StrType)le.add_date,(SALT32.StrType)le.change_date,(SALT32.StrType)le.year_licensed,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.occupation_id,(SALT37.StrType)le.first_name,(SALT37.StrType)le.middle_name,(SALT37.StrType)le.last_name,(SALT37.StrType)le.suffix,(SALT37.StrType)le.address,(SALT37.StrType)le.predir,(SALT37.StrType)le.addr_suffix,(SALT37.StrType)le.postdir,(SALT37.StrType)le.unit_type,(SALT37.StrType)le.city,(SALT37.StrType)le.state,(SALT37.StrType)le.zip,(SALT37.StrType)le.zip4,(SALT37.StrType)le.bar,(SALT37.StrType)le.ace_rec_type,(SALT37.StrType)le.cart,(SALT37.StrType)le.census_state_code,(SALT37.StrType)le.census_county_code,(SALT37.StrType)le.county_code_desc,(SALT37.StrType)le.census_tract,(SALT37.StrType)le.census_block_group,(SALT37.StrType)le.match_code,(SALT37.StrType)le.latitude,(SALT37.StrType)le.longitude,(SALT37.StrType)le.mail_score,(SALT37.StrType)le.residential_business_ind,(SALT37.StrType)le.family_id,(SALT37.StrType)le.individual_id,(SALT37.StrType)le.industry_title,(SALT37.StrType)le.occupation_title,(SALT37.StrType)le.specialty_title,(SALT37.StrType)le.sic_code,(SALT37.StrType)le.naics_group,(SALT37.StrType)le.license_state,(SALT37.StrType)le.license_id,(SALT37.StrType)le.license_number,(SALT37.StrType)le.exp_date,(SALT37.StrType)le.status_code,(SALT37.StrType)le.effective_date,(SALT37.StrType)le.add_date,(SALT37.StrType)le.change_date,(SALT37.StrType)le.year_licensed,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,43,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(),STRING10 Src='UNK') := FUNCTION
-    SALT32.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT37.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -475,12 +475,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT32.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT37.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT32.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT37.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;

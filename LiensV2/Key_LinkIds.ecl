@@ -1,7 +1,7 @@
-IMPORT BIPV2, doxie, data_services;
+﻿IMPORT BIPV2, doxie, data_services;
 
 EXPORT Key_LinkIds := MODULE
-		shared  base_recs 					:= LiensV2.file_liens_party_BIPV2;
+		shared  base_recs 					:= project(LiensV2.file_liens_party_BIPV2,LiensV2.Layout_liens_party_SSN_BIPV2 and not [tmsid_old,rmsid_old]);
 		export  out_SuperKeyName  := Data_Services.Data_location.Prefix('Liensv2')+'thor_data400::key::liensv2::party::linkids_' + Doxie.Version_SuperKey;
 
 		BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_SuperKeyName);
