@@ -87,11 +87,8 @@ Apply_Rules := Fn_Apply_Rules(Apply_EDA_History);
 //-------Propagate Rules--------------------------------------------------------------------
 Propagate_rules := Fn_Propagate_Rules(Apply_Rules);
 
-//Append Neustar Wireless Rules - Jira: DF-24336
-Neustar_Wireless_Rules_Appended := fn_Append_Neustar_Wireless_Rules(Propagate_rules);
-
 //-------Place cellphones with DID  where current above the line doesn't have one 
-Add_dids := Fn_Add_Cellphone_Did(Neustar_Wireless_Rules_Appended);
+Add_dids := Fn_Add_Cellphone_Did(Propagate_rules);
 
 //-------Propagate Rules Again---------------------------------------------------------------
 Propagate_rules2 := Phonesplus_v2.Fn_Propagate_Rules(Add_dids);
@@ -100,8 +97,11 @@ Propagate_rules2 := Phonesplus_v2.Fn_Propagate_Rules(Add_dids);
 Eliminate_duplications := Fn_Eliminate_Duplications(Propagate_rules2)
 :persist('~thor_data400::persist::Phonesplus::eliminate_duplications');
 
+//Append Neustar Wireless Rules - Jira: DF-24336
+Neustar_Wireless_Rules_Appended := fn_Append_Neustar_Wireless_Rules(Eliminate_duplications);
+
 //-------Verify with Insurance and File One 
-Verify_With_Ins_File1 := Fn_Phone_Verification(Eliminate_duplications, pversion);
+Verify_With_Ins_File1 := Fn_Phone_Verification(Neustar_Wireless_Rules_Appended, pversion);
 
 //-------Add other household members for landlines------------------------------------------
 Add_Header_Household := Fn_Add_Header_Household(Verify_With_Ins_File1);
