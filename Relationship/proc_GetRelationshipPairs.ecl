@@ -1,4 +1,4 @@
-﻿import std;
+﻿import std, dx_Relatives_v3;
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout);
 
@@ -21,7 +21,10 @@ EXPORT proc_GetRelationshipPairs(DATASET(Layout_GetRelationship.DIDs_pairs_layou
                                  boolean   HighConfidenceRelatives           = FALSE,
                                  boolean   HighConfidenceAssociates          = FALSE,
                                  unsigned2 RelLookbackMonths                 = 0,
-                                 Layout_GetRelationship.TransactionalFlags_layout txflag = notx) := MODULE
+                                 Layout_GetRelationship.TransactionalFlags_layout txflag = notx,
+                                 string    RelKeyFlag                        = '',
+                                 boolean   SecondDegreeFlag                  = FALSE,
+                                 boolean   ThirdDegreeFlag                   = FALSE) := MODULE
 
 CurrentDate             := (unsigned4) stringlib.GetDateYYYYMMDD();
 shared LookbackDate     := std.date.AdjustDate(CurrentDate,,-RelLookbackMonths);
@@ -79,8 +82,10 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.AptFlag OR
                   txflag.POBoxFlag;
 
-shared relationship_key  := Relationship.key_relatives_v3;
-shared relationship_flat := distribute(pull(Relationship.key_relatives_v3),hash(did1));
+shared relationship_key  := MAP(RelKeyFlag='D2C'       => dx_Relatives_v3.key_D2C_Header_Relatives(),
+                                RelKeyFlag='MARKETING' => dx_Relatives_v3.key_Marketing_Header_Relatives(),
+                                Relationship.key_relatives_v3);
+shared relationship_flat := distribute(pull(relationship_key),hash(did1));
 shared DID_ds_dist       := distribute(DID_ds,hash(did));
 
 shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key r) := TRANSFORM
@@ -184,29 +189,29 @@ shared RelativesOnly   := relsFlat(title BETWEEN 1 AND 43);
 shared AssociatesOnly  := relsFlat(title = 44);
 
 rel_title_layout := RECORD
-   unsigned1 title;
-   unsigned8 permissions;
+ unsigned1 title;
+ unsigned8 permissions;
 END;
 
 old_key_layout := record
-    unsigned5 person1;
-    boolean   same_lname;
-    unsigned2 number_cohabits,
-    integer3  recent_cohabit,
-    unsigned5 person2;
-    integer2  prim_range;
-    DATASET(rel_title_layout) rel_title;
+	unsigned5 person1;
+	boolean   same_lname;
+	unsigned2 number_cohabits,
+	integer3  recent_cohabit,
+	unsigned5 person2;
+	integer2  prim_range;
+	DATASET(rel_title_layout) rel_title;
 end;
 
 shared old_key_layout legacy_format (recordof(RelativesOnly) l) := TRANSFORM
-    self.person1         := l.did1;
-    self.person2         := l.did2;
-    self.same_lname      := l.isanylnamematch;
-    self.number_cohabits := MAX(l.total_score / 5, 6);
-    self.recent_cohabit  := l.rel_dt_last_seen / 100;
-    self.prim_range      := l.source_type;
-    self.rel_title       := DATASET([{l.title,0}],rel_title_layout),
-    self := l;
+	self.person1         := l.did1;
+	self.person2         := l.did2;
+	self.same_lname      := l.isanylnamematch;
+	self.number_cohabits := MAX(l.total_score / 5, 6);
+	self.recent_cohabit  := l.rel_dt_last_seen / 100;
+	self.prim_range      := l.source_type;
+	self.rel_title       := DATASET([{l.title,0}],rel_title_layout),
+	self := l;
 END;
 
 shared OldRelativesOnly  := project(RelativesOnly,legacy_format(left));

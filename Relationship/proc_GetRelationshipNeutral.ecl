@@ -1,4 +1,4 @@
-﻿import std;
+﻿import std, dx_Relatives_v3;
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout);
 
@@ -22,7 +22,10 @@ EXPORT proc_GetRelationshipNeutral(DATASET(Layout_GetRelationship.DIDs_layout) D
                                    boolean   HighConfidenceRelatives           = FALSE,
                                    boolean   HighConfidenceAssociates          = FALSE,
                                    unsigned2 RelLookbackMonths                 = 0,
-                                   Layout_GetRelationship.TransactionalFlags_layout txflag = notx) := MODULE
+                                   Layout_GetRelationship.TransactionalFlags_layout txflag = notx,
+                                   string    RelKeyFlag                        = '',
+                                   boolean   SecondDegreeFlag                  = FALSE,
+                                   boolean   ThirdDegreeFlag                   = FALSE) := MODULE
 
 CurrentDate             := (unsigned4) stringlib.GetDateYYYYMMDD();
 shared LookbackDate     := std.date.AdjustDate(CurrentDate,,-RelLookbackMonths);
@@ -84,8 +87,10 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.CCFlag OR
                   txflag.CLUEFlag;
 
-shared relationship_key  := Relationship.key_relatives_v3;
-shared relationship_flat := distribute(pull(Relationship.key_relatives_v3),hash(did1));
+shared relationship_key  := MAP(RelKeyFlag='D2C'       => dx_Relatives_v3.key_D2C_Header_Relatives(),
+                                RelKeyFlag='MARKETING' => dx_Relatives_v3.key_Marketing_Header_Relatives(),
+                                Relationship.key_relatives_v3);
+shared relationship_flat := distribute(pull(relationship_key),hash(did1));
 shared DID_ds_dist       := distribute(DID_ds,hash(did));
 
 shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key r) := TRANSFORM
