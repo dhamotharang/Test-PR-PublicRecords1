@@ -9,7 +9,7 @@
 		 
 import iesp, PersonReports, Relationship, SmartRollup, riskwise;
 
-export fn_smart_OtherPersonAssoc( dataset(iesp.bpsreport.t_BpsReportAssociateSlim) inAssociates,unsigned6 subjectDID, PersonReports.input._smartlinxreport param) := FUNCTION
+export fn_smart_OtherPersonAssoc( dataset(iesp.bpsreport.t_BpsReportAssociateSlim) inAssociates,unsigned6 subjectDID, PersonReports.IParam._smartlinxreport param) := FUNCTION
   outlayout := iesp.smartlinxreport.t_SLRAssociate;
 	entitylayoutSlim := iesp.bpsreport.t_BpsReportIdentitySlim;
 	entitylayout := iesp.bps_share.t_BpsReportIdentity;
