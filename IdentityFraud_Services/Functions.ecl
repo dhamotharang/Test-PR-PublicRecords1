@@ -75,7 +75,6 @@ EXPORT Functions := MODULE
 		Suppress.MAC_Suppress(pull_dids,pull_ssns,param.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
     Doxie.MAC_PruneOldSSNs (pull_ssns, pruned_ssns, ssn, did);
   
-    // don't want to make a wrapper call to ut@PermissionTools
     dl_glb  := pruned_ssns (doxie.compliance.minor_ok (ut.Age (dob), param.show_minors)); // pull minors
     dl_cleaned := dl_glb (param.isValidDPPAState (orig_state, , source_code)); //pull by DPPA
 

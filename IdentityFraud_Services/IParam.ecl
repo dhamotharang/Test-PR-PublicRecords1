@@ -19,5 +19,4 @@ export IParam := module
     export unsigned1 indicators_per_imposter := 3;
   end;
 
-
 end;

@@ -23,7 +23,7 @@ EXPORT IdentityFraudReport (
   // cannot use doxie/header_records_byDID: it fails at a certain limit on number of records, and here I may have
   // dozens of DIDs
 
-  shared mod_access := MODULE (PROJECT (param, doxie.IDataAccess)) END;
+  shared mod_access := PROJECT (param, doxie.IDataAccess);
 
  shared header_obj := doxie.mod_header_records (
                      false, true, false, //DoSearch, include dailies, allow_wildcard

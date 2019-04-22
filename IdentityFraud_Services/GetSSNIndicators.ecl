@@ -107,4 +107,3 @@ EXPORT layouts.ssn_did_rec GetSSNIndicators (
 
   return a_ssns;
 END;
-
