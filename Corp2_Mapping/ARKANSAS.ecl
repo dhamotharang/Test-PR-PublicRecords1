@@ -1,4 +1,4 @@
-Import _control, corp2, corp2_raw_ar, scrubs, scrubs_corp2_mapping_ar_main, tools, ut, versioncontrol, std;
+﻿Import _control, corp2, corp2_raw_ar, scrubs, scrubs_corp2_mapping_ar_main, tools, ut, versioncontrol, std;
 
 //NOTE: The ARKANSAS module cannot be abbreviated to "AR" because of a compiler issue that causes a conflict with
 //			corp2_mapping.LayoutsCommon.AR.
@@ -140,7 +140,7 @@ Export ARKANSAS	:= Module
 			temp_ra_lname											:= corp2_mapping.fCleanPersonName(state_origin,state_desc,input.Agent_First_Name,input.Agent_Middle_Name,input.Agent_Last_Name).LastName;
 			temp_ra_suffix                  	:= corp2_raw_ar.Functions.SuffixDesc(input.Agent_suffix_id);
 			self.corp_ra_full_name						:= if(Corp2.t2u(input.Registered_Agent)not in['SEE FILE','SEEFILE','SAME','X','N/A','','<NONE>','NONE','NO AGENT NAME','AGENT RESIGNED' ]  ,
-																							corp2_mapping.fCleanBusinessName(state_origin,state_desc,regexreplace('\\x80',input.Registered_Agent,' ')).BusinessName,// Replaces â‚¬ characters with blanks !
+																							corp2_mapping.fCleanBusinessName(state_origin,state_desc,regexreplace('\\x80',input.Registered_Agent,' ')).BusinessName,// Replaces Ã¢â€šÂ¬ characters with blanks !
 																							corp2_mapping.fCleanBusinessName(state_origin,state_desc,corp2.t2u(temp_ra_fname + ' ' + temp_ra_mname + ' ' +temp_ra_lname + ' ' +temp_ra_suffix)).BusinessName
 																							);		
 			self.corp_ra_address_line1      	:= corp2_mapping.fCleanAddress(state_origin,state_desc,input.Agent_Address1,input.Agent_Address2,input.Agent_city,input.Agent_State,input.Agent_zip).AddressLine1;
@@ -292,16 +292,13 @@ Export ARKANSAS	:= Module
 	
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_AR Report' 	//Subject
 																																	 ,'Scrubs CorpMain_AR Report' //Body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpARMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																	);
 
 		Main_BadRecords		  := Main_N.ExpandedInFile(  dt_vendor_first_reported_Invalid	 <> 0 or
 																									 dt_vendor_last_reported_Invalid	 <> 0 or

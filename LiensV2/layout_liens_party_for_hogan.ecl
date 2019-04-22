@@ -40,4 +40,5 @@ string50 TMSID_old;
 string50 RMSID_old;
 unsigned4 global_sid;
 unsigned8 record_sid; 
+
 end;

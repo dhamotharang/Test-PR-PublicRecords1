@@ -1,4 +1,4 @@
-Import _Control, Corp2, Corp2_Raw_DC, lib_stringlib, Scrubs, Scrubs_Corp2_Mapping_DC_Main, Tools, UT, VersionControl, std;
+﻿Import _Control, Corp2, Corp2_Raw_DC, lib_stringlib, Scrubs, Scrubs_Corp2_Mapping_DC_Main, Tools, UT, VersionControl, std;
 
 Export DC 	:= Module
 	
@@ -131,16 +131,13 @@ Export DC 	:= Module
 		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').CompareToProfile_with_Examples;
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_DC Report' //subject
 																																	 ,'Scrubs CorpMain_DC Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpDCMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																);
 
 			Main_BadRecords		  := Main_N.ExpandedInFile(	dt_vendor_first_reported_Invalid 			<> 0 or
 																										dt_vendor_last_reported_Invalid 			<> 0 or

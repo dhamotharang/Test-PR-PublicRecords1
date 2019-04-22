@@ -28,7 +28,7 @@
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType,ce).BocaOps
 								,'FraudGov '+filedate+' Build ROLLBACK'
-								,workunit+ ' ' + FAILMESSAGE + '\n'
+								,'WUID: ' + workunit +'\n\n'
 								+'Build failed due one of the following reasons:\n\n'
 								+'Validate Build: ' + build_status + '\n'
 								+'Validate RIDs: ' + rid_status + '\n'
