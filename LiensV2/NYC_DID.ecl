@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////
 // Attribute 	: NYC_DID
 
 // DEPENDENT ON : liensV2.Mapping_NYC_party,
@@ -131,6 +131,7 @@ rec_temp tappendSSN(liensV2.Layout_liens_party_BIPV2 L) := transform
 self := L;
 self.temp_did := (unsigned6)L.did;
 self.temp_bdid := (unsigned6)L.bdid;
+self := [];
 end;
 
 file_party_SSN_temp := project(proj_tbdid,tappendSSN(left)); 
