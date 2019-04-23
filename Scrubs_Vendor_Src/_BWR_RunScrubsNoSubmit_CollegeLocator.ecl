@@ -1,4 +1,5 @@
-﻿#OPTION('multiplePersistInstances',FALSE);
+﻿IMPORT _Control,Scrubs;
+#OPTION('multiplePersistInstances',FALSE);
 /*******************************************************************************/
 /*	datasetName:=<Dataset>                                                     */
 /*	This assumes:                                                              */

@@ -1,4 +1,5 @@
-﻿#OPTION('multiplePersistInstances',FALSE);
+﻿IMPORT _Control,Scrubs;
+#OPTION('multiplePersistInstances',FALSE);
 /*******************************************************************************/
 /*	datasetName:=<Dataset>                                                     */
 /*	This assumes:                                                              */
@@ -7,7 +8,7 @@
 /*******************************************************************************/
 datasetName	:=	'Vendor_Src';
 filedate		:=	'20190418';	//	Build Date
-scopename		:=	'CollegeLocator';
+scopename		:=	'Bankruptcy';
 
 /*******************************************************************************/
 /*	NO NEED TO CHANGE ANYTHING BELOW THIS LINE                                 */

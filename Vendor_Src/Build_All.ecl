@@ -14,7 +14,7 @@ built := sequential(
 					spray,
 					ExtractORBIT,
 					Vendor_Src.Build_Base(pversion,pUseProd).all,
-					Build_Keys(pversion,pUseProd).all,
+					//Build_Keys(pversion,pUseProd).all,
 					Vendor_Src.Promote.Promote_vendorsrc(pversion,pUseProd).buildfiles.Built2QA,
 			    Build_Strata(pversion,pUseProd).all, 
 					
