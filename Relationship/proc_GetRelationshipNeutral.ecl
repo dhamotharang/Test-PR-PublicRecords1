@@ -87,13 +87,12 @@ shared isTx   :=  txflag.VehicleFlag OR
                   txflag.CCFlag OR
                   txflag.CLUEFlag;
 
-shared relationship_key  := MAP(RelKeyFlag='D2C'       => dx_Relatives_v3.key_D2C_Header_Relatives(),
-                                RelKeyFlag='MARKETING' => dx_Relatives_v3.key_Marketing_Header_Relatives(),
-                                Relationship.key_relatives_v3);
-shared relationship_flat := distribute(pull(relationship_key),hash(did1));
-shared DID_ds_dist       := distribute(DID_ds,hash(did));
+shared relationship_key_qa        := Relationship.key_relatives_v3;
+shared relationship_key_Marketing := dx_Relatives_v3.key_Marketing_Header_Relatives();
+shared relationship_key_D2C       := dx_Relatives_v3.key_D2C_Header_Relatives();
+shared DID_ds_dist                := distribute(DID_ds,hash(did));
 
-shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key r) := TRANSFORM
+shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationship_key_qa r) := TRANSFORM
   self.title_type  := MAP(r.title between 1 and 43 => 'R',
                           r.title = 44             => 'A',
                           r.title = 45             => 'N',
@@ -122,12 +121,36 @@ shared layout_GetRelationship.interfaceOutputNeutral xform(DID_ds l, relationshi
   self := r;
 END;
 
-relsSkip         := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),LIMIT(MaxCount,SKIP));
-relsFail         := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),LIMIT(MaxCount));
-relsAtmost       := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),ATMOST(MaxCount));
-relsAll0         := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),KEEP(20000),LIMIT(0));
+doJoin(relKey, joinOptions) := functionmacro
+  out := join(DID_ds, relKey, keyed(left.did=right.did1), xform(left,right),#EXPAND(joinOptions));
+  return out;
+endmacro;
+doJoinThor(relKey, joinOptions) := functionmacro
+  relKeyJ := distribute(pull(relKey),hash(did1));
+  out := join(DID_ds_dist, relKeyJ, left.did=right.did1, xform(left,right),#EXPAND(joinOptions), local);
+  return out;
+endmacro;
+skipOption   := 'LIMIT(MaxCount,SKIP)';
+failOption   := 'LIMIT(MaxCount)';
+atmostOption := 'ATMOST(MaxCount)';
+allOption    := 'KEEP(20000),LIMIT(0)';
+thorOption   := atmostOption;
+relsSkip         := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, skipOption),
+                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, skipOption),
+                        doJoin(relationship_key_qa, skipOption));
+relsFail         := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, failOption),
+                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, failOption),
+                        doJoin(relationship_key_qa, failOption));
+relsAtmost       := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, atmostOption),
+                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, atmostOption),
+                        doJoin(relationship_key_qa, atmostOption));
+relsAll0         := MAP(RelKeyFlag='D2C'       => doJoin(relationship_key_D2C, allOption),
+                        RelKeyFlag='MARKETING' => doJoin(relationship_key_Marketing, allOption),
+                        doJoin(relationship_key_qa, allOption));
 relsAll          := TOPN(relsAll0, 10000, -total_score, -total_cnt);
-relsTHOR         := join(DID_ds_dist,relationship_flat,left.did = right.did1,xform(left,right),ATMOST(MaxCount),local);
+relsTHOR         := MAP(RelKeyFlag='D2C'       => doJoinThor(relationship_key_D2C, thorOption),
+                        RelKeyFlag='MARKETING' => doJoinThor(relationship_key_Marketing, thorOption),
+                        doJoinThor(relationship_key_qa, thorOption));
 
 shared rels      := MAP(doThor                       => relsThor,
                         doSkip                       => relsSkip,
