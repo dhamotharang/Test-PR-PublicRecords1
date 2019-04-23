@@ -17,8 +17,10 @@ Dashboard_Build_version := Std.Str.SplitWords(fname,'::')[3];
 dUpdateBuildVersion := dataset([{currentBuildVersion}], {string DashboardBuildVersion});
 updateDashboardBuildVersion := OUTPUT(dUpdateBuildVersion,, filename, compressed,overwrite);
 
-fsuperadd	:= Sequential(nothor(fileservices.Clearsuperfile(supername))
-									     ,nothor(fileServices.AddSuperfile(supername, filename))	
+fsuperadd	:= Sequential(STD.File.StartSuperFileTransaction()
+											 ,STD.File.Clearsuperfile(supername)
+									     ,STD.File.AddSuperfile(supername, filename)	
+											 ,STD.File.FinishSuperFileTransaction()
 												);
 
 RunDashboards:=  SEQUENTIAL(FraudGovPlatform_Analytics.GenerateDashboards(true,true), updateDashboardBuildVersion,fsuperadd);
