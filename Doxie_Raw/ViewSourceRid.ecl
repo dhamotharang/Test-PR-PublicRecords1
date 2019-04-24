@@ -1,4 +1,4 @@
-// A wrapper over Header.HeaderShowSources, to re-layout.
+﻿// A wrapper over Header.HeaderShowSources, to re-layout.
 import Doxie, Doxie_crs, Header, atf, atf_services, Bankrupt, bankruptcyv2_services, Drivers, DriversV2, VehLic, 
        Dea, Prof_License, faa, watercraft, ak_perm_fund, emerges,
        govdata, property, utilfile, LN_TU, Doxie_LN, Doxie_Raw, liensv2_services
@@ -7,11 +7,7 @@ import Doxie, Doxie_crs, Header, atf, atf_services, Bankrupt, bankruptcyv2_servi
 
 export ViewSourceRid(
        dataset(Doxie.Layout_ref_rid) rids,
-       unsigned4 dateVal      = 0,
-       unsigned1 dppa_purpose = 0,
-       unsigned1 glb_purpose  = 0,
-			 string6 ssn_mask_value = 'NONE',
-			 boolean dl_mask_value  = false,
+       doxie.IDataAccess mod_access,
 			 set of string2 sources = ALL,
 			 BankruptcyVersion = 0,
 			 JudgmentLienVersion = 0,
@@ -19,13 +15,15 @@ export ViewSourceRid(
 			 VehicleVersion = 0,
 			 VoterVersion = 0,
 			 DeaVersion =0,
-			 string32 appType,
 			 boolean IncludeNonRegulatedVehicleSources = false,
 			 boolean IncludeNonRegulatedWatercraftSources = false
 		) := FUNCTION
 
+//values used in suppress.MAC_Mask:
+ssn_mask_value := mod_access.ssn_mask;
+dl_mask_value := mod_access.dl_mask>0;
 
-headerSrc := header.HeaderShowSources(rids, dateVal, dppa_purpose, glb_purpose, sources, appType,
+headerSrc := header.HeaderShowSources(rids, mod_access, sources,
 													IncludeNonRegulatedVehicleSources, IncludeNonRegulatedWatercraftSources);
 
 Doxie.Layout_VehicleSearch vehOut(vehlic.Layout_Vehicles fileL) := TRANSFORM

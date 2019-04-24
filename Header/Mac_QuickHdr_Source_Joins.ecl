@@ -1,4 +1,4 @@
-EXPORT Mac_QuickHdr_Source_Joins(dInFile,pSourcesIndex,pSources,pOptions) :=
+EXPORT Mac_QuickHdr_Source_Joins(dInFile,pSourcesIndex,pSources,mod_access) :=
 FUNCTIONMACRO
   IMPORT bankruptcyv2_services, doxie_crs, doxie_raw, drivers, DriversV2, ExperianCred, Header, mdr, ut,
          vehiclev2_services, liensv2_services, Header_Quick, LN_PropertyV2_Services, DriversV2_Services;
@@ -58,8 +58,8 @@ FUNCTIONMACRO
     #ELSEIF(srcAllDLs IN pSources)
       drivers.layout_dl tDLssn(DriversV2.Layout_DL pInput) :=
       TRANSFORM
-        SELF.ssn      := IF(dppa_purpose NOT IN [1,4,6],'',IF((INTEGER)pInput.ssn_safe=0,'',pInput.ssn_safe));
-        SELF.ssn_safe := IF(dppa_purpose NOT IN [1,4,6],'',IF((INTEGER)pInput.ssn_safe=0,'',pInput.ssn_safe));
+        SELF.ssn      := IF(mod_access.dppa NOT IN [1,4,6],'',IF((INTEGER)pInput.ssn_safe=0,'',pInput.ssn_safe));
+        SELF.ssn_safe := IF(mod_access.dppa NOT IN [1,4,6],'',IF((INTEGER)pInput.ssn_safe=0,'',pInput.ssn_safe));
         SELF          := pInput;
       END;
       
@@ -90,7 +90,7 @@ FUNCTIONMACRO
     #ELSEIF(MDR.sourceTools.src_Liens_v2 IN pSources)
       SELF.lien_V2_child := doxie_raw.LiensV2_raw(doxie_raw.ds_EmptyDIDs,
                                                   doxie_raw.ds_EmptyBDIDs,
-                                                  PROJECT(ri.lienv2_child,liensv2_services.layout_tmsid),,,,,,,,,,,,,pOptions.ApplicationType);
+                                                  PROJECT(ri.lienv2_child,liensv2_services.layout_tmsid),,,,,,,,,,,,,mod_access.application_type);
     
     // Property assessments
     #ELSEIF(MDR.sourceTools.src_LnPropV2_Fares_Asrs IN pSources OR MDR.sourceTools.src_LnPropV2_Lexis_Asrs IN pSources)
@@ -102,7 +102,7 @@ FUNCTIONMACRO
     
     // Vehicles
     #ELSEIF(srcAllVeh IN pSources)
-      SELF.veh_child    := doxie_raw.veh_legacy_raw(PROJECT(ri.veh_child, vehiclev2_services.layout_vehicle_key),pOptions.dateVal,pOptions.DPPAPurpose,pOptions.GLBPurpose,IncludeNonRegulatedVehicleSources);
+      SELF.veh_child    := doxie_raw.veh_legacy_raw(PROJECT(ri.veh_child, vehiclev2_services.layout_vehicle_key),mod_access.date_threshold,mod_access.dppa,mod_access.glb,IncludeNonRegulatedVehicleSources);
       SELF.veh_v2_child := doxie_raw.VehV2_raw( doxie_raw.ds_EmptyDIDs,
                                                 doxie_raw.ds_EmptyBDIDs,
                                                 PROJECT(ri.veh_child,vehiclev2_services.layout_vehicle_key));

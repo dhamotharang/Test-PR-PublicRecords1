@@ -1,4 +1,4 @@
-IMPORT AutoKeyB2, InfoUSA, standard, doxie_raw, doxie, doxie_cbrs, ut, AutoKeyI, AutoStandardI;
+﻿IMPORT AutoKeyB2, InfoUSA, standard, doxie_raw, doxie, doxie_cbrs, ut, AutoKeyI, AutoStandardI;
 
 EXPORT Get_ids 
   (boolean workHard = true, boolean noFail = false, boolean IncludeDeepDives = false, boolean is_CompSearchL = false) := FUNCTION
@@ -29,6 +29,9 @@ EXPORT Get_ids
     standard.L_Address.Base addr;
     unsigned1 zero := 0;
     unsigned6 fdid := 0;
+		// Added CCPA fields RR-15150
+		dBase.global_sid;
+		dBase.record_sid;
   END;
   ds := DATASET ([], layout_slim);
 

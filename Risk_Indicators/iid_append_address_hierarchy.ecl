@@ -1,9 +1,9 @@
-﻿import _Control, header, riskwise, address, ut, mdr;
+﻿import _Control, dx_header, riskwise, address, ut, mdr, data_services;
 onThor := _Control.Environment.OnThor;
 
 EXPORT iid_append_address_hierarchy(GROUPED DATASET(risk_indicators.iid_constants.layout_outx) allheader , boolean isFCRA, integer bsversion) := FUNCTION
 
-hierarchy_key := header.key_addr_hist(isFCRA); 
+hierarchy_key := dx_header.key_addr_hist(IF (isFCRA, data_services.data_env.iFCRA, 0)); 
 
 just_dids_roxie := table(allheader(did<>0), {did}, did);
 

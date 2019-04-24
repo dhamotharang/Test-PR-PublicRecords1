@@ -1,4 +1,4 @@
-/*2014-04-09T23:10:40Z (Ken Hill)
+﻿/*2014-04-09T23:10:40Z (Ken Hill)
 clean up some addition non-valid ECL constructs
 */
 /*** Not to be hand edited (changes will be lost on re-generation) ***/
@@ -102,12 +102,12 @@ export t_InputID := record
 end;
 		
 export t_InputName := record
-	string Full {xpath('Full')};
-	string Title {xpath('Title')};
-	string First {xpath('First')};
-	string Middle {xpath('Middle')};
-	string Last {xpath('Last')};
-	string Generation {xpath('Generation')};
+	unicode Full {xpath('Full')};
+	unicode Title {xpath('Title')};
+	unicode First {xpath('First')};
+	unicode Middle {xpath('Middle')};
+	unicode Last {xpath('Last')};
+	unicode Generation {xpath('Generation')};
 end;
 		
 export t_InputPhone := record
@@ -281,7 +281,7 @@ export t_ResultMatchEntity := record
 	string EntityUniqueID {xpath('EntityUniqueID')};
 	string SearchCriteria {xpath('SearchCriteria')};
 	boolean MatchRealert {xpath('MatchRealert')};
-	string Name {xpath('Name')};
+	Unicode Name {xpath('Name')};
 	integer Offset {xpath('Offset')};
 	integer8 PrevResultID {xpath('PrevResultID')};
 	integer Score {xpath('Score')};
@@ -314,7 +314,7 @@ end;
 export t_ResultMatchName := record
 	boolean AddressName {xpath('AddressName')};
 	integer AddressInputInstance {xpath('AddressInputInstance')};
-	string Best {xpath('Best')};
+	unicode Best {xpath('Best')};
 	unsigned1 BestID {xpath('BestID')};
 	integer BestScore {xpath('BestScore')};
 	boolean Conflict {xpath('Conflict')};

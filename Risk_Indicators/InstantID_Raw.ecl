@@ -100,7 +100,7 @@ string20 Test_Data_Table_Name := ''  	: stored('TestDataTableName');
 unsigned1 DPPA_Purpose := 0 					: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := 8 						: stored('GLBPurpose');
 STRING5 industry_class_val := '' 			: stored('IndustryClass');
-	isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+	isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 unsigned3 history_date := 999999 			: stored('HistoryDateYYYYMM');
 boolean IsPOBoxCompliant := false 		: stored('PoBoxCompliance');
 boolean ofac_only := true 						: stored('OfacOnly');

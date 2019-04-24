@@ -2,7 +2,7 @@
 
 EXPORT IParam := MODULE
   
-  EXPORT BatchParams := INTERFACE (BatchShare.IParam.BatchParams)
+  EXPORT BatchParams := INTERFACE (BatchShare.IParam.BatchParamsV2)
 		EXPORT boolean   AppendBest := true;
 		EXPORT boolean   TestVelocityRules := false;
 		EXPORT boolean   IsOnline := false;
@@ -30,7 +30,6 @@ EXPORT IParam := MODULE
 		EXPORT integer 	 MaxAssociatedIdentities;
 		EXPORT string		 FraudPlatform;
 		EXPORT boolean   ReturnDetailedRoyalties;
-		EXPORT string6 	 DOBMask := 'NONE';
 		
 		//InstantID
 		EXPORT boolean IIDVersionOverride;
@@ -55,7 +54,6 @@ EXPORT IParam := MODULE
 		EXPORT boolean OFAC;
 		EXPORT boolean	IncludeTargus;	
 		EXPORT boolean IncludeTargus3220;
-		EXPORT boolean ln_branded_value;
 		EXPORT unsigned1 RedFlag_version;		
 		EXPORT unsigned actualIIDVersion;
 		EXPORT	unsigned3 history_date;			
@@ -73,7 +71,7 @@ EXPORT IParam := MODULE
 		IndustryTypeCode := FraudShared.Key_MbsFdnIndType(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)
 																			(keyed(description = ut.CleanSpacesAndUpper(IndustryType_Name)))[1].ind_type;
 		
-		base_params := BatchShare.IParam.getBatchParams();
+		base_params := BatchShare.IParam.getBatchParamsV2();
 		in_mod := MODULE(PROJECT(base_params, BatchParams, OPT))
 			EXPORT boolean   TestVelocityRules	:= false: STORED('TestVelocityRules'); // this option is internal to roxie. added to toggle between test/actual velocity rules. 
 			EXPORT boolean   AppendBest 				:= true	: STORED('AppendBest');
@@ -102,8 +100,7 @@ EXPORT IParam := MODULE
 			EXPORT string    FraudPlatform						:= FraudGovPlatform_Services.Constants.FRAUD_PLATFORM 							: STORED('FraudPlatform');
 			EXPORT BOOLEAN   ReturnDetailedRoyalties 	:= false : STORED('ReturnDetailedRoyalties');
 			EXPORT DATASET(Gateway.Layouts.Config) Gateways	:= 	dataset ([], Gateway.Layouts.Config) : STORED('Gateways');
-			EXPORT string6 	 DOBMask := 'NONE' : STORED('DOBMask');
-
+			
 			//InstantID
 			EXPORT boolean IIDVersionOverride := FALSE	: STORED('IIDVersionOverride');	// back office tag that, if true, allows a version lower than the lowestAllowedVersion
 			EXPORT string1 IIDVersion := '0' : STORED('InstantIDVersion');	// this is passed in by the customer, if nothing passed in, then 0
@@ -134,7 +131,6 @@ EXPORT IParam := MODULE
 			EXPORT boolean OFAC := FraudGovPlatform_Services.Constants.ofac;
 			EXPORT boolean	IncludeTargus := TRUE	: STORED('Targus');	
 			EXPORT boolean IncludeTargus3220 := FALSE : STORED('IncludeTargusE3220');
-			EXPORT boolean ln_branded_value := FALSE : STORED('LnBranded');
 			EXPORT unsigned1 RedFlag_version := 1 : STORED('RedFlag_version');		
 			EXPORT	unsigned3 history_date := 999999 : STORED('HistoryDateYYYYMM');			
 			EXPORT string3 NameInputOrder := '' : STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser

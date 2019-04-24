@@ -26,7 +26,7 @@ EXPORT Mod_CalculateBusinessAdHocRiskIndicators( DATASET(BusinessInstantID20_Ser
                      OR ((watchlist_results[1].bus_ofac_table_7 <> '' AND watchlist_results[1].bus_ofac_record_number_7[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_7<>'OFC' );
       SHARED isCode10 := ((BOOLEAN)(pop_bus_name = '1') AND (BOOLEAN)OFACHit);
       SHARED isCode11 := ((BOOLEAN)(pop_bus_name = '1') AND (BOOLEAN)OtherHit);
-      SHARED mod_rcSet := Business_Risk_BIP.rcSet( BusShell, useSBFE, bus_verification.bvi_desc_key );
+      SHARED mod_rcSet := BusinessInstantID20_Services.rcSet( BusShell, useSBFE, bus_verification.bvi_desc_key );
       // Suppress Risk Indicators and descriptions if there has been a no-hit. The system must return a 
       // no-hit response.
       SHARED is_noHit := bus_verification.bvi IN BusinessInstantID20_Services.Constants.BVI_NOHIT_VALUES OR 

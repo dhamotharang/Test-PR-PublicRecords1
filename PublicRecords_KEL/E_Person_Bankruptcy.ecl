@@ -16,10 +16,9 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'subject(Subject_:0),Bankrupt_(Bankrupt_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'did(Subject_:0),Bankrupt_(Bankrupt_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'did(Subject_:0),Bankrupt_(Bankrupt_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('BA');
-    SELF.__Permits := CFG_Compile.Permit_FCRA;
     SELF := __r;
   END;
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
@@ -31,22 +30,7 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED __d0_Bankrupt__Mapped := JOIN(__d0_KELfiltered,E_Bankruptcy(__in,__cfg).Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d0_Bankrupt__Layout,SELF.Bankrupt_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Bankrupt__Mapped;
   SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
-  SHARED __Mapping1 := 'did(Subject_:0),Bankrupt_(Bankrupt_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
-  SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
-    SELF.Source_ := __CN('BA');
-    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
-    SELF := __r;
-  END;
-  SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
-  EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0 AND name_type = 'D');
-  SHARED __d1_Bankrupt__Layout := RECORD
-    RECORDOF(__d1_KELfiltered);
-    KEL.typ.uid Bankrupt_;
-  END;
-  SHARED __d1_Bankrupt__Mapped := JOIN(__d1_KELfiltered,E_Bankruptcy(__in,__cfg).Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d1_Bankrupt__Layout,SELF.Bankrupt_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
-  SHARED __d1_Prefiltered := __d1_Bankrupt__Mapped;
-  SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1),__Mapping1_Transform(LEFT)));
-  EXPORT InData := __d0 + __d1;
+  EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -85,10 +69,6 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
     {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Bankrupt',COUNT(__d0(__NL(Bankrupt_))),COUNT(__d0(__NN(Bankrupt_)))},
     {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d1(__NL(Subject_))),COUNT(__d1(__NN(Subject_)))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Bankrupt',COUNT(__d1(__NL(Bankrupt_))),COUNT(__d1(__NN(Bankrupt_)))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))}]
+    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

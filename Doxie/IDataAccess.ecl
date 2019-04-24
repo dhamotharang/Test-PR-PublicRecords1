@@ -13,6 +13,8 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean no_scrub := FALSE; // If TRUE, records put on probation will be returned (same as input parameter "raw")
   EXPORT unsigned3 date_threshold := 0; // a.k.a. dateVal
   EXPORT boolean suppress_dmv := TRUE; // as simple as "SuppressDMVInfo := false : stored('ExcludeDMVPII');"
+  EXPORT unsigned1 reseller_type := 0; // 0 - 'End User' (not reseller)| 1 - 'Reseller - We Bill'| 2 - 'Reseller - They Bill'| 3 - Integrator| 4 - Integrator Child| 5 - 'Sales Agent - They Sell'| 6 - 'Sales Agent - We Sell'| 7 - 'Billing Intermediary'| 8 - 'Reseller - LNAC'|
+  EXPORT unsigned1 intended_use := 0; // a bit mask with first bit reserved for marketing
 
   // a combination of "include" and dppa; I don't like it, but need to keep for backward compatibility 
   //TODO: try rid of it completely, or at least of "include" part
@@ -43,9 +45,12 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isHeaderPreGLB (unsigned3 nonglb_last_seen, unsigned3 first_seen, string2 src) := 
            $.compliance.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
 
+  EXPORT boolean isResellerAccount () := reseller_type > 0; // 0 - 'End User' (not reseller)| 1 - 'Reseller - We Bill'| 2 - 'Reseller - They Bill'| 3 - Integrator| 4 - Integrator Child| 5 - 'Sales Agent - They Sell'| 6 - 'Sales Agent - We Sell'| 7 - 'Billing Intermediary'| 8 - 'Reseller - LNAC'|
   EXPORT boolean isConsumer () := industry_class = 'CNSMR';
-  EXPORT boolean isDirectMarketing () := industry_class = 'DRMKT';
-  EXPORT boolean isUtility () := industry_class = 'UTILI';  // should we look for 'DRMKT' here as well?
+  EXPORT boolean isDirectMarketing () := industry_class = 'DRMKT' 
+                                         OR (intended_use & 1) = 1; // hardcoded 1 here (designated for marketing) for simplicity. Didn't create Constant since for now it is the only value expected for use case
+
+  EXPORT boolean isUtility () := industry_class = 'UTILI' OR isDirectMarketing(); // indicates restriction of utility sources 
 
   // restrictions based on data restriction mask flags
   EXPORT boolean isPreGLBRestricted () := $.compliance.isPreGLBRestricted (DataRestrictionMask);

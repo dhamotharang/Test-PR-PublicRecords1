@@ -1,4 +1,4 @@
-IMPORT Address, Models, ut, risk_indicators, easi, doxie, Header, MDR, drivers, Riskwise, gateway, DeathV2_Services, AutoStandardI;
+IMPORT Address, Models, ut, risk_indicators, easi, doxie, Header, dx_header, MDR, drivers, Riskwise, gateway, DeathV2_Services, AutoStandardI;
 
 EXPORT HealthCare_Attributes_Search_Function(
 														DATASET(Models.layouts.Layout_HealthCare_Attributes_In) indata,
@@ -21,7 +21,7 @@ EXPORT HealthCare_Attributes_Search_Function(
 		SELF.seq := (INTEGER)le.Seq;	
 		SELF.ssn := IF(le.SSN='000000000', '', le.SSN);	// blank out social if it is all 0's
 		SELF.dob := cleanDOB;
-		SELF.age := IF(TRIM(cleanDOB) = '', '', (STRING3)ut.GetAgeI((INTEGER)cleanDOB));
+		SELF.age := IF(TRIM(cleanDOB) = '', '', (STRING3)ut.Age((INTEGER)cleanDOB));
 		SELF.fname := le.FirstName;
 		SELF.mname := le.MiddleName;
 		SELF.lname := le.LastName;
@@ -103,7 +103,7 @@ rHeader := record
 	integer 		seq;
 	UNSIGNED3 	EstimatedHHIncome;
 	string12		in_DID;
-	recordof(doxie.Key_Header_Address);
+	dx_header.layouts.i_header_address;
 end;
 
 rStats := record
@@ -163,11 +163,11 @@ rAttributes := record
 	Models.layouts.Layout_HealthCare_Attributes;
 end;
 
-header_addr := doxie.Key_Header_Address;
+header_addr := dx_header.key_header_address();
 
 unsigned3 	LastSeenThreshold := Risk_Indicators.iid_constants.oneyear;
 	
-//Join the input address to the doxie.Key_Header_Address to get all header records for the address
+//Join the input address to the key_header_address to get all header records for the address
 //*** kwh - possible enhancement??  We are possibly losing DOB's in the below join since we are only keeping recs with last seen date within last year, which sometimes is missing DOB and therefore not kept.  
 //*** There can be older header records (not within last year) that do have the DOB.  Can we append DOB from an older record to the record/s we do keep?
 
@@ -196,7 +196,7 @@ hdr_Recs := join(clam, header_addr,
 								glb_ok AND
 								// dppa check
 								(	~mdr.Source_is_DPPA(RIGHT.src) OR 
-									(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPApurpose,RIGHT.src))) and
+									(dppa_ok AND drivers.state_dppa_ok(mdr.sourceTools.translateSource(RIGHT.src),DPPApurpose,RIGHT.src))) and
 								// last seen date is within a year
 								ut.DaysApart(Risk_Indicators.iid_constants.myGetDate(left.historydate), (string)right.dt_last_seen) <= LastSeenThreshold,
 								getHeader(left, right), left outer, keep(200), ATMOST(RiskWise.max_atmost));

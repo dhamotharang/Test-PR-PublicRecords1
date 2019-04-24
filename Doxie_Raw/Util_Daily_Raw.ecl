@@ -36,5 +36,5 @@ census_data.MAC_Fips2County_Keyed(j2_masked,st,county[3..5],county_name,f2);
 
 glb_ok := ut.PermissionTools.glb.ok(glb_purpose);
 
-return IF(industry_class_value<>'UTILI' and glb_ok,SORT(f2,RECORD));
+return IF(~Doxie.Compliance.isUtilityRestricted(industry_class_value) and glb_ok,SORT(f2,RECORD));
 END;

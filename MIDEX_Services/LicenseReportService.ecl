@@ -71,9 +71,9 @@ export LicenseReportService := macro
   input_params := AutoStandardI.GlobalModule();
 	tempmod := module(project(input_params,Midex_Services.Iparam.reportrecords,opt));
     // SearchBy fields not handled by AutoStandardI.GlobalModule
-		export dataset   MidexReportNumbers := 						ds_Midex_number;
-		export dataset   MariRidNumbers := 								ds_Mari_number;
-		export string1   searchType := ''									: stored('SearchType');
+		export dataset   MidexReportNumbers := ds_Midex_number;
+		export dataset   MariRidNumbers := ds_Mari_number;
+		export string1   searchType := ''	: stored('SearchType');
 		export string25  nameHash := alert_input.hashes.name.hashvalue;
 		export string25  addressHash := alert_input.hashes.address.hashvalue;
 		export string25  licenseStatHash := alert_input.hashes.LicenseStatus.hashvalue;
@@ -97,6 +97,7 @@ export LicenseReportService := macro
                                         vAlertVersion,
                                         Midex_Services.Constants.AlertVersion.None);
 		export boolean   isLicenseOnlyReport := IF(Midex_number = '',TRUE,FALSE);
+    export boolean   includeLicRptsFromNMLS := FALSE;  // Only return License report requested
 	end;
 
   // No MAC_marshal is used, since the alert values are set at the repsone record level, the .val

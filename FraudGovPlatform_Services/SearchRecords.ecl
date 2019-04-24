@@ -13,9 +13,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// Getting the payload records from FraudGov Payload key.
 	// **************************************************************************************
 	SHARED ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs( ds_batch_in,
-																																									batch_params.GlobalCompanyId,
-																																									batch_params.IndustryType,
-																																									batch_params.ProductCode,
+																																									batch_params,
 																																									IsOnline := batch_params.IsOnline);
 
 	// **************************************************************************************

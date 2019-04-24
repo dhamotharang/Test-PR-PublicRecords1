@@ -439,15 +439,15 @@ RECORD
 	
 	STRING60 watchlist_table := '';
 	STRING10 watchlist_record_number := '';
-	STRING20 watchlist_fname := '';
-	STRING20 watchlist_lname := '';
+	UNICODE20 watchlist_fname := '';
+	UNICODE20 watchlist_lname := '';	
 	STRING50 watchlist_address := '';
 	STRING30 watchlist_city := '';
 	STRING2 watchlist_state := '';
 	STRING9 watchlist_zip := '';
 	BOOLEAN watchlistHit := false;
 
-	STRING50 watchlist_entity_name := '';
+	UNICODE50 watchlist_entity_name := '';
 	
 	STRING30 wphonename := '';
 	STRING50 wphoneaddr := '';
@@ -811,6 +811,13 @@ RECORD
 	string3 reason4FP_V3_fdn;
 	string3 reason5FP_V3_fdn;
 	string3 reason6FP_V3_fdn;
+  string3 digital_insight_score := '';
+  string3 digital_insight_reason1 := '';
+  string3 digital_insight_reason2 := '';
+  string3 digital_insight_reason3 := '';
+  string3 digital_insight_reason4 := '';
+  string3 digital_insight_reason5 := '';
+  string3 digital_insight_reason6 := '';
 END;
 
 export Layout_Boca_Shell :=
@@ -938,6 +945,9 @@ RECORD
 	Risk_Indicators.Layouts.layout_BIP_Header_info_54 BIP_Header54;	//MS-123	
 	
 	string2 phone_ver_bureau; //replacement for Experian
+  
+  risk_indicators.layouts.layout_threatmetrix_shell_internal_results ThreatMetrix;
+  
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets LnJ_datasets;
 	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};

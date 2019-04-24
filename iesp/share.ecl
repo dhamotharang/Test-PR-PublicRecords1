@@ -138,6 +138,7 @@ export t_User := record
 	string ProductCode {xpath('ProductCode')};//hidden[internal]
   string OutputType {xpath('OutputType')};
 	string10 DeathMasterPurpose {xpath('DeathMasterPurpose')};//hidden[internal]
+	string2 ResellerType {xpath('ResellerType')};//hidden[internal]
 end;
 		
 export t_LoginInfo := record
@@ -362,6 +363,7 @@ end;
 export t_BaseOption := record
 	boolean Blind {xpath('Blind')};//hidden[inhouse]
 	integer MakeVendorGatewayCall {xpath('MakeVendorGatewayCall')};//hidden[internal]
+	string2 IntendedUse {xpath('IntendedUse')};//hidden[internal]
 end;
 		
 export t_BaseSearchOption := record (t_BaseOption)

@@ -1,11 +1,11 @@
-﻿import _Control, header, riskwise, address, ut;
+﻿import _Control, dx_header, riskwise, address, ut, data_services;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, boolean isFCRA) := function
 
 	temp := record
 		unsigned seq;
-		recordof(header.key_addr_hist(isFCRA));
+		dx_header.layouts.i_addr_hist;
 		integer unverified_addr_count := 0;
 		integer trusted_sources_count := 0;
 		integer occupancy_status := 0;		
@@ -20,7 +20,7 @@ EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, bo
 		integer	bus_addr_only;
 	end;
 	
-	AddrHistKey := header.key_addr_hist(isFCRA);
+	AddrHistKey := dx_header.key_addr_hist(IF (isFCRA, data_services.data_env.iFCRA, 0));
 	temp getAddrHistory(clam le, AddrHistKey ri) := TRANSFORM
 		self.seq := le.seq;
 		addr1 := address.Addr1FromComponents(ri.prim_range,ri.predir,ri.prim_name,ri.suffix,ri.postdir,ri.unit_desig,ri.sec_range);

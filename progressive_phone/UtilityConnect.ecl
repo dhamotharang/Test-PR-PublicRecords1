@@ -12,10 +12,11 @@ EXPORT UtilityConnect(UNSIGNED6 in_did,DATASET(doxie.Layout_Rollup.AddrRec) addr
 		self.did := in_did,
 		SELF := L;
 	END;
-
+	
+    utility_flag := Doxie.Compliance.isUtilityRestricted(ut.IndustryClass.Get());
 // stlf RQ-12930 - GLB check added as a passed paramenter to the function above.
 	RETURN JOIN(addrRecs,UtilFile.Key_Address,
-		 (~ut.IndustryClass.Is_Utility)
+		 (~utility_flag)
 		 AND isGLB_Ok
 		 AND LEFT.zip!='' AND LEFT.prim_name!='' AND	KEYED(LEFT.prim_name=RIGHT.prim_name) 
 		 AND KEYED(LEFT.st=RIGHT.st) AND	KEYED(LEFT.zip=RIGHT.zip) 

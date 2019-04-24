@@ -358,14 +358,14 @@ EXPORT Layouts := MODULE
 		STRING60 		Watchlist_Table;
 		STRING10 		Watchlist_Record_Number;
 		STRING120   Watchlist_Program;
-		STRING120	 	Watchlist_Cmpy;
+		UNICODE120	 	Watchlist_Cmpy;
 		STRING50 		Watchlist_Address;
 		STRING25 		Watchlist_City;
 		STRING2 		Watchlist_State;
 		STRING9 		Watchlist_Zip;
 		STRING30 		Watchlist_Country;
-		STRING20		Watchlist_FName;  
-		STRING20		Watchlist_LName; 
+		UNICODE20		Watchlist_FName;  
+		UNICODE20		Watchlist_LName; 
 	END;
 	
 	EXPORT LayoutPhoneAddrDistances := RECORD

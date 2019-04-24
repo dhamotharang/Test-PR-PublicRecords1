@@ -1,61 +1,35 @@
-import doxie, Doxie_Raw, Doxie_crs, suppress, ut, mdr, watercraft, 
+﻿import doxie, Doxie_Raw, Doxie_crs, suppress, ut, mdr, watercraft, 
        census_data, DEAV2_Services, DeathV2_Services,
-			 VotersV2_services, Header, faa;
+       VotersV2_services, Header, faa;
 
 export HeaderShowSources(
     dataset(Doxie.Layout_ref_rid) rid_data,
-    unsigned4 dateVal = 0,
-    unsigned1 dppa_purpose = 0,
-    unsigned1 glb_purpose = 0,
-		SET OF STRING2 sources = ALL,
-	  string32 appType,
-		boolean IncludeNonRegulatedVehicleSources = false,
-		boolean IncludeNonRegulatedWatercraftSources = false
+    doxie.IDataAccess mod_access,
+    SET OF STRING2 sources = ALL,
+    boolean IncludeNonRegulatedVehicleSources = false,
+    boolean IncludeNonRegulatedWatercraftSources = false
 ) := FUNCTION
-
-// canot use doxie.compliance.GetGlobalDataAccessModule (); -- because of name conflicts
-mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
-  EXPORT unsigned1 glb := glb_purpose;
-  EXPORT unsigned1 dppa := dppa_purpose;
-  EXPORT string32 application_type := appType; //is it translated?
-  EXPORT unsigned3 datdate_threshold := dateVal;
-
-  // these are hardcoded for MAC_GlbClean_Header below; setting them here is a bit risky, since there's no guarantee
-  // that this module will be used in other calls, where values should be taken from global module, but this doesn't happen so far.
-  EXPORT boolean probation_override := FALSE;
-  EXPORT string5 industry_class := '';
-  EXPORT boolean no_scrub := FALSE;
-END;
 
 boolean glb_ok := mod_access.isValidGLB();
 boolean dppa_ok := mod_access.isValidDPPA();
-
-optionsMod := MODULE
-  EXPORT UNSIGNED1 GLBPurpose      := mod_access.glb;
-  EXPORT UNSIGNED1 DPPAPurpose     := mod_access.dppa;
-  EXPORT STRING32  ApplicationType := mod_access.application_type;
-  EXPORT UNSIGNED4 dateVal         := mod_access.date_threshold;
-  EXPORT BOOLEAN   IncludeNonRegulatedVehicleSources    := IncludeNonRegulatedVehicleSources;
-	EXPORT BOOLEAN   IncludeNonRegulatedWatercraftSources := IncludeNonRegulatedWatercraftSources;
-END;
 
 key_hdr_rid  := doxie.Key_Header_Rid(false,false);
 key_qhdr_rid := doxie.Key_Header_Rid(true,false);
 
 //Get only RIDs with correct permissions
 key_data_rec := record
-	unsigned6 rid;
-	unsigned6 did;
-	unsigned6 first_seen;
-	unsigned3 dt_nonglb_last_seen;
-	Header.Layout_Source_ID;
+  unsigned6 rid;
+  unsigned6 did;
+  unsigned6 first_seen;
+  unsigned3 dt_nonglb_last_seen;
+  Header.Layout_Source_ID;
 end;
 
 key_data_rec  loadit(Doxie.Layout_ref_rid l, recordof(key_hdr_rid) r) := transform
   self.did := if(l.did > 0 ,l.did,r.did); //  138824: Search by DID has value for l.did  and Search by RID has value for r.did .  
   self := r;
-	self.uid := 0;
-	self.src := '';
+  self.uid := 0;
+  self.src := '';
 end;
 
 withDIDFromHeader := join(rid_data,key_hdr_rid,
@@ -77,9 +51,9 @@ allRIDs := dedup(withDID,all);
 //Pull by RID
 key_data_rec getRids(key_data_rec L, recordof(header.Key_Rid_SrcID(pCombo := false)) R) := transform
   self.rid := l.rid;
-	self.did := l.did;
-	self.first_seen := l.first_seen;
-	self.dt_nonglb_last_seen := l.dt_nonglb_last_seen;
+  self.did := l.did;
+  self.first_seen := l.first_seen;
+  self.dt_nonglb_last_seen := l.dt_nonglb_last_seen;
   self.uid := r.uid;
   self.src := r.src;
 end;
@@ -117,12 +91,12 @@ rid_rec := record, maxlength(doxie_crs.maxlength_report)
 end;
 
 Airc_rid := IF('AR' IN sources,
-								join(with_rid(src in sources),header.Key_Src_Airc,
+                join(with_rid(src in sources),header.Key_Src_Airc,
                       left.src='AR' and
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),
                       transform(rid_rec, self.airc_child := right.airc_child, self := left, self := []),left outer,
                       LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
-								PROJECT(with_rid, TRANSFORM(rid_rec, SELF := LEFT, SELF := [])));
+                PROJECT(with_rid, TRANSFORM(rid_rec, SELF := LEFT, SELF := [])));
 
 
 Airm_rid := IF ('AM' IN sources,
@@ -148,7 +122,7 @@ ATF_rid := IF ('FF' IN sources OR 'FE' IN sources,
                 transform(rid_rec, self.atf_child := right.atf_child, self := left),left outer),
                 AK_rid);
 
-BKV2_rid := IF ('BA' IN sources,Header.Mac_QuickHdr_Source_Joins(ATF_rid,'header.Key_Src_BKV2',['BA'],optionsMod),ATF_rid);
+BKV2_rid := IF ('BA' IN sources,Header.Mac_QuickHdr_Source_Joins(ATF_rid,'header.Key_Src_BKV2',['BA'],mod_access),ATF_rid);
 
 Boater_rid := IF ('EB' IN sources,
                   join(BKV2_rid,header.Key_Src_Boater,
@@ -186,11 +160,11 @@ Death_rid := IF ('DE' IN sources,
                         left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                   DEAV2_rid);
 
-Deed_rid := IF ('FP' IN sources OR 'LP' IN sources,Header.Mac_QuickHdr_Source_Joins(Death_rid,'header.Key_Src_Deed',['FP','LP'],optionsMod),Death_rid);
+Deed_rid := IF ('FP' IN sources OR 'LP' IN sources,Header.Mac_QuickHdr_Source_Joins(Death_rid,'header.Key_Src_Deed',['FP','LP'],mod_access),Death_rid);
 
 // hack - I know this is the only time I'm interested in this
 // Since header file has multiple source codes for dl's, we only show the vehicle sources if nothing is selected or everything is
-DLV2_rid := IF (sources=ALL,Header.Mac_QuickHdr_Source_Joins(Deed_rid,'header.Key_Src_DLv2',['DL'],optionsMod),Deed_rid);
+DLV2_rid := IF (sources=ALL,Header.Mac_QuickHdr_Source_Joins(Deed_rid,'header.Key_Src_DLv2',['DL'],mod_access),Deed_rid);
 
 em_rid := IF ('EM' IN sources,
               join(DLV2_rid,header.Key_Src_em,
@@ -203,9 +177,9 @@ em_rid := IF ('EM' IN sources,
 // bug #104893: Removing src from keyed condition below. 'EH' records found in src keys will have 'EQ' source. 
 //138824  : Adding WH to the join (to enable viewing of WH records in the source key)
 // 138824 : New EQ_RID 											
-eq_rid := IF ('EQ' IN sources, Header.Mac_QuickHdr_Source_Joins(em_rid,'header.Key_Src_eq',['EQ','WH'],optionsMod),em_rid);
+eq_rid := IF ('EQ' IN sources, Header.Mac_QuickHdr_Source_Joins(em_rid,'header.Key_Src_eq',['EQ','WH'],mod_access),em_rid);
 
-en_rid := IF ('EN' IN sources,Header.Mac_QuickHdr_Source_Joins(eq_rid,'header.key_src_experian',['EN'],optionsMod),eq_rid);
+en_rid := IF ('EN' IN sources,Header.Mac_QuickHdr_Source_Joins(eq_rid,'header.key_src_experian',['EN'],mod_access),eq_rid);
 
 for_rid := IF ('FR' IN sources,
                 join(en_rid,header.Key_Src_for,
@@ -223,7 +197,7 @@ nod_rid := IF ('NT' IN sources,
                 for_rid);
 
 // Liens V2 source key returns TMSIDs, which then need to be used to retrieve data to populate lien_v2_child				
-lienV2_rid := IF ('L2' IN sources,Header.Mac_QuickHdr_Source_Joins(nod_rid,'header.Key_Src_Lienv2',['L2'],optionsMod),nod_rid);
+lienV2_rid := IF ('L2' IN sources,Header.Mac_QuickHdr_Source_Joins(nod_rid,'header.Key_Src_Lienv2',['L2'],mod_access),nod_rid);
 
 lntu_rid := IF ('LT' IN sources,
                 join(lienV2_rid,header.Key_Src_lntu,
@@ -233,7 +207,7 @@ lntu_rid := IF ('LT' IN sources,
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 lienV2_rid);
 
-tn_rid := IF ('TN' IN sources,Header.Mac_QuickHdr_Source_Joins(lntu_rid,'header.Key_Src_Tn',['TN'],optionsMod),lntu_rid);
+tn_rid := IF ('TN' IN sources,Header.Mac_QuickHdr_Source_Joins(lntu_rid,'header.Key_Src_Tn',['TN'],mod_access),lntu_rid);
 
 ms_rid := IF ('MS' IN sources,
               join(tn_rid,header.Key_Src_ms,
@@ -251,7 +225,7 @@ prof_rid := IF ('PL' IN sources,
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 ms_rid);
 
-propassess_rid := IF ('FA' IN sources OR 'LA' IN sources,Header.Mac_QuickHdr_Source_Joins(prof_rid,'header.Key_Src_PropAssess',['FA','LA'],optionsMod),prof_rid);
+propassess_rid := IF ('FA' IN sources OR 'LA' IN sources,Header.Mac_QuickHdr_Source_Joins(prof_rid,'header.Key_Src_PropAssess',['FA','LA'],mod_access),prof_rid);
 
 statedeath_rid := IF ('DS' IN sources,
                       join(propassess_rid,header.Key_Src_statedeath,
@@ -279,7 +253,7 @@ util_rid := IF ('UT' IN sources or 'ZT' IN sources,
 
 //// hack - I know this is the only time I'm interested in this
 // Since header file has multiple source codes for vehicles, we only show the vehicle sources if nothing is selected or everything is
-vehV2_rid := IF (sources=ALL,Header.Mac_QuickHdr_Source_Joins(util_rid,'header.Key_Src_vehV2',['VH'],optionsMod),util_rid);
+vehV2_rid := IF (sources=ALL,Header.Mac_QuickHdr_Source_Joins(util_rid,'header.Key_Src_vehV2',['VH'],mod_access),util_rid);
 
 votersV2_rid := IF ('VO' IN sources,
                     join(vehV2_rid,Header.key_src_voters,
@@ -301,7 +275,7 @@ end;
 //// hack - I know this is the only time I'm interested in this
 
 out_rid := IF (sources=ALL,
-								join(votersV2_rid,header.Key_Src_water,
+                join(votersV2_rid,header.Key_Src_water,
                       mdr.Source_is_DPPA(left.src) and 
                       mdr.sourceTools.sourceIsWC(left.src) and 
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),

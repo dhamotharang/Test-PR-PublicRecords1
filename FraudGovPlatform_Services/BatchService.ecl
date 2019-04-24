@@ -8,7 +8,7 @@
 	<part name="GLBPurpose"	type="xsd:byte"/> 
 	<part name="IndustryClass" type="xsd:string"/>
 	
-	<!-- FDN Related Options -->
+	<!-- FraudGov Related Options -->
 	<part name="GlobalCompanyId"	type="xsd:unsigned6"/>	
 	<part name="IndustryTypeName"	type="xsd:string"/>
 	<part name="ProductCode"	type="xsd:unsigned6"/>
@@ -68,7 +68,7 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
 	// **************************************************************************************
 	// Call Batch Records attribute to fetch records. 
 	// **************************************************************************************
-	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params).ds_results;
+	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params);
 
 	// ** Simple transform to convert the ds_records to the flat output layout
 	flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records);

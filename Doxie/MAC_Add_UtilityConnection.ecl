@@ -56,7 +56,7 @@ import doxie, Utilfile, ut;
 
 // Utility data is FCRA,GLB,Industry class-'UTILI resctricted.
 		
-	%Is_utileqfx% := ut.IndustryClass.Is_Utility; // Industryclass = 'UTILI'.		
+	%Is_utileqfx% := Doxie.Compliance.isUtilityRestricted(ut.IndustryClass.Get()); 		
 	outdata := IF(IsFCRA OR %Is_utileqfx% OR ~glb_ok,PROJECT(InData,TRANSFORM(OutLayout,SELF := LEFT,SELF := [])),%fnloutdata%);
 		
 ENDMACRO;

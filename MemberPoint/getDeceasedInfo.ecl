@@ -1,7 +1,7 @@
-import DeathV2_Services, BatchShare;
+﻿import DeathV2_Services;
 
 /*
-Deceased matching needs to be very tight â€“ The query should allow the passing of match codes, 
+Deceased matching needs to be very tight. The query should allow the passing of match codes, 
 along with a post process check against DOB.The post process DOB check will only need to be a Month/Year match
 
 Deceased : 
@@ -18,8 +18,8 @@ SXZ, SX, AYSZC, SYZC, AYSC, AYS, SYZC, SYCZ, SYC, SYZ, SY
 
 Add in a DOB check on all matched records and if the DOB matches append D to the match code.
 
-Multiple hits will be returned on Deceased â€“ return the strongest match for each record based on the 
-following  sort order â€“ the unique and return the strongest match:
+Multiple hits will be returned on Deceased return the strongest match for each record based on the 
+following sort order the unique and return the strongest match:
 
 */
 
@@ -53,9 +53,8 @@ EXPORT dataset(MemberPoint.Layouts.DeceasedOut) getDeceasedInfo (dataset (Member
 			end; 
 				
 		BatchInCommon 	:= project(dsInterE,xformInterExToDec(left));
-			
-		mod_batch := BatchShare.IParam.GetFromLegacy(BParams);
-		deathBatchParams := module(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt))
+
+		deathBatchParams := module(project(BParams, DeathV2_Services.IParam.BatchParams, opt))
       // copy death-related parameters that may have been initialized
 			EXPORT STRING MatchCodeIncludes:= BParams.DeceasedMatchCodes;
 			EXPORT BOOLEAN AddSupplemental:= BParams.AddSupplemental;

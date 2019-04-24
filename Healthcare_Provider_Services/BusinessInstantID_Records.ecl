@@ -1,4 +1,4 @@
-Import iesp,Business_Risk,Healthcare_Header_Services;
+﻿Import iesp,Business_Risk,Healthcare_Header_Services;
 export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParams inputData) := module
 // Pass in global object and build input object for 
 	rawData := Business_Risk.business_instantid_records();
@@ -106,65 +106,65 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		RepWatchList1 := if(input.RepWatchlist_Record_Number<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.RepWatchlist_table;
 																						 self.RecordNumber := left.RepWatchlist_Record_Number;
-																						 self.Name := iesp.ECL2ESP.SetName(left.RepWatchlist_fname, '', left.RepWatchlist_lname, '', '', '');
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.RepWatchlist_fname, '', (string)left.RepWatchlist_lname, '', '', '');
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.RepWatchlist_city, left.RepWatchlist_state, 
 																																			left.RepWatchlist_zip,'','','', left.RepWatchlist_address,'','');
 																						 self.Country := left.RepWatchlist_country;
-																						 self.EntityName := left.RepWatchlist_entity_name;
+																						 self.EntityName := (string)left.RepWatchlist_entity_name;
 																						 self.Sequence := 1)));
 		RepWatchList2 := if(input.RepWatchlist_Record_Number_2<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.RepWatchlist_table_2;
 																						 self.RecordNumber := left.RepWatchlist_Record_Number_2;
-																						 self.Name := iesp.ECL2ESP.SetName(left.RepWatchlist_fname_2, '', left.RepWatchlist_lname_2, '', '', '');
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.RepWatchlist_fname_2, '', (string)left.RepWatchlist_lname_2, '', '', '');
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.RepWatchlist_city_2, left.RepWatchlist_state_2, 
 																																			left.RepWatchlist_zip_2,'','','', left.RepWatchlist_address_2,'','');
 																						 self.Country := left.RepWatchlist_country_2;
-																						 self.EntityName := left.RepWatchlist_entity_name_2;
+																						 self.EntityName := (string)left.RepWatchlist_entity_name_2;
 																						 self.Sequence := 2)));
 		RepWatchList3 := if(input.RepWatchlist_Record_Number_3<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.RepWatchlist_table_3;
 																						 self.RecordNumber := left.RepWatchlist_Record_Number_3;
-																						 self.Name := iesp.ECL2ESP.SetName(left.RepWatchlist_fname_3, '', left.RepWatchlist_lname_3, '', '', '');
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.RepWatchlist_fname_3, '', (string)left.RepWatchlist_lname_3, '', '', '');
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.RepWatchlist_city_3, left.RepWatchlist_state_3, 
 																																			left.RepWatchlist_zip_3,'','','', left.RepWatchlist_address_3,'','');
 																						 self.Country := left.RepWatchlist_country_3;
-																						 self.EntityName := left.RepWatchlist_entity_name_3;
+																						 self.EntityName := (string)left.RepWatchlist_entity_name_3;
 																						 self.Sequence := 3)));
 		RepWatchList4 := if(input.RepWatchlist_Record_Number_4<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.RepWatchlist_table_4;
 																						 self.RecordNumber := left.RepWatchlist_Record_Number_4;
-																						 self.Name := iesp.ECL2ESP.SetName(left.RepWatchlist_fname_4, '', left.RepWatchlist_lname_4, '', '', '');
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.RepWatchlist_fname_4, '', (string)left.RepWatchlist_lname_4, '', '', '');
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.RepWatchlist_city_4, left.RepWatchlist_state_4, 
 																																			left.RepWatchlist_zip_4,'','','', left.RepWatchlist_address_4,'','');
 																						 self.Country := left.RepWatchlist_country_4;
-																						 self.EntityName := left.RepWatchlist_entity_name_4;
+																						 self.EntityName := (string)left.RepWatchlist_entity_name_4;
 																						 self.Sequence := 4)));
 		RepWatchList5 := if(input.RepWatchlist_Record_Number_5<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.RepWatchlist_table_5;
 																						 self.RecordNumber := left.RepWatchlist_Record_Number_5;
-																						 self.Name := iesp.ECL2ESP.SetName(left.RepWatchlist_fname_5, '', left.RepWatchlist_lname_5, '', '', '');
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.RepWatchlist_fname_5, '', (string)left.RepWatchlist_lname_5, '', '', '');
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.RepWatchlist_city_5, left.RepWatchlist_state_5, 
 																																			left.RepWatchlist_zip_5,'','','', left.RepWatchlist_address_5,'','');
 																						 self.Country := left.RepWatchlist_country_5;
-																						 self.EntityName := left.RepWatchlist_entity_name_5;
+																						 self.EntityName := (string)left.RepWatchlist_entity_name_5;
 																						 self.Sequence := 5)));
 		RepWatchList6 := if(input.RepWatchlist_Record_Number_6<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.RepWatchlist_table_6;
 																						 self.RecordNumber := left.RepWatchlist_Record_Number_6;
-																						 self.Name := iesp.ECL2ESP.SetName(left.RepWatchlist_fname_6, '', left.RepWatchlist_lname_6, '', '', '');
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.RepWatchlist_fname_6, '', (string)left.RepWatchlist_lname_6, '', '', '');
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.RepWatchlist_city_6, left.RepWatchlist_state_6, 
 																																			left.RepWatchlist_zip_6,'','','', left.RepWatchlist_address_6,'','');
 																						 self.Country := left.RepWatchlist_country_6;
-																						 self.EntityName := left.RepWatchlist_entity_name_6;
+																						 self.EntityName := (string)left.RepWatchlist_entity_name_6;
 																						 self.Sequence := 6)));
 		RepWatchList7 := if(input.RepWatchlist_Record_Number_7<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.RepWatchlist_table_7;
 																						 self.RecordNumber := left.RepWatchlist_Record_Number_7;
-																						 self.Name := iesp.ECL2ESP.SetName(left.RepWatchlist_fname_7, '', left.RepWatchlist_lname_7, '', '', '');
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.RepWatchlist_fname_7, '', (string)left.RepWatchlist_lname_7, '', '', '');
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.RepWatchlist_city_7, left.RepWatchlist_state_7, 
 																																			left.RepWatchlist_zip_7,'','','', left.RepWatchlist_address_7,'','');
 																						 self.Country := left.RepWatchlist_country_7;
-																						 self.EntityName := left.RepWatchlist_entity_name_7;
+																						 self.EntityName := (string)left.RepWatchlist_entity_name_7;
 																						 self.Sequence := 7)));
 		self.AuthorizedRepresentativeResults.WatchListMatch := RepWatchList1;
 		repWatchListCombine := RepWatchList1+RepWatchList2+RepWatchList3+RepWatchList4+RepWatchList5+RepWatchList6+RepWatchList7;
@@ -259,7 +259,7 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		watchList1 := if(input.watchlist_Record_Number<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.watchlist_table;
 																						 self.RecordNumber := left.watchlist_Record_Number;
-																						 self.Name := iesp.ECL2ESP.SetName(left.watchlist_fname, '', left.watchlist_lname, '', '', left.watchlist_cmpy);
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.watchlist_fname, '', (string)left.watchlist_lname, '', '', (string)left.watchlist_cmpy);
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.watchlist_city, left.watchlist_state, 
 																																			left.watchlist_zip,'','','', left.watchlist_address,'','');
 																						 self.Country := left.watchlist_country;
@@ -268,7 +268,7 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		watchList2 := if(input.watchlist_Record_Number_2<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.watchlist_table_2;
 																						 self.RecordNumber := left.watchlist_Record_Number_2;
-																						 self.Name := iesp.ECL2ESP.SetName(left.watchlist_fname_2, '', left.watchlist_lname_2, '', '', left.watchlist_cmpy_2);
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.watchlist_fname_2, '', (string)left.watchlist_lname_2, '', '', (string)left.watchlist_cmpy_2);
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.watchlist_city_2, left.watchlist_state_2, 
 																																			left.watchlist_zip_2,'','','', left.watchlist_address_2,'','');
 																						 self.Country := left.watchlist_country_2;
@@ -277,7 +277,7 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		watchList3 := if(input.watchlist_Record_Number_3<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.watchlist_table_3;
 																						 self.RecordNumber := left.watchlist_Record_Number_3;
-																						 self.Name := iesp.ECL2ESP.SetName(left.watchlist_fname_3, '', left.watchlist_lname_3, '', '', left.watchlist_cmpy_3);
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.watchlist_fname_3, '', (string)left.watchlist_lname_3, '', '', (string)left.watchlist_cmpy_3);
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.watchlist_city_3, left.watchlist_state_3, 
 																																			left.watchlist_zip_3,'','','', left.watchlist_address_3,'','');
 																						 self.Country := left.watchlist_country_3;
@@ -286,7 +286,7 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		watchList4 := if(input.watchlist_Record_Number_4<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.watchlist_table_4;
 																						 self.RecordNumber := left.watchlist_Record_Number_4;
-																						 self.Name := iesp.ECL2ESP.SetName(left.watchlist_fname_4, '', left.watchlist_lname_4, '', '', left.watchlist_cmpy_4);
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.watchlist_fname_4, '', (string)left.watchlist_lname_4, '', '', (string)left.watchlist_cmpy_4);
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.watchlist_city_4, left.watchlist_state_4, 
 																																			left.watchlist_zip_4,'','','', left.watchlist_address_4,'','');
 																						 self.Country := left.watchlist_country_4;
@@ -295,7 +295,7 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		watchList5 := if(input.watchlist_Record_Number_5<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.watchlist_table_5;
 																						 self.RecordNumber := left.watchlist_Record_Number_5;
-																						 self.Name := iesp.ECL2ESP.SetName(left.watchlist_fname_5, '', left.watchlist_lname_5, '', '', left.watchlist_cmpy_5);
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.watchlist_fname_5, '', (string)left.watchlist_lname_5, '', '', (string)left.watchlist_cmpy_5);
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.watchlist_city_5, left.watchlist_state_5, 
 																																			left.watchlist_zip_5,'','','', left.watchlist_address_5,'','');
 																						 self.Country := left.watchlist_country_5;
@@ -304,7 +304,7 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		watchList6 := if(input.watchlist_Record_Number_6<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.watchlist_table_6;
 																						 self.RecordNumber := left.watchlist_Record_Number_6;
-																						 self.Name := iesp.ECL2ESP.SetName(left.watchlist_fname_6, '', left.watchlist_lname_6, '', '', left.watchlist_cmpy_6);
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.watchlist_fname_6, '', (string)left.watchlist_lname_6, '', '', (string)left.watchlist_cmpy_6);
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.watchlist_city_6, left.watchlist_state_6, 
 																																			left.watchlist_zip_6,'','','', left.watchlist_address_6,'','');
 																						 self.Country := left.watchlist_country_6;
@@ -313,7 +313,7 @@ export BusinessInstantID_Records (Healthcare_Header_Services.IParams.ReportParam
 		watchList7 := if(input.watchlist_Record_Number_7<>'',project(input, transform(iesp.instantid.t_WatchList, 
 																						 self.Table := left.watchlist_table_7;
 																						 self.RecordNumber := left.watchlist_Record_Number_7;
-																						 self.Name := iesp.ECL2ESP.SetName(left.watchlist_fname_7, '', left.watchlist_lname_7, '', '', left.watchlist_cmpy_7);
+																						 self.Name := iesp.ECL2ESP.SetName((string)left.watchlist_fname_7, '', (string)left.watchlist_lname_7, '', '', (string)left.watchlist_cmpy_7);
 																						 self.Address := iesp.ECL2ESP.SetAddress('','','','','','','',left.watchlist_city_7, left.watchlist_state_7, 
 																																			left.watchlist_zip_7,'','','', left.watchlist_address_7,'','');
 																						 self.Country := left.watchlist_country_7;

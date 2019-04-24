@@ -25,7 +25,7 @@ temp := record
 	integer avm_5_yrs;
 end;
 
-temp add_header_by_address(addresses_in le, Doxie.Key_Header_Address rt) := transform
+temp add_header_by_address(addresses_in le, Doxie.Key_FCRA_Header_Address rt) := transform
 	self.DID_from_addr := rt.did;
 	self.ssn_from_addr := rt.ssn;	
 	

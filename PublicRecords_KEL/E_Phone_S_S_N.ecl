@@ -18,39 +18,28 @@ EXPORT E_Phone_S_S_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
   SHARED __Mapping := 'phonenumber(Phone_Number_:0),social(Social_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping0 := 'phone(Phone_Number_:0),ssn(Social_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule)';
+  SHARED __Mapping0 := 'phone(Phone_Number_:0),ssn(Social_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),DPMBitmap(__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Header,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Header),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)phone != 0 AND (UNSIGNED)ssn != 0);
   SHARED __d0_Prefiltered := __d0_KELfiltered;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   SHARED Date_First_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
-  SHARED __Mapping1 := 'phone(Phone_Number_:0),ssn(Social_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_1Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule)';
+  SHARED __Mapping1 := 'phone(Phone_Number_:0),ssn(Social_:0),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_1Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),DPMBitmap(__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Header_Quick__Key_Did,TRANSFORM(RECORDOF(__in.Dataset_Header_Quick__Key_Did),SELF:=RIGHT));
   EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)ssn != 0 AND (UNSIGNED)phone != 0);
   SHARED __d1_Prefiltered := __d1_KELfiltered;
   SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1));
-  SHARED __Mapping2 := 'phone(Phone_Number_:0),ssn(Social_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping2 := 'phone(Phone_Number_:0),ssn(Social_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
   SHARED InLayout __Mapping2_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('BA');
-    SELF.__Permits := CFG_Compile.Permit_FCRA;
     SELF := __r;
   END;
   SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
   EXPORT __d2_KELfiltered := __d2_Norm((UNSIGNED)ssn != 0 AND (UNSIGNED)phone != 0);
   SHARED __d2_Prefiltered := __d2_KELfiltered;
   SHARED __d2 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2),__Mapping2_Transform(LEFT)));
-  SHARED __Mapping3 := 'phone(Phone_Number_:0),ssn(Social_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
-  SHARED InLayout __Mapping3_Transform(InLayout __r) := TRANSFORM
-    SELF.Source_ := __CN('BA');
-    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
-    SELF := __r;
-  END;
-  SHARED __d3_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
-  EXPORT __d3_KELfiltered := __d3_Norm((UNSIGNED)ssn != 0 AND (UNSIGNED)phone != 0);
-  SHARED __d3_Prefiltered := __d3_KELfiltered;
-  SHARED __d3 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3),__Mapping3_Transform(LEFT)));
-  EXPORT InData := __d0 + __d1 + __d2 + __d3;
+  EXPORT InData := __d0 + __d1 + __d2;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -99,10 +88,6 @@ EXPORT E_Phone_S_S_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','phone',COUNT(__d2(__NL(Phone_Number_))),COUNT(__d2(__NN(Phone_Number_)))},
     {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ssn',COUNT(__d2(__NL(Social_))),COUNT(__d2(__NN(Social_)))},
     {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d2(Date_First_Seen_=0)),COUNT(__d2(Date_First_Seen_!=0))},
-    {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))},
-    {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','phone',COUNT(__d3(__NL(Phone_Number_))),COUNT(__d3(__NN(Phone_Number_)))},
-    {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ssn',COUNT(__d3(__NL(Social_))),COUNT(__d3(__NN(Social_)))},
-    {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d3(Date_First_Seen_=0)),COUNT(__d3(Date_First_Seen_!=0))},
-    {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d3(Date_Last_Seen_=0)),COUNT(__d3(Date_Last_Seen_!=0))}]
+    {'PhoneSSN','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d2(Date_Last_Seen_=0)),COUNT(__d2(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

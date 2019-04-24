@@ -14497,7 +14497,7 @@ pbm1803_0_1 := map(
                     SELF                                  := [];
 
 		#ELSE
-      SELF.attributes.version1.score1	:= 	(STRING)pbm1803_0_1;
+      SELF.attributes.version1.score1	:= If(ProspectAge='0','',	(STRING)pbm1803_0_1);
 
 		#END
 			SELF := le;

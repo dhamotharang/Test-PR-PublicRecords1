@@ -8,6 +8,13 @@ EXPORT E_Accident_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT InLayout := RECORD
     KEL.typ.ntyp(E_Accident().Typ) Acc_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.nstr Secondary_Range_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -15,7 +22,7 @@ EXPORT E_Accident_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'Acc_(Acc_:0),Location_(Location_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'Acc_(Acc_:0),Location_(Location_:0),primaryrange(Primary_Range_:\'\'),predirectional(Predirectional_:\'\'),primaryname(Primary_Name_:\'\'),suffix(Suffix_:\'\'),postdirectional(Postdirectional_:\'\'),secondaryrange(Secondary_Range_:\'\'),zip5(Z_I_P5_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __d0_Acc__Layout := RECORD
     RECORDOF(__in);
     KEL.typ.uid Acc_;
@@ -38,12 +45,19 @@ EXPORT E_Accident_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT Layout := RECORD
     KEL.typ.ntyp(E_Accident().Typ) Acc_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
+    KEL.typ.nstr Primary_Range_;
+    KEL.typ.nstr Predirectional_;
+    KEL.typ.nstr Primary_Name_;
+    KEL.typ.nstr Suffix_;
+    KEL.typ.nstr Postdirectional_;
+    KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
+    KEL.typ.nstr Secondary_Range_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Acc_,Location_,ALL));
+  EXPORT __PostFilter := __GroupedFilter(GROUP(InData,Acc_,Location_,Primary_Range_,Predirectional_,Primary_Name_,Suffix_,Postdirectional_,Z_I_P5_,Secondary_Range_,ALL));
   Accident_Address_Group := __PostFilter;
   Layout Accident_Address__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
@@ -62,10 +76,18 @@ EXPORT E_Accident_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Acc__Orphan := JOIN(InData(__NN(Acc_)),E_Accident(__in,__cfg).__Result,__EEQP(LEFT.Acc_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(Acc__Orphan),COUNT(Location__Orphan)}],{KEL.typ.int Acc__Orphan,KEL.typ.int Location__Orphan});
+  EXPORT Z_I_P5__Orphan := JOIN(InData(__NN(Z_I_P5_)),E_Zip_Code(__in,__cfg).__Result,__EEQP(LEFT.Z_I_P5_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT SanityCheck := DATASET([{COUNT(Acc__Orphan),COUNT(Location__Orphan),COUNT(Z_I_P5__Orphan)}],{KEL.typ.int Acc__Orphan,KEL.typ.int Location__Orphan,KEL.typ.int Z_I_P5__Orphan});
   EXPORT NullCounts := DATASET([
     {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Acc',COUNT(__d0(__NL(Acc_))),COUNT(__d0(__NN(Acc_)))},
     {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Location',COUNT(__d0(__NL(Location_))),COUNT(__d0(__NN(Location_)))},
+    {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryRange',COUNT(__d0(__NL(Primary_Range_))),COUNT(__d0(__NN(Primary_Range_)))},
+    {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Predirectional',COUNT(__d0(__NL(Predirectional_))),COUNT(__d0(__NN(Predirectional_)))},
+    {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','PrimaryName',COUNT(__d0(__NL(Primary_Name_))),COUNT(__d0(__NN(Primary_Name_)))},
+    {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Suffix',COUNT(__d0(__NL(Suffix_))),COUNT(__d0(__NN(Suffix_)))},
+    {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Postdirectional',COUNT(__d0(__NL(Postdirectional_))),COUNT(__d0(__NN(Postdirectional_)))},
+    {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SecondaryRange',COUNT(__d0(__NL(Secondary_Range_))),COUNT(__d0(__NN(Secondary_Range_)))},
+    {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ZIP5',COUNT(__d0(__NL(Z_I_P5_))),COUNT(__d0(__NN(Z_I_P5_)))},
     {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'AccidentAddress','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]

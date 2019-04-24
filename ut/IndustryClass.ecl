@@ -31,6 +31,6 @@ export IndustryClass := MODULE
 	EXPORT boolean is_valid_entrp(string dt) :=  (LIB_Date.DaysApart(dt ,sys_date)<= EntDateVal);
 	
 	EXPORT Get() := AutoStandardI.InterfaceTranslator.industry_class_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.industry_class_val.params));	
-	EXPORT Is_Utility := Get() = UTILI_IC;	
+	//EXPORT Is_Utility := Get() = UTILI_IC;	// --deprecated, use Doxie.Compliance.isUtilityRestricted() instead
 	
 END;

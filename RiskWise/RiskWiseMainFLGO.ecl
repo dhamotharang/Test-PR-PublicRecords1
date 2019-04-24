@@ -137,7 +137,7 @@ END;
 prep := PROJECT(t,into(LEFT,COUNTER));
 
 
-iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, industry_class_value='UTILI', ln_branded_value, 
+iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value, 
 					ofac_only, false,false,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission);
 
 RiskWise.Layout_FLGO format_out(iid le) := TRANSFORM					

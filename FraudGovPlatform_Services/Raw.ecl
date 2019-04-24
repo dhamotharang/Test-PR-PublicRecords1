@@ -153,9 +153,9 @@ EXPORT Raw(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, FraudG
 		*/
 
 		gateways := dataset([], Gateway.Layouts.Config);
-		ds_instantID_out := Risk_Indicators.InstantID_Function(ds_instantID_in, gateways, batch_params.DPPAPurpose,  
-																													 batch_params.GLBPurpose, batch_params.IndustryClass='UTILI', 
-																													 batch_params.ln_branded_value);
+		ds_instantID_out := Risk_Indicators.InstantID_Function(ds_instantID_in, gateways, batch_params.dppa,  
+																													 batch_params.glb, batch_params.isUtility(), 
+																													 batch_params.ln_branded);
 																																																			 
 		RETURN ds_instantID_out;
 

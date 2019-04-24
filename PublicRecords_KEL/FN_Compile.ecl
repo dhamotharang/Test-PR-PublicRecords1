@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
-IMPORT Risk_Indicators,STD;
+IMPORT PublicRecords_KEL,Risk_Indicators,STD;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT FN_Compile := MODULE
@@ -43,5 +43,11 @@ EXPORT FN_Compile := MODULE
     __IsNull := __NL(__Pfield1) OR __NL(__Pfield2);
     __Value := STD.Str.EditDistance(field1,field2);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
+  END;
+  EXPORT KEL.typ.nstr FN_Source_Group(KEL.typ.nstr __PRawSource) := FUNCTION
+    RawSource := __T(__PRawSource);
+    __IsNull := __NL(__PRawSource);
+    __Value := PublicRecords_KEL.ECL_Functions.Common_Functions.SourceGroup(RawSource);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
 END;

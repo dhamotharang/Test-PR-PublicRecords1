@@ -33,7 +33,7 @@ IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI, MDR;
 #uniquename(cnsmr_flag)
 %cnsmr_flag% := ut.IndustryClass.Is_Knowx;
 #uniquename(utility_flag)
-%utility_flag% := ut.IndustryClass.Is_Utility;
+%utility_flag% := Doxie.Compliance.isUtilityRestricted(ut.IndustryClass.Get());
 #uniquename(filter_exp)
 %filter_exp% := doxie.DataRestriction.isECHRestricted(drm);
 #uniquename(filter_eq)

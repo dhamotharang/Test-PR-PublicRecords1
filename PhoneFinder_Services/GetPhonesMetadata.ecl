@@ -4,14 +4,15 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 													 PhoneFinder_Services.iParam.ReportParams inMod, 
 													 DATASET(Gateway.Layouts.Config) dGateways, 
 													 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
-													 DATASET(PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo) :=
+													 DATASET(PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo,
+                           BOOLEAN isBatch = FALSE) :=
 	FUNCTION
 	
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process Location*************************************************
 	// ---------------------------------------------------------------------------------------------------------																
 	PhoneFinder_Services.Layouts.PhoneFinder.Final UpdatePrimaryAddress (PhoneFinder_Services.Layouts.PhoneFinder.Final l, dInBestInfo r) := TRANSFORM
-		bestMatch := l.acctno=r.acctno and (l.did=r.did OR l.batch_in.did = r.did);
+		bestMatch := l.acctno=r.acctno and (r.did != 0 AND (l.did=r.did OR l.batch_in.did = r.did));
 		SELF.prim_range 	:= IF(bestMatch,r.prim_range,l.prim_range);
 		SELF.predir 			:= IF(bestMatch,r.predir,l.predir);
 		SELF.prim_name 		:= IF(bestMatch,r.prim_name,l.prim_name);
@@ -21,6 +22,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		SELF.city_name 		:= IF(bestMatch,r.p_city_name,l.city_name);
 		SELF.st 					:= IF(bestMatch,r.st,l.st);
 		SELF.zip 					:= IF(bestMatch,r.z5,l.zip);
+		SELF.zip4					:= IF(bestMatch,r.zip4,l.zip4);
 		SELF.did 					:= IF(bestMatch,r.did,l.did);
 		SELF.phone_vendor	:= IF(bestMatch,'BA',l.phone_vendor); // identify info as coming from best rec, is not display in final output
 		SELF.isprimaryphone := l.isprimaryphone;
@@ -67,7 +69,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 			SELF.best_predir     		:= r.predir;
 			SELF.best_prim_name  		:= r.prim_name;
 			SELF.best_addr_suffix 	:= r.addr_suffix;
-			SELF.best_postdir    		:= r.postdir;			
+			SELF.best_postdir    		:= r.postdir;
 			SELF.best_sec_range  	 	:= r.sec_range;
 			SELF.best_city_name			:= r.p_city_name;
 			SELF.best_st          	:= r.st;
@@ -309,11 +311,13 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 															LIMIT(PhoneFinder_Services.Constants.MetadataLimit,SKIP));
 									
 	dOTPPhones := DEDUP(SORT(UNGROUP(dOTP + IF(EXISTS(subjectInfo) AND inMod.UseDeltabase,dDeltaOTPwSubject)),   //combine results
-																acctno, did, phone, -event_date, transaction_id),acctno, did, phone, event_date, transaction_id); 	
-	dedupOTPs := 	SORT(DEDUP(SORT(dOTPPhones, acctno, did, phone, otp_id,
+																acctno, phone, -event_date, transaction_id),acctno, phone, event_date, transaction_id);
+  
+	dedupOTPs := 	SORT(DEDUP(SORT(dOTPPhones, acctno, phone, otp_id,
 															STD.Str.ToLowerCase(function_name) NOT IN PhoneFinder_Services.Constants.OTPVerifyTransactions,-verify_passed),
-															acctno, did, phone, otp_id),
-											acctno, did, phone,-event_date);														
+															acctno, phone, otp_id),
+											acctno, phone,-event_date);
+  
 	dsOTPHistory := PROJECT(dedupOTPs,TRANSFORM({PhoneFinder_Services.Layouts.SubjectPhone,PhoneFinder_Services.Layouts.PhoneFinder.OTPs}, 
 																									SELF.OTPStatus:= IF(STD.Str.ToLowerCase(LEFT.function_name) IN PhoneFinder_Services.Constants.OTPVerifyTransactions,
 																																			LEFT.verify_passed,FALSE), 
@@ -321,7 +325,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 	//select necessary fields
 	OTPRec := RECORD
 			dOTPPhones.acctno;
-			dOTPPhones.did;
 			dOTPPhones.phone;
 			BOOLEAN OTP := dOTPPhones.transaction_id <> '';
 			UNSIGNED4 OTPCount := COUNT(GROUP,dOTPPhones.transaction_id<>'');
@@ -330,7 +333,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 			BOOLEAN LastOTPStatus := IF(STD.Str.ToLowerCase(dOTPPhones.function_name) IN PhoneFinder_Services.Constants.OTPVerifyTransactions,
 																					dOTPPhones.verify_passed, FALSE);	
 	END;
-	dvalidOTP:= TABLE(GROUP(dedupOTPs,acctno, did, phone),OTPRec);	
+	dvalidOTP:= TABLE(GROUP(dedupOTPs,acctno, phone),OTPRec);	
 		
 	{OTPRec, PhoneFinder_Services.Layouts.PhoneFinder.OneTimePassword} getOTPHistory (dvalidOTP l, DATASET(RECORDOF(dsOTPHistory)) r) := TRANSFORM
 			SELF.OTPHistory := PROJECT(r, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.OTPs, SELF:=LEFT));
@@ -339,7 +342,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		
 	dvalidOTPwHistory := DENORMALIZE(dvalidOTP,dsOTPHistory,
 															LEFT.acctno	= RIGHT.acctno AND
-															LEFT.did		= RIGHT.did AND
 															LEFT.phone 	= RIGHT.phone,
 															GROUP,
 															getOTPHistory(LEFT,ROWS(RIGHT)));
@@ -359,7 +361,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		
 	dPhoneInfowOTP		:= JOIN(dPhoneInfoUpdate_Spoofing,dvalidOTPwHistory,
 															LEFT.acctno	= RIGHT.acctno AND
-															LEFT.did		= RIGHT.did AND
 															LEFT.phone 	= RIGHT.phone,
 															mergeOTP(LEFT,RIGHT),
 															LEFT OUTER, KEEP(1),
@@ -373,7 +374,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 	primaryPhoneSource := [PhoneFinder_Services.Constants.PhoneSource.Waterfall,PhoneFinder_Services.Constants.PhoneSource.QSentGateway];				
 	 // original approach : display RI's when IncludePhoneMetadata and transaction type = premium,ultimate and phoneriskassesment
 	 //Re-design approach: display RI's info when IncludeRiskIndicators = true
-	displayPRI := inMod.IncludeRiskIndicators AND EXISTS(inMod.RiskIndicators(Active));
+	displayPRI := isBatch AND inMod.IncludeRiskIndicators AND EXISTS(inMod.RiskIndicators(Active));
 	call_fowarded := PhoneFinder_Services.Functions.CallForwardingDesc(1);	// FORWARDED
 	PhoneFinder_Services.Layouts.PhoneFinder.Final rollMetadata(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
 																																PhoneFinder_Services.Layouts.PhoneFinder.Final r) := TRANSFORM
@@ -464,52 +465,50 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 														mergePRI(LEFT,RIGHT), LEFT OUTER, ALL);
 														
 	MetadataResults:= IF(displayPRI,dPhoneInfowPRI,dPhoneInfoUpdate_OTP);
-		
 	
-  #IF(PhoneFinder_Services.Constants.Debug.PhoneMetadata)		
- 		 OUTPUT(dInRecs,NAMED('dInRecs'));												
- 		 OUTPUT(dInBestInfo,NAMED('dInBestInfo'));												
-   	OUTPUT(dSearchRecs,NAMED('dSearchRecs_metadata'));												
-   	OUTPUT(phoneStateUpdate,NAMED('phoneStateUpdate'));												
-    OUTPUT(bestInfo,NAMED('bestInfo'));												
-    OUTPUT(phonewBestAddr,NAMED('phonewBestAddr'));												
-    OUTPUT(ds_zip,NAMED('ds_zip'));												
-    OUTPUT(ds_cityState,NAMED('ds_cityState'));												
-    OUTPUT(dSearchRecswAddrType,NAMED('dSearchRecswAddrType'));												
-    OUTPUT(dPhoneInquiryRecs_final,NAMED('dPhoneInquiryRecs_final'));												
-    OUTPUT(dPhoneInfoWPorting,NAMED('dPhoneInfoWPorting'));												
-    OUTPUT(dPortedRecs,NAMED('dPortedRecs'));												
-		// OUTPUT(dssubjects,NAMED('dsSubjects'));												
-		// OUTPUT(subjectInfo,NAMED('subjectInfo'));																			
-		// OUTPUT(dDeltabaseSpoofed,NAMED('dDeltabaseSpoofed'));												
-		// OUTPUT(dSpoofedPhones,NAMED('dSpoofedPhones'));		
-		// OUTPUT(dSpoof,NAMED('dSpoof'));		
-		// OUTPUT(transformSpoof,NAMED('transformSpoof'));		
-		// OUTPUT(spoofInfo,NAMED('spoofInfo'));		
-		// OUTPUT(spoofInfowHistory,NAMED('spoofInfowHistory'));	
-	  OUTPUT(dPhoneInfoUpdate_Spoofing,NAMED('dPhoneInfoUpdate_Spoofing'));	
-		// OUTPUT(dOTP,NAMED('dOTPIndex'));		
-		// OUTPUT(dDeltaOTPwSubject,NAMED('dDeltaOTPwSubject'));		
-		// OUTPUT(dOTPPhones,NAMED('dOTPPhones'));		
-		// OUTPUT(dedupOTPs,NAMED('dedupOTPs'));		
-		// OUTPUT(dvalidOTP,NAMED('dvalidOTP'));		
-		// OUTPUT(dvalidOTPwHistory,NAMED('dvalidOTPwHistory'));			
-		OUTPUT(dPhoneInfowOTP,NAMED('dPhoneInfowOTP'));				
-		OUTPUT(drolledMetadataRecs,NAMED('rolledMetadataRecs'));	
-		OUTPUT(dSortedPhoneRecs,NAMED('SortedPhoneRecs'));	
-		// OUTPUT(SortedIdentity,NAMED('SortedIdentity'));	
-		// OUTPUT(SortedPhone,NAMED('SortedPhone'));	
-		OUTPUT(dPrimaryPhoneRecs,NAMED('PrimaryPhoneRecs'));	
-		OUTPUT(dPrimaryPhone_wRiskValues,NAMED('dPrimaryPhone_wRiskValues'));	
-		OUTPUT(dotherPhones,NAMED('otherPhones'));	
-		OUTPUT(dsortedPhoneswSubjectPRIs,NAMED('sortedPhoneswSubjectPRIs'));	
-		OUTPUT(dotherPhones_wRiskValues,NAMED('otherPhones_wRiskValues'));		
-		// OUTPUT(dPRIResults,NAMED('PRIResults'));		
-		OUTPUT(PhoneAlerts,NAMED('PhoneAlerts'));		
-		OUTPUT(dPhoneInfowPRI,NAMED('dPhoneInfowPRI'));		
-		OUTPUT(MetadataResults,NAMED('MetadataResults'));		
+  #IF(PhoneFinder_Services.Constants.Debug.PhoneMetadata)
+    OUTPUT(dInRecs,NAMED('dInRecs'));
+    OUTPUT(dInBestInfo,NAMED('dInBestInfo'));
+   	OUTPUT(dSearchRecs,NAMED('dSearchRecs_metadata'));
+   	OUTPUT(phoneStateUpdate,NAMED('phoneStateUpdate'));
+    OUTPUT(bestInfo,NAMED('bestInfo'));
+    OUTPUT(phonewBestAddr,NAMED('phonewBestAddr'));
+    OUTPUT(ds_zip,NAMED('ds_zip'));
+    OUTPUT(ds_cityState,NAMED('ds_cityState'));
+    OUTPUT(dSearchRecswAddrType,NAMED('dSearchRecswAddrType'));
+    OUTPUT(dPhoneInquiryRecs_final,NAMED('dPhoneInquiryRecs_final'));
+    OUTPUT(dPhoneInfoWPorting,NAMED('dPhoneInfoWPorting'));
+    OUTPUT(dPortedRecs,NAMED('dPortedRecs'));
+		// OUTPUT(dssubjects,NAMED('dsSubjects'));
+		// OUTPUT(subjectInfo,NAMED('subjectInfo'));
+		// OUTPUT(dDeltabaseSpoofed,NAMED('dDeltabaseSpoofed'));
+		// OUTPUT(dSpoofedPhones,NAMED('dSpoofedPhones'));
+		// OUTPUT(dSpoof,NAMED('dSpoof'));
+		// OUTPUT(transformSpoof,NAMED('transformSpoof'));
+		// OUTPUT(spoofInfo,NAMED('spoofInfo'));
+		// OUTPUT(spoofInfowHistory,NAMED('spoofInfowHistory'));
+	  OUTPUT(dPhoneInfoUpdate_Spoofing,NAMED('dPhoneInfoUpdate_Spoofing'));
+		// OUTPUT(dOTP,NAMED('dOTPIndex'));
+		// OUTPUT(dDeltaOTPwSubject,NAMED('dDeltaOTPwSubject'));
+		// OUTPUT(dOTPPhones,NAMED('dOTPPhones'));
+		OUTPUT(dedupOTPs,NAMED('dedupOTPs'));
+		OUTPUT(dsOTPHistory,NAMED('dsOTPHistory'));
+		OUTPUT(dvalidOTP,NAMED('dvalidOTP'));
+		OUTPUT(dvalidOTPwHistory,NAMED('dvalidOTPwHistory'));
+		OUTPUT(dPhoneInfowOTP,NAMED('dPhoneInfowOTP'));
+		OUTPUT(dPhoneInfoUpdate_OTP,NAMED('dPhoneInfoUpdate_OTP'));
+		IF(displayPRI, OUTPUT(drolledMetadataRecs,NAMED('rolledMetadataRecs')));
+		IF(displayPRI, OUTPUT(dSortedPhoneRecs,NAMED('SortedPhoneRecs')));
+		IF(displayPRI, OUTPUT(dPrimaryPhoneRecs,NAMED('PrimaryPhoneRecs')));
+		IF(displayPRI, OUTPUT(dPrimaryPhone_wRiskValues,NAMED('dPrimaryPhone_wRiskValues')));
+		IF(displayPRI, OUTPUT(dotherPhones,NAMED('otherPhones')));
+		IF(displayPRI, OUTPUT(dsortedPhoneswSubjectPRIs,NAMED('sortedPhoneswSubjectPRIs')));
+		IF(displayPRI, OUTPUT(dotherPhones_wRiskValues,NAMED('otherPhones_wRiskValues')));
+		IF(displayPRI, OUTPUT(PhoneAlerts,NAMED('PhoneAlerts')));
+		IF(displayPRI, OUTPUT(dPhoneInfowPRI,NAMED('dPhoneInfowPRI')));
+		IF(displayPRI, OUTPUT(MetadataResults,NAMED('MetadataResults')));
 	#END;
 
-	RETURN SORT(MetadataResults,acctno,seq);	
+	RETURN  SORT(MetadataResults, acctno, seq);
 		
 	END;

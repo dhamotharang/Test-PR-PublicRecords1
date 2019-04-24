@@ -82,6 +82,7 @@ export ProdData_FCRA := MACRO
 	));
 
 boolean	isFCRA := true;
+unsigned1 ENV := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 unsigned6 in_did := 0    : stored('did');
 string9 in_socs := ''	   : stored('socs');
 string120 in_addr := ''	 : stored('addr');
@@ -171,7 +172,7 @@ output(clean_a2, named('cleaned_input'));
 	header_corr := choosen(FCRA.Key_Override_Header_DID(keyed(did=in_did)), 500);
 	if(include_header or Include_All_Files, output(header_corr, named('header_corrections'))) ;
 	
-	address_hierarchy_recs := choosen(header.key_addr_hist(isFCRA)(keyed(s_did=in_did)), 200);
+	address_hierarchy_recs := choosen(dx_header.key_addr_hist(ENV)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;	
 	
 	deathMaster_Recs := choosen(doxie.key_death_masterV2_ssa_DID_fcra(keyed(l_did=in_did)), 10);

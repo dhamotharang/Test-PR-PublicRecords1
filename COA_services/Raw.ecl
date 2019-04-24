@@ -1,5 +1,5 @@
-import doxie,doxie_cbrs,Doxie_Raw,COA_services, iesp, 
-      AutoStandardI, header_quick, utilfile, ut, census_data, Address, header, suppress, Relationship;
+import doxie, Doxie_Raw, COA_services, dx_header,
+      AutoStandardI, header_quick, utilfile, Address, header, suppress, Relationship;
 
 export Raw := module
 export params := interface(AutoStandardI.InterfaceTranslator.application_type_val.params)
@@ -46,7 +46,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 				
 	   	end;
 			
-    	export  COA_services.Layouts.rawrec getMasterRec(Dataset (header.layout_header) in_recs, params in_mod, 
+    	export  COA_services.Layouts.rawrec getMasterRec(Dataset (dx_header.layout_header) in_recs, params in_mod, 
 																												Address.ICleanAddress clean_addr) := function
 				mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
 					EXPORT unsigned1 glb := in_mod.glbPurpose;
@@ -79,7 +79,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 				quick_recs := byDids(in_dids_slim, mod_access.dppa, mod_access.glb);
 				
 				//project to layout header to be cleaned.
-				quick_recs_header_format := project(quick_recs, transform(header.Layout_header,
+				quick_recs_header_format := project(quick_recs, transform(dx_header.layout_header,
 				                     self := left));
 														 
 				
@@ -93,7 +93,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 				header.MAC_GlbClean_Header(quick_recs_header_format,quick_recs_header_format_cleaned, , , mod_access);
 				
 				// put cleaned quick headers into a common layout.
-				quick_recs_header_layout := project(quick_recs_header_format_cleaned, header.layout_header);
+				quick_recs_header_layout := project(quick_recs_header_format_cleaned, dx_header.layout_header);
 												
         // add header recs and quick headers together.												 
 				header_and_quick_recs_cleaned_plus := project (in_recs + quick_recs_header_layout, 
@@ -278,7 +278,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			
         header_recs_coa := join (coa_dids_final, doxie.key_header, 
 									keyed (left.did = right.s_did),
-									transform(header.Layout_Header,						
+									transform(dx_header.Layout_Header,						
 									self := right)							
 									, limit(coa_services.constants.max_recs_on_coa_util_join, skip)
 									);
@@ -295,7 +295,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			 
 			  // use either prim_name/prim_range or use parsed address pieces determined above
 				// thus in_prim_range and in_prim_name used instead.
-			  header_recs_coa_slim := join(header_recs_coa_cleaned, doxie.key_header_address,
+			  header_recs_coa_slim := join(header_recs_coa_cleaned, dx_header.key_header_address(),
 			                        keyed(in_prim_name = right.prim_name) AND
 			                        keyed(in_mod.zip = right.zip) AND
 			                        keyed(in_prim_range = right.prim_range),

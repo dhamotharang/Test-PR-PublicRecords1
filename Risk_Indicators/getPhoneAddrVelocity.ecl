@@ -2,7 +2,7 @@
 // ********  IF YOU CHANGE LOGIC IN THIS FUNCTION, ALSO MODIFY THE CORRESPONDING CODE WITHIN Risk_Indicators.get_IID_Best_Flags ATTRIBUTE ****************
 // *******************************************************************************************************************************************************
 
-import _Control, risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA;
+import _Control, risk_indicators, gong, riskwise, ut, dx_header, doxie, mdr, drivers, FCRA;
 onThor := _Control.Environment.OnThor;
 
 export getPhoneADDRVelocity (GROUPED DATASET(risk_indicators.iid_constants.layout_outx) iid, boolean isUtility=false, unsigned1 dppa,
@@ -84,7 +84,9 @@ slim_addr_rec := record
 	integer adls_per_addr_created_6months;
 end;
 
-slim_addr_rec add_header_by_address(risk_indicators.iid_constants.layout_outx le, Doxie.Key_Header_Address rt) := transform
+header_address_key := if(isFCRA, Doxie.Key_FCRA_Header_Address, dx_header.Key_Header_Address());
+
+slim_addr_rec add_header_by_address(risk_indicators.iid_constants.layout_outx le, header_address_key rt) := transform
   head_first_seen := ((string) rt.dt_first_seen)[1..6];	
 	self.DID_from_srch := rt.did;
 	self.ssn_from_addr := rt.ssn;	
@@ -99,8 +101,6 @@ slim_addr_rec add_header_by_address(risk_indicators.iid_constants.layout_outx le
 	self := le;
 end;	
 
-header_address_key := if(isFCRA, Doxie.Key_FCRA_Header_Address, Doxie.Key_Header_Address);
-
 header_by_address_pre50_roxie := join(dedup_by_did, header_address_key,	
 															left.prim_name!='' and left.z5!='' and
 															keyed(left.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
@@ -113,7 +113,7 @@ header_by_address_pre50_roxie := join(dedup_by_did, header_address_key,
 															right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 															(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 															(~mdr.Source_is_DPPA(RIGHT.src) OR
-																(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+																(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 															~risk_indicators.iid_constants.filtered_source(right.src, right.st) and
 															(~IsFCRA OR ~FCRA.Restricted_Header_Src (RIGHT.src, '')) and
 															(~isFCRA or 
@@ -140,7 +140,7 @@ header_by_address_pre50_thor_addr := join(distribute(dedup_by_did(prim_name!='' 
 															right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 															(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 															(~mdr.Source_is_DPPA(RIGHT.src) OR
-																(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+																(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 															~risk_indicators.iid_constants.filtered_source(right.src, right.st) and
 															(~IsFCRA OR ~FCRA.Restricted_Header_Src (RIGHT.src, '')) and
 															(~isFCRA or 
@@ -173,7 +173,7 @@ header_by_address_50_roxie := join(dedup_by_did, header_address_key,
 															right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 															(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 															(~mdr.Source_is_DPPA(RIGHT.src) OR
-																(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+																(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 															~risk_indicators.iid_constants.filtered_source(right.src, right.st) and
 															(~IsFCRA OR ~FCRA.Restricted_Header_Src (RIGHT.src, '')) and
 															(~isFCRA or 
@@ -200,7 +200,7 @@ header_by_address_50_thor_addr := join(distribute(dedup_by_did(prim_name!='' and
 															right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 															(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 															(~mdr.Source_is_DPPA(RIGHT.src) OR
-																(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+																(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 															~risk_indicators.iid_constants.filtered_source(right.src, right.st) and
 															(~IsFCRA OR ~FCRA.Restricted_Header_Src (RIGHT.src, '')) and
 															(~isFCRA or 

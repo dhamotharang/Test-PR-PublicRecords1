@@ -121,4 +121,15 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		Options.IncludeSSNAddress OR
 		Options.IncludeZipCodePerson);
 	
+	EXPORT DoFDCJoin_Tradeline_Files__Tradeline__Key_LinkIds := 
+		NOT Options.isFCRA AND 
+		(Options.IncludeTradeline or 
+		Options.IncludeTradelineBusiness);
+		
+	EXPORT DoFDCJoin_Business_Files__Business__Key_BH_Linking_Ids :=
+		NOT Options.isFCRA AND
+		 (Options.IncludeBusiness or
+		 Options.IncludeTradelineBusiness);
+
+	
 END;

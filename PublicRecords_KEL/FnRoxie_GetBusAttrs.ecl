@@ -39,16 +39,24 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	// Get Business attributes
 	// When we get the cleaned attributes, then BusInputArchiveDateEcho will change to BusInputArchiveDateClean
 	InputPIIBIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Bus_Attributes_V1(withRepLexIDs, withBIPIDs, 
-		(STRING) withBIPIDs[1].BusInputArchiveDateEcho[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
+		(STRING) withBIPIDs[1].BusInputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 		
-		
+	BusinessSeleIDAttributes := PublicRecords_KEL.FnRoxie_GetBusinessSeleIDAttributes(withBIPIDs, FDCDataset, Options);
+	
+	withBusinessSeleIDAttributes := JOIN(InputPIIBIIAttributes, BusinessSeleIDAttributes, LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			SELF := RIGHT,
+			SELF := LEFT,
+			SELF := []),
+		LEFT OUTER, KEEP(1), ATMOST(100));	
+
 	// Get consumer attributes
 	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].InputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 
 	Rep1PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(Rep1Input, FDCDataset, Options);
 
 	// Join Consumer Results back in with business results
-	withRep1InputPII := JOIN(InputPIIBIIAttributes, Rep1InputPIIAttributes, LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend,
+	withRep1InputPII := JOIN(withBusinessSeleIDAttributes, Rep1InputPIIAttributes, LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF.InputUIDAppend := RIGHT.InputUIDAppend, // Set InputUIDAppend to Rep1 value so we can use this value for other rep 1 attributes.
 			SELF := RIGHT,
@@ -64,14 +72,11 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 		LEFT OUTER, KEEP(1), ATMOST(100));	
 		
 	// If consumer shell attributes are turned off, we can bypass these calculations as a performance enhancement.	
-	FinalResult := IF(Options.ExcludeConsumerShell, 
-		PROJECT(InputPIIBIIAttributes, TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
-			SELF := LEFT,
-			SELF := [])),
-		withRep1PersonAttributes);
+	FinalResult := IF(Options.ExcludeConsumerShell, withBusinessSeleIDAttributes, withRep1PersonAttributes);
 	
 	MasterResults := SORT(FinalResult, BusInputUIDAppend);
 	
 	IF(Options.OutputMasterResults, OUTPUT(MasterResults, NAMED('MasterResults')));
+
 	RETURN MasterResults;
 END;

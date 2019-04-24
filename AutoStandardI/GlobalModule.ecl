@@ -345,4 +345,6 @@ export GlobalModule(boolean isFCRA = false) := module
 	export boolean SuppressDMVInfo := false : stored('ExcludeDMVPII');
 	export unsigned2 xadl2_weight_threshold := 0 : stored('xadl2_weight_threshold');
 	export boolean restrictPreGlb := DataRestrictionMask[23] = '1';
+	export unsigned1 ResellerType := 0 : stored('ResellerType');
+	export unsigned1 IntendedUse := 0 : stored('IntendedUse');
 end;

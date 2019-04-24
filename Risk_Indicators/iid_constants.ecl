@@ -152,6 +152,7 @@ export posExactAddrZip5andPrimRange := 9;
 // default to Experian and Transunion, bureau death records and Experian FCRA restricted, currently we're up to 14 restrictions now
 export default_DataRestriction := '0000010001001100000000000'; 
 export posFaresRestriction := 1;
+export posExperianEBR := 3;
 export posExperianRestriction := 6;
 export posCertegyRestriction := 7;
 export posEquifaxRestriction := 8;
@@ -170,8 +171,10 @@ export FDNvf_ok(string DataRestriction) := DataRestriction[posFDNvfRestriction]=
 
 // default to no permission granted - this created for SSA Death Master file restrictions as of 3/26/14
 export default_DataPermission := '0000000000000';  
+export posTargusPermission := 2;
 export posSSADeathMasterPermission := 10;
 export posFDNcftfPermission := 11;	//FDN Contributory Fraud and Test Fraud data
+export posSBFEPermission := 12;
 export InsuranceDLPermission := 13;
 export deathSSA_ok(string DataPermission) := DataPermission[posSSADeathMasterPermission]=sTrue;
 export FDNcftf_ok(string DataPermission) := DataPermission[posFDNcftfPermission]=sTrue;

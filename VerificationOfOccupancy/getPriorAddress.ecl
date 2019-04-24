@@ -1,4 +1,4 @@
-import Risk_Indicators, ut, LN_PropertyV2, RiskWise, doxie, header_quick, MDR, drivers, header;
+import Risk_Indicators, ut, LN_PropertyV2, RiskWise, doxie, MDR, drivers, dx_header;
 
 EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
 													 DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) allHeader, 
@@ -13,7 +13,7 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 // For attribute 'PriorAddressMoveIndex' - 
 // ******************************************************************************************************************************
 	isFCRA := false;
-	headerKey := header.key_addr_hist(isFCRA);
+	headerKey := dx_header.key_addr_hist();
 	dk := choosen(doxie.key_max_dt_last_seen, 1);
 	hdrBuildDate01 := ((string)dk[1].max_date_last_seen)[1..6];
 
@@ -98,7 +98,8 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
   rolled_Property := rollup(sortProperty, rollProperty(left,right), seq);
 
 //get DIDs associated with the prior address 
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getPriorDIDs(rolled_Property le, doxie.Key_Header_Address ri) := TRANSFORM
+  Key_Header_Address := dx_header.key_header_address();
+	VerificationOfOccupancy.Layouts.Layout_VOOShell getPriorDIDs(rolled_Property le, Key_Header_Address ri) := TRANSFORM
 		SELF.prior_addr_current				:= trim((string)ri.dt_last_seen) >= hdrBuildDate01 OR ri.dt_last_seen >= le.historydate; //within 1 yr
 		SELF.prior_addr_DID 					:= ri.DID;
 		SELF.prior_addr_dt_first_seen := ri.dt_first_seen;
@@ -106,7 +107,7 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 		SELF 													:= le;
 	END;
 	
-	priorAddrDIDs := join(rolled_Property, doxie.Key_Header_Address,
+	priorAddrDIDs := join(rolled_Property, Key_Header_Address,
 												keyed(left.h.prim_name = right.prim_name) and
 												keyed(left.h.zip = right.zip) and
 												keyed(left.h.prim_range = right.prim_range) and
@@ -117,21 +118,22 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 												glb_ok AND
 												(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 												(~mdr.Source_is_DPPA(RIGHT.src) OR 
-													(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),DPPA,RIGHT.src))),
+													(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),DPPA,RIGHT.src))),
 									 getPriorDIDs(LEFT,RIGHT), left outer, ATMOST(RiskWise.max_atmost));
 
 //Dedup to just a list of DIDs associated with prior address - if any are currently updating, save that one for the DID
 	dedupAddrDIDs := dedup(sort(priorAddrDIDs, seq, prior_addr_DID, -prior_addr_current), seq, prior_addr_DID);  
 
 //apply HouseHold ID to each DID found at the prior address and flag subject and/or prior DIDs if currently updating at that address
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getHHIDs(dedupAddrDIDs le, doxie.Key_Header ri) := TRANSFORM
+  key_header := dx_header.key_header();
+	VerificationOfOccupancy.Layouts.Layout_VOOShell getHHIDs(dedupAddrDIDs le, key_header ri) := TRANSFORM
 		SELF.prior_addr_HHID 						:= ri.HHID;
 		SELF.prior_addr_rpting_subject 	:= le.h.HHID = ri.HHID and le.prior_addr_current;  //target subject is still being reported at their prior address
 		SELF.prior_addr_rpting_newID 		:= le.h.HHID <> ri.HHID and le.prior_addr_current; //other people are currently being reported at the subject's prior address
 		SELF 														:= le;
 	END;
 	
-	priorAddrHHIDs := join(dedupAddrDIDs, doxie.Key_Header,
+	priorAddrHHIDs := join(dedupAddrDIDs, key_header,
 									keyed(left.prior_addr_DID = right.s_DID) and 
 									left.h.prim_name = right.prim_name and
 									left.h.zip = right.zip and

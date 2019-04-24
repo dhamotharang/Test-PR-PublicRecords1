@@ -120,13 +120,13 @@ riskwise.Layout_OFCO add_patriot(patriot_final le) := TRANSFORM
 																									if(tribcode='ofc2', le.watchlist_record_number, 
 																																			if(le.watchlist_record_number[1..3]='OSC', le.watchlist_record_number[4..10], 
 																																																								 le.watchlist_record_number[5..10])) );
-	SELF.alertfirst := if(le.watchlist_table='', '', le.watchlist_fname);
-	SELF.alertlast := if(le.watchlist_table='', '', le.watchlist_lname);
+	SELF.alertfirst := if(le.watchlist_table='', '', (string)le.watchlist_fname);
+	SELF.alertlast := if(le.watchlist_table='', '', (string)le.watchlist_lname);
 	SELF.alertaddr := if(le.watchlist_table='', '', le.watchlist_address);
 	SELF.alertcity := if(le.watchlist_table='', '', le.watchlist_city);
 	SELF.alertstate := if(le.watchlist_table='', '', le.watchlist_state);
 	SELF.alertzip := if(le.watchlist_table='', '', le.watchlist_zip);
-	SELF.alertentity := if(le.watchlist_table='', '', le.watchlist_entity_name);
+	SELF.alertentity := if(le.watchlist_table='', '', (string)le.watchlist_entity_name);
 	SELF.alertcountry := if(le.watchlist_table='', '', if(tribcode='ofc3' and le.watchlist_record_number[1..3]='OSC', le.in_country, le.watchlist_contry)); // if the country hit, return the input country code like attus did
 	SELF.alertphone := '';	
 END;
@@ -140,13 +140,13 @@ riskwise.Layout_OFCO filterAttus(attus_final le) := TRANSFORM
 	SELF.riskwiseid := '';
 	SELF.hriskalerttable := if(isGatewayValid, if( le.watchlist_table='', '', if(tribcode='ofc2', le.watchlist_table, 'OFC') ), 'XXX' );
 	SELF.hriskalertnum := if(le.watchlist_table='', '', if(tribcode='ofc2', le.watchlist_record_number, le.watchlist_record_number[5..10]));
-	SELF.alertfirst := if(le.watchlist_table='', '', le.watchlist_fname);
-	SELF.alertlast := if(le.watchlist_table='', '', le.watchlist_lname);
+	SELF.alertfirst := if(le.watchlist_table='', '', (string)le.watchlist_fname);
+	SELF.alertlast := if(le.watchlist_table='', '', (string)le.watchlist_lname);
 	SELF.alertaddr := if(le.watchlist_table='', '', le.watchlist_address);
 	SELF.alertcity := if(le.watchlist_table='', '', le.watchlist_city);
 	SELF.alertstate := if(le.watchlist_table='', '', le.watchlist_state);
 	SELF.alertzip := if(le.watchlist_table='', '', le.watchlist_zip);
-	SELF.alertentity := if(le.watchlist_table='', '', le.watchlist_entity_name);
+	SELF.alertentity := if(le.watchlist_table='', '', (string)le.watchlist_entity_name);
 	SELF.alertcountry := if(le.watchlist_table='', '', le.watchlist_contry);
 	SELF.alertphone := '';	
 END;

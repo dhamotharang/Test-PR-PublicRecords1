@@ -1,4 +1,4 @@
-export MAC_Header_Field_Declare(IsFCRA = false) := MACRO
+﻿export MAC_Header_Field_Declare(IsFCRA = false) := MACRO
 	import AutoStandardI;
 	#uniquename(inputmod);
 	
@@ -207,4 +207,6 @@ export MAC_Header_Field_Declare(IsFCRA = false) := MACRO
 	suppressDMVInfo_value	:= %inputmod%.SuppressDMVInfo;
 //only in LN_PropertyV2_Services.fn_get_report 
 	xadl2_weight_threshold_value	:= %inputmod%.xadl2_weight_threshold;
+	reseller_type	:= AutoStandardI.InterfaceTranslator.reseller_type_value.val(project(%inputmod%,AutoStandardI.InterfaceTranslator.reseller_type_value.params));
+	intended_use	:= AutoStandardI.InterfaceTranslator.intended_use_value.val(project(%inputmod%,AutoStandardI.InterfaceTranslator.intended_use_value.params));
 endmacro;

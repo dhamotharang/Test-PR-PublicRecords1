@@ -233,8 +233,8 @@ ProgPhone_mod     := doxie.iParam.getProgressivePhoneParams();
 progressivePhones := if (IncludeProgressivePhone, doxie.fn_progressivePhone.CompReportAddProgPhones(dids, progPhone_mod,application_type_value));												
 // comment                                                                                                                                                                                                                         ^^^^^^^^^^^^^^^^^^^
 // comment                                                                                                                                                                                         from doxie.MAC_Header_Field_Declare above                         
-
-tempmod := module(project(AutoStandardI.GlobalModule(),CriminalRecords_Services.IParam.report,opt))
+global_mod := AutoStandardI.GlobalModule();
+tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
     export string14 did := (string) dids[1].did;
     export string25 doc_number   := '' ;
     export string60 offender_key := '' ;
@@ -338,7 +338,9 @@ end;
 
 recflags1 := normalize(src_recs,54,into_flags(LEFT,COUNTER));
 
-header_recs := Doxie_Raw.Header_Raw(dids, dateVal, dppa_purpose, glb_purpose);
+mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(global_mod))
+END;
+header_recs := Doxie_Raw.Header_Raw(dids, mod_access); 
 
 layout_flag into_flags2(header_recs L, integer C) := transform
 	self.field_present := choose(C,

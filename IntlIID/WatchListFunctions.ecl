@@ -1,4 +1,4 @@
-import GlobalWatchlists, iesp, Patriot, Risk_Indicators, WorldCheckServices;
+﻿import GlobalWatchlists, iesp, Patriot, Risk_Indicators, WorldCheckServices;
 
 export WatchListFunctions() := MODULE
 
@@ -44,9 +44,9 @@ export addWLMatches(dataset(iesp.iid_international.t_InstantIDInternationalReque
 		self.result.watchlist.table := ri.watchlist_table;
 		self.result.watchlist.recordnumber := ri.watchlist_record_number;
 		self.result.watchlist.name.full := '';
-		self.result.watchlist.name.first := stringlib.stringtouppercase(ri.watchlist_fname);
+		self.result.watchlist.name.first := stringlib.stringtouppercase((string)ri.watchlist_fname);
 		self.result.watchlist.name.middle := '';
-		self.result.watchlist.name.last := stringlib.stringtouppercase(ri.watchlist_lname);
+		self.result.watchlist.name.last := stringlib.stringtouppercase((string)ri.watchlist_lname);
 		self.result.watchlist.name.suffix := '';
 		self.result.watchlist.name.prefix := '';
 		self.result.watchlist.address.streetname := '';
@@ -66,7 +66,7 @@ export addWLMatches(dataset(iesp.iid_international.t_InstantIDInternationalReque
 		self.result.watchlist.address.postalcode := '';
 		self.result.watchlist.address.statecityzip := '';
 		self.result.watchlist.country := stringlib.stringtouppercase(ri.watchlist_contry);
-		self.result.watchlist.entityname := stringlib.stringtouppercase(ri.watchlist_entity_name);
+		self.result.watchlist.entityname := stringlib.stringtouppercase((string)ri.watchlist_entity_name);
 		
 		ofac := DATASET([{'I32',getRCdesc('I32')}],iesp.share.t_RiskIndicator);
 		wl := DATASET([{'IWL',getRCdesc('IWL')}],iesp.share.t_RiskIndicator);

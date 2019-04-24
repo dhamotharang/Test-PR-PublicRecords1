@@ -7,10 +7,10 @@ NonErrorRecs := responseXG5(errormessage = '');
 
 EntityMatchFLAT := RECORD
 	OFAC_XG5.Layout.EntityMatch  ;
-	string350 BestFullName;
-	string50 BestFName;
-	string50 BestMName;
-	string50 BestLName;
+	unicode350 BestFullName;
+	unicode50 BestFName;
+	unicode50 BestMName;
+	unicode50 BestLName;
 	integer BestAKAID;
 	integer addressCount;
 	STRING100 country;

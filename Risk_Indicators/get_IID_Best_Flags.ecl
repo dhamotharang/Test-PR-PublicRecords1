@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA, gateway;
+﻿import _Control, risk_indicators, riskwise, ut, dx_header, doxie, mdr, drivers, FCRA, gateway;
 onThor := _Control.Environment.OnThor;
 
 export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_input,  
@@ -42,7 +42,9 @@ slim_addr_rec := record
 	integer adls_per_addr_created_6months;
 end;
 
-slim_addr_rec add_header_by_address(risk_indicators.layout_output le, Doxie.Key_Header_Address rt) := transform
+Header_Address_Key := if(isFCRA, Doxie.Key_FCRA_Header_Address, dx_header.key_header_address());
+
+slim_addr_rec add_header_by_address(risk_indicators.layout_output le, Header_Address_Key rt) := transform
   head_first_seen := ((string) rt.dt_first_seen)[1..6];
 	self.DID_from_srch := rt.did;
 	self.ssn_from_addr := rt.ssn;	
@@ -57,8 +59,6 @@ slim_addr_rec add_header_by_address(risk_indicators.layout_output le, Doxie.Key_
 	self := le;
 end;	
 		
-Header_Address_Key := if(isFCRA, Doxie.Key_FCRA_Header_Address, Doxie.Key_Header_Address);
-
 // Risk_Indicators.getPhoneAddrVelocity has branch of code to handle prior to 50, but this function will only be called for shell 52 and higher, so we have removed that branch here
 header_by_address_roxie := join(iid_input, Header_Address_Key,	
 															left.prim_name!='' and left.z5!='' and
@@ -72,7 +72,7 @@ header_by_address_roxie := join(iid_input, Header_Address_Key,
 															right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 															(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 															(~mdr.Source_is_DPPA(RIGHT.src) OR
-																(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+																(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 															~risk_indicators.iid_constants.filtered_source(right.src, right.st) and
 															(~IsFCRA OR ~FCRA.Restricted_Header_Src (RIGHT.src, '')) and
 															(~isFCRA or 
@@ -98,7 +98,7 @@ header_by_address_thor_addr := join(distribute(iid_input(prim_name!='' and z5!='
 															right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 															(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
 															(~mdr.Source_is_DPPA(RIGHT.src) OR
-																(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+																(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 															~risk_indicators.iid_constants.filtered_source(right.src, right.st) and
 															(~IsFCRA OR ~FCRA.Restricted_Header_Src (RIGHT.src, '')) and
 															(~isFCRA or 

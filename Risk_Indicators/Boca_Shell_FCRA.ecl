@@ -275,7 +275,7 @@ if( IncludeBureauRecs, risk_indicators.iid_constants.BSOptions.BCBLienFtlr, 0 )
 ;
 
 ret := risk_indicators.Boca_Shell_Function_FCRA
-   (iid_prep, gateways, DPPA_Purpose, GLB_purpose, industry_class_value='UTILI',
+   (iid_prep, gateways, DPPA_Purpose, GLB_purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value),
     false, require2Ele, includeRelativeInfo, true, false, true, TRUE, FALSE, FALSE, 
     FALSE, FALSE, 1, FALSE, FALSE, 0.84, version, isPreScreen, doScore, nugen, 
 		ADL_Based_Shell,dataRestriction, AppendBest, BSOptions,

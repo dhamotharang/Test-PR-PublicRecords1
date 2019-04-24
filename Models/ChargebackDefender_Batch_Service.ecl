@@ -97,7 +97,7 @@ model_name := StringLib.StringToLowerCase( modelname_in );
 unsigned1 dppa := 0 									: stored('DPPAPurpose');
 unsigned1 glb := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 string5   industry_class_val := '' 		: stored('IndustryClass');
-boolean   isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
+boolean   isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 
 boolean   ofac_Only := true 					: stored('OfacOnly');
 boolean   ofacSearching := true 			: stored('OFACSearching');

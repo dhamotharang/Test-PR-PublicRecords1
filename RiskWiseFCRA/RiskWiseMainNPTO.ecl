@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="St. Cloud Main Service NPTO FCRA">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -286,13 +286,13 @@ working_layout format_out(clam le) := TRANSFORM
 									
 	self.hriskalerttable := if(tribCode = 'npt3', if(le.iid.watchlist_table <> '', 'OFC', ''), '');
 	self.hriskalertnum := if(tribCode = 'npt3' and le.iid.watchlist_table <> '' , le.iid.Watchlist_Record_Number[5..10], '');
-	self.alertfirst := if(tribCode = 'npt3', le.iid.Watchlist_fname, '');
-	self.alertlast := if(tribCode = 'npt3', le.iid.Watchlist_lname, '');
+	self.alertfirst := if(tribCode = 'npt3', (string)le.iid.Watchlist_fname, '');
+	self.alertlast := if(tribCode = 'npt3', (string)le.iid.Watchlist_lname, '');
 	self.alertaddr := if(tribCode = 'npt3', le.iid.Watchlist_address, '');
 	self.alertcity := if(tribCode = 'npt3', le.iid.Watchlist_city, '');
 	self.alertstate := if(tribCode = 'npt3', le.iid.Watchlist_state, '');
 	self.alertzip := if(tribCode = 'npt3', le.iid.Watchlist_zip, '');
-	self.alertentity := if(tribCode = 'npt3', le.iid.Watchlist_Entity_Name, '');
+	self.alertentity := if(tribCode = 'npt3', (string)le.iid.Watchlist_Entity_Name, '');
 	
 	self.score := if(tribCode in ['npt4','npt5'], '', intformat(le.iid.cvi,2,1)); // should we include cvi for npt5?
 	

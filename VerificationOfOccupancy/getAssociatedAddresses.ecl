@@ -1,11 +1,11 @@
 
-IMPORT Address, Header, Risk_Indicators, RiskWise;
+IMPORT Address, dx_header, Risk_Indicators, RiskWise, data_services;
 
 EXPORT getAssociatedAddresses(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell = DATASET([],VerificationOfOccupancy.Layouts.Layout_VOOShell), BOOLEAN isFCRA = FALSE) := FUNCTION 
 		
 	addr_history_data := 
 		JOIN(
-			VOOShell, header.key_addr_hist(isFCRA), 
+			VOOShell, dx_header.key_addr_hist(IF(isFCRA, data_services.data_env.iFCRA, 0)),
 			KEYED(LEFT.did = RIGHT.s_did), 
 			TRANSFORM( VerificationOfOccupancy.Layouts.Layout_address, 
 				SELF.s_did                   := RIGHT.s_did,

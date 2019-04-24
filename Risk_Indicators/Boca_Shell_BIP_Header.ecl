@@ -133,7 +133,7 @@ string6 ninesDate   := '999999';
   RolledBusinessHeader := rollup(SortedBusinessHeader, rollBusinessHeader(left,right), UniqueID);
 
 	//Get Business header build date
-	BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
+	BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 	
 	risk_indicators.Layout_Boca_Shell addBusinessHeader(risk_indicators.Layout_Boca_Shell le, RolledBusinessHeader ri) := TRANSFORM
 		noHit																					:= le.seq <> ri.UniqueID;

@@ -1,4 +1,4 @@
-﻿import risk_indicators, iesp;
+﻿import risk_indicators, iesp, BIPV2;
 
 export layouts := module
 
@@ -70,13 +70,16 @@ export Layout_CDM_Batch_In := RECORD
 	STRING5   Name_Suffix;
 	STRING120 unParsedFullName :='';
 	STRING120 Name_Company :='';
-	STRING9   SSN;
+	STRING9   SSN_TIN_FEIN;
+	STRING4		SIC_Code;
+	STRING6		NAICS_Code;
 	STRING65 	street_addr := '';
 	STRING65 	street_addr_2 := '';
 	STRING25  p_City_name;
 	STRING2   St;
 	STRING9   Zip;
 	STRING8   DOB;
+	STRING50	Email;
 	STRING10  Service_Request;
 	STRING2   Record_Type;
 	STRING10  Phone_1;
@@ -155,7 +158,20 @@ export Layout_CDM_Batch_Out := record
 	string4   IDVerDeceasedGovernmentMonthsSeen;
 	string3 	IDVerDeceasedBehavioralCount;
 	string4		IDVerDeceasedBehavioralMonthsSeen;
-	
+
+ // company
+	string3		BusBestFEINCreditBureauCount;
+	string8  	BusBestFEINCreditBureauMonthsSeen;
+	string3		BusBestFEINGovernmentCount;
+	string8  	BusBestFEINGovernmentMonthsSeen;
+	string3 	BusBestFEINBehavioralCount;
+	string8		BusBestFEINBehavioralMonthsSeen;
+	string3		BusBestCompanyNameCreditBureauCount;
+	string8  	BusBestCompanyNameCreditBureauMonthsSeen;
+	string3		BusBestCompanyNameGovernmentCount;
+	string8  	BusBestCompanyNameGovernmentMonthsSeen;
+	string3 	BusBestCompanyNameBehavioralCount;
+	string8		BusBestCompanyNameBehavioralMonthsSeen;
 end;
 
 

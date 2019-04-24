@@ -1,4 +1,4 @@
-/*--SOAP--	 
+﻿/*--SOAP--	 
 	 <message name="BatchService">
 			<part name="DataRestrictionMask"  type="xsd:string"/>
 			<part name="ApplicationType"      type="xsd:string"/>
@@ -51,9 +51,8 @@
 	processed_input := BatchShare.MAC_Process_Validate(ds_batch_in);
 	ds_batch_out    := SSNBest_Services.Records(processed_input, batch_params);	
 
-  // NO_GM - no global mod hits
-  NO_GM := AutoStandardI.PermissionI_Tools.val(ut.PopulateDRI_Mod(batch_params));
-	IF(batch_params.IsGlbRequired AND NOT NO_GM.glb.ok(batch_params.GLBpurpose),
+  
+	IF(batch_params.IsGlbRequired AND NOT batch_params.isValidGLB(batch_params.check_RNA_),
 	   FAIL('An error occurred while running SSNBest_Services.BatchService: invalid GLB purpose.'));
 
 	RETURN OUTPUT(ds_batch_out,NAMED('Results'));

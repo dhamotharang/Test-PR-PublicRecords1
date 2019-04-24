@@ -1,4 +1,4 @@
-//============================================================================
+﻿//============================================================================
 // Attribute: header_raw.  Used by view source service. 
 // Function to get dl records by did.  Based on Doxie.header_records.
 // Return layout: dataset of type Doxie.Key_Header.
@@ -8,27 +8,20 @@ import lib_ziplib,ut,header,mdr,drivers,suppress, Doxie, FCRA;
 
 export Header_Raw(
   dataset(Doxie.layout_references) dids,
-  unsigned3 dateVal = 0,
-  unsigned1 dppa_purpose = 0,
-  unsigned1 glb_purpose = 0,
-  string6 ssn_mask_value = 'NONE',
-  boolean ln_branded_value = false,
-  boolean probation_override_value = false,
+  doxie.IDataAccess mod_access,
   boolean IsFCRA = false
-//	string5 industry_class_value
 ) := FUNCTION
 
 doxie_raw.Layout_HeaderRawBatchInput tra_for_Batch(dids l) := transform
 	self.input.seq := 0;
 	self.input.did := l.did;
-	self.input.dateVal := dateVal;
-	self.input.dppa_purpose := dppa_purpose;
-	self.input.glb_purpose := glb_purpose;
-	self.input.ssn_mask_value := ssn_mask_value;
-	self.input.ln_branded_value := ln_branded_value;
+	self.input.dateVal := mod_access.date_threshold;
+	self.input.dppa_purpose := mod_access.dppa;
+	self.input.glb_purpose := mod_access.glb;
+	self.input.ssn_mask_value := mod_access.ssn_mask;
+	self.input.ln_branded_value := mod_access.ln_branded;
 
-	self.input.probation_override_value := probation_override_value;
-	//self.industry_class_value := industry_class_value;
+	self.input.probation_override_value := mod_access.probation_override;
 	self := [];
 end;
 

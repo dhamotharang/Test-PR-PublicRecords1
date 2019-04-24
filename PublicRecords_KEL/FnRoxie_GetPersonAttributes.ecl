@@ -5,30 +5,20 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
 			PublicRecords_KEL.Interface_Options Options) := FUNCTION
 
+	Common_Functions := PublicRecords_KEL.ECL_Functions.Common_Functions;
+
 	RecordsWithLexID := InputData(LexidAppend > 0);
 	RecordsWithoutLexID := InputData(LexidAppend <= 0);
-
-	roll_list(dataset_to_roll, field_to_roll, delimiter) := FUNCTIONMACRO
-	// cast the field we need to concatenate to a STRING so that it can be rolled up and preserve the same RECORD format.
-	clean_dataset := PROJECT(dataset_to_roll, TRANSFORM({STRING roll_field},
-		SELF.roll_field := (STRING)LEFT.field_to_roll));
-	
-	// Use ROLLUP to concatenate the dataset into a list	
-	result := ROLLUP(clean_dataset, TRUE, TRANSFORM({string roll_field},
-		SELF.roll_field := LEFT.roll_field + delimiter + RIGHT.roll_field));
-		
-	RETURN result[1].roll_field;
-ENDMACRO;
 	
 	LayoutFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1([], 0, 0).res0);
 	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1([], 0, 0).res0);
 	
-	NonFCRAPersonAttributesRaw := PROJECT(InputData, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
+	NonFCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
 		SELF.InputUIDAppend := LEFT.InputUIDAppend;
 		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := NonFCRAPersonResults[1]));	
 
-	FCRAPersonAttributesRaw := PROJECT(InputData, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
+	FCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
 		SELF.InputUIDAppend := LEFT.InputUIDAppend;
 		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := FCRAPersonResults[1],
@@ -110,9 +100,9 @@ ENDMACRO;
 			SELF.BkCnt1Y := RIGHT.BkCnt1Y; 
 			SELF.BkCnt7Y := RIGHT.BkCnt7Y;
 			SELF.BkCnt10Y := RIGHT.BkCnt10Y;
-			SELF.DtOfBksList1Y := IF(RIGHT.BkCnt1Y > 0,roll_list(RIGHT.DtOfBksList1Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.DtOfBksList7Y := IF(RIGHT.BkCnt7Y > 0,roll_list(RIGHT.DtOfBksList7Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.DtOfBksList10Y := IF(RIGHT.BkCnt10Y > 0,roll_list(RIGHT.DtOfBksList10Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DtOfBksList1Y := IF(RIGHT.BkCnt1Y > 0,Common_Functions.roll_list(RIGHT.DtOfBksList1Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DtOfBksList7Y := IF(RIGHT.BkCnt7Y > 0,Common_Functions.roll_list(RIGHT.DtOfBksList7Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DtOfBksList10Y := IF(RIGHT.BkCnt10Y > 0,Common_Functions.roll_list(RIGHT.DtOfBksList10Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkNew1Y := IF(ResultsFound, (STRING)RIGHT.BkNew1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkNew7Y := IF(ResultsFound, (STRING)RIGHT.BkNew7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkNew10Y := IF(ResultsFound, (STRING)RIGHT.BkNew10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -125,9 +115,9 @@ ENDMACRO;
 			SELF.MonSinceOldestBkCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestBkCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestBkCnt10Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.ChForBksList1Y := IF(RIGHT.BkCnt1Y > 0,roll_list(RIGHT.ChForBksList1Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ChForBksList7Y := IF(RIGHT.BkCnt7Y > 0,roll_list(RIGHT.ChForBksList7Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ChForBksList10Y := IF(RIGHT.BkCnt10Y > 0,roll_list(RIGHT.ChForBksList10Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ChForBksList1Y := IF(RIGHT.BkCnt1Y > 0,Common_Functions.roll_list(RIGHT.ChForBksList1Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ChForBksList7Y := IF(RIGHT.BkCnt7Y > 0,Common_Functions.roll_list(RIGHT.ChForBksList7Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ChForBksList10Y := IF(RIGHT.BkCnt10Y > 0,Common_Functions.roll_list(RIGHT.ChForBksList10Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkWithNewestDateCh1Y := IF(ResultsFound,(STRING)RIGHT.BkWithNewestDateCh1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkWithNewestDateCh7Y := IF(ResultsFound,(STRING)RIGHT.BkWithNewestDateCh7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkWithNewestDateCh10Y := IF(ResultsFound,(STRING)RIGHT.BkWithNewestDateCh10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -143,9 +133,9 @@ ENDMACRO;
 			SELF.MonSinceNewestBkUpdateCnt1Y := IF(ResultsFound,(INTEGER)RIGHT.MonSinceNewestBkUpdateCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);	
 			SELF.MonSinceNewestBkUpdateCnt7Y := IF(ResultsFound,(INTEGER)RIGHT.MonSinceNewestBkUpdateCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);	
 			SELF.MonSinceNewestBkUpdateCnt10Y := IF(ResultsFound,(INTEGER)RIGHT.MonSinceNewestBkUpdateCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);	
-			SELF.DispOfBksList1Y :=  IF(RIGHT.BkCnt1Y > 0,roll_list(RIGHT.DispOfBksList1Y, Disposition, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.DispOfBksList7Y :=  IF(RIGHT.BkCnt7Y > 0,roll_list(RIGHT.DispOfBksList7Y, Disposition, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.DispOfBksList10Y :=  IF(RIGHT.BkCnt10Y > 0,roll_list(RIGHT.DispOfBksList10Y, Disposition, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DispOfBksList1Y :=  IF(RIGHT.BkCnt1Y > 0,Common_Functions.roll_list(RIGHT.DispOfBksList1Y, Disposition, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DispOfBksList7Y :=  IF(RIGHT.BkCnt7Y > 0,Common_Functions.roll_list(RIGHT.DispOfBksList7Y, Disposition, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DispOfBksList10Y :=  IF(RIGHT.BkCnt10Y > 0,Common_Functions.roll_list(RIGHT.DispOfBksList10Y, Disposition, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkWithNewestDateDisp1Y := IF(ResultsFound,RIGHT.BkWithNewestDateDisp1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkWithNewestDateDisp7Y := IF(ResultsFound,RIGHT.BkWithNewestDateDisp7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkWithNewestDateDisp10Y := IF(ResultsFound,RIGHT.BkWithNewestDateDisp10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -164,9 +154,9 @@ ENDMACRO;
 			SELF.BkDischargedCnt1Y := IF(ResultsFound,RIGHT.BkDischargedCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.BkDischargedCnt7Y := IF(ResultsFound,RIGHT.BkDischargedCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.BkDischargedCnt10Y := IF(ResultsFound,RIGHT.BkDischargedCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.TypeOfBksList1Y :=  IF(RIGHT.BkCnt1Y > 0,roll_list(RIGHT.TypeOfBksList1Y, FilingType, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.TypeOfBksList7Y :=  IF(RIGHT.BkCnt7Y > 0,roll_list(RIGHT.TypeOfBksList7Y, FilingType, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.TypeOfBksList10Y :=  IF(RIGHT.BkCnt10Y > 0,roll_list(RIGHT.TypeOfBksList10Y, FilingType, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.TypeOfBksList1Y :=  IF(RIGHT.BkCnt1Y > 0,Common_Functions.roll_list(RIGHT.TypeOfBksList1Y, FilingType, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.TypeOfBksList7Y :=  IF(RIGHT.BkCnt7Y > 0,Common_Functions.roll_list(RIGHT.TypeOfBksList7Y, FilingType, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.TypeOfBksList10Y :=  IF(RIGHT.BkCnt10Y > 0,Common_Functions.roll_list(RIGHT.TypeOfBksList10Y, FilingType, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.BkHavingBusTypeFlag1Y := IF(ResultsFound,RIGHT.BkHavingBusTypeFlag1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);		
 			SELF.BkHavingBusTypeFlag7Y := IF(ResultsFound,RIGHT.BkHavingBusTypeFlag7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);		
 			SELF.BkHavingBusTypeFlag10Y := IF(ResultsFound,RIGHT.BkHavingBusTypeFlag10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);		

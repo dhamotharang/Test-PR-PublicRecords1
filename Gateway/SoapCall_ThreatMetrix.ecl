@@ -1,9 +1,7 @@
-import ThreatMetrix, Royalty, Gateway;
+﻿import ThreatMetrix, Royalty, Gateway, data_services;
 
 export SoapCall_ThreatMetrix(dataset(ThreatMetrix.gateway_trustdefender.t_TrustDefenderRequest) Inf, Gateway.Layouts.Config gateway_cfg, boolean makeGatewayCall = FALSE) := function
 
-//'http://10.176.68.164:7726/WsGatewayEx/?ver_=1.95'; //test gateway
-//'http://wsgatewaycert.sc.seisint.com:8090/WsGateway';
 
 ThreatMetrix.gateway_trustdefender.t_TrustDefenderRequest into_in(inf L) := transform
 	self.User.ReferenceCode := if(L.user.referenceCode <> '', trim(L.user.referenceCode), gateway_cfg.TransactionId);
@@ -26,9 +24,18 @@ ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEx failX() := transfor
 	self := [];
 end;
 
+// output(inf,,'~dvstemp::in::trustdefender_gateway_debugging_input_' + thorlib.wuid(), xml);
+// output(inf,named('tmx_gateway_input'));
+
+// when using the static logical file for testing instead of hitting the gateway again
+// outf := dataset(data_services.foreign_dataland + 'dvstemp::out::tmx_gateway_results_debugging_w20190306-171557', ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEx, thor);
+
 outf := if (makeGatewayCall, soapcall(inf, gateway_cfg.url, 'TrustDefender',ThreatMetrix.gateway_trustdefender.t_TrustDefenderRequest, into_in(LEFT),
-			   dataset(ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEx),XPATH('TrustDefenderResponseEx'),
+			   dataset(ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEx),
+         XPATH('TrustDefenderResponseEx'),
 			   onfail(failx()), timeout(1)));
+
+
 
 return outf;
 			   

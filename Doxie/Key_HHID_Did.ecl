@@ -1,7 +1,3 @@
-import header, data_services;
+IMPORT dx_header;
 
-hf := header.File_HHID_Current;
-
-export Key_HHID_Did := index(
-	hf,	{hhid_relat, ver}, {did},
-	data_services.data_location.prefix() + 'thor_data400::key::hhid_did_' + version_superkey, OPT);
+EXPORT Key_HHID_Did := dx_header.key_hhid_did();

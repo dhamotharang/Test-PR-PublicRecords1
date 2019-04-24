@@ -1,11 +1,11 @@
-export layout_batch_out :=
+﻿export layout_batch_out :=
 RECORD
 	layout_batch_in;
 	STRING3 HitNum;
 	STRING5 score;
 	STRING20 pty_key;
 	STRING60 source;
-	STRING350 orig_pty_name;
+	UNICODE350 orig_pty_name;
 	STRING100 blocked_country;
 	STRING50 addr_1;
 	STRING50 addr_2;

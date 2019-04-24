@@ -1,4 +1,4 @@
-IMPORT ACA, ADVO, AutoKey, Business_Risk, Drivers, Doxie, Header, Header_Quick, Inquiry_AccLogs, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, USPIS_HotList, UT;
+IMPORT ACA, ADVO, Business_Risk, Drivers, Doxie, dx_header, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, USPIS_HotList, UT, STD;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																					DATASET(Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries) Inquiries,
@@ -6,11 +6,13 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 																																					UNSIGNED1 GLBPurpose,
 																																					STRING50 DataRestrictionMask) := FUNCTION
 
+  todays_date := (string)STD.Date.Today();
+
 	// Address Indexed Keys Used
 	ADVOKey := ADVO.Key_Addr1;
 	USPISKey := USPIS_HotList.Key_Addr_Search_ZIP;
 	CriminalKey := ACA.Key_ACA_Addr;
-	FullHeaderKey := Doxie.Key_Header_Address;
+	FullHeaderKey := dx_header.key_header_address();
 	BusinessHeaderKey := Business_Risk.Key_Business_Header_Address;
 	AddressRiskKey := Risk_Indicators.Key_HRI_Address_To_SIC;
 	
@@ -77,7 +79,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		
 		SELF.USPIS_Hot_List := TRUE; // We hit the key, we have a USPIS Hot List hit
 		SELF.USPIS_Comment := ri.comments;
-		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, UT.GetDate, le.Clean_Input.ArchiveDate + '01');
+		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, todays_date, le.Clean_Input.ArchiveDate + '01');
 		cleanedDate := IF(TRIM(ri.dt_first_reported) = '', todaysDate, Suspicious_Fraud_LN.Common.padDate(ri.dt_first_reported[1..8]));
 		SELF.DateFirstSeen := cleanedDate;
 		cleanComment := StringLib.StringFilter(StringLib.StringToUpperCase(TRIM(ri.comments, ALL)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -198,7 +200,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		SELF.Unit_Desig := le.Clean_Input.Unit_Desig;
 		SELF.Sec_Range := le.Clean_Input.Sec_Range;
 		SELF.ArchiveDate := le.Clean_Input.ArchiveDate;
-		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
+		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, todays_date, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
 		cleanedDate := IF((UNSIGNED)ri.dt_first_seen = 0, todaysDate, Suspicious_Fraud_LN.Common.padDate((STRING)ri.dt_first_seen));
 		SELF.DateFirstSeen := cleanedDate;
 		SELF.TransientCommercialIdentity := TRIM(ri.Sic_Code) NOT IN ['', '2225'];
@@ -287,7 +289,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		SELF.Unit_Desig := le.Clean_Input.Unit_Desig;
 		SELF.Sec_Range := le.Clean_Input.Sec_Range;
 		SELF.ArchiveDate := le.Clean_Input.ArchiveDate;
-		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
+		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, todays_date, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
 		SELF.DateFirstSeen := todaysDate;
 		SELF.CorrectionalFacility := TRUE; // If we hit this key it's a correctional facility
 		
@@ -349,7 +351,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		SELF.Unit_Desig := le.Clean_Input.Unit_Desig;
 		SELF.Sec_Range := le.Clean_Input.Sec_Range;
 		SELF.ArchiveDate := le.Clean_Input.ArchiveDate;
-		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, UT.GetDate, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
+		todaysDate := IF(le.Clean_Input.ArchiveDate = 999999, todays_date, ((STRING)le.Clean_Input.ArchiveDate)[1..6] + '01');
 		cleanDate := IF((UNSIGNED)ri.Date_First_Seen = 0, todaysDate, Suspicious_Fraud_LN.Common.padDate((STRING)ri.Date_First_Seen));
 		SELF.DateFirstSeen := cleanDate;
 		SELF.InputPOBox := TRIM(le.Clean_Input.Prim_Name, ALL)[1..5] = 'POBOX';
@@ -442,7 +444,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		SELF.Sec_Range := le.Clean_Input.Sec_Range;
 		SELF.ArchiveDate := le.Clean_Input.ArchiveDate;
 		
-		todaysDateTemp := IF((INTEGER)ut.GetDate >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', ut.GetDate);
+		todaysDateTemp := IF((INTEGER)todays_date >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', todays_date);
 		// If todaysDate is greater than the header build date, use the header build date
 		todaysDate := IF(todaysDateTemp >= headerBuildDate, headerBuildDate, todaysDateTemp);
 		
@@ -475,7 +477,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 																									LEFT.Clean_Input.Postdir = RIGHT.Postdir AND UT.NNEQ(LEFT.Clean_Input.Sec_Range, RIGHT.Sec_Range) AND
 																												translateSrc(RIGHT.src) NOT IN Risk_Indicators.iid_constants.masked_header_sources(DataRestrictionMask, isFCRA := FALSE) AND
 																												(Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA := FALSE)) AND
-																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, isFCRA := FALSE) AND Drivers.state_dppa_ok(Header.TranslateSource(translateSrc(RIGHT.src)), DPPAPurpose, translateSrc(RIGHT.src)))) AND
+																												(~MDR.Source_is_DPPA(translateSrc(RIGHT.src)) OR (Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, isFCRA := FALSE) AND Drivers.state_dppa_ok(dx_header.functions.TranslateSource(translateSrc(RIGHT.src)), DPPAPurpose, translateSrc(RIGHT.src)))) AND
 																												~Risk_Indicators.iid_constants.filtered_source(translateSrc(RIGHT.src), RIGHT.st) AND
 																												((UNSIGNED)(((STRING)RIGHT.dt_first_seen)[1..6]) <= LEFT.Clean_Input.ArchiveDate AND RIGHT.dt_first_seen <> 0) AND
 																									RIGHT.DID <> 0,
@@ -540,7 +542,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 		SELF.Sec_Range := le.Clean_Input.Sec_Range;
 		SELF.ArchiveDate := le.Clean_Input.ArchiveDate;
 		
-		todaysDateTemp := IF((INTEGER)ut.GetDate >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', ut.GetDate);
+		todaysDateTemp := IF((INTEGER)todays_date >= le.Clean_Input.ArchiveDate AND le.Clean_Input.ArchiveDate <> 999999, (STRING)le.Clean_Input.ArchiveDate + '01', todays_date);
 		// If todaysDate is greater than the header build date, use the header build date
 		todaysDate := IF(todaysDateTemp >= headerBuildDate, headerBuildDate, todaysDateTemp);
 		

@@ -1,5 +1,5 @@
-import location_services, address, ut, risk_indicators, property, doxie, doxie_raw, doxie_ln,
-       AutoStandardI, DeathV2_Services, LN_PropertyV2_Services, LN_PropertyV2, STD;
+﻿import location_services, address, ut, risk_indicators, property, doxie, doxie_raw, doxie_ln,
+       AutoStandardI, DeathV2_Services, LN_PropertyV2_Services, LN_PropertyV2, location_services, STD;
 
 todays_date := (string) STD.Date.Today();
 
@@ -11,8 +11,16 @@ export AddrHistory_Function(dataset(location_services.Layout_AddrHistory_In) inr
 														string32 appType) := 
 function
 
-deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-glb_ok_death := deathparams.isValidGlb();
+mod_access := module(doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  EXPORT boolean ln_branded := ln_branded_val;
+  EXPORT boolean probation_override := prob_override_val;
+  EXPORT string32 application_type := appType;
+  EXPORT unsigned1 glb := glbperms;
+  EXPORT unsigned1 dppa := dppaperms;
+end;
+
+deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
+glb_ok_death := deathparams.isValidGlb();  
 
 MAX_RECS_PER_ADDRESS := 1000; // Big enough to get records back from doxie.did_from_address
 
@@ -32,7 +40,7 @@ dfseq := project(inrecs,into_seq(LEFT,COUNTER));
 
 //-------------[ then, normalize them ]------------------
 
-layout_addrHistory_Norm into_Norm(dfseq L, integer C) := transform
+location_services.layout_addrHistory_Norm into_Norm(dfseq L, integer C) := transform
 	self.seq 			:= L.seq;
 	self.source		:= choose(C, 'B1','B2','S1','S2');
 	self.did			:= choose (C, L.buyer_did, L.buyer2_did, L.seller_did, L.seller2_did);
@@ -44,7 +52,7 @@ df := normalize(dfseq, 4, into_norm(LEFT,COUNTER));
 // ------------------ get best info
 withdid 	:= df(did != 0);
 
-glb_ok := ut.glb_ok(glbperms);
+glb_ok := mod_access.isValidGLB();
 dids := dedup(sort(project(withdid, doxie.layout_references), did), did);
 doxie.mac_best_records(dids, 
 											 did, 
@@ -80,7 +88,7 @@ withbestinfo := join(withdid, best_recs,
 maxHRIPer_Value := 50;
 
 layout_addr_search_plus := record, maxlength(100004)
-	layout_addr_search;
+	location_services.Layout_Addr_Search;
 	unsigned4	seq;
 end;
 
@@ -104,13 +112,13 @@ end;
 
 srchrec := project(dfseq, into_srch(LEFT));
 
-location_services.get_hriAddr(srchrec, withsearch)
+location_services.get_hriAddr(srchrec, withsearch);
 
-get_gong_by_address(withsearch, phones_children, withgonginfo);
+location_services.get_gong_by_address(withsearch, phones_children, withgonginfo);
 
 
-layout_addrhistory_norm integrate_search(withbestinfo L, withgonginfo R) := transform
-	self.search_addr := project(R, transform(layout_addr_search, self := LEFT));
+location_services.Layout_AddrHistory_Norm integrate_search(withbestinfo L, withgonginfo R) := transform
+	self.search_addr := project(R, transform(location_services.Layout_Addr_Search, self := LEFT));
 	self := L;
 end;
 
@@ -136,7 +144,8 @@ withDeathCodes := join(withdidinfo, doxie.key_death_masterV2_ssa_DID,
 
 //-------------------[ get AKAs ]--------------------
 refs := project (withdeathcodes, TRANSFORM (doxie.layout_references, SELF := Left));
-hk := doxie_raw.Header_Raw(refs, 0, dppaperms, glbperms,,ln_branded_val, prob_override_val);
+
+hk := doxie_raw.Header_Raw(refs, mod_access);
 
 hk get_header_recs(withdeathcodes L, hk R) := transform
 	self.name_suffix := if (R.name_suffix ='UNK','',R.name_suffix);
@@ -152,7 +161,7 @@ hrecs_srt := dedup(sort(hrecs,did,lname,fname,mname),did,lname,fname,mname);
 
 withdeathcodes denorm_names(withdeathcodes L, hrecs_srt R) := transform
 // decision was made to drop name_suffix from akas....not in dedup or populated in output
-	self.akas := L.akas + dataset([{r.fname,R.mname,R.lname,''}], layout_name);
+	self.akas := L.akas + dataset([{r.fname,R.mname,R.lname,''}], location_services.Layout_Name);
 	self := L;
 end;
 
@@ -167,15 +176,15 @@ withAkas := denormalize (withdeathcodes, hrecs_srt,
 // IN THE FUTURE, when the contract with Fares ends, we can remove this filter.
 prop_ids := doxie_ln.property_ids (
               refs, dataset([],doxie.layout_ref_bdid),
-              0, dppaperms, glbperms, ln_branded_val, prob_override_val,,,,,,,,appType); //? appType := ^.appType
-
+              0, mod_access.dppa, mod_access.glb, mod_access.ln_branded, mod_access.probation_override,,,,,,,,mod_access.application_type); 
+							
 props_deeds := if(Doxie.Datarestriction.Fares,
                   dataset([],doxie_ln.layout_deed_records),
-                  doxie_ln.deed_records (prop_ids, 0, ln_branded_val)(current = true, ln_fares_id[1] ='R'));
+                  doxie_ln.deed_records (prop_ids, 0, mod_access.ln_branded)(current = true, ln_fares_id[1] ='R'));
 
 props_assess := if(Doxie.DataRestriction.Fares,
                    dataset([],doxie_ln.layout_assessor_records),
-                   doxie_ln.asses_records(prop_ids, 0, ln_branded_val)(current = true, ln_fares_id[1] ='R'));
+                   doxie_ln.asses_records(prop_ids, 0, mod_access.ln_branded)(current = true, ln_fares_id[1] ='R'));
 
 slimrec := record
 	string12 ln_fares_id;
@@ -475,7 +484,7 @@ hrs_ownrec := record, maxlength(100000)
 	boolean	owned_by_subject;
 	boolean	current_addr;
 	dataset(Risk_Indicators.Layout_Desc) Hri_address;
-	dataset(layout_phone) phone_children;
+	dataset(location_services.Layout_Phone) phone_children;
 end;
 
 hrs_ownrec into_ownedrec(hrs_ddp L, slimprop_rdy R) := transform
@@ -521,8 +530,8 @@ doxie.mac_AddHRIAddress(hrscurrent,hrs_highrisk);
 location_services.get_gong_by_address(hrs_highrisk, phone_children, hrs_wgong);
 
 withpropinfo add_history(withpropinfo L, hrs_wgong R) := transform
-	self.address_history := L.address_history + if (~R.current_addr, dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.city_name, R.st, R.zip, R.zip4, (string)R.dt_first_seen, (string)R.dt_last_seen, R.owned_by_subject, choosen(R.hri_address,consts.max_hri_addr), choosen(R.phone_children,consts.max_hri_phone)}], layout_address_hist));
-	self.current_address := L.current_address + if (R.current_addr, dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.city_name, R.st, R.zip, R.zip4, (string)R.dt_first_seen, (string)R.dt_last_seen, R.owned_by_subject, choosen(R.hri_address,consts.max_hri_addr), choosen(R.phone_children,consts.max_hri_phone)}], layout_address_hist));
+	self.address_history := L.address_history + if (~R.current_addr, dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.city_name, R.st, R.zip, R.zip4, (string)R.dt_first_seen, (string)R.dt_last_seen, R.owned_by_subject, choosen(R.hri_address,location_services.consts.max_hri_addr), choosen(R.phone_children,location_services.consts.max_hri_phone)}], location_services.Layout_address_hist));
+	self.current_address := L.current_address + if (R.current_addr, dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.city_name, R.st, R.zip, R.zip4, (string)R.dt_first_seen, (string)R.dt_last_seen, R.owned_by_subject, choosen(R.hri_address,location_services.consts.max_hri_addr), choosen(R.phone_children,location_services.consts.max_hri_phone)}], location_services.Layout_address_hist));
 	self := L;
 end;
 
@@ -534,7 +543,7 @@ withhist := denormalize(withpropinfo,
 
 // -------------------- [ Current Properties Section ] -------------
 
-currOwn := LN_PropertyV2_Services.Ownership.get_dids(refs,true,appType);
+currOwn := LN_PropertyV2_Services.Ownership.get_dids(refs,true,mod_access.application_type);
 
 // massage results into legacy format with help of unparsed deed & assessment keys
 k_deed1 := LN_PropertyV2.key_deed_fid();
@@ -620,7 +629,7 @@ currentbests0 := project(outfile, transform(watchdog.Layout_Best,
 currentbests := dedup(sort(currentbests0(ut.daysapart((string)addr_dt_last_seen, todays_date) <= 365), did), did);
 
 layout_prop_with_did := record, maxlength(50006)
-	layout_prop_owned;
+	location_services.Layout_Prop_Owned;
 	unsigned6	did;
 end;
 
@@ -645,7 +654,7 @@ end;
 cpwd := project(currentprop, into_withdid(LEFT));
 
 layout_prop_with_did into_propowned(layout_prop_with_did L, currentbests R) := transform
-	self.current_residents := L.current_residents + dataset([{R.did, R.fname, R.mname, R.lname, '', R.dod != ''}], layout_name_did);
+	self.current_residents := L.current_residents + dataset([{R.did, R.fname, R.mname, R.lname, '', R.dod != ''}], location_services.layout_name_did);
 	self.owner_is_resident := L.owner_is_resident or L.did = R.did;
 	self := L;
 end;
@@ -658,12 +667,12 @@ ownedprops := denormalize(cpwd,
 						left.zip = right.zip,
 					 into_propowned(LEFT,RIGHT));
 
-doxie.mac_AddHRIAddress(ownedprops,owned_wHRI)
+doxie.mac_AddHRIAddress(ownedprops,owned_wHRI);
 
-get_gong_by_address(owned_wHRI, phones_children, owned_wGong)
+location_services.get_gong_by_address(owned_wHRI, phones_children, owned_wGong);
 
 withhist add_current(withhist L, owned_wGong R) := transform
-	self.current_property := L.current_property + dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.p_city_name, R.st, R.zip, R.zip4, R.sales_price, R.purchase_date, R.refinance_date, R.years_owned, R.seller1, R.seller2, R.purchaser1, R.purchaser2, R.current_residents, R.owner_is_resident, R.foreclosure_flag, R.phones_children, R.hri_address}],layout_prop_owned);
+	self.current_property := L.current_property + dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.p_city_name, R.st, R.zip, R.zip4, R.sales_price, R.purchase_date, R.refinance_date, R.years_owned, R.seller1, R.seller2, R.purchaser1, R.purchaser2, R.current_residents, R.owner_is_resident, R.foreclosure_flag, R.phones_children, R.hri_address}],location_services.Layout_Prop_Owned);
 	self := L;
 end;
 
@@ -673,7 +682,7 @@ withcurrent := denormalize (withhist, owned_wGong,
 
 //---------------------[ Previous Property Section ]-----------
 lprev_did := record, maxlength(500000)
-  layout_prev_property;
+  location_services.Layout_Prev_Property;
   unsigned6	did;
   boolean	Skip_res := false;
 end;
@@ -744,7 +753,7 @@ prevdids := doxie.did_from_address (plas,true,MAX_RECS_PER_ADDRESS);
 //is passed todoxie_raw.Header_Raw.
 pds := project(dedup(sort(prevdids, did), did), transform(Doxie.layout_references, self := left));
 
-prev_hdrs := doxie_raw.Header_Raw(pds, 0, dppaperms, glbperms,,ln_branded_val, prob_override_val);
+prev_hdrs := doxie_raw.Header_Raw(pds, mod_access);
 
 prev_hdrs_ddp := dedup(sort(prev_hdrs, did, lname, fname, prim_range, Prim_name, sec_range, zip), did, lname, fname, prim_range, prim_name, sec_range, zip);
 
@@ -784,8 +793,8 @@ prev_hdr_wDOD := join(prev_hdrs_prev_props, outfile2,
 
 prev_props add_residents(prev_props L, prev_hdr_wdod R, integer C) := transform
 	self.skip_res := if (L.prim_range = '' and L.sec_range = '' and C > 10, true, false);
-	self.current_residents := if (C < 10, L.current_residents + dataset([{R.did, R.fname, R.mname, R.lname, '', R.deceased}], layout_name_did),
-						    if (self.skip_res, dataset([], layout_name_did), L.current_residents));	
+	self.current_residents := if (C < 10, L.current_residents + dataset([{R.did, R.fname, R.mname, R.lname, '', R.deceased}], location_services.layout_name_did),
+						    if (self.skip_res, dataset([], location_services.layout_name_did), L.current_residents));	
 	self := l;
 end;
 
@@ -801,12 +810,12 @@ prev_props_wresidents := denormalize(prev_props,
 							(integer)(left.sale_date[1..6]) >= (integer) right.dt_first_seen,
 					    add_residents(LEFT,RIGHT, counter));
 							
-doxie.mac_AddHRIAddress(prev_props_wresidents,prev_props_wHRI)
+doxie.mac_AddHRIAddress(prev_props_wresidents,prev_props_wHRI);
 
-get_gong_by_address(prev_props_wHRI, phones_children, prev_wGong)
+location_services.get_gong_by_address(prev_props_wHRI, phones_children, prev_wGong);
 
-layout_addrhistory_norm add_prev_props(withcurrent L, prev_wGong R) := transform
-	self.previous_property := L.previous_property + dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.p_city_name, R.st, R.zip, R.zip4, R.years_owned, R.purchase_Date, R.purchase_price, R.refinance_Date, R.seller1, R.seller2, R.sale_date, R.sales_price, R.purchaser1, R.purchaser2,R.current_residents, R.Net_Profit_From_Sale, R.pcnt_Gain_or_Loss, R.foreclosure_flag, R.phones_children, R.hri_address}], layout_prev_property);
+location_services.Layout_AddrHistory_Norm add_prev_props(withcurrent L, prev_wGong R) := transform
+	self.previous_property := L.previous_property + dataset([{R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range, R.p_city_name, R.st, R.zip, R.zip4, R.years_owned, R.purchase_Date, R.purchase_price, R.refinance_Date, R.seller1, R.seller2, R.sale_date, R.sales_price, R.purchaser1, R.purchaser2,R.current_residents, R.Net_Profit_From_Sale, R.pcnt_Gain_or_Loss, R.foreclosure_flag, R.phones_children, R.hri_address}], location_services.layout_prev_property);
 	self := L;
 end;
 
@@ -833,27 +842,27 @@ foorec := record
 	boolean foo;
 end;
 
-foorec compare_hist_to_cprop(layout_address_hist L, layout_prop_owned R) := transform
+foorec compare_hist_to_cprop(location_services.layout_address_hist L, location_services.layout_prop_owned R) := transform
 	self.foo := true;
 end;
 
-foorec compare_hist_to_pprop(layout_address_hist L, layout_prev_property R) := transform
+foorec compare_hist_to_pprop(location_services.layout_address_hist L, location_services.layout_prev_property R) := transform
 	self.foo := true;
 end;
 
-foorec compare_hist_to_hist(layout_address_hist L, layout_address_hist R) := transform
+foorec compare_hist_to_hist(location_services.layout_address_hist L, location_services.layout_address_hist R) := transform
 	self.foo := true;
 end;
 
-foorec compare_cur_to_cur(layout_prop_owned L, layout_prop_owned R) := transform
+foorec compare_cur_to_cur(location_services.layout_prop_owned L, location_services.layout_prop_owned R) := transform
 	self.foo := true;
 end;
 
-foorec compare_prev_to_cur(layout_prev_property L, layout_prop_owned R) := transform
+foorec compare_prev_to_cur(location_services.layout_prev_property L, location_services.layout_prop_owned R) := transform
 	self.foo := true;
 end;
 
-foorec compare_prev_to_prev(layout_prev_property L, layout_prev_property R) := transform
+foorec compare_prev_to_prev(location_services.layout_prev_property L, location_services.layout_prev_property R) := transform
 	self.foo := true;
 end;
 
@@ -912,8 +921,8 @@ with_checked_rels1 := join(withprev, withprev,
 					  check_rel(LEFT,RIGHT));
 					  
 					  
-layout_addrHistory_Norm add_relations(layout_addrHistory_Norm L, with_checked_rels1 R) := transform
-	self.related_subjects := dedup(L.related_subjects + dataset([{R.rel_source1,'Owns Property in Address History'},{R.rel_source2,'Formerly Owned Property in Address History'},{R.rel_source3,'Share Address in Address Histories'},{R.rel_source4,'Both Owned Same Property'},{R.rel_source5,'Both Owned Same Property'},{R.rel_source6,'Both Owned Same Property'},{R.rel_source7,'Both Owned Same Property'}], layout_rel),whole record, all)(source != '');
+location_services.layout_addrHistory_Norm add_relations(location_services.layout_addrHistory_Norm L, with_checked_rels1 R) := transform
+	self.related_subjects := dedup(L.related_subjects + dataset([{R.rel_source1,'Owns Property in Address History'},{R.rel_source2,'Formerly Owned Property in Address History'},{R.rel_source3,'Share Address in Address Histories'},{R.rel_source4,'Both Owned Same Property'},{R.rel_source5,'Both Owned Same Property'},{R.rel_source6,'Both Owned Same Property'},{R.rel_source7,'Both Owned Same Property'}], location_services.layout_rel),whole record, all)(source != '');
 	self := L;
 end;
 
@@ -923,7 +932,7 @@ with_rel_relations := denormalize (withprev, with_checked_rels1,
 						add_relations(LEFT,RIGHT));
 						
 						
-newrec := RECORD(layout_addrHistory_Norm)
+newrec := RECORD(location_services.layout_addrHistory_Norm)
 boolean do_royal;
 end;
 

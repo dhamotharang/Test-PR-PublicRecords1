@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, ut;
+﻿IMPORT Risk_Indicators, ut;
 
 EXPORT Risk_Reporting.Layouts.LOG_Boca_Shell_BtSt To_LOG_Boca_Shell_BtSt (
 																				GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) Boca_Shell_BtSt,
@@ -12,6 +12,13 @@ EXPORT Risk_Reporting.Layouts.LOG_Boca_Shell_BtSt To_LOG_Boca_Shell_BtSt (
 	Risk_Reporting.Layout_Boca_Shell_BtSt slimShell(Risk_Indicators.Layout_BocaShell_BtSt_Out le) := TRANSFORM
 		// To start with the two shells are the same, and in general will always remain the same.
 		// Adding the transform just in case the two diverge slightly in the future.
+    SELF.bill_to_out.iid.watchlist_fname := (string)le.bill_to_out.iid.watchlist_fname;
+    SELF.bill_to_out.iid.watchlist_lname := (string)le.bill_to_out.iid.watchlist_lname;
+    SELF.bill_to_out.iid.watchlist_entity_name := (string)le.bill_to_out.iid.watchlist_entity_name;
+    SELF.ship_to_out.iid.watchlist_fname := (string)le.ship_to_out.iid.watchlist_fname;
+    SELF.ship_to_out.iid.watchlist_lname := (string)le.ship_to_out.iid.watchlist_lname;
+    SELF.ship_to_out.iid.watchlist_entity_name := (string)le.ship_to_out.iid.watchlist_entity_name;
+    
 		SELF := le;
 	END;
 

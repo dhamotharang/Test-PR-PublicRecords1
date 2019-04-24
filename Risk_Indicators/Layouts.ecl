@@ -30,8 +30,8 @@ export layout_watchlists := record
 	STRING60 Watchlist_Table;
 	STRING120 Watchlist_Program;
 	STRING10 Watchlist_Record_Number;
-	STRING20 Watchlist_fname;
-	STRING20 Watchlist_lname;
+	UNICODE20 Watchlist_fname;
+	UNICODE20 Watchlist_lname;
 	STRING65 Watchlist_address;
 	// parsed watchlist address
 	STRING10 WatchlistPrimRange;
@@ -45,7 +45,7 @@ export layout_watchlists := record
 	STRING2 Watchlist_state;
 	STRING5 Watchlist_zip;
 	STRING30 Watchlist_contry;
-	STRING200 Watchlist_Entity_Name;
+	UNICODE200 Watchlist_Entity_Name;
 end;
 
 export layout_watchlists_plus_seq := record
@@ -1455,14 +1455,18 @@ end;
 
 
 
-export layout_trustdefender_in := RECORD
-	unsigned seq;
-	string255 sessionID;
-	string255 OrgId;
-	string255 ApiKey; 
-	string50 Policy;
-	string20 ApiType;
-	string40 serviceType;
+export layout_trustdefender_in := RECORD 
+	string sessionID;
+	string OrgId;
+	string ApiKey; 
+	string Policy;
+	string ApiType;
+	string serviceType;
+  boolean NoPIIPersistence;  // set this to true when running tests or bocashells for testing.  for live product transactions, the default will be false
+  string MerchantID; // 'LNRS_' + companyID
+  string MerchantName; // 'LNRS_' + company name
+  
+  Risk_Indicators.Layout_Input;
  end;
  
 export layout_fp201_attributes := RECORD
@@ -1820,5 +1824,196 @@ export layout_Equifax_FraudFlags := record
 	integer 	factact_hist_fraud_alert_lseen := 0;
  
 end;
+
+export layout_threatmetrix_shell_results := record  
+  string	TxinqWAddrFirst	;
+  string	TxinqWAddrLast	;
+  string	TxinqAddrStatusInd	;
+  string	TxinqWEmailFirst	;
+  string	TxinqWEmailLast	;
+  string	TxinqEmailStatusInd	;
+  string	TxinqWNameFirst	;
+  string	TxinqWNameLast 	;
+  string	TxinqNameStatusInd	;
+  string	TxinqWPhoneFirst	;
+  string	TxinqWPhoneLast	;
+  string	TxinqPhoneStatusInd	;
+  string	Tmxid	;
+  string	TmxidConfidenceScore	;
+  string	TxinqWTmxidFirst	;
+  string	TxinqWTmxidLast	;
+  string	TxinqTmxidStatusInd	;
+  string	TmxPolicyScore	;
+  string	SmartidPerEmailInTxinqCnt	;
+  string	SmartidPerEmailInTxinqCnt1Y	;
+  string	SmartidPerEmailInTxinqCnt6M	;
+  string	SmartidPerEmailInTxinqCnt3M	;
+  string	SmartidPerEmailInTxinqCnt1M	;
+  string	SmartidPerPhoneInTxinqCnt	;
+  string	SmartidPerPhoneInTxinqCnt1Y	;
+  string	SmartidPerPhoneInTxinqCnt6M	;
+  string	SmartidPerPhoneInTxinqCnt3M	;
+  string	SmartidPerPhoneInTxinqCnt1M	;
+  string	ExactidPerEmailInTxinqCnt	;
+  string	ExactidPerEmailInTxinqCnt1Y	;
+  string	ExactidPerEmailInTxinqCnt6M	;
+  string	ExactidPerEmailInTxinqCnt3M	;
+  string	ExactidPerEmailInTxinqCnt1M	;
+  string	ExactidPerPhoneInTxinqCnt	;
+  string	ExactidPerPhoneInTxinqCnt1Y	;
+  string	ExactidPerPhoneInTxinqCnt6M	;
+  string	ExactidPerPhoneInTxinqCnt3M	;
+  string	ExactidPerPhoneInTxinqCnt1M	;
+  string	EmailPerPhoneInTxinqCnt	;
+  string	EmailPerPhoneInTxinqCnt1Y	;
+  string	EmailPerPhoneInTxinqCnt1M	;
+  string	EmailPerPhoneInTxinqCnt3M	;
+  string	EmailPerPhoneInTxinqCnt6M	;
+  string	PhonePerEmailInTxinqCnt1Y	;
+  string	PhonePerEmailInTxinqCnt1M	;
+  string	PhonePerEmailInTxinqCnt3M	;
+  string	TmxidPerEmailInTxinqCnt	;
+  string	TmxidPerEmailInTxinqCnt1Y	;
+  string	TmxidPerEmailInTxinqCnt6M	;
+  string	TmxidPerEmailInTxinqCnt3M	;
+  string	TmxidPerEmailInTxinqCnt1M	;
+  string	TmxidPerPhoneInTxinqCnt	;
+  string	TmxidPerPhoneInTxinqCnt1Y	;
+  string	TmxidPerPhoneInTxinqCnt6M	;
+  string	TmxidPerPhoneInTxinqCnt3M	;
+  string	TmxidPerPhoneInTxinqCnt1M	;
+  string	OrgidPerEmailInTxinqCnt	;
+  string	TrueipPerEmailInTxinqCnt	;
+  string	TrueipgPerEmailInTxinqCnt	;
+  string	TrueipPerPhoneInTxinqCnt	;
+  string	DnsipPerEmailInTxinqCnt	;
+  string	DnsipgPerEmailInTxinqCnt	;
+  string	ProxyipPerEmailInTxinqCnt	;
+  string	ProxyipgPerEmailInTxinqCnt	;
+  string	BrowserPerEmailInTxinqCnt	;
+  string	BrowserHashPerEmailInTxinqCnt	;
+  string	BrowserHashPerPhoneInTxinqCnt	;
+  string	ScreenResPerEmailInTxinqCnt	;
+  string	TimeZonePerEmailInTxinqCnt	;
+  string	CurrencyPerEmailInTxinqCnt	;
+  string	LoginidPerPhoneInTxinqCnt	;
+  string	AchPerEmailInTxinqCnt	;
+  string	AgentpubkeyPerEmailInTxinqCnt	;
+  string	CarrieridPerEmailInTxinqCnt	;
+  string	CcardPerEmailInTxinqCnt	;
+  string	TxinqCorrEmailWPhoneNameCnt	;
+  string	TxinqCorrEmailWPhoneNameCnt1Y	;
+  string	TxinqCorrEmailWPhoneNameCnt6M	;
+  string	TxinqCorrEmailWPhoneNameCnt3M	;
+  string	TxinqCorrEmailWPhoneNameCnt1M	;
+  string	TxinqCorrEmailWPFLACnt	;
+  string	TxinqCorrEmailWPFLACnt1Y	;
+  string	TxinqCorrEmailWPFLACnt6M	;
+  string	TxinqCorrEmailWPFLACnt3M	;
+  string	TxinqCorrEmailWPFLACnt1M	;
+  string	TxinqCorrEmailWPhoneCnt	;
+  string	TxinqCorrEmailWPhoneCnt1Y	;
+  string	TxinqCorrEmailWPhoneCnt6M	;
+  string	TxinqCorrEmailWPhoneCnt3M	;
+  string	TxinqCorrEmailWPhoneCnt1M	;
+  string	TxinqWEmailCnt1Y	;
+  string	TxinqWEmailCnt6M	;
+  string	TxinqWPhoneCnt	;
+  string	TxinqWPhoneCnt1Y	;
+  string	TxinqWPhoneCnt6M	;
+  string	TxinqCorrEmailWAddressCnt	;
+  string	TxinqCorrEmailWAddressCnt1Y	;
+  string	TxinqCorrEmailWAddressCnt6M	;
+  string	TxinqCorrEmailWAddressCnt3M	;
+  string	TxinqCorrEmailWAddressCnt1M	;
+  string	TxinqCorrEmailWNameCnt	;
+  string	TxinqCorrEmailWNameCnt1Y	;
+  string	TxinqCorrEmailWNameCnt6M	;
+  string	TxinqCorrEmailWNameCnt3M	;
+  string	TxinqCorrEmailWNameCnt1M	;
+  string	TxinqCorrNameWPhoneCnt	;
+  string	TxinqCorrNameWPhoneCnt1Y	;
+  string	TxinqCorrNameWPhoneCnt6M	;
+  string	TxinqCorrNameWPhoneCnt3M	;
+  string	TxinqCorrNameWPhoneCnt1M	;
+  string	TxinqWEmailFinStatusRejCnt	;
+  string	TxinqWEmailFinStatusRejCnt1M	;
+  string	TxinqWEmailFinStatusAccCnt	;
+  string	TxinqWEmailFinStatusAccCnt1M	;
+  string	TxinqWPhoneFinStatusRejCnt	;
+  string	TxinqWPhoneFinStatusRejCnt1M	;
+  string	TxinqWPhoneFinStatusAccCnt	;
+  string	TxinqWPhoneFinStatusAccCnt1M	;
+  string	DistBtwTrueipWEmailAvg	;
+  string	DistBtwTrueipWPhoneAvg	;
+  string	TimeBtwTxinqWEmailAvg	;
+  string	TimeBtwTxinqWPhoneAvg	;
+  string	TrueiprcPerPhoneInTxinqCnt1W	;
+  string	TrueiprcPerEmailInTxinqCnt1W	;
+  string	ExactidPerTmxidInTxinqCnt1W	;
+  string	TrueipgPerTmxidInTxinqCnt1W	;
+  string	TrueipPerTmxidInTxinqCnt1W	;
+  string	TrueipPerTmxidInTxinqCnt1M	;
+  string	TxinqWTmxidCnt1M	;
+  string	ExactidPerTmxidInTxinqDoCnt1W	;
+  string	TrueipgPerTmxidInTxinqDoCnt1W	;
+  string	SmartidPerTmxidInTxinqCnt	;
+  string	ExactidPerTmxidInTxinqCnt	;
+  string	EmailPerTmxidInTxinqCnt	;
+  string	PhonePerTmxidInTxinqCnt	;
+  string	NamePerTmxidInTxinqCnt	;
+  string	TrueipPerTmxidInTxinqCnt	;
+  string 	RuleTmxidTrustVeryHighFlag	;
+  string 	RuleTmxidTrustHighFlag	;
+  string 	RuleTmxidTrustMediumFlag	;
+  string 	RuleTmxidTrustedByUserFlag1M	;
+  string 	RuleTmxidTrustedByUserFlag3M	;
+  string 	RuleTmxidTrustedByUserFlag6M	;
+  string 	RuleTmxidTrustedByUserFlag1Y	;
+  string 	RuleEmailTrustedByUserFlag1M	;
+  string 	RuleEmailTrustedByUserFlag3M	;
+  string 	RuleEmailTrustedByUserFlag6M	;
+  string 	RuleEmailTrustedByUserFlag1Y	;
+  string 	RuleTmxidFraudByUserFlag1M	;
+  string 	RuleTmxidFraudByUserFlag3M	;
+  string 	RuleTmxidFraudByUserFlag6M	;
+  string 	RuleTmxidFraudByUserFlag1Y	;
+  string 	RuleEmailBlistFlag	;
+  string 	RuleEmailBlistByBankFlag	;
+  string 	RuleEmailBlistByFinTechFlag	;
+  string 	RuleEmailBlistByEcommFlag	;
+  string 	RuleExactidBlistInTxinqWEFlag1M	;
+  string 	RuleExactidBlistInTxinqWEFlag	;
+  string 	RuleSmartidBlistInTxinqWEFlag1M	;
+  string 	RuleSmartidBlistInTxinqWEFlag	;
+  string 	RuleExactidBlistInTxinqWPFlag1M	;
+  string 	RuleExactidBlistInTxinqWPFlag1Y	;
+  string 	RuleSmartidBlistInTxinqWPFlag1M	;
+  string 	RuleSmartidBlistInTxinqWPFlag1Y	;
+  string 	RuleEmailHighRiskDomainFlag	;
+  string 	RuleEmailAliasFlag	;
+  string 	RuleEmailMachineGeneratedFlag	;
+end;
+
+export layout_tmx_extras := record
+  unsigned seq;  
+  string1 invalid_account_email;
+  string1 invalid_account_telephone;
+  string digital_id_result;
+  string account_telephone_result;
+  string account_email_result;
+  string account_name_result;
+  string account_address_result;
+end;
+
+export layout_threatmetrix_shell_internal_results := record  
+  layout_threatmetrix_shell_results;
+  
+  // fields added for UAT, or debugging the gateway.  
+  // not to be included in Risk_Indicators.Layout_Boca_Shell_Edina_v55
+  layout_tmx_extras;
+end; 
+  
+  
 
 END;

@@ -777,7 +777,7 @@ layout_watchlists_temp := record
 	kFetchLinkIDs := Business_Risk_BIP.Common.GetLinkIDs(LinkIDsFound);
 	kFetchLinkSearchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel);
 	// --------------- LexisNexis Business Header ----------------
-	BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
+	BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 
 	BusinessHeader := Business_Risk_BIP.PD_Business_Header(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
 	

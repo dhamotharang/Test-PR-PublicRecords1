@@ -1,5 +1,5 @@
 ﻿
-IMPORT BatchShare;
+IMPORT BatchShare, Doxie;
 
 EXPORT BeneficiaryRiskScore_Interfaces := MODULE
 	
@@ -35,7 +35,7 @@ EXPORT BeneficiaryRiskScore_Interfaces := MODULE
 	EXPORT modInstantIDConfigDefault(IRestrictionParams	restrictions, unsigned1 ofac_version_ = 1, boolean include_ofac_ = false, real global_watchlist_threshold_ = 0.84) := MODULE(IInstantIDConfig)
 		EXPORT BOOLEAN isFCRA              := FALSE;
 		EXPORT BOOLEAN ln_branded          := FALSE;
-		EXPORT BOOLEAN isUtility           := restrictions.industryclass = 'UTILI';
+		EXPORT BOOLEAN isUtility           := Doxie.Compliance.isUtilityRestricted(restrictions.industryclass);
 		EXPORT BOOLEAN ofac_only           := TRUE;
 		EXPORT BOOLEAN suppressNearDups    := FALSE;
 		EXPORT BOOLEAN require2ele         := FALSE;

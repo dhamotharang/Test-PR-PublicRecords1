@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, ut, std;
+﻿IMPORT Risk_Indicators, ut, std;
 
 EXPORT Risk_Reporting.Layouts.LOG_Boca_Shell To_LOG_Boca_Shell (
 																				GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) Boca_Shell,
@@ -12,7 +12,10 @@ EXPORT Risk_Reporting.Layouts.LOG_Boca_Shell To_LOG_Boca_Shell (
 	Risk_Reporting.Layout_Boca_Shell slimShell(Risk_Indicators.Layout_Boca_Shell le) := TRANSFORM
 		// To start with the two shells are the same, and in general will always remain the same.
 		// Adding the transform just in case the two diverge slightly in the future.
-		SELF := le;
+		SELF.iid.watchlist_fname := (string)le.iid.watchlist_fname;
+		SELF.iid.watchlist_lname := (string)le.iid.watchlist_lname;
+		SELF.iid.watchlist_entity_name := (string)le.iid.watchlist_entity_name;
+    SELF := le;
 	END;
 
 	slimmedBocaShell := PROJECT(IF(TurnOffLogging, DATASET([], Risk_Indicators.Layout_Boca_Shell), UNGROUP(Boca_Shell)), slimShell(LEFT));

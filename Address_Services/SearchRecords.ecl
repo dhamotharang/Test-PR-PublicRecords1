@@ -1,4 +1,4 @@
-IMPORT Address, doxie, Advo, Address_Services, iesp, header, AutoStandardI;
+IMPORT Address, doxie, Advo, Address_Services, iesp, dx_header, AutoStandardI;
 
 EXPORT SearchRecords(dataset(iesp.addresssearch.t_AddressSearchBy) in_ds, Address_Services.IParams.address_search in_mod) := FUNCTION
 		
@@ -25,14 +25,14 @@ EXPORT SearchRecords(dataset(iesp.addresssearch.t_AddressSearchBy) in_ds, Addres
 	end;
 	clean_in := PROJECT(in_ds, cleanInput(LEFT));
 	
-	pre_header_addr	:= JOIN(clean_in, doxie.Key_Header_Address,
+	pre_header_addr	:= JOIN(clean_in, dx_header.key_header_address(),
 		KEYED(LEFT.prim_name = RIGHT.prim_name) AND
 		KEYED(LEFT.zip = 	RIGHT.zip) AND
 		KEYED(LEFT.prim_range = RIGHT.prim_range) AND
 		KEYED(LEFT.sec_range = '' or LEFT.sec_range = RIGHT.sec_range),
 		TRANSFORM(RIGHT),
 			LIMIT(0), KEEP(Address_Services.Constants.MAX_HEADER_ADDR));
-	header.MAC_Filter_Sources(pre_header_addr, header_addr_filt, src, in_mod.DataRestrictionMask);
+	header_addr_filt := doxie.compliance.MAC_FilterSources(pre_header_addr, src, in_mod.DataRestrictionMask);
 	
 	header_addr := project(header_addr_filt,
 		TRANSFORM(Address_Services.Layouts.int_rec,

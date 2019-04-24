@@ -1,10 +1,14 @@
-import doxie,doxie_raw,doxie_crs,ut,Header;
+﻿import doxie,doxie_raw,doxie_crs,ut,Header;
 
 export Source_counts (dataset (doxie.layout_references) dids) := function
 
 doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare();
-boolean is_knowx1 := ut.IndustryClass.is_knowx;
+
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
+
+boolean is_knowx1 := mod_access.isConsumer();
+
 Out_layout := record
  unsigned2 atf_cnt; 
  unsigned2 bk_cnt;
@@ -72,8 +76,7 @@ end;
 
 inputi := project(dids,intoInput(left));
 
-outDid := Doxie_Raw.ViewSourceDid(inputi, dateVal, 
-    dppa_purpose, glb_purpose, application_type_value,ln_branded_value, probation_override_value, industry_class_value,IsCRS,,,
+outDid := Doxie_Raw.ViewSourceDid(inputi, mod_access, IsCRS,
 		BankruptcyVersion,JudgmentLienVersion,UccVersion,DlVersion,VehicleVersion,VoterVersion,DeaVersion,CriminalRecordVersion,
 		doxie_crs.str_typeDebtor); //limit counts for CRS
 
@@ -126,7 +129,7 @@ outRec combineChildResults(outRec L, outRec R) := transform
 	self.finder_child := (L.finder_child + R.finder_child);
 	self.phone_child := (L.phone_child + R.phone_child);
 	self.targ_child := IF(not is_knowx1,(L.targ_child + R.targ_child));
-	self.phonesPlus_child := IF(not is_knowx1,(L.phonesPlus_child  + R.phonesPlus_child ));
+	self.phonesPlus_child := L.phonesPlus_child  + R.phonesPlus_child;
 	self.FBNv2_child := (L.FBNv2_child + R.FBNv2_child);
 	self.DOC_people_child := L.DOC_people_child + R.DOC_people_child;
 	self.DOCv2_child := L.DOCv2_child + R.DOCv2_child;

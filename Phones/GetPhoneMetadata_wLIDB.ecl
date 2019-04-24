@@ -22,21 +22,18 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 	LIMIT(0),LEFT OUTER, KEEP(Consts.MaxRecsPerPhone));
 
 
-//Add account numbers back from input data.	
-Layout_BatchRaw_info := RECORD
-	Layout_BatchRaw;
-	string1 block_id;
-END;	
 
-Layout_BatchRaw_info transformLerg6(Phones.Layouts.PhoneAttributes.BatchIn l, recordof(dx_PhonesInfo.Key_Phones_Lerg6) r) := TRANSFORM
+Layout_BatchRaw transformLerg6(Phones.Layouts.PhoneAttributes.BatchIn l, recordof(dx_PhonesInfo.Key_Phones_Lerg6) r) := TRANSFORM
+		is_block := (r.block_id = Consts.DEFAULT_BLOCK_ID);
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phoneno;
 		SELF.source := r.source;  
-		SELF.dt_first_reported := (Integer)r.dt_first_reported;
-		SELF.dt_last_reported := (Integer)r.dt_last_reported;
+		SELF.dt_first_reported := IF(is_block, 0, (Integer)r.dt_first_reported);
+		SELF.dt_last_reported := IF(is_block, 0, (Integer)r.dt_last_reported);// Need to keep default at bottom as it is not an exact match
 		SELF.account_owner := r.ocn;
 		SELF.local_area_transport_area := r.lata;
-		SELF.block_id := r.block_id;
+		SELF.vendor_last_reported_dt := IF(is_block, 0,(Integer)r.dt_last_reported);
+		SELF.vendor_first_reported_dt := IF(is_block, 0,(Integer)r.dt_first_reported);
 		SELF := [];
 	END;
 	
@@ -47,11 +44,11 @@ dLerg6Phones := JOIN(dBatchPhonesIn, dx_PhonesInfo.Key_Phones_Lerg6, (LEFT.phone
 
 	
 
-	filteredLerg6Phones_info := 	DEDUP(SORT(dLerg6Phones, acctno,phone,-dt_last_reported,block_id),acctno,phone);
+	filteredLerg6Phones := 	DEDUP(SORT(dLerg6Phones, acctno,phone,-dt_last_reported),acctno,phone);
     
-	filteredLerg6Phones := PROJECT(filteredLerg6Phones_info, TRANSFORM(Layout_BatchRaw, SELF := left));
-	dPortedPhones := DEDUP(SORT((dPortedMetadataPhones + filteredLerg6Phones),acctno,phone,source,-dt_last_reported,dt_first_reported,account_owner), 
-	                             acctno,phone,source,dt_last_reported,dt_first_reported,account_owner);
+
+	dPortedPhones := DEDUP(SORT((dPortedMetadataPhones + filteredLerg6Phones),acctno,phone,source,-vendor_last_reported_dt, vendor_first_reported_dt, -dt_last_reported, dt_first_reported, account_owner), 
+	                             acctno,phone,source,vendor_last_reported_dt, vendor_first_reported_dt, dt_last_reported, dt_first_reported, account_owner);
 
 	//Add additional carrier info to Lerg6 records. They don't contain this information.
 	//However records retrieved from the metadata file should be left alone.
