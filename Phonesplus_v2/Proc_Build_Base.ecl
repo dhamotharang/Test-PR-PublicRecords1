@@ -93,15 +93,15 @@ Add_dids := Fn_Add_Cellphone_Did(Propagate_rules);
 //-------Propagate Rules Again---------------------------------------------------------------
 Propagate_rules2 := Phonesplus_v2.Fn_Propagate_Rules(Add_dids);
 
+//Append Neustar Wireless Rules - Jira: DF-24336
+Neustar_Wireless_Rules_Appended := fn_Append_Neustar_Wireless_Rules(Propagate_rules2);
+
 //-------Reformat layout to be the same as old layout----------------------------------------
-Eliminate_duplications := Fn_Eliminate_Duplications(Propagate_rules2)
+Eliminate_duplications := Fn_Eliminate_Duplications(Neustar_Wireless_Rules_Appended)
 :persist('~thor_data400::persist::Phonesplus::eliminate_duplications');
 
-//Append Neustar Wireless Rules - Jira: DF-24336
-Neustar_Wireless_Rules_Appended := fn_Append_Neustar_Wireless_Rules(Eliminate_duplications);
-
 //-------Verify with Insurance and File One 
-Verify_With_Ins_File1 := Fn_Phone_Verification(Neustar_Wireless_Rules_Appended, pversion);
+Verify_With_Ins_File1 := Fn_Phone_Verification(Eliminate_duplications, pversion);
 
 //-------Add other household members for landlines------------------------------------------
 Add_Header_Household := Fn_Add_Header_Household(Verify_With_Ins_File1);
