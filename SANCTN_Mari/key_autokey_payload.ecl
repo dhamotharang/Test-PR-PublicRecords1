@@ -1,4 +1,4 @@
-Import Data_Services, autokeyb2,doxie;
+﻿Import Data_Services, autokeyb2,doxie;
 
 addr := RECORD
    string10 prim_range;
@@ -63,6 +63,12 @@ rec := RECORD
 	string1 dbcode;
   unsigned1 zero;
   string1 blank;
+	//CCPA-97 Per requirement, all in scope data needs to have a date when the data was collected
+	STRING8 date_vendor_first_reported;
+	STRING8 date_vendor_last_reported;
+	//CCPA-97 Add 2 new fields for CCPA
+	unsigned4 global_sid;
+	unsigned8 record_sid;
   unsigned8 __internal_fpos__;
  END;
 
