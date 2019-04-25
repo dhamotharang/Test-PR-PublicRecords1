@@ -1752,5 +1752,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/562 Iran List','1739'},
 {'EC 2019/555 ISIL (Da\'esh) and Al-Qaida List','1740'},
 {'EC 2019/560 Iran List','1741'},
-{'The Gambling Commission (UK) - Regulatory Decisions','1742'}
+{'The Gambling Commission (UK) - Regulatory Decisions','1742'},
+{'EC 2019/618 Banned Air Carriers List','1743'},
+{'Tunisia National Counter-Terrorism Committee (CNLCT) List','1744'}
 ],r);
