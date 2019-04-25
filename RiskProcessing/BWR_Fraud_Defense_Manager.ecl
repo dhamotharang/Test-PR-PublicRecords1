@@ -1,4 +1,4 @@
-#workunit('name', 'Fraud Defense Manager');
+﻿#workunit('name', 'Fraud Defense Manager');
 
 IMPORT Gateway, iesp, RiskWise, Risk_Indicators, Suspicious_Fraud_LN, UT;
 
@@ -24,7 +24,7 @@ IMPORT Gateway, iesp, RiskWise, Risk_Indicators, Suspicious_Fraud_LN, UT;
  // roxieIP := RiskWise.shortcuts.Dev194; // Development Roxie 194
  // roxieIP := RiskWise.shortcuts.D4; // Development Roxie - One Way #4
  // roxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging 128 Roxie
- roxieIP := RiskWise.shortcuts.prod_batch_neutral; // Production Batch Roxie
+ roxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie; // Production Batch Roxie
  
  inputFile := ut.foreign_dataland + 'bpahl::out::inquiry_acclogs::inquiry_test::identity_fraud::internal_w20140227-151602';
  
@@ -77,7 +77,7 @@ iesp.FraudDefenseManager.t_FraudDefenseManagerRequest intoPII(prii_layout le) :=
 		SELF.DLPurpose	:= (STRING)1;
 		SELF.DataRestrictionMask := Risk_Indicators.iid_constants.default_dataRestriction;
 		SELF.TestDataEnabled	:= FALSE;
-																									SELF := []));
+		SELF := []));
 
 	SELF.SearchBy := PROJECT(le, TRANSFORM(iesp.frauddefensemanager.t_FraudDefenseManagerSearchBy,
 		SELF.Name := DATASET([{'', LEFT.FirstName, LEFT.MiddleName, LEFT.LastName, '', ''}], iesp.share.t_Name)[1];
@@ -90,14 +90,14 @@ iesp.FraudDefenseManager.t_FraudDefenseManagerRequest intoPII(prii_layout le) :=
 		SELF.DriverLicenseNumber := LEFT.DLNumber;
 		SELF.DriverLicenseState := LEFT.DLState;
 		SELF.DeviceID := '';
-																									SELF := []));
+		SELF := []));
 
 	SELF := [];
 END;
 
 soapcall_layout intoSOAP(prii_layout le) := TRANSFORM
 	SELF.FraudDefenseManagerReportRequest := PROJECT(le, intoPII(LEFT));
-	SELF.Gateways := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := IF(EnableNetAcuity, 'netacuity', ''); SELF.URL := IF(EnableNetAcuity, 'http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway', ''); SELF := [])) +
+	SELF.Gateways := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := IF(EnableNetAcuity, 'netacuity', ''); SELF.URL := IF(EnableNetAcuity, 'http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93', ''); SELF := [])) +
 									 PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := IF(EnableDeltabase, 'delta_inquiry', ''); SELF.URL := IF(EnableDeltabase, 'http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql', ''); SELF := []));
 	SELF.HistoryDateYYYYMM := 999999; // Set to 999999 for Realtime, YYYYMM for Archive runs
 END;

@@ -1,4 +1,5 @@
-﻿  import ut, risk_indicators, models, riskwise, Gateway;
+﻿
+  import ut, risk_indicators, models, riskwise, iesp;
 #workunit('name','Fraudpoint Score and Attributes 2.0');
 
 // internal fields for debugging, when set to false, QA file will not be output
@@ -81,7 +82,7 @@ layout_soap := record
 	boolean IncludeOfac;
 	boolean IncludeAdditionalWatchLists;
 	real GlobalWatchlistThreshold;
-  // dataset(iesp.share.t_StringArrayItem) WatchList;
+  // dataset(iesp.share.t_StringArrayItem) Watchlist {xpath('Watchlist/Row/WatchList/Name')}; ;
 	// fields below are all new for fp 2.0
 	boolean IncludeRiskIndices;  // turns on the 6 fp indices that go with the model
 	// the rest of these aren't used yet, just added for possible future custom models to use
@@ -147,15 +148,17 @@ self.model := 'fp1109_0';  //
 		//self.model := 'fp1109_9';  // fp1109_9 is the same model as fp1109_0, but includes criminal risk indicators
 	self.IncludeRiskIndices := true;
  	self.gateways := riskwise.shortcuts.gw_netacuityv4 /*+ riskwise.shortcuts.gw_targus*/
-  /* + dataset([{'bridgerwlc', 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore?ver_=1'}], Gateway.Layouts.Config)*/; //Can uncomment targus gateway and/or watchlists if needed
+  /* + dataset([{'bridgerwlc', 'http://bridger_batch_cert:Br1dg3rBAtchC3rt@172.16.70.19:7003/WsSearchCore?ver_=1'}], Risk_Indicators.Layout_Gateways_In)*/; //Can uncomment targus gateway and/or watchlists if needed
   
 	self.OfacOnly := false;
   self.ExcludeWatchLists := false;
-	self.OFACversion := 2;
+	self.OFACversion := 1;
 	self.IncludeOfac := false;
 	self.IncludeAdditionalWatchLists := false;
 	self.GlobalWatchlistThreshold := 0.84;
-  // self.watchlist := dataset([{'OFAC'}],iesp.share.t_StringArrayItem);
+  // self.watchlist := dataset([{'OFAC'}],iesp.share.t_StringArrayItem); // use this if you only need one watchlist
+  // self.watchlist := dataset([{'OFAC'}],iesp.share.t_StringArrayItem) +
+									  // dataset([{'BES'}],iesp.share.t_StringArrayItem); // use this if you need more than one watchlist, follow the same formatting to add one more if needing more than two 
     
   SELF.IncludeQAOutputs := include_internal_extras;   
 	
@@ -750,4 +753,3 @@ output(rolled_to_1_record,,outputfile,CSV(heading(single), quote('"')), overwrit
 
 IF(Include_Internal_Extras, OUTPUT(CHOOSEN(qa_results, eyeball), NAMED('Sample_QA_Results')));
 IF(Include_Internal_Extras, OUTPUT(qa_results,,qa_outputfile, CSV(heading(single), quote('"')), overwrite));
-

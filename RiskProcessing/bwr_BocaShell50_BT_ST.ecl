@@ -4,45 +4,66 @@
 
 import risk_indicators, riskwise, ut;
 
-unsigned record_limit :=   5;    //number of records to read from input file; 0 means ALL
+unsigned record_limit := 0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
-string DataRestrictionMask := '000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 12 restricts ADVO
+string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 12 restricts ADVO
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
-infile_name  := ut.foreign_prod+'tfuerstenberg::in::axcess_4284_f_s_in';
-outfile_name := '~dvstemp::out::test_btst_out_'+ thorlib.wuid();	// this will output your work unit number in your filename
+infile_name  := '~tfuerstenberg::in::axcess_4284_f_s_in';
+outfile_name := '~dvstemp::out::btst50'+ thorlib.wuid();	// this will output your work unit number in your filename
 
-// roxieIP := RiskWise.Shortcuts.prod_batch_neutral;    // Roxiebatch
-roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP;   
+roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;    // Roxiebatch
+// roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP;   
 
 //==============  Program uses Consumer Data Only  ====================
 //==================  bt-st input file layout  ========================
 BTST_in := record
-	string30            accountnumber := '';
-	string30            firstname := '';
-	string30            middlename := '';
-	string30            lastname := '';
-	string120          streetaddress := '';
-	string25            city := '';
-	string2              state := '';
-	string5              zip := '';
-	string10            homephone := '';                             
-	string9              ssn := '';
-	string8              dateofbirth := '';
-	string10            workphone := '';
-	string15            income := '';
-	string20            dlnumber := '';
-	string2              dlstate := '';
-	string15            balance := '';
-	string15            CHARGEOFFD := '';  
-	string30            FormerName := '';
-	string100          email := '';                            
-	string100          employername := '';
-	string6              historydateyyyymm := '';
-	string120          ipaddress := '';
+      string30 	accountnumber := '';
+      string30 	firstname := '';
+	    string30 	middlename := '';
+      string30 	lastname := '';
+	    string5	  suffix := '';
+      string120	streetaddress := '';
+      string25 	city := '';
+      string2 	state := '';
+      string5 	zip := '';
+	    string25	country := '';
+      string9 	ssn := '';
+      string8 	dateofbirth := '';
+	    unsigned1	age := 0;       // not used
+      string20 	dlnumber := '';
+      string2 	dlstate := '';
+	    string100	email := '';
+	    string120	ipaddress := '';
+	    string10 	homephone := '';
+      string10 	workphone := '';
+	    string100	employername := '';
+      string30	formername := '';
+      string30 	firstname2 := '';
+	    string30 	middlename2 := '';
+      string30 	lastname2 := '';
+	    string5	  suffix2 := '';
+      string120	streetaddress2 := '';
+      string25 	city2 := '';
+      string2 	state2 := '';
+      string5 	zip2 := '';
+	    string25	country2 := '';
+      string9 	ssn2 := '';
+      string8 	dateofbirth2 := '';
+	    unsigned1	age2 := 0;       // not used
+      string20 	dlnumber2 := '';
+      string2 	dlstate2 := '';
+	    string100	email2 := '';
+	    string120	ipaddress2 := '';
+	    string10 	homephone2 := '';
+      string10 	workphone2 := '';
+	    string100	employername2 := '';
+      string30	formername2 := '';
+      string6 	historydateyyyymm := '';
 end;
 
 //====================================================
@@ -105,21 +126,43 @@ l :=	RECORD
 	string DataRestrictionMask;
 	dataset(risk_indicators.Layout_Gateways_In) gateways;
 	integer bsversion;
+	unsigned3 LastSeenThreshold;
 END;
 
 l t_f(ds_input le, INTEGER c) := TRANSFORM
 	self.old_accountnumber := le.accountnumber;
 	SELF.accountnumber := (string)C;
 
+  //**************************************************************************************** 
+  // When hard-coding archive dates, uncomment and modify one of the following sets of code 
+	//   below and comment out the existing  code for self.historydateyyyymm and self.historyDateTimeStamp 
+	//****************************************************************************************
 	//	self.historydateyyyymm := 201109;  
-	//	self.historyDateTimeStamp := '20110901 12010100';  
-	self.historydateyyyymm := (unsigned)le.historydateyyyymm;
-	self.historyDateTimeStamp := '';  // can populate this with full timestamp if the customer has it
-		
+	//	self.historyDateTimeStamp := '20110901 00000100';  
+
+	//	self.historydateyyyymm := 999999;  
+	//	self.historyDateTimeStamp := '';  // leave timestamp blank, query will populate it with the current date  
+
+  self.historydateyyyymm := map(
+			regexfind('^\\d{8} \\d{8}$', le.HistoryDateYYYYMM) => (unsigned)le.HistoryDateYYYYMM[..6],
+			regexfind('^\\d{8}$',        le.HistoryDateYYYYMM) => (unsigned)le.HistoryDateYYYYMM[..6],
+			                                                (unsigned)le.HistoryDateYYYYMM
+	);
+	
+  self.historyDateTimeStamp := map(
+      le.HistoryDateYYYYMM in ['', '999999']             => '',  // leave timestamp blank, query will populate it with the current date   	
+			regexfind('^\\d{8} \\d{8}$', le.HistoryDateYYYYMM) => le.HistoryDateYYYYMM,
+			regexfind('^\\d{8}$',        le.HistoryDateYYYYMM) => le.HistoryDateYYYYMM +   ' 00000100',
+			regexfind('^\\d{6}$',        le.HistoryDateYYYYMM) => le.HistoryDateYYYYMM + '01 00000100',		                                                
+			                                                le.HistoryDateYYYYMM
+	);
+	
+ 	
 	self.dppapurpose := dppa;
 	self.glbpurpose := glba;
 	self.gateways := riskwise.shortcuts.gw_netacuityv4;
 	SELF.datarestrictionmask := datarestrictionmask;
+	SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 50;		
 	SELF := le;
 END;
@@ -144,13 +187,15 @@ END;
 resu := soapcall(indata, roxieIP,
 				'Risk_Indicators.Boca_Shell_BtSt_Service', {indata},
 				DATASET(temp_layout),
+				XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
+				RETRY(5), TIMEOUT(500),
 				PARALLEL(parallel_calls), onFail(myFail(LEFT)));
 
 final_layout := record
 	unsigned8 time_ms := 0;
 	string30 accountnumber;
-	risk_indicators.Layout_Boca_Shell Bill_To_Out;
-	risk_indicators.Layout_Boca_Shell Ship_To_Out;
+	risk_indicators.Layout_Boca_Shell -LNJ_Datasets -ConsumerStatements Bill_To_Out;
+	risk_indicators.Layout_Boca_Shell -LNJ_Datasets -ConsumerStatements Ship_To_Out;
 	risk_indicators.Layout_EDDO eddo;
 	riskwise.Layout_IP2O ip2o;
 	string50 errorcode;
@@ -158,7 +203,7 @@ end;
 
 fin := project(resu, transform(final_layout, self:=left));
 final := join(indata,fin, ((unsigned)left.accountnumber)*2 = right.bill_to_out.seq, 
-			transform(final_layout, self.accountnumber := left.old_accountnumber, self := right));
+			transform(final_layout, self.accountnumber := left.old_accountnumber, self := right, self := []));
 res_err := final(errorcode<>'');
 
 OUTPUT (choosen(final, eyeball), NAMED ('final'));
@@ -173,8 +218,8 @@ OUTPUT (final, , outfile_name, CSV(QUOTE('"')) );  // write the shell result to 
 f := dataset(outfile_name, final_layout, csv(quote('"'), maxlength(40000)));
 output(choosen(f, eyeball), named('infile'));
 
-billtoshell5 := project(f, transform(riskprocessing.layouts.layout_internal_shell, self.time_ms := left.time_ms, self.accountnumber := left.accountnumber, self.errorcode := left.errorcode, self := left.bill_to_out));
-shiptoshell5 := project(f, transform(riskprocessing.layouts.layout_internal_shell, self.time_ms := left.time_ms, self.accountnumber := left.accountnumber, self.errorcode := left.errorcode, self := left.ship_to_out));
+billtoshell5 := project(f, transform(riskprocessing.layouts.layout_internal_shell_noDatasets, self.time_ms := left.time_ms, self.accountnumber := left.accountnumber, self.errorcode := left.errorcode, self := left.bill_to_out));
+shiptoshell5 := project(f, transform(riskprocessing.layouts.layout_internal_shell_noDatasets, self.time_ms := left.time_ms, self.accountnumber := left.accountnumber, self.errorcode := left.errorcode, self := left.ship_to_out));
 isFCRA := false;
 
 billto_edina5 := risk_indicators.ToEdina_v50(billtoshell5, isFCRA, DataRestrictionMask);

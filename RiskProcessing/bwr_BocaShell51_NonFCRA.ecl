@@ -1,3 +1,6 @@
+﻿/*2015-09-25T19:35:58Z (Kevin Huls_prod)
+Changed to call 'ToEdina_v51' to format the FDN and FP3 model output fields.
+*/
 #workunit('name','NonFCRA BocaShell 5.1');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
@@ -13,15 +16,20 @@
 
 IMPORT Risk_Indicators, RiskWise, ut;
 
-unsigned record_limit      := 10;     //number of records to read from input file; 0 means ALL
+unsigned record_limit      := 0;     //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls   := 30;     //number of parallel soap calls to make [1..30]
 unsigned1 eyeball          := 10;
 boolean RemoveFares        := false;	// change this to TRUE for FARES filtering
 boolean LeadIntegrityMode  := false;  // change this to TRUE for LeadIntegrity modeling
-string DataRestrictionMask := '0000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
-																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
+string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
+																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data,
+string DataPermissionMask  := '0000000000100';	// byte 11, if 0, restricts FDN test fraud and contributory fraud  
+																								// byte 13, if 0, restricts Insurance DL data  
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
+boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
+boolean isPrescreen := FALSE; 
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output filenames  ======================
 
@@ -51,6 +59,7 @@ layout_input := RECORD
     string EMAIL;  
     string employername;
     string historydate;
+		string LexID; 
   END;
 	
 //====================================================
@@ -61,7 +70,7 @@ layout_input := RECORD
 bs_service := 'risk_indicators.Boca_Shell';
 
 // Target Roxie:
-roxieIP := RiskWise.Shortcuts.prod_batch_neutral;    // Roxiebatch
+roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;    // Roxiebatch
 // roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
 
 //====================================================
@@ -83,12 +92,19 @@ END;
 	
 	
 l assignAccount (ds_input le, INTEGER c) := TRANSFORM
+
+self.ExcludeIbehavior := true;  // set this back to false if they would like to include this data for their test
+
+
   SELF.old_account_number := le.Account;
   SELF.AccountNumber := (STRING)c;
   	
   SELF.GLBPurpose  := glba;
   SELF.DPPAPurpose := dppa;
 		
+	self.retainInputDID := RetainInputDID;
+	self.did := le.LexID; 
+	
   //**************************************************************************************** 
   // When hard-coding archive dates, uncomment and modify one of the following sets of code 
 	//   below and comment out the existing  code for self.historydateyyyymm and self.historyDateTimeStamp 
@@ -115,7 +131,10 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 	
   SELF.IncludeScore        := true;
   SELF.datarestrictionmask := datarestrictionmask;
+  SELF.datapermissionmask  := datapermissionmask;
   SELF.RemoveFares         := RemoveFares;
+  SELF.LeadIntegrityMode := LeadIntegrityMode;
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion           := 51;				
   SELF := le;
   SELF := [];
@@ -129,7 +148,7 @@ output(CHOOSEN(p_f,eyeball), NAMED('BSInput'));
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 
-riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM
+riskprocessing.layouts.layout_internal_shell_noDatasets getold(s le, l ri) :=	TRANSFORM
   SELF.AccountNumber := ri.old_account_number;
   SELF := le;
 END;
@@ -145,33 +164,15 @@ OUTPUT(res, , outfile_name, CSV(QUOTE('"')));  // Write to disk.
 
 // the conversion portion-----------------------------------------------------------------------
 
-f := DATASET(outfile_name, riskprocessing.layouts.layout_internal_shell, csv(quote('"'), maxlength(20000)));
+f := DATASET(outfile_name, riskprocessing.layouts.layout_internal_shell_noDatasets, csv(quote('"'), maxlength(20000)));
 OUTPUT(CHOOSEN(f, eyeball), NAMED('infile'));
 
-// NOTE....: Even though we called the Boca Shell using version 5.1, for the time being 
-// we are still converting the results ToEdina_v50( ). 
+// ToEdina_v51 converts to a temporary 5.1 layout where the FDN and FP3 data are placed at the end of the layout.  When the
+// real BS 5.1 layout comes out than ToEdina_v51 will change to produce the permanent layout. 
+
 isFCRA := false;
-edina := risk_indicators.ToEdina_v50(f, isFCRA, DataRestrictionMask);
+edina := risk_indicators.ToEdina_v51(f, isFCRA, DataRestrictionMask);
 
-// Now tack the FDN attributes--test_fraud and contributory_fraud--to the end of the v50 layout.
-layout_with_FDN_attributes :=	RECORD
-	risk_indicators.Layout_Boca_Shell_Edina_v50;
-	risk_indicators.layouts.layout_test_fraud  Test_Fraud;
-	risk_indicators.layouts.layout_contributory_fraud  Contributory_Fraud;
-END;
-
-edina_with_FDN_attributes := 
-	join(
-		edina, f, 
-		left.seq = right.seq,
-		transform( layout_with_FDN_attributes, 
-			self.Test_Fraud         := right.Test_Fraud,  
-			self.Contributory_Fraud := right.Contributory_Fraud,  
-			self                    := left
-		),
-		left outer
-	);
-
-OUTPUT(CHOOSEN(edina_with_FDN_attributes,eyeball), NAMED('edina'));
-OUTPUT(edina_with_FDN_attributes,, outfile_name+'_edina_v50',CSV(QUOTE('"'))); // Write to disk.
+OUTPUT(CHOOSEN(edina,eyeball), NAMED('edina'));
+OUTPUT(edina,, outfile_name+'_edina_v50',CSV(QUOTE('"'))); // Write to disk.
 

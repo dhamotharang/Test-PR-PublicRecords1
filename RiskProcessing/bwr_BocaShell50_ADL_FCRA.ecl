@@ -1,4 +1,4 @@
-#workunit('name','FCRA ADL Bocashell 5.0 Process');
+﻿#workunit('name','FCRA ADL Bocashell 5.0 Process');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -13,14 +13,15 @@
 
 IMPORT Risk_Indicators, RiskWise, riskprocessing, ut;
 
-unsigned record_limit :=   5;    //number of records to read from input file; 0 means ALL
+unsigned record_limit := 0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
-string DataRestrictionMask := '10000100010001'; // to restrict fares, experian, transunion and experian FCRA 
+string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name :=   ut.foreign_prod+'tfuerstenberg::in::fico_4332_fullsample_in_pt25';
-outfile_name := '~mlwalklin::out::fcrashell50_ADL_' + thorlib.wuid();	// this will output your work unit number in your filename;
+outfile_name := '~mlwalklin::out::fcra50_ADL_' + thorlib.wuid();	// this will output your work unit number in your filename;
 
 //==================  input file layout  ========================
 layout_input := RECORD
@@ -51,7 +52,7 @@ layout_input := RECORD
 //=============  Service settings ====================
 //====================================================
 // Neutral service ip
-roxie_IP := RiskWise.Shortcuts.prod_batch_neutral;    // Roxiebatch
+roxie_IP := RiskWise.Shortcuts.prod_batch_analytics_roxie;    // Roxiebatch
 // roxie_IP := RiskWise.Shortcuts.staging_neutral_roxieIP;  
 
 // FCRA service settings
@@ -92,7 +93,7 @@ l := RECORD
 	string neutral_gateway;
 	string DataRestrictionMask;
 	integer bsversion;
-	boolean FilterLiens;
+	unsigned3 LastSeenThreshold;
 END;
 
 l t_f(ds_input le, INTEGER c) := TRANSFORM
@@ -116,7 +117,7 @@ l t_f(ds_input le, INTEGER c) := TRANSFORM
 	);
  	self.neutral_gateway := roxie_IP;
 	SELF.datarestrictionmask := datarestrictionmask;
-	self.FilterLiens := false;
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 50;		
 	self := le;
 END;
@@ -127,7 +128,7 @@ output(choosen(dist_dataset, eyeball), named('bocashell_input'));
 
 xlayout := record
 	unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	risk_indicators.Layout_Boca_Shell;	
+	risk_indicators.Layout_Boca_Shell -LnJ_datasets;	
 	string200 errorcode;
 end;
 								
@@ -152,7 +153,7 @@ edina_plus_bob_v50 := record
 	risk_indicators.Layout_Boca_Shell_Edina_v50;
 end;	
 	
-riskprocessing.layouts.layout_internal_shell getold(roxie_results le, p_f ri) :=	TRANSFORM
+riskprocessing.layouts.layout_internal_shell_noDatasets getold(roxie_results le, p_f ri) :=	TRANSFORM
   SELF.AccountNumber := ri.original_account_number;
   SELF := le;
 END;
@@ -170,7 +171,7 @@ OUTPUT (res, , outfile_name, CSV(QUOTE('"')));
 
 // the conversion portion-----------------------------------------------------------------------
 
-f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell, csv(quote('"'), maxlength(20000)));
+f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell_noDatasets, csv(quote('"'), maxlength(20000)));
 output(choosen(f, eyeball), named('infile'));
 isFCRA := true;
 
