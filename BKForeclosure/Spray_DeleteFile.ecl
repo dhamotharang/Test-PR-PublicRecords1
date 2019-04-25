@@ -69,8 +69,8 @@ Spray_delete_all
 //  Transform All Files
 xform_all
 	:= PARALLEL(
-							OUTPUT(TransformFile_Nod,, dst_Delete_Nod, CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR('\n')), OVERWRITE, COMPRESSED),
-							OUTPUT(TransformFile_Reo,, dst_Delete_Reo, CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR('\n')), OVERWRITE, COMPRESSED)
+							OUTPUT(TransformFile_Nod,, dst_Delete_Nod, OVERWRITE, COMPRESSED),
+							OUTPUT(TransformFile_Reo,, dst_Delete_Reo, OVERWRITE, COMPRESSED)
 					   );		
 	
 //  Add Files to Superfile
