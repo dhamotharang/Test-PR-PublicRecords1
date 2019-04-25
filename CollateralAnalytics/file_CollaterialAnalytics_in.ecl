@@ -1,0 +1,2 @@
+﻿EXPORT file_CollaterialAnalytics_in := dataset('~thor_data400::in::collateralanalytics::sprayed',
+                           CollateralAnalytics.layouts.raw,csv(SEPARATOR('\t'),TERMINATOR(['\n','\r','\r\n']),heading(1)));

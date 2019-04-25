@@ -1006,6 +1006,7 @@ USE KELOtto.fraudgovshared(FLAT,
 		PrimaryName = clean_address.prim_name,
 		Suffix =clean_address.addr_suffix,
 		Postdirectional = clean_address.postdir,
+		Postdirectional = clean_address.postdir,
 		Zip = clean_address.zip,
 		SecondaryRange = clean_address.sec_range,
     EventDate = event_date,
@@ -1172,9 +1173,9 @@ Event: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCus
 Event: => PersonEntityContextUid := Subject.EntityContextUid;
 Event: => CustomerId := rCustomer.CustomerId;
 Event: => IndustryType := rCustomer.IndustryType;
-Event: => DeceasedPriorToEvent := MAP(Subject.Deceased = 1 AND Subject.DeceasedDate < EventDate => 1, 0);
+Event: => DeceasedPriorToEvent := MAP(Subject.DeceasedMatch = 1 AND Subject.DeceasedDate < EventDate => 1, 0);
 Event: => EventYearMonth := INTEGER(EventDate) DIV 100;
-Event: => DeceasedToEventYearDiff := YEARSBETWEEN(EventDate, Subject.DeceasedDate);
+Event: => DeceasedToEventYearDiff := MAP(Subject.DeceasedMatch = 1 => YEARSBETWEEN(EventDate, Subject.DeceasedDate), 0);
 Event: => AddressEntityContextUid := Location.EntityContextUid;
 Event: => PersonLabel := Subject.Label;
 Event: => FullAddress := Location.FullAddress;
@@ -1205,7 +1206,6 @@ Event: => KrLowRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['200','201','293
 Event: => KrHighRiskBankFlag := MAP(bank_account_1_risk_code != 0 OR bank_account_2_risk_code != 0 OR COUNT(EventTypes(EventType IN ['800','891']))>0 => 1, 0);
 Event: => KrMediumRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['801','802','892']))>0 => 1, 0);
 Event: => KrLowRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['893','890']))>0 => 1, 0);
-
 
 Event: => DemoCustomer := rCustomer.CustomerId IN ['248283691','248283681','248283671'];
 Event: => Age := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
