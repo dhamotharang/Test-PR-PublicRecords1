@@ -54,9 +54,7 @@ FUNCTION
 											,Orbit3.proc_Orbit3_CreateBuild ('Death Master SSA',filedate, 'N|B')
 											,Orbit3.proc_Orbit3_CreateBuild ('FCRA_Death Master',filedate,'F')
 											,Orbit3.proc_Orbit3_CreateBuild ('FCRA_Death Master SSA',filedate,'F')
-											,header.proc_OrbitI_CreateBuild_Death(filedate)
-											,header.proc_OrbitI_CreateBuild_Death(filedate,'FCRA')	
-										): SUCCESS(sendSuccMsg), FAILURE(sendFailMsg);
+												): SUCCESS(sendSuccMsg), FAILURE(sendFailMsg);
 	RETURN result;
 	
 END;
