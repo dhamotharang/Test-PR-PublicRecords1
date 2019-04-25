@@ -1223,6 +1223,9 @@
 				trim(kword, left, right) = 'DKDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKDPA,
 				trim(kword, left, right) = 'NLDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLDPA,
 				trim(kword, left, right) = 'NODPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NODPA,
+				trim(kword, left, right) = 'CZDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_CZDPA,
+				trim(kword, left, right) = 'HUDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_HUDPA,
+				trim(kword, left, right) = 'ICDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ICDPA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
