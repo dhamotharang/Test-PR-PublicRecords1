@@ -1,0 +1,145 @@
+﻿lay:=RECORD
+  integer8 inputuidappend;
+  string65 inputaccountecho;
+  integer7 inputlexidecho;
+  string78 inputfirstnameecho;
+  string120 inputstreetecho;
+  string50 inputcityecho;
+  string25 inputstateecho;
+  string10 inputzipecho;
+  string16 inputhomephoneecho;
+  string16 inputworkphoneecho;
+  string54 inputemailecho;
+  string20 inputarchivedateecho;
+  string1 inputaccountechopop;
+  string1 inputlexidechopop;
+  string1 inputfirstnameechopop;
+  string1 inputstreetechopop;
+  string1 inputcityechopop;
+  string1 inputstateechopop;
+  string1 inputzipechopop;
+  string1 inputhomephoneechopop;
+  string1 inputworkphoneechopop;
+  string1 inputemailechopop;
+  string1 inputarchivedateechopop;
+  integer7 lexidappend;
+  integer2 lexidscoreappend;
+  string5 inputprefixclean;
+  string20 inputfirstnameclean;
+  string5 inputsuffixclean;
+  string10 inputprimaryrangeclean;
+  string3 inputpredirectionclean;
+  string28 inputprimarynameclean;
+  string4 inputaddresssuffixclean;
+  string3 inputpostdirectionclean;
+  string10 inputunitdesigclean;
+  string8 inputsecondaryrangeclean;
+  string25 inputcityclean;
+  string3 inputstateclean;
+  string5 inputzip5clean;
+  string4 inputzip4clean;
+  string10 inputlatitudeclean;
+  string11 inputlongitudeclean;
+  string3 inputcountyclean;
+  string7 inputgeoblockclean;
+  string3 inputaddresstypeclean;
+  string4 inputaddressstatusclean;
+  string54 inputemailclean;
+  string10 inputhomephoneclean;
+  string10 inputworkphoneclean;
+  string20 inputarchivedateclean;
+  string3 inputprefixcleanpop;
+  string3 inputfirstnamecleanpop;
+  string3 inputsuffixcleanpop;
+  string3 inputprimaryrangecleanpop;
+  string3 inputpredirectioncleanpop;
+  string3 inputprimarynamecleanpop;
+  string3 inputaddresssuffixcleanpop;
+  string3 inputpostdirectioncleanpop;
+  string3 inputunitdesigcleanpop;
+  string3 inputsecondaryrangecleanpop;
+  string3 inputcitycleanpop;
+  string3 inputstatecleanpop;
+  string3 inputzip5cleanpop;
+  string3 inputzip4cleanpop;
+  string3 inputlatitudecleanpop;
+  string3 inputlongitudecleanpop;
+  string3 inputcountycleanpop;
+  string3 inputgeoblockcleanpop;
+  string3 inputaddresstypecleanpop;
+  string3 inputaddressstatuscleanpop;
+  string3 inputemailcleanpop;
+  string3 inputhomephonecleanpop;
+  string3 inputworkphonecleanpop;
+  string3 inputarchivedatecleanpop;
+  integer2 felonycnt1y;
+  integer2 felonycnt7y;
+  string felonynew1y;
+  string felonyold1y;
+  string felonynew7y;
+  string felonyold7y;
+  integer1 monsincenewestfelonycnt1y;
+  integer1 monsinceoldestfelonycnt1y;
+  integer1 monsincenewestfelonycnt7y;
+  integer1 monsinceoldestfelonycnt7y;
+  integer2 nonfelonycnt1y;
+  integer2 nonfelonycnt7y;
+  string nonfelonynew1y;
+  string nonfelonyold1y;
+  string nonfelonynew7y;
+  string nonfelonyold7y;
+  integer1 monsincenewestnonfelonycnt1y;
+  integer1 monsinceoldestnonfelonycnt1y;
+  integer1 monsincenewestnonfelonycnt7y;
+  integer1 monsinceoldestnonfelonycnt7y;
+  integer2 arrestcnt1y;
+  integer2 arrestcnt7y;
+  string arrestnew1y;
+  string arrestold1y;
+  string arrestnew7y;
+  string arrestold7y;
+  integer1 monsincenewestarrestcnt1y;
+  integer1 monsinceoldestarrestcnt1y;
+  integer1 monsincenewestarrestcnt7y;
+  integer1 monsinceoldestarrestcnt7y;
+  integer2 crimcnt1y;
+  integer2 crimcnt7y;
+  string crimnew1y;
+  string crimold1y;
+  string crimnew7y;
+  string crimold7y;
+  integer1 monsincenewestcrimcnt1y;
+  integer1 monsinceoldestcrimcnt1y;
+  integer1 monsincenewestcrimcnt7y;
+  integer1 monsinceoldestcrimcnt7y;
+  string crimseverityindex7y;
+  string crimbehaviorindex7y;
+  string errorcode;
+ END;
+
+
+
+new_logical_file_name:='~calbrecht::out::vault::fcra::criminal_100kw20181108-174350';
+old_logical_file_name:='~cdal::out::publicrecs::fcra::criminal_100kw20181108-173923';
+
+unique_id:='inputaccountecho';
+
+new_Tag:= regexreplace('~',new_logical_file_name,'');
+old_Tag:= regexreplace('~',old_logical_file_name,'');
+// new_Tag:= new_logical_file_name;
+// old_Tag:= old_logical_file_name;
+
+sample_size:=0;
+   
+new_input_file := dataset(new_logical_file_name ,Lay,CSV(HEADING(single), QUOTE('"')));
+old_input_file := dataset(old_logical_file_name ,Lay,CSV(HEADING(single), QUOTE('"')));
+
+new_input_file_records:= if(sample_size=0, choosen(new_input_file,all),choosen(new_input_file,sample_size) );
+old_input_file_records:= if(sample_size=0, choosen(old_input_file,all),choosen(old_input_file,sample_size) );
+   
+ 
+Distribution_comparison_report:=Kel_Shell_QA.PSI_Compare_Macro(unique_id, new_input_file_records, old_input_file_records, new_Tag, old_Tag);
+
+sequential(Distribution_comparison_report);
+
+EXPORT BWR_PSI_Compare_Macro := 'todo';
