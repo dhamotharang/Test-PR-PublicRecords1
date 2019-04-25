@@ -112,8 +112,8 @@ IMPORT ut, Risk_Indicators, riskwise, models;
 		
 		Soap_out := 	soapcall(soap_input, roxieIP,
 						'Risk_Indicators.InstantID', {soap_input}, 
-						DATASET(layout_Soap_output), RETRY(3), TIMEOUT(120), LITERAL,
-						XPATH('Risk_Indicators.InstantIDResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+						DATASET(layout_Soap_output), RETRY(3), TIMEOUT(120), //LITERAL,
+						//XPATH('Risk_Indicators.InstantIDResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
 						PARALLEL(threads), onFail(myFail(LEFT)));
 			
 		RETURN Soap_out;

@@ -1,7 +1,7 @@
 ﻿EXPORT BocaShell_50_nonFCRA_cert_MACRO( bs_version, nonfcraroxie_IP,neutralroxie_IP, Thread, Timeout, Retry, Input_file_name,Output_file_name, records_ToRun, retro_date = 999999):= functionmacro
 
 
-IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
+IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Scoring_Project_PIP;
 
 unsigned8 no_of_records := records_ToRun;
 integer retry := retry;
@@ -106,7 +106,7 @@ END;
 p_f := Distribute(PROJECT (ds_input, assignAccount (LEFT,COUNTER)), random());
 
 										
-s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+s := Scoring_Project_PIP.test_BocaShell_SoapCall  (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, threads);
 
 riskprocessing.layouts.layout_internal_shell_noDatasets getold(s le, l ri) :=	TRANSFORM

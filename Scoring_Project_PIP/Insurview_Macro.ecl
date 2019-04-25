@@ -16,6 +16,10 @@ import risk_indicators, riskwise, ut, iesp,  iss, scoring_project_PIP, gateway, 
 		dt1_1 := ut.getdate;
 		// dt1_1 := c_file_name1[length(c_file_name1)-9.. length(c_file_name1)-2];
 
+		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		// PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		// integer FFD := 1;	
+
 		//*********** SETTINGS ********************************
 
 		DPM:=Scoring_Project_PIP.User_Settings_Module.Insurview_FCRA_settings.DPM;
@@ -118,7 +122,9 @@ soapLayout intoSOAP(Input le, UNSIGNED4 c) := TRANSFORM
 	
 	option := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.fcrainsurviewattributes.t_FCRAInsurViewAttributesOptions,
 						SELF.IntendedPurpose := '';					
-						SELF.RequestedAttributeGroups := dataset([{'version4'}], iesp.share.t_StringArrayItem);				
+						SELF.RequestedAttributeGroups := dataset([{'version4'}], iesp.share.t_StringArrayItem);			
+						// self.FFDOptionsMask := (string)FFD;
+
 						SELF := []));
 	
 	users := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User,
@@ -139,6 +145,8 @@ soapLayout intoSOAP(Input le, UNSIGNED4 c) := TRANSFORM
 
   self.HistoryDateYYYYMM := (unsigned) le.historydateyyyymm;
 	SELF.Gateways := riskwise.shortcuts.gw_FCRA;
+	// SELF.Gateways := DATASET([{'neutralroxie', NeutralRoxieIP}, // TransUnion Gateway
+					// {'delta_personcontext', PCG_Dev}], Risk_Indicators.Layout_Gateways_In);
 END;
 soapInput := PROJECT(SeqInput, intoSOAP(LEFT, COUNTER));//DISTRIBUTE(PROJECT(Input, intoSOAP(LEFT, COUNTER)), RANDOM());
 

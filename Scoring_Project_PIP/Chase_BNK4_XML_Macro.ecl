@@ -17,6 +17,7 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 		DPPA:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_XML_Chase_BNK4_settings.DPPA;
 		GLB:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_XML_Chase_BNK4_settings.GLB;
 		DRM:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_XML_Chase_BNK4_settings.DRM;
+		DPM:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_XML_Chase_BNK4_settings.DPM;
     HISTORYDATE := 999999;
 			
 		//*****************************************************
@@ -58,6 +59,7 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 			self.dppapurpose := DPPA;
 			self.glbpurpose := GLB;
 			self.DataRestrictionMask := DRM;
+			self.DataPermissionMask := DPM;
 			self := le;
 			self := [];
 		end;
@@ -84,7 +86,8 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 						'RiskWise.RiskWiseMainBC1O', {soap_in}, 
 						DATASET(Global_output_lay),
 						RETRY(retry), TIMEOUT(timeout), LITERAL,
-						XPATH('RiskWise.RiskWiseMainBC1OResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+						XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
+						// XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 						PARALLEL(threads), onFail(myFail(LEFT)));
 
 
@@ -105,8 +108,9 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 		res := JOIN(did_results, ds_slim, left.acctno = right.acctno, did_append(left, right),right outer);
 							
 		Global_output_lay internal_extras_append(res l, soap_in r) := TRANSFORM
-						  self.DID := l.did; 
-							self.historydate := (string)r.HistoryDateYYYYMM;
+						  self.DID := l.did; 							
+							self.errorcode:=l.errorcode;
+  						self.historydate := (string)r.HistoryDateYYYYMM;
 							self.FNamePop := r.first<>'';
 							self.LNamePop := r.last<>'';
 							self.AddrPop := r.addr<>'';
@@ -119,12 +123,14 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 						  self := [];
 					END;
 						
-		ds_with_extras:=join(res,soap_in,left.acctno=(string)right.acctno ,internal_extras_append(left, right));	
+		ds_with_extras:=join(res,soap_in,left.acctno=(string)right.acctno 
+																		,internal_extras_append(left, right));	
 
     //final file out to thor
 
-		final_output := output(ds_with_extras,,outfile_name, thor, compressed, OVERWRITE);
-
-		RETURN final_output;
+		output(ds_with_extras,,outfile_name, thor, compressed, OVERWRITE);
+		output(ds_with_extras,,outfile_name +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));
+			 
+	  RETURN 0;
 
 ENDMACRO;

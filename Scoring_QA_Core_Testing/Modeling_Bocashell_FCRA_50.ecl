@@ -11,7 +11,7 @@
 //   check that the data restrictions are set appropriately, specifically  EN and EQ
 //   eyeball is how many records you want to see on output, similar to record_limit except this is your intermediate result output count
 
-IMPORT Risk_Indicators, RiskWise, riskprocessing, ut;
+IMPORT Risk_Indicators, RiskWise, riskprocessing, ut, Scoring_Project_PIP;
 
 unsigned record_limit :=   RecordsToRun;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := Threads;  //number of parallel soap calls to make [1..30]
@@ -82,7 +82,7 @@ layout_input := RECORD
 // Neutral service ip
 // roxie_IP := RiskWise.Shortcuts.prod_batch_neutral;    // Roxiebatch
 // roxie_IP := RiskWise.Shortcuts.staging_neutral_roxieIP;  
-// roxie_IP := riskwise.shortcuts.core_roxieIP;  
+// roxie_IP := riskwise.shortcuts.core_97_roxieIP;  
 roxie_IP := NeutralRoxie;  
 
 // FCRA service settings
@@ -151,7 +151,7 @@ p_f := p_f1 + p_f4;
 // p_f := p_f4;     // this runs only in current mode
 // Out2 := output(choosen(p_f, eyeball), named('FCRA_BSInput'));
 
-s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+s :=Scoring_Project_PIP.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 		
 riskprocessing.layouts.layout_internal_shell_noDatasets getold(s le, l ri) :=	TRANSFORM

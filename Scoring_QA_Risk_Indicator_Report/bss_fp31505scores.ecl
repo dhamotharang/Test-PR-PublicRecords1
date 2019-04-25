@@ -3,7 +3,7 @@
 import ut,std;
 // import RiskView_Attributes_Reports;
 
-import Scoring_Project_Macros,scoring_project_pip,Scoring_Project_DailyTracking,zz_bbraaten2;
+import Scoring_Project_Macros,scoring_project_pip,Scoring_Project_DailyTracking;
 	a:= ut.GetDate;
 fn_LastTwoMonths(string10 date_inp,integer offset) := function
 res  := GLOBAL(ut.DateFrom_DaysSince1900(ut.DaysSince1900(date_inp[1..4], date_inp[5..6], date_inp[7..8]) - offset));
@@ -111,7 +111,7 @@ ip:='~';
 																				'BSS_RiskIndicatorDistribution_FP31505' + curr_date + '_vs_' + prev_date + '.csv',
 																				 ,
 																				 ,
-																				 'karthik.reddy@lexisnexis.com')   	
+																				 'Scoring_QA@risk.lexisnexis.com')   	
 	          
   
 	);

@@ -16,12 +16,13 @@ end;
 
 b:=fn_LastTwoMonths(a,1);
 	a1:= a +'_1';
+	// a1:= '20180601_1';
 
 
 b1:=b +'_1';
+// b1:='20180531_1';
 
-// ip:=ut.foreign_prod_boca;
-// ip:=ut.foreign_dataland_boca;
+
 ip:='~';
 						
 	  // rpt1:=Scoring_QA.FCRA_RiskView_xml_generic_attributes_v3(ip,a1,b1);
@@ -501,7 +502,7 @@ ip:='~';
 																				'BSS_AttributeDistributionShifts_' + a1 + '_vs_' + b1 + '.csv',
 																				 ,
 																				 ,
-																				 'karthik.reddy@lexisnexis.com') ;  	
+																				 'Scoring_QA@risk.lexisnexis.com') ;  	
 	          
   	 send_file1:=	
  	 fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.BSS_Capone_Specific_Success_list,
@@ -513,7 +514,7 @@ ip:='~';
 																				'BSS_AttributeDistributionShifts_' + a1 + '_vs_' + b1 + '.csv',
 																				 ,
 																				 ,
-																				 'karthik.reddy@lexisnexis.com') ;  	
+																				 'Scoring_QA@risk.lexisnexis.com') ;  	
 	          
 
    

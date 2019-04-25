@@ -6,7 +6,7 @@ import RiskView_Attributes_Reports;
 import Scoring_Project_Macros,scoring_project_pip,Scoring_Project_DailyTracking, scoring_QA;
 
 import ut,std;
-import RiskView_Attributes_Reports,zz_bbraaten2;
+import RiskView_Attributes_Reports;
 
 	a:= ut.GetDate;
 	
@@ -17,14 +17,14 @@ end;
 
 b:=fn_LastTwoMonths(a,1);
 	a1:= a +'_1';
-	// a1 := '20170803_test3';
+	// a1:= '20180601_1';
 
 
 b1:=b +'_1';
-// b1 :='20170803_test2';
-// Scoring_QA_New_Bins.Test_FCRA_Attributes
-// ip:=ut.foreign_prod_boca;
-// ip:=ut.foreign_dataland_boca;
+// b1:='20180531_1';
+
+
+// ip:='~';
 ip:='~';
 						
 	  rpt1:=Scoring_QA_New_Bins.test_rvv3_generic_xml_attr_report(ip,a1,b1);
@@ -479,13 +479,13 @@ rpt24:=Scoring_QA_New_Bins.test_rvv3_experian_batch_attr_report(ip,a1,b1);
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ a1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + a1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + a1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt1,rpt2,rpt3,rpt4,rpt24,rpt25,rpt27,rpt28) );
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt1,rpt2,rpt3,rpt4,rpt24,rpt25,rpt27) );
                 																		 
          old_bins:= if( not NOTHOR(STD.File.FileExists('~scoringqa::bss::stats::'+ b1) and STD.File.FileExists('~scoringqa::bss::averages::'+ b1)  and
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ b1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + b1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + b1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt1_1,rpt2_1,rpt3_1,rpt4_1,rpt24_1,rpt25_1,rpt27_1,rpt28_1) );
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt1_1,rpt2_1,rpt3_1,rpt4_1,rpt24_1,rpt25_1,rpt27_1) );
 
          
 	 send_file:=	
@@ -498,7 +498,7 @@ rpt24:=Scoring_QA_New_Bins.test_rvv3_experian_batch_attr_report(ip,a1,b1);
 																				'FCRA_AttributeDistributionShifts_' + a1 + '_vs_' + b1 + '.csv',
 																				 ,
 																				 ,
-																				 'karthik.reddy@lexisnexis.com') ;  	
+																				 'Scoring_QA@risk.lexisnexis.com') ;  	
 	          
   	 send_file1:=	
  	 fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.BSS_Capone_Specific_Success_list,
@@ -510,7 +510,7 @@ rpt24:=Scoring_QA_New_Bins.test_rvv3_experian_batch_attr_report(ip,a1,b1);
 																				'FCRA_AttributeDistributionShifts_' + a1 + '_vs_' + b1 + '.csv',
 																				 ,
 																				 ,
-																				 'karthik.reddy@lexisnexis.com') ;  	
+																				 'Scoring_QA@risk.lexisnexis.com') ;  	
 	          
 
    

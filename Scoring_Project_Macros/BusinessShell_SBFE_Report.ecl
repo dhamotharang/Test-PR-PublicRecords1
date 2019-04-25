@@ -3,12 +3,11 @@
 #OPTION('AllowAutoSwitchQueue', true);
 #option('allowedClusters', 'thor50_dev02,thor50_dev');
 
-
 import ut;
 import std;
 import scoring_project;
-import deurlein_jon; 
-import Scoring_Project_Macros, Scoring_Project_DailyTracking;
+
+import Scoring_Project_Macros, Scoring_Project_DailyTracking, Scoring_QA_New_Bins;
 
 dt := ut.getdate;
 
@@ -219,7 +218,7 @@ END;
          			
 //***************************************************//							
 							
- distro :=  SEQUENTIAL(out_file,	fileservices.SendEmailAttachText('bridgett.braaten@lexisnexis.com;Matthew.Ludewig@lexisnexisrisk.com;Joseph.Nassar@lexisnexisrisk.com;nathan.koubsky@lexisnexis.com;benjamin.karnatz@lexisnexis.com;apaar.sinha@lexisnexis.com;Haley.Vicchio@lexisnexis.com; lea.smith@lexisnexis.com',					
+ distro :=  SEQUENTIAL(out_file,	fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.business_reports_detailed,					
 					   'BusinessShell SBFE Attribute Distribution Report',
 																				'BusinessShell SBFE Attribute Distribution Report '+ dt1_1 + ' vs ' + dt2_1 + '\n Please view attachment.',
 																				 XtabOut[no_of_records].line ,
@@ -227,7 +226,7 @@ END;
 																				'BusinessShell SBFE Attributes Comparing ' + dt1_1 + '_vs_' + dt2_1 + '.csv',
 																				 ,
 																				 ,
-																				 'Jonathan.Deurlein@lexisnexis.com'));
+																				 'Scoring_QA@risk.lexisnexis.com'));
 
 
 final := sequential( filenames_details1, new_bins_remove_file,old_bins_remove_file,new_bins,old_bins,distro):

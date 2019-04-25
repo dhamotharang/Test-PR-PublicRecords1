@@ -1,6 +1,6 @@
 ﻿EXPORT Runway_Macro_Join_Code(dt) := functionmacro
 
-IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, zz_Koubsky, Scoring_Project_Macros, ut;
+IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT,  Scoring_Project_Macros, ut;
 
 // Test settings
 unsigned8 records_ToRun := 50000;
@@ -13,8 +13,7 @@ String neutralroxie_IP := RiskWise.shortcuts.staging_neutral_roxieIP;
 String roxieIP := Riskwise.shortcuts.staging_fcra_roxieIP ;
 
 // dt := ut.GetDate;
-tag:=ut.foreign_prod;
-
+tag:='~foreign::' + '10.173.44.105' + '::';
 nonfcra_bs_out_file_curr := tag + 'scoringqa::out::nonfcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
 fcra_bs_out_file_curr := tag + 'scoringqa::out::fcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
 

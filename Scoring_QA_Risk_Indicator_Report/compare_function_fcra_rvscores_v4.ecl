@@ -1,6 +1,6 @@
 ﻿EXPORT compare_function_fcra_rvscores_v4(route,current_dt,previous_dt) := functionmacro
 
-
+//rvp1104_0 8/15 deprecated depmsey
 file1:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Scores_V4_XML_Generic_outfile + previous_dt,  Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_V4_Global_Layout,
 
 thor);
@@ -75,16 +75,16 @@ mr:= c21 + c22 + c23 + c24 + c25;
 
 Scoring_QA_Risk_Indicator_Report.functions.count_function1(mr,'money_reason',mr_1);
 
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_prescreen_reason',c26);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_prescreen_reason',c26);
       
-	pr:= c26;
+	// pr:= c26;
 
-Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr,'prescreen_reason',pr_1);
+// Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr,'prescreen_reason',pr_1);
 				
 			  	
        	 
 						 
-				score_file1:=	ar_1  + br_1 + rr_1+	tr_1 + mr_1 + pr_1;
+				score_file1:=	ar_1  + br_1 + rr_1+	tr_1 + mr_1 ;
 						 
 			////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////
@@ -146,16 +146,16 @@ mr2:= cc21 + cc22 + cc23 + cc24 + cc25;
 
 Scoring_QA_Risk_Indicator_Report.functions.count_function1(mr2,'money_reason',mr_2);
 
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_prescreen_reason',cc26);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_prescreen_reason',cc26);
       
-pr2:= cc26;
+// pr2:= cc26;
 
-Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr2,'prescreen_reason',pr_2);
+// Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr2,'prescreen_reason',pr_2);
 			  	
 			
 	    
 						 
-						score_file2:=	ar_2  + br_2 + rr_2+	tr_2 + mr_2 + pr_2;	 
+						score_file2:=	ar_2  + br_2 + rr_2+	tr_2 + mr_2 ;	 
 						 
 		    compare_layout := RECORD
    		   string file_version;

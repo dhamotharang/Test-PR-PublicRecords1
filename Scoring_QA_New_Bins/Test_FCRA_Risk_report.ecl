@@ -122,7 +122,7 @@ ip:='~';
 																				'FCRA_BSS_RiskIndicatorDistribution_' + curr_date + '_vs_' + prev_date + '.csv',
 																				 ,
 																				 ,
-																				 'karthik.reddy@lexisnexis.com')   	
+																				 'Scoring_QA@risk.lexisnexis.com')   	
 	          
   
 	);

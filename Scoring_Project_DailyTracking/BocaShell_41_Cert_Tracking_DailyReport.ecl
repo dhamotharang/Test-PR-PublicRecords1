@@ -307,7 +307,7 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 
 		head_cert_archive := DATASET([{1,    
 														'Environment:  CERT - FCRA'	+ '\n'
-													+ 'Archive date:  201207' + '\n'
+													+ 'Archive date:  201607' + '\n'
 													+ 'Previous run date:  ' + cleaned_prev_arch_date + '\n'
 													+ 'Current run date:  ' + cleaned_curr_arch_date + '\n' 
 													+ 'Previous record count:  ' + COUNT(ds_prev_archive) + '\n'
@@ -336,7 +336,7 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 
 		head_prod_archive := DATASET([{1,    
 														'Environment:  CERT - NONFCRA'	+ '\n'
-													+ 'Archive date:  201207' + '\n'
+													+ 'Archive date:  201607' + '\n'
 													+ 'Previous run date:  ' + cleaned_nonfcra_prev_date_arch + '\n'
 													+ 'Current run date:  ' + cleaned_nonfcra_curr_date_arch + '\n' 
 													+ 'Previous record count:  ' + COUNT(nonfcra_ds_prev_arch) + '\n'

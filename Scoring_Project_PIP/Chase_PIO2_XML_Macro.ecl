@@ -19,7 +19,8 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 		DPPA:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_XML_Chase_PIO2_settings.DPPA;
 		GLB:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_XML_Chase_PIO2_settings.GLB;
 		DRM:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_XML_Chase_PIO2_settings.DRM;
-		ISFCRA :=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_XML_Chase_PIO2_settings.isFCRA;
+		DPM:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_XML_Chase_PIO2_settings.DPM;
+		// ISFCRA :=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_XML_Chase_PIO2_settings.isFCRA;
 		HISTORYDATE := 999999;
 
     //*****************************************************
@@ -52,6 +53,8 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 			self.historydateyyyymm := historydate;
 			self.dppapurpose := dppa;
 			self.glbpurpose := glb;
+			self.datarestrictionmask := drm;
+			self.DataPermissionMask := dpm;
 			self := le;
 			self := [];
 		end;
@@ -74,14 +77,14 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 
     //*********** PERFORMING SOAPCALL TO ROXIE ************
 		
-		serviceName := if(isFCRA, 'RiskWiseFCRA.RiskWiseMainPRIO', 'RiskWise.RiskWiseMainPRIO');
-		ip := if(isFCRA, fcraRoxie, roxieIP);
+		// serviceName := if(isFCRA, 'RiskWiseFCRA.RiskWiseMainPRIO', 'RiskWise.RiskWiseMainPRIO');
+		// ip := if(isFCRA, fcraRoxie, roxieIP);
 		
-		Soap_output := SOAPCALL(soap_in, ip,
-						serviceName, {soap_in}, 
+		Soap_output := SOAPCALL(soap_in, roxieIP,
+						'RiskWise.riskwisemainprio', {soap_in}, 
 						DATASET(Global_output_lay),
-						RETRY(retry), TIMEOUT(timeout), LITERAL,
-						XPATH(serviceName + 'Response/Results/Result/Dataset[@name=\'Results\']/Row'),
+						RETRY(retry), TIMEOUT(timeout), 
+						XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 						PARALLEL(threads), onFail(myFail(LEFT)));
 
 
@@ -119,8 +122,9 @@ IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
 		ds_with_extras:=join(res,soap_in,left.acctno=(string)right.acctno ,internal_extras_append(left, right));	
 								 
 		 //final file out to thor
-		 final_output := output(ds_with_extras,, outfile_name, thor,compressed, OVERWRITE);
-
-		RETURN final_output;
+		 output(ds_with_extras,, outfile_name, thor,compressed, OVERWRITE);
+		 output(ds_with_extras,, outfile_name +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));
+		
+		RETURN 0;
 
 ENDMACRO;

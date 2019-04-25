@@ -2,11 +2,12 @@
 #workunit('name','BIID_Batch');
 
 import IntlIID;
+		import  zz_bbraaten, Scoring_Project_Macros, ut, zz_Koubsky_SALT,SALT23;
 
 
-fileLocation2 := '~bbraaten::chasebiid_clean.txt';
-filein2 := '~scoring_project::in::biid_batch_chase_generic_20150824';
-fileout :='~bbraaten::in::IID_Batch_Chase_test';
+fileLocation2 := '~bbraaten::chasebiid_clean';
+filein2 := '~scoring_project::in::biid_batch_chase_generic_20170330';
+fileout :='~bbraaten::in::BIID_Batch_Chase_test';
 eyeball := 50;
 
 
@@ -20,18 +21,20 @@ inputstructure := record
   string zip4_2;
 	string fein;
   string phoneno;
-	string firstname;
-  string middlename;
-  string lastname;
+	// string firstname;
+  // string middlename;
+  // string lastname;
+  string Rep_Name;
   string streetaddress;
   string city;
   string state;
-  string zip;
+  string zip_5;
+  string zip_4;
 	string ssn;
   string dateofbirth;
   string dlnumber;
   string dlstate;
-	string workphone;
+	// string workphone;
   string email;
 
 	end;
@@ -57,23 +60,29 @@ FindMaxAccount := choosen(sort(OriginalData, -accountnumber), 5);
 MaxAccount := max(FindMaxAccount, accountnumber);
 output(MaxAccount, named('maxaccount'));
 
-Output_structure batchlay(inputStructure l, integer c) := TRANSFORM
+
+
+Output_structure batchlay(inputStructure le ) := TRANSFORM
 	self.Date_added := (Integer)ut.getdate;
-	self.accountnumber := c + MaxAccount;
-	self.perm_flag := 5;	
+	// self.accountnumber := c + MaxAccount;
+	// self.perm_flag := 5;	
 	self.customer := 'Chase 1560585';
 	self.Source_Info := 'BIID Batch Logs';
+  self.firstname := StringLib.StringGetNthWord(le.rep_name, 1);
+  self.middlename := if(StringLib.StringGetNthWord(le.rep_name, 3) = '', '', StringLib.StringGetNthWord(le.rep_name, 2));
+  self.lastname := if(StringLib.StringGetNthWord(le.rep_name, 3) = '', StringLib.StringGetNthWord(le.rep_name, 2), StringLib.StringGetNthWord(le.rep_name, 3));
+  self.Zip := le.z5_2 + le.zip4_2;
 		self.history_date := 999999;
 		self.historydateyyyymm := 999999;
 
-	self := l;
+	self := le;
 	SELF := [];
 END;
 
 
 
 
-BIID := project(inputData, batchlay(left, counter));
+BIID := project(inputData, batchlay(left));
 OUTPUT(CHOOSEN(BIID, eyeball), NAMED('BIID_input'));
 output(count(BIID), named('BIID_count'));
 
@@ -109,18 +118,17 @@ keepers_1_4 := OriginalData(perm_flag = 4);
 output(count(keepers_1_4));
 
 
-keepers := sort(keepers_1_0+keepers_1_3+keepers_1_4, date_added);
+keepers := sort(keepers_1_0+keepers_1_2+keepers_1_3+keepers_1_4, date_added);
 output(count(keepers), named('keepers'));
 
-Output_structure Rearrange(output_structure l, integer c) := TRANSFORM
-	self.Perm_Flag := If(l.perm_flag <= 0, 0, l.perm_flag - 2);  	
-	self.history_date := 999999;
-	self.historydateyyyymm := 999999;
-	self := l;
+Output_structure Rearrange(output_structure le ) := TRANSFORM
+	self.Perm_Flag := If(le.perm_flag <= 0, 0, le.perm_flag - 1);  	
+
+	self := le;
   self := [];
 END;
 
-Reflagged_Logs2 := project(keepers, Rearrange(left, counter));
+Reflagged_Logs2 := project(keepers, Rearrange(left));
 output(choosen(Reflagged_Logs2, eyeball), named('Reflagged_Logs2'));
 output(count(keepers), named('Reflagged_Logs2_count'));
 
@@ -145,23 +153,24 @@ New_right := join(Reflagged_Logs2, DedupedData,  left.name_company = right.name_
 output(New_right, named('New_right'));
 
 
-new_large_sample := Reflagged_Logs2 + New_right; //add "new_right" to old dataset;
-output(count(new_large_sample), named('new_large_sample_count'));
+// new_large_sample := Reflagged_Logs2 + New_right; //add "new_right" to old dataset;
+// output(count(new_large_sample), named('new_large_sample_count'));
 
 
-sort_large_sample := Sort(new_large_sample, name_company, Date_added); //sort by date added for dedup
+// sort_large_sample := Sort(new_large_sample, name_company, Date_added); //sort by date added for dedup
 
-deduped_new := sort_large_sample(Date_added = (Integer)ut.getdate);  //seperates new and old records by date;
-dedupold:= sort_large_sample(Date_added <> (Integer)ut.getdate);
+deduped_new := New_right(Date_added = (Integer)ut.getdate);  //seperates new and old records by date;
+// dedupold:= sort_large_sample(Date_added <> (Integer)ut.getdate);
 
 
-ut.MAC_Pick_Random(deduped_new,New_5000,10000);   //grabs 5000 of new deduped rocrods;
+ut.MAC_Pick_Random(deduped_new,New_5000,5000);   //grabs 5000 of new deduped rocrods;
 output(New_5000, named('New_5000'));
 output(count(New_5000), named('New_5000_count'));
 
-Output_structure renumber(Output_structure l, integer c) := TRANSFORM
-		self.perm_flag := if(c <= 5000, 3,4);	
-	self := l;
+Output_structure renumber(Output_structure le, integer c) := TRANSFORM
+	self.accountnumber := c + (integer)MaxAccount;
+	self.perm_flag := 4;	
+	self := le;
 	SELF := [];
 END;
 
@@ -172,13 +181,13 @@ output(count(new_records), named('new_records_count'));
 
 
 
-New_Test_Sample := dedupold + new_records ; //adds back to old file;
+New_Test_Sample := Reflagged_Logs2 + new_records ; //adds back to old file;
 output(New_Test_Sample, named('New_Test_Sample'));
 output(count(New_Test_Sample), named('New_Test_Sample_count'));
 
 
 Sorted_Sample := Sort(New_Test_Sample, perm_flag, date_added);
-OUTPUT(choosen(Sorted_Sample, 25000),,fileout, thor, expire(18), overwrite);
+OUTPUT(choosen(Sorted_Sample, 25000),,fileout, thor,  overwrite);
 
 
 final_salt := choosen(Sorted_Sample, 25000);

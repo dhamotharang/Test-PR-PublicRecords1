@@ -1,0 +1,30 @@
+﻿import riskwise;
+
+export Layout_FLGOFLG1 := record
+	string account := '';
+	string first := '';
+	string last := '';
+	string addr := '';
+	string city := '';
+	string state := '';
+	string zip := '';
+	string hphone := '';
+	string socs := '';
+	string dob := '';
+	string wphone := '';
+	string drlc := '';
+	string drlcstate := '';
+	STRING30 account2 := '';
+	STRING32 riskwiseid := '';
+	STRING1 	hriskphoneflag := '';
+	STRING1 	phonevalflag := '';
+	STRING1 	phonezipflag := '';
+	STRING1 	hriskaddrflag := '';
+	STRING1 	decsflag := '';
+	STRING1 	socsdobflag := '';
+	STRING1 	socsvalflag := '';
+	STRING1 	drlcvalflag := '';
+	STRING1 	areacodesplitflag := '';
+	STRING1 	addrvalflag := '';
+	STRING1 	dwelltypeflag := '';
+end;

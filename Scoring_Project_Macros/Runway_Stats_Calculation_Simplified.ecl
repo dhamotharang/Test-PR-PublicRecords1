@@ -40,6 +40,7 @@ prev_222_count := sum(group,final_jn.prev_222);
 end;
 
 stats_tab := TABLE(final_jn, stats_lay, final_jn.field_name);
+sorted_stats_tab := sort(stats_tab, score_name);
 
 match_count := count(ds_curr);
 
@@ -71,9 +72,9 @@ self.Total_222_Change := '';
 end;
 
 res_join := JOIN(curr_avg, prev_avg, left.score_name = right.score_name, xfrm1(left, right));
+sorted_res_join := Sort(res_join, score_name);
 
-
-stats_layout xfrm2 (res_join l, stats_tab r) := transform
+stats_layout xfrm2 (sorted_res_join l, sorted_stats_tab r) := transform
 self.Percent_Change := (r.difference_count / match_count)*100;
 self.Percent_Increase := (r.increase_count / match_count)*100;
 self.Percent_Decrease := (r.decrease_count / match_count)*100;
@@ -81,7 +82,7 @@ self.Total_222_Change := IF(std.str.startswith(l.score_name, 'rv'),(string)(r.cu
 self := l;
 end;
 
-final_result := JOIN(res_join, stats_tab, left.score_name = right.score_name, xfrm2(left, right));
+final_result := JOIN(sorted_res_join, sorted_stats_tab, left.score_name = right.score_name, xfrm2(left, right));
 
 return final_result;
 // return stats_tab;

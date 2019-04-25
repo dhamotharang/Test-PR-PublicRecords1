@@ -1,5 +1,6 @@
 ﻿EXPORT RV_Scores_Attributes_V3_BATCH_Macro(fcraroxie_IP, neutralroxie_IP, Thread, Timeout, Retry, Input_file_name, Output_file_name1_score, Output_file_name2_attr, records_ToRun):= FUNCTIONMACRO
-
+//rvr1003_0 8/15 deprecated depmsey
+//rvp1003_0 8/15 deprecated depmsey
 IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 
 		unsigned8 no_of_records := records_ToRun;
@@ -16,11 +17,12 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
     //*********** SETTINGS ********************************
 
 		DRM:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V3_BATCH_Generic_settings.DRM;
-		isFCRA:=if(Scoring_Project_PIP.User_Settings_Module.RV_Scores_V3_BATCH_Generic_settings.isFCRA=true,'FCRA','NONFCRA');
 		IncludeVersion3:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V3_BATCH_Generic_settings.IncludeVersion3;
-		// IsPreScreen:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V3_BATCH_Generic_settings.IsPreScreen;
     HistoryDate := 999999;
 
+		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		integer FFD := 1;
 		//*****************************************************
 
 	  //************** INPUT FILE GENERATION ****************	
@@ -42,8 +44,11 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			DATASET(Risk_Indicators.Layout_Gateways_In) gateways;
 			STRING DataRestrictionMask;
 			boolean IncludeVersion3;
-			boolean IncludeAllScores;
-			// BOOLEAN IsPreScreen;	
+			boolean includeauto;
+			boolean includebankcard;
+			boolean includetelecom;
+			boolean includemoney;
+			string FFDOptionsMask ;
 			integer Flagshipversion;
 		END;
 
@@ -69,11 +74,17 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		layout_soap_input append_settings(ds_raw_input le, integer c) := TRANSFORM
 			batch := PROJECT(le, make_batch_in(LEFT, c));
 			SELF.batch_in := batch;
-			SELF.gateways := DATASET([{isFCRA, neutralroxieIP}], risk_indicators.layout_gateways_in);
+			// SELF.gateways := DATASET([{'neutralroxie', neutralroxieIP}], risk_indicators.layout_gateways_in);
+			SELF.Gateways := DATASET([{'neutralroxie', NeutralRoxieIP}, // TransUnion Gateway
+						{'delta_personcontext', PCG_Cert}], Risk_Indicators.Layout_Gateways_In);
 			// SELF.IsPreScreen := IsPreScreen;		
 			self.IncludeVersion3 := IncludeVersion3;
-			self.IncludeAllScores := true;
+			self.includeauto := true;
+			self.includebankcard := true;
+			self.includetelecom := true;
+			self.includemoney := true;
 			SELF.DataRestrictionMask := DRM;
+			self.FFDOptionsMask := (string)FFD;
 			SELF.FlagshipVersion := 3;  
 		END;
 			
@@ -103,12 +114,22 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 												{soap_in},
 												dataset(layout_Soap_output), 
 												RETRY(retry), TIMEOUT(timeout),
+												XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
+												// XPATH('*/Results/Result/*'),
 												parallel(threads) ,
 												onfail(myfail(LEFT)));
 
 		// ***************************************************************************************************
 		// *********************** Transform into layout for use in daily reports ****************************
 		// ***************************************************************************************************
+				
+layout_Soap_output trans_rollup(layout_Soap_output l, layout_Soap_output r) := transform
+	self.Did := r.Did;
+
+	self := l;
+End;
+					
+soap_output_withDID := rollup(soap_output, ((integer)left.acctno = (integer)right.acctno and left.acctno <>''), trans_rollup(left,right));				
 				
 	  //GLOBAL OUTPUT LAYOUT
 		Global_output_lay:= RECORD	 
@@ -117,7 +138,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 
     //Appeding additional internal extras to Soap output file 
     //Mapping Version3 scores and reason codes
-		Global_output_lay v3_trans(Soap_output L, soap_in R) := transform
+		Global_output_lay v3_trans(soap_output_withDID L, soap_in R) := transform
 														 self.time_ms := l.time_ms;  
 			
 			self.Acctno :=(string) R.batch_in[1].acctno;
@@ -161,7 +182,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			self := [];
 		END;
 			 
-		ds_with_extras1 := JOIN(Soap_output,soap_in,LEFT.Acctno=(string)RIGHT.batch_in[1].acctno,v3_trans(LEFT,RIGHT));
+		ds_with_extras1 := JOIN(soap_output_withDID,soap_in,LEFT.Acctno=(string)RIGHT.batch_in[1].acctno,v3_trans(LEFT,RIGHT));
 
 
 Global_output_lay2:= RECORD		 
@@ -169,7 +190,7 @@ Global_output_lay2:= RECORD
 		END;
 
     //Appeding additional internal extras to Soap output file 
-		Global_output_lay2 normit(Soap_output L, soap_in R) := transform
+		Global_output_lay2 normit(soap_output_withDID L, soap_in R) := transform
 self.time_ms := l.time_ms;			
 			self.accountnumber := L.acctno;
 			self.DID := (integer)l.did; 
@@ -221,14 +242,15 @@ self.time_ms := l.time_ms;
       SELF := [];
 	  END;
 			 
-		ds_with_extras2 := JOIN(Soap_output,soap_in,LEFT.Acctno=(string)RIGHT.batch_in[1].acctno,normit(LEFT,RIGHT));
+		ds_with_extras2 := JOIN(soap_output_withDID,soap_in,LEFT.Acctno=(string)RIGHT.batch_in[1].acctno,normit(LEFT,RIGHT));
 
 		//score output
 		output(ds_with_extras1 ,, outfile_name1, thor, compressed, overwrite);
 
 	//attr output
 		output(ds_with_extras2 ,,outfile_name2,thor, compressed,overwrite);
-
+		 // output(Soap_output,named('Soap_output'));
+		// output(soap_in,named('soap_in'));
 		RETURN 0;
 		
 endmacro;

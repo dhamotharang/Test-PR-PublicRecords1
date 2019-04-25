@@ -48,8 +48,8 @@
       
 
 		main_head := 	'*************************************************************************************' + '\n' +
-									'    Data Deployment Tracking Report' + '\n' +
-									'    This report is produced by Scoring QA. Please send comments to Nathan Koubsky' + '\n' +
+									'Data Deployment Tracking Report' + '\n' +
+									'This report is produced by Scoring QA. Please send comments to Scoring_QA@risk.lexisnexis.com' + '\n' +
 									'*************************************************************************************';
 									
 

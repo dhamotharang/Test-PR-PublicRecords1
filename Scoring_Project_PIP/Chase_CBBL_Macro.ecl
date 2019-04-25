@@ -17,6 +17,7 @@ IMPORT riskwise, Scoring, risk_indicators, ut;
 		DPPA:=Scoring_Project_PIP.User_Settings_Module.CBBL_Scores_XML_Chase_settings.DPPA;
 		GLB:=Scoring_Project_PIP.User_Settings_Module.CBBL_Scores_XML_Chase_settings.GLB;
 		DRM:=Scoring_Project_PIP.User_Settings_Module.CBBL_Scores_XML_Chase_settings.DRM;
+		DPM:=Scoring_Project_PIP.User_Settings_Module.CBBL_Scores_XML_Chase_settings.DPM;
 		HISTORYDATE := 999999;
 			
 		//*****************************************************
@@ -58,6 +59,7 @@ IMPORT riskwise, Scoring, risk_indicators, ut;
 			self.dppapurpose := DPPA;
 			self.glbpurpose := GLB;
 			self.DataRestrictionMask := DRM; 
+			self.DataPermissionMask := DPM; 
 			self := le;
 			self := [];
 		end;
@@ -84,7 +86,7 @@ IMPORT riskwise, Scoring, risk_indicators, ut;
 						'RiskWise.RiskWiseMainBC1O', {soap_in}, 
 						DATASET(Global_output_lay),
 						RETRY(retry), TIMEOUT(timeout), LITERAL,
-						XPATH('RiskWise.RiskWiseMainBC1OResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+						XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 						PARALLEL(threads), onFail(myFail(LEFT)));
 
 
@@ -96,6 +98,7 @@ IMPORT riskwise, Scoring, risk_indicators, ut;
 					
 		Risk_Indicators.layout_input into_did_input(ds_raw_input le) := TRANSFORM
 						self.seq := (integer)le.accountnumber;
+						
 						self.fname := le.firstname;
 						self.mname := le.middlename;
 						self.lname := le.lastname;
@@ -120,6 +123,7 @@ IMPORT riskwise, Scoring, risk_indicators, ut;
 		
 		Global_output_lay did_append(did_results l, ds_slim r) := TRANSFORM
 					self.did := l.did;
+					// self.errorcode:=r.errorcode;
 					self := r;
 		END;
 					
@@ -128,6 +132,7 @@ IMPORT riskwise, Scoring, risk_indicators, ut;
 	  //Appeding additional internal extras to Soap output file 				
 		Global_output_lay internal_extras_append(res l, soap_in r) := TRANSFORM
 							self.DID := l.did; 
+							// self.errorcode:=l.errorcode;
 							self.historydate := (string)r.HistoryDateYYYYMM;
 							self.FNamePop := r.first<>'';
 							self.LNamePop := r.last<>'';
@@ -144,8 +149,9 @@ IMPORT riskwise, Scoring, risk_indicators, ut;
 		ds_with_extras:=join(res,soap_in,left.acctno=(string)right.acctno ,internal_extras_append(left, right));	
 			 
     //final file out to thor
-		final_output := output(ds_with_extras,,outfile_name, thor, compressed, OVERWRITE);
-
-		RETURN final_output;
+		output(ds_with_extras,,outfile_name, thor, compressed, OVERWRITE);
+    output(ds_with_extras,,outfile_name +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));
+				
+		RETURN 0;
 
 ENDMACRO;

@@ -23,35 +23,40 @@ IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT, Scoring_Project_Refresh_Sa
 Boolean RunAll 						:= false;
 
 Boolean isFraudPointv201 		:= false;
-fileoldFPv2_2 := '~scoring_project::in:fraudpoint_xml_American_Express_fp1109_0_20160729';
-FileoutFPv2_2 := '~bb::in::test_fpv2_2_new_test2';
+fileoldFPv2_2 := '~scoring_project::in:fraudpoint_xml_American_Express_fp1109_0_20161206';
+FileoutFPv2_2 := '~bb::in::fraudpoint_xml_American_Express_test';
 
 Boolean isFraudPoint31505   := false;
 fileoldFPv3 := '~Scoring_Project::in::FraudPoint_XML_FP31505_0_20161220';
-FileoutFPv3 := '~bbraaten::in::test_fpv3_new_test4';
+FileoutFPv3 := '~bbraaten::in::FraudPoint_XML_FP31505_0_test';
 
 Boolean isLeadIntegrityv4 := false;
-fileoldLI_v4 := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20160519';
-FileoutLI_v4 := '~bb::in::test_LI_v4_new_20160615_test2';
+fileoldLI_v4 := '~scoring_project::in::leadintegrity_xml_generic_msn1210_1_20161206';
+FileoutLI_v4 := '~bb::in::leadintegrity_xml_generic_msn1210_test';
 
 Boolean isBNK4 						:= false;
 fileoldBNK4 := '~scoring_project::in::bc1o_xml_chase_bnk4_20160525';
-NewFileBNK4 := '~bb::in::test_bnk4_new_20160422_test2';
+NewFileBNK4 := '~bb::in::bc1o_xml_chase_bnk4_test';
+
+Boolean isCBBL        := false;
+fileoldCBBL := '~scoring_project::in::cbbl_xml_chase_20160525';
+NewFileCBBL := '~bb::in::cbbl_xml_chase_test';
 
 Boolean isPI02 						:= false;
-fileoldPI02 := '~scoring_project::in::prio_xml_chase_pi02_20160520';
-FileoutPI02 := '~bbn::in::test_PI02_new_201604615_test2';
+fileoldPI02 := '~scoring_project::in::prio_xml_chase_pi02_20161206';
+FileoutPI02 := '~bbn::in::prio_xml_chase_pi02_test';
 
 boolean isBIID						:= false;
-fileoldBIID	:= '~scoring_project::in::biid_xml_general_generic_20150223';
+fileoldBIID	:= '~scoring_project::in::biid_xml_general_generic_20160602';
 fileoutBIID	:= '~bb::in::BIID_Batch_test';
 
-boolean isIID							:= false;
-fileoldIID  := '~scoring_project::in::instantid_xml_generic_version0_20160602';
-fileoutIID	 := '~bb::in::IID_xml_test';
+boolean isIID							:= true;
+fileoldIID  := '~scoring_project::in::instantid_xml_generic_version0_20161215';
+fileoutIID	 := '~bb::in::IID_xml_test2';
 
-BeginDate := '20160617';
-EndDate := ut.getdate;
+BeginDate := '20180301';
+// EndDate := ut.getdate;
+EndDate := '20180401';
 
 AccountIDs := ['']; // leave this alone
 eyeball := 300;
@@ -61,7 +66,8 @@ eyeball := 300;
 
 File := Score_Logs.Files_index.File_TransactionID; 
 File_nonFCRA := File(StringLib.StringToUpperCase(product) NOT IN Score_Logs.FCRA_Transaction_Constants.product);
-LogFile := INDEX(File_nonFCRA, {transaction_id}, {File_nonFCRA}, ut.foreign_prod +'thor_data400::key::acclogs_scoring::'+doxie.Version_SuperKey+'::xml_transactionid');
+// LogFile := INDEX(File_nonFCRA, {transaction_id}, {File_nonFCRA}, '~foreign::' + '10.173.44.105' + '::'+'thor_data400::key::acclogs_scoring::'+doxie.Version_SuperKey+'::xml_transactionid');
+LogFile := INDEX(File_nonFCRA, {transaction_id}, {File_nonFCRA}, '~foreign::' + '10.173.44.105' + '::' +'thor_data400::key::acclogs_scoring::20180506::xml_transactionid');
 
 //**********************************************************************************************************************************
 																			// 
@@ -118,7 +124,7 @@ Scoring_Project_Refresh_Samples.New_Samples_layouts.FraudAdvisor_Layout parseInp
 		self := [];)
 		);
 		
-	temp_FPv2 := parse(logs_tempFPv2, inputxml, parse_inputxmlFPv2(), XML('FraudPoint'));
+	temp_FPv2 := parse(logs_tempFPv2, inputxml, parse_inputxmlFPv2(), XML('FraudPointRequest'));
 	
 	self := temp_FPv2[1];
 	
@@ -212,7 +218,7 @@ Scoring_Project_Refresh_Samples.New_Samples_layouts.FraudAdvisor_Layout parseInp
 		self := [];)
 		);
 		
-	temp_Fraud := parse(logs_temp, inputxml, parse_inputxmlFraud(), XML('FraudPoint'));
+	temp_Fraud := parse(logs_temp, inputxml, parse_inputxmlFraud(), XML('FraudPointRequest'));
 	
 	self := temp_Fraud[1];
 	
@@ -295,7 +301,7 @@ Scoring_Project_Refresh_Samples.New_Samples_layouts.LeadIntegrity_Layout parseIn
 		self := [];)
 		);
 		
-	temp_LIv4 := parse(logs_tempLIv4, inputxml, parse_inputxmlLIv4(), XML('LeadIntegrity'));
+	temp_LIv4 := parse(logs_tempLIv4, inputxml, parse_inputxmlLIv4(), XML('LeadIntegrityRequest'));
 	
 	self := temp_LIv4[1];
 	
@@ -402,6 +408,91 @@ Scoring_Project_Refresh_Samples.NonFCRA_New_Samples_Logs.NonFCRA_New_Samples_Log
 #end
 
 //**********************************************************************************************************************************
+
+#if(isCBBL or RunAll)
+LogsRawBC10_CBBL := IF(AccountIDs[1] != '', DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['RISKWISE.RISKWISEMAINBC1O'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND customer_id IN AccountIDs AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs))),
+																	 DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['RISKWISE.RISKWISEMAINBC1O'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs))));
+
+logs_raw_layoutBC10_CBBL := record
+	RECORDOF(LogsRawBC10_CBBL);
+	STRING30 TransactionID; 
+	STRING10 AccountID;
+	STRING8 TransactionDate;
+end;
+
+LogsBC10_CBBL := PROJECT(LogsRawBC10_CBBL, TRANSFORM(logs_raw_layoutBC10_CBBL, 
+																		SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<RiskWise.RiskWiseMainBC1O>', '<RiskWise.RiskWiseMainBC1O><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>');
+																		SELF.outputxml := '<RiskWise.RiskWiseMainBC1O><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>' + LEFT.outputxml + '</RiskWise.RiskWiseMainBC1O>';
+																		SELF.TransactionID := LEFT.Transaction_ID;
+																		SELF.AccountID := LEFT.customer_id;
+																		SELF.TransactionDate := LEFT.DateTime[1..8];
+																		SELF := LEFT));
+																												
+OUTPUT(CHOOSEN(LogsBC10_CBBL, eyeball), NAMED('LogsBC10_CBBL'));
+
+Scoring_Project_Refresh_Samples.New_Samples_layouts.BNK4_CBBL_Layout parse_inputxmlBC10_cbbl () := TRANSFORM
+	SELF.TransactionID				:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF._LoginId            := StringLib.StringToUpperCase(TRIM(XMLTEXT('_LoginId')));
+	SELF.TribCode            := StringLib.StringToUpperCase(TRIM(XMLTEXT('tribcode')));
+	SELF.DataRestrictionMask := TRIM(XMLTEXT('DataRestrictionMask'));
+	SELF.Account             := TRIM(XMLTEXT('account'));
+	SELF.FirstName           := TRIM(XMLTEXT('first'));
+	SELF.LastName            := TRIM(XMLTEXT('last'));
+	SELF.Address             := TRIM(XMLTEXT('addr'));
+	SELF.City                := TRIM(XMLTEXT('city'));
+	SELF.State               := TRIM(XMLTEXT('state'));
+	SELF.Zip                 := Risk_Reporting.Common.ParseZIP(TRIM(XMLTEXT('zip')));
+	SELF.SSN                 := Risk_Reporting.Common.ParseSSN(TRIM(XMLTEXT('socs')));
+	SELF.DateOfBirth         := TRIM(XMLTEXT('dob'));
+	SELF.HomePhone           := Risk_Reporting.Common.ParsePhone(XMLTEXT('hphone'));
+	SELF.WorkPhone           := Risk_Reporting.Common.ParsePhone(XMLTEXT('wphone'));
+	SELF.Income              := TRIM(XMLTEXT('income'));
+	SELF.CompanyName			   := TRIM(XMLTEXT('cmpy'));
+	SELF.CompanyAddress	     := TRIM(XMLTEXT('cmpyaddr'));
+	SELF.CompanyCity			   := TRIM(XMLTEXT('cmpycity'));
+	SELF.CompanyState		     := TRIM(XMLTEXT('cmpystate'));
+	SELF.CompanyZIP			     := TRIM(XMLTEXT('cmpyzip'));
+	SELF.FEIN						     := TRIM(XMLTEXT('fin'));
+	SELF := [];
+END;
+
+
+Scoring_Project_Refresh_Samples.New_Samples_layouts.BNK4_CBBL_Layout parse_inputxmlBC10cbbl (LogsBC10_CBBL l) := TRANSFORM
+	self.AccountID 			:= l.AccountID;
+	
+	logs_tempBC10_CBBL := project(ut.ds_oneRecord, transform(logs_raw_layoutBC10_CBBL,
+		self.accountid := l.accountid;
+		self.inputxml := l.inputxml;
+		self := [];)
+		);
+		
+	temp_BC10_CBBL := parse(logs_tempBC10_CBBL, inputxml, parse_inputxmlBC10_CBBL(), XML('RiskWise.RiskWiseMainBC1O'));
+	
+	self := temp_BC10_CBBL[1];
+	
+	SELF := [];
+END;
+
+cleanLogsBC10_CBBL:= project(LogsBC10_CBBL, parse_inputxmlBC10cbbl(left));
+OUTPUT(CHOOSEN(cleanLogsBC10_CBBL, eyeball), NAMED('cleanLogsBC10_CBBL'));
+
+
+logsaccountBC10_CBBL:= cleanLogsBC10_CBBL;
+
+CBBL_2 := logsaccountBC10_CBBL(TribCode = 'CBBL');
+CBBL := CBBL_2(accountid = '104706');
+OUTPUT(CHOOSEN(CBBL_2, eyeball), NAMED('CBBL'));
+
+
+OriginalDataCBBL := DATASET(fileoldCBBL, Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structureBNK4, thor);
+
+
+Scoring_Project_Refresh_Samples.NonFCRA_New_Samples_Logs.NonFCRA_New_Samples_Logs_CBBL(CBBL_2, OriginalDataCBBL, NewFileCBBL);
+
+#end
+
+//**********************************************************************************************************************************
+
 
 #if(isPI02 or RunAll)
 
@@ -542,7 +633,7 @@ Scoring_Project_Refresh_Samples.New_Samples_layouts.BusinessIID_Layout parseInpu
 		self := [];)
 		);
 		
-	temp_BIID := parse(logs_tempBIID, inputxml, parse_inputxmlBIID(), XML('BusinessInstantID'));
+	temp_BIID := parse(logs_tempBIID, inputxml, parse_inputxmlBIID(), XML('BusinessInstantIDRequest'));
 	
 	self := temp_BIID[1];
 	
@@ -645,7 +736,7 @@ Scoring_Project_Refresh_Samples.New_Samples_layouts.InstantID_Layout parseInputI
 		self := [];)
 		);
 		
-	temp_IID := parse(logs_temp, inputxml, parse_inputxmlIID(), XML('InstantID'));
+	temp_IID := parse(logs_temp, inputxml, parse_inputxmlIID(), XML('InstantIDRequest'));
 	
 	self := temp_IID[1];
 	

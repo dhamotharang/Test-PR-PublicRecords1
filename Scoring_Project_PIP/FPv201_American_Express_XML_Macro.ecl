@@ -1,7 +1,7 @@
 ﻿EXPORT FPv201_American_Express_XML_Macro (roxie_ip, Gateway_dummy, Thread, Timeout, Retry, Input_file_name, Output_file_name, records_ToRun):= FUNCTIONMACRO
 
 
-IMPORT ut, Risk_Indicators, riskwise, models, RiskProcessing, Scoring_Project_PIP, gateway,sghatti,Scoring_Project_Macros;
+IMPORT ut, Risk_Indicators, riskwise, models, RiskProcessing, Scoring_Project_PIP, gateway,Scoring_Project_Macros;
 	
 	unsigned8 no_of_records := records_ToRun;
 		unsigned1 eyeball := 10;
@@ -694,11 +694,14 @@ IMPORT ut, Risk_Indicators, riskwise, models, RiskProcessing, Scoring_Project_PI
     NewRecs := PROJECT(rolled_to_1_record,TRANSFORM(Global_output_lay,self.acctno:=left.accountnumber;
 																							                        self := left));
     //final file out to thor
-		final_output :=   output(NewRecs,, Output_file_name, thor, compressed, overwrite );
+ output(NewRecs,, Output_file_name, thor, compressed, overwrite );
+
+ OUTPUT(NewRecs, , Output_file_name +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
+
 // output(NewRecs,, outfile_name, thor, compressed, overwrite, expire(5) );
 // output(NewRecs);
 			 
-	  RETURN final_output;
+	  RETURN 0;
 
 ENDMACRO;
 

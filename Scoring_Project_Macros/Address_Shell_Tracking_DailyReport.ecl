@@ -1,7 +1,7 @@
 ﻿EXPORT Address_Shell_Tracking_DailyReport := FUNCTION
 // #workunit('name','AddressShell_DailyReport');
 import ut;
-import std, Scoring_Project, ashirey,Scoring_Project_Macros, zz_bbraaten2, Scoring_Project_DailyTracking;
+import std, Scoring_Project, ashirey,Scoring_Project_Macros,  Scoring_Project_DailyTracking;
 
 dt := ut.getdate;
 decimal19_2 thresh := 1.00;
@@ -125,7 +125,7 @@ re_filter2_nonfcra := SORT(re_filter1_nonfcra, -Difference_Percent);
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
   	// OUTPUT(XtabOut, NAMED('XtabOut'));
 
-		 final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.general_list_all, 'AddressShell Cert Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
+		 final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.addr_reports, 'AddressShell Cert Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
 		// final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com;nathan.koubsky@lexisnexis.com', 'TEST...AddressShell Cert Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
 		// final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com', 'TEST...AddressShell Cert Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):
 		// final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.fail_list, 'TEST......LeadIntegrity 4.1 Daily Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line):

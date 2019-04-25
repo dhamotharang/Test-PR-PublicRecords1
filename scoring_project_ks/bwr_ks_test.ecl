@@ -1,7 +1,7 @@
 ﻿import ut,scoring_project_pip,Scoring_Project_Macros,Scoring_Project_DailyTracking;
 
 rule_based_test := (real) 2.0;
-
+//
 // curr_date := ut.GetDate + '_1' ; //'20130908_1' ;
 // prev_date := (string) ((integer4)ut.GetDate -1)  + '_1' ;
 
@@ -75,14 +75,14 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_money' 	 => 'RiskView' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_retail' 	 => 'RiskView' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_telecom' 	 => 'RiskView' , 
-													  left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_prescreen' 	 => 'RiskView' , 
+													  // left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_prescreen' 	 => 'RiskView' , 
 														
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_auto'  	 => 'RiskView' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_bank' 	 => 'RiskView' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_money'	 => 'RiskView' ,
-														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'RiskView' ,
+														// left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'RiskView' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_telecom'     => 'RiskView' ,
-														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'     => 'RiskView' ,
+														// left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'     => 'RiskView' ,
 
 								
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_auto'  	 => 'RiskView' ,
@@ -90,14 +90,14 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_money'	 => 'RiskView' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_retail' 	 => 'RiskView' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_telecom'  => 'RiskView' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'RiskView' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'RiskView' ,
 														
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_auto'  	 => 'RiskView' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_bank' 	 => 'RiskView' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_money'	 => 'RiskView' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'RiskView' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'RiskView' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_telecom'  => 'RiskView' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'RiskView' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'RiskView' ,
 
 		            left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'auto_score'  	 => 'RiskView' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'bankcard_score' 	 => 'RiskView' ,
@@ -347,14 +347,14 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_money' 	 => 'Generic' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_retail' 	 => 'Generic' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_telecom' 	 => 'Generic' ,
-													  left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
+													  // left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
 
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_auto'  	 => 'Generic' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_bank' 	 => 'Generic' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_money'	 => 'Generic' ,
-														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'Generic' ,
+														// left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'Generic' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_telecom'     => 'Generic' ,
-														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
+														// left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
 																									
 														
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_auto'  	 => 'Generic' ,
@@ -362,7 +362,7 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_money'	 => 'Generic' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_retail' 	 => 'Generic' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_telecom'  => 'Generic' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
 														
 														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'auto_score'  	 => 'Generic' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'bankcard_score' 	 => 'Generic' ,
@@ -378,9 +378,9 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_auto'  	 => 'Generic' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_bank' 	 => 'Generic' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_money'	 => 'Generic' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'Generic' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'Generic' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_telecom'  => 'Generic' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'Generic' ,
 
 
 
@@ -485,14 +485,14 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_money' 	 => 'rvg1103_0' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_retail' 	 => 'rvr1103_0' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_telecom' 	 => 'rvt1104_0' ,
-														left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'rvp1104_0' ,
+														// left.flagship  = 'RiskView_batch_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'rvp1104_0' ,
 
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_auto'  	 => 'rva1003_0' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_bank' 	 => 'rvb1003_0' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_money'	 => 'rvg1003_0' ,
-														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'rvr1003_0' ,
+														// left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'rvr1003_0' ,
 														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_telecom'     => 'rvt1003_0' ,
-														left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'rvp1003_0' ,
+														// left.flagship  = 'RiskView_batch_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'rvp1003_0' ,
 																									
 														
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_auto'  	 => 'rva1104_0' ,
@@ -500,14 +500,14 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_money'	 => 'rvg1103_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_retail' 	 => 'rvr1103_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_telecom'  => 'rvt1104_0' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'rvp1104_0' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v4'  and left.model = 'rv_score_prescreen'  => 'rvp1104_0' ,
 
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_auto'  	 => 'rva1003_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_bank' 	 => 'rvb1003_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_money'	 => 'rvg1003_0' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'rvr1003_0' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_retail' 	 => 'rvr1003_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_telecom'  => 'rvt1003_0' ,
-														left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'rvp1003_0' ,
+														// left.flagship  = 'RiskView_xml_generic_allflagships_v3'  and left.model = 'rv_score_prescreen'  => 'rvp1003_0' ,
 
                             left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'auto_score'  	 => 'RVA1503_0' ,
 														left.flagship  = 'RiskView_xml_generic_allflagships_attributes_v5'  and left.model = 'bankcard_score' 	 => 'RVB1503_0' ,
@@ -1029,54 +1029,55 @@ avg_layout_prev:= record
 		// avg_dataset_curr;
 		
 dual_rec := record
-  string30 acctno; 
-  string80 product; 
-	string80 version;
-	string80 process1 ;
-	string80 customer ;
-	string80 model1 ;
-	string80 prev_dual_valid;
-	string80 curr_dual_valid ;
-	decimal19_2 curr_dual_valid_prev_dual_valid;
-	
-	
+			string30 acctno; 
+			string80 product; 
+			string80 version;
+			string80 process1 ;
+			string80 customer ;
+			string80 model1 ;
+			string80 prev_dual_valid;
+			string80 curr_dual_valid ;
+			decimal19_2 curr_dual_valid_prev_dual_valid;
+			decimal19_2 _count;	
 end;
 		 
 											 
 							dual_rec_ds:=				 join(dataset_prev,dataset_curr,left.acctno=right.acctno and 
-											                           left.product=right.product and 
-											                           left.version=right.version and
-																								  left.process1=right.process1 and 
-											                           left.customer=right.customer and
-																								   left.model1=right.model1,
+																															left.product=right.product and 
+																															left.version=right.version and
+																															left.process1=right.process1 and 
+																															left.customer=right.customer and
+																															left.model1=right.model1,
+																									transform(recordof(dual_rec),
+																																			self.prev_dual_valid 	:= left.score ;
+																																			self.curr_dual_valid := right.score;
+																																			self.curr_dual_valid_prev_dual_valid:= (decimal19_2)right.score- (decimal19_2)left.score;
+																																			self._count := 0;
+																																			self:=left;
+																																 ),inner);
 																								 
-																								 			transform(recordof(dual_rec),
-																											self.prev_dual_valid 	:= left.score ;
-			                                                self.curr_dual_valid := right.score;
-																											self.curr_dual_valid_prev_dual_valid:= (decimal19_2)right.score- (decimal19_2)left.score;
-																											self:=left;
-																								 ),inner);
-																								 
-																								 // count(dual_rec_ds);
-										// dual_rec_ds(curr_dual_valid_prev_dual_valid>0);
-										
-										
-				
+
 											 
-											 
-dual_rec_mean := record
-  // dual_rec_ds.acctno; 
-  dual_rec_ds.product; 
-	dual_rec_ds.version;
-	dual_rec_ds.process1 ;
-	dual_rec_ds.customer ;
-	dual_rec_ds.model1 ;
-	decimal19_2 Dual_Mean_Chg:=ave(group,(real)dual_rec_ds.curr_dual_valid )- ave(group,(real)dual_rec_ds.prev_dual_valid );
-	decimal19_2 Dual_Max_Chg :=abs(max(group,dual_rec_ds.curr_dual_valid_prev_dual_valid));
-	// decimal19_2	avg_curr_dual_valid:=ave(group,(real)dual_rec_ds.curr_dual_valid );	
-end;
-											 
- 	dual_rec_ds_mean:=  table(dual_rec_ds,dual_rec_mean,product,version,process1,customer,model1);
+ds_sort := sort(		dual_rec_ds,version,process1,customer,model1,  acctno		);				
+roll := rollup(		ds_sort, left.acctno=right.acctno and 
+																															left.product=right.product and 
+																															left.version=right.version and
+																															left.process1=right.process1 and 
+																															left.customer=right.customer and
+																															left.model1=right.model1	, transform(recordof(dual_rec), self._count := left._count+right._count; self := left;));
+												
+	dual_rec_mean := RECORD
+			roll.product; 
+			roll.version;
+			roll.process1 ;
+			roll.customer ;
+			roll.model1 ;
+			decimal19_2 Dual_Mean_Chg:=ave(group,(real)roll.curr_dual_valid )- ave(group,(real)roll.prev_dual_valid );
+			decimal19_2 Dual_count := count(group);
+			decimal19_2 Dual_Max_Chg :=max(group,abs(roll.curr_dual_valid_prev_dual_valid));
+		END;
+													 
+	 dual_rec_ds_mean:=  table(roll,dual_rec_mean,product,version,process1,customer,model1);
 	
 	
 	
@@ -1871,6 +1872,7 @@ final_result  :=
 join2_layout:= record
    recordof(join1_layout);
   decimal19_2 Dual_Mean_Chg;
+			decimal19_2 Dual_count;
 	decimal19_2 Dual_Max_Chg ;
  end;
 
@@ -1883,6 +1885,7 @@ join2:=join(join1,dual_rec_ds_mean,                      left.product = right.pr
 			transform(recordof(join2_layout),
 			
 			self.Dual_Mean_Chg := right.Dual_Mean_Chg;	
+					self.Dual_count := right.Dual_count;	
 			self.Dual_Max_Chg := right.Dual_Max_Chg;	
 			
 			self:=left;
@@ -2262,14 +2265,14 @@ end;
             										 {'RiskView','Generic','XML','rva1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 {'RiskView','Generic','XML','rvb1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 {'RiskView','Generic','XML','rvg1003_0','3',file_count_function(RV_V3_Generic_infile)},
-																 {'RiskView','Generic','XML','rvr1003_0','3',file_count_function(RV_V3_Generic_infile)},
+																 // {'RiskView','Generic','XML','rvr1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 {'RiskView','Generic','XML','rvt1003_0','3',file_count_function(RV_V3_Generic_infile)},
-																 {'RiskView','Generic','XML','rvp1003_0','3',file_count_function(RV_V3_Generic_infile)},
+																 // {'RiskView','Generic','XML','rvp1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 
 																 {'RiskView','Generic','Batch','rva1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 {'RiskView','Generic','Batch','rvb1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 {'RiskView','Generic','Batch','rvg1003_0','3',file_count_function(RV_V3_Generic_infile)},
-																 {'RiskView','Generic','Batch','rvr1003_0','3',file_count_function(RV_V3_Generic_infile)},
+																 // {'RiskView','Generic','Batch','rvr1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 {'RiskView','Generic','Batch','rvt1003_0','3',file_count_function(RV_V3_Generic_infile)},
 																 
 																 {'RiskView','Generic','XML','rva1104_0','4',file_count_function(RV_V4_Generic_infile)},
@@ -2277,7 +2280,7 @@ end;
 																 {'RiskView','Generic','XML','rvg1103_0','4',file_count_function(RV_V4_Generic_infile)},
 																 {'RiskView','Generic','XML','rvr1103_0','4',file_count_function(RV_V4_Generic_infile)},
 																 {'RiskView','Generic','XML','rvt1104_0','4',file_count_function(RV_V4_Generic_infile)},
-																 {'RiskView','Generic','XML','rvp1104_0','4',file_count_function(RV_V4_Generic_infile)}	,	
+																 // {'RiskView','Generic','XML','rvp1104_0','4',file_count_function(RV_V4_Generic_infile)}	,	
 																 
 																 // {'RiskView','Generic_Prescreen','XML','RVA1503_0','5',file_count_function(RV_V5_Generic_infile)},
 																 // {'RiskView','Generic_Prescreen','XML','RVB1503_0','5',file_count_function(RV_V5_Generic_infile)},
@@ -2389,6 +2392,7 @@ end;
  	decimal19_5 perc_From_Default;
   decimal19_2 Dual_Pos_Scr_Chg;
 	decimal19_2 Dual_Neg_Scr_Chg;
+	decimal19_2 Dual_count;
 	decimal19_2 pct_score_same;	
  end;
       	 result_1:=project(input_file_count_ds_result,transform(final_layout,self.Diff_Default:=left.curr_default-left.Prev_Default,
@@ -2529,7 +2533,7 @@ end;
       																				 'KS_FCRA' +  prev_date + '_VS_' + curr_date + '.csv',
       																				 ,
       																				 ,
-      																				 'karthik.reddy@lexisnexis.com');
+      																				 'Scoring_QA@risk.lexisnexis.com');
       																				 
       					out_file1 := output(NON_FCRA_result , ,'~ScoringQA::out::ks1::NON_FCRA_result' + curr_date, CSV(heading(single), quote('"')), overwrite, EXPIRE(30) );
       			
@@ -2582,10 +2586,10 @@ end;
       																				 'KS_NON_FCRA' +  prev_date + '_VS_' + curr_date + '.csv',
       																				 ,
       																				 ,
-      																				 'karthik.reddy@lexisnexis.com');	
+      																				 'Scoring_QA@risk.lexisnexis.com');	
 																							 
-					   send_file2 :=FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Daily_Data_collections_fail_list, 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
-					   // send_file2 :=FileServices.SendEmail('bridgett.braaten@lexisnexis.com', 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
+					   // send_file2 :=FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Daily_Data_collections_fail_list, 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
+					   send_file2 :=FileServices.SendEmail('Weiyu.Ma@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com', 'KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
       																				 
       																				 
            sequential ( out_file, send_file ,out_file1,send_file1,IF(count(alert_file_list)>0,send_file2));																				 

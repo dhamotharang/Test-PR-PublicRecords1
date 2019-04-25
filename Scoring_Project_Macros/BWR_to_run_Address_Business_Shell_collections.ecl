@@ -47,7 +47,7 @@ AddressShellReport := Scoring_project_dailyTracking.Address_Shell_Tracking_Daily
 
 
 sequential(AddressShell,BusinessShell, AddressShellReport) :   WHEN(CRON('00 5 * * *')), 
-FAILURE(FileServices.SendEmail( Scoring_Project_DailyTracking.email_distribution.ISS_Email_list,'Daily Data Collection Addressshell & BusinessShell job failed','The failed workunit is:' + workunit + FailMessage));
+FAILURE(FileServices.SendEmail( Scoring_Project_DailyTracking.email_distribution.DDT_fail_list,'Daily Data Collection Addressshell & BusinessShell job failed','The failed workunit is:' + workunit + FailMessage));
 
 
 // EXPORT BWR_All := 'todo';

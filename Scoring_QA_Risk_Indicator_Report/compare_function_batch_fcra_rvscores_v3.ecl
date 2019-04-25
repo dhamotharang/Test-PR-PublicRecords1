@@ -1,6 +1,7 @@
 ﻿EXPORT compare_function_batch_fcra_rvscores_v3(route,current_dt,previous_dt) := functionmacro
 
-
+//rvr1003_0 8/15 deprecated depmsey
+//rvp1003_0 8/15 deprecated depmsey
 
 file1:= dataset(route + scoring_project_pip.Output_Sample_Names.RV_Scores_V3_BATCH_Generic_outfile + previous_dt,Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_V3_Global_Layout,
 
@@ -49,14 +50,14 @@ br:= c5  + c6  + c7  + c8;
 
 Scoring_QA_Risk_Indicator_Report.functions.count_function1(br,'bank_reason',br_1);
 				
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason',c9);
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason2',c10);
-      	Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason3',c11);
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason4',c12);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason',c9);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason2',c10);
+      	// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason3',c11);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_retail_reason4',c12);
 		
-rr:= c9  + c10 + c11 + c12;
+// rr:= c9  + c10 + c11 + c12;
 
-Scoring_QA_Risk_Indicator_Report.functions.count_function1(rr,'retail_reason',rr_1);
+// Scoring_QA_Risk_Indicator_Report.functions.count_function1(rr,'retail_reason',rr_1);
 
 				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_telecom_reason',c13);
       	Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_telecom_reason2',c14);
@@ -77,18 +78,16 @@ mr:= c17 + c18 + c19 + c20;
 
 Scoring_QA_Risk_Indicator_Report.functions.count_function1(mr,'money_reason',mr_1);
 
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_prescreen_reason',c21);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS1,'rv_prescreen_reason',c21);
       
-pr:= c21;
+// pr:= c21;
 
-Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr,'prescreen_reason',pr_1);
+// Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr,'prescreen_reason',pr_1);
 				
 			  	
-       	 c:= c1  + c2  + c3  + c4  + c5  + c6  + c7  + c8  + c9  + c10 +
-				     c11 + c12 + c13 + c14 + c15 + c16 + c17 + c18 + c19 + c20 +
-						 c21 ;
+       	 c:= c1  + c2  + c3  + c4  + c5  + c6  + c7  + c8  + c13 + c14 + c15 + c16 + c17 + c18 + c19 + c20;
 						 
-				score_file1:=	ar_1  + br_1 + rr_1+	tr_1 + mr_1 + pr_1;
+				score_file1:=	ar_1  + br_1 + 	tr_1 + mr_1 ;
 						 
 			////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////
@@ -113,14 +112,14 @@ br2:=cc5  + cc6  + cc7  + cc8;
 
 Scoring_QA_Risk_Indicator_Report.functions.count_function1(br2,'bank_reason',br_2);
 
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason',cc9);
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason2',cc10);
-      	Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason3',cc11);
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason4',cc12);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason',cc9);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason2',cc10);
+      	// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason3',cc11);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_retail_reason4',cc12);
 				
-rr2:=cc9  + cc10 + cc11 + cc12;
+// rr2:=cc9  + cc10 + cc11 + cc12;
 
-Scoring_QA_Risk_Indicator_Report.functions.count_function1(rr2,'retail_reason',rr_2);
+// Scoring_QA_Risk_Indicator_Report.functions.count_function1(rr2,'retail_reason',rr_2);
 		
 				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_telecom_reason',cc13);
       	Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_telecom_reason2',cc14);
@@ -142,19 +141,17 @@ mr2:= cc17 + cc18 + cc19 + cc20;
 
 Scoring_QA_Risk_Indicator_Report.functions.count_function1(mr2,'money_reason',mr_2);
 
-				Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_prescreen_reason',cc21);
+				// Scoring_QA_Risk_Indicator_Report.functions.count_function(DS2,'rv_prescreen_reason',cc21);
       
- pr2:= cc21;
+ // pr2:= cc21;
 
-Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr2,'prescreen_reason',pr_2);
+// Scoring_QA_Risk_Indicator_Report.functions.count_function1(pr2,'prescreen_reason',pr_2);
 		     	
 				
 			  	
-       	 cc:= cc1  + cc2  + cc3  + cc4  + cc5  + cc6  + cc7  + cc8  + cc9  + cc10 +
-				     cc11 + cc12 + cc13 + cc14 + cc15 + cc16 + cc17 + cc18 + cc19 + cc20 +
-						 cc21 ;
+       	 cc:= cc1  + cc2  + cc3  + cc4  + cc5  + cc6  + cc7  + cc8  +  cc13 + cc14 + cc15 + cc16 + cc17 + cc18 + cc19 + cc20;
 						 
-						score_file2:=	ar_2  + br_2 + rr_2+	tr_2 + mr_2 + pr_2;	 
+						score_file2:=	ar_2  + br_2 + 	tr_2 + mr_2 ;	 
 						 
 		    compare_layout := RECORD
    		   string file_version;

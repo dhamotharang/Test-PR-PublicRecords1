@@ -1,5 +1,5 @@
 ﻿EXPORT Modeling_Bocashell_FCRA_52(RecordsToRun) := FunctionMacro;
-IMPORT Risk_Indicators, RiskWise, riskprocessing, ut;
+IMPORT Risk_Indicators, RiskWise, riskprocessing, ut, Scoring_Project_PIP;
 
 unsigned record_limit :=   RecordsToRun;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 3;  //number of parallel soap calls to make [1..30]
@@ -46,12 +46,12 @@ layout_input := RECORD
 //=============  Service settings ====================
 //====================================================
 // Neutral service ip
-roxie_IP :=riskwise.shortcuts.core_roxieIP;    // Roxiebatch
+roxie_IP :=riskwise.shortcuts.core_97_roxieIP;    // Roxiebatch
  
 
 // FCRA service settings
 bs_service := 'risk_indicators.Boca_Shell_FCRA';
-roxieIP :=riskwise.shortcuts.core_roxieIP; 		// FCRAbatch Roxie
+roxieIP :=riskwise.shortcuts.core_97_roxieIP; 		// FCRAbatch Roxie
  
 
 //====================================================
@@ -118,7 +118,7 @@ p_f4 := project(p_f1, transform(l, self.accountnumber := (string)(300000 + (unsi
 p_f := p_f1 + p_f4;
 Out2 := output(choosen(p_f, eyeball));
 
-s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+s :=Scoring_Project_PIP.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 
 riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM

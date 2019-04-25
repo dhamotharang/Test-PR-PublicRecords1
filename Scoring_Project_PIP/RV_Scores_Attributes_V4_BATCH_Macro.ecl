@@ -14,11 +14,14 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 
 
 		DRM:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V4_BATCH_Generic_settings.DRM;
-		isFCRA:=if(Scoring_Project_PIP.User_Settings_Module.RV_Scores_V4_BATCH_Generic_settings.isFCRA,'FCRA','NONFCRA');
-		// IsPreScreen:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V4_BATCH_Generic_settings.IsPreScreen;
 		IncludeVersion4:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V4_BATCH_Generic_settings.IncludeVersion4;
 		HistoryDate := 999999;
 
+
+		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		integer FFD := 1;
+		
 		//*****************************************************
 
 	  //************** INPUT FILE GENERATION ****************	
@@ -41,7 +44,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			STRING DataRestrictionMask;
 			boolean IncludeVersion4;
 			boolean IncludeAllScores;
-			// BOOLEAN IsPreScreen;	
+			string FFDOptionsMask ;
 			integer FlagshipVersion;
 
 		END;
@@ -68,12 +71,15 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		layout_soap_input append_settings(ds_raw_input le, integer c) := TRANSFORM
 			batch := PROJECT(le, make_batch_in(LEFT, c));
 			SELF.batch_in := batch;
-			SELF.gateways := DATASET([{isFCRA, neutralroxieIP}], risk_indicators.layout_gateways_in);
-			// SELF.IsPreScreen := IsPreScreen;		
+			// SELF.gateways := DATASET([{'neutralroxie', neutralroxieIP}], risk_indicators.layout_gateways_in);
+			SELF.Gateways := DATASET([{'neutralroxie', NeutralRoxieIP}, // TransUnion Gateway
+								{'delta_personcontext', PCG_Cert}], Risk_Indicators.Layout_Gateways_In);
 			self.IncludeVersion4 := IncludeVersion4;
 			self.IncludeAllScores := true;
 			SELF.DataRestrictionMask := DRM;
 			SELF.FlagshipVersion := 4;
+			self.FFDOptionsMask := (string)FFD;
+
 			self := [];
 		END;
 			
@@ -101,9 +107,17 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 												{soap_in},
 												dataset(layout_Soap_output), 
 												RETRY(retry), TIMEOUT(timeout),
+												XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 												parallel(threads) ,
 												onfail(myfail(LEFT)));
 
+layout_Soap_output trans_rollup(layout_Soap_output l, layout_Soap_output r) := transform
+	self.Did := r.Did;
+
+	self := l;
+End;
+					
+soap_output_withDID := rollup(soap_output, ((integer)left.acctno = (integer)right.acctno and left.acctno <>''), trans_rollup(left,right));				
 
 		//GLOBAL OUTPUT LAYOUT
 		Global_output_lay:= RECORD	 
@@ -112,7 +126,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 
     //Appeding additional internal extras to Soap output file 
 		//Mapping Version4 scores and reason codes
-		rv_scores_v4 := join(Soap_output, soap_in  , 
+		rv_scores_v4 := join(soap_output_withDID, soap_in  , 
 												 left.acctno = (string)right.batch_in[1].acctno,			
 			                       TRANSFORM(Global_output_lay, 
 														 self.time_ms := left.time_ms;  
@@ -168,7 +182,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		END;
 
 		//Appeding additional internal extras to Soap output file 
-		Global_output_lay2 normit(Soap_output L, soap_in R) := transform
+		Global_output_lay2 normit(soap_output_withDID L, soap_in R) := transform
 			SELF.accountnumber :=(string) R.batch_in[1].acctno;
 			self.DID := (integer)l.did; 
 			self.historydate := (string)r.batch_in[1].HistoryDateYYYYMM;
@@ -183,14 +197,15 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			self := [];
 		END;
 			 
-		ds_with_extras2 := JOIN(Soap_output,soap_in,LEFT.Acctno=(string)RIGHT.batch_in[1].acctno,normit(LEFT,RIGHT));
+		ds_with_extras2 := JOIN(soap_output_withDID,soap_in,LEFT.Acctno=(string)RIGHT.batch_in[1].acctno,normit(LEFT,RIGHT));
 
 		//scores
 				 output(rv_scores_v4 ,,outfile_name1, thor, compressed, overwrite);
 //attributes
 		output(ds_with_extras2 ,,outfile_name2, thor, compressed, overwrite);
 		
-		
+		 // output(soap_output_withDID,named('Soap_output'));
+		// output(soap_in,named('soap_in'));
 return 0;
 endmacro;
 		 

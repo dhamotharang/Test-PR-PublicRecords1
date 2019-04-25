@@ -127,7 +127,7 @@ filteredSSNFPv3 := FPv3(REGEXFIND('(^[0-9]{4}$)|(^[0-9]{3}-?[0-9]{2}-?[0-9]{4}$)
 filteredzipFPv3 := filteredSSNFPv3(REGEXFIND('(^[0-9]{5}$)|(^[0-9]{5}-?[0-9]{4}$)', zip));
 
 goodinfoFPv3 := filteredzipFPv3(lastname not in ['','MARSUPIAL'] and lastname[1..2] != 'AA' and firstname not in [''] and Address != '' and city != ''
-											 and state != '' and zip != '' and ssn != '' and ssn != '000000000' and ssn != '00000' and dob != '' and (homephone != '' or workphone != ''));
+											 and state != '' and zip != '' and ssn != '' and ssn != '000000000' and ssn != '00000' and dob != '' and dob != '10101' and (homephone != '' or workphone != ''));
 
 keepers0FPv3 := OriginalDataFPv3(perm_flag = 0);
 keepers1FPv3 := OriginalDataFPv3(perm_flag = 1);
@@ -187,8 +187,8 @@ New_Test_SampleFPv3 := dedupoldFPv3 + Formatted_acct_NewFPv3 ; //adds back to ol
 
 Sorted_SampleFPv3 := Sort(New_Test_SampleFPv3, perm_flag, date_added);
 
-// finalFPv3 := OUTPUT(choosen(Sorted_SampleFPv3, 10000),,FileoutFPv3, thor, overwrite);
-finalFPv3 := OUTPUT(choosen(Sorted_SampleFPv3, 10000));
+finalFPv3 := OUTPUT(choosen(Sorted_SampleFPv3, 10000),,FileoutFPv3, thor, overwrite);
+// finalFPv3 := OUTPUT(choosen(Sorted_SampleFPv3, 10000));
 
 finalFPv3_salt := choosen(Sorted_SampleFPv3, 10000);
 
@@ -365,6 +365,92 @@ return finalBNK4;
 end;
 
 // ************************************************************************************************************************************************************************************************************************
+//cbbl
+EXPORT NonFCRA_New_Samples_Logs_cbbl (DATASET(Scoring_Project_Refresh_Samples.New_Samples_layouts.BNK4_CBBL_Layout) CBBL_2, dataset(Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structureBNK4) OriginalDatacbbl, string NewFilecbbl) := FUNCTION 
+
+FindMaxAccountcbbl := choosen(sort(OriginalDatacbbl, -accountnumber), 5);
+MaxAccouncbbl := max(FindMaxAccountcbbl, accountnumber);
+
+filteredSSNcbbl := cbbl_2(REGEXFIND('(^[0-9]{4}$)|(^[0-9]{3}-?[0-9]{2}-?[0-9]{4}$)|(^[0-9]{9}$)', ssn));
+filteredzipcbbl := filteredSSNcbbl(REGEXFIND('(^[0-9]{5}$)|(^[0-9]{5}-?[0-9]{4}$)', zip));
+
+goodinfocbbl := filteredzipcbbl(lastname not in ['','MARSUPIAL'] and lastname[1..2] != 'AA' and firstname not in [''] and Address != '' and city != ''
+											and state != '' and zip != '' and zip != '00000' and ssn!= '999999999' and ssn != '' and ssn != '000000000' and ssn != '0000' );
+											
+DedupedDatacbbl := dedup(goodinfocbbl, SSN,  all); //sorted by ssn since all blank ssn's have been removed;
+
+keepers0cbbl := OriginalDatacbbl(perm_flag = 0);
+keepers1cbbl := OriginalDatacbbl(perm_flag = 1);
+keepers2cbbl := OriginalDatacbbl(perm_flag = 2);
+keepers3cbbl := OriginalDatacbbl(perm_flag = 3);
+keepers4cbbl := OriginalDatacbbl(perm_flag = 4);
+
+keeperscbbl := sort(keepers0cbbl+keepers2cbbl+keepers3cbbl+keepers4cbbl, accountnumber);
+
+Reflagged_Logscbbl := project(keeperscbbl, RearrangeBNK4(left, counter));
+
+Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structureBNK4 format_themcbbl(Scoring_Project_Refresh_Samples.New_Samples_layouts.BNK4_CBBL_Layout l, integer c) := Transform
+	self.Date_added := Std.Date.Today();
+	self.streetaddress := l.Address;
+	self.customer := 'Chase';
+	self.source_info := 'acclogs_scoring';
+	self.dateofbirth := l.DateOfBirth;
+	self.homephone := l.homephone;
+	self.name_company	:= l.companyname;
+	self.street_addr2 := l.companyaddress;
+	self.p_city_name_2 := l.companycity;
+  self.st_2	 := l.companystate;
+	self.z5_2	:= l.companyzip;
+	self.fein  := l.fein;
+	self.drm	:= l.datarestrictionmask;
+	self.Perm_Flag := 4;
+	//self.AccountNumber := c + (integer)MaxAccounBNK4;
+	self.history_date := 999999;
+	self.historydateyyyymm := 999999;
+	self:=l;
+	self:=[];
+End;
+
+Formatted_Newcbbl := project(DedupedDatacbbl, format_themcbbl(left, counter));
+
+New_rightcbbl := join(Reflagged_Logscbbl, Formatted_Newcbbl,  left.ssn = right.ssn, right only);  //dataset with ssn's that are not in the old dataset;
+new_large_samplecbbl := Reflagged_Logscbbl + New_rightcbbl; //add "new_right" to old dataset;
+
+sort_large_samplecbbl := Sort(new_large_samplecbbl, ssn, Date_added); //sort by date added for dedup
+
+//deduped_newBNK4 := sort_large_sampleBNK4(Date_added = (Integer)ut.getdate);  //seperates new and old records by date;
+//dedupoldBNK4:= sort_large_sampleBNK4(Date_added <> (Integer)ut.getdate);
+
+deduped_newcbbl := sort_large_samplecbbl(Date_added = Std.Date.Today());  //seperates new and old records by date;
+dedupoldcbbl:= sort_large_samplecbbl(Date_added <> Std.Date.Today());
+
+ut.MAC_Pick_Random(deduped_newcbbl,New_5000cbbl,5000);   //grabs 5000 of new deduped rocrods;
+
+// Transform to add account number after grabbing the 5000 new records. (12-13-2016)
+Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structureBNK4 add_acctcbbl(Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structureBNK4 le, integer c) := Transform
+	self.AccountNumber := c + (integer)MaxAccouncbbl;
+	self:= le;
+	self:= [];
+End;
+
+Formatted_acct_Newcbbl := project(New_5000cbbl, add_acctcbbl(left, counter));
+
+New_Test_Samplecbbl := dedupoldcbbl + Formatted_acct_Newcbbl ; //adds back to old file;
+
+Sorted_Samplecbbl := Sort(New_Test_Samplecbbl, perm_flag, date_added);
+//finalBNK4 := output(choosen(Sorted_SampleBNK4, all));
+
+ finalcbbl := OUTPUT(choosen(Sorted_Samplecbbl, 25000),,NewFilecbbl, thor, overwrite);	
+finalcbbl_salt := choosen(Sorted_Samplecbbl, 25000);
+
+zz_Koubsky_SALT.mac_profile(finalcbbl_salt);
+return finalcbbl;
+end;
+
+// ************************************************************************************************************************************************************************************************************************
+
+
+
 
 export NonFCRA_New_Samples_Logs_PI02(DATASET(Scoring_Project_Refresh_Samples.New_Samples_layouts.PI02_layout) PI02, dataset(Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure) OriginalDataPI02, string FileoutPI02) := FUNCTION 
 

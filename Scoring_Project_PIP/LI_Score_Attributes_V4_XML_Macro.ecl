@@ -1,7 +1,7 @@
 ﻿EXPORT LI_Score_Attributes_V4_XML_Macro(roxie_ip, Gateway_dummy, Thread, Timeout, Retry, Input_file_name, Output_file_name1_score, Output_file_name2_attr, records_ToRun):= FUNCTIONMacro
 
 
-IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, zz_bbraaten2;
+IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 IMPORT UT, scoring , Scoring_Project_PIP;
 
 
@@ -148,7 +148,6 @@ IMPORT UT, scoring , Scoring_Project_PIP;
 																						self.errorcode:=right.errorcode;
 																						), keep(1)
 																				);
-
 
 	  //final file out to thor
 
@@ -571,7 +570,9 @@ Global_output_lay2:= RECORD
 																				);
 																				
 output(ds_with_extras,, outfile_name1, thor, compressed, OVERWRITE);
+output(ds_with_extras,, outfile_name1+'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));
 output(ds_with_extras2,, outfile_name2, thor, compressed, OVERWRITE);
+output(ds_with_extras2,, outfile_name2+'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));
 // end;
 		RETURN 0;
 // export scores;

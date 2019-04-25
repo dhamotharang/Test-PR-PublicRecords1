@@ -1,11 +1,12 @@
-﻿EXPORT Prod_Capone_Daily_Tracking := FUNCTION
-//Capone has migrated to RV v5 as of 3/24 - oked by product.
-
+﻿export Prod_Capone_Daily_Tracking := FUNCTION
+//retired v3
+//retired v5 oked 3/12
+//making new//making new
 import ut;
-import std, Scoring_Project, ashirey,Scoring_Project_Macros, zz_bbraaten2;
+import std, Scoring_Project, ashirey,Scoring_Project_Macros, Scoring_Project_PIP,Scoring_Project_DailyTracking;
 
 dt := ut.getdate;
-decimal19_2 thresh := 0.25;
+decimal19_2 thresh := 0.01;
 
 
 ds_curr := dataset('~ScoringQA::out::NONFCRA::Profile_Booster_Batch_Prod_CapitalOne_attributes_v1_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.ProfileBooster_layout, thor)(length(trim(errorcode,left,right))= 0 );
@@ -26,61 +27,11 @@ ds_prev := dataset('~'+ p_file_name, Scoring_Project_Macros.Global_Output_Layout
 clean_prev := ds_prev(errorcode = '');
 clean_curr := ds_curr(errorcode = '');
 
-ds_results2 := zz_bbraaten2.Compare_dsets_macro_email(clean_prev, clean_curr, ['acctno'], thresh);
+ds_results2 := Scoring_Project_PIP.Compare_dsets_macro_email(clean_prev, clean_curr, ['acctno'], thresh);
 
 re_filter2 := ds_results2(field <> 'time_ms');
 
-
-/*
-		join1 := JOIN(ds_curr, ds_prev, LEFT.accountnumber=RIGHT.accountnumber, transform(left));
-		clean_file := join1(accountnumber <> '');
-		ds_curr_join := JOIN(ds_curr, clean_file, LEFT.accountnumber=RIGHT.accountnumber, transform(left));
-		ds_prev_join := JOIN(ds_prev, clean_file, LEFT.accountnumber=RIGHT.accountnumber, transform(left));
-
-ashirey.flatten(ds_curr_join, curr_output, ,true , ,);
-ashirey.flatten(ds_prev_join, prev_output, ,true , ,);
-curr_ds := Scoring_Project.BocaShell_Normalized_Code(curr_output, 'accountnumber');
-prev_ds := 	Scoring_Project.BocaShell_Normalized_Code(prev_output, 'accountnumber');
-*/
-
-/* //Alternate Approach
-   // curr_ds := Scoring_Project.BocaShell_Normalized_Code(Scoring_Project.BocaShell_Normalized_Layout(ds_curr_join), 'accountnumber');
-   
-   // prev_ds := 	Scoring_Project.BocaShell_Normalized_Code(Scoring_Project.BocaShell_Normalized_Layout(ds_prev_join), 'accountnumber');																 
-*/
-/*
-
-layout := record
-recordof(curr_ds);
-Integer flag;
-end;
-
-
-fcra_jn := JOIN(curr_ds, prev_ds, left.accountnumber = right.accountnumber and
-														 left.field_name = right.field_name,
-														TRANSFORM(layout, 
-																			self.flag := If(left.field_value <> right.field_value, 1, 0);
-																			self := Left;
-																			));
-														
-fcra_filter_join := fcra_jn(flag = 1, field_name <> 'proflic_build_date');	
-
-fcra_recrd := record
-fcra_filter_join.field_name;
-Integer Difference_count := count(group);
-decimal19_2  Difference_Percent :=  (count(group)/count(ds_curr_join))*100;
-end;
-
-fcra_result := table(fcra_filter_join, fcra_recrd, fcra_filter_join.field_name);
-
-
-re_filter1:=fcra_result(field_name not in ['aircraft_build_date', 'historydatetimestamp', 'property_build_date', 'time_ms'], Difference_Percent > thresh);
-
-re_filter2:=SORT(re_filter1, -Difference_Percent);
-*/
-
-// ******** END: CURRENT MODE CALCULATIONS *********************************************************************************************************************
-
+//v3 retired
 // ******** START: ARCHIVE MODE CALCULATIONS *********************************************************************************************************************
 /*
 ds_curr_archive := dataset('~ScoringQA::out::FCRA::RiskView_Batch_Prod_Capitalone_attributes_V3_' + dt + '_1', scoring_project_Macros.Global_Output_Layouts.FCRA_RiskView_BATCH_Capitalone_Attributes_V3_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
@@ -143,13 +94,13 @@ re_filter2_archive := ds_results2_archive(field <> 'time_ms');
 */
 // ******** END: ARCHIVE MODE CALCULATIONS *********************************************************************************************************************
 		
-
+//retired v5
 // ******** START: NON FCRA CURRENT MODE CALCULATIONS *********************************************************************************************************************
 
-nonfcra_ds_curr := dataset('~ScoringQA::out::FCRA::RiskView_Batch_Prod_Capitalone_attributes_V5_' + dt + '_1',  Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Capone_allflagships_Attributes_V5_Batch_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+nonfcra_ds_curr := dataset('~scoringqa::out::fcra::riskview_xml_generic_prod_allflagships_attributes_v5_' + dt + '_1',  Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_Attributes_V5_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 
 
-nonfcra_filenames_details :=  nothor(STD.File.LogicalFileList('ScoringQA::out::FCRA::RiskView_Batch_Prod_Capitalone_attributes_V5_*_1'));
+nonfcra_filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::riskview_xml_generic_prod_allflagships_attributes_v5_*_1'));
 
 
 nonfcra_filelist := sort(nonfcra_filenames_details, -modified);
@@ -160,53 +111,15 @@ nonfcra_prev_date := nonfcra_p_file_name[length(nonfcra_p_file_name)-9.. length(
 cleaned_nonfcra_curr_date := dt;
 cleaned_nonfcra_prev_date := nonfcra_prev_date;
 
-nonfcra_ds_prev := dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Capone_allflagships_Attributes_V5_Batch_Layout, thor)(length(trim(errorcode,left,right))= 0 );
+nonfcra_ds_prev := dataset('~'+ nonfcra_p_file_name, Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_Generic_allflagships_Attributes_V5_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 
 clean_prev_nonfcra := nonfcra_ds_prev(errorcode = '');
 clean_curr_nonfcra := nonfcra_ds_curr(errorcode = '');
 
-ds_results2_nonfcra := zz_bbraaten2.Compare_dsets_macro_email(clean_prev_nonfcra, clean_curr_nonfcra, ['acctno'], thresh);
+ds_results2_nonfcra := Scoring_Project_PIP.Compare_dsets_macro_email(clean_prev_nonfcra, clean_curr_nonfcra, ['acctno'], thresh);
 
 re_filter2_nonfcra := ds_results2_nonfcra(field <> 'time_ms');
 
-		// nonfcra_join1 := JOIN(nonfcra_ds_curr, nonfcra_ds_prev, LEFT.acctNo=RIGHT.acctNo, transform(left));
-		// nonfcra_clean_file := nonfcra_join1(acctNo <> '');
-		// nonfcra_ds_curr_join := JOIN(nonfcra_ds_curr, nonfcra_clean_file, LEFT.acctNo=RIGHT.acctNo, transform(left));
-		// nonfcra_ds_prev_join := JOIN(nonfcra_ds_prev, nonfcra_clean_file, LEFT.acctNo=RIGHT.acctNo, transform(left));
-
-/* LAYOUT FLATTENING */ 
-				 // ashirey.flatten(nonfcra_ds_curr_join, nonfcra_curr_output, ,true , ,);
-         // ashirey.flatten(nonfcra_ds_prev_join, nonfcra_prev_output, ,true , ,);
-         // nonfcra_curr_ds := Scoring_Project.BocaShell_Normalized_Code(nonfcra_curr_output, 'acctno');
-         // nonfcra_prev_ds := 	Scoring_Project.BocaShell_Normalized_Code(nonfcra_prev_output, 'acctno');
-         
-         // nonfcra_layout := record
-         // recordof(nonfcra_curr_ds);
-         // Integer flag;
-         // end;
-         
-         
-         // nonfcra_jn := JOIN(nonfcra_curr_ds, nonfcra_prev_ds, left.accountnumber = right.accountnumber and
-         														 // left.field_name = right.field_name,
-         														// TRANSFORM(nonfcra_layout, 
-         																			// self.flag := If(left.field_value <> right.field_value, 1, 0);
-         																			// self := Left;
-         																			// ));
-         														
-         // nonfcra_filter_join := nonfcra_jn(flag = 1, field_name <> 'proflic_build_date');	
-         
-         // nonfcra_recrd := record
-         // nonfcra_filter_join.field_name;
-         // Integer Difference_count := count(group);
-         // decimal19_2  Difference_Percent :=  (count(group)/count(nonfcra_ds_curr_join))*100;
-         // end;
-         
-         // nonfcra_result := table(nonfcra_filter_join, nonfcra_recrd, nonfcra_filter_join.field_name);
-
-
-
-// re_filter1_nonfcra := nonfcra_result(field_name not in ['aircraft_build_date', 'historydatetimestamp', 'property_build_date', 'time_ms'], Difference_Percent > thresh);
-// re_filter2_nonfcra := SORT(re_filter1_nonfcra, -Difference_Percent);
 
 // ******** END: NonFCRA CURRENT MODE CALCULATIONS *********************************************************************************************************************
 
@@ -231,48 +144,9 @@ nonfcra_ds_prev_arch := dataset('~'+ nonfcra_p_file_name_arch, scoring_project_M
 nonfcra_clean_prev := nonfcra_ds_prev_arch(errorcode = '');
 nonfcra_clean_curr := nonfcra_ds_curr_arch(errorcode = '');
 
-nonfcra_ds_results2 := zz_bbraaten2.Compare_dsets_macro_email(nonfcra_clean_prev, nonfcra_clean_curr, ['acctno'], thresh);
+nonfcra_ds_results2 := Scoring_Project_PIP.Compare_dsets_macro_email(nonfcra_clean_prev, nonfcra_clean_curr, ['acctno'], thresh);
 
 re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> 'seq');
-
-		// nonfcra_join1_arch := JOIN(nonfcra_ds_curr_arch, nonfcra_ds_prev_arch, LEFT.acctno=RIGHT.acctno, transform(left));
-		// nonfcra_clean_file_arch := nonfcra_join1_arch(acctno <> '');
-		// nonfcra_ds_curr_join_arch := JOIN(nonfcra_ds_curr_arch, nonfcra_clean_file_arch, LEFT.acctno=RIGHT.acctno, transform(left));
-		// nonfcra_ds_prev_join_arch := JOIN(nonfcra_ds_prev_arch, nonfcra_clean_file_arch, LEFT.acctno=RIGHT.acctno, transform(left));
-
-/* LAYOUT FLATTENING */ 
-				 // ashirey.flatten(nonfcra_ds_curr_join_arch, nonfcra_curr_output_arch, ,true , ,);
-         // ashirey.flatten(nonfcra_ds_prev_join_arch, nonfcra_prev_output_arch, ,true , ,);
-         // nonfcra_curr_ds_arch := Scoring_Project.BocaShell_Normalized_Code(nonfcra_curr_output_arch, 'acctno');
-         // nonfcra_prev_ds_arch := 	Scoring_Project.BocaShell_Normalized_Code(nonfcra_prev_output_arch, 'acctno');
-         
-         // nonfcra_layout_arch := record
-         // recordof(nonfcra_curr_ds_arch);
-         // Integer flag;
-         // end;
-         
-         
-         // nonfcra_jn_arch := JOIN(nonfcra_curr_ds_arch, nonfcra_prev_ds_arch, left.accountnumber = right.accountnumber and
-         														 // left.field_name = right.field_name,
-         														// TRANSFORM(nonfcra_layout_arch, 
-         																			// self.flag := If(left.field_value <> right.field_value, 1, 0);
-         																			// self := Left;
-         																			// ));
-         														
-         // nonfcra_filter_join_arch := nonfcra_jn_arch(flag = 1, field_name <> 'seq');	
-         
-         // nonfcra_recrd_arch := record
-         // nonfcra_filter_join_arch.field_name;
-         // Integer Difference_count := count(group);
-         // decimal19_2  Difference_Percent :=  (count(group)/count(nonfcra_ds_curr_join_arch))*100;
-         // end;
-         
-         // nonfcra_result_arch := table(nonfcra_filter_join_arch, nonfcra_recrd_arch, nonfcra_filter_join_arch.field_name);
-
-
-
-// re_filter1_nonfcra_arch := nonfcra_result_arch(field_name not in ['aircraft_build_date', 'historydatetimestamp', 'property_build_date', 'time_ms'], Difference_Percent > thresh);
-// re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 
 
 // ******** END: NonFCRA ARCHIVE MODE CALCULATIONS *********************************************************************************************************************
@@ -282,6 +156,7 @@ re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> '
 			STRING line;
 		END;
 
+		// max_diff := (STRING)SORT( re_filter2 +   re_filter2_nonfcra_arch, -diff_pct)[1].diff_pct + '%';
 		max_diff := (STRING)SORT( re_filter2 +  re_filter2_nonfcra + re_filter2_nonfcra_arch, -diff_pct)[1].diff_pct + '%';
 		// max_diff := (STRING)SORT( re_filter2 + re_filter2_archive + re_filter2_nonfcra + re_filter2_nonfcra_arch, -diff_pct)[1].diff_pct + '%';
 		// max_diff := (STRING)re_filter2_nonfcra_arch[1].diff_pct	 + '%';
@@ -346,7 +221,7 @@ re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> '
 													// }], MyRec);
 													
 		head_prod_realtime := DATASET([{1,    
-														'Environment:  Prod - RV v5 Capone Prescreen'	+ '\n\n'
+														'Environment:  Prod - RV v5 Generic'	+ '\n\n'
 													+ 'Archive date:  999999' + '\n'
 													+ 'Previous run date:  ' + cleaned_nonfcra_prev_date + '\n'
 													+ 'Current run date:  ' + cleaned_nonfcra_curr_date + '\n' 
@@ -389,9 +264,9 @@ re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> '
 		output_prod_archive := PROJECT(SORT(head_prod_archive + outfile_prod_archive, order), TRANSFORM(MyRec, SELF.order := 8; SELF := LEFT));
 
 
-		// output_append := main_head + output_cert_realtime + spacer + output_cert_archive + spacer2 + output_prod_realtime + spacer3 + output_prod_archive;
+		// output_append := main_head +spacer + output_cert_realtime + spacer3 + output_prod_archive;
 		output_append := main_head +spacer + output_cert_realtime +  spacer2 + output_prod_realtime + spacer3 + output_prod_archive;
-		// output_append := main_head + spacer + output_cert_archive + spacer2 + output_prod_realtime + spacer3 + output_prod_archive;
+		// output_append := main_head + output_cert_realtime + spacer + output_cert_archive + spacer2 + output_prod_realtime + spacer3 + output_prod_archive;
 		output_full := SORT(output_append, order);
 
 		MyRec Xform(myrec L,myrec R) := TRANSFORM
@@ -401,10 +276,8 @@ re_filter2_nonfcra_arch := nonfcra_ds_results2(field <> 'time_ms' and field <> '
 
 		XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
 
-		final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com; nathan.koubsky@lexisnexis.com; Joseph.Nassar@lexisnexis.com; Apaar.Sinha@lexisnexisrisk.com; Benjamin.Karnatz@lexisnexis.com; Matthew.Ludewig@lexisnexisrisk.com', 'Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
-		// final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com', 'TEST...Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
-									// WHEN(CRON('0 11 * * *')), //run at 6:00 AM
-									// FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.Bocashell_collections_fail_list,'BocaShell 4.1 Cert Tracking CRON job failed','The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+		final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.prod_reports, 'Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
+		// final := FileServices.SendEmail('Bridgett.braaten@lexisnexis.com', 'Capone Prod Tracking Report: MaxDiff ' + max_diff, XtabOut[COUNT(XtabOut)].line);
 
 		RETURN final;
 END;	

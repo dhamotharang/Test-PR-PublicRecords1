@@ -51,7 +51,7 @@ BusinessShell_SBFE_Report := Scoring_Project_Macros.BusinessShell_SBFE_Report;
 sequential(AddressShell,BusinessShell, AddressShellReport, BusinessShell_Tracking_Report, BusinessShell_NonSBFE_Report, BusinessShell_SBFE_Report);
 
  // :   WHEN(CRON('00 6 * * *')), 
-// FAILURE(FileServices.SendEmail( Scoring_Project_DailyTracking.email_distribution.ISS_Email_list,'Daily Data Collection Addressshell & BusinessShell job failed','The failed workunit is:' + workunit + FailMessage));
+// FAILURE(FileServices.SendEmail( Scoring_Project_DailyTracking.email_distribution.DDT_fail_list,'Daily Data Collection Addressshell & BusinessShell job failed','The failed workunit is:' + workunit + FailMessage));
 
 
 

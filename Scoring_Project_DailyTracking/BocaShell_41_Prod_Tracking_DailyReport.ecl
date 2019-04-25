@@ -1,12 +1,12 @@
 ﻿EXPORT BocaShell_41_Prod_Tracking_DailyReport := FUNCTION
-
+//making new
 import ut;
-import std, Scoring_Project, ashirey,Scoring_Project_Macros, zz_bbraaten2;
-
+import std, Scoring_Project, ashirey,Scoring_Project_Macros;
+//making new//making new
 dt := ut.getdate;
 decimal19_2 thresh := 1.25;
 
-tag:=ut.foreign_prod_boca;
+tag:='~foreign::' + '10.173.44.105' + '::';
 // Layout3 := zz_bbraaten2.Boca_41_Non_Cert_lay_new;   //NonFCRA
 
 
@@ -313,7 +313,7 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 
 	head_fcra_prod_archive := DATASET([{1,    
 														'Environment:  PROD - FCRA'	+ '\n'
-													+ 'Archive date:  201207' + '\n'
+													+ 'Archive date:  201607' + '\n'
 													+ 'Previous run date:  ' + cleaned_prev_arch_date + '\n'
 													+ 'Current run date:  ' + cleaned_curr_arch_date + '\n' 
 													+ 'Previous record count:  ' + COUNT(ds_prev_archive) + '\n'
@@ -342,7 +342,7 @@ re_filter2_nonfcra_arch := SORT(re_filter1_nonfcra_arch, -Difference_Percent);
 
 	head_nonfcra_prod_archive := DATASET([{1,    
 														'Environment:  PROD - NONFCRA'	+ '\n'
-													+ 'Archive date:  201207' + '\n'
+													+ 'Archive date:  201607' + '\n'
 													+ 'Previous run date:  ' + cleaned_nonfcra_prev_date_arch + '\n'
 													+ 'Current run date:  ' + cleaned_nonfcra_curr_date_arch + '\n' 
 													+ 'Previous record count:  ' + COUNT(nonfcra_ds_prev_arch) + '\n'

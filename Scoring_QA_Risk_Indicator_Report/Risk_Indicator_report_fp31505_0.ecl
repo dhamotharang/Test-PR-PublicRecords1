@@ -1,7 +1,7 @@
 ﻿
 
 EXPORT Risk_Indicator_report_fp31505_0(route, fpname ,current_dt,previous_dt) :=  functionmacro
-import zz_bbraaten2, Scoring_QA_Risk_Indicator_Report;
+import  Scoring_QA_Risk_Indicator_Report;
 	 
 	 
  file1:= dataset(route + 'scoringqa::out::nonfcra::fraudpoint_xml_generic_fp31505_0_v3_' + fpname + previous_dt, Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_FraudPoint_V3_Global_Layout,thor);

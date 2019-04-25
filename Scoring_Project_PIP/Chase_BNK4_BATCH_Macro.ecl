@@ -17,6 +17,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT, scoring;
 		DPPA:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_BATCH_Chase_BNK4_settings.DPPA;
 		GLB:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_BATCH_Chase_BNK4_settings.GLB;
 		DRM:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_BATCH_Chase_BNK4_settings.DRM;
+		DPM:=Scoring_Project_PIP.User_Settings_Module.BC10_Scores_BATCH_Chase_BNK4_settings.DPM;
     HISTORYDATE := 999999;
 		
     //*****************************************************
@@ -40,6 +41,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT, scoring;
 			unsigned1	DPPAPurpose;
 			unsigned1	GLBPurpose;
 			STRING DataRestrictionMask;
+			STRING DataPermissionMask;
 		END;
 
 		Riskwise.Layout_BC1O_BatchIn make_batch_in(ds_raw_input le, integer c) := transform
@@ -71,6 +73,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT, scoring;
 			SELF.DPPAPurpose := DPPA;
 			SELF.GLBPurpose := GLB;
 			SELF.DataRestrictionMask := DRM;
+			SELF.DataPermissionMask := DPM;
 		END;
 
     //ds_soap_in
@@ -79,12 +82,16 @@ IMPORT Models, Risk_Indicators, RiskWise, UT, scoring;
 		//Soap output layout		
 		//GLOBAL OUTPUT LAYOUT
 		Global_output_lay:= RECORD	 
-		Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_Chase_BNK4_Global_Layout;			 
+		Scoring_Project_Macros.Global_Output_Layouts.NONFCRA_Chase_BNK4_Global_Layout;		
+		
 		END;
 
 		Global_output_lay myFail(soap_in l) := TRANSFORM
 			SELF.errorcode := FAILCODE + FAILMESSAGE;
-			self.account := l.batch_in[1].account;
+			// self.account := l.batch_in[1].account;
+			// self.account := l.batch_in[1].account;
+			self.acctno := l.batch_in[1].acctno;
+			SELF := l;
 			SELF := [];
 		END;
 
@@ -104,6 +111,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT, scoring;
 						 
 		Global_output_lay did_append(did_results l, Soap_output r) := TRANSFORM
 																															 self.did := l.did;
+																															 // self.errorcode:=l.errorcode+r.errorcode;
 																															 self := r;
 																														 END;
 																														 
@@ -112,6 +120,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT, scoring;
 		//Appeding additional internal extras to Soap output file 	 
 		Global_output_lay internal_extras_append(res l, soap_in r) := TRANSFORM
 																self.DID := l.did; 
+																self.errorcode:= l.errorcode;
 																self.historydate := (string)r.batch_in[1].HistoryDateYYYYMM;
 																self.FNamePop := r.batch_in[1].Name_First<>'';
 																self.LNamePop := r.batch_in[1].Name_Last<>'';
@@ -128,6 +137,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT, scoring;
 
     //final file out to thor
 		final_output := output(ds_with_extras, , outfile_name, thor, compressed, OVERWRITE);
+
 
 		RETURN final_output;
 
