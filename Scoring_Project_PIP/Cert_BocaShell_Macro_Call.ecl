@@ -82,10 +82,10 @@ data_collection := parallel(Nonfcra_41, Nonfcra_50, Fcra_41, Fcra_50);
 // Boca_macros := parallel(Boca41FCRA_Macro,Boca41NonFCRA_Macro);
 
 //Run Collections in parallel
-sequential( data_collection);
+sequential( data_collection)
 
-			 // : WHEN(CRON('00 8 * * *')), //4:30 am
-			// FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.fail_list,'Test Cert Bocashell collections job failed.','The failed workunit is: ' + workunit + FailMessage));
+			 : WHEN(CRON('00 8 * * *')), //4:30 am
+			FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.fail_list,'Test Cert Bocashell collections job failed.','The failed workunit is: ' + workunit + FailMessage));
 		
 
 

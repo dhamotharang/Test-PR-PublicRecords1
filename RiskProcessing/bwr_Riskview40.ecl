@@ -1,5 +1,5 @@
-#workunit('name','FCRA-RiskView Process');
-#option ('hthorMemoryLimit', 1000)
+﻿#workunit('name','FCRA-RiskView Process');
+#option ('hthorMemoryLimit', 1000);
 import models, Riskwise, Risk_Indicators;
 
 // new internal fields for debugging, set to false so they are excluded from the layout by default
@@ -29,7 +29,6 @@ prii_layout := RECORD
      integer HistoryDateYYYYMM;
 		 unsigned did;
 end;
-
 f := DATASET('~jpyon::in::sprint_1552_in',prii_layout,csv(quote('"')));
 // f := choosen(DATASET('~jpyon::in::sprint_1552_in',prii_layout,csv(quote('"'))),10);
 output(f, named('original_input'));
@@ -64,7 +63,7 @@ layout_soap := record
 	dataset(Models.Layout_Score_Chooser) scores;
 	dataset(Risk_Indicators.Layout_Gateways_In) gateways;
 	unsigned6 did;
-	boolean FilterLiens;
+	string DataRestrictionMask;
 end;
 
 // params := dataset([], models.Layout_Parameters);
@@ -83,6 +82,8 @@ l := RECORD
 	layout_soap;
 END;
 
+DataRestrictionMask := '10000100010001000000000000000000000000000'; // to restrict fares, experian and transunion -- returns liens and judgments
+// DataRestrictionMask := '10000100010001000000000000000000000000001';//to restrict fares, LIENS/Jdgmts, experian and transunion 
 
 fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
 neutralroxieIP := 'http://roxiebatch.br.seisint.com:9856';
@@ -94,7 +95,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.old_account_number := le.account;
 	SELF.Accountnumber := (STRING)c;	
 	SELF.Attributes := False;
-	
+  SELF.HistoryDateYYYYMM := (Integer) le.historydateyyyymm[1..6];	
 // use it for FCRA RiskView	
 	// if you only want to run one, pick the one you want
 	// self.scores := dataset([{'Models.RVAuto_Service', fcraroxieIP, paramsA}], models.Layout_Score_Chooser); 
@@ -110,8 +111,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 							{'Models.RVMoney_Service', fcraroxieIP,paramsM},{'Models.RVPrescreen_Service', fcraroxieIP,paramsP}], models.Layout_Score_Chooser); 
  
 	self.gateways := dataset([{'neutralroxie', neutralroxieIP}], risk_indicators.Layout_Gateways_In);
-	
-	self.filterLiens := false;  // temporary input option, RQ-12867
+	self.DataRestrictionMask := DataRestrictionMask;
 	
 	SELF := le;
 	self := [];
@@ -478,5 +478,5 @@ j_f := JOIN(resu,p_f,LEFT.accountnumber=RIGHT.accountnumber,normit(LEFT,RIGHT));
 
 output(j_f, named('j_f'));
 
-output(j_f,,'~dvstemp::out::rvscores4_test_' + thorlib.wuid(),CSV(heading(single), quote('"')));
+output(j_f,,'~dvstemp::out::rvscores4_' + thorlib.wuid(),CSV(heading(single), quote('"')));
 //output(j_f(errorcode<>''),,'~jpyon::out::sprint_1522_rvmoney_error',CSV(QUOTE('"')), overwrite);

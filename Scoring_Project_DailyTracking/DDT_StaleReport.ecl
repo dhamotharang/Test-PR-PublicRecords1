@@ -28,7 +28,7 @@ end;
 
 EXPORT DDT_StaleReport( dataset(outrec) ddt_set, string env, string loc, string clus, string histdt) := function
 		
-		yesterday := ut.date_math(ut.getdate, -1);
+		yesterday := ut.date_math(ut.getdate, -1.5);
 		
 		environment_name := 	map(	env = 'P' 		=>		'Prod',
 																env = 'Q'			=>		'Cert',

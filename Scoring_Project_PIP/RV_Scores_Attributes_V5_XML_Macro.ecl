@@ -16,8 +16,11 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Gateway;
 
 		DataRestrictionMask:=Scoring_Project_PIP.User_Settings_Module.RV_Attributes_V5_XML_Generic_settings.DRM;
 		isFCRA:=if(Scoring_Project_PIP.User_Settings_Module.RV_Attributes_V5_XML_Generic_settings.isFCRA=true,'FCRA','NONFCRA');
-		// GLBPurpose:=Scoring_Project_PIP.User_Settings_Module.RV_Attributes_V5_XML_Generic_settings.GLB;
-		// DLPurpose :=Scoring_Project_PIP.User_Settings_Module.RV_Attributes_V5_XML_Generic_settings.DL;
+		
+		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		integer FFD := 1;	
+		
 		
 		AttributesVersion := 'riskviewattrv5';
     intendedPurpose := '';// Turn on the PRESCREENING intended purpose if this customer will be running in prescreen mode 
@@ -50,7 +53,8 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Gateway;
 		soapLayout := RECORD
 			DATASET(iesp.riskview2.t_RiskView2Request) RiskView2Request := DATASET([], iesp.riskview2.t_RiskView2Request);
 			STRING HistoryDateTimeStamp := '';
-			DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+			// DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+			DATASET(Risk_Indicators.Layout_Gateways_In) gateways := DATASET([], Risk_Indicators.Layout_Gateways_In);
 		END;
 
 		soapLayout intoSOAP(ds_raw_input le, UNSIGNED4 c) := TRANSFORM
@@ -96,12 +100,11 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Gateway;
 								SELF.IncludeModels := models[1];
 								SELF.AttributesVersionRequest := AttributesVersion;
 								SELF.IncludeReport := FALSE; 
+								self.FFDOptionsMask := (string)FFD;
 								SELF.IntendedPurpose := intendedPurpose;
 								SELF := []));
 			
 			users := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User,
-								// SELF.GLBPurpose := (STRING)GLBPurpose;
-								// SELF.DLPurpose :=(STRING)DLPurpose;
 								SELF.DataRestrictionMask := DataRestrictionMask;
 								SELF.AccountNumber := (STRING) le.AccountNumber;
 								SELF.TestDataEnabled := FALSE;
@@ -116,8 +119,9 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Gateway;
 			
 			SELF.HistoryDateTimeStamp := (string)HistoryDate;
 
-			SELF.Gateways := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'neutralroxie'; SELF.URL := NeutralRoxieIP; SELF := []));
-			// SELF.Gateways := DATASET([{isFCRA, neutralroxieIP}], risk_indicators.layout_gateways_in);
+			// SELF.Gateways := PROJECT(ut.ds_oneRecord, TRANSFORM(Gateway.Layouts.Config, SELF.ServiceName := 'neutralroxie'; SELF.URL := NeutralRoxieIP; SELF := []));
+			SELF.Gateways := DATASET([{'neutralroxie', NeutralRoxieIP}, // TransUnion Gateway
+														{'delta_personcontext', PCG_Cert}], Risk_Indicators.Layout_Gateways_In);
 		END;
 
 	  //ds_soap_in
@@ -451,7 +455,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Gateway;
 		//final file out to thor
 		final_output := output(ds_with_extras ,,outfile_name, thor, compressed, overwrite);
 		
-		// output(ds_raw_input,named('ds_raw_input'));
+		// output(Soap_output,named('Soap_output'));
 		// output(soap_in,named('soap_in'));
 		
 		RETURN final_output;

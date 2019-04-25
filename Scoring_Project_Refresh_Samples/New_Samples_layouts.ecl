@@ -16,6 +16,7 @@ Export FraudAdvisor_Layout := RECORD
 	STRING	State;
 	STRING	Zip;
 	STRING	DL;
+	STRING	DLstate;
 	STRING	HomePhone;
 	STRING	WorkPhone;
 	string	FP_Model;

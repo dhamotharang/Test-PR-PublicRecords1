@@ -7,7 +7,7 @@
 import ut;
 import std;
 import scoring_project, Scoring_Project_Macros;
-import deurlein_jon, Scoring_Project_DailyTracking; 
+import  Scoring_Project_DailyTracking; 
 
 dt := ut.getdate;
 
@@ -222,7 +222,7 @@ END;
          			
 //***************************************************//							
 							
- distro :=  SEQUENTIAL(out_file,	fileservices.SendEmailAttachText('bridgett.braaten@lexisnexis.com;Matthew.Ludewig@lexisnexisrisk.com;Joseph.Nassar@lexisnexisrisk.com;nathan.koubsky@lexisnexis.com;benjamin.karnatz@lexisnexis.com;apaar.sinha@lexisnexis.com;Haley.Vicchio@lexisnexis.com; lea.smith@lexisnexis.com',					
+ distro :=  SEQUENTIAL(out_file,	fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.business_reports_detailed,					
 					   'BusinessShell NonSBFE Attribute Distribution Report',
 																				'BusinessShell NonSBFE Attribute Distribution Report '+ dt1_1 + ' vs ' + dt2_1 + '\n Please view attachment.',
 																				 XtabOut[no_of_records].line ,
@@ -230,7 +230,7 @@ END;
 																				'BusinessShell NonSBFE Attributes Comparing' + dt1_1 + '_vs_' + dt2_1 + '.csv',
 																				 ,
 																				 ,
-																				 'Jonathan.Deurlein@lexisnexis.com'));
+																				 'Scoring_QA@risk.lexisnexis.com'));
 
 
 final := sequential( filenames_details1, new_bins_remove_file,old_bins_remove_file,new_bins,old_bins,distro):

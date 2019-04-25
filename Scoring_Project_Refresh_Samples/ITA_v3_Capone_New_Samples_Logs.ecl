@@ -9,39 +9,34 @@
 
 
 IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
-import ut, Scoring_Project_Macros, Business_Risk, zz_bbraaten2, Risk_Indicators, Models;
+import ut, Scoring_Project_Macros, Business_Risk,  Risk_Indicators, Models, zz_Koubsky_SALT, SALT23;
 
 infile := '~bbraaten::in::ita_clean';
-fileold3 := '~scoring_project::in::ita_v3_batch_capitalone_attributes_20141001';
+fileold3 := '~scoring_project::in::ita_v3_batch_capitalone_attributes_20161208';
 
 // fileout := '~scoring_project::in::ita_v3_batch_capitalone_attributes_' + ut.getdate;
-fileout := '~bbraaten::in::test_ITA_v3_capone_full_test2';
+fileout := '~bbraaten::in::test_ITA_v3_capone_full_test';
 
 eyeball := 25;
 
 lay := RECORD
-	String First;
-	STRING middle;
-	STRING last;
+	String Name;
 	STRING Address;
-	STRING Address2;	
 	STRING city;
 	STRING state;
 	STRING Zip5;
 	STRING Zip4;
 	END;
 	
-new_sort := DATASET(infile, lay, csv(Heading(1)));
+// new_sort := DATASET(infile, lay, csv(Heading(1)));
+new_sort := DATASET(infile, lay, csv);
 OUTPUT(CHOOSEN(new_sort, eyeball), NAMED('new_sort'));
 output(count(new_sort));
 
 tlay := record
 	integer3 Accountnumber := 1;
-	String First;
-	STRING middle;
-	STRING last;
+		String Name;
 	STRING Address;
-	STRING Address2;	
 	STRING city;
 	STRING state;
 	STRING Zip5;
@@ -83,19 +78,19 @@ END;
 bs_service := 'risk_indicators.Boca_Shell';
 
 
-layout_input  in_lay(lay l, integer c) := TRANSFORM		
+layout_input  in_lay(lay le, integer c) := TRANSFORM		
 self.Accountnumber :=  c;
-self.firstname := l.first;
-self.middlename := l.middle;
-self.lastname := l.last;
-self.streetaddress := l.address;
-self.city := l.city;
-self.state := l.state;
-self.zip := l.zip5 + l.zip4;
+  self.firstname := StringLib.StringGetNthWord(le.Name, 1);
+  self.middlename := if(StringLib.StringGetNthWord(le.Name, 3) = '', '', StringLib.StringGetNthWord(le.Name, 2));
+  self.lastname := if(StringLib.StringGetNthWord(le.Name, 3) = '', StringLib.StringGetNthWord(le.Name, 2), StringLib.StringGetNthWord(le.Name, 3));
+self.streetaddress := le.address;
+self.city := le.city;
+self.state := le.state;
+self.zip := le.zip5 + le.zip4;
 self.ssn := '';
 self.historydateyyyymm := archive_date;
 
-self := l;
+self := le;
 self := [];
 
 end;
@@ -107,7 +102,7 @@ OUTPUT(CHOOSEN(ds_in, eyeball), NAMED('ds_in'));
 l := RECORD
    STRING old_account_number;
   Risk_Indicators.Layout_InstID_SoapCall;
-	boolean adl_based_shell;
+	// boolean adl_based_shell;
 END;
 	
 	
@@ -198,7 +193,7 @@ OUTPUT(CHOOSEN(res, eyeball), NAMED('res'));
 
  Layout2 := Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout;
 
-layout_input batchlay2(Layout2 l) := TRANSFORM
+layout_input batchlay2(res l) := TRANSFORM
 	self.accountnumber := (integer)l.accountnumber;
 	self.perm_flag := 5;	
 	self.firstname := l.shell_input.fname ;
@@ -308,7 +303,7 @@ End;
 
 
 Reflagged_Logs := project(keepers, Rearrange(left, counter));
-new_perm  := choosen(Reflagged_Logs, 15000);
+new_perm  := choosen(Reflagged_Logs, 10000);
 output(choosen(new_perm, eyeball), named('new_perm'));
 output(count(new_perm), named('new_perm_count'));
 
@@ -345,7 +340,7 @@ deduped_new := sort_large_sample(Date_added = (Integer)ut.getdate);  //seperates
 dedupold := sort_large_sample(Date_added <> (Integer)ut.getdate);
 
 
-ut.MAC_Pick_Random(deduped_new,New_5000,5000);   //grabs 5000 of new deduped rocrods;
+ut.MAC_Pick_Random(deduped_new,New_5000,5001);   //grabs 5000 of new deduped rocrods;
 
 New_Test_Sample := dedupold + New_5000 ;
 output(choosen(New_Test_Sample, eyeball), named('New_Sample'));

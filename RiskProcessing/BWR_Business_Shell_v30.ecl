@@ -1,10 +1,10 @@
 ﻿#workunit('name', 'Business_Shell_V30');
 
-IMPORT Business_Risk_BIP, RiskProcessing, Risk_Indicators, RiskWise, UT;
+IMPORT Business_Risk_BIP, Cortera, RiskProcessing, Risk_Indicators, RiskWise, UT;
 
 eyeball := 10;
 
-Threads := 2;
+Threads := 30;
 RecordsToRun := ALL; // Set to ALL to run all, otherwise set to the number of records from the inputFile you wish to run
 
 //Business Shell 2.1 accepts YYYYMM, YYYYMMDD, and YYYYMMDDTTTT dates. HistDate can be in any of these forms.
@@ -37,24 +37,29 @@ Allowed_Sources := Business_Risk_BIP.Constants.Default_AllowedSources; // By def
 Include_AuthRep_In_BIPAppend := FALSE; // Prevent the Authorized Rep from being used to determine the BIP IDs for the company.
 // Include_AuthRep_In_BIPAppend := TRUE; // Include the Authorized Rep in determining the BIP IDs for the company.
 
-// RoxieIP := RiskWise.shortcuts.prod_batch_neutral;
-RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; 
+RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;
+// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; 
 
 BusShellVersion := 30; // business shell version 30 is the most recent business shell version 
-
-inputFileName      := '~calbee::in::cortera_sba_sample';
-InputRetrotestFile := '~thor::cortera::retrotester::results::lnretro_linkid_20170920_1_output.txt';
-// Set InputRetrotestFile := '' if we don't want to read from a Cortera Retrotest file.
 
 useRetrotestData := TRUE;   // Use Cortera Retrotest data.
 // useRetrotestData := FALSE;  // Don't use Cortera Retrotest data.
 
+// Typically we want to process as "Retrotest" only those Cortera Retrotest records whose historydate
+// is earlier than 201705 since we have good Cortera in-house records on or after that date. But
+// if we want to process all records as "Retrotest", set ignore201705ArchiveDateThreshold to TRUE.
+ignore201705ArchiveDateThreshold := FALSE;
+// ignore201705ArchiveDateThreshold := TRUE;
 
-outputFile := '~calbee::out::business_shell_v30_results_sprint1_' + ThorLib.wuid();
+inputFileName := '~hmccarl::in::bshell_test_inputs';
+
+// Specify the Cortera Retrotest file, if applicable.
+InputRetrotestFile := '~thor::cortera::retrotester::results::lnretro_linkid_20170920_1_output.txt';
+// Set InputRetrotestFile := '' if we don't want to read from a Cortera Retrotest file.
+
+outputFile := '~lweiner::out::business_shell_v22_results_' + ThorLib.wuid();
 
 InputFileLayout := RECORD
- INTEGER seq;
-	INTEGER HistoryDate; //Business Shell 2.1 accepts YYYYMM, YYYMMDD, and YYYYMMDDTTTT dates. historyDate can be in any of these forms.
 	STRING AccountNumber;
 	STRING CompanyName;
 	STRING AlternateCompanyName;
@@ -81,15 +86,17 @@ InputFileLayout := RECORD
 	STRING RepresentativeHomePhone;
 	STRING RepresentativeEmailAddress;
 	STRING RepresentativeFormerLastName;
-	STRING ln_project_id;
-	STRING pf_declined;
-	STRING pf_approved_not_funded;
- STRING pf_other_indeterminate;
- STRING pf_funded;	
- STRING pf_bad;
+	INTEGER HistoryDate; //Business Shell 2.1 accepts YYYYMM, YYYMMDD, and YYYYMMDDTTTT dates. historyDate can be in any of these forms.
+	UNSIGNED6 PowID;
+	UNSIGNED6 ProxID;
+	UNSIGNED6 SeleID;
+	UNSIGNED6 OrgID;
+	UNSIGNED6 UltID;
+	STRING SIC_Code;
+	STRING NAIC_Code;
 END;
 
-InputFile := CHOOSEN( DATASET(inputFileName, InputFileLayout, CSV(HEADING(SINGLE),QUOTE('"'))), RecordsToRun );
+InputFile := CHOOSEN(DATASET(inputFileName, InputFileLayout, CSV(QUOTE('"'))), RecordsToRun);
 
 OUTPUT(CHOOSEN(InputFile, eyeball), NAMED('Sample_Raw_Input'));
 OUTPUT(COUNT(InputFile), NAMED('Total_Raw_Input_Records'));
@@ -184,12 +191,11 @@ SOAPLayout := RECORD
 	BOOLEAN OverrideExperianRestriction;
 	STRING AllowedSources;
 	BOOLEAN IncludeAuthRepInBIPAppend;
-  BOOLEAN CorteraRetrotest;
+	BOOLEAN CorteraRetrotest;
 	DATASET(Cortera.layout_Retrotest_raw) CorteraRetrotestRecords;
 END;
 
 SOAPLayout intoSOAP(InputFile le) := TRANSFORM
- SELF.seq := le.seq;
 	SELF.AcctNo := le.AccountNumber;
 	SELF.CompanyName := le.CompanyName;
 	SELF.AltCompanyName := le.AlternateCompanyName;
@@ -252,27 +258,27 @@ SOAPLayout intoSOAP(InputFile le) := TRANSFORM
 	SELF.Rep_DLState := le.RepresentativeDLState;
 	SELF.Rep_Email := le.RepresentativeEmailAddress;
 	
-	SELF.DPPA_Purpose := 1;
+	SELF.DPPA_Purpose := 3;
 	SELF.GLBA_Purpose := 1;
 	SELF.Data_Restriction_Mask := '0000000000000000000000000';
 	SELF.Data_Permission_Mask := dataPermissionMask;
 	SELF.HistoryDate := IF(histDate <= 0, le.HistoryDate, histDate);
 	SELF.MarketingMode := Marketing_Mode;
 	SELF.LinkSearchLevel := link_Search_Level;
-	SELF.SIC_Code := '';
-	SELF.NAIC_Code := '';
+	SELF.SIC_Code := le.SIC_Code;
+	SELF.NAIC_Code := le.NAIC_Code;
 	SELF.BIPBestAppend := BIPBestAppend;
 	SELF.BusShellVersion := BusShellVersion;
-	SELF.PowID := 0;
-	SELF.ProxID := 0;
-	SELF.SeleID := 0;
-	SELF.OrgID := 0;
-	SELF.UltID := 0;
+	SELF.PowID := le.PowID;
+	SELF.ProxID := le.ProxID;
+	SELF.SeleID :=le.SeleID;
+	SELF.OrgID := le.OrgID;
+	SELF.UltID := le.UltID;
 	SELF.OverrideExperianRestriction := IncludeExperian;
 	SELF.AllowedSources := Allowed_Sources;
 	SELF.IncludeAuthRepInBIPAppend := Include_AuthRep_In_BIPAppend;
-  SELF.CorteraRetrotest := useRetrotestData;
-	SELF.CorteraRetrotestRecords := DATASET([],Cortera.layout_Retrotest_raw);
+	SELF.CorteraRetrotest := useRetrotestData AND ( ( le.historydate != 0 AND (INTEGER)(((STRING)le.historydate)[1..6]) < 201705 ) OR ignore201705ArchiveDateThreshold );
+	SELF.CorteraRetrotestRecords := DATASET([],Cortera.layout_Retrotest_raw); // Set as null for now.
 	SELF := [];
 END;
 
@@ -288,7 +294,6 @@ SOAPLayout xfm_AttachRetrotestRecs(SOAPLayout le, DATASET(Cortera.layout_Retrote
 InputBusShell_withRetrotestRecs :=
 		DENORMALIZE(
     InputBusShell, ds_inputRetrotesterFile,
-    LEFT.seq = (INTEGER)RIGHT.seq AND
     LEFT.acctno = RIGHT.acctno,
 				GROUP,
     xfm_AttachRetrotestRecs(LEFT,ROWS(RIGHT))
@@ -298,7 +303,7 @@ OUTPUT(CHOOSEN(InputBusShell, eyeball), NAMED('Sample_InputBusShell'));
 OUTPUT(CHOOSEN(InputBusShell_withRetrotestRecs, eyeball), NAMED('Sample_withRetrotestRecs'));
 
 xLayout := RECORD
-	Business_Risk_BIP.Layouts.OutputLayout; // Change this to v30 version layout?
+	Business_Risk_BIP.Layouts.OutputLayout;
 	STRING200 ErrorCode := '';
 END;
 
@@ -333,7 +338,6 @@ OUTPUT(CHOOSEN(BusShellFinal, eyeball), NAMED('Sample_Final_BusShell'));
 OUTPUT(COUNT(BusShellFinal), NAMED('Total_Final_BusShell'));
 OUTPUT(BusShellFinal,, outputFile + '_BusShell.csv', CSV(HEADING(single), QUOTE('"')), EXPIRE(30), OVERWRITE);
 
-//SASBusShellFinal := Business_Risk_BIP.to_OutputLayout_SAS_v30(PROJECT(BusShellFinal, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT)));
-SASBusShellFinal := Business_Risk_BIP.to_OutputLayout_SAS_v22(PROJECT(BusShellFinal, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT)));
+SASBusShellFinal := Business_Risk_BIP.to_OutputLayout_SAS_v30(PROJECT(BusShellFinal, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT)));
 OUTPUT(CHOOSEN(SASBusShellFinal, eyeball), NAMED('Sample_Final_SAS_BusShell'));
 OUTPUT(SASBusShellFinal,, outputFile + '_SAS_Layout_BusShell.csv', CSV(HEADING(single), QUOTE('"')), EXPIRE(30), OVERWRITE);

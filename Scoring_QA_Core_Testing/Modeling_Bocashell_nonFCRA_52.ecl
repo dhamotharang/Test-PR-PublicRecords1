@@ -1,6 +1,6 @@
 ﻿EXPORT Modeling_Bocashell_nonFCRA_52(RecordsToRun) := functionMacro;
 
-IMPORT Risk_Indicators, RiskWise, riskprocessing, ut;
+IMPORT Risk_Indicators, RiskWise, riskprocessing, ut, Scoring_Project_PIP;
 
 IMPORT Risk_Indicators, RiskWise, ut;
 
@@ -58,7 +58,7 @@ bs_service := 'risk_indicators.boca_shell';
 // roxieIP := RiskWise.Shortcuts.dev194; 
 // roxieIP := RiskWise.Shortcuts.QA_neutral_roxieIP; 
 // roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
-roxieIP :=riskwise.shortcuts.core_roxieIP; 
+roxieIP :=riskwise.shortcuts.core_97_roxieIP; 
 
 
 //====================================================
@@ -106,7 +106,7 @@ p_f4 := project(p_f1, transform(l, self.accountnumber := (string)(300000 + (unsi
 p_f := p_f1 + p_f4;
 Out2 := output(choosen(p_f, eyeball));
 								
-s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+s :=Scoring_Project_PIP.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 
 riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM

@@ -1,5 +1,5 @@
 ﻿
-IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT, Scoring_Project_Macros;
+IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT, Scoring_Project_Macros, Scoring_Project_Refresh_Samples, zz_Koubsky_SALT, SALT23;
 
 EXPORT FCRA_New_Samples_Logs := module
 shared eyeball := 100;
@@ -52,7 +52,7 @@ Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure format_them
 	self.source_info := 'Riskview_XML_Logs';
 	self.dateofbirth := l.dob;
 	self.Perm_Flag := 4;
-	self.AccountNumber := c + (integer)MaxAccounExperian;
+	// self.AccountNumber := c + (integer)MaxAccounExperian;
 	self.history_date := 999999;
 	self.historydateyyyymm := 999999;
 	self:=l;
@@ -72,7 +72,15 @@ dedupoldExperian:= sort_large_sampleExperian(Date_added <> (Integer)ut.getdate);
 
 ut.MAC_Pick_Random(deduped_newExperian,New_5000Experian,5000);   //grabs 5000 of new deduped rocrods;
 
-New_Test_SampleExperian := dedupoldExperian + New_5000Experian ;
+Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure add_acctBExperian(Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure le, integer c) := Transform
+	self.AccountNumber := c + (integer)MaxAccounExperian;
+	self:= le;
+	self:= [];
+End;
+
+Formatted_acct_NewExperian := project(New_5000Experian, add_acctBExperian(left, counter));
+
+New_Test_SampleExperian := dedupoldExperian + Formatted_acct_NewExperian ;
 
 
 Sorted_SampleExperian := Sort(New_Test_SampleExperian, perm_flag, date_added);
@@ -89,7 +97,8 @@ end;
 
 //RV generic v3 v4 v5 sample*************************************************************************************
 
-EXPORT FCRA_New_Samples_Logs_RVGeneric (DATASET(Scoring_Project_Refresh_Samples.New_Samples_layouts.RiskView_Layout) fullinputRVGeneric, dataset(Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure) OriginalDataRVGeneric, string FileoutRVGeneric) := FUNCTION 
+EXPORT FCRA_New_Samples_Logs_RVGeneric (DATASET(Scoring_Project_Refresh_Samples.New_Samples_layouts.RiskView_Layout) fullinputRVGeneric, 
+dataset(Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure) OriginalDataRVGeneric, string FileoutRVGeneric) := FUNCTION 
 
 FindMaxAccountRVGeneric := choosen(sort(OriginalDataRVGeneric, -accountnumber), 5);
 MaxAccountRVGeneric := max(FindMaxAccountRVGeneric, accountnumber);
@@ -99,22 +108,28 @@ filteredzipRVGeneric := filteredSSNRVGeneric(REGEXFIND('(^[0-9]{5}$)|(^[0-9]{5}-
 
 
 goodinfoRVGeneric := filteredzipRVGeneric(lastname not in ['','MARSUPIAL'] and lastname[1..2] != 'AA' and firstname not in [''] and Address != '' and city != ''
-											and state != '' and zip != '' and zip != '00000' and ssn != '' and ssn != '000000000' and ssn != '0000' and dob != '' );
+											and state != '' and zip != '' and zip != '00000'  and ssn != '000000000' and ssn != '0000' and ssn <> '' and dob != '' );
+
+// filter_generic := goodinfoRVGeneric();
 
 DedupedDataRVGeneric := dedup(goodinfoRVGeneric, SSN, all); //sorted by ssn since all blank ssn's have been removed;
 
+// rv3_base := DedupedDataRVGeneric(StringLib.StringContains(attributeversion , 'VERSION3' , true )); //want to add to look for rv3 to get 1/2 sample consitently rvv3
 rv4_base := DedupedDataRVGeneric(StringLib.StringContains(attributeversion , 'VERSION4' , true)); //want to add to look for rv4 to get 1/2 sample consitently rvv4 
-rv3_base := DedupedDataRVGeneric(StringLib.StringContains(attributeversion , 'VERSION3' , true )); //want to add to look for rv3 to get 1/2 sample consitently rvv3
+rv5_base := DedupedDataRVGeneric(StringLib.StringContains(attributeversion , 'RISKVIEWATTRV5' , true )); //want to add to look for rv3 to get 1/2 sample consitently rvv3
 
 
-ut.MAC_Pick_Random(rv4_base,RV_full_1,15000); //sliming down some of the transform work
-ut.MAC_Pick_Random(rv3_base,RV_full_2,15000); //sliming down some of the transform work
+// ut.MAC_Pick_Random(rv3_base,RV_full_3,15000); //sliming down some of the transform work
+ut.MAC_Pick_Random(rv4_base,RV_full_4,15000); //sliming down some of the transform work
+ut.MAC_Pick_Random(rv5_base,RV_full_5,15000); //sliming down some of the transform work
 
-output(RV_full_1);
-output(RV_full_2);
+// output(RV_full_3);
+output(RV_full_4);
+output(RV_full_5);
 
 
-RV_full := RV_full_1+ RV_full_2;
+// RV_full := RV_full_3+ RV_full_4+RV_full_5;
+RV_full :=  RV_full_4+RV_full_5;
 
 keepers_1_0RVGeneric := OriginalDataRVGeneric(perm_flag = 0);
 keepers_1_1RVGeneric := OriginalDataRVGeneric(perm_flag = 1);
@@ -125,6 +140,9 @@ keepers_1_4RVGeneric := OriginalDataRVGeneric(perm_flag = 4);
 keepersRVGeneric := sort(keepers_1_0RVGeneric + keepers_1_2RVGeneric + keepers_1_3RVGeneric + keepers_1_4RVGeneric, date_added);
 
 Reflagged_LogsRVGeneric := project(keepersRVGeneric, Rearrange(left, counter));
+
+models := ['RVA1503_0','RVB1503_0','RVG1502_0','RVT1503_0','RVS1706_0'];
+
 
 Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure format_themRVGeneric(Scoring_Project_Refresh_Samples.New_Samples_layouts.RiskView_Layout l, integer c) := Transform
 	self.Date_added := (Integer)ut.getdate;
@@ -139,22 +157,25 @@ self.source_info := if(l.auto = 'RVA1104_0', 'RV4_Auto', '')  +
 						if(l.Prescreen = 'RVP1104_0' and (l.Retail = 'RVR1103_0' or l.telecom = 'RVT1104_0'), ',', '') +
 						if(l.Retail = 'RVR1103_0', 'RV4_Retail', '')  +
 						if(l.Retail = 'RVR1103_0' and (l.telecom = 'RVT1104_0'), ',', '') +
-						if(l.telecom = 'RVT1104_0', 'RV4_Telecom', '') +
+						if(l.telecom = 'RVT1104_0', 'RV4_Telecom', '') 
 						
-						if(l.auto = 'RVA1003_0', 'RV3_Auto', '')  + 
-						if(l.auto = 'RVA1003_0' and (l.Bank = 'RVB1003_0' or l.Money = 'RVG1003_0' or l.prescreen = 'RVP1003_0' or l.retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
-						if(l.Bank = 'RVB1003_0', 'RV3_Bank', '')  +
-						if(l.Bank = 'RVB1003_0' and (l.Money = 'RVG1003_0' or l.prescreen = 'RVP1003_0' or l.retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
-						if(l.Money = 'RVG1003_0', 'RV3_Money', '')  +
-						if(l.Money = 'RVG1003_0' and (l.Prescreen = 'RVP1003_0' or l.retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
-						if(l.Prescreen = 'RVP1003_0', 'RV3_Prescreen', '')  +
-						if(l.Prescreen = 'RVP1003_0' and (l.Retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
-						if(l.Retail = 'RVR1003_0', 'RV3_Retail', '')  +
-						if(l.Retail = 'RVR1003_0' and (l.telecom = 'RVT1003_0'), ',', '') +
-						if(l.telecom = 'RVT1003_0', 'RV3_Telecom', '');
+						// if(l.auto = 'RVA1003_0', 'RV3_Auto', '')  + 
+						// if(l.auto = 'RVA1003_0' and (l.Bank = 'RVB1003_0' or l.Money = 'RVG1003_0' or l.prescreen = 'RVP1003_0' or l.retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
+						// if(l.Bank = 'RVB1003_0', 'RV3_Bank', '')  +
+						// if(l.Bank = 'RVB1003_0' and (l.Money = 'RVG1003_0' or l.prescreen = 'RVP1003_0' or l.retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
+						// if(l.Money = 'RVG1003_0', 'RV3_Money', '')  +
+						// if(l.Money = 'RVG1003_0' and (l.Prescreen = 'RVP1003_0' or l.retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
+						// if(l.Prescreen = 'RVP1003_0', 'RV3_Prescreen', '')  +
+						// if(l.Prescreen = 'RVP1003_0' and (l.Retail = 'RVR1003_0' or l.telecom = 'RVT1003_0'), ',', '') +
+						// if(l.Retail = 'RVR1003_0', 'RV3_Retail', '')  +
+						// if(l.Retail = 'RVR1003_0' and (l.telecom = 'RVT1003_0'), ',', '') +
+						// if(l.telecom = 'RVT1003_0', 'RV3_Telecom', '')
+						
++					if(l.auto in models, 'RVv5','')	;
+						
 	self.dateofbirth := l.dob;
 	self.Perm_Flag := 4;
-	self.AccountNumber := c + MaxAccountRVGeneric;
+	// self.AccountNumber := c + MaxAccountRVGeneric;
 	self.streetaddress := l.address;
 	self.history_date := 999999;
 	self.historydateyyyymm := 999999;
@@ -176,14 +197,28 @@ sort_large_sampleRVGeneric := Sort(new_large_sampleRVGeneric, ssn, Date_added); 
 deduped_newRVGeneric := sort_large_sampleRVGeneric(Date_added = (Integer)ut.getdate);  //seperates new and old records by date;
 dedupoldRVGeneric := sort_large_sampleRVGeneric(Date_added <> (Integer)ut.getdate);
 
+rv5 := deduped_newRVGeneric(StringLib.StringContains(source_info , 'RVv5' , true)); //want to add to look for rv4 to get 1/2 sample consitently rvv4 
 rv4 := deduped_newRVGeneric(StringLib.StringContains(source_info , 'RV4' , true)); //want to add to look for rv4 to get 1/2 sample consitently rvv4 
-rv3 := deduped_newRVGeneric(StringLib.StringContains(source_info , 'RV3' , true )); //want to add to look for rv3 to get 1/2 sample consitently rvv3
+// rv3 := deduped_newRVGeneric(StringLib.StringContains(source_info , 'RV3' , true )); //want to add to look for rv3 to get 1/2 sample consitently rvv3
 
+ut.MAC_Pick_Random(rv5,New_5000RV5,5000);   //grabs 5000 rvv4 of new deduped rocrods;
 ut.MAC_Pick_Random(rv4,New_5000RV4,5000);   //grabs 5000 rvv4 of new deduped rocrods;
-ut.MAC_Pick_Random(rv3,New_5000RV3,5000);   //grabs 5000 rvv3 of new deduped rocrods;
+// ut.MAC_Pick_Random(rv3,New_5000RV3,3333);   //grabs 5000 rvv3 of new deduped rocrods;
+
+// New_5000RVGeneric := New_5000RV5 + New_5000RV4 + New_5000RV3;
+New_5000RVGeneric := New_5000RV5 + New_5000RV4 ;
 
 
-New_Test_SampleRVGeneric := dedupoldRVGeneric + New_5000RV3 + New_5000RV4;
+Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure add_acctRVGeneric(Scoring_Project_Refresh_Samples.New_Samples_layouts.Output_structure le, integer c) := Transform
+	self.AccountNumber := c + (integer)MaxAccountRVGeneric;
+	self:= le;
+	self:= [];
+End;
+
+Formatted_acct_NewRVGeneric := project(New_5000RVGeneric, add_acctRVGeneric(left, counter));
+
+
+New_Test_SampleRVGeneric := dedupoldRVGeneric + Formatted_acct_NewRVGeneric;
 
 
 Sorted_SampleRVGeneric := Sort(New_Test_SampleRVGeneric, accountnumber);
@@ -192,7 +227,7 @@ Sorted_SampleRVGeneric := Sort(New_Test_SampleRVGeneric, accountnumber);
 finalRVGeneric := OUTPUT(choosen(Sorted_SampleRVGeneric, 50000),,FileoutRVGeneric, thor, overwrite);
 finalRVGeneric_salt := choosen(Sorted_SampleRVGeneric, 50000);
 
-zz_Koubsky_SALT.mac_profile(finalRVGeneric); 
+zz_Koubsky_SALT.mac_profile(finalRVGeneric_salt); 
 return finalRVGeneric;
 
 end;

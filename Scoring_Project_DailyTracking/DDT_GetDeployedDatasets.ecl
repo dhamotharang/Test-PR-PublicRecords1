@@ -14,6 +14,7 @@ import dops;
 		string cluster{xpath('cluster')} := cluster;
 		string location{xpath('location')} := location;
 		string dsname{xpath('dsname')} := datasetname;
+		//string releasedate{xpath('releasedate')} := releasedate;
 		
 	end;
 	

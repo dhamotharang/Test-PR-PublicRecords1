@@ -133,7 +133,7 @@ layoutSOAPIn := RECORD
 	STRING StreetAddress2_In := '';
 	STRING City_In := '';
 	STRING State_In := '';
-	STRING Zip_In := 0;
+	integer Zip_In := 0;
 	STRING Prim_Range := '';
 	STRING Predir := '';
 	STRING Prim_Name := '';
@@ -143,11 +143,11 @@ layoutSOAPIn := RECORD
 	STRING Sec_Range := '';
 	STRING Zip5 := '';
 	STRING Zip4 := '';
-	STRING SSN_In := 0;
-	STRING DateOfBirth_In := 0;
-	STRING Age_In := 0;
-	STRING HomePhone_In := 0;
-	STRING WorkPhone_In := 0;
+	integer SSN_In := 0;
+	integer DateOfBirth_In := 0;
+	integer Age_In := 0;
+	integer HomePhone_In := 0;
+	integer WorkPhone_In := 0;
 	BOOLEAN EnableExperianGateway := FALSE;
 	BOOLEAN EnableTransUnionGateway := FALSE;
 	BOOLEAN EnableInsuranceGateway := FALSE;
@@ -213,8 +213,8 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.StreetAddress2_In := le.watchdog_address_line_2;
 	SELF.City_In := le.v_city_name;
 	SELF.State_In := le.st;
-	SELF.Zip_In := le.zip5;
-	SELF.SSN_In := le.watchdog_ssn;		
+	SELF.Zip_In := (integer)le.zip5;
+	SELF.SSN_In := (integer)le.watchdog_ssn;		
 	
 	
 	// Options

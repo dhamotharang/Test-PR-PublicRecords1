@@ -2,13 +2,13 @@
 
 #workunit('name', 'Small_Business_Analytics_Pull_SAOT_Logs');
 
-IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT, Scoring_Project_Macros;
+IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT, Scoring_Project_Macros, zz_Koubsky_SALT, salt23;
 
 oldinputfile := '~scoring_project::in::businessshell_xml_20160825';
 
-fileout := '~bbraaten::test::SBA_inputsample';
+fileout := '~bbraaten::test::SBA_inputsample_test2';
 
-BeginDate := '20160101';
+BeginDate := '20180101';
 	EndDate := ut.getdate;
 
 AccountIDs := ['']; // Set to a blank string dataset [''] to pull all records except for test transaction login ids
@@ -19,8 +19,8 @@ eyeball := 50;
 
 File := Score_Logs.Files_index.File_TransactionID; 
 File_nonFCRA := File(StringLib.StringToUpperCase(product) NOT IN Score_Logs.FCRA_Transaction_Constants.product);
-LogFile := INDEX(File_nonFCRA, {transaction_id}, {File_nonFCRA}, ut.foreign_prod +
-																			'thor_data400::key::acclogs_scoring::'+doxie.Version_SuperKey+'::xml_transactionid');
+LogFile := INDEX(File_nonFCRA, {transaction_id}, {File_nonFCRA}, '~foreign::' + '10.173.44.105' + '::' +
+																			'thor_data400::key::acclogs_scoring::20180506::xml_transactionid');
 
 
 // The files are exported from MySQL the following day, which means the data isn't loaded to THOR until 2 days after.
@@ -126,7 +126,7 @@ Scoring_Project_Refresh_Samples.New_Samples_layouts.SBALayout parseInput (Logs l
 		self := [];)
 		);
 		
-	temp := parse(logs_temp, inputxml, parse_inputxml(), XML('SmallBusinessAnalytics'));
+	temp := parse(logs_temp, inputxml, parse_inputxml(), XML('SmallBusinessAnalyticsRequest'));
 	
 	self := temp[1];
 	
@@ -142,112 +142,279 @@ OUTPUT(CHOOSEN(logsaccount, 20000), NAMED('logsaccount'));
 
 
 prii_layout := RECORD
-  Scoring_Project_Macros.Regression.global_layout;
-	Scoring_Project_Macros.Regression.pii_layout;
-	Scoring_Project_Macros.Regression.bus_layout;
-	Scoring_Project_Macros.Regression.runtime_layout;
+  integer8 date_added;
+  string customer;
+  string source_info;
+  integer1 perm_flag;
+  string seq;
+  integer8 acctno;
+  string companyname;
+  string altcompanyname;
+  string streetaddress1;
+  string streetaddress2;
+  string city;
+  string state;
+  string zip9;
+  string prim_range;
+  string predir;
+  string prim_name;
+  string addr_suffix;
+  string postdir;
+  string unit_desig;
+  string sec_range;
+  string zip5;
+  string zip4;
+  string lat;
+  string long;
+  string addr_type;
+  string addr_status;
+  string county;
+  string geo_block;
+  string fein;
+  string phone10;
+  string ipaddr;
+  string companyurl;
+  string sic_code;
+  string naic_code;
+  string bus_lexid;
+  string bus_structure;
+  string years_in_business;
+  string bus_start_date;
+  string yearly_revenue;
+  string fax_number;
+  string rep_fullname;
+  string rep_nametitle;
+  string rep_firstname;
+  string rep_middlename;
+  string rep_lastname;
+  string rep_namesuffix;
+  string rep_formerlastname;
+  string rep_streetaddress1;
+  string rep_streetaddress2;
+  string rep_city;
+  string rep_state;
+  string rep_zip;
+  string rep_prim_range;
+  string rep_predir;
+  string rep_prim_name;
+  string rep_addr_suffix;
+  string rep_postdir;
+  string rep_unit_desig;
+  string rep_sec_range;
+  string rep_zip5;
+  string rep_zip4;
+  string rep_lat;
+  string rep_long;
+  string rep_addr_type;
+  string rep_addr_status;
+  string rep_county;
+  string rep_geo_block;
+  string rep_ssn;
+  string rep_dateofbirth;
+  string rep_phone10;
+  string rep_age;
+  string rep_dlnumber;
+  string rep_dlstate;
+  string rep_email;
+  string rep_lexid;
+  string rep2_fullname;
+  string rep2_nametitle;
+  string rep2_firstname;
+  string rep2_middlename;
+  string rep2_lastname;
+  string rep2_namesuffix;
+  string rep2_formerlastname;
+  string rep2_streetaddress1;
+  string rep2_streetaddress2;
+  string rep2_city;
+  string rep2_state;
+  string rep2_zip;
+  string rep2_prim_range;
+  string rep2_predir;
+  string rep2_prim_name;
+  string rep2_addr_suffix;
+  string rep2_postdir;
+  string rep2_unit_desig;
+  string rep2_sec_range;
+  string rep2_zip5;
+  string rep2_zip4;
+  string rep2_lat;
+  string rep2_long;
+  string rep2_addr_type;
+  string rep2_addr_status;
+  string rep2_county;
+  string rep2_geo_block;
+  string rep2_ssn;
+  string rep2_dateofbirth;
+  string rep2_phone10;
+  string rep2_age;
+  string rep2_dlnumber;
+  string rep2_dlstate;
+  string rep2_email;
+  string rep2_lexid;
+  string rep3_fullname;
+  string rep3_nametitle;
+  string rep3_firstname;
+  string rep3_middlename;
+  string rep3_lastname;
+  string rep3_namesuffix;
+  string rep3_formerlastname;
+  string rep3_streetaddress1;
+  string rep3_streetaddress2;
+  string rep3_city;
+  string rep3_state;
+  string rep3_zip;
+  string rep3_prim_range;
+  string rep3_predir;
+  string rep3_prim_name;
+  string rep3_addr_suffix;
+  string rep3_postdir;
+  string rep3_unit_desig;
+  string rep3_sec_range;
+  string rep3_zip5;
+  string rep3_zip4;
+  string rep3_lat;
+  string rep3_long;
+  string rep3_addr_type;
+  string rep3_addr_status;
+  string rep3_county;
+  string rep3_geo_block;
+  string rep3_ssn;
+  string rep3_dateofbirth;
+  string rep3_phone10;
+  string rep3_age;
+  string rep3_dlnumber;
+  string rep3_dlstate;
+  string rep3_email;
+  string rep3_lexid;
+  string dppa_purpose;
+  string glba_purpose;
+  string data_restriction_mask;
+  string data_permission_mask;
+  string industryclass;
+  integer8 historydate;
+  string busshellversion;
+  string powid;
+  string proxid;
+  string seleid;
+  string orgid;
+  string ultid;
  END;
+
+
 
 oldfile := dataset(oldinputfile, prii_layout, thor);
 OUTPUT(CHOOSEN(oldfile, eyeball), NAMED('oldfile'));
 output(count(oldfile));
 
-Dedupedoldfile := dedup(oldfile, name_company, street_addr2, z5_2, ssn, all);
-output(count(Dedupedoldfile), named('Dedupedoldfile'));
 
 
-FindMaxAccount := choosen(sort(Dedupedoldfile, -accountnumber), 5);
-MaxAccount := max(FindMaxAccount, accountnumber);
+FindMaxAccount := choosen(sort(oldfile, -acctno), 5);
+MaxAccount := max(FindMaxAccount, acctno);
 output(MaxAccount, named('max_account_rvv3'));
 
 
-SBA := logsaccount(attributes = 'SMALLBUSINESSATTRV1');
-Output(choosen(logsaccount (attributes = 'SMALLBUSINESSATTRV1'), 100), named('SMALLBUSINESSATTRV1'));
+// SBA := logsaccount(attributes = 'SMALLBUSINESSATTRV1');
+// Output(choosen(logsaccount (attributes = 'SMALLBUSINESSATTRV1'), 100), named('SMALLBUSINESSATTRV1'));
+// count(SBA);
 
-filteredSSN := SBA(REGEXFIND('(^[0-9]{4}$)|(^[0-9]{3}-?[0-9]{2}-?[0-9]{4}$)|(^[0-9]{9}$)', Rep_SSN));
-filteredzip := filteredSSN(REGEXFIND('(^[0-9]{5}$)|(^[0-9]{5}-?[0-9]{4}$)', zip9));
-OUTPUT(CHOOSEN(filteredzip, 200), NAMED('filteredzip'));
+// filteredSSN := logsaccount(REGEXFIND('(^[0-9]{4}$)|(^[0-9]{3}-?[0-9]{2}-?[0-9]{4}$)|(^[0-9]{9}$)', zip9));
+// filteredzip := filteredSSN(REGEXFIND('(^[0-9]{5}$)|(^[0-9]{5}-?[0-9]{4}$)', 	fein));
+// OUTPUT(CHOOSEN(filteredzip, 200), NAMED('filteredzip'));
 
 
 
-goodinfo := filteredzip( companyname != '' and streetaddress1 != ''and zip9 != '' and Rep_SSN != '');
+goodinfo := logsaccount( companyname != '' and streetaddress1 != ''and zip9 != '' and fein != '');
 																						
 
 OUTPUT(CHOOSEN(goodinfo, eyeball), NAMED('goodinfo'));
 output(count(goodinfo));
 
-DedupedData := dedup(goodinfo, companyname, streetaddress1, zip9, Rep_SSN, all); //sorted by ssn since all blank ssn's have been removed;
+DedupedData := dedup(goodinfo, companyname, streetaddress1, zip9, fein, all); //sorted by ssn since all blank ssn's have been removed;
 OUTPUT(CHOOSEN(DedupedData, eyeball), NAMED('DedupedData'));
 output(count(DedupedData));
 countnew := count(DedupedData);
 
+DedupedDatas_1_0 := oldfile(perm_flag = 0);
+output(count(DedupedDatas_1_0), named('DedupedDatas_1_0'));
 
-Scoring_Project_Macros.Regression.Business_shell_PII Rearrange( prii_layout l, integer c) := TRANSFORM
-	// self.Date_added := (Integer)20151022;
-	self.acctno := l.AccountNumber;
-	self.Perm_Flag := If(c <= 10000, 0, if(c >10000 and c <= 20000, 1,if(c >20000 and c <= 30000, 2, if(c >30000 and c <= 40000, 3, 4))));
-	self.rep_firstname := l.firstname;
-  self.rep_middlename  := l.middlename;
-  self.rep_lastname  := l.lastname;
-  self.rep_streetaddress1  := l.streetaddress;
-  self.rep_city  := l.city;
-  self.rep_state  := l.state;
-  self.rep_zip := l.zip;
-  self.rep_phone10 := l.workphone;
-  self.rep_ssn := l.ssn;
-  self.rep_dateofbirth := l.dateofbirth;
-  self.rep_dlnumber := l.dlnumber;
-  self.rep_dlstate := l.dlstate;
-	self.companyname := l.name_company;
-  self.altcompanyname := l.alt_company_name;
-  self.streetaddress1 := l.street_addr2;
-  self.city := l.p_city_name_2;
-  self.state := l.st_2;
-  self.zip9 := l.z5_2;
-  self.zip4 := l.zip4_2;
-  self.phone10 := l.phoneno;
-  self.fein := l.fein;	
-	self.historydate := 999999;
-	self := l;
-  self := [];
-END;
-Reflagged_oldfile := project(Dedupedoldfile, Rearrange(left, counter));
-output(choosen(Reflagged_oldfile, eyeball));
-output(count(Reflagged_oldfile), named('Reflagged_Logs'));
+DedupedDatas_1_1 := oldfile(perm_flag = 1);
+output(count(DedupedDatas_1_1), named('DedupedDatas_1_1'));
 
+DedupedDatas_1_2 := oldfile(perm_flag = 2);
+output(count(DedupedDatas_1_2), named('DedupedDatas_1_2'));
 
-Reflagged_oldfiles_1_0 := Reflagged_oldfile(perm_flag = 0);
-output(count(Reflagged_oldfiles_1_0), named('Reflagged_oldfiles_1_0'));
+DedupedDatas_1_3 := oldfile(perm_flag = 3);
+output(count(DedupedDatas_1_3), named('DedupedDatas_1_3'));
 
-Reflagged_oldfiles_1_1 := Reflagged_oldfile(perm_flag = 1);
-output(count(Reflagged_oldfiles_1_1), named('Reflagged_oldfiles_1_1'));
-
-Reflagged_oldfiles_1_2 := Reflagged_oldfile(perm_flag = 2);
-output(count(Reflagged_oldfiles_1_2), named('Reflagged_oldfiles_1_2'));
-
-Reflagged_oldfiles_1_3 := Reflagged_oldfile(perm_flag = 3);
-output(count(Reflagged_oldfiles_1_3), named('Reflagged_oldfiles_1_3'));
-
-Reflagged_oldfiles_1_4 := Reflagged_oldfile(perm_flag = 4);
-output(count(Reflagged_oldfiles_1_4), named('Reflagged_oldfiles_1_4'));
+DedupedDatas_1_4 := oldfile(perm_flag = 4);
+output(count(DedupedDatas_1_4), named('DedupedDatas_1_4'));
 
 // _choose := (10000 - countnew);
 // newReflagged_old_4 := choosen(Reflagged_oldfiles_1_4, _choose);
 // output(count(newReflagged_old_4), named('newReflagged_old_4'));
 
 
-keepers := sort(Reflagged_oldfiles_1_0+Reflagged_oldfiles_1_1+Reflagged_oldfiles_1_2+Reflagged_oldfiles_1_3+Reflagged_oldfiles_1_4, date_added);
+// keepers := sort(Reflagged_oldfiles_1_0+Reflagged_oldfiles_1_1+Reflagged_oldfiles_1_2+Reflagged_oldfiles_1_3+Reflagged_oldfiles_1_4, date_added);
+keepers := sort(DedupedDatas_1_0+DedupedDatas_1_2+DedupedDatas_1_3+DedupedDatas_1_4, date_added);
 output(choosen(keepers, eyeball));
 output(count(keepers), named('keepers'));
 
+
+Scoring_Project_Macros.Regression.Business_shell_PII Rearrange( prii_layout l, integer c) := TRANSFORM
+	// self.Date_added := (Integer)20151022;
+	self.acctno := l.acctno;
+	// self.Perm_Flag := If(c <= 10000, 0, if(c >10000 and c <= 20000, 1,if(c >20000 and c <= 30000, 2, if(c >30000 and c <= 40000, 3, 4))));
+		self.Perm_Flag := If(l.perm_flag <= 0, 0, l.perm_flag - 1);  	
+	// self.rep_firstname := l.rep_firstname;
+  // self.rep_middlename  := l.rep_middlename;
+  // self.rep_lastname  := l.lastname;
+  // self.rep_streetaddress1  := l.streetaddress;
+  // self.rep_city  := l.city;
+  // self.rep_state  := l.state;
+  // self.rep_zip := l.zip;
+  // self.rep_phone10 := l.workphone;
+  // self.rep_ssn := l.ssn;
+  // self.rep_dateofbirth := l.dateofbirth;
+  // self.rep_dlnumber := l.dlnumber;
+  // self.rep_dlstate := l.dlstate;
+	// self.companyname := l.name_company;
+  // self.altcompanyname := l.alt_company_name;
+  // self.streetaddress1 := l.street_addr2;
+  // self.city := l.p_city_name_2;
+  // self.state := l.st_2;q
+  // self.zip9 := l.z5_2;
+  // self.zip4 := l.zip4_2;
+  // self.phone10 := l.phoneno;
+  // self.fein := l.fein;	
+	// self.historydate := 999999;
+	self := l;
+  self := [];
+END;
+Reflagged_oldfile := project(keepers, Rearrange(left, counter));
+output(choosen(Reflagged_oldfile, eyeball));
+output(count(Reflagged_oldfile), named('Reflagged_Logs'));
+
+wNew0Reflagged_oldfile := Reflagged_oldfile(perm_flag = 0);
+output(count(wNew0Reflagged_oldfile), named('New_Test_SampleNew0Reflagged_oldfile'));
+wNew1Reflagged_oldfile := Reflagged_oldfile(perm_flag = 1);
+output(count(wNew1Reflagged_oldfile), named('New_Test_SampleNew1Reflagged_oldfile'));
+wNew2Reflagged_oldfile := Reflagged_oldfile(perm_flag = 2);
+output(count(wNew2Reflagged_oldfile), named('New_Test_SampleNew2Reflagged_oldfile'));
+wNew3Reflagged_oldfile := Reflagged_oldfile(perm_flag = 3);
+output(count(wNew3Reflagged_oldfile), named('New_Test_SampleNew3Reflagged_oldfile'));
+wNew4Reflagged_oldfile := Reflagged_oldfile(perm_flag = 4);
+output(count(wNew4Reflagged_oldfile), named('New_Test_SampleNew4Reflagged_oldfile'));
+
+
 // Scoring_Project_Macros.Business_shell_PII format_them(Scoring_Project_Refresh_Samples.New_Samples_layouts.SBALayout l, integer c) := Transform
-Scoring_Project_Macros.Regression.Business_shell_PII format_them(Scoring_Project_Refresh_Samples.New_Samples_layouts.SBALayout l, integer c) := Transform
+prii_layout format_them(Scoring_Project_Refresh_Samples.New_Samples_layouts.SBALayout l, integer c) := Transform
 	self.Date_added := (integer)ut.getdate;
 	self.Customer := l.accountid;
 	self.Source_Info := 'acclogs_scoring';
 	self.Perm_Flag := 4;
 	// self.AccountNumber := c + MaxAccount;
-	self.acctno := c + MaxAccount;
+	// self.acctno := c + MaxAccount;
 		self.rep_state := if(length(l.rep_state) > 2, l.rep_city, l.rep_state);
 	self.rep_city := if(length(l.rep_state) > 2, l.rep_state, l.rep_city);
 		self.historydate := 999999;
@@ -260,23 +427,32 @@ Formatted_New := project(DedupedData, format_them(left, counter));
 OUTPUT(CHOOSEN(Formatted_New, eyeball), NAMED('Formatted_New'));
 output(count(Formatted_New));
 
-aold0 := Formatted_New(perm_flag = 0);
-output(count(aold0), named('Formatted_New0'));
-aold1 := Formatted_New(perm_flag = 1);
-output(count(aold1), named('Formatted_New1'));
-aold2 := Formatted_New(perm_flag = 2);
-output(count(aold2), named('Formatted_New2'));
-aold3 := Formatted_New(perm_flag = 3);
-output(count(aold3), named('Formatted_New3'));
-aold4 := Formatted_New(perm_flag = 4);
-output(count(aold4), named('Formatted_New4'));
 
 
-New_right := join(keepers, Formatted_New,  left.companyname = right.companyname and
+New_right := join(Reflagged_oldfile, Formatted_New,  left.companyname = right.companyname and
 																									left.streetaddress1 = right.streetaddress1 and
+																									left.fein = right.fein and 
 																									left.zip9 = right.zip9 and 
 																									left.Rep_SSN = right.Rep_SSN, right only);  //dataset with ssn's that are not in the old dataset;
-new_large_sample := keepers + New_right; //add "new_right" to old dataset;
+																									
+sort_large_sample := Sort(New_right, fein, Rep_SSN, Date_added); //sort by date added for dedup
+
+deduped_new := sort_large_sample(Date_added = (Integer)ut.getdate);  //seperates new and old records by date;
+dedupold:= deduped_new(Date_added <> (Integer)ut.getdate);
+
+ut.MAC_Pick_Random(deduped_new,New_5000,10000);   //grabs 5000 of new deduped rocrods;
+
+prii_layout add_acct(prii_layout le, integer c) := Transform
+	self.acctno := c + (integer)MaxAccount;
+	self:= le;
+	self:= [];
+End;
+
+Formatted_acct_New := project(New_5000, add_acct(left, counter));
+
+new_large_sample := Reflagged_oldfile + Formatted_acct_New;																									
+																									
+// new_large_sample := keepers + New_right; //add "new_right" to old dataset;
 output(choosen(new_large_sample, eyeball), named('new_and_old'));
 
 wNew0 := new_large_sample(perm_flag = 0);
@@ -303,7 +479,7 @@ Sorted_Sample := Sort(new_large_sample, perm_flag);
 
 output(choosen(Sorted_Sample, eyeball), named('Sorted_Sample'));
 
-OUTPUT(choosen(Sorted_Sample, 50000),,fileout, thor,  expire(18),overwrite);
+OUTPUT(choosen(Sorted_Sample, 50000),,fileout, thor, overwrite);
 Sorted_Sample_salt := choosen(Sorted_Sample, 50000);
 
 zz_Koubsky_SALT.mac_profile(Sorted_Sample_salt); 

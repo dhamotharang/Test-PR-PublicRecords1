@@ -97,6 +97,8 @@ EXPORT BIID_Scores_Batch_Chase_outfile := '~ScoringQA::out::NONFCRA::businessins
 
 EXPORT BIID_Scores_XML_Generic_outfile := '~ScoringQA::out::NONFCRA::businessinstantid_xml_generic_';
 
+EXPORT BIIDv2_Scores_XML_Generic_outfile := '~ScoringQA::out::NONFCRA::businessinstantidv2_xml_generic_';
+
 EXPORT BIID_Scores_BATCH_Generic_outfile := '~ScoringQA::out::NONFCRA::businessinstantid_batch_generic_';
 
 EXPORT IID_Scores_V0_XML_Generic_outfile := '~ScoringQA::out::NONFCRA::instantid_xml_generic_';

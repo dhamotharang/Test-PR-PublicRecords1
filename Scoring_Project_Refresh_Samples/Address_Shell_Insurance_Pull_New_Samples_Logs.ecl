@@ -1,9 +1,17 @@
 ﻿// EXPORT Address_Shell_Insurance_Pull_New_Samples_Logs := 'todo';
 // oldfile := '~scoring_project::in::address_shell_batch_20151022';
-oldfile := '~scoring_project::in::address_shell_batch_20160809';
+oldfile := '~scoring_project::in::address_shell_batch_20170330';
 fileout := '~bbraaten::test::address_shell_test';
 
 		import _control, zz_bbraaten, Insurance_iesp, InsuranceContext_iesp, Scoring_Project_Macros, ut;
+t_scoreservereditsrecord := RECORD
+    string value{xpath(''), maxlength(230)};
+   END;
+
+t_scoreserverrequest := RECORD
+   DATASET(t_scoreservereditsrecord) records{xpath('Records/Record'), maxcount(3000)};
+  END;
+
 t_commoninformation := RECORD
      string14 referencenumber{xpath('ReferenceNumber')};
      string16 transactionid{xpath('TransactionId')};
@@ -32,12 +40,13 @@ t_commonaccountinformation := RECORD
      string2 state{xpath('State')};
      string5 zip{xpath('Zip')};
      string4 zip4{xpath('Zip4')};
+     string15 roxiequeryversion{xpath('RoxieQueryVersion')};
      t_legacyaccount legacy{xpath('Legacy')};
     END;
 
 t_gateway := RECORD
      string40 servicename{xpath('ServiceName')};
-     string150 url{xpath('URL')};
+     string300 url{xpath('URL')};
     END;
 
 t_dmfinformation := RECORD
@@ -48,7 +57,7 @@ t_dmfinformation := RECORD
 record__3 := RECORD
     t_commoninformation common{xpath('Common')};
     t_commonaccountinformation account{xpath('Account')};
-    DATASET(t_gateway) gateways{xpath('Gateways/Gateway'), maxcount(15)};
+    DATASET(t_gateway) gateways{xpath('Gateways/Gateway'), maxcount(45)};
     t_dmfinformation dmfinfo{xpath('DMFInfo')};
    END;
 record__11 := RECORD
@@ -342,6 +351,7 @@ t_ncfaccountfeatures := RECORD
       string1 dupesamedaycount{xpath('DupeSameDayCount')};
       string30 moduleruleplan{xpath('ModuleRulePlan')};
       string30 modulereformat{xpath('ModuleReformat')};
+      string3 lienjudgementindicator{xpath('LienJudgementIndicator')};
       DATASET(t_ncfswitchmodelconfig) switchmodelconfigs{xpath('SwitchModelConfigs/SwitchModelConfig'), maxcount(99)};
       DATASET(t_ncfreportsection) reportsections{xpath('ReportSections/ReportSection'), maxcount(15)};
      END;
@@ -367,15 +377,15 @@ t_ncfagencyfeature := RECORD
 
 t_ncfcarrierscores := RECORD
        string11 carrieracctid{xpath('CarrierAcctId')};
-       string11 acctnumber{xpath('AcctNumber')};
+       string11 accountnumber{xpath('AccountNumber')};
        string11 modelid{xpath('ModelId')};
        string40 modelcode{xpath('ModelCode')};
+       string1 modelversion{xpath('ModelVersion')};
       END;
 
 t_ncfcarrierfeatures := RECORD
       string11 carriercustnumber{xpath('CarrierCustNumber')};
       string40 carriercustname{xpath('CarrierCustName')};
-      string11 carrieracctid{xpath('CarrierAcctId')};
       string100 accountname{xpath('AccountName')};
       string11 accountnumber{xpath('AccountNumber')};
       string1 carrierstatus{xpath('CarrierStatus')};
@@ -391,6 +401,7 @@ t_ncfinformation := RECORD
      string11 customernumber{xpath('CustomerNumber')};
      string20 returnnode{xpath('ReturnNode')};
      boolean srcnodevalidated{xpath('SrcNodeValidated')};
+     string10 purposecode{xpath('PurposeCode')};
      t_ncfaccountfeatures accountfeatures{xpath('AccountFeatures')};
      t_ncfcompanyfeatures companyfeatures{xpath('CompanyFeatures')};
      t_ncfagencyfeature agencyfeatures{xpath('AgencyFeatures')};
@@ -542,6 +553,7 @@ t_cccompanyfeatures := RECORD
        DATASET(t_cccustomerpolicyexclusion) customerpolicyexclusions{xpath('CustomerPolicyExclusions/CustomerPolicyExclusion'), maxcount(10000)};
        DATASET(t_cccustomervinexclusion) customervinexclusions{xpath('CustomerVinExclusions/CustomerVinExclusion'), maxcount(10000)};
        DATASET(t_ccrelatedcustomers) relatedcustomers{xpath('RelatedCustomers/Number'), maxcount(20)};
+       DATASET(t_stringarrayitem) prioralerts{xpath('PriorAlerts/CustomerNumber'), maxcount(12)};
       END;
 
 t_ccproductfeatures := RECORD
@@ -559,6 +571,36 @@ t_ccinformation := RECORD
      string11 customernumber{xpath('CustomerNumber')};
     END;
 
+t_tobaccoinformation := RECORD
+     string marketcode{xpath('MarketCode')};
+     string customerid{xpath('CustomerId')};
+     string customername{xpath('CustomerName')};
+     string productstatus{xpath('ProductStatus')};
+     string flgreturnredgreen{xpath('FlgReturnRedGreen')};
+     string flgreturnmodelindicator{xpath('FlgReturnModelIndicator')};
+     string flgreturnnumericalscore{xpath('FlgReturnNumericalScore')};
+     string redscoremin{xpath('RedScoreMin')};
+     string redscoremax{xpath('RedScoreMax')};
+     string greenscoremin{xpath('GreenScoreMin')};
+     string greenscoremax{xpath('GreenScoreMax')};
+     string modelthreshold{xpath('ModelThreshold')};
+     string tobaccostatus{xpath('TobaccoStatus')};
+    END;
+
+t_fdnriskfactors := RECORD
+     string marketcode{xpath('MarketCode')};
+     string customerid{xpath('CustomerId')};
+     string customername{xpath('CustomerName')};
+     string productstatus{xpath('ProductStatus')};
+     string returnnode{xpath('ReturnNode')};
+     string indscoreattributesdescription{xpath('IndScoreAttributesDescription')};
+     string accountconfigid{xpath('AccountConfigId')};
+     string indscoreattributes{xpath('IndScoreAttributes')};
+     string gcid{xpath('GCId')};
+     string fdnproductid{xpath('FDNProductId')};
+     string fdnindustrytype{xpath('FDNIndustryType')};
+    END;
+
 t_insurancescoreproductsinfo := RECORD
     t_issinformation iss{xpath('ISS')};
     t_clueautoinformation cluea{xpath('CLUEA')};
@@ -569,30 +611,23 @@ t_insurancescoreproductsinfo := RECORD
     t_ncfinformation ncf{xpath('NCF')};
     t_ddinformation dd{xpath('DD')};
     t_ccinformation cc{xpath('CC')};
+    t_tobaccoinformation tobacco{xpath('TOBACCO')};
+    t_fdnriskfactors fdnrskcl{xpath('FDNRSKCL')};
+   END;
+
+t_ffdproduct := RECORD
+     string productcode{xpath('ProductCode')};
+     string returnconsumerstatement{xpath('ReturnConsumerStatement')};
+    END;
+
+t_ffdinsurancecontext := RECORD
+    DATASET(t_ffdproduct) products{xpath('Products/Product'), maxcount(999)};
    END;
 
 t_insurancescorecontext := RECORD(record__3)
    t_insurancescoreproductsinfo products{xpath('Products')};
+   t_ffdinsurancecontext ffd{xpath('FFD')};
   END;
-	
-	t_ScoreServerEditsRecord := record
-	string value {xpath(''), maxlength(230)};
-end;
-
-t_ScoreServerRequest := record
-	dataset(t_ScoreServerEditsRecord) Records {xpath('Records/Record'), MAXCOUNT(3000)};
-end;
-
-
-
- t_BaseInsuranceContext := record
-	t_CommonInformation Common {xpath('Common')};
-	t_CommonAccountInformation Account {xpath('Account')};
-	dataset(t_Gateway) Gateways {xpath('Gateways/Gateway'), MAXCOUNT(15)};
-	t_DMFInformation DMFInfo {xpath('DMFInfo')};
-end;
-
-
 
 lay := RECORD
   unsigned8 date_added;
@@ -604,11 +639,11 @@ lay := RECORD
   t_insurancescorecontext insurance_context;
  END;
 
-	
+
 	
 	//alpa dataland  http://10.194.10.2:8010
 			// ds_raw_input:=dataset('~foreign::' + _control.IPAddress.adataland_dali + '::' + 'scoringqa::in::nonfcra::scoreserver_mbsi_xml_20160212',lay,thor);
-			ds_raw_input:=dataset('~foreign::' + _control.IPAddress.adataland_dali + '::' + 'scoringqa::in::nonfcra::scoreserver_mbsi_xml_p507_20170303',lay,thor);
+			ds_raw_input:=dataset('~foreign::' + _control.IPAddress.adataland_dali + '::' + 'scoringqa::in::nonfcra::scoreserver_mbsi_xml_p507_20180404',lay,thor);
 
 
 // scoringqa::in::nonfcra::scoreserver_mbsi_xml_p507_*
@@ -735,28 +770,27 @@ keepers_1_4 := OriginalDataRvv3(perm_flag = 4);
 output(count(keepers_1_4));
 
 
-keepers := sort(keepers_1_0+keepers_1_1+keepers_1_2+keepers_1_3+keepers_1_4, date_added);
+keepers := sort(keepers_1_0+keepers_1_2+keepers_1_3+keepers_1_4, date_added);
 output(keepers);
 output(count(keepers), named('keepers'));
 
-// Output_structure Rearrange(output_structure l, integer c) := TRANSFORM
-	// self.Date_added := (Integer)20151022;
+Output_structure Rearrange(output_structure l, integer c) := TRANSFORM
+	// self.Date_added := ut.getdate;
 
-	// self.Perm_Flag := If(c <= 5000, 0, if(c >5000 and c <= 10000, 1, 2));  //subtracting 1 from original permflag;
+		self.Perm_Flag := If(l.perm_flag <= 0, 0, l.perm_flag - 1);  	
 	// self.zip := l.zip[1..5];
 	// self.homephone := if(l.homephone[1] = '0', '', l.homephone);
 	// self.history_date := 999999;
 	// self.historydateyyyymm := 999999;
-	// self := l;
-  // self := [];
-// END;
+	self := l;
+  self := [];
+END;
 
 Output_structure format_them(inputStructure l, integer c) := Transform
 	self.Date_added := (Integer)ut.getdate;
 	self.Customer := 'Generic';
 	self.Source_Info := 'P507 Model';
-	self.Perm_Flag := If(c <= 3386, 2, if(c >3386 and C <= 8386, 3, 4));
-	self.AccountNumber := c + MaxAccount;
+		self.Perm_Flag := 4;  	
 		self.zip := l.zip[1..5];
 	self.streetaddress :=  l.streetname;
 	self.history_date := 999999;
@@ -766,59 +800,55 @@ Output_structure format_them(inputStructure l, integer c) := Transform
 End;
 
 
-// Reflagged_Logs := project(keepers, Rearrange(left, counter));
-new_perm  := keepers;
-output(choosen(new_perm, eyeball), named('new_perm'));
-output(count(new_perm), named('new_perm_count'));
+Reflagged_Logs := project(keepers, Rearrange(left, counter));
+// new_perm  := keepers;
+output(choosen(Reflagged_Logs, eyeball), named('Reflagged_Logs'));
+output(count(Reflagged_Logs), named('Reflagged_Logs_count'));
 
-// old0 := new_perm(perm_flag = 0);
-// output(count(old0), named('Reflagged_LogsNew0'));
-// old1 := new_perm(perm_flag = 1);
-// output(count(old1), named('Reflagged_LogsNew1'));
-// old2 := new_perm(perm_flag = 2);
-// output(count(old2), named('Reflagged_LogsNew2'));
-// old3 := new_perm(perm_flag = 3);
-// output(count(old3), named('Reflagged_LogsNew3'));
-// old4 := new_perm(perm_flag = 4);
-// output(count(old4), named('Reflagged_Logsnew4'));
 
 Formatted_New := project(DedupedData, format_them(left, counter));
 OUTPUT(CHOOSEN(Formatted_New, eyeball), NAMED('Formatted_New'));
 output(count(Formatted_New));
 
-// aold0 := Formatted_New(perm_flag = 0);
-// output(count(aold0), named('Formatted_New0'));
-// aold1 := Formatted_New(perm_flag = 1);
-// output(count(aold1), named('Formatted_New1'));
-// aold2 := Formatted_New(perm_flag = 2);
-// output(count(aold2), named('Formatted_New2'));
-// aold3 := Formatted_New(perm_flag = 3);
-// output(count(aold3), named('Formatted_New3'));
-// aold4 := Formatted_New(perm_flag = 4);
-// output(count(aold4), named('Formatted_New4'));
 
-New_right := join(new_perm, Formatted_New,  left.streetaddress = right.streetaddress and
+
+new_large_sample := join(Reflagged_Logs, Formatted_New,  left.streetaddress = right.streetaddress and
 																									left.city = right.city and
 																									left.state = right.state and 
 																									left.zip = right.zip, right only);  //dataset with ssn's that are not in the old dataset;
-new_large_sample := new_perm + New_right; //add "new_right" to old dataset;
-output(choosen(new_large_sample, eyeball), named('new_and_old'));
+// new_large_sample := Reflagged_Logs + New_right; //add "new_right" to old dataset;
+output(choosen(new_large_sample, eyeball), named('new'));
+
+deduped_new := new_large_sample(Date_added = (Integer)ut.getdate);  //seperates new and old records by date;
+dedupold:= deduped_new(Date_added <> (Integer)ut.getdate);
+
+ut.MAC_Pick_Random(deduped_new,New_5000,5000);   //grabs 5000 of new deduped rocrods;
+
+Output_structure add_acct(Output_structure le, integer c) := Transform
+	self.accountnumber := c + (integer)MaxAccount;
+	self:= le;
+	self:= [];
+End;
+
+Formatted_acct_New := project(New_5000, add_acct(left, counter));
+
+new_large_sample_full := Reflagged_Logs + Formatted_acct_New;						
 
 
-// wNew0 := new_large_sample(perm_flag = 0);
-// output(count(wNew0), named('New_Test_SampleNew0'));
-// wNew1 := new_large_sample(perm_flag = 1);
-// output(count(wNew1), named('New_Test_SampleNew1'));
-// wNew2 := new_large_sample(perm_flag = 2);
-// output(count(wNew2), named('New_Test_SampleNew2'));
-// wNew3 := new_large_sample(perm_flag = 3);
-// output(count(wNew3), named('New_Test_SampleNew3'));
-// wNew4 := new_large_sample(perm_flag = 4);
-// output(count(wNew4), named('New_Test_SampleNew4'));
+aold0 := new_large_sample_full(perm_flag = 0);
+output(count(aold0), named('Formatted_New0'));
+aold1 := new_large_sample_full(perm_flag = 1);
+output(count(aold1), named('Formatted_New1'));
+aold2 := new_large_sample_full(perm_flag = 2);
+output(count(aold2), named('Formatted_New2'));
+aold3 := new_large_sample_full(perm_flag = 3);
+output(count(aold3), named('Formatted_New3'));
+aold4 := new_large_sample_full(perm_flag = 4);
+output(count(aold4), named('Formatted_New4'));
 
-Sorted_Sample := Sort(new_large_sample, AccountNumber);
+Sorted_Sample := Sort(new_large_sample_full, AccountNumber);
 
-output(choosen(Sorted_Sample, all), named('Sorted_Sample'));
+output(choosen(Sorted_Sample, 25000), named('Sorted_Sample'));
 output(count(Sorted_Sample));
 
-// OUTPUT(choosen(Sorted_Sample, 25000),,fileout, thor,  expire(18),overwrite);
+OUTPUT(choosen(Sorted_Sample, 25000),,fileout, thor,  overwrite);

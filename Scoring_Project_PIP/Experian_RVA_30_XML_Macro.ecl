@@ -15,10 +15,11 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		//*********** SETTINGS ********************************
 
 		DRM:=Scoring_Project_PIP.User_Settings_Module.RV_Attributes_V3_XML_Experian_settings.DRM;
-		// GLB:=Scoring_Project_PIP.User_Settings_Module.RV_Attributes_V3_XML_Experian_settings.GLB;
-		// DPPA:=Scoring_Project_PIP.User_Settings_Module.RV_Attributes_V3_XML_Experian_settings.DPPA;
+
 		HISTORYDATE := 999999;
-		
+		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		integer FFD := 1;
 		//*****************************************************
 
 	  //************** INPUT FILE GENERATION ****************	
@@ -60,8 +61,8 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			STRING WorkPhone;
 			STRING EmployerName;
 			STRING FormerName;
-			// INTEGER GLBPurpose;
-			// INTEGER DPPAPurpose;
+			string FFDOptionsMask ;
+
 			integer HistoryDateYYYYMM := HistoryDate;
 			boolean Attributes := False;
 			dataset(Layout_Attributes_In) RequestedAttributeGroups;
@@ -71,13 +72,14 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 
 	  layout_soap_input append_settings(ds_raw_input le, INTEGER c) := TRANSFORM
 			self.Accountnumber := (STRING)le.AccountNumber;;	
-			// self.DPPAPurpose := DPPA;
-			// self.GLBPurpose := GLB;
 			self.Attributes := True;
 			self.RequestedAttributeGroups := dataset([{'version3'}], layout_attributes_in); 
 			self.HistoryDateYYYYMM := HistoryDate;
-			self.gateways := dataset([{'neutralroxie', neutralroxieIP}], risk_indicators.Layout_Gateways_In);
+			// self.gateways := dataset([{'neutralroxie', neutralroxieIP}], risk_indicators.Layout_Gateways_In);
+			SELF.Gateways := DATASET([{'neutralroxie', NeutralRoxieIP}, // TransUnion Gateway
+					{'delta_personcontext', PCG_Cert}], Risk_Indicators.Layout_Gateways_In);
 			self.DataRestrictionMask := DRM; 
+			self.FFDOptionsMask := (string)FFD;
 			self := le;
 			self := [];
 		END;
@@ -123,8 +125,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		Soap_output := soapcall(soap_in, fcraroxieIP,
 												'Models.RiskView_Testing_Service', {soap_in}, 
 												DATASET(layout_Soap_output),
-												RETRY(retry), TIMEOUT(timeout), LITERAL,
-												XPATH('Models.RiskView_Testing_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+												RETRY(retry), TIMEOUT(timeout), 
 												PARALLEL(threads), onFail(myFail(LEFT)));
 
 	

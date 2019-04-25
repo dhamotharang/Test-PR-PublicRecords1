@@ -43,7 +43,7 @@ AddressShell:=Scoring_Project_ISS.AddressShell_Attributes_V1_BATCH_Macro(roxieIP
 BusinessShell:=Scoring_Project_ISS.BusinessShell_Attributes_V2_XML_Macro(roxieIP, gateway_ip,no_of_threads,Timeout,Retry_time,BusinessShell_Attributes_V2_XML_Generic_infile,BusinessShell_Attributes_V2_XML_Generic_outfile,no_of_recs_to_run):RECOVERY(message1,10);
 
 sequential(AddressShell,BusinessShell) :  WHEN(CRON('00 5 * * *')), 
-FAILURE(FileServices.SendEmail( Scoring_Project_DailyTracking.email_distribution.ISS_Email_list,'Daily Data Collection Addressshell & BusinessShell job failed','The failed workunit is:' + workunit + FailMessage));
+FAILURE(FileServices.SendEmail( Scoring_Project_DailyTracking.email_distribution.DDT_fail_list,'Daily Data Collection Addressshell & BusinessShell job failed','The failed workunit is:' + workunit + FailMessage));
 
 
 EXPORT BWR_All := 'todo';

@@ -2,11 +2,19 @@
 EXPORT Cert_Runway_Macro := FUNCTION
 
 
-import ut,STD, Scoring_Project_Macros, Scoring_Project_DailyTracking, zz_bbraaten2;
+import ut,STD, Scoring_Project_Macros, Scoring_Project_DailyTracking;
 
  dt := ut.getdate;
  // dt := '20150428';
 decimal19_2 thresh := 1.25;
+fn_LastTwoMonths(string10 date_inp,integer offset) := function
+res  := GLOBAL(ut.DateFrom_DaysSince1900(ut.DaysSince1900(date_inp[1..4], date_inp[5..6], date_inp[7..8]) - offset));
+return res[1..8];
+end;
+
+b:=fn_LastTwoMonths(dt,1);
+
+
 
 
 
@@ -14,14 +22,16 @@ ds_cur:=  Scoring_Project_Macros.Runway_Macro_Join_Cert(dt);
 
 // ds_curr := dataset('~' + 'Scoring_Project::out::runway_join_results_' + dt + '_1', Scoring_Project_Macros.Runway_Join_Layout, thor);
 
-filenames_details :=  nothor(STD.File.LogicalFileList('Scoring_Project::out::runway_cert_join_results_*_1'));
-filelist := sort(filenames_details, -modified);
+// filenames_details :=  nothor(STD.File.LogicalFileList('Scoring_Project::out::runway_cert_join_results_*_1'));
+// filelist := sort(filenames_details, -modified);
 
-p_file_name := filelist[1].name;
-prev_date := p_file_name[length(p_file_name)-9.. length(p_file_name)-2];
+// p_file_name := filelist[1].name;
+p_file_name := '~Scoring_Project::out::runway_cert_join_results_'+b+'_1';
+prev_date := b;
 
 cleaned_curr_date := dt;
-cleaned_prev_date := prev_date;
+// cleaned_prev_date := prev_date;
+cleaned_prev_date := b;
 
 // ds_pre := dataset('~'+ p_file_name, test_apaar.Runway_Join_Layout_Old_test, thor);
 ds_pre := dataset('~' + p_file_name, Scoring_Project_Macros.Runway_Join_Layout, thor);

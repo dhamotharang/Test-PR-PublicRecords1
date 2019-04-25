@@ -1,6 +1,6 @@
 ﻿EXPORT Runway_NonFCRA_Macro( bs_version, neutralroxie_IP, Thread, Timeout, Retry, Input_file_name, Output_file_name, records_ToRun):= functionmacro
 
-IMPORT Risk_Indicators, ut, models, Scoring_Project, zz_bbraaten2;
+IMPORT Risk_Indicators, ut, models, Scoring_Project;
 
 unsigned8 no_of_records := records_ToRun;
 integer retry := retry;
@@ -32,8 +32,11 @@ layout_input := Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_La
 ds_in_prep := dataset (Input_file, Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor);
 // ds_in_prep := dataset (Input_file,  zz_bbraaten2.Boca_50_Cert_NonFCRA, thor);
 
+	clean_ds_baseline := ds_in_prep(errorcode='');
 
-ds_in := project(ds_in_prep, TRANSFORM(layout_input, self.historydate := (Integer)archive_date, self:= LEFT));
+
+ds_in := project(clean_ds_baseline, TRANSFORM(layout_input, self.historydate := (Integer)archive_date, self:= LEFT));
+
 nonfcra_ds_input := IF (no_of_records = 0, ds_in, CHOOSEN (ds_in, no_of_records));
 
 // output(ds_input,named('ds_input'));
@@ -41,12 +44,12 @@ nonfcra_ds_input := IF (no_of_records = 0, ds_in, CHOOSEN (ds_in, no_of_records)
 layout_soap_in := record
 	integer model_environment;
 	boolean excludeReasons;
-	dataset(risk_indicators.Layout_Boca_Shell - LnJ_datasets - ConsumerStatements) shell;
+	dataset(risk_indicators.Layout_Boca_Shell - LnJ_datasets - ConsumerStatements -bk_chapters) shell;
 	// dataset( zz_bbraaten2.Boca_50_Cert_NonFCRA) shell;
 end;
 
 layout_soap_in create_soap_in(Layout_input le) := transform
-	self.shell := project(le, transform(risk_indicators.Layout_Boca_Shell - LnJ_datasets - ConsumerStatements, self := left));
+	self.shell := project(le, transform(risk_indicators.Layout_Boca_Shell - LnJ_datasets - ConsumerStatements -bk_chapters, self := left));
 	// self.shell := project(le, transform( zz_bbraaten2.Boca_50_Cert_NonFCRA, self := left));
 	self.model_environment := 3;  // nonfcra only
 	// self.model_environment := 2;  // fcra only

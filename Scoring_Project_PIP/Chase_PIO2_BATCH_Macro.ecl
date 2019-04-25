@@ -19,6 +19,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT;
 		DPPA:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_BATCH_Chase_PIO2_settings.DPPA;
 		GLB:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_BATCH_Chase_PIO2_settings.GLB;
 		DRM:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_BATCH_Chase_PIO2_settings.DRM;
+		DPM:=Scoring_Project_PIP.User_Settings_Module.PRIO_Scores_BATCH_Chase_PIO2_settings.DPM;
 		HISTORYDATE := 999999;
 
 		//*****************************************************
@@ -43,6 +44,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT;
 			unsigned1	DPPAPurpose:= '';
 			unsigned1	GLBPurpose:= '';
 			STRING DataRestrictionMask := '';
+			STRING DataPermissionMask := '';
 			integer	HistoryDateyyyymm := '';
 			string Gateways := '';
 			end;
@@ -70,6 +72,7 @@ IMPORT Models, Risk_Indicators, RiskWise, UT;
 			self.dppapurpose := dppa;
 			self.glbpurpose := glb;
 			self.datarestrictionmask := drm;
+			self.DataPermissionMask := dpm;
 			self.historydateyyyymm := historydate;
 		END;
 

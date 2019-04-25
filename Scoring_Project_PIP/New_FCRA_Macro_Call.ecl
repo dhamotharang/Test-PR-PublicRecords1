@@ -95,16 +95,16 @@ IV_Attributes 																	:= scoring_project_pip.insurview_Macro(fcra_roxie
 
 sequential(
 					 // CapitalOne_RVAttributes_V2,
-					 CapitalOne_RVAttributes_V3,
-					 CapitalOne_RVAttributes_V5,
+					 // CapitalOne_RVAttributes_V3,
+					 // CapitalOne_RVAttributes_V5,
 					 RV_Scores_Attribute_V3_BATCH,
 					 RV_Scores_Attribute_V4_BATCH,
 					 RV_Scores_Attribute_V3_XML,
 					 RV_Scores_Attribute_V4_XML,
 					 RV_Scores_Attributes_V5_XML,
 					 Experian_RVA_30_XML,
-					 Experian_RVA_30_BATCH,
-					 IV_Attributes
+					 Experian_RVA_30_BATCH
+					 // IV_Attributes
 					 );	 
 
 

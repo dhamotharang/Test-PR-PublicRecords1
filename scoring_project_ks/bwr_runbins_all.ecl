@@ -60,7 +60,7 @@ scoring_project_ks.bwr_mac_get_score_details_test( 'fcra', 'RiskView_batch_gener
 
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v3', 'rv_score_auto', 		date_in, ret6);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v3', 'rv_score_bank', 		date_in, ret7);
-scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v3', 'rv_score_retail', 	date_in, ret8);
+// scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v3', 'rv_score_retail', 	date_in, ret8);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v3', 'rv_score_telecom', 	date_in, ret9);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_batch_generic_allflagships_v3', 'rv_score_money', 		date_in, ret10);
 
@@ -70,15 +70,15 @@ scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v4', 'rv_score_retail', 	date_in, ret13);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v4', 'rv_score_telecom', 	date_in, ret14);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v4', 'rv_score_money', 		date_in, ret15);
-scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v4', 'rv_score_prescreen',date_in, ret16);
+// scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v4', 'rv_score_prescreen',date_in, ret16);
 
 
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_auto', 		date_in, ret17);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_bank', 		date_in, ret18);
-scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_retail', 	date_in, ret19);
+// scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_retail', 	date_in, ret19);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_telecom', 	date_in, ret20);
 scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_money', 		date_in, ret21);
-scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_prescreen',date_in, ret22);
+// scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_allflagships_v3', 'rv_score_prescreen',date_in, ret22);
 
 
 
@@ -181,9 +181,9 @@ scoring_project_ks.bwr_mac_get_score_details_test( 'fcra','RiskView_xml_generic_
 
 
 
-sequential( ret1  , ret2  , ret3  , ret4 ,ret5  , ret6  , ret7  , ret8  , ret9  , ret10 ,
-				        ret11 , ret12 , ret13 , ret14 , ret15 , ret16 , ret17 , ret18 , ret19 , ret20 ,
-						    ret21 , ret22 ,  ret30 ,
+sequential( ret1  , ret2  , ret3  , ret4 ,ret5  , ret6  , ret7  , ret9  , ret10 ,
+				        ret11 , ret12 , ret13 , ret14 , ret15 ,  ret17 , ret18 ,  ret20 ,
+						    ret21 ,   ret30 ,
 				        ret31 , ret32 , ret33 , ret34 , ret35 , ret38 , ret39 , ret40, ret41, ret42, 
 				          ret43 , ret44 , ret45 , ret50, ret54 , ret55 , ret56 , ret57 , ret58 , ret59, ret60,
 								ret61, ret62, ret63, ret64 , ret65, ret66, ret67, ret68 , ret69 , ret70, ret71, ret72, ret73, ret74, ret75, 

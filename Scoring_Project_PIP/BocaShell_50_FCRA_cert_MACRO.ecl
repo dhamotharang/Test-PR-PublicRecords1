@@ -1,6 +1,6 @@
 ﻿EXPORT BocaShell_50_FCRA_cert_MACRO ( bs_version, fcraroxie_IP,neutralroxie_IP, Thread, Timeout, Retry, Input_file_name,Output_file_name, records_ToRun, retro_date = 999999):= functionmacro
-
-			IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
+//
+			IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Scoring_Project_PIP;
 
 			unsigned8 no_of_records := records_ToRun;
 			integer retry := retry;
@@ -23,6 +23,12 @@
 
 			DRM := scoring_project_pip.User_Settings_Module.BocaShell_50_FCRA_settings.DRM;  
 
+
+		
+		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		// PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		// integer FFD := 1;	
+		
 			//*********************************************************
 
 			//********* input file generation *************************
@@ -51,6 +57,7 @@
 			layout_soap_input append_settings (ds_input le, INTEGER c) := TRANSFORM
 			SELF.old_account_number := (string)le.AccountNumber;
 			SELF.AccountNumber := (STRING)c;
+			// self.FFDOptionsMask := (string)FFD;
 
 			self.neutral_gateway := neutralroxieIP;
 
@@ -79,7 +86,7 @@
 			ds_soap_in := Distribute(PROJECT (ds_input, append_settings (LEFT,COUNTER)), random());
 
 			// ds_soap_output
-			ds_soap_output := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (ds_soap_in, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
+			ds_soap_output := Scoring_Project_PIP.test_BocaShell_SoapCall(PROJECT (ds_soap_in, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
 		                                                                                             bs_service, fcraroxieIP, threads);
 
 			//GLOBAL OUTPUT LAYOUT
@@ -96,8 +103,15 @@
 
       //final file out to thor
 			// final_output := OUTPUT (ds_soap_output_pjt, , out_name_head , thor,cluster('thor50_dev'),compressed, overwrite,expire(60));
-			final_output := OUTPUT (ds_soap_output_pjt, , out_name_head , thor,compressed, overwrite);
+			
+			// final_output := OUTPUT (ds_soap_output_pjt, , out_name_head , thor,compressed, overwrite);
+			// return final_output;
+			
+output(ds_soap_output_pjt, , out_name_head , thor,compressed, overwrite);
 
-			return final_output;
+OUTPUT(ds_soap_output_pjt, , out_name_head +'_CSV_copy', CSV(heading(single), quote('"')), overwrite,expire(14));  
+	
+return 0;	
+	
 
 ENDMACRO;

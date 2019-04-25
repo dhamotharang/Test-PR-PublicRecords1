@@ -23,9 +23,9 @@ include_internal_extras:=true;
 
 
 DRM:=Scoring_Project_PIP.User_Settings_Module.IID_Scores_V0_BATCH_Generic_settings.DRM;
-IncludeVersion4:=Scoring_Project_PIP.User_Settings_Module.IID_Scores_V0_BATCH_Generic_settings.IncludeVersion4;
-IsPreScreen:=Scoring_Project_PIP.User_Settings_Module.IID_Scores_V0_BATCH_Generic_settings.IsPreScreen;
-isFCRA:=if(Scoring_Project_PIP.User_Settings_Module.IID_Scores_V0_BATCH_Generic_settings.isFCRA=true,'FCRA','NONFCRA');
+// IncludeVersion4:=Scoring_Project_PIP.User_Settings_Module.IID_Scores_V0_BATCH_Generic_settings.IncludeVersion4;
+// IsPreScreen:=Scoring_Project_PIP.User_Settings_Module.IID_Scores_V0_BATCH_Generic_settings.IsPreScreen;
+// isFCRA:=if(Scoring_Project_PIP.User_Settings_Module.IID_Scores_V0_BATCH_Generic_settings.isFCRA=true,'FCRA','NONFCRA');
 
 	HistoryDate := 999999;
 
@@ -189,10 +189,10 @@ dist_dataset := PROJECT(p_f,TRANSFORM(layout_soap,SELF := LEFT));
 
 layout_soap_input := RECORD
 	DATASET(Risk_Indicators.Layout_Batch_In) batch_in;
-	DATASET(Risk_Indicators.Layout_Gateways_In) gateways;
+	// DATASET(Risk_Indicators.Layout_Gateways_In) gateways;
 	STRING DataRestrictionMask;
-	boolean IncludeVersion4;
-	BOOLEAN IsPreScreen;	
+	// boolean IncludeVersion4;
+	// BOOLEAN IsPreScreen;	
 END;
 
 Risk_Indicators.Layout_Batch_In make_batch_in(p_f le, integer c) := TRANSFORM
@@ -217,9 +217,9 @@ END;
 layout_soap_input make_rv_in(p_f le, integer c) := TRANSFORM
 	batch := PROJECT(le, make_batch_in(LEFT, c));
 	SELF.batch_in := batch;
-	SELF.gateways := DATASET([{isFCRA, roxieIP}], risk_indicators.layout_gateways_in);
-	SELF.IsPreScreen := IsPreScreen;		
-	self.IncludeVersion4 := IncludeVersion4;
+	// SELF.gateways := DATASET([{isFCRA, roxieIP}], risk_indicators.layout_gateways_in);
+	// SELF.IsPreScreen := IsPreScreen;		
+	// self.IncludeVersion4 := IncludeVersion4;
 	SELF.DataRestrictionMask := DRM;
 	END;
 	

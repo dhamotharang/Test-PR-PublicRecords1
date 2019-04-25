@@ -1,0 +1,23 @@
+﻿import risk_indicators;
+export Layout_IDPO_Soapcall := record
+string	tribcode;  
+string	account;  
+string	first;  
+string	middleini;  
+string	last;  
+string	addr;  
+string	city;  
+string	state;  
+string	zip;  
+string	hphone;  
+string	socs;  
+string	dob;  
+string	wphone;  
+string	drlc;  
+string	drlcstate;  
+integer	DPPAPurpose;
+integer	GLBPurpose; 
+integer	HistoryDateYYYYMM;
+boolean	runSeed;  
+dataset(risk_indicators.Layout_Gateways_In) gateways;
+end; 

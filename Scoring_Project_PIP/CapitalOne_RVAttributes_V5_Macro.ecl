@@ -1,5 +1,5 @@
 ﻿EXPORT CapitalOne_RVAttributes_V5_Macro(fcraroxie_IP,neutralroxie_IP, Thread, Timeout, Retry, Input_file_name, Output_file_name, records_ToRun):= FUNCTIONMACRO
-
+//test
 IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT, Gateway, scoring_project_pip, riskview, Gateway, Address, DidVille;
 
 		unsigned8 no_of_records := records_ToRun;

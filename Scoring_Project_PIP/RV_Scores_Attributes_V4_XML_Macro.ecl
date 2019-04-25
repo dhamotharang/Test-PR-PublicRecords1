@@ -1,4 +1,6 @@
 ﻿EXPORT RV_Scores_Attributes_V4_XML_Macro(fcraroxie_IP, neutralroxie_IP, Thread, Timeout, Retry, Input_file_name, Output_file_name1_score, Output_file_name2_attr, records_ToRun):= FUNCTIONMACRO
+//rvp1104_0 8/15 deprecated depmsey
+
 IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 
 		unsigned8 no_of_records := records_ToRun;
@@ -14,9 +16,11 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		
 		
 		DRM:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V4_XML_Generic_settings.DRM;
+		
+		// PCG_Dev := 'http://delta_dempers_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		PCG_Cert := 'http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.149:7720/WsSupport/?ver_=2.0'; //-- testing on DEV servers
+		integer FFD := 1;
 
-		// DPPA:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V4_XML_Generic_settings.DPPA;
-		// GLB:=Scoring_Project_PIP.User_Settings_Module.RV_Scores_V4_XML_Generic_settings.GLB;
     HistoryDate := 999999;
 
 		//*****************************************************
@@ -61,14 +65,13 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 			STRING EmployerName;
 			STRING FormerName;
 			STRING datarestrictionmask;
-			// INTEGER GLBPurpose;
-			// INTEGER DPPAPurpose;
 			integer HistoryDateYYYYMM;
 			boolean Attributes := false;
 			dataset(Layout_Attributes_In) RequestedAttributeGroups;
 			dataset(Models.Layout_Score_Chooser) scores;
 			dataset(Risk_Indicators.Layout_Gateways_In) gateways;
 			unsigned6 did;
+			string FFDOptionsMask ;
 			string IntendedPurpose := '';
 		end;
 
@@ -78,7 +81,7 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 		paramsR := dataset([{'Custom', 'rvr1103_0'}], models.Layout_Parameters);
 		paramsT := dataset([{'Custom', 'rvt1104_0'}], models.Layout_Parameters);	
 		paramsM := dataset([{'Custom', 'rvg1103_0'}], models.Layout_Parameters);
-		paramsP := dataset([{'Custom', 'rvp1104_0'}], models.Layout_Parameters);	
+		// paramsP := dataset([{'Custom', 'rvp1104_0'}], models.Layout_Parameters);	//8/15 deprecated depmsey
 
 		layout_soap append_settings(ds_raw_input le, INTEGER c) := TRANSFORM
 			self.Accountnumber := (STRING)le.accountnumber;	
@@ -89,11 +92,14 @@ IMPORT Models, iESP, Risk_Indicators, RiskWise, RiskProcessing, UT;
 								            	{'Models.RVRetail_Service', fcraroxieIP,paramsR},{'Models.RVTelecom_Service', fcraroxieIP,paramsT},
 								            	{'Models.RVMoney_Service', fcraroxieIP,paramsM}],
 									             models.Layout_Score_Chooser);  
-			self.gateways := dataset([{'neutralroxie', neutralroxieIP}], risk_indicators.Layout_Gateways_In);
+			// self.gateways := dataset([{'neutralroxie', neutralroxieIP}], risk_indicators.Layout_Gateways_In);
+			SELF.Gateways := DATASET([{'neutralroxie', NeutralRoxieIP}, // TransUnion Gateway
+											{'delta_personcontext', PCG_Cert}], Risk_Indicators.Layout_Gateways_In);
 			self.IntendedPurpose := '';
 			self.HistoryDateYYYYMM := HistoryDate;
-			// self.glbpurpose := GLB;
 			self.datarestrictionmask := DRM;
+			self.FFDOptionsMask := (string)FFD;
+
 			self := le;
 			self := [];
 		END;
@@ -121,10 +127,12 @@ Layout_Attribute := RECORD, maxlength(100000)
 
 		// run the prescreen score as seperate soapcall so you can send in the intended purpose
 		//ds_soap_in_prescreen
+		// 8/15 deprecated depmsey
+		/*
 		soap_in_prescreen := PROJECT(soap_in,TRANSFORM(layout_soap,
 			                                     self.IntendedPurpose := 'PRESCREENING'; 
 																					 self.scores := dataset([{'Models.RVPrescreen_Service', fcraroxieIP,paramsP}], models.Layout_Score_Chooser); 
-																					 self := LEFT));
+																					 self := LEFT));*/
 
 		//Soap output layout
 		layout_Soap_output := RECORD
@@ -150,16 +158,16 @@ Layout_Attribute := RECORD, maxlength(100000)
 		Soap_output := soapcall(soap_in, fcraroxieIP,
 						'Models.RiskView_Testing_Service', {soap_in}, 
 						DATASET(layout_Soap_output),
-						RETRY(retry), TIMEOUT(timeout), LITERAL,
-						XPATH('Models.RiskView_Testing_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+						RETRY(retry), TIMEOUT(timeout), 
 						PARALLEL(threads), onFail(myFail(LEFT)));
 						
+		// 8/15 deprecated depmsey
+		/*				
 		Soap_output_prescreen := soapcall(soap_in_prescreen, fcraroxieIP,
 						'Models.RiskView_Testing_Service', {soap_in_prescreen}, 
 						DATASET(layout_Soap_output),
-						RETRY(retry), TIMEOUT(timeout), LITERAL,
-						XPATH('Models.RiskView_Testing_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
-						PARALLEL(threads), onFail(myFail(LEFT)));
+						RETRY(retry), TIMEOUT(timeout), 
+						PARALLEL(threads), onFail(myFail(LEFT)));*/
 	
 					
 		// ***************************************************************************************************
@@ -224,12 +232,14 @@ Layout_Attribute := RECORD, maxlength(100000)
 			monyModel5 := l.models[5].scores(description='Money');
 			monyModel6 := l.models[6].scores(description='Money');
 			
+			// 8/15 deprecated depmsey
+		/*				
 			presModel1 := l.models[1].scores(description='PreScreen');
 			presModel2 := l.models[2].scores(description='PreScreen');
 			presModel3 := l.models[3].scores(description='PreScreen');
 			presModel4 := l.models[4].scores(description='PreScreen');
 			presModel5 := l.models[5].scores(description='PreScreen');
-			presModel6 := l.models[6].scores(description='PreScreen');
+			presModel6 := l.models[6].scores(description='PreScreen');*/
 
 			self.rv_score_auto := map(  autoModel1[1].i <> '' => autoModel1[1].i,
 										autoModel2[1].i <> '' => autoModel2[1].i,
@@ -445,7 +455,8 @@ Layout_Attribute := RECORD, maxlength(100000)
 										monyModel5[1].i <> '' => monyModel5[1].reason_codes[5].reason_code,
 										monyModel6[1].i <> '' => monyModel6[1].reason_codes[5].reason_code,
 										'');							
-										
+			// 8/15 deprecated depmsey
+		/*											
 			self.rv_score_prescreen := map( presModel1[1].i <> '' => presModel1[1].i,
 											presModel2[1].i <> '' => presModel2[1].i,
 											presModel3[1].i <> '' => presModel3[1].i,
@@ -459,21 +470,23 @@ Layout_Attribute := RECORD, maxlength(100000)
 											presModel4[1].i <> '' => presModel4[1].reason_codes[1].reason_code,
 											presModel5[1].i <> '' => presModel5[1].reason_codes[1].reason_code,
 											presModel6[1].i <> '' => presModel6[1].reason_codes[1].reason_code,
-											'');		
+											'');	*/	
 			self := L;
 		  self := [];
 		END;
 
 		ds_with_extras := JOIN(Soap_output,soap_in,LEFT.accountnumber=RIGHT.accountnumber,v4_trans(LEFT,RIGHT));
 
-		ds_prescreen := JOIN(Soap_output_prescreen,soap_in_prescreen,LEFT.accountnumber=RIGHT.accountnumber,v4_trans(LEFT,RIGHT));
+		// ds_prescreen := JOIN(Soap_output_prescreen,soap_in_prescreen,LEFT.accountnumber=RIGHT.accountnumber,v4_trans(LEFT,RIGHT));
 
 		//appening prescreen scores	 
+					// 8/15 deprecated depmsey
+		/*		
 		ds_final := join(ds_with_extras, ds_prescreen, left.acctno=right.acctno, transform(Global_output_lay, 
 																															self.rv_score_prescreen := right.rv_score_prescreen;
 																															self.RV_prescreen_reason := right.rv_prescreen_reason;
 																															self.errorcode := left.errorcode + right.errorcode;
-																															self := left) );
+																															self := left) );*/
 	
 Global_output_lay2:= RECORD	 
 		Scoring_Project_Macros.Global_Output_Layouts.FCRA_RiskView_XML_Generic_Attributes_V4_Global_Layout;			 
@@ -790,10 +803,14 @@ Global_output_lay2:= RECORD
 		ds_slim := JOIN(Soap_output,soap_in,LEFT.accountnumber=RIGHT.accountnumber,v4_trans_attr(left,right));
 
 		//scores	
-	output(ds_final,,outfile_name1, thor, compressed, overwrite );
+	// output(ds_final,,outfile_name1, thor, compressed, overwrite );
+	output(ds_with_extras,,outfile_name1, thor, compressed, overwrite );
 
 		//final file out to thor
 	output(ds_slim,, outfile_name2, thor, compressed, overwrite);	
-	
+			
+		// output(Soap_output,named('Soap_output'));
+		// output(soap_in,named('soap_in'));
+		
 return 0;
 endmacro;

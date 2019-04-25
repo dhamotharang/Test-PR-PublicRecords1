@@ -1,29 +1,44 @@
+﻿//REMOVE DID field in layout and getting populated in soap input if wanting apples to apples with other scripts as NOT all scripts are sending this in.
 #WORKUNIT('name', 'Phone_Shell');
 
-IMPORT Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT;
+IMPORT Phone_Shell, Relocations, Risk_Indicators, RiskWise, data_services;
 
 RecordsToRun := 0; // Number of records to run through the service - set to 0 to run all
 
 eyeball := 250; // Number of sample records to view
 
-RoxieIP := RiskWise.Shortcuts.Prod_Batch_Neutral; // Production Roxie
+RoxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie; // Production Roxie
 // RoxieIP := RiskWise.Shortcuts.Staging_Neutral_RoxieIP; // Staging/Cert Roxie
 
-Threads := 33; // Number of Parallel threads to SOAPCALL with
+Threads := 30; // Number of Parallel threads to SOAPCALL with
 
 /* *****************************************
  * Input/Output File Names                 *
  *******************************************/
-InputFile := ut.foreign_prod + 'jpyon::in::sprint_1552_in';
-OutputFile := '~bpahl::out::phone_shell';
+//these WU will have the input data: PROD W20150702-110536 (First Party) and PROD W20150702-110602 (Third Party)
+//InputFile := '~bweiner::in::jan16_3p_pii';
+//OutputFile := '~akoenen::out::phone_shell';
+
+//InputFile := data_services.foreign_prod +'bweiner::in::mar18_1p_pii.csv';
+InputFile := '~bweiner::in::mar18_1p_pii.csv';
+
+// OutputFile := '~bweiner::out::phone_shell_sample_mar18_1p-equifax_OFF';
+OutputFile := '~bweiner::out::phone_shell_sample_mar18_1p-equifax_ON';
 
 /* *****************************************
  * Phone Shell Input Options               *
  *******************************************/
-DataRestrictionMask := '000000000000000000';
+// DataRestrictionMask := '0000000000000000000000000'; //orig PHone shell setting
+DataRestrictionMask := '101000000000000000000000000'; //If bit 24 is 1 that means NO Equifax data can be used
+//DataPermission := Phone_Shell.Constants.Default_DataPermission; //orig PHone shell setting
+DataPermission := '100000000000000000000'; 
+//set Premium A flag here
+//PremiumAFlag := TRUE;
+PremiumAFlag := FALSE; //no Equifax gateway
+
 EnableInsuranceAttributes := TRUE; // Should probably always be TRUE - turns on the Insurance Verification Attributes
-ScoringModelName := 'PHONESCORE_V2'; // Set to BLANK to turn off the scoring model
-Score_Threshold_In := 245;
+ScoringModelName := 'COLLECTIONSCORE_V3';//'PHONESCORE_V2' = OLD phone model; // Set to BLANK to turn off the scoring model
+Score_Threshold_In := 306; //orig script had 245
 
 /* *****************************************
  * Gateway Information                     *
@@ -36,17 +51,12 @@ EnableTargus_Gateway := FALSE; // Set to TRUE to run the Targus Gateway (Source_
 Targus_Gateway_URL := '';
 // Targus_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway/?ver_=1.70';
 
-EnableMetronet_Experian_Gateway := FALSE; // Set to TRUE to run the Metronet Experian Gateway (Source_List == 'EXP')
-Metronet_Experian_Gateway_URL := '';
-// Metronet_Experian_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway?ver_=1.043';
-
-
-
 prii_layout := RECORD
      STRING Account;
      STRING FirstName;
      STRING MiddleName;
      STRING LastName;
+     STRING SuffixName;
      STRING StreetAddress;
      STRING City;
      STRING State;
@@ -82,33 +92,30 @@ layoutSOAPIn := RECORD
 	STRING StreetAddress2_In := '';
 	STRING City_In := '';
 	STRING State_In := '';
-	UNSIGNED Zip_In := 0;
-	STRING Prim_Range := '';
-	STRING Predir := '';
-	STRING Prim_Name := '';
-	STRING Addr_Suffix := '';
-	STRING Postdir := '';
-	STRING Unit_Desig := '';
-	STRING Sec_Range := '';
-	STRING Zip5 := '';
-	STRING Zip4 := '';
-	UNSIGNED SSN_In := 0;
-	UNSIGNED DateOfBirth_In := 0;
-	UNSIGNED Age_In := 0;
-	UNSIGNED HomePhone_In := 0;
-	UNSIGNED WorkPhone_In := 0;
-	BOOLEAN EnableExperianGateway := FALSE;
+	STRING Zip_In := '';
+	STRING Prim_Range_In := '';
+	STRING Predir_In := '';
+	STRING Prim_Name_In := '';
+	STRING Addr_Suffix_In := '';
+	STRING Postdir_In := '';
+	STRING Unit_Desig_In := '';
+	STRING Sec_Range_In := '';
+	STRING Zip5_In := '';
+	STRING Zip4_In := '';
+	STRING SSN_In := '';
+	STRING DateOfBirth_In := '';
+	STRING Age_In := '';
+	STRING HomePhone_In := '';
+	STRING WorkPhone_In := '';
 	BOOLEAN EnableTransUnionGateway := FALSE;
 	BOOLEAN EnableInsuranceGateway := FALSE;
 	BOOLEAN EnableTargusGateway := FALSE;
 	DATASET(Phone_Shell.Layout_Phone_Shell.Input) Batch_Input := DATASET([], Phone_Shell.Layout_Phone_Shell.Input);
 	DATASET(Risk_Indicators.Layout_Gateways_In) Gateways := DATASET([], Risk_Indicators.Layout_Gateways_In);
-	UNSIGNED3 ExperianScoreThreshold := 632;
-	UNSIGNED1 ExperianMaxMetronetPhones := 3;
-	BOOLEAN ExperianAllowBatchUse := FALSE;
-	UNSIGNED GLB_Purpose := 0;
-	UNSIGNED DPPA_Purpose := 0;
-	STRING Data_Restriction_Mask := '';
+	UNSIGNED GLBPurpose := 0;
+	UNSIGNED DPPAPurpose := 0;
+	STRING DataRestrictionMask := '';
+	STRING DataPermissionMask := '';
 	INTEGER Phone_Restriction_Mask := 0;
 	UNSIGNED MaxNumberOfPhones := 0;
 	UNSIGNED InsuranceVerificationAgeLimit := 0;
@@ -135,7 +142,11 @@ layoutSOAPIn := RECORD
 	INTEGER BocaShell_DOB_Radius := 0;
 	STRING BocaShell_Watchlist_Threshold := '';
 	STRING Phone_Score_Model := '';
-	UNSIGNED2 Score_Threshold := 245;
+	UNSIGNED2 Score_Threshold := Score_Threshold_In;
+	BOOLEAN UsePremiumSource_A := PremiumAFlag;
+	INTEGER PremiumSource_A_limit := 3;
+	BOOLEAN IncludePhonesFeedback := FALSE;
+	UNSIGNED8 DID; //REMOVE this field here and below to get apples to apples with other scripts as NOT all scripts are sending this in.
 END;
 
 layoutSOAPIn intoSOAP(Input le) := TRANSFORM
@@ -145,37 +156,36 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.FirstName_In := le.FirstName;
 	SELF.MiddleName_In := le.MiddleName;
 	SELF.LastName_In := le.LastName;
+	SELF.SuffixName_In := le.SuffixName;
 	SELF.StreetAddress1_In := le.StreetAddress;
 	SELF.City_In := le.City;
 	SELF.State_In := le.State;
-	SELF.Zip_In := (UNSIGNED)le.Zip;
-	SELF.SSN_In := (UNSIGNED)le.SSN;
-	SELF.DateOfBirth_In := (UNSIGNED)le.DateOfBirth;
-	SELF.HomePhone_In := (UNSIGNED)le.HomePhone;
-	SELF.WorkPhone_In := (UNSIGNED)le.WorkPhone;
+	SELF.Zip_In := le.Zip;
+	SELF.SSN_In := le.SSN;
+	SELF.DateOfBirth_In := le.DateOfBirth;
+	SELF.HomePhone_In := le.HomePhone;
+	SELF.WorkPhone_In := le.WorkPhone;
 	
 	// Options
 	SELF.Phone_Score_Model := ScoringModelName; // Set to blank to disable the phone score model and just run a Phone Shell
 	
 	SELF.EnableInsuranceGateway := EnableInsuranceAttributes;
 	
-	SELF.EnableExperianGateway := EnableMetronet_Experian_Gateway;
 	SELF.EnableTransUnionGateway := EnableQSentV2_TransUnion_Gateway;
 	SELF.EnableTargusGateway := EnableTargus_Gateway;
 	
 	SELF.Batch_Input := DATASET([], Phone_Shell.Layout_Phone_Shell.Input);
 	
-	SELF.Gateways := DATASET([{'qsentv2', IF(EnableQSentV2_TransUnion_Gateway, QSentV2_TransUnion_Gateway_URL, '')}, // TransUnion Gateway
-														{'targus', IF(EnableTargus_Gateway, Targus_Gateway_URL, '')}, // Targus Gateway
-														{'metronet', IF(EnableMetronet_Experian_Gateway, Metronet_Experian_Gateway_URL, '')}], Risk_Indicators.Layout_Gateways_In);
-
-	SELF.ExperianScoreThreshold := 632;
-	SELF.ExperianMaxMetronetPhones := 3;
-	SELF.ExperianAllowBatchUse := TRUE;
+	SELF.Gateways := DATASET([
+  {'qsentv2',IF(EnableQSentV2_TransUnion_Gateway, QSentV2_TransUnion_Gateway_URL, '')}, // TransUnion Gateway
+		{'targus', IF(EnableTargus_Gateway, Targus_Gateway_URL, '')} // Targus Gateway
+		], Risk_Indicators.Layout_Gateways_In);
 	
-	SELF.GLB_Purpose := 1;
-	SELF.DPPA_Purpose := 1;
-	SELF.Data_Restriction_Mask := DataRestrictionMask;
+	SELF.GLBPurpose := 1;
+	// SELF.DPPAPurpose := 1; //orig phone shell setting
+  SELF.DPPAPurpose := 3;
+	SELF.DataRestrictionMask := DataRestrictionMask;
+	SELF.DataPermissionMask := DataPermission;
 	SELF.Phone_Restriction_Mask := Phone_Shell.Constants.PRM.AllPhones;
 	SELF.MaxNumberOfPhones := 99;
 	SELF.InsuranceVerificationAgeLimit := Phone_Shell.Constants.Default_InsuranceVerificationAgeLimit;
@@ -184,7 +194,7 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.RelocationsMaxDaysAfter := Relocations.wdtg.default_daysAfter;
 	SELF.RelocationsTargetRadius := Relocations.wdtg.default_radius;
 	SELF.VerticalMarket := '';
-	SELF.IncludeLastResort := FALSE;
+	SELF.IncludeLastResort := TRUE;
 	SELF.BocaShell_Version := 41;
 	SELF.BocaShell_IncludeRelatives := TRUE;
 	SELF.BocaShell_IncludeDL := FALSE;
@@ -197,13 +207,19 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.BocaShell_DoScore := FALSE;
 	SELF.BocaShell_SuppressNearDups := FALSE;
 	SELF.BocaShell_Require2Elements := FALSE;
-	SELF.BocaShell_AppendBest := 0;
+	//SELF.BocaShell_AppendBest := 0;//orig phone shell settings
+	SELF.BocaShell_AppendBest := 1; 
 	SELF.BocaShell_OFAC_Version := 1;
 	SELF.BocaShell_DOB_Radius := -1;
-	SELF.BocaShell_Watchlist_Threshold := '0.84';
+	// SELF.BocaShell_Watchlist_Threshold := '0.84'; //orig phone shell settings
+	SELF.BocaShell_Watchlist_Threshold := '0.8399999737739563';
 	SELF.Score_Threshold := Score_Threshold_In;
-	
-	SELF := le;
+	SELF.UsePremiumSource_A := PremiumAFlag; //set to true if you want to use Equifax data
+	// SELF.PremiumSource_A_limit := 3; //orig phone settings
+	SELF.PremiumSource_A_limit := 1; //the maximum is 3 ....if you want less change this
+	self.IncludePhonesFeedback := false;
+	SELF.DID := le.did;
+	//SELF := le; //sets other input variables that cause batch to be different
 	SELF := [];
 END;
 
@@ -240,10 +256,17 @@ modelingShell := SORT(Phone_Shell.To_Modeling_Shell(goodResults, DataRestriction
 OUTPUT(CHOOSEN(goodResults, eyeball), NAMED('Sample_Success'));
 OUTPUT(COUNT(goodResults), NAMED('Total_Number_Of_Success'));
 
+
 OUTPUT(CHOOSEN(modelingShell, eyeball), NAMED('Sample_Modeling_Shell'));
 
 OUTPUT(goodResults,, OutputFile + '_' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
 OUTPUT(modelingShell,, OutputFile + '_ModelingLayout_' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+
+//for model validation on ECL side
+//tmpGoodResults := PROJECT(goodResults, TRANSFORM(
+//  phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, SELF := LEFT, SELF :=[]));
+//OUTPUT(choosen(tmpGoodResults,eyeball), NAMED('Total_Number_Of_TmpSuccess'));
+//OUTPUT(tmpGoodResults,, OutputFile + '_tmpPS' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
 
 fieldsOfInterest := RECORD
 	STRING50 AcctNo := '';

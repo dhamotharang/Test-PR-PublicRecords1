@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA BocaShell 5.0');
+﻿#workunit('name','NonFCRA BocaShell 5.0');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -13,19 +13,22 @@
 
 IMPORT Risk_Indicators, RiskWise, ut;
 
-unsigned record_limit :=   5;    //number of records to read from input file; 0 means ALL
+unsigned record_limit := 0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
 boolean RemoveFares := false;	// change this to TRUE for FARES filtering
 boolean LeadIntegrityMode := false;  // change this to TRUE for LeadIntegrity modeling
-string DataRestrictionMask := '0000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
+string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
 																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
+string DataPermissionMask  := '0000000000100';	// byte 11, if 0, restricts FDN test fraud and contributory fraud  
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
+boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
 
 //===================  input-output files  ======================
-infile_name :=  ut.foreign_prod+'tfuerstenberg::in::fico_4332_fullsample_in_pt25';
-outfile_name := '~dvstemp::out::nonfcrashell50_' + thorlib.wuid();
+infile_name :=  ut.foreign_prod+'jpyon::in::heather_test_in';
+outfile_name := '~hmccarl::out::test_nonfcra50_shell_retaininputdid' + thorlib.wuid();
 
 //==================  input file layout  ========================
 layout_input := RECORD
@@ -49,8 +52,9 @@ layout_input := RECORD
     string FormerName;
     string EMAIL;  
     string employername;
-    integer historydateyyyymm;
-  END;
+    string historydate;
+ 		string LexID; 
+ END;
 	
 
 //====================================================
@@ -58,8 +62,8 @@ layout_input := RECORD
 //====================================================
 // Regular BocaShell service
 bs_service := 'risk_indicators.Boca_Shell';
-// roxieIP := RiskWise.Shortcuts.prod_batch_neutral;    // Roxiebatch
-roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
+roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;    // Roxiebatch
+// roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
 
 
 //====================================================
@@ -84,15 +88,40 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
   	
   SELF.GLBPurpose  := glba;
   SELF.DPPAPurpose := dppa;
-		
+	
+	self.retainInputDID := RetainInputDID;
+	self.did := le.LexID; 
+	
+  //**************************************************************************************** 
+  // When hard-coding archive dates, uncomment and modify one of the following sets of code 
+	//   below and comment out the existing  code for self.historydateyyyymm and self.historyDateTimeStamp 
+	//****************************************************************************************
 	//	self.historydateyyyymm := 201109;  
-	//	self.historyDateTimeStamp := '20110901 12010100';  
-	self.historydateyyyymm := (unsigned)le.historydateyyyymm;
-	self.historyDateTimeStamp := '';  // can populate this with full timestamp if the customer has it
-	 
+	//	self.historyDateTimeStamp := '20110901 00000100';  
+
+	//	self.historydateyyyymm := 999999;  
+	//	self.historyDateTimeStamp := '';  // leave timestamp blank, query will populate it with the current date  
+
+  self.historydateyyyymm := map(
+			regexfind('^\\d{8} \\d{8}$', le.historydate) => (unsigned)le.historydate[..6],
+			regexfind('^\\d{8}$',        le.historydate) => (unsigned)le.historydate[..6],
+			                                                (unsigned)le.historydate
+	);
+	
+  self.historyDateTimeStamp := map(
+      le.historydate in ['', '999999']             => '',  // leave timestamp blank, query will populate it with the current date   	
+			regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
+			regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',
+			regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',		                                                
+			                                                le.historydate
+	);
+	
+ 
   SELF.IncludeScore := true;
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.RemoveFares := RemoveFares;
+  SELF.LeadIntegrityMode := LeadIntegrityMode;
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 50;				
   SELF := le;
   SELF := [];
@@ -104,7 +133,7 @@ output(choosen(p_f,eyeball), named('BSInput'));
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 
-riskprocessing.layouts.layout_internal_shell getold(s le, l ri) :=	TRANSFORM
+riskprocessing.layouts.layout_internal_shell_noDatasets getold(s le, l ri) :=	TRANSFORM
   SELF.AccountNumber := ri.old_account_number;
   SELF := le;
 END;
@@ -120,7 +149,7 @@ OUTPUT (res, , outfile_name, CSV(QUOTE('"')));
 
 // the conversion portion-----------------------------------------------------------------------
 
-f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell, csv(quote('"'), maxlength(20000)));
+f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell_noDatasets, csv(quote('"'), maxlength(20000)));
 output(choosen(f, eyeball), named('infile'));
 isFCRA := false;
 edina := risk_indicators.ToEdina_v50(f, isFCRA, DataRestrictionMask);

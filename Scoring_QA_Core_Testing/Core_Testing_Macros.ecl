@@ -1,11 +1,11 @@
-﻿// EXPORT Updated_core_testing_macros := 'todo';
+﻿﻿// EXPORT Updated_core_testing_macros := 'todo';
 EXPORT Core_Testing_Macros (STRING neutralroxieIP, STRING fcra_roxieIP, INTEGER no_of_threads, INTEGER no_of_recs_to_run, INTEGER no_of_recs_to_run_2, INTEGER no_of_recs_to_run_3, STRING filetag) := FUNCTION
 
+//retired rv v3 capone and RV v5 capone
 
+IMPORT sghatti, RiskWise,ut, STD, data_services, Scoring_Project_Macros, Gateway, Risk_Indicators, models, RiskProcessing, scoring_project_pip, Scoring_Project_ISS, Scoring_QA_Core_Testing; 
 
-IMPORT sghatti, RiskWise, ut, STD, data_services, Scoring_Project_Macros, Gateway, Risk_Indicators, models, RiskProcessing, scoring_project_pip, Scoring_Project_ISS, zz_bkarnatz; 
-
-
+model_phone_shell :='COLLECTIONSCORE_V3';
 Timeout := 120;
 Retry_time := 3;
 roxieIP := neutralroxieIP;
@@ -102,8 +102,8 @@ CapitalOne_RVAttributes_V2_outfile_name := '~ScoringQA::out::FCRA::RiskView_Batc
 CapitalOne_RVAttributes_V5_infile_name := scoring_project_pip.Input_Sample_Names.RV_Attributes_V2_BATCH_CapOne_infile;
 CapitalOne_RVAttributes_V5_outfile_name := '~ScoringQA::out::FCRA::RiskView_Batch_Capitalone_attributes_v5_' + (String8)Std.Date.Today() + '_' + filetag;
 
-CreditAcceptanceCorp_RV2_BATCH_infile_name := Scoring_Project_PIP.Input_Sample_Names.RV_Attributes_V2_BATCH_CreditAcceptance_infile;  
-CreditAcceptanceCorp_RV2_BATCH_outfile_name := '~ScoringQA::out::FCRA::RiskView_xml_creditacceptancecorp_attributes_v2_' + (String8)Std.Date.Today() + '_' + filetag;
+// CreditAcceptanceCorp_RV2_BATCH_infile_name := Scoring_Project_PIP.Input_Sample_Names.RV_Attributes_V2_BATCH_CreditAcceptance_infile;  
+// CreditAcceptanceCorp_RV2_BATCH_outfile_name := '~ScoringQA::out::FCRA::RiskView_xml_creditacceptancecorp_attributes_v2_' + (String8)Std.Date.Today() + '_' + filetag;
 
 T_Mobile_RVT1212_infile_name := Scoring_Project_PIP.Input_Sample_Names.RV_Scores_XML_Tmobile_rvt1212_1_infile;  
 T_Mobile_RVT1212_outfile_name := '~ScoringQA::out::FCRA::RiskView_xml_T_mobile_RVT1212_1_v4_' + (String8)Std.Date.Today() + '_' + filetag;
@@ -154,8 +154,8 @@ RV_Scores_Attributes_V5_XMl_Generic_infile :=  scoring_project_pip.Input_Sample_
 RV_Scores_Attributes_V5_XML_Generic_outfile := '~ScoringQA::out::FCRA::RiskView_xml_generic_allflagships_attributes_v5_' + (String8)Std.Date.Today() + '_' + filetag;
 // RV_Scores_Attributes_V5_XML_Generic_prescreen_outfile := '~ScoringQA::out::FCRA::RiskView_xml_generic_allflagships_attributes_v5_prescreen_' + (String8)Std.Date.Today() + '_' + filetag;  //removed in favor of Capone v5 prescreen
 
-
-
+IV_Attributes_infile := scoring_project_pip.Input_Sample_Names.IV_Attributes_infile;
+IV_Attributes_outfile := scoring_project_pip.Output_Sample_Names.IV_Attributes_outfile + (String8)Std.Date.Today() + '_' + filetag;
 //***** SHELLS **********************************************************************************************************************
 
 bocashell_infile_name :=  Scoring_Project_PIP.Input_Sample_Names.bocashell_infile_name;																						
@@ -168,11 +168,11 @@ AddressShell_Attributes_V1_BATCH_Generic_infile :=   scoring_project_pip.Input_S
 AddressShell_Attributes_V1_BATCH_Generic_outfile := '~ScoringQA::out::AddressShell_V1_Batch_Generic_' + (String8)Std.Date.Today() + '_' + filetag;
 
 BusinessShell_Attributes_V2_XML_Generic_infile :=   scoring_project_pip.Input_Sample_Names.BusinessShell_Attributes_V2_XML_Generic_infile;
-BusinessShell_Attributes_V2_XML_Generic_outfile := '~ScoringQA::out::NONFCRA::BusinessShell_xml_generic_attributes_v2_' + (String8)Std.Date.Today() + '_' + filetag;
+BusinessShell_Attributes_V2_XML_Generic_outfile := '~ScoringQA::out::NONFCRA::BusinessShell_xml_CORE_generic_attributes_v2_' + (String8)Std.Date.Today() + '_' + filetag;
 
-PhoneShell_infile_name := data_services.foreign_prod + 'thor_200::out::inquiry_acclogs::inquiry_test::collections::internal_w20140218-105428';  //Used in Relatives Testing
-PhoneShell_outfile_name := '~ScoringQA::out::phone_shell_' + (String8)std.date.Today() + '_' + filetag;
-
+PhoneShell_infile_name := Scoring_Project_PIP.Input_Sample_Names.phone_shell_core_testing_copy;  
+PhoneShell_10_outfile_name := '~ScoringQA::out::phone_shell_' + model_phone_shell +'_version_10_' + (String8)std.date.Today() + '_' + filetag;
+PhoneShell_20_outfile_name := '~ScoringQA::out::phone_shell_' + model_phone_shell +'_version_20_' + (String8)std.date.Today() + '_' + filetag;
 
 // *******NONFCRA MACROS***************************************************************************************************************************
 
@@ -267,7 +267,7 @@ CapitalOne_RVAttributes_V3 := scoring_project_pip.CapitalOne_RVAttributes_V3_Mac
 CapitalOne_RVAttributes_V5 := scoring_project_pip.CapitalOne_RVAttributes_V5_Macro(fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,CapitalOne_RVAttributes_V5_infile_name,CapitalOne_RVAttributes_V5_outfile_name,no_of_recs_to_run_3);
 
 
-CreditAcceptanceCorp_RV2_BATCH := scoring_project_pip.CreditAcceptanceCorp_RV_V2_BATCH_Macro(fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,CreditAcceptanceCorp_RV2_BATCH_infile_name,CreditAcceptanceCorp_RV2_BATCH_outfile_name,no_of_recs_to_run_3);
+// CreditAcceptanceCorp_RV2_BATCH := scoring_project_pip.CreditAcceptanceCorp_RV_V2_BATCH_Macro(fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,CreditAcceptanceCorp_RV2_BATCH_infile_name,CreditAcceptanceCorp_RV2_BATCH_outfile_name,no_of_recs_to_run_3);
 
 T_Mobile_RVT1212 := scoring_project_pip.T_Mobile_RVT1212_Macro(fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,T_Mobile_RVT1212_infile_name,T_Mobile_RVT1212_outfile_name,no_of_recs_to_run_3);
 
@@ -281,6 +281,7 @@ RV_Scores_Attributes_V5_XML := Scoring_Project_PIP.RV_Scores_Attributes_V5_XML_M
 
 // RV_Scores_Attributes_V5_XML_Prescreen := Scoring_Project_PIP.RV_Scores_Attributes_V5_XML_Prescreen_Macro(fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,RV_Scores_Attributes_V5_XMl_Generic_infile,RV_Scores_Attributes_V5_XML_Generic_prescreen_outfile,no_of_recs_to_run_3);    //removed in favor of CapOne v5 prescreen
 
+IV_Attributes := Scoring_QA_Core_Testing.Insurview_macro(fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,IV_Attributes_infile,IV_Attributes_outfile,no_of_recs_to_run_2);
 
 
 bocashell_41_fcra := Scoring_Project_PIP.BocaShell_41_FCRA_cert_MACRO( 41, fcra_roxieIP, neutralroxieIP,no_of_threads,Timeout,Retry_time,bocashell_infile_name,bocashell_41_fcra_outfile_name,no_of_recs_to_run);
@@ -292,14 +293,15 @@ AddressShell:=Scoring_Project_ISS.AddressShell_Attributes_V1_BATCH_Macro(neutral
 
 BusinessShell:=Scoring_Project_ISS.BusinessShell_Attributes_V2_XML_Macro(roxieIP, gateway_ip,no_of_threads,Timeout,Retry_time,BusinessShell_Attributes_V2_XML_Generic_infile,BusinessShell_Attributes_V2_XML_Generic_outfile,no_of_recs_to_run);
 
-PhoneShell := zz_bkarnatz.PhoneShell_Macro(roxieIP, gateway_ip, no_of_threads,Timeout,Retry_time,PhoneShell_infile_name,PhoneShell_outfile_name,no_of_recs_to_run_2);
+// PhoneShell := Scoring_QA_Core_Testing.PhoneShell_Macro(roxieIP, model_phone_shell, roxieIP, no_of_threads,Timeout,Retry_time,PhoneShell_infile_name,PhoneShell_outfile_name,no_of_recs_to_run);
+PhoneShell_10 := Scoring_QA_Core_Testing.Phone_shell_20_macro(roxieIP, model_phone_shell, roxieIP, no_of_threads, Timeout, Retry_time, PhoneShell_infile_name, PhoneShell_10_outfile_name, no_of_recs_to_run, 10);
+PhoneShell_20 := Scoring_QA_Core_Testing.Phone_shell_20_macro(roxieIP, model_phone_shell, roxieIP, no_of_threads, Timeout, Retry_time, PhoneShell_infile_name, PhoneShell_20_outfile_name, no_of_recs_to_run, 20);
 
 // ****************************************************************************************************************
 
 
-
-NonFCRA_Ordered := sequential(
-										bocashell_41_nonfcra,		
+NonFCRA_Ordered_1 := sequential(
+										FP_AmericanExpress_XML,											
 										Chase_BNK4_xml,
 										Chase_BNK4_batch,
 										Chase_PIO2_XML,
@@ -310,29 +312,30 @@ NonFCRA_Ordered := sequential(
 										BIID_batch,			
 										instant_id_xml,										
 										instant_id_batch,
+										PB_capone,
 										CapitalOne_batch_ITA,
 										LI_v4_scores_attr_xml,
 										LI_v4_scores_attr_batch,
+										PhoneShell_10
+							
 										// FP_ScoresAttributes_XML,											
-										// FP_ScoresAttributes_BATCH,									
-										FP_AmericanExpress_XML,							
-										FP_v3_ScoresAttributes_XML,										
-										bocashell_50_nonfcra,		
-										PhoneShell,
-										BusinessShell,
-										PB_capone
-										
-										
+										// FP_ScoresAttributes_BATCH,		
 										// Chase_CBBL_FPScore_ONLY,   //diff sample than chase_cbbl
-										
+
 										// bestbuy,      //REMOVED/BB no longer using this model  7/22/16
 									);
-
+									
+NonFCRA_Ordered_2 := sequential(
+										bocashell_41_nonfcra,
+										bocashell_50_nonfcra,
+										BusinessShell,
+										AddressShell,
+										FP_v3_ScoresAttributes_XML,
+										PhoneShell_20
+									);
 
 FCRA_Ordered := sequential(
-										bocashell_41_fcra,									
-										CapitalOne_RVAttributes_V3,
-										CapitalOne_RVAttributes_V5,
+										bocashell_41_fcra,								
 										Experian_RVA_30_XML,
 										Experian_RVA_30_BATCH,
 										RV_Scores_Attribute_V3_BATCH,
@@ -340,9 +343,12 @@ FCRA_Ordered := sequential(
 										RV_Scores_Attribute_V3_XML,
 										RV_Scores_Attribute_V4_XML,
 										RV_Scores_Attributes_V5_XML,		
-										bocashell_50_fcra					  
+										bocashell_50_fcra,					  
+										IV_Attributes
 										
 										
+										//CapitalOne_RVAttributes_V3, retired
+										//CapitalOne_RVAttributes_V5, per product capone is not running this - retired 3/12
 										// RV_Scores_Attributes_V5_XML_Prescreen,   //Removed in favor of CapOne RVA v5 prescreen										
 										// RV_V3_ENOVA_XML_Scores,      //REMOVED/No Longer Monitoring  7/22/16										
 										// Regional_Acceptance_RVA1008_1,      //REMOVED/No Longer Monitoring	  7/22/16									
@@ -354,15 +360,15 @@ FCRA_Ordered := sequential(
 										// RV_Attributes_V2_BATCH,	 //Removed/No Longer Monitoring		
 										// CapitalOne_RVAttributes_V2,	//Removed/No Long Monitoring 3/29/17									
 										
-										
-										
 										);
 
 
-// RETURN sequential(NonFCRA_Ordered);
+RETURN sequential(NonFCRA_Ordered_1);
+// RETURN sequential(NonFCRA_Ordered_2);
 // RETURN sequential(FCRA_Ordered);
-RETURN sequential(NonFCRA_Ordered, FCRA_Ordered);
+// RETURN sequential(NonFCRA_Ordered_1,FCRA_Ordered);
 // RETURN sequential(bocashell_41_nonfcra,bocashell_50_nonfcra,bocashell_41_fcra, bocashell_50_fcra);
 
+// Return FP_v3_ScoresAttributes_XML;
 // Return RV_Scores_Attributes_V5_XML;
 END;

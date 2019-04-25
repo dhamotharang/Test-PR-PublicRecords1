@@ -1,4 +1,4 @@
-﻿#workunit('name','NonFCRA BocaShell 4.1');
+#workunit('name','NonFCRA BocaShell 4.1');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
