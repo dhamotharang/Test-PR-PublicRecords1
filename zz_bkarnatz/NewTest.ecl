@@ -1,0 +1,1 @@
+﻿EXPORT NewTest := 'todo';
