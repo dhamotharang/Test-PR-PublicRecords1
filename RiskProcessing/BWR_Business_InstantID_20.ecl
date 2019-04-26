@@ -31,7 +31,7 @@ eyeball      := 10;
 threads      := 30;
 
 RoxieIP := RiskWise.shortcuts.prod_batch_analytics_roxie;      // Production
- // RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
+// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
 // RoxieIP := RiskWise.shortcuts.Dev192;                  // Development Roxie 192
 // RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
 
@@ -473,39 +473,7 @@ LOADXML('<xml/>');
 
 #FOR(_recordOf_BIID20_results_raw)
 	#FOR(Field)
-		#IF(%'{@name}'% != 'seq' and %'{@name}'% != 'acctno' and %'{@name}'% != 'historydate' and %'{@name}'% != 'errorcode' and %'{@name}'% != 'bus_ofac_companyname_1'and %'{@name}'% != 'bus_ofac_firstname_1'
-and %'{@name}'% != 'bus_ofac_lastname_1' and %'{@name}'% != 'bus_ofac_entity_name_1' and %'{@name}'% != 'bus_ofac_companyname_2' and %'{@name}'% != 'bus_ofac_firstname_2' and %'{@name}'% != 'bus_ofac_lastname_2' 
-and %'{@name}'% != 'bus_ofac_entity_name_2' and %'{@name}'% != 'bus_ofac_companyname_3' and %'{@name}'% != 'bus_ofac_firstname_3' and %'{@name}'% != 'bus_ofac_lastname_3' and %'{@name}'% != 'bus_ofac_entity_name_3' 
-and %'{@name}'% != 'bus_ofac_companyname_4' and %'{@name}'% != 'bus_ofac_firstname_4' and %'{@name}'% != 'bus_ofac_lastname_4' and %'{@name}'% != 'bus_ofac_entity_name_4' and %'{@name}'% != 'bus_ofac_companyname_5' 
-and %'{@name}'% != 'bus_ofac_firstname_5' and %'{@name}'% != 'bus_ofac_lastname_5' and %'{@name}'% != 'bus_ofac_entity_name_5' and %'{@name}'% != 'bus_ofac_companyname_6' and %'{@name}'% != 'bus_ofac_firstname_6' 
-and %'{@name}'% != 'bus_ofac_lastname_6' and %'{@name}'% != 'bus_ofac_entity_name_6' and %'{@name}'% != 'bus_ofac_companyname_7' and %'{@name}'% != 'bus_ofac_firstname_7' and %'{@name}'% != 'bus_ofac_lastname_7' 
-and %'{@name}'% != 'bus_ofac_entity_name_7' and %'{@name}'% != 'bus_watchlist_companyname_1' and %'{@name}'% != 'bus_watchlist_firstname_1' and %'{@name}'% != 'bus_watchlist_lastname_1' and %'{@name}'% != 'bus_watchlist_entity_name_1'
-and %'{@name}'% != 'bus_watchlist_companyname_2' and %'{@name}'% != 'bus_watchlist_firstname_2' and %'{@name}'% != 'bus_watchlist_lastname_2' and %'{@name}'% != 'bus_watchlist_entity_name_2' and %'{@name}'% != 'bus_watchlist_companyname_3' 
-and %'{@name}'% != 'bus_watchlist_firstname_3' and %'{@name}'% != 'bus_watchlist_lastname_3' and %'{@name}'% != 'bus_watchlist_entity_name_3' and %'{@name}'% != 'bus_watchlist_companyname_4' and %'{@name}'% != 'bus_watchlist_firstname_4'
-and %'{@name}'% != 'bus_watchlist_lastname_4' and %'{@name}'% != 'bus_watchlist_entity_name_4' and %'{@name}'% != 'bus_watchlist_companyname_5' and %'{@name}'% != 'bus_watchlist_firstname_5' and %'{@name}'% != 'bus_watchlist_lastname_5'
-and %'{@name}'% != 'bus_watchlist_entity_name_5' and %'{@name}'% != 'bus_watchlist_companyname_6' and %'{@name}'% != 'bus_watchlist_firstname_6' and %'{@name}'% != 'bus_watchlist_lastname_6' and %'{@name}'% != 'bus_watchlist_entity_name_6'
-and %'{@name}'% != 'bus_watchlist_companyname_7' and %'{@name}'% != 'bus_watchlist_firstname_7' and %'{@name}'% != 'bus_watchlist_lastname_7' and %'{@name}'% != 'bus_watchlist_entity_name_7' and %'{@name}'% != 'rep1_watchlist_fname'
-and %'{@name}'% != 'rep1_watchlist_lname' and %'{@name}'% != 'rep1_watchlist_entity_name' and %'{@name}'% != 'rep1_watchlist_fname_2' and %'{@name}'% != 'rep1_watchlist_lname_2' and %'{@name}'% != 'rep1_watchlist_entity_name_2'
-and %'{@name}'% != 'rep1_watchlist_fname_3' and %'{@name}'% != 'rep1_watchlist_lname_3' and %'{@name}'% != 'rep1_watchlist_entity_name_3' and %'{@name}'% != 'rep1_watchlist_fname_4' and %'{@name}'% != 'rep1_watchlist_lname_4'
-and %'{@name}'% != 'rep1_watchlist_entity_name_4' and %'{@name}'% != 'rep1_watchlist_fname_5' and %'{@name}'% != 'rep1_watchlist_lname_5' and %'{@name}'% != 'rep1_watchlist_entity_name_5' and %'{@name}'% != 'rep1_watchlist_fname_6'
-and %'{@name}'% != 'rep1_watchlist_lname_6' and %'{@name}'% != 'rep1_watchlist_entity_name_6' and %'{@name}'% != 'rep1_watchlist_fname_7' and %'{@name}'% != 'rep1_watchlist_lname_7' and %'{@name}'% != 'rep1_watchlist_entity_name_7'
-and %'{@name}'% != 'rep2_watchlist_fname' and %'{@name}'% != 'rep2_watchlist_lname' and %'{@name}'% != 'rep2_watchlist_entity_name' and %'{@name}'% != 'rep2_watchlist_fname_2' and %'{@name}'% != 'rep2_watchlist_lname_2'
-and %'{@name}'% != 'rep2_watchlist_entity_name_2' and %'{@name}'% != 'rep2_watchlist_fname_3' and %'{@name}'% != 'rep2_watchlist_lname_3' and %'{@name}'% != 'rep2_watchlist_entity_name_3' and %'{@name}'% != 'rep2_watchlist_fname_4'
-and %'{@name}'% != 'rep2_watchlist_lname_4' and %'{@name}'% != 'rep2_watchlist_entity_name_4' and %'{@name}'% != 'rep2_watchlist_fname_5' and %'{@name}'% != 'rep2_watchlist_lname_5' and %'{@name}'% != 'rep2_watchlist_entity_name_5'
-and %'{@name}'% != 'rep2_watchlist_fname_6' and %'{@name}'% != 'rep2_watchlist_lname_6' and %'{@name}'% != 'rep2_watchlist_entity_name_6' and %'{@name}'% != 'rep2_watchlist_fname_7' and %'{@name}'% != 'rep2_watchlist_lname_7'
-and %'{@name}'% != 'rep2_watchlist_entity_name_7' and %'{@name}'% != 'rep3_watchlist_fname' and %'{@name}'% != 'rep3_watchlist_lname' and %'{@name}'% != 'rep3_watchlist_entity_name' and %'{@name}'% != 'rep3_watchlist_fname_2'
-and %'{@name}'% != 'rep3_watchlist_lname_2' and %'{@name}'% != 'rep3_watchlist_entity_name_2' and %'{@name}'% != 'rep3_watchlist_fname_3' and %'{@name}'% != 'rep3_watchlist_lname_3' and %'{@name}'% != 'rep3_watchlist_entity_name_3' 
-and %'{@name}'% != 'rep3_watchlist_fname_4' and %'{@name}'% != 'rep3_watchlist_lname_4' and %'{@name}'% != 'rep3_watchlist_entity_name_4' and %'{@name}'% != 'rep3_watchlist_fname_5' and %'{@name}'% != 'rep3_watchlist_lname_5' 
-and %'{@name}'% != 'rep3_watchlist_entity_name_5' and %'{@name}'% != 'rep3_watchlist_fname_6' and %'{@name}'% != 'rep3_watchlist_lname_6' and %'{@name}'% != 'rep3_watchlist_entity_name_6' and %'{@name}'% != 'rep3_watchlist_fname_7' 
-and %'{@name}'% != 'rep3_watchlist_lname_7' and %'{@name}'% != 'rep3_watchlist_entity_name_7' and %'{@name}'% != 'rep4_watchlist_fname' and %'{@name}'% != 'rep4_watchlist_lname' and %'{@name}'% != 'rep4_watchlist_entity_name'
-and %'{@name}'% != 'rep4_watchlist_fname_2' and %'{@name}'% != 'rep4_watchlist_lname_2' and %'{@name}'% != 'rep4_watchlist_entity_name_2' and %'{@name}'% != 'rep4_watchlist_fname_3' and %'{@name}'% != 'rep4_watchlist_lname_3'
-and %'{@name}'% != 'rep4_watchlist_entity_name_3' and %'{@name}'% != 'rep4_watchlist_fname_4' and %'{@name}'% != 'rep4_watchlist_lname_4' and %'{@name}'% != 'rep4_watchlist_entity_name_4' and %'{@name}'% != 'rep4_watchlist_fname_5'
-and %'{@name}'% != 'rep4_watchlist_lname_5' and %'{@name}'% != 'rep4_watchlist_entity_name_5' and %'{@name}'% != 'rep4_watchlist_fname_6' and %'{@name}'% != 'rep4_watchlist_lname_6' and %'{@name}'% != 'rep4_watchlist_entity_name_6'
-and %'{@name}'% != 'rep4_watchlist_fname_7' and %'{@name}'% != 'rep4_watchlist_lname_7' and %'{@name}'% != 'rep4_watchlist_entity_name_7' and %'{@name}'% != 'rep5_watchlist_fname'and %'{@name}'% != 'rep5_watchlist_lname'
-and %'{@name}'% != 'rep5_watchlist_entity_name' and %'{@name}'% != 'rep5_watchlist_fname_2' and %'{@name}'% != 'rep5_watchlist_lname_2' and %'{@name}'% != 'rep5_watchlist_entity_name_2' and %'{@name}'% != 'rep5_watchlist_fname_3'
-and %'{@name}'% != 'rep5_watchlist_lname_3' and %'{@name}'% != 'rep5_watchlist_entity_name_3' and %'{@name}'% != 'rep5_watchlist_fname_4' and %'{@name}'% != 'rep5_watchlist_lname_4' and %'{@name}'% != 'rep5_watchlist_entity_name_4'
-and %'{@name}'% != 'rep5_watchlist_fname_5' and %'{@name}'% != 'rep5_watchlist_lname_5' and %'{@name}'% != 'rep5_watchlist_entity_name_5' and %'{@name}'% != 'rep5_watchlist_fname_6' and %'{@name}'% != 'rep5_watchlist_lname_6' 
-and %'{@name}'% != 'rep5_watchlist_entity_name_6' and %'{@name}'% != 'rep5_watchlist_fname_7' and %'{@name}'% != 'rep5_watchlist_lname_7' and %'{@name}'% != 'rep5_watchlist_entity_name_7')
+		#IF(%'{@name}'% != 'seq' and %'{@name}'% != 'acctno' and %'{@name}'% != 'historydate' and %'{@name}'% != 'errorcode')
 			// Convert each field in the Record layout to a string.
 			#APPEND(RecordFields,'string ' + %'{@name}'% + ';\n')
 			// For the Transform...:
@@ -515,7 +483,7 @@ and %'{@name}'% != 'rep5_watchlist_entity_name_6' and %'{@name}'% != 'rep5_watch
 				#IF(%'{@type}'%	=	'integer' or %'{@type}'%	=	'unsigned' or %'{@type}'%	=	'real')
 					#APPEND(TransformFields,'SELF.' + %'{@name}'% + ' := IF( isMinInputErr, \'\', IF( le.' + %'{@name}'% + ' = 0, \'0\', (string)le.' + %'{@name}'% + ' ) );\n')
 				#ELSE  // ...otherwise, the field is (most likely) a string; don't change the datatype of the value in "le".
-					#APPEND(TransformFields,'SELF.' + %'{@name}'% + ' := IF( isMinInputErr, \'\', le.' + %'{@name}'% + ' );\n')
+					#APPEND(TransformFields,'SELF.' + %'{@name}'% + ' := (STRING)(IF( isMinInputErr, \'\', le.' + %'{@name}'% + ' ));\n')
 				#END // IF
 			#END // IF
 		#END // IF
