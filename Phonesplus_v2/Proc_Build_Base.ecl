@@ -125,7 +125,8 @@ Map_v1_Fields := Fn_Map_v1_Fields(supress_data)
 :persist('~thor_data400::persist::Phonesplus::Map_v1_Fields');
 
 //Append Neustar Wireless Rules - Jira: DF-24336
-Neustar_Wireless_Rules_Appended := Phonesplus_v2.fn_Append_Neustar_Wireless_Rules(Map_v1_Fields);
+Neustar_Wireless_Rules_Appended := Phonesplus_v2.fn_Append_Neustar_Wireless_Rules(Map_v1_Fields)
+:persist('~thor_data400::persist::Phonesplus::Neustar_Wireless_Rules_Appended');
 
 //------Invoke Scrubs---------------------------------------------------------------------l
 
