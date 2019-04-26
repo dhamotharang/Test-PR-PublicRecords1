@@ -338,6 +338,9 @@ EXPORT Functions := MODULE
 			physicalAddress :=  IF( isPhysicalAddress AND 
 															(skip_autokey_element_matching  OR (l.prim_range = r.clean_address.prim_range AND
 															l.prim_name = r.clean_address.prim_name AND
+															l.addr_suffix = r.clean_address.addr_suffix AND
+															l.predir = r.clean_address.predir AND
+															l.postdir = r.clean_address.postdir AND
 															l.sec_range = r.clean_address.sec_range AND
 															l.unit_desig = r.clean_address.unit_desig AND
 															((l.p_city_name = r.clean_address.p_city_name AND l.st = r.clean_address.st ) OR l.z5 = r.clean_address.zip))),
