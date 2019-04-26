@@ -63,29 +63,11 @@ EXPORT Standardize_NameAddr := MODULE
 		
 		DataBridge.Layouts.Base tprepAddr(DataBridge.Layouts.Base L) :=	TRANSFORM
 			
-			cleanStreet  := ut.CleanSpacesAndUpper(L.Address + ' ' + L.Address2);	
-			prepAddrLast :=	ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.City) + 
-												IF(L.City <> '' and L.State <> '', ', ', '') + L.State + ' ' +
-											  IF(LENGTH(L.Zip) = 5, L.Zip, ''));
-			
-			string182	clean_AddrPrep	:= IF(prepAddrLast <> '', Address.CleanAddress182(cleanStreet, prepAddrLast), '');
-			Address.Layout_Clean182_fips	clean_AddrRec	:=	transfer(clean_AddrPrep, Address.Layout_Clean182_fips);
-
-			SELF.prep_Address_line1     := IF(Codes.St2Name(L.State) <> '' and clean_AddrPrep not in ['','.'] and ut.CleanSpacesAndUpper(clean_AddrPrep[1..64]) not in ['0','.']  
-																			,Address.Addr1FromComponents(clean_AddrRec.prim_range,
-																																	 clean_AddrRec.predir,
-																																	 clean_AddrRec.prim_name,
-																																	 clean_AddrRec.addr_suffix,
-																																	 clean_AddrRec.postdir,
-																																	 clean_AddrRec.unit_desig,
-																																	 clean_AddrRec.sec_range)
-																		 ,'');
-			SELF.prep_Address_line_last := IF(Codes.St2Name(L.State) <> '' and clean_AddrPrep not in ['','.']
-																			,Address.Addr2FromComponents(clean_AddrRec.p_city_name,
-																																	 clean_AddrRec.st,
-																																	 clean_AddrRec.zip)
-																		 ,'');
-			SELF											:= L;
+			SELF.prep_Address_line1     := ut.CleanSpacesAndUpper(L.Address + ' ' + L.Address2);	
+			SELF.prep_Address_line_last := ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.City) + 
+												                IF(L.City <> '' and L.State <> '', ', ', '') + L.State + ' ' +
+											                  IF(LENGTH(L.Zip) = 5, L.Zip, ''));
+  		SELF											  := L;
 		END;   
 		
 		pPrepAddresses := PROJECT(pStandardizeNameInput, tprepAddr(LEFT));

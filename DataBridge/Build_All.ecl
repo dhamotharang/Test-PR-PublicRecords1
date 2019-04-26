@@ -1,9 +1,8 @@
 ﻿import tools, _control, ut, std, Scrubs, Scrubs_DataBridge;
 						
 export Build_All(
-
 	 string															pversion
-	,string													    pDirectory			= '/data/hds_180/DataBridge/data/' + pversion[1..8]
+	,string													    pDirectory			= '/data/hds_180/DataBridge/data/' + pversion[1..8]	 
 	,string															pServerIP				= 'uspr-edata11.risk.regn.net'
 	,string															pFilename				= 'LN_*_database.txt'
 	,string															pGroupName			= STD.System.Thorlib.Group( )
@@ -19,7 +18,7 @@ function
 		 Create_Supers
 		,Spray (pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)    
 		,Build_Base (pversion,pIsTesting,pSprayedFile,pBaseFile)
-		,Build_Keys (pversion).all
+		//,Build_Keys (pversion).all   **DOPs package has not been created yet
 		,Scrubs.ScrubsPlus('DataBridge','Scrubs_DataBridge','Scrubs_DataBridge_Base', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 		,Promote().Inputfiles.using2used

@@ -38,11 +38,12 @@ EXPORT Functions := MODULE
   END;
 	
    //****************************************************************************
-	 //fn_verify_state:  returns true or false based upon whether or not there is
-   //                  a valid state abbreviation.
+	 //fn_verify_state:  returns true or false based upon whether or not the state
+	 //                  code is blank or there is a valid state abbreviation.
+	 //                  Having a blank state code is valid.
 	 //****************************************************************************
 	 EXPORT fn_verify_state(STRING code) := function    
-		  RETURN IF(LENGTH(Codes.St2Name(code)) > 0, 1, 0);
+		  RETURN IF(TRIM(code,LEFT,RIGHT) = '' OR LENGTH(Codes.St2Name(code)) > 0, 1, 0);
   END;  
 	
   //****************************************************************************

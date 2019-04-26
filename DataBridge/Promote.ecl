@@ -10,7 +10,7 @@ EXPORT Promote(
 	,BOOLEAN							pIsTesting			= 	FALSE
 	,DATASET(lay_inputs)	pInputFilenames = 	Filenames	(pversion).Input.dAll_filenames 
 	,DATASET(lay_builds)	pBuildFilenames = 	Filenames	(pversion).dAll_filenames
-																						+ dx_DataBridge.Keynames(pversion).dAll_filenames
+																						
 ) := MODULE
 	
 	EXPORT inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);

@@ -1,5 +1,5 @@
-﻿IMPORT tools, dx_DataBridge;
+﻿IMPORT tools;
 
 EXPORT Create_Supers := tools.mod_Utilities.createallsupers(
 													 filenames().Input.dAll_filenames
-                          ,filenames().dAll_filenames + dx_DataBridge.keynames().dAll_filenames);
+                          ,filenames().dAll_filenames); 

@@ -38,9 +38,8 @@
 						3. Builds LinkID Keys
             4. Runs Scrubs Plus on the new base file
 						5. Builds Strata
-						6. Runs BIPStats -- This step is commented out until the BIP team puts the macro into Production
-            7. Create QA Samples
-						8. Updates DOPS
+            6. Create QA Samples
+						7. Updates DOPS
 						
 	
 	Notes:

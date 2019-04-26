@@ -1,10 +1,10 @@
-﻿IMPORT STD,SALT311,DataBridge;
+﻿IMPORT STD,SALT311;
 EXPORT Ingest(BOOLEAN incremental=FALSE
-, DATASET(Layout_Base) Delta = DATASET([],Layout_Base)
-, DATASET(Layout_Base) dsBase = In_Base // Change IN_Base to change input to ingest process
-, DATASET(RECORDOF(DataBridge.In_File))  infile = DataBridge.In_File
+, DATASET(DataBridge.Layouts.Base)            Delta = DATASET([],DataBridge.Layouts.Base)
+, DATASET(DataBridge.Layouts.Base)            dsBase 
+, DATASET(RECORDOF(DataBridge.Layouts.Base))  infile 
 ) := MODULE
-  SHARED NullFile := DATASET([],Layout_Base); // Use to replace files you wish to remove
+  SHARED NullFile := DATASET([],DataBridge.Layouts.Base); // Use to replace files you wish to remove
  
   SHARED FilesToIngest := infile;
   In_Src_Cnt_Rec := RECORD
@@ -17,7 +17,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT RecordType := ENUM(UNSIGNED1,Unknown,Ancient,Old,Unchanged,Updated,New);
   EXPORT RTToText(unsigned1 c) := CHOOSE(c,'UNKNOWN','Ancient','Old','Unchanged','Updated','New','UNKNOWN');
   SHARED WithRT := RECORD
-    Layout_Base;
+    DataBridge.Layouts.Base;
     __Tpe := RecordType.Unknown;
   END;
  
@@ -252,13 +252,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SHARED NoFlagsRec := WithRT;
   SHARED emptyDS := DATASET([], NoFlagsRec);
   EXPORT NewRecords := PROJECT(AllRecs(__Tpe=RecordType.New), NoFlagsRec);
-  EXPORT NewRecords_NoTag := PROJECT(NewRecords,Layout_Base);
+  EXPORT NewRecords_NoTag := PROJECT(NewRecords,DataBridge.Layouts.Base);
   EXPORT OldRecords :=PROJECT( AllRecs(__Tpe=RecordType.Old), NoFlagsRec);
-  EXPORT OldRecords_NoTag := PROJECT(OldRecords,Layout_Base);
+  EXPORT OldRecords_NoTag := PROJECT(OldRecords,DataBridge.Layouts.Base);
   EXPORT UpdatedRecords := PROJECT(AllRecs(__Tpe=RecordType.Updated), NoFlagsRec);
-  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,Layout_Base);
+  EXPORT UpdatedRecords_NoTag := PROJECT(UpdatedRecords,DataBridge.Layouts.Base);
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
-  EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_Base); // Records in 'pure' format
+  EXPORT AllRecords_NoTag := PROJECT(AllRecords,DataBridge.Layouts.Base); // Records in 'pure' format
  
 f := TABLE(dsBase,{record_sid}) : GLOBAL;
 rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,record_sid);
@@ -272,7 +272,8 @@ EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));
     infileCntOverall := IF(doInfileOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileOverallCount(COUNT(FilesToIngest), 'Infile', myTimeStamp));
     basefileCntOverall := IF(doInfileOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileOverallCount(COUNT(dsBase), 'Basefile', myTimeStamp));
     deltaCntOverall := IF(doInfileOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileOverallCount(COUNT(Delta), 'Deltafile', myTimeStamp));
-    sourceCountsStandard := IF(doInfilePerSrcCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileSourceCounts(InputSourceCounts, source, myTimeStamp));    ingestStatusOverall := IF(doStatusOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestStatus(UpdateStats,, myTimeStamp));
+    sourceCountsStandard := IF(doInfilePerSrcCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileSourceCounts(InputSourceCounts, source, myTimeStamp));
+    ingestStatusOverall := IF(doStatusOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestStatus(UpdateStats,, myTimeStamp));
     ingestStatusPerSrc := IF(doStatusPerSrcCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestStatus(UpdateStatsSrc, source, myTimeStamp));
     standardStats := infileCntOverall & basefileCntOverall & ingestStatusOverall & sourceCountsStandard & ingestStatusPerSrc;
     RETURN standardStats;

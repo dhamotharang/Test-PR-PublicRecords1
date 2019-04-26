@@ -72,8 +72,6 @@ export Layouts := module
 		unsigned4                       global_sid                       ; //this is a unique source ID that will be coming from Orbit.
 		unsigned8                       record_sid                       ; //this is a source specific unique and persistent record id (from SALT).  
 		BIPV2.IDlayouts.l_xlink_ids;
-		unsigned6												Bdid												:=  0;
-		unsigned1												bdid_score									:=  0;
 		unsigned6												did													:=  0;
 	  unsigned1											  did_score							      :=  0;
   	unsigned4 											dt_first_seen								     ;

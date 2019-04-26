@@ -2,9 +2,15 @@
 
 export Functions := Module;
 
-  //*************************************************************************
+  //***************************************************************************
 		//fParseString: Returns the strings that are in the email or web address 
-	//*************************************************************************
+		//     The vendor may send 1 - 3 emails or wed addresses, for example
+		//     (SDERUNGES@ADVANCE.ORG^^SDERUNGES@ADVANCE.COM^^SDERUNGES@ADVANCE.NET).
+		//     When the email or web address has more than 1 email or web address
+		//     it is separated by &, ;, or ^^.  If these characters are found,
+		//     the email or web will be parsed.  Two @ signs have been found also.
+		//     If found those are being replaced with just 1 @ sign.
+	//***************************************************************************
   export string fParseString(string inStr,integer val) := function
 			SetParts := map(regexfind(' & ',inStr) => Std.Str.SplitWords(inStr,' & '),
 									    regexfind(' ; ',inStr) => Std.Str.SplitWords(inStr,' ; '),

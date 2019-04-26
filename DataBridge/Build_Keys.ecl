@@ -5,12 +5,12 @@ module
 
  		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_DataBridge.Key_LinkIds.Key
 																							 ,DataBridge.Files().Base.Built
-																							 ,dx_DataBridge.keynames().LinkIds.QA
-																							 ,dx_DataBridge.keynames(pversion,false).LinkIds.New
+																							 ,dx_DataBridge.Names().LinkIds.QA
+																							 ,dx_DataBridge.Names(pversion,false).LinkIds.New
 																							 ,BuildLinkIdsKey);  
 																							 
 		 //DOPSGrowthCheck 
-		 GetDops:=dops.GetDeployedDatasets('P','B','F');
+		 GetDops:=dops.GetDeployedDatasets('P','B','N');
 	 	 OnlyDataBridge:=GetDops(datasetname='DataBridgeKeys');
 			
 		 father_pversion := OnlyDataBridge[1].buildversion;

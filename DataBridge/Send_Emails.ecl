@@ -6,7 +6,7 @@ EXPORT Send_Emails(
 	 STRING								pversion
 	,BOOLEAN							pUseOtherEnvironment 		= FALSE
 	,BOOLEAN							pShouldUpdateRoxiePage	= TRUE   
-	,DATASET(lay_builds)	pBuildFilenames					= dx_DataBridge.keynames(pversion,pUseOtherEnvironment).dAll_filenames
+	,DATASET(lay_builds)	pBuildFilenames					= DataBridge.Filenames(pversion,pUseOtherEnvironment).dAll_filenames
 	,STRING								pEmailList							= DataBridge.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).BuildSuccess
 	,STRING								pRoxieEmailList					= DataBridge.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).Roxie
 	,STRING								pBuildName							= DataBridge._Constants().Name

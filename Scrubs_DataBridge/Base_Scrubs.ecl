@@ -566,13 +566,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
-          ,'powid:' + getFieldTypeText(h.powid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'proxid:' + getFieldTypeText(h.proxid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'seleid:' + getFieldTypeText(h.seleid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'orgid:' + getFieldTypeText(h.orgid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'ultid:' + getFieldTypeText(h.ultid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'bdid:' + getFieldTypeText(h.bdid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'did:' + getFieldTypeText(h.did) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'dt_first_seen:' + getFieldTypeText(h.dt_first_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'dt_last_seen:' + getFieldTypeText(h.dt_last_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'dt_vendor_first_reported:' + getFieldTypeText(h.dt_vendor_first_reported) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -580,45 +573,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'process_date:' + getFieldTypeText(h.process_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'record_type:' + getFieldTypeText(h.record_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_company_name:' + getFieldTypeText(h.clean_company_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'clean_area_code:' + getFieldTypeText(h.clean_area_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'clean_telephone_num:' + getFieldTypeText(h.clean_telephone_num) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'mail_score_desc:' + getFieldTypeText(h.mail_score_desc) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name_gender_desc:' + getFieldTypeText(h.name_gender_desc) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_desc_1:' + getFieldTypeText(h.title_desc_1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_desc_2:' + getFieldTypeText(h.title_desc_2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_desc_3:' + getFieldTypeText(h.title_desc_3) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_desc_4:' + getFieldTypeText(h.title_desc_4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic8_desc_1:' + getFieldTypeText(h.sic8_desc_1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic8_desc_2:' + getFieldTypeText(h.sic8_desc_2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic8_desc_3:' + getFieldTypeText(h.sic8_desc_3) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic8_desc_4:' + getFieldTypeText(h.sic8_desc_4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic6_desc_1:' + getFieldTypeText(h.sic6_desc_1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic6_desc_2:' + getFieldTypeText(h.sic6_desc_2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic6_desc_3:' + getFieldTypeText(h.sic6_desc_3) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic6_desc_4:' + getFieldTypeText(h.sic6_desc_4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sic6_desc_5:' + getFieldTypeText(h.sic6_desc_5) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name:' + getFieldTypeText(h.name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'company:' + getFieldTypeText(h.company) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'address:' + getFieldTypeText(h.address) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'address2:' + getFieldTypeText(h.address2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'city:' + getFieldTypeText(h.city) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'state:' + getFieldTypeText(h.state) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'scf:' + getFieldTypeText(h.scf) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'zip:' + getFieldTypeText(h.zip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'zip4:' + getFieldTypeText(h.zip4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'mail_score:' + getFieldTypeText(h.mail_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'area_code:' + getFieldTypeText(h.area_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'telephone_number:' + getFieldTypeText(h.telephone_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'name_gender:' + getFieldTypeText(h.name_gender) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name_prefix:' + getFieldTypeText(h.name_prefix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name_first:' + getFieldTypeText(h.name_first) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name_middle_initial:' + getFieldTypeText(h.name_middle_initial) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name_last:' + getFieldTypeText(h.name_last) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'suffix:' + getFieldTypeText(h.suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_code_1:' + getFieldTypeText(h.title_code_1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_code_2:' + getFieldTypeText(h.title_code_2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_code_3:' + getFieldTypeText(h.title_code_3) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title_code_4:' + getFieldTypeText(h.title_code_4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'web_address:' + getFieldTypeText(h.web_address) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'sic8_1:' + getFieldTypeText(h.sic8_1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'sic8_2:' + getFieldTypeText(h.sic8_2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -629,7 +588,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'sic6_3:' + getFieldTypeText(h.sic6_3) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'sic6_4:' + getFieldTypeText(h.sic6_4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'sic6_5:' + getFieldTypeText(h.sic6_5) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'transaction_date:' + getFieldTypeText(h.transaction_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'database_site_id:' + getFieldTypeText(h.database_site_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'database_individual_id:' + getFieldTypeText(h.database_individual_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'email:' + getFieldTypeText(h.email) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -654,50 +612,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'individual_source8:' + getFieldTypeText(h.individual_source8) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'individual_source9:' + getFieldTypeText(h.individual_source9) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'individual_source10:' + getFieldTypeText(h.individual_source10) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'email_status:' + getFieldTypeText(h.email_status) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'title:' + getFieldTypeText(h.title) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'fname:' + getFieldTypeText(h.fname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'mname:' + getFieldTypeText(h.mname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'lname:' + getFieldTypeText(h.lname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name_suffix:' + getFieldTypeText(h.name_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'name_score:' + getFieldTypeText(h.name_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'prim_range:' + getFieldTypeText(h.prim_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'predir:' + getFieldTypeText(h.predir) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'prim_name:' + getFieldTypeText(h.prim_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'addr_suffix:' + getFieldTypeText(h.addr_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'postdir:' + getFieldTypeText(h.postdir) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'unit_desig:' + getFieldTypeText(h.unit_desig) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'sec_range:' + getFieldTypeText(h.sec_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'p_city_name:' + getFieldTypeText(h.p_city_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'v_city_name:' + getFieldTypeText(h.v_city_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'st:' + getFieldTypeText(h.st) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'cart:' + getFieldTypeText(h.cart) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'cr_sort_sz:' + getFieldTypeText(h.cr_sort_sz) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'lot:' + getFieldTypeText(h.lot) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'lot_order:' + getFieldTypeText(h.lot_order) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'dbpc:' + getFieldTypeText(h.dbpc) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'chk_digit:' + getFieldTypeText(h.chk_digit) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'rec_type:' + getFieldTypeText(h.rec_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'fips_state:' + getFieldTypeText(h.fips_state) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'fips_county:' + getFieldTypeText(h.fips_county) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'geo_lat:' + getFieldTypeText(h.geo_lat) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'geo_long:' + getFieldTypeText(h.geo_long) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'msa:' + getFieldTypeText(h.msa) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'geo_blk:' + getFieldTypeText(h.geo_blk) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'geo_match:' + getFieldTypeText(h.geo_match) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'err_stat:' + getFieldTypeText(h.err_stat) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'raw_aid:' + getFieldTypeText(h.raw_aid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'ace_aid:' + getFieldTypeText(h.ace_aid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'prep_address_line1:' + getFieldTypeText(h.prep_address_line1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'prep_address_line_last:' + getFieldTypeText(h.prep_address_line_last) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+          ,'email_status:' + getFieldTypeText(h.email_status) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
-          ,le.populated_powid_cnt
-          ,le.populated_proxid_cnt
-          ,le.populated_seleid_cnt
-          ,le.populated_orgid_cnt
-          ,le.populated_ultid_cnt
-          ,le.populated_bdid_cnt
-          ,le.populated_did_cnt
           ,le.populated_dt_first_seen_cnt
           ,le.populated_dt_last_seen_cnt
           ,le.populated_dt_vendor_first_reported_cnt
@@ -705,45 +621,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_process_date_cnt
           ,le.populated_record_type_cnt
           ,le.populated_clean_company_name_cnt
-          ,le.populated_clean_area_code_cnt
           ,le.populated_clean_telephone_num_cnt
-          ,le.populated_mail_score_desc_cnt
-          ,le.populated_name_gender_desc_cnt
-          ,le.populated_title_desc_1_cnt
-          ,le.populated_title_desc_2_cnt
-          ,le.populated_title_desc_3_cnt
-          ,le.populated_title_desc_4_cnt
-          ,le.populated_sic8_desc_1_cnt
-          ,le.populated_sic8_desc_2_cnt
-          ,le.populated_sic8_desc_3_cnt
-          ,le.populated_sic8_desc_4_cnt
-          ,le.populated_sic6_desc_1_cnt
-          ,le.populated_sic6_desc_2_cnt
-          ,le.populated_sic6_desc_3_cnt
-          ,le.populated_sic6_desc_4_cnt
-          ,le.populated_sic6_desc_5_cnt
-          ,le.populated_name_cnt
-          ,le.populated_company_cnt
-          ,le.populated_address_cnt
-          ,le.populated_address2_cnt
-          ,le.populated_city_cnt
           ,le.populated_state_cnt
-          ,le.populated_scf_cnt
           ,le.populated_zip_cnt
-          ,le.populated_zip4_cnt
           ,le.populated_mail_score_cnt
-          ,le.populated_area_code_cnt
-          ,le.populated_telephone_number_cnt
           ,le.populated_name_gender_cnt
-          ,le.populated_name_prefix_cnt
-          ,le.populated_name_first_cnt
-          ,le.populated_name_middle_initial_cnt
-          ,le.populated_name_last_cnt
-          ,le.populated_suffix_cnt
-          ,le.populated_title_code_1_cnt
-          ,le.populated_title_code_2_cnt
-          ,le.populated_title_code_3_cnt
-          ,le.populated_title_code_4_cnt
           ,le.populated_web_address_cnt
           ,le.populated_sic8_1_cnt
           ,le.populated_sic8_2_cnt
@@ -754,7 +636,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_sic6_3_cnt
           ,le.populated_sic6_4_cnt
           ,le.populated_sic6_5_cnt
-          ,le.populated_transaction_date_cnt
           ,le.populated_database_site_id_cnt
           ,le.populated_database_individual_id_cnt
           ,le.populated_email_cnt
@@ -779,50 +660,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_individual_source8_cnt
           ,le.populated_individual_source9_cnt
           ,le.populated_individual_source10_cnt
-          ,le.populated_email_status_cnt
-          ,le.populated_title_cnt
-          ,le.populated_fname_cnt
-          ,le.populated_mname_cnt
-          ,le.populated_lname_cnt
-          ,le.populated_name_suffix_cnt
-          ,le.populated_name_score_cnt
-          ,le.populated_prim_range_cnt
-          ,le.populated_predir_cnt
-          ,le.populated_prim_name_cnt
-          ,le.populated_addr_suffix_cnt
-          ,le.populated_postdir_cnt
-          ,le.populated_unit_desig_cnt
-          ,le.populated_sec_range_cnt
-          ,le.populated_p_city_name_cnt
-          ,le.populated_v_city_name_cnt
-          ,le.populated_st_cnt
-          ,le.populated_cart_cnt
-          ,le.populated_cr_sort_sz_cnt
-          ,le.populated_lot_cnt
-          ,le.populated_lot_order_cnt
-          ,le.populated_dbpc_cnt
-          ,le.populated_chk_digit_cnt
-          ,le.populated_rec_type_cnt
-          ,le.populated_fips_state_cnt
-          ,le.populated_fips_county_cnt
-          ,le.populated_geo_lat_cnt
-          ,le.populated_geo_long_cnt
-          ,le.populated_msa_cnt
-          ,le.populated_geo_blk_cnt
-          ,le.populated_geo_match_cnt
-          ,le.populated_err_stat_cnt
-          ,le.populated_raw_aid_cnt
-          ,le.populated_ace_aid_cnt
-          ,le.populated_prep_address_line1_cnt
-          ,le.populated_prep_address_line_last_cnt,0);
+          ,le.populated_email_status_cnt,0);
       SELF.rulepcnt := CHOOSE(c
-          ,le.populated_powid_pcnt
-          ,le.populated_proxid_pcnt
-          ,le.populated_seleid_pcnt
-          ,le.populated_orgid_pcnt
-          ,le.populated_ultid_pcnt
-          ,le.populated_bdid_pcnt
-          ,le.populated_did_pcnt
           ,le.populated_dt_first_seen_pcnt
           ,le.populated_dt_last_seen_pcnt
           ,le.populated_dt_vendor_first_reported_pcnt
@@ -830,45 +669,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_process_date_pcnt
           ,le.populated_record_type_pcnt
           ,le.populated_clean_company_name_pcnt
-          ,le.populated_clean_area_code_pcnt
           ,le.populated_clean_telephone_num_pcnt
-          ,le.populated_mail_score_desc_pcnt
-          ,le.populated_name_gender_desc_pcnt
-          ,le.populated_title_desc_1_pcnt
-          ,le.populated_title_desc_2_pcnt
-          ,le.populated_title_desc_3_pcnt
-          ,le.populated_title_desc_4_pcnt
-          ,le.populated_sic8_desc_1_pcnt
-          ,le.populated_sic8_desc_2_pcnt
-          ,le.populated_sic8_desc_3_pcnt
-          ,le.populated_sic8_desc_4_pcnt
-          ,le.populated_sic6_desc_1_pcnt
-          ,le.populated_sic6_desc_2_pcnt
-          ,le.populated_sic6_desc_3_pcnt
-          ,le.populated_sic6_desc_4_pcnt
-          ,le.populated_sic6_desc_5_pcnt
-          ,le.populated_name_pcnt
-          ,le.populated_company_pcnt
-          ,le.populated_address_pcnt
-          ,le.populated_address2_pcnt
-          ,le.populated_city_pcnt
           ,le.populated_state_pcnt
-          ,le.populated_scf_pcnt
           ,le.populated_zip_pcnt
-          ,le.populated_zip4_pcnt
           ,le.populated_mail_score_pcnt
-          ,le.populated_area_code_pcnt
-          ,le.populated_telephone_number_pcnt
           ,le.populated_name_gender_pcnt
-          ,le.populated_name_prefix_pcnt
-          ,le.populated_name_first_pcnt
-          ,le.populated_name_middle_initial_pcnt
-          ,le.populated_name_last_pcnt
-          ,le.populated_suffix_pcnt
-          ,le.populated_title_code_1_pcnt
-          ,le.populated_title_code_2_pcnt
-          ,le.populated_title_code_3_pcnt
-          ,le.populated_title_code_4_pcnt
           ,le.populated_web_address_pcnt
           ,le.populated_sic8_1_pcnt
           ,le.populated_sic8_2_pcnt
@@ -879,7 +684,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_sic6_3_pcnt
           ,le.populated_sic6_4_pcnt
           ,le.populated_sic6_5_pcnt
-          ,le.populated_transaction_date_pcnt
           ,le.populated_database_site_id_pcnt
           ,le.populated_database_individual_id_pcnt
           ,le.populated_email_pcnt
@@ -904,45 +708,10 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_individual_source8_pcnt
           ,le.populated_individual_source9_pcnt
           ,le.populated_individual_source10_pcnt
-          ,le.populated_email_status_pcnt
-          ,le.populated_title_pcnt
-          ,le.populated_fname_pcnt
-          ,le.populated_mname_pcnt
-          ,le.populated_lname_pcnt
-          ,le.populated_name_suffix_pcnt
-          ,le.populated_name_score_pcnt
-          ,le.populated_prim_range_pcnt
-          ,le.populated_predir_pcnt
-          ,le.populated_prim_name_pcnt
-          ,le.populated_addr_suffix_pcnt
-          ,le.populated_postdir_pcnt
-          ,le.populated_unit_desig_pcnt
-          ,le.populated_sec_range_pcnt
-          ,le.populated_p_city_name_pcnt
-          ,le.populated_v_city_name_pcnt
-          ,le.populated_st_pcnt
-          ,le.populated_cart_pcnt
-          ,le.populated_cr_sort_sz_pcnt
-          ,le.populated_lot_pcnt
-          ,le.populated_lot_order_pcnt
-          ,le.populated_dbpc_pcnt
-          ,le.populated_chk_digit_pcnt
-          ,le.populated_rec_type_pcnt
-          ,le.populated_fips_state_pcnt
-          ,le.populated_fips_county_pcnt
-          ,le.populated_geo_lat_pcnt
-          ,le.populated_geo_long_pcnt
-          ,le.populated_msa_pcnt
-          ,le.populated_geo_blk_pcnt
-          ,le.populated_geo_match_pcnt
-          ,le.populated_err_stat_pcnt
-          ,le.populated_raw_aid_pcnt
-          ,le.populated_ace_aid_pcnt
-          ,le.populated_prep_address_line1_pcnt
-          ,le.populated_prep_address_line_last_pcnt,0);
+          ,le.populated_email_status_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,124,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,47,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -958,7 +727,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Base_Delta(prevDS, PROJECT(h, Base_Layout_DataBridge));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),124,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),47,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');

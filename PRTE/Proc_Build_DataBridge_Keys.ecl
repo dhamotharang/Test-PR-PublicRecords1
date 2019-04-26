@@ -27,8 +27,6 @@ export Proc_Build_DataBridge_Keys(STRING pIndexVersion) := function
 		STRING6   source;
 		UNSIGNED4 global_sid;
 		UNSIGNED8 record_sid;
-		UNSIGNED6 bdid;
-		UNSIGNED1 bdid_score;
 		UNSIGNED6 did;
 		UNSIGNED1 did_score;
 		UNSIGNED4 dt_first_seen;

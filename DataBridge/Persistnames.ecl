@@ -10,7 +10,7 @@ EXPORT Persistnames(
 	
 	EXPORT StandardizeInput			 := Root + '::standardize_Input';
 	EXPORT StandardizeNameAddr	 := Root + '::standardize_NameAddr';
-	EXPORT AppendIds						 := Root + '::Append_Ids.Bdid_xlinkids';
+	EXPORT AppendIds						 := Root + '::Append_Ids.xlinkids';
 
 
 	EXPORT dall_filenames := DATASET([
