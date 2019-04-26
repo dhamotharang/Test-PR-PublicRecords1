@@ -25,7 +25,8 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
   temp_addr_error_value := _row.taddress.err[1..2]='E3' OR _row.taddress.err[1..4] IN ['E500','E502'];  
   temp_city_value := _row.taddress.city;
   temp_state_value :=  _row.taddress.state;
-    
+  temp_phone_value := _row.tphone.phone10;
+  
   boolean SEARCH_DID := (_row.did > 0);
 
   boolean SEARCH_RID := _row.rid > 0;
@@ -39,7 +40,7 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 
   boolean SEARCH_DOB_NAME := doxie.DOBTools(temp_dob_val_low).IsValidYOB AND 
                              doxie.DOBTools(temp_dob_val_high).IsValidYOB AND 
-                             (temp_lname_value <> '');
+                             (temp_lname_value <> '') AND NOT SEARCH_ADDRESS and temp_ssn_value='' and temp_phone_value='';
 
   boolean SEARCH_NAME := temp_fname_value <> '' and temp_lname_value <> '' and temp_city_value='' AND temp_state_value='';
 	
@@ -70,7 +71,10 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 	saltPlus_results := AutoHeaderV2.fetch_salt(ds_search, SALT_SearchCode);												
 	boolean noSaltResults := 	count(saltPlus_results)=0;			
 	
-	fetched_dups := IF(SEARCH_DID or SEARCH_RID or noSaltResults  , DEDUP(SORT(fetched_dups1, 	seq, did), seq, did), saltPlus_results);
+	//fetched_dups := IF(SEARCH_DID or SEARCH_RID or noSaltResults  , DEDUP(SORT(fetched_dups1, 	seq, did), seq, did), saltPlus_results);
+  legacy_dups := DEDUP(SORT(fetched_dups1, 	seq, did), seq, did);
+  fetched_dups := IF(SEARCH_DOB_NAME and temp_dob_val_high<>temp_dob_val_low, legacy_dups,
+                    IF(SEARCH_DID or SEARCH_RID or noSaltResults ,legacy_dups, saltPlus_results));
 // output(fetched_dups1, named('fetched_dups1'));
 // output(saltPlus_results, named('saltPlus_results'));
 // output(noSaltResults, named('noSaltResults'));

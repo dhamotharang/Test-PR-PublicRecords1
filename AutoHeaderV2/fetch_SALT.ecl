@@ -15,7 +15,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.did := 0;
 			self.new_score := 0;			
 			self.ssn := if(left.tssn.ssn in ut.Set_BadSSN, '', left.tssn.ssn) ;	 // remove from inquiry bad ssn searches			
-			self.dob := (STRING)IF(left.tdob.dob=0, LEFT.tdob.dob_low, left.tdob.dob) ; // left.tdob.agehigh
+			self.dob := IF(left.tdob.dob=0, '', (STRING)left.tdob.dob) ; 
 			self.fname := left.tname.fname;
 			self.mname := left.tname.mname;
 			self.lname := left.tname.lname;
@@ -65,7 +65,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 	boolean isNickName := ~isStrict and ds_search[1].tname.nicknames;
   boolean isFullssn  := length(trim(inDataOne(0)[1].ssn))=9 and STD.Str.FindCount(inDataOne(0)[1].ssn, '00000')=0;
   boolean isCompleteAddr := inDataOne(0)[1].prim_range<>'' and inDataOne(0)[1].prim_name<>'' and ((inDataOne(0)[1].city<>'' and inDataOne(0)[1].state<>'') or inDataOne(0)[1].zip<>'');
-  boolean isNickNameLink := isNickName and inDataOne(0)[1].dob='0' and not isFullSsn and not isCompleteAddr;
+  boolean isNickNameLink := isNickName and inDataOne(0)[1].dob='' and not isFullSsn and not isCompleteAddr;
 	boolean isPhonetic := ~isStrict and ds_search[1].tname.phonetic;
 	boolean isWildcard := search_code & AutoHeaderV2.Constants.SearchCode.ALLOW_WILDCARD;
   boolean isOtherSt1 := ds_search[1].taddress.state_prev_1<>'';
