@@ -62,7 +62,7 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut;
 
 EXPORT PhoneFinderReportService() :=
 MACRO	
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// parse ESDL input
   dIn       := DATASET([], iesp.phonefinder.t_PhoneFinderSearchRequest) : STORED('PhoneFinderSearchRequest',FEW);
   pfRequest := dIn[1] : INDEPENDENT;

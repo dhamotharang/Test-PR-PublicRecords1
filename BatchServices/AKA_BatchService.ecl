@@ -18,7 +18,7 @@ IMPORT BatchServices;
 EXPORT AKA_BatchService(useCannedRecs = 'false') := 
 	MACRO
 
-    #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+    #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     UNSIGNED1 did_limit := 1 : STORED('DidLimit');
 		
 		// 1a. Grab the input XML and throw into a dataset.	
