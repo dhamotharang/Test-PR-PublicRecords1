@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, iesp, risk_indicators, Seed_Files, STD;
+﻿IMPORT DueDiligence, iesp, Risk_Indicators, Seed_Files, STD;
 
 
 //Since these test seeds are for XML queries - making assumptions 
@@ -12,6 +12,17 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
     SHARED personResponseLayout := iesp.duediligencepersonreport.t_DueDiligencePersonReportResponse;
     SHARED attributeResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
     
+    
+    SHARED getHash(STRING firstName, STRING lastName, STRING ssn, STRING companyName, STRING fein, STRING zip, STRING phone) := FUNCTION
+        RETURN Seed_Files.Hash_InstantID(STD.Str.ToUpperCase(TRIM(firstName)),    //first name - not used for business products
+                                         STD.Str.ToUpperCase(TRIM(lastName)),     //last name - not used for business products
+                                         STD.Str.ToUpperCase(TRIM(ssn)),  //ssn - not used for business products
+                                         STD.Str.ToUpperCase(TRIM(fein)),  //fein - not used for person products
+                                         STD.Str.ToUpperCase(TRIM(zip)),   // zip
+                                         STD.Str.ToUpperCase(TRIM(phone)),     // phone
+                                         STD.Str.ToUpperCase(TRIM(companyName))); //company_name - not used for person products
+    END;
+    
 
     SHARED getKeys(layout, indvOrBus) := FUNCTIONMACRO
         
@@ -24,15 +35,25 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
         
         RETURN PROJECT(inData, TRANSFORM(workingLayout,
                                           SELF.datasetName := testDataTableName;
-                                          SELF.hashKey := Seed_Files.Hash_InstantID(StringLib.StringToUpperCase(TRIM(LEFT.individual.name.firstName)),   //first name
-                                                                                    StringLib.StringToUpperCase(TRIM(LEFT.individual.name.lastName)),    //last name
-                                                                                    StringLib.StringToUpperCase(TRIM(LEFT.individual.ssn)),              //ssn
-                                                                                    risk_indicators.nullstring,    //fein - not used for person products
-                                                                                    StringLib.StringToUpperCase(TRIM(LEFT.individual.address.zip5)),     // zip
-                                                                                    StringLib.StringToUpperCase(TRIM(LEFT.individual.phone)),            // phone
-                                                                                    risk_indicators.nullstring);   //company_name - not used for person products
-                                                                                    
+                                          
+                                          #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
+                                                      'SELF.hashKey := getHash(LEFT.individual.name.firstName, LEFT.individual.name.lastName, LEFT.individual.ssn,' +
+                                                                                'Risk_Indicators.nullstring, Risk_Indicators.nullstring,' +
+                                                                                'LEFT.individual.address.zip5, LEFT.individual.phone);',
+                                                      DueDiligence.Constants.EMPTY))
+                                                     
+                                                     
+                                                     
+                                          #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS,
+                                                      'SELF.hashKey := getHash(Risk_Indicators.nullstring, Risk_Indicators.nullstring, Risk_Indicators.nullstring,' +
+                                                                                'LEFT.business.companyName, LEFT.business.fein,' +
+                                                                                'LEFT.business.address.zip5, LEFT.business.phone);',
+                                                      DueDiligence.Constants.EMPTY))
+                                              
+                                                      
+                                                      
                                           SELF.historyDate := LEFT.historyDateYYYYMMDD;
+                                          SELF.result.AdditionalInput := additionalInfo;
                                            
                                           //populate input echo for a person
                                           #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
@@ -62,10 +83,38 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                                                                                                  'LEFT.individual.name.lastName,' + 
                                                                                                                  'LEFT.individual.name.suffix,' + 
                                                                                                                  'DueDiligence.Constants.EMPTY,' + 
-                                                                                                                 'LEFT.individual.name.fullName);' +
+                                                                                                                 'LEFT.individual.name.fullName);',
                                                                                                                  
-                                                      'SELF.result.AdditionalInput := additionalInfo;',
                                                       DueDiligence.Constants.EMPTY))
+                                                      
+                                                      
+                                          //populate input echo for a business
+                                          #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS,
+                                                      'SELF.result.inputEcho.business.lexID := LEFT.business.lexID;' + 
+                                                      'SELF.result.inputEcho.business.phone := LEFT.business.phone;' +
+                                                      'SELF.result.inputEcho.business.fein := LEFT.business.fein;' +
+                                                      'SELF.result.inputEcho.business.companyName := LEFT.business.companyName;' +
+                                                      'SELF.result.inputEcho.business.alternateCompanyName := LEFT.business.altCompanyName;' +
+                                                      
+                                                      'SELF.result.inputEcho.business.address := iesp.ECL2ESP.SetAddress(LEFT.business.address.prim_name,' +
+                                                                                                                       'LEFT.business.address.prim_range,' + 
+                                                                                                                       'LEFT.business.address.predir,' + 
+                                                                                                                       'LEFT.business.address.postdir,' + 
+                                                                                                                       'LEFT.business.address.addr_suffix,' + 
+                                                                                                                       'LEFT.business.address.unit_desig,' + 
+                                                                                                                       'LEFT.business.address.sec_range,' + 
+                                                                                                                       'LEFT.business.address.city,' + 
+                                                                                                                       'LEFT.business.address.state,' + 
+                                                                                                                       'LEFT.business.address.zip5,' + 
+                                                                                                                       'LEFT.business.address.zip4,' + 
+                                                                                                                       'DueDiligence.Constants.EMPTY,' + 
+                                                                                                                       'DueDiligence.Constants.EMPTY,' + 
+                                                                                                                       'LEFT.business.address.streetAddress1,' + 
+                                                                                                                       'LEFT.business.address.streetAddress2);',
+                                                                                                                 
+                                                      DueDiligence.Constants.EMPTY))
+                                                      
+                                                      
                                                       
                                           SELF := []));
     ENDMACRO;
@@ -113,21 +162,50 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                           KEYED(RIGHT.inDatasetName = LEFT.datasetName) AND
                           KEYED(RIGHT.hashValue = LEFT.hashkey),
                           TRANSFORM(RECORDOF(LEFT),
+                                    
+                                    seedExists := LEFT.hashKey = RIGHT.hashValue;
+                                    
+                                    name := iesp.ECL2ESP.SetName(RIGHT.firstName,
+                                                                  RIGHT.middleName,
+                                                                  RIGHT.lastName,
+                                                                  RIGHT.suffix,
+                                                                  DueDiligence.Constants.EMPTY,
+                                                                  RIGHT.fullName);
+                                                                  
+                                    address := iesp.ECL2ESP.SetAddress(RIGHT.streetName,
+                                                                       RIGHT.streetNumber, 
+                                                                       RIGHT.streetPreDirection,
+                                                                       RIGHT.streetPostDirection,
+                                                                       RIGHT.streetSuffix,
+                                                                       RIGHT.unitDesignation,
+                                                                       RIGHT.unitNumber,
+                                                                       RIGHT.city,
+                                                                       RIGHT.state,
+                                                                       RIGHT.zip5,
+                                                                       RIGHT.zip4,
+                                                                       DueDiligence.Constants.EMPTY,
+                                                                       DueDiligence.Constants.EMPTY,
+                                                                       RIGHT.streetAddress1,
+                                                                       RIGHT.streetAddress2);
+                                    
+                                    SELF.result.inputEcho.person.lexID := IF(seedExists, (STRING)RIGHT.lexID, LEFT.result.inputEcho.person.lexID);
+                                    SELF.result.inputEcho.person.phone := IF(seedExists, RIGHT.phone, LEFT.result.inputEcho.person.phone);
+                                    SELF.result.inputEcho.person.ssn := IF(seedExists, RIGHT.ssn, LEFT.result.inputEcho.person.ssn);
+                                    SELF.result.inputEcho.person.dob := IF(seedExists, iesp.ECL2ESP.toDate(RIGHT.dob), LEFT.result.inputEcho.person.dob);
+                                    SELF.result.inputEcho.person.address := IF(seedExists, address, LEFT.result.inputEcho.person.address);                                             
+                                    SELF.result.inputEcho.person.name := IF(seedExists, name, LEFT.result.inputEcho.person.name);
+                          
+                          
+                          
                                     SELF.result.personReport.personInformation.lexID := (STRING)RIGHT.lexID; 
-                                    SELF.result.personReport.personInformation.inputName := IF(RIGHT.lexID > 0, LEFT.result.inputEcho.person.name);
-                                    SELF.result.personReport.personInformation.inputAddress := IF(RIGHT.lexID > 0, LEFT.result.inputEcho.person.address);
+                                    SELF.result.personReport.personInformation.inputName := name;
+                                    SELF.result.personReport.personInformation.inputAddress := address;
                                     SELF.result.personReport.personInformation.inputAddressType := RIGHT.addressType;
-                                    SELF.result.personReport.personInformation.inputSSN := IF(RIGHT.lexID > 0, LEFT.result.inputEcho.person.ssn, DueDiligence.Constants.EMPTY);
-                                    SELF.result.personReport.personInformation.inputPhone := IF(RIGHT.lexID > 0, LEFT.result.inputEcho.person.phone, DueDiligence.Constants.EMPTY);
+                                    SELF.result.personReport.personInformation.inputSSN := RIGHT.ssn;
+                                    SELF.result.personReport.personInformation.inputPhone := RIGHT.phone;
                                     
-                                    inputDOB := IF(RIGHT.lexID > 0, LEFT.result.inputEcho.person.dob);
-                                    dobForCalc := iesp.ECL2ESP.DateToInteger(inputDOB);
-                                                    
-                                    validInputDOB := STD.Date.IsValidDate(dobForCalc);
-                                    validHistDate := STD.Date.IsValidDate(LEFT.historyDate);
-                                    
-                                    SELF.result.personReport.personInformation.inputDOB := inputDOB;
-                                    SELF.result.personReport.personInformation.inputAge := IF(validInputDOB AND validHistDate, STD.Date.YearsBetween(dobForCalc, LEFT.historyDate), 0);
+                                    SELF.result.personReport.personInformation.inputDOB := iesp.ECL2ESP.toDate(RIGHT.dob);
+                                    SELF.result.personReport.personInformation.inputAge := RIGHT.age;
                                     
                                     SELF := LEFT;),
                           LEFT OUTER, 
@@ -298,10 +376,51 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
     
         inRecs := getKeys(attributeResponseLayout, DueDiligence.Constants.INDIVIDUAL);
         
+        inputInfo := JOIN(inRecs, Seed_Files.keys_DueDiligencePersonReport.PersonInformationSection,
+                          KEYED(RIGHT.inDatasetName = LEFT.datasetName) AND
+                          KEYED(RIGHT.hashValue = LEFT.hashkey),
+                          TRANSFORM(RECORDOF(LEFT),
+                                    
+                                    seedExists := LEFT.hashKey = RIGHT.hashValue;
+                                    
+                                    name := iesp.ECL2ESP.SetName(RIGHT.firstName,
+                                                                  RIGHT.middleName,
+                                                                  RIGHT.lastName,
+                                                                  RIGHT.suffix,
+                                                                  DueDiligence.Constants.EMPTY,
+                                                                  RIGHT.fullName);
+                                                                  
+                                    address := iesp.ECL2ESP.SetAddress(RIGHT.streetName,
+                                                                       RIGHT.streetNumber, 
+                                                                       RIGHT.streetPreDirection,
+                                                                       RIGHT.streetPostDirection,
+                                                                       RIGHT.streetSuffix,
+                                                                       RIGHT.unitDesignation,
+                                                                       RIGHT.unitNumber,
+                                                                       RIGHT.city,
+                                                                       RIGHT.state,
+                                                                       RIGHT.zip5,
+                                                                       RIGHT.zip4,
+                                                                       DueDiligence.Constants.EMPTY,
+                                                                       DueDiligence.Constants.EMPTY,
+                                                                       RIGHT.streetAddress1,
+                                                                       RIGHT.streetAddress2);
+                                    
+                                    SELF.result.inputEcho.person.lexID := IF(seedExists, (STRING)RIGHT.lexID, LEFT.result.inputEcho.person.lexID);
+                                    SELF.result.inputEcho.person.phone := IF(seedExists, RIGHT.phone, LEFT.result.inputEcho.person.phone);
+                                    SELF.result.inputEcho.person.ssn := IF(seedExists, RIGHT.ssn, LEFT.result.inputEcho.person.ssn);
+                                    SELF.result.inputEcho.person.dob := IF(seedExists, iesp.ECL2ESP.toDate(RIGHT.dob), LEFT.result.inputEcho.person.dob);
+                                    SELF.result.inputEcho.person.address := IF(seedExists, address, LEFT.result.inputEcho.person.address);                                             
+                                    SELF.result.inputEcho.person.name := IF(seedExists, name, LEFT.result.inputEcho.person.name);
+                                    
+                                    SELF := LEFT;),
+                          LEFT OUTER, 
+                          ATMOST(1));
+        
         //================================
         // Attributes Section
         //================================
-        attributes := JOIN(inRecs, Seed_Files.keys_DueDiligencePersonReport.AttributesSection,
+        attributes := JOIN(inputInfo, Seed_Files.keys_DueDiligencePersonReport.AttributesSection,
                               KEYED(RIGHT.inDatasetName = LEFT.datasetName) AND
                               KEYED(RIGHT.hashValue = LEFT.hashkey),
                               TRANSFORM(RECORDOF(LEFT),
@@ -310,6 +429,64 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                                                             DueDiligence.TestSeeds.TestSeedFunctionHelperPerson.GetPersonAttributesNotFound);
                                         SELF.result.PersonLexIDMatch := (UNSIGNED)RIGHT.perLexIDMatch;
                                         SELF.result.UniqueID := (STRING)RIGHT.perLexID;
+                                        SELF := LEFT;),
+                              LEFT OUTER, 
+                              ATMOST(1));
+                        
+        RETURN PROJECT(attributes, TRANSFORM(attributeResponseLayout, SELF := LEFT;));
+    END;
+    
+    
+    EXPORT GetBusinessAttributeSeeds := FUNCTION
+        inRecs := getKeys(attributeResponseLayout, DueDiligence.Constants.BUSINESS);
+        
+        //================================
+        // Input Echo Section
+        //================================
+        inputEcho := JOIN(inRecs, Seed_Files.keys_DueDiligenceBusinessReport.InputEchoSection,
+                            KEYED(RIGHT.inDatasetName = LEFT.datasetName) AND
+                            KEYED(RIGHT.hashValue = LEFT.hashkey),
+                            TRANSFORM(RECORDOF(LEFT),
+                                      
+                                      seedFound := RIGHT.hashValue = LEFT.hashkey;
+                                      
+                                      SELF.result.inputEcho.business.lexID := IF(seedFound, RIGHT.lexID, LEFT.result.inputEcho.business.lexID);
+                                      SELF.result.inputEcho.business.phone := IF(seedFound, RIGHT.phone, LEFT.result.inputEcho.business.phone);
+                                      SELF.result.inputEcho.business.address := IF(seedFound, iesp.ECL2ESP.SetAddress(RIGHT.streetName,
+                                                                                                                       RIGHT.streetNumber, 
+                                                                                                                       RIGHT.streetPreDirection,
+                                                                                                                       RIGHT.streetPostDirection,
+                                                                                                                       RIGHT.streetSuffix,
+                                                                                                                       RIGHT.unitDesignation,
+                                                                                                                       RIGHT.unitNumber,
+                                                                                                                       RIGHT.city,
+                                                                                                                       RIGHT.state,
+                                                                                                                       RIGHT.zip5,
+                                                                                                                       RIGHT.zip4,
+                                                                                                                       DueDiligence.Constants.EMPTY,
+                                                                                                                       DueDiligence.Constants.EMPTY,
+                                                                                                                       RIGHT.streetAddress1,
+                                                                                                                       RIGHT.streetAddress2),
+                                                                                              LEFT.result.inputEcho.business.address);
+                                      SELF.result.inputEcho.business.companyName := IF(seedFound, RIGHT.companyName, LEFT.result.inputEcho.business.companyName);
+                                      SELF.result.inputEcho.business.alternateCompanyName := IF(seedFound, RIGHT.altCompanyName, LEFT.result.inputEcho.business.alternateCompanyName);
+                                      SELF.result.inputEcho.business.fein := IF(seedFound, RIGHT.fein, LEFT.result.inputEcho.business.fein);
+                                      SELF := LEFT;),
+                            LEFT OUTER, 
+                            ATMOST(1));
+        
+        //================================
+        // Attributes Section
+        //================================
+        attributes := JOIN(inputEcho, Seed_Files.keys_DueDiligenceBusinessReport.AttributesSection,
+                              KEYED(RIGHT.inDatasetName = LEFT.datasetName) AND
+                              KEYED(RIGHT.hashValue = LEFT.hashkey),
+                              TRANSFORM(RECORDOF(LEFT),
+                                        SELF.result.AttributeGroup := IF(RIGHT.busLexID <> DueDiligence.Constants.EMPTY, 
+                                                                            DueDiligence.TestSeeds.TestSeedFunctionHelperBusiness.GetBusinessAttributes(RIGHT),
+                                                                            DueDiligence.TestSeeds.TestSeedFunctionHelperBusiness.GetBusinessAttributesNotFound);
+                                        SELF.result.BusinessLexIDMatch := (UNSIGNED)RIGHT.busLexIDMatch;
+                                        SELF.result.BusinessID := RIGHT.busLexID;
                                         SELF := LEFT;),
                               LEFT OUTER, 
                               ATMOST(1));
