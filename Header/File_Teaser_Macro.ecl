@@ -1,5 +1,5 @@
 export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true') := MACRO
-	import AutoStandardI,ut,suppress,doxie_files,dx_BestRecords;
+	import AutoStandardI,ut,suppress,dx_header,dx_BestRecords;
 
 	// filter probation data
 	hdrNonProb := teaserInFile(mdr.sourcetools.sourceisonprobation(src)=false);
@@ -19,8 +19,8 @@ export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true')
 	hdrClean := hdrNonAmbig(isValidStr(st, true) and isValidStr(lname) and isValidStr(fname));
 
 	// remove all of the records for minors
-	minors := distribute(pull(doxie_files.key_minors), hash(did));
-	hdrAdult := join(hdrClean, minors, left.did = right.did and ut.GetAgeI(right.dob) < 18, transform(left), 
+	minors := distribute(pull(dx_header.key_minors()), hash(did));
+	hdrAdult := join(hdrClean, minors, left.did = right.did and ut.age(right.dob) < 18, transform(left), 
 									 left only, local);
 
 	appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));

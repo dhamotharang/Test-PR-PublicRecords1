@@ -1,4 +1,4 @@
-﻿import Address;
+﻿import dx_Header;
 import BIPV2;
 import BIPV2_Company_Names;
 import BIPV2_Suppression;
@@ -35,7 +35,7 @@ inputDsZip :=
 		newState0 := Str.ToUpperCase(if(count(airportReplacement) = 0, left.state, airportReplacement[2]));
 		newState := if(newState0 != '', newState0,
 		               if(newCity = '', '',
-		                  Address.Key_CityStChance(city_name = newCity and percent_chance >= 99)[1].st));
+		                  dx_Header.Key_CityStChance()(KEYED(city_name = newCity) and percent_chance >= 99)[1].st));
 		inputZipRadius := left.zip_radius_miles;
 		zipsExpanded := BIPV2.fn_get_zips_2(newCity, newState, left.zip5, left.zip_radius_miles);
 		zipCases := project(zipsExpanded, transform(BizLinkFull.Process_Biz_Layouts.layout_zip_cases,

@@ -1,6 +1,6 @@
 // Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
 IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp, 
-      AutoStandardI, ut, American_Student_Services,  
+      AutoStandardI, ut, American_Student_Services, dx_header, 
 			SmartRollup, FCRA, LN_PropertyV2_Services;
 iespOut := iesp.smartlinxreport;			
 out_rec := record(iespOut.t_SmartlinxReportIndividual)
@@ -72,7 +72,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	end;
 	subject_addrs_plus := project(subject_addrs_rolled, fillPlus(left,counter));
 	
-	subject_addrs_hhid := join(subject_addrs_plus,doxie.Key_Did_HDid, 
+	subject_addrs_hhid := join(subject_addrs_plus,dx_header.key_did_hhid(),
                   keyed((integer)left.did = right.did), 
                   transform(tnt_rec, self.hhid := right.hhid_relat, self := left), left outer, atmost(ut.limits.HHID_PER_PERSON));
 	

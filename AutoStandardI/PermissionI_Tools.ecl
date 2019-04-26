@@ -92,7 +92,7 @@ export PermissionI_Tools := module
 			export mac_FilterOutMinors(inrec, outrec, didfield = 'did', the_macro_module = 'AutoStandardI.GlobalModule()',
 																 dobfield = '?') :=
 			MACRO //because i want to use on datasets of various layouts
-			import doxie_files,AutoStandardI,ut;
+			import dx_Header,AutoStandardI,ut;
 			
 				#uniquename(j0)
 				// need to check for minors on zero DIDs that have a valid DOB.
@@ -108,7 +108,7 @@ export PermissionI_Tools := module
 				%j% := 
 					join(
 						inrec((unsigned6)didfield > 0),
-						doxie_files.key_minors_hash,
+						dx_Header.key_minors_hash(),
 						keyed(hash32((unsigned6)left.didfield)=right.hash32_did) and
 						keyed((unsigned6)left.didfield = right.did) and	//at build time, key contains only minors
 						ut.age(right.dob) < 18,						//check age since a few will turn 18 between builds
