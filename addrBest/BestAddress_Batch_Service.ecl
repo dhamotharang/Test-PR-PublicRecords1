@@ -79,7 +79,7 @@
 
 
 export BestAddress_Batch_Service := macro
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('OnlyReturnSuccessfullyCleanedAddresses',true);
 
 	ds_raw := dataset([],AddrBest.Layout_BestAddr.Batch_in) : stored('batch_in',few);

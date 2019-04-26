@@ -42,7 +42,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI;
 
 EXPORT PrelitReportService () := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #onwarning(4207, ignore);
 
 //The following macro defines the field sequence on WsECL page of query. 
