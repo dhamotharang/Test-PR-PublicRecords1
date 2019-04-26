@@ -52,7 +52,7 @@
 
 
 export ReportService := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #constant('IsCRS', true);
 
 con := ContactCard.constants;
