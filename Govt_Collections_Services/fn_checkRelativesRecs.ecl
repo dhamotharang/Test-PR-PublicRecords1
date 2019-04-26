@@ -1,8 +1,8 @@
-
-IMPORT doxie,ut,Relationship;
+﻿
+IMPORT doxie, Govt_Collections_Services, Relationship, ut;
 
 EXPORT fn_checkRelativesRecs(dataset(Layouts.batch_working) ds_batch_in,
-                     IParams.BatchParams in_mod ) := 
+                     Govt_Collections_Services.IParams.BatchParams in_mod ) := 
 	FUNCTION
 		
 		// Fulfills new version documentation Req. 4.1.11
@@ -44,7 +44,7 @@ EXPORT fn_checkRelativesRecs(dataset(Layouts.batch_working) ds_batch_in,
 
 		// 3. Find best SSN for each relative's did record.	Output layout - doxie.layout_best	
 		rels_dids := dedup(sort(ds_with_relative_raw, rel_did), rel_did);
-		doxie.mac_best_records(rels_dids, rel_did, best_rels_recs, ut.dppa_ok(in_mod.DPPAPurpose),ut.glb_ok(in_mod.GLBPurpose), , in_mod.DataRestrictionMask);	
+		doxie.mac_best_records(rels_dids, rel_did, best_rels_recs, in_mod.isValidDPPA(),in_mod.isValidGLB(), , in_mod.DataRestrictionMask);	
 		
 		// 4. Join back to acctno.
 		ds_rels_recs_pre := JOIN(ds_with_relative_raw, best_rels_recs, 

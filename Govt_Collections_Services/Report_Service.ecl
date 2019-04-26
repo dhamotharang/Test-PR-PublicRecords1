@@ -3,7 +3,7 @@
   <part name="IdentityContactResolutionReportRequest" sequence="1" type="tns:XmlDataset"/>
 </message>
 */
-IMPORT Address, AutoStandardI, Gateway, iesp, govt_collections_services, ut, Doxie, Suppress, STD, WSInput;
+IMPORT Address, iesp, Govt_Collections_Services, Suppress, STD, WSInput;
 
 EXPORT Report_Service() := MACRO
     #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -35,19 +35,16 @@ EXPORT Report_Service() := MACRO
 		// From batch - Initialize batch param values now that ESP param values have been loaded.
 		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
     
-   // Global module
-   globalMod := AutoStandardI.GlobalModule();
-
    // Attempt to derive an SSN from the given DID value that may be provided on input to this service
    // interface Use the unmasked SSN regardless of SSN mask setting because we are using this SSN 
    // internally in our search criteria.
    rec := SSNBest_Services.Raw.Get_All(DATASET([{'', icrReportBy.uniqueid}],{STRING best_ssn, INTEGER did}));
    ssn_by_did := rec.subject[1].ssn;
 
-   // Setup some values that will be passed into the Records attribute call later.
-		in_ssn_mask := globalMod.SSNMask;
-		is_GLB_fail := NOT ut.glb_ok(globalMod.GLBPurpose);
-		is_DRM_fail := Doxie.DataRestriction.isECHRestricted(globalMod.DataRestrictionMask); 
+   // Setup some values that will be passed into the Suppress.MAC_Mask calls later or used towards the end.
+		in_ssn_mask := batch_params.ssn_mask;
+		is_GLB_fail := NOT batch_params.isValidGLB();  
+		is_DRM_fail := batch_params.isECHRestricted(); // i.e. if DRM pos #6(Experian Credit Hdr) is = '1'
 
    // Build the batch record with the appropriate values transliterated from the ESP Report By inputs.
 		ds_xml_in := 
@@ -136,9 +133,9 @@ EXPORT Report_Service() := MACRO
 
     
 		// From batch - Restrictions/suppressions based on application type.
-		Suppress.MAC_Suppress(ds_batchview_recs, ds_recs_sup_1, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.DID, lex_id);			
-		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, ssn);
-		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, best_ssn);
+		Suppress.MAC_Suppress(ds_batchview_recs, ds_recs_sup_1, batch_params.application_type,,,Suppress.Constants.LinkTypes.DID, lex_id);			
+		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, ssn);
+		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, best_ssn);
 
 
 		// From batch - Provide for ssn masking. Return the input ssn as-is; mask best_ and expanded_ ssn.
