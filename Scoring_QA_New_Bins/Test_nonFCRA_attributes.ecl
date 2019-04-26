@@ -84,7 +84,9 @@ ip:='~';
 		
 		rpt29:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,a1,b1);
 
-		
+/*for biid2		rpt30:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,a1,b1);
+*/
+
 		//*********************************************************************************************************************
 		// rpt1_1:=Scoring_QA.FCRA_RiskView_xml_generic_attributes_v3(ip,b1,a1);
 	
@@ -144,6 +146,9 @@ ip:='~';
 		// rpt28_1:=Scoring_QA.FCRA_RiskView_batch_capitalone_attributes_v5(ip,b1,a1);
 
 		rpt29_1:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,b1,a1);
+
+/*for biid2				rpt30_1:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,b1,a1);
+*/
 
 			  compare_layout_stats := RECORD
 	    string file_version;
@@ -394,11 +399,11 @@ ip:='~';
    // jn;
 	 dedup_jn:=dedup(jn,all);
 	 
-	 	out_file := output(choosen(dedup_jn,all), ,'~RiskView_Attributes_Reports::out::AttributeDistribution' + a1, CSV(heading(single), quote('"')), overwrite,EXPIRE(10));
+	 	out_file := output(choosen(dedup_jn,all), ,'~nonFCRA_Attributes_Reports::out::AttributeDistribution' + a1, CSV(heading(single), quote('"')), overwrite,EXPIRE(10));
 			
 			
 				string out_file_layout := '';
-      outfile := dataset('~RiskView_Attributes_Reports::out::AttributeDistribution' + a1, typeof(out_file_layout));
+      outfile := dataset('~nonFCRA_Attributes_Reports::out::AttributeDistribution' + a1, typeof(out_file_layout));
 			
 
         no_of_records := count(outfile);
@@ -432,12 +437,12 @@ ip:='~';
 							
 						filtered_dedup_jn:=dedup_jn(file_version in ['ITA_V3_Capone' , 'RISKVIEW_v3_capone_prescreen' , 'RISKVIEW_v2_capone_prescreen', 'RISKVIEW_v5_capone_prescreen']);
 							
-			out_file1 := output(choosen(filtered_dedup_jn,all), ,'~RiskView_Attributes_Reports::out::AttributeDistribution1' + a1, CSV(heading(single), quote('"')), overwrite,EXPIRE(10));
+			out_file1 := output(choosen(filtered_dedup_jn,all), ,'~nonFCRA_Attributes_Reports::out::AttributeDistribution1' + a1, CSV(heading(single), quote('"')), overwrite,EXPIRE(10));
 			
 			
 				string out_file_layout1 := '';
 				
-      outfile1 := dataset('~RiskView_Attributes_Reports::out::AttributeDistribution1' + a1, typeof(out_file_layout));
+      outfile1 := dataset('~nonFCRA_Attributes_Reports::out::AttributeDistribution1' + a1, typeof(out_file_layout));
 			
 
         no_of_records1 := count(outfile1);
@@ -483,18 +488,22 @@ ip:='~';
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ a1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + a1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + a1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt5,rpt11,rpt12,rpt15,rpt16,rpt17,rpt18,rpt19,rpt26,rpt29) );
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt5,rpt11,rpt12,rpt15,rpt16,rpt17,rpt18,rpt19,rpt26,rpt29
+/*fpr biid2		,rpt30	*/					
+						) );
                 																		 
          old_bins:= if( not NOTHOR(STD.File.FileExists('~scoringqa::bss::stats::'+ b1) and STD.File.FileExists('~scoringqa::bss::averages::'+ b1)  and
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ b1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + b1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + b1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt5_1,rpt11_1,rpt12_1,rpt15_1,rpt16_1,rpt17_1,rpt18_1,rpt19_1,rpt26_1,rpt29_1) );
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt5_1,rpt11_1,rpt12_1,rpt15_1,rpt16_1,rpt17_1,rpt18_1,rpt19_1,rpt26_1,rpt29_1
+/*fpr biid2		,rpt30_1	*/					
+						) );
 
          
 	 send_file:=	
  	 fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.BSS_Success_list,
-// fileservices.SendEmailAttachText('Bridgett.braaten@lexisnexis.com',					
+// fileservices.SendEmailAttachText('isabel.ma@lexisnexisrisk.com',					
 					'BSS Attribute Distribution Report',
 																				'BUSINESS SERVICES SCORING(BSS)NonFCRA Attribute Distribution Report '+ a1 + ' vs ' + b1 + '\n Please view attachment.',
 																				 XtabOut[no_of_records].line ,
@@ -506,7 +515,7 @@ ip:='~';
 	          
   	 send_file1:=	
  	 fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.BSS_Capone_Specific_Success_list,
-// fileservices.SendEmailAttachText('Bridgett.braaten@lexisnexis.com',					
+// fileservices.SendEmailAttachText('isabel.ma@lexisnexisrisk.com',					
 					'BSS Attribute Distribution Report CAPONE Product specific ',
 					'BUSINESS SERVICES SCORING(BSS)Attribute Distribution Report'+ a1 + ' vs ' + b1 + '\n Please view attachment.',
 																				 XtabOut1[no_of_records1].line ,
