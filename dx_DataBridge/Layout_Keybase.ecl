@@ -7,8 +7,6 @@
 		unsigned4 global_sid;              //this is a unique source ID that will be coming from Orbit.
 		unsigned8 record_sid;              //this is a source specific unique and persistent record id (from SALT).  
 		BIPV2.IDlayouts.l_xlink_ids;
-		unsigned6	Bdid;
-		unsigned1	bdid_score;
 		unsigned6	did;
 	  unsigned1	did_score;
   	unsigned4 dt_first_seen;

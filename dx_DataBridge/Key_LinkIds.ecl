@@ -3,7 +3,7 @@
 EXPORT Key_LinkIds := MODULE
 
   // DEFINE THE INDEX
-  shared superfile_name  := $.keynames().LinkIds.QA;
+  shared superfile_name  := $.Names().LinkIds.QA;
   
   export Key := INDEX(
      BIPV2.IDlayouts.l_key_ids_bare, //{UltID,OrgID,SELEID,ProxID,POWID,EmpID,DotID},    
