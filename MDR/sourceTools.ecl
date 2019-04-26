@@ -317,6 +317,7 @@ MODULE
 	export src_MPRD_Individual           := 'QN'; 
 	export src_MMCP						           := '61';  // Michigan/Illinois Medicaid Custom Program
 	export src_NaturalDisaster_Readiness := 'NR';
+ export src_NeustarWireless           := 'N2';  // Neustar Wireless Phones
 	export src_NCOA                      := 'NC';
 	export src_NCPDP                     := 'J2';  // National Council for Prescription Drug Programs
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
@@ -1392,11 +1393,12 @@ export set_NonDerog_FCRA_sources_v50 := [
 	+ set_email
 	;
 
+ // Jira DF-24336 - added src_NeustarWireless
 	export set_Phonesplus := [
-	 src_InfutorCID									, src_Cellphones_Kroll					,src_Cellphones_Traffix				,src_Cellphones_Nextones
-	,src_Intrado										,src_Pcnsr											,src_Wired_Assets_Owned 			,src_Wired_Assets_Royalty
-	,src_Targus_White_pages					,src_Gong_History,src_Gong_Neustar								,src_InquiryAcclogs						,src_Ibehavior
-	,src_thrive_lt									, src_thrive_pd									,src_AlloyMedia_student_list	,src_Link2tek];
+	 src_InfutorCID									, src_Cellphones_Kroll					,src_Cellphones_Traffix			  	,src_Cellphones_Nextones
+	,src_Intrado										  ,src_Pcnsr											      ,src_Wired_Assets_Owned 		  	,src_Wired_Assets_Royalty
+	,src_Targus_White_pages	,src_Gong_History          ,src_Gong_Neustar							  	  ,src_InquiryAcclogs						  ,src_Ibehavior
+	,src_thrive_lt									 , src_thrive_pd								   	,src_AlloyMedia_student_list	, src_Link2tek             , src_NeustarWireless];
 	
 	export set_Phonesplus_Royalty := [src_Wired_Assets_Royalty];
 	
@@ -1914,6 +1916,7 @@ export set_NonDerog_FCRA_sources_v50 := [
   export set_NaturalDisaster_Readiness := [src_NaturalDisaster_Readiness ];
 	export set_NCPDP                     := [src_NCPDP                     ];
 	export set_NCOA                      := [src_NCOA                      ];
+ export set_NeustarWireless           := [src_NeustarWireless           ];
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
@@ -2440,7 +2443,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsMixed_Probation            (string  sr) := sr               in set_Mixed_Probation            ;
 	export SourceIsMixed_Utilities            (string  sr) := sr               in set_Mixed_Utilities            ;
 	export SourceIsMMCP						            (string  sr) := sr               in set_MMCP						           ;
-  export SourceIsNaturalDisaster_Readiness  (string  sr) := sr               in set_NaturalDisaster_Readiness  ;
+ export SourceIsNaturalDisaster_Readiness  (string  sr) := sr               in set_NaturalDisaster_Readiness  ;
+ export SourceIsNeustarWireless            (string  sr) := sr               in set_NeustarWireless            ;  // Jira DF-24336
 	export SourceIsNCOA                       (string  sr) := sr               in set_NCOA                       ;
 	export SourceIsNCPDP                      (string  sr) := sr               in set_NCPDP                      ;
 	export SourceIsNPPES                      (string  sr) := sr               in set_NPPES                      ;
@@ -2960,7 +2964,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NaturalDisaster_Readiness	,'NaturalDisaster Readiness'																 }
 		,{src_NCOA                      ,'NCOA'                                                      }
 		,{src_NCPDP											,'NCPDP'																										 }
-		,{src_NPPES                     ,'NPPES'                                                     }
+		,{src_NeustarWireless           ,'Neustar Wireless Phones'                                   }
+  ,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
     ,{src_OKC_Probate               ,'OKC Probate'                                               }
@@ -3466,7 +3471,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_MMCP						           => 'Michigan Medicaid Custom Program'                                      
 		,src_NCOA                      => 'NCOA'                                                 
 		,src_NaturalDisaster_Readiness => 'NaturalDisaster Readiness'														
-		,src_NCPDP										 => 'NCPDP'																								
+		,src_NCPDP										 => 'NCPDP'	
+  ,src_NeustarWireless           => 'Neustar Wireless Phones'
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       
