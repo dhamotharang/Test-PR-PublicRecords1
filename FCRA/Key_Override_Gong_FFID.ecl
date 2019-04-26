@@ -1,6 +1,4 @@
-import ut, data_services;
-
-
+﻿import ut, data_services, Gong_Neustar;
 
 ds := dataset('~thor_data400::base::override::fcra::qa::gong', fcra.Layout_Override_Gong_In,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 
@@ -20,5 +18,8 @@ end;
 
 kf := project(ds,proj_recs(left));
 
-export Key_Override_Gong_FFID := index(kf,{flag_file_id}, {kf},
+//DF-22458 FCRA Consumer Data Field Deprecation - thor_data400::key::override::fcra::gong::qa::ffid														
+ut.MAC_CLEAR_FIELDS(kf, kf_cleared, Gong_Neustar.Constants.fields_to_clear);
+
+export Key_Override_Gong_FFID := index(kf_cleared,{flag_file_id}, {kf_cleared},
 data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::gong::qa::ffid');

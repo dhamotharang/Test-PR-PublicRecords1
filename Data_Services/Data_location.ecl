@@ -34,7 +34,7 @@ export Prefix(string serviceName='NoNameGiven') := function
                                           ,thorlib.group() = 'thor400_44' => '~thor400_44::'
 																					,'~thor_data400::'),
 								'BogusPlaceHolder' => Data_Services.Default_Data_Location,	// Can add exceptions here
-								Data_Services.Default_Data_Location));
+								'~'));
 end;
 
 export person_header      := Prefix('person_header');

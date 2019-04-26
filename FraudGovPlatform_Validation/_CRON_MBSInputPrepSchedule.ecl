@@ -1,6 +1,6 @@
 ﻿import ut,_Control;
 
-EVERY_DAY_AT_230AM := '30 7 * * *';
+EVERY_DAY_AT_6PM := '0 23 * * *';
 IP				:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 RootDir		:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.MBSLandingZonePathBase_dev,	Constants.MBSLandingZonePathBase_prod);
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
@@ -35,7 +35,7 @@ lECL1 :=
 
 d:=FileServices.RemoteDirectory(IP, RootDir+version+'/', '*.dat');
 if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
-			: WHEN(CRON(EVERY_DAY_AT_230AM))
+			: WHEN(CRON(EVERY_DAY_AT_6PM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 																			,'FraudGov MBS Input Prep Schedule failure'
 																			,Constants.NOC_MSG

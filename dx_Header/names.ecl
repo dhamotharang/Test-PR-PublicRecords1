@@ -2,7 +2,7 @@ IMPORT data_services, doxie, STD;
 
 // common for all indices name prefix
 //string prefix := data_services.data_location.person_header + 'thor_data400::key::' + $.Constants.DataSetName + '::';
-string prefix := data_services.data_location.person_header + 'thor_data400::key::';
+string prefix := data_services.data_location.prefix ('person_header') + 'thor_data400::key::';
 
 // a default version is chosen so that the user of an index won't have to provide any specific value;
 // when building keys using existing procedures, an empty string will have to be specified. 
@@ -13,8 +13,8 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   SHARED string postfix := IF (file_version != '', '_' + file_version, '');
 
-  EXPORT i_rid := prefix + 'header.rid_header';
-  EXPORT i_rid_src := prefix + 'header_rid_srid_header'; //TODO: different name pattern 
+  EXPORT i_rid := prefix + 'header.rid';
+  EXPORT i_rid_src := prefix + 'header_rid_srid'; //TODO: different name pattern 
 
   // ----------------- wild -----------------
   EXPORT i_wild_ssn           := prefix + 'header.wild.ssn.did' + postfix;
