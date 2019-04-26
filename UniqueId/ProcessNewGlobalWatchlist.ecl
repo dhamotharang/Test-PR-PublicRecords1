@@ -149,7 +149,7 @@ SEQUENTIAL(
 		OUTPUT(newrec,,'~thor::uniqueid::newrecords.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 		OUTPUT(remrec,,'~thor::uniqueid::deletedrecords.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 		OUTPUT(watchliststats,,'~thor::uniqueid::watchliststats.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
-		OUTPUT(UniqueId.PubDates,,'~thor::uniqueid::listcounts.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
+
 		OUTPUT(scored,,'~thor::uniqueid::scores.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 		//OUTPUT(reconstruct(WatchListName NOT IN uniqueId.SetOfLists),named('unplanned')),	// should be 0
 		//OUTPUT(new2,,'~thor::uniqueid::new2::'+version,OVERWRITE),
@@ -159,6 +159,7 @@ SEQUENTIAL(
 		OUTPUT(newrecords,,'~thor::uniqueid::newrecords',OVERWRITE),
 		OUTPUT(watchliststats,,'~thor::uniqueid::watchliststats',OVERWRITE)
 	),
+	OUTPUT(UniqueId.PubDates,,'~thor::uniqueid::listcounts.csv',CSV(HEADING(SINGLE),QUOTE('"'),TERMINATOR('\r\n')),OVERWRITE),
 	PARALLEL(
 	UniqueId.UnsprayCSV('~thor::uniqueid::stats.csv'),
 	UniqueId.UnsprayCSV('~thor::uniqueid::likelymatches.csv'),
