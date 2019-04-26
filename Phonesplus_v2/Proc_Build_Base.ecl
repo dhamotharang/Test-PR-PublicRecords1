@@ -93,11 +93,8 @@ Add_dids := Fn_Add_Cellphone_Did(Propagate_rules);
 //-------Propagate Rules Again---------------------------------------------------------------
 Propagate_rules2 := Phonesplus_v2.Fn_Propagate_Rules(Add_dids);
 
-//Append Neustar Wireless Rules - Jira: DF-24336
-Neustar_Wireless_Rules_Appended := fn_Append_Neustar_Wireless_Rules(Propagate_rules2);
-
 //-------Reformat layout to be the same as old layout----------------------------------------
-Eliminate_duplications := Fn_Eliminate_Duplications(Neustar_Wireless_Rules_Appended)
+Eliminate_duplications := Fn_Eliminate_Duplications(Propagate_rules2)
 :persist('~thor_data400::persist::Phonesplus::eliminate_duplications');
 
 //-------Verify with Insurance and File One 
@@ -126,14 +123,17 @@ supress_data := Add_Header_Household (cellphone not in Phonesplus_v2.Set_Supress
 //-------Map v2 fields---------------------------------------------------------------------
 Map_v1_Fields := Fn_Map_v1_Fields(supress_data);
 
+//Append Neustar Wireless Rules - Jira: DF-24336
+Neustar_Wireless_Rules_Appended := fn_Append_Neustar_Wireless_Rules(Map_v1_Fields);
+
 //------Invoke Scrubs---------------------------------------------------------------------l
 
-scrubscall := Phonesplus_v2.Fn_Invoke_scrubs(Map_v1_Fields, pversion,emailList); 
+scrubscall := Phonesplus_v2.Fn_Invoke_scrubs(Neustar_Wireless_Rules_Appended, pversion,emailList); 
 //-------Rollup previous base file and current file
 
-split_Phonesplus := Map_v1_Fields(~(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty))));
+split_Phonesplus := Neustar_Wireless_Rules_Appended(~(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty))));
 
-split_Royalty := Map_v1_Fields(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
+split_Royalty := Neustar_Wireless_Rules_Appended(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
 
 Rollup_base := Fn_Rollup_Base(split_Phonesplus, 'phonesplus_main', pversion);
 
