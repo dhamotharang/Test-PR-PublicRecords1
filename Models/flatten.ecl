@@ -60,7 +60,7 @@ EXPORT Flatten( indata, outnames, fullyQualify=true, stringify=false, returnECL=
               #set(sz, roundup(log(power(2,(8*%@size%)))))
             #elseif(%'@type'% = 'integer')
               #set(sz, 1+roundup(log(power(2,(8*%@size%)))))
-            #elseif(%'@type'% in ['string','qstring','data','unicode'])
+            #elseif(%'@type'% in ['string','qstring','data'])
               #if(%@size% > 0)
                 #set(sz, %@size%)
               #else
@@ -150,7 +150,7 @@ EXPORT Flatten( indata, outnames, fullyQualify=true, stringify=false, returnECL=
             #set(sz, roundup(log(power(2,(8*%@size%)))))
           #elseif(%'@type'% = 'integer')
             #set(sz, 1+roundup(log(power(2,(8*%@size%)))))
-          #elseif(%'@type'% in ['string','qstring','data','unicode'])
+          #elseif(%'@type'% in ['string','qstring','data'])
             #if(%@size% > 0)
               #set(sz, %@size%)
             #else
@@ -208,7 +208,7 @@ EXPORT Flatten( indata, outnames, fullyQualify=true, stringify=false, returnECL=
           #if(stringify)
             #if(%'@type'% = 'boolean')
               #set(thisLine, '\tself.' + %'fieldname'% + ' := if(le.' + %'origfieldname'% + ', \'1\', \'0\');\n')
-            #elseif(%'@type'% in ['string','qstring','unicode'])
+            #elseif(%'@type'% in ['string','qstring'])
               #set(thisLine, '\tself.' + %'fieldname'% + ' := le.' + %'origfieldname'% + ';\n')
             #else
 
