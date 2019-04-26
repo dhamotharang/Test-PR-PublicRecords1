@@ -19,11 +19,6 @@
 
 	inputDs := dataset([], BIPV2.IdAppendLayouts.AppendInput) : stored('append_input');
 
-	postAppendLayout := {
-		inputDs.request_id,
-		BIPV2.IDlayouts.l_xlink_ids
-	};
-
 	withAppendRoxie := BIPV2.IdAppendRoxieLocal(inputDs
 		,scoreThreshold := score_threshold
 		,weightThreshold := weight_threshold
@@ -65,7 +60,7 @@
 	withAppend := if(from_thor, withAppendThor, withAppendRoxie);
 
 	postAppend := project(withAppend,
-		transform(BIPV2.IDAppendLayouts.svcAppendOut,
+		transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
 			self := left,
 			self := []));
 
@@ -73,6 +68,7 @@
 	                                           allBest := allBest, isMarketing := isMarketing);
 
 	res := if(includeBest, postBest, postAppend);
+	resv1 := project(res, transform(BIPV2.IdAppendLayouts.svcAppendOut, self := left));
 
 	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove);
 
@@ -81,12 +77,16 @@
 	// Catch failures so roxiepipe won't fail.
 	// Return dataset with request ids in case of failure, turning an error into a no hit.
 	catchRes := catch(res, skip);
-	failResult := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOut,
+	failResultv1 := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOut,
+	                      self.request_id := left.request_id, self := []));
+	failResult := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
 	                      self.request_id := left.request_id, self := []));
 				
 	parallel(
-		output(if(not exists(catchRes), failResult, res), named('Results'));
+		output(if(not exists(catchRes), failResult, res), named('Results_v2'));
 		output(if(includeRecords, postHeader, emptyHeader), named('Header'));
+		output(if(not exists(catchRes), failResultv1, resv1), named('Results'));
+
 	);
 
 	// parallel(
