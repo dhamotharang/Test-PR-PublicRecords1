@@ -1,6 +1,6 @@
-/* Contains Common Functions Used in SAOT */
+﻿/* Contains Common Functions Used in SAOT */
 
-IMPORT Address, UT;
+IMPORT Address;
 
 EXPORT Common := MODULE
 	// Takes in the Year/Month/Day from ESP results and formats it as YYYYMMDD
@@ -13,7 +13,7 @@ EXPORT Common := MODULE
 		RETURN(Combined);
 	END;
 	
-	EXPORT ParseSSN(STRING In_SSN) := IF((INTEGER)In_SSN <> 0, INTFORMAT((INTEGER)In_SSN, 9, 1), '');
+	EXPORT ParseSSN(STRING In_SSN, Integer1 Num_Length = 9) := IF((INTEGER)In_SSN <> 0, In_SSN, '');
 	
 	EXPORT ParseZIP(STRING In_Zip5) := IF((INTEGER)In_Zip5 <> 0, INTFORMAT((INTEGER)(In_Zip5[1..5]), 5, 1), '');
 	
