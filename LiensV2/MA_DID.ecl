@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////
 // Attribute 	: MA_DID
 
 // DEPENDENT ON : liensV2.Mapping_MA_party,
@@ -136,7 +136,7 @@ Business_Header_SS.MAC_Add_BDID_FLEX(preBDID_src,myset,
 						,mname										// mname
 						,lname										// lname
 						,													// Contact_SSN
-						,source										// Source Â– MDR.sourceTools
+						,source										// Source Ã‚â€“ MDR.sourceTools
 						,persistent_record_id			//Source_Record_Id
 						,true											//Src_Matching_is_priorty
 						);
@@ -178,6 +178,7 @@ rec_temp tappendSSN(temp_rec L) := transform
 self := L;
 self.temp_did := (unsigned6)L.did;
 self.temp_bdid := (unsigned6)L.bdid;
+self := [];
 end;
 
 file_party_SSN_temp := project(proj_tbdid,tappendSSN(left)); 
