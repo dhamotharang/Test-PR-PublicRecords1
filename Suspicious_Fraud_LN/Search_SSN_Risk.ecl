@@ -1,4 +1,4 @@
-IMPORT AutoKey, Death_Master, Doxie, Doxie_Files, Drivers, Header, Header_Quick, /*Inquiry_AccLogs,*/ MDR, Risk_Indicators, RiskWise, 
+IMPORT AutoKey, Death_Master, Doxie, dx_header, Drivers, Header, Header_Quick, /*Inquiry_AccLogs,*/ MDR, Risk_Indicators, RiskWise, 
 Suspicious_Fraud_LN, UT,AutoStandardI,DeathV2_Services, Relationship, STD;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
@@ -9,15 +9,15 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
   unsigned4 todays_date := STD.Date.Today ();
 
 	// SSN Indexed Keys Used
-	FullHeaderSSNKey := Doxie.Key_Header_SSN;
+	FullHeaderSSNKey := dx_header.key_ssn();
 	FastHeaderSSNKey := AutoKey.Key_SSN(Header_Quick.Str_AutoKeyName);
-	FullHeaderKey := Doxie.Key_Header;
+	FullHeaderKey := dx_header.key_header();
 	FastHeaderKey := Header_Quick.Key_DID;
 	DeathMasterKey := Death_Master.Key_SSN_SSA(isFCRA := FALSE);
-	MinorsKey := Doxie_Files.Key_Minors_Hash;
+	MinorsKey := dx_header.key_minors_hash();
 	RiskTableKey := Risk_Indicators.Key_SSN_Table_V4_2;
 	
-	headerBuild := CHOOSEN(Doxie.Key_Max_Dt_Last_Seen, 1);
+	headerBuild := CHOOSEN(dx_header.key_max_dt_last_seen(), 1);
 	headerBuildDate := ((STRING)headerBuild[1].Max_Date_Last_Seen)[1..6];
 	
 	sixMonths := Risk_Indicators.iid_constants.sixmonths;

@@ -5,6 +5,7 @@ IMPORT BIPV2_Company_Names;
 IMPORT lib_ziplib;
 IMPORT lib_stringlib;
 IMPORT RiskWise;
+IMPORT dx_Header;
 THISMODULE:=BizLinkFull;
 //�
   UNSIGNED e_proxid := 0 : STORED('proxid',FORMAT(SEQUENCE(1)));
@@ -73,7 +74,7 @@ dCnpName:=dCleaned;
 // If city is entered, but not state, determine if the city can only be in
 // one state and if so, add the state
 //---------------------------------------------------------------------------
-sNewState:=IF(sNewState_<>'',sNewState_,IF(sNewCity='','',address.Key_CityStChance(city_name=sNewCity and percent_chance>=99)[1].st));
+sNewState:=IF(sNewState_<>'',sNewState_,IF(sNewCity='','',dx_header.key_CityStChance()(city_name=sNewCity and percent_chance>=99)[1].st));
 //---------------------------------------------------------------------------
 // Derive the list of zip codes to use based on the radius
 //---------------------------------------------------------------------------

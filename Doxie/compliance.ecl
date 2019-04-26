@@ -109,7 +109,7 @@ EXPORT compliance := MODULE
 
 
   EXPORT MAC_FilterOutMinors (inrec, didfield = 'did', dobfield = '?', ok_to_show_minors) := FUNCTIONMACRO
-      IMPORT doxie_files, ut;
+      IMPORT dx_header, ut;
       
     // need to check for minors on zero DIDs that have a valid DOB.
     // if input layout to the macro doesn't contain a DOB field, just let the 
@@ -120,7 +120,7 @@ EXPORT compliance := MODULE
       local j0 := inrec ((unsigned6)didfield = 0);
     #END
         
-    local jj := JOIN (inrec((unsigned6)didfield > 0), doxie_files.key_minors_hash,
+    local jj := JOIN (inrec((unsigned6)didfield > 0), dx_header.key_minors_hash(),
                      KEYED (hash32((unsigned6)LEFT.didfield)=RIGHT.hash32_did) AND
                      KEYED ((unsigned6)LEFT.didfield = RIGHT.did) AND  //at build time, key contains only minors
                      ut.age (RIGHT.dob) < 18,            //check age since a few will turn 18 between builds

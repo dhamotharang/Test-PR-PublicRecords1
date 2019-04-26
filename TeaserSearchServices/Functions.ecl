@@ -1,4 +1,4 @@
-﻿import doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list;
+﻿import doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list, dx_header;
 
 export Functions := MODULE
 	
@@ -131,7 +131,7 @@ export Functions := MODULE
 																						self := left,
 																						self := []));
 																						
-		recs_hhid := join(recs_pres, doxie.Key_Did_HDid, keyed(left.did = right.did), 
+		recs_hhid := join(recs_pres, dx_header.key_did_hhid(), keyed(left.did = right.did), 
 											transform(doxie.layout_presentation, 
 																self.hhid := right.hhid,
 																self := left),
