@@ -23,6 +23,11 @@ export ReportService_Records := module
     string in_excluded_sources  := in_mod.excluded_sources;
 		BOOLEAN IncludeCorp:= TRUE;	// Defined to use in WorkPlace_Services.Functions.getParentCompany for shared code  in Batch and Report Services
 		
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+      EXPORT unsigned1 glb := in_mod.GLBPurpose;
+      EXPORT string32 application_type := in_mod.applicationtype;
+    END;
+
 		// Edit the input ExcludedSources string as needed for processing below.
     in_excluded_sources_edited := TRIM(Stringlib.StringToUpperCase(in_excluded_sources),
 	                                     LEFT,RIGHT,ALL);
@@ -294,7 +299,7 @@ export ReportService_Records := module
 		// 18. Get some additional detailed POE data for specific sources from the 
 		//     individual sources' did key file.
 		//     As of 01/04/11, we only need to get:
-		temp_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat);
+		temp_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat, mod_access);
 		
 		ds_best_cand_walldetail:= DEDUP(SORT(temp_best_cand_walldetail, did), did);
 		
@@ -324,7 +329,7 @@ export ReportService_Records := module
 		ds_best_cand_wpar_corpstat:= WorkPlace_Services.Functions.getParentCompany(ds_best_cand_wcorpstat, IncludeCorp);		
  		
 		// 20. Get any Professional License data.
-		ds_best_cand_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_best_cand_wpar_corpstat);
+		ds_best_cand_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_best_cand_wpar_corpstat, mod_access);
 
 	  // 21. Project interim poe_didkey_plus layout onto the ReportService output layout.
 		ds_rs_final := project(ds_best_cand_wprolic,

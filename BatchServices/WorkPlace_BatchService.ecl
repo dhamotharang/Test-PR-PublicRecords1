@@ -29,6 +29,9 @@ EXPORT WorkPlace_BatchService(useCannedRecs = 'false') := MACRO
   Pre_result := BatchServices.WorkPlace_Records(useCannedRecs);
 	ut.mac_TrimFields(Pre_result, 'Pre_result', result);	
 
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+  IF (exists(result), doxie.compliance.logSoldToTransaction(mod_access)); 
+
 	returnDetailedRoyalties	:= false : stored('ReturnDetailedRoyalties');	
 	royalties := Royalty.RoyaltyWorkplace.GetBatchRoyaltySet(result,,returnDetailedRoyalties);
 	

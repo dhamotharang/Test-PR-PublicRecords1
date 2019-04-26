@@ -274,7 +274,9 @@ EXPORT WorkPlace_Layouts := MODULE
     string12 did            := '';
     string8  date_last_seen := '';
     string60 license_type   := '';
-		string45 status         := '';
+    string45 status         := '';
+    unsigned4 global_sid    := 0;
+    unsigned8 record_sid    := 0;
 	END;
 
   // This layout is used to keep only the needed email data fields
@@ -283,6 +285,8 @@ EXPORT WorkPlace_Layouts := MODULE
     string200 clean_email    := '';
 		STRING2 email_src				 := '';
     string8   date_last_seen := '';
+    unsigned4 global_sid     := 0;
+    unsigned8 record_sid     := 0;
 	END;
 
   // This layout is used to combine the info on up to 3 emails recs for a did

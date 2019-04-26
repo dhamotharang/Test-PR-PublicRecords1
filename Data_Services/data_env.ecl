@@ -5,9 +5,11 @@ EXPORT data_env := MODULE
   EXPORT UNSIGNED1 iNonFCRA := 0;
   EXPORT UNSIGNED1 iFCRA := 1;
   EXPORT UNSIGNED1 iPRCT := 2;
+  EXPORT UNSIGNED1 iHIPAA := 4;
 
   EXPORT STRING GetString(UNSIGNED __env) := TRIM(CASE(__env,
                                                   iFCRA    => 'fcra',
                                                   iPRCT    => 'prct',
+                                                  iHIPAA   => 'hipaa',
                                                   ''));
 END;
