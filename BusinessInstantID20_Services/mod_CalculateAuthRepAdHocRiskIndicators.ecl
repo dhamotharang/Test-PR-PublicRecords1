@@ -1,4 +1,4 @@
-﻿IMPORT BusinessInstantID20_Services, Business_Risk_BIP, Risk_Indicators;
+﻿IMPORT BusinessInstantID20_Services, Risk_Indicators;
 EXPORT mod_CalculateAuthRepAdHocRiskIndicators( BusinessInstantID20_Services.iOptions Options,
                         DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) watchlist_table_authrep1,
                         DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) watchlist_table_authrep2,
@@ -215,23 +215,23 @@ EXPORT mod_CalculateAuthRepAdHocRiskIndicators( BusinessInstantID20_Services.iOp
       SHARED fuaAuthRep1 := CHOOSEN(DEDUP(SORT(IF(Options.include_ofac AND EXISTS(riAuthRep1(hri='32')),
                                       DATASET([{'A',risk_indicators.getFUADesc('A')}],risk_indicators.Layout_Desc)) &
                                     IF(Options.include_additional_watchlists AND EXISTS(riAuthRep1(hri='WL')),
-                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc)) & fua,hri,desc),hri),cnt);
+                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc)) & fua,hri,desc),hri),4);
       SHARED fuaAuthRep2 := CHOOSEN(DEDUP(SORT(IF(Options.include_ofac AND EXISTS(riAuthRep2(hri='32')),
                                       DATASET([{'A',risk_indicators.getFUADesc('A')}],risk_indicators.Layout_Desc)) &
                                     IF(Options.include_additional_watchlists AND EXISTS(riAuthRep2(hri='WL')),
-                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),cnt);
+                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),4);
       SHARED fuaAuthRep3 := CHOOSEN(DEDUP(SORT(IF(Options.include_ofac AND EXISTS(riAuthRep3(hri='32')),
                                       DATASET([{'A',risk_indicators.getFUADesc('A')}],risk_indicators.Layout_Desc)) &
                                     IF(Options.include_additional_watchlists AND EXISTS(riAuthRep3(hri='WL')),
-                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),cnt);
+                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),4);
       SHARED fuaAuthRep4 := CHOOSEN(DEDUP(SORT(IF(Options.include_ofac AND EXISTS(riAuthRep4(hri='32')),
                                       DATASET([{'A',risk_indicators.getFUADesc('A')}],risk_indicators.Layout_Desc)) &
                                     IF(Options.include_additional_watchlists AND EXISTS(riAuthRep4(hri='WL')),
-                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),cnt);
+                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),4);
       SHARED fuaAuthRep5 := CHOOSEN(DEDUP(SORT(IF(Options.include_ofac AND EXISTS(riAuthRep5(hri='32')),
                                       DATASET([{'A',risk_indicators.getFUADesc('A')}],risk_indicators.Layout_Desc)) &
                                     IF(Options.include_additional_watchlists AND EXISTS(riAuthRep5(hri='WL')),
-                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),cnt);   
+                                      DATASET([{'E',risk_indicators.getFUADesc('E')}],risk_indicators.Layout_Desc))& fua,hri,desc),hri),4);   
       EXPORT fuaAuthRep  := CASE(Rep_Whichone,
                                '1' => fuaAuthRep1,
                                '2' => fuaAuthRep2,
