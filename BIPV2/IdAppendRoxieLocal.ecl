@@ -134,6 +134,16 @@ topScores :=
 		self.powid      := if(exists(topPow),  topPow[1].powid,   0);
 		self.powWeight  := if(exists(topPow),  topPow[1].weight,  0);
 		self.powScore   := if(exists(topPow),  topPow[1].score,   0);
+		self.parent_proxid := if(exists(topProx), topProx[1].parent_proxid, 0);
+		self.sele_proxid := map(exists(topProx) => topProx[1].sele_proxid,
+		                        exists(topSele) => topSele[1].sele_proxid,
+		                        0);
+		self.org_proxid := map(exists(topProx) => topProx[1].org_proxid,
+		                        exists(topSele) => topSele[1].org_proxid,
+		                        0);
+		self.ultimate_proxid := map(exists(topProx) => topProx[1].ultimate_proxid,
+		                        exists(topSele) => topSele[1].ultimate_proxid,
+		                        0);
 		self.request_id := left.uniqueid;
 		self := left;
 		self := []));
