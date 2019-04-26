@@ -1,6 +1,6 @@
 IMPORT $, iesp, doxie, USPIS_HotList, Advo, header, ut, risk_indicators;
 
-header_rec := IdentityFraud_Services.layouts.slim_header;
+header_rec := $.layouts.slim_header;
 
 adv := $.Constants.RiskCodes.Address; //Volassis, aka ADVO
 
@@ -38,8 +38,8 @@ end;
 
 EXPORT $.layouts.address_did_rec GetAddressIndicators (
   dataset (header_rec) header_ext,
-	dataset (IdentityFraud_Services.layouts.id_fraud_attributes) fraud_indices,
-  IdentityFraud_Services.IParam._identityfraudreport param
+	dataset ($.layouts.id_fraud_attributes) fraud_indices,
+  $.IParam._identityfraudreport param
 	) := FUNCTION
 
   // ... address needs to be rolled up; auxiliary layouts for slimmming and rollup
@@ -145,7 +145,7 @@ EXPORT $.layouts.address_did_rec GetAddressIndicators (
 													limit(0),keep(1));
 	
 	// Format to iesp layout and add NLR indicators
-  layouts.address_did_rec SetAssociatedAddresses (address_hri_rec L) := transform
+  $.layouts.address_did_rec SetAssociatedAddresses (address_hri_rec L) := transform
     Self.did := L.did;
     Self.Address := iesp.ECL2ESP.SetAddress (L.prim_name, L.prim_range, L.predir, L.postdir,
                      L.suffix, L.unit_desig, L.sec_range, L.city_name,
@@ -157,7 +157,7 @@ EXPORT $.layouts.address_did_rec GetAddressIndicators (
 
     // get source categories' counts:
     R := project (L.sources, transform (header_rec, Self := Left, Self := []));
-    Self.Sources := choosen (Functions.GetSources (R), iesp.Constants.IFR.MaxSourcetypes);
+    Self.Sources := choosen ($.Functions.GetSources (R), iesp.Constants.IFR.MaxSourcetypes);
     // overal count:
     Self.SourceCount := if (param.count_by_source, count (dedup (R, src, all)), count (dedup (R, _type, all)));
 
@@ -165,22 +165,22 @@ EXPORT $.layouts.address_did_rec GetAddressIndicators (
     ISC := Header.constants.no_longer_reported;
     ICRN := IdentityFraud_Services.Constants.RiskCodes.NLR;
     indicators := L.not_in_bureau;
-    ri_nlr := if (indicators & ISC.addr_not_in_en = ISC.addr_not_in_en, Functions.GetRiskIndicator (ICRN.ADDRESS_EN)) +
-              if (indicators & ISC.addr_not_in_eq = ISC.addr_not_in_eq, Functions.GetRiskIndicator (ICRN.ADDRESS_EQ)) +
-              if (indicators & ISC.addr_not_in_tn = ISC.addr_not_in_tn, Functions.GetRiskIndicator (ICRN.ADDRESS_TU));
+    ri_nlr := if (indicators & ISC.addr_not_in_en = ISC.addr_not_in_en, $.Functions.GetRiskIndicator (ICRN.ADDRESS_EN)) +
+              if (indicators & ISC.addr_not_in_eq = ISC.addr_not_in_eq, $.Functions.GetRiskIndicator (ICRN.ADDRESS_EQ)) +
+              if (indicators & ISC.addr_not_in_tn = ISC.addr_not_in_tn, $.Functions.GetRiskIndicator (ICRN.ADDRESS_TU));
 
     // take all RIs together
     _indicators_deduped := dedup (L.hri_address, hri, all); // can contain dupes, see #70450
 		// OSS platform issue - bug 146931
     // _indicators := if(exists (L.hri_address), project (_indicators_deduped, Functions.TransformRiskIndicators (Left))) + ri_nlr;
-    _indicators := if (count (L.hri_address) + nofold (1) > 1, project (_indicators_deduped, Functions.TransformRiskIndicators (Left))) + ri_nlr;
+    _indicators := if (count (L.hri_address) + nofold (1) > 1, project (_indicators_deduped, $.Functions.TransformRiskIndicators (Left))) + ri_nlr;
 
     Self.RiskIndicators := choosen (_indicators, iesp.Constants.IFR.MaxIndicators);
   end;
   ri_base := project (addr_fraud_hri, SetAssociatedAddresses (left));
 
   // (conditionally) attach USPIS indicators
-  layouts.address_did_rec AppendUSPISIndicators (layouts.address_did_rec L, USPIS_HotList.key_addr_search_zip R) := transform
+  $.layouts.address_did_rec AppendUSPISIndicators ($.layouts.address_did_rec L, USPIS_HotList.key_addr_search_zip R) := transform
     boolean is_matched := (R.zip != '');
     string _text := if (is_matched, if (R.comments != '', R.comments, $.Constants.USPIS_INDICATOR_TEXT), '');
     string formatted_date :=  R.dt_last_reported[5..6] + '/' + R.dt_last_reported[7..8] + '/' +R.dt_last_reported[1..4] ;
@@ -204,15 +204,15 @@ EXPORT $.layouts.address_did_rec GetAddressIndicators (
   ri_base_uspis := if (param.include_ri_uspis, ri_uspis, ri_base);
 
   // (conditionally) attach ADVO indicators
-  layouts.address_did_rec AppendADVOIndicators (layouts.address_did_rec L, Advo.Key_Addr1 R) := transform
+  $.layouts.address_did_rec AppendADVOIndicators ($.layouts.address_did_rec L, Advo.Key_Addr1 R) := transform
     integer vac := if (L.Address.StreetName[1..6] = 'PO BOX', adv.ADVO_VACANT_PO, adv.ADVO_VACANT);
-    ri_advo := if (R.address_vacancy_indicator   = 'Y', Functions.GetRiskIndicator (vac)) +
-               if (R.seasonal_delivery_indicator = 'Y', Functions.GetRiskIndicator (adv.ADVO_SEASONAL)) +
-               if (R.owgm_indicator = 'Y',              Functions.GetRiskIndicator (adv.ADVO_POBOX)) +
-               if (R.drop_indicator = 'C',              Functions.GetRiskIndicator (adv.ADVO_CMRA)) +
-               if (R.drop_indicator = 'Y',              Functions.GetRiskIndicator (adv.ADVO_IDA)) +
-               if (R.residential_or_business_ind != '', Functions.GetRiskIndicator (AdvoCodeByAddressType (R.residential_or_business_ind))) +
-               if (R.mixed_address_usage != '',         Functions.GetRiskIndicator (GetAdvoCode (R.residential_or_business_ind, R.mixed_address_usage)));               // TODO: ADVO has college as well
+    ri_advo := if (R.address_vacancy_indicator   = 'Y', $.Functions.GetRiskIndicator (vac)) +
+               if (R.seasonal_delivery_indicator = 'Y', $.Functions.GetRiskIndicator (adv.ADVO_SEASONAL)) +
+               if (R.owgm_indicator = 'Y',              $.Functions.GetRiskIndicator (adv.ADVO_POBOX)) +
+               if (R.drop_indicator = 'C',              $.Functions.GetRiskIndicator (adv.ADVO_CMRA)) +
+               if (R.drop_indicator = 'Y',              $.Functions.GetRiskIndicator (adv.ADVO_IDA)) +
+               if (R.residential_or_business_ind != '', $.Functions.GetRiskIndicator (AdvoCodeByAddressType (R.residential_or_business_ind))) +
+               if (R.mixed_address_usage != '',         $.Functions.GetRiskIndicator (GetAdvoCode (R.residential_or_business_ind, R.mixed_address_usage)));               // TODO: ADVO has college as well
                // TODO: ADVO has college as well
 
     Self.RiskIndicators := choosen (L.RiskIndicators + if (R.zip != '' and exists (ri_advo), ri_advo),

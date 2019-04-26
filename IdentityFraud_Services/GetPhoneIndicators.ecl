@@ -3,7 +3,7 @@ IMPORT $, doxie, iesp, Risk_Indicators, moxie_phonesplus_server;
 ifr := iesp.identityfraudreport;
 
 // fictitious dataset representing Gong entry, when it is not included into the header yet
-layouts.slim_header CreateGongEntry () := transform
+$.layouts.slim_header CreateGongEntry () := transform
   Self.src := 'PH';
   Self._type := 'PHONE';
   Self := []; // don't care about anything else
@@ -12,8 +12,8 @@ ph_fabricated := dataset ([CreateGongEntry ()]);
 
 EXPORT GetPhoneIndicators (
   dataset (doxie.layout_best) bestrecs,
-  dataset (IdentityFraud_Services.layouts.slim_header) header_recs,
-  IdentityFraud_Services.IParam._identityfraudreport param) := FUNCTION
+  dataset ($.layouts.slim_header) header_recs,
+  $.IParam._identityfraudreport param) := FUNCTION
  
   // ===================================================================
   // =========================== Get phones  ===========================
@@ -165,11 +165,11 @@ EXPORT GetPhoneIndicators (
     header_pre_phones.not_in_bureau; // always zero for phones
   end;
 
-  phone_count_rec GetHeaderPhonesCounts (layouts.slim_header L, dataset (layouts.slim_header) R) := transform
+  phone_count_rec GetHeaderPhonesCounts ($.layouts.slim_header L, dataset ($.layouts.slim_header) R) := transform
     Self.did := L.did;
     Self.phone := L.phone;
     // get source categories' counts.  Add fabricated Gong entry (in case if it's not there)
-    Self.Sources := choosen (Functions.GetSources (R + ph_fabricated), iesp.Constants.IFR.MaxSourcetypes);
+    Self.Sources := choosen ($.Functions.GetSources (R + ph_fabricated), iesp.Constants.IFR.MaxSourcetypes);
     // overal count:
     Self.count := if (param.count_by_source, count (dedup (R, src, all)), count (Self.Sources));
     Self.not_in_bureau := L.not_in_bureau;
@@ -190,7 +190,7 @@ EXPORT GetPhoneIndicators (
     Self._Type := L._Type;
   end;
 
-  layouts.phone_did_rec SetCounts (phones_hri_rec L, phone_count_rec R) := transform
+  $.layouts.phone_did_rec SetCounts (phones_hri_rec L, phone_count_rec R) := transform
     Self.did := L.did;
     Self.Phone10 := L.phone;
     Self.ListedName := L.listed_name;
@@ -206,14 +206,14 @@ EXPORT GetPhoneIndicators (
     // also hardcode sources and counts for PP-phones for the time being; temporarily set PHONES+ source
     Self.Sources := if (L.is_phonesplus,
                         dataset ([{'PHONE', 1}], ifr.t_IFRLinkIdSources),
-                        if (R.count = 0, Functions.GetSources (ph_fabricated), R.Sources));
+                        if (R.count = 0, $.Functions.GetSources (ph_fabricated), R.Sources));
     Self.Sourcecount := if (R.count = 0 or L.is_phonesplus, 1, R.count); 
 
     Self.DateFirstSeen := iesp.ECL2ESP.toDateYM (L.phone_first_seen);
     Self.DateLastSeen := iesp.ECL2ESP.toDateYM (L.phone_last_seen);
     
     // take previously calculated RIs
-    all_inds := project (L.hri_phone, Functions.TransformRiskIndicators (Left));
+    all_inds := project (L.hri_phone, $.Functions.TransformRiskIndicators (Left));
     selected_inds := choosen (sort (all_inds, -all_inds.Rank), $.Constants.MAX_PHONES_INDICATORS);
     Self.RiskIndicators := if (exists (L.hri_phone), selected_inds);
   end;
