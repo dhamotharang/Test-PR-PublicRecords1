@@ -166,6 +166,32 @@ EXPORT product_files := MODULE
 		// "INTERNAL: Expected a parent/container context.  Likely to be caused by executing something 
 		// invalid inside a NOTHOR." Use the superkey reference for now.
 		// *** adding INDEPENDENT to get_EnvVariable call to avoid referenced error above ***
+
+//----------------------------------------------RoxieVersionPersonHeader-----------------------------------------------------------------
+
+		EXPORT r_doxie_key_header_superkeyname_raw := 'batchr3::monitor::personheader_qa_' + doxie.version_superkey;
+		EXPORT r_doxie_key_header_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + r_doxie_key_header_superkeyname_raw;
+
+		// Define a Duplicate Index; see the ECL Language Guide, p. 68
+		SHARED r_doxie_key_header_undist := 
+			pull(INDEX(
+				doxie.key_header,  
+				// doxie_key_header_keyname
+				r_doxie_key_header_superkeyname
+			))(did <> 0);
+			
+		SHARED r_doxie_key_header :=
+			DISTRIBUTE(
+				PROJECT(r_doxie_key_header_undist, layout_base_header), 
+				HASH64(did)
+			);
+      
+		EXPORT r_doxie_key_header_slim := DEDUP(SORT(r_doxie_key_header, 
+																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
+																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
+																		: INDEPENDENT; //PERSIST('acctmon::header::doxie_key_header_slim');
+
+//----------------------------------------------EndRoxieVersionPersonHeader------------------------------------------------------------------
 		
 		EXPORT header_build_version         := TRIM( did_add.get_EnvVariable('header_build_version') ):INDEPENDENT;
 
@@ -193,6 +219,7 @@ EXPORT product_files := MODULE
 																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
 																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
 																		: INDEPENDENT; //PERSIST('acctmon::header::doxie_key_header_slim');
+
 		
 		// DIDUPDATE FILES
 		EXPORT doxie_key_rid_did_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::rid_did';
