@@ -87,7 +87,8 @@ export Search_Service := MACRO
 	// Other PII
 		tmpDOB := iesp.ECL2ESP.DateToString(search.DOB);
 	STRING8 DateOfBirth :=  IF(tmpDOB = '00000000', '', tmpDOB);
-	STRING9 SSN := search.SSN;
+	STRING4 SSNLast4 := search.SSNLast4;
+  STRING9 SSN := if(search.SSN = '' and SSNLast4 <> '', SSNLast4, search.SSN);
 	STRING10 HomePhone := search.HomePhone;
 	STRING10 WorkPhone := search.WorkPhone;
 	STRING50 Email := search.Email;
