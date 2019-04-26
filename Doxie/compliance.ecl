@@ -107,6 +107,9 @@ EXPORT compliance := MODULE
          preGLBRestrict (DataRestrictionMask) => FALSE,
          dateOK (nonglb_last_seen, first_seen));
 
+  EXPORT boolean minor_ok (unsigned1 age, boolean ok_to_show_minors) := //aka minorOK
+				ok_to_show_minors OR (age = 0) or (age >= 18);
+
 
   EXPORT MAC_FilterOutMinors (inrec, didfield = 'did', dobfield = '?', ok_to_show_minors) := FUNCTIONMACRO
       IMPORT dx_header, ut;

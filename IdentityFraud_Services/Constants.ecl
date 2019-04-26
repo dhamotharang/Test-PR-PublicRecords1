@@ -20,7 +20,9 @@ export Constants := MODULE
 
   // in case of search, we want closer than usual match
   export integer1 MAX_PENALTY_SCORE := 5;
-	
+
+  export unsigned1 MAX_HRI := 10;
+
   // indicators' types
   export ITYPES := MODULE
     export unsigned1 T_DID := 0;
