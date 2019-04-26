@@ -427,13 +427,12 @@ export Functions := MODULE
 			self.County := L.county_name;
 			self.PostalCode := '';
 			self.StateCityZip := Address.Addr2FromComponents(l.city_name, l.st, l.zip);
-			//To match TeaserSearchServices.Search_Records
 			dt_vendor_last_seen := iesp.ECL2ESP.toDateYM((unsigned3)L.dt_vendor_last_reported); 
 			dt_last_seen := iesp.ECL2ESP.toDateYM((unsigned3)L.dt_last_seen);
-			self.DateLastSeen := dt_vendor_last_seen;
-			self.VendorDateLastSeen.Year := dt_last_seen.year;
-			self.VendorDateLastSeen.Month := dt_last_seen.month;
-			self.VendorDateLastSeen.Day := dt_last_seen.day;
+			self.DateLastSeen := dt_last_seen;
+			self.VendorDateLastSeen.Year := dt_vendor_last_seen.year;
+			self.VendorDateLastSeen.Month := dt_vendor_last_seen.month;
+			self.VendorDateLastSeen.Day := dt_vendor_last_seen.day;
 			self.VendorDateFirstSeen := [];
 			self.Phones := if(IncludePhones OR IncludePhoneNumber, L.phones, dataset([], iesp.share.t_PhoneInfo));		
 		end;
