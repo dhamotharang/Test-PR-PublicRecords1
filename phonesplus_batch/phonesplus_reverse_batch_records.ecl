@@ -1,4 +1,4 @@
-IMPORT phonesplus_batch, Royalty, Gateway, phonesplus_v2, Phones, MDR, doxie, Gong, Header, Risk_Indicators, ut, std;
+﻿IMPORT phonesplus_batch, Royalty, Gateway, phonesplus_v2, Phones, MDR, doxie, Gong, Header, Risk_Indicators, ut, std;
 //AutoKey
 
 //Royalty.Layouts.RoyaltyForBatch
@@ -24,9 +24,9 @@ IMPORT phonesplus_batch, Royalty, Gateway, phonesplus_v2, Phones, MDR, doxie, Go
 
 		//get the phonesplus records
 		phonesplus_batch.mac_get_ppl_by_phone(f_in_seq, f_out_ppl
-																					,optionsIn.GLBPurpose
-																					,optionsIn.DPPAPurpose
-																					,optionsIn.IndustryClass
+																					,optionsIn.glb
+																					,optionsIn.dppa
+																					,optionsIn.industry_class
 																					, //min_confidencescore, use macro default of 11
 																					,doxie.DataRestriction.fixed_DRM)
 		
