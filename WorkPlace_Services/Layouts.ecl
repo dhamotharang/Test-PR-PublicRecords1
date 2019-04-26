@@ -76,6 +76,8 @@ EXPORT Layouts := MODULE
 		string4   sos_reg_agent_zip4    := '',
 		string60  sos_place_incorp      := '';
 		string10  sos_fein              := '';
+    unsigned4 global_sid := 0;
+		unsigned8 record_sid := 0;
   END;
 
 	export poe_crim_ind :=

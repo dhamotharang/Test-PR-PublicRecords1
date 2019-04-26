@@ -1,12 +1,12 @@
-﻿IMPORT AutoStandardI, mdr, codes;
+﻿IMPORT AutoStandardI, codes, data_services, mdr;
 
 EXPORT compliance := MODULE
  
   // from doxie.mac_header_field_declare() -- i.e. translated
-  EXPORT GetGlobalDataAccessModule () := FUNCTIONMACRO
+  EXPORT GetGlobalDataAccessModule (isFCRA = false) := FUNCTIONMACRO
     IMPORT STD;
     // a hack: DPM and DRM are not provided
-    local gm := AutoStandardI.GlobalModule();
+    local gm := AutoStandardI.GlobalModule(isFCRA);
     local access := MODULE (doxie.IDataAccess)
       EXPORT unsigned1 glb := GLB_Purpose;
       EXPORT unsigned1 dppa := DPPA_Purpose;
@@ -19,12 +19,17 @@ EXPORT compliance := MODULE
       EXPORT boolean no_scrub := ^.no_scrub;
       EXPORT unsigned3 date_threshold := dateVal;
       EXPORT boolean suppress_dmv := suppressDMVInfo_value;
+      EXPORT boolean lexid_source_optout := gm.LexIdSourceOptout;
+      // "unsigned", so that we could accommodate different log levels, if needed
+      EXPORT boolean log_record_source := ~gm.isFCRAval AND gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
       EXPORT boolean show_minors := gm.IncludeMinors OR (GLB_Purpose = 2);
       EXPORT string ssn_mask := ssn_mask_value;
       EXPORT unsigned1 dl_mask :=  dl_mask_val;
       EXPORT unsigned1 dob_mask := dob_mask_value;
       EXPORT unsigned1 reseller_type := ^.reseller_type;
       EXPORT unsigned1 intended_use := ^.intended_use;
+      EXPORT string transaction_id := if(gm.TransactionID <> '', gm.TransactionID, gm.BatchUID); 
+      EXPORT unsigned6 global_company_id := gm.GlobalCompanyId;
     END;
     RETURN access;
   ENDMACRO;
@@ -45,12 +50,17 @@ EXPORT compliance := MODULE
       EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gm,AutoStandardI.InterfaceTranslator.no_scrub.params));
       EXPORT unsigned3 date_threshold := AutoStandardI.InterfaceTranslator.dateVal.val(project(gm,AutoStandardI.InterfaceTranslator.dateVal.params));
       EXPORT boolean suppress_dmv := gm.SuppressDMVInfo;
+      EXPORT boolean lexid_source_optout := gm.LexIdSourceOptout;
+      // "unsigned", so that we could accommodate different log levels, if needed
+      EXPORT boolean log_record_source := ~gm.isFCRAVal AND gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0); 
       EXPORT boolean show_minors := gm.IncludeMinors OR (glb_auto = 2);
       EXPORT string ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
       EXPORT unsigned1 dl_mask :=  AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.dl_mask_val.params));
       EXPORT unsigned1 dob_mask := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params));
       EXPORT unsigned1 reseller_type := AutoStandardI.InterfaceTranslator.reseller_type_value.val(project(gm,AutoStandardI.InterfaceTranslator.reseller_type_value.params));;
       EXPORT unsigned1 intended_use := AutoStandardI.InterfaceTranslator.intended_use_value.val(project(gm,AutoStandardI.InterfaceTranslator.intended_use_value.params));
+      EXPORT string transaction_id := if(gm.TransactionID <> '', gm.TransactionID, gm.BatchUID); 
+      EXPORT unsigned6 global_company_id := gm.GlobalCompanyId;
     END;
     RETURN access;
   ENDMACRO;
@@ -193,5 +203,16 @@ EXPORT compliance := MODULE
 
     // to exclude utility sources:
     EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';
+
+    // CCPA logging
+    EXPORT logSoldToSources(ds_in, mod_access, did_field='did') := MACRO
+      doxie.log.logSoldToSources(ds_in, mod_access, did_field);   
+    ENDMACRO;
+
+     // CCPA logging
+    EXPORT logSoldToTransaction(mod_access, env_flag = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
+      RETURN doxie.log.logSoldToTransaction(mod_access, env_flag);
+    ENDMACRO;
+
 
 END;
