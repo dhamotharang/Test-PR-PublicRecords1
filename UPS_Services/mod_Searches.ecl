@@ -1,4 +1,4 @@
-﻿import autoheaderi, autostandardi,BIPV2, doxie, doxie_cbrs, iesp, address, UPS_Services, ut;
+﻿import autoheaderi, autostandardi, BIPV2, doxie, iesp, address, UPS_Services, ut, dx_header;
 
 
 export mod_Searches := MODULE
@@ -156,7 +156,7 @@ export mod_Searches := MODULE
 					left.state <> '', 	//if state is given, use it
 					left.state,
 					if(left.city <> '',	//if state empty and city given, guess the state.
-					address.Key_CityStChance(left.state = '' and keyed(city_name = left.city) and percent_chance > 50)[1].st, //no reason not to guess, but > 50 makes me deterministic
+					dx_header.key_CityStChance()(left.state = '' and keyed(city_name = left.city) and percent_chance > 50)[1].st, //no reason not to guess, but > 50 makes me deterministic
 					left.state //blank
 					)
 				);

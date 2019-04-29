@@ -1,4 +1,4 @@
-IMPORT BatchShare, Didville, Govt_Collections_Services;
+﻿IMPORT BatchShare, Didville, Govt_Collections_Services;
 
 EXPORT fn_getBestADLRecs(dataset(Govt_Collections_Services.Layouts.batch_working) ds_batch_in,
                         Govt_Collections_Services.IParams.BatchParams in_mod
@@ -24,9 +24,9 @@ EXPORT fn_getBestADLRecs(dataset(Govt_Collections_Services.Layouts.batch_working
 					appends_value      := 'BEST_ALL,VERIFY_ALL',
 					verify_value       := 'BEST_ALL,VERIFY_ALL',
 					glb_flag           := TRUE,
-					glb_purpose_value  := in_mod.GLBPurpose,
-					appType            := in_mod.ApplicationType,
-					include_minors     := in_mod.IncludeMinors,
+					glb_purpose_value  := in_mod.glb,
+					appType            := in_mod.application_type,
+					include_minors     := in_mod.show_minors,
 					IndustryClass_val  := in_mod.industry_class,
 					DRM_val            := in_mod.DataRestrictionMask,
 					GetSSNBest         := in_mod.GetSSNBest

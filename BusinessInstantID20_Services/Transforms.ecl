@@ -1,5 +1,5 @@
 ﻿
-IMPORT Business_Risk_BIP, STD, ut, LNSmallBusiness, BusinessInstantID20_Services, iesp, Risk_Indicators;
+IMPORT Business_Risk_BIP, STD, BusinessInstantID20_Services, iesp, Risk_Indicators;
 
 EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 
@@ -2091,7 +2091,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				  DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ri2, 
 				  DATASET(BusinessInstantID20_Services.layouts.OFACAndWatchlistLayoutFlat) ri3 ) :=
 			TRANSFORM
-				bus_verification  := BusinessInstantID20_Services.mod_CalculateBVI( ri, Options.useSBFE );
+				bus_verification  := BusinessInstantID20_Services.mod_CalculateBVI( ri, Options.useSBFE, ri3 );
 				_risk_indicators  := BusinessInstantID20_Services.Mod_CalculateBusinessAdHocRiskIndicators( ri2, ri, Options, ri3,5).riBusiness;
 				sbfe_verification := BusinessInstantID20_Services.fn_CalculateSBFEVerification( ri, Options.useSBFE );
 				bus2exec_index    := BusinessInstantID20_Services.mod_CalculateBusiness2Exec( ri, Options.useSBFE ).rw_result;

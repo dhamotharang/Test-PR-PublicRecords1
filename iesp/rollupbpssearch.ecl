@@ -49,6 +49,7 @@ export t_RollupBpsSearchDate := record
 	iesp.share.t_Date DOB {xpath('DOB')};
 	integer Age {xpath('Age')};
 	iesp.share.t_Date DOD {xpath('DOD')};
+	iesp.share.t_Identity.IsLimitedAccessDMF;
 	string1 Deceased {xpath('Deceased')}; //values['U','Y','N','']
 	integer AgeAtDeath {xpath('AgeAtDeath')};
 	string1 DeathVerificationCode {xpath('DeathVerificationCode')};

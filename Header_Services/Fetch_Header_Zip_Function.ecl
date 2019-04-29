@@ -1,7 +1,7 @@
 
-import ut,autokey, doxie, NID;
+import doxie, dx_header, NID;
 
-j := doxie.Key_Header_Zip;
+j := dx_header.key_zip();
 
 
 doxie.layout_references xtz(j r) := TRANSFORM

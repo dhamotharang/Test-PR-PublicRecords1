@@ -32,17 +32,28 @@ export IdAppendLayouts := module
 		baseLayout.seleid,
 	};
 
+	export parentIds := {
+		baselayout.parent_proxid;
+		baselayout.sele_proxid;
+		baselayout.org_proxid;
+		baselayout.ultimate_proxid;
+	};
+
 	export IdsOnly := {
 		appendInput.request_id,
 		BIPV2.IDlayouts.l_xlink_ids,
+		parentIds,
+	};
+
+	shared errorRec := {
+		integer error_code := 0,
+		string error_msg := '',
 	};
 
 	// Error code and message added to capture soapcall errors.
 	export IdsOnlyOutput := {
-		appendInput.request_id,
-		BIPV2.IDlayouts.l_xlink_ids,
-		integer error_code := 0,
-		string error_msg := '',
+		IdsOnly,
+		errorRec,
 	};
 
 	// This is the layout returned by BizLinkFull.svcAppend service. If Best is not requested,
@@ -81,17 +92,51 @@ export IdAppendLayouts := module
 		baselayout.contact_did,
 	};
 
-	// BizLinkFull.svcAppend service also returns a dataset of this layout to return the header records.
-	export svcAppendRecsOut := {
+	// adding in parent_proxid, sele_proxid, org_proxid, ultimate_proxid, error_code
+	export svcAppendOutv2 := {
 		appendInput.request_id,
-		IdsOnly or baseLayout,
+		BIPV2.IdLayouts.l_xlink_ids,
+		parentIds,
+		boolean isActive,
+		boolean isDefunct,
+		baseLayout.company_name,
+		baseLayout.prim_range,
+		baseLayout.predir,
+		baseLayout.prim_name,
+		baseLayout.addr_suffix,
+		baseLayout.postdir,
+		baseLayout.unit_desig,
+		baseLayout.sec_range,
+		baseLayout.p_city_name,
+		baseLayout.v_city_name,
+		baseLayout.st,
+		baseLayout.zip,
+		baseLayout.zip4,
+		baseLayout.company_phone,
+		baseLayout.company_fein,
+		baseLayout.company_url,
+		baseLayout.company_incorporation_date,
+		baseLayout.duns_number,
+		baseLayout.company_sic_code1,
+		baseLayout.company_naics_code1,
+		typeof(baseLayout.dba_name) dba_name,
+		typeof(baseLayout.cnp_btype) company_btype,
+		typeof(baseLayout.fname) contact_fname,
+		typeof(baseLayout.mname) contact_mname,
+		typeof(baseLayout.lname) contact_lname,
+		typeof(baseLayout.contact_job_title_derived) contact_job_title,
+		baselayout.contact_did,
+		errorRec,
 	};
 
-	// Error code and message added to capture soapcall errors.
+	// BizLinkFull.svcAppend service also returns a dataset of this layout to return the header records.
+	export svcAppendRecsOut := {
+		{IdsOnly - parentIds} or baseLayout,
+	};
+
+	// This is the layout returned by the interface.
 	export AppendOutput := {
-		svcAppendOut,
-		integer error_code := 0,
-		string error_msg := '',
+		svcAppendOutv2,
 	};
 
 	// Error code and message added to capture soapcall errors.

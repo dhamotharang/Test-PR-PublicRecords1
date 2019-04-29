@@ -28,7 +28,7 @@
 /*--INFO-- Returns DID based on VRU input. */
 
 EXPORT VRU_IdentityService := MACRO
-IMPORT doxie, gong, mdr, header, drivers, FCRA, ut, Address, Didville, risk_indicators, header_quick, AutoStandardI, DeathV2_Services, did_add, Suppress, gateway;
+IMPORT doxie, gong, header, FCRA, Address, risk_indicators, header_quick, AutoStandardI, DeathV2_Services, did_add, gateway;
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
@@ -134,7 +134,8 @@ layout_did := RECORD
   unsigned6 did := 0;
 END;	
 
-layout_person GetPersonData (doxie.key_header R) := TRANSFORM
+index_header := dx_header.key_header();
+layout_person GetPersonData (index_header R) := TRANSFORM
   SELF := R;
 END;
 layout_person GetPersonDataQuick (header_quick.key_DID R) := TRANSFORM
@@ -142,7 +143,7 @@ layout_person GetPersonDataQuick (header_quick.key_DID R) := TRANSFORM
 END;
 
 //Get dids by social; duplicate dids might be returned here; no filtering when just "searching" for did
-ds_DidsFromSSN := CHOOSEN (doxie.key_header_ssn (
+ds_DidsFromSSN := CHOOSEN (dx_header.key_ssn() (
                  keyed (ssn_val[1] = s1) AND
                  keyed (ssn_val[2] = s2) AND
                  keyed (ssn_val[3] = s3) AND
@@ -155,7 +156,7 @@ ds_DidsFromSSN := CHOOSEN (doxie.key_header_ssn (
                  (did != 0)), MAX_HEADER_DID);
 
 // Get all header records for given did(s); did != 0 here, but ds_dids might be empty
-dids_ssn1 := JOIN (DEDUP (ds_DidsFromSSN, did, ALL), doxie.key_header,
+dids_ssn1 := JOIN (DEDUP (ds_DidsFromSSN, did, ALL), index_header,
                   keyed (Left.did = Right.s_did) AND Risk_Indicators.iid_constants.IsEligibleHeaderRec (Right, dppa_ok) AND left.did!=0,
                   GetPersonData (Right),
                   LIMIT (MAX_HEADER_DID, SKIP));
@@ -177,7 +178,7 @@ ds_DidsFromGong := JOIN (DATASET ([{phone_val}], {string10 phone}), gong.Key_His
                     LIMIT (MAX_GONG_DID, SKIP));
 
 // get person's data from header
-dids_phone1 := JOIN (DEDUP (ds_DidsFromGong, did, ALL), doxie.key_header,
+dids_phone1 := JOIN (DEDUP (ds_DidsFromGong, did, ALL), index_header,
                   keyed (Left.did = Right.s_did) AND Risk_Indicators.iid_constants.IsEligibleHeaderRec (Right, dppa_ok) AND left.did!=0,
                   GetPersonData (Right),
                   LEFT OUTER, LIMIT (MAX_HEADER_DID, SKIP));
@@ -341,22 +342,23 @@ CNT_DidsBySSN := COUNT (DEDUP (dids_ssn_filtered, did, ALL));
         layout_did_hhid := RECORD
           unsigned6 did;
           unsigned6 hhid;
-        END; 
-        layout_did_hhid getRelativesHHID (doxie.Key_Did_HDid R) := TRANSFORM
+        END;
+        index_did_hhid := dx_header.key_did_hhid();
+        layout_did_hhid getRelativesHHID (index_did_hhid R) := TRANSFORM
           SELF.did := R.did;
           SELF.hhid := R.hhid_relat;
         END;
 
         //get dids from Gong, get relatives' hhids for all those dids.
         ds_slim_gong := PROJECT (DEDUP (dids_phone, did, ALL), TRANSFORM (layout_did_hhid, SELF:= Left));
-        ds_rel_hhid_gong := JOIN (ds_slim_gong, doxie.Key_Did_HDid,
+        ds_rel_hhid_gong := JOIN (ds_slim_gong, index_did_hhid,
                                   keyed (Left.did = Right.did),
                                   getRelativesHHID (Right),
                                   LEFT OUTER, LIMIT (MAX_HHID_DID, SKIP));
 
         //get dids from Header, get relatives' hhids for all those dids.
         ds_slim_header := PROJECT (DEDUP (dids_ssn, did, ALL), TRANSFORM (layout_did_hhid, SELF:= Left));
-        ds_rel_hhid_header := JOIN (ds_slim_header, doxie.Key_Did_HDid,
+        ds_rel_hhid_header := JOIN (ds_slim_header, index_did_hhid,
                                     keyed (Left.did = Right.did),
                                     getRelativesHHID (Right),
                                     LEFT OUTER, LIMIT (MAX_HHID_DID, SKIP));
@@ -552,7 +554,7 @@ CNT_DidsGeneral := COUNT (did_general_deduped);
 did_score := did_general_deduped[1].score;
 
 
-layout_person GetPersonDataNonNumeric (did_general_deduped L, doxie.key_header R) := TRANSFORM
+layout_person GetPersonDataNonNumeric (did_general_deduped L, index_header R) := TRANSFORM
 	SELF.did := L.did;
   SELF := R;
 END;
@@ -563,7 +565,7 @@ END;
 
 
 //Get all header records for given did(s); here we have single did
-did_general_header1 := JOIN (did_general_deduped, doxie.key_header,
+did_general_header1 := JOIN (did_general_deduped, index_header,
                             keyed (Left.did = Right.s_did) AND Risk_Indicators.iid_constants.IsEligibleHeaderRec (Right, dppa_ok) AND left.did!=0,
                             GetPersonDataNonNumeric (Left, Right),
                             LEFT OUTER, LIMIT(MAX_HEADER_DID,SKIP));

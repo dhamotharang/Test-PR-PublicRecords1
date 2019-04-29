@@ -177,7 +177,7 @@ end;
 
 
 
-import ut, codes, address, models, riskwise, suppress, seed_files, iesp, AutoStandardI, OFAC_XG5, Risk_Indicators;
+import ut, address, models, iesp, OFAC_XG5, Risk_Indicators;
 
 export Identifier2_Service := MACRO
  

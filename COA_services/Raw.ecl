@@ -39,9 +39,14 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 							transform(doxie.layout_references_hh, 
 							        self.did := left.did, 
 											self.includedByHHID := false));
-											
-				raw_recs := doxie_raw.QuickHeader_raw(new_did_set,0,dppaPurpose,glbpurpose,'NONE',false,false,'',TRUE);				
-												
+
+				mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+					EXPORT unsigned1 glb := glbpurpose;
+					EXPORT unsigned1 dppa := dppaPurpose;
+				END;
+										
+				raw_recs := doxie_raw.QuickHeader_raw(new_did_set, mod_access);
+													
 				return (raw_recs);
 				
 	   	end;

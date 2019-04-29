@@ -31,7 +31,22 @@ EXPORT IParam := MODULE
 																		commonVehParams)
 			EXPORT BOOLEAN  	excludeLessors := false; // required for doxie.MAC_Header_Field_Declare
 	END;
-	
+
+  // Temporary, until this interface is made compatible with doxie/IDataAccess
+  EXPORT MAC_CopyDataAccessParams(mod_access) := MACRO
+    EXPORT boolean allowall := false;
+    EXPORT allowdppa := false;
+    EXPORT allowglb := false;
+    EXPORT string32	applicationtype := mod_access.application_type;
+    EXPORT string	datapermissionmask := mod_access.datapermissionmask;
+    EXPORT unsigned1 dppapurpose := mod_access.dppa;
+    EXPORT unsigned1 glbpurpose := mod_access.glb;
+    EXPORT boolean includeminors := mod_access.show_minors;
+    EXPORT string5 	industryclass := mod_access.industry_class;
+    EXPORT unsigned2 penalty_threshold := mod_access.penalty_threshold;
+    EXPORT boolean restrictpreglb := false; //?
+  ENDMACRO;        
+
 	SHARED baseSearchParams :=  interface(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
 							AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,AutoKeyIdsParams)					
 		EXPORT STRING50	ReferenceCode;

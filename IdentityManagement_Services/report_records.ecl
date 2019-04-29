@@ -6,7 +6,7 @@ IMPORT doxie, DriversV2_Services, Gong_services, American_Student_Services,
 				VehicleV2_Services, WatercraftV2_Services, LN_PropertyV2_Services,
 				FaaV2_Services, PersonReports, iesp, doxie_raw,IdentityManagement_Services; 
 
-EXPORT report_records  (DATASET(doxie.layout_references) dids,IdentityManagement_Services.IParam._report in_params) := MODULE
+EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagement_Services.IParam._report in_params) := MODULE
 	
 // =======================================================================
 // ============================= Person Section ==========================
@@ -53,8 +53,8 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids,IdentityManagement
 			//Phones Plus
 			UNSIGNED1 score_threshold_value := 10; // used in macro
 			doxie.MAC_Get_GLB_DPPA_PhonesPlus(dids, phonespp, true,,
-                                  in_params.GLBPurpose, in_params.DPPAPurpose, in_params.IndustryClass,0,
-                                  ,,false,doxie.DataRestriction.fixed_DRM);
+                                  in_params.glb, in_params.dppa, in_params.industry_class,0,
+                                  ,,false,in_params.DataRestrictionMask);
 			
 			did_set := SET(dids, did); //there should only be one did in did_set
 
@@ -67,10 +67,14 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids,IdentityManagement
 // =======================================================================
 			students_raw := American_Student_Services.Raw.getPayloadByDIDS(PROJECT(dids, American_Student_Services.Layouts.deepDids));
 			
-			students_rest_mod := MODULE (PROJECT (in_params, American_Student_Services.IParam.reportParams, OPT)) 
-				EXPORT UNSIGNED1 	dob_mask_value := in_params.dob_mask; 
+      //Can't project modules, have to copy the content manually:
+			students_rest_mod := MODULE (American_Student_Services.IParam.reportParams) 
+        American_Student_Services.IParam.MAC_CopyDataAccessParams(in_params);
+ 
+ 				EXPORT UNSIGNED1 	dob_mask_value := in_params.dob_mask; 
 				EXPORT STRING6 ssnmask := in_params.ssn_mask;
 			END;
+
 			studentsr := American_Student_Services.Functions.apply_restrictions(students_raw, students_rest_mod);
 			studentsf := IdentityManagement_Services.Functions.debatable_names(studentsr,American_Student_Services.Layouts.finalrecs,LN_college_name);
 			
@@ -83,23 +87,24 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids,IdentityManagement
 // =======================================================================
 
       veh_lookup := '';
-      veh_mod := module (project (in_params, VehicleV2_Services.IParam.reportParams, opt))
+      //Can't project modules, have to copy the content manually:
+      veh_mod := module (VehicleV2_Services.IParam.reportParams)
         export boolean displayMatchedParty := true; // this corresponds to #CONSTANT('DisplayMatchedParty', true); at the top level
         export boolean IncludeNonRegulatedSources := in_params.include_noregulatedvehicles;
-        export string6  ssnmask := in_params.SSN_mask;
-        export boolean	dl_Mask	:= in_params.mask_dl;
+        export string6  ssnmask := in_params.ssn_mask;
+        export boolean	dl_Mask	:= in_params.dl_mask = 1;
         export unsigned4 lookupValue := doxie.lookup_bit(StringLib.StringToUpperCase(veh_lookup));
             // this is to avoid a call to AutoStandardI.InterfaceTranslator.lookup_value.val(); 
+
+        VehicleV2_Services.IParam.MAC_CopyDataAccessParams(in_params);
+
         // others of possible interest:
-	      // export string32 applicationType	:= in_params.applicationType;
      		// EXPORT STRING      DataSource := Constant.LOCAL_VAL;  
         // EXPORT UNSIGNED2   penalty_threshold := VehicleV2_Services.Constant.VEHICLE_PENALT_THRESHOLD;
-        // EXPORT BOOLEAN     getMinors := false;
         // EXPORT BOOLEAN    excludeLessors := false; 
       end;
 
       vehi := VehicleV2_Services.raw.get_vehicle_crs_report (veh_mod, dids, in_params.SSN_mask);
-			// vehi := VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report (dids, in_params.SSN_mask);
 
 			esp_vehicles_V2 := IdentityManagement_Services.format_vehicles(vehi);
 
@@ -123,7 +128,7 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids,IdentityManagement
 // =======================================================================			
 			aircraft_ids := PROJECT (FaaV2_Services.raw.ByDids (dids), FaaV2_Services.layouts.search_id);
     
-			aircraft_recs := FaaV2_Services.raw.getFullAircraft(aircraft_ids,in_params.applicationType);
+			aircraft_recs := FaaV2_Services.raw.getFullAircraft(aircraft_ids,in_params.application_type);
 			
 			esp_aircraft_V2 := IdentityManagement_Services.format_FAA(aircraft_recs);
 			
@@ -159,8 +164,7 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids,IdentityManagement
 // =======================================================================
 // ========================   Emails	 ===================================
 // =======================================================================
-			tmpMod := MODULE (PROJECT (in_params, PersonReports.input.emails, opt))	END;
-
+			tmpMod := PersonReports.input.getCompatibleModuleEmail (in_params);
 			EXPORT emails := PersonReports.email_records(dids,tmpMod);
 
 // =======================================================================

@@ -25,7 +25,7 @@ export MAC_BestAppend(infile,
 											GetSSNBest = false
 										) := MACRO
 										
-import didville, suppress, doxie, doxie_files, DeathV2_Services, AutoStandardI, SSNBest_Services,
+import didville, suppress, doxie, dx_header, DeathV2_Services, AutoStandardI, SSNBest_Services,
        did_add, header_slimsort, ut, STD, dx_BestRecords;
 
 	didville.Mac_Common_Field_Declare();
@@ -201,7 +201,9 @@ typeof(infile) strip_thresh(infile le) := transform
   
   outfile_strip_thresh := project(outfi,strip_thresh(left));
 
-typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transform
+index_minors_hash := dx_header.key_minors_hash();
+
+typeof(infile) strip_minors(infile le, index_minors_hash re) := transform
   #if (not clickdata)
 		self.best_phone := IF(glb_purpose_value<>2 and re.did <>0, '', le.best_phone);
 	#end
@@ -225,7 +227,7 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
   self := le;
   end;
   
-  outfile_strip_minors := join(outfile_strip_thresh, doxie_files.key_minors_hash,
+  outfile_strip_minors := join(outfile_strip_thresh, index_minors_hash,
                                left.did != 0 and
 														   keyed(hash32((unsigned6)left.did)=right.hash32_did) and
 		                  			   keyed(left.did = right.did) and	//at build time, key contains only minors

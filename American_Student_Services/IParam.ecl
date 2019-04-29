@@ -22,6 +22,17 @@ EXPORT IParam := MODULE
 										AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
 										AutoKeyIdsParams)	
 	END;
-	
+
+  // Temporary, until this interface is made compatible with doxie/IDataAccess
+  EXPORT MAC_CopyDataAccessParams(mod_access) := MACRO
+    EXPORT boolean allowall := false;
+    EXPORT allowdppa := false;
+    EXPORT allowglb := false;
+    EXPORT unsigned1 dppapurpose := mod_access.dppa;
+    EXPORT unsigned1 glbpurpose := mod_access.glb;
+    EXPORT boolean includeminors := mod_access.show_minors;
+    EXPORT boolean restrictpreglb := false;
+    EXPORT string32 applicationtype := mod_access.application_type;
+  ENDMACRO;  
 
 END;

@@ -78,14 +78,14 @@
  // in the keys to create an updated src_all for the Phone Shell.
  // When our list of allowed sources changes, this should change as well.
  // Also if for some reason the order of sources in the bits of src_all are changed, this changes too.
- // Currently 47 sources accepted in 48 bits (9th bit empty/not used, going 'backwards')
+ // Currently 48 sources accepted in 49 bits (9th bit empty/not used, going 'backwards')
  // whole string is 64 bits, any bits not listed should be zero automatically, can fill some extras with zeroes as safety net
-    EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000000111111111111111111111111111111111111111011111111';
- // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000000111111111111111111111111111111111111101011111111'; // debug mask pretending UT is not allowed
- // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000000111111111111111111101111111111111111111011111111'; // debug mask pretending E2 is not allowed
- // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000000111111111111111111111111111111111011111011111111'; // debug mask pretending SL is not allowed
- // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000000111111011111111111111111111111111111111011111111'; // debug mask pretending IQ is not allowed
- // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000000111111111111111111111111111111111110111011111111'; // debug mask pretending VO is not allowed
+    EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000001111111111111111111111111111111111111111011111111';
+ // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000001111111111111111111111111111111111111101011111111'; // debug mask pretending UT is not allowed
+ // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000001111111111111111111101111111111111111111011111111'; // debug mask pretending E2 is not allowed
+ // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000001111111111111111111111111111111111011111011111111'; // debug mask pretending SL is not allowed
+ // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000001111111011111111111111111111111111111111011111111'; // debug mask pretending IQ is not allowed
+ // EXPORT PhonesPlus_AllowedSourcesMask := '0000000000000001111111111111111111111111111111111110111011111111'; // debug mask pretending VO is not allowed
  
  // This list (obtained from the Data Team's MDR.SourceTools file - it's not in RoxieDev
  // is all the sources that are considered 'header' sources when filling out the Vendor and Src fields

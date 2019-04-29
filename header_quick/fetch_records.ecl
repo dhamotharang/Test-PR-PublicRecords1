@@ -2,14 +2,15 @@ import doxie,autokeyb,census_data,doxie_raw,AutoKeyI,AutoStandardI;
 
 export fetch_records(
 	Dataset(doxie.layout_references_hh) indids = dataset([], doxie.layout_references_hh),
+	doxie.IDataAccess mod_access,
 	boolean include_dailies = false, 
 	boolean allow_wildcard = false,
 	set of STRING1 autokey_skipset=[],
 	boolean ApplyBpsFilter = false) := 
 FUNCTION
 
+// this seems to be needed only to pull did_value:
 doxie.MAC_Header_Field_Declare()
-
 
 //***** BY AUTOKEY ******
 t := header_quick.str_AutokeyName;
@@ -50,7 +51,7 @@ ak_hdr_dids := project(ak(~autokeyb.isFakeID(id,'HEAD')),fix(LEFT));
 d := indids + if((unsigned8)did_value<>0, Fetch_HeaderQuick_Did((unsigned8)did_value));
 
 bothIds := dedup(sort(d+ak_hdr_dids,did),did);
-byd := doxie_Raw.QuickHeader_raw(bothIds, dateVal,dppa_purpose,glb_purpose,,,,,false,applyBpsFilter);
+byd := doxie_Raw.QuickHeader_raw(bothIds, mod_access,false,applyBpsFilter);
 return if(header_quick.stored_Allow, wsrc + byd);
 
 END;

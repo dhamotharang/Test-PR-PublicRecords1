@@ -211,6 +211,7 @@ MODULE
 	export src_Enclarity								 := '64';
 	export src_Entiera 									 := 'ET';	
 	export src_Equifax                   := 'EQ';
+	export src_Equifax_Business_Data     := 'Z1';
 	export src_Equifax_Quick             := 'QH';
 	export src_Equifax_Weekly            := 'WH';
 	export src_Eq_Employer               := 'QQ';
@@ -317,6 +318,7 @@ MODULE
 	export src_MPRD_Individual           := 'QN'; 
 	export src_MMCP						           := '61';  // Michigan/Illinois Medicaid Custom Program
 	export src_NaturalDisaster_Readiness := 'NR';
+ export src_NeustarWireless           := 'N2';  // Neustar Wireless Phones
 	export src_NCOA                      := 'NC';
 	export src_NCPDP                     := 'J2';  // National Council for Prescription Drug Programs
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
@@ -1040,6 +1042,19 @@ MODULE
 		,src_FBNV2_FL 								 ,src_FBNV2_CA_Santa_Clara			,src_FBNV2_New_York						 ,src_FBNV2_CA_San_Diego
 	];
 
+	export set_Marketing_Death       				:= [  /* Death sources allowed for Marketing */
+		 src_Death_State 	 						 ,src_Death_Tributes						,src_Death_CT									 ,src_Death_FL
+		 ,src_Death_GA								 ,src_Death_KY								  ,src_Death_MA									 ,src_Death_ME									 
+		 ,src_Death_MN								 ,src_Death_MT								  ,src_Death_NC									 ,src_Death_NV
+		 ,src_Death_OH
+	   ,src_Death_VA									
+	];
+	
+	export set_Marketing_Liquor_Licenses            := [  /* Liquor sources allowed for Marketing */
+		 src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        ,src_LA_Liquor_Licenses				 ,src_OH_Liquor_Licenses        
+		,src_PA_Liquor_Licenses        ,src_TX_Liquor_Licenses        
+	];
+	
 	export set_Marketing_Header           := [
 		 set_Marketing_Veh             ,src_Aircrafts                 ,src_Airmen						         ,set_Marketing_WC              
 		,src_AK_Busreg    						 ,set_Marketing_Corp            ,set_Marketing_FBN             ,src_DEA 
@@ -1067,6 +1082,49 @@ MODULE
 		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
+// Marketing approved soources as of 3/2019.
+export set_Marketing_Sources           := [
+		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
+		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
+		,src_AlloyMedia_student_list   ,src_American_Students_List    ,src_BBB_Member								 ,src_BBB_Non_Member						 
+		,src_Bankruptcy								 ,src_Bankruptcy_Attorney  		  ,src_CA_Liquor_Licenses				 ,src_CA_Sales_Tax							 
+		,src_DEA									 		 ,src_Datagence								  ,src_Diversity_Cert						 ,src_Divorce									 
+		,src_Dunn_Bradstreet_Fein			 ,src_EMerge_CCW								,src_Employee_Directories			 ,src_Experian_Phones					 
+		,src_EMerge_Fish							 ,src_EMerge_Hunt							  ,src_EMerge_Boat							 ,src_FCC_Radio_Licenses 			 
+		,src_FDIC											 ,src_Foreclosures						  ,src_Federal_Firearms					 ,src_Gong_Neustar						  
+		,src_GSA											 ,src_IRS_5500									,src_Impulse									 ,src_IA_Sales_Tax     				  
+		,src_IRS_Non_Profit    				 ,src_InfutorNarc								,src_InfutorTRK  							 ,src_InfutorCID    						
+		,src_Infutor_Motorcycle_Veh 	 ,src_InfutorNare 							,src_Ingenix_Sanctions				 ,src_LaborActions_EBSA					
+		,src_LaborActions_WHD				   /*,src_Liens										  ,src_Liens_v2  */  					 ,src_LnPropV2_Fares_Asrs			 
+		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL   
+		,src_Marriage 								 ,src_MediaOne								  ,src_NaturalDisaster_Readiness ,src_NJ_Gaming_Licenses			 
+		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
+		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
+		,src_Vickers									 ,src_ZOOM											,src_Cortera									 ,src_Equifax_Business_Data		
+    ,src_FBNV2_Hist_Choicepoint
+    /*updated set_Marketing_Corp*/		
+    ,src_AK_Corporations					 ,src_AL_Corporations						,src_AZ_Corporations					 ,src_AR_Corporations 
+		,src_CA_Corporations					 ,src_CO_Corporations						,src_CT_Corporations					 ,src_DC_Corporations
+		,src_FL_Corporations					 ,src_GA_Corporations						,src_HI_Corporations					 ,src_IA_Corporations 
+		,src_IL_Corporations					 ,src_IN_Corporations					 	,src_KY_Corporations					 ,src_LA_Corporations					 
+		,src_ME_Corporations 					 ,src_MD_Corporations					  ,src_MA_Corporations					 ,src_MI_Corporations					 
+		,src_MN_Corporations					 ,src_MS_Corporations					  ,src_MO_Corporations					 ,src_MT_Corporations					 
+		,src_NE_Corporations					 ,src_NH_Corporations						,src_NV_Corporations					 ,src_NJ_Corporations						
+		,src_NC_Corporations					 ,src_NY_Corporations					  ,src_ND_Corporations					 ,src_OH_Corporations						
+		,src_OK_Corporations					 ,src_OR_Corporations						,src_PA_Corporations					 ,src_RI_Corporations					 
+		,src_SD_Corporations					 ,src_TN_Corporations					  ,src_TX_Corporations					 ,src_UT_Corporations					 
+		,src_VT_Corporations					 ,src_VA_Corporations					  ,src_WI_Corporations					 ,src_WV_Corporations
+		,src_WY_Corporations				
+    /*updated watercraft set*/
+    ,src_AL_Watercraft						 ,src_AR_Watercraft						  ,src_AZ_Watercraft						 ,src_CO_Watercraft 
+		,src_CT_Watercraft						 ,src_GA_Watercraft							,src_IA_Watercraft						 ,src_IL_Watercraft
+		,src_Infutor_Watercraft				 ,src_ME_Watercraft							,src_MA_Watercraft						 ,src_MN_Watercraft							
+		,src_MS_Watercraft						 ,src_NY_Watercraft						 	,src_NC_Watercraft						 ,src_NV_Watercraft
+		,src_NM_Watercraft						 ,src_OH_Watercraft						 	,src_OR_Watercraft						 ,src_TN_Watercraft
+		,src_TX_Watercraft						 ,src_WV_Watercraft							,src_WI_Watercraft		
+		,set_Marketing_Death					 ,set_Marketing_FBN						,set_Marketing_Liquor_Licenses
+	]; 
+	
 export set_Marketing_Restricted := [
   src_Aircrafts,             src_AK_Corporations,        src_AL_Corporations,        src_AL_Watercraft,             src_AR_Corporations,
   src_AR_Watercraft,         src_AZ_Corporations,        src_AZ_Watercraft,          src_BBB_Member,                src_BBB_Non_Member,
@@ -1209,7 +1267,6 @@ export set_Marketing_Restricted_Master := [
   src_WY_DL,                   src_WY_Experian_Veh,           src_WY_Veh,                  src_WY_Watercraft,
   src_Yellow_Pages,            src_ZOOM,                      src_ZUtil_Work_Phone,        src_ZUtilities
  ];
-  
 
 	export set_NonDerog_FCRA_sources := [
 		src_Aircrafts              			,src_Airmen                 	,src_AK_Fishing_boats          ,src_AK_Perm_Fund                 	,
@@ -1233,7 +1290,7 @@ export set_Marketing_Restricted_Master := [
 		src_Death_MT										,src_Death_NC									,src_Death_NV									 ,src_Death_OH											,src_Death_VA											 ,
 		src_Death_Obituary							,src_Infutor_Watercraft*/ //Not cleared by modeling for use in FCRA				
 	];
-
+	
 // in version 5.0, remove gong, targus white pages, death, emerge_master, emerge_cens, src_FCRA_Corrections_record, and workers comp
 export set_NonDerog_FCRA_sources_v50 := [
 		src_Aircrafts              			,src_Airmen                 	,src_AK_Fishing_boats								,src_AK_Perm_Fund                 	,
@@ -1392,11 +1449,12 @@ export set_NonDerog_FCRA_sources_v50 := [
 	+ set_email
 	;
 
+ // Jira DF-24336 - added src_NeustarWireless
 	export set_Phonesplus := [
-	 src_InfutorCID									, src_Cellphones_Kroll					,src_Cellphones_Traffix				,src_Cellphones_Nextones
-	,src_Intrado										,src_Pcnsr											,src_Wired_Assets_Owned 			,src_Wired_Assets_Royalty
-	,src_Targus_White_pages					,src_Gong_History,src_Gong_Neustar								,src_InquiryAcclogs						,src_Ibehavior
-	,src_thrive_lt									, src_thrive_pd									,src_AlloyMedia_student_list	,src_Link2tek];
+	 src_InfutorCID									, src_Cellphones_Kroll					,src_Cellphones_Traffix			  	,src_Cellphones_Nextones
+	,src_Intrado										  ,src_Pcnsr											      ,src_Wired_Assets_Owned 		  	,src_Wired_Assets_Royalty
+	,src_Targus_White_pages	,src_Gong_History          ,src_Gong_Neustar							  	  ,src_InquiryAcclogs						  ,src_Ibehavior
+	,src_thrive_lt									 , src_thrive_pd								   	,src_AlloyMedia_student_list	, src_Link2tek             , src_NeustarWireless];
 	
 	export set_Phonesplus_Royalty := [src_Wired_Assets_Royalty];
 	
@@ -1914,6 +1972,7 @@ export set_NonDerog_FCRA_sources_v50 := [
   export set_NaturalDisaster_Readiness := [src_NaturalDisaster_Readiness ];
 	export set_NCPDP                     := [src_NCPDP                     ];
 	export set_NCOA                      := [src_NCOA                      ];
+ export set_NeustarWireless           := [src_NeustarWireless           ];
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
@@ -2440,7 +2499,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsMixed_Probation            (string  sr) := sr               in set_Mixed_Probation            ;
 	export SourceIsMixed_Utilities            (string  sr) := sr               in set_Mixed_Utilities            ;
 	export SourceIsMMCP						            (string  sr) := sr               in set_MMCP						           ;
-  export SourceIsNaturalDisaster_Readiness  (string  sr) := sr               in set_NaturalDisaster_Readiness  ;
+ export SourceIsNaturalDisaster_Readiness  (string  sr) := sr               in set_NaturalDisaster_Readiness  ;
+ export SourceIsNeustarWireless            (string  sr) := sr               in set_NeustarWireless            ;  // Jira DF-24336
 	export SourceIsNCOA                       (string  sr) := sr               in set_NCOA                       ;
 	export SourceIsNCPDP                      (string  sr) := sr               in set_NCPDP                      ;
 	export SourceIsNPPES                      (string  sr) := sr               in set_NPPES                      ;
@@ -2960,7 +3020,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NaturalDisaster_Readiness	,'NaturalDisaster Readiness'																 }
 		,{src_NCOA                      ,'NCOA'                                                      }
 		,{src_NCPDP											,'NCPDP'																										 }
-		,{src_NPPES                     ,'NPPES'                                                     }
+		,{src_NeustarWireless           ,'Neustar Wireless Phones'                                   }
+  ,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
     ,{src_OKC_Probate               ,'OKC Probate'                                               }
@@ -3466,7 +3527,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_MMCP						           => 'Michigan Medicaid Custom Program'                                      
 		,src_NCOA                      => 'NCOA'                                                 
 		,src_NaturalDisaster_Readiness => 'NaturalDisaster Readiness'														
-		,src_NCPDP										 => 'NCPDP'																								
+		,src_NCPDP										 => 'NCPDP'	
+  ,src_NeustarWireless           => 'Neustar Wireless Phones'
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       

@@ -169,7 +169,14 @@ ta4 := if(reduced_data_value,ta3,ta3_pruned) + ta3_daily_util;
 use_dids := dedup(sort(PROJECT(ta4(did <> ''), TRANSFORM(doxie.layout_references, SELF.did := (UNSIGNED6) LEFT.did)), did, did));
 
 dd := doxie_raw.death_raw(use_dids,,dateVal,dppa_purpose,glb_purpose);
-doxie.Layout_HeaderFileSearch check_death1(doxie.Layout_HeaderFileSearch le, dd ri) :=
+
+Death_source_grp:= Sort(group(dd,did,dod8), if(src = MDR.sourceTools.src_Death_Restricted, 1,0));
+Death_source_info := iterate(Death_source_grp, TRANSFORM(doxie_raw.Layout_Death_Raw, 
+									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod8 != 0 AND RIGHT.src= MDR.sourceTools.src_Death_Restricted),
+	                                LEFT.IsLimitedAccessDMF ) ,
+									SELF :=right));
+									
+doxie.Layout_HeaderFileSearch check_death1(doxie.Layout_HeaderFileSearch le, Death_source_info ri) :=
 TRANSFORM
 	SELF.did := le.did;
 	SELF.dod := (INTEGER)IF((INTEGER)ri.did=0 AND mdr.SourceTools.SourceIsDeath(le.src), '', ri.dod8);
@@ -179,7 +186,9 @@ TRANSFORM
 	SELF.IsLimitedAccessDMF := ri.IsLimitedAccessDMF;
 	SELF := le;
 END;
-death_checked := JOIN(ta4, dd, (INTEGER)LEFT.did=(INTEGER)RIGHT.did, check_death1(LEFT,RIGHT), LEFT OUTER);
+
+
+death_checked := JOIN(ta4, Death_source_info, (INTEGER)LEFT.did=(INTEGER)RIGHT.did, check_death1(LEFT,RIGHT), LEFT OUTER);
 
 clean_age := if(reduced_data_value, ta4, death_checked);
 
@@ -215,8 +224,6 @@ jnd2 := join(clean_age,lookup_rec,(unsigned6)left.did=right.did,add_lookups(left
 ta := if (include_wealsofound,
           if ( nolookupsearch,clean_age_revisedpropcounts,jnd2 ),
           clean_age);
-// OUTPUT(pre_outf,NAMED('pre_outf'));
-// output(outf_raw, named('outf_raw'));
 
 // need to perform lookups on all non-zero DIDs for DL info
 dlRollRec := RECORD
@@ -264,6 +271,7 @@ ta_Final := if(includeCriminalImages,ta_Temp2,ta_Temp1);
 // output(outf,named('outf'),extend);
 // output(lookup_rec,named('lookup_rec'),extend);
 // output(ta_Final,named('ta_Final'),extend);
+
 RETURN ta_Final;
 
 END;
