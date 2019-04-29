@@ -25,6 +25,7 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 
 	self.phone7_did_key := hashmd5(input.phone[4..10] + input.did);
 	self.pdid := 0;
+	self.did := input.did;
 	self.did_score := (string3) input.did_score;
 	self.datefirstseen := 0;
 	self.datelastseen := 0; 
@@ -49,7 +50,9 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.origstate := input.state;
 	self.origzip := input.zip;
 	self.orig_phone := input.phone;
+	self.dob := input.cln_dob;
 	self.agegroup := '';
+	self.gender := input.gender;
 	self.orig_listing_type := '';
 	self.listingtype := '';
 	self.orig_publish_code := '';
@@ -96,9 +99,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.min_orig_conf_score := 0;
 	self.cur_orig_conf_score := 0;
 	self.activeflag := '';
-	self.phone7_hhid_key := hashmd5(input.phone[4..10] + input.did);
+	self.rawaid := input.rawaid;
 	self.cleanaid := input.aceaid;
-	self.current_rec := input.current_rec;
 	self := input;
 end;
 
