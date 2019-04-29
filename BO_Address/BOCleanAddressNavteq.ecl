@@ -1,4 +1,4 @@
-﻿import BO_Address, lib_addrClean;
+import BO_Address, lib_addrClean;
 export BOCleanAddressNavteq (const string line1,const string line2,
 							const string server = BO_Address.BO_Server, 
 							unsigned2 port = BO_Address.BO_Port)	:= FUNCTION
