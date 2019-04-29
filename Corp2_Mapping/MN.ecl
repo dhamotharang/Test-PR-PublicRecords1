@@ -1,4 +1,4 @@
-import corp2, corp2_Mapping, corp2_raw_mn, scrubs, scrubs_corp2_Mapping_mn_event,
+﻿import corp2, corp2_Mapping, corp2_raw_mn, scrubs, scrubs_corp2_Mapping_mn_event,
 			 scrubs_corp2_Mapping_mn_main, scrubs_corp2_Mapping_mn_stock, std,
 			 tools, versioncontrol, ut;
 
@@ -424,15 +424,13 @@ export MN := MODULE;
 
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);
-		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Event_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpEvent_MN Report' //subject
 																																 ,'Scrubs CorpEvent_MN Report' //body
 																																 ,(data)Event_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMNEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																														);
 
 		Event_BadRecords				 	:= Event_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or
@@ -504,15 +502,13 @@ export MN := MODULE;
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Main_MailFile							:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpMain_MN Report' //subject
 																																 ,'Scrubs CorpMain_MN Report' //body
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMNMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																);
 
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or
@@ -627,15 +623,13 @@ export MN := MODULE;
 
 		Stock_ScrubsAlert					:= Stock_ScrubsWithExamples(RejectWarning = 'Y');
 		Stock_ScrubsAttachment		:= Scrubs.fn_email_attachment(Stock_ScrubsAlert);
-		Stock_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		Stock_MailFile						:= FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																																 ,'Scrubs CorpStock_MN Report' //subject
 																																 ,'Scrubs CorpStock_MN Report' //body
 																																 ,(data)Stock_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpMNEventScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																															);
 
 		Stock_BadRecords					:= Stock_N.ExpandedInFile(	
 																												corp_key_Invalid							  			<> 0 or

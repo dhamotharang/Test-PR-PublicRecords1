@@ -1,9 +1,10 @@
-import Data_Services;
+﻿
 // This macro will copy the portfolio base file from thorwatch to the 400 only if 
 // the most current version does not reside in 400 environment yet.  This is needed
 // as we will be leaving the portfolio update process on thorwatch for the time being.
 
 EXPORT mac_copy_portfolio_base(pseudo_environment) := MACRO
+import Data_Services;
 	// FOREIGN FILE INFO
 	fn_r3_super_local := '~thor_10_219::base::account_monitoring::prod::portfolio::base' : INDEPENDENT;
 	fn_r3_super := Data_Services.foreign_r3_OSS+'thor_10_219::base::account_monitoring::prod::portfolio::base' : INDEPENDENT;

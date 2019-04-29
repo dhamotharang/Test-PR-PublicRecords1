@@ -49,7 +49,7 @@ EXPORT Layouts := MODULE
 		STRING8  expiration_date;		
 		STRING2	 lab_term_code;			// added Aug 2013
 		STRING2  lab_type_code;
-		STRING22 prov_cat_code;
+		STRING4  prov_cat_code;
 	END;
 	
 	EXPORT CD_Input := RECORD //lab_type_code and lab_term_code positions are interchanged in base compared to actual input
@@ -66,7 +66,7 @@ EXPORT Layouts := MODULE
 		STRING8  expiration_date;			
 		STRING2  lab_type_code;
 		STRING2	 lab_term_code;			// added Aug 2013
-		STRING22 prov_cat_code;
+		STRING4  prov_cat_code;
 	END;
 
 	

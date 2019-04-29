@@ -132,6 +132,7 @@ MODULE
 	export src_infutor_narc3             := 'KP';  // infutor_narc3 consumer
 	export src_fed_crim                  := 'VM';  // federal Criminal
 	export src_Credit_Unions             := 'CU';
+	export src_DataBridge                := 'RQ';	
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
 	export src_DEA                       := 'DA';  // US Drug Enforcement Administration
@@ -1277,11 +1278,13 @@ export set_NonDerog_FCRA_sources_v50 := [
 	+ set_email
 	;
 
+	//Jira DF-24336 - added src_NeustarWireless
 	export set_Phonesplus := [
 	 src_InfutorCID									, src_Cellphones_Kroll					,src_Cellphones_Traffix				,src_Cellphones_Nextones
 	,src_Intrado										,src_Pcnsr											,src_Wired_Assets_Owned 			,src_Wired_Assets_Royalty
 	,src_Targus_White_pages					,src_Gong_History,src_Gong_Neustar								,src_InquiryAcclogs						,src_Ibehavior
-	,src_thrive_lt									, src_thrive_pd									,src_AlloyMedia_student_list	,src_Link2tek];
+	,src_thrive_lt									, src_thrive_pd									,src_AlloyMedia_student_list	,src_Link2tek, src_NeustarWireless 
+	]; 
 	
 	//DF-22944
 	export set_Phonesplus_Header := [
@@ -2351,6 +2354,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsMixed_Utilities            (string  sr) := sr               in set_Mixed_Utilities            ;
 	export SourceIsMMCP						            (string  sr) := sr               in set_MMCP						           ;
   export SourceIsNaturalDisaster_Readiness  (string  sr) := sr               in set_NaturalDisaster_Readiness  ;
+  export SourceIsNeustarWireless  					(string  sr) := sr               in set_NeustarWireless					   ;  //Jira DF-24336
 	export SourceIsNCOA                       (string  sr) := sr               in set_NCOA                       ;
 	export SourceIsNCPDP                      (string  sr) := sr               in set_NCPDP                      ;
 	export SourceIsNPPES                      (string  sr) := sr               in set_NPPES                      ;
