@@ -57,7 +57,7 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Update DOps Page///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	dopsUpdate 		:= dops.updateversion('PhonesMetadataKeys', version, 'charlene.ros@lexisnexisrisk.com,judy.tao@lexisnexisrisk.com,gregory.rose@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com',,'N');
+	//dopsUpdate 		:= dops.updateversion('PhonesMetadataKeys', version, 'charlene.ros@lexisnexisrisk.com,judy.tao@lexisnexisrisk.com,gregory.rose@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com',,'N');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Update Orbit///////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 																											bkPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvQAPhonesMetadataCarrierName, 
 																										BuildLogger.KeyEnd(false),
 																										BuildLogger.PostStart(False),
-																											dopsUpdate, 
+																											//dopsUpdate, 
 																											buildStrata, 
 																											Sample_PhonesMetadata, 
 																											ScrubsRuns,
