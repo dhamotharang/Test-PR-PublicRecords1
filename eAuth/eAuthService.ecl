@@ -13,7 +13,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, eAuth;
 
 EXPORT EAuthService () := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #onwarning(4207, ignore);
 #option ('globalAutoHoist', false);
 // for use in outdated code

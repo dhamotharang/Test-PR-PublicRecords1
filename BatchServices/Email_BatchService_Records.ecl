@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_batch, AutoStandardI, BatchServices, Codes, Suppress, MDR, Royalty, ut, D2C;
+﻿IMPORT Autokey_batch, BatchServices, Codes, Suppress, MDR, Royalty, D2C;
 
 EXPORT Email_BatchService_Records(BatchServices.Email_BatchService_Interfaces.BatchParams email_batch_params,
 																	DATASET(BatchServices.Layouts.Email.rec_batch_email_input) batch_in,
@@ -33,10 +33,12 @@ EXPORT Email_BatchService_Records(BatchServices.Email_BatchService_Interfaces.Ba
 		ds_raw := fromAK + fromDID + fromInputEmail;
 		ds_raw_slim := dedup(sort(ds_raw(orig_email <> ''), acctno, orig_email), acctno, orig_email);
 		
-    boolean D2c_Restrict := email_batch_params.industryclass = ut.IndustryClass.Knowx_IC;  // D2C - filter for consumer
+    boolean D2c_Restrict := email_batch_params.isConsumer();
+    
 		D2c_Restrict_Src := if(D2c_Restrict, ds_raw_slim(email_src not in D2C.Constants.EmailRestrictedSources), ds_raw_slim);
 		
-		appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+		appType := email_batch_params.application_type;
+    
 		Suppress.MAC_Suppress(D2c_Restrict_Src,ds_raw_pulled_did,appType,Suppress.Constants.LinkTypes.DID,did);
 		Suppress.MAC_Suppress(ds_raw_pulled_did,ds_raw_pulled_ssn,appType,Suppress.Constants.LinkTypes.SSN,best_ssn);
 		

@@ -177,11 +177,11 @@ end;
 
 
 
-import ut, codes, address, models, riskwise, suppress, seed_files, iesp, AutoStandardI, OFAC_XG5, Risk_Indicators;
+import ut, address, models, iesp, OFAC_XG5, Risk_Indicators;
 
 export Identifier2_Service := MACRO
  
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   ds_in := DATASET ([], iesp.mod_identifier2.t_Identifier2Request) : STORED ('Identifier2Request', FEW);
   first_row := ds_in[1] : independent;
   

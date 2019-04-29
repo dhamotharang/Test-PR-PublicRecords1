@@ -1,4 +1,4 @@
-import didville, business_header_ss, business_header, ut, doxie, DriversV2, NID;
+import didville, business_header_ss, business_header, DriversV2, NID, dx_header;
 
 
 export ID_Function(DATASET(clerksofcourt.Layout_ID_Batch) full_layout) :=
@@ -19,12 +19,13 @@ to_did_append := PROJECT(full_layout, toDid(LEFT));
 
 didville.MAC_DidAppend(to_did_append,resu,dedup_these,fz,allscores)
 
-resu getCnt(resu le, doxie.Key_Did_Lookups ri) :=
+index_did_lookups := dx_header.key_did_lookups();
+resu getCnt(resu le, index_did_lookups ri) :=
 TRANSFORM
 	SELF.head_cnt := ri.head_cnt;
 	SELF := le;
 END;
-j := JOIN(resu, doxie.Key_Did_Lookups, keyed(LEFT.did=RIGHT.did), getCnt(LEFT,RIGHT), LEFT OUTER);
+j := JOIN(resu, index_did_lookups, keyed(LEFT.did=RIGHT.did), getCnt(LEFT,RIGHT), LEFT OUTER);
 
 resu jroll(j le, j ri) :=
 TRANSFORM
@@ -138,8 +139,8 @@ dl_match := JOIN(x_todo, key_dl, LEFT.DLNum<>'' AND
 				ATMOST(keyed(LEFT.DLNum[3..]=RIGHT.s_dl),50),
 				LEFT OUTER);
 
-
-Layout_ID_Batch getSsnDid(Layout_ID_Batch le, doxie.Key_Header_SSN ri) :=
+index_ssn := dx_header.key_ssn();
+Layout_ID_Batch getSsnDid(Layout_ID_Batch le, index_ssn ri) :=
 TRANSFORM
 	SELF.did := IF(ri.did<>0,ri.did,le.did);
 	SELF.score := IF(ri.did<>0,50,le.did);
@@ -147,7 +148,7 @@ TRANSFORM
 END;
 
 
-ssn_match := JOIN(dl_match, doxie.Key_Header_SSN,
+ssn_match := JOIN(dl_match, index_ssn,
 								LEFT.did=0 AND
 								(INTEGER)LEFT.ssn<>0 AND
 								keyed(RIGHT.s1=LEFT.ssn[1]) AND
@@ -172,12 +173,12 @@ ssn_match := JOIN(dl_match, doxie.Key_Header_SSN,
 									keyed(RIGHT.s9=LEFT.ssn[9]),
 								100), LEFT OUTER);
 
-Layout_ID_Batch rmBads(Layout_ID_Batch le, doxie.Key_Did_Lookups ri) :=
+Layout_ID_Batch rmBads(Layout_ID_Batch le, index_did_lookups ri) :=
 TRANSFORM
 	SELF.head_cnt := ri.head_cnt;
 	SELF := le;
 END;
-ssn_rm := JOIN(ssn_match, doxie.Key_Did_Lookups, LEFT.did=RIGHT.did, rmBads(LEFT, RIGHT), LEFT OUTER);
+ssn_rm := JOIN(ssn_match, index_did_lookups, LEFT.did=RIGHT.did, rmBads(LEFT, RIGHT), LEFT OUTER);
 
 Layout_ID_Batch rollBads(Layout_ID_Batch le, Layout_ID_Batch ri) :=
 TRANSFORM
@@ -189,14 +190,14 @@ ssn_roll := ROLLUP(SORT(ssn_rm,-head_cnt,did), true, rollBads(LEFT,RIGHT));
 
 xx_todo := ssn_roll(did=0);
 
-
-Layout_ID_Batch getCountyDid(Layout_ID_Batch le, doxie.Key_Header_CountyName ri) :=
+index_county :=  dx_header.key_countyName();
+Layout_ID_Batch getCountyDid(Layout_ID_Batch le, index_county ri) :=
 TRANSFORM
 	SELF.did := ri.did;
 	SELF.score := IF(ri.did<>0,50,0);
 	SELF := le;
 END;
-county_match := JOIN(xx_todo, doxie.Key_Header_CountyName,
+county_match := JOIN(xx_todo, index_county,
 					keyed(LEFT.lname=RIGHT.lname) AND
 					keyed(LEFT.county_name=RIGHT.county_name) AND
 					keyed(LEFT.st=RIGHT.st) AND
@@ -208,7 +209,7 @@ county_match := JOIN(xx_todo, doxie.Key_Header_CountyName,
 							LEFT.county_name=RIGHT.county_name AND
 							LEFT.fname[1]=RIGHT.fname[1],
 							1000), LEFT OUTER);
-county_rm := JOIN(county_match, doxie.Key_Did_Lookups, LEFT.did=RIGHT.did, rmBads(LEFT, RIGHT), LEFT OUTER);
+county_rm := JOIN(county_match, index_did_lookups, LEFT.did=RIGHT.did, rmBads(LEFT, RIGHT), LEFT OUTER);
 county_roll := ROLLUP(SORT(county_rm,-head_cnt,did), true, rollBads(LEFT,RIGHT));
 
 

@@ -1,4 +1,4 @@
-
+﻿
 import AutoStandardI,iesp, ut, doxie,  Header, NID, Suppress, RiskWise, STD;
 
 export Search_Records := module
@@ -245,19 +245,8 @@ export Search_Records := module
 		final_sorted := SORT(final_res, 		                    
 												  if((integer)UniqueId = (integer)in_mod.PreferredUniqueId, 0, 1), penalt, -Addresses[1].DateLastSeen.Year,
 						-Addresses[1].DateLastSeen.Month,-Addresses[1].DateLastSeen.Day, -totalRecords, record);		
-										
-		final_sorted_cnsrm := project(final_sorted, transform(recordof(final_sorted),
-				self.Addresses := project(left.Addresses, transform(iesp.thinrolluppersonsearch.t_ThinRpsAddress, 									 
-						self.DateLastSeen.Year := left.VendorDateLastSeen.Year;
-						self.DateLastSeen.Month := left.VendorDateLastSeen.Month;
-						self.DateLastSeen.Day := left.VendorDateLastSeen.Day;				
-						self.VendorDateLastSeen.Year := left.DateLastSeen.Year;	
-						self.VendorDateLastSeen.Month := left.DateLastSeen.Month;
-						self.VendorDateLastSeen.Day := left.DateLastSeen.Day;
-						self := left));
-					self := left)); 
 
-		final_out := PROJECT(final_sorted_cnsrm, Layouts.records);
+ 		final_out := PROJECT(final_sorted, Layouts.records);
 	  //output(recs_clean_tsr, named('recs_clean_tsr'));
 		//output(did_value, named('did_value'));
 		return final_out;

@@ -1,4 +1,4 @@
-﻿import AutostandardI, iesp,  doxie,gateway, Gong, Risk_Indicators, PhonesInfo, Suppress, ut, bipv2,
+﻿import AutostandardI, iesp, doxie, dx_header, gateway, Gong, Risk_Indicators, PhonesInfo, Suppress, ut, bipv2,
   MDR;
 
 EXPORT ReversePhoneTeaserRecords := Module
@@ -96,7 +96,7 @@ EXPORT Records(AutoStandardI.DataRestrictionI.params tempMod,
 	Suppress.MAC_Suppress(AddrInfo_valueFromPhoneFinal,
 		  AddrInfo_valueFromPhoneFinalPulled,application_type_value,Suppress.Constants.LinkTypes.DID,DID);		
 	
-	AddrInfoFromPhoneInput := JOIN(AddrInfo_valueFromPhoneFinalPulled,   doxie.Key_Did_HDid,
+	AddrInfoFromPhoneInput := JOIN(AddrInfo_valueFromPhoneFinalPulled, dx_header.key_did_hhid(),
                         KEYED(LEFT.did = RIGHT.did),   
 													transform(doxie.layout_presentation,
 													      SELF.hhid := RIGHT.hhid,

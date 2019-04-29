@@ -83,6 +83,13 @@ export ReportService := macro
 	
 	// royalties:= temp_royalties + email_royalties;
 	
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ())) 
+    EXPORT unsigned1 glb := tempmod.GLBPurpose;
+    EXPORT string32 application_type := tempmod.applicationtype;
+  END;
+  IF (exists(ds_temp_results), doxie.compliance.logSoldToTransaction(mod_access)); 
+  
+
   //Uncomment line below as needed to assist in debugging
   //output(ds_temp_results,  named('ds_temp_results'));
   output(ds_results,named('Results'));

@@ -1,13 +1,13 @@
-import doxie, iesp, personReports, driversv2_services, suppress, risk_indicators;
+import doxie, iesp, personReports, risk_indicators;
 
 export getImposters(dataset(identifier2.layout_Identifier2) indata, 
                     boolean Include_Imposter_Data=false,
 										boolean IsFCRA = false,
-										PersonReports.input._finderreport finderParams,
+										PersonReports.input.personal personParams,
 										unsigned1 dob_mask_value) := function 
 
   dids := project(indata, transform(doxie.layout_references, self.did := left.did));
-  pers := PersonReports.Person_records(dids, module (project (finderParams, personReports.input.personal, opt)) end, IsFCRA);
+  pers := PersonReports.Person_records(dids, personParams, IsFCRA);
   imposters := pers.imposters;
   found := exists(imposters);
 	ADLCount := count(dedup(sort(imposters.akas, uniqueid), uniqueid));

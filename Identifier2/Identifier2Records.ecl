@@ -1,7 +1,7 @@
 ﻿import iesp,identifier2,address,ut,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std;
-	
+
 	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-	finderParams := project (AutoStandardI.GlobalModule(), PersonReports.input._finderreport, opt);
+	personParams := project (AutoStandardI.GlobalModule(), PersonReports.input.personal, opt);
 
 	boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');
 	string20 Test_Data_Table_Name := ''  	: stored('TestDataTableName');
@@ -298,7 +298,7 @@
 	prop_details := getProperty(data_prep, owned_any_property, ever_owned_input_property, currently_own_input_property, 
 																	Ever_Owned_Input_Property_InPastNumberOfYears, Include_Prop_Data);
 
-	imposter_details := if(Include_Multiple_Identities, getImposters(data_prep, Include_Imposter_Data, IsFCRA,finderParams,dob_mask_value), data_prep);
+	imposter_details := if(Include_Multiple_Identities, getImposters(data_prep, Include_Imposter_Data, IsFCRA, personParams, dob_mask_value), data_prep);
 
 	dl_details := if(Include_Valid_Drivers_License, getDls(data_prep, Include_DL_Data, ssnMask, dob_mask_value, dlMask), data_prep);
 

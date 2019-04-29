@@ -1,4 +1,4 @@
- import address, bankruptcyv3, daybatchpcnsr, doxie, doxie_files, header, LN_PropertyV2, marital_status_indicator, marriage_divorce_v2, models, risk_indicators, ut, watchdog;
+ import bankruptcyv3, doxie, doxie_files, LN_PropertyV2, marital_status_indicator, marriage_divorce_v2, models, risk_indicators, ut, dx_header;
 
 
 export get_MD_shell(DATASET(recordof(marital_status_indicator.key_MSI_Best_did)) indata ) := FUNCTION
@@ -60,7 +60,6 @@ export get_MD_shell(DATASET(recordof(marital_status_indicator.key_MSI_Best_did))
 		STRING8			sec_range2;
 		INTEGER4		dob_diff;
 	end;
-	layout_hed := recordof(doxie.key_header);
 	rHHID := record
 		unsigned6	did;
 		unsigned6 hhid_did;
@@ -72,10 +71,10 @@ export get_MD_shell(DATASET(recordof(marital_status_indicator.key_MSI_Best_did))
 
 	//data sets
 	dInData 		:= distribute(indata, did);
-	fHeader 		:= distribute(doxie.Key_Header, s_did);
+	fHeader 		:= distribute(dx_header.key_header(), s_did);
 	fRelatives 	:= distribute(doxie.Key_Relatives, person1);
 	did_lookup 	:= distribute(doxie.Key_Did_Lookups_v2, did);
-	households 	:= distribute(doxie.Key_HHID_Did, hhid_relat);
+	households 	:= distribute(dx_header.key_hhid_did(), hhid_relat);
 	watchdog 		:= distribute(marital_status_indicator.key_MSI_best_did, did);
 	pkMD_did 		:= distribute(marriage_divorce_v2.key_mar_div_did(false), did);
 	pkMD_main 	:= distribute(marriage_divorce_v2.key_mar_div_id_main(false), record_id);

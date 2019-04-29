@@ -251,7 +251,7 @@ EXPORT phone_noreconn_search := MACRO
 
 	/*---Get TNT Value---*/
 	//get HHID
-	did_hhid_key := doxie.Key_Did_HDid;
+	did_hhid_key := dx_header.key_did_hhid();
 			
 	infile_rec_hhid := record
 		seq_rec;

@@ -17,7 +17,7 @@ IMPORT BatchServices;
 
 EXPORT OthersUsingSSN_BatchService(useCannedRecs = 'false') := 
 	MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		BOOLEAN return_subject_also := FALSE : STORED('ReturnSubjectAlso');
 
 		// 1. Grab the input XML and throw into a dataset.	

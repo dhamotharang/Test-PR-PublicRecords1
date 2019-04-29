@@ -2,22 +2,8 @@ IMPORT iesp, doxie_crs, Census_data, ut, Address, header, DidVille, doxie, Death
 
 EXPORT iesp.identitymanagementreport.t_IdmNeighborAddress NeighborsRecords(IdentityManagement_Services.IParam._report in_params, DATASET (doxie.layout_references) dids) := FUNCTION
 
-// some values are missing, take them from global:
-gmod := AutoStandardI.GlobalModule ();
-// ssn_mask has different type;
-// this is how I can project just selected values:
-mod_access := MODULE (PROJECT (in_params, doxie.IDataAccess, datapermissionmask, datarestrictionmask, ln_branded))
-  EXPORT unsigned1 glb := in_params.glbpurpose;
-  EXPORT unsigned1 dppa := in_params.dppapurpose;
-  EXPORT boolean probation_override := gmod.probationoverride;
-  EXPORT string5 industry_class := in_params.industryclass;
-  EXPORT string32 application_type := in_params.applicationtype;
-  EXPORT boolean no_scrub := gmod.raw;
-  EXPORT unsigned3 date_threshold := in_params.dateVal;
-  EXPORT boolean suppress_dmv := gmod.suppressDMVInfo;
-  EXPORT string ssn_mask := in_params.ssn_mask;
-  EXPORT unsigned1 dl_mask :=	gmod.dlmask;
-END;
+mod_access := PROJECT (in_params, doxie.IDataAccess);
+
 doxie_nbrs := doxie_crs.nbr_records(mode = 'C');
 nbr_dids := DEDUP(SORT(
 											PROJECT(UNGROUP(doxie_nbrs),TRANSFORM(doxie.layout_references, SELF.did := LEFT.did)),

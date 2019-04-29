@@ -1,4 +1,4 @@
-import doxie,gong,ut;
+import doxie, dx_header, gong, ut;
 
 export mod_gong_records(
 	dataset(doxie.layout_references) dids):=
@@ -12,7 +12,7 @@ END;
 iKeep := ut.limits.default;
 
 // DID and HHID lookups
-kh := doxie.Key_Did_HDid;
+kh := dx_header.key_did_hhid();
 
 layout_hid := RECORD
 	UNSIGNED8 hhid_relat;

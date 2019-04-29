@@ -1,8 +1,7 @@
-import MDR;
-
 EXPORT FilterDMVInfo(dIn, pDidField = 'did', pRidField = 'rid') := FUNCTIONMACRO
-	
-	headerKey := Header.Key_DMV_restricted();
+  IMPORT dx_header;
+
+	headerKey := dx_header.key_DMV_restricted();
 
 	dIn xformOut(dIn L,  headerKey R) := transform, skip(r.exclusivedmvsourced)
 		right_row := project(R, transform(recordof(dIn),

@@ -1,6 +1,6 @@
 ﻿import BizLinkFull, BIPV2_Company_Names, ut, SALT28, BIPV2_Best, BIPV2_Suppression;
 import std.Str AS Str;
-import address;
+import dx_Header;
 EXPORT IDfunctions := 
 MODULE
 EXPORT rec_SearchInput := record
@@ -39,7 +39,7 @@ SHARED SearchInputc:=PROJECT(SearchInput,TRANSFORM({SearchInput;UNSIGNED6 cntr;S
   ssAirportReplacement:=BIPV2.fn_translate_city(stringlib.StringToUpperCase(LEFT.city));
   sNewCity:=Str.ToUpperCase(IF(COUNT(ssAirportReplacement)=0,LEFT.city,ssAirportReplacement[1]));
   sNewState_:=Str.ToUpperCase(IF(COUNT(ssAirportReplacement)=0,LEFT.state,ssAirportReplacement[2]));
-  sNewState:=IF(sNewState_<>'',sNewState_,IF(sNewCity='','',address.Key_CityStChance(city_name=sNewCity and percent_chance>=99)[1].st));
+  sNewState:=IF(sNewState_<>'',sNewState_,IF(sNewCity='','',dx_header.key_CityStChance()(KEYED(city_name=sNewCity) and percent_chance>=99)[1].st));
   dZips:=BIPV2.fn_get_zips_2(sNewCity,sNewState,LEFT.zip5,LEFT.zip_radius_miles);
   Input_zip_radius:=LEFT.zip_radius_miles;
   SELF.zip_cases:=IF(dZips[1].zip='',DATASET([],THISMODULE.Process_Biz_Layouts.layout_zip_cases),PROJECT(dZips,TRANSFORM(THISMODULE.Process_Biz_Layouts.layout_zip_cases,SELF.weight:=100-((LEFT.radius/Input_zip_radius)*80);SELF:=LEFT;)));

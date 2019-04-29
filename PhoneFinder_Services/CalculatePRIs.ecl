@@ -109,7 +109,7 @@ FUNCTION
       SELF             := le;
     END;
 
-    dIterateRIs := PROJECT(dRIs(Active), tCheckRIs(LEFT));
+    dIterateRIs := PROJECT(dRIs(Active AND LevelCount > 0), tCheckRIs(LEFT));
     
     // For each Level we would only have ONE LevelCount. The structure of RIs is misleading.
     // For any RI with respective Level, we can look at the LevelCount to get the threshold of PASS/WARN/FAIL
@@ -122,7 +122,7 @@ FUNCTION
 
     tblLevelCnt := TABLE(dIterateRIs, rLevelCnt_Layout, Level, LevelCount, FEW);
 
-    SELF.AlertIndicators   := PROJECT(dIterateRIs(Category != ''),
+    SELF.AlertIndicators   := PROJECT(SORT(dIterateRIs(Category != ''), Category),
                                       TRANSFORM(iesp.phonefinder.t_PhoneFinderAlertIndicator,
                                                 SELF.Flag     := LEFT.Category,
                                                 SELF.Messages := LEFT.RiskDescription,

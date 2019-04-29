@@ -17,7 +17,7 @@
 IMPORT AutoStandardI, BatchShare, Residency_Services, Suppress;	
 
 EXPORT BatchService() := MACRO
-		 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+		 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     // *************************************************************************
    // *                      Force the order on the WsECL page                *
    // *************************************************************************
