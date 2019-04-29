@@ -5,8 +5,7 @@ r:=doxie.layout_references;
 export Append_addr_ind(dataset(r) in_ds, 
 											 BOOLEAN bypassTU = FALSE,		//set to TRUE to bypass Transunion data
 											 BOOLEAN returnInsAdr = FALSE,//insurance only addresses, REQUIRES perm use
-											 BOOLEAN returnDates = FALSE, //set to TRUE to get dates on output, type of date depends on next flag
-											 BOOLEAN usePRDates = TRUE,		//set to FALSE to use insurance dates (more comprehensive, but requires perm use). returnDates needs to be set to TRUE for dates to be populated.
+											 BOOLEAN returnDates = FALSE, //includes insurance metadata, REQUIRES perm use
 											 BOOLEAN slimOutput = FALSE,	//set to TRUE to remove predir, postdir, and addr_suffix
 											 BOOLEAN isFCRA = FALSE,			//set to TRUE to used FCRA addr_unique, header, and header_quick keys
 											 BOOLEAN bypassQH = FALSE) 		//set to TRUE to bypass Quick Header data
@@ -22,9 +21,8 @@ tu_srcs := ['TU','TS','LT','TN'];
 bureau_srcs := ['EQ','EN','QH'] + tu_srcs;
 
 rec := Layout_addr_ind;
-rec_full := Layout_addr_ind_full;
 newrec := record
-  rec_full;
+  rec;
 	string1 isTU;
 	string1 isQH;
 	string2 src;
@@ -49,13 +47,9 @@ datesRolled  := rollup(sort(get_ua,did,-(integer) addr_ind),
 											left.addr_ind = right.addr_ind,
 											transform(newrec,
 											          self.dt_first_seen := mindate(left.dt_first_seen,right.dt_first_seen),
-											          self.dt_first_seen_pr := mindate(left.dt_first_seen_pr,right.dt_first_seen_pr),
 																self.dt_last_seen  := max(left.dt_last_seen,right.dt_last_seen),
-																self.dt_last_seen_pr  := max(left.dt_last_seen_pr,right.dt_last_seen_pr),
 																self.dt_vendor_first_reported := mindate(left.dt_vendor_first_reported,right.dt_vendor_first_reported),
-																self.dt_vendor_first_reported_pr := mindate(left.dt_vendor_first_reported_pr,right.dt_vendor_first_reported_pr),
 																self.dt_vendor_last_reported  := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
-																self.dt_vendor_last_reported_pr  := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
 																self := right,
 																self := left));
 
@@ -70,10 +64,6 @@ bhdr         := join(in_ds,hdr,keyed(left.did = right.s_did),
 															self.addr_ind       := '1';
 															self.src_cnt        := 1;
 															self.bureau_src_cnt := 1;
-															self.dt_first_seen_pr := right.dt_first_seen;
-															self.dt_last_seen_pr := right.dt_last_seen;
-															self.dt_vendor_first_reported_pr := right.dt_vendor_first_reported;
-															self.dt_vendor_last_reported_pr := right.dt_vendor_last_reported;
 														  self:=right,self:=[]),limit(10000));
 
 bhdr_tu      := bhdr(src IN tu_srcs);
@@ -89,10 +79,6 @@ qhdr         := join(in_ds,qh,keyed(left.did = right.did),
 															self.src_cnt        := 1;
 															self.bureau_src_cnt := IF(right.src IN bureau_srcs,1,0);
 															self.isTU						:= IF(right.src IN tu_srcs,'Y','');
-															self.dt_first_seen_pr := right.dt_first_seen;
-															self.dt_last_seen_pr := right.dt_last_seen;
-															self.dt_vendor_first_reported_pr := right.dt_vendor_first_reported;
-															self.dt_vendor_last_reported_pr := right.dt_vendor_last_reported;
 														  self:=right,self:=[]),limit(10000));
 
 qhdr_tu      := qhdr(src IN tu_srcs);
@@ -111,13 +97,9 @@ roll_qh := rollup(sort(qhdr_nontu,did,prim_range,predir,prim_name,addr_suffix,po
 										  left.zip         = right.zip,
 										  transform(newrec,
 										            self.dt_first_seen  := mindate(left.dt_first_seen,right.dt_first_seen),
-										            self.dt_first_seen_pr  := mindate(left.dt_first_seen_pr,right.dt_first_seen_pr),
 															  self.dt_last_seen   := max(left.dt_last_seen,right.dt_last_seen),
-															  self.dt_last_seen_pr   := max(left.dt_last_seen_pr,right.dt_last_seen_pr),
 																self.dt_vendor_first_reported  := mindate(left.dt_vendor_first_reported,right.dt_vendor_first_reported),
-																self.dt_vendor_first_reported_pr  := mindate(left.dt_vendor_first_reported_pr,right.dt_vendor_first_reported_pr),
 															  self.dt_vendor_last_reported   := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
-															  self.dt_vendor_last_reported_pr   := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
 																self.src_cnt        := if(left.src<>right.src,left.src_cnt + right.src_cnt,left.src_cnt),
 																self.bureau_src_cnt := if(left.src<>right.src,left.bureau_src_cnt + right.bureau_src_cnt,left.bureau_src_cnt),
 															  self := right,
@@ -182,13 +164,9 @@ qh_adddates := join(qh_matches + qh_blanksec + qh_nonblanksec,datesRolled,
                  left.did = right.did AND left.addr_ind = right.addr_ind,
 								 transform(newrec,
 								           self.dt_first_seen := mindate(left.dt_first_seen,right.dt_first_seen),
-								           self.dt_first_seen_pr := mindate(left.dt_first_seen_pr,right.dt_first_seen_pr),
 													 self.dt_last_seen  := max(left.dt_last_seen,right.dt_last_seen),
-													 self.dt_last_seen_pr  := max(left.dt_last_seen_pr,right.dt_last_seen_pr),
 													 self.dt_vendor_first_reported := mindate(left.dt_vendor_first_reported,right.dt_vendor_first_reported),
-													 self.dt_vendor_first_reported_pr := mindate(left.dt_vendor_first_reported_pr,right.dt_vendor_first_reported_pr),
-													 self.dt_vendor_last_reported  := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
-													 self.dt_vendor_last_reported_pr  := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
+													 self.dt_vendor_last_reported  := max(left.dt_last_seen,right.dt_last_seen),
 													 self := left)); 
 													 
 qh_matches_all := dedup(sort(qh_adddates,
@@ -228,26 +206,18 @@ qh_mismatches_rolled := rollup(qh_mismatches_nbrd,
                                left.did = right.did AND left.addr_ind = right.addr_ind,
 															 transform(newrec,
 															           self.dt_first_seen := mindate(left.dt_first_seen,right.dt_first_seen),
-															           self.dt_first_seen_pr := mindate(left.dt_first_seen_pr,right.dt_first_seen_pr),
 																				 self.dt_last_seen  := max(left.dt_last_seen,right.dt_last_seen),
-																				 self.dt_last_seen_pr  := max(left.dt_last_seen_pr,right.dt_last_seen_pr),
 																				 self.dt_vendor_first_reported := mindate(left.dt_vendor_first_reported,right.dt_vendor_first_reported),
-																				 self.dt_vendor_first_reported_pr := mindate(left.dt_vendor_first_reported_pr,right.dt_vendor_first_reported_pr),
 																				 self.dt_vendor_last_reported  := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
-																				 self.dt_vendor_last_reported_pr  := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
 																				 self := right));
 																				 
 qh_mismatches_dated  := join(qh_mismatches_nbrd,qh_mismatches_rolled,
                              left.did=right.did AND left.addr_ind = right.addr_ind,
 														 transform(newrec,
 														           self.dt_first_seen := right.dt_first_seen,
-														           self.dt_first_seen_pr := right.dt_first_seen_pr,
 																			 self.dt_last_seen  := right.dt_last_seen,
-																			 self.dt_last_seen_pr  := right.dt_last_seen_pr,
 																			 self.dt_vendor_first_reported := right.dt_vendor_first_reported,
-																			 self.dt_vendor_first_reported_pr := right.dt_vendor_first_reported_pr,
 																			 self.dt_vendor_last_reported  := right.dt_vendor_last_reported,
-																			 self.dt_vendor_last_reported_pr  := right.dt_vendor_last_reported_pr,
 																			 self := left));
 
 qh_join_rec := RECORD
@@ -312,13 +282,9 @@ roll_tu := rollup(sort(IF(bypassQH,bhdr_tu,bhdr_tu+qhdr_tu),did,prim_range,predi
 										  left.zip         = right.zip,
 										  transform(newrec,
 										            self.dt_first_seen  := mindate(left.dt_first_seen,right.dt_first_seen),
-										            self.dt_first_seen_pr  := mindate(left.dt_first_seen_pr,right.dt_first_seen_pr),
 															  self.dt_last_seen   := max(left.dt_last_seen,right.dt_last_seen),
-															  self.dt_last_seen_pr   := max(left.dt_last_seen_pr,right.dt_last_seen_pr),
 																self.dt_vendor_first_reported  := mindate(left.dt_vendor_first_reported,right.dt_vendor_first_reported),
-																self.dt_vendor_first_reported_pr  := mindate(left.dt_vendor_first_reported_pr,right.dt_vendor_first_reported_pr),
 															  self.dt_vendor_last_reported   := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
-															  self.dt_vendor_last_reported_pr   := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
 																self.src_cnt        := if(left.src<>right.src,left.src_cnt + right.src_cnt,left.src_cnt),
 																self.bureau_src_cnt := if(left.src<>right.src,left.bureau_src_cnt + right.bureau_src_cnt,left.bureau_src_cnt),
 															  self := right,
@@ -382,13 +348,9 @@ adddates := join(tu_matches + tu_blanksec + tu_nonblanksec,qh_all,
                  left.did = right.did AND left.addr_ind = right.addr_ind,
 								 transform(newrec,
 								           self.dt_first_seen := right.dt_first_seen,
-								           self.dt_first_seen_pr := right.dt_first_seen_pr,
 													 self.dt_last_seen  := right.dt_last_seen,
-													 self.dt_last_seen_pr  := right.dt_last_seen_pr,
 													 self.dt_vendor_first_reported := right.dt_vendor_first_reported,
-													 self.dt_vendor_first_reported_pr := right.dt_vendor_first_reported_pr,
 													 self.dt_vendor_last_reported  := right.dt_vendor_last_reported,
-													 self.dt_vendor_last_reported_pr  := right.dt_vendor_last_reported_pr,
 													 self := left)); 
 
 tu_matches_all := dedup(sort(adddates,
@@ -428,26 +390,18 @@ tu_mismatches_rolled := rollup(tu_mismatches_nbrd,
                                left.did = right.did AND left.addr_ind = right.addr_ind,
 															 transform(newrec,
 															           self.dt_first_seen := mindate(left.dt_first_seen,right.dt_first_seen),
-															           self.dt_first_seen_pr := mindate(left.dt_first_seen_pr,right.dt_first_seen_pr),
 																				 self.dt_last_seen  := max(left.dt_last_seen,right.dt_last_seen),
-																				 self.dt_last_seen_pr  := max(left.dt_last_seen_pr,right.dt_last_seen_pr),
 																				 self.dt_vendor_first_reported := mindate(left.dt_vendor_first_reported,right.dt_vendor_first_reported),
-																				 self.dt_vendor_first_reported_pr := mindate(left.dt_vendor_first_reported_pr,right.dt_vendor_first_reported_pr),
 																				 self.dt_vendor_last_reported  := max(left.dt_vendor_last_reported,right.dt_vendor_last_reported),
-																				 self.dt_vendor_last_reported_pr  := max(left.dt_vendor_last_reported_pr,right.dt_vendor_last_reported_pr),
 																				 self := right));
 																				 
 tu_mismatches_dated  := join(tu_mismatches_nbrd,tu_mismatches_rolled,
                              left.did=right.did AND left.addr_ind = right.addr_ind,
 														 transform(newrec,
 														           self.dt_first_seen := right.dt_first_seen,
-														           self.dt_first_seen_pr := right.dt_first_seen_pr,
 																			 self.dt_last_seen  := right.dt_last_seen,
-																			 self.dt_last_seen_pr  := right.dt_last_seen_pr,
 																			 self.dt_vendor_first_reported := right.dt_vendor_first_reported,
-																			 self.dt_vendor_first_reported_pr := right.dt_vendor_first_reported_pr,
 																			 self.dt_vendor_last_reported  := right.dt_vendor_last_reported,
-																			 self.dt_vendor_last_reported_pr  := right.dt_vendor_last_reported_pr,
 																			 self := left));
 
 stdAptCnt := iterate(sort(qh_all + tu_matches_all + tu_mismatches_dated,
@@ -490,10 +444,6 @@ add_rawaid_full := join(tu_apts_combined(isQH = ''),bhdr,
 									 left.zip         = right.zip,
                    transform(outrec,
 									           self.rawaid := right.rawaid,
-														 self.dt_first_seen := IF(usePRDates,LEFT.dt_first_seen_pr,LEFT.dt_first_seen);
-														 self.dt_last_seen := IF(usePRDates,LEFT.dt_last_seen_pr,LEFT.dt_last_seen);
-														 self.dt_vendor_first_reported := IF(usePRDates,LEFT.dt_vendor_first_reported_pr,LEFT.dt_vendor_first_reported);
-														 self.dt_vendor_last_reported := IF(usePRDates,LEFT.dt_vendor_last_reported_pr,LEFT.dt_vendor_last_reported);
 														 self := left),left outer);
 														 
 add_rawaid_quick := join(tu_apts_combined(isQH = 'Y'),qhdr,
@@ -509,10 +459,6 @@ add_rawaid_quick := join(tu_apts_combined(isQH = 'Y'),qhdr,
 									 left.zip         = right.zip,
                    transform(outrec,
 									           self.rawaid := right.rawaid,
-														 self.dt_first_seen := IF(usePRDates,LEFT.dt_first_seen_pr,LEFT.dt_first_seen);
-														 self.dt_last_seen := IF(usePRDates,LEFT.dt_last_seen_pr,LEFT.dt_last_seen);
-														 self.dt_vendor_first_reported := IF(usePRDates,LEFT.dt_vendor_first_reported_pr,LEFT.dt_vendor_first_reported);
-														 self.dt_vendor_last_reported := IF(usePRDates,LEFT.dt_vendor_last_reported_pr,LEFT.dt_vendor_last_reported);
 														 self := left),left outer);
 														 
 dates_out := project(add_rawaid_full + add_rawaid_quick,TRANSFORM(outrec,
