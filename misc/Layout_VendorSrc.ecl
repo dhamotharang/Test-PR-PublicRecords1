@@ -15,7 +15,7 @@ EXPORT Layout_VendorSrc := MODULE
 	END;
 	
 	EXPORT Bank_Court	:= RECORD
-	  STRING    lncourt_code;    
+	  STRING    lncourt_code;
 		STRING		court_code;
 		STRING		court_name;
 		STRING		address1;
