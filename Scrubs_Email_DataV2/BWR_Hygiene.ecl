@@ -1,0 +1,128 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_Email_DataV2.BWR_Hygiene - Hygiene & Stats - SALT V3.11.6');
+IMPORT Scrubs_Email_DataV2,SALT311;
+// First create an instantiated hygiene module
+  infile := Scrubs_Email_DataV2.In_Email_DataV2;
+  ip := DISTRIBUTE(infile, SKEW(0.1));
+  h := Scrubs_Email_DataV2.hygiene(ip);
+  p := h.AllProfiles; // Detailed profile of every field
+  OUTPUT(h.Summary('SummaryReport'),ALL,NAMED('Summary'));
+  OUTPUT(h.SourceCounts,ALL,NAMED('SourceCounts'));
+  OUTPUT(h.CrossLinkingPotential,ALL,NAMED('CrossLinkingPotential'));
+  OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
+  OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
+  OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
+  OUTPUT(SALT311.MAC_Character_Counts.EclRecord(p,'Layout_Email_DataV2'),NAMED('OptimizedLayout'));// File layout suggested by data
+  // Produces field types that match the most common 99.9% of your data. Change to 100 to match all your data
+  OUTPUT(SALT311.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
+  // ****** Cross Tabs *******
+  // It is possible to create a cross table between any two fields, see documentation on SALT311.MAC_CrossTab
+  // These commented out lines will create crosstabs from the sourcefield to each individual field
+  // IF you find yourself using ALL of these a LOT - let me know, I can make the 'all' case faster
+   Examples := 10;
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,clean_email,Examples),NAMED('clean_emailByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_email_username,Examples),NAMED('append_email_usernameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_domain,Examples),NAMED('append_domainByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_domain_type,Examples),NAMED('append_domain_typeByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_domain_root,Examples),NAMED('append_domain_rootByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_domain_ext,Examples),NAMED('append_domain_extByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_is_tld_state,Examples),NAMED('append_is_tld_stateByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_is_tld_generic,Examples),NAMED('append_is_tld_genericByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_is_tld_country,Examples),NAMED('append_is_tld_countryByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_is_valid_domain_ext,Examples),NAMED('append_is_valid_domain_extByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,email_rec_key,Examples),NAMED('email_rec_keyByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_pmghousehold_id,Examples),NAMED('orig_pmghousehold_idByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_pmgindividual_id,Examples),NAMED('orig_pmgindividual_idByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_first_name,Examples),NAMED('orig_first_nameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_last_name,Examples),NAMED('orig_last_nameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_middle_name,Examples),NAMED('orig_middle_nameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_name_suffix,Examples),NAMED('orig_name_suffixByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_address,Examples),NAMED('orig_addressByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_city,Examples),NAMED('orig_cityByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_state,Examples),NAMED('orig_stateByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_zip,Examples),NAMED('orig_zipByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_zip4,Examples),NAMED('orig_zip4Byemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_email,Examples),NAMED('orig_emailByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_ip,Examples),NAMED('orig_ipByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_login_date,Examples),NAMED('orig_login_dateByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_site,Examples),NAMED('orig_siteByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_e360_id,Examples),NAMED('orig_e360_idByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_teramedia_id,Examples),NAMED('orig_teramedia_idByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_phone,Examples),NAMED('orig_phoneByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_ssn,Examples),NAMED('orig_ssnByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_dob,Examples),NAMED('orig_dobByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,did,Examples),NAMED('didByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,did_score,Examples),NAMED('did_scoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,did_type,Examples),NAMED('did_typeByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,hhid,Examples),NAMED('hhidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,title,Examples),NAMED('titleByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,fname,Examples),NAMED('fnameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,mname,Examples),NAMED('mnameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,lname,Examples),NAMED('lnameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,name_suffix,Examples),NAMED('name_suffixByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,name_score,Examples),NAMED('name_scoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,prim_range,Examples),NAMED('prim_rangeByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,predir,Examples),NAMED('predirByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,prim_name,Examples),NAMED('prim_nameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,addr_suffix,Examples),NAMED('addr_suffixByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,postdir,Examples),NAMED('postdirByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,unit_desig,Examples),NAMED('unit_desigByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,sec_range,Examples),NAMED('sec_rangeByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,p_city_name,Examples),NAMED('p_city_nameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,v_city_name,Examples),NAMED('v_city_nameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,st,Examples),NAMED('stByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,zip,Examples),NAMED('zipByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,zip4,Examples),NAMED('zip4Byemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,cart,Examples),NAMED('cartByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,cr_sort_sz,Examples),NAMED('cr_sort_szByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,lot,Examples),NAMED('lotByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,lot_order,Examples),NAMED('lot_orderByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,dbpc,Examples),NAMED('dbpcByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,chk_digit,Examples),NAMED('chk_digitByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,rec_type,Examples),NAMED('rec_typeByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,county,Examples),NAMED('countyByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,geo_lat,Examples),NAMED('geo_latByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,geo_long,Examples),NAMED('geo_longByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,msa,Examples),NAMED('msaByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,geo_blk,Examples),NAMED('geo_blkByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,geo_match,Examples),NAMED('geo_matchByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,err_stat,Examples),NAMED('err_statByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,append_rawaid,Examples),NAMED('append_rawaidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,clean_phone,Examples),NAMED('clean_phoneByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,clean_ssn,Examples),NAMED('clean_ssnByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,clean_dob,Examples),NAMED('clean_dobByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,process_date,Examples),NAMED('process_dateByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,activecode,Examples),NAMED('activecodeByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,date_first_seen,Examples),NAMED('date_first_seenByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,date_last_seen,Examples),NAMED('date_last_seenByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,date_vendor_first_reported,Examples),NAMED('date_vendor_first_reportedByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,date_vendor_last_reported,Examples),NAMED('date_vendor_last_reportedByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,current_rec,Examples),NAMED('current_recByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orig_companyname,Examples),NAMED('orig_companynameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,cln_companyname,Examples),NAMED('cln_companynameByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,companytitle,Examples),NAMED('companytitleByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,rules,Examples),NAMED('rulesByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,dotid,Examples),NAMED('dotidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,dotscore,Examples),NAMED('dotscoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,dotweight,Examples),NAMED('dotweightByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,empid,Examples),NAMED('empidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,empscore,Examples),NAMED('empscoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,empweight,Examples),NAMED('empweightByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,powid,Examples),NAMED('powidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,powscore,Examples),NAMED('powscoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,powweight,Examples),NAMED('powweightByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,proxid,Examples),NAMED('proxidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,proxscore,Examples),NAMED('proxscoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,proxweight,Examples),NAMED('proxweightByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,seleid,Examples),NAMED('seleidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,selescore,Examples),NAMED('selescoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,seleweight,Examples),NAMED('seleweightByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orgid,Examples),NAMED('orgidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orgscore,Examples),NAMED('orgscoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,orgweight,Examples),NAMED('orgweightByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,ultid,Examples),NAMED('ultidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,ultscore,Examples),NAMED('ultscoreByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,ultweight,Examples),NAMED('ultweightByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,global_sid,Examples),NAMED('global_sidByemail_src'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,email_src,record_sid,Examples),NAMED('record_sidByemail_src'));

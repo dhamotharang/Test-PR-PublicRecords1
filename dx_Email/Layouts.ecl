@@ -83,7 +83,7 @@ EXPORT base := RECORD
 	string10	clean_phone;
   string9 	clean_ssn;
   unsigned4 clean_dob;
-	string8		process_date;
+	string8	process_date;
 	string1 activecode;
   string8 date_first_seen;
   string8 date_last_seen;
@@ -95,6 +95,8 @@ EXPORT base := RECORD
 	string	CompanyTitle;
 	unsigned	rules;
 	bipv2.IDlayouts.l_xlink_ids;
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 END;
 
 EXPORT i_DID	:= RECORD
@@ -110,6 +112,24 @@ END;
 EXPORT i_Payload	:= RECORD
 	unsigned	email_rec_key;
 	base;
+END;
+
+EXPORT i_Event_lkp := RECORD
+	STRING16	transaction_id;
+	STRING120 email_address;
+	STRING100 account;
+	STRING100	domain;
+	STRING10	status;
+	STRING10	disposable;
+	STRING10	role_address;
+	STRING40	error_code;
+	STRING100	error_desc;
+	STRING20	source;
+	STRING8		date_added;
+	STRING8		process_date;
+	STRING2		source_cd;	//Needed for populating field(s) below
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
 END;
 
 END;

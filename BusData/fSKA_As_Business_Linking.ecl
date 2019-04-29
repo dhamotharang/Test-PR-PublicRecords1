@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, address, mdr, _Validate;
+﻿IMPORT Business_Header, ut, address, mdr, _Validate;
 
 EXPORT fSKA_As_Business_Linking(
 
@@ -37,7 +37,8 @@ FUNCTION
 	  SELF.dt_vendor_first_reported := (UNSIGNED4)Stringlib.GetDateYYYYMMDD();
 	  SELF.dt_vendor_last_reported := (UNSIGNED4)Stringlib.GetDateYYYYMMDD();
 	  SELF.company_bdid := (UNSIGNED6)l.bdid;
-	  SELF.company_name := Stringlib.StringToUpperCase(l.company_name);
+	  // SELF.company_name := Stringlib.StringToUpperCase(l.company_name);
+	  SELF.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
  	  SELF.company_address.prim_range := CHOOSE(CTR, l.mail_prim_range, l.alt_prim_range);
 	  SELF.company_address.predir := CHOOSE(CTR, l.mail_predir, l.alt_predir);
 	  SELF.company_address.prim_name := CHOOSE(CTR, l.mail_prim_name, l.alt_prim_name);
@@ -170,7 +171,8 @@ FUNCTION
 	  SELF.dt_vendor_last_reported := IF((INTEGER)l.NIXIE_DATE <> 0, (UNSIGNED4)l.NIXIE_DATE,
 									                     (UNSIGNED4)Stringlib.GetDateYYYYMMDD());
 	  SELF.company_bdid := (UNSIGNED6)l.bdid;
-	  SELF.company_name := Stringlib.StringToUpperCase(l.company_name);
+	  // SELF.company_name := Stringlib.StringToUpperCase(l.company_name);
+	  SELF.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
  	  SELF.company_address.prim_range := l.mail_prim_range;
 	  SELF.company_address.predir := l.mail_predir;
 	  SELF.company_address.prim_name := l.mail_prim_name;
@@ -198,17 +200,20 @@ FUNCTION
 	  SELF.company_address.geo_blk := l.mail_geo_blk;
 	  SELF.company_address.geo_match := l.mail_geo_match;
 	  SELF.company_address.err_stat := l.mail_err_stat;
-	  SELF.company_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.phone);
+	  // SELF.company_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.phone);
+	  SELF.company_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.NUMBER);
 	  SELF.vl_id := 'SKAN' + l.id;
     SELF.current := TRUE;
-	  SELF.phone_score := IF((INTEGER)l.phone = 0, 0, 1);
+	  // SELF.phone_score := IF((INTEGER)l.phone = 0, 0, 1);
+	  SELF.phone_score := IF((INTEGER)l.NUMBER = 0, 0, 1);
 	  SELF.contact_name.title := l.title;
  	  SELF.contact_name.fname := l.fname;
  	  SELF.contact_name.mname := l.mname;
  	  SELF.contact_name.lname := l.lname;
  	  SELF.contact_name.name_suffix := l.name_suffix;
  	  SELF.contact_name.name_score := l.name_score;
-	  SELF.contact_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.phone);
+	  // SELF.contact_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.phone);
+	  SELF.contact_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.NUMBER);
 	  SELF.cid := (UNSIGNED8)l.persid;
     SELF.contact_score := IF(l.persid = '', 0, 1);
     SELF.company_department := l.dept_code;
@@ -223,9 +228,11 @@ FUNCTION
 	Layout_BLF_Local RollupBR(Layout_BLF_Local l, Layout_BLF_Local r) := TRANSFORM
 	  SELF.dt_first_seen := ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 				                                  ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
-	  SELF.dt_last_seen := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
-	  SELF.dt_vendor_last_reported := ut.LatestDate(l.dt_vendor_last_reported, 
-                                                  r.dt_vendor_last_reported);
+	  // SELF.dt_last_seen := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
+	  SELF.dt_last_seen := MAX(l.dt_last_seen,r.dt_last_seen);
+	  // SELF.dt_vendor_last_reported := ut.LatestDate(l.dt_vendor_last_reported, 
+	  SELF.dt_vendor_last_reported := MAX(l.dt_vendor_last_reported, 
+                                        r.dt_vendor_last_reported);
 	  SELF.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported,
                                                      r.dt_vendor_first_reported);
 	  SELF.company_name := IF(l.company_name = '', r.company_name, l.company_name);

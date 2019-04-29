@@ -151,6 +151,11 @@ EXPORT FilterPrimNames_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+EXPORT UnderLinks_ChildRec := RECORD
+  SALT311.StrType Basis;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
 EXPORT Uber_ChildRec := RECORD
   SALT311.Str30Type word;
   UNSIGNED8 cnt;
@@ -278,6 +283,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 FilterPrimNames_switch;
   REAL4 FilterPrimNames_maximum;
   DATASET(FilterPrimNames_ChildRec) nulls_FilterPrimNames {MAXCOUNT(100)};
+  REAL4 UnderLinks_specificity;
+  REAL4 UnderLinks_switch;
+  REAL4 UnderLinks_maximum;
+  DATASET(UnderLinks_ChildRec) nulls_UnderLinks {MAXCOUNT(100)};
   REAL4 uber_specificity;
   REAL4 uber_switch;
   REAL4 uber_maximum;

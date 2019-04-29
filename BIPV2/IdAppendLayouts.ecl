@@ -1,4 +1,5 @@
-﻿import BIPV2;
+﻿import AutoStandardI;
+import BIPV2;
 
 export IdAppendLayouts := module
 	
@@ -7,24 +8,24 @@ export IdAppendLayouts := module
 
 	export appendInput := {
 		unsigned request_id,
-	  baseLayout.company_name,
-	  baseLayout.prim_range,
-	  baseLayout.prim_name,
-	  baseLayout.sec_range,
-	  typeof(baseLayout.p_city_name) city,
-	  typeof(baseLayout.st) state,
-	  typeof(baseLayout.zip) zip5,
+		baseLayout.company_name,
+		baseLayout.prim_range,
+		baseLayout.prim_name,
+		baseLayout.sec_range,
+		typeof(baseLayout.p_city_name) city,
+		typeof(baseLayout.st) state,
+		typeof(baseLayout.zip) zip5,
 		unsigned3 zip_radius_miles := 0;
-	  typeof(baseLayout.company_phone) phone10,
-	  typeof(baseLayout.company_fein) fein,
-	  typeof(baseLayout.company_url) url,
-	  typeof(baseLayout.contact_email) email,
-	  typeof(baseLayout.fname) contact_fname,
-	  typeof(baseLayout.mname) contact_mname,
-	  typeof(baseLayout.lname) contact_lname,
-	  baseLayout.contact_ssn,
+		typeof(baseLayout.company_phone) phone10,
+		typeof(baseLayout.company_fein) fein,
+		typeof(baseLayout.company_url) url,
+		typeof(baseLayout.contact_email) email,
+		typeof(baseLayout.fname) contact_fname,
+		typeof(baseLayout.mname) contact_mname,
+		typeof(baseLayout.lname) contact_lname,
+		baseLayout.contact_ssn,
 		baseLayout.contact_did,
-	  typeof(baseLayout.company_sic_code1) sic_code,
+		typeof(baseLayout.company_sic_code1) sic_code,
 		baseLayout.source,
 		baseLayout.source_record_id,
 		baseLayout.proxid,
@@ -71,6 +72,13 @@ export IdAppendLayouts := module
 		baseLayout.duns_number,
 		baseLayout.company_sic_code1,
 		baseLayout.company_naics_code1,
+		typeof(baseLayout.dba_name) dba_name,
+		typeof(baseLayout.cnp_btype) company_btype,
+		typeof(baseLayout.fname) contact_fname,
+		typeof(baseLayout.mname) contact_mname,
+		typeof(baseLayout.lname) contact_lname,
+		typeof(baseLayout.contact_job_title_derived) contact_job_title,
+		baselayout.contact_did,
 	};
 
 	// BizLinkFull.svcAppend service also returns a dataset of this layout to return the header records.
@@ -93,6 +101,20 @@ export IdAppendLayouts := module
 		string error_msg := '',
 	};
 
+	shared globalMod := AutoStandardI.GlobalModule();
+	export Permissions := {
+		string dummy_field, // Needed to create a record that uses the defaults for the other fields.
+		typeof(globalMod.AllowAll) allowAll {xpath('AllowAll')} := globalMod.AllowAll,
+		typeof(globalMod.AllowDPPA) AllowDPPA {xpath('AllowDPPA')} := globalMod.AllowDPPA,
+		typeof(globalMod.DataPermissionMask) DataPermissionMask {xpath('DataPermissionMask')} := globalMod.DataPermissionMask,
+		typeof(globalMod.DataRestrictionMask) DataRestrictionMask {xpath('DataRestrictionMask')} := globalMod.DataRestrictionMask,
+		typeof(globalMod.GLBPurpose) GLBPurpose {xpath('GLBPurpose')} := globalMod.GLBPurpose,
+		typeof(globalMod.ignoreFares) ignoreFares {xpath('ignoreFares')} := globalMod.ignoreFares,
+		typeof(globalMod.ignoreFidelity) ignoreFidelity {xpath('ignoreFidelity')} := globalMod.ignoreFidelity,
+		typeof(globalMod.IndustryClass) IndustryClass {xpath('IndustryClass')} := globalMod.IndustryClass,
+		typeof(globalMod.LnBranded) LnBranded {xpath('LnBranded')} := globalMod.LnBranded,
+	};
+
 	export SoapRequest := {
 		dataset(AppendInput) append_input {xpath('append_input/Row')},
 		unsigned score_threshold {xpath('score_threshold')},
@@ -109,6 +131,12 @@ export IdAppendLayouts := module
 		string fetch_level {xpath('fetch_level')},
 
 		boolean include_records {xpath('include_records')},
+
+		boolean is_marketing {xpath('is_marketing')},
+		boolean dnb_full_remove {xpath('dnb_full_remove')},
+
+		// query permissions need to be passed to remote service
+		permissions - dummy_field,
 	};
 
 end;

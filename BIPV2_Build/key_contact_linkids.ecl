@@ -1,7 +1,7 @@
 ﻿import Business_Header_SS,corp2,BIPV2,business_header,ut,AutoStandardI,tools
        ,acf,diversity_certification,govdata,gsa,insurance_certification,martindale_hubbell
 			 ,ncpdp,oig,one_click_data,poesfromemails,poesfromutilities,redbooks,saleschannel,sda_sdaa
-			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools,Suppress;
+			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools,Suppress, Address;
 EXPORT key_contact_linkids :=
 module
 													 //BIPV2.File_Business_Sources(source not in [mdr.sourcetools.src_Dunn_Bradstreet,mdr.sourcetools.src_zoom])
@@ -26,7 +26,48 @@ module
 														//+teletrack.As_Business_Linking_Contact()				 //*** Removed teletrack as per bug# 132603.
 														//+thrive.As_Business_Linking_Contact()						 //*** Removed thrive as per bug# 132603.
 														;
-//  shared contacts_sources := choosen(Corp2.Corp2_As_Business_Linking(),1000000);
+
+  didding_layout := {
+     BIPV2.Layout_Business_Linking_Full - contact_name - company_address,
+	  		address.layout_clean_name - name_score,
+	  		address.Layout_Clean_125  
+  };
+
+  contacts_sources_with_id := distribute(project(contacts_sources, 
+      transform(BIPV2.Layout_Business_Linking_Full, self.rcid:=counter; self:=left;)), rcid);
+
+  ds := project(contacts_sources_with_id, transform(didding_layout, 																																						
+    self.title := left.contact_name.title;
+    self.fname := left.contact_name.fname;
+    self.mname := left.contact_name.mname;
+    self.lname := left.contact_name.lname;
+    self.name_suffix := left.contact_name.name_suffix;
+		
+    self.predir := left.company_address.predir;
+    self.prim_name := left.company_address.prim_name;
+    self.prim_range := left.company_address.prim_range;
+    self.addr_suffix := left.company_address.addr_suffix;
+    self.unit_desig := left.company_address.unit_desig;																																								
+    self.postdir := left.company_address.postdir;
+    self.sec_range := left.company_address.sec_range;
+    self.p_city_name := left.company_address.p_city_name;
+    self.v_city_name := left.company_address.v_city_name;
+    self.st := left.company_address.st;																																									
+    self.zip := left.company_address.zip;
+    self.zip4 := left.company_address.zip4;
+    self := left;
+		  self:=[]));
+  // Same Append as done in BIPV2_Build.proc_ingest
+  append := BIPV2_Files.tools_dotid().APPEND_DID(distribute(ds));//this can get skewed, so add distribute
+
+  shared contacts_sources_w_append := join(contacts_sources_with_id, append, 
+    left.rcid=right.rcid, 
+    transform(BIPV2.Layout_Business_Linking_Full,
+        self.contact_did := if(right.contact_did<>0, right.contact_did, left.contact_did);
+        self := left;),
+		  keep(1));
+
+
   shared r1 :=
   record
 	  unsigned8 rid:=0;
@@ -37,7 +78,7 @@ module
 		integer executive_ind_order:=0;
   end;
   
-  shared ds1 := contacts_sources;
+  shared ds1 := contacts_sources_w_append;
   
   shared ds_add_ids := project(ds1,r1);
   shared ds_add_ids_commonbase := project(bipv2.commonbase.ds_built(BIPV2.mod_sources.srcInBase(source),ingest_status in ['New','Unchanged','Updated']),transform(r1

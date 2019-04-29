@@ -1,4 +1,4 @@
-import business_header,business_header_ss,ut,did_add, STRATA,mdr;
+﻿import business_header, business_header_ss, ut, did_add, STRATA, mdr, PromoteSupers;
 
 //-----------[ nixie ]----------
 df0 := busdata.File_SKA_Nixie_In;
@@ -15,29 +15,28 @@ end;
 rec1 into_bdid(df1 L) := transform
 	self.bdid 				 := 0;
 	self.source 			 := MDR.sourceTools.src_SKA;
-	self.source_rec_id := hash64(
-														 ut.fnTrim2Upper(l.prename)
-														,ut.fnTrim2Upper(l.first_name)
-														,ut.fnTrim2Upper(l.middle)
-														,ut.fnTrim2Upper(l.last_name)
-														,ut.fnTrim2Upper(l.dept_title)
-														,ut.fnTrim2Upper(l.dept_code)
-														,ut.fnTrim2Upper(l.dept_expl)
-														,ut.fnTrim2Upper(l.spec)
-														,ut.fnTrim2Upper(l.spec_expl)
-														,ut.fnTrim2Upper(l.dept_file)
-														,ut.fnTrim2Upper(l.company_name)
-														,ut.fnTrim2Upper(l.address1)
-														,ut.fnTrim2Upper(l.city)
-														,ut.fnTrim2Upper(l.state)														
- 														,ut.fnTrim2Upper(l.zip)
-														,ut.fnTrim2Upper(l.area_code)			
-														,ut.fnTrim2Upper(l.phone)			
-														,ut.fnTrim2Upper(l.id)			
-														,ut.fnTrim2Upper(l.persid)			
-														,ut.fnTrim2Upper(l.nixie_date)
-														);
+  DATA temp_record_id := HASHMD5(ut.CleanSpacesAndUpper(l.TTL)
+														 + ','  + ut.CleanSpacesAndUpper(l.first_name)
+                                 + ','  + ut.CleanSpacesAndUpper(l.middle)
+                                 + ','  + ut.CleanSpacesAndUpper(l.last_name)
+                                 + ','  + ut.CleanSpacesAndUpper(l.T1)
+                                 + ','  + ut.CleanSpacesAndUpper(l.dept_code)
+                                 + ','  + ut.CleanSpacesAndUpper(l.dept_expl)
+														 + ','  + ut.CleanSpacesAndUpper(l.spec)
+														 + ','  + ut.CleanSpacesAndUpper(l.spec_expl)
+														 + ','  + ut.CleanSpacesAndUpper(l.COMPANY1)
+														 + ','  + ut.CleanSpacesAndUpper(l.address1)
+														 + ','  + ut.CleanSpacesAndUpper(l.city)
+														 + ','  + ut.CleanSpacesAndUpper(l.state)														
+ 														 + ','  + ut.CleanSpacesAndUpper(l.zip)
+														 + ','  + ut.CleanSpacesAndUpper(l.area_code)			
+														 + ','  + ut.CleanSpacesAndUpper(l.NUMBER)			
+														 + ','  + ut.CleanSpacesAndUpper(l.id)			
+														 + ','  + ut.CleanSpacesAndUpper(l.persid)			
+														 + ','  + ut.CleanSpacesAndUpper(l.nixie_date));
+	self.source_rec_id := hash64(temp_record_id);
 	self 							:= l;
+	self 							:= [];
 end;
 
 df1_2_proj	:= project(df1,into_bdid(LEFT));
@@ -50,18 +49,20 @@ business_header.MAC_Source_Match(
 				 df1_2													// infile
 				,outf1													// outfile
 				,false													// bool_bdid_field_is_string12
-				,bdid														// bdid_field
+				,bdid													// bdid_field
 				,false													// bool_infile_has_source_field
-				,MDR.sourceTools.src_SKA				// source_type_or_field
+				,MDR.sourceTools.src_SKA				  // source_type_or_field
 				,false													// bool_infile_has_source_group
 				,foo														// source_group_field
-				,company_name										// company_name_field
+				// ,company_name										// company_name_field
+				,COMPANY1										  // company_name_field
 				,mail_prim_range								// prim_range_field
 				,mail_prim_name									// prim_name_field
 				,mail_sec_range									// sec_range_field
-				,mail_zip												// zip_field
-				,true														// bool_infile_has_phone
-				,phone													// phone_field
+				,mail_zip											// zip_field
+				,true													// bool_infile_has_phone
+				// ,phone													// phone_field
+				,NUMBER  											// phone_field
 				,false													// bool_infile_has_fein
 				,foo														// fein_field
 				,																// bool_infile_has_vendor_id = 'false'
@@ -73,13 +74,15 @@ myset := ['A','P'];
 Business_Header_SS.MAC_Match_Flex(
 			 outf1																// input dataset						
 			,myset				                				// bdid matchset what fields to match on           
-			,company_name	                        // company_name	              
+			// ,company_name	                        // company_name	              
+			,COMPANY1	                          // company_name	              
 			,mail_prim_range		                  // prim_range		              
 			,mail_prim_name		                    // prim_name		              
 			,mail_zip					                    // zip5					              
 			,mail_sec_range		                    // sec_range		              
 			,mail_st				        		          // state				              
-			,phone						                    // phone				              
+			// ,phone						                    // phone				              
+			,NUMBER					                    // phone				              
 			,foo            			           	  	// fein              
 			,bdid										        			// bdid												
 			,rec1																	// output layout 
@@ -105,7 +108,7 @@ Business_Header_SS.MAC_Match_Flex(
 
 outf1_4 := project(outf1_3, transform(busdata.layout_ska_nixie_bdid,self := LEFT));
 
-ut.MAC_SF_BuildProcess(outf1_4,'~thor_data400::base::ska_nixie',do1,2);
+PromoteSupers.MAC_SF_BuildProcess(outf1_4,'~thor_data400::base::ska_nixie',do1,2);
 
 //--------------[ verified ]----------
 
@@ -122,34 +125,35 @@ rec2 into_bdid2(df2 L,integer C) := transform
 	self.bdid 				 := 0;
 	self.source 			 := MDR.sourceTools.src_SKA;
 	self.seq 					 := C;
-	self.source_rec_id := hash64(ut.fnTrim2Upper(l.prename)
-														,ut.fnTrim2Upper(l.first_name)
-														,ut.fnTrim2Upper(l.middle)
-														,ut.fnTrim2Upper(l.last_name)
-														,ut.fnTrim2Upper(l.company_title)
-														,ut.fnTrim2Upper(l.do)
-														,ut.fnTrim2Upper(l.key_code)
-														,ut.fnTrim2Upper(l.key_title)
-														,ut.fnTrim2Upper(l.company_name)
-														,ut.fnTrim2Upper(l.address1)
-														,ut.fnTrim2Upper(l.city)
-														,ut.fnTrim2Upper(l.state)														
- 														,ut.fnTrim2Upper(l.zip)
-														,ut.fnTrim2Upper(l.address2)
-														,ut.fnTrim2Upper(l.city2)
-														,ut.fnTrim2Upper(l.state2)														
- 														,ut.fnTrim2Upper(l.zip2)														
-														,ut.fnTrim2Upper(l.fips)			
-														,ut.fnTrim2Upper(l.phone)
-														,ut.fnTrim2Upper(l.spec)
-														,ut.fnTrim2Upper(l.spec_expl)
-														,ut.fnTrim2Upper(l.spec2)
-														,ut.fnTrim2Upper(l.spec2_expl)	
-														,ut.fnTrim2Upper(l.spec3)
-														,ut.fnTrim2Upper(l.spec3_expl)															
-														,ut.fnTrim2Upper(l.id)			
-														,ut.fnTrim2Upper(l.persid)			
-														,ut.fnTrim2Upper(l.owner));		
+  DATA temp_record_id := HASHMD5(ut.CleanSpacesAndUpper(l.TTL)
+														 + ','  + ut.CleanSpacesAndUpper(l.first_name)
+														 + ','  + ut.CleanSpacesAndUpper(l.middle)
+														 + ','  + ut.CleanSpacesAndUpper(l.last_name)
+														 + ','  + ut.CleanSpacesAndUpper(l.T1)
+														 + ','  + ut.CleanSpacesAndUpper(l.do)
+														 + ','  + ut.CleanSpacesAndUpper(l.DEPTCODE)
+														 + ','  + ut.CleanSpacesAndUpper(l.DEPT_EXPL)
+														 + ','  + ut.CleanSpacesAndUpper(l.COMPANY1)
+														 + ','  + ut.CleanSpacesAndUpper(l.address1)
+														 + ','  + ut.CleanSpacesAndUpper(l.city)
+														 + ','  + ut.CleanSpacesAndUpper(l.state)														
+ 														 + ','  + ut.CleanSpacesAndUpper(l.zip)
+														 + ','  + ut.CleanSpacesAndUpper(l.address2)
+														 + ','  + ut.CleanSpacesAndUpper(l.city2)
+														 + ','  + ut.CleanSpacesAndUpper(l.state2)														
+ 														 + ','  + ut.CleanSpacesAndUpper(l.zip2)														
+														 + ','  + ut.CleanSpacesAndUpper(l.fips)			
+														 + ','  + ut.CleanSpacesAndUpper(l.phone)
+														 + ','  + ut.CleanSpacesAndUpper(l.spec)
+														 + ','  + ut.CleanSpacesAndUpper(l.spec_expl)
+														 + ','  + ut.CleanSpacesAndUpper(l.spec2)
+														 + ','  + ut.CleanSpacesAndUpper(l.spec2_expl)	
+														 + ','  + ut.CleanSpacesAndUpper(l.spec3)
+														 + ','  + ut.CleanSpacesAndUpper(l.spec3_expl)															
+														 + ','  + ut.CleanSpacesAndUpper(l.id)			
+														 + ','  + ut.CleanSpacesAndUpper(l.persid)			
+														 + ','  + ut.CleanSpacesAndUpper(l.owner));
+	self.source_rec_id := hash64(temp_record_id);		
 	self 							 := l;	
 end;
 
@@ -188,7 +192,8 @@ business_header.MAC_Source_Match(
 				,MDR.sourceTools.src_SKA						// source_type_or_field
 				,false															// bool_infile_has_source_group
 				,foo																// source_group_field
-				,company_name												// company_name_field
+				// ,company_name												// company_name_field
+				,COMPANY1   												// company_name_field
 				,prim_range													// prim_range_field
 				,prim_name													// prim_name_field
 				,sec_range													// sec_range_field
@@ -213,7 +218,8 @@ myset2 := ['A','P'];
 Business_Header_SS.MAC_Match_Flex(
 			 outf2_bdid_score											// input dataset						
 			,myset2				                				// bdid matchset what fields to match on           
-			,company_name	                        // company_name	              
+			// ,company_name	                        // company_name	              
+			,COMPANY1   	                        // company_name	              
 			,prim_range		                  			// prim_range		              
 			,prim_name		                    		// prim_name		              
 			,my_zip					                    	// zip5					              
@@ -251,28 +257,7 @@ end;
 
 outf2_5 := join(outf2_4, df2_2, left.seq = right.seq, into_out(LEFT),hash);
 
-ut.MAC_SF_BuildProcess(outf2_5,'~thor_data400::base::ska_verified',do2,2);
+PromoteSupers.MAC_SF_BuildProcess(outf2_5,'~thor_data400::base::ska_verified',do2,2);
 
-export Build_Bases := sequential(do1, do2);
+export Proc_Build_SKAs := sequential(do1, do2);
 
-//------------------------------
-Out_Population_Stats.Business_Headers.Ska(qa, BH_Stats);
-Out_Population_Stats.Business_Contact.SKA(qa, BC_Stats);
-
-STRATA.CreateAsBusinessHeaderStats(BusData.fSKA_As_Business_Header(BusData.File_SKA_Verified_Base,BusData.File_SKA_Nixie_Base),
-                                   'SKA',
-																	 'data',
-																	 '',
-																	 '',
-                                   runAsBusinessHeaderStats
-                                  );
-
-export Proc_Build_SKAs := 
-sequential(
-	 Build_Bases
-	/*,parallel(busdata.Out_Base_Stats_Population_Nixie
-	          ,busdata.Out_Base_Stats_Population_Verified
-	          ,runAsBusinessHeaderStats)
-	,BH_Stats
-	,BC_Stats*/
-);

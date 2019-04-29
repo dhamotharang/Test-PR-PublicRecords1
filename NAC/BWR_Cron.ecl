@@ -1,4 +1,4 @@
-envVars :=
+﻿envVars :=
  '#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -33,7 +33,7 @@ envVars
 
 import _Control;
 #WORKUNIT('protect',true);
-ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241','thor400_44_sla');
+ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241','thor400_44_sla_eclcc');
 Sun_thru_Thur_at_10_PM:='0 3 * * 1-5';
 Sat_at_10_AM:='0 15 * * 6';
 

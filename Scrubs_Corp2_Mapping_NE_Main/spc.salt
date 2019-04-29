@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_NE_Main
 FILENAME:in_file
 //Uncomment up to NINES for internal or external adl
@@ -16,8 +16,8 @@ FILENAME:in_file
 //FIELDTYPE DEFINITIONS
 FIELDTYPE:invalid_corp_key:ALLOW(-0123456789):LENGTHS(4..)
 FIELDTYPE:invalid_charter_nbr:ALLOW(0123456789):LENGTHS(1..)
-FIELDTYPE:invalid_corp_vendor:ENUM(31)
-FIELDTYPE:invalid_state_origin:ENUM(NE)
+FIELDTYPE:invalid_corp_vendor:ENUM(31|31)
+FIELDTYPE:invalid_state_origin:ENUM(NE|NE)
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid_future_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
@@ -30,8 +30,6 @@ FIELDTYPE:invalid_org_type_cd:ENUM(Scrubs_Corp2_Mapping_NE_Main.Functions.set_va
 FIELDTYPE:invalid_name_type_code:CUSTOM(Scrubs_Corp2_Mapping_NE_Main.Functions.invalid_name_type_code>0,recordorigin)
 FIELDTYPE:invalid_recordorigin:ENUM(C|T)
 FIELDTYPE:invalid_flag_code:ENUM(N| )
-FIELDTYPE:invalid_trademark_class:ALLOW( &()-;,.ABCDEFGHIJKLMNOPQRSTUVWXYZ) 
-FIELDTYPE:invalid_farm_exemptions:ALLOW( /-;,.ABCDEFGHIJKLMNOPQRSTUVWXYZ) 
 
 FIELD:dt_vendor_first_reported:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
 FIELD:dt_vendor_last_reported:TYPE(UNSIGNED4):LIKE(invalid_date):0,0
@@ -57,7 +55,7 @@ FIELD:corp_address1_type_desc:TYPE(STRING60):0,0
 FIELD:corp_address1_line1:TYPE(STRING70):0,0
 FIELD:corp_address1_line2:TYPE(STRING70):0,0
 FIELD:corp_address1_line3:TYPE(STRING70):0,0
-FIELD:corp_address1_effective_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:corp_address1_effective_date:TYPE(STRING8):0,0
 FIELD:corp_address2_type_cd:TYPE(STRING8):0,0
 FIELD:corp_address2_type_desc:TYPE(STRING60):0,0
 FIELD:corp_address2_line1:TYPE(STRING70):0,0
@@ -222,7 +220,7 @@ FIELD:corp_date_of_organization_meeting:TYPE(STRING8):0,0
 FIELD:corp_delayed_effective_date:TYPE(STRING8):0,0
 FIELD:corp_directors_from_to:TYPE(STRING10):0,0
 FIELD:corp_dissolved_date:TYPE(STRING8):0,0
-FIELD:corp_farm_exemptions:TYPE(STRING30):LIKE(invalid_farm_exemptions):0,0
+FIELD:corp_farm_exemptions:TYPE(STRING30):0,0
 FIELD:corp_farm_qual_date:TYPE(STRING10):0,0
 FIELD:corp_farm_status_cd:TYPE(STRING1):0,0
 FIELD:corp_farm_status_desc:TYPE(STRING100):0,0
@@ -292,7 +290,7 @@ FIELD:corp_termination_desc:TYPE(STRING100):0,0
 FIELD:corp_termination_date:TYPE(STRING8):0,0
 FIELD:corp_trademark_business_mark_type:TYPE(STRING20):0,0
 FIELD:corp_trademark_cancelled_date:TYPE(STRING8):0,0
-FIELD:corp_trademark_class_desc1:TYPE(STRING250):LIKE(invalid_trademark_class):0,0
+FIELD:corp_trademark_class_desc1:TYPE(STRING250):0,0
 FIELD:corp_trademark_class_desc2:TYPE(STRING250):0,0
 FIELD:corp_trademark_class_desc3:TYPE(STRING250):0,0
 FIELD:corp_trademark_class_desc4:TYPE(STRING250):0,0

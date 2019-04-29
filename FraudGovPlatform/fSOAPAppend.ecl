@@ -1,4 +1,4 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch;
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 Shared nodes				:= thorlib.nodes();
@@ -153,7 +153,7 @@ layoutSoap := record
 		boolean ExactDOBMatch := false ;
 		boolean ExactDriverLicenseMatch := false;
 		boolean ExactFirstNameMatchAllowNicknames  := false;
-		string10 ExactMatchLevel := 	false;
+		string10 ExactMatchLevel := risk_indicators.iid_constants.default_ExactMatchLevel;  // default to using the scoring thresholds.
 		boolean   IncludeAllRiskIndicators := true;
 		unsigned1 NumReturnCodes :=  risk_indicators.iid_constants.DefaultNumCodes;
 		string15  DOBMatchType := '';
@@ -237,14 +237,19 @@ soap_results := soapcall(	soap_in,
 						;
 
 
-shared p	:=	dedup(project(soap_results,Transform(Layouts.CIID,self.record_id	:= (unsigned8)left.AcctNo,self:=left,self:=[])),record,all);
+shared p	:=	dedup(project(soap_results,Transform(Layouts.CIID-[relativeaddressmatch],self.record_id	:= (unsigned8)left.AcctNo,self:=left,self:=[])),record,all);
+
 
 //Assign record_ids to the ciid appends
 
-shared ciid_recid_map	:= Join(Pii_Base_norm, P, left.record_id = right.record_id, Transform(Layouts.CIID, self.record_id	:=left.record_id_new,self:=right));
+shared ciid_recid_map	:= Join(Pii_Base_norm, p, left.record_id = right.record_id, Transform(Layouts.CIID-[relativeaddressmatch], self.record_id	:=left.record_id_new,self:=right));
+
+//Get Relative address match flag
+
+shared ciid_reladdr := AppendRelativesAddressMatch.macAppendRelativesAddressMatch(ciid_recid_map,did,prim_range,prim_name,z5);
 
 //Assign fdn_file_info_ids
-shared ciid_base_map	:= Join(pii_input ,ciid_recid_map, left.record_id=right.record_id,Transform(Layouts.Ciid
+shared ciid_base_map	:= Join(pii_input ,ciid_reladdr, left.record_id=right.record_id,Transform(Layouts.Ciid
 																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
 
 //Anonymize if needed for a specific source
@@ -342,7 +347,13 @@ shared Crim_recid_map	:= Join(Pii_Base_norm, P, left.record_id = right.record_id
 //Assign fdn_file_info_ids
 
 shared Crim_base_map	:= Join(pii_input , Crim_recid_map, left.record_id=right.record_id,Transform(Layouts.Crim
-																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
+																	,self.fdn_file_info_id	:= left.fdn_file_info_id
+																	,self.fname_orig	:= left.fname
+																	,self.mname_orig	:= left.mname
+																	,self.lname_orig	:= left.lname
+																	,self.ssn_orig		:= left.ssn
+																	,self.dob_orig		:= left.dob
+																	,self:=right));
 
 shared Crim_anon	:= Anonymize.Crim(Crim_base_map).all;
 

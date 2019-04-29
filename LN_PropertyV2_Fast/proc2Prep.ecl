@@ -1,4 +1,4 @@
-IMPORT LN_PropertyV2_Fast,LN_PropertyV2,ut,Std;
+﻿IMPORT LN_PropertyV2_Fast,LN_PropertyV2,ut,Std;
 
 // Jira DF-11862 - added isfast parameter to name persist file accordingly in order to run continuous delta
 EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
@@ -13,17 +13,18 @@ EXPORT proc2Prep(string	prepDate, boolean isFast) :=  FUNCTION
 																	LN_PropertyV2_Fast.FileNames.raw.frs.assessment,
 																	LN_PropertyV2_Fast.FileNames.raw.frs.assessment_ptu
 																 ],{string rawSuperFileName});
+																 
+	//DF-23895 -- Removed Superfile transaction for setting up file description as it hammered dali 
 
-		replaceSubFilesTag(string rawSuperFile,string oldTag = '', string newTag = '',boolean isArchive=false) := FUNCTION 
+	 replaceSubFilesTag(string rawSuperFile,string oldTag = '', string newTag = '',boolean isArchive=false) := FUNCTION 
 				superFileName := rawSuperFile + if(isArchive,'_archive','');
 				subFileNames := fileservices.SuperFileContents(superFileName);
-				return apply(subFileNames,fileservices.StartSuperFileTransaction()
-																 ,if(trim(fileservices.GetFileDescription( '~'+Name))=oldTag
-																			,fileServices.SetFileDescription( '~'+Name,newTag)
-																		)
-																 ,fileservices.FinishSuperFileTransaction()
-										);
+				return apply(subFileNames, if(trim(STD.File.GetFileDescription('~'+Name))=oldTag
+																			,STD.File.SetFileDescription('~'+Name,newTag)
+																		  )
+																 );
 		END;
+
 
 		tagBeforeProcessing := apply(rawSuperFileNames,replaceSubFilesTag(rawSuperFileName,'','processing '+prepDate));
 		

@@ -1,5 +1,7 @@
 ﻿IMPORT KELOtto;
 IMPORT Std;
+IMPORT AppendLexidToLexidAssociation;
+   
 
 // Take the sharing, join to customer people
 
@@ -159,9 +161,9 @@ EXPORT AddressPersonAssociations := MODULE
 																			SELF := LEFT, SELF := []));
 
 
-	SHARED PersonAddressMatchStatsPrep := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31');
-														 
-	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep(
+	SHARED PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31');
+										
+  SHARED PersonAddressMatchStatsPrep4 := PersonAddressMatchStatsPrep3(
 			// Rules for a valid association
 			SelfMatch = 1 OR
 			sameaddressemailmatch = 1 OR 
@@ -170,7 +172,17 @@ EXPORT AddressPersonAssociations := MODULE
 			NonHighFrequencyAddressCount > 2 OR 
 			NonHighFrequencySameAddressSameDayCount > 0 OR
 			HighFrequencySameAddressSameDayCount > 5
-			 );                          	
+			 );          
+
+//	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep4;                	
+       
+  SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep4, FromPersonLexId, ToPersonLexId, 'VerifiedPR', 2, 2000000) 
+         : PERSIST('~deletemefraudgov1');
+         
+  SHARED HighFrequencyFroms := TABLE(LexidAssociationsPrep, {FromPersonLexId, recs := COUNT(GROUP)}, FromPersonLexId, MERGE);
+  // Remove high frequency matches.
+	SHARED PersonAddressMatchStatsPrep := DEDUP(SORT(DISTRIBUTE(LexidAssociationsPrep, HASH32(FromPersonLexId, ToPersonLexId)), FromPersonLexId, ToPersonLexId, LOCAL), FromPersonLexId, ToPersonLexId, LOCAL);
+	EXPORT PersonAddressMatchStats := JOIN(LexidAssociationsPrep, HighFrequencyFroms(recs > 50), LEFT.FromPersonLexId=RIGHT.FromPersonLexId, LEFT ONLY, LOOKUP);
 												 
 	//   Same Day or within 7 days?
 	//   Multiple Distinct addresses (non-high fequency, within time threshold?)

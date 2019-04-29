@@ -1,6 +1,19 @@
-﻿import Address, BIPV2, BIPV2_Best, Business_Header, TopBusiness_BIPV2, BIPV2_ProxID, SALT30;
+﻿import SALT311,BIPV2_LGID3, BIPV2,BIPV2_Best, Business_Header, TopBusiness_BIPV2,BIPV2_ProxID;
 
 export Layouts := module
+
+Export Layout_Matches:=RECORD,maxlength(32000)  
+  unsigned6 lgid31;
+  unsigned6 lgid32;
+  unsigned2 rule;
+  integer2 conf;
+  integer2 dateoverlap;
+  integer2 conf_prop;
+  unsigned6 rcid1;
+  unsigned6 rcid2;
+  string source_id;
+END;
+
 
 	////////////////////////////////////////////////////////////////////////
 	// -- Temporary Layouts for processing

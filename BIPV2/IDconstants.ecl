@@ -40,5 +40,7 @@ export Set_Fetch_Level_Above_SELEID    				:= [Fetch_Level_OrgID,Fetch_Level_Ult
 export Set_Fetch_Level_Above_OrgID		       	:= [Fetch_Level_UltID];
 
 export USE_LOCAL_KEYS := true;
+export APPEND_WEIGHT_THRESHOLD_ROXIE := 44;
+export DEV_ROXIE_URL := 'dev155vip.hpcc.risk.regn.net:9876';
 
 END;

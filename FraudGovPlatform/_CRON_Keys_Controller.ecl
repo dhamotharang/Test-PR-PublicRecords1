@@ -26,13 +26,13 @@ lECL1 :=
 +'		,sequential(FraudGovPlatform.Build_All(version).Build_Fraudgov_Keys\n'
 +'	));\n'
 ;
-lECL1;
-// #WORKUNIT('protect',true);
-// #WORKUNIT('name', 'FraudGov Build Keys Controller');
 
-// _Control.fSubmitNewWorkunit(lECL1,ThorName)
-			// : WHEN('Base_Completed')
-			// ,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			// ,'FraudGov Build Keys Controller failure'
-																			// ,FraudGovPlatform_Validation.Constants.NOC_MSG
-																			// ));
+#WORKUNIT('protect',true);
+#WORKUNIT('name', 'FraudGov Build Keys Controller');
+
+_Control.fSubmitNewWorkunit(lECL1,ThorName)
+			: WHEN('Base_Completed')
+			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
+																			,'FraudGov Build Keys Controller failure'
+																			,FraudGovPlatform_Validation.Constants.NOC_MSG
+																			));

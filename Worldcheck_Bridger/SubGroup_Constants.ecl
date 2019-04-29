@@ -205,7 +205,7 @@
 		export string SUDAN 						:= '201';
 		export string SURINAME 						:= '202';
 		export string SVALBARD 						:= '203';
-		export string SWAZILAND 					:= '204';
+		export string ESWATINI 					:= '204';
 		export string SWEDEN 						:= '205';
 		export string SWITZERLAND 					:= '206';
 		export string SYRIA 						:= '207';
@@ -272,6 +272,8 @@
 		export string TRADE_UNION					:= '22';
 		export string PORT							:= '23';
 		export string VESSEL						:= '24';
+		export string CRIME_TERROR				:= '25';
+		export string NONCONVICTION_TERROR				:= '26';
 	end;
 
 	export numSubCategory := module
@@ -1103,6 +1105,26 @@
 		export string KEYWORD_SECO_MALTB						:= '791';		
 		export string KEYWORD_UNTB_MAL							:= '792';		
 		export string KEYWORD_EUTB_MAL							:= '793';		
+		export string KEYWORD_EU_PCW								:= '794';
+		export string KEYWORD_DKFSAPEP							:= '795';
+		export string KEYWORD_RUFTS_GA							:= '796';
+		export string KEYWORD_MINEFI_TB							:= '797';
+		export string KEYWORD_LIFMA									:= '798';
+		export string KEYWORD_ZANTRS								:= '799';
+		export string KEYWORD_USDA									:= '800';
+		export string KEYWORD_TRL_WC								:= '801';
+		export string KEYWORD_CAPTA_561							:= '802';
+		export string KEYWORD_PSPMA_LFL							:= '803';
+		export string KEYWORD_NLPOL									:= '804';
+		export string KEYWORD_NLDNB									:= '805';
+		export string KEYWORD_ZA_FICTFS							:= '806';
+		export string KEYWORD_DKDPA									:= '807';
+		export string KEYWORD_NLDPA									:= '808';
+		export string KEYWORD_NODPA									:= '809';
+		export string KEYWORD_CZDPA									:= '810';
+		export string KEYWORD_HUDPA									:= '811';
+		export string KEYWORD_ICDPA									:= '812';
+		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

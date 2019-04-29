@@ -1,8 +1,14 @@
-import std;
+﻿import Workman,wk_ut;
+
 EXPORT get_FilesWritten(
-   string pWorkunitID = ''
-  ,string pesp        = _constants.LocalEsp
+   pWorkunitID = '\'\''
+  ,pesp        = 'wk_ut._Constants.LocalEsp'
+  ,pUseGlobal  = 'true'
 ) :=
-  if(pesp in _constants.LocalEsps  and wk_ut.Is_Valid_Wuid(pWorkunitID) ,STD.System.Workunit.WorkunitFilesWritten(pWorkunitID)
-                                                                        ,wk_ut.get_WUInfo(pWorkunitID,pesp).FilesWritten
-  );
+functionmacro
+
+  import Workman;
+  
+  return Workman.get_FilesWritten(pWorkunitID ,pesp ,pUseGlobal);
+
+endmacro;

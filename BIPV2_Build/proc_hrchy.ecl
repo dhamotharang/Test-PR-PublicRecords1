@@ -10,6 +10,7 @@ EXPORT proc_hrchy(
 functionmacro
 
   ecl2run   :=  '#workunit(\'name\',\'BIPV2_Build.build_hrchy  @version@\');\n#workunit(\'priority\',\'high\');\n#OPTION(\'multiplePersistInstances\',FALSE);\n' 
+              + '#workunit(\'protect\' ,true);\n'
               + 'BIPV2_Build.build_hrchy(\'@version@\' ,,,,,false,,' 
               + if(pIsTesting = false,'false','true') + '  ).runIter;';
   cluster   := pcluster;

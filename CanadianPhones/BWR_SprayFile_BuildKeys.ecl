@@ -1,4 +1,4 @@
-import Canadianphones, ut,Roxiekeybuild, Canadianphones_V2, Scrubs_CanadianPhones;
+﻿import Canadianphones, ut,Roxiekeybuild, Canadianphones_V2, Scrubs_CanadianPhones;
 
 
 
@@ -18,8 +18,8 @@ export BWR_SprayFile_BuildKeys(string filedate) := function
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //filedate := '20100727';
 //vsDate   := ut.GetDate;
-dops_update := Roxiekeybuild.updateversion('CanadianPhonesKeys',filedate,'john.freibaum@lexisnexis.com',,'N');
-dops_update_v2 := Roxiekeybuild.updateversion('CanadianPhonesV2Keys',filedate,'john.freibaum@lexisnexis.com',,'N');
+dops_update := Roxiekeybuild.updateversion('CanadianPhonesKeys',filedate,'kevin.reeder@lexisnexisrisk.com',,'N');
+dops_update_v2 := Roxiekeybuild.updateversion('CanadianPhonesV2Keys',filedate,'kevin.reeder@lexisnexisrisk.com',,'N');
 
 return sequential(
 CanadianPhones.spray_CanadianWhitepages(filedate)

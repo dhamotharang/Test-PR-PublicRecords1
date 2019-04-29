@@ -1,4 +1,4 @@
-﻿EXPORT Mailing_List(string st = '', string ut = '') := module
+﻿EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') := module
 
 	shared Dev_list :=			'Oscar.Barrientos@lexisnexisrisk.com'
 										+	';Sesha.Nookala@lexisnexisrisk.com'
@@ -22,11 +22,7 @@
 										
 	shared fn_mail_recipiant(string recipiant) := function
 		return		map(
-									recipiant='Validation' =>
-										map (
-													 st = '248283671'	=> list_248283671
-													,Dev_list
-													)
+									 recipiant='Validation' => Customer_list
 									,recipiant='Alert'		=> Dev_list
 									,recipiant='Roxie' 		=> Roxie_list
 									,recipiant='BocaOps'	=> Boca_Ops

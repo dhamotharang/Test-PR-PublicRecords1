@@ -104,6 +104,7 @@ FUNCTION
 		self.company_fein			:= restrict(L.company_fein, in_mod, company_fein_data_permits, sources);
 		self.company_url			:= restrict(L.company_url, in_mod, company_url_data_permits);
 		self.company_incorporation_date := restrict(L.company_incorporation_date, in_mod, company_incorporation_date_permits, sources);
+		self.dba_name      := mask(restrict(L.dba_name, in_mod, dba_name_data_permits, , true), in_mod, dba_name_data_permits);
 		self := L;
 	end;
 	ds_restricted := project(ds_fetched, apply_restrict(left));
@@ -132,6 +133,7 @@ FUNCTION
 		self.company_fein			:= filterSrcCode(L.company_fein,    company_fein_data_permits,    sources, allowCodeBmap);
 		self.company_url			 := filterSrcCode(L.company_url,     company_url_data_permits,            , allowCodeBmap);
 		self.company_incorporation_date := filterSrcCode(L.company_incorporation_date, company_incorporation_date_permits, sources, allowCodeBmap);
+		self.dba_name       := filterSrcCode(L.dba_name,        dba_name_data_permits,               , allowCodeBmap);
 		self := L;
 	end;
 	return project(ds, apply_src_filter(left));

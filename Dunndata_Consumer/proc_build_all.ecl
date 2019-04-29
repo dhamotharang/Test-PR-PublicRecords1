@@ -6,10 +6,10 @@ EXPORT proc_build_all(STRING pversion) := FUNCTION
 		#OPTION('multiplePersistInstances',FALSE);
 
 		//load input files
-		spray_new_update := Dunndata_Consumer.fSprayFiles(pversion,,Dunndata_Consumer.Constants().Directory+pversion,,'thor400_sta01');
+		spray_new_update := Dunndata_Consumer.fSprayFiles(pversion,,Dunndata_Consumer.Constants().Directory+pversion);
 
 		//scrub input files
-		scrubs_new_update := Scrubs_Dunndata_Consumer.Scrubs_InputFiles('20180918','cathy.tio@lexisnexisrisk.com');
+		scrubs_new_update := Scrubs_Dunndata_Consumer.Scrubs_InputFiles(pversion,'cathy.tio@lexisnexisrisk.com');
 	
 		//build base
 		build_base					:= proc_build_base(pversion);

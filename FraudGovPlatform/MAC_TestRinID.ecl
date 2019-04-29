@@ -1,7 +1,8 @@
 ﻿IMPORT FraudShared;
 EXPORT Mac_TestRinID(   
 	string pversion
-	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile	=	FraudShared.Files().Base.Main.Built
+	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile =	FraudGovPlatform.Files().Base.Main_Anon.Built
+	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = FraudGovPlatform.Files().Base.Main_Anon.QA
 ) := 
 FUNCTION
 	// Find Duplicate RinIDs on 2 or more different People
@@ -16,7 +17,7 @@ FUNCTION
 
 	//check that we don't lose RinIDs from previous file -  use a 1% treshld
 	
-	prev_recs := dedup(sort(distribute(FraudShared.Files().Base.Main.Father, hash32(did)), did, local),all);
+	prev_recs := dedup(sort(distribute(pPreviousMain, hash32(did)), did, local),all);
 	new_recs  := dedup(sort(distribute(pBaseMainFile, hash32(did)), did, local),all);
 
 	missingRecIDs := join(prev_recs, new_recs, left.did = right.did, left only);	

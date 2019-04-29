@@ -1,4 +1,4 @@
-﻿#OPTION('allowedClusters','thor400_44,thor400_66');
+﻿#OPTION('allowedClusters','thor400_44,thor400_36');
 IMPORT Roxiekeybuild,bankruptcyv3, Banko,bankruptcyv2,lib_fileservices, lib_stringlib, _control,did_add, ut , fcra, dops, STD, Orbit3;
 
 

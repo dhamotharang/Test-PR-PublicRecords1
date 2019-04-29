@@ -18,9 +18,10 @@ functionmacro
   cronFreq        := CRON('0-59/' + dPollingFrequency + ' * * * *');
   emails          := pNotifyEmails;
   watchworkunit   := pWorkunit;
-
-  getstate      := trim(WorkMan.get_State(pWorkunit),left,right); 
-  realstate     := if(getstate[1..6] = 'failed' ,'failed' ,getstate);
+  
+  gettimescalled  := WorkMan.get_Scalar_Result(workunit,'Times_Called'); 
+  getstate        := trim(WorkMan.get_State(pWorkunit),left,right); 
+  realstate       := if(getstate[1..6] = 'failed' ,'failed' ,getstate);
   // realjobname   := trim(WorkMan.get_Jobname(watchworkunit));
   // jobname       := if(realjobname = ''  ,watchworkunit  ,realjobname + ' (' + watchworkunit + ')');
   // totalthortime := WorkMan.get_TotalTime(watchworkunit);
@@ -40,7 +41,8 @@ functionmacro
   doNotify := if(IsEspLocal ,notify(pNotifyEvent, '*')
                             ,WorkMan.Remote_Notify(pNotifyEvent,pESP)
   )
-  : FAILURE(send_email_);
+  // : FAILURE(send_email_)
+  ;
  // :FAILURE(WorkMan.Clone_Thyself(,,,,emailsubject,emailbody)); //not ready for prime time.  causes weird issues of notifying the childrunner even though the wuid is not finished.  more investigation needed here before putting it back in
   ;
   output_state := parallel(
@@ -49,18 +51,21 @@ functionmacro
     ,output(pWorkunit             ,named('Workunit'),overwrite)
     ,output(getstate              ,named('State'   ),overwrite)
     ,output(WorkMan.getTimeDate() ,named('Time'    ),overwrite)
+    ,output((unsigned)gettimescalled + 1              ,named('Times_Called'   ),overwrite)
     ,output('false'               ,named('Is_Mission_Accomplished'),overwrite)
     // ,fail('test fail')
   )
-  : FAILURE(send_email_);
+  // : FAILURE(send_email_)
+  ;
   // : FAILURE(WorkMan.Clone_Thyself(,,,,emailsubject,emailbody));
     ;
   completed_condition := trim(pWorkunit) = '' or
-         (    (realstate = 'completed' or realstate = 'failed' or realstate = 'aborted' or realstate = 'unknown')
-          and (realstate = 'completed' or realstate = 'failed' or realstate = 'aborted' or realstate = 'unknown')  
-          and (realstate = 'completed' or realstate = 'failed' or realstate = 'aborted' or realstate = 'unknown') //do it three times to make sure
+         (    (realstate = 'completed' or realstate = 'failed' or realstate = 'aborted' or realstate = 'unknown' or realstate = 'compiled')
+          and (realstate = 'completed' or realstate = 'failed' or realstate = 'aborted' or realstate = 'unknown' or realstate = 'compiled')  
+          and (realstate = 'completed' or realstate = 'failed' or realstate = 'aborted' or realstate = 'unknown' or realstate = 'compiled') //do it three times to make sure
          )
-  : FAILURE(send_email_);
+  // : FAILURE(send_email_)
+  ;
          // :FAILURE(WorkMan.Clone_Thyself(,,,,emailsubject,emailbody));
          ;
   dothis := sequential(

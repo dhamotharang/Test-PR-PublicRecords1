@@ -48,16 +48,33 @@ sendemail(string keyword = '',string status = '') := function
 		return verifystatus;
 	   end;
 
-spcluster := if ( regexfind('_eclcc',tgtcluster) , 'hthor_dev_eclcc','hthor_dev');
-
-
-    fswu :=  _control.fSubmitNewWorkunit(ECL1, spcluster) :   SUCCESS(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit3  submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit3 submit WU to spawn success -- '+ workunit
-																			                                                                                                       )),
-		                                                                                                                                                                                      FAILURE(fileservices.sendemail(Send_Email(Buildvs,email_list).emaillist
-																			                                                                                                     ,'Orbit3 submit WU to spawn status'+ workunit
-																			                                                                                                      ,'Orbit3 submit WU to spawn failed -- '+ workunit
-																			                                                                                                       ));
-return 	fswu;
+	return sequential
+							(
+								
+									if( runcreatebuild,
+								    Sequential
+								         (
+									        if ( skipcreatebuild , 
+											                sendemail('CREATE','SKIP'),
+														 
+													           if( create_build.Status = 'Success',
+															        sendemail('CREATE','SUCCESS'),
+																			sendemail('CREATE','FAIL')
+																			)
+															),
+														
+													if ( skipupdatebuild ,
+																				sendemail('UPDATE','SKIP')	,
+												
+													              if ( Update_build.Status = 'Success', 
+													                 sendemail('UPDATE','SUCCESS'),
+																					 sendemail('UPDATE','FAIL')
+																					 )
+														)
+											),
+									Output('Dont run build')
+								   )
+				
+								);
+								
 end;

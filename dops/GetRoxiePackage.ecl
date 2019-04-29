@@ -1,4 +1,5 @@
-﻿EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) := module
+﻿import ut;
+EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) := module
 
 	export rSubFile := record
 		string subfile {xpath('@value')};
@@ -46,7 +47,8 @@
 				'GetPackage',
 				InputRec
 				,dataset(outrec),
-				xpath('GetPackageResponse'));
+				xpath('GetPackageResponse')
+				,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues()));
 	
 		xmlout_rec := record,maxlength(5000000)
 			string xmlline;
@@ -54,12 +56,11 @@
 	
 		xmlds := dataset([{soapresults[1].Info}],xmlout_rec);
 
+		
+	
 		dFromXML := fromxml(rPackageMap,soapresults[1].Info);
 
-		dFromXMLtoDataset := if (count(soapresults(info <> '')) > 0
-															,dataset([dFromXML],recordof(dFromXML))
-															,dataset([],rPackageMap)
-															);
+		dFromXMLtoDataset := dataset([dFromXML],recordof(dFromXML));
 		
 		return dFromXMLtoDataset;
 		

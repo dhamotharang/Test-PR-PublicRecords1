@@ -15,6 +15,7 @@ EXPORT mac_persistence_cluster_stats(
    pStrata_Persistence_Stats  // result of BIPV2_Strata.PersistenceStats
   ,pID
   ,pversion
+  ,pOutputFile                = 'true'
 
 ) :=
 functionmacro
@@ -42,18 +43,24 @@ functionmacro
     ,{trim(pID) ,trim(pversion) ,'Recs Removed'            ,(real8)ds_persistence_stats(trim(cluster_type) = '1 Same Clusters'                   ,trim(stat_desc) = 'Recs Removed'       )[1].stat_value }
     ,{trim(pID) ,trim(pversion) ,'Recs Added'              ,(real8)ds_persistence_stats(trim(cluster_type) = '1 Same Clusters'                   ,trim(stat_desc) = 'Recs Added'         )[1].stat_value }
     ,{trim(pID) ,trim(pversion) ,'Recs Mixed'              ,(real8)ds_persistence_stats(trim(cluster_type) = '1 Same Clusters'                   ,trim(stat_desc) = 'Recs Mixed'         )[1].stat_value }
-    ,{trim(pID) ,trim(pversion) ,'Persistent Cluster Pct'  ,(real8)ds_persistence_stats(trim(cluster_type) = 'pct_persistent_clusters'           ,trim(stat_desc) = '(Same Cluster)/(Previous Cluster Total)')[1].stat_value }
+    ,{trim(pID) ,trim(pversion) ,'Persistent Cluster Pct'  ,(real8)ds_persistence_stats(trim(cluster_type) = 'pct_persistent_clusters'           ,trim(stat_desc) = '(Same Cluster)/(Previous Cluster Total)')[1].stat_value / 100 }
   ],BIPV2_QA_Tool.Layouts.persistence_stats);
 
-  thefilename                       := BIPV2_QA_Tool.Filenames(trim(pversion),,trim(pID)).Persistence_Cluster_Stats.logical;
-  output_persistence_cluster_stats  := tools.macf_WriteFile(thefilename  ,ds_persistence_cluster_stats_qa_tool ,pOverwrite := true);
+  #IF(pOutputFile = true)
 
-  result := sequential(
-     // std.file.clearsuperfile(BIPV2_QA_Tool.Filenames(,,pID).Persistence_Cluster_Stats.qa)
-     output_persistence_cluster_stats
-    ,BIPV2_QA_Tool.Promote(trim(pversion),trim(pID)).new2qaMult
-  );
-  
-  return result;
+    thefilename                       := BIPV2_QA_Tool.Filenames(trim(pversion),,trim(pID)).Persistence_Cluster_Stats.logical;
+    output_persistence_cluster_stats  := tools.macf_WriteFile(thefilename  ,ds_persistence_cluster_stats_qa_tool ,pOverwrite := true);
+
+    result := sequential(
+       // std.file.clearsuperfile(BIPV2_QA_Tool.Filenames(,,pID).Persistence_Cluster_Stats.qa)
+       output_persistence_cluster_stats
+      ,BIPV2_QA_Tool.Promote(trim(pversion),trim(pID)).new2qaMult
+    );
+    
+    return result;
+
+  #ELSE
+    return ds_persistence_cluster_stats_qa_tool;
+  #END
 
 endmacro;

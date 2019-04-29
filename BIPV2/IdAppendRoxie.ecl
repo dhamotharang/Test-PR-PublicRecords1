@@ -3,7 +3,7 @@
 export IdAppendRoxie(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 0
+		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_ROXIE
 		,boolean primForce = false
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
@@ -37,9 +37,11 @@ export IdAppendRoxie(
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
 
-	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false) := function
+	export WithBest(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean allBest = false,
+	                boolean isMarketing = false) := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
-			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest);
+			res0 := BIPV2.IdAppendLocal.AppendBest(localAppend, fetchLevel := fetchLevel, allBest := allBest,
+			                                       isMarketing := isMarketing);
 			res := project(res0, transform(BIPV2.IdAppendLayouts.AppendOutput, self := left, self := []));
 		#ELSE
 			res := remoteAppend.WithBest(fetchLevel := fetchLevel, allBest := allBest);
@@ -50,9 +52,9 @@ export IdAppendRoxie(
 			error(recordof(res), 'score <= 50 can produce invalid id resolution'));
 	end;
 
-	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid) := function
+	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean dnbFullRemove = false) := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
-			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel);
+			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel, dnbFullRemove);
 			res := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
 		#ELSE
 			res := remoteAppend.WithRecs(fetchLevel := fetchLevel);

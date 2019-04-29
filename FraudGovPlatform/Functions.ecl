@@ -13,7 +13,8 @@ EXPORT Functions :=  MODULE
 						 
 	FUNCTION 
 
-		MBS_CVD_Rec := DEDUP(TABLE(pBaseFile,{Customer_ID, Source}),ALL);	
+		dBaseFile := distribute(pBaseFile):persist('~fraudgov::backup::dBaseFile');
+		MBS_CVD_Rec := DEDUP(TABLE(dBaseFile,{Customer_ID, Source}),ALL);	
 
 		MBS_Layout := RECORD
 			string12 			Customer_ID;
@@ -65,7 +66,7 @@ EXPORT Functions :=  MODULE
 			self := left;
 		));	
 
-		JCVD := join (pBaseFile , MBS_CVD_T , trim(StringLib.StringToUppercase(left.Customer_ID),left,right) = trim(StringLib.StringToUppercase(right.Customer_ID),left,right)
+		JCVD := join (dBaseFile , MBS_CVD_T , trim(StringLib.StringToUppercase(left.Customer_ID),left,right) = trim(StringLib.StringToUppercase(right.Customer_ID),left,right)
 															 and  trim(StringLib.StringToUppercase(left.Source),left,right) = trim(StringLib.StringToUppercase(right.Source) ,left,right) ,
 								transform (FraudShared.Layouts.Base.Main ,
 										is_delta := regexfind('DELTA', left.source, nocase);
@@ -103,11 +104,12 @@ EXPORT Functions :=  MODULE
 										self.classification_Entity.role := right.classification_Entity.role; 
 										self.classification_Entity.Evidence := right.classification_Entity.Evidence; 
 										self.classification_Entity.investigated_count := right.classification_Entity.investigated_count; 
-										self:= left ) , left outer , lookup );
+										self:= left ) , left outer , lookup ):Persist('~fraudgov::backup::MBS_CVD_T');
 
 	  MBSPrimary := FraudShared.Files().Input.MBS.Sprayed; 
 		
-		JMbs  := join (JCVD , MBSPrimary(status = 1) , trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
+		JMbs  := join (JCVD , MBSPrimary(status = 1) , 
+		trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
 
 					transform (FraudShared.Layouts.Base.Main , 								 
 
@@ -152,7 +154,7 @@ EXPORT Functions :=  MODULE
 										self.classification_Entity.Entity_sub_type_id                                          := right.Entity_sub_type;
 										self.classification_Entity.role_id                                                     := right.role;
 										self.classification_Entity.Evidence_id                                                 := right.Evidence;
-										self:= left ) , left outer , lookup ); 
+										self:= left ) , left outer , lookup ):Persist('~fraudgov::backup::JMbs');
 		 
 		return JMbs;
 		
@@ -295,16 +297,30 @@ EXPORT Functions :=  MODULE
 											 customer_program = 'M' => 1024,
 											 customer_program = 'U' => 1029,
 											 customer_program = 'N' => 1312,
+											 customer_program = 'D' => 1049,											 
 											 0
 											);
 		RETURN ind_type_prod_v;
+	END;
+
+	EXPORT customer_program_fn(unsigned6 ind_type) := function
+		import _Control;
+		customer_program := map(
+											 ind_type = 1014 => 'S',
+											 ind_type = 1024 => 'M',
+											 ind_type = 1029 => 'U',
+											 ind_type = 1312 => 'N',
+											 ind_type = 1049 => 'D',
+											 ''
+											);
+		RETURN customer_program;
 	END;
 
 	EXPORT new_addresses(pInputFile) := 
 	FUNCTIONMACRO		
 			IMPORT address;
 
-			Address_Cache := FraudGovPlatform.Files().Base.AddressCache.Built;
+			Address_Cache := if(FraudGovPlatform._flags.update.AddressCache, FraudGovPlatform.Files().Base.AddressCache.Built, dataset([],layouts.base.AddressCache));
 			
 			prepped_Addresses := 	dedup(
 											table(pInputFile(address_1 <> '' and address_2 <> ''),{address_1, address_2, address_id})  
@@ -357,7 +373,7 @@ EXPORT Functions :=  MODULE
 												LOCAL
 										);							
 
-			Sort_Address_Cache := sort(FraudGovPlatform.Files().Base.AddressCache.Built + new_addresses, address_id, -address_cleaned);
+			Sort_Address_Cache := sort(Address_Cache + new_addresses, address_id, -address_cleaned);
 			New_Address_Cache :=  dedup(Sort_Address_Cache, address_id);
 
 			RETURN New_Address_Cache;
@@ -419,7 +435,7 @@ EXPORT Functions :=  MODULE
 
 	ENDMACRO;
 
-	Current_Build := FraudShared.Files().Base.Main.Built;
+	Current_Build := IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main));
 	
 	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
 

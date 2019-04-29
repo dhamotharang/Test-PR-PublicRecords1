@@ -18,6 +18,7 @@ module
 
   //weekly keys
 	export contact_linkids           := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::contact_linkids'            ,pversion    );
+	export contact_title_linkids     := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::contact_title_linkids'      ,pversion    );
 	export directories_linkids       := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::directories_linkids'        ,pversion    );
 
   //misc keys
@@ -61,6 +62,7 @@ module
   export BIPV2WeeklyKeys := 
       directories_linkids         .dall_filenames
     + contact_linkids             .dall_filenames
+    + contact_title_linkids       .dall_filenames
       ;
   
   export BIPV2DatalandKeys := BIPV2FullKeys;

@@ -1,4 +1,4 @@
-import aid, address;
+﻿import aid, address;
 export Fn_Apply_AID (dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
 
 temp_layout := record
@@ -24,7 +24,7 @@ end;
 phones_clean_add := PROJECT(phplus_in, t_clean_adrr(LEFT));
 
 // AID
-			unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
+			unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles; //Jira DF-23863
 	    AID.MacAppendFromRaw_2Line(phones_clean_add, address1_, address2_, RawAID, withAID, lFlags);
 			
 recordof(phplus_in) t_append_aid (withAID input):= Transform

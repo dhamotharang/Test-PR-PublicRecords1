@@ -1,8 +1,10 @@
-import ut;
+﻿IMPORT Data_Services, dx_PhonesInfo;
+
+	//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT File_Source_Reference := MODULE
-
-	EXPORT RAW	:= dataset('~thor_data400::in::phones::source_reference', 				PhonesInfo.Layout_Common.sourceRefIn , csv(heading(1), terminator('\n'), separator('\t'), quote('"')));
-	EXPORT MAIN := dataset('~thor_data400::base::phones::source_reference_main', 	PhonesInfo.Layout_Common.sourceRefBase, flat);
-
+	
+	//Carrier Reference Base File
+	EXPORT Main 	:= dataset('~thor_data400::base::phones::source_reference_main', dx_PhonesInfo.Layouts.sourceRefBase, flat);
+	
 END; 

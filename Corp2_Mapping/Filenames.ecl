@@ -651,31 +651,28 @@ module
 	export ne_raw :=
 	module
 
-		export CorpAction                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpAction::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export CorpOfficers              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpOfficers::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',',');
-		export CorpEntity                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpEntity::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export CorporationType           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationType::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export NECountryCodes            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NECountryCodes::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export ListOfStates              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ListOfStates::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export PositionHeld              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PositionHeld::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export RegisterAgent             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::RegisterAgent::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export ServiceType               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ServiceType::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
+		export CorporateActions          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporateactions::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'','},{,]',);
+		export CorporateOfficers         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporateofficers::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'','},{,]',);
+		export CorporationEntity         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporationentity::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'','},{,]',);
+		export RegisteredAgent           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::registeredagent::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'','},{,]',);
+		export CorporationType           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporationtype::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'','\\]',);
+		export NECountryCodes            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::countrycodes::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'','\\]',);
+		export ListOfStates              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::listofStates::ne',landing_zone,,,,,pGroupname,,,'VARIABLE',,,'','\\]',);
 
 		export dAll_filenames :=
-			  CorpAction.dAll_filenames
-			+ CorpOfficers.dAll_filenames
-			+ CorpEntity.dAll_filenames
+				CorporateActions.dAll_filenames
+			+ CorporateOfficers.dAll_filenames
+			+ CorporationEntity.dAll_filenames
+			+ RegisteredAgent.dAll_filenames
 			+ CorporationType.dAll_filenames
 			+ NECountryCodes.dAll_filenames
 			+ ListOfStates.dAll_filenames
-			+ PositionHeld.dAll_filenames
-			+ RegisterAgent.dAll_filenames
-			+ ServiceType.dAll_filenames
-			;
+		  ;
 
-	end;
-
-	export nh_raw :=
+  end;
+  
+ 
+  export nh_raw :=
 	module
 
 		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::nh',landing_zone,,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);

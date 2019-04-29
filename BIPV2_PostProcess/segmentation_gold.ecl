@@ -304,7 +304,7 @@ shared isGold :=
 	AND (
 		hasSuperCoreSrc 
 		OR 
-		((hasOtherCoreSrc or has2TSrc) and (hasMultipleSources or hasBizAddr))
+		((hasOtherCoreSrc or has2TSrc) and hasMultipleSources)
 	);			
 shared Gold := AddBackNew(isGold);
 shared NotGold := AddBackNew(~isGold);
