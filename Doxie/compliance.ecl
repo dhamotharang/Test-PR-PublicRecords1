@@ -198,8 +198,9 @@ EXPORT compliance := MODULE
       RETURN infile (NOT doxie.compliance.isHeaderSourceRestricted (src_field, drm));
     ENDMACRO;  
 
-    restrictedSet := ['0',''];
+    shared restrictedSet := ['0',''];
     EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
+    EXPORT use_InsuranceDLData(string dpm) := dpm[13] NOT IN restrictedSet;
 
     // to exclude utility sources:
     EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';

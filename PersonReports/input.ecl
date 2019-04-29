@@ -748,4 +748,41 @@ end;
     export unsigned1 agehigh := 0;
   end;
 
+
+  // Until we switch all reports to the $.IParam._report interface: an utility macro to copy report's fields 
+  EXPORT mac_copy_report_fields (mod_new) := MACRO
+    EXPORT unsigned1 GLBPurpose := mod_new.glb;
+    EXPORT unsigned1 DPPAPurpose := mod_new.dppa;
+    EXPORT boolean IncludeMinors := mod_new.show_minors;
+    EXPORT string32 ApplicationType := mod_new.application_type;    
+      //? restrictPreGLB
+    EXPORT string DataRestrictionMask := mod_new.DataRestrictionMask;
+      // export boolean ignoreFares := false;
+      // export boolean ignoreFidelity:= false;
+    EXPORT INTEGER FCRAPurpose := mod_new.FCRAPurpose;  
+    EXPORT integer8 FFDOptionsMask := mod_new.FFDOptionsMask;
+    EXPORT string6 ssn_mask := mod_new.ssn_mask;
+    EXPORT boolean mask_dl := mod_new.dl_mask = 1;
+    EXPORT unsigned1 dob_mask := mod_new.dob_mask;
+    EXPORT boolean include_hri := mod_new.include_hri;
+    EXPORT boolean legacy_verified := mod_new.legacy_verified;
+    EXPORT unsigned1 score_threshold := mod_new.score_threshold;
+    EXPORT unsigned2 penalty_threshold := mod_new.penalty_threshold;
+    EXPORT boolean ln_branded := mod_new.ln_branded;
+    EXPORT unsigned1 max_hri := mod_new.max_hri;
+    EXPORT boolean include_BlankDOD := mod_new.include_BlankDOD;
+    EXPORT unsigned3 dateval := mod_new.date_threshold;
+    EXPORT boolean smart_rollup := mod_new.smart_rollup;
+    EXPORT integer1 non_subject_suppression := mod_new.non_subject_suppression;
+  ENDMACRO;    
+
+  EXPORT getCompatibleModuleEmail (in_mod) := FUNCTIONMACRO
+    IMPORT PersonReports;
+    mod_email := MODULE (PersonReports.input.emails)
+      // email has only standard report-interface fields
+      PersonReports.input.mac_copy_report_fields (in_mod);
+    END;
+    RETURN mod_email;
+  ENDMACRO;
+
 END;

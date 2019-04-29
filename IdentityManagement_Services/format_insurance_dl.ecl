@@ -2,11 +2,11 @@
  ** Function takes doxie Insurance DL dataset and project/transform to desired format
 ***/
 
-IMPORT iesp, InsuranceHeader_PostProcess, IdentityManagement_Services, ut, DriversV2_Services;
+IMPORT iesp, InsuranceHeader_PostProcess, ut, DriversV2_Services, STD;
 
 out_rec := iesp.identitymanagementreport.t_IdmInsuranceDriverLicenseRecord;
 EXPORT out_rec format_insurance_dl (dataset(InsuranceHeader_PostProcess.layouts.DL) ins_dls) := FUNCTION
-	dup_ins_dls := dedup(sort(ins_dls, did, -dt_last_seen), did)(ut.DaysApart((string)dt_last_seen, ut.GetDate) <= DriversV2_Services.Constants.INS_MAX_DAYS_SINCE_DT_LAST_SEEN);
+	dup_ins_dls := dedup(sort(ins_dls, did, -dt_last_seen), did)(ut.DaysApart((string)dt_last_seen, (string) STD.Date.Today()) <= DriversV2_Services.Constants.INS_MAX_DAYS_SINCE_DT_LAST_SEEN);
 	
 	out_rec toOut (InsuranceHeader_PostProcess.layouts.DL L) := TRANSFORM
     SELF.UniqueId := (STRING)L.did;
