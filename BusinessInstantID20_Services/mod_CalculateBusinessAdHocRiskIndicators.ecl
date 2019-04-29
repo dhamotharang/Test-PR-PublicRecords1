@@ -1,4 +1,4 @@
-﻿IMPORT BusinessInstantID20_Services, Business_Risk_BIP, Risk_Indicators;
+﻿IMPORT BusinessInstantID20_Services, Business_Risk_BIP;
 EXPORT Mod_CalculateBusinessAdHocRiskIndicators( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                         Business_Risk_BIP.Layouts.Shell BusShell, 
                         BusinessInstantID20_Services.iOptions Options,
@@ -7,7 +7,7 @@ EXPORT Mod_CalculateBusinessAdHocRiskIndicators( DATASET(BusinessInstantID20_Ser
                         ) := 
 		MODULE
       SHARED BOOLEAN useSBFE       := Options.useSBFE;
-      SHARED bus_verification      := BusinessInstantID20_Services.mod_CalculateBVI( BusShell, useSBFE );
+      SHARED bus_verification      := BusinessInstantID20_Services.mod_CalculateBVI( BusShell, useSBFE,watchlist_results);
       SHARED mod_Risk_Indicators   := Business_Risk_BIP.mod_CalculateRiskIndicators( BusShell, bus_verification.bvi, bus_verification.bvi_desc_key, useSBFE );
       SHARED pop_bus_name          := Business_Risk_BIP.Common.SetBoolean(TRIM(ds_input[1].CompanyName) <> '' OR TRIM(ds_input[1].AltCompanyName) <> '');
       SHARED BOOLEAN OFACHit := ((watchlist_results[1].bus_ofac_table_1 <> '' AND watchlist_results[1].bus_ofac_record_number_1[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_1='OFC' )
