@@ -135,11 +135,15 @@ EXPORT GetBusHeaderMetaData := MODULE
     
     // filter out blank sic code and naics 
     // JIRA 10621 - conditionally filter out Experian Records
-    ds_IndustryRecs := TopBusiness_BIPV2.Key_Industry_Linkids.KeyFetch(ds_recsLinkidsOnly, FETCH_LEVEL)
+    ds_IndustryRecsRaw := TopBusiness_BIPV2.Key_Industry_Linkids.KeyFetch(ds_recsLinkidsOnly, FETCH_LEVEL)
                        ( ( siccode <> '' OR naics <> '' ) AND 
                          ( IF(inMod.ExcludeExperian, source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source), TRUE)) );
-                                                          
-                                                          
+
+    // additionally filter marketing-restricted records out
+    ds_IndustryRecsMark := ds_IndustryRecsRaw(source IN MDR.sourceTools.set_Marketing_Sources);                                                      
+
+    ds_IndustryRecs := IF (inMod.ExcludeMarketing, ds_IndustryRecsMark, ds_IndustryRecsRaw);
+
     ds_IndustryRecsSicCode := ds_IndustryRecs(siccode <> '');
     ds_IndustryRecsNaicsCode := ds_IndustryRecs(naics <> '');
     
@@ -315,10 +319,16 @@ EXPORT GetBusHeaderMetaData := MODULE
   
     // passing in param TRUE ,  removes all source = D recs from kfetch		
     // JIRA RR-10621 conditionally removing Experian based on inMod.ExcludeExperian boolean
-    ds_busHeaderRecsSlim := BIPV2.Key_BH_Linking_Ids.kfetch(ds_recsLinkidsOnly,FETCH_LEVEL,,,
+    ds_busHeaderRecsRaw := BIPV2.Key_BH_Linking_Ids.kfetch(ds_recsLinkidsOnly,FETCH_LEVEL,,,
                                                             BusinessBatch_BIP.Constants.DEFAULTS.MaxBHLinkidsDBA
                                                             ,TRUE)(source <> MDR.sourceTools.src_Dunn_Bradstreet AND
                                                                    ( IF(inMod.ExcludeExperian, source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source), TRUE)));
+
+    // also conditionally remove marketing-restricted sources
+    ds_busHeaderRecsMark := ds_busHeaderRecsRaw(source IN MDR.sourceTools.set_Marketing_Sources);
+
+    ds_busHeaderRecsSlim := IF (inMod.ExcludeMarketing, ds_busHeaderRecsMark, ds_busHeaderRecsRaw);
+
 		// slim layout before dedup/sort to reduce footprint.																															 
     ds_busHeaderRecsMetaDataSlimDBA := PROJECT(ds_busHeaderRecsSlim, TRANSFORM(rec_DBALayoutSlim, self.business_status := ''; SELF := LEFT));
 		ds_busHeaderRecsMetaData := DEDUP(SORT (ds_busHeaderRecsMetaDataSlimDBA(dba_name <> '' AND source <> ''),
