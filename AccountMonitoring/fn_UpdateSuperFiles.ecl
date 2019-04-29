@@ -9,22 +9,7 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
                             ) := function
 
    
-   liveClust := dops.GetRoxieClusterInfo(esp_server).LiveCluster(vip_server); 
-   roxiePack := dops.GetRoxiePackage(esp_server,roxieport,liveClust).Keys();
-/* 
-   // SBFE   
-      sbfeKeySuperFile_1 := 'thor_data400::key::sbfe::qa::linkids';
-      sbfeKeySuperFile_2 := 'thor_data400::::key::sbfe::qa::tradeline';
-      sbfeKeySuperFile_3 := 'thor_data400::key::sbfescoring::qa::scoringindex';
-      sbfeKeyLogical_1 := roxiePack(superfile = sbfeKeySuperFile_1);
-      sbfeKeyLogical_2 := roxiePack(superfile = sbfeKeySuperFile_2);
-      sbfeKeyLogical_3 := roxiePack(superfile = sbfeKeySuperFile_3);
-      
-   // PERSON HEADER
-      personHeaderKeySuperFile := 'thor_data400::key::header_qa';
-      personHeaderKeyLogical := roxiePack(superfile = personHeaderKeySuperFile);
-*/
-  
+ 
    roxie_monitor_superfile_layout := RECORD
       STRING250 RoxieSuperFile;
       STRING250 MonitorSuperFile;
@@ -49,29 +34,33 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
       DATASET(LogicalFile_layout) LogicalFiles;
       BOOLEAN AllLogicalFileExists;
    end;
-        
-// Roxie Super key name vs Monitoring Superkey name
-       
-   SuperFile_ro_mo := DATASET([
-                              {'thor_data400::key::header_qa','monitor::personheader',1},
-                              {'thor_data400::key::sbfe::qa::linkids','monitor::sbfe::linkids',2},
-                              {'thor_data400::key::sbfe::qa::tradeline','monitor::sbfe::tradeline',2},
-                              {'thor_data400::key::sbfescoring::qa::scoringindex','monitor::sbfescoring::scoringindex',2}
-                             ],roxie_monitor_superfile_layout);
-                                     
+//--------------------------------------------------------------------------------------------------------------------//
+/*  Roxie Super key name vs Monitoring Superkey name. Currently 2 categories are available: 
+    (1)PersonHeader (2)SBFE. More categories and their superfiles that this function should
+     update can be added in this dataset.       
+*/
+    
+     Superfiles := DATASET([
+                          {'thor_data400::key::header_qa','monitor::personheader',1},
+                          {'thor_data400::key::sbfe::qa::linkids','monitor::sbfe::linkids',2},
+                          {'thor_data400::key::sbfe::qa::tradeline','monitor::sbfe::tradeline',2},
+                          {'thor_data400::key::sbfescoring::qa::scoringindex','monitor::sbfescoring::scoringindex',2}
+                         ],roxie_monitor_superfile_layout);
+//--------------------------------------------------------------------------------------------------------------------//
+                             
+  liveClust := dops.GetRoxieClusterInfo(esp_server).LiveCluster(vip_server); 
+  roxiePack := dops.GetRoxiePackage(esp_server,roxieport,liveClust).Keys();                               
 
-// 
    strToday := STD.Date.Today();
-   //file_not_found( string filename = '' ) := nothor(~STD.File.FileExists(filename));
-   newSuperfileLink :=  join(SuperFile_ro_mo,roxiePack,
+  
+   newSuperfileLink :=  join(Superfiles,roxiePack,
                                if(category_num = 0,true, left.category_num = category_num) and
                                left.RoxieSuperFile = right.superfile,
                                   transform(superfile_logicalfile_flat_layout,
-                                   // skip(file_not_found(right.subfile)) ,  
                                     self.MonitorSuperFile := left.MonitorSuperFile,
                                     self.RoxieSuperFile := left.RoxieSuperFile,
                                     self.LogicalFile := right.subfile,
-                                    self.LogicalFileExists := true, // assume all exists
+                                    self.LogicalFileExists := true, // assume all exists for now
                                     self.FirstInstance := false,
                                   ));
      
@@ -85,10 +74,8 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
                                                    ));
                            
 
-   CGM_monitor_dset := SuperFile_ro_mo;
-                      
-   
-   CGM_LogicalFiles := newSuperfileLinkCheckLogical; //newSuperfileLink; //newSuperfileLinkCheckLogical;
+  
+   CGM_LogicalFiles := newSuperfileLinkCheckLogical;
    
    CGM_LogicalFilesGroup := GROUP(CGM_LogicalFiles,MonitorSuperFile);
    
@@ -102,7 +89,6 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
    
    CGM_LogicalFilesFinal2 := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
    
-   
    CGM_LogicalFilesSorted := SORT(CGM_LogicalFiles,MonitorSuperFile,RECORD);
    
    superfile_logicalfile_flat_layout UpdateInstance(superfile_logicalfile_flat_layout L, superfile_logicalfile_flat_layout R) := TRANSFORM
@@ -111,28 +97,6 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
    END;
    CGM_LogicalFilesFinal := ITERATE(CGM_LogicalFilesSorted,UpdateInstance(LEFT,RIGHT),STABLE);
    							
-   pseudo_environment := AccountMonitoring.constants.pseudo.TEST2;
-   superfile_stem_name := AccountMonitoring.filenames(pseudo_environment).monitor.base;
-   //logical_file_name   := '~batchr3::base::account_monitoring::test2::portfolio::forec20190120';
-   
-   DELETE_SUBFILE      := TRUE;
-   COPY_FILE_CONTENTS  := TRUE;
-   	
-   	// output_file         := OUTPUT(ds_portfolio,,logical_file_name,COMPRESSED);
-   	// file_size           := Utilities.Get_FileRowCount(logical_file_name);
-   //update_superfiles   := AccountMonitoring.Utilities.fn_update_superfiles(superfile_stem_name, logical_file_name, DELETE_SUBFILE, COPY_FILE_CONTENTS);
-   
-   // update_portfolio_file :=
-   		// SEQUENTIAL(update_superfiles
-   		          // );
-   							
-   // output(superfile_stem_name,named('superfile_stem_name'));
-   // update_portfolio_file;
-   
-   out_layout := record
-      STRING250 logicialName;
-   end;
-   
    updateMonitorFiles(DATASET(superfile_logicalfile_Rollup_layout) inFiles, STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
     
           
@@ -165,18 +129,18 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
                      ,STD.System.Log.addWorkunitWarning(TRIM(stem_name+monitorsuperfile)+
                        ' were not updated as package files(s) were not available on THOR.',1)      
                     ));
-   		//output(stem_name,named(stem_name));
    		return NOTHOR(update_action);		
    END;
    
-   output(newSuperfileLinkCheckLogical,named('newSuperfileLinkCheckLogical'));
-   output(liveClust,named('liveClust'));
-   output(superfile_stem_name,named('superfile_stem_name'));
-   output(choosen(roxiePack,4000),named('roxiePack'));
-   //output(CGM_KeyLogical,named('CGM_KeyLogical'));
-   output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
-   // output(sbfeLogicalFilesFinal,named('sbfeLogicalFilesFinal'));
-   output(CGM_LogicalFilesFinal2,named('CGM_LogicalFilesFinal2'));
+/*    output(newSuperfileLinkCheckLogical,named('newSuperfileLinkCheckLogical'));
+      output(liveClust,named('liveClust'));
+      //output(superfile_stem_name,named('superfile_stem_name'));
+      output(choosen(roxiePack,4000),named('roxiePack'));
+      //output(CGM_KeyLogical,named('CGM_KeyLogical'));
+      output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
+      // output(sbfeLogicalFilesFinal,named('sbfeLogicalFilesFinal'));
+      output(CGM_LogicalFilesFinal2,named('CGM_LogicalFilesFinal2'));
+*/
     update_monitor_file :=
       		SEQUENTIAL(updateMonitorFiles(CGM_LogicalFilesFinal2)
       		          );
