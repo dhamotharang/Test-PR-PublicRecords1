@@ -17,7 +17,7 @@ utilfile.layout_utility_in getUT(utilfile.layout_utility_in L) := transform
 end;
 
 out_file := normalize(ds_ut,left.util_child,getUT(right))+ // glb already applied in ViewSourceRid.
-						PROJECT(doxie_raw.Util_Daily_Raw(dids,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.industry_class,mod_access.ssn_mask,mod_access.dl_mask>0),utilfile.Layout_Utility_In);
+            PROJECT(doxie_raw.Util_Daily_Raw(dids,mod_access),utilfile.Layout_Utility_In);
 
 glb_ok := mod_access.isValidGLB();
 
