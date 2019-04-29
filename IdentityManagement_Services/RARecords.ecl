@@ -2,26 +2,13 @@
  ** Module to filter/transform Header records into desired format for Relatives and Associates
 ***/
 
-import doxie, doxie_crs, iesp, ut, DeathV2_Services, Risk_Indicators, Address, header, DidVille, AutoStandardI;
+import doxie, doxie_crs, iesp, ut, DeathV2_Services, Risk_Indicators, Address, header, DidVille;
 
 //Relatives and associates for IDM services.
 int_rec := iesp.identitymanagementreport.t_IdmReportRNASlim;
 export RARecords (IdentityManagement_Services.IParam._report in_params, dataset (doxie.layout_references) dids) :=	MODULE
 
-  // Get values missing from the input from global.
-  // Can't project from {input} because of different type of ssn_mask (string vs. string6);
-  gmod := AutoStandardI.GlobalModule ();
-  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod))
-    EXPORT unsigned1 glb := in_params.glbpurpose;
-    EXPORT unsigned1 dppa := in_params.dppapurpose;
-    EXPORT string DataPermissionMask := in_params.DataPermissionMask;
-    EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
-    EXPORT boolean ln_branded := in_params.ln_branded;
-    EXPORT string5 industry_class := in_params.industryclass;
-    EXPORT string32 application_type := in_params.applicationtype;
-    EXPORT unsigned3 date_threshold := in_params.dateVal;
-    EXPORT string ssn_mask := in_params.ssn_mask;
-  END;
+    mod_access := PROJECT (in_params, doxie.IDataAccess);
 
 		//Doxie files used are - doxie.relative_summary & doxie.Comp_Addresses
 		layout_comp_names := record
@@ -95,8 +82,6 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 		
     best_akas := doxie.best_records (rel_dids, , , , true, header.constants.checkRNA, modAccess := mod_access);
 
-		unsigned1 GetAge (integer4 dob) := IF (dob<>0, ut.GetAge((string8) dob),0); //Quick function to get age
-		
 		// defenestrate relative if ssn matches subject ssn, or the name is not complete
 		// whilst projecting best aliases into proper layout and calculate age
 				// Get a set of SSNs associated with Subject as person might have more than one SSN
@@ -107,7 +92,7 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 		aka_src := project (best_akas(~(ssn_unmasked IN subject_ssn_set)  // toss for matching SSN
 		                              OR fname = '' OR lname = ''         // toss for partial name
 		                              ), transform (layout_comp_names,  
-																							 Self.age := GetAge (Left.dob);
+																							 Self.age := ut.Age (Left.dob);
 																							 Self:=Left));
 		
 		identity_exp_slim ToIdentity(layout_comp_names L):=transform
@@ -130,12 +115,12 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 				left_dob := (string4) L.DOB.year + intformat (L.DOB.month, 2, 1) + intformat (L.DOB.day, 2, 1);
 				Self.DeathVerificationCode := r.vorp_code; //death_code in header index
 				self.Deceased := if ( r.l_did != 0 , 'Y','N');
-				self.Age := if( r.l_did != 0,ut.GetAgeI_asOf((unsigned8)left_dob, (unsigned8)R.dod8), L.Age); //if dead, get age at death
+				self.Age := if( r.l_did != 0,ut.Age((unsigned8)left_dob, (unsigned8)R.dod8), L.Age); //if dead, get age at death
 				Self := L; // copy about 25 fields
 		END;
 
 		rna_glb_ok := mod_access.isValidGLB(header.constants.checkRNA);
-		death_params := DeathV2_Services.IParam.GetDeathRestrictions(gmod);
+		death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
 		rel_w_d_pre := JOIN (aka, doxie.key_death_masterV2_ssa_DID, 
                             keyed (Left.did = Right.l_did)
