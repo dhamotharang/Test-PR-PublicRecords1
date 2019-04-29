@@ -2,25 +2,29 @@
 
 EXPORT Layouts := MODULE
 
-	EXPORT Input := RECORD
-		STRING20  acctno;
-		STRING120 comp_name;
-		STRING10  prim_range;
-		STRING2   predir;
-		STRING28  prim_name;
-		STRING4   addr_suffix;
-		STRING2   postdir;
-		STRING10  unit_desig;
-		STRING8   sec_range;
-		STRING25  city_name;
-		STRING2   st;
-		STRING5   z5;
-		STRING4   zip4;
-		STRING3   mileradius;
-		STRING16  workphone;
-		STRING9   fein;
-		UNSIGNED6 seleid;
-	END;
+  EXPORT Input := RECORD
+    STRING20  acctno;
+    STRING120 comp_name;
+    STRING120 dba_name;
+    STRING10  prim_range;
+    STRING2   predir;
+    STRING28  prim_name;
+    STRING4   addr_suffix;
+    STRING2   postdir;
+    STRING10  unit_desig;
+    STRING8   sec_range;
+    STRING25  city_name;
+    STRING2   st;
+    STRING5   z5;
+    STRING4   zip4;
+    STRING3   mileradius;
+    STRING16  workphone;
+    STRING9   fein;
+    UNSIGNED6 ultid;
+    UNSIGNED6 orgid;
+    UNSIGNED6 seleid;
+    UNSIGNED6 proxid;
+  END;
 	
   EXPORT Input_Processed :=
 	RECORD(Input)
