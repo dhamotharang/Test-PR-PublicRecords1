@@ -324,20 +324,22 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																		CHOOSEN(ds_score_breakdown,batch_params.MaxScoreBreakdown),
 																DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
 
-			SELF.AssociatedIdentities := IF(batch_params.IsOnline,
+			SELF.AssociatedIdentities := IF(batch_params.IsOnline AND ~IsRealTime,
 																			CHOOSEN(ds_contributoryBest_w_scores_sorted, batch_params.MaxAssociatedIdentities),
 																			DATASET([],iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
 			
-			SELF.AssociatedAddresses := IF(batch_params.IsOnline,
+			SELF.AssociatedAddresses := IF(batch_params.IsOnline AND ~IsRealTime,
 																			CHOOSEN(ds_associated_addresses, batch_params.MaxAssociatedAddresses),
 																			DATASET([],iesp.fraudgovreport.t_FraudGovAssociatedAddress));
 
-			SELF.RelatedClusters := IF(batch_params.IsOnline, 
+			SELF.RelatedClusters := IF(batch_params.IsOnline AND ~IsRealTime, 
 																	CHOOSEN(ds_related_clusters_sorted, batch_params.MaxRelatedClusters),
 																	DATASET([],iesp.fraudgovreport.t_FraudGovClusterCardDetails));
 																
-			SELF.TimeLineDetails := IF(batch_params.IsOnline, 
-																CHOOSEN(ds_timeline_sorted, batch_params.MaxTimelineDetails), 
+			SELF.TimeLineDetails := MAP(batch_params.IsOnline  AND ~IsRealTime => 
+																					CHOOSEN(ds_timeline_sorted, batch_params.MaxTimelineDetails), 
+																 batch_params.IsOnline  AND IsRealTime =>
+																					CHOOSEN(ds_recentTransactions_sorted, batch_params.MaxTimelineDetails),
 																DATASET([],iesp.fraudgovreport.t_FraudGovTimeLineDetails));
 		END;
 		
