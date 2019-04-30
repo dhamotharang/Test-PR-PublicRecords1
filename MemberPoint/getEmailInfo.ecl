@@ -24,8 +24,7 @@ EXPORT getEmailInfo(dataset (MemberPoint.Layouts.BestExtended) dsBestE,
 							self.z5						:= left.c_best_z5,
 							self.email_addrFull := left.input_email ));
 							
-    SHARED mod_batch := BatchShare.IParam.ConvertToLegacy(InputParams);
-		EmailBatchParams := MODULE(project(mod_batch, BatchServices.Email_BatchService_Interfaces.BatchParams, opt))
+		EmailBatchParams := MODULE(project(InputParams, BatchServices.Email_BatchService_Interfaces.BatchParams, opt))
 				EXPORT unsigned8 MAX_EMAIL_PER_ACCTNO := 5; // implicitly defined by flat output layout.
 				EXPORT boolean useDMEmailSourcesOnly := false	: stored('UseDMEmailSourcesOnly');
 		END;
