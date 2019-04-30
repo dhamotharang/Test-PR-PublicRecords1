@@ -1,7 +1,7 @@
 ﻿IMPORT SALT311;
 EXPORT Fields := MODULE
 
-EXPORT NumFields := 41;
+EXPORT NumFields := 42;
 
 // Processing for each FieldType
 EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'number','alpha','NAME');
@@ -31,11 +31,11 @@ EXPORT InValidFT_NAME(SALT311.StrType s) := WHICH(SALT311.stringtouppercase(s)<>
 EXPORT InValidMessageFT_NAME(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotCaps,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ -\''),SALT311.HygieneErrors.Good);
 
 
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'pflag1','pflag2','pflag3','src','dt_first_seen','dt_last_seen','dt_vendor_last_reported','dt_vendor_first_reported','dt_nonglb_last_seen','rec_type','phone','ssn','dob','title','fname','mname','lname','name_suffix','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','city_name','st','zip','zip4','tnt','valid_ssn','jflag1','jflag2','jflag3','rawaid','dodgy_tracking','address_ind','name_ind','persistent_record_id','ssnum','address');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'pflag1','pflag2','pflag3','src','dt_first_seen','dt_last_seen','dt_vendor_last_reported','dt_vendor_first_reported','dt_nonglb_last_seen','rec_type','phone','ssn','dob','title','fname','mname','lname','name_suffix','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','city_name','st','zip','zip4','tnt','valid_ssn','jflag1','jflag2','jflag3','rawaid','dodgy_tracking','address_ind','name_ind','persistent_record_id','ssnum','address');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'pflag1' => 0,'pflag2' => 1,'pflag3' => 2,'src' => 3,'dt_first_seen' => 4,'dt_last_seen' => 5,'dt_vendor_last_reported' => 6,'dt_vendor_first_reported' => 7,'dt_nonglb_last_seen' => 8,'rec_type' => 9,'phone' => 10,'ssn' => 11,'dob' => 12,'title' => 13,'fname' => 14,'mname' => 15,'lname' => 16,'name_suffix' => 17,'prim_range' => 18,'predir' => 19,'prim_name' => 20,'suffix' => 21,'postdir' => 22,'unit_desig' => 23,'sec_range' => 24,'city_name' => 25,'st' => 26,'zip' => 27,'zip4' => 28,'tnt' => 29,'valid_ssn' => 30,'jflag1' => 31,'jflag2' => 32,'jflag3' => 33,'rawaid' => 34,'dodgy_tracking' => 35,'address_ind' => 36,'name_ind' => 37,'persistent_record_id' => 38,'ssnum' => 39,'address' => 40,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'pflag1','pflag2','pflag3','src','dt_first_seen','dt_last_seen','dt_vendor_last_reported','dt_vendor_first_reported','dt_nonglb_last_seen','rec_type','phone','ssn','dob','title','fname','mname','lname','name_suffix','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','city_name','st','zip','zip4','tnt','valid_ssn','jflag1','jflag2','jflag3','rawaid','dodgy_tracking','address_ind','name_ind','persistent_record_id','lastname','ssnum','address');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'pflag1','pflag2','pflag3','src','dt_first_seen','dt_last_seen','dt_vendor_last_reported','dt_vendor_first_reported','dt_nonglb_last_seen','rec_type','phone','ssn','dob','title','fname','mname','lname','name_suffix','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','city_name','st','zip','zip4','tnt','valid_ssn','jflag1','jflag2','jflag3','rawaid','dodgy_tracking','address_ind','name_ind','persistent_record_id','lastname','ssnum','address');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'pflag1' => 0,'pflag2' => 1,'pflag3' => 2,'src' => 3,'dt_first_seen' => 4,'dt_last_seen' => 5,'dt_vendor_last_reported' => 6,'dt_vendor_first_reported' => 7,'dt_nonglb_last_seen' => 8,'rec_type' => 9,'phone' => 10,'ssn' => 11,'dob' => 12,'title' => 13,'fname' => 14,'mname' => 15,'lname' => 16,'name_suffix' => 17,'prim_range' => 18,'predir' => 19,'prim_name' => 20,'suffix' => 21,'postdir' => 22,'unit_desig' => 23,'sec_range' => 24,'city_name' => 25,'st' => 26,'zip' => 27,'zip4' => 28,'tnt' => 29,'valid_ssn' => 30,'jflag1' => 31,'jflag2' => 32,'jflag3' => 33,'rawaid' => 34,'dodgy_tracking' => 35,'address_ind' => 36,'name_ind' => 37,'persistent_record_id' => 38,'lastname' => 39,'ssnum' => 40,'address' => 41,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE);
 
 //Individual field level validation
 
@@ -234,6 +234,10 @@ EXPORT Make_persistent_record_id(SALT311.StrType s0) := s0;
 EXPORT InValid_persistent_record_id(SALT311.StrType s) := 0;
 EXPORT InValidMessage_persistent_record_id(UNSIGNED1 wh) := '';
 
+
+EXPORT Make_lastname(SALT311.StrType s0) := s0;
+EXPORT InValid_lastname(SALT311.StrType lname,SALT311.StrType name_ind) := WHICH(InValid_lname(lname)>0,InValid_name_ind(name_ind)>0);
+EXPORT InValidMessage_lastname(UNSIGNED1 wh) := '';
 
 EXPORT Make_ssnum(SALT311.StrType s0) := s0;
 EXPORT InValid_ssnum(SALT311.StrType ssn,SALT311.StrType valid_ssn) := WHICH(InValid_ssn(ssn)>0,InValid_valid_ssn(valid_ssn)>0);

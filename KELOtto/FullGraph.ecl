@@ -39,7 +39,7 @@ PersonEntities := PROJECT(KELOtto.Q__show_Customer_Person_Entities.Res0,
 
 /* NB This is to limit adding hyper connected entities (mostly addresses) Will need to be revisited later to only add the centroid */
 
-PersonToAddress := JOIN(KELOtto.Q__show_Customer_Address_Person_Tree_Entities.Res0, KELOtto.Q__show_Customer_Address.Res0(all_person_count_ > 100), 
+PersonToAddress := JOIN(KELOtto.Q__show_Customer_Address_Person_Tree_Entities.Res0, KELOtto.Q__show_Customer_Address.Res0(cl_identity_count_ > 1000), 
                          LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, 
                          TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, LOOKUP);
                   
@@ -81,7 +81,7 @@ FullPersonTreeEntities1 := JOIN(TreeToEntity, EntityToTree,
                               RECORDOF(LEFT), 
                               SELF.tree_uid_ := LEFT.tree_uid_,
                               SELF.entity_context_uid_ := RIGHT.entity_context_uid_, //RIGHT.tree_uid_,
-                              SELF := LEFT), LOCAL, KEEP(200));
+                              SELF := LEFT), LOCAL, KEEP(1000));
 
 FullTreeEntities := DEDUP(SORT(DISTRIBUTE(EntityToTree + FullPersonTreeEntities1, HASH32(entity_context_uid_)), source_customer_, tree_uid_, entity_context_uid_, LOCAL), source_customer_, tree_uid_, entity_context_uid_, LOCAL);
 
@@ -413,7 +413,6 @@ FullGraphPrep8 := PROJECT(FullGraphPrep8_1, TRANSFORM(temprec, SELF := LEFT));
 ElementCountAggregation := DISTRIBUTE(TABLE(FullGraphPrep8(entity_type_ != 1), {source_customer_, tree_uid_, UNSIGNED cl_element_count_ := COUNT(GROUP)}, source_customer_, tree_uid_, MERGE), HASH32(tree_uid_)); 
 // Join the element count back to each entity within all the trees.
 FullGraphElementCount1 := JOIN(FullGraphPrep8, ElementCountAggregation, LEFT.source_customer_ = RIGHT.source_customer_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_, TRANSFORM(RECORDOF(LEFT), SELF.cl_element_count_ := RIGHT.cl_element_count_, SELF := LEFT), LEFT OUTER, LOCAL);
-
 
 FullGraphElementCount := JOIN(FullGraphElementCount1, AdditionalAttributes, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 
    TRANSFORM({

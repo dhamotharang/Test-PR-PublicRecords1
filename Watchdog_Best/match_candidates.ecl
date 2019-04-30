@@ -4,147 +4,10 @@ IMPORT Watchdog_Best; // Import modules for  attribute definitions
 EXPORT match_candidates(DATASET(layout_Hdr) ih) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
   h00 := Watchdog_best.BasicMatch(ih).input_file;
-SHARED thin_table := DISTRIBUTE(TABLE(h00,{rid,pflag1,pflag2,pflag3,src,dt_first_seen,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported,dt_nonglb_last_seen,rec_type,phone,phone_len,ssn,dob,title,fname,fname_len,mname,mname_len,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4,tnt,valid_ssn,jflag1,jflag2,jflag3,rawaid,dodgy_tracking,address_ind,name_ind,persistent_record_id,ssnum,address,did}),HASH(did));
-
-//Prepare for field propagations ...
-PrePropCounts := RECORD
-  REAL8 pflag1_pop := AVE(GROUP,IF((thin_table.pflag1  IN SET(s.nulls_pflag1,pflag1) OR thin_table.pflag1 = (TYPEOF(thin_table.pflag1))''),0,100));
-  REAL8 pflag2_pop := AVE(GROUP,IF((thin_table.pflag2  IN SET(s.nulls_pflag2,pflag2) OR thin_table.pflag2 = (TYPEOF(thin_table.pflag2))''),0,100));
-  REAL8 pflag3_pop := AVE(GROUP,IF((thin_table.pflag3  IN SET(s.nulls_pflag3,pflag3) OR thin_table.pflag3 = (TYPEOF(thin_table.pflag3))''),0,100));
-  REAL8 src_pop := AVE(GROUP,IF((thin_table.src  IN SET(s.nulls_src,src) OR thin_table.src = (TYPEOF(thin_table.src))''),0,100));
-  REAL8 dt_first_seen_pop := AVE(GROUP,IF((thin_table.dt_first_seen  IN SET(s.nulls_dt_first_seen,dt_first_seen) OR thin_table.dt_first_seen = (TYPEOF(thin_table.dt_first_seen))''),0,100));
-  REAL8 dt_last_seen_pop := AVE(GROUP,IF((thin_table.dt_last_seen  IN SET(s.nulls_dt_last_seen,dt_last_seen) OR thin_table.dt_last_seen = (TYPEOF(thin_table.dt_last_seen))''),0,100));
-  REAL8 dt_vendor_last_reported_pop := AVE(GROUP,IF((thin_table.dt_vendor_last_reported  IN SET(s.nulls_dt_vendor_last_reported,dt_vendor_last_reported) OR thin_table.dt_vendor_last_reported = (TYPEOF(thin_table.dt_vendor_last_reported))''),0,100));
-  REAL8 dt_vendor_first_reported_pop := AVE(GROUP,IF((thin_table.dt_vendor_first_reported  IN SET(s.nulls_dt_vendor_first_reported,dt_vendor_first_reported) OR thin_table.dt_vendor_first_reported = (TYPEOF(thin_table.dt_vendor_first_reported))''),0,100));
-  REAL8 dt_nonglb_last_seen_pop := AVE(GROUP,IF((thin_table.dt_nonglb_last_seen  IN SET(s.nulls_dt_nonglb_last_seen,dt_nonglb_last_seen) OR thin_table.dt_nonglb_last_seen = (TYPEOF(thin_table.dt_nonglb_last_seen))''),0,100));
-  REAL8 rec_type_pop := AVE(GROUP,IF((thin_table.rec_type  IN SET(s.nulls_rec_type,rec_type) OR thin_table.rec_type = (TYPEOF(thin_table.rec_type))''),0,100));
-  REAL8 phone_pop := AVE(GROUP,IF((thin_table.phone  IN SET(s.nulls_phone,phone) OR thin_table.phone = (TYPEOF(thin_table.phone))''),0,100));
-  REAL8 ssn_pop := AVE(GROUP,IF((thin_table.ssn  IN SET(s.nulls_ssn,ssn) OR thin_table.ssn = (TYPEOF(thin_table.ssn))''),0,100));
-  REAL8 dob_pop := AVE(GROUP,IF((thin_table.dob  IN SET(s.nulls_dob,dob) OR thin_table.dob = (TYPEOF(thin_table.dob))''),0,100));
-  REAL8 title_pop := AVE(GROUP,IF((thin_table.title  IN SET(s.nulls_title,title) OR thin_table.title = (TYPEOF(thin_table.title))''),0,100));
-  REAL8 fname_pop := AVE(GROUP,IF((thin_table.fname  IN SET(s.nulls_fname,fname) OR thin_table.fname = (TYPEOF(thin_table.fname))''),0,100));
-  REAL8 mname_pop := AVE(GROUP,IF((thin_table.mname  IN SET(s.nulls_mname,mname) OR thin_table.mname = (TYPEOF(thin_table.mname))''),0,100));
-  REAL8 lname_pop := AVE(GROUP,IF((thin_table.lname  IN SET(s.nulls_lname,lname) OR thin_table.lname = (TYPEOF(thin_table.lname))''),0,100));
-  REAL8 name_suffix_pop := AVE(GROUP,IF((thin_table.name_suffix  IN SET(s.nulls_name_suffix,name_suffix) OR thin_table.name_suffix = (TYPEOF(thin_table.name_suffix))''),0,100));
-  REAL8 prim_range_pop := AVE(GROUP,IF((thin_table.prim_range  IN SET(s.nulls_prim_range,prim_range) OR thin_table.prim_range = (TYPEOF(thin_table.prim_range))''),0,100));
-  REAL8 predir_pop := AVE(GROUP,IF((thin_table.predir  IN SET(s.nulls_predir,predir) OR thin_table.predir = (TYPEOF(thin_table.predir))''),0,100));
-  REAL8 prim_name_pop := AVE(GROUP,IF((thin_table.prim_name  IN SET(s.nulls_prim_name,prim_name) OR thin_table.prim_name = (TYPEOF(thin_table.prim_name))''),0,100));
-  REAL8 suffix_pop := AVE(GROUP,IF((thin_table.suffix  IN SET(s.nulls_suffix,suffix) OR thin_table.suffix = (TYPEOF(thin_table.suffix))''),0,100));
-  REAL8 postdir_pop := AVE(GROUP,IF((thin_table.postdir  IN SET(s.nulls_postdir,postdir) OR thin_table.postdir = (TYPEOF(thin_table.postdir))''),0,100));
-  REAL8 unit_desig_pop := AVE(GROUP,IF((thin_table.unit_desig  IN SET(s.nulls_unit_desig,unit_desig) OR thin_table.unit_desig = (TYPEOF(thin_table.unit_desig))''),0,100));
-  REAL8 sec_range_pop := AVE(GROUP,IF((thin_table.sec_range  IN SET(s.nulls_sec_range,sec_range) OR thin_table.sec_range = (TYPEOF(thin_table.sec_range))''),0,100));
-  REAL8 city_name_pop := AVE(GROUP,IF((thin_table.city_name  IN SET(s.nulls_city_name,city_name) OR thin_table.city_name = (TYPEOF(thin_table.city_name))''),0,100));
-  REAL8 st_pop := AVE(GROUP,IF((thin_table.st  IN SET(s.nulls_st,st) OR thin_table.st = (TYPEOF(thin_table.st))''),0,100));
-  REAL8 zip_pop := AVE(GROUP,IF((thin_table.zip  IN SET(s.nulls_zip,zip) OR thin_table.zip = (TYPEOF(thin_table.zip))''),0,100));
-  REAL8 zip4_pop := AVE(GROUP,IF((thin_table.zip4  IN SET(s.nulls_zip4,zip4) OR thin_table.zip4 = (TYPEOF(thin_table.zip4))''),0,100));
-  REAL8 tnt_pop := AVE(GROUP,IF((thin_table.tnt  IN SET(s.nulls_tnt,tnt) OR thin_table.tnt = (TYPEOF(thin_table.tnt))''),0,100));
-  REAL8 valid_ssn_pop := AVE(GROUP,IF((thin_table.valid_ssn  IN SET(s.nulls_valid_ssn,valid_ssn) OR thin_table.valid_ssn = (TYPEOF(thin_table.valid_ssn))''),0,100));
-  REAL8 jflag1_pop := AVE(GROUP,IF((thin_table.jflag1  IN SET(s.nulls_jflag1,jflag1) OR thin_table.jflag1 = (TYPEOF(thin_table.jflag1))''),0,100));
-  REAL8 jflag2_pop := AVE(GROUP,IF((thin_table.jflag2  IN SET(s.nulls_jflag2,jflag2) OR thin_table.jflag2 = (TYPEOF(thin_table.jflag2))''),0,100));
-  REAL8 jflag3_pop := AVE(GROUP,IF((thin_table.jflag3  IN SET(s.nulls_jflag3,jflag3) OR thin_table.jflag3 = (TYPEOF(thin_table.jflag3))''),0,100));
-  REAL8 rawaid_pop := AVE(GROUP,IF((thin_table.rawaid  IN SET(s.nulls_rawaid,rawaid) OR thin_table.rawaid = (TYPEOF(thin_table.rawaid))''),0,100));
-  REAL8 dodgy_tracking_pop := AVE(GROUP,IF((thin_table.dodgy_tracking  IN SET(s.nulls_dodgy_tracking,dodgy_tracking) OR thin_table.dodgy_tracking = (TYPEOF(thin_table.dodgy_tracking))''),0,100));
-  REAL8 address_ind_pop := AVE(GROUP,IF((thin_table.address_ind  IN SET(s.nulls_address_ind,address_ind) OR thin_table.address_ind = (TYPEOF(thin_table.address_ind))''),0,100));
-  REAL8 name_ind_pop := AVE(GROUP,IF((thin_table.name_ind  IN SET(s.nulls_name_ind,name_ind) OR thin_table.name_ind = (TYPEOF(thin_table.name_ind))''),0,100));
-  REAL8 persistent_record_id_pop := AVE(GROUP,IF((thin_table.persistent_record_id  IN SET(s.nulls_persistent_record_id,persistent_record_id) OR thin_table.persistent_record_id = (TYPEOF(thin_table.persistent_record_id))''),0,100));
-  REAL8 ssnum_pop := AVE(GROUP,IF(((thin_table.ssn  IN SET(s.nulls_ssn,ssn) OR thin_table.ssn = (TYPEOF(thin_table.ssn))'') AND (thin_table.valid_ssn  IN SET(s.nulls_valid_ssn,valid_ssn) OR thin_table.valid_ssn = (TYPEOF(thin_table.valid_ssn))'')),0,100));
-  REAL8 address_pop := AVE(GROUP,IF(((thin_table.prim_range  IN SET(s.nulls_prim_range,prim_range) OR thin_table.prim_range = (TYPEOF(thin_table.prim_range))'') AND (thin_table.predir  IN SET(s.nulls_predir,predir) OR thin_table.predir = (TYPEOF(thin_table.predir))'') AND (thin_table.prim_name  IN SET(s.nulls_prim_name,prim_name) OR thin_table.prim_name = (TYPEOF(thin_table.prim_name))'') AND (thin_table.suffix  IN SET(s.nulls_suffix,suffix) OR thin_table.suffix = (TYPEOF(thin_table.suffix))'') AND (thin_table.postdir  IN SET(s.nulls_postdir,postdir) OR thin_table.postdir = (TYPEOF(thin_table.postdir))'') AND (thin_table.unit_desig  IN SET(s.nulls_unit_desig,unit_desig) OR thin_table.unit_desig = (TYPEOF(thin_table.unit_desig))'') AND (thin_table.sec_range  IN SET(s.nulls_sec_range,sec_range) OR thin_table.sec_range = (TYPEOF(thin_table.sec_range))'') AND (thin_table.city_name  IN SET(s.nulls_city_name,city_name) OR thin_table.city_name = (TYPEOF(thin_table.city_name))'') AND (thin_table.st  IN SET(s.nulls_st,st) OR thin_table.st = (TYPEOF(thin_table.st))'') AND (thin_table.zip  IN SET(s.nulls_zip,zip) OR thin_table.zip = (TYPEOF(thin_table.zip))'') AND (thin_table.zip4  IN SET(s.nulls_zip4,zip4) OR thin_table.zip4 = (TYPEOF(thin_table.zip4))'') AND (thin_table.tnt  IN SET(s.nulls_tnt,tnt) OR thin_table.tnt = (TYPEOF(thin_table.tnt))'') AND (thin_table.rawaid  IN SET(s.nulls_rawaid,rawaid) OR thin_table.rawaid = (TYPEOF(thin_table.rawaid))'') AND (thin_table.dt_first_seen  IN SET(s.nulls_dt_first_seen,dt_first_seen) OR thin_table.dt_first_seen = (TYPEOF(thin_table.dt_first_seen))'') AND (thin_table.dt_last_seen  IN SET(s.nulls_dt_last_seen,dt_last_seen) OR thin_table.dt_last_seen = (TYPEOF(thin_table.dt_last_seen))'') AND (thin_table.dt_vendor_first_reported  IN SET(s.nulls_dt_vendor_first_reported,dt_vendor_first_reported) OR thin_table.dt_vendor_first_reported = (TYPEOF(thin_table.dt_vendor_first_reported))'') AND (thin_table.dt_vendor_last_reported  IN SET(s.nulls_dt_vendor_last_reported,dt_vendor_last_reported) OR thin_table.dt_vendor_last_reported = (TYPEOF(thin_table.dt_vendor_last_reported))'')),0,100));
-END;
-EXPORT PPS := TABLE(thin_table,PrePropCounts);
-EXPORT poprec := RECORD
-	STRING label;
-		REAL8 pop;
-	END;
-EXPORT PrePropogationStats := SALT311.MAC_Pivot(PPS, poprec);
-SHARED layout_withpropvars := RECORD
-  thin_table;
-  UNSIGNED1 fname_prop := 0;
-  INTEGER1 fname_prop_method := 0;
-  UNSIGNED1 mname_prop := 0;
-  INTEGER1 mname_prop_method := 0;
-END;
-SHARED with_props := TABLE(thin_table,layout_withpropvars);
+SHARED thin_table := DISTRIBUTE(TABLE(h00,{rid,pflag1,pflag2,pflag3,src,dt_first_seen,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported,dt_nonglb_last_seen,rec_type,phone,phone_len,ssn,dob,title,fname,fname_len,mname,mname_len,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4,tnt,valid_ssn,jflag1,jflag2,jflag3,rawaid,dodgy_tracking,address_ind,name_ind,persistent_record_id,lastname,ssnum,address,did}),HASH(did));
 SHARED BestM := MAC_CreateBest(ih, , );
-// Now generate code for basis :did,src,data_permits
-// There are 2 best types that we can propogate from this basis which means we will not need to use this basis again
-  Layout_WithPropVars T_CommonFirstName_2_0(Layout_WithPropVars le,BestM.BestBy_did_best ri) := TRANSFORM
-    SELF.fname_prop_method := MAP ( ri.fname_method = 0 OR le.fname_prop_method <> 0 OR le.fname = ri.fname => le.fname_prop_method, // No propogation
-      ri.fname_method = 2 AND ((SALT311.StrType)ri.fname)[1..length(trim((SALT311.StrType)le.fname))] = (SALT311.StrType)le.fname  => 2, // This field is extensible
-      le.fname_prop_method);
-    SELF.fname := MAP ( le.fname_prop > 0 OR le.fname = ri.fname OR (ri.fname  IN SET(s.nulls_fname,fname) OR ri.fname = (TYPEOF(ri.fname))'') => le.fname, // No propogation
-      ri.fname_method = 2 AND ((SALT311.StrType)ri.fname)[1..length(trim((SALT311.StrType)le.fname))] = (SALT311.StrType)le.fname  => ri.fname, // This field is extensible
-      le.fname);
-    SELF.fname_prop := IF ( le.fname = SELF.fname, le.fname_prop,MAX(1,length(trim(SELF.fname))-length(trim(le.fname)))); // Need MAX as prop MAY not have been an EXTEND
-    SELF.fname_len := IF ( le.fname = SELF.fname, le.fname_len, LENGTH(TRIM(SELF.fname)));
-    SELF.mname_prop_method := MAP ( ri.mname_method = 0 OR le.mname_prop_method <> 0 OR le.mname = ri.mname => le.mname_prop_method, // No propogation
-      ri.mname_method = 2 AND ((SALT311.StrType)ri.mname)[1..length(trim((SALT311.StrType)le.mname))] = (SALT311.StrType)le.mname  => 2, // This field is extensible
-      le.mname_prop_method);
-    SELF.mname := MAP ( le.mname_prop > 0 OR le.mname = ri.mname OR (ri.mname  IN SET(s.nulls_mname,mname) OR ri.mname = (TYPEOF(ri.mname))'') => le.mname, // No propogation
-      ri.mname_method = 2 AND ((SALT311.StrType)ri.mname)[1..length(trim((SALT311.StrType)le.mname))] = (SALT311.StrType)le.mname  => ri.mname, // This field is extensible
-      le.mname);
-    SELF.mname_prop := IF ( le.mname = SELF.mname, le.mname_prop,MAX(1,length(trim(SELF.mname))-length(trim(le.mname)))); // Need MAX as prop MAY not have been an EXTEND
-    SELF.mname_len := IF ( le.mname = SELF.mname, le.mname_len, LENGTH(TRIM(SELF.mname)));
-    SELF := le;
-  END;
-SHARED P_CommonFirstName_2_0 := JOIN(with_props(did <> 0),PULL(BestM.BestBy_did_best), LEFT.did = RIGHT.did ,T_CommonFirstName_2_0(LEFT,RIGHT),LEFT OUTER,HASH)
-                 + with_props(did = 0);
 
 
-P_CommonFirstName_2_0 do_computes(P_CommonFirstName_2_0 le) := TRANSFORM
-  SELF.ssnum := IF (Fields.InValid_ssnum((SALT311.StrType)le.ssn,(SALT311.StrType)le.valid_ssn)>0,0,HASH32((SALT311.StrType)le.ssn,(SALT311.StrType)le.valid_ssn)); // Combine child fields into 1 for specificity counting
-  SELF.address := IF (Fields.InValid_address((SALT311.StrType)le.prim_range,(SALT311.StrType)le.predir,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.suffix,(SALT311.StrType)le.postdir,(SALT311.StrType)le.unit_desig,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.tnt,(SALT311.StrType)le.rawaid,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported)>0,0,HASH32((SALT311.StrType)le.prim_range,(SALT311.StrType)le.predir,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.suffix,(SALT311.StrType)le.postdir,(SALT311.StrType)le.unit_desig,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.tnt,(SALT311.StrType)le.rawaid,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported)); // Combine child fields into 1 for specificity counting
-  SELF := le;
-END;
-SHARED propogated := PROJECT(P_CommonFirstName_2_0,do_computes(left)) : PERSIST('~temp::did::Watchdog_best::mc_props::Hdr',EXPIRE(Watchdog_best.Config.PersistExpire)); // to allow to 'jump' over an exported value
-PostPropCounts := RECORD
-  REAL8 pflag1_pop := AVE(GROUP,IF((propogated.pflag1  IN SET(s.nulls_pflag1,pflag1) OR propogated.pflag1 = (TYPEOF(propogated.pflag1))''),0,100));
-  REAL8 pflag2_pop := AVE(GROUP,IF((propogated.pflag2  IN SET(s.nulls_pflag2,pflag2) OR propogated.pflag2 = (TYPEOF(propogated.pflag2))''),0,100));
-  REAL8 pflag3_pop := AVE(GROUP,IF((propogated.pflag3  IN SET(s.nulls_pflag3,pflag3) OR propogated.pflag3 = (TYPEOF(propogated.pflag3))''),0,100));
-  REAL8 src_pop := AVE(GROUP,IF((propogated.src  IN SET(s.nulls_src,src) OR propogated.src = (TYPEOF(propogated.src))''),0,100));
-  REAL8 dt_first_seen_pop := AVE(GROUP,IF((propogated.dt_first_seen  IN SET(s.nulls_dt_first_seen,dt_first_seen) OR propogated.dt_first_seen = (TYPEOF(propogated.dt_first_seen))''),0,100));
-  REAL8 dt_last_seen_pop := AVE(GROUP,IF((propogated.dt_last_seen  IN SET(s.nulls_dt_last_seen,dt_last_seen) OR propogated.dt_last_seen = (TYPEOF(propogated.dt_last_seen))''),0,100));
-  REAL8 dt_vendor_last_reported_pop := AVE(GROUP,IF((propogated.dt_vendor_last_reported  IN SET(s.nulls_dt_vendor_last_reported,dt_vendor_last_reported) OR propogated.dt_vendor_last_reported = (TYPEOF(propogated.dt_vendor_last_reported))''),0,100));
-  REAL8 dt_vendor_first_reported_pop := AVE(GROUP,IF((propogated.dt_vendor_first_reported  IN SET(s.nulls_dt_vendor_first_reported,dt_vendor_first_reported) OR propogated.dt_vendor_first_reported = (TYPEOF(propogated.dt_vendor_first_reported))''),0,100));
-  REAL8 dt_nonglb_last_seen_pop := AVE(GROUP,IF((propogated.dt_nonglb_last_seen  IN SET(s.nulls_dt_nonglb_last_seen,dt_nonglb_last_seen) OR propogated.dt_nonglb_last_seen = (TYPEOF(propogated.dt_nonglb_last_seen))''),0,100));
-  REAL8 rec_type_pop := AVE(GROUP,IF((propogated.rec_type  IN SET(s.nulls_rec_type,rec_type) OR propogated.rec_type = (TYPEOF(propogated.rec_type))''),0,100));
-  REAL8 phone_pop := AVE(GROUP,IF((propogated.phone  IN SET(s.nulls_phone,phone) OR propogated.phone = (TYPEOF(propogated.phone))''),0,100));
-  REAL8 ssn_pop := AVE(GROUP,IF((propogated.ssn  IN SET(s.nulls_ssn,ssn) OR propogated.ssn = (TYPEOF(propogated.ssn))''),0,100));
-  REAL8 dob_pop := AVE(GROUP,IF((propogated.dob  IN SET(s.nulls_dob,dob) OR propogated.dob = (TYPEOF(propogated.dob))''),0,100));
-  REAL8 title_pop := AVE(GROUP,IF((propogated.title  IN SET(s.nulls_title,title) OR propogated.title = (TYPEOF(propogated.title))''),0,100));
-  REAL8 fname_pop := AVE(GROUP,IF((propogated.fname  IN SET(s.nulls_fname,fname) OR propogated.fname = (TYPEOF(propogated.fname))''),0,100));
-  REAL8 fname_method_1 := AVE(GROUP,IF(propogated.fname_prop_method = 1, 100, 0));
-  REAL8 fname_method_2 := AVE(GROUP,IF(propogated.fname_prop_method = 2, 100, 0));
-  REAL8 mname_pop := AVE(GROUP,IF((propogated.mname  IN SET(s.nulls_mname,mname) OR propogated.mname = (TYPEOF(propogated.mname))''),0,100));
-  REAL8 mname_method_1 := AVE(GROUP,IF(propogated.mname_prop_method = 1, 100, 0));
-  REAL8 mname_method_2 := AVE(GROUP,IF(propogated.mname_prop_method = 2, 100, 0));
-  REAL8 lname_pop := AVE(GROUP,IF((propogated.lname  IN SET(s.nulls_lname,lname) OR propogated.lname = (TYPEOF(propogated.lname))''),0,100));
-  REAL8 name_suffix_pop := AVE(GROUP,IF((propogated.name_suffix  IN SET(s.nulls_name_suffix,name_suffix) OR propogated.name_suffix = (TYPEOF(propogated.name_suffix))''),0,100));
-  REAL8 prim_range_pop := AVE(GROUP,IF((propogated.prim_range  IN SET(s.nulls_prim_range,prim_range) OR propogated.prim_range = (TYPEOF(propogated.prim_range))''),0,100));
-  REAL8 predir_pop := AVE(GROUP,IF((propogated.predir  IN SET(s.nulls_predir,predir) OR propogated.predir = (TYPEOF(propogated.predir))''),0,100));
-  REAL8 prim_name_pop := AVE(GROUP,IF((propogated.prim_name  IN SET(s.nulls_prim_name,prim_name) OR propogated.prim_name = (TYPEOF(propogated.prim_name))''),0,100));
-  REAL8 suffix_pop := AVE(GROUP,IF((propogated.suffix  IN SET(s.nulls_suffix,suffix) OR propogated.suffix = (TYPEOF(propogated.suffix))''),0,100));
-  REAL8 postdir_pop := AVE(GROUP,IF((propogated.postdir  IN SET(s.nulls_postdir,postdir) OR propogated.postdir = (TYPEOF(propogated.postdir))''),0,100));
-  REAL8 unit_desig_pop := AVE(GROUP,IF((propogated.unit_desig  IN SET(s.nulls_unit_desig,unit_desig) OR propogated.unit_desig = (TYPEOF(propogated.unit_desig))''),0,100));
-  REAL8 sec_range_pop := AVE(GROUP,IF((propogated.sec_range  IN SET(s.nulls_sec_range,sec_range) OR propogated.sec_range = (TYPEOF(propogated.sec_range))''),0,100));
-  REAL8 city_name_pop := AVE(GROUP,IF((propogated.city_name  IN SET(s.nulls_city_name,city_name) OR propogated.city_name = (TYPEOF(propogated.city_name))''),0,100));
-  REAL8 st_pop := AVE(GROUP,IF((propogated.st  IN SET(s.nulls_st,st) OR propogated.st = (TYPEOF(propogated.st))''),0,100));
-  REAL8 zip_pop := AVE(GROUP,IF((propogated.zip  IN SET(s.nulls_zip,zip) OR propogated.zip = (TYPEOF(propogated.zip))''),0,100));
-  REAL8 zip4_pop := AVE(GROUP,IF((propogated.zip4  IN SET(s.nulls_zip4,zip4) OR propogated.zip4 = (TYPEOF(propogated.zip4))''),0,100));
-  REAL8 tnt_pop := AVE(GROUP,IF((propogated.tnt  IN SET(s.nulls_tnt,tnt) OR propogated.tnt = (TYPEOF(propogated.tnt))''),0,100));
-  REAL8 valid_ssn_pop := AVE(GROUP,IF((propogated.valid_ssn  IN SET(s.nulls_valid_ssn,valid_ssn) OR propogated.valid_ssn = (TYPEOF(propogated.valid_ssn))''),0,100));
-  REAL8 jflag1_pop := AVE(GROUP,IF((propogated.jflag1  IN SET(s.nulls_jflag1,jflag1) OR propogated.jflag1 = (TYPEOF(propogated.jflag1))''),0,100));
-  REAL8 jflag2_pop := AVE(GROUP,IF((propogated.jflag2  IN SET(s.nulls_jflag2,jflag2) OR propogated.jflag2 = (TYPEOF(propogated.jflag2))''),0,100));
-  REAL8 jflag3_pop := AVE(GROUP,IF((propogated.jflag3  IN SET(s.nulls_jflag3,jflag3) OR propogated.jflag3 = (TYPEOF(propogated.jflag3))''),0,100));
-  REAL8 rawaid_pop := AVE(GROUP,IF((propogated.rawaid  IN SET(s.nulls_rawaid,rawaid) OR propogated.rawaid = (TYPEOF(propogated.rawaid))''),0,100));
-  REAL8 dodgy_tracking_pop := AVE(GROUP,IF((propogated.dodgy_tracking  IN SET(s.nulls_dodgy_tracking,dodgy_tracking) OR propogated.dodgy_tracking = (TYPEOF(propogated.dodgy_tracking))''),0,100));
-  REAL8 address_ind_pop := AVE(GROUP,IF((propogated.address_ind  IN SET(s.nulls_address_ind,address_ind) OR propogated.address_ind = (TYPEOF(propogated.address_ind))''),0,100));
-  REAL8 name_ind_pop := AVE(GROUP,IF((propogated.name_ind  IN SET(s.nulls_name_ind,name_ind) OR propogated.name_ind = (TYPEOF(propogated.name_ind))''),0,100));
-  REAL8 persistent_record_id_pop := AVE(GROUP,IF((propogated.persistent_record_id  IN SET(s.nulls_persistent_record_id,persistent_record_id) OR propogated.persistent_record_id = (TYPEOF(propogated.persistent_record_id))''),0,100));
-  REAL8 ssnum_pop := AVE(GROUP,IF(((propogated.ssn  IN SET(s.nulls_ssn,ssn) OR propogated.ssn = (TYPEOF(propogated.ssn))'') AND (propogated.valid_ssn  IN SET(s.nulls_valid_ssn,valid_ssn) OR propogated.valid_ssn = (TYPEOF(propogated.valid_ssn))'')),0,100));
-  REAL8 address_pop := AVE(GROUP,IF(((propogated.prim_range  IN SET(s.nulls_prim_range,prim_range) OR propogated.prim_range = (TYPEOF(propogated.prim_range))'') AND (propogated.predir  IN SET(s.nulls_predir,predir) OR propogated.predir = (TYPEOF(propogated.predir))'') AND (propogated.prim_name  IN SET(s.nulls_prim_name,prim_name) OR propogated.prim_name = (TYPEOF(propogated.prim_name))'') AND (propogated.suffix  IN SET(s.nulls_suffix,suffix) OR propogated.suffix = (TYPEOF(propogated.suffix))'') AND (propogated.postdir  IN SET(s.nulls_postdir,postdir) OR propogated.postdir = (TYPEOF(propogated.postdir))'') AND (propogated.unit_desig  IN SET(s.nulls_unit_desig,unit_desig) OR propogated.unit_desig = (TYPEOF(propogated.unit_desig))'') AND (propogated.sec_range  IN SET(s.nulls_sec_range,sec_range) OR propogated.sec_range = (TYPEOF(propogated.sec_range))'') AND (propogated.city_name  IN SET(s.nulls_city_name,city_name) OR propogated.city_name = (TYPEOF(propogated.city_name))'') AND (propogated.st  IN SET(s.nulls_st,st) OR propogated.st = (TYPEOF(propogated.st))'') AND (propogated.zip  IN SET(s.nulls_zip,zip) OR propogated.zip = (TYPEOF(propogated.zip))'') AND (propogated.zip4  IN SET(s.nulls_zip4,zip4) OR propogated.zip4 = (TYPEOF(propogated.zip4))'') AND (propogated.tnt  IN SET(s.nulls_tnt,tnt) OR propogated.tnt = (TYPEOF(propogated.tnt))'') AND (propogated.rawaid  IN SET(s.nulls_rawaid,rawaid) OR propogated.rawaid = (TYPEOF(propogated.rawaid))'') AND (propogated.dt_first_seen  IN SET(s.nulls_dt_first_seen,dt_first_seen) OR propogated.dt_first_seen = (TYPEOF(propogated.dt_first_seen))'') AND (propogated.dt_last_seen  IN SET(s.nulls_dt_last_seen,dt_last_seen) OR propogated.dt_last_seen = (TYPEOF(propogated.dt_last_seen))'') AND (propogated.dt_vendor_first_reported  IN SET(s.nulls_dt_vendor_first_reported,dt_vendor_first_reported) OR propogated.dt_vendor_first_reported = (TYPEOF(propogated.dt_vendor_first_reported))'') AND (propogated.dt_vendor_last_reported  IN SET(s.nulls_dt_vendor_last_reported,dt_vendor_last_reported) OR propogated.dt_vendor_last_reported = (TYPEOF(propogated.dt_vendor_last_reported))'')),0,100));
-END;
- PoPS := TABLE(propogated,PostPropCounts);
-EXPORT PostPropogationStats := SALT311.MAC_Pivot(PoPS, poprec);
   SHARED MAC_RollupCandidates(inCandidates, sortFields, groupFields, addBuddies) := FUNCTIONMACRO
     Grpd0 := GROUP(SORT(
       DISTRIBUTE(TABLE(inCandidates, {inCandidates #IF(addBuddies) , UNSIGNED2 Buddies := 0 #END}), HASH(did)),
@@ -157,10 +20,8 @@ EXPORT PostPropogationStats := SALT311.MAC_Pivot(PoPS, poprec);
     RETURN UNGROUP(ROLLUP(Grpd0,TRUE,Tr0(LEFT,RIGHT)));// Only one copy of each record
   ENDMACRO;
   SHARED fieldList := 'pflag1,pflag2,pflag3,src,dt_first_seen,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported,dt_nonglb_last_seen,rec_type,phone,ssn,dob,title,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4,tnt,valid_ssn,jflag1,jflag2,jflag3,rawaid,dodgy_tracking,address_ind,name_ind,persistent_record_id';
-  SHARED fieldListWithPropFlags := fieldList + ',fname_prop,mname_prop';
-  GrpdRoll_withpropfields := MAC_RollupCandidates(propogated, fieldListWithPropFlags, fieldListWithPropFlags, TRUE);
-  GrpdRoll_nopropfields := MAC_RollupCandidates(propogated, fieldListWithPropFlags, fieldList, TRUE);
-SHARED h0 := IF(Config.FastSlice, GrpdRoll_nopropFields, GrpdRoll_withpropfields);
+  GrpdRoll := MAC_RollupCandidates(thin_table, fieldList, fieldList, TRUE);
+SHARED h0 := GrpdRoll;// Only one copy of each record
 
 EXPORT Layout_Matches := RECORD//in this module for because of ,foward bug
   UNSIGNED2 Rule;
@@ -260,6 +121,8 @@ EXPORT Layout_Candidates := RECORD // A record to hold weights of each field val
   BOOLEAN name_ind_isnull := (h0.name_ind  IN SET(s.nulls_name_ind,name_ind) OR h0.name_ind = (TYPEOF(h0.name_ind))''); // Simplify later processing 
   INTEGER2 persistent_record_id_weight100 := 0; // Contains 100x the specificity
   BOOLEAN persistent_record_id_isnull := (h0.persistent_record_id  IN SET(s.nulls_persistent_record_id,persistent_record_id) OR h0.persistent_record_id = (TYPEOF(h0.persistent_record_id))''); // Simplify later processing 
+  INTEGER2 lastname_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN lastname_isnull := ((h0.lname  IN SET(s.nulls_lname,lname) OR h0.lname = (TYPEOF(h0.lname))'') AND (h0.name_ind  IN SET(s.nulls_name_ind,name_ind) OR h0.name_ind = (TYPEOF(h0.name_ind))'')); // Simplify later processing 
   INTEGER2 ssnum_weight100 := 0; // Contains 100x the specificity
   BOOLEAN ssnum_isnull := ((h0.ssn  IN SET(s.nulls_ssn,ssn) OR h0.ssn = (TYPEOF(h0.ssn))'') AND (h0.valid_ssn  IN SET(s.nulls_valid_ssn,valid_ssn) OR h0.valid_ssn = (TYPEOF(h0.valid_ssn))'')); // Simplify later processing 
   INTEGER2 address_weight100 := 0; // Contains 100x the specificity
@@ -270,11 +133,16 @@ h1 := TABLE(h0,layout_candidates);
 
 //Would also create auto-id fields here
 
+layout_candidates add_lastname(layout_candidates le,Specificities(ih).lastname_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.lastname_weight100 := MAP (le.lastname_isnull => 0, patch_default and ri.field_specificity=0 => s.lastname_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+j41 := JOIN(h1,PULL(Specificities(ih).lastname_values_persisted),LEFT.lastname=RIGHT.lastname,add_lastname(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 layout_candidates add_persistent_record_id(layout_candidates le,Specificities(ih).persistent_record_id_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.persistent_record_id_weight100 := MAP (le.persistent_record_id_isnull => 0, patch_default and ri.field_specificity=0 => s.persistent_record_id_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-j40 := JOIN(h1,PULL(Specificities(ih).persistent_record_id_values_persisted),LEFT.persistent_record_id=RIGHT.persistent_record_id,add_persistent_record_id(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
+j40 := JOIN(j41,PULL(Specificities(ih).persistent_record_id_values_persisted),LEFT.persistent_record_id=RIGHT.persistent_record_id,add_persistent_record_id(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 layout_candidates add_name_ind(layout_candidates le,Specificities(ih).name_ind_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.name_ind_weight100 := MAP (le.name_ind_isnull => 0, patch_default and ri.field_specificity=0 => s.name_ind_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -484,18 +352,12 @@ layout_candidates add_src(layout_candidates le,Specificities(ih).src_values_pers
 END;
 SALT311.MAC_Choose_JoinType(j1,s.nulls_src,Specificities(ih).src_values_persisted,src,src_weight100,add_src,j0);
 //Using HASH(did) to get smoother distribution
-SHARED j0_dist := DISTRIBUTE(j0, HASH(did));
-SHARED Annotated_NoDedup := j0_dist : PERSIST('~temp::did::Watchdog_best::mc_nodedup',EXPIRE(Watchdog_best.Config.PersistExpire)); // No dedup- for aggressive slicing
-SHARED Annotated_Dedup := IF(Config.FastSlice, j0_dist, MAC_RollupCandidates(Annotated_NoDedup, fieldListWithPropFlags, fieldList, FALSE));
-SHARED Annotated := Annotated_Dedup : PERSIST('~temp::did::Watchdog_best::mc',EXPIRE(Watchdog_best.Config.PersistExpire)); // Distributed for keybuild case
+SHARED Annotated := DISTRIBUTE(j0, HASH(did)) : PERSIST('~temp::did::Watchdog_best::mc',EXPIRE(Watchdog_best.Config.PersistExpire)); // Distributed for keybuild case
 //Now see if these records are actually linkable
-TotalWeight := Annotated.src_weight100 + Annotated.address_weight100 + Annotated.name_suffix_weight100 + Annotated.dt_nonglb_last_seen_weight100 + Annotated.ssnum_weight100 + Annotated.dodgy_tracking_weight100 + Annotated.pflag1_weight100 + Annotated.pflag2_weight100 + Annotated.jflag2_weight100 + Annotated.jflag3_weight100 + Annotated.jflag1_weight100 + Annotated.phone_weight100 + Annotated.dob_weight100 + Annotated.rec_type_weight100 + Annotated.pflag3_weight100 + Annotated.title_weight100 + Annotated.fname_weight100 + Annotated.mname_weight100 + Annotated.lname_weight100 + Annotated.address_ind_weight100 + Annotated.name_ind_weight100 + Annotated.persistent_record_id_weight100;
+TotalWeight := Annotated.src_weight100 + Annotated.address_weight100 + Annotated.name_suffix_weight100 + Annotated.dt_nonglb_last_seen_weight100 + Annotated.ssnum_weight100 + Annotated.dodgy_tracking_weight100 + Annotated.pflag1_weight100 + Annotated.pflag2_weight100 + Annotated.jflag2_weight100 + Annotated.jflag3_weight100 + Annotated.jflag1_weight100 + Annotated.phone_weight100 + Annotated.dob_weight100 + Annotated.rec_type_weight100 + Annotated.pflag3_weight100 + Annotated.title_weight100 + Annotated.fname_weight100 + Annotated.mname_weight100 + Annotated.address_ind_weight100 + Annotated.persistent_record_id_weight100 + Annotated.lastname_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;
-TotalWeight_NoDedup := Annotated_NoDedup.src_weight100 + Annotated_NoDedup.address_weight100 + Annotated_NoDedup.name_suffix_weight100 + Annotated_NoDedup.dt_nonglb_last_seen_weight100 + Annotated_NoDedup.ssnum_weight100 + Annotated_NoDedup.dodgy_tracking_weight100 + Annotated_NoDedup.pflag1_weight100 + Annotated_NoDedup.pflag2_weight100 + Annotated_NoDedup.jflag2_weight100 + Annotated_NoDedup.jflag3_weight100 + Annotated_NoDedup.jflag1_weight100 + Annotated_NoDedup.phone_weight100 + Annotated_NoDedup.dob_weight100 + Annotated_NoDedup.rec_type_weight100 + Annotated_NoDedup.pflag3_weight100 + Annotated_NoDedup.title_weight100 + Annotated_NoDedup.fname_weight100 + Annotated_NoDedup.mname_weight100 + Annotated_NoDedup.lname_weight100 + Annotated_NoDedup.address_ind_weight100 + Annotated_NoDedup.name_ind_weight100 + Annotated_NoDedup.persistent_record_id_weight100;
-SHARED Linkable_NoDedup := TotalWeight_NoDedup >= Config.MatchThreshold;
-EXPORT BuddyCounts := TABLE(IF(Config.FastSlice, Annotated, Annotated_NoDedup),{ buddies, Cnt := COUNT(GROUP) }, buddies, FEW);
-EXPORT HasBuddies := TABLE(IF(Config.FastSlice, Annotated, Annotated_NoDedup)(buddies>0), { rid });
+EXPORT BuddyCounts := TABLE(Annotated,{ buddies, Cnt := COUNT(GROUP) }, buddies, FEW);
+EXPORT HasBuddies := TABLE(Annotated(buddies>0), { rid });
 EXPORT Unlinkables := Annotated(~Linkable); // Insufficient data to ever get a match
 EXPORT Candidates := Annotated(Linkable); //No point in trying to link records with too little data
-EXPORT Candidates_ForSlice := IF(Config.FastSlice, Candidates, Annotated_NoDedup(Linkable_NoDedup));
 END;
