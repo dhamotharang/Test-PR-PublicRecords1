@@ -39,27 +39,29 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
   CGM_LogicalFiles := newSuperfileLinkCheckLogical;
   CGM_LogicalFilesGroup := GROUP(CGM_LogicalFiles,MonitorSuperFile);
 
-  AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout RollFiles
-   (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
-   DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout) AllRows) := TRANSFORM
-      SELF.MonitorSuperFile := L.MonitorSuperFile;
-      SELF.RoxieSuperFile := L.RoxieSuperFile;
-      SELF.LogicalFiles := PROJECT(AllRows,TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout,SELF := LEFT));
-      SELF.AllLogicalFileExists := min(l.LogicalFileExists,  min( AllRows,AllRows.LogicalFileExists));
-  END;
+   AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout RollFiles
+      (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
+      DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout) AllRows) := TRANSFORM
+         SELF.MonitorSuperFile := L.MonitorSuperFile;
+         SELF.RoxieSuperFile := L.RoxieSuperFile;
+         SELF.LogicalFiles := PROJECT(AllRows,TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout,SELF := LEFT));
+         SELF.AllLogicalFileExists := min(l.LogicalFileExists,  min( AllRows,AllRows.LogicalFileExists));
+     END;
+   
+     CGM_LogicalFilesFinal2 := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
 
-  CGM_LogicalFilesFinal2 := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
 
   CGM_LogicalFilesSorted := SORT(CGM_LogicalFiles,MonitorSuperFile,RECORD);
 
-  AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout UpdateInstance
-     (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
-      AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout R) := TRANSFORM
-    SELF.FirstInstance := L.MonitorSuperFile != R.MonitorSuperFile;
-   SELF := R;
-  END;
-  
-  CGM_LogicalFilesFinal := ITERATE(CGM_LogicalFilesSorted,UpdateInstance(LEFT,RIGHT),STABLE);
+/*   AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout UpdateInstance
+        (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
+         AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout R) := TRANSFORM
+       SELF.FirstInstance := L.MonitorSuperFile != R.MonitorSuperFile;
+      SELF := R;
+     END;
+     
+     CGM_LogicalFilesFinal := ITERATE(CGM_LogicalFilesSorted,UpdateInstance(LEFT,RIGHT),STABLE);
+*/
               
   updateMonitorFiles(DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout) inFiles, 
                      STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
