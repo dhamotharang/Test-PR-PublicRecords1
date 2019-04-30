@@ -1,4 +1,4 @@
-﻿IMPORT MDR, Watchdog_V2, header, Python, ut;
+﻿IMPORT MDR, Watchdog_V2, header, Python, ut, codes;
 EXPORT mod_sources := MODULE
 
 	lfn := '~thor::watchdog_best::sources';
@@ -14,8 +14,9 @@ EXPORT mod_sources := MODULE
 	export dGlb := DICTIONARY(sources(glb='X'), {src});
 	export dNonglb := DICTIONARY(sources(non_glb='X'), {src});
 	export dMarketing := DICTIONARY(sources(marketing='X'), {src});
+	export dDPPA := DICTIONARY(sources, {src});
 
-	export codes := 
+	export flavors := 
 					ENUM(UNSIGNED4,
 								glb                      = 1b,
 								glb_nonutil              = 10b,
@@ -25,8 +26,16 @@ EXPORT mod_sources := MODULE
 								nonglb                   = 100000b,
 								nonglb_noneq             = 1000000b,
 								marketing								 = 10000000b,
-								dppa										 = 1000000000000b		// all are valid
+								d2c											 = 100000000b,			// direct to consumer
+								dppa										 = 1000000000000b		// dppa
 					);
+				
+	export dsD2c := codes.file_codes_v3_in(long_flag = 'N' and 
+						field_name2 = 'ALLOW' and file_name = 'PERSON-HEADER' and field_name = 'CONSUMER-PORTAL' 
+						);						
+
+	export dD2c := DICTIONARY(dsD2c, {code});
+
 	
 	//shared glb(string2 src) := ~mdr.Source_is_DPPA(src) AND NOT mdr.sourcetools.sourceisonprobation(src)
 	//											AND src != mdr.sourcetools.src_TU_CreditHeader;
@@ -44,17 +53,20 @@ EXPORT mod_sources := MODULE
 	export nonglb(string2 src) := src in dNonglb;												
 	export nonglb_noneq(string2 src) := nonGlb(src) AND src<>'EQ';
   export marketing(string2 src) := src in dMarketing;
+  export dppa(string2 src) := src in dDPPA OR mdr.sourcetools.SourceIsDPPA(src);
+  export d2c(string2 src) := src in dD2c;
 	
 
 	export unsigned src2bmap(string src) := 
-								IF(glb(src), codes.glb, 0)
-						|		IF(glb_noneq(src), codes.glb_noneq, 0)
-						|		IF(glb_nonen(src), codes.glb_nonen, 0)
-						|		IF(glb_nonen_noneq(src), codes.glb_nonen_noneq, 0)
-						|		IF(nonGlb(src), codes.nonglb, 0)
-						|		IF(nonglb_noneq(src), codes.nonglb_noneq, 0)
-						|		IF(marketing(src), codes.marketing, 0)
-						|		codes.dppa;
+								IF(glb(src), flavors.glb, 0)
+						|		IF(glb_noneq(src), flavors.glb_noneq, 0)
+						|		IF(glb_nonen(src), flavors.glb_nonen, 0)
+						|		IF(glb_nonen_noneq(src), flavors.glb_nonen_noneq, 0)
+						|		IF(nonGlb(src), flavors.nonglb, 0)
+						|		IF(nonglb_noneq(src), flavors.nonglb_noneq, 0)
+						|		IF(marketing(src), flavors.marketing, 0)
+						|		IF(d2c(src), flavors.d2c, 0)
+						|		IF(dppa(src), flavors.dppa, 0)
 				;
 
 
@@ -68,14 +80,15 @@ EXPORT mod_sources := MODULE
 	// it returns a string representation of the sources rather than a bitmpa
 	export string src2str(unsigned x) := FUNCTION
 					s := 
-								IF(bit_test(x, codes.glb), 'GLB', '')
-						+		IF(bit_test(x, codes.glb_nonen), ' NONEN', '')
-						+		IF(bit_test(x, codes.glb_noneq), ' NONEQ', '')
-						+		IF(bit_test(x, codes.glb_nonen_noneq), ' NONENEQ', '')
-						+		IF(bit_test(x, codes.nonglb), ' NONGLB', '')
-						+		IF(bit_test(x, codes.nonglb_noneq), ' NONGLBEQ', '')
-						+		IF(bit_test(x, codes.marketing), ' MARKETING', '')
-						+		IF(bit_test(x, codes.dppa), ' DPPA', '')
+								IF(bit_test(x, flavors.glb), 'GLB', '')
+						+		IF(bit_test(x, flavors.glb_nonen), ' NONEN', '')
+						+		IF(bit_test(x, flavors.glb_noneq), ' NONEQ', '')
+						+		IF(bit_test(x, flavors.glb_nonen_noneq), ' NONENEQ', '')
+						+		IF(bit_test(x, flavors.nonglb), ' NONGLB', '')
+						+		IF(bit_test(x, flavors.nonglb_noneq), ' NONGLBEQ', '')
+						+		IF(bit_test(x, flavors.marketing), ' MARKETING', '')
+						+		IF(bit_test(x, flavors.d2c), ' D2C', '')
+						+		IF(bit_test(x, flavors.dppa), ' DPPA', '')
 				;
 				
 		return TRIM(s, left, right);

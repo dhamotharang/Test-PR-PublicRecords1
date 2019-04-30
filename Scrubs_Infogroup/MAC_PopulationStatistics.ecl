@@ -1,9 +1,9 @@
- 
+﻿ 
 EXPORT MAC_PopulationStatistics(infile,Ref='',Input_occupation_id = '',Input_first_name = '',Input_middle_name = '',Input_last_name = '',Input_suffix = '',Input_address = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_type = '',Input_unit_number = '',Input_city = '',Input_state = '',Input_zip = '',Input_zip4 = '',Input_bar = '',Input_ace_rec_type = '',Input_cart = '',Input_census_state_code = '',Input_census_county_code = '',Input_county_code_desc = '',Input_census_tract = '',Input_census_block_group = '',Input_match_code = '',Input_latitude = '',Input_longitude = '',Input_mail_score = '',Input_residential_business_ind = '',Input_employer_name = '',Input_family_id = '',Input_individual_id = '',Input_abi_number = '',Input_industry_title = '',Input_occupation_title = '',Input_specialty_title = '',Input_sic_code = '',Input_naics_group = '',Input_license_state = '',Input_license_id = '',Input_license_number = '',Input_exp_date = '',Input_status_code = '',Input_effective_date = '',Input_add_date = '',Input_change_date = '',Input_year_licensed = '',Input_carriage_return = '',OutFile) := MACRO
-  IMPORT SALT32,Scrubs_Infogroup;
+  IMPORT SALT37,Scrubs_Infogroup;
   #uniquename(of)
   %of% := RECORD
-    SALT32.Str512Type fields;
+    SALT37.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

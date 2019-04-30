@@ -196,6 +196,11 @@ EXPORT persistent_record_id_ChildRec := RECORD
   UNSIGNED8 cnt;
   UNSIGNED4 id;
 END;
+EXPORT lastname_ChildRec := RECORD
+  UNSIGNED4 lastname;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
 EXPORT ssnum_ChildRec := RECORD
   UNSIGNED4 ssnum;
   UNSIGNED8 cnt;
@@ -369,6 +374,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 persistent_record_id_switch;
   REAL4 persistent_record_id_maximum;
   DATASET(persistent_record_id_ChildRec) nulls_persistent_record_id {MAXCOUNT(100)};
+  REAL4 lastname_specificity;
+  REAL4 lastname_switch;
+  REAL4 lastname_maximum;
+  DATASET(lastname_ChildRec) nulls_lastname {MAXCOUNT(100)};
   REAL4 ssnum_specificity;
   REAL4 ssnum_switch;
   REAL4 ssnum_maximum;
