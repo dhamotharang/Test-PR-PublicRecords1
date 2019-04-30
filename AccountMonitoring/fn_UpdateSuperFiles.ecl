@@ -2,11 +2,12 @@
 
 import dops, _control, AccountMonitoring, STD, _Control, ut, Data_Services;
 
-EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
+EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
+                            AccountMonitoring.types.productMask.allProducts, // all
+                            string esp_server = '10.173.104.101' ,  // prod esp
                             string vip_server =  _Control.RoxieEnv.prodvip,
-                            string roxieport = '8010',
-                            AccountMonitoring.types.productMask product_mask = 
-                                  AccountMonitoring.types.productMask.allProducts // all
+                            string roxieport = '8010'
+                            
                             ) := function
 
    
@@ -51,18 +52,17 @@ EXPORT fn_UpdateSuperFiles(string esp_server = '10.173.104.101' ,  // prod esp
 
   CGM_LogicalFilesSorted := SORT(CGM_LogicalFiles,MonitorSuperFile,RECORD);
 
-  AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout UpdateInstance(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
-                                                  AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout R) := TRANSFORM
+  AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout UpdateInstance
+     (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
+      AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout R) := TRANSFORM
     SELF.FirstInstance := L.MonitorSuperFile != R.MonitorSuperFile;
    SELF := R;
   END;
+  
   CGM_LogicalFilesFinal := ITERATE(CGM_LogicalFilesSorted,UpdateInstance(LEFT,RIGHT),STABLE);
               
   updateMonitorFiles(DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout) inFiles, 
-                    STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
-
-        
-
+                     STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
 
   add_logicals(STRING SuperFileName, DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout) LogicalFiles) := FUNCTION
             update_action := APPLY(LogicalFiles,

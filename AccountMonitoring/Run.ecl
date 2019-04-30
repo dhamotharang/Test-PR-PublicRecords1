@@ -11,7 +11,7 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
           ) :=	    
 	FUNCTION
 		 //We first create some of our own superfiles that match the Roxie super files. 
-     AccountMonitoring.fn_UpdateSuperFiles();
+     AccountMonitoring.fn_UpdateSuperFiles(product_mask);
     
 		// Get the already sorted and distributed main portfolio records and assign them to pf_AllRecords
 		// *** TODO *** Since we're saving the portfolio "already deduped", we don't need the -timestamp for: SORTED (because there is only one record for each pid/rid)
