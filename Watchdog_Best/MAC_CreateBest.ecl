@@ -176,8 +176,8 @@ M := MODULE
   END;
   EXPORT BestMiddleName_fuzz_mname := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
 
-  // Now actually find the best value enforcing minimum
-  EXPORT BestMiddleName_method_mname := DEDUP( SORT( BestMiddleName_fuzz_mname,did,-LENGTH(TRIM((SALT311.StrType)mname)),-Row_Cnt,LOCAL)(Row_Cnt >= 2),did,LOCAL);
+  // Now actually find the best value
+  EXPORT BestMiddleName_method_mname := DEDUP( SORT( BestMiddleName_fuzz_mname,did,-LENGTH(TRIM((SALT311.StrType)mname)),-Row_Cnt,LOCAL),did,LOCAL);
 
 
 
@@ -215,7 +215,10 @@ M := MODULE
   EXPORT CommonMiddleName_fuzz_mname := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
 
   // Now actually find the best value
-  EXPORT CommonMiddleName_method_mname := DEDUP( SORT( CommonMiddleName_fuzz_mname,did,-LENGTH(TRIM((SALT311.StrType)mname)),-Row_Cnt,LOCAL),did,LOCAL);
+  grp := GROUP( CommonMiddleName_fuzz_mname,did,ALL,LOCAL);
+  srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
+  cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
+  EXPORT CommonMiddleName_method_mname := cmn;
 
 
 

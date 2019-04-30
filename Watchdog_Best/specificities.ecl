@@ -710,8 +710,7 @@ EXPORT lname_switch := bf;
 EXPORT lname_max := MAX(lname_values_persisted,field_specificity);
 SALT311.MAC_Field_Specificity(lname_values_persisted,lname,lname_nulls,ol) // Compute column level specificity
 EXPORT lname_specificity := ol;
-SALT311.MAC_Field_Nulls(name_suffix_values_persisted,Layout_Specificities.name_suffix_ChildRec,nv) // Use automated NULL spotting
-EXPORT name_suffix_nulls := nv;
+EXPORT name_suffix_nulls := DATASET([{'',0,0}],Layout_Specificities.name_suffix_ChildRec); // Automated null spotting not applicable
 SALT311.MAC_Field_Bfoul(name_suffix_deduped,name_suffix,did,name_suffix_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
 EXPORT name_suffix_switch := bf;
 EXPORT name_suffix_max := MAX(name_suffix_values_persisted,field_specificity);

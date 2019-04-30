@@ -30,8 +30,8 @@ BESTTYPE:BestFirstName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_f
 BESTTYPE:CommonFirstName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_fname)
 BESTTYPE:AnyFirstName:BASIS(did):COMMONEST
 // middle name
-BESTTYPE:BestMiddleName:BASIS(did):LONGEST:MINIMUM(2):FUZZY:VALID(Watchdog_Best.fn_valid_mname_strict)
-BESTTYPE:CommonMiddleName:BASIS(did):LONGEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname)
+BESTTYPE:BestMiddleName:BASIS(did):LONGEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname_strict)
+BESTTYPE:CommonMiddleName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname)
 BESTTYPE:AnyMiddleName:BASIS(did):COMMONEST
 // last name
 BESTTYPE:BestLastName:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_best_lname)
@@ -83,7 +83,7 @@ FIELD:title:TYPE(QSTRING4):BestTitle:1,0
 FIELD:fname:TYPE(QSTRING15):EDIT1:INITIAL:BestFirstName:CommonFirstName:AnyFirstName:1,1
 FIELD:mname:TYPE(QSTRING15):EDIT1:INITIAL:BestMiddleName:CommonMiddleName:AnyMiddleName:1,1
 FIELD:lname:TYPE(QSTRING15):HYPHEN1:1,1
-FIELD:name_suffix:TYPE(QSTRING4):BestSuffix:70,1
+FIELD:name_suffix:TYPE(QSTRING4):NULLS(REPLACE,):BestSuffix:70,1
 FIELD:prim_range:TYPE(QSTRING8):115,3
 FIELD:predir:TYPE(STRING2):38,3
 FIELD:prim_name:TYPE(QSTRING21):131,4
