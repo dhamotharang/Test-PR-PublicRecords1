@@ -1,4 +1,5 @@
-﻿EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') := module
+﻿import _control;
+EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') := module
 
 	shared Dev_list :=			'Oscar.Barrientos@lexisnexisrisk.com'
 										+	';Sesha.Nookala@lexisnexisrisk.com'
