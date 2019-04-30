@@ -212,9 +212,17 @@ Export Utah 	:= Module
 
 		MapCont 		:= normalize(DedupDenormalized,if(corp2.t2u(left.Prin_Full_name)<>'' and corp2.t2u(left.Applicant_Name)<>'' ,2,1),ut_contactTransform(left,counter));
 		
-		mapMain 		:= dedup(sort(distribute(MapCorp + 
-																			   MapCont,hash(corp_key)),
-															record,local),
+		Corp2_Mapping.LayoutsCommon.Main legalNameFix_Trans(Corp2_Mapping.LayoutsCommon.Main  l):= transform
+			
+			self.corp_legal_name :=if(Corp2_Mapping.fSpecialChars(l.corp_legal_name)='FOUND', Corp2_Raw_UT.Functions.fix_ForeignChar(l.corp_legal_name), l.corp_legal_name);
+			self								 :=l;
+			
+		end;
+		
+	  legalNameFix := project(MapCorp +  MapCont, legalNameFix_Trans(left)) ;
+		
+		mapMain 		 := dedup(sort(distribute(legalNameFix,hash(corp_key)),
+															 record,local),
 													record,local):independent;
 
 		joinstock := join( Busentity,Businfo, 
