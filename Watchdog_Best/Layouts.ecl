@@ -92,10 +92,20 @@ mname_case_layout := RECORD
    unsigned1 mname_method;
   END;
 
+lastname_case_layout := RECORD
+   qstring20 lastname_lname;
+   unsigned2 lastname_name_ind;
+   unsigned4 lastname_data_permits;
+   unsigned1 lastname_method;
+END;
+
 export BestBy_did_child := RECORD
   unsigned6 did;
   qstring5 title;
   unsigned4 title_data_permits;
+  DATASET(fname_case_layout) fname_cases;
+  DATASET(mname_case_layout) mname_cases;
+  DATASET(lastname_case_layout) lastname_cases;
   qstring5 name_suffix;
   unsigned4 name_suffix_data_permits;
   DATASET(ssnum_case_layout) ssnum_cases;
@@ -103,10 +113,6 @@ export BestBy_did_child := RECORD
   unsigned4 phone_data_permits;
   DATASET(dob_case_layout) dob_cases;
   DATASET(address_case_layout) address_cases;
-  DATASET(fname_case_layout) fname_cases;
-  DATASET(mname_case_layout) mname_cases;
-  qstring20 lname;
-  unsigned4 lname_data_permits;
  END;
  
 export BestBy_did := RECORD
@@ -302,15 +308,6 @@ export Layout_Best := record
 			string4     zip4 := '';
 			unsigned3    addr_dt_last_seen := 0;
 			string8	 DOD := '';
-			string17    Prpty_deed_id := '';
-			string22    Vehicle_vehnum := '';
-			string22  	 Bkrupt_CrtCode_CaseNo := '';
-			integer4     main_count := 0;
-			integer4     search_count := 0;
-			string15	 DL_number := '';
-			string12     bdid := '';
-			integer4     run_date := 0;
-			integer4	 total_records := 0;
 			AID.Common.xAID	RawAID:=0;
 			unsigned3    addr_dt_first_seen := 0;
 			string10     ADL_ind := '';
@@ -318,7 +315,7 @@ export Layout_Best := record
 
 end; 
 
-export Slim := record
+export Legacy := record
 
 			unsigned6    did := 0;
 			string10    phone := '';
@@ -340,17 +337,22 @@ export Slim := record
 			string2      st := '';
 			string5     zip := '';
 			string4     zip4 := '';
-			unsigned3    addr_dt_last_seen := 0;
 			unsigned3    addr_dt_first_seen := 0;
-			string1	     valid_SSN := '';
-			string22    Vehicle_vehnum := '';
-			string22  	 Bkrupt_CrtCode_CaseNo := '';
-			string15	 	DL_number := '';
-			string10		ADL_ind := '';
-			string12		bdid := '';
-			string8			DOD := '';
+			unsigned3    addr_dt_last_seen := 0;
+	end;
+	
+export Slim := record
 
+			unsigned6    did := 0;
+			//string10    phone := '';
+			string9     ssn := '';
+			integer4     dob := 0;
+
+			string			name;
+			string			addrline;
+			string			lastline;
+
+			unsigned3    addr_dt_first_seen := 0;
+			unsigned3    addr_dt_last_seen := 0;
+	end;	
 end; 
-
-
-END;

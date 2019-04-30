@@ -188,22 +188,28 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         LENGTH(TRIM(ri.mname))>0 and ri.mname = le.mname[1..LENGTH(TRIM(ri.mname))] => ri.mname_weight100, // An initial match - take initial specificity
                         Config.WithinEditN(le.mname,le.mname_len,ri.mname,ri.mname_len,1,0) =>  SALT311.fn_fuzzy_specificity(le.mname_weight100,le.mname_cnt, le.mname_e1_cnt,ri.mname_weight100,ri.mname_cnt,ri.mname_e1_cnt),
                         SALT311.Fn_Fail_Scale(AVE(le.mname_weight100,ri.mname_weight100),s.mname_switch));
-  INTEGER2 lname_score := MAP(
-                        le.lname_isnull OR ri.lname_isnull => 0,
-                        le.lname = ri.lname OR SALT311.HyphenMatch(le.lname,ri.lname,1)<=1  => MIN(le.lname_weight100,ri.lname_weight100),
-                        SALT311.Fn_Fail_Scale(AVE(le.lname_weight100,ri.lname_weight100),s.lname_switch));
   INTEGER2 address_ind_score := MAP(
                         le.address_ind_isnull OR ri.address_ind_isnull => 0,
                         le.address_ind = ri.address_ind  => le.address_ind_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.address_ind_weight100,ri.address_ind_weight100),s.address_ind_switch));
-  INTEGER2 name_ind_score := MAP(
-                        le.name_ind_isnull OR ri.name_ind_isnull => 0,
-                        le.name_ind = ri.name_ind  => le.name_ind_weight100,
-                        SALT311.Fn_Fail_Scale(AVE(le.name_ind_weight100,ri.name_ind_weight100),s.name_ind_switch));
   INTEGER2 persistent_record_id_score := MAP(
                         le.persistent_record_id_isnull OR ri.persistent_record_id_isnull => 0,
                         le.persistent_record_id = ri.persistent_record_id  => le.persistent_record_id_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.persistent_record_id_weight100,ri.persistent_record_id_weight100),s.persistent_record_id_switch));
+  REAL lastname_score_scale := ( le.lastname_weight100 + ri.lastname_weight100 ) / (le.lname_weight100 + ri.lname_weight100 + le.name_ind_weight100 + ri.name_ind_weight100); // Scaling factor for this concept
+  INTEGER2 lastname_score_pre := MAP( (le.lastname_isnull OR le.lname_isnull AND le.name_ind_isnull) OR (ri.lastname_isnull OR ri.lname_isnull AND ri.name_ind_isnull) => 0,
+                        le.lastname = ri.lastname  => le.lastname_weight100,
+                        0);
+  INTEGER2 lname_score := MAP(
+                        le.lname_isnull OR ri.lname_isnull => 0,
+                        lastname_score_pre > 0 => 0, // Ancestor has found solution so child keeps quiet
+                        le.lname = ri.lname OR SALT311.HyphenMatch(le.lname,ri.lname,1)<=1  => MIN(le.lname_weight100,ri.lname_weight100),
+                        SALT311.Fn_Fail_Scale(AVE(le.lname_weight100,ri.lname_weight100),s.lname_switch))*IF(lastname_score_scale=0,1,lastname_score_scale);
+  INTEGER2 name_ind_score := MAP(
+                        le.name_ind_isnull OR ri.name_ind_isnull => 0,
+                        lastname_score_pre > 0 => 0, // Ancestor has found solution so child keeps quiet
+                        le.name_ind = ri.name_ind  => le.name_ind_weight100,
+                        SALT311.Fn_Fail_Scale(AVE(le.name_ind_weight100,ri.name_ind_weight100),s.name_ind_switch))*IF(lastname_score_scale=0,1,lastname_score_scale);
 // Compute the score for the concept address
   INTEGER2 address_score_ext := SALT311.ClipScore(MAX(address_score_pre,0) + prim_range_score + predir_score + prim_name_score + suffix_score + postdir_score + unit_desig_score + sec_range_score + city_name_score + st_score + zip_score + zip4_score + tnt_score + rawaid_score + dt_first_seen_score + dt_last_seen_score + dt_vendor_first_reported_score + dt_vendor_last_reported_score);// Score in surrounding context
   INTEGER2 address_score_res := MAX(0,address_score_pre); // At least nothing
@@ -212,11 +218,13 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   INTEGER2 ssnum_score_ext := SALT311.ClipScore(MAX(ssnum_score_pre,0) + ssn_score + valid_ssn_score);// Score in surrounding context
   INTEGER2 ssnum_score_res := MAX(0,ssnum_score_pre); // At least nothing
   INTEGER2 ssnum_score := ssnum_score_res;
+// Compute the score for the concept lastname
+  INTEGER2 lastname_score_ext := SALT311.ClipScore(MAX(lastname_score_pre,0) + lname_score + name_ind_score);// Score in surrounding context
+  INTEGER2 lastname_score_res := MAX(0,lastname_score_pre); // At least nothing
+  INTEGER2 lastname_score := lastname_score_res;
   // Get propagation scores for individual propagated fields
-  INTEGER2 fname_score_prop := (MAX(le.fname_prop,ri.fname_prop)/MAX(LENGTH(TRIM(le.fname)),LENGTH(TRIM(ri.fname))))*fname_score; // Proportion of longest string propogated
-  INTEGER2 mname_score_prop := (MAX(le.mname_prop,ri.mname_prop)/MAX(LENGTH(TRIM(le.mname)),LENGTH(TRIM(ri.mname))))*mname_score; // Proportion of longest string propogated
-  SELF.Conf_Prop := (0 + fname_score_prop + mname_score_prop) / 100; // Score based on propogated fields
-  iComp := (src_score + IF(address_score>0,MAX(address_score,prim_range_score + predir_score + prim_name_score + suffix_score + postdir_score + unit_desig_score + sec_range_score + city_name_score + st_score + zip_score + zip4_score + tnt_score + rawaid_score + dt_first_seen_score + dt_last_seen_score + dt_vendor_first_reported_score + dt_vendor_last_reported_score),prim_range_score + predir_score + prim_name_score + suffix_score + postdir_score + unit_desig_score + sec_range_score + city_name_score + st_score + zip_score + zip4_score + tnt_score + rawaid_score + dt_first_seen_score + dt_last_seen_score + dt_vendor_first_reported_score + dt_vendor_last_reported_score) + name_suffix_score + dt_nonglb_last_seen_score + IF(ssnum_score>0,MAX(ssnum_score,ssn_score + valid_ssn_score),ssn_score + valid_ssn_score) + dodgy_tracking_score + pflag1_score + pflag2_score + jflag2_score + jflag3_score + jflag1_score + phone_score + dob_score + rec_type_score + pflag3_score + title_score + fname_score + mname_score + lname_score + address_ind_score + name_ind_score + persistent_record_id_score) / 100 + outside;
+  SELF.Conf_Prop := (0) / 100; // Score based on propogated fields
+  iComp := (src_score + IF(address_score>0,MAX(address_score,prim_range_score + predir_score + prim_name_score + suffix_score + postdir_score + unit_desig_score + sec_range_score + city_name_score + st_score + zip_score + zip4_score + tnt_score + rawaid_score + dt_first_seen_score + dt_last_seen_score + dt_vendor_first_reported_score + dt_vendor_last_reported_score),prim_range_score + predir_score + prim_name_score + suffix_score + postdir_score + unit_desig_score + sec_range_score + city_name_score + st_score + zip_score + zip4_score + tnt_score + rawaid_score + dt_first_seen_score + dt_last_seen_score + dt_vendor_first_reported_score + dt_vendor_last_reported_score) + name_suffix_score + dt_nonglb_last_seen_score + IF(ssnum_score>0,MAX(ssnum_score,ssn_score + valid_ssn_score),ssn_score + valid_ssn_score) + dodgy_tracking_score + pflag1_score + pflag2_score + jflag2_score + jflag3_score + jflag1_score + phone_score + dob_score + rec_type_score + pflag3_score + title_score + fname_score + mname_score + address_ind_score + persistent_record_id_score + IF(lastname_score>0,MAX(lastname_score,lname_score + name_ind_score),lname_score + name_ind_score)) / 100 + outside;
   SELF.Conf := IF( iComp>=LowerMatchThreshold OR iComp-SELF.Conf_Prop >= LowerMatchThreshold OR (le.did = ri.did AND (iComp >= IntraMatchThreshold OR iComp-SELF.Conf_Prop >= IntraMatchThreshold)),iComp,SKIP ); // Remove failing records asap
 END;
 //Allow rule numbers to be converted to readable text.
@@ -602,8 +610,8 @@ EXPORT PossibleMatches := o : PERSIST('~temp::did::Watchdog_best::mt',EXPIRE(Wat
 SALT311.mac_get_BestPerRecord( All_Matches,rid1,did1,rid2,did2,o );
 EXPORT BestPerRecord := o : PERSIST('~temp::did::Watchdog_best::mr',EXPIRE(Watchdog_best.Config.PersistExpire));
 //Now lets see if any slice-outs are needed
-SHARED too_big := TABLE(match_candidates(ih).Candidates_ForSlice,{did, InCluster := COUNT(GROUP)},did,LOCAL)(InCluster>1000); // did that are too big for sliceout
-SHARED h_ok := JOIN(match_candidates(ih).Candidates_ForSlice,too_big,LEFT.did=RIGHT.did,TRANSFORM(LEFT),LOCAL,LEFT ONLY);
+SHARED too_big := TABLE(h,{did, InCluster := COUNT(GROUP)},did,LOCAL)(InCluster>1000); // did that are too big for sliceout
+SHARED h_ok := JOIN(h,too_big,LEFT.did=RIGHT.did,TRANSFORM(LEFT),LOCAL,LEFT ONLY);
 SHARED in_matches := JOIN(h_ok,h_ok,LEFT.did=RIGHT.did AND (>STRING6<)LEFT.rid<>(>STRING6<)RIGHT.rid,match_join(LEFT,RIGHT,9999),LOCAL,UNORDERED);
 SALT311.mac_cluster_breadth(in_matches,rid1,rid2,did1,o);
 SHARED in_matches1 := o;

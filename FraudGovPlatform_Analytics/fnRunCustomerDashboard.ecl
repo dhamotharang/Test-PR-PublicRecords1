@@ -14,6 +14,7 @@
 	hpccConnection 			:= FraudGovPlatform_Analytics.configFunctions.getHpccConnection(runProd, newVersion);
 	eclCompileStrategy	:= FraudGovPlatform_Analytics.Constants.RampsWebServices.EclCompileStrategy;											
 	keepEcl 						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.KeepEcl;					
+	forceRun						:= FraudGovPlatform_Analytics.Constants.RampsWebServices.ForceRun;
 	
 	//Files used to create the dashboard
 	inputLogicalGraphFilename 			:= STD.Str.FindReplace(FraudGovPlatform_Analytics.Constants.RampsWebServices.CustomerDashboard.Filenames(useProdData).InputLogicalGraph, '::', '%3A%3A');
@@ -25,6 +26,6 @@
 	dRunComposition := RAMPS_WebServices.macRunComposition(cmpUuid, encodedCreds, 
 		dspToUse, hpccConnection, reqSource,
 		eclCompileStrategy, keepEcl, 
-		vizVersion, filenames);
+		vizVersion, filenames, forceRun);
 	RETURN dRunComposition;
 END;

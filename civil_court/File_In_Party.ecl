@@ -1,4 +1,4 @@
-import civ_court;
+﻿import civ_court;
 
 Civil_Court.Macro_Input_File_List('_party',Civil_Court.Layout_In_Party,dTempDataset)
 
@@ -37,4 +37,5 @@ export File_In_Party := dTempDataset
 						+ Civ_Court.map_TX_Denton_Party
 						+ Civ_Court.Map_CT_Party
 						+ Civ_Court.Map_CA_Santa_Barbara_Party
-						+ Civ_Court.Map_CA_San_Bernardino_Party;
+						+ Civ_Court.Map_CA_San_Bernardino_Party
+						+ Civ_Court.Map_CA_Stanislaus_Party;
