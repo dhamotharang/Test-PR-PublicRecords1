@@ -262,6 +262,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages         
     + MDR.sourceTools.set_Cortera         
+    + MDR.sourceTools.set_DataBridge         
     + MDR.sourceTools.set_Equifax_Business_Data         
     + MDR.sourceTools.set_Infutor_NARB        
   ;
@@ -315,6 +316,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages                  
     + MDR.sourceTools.set_Cortera                 
+    + MDR.sourceTools.set_DataBridge                 
     + MDR.sourceTools.set_Equifax_Business_Data                 
     + MDR.sourceTools.set_Infutor_NARB                 
   ;
@@ -398,6 +400,7 @@ export mod_sources := module
 		MDR.sourceTools.SourceIsCortera               (src) => '39',
 		MDR.sourceTools.SourceIsInfutor_NARB          (src) => '40',
 		MDR.sourceTools.SourceIsEquifax_Business_Data (src) => '41',
+		MDR.sourceTools.SourceIsDataBridge            (src) => '42',
 		nonCode
 	);
 	export boolean srcInBIPV2Header(string2 src) := src2numCode(src) <> nonCode;
@@ -428,6 +431,7 @@ export mod_sources := module
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
     ,MDR.sourceTools.set_Cortera        // S61(BH-501)
+    ,MDR.sourceTools.set_DataBridge     // S70(BH-644)
     ,MDR.sourceTools.set_Equifax_Business_Data   // S65 (BH-584)
     ,MDR.sourceTools.set_Infutor_NARB        // S61(BH-528)
     ,MDR.sourceTools.set_Workers_Compensation // S62a(BH-502)
@@ -527,6 +531,7 @@ export mod_sources := module
 		'39' => MDR.sourceTools.set_Cortera[1],
 		'40' => MDR.sourceTools.set_Infutor_NARB[1],
 		'41' => MDR.sourceTools.set_Equifax_Business_Data[1],
+		'42' => MDR.sourceTools.set_DataBridge[1],
 		nonCode
 	);
 	export TranslateCode(string2 code) := TranslateSource_aggregate(code2src1(code));
