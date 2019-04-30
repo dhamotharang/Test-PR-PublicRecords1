@@ -208,7 +208,7 @@ EXPORT Flatten( indata, outnames, fullyQualify=true, stringify=false, returnECL=
           #if(stringify)
             #if(%'@type'% = 'boolean')
               #set(thisLine, '\tself.' + %'fieldname'% + ' := if(le.' + %'origfieldname'% + ', \'1\', \'0\');\n')
-            #elseif(%'@type'% in ['string','qstring','unicode'])
+            #elseif(%'@type'% in ['string','qstring'])
               #set(thisLine, '\tself.' + %'fieldname'% + ' := le.' + %'origfieldname'% + ';\n')
             #else
 
