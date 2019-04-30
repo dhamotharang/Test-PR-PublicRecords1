@@ -460,10 +460,10 @@ END;
 
 //Added to translate codes for both NOD and REO
 EXPORT CodeTable := RECORD
-	STRING2		src;
-	STRING20	field_name;
-	STRING5		code;
-	STRING55	code_desc;
+	STRING		src;
+	STRING		field_name;
+	STRING		code;
+	STRING		code_desc;
 END;
 
 //Flattened layout for Ingest process
