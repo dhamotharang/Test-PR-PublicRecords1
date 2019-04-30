@@ -67,6 +67,7 @@ Layout_BK.CleanFields_REO t_norm_reo (Layout_BK.Base_Reo_ext  le, INTEGER C) := 
 	buyer_mail_full_addr  := ut.CleanSpacesAndUpper(le.buyer_mail_full_addr);
 	buyer_mail_city       := ut.CleanSpacesAndUpper(le.buyer_mail_city);
 	buyer_mail_state      := ut.CleanSpacesAndUpper(le.buyer_mail_state);
+	buyer_mail_zip      	:= REGEXREPLACE('NULL',le.buyer_mail_zip,'',NOCASE);
   prepAddress     := CHOOSE(C,buyer_mail_full_addr,prop_full_addr);
 	prepcity        := CHOOSE(C,buyer_mail_city,prop_addr_city);
 	prepState       := CHOOSE(C,buyer_mail_state,prop_addr_state);
