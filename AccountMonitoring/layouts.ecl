@@ -366,6 +366,37 @@ EXPORT layouts := MODULE
 		
 	END;
 
+ 
+ export UPDATE_SOURCE := module
+ 
+  export roxie_monitor_superfile_layout := RECORD
+      STRING250 RoxieSuperFile;
+      STRING250 MonitorSuperFile;
+      UNSIGNED8 product_mask_supported;
+   end;
+   
+   export superfile_logicalfile_flat_layout := RECORD
+      STRING250 MonitorSuperFile;
+      STRING250 RoxieSuperFile;
+      STRING250 LogicalFile;
+      BOOLEAN LogicalFileExists;
+      BOOLEAN FirstInstance;
+   end;
+   
+   export logicalfile_layout := RECORD
+      STRING250 LogicalFile;
+   end;
+   
+   export superfile_logicalfile_Rollup_layout := RECORD
+      STRING250 MonitorSuperFile;
+       STRING250 RoxieSuperFile;
+      DATASET(LogicalFile_layout) LogicalFiles;
+      BOOLEAN AllLogicalFileExists;
+   end;
+   
+ END;
+
+
 END;
 
 /*  Leaving this in for future use -- when we get the #for to read the output

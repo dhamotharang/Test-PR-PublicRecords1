@@ -198,7 +198,7 @@ EXPORT product_files := MODULE
 //----------------------------------------------RoxieVersionPersonHeader-----------------------------------------------------------------
 
 		EXPORT r_doxie_key_header_superkeyname_raw := 'batchr3::monitor::personheader_' + doxie.version_superkey;
-		EXPORT r_doxie_key_header_superkeyname     := '~' + r_doxie_key_header_superkeyname_raw;
+		EXPORT r_doxie_key_header_superkeyname     :=  r_doxie_key_header_superkeyname_raw; /*AccountMonitoring.constants.DATA_LOCATION*/
 
 		// Define a Duplicate Index; see the ECL Language Guide, p. 68
 		SHARED r_doxie_key_header_undist := 
