@@ -1,4 +1,4 @@
-import tools,FraudShared;
+﻿import tools,FraudShared;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 export Send_Emails(
 	
@@ -12,7 +12,7 @@ export Send_Emails(
 	,string								pPackageName						= FraudShared.Platform.Name(pUseOtherEnvironment) + 'Keys'
 	,string								pBuildMessage						= 'Base Files Finished'
 ) := 
-	tools.mod_SendEmails(
+	if(_control.ThisEnvironment.Name = 'Prod_Thor',tools.mod_SendEmails(
 		 pversion
 		,pBuildFilenames					
 		,pEmailList							
@@ -23,4 +23,4 @@ export Send_Emails(
 		,pShouldUpdateRoxiePage
 		,
 		,'N'
-	);
+	));
