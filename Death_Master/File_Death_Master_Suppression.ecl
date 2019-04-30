@@ -278,7 +278,10 @@ dSuppressRecs				:=
 	// LNK-2103 Alive person marked as deceased
     {'000880859745', 100, '20181105', ' ', ' ', '334549109', 'LINDENMUTH          ', '    ', 'KRYSTYNA       ', 'MARIA          ', ' ', '        ', '19480612', '08', '80002', '     ', 'CO', '059', '  ', 'N', 'ENC', /*'000880859745LENC'*/'', '64', 'N'}, 
 	// LNK-2124 FW: Deceased record comingle possibility
-    {'000566764672', 100, '20090807', 'A', 'A', '608746456', 'NGUYEN              ', '    ', 'THE            ', '               ', 'P', '20090724', '19440515', '45', '75052', '     ', 'TX', '113', '  ', 'N', 'SSA', /*'608746456N090724'*/'', 'DE', 'N'}
+    {'000566764672', 100, '20090807', 'A', 'A', '608746456', 'NGUYEN              ', '    ', 'THE            ', '               ', 'P', '20090724', '19440515', '45', '75052', '     ', 'TX', '113', '  ', 'N', 'SSA', /*'608746456N090724'*/'', 'DE', 'N'},
+  // LNK-2547 Non-FCRA Possible Over Linking of Death Record LexID 002664383215 Watts
+    {'238121936659', 100,	'20190408', ' ', ' ',	'372623282', 'WATTS               ', '    ', 'RUTH           ', 'ANNETTE        ', ' ',	'20160907', '        ', '26',	'48244', '	   ',	'MI',	'163', '	', 'N',	'ENC', /*'238121936659WENC'*/'', '64', 'N'}
+	
 	], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

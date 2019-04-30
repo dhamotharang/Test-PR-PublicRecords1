@@ -14,6 +14,9 @@ EXPORT proc_prep_input(DATASET(header.Layout_Header_v2) base) := FUNCTION
 				self.dt_vendor_first_reported := left.dt_vendor_first_reported;
 				self.dt_vendor_last_reported := left.dt_vendor_last_reported;
 				self.dt_nonglb_last_seen := left.dt_nonglb_last_seen;
+
+				self.unit_desig := IF(left.sec_range='', '', left.unit_desig);	// remove orphan unit designators
+
 				self := left));
 	h := $.fn_get_best_address(h4);
 

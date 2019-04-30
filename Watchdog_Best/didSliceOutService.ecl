@@ -12,11 +12,11 @@ STRING20 ridstr := ''  : STORED('Baserid');
 STRING20 didstr := ''  : STORED('Basedid');
 STRING20 Pref_didstr := ''  : STORED('Preferreddid');
 BFile := Watchdog_best.In_Hdr;
-Watchdog_best.match_candidates(BFile).layout_candidates into(Watchdog_best.Keys(BFile).CandidatesForSlice le) := TRANSFORM
+Watchdog_best.match_candidates(BFile).layout_candidates into(Watchdog_best.Keys(BFile).Candidates le) := TRANSFORM
   SELF := le;
 END;
-odl := PROJECT(CHOOSEN(Watchdog_best.Keys(BFile).CandidatesForSlice(did=(UNSIGNED)didstr),10000),into(LEFT));
-odr := PROJECT(CHOOSEN(Watchdog_best.Keys(BFile).CandidatesForSlice(did=(UNSIGNED)Pref_didstr),10000),into(LEFT));
+odl := PROJECT(CHOOSEN(Watchdog_best.Keys(BFile).Candidates(did=(UNSIGNED)didstr),10000),into(LEFT));
+odr := PROJECT(CHOOSEN(Watchdog_best.Keys(BFile).Candidates(did=(UNSIGNED)Pref_didstr),10000),into(LEFT));
 k := Watchdog_best.Keys(BFile).Specificities_Key;
 Watchdog_best.Layout_Specificities.R s_into(k le) := TRANSFORM
   SELF := le;
