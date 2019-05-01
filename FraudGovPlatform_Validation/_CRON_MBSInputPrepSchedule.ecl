@@ -1,4 +1,4 @@
-﻿import FraudGovPlatform,_Control,ut;
+﻿import FraudGovPlatform,FraudGovPlatform_Validation,_Control,ut;
 
 EVERY_DAY_AT_9AM := '0 13 * * *';
 IP:=IF(_control.ThisEnvironment.Name<>'Prod_Thor',_control.IPAddress.bctlpedata12,_control.IPAddress.bctlpedata10);
@@ -8,7 +8,7 @@ version:=ut.GetDate : independent;
 emailList:=FraudGovPlatform_Validation.Mailing_List().Alert;
 
 lECL1 :=
- 'import ut;\n'
+ 'import FraudGovPlatform_Validation,Scrubs_MBS,ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov MBS Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
