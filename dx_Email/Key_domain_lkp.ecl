@@ -1,4 +1,4 @@
-﻿IMPORT $, Data_Services, Doxie, email_event;
+﻿IMPORT $, Data_Services, Doxie;
 
 inFile := $.Layouts.i_domain_lkp;
 
