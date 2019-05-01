@@ -1631,6 +1631,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_infutor_narc3             := [src_infutor_narc3             ];
 	export set_fed_crim                  := [src_fed_crim                  ];
 	export set_Credit_Unions             := [src_Credit_Unions             ];
+	export set_DataBridge                := [src_DataBridge                ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
 	export set_Death_Michigan            := [src_Death_Michigan            ];
@@ -2150,6 +2151,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCrashCarrier               (string  sr) := sr               in set_CrashCarrier               ;	
 	export SourceIsCredit_Unions              (string  sr) := sr               in set_Credit_Unions              ;		
 	export SourceIsCriminal_History           (string  sr) := sr               in set_Criminal_History           ;
+	export SourceIsDataBridge                 (string  sr) := sr               in set_DataBridge                 ;
 	export SourceDatagence                    (string  sr) := sr               in set_Datagence;
 	export SourceIsDCA                        (string  sr) := sr               in set_DCA                        ;
 	export SourceIsDea                        (string  sr) := sr               in set_Dea                        ;
@@ -2689,6 +2691,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_WY_Corporations           ,'WY Corporations'                                           }
 		,{src_CrashCarrier			        ,'Crash Carrier'		                                         }		
 		,{src_Credit_Unions             ,'Credit Unions'                                             }
+		,{src_DataBridge    						,'DataBridge'                                                }
 		,{src_Datagence      						,'Datagence'                                    }
 		,{src_DCA                       ,'DCA'                                                       }
 		,{src_DEA                       ,'DEA'                                                       }
@@ -3204,6 +3207,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Credit_Unions             => 'Credit Unions'                                        
 		,src_CNLD_Facilities					 => 'CNLD Facilities'
 		,src_CNLD_Practitioner				 => 'CNLD_Practitioner'
+		,src_DataBridge                => 'DataBridge'
 		,src_Datagence      					 => 'Datagence'                               
 		,src_DCA                       => 'DCA'                                                  
 		,src_DEA                       => 'DEA'                                                  
