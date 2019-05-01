@@ -5082,8 +5082,8 @@ export Temp_Legacy_BusinessInstantId_Layout := Record
   string60 watchlist_table_2;
   string120 watchlist_program_2;
   string10 watchlist_record_number_2;
-  UNICODE20 watchlist_fname_2;
-  UNICODE20 watchlist_lname_2;
+  string20 watchlist_fname_2;
+  string20 watchlist_lname_2;
   string65 watchlist_address_2;
   string25 watchlist_city_2;
   string2 watchlist_state_2;
@@ -5093,8 +5093,8 @@ export Temp_Legacy_BusinessInstantId_Layout := Record
   string60 watchlist_table_3;
   string120 watchlist_program_3;
   string10 watchlist_record_number_3;
-  UNICODE20 watchlist_fname_3;
-  UNICODE20 watchlist_lname_3;
+  string20 watchlist_fname_3;
+  string20 watchlist_lname_3;
   string65 watchlist_address_3;
   string25 watchlist_city_3;
   string2 watchlist_state_3;
@@ -5104,8 +5104,8 @@ export Temp_Legacy_BusinessInstantId_Layout := Record
   string60 watchlist_table_4;
   string120 watchlist_program_4;
   string10 watchlist_record_number_4;
-  UNICODE20 watchlist_fname_4;
-  UNICODE20 watchlist_lname_4;
+  string20 watchlist_fname_4;
+  string20 watchlist_lname_4;
   string65 watchlist_address_4;
   string25 watchlist_city_4;
   string2 watchlist_state_4;
@@ -5115,8 +5115,8 @@ export Temp_Legacy_BusinessInstantId_Layout := Record
   string60 watchlist_table_5;
   string120 watchlist_program_5;
   string10 watchlist_record_number_5;
-  UNICODE20 watchlist_fname_5;
-  UNICODE20 watchlist_lname_5;
+  string20 watchlist_fname_5;
+  string20 watchlist_lname_5;
   string65 watchlist_address_5;
   string25 watchlist_city_5;
   string2 watchlist_state_5;
@@ -5126,8 +5126,8 @@ export Temp_Legacy_BusinessInstantId_Layout := Record
   string60 watchlist_table_6;
   string120 watchlist_program_6;
   string10 watchlist_record_number_6;
-  UNICODE20 watchlist_fname_6;
-  UNICODE20 watchlist_lname_6;
+  string20 watchlist_fname_6;
+  string20 watchlist_lname_6;
   string65 watchlist_address_6;
   string25 watchlist_city_6;
   string2 watchlist_state_6;
@@ -5137,8 +5137,8 @@ export Temp_Legacy_BusinessInstantId_Layout := Record
   string60 watchlist_table_7;
   string120 watchlist_program_7;
   string10 watchlist_record_number_7;
-  UNICODE20 watchlist_fname_7;
-  UNICODE20 watchlist_lname_7;
+  string20 watchlist_fname_7;
+  string20 watchlist_lname_7;
   string65 watchlist_address_7;
   string25 watchlist_city_7;
   string2 watchlist_state_7;
