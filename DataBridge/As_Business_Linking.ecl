@@ -17,7 +17,6 @@ EXPORT As_Business_Linking (
 				self.rcid												 := 0;
 				self.vl_id                       := '';
 				self.source                      := mdr.sourcetools.src_DataBridge;
-				self.company_bdid                := l.bdid;
 				self.company_phone               := l.clean_telephone_num;
 				self.phone_score                 := if((integer)self.company_phone=0,0,1);
 				self.phone_type     						 := if((integer)self.company_phone=0,'','T');
