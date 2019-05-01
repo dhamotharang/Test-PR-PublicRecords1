@@ -485,7 +485,7 @@ LOADXML('<xml/>');
 				#IF(%'{@type}'%	=	'integer' or %'{@type}'%	=	'unsigned' or %'{@type}'%	=	'real')
 					#APPEND(TransformFields,'SELF.' + %'{@name}'% + ' := IF( isMinInputErr, \'\', IF( le.' + %'{@name}'% + ' = 0, \'0\', (string)le.' + %'{@name}'% + ' ) );\n')
 				#ELSE  // ...otherwise, the field is (most likely) a string; don't change the datatype of the value in "le".
-					#APPEND(TransformFields,'SELF.' + %'{@name}'% + ' := IF( isMinInputErr, \'\', le.' + %'{@name}'% + ' );\n')
+					#APPEND(TransformFields,'SELF.' + %'{@name}'% + ' := (STRING)(IF( isMinInputErr, \'\', le.' + %'{@name}'% + ' ));\n')
 				#END // IF
 			#END // IF
 		#END // IF
