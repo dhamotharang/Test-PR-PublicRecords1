@@ -5,7 +5,7 @@ EVERY_DAY_AT_10AM := '0 14 * * *';
 ThorName	:=		IF(_control.ThisEnvironment.Name		<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
 lECL1 :=
- 'import ut;\n'
+ 'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
  +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov InquiryLogs Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
