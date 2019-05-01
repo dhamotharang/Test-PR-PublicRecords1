@@ -1430,7 +1430,7 @@ EXPORT product_files := MODULE
 				HASH64(seleid)
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_linkid');
   	
-  //--------------------------------------------------------------------------------------------------------------//
+  
   // Duplicate of Roxie Key 
 	// Linkid key	
 		EXPORT r_sbfeLinkid_superkeyname_raw := 'batchr3::monitor::sbfe::linkids::' + doxie.Version_SuperKey;
@@ -1447,7 +1447,7 @@ EXPORT product_files := MODULE
 				r_sbfeLinkid_key_undist, 
 				HASH64(seleid)
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_linkid');
-//--------------------------------------------------------------------------------------------------------------//  
+  
  // Tradeline Key		
 		
 		EXPORT sbfeTrade_keyname_raw := 'thor_data400::key::sbfe::' + sbfe_build_version + '::tradeline';
@@ -1467,7 +1467,8 @@ EXPORT product_files := MODULE
 				sbfeTrade_key_undist, 
 				HASH64(sbfe_contributor_number,contract_account_number)
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_tradeline'); 
-  //--------------------------------------------------------------------------------------------------------------//
+  
+  
 	// Duplicate of Roxie Key	
 	// Tradeline Key		
 		
@@ -1475,10 +1476,10 @@ EXPORT product_files := MODULE
 		EXPORT r_sbfeTrade_superkeyname     := '~' + r_sbfeTrade_superkeyname_raw;
 
 		SHARED r_sbfeTrade_key_undist := 
-			INDEX(
+			pull(INDEX(
 				Business_Credit.key_tradeline(),  
 				r_sbfeTrade_superkeyname
-			);
+			));
 
 		EXPORT r_sbfeTrade_key :=
 			DISTRIBUTE(
@@ -1487,7 +1488,7 @@ EXPORT product_files := MODULE
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_tradeline');
 
 
-//--------------------------------------------------------------------------------------------------------------//  
+  
 		// Credit Score Key	
 		
 		EXPORT sbfeScore_build_version := TRIM(did_add.get_EnvVariable('sbfecvscoring_build_version')):INDEPENDENT;
@@ -1499,10 +1500,10 @@ EXPORT product_files := MODULE
 		EXPORT sbfeScore_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeScore_superkeyname_raw;
 
 		SHARED sbfeScore_key_undist := 
-			pull(INDEX(
+			INDEX(
 				Business_Credit_Scoring.Key_ScoringIndex().Key,  
 				sbfeScore_keyname
-			));
+			);
 
 		EXPORT sbfeScore_key :=
 			DISTRIBUTE(
@@ -1510,14 +1511,9 @@ EXPORT product_files := MODULE
 				HASH64(seleid) 
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_scoring');
 	
-//--------------------------------------------------------------------------------------------------------------//
+
 // Duplicate of Roxie Key	
 // Credit Score Key	
-		
-		//EXPORT r_sbfeScore_build_version := TRIM(did_add.get_EnvVariable('sbfecvscoring_build_version')):INDEPENDENT;
-		
-		//EXPORT r_sbfeScore_keyname_raw := 'thor_data400::key::sbfescoring::' + sbfeScore_build_version + '::scoringindex';
-		//EXPORT r_sbfeScore_keyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeScore_keyname_raw;
 		
 		EXPORT r_sbfeScore_superkeyname_raw := 'batchr3::monitor::sbfescoring::scoringindex' + doxie.Version_SuperKey ;
 		EXPORT r_sbfeScore_superkeyname     := '~' + r_sbfeScore_superkeyname_raw;
@@ -1534,7 +1530,7 @@ EXPORT product_files := MODULE
 				HASH64(seleid) 
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_scoring');
 	END;
-//--------------------------------------------------------------------------------------------------------------//  
+  
 
 		
 	EXPORT ucc := MODULE
