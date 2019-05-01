@@ -95,12 +95,12 @@ export RealTime_Batch_Service_V2_records(dataset(Batch_Layout.RealTime_InLayout_
 													livingsits_flag    := false,
 													hhidplus_value     := hhidplus,
 													edabest_value      := edabest,
-													glb_purpose_value  := in_mod.glb_purpose_value,
-													include_minors     := in_mod.include_minors,
-													appType            := in_mod.ApplicationType,
-													dppa_purpose_value := in_mod.dppa_purpose_value,
-													IndustryClass_val  := in_mod.IndustryClass,
-													DRM_val            := in_mod.DataRestriction,
+													glb_purpose_value  := in_mod.glb,
+													include_minors     := in_mod.show_minors,
+													appType            := in_mod.application_type,
+													dppa_purpose_value := in_mod.dppa,
+													IndustryClass_val  := in_mod.industry_class,
+													DRM_val            := in_mod.DataRestrictionMask,
 													GetSSNBest         := in_mod.GetSSNBest
 												);
 
@@ -117,12 +117,12 @@ export RealTime_Batch_Service_V2_records(dataset(Batch_Layout.RealTime_InLayout_
 													livingsits_flag    := false,
 													hhidplus_value     := hhidplus,
 													edabest_value      := edabest,
-													glb_purpose_value  := in_mod.glb_purpose_value,
-													include_minors     := in_mod.include_minors,
-													appType            := in_mod.ApplicationType,
-													dppa_purpose_value := in_mod.dppa_purpose_value,
-													IndustryClass_val  := in_mod.IndustryClass,
-													DRM_val            := in_mod.DataRestriction,
+													glb_purpose_value  := in_mod.glb,
+													include_minors     := in_mod.show_minors,
+													appType            := in_mod.application_type,
+													dppa_purpose_value := in_mod.dppa,
+													IndustryClass_val  := in_mod.industry_class,
+													DRM_val            := in_mod.DataRestrictionMask,
 													GetSSNBest         := in_mod.GetSSNBest
 												);
 					
