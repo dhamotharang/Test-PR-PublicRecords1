@@ -1,4 +1,4 @@
-﻿import FraudGovPlatform, FraudShared, ut, scrubs, _control,tools,std;
+﻿import FraudGovPlatform, FraudGovPlatform_Validation, FraudShared, ut, scrubs, _control,tools,std;
 
 EXPORT BuildSCRUBSReport(string filedate=(string)std.date.today(), string emailList=FraudGovPlatform_Validation.Mailing_List().Alert) := FUNCTION
 
