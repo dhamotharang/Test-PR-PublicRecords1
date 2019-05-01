@@ -2,7 +2,7 @@ import PersonReports;
 
 EXPORT IParam := MODULE
 	
-	EXPORT searchParams := INTERFACE (PersonReports.input._report)
+	EXPORT searchParams := INTERFACE (PersonReports.IParam._report)
 		EXPORT STRING12  UniqueID := '';
 		EXPORT STRING30  FirstName := '';
 		EXPORT STRING30  MiddleName := '';

@@ -60,7 +60,7 @@
 </pre>
 */
 
-IMPORT iesp,address,PersonReports,AutoStandardI, std;
+IMPORT iesp,address,AutoStandardI, std;
 
 EXPORT ReportService := MACRO
  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -96,18 +96,13 @@ EXPORT ReportService := MACRO
 		ReportBy.Address.StreetPostDirection,ReportBy.Address.UnitDesignation,ReportBy.Address.UnitNumber);
 	STRING200 fullAddress := TRIM(ReportBy.Address.StreetAddress1)+' '+ReportBy.Address.StreetAddress2;
 
-	//TODO: verify that we need to set glb, dppa (can set "allow..." as an alternative)
-	perm_mod := module (PersonReports.input.permissions)
-		// export boolean AllowAll := false;
-		// export boolean AllowGLB := false;
-		// export boolean AllowDPPA := false;
-		export unsigned1 glbpurpose := (unsigned1) User.GLBPurpose;
-		export unsigned1 dppapurpose := (unsigned1) User.DLPurpose;
-		export boolean IncludeMinors := true;
-	end;
+  // glbMod := AutoStandardI.GlobalModule(); // will need it for reading legacy settings
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	rptByMod := MODULE (PROJECT (mod_access, PublicProfileServices.IParam.searchParams, OPT))
+		export unsigned1 glb := (unsigned1) User.GLBPurpose;
+		export unsigned1 dppa := (unsigned1) User.DLPurpose;
+		export boolean show_minors := TRUE;
 
-  glbMod := AutoStandardI.GlobalModule(); // will need it for reading legacy settings
-	rptByMod := MODULE(PublicProfileServices.IParam.searchParams)
 		EXPORT STRING12  UniqueID := ReportBy.UniqueID;
 		EXPORT STRING30  FirstName  := IF(isFullName,cln.fname,stringlib.StringToUpperCase(ReportBy.Name.First));
 		EXPORT STRING30  MiddleName := IF(isFullName,cln.mname,stringlib.StringToUpperCase(ReportBy.Name.Middle));
@@ -125,16 +120,8 @@ EXPORT ReportService := MACRO
 		EXPORT BOOLEAN   IncludeNameAddress := Options.IncludeNameAddress;
 		EXPORT BOOLEAN   IncludeCombination := Options.IncludeCombination;
 		EXPORT BOOLEAN   UseTestData := Options.UseTestData;
-
-    export unsigned1 glbpurpose := AutoStandardI.PermissionI_Tools.val(perm_mod).glb.stored_value;
-    export unsigned1 dppapurpose := AutoStandardI.PermissionI_Tools.val (perm_mod).dppa.stored_value;
-    // legacy: can be provided outside of ESDL input
-    export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val (project (glbMod, AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
-		export boolean mask_dl := User.DLMask;
-		export string32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(glbMod,AutoStandardI.InterfaceTranslator.application_type_val.params));
 	END;
 
-	rptBy := ReportBy;
 	hdrSum := PublicProfileServices.Records.HeaderSummary(rptByMod);
 	perSum := IF(Options.IncludeFootPrint,
 		PublicProfileServices.Records.PersonSummary(rptByMod),
@@ -143,7 +130,7 @@ EXPORT ReportService := MACRO
 	iesp.public_profile_report.t_PublicProfileReportResponse initResponse() := TRANSFORM
 		SELF._Header := iesp.ECL2ESP.GetHeaderRow();
 		SELF.Messages := [];
-		SELF.UserInput := rptBy;
+		SELF.UserInput := ReportBy;
 		SELF.RunDate := iesp.ECL2ESP.toDate((INTEGER)Std.Date.Today());
 		SELF.SSNResults := GLOBAL(hdrSum.SSNResults);
 		SELF.NameSSNResults := GLOBAL(hdrSum.NameSSNResults);
@@ -179,54 +166,3 @@ EXPORT ReportService := MACRO
 	OUTPUT(Results,NAMED('Results'));
 
 ENDMACRO;
-// PublicProfileServices.ReportService();
-/*
-<PublicProfileReportRequest>
-	<Row>
-		<User>
-			<GLBPurpose></GLBPurpose>
-			<DLPurpose></DLPurpose>
-			<DataRestrictionMask></DataRestrictionMask>
-			<SSNMask></SSNMask>
-		</User>
-		<ReportBy>
-			<UniqueID></UniqueID>
-			<Name>
-        <Full></Full>
-				<First></First>
-				<Middle></Middle>
-				<Last></Last>
-			</Name>
-			<Address>
-        <StreetNumber></StreetNumber>
-        <StreetPreDirection></StreetPreDirection>
-        <StreetName></StreetName>
-        <StreetPostDirection></StreetPostDirection>
-        <StreetSuffix></StreetSuffix>
-        <UnitDesignation></UnitDesignation>
-        <UnitNumber></UnitNumber>
-				<StreetAddress1></StreetAddress1>
-				<StreetAddress2></StreetAddress2>
-				<City></City>
-				<State></State>
-				<Zip5></Zip5>
-			</Address>
-			<Dob>
-				<Year></Year>
-				<Month></Month>
-				<Day></Day>
-			</Dob>
-			<Ssn></Ssn>
-		</ReportBy>
-		<Options>
-      <IncludeSSN></IncludeSSN>
-      <IncludeNameSSN></IncludeNameSSN>
-      <IncludeNameDOB></IncludeNameDOB>
-      <IncludeAddress></IncludeAddress>
-      <IncludeNameAddress></IncludeNameAddress>
-      <IncludeCombination></IncludeCombination>
-			<IncludeFootPrint></IncludeFootPrint>
-		</Options>
-	</Row>
-</PublicProfileReportRequest>
-*/
