@@ -391,7 +391,7 @@ EXPORT layouts := MODULE
       STRING250 MonitorSuperFile;
        STRING250 RoxieSuperFile;
       DATASET(LogicalFile_layout) LogicalFiles;
-      BOOLEAN AllLogicalFileExists;
+      BOOLEAN AllLogicalFilesExist;
    end;
    
  END;

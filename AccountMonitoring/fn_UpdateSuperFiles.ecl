@@ -44,7 +44,7 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
          SELF.MonitorSuperFile := L.MonitorSuperFile;
          SELF.RoxieSuperFile := L.RoxieSuperFile;
          SELF.LogicalFiles := PROJECT(AllRows,TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout,SELF := LEFT));
-         SELF.AllLogicalFileExists := min(l.LogicalFileExists,  min( AllRows,AllRows.LogicalFileExists));
+         SELF.AllLogicalFilesExist := min(l.LogicalFileExists,  min( AllRows,AllRows.LogicalFileExists));
      END;
    
   CGM_LogicalFilesFinal := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
@@ -65,7 +65,7 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
 
     
     update_action := APPLY(inFiles,
-                   if(AllLogicalFileExists,
+                   if(AllLogicalFilesExist,
                       SEQUENTIAL(
                              STD.File.StartSuperFileTransaction()
                             ,IF(NOT STD.File.SuperfileExists(TRIM(stem_name+monitorsuperfile)+'_qa'),STD.File.CreateSuperFile(TRIM(stem_name+monitorsuperfile)+'_qa'))
