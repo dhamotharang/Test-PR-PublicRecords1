@@ -4,16 +4,16 @@ import dops, _control, AccountMonitoring, STD, _Control, ut, Data_Services;
 
 EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
                             AccountMonitoring.types.productMask.allProducts, // all
-                            string roxieesp_server = '10.173.104.101' ,  // prod
-                            string vip_server =  _Control.RoxieEnv.prodvip,
-                            string roxieport = '8010'
+                            string roxie_esp_server = '10.173.104.101' ,  // prod
+                            string roxie_vip_server =  _Control.RoxieEnv.prodvip,
+                            string roxie_port = '8010'
                             
                             ) := function
 
    
                   
-  liveClust := dops.GetRoxieClusterInfo(roxieesp_server).LiveCluster(vip_server); 
-  roxiePack := dops.GetRoxiePackage(roxieesp_server,roxieport,liveClust).Keys();                               
+  liveClust := dops.GetRoxieClusterInfo(roxie_esp_server).LiveCluster(roxie_vip_server); 
+  roxiePack := dops.GetRoxiePackage(roxie_esp_server,roxie_port,liveClust).Keys();                               
 
   Superfiles := AccountMonitoring.config_UpdateSuperFiles(product_mask);
   newSuperfileLink :=  join(Superfiles,roxiePack,
