@@ -1,6 +1,6 @@
 ﻿//modify BIPV2.KeySuffix to new build version before running
 
-import bipv2,Workman,_control,bipv2_build;
+import bipv2,Workman,_control,bipv2_build,std,tools,WsWorkunits;
 
 pversion      := BIPV2.KeySuffix                                     ;
 cluster       := Workman._Config.localhthor                          ;
@@ -94,7 +94,8 @@ eclcodepre  :=
  + 'SkipCDWBuild          := SkipSeleidRelative   ; // -- back to Master\n'
  + 'SkipXAppend           := SkipCDWBuild         ; //\n'
  + 'SkipDataCard          := SkipXAppend          ;\n'
- + 'SkipDashboard         := SkipDataCard         ;\n'
+ + 'SkipEntityReport      := SkipDataCard         ;\n'
+ + 'SkipDashboard         := SkipEntityReport     ;\n'
  + 'SkipCopyOtherKeys     := SkipDashboard        ;\n'
  + 'SkipRenameKeys        := SkipCopyOtherKeys    ;\n'
  + 'SkipVerifyKeys        := SkipRenameKeys       ;\n'
@@ -184,6 +185,7 @@ eclcodepre  :=
  + '  ,pSkipCDWBuild          := SkipCDWBuild\n'
  + '  ,pSkipXAppend           := SkipXAppend\n'
  + '  ,pSkipDataCard          := SkipDataCard\n'
+ + '  ,pSkipEntityReport      := SkipEntityReport\n'
  + '  ,pSkipDashboard         := SkipDashboard\n'
  + '  ,pSkipCopyOtherKeys     := SkipCopyOtherKeys\n'
  + '  ,pSkipRenameKeys        := SkipRenameKeys\n'

@@ -276,9 +276,9 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
   
   /* ---------------------- SALT Output -------------------------------- */
   import BIPV2_QA_Tool;
-  shared updateBuilding(string fname=f_out(iter)) := BIPv2_Files.files_lgid3.updateBuilding(fname);
-  shared before_restore_ds := dataset(f_out(iter),l_base,thor);
-  shared restoredDs :=postProcess(before_restore_ds,ds_hrchy);
+  shared last_lgid3_iter    := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_lgid3.FILE_BUILDING)[1].name);
+  shared before_restore_ds  := dataset(last_lgid3_iter,l_base,thor);
+  shared restoredDs         := postProcess(before_restore_ds,ds_hrchy);
 
   /* ---------------------- Persistence stats and QA tool outputs -------------------------------- */
   shared ds_lgid3_persistence_stats                 := BIPV2_Strata.PersistenceStats(restoredDs,BIPV2.CommonBase.DS_BASE,rcid,lgid3) : independent;
@@ -286,7 +286,7 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
   shared QA_Tool_lgid3_persistence_cluster_stats    := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_lgid3_persistence_stats ,'lgid3' ,pversion);
   
 
-  export updateSuperfiles(string fname=f_out(iter), dataset(l_common) ds_common=ds_hrchy) := 
+  export updateSuperfiles(string fname=last_lgid3_iter, dataset(l_common) ds_common=ds_hrchy) := 
   function
   
     kick_copy2_storage_thor_post  := BIPV2_Tools.Copy2_Storage_Thor(fname  ,pversion ,'lgid3_postprocess');
@@ -332,6 +332,7 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
   export lgid3_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,lgid3 ,pversion  ,iter  ,BIPV2_LGID3.Config.MatchThreshold ,'BIPV2_LGID3');
 
   // -- Run Iteration
+  shared updateBuilding(string fname=f_out(iter)) := BIPv2_Files.files_lgid3.updateBuilding(fname);
   export runIter := sequential(linking,outputReviewSamples, updateBuilding(), updateLinkHist,BIPV2_LGID3._Lgid3Changes(iter,pversion, input).out,output_lnk_197,lgid3_iteration_stats)
     : SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'LGID3')),
       FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'LGID3'));

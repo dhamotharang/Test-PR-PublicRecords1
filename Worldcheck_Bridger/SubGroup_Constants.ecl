@@ -1116,6 +1116,14 @@
 		export string KEYWORD_CAPTA_561							:= '802';
 		export string KEYWORD_PSPMA_LFL							:= '803';
 		export string KEYWORD_NLPOL									:= '804';
+		export string KEYWORD_NLDNB									:= '805';
+		export string KEYWORD_ZA_FICTFS							:= '806';
+		export string KEYWORD_DKDPA									:= '807';
+		export string KEYWORD_NLDPA									:= '808';
+		export string KEYWORD_NODPA									:= '809';
+		export string KEYWORD_CZDPA									:= '810';
+		export string KEYWORD_HUDPA									:= '811';
+		export string KEYWORD_ICDPA									:= '812';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

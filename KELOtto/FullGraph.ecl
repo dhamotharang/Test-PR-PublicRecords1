@@ -14,10 +14,11 @@ Temporary collection of attributes to add. These should be woven back into the g
    UNSIGNED industry_type_;
    STRING Entity_Context_uid_;
    UNSIGNED event_count_;
+   UNSIGNED identity_count_;
   END;
 
   AdditionalAttributes := 
-    PROJECT(KELOtto.Q__show_Customer_Person.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
+    PROJECT(KELOtto.Q__show_Customer_Person.Res0, TRANSFORM(AdditionalAttributesRecord, SELF.identity_count_ := 1, SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Address.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Social_Security_Number.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
     PROJECT(KELOtto.Q__show_Customer_Email.Res0, TRANSFORM(AdditionalAttributesRecord, SELF := LEFT)) + 
@@ -38,7 +39,7 @@ PersonEntities := PROJECT(KELOtto.Q__show_Customer_Person_Entities.Res0,
 
 /* NB This is to limit adding hyper connected entities (mostly addresses) Will need to be revisited later to only add the centroid */
 
-PersonToAddress := JOIN(KELOtto.Q__show_Customer_Address_Person_Tree_Entities.Res0, KELOtto.Q__show_Customer_Address.Res0(all_person_count_ > 100), 
+PersonToAddress := JOIN(KELOtto.Q__show_Customer_Address_Person_Tree_Entities.Res0, KELOtto.Q__show_Customer_Address.Res0(cl_identity_count_ > 1000), 
                          LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, 
                          TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, LOOKUP);
                   
@@ -51,6 +52,7 @@ FullTreePrep1 :=
   KELOtto.Q__show_Customer_Person_Phone_Tree_Entities.Res0 + // Phone to Person
   KELOtto.Q__show_Customer_Person_Email_Tree_Entities.Res0 +
   KELOtto.Q__show_Customer_Person_Bank_Account_Tree_Entities.Res0 +
+  KELOtto.Q__show_Customer_Person_Ip_Tree_Entities.Res0 +
   KELOtto.Q__show_Customer_Person_Drivers_License_Tree_Entities.Res0)(tree_uid_ != '_011' AND entity_context_uid_ != '_011')
   : persist('~temp::deleteme99');
 
@@ -79,7 +81,7 @@ FullPersonTreeEntities1 := JOIN(TreeToEntity, EntityToTree,
                               RECORDOF(LEFT), 
                               SELF.tree_uid_ := LEFT.tree_uid_,
                               SELF.entity_context_uid_ := RIGHT.entity_context_uid_, //RIGHT.tree_uid_,
-                              SELF := LEFT), LOCAL, KEEP(200));
+                              SELF := LEFT), LOCAL, KEEP(1000));
 
 FullTreeEntities := DEDUP(SORT(DISTRIBUTE(EntityToTree + FullPersonTreeEntities1, HASH32(entity_context_uid_)), source_customer_, tree_uid_, entity_context_uid_, LOCAL), source_customer_, tree_uid_, entity_context_uid_, LOCAL);
 
@@ -415,8 +417,9 @@ FullGraphElementCount1 := JOIN(FullGraphPrep8, ElementCountAggregation, LEFT.sou
 FullGraphElementCount := JOIN(FullGraphElementCount1, AdditionalAttributes, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_, 
    TRANSFORM({
                RECORDOF(LEFT),
-               RIGHT.event_count_
+               RIGHT.event_count_,
+               RIGHT.identity_count_
              },
-              SELF.event_count_ := RIGHT.event_count_, SELF := LEFT), LEFT OUTER, HASH) : PERSIST('~fraudgov::deleteme101');
+              SELF.event_count_ := RIGHT.event_count_, SELF.identity_count_ := RIGHT.identity_count_, SELF := LEFT), LEFT OUTER, HASH) : PERSIST('~fraudgov::deleteme101');
 
 EXPORT FullGraph := FullGraphElementCount;

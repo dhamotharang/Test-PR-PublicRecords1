@@ -32,7 +32,7 @@ EXPORT	proc_build_base(STRING	pVersion	,
 	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.memberSpecific.new		,dMemberSpecific		,Build_MemberSpecific_File		,TRUE);
   VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.releasedate.new				,dReleaseDate				,Build_ReleaseDate_File				,TRUE);
 	
-	//	SBFE Best Key Base Files
+		// SBFE Best Key Base Files
 	SHARED	dHrchyBase		:=	PROJECT(BIPV2_Best_SBFE.CommonBase.DS_SBFE_CLEAN,BIPV2.CommonBase.Layout);
 	SHARED	pInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Proxid;
 	SHARED	sInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Seleid;

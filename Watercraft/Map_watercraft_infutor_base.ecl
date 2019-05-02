@@ -73,7 +73,8 @@ lengthFttoInch(STRING10 lenft) := FUNCTION
 			MyLenft := (DECIMAL5_2) lenft;
 			MyLenin := MyLenft * 12;
 	FinalLenin := (STRING10)MyLenin;
-	RETURN FinalLenin;
+	LengthIn := IF(FinalLenin = '0', '', FinalLenin);
+	RETURN LengthIn;
 END;
 
 //Filter out blank name records since there are no registration/hull information to identify watercraft info

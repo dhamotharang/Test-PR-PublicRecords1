@@ -1,7 +1,7 @@
 ﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
 Add BK daily files.
 */
-IMPORT BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
+IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
 			 Gong, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
@@ -29,6 +29,8 @@ EXPORT product_files := MODULE
 			Header.Layout_Header.dt_vendor_last_reported;
 			Header.Layout_Header.did;
 			Header.Layout_Header.src;
+      Header.Layout_Header_v2.dob;
+			Header.Layout_Header_v2.ssn;
 		END;
 
 		EXPORT layout_base_file_util_daily := RECORD
@@ -83,6 +85,7 @@ EXPORT product_files := MODULE
 			Header.Layout_Header_v2.dt_vendor_last_reported;
 			Header.Layout_Header_v2.did;
 			Header.Layout_Header_v2.src;
+      
 		END;
 		
 		EXPORT Base_Header_file_slim := 
@@ -185,7 +188,7 @@ EXPORT product_files := MODULE
 				PROJECT(doxie_key_header_undist, layout_base_header), 
 				HASH64(did)
 			);
-		
+      
 		EXPORT doxie_key_header_slim := DEDUP(SORT(doxie_key_header, 
 																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
 																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 

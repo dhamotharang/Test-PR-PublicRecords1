@@ -1,4 +1,4 @@
-import ut, tools, corp2, versioncontrol, scrubs, std, corp2_raw_vt, scrubs_corp2_mapping_vt_main;
+﻿import ut, tools, corp2, versioncontrol, scrubs, std, corp2_raw_vt, scrubs_corp2_mapping_vt_main;
 
 export VT  := MODULE;
 
@@ -341,16 +341,13 @@ export VT  := MODULE;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_VT Report' 	//subject
 																																	 ,'Scrubs CorpMain_VT Report'  //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpVTMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																	);
 																				 
 		EXPORT Main_BadRecords		 := Main_N.ExpandedInFile( dt_vendor_first_reported_Invalid       <> 0 or
 																												 dt_vendor_last_reported_Invalid 	      <> 0 or

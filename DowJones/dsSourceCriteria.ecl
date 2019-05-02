@@ -1746,5 +1746,17 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/468 Egypt List','1733'},
 {'EC 2019/431 ISIL (Da\'esh) and Al-Qaida List','1734'},
 {'EC 2019/459 Egypt List','1735'},
-{'Financial Sector Conduct Authority (South Africa) Media Releases','1736'}
+{'Financial Sector Conduct Authority (South Africa) Media Releases','1736'},
+{'EC 2019/507 ISIL (Da\'esh) and Al-Qaida List','1737'},
+{'FBI Featured Fugitives - Law Enforcement Assistance','1738'},
+{'EC (CFSP) 2019/562 Iran List','1739'},
+{'EC 2019/555 ISIL (Da\'esh) and Al-Qaida List','1740'},
+{'EC 2019/560 Iran List','1741'},
+{'The Gambling Commission (UK) - Regulatory Decisions','1742'},
+{'EC 2019/618 Banned Air Carriers List','1743'},
+{'Tunisia National Counter-Terrorism Committee (CNLCT) List','1744'},
+{'EC 2019/663 ISIL (Da\'esh) and Al-Qaida List','1745'},
+{'FIAU (Malta) Financial Intelligence Analysis Unit Administrative Penalties','1746'},
+{'FINTRAC (Canada) News Releases','1747'},
+{'MFSA (Malta) Sanctions & Penalties','1748'}
 ],r);

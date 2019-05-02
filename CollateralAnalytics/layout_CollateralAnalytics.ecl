@@ -1,0 +1,1 @@
+﻿EXPORT layout_CollateralAnalytics := CollateralAnalytics.layouts.base;

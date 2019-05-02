@@ -79,6 +79,7 @@ export proc_build_all(
   ,pSkipCDWBuild          = 'false'
   ,pSkipXAppend           = 'false'
   ,pSkipDataCard          = 'false'
+  ,pSkipEntityReport      = 'false'
   ,pSkipDashboard         = 'false'
   ,pSkipCopyOtherKeys     = 'false'
   ,pSkipRenameKeys        = 'false'
@@ -157,7 +158,7 @@ functionmacro
       ,if(pSkipProxMj6       = false ,BIPV2_Build.proc_proxid_mj6                           ( '' ,pProxMj6NumIterations  ,pversion     ,pdoProxidMj6Preprocess,pdoProxidMj6Specs, pdoProxidMj6Iters,pdoProxidMj6PostProcess,,,pInputFilenameForProxMj6     ,,,pCompileTest ))            
       ,if(pSkipProxPost      = false ,BIPV2_Build.proc_proxid                               ( '' ,pProxPostNumIterations ,pversion     ,'bipv2_proxid_mj6._files().out.built',,pInputFilenameForProxPost ,,false             ,,,'ProxidPost'               ,,,pCompileTest ))
       ,if(pSkipHierarchy     = false ,BIPV2_Build.proc_hrchy                (pversion                                                                                                                   ))
-      ,if(pSkipLgid3         = false ,BIPV2_Build.proc_lgid3                ().MultIter_run (pLgid3StartIteration   ,pLgid3NumIterations  ,pdoLgid3Init  ,pdoLgid3Specs   ,pdoLgid3Iters  ,pdoLgid3Post ,pversion    ,,,pCompileTest  ))
+      ,if(pSkipLgid3         = false ,BIPV2_Build.proc_lgid3                ().MultIter_run (pLgid3StartIteration   ,pLgid3NumIterations  ,pdoLgid3Init  ,pdoLgid3Specs   ,pdoLgid3Iters  ,pdoLgid3Post ,pversion     ,,pCompileTest  ))
       ,if(pSkipPowDown       = false ,BIPV2_Build.proc_powid_down           ().MultIter_run (pPowDownStartIteration ,pPowDownNumIterations,pdoPowDownInit,pdoPowDownSpecs                                         ,,,,,,pCompileTest  )) 
       ,if(pSkipPow           = false ,BIPV2_Build.proc_powid                ().MultIter_run (pPowStartIteration     ,pPowNumIterations    ,pdoPowInit    ,pdoPowSpecs     ,pdoPowIters    ,pdoPowPost              ,,,,,pCompileTest  ))
       ,if(pSkipEmpDown       = false ,BIPV2_Build.proc_empid_down           ().MultIter_run (pEmpDownStartIteration ,pEmpDownNumIterations,pdoEmpDownInit                                                       ,,,,,,,,pCompileTest  ))
@@ -172,6 +173,7 @@ functionmacro
       ,if(pSkipCDWBuild      = false ,BIPV2_Build.proc_CDW_Files              (pversion                                                                                                     )) // do Build CDW
       // ,if(pSkipXAppend       = false ,BIPV2_Build.proc_External_Append_Testing(pversion                                                                                                     )) // do external append testing
       ,if(pSkipDataCard      = false ,BIPV2_Build.proc_DataCard               (pversion                                                                                                     )) // do datacard
+      ,if(pSkipEntityReport  = false ,BIPV2_Build.proc_EntityReport           (pversion                                                                                                     )) // do entity report
       ,if(pSkipDashboard     = false ,BIPV2_Build.proc_Dashboard              (pversion                                                                                                     )) // do dashboard
       ,if(pSkipRenameKeys    = false ,BIPV2_Build.proc_rename_BIPV2FullKeys   (pversion,pRenameKeysFilter,false,,'built')                                                                    ) //only rename bipv2_proxid,strnbrname & bipv2_relative, rest should be correct
       ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',true                                                                   )) // Copy the rest of the BIPV2FullKeys package to dataland
