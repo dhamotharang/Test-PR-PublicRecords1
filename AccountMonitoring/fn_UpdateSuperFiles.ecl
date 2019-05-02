@@ -4,7 +4,7 @@ import dops, _control, AccountMonitoring, STD, _Control, ut, Data_Services;
 
 EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
                             AccountMonitoring.types.productMask.allProducts, // all
-                            string esp_server = '10.173.104.101' ,  // prod esp
+                            string roxieesp_server = '10.173.104.101' ,  // prod
                             string vip_server =  _Control.RoxieEnv.prodvip,
                             string roxieport = '8010'
                             
@@ -12,10 +12,9 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
 
    
                   
-  liveClust := dops.GetRoxieClusterInfo(esp_server).LiveCluster(vip_server); 
-  roxiePack := dops.GetRoxiePackage(esp_server,roxieport,liveClust).Keys();                               
+  liveClust := dops.GetRoxieClusterInfo(roxieesp_server).LiveCluster(vip_server); 
+  roxiePack := dops.GetRoxiePackage(roxieesp_server,roxieport,liveClust).Keys();                               
 
-  strToday := STD.Date.Today();
   Superfiles := AccountMonitoring.config_UpdateSuperFiles(product_mask);
   newSuperfileLink :=  join(Superfiles,roxiePack,
                         left.RoxieSuperFile = right.superfile,
@@ -48,21 +47,8 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
          SELF.AllLogicalFileExists := min(l.LogicalFileExists,  min( AllRows,AllRows.LogicalFileExists));
      END;
    
-     CGM_LogicalFilesFinal2 := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
-
-
-  CGM_LogicalFilesSorted := SORT(CGM_LogicalFiles,MonitorSuperFile,RECORD);
-
-/*   AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout UpdateInstance
-        (AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout L, 
-         AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout R) := TRANSFORM
-       SELF.FirstInstance := L.MonitorSuperFile != R.MonitorSuperFile;
-      SELF := R;
-     END;
-     
-     CGM_LogicalFilesFinal := ITERATE(CGM_LogicalFilesSorted,UpdateInstance(LEFT,RIGHT),STABLE);
-*/
-              
+  CGM_LogicalFilesFinal := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
+           
   updateMonitorFiles(DATASET(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_Rollup_layout) inFiles, 
                      STRING stem_name = AccountMonitoring.constants.filename_cluster) := FUNCTION
 
@@ -96,18 +82,13 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
     return NOTHOR(update_action);		
   END;
 
-/*    output(newSuperfileLinkCheckLogical,named('newSuperfileLinkCheckLogical'));
-       output(liveClust,named('liveClust'));
-       //output(superfile_stem_name,named('superfile_stem_name'));
-       output(choosen(roxiePack,4000),named('roxiePack'));
-       //output(CGM_KeyLogical,named('CGM_KeyLogical'));
-       output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
-       // output(sbfeLogicalFilesFinal,named('sbfeLogicalFilesFinal'));
-       output(CGM_LogicalFilesFinal2,named('CGM_LogicalFilesFinal2'));
+/*        output(liveClust,named('liveClust'));
+          output(choosen(roxiePack,4000),named('roxiePack'));
+          output(CGM_LogicalFiles,named('CGM_LogicalFiles'));
+          output(CGM_LogicalFilesFinal,named('CGM_LogicalFilesFinal'));
 */
-
   update_monitor_file :=
-        SEQUENTIAL(updateMonitorFiles(CGM_LogicalFilesFinal2)
+        SEQUENTIAL(updateMonitorFiles(CGM_LogicalFilesFinal)
                   );
     update_monitor_file;
 
