@@ -117,6 +117,10 @@ EXPORT compliance := MODULE
          preGLBRestrict (DataRestrictionMask) => FALSE,
          dateOK (nonglb_last_seen, first_seen));
 
+  //SrcOk from ut/PermissionTools; has DRM in addition to other parameters
+  EXPORT boolean source_ok (unsigned1 purpose, string DataRestrictionMask, string2 src, unsigned3 first_seen = 0, unsigned3 nonglb_last_seen = 0) :=
+                   glb_ok(purpose) OR HeaderIsPreGLB(nonglb_last_seen, first_seen, src, DataRestrictionMask);
+
   EXPORT boolean minor_ok (unsigned1 age, boolean ok_to_show_minors) := //aka minorOK
 				ok_to_show_minors OR (age = 0) or (age >= 18);
 
@@ -177,6 +181,7 @@ EXPORT compliance := MODULE
     // TCH = Transunion Credit Header data
     EXPORT boolean isTCHRestricted(drm_type drm) := ~allowAll AND (drm[10] NOT IN ['0','']);  
     //EXPORT boolean TCH := isTCHRestricted(drm);  
+    EXPORT boolean isTTRestricted(drm_type drm) := ~allowAll AND (drm[11] NOT IN ['0','']); //TeleTrack, a.k.a. TT
 
     EXPORT boolean isHeaderSourceRestricted (string src, drm_type drm) := MAP (
       MDR.sourceTools.SourceIsExperian_Credit_Header (src) => isECHRestricted(drm),
