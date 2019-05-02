@@ -68,7 +68,7 @@ EXPORT AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
                   boolean isMarketing = FALSE) := FUNCTION
   isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
   preBest :=
-    project(withAppend(proxid != 0 or (isSeleBest and seleid != 0)),
+    project(withAppend,
       transform(BIPV2.IdLayouts.l_xlink_ids2,
         self.uniqueid := left.request_id,
         self := left));
