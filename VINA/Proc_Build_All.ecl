@@ -26,6 +26,8 @@ idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notificatio
 //Orbit update
 orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('VINA',(filedate),'N'); 
 
+//Orbiti Update
+orbiti_update := Orbit3Insurance.Proc_Orbit3I_CreateBuild ('VINA', filedate,'N','Melanie.Jackson@lexisnexisrisk.com' ) ;
 
 
 // sample records for QA
@@ -45,6 +47,7 @@ retval := sequential(
 													dops_update,
 													idops_update,													//DF-16616
 													orbit_update,
+													orbiti_update,
 													new_records_sample_for_qa,
 													CopyKey2Alpha('thor_data400::key::vina::vin_qa'),
 													//move the new file to processed
