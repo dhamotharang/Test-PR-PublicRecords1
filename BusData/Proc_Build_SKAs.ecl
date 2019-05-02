@@ -13,8 +13,8 @@ end;
 
 // Create a unique source_rec_id by hashing on all raw fields
 rec1 into_bdid(df1 L) := transform
-	self.bdid 				 := 0;
-	self.source 			 := MDR.sourceTools.src_SKA;
+  self.bdid           := 0;
+  self.source         := MDR.sourceTools.src_SKA;
   DATA temp_record_id := HASHMD5(ut.CleanSpacesAndUpper(l.TTL)
 														 + ','  + ut.CleanSpacesAndUpper(l.first_name)
                                  + ','  + ut.CleanSpacesAndUpper(l.middle)
@@ -34,9 +34,9 @@ rec1 into_bdid(df1 L) := transform
 														 + ','  + ut.CleanSpacesAndUpper(l.id)			
 														 + ','  + ut.CleanSpacesAndUpper(l.persid)			
 														 + ','  + ut.CleanSpacesAndUpper(l.nixie_date));
-	self.source_rec_id := hash64(temp_record_id);
-	self 							:= l;
-	self 							:= [];
+  self.source_rec_id  := hash64(temp_record_id);
+  self                := l;
+  self                := [];
 end;
 
 df1_2_proj	:= project(df1,into_bdid(LEFT));
@@ -54,56 +54,52 @@ business_header.MAC_Source_Match(
 				,MDR.sourceTools.src_SKA				  // source_type_or_field
 				,false													// bool_infile_has_source_group
 				,foo														// source_group_field
-				// ,company_name										// company_name_field
 				,COMPANY1										  // company_name_field
 				,mail_prim_range								// prim_range_field
 				,mail_prim_name									// prim_name_field
 				,mail_sec_range									// sec_range_field
 				,mail_zip											// zip_field
 				,true													// bool_infile_has_phone
-				// ,phone													// phone_field
 				,NUMBER  											// phone_field
 				,false													// bool_infile_has_fein
 				,foo														// fein_field
-				,																// bool_infile_has_vendor_id = 'false'
-				,																// vendor_id field					 = 'vendor_id'
+				,															// bool_infile_has_vendor_id = 'false'
+				,															// vendor_id field = 'vendor_id'
 				);
 
 myset := ['A','P'];
 
 Business_Header_SS.MAC_Match_Flex(
-			 outf1																// input dataset						
-			,myset				                				// bdid matchset what fields to match on           
-			// ,company_name	                        // company_name	              
-			,COMPANY1	                          // company_name	              
-			,mail_prim_range		                  // prim_range		              
-			,mail_prim_name		                    // prim_name		              
-			,mail_zip					                    // zip5					              
-			,mail_sec_range		                    // sec_range		              
-			,mail_st				        		          // state				              
-			// ,phone						                    // phone				              
-			,NUMBER					                    // phone				              
-			,foo            			           	  	// fein              
-			,bdid										        			// bdid												
-			,rec1																	// output layout 
-			,false                               	// output layout has bdid score field? 																	
-			,foo                     							// bdid_score                 
-			,outf1_3										          // output dataset
-			,																			// keep count
-			,																			// default threshold
-			,																			// use prod version of superfiles
-			,																			// default is to hit prod from dataland, and on prod hit prod.		
-			,BIPV2.xlink_version_set							// create BIP keys only
-			,																			// url
-			,																			// email 
-			,mail_p_city_name											// city
-			,fname																// fname
-			,mname																// mname
-			,lname																// lname
-			,																			// contact ssn
-			,source																// source
-			,source_rec_id												// source_record_id
-			,true																	// if mac_Source_Match appears exists before flex macro
+			 outf1                              // input dataset						
+			,myset                              // bdid matchset what fields to match on           
+			,COMPANY1                           // company_name	              
+			,mail_prim_range                    // prim_range		              
+			,mail_prim_name                     // prim_name		              
+			,mail_zip                           // zip5					              
+			,mail_sec_range                     // sec_range		              
+			,mail_st                            // state				              
+			,NUMBER                             // phone				              
+			,foo                                // fein              
+			,bdid                               // bdid												
+			,rec1                               // output layout 
+			,false                              // output layout has bdid score field? 																	
+			,foo                                // bdid_score                 
+			,outf1_3                            // output dataset
+			,                                   // keep count
+			,                                   // default threshold
+			,                                   // use prod version of superfiles
+			,                                   // default is to hit prod from dataland, and on prod hit prod.		
+			,BIPV2.xlink_version_set            // create BIP keys only
+			,                                   // url
+			,                                   // email 
+			,mail_p_city_name                   // city
+			,fname                              // fname
+			,mname                              // mname
+			,lname                              // lname
+			,                                   // contact ssn
+			,source                             // source
+			,source_rec_id                      // source_record_id
+			,true                               // if mac_Source_Match appears exists before flex macro
 		);	
 
 outf1_4 := project(outf1_3, transform(busdata.layout_ska_nixie_bdid,self := LEFT));
@@ -122,9 +118,9 @@ end;
 
 // Create a unique source_rec_id by hashing on all raw fields
 rec2 into_bdid2(df2 L,integer C) := transform
-	self.bdid 				 := 0;
-	self.source 			 := MDR.sourceTools.src_SKA;
-	self.seq 					 := C;
+	self.bdid           := 0;
+	self.source         := MDR.sourceTools.src_SKA;
+	self.seq            := C;
   DATA temp_record_id := HASHMD5(ut.CleanSpacesAndUpper(l.TTL)
 														 + ','  + ut.CleanSpacesAndUpper(l.first_name)
 														 + ','  + ut.CleanSpacesAndUpper(l.middle)
@@ -161,12 +157,12 @@ df2_2 := project(df2,into_bdid2(LEFT,COUNTER));
 
 rec3 := record
 	rec2;
-	string10	prim_range;
-	string28	prim_name;
-	string10	sec_range;
-	string25	p_city_name;	
-	string5		my_zip;
-	string2		my_st;
+	string10  prim_range;
+	string28  prim_name;
+	string10  sec_range;
+	string25  p_city_name;	
+	string5   my_zip;
+	string2   my_st;
 	unsigned1 score;
 end;
 
@@ -176,34 +172,35 @@ rec3 into_norm(df2_2 L, integer C) := transform
 	self.sec_range 		:= if (c = 1, L.mail_sec_range, 	L.alt_sec_range);
 	self.p_city_name 	:= if (c = 1, L.mail_p_city_name, L.alt_p_city_name);	
 	self.my_zip 			:= if (c = 1, L.mail_zip, 				L.alt_zip);
-	self.my_st 				:= if (c = 1, L.mail_st, 					L.alt_st);
+	self.my_st 				:= if (c = 1, L.mail_st, 				L.alt_st);
 	self.score 				:= 0;
-	self 							:= L;
+	self 						:= L;
 end;
 
 df2_3 := normalize(df2_2,2,into_norm(LEFT,COUNTER));
 
 business_header.MAC_Source_Match(
-				 df2_3															// infile
-				,outf2															// outfile
-				,false															// bool_bdid_field_is_string12
-				,bdid																// bdid_field
-				,false															// bool_infile_has_source_field
-				,MDR.sourceTools.src_SKA						// source_type_or_field
-				,false															// bool_infile_has_source_group
-				,foo																// source_group_field
-				// ,company_name												// company_name_field
-				,COMPANY1   												// company_name_field
-				,prim_range													// prim_range_field
-				,prim_name													// prim_name_field
-				,sec_range													// sec_range_field
-				,my_zip															// zip_field
-				,true																// bool_infile_has_phone
-				,phone															// phone_field
-				,false															// bool_infile_has_fein
-				,foo																// fein_field
-				,																		// bool_infile_has_vendor_id = 'false'
-				,																		// vendor_id field					 = 'vendor_id'
+				 df2_3                            // infile
+				,outf2                            // outfile
+				,false                            // bool_bdid_field_is_string12
+				,bdid                             // bdid_field
+				,false                            // bool_infile_has_source_field
+				,MDR.sourceTools.src_SKA          // source_type_or_field
+				,false                            // bool_infile_has_source_group
+				,foo                              // source_group_field
+				,COMPANY1                         // company_name_field
+				,prim_range                       // prim_range_field
+				,prim_name                        // prim_name_field
+				,sec_range                        // sec_range_field
+				,my_zip                           // zip_field
+				,true                             // bool_infile_has_phone
+				,phone                            // phone_field
+				,false                            // bool_infile_has_fein
+				,foo                              // fein_field
+				,                                 // bool_infile_has_vendor_id = 'false'
+				,                                 // vendor_id field = 'vendor_id'
+				,                                 // pFileVersion = '\'prod\''	-- default to use prod version of superfiles
+				,FALSE                            // pUseOtherEnvironment = business_header._Dataset().IsDataland	-- default is to hit prod on dataland, and on prod hit prod.
 				);
 
 outf2 fake_score(outf2 L) := transform
@@ -216,37 +213,36 @@ outf2_bdid_score := project(outf2,fake_score(LEFT));
 myset2 := ['A','P'];
 
 Business_Header_SS.MAC_Match_Flex(
-			 outf2_bdid_score											// input dataset						
-			,myset2				                				// bdid matchset what fields to match on           
-			// ,company_name	                        // company_name	              
-			,COMPANY1   	                        // company_name	              
-			,prim_range		                  			// prim_range		              
-			,prim_name		                    		// prim_name		              
-			,my_zip					                    	// zip5					              
-			,sec_range		                    		// sec_range		              
-			,my_st				        		          	// state				              
-			,phone						                    // phone				              
-			,foo            			           	  	// fein              
-			,bdid										        			// bdid												
-			,rec3																	// output layout 
-			,true                               	// output layout has bdid score field? 																	
-			,score                     						// bdid_score                 
-			,outf2_3										          // output dataset
-			,																			// keep count
-			,																			// default threshold
-			,																			// use prod version of superfiles
-			,																			// default is to hit prod from dataland, and on prod hit prod.		
-			,BIPV2.xlink_version_set							// create BIP keys only
-			,																			// url
-			,																			// email 
-			,p_city_name													// city
-			,fname																// fname
-			,mname																// mname
-			,lname																// lname
-			,																			// contact ssn
-			,source																// source
-			,source_rec_id												// source_record_id
-			,true																	// if mac_Source_Match appears exists before flex macro
+			 outf2_bdid_score                   // input dataset						
+			,myset2                             // bdid matchset what fields to match on           
+			,COMPANY1                           // company_name	              
+			,prim_range                         // prim_range		              
+			,prim_name                          // prim_name		              
+			,my_zip                             // zip5					              
+			,sec_range                          // sec_range		              
+			,my_st                              // state				              
+			,phone                              // phone				              
+			,foo                                // fein              
+			,bdid                               // bdid												
+			,rec3                               // output layout 
+			,true                               // output layout has bdid score field? 																	
+			,score                              // bdid_score                 
+			,outf2_3                            // output dataset
+			,                                   // keep count
+			,                                   // default threshold
+			,                                   // use prod version of superfiles
+			,                                   // default is to hit prod from dataland, and on prod hit prod.		
+			,BIPV2.xlink_version_set            // create BIP keys only
+			,                                   // url
+			,                                   // email 
+			,p_city_name                        // city
+			,fname                              // fname
+			,mname                              // mname
+			,lname                              // lname
+			,                                   // contact ssn
+			,source                             // source
+			,source_rec_id                      // source_record_id
+			,true                               // if mac_Source_Match appears exists before flex macro
 		);	
 
 outf2_4 := dedup(sort(distribute(outf2_3,hash(seq)),seq,-score,bdid,local),seq,local);
