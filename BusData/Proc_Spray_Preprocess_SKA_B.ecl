@@ -1,12 +1,13 @@
 ﻿IMPORT address, ut, HEADER,NID;
 
-EXPORT Proc_Spray_Preprocess_ska_b(String filedate) := FUNCTION
+EXPORT Proc_Spray_Preprocess_ska_b(String filedate, string OM_number, string filedate_m_d_yyyy) := FUNCTION
 
 ds_ska_b := BusData.File_In_SKA_B;
 
 temprec := record
 	layouts_ska.raw_b;
-	string73 name;
+	// string73 name;
+	string91 name;
 end;
 
 temprec t_Name_ska(ds_ska_b le) := TRANSFORM
@@ -17,7 +18,7 @@ end;
 d_ska_b_name := project(ds_ska_b,t_Name_ska(left));
 
 Clean_Name_ska_b(DATASET(temprec) pInput) := FUNCTION
-	NID.Mac_CleanFullNames(pInput, cleaned_names,name);
+	NID.Mac_CleanFullNames(pInput, cleaned_names,name,,,,,,,,,,,,,,,,,,,TRUE);
 	RETURN cleaned_names;
 end;
 
@@ -86,7 +87,6 @@ name_clean2_ska_b := project(la_clean_baddr_ska_b, get_parsed_bddr(left)) : pers
 
 
 BusData.Layout_SKA_Nixie_In t_Convfinal( name_clean2_ska_b l) := transform
-   // self.title                    := l.title;                    
   SELF.mail_prim_range          := l.clean_address[1..10]      ;	 
   SELF.mail_predir              := l.clean_address[11..12]     ;	 
   SELF.mail_prim_name           := l.clean_address[13..40]     ;	 
@@ -114,10 +114,6 @@ BusData.Layout_SKA_Nixie_In t_Convfinal( name_clean2_ska_b l) := transform
   SELF.mail_geo_blk             := l.clean_address[171..177]   ;  
   SELF.mail_geo_match           := l.clean_address[178]     	 ;	 
   SELF.mail_err_stat            := l.clean_address[179..182] ;	   
-   // self.T1                       := l.T1;                       
-   // self.company_name             := l.company;                     
-   // self.address1                 := l.address;                     
-   // self.lf                       := '';                            
   SELF                          := l;                                                      
   SELF                          := [];                                                      
 
@@ -132,7 +128,7 @@ super_file_b := sequential(
 							FileServices.addSuperFile('~thor_data400::base::ska_b','~thor_data400::base::ska_b_'+filedate)
 				);
 
-return Sequential(Proc_SKA_Spray_In(filedate).spray_all_b,ska_b_final,super_file_b);
+return Sequential(Proc_SKA_Spray_In(filedate, OM_number, filedate_m_d_yyyy).spray_all_b,ska_b_final,super_file_b);
 
 
 end;

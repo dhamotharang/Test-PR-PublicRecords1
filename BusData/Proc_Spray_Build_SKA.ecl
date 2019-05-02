@@ -1,8 +1,9 @@
 ﻿import ut, _control, Scrubs, Scrubs_SKA;
 
-export Proc_Spray_Build_SKA(string filedate) := function
+export Proc_Spray_Build_SKA(string filedate, string OM_number = '379725', string filedate_m_d_yyyy = '') := function
 
-spray_map_all := sequential(BusData.Proc_Spray_Preprocess_SKA_A(filedate), BusData.Proc_Spray_Preprocess_SKA_B(filedate));
+spray_map_all := sequential(BusData.Proc_Spray_Preprocess_SKA_A(filedate, OM_number, filedate_m_d_yyyy),
+                            BusData.Proc_Spray_Preprocess_SKA_B(filedate, OM_number, filedate_m_d_yyyy));
 
 doBld := BusData.Make_Ska_files;
 
