@@ -1,86 +1,21 @@
-IMPORT ut,strata, BKForeclosure;
+﻿IMPORT ut,strata, BKForeclosure;
 
 EXPORT Strata_Population_Stats_Reo(STRING filedate) := FUNCTION;
 basefile_Reo := File_BK_Foreclosure.fReo;
 rPopulationStats_Reo := RECORD
-      basefile_Reo.st;
+      basefile_Reo.fips_cd;
       CountGroup     := COUNT(GROUP); 
-      create_dte_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.create_dte<>'',1,0));       
-	    last_upd_dte_CountNonBlank      := SUM(GROUP,IF(basefile_Reo.last_upd_dte<>'',1,0));   
- 	    stamp_dte_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.stamp_dte<>'',1,0));   
-	    date_first_seen_CountNonBlank   := SUM(GROUP,IF(basefile_Reo.date_first_seen<>'',1,0));   
-	    date_last_seen_CountNonBlank    := SUM(GROUP,IF(basefile_Reo.date_last_seen<>'',1,0));  
+			record_id_CountNonBlank         	:= SUM(GROUP,IF(basefile_Reo.record_id<>0,1,0));   
+	    date_first_seen_CountNonBlank   	:= SUM(GROUP,IF(basefile_Reo.date_first_seen<>'',1,0));   
+	    date_last_seen_CountNonBlank    	:= SUM(GROUP,IF(basefile_Reo.date_last_seen<>'',1,0));  
 	    date_vendor_first_reported_CountNonBlank   := SUM(GROUP,IF(basefile_Reo.date_vendor_first_reported<>'',1,0));   
 	    date_vendor_last_reported_CountNonBlank    := SUM(GROUP,IF(basefile_Reo.date_vendor_last_reported<>'',1,0));   
-	    process_date_CountNonBlank      := SUM(GROUP,IF(basefile_Reo.process_date<>'',1,0));   
-      src_CountNonBlank               := SUM(GROUP,IF(basefile_Reo.src<>'',1,0));  
-	    record_id_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.record_id<>'',1,0));   
-      did_CountNonZero                := SUM(GROUP,IF(basefile_Reo.did<>0,1,0));   
-	    rawaidin_CountNonZero           := SUM(GROUP,IF(basefile_Reo.rawaidin<>0,1,0));
-      cleanaid_CountNonZero           := SUM(GROUP,IF(basefile_Reo.cleanaid<>0,1,0));  
-   		addresstype_CountNonBlank       := SUM(GROUP,IF(basefile_Reo.addresstype<>'',1,0));  
-   		prim_range_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.prim_range<>'',1,0));  
-   		predir_CountNonBlank            := SUM(GROUP,IF(basefile_Reo.predir<>'',1,0));
-      prim_name_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.prim_name<>'',1,0));
-   		addr_suffix_CountNonBlank       := SUM(GROUP,IF(basefile_Reo.addr_suffix<>'',1,0));
-   		postdir_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.postdir<>'',1,0));
-   		unit_desig_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.unit_desig<>'',1,0));
-   		sec_range_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.sec_range<>'',1,0));
-   		p_city_name_CountNonBlank       := SUM(GROUP,IF(basefile_Reo.p_city_name<>'',1,0));
-   		v_city_name_CountNonBlank       := SUM(GROUP,IF(basefile_Reo.v_city_name<>'',1,0));
-   		// st_CountNonBlank                := SUM(GROUP,IF(basefile_Reo.st<>'',1,0));
-   		zip_CountNonBlank               := SUM(GROUP,IF(basefile_Reo.zip<>'',1,0));
-   		zip4_CountNonBlank              := SUM(GROUP,IF(basefile_Reo.zip4<>'',1,0));
-   		cart_CountNonBlank              := SUM(GROUP,IF(basefile_Reo.cart<>'',1,0));
-   		cr_sort_sz_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.cr_sort_sz<>'',1,0));
-   		lot_CountNonBlank               := SUM(GROUP,IF(basefile_Reo.lot<>'',1,0));
-   		lot_order_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.lot_order<>'',1,0));
-   		dbpc_CountNonBlank              := SUM(GROUP,IF(basefile_Reo.dbpc<>'',1,0));
-   		chk_digit_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.chk_digit<>'',1,0));
-   		rec_type_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.rec_type<>'',1,0));
-   		county_CountNonBlank            := SUM(GROUP,IF(basefile_Reo.county<>'',1,0));
-   		geo_lat_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.geo_lat<>'',1,0));
-   		geo_long_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.geo_long<>'',1,0));
-   		msa_CountNonBlank               := SUM(GROUP,IF(basefile_Reo.msa<>'',1,0));
-   		geo_blk_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.geo_blk<>'',1,0));
-   		geo_match_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.geo_match<>'',1,0));
-   		err_stat_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.err_stat<>'',1,0));
-	    pdid_CountNonBlank              := SUM(GROUP,IF(basefile_Reo.pdid<>'',1,0));
-	    pfrd_address_ind_CountNonBlank  := SUM(GROUP,IF(basefile_Reo.pfrd_address_ind<>'',1,0));
-	    rawAid_CountNonZero             := SUM(GROUP,IF(basefile_Reo.rawAid<>0,1,0));
-      nid_CountNonZero                := SUM(GROUP,IF(basefile_Reo.nid<>0,1,0));
-	 		cln_title_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.cln_title<>'',1,0));
-	  	cln_fname_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.cln_fname<>'',1,0));
-	  	cln_mname_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.cln_mname<>'',1,0));
-	  	cln_lname_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.cln_lname<>'',1,0));
-	 		cln_suffix_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.cln_suffix<>'',1,0));
-			cln_title2_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.cln_title2<>'',1,0));
-	  	cln_fname2_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.cln_fname2<>'',1,0));
-	  	cln_mname2_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.cln_mname2<>'',1,0));
-	  	cln_lname2_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.cln_lname2<>'',1,0));
-	   	cln_suffix2_CountNonBlank       := SUM(GROUP,IF(basefile_Reo.cln_suffix2<>'',1,0));
-      name_ind_CountNonZero           := SUM(GROUP,IF(basefile_Reo.name_ind<>0,1,0));
-      persistent_record_id_CountNonZero := SUM(GROUP,IF(basefile_Reo.persistent_record_id<>0,1,0));
-	    cname_CountNonBlank               := SUM(GROUP,IF(basefile_Reo.cname<>'',1,0));
-	    Orig_Address_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.Orig_Address<>'',1,0));
-	    Orig_City_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.Orig_City<>'',1,0));
-	    Orig_State_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.Orig_State<>'',1,0));
-	    Orig_Zip5_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.Orig_Zip5<>'',1,0));
-	    Orig_Zip4_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.Orig_Zip4<>'',1,0));
-      AddrType_CountNonBlank            := SUM(GROUP,IF(basefile_Reo.AddrType<>'',1,0));
-      NAME_FULL_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.NAME_FULL<>'',1,0));
-	    Name_First_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.Name_First<>'',1,0));
-	    Name_Last_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.Name_Last<>'',1,0));
-	    Name_Type_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.Name_Type<>'',1,0)); 
-	    TYPE_CODE_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.TYPE_CODE<>'',1,0));
-	    Company_Name_CountNonBlank        := SUM(GROUP,IF(basefile_Reo.Company_Name<>'',1,0));
-      // append_row_ID_CountNonZero        := SUM(GROUP,IF(basefile_Reo.append_row_ID<>0,1,0));
-	    ln_filedate_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.ln_filedate<>'',1,0));
+	    process_date_CountNonBlank      	:= SUM(GROUP,IF(basefile_Reo.process_date<>'',1,0));   
+      src_CountNonBlank               	:= SUM(GROUP,IF(basefile_Reo.src<>'',1,0));  
 	    Delete_Flag_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.Delete_Flag<>'',1,0));
+			foreclosure_id_CountNonBlank			:= SUM(GROUP,IF(basefile_Reo.foreclosure_id<>'',1,0));
+			ln_filedate_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.ln_filedate<>'',1,0));
 	    bk_infile_type_CountNonBlank      := SUM(GROUP,IF(basefile_Reo.bk_infile_type<>'',1,0));	
-	
-	
-      fips_cd_CountNonBlank             := SUM(GROUP,IF(basefile_Reo.fips_cd<>'',1,0));
       prop_full_addr_CountNonBlank      := SUM(GROUP,IF(basefile_Reo.prop_full_addr<>'',1,0));
       prop_addr_city_CountNonBlank      := SUM(GROUP,IF(basefile_Reo.prop_addr_city<>'',1,0));
       prop_addr_state_CountNonBlank     := SUM(GROUP,IF(basefile_Reo.prop_addr_state<>'',1,0));
@@ -101,7 +36,7 @@ rPopulationStats_Reo := RECORD
       doc_type_cd_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.doc_type_cd<>'',1,0));
       APN_CountNonBlank                 := SUM(GROUP,IF(basefile_Reo.APN<>'',1,0));
       multi_APN_CountNonBlank           := SUM(GROUP,IF(basefile_Reo.multi_APN<>'',1,0));
-      partial_interest_trans_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.partial_interest_trans<>'',1,0));
+      partial_interest_trans_CountNonBlank	:= SUM(GROUP,IF(basefile_Reo.partial_interest_trans<>'',1,0));
       seller1_fname_CountNonBlank       := SUM(GROUP,IF(basefile_Reo.seller1_fname<>'',1,0));
       seller1_lname_CountNonBlank       := SUM(GROUP,IF(basefile_Reo.seller1_lname<>'',1,0));
       seller1_id_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.seller1_id<>'',1,0));
@@ -132,7 +67,7 @@ rPopulationStats_Reo := RECORD
       legal_brief_desc_CountNonBlank    := SUM(GROUP,IF(basefile_Reo.legal_brief_desc<>'',1,0));
       Legal_Township_CountNonBlank      := SUM(GROUP,IF(basefile_Reo.Legal_Township<>'',1,0));
       recorder_map_ref_CountNonBlank    := SUM(GROUP,IF(basefile_Reo.recorder_map_ref<>'',1,0));
-      prop_buyer_mail_addr_cd_CountNonBlank          := SUM(GROUP,IF(basefile_Reo.prop_buyer_mail_addr_cd<>'',1,0));
+      prop_buyer_mail_addr_cd_CountNonBlank	:= SUM(GROUP,IF(basefile_Reo.prop_buyer_mail_addr_cd<>'',1,0));
       property_use_cd_CountNonBlank     := SUM(GROUP,IF(basefile_Reo.property_use_cd<>'',1,0));
       orig_contract_date_CountNonBlank  := SUM(GROUP,IF(basefile_Reo.orig_contract_date<>'',1,0));
       sales_price_CountNonBlank         := SUM(GROUP,IF(basefile_Reo.sales_price<>'',1,0));
@@ -180,13 +115,13 @@ rPopulationStats_Reo := RECORD
 END;
 
   
-basestrata_Reo := SORT(TABLE(basefile_Reo,rPopulationStats_Reo,st,few),st);
+basestrata_Reo := SORT(TABLE(basefile_Reo,rPopulationStats_Reo,fips_cd[1..2],few),fips_cd);
 
 STRATA.createXMLStats(basestrata_Reo,
                       'BKForeclosure_Reo Stats',
 					            'data',
 					            filedate,
-					            'Xia.Sheng@LexisNexis.com',
+					            BKForeclosure.Roxie_Email_List,
 					            strataresults
 					           );
 return strataresults;
