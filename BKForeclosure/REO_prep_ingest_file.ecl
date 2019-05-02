@@ -1,27 +1,32 @@
-﻿IMPORT BKForeclosure, MDR, ut;
+﻿IMPORT BKForeclosure, MDR, PRTE2, ut, STD;
 
 EXPORT REO_prep_ingest_file := FUNCTION
 
   //Project to base layout for ingest
 	fIn_Raw_Reo   := BKForeclosure.File_BK_Foreclosure.Reo_File;
+	
+	prte2.CleanFields(fIn_Raw_Reo, ClnRawReoIn); //using PRTE2 clean function as it cleans unprintable characters and uppercases output
 
-BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(fIn_Raw_Reo L, seqNum) := TRANSFORM
+BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(ClnRawReoIn L, seqNum) := TRANSFORM
 	SELF.DATE_FIRST_SEEN						:= thorlib.wuid()[2..9];
 	SELF.DATE_LAST_SEEN							:= thorlib.wuid()[2..9];
 	SELF.DATE_VENDOR_FIRST_REPORTED := L.ln_filedate;
 	SELF.DATE_VENDOR_LAST_REPORTED	:= L.ln_filedate;
 	SELF.PROCESS_DATE						 := thorlib.wuid()[2..9];
 	SELF.src  									 := mdr.sourceTools.src_BKFS_Reo;
+	ClnAPN											 := IF(LENGTH(TRIM(L.APN)) = 1 and STD.Str.Find(L.APN,'+',1) = 1, STD.Str.FindReplace(L.APN,'+',''),
+																			STD.Str.FindReplace(L.APN,'~',''));
 	SELF.foreclosure_id					 :=	IF(L.APN <> '',
-																		 StringLib.StringFindReplace(TRIM(L.APN,LEFT,RIGHT) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', ''),
-																		 StringLib.StringFindReplace('FC' + INTFORMAT(seqNum, 8, 1) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', '')																
+																		 STD.Str.FindReplace(TRIM(ClnAPN,LEFT,RIGHT) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', ''),
+																		 STD.Str.FindReplace('FC' + INTFORMAT(seqNum, 8, 1) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', '')																
 																		);
 	SELF.fips_cd                 := L.fips_cd;
 	SELF.prop_full_addr          := ut.CleanSpacesAndUpper(L.prop_full_addr);
 	SELF.prop_addr_city          := ut.CleanSpacesAndUpper(L.prop_addr_city);
 	SELF.prop_addr_state         := ut.CleanSpacesAndUpper(L.prop_addr_state);
 	SELF.prop_addr_zip5          := L.prop_addr_zip5;
-	SELF.prop_addr_zip4          := L.prop_addr_zip4;
+	SELF.prop_addr_zip4          := IF(TRIM(L.prop_addr_zip4) = '0','',
+																		IF(TRIM(L.prop_addr_zip4) = 'NULL','',L.prop_addr_zip4));
 	SELF.prop_addr_unit_type     := L.prop_addr_unit_type;	
 	SELF.prop_addr_unit_no       := L.prop_addr_unit_no;
 	SELF.prop_addr_house_no      := L.prop_addr_house_no;
@@ -35,7 +40,7 @@ BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(fIn_Raw_Reo L, seqNum) := TRAN
 	SELF.recording_page_num      := L.recording_page_num;
 	SELF.recording_doc_num       := L.recording_doc_num;
 	SELF.doc_type_cd             := L.doc_type_cd;
-	SELF.APN                     := L.APN;
+	SELF.APN                     := STD.Str.FindReplace(L.APN,'~','');
 	SELF.multi_APN               := L.multi_APN;
 	SELF.partial_interest_trans  := L.partial_interest_trans;
 	SELF.seller1_fname           := ut.CleanSpacesAndUpper(L.seller1_fname);
@@ -50,10 +55,11 @@ BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(fIn_Raw_Reo L, seqNum) := TRAN
 	SELF.buyer2_lname            := ut.CleanSpacesAndUpper(L.buyer2_lname);
 	SELF.buyer_vesting_cd        := L.buyer_vesting_cd;
 	SELF.concurrent_doc_num      := L.concurrent_doc_num;
-	SELF.buyer_mail_city         := L.buyer_mail_city;
+	SELF.buyer_mail_city         := STD.Str.FindReplace(L.buyer_mail_city,'N/A','');
 	SELF.buyer_mail_state        := L.buyer_mail_state;
 	SELF.buyer_mail_zip5         := L.buyer_mail_zip5;
-	SELF.buyer_mail_zip4         := L.buyer_mail_zip4;
+	SELF.buyer_mail_zip4         := IF(TRIM(L.buyer_mail_zip4) = '0','',
+																		IF(TRIM(L.buyer_mail_zip4) = 'NULL','',L.buyer_mail_zip4));
 	SELF.legal_lot_cd            := L.legal_lot_cd;
 	SELF.legal_lot_num           := L.legal_lot_num;
 	SELF.legal_block             := L.legal_block;
@@ -117,7 +123,7 @@ BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(fIn_Raw_Reo L, seqNum) := TRAN
 	SELF := [];
 END;
 
- Reo_Clean_In := project(fIn_Raw_Reo,CleanTrimReo(left,counter));
+ Reo_Clean_In := project(ClnRawReoIn,CleanTrimReo(left,counter));
  
 RETURN Reo_Clean_in;
 

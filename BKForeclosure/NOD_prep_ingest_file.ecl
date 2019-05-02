@@ -1,11 +1,13 @@
-﻿IMPORT BKForeclosure, MDR, ut;
+﻿IMPORT BKForeclosure, MDR, PRTE2, ut, STD;
 
 EXPORT NOD_prep_ingest_file := FUNCTION
 
 	  //Project to base layout for ingest
 fIn_Raw_Nod   := BKForeclosure.File_BK_Foreclosure.Nod_File;
 
-BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(fIn_Raw_Nod L, seqNum) := TRANSFORM
+prte2.CleanFields(fIn_Raw_Nod, ClnRawNodIn); //using PRTE2 clean function as it cleans unprintable characters and uppercases output
+
+BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(ClnRawNodIn L, seqNum) := TRANSFORM
 	SELF.DATE_FIRST_SEEN						:= thorlib.wuid()[2..9];
 	SELF.DATE_LAST_SEEN							:= thorlib.wuid()[2..9];
 	SELF.DATE_VENDOR_FIRST_REPORTED := L.ln_filedate;
@@ -40,7 +42,7 @@ BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(fIn_Raw_Nod L, seqNum) := TRAN
 	SELF.contact_mail_state  := ut.CleanSpacesAndUpper(L.contact_mail_state);
 	SELF.contact_mail_zip5   := ut.CleanSpacesAndUpper(L.contact_mail_zip5);
 	SELF.contact_mail_zip4   := ut.CleanSpacesAndUpper(L.contact_mail_zip4);
-	SELF.contact_telephone   := L.contact_telephone;
+	SELF.contact_telephone   := ut.CleanPhone(L.contact_telephone);
 	SELF.due_date            := ut.CleanSpacesAndUpper(L.due_date);
 	SELF.trustee_fname       := ut.CleanSpacesAndUpper(L.trustee_fname);
 	SELF.trustee_lname       := ut.CleanSpacesAndUpper(L.trustee_lname);
@@ -99,7 +101,7 @@ BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(fIn_Raw_Nod L, seqNum) := TRAN
 	SELF := [];
 END;
 
-Nod_Clean_In := PROJECT(fIn_Raw_Nod,CleanTrimNod(LEFT,COUNTER));
+Nod_Clean_In := PROJECT(ClnRawNodIn,CleanTrimNod(LEFT,COUNTER));
 
 RETURN Nod_Clean_In;
 
