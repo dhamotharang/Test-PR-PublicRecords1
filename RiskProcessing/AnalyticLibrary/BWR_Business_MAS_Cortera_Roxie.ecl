@@ -2,8 +2,8 @@
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 Threads := 1;
 
-// RoxieIP := RiskWise.shortcuts.Dev156;
-roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
+RoxieIP := RiskWise.shortcuts.Dev156;
+// roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
@@ -57,7 +57,7 @@ Output_SALT_Profile := FALSE;
 
 Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
-RecordsToRun := 0;
+RecordsToRun := 100;
 eyeball := 120;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
@@ -104,80 +104,6 @@ prii_layout := RECORD
 	STRING UltID                 ;
 	STRING SIC_Code              ;
 	STRING NAIC_Code             ;
-	STRING Rep2firstname         ;
-	STRING Rep2MiddleName        ;
-	STRING Rep2lastname          ;
-	STRING Rep2NameSuffix        ;
-	STRING Rep2Addr              ;
-	STRING Rep2City              ;
-	STRING Rep2State             ;
-	STRING Rep2Zip               ;
-	STRING Rep2SSN               ;
-	STRING Rep2DOB               ;
-	STRING Rep2Age               ;
-	STRING Rep2DLNumber          ;
-	STRING Rep2DLState           ;
-	STRING Rep2HomePhone         ;
-	STRING Rep2EmailAddress      ;
-	STRING Rep2FormerLastName    ;
-	STRING Rep2LexID             ;
-	STRING Rep3firstname         ;
-	STRING Rep3MiddleName        ;
-	STRING Rep3lastname          ;
-	STRING Rep3NameSuffix        ;
-	STRING Rep3Addr              ;
-	STRING Rep3City              ;
-	STRING Rep3State             ;
-	STRING Rep3Zip               ;
-	STRING Rep3SSN               ;
-	STRING Rep3DOB               ;
-	STRING Rep3Age               ;
-	STRING Rep3DLNumber          ;
-	STRING Rep3DLState           ;
-	STRING Rep3HomePhone         ;
-	STRING Rep3EmailAddress      ;
-	STRING Rep3FormerLastName    ;
-	STRING Rep3LexID             ;
-	STRING Rep4firstname         ;
-	STRING Rep4MiddleName        ;
-	STRING Rep4lastname          ;
-	STRING Rep4NameSuffix        ;
-	STRING Rep4Addr              ;
-	STRING Rep4City              ;
-	STRING Rep4State             ;
-	STRING Rep4Zip               ;
-	STRING Rep4SSN               ;
-	STRING Rep4DOB               ;
-	STRING Rep4Age               ;
-	STRING Rep4DLNumber          ;
-	STRING Rep4DLState           ;
-	STRING Rep4HomePhone         ;
-	STRING Rep4EmailAddress      ;
-	STRING Rep4FormerLastName    ;
-	STRING Rep4LexID             ;
-	STRING Rep5firstname         ;
-	STRING Rep5MiddleName        ;
-	STRING Rep5lastname          ;
-	STRING Rep5NameSuffix        ;
-	STRING Rep5Addr              ;
-	STRING Rep5City              ;
-	STRING Rep5State             ;
-	STRING Rep5Zip               ;
-	STRING Rep5SSN               ;
-	STRING Rep5DOB               ;
-	STRING Rep5Age               ;
-	STRING Rep5DLNumber          ;
-	STRING Rep5DLState           ;
-	STRING Rep5HomePhone         ;
-	STRING Rep5EmailAddress      ;
-	STRING Rep5FormerLastName    ;
-	STRING Rep5LexID             ;
-	STRING ln_project_id         ;
-	STRING pf_fraud              ;
-	STRING pf_bad                ;
-	STRING pf_funded             ;
-	STRING pf_declined           ;
-	STRING pf_approved_not_funded; 
 END;
 inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
@@ -185,7 +111,7 @@ inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
 inDataReady := PROJECT(inDataRecs(AccountNumber != 'AccountNumber'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
 	SELF.ArchiveDate := IF(historyDate = '0', LEFT.ArchiveDate, (STRING)HistoryDate);
 	SELF := LEFT, 
-	// SELF := [] 
+	SELF := [] 
 	));
 inDataReadyDist := DISTRIBUTE(inDataReady, RANDOM());
 // inDataReadyDist := inDataReady;
@@ -301,14 +227,6 @@ OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 LayoutMaster_With_Extras := RECORD
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
 	STRING ErrorCode;
-	STRING ln_project_id;
-	STRING pf_fraud;
-	STRING pf_bad;
-	STRING pf_funded;
-	STRING pf_declined;
-	STRING pf_approved_not_funded; 
-	STRING Perf;
-	STRING Proj;
 END;
 
 Layout_Business := RECORD
