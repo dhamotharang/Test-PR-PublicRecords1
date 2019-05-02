@@ -69,7 +69,7 @@ rec := RECORD
 	//CCPA-97 Add 2 new fields for CCPA
 	unsigned4 global_sid;
 	unsigned8 record_sid;
-  unsigned8 __internal_fpos__;
+  // unsigned8 __internal_fpos__;
  END;
 
 
