@@ -52,14 +52,14 @@ EXPORT fn_build_merged := FUNCTION
 		SELF := [];
 	END;
 	
-	dx_BestRecords.Layout_Watchdog_Merged add_bitmap_permission2(dx_BestRecords.Layout_Watchdog_Merged L, UNSIGNED8 permission) := TRANSFORM
+/*	dx_BestRecords.Layout_Watchdog_Merged add_bitmap_permission2(dx_BestRecords.Layout_Watchdog_Merged L, UNSIGNED8 permission) := TRANSFORM
 		SELF.permissions := permission;
 		self.counts := ROW({SELF.permissions, L.total_records}, recordof(self.counts));
 		
 		SELF := L;
 		SELF := [];
 	END;	
-
+*/
 
 	ds_glb_w_bit                      := PROJECT(ds_glb_proj, add_bitmap_permission(LEFT, Permissions.glb));
 	ds_glb_nonblank_w_bit             := PROJECT(ds_glb_nonblank_proj, add_bitmap_permission(LEFT, Permissions.glb_nonblank));
@@ -71,12 +71,12 @@ EXPORT fn_build_merged := FUNCTION
 	ds_glb_noneq_nonblank_w_bit       := PROJECT(ds_glb_noneq_nonblank_proj, add_bitmap_permission(LEFT, Permissions.glb_noneq_nonblank));
 	ds_glb_nonen_noneq_w_bit          := PROJECT(ds_glb_nonen_noneq_proj, add_bitmap_permission(LEFT, Permissions.glb_nonen_noneq));
 	ds_glb_nonen_noneq_nonblank_w_bit := PROJECT(ds_glb_nonen_noneq_nonblank_proj, add_bitmap_permission(LEFT, Permissions.glb_nonen_noneq_nonblank));
-	ds_nonglb_w_bit                   := PROJECT(ds_nonglb_proj, add_bitmap_permission2(LEFT, Permissions.nonglb));
-	ds_nonglb_nonblank_w_bit          := PROJECT(ds_nonglb_nonblank_proj, add_bitmap_permission2(LEFT, Permissions.nonglb_nonblank));
-	ds_nonglb_noneq_w_bit             := PROJECT(ds_nonglb_noneq_proj, add_bitmap_permission2(LEFT, Permissions.nonglb_noneq));
-	ds_nonglb_noneq_nonblank_w_bit    := PROJECT(ds_nonglb_noneq_nonblank_proj, add_bitmap_permission2(LEFT, Permissions.nonglb_noneq_nonblank));
-	ds_marketing_w_bit    						:= PROJECT(ds_marketing_proj, add_bitmap_permission2(LEFT, Permissions.marketing));
-	ds_marketing_preglb_w_bit    			:= PROJECT(ds_marketing_preglb_proj, add_bitmap_permission2(LEFT, Permissions.marketing_preglb));
+	ds_nonglb_w_bit                   := PROJECT(ds_nonglb_proj, add_bitmap_permission(LEFT, Permissions.nonglb));
+	ds_nonglb_nonblank_w_bit          := PROJECT(ds_nonglb_nonblank_proj, add_bitmap_permission(LEFT, Permissions.nonglb_nonblank));
+	ds_nonglb_noneq_w_bit             := PROJECT(ds_nonglb_noneq_proj, add_bitmap_permission(LEFT, Permissions.nonglb_noneq));
+	ds_nonglb_noneq_nonblank_w_bit    := PROJECT(ds_nonglb_noneq_nonblank_proj, add_bitmap_permission(LEFT, Permissions.nonglb_noneq_nonblank));
+	ds_marketing_w_bit    						:= PROJECT(ds_marketing_proj, add_bitmap_permission(LEFT, Permissions.marketing));
+	ds_marketing_preglb_w_bit    			:= PROJECT(ds_marketing_preglb_proj, add_bitmap_permission(LEFT, Permissions.marketing_preglb));
 
 	// Combine all the datasets together and update the permission level as appropriate.
 	dx_BestRecords.Layout_Watchdog_Merged combine_permission_bits(dx_BestRecords.Layout_Watchdog_Merged L, dx_BestRecords.Layout_Watchdog_Merged R) := TRANSFORM

@@ -1,7 +1,7 @@
 ﻿IMPORT $;
 IMPORT doxie, Data_Services;
 
-rec_key := $.Layout_Watchdog_Merged;
+rec_key := $.layout_watchdog_merged;
 
 string lfn := data_services.data_location.prefix ('Watchdog_Best') +
                 'thor_data400::key::watchdog_' + doxie.Version_SuperKey;
