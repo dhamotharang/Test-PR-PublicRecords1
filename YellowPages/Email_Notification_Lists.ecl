@@ -1,4 +1,4 @@
-import roxiekeybuild, _control,tools;
+﻿import roxiekeybuild, _control,tools;
 
 export Email_Notification_Lists(
 
@@ -7,8 +7,8 @@ export Email_Notification_Lists(
 ) :=
 	tools.mod_Email_Notification_Lists(
 		 _Control.MyInfo.EmailAddressNotify	
-		,_Control.MyInfo.EmailAddressNotify + ';john.freibaum@lexisnexis.com;qualityassurance@seisint.com'	
-		,_Control.MyInfo.EmailAddressNotify + ';john.freibaum@lexisnexis.com'	
-		,_Control.MyInfo.EmailAddressNotify + ';' + roxiekeybuild.Email_Notification_List + ';john.freibaum@lexisnexis.com'		
+		,_Control.MyInfo.EmailAddressNotify + ';kevin.reeder@lexisnexisrisk.com;qualityassurance@seisint.com'	
+		,_Control.MyInfo.EmailAddressNotify + ';kevin.reeder@lexisnexisrisk.com'	
+		,_Control.MyInfo.EmailAddressNotify + ';' + roxiekeybuild.Email_Notification_List + ';kevin.reeder@lexisnexisrisk.com'		
 		,pIsTesting						
 	);

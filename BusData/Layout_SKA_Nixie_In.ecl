@@ -1,38 +1,7 @@
 ﻿IMPORT Address;
 
 export Layout_SKA_Nixie_In := record
-  // string5 PRENAME;
-  string5     TTL;               //Formerly PRENAME
-  string15    FIRST_NAME;
-  string1     MIDDLE;
-  string15    LAST_NAME;
-  // string35		DEPT_TITLE;
-  string35    T1;                //Formerly DEPT_TITLE
-  string3     DEPT_CODE;
-  string31    DEPT_EXPL;
-  string3     SPEC;
-  string31    SPEC_EXPL;
-  string40    DEPT_FILE;
-  // string31    COMPANY_NAME;
-  string31    COMPANY1;          //Formerly COMPANY_NAME
-  string31    ADDRESS1;
-  string17    CITY;
-  string2     STATE;
-  string10    ZIP;
-  string3     AREA_CODE;
-  // string8     PHONE;
-  string8     NUMBER;             //Formerly PHONE
-  string7     ID;
-  string10    PERSID;             //Changed from length of 7
-  string10    NIXIE_DATE;
-
-  Address.Layout_Clean_Name;
-  // string5     title;
-  // string20    fname;
-  // string20    mname;
-  // string20    lname;
-  // string5     name_suffix;
-  // string3     name_score;
+  BusData.layouts_ska.parse_ska_b;
   string10    mail_prim_range;
   string2     mail_predir;
   string28    mail_prim_name;
@@ -60,5 +29,4 @@ export Layout_SKA_Nixie_In := record
   string7     mail_geo_blk;
   string1     mail_geo_match;
   string4     mail_err_stat;
-  // string1     lf;
 end;

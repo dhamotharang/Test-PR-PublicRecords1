@@ -1,4 +1,4 @@
-//Copied from CanadianPhones.layoutCanadianWhitepagesBase
+﻿//Copied from CanadianPhones.layoutCanadianWhitepagesBase
 EXPORT layoutCanadianWhitepagesBase := 
 
  RECORD
@@ -109,4 +109,7 @@ EXPORT layoutCanadianWhitepagesBase :=
 	string20 lname := '';
 	string5  name_suffix := '';
 	string3  name_score := '';
+	//Added for CCPA-90
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 END;

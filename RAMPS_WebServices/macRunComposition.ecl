@@ -9,7 +9,8 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
 	keepEcl = 'FALSE', 									//If you want to keep the HIPIE generated ECL code
 	vizServiceVersion = ut.GetDate, 		//Service version. This is appended at the end of the dashboard generated roxie services and ensures we create a new roxie service. 
 																			//If you want to override a given dashboard service use the same viz service version; otherwise, use a new one.
-	filenames = ''											//Files used to create the dashboard. These need to be URL encoded.
+	filenames = '',											//Files used to create the dashboard. These need to be URL encoded.
+	forceRun = 'FALSE'									//Force to always regenerate the service
 	) := FUNCTIONMACRO
 	
 	LOCAL url := 'https://' + TRIM(dsp) + '.risk.regn.net/ws/wsCompositions/run/json?uuid='+cmpUuid
@@ -18,6 +19,7 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
 		+'&ECL_COMPILE_STRATEGY='+TRIM(eclCompileStrategy)
 		+'&KeepECL='+TRIM(keepEcl)
 		+'&VIZSERVICEVERSION='+TRIM(vizServiceVersion)
+		+'&forcerun='+TRIM(forceRun)
 		+TRIM(filenames);
 
 	LOCAL authString := 'Basic ' + encodedCredentials;
