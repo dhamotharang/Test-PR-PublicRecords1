@@ -39,7 +39,7 @@ SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipBuild;
 Run_ECL := if(SkipJob=false,lECL1, 'output(\'Build Skipped\');\n' );
 _Control.fSubmitNewWorkunit(Run_ECL,ThorName)
 			:WHEN(CRON(EVERY_DAY_AT_1AM))
-			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Boca_Ops
+			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').BocaOps
 																			,'FraudGov Build Base Schedule failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));

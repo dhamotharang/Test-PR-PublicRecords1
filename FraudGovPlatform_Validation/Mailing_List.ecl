@@ -1,22 +1,17 @@
 ﻿import _control;
 EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') := module
 
-	shared Dev_list :=			'Oscar.Barrientos@lexisnexisrisk.com'
+	shared Dev_list :=	'Oscar.Barrientos@lexisnexisrisk.com'
 										+	';Sesha.Nookala@lexisnexisrisk.com'
 										;
 	shared Batch_list	:=	Dev_list
 										+	';roberto.perez@lexisnexisrisk.com'
 										;
 	shared Roxie_list := 	Dev_list
-										+	';Jose.Bello@lexisnexisrisk.com'	
-										+	';Vishesh.Ved@lexisnexisrisk.com'
-										+	';greg.whitaker@lexisnexisrisk.com'
-										+	';Swathi.Ankala@lexisnexisrisk.com'
-										+	';Julie.Carmigniani@lexisnexisrisk.com'
-										+	';Jo.Prichard@lexisnexisrisk.com'
+										+	';riskintelligencenetwork.support@lexisnexisrisk.com'	
 										;
 										
-	shared Boca_Ops	:= 						'SupercomputerOps@lexisnexisrisk.com'
+	shared Boca_Ops	:= 	'SupercomputerOps@lexisnexisrisk.com'
 										+	';'+Dev_list										
 										;
 
