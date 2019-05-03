@@ -1,4 +1,4 @@
-import SANCTN_Mari, standard, AID, BIPV2;
+﻿import SANCTN_Mari, standard, AID, BIPV2;
 
 export layouts_SANCTN_common := MODULE
 
@@ -36,6 +36,12 @@ export SANCTN_incident_base := RECORD
 		UNSIGNED6		DID_SCORE := 0;
 		UNSIGNED6		BDID	:= 0;
 		UNSIGNED6		BDID_SCORE	:= 0;
+	//CCPA-97 Per requirement, all in scope data needs to have a date when the data was collected
+	STRING8 date_vendor_first_reported;
+	STRING8 date_vendor_last_reported;
+	//CCPA-97 Add 2 new fields for CCPA
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 		
 		
 END;
@@ -92,6 +98,13 @@ export SANCTN_party_base := RECORD
 		UNSIGNED6		BDID	:= 0;
 		UNSIGNED6		BDID_SCORE	:= 0;
 		string1	enh_did_src := '';					//Ehanced did source; M for Mari, S for SANCTN, N for SANCTN Non-public
+
+	//CCPA-97 Per requirement, all in scope data needs to have a date when the data was collected
+	STRING8 date_vendor_first_reported;
+	STRING8 date_vendor_last_reported;
+	//CCPA-97 Add 2 new fields for CCPA
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 	
 		
 END;
