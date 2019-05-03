@@ -516,26 +516,12 @@ EXPORT Layouts := MODULE
 		
 		export SkipModules := RECORD
 			//General Processes
-			boolean SkipInputBuild;
-			boolean SkipBaseBuild;
-			boolean SkipMainBuild;
-			boolean SkipBaseRollback;
-			boolean SkipKeysBuild;
-			//Sub-processes
-			boolean SkipNACBuild;
-			boolean SkipInquiryLogsBuild;
-			boolean SkipPiiBuild;		
-			boolean SkipKelBuild;
-			boolean SkipOrbitBuild;
-			boolean SkipDashboardsBuild;
-
+			boolean SkipBuild;
+			boolean SkipContributions;
+			boolean SkipNAC;
+			boolean SkipInquiryLogs;
 			boolean SkipMBS;
 			boolean SkipDeltabase;
-			boolean SkipScrubs;
-			boolean SkipRefreshHeader;
-			boolean SkipRefreshAddresses;
-			boolean SkipGarbageCollector;
-
 		END;
 
 		export SkipValidationByGCID	 := RECORD

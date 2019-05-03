@@ -2,15 +2,15 @@
 EXPORT Layout_BK := MODULE
   EXPORT Delete_Nod  := RECORD
 	STRING5    fips_cd;
-	STRING20   Pid;
-	STRING15   NOD_Source;
+	STRING10	 Pid;
+	STRING1	   NOD_Source;
 	STRING6    Delete_Flag := '';
 	STRING8    ln_filedate;
 	END;
 	
 	EXPORT Delete_Reo  := RECORD
 	STRING5    fips_cd;
-	STRING20   Pid;
+	STRING10   Pid;
 	STRING6    Delete_Flag := '';
 	STRING8    ln_filedate;
 	END;
@@ -460,10 +460,10 @@ END;
 
 //Added to translate codes for both NOD and REO
 EXPORT CodeTable := RECORD
-	STRING2		src;
-	STRING20	field_name;
-	STRING5		code;
-	STRING55	code_desc;
+	STRING		src;
+	STRING		field_name;
+	STRING		code;
+	STRING		code_desc;
 END;
 
 //Flattened layout for Ingest process

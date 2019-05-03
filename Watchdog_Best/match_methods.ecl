@@ -206,6 +206,11 @@ EXPORT match_persistent_record_id(TYPEOF(h.persistent_record_id) L, TYPEOF(h.per
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
+EXPORT match_lastname(TYPEOF(h.lastname) L,TYPEOF(h.lastname) R, BOOLEAN RequiredField = FALSE) :=  IF(~RequiredField,
+    MAP(L = R => SALT311.MatchCode.ExactMatch,
+      SALT311.MatchCode.NoMatch),
+        MAP(L = R => SALT311.MatchCode.ExactMatch,SALT311.MatchCode.NoMatch)
+);
 EXPORT match_ssnum(TYPEOF(h.ssnum) L,TYPEOF(h.ssnum) R, BOOLEAN RequiredField = FALSE) :=  IF(~RequiredField,
     MAP(L = R => SALT311.MatchCode.ExactMatch,
       SALT311.MatchCode.NoMatch),

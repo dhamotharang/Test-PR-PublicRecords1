@@ -10,8 +10,6 @@ SKIP((C = 1 AND (L.SIC8_1 = '' OR L.SIC8_Desc_1[1..2] = '**')) OR
      (C = 3 AND (L.SIC8_3 = '' OR L.SIC8_Desc_3[1..2] = '**')) OR
      (C = 4 AND (L.SIC8_4 = '' OR L.SIC8_Desc_4[1..2] = '**')))
 
-	SELF.bdid 										:=	L.bdid;
-	SELF.bdid_score								:=	L.bdid_score;
 	SELF.source       						:=	MDR.sourcetools.src_DataBridge;
 	SELF.source_docid  						:=	'';
 	SELF.source_rec_id            :=  L.record_sid;
