@@ -30,7 +30,7 @@ module
 			))): success(FraudGovPlatform.Send_Emails(version).Roxie), failure(FraudGovPlatform.Send_Emails(version).BuildFailure);
 
 	export All :=
-	if(tools.fun_IsValidVersion(pversion),
+	if(tools.fun_IsValidVersion(version),
 		 build_all
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All'));	
 end;	
