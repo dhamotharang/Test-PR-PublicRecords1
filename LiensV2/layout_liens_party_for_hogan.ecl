@@ -38,6 +38,7 @@ string8  date_vendor_last_reported := '';
 unsigned8 persistent_record_id := 0 ; 
 string50 TMSID_old;
 string50 RMSID_old;
+//DF-24061 VC
 unsigned4 global_sid;
 unsigned8 record_sid; 
 
