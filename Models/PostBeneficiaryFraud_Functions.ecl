@@ -5,17 +5,17 @@ Changed scoring queries to use Bankruptcy V3 per Bug: 179687
 IMPORT Advo, AutoStandardI, BankruptcyV3, Batchservices, Corp2,
        Didville, doxie, doxie_files, Doxie_Raw, DriversV2,
        faa, LiensV2, NID, PAW, Prof_LicenseV2, Risk_Indicators, RiskWise, UCCV2, ut,
-			 VehicleV2_Services, Watercraft,header, BatchShare, SexOffender_Services, DeathV2_Services, Models;
+			 VehicleV2_Services, Watercraft,header, BatchShare, SexOffender_Services, DeathV2_Services, Models, STD;
 
   R_I := Risk_Indicators;
   PBF_Layout := Models.Layout_PostBeneficiaryFraud;
-  UCase := StringLib.StringToUpperCase;
+  UCase := STD.Str.ToUpperCase;
 
 EXPORT PostBeneficiaryFraud_Functions := MODULE
 	
 	// -------------[ Shared scalar values and functions ]--------------
 	SHARED STRING CURRENT          := 'C';
-	SHARED STRING8 todays_date_full := StringLib.GetDateYYYYMMDD();	
+	SHARED STRING8 todays_date_full := (string8)STD.Date.Today();	
 	SHARED STRING6 todays_date      := todays_date_full[1..6];
 	SHARED SET OF UNSIGNED3 datesConsideredCurrent := [0, 999999, (UNSIGNED3)todays_date];
 	
@@ -1255,8 +1255,8 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 		// (i.e. the archive date) falls anywhere during the time of incarceration.
 		layout_incarc_temp get_offenses(layout_incarc_temp l, layout_offensesKey r) := transform
 			// Parse incarceration or sentencing information out ofstc_desc fields
-			posBeg := stringlib.stringfind(r.stc_desc_2, 'Date:', 1);  // format is 'Sent Start Date: yyyymmdd Sent End Date: yyyymmdd'
-			posEnd := stringlib.stringfind(r.stc_desc_2, 'Date:', 2);
+			posBeg := STD.Str.Find(r.stc_desc_2, 'Date:', 1);  // format is 'Sent Start Date: yyyymmdd Sent End Date: yyyymmdd'
+			posEnd := STD.Str.Find(r.stc_desc_2, 'Date:', 2);
 			
 			beg_dt	:= if(posBeg <> 0, r.stc_desc_2[posBeg+6..posBeg+11], '');  // position at start date and grab yyyymm
 			end_dt	:= if(posEnd <> 0, r.stc_desc_2[posEnd+6..posEnd+11], '');  // position at end date and grab yyyymm

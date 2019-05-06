@@ -54,7 +54,7 @@
 </table>
 */
 
-import address, autokey_batch, doxie, DidVille, ut, risk_indicators, AutoStandardI, Royalty, VehicleV2_Services;
+import address, doxie, AutoStandardI, Royalty, VehicleV2_Services;
 
 export RealTime_Batch_Service_V2 := macro
  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
