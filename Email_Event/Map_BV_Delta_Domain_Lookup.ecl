@@ -5,13 +5,13 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 	superfile_name		:= '~thor_data400::in::email_dataV2::BV_delta_domain_lkp';
 	subfile_name      := '~thor_data400::in::email_dataV2::BV_delta_domain_lkp::' + version; 
 
-	// input file Bright Verify Delta
+	// Input file Bright Verify Delta
 	ds_delta_in := Email_Event.Files.BV_delta_raw;
 	
 	fmtsin	:= ['%Y-%m-%d'];
 	fmtout	:= '%Y%m%d';
 
-	// BV Delta to domain lookup
+	// Transform BV Delta to domain lookup layout
 	dx_email.Layouts.i_Domain_lkp Xform_Delta(Email_Event.Layouts.BV_Delta_raw L) := TRANSFORM
 	  SELF.domain_name := email_data.Fn_Clean_Email_Domain(ut.CleanSpacesAndUpper(L.email_address));
 	  SELF.create_date := '';
@@ -29,7 +29,7 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
                             email_status = 'INVALID' and sec_status = 'EMAIL_ACCOUNT_INVALID' => 'VALID',
 														// email_status = 'INVALID' and sec_status = 'DISPOSABLE' => 'VALID',
 														// email_status = 'INVALID' and sec_status = 'ROLE_ADDRESS' => 'VALID',
-														'UNKNOWN');//Look at the BV 
+														'UNKNOWN'); 
 	  SELF.domain_status := tmpDomain_status;
 	  SELF.verifies_account := IF(email_status = 'ACCEPT_ALL','FALSE', '');
 	  SELF.process_date  := thorlib.wuid()[2..9];
@@ -39,7 +39,7 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 	
 	pBV_delta_out	:= PROJECT(ds_delta_in, Xform_Delta(LEFT));	
 	
-
+  // Adding to Superfile
 	d_final := OUTPUT(pBV_delta_out,,'~thor_data400::in::email_dataV2::BV_delta_domain_lkp::' + version,__COMPRESSED__,OVERWRITE);
 
   Add_superfile := SEQUENTIAL(FileServices.StartSuperFileTransaction();
@@ -48,7 +48,6 @@ EXPORT Map_BV_Delta_Domain_Lookup(STRING version) := FUNCTION
 															 FileServices.AddSuperFile(superfile_name, subfile_name);
 															 FileServices.FinishSuperFileTransaction());
 	
-	return  sequential(d_final,Add_superfile);
-	// */
-	// return pBV_delta_out;
+	RETURN  SEQUENTIAL(d_final,Add_superfile);
+
 END;

@@ -19,5 +19,5 @@ INLINE MODULE
 	//  Group to spray
 	EXPORT GroupName  :=  IF(	Tools._Constants.IsDataland,
 																									'thor400_dev01',
-																									'thor44');
+																									'thor400_36');
 END;

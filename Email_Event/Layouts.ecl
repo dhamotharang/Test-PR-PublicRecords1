@@ -22,23 +22,5 @@ EXPORT BV_Delta_raw	:= RECORD
 	STRING100	extra2;
 	STRING10	date_added;
 END;
-/*
-EXPORT Domain_lkp := RECORD
-	STRING100	domain_name;
-	STRING8	  create_date;
-	STRING8	  expire_date;
-	STRING8	  date_first_seen;
-	STRING8	  date_last_seen;
-	STRING8	  date_first_verified;
-	STRING8	  date_last_verified;
-	// STRING	domain_type;		//MILITARY, EDU, GOVT, FREE, ect.
-	STRING50	domain_status;
-	STRING10	verifies_account := true;
-	STRING8   process_date;
-	UNSIGNED  email_rec_key;
-	// STRING	ip_address;
-	// STRING	ip_location;
-	// STRING	domain_ASN;		//Autonomous System Number
-END;
-*/
+
 END;
