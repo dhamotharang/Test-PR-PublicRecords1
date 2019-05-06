@@ -8,7 +8,7 @@ EXPORT config_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask 
 
 
 /*  Roxie Super key name vs Monitoring Superkey name. More categories and their superfiles 
-     that this function should update can be added in this dataset. If there is a file that 
+     that fn_UpdateSuperFiles function should update can be added in this dataset. If there is a file that 
      is used by multiple products,just add all their product masks. 
      Example : AccountMonitoring.types.productMask.abc + 
                AccountMonitoring.types.productMask.xyz          

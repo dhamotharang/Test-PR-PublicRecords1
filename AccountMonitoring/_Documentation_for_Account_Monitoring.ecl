@@ -18,6 +18,7 @@
 	AccountMonitoring.product_files
 	AccountMonitoring.Get_Dataset_Versions
 	AccountMonitoring.fn_generate_ecm_metrics 
+  AccountMonitoring.fn_UpdateSuperFiles
 	
 	********** Raison d'etre **********
 	
