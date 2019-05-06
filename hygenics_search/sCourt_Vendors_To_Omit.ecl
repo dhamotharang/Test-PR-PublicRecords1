@@ -5,7 +5,6 @@
 //// Sources older than 180
 '10A', // OHIO_VINTON_COUNTY_COMMON_PLEAS_COURT                                                               
 '10D', // UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY                                                           
-'10H', // TEXAS_WISE_COUNTY_DISTRICT_COURT                                                                    
 '3A', // SOUTH_CAROLINA_DILLON_COUNTY_CIRCUIT_COURTS                                                         
 '3B', // SOUTH_CAROLINA_DILLON_COUNTY_SUMMARY_COURTS                                                         
 '3P', // SOUTH_CAROLINA_EDGEFIELD_COUNTY_CIRCUIT_COURTS                                                      
@@ -75,7 +74,6 @@
 '7O', // TEXAS_LAMAR_COUNTY_JUSTICE_OF_THE_PEACE_COURTS                                                      
 '7R', // FLORIDA_PASCO_COUNTY                                                                                
 '7S', // FLORIDA_PASCO_COUNTY_TRAFFIC                                                                        
-'7U', // DISTRICT_OF_COLUMBIA_SUPERIOR_COURT                                                                 
 '7W', // FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT                                                                
 '7X', // FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS                                                           
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
@@ -89,7 +87,6 @@
 '9A', // OHIO_TRUMBULL_COUNTY_WARREN_MUNICIPAL_COURT                                                         
 '9C', // OHIO_GEAUGA_COUNTY_COMMON_PLEAS_COURT                                                               
 '9G', // OHIO_LAWRENCE_COUNTY_COMMON_PLEAS_COURT                                                             
-'9J', // OHIO_MEDINA_COUNTY_WADSWORTH_MUNICIPAL_COURT                                                        
 '9P', // OHIO_SCIOTO_COUNTY_PORTSMOUTH_MUNICIPAL_COURT                                                       
 '9R', // OHIO_STARK_COUNTY_MASSILLON_MUNICIPAL_COURT                                                         
 '9T', // OHIO_OTTAWA_COUNTY_COMMON_PLEAS_COURT                                                               
@@ -308,7 +305,6 @@
 'OI', // OHIO_COLUMBIANA_COUNTY                                                                              
 'OM', // OHIO_ALLEN_COUNTY                                                                                   
 'ON', // OHIO_PORTAGE_COUNTY                                                                                 
-'OO', // OHIO_LICKING_COUNTY                                                                                 
 'OP', // OHIO_GREENE_COUNTY_XENIA_MUNICIPAL_COURT                                                            
 'OQ', // OHIO_CLERMONT_COUNTY                                                                                
 'OS', // OHIO_ROSS_COUNTY                                                                                    
@@ -394,7 +390,6 @@
 'UY', // MICHIGAN_MACOMB_COUNTY                                                                              
 'UZ', // MICHIGAN_OAKLAND_COUNTY                                                                             
 'VB', // VIRGINIA_ADMINISTRATOR_OF_THE_COURTS                                                                
-'VC', // MICHIGAN_SAGINAW_COUNTY                                                                             
 'VF', // NEVADA_CLARK_COUNTY_JUSTICE_COURTS                                                                  
 'VG', // NEW_MEXICO_BERNALILLO_COUNTY                                                                        
 'VI', // OHIO_ASHLAND_COUNTY                                                                                 
@@ -453,6 +448,7 @@
 'ZW', // SOUTH_CAROLINA_COLLETON_COUNTY_CIRCUIT_COURTS                                                       
 'ZX', // SOUTH_CAROLINA_COLLETON_COUNTY_SUMMARY_COURTS                                                       
 'ZY', // SOUTH_CAROLINA_DARLINGTON_COUNTY_CIRCUIT_COURTS                                                     
+'ZZ', // SOUTH_CAROLINA_DARLINGTON_COUNTY_SUMMARY_COURTS                                                     
 
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
