@@ -40,10 +40,6 @@ EXPORT WorkPlace_BatchService(useCannedRecs = 'false') := MACRO
 	OUTPUT(result, NAMED('Results'));	
 	OUTPUT(royalties, NAMED('RoyaltySet'));
 	
-  bd := false : STORED ('useOnlyBestDID');
-	OUTPUT(bd, NAMED('use_best_did'));
-
-	
 ENDMACRO;
 
 /* For testing on a roxie box:
