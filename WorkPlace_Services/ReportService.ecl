@@ -50,14 +50,14 @@ export ReportService := macro
   #stored ('UniqueID', report_by.UniqueID);
 
   // *** Start of processing
-	tempmod := module(project(AutoStandardI.GlobalModule(),WorkPlace_Services.ReportService_Records.params,opt));
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	tempmod := module(project(mod_access,WorkPlace_Services.ReportService_Records.params,opt));
 	  // NOTE: UniqueID is the xml input name, but it is really a did 
 		// so it is stored into the standard global "did" name. 
 	  export string12 unique_id  := ''    : stored('UniqueID');
     export boolean include_sos := false : stored('IncludeSecretaryOfStateInfo');
 		export boolean is_spouse   := false : stored('IsSpouse');	// defaults to OFF
 	  export string  excluded_sources := '' : stored('ExcludedSources'); 
-		export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 	end;
 
 	ds_temp_results  := WorkPlace_Services.ReportService_Records.val(tempmod);
@@ -83,10 +83,6 @@ export ReportService := macro
 	
 	// royalties:= temp_royalties + email_royalties;
 	
-  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ())) 
-    EXPORT unsigned1 glb := tempmod.GLBPurpose;
-    EXPORT string32 application_type := tempmod.applicationtype;
-  END;
   IF (exists(ds_temp_results), doxie.compliance.logSoldToTransaction(mod_access)); 
   
 

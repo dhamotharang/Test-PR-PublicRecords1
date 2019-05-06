@@ -37,7 +37,7 @@
 EXPORT WeAlsoFoundService := MACRO
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   import doxie;
-  #CONSTANT('BestOnly', true);
+  #CONSTANT('useonlybestdid', true);
 
   dids := doxie.Get_Dids ();
   boolean Err := count (dids) > 1;
