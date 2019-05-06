@@ -14,8 +14,7 @@ dlog(string bld_cmp_nm):=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,
 sf_name := '~thor_data400::out::header_post_move_status';
 update_status(unsigned2 new_status) := Header.LogBuildStatus(sf_name,build_version,new_status).Write;
 
-path := '/data/data_lib_2_hus2/efx_hdrs/logs/';
-postMove:= STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, path + 'done/go.txt', path + 'ready/go.txt');
+postMove:= STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, _Constant.QH_path_done + _Constant.QH_filename, _Constant.QH_path_ready + _Constant.QH_filename);
 
 step1:=Header.proc_postHeaderBuilds(build_version).finalize;
 step2:=Header.proc_postHeaderBuilds(build_version).FCRAheader;

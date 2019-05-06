@@ -17,8 +17,7 @@ build_version:= header.version_build;
 dops_datasetname:='PersonHeaderKeys';
 build_component:='KEY BUILD:nFCRA';
 
-path := '/data/data_lib_2_hus2/efx_hdrs/logs/';
-preMove:= STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, path + 'ready/go.txt', path + 'done/go.txt');
+preMove:= STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, _Constant.QH_path_ready + _Constant.QH_filename, _Constant.QH_path_done + _Constant.QH_filename);
 
 dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
 sequential(
