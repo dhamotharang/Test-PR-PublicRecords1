@@ -25,7 +25,7 @@
 					 */
 
 export LocationSearchService := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 
 doxie.MAC_Header_Field_Declare();
 
