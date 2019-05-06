@@ -36,6 +36,9 @@ EXPORT Proc_FirstData_buildall(
 		BuildLogger.BaseStart(False),
 		FirstData.Build_BaseFile(pversion).ALL,
 		BuildLogger.BaseEnd(False),
+		BuildLogger.KeyStart(false),
+		FirstData.proc_build_keys(pVersion),
+		BuildLogger.KeyEnd(false),
 		BuildLogger.PostStart(False),
 		FirstData.QA_Records(),
 		// FirstData.Strata_Population_Stats(pversion,pIsTesting).All,
@@ -56,7 +59,6 @@ EXPORT Proc_FirstData_buildall(
 			RoxieKeyBuild.Email_Notification_List + ';' + pContacts
 		).BuildFailure
 	);
-
 	EXPORT All :=
 	IF(VersionControl.IsValidVersion(pversion)
 		,full_build
