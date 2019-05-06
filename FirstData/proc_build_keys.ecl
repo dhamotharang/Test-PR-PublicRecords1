@@ -2,11 +2,10 @@
 EXPORT proc_build_keys (STRING	pVersion):=function
 
 	prefix := '~thor_data400::key::FirstData::FCRA::' + pVersion + '::';
-	loadfile:=DATASET('~thor_data400::base::FirstData::qa::firstdata'
-																					,firstdata.layout.base,THOR,__compressed__,OPT);
+	
 	name_did := prefix + 'did';
 
-	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_DID_FCRA,loadfile(trim(lex_id,left,right)<>''),dx_FirstData.names('').i_did_FCRA,name_did,fcra_first_data_key);
+	RoxieKeybuild.MAC_build_logical(dx_FirstData.key_DID_FCRA,FirstData.data_key_did_fcra(trim(lex_id,left,right)<>''),dx_FirstData.names('').i_did_FCRA,name_did,fcra_first_data_key);
 	
 	RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_FirstData.names('').i_did_FCRA,name_did,ma_fcra_first_data_key);
 	
