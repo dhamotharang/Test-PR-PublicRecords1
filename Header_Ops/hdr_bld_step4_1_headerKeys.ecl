@@ -1,4 +1,4 @@
-﻿import ut,header,dops;
+﻿import ut,header,dops,_control,std;
 
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
@@ -17,8 +17,14 @@ build_version:= header.version_build;
 dops_datasetname:='PersonHeaderKeys';
 build_component:='KEY BUILD:nFCRA';
 
+path := '/data/data_lib_2_hus2/efx_hdrs/logs/';
+preMove:= STD.File.MoveExternalFile(_control.IPAddress.bctlpedata10, path + 'ready/go.txt', path + 'done/go.txt');
+
 dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
-sequential(dlog,Header.proc_postHeaderBuilds().headerKeys);
+sequential(
+    dlog,
+    Header.proc_postHeaderBuilds().headerKeys,
+    preMove);
 
 //  Builds file_header_building and all header keys including
 // Relatives and XADL1.  It moves all except source keys to _QA
