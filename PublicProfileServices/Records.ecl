@@ -94,8 +94,11 @@ EXPORT Records := MODULE
 		RETURN dedupDids;
 	END;
 
-	EXPORT PersonSummary(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
-
+	EXPORT PersonSummary(PublicProfileServices.IParam.searchParams rptByMod_new) := FUNCTION
+		//create a module compatible with the old person-report
+		rptByMod := MODULE (PersonReports.input._report)
+			PersonReports.input.mac_copy_report_fields(rptByMod_new);
+		END;
 		getID(iesp.sexualoffender.t_SexOffRecordIdNumbers recID) := FUNCTION
 			ID := MAP(TRIM(recID.OffenderId)!='' => recID.OffenderId,
 								TRIM(recID.DocNumber)!='' => recID.DocNumber,
@@ -109,8 +112,8 @@ EXPORT Records := MODULE
 		
 		// ONLY DID USED FROM GLOBAL MODULE
 		glbMod := AutoStandardI.GlobalModule();
-		dids := IF(rptByMod.UniqueID='',PublicProfileServices.Functions.FetchI_Hdr_Indv_do(rptByMod),
-			DATASET([{(UNSIGNED6)rptByMod.UniqueID}],doxie.layout_references));
+		dids := IF(rptByMod_new.UniqueID='',PublicProfileServices.Functions.FetchI_Hdr_Indv_do(rptByMod_new),
+			DATASET([{(UNSIGNED6)rptByMod_new.UniqueID}],doxie.layout_references));
 
 		atfMod := MODULE(PROJECT(glbMod,ATF_Services.IParam.search_params,opt))
 			EXPORT STRING14 did := (STRING)dids[1].did;
@@ -135,7 +138,7 @@ EXPORT Records := MODULE
 			EXPORT STRING14 did := (STRING)dids[1].did;
 		END;
 		accidents_mode := MODULE (project (glbMod, PersonReports.input.accidents, opt)) //?
-			EXPORT boolean mask_dl := rptByMod.mask_dl;
+			EXPORT boolean mask_dl := rptByMod_new.dl_mask = 1;
 		END;
 		sexoffenses_mode := MODULE (project (rptByMod, PersonReports.input.sexoffenses)) END;
 	

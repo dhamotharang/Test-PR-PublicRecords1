@@ -23,14 +23,8 @@ MACRO
   // Standardize input
   BatchShare.MAC_ProcessInput(ds_batchIn, ds_batchInProcessed);
 
-  // get global access module
-  gm := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
-  
-  // and batch params
-  batchParams := MODULE(BusinessBatch_BIP.iParam.getBatchParams())
-    // utilize intended_use flag 1 (used for marketing restriction) to determine marketing mode
-    EXPORT ExcludeMarketing := (gm.intended_use & 1) = 1;
-  END;
+  // get batch params
+  batchParams := BusinessBatch_BIP.iParam.getBatchParams();
   
   ds_batchResults := BusinessBatch_BIP.Records(ds_batchInProcessed, batchParams);
   

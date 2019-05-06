@@ -5,7 +5,7 @@ IMPORT Risk_Indicators, riskprocessing, RiskWise, data_services, _control, gatew
 
 unsigned record_limit :=   0;    //number of records to read from input file; 0 means ALL
 // unsigned record_limit :=   10;    //number of records to read from input file; 0 means ALL
-unsigned1 parallel_calls := 3;  //number of parallel soap calls to make [1..30]
+unsigned1 parallel_calls := 2;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
 boolean RemoveFares := false;	// change this to TRUE for FARES filtering
 boolean LeadIntegrityMode := false;  // change this to TRUE for LeadIntegrity modeling
@@ -16,7 +16,7 @@ string DataRestrictionMask := '101000000000000000000000000'; //No Fares or Exper
 // string DataPermissionMask  := '0000000001101';	// 10 is SSA, 11 is FDN test fraud/contributory fraud, 13 is Insurance DL
 string DataPermissionMask  := '100000000000000000000';	//  Matching with the PhoneShell Permissions
 string IntendedPurpose := '';  // leave blank in nonfcra
-unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
+unsigned3 LastSeenThreshold := 365;	//Phoneshell uses default of 365.  # of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all)
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
 boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
@@ -29,7 +29,8 @@ infile_name := '~scoringqa::in::shell_2_0_testfile_may_july_2018_input.csv';
 
 // outfile_name := '~Scoring::out::phoneshell_project_bocashell_54_nonFCRA_May_July_NoRestrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();          //Run with No Restrictions
 // outfile_name := '~Scoring::out::phoneshell_project_bocashell_54_nonFCRA_May_July_Restrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();           //Run with Restrictions
-outfile_name := '~Scoring::out::phoneshell_project_bocashell_54_nonFCRA_May_July_Restrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();           //Run with Restrictions
+// outfile_name := '~Scoring::out::phoneshell_project_bocashell_54_nonFCRA_May_July_Restrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();           //Run with Restrictions
+outfile_name := '~ScoringQA::out::phoneshell_project_bocashell_54_nonFCRA_May_July_PSMatch_' + thorlib.wuid();           //Run with Restrictions
 // outfile_name := '~bbraaten_test_phoneshell';
 
 
@@ -55,13 +56,13 @@ END;
 //=============  Service settings ====================
 //====================================================
 // Regular BocaShell service
-// bs_service := 'risk_indicators.boca_shell.5';
-bs_service := 'risk_indicators.boca_shell';
+bs_service := 'risk_indicators.boca_shell.58';
+// bs_service := 'risk_indicators.boca_shell';
 // roxieIP := RiskWise.Shortcuts.dev194;
 // roxieIP := RiskWise.Shortcuts.QA_neutral_roxieIP; 
 // roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
-// roxieIP := RiskWise.Shortcuts.Dev156; 
-RoxieIP := Riskwise.shortcuts.core_97_roxieIP; // Core Roxie
+roxieIP := RiskWise.Shortcuts.Dev156; 
+// RoxieIP := Riskwise.shortcuts.core_97_roxieIP; // Core Roxie
 
 
 //====================================================
@@ -121,7 +122,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
   SELF.datapermissionmask := datapermissionmask;
   // SELF.RemoveFares := RemoveFares;                 //Removing so it sets to default and guarantees it matches Phoneshell
   // SELF.LeadIntegrityMode := LeadIntegrityMode;     //Removing so it sets to default and guarantees it matches Phoneshell
-  // SELF.LastSeenThreshold := LastSeenThreshold;     //Removing so it sets to default and guarantees it matches Phoneshell
+  SELF.LastSeenThreshold := LastSeenThreshold;     
 	self.bsversion := 54;	
 	// if you are running realtime mode with today's date and you need realtime inquiries turn on deltabase searching
 	// self.gateways := project(riskwise.shortcuts.gw_delta_dev, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev deltabase
@@ -131,7 +132,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 END;
 p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
 // output(choosen(p_f,eyeball), named('BSInput'));
-OUTPUT(p_f,, '~ScoringQA::out::BSINputSample' + '_thor_copy', thor, OVERWRITE);
+OUTPUT(p_f,, outfile_name + '_BSInputSample', thor, OVERWRITE);
 								
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
@@ -148,7 +149,7 @@ res_err := res (errorcode<>'');
 // OUTPUT (choosen(res_err, eyeball), NAMED ('res_err'));
 // output(count(res_err), named('error_count'));
 
-// OUTPUT (res, , outfile_name, __compressed__);
+OUTPUT (res, , outfile_name, __compressed__);
 
 // the conversion portion-----------------------------------------------------------------------
 
@@ -159,5 +160,5 @@ isFCRA := false;
 edina := Risk_Indicators.ToEdina_54(f, isFCRA, DataRestrictionMask, IntendedPurpose);
 OUTPUT(edina,, outfile_name + 'ModelingLayout'+ '_thor_copy', thor, OVERWRITE);
 
-OUTPUT(CHOOSEN(edina,eyeball), NAMED('edina'));
+// OUTPUT(CHOOSEN(edina,eyeball), NAMED('edina'));
 OUTPUT(edina,, outfile_name+'_edina_v54',CSV(HEADING(single), QUOTE('"'))); // Write to disk.
