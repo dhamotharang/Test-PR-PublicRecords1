@@ -343,7 +343,7 @@ sorted_offense := sort(distribute(fcra_v1_as_v3,HASH(offender_key,  vendor,  sou
 									        StringLib.StringFilter(StringLib.StringToUpperCase(court_dt),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 									        StringLib.StringFilter(StringLib.StringToUpperCase(court_county),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),		
 													/*arr_off_lev_mapped,  court_off_lev_mapped,  fcra_offense_key,*/ fcra_conviction_flag,   fcra_date,  fcra_date_type,conviction_override_date,  conviction_override_date_type, offense_score, //offense_category, 
-									        offense_persistent_id, off_comp,-process_date,-offense_category,-fcra_traffic_flag,	local);
+									        offense_persistent_id, off_comp,-process_date,-offense_category,-fcra_traffic_flag,	local) :persist('~thor_400::persist::Crim_records_sorted_offense');
 deduped_offenses := dedup(sorted_offense,
                           offender_key,  vendor,  state_origin,  source_file,  data_type, trim(off_date),  trim(arr_date),  
 									        StringLib.StringFilter(StringLib.StringToUpperCase(num_of_counts),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
@@ -402,12 +402,15 @@ deduped_offenses := dedup(sorted_offense,
 													StringLib.StringFilter(StringLib.StringToUpperCase(addl_sent_dates),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 									        StringLib.StringFilter(StringLib.StringToUpperCase(probation_desc2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
 									        StringLib.StringFilter(StringLib.StringToUpperCase(court_dt),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-									        StringLib.StringFilter(StringLib.StringToUpperCase(court_county),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
-													/*arr_off_lev_mapped,  court_off_lev_mapped,  fcra_offense_key,*/ fcra_conviction_flag, /*fcra_traffic_flag,*/  fcra_date,  fcra_date_type,conviction_override_date,  conviction_override_date_type, offense_score,offense_category, 
-									        offense_persistent_id,	local);    
+									        //StringLib.StringFilter(StringLib.StringToUpperCase(court_county),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),	
+													/*arr_off_lev_mapped,  court_off_lev_mapped,  fcra_offense_key,*/ /*fcra_conviction_flag,*/ /*fcra_traffic_flag,*/  fcra_date,  fcra_date_type,conviction_override_date,  conviction_override_date_type, offense_score,offense_category, 
+									        offense_persistent_id,	local) :persist('~thor_400::persist::Crim_records_deduped_offenses');    
 /***************************************end*******************************************************/										
+  
+	deduped_offensesPID := dedup(sort(distribute(deduped_offenses,HASH(offense_persistent_id)),offense_persistent_id,local),offense_persistent_id,local);
+  
 
-	PromoteSupers.MAC_SF_BuildProcess(deduped_offenses,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true)
+	PromoteSupers.MAC_SF_BuildProcess(deduped_offensesPID,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true)
 			 
 export Out_Offenses := aout;	
 							
