@@ -1,5 +1,6 @@
 ﻿EXPORT AC_automated_file(unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO
 
+
 IMPORT STD;
 
 projected_input_file:= project(inut_file_records,transform(recordof(inut_file_records),
