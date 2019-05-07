@@ -34,5 +34,7 @@ EXPORT GenerateDashboards(
 */
 	dRunCustDashboard					:= FraudGovPlatform_Analytics.fnRunCustomerDashboard(runProd, useProdData, newVersion);
 	dRunClusDetailsDashboard	:= FraudGovPlatform_Analytics.fnRunClusterDetailsDashboard(runProd, useProdData, newVersion);
-	RETURN SEQUENTIAL(dRunCustDashboard, dRunClusDetailsDashboard);
+	RunCustDashboard 					:= OUTPUT(dRunCustDashboard);
+	RunClusDetailsDashboard 	:= OUTPUT(dRunClusDetailsDashboard);
+	RETURN SEQUENTIAL(RunCustDashboard, RunClusDetailsDashboard);
 END;
