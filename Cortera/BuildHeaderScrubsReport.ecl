@@ -23,8 +23,8 @@ EXPORT BuildHeaderScrubsReport(DATASET(cortera.Layout_Header) F, string version)
 				EyeballSomeErrors,
 				SomeErrorValues,
 				OrbitReport,
-				//submitStats,
-				GenerateAlertCSVTemplate
+				submitStats
+				//GenerateAlertCSVTemplate
 		);
 
 END;

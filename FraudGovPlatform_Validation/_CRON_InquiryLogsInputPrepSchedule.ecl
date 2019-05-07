@@ -1,10 +1,12 @@
-﻿import _Control;
+﻿import FraudGovPlatform,_Control;
 
-EVERY_DAY_AT_6AM := '0 11 * * *';
+EVERY_DAY_AT_10AM := '0 14 * * *';
+
 ThorName	:=		IF(_control.ThisEnvironment.Name		<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
 lECL1 :=
- 'import ut;\n'
+ 'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
+ +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov InquiryLogs Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
@@ -22,11 +24,15 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInquiryLogs(version))\n'
++'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInquiryLogs(version)\n'
++'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'InquiryLogs\', Scrubs_FraudGov.InquiryLogs_In_InquiryLogs, FraudGovPlatform_Validation.Mailing_List().Alert))\n'
 +'	);\n'
 ;
 
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov InquiryLogs Input Prep Schedule');
 
-_Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_6AM));
+SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipInquiryLogs;
+Run_ECL := if(SkipJob=false,lECL1, 'output(\'Spray InquiryLogs Skipped\');\n' );
+
+_Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_10AM));

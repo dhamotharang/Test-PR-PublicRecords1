@@ -13,15 +13,8 @@ FUNCTION
 	
 	IdentityData MapIDDT(Sprayed_InquiryLogs L) := TRANSFORM 
 	
-			SELF.Customer_Name	:= '';
-			SELF.Customer_Account_Number	:= '248283671'; 
-			SELF.Customer_State	:= 'FL';
-			SELF.Customer_County	:= '100'; 
-			SELF.Customer_Agency	:= ''; 														
-			SELF.Customer_Agency_Vertical_Type	:= 'S'; 
-			SELF.Customer_Program	:= 'S'; 
-			SELF.Customer_Job_ID	:= ''; 
-			SELF.Batch_Record_ID	:= ''; 
+			SELF.Customer_Job_ID	:= '1'; 
+			SELF.Batch_Record_ID	:= '1'; 
 			SELF.Transaction_ID_Number	:= L.search_info.transaction_id; 
 			SELF.Reason_for_Transaction_Activity	:= ''; 	
 			SELF.Date_of_Transaction	:= L.search_info.datetime[1..8]; 												

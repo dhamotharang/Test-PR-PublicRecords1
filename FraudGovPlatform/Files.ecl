@@ -15,10 +15,10 @@ module
 		 
 		export IdentityData := dataset(Filenames().Sprayed.IdentityData, 
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.IdentityData},
-											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));
+											CSV(heading(1),separator(['~|~']),quote(''),terminator('~<EOL>~')));
 		export KnownFraud := dataset(Filenames().Sprayed.KnownFraud,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.KnownFraud},
-											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));		
+											CSV(heading(1),separator(['~|~']),quote(''),terminator('~<EOL>~')));		
 		export Deltabase := dataset(Filenames().Sprayed.Deltabase,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.Deltabase},
 											CSV(separator(['|\t|']),quote(''),terminator('|\n')));	
@@ -82,11 +82,12 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
 	end;
 
+	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
+	export CustomerMappings := dataset(Filenames().CustomerMappings,Layouts.CustomerMappings,thor,opt);
+
 	export Flags := module
 		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
-		export SourcesToAnonymize	:= dataset(Filenames().Flags.SourcesToAnonymize,Layouts.Flags.SourcesToAnonymize,thor,opt);
 		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
-		export SkipValidationByGCID	:= dataset(Filenames().Flags.SkipValidationByGCID,Layouts.Flags.SkipValidationByGCID,thor,opt);
 	end;
 
 	

@@ -1,4 +1,4 @@
-import utilFile;
+﻿import utilFile;
 
 EXPORT Files := module
 
@@ -11,7 +11,7 @@ EXPORT Files := module
 	
 //Files for Indexes
 utilfile.mac_convert_util_type(basefile, full_did_out);
-export full_did_for_index := full_did_out;
+export full_did_for_index := full_did_out(did!='0');
 
 
 layouts.did_out t(full_did_for_index le, unsigned6 i) :=

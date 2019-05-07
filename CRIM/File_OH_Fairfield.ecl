@@ -1,8 +1,8 @@
-IMPORT crim;
-
+﻿IMPORT crim;
+import  data_services;
 EXPORT File_OH_Fairfield := MODULE
 
-	EXPORT	raw					:=	dataset('~thor_data400::in::crim_court::oh_Fairfield',crim.layout_OH_fairfield.raw_in, CSV);
+	EXPORT	raw					:=	dataset(data_services.foreign_prod+'thor_data400::in::crim_court::oh_Fairfield',crim.layout_OH_fairfield.raw_in, CSV);
 
 	crim.layout_OH_fairfield.disposition	tDisposition(raw	pInput)	:=	TRANSFORM
 		SELF.case_number		:=	pInput.line[1..20];

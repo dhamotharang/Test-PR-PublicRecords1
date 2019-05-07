@@ -1,8 +1,21 @@
-﻿import std,WsWorkunits;
+﻿import std,WsWorkunits,Workman;
 EXPORT get_FilesWritten(
-   string pWorkunitID = ''
-  ,string pesp        = _Config.LocalEsp
+   pWorkunitID = '\'\''
+  ,pesp        = 'Workman._Config.LocalEsp'
+  ,pUseGlobal  = 'true'
 ) :=
-  if(pesp in _Config.LocalEsps  and WorkMan.Is_Valid_Wuid(pWorkunitID) ,STD.System.Workunit.WorkunitFilesWritten (pWorkunitID        )
-                                                                       ,WsWorkunits.get_FilesWritten             (pWorkunitID  ,pesp )
-  );
+functionmacro
+
+  import std,Workman,wk_ut;
+  
+  #IF(pUseGlobal = true and pesp in Workman._Config.LocalEsps)
+    returnresult := global(nothor(STD.System.Workunit.WorkunitFilesWritten(pWorkunitID)),few);
+  #ELSIF(pUseGlobal = false and pesp in Workman._Config.LocalEsps)
+    returnresult := STD.System.Workunit.WorkunitFilesWritten(pWorkunitID);
+  #ELSE
+    returnresult := WsWorkunits.get_FilesWritten            (pWorkunitID,pesp,pUseGlobal);
+  #END
+
+  return returnresult;
+  
+endmacro;
