@@ -1124,6 +1124,7 @@
 		export string KEYWORD_CZDPA									:= '810';
 		export string KEYWORD_HUDPA									:= '811';
 		export string KEYWORD_ICDPA									:= '812';
+		export string KEYWORD_MDBP_W								:= '813';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
