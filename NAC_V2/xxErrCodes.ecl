@@ -1,4 +1,4 @@
-	EXPORT	errcodes := ENUM(
+﻿	EXPORT	xxerrcodes := ENUM(
 		E101 = 0x0000001,				// Invalid Record Code
 		E102 = 0x0000002,				// Invalid/Missing Contributing State
 		E103 = 0x0000004,				// Invalid/Missing Program Code

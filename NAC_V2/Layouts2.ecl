@@ -76,7 +76,7 @@ export rClient := RECORD
 	string10		MonthlyAllotment := '0';	// whole dollar
 	string1			Eligibility;			// E=Elibible, I=Ineligible Alien, D=Disqualified, N=Not Eligible, A=Applicant
 	string8			EffectiveDate;		// CCYYMMDD
-	string8			PeriodType;				// M=Month, D=Date
+	string1			PeriodType;				// M=Month, D=Date
 	string5			HistoricalBenefitCount;
 	string8			StartDate;
 	string8			EndDate;
@@ -94,9 +94,12 @@ export rException := RECORD
 	string2			MatchedState;
 	string1			MatchedProgramCode;
 	string20		MatchedClientId;
+	string4			MatchedGroupId;
 	string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
 	string50		Comments;
 END;
+
+EXPORT validRecordCodes := ['CA01','CL01','AD01','SC01','EX01'];
 
 EXPORT rNac2 := RECORD
 	string4			RecordCode;
@@ -121,14 +124,23 @@ EXPORT rNac2 := RECORD
 	string	eol := '\n';
 END;
 
-// extended records
-	export rAddressEx := RECORD
-		rAddress - RecordCode;
+export rCommonEx := RECORD
+		string4						GroupId := '';
 		STD.Date.Date_t		created := 0;
 		STD.Date.Date_t		updated := 0;
 		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
+		unsigned4					errors := 0;
 		unsigned4					warnings := 0;
+		DATASET(nac_v2.ValidationCodes.rError)	dsErrs;
+		string4						OrigGroupId := '';
+		string32					filename := '';
+END;
+
+// extended records
+	export rAddressEx := RECORD
+		rAddress;
+
+		rCommonEx;
 
 		String60  Prepped_addr1:='';
 		String45  Prepped_addr2:=''
@@ -164,12 +176,9 @@ END;
 	END;
 
 	export rClientEx := RECORD
-		rClient - RecordCode;
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rClient;
+
+		rCommonEx;
 
 		String75  Prepped_name:=''
 			,address.Layout_Clean_Name.title
@@ -189,30 +198,21 @@ END;
 	END;
 	
 	export rCaseEx := RECORD
-		rCase - RecordCode;
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rCase;
+
+		rCommonEx;
+
 	END;
 
 	export rStateContactEx := RECORD
-		rStateContact - RecordCode;
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rStateContact;
+		rCommonEx;
 	END;
 	
 	export rExceptionEx := RECORD
-		rException - [RecordCode];
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rException;
+		rCommonEx;
 	END;
+	
 
 END;

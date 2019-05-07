@@ -173,7 +173,7 @@ EXPORT Print := MODULE
 	END;
 	
 	
-	export Layout_RejectReport := RECORD
+	export rNCX2 := RECORD						// reject report
 				string4			RecordCode;
 				string2			ProgramState;
 				string1			ProgramCode;
@@ -190,13 +190,13 @@ EXPORT Print := MODULE
 		END;
 
 	
-	export Reject_Report( DATASET(nac_v2.Layouts2.rCaseEx) cases
+	export NCX2_Report( DATASET(nac_v2.Layouts2.rCaseEx) cases
 												,DATASET(nac_v2.Layouts2.rClientEx) clients
 												,DATASET(nac_v2.Layouts2.rAddressEx) addresses
 												,DATASET(nac_v2.Layouts2.rStateContactEx) contacts
 												/*,DATASET(nac_v2.Layouts2.rExceptionEx) exceptions*/) := FUNCTION
 
-		rr_cases := PROJECT(cases(errors>0), transform(Layout_RejectReport,
+		rr_cases := PROJECT(cases(errors>0), transform(rNCX2,
 													err := left.dsErrs[1];
 													x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E106', skip, 0);
 													self := left;
@@ -207,7 +207,7 @@ EXPORT Print := MODULE
 													self.SampleValue := if(err.badValue='', Missing, err.badValue);
 													self := err;));
 													
-		rr_clients := PROJECT(clients(errors>0), transform(Layout_RejectReport,
+		rr_clients := PROJECT(clients(errors>0), transform(rNCX2,
 													err := left.dsErrs[1];
 													x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E129', skip, 0);
 													self := left;
@@ -217,7 +217,7 @@ EXPORT Print := MODULE
 													self.SampleValue := if(err.badValue='', Missing, err.badValue);
 													self := err;));
 
-		rr_addresses := PROJECT(addresses(errors>0), transform(Layout_RejectReport,
+		rr_addresses := PROJECT(addresses(errors>0), transform(rNCX2,
 													err := left.dsErrs[1];
 													self := left;
 													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
@@ -226,7 +226,7 @@ EXPORT Print := MODULE
 													self.SampleValue := if(err.badValue='', Missing, err.badValue);
 													self := err;));
 
-		rr_contacts := PROJECT(contacts(errors>0), transform(Layout_RejectReport,
+		rr_contacts := PROJECT(contacts(errors>0), transform(rNCX2,
 													err := left.dsErrs[1];
 													self := left;
 													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
