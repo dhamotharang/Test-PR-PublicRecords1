@@ -4,8 +4,8 @@ IMPORT B_Event_5,E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_4 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_5.__ENH_Event_5) __ENH_Event_5 := B_Event_5.__ENH_Event_5;
-  SHARED __EE50840 := __ENH_Event_5;
-  EXPORT __ST22020_Layout := RECORD
+  SHARED __EE50762 := __ENH_Event_5;
+  EXPORT __ST22007_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -161,14 +161,14 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST22020_Layout __ND50677__Project(B_Event_5.__ST22494_Layout __PP48617) := TRANSFORM
-    SELF.Ip_Hosted_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48617._proxytype_),=,__CN('HOSTING')))=>1,0);
-    SELF.Ip_Not_Us_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48617._edgecountry_),IN,__CN(['USA',''])))=>0,1);
-    SELF.Ip_Tor_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48617._proxydescription_),IN,__CN(['TOR EXIT','TOR RELAY'])))=>1,0);
-    SELF.Ip_Vpn_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48617._proxydescription_),=,__CN('VPN')))=>1,0);
-    __BS50618 := __T(__PP48617.Event_Types_);
-    SELF.Kr_High_Risk_Identity_Flag_ := MAP(__PP48617.Kr_Identity_Risk_ = 1 OR EXISTS(__BS50618(__T(__OP2(__T(__PP48617.Event_Types_).Event_Type_,IN,__CN(['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400'])))))=>1,0);
-    SELF := __PP48617;
+  SHARED __ST22007_Layout __ND50599__Project(B_Event_5.__ST22481_Layout __PP48539) := TRANSFORM
+    SELF.Ip_Hosted_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48539._proxytype_),=,__CN('HOSTING')))=>1,0);
+    SELF.Ip_Not_Us_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48539._edgecountry_),IN,__CN(['USA',''])))=>0,1);
+    SELF.Ip_Tor_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48539._proxydescription_),IN,__CN(['TOR EXIT','TOR RELAY'])))=>1,0);
+    SELF.Ip_Vpn_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48539._proxydescription_),=,__CN('VPN')))=>1,0);
+    __BS50540 := __T(__PP48539.Event_Types_);
+    SELF.Kr_High_Risk_Identity_Flag_ := MAP(__PP48539.Kr_Identity_Risk_ = 1 OR EXISTS(__BS50540(__T(__OP2(__T(__PP48539.Event_Types_).Event_Type_,IN,__CN(['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400'])))))=>1,0);
+    SELF := __PP48539;
   END;
-  EXPORT __ENH_Event_4 := PROJECT(__EE50840,__ND50677__Project(LEFT));
+  EXPORT __ENH_Event_4 := PROJECT(__EE50762,__ND50599__Project(LEFT));
 END;
