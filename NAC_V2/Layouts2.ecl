@@ -214,5 +214,27 @@ END;
 		rCommonEx;
 	END;
 	
+EXPORT rNac2Ex := RECORD
+	string4			RecordCode;
+	IFBLOCK(self.RecordCode = 'CA01')
+	  rCaseEx - RecordCode			CaseRec;
+	END;
+	IFBLOCK(self.RecordCode = 'CL01')
+	  rClientEx - RecordCode		ClientRec;
+	END;
+	IFBLOCK(self.RecordCode = 'AD01')
+	  rAddressEx - RecordCode		AddressRec;
+	END;
+	IFBLOCK(self.RecordCode = 'SC01')
+	  rStateContactEx - RecordCode	StateContactRec;
+	END;
+	IFBLOCK(self.RecordCode = 'EX01')
+	  rExceptionEx - RecordCode		ExceptionRec;
+	END;
+	IFBLOCK(self.RecordCode NOT IN ['CA01','CL01','AD01','SC01','EX01'])
+		string		BadRecord {maxlength(256)};
+	END;
+	string	eol := '\n';
+END;	
 
 END;
