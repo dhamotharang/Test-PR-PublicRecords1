@@ -1,7 +1,6 @@
-IMPORT Gateway;
+﻿IMPORT Gateway;
 
 	EXPORT constants := MODULE
-		EXPORT STRING5 IndustryClass := '';
 		EXPORT BOOLEAN ExcludeCurrentGong:= FALSE;
 		EXPORT BOOLEAN IncludeTargus:= FALSE;
 		EXPORT BOOLEAN IncludeQsent:= FALSE;

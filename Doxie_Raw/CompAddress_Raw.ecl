@@ -39,10 +39,7 @@ utDailyRecs := project(Doxie_Raw.Util_Daily_Raw(
                         project(input(section = 'addresses'), 
                                 transform(Doxie.layout_references_hh, 
                                           self.did:=(unsigned6)left.id, self.includedByHHID := false)),            
-                        mod_access.date_threshold,
-                        mod_access.dppa, 
-                        mod_access.glb,
-                        mod_access.industry_class), 
+                        mod_access), 
                       transform(recordof(srcRec), 
                                 self.did := (unsigned8)left.did, 
                                 self.rid := 0;

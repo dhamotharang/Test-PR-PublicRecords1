@@ -4,11 +4,12 @@
  ** Filter addresses named "UNIV" or "UNIVERSITY".
  ***/
 
-import American_Student_Services, ut, iesp, Address;
+import American_Student_Services, iesp, Address, STD;
+
+now := (string) STD.Date.Today();
 
 out_rec := iesp.identitymanagementreport.t_IdmStudentRecord;
 Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
-	now		:= ut.GetDate;
 	high	:= (unsigned)now[1..4] + delta;
 	test	:= yy + ((unsigned)now[1..2]*100);
 	yyyy	:= if(test<=high, test, test-100);

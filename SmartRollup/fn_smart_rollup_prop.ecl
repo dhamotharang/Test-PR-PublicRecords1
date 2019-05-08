@@ -14,7 +14,7 @@ export fn_smart_rollup_prop(dataset(assess_ext) inAssess,
                             dataset(iesp.foreclosure.t_ForeclosureReportRecord) inFore =dataset([],iesp.foreclosure.t_ForeclosureReportRecord),
 														dataset(iesp.foreclosure.t_ForeclosureReportRecord) inNOD = dataset([],iesp.foreclosure.t_ForeclosureReportRecord),
 														unsigned6 subjectDID,
-														PersonReports.input._smartlinxreport inParam) := function;
+														PersonReports.IParam._smartlinxreport inParam) := function;
 	//bug 105902 deed only property no field to indicate current so need to hit ownership key.
 	//we may end up using this for Assessments also in the future.
 	histRec := RECORD

@@ -670,7 +670,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF := []),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);		
 																				
-		HeaderHHID := JOIN(ConsumerHeaderDIDSlim, Doxie.Key_HHID_Did, KEYED(LEFT.HHID = RIGHT.HHID_Relat) AND LEFT.DID <> RIGHT.DID, 
+		HeaderHHID := JOIN(ConsumerHeaderDIDSlim, dx_header.key_hhID_did(), KEYED(LEFT.HHID = RIGHT.HHID_Relat) AND LEFT.DID <> RIGHT.DID, 
 																	TRANSFORM(Business_Risk_BIP.Layouts.LayoutContacts,
 																							SELF.Seq := LEFT.Seq,
 																							SELF.DID := RIGHT.DID,
@@ -1002,7 +1002,7 @@ EXPORT getConsumerHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		STRING2 AR2BRep5SSNBusHeaderLexID;
 	END;
 	
-	ConsumerShellContactInfoRaw := JOIN(seqContactInfo, doxie.Key_Header, LEFT.DID > 0 AND KEYED(LEFT.DID = RIGHT.S_DID) AND
+	ConsumerShellContactInfoRaw := JOIN(seqContactInfo, dx_header.key_header(), LEFT.DID > 0 AND KEYED(LEFT.DID = RIGHT.S_DID) AND
 																	// check permissions
 																	ut.PermissionTools.glb.SrcOk(Options.GLBA_Purpose, right.src, right.dt_first_seen) and
 																	RIGHT.src NOT IN Risk_Indicators.iid_constants.masked_header_sources(Options.DataRestrictionMask, FALSE /*isFCRA*/) AND

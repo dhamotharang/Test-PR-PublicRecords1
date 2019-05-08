@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, doxie, iesp, PersonReports, suppress, ut;
+IMPORT AutoStandardI, doxie, iesp, PersonReports;
 
 EXPORT SmartLinx_Person_Sections (STRING in_did, BOOLEAN include_sourceDocSection, MIDEX_Services.Iparam.smartLinxPersonIncludeOptions options) :=
       // NOTE: the original SmartLinx code uses Exclude Sources -- This function takes 
@@ -13,19 +13,10 @@ EXPORT SmartLinx_Person_Sections (STRING in_did, BOOLEAN include_sourceDocSectio
     in_mod := AutoStandardI.GlobalModule();  
     
     search_mod := MODULE (PROJECT (in_mod, PersonReports.input._didsearch, OPT))
-      END;                       
-    report_mod := MODULE ( PersonReports.input._smartlinxreport )
-      EXPORT UNSIGNED1 GLBPurpose        := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-      EXPORT UNSIGNED1 DPPAPurpose       := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-			EXPORT STRING5 	 industryclass 		 := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-      EXPORT BOOLEAN ln_branded          := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
-      EXPORT UNSIGNED1 score_threshold   := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-      EXPORT STRING6 ssn_mask            := in_mod.SSNMask;  
-      EXPORT STRING  dobMask             := in_mod.dobMask;
-      EXPORT UNSIGNED1 dob_mask          := suppress.date_mask_math.MaskIndicator(in_mod.dobMask);
-      EXPORT STRING dataPermissionMask   := in_mod.dataPermissionMask;
-      EXPORT STRING dataRestrictionMask  := in_mod.dataRestrictionMask;
-      //---------------------------------------------------------------------------------------
+      END;
+
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(in_mod);  
+    report_mod := MODULE (PROJECT (mod_access, PersonReports.IParam._smartlinxreport, OPT))
       // Include
       EXPORT BOOLEAN select_individually        := TRUE; 
       EXPORT BOOLEAN include_akas               := TRUE;
@@ -98,3 +89,4 @@ EXPORT SmartLinx_Person_Sections (STRING in_did, BOOLEAN include_sourceDocSectio
     smartLinxPersonRecsRaw := PersonReports.SmartLinxReport (ds_did, report_mod, FALSE);
     RETURN smartLinxPersonRecsRaw;
   END;  // end SmartLinx_Person_Sections function
+  

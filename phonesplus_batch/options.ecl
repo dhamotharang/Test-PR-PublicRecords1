@@ -1,10 +1,9 @@
-IMPORT phonesplus_batch, Gateway, BatchShare;
+﻿IMPORT phonesplus_batch, Gateway, BatchShare;
 
 	ppc:= phonesplus_batch.constants;
 	EXPORT options := MODULE
 	
-		EXPORT IOptions:= INTERFACE(BatchShare.IParam.BatchParams)
-			EXPORT STRING5 IndustryClass := ppc.IndustryClass;
+		EXPORT IOptions:= INTERFACE(BatchShare.IParam.BatchParamsV2)
 			EXPORT BOOLEAN ExcludeCurrentGong:= ppc.ExcludeCurrentGong;
 			EXPORT BOOLEAN IncludeTargus:= ppc.IncludeTargus;
 			EXPORT BOOLEAN IncludeQsent:= ppc.IncludeQsent;
@@ -12,9 +11,8 @@ IMPORT phonesplus_batch, Gateway, BatchShare;
 		END;
 
 		EXPORT getOptions():= FUNCTION
-			baseOptions:= BatchShare.IParam.getBatchParams();
+			baseOptions:= BatchShare.IParam.getBatchParamsV2();
 			optionsModule := MODULE(PROJECT(baseOptions, IOptions, OPT))
-				EXPORT STRING5 IndustryClass := ppc.IndustryClass : STORED('IndustryClass');
 				EXPORT BOOLEAN ExcludeCurrentGong:= ppc.ExcludeCurrentGong : STORED('ExcludeCurrentGong');
 				EXPORT BOOLEAN IncludeTargus:= ppc.IncludeTargus : STORED('IncludeTargus');
 				EXPORT BOOLEAN IncludeQsent:= ppc.IncludeQsent : STORED('IncludeQsent');

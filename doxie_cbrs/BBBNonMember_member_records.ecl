@@ -1,11 +1,17 @@
-
+﻿
 import bbb2;
 
 export BBBNonMember_member_records(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
 
 indexedBDIDs := bbb2.Key_BBB_Non_Member_BDID;
 
-indexedBDIDs xf_indexedBDIDs(indexedBDIDs r) := TRANSFORM
+// RQ-15799 REMOVING CCPA RELATED FIELDS FROM QUERY OUTPUT
+// DEFINING LAYOUT USING ACTUAL LAYOUT INSTEAD OF THE DATASET
+indexedBDIDs_layout:= RECORD
+	BBB2.Layouts_Files.Base.NonMember -[global_sid, record_sid];
+END;
+
+indexedBDIDs_layout xf_indexedBDIDs(indexedBDIDs r) := TRANSFORM
 	SELF := r;
 END;
 

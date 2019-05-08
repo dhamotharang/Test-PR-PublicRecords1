@@ -1,4 +1,4 @@
-﻿import doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list;
+﻿import doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list, dx_header;
 
 export Functions := MODULE
 	
@@ -131,7 +131,7 @@ export Functions := MODULE
 																						self := left,
 																						self := []));
 																						
-		recs_hhid := join(recs_pres, doxie.Key_Did_HDid, keyed(left.did = right.did), 
+		recs_hhid := join(recs_pres, dx_header.key_did_hhid(), keyed(left.did = right.did), 
 											transform(doxie.layout_presentation, 
 																self.hhid := right.hhid,
 																self := left),
@@ -427,13 +427,12 @@ export Functions := MODULE
 			self.County := L.county_name;
 			self.PostalCode := '';
 			self.StateCityZip := Address.Addr2FromComponents(l.city_name, l.st, l.zip);
-			//To match TeaserSearchServices.Search_Records
 			dt_vendor_last_seen := iesp.ECL2ESP.toDateYM((unsigned3)L.dt_vendor_last_reported); 
 			dt_last_seen := iesp.ECL2ESP.toDateYM((unsigned3)L.dt_last_seen);
-			self.DateLastSeen := dt_vendor_last_seen;
-			self.VendorDateLastSeen.Year := dt_last_seen.year;
-			self.VendorDateLastSeen.Month := dt_last_seen.month;
-			self.VendorDateLastSeen.Day := dt_last_seen.day;
+			self.DateLastSeen := dt_last_seen;
+			self.VendorDateLastSeen.Year := dt_vendor_last_seen.year;
+			self.VendorDateLastSeen.Month := dt_vendor_last_seen.month;
+			self.VendorDateLastSeen.Day := dt_vendor_last_seen.day;
 			self.VendorDateFirstSeen := [];
 			self.Phones := if(IncludePhones OR IncludePhoneNumber, L.phones, dataset([], iesp.share.t_PhoneInfo));		
 		end;

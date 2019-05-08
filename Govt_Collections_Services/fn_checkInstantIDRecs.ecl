@@ -1,7 +1,7 @@
-import ut, address, codes, models, riskwise, iesp, patriot, intliid, address, Risk_Indicators;
+﻿import Govt_Collections_Services, Risk_Indicators;
 
 EXPORT fn_checkInstantIDRecs (dataset(Layouts.batch_working) ds_batch_in,
-                              IParams.BatchParams in_mod) := 
+                              Govt_Collections_Services.IParams.BatchParams in_mod) := 
 															FUNCTION
 
  BOOLEAN isFCRA :=  FALSE;
@@ -11,8 +11,8 @@ EXPORT fn_checkInstantIDRecs (dataset(Layouts.batch_working) ds_batch_in,
  inrec := GROUP(SORT(inrec_raw(ssn != ''),seq),seq);
 
  ret := Risk_Indicators.iid_getSSNFlags(inrec, //(groupped by seq)
-                                        in_mod.DPPAPurpose, 
-						                            in_mod.GLBpurpose, 
+                                        in_mod.dppa, 
+						                            in_mod.glb, 
 						                            isFCRA, 
 						                            runSSNCodes,
 						                            Risk_Indicators.iid_constants.default_ExactMatchLevel,

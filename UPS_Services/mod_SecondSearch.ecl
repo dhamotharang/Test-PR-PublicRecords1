@@ -1,4 +1,4 @@
-﻿import doxie, ut, AutoStandardI, BIPV2;
+﻿import doxie, dx_header, ut, AutoStandardI, BIPV2;
 
 export mod_SecondSearch := MODULE
 
@@ -31,18 +31,18 @@ export mod_SecondSearch := MODULE
 		inPhone := IT.phone_value.val(project(search_mod, IT.phone_value.params));
 		phoneLen := LENGTH(TRIM(inPhone));
 
-		StreetQuery := PROJECT(CHOOSEN(doxie.key_header_dts_address(
+		StreetQuery := PROJECT(CHOOSEN(dx_header.key_DTS_address()(
 															KEYED(prim_name in [inPrimName,ut.Word(inPrimName, 1, ' ')]) AND
 															KEYED(prim_range = inPrimRange) AND
 															KEYED(st IN inStateSet OR NOT EXISTS(inStateSet))), maxRecs), 
 													 TRANSFORM(layout, SELF := LEFT));
 
-		RangeZipQuery := PROJECT(CHOOSEN(doxie.key_header_zipprlname(
+		RangeZipQuery := PROJECT(CHOOSEN(dx_header.key_zipprlname()(
 															KEYED(zip IN inZip5Set) AND
 															KEYED(prim_range = inPrimRange)), maxRecs),
 													 TRANSFORM(layout, SELF := LEFT));
 
-		StreetZipQuery := PROJECT(CHOOSEN(doxie.key_header_dts_streetzipname(
+		StreetZipQuery := PROJECT(CHOOSEN(dx_header.key_DTS_StreetZipName()(
 															KEYED(prim_name in [inPrimName,ut.Word(inPrimName, 1, ' ')]) AND
 															KEYED(zip IN inZip5Set) AND
 															(dph_lname = inPhoneticLastName OR dph_lname = '')), maxRecs),
@@ -50,35 +50,35 @@ export mod_SecondSearch := MODULE
 
 		inPiz5Set := ut.PizTools.reverseZipset(inZip5Set);
 	
-		LastZipQuery := PROJECT(CHOOSEN(doxie.key_header_piz(
+		LastZipQuery := PROJECT(CHOOSEN(dx_header.key_piz()(
 															KEYED(piz IN inPiz5Set) AND
 															KEYED(dph_lname = inPhoneticLastName)), maxRecs),
 													 TRANSFORM(layout, SELF := LEFT));
 		
-		LastCityStateQuery := PROJECT(CHOOSEN(doxie.key_header_stcitylfname(
+		LastCityStateQuery := PROJECT(CHOOSEN(dx_header.key_StCityLFName()(
 															KEYED(city_code in inCityCode) AND
 															KEYED(st = inState) AND
 															KEYED(dph_lname = inPhoneticLastName)), maxRecs),
 													 TRANSFORM(layout, SELF := LEFT));
 
-		LastStateQuery :=	PROJECT(CHOOSEN(doxie.key_header_stfnamelname(
+		LastStateQuery :=	PROJECT(CHOOSEN(dx_header.key_StFnameLname()(
 															KEYED(st = inState) AND
 															KEYED(dph_lname = inPhoneticLastName) AND
 															KEYED(lname = inLastName)), maxRecs),
 													 TRANSFORM(layout, SELF := LEFT));
 		
 		//EVEN LOOSER
-		StreetQuery2 := PROJECT(CHOOSEN(doxie.key_header_dts_address(
+		StreetQuery2 := PROJECT(CHOOSEN(dx_header.key_DTS_address()(
 															KEYED(prim_name in [inPrimName,ut.Word(inPrimName, 1, ' ')]) AND
 															KEYED(prim_range = inPrimRange)), maxRecs), 
 													 TRANSFORM(layout, SELF := LEFT));
 
-		StreetZipQuery2 := PROJECT(CHOOSEN(doxie.key_header_dts_streetzipname(
+		StreetZipQuery2 := PROJECT(CHOOSEN(dx_header.key_DTS_StreetZipName()(
 															KEYED(prim_name in [inPrimName,ut.Word(inPrimName, 1, ' ')]) AND
 															KEYED(zip IN inZip5Set)), maxRecs),
 													 TRANSFORM(layout, SELF := LEFT));
 
-		LastStateQuery2 :=	PROJECT(CHOOSEN(doxie.key_header_stfnamelname(
+		LastStateQuery2 :=	PROJECT(CHOOSEN(dx_header.key_StFnameLname()(
 															KEYED(st = inState) AND
 															KEYED(dph_lname = inPhoneticLastName)), maxRecs),
 													 TRANSFORM(layout, SELF := LEFT));													 
@@ -100,7 +100,7 @@ export mod_SecondSearch := MODULE
 		PROJECT(
 			CHOOSEN(
 				LIMIT(
-					doxie.key_header_wild_phone( //ups right address service is already using this key (as opposed to non-wild version)
+					dx_header.key_wild_phone()( //ups right address service is already using this key (as opposed to non-wild version)
 						KEYED(p7 in errantPhones_7) AND
 						KEYED(p3 in errantPhones_3) AND
 						p3+p7 in errantPhones

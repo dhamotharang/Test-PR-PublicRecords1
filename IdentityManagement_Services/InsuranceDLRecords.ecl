@@ -1,8 +1,8 @@
-IMPORT doxie, ut, IdentityManagement_Services, InsuranceHeader_PostProcess, AutoStandardI, InsuranceHeader_BestOfBest;
+IMPORT doxie, IdentityManagement_Services, InsuranceHeader_PostProcess, InsuranceHeader_BestOfBest;
 
 EXPORT InsuranceDLRecords(IdentityManagement_Services.IParam._report in_params, DATASET (doxie.layout_references) dids) := FUNCTION
-	dppa_ok := AutoStandardI.PermissionI_Tools.val(in_params).DPPA.ok(in_params.dppaPurpose);
-	dl_ok	:= AutoStandardI.DataPermissionI.val(in_params).use_InsuranceDLData;
+	dppa_ok := in_params.isValidDppa();
+	dl_ok	:= doxie.compliance.use_InsuranceDLData (in_params.DataPermissionMask);
 	
 	InsuranceHeader_BestOfBest.Layouts.InsuranceDL_Layout_Input Insurance_Input(doxie.layout_references L,INTEGER C) := TRANSFORM
 		SELF.Seq := C;
@@ -15,13 +15,13 @@ EXPORT InsuranceDLRecords(IdentityManagement_Services.IParam._report in_params, 
 	ds_InReq_Formatted := GROUP(SORT(ds_InReq_InsuranceDL,Seq),Seq); 
 	
 	
-  dppa := in_params.dppaPurpose;
-	DataPermission := AutoStandardI.DataPermissionI.val(in_params).permission_mask;
+  dppa := in_params.dppa;
+	DataPermission := in_params.DataPermissionMask;
 	Insurance_DL_Did := InsuranceHeader_BestOfBest.search_Insurance_DL_by_DID(ds_InReq_Formatted,dppa,false,DataPermission);
 	
 	Insurance_DL_Recs := PROJECT(UNGROUP(Insurance_DL_Did), InsuranceHeader_PostProcess.layouts.DL);
 
-	Insurance_DL_Final := Insurance_DL_Recs(ut.PermissionTools.dppa.state_ok(dl_state,in_params.dppaPurpose,,src));
+	Insurance_DL_Final := Insurance_DL_Recs(in_params.isValidDppaState(dl_state,,src));
 
 	//=====For Debug Purposes========================================
 	// output(dids, named('dids'));

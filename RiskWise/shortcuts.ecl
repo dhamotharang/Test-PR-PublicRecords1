@@ -1,12 +1,9 @@
-﻿/*2014-11-16T00:19:09Z (Nathan Koubsky)
-Added core roxie ip
-*/
-import risk_indicators, Phone_Shell, Data_Services;
+﻿import risk_indicators, Phone_Shell, Data_Services;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
 
- export prod_batch_analytics_roxie := 'http://10.176.71.36:9856';  // use this VIP starting week of 2018-02-12
+ export prod_batch_analytics_roxie := 'http://roxiethor.sc.seisint.com:9856';
 
 	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
 	export prod_batch_fcra := 'http://fcrabatch.sc.seisint.com:9876';
@@ -22,24 +19,14 @@ export shortcuts := module
 
   export core_96_roxieIP := 'http://10.176.68.187:9876/';
   export core_97_roxieIP := 'http://10.176.68.184:9876/';
-
-	export dev190 := 'http://roxiedevvip.sc.seisint.com:9876'; // stu's roxie, 190
-	export Dev192 := 'http://roxiedevvip2.sc.seisint.com:9876';  // dev roxie 192
-	export Dev194 := 'http://roxiedevvip3.sc.seisint.com:9876';  // dev roxie 194
-	export Dev196 := 'http://roxiedataqa.sc.seisint.com:9876';  // dev roxie 196
 	
   export dev154 := 'http://dev154vip.hpcc.risk.regn.net:9876'; // dev roxie 154
 	export Dev155 := 'http://dev155vip.hpcc.risk.regn.net:9876';  // dev roxie 155
 	export Dev156 := 'http://dev156vip.hpcc.risk.regn.net:9876';  // dev roxie 156
 	export Dev157 := 'http://dev157vip.hpcc.risk.regn.net:9876';  // dev roxie 157
 	export Dev158 := 'http://dev158vip.hpcc.risk.regn.net:9876';  // dev roxie 158
+	export Dev160 := 'http://dev160vip.hpcc.risk.regn.net:9876';  // dev roxie 160  - Stu's dev roxie
     
-	// keep these 4 around just in case there are any scripts using them
-	export Dev64RoxieIP := dev190;
-	export Dev64 := dev190; 
-	export Dev64b := dev192;
-	export Dev64c := dev194;
-	
 	// prod one-way roxies:
 	export p1 := 'http://10.173.3.41:9876';
 	export p2 := 'http://10.173.3.42:9876';
@@ -75,17 +62,16 @@ export shortcuts := module
 	export gw_targus_sco:= dataset( [{'targus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
 	export gw_attus     := dataset( [{'attus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
 	export gw_netacuityv4_cert := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
-  export gw_netacuityv4 := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@gatewayprodesp.sc.seisint.com:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
-	
+// use this version for anything that is customer paid test  
+	export gw_netacuityv4_prod := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@gatewayprodesp.sc.seisint.com:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+  export gw_netacuityv4 := gw_netacuityv4_cert  :DEPRECATED('If running a paid customer test, use gw_netacuityv4_prod instead');
+
   export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
 	export gw_personContext	:= dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
 	//deltabase gateways for Inquiries
 	export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
 	export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
 	
-	// export gw_FCRA      := dataset( [{'FCRA','http://rwgatewaycert.sc.seisint.com:7726'}], risk_indicators.layout_gateways_in );
-	// export gw_FCRA      := dataset( [{'FCRA','http://rwgatewaycert.sc.seisint.com:7726'}], risk_indicators.layout_gateways_in );
-
 // <gateways><row><servicename>insurancephoneheader</servicename><url>http://rw_score_dev:Password01@10.176.68.164:7526/WsPrism/?ver_=1.82</url></row></gateways>
 
 	// DATA

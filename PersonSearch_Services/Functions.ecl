@@ -249,7 +249,8 @@ export Functions := MODULE
 			 self.AgeAtDeath := IF(l.dod<>0 and l.dob<>0, (l.dod-l.dob) div 10000, 0);
 			 self.DeathVerificationCode := l.death_code;
 			 self.DOB := iesp.ECL2ESP.toDate(l.dob);
-			 self.DOD := iesp.ECL2ESP.toDate(l.dod);		
+			 self.DOD := iesp.ECL2ESP.toDate(l.dod);
+			 self.IsLimitedAccessDMF := l.IsLimitedAccessDMF;		
 			 self.deceased := l.deceased;
 		END;
 

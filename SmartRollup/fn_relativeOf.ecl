@@ -1,5 +1,5 @@
 import iesp, Header, PersonReports, Relationship, SmartRollup, riskwise;
-export fn_relativeOf(dataset(iesp.smartlinxreport.t_SLRRelative) inRels, integer subjectDid, PersonReports.input._smartlinxreport param) := function
+export fn_relativeOf(dataset(iesp.smartlinxreport.t_SLRRelative) inRels, integer subjectDid, PersonReports.IParam._smartlinxreport param) := function
   outrec := iesp.smartlinxreport.t_SLRRelative;
 
   relrec := record

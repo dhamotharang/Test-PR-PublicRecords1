@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare,BusinessBatch_BIP,Business_Risk_BIP,Gateway;
+﻿IMPORT AutoStandardI,BatchShare,BusinessBatch_BIP,Business_Risk_BIP,Doxie,Gateway;
 
 EXPORT iParam :=
 MODULE
@@ -7,7 +7,10 @@ MODULE
   EXPORT BatchParams :=
   INTERFACE(BatchShare.IParam.BatchParams)
 		EXPORT BOOLEAN BestOnly;
+    EXPORT BOOLEAN Use_Append;
     EXPORT BOOLEAN ExcludeExperian;
+    EXPORT BOOLEAN ExcludeMarketing;
+    EXPORT UNSIGNED1 Score_Threshold;
     EXPORT UNSIGNED1 OFAC_Version;
   END;
 
@@ -15,11 +18,19 @@ MODULE
 	EXPORT getBatchParams() :=
 	FUNCTION
 			BaseBatchParams := BatchShare.IParam.getBatchParams();
+      gm := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
+      // for now don't use exclude marketing as an input as the intended_use flag serves the same purpose
+      //marketingFlag := FALSE : STORED('ExcludeMarketing');
 			
 			inMod := MODULE(PROJECT(BaseBatchParams,BatchParams,OPT))
 				EXPORT UNSIGNED8 MaxResultsPerAcct := BusinessBatch_BIP.Constants.Defaults.MaxResultsPerAcctno : STORED('Max_Results_Per_Acct');
 				EXPORT BOOLEAN BestOnly := FALSE : STORED('Best_Only');
+        EXPORT BOOLEAN Use_Append := FALSE : STORED('Use_Append');
         EXPORT BOOLEAN ExcludeExperian := FALSE : STORED('ExcludeExperian');
+        // JIRA RR-15244: if we are classified as marketing use (via industry_class / intended_use), we will use BRM Marketing mode
+        EXPORT BOOLEAN ExcludeMarketing := gm.isDirectMarketing();
+        EXPORT UNSIGNED1 Score_Threshold := 75 : STORED('Score_Threshold');
         EXPORT UNSIGNED1 OFAC_Version := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
 	
         EXPORT DATASET(Gateway.Layouts.Config) Gateways := Gateway.Configuration.Get();

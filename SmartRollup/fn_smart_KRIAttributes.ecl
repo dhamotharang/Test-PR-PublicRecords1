@@ -3,7 +3,7 @@ IMPORT iesp, Risk_Indicators, PersonReports, Gateway, AML;
 /* Function that will retrieve and assign the Key Risk Indicator values based on the passed did and
    will set the appropriate caution indicator flags using the passed bestinfo, akas and relative records.
 */
-EXPORT fn_smart_KRIAttributes(PersonReports.input._smartlinxreport inParam,
+EXPORT fn_smart_KRIAttributes(PersonReports.IParam._smartlinxreport inParam,
 															unsigned6 subjectDID,
 															iesp.smartlinxreport.t_SLRBestInfo inBest = ROW([],iesp.smartlinxreport.t_SLRBestInfo),
 															DATASET(iesp.smartlinxreport.t_SLRProfLicenseAndSanctionAndProvider) inProfs = DATASET ([],iesp.smartlinxreport.t_SLRProfLicenseAndSanctionAndProvider),
@@ -35,8 +35,8 @@ EXPORT fn_smart_KRIAttributes(PersonReports.input._smartlinxreport inParam,
 	// gateway is used to calculate news profile indicators. As of now, the news profile indicators
 	// are only being calculated for when the xg5 data is used (primary individual) and not for relatives
 	// and associates.
-	kris := AML.getAMLattributesV2(iid,inParam.datarestrictionmask,inParam.dppapurpose,
-																	inParam.glbpurpose,DATASET ([],Gateway.Layouts.Config),,inParam.datapermissionmask,XGParam,useXG5Gate);
+	kris := AML.getAMLattributesV2(iid,inParam.datarestrictionmask,inParam.dppa,
+																	inParam.glb,DATASET ([],Gateway.Layouts.Config),,inParam.datapermissionmask,XGParam,useXG5Gate);
 
 	/* Transform to iesp layout and set the caution flag */
 	outLayout xfm_keyrisk(AML.Layouts.LayoutAMLShellV2 l) := TRANSFORM

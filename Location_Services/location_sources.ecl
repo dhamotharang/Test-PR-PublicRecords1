@@ -1,5 +1,5 @@
 import Location_Services;
-import header, property, Doxie, Doxie_Raw, Doxie_crs, Doxie_LN, doxie_cbrs,
+import dx_header, property, Doxie, Doxie_Raw, Doxie_LN, doxie_cbrs,
 		LN_PropertyV2, LN_PropertyV2_Services, iesp, MDR, BIPV2, Suppress;
 
 export location_sources(DATASET(doxie_raw.Layout_input) addr_in,
@@ -86,7 +86,7 @@ deed_out := Location_Services.deed_records(addr,bus_prop);
 asset_out := Location_Services.asses_records(addr,bus_prop);
 
 kfs := LN_PropertyV2.key_search_fid();
-kh := doxie.key_header;
+kh := dx_header.key_header();
 
 rec := RECORD 
 	kfs.ln_fares_id;
@@ -102,7 +102,7 @@ fids_dids := join(fids, kfs, keyed(left.ln_fares_id = right.ln_fares_id), TRANSF
 fids_dids_ssns0 := join(fids_dids, kh, keyed(left.did = right.s_did) and
 	(~doxie.DataRestriction.ECH or ~MDR.sourceTools.SourceIsExperian_Credit_Header(right.src)), 
 	TRANSFORM({rec, unsigned rid}, SELF.ssn := RIGHT.ssn, SELF.rid := RIGHT.rid, SELF := LEFT));
-fids_dids_ssns_filt := join(fids_dids_ssns0, header.Key_DMV_restricted(), keyed(left.rid = right.rid) and left.did = right.did and right.ssn = '', transform(left), left only);
+fids_dids_ssns_filt := join(fids_dids_ssns0, dx_header.key_DMV_restricted(), keyed(left.rid = right.rid) and left.did = right.did and right.ssn = '', transform(left), left only);
 fids_dids_ssns := project(if(suppressDMVInfo_value, fids_dids_ssns_filt), rec);
 Suppress.MAC_Suppress(fids_dids,good_fids_did,application_type_value,Suppress.Constants.LinkTypes.DID,did);
 Suppress.MAC_Suppress(fids_dids_ssns,good_fids_ssn,application_type_value,Suppress.Constants.LinkTypes.SSN,ssn);

@@ -25,7 +25,7 @@ export IdAppendLocal := module
 			join(withAppend, withBest(allBest or (isSeleBest and proxid = 0) or (not isSeleBest and proxid != 0)),
 				left.request_id = right.uniqueid
 					and (right.proxid = 0 or left.proxid = right.proxid or allBest),
-				transform(BIPV2.IDAppendLayouts.svcAppendOut,
+				transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
 					hasMatch := right.proxid != 0 or right.seleid != 0;
 					sameProx := left.proxid = right.proxid or (not allBest and isSeleBest);
 					self.proxid := if(sameProx or not hasMatch, left.proxid, right.proxid),
@@ -127,6 +127,7 @@ export IdAppendLocal := module
 					self.powid := if(right.powid != 0, right.powid, left.powid);
 					self.powScore := if(isProxLevel or left.powid = right.powid, left.powScore, 0),
 					self.powWeight := if(isProxLevel or left.powid = right.powid, left.powWeight, 0),
+					self.parent_proxid := right.parent_proxid,
 					self := left,
 					self := right),
 				left outer);

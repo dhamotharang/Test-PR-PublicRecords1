@@ -103,8 +103,12 @@ EXPORT DueDiligence_Service := MACRO
       
       
       //********************************************************PERSON TEST SEED LOGIC HERE**********************************************************
+      
+      testSeedFunction := DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName, optionsIn.AdditionalInput);
       final_testSeeds := CASE(reqProduct,
-                              DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY => DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName, optionsIn.AdditionalInput).GetPersonAttributeSeeds);
+                              DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY => IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
+                                                                                                      testSeedFunction.GetPersonAttributeSeeds,
+                                                                                                      testSeedFunction.GetBusinessAttributeSeeds));
 
 
 

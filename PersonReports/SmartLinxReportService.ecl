@@ -405,16 +405,9 @@ EXPORT SmartLinxReportService () := MACRO
   end;
 
   // Now define all report parameters
-  report_mod := module (options)
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globals);
+  report_mod := module (options, mod_access)
     // Do all required translations here
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-		export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-		export string DataPermissionMask := globals.dataPermissionMask;
-    export string DataRestrictionMask := globals.dataRestrictionMask;
-    export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
-    export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
-    //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
     export boolean legacy_verified := false : stored('LegacyVerified');
     export boolean include_BlankDOD := false : stored ('IncludeBlankDOD');
@@ -464,7 +457,7 @@ EXPORT SmartLinxReportService () := MACRO
 	// main records
 
 	Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
-	smartMod := Relationship.IParams.getParams(report_mod,PersonReports.input._smartlinxreport);
+	smartMod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._smartlinxreport);
   recs := PersonReports.SmartLinxReport (dids, smartMod, FALSE);
 
   // wrap it into output structure

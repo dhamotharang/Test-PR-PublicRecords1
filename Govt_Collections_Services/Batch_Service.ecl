@@ -35,14 +35,14 @@
 	 STRING2   st;
 	 STRING5   z5;
 */
-IMPORT Address, BatchShare, Doxie, Govt_Collections_Services, Suppress, ut, STD, AutoheaderV2;
+IMPORT Address, BatchShare, Govt_Collections_Services, Suppress, STD, AutoheaderV2;
 
 EXPORT Batch_Service() := FUNCTION
-		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
+  batch_params := Govt_Collections_Services.IParams.getBatchParams();	
 
   // batch_params is a module, so this couldn't be declared before it (side effect)
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-		
+
 		
 		/* ************************************************************************
 		 *                      Force the order on the WsECL page                 *
@@ -64,10 +64,10 @@ EXPORT Batch_Service() := FUNCTION
 			'PenaltThreshold',
 			'SSNMask'
 		));
-		
+
 		in_ssn_mask := batch_params.ssn_mask;
-		is_GLB_fail := NOT ut.glb_ok(batch_params.GLBpurpose);
-		is_DRM_fail := Doxie.DataRestriction.isECHRestricted(batch_params.DataRestrictionMask); // i.e. if pos #6 = '1'
+		is_GLB_fail := NOT batch_params.isValidGLB();  
+		is_DRM_fail := batch_params.isECHRestricted(); // i.e. if DRM pos #6(Experian Credit Hdr) = '1'
 
 		ds_xml_in := DATASET( [], Govt_Collections_Services.Layouts.batch_in_raw ) : STORED('batch_in', FEW);
 
@@ -150,9 +150,9 @@ EXPORT Batch_Service() := FUNCTION
 		BatchShare.MAC_RestoreAcctno(ds_batch_in_marked, ds_recs_out, ds_recs_ready)		
     
 		// 8. Restrictions/suppressions based on application type.
-		Suppress.MAC_Suppress(ds_recs_ready, ds_recs_sup_1, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.DID, lex_id);			
-		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, ssn);
-		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, best_ssn);
+		Suppress.MAC_Suppress(ds_recs_ready, ds_recs_sup_1, batch_params.application_type,,,Suppress.Constants.LinkTypes.DID, lex_id);			
+		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, ssn);
+		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, best_ssn);
 
 		// 9. Provide for ssn masking. Return the input ssn as-is; mask best_ and expanded_ ssn.
 		Suppress.MAC_Mask(ds_recs_sup_3, ds_recs_masked_1, best_ssn, '', true, false,,,,in_ssn_mask);	

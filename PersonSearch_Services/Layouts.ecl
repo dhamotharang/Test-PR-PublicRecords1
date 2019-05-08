@@ -127,6 +127,7 @@ export Layouts := MODULE
 		doxie.Layout_HeaderFileSearch.dob;
 		doxie.Layout_HeaderFileSearch.age;
 		doxie.Layout_HeaderFileSearch.dod;
+		doxie.Layout_HeaderFileSearch.IsLimitedAccessDMF;
 		doxie.Layout_HeaderFileSearch.dead_age;
 		doxie.Layout_HeaderFileSearch.death_code;
 		doxie.Layout_HeaderFileSearch.deceased;

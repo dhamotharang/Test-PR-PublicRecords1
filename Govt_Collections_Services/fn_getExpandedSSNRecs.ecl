@@ -1,8 +1,8 @@
-
-IMPORT Doxie, PhilipMorris;
+﻿
+IMPORT Doxie, Govt_Collections_Services, PhilipMorris;
 
 EXPORT fn_getExpandedSSNRecs( dataset(Layouts.batch_working) ds_batch_in,
-	                            IParams.BatchParams in_mod ) :=
+	                            Govt_Collections_Services.IParams.BatchParams in_mod ) :=
 	FUNCTION
 		
 		// Fulfills _documentation, Req. 4.1.10
@@ -172,7 +172,7 @@ EXPORT fn_getExpandedSSNRecs( dataset(Layouts.batch_working) ds_batch_in,
 		inputDataAndSequence   := PROJECT(data_in, TF.xfm_append_seqno_ssn4(LEFT, COUNTER));
 		searchDataInput        := PROJECT(inputDataAndSequence, TF.xfm_set_clean_data_ssn4(LEFT));	
 		searchdataInputNorm    := NORMALIZE(searchDataInput,3,TF.xfm_normalize_search_data(LEFT, COUNTER));
-		ssnExpansionCandidates := fn_getSSN4ExpansionCandidates(searchdataInputNorm, CN.DEFAULT_UNDERAGE_VALUE, in_mod.DPPAPurpose, in_mod.GLBPurpose);
+		ssnExpansionCandidates := fn_getSSN4ExpansionCandidates(searchdataInputNorm, CN.DEFAULT_UNDERAGE_VALUE, in_mod.dppa, in_mod.glb);
 		
 		// 3. Search by Current Address with house number and no DOBYear match. *** NOTE: we can do
 		// a lot below to remove some unnecessary joins.

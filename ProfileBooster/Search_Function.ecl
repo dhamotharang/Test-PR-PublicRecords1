@@ -1,5 +1,5 @@
-﻿import 	_Control, address, Address_Attributes, avm_v2, dma, doxie, Gateway, iesp, LN_PropertyV2_Services, mdr, ProfileBooster, 
-				Riskwise, Risk_Indicators, ut, Relationship, aid, std;
+﻿import 	_Control, address, Address_Attributes, avm_v2, dma, doxie, Gateway, LN_PropertyV2_Services, mdr, ProfileBooster, 
+				Riskwise, Risk_Indicators, Relationship, aid, std, dx_header;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(DATASET(ProfileBooster.Layouts.Layout_PB_In) PB_In, 
@@ -371,13 +371,14 @@ withCurrBus_thor := withCurrBus_thor_hits + with_InputBus_curraddr_notpopulated;
 #END
 		
 //get household members (DIDs) by doing inner join of the HHID to the HHID_Did key
-ProfileBooster.Layouts.Layout_PB_Shell add_household_members(ProfileBooster.Layouts.Layout_PB_Shell le, doxie.Key_HHID_Did rt) := transform
+index_hhid_did := dx_header.key_hhid_did();
+ProfileBooster.Layouts.Layout_PB_Shell add_household_members(ProfileBooster.Layouts.Layout_PB_Shell le, index_hhid_did rt) := transform
 		self.DID2			:= rt.DID;
 		self.rec_type	:= ProfileBooster.Constants.recType.Household; //set rec_type as household member
 		self := le;
 end;
 
-	hhDIDs_roxie := join(withCurrBus, doxie.Key_HHID_Did,
+	hhDIDs_roxie := join(withCurrBus, index_hhid_did,
 												keyed(left.HHID = right.hhid_relat) and
 												keyed(right.ver = 1) and 			//ver of 1 = current household members
 												left.DID <> right.DID,	//exclude the prospect's DID - we already have it as the prospect record
@@ -385,7 +386,7 @@ end;
 												atmost(RiskWise.max_atmost),keep(300));		
 
 	hhDIDs_thor_hits := join(distribute(withCurrBus(hhid<>0), hhid),
-											distribute(pull(doxie.Key_HHID_Did), hhid_relat),
+											distribute(pull(index_hhid_did), hhid_relat),
 												left.HHID = right.hhid_relat and
 												right.ver = 1 and 			//ver of 1 = current household members
 												left.DID <> right.DID,	//exclude the prospect's DID - we already have it as the prospect record
@@ -477,7 +478,7 @@ end;
 
 //--------- Student-------------//
 
-	dk := choosen(doxie.key_max_dt_last_seen, 1);
+	dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 	hdrBuildDate01 := dk[1].max_date_last_seen[1..6]+'01';
 
 	studentRecs := ProfileBooster.getStudent(slimShell);

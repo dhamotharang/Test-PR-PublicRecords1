@@ -1,6 +1,6 @@
 ﻿
-import ut, riskwise, doxie, LN_PropertyV2, paw, Inquiry_AccLogs, liensv2, doxie_files, 
-BankruptcyV2, BankruptcyV3, american_student_list, AlloyMedia_student_list, prof_licenseV2, Impulse_Email, thrive, mdr;
+import ut, riskwise, dx_header, LN_PropertyV2, paw, Inquiry_AccLogs, liensv2, doxie_files, 
+BankruptcyV3, american_student_list, AlloyMedia_student_list, prof_licenseV2, Impulse_Email, thrive, mdr;
 
 // this function gives a high level overview of different public records attributes at the household level
 EXPORT Boca_Shell_HHID_Summary(grouped DATASET(risk_indicators.iid_constants.layout_outx) all_header,
@@ -29,7 +29,7 @@ end;
 
 hhids := dedup(hhid_input(hhid<>0), hhid);
 
-with_hhid_dids := join(hhids, doxie.Key_HHID_Did,
+with_hhid_dids := join(hhids, dx_header.key_hhid_did(),
 	keyed(left.hhid=right.hhid_relat),
 	transform(layout_hhid_temp, self.did := right.did, 
 		self.hh_members_ct := if(right.did<>0, 1, 0),

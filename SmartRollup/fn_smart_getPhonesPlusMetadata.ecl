@@ -74,7 +74,7 @@ export fn_smart_getPhonesPlusMetadata := MODULE
 		RETURN PROJECT(addresses,getPhonesPlusMetadata(LEFT));
 	END;
 
-	EXPORT byDid(doxie.layout_best B, personreports.input._smartlinxreport param) := FUNCTION
+	EXPORT byDid(doxie.layout_best B, personreports.IParam._smartlinxreport param) := FUNCTION
 		srchMod := MODULE(PROJECT(AutoStandardI.GlobalModule(),doxie.phone_noreconn_param.searchParams,OPT))
 			EXPORT STRING14  DID := (STRING)ROW(B,TRANSFORM(doxie.layout_best,SELF:=LEFT)).did;
 			EXPORT BOOLEAN   IncludeFullPhonesPlus := FALSE : STORED('IncludeFullPhonesPlus');
