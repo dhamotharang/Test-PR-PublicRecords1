@@ -1,9 +1,10 @@
 ﻿IMPORT STD,_control;
 
 //Files for S0376 are Located  //
-EXPORT Spray_refreshFile(STRING filedate, STRING	pServerIP	= IF(_control.thisenvironment.name = 'Dataland',
-																																	_control.IPAddress.bctlpedata12,
-																																	_control.IPAddress.bctlpedata11)) := MODULE
+EXPORT Spray_refreshFile(STRING filedate, STRING	pServerIP	= _control.IPAddress.bctlpedata12) := MODULE
+// pServerIP	= IF(_control.thisenvironment.name = 'Dataland',
+																																	// _control.IPAddress.bctlpedata12,
+																																	// _control.IPAddress.bctlpedata11)) := MODULE
 
 #workunit('name','Spray Foreclosure Refresh');
 
@@ -119,13 +120,13 @@ super_all
 	:=	
 	SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod_orphan', TRUE),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod_orphan'/*, TRUE*/),
 		AddToSuperfile_Nod_Orph,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod', TRUE),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod'/*, TRUE*/),
 		AddToSuperfile_Nod_Ref,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo_orphan', TRUE),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo_orphan'/*, TRUE*/),
 		AddToSuperfile_Reo_Orph,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo', TRUE),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo'/*, TRUE*/),
 		AddToSuperfile_Reo_Ref,
 		STD.File.FinishSuperFileTransaction()
 	);	

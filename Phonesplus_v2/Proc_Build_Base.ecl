@@ -1,6 +1,6 @@
-﻿import didville, Gong_v2, watchdog, phonesplus, ut, mdr, Address, STD;
+﻿import didville, Gong_v2, watchdog, phonesplus, mdr, Address, STD, PromoteSupers;
 
-export Proc_build_base(string pversion,string emailList=''):=function
+export Proc_build_base(string pversion,string emailList='', boolean isTest = false):=function
 //-------Concatenate all Pplus sources in a common layout---------------------------------
 pplus_sources := 
          Map_Cellphone_as_Phonesplus +
@@ -17,7 +17,9 @@ pplus_sources :=
 				 // Map_IBehavior_as_Phonesplus +
 				 Map_Thrive_as_Phonesplus +
 				 Map_AlloyMedia_as_Phonesplus +
-				 Map_NVerified_as_Phonesplus;
+				 Map_NVerified_as_Phonesplus +
+				 Map_NeustarWireless_as_Phonesplus //Jira: DF-24336
+				 ;
 
 pplus_royalty := Map_WiredAssets_as_Phonesplus(false);	
 
@@ -119,16 +121,21 @@ supress_data := Add_Header_Household (cellphone not in Phonesplus_v2.Set_Supress
 																 ~IsObsceneWord(mname) and
 																 ~IsObsceneWord(lname));
 //-------Map v2 fields---------------------------------------------------------------------
-Map_v1_Fields := Fn_Map_v1_Fields(supress_data);
+Map_v1_Fields := Fn_Map_v1_Fields(supress_data)
+:persist('~thor_data400::persist::Phonesplus::Map_v1_Fields');
+
+//Append Neustar Wireless Rules - Jira: DF-24336
+Neustar_Wireless_Rules_Appended := Phonesplus_v2.fn_Append_Neustar_Wireless_Rules(Map_v1_Fields)
+:persist('~thor_data400::persist::Phonesplus::Neustar_Wireless_Rules_Appended');
 
 //------Invoke Scrubs---------------------------------------------------------------------l
 
-scrubscall := Phonesplus_v2.Fn_Invoke_scrubs(Map_v1_Fields, pversion,emailList); 
+scrubscall := Phonesplus_v2.Fn_Invoke_scrubs(Neustar_Wireless_Rules_Appended, pversion,emailList); 
 //-------Rollup previous base file and current file
 
-split_Phonesplus := Map_v1_Fields(~(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty))));
+split_Phonesplus := Neustar_Wireless_Rules_Appended(~(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty))));
 
-split_Royalty := Map_v1_Fields(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
+split_Royalty := Neustar_Wireless_Rules_Appended(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
 
 Rollup_base := Fn_Rollup_Base(split_Phonesplus, 'phonesplus_main', pversion);
 
@@ -136,12 +143,17 @@ Rollup_royalty_base := Fn_Rollup_Base(split_Royalty, 'royalty', pversion);
 
 Transform_to_old_layout := Fn_Transform_to_Old_Layout(Rollup_base);
 
-ut.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, pversion);
-ut.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, pversion);
-ut.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, pversion);
+create_base_files_and_promote := sequential(scrubscall, pplus_base,	pplusv2_base, pplus_royalty_v2_base);
 
-return sequential(scrubscall,
-                                     pplus_base,
-																		 pplusv2_base, pplus_royalty_v2_base);
+pplusv2_base_test := output(Rollup_base,,'~thor_data400::base::phonesplusv2_test_' + pversion,overwrite,compressed);
+pplus_royalty_v2_base_test := output(Rollup_royalty_base,,'~thor_data400::base::phonesplusv2_royalty_test_' + pversion,overwrite,compressed);
+pplus_base_test := output(Transform_to_old_layout,,'~thor_data400::base::phonesplus_test_' + pversion,overwrite,compressed);
+create_test_files := sequential(pplus_base_test, pplusv2_base_test, pplus_royalty_v2_base_test);
+									
+return if(isTest, create_test_files, create_base_files_and_promote);
+
 end;
-																		
+								

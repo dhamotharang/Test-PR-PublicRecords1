@@ -22,5 +22,5 @@ output(KELOtto.KelFiles.PersonAssociationsDetails,, '~gov::otto::person_associat
 output(KELOtto.KelFiles.ScoreBreakdown,,'~gov::otto::entity_scorebreakdown', overwrite);
 
 // Optimized Customer Dashboard Content.
-//output(KELOtto.CustomerDash.TopEntityStats,, '~gov::otto::customerdashtopentitystats', overwrite);
-//output(KELOtto.CustomerDash.TopClustersAndElements,, '~gov::otto::customerdashtopclusters', overwrite);
+output(KELOtto.CustomerDash.TopEntityStats,, '~gov::otto::customerdashtopentitystats', overwrite);
+output(KELOtto.CustomerDash.TopClustersAndElements,, '~gov::otto::customerdashtopclusters', overwrite);

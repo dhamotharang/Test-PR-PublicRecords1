@@ -1,32 +1,11 @@
-import orbit,_Control;
-export Proc_OrbitI_CreateBuild(string pdate) := function
+﻿import orbit,_Control,Orbit3Insurance;
+export Proc_OrbitI_CreateBuild(string pdate,string envment = 'N|B|F') := function
 
-	tokenval := orbit.GetToken();
 
-	createbuild := orbit.CreateBuild(orbitIConstants.buildname,
-									orbitIConstants.masterbuildname,
-									pdate,
-									orbitIConstants.platform,
-									tokenval,
-									,
-									,
-									,
-									OrbitIConstants.platformstatus
-									);
 
-																	
-	return if(_Control.ThisEnvironment.Name = 'Prod_Thor', if( createbuild[1].retcode = 'Success',
-									//addcomponents,
-									fileservices.sendemail(
-												OrbitIConstants.emaillist,
-												'CodesV3 OrbitI Create Build:'+pdate+':SUCCESS',
-												'OrbitI Create build successful: ' + pdate),
-									fileservices.sendemail(
-												OrbitIConstants.emaillist,
-												'CodesV3 OrbitI Create Build:'+pdate+':FAILED',
-												'OrbitI Create build failed. Reason: ' + createbuild[1].retdesc)
-									),
-									output('Not a prod environment')
-									);
+
+create_build :=  Orbit3Insurance.Proc_Orbit3I_CreateBuild (Codes.OrbitIConstants.masterbuildname, pdate,envment,'Darren.Knowles@lexisnexisrisk.com' ) ;
+
+return create_build;
 
 end;
