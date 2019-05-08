@@ -1,5 +1,6 @@
 ﻿EXPORT AC_automated_file(unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO
 
+
 IMPORT STD;
 
 projected_input_file:= project(inut_file_records,transform(recordof(inut_file_records),
@@ -44,7 +45,7 @@ rules_appended_file:=join(Distribute(Category_append_ds,random()),
 															 self.Acceptance_Criteria:=trim(right.Acceptance_Criteria,left,right);
 															 self:=left;
 															 // self:=right;
-															 ),left outer,lookup,many);												
+															 ),left outer,lookup,many):persist('kel_shell::persist::Acceptance_Criteria_results_rules_appended_file'+'_'+Tag+'_'+Category_par);												
 														
 lay := record
 	recordof(Acceptance_Criteria_Module_lay);
@@ -80,7 +81,7 @@ lay makeFatRecord(rules_appended_file L) := TRANSFORM
 							self:=[];
 							END;
       
-AC_result:=PROJECT(rules_appended_file, makeFatRecord(LEFT));
+AC_result:=PROJECT(rules_appended_file, makeFatRecord(LEFT)):persist('kel_shell::persist::Acceptance_Criteria_results_AC_result'+'_'+Tag+'_'+Category_par);
 
 #uniquename(report_lay)
     %report_lay% :=record

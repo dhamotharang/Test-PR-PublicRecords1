@@ -1,4 +1,4 @@
-IMPORT $, STD;
+﻿IMPORT $, STD;
 
 EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)     dSearchResults,
                 DATASET($.Layouts.BatchInAppendDID)      dInBestInfo,
@@ -121,7 +121,7 @@ FUNCTION
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
                 inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,
-                dPrimaryForRIs + dPrepOtherPhonesForRIs);
+                dPrimaryForRIs + dPrepOtherPhonesForRIs + dOtherIdentities);
 
   #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'));

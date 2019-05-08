@@ -16,12 +16,13 @@ Threads := Thread; // Number of Parallel threads to SOAPCALL with
 // InputFile := '~scoringqa::in::shell_2_0_testfile_may_july_2018_input.csv';             //12k
 // InputFile := '~scoringqa::phoneshell::nuestar_only_records_5k.csv';                    //Neustar only sample 5k
 // InputFile := '~scoringqa::phoneshell::nuestar_only_records_5k_PhoneBlanked.csv';       //Neustar only sample blanked phone for test 5k
-// InputFile := '~ScoringQA::PhoneShell::Nuestar_exclusive_records_5k.csv';               //Neustar exclusive 5k
-InputFile := '~scoringqa::in::phoneshell_testsample_nov18_jan19_input.csv';               //Newest Sample From Blake/Ben W  12k
+InputFile := '~ScoringQA::PhoneShell::Nuestar_exclusive_records_5k.csv';               //Neustar exclusive 5k
+// InputFile := '~scoringqa::in::phoneshell_testsample_nov18_jan19_input.csv';               //Newest Sample From Blake/Ben W  12k
 
 // OutputFile := '~ScoringQA::out::phone_shell_version_10_May_July_gateways_NoRestrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();						//Run with No Restrictions
 // OutputFile := '~ScoringQA::out::phone_shell_version_10_May_July_' + '_' + ProjectName + '_' + OptionsName + '_' + BaseTest;         //Run with Restrictions
-OutputFile := '~ScoringQA::out::phone_shell_version_10' + '_' + ProjectName + '_' + OptionsName + '_' + BaseTest;         //Run with Restrictions
+// OutputFile := '~ScoringQA::out::phone_shell_version_10' + '_' + ProjectName + '_' + OptionsName + '_' + BaseTest;         //Run with Restrictions
+OutputFile := '~ScoringQA::out::phone_shell_version_'+ (string)PSVersion + '_' + ProjectName + '_' + OptionsName + '_' + BaseTest + '_' + ThorLib.wuid();         //Run with Restrictions
 
 /* *****************************************
  * Phone Shell Input Options               *
@@ -231,11 +232,12 @@ Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout errx(soap le) := TRANSFORM
 END;
 
 // OUTPUT(CHOOSEN(soap, eyeball), NAMED('Sample_SOAP_Input'));
+OUTPUT(soap,, OutputFile + '_PSInputSample', thor, OVERWRITE);
 
 soapResults := SOAPCALL(
 													soap, 
 													RoxieIP, 
-													// 'Phone_Shell.Phone_Shell_service.5', // change to whichever version you want to run
+													// 'Phone_Shell.Phone_Shell_service.33', // change to whichever version you want to run
 													'Phone_Shell.Phone_Shell_service', // change to whichever version you want to run
 													{soap},  
 													DATASET(Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout),
@@ -250,6 +252,8 @@ errors := soapResults (TRIM(Phone_Shell.Gathered_Phone) = '' AND TRIM(Phone_Shel
 // OUTPUT(COUNT(errors), NAMED('Total_Number_Of_Errors'));
 
 goodResults := SORT(soapResults (TRIM(Phone_Shell.Gathered_Phone) <> '' AND TRIM(Phone_Shell.Sources.Source_List_Last_Seen) <> ''), Phone_Shell.Input_Echo.AcctNo, -LENGTH(TRIM(Phone_Shell.Sources.Source_List)), Phone_Shell.Gathered_Phone);
+OUTPUT(goodResults,, OutputFile, thor, OVERWRITE);
+
 
 // Trims back some layout names for Modeling team so they can import file to SAS
 modelingShell := SORT(Phone_Shell.To_Modeling_Shell(goodResults, DataRestrictionMask), AcctNo, -LENGTH(TRIM(Source_List)), Gathered_Ph);
@@ -260,6 +264,6 @@ modelingShell := SORT(Phone_Shell.To_Modeling_Shell(goodResults, DataRestriction
 // OUTPUT(CHOOSEN(modelingShell, eyeball), NAMED('Sample_Modeling_Shell'));
 // OUTPUT(modelingShell,, OutputFile + 'ModelingLayout'+ '_thor_copy', thor, OVERWRITE);
 
-Return OUTPUT(modelingShell,, OutputFile + '_ModelingLayout_' + ThorLib.wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
+Return OUTPUT(modelingShell,, OutputFile + '_ModelingLayout.csv', CSV(HEADING(single), QUOTE('"')), OVERWRITE);
 // return 0;
 END;

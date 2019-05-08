@@ -2,8 +2,8 @@
 IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 Threads := 1;
 
-RoxieIP := RiskWise.shortcuts.Dev156;
-// roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
+// RoxieIP := RiskWise.shortcuts.Dev156;
+roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie;
 
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
@@ -57,7 +57,7 @@ Output_SALT_Profile := FALSE;
 
 Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
-RecordsToRun := 100;
+RecordsToRun := 0;
 eyeball := 120;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
@@ -230,7 +230,7 @@ LayoutMaster_With_Extras := RECORD
 END;
 
 Layout_Business := RECORD
-    STRING AccountNumber;
+    STRING BusInputAccountEcho;
 		STRING10	B2bHistoryBuild;
 		INTEGER3	B2bTLCntEv;
 		INTEGER3	B2bTLCnt2Y;

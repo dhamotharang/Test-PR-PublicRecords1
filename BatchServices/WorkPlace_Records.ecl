@@ -14,10 +14,8 @@ IMPORT BatchShare, doxie, doxie_cbrs, MDR, POE, Suppress, ut, WorkPlace_Services
 
 string todays_date := (string) STD.Date.Today ();
 
-EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION 
+EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = FALSE) := FUNCTION 
 
-  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()); 
-   
   // *** Stored soap input and temporary/internal constants
 	boolean IncludeSpouseAlways := false : STORED('IncludeSpouseAlways');
 	boolean IncludeSpouseOnly   := false : STORED('IncludeSpouseOnlyIfNoDebtor');
@@ -174,15 +172,11 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // 7.2 Filter to only include records for sources that are not restricted;
 	//     based upon the DataRestrictionMask positions associated with those sources.
   ds_all_recs_not_restricted := ds_all_recs_slimmed(
-	     // First, include the record if the source is not restricted.
-			 // NOTE1: As of 01/14/2011, Teletrack is the only source that might be 
-			 //                          restricted via the DataRestrictionMask.
-		   (MDR.sourceTools.SourceIsTeletrack(source) and ~doxie.DataRestriction.TT) OR
-       // OR include the record if the source is not Teletrack.
-			 ~MDR.sourceTools.SourceIsTeletrack(source));
+			 // NOTE1: As of 01/14/2011, Teletrack is the only source that might be restricted via the DataRestrictionMask.
+		   (~MDR.sourceTools.SourceIsTeletrack(source) OR ~doxie.compliance.isTTRestricted (mod_access.DataRestrictionMask)));
 
 	// 7.3 Applying GLB restrictions.
-	ds_all_recs_glb_ok := ds_all_recs_not_restricted(ut.PermissionTools.glb.SrcOk(mod_access.glb, source, dt_first_seen, 0));
+	ds_all_recs_glb_ok := ds_all_recs_not_restricted(doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen, 0));
 
   // 7.3 Next do a "left only" join to the excluded_sources dataset to pass through
   //     all sources that are not excluded.
