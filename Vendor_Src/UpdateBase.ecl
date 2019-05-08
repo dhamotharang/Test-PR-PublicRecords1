@@ -12,7 +12,7 @@ EXPORT UpdateBase (STRING filedate, BOOLEAN pUseProd = FALSE) := MODULE
 	 MasterList      		      := Vendor_Src.StandardizeInputFile(filedate, pUseProd).MasterList;
 	 
  	 
-NewBaseData	:= CleanBankFile + CleanLienFile + FixedRiskViewFile + CleanCourtLocatorFile + MasterList + CollegeLocator; //+ Files().base.qa;
+NewBaseData	:= CleanBankFile + CleanLienFile + FixedRiskViewFile + CleanCourtLocatorFile + MasterList + CollegeLocator + Files().base.qa;
                                                                                                                               
 				
 DistNewBaseFile := DISTRIBUTE(NewBaseData, HASH(input_file_id, source_code));
