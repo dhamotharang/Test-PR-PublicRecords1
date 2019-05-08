@@ -33,7 +33,7 @@ header_services.Supplemental_Data.mac_verify(	'file_infutor_inj.txt',
 /* //check date validity by length, number values, and between 1901 and today */  
 loadfile:=STD.File.SUPERFILECONTENTS(infutor.filename_infutor);
 
-SearchPattern:='^thor_dell400::in::infutor::([^ ]*)::';
+SearchPattern:='thor_dell400::in::infutor::([^ ]*)::';
 cversion_dev:=regexfind(SearchPattern,loadfile[1].name,1);  
 
 Valid_Date_Range(string in_date) := in_date[1..6] between '190101' and ut.GetDate[1..6];

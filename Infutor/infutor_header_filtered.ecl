@@ -10,7 +10,7 @@ Test_Count := 0;
 header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l, integer c) := transform
 loadfile:=STD.File.SUPERFILECONTENTS(infutor.filename_infutor);
 
-SearchPattern:='^thor_dell400::in::infutor::([^ ]*)::';
+SearchPattern:='thor_dell400::in::infutor::([^ ]*)::';
 cversion_dev:=regexfind(SearchPattern,loadfile[1].name,1);
 /* //check date validity by length, number values, and between 1901 and today */
 
