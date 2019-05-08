@@ -132,4 +132,18 @@ EXPORT i_Event_lkp := RECORD
 	UNSIGNED8 record_sid;
 END;
 
+EXPORT i_Domain_lkp := RECORD
+	STRING100	domain_name;
+	STRING8	  create_date;
+	STRING8	  expire_date;
+	STRING8	  date_first_seen;
+	STRING8	  date_last_seen;
+	STRING8	  date_first_verified;
+	STRING8	  date_last_verified;
+	STRING50	domain_status;
+	STRING10	verifies_account;
+	STRING8   process_date;
+	UNSIGNED  email_rec_key;
+END;
+
 END;
