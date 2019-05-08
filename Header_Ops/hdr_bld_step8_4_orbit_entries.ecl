@@ -1,73 +1,32 @@
 ﻿IMPORT Orbit3,_control, header;
 
-EXPORT orbit_update_entries(string filedate, string createORupdate) := function
+EXPORT fn_orbit_entries(boolean isCreate, string filedate) := function    
 
-    tokenval := orbit3.GetToken();
-    rec_rep := {STRING  Name, STRING  Status, STRING  Message};
+    is_hash_month := filedate[5..6] in ['03','06','09','12'];   
     
-    update_entry(string buildname, string Buildvs, string Envmt) := FUNCTION
-             
-            submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
-                                                                    Orbit3.Constants(Envmt).platform_upd).retcode ;
-            
-            return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-                        project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-                        );
-    END;
-    update_bentry(string buildname, string Buildvs, string Envmt) := FUNCTION
-            
-            status := Orbit3.Constants(Envmt).platform_upd(PlatformName='Boolean Roxie Production');
-            submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
-                                                                    status).retcode ;
-            
-            return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-                        project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-                        );
-    END;
-    create_entry(string buildname, string Buildvs) := FUNCTION
-    
-            submit_change1 := Orbit3.CreateBuild        (buildname, Buildvs, tokenval).retcode;
-            submit_change2 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval).retcode;
-            return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-                       project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))+
-                       project(submit_change2, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-                      );
-    end;
-    is_hash_month := filedate[5..6] in ['03','06','09','12'];
-    
-    RETURN if (createORupdate='create',
-                        create_entry('Show Sources'          ,filedate)+
-                        create_entry('FCRA_Header'           ,filedate)+
-                        create_entry('Header'                ,filedate)+
-                        create_entry('RelativesV3'           ,filedate)+
-                        create_entry('PersonXLAB'            ,filedate)+
-                        create_entry('personAncillarykeys'   ,filedate)+
-                        create_entry('Slimsorts'             ,filedate)+
-                        create_entry('PowerSearchBoolean'    ,filedate)+
-                        create_entry('Remote Linking'        ,filedate)+
-                        create_entry('Header_IKB'            ,filedate)+
-                        if(is_hash_month,   create_entry('Header Hashes'         ,filedate))
-                        ,
-               // createORupdate = 'update',
-                        update_entry('Show Sources'          ,filedate,'N')+
-                        update_entry('FCRA_Header'           ,filedate,'F')+
-                        update_entry('Header'                ,filedate,'N')+
-                        update_entry('RelativesV3'           ,filedate,'N')+
-                        update_entry('PersonXLAB'            ,filedate,'N')+
-                        update_entry('personAncillarykeys'   ,filedate,'N')+
-                        update_entry('Slimsorts'             ,filedate,'N')+
-                        update_bentry('PowerSearchBoolean'   ,filedate,'N|B')+
-                        update_bentry('Remote Linking'       ,filedate,'N')+
-                        update_bentry('Header_IKB'           ,filedate,'N')
-               );
-    
- 
+    skipcreatebuild := if(isCreate, false, true);
+    skipupdatebuild := if(isCreate, true, false);
+       
+    return parallel(
+            Orbit3.Proc_Orbit3_CreateBuild('Show Sources', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('Header', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('RelativesV3', filedate, 'N',skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('personAncillarykeys', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('Slimsorts', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('PowerSearchBoolean', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('Remote Linking', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers);
+            if(is_hash_month, Orbit3.Proc_Orbit3_CreateBuild('Header Hashes', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
+            );
 end;
 
-filedate := '20180926'; // RUN ON HTHOR
-// filedate := header.version_build;
-// orbit_update_entries(filedate,'create');
-orbit_update_entries(filedate,'update');
+filedate := '20190324'; // RUN ON HTHOR
+
+fn_orbit_entries(true, filedate);
+fn_orbit_entries(false, filedate);
+
 
 // W:\Projects\Header\15-05a_BuildAssistScripts\personheader_create_orbit_entries.ecl
 /*
@@ -77,19 +36,17 @@ version
 create entries
 update for QA
 
+20190422 W20190424-145840 - create
+20190324 W20190424-092000 - update
+20181224 W20190109-101007(create)
 20181023 W20181029-111111
-
 20180926 W20181001-073122
 20180522 W20180621-161729
-20180423
-
-http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180425-095340#/stub/Summary
-
-20180320
-http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-152657#/stub/Summary
+20180423 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180425-095340#/stub/Summary
+20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180419-152657#/stub/Summary
 W20180322-100610
-
 // */
+
 // version |create entries  |update for QA   |
 // 20180221|W20180314-152102|W20180320-130745|
 // 20180130|W20180306-154721|W20180306-155728|
