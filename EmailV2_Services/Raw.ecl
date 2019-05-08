@@ -1,42 +1,38 @@
-﻿IMPORT $, dx_Email, DidVille, AutokeyB2_batch, Autokey_batch;
+﻿IMPORT $, dx_Email, DidVille, AutokeyB2_batch, Autokey_batch, Data_Services;
 
 EXPORT Raw := MODULE
 
 
-  EXPORT getIdsByLexID(DATASET($.Layouts.batch_in_rec) ds_batch_in) := FUNCTION
-
-    ids_from_did := JOIN(ds_batch_in,dx_Email.Key_Did(), 
-                          KEYED(LEFT.DID = RIGHT.DID), 
+  EXPORT getIdsByLexID(DATASET($.Layouts.batch_in_rec) ds_batch_in, UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA) := FUNCTION
+    
+    ids_from_did := PROJECT(dx_Email.Ids.mac_byLexID(ds_batch_in, DID, data_environment), 
                             TRANSFORM($.Layouts.email_ids_rec,
                               SELF.acctno        := LEFT.acctno;
                               SELF.seq           := LEFT.seq;
-                              SELF.email_rec_key := RIGHT.email_rec_key,                                
+                              SELF.email_rec_key := LEFT.email_rec_key,                                
                               SELF := LEFT,
-                              SELF := []),
-                              LIMIT($.Constants.SEARCH_JOIN_LIMIT, SKIP));
+                              SELF := []));
     RETURN ids_from_did;                                           
   END;          
 
   EXPORT getIdsByInputEmail(DATASET($.Layouts.batch_in_rec) ds_batch_in) := FUNCTION
     
-    email_lookup := JOIN(ds_batch_in,dx_Email.Key_Email_Address, 
-                          KEYED(LEFT.email_username+'@'+LEFT.email_domain = RIGHT.clean_email), 
+    ds_batch := PROJECT(ds_batch_in,TRANSFORM($.Layouts.batch_in_rec, SELF.email := TRIM(LEFT.email_username)+'@'+LEFT.email_domain, SELF:=LEFT)); 
+    email_lookup := PROJECT(dx_Email.Ids.mac_byEmail(ds_batch, email),
                             TRANSFORM($.Layouts.email_ids_rec,
                               SELF.acctno        := LEFT.acctno;
                               SELF.seq           := LEFT.seq;
-                              SELF.email_rec_key := RIGHT.email_rec_key,                                
+                              SELF.email_rec_key := LEFT.email_rec_key,                                
                               SELF := LEFT,
-                              SELF := []),
-                              LIMIT($.Constants.SEARCH_JOIN_LIMIT, SKIP));
+                              SELF := []));
     RETURN email_lookup;                                           
   END;  
   
-  EXPORT getEmailPayload(DATASET($.Layouts.email_ids_rec) ids_batch_in) := FUNCTION
+  
+  EXPORT getEmailPayload(DATASET($.Layouts.email_ids_rec) ids_batch_in, UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA) := FUNCTION
     
-    email_payload := JOIN(ids_batch_in,dx_Email.Key_email_payload(), 
-                          KEYED(LEFT.email_rec_key = RIGHT.email_rec_key), 
-                            $.Transforms.addRawPayload(LEFT,RIGHT),
-                              KEEP(1),LIMIT(0));
+    email_payload := PROJECT(dx_Email.Get.mac_payload(ids_batch_in, email_rec_key, data_environment), 
+                            $.Transforms.addRawPayload(LEFT,LEFT._email_data));
     RETURN email_payload;                                           
   END;  
   
@@ -83,27 +79,29 @@ EXPORT Raw := MODULE
 
   EXPORT getEmailRawData(DATASET($.Layouts.batch_in_rec) batch_in,
                          $.IParams.EmailParams in_mod,
-                         STRING5 search_by) := FUNCTION
+                         STRING5 search_by,
+                         UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA) := FUNCTION
 
-    search_by_email := getIdsByInputEmail(batch_in);
+    BOOLEAN isFCRA := data_environment=Data_Services.data_env.iFCRA;
+    
+    search_by_email := IF(~isFCRA, getIdsByInputEmail(batch_in));
  
-    search_by_lexid := getIdsByLexID(batch_in(did>0));
+    search_by_lexid := getIdsByLexID(batch_in(did>0),data_environment);
     
     // in case of search by PII we will use input Did or Did coming as deep dive
-    deepdive_dids := IF(in_mod.RunDeepDive AND ~in_mod.RequireLexidMatch, DeepDiveForIds(batch_in(did=0)));
+    deepdive_dids := IF(~isFCRA AND in_mod.RunDeepDive AND ~in_mod.RequireLexidMatch, DeepDiveForIds(batch_in(did=0)));
     batch_did_ids := getIdsByLexID(batch_in(did>0) + deepdive_dids);
     
-    batch_autokey_ids := getIdsByAutokeys(batch_in);
+    batch_autokey_ids := IF(~isFCRA, getIdsByAutokeys(batch_in));
     search_by_input_pii := DEDUP(SORT(batch_did_ids + batch_autokey_ids,acctno,seq,email_rec_key,isdeepdive),acctno,seq,email_rec_key);
    
     id_recs := CASE(search_by,
                  $.Constants.SearchBy.ByEmail => search_by_email,
                  $.Constants.SearchBy.ByLexid => search_by_lexid,
                  $.Constants.SearchBy.ByPII   => search_by_input_pii,
-                 search_by_email );
-               //  DATASET([], $.Layouts.email_ids_rec) );
+                 DATASET([], $.Layouts.email_ids_rec) );
                  
-    payload_recs := getEmailPayload(id_recs); 
+    payload_recs := getEmailPayload(id_recs, data_environment); 
     
     //output(search_by_email, named('search_by_email'),EXTEND);
     //output(search_by_lexid, named('search_by_lexid'),EXTEND);
