@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, Thrive, ConsumerDisclosure, MDR,STD,UT;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, Thrive, ConsumerDisclosure, MDR,STD,UT;
 
 layout_thrive_raw := RECORD(Thrive.layouts.baseOld)  //recordof(Thrive.keys().did_fcra.qa)
 END;

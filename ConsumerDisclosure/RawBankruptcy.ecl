@@ -1,4 +1,10 @@
-﻿IMPORT BankruptcyV2,BankruptcyV3,BankruptcyV3_Services,ConsumerDisclosure,doxie,FCRA,FFD,Suppress,STD;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT BankruptcyV2,BankruptcyV3,BankruptcyV3_Services,ConsumerDisclosure,doxie,FCRA,FFD,Suppress,STD;
 
 boolean IsFCRA := TRUE;
 

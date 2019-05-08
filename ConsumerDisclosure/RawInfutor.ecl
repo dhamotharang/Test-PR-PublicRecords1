@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, InfutorCID, ConsumerDisclosure;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, InfutorCID, ConsumerDisclosure;
 
 layout_Infutor_raw := RECORD //RECORDOF(InfutorCID.Key_Infutor_DID_FCRA);
     FCRA.Layout_Override_Infutor -[flag_file_id];

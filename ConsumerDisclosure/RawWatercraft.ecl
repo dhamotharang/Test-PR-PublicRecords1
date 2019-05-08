@@ -1,4 +1,10 @@
-﻿IMPORT Watercraft, ConsumerDisclosure, doxie, FCRA, FFD, MDR, Suppress;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT Watercraft, ConsumerDisclosure, doxie, FCRA, FFD, MDR, Suppress;
 
   BOOLEAN IsFCRA := TRUE;
 
