@@ -1600,13 +1600,13 @@ biidv2_layout_input:=Record
       																				 // ,
       																				 // 'Scoring_QA@risk.lexisnexis.com');
       																				 
-      					out_file1 := output(NON_FCRA_result , ,'~ScoringQA::out::ks1::NON_FCRA_result' + curr_date, CSV(heading(single), quote('"')), overwrite, EXPIRE(30) );
+      					out_file1 := output(NON_FCRA_result , ,'~ScoringQA::out::ks1::NON_FCRA_result' + curr_date + '_biidv2', CSV(heading(single), quote('"')), overwrite, EXPIRE(30) );
       			
       			
       			// string out_file_layout := '';
       
       			
-            outfile1 := dataset('~ScoringQA::out::ks1::NON_FCRA_result' + curr_date, typeof(out_file_layout));
+            outfile1 := dataset('~ScoringQA::out::ks1::NON_FCRA_result' + curr_date + '_biidv2', typeof(out_file_layout));
       			
       
             no_of_records1 := count(outfile1);

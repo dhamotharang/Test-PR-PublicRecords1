@@ -84,7 +84,7 @@ ip:='~';
 		
 		rpt29:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,a1,b1);
 
-/*for biid2		rpt30:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,a1,b1);
+/*for biid2		rpt30:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,a1,b1); ////////change inside: stats, average & dids delete "1"
 */
 
 		//*********************************************************************************************************************
@@ -147,7 +147,7 @@ ip:='~';
 
 		rpt29_1:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,b1,a1);
 
-/*for biid2				rpt30_1:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,b1,a1);
+/*for biid2				rpt30_1:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,b1,a1); ////////change inside: stats, average & dids delete "1"
 */
 
 			  compare_layout_stats := RECORD
