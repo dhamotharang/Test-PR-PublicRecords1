@@ -2,6 +2,7 @@
 	import FraudShared,FraudGovPlatform;
 	folder := #EXPAND(myFolder);
 	inFile := inputFile;
+	datasetName	:=	'FraudGov';
 	scrubs_name := IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
 	scope_datasetName := IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
 	profilename := 'Scrubs_FraudGov_'+scopename;
@@ -84,7 +85,7 @@
 	TranslateBitmap	:=	OUTPUT(T);
 	NumRemovedRecs := '';
 	WU := '';
-	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,NumRemovedRecs,WU,workunit}],Scrubs.Layouts.LogRecord);
+	new_entry:=dataset([{DatasetName,ProfileName,scopename,BuildDate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,NumRemovedRecs,WU,workunit}],Scrubs.Layouts.LogRecord);
 	outnew:=output(new_entry,named(scope_datasetName+'_LogEntry'));
 
 	EmailReport:=if(MemailList <>'', fileservices.sendEmail(MemailList,
@@ -93,7 +94,7 @@
 		'DatasetName:'+DatasetName+'\n'+
 		'ProfileName:'+ProfileName+'\n'+
 		'ScopeName:'+scopename+'\n'+
-		'FileDate:'+filedate+'\n'+
+		'FileDate:'+BuildDate+'\n'+
 		'Total Number of Records:'+TotalRecs+'\n'+
 		'Total Number of Rules:'+NumRules+'\n'+
 		'Total Number of Failed Rules:'+NumFailedRules+'\n'+
@@ -102,7 +103,7 @@
 		'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
 		'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
 
-	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
+	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,BuildDate,profilename).SubmitStats;
 	//Submits Profile's stats to Orbit
 	
 	SuperFile :=FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::' + scopename;

@@ -1,10 +1,8 @@
-﻿IMPORT $;
-
-EXPORT layout_best := RECORD
+﻿EXPORT Layout_Watchdog_Merged := RECORD
 
 	unsigned6    did := 0;
-  UNSIGNED8		 permissions;
-	DATASET($.Layout_records)	counts;
+  UNSIGNED8		 permissions := 0;
+	DATASET($.Layout_records)	counts := DATASET([], $.Layout_records);
 	qstring10    phone := '';
 	qstring9     ssn := '';
 	integer4     dob := 0;
@@ -40,5 +38,8 @@ EXPORT layout_best := RECORD
 	STRING10     ADL_ind := '';
 	string1	     valid_SSN := '';
   $.Layout_best_flags;
+	//CCPA Fields
+	unsigned8	record_sid := 0;		// record id 
+	unsigned4 global_sid := 0;   //this is a unique source ID that will be coming from Orbit.
 
 END;
