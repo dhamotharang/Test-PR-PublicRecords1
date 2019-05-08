@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, Header, ConsumerDisclosure;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, Header, ConsumerDisclosure;
 
 layout_DeathDID_raw := RECORD
     UNSIGNED6 l_did;
