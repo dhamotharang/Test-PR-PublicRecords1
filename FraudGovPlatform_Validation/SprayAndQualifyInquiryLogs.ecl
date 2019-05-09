@@ -23,7 +23,7 @@ EXPORT SprayAndQualifyInquiryLogs(
 			,~regexfind('test',bus_intel.sub_market,nocase)
 		);
 			
-	fname	:= 'inquirylogs_' + DateSearch;
+	fname	:= 'inquirylogs_' + pVersion[1..8];
 	FileSprayed := FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
 	InquiryLogs_Sprayed := FraudGovPlatform.Filenames().Sprayed.InquiryLogs;
 	

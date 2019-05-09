@@ -18,9 +18,8 @@ payload := RECORD
   rec.did_cnt;
 END;
 
-fname (integer data_category) := IF (data_category = data_services.data_env.iFCRA,
-                                     $.names().i_aptbuildings_fcra,
-                                     $.names().i_aptbuildings); 
+fname (integer data_category) := $.names().i_aptbuildings_fcra_en; // doesn't exist on non-FCRA side
 
-EXPORT key_AptBuildings (integer data_category = 0) := 
+//TODO: only on FCRA side? Then "fname" above is not needed.
+EXPORT key_aptbuildings_en (integer data_category = 0) := 
          INDEX (keyed_fields, payload, fname(data_category));
