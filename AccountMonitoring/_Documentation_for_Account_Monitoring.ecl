@@ -124,8 +124,12 @@
 	   Bankruptcy, Deceased, etc.
 	
 	PRODUCT FILE REFERENCES
-	
-	5. Add a new module having the name of the new product to the Product_Files attribute, and create 
+
+	5. Update AccountMonitoring.config_UpdateSuperFiles. This will enable AccountMonitoring.fn_UpdateSuperFiles
+     to create/update keys that can be used in product_files instead of the thor version of the
+     superfiles.
+
+	6. Add a new module having the name of the new product to the Product_Files attribute, and create 
 	   however many references you require to the product files located on the Prod Dali (i.e. ut.foreign_prod). 
 		 Mind that some files may require some additional logic to be made useful to Account Monitoring. 
 		 Some things to keep in mind:
@@ -134,20 +138,20 @@
 			 o  This is also a good place to make the files slimmer (to only those fields necessary for running
 			    the Account Monitoring job) to reduce the amount of disk space they occupy.
 
-	6. Add a new, local attribute having the name of the new product to AccountMonitoring.Get_Dataset_Versions 
+	7. Add a new, local attribute having the name of the new product to AccountMonitoring.Get_Dataset_Versions 
 	   and configure it as you see with the other local product attributes there. Union this attribute to the 
 		 All_Products local attribute.
 	
 	CANDIDATE GENERATION MECHANISMS (CGMs)
 	
-	7. Write a new attribute--a Candidate Generation Mechanism--and ensure that it obeys the interface 
+	8. Write a new attribute--a Candidate Generation Mechanism--and ensure that it obeys the interface 
 	   definition for all of the other CGMs that have been written thus far (i.e. those attributes named 
 		 'fn_cgm_[productname]'), and that you have unit-tested it to the point where it returns the 
 		 results it should.
 	
 	PRODUCT CONFIGURATION MODULE
 	
-	8. Write a new attribute--a product configuration module--and ensure that it inherits from the 
+	9. Write a new attribute--a product configuration module--and ensure that it inherits from the 
 	   i_Monitoring_Product_Config interface. In this module, make appropriate reference to your new 
 		 filename, file, and CGM attributes, See other product configuration modules for examples, e.g.
 		  - AccountMonitoring.mod_Monitoring_address
@@ -156,7 +160,7 @@
 	
 	IN THE SERVICE-LEVEL ATTRIBUTE
 	
-	9. In the Run attribute, add your product to the list of other products, defining the following 
+	10. In the Run attribute, add your product to the list of other products, defining the following 
 	attributes:
 
 		// ***** [productname] *****
@@ -164,15 +168,15 @@
 			candidates_[productname]          := .....
 			update_history_file_[productname] := .....
 
-	10. Next, in the Run attribute, add a reference to the attribute candidates_[productname] to the list 
+	11. Next, in the Run attribute, add a reference to the attribute candidates_[productname] to the list 
 	    of attributes that are unioned together to comprise candidate_all. 
 		 
-	11. Then, in the Run attribute, add a reference to the attribute update_history_file_[productname] to 
+	12. Then, in the Run attribute, add a reference to the attribute update_history_file_[productname] to 
 	    the list of Parallel actions that comprise update_history_files.
 
 	DENOUEMENT
 	
-	12. Shake head in wonder at how easy this was.
+	13. Shake head in wonder at how easy this was.
 	
 
 

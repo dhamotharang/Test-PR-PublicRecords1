@@ -1,10 +1,10 @@
 ﻿/* This function updates all the super files for a particular product*/
 
-import dops, _control, AccountMonitoring, STD, _Control, ut, Data_Services;
+import dops, _control, AccountMonitoring, STD, _Control, Data_Services;
 
 EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask = 
                             AccountMonitoring.types.productMask.allProducts, // all
-                            string roxie_esp_server = '10.173.104.101' ,  // prod
+                            string roxie_esp_server = dops.constants.vESPSet('nonfcra','prod')[1], // prod //'10.173.104.101' 
                             string roxie_vip_server =  _Control.RoxieEnv.prodvip,
                             string roxie_port = '8010'
                             
@@ -31,7 +31,7 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
 
   newSuperfileLinkCheckLogical  :=  nothor(PROJECT(global_newSuperfileLink,
                                            TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.superfile_logicalfile_flat_layout,
-                                            SELF.LogicalFileExists := STD.File.FileExists('~' + left.LogicalFile),
+                                            SELF.LogicalFileExists := STD.File.FileExists(Data_Services.Default_Data_Location + left.LogicalFile),
                                             SELF := left)
                                            ));
                          
@@ -44,7 +44,7 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
          SELF.MonitorSuperFile := L.MonitorSuperFile;
          SELF.RoxieSuperFile := L.RoxieSuperFile;
          SELF.LogicalFiles := PROJECT(AllRows,TRANSFORM(AccountMonitoring.layouts.UPDATE_SOURCE.LogicalFile_layout,SELF := LEFT));
-         SELF.AllLogicalFilesExist := min(l.LogicalFileExists,  min( AllRows,AllRows.LogicalFileExists));
+         SELF.AllLogicalFilesExist := min( AllRows,AllRows.LogicalFileExists);
      END;
    
   CGM_LogicalFilesFinal := GLOBAL(ROLLUP(CGM_LogicalFilesGroup,GROUP,RollFiles(LEFT,ROWS(LEFT))),FEW);
@@ -57,7 +57,7 @@ EXPORT fn_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask =
                            
                                 SEQUENTIAL(
                                           STD.File.StartSuperFileTransaction()
-                                         ,STD.File.AddSuperFile(SuperFileName,'~'+logicalFile)
+                                         ,STD.File.AddSuperFile(SuperFileName,Data_Services.Default_Data_Location + logicalFile)
                                          ,STD.File.FinishSuperFileTransaction()
                                 ));
             RETURN update_action;

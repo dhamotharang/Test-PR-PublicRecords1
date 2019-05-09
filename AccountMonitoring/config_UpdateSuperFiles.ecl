@@ -7,11 +7,15 @@ EXPORT config_UpdateSuperFiles(AccountMonitoring.types.productMask product_mask 
 
 
 
-/*  Roxie Super key name vs Monitoring Superkey name. More categories and their superfiles 
-     that fn_UpdateSuperFiles function should update can be added in this dataset. If there is a file that 
-     is used by multiple products,just add all their product masks. 
-     Example : AccountMonitoring.types.productMask.abc + 
-               AccountMonitoring.types.productMask.xyz          
+/* This config file is based on the following layout: 
+   
+roxie_monitor_superfile_layout := RECORD
+  STRING250 RoxieSuperFile;    // Name of the Roxie superfile.  
+  STRING250 MonitorSuperFile;  // Name of the new superfile on thor that will contain the same data as the Roxie superfile. 
+  UNSIGNED8 product_mask_supported; // The sum of all the product's product-masks that this superfile will be used for. 
+end;
+
+       
 */
     
      Superfiles := DATASET([
