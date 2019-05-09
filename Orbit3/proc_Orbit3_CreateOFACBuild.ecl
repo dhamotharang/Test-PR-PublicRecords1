@@ -74,7 +74,7 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 												'---------------------'+'\n'+
 												'Status:'+status+'\n'+
 												'---------------------'+'\n'+
-												'Error Description:'+description+'\n'+
+												'Description:'+description+'\n'+
 												'---------------------'+'\n'+
 												'Workunit:'+workunit);
 	   end;
