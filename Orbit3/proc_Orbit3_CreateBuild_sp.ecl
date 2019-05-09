@@ -1,5 +1,5 @@
 ﻿import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true) := function
+export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true,string wuid) := function
 
 	tokenval := orbit3.GetToken();
 
@@ -38,9 +38,11 @@ sendemail(string keyword = '',string status = '') := function
 												'---------------------'+'\n'+
 												'Status:'+status+'\n'+
 												'---------------------'+'\n'+
-												'Error Description:'+description+'\n'+
+												'Description:'+description+'\n'+
 												'---------------------'+'\n'+
-												'Workunit:'+workunit);
+												'Spawn Workunit:'+workunit + '\n' + 
+												'---------------------'+'\n'+
+												'Parent Workunit:'+wuid);
 												
 		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
 									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )

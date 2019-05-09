@@ -1,5 +1,5 @@
 ﻿import ut,Orbit3,_Control;
-export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
+export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N',  string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,string wuid) := function
 
 	tokenval := orbit3.GetToken() : independent;
 
@@ -78,9 +78,11 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 												'---------------------'+'\n'+
 												'Status:'+status+'\n'+
 												'---------------------'+'\n'+
-												'Error Description:'+description+'\n'+
+												'Description:'+description+'\n'+
 												'---------------------'+'\n'+
-												'Workunit:'+workunit);
+												'Spawn Workunit:'+workunit+ '\n'+
+												'---------------------'+'\n'+
+												'Parent Workunit:'+wuid);
 												
 		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
 									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
