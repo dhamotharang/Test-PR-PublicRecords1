@@ -47,8 +47,10 @@ get_build_candidates := 	Orbit3.GetBuildCandidates(buildname,
 		
 			sendemail(string keyword = '',string status = '') := function 
 		
-		error_description := map ( keyword = 'CREATE' and status in ['FAIL','SKIP'] => create_build.Message,
-		                     keyword = 'UPDATE' and status in ['FAIL','SKIP'] => Update_build.Message,
+		error_description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
+		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
+		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
+						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
 												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
 												 'N/A'
 												 );

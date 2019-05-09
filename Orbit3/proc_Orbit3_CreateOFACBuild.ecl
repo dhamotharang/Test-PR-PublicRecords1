@@ -56,9 +56,10 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 		
 		sendemail(string keyword,string status) := function 
 		
-		error_description := map ( keyword = 'CREATE' and status in ['FAIL','SKIP'] => 'Build Instance Already Exists in Orbit',
-		                     keyword = 'UPDATE' and status = 'FAIL' => 'Build Instance Already Exists and Updated to On Develelopment in Orbit',
-												 keyword = 'UPDATE' and status = 'SKIP' => 'Build Instance did not get Updated to On Develelopment as skipupdatebuild parameter is passed true',
+	error_description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
+		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
+		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
+						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
 												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
 												 'N/A'
 												 );
