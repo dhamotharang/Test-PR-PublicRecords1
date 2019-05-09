@@ -1,11 +1,11 @@
-IMPORT FraudShared, tools;
+﻿IMPORT FraudShared, tools;
 EXPORT Build_Main(
 	 string	pversion
 ) :=
 module
 
 	// Modules
-	export Run_Main := MapToCommon(pversion).Build_Main.All;
+	export Run_Main := FraudGovPlatform.MapToCommon(pversion).Build_Main_Base.All;
 	export Run_Anonymize := Build_Base_Anonymized(pversion).All;
 	export Run_Demo := Append_DemoData(pversion);
 

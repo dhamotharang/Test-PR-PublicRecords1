@@ -7,10 +7,8 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 	shared Batch_list	:=	Dev_list
 										+	';roberto.perez@lexisnexisrisk.com'
 										;
-	shared Roxie_list := 	Dev_list
-										+	';riskintelligencenetwork.support@lexisnexisrisk.com'	
-										;
-										
+	shared Roxie_list := 'riskintelligencenetwork.support@lexisnexisrisk.com';
+										;										
 	shared Boca_Ops	:= 	'SupercomputerOps@lexisnexisrisk.com'
 										+	';'+Dev_list										
 										;
