@@ -129,6 +129,6 @@ module
 	// Append RinID
 	EXPORT NewBaseRinID := Append_RinID (NewBaseRID,pBaseMainFile);
 
-	EXPORT Build_Main := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
 
 END;
