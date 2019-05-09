@@ -1,5 +1,7 @@
 ﻿import  ut,Orbit3,_Control,STD;
-export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string Envmt = 'N',  boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,string email_list = '',string wuid = workunit) := function
+export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string Envmt = 'N',  boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false,string email_list = '') := function
+
+string wuid := workunit;
 
 ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance and Add Items -- '+ buildname + '-- '+Buildvs+'\');\r\n'+
 		   'Orbit3.proc_Orbit3_CreateBuild_AddItem_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\',\''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', '+skipaddcomponents+', '+runcreatebuild+', '+runaddcomponentsonly+',  \''+wuid+'\')\n' 
