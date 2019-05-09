@@ -2,7 +2,7 @@
 
 EXPORT Email_Notification_Lists := MODULE
    //developer := 'angela.herzberg@lexisnexis.com;';
-	 developer := 'vlad.petrokas@lexisnexisrisk.com;';
+	 EXPORT developer := 'vlad.petrokas@lexisnexisrisk.com;';
    tester := _Control.MyInfo.EmailAddressNotify;
 	 //quality_assurance := 'qualityassurance@seisint.com;';
 	 //quality_assurance := 'angela.herzberg@lexisnexis.com;';
@@ -11,4 +11,5 @@ EXPORT Email_Notification_Lists := MODULE
 	 
    EXPORT BuildSuccess :=	IF(_Flags().IsTesting, developer + tester, all_hands);
    EXPORT BuildFailure := BuildSuccess;
+ 
 END;

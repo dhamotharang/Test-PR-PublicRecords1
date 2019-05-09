@@ -14,53 +14,55 @@ SHARED full_build	:=
                  SEQUENTIAL(				
 						 		 Build_Base_File
 								,Promote.Promote_vendorsrc(pversion, pUseProd).buildfiles.New2Built);
-															
-MyRec := RECORD
+	
+
+BaseFileLayout := RECORD
 Vendor_Src.Layouts.Base;
 END;
 
-PrevBase := DATASET('~thor_data400::base::vendor_src::father', MyRec, thor);
-NewBase := DATASET('~thor_data400::base::vendor_src::built', MyRec, thor);
+PrevBase := Vendor_Src.Files().base.father;
+NewBase  := Vendor_Src.Files().base.built;
 
-MyOutRec := RECORD
+PrevBaseLayout := RECORD
 	PrevBase.source_code;
+	PrevBase.input_file_id;
 	INTEGER CNT := COUNT(GROUP);
 END;
 
-MyTable := TABLE(PrevBase,MyOutRec,source_code);
-RecSort := SORT(MyTable, -cnt, source_code);
-OUTPUT(RecSort,NAMED('PrevBase'));
-PrevBaseCount:=COUNT(RecSort);
-OUTPUT(PrevBaseCount, NAMED('PrevBaseSource_Code_Count'));
+PrevBaseTable := TABLE(PrevBase,PrevBaseLayout,source_code, input_file_id);
+PrevBaseRecSort := SORT(PrevBaseTable, source_code, input_file_id);
+OUTPUT(PrevBaseRecSort,NAMED('PrevBaseSortedBySource_code_and_Input_file_id'));
+PrevBaseRecCount:=COUNT(PrevBaseRecSort);
+OUTPUT(PrevBaseRecCount, NAMED('PrevBaseSortedRecCnt'));
 
-OUTPUT(PrevBase(source_code in SET (MyTable (cnt > 1), source_code)),NAMED('Source_Records_For_Multiple_SOurce_Code'));
-
-
-MyOutRec2 := RECORD
+NewBaseLayout := RECORD
 	NewBase.source_code;
+	NewBase.input_file_id;
 	INTEGER CNT := COUNT(GROUP);
 END;
 
-MyTable2 := TABLE(NewBase,MyOutRec2,source_code);
-RecSort2 := SORT(MyTable2, source_code);
-OUTPUT(RecSort2,NAMED('NewBase'));
-NewBaseCount:=COUNT(RecSort2);
-OUTPUT(NewBaseCount, NAMED('NewBaseSource_Code_Count'));
+NewBaseTable := TABLE(NewBase,NewBaseLayout,source_code, input_file_id);
+NewBaseRecSort := SORT(NewBaseTable, source_code, input_file_id);
+OUTPUT(NewBaseRecSort,NAMED('NewBaseSortedBySource_code_and_Input_file_id'));
+NewBaseRecCount:=COUNT(NewBaseRecSort);
+OUTPUT(NewBaseRecCount, NAMED('NewBaseSortedRecCnt'));
 
 
-j := JOIN(MyTable, MyTable2,
-          LEFT.source_code=RIGHT.source_code,
-					TRANSFORM(MyRec,
+j := JOIN(PrevBaseTable, NewBaseTable,
+          LEFT.source_code=RIGHT.source_code AND LEFT.input_file_id=RIGHT.input_file_id,
+					TRANSFORM(BaseFileLayout,
 					SELF.source_code := IF(LEFT.source_code<>'', LEFT.source_code, RIGHT.source_code);
 					SELF:=LEFT;
 					SELF:=[];
-	      ));
-OUTPUT(j,NAMED('Inner_Join'));
+	      ),LEFT ONLY);
+OUTPUT(j,NAMED('PrevBaseAndNewBaseLeftOnlyJoin'));
 InnerJoinCount:=COUNT(j);
-OUTPUT(InnerJoinCount, NAMED('Inner_Join_Source_Code_Count'));
+OUTPUT(InnerJoinCount, NAMED('NotMatchingRecCnt'));
 
 
-BaseComparison := PrevBaseCount<=NewBaseCount;
+BaseComparison := PrevBaseRecCount<=NewBaseRecCount;
+
+OUTPUT(BaseComparison,NAMED('IsNewBaseHaveSameOrMoreRecThanPrevBase'));
 
 
 isBuild := VersionControl.IsValidVersion(pversion) AND BaseComparison <> FALSE;
