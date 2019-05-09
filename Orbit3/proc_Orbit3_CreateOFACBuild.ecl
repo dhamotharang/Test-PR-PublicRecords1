@@ -56,7 +56,7 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 		
 		sendemail(string keyword,string status) := function 
 		
-	error_description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
+	description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
 		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
 		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
 						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
@@ -74,7 +74,7 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 												'---------------------'+'\n'+
 												'Status:'+status+'\n'+
 												'---------------------'+'\n'+
-												'Error Description:'+error_description+'\n'+
+												'Error Description:'+description+'\n'+
 												'---------------------'+'\n'+
 												'Workunit:'+workunit);
 	   end;

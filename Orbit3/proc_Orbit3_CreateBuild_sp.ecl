@@ -20,7 +20,7 @@ export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt =
 																
 sendemail(string keyword = '',string status = '') := function 
 		
-		error_description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
+		description := map ( keyword = 'CREATE' and status = 'FAIL'   => create_build.Message,
 		                                              keyword = 'CREATE' and status =   'SKIP'  => 'User_Skipped_create_build_instance',
 		                     keyword = 'UPDATE' and  status = 'FAIL' => Update_build.Message,
 						keyword = 'UPDATE' and  status = 'SKIP' => 'User_Skipped_Update_build_instance', 
@@ -38,12 +38,12 @@ sendemail(string keyword = '',string status = '') := function
 												'---------------------'+'\n'+
 												'Status:'+status+'\n'+
 												'---------------------'+'\n'+
-												'Error Description:'+error_description+'\n'+
+												'Error Description:'+description+'\n'+
 												'---------------------'+'\n'+
 												'Workunit:'+workunit);
 												
 		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
-									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+error_description )
+									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
 																					          )
 							);
 							
