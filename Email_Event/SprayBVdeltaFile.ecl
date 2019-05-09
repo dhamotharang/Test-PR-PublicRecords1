@@ -1,18 +1,14 @@
 ﻿IMPORT Email_Event, tools, _control;
 
-srcCSVseparator					:=	',';
-srcCSVterminator				:=	'\\n,\\r\\n';
-srcCSVquote							:=	'"';
-
-EXPORT SprayBVFile(
+EXPORT SprayBVdeltaFile(
 	STRING		pVersionDate	=	'',
 	BOOLEAN		pPromote			= FALSE,
 	STRING		pServerIP			  = _Constants.serverIP,
-	STRING		pDirectory			= _Constants.Directory,
+	STRING		pDirectory			= _Constants.Directory_delta + pVersionDate,
 	STRING		pGroupName			=	_Constants.Groupname,															
 	BOOLEAN		pIsTesting			=	FALSE,
 	BOOLEAN		pOverwrite			=	TRUE,
-	STRING		pNameOutput			=	_Constants.Name + 'Delta Spray Info'
+	STRING		pNameOutput			=	_Constants.Name + ' Spray Info'
 ) :=
 FUNCTION
 
@@ -20,19 +16,19 @@ FUNCTION
 
 			{pServerIP																// SourceIP
 			,pDirectory															// SourceDirectory
-			,'*.csv'						 										// directory_filter
+			,'*.txt'						 										// directory_filter
 			,0																			// record_size
-			,'~thor_data400::raw::email_dataV2::bv::@version@'	// Thor_filename_template
-			,[{'~thor_data400::raw::email_dataV2::bv'}]				// dSuperfilenames
+			,'~thor_data400::raw::email_dataV2::bv_delta::@version@'	// Thor_filename_template
+			,[{'~thor_data400::raw::email_dataV2::bv_delta'}]				// dSuperfilenames
 			,pGroupName															// fun_Groupname
 			,pVersionDate														// FileDate
 			,'[0-9]{8}' 														// date_regex
 			,'VARIABLE' 														// file_type
 			,''																			// sourceRowTagXML
 			,8192 																	// sourceMaxRecordSize
-			,srcCSVseparator 											  // sourceCsvSeparate
-			,srcCSVterminator 									  	// sourceCsvTerminate
-			,srcCSVquote 													  // sourceCsvQuote
+			,'|'																		// sourceCsvSeparate
+			,'\\n,\\r\\n' 													// sourceCsvTerminate
+			,'' 																		// sourceCsvQuote
 			,TRUE 																	// compress
 			,pOverwrite 														// shouldoverwrite
 			,FALSE 																	// ShouldSprayZeroByteFiles
@@ -50,7 +46,7 @@ RETURN tools.fun_Spray
 					,TRUE					// pAddCounter
 					,pIsTesting		// pIsTesting
 					,							// pEmailNotificationList
-					,'BV Event spray' + ' ' + pVersionDate	// pEmailSubjectDataset
+					,'BV Delta Event spray' + ' ' + pVersionDate	// pEmailSubjectDataset
 					,pNameOutput 	// pOutputName
 					,TRUE 				// pShouldClearSuperfileFirst
 					,FALSE 				// pSplitEmails
