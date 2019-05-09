@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BestService">
 <part name="Proxid" type="xsd:string"/>
 </message>
@@ -96,4 +96,20 @@ OUTPUT(CM.BestNaicsCommon_tab_company_naics_code1,NAMED('Tab_BestNaicsCommon_com
 OUTPUT(CM.BestNaicsCommon_method_company_naics_code1,NAMED('Method_BestNaicsCommon_company_naics_code1'));
 OUTPUT(CM.BestNaicsCurrent_tab_company_naics_code1,NAMED('Tab_BestNaicsCurrent_company_naics_code1'));
 OUTPUT(CM.BestNaicsCurrent_method_company_naics_code1,NAMED('Method_BestNaicsCurrent_company_naics_code1'));
+OUTPUT(CM.BestDbaNameLegal_tab_dba_name,NAMED('Tab_BestDbaNameLegal_dba_name'));
+OUTPUT(CM.BestDbaNameLegal_method_dba_name,NAMED('Method_BestDbaNameLegal_dba_name'));
+OUTPUT(CM.BestDbaNameCommon_tab_dba_name,NAMED('Tab_BestDbaNameCommon_dba_name'));
+OUTPUT(CM.BestDbaNameCommon_method_dba_name,NAMED('Method_BestDbaNameCommon_dba_name'));
+OUTPUT(CM.BestDbaNameCurrent_tab_dba_name,NAMED('Tab_BestDbaNameCurrent_dba_name'));
+OUTPUT(CM.BestDbaNameCurrent_method_dba_name,NAMED('Method_BestDbaNameCurrent_dba_name'));
+OUTPUT(CM.BestDbaNameVoted_tab_dba_name,NAMED('Tab_BestDbaNameVoted_dba_name'));
+OUTPUT(CM.BestDbaNameVoted_method_dba_name,NAMED('Method_BestDbaNameVoted_dba_name'));
+OUTPUT(CM.BestDbaNameLength_tab_dba_name,NAMED('Tab_BestDbaNameLength_dba_name'));
+OUTPUT(CM.BestDbaNameLength_method_dba_name,NAMED('Method_BestDbaNameLength_dba_name'));
+OUTPUT(CM.BestDbaNameStrong_tab_dba_name,NAMED('Tab_BestDbaNameStrong_dba_name'));
+OUTPUT(CM.BestDbaNameStrong_method_dba_name,NAMED('Method_BestDbaNameStrong_dba_name'));
+OUTPUT(CM.BestDbaNameCurrent2_tab_dba_name,NAMED('Tab_BestDbaNameCurrent2_dba_name'));
+OUTPUT(CM.BestDbaNameCurrent2_method_dba_name,NAMED('Method_BestDbaNameCurrent2_dba_name'));
+OUTPUT(CM.BestDbaNameVotedUnrestricted_tab_dba_name,NAMED('Tab_BestDbaNameVotedUnrestricted_dba_name'));
+OUTPUT(CM.BestDbaNameVotedUnrestricted_method_dba_name,NAMED('Method_BestDbaNameVotedUnrestricted_dba_name'));
 ENDMACRO;

@@ -1,6 +1,7 @@
-﻿import data_services, ut;
+﻿IMPORT Data_services, dx_PhonesInfo, Ut;
 
 //DF-23525: Phones Metadata - Split Key into Transaction & Phone Type
+//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT File_Deact := MODULE
 
@@ -30,8 +31,8 @@ EXPORT File_Deact := MODULE
 	EXPORT History2						:= dataset('~thor_data400::in::phones::deact2_daily_history', 				PhonesInfo.Layout_Deact.History2, flat);
 
 	//Base File	
-	EXPORT Main 							:= dataset('~thor_data400::base::phones::deact2_main', 								PhonesInfo.Layout_Common.Phones_Transaction_Main, flat);	//Phone Transaction Key (DF-23525)
+	EXPORT Main 							:= dataset('~thor_data400::base::phones::deact2_main', 								dx_PhonesInfo.Layouts.Phones_Transaction_Main, flat);	//Phone Transaction Key (DF-23525)
 	EXPORT Main_Current 			:= dataset('~thor_data400::base::phones::disconnect_main', 						PhonesInfo.Layout_Deact.Temp, flat);
 	EXPORT Main_Current2 			:= dataset('~thor_data400::base::phones::disconnect2_main', 					PhonesInfo.Layout_Deact.Temp, flat);
 
-END; 
+END;

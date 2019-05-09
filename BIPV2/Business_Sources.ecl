@@ -39,6 +39,7 @@
 	,cortera
 	,infutor_narb
 	,Equifax_Business_Data
+	,DataBridge
 	;
 
 Business_Sources1 :=
@@ -54,7 +55,7 @@ Business_Sources1 :=
   + dcav2.as_Business_linking()  								//** Due to layout change, Audra is reworking on it, so pulling in the older persist.
   + DEA.DEA_As_Business_Linking
   + DNB_DMI.As_Business_Linking()
-  + DNB_FEINV2.DNB_FEIN_As_Business_Linking			//***Business info only, no contacts
+  // + DNB_FEINV2.DNB_FEIN_As_Business_Linking			//***Business info only, no contacts
   + EBR.EBR_As_Business_Linking            // comment out in january 2018 because of big increase in new records.
   + Experian_CRDB.As_Business_Linking()
   + Experian_FEIN.As_Business_Linking()
@@ -84,6 +85,7 @@ Business_Sources1 :=
 	+ Cortera.Files.Bus_linking
 	+ Infutor_NARB.As_Business_Linking()
 	+ Equifax_Business_Data.As_Business_Linking()
+	+ DataBridge.As_Business_Linking()
   ;
 
  // -- remove these re-corp states because we are not ready to ingest them yet.

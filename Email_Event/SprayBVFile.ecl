@@ -1,16 +1,18 @@
-﻿IMPORT tools, _control;
+﻿IMPORT Email_Event, tools, _control;
+
+srcCSVseparator					:=	',';
+srcCSVterminator				:=	'\\n,\\r\\n';
+srcCSVquote							:=	'"';
 
 EXPORT SprayBVFile(
 	STRING		pVersionDate	=	'',
 	BOOLEAN		pPromote			= FALSE,
-	STRING		pServerIP			= IF(_control.thisenvironment.name='Dataland',
-																										_control.IPAddress.bctlpedata12,
-																										_control.IPAddress.bctlpedata11),
-	STRING		pDirectory			= '/data/data_999/email/delta_gateway/'+pVersionDate,
-	STRING		pGroupName			=	_Constants().groupname,															
+	STRING		pServerIP			  = _Constants.serverIP,
+	STRING		pDirectory			= _Constants.Directory,
+	STRING		pGroupName			=	_Constants.Groupname,															
 	BOOLEAN		pIsTesting			=	FALSE,
 	BOOLEAN		pOverwrite			=	TRUE,
-	STRING		pNameOutput			=	_Constants().Name + ' Spray Info'
+	STRING		pNameOutput			=	_Constants.Name + 'Delta Spray Info'
 ) :=
 FUNCTION
 
@@ -18,19 +20,19 @@ FUNCTION
 
 			{pServerIP																// SourceIP
 			,pDirectory															// SourceDirectory
-			,'*.txt'						 										// directory_filter
+			,'*.csv'						 										// directory_filter
 			,0																			// record_size
-			,'~thor_data400::in::email_dataV2::bv_email_event::@version@'	// Thor_filename_template
-			,[{'~thor_data400::in::email_dataV2::bv_email_event'}]				// dSuperfilenames
+			,'~thor_data400::raw::email_dataV2::bv::@version@'	// Thor_filename_template
+			,[{'~thor_data400::raw::email_dataV2::bv'}]				// dSuperfilenames
 			,pGroupName															// fun_Groupname
 			,pVersionDate														// FileDate
 			,'[0-9]{8}' 														// date_regex
 			,'VARIABLE' 														// file_type
 			,''																			// sourceRowTagXML
 			,8192 																	// sourceMaxRecordSize
-			,'|'																		// sourceCsvSeparate
-			,'\\n,\\r\\n' 													// sourceCsvTerminate
-			,'' 																		// sourceCsvQuote
+			,srcCSVseparator 											  // sourceCsvSeparate
+			,srcCSVterminator 									  	// sourceCsvTerminate
+			,srcCSVquote 													  // sourceCsvQuote
 			,TRUE 																	// compress
 			,pOverwrite 														// shouldoverwrite
 			,FALSE 																	// ShouldSprayZeroByteFiles

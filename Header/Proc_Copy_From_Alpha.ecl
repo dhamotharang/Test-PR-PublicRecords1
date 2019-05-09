@@ -1,10 +1,10 @@
 ﻿IMPORT STD,header,ut,_control,wk_ut;
 
-EXPORT Proc_Copy_From_Alpha := module
+EXPORT Proc_Copy_From_Alpha(string8 pBldVer = '') := module
 
-SHARED filedate:=header.version_build;
+SHARED filedate:=if(pBldVer <> '', pBldVer, header.version_build);
 
-SHARED linking_keys := dataset ( [ 
+SHARED linking_keys := dataset ( [  //13 keys
 
                             {'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind','thor_data400::key::insuranceheader_segmentation::did_ind_qa'},
                             {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::address',''},
@@ -57,7 +57,7 @@ SHARED copy_files(string nm, string src_name, string dest_clstr,string src_alpha
     target_filename := ver(nm,filedate,agmntName); // update the version number
     
     return sequential(output(dataset([{'~'+source_filename,dest_clstr,'~'+target_filename}],{string src,string d_clstr, string trgt}),named('cp_copy'),extend)
-                      ,std.file.copy('~'+source_filename,dest_clstr,'~'+target_filename,replicate:=true,compress:=true,allowoverwrite:=true)
+                      ,if(~std.file.FileExists('~'+target_filename), std.file.copy('~'+source_filename,dest_clstr,'~'+target_filename,replicate:=true,compress:=true,allowoverwrite:=true))
                      );
 
 end;

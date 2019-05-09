@@ -40,9 +40,9 @@ dontskip_fcra:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_fcra'
 dontskip_wkly:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_weekly');
 
 // Check each package for skips or availability of CERT for deployment
-ikbShouldUpdate := ( dontskip_ikb  AND lastestIkbVersionOnThor  > ver_lab_cert_ver  AND ver_lab_cert_ver  = ver_lab_prod_ver  AND lastestIkbVersionOnThor  <> ver_lab_TBD);
-fcraShouldUpdate:= ( dontskip_fcra AND lastestFCRAversionOnThor > ver_fcra_cert_ver AND ver_fcra_cert_ver = ver_fcra_prod_ver AND lastestFCRAversionOnThor <> ver_fcra_TBD);
-wklyShouldUpdate:= ( dontskip_wkly AND lastestWklyversionOnThor > ver_wkly_cert_ver AND ver_wkly_cert_ver = ver_wkly_prod_ver AND lastestWklyversionOnThor <> ver_wkly_TBD);
+ikbShouldUpdate := ( dontskip_ikb  AND lastestIkbVersionOnThor  > ver_lab_cert_ver  AND ver_lab_cert_ver  = ver_lab_prod_ver  AND lastestIkbVersionOnThor  <> ver_lab_TBD  AND ver_lab_TBD  = ver_lab_cert_ver);
+fcraShouldUpdate:= ( dontskip_fcra AND lastestFCRAversionOnThor > ver_fcra_cert_ver AND ver_fcra_cert_ver = ver_fcra_prod_ver AND lastestFCRAversionOnThor <> ver_fcra_TBD AND ver_fcra_TBD = ver_fcra_cert_ver);
+wklyShouldUpdate:= ( dontskip_wkly AND lastestWklyversionOnThor > ver_wkly_cert_ver AND ver_wkly_cert_ver = ver_wkly_prod_ver AND lastestWklyversionOnThor <> ver_wkly_TBD AND ver_wkly_TBD = ver_wkly_cert_ver);
 
 // Generates a report prior to deployment
 rpt := output(dataset([

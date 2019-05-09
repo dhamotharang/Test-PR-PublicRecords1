@@ -1,8 +1,8 @@
-IMPORT BKForeclosure,ut;
+﻿IMPORT BKForeclosure,ut, STD;
+#option('multiplePersistInstances',FALSE);
 
-EXPORT Normalize_Reo(DATASET(RECORDOF(Layout_BK.reo)) ds_reo) := Function	
-//input, and row identifier appended layouts
-  reo_in    := BKForeclosure.Layout_BK.reo;
+EXPORT Normalize_Reo(DATASET(RECORDOF(Layout_BK.Base_Reo_ext)) ds_reo) := Function	
+
 //-----------------------------------------------------------------
 //NORMALIZE Names
 //-----------------------------------------------------------------
@@ -11,9 +11,16 @@ EXPORT Normalize_Reo(DATASET(RECORDOF(Layout_BK.reo)) ds_reo) := Function
 	'B2'  = 2nd Buyer Name
   'S1'  = 1st Seller Name
 	'S2'  = 2nd Seller Name
-  'PF'  = Property Address
-  'BM'  = Buyer Mailing Address
 */
+
+//-----------------------------------------------------------------
+//NORMALIZE Address
+//-----------------------------------------------------------------
+/*
+  'PF'   = Property Address
+	'BM'	 = Buyer's Mailing Address
+*/
+
 Co_Pattern  := '( AND | ASSOCIATES|ASSOCIATION| PC$| OF | PLLC$| PLC$| PA$| FIRM$| LP$| INC| LLC$| LLC |L L C| LC$| LLP$|MORTGAGE|INSURANCE|REGISTRATION| LAW | LAW$|' +
                'SOLUTION|&| AGENCY|COMPANY| RE$| BANKS|BANK| BANKER| GROUP| PROPERTIES| REALTY|INVESTMENT|DEVELOPMENT|OFFICE|INVESTORS|TRULIANT FCU|' +
 							 ' MTG$| MTG | CORP$| CORPS$| FUND | CORPORATION| CO$| CO NA$| LENDING| TRUST| HOME| ASSISTANCE| SERVICE|^THE | BBQ|^HUD$|FDIC$|' +
@@ -23,77 +30,50 @@ Co_Pattern  := '( AND | ASSOCIATES|ASSOCIATION| PC$| OF | PLLC$| PLC$| PA$| FIRM
 invalid_Pattern := '(NOT PROVIDED|NOT GIVEN|NO PROVIDED| NONE)';
 
 // Normalized Name records
-Layout_BK.Norm_Names_reo t_norm_name_reo (Reo_in  le, INTEGER C) := TRANSFORM
-	trim_buyer_fname1      := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.buyer1_fname));
-	trim_buyer_lname1      := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.buyer1_lname));
-	trim_buyer_fname2      := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.buyer2_fname));
-	trim_buyer_lname2      := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.buyer2_lname));
-	trim_seller_fname1     := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.seller1_fname));
-	trim_seller_lname1     := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.seller1_lname));
-	trim_seller_fname2     := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.seller2_fname));
-	trim_seller_lname2     := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(le.seller2_lname));	
+Layout_BK.CleanFields_REO t_norm_reo (Layout_BK.Base_Reo_ext  le, INTEGER C) := TRANSFORM
+	trim_buyer_fname1      := ut.CleanSpacesAndUpper(le.buyer1_fname);
+	trim_buyer_lname1      := ut.CleanSpacesAndUpper(le.buyer1_lname);
+	trim_buyer_fname2      := ut.CleanSpacesAndUpper(le.buyer2_fname);
+	trim_buyer_lname2      := ut.CleanSpacesAndUpper(le.buyer2_lname);
+	trim_seller_fname1     := ut.CleanSpacesAndUpper(le.seller1_fname);
+	trim_seller_lname1     := ut.CleanSpacesAndUpper(le.seller1_lname);
+	trim_seller_fname2     := ut.CleanSpacesAndUpper(le.seller2_fname);
+	trim_seller_lname2     := ut.CleanSpacesAndUpper(le.seller2_lname);	
 
-	buyer_fname1	    := IF(NOT REGEXFIND(Co_Pattern, trim_buyer_fname1) AND NOT REGEXFIND(invalid_pattern, trim_buyer_fname1)
-	                        AND NOT REGEXFIND('[0-9/]', trim_buyer_fname1) AND trim_buyer_fname1 != '',StringLib.StringCleanSpaces(trim_buyer_fname1),'');
-	buyer_lname1	    := IF(NOT REGEXFIND(Co_Pattern, trim_buyer_lname1) AND NOT REGEXFIND(invalid_pattern, trim_buyer_lname1) 
-	                        AND NOT REGEXFIND('[0-9/]', trim_buyer_lname1) AND trim_buyer_lname1 != '',StringLib.StringCleanSpaces(trim_buyer_lname1),'');
-	buyer_fname2	    := IF(NOT REGEXFIND(Co_Pattern, trim_buyer_fname2) AND NOT REGEXFIND(invalid_pattern, trim_buyer_fname2) 
-	                        AND NOT REGEXFIND('[0-9/]', trim_buyer_fname2) AND trim_buyer_fname2 != '',StringLib.StringCleanSpaces(trim_buyer_fname2),'');
-	buyer_lname2	    := IF(NOT REGEXFIND(Co_Pattern, trim_buyer_lname2) AND NOT REGEXFIND(invalid_pattern, trim_buyer_lname2) 
-	                        AND NOT REGEXFIND('[0-9/]', trim_buyer_lname2) AND trim_buyer_lname2 != '',StringLib.StringCleanSpaces(trim_buyer_lname2),'');  
-	seller_fname1	    := IF(NOT REGEXFIND(Co_Pattern, trim_seller_fname1) AND NOT REGEXFIND(invalid_pattern, trim_seller_fname1)
-	                        AND NOT REGEXFIND('[0-9/]', trim_seller_fname1) AND trim_seller_fname1 != '',StringLib.StringCleanSpaces(trim_seller_fname1),'');
-	seller_lname1	    := IF(NOT REGEXFIND(Co_Pattern, trim_seller_lname1) AND NOT REGEXFIND(invalid_pattern, trim_seller_lname1) 
-	                        AND NOT REGEXFIND('[0-9/]', trim_seller_lname1) AND trim_seller_lname1 != '',StringLib.StringCleanSpaces(trim_seller_lname1),'');
-	seller_fname2	    := IF(NOT REGEXFIND(Co_Pattern, trim_seller_fname2) AND NOT REGEXFIND(invalid_pattern, trim_seller_fname2) 
-	                        AND NOT REGEXFIND('[0-9/]', trim_seller_fname2) AND trim_seller_fname2 != '',StringLib.StringCleanSpaces(trim_seller_fname2),'');
-	seller_lname2	    := IF(NOT REGEXFIND(Co_Pattern, trim_seller_lname2) AND NOT REGEXFIND(invalid_pattern, trim_seller_lname2) 
-	                        AND NOT REGEXFIND('[0-9/]', trim_seller_lname2) AND trim_seller_lname2 != '',StringLib.StringCleanSpaces(trim_seller_lname2),'');  
-																									
-	buyer_comp1	      := MAP(REGEXFIND(Co_Pattern, trim_buyer_fname1) AND NOT REGEXFIND(invalid_pattern, trim_buyer_fname1)=> StringLib.StringCleanSpaces(trim_buyer_fname1),
-													REGEXFIND(Co_Pattern, trim_buyer_lname1) AND NOT REGEXFIND(invalid_pattern, trim_buyer_lname1)=> StringLib.StringCleanSpaces(trim_buyer_lname1),
-													'');
-	
-	buyer_comp2	      := MAP(REGEXFIND(Co_Pattern, trim_buyer_fname2) AND NOT REGEXFIND(invalid_pattern, trim_buyer_fname2) => StringLib.StringCleanSpaces(trim_buyer_fname2),
-	                        REGEXFIND(Co_Pattern, trim_buyer_lname2) AND NOT REGEXFIND(invalid_pattern, trim_buyer_lname2) => StringLib.StringCleanSpaces(trim_buyer_lname2),
-													''); 												
-	seller_comp1	      := MAP(REGEXFIND(Co_Pattern, trim_seller_fname1) AND NOT REGEXFIND(invalid_pattern, trim_seller_fname1)=> StringLib.StringCleanSpaces(trim_seller_fname1),
-													   REGEXFIND(Co_Pattern, trim_seller_lname1) AND NOT REGEXFIND(invalid_pattern, trim_seller_lname1)=> StringLib.StringCleanSpaces(trim_seller_lname1),
-													   '');
-	
-	seller_comp2	      := MAP(REGEXFIND(Co_Pattern, trim_seller_fname2) AND NOT REGEXFIND(invalid_pattern, trim_seller_fname2) => StringLib.StringCleanSpaces(trim_seller_fname2),
-	                           REGEXFIND(Co_Pattern, trim_seller_lname2) AND NOT REGEXFIND(invalid_pattern, trim_seller_lname2) => StringLib.StringCleanSpaces(trim_seller_lname2),
-													   ''); 												
+	buyer_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname1) AND NOT REGEXFIND('[0-9/]', trim_buyer_fname1) 
+													AND trim_buyer_fname1 != '',trim_buyer_fname1,'');
+	buyer_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname1) AND NOT REGEXFIND('[0-9/]', trim_buyer_lname1) 
+													AND trim_buyer_lname1 != '',trim_buyer_lname1,'');
+	buyer_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname2) AND NOT REGEXFIND('[0-9/]', trim_buyer_fname2) 
+													AND trim_buyer_fname2 != '',trim_buyer_fname2,'');
+	buyer_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname2) AND NOT REGEXFIND('[0-9/]', trim_buyer_lname2) 
+													AND trim_buyer_lname2 != '',trim_buyer_lname2,'');  
+	seller_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname1) AND NOT REGEXFIND('[0-9/]', trim_seller_fname1) 
+													AND trim_seller_fname1 != '',trim_seller_fname1,'');
+	seller_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname1) AND NOT REGEXFIND('[0-9/]', trim_seller_lname1) 
+													AND trim_seller_lname1 != '',trim_seller_lname1,'');
+	seller_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname2) AND NOT REGEXFIND('[0-9/]', trim_seller_fname2) 
+													AND trim_seller_fname2 != '',trim_seller_fname2,'');
+	seller_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname2) AND NOT REGEXFIND('[0-9/]', trim_seller_lname2) 
+													AND trim_seller_lname2 != '',trim_seller_lname2,'');  
+																																		
 	SELF.Name_First   := CHOOSE(C,buyer_fname1,buyer_fname2,seller_fname1,seller_fname2);
 	SELF.Name_Last		:= CHOOSE(C,buyer_lname1,buyer_lname2,seller_lname1,seller_lname2);
-	SELF.Company_Name := CHOOSE(C,buyer_comp1,buyer_comp2,seller_comp1,seller_comp2);
-	SELF.Type_Code    := IF(SELF.Company_Name != '','B','P');// 'B' stands for Business, 'P' stands for Individual
 	SELF.name_type    := CHOOSE(C,'B1','B2','S1','S2'); 
-	SELF.NAME_FULL    := IF(SELF.Type_Code = 'P',SELF.Name_Last + ' ' + SELF.Name_First, SELF.company_name);
-	SELF 					:= le;
-	SELF					:= [];
-END;
-
-	Norm_Name 	  := DEDUP(NORMALIZE(ds_reo,4,t_norm_name_reo(LEFT,COUNTER)),ALL,RECORD);
-  GoodNormName  := Norm_Name(TRIM(Name_Last + Name_First + Company_Name,ALL) <> '');	
-  ds_Norm_name  := PROJECT(GoodNormName,TRANSFORM(Layout_BK.Norm_Names_Reo,SELF := LEFT;SELF:=[])): PERSIST('~thor_data400::in::BKForeclosure::NormName_Reo_Test');
-
-//-----------------------------------------------------------------
-//NORMALIZE Address
-//-----------------------------------------------------------------
-Layout_BK.Norm_Addr_REO t_norm_addr_reo (Layout_BK.Norm_Names_reo le, INTEGER C) := TRANSFORM
-  prop_full_addr        := ut.CleanSpacesAndUpper(le.prop_full_addr);
+	SELF.NAME_FULL    := STD.Str.CleanSpaces(TRIM(SELF.NAME_FIRST,LEFT,RIGHT)+' '+TRIM(SELF.NAME_LAST,LEFT,RIGHT));
+	prop_full_addr        := ut.CleanSpacesAndUpper(le.prop_full_addr);
 	prop_addr_city        := ut.CleanSpacesAndUpper(le.prop_addr_city);
 	prop_addr_state       := ut.CleanSpacesAndUpper(le.prop_addr_state);
 	buyer_mail_full_addr  := ut.CleanSpacesAndUpper(le.buyer_mail_full_addr);
 	buyer_mail_city       := ut.CleanSpacesAndUpper(le.buyer_mail_city);
 	buyer_mail_state      := ut.CleanSpacesAndUpper(le.buyer_mail_state);
-  prepAddress     := CHOOSE(C,prop_full_addr,buyer_mail_full_addr);
-	prepcity        := CHOOSE(C,prop_addr_city,buyer_mail_city);
-	prepState       := CHOOSE(C,prop_addr_state,buyer_mail_state);
-	prepzip5        := CHOOSE(C,le.prop_addr_zip5,le.buyer_mail_zip5);
-	prepzip4        := CHOOSE(C,le.prop_addr_zip4,le.buyer_mail_zip4);
-	prepAddrType    := CHOOSE(C,'PF','BM');
+	buyer_mail_zip4      	:= REGEXREPLACE('NULL',le.buyer_mail_zip4,'',NOCASE);
+  prepAddress     := CHOOSE(C,buyer_mail_full_addr,prop_full_addr);
+	prepcity        := CHOOSE(C,buyer_mail_city,prop_addr_city);
+	prepState       := CHOOSE(C,buyer_mail_state,prop_addr_state);
+	prepzip5        := CHOOSE(C,le.buyer_mail_zip5,le.prop_addr_zip5);
+	prepzip4        := CHOOSE(C,buyer_mail_zip4,le.prop_addr_zip4);
+	prepAddrType    := CHOOSE(C,'BM','PF');
 	SELF.AddrType   := prepAddrType;		
 	SELF 				  	:= le;
 	SELF.Orig_Address := MAP(SELF.Name_Type = 'B1' and prepAddrType = 'BM' => prepAddress,
@@ -126,13 +106,13 @@ Layout_BK.Norm_Addr_REO t_norm_addr_reo (Layout_BK.Norm_Names_reo le, INTEGER C)
 													 SELF.Name_Type = 'B2' and prepAddrType = 'PF' => prepZip4,
 													 SELF.Name_Type = 'S1' and prepAddrType = 'PF' => prepZip4,
 													 SELF.Name_Type = 'S2' and prepAddrType = 'PF' => prepZip4,'');
-											 												 
+	SELF 					:= le;
 	SELF					:= [];
 END;
 
-Norm_Addr    := DEDUP(NORMALIZE(ds_Norm_name, 3, t_norm_addr_reo(LEFT, COUNTER)),ALL,RECORD);
-GoodNormAddr := Norm_Addr(TRIM(Orig_Address + Orig_City + Orig_State + Orig_zip5 + Orig_zip4,ALL) <> '');
-ds_final     := PROJECT(GoodNormAddr, Layout_BK.Norm_Addr_REO) : PERSIST('~thor_data400::in::BKForeclosure::Normalized_Reo_Test');
+	Norm_Name 	  := DEDUP(NORMALIZE(ds_reo,4,t_norm_reo(LEFT,COUNTER)),ALL,RECORD);
+  GoodNormName  := Norm_Name(TRIM(Name_Last + Name_First,ALL) <> '');	
+  ds_final		  := PROJECT(GoodNormName,TRANSFORM(Layout_BK.CleanFields_REO,SELF := LEFT;SELF:=[])): PERSIST('~thor_data400::in::BKForeclosure::Normalized_Reo');
 
 	RETURN ds_final;
 END;

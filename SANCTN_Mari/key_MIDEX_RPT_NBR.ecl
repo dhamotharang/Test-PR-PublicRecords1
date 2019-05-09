@@ -1,4 +1,4 @@
-Import Data_Services, doxie_files, doxie,ut,SANCTN_Mari, BIPV2;
+﻿Import Data_Services, doxie_files, doxie,ut,SANCTN_Mari, BIPV2;
 
 // DEFINE THE INDEX
   f_sanctn_party		:= SANCTN_Mari.files_SANCTN_common.party_bip;
@@ -9,6 +9,12 @@ layout_party_srch := RECORD
 	SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_srch;
 	string26 midex_rpt_nbr;
 	BIPV2.IDlayouts.l_xlink_ids;
+	//CCPA-97 Per requirement, all in scope data needs to have a date when the data was collected
+	STRING8 date_vendor_first_reported;
+	STRING8 date_vendor_last_reported;
+	//CCPA-97 Add 2 new fields for CCPA
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 END;
 
 dsParty := project(f_sanctn_party,transform(layout_party_srch,

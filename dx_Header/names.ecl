@@ -2,7 +2,7 @@ IMPORT data_services, doxie, STD;
 
 // common for all indices name prefix
 //string prefix := data_services.data_location.person_header + 'thor_data400::key::' + $.Constants.DataSetName + '::';
-string prefix := data_services.data_location.person_header + 'thor_data400::key::';
+string prefix := data_services.data_location.prefix ('person_header') + 'thor_data400::key::';
 
 // a default version is chosen so that the user of an index won't have to provide any specific value;
 // when building keys using existing procedures, an empty string will have to be specified. 
@@ -13,8 +13,8 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   SHARED string postfix := IF (file_version != '', '_' + file_version, '');
 
-  EXPORT i_rid := prefix + 'header.rid_header';
-  EXPORT i_rid_src := prefix + 'header_rid_srid_header'; //TODO: different name pattern 
+  EXPORT i_rid := prefix + 'header.rid';
+  EXPORT i_rid_src := prefix + 'header_rid_srid'; //TODO: different name pattern 
 
   // ----------------- wild -----------------
   EXPORT i_wild_ssn           := prefix + 'header.wild.ssn.did' + postfix;
@@ -66,15 +66,19 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   EXPORT i_did_rid2 := prefix + 'rid_did2' + postfix;
 
   EXPORT i_aptbuildings := prefix + 'hdr_apt_bldgs' + postfix;
+  EXPORT i_aptbuildings_fcra := prefix + 'fcra::hdr_apt_bldgs' + postfix;
+  EXPORT i_aptbuildings_fcra_en := prefix + 'fcra::en_hdr_apt_bldgs' + postfix;
 
-  EXPORT i_did_ssn_date :=      prefix + 'header.did.ssn.date' + postfix;
+  EXPORT i_did_ssn_date      := prefix + 'header.did.ssn.date' + postfix;
   EXPORT i_did_ssn_date_fcra := prefix + 'fcra::header.did.ssn.date' + postfix;
 
   EXPORT i_county := prefix + 'header.county' + postfix;
 
   EXPORT i_fnamesmall := prefix + 'header.fname_small' + postfix;
 
-  EXPORT i_header_address := prefix + 'header_address' + postfix;
+  EXPORT i_header_address      := prefix + 'header_address' + postfix;
+  EXPORT i_header_address_fcra := prefix + 'fcra::header_address' + postfix;
+  
   EXPORT i_DTS_address := prefix + 'header.dts.pname.prange.st.city.sec_range.lname' + postfix;
   EXPORT i_DTS_FnameSmall := prefix + 'header.dts.fname_small' + postfix;
   EXPORT i_DTS_StreetZipName := prefix + 'header.dts.pname.zip.name.range' + postfix;
@@ -88,10 +92,12 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
   EXPORT i_minors := prefix + 'header::minors' + postfix;
   EXPORT i_minors_hash := prefix + 'header.minors_hash' + postfix;
 
-  EXPORT i_max_date := prefix + 'max_dt_last_seen' + postfix;
+  EXPORT i_max_date      := prefix + 'max_dt_last_seen' + postfix;
+  EXPORT i_max_date_fcra := prefix + 'fcra::max_dt_last_seen' + postfix;
 
   // main payload
-  EXPORT i_header := prefix + 'header' + postfix;
+  EXPORT i_header      := prefix + 'header' + postfix;
+  EXPORT i_header_fcra := prefix + 'fcra::header' + postfix;
 
   EXPORT i_dob_fname := prefix + 'header.dob_fname' + postfix;
 
@@ -99,7 +105,8 @@ EXPORT names (string file_version = doxie.Version_SuperKey):= MODULE
 
   EXPORT i_did_rid_split := prefix + 'rid_did_split' + postfix;
 
-  EXPORT i_legacy_ssn := prefix + 'header.legacy_ssn' + postfix;
+  EXPORT i_legacy_ssn      := prefix + 'header.legacy_ssn' + postfix;
+  EXPORT i_legacy_ssn_fcra := prefix + 'fcra::header.legacy_ssn' + postfix;
 
   EXPORT i_tuch_dob := prefix + 'header.TUCH_dob' + postfix;
 

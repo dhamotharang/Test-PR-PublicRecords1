@@ -1,4 +1,4 @@
-export MAC_IncludeInRepository(inFile, 
+﻿export MAC_IncludeInRepository(inFile, 
 	Field='fullname',
 nameid = 'nid',
 namtype = 'nametype',		// name type field
@@ -11,7 +11,8 @@ title2 = 'cln_title2',		// cleaned title for name 2
 fname2 = 'cln_fname2',		// cleaned first name for name 2
 mname2 = 'cln_mname2',		// cleaned middle name for name 2
 lname2 = 'cln_lname2',		// cleaned last name for name 2
-suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
+suffix2 = 'cln_suffix2',		// cleaned suffix for name 2
+useV2
 ) := MACRO
 
 #UNIQUENAME(xform)
@@ -40,33 +41,7 @@ suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
 
 #UNIQUENAME(dsOut)
 	%dsOut% := 	PROJECT(DEDUP(SORT(DISTRIBUTE(inFile,NID),NID,LOCAL),NID,LOCAL), %xform%(LEFT)); // : INDEPENDENT;
-/*	
-#UNIQUENAME(dualxform)
-	NID.Layout_Repository %dualxform%(NID.Layout_Repository L, integer c) := TRANSFORM
-		SELF.NameType := IF(L.NameType='D','P',SKIP);
-		self.NID := NID.Common.fGetNID(L.name,c);
-		self.derivation := c;
-		
-		SELF.cln_title := IF(c=1,L.cln_title, L.cln_title2);
-		SELF.cln_fname := IF(c=1,L.cln_fname, L.cln_fname2);
-		SELF.cln_mname := IF(c=1,L.cln_mname, L.cln_mname2);
-		SELF.cln_lname := IF(c=1,L.cln_lname, L.cln_lname2);
-		SELF.cln_suffix := IF(c=1,L.cln_suffix, L.cln_suffix2);
-		self.gender		:= Address.NameTester.GenderEx(SELF.cln_fname,SELF.cln_mname);
-		self.nameind := Nid.NameIndicators.fn_setNameIndicator('P',c,
-					Address.NameTester.GenderEx(SELF.cln_fname,SELF.cln_mname),
-					LENGTH(TRIM(SELF.cln_fname))=1);
-		
-		SELF.cln_title2 := '';
-		SELF.cln_fname2 := '';
-		SELF.cln_mname2 := '';
-		SELF.cln_lname2 := '';
-		SELF.cln_suffix2 := '';
-		SELF := L;	
-	END;
-#UNIQUENAME(dual)
-	%dual% := DISTRIBUTE(NORMALIZE(%dsOut%(NameType='D'), 2, %dualxform%(LEFT, COUNTER)),nid);
-*/				
+
 #UNIQUENAME(outfile)
 	//%outfile% := SORT(DISTRIBUTE(%dsOut% + %dual%,HASH64(NID)),NID,LOCAL)
 	%outfile% := %dsOut%;	// & %dual%;
@@ -75,6 +50,6 @@ suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
 #UNIQUENAME(filename)
 #UNIQUENAME(fn, '#$');
 	%filename% := Nid.CreateRepositoryFilename(#TEXT(%fn%));
-		NID.AddToCache(%outfile%, %filename%);
+		NID.AddToCache(%outfile%, %filename%, useV2);
 
 ENDMACRO;
