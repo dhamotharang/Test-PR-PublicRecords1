@@ -42,7 +42,7 @@ sendemail(string keyword = '',string status = '') := function
 												'---------------------'+'\n'+
 												'Spawn Workunit:'+workunit + '\n' + 
 												'---------------------'+'\n'+
-												'Parent Workunit:'+wuid);
+												'Build Workunit:'+wuid);
 												
 		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
 									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )

@@ -82,7 +82,7 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 												'---------------------'+'\n'+
 												'Spawn Workunit:'+workunit+ '\n'+
 												'---------------------'+'\n'+
-												'Parent Workunit:'+wuid);
+												'Build Workunit:'+wuid);
 												
 		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
 									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+description )
