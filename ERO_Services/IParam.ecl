@@ -1,7 +1,7 @@
-﻿import Address,AutoKeyI,AutoHeaderI,AutoStandardI, BatchShare,suppress;
+import AutoKeyI, AutoHeaderI, AutoStandardI, suppress;
 
 export IParam := module
-	
+
 	EXPORT AutoKeyIdsParams := interface(AutoKeyI.AutoKeyStandardFetchBaseInterface)
 		EXPORT BOOLEAN workHard := true;
 		EXPORT BOOLEAN noFail := true;

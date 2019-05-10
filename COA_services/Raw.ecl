@@ -31,7 +31,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			
 	end;
 
-		  export header_quick.layout_records byDids(Dataset (doxie.layout_references) in_dids, unsigned1 dppaPurpose,
+		  shared header_quick.layout_records byDids(Dataset (doxie.layout_references) in_dids, unsigned1 dppaPurpose,
 		                                                          unsigned1 glbpurpose)  := function
 		
 				// get quick header records.
