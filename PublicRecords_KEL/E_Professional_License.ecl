@@ -24,15 +24,11 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     KEL.typ.nstr License_Description_;
     KEL.typ.nkdate Date_Of_Issuance_;
     KEL.typ.nkdate Date_Of_Expiration_;
-    KEL.typ.nint Nationwide_Mortgage_Licensing_System_;
     KEL.typ.nkdate Date_Of_License_Renewal_;
     KEL.typ.nstr Affiliated_Type_Code_;
-    KEL.typ.nint Foreign_Nationwide_Mortgage_Licensing_System_;
-    KEL.typ.nstr Location_Type_;
-    KEL.typ.nstr Name_Type_;
     KEL.typ.nkdate Start_Date_;
-    KEL.typ.nstr Is_Authorized_License_;
-    KEL.typ.nstr Is_Authorized_Conduct_;
+    KEL.typ.nint License_Category_;
+    KEL.typ.nstr Occupation_;
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -40,7 +36,7 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),datecreated(Date_Created_:DATE),licensestate(License_State_:\'\'),dateprocessed(Date_Processed_:DATE),legacyresultcode(Legacy_Result_Code_:\'\'),sourcedescription(Source_Description_:\'\'),sourcecode(Source_Code_:\'\'),datefirstreported(Date_First_Reported_:DATE),datelastreported(Date_Last_Reported_:DATE),datelastupdated(Date_Last_Updated_:DATE),licensenumber(License_Number_:\'\'),licensebusinessflag(License_Business_Flag_:\'\'),licenseprofessioncode(License_Profession_Code_:\'\'),licenseprofessiondescription(License_Profession_Description_:\'\'),licensestatus(License_Status_:\'\'),licensedescription(License_Description_:\'\'),dateofissuance(Date_Of_Issuance_:DATE),dateofexpiration(Date_Of_Expiration_:DATE),nationwidemortgagelicensingsystem(Nationwide_Mortgage_Licensing_System_:0),dateoflicenserenewal(Date_Of_License_Renewal_:DATE),affiliatedtypecode(Affiliated_Type_Code_:\'\'),foreignnationwidemortgagelicensingsystem(Foreign_Nationwide_Mortgage_Licensing_System_:0),locationtype(Location_Type_:\'\'),nametype(Name_Type_:\'\'),startdate(Start_Date_:DATE),isauthorizedlicense(Is_Authorized_License_:\'\'),isauthorizedconduct(Is_Authorized_Conduct_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),datecreated(Date_Created_:DATE),licensestate(License_State_:\'\'),dateprocessed(Date_Processed_:DATE),legacyresultcode(Legacy_Result_Code_:\'\'),sourcedescription(Source_Description_:\'\'),sourcecode(Source_Code_:\'\'),datefirstreported(Date_First_Reported_:DATE),datelastreported(Date_Last_Reported_:DATE),datelastupdated(Date_Last_Updated_:DATE),licensenumber(License_Number_:\'\'),licensebusinessflag(License_Business_Flag_:\'\'),licenseprofessioncode(License_Profession_Code_:\'\'),licenseprofessiondescription(License_Profession_Description_:\'\'),licensestatus(License_Status_:\'\'),licensedescription(License_Description_:\'\'),dateofissuance(Date_Of_Issuance_:DATE),dateofexpiration(Date_Of_Expiration_:DATE),dateoflicenserenewal(Date_Of_License_Renewal_:DATE),affiliatedtypecode(Affiliated_Type_Code_:\'\'),startdate(Start_Date_:DATE),licensecategory(License_Category_:0),occupation(Occupation_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -90,17 +86,8 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     KEL.typ.nstr License_Description_;
     KEL.typ.nstr Affiliated_Type_Code_;
     KEL.typ.nstr License_Business_Flag_;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  EXPORT Mortgage_Licensing_System_Layout := RECORD
-    KEL.typ.nint Nationwide_Mortgage_Licensing_System_;
-    KEL.typ.nint Foreign_Nationwide_Mortgage_Licensing_System_;
-    KEL.typ.nstr Name_Type_;
-    KEL.typ.nstr Location_Type_;
-    KEL.typ.nstr Is_Authorized_License_;
-    KEL.typ.nstr Is_Authorized_Conduct_;
+    KEL.typ.nint License_Category_;
+    KEL.typ.nstr Occupation_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
@@ -122,7 +109,6 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     KEL.typ.ndataset(License_Dates_Layout) License_Dates_;
     KEL.typ.ndataset(Status_Layout) Status_;
     KEL.typ.ndataset(License_Description_Layout) License_Description_;
-    KEL.typ.ndataset(Mortgage_Licensing_System_Layout) Mortgage_Licensing_System_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -139,8 +125,7 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     SELF.Source_Code_ := KEL.Intake.SingleValue(__recs,Source_Code_);
     SELF.License_Dates_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Date_Of_Issuance_,Date_Of_Expiration_,Date_Of_License_Renewal_,Date_First_Reported_,Date_Last_Reported_,Date_Last_Updated_,Start_Date_},Date_Of_Issuance_,Date_Of_Expiration_,Date_Of_License_Renewal_,Date_First_Reported_,Date_Last_Reported_,Date_Last_Updated_,Start_Date_),License_Dates_Layout)(__NN(Date_Of_Issuance_) OR __NN(Date_Of_Expiration_) OR __NN(Date_Of_License_Renewal_) OR __NN(Date_First_Reported_) OR __NN(Date_Last_Reported_) OR __NN(Date_Last_Updated_) OR __NN(Start_Date_)));
     SELF.Status_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),License_Status_,Date_Processed_},License_Status_,Date_Processed_),Status_Layout)(__NN(License_Status_) OR __NN(Date_Processed_)));
-    SELF.License_Description_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),License_Profession_Code_,License_Profession_Description_,License_Description_,Affiliated_Type_Code_,License_Business_Flag_},License_Profession_Code_,License_Profession_Description_,License_Description_,Affiliated_Type_Code_,License_Business_Flag_),License_Description_Layout)(__NN(License_Profession_Code_) OR __NN(License_Profession_Description_) OR __NN(License_Description_) OR __NN(Affiliated_Type_Code_) OR __NN(License_Business_Flag_)));
-    SELF.Mortgage_Licensing_System_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Nationwide_Mortgage_Licensing_System_,Foreign_Nationwide_Mortgage_Licensing_System_,Name_Type_,Location_Type_,Is_Authorized_License_,Is_Authorized_Conduct_},Nationwide_Mortgage_Licensing_System_,Foreign_Nationwide_Mortgage_Licensing_System_,Name_Type_,Location_Type_,Is_Authorized_License_,Is_Authorized_Conduct_),Mortgage_Licensing_System_Layout)(__NN(Nationwide_Mortgage_Licensing_System_) OR __NN(Foreign_Nationwide_Mortgage_Licensing_System_) OR __NN(Name_Type_) OR __NN(Location_Type_) OR __NN(Is_Authorized_License_) OR __NN(Is_Authorized_Conduct_)));
+    SELF.License_Description_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),License_Profession_Code_,License_Profession_Description_,License_Description_,Affiliated_Type_Code_,License_Business_Flag_,License_Category_,Occupation_},License_Profession_Code_,License_Profession_Description_,License_Description_,Affiliated_Type_Code_,License_Business_Flag_,License_Category_,Occupation_),License_Description_Layout)(__NN(License_Profession_Code_) OR __NN(License_Profession_Description_) OR __NN(License_Description_) OR __NN(Affiliated_Type_Code_) OR __NN(License_Business_Flag_) OR __NN(License_Category_) OR __NN(Occupation_)));
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,TRUE);
@@ -150,8 +135,7 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
   Layout Professional_License__Single_Rollup(InLayout __r) := TRANSFORM
     SELF.License_Dates_ := __CN(PROJECT(DATASET(__r),TRANSFORM(License_Dates_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Date_Of_Issuance_) OR __NN(Date_Of_Expiration_) OR __NN(Date_Of_License_Renewal_) OR __NN(Date_First_Reported_) OR __NN(Date_Last_Reported_) OR __NN(Date_Last_Updated_) OR __NN(Start_Date_)));
     SELF.Status_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Status_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(License_Status_) OR __NN(Date_Processed_)));
-    SELF.License_Description_ := __CN(PROJECT(DATASET(__r),TRANSFORM(License_Description_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(License_Profession_Code_) OR __NN(License_Profession_Description_) OR __NN(License_Description_) OR __NN(Affiliated_Type_Code_) OR __NN(License_Business_Flag_)));
-    SELF.Mortgage_Licensing_System_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Mortgage_Licensing_System_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Nationwide_Mortgage_Licensing_System_) OR __NN(Foreign_Nationwide_Mortgage_Licensing_System_) OR __NN(Name_Type_) OR __NN(Location_Type_) OR __NN(Is_Authorized_License_) OR __NN(Is_Authorized_Conduct_)));
+    SELF.License_Description_ := __CN(PROJECT(DATASET(__r),TRANSFORM(License_Description_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(License_Profession_Code_) OR __NN(License_Profession_Description_) OR __NN(License_Description_) OR __NN(Affiliated_Type_Code_) OR __NN(License_Business_Flag_) OR __NN(License_Category_) OR __NN(Occupation_)));
     SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Source_)));
     SELF.__RecordCount := 1;
     SELF := __r;
@@ -185,15 +169,11 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LicenseDescription',COUNT(__d0(__NL(License_Description_))),COUNT(__d0(__NN(License_Description_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfIssuance',COUNT(__d0(__NL(Date_Of_Issuance_))),COUNT(__d0(__NN(Date_Of_Issuance_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfExpiration',COUNT(__d0(__NL(Date_Of_Expiration_))),COUNT(__d0(__NN(Date_Of_Expiration_)))},
-    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NationwideMortgageLicensingSystem',COUNT(__d0(__NL(Nationwide_Mortgage_Licensing_System_))),COUNT(__d0(__NN(Nationwide_Mortgage_Licensing_System_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfLicenseRenewal',COUNT(__d0(__NL(Date_Of_License_Renewal_))),COUNT(__d0(__NN(Date_Of_License_Renewal_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AffiliatedTypeCode',COUNT(__d0(__NL(Affiliated_Type_Code_))),COUNT(__d0(__NN(Affiliated_Type_Code_)))},
-    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ForeignNationwideMortgageLicensingSystem',COUNT(__d0(__NL(Foreign_Nationwide_Mortgage_Licensing_System_))),COUNT(__d0(__NN(Foreign_Nationwide_Mortgage_Licensing_System_)))},
-    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LocationType',COUNT(__d0(__NL(Location_Type_))),COUNT(__d0(__NN(Location_Type_)))},
-    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameType',COUNT(__d0(__NL(Name_Type_))),COUNT(__d0(__NN(Name_Type_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StartDate',COUNT(__d0(__NL(Start_Date_))),COUNT(__d0(__NN(Start_Date_)))},
-    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsAuthorizedLicense',COUNT(__d0(__NL(Is_Authorized_License_))),COUNT(__d0(__NN(Is_Authorized_License_)))},
-    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsAuthorizedConduct',COUNT(__d0(__NL(Is_Authorized_Conduct_))),COUNT(__d0(__NN(Is_Authorized_Conduct_)))},
+    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LicenseCategory',COUNT(__d0(__NL(License_Category_))),COUNT(__d0(__NN(License_Category_)))},
+    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Occupation',COUNT(__d0(__NL(Occupation_))),COUNT(__d0(__NN(Occupation_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]

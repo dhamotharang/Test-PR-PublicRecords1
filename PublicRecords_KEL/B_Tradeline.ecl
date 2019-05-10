@@ -4,8 +4,8 @@ IMPORT B_Tradeline_1,CFG_Compile,E_Tradeline,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_1(__in,__cfg).__ENH_Tradeline_1) __ENH_Tradeline_1 := B_Tradeline_1(__in,__cfg).__ENH_Tradeline_1;
-  SHARED __EE492258 := __ENH_Tradeline_1;
-  EXPORT __ST30800_Layout := RECORD
+  SHARED __EE793657 := __ENH_Tradeline_1;
+  EXPORT __ST47995_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -19,34 +19,52 @@ EXPORT B_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.nstr Status_;
     KEL.typ.nkdate First_Sale_Date_;
     KEL.typ.nkdate Last_Sale_Date_;
+    KEL.typ.nkdate A_R_Date_Group_;
+    KEL.typ.nint Aging1_To30_L_N_;
+    KEL.typ.nint Aging31_To60_L_N_;
+    KEL.typ.nint Aging61_To90_L_N_;
+    KEL.typ.nint Aging91_Plus_L_N_;
     KEL.typ.nbool Carrier_Segment_;
-    KEL.typ.nint Current___A_R___L_N_;
+    KEL.typ.nint Current_A_R_L_N_;
+    KEL.typ.nint D_P_D1_Total_;
+    KEL.typ.nint D_P_D31_Total_;
+    KEL.typ.nint D_P_D61_Total_;
+    KEL.typ.nint D_P_D91_Total_;
     KEL.typ.nbool Fleet_Segment_;
     KEL.typ.nbool Is1_Y_Record_;
+    KEL.typ.nbool Is_Most_Recent_Active_Record_;
+    KEL.typ.nbool Is_Most_Recent_Active_Record1_Y_;
+    KEL.typ.nbool Is_Two_Year_Full_Record_;
     KEL.typ.nbool Materials_Segment_;
+    KEL.typ.nint Months_From_First_Of_Current_Month_;
     KEL.typ.nbool Operations_Segment_;
     KEL.typ.nbool Other_Segment_;
+    KEL.typ.int Perf_Level_ := 0;
     KEL.typ.nint Record_Age_In_Days_;
     KEL.typ.nint Record_Age_In_Days1_Y_;
     KEL.typ.nkdate Record_Date_;
-    KEL.typ.nint Total___A_R___L_N_;
+    KEL.typ.nint Total_A_R_L_N_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST30793_Layout := RECORD
+  EXPORT __ST47988_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST30800_Layout) Records_;
+    KEL.typ.ndataset(__ST47995_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_;
+    KEL.typ.nkdate Current_Date_First_Of_Month_;
+    KEL.typ.nint Current_Month_;
+    KEL.typ.nint Current_Year_;
     KEL.typ.nint Filing_Age_In_Days_;
     KEL.typ.nbool Is_Active_;
     KEL.typ.nbool Is_Active1_Y_;
+    KEL.typ.nbool Is_Active2_Y_;
     KEL.typ.bool Is_Carrier_Segment_ := FALSE;
     KEL.typ.bool Is_Fleet_Segment_ := FALSE;
     KEL.typ.bool Is_Materials_Segment_ := FALSE;
@@ -54,17 +72,20 @@ EXPORT B_Tradeline(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.bool Is_Other_Segment_ := FALSE;
     KEL.typ.nint Newest_Record_Age_In_Days_;
     KEL.typ.nint Newest_Record_Age_In_Days1_Y_;
-    KEL.typ.nint Total___A_R___L_N_;
+    KEL.typ.nint Total_A_R_L_N_;
     KEL.typ.nkdate Trade_Date_;
+    KEL.typ.nkdate Two_Year_Full_Date_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST30793_Layout __ND492505__Project(B_Tradeline_1(__in,__cfg).__ST34260_Layout __PP491976) := TRANSFORM
-    __EE492045 := __PP491976.Records_;
-    SELF.Records_ := __BN(PROJECT(__T(__EE492045),__ST30800_Layout),__NL(__EE492045));
-    SELF.Filing_Age_In_Days_ := FN_Compile.FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP491976.Trade_Date_),__ECAST(KEL.typ.nkdate,__PP491976.Current_Date_));
-    SELF := __PP491976;
+  SHARED __ST47988_Layout __ND794030__Project(B_Tradeline_1(__in,__cfg).__ST55570_Layout __PP793279) := TRANSFORM
+    __EE793358 := __PP793279.Records_;
+    SELF.Records_ := __BN(PROJECT(__T(__EE793358),__ST47995_Layout),__NL(__EE793358));
+    SELF.Filing_Age_In_Days_ := FN_Compile.FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP793279.Trade_Date_),__ECAST(KEL.typ.nkdate,__PP793279.Current_Date_));
+    __CC11111 := 730;
+    SELF.Is_Active2_Y_ := __OP2(__PP793279.Newest_Record_Age_In_Days_,<=,__CN(__CC11111));
+    SELF := __PP793279;
   END;
-  EXPORT __ENH_Tradeline := PROJECT(__EE492258,__ND492505__Project(LEFT));
+  EXPORT __ENH_Tradeline := PROJECT(__EE793657,__ND794030__Project(LEFT));
 END;
