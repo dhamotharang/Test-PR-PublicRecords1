@@ -6,217 +6,405 @@ EXPORT RegularExpressions := MODULE
     SHARED STARTS_WITH := '^';
     SHARED ENDS_WITH := '.*$';
     
-    
-    //Common/shared list for expressions
-    SHARED COMMON_ALCOHOL := '(((?=.*(\\b|\\B)(PUB))(?=.*(\\b|\\B)(INTOX|CONSUM|DRIN(G|K))))|((?=.*(\\b|\\B)(OPEN))(?=.*(\\b|\\B)(ALC|BOTT|BTL|C(ON|NT|TN))))|((?=.*(\\b|\\B)(ALC(.)?))(?=.*(\\b|\\B)(BAC|BLOOD|CON|POSS(.)?|VIO)))|((?=.*(\\b|\\B)(CONSUM))(?=.*(\\b|\\B)(UNDERAGE|MINOR)))|((?=.*(\\b|\\B)(UNDER))(?=.*(\\b|\\B)(INFL)))|((?=.*(\\b|\\B)(REFUSE))(?=.*(\\b|\\B)(BLOOD|BREA)))|(?=.*(\\b|\\B)(ALCOH|BEER|DRUNK|INTOX|KEG|LIQUOR|MOONSHI|WHISKEY)))';
-    SHARED COMMON_ARSON := '(?=.*(\\b|\\B)(ARSO|BURN))';
-    SHARED COMMON_BREAKING_AND_ENTERING := '(((?=.*(\\b|\\B)(BREAK))(?=.*(\\b|\\B)(ENT|IN)))|((?=.*(\\b|\\B)(HOME))(?=.*(\\b|\\B)(INV)))|(?=.*(\\b|\\B)(B(\\s)?\\&(\\s)?E)))';
-    SHARED COMMON_BURGLARY := '((?=.*(\\b|\\B)(B(RG|U(GL|RG|RL(A|G)))))((?!.*(\\b|\\B)(PITTSBURGH))))';
-    SHARED COMMON_CAR_JACK := '(((?=.*(\\b|\\B)(JACK))(?=.*(\\b|\\B)(CAR|VEH)))|(?=.*(\\b|\\B)(CARJACK)))';
-    SHARED COMMON_CHILD := '(?=.*(\\b|\\B)(CH(ILD|D|LD)|MINO|MNR|JUV))';     
-    SHARED COMMON_CONTROLLED_SUBSTANCE := '(((?=.*(\\b|\\B)(CONTROLLED))(?=.*(\\b|\\B)(SUBSTANCE)))|((?=.*(\\b|\\B)(CONTR))(?=.*(\\b|\\B)(SUB|STB)))|(?=.*(\\b|\\B)(C\\/S(UBSTANCE)?))|((?=.*(\\b|\\B)(CON))(?=.*(\\b|\\B)(SB)))|((?=.*(\\b|\\B)(CTR))(?=.*(\\b|\\B)(SU)))|((?=.*(\\b|\\B)(CNTRLD))(?=.*(\\b|\\B)(SBSTNC)))|((?=.*(\\b|\\B)(C(ON(T|\\\'T)|N(T(L|R(L|OL(LED)?)?)?)?|TL)))(?=.*(\\b|\\B)(SUB)))|(?=.*(\\b|\\B)(CONT\\/SUB|C\\-SUB|CONSUB|C\\.S\\.|CONT\\.SUB)))';
-    SHARED COMMON_COUNTERFEIT := '((?=.*(\\b|\\B)(COUNTER|CNTERFEIT))|((?=.*(\\b|\\B)(ILL|MAKE|SUB|IMA|ALT|COUN|CNT|FAKE))(?=.*(\\b|\\B)(MONEY|CURRENCY))))';
-    SHARED COMMON_CRIMINAL_PROCEEDS := '((?=.*(\\b|\\B)(PROCEEDS))(?=.*(\\b|\\B)(ACQ(UIR)?|CRIM|DRUG)))';
-    SHARED COMMON_DISORDERLY_CONDUCT := '((((?=.*(\\b|\\B)(DISOR))(?=.*(\\b|\\B)(CON)))|((?=.*(\\b|\\B)(PEAC))(?=.*(\\b|\\B)(DIST|BREACH)))|((?=.*(\\b|\\B)(FAL))(?=.*(\\b|\\B)(911)))|(?=.*(\\b|\\B)(URINAT)))(?!.*' + COMMON_ALCOHOL + '))';
-    SHARED COMMON_DOMESTIC_FAMILY := '((((?=.*(\\b|\\B)(AB(AN(DON)?|ON|SE|US)|CRUEL|E(ND|XPLOIT)|INJ|M(IST|STR)|NEG|RECK))((?=.*(\\b|\\B)(ADULT|C(ARETAKER|UST)|ELDER|PA(RENT|TIENT)|RESIDENT|WLF))|' + COMMON_CHILD + '))|((?=.*(\\b|\\B)(FAMILY))(?=.*(\\b|\\B)(VIOL)))|(?=.*(\\b|\\B)(DOMESTIC|CHILDEND)))(?!.*(\\b|\\B)(ANI|DOMESTICALLY|F(ISH|OWL)|GAME|SECURITIES)))';
-    SHARED COMMON_DRUG := '((?=.*(\\b|\\B)(ALPRA(X|Z)|A(M(MONIA|PH)|NHY)|BARBITU|C(A(RFE|NNA)|H(E)?M|O(CA|DEINE|KE)|RA(C|N)K)|D(ARVO|ESTROMETH|GS|I(AZEPAM|HYDRO|MTHYL)|R(GS|UG))|E(CSTASY|PHED)|FENT|G(HB|RAMS)|H(A(LLUC|RIHUANA|SH(ISH)?)|ER(ION|OI)|OX|YDRO(C|MORPH))|LSD|M(AIRHUANA|AR(I|J|U|RIJ)|DMA|E(HT|TH)|ORPH|RHNA)|N(ARC|ITROU|ORTEST)|O(PI(ATE|UM)|XY)|P(ENTAZ|H(ARM|EN(CYC|LACET|YL(ACETONE)?)?)|RE(SC|CS))|SCHEDULE|STEROID|VALIUM|VICODIN|XANAX|((?=.*(\\b|\\B)(CONTR))(?=.*(\\b|\\B)(DANG)))|((?=.*(\\b|\\B)(SCH(ED)?))(?=.*(\\b|\\B)(\\s(I(I(I)?|\\/II)?|IV|V(I)?)\\s)))|' + COMMON_CONTROLLED_SUBSTANCE + '))(?!.*(\\b|\\B)(SCHEME|CRACKING|PROGRAM)))';
-    SHARED COMMON_DRUG_PARAPHERNALIA := '((((?=.*(\\b|\\B)(DR))(?=.*(\\b|\\B)(PAR)))|(?=.*(\\b|\\B)(DGPARA|HYPODERMIC|NEEDLE|PAR(A(PH)?|P)|PHARAPH|PIPE|SYRING)))(?!.*(\\b|\\B)(PARAGRAPH)))';
-    SHARED COMMON_DRUG_SLIM := '((((?=.*(\\b|\\B)(SC(\\/|\\.)?))(?=.*(\\b|\\B)(I(I(I)?|V)?|V|1|2|3|4|5)))|((?=.*(\\b|\\B)(C))(?=.*(\\b|\\B)(SUB)))|(?=.*(\\b|\\B)(C(D(S)?|OC|S)|MJ|MUSHR|SUB|SYNTH|TEST|THC)))((?!.*(\\b|\\B)(SCISSORS))))';
-    SHARED COMMON_DUI := '((?=.*(\\b|\\B)(D((U|W)I|\\.(U|W)\\.I(\\.)?|\\.\\s(U|W)\\.\\sI(\\.)?|\\s(U|W)\\sI|WR)))|((?=.*(\\b|\\B)(DR(IV|VG)?|OPER|MV|VESSEL))((?=.*(\\b|\\B)(INOTX|BAC|ALC|CHEM|IMPAIR|OWI|CONSUME|UNDER))|((?=.*(\\b|\\B)(UND))(?=.*(\\b|\\B)(INF))))))';
-    SHARED COMMON_EXPLOSIVES := '((?=.*(\\b|\\B)(EXPLOS|NUCLEAR|BOMB|GRENADE|WMD))|((?=.*(\\b|\\B)(DES))(?=.*(\\b|\\B)(DEV|MASS)))|((?=.*(\\b|\\B)(WEAP))(?=.*(\\b|\\B)(MASS)))|((?=.*(\\b|\\B)(TEAR))(?=.*(\\b|\\B)(GAS)))|((?=.*(\\b|\\B)(BIO))(?=.*(\\b|\\B)(AGENT|TOXIN))))';
-    SHARED COMMON_FALSE_STATEMENT := '(((?=.*(\\b|\\B)(FALSE))(?=.*(\\b|\\B)(IDENTIF|PERSONAT|INFORM|STATE)))|((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(IDENTIF)))|(?=.*(\\b|\\B)(FICTICOUS\\s\\(INFO\\)))|((?=.*(\\b|\\B)(ID))(?=.*(\\b|\\B)(MISREP)))|(?=.*(\\b|\\B)(IMPERSON)))';
-    SHARED COMMON_FORGERY := '(?=.*(\\b|\\B)(F(ORG(E|R)?|RGD)|TRADEM|UTTER))';
-    SHARED COMMON_FRAUD := '(?=.*(\\b|\\B)((DE)?FRAUD|CHEAT))';
-    SHARED COMMON_GANG := '(((?=.*(\\b|\\B)(GANG))|((?=.*(\\b|\\B)(GNG))(?=.*(\\b|\\B)(STR|CRM))))(?!.*(\\b|\\B)(ENGANG)))';
-    SHARED COMMON_HUNT_AND_FISH := '((((?=.*(\\b|\\B)(BIRD))(?=.*(\\b|\\B)(GAM|LIMIT|MIG|WILD)))|((?=.*(\\b|\\B)(NORTH))(?=.*(\\b|\\B)(PIKE|LIMIT)))|((?=.*(\\b|\\B)(BASS))(?=.*(\\b|\\B)(BLACK|MOUTH|SEA|STRIP|UNDERS)))|((?=.*(\\b|\\B)(RED))(?=.*(\\b|\\B)(DRUM)))|((?=.*(\\b|\\B)(LIMIT))(?=.*(\\b|\\B)(BASS|PIKE)))|((?=.*(\\b|\\B)(GAM))(?=.*(\\b|\\B)(BIG|DARK|STAMP|TAG|TRANSP)))|((?=.*(\\b|\\B)(SEAS))(?=.*(\\b|\\B)(CLOSED|HUNT|OUT)))|((?=.*(\\b|\\B)(EXCEED|OVER))((?=.*(\\b|\\B)(DAIL))(?=.*(\\b|\\B)(LIMIT))))|((?=.*(\\b|\\B)(TREE))(?=.*(\\b|\\B)(STAN)))|((?=.*(\\b|\\B)(ICE))(?=.*(\\b|\\B)(HOUSE)))|(?=.*(\\b|\\B)(BEAR|CONCH|CRAB|DEER|DOVE|DUCK|(W)?ELK|FISH|FLOUNDER|FOX|G(EE|OO)SE|HUNT|PELICAN|PERCH|PHEASANT|PINTAIL|RABBIT|ROCKF|SHRIMP|SNAPPER|SPORTSMAN|SQUIRREL|TAXIDERMY|TROUT|TUNA|TURKEY|WALLEYE|WATERFOWL|WILDLIFE)))(?!.*(\\b|\\B)(BEARING)))';
-    SHARED COMMON_IDENTITY_FRAUD := '((((?=.*(\\b)(ID))|(?=.*(\\b|\\B)(IDEN(TITY)?)))(?=.*(\\b|\\B)(TH(EF|(E)?FT)|FRAUD|ST(EA)?L|TAK|CRIM|OBTAIN|CONC)))|((?=.*(\\b|\\B)(FALSE|FICT|FAKE|SALE))(((?=.*(\\b|\\B)(BIR))(?=.*(\\b|\\B)(CE|REC)))|((?=.*(\\b|\\B)(SOC))(?=.*(\\b|\\B)(SEC)))|(?=.*(\\b|\\B)(IDEN|I(\\.)?D(\\.)?|D(\\.)?L(\\.)?|DR|O(\\/)?L|O(\\.)L(\\.)|SSN|S(\\/)?S|CARD|DOCU)))))';
-    SHARED COMMON_IMPORT_EXPORT := '(?=.*(\\b|\\B)(IMPORT|EXPORT))';
-    SHARED COMMON_INFRACTION_AND_ORDINANCES := '(?=.*(\\b|\\B)(CODE|LOUD|ORDINANCE|MUSIC|NOISE))';
-    SHARED COMMON_KIDNAPPING := '((?=.*(\\b|\\B)(ABDU|K(DN(A)?P|I(D(A|D|N(A(P)?)?|PNG)?|N(D)?AP|PN)|NDN)))|((?=.*(\\b|\\B)(CHILD))(?=.*(\\b|\\B)(STEAL)))|((?=.*(\\b|\\B)(FALS))(?=.*(\\b|\\B)(IMPRIS))))';
-    SHARED COMMON_LAB := '((?=.*(\\b|\\B)(LAB))(?=.*(\\b|\\B)(OPER\\/MAIN|OPERAT|MAIN)))';
-    SHARED COMMON_LIVESTOCK_AND_ANIMAL := '((((?=.*(\\b|\\B)(EXOTIC))(?=.*(\\b|\\B)(SPEC)))|(?=.*(\\b|\\B)(ANIMAL|CAT(TLE)?|COW|DOG|GOAT|LIVESTOCK|MULE|RABIES|SHEEP|SWINE|VACC)))(?!.*(' + COMMON_HUNT_AND_FISH + '|' + COMMON_INFRACTION_AND_ORDINANCES + ')))';
-    SHARED COMMON_MANUFACTURING := '((?=.*(\\b|\\B)(MA(N(F(CTR)?|UF)?|UF)|MDP|MFG|MNF))(?!.*(\\b|\\B)(MANATEE)))';
-    SHARED COMMON_MANUFACTURING_DELIVERY_SELLING := '(((?=.*(\\b|\\B)(CONV|DE(AL|L(IVERY)?)|DIS(T(RB)?)?|DS(PNS|T)+|PR(EP|OCS|OD)+|S\\/D|SALE|(\\-)?SELL|TRAN))|' + COMMON_MANUFACTURING + ')(?!.*(\\b|\\B)(DIS(ARMING|CHAR|PLAY|C|AB)|CHILD|BRANDISH|SENT)))';
-    SHARED COMMON_MANUFACTURING_STANDALONE_ACRONYM := '((?=.*(\\b|\\B)((MAN|MFG)\\/DEL|DEL\\/(SELL|MAN)|DIST\\/DEL(\\/SELL)?|SL\\/DEL(\\/POS)?|DIS(T)?\\/POSS|S\\/M\\/D|POSS\\/SELL|DISTR(IBUTE\\/PID|B\\/SELL)|(\\()?DIST\\,(\\s)?SELL(\\))?))|((?=.*(\\b|\\B)(MAN))(?=.*(\\b|\\B)(DEL|SELL|D(I)?ST|SALE|PROD))))';
-    SHARED COMMON_MISAPPROPRIATION_FUNDS := '((?=.*(\\b|\\B)(MISAP(L(Y)?|P)?))(?=.*(\\b|\\B)((F(ID(C|U(C)?))?|UD(U|I)C)|UNDS|P(ROP|UBLIC)|TRUST|ASSIST|SECURITY|MON(EY|IES))))';
-    SHARED COMMON_MONEY_LAUNDER_TAX_EVASION := '((((?=.*(\\b|\\B)(UNTAX|UNSTAM|TAX|STAM))|((?=.*(\\b|\\B)(TX))(?=.*(\\b|\\B)(STAM))))(?=.*(\\b|\\B)(CIG|TOB|ALC|LIQ|FOOD)))((?!.*(\\b|\\B)(REDE(E)?M|MISAPPROP|USE|FALSE))(?!.*(' + COMMON_DRUG + '|' + COMMON_DRUG_SLIM + '))))';
-    SHARED COMMON_MONEY_TRANSMITTER := '(((?=.*(\\b|\\B)(TRANS))(?=.*(\\b|\\B)(EMB)))|(?=.*(\\b|\\B)(\\$TRANS|TRANSMITTER)))';
-    SHARED COMMON_OBTAIN_PROPERTY := '(((?=.*(\\b|\\B)(PRET))(?=.*(\\b|\\B)(FAL|FLS)))|((?=.*(\\b|\\B)(OBT))(?=.*(\\b|\\B)(MONEY|PROP|MERCH|CASH))))';
-    SHARED COMMON_PORN := '(((?=.*(\\b|\\B)(PHOTO))(?=.*(\\b|\\B)(INDEC|LEWD|OBSC)))|((?=.*(\\b|\\B)(OBSC))(?=.*(\\b|\\B)(MATER)))|(?=.*(\\b|\\B)(PO(RN|SS\\sOBSC))))';
-    SHARED COMMON_POSSESSION := '((?=.*(\\b|\\B)(POS|POSN|PCS|USE))|((?=.*(\\b|\\B)(CONST))(?=.*(\\b|\\B)(POS))))';
-    SHARED COMMON_POSSESSION_WITH_INTENT := '(?=.*(\\b|\\B)(PWI(T|D)|PSNW\\/I|(P|W)ID|W\\.I\\.T\\.D))';
-    SHARED COMMON_RACKETEERING := '(?=.*(\\b|\\B)(R(ACKE|ICO)|SHARK))';
-    SHARED COMMON_SEX := '(((?=.*(\\b|\\B)(ENTIC(I|EMENT)|FO(NDL|RNICA)|I(MPREGN|NCEST|NDEC(ENT)?|NTERCOURSE)|LASCIVI|LEWD|LUR(E|ING)|LUSTFU|MASTERBA|M(LST|OLEST)|PEEPING|S(E)?X|SOD(O)?MY))|(' + COMMON_CHILD + '(?=.*(\\b|\\B)(MIST|MO((S)?L|E))))|(' + COMMON_CHILD + '(?=.*(\\b|\\B)(ENTI))(?=.*(\\b|\\B)(INDE)))|((?=.*(\\b|\\B)(EXPOS))(?=.*(\\b|\\B)(GENI)))|((?=.*(\\b|\\B)(LASC))(?=.*(\\b|\\B)(ACT)))|((?=.*(\\b|\\B)(IND))(?=.*(\\b|\\B)(LIB|PROP|EXPO)))|((?=.*(\\b|\\B)(VIOL))(?=.*(\\b|\\B)(DAT(E|ING)))))(?!.*(\\b|\\B)(WINDSHIELD)))';
-    SHARED COMMON_STRUCTURING := '((((?=.*(\\b|\\B)(STRUCT))(?=.*(\\b|\\B)(TRAN)))|(?=.*(\\b|\\B)(STRUCTURESFINANCIALTRANSACTTOEVADEREPORT)))(?!.*(\\b|\\B)(DESTRUCTIVE)))';
-    SHARED COMMON_SUPPORT := '(?=.*(\\b|\\B)(SP(PT|RT|T)|SUP(OORT|ORT|PORT|POT|PPORT|PRT|PT|RT|T)?))';
-    SHARED COMMON_TERRORISM := '(((?=.*(\\b|\\B)(TERROR(ISM|IST)|HIJACK))|((?=.*(\\b|\\B)(PLAN|ATT|CONSP|PERF|THREAT))((?=.*(\\b|\\B)(ACT))(?=.*(\\b|\\B)(VIO)))(?!.*(\\b|\\B)(BATTERY|MANUFACTURE)))|((?=.*(\\b|\\B)(TEACH))(?=.*(\\b|\\B)(SYND)))|((?=.*(\\b|\\B)(THREAT))(?=.*(\\b|\\B)(CATAST))))((?!.*(\\b|\\B)(TERRORI(ZE|STIC)|KIDNAP))(?!.*(' + COMMON_CAR_JACK + '))))';
-    SHARED COMMON_THEFT := '((?=.*(\\b|\\B)(TH(E(F(T)?|T)|FT)|ST(EAL|L(G)?|OLE)))|((?=.*(\\b|\\B)(KEEP))(?=.*(\\b|\\B)(PROP))))';
-    SHARED COMMON_TRAFFIC := '((((?=.*(\\b|\\B)(SEAT))(?=.*(\\b|\\B)(BELT|REST|CHILD)))|' +
-                              '((?=.*(\\b|\\B)(SAFE))(?=.*(\\b|\\B)(BELT|RESTR)))|' +
-                              '((?=.*(\\b|\\B)(LIC))(?=.*(\\b|\\B)(DRIV|VALID|PLAT|SUS|REG)))|' +
-                              '((?=.*(\\b|\\B)(VEH))(?=.*(\\b|\\B)(FEE|COMM)))|' +
-                              '((?=.*(\\b|\\B)(TRAF))(?=.*(\\b|\\B)(DEVIC)))|' +
-                              '((?=.*(\\b|\\B)(INS))(?=.*(\\b|\\B)(VEH|PROOF)))|' +
-                              '((?=.*(\\b|\\B)(SUS))(?=.*(\\b|\\B)(DRIV|MV)))|' +
-                              '((?=.*(\\b|\\B)(EXP))(?=.*(\\b|\\B)(REG|METER)))|' +
-                              '((?=.*(\\b|\\B)(REG))(?=.*(\\b|\\B)(TAG|PLAT)))|' +
-                              '((?=.*(\\b|\\B)(TEMP))(?=.*(\\b|\\B)(TAG|REG)))|' +
-                              '((?=.*(\\b|\\B)(VALID))(?=.*(\\b|\\B)(STICK)))|' +
-                              '((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(REG|TOLL|STOP)))|' +
-                              '((?=.*(\\b|\\B)(SCEN))(?=.*(\\b|\\B)(L(EAVE|V))))|' +
-                              '((?=.*(\\b|\\B)(HIT))(?=.*(\\b|\\B)(RUN)))|' +
-                              '((?=.*(\\b|\\B)(FOLLO))(?=.*(\\b|\\B)(CLOS)))|' +
-                              '((?=.*(\\b|\\B)(FIN))(?=.*(\\b|\\B)(MAINTAIN|RES)))|' +
-                              '((?=.*(\\b|\\B)(VIOL))((?=.*(\\b|\\B)(WEIG|PARK|METER|PLATE))|((?=.*(\\b|\\B)(BAS))(?=.*(\\b|\\B)(RUL)))|((?=.*(\\b|\\B)(INST))(?=.*(\\b|\\B)(PERM)))))|' +
-                              '((?=.*(\\b|\\B)(STOP))(?=.*(\\b|\\B)(SIGN)))|' +
-                              '((?=.*(\\b|\\B)(RED))(?=.*(\\b|\\B)(LIGHT)))|' +
-                              '((?=.*(\\b|\\B)(DIS))(?=.*(\\b|\\B)(TC))(?=.*(\\b|\\B)(DEV)))|' +
-                              '((?=.*(\\b|\\B)(PASS))(?=.*(\\b|\\B)(OBS|REST)))|' +
-                              '((?=.*(\\b|\\B)(HAB))(?=.*(\\b|\\B)(OFF)))|' +
-                              '((?=.*(\\b|\\B)(CLEAR))(?=.*(\\b|\\B)(DIST)))|' +
-                              '((?=.*(\\b|\\B)(JET|WATER))(?=.*(\\b|\\B)(SKI)))|' +
-                              '(?=.*(\\b|\\B)(A(CDA|XLES)|B(ICYC|OAT)|D(R(IV(ING)?|VNG)|WLS)|FMRF|H(ELMET|IGHWAY)|INSURANCE|LANE|M(ETER|O(PED|TOR|VING)|VI)|NONMOVING|ONE\\-WAY|P(ARKING|EDE|LATES|ONTOON|WC)|S(IGNAL|P(DG|EED)|TNS|URFBOARD)|UNINSUR|VE(HICLE|SSEL)|WATERCRAFT)))' +
-                              '(?!.*(\\b|\\B)(COMVICTIONS)))';
-    SHARED COMMON_TRAFFICKING_ITEMS := '(((?=.*(\\b|\\B)(PROM|ADVER|PLACE))((?=.*(\\b|\\B)(PROS|POST|PORN|STAT|SEX|OBSC|PHOTO))|' + COMMON_CHILD + '))|((?=.*(\\b|\\B)(TRAF|TRANS|MOVE))((?=.*(\\b|\\B)(ALIEN|ORGAN|SEX|LABOR|HUMAN|FOOD))|' + COMMON_CHILD + ')))';
-    SHARED COMMON_TRAFFICKING_HUMANS := '((?=.*(\\b|\\B)(P(AND|IMP|AMPER)|PROM(.PROST|\\/PROS)|TRAFFCHILD))|((?=.*(\\b|\\B)(PROM|ADVER|PLACE))((?=.*(\\b|\\B)(PROS|PO(ST|RN)|STAT|SEX|OBSC|PHOTO))|' + COMMON_CHILD + '))|((?=.*(\\b|\\B)(CORRUP))' + COMMON_CHILD + '))';
-    SHARED COMMON_TRAFFICKING_TERMS := '((?=.*(\\b|\\B)(SMUG|(TRFF(CKING|ICKING|K(G|NG))?)|(TRFK(G|ING)?)|(TRAFF(\\.|C(KG|K(I)?NG)|ICK(ING)?|IK(GN|ING)?|ING|K(G|ICKING|NG)?|RKG)?)|(TRAF(\\.|\\/|CK(G\\.|ING)|ICK(\\.|ING)?|IK(G|ING)))))(?!.*(\\b|\\B)(\\sTRAFFIC\\s)))';
-    SHARED COMMON_TRANSPORT_PROCEEDS := '((((?=.*(\\b|\\B)(TRANSPORT))(?=.*(\\b|\\B)(VIOLATION)))|((?=.*(\\b|\\B)(CURR))(?=.*(\\b|\\B)(EXCHA)))|((?=.*(\\b|\\B)(TRANS))(?=.*(\\b|\\B)(UNLAW|PROCEED))))(?!.*(\\b|\\B)(PROBATION)))';
-    SHARED COMMON_WEAPON := '(((?=.*(\\b|\\B)(AMM(O|UNI)|ARM(O|ED)|CCW|CONTRA|DISCHARG|F(\\-ARM|IR(ARM|EA(MR|RM))|REARM|RIEARM)|GUN|KNIFE|PISTOL|RAZOR|RIFLE|RVOLV|SAWEDOFF|SH(OTG|TGN)|SWORD|U(\\.)?U(\\.)?W(\\.)?|UCW|WEA(P(ON)?)?|W(EP|PN)|U\\sU\\sW))|((?=.*(\\b|\\B)(SHO|SHRT))(?=.*(\\b|\\B)(BARR|BRL)))|((?=.*(\\b|\\B)(SAW))(?=.*(\\b|\\B)(OFF)))|((?=.*(\\b|\\B)(UNLAW))(?=.*(\\b|\\B)(CARR))))((?!.*(\\b|\\B)(AMMONIA|(SUB)?CONTRACT|PARKING|UNARMED))(?!.*((?=.*(\\b|\\B)(ARM))(?=.*(\\b|\\B)(ROB))))))';
-    SHARED COMMON_WITH_INTENT := '((?=.*(\\b|\\B)(INT(ENT)?|WI(T)?|W\\/((\\s)?INTENT|I(NT(\\.)?)?)?|W\\.I\\.T\\.D))(?!.*(\\b|\\B)(WITHIN)))';
-    
-    
-    SHARED COMMON_AGGRAVATED_ASSAULT := '(((?=.*(\\b|\\B)(A(\\s)?\\&(\\s)?b|A\\/B|AA\\/(DW|PO|SBI)|AAWW|AW(DW(ISI|WITKISI)?)))|((?=.*(\\b|\\B)(AG(G|RV|A)?))|' + COMMON_WITH_INTENT + ')(?=.*(\\b|\\B)(A(LST|S(AULT|L(T)?|S(LT)?|T|U(A)?LT))|B(AT(RY|T)|TRY)|INJ)))(?!.*(\\b|\\B)(CLASS|TRESPASS|' + COMMON_DUI + ')))';
-    SHARED COMMON_ASSAULT := '(((?=.*(\\b|\\B)(MAL))(?=.*(\\b|\\B)(INJ|SHOOT|STAB|WOUND)))|((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(ASS)))|(?=.*(\\b)(ASS))|(?=.*(\\b|\\B)(A(LST|S((AU)?LT|U(A)?LT)|SAULT|SS(A(ULT)?|LT))|B(AT(T|RY)|TRY)|INTIMIDATE|LYNCH|STRANGU|THREATEN)))';
-    SHARED COMMON_ASSAULT_DEADLY_INTENT := '(((?=.*(\\b|\\B)(AS(S|A)|INT))(?=.*(\\b|\\B)(KILL)))|((?=.*(\\b|\\B)(DEAD))(?=.*(\\b|\\B)(COND)))|((?=.*(\\b|\\B)(IMPED))(?=.*(\\b|\\B)(BR)))|(?=.*(\\b|\\B)(AA\\/DW|AAWW|AW(DWISI|I(K|T(K)?))|SHOOTING))|((' + COMMON_ASSAULT + ')((?=.*(\\b|\\B)(DEAD|DANG))|' + COMMON_WEAPON + ')))';
-    SHARED COMMON_ASSAULT_COMBINED := '((' + COMMON_ASSAULT + '|' + COMMON_ASSAULT_DEADLY_INTENT + '|' + COMMON_AGGRAVATED_ASSAULT + ')((?!.*(\\b|\\B)(ASS(I(GN|S(T(AN(CE|T))?)?)|T|UR)|HARAS|MASSAGE))(?!.*' + COMMON_SEX + ')))'; 
-    SHARED COMMON_CHECK := '((?=.*(\\b|\\B)(CH(ECK|K|EC)))|((?=.*(\\b|\\B)(CK))((?=.*(\\b|\\B)(WORTH|BAD|UTTER|BOGUS|NSF))|' + COMMON_FRAUD + ')))';
-    SHARED COMMON_CHILD_SUPPORT := '((' + COMMON_CHILD + COMMON_SUPPORT + ')|((?=.*(\\b|\\B)(NON(\\-(\\s)?|\\/)?|NUN))' + COMMON_SUPPORT + ')|(?=.*(\\b|\\B)(NSUP)))';
-    SHARED COMMON_DRUGS_WITH_POSSESSION := '(' + COMMON_POSSESSION + '(' + COMMON_DRUG + '|' + COMMON_DRUG_SLIM + '|' + COMMON_DRUG_PARAPHERNALIA + '))';
-    SHARED COMMON_DRUGS_WITHOUT_POSSESSION := '(((' + COMMON_POSSESSION + COMMON_DRUG_SLIM + ')|' + COMMON_DRUG + '|' + COMMON_DRUG_PARAPHERNALIA + ')(?!.*' + COMMON_DUI + '))';
-    SHARED COMMON_ORGANIZED_CRIME := '((((?=.*(\\b)(OGR|OR(A|G|I(G)?)))|(?=.*(\\b|\\B)(\\-O(GR|R(A|G|I(G)?))|\\/O(GR|R(G|I(G)?))|ORG(\\.|(A|I)N|N|R|Z)|SYND)))((?=.*(\\b|\\B)(ACT|C(IM|R(IM|M(\\.)?))))|' + COMMON_THEFT + '))|((?=.*(\\b|\\B)(OG))(?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(ACT))))';
-    SHARED COMMON_ROBBERY := '(((?=.*(\\b|\\B)(ATT))(?=.*(\\b|\\B)(ROB)))|((?=.*(\\b|\\B)(SAFE))(?=.*(\\b|\\B)(CRACK)))|(?=.*(\\b|\\B)(ROB(B|ER)|SAFECRACK)))';
-    SHARED COMMON_ROBBERY_ARMED := '((((?=.*(\\b)(ROB))((?=.*(\\b|\\B)(AGG|DEAD|DDL|DW|SER|BOD))|' + COMMON_WEAPON + '))|(?=.*(\\b|\\B)(ARMED\\/ROB))|(?=.*(\\b|\\B)(A(\\s)?\\&(\\s)?ROB)))(?!.*(\\b|\\B)(PROBATION)))';
-    SHARED COMMON_ROBBERY_BANK := '(((?=.*(\\b|\\B)(ROB))(?=.*(\\b|\\B)(BANK)))|((?=.*(\\b|\\B)(ROBB))(?=.*(\\b|\\B)(BAN))))';
-    
-    
 
-
-
-
-
-    EXPORT EXPRESSION_INFRACTIONS_AND_ORDINANCES := STARTS_WITH + COMMON_INFRACTION_AND_ORDINANCES + ENDS_WITH;
-    EXPORT EXPRESSION_LIVESTOCK_AND_ANIMAL := STARTS_WITH + COMMON_LIVESTOCK_AND_ANIMAL + ENDS_WITH;
-    EXPORT EXPRESSION_HUNTING_AND_FISHING := STARTS_WITH + COMMON_HUNT_AND_FISH + ENDS_WITH;
-    EXPORT EXPRESSION_ZONING := STARTS_WITH + '(?=.*(\\b|\\B)(ZONING))' + ENDS_WITH;
-    EXPORT EXPRESSION_COURT_CHARGES := STARTS_WITH + '(((?=.*(\\b|\\B)(COURT))(?=.*(\\b|\\B)(CONTEMPT|APPEAR|ORDER)))|((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(APPEAR)))|(?=.*(\\b|\\B)(FTA(\\/)?|JUMP|BAIL|BOND)))' + ENDS_WITH;
-    EXPORT EXPRESSION_ALCOHOL_RELATED := STARTS_WITH + '(' + COMMON_ALCOHOL + '(?!.*(\\b|\\B)(FTA)))' + ENDS_WITH;
-    EXPORT EXPRESSION_TRAFFIC_OFFENSES := STARTS_WITH + '(((?=.*(\\b|\\B)(ST))(?=.*(\\b|\\B)(SN)))|((?=.*(\\b|\\B)(RD))(?=.*(\\b|\\B)(LT)))|(?=.*(\\b|\\B)(TRAFFIC|NDL))|' + COMMON_TRAFFIC + ')' + ENDS_WITH;
-    EXPORT EXPRESSION_DUI := STARTS_WITH + '(' + COMMON_DUI + '(?!.*(\\b|\\B)(REDUCED)))' + ENDS_WITH;
-    EXPORT EXPRESSION_CHILD_SUPPORT := STARTS_WITH + COMMON_CHILD_SUPPORT + ENDS_WITH;
-    EXPORT EXPRESSION_ALIEN_AND_IMMIGRATION := STARTS_WITH + '((?=.*(\\b|\\B)(ALIEN|IMMIG))(?!.*(\\b|\\B)(SMUG)))' + ENDS_WITH;
-    EXPORT EXPRESSION_DISORDERLY_CONDUCT := STARTS_WITH + COMMON_DISORDERLY_CONDUCT + ENDS_WITH;
-    EXPORT EXPRESSION_TRESPASSING := STARTS_WITH + '(?=.*(\\b|\\B)(TRES))' + ENDS_WITH;
-    EXPORT EXPRESSION_SHOPLIFTING := STARTS_WITH + '(?=.*(\\b|\\B)(SHOPL))' + ENDS_WITH;
-    EXPORT EXPRESSION_ORGANIZED_RETAIL_THEFT := STARTS_WITH + '(((?=.*(\\b|\\B)(ORG))(?=.*(\\b|\\B)(RET)))((?!.*(\\b|\\B)(RETAL|ENDANGER))(?!.*' + COMMON_FORGERY + ')))' + ENDS_WITH;
+    //These are common shared between expressions or could be in future releases
+    SHARED COMMON_INFRACTION_ORDINANCES_LIST := '((?=.*(\\b|\\B)(ORDINANCE|NOISE|MUSIC|LOUD|CODE|LITTER|TRASH|FIREWORK|CURFEW|CITATION|PEDDL|JAYWALK))|((?=.*(\\b|\\B)(PAN))(?=.*(\\b|\\B)(HANDL)))|((?=.*(\\b|\\B)(PUB))(?=.*(\\b|\\B)(NUIS|DIST)))|((?=.*(\\b|\\B)(CITY))(?=.*(\\b|\\B)(ORDIN)))|((?=.*(\\b|\\B)(CIVIL))(?=.*(\\b|\\B)(ASSESS))))';
+    SHARED COMMON_LIVESTOCK_ANIMAL_LIST := '(((?=.*(\\b|\\B)(ANIMAL|AMNL|ANIML|ANMLS|DOG|RABIES|VACC|LIVESTOCK|LVSTOK|LIVESTK|LVSTCK|L\\/STOCK|SWINE|HOG|COW|CATTLE|SHEEP|GOAT|MULE|HORSE|HRSE))|(?=.*(CAT|PET)\\b)|((?=.*(\\b|\\B)(EXOTIC))(?=.*(\\b|\\B)(SPEC))))(?!.*((\\b|\\B)(VERIFICAT|IDENTIFICAT|DEFACAT|INTOXICAT|REVOCAT|EQUIP|CERTIFICAT)|' + COMMON_INFRACTION_ORDINANCES_LIST + ')))';
+    SHARED COMMON_FISH_GAME_ANIMAL_LIST := '(((?=.*(\\b|\\B)(WILDLIFE|WLDLIF|BOBCAT|PHEASANT|TURKEY|DUCK|WATERFOWL|PINTAIL|GEESE|GOOSE|PELICAN|DOVE|FOWL|BEAR|DEER|ELK|MOOSE|SQUIRREL|RABBIT|MINK|FOX|WALLEYE|CRAPPIE|BLUEGILL|SAUGER|SALMON|SNAPPER|TROUT|FLOUNDER|ROCKF|WELK|PERCH|TUNA|CRAB|CONCH|SHRIMP|LOBSTER|OYSTER|ANIMAL|BIRD|MIGRATORY|SWAN|BUCK|DOE|RAC(C)?OON|GOPHER|STEELHEAD|GATOR|STURGEON|TORTOISE|F\\&W))|((?=.*(\\b|\\B)(GAM))(?=.*(\\b|\\B)(BIG|MAMMAL)))|((?=.*(\\b|\\B)(BG))(?=.*(\\b|\\B)(GAM)))|((?=.*(\\b|\\B)(NORTH))(?=.*(\\b|\\B)(PIKE)))|((?=.*(\\b|\\B)(BASS))(?=.*(\\b|\\B)(SEA|STRIP|MOUTH|BLACK|UNDERS)))|((?=.*(\\b|\\B)(BIRD))(?=.*(\\b|\\B)(GAM|WILD|MIG)))|((?=.*(\\b|\\B)(RED))(?=.*(\\b|\\B)(DRUM)))|((?=.*(\\b|\\B)(LARGE))(?=.*(\\b|\\B)(MOUTH))))(?!.*(\\b|\\B)(BEARING|BIGAMY)))';
+    SHARED COMMON_HUNT_TRAP_FISH_TERMS_LIST := '(((?=.*(\\b|\\B)(FISH|HUNT|TRAP|SPORTSMAN|TAXIDERMY|CREEL|ANGLING))|((?=.*(\\b|\\B)(GAM))(?=.*(\\b|\\B)(TAG|TRANSP|STAMP|DARK)))|((?=.*(\\b|\\B)(SEAS))(?=.*(\\b|\\B)(OUT|CLOSED)))|((?=.*(\\b|\\B)(EXCEED|OVER))((?=.*(\\b|\\B)(DAIL))(?=.*(\\b|\\B)(LIMIT))))|((?=.*(\\b|\\B)(ICE))(?=.*(\\b|\\B)(HOUSE)))|((?=.*(\\b|\\B)(TREE))(?=.*(\\b|\\B)(STAN)))|((?=.*(\\b|\\B)(LIMIT))(?=.*(\\b|\\B)(BIRD|BASS|NORTH|PIKE))))(?!.*(\\b|\\B)(BEARING|TRAPSP|BOOBY|MANTRAP|RAPE|STAT|DANGLING|ROUTE)))';
     
+    SHARED COMMON_DUI_LIST := '(((?=.*(\\b|\\B)(D(W|U)I|(D\\.(W|U)\\.I(\\.)?)|(D\\s(W|U)\\sI)|(D\\.\\s(W|U)\\.\\sI(\\.)?)|DWR))|((?=.*(\\b|\\B)(DRIV|DRVG|OPER|MV|DR|OPER|VESSEL))(?=.*(\\b|\\B)(INOTX|BAC|ALC|CHEM|IMPAIR|OWI|CONSUM|UNDER|DRINK|((?=.*(\\b|\\B)(UND))(?=.*(\\b|\\B)(INF)))))))(?!.*(\\b|\\B)(DRY|BACKING|KNOWI|((?=.*(\\b|\\B)(UND))(?=.*(\\b|\\B)(REVO|SUSP))))))';
+    SHARED COMMON_ALCOHOL_LIST := '((((?=.*(\\b|\\B)(PUB))(?=.*(\\b|\\B)(INTOX|CONSUM|DRING|DRINK)))|((?=.*(\\b|\\B)(OPEN))(?=.*(\\b|\\B)(CON|CNT|CTN|BOTT|BTL|ALC)))|((?=.*(\\b|\\B)(ALC(\\.)?))(?=.*(\\b|\\B)(VIO|BAC|POSS(\\.)?|BLOOD|CON)))|((?=.*(\\b|\\B)(CONSUM))(?=.*(\\b|\\B)(UNDERAGE|MINOR)))|((?=.*(\\b|\\B)(SELL))(?=.*(\\b|\\B)(ALCH)))|((?=.*(\\b|\\B)(DRY))(?=.*(\\b|\\B)(AREA)))|((?=.*(\\b|\\B)(UNDER))(?=.*(\\b|\\B)(INFL)))|((?=.*(\\b|\\B)(REFUSE))(?=.*(\\b|\\B)(BLOOD|BREA)))|(?=.*(\\b|\\B)(DRUNK|ABC|LIQUOR|ALCOH|BEER|MOONSHI|WHISKEY|KEG|MALT|WINE|INTOX)))(?!.*(\\b|\\B)(MALTREAT|SWINE)))';
     
-    EXPORT EXPRESSION_GAMBLING_BITCOIN := STARTS_WITH + '(((?=.*(\\b|\\B)(PROM))(?=.*(\\b|\\B)(GAM)))|(?=.*(\\b|\\B)(GAMING|CASINO|BITCOIN|GAMBL|PROM\\/GA(B)?M|LOTTERY)))' + ENDS_WITH;
-    EXPORT EXPRESSION_COMPUTER := STARTS_WITH + '((?=.*(\\b|\\B)(COMPU))(?!.*(\\b|\\B)(RAPE|COMPUL)))' + ENDS_WITH;
-    EXPORT EXPRESSION_FALSE_STATEMENTS_IMPERSONATION_IDENTIFICATION := STARTS_WITH + COMMON_FALSE_STATEMENT + ENDS_WITH;
-    EXPORT EXPRESSION_TAMPERING := STARTS_WITH + '((((?=.*(\\b|\\B)(TAM))(?=.*(\\b|\\B)(EVI)))|(?=.*(\\b|\\B)(TAMP)))(?!.*(\\b|\\B)(STAMP|ME(TH|HT|TA))))' + ENDS_WITH;
-    EXPORT EXPRESSION_OBSTRUCTION := STARTS_WITH + '((?=.*(\\b|\\B)(OBSTR))((?!.*(\\b|\\B)(HIGH|FIRE|WINDSHIELD))(?!.*' + COMMON_TRAFFIC + ')))' + ENDS_WITH;
-    EXPORT EXPRESSION_PERJURY := STARTS_WITH + '(?=.*(\\b|\\B)(PERJU))' + ENDS_WITH;
+    SHARED COMMON_GANG_LIST := '(((?=.*(\\b|\\B)(GANG))|((?=.*(\\b|\\B)(GNG))(?=.*(\\b|\\B)(STR|CR(I)?M)))|((?=.*(\\b|\\B)(GAN))(?=.*(\\b|\\B)(STR))(?=.*(\\b|\\B)(CR(I|M))))|((?=.*(\\b|\\B)(GAN))(?=.*(\\b|\\B)(STRE|CR(I)?M))))(?!.*(\\b|\\B)(ENGANG|ENDANGERING|DMGNG)))';
     
+    SHARED COMMON_COMPUTER_CYBER_LIST := '((?=.*(\\b|\\B)(COMPU|CYBER|INTERNET))(?!.*(\\b|\\B)(RAPE|COMPUL)))';
+    SHARED COMMON_STALK_INTIM_LIST := '(((?=.*(\\b|\\B)(STALK|HAR(R)?AS|TERRORI(ZE|STIC)|INTIMID|THREATEN|BULLY|PROWL|MENAC|BRANDISH))|((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(THREAT))))(?!.*(\\b|\\B)(BIAS|ETHNIC|RACIAL|RELIGIOUS)))';
     
-    EXPORT EXPRESSION_VANDALISM := STARTS_WITH + '((?=.*(\\b|\\B)(VAND))(?!.*(\\b|\\B)(SERVAND)))' + ENDS_WITH;
-    EXPORT EXPRESSION_DESTRUCTION_OF_PROPERTY := STARTS_WITH + '((((?=.*(\\b|\\B)(PROP))(?=.*(\\b|\\B)(D(AMA|EST))))|(?=.*(\\b|\\B)(DESTR(U|OY)|DAMAGE)))((?!.*(\\b|\\B)(DEV|ANIM|REG))(?!.*' + COMMON_DUI + ')))' + ENDS_WITH;
-    EXPORT EXPRESSION_RESISTING_ARREST_ESCAPE_ELUDE := STARTS_WITH + '((((?=.*(\\b|\\B)(RES))(?=.*(\\b|\\B)(AR(R)?ST)))|((?=.*(\\b|\\B)(EVAD))(?=.*(\\b|\\B)(AR(R|ST)|DET|FUGI)))|((?=.*(\\b|\\B)(ABSCON))(?=.*(\\b|\\B)(PAROLE)))|(?=.*(\\b|\\B)(ELUD(E|I)|ESC(AP(E)?|P)|EVAD(E|ING)|FL(EE|IGHT)|RESIST|SCAPE)))((?!.*(\\b|\\B)(RAPE|PERSISTENT|RESISTER))(?!.*(' + COMMON_SEX + '|' + COMMON_ALCOHOL + '|' + COMMON_DUI + '))))' + ENDS_WITH;
-    EXPORT EXPRESSION_VIOLATING_ORDERS := STARTS_WITH + '(((?=.*(\\b)(ORD))(?=.*(\\b)(RESTRAIN|PR(O)?T|VIOL)))|((?=.*(\\b)(CIV))(?=.*(\\b)(PROT))))' + ENDS_WITH;
-    EXPORT EXPRESSION_FUGITIVE_OR_WARRANT := STARTS_WITH + '(?=.*(\\b|\\B)(FUGITIVE|WARRANT))' + ENDS_WITH;
-    EXPORT EXPRESSION_CYBER_STALKING := STARTS_WITH + '(?=.*(\\b|\\B)(CYBER))' + ENDS_WITH;
-    EXPORT EXPRESSION_STALKING_HARASSMENT_TERRORIZE := STARTS_WITH + '(?=.*(\\b|\\B)(STALK|HAR(R)?AS|TERRORI(ZE|STIC)))' + ENDS_WITH;
-    EXPORT EXPRESSION_ANIMAL_FIGHTING := STARTS_WITH + '(((?=.*(\\b|\\B)(ANIMA|DOG))(?=.*(\\b|\\B)(FIGHT)))|(?=.*(\\b|\\B)(COCKFIGHT|SPEC\\sDOG)))' + ENDS_WITH;
-    EXPORT EXPRESSION_DOMESTIC_AND_FAMILY_VIOLENCE_OR_ABUSE := STARTS_WITH + COMMON_DOMESTIC_FAMILY + ENDS_WITH;
-    EXPORT EXPRESSION_ASSAULT := STARTS_WITH + COMMON_ASSAULT_COMBINED + ENDS_WITH;
-    EXPORT EXPRESSION_BREAKING_AND_ENTERING := STARTS_WITH + COMMON_BREAKING_AND_ENTERING + ENDS_WITH;
-    EXPORT EXPRESSION_BURGLARY := STARTS_WITH + COMMON_BURGLARY + ENDS_WITH;
-    EXPORT EXPRESSION_ARSON := STARTS_WITH + COMMON_ARSON + ENDS_WITH;
-    EXPORT EXPRESSION_KIDNAPPING_ABDUCTION := STARTS_WITH + COMMON_KIDNAPPING + ENDS_WITH;
-    EXPORT EXPRESSION_MURDER_MANSLAUGHTER := STARTS_WITH + '((?=.*(\\b|\\B)(HOM((I|O)C)|KILL|M(A)?NSL|MRDER|MSLGRT|MUR))(?!.*(\\b|\\B)(MURATIC)))' + ENDS_WITH;
-    
-    
-    EXPORT EXPRESSION_RAPE := STARTS_WITH + '((?=.*(\\b|\\B)(RAPE))(?!.*(\\b|\\B)(STAT)))' + ENDS_WITH;
-    EXPORT EXPRESSION_STATUTORY_RAPE := STARTS_WITH + '((?=.*(\\b|\\B)(STAT))(?=.*(\\b|\\B)(RAPE)))' + ENDS_WITH;
-    EXPORT EXPRESSION_SEX_OFFENSES := STARTS_WITH + '(' + COMMON_SEX + '(?!.*(\\b|\\B)(FAILURE)))' + ENDS_WITH;
-    EXPORT EXPRESSION_PROSTITUTION := STARTS_WITH + '(?=.*(\\b|\\B)(PROST|POSTITUTION))' + ENDS_WITH;
-    EXPORT EXPRESSION_PORNOGRAPHY := STARTS_WITH + COMMON_PORN + ENDS_WITH;
-    EXPORT EXPRESSION_SOLICITATION := STARTS_WITH + '(?=.*(\\b|\\B)(SOLIC))' + ENDS_WITH;
-    
-    
-    EXPORT EXPRESSION_LARCENY := STARTS_WITH + '(((?=.*(\\b|\\B)(LARY))(?=.*(\\b|\\B)(AUTO|MER))|(?=.*(\\b|\\B)(LAR(C|A))))(?!.*(\\b|\\B)(GR)))' + ENDS_WITH;
-    EXPORT EXPRESSION_THEFT := STARTS_WITH + '((' + COMMON_THEFT + '|((?=.*(\\b|\\B)(UNAUTH))(?=.*(\\b|\\B)(VEH)))|((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(CONVER))))(?!.*(\\b|\\B)(IDENTITY|FELON|SHOPL|LARC|((?=.*(\\b|\\B)(ORG))(?=.*(\\b|\\B)(RET))))))' + ENDS_WITH;
-    EXPORT EXPRESSION_FELONY_OR_AGGRAVATED_THEFT := STARTS_WITH + '((?=.*(\\b|\\B)(FEL|AGG))' + COMMON_THEFT + ')' + ENDS_WITH;
-    EXPORT EXPRESSION_CAR_JACK := STARTS_WITH + COMMON_CAR_JACK + ENDS_WITH;
-    EXPORT EXPRESSION_ROBBERY := STARTS_WITH + COMMON_ROBBERY + ENDS_WITH;
-    EXPORT EXPRESSION_ARMED_ROBBERY := STARTS_WITH + '(' + COMMON_ROBBERY_ARMED + '(?!.*' + COMMON_CAR_JACK + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_BANK_ROBBERY := STARTS_WITH + COMMON_ROBBERY_BANK + ENDS_WITH;
-    EXPORT EXPRESSION_GRAND_LARCENY := STARTS_WITH + '((?=.*(\\b|\\B)(LARC))(?=.*(\\b|\\B)(GR)))' + ENDS_WITH;
-    
-    
-    EXPORT EXPRESSION_OBTAIN_PROPERTY_BY_FALSE_PRETENSES := STARTS_WITH + COMMON_OBTAIN_PROPERTY + ENDS_WITH;
-    EXPORT EXPRESSION_CONCEALMENT_OF_FUNDS_OR_PROPERTY := STARTS_WITH + '(((?=.*(\\b|\\B)(CONCEAL))(?=.*(\\b|\\B)(FUN|MONEY|PRO(C|P))))(?!.*' + COMMON_CHILD + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_TAX_OFFENSES := STARTS_WITH + '((?=.*(\\b|\\B)(TAX))(?!.*(\\b|\\B)(TAXI)))' + ENDS_WITH;
-    EXPORT EXPRESSION_MISAPPROPRIATION_OF_FUNDS := STARTS_WITH + COMMON_MISAPPROPRIATION_FUNDS + ENDS_WITH;
-    EXPORT EXPRESSION_EMBEZZLEMENT := STARTS_WITH + '(?=.*(\\b|\\B)(EMB(E)?Z))' + ENDS_WITH;
-    EXPORT EXPRESSION_FRAUD := STARTS_WITH + '(' + COMMON_FRAUD + '(?!.*' + COMMON_CHECK + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_CHECK_FRAUD_BAD_CHECK := STARTS_WITH + '(' + COMMON_CHECK + '(?!.*(' + COMMON_THEFT + '|' + COMMON_OBTAIN_PROPERTY + ')))' + ENDS_WITH;
-    EXPORT EXPRESSION_IDENTITY_FRAUD_AND_THEFT := STARTS_WITH + '(' + COMMON_IDENTITY_FRAUD + '(?!.*(\\b|\\B)(MEDICAID|RIDSTLVEH|PUB\\sAID|AVOID|DILANDID)))' + ENDS_WITH;
-    EXPORT EXPRESSION_ORGANIZED_FRAUD := STARTS_WITH + '((?=.*(\\b|\\B)(ORG))' + COMMON_FRAUD + ')' + ENDS_WITH;
-    EXPORT EXPRESSION_INSURANCE_FRAUD := STARTS_WITH + '((?=.*(\\b|\\B)(INSUR))((?=.*(\\b|\\B)(FALSE))|' + COMMON_FRAUD + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_HEALTHCARE_FRAUD := STARTS_WITH + '(((?=.*(\\b|\\B)(HEALTH|WORKER|COMPEN))' + COMMON_FRAUD + ')|((?=.*(\\b|\\B)(WORKER))(?=.*(\\b|\\B)(COMP)))|((?=.*(\\b|\\B)(HEALTH))(?=.*(\\b|\\B)(FALSE|PLAN)))|((?=.*(\\b|\\B)(UNAUTH))(?=.*(\\b|\\B)(USE))(?=.*(\\b|\\B)(PROVIDER)))|(?=.*(\\b|\\B)(MEDICAID)))' + ENDS_WITH;
-    EXPORT EXPRESSION_MORTGAGE_FRAUD := STARTS_WITH + '((?=.*(\\b|\\B)(MORTGAGE))' + COMMON_FRAUD + ')' + ENDS_WITH;
-    EXPORT EXPRESSION_TAX_FRAUD := STARTS_WITH + '(((?=.*(\\b|\\B)(TAX))((?=.*(\\b|\\B)(EVAS|CONV))|' + COMMON_FRAUD + '))(?!.*(\\b|\\B)(TAXI)))' + ENDS_WITH;
-    EXPORT EXPRESSION_CREDIT_CARD_FRAUD := STARTS_WITH + '((((?=.*(\\b|\\B)(FIN|CRED))(?=.*(\\b|\\B)(CARD)))|((?=.*(\\b|\\B)(FALSE))(?=.*(\\b|\\B)(EMBOSS))))(?!.*' + COMMON_CHECK + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_BANK_FRAUD := STARTS_WITH + '((' + COMMON_FRAUD + '((?=.*(\\b|\\B)(BANK))|((?=.*(\\b|\\B)(FIN))(?=.*(\\b|\\B)(INST)))))(?!.*' + COMMON_CHECK + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_WIRE_FRAUD := STARTS_WITH + '((' + COMMON_FRAUD + '(?=.*(\\b|\\B)(WIRE)))(?!.*' + COMMON_CHECK + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_SECURITIES_FRAUD := STARTS_WITH + '((((?=.*(\\b|\\B)(SECURITIES))(?=.*(\\b|\\B)(FALSE)))|((?=.*(\\b|\\B)(UNREG))(?=.*(\\b|\\B)(LOAN|BROK|ADVIS|BROKER\\/DEALER|AGENT|INVEST)))|((?=.*(\\b|\\B)(SECUR))(((?=.*(\\b|\\B)(FALSE))(?=.*(\\b|\\B)(REP|STATE)))|' + COMMON_FRAUD + ')))(?!.*' + COMMON_CHECK + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_FORGERY_AND_DEVICES := STARTS_WITH + '((' + COMMON_FORGERY + '|' + COMMON_COUNTERFEIT + ')(?!.*' + COMMON_CHECK + '))' + ENDS_WITH;
-    
-    
-    EXPORT EXPRESSION_DRUGS := STARTS_WITH + '((' + COMMON_DRUGS_WITH_POSSESSION + '|' + COMMON_DRUGS_WITHOUT_POSSESSION + ')' +
-                                              '(?!.*(' + COMMON_TRAFFIC + '|' + COMMON_ALCOHOL + '|' + COMMON_FRAUD + '|' + COMMON_ASSAULT_COMBINED + '|' + COMMON_DISORDERLY_CONDUCT + '|' + COMMON_ROBBERY + '|' + COMMON_ROBBERY_ARMED + '|' + COMMON_ROBBERY_BANK + ')))' + ENDS_WITH; 
-    EXPORT EXPRESSION_WEAPONS := STARTS_WITH + '(' + COMMON_WEAPON +  '(?!.*(' + COMMON_SEX + '|' + COMMON_TRAFFIC + '|' + COMMON_THEFT + '|' + COMMON_ASSAULT_COMBINED + '|' + COMMON_ROBBERY + '|' + COMMON_ROBBERY_ARMED + '|' + COMMON_ROBBERY_BANK + ')))' + ENDS_WITH;                                                 
-    EXPORT EXPRESSION_DISTRIBUTION_DRUGS_OR_WEAPONS := STARTS_WITH + '((' + COMMON_MANUFACTURING_STANDALONE_ACRONYM + '|' + COMMON_LAB + '|' + COMMON_POSSESSION_WITH_INTENT + '|' +
-                                                                        '(' + COMMON_POSSESSION + COMMON_WITH_INTENT + ')|' +
-                                                                        '(' + COMMON_WITH_INTENT + COMMON_MANUFACTURING_DELIVERY_SELLING + ')|' +
-                                                                        '(' + COMMON_WITH_INTENT + '(' + COMMON_DRUG + '|' + COMMON_WEAPON + '|' + COMMON_DRUG_PARAPHERNALIA + '|' + COMMON_DRUG_SLIM + '))|' +
-                                                                        '(' + COMMON_MANUFACTURING_DELIVERY_SELLING + '(' + COMMON_DRUG + '|' + COMMON_WEAPON + '|' + COMMON_DRUG_PARAPHERNALIA + '|' + COMMON_DRUG_SLIM + '))|' +
-                                                                        '(((?=.*(\\b|\\B)(MAINTAIN))(?=.*(\\b|\\B)(DWELLING|VEH)))(' + COMMON_DRUG + '|' + COMMON_WEAPON + '|' + COMMON_DRUG_PARAPHERNALIA + '|' + COMMON_DRUG_SLIM + ')))' +
-                                                                        '((?!.*(\\b|\\B)(DRIV))(?!.*(' + COMMON_DUI + '|' + COMMON_THEFT + '|' + COMMON_ALCOHOL + '))))' + ENDS_WITH;
-    EXPORT EXPRESSION_EXPLOSIVES_DESTRUCTION_DEVICES := STARTS_WITH + '(' + COMMON_EXPLOSIVES + '(?!.*' + COMMON_ARSON + '))' + ENDS_WITH;
-    EXPORT EXPRESSION_TRAFFICKING_SMUGGLING_NONHUMAN := STARTS_WITH + '((' + COMMON_TRAFFICKING_TERMS + '|((?=.*(\\b|\\B)(TRAF))((?=.*(\\b|\\B)(FOOD))|' + COMMON_DRUG_SLIM + '|' + COMMON_DRUG + '|' + COMMON_CONTROLLED_SUBSTANCE + '|' + COMMON_WEAPON + ')))((?!.*(' + COMMON_DUI + '|' + COMMON_TRAFFIC + '|' + COMMON_ALCOHOL + '))(?!.*(\\b|\\B)(OFFENSE|BLOCK|CHAPTER|OBSTRUCTING|ABANDON|TRANSMIT|TOBAC|((?=.*(\\b|\\B)(SER))(?=.*(\\b|\\B)(REM)))))))' + ENDS_WITH;
-    EXPORT EXPRESSION_TRAFFICKING_SMUGGLING_HUMAN := STARTS_WITH + '((' + COMMON_TRAFFICKING_HUMANS + '|(((?=.*(\\b|\\B)(TRA(F|NSP)|MOVE|SALE))|' + COMMON_TRAFFICKING_TERMS + ')((?=.*(\\b|\\B)(ALIEN|ORGAN|SEX|LABOR|HUMAN))|' + COMMON_CHILD + ')))((?!.*(' + COMMON_DUI + '|' + COMMON_TRAFFIC + '|' + COMMON_ALCOHOL + '))(?!.*(\\b|\\B)(OFFENSE|BLOCK|CHAPTER|OBSTRUCTING|ABANDON|TRANSMIT|TOBAC|((?=.*(\\b|\\B)(SER))(?=.*(\\b|\\B)(REM)))))))' + ENDS_WITH;
-    
+    SHARED COMMON_ARSON_LIST := '(((?=.*(\\b|\\B)(ARSO|BURN))|((?=.*(\\b|\\B)(SET))(?=.*(\\b|\\B)(FIRE))))(?!.*(\\b|\\B)(FIREWORK)))';
+    SHARED COMMON_BREAK_ENTER_LIST := '(((?=.*(\\b|\\B)(BREAK))(?=.*(\\b|\\B)(ENT|IN)))|((?=.*(\\b|\\B)(HOME))(?=.*(\\b|\\B)(INV)))|(?=.*(\\b|\\B)(B\\&E|B\\s\\&\\sE)))';
+    SHARED COMMON_BURGLARY_LIST := '((?=.*(\\b|\\B)(BUR(G|L(A|G))|BRG|BUGL))(?!.*(\\b|\\B)(PITTSBURGH|PETERSBURG)))';
+    SHARED COMMON_CAR_JACK_LIST := '(((?=.*(\\b|\\B)(JACK))(?=.*(\\b|\\B)(CAR|VEH)))|(?=.*(\\b|\\B)(CARJACK)))';
         
-    EXPORT EXPRESSION_CHOP_SHOP := STARTS_WITH + '((?=.*(\\b|\\B)(CHOP))(?!.*(\\b|\\B)(PSYCHOPATH)))' + ENDS_WITH;
-    EXPORT EXPRESSION_GANG := STARTS_WITH + COMMON_GANG + ENDS_WITH;
-    EXPORT EXPRESSION_EXTORTION_BLACKMAIL_RANSOM := STARTS_WITH + '(((?=.*(\\b|\\B)(EXTOR|BLACKM|RANSOM|HOSTAG|KFR))|((?=.*(\\b|\\B)(BLACK))(?=.*(\\b|\\B)(MAIL))))(?!.*(\\b|\\B)(NO|WITHOUT|TRANSOM|TRANSPORT)))' + ENDS_WITH;
-    EXPORT EXPRESSION_TREASON_ESPIONAGE := STARTS_WITH + '(?=.*(\\b|\\B)(TREASO|ESPIO))' + ENDS_WITH;
-    EXPORT EXPRESSION_INSIDER_TRADING_MANIPULATION := STARTS_WITH + '(((?=.*(\\b|\\B)(TRADE|MARK|DEC))(?=.*(\\b|\\B)(PRAC)))|((?=.*(\\b|\\B)(FALS))(?=.*(\\b|\\B)(ADVER))))' + ENDS_WITH;
-    EXPORT EXPRESSION_INTERCEPTION_OF_COMMUNICATION_WIRETAPPING := STARTS_WITH + '((?=.*(\\b|\\B)(INTERCEPT|WIRE|EAVESDROP|((?=.*(\\b|\\B)(RECO))(?=.*(\\b|\\B)(DEV)))))((?!.*(\\b|\\B)(C(ABLE|ELL|OP(PER)?)|DAMAG|ELECTRICAL|PIPES))(?!.*(' + COMMON_FRAUD + '|' + COMMON_THEFT + '))))' + ENDS_WITH;
-    EXPORT EXPRESSION_TRANSPORTATION_VIOLATIONS := STARTS_WITH + COMMON_TRANSPORT_PROCEEDS + ENDS_WITH;
-    EXPORT EXPRESSION_IMPORT_EXPORT := STARTS_WITH + COMMON_IMPORT_EXPORT + ENDS_WITH;
-    EXPORT EXPRESSION_CRIMINAL_PROCEEDS := STARTS_WITH + COMMON_CRIMINAL_PROCEEDS + ENDS_WITH;
-    EXPORT EXPRESSION_TERRORISM := STARTS_WITH + COMMON_TERRORISM + ENDS_WITH;
-    EXPORT EXPRESSION_RACKETEERING_OR_LOAN_SHARKING := STARTS_WITH + COMMON_RACKETEERING + ENDS_WITH;
-    EXPORT EXPRESSION_ORGANIZED_CRIME := STARTS_WITH + '(' + COMMON_ORGANIZED_CRIME + '(?!.*(\\b|\\B)(RETAIL)))' + ENDS_WITH;
-    EXPORT EXPRESSION_STRUCTURING := STARTS_WITH + COMMON_STRUCTURING + ENDS_WITH;
-    EXPORT EXPRESSION_MONEY_TRANSMITTER := STARTS_WITH + COMMON_MONEY_TRANSMITTER + ENDS_WITH;
-    EXPORT EXPRESSION_MONEY_LAUNDERING_TAX_EVASION := STARTS_WITH + COMMON_MONEY_LAUNDER_TAX_EVASION + ENDS_WITH;
-    EXPORT EXPRESSION_MONEY_OR_CREDIT_CARD_LAUNDERING := STARTS_WITH + '((?=.*(\\b|\\B)(L(AU(N)?D(ER)?|UADER)))(?!.*(\\b|\\B)(DILAUDID)))' + ENDS_WITH;
-    EXPORT EXPRESSION_CORRUPTION_OR_BRIBERY := STARTS_WITH + '((?=.*(\\b|\\B)(CORRUPT|BRIB|ABC))((?!.*(\\b|\\B)(DISTRIBUTE))(?!.*' + COMMON_CHILD + ')))' + ENDS_WITH;
+    SHARED COMMON_TRAFFIC_VEHICLES_LIST := '(((?=.*(\\b|\\B)(VEH))(?=.*(\\b|\\B)(FEE|COMM)))|((?=.*(\\b|\\B)(JET))(?=.*(\\b|\\B)(SKI)))|((?=.*(\\b|\\B)(WIND))(?=.*(\\b|\\B)(TINT|SIDE)))|((?=.*(\\b|\\B)(WATER))(?=.*(\\b|\\B)(VESS|SKI)))|(?=.*(\\b|\\B)(MOPED|VEHICLE|MOTOR|MOTCY|BIKE|BICYC|BOAT|JETSKI|PONTOON|WATERCRAFT|VESSEL|SURFBOARD|PWC|M\\/CYCLE|MOTORC|PEDES|HELMET|ODOMETER|SPEEDOMETER|AXLE|AXEL|WINDSHIELD|SUNSCREEN|SUNROOF|SNOWMOBILE|SNOWMACHIN|SNWMBL|SNWB|SNW\\/MBL|ATV|DRIVERSIDE|MUFFLER|EXHAUST|FENDER|MUDGUARD|TIRES|WINDOW))|((?=.*(\\b|\\B)(SNW))(?=.*(\\b|\\B)(OPR|TRAC|STOP)))|((?=.*(\\b|\\B)(HEAD|BR(K|AKE)|TAIL))(?=.*(\\b|\\B)(LAMP|LIGHT|LITE|LGT)))|((?=.*(\\b|\\B)(DEFECT))(?=.*(\\b|\\B)(EQUIP)))|((?=.*(\\b|\\B)(HAND))(?=.*(\\b|\\B)(BAR)))|((?=.*(\\b|\\B)(PHONE))(?=.*(\\b|\\B)(CELL|MOB|EAR))))';
+    SHARED COMMON_TRAFFIC_TERM_SIGN_LIST := '(((?=.*(\\b|\\B)(SIGN))(?=.*(\\b|\\B)(STOP|HWY|HIGH)))|((?=.*(\\b|\\B)(RED))(?=.*(\\b|\\B)(LIGHT)))|((?=.*(\\b|\\B)(TRAF))(?=.*(\\b|\\B)(DEVIC|LIGHT|LANE|CONTR|BARRIER)))|((?=.*(\\b|\\B)(DIS))(?=.*(\\b|\\B)(TC))(?=.*(\\b|\\B)(DEV)))|((?=.*(\\b|\\B)(TRAFFIC))(?=.*(\\b|\\B)(LANE)))|((?=.*(\\b|\\B)(HIGHWAY))(?=.*(\\b|\\B)(OBSTRUCT|VEH|FIXTURE|DIV|STOP|MARK)))|(?=.*(\\b|\\B)(STNS|SIGNAL|ONE\\-WAY|SNWRMVL|SIDEWALK|FREEWAY|DRIVEWAY|BLOCKING|TRAVELING|METER|CROSSWALK|RADAR))|((?=.*(\\b|\\B)(RAIL))(?=.*(\\b|\\B)(ROAD)))|((?=.*(\\b|\\B)(BLOCK))(?=.*(\\b|\\B)(ROAD|PLATES|DRIVE|TRAFFIC))))';
+    SHARED COMMON_TRAFFIC_ACCIDENT_VIOLATIONS_LIST := '((((?=.*(\\b|\\B)(SCEN|CRASH|ACCIDENT))(?=.*(\\b|\\B)(LEAVE|LV)))|((?=.*(\\b|\\B)(HIT))(?=.*(\\b|\\B)(RUN)))|((?=.*(\\b|\\B)(RECK))(?=.*(\\b|\\B)(DRIV(E|I)|OPER)))|((?=.*(\\b|\\B)(ACCIDENT))(?=.*(\\b|\\B)(INFO)))|((?=.*(\\b|\\B)(FOLLO))(?=.*(\\b|\\B)(CLOS)))|((?=.*(\\b|\\B)(IMPRO))(?=.*(\\b|\\B)(BACK)))|((?=.*(\\b|\\B)(VIOL))(?=.*(\\b|\\B)(WEIG|PARK|METER|PLATE|((?=.*(\\b|\\B)(BAS))(?=.*(\\b|\\B)(RUL)))|((?=.*(\\b|\\B)(INST))(?=.*(\\b|\\B)(PERM))))))|((?=.*(\\b|\\B)(CLEAR))(?=.*(\\b|\\B)(DIST)))|((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(STOP|YIEL|YLD|YROW|TOLL)))|((?=.*(\\b|\\B)(SPEED))(?=.*(\\b|\\B)(RAC|EXCES|RECK|CONTEST|EXCEED|TOW|MPH|LIMIT|TRAFFIC|DRIV|EXHIB|MISD|MSD|POST|ENDANG|IDLE|REASONABLE|IMP|MAX|VEHIC|VIOLAT|RATE|(\\d(\\s)?(\\/|\\-|\\\\)(\\s)?\\d)|((?=.*(\\b|\\B)(MILES))(?=.*(\\b|\\B)(OVER))))))|((?=.*(\\b|\\B)(SEAT))(?=.*(\\b|\\B)(BELT|BLT|REST|CHILD)))|((?=.*(\\b|\\B)(SAFE|SFTY))(?=.*(\\b|\\B)(BELT|BLT|RESTR)))|((?=.*(\\b|\\B)(PASS))(?=.*(\\b|\\B)(OBS|REST|BELT|BLT)))|(?=.*(\\b|\\B)(ACDA|BACKING|PARKING|NONMOVING|DRVNG|OMV|SPDG|RACING|SPEEDING|MVI|YIELD))|((?=.*(\\b|\\B)(DRIV|TRAFFIC|DROV|OPER))(?=.*(\\b|\\B)(ROAD|MOVING|UNSAFE|CAR(ELESS)?|TIRE|RESTRIC|VIOL|RIGHT|LEFT|CENTER|CANCEL|REV|BARRICADE|FAST|OUTSIDE|VALID|EXCESS|IMPE|INAT|PERM|HRS|UNAUTH|RULE|TRAIL|IMPROP|CONSUMP|INFO|WITHDR|MEDIAN|COND|MIRROR|RECK|TEXT|TYPE|AGGRES|EXHIB|RECORD|GAS|NEGLIG|LIGHT|SUSP|VEHIC|((?=.*(\\b|\\B)(DL))(?=.*(\\b|\\B)(WRONG|CLASS)))|((?=.*(\\b|\\B)(TOO))(?=.*(\\b|\\B)(FAST))))))|((?=.*(\\b|\\B)(LANE))(?=.*(\\b|\\B)(CONTR|MAINT|IMPRO|CHANG|VIOLAT|TRF|TRAF|USAGE|USE|UNSAFE|WRONG|MARK|PASS|TURN|SWITCH|SINGLE|SNGL|NEGL|PRECAUTION|FIRE|RESTRIC|LEFT|RIGHT|CENTER|BLOCK)))|((?=.*(\\b|\\B)(OPER))(?=.*(\\b|\\B)(AGAINST))(?=.*(\\b|\\B)(TRAF)))|((?=.*(\\b|\\B)(RUN|RAN))((?=.*(\\b|\\B)(RD))(?=.*(\\b|\\B)(LT))))|((?=.*(\\b|\\B)(NON|SLOW))(?=.*(\\b|\\B)(MOVING)))|((?=.*(\\b|\\B)(PASS))(?=.*(\\b|\\B)(IMPRO)))|((?=.*(\\b|\\B)(CH(I)?LD))(?=.*(\\b|\\B)(REST|SEAT)))|((?=.*(\\b|\\B)(WRONG))(?=.*(\\b|\\B)(WAY|SIDE)))|((?=.*(\\b|\\B)(HAB))(?=.*(\\b|\\B)(TRAFF))(?=.*(\\b|\\B)(OFFEN)))|((?=.*(\\b|\\B)(WAKE))(?=.*(\\b|\\B)(ZONE|AREA)))|((?=.*(\\b|\\B)(FARE))(?=.*(\\b|\\B)(EVASION)))|((?=.*(\\b|\\B)(HOV))(?=.*(\\b|\\B)(VIO))))(?!.*(\\b|\\B)(COMVICTION)))';
+    SHARED COMMON_TRAFFIC_LICENSE_REGISTRATION_LIST := '(((?=.*(\\b|\\B)(PLATES))(?=.*(\\b|\\B)(ALTER|IMPOUND|RVKD|REVOKE|EXP|ILL|IMPROP|DISPLAY|VALID|LICENSE|((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(DISP))))))|(((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(CARRY|PROVIDE)))(?=.*(\\b|\\B)(INSUR|DRIVER|PROOF|LIAB|REGIST|VEHICLE)))|(?=.*(\\b|\\B)(DW(L|S)|UNINSUR|CDL))|((?=.*(\\b|\\B)(REG))(?=.*(\\b|\\B)(TAG|LIC|PLAT|FAIL)))|((?=.*(\\b|\\B)(EXP))(?=.*(\\b|\\B)(REG|METER)))|((?=.*(\\b|\\B)(TEMP))(?=.*(\\b|\\B)(REG|TAG)))|((?=.*(\\b|\\B)(SUS))(?=.*(\\b|\\B)(DRIV|MV|LIC)))|((?=.*(\\b|\\B)(LIC))(?=.*(\\b|\\B)(DRIV|VALID|PLAT|COMMER|OPERAT|REVOK)))|((?=.*(\\b|\\B)(INSURANCE))(?=.*(\\b|\\B)(FAIL|PROOF|VEHICLE)))|((?=.*(\\b|\\B)(INS))(?=.*(\\b|\\B)(VEH|PROOF|DRIV|MSD|M\\/V|LIAB|FAULT|VALID)))|((?=.*(\\b|\\B)(OPER))(?=.*(\\b|\\B)(UNINS|UNREG)))|((?=.*(\\b|\\B)(D(\\/)?L))(?=.*(\\b|\\B)(VALID|((?=.*(\\b|\\B)(DRIV))(?=.*(\\b|\\B)(W\\/O))))))|((?=.*(\\b|\\B)(MVI))(?=.*(\\b|\\B)(VALID|OPER)))|((?=.*(\\b|\\B)(DOT))(?=.*(\\b|\\B)(HEALTH|CARD)))|((?=.*(\\b|\\B)(VEH|PERIODIC))(?=.*(\\b|\\B)(INSP)))|((?=.*(\\b|\\B)(TRAFFIC))(?=.*(\\b|\\B)(LAW|OBEY|IMPEDE)))|((?=.*(\\b|\\B)(INS))(?=.*(\\b|\\B)(NO))(?=.*(\\b|\\B)(MSD|OWN|OPER))))';
+    SHARED COMMON_TRAFFIC_GROUP_LIST := '((' + COMMON_TRAFFIC_VEHICLES_LIST + '|' + COMMON_TRAFFIC_TERM_SIGN_LIST + '|' + COMMON_TRAFFIC_ACCIDENT_VIOLATIONS_LIST + '|' + COMMON_TRAFFIC_LICENSE_REGISTRATION_LIST + ')(?!.*(\\b|\\B)(PEEP|' + COMMON_DUI_LIST + '|' + COMMON_LIVESTOCK_ANIMAL_LIST + ')))';
+    
+    SHARED COMMON_FALSE_ADVERTISING_LIST := '(((?=.*(\\b|\\B)(ADVER))(?=.*(\\b|\\B)(FALS|BAIT|FRAUD|MISLEAD)))|((?=.*(\\b|\\B)(BAIT))(?=.*(\\b|\\B)(SWITCH))))';
+    SHARED COMMON_KIDNAPPING_LIST := '(((?=.*(\\b|\\B)(CHILD))(?=.*(\\b|\\B)(STEAL)))|((?=.*(\\b|\\B)(FALS))(?=.*(\\b|\\B)(I(N)?MPRIS)))|((?=.*(\\b|\\B)(HELD))(?=.*(\\b|\\B)(WILL)))|((?=.*(\\b|\\B)(SECRET))(?=.*(\\b|\\B)(CONFIN)))|((?=.*(\\b|\\B)(FELON))(?=.*(\\b|\\B)(RESTRAIN)))|(?=.*(\\b|\\B)(KIDN(A|AP|PNG)?|KIN(D)?AP|KIPN|KID(D|A)?|KDN(A)?P|KNDN|FALS\\.IMPR|ABDU)))';
+    SHARED COMMON_SANCTIONS_GENERAL_LIST := '(?=.*(\\b|\\B)(SANCTION))';
+    SHARED COMMON_CRIMINAL_SYNDICALISM_LIST := '(((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(AGAINST))(?=.*(\\b|\\B)(GOV)))|((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(SYNDICAL)))|((?=.*(\\b|\\B)(ADVO))(?=.*(\\b|\\B)(SYNDICA|SABOTAGE|VIOL|OVERTH)))|((?=.*(\\b|\\B)(OVERTH))(?=.*(\\b|\\B)(GOV|GVT|ORG)))|(?=.*(\\b|\\B)(SYNDICALISM|SEDITION)))';
+    
+    SHARED COMMON_SUPPORT_LIST := '(?=.*(\\b|\\B)(SP(PT|RT|T)|SUP(OORT|ORT|PORT|POT|PPORT|PRT|PT|RT|T)?))';
+    SHARED COMMON_CHILD_SUPPORT_LIST := '((((?=.*(\\b|\\B)(CHILD|NON(\\-)?))' + COMMON_SUPPORT_LIST + ')|(?=.*(\\b|\\B)(NONSP(ORT|PRT)?|NS(PT|UP)|NUNSUPPORT)))(?!.*(\\b|\\B)((O|I|C|A)NSPT)))';
+    SHARED COMMON_CHILD_CUSTODY_LIST := '(((?=.*(\\b|\\B)(CUSTODY))(?=.*(\\b|\\B)(CHILD|MINOR|VIOL|VISIT)))|(?=.*(\\b|\\B)(CUSTODIAL)))';
+    
+    SHARED COMMON_CHILD_LIST := '(((?=.*(\\b|\\B)(FEMAL|MALE))(?=.*(\\b|\\B)(UND|\\<)))|(?=.*(\\b|\\B)(CH(ILD|D|LD)|MINO|MNR|JUV|GIRL|BOY|YOUTH)))';
+    SHARED COMMON_PORN_LIST := '(((?=.*(\\b|\\B)(POSS))(?=.*(\\b|\\B)(OBSC)))|((?=.*(\\b|\\B)(PHOTO))(?=.*(\\b|\\B)(INDEC|LEWD|OBSC)))|((?=.*(\\b|\\B)(OBSC))(?=.*(\\b|\\B)(MATER)))|(?=.*(\\b|\\B)(PORN)))';
+    SHARED COMMON_SEX_LIST := '((((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(AG))(?=.*(\\b|\\B)(NATU)))|((?=.*(\\b|\\B)(EXPOS))(?=.*(\\b|\\B)(GENI)))|((?=.*(\\b|\\B)(LASC))(?=.*(\\b|\\B)(ACT)))|((?=.*(\\b|\\B)(IND))(?=.*(\\b|\\B)(LIB|PROP|EXPO)))|((?=.*(\\b|\\B)(VIOL))(?=.*(\\b|\\B)(DAT(E|ING))))|((?=.*(\\b|\\B)(PRED))(?=.*(\\b|\\B)(OFFEND)))|(' + COMMON_CHILD_LIST + '(?=.*(\\b|\\B)(MIST|MOL|MOE|MOSL)))|(' + COMMON_CHILD_LIST + '(?=.*(\\b|\\B)(ENTI))(?=.*(\\b|\\B)(INDE)))|(?=.*(\\b|\\B)(S(E)?X|INTERCOURSE|SOD(O)?MY|LEWD|INDEC(ENT)?|INCEST|ENTIC(I|EMENT)|MASTERBA|LASCIVI|LUR(E|ING)|FONDL|PEEP|FORNICA|LUSTFU|IMPREG(N)?|MOLEST|MLST|CSC|C\\.S\\.C\\.|SEDUCTION|VOYEUR|NUD(E|ITY))))(?!.*(\\b|\\B)(WINDSHIELD|SIGNATURE|SPEEDING|VACSC)))';
+    SHARED COMMON_THEFT_LIST := '((((?=.*(\\b|\\B)(KEEP|STOL|RETURN|RTN))(?=.*(\\b|\\B)(PROP|RENT)))|((?=.*(\\b|\\B)(FALS|FAK))(?=.*(\\b|\\B)(OWNER)))|((?=.*(\\b|\\B)(FAL))(?=.*(\\b|\\B)(DEC))(?=.*(\\b|\\B)(OWN)))|((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(RETURN|RTN)))|((?=.*(\\b|\\B)(OBT))(?=.*(\\b|\\B)(FALS))(?=.*(\\b|\\B)(PRETEN)))|(?=.*(\\b|\\B)(TH(E)?FT|THE(F|T)|STEAL|STL(G)?|STOLE|THT)))(?!.*(\\b|\\B)(' + COMMON_SEX_LIST + '|' + COMMON_DUI_LIST + ')))';
+    SHARED COMMON_LARCENY_LIST := '(((?=.*(\\b|\\B)(LARC))|((?=.*(\\b|\\B)(LARA|LARY))(?=.*(\\b|\\B)(AUTO|MER))))(?!.*(\\b|\\B)(GR|DECLARATION)))';
+    SHARED COMMON_GRAND_LARCENY_LIST := '(((?=.*(\\b|\\B)(GR))(?=.*(\\b|\\B)(LARC)))|((?=.*(\\b|\\B)(GRAN))(?=.*(\\b|\\B)(LAR))))';
+    
+    SHARED COMMON_DISORDERLY_CONDUCT_LIST := '((((?=.*(\\b|\\B)(DISOR))(?=.*(\\b|\\B)(CON)))|((?=.*(\\b|\\B)(PEAC))(?=.*(\\b|\\B)(DIST|BREACH)))|((?=.*(\\b|\\B)(RESID))(?=.*(\\b|\\B)(VIOL)))|((?=.*(\\b|\\B)(FAL))(?=.*(\\b|\\B)(911)))|((?=.*(\\b|\\B)(PROFAN))(?=.*(\\b|\\B)(LANG)))|(?=.*(\\b|\\B)(DISORDERLY|URINAT|DEFICATE|LOITER|FIGHTING|PROFANITY|LANGUAGE|SWEAR|CURSE|SHOUT|OBSCEN(E|ITY))))(?!.*(\\b|\\B)(' + COMMON_ALCOHOL_LIST + ')))';
+    
+    SHARED COMMON_FRAUD_LIST := '(?=.*(\\b|\\B)((DE)?FRAUD|DEFRD|CHEAT|SWINDLE|SKIM))';
+    SHARED COMMON_FRAUD_CHECK_LIST := '(((?=.*(\\b|\\B)(CHECK|CHK|CHE(C|K)))|((?=.*(\\b|\\B)(CK))(?=.*(\\b|\\B)(' + COMMON_FRAUD_LIST + '|WORTH|BAD|UTT|UTE(E)?R|BOGUS|NSF))))(?!.*(\\b|\\B)(TICKET)))';
+    SHARED COMMON_CREDIT_CARD_LIST := '((?=.*(\\b|\\B)(CARD))(?=.*(\\b|\\B)(FIN|CR(ED)?|UNLAW|B(A)?NK|DEBIT)))';
+
+    SHARED COMMON_IDENTITY_FRAUD_LIST := '((((?=.*(\\b|\\B)(FALSE|FICT|FAKE|SALE))((?=.*(\\b|\\B)(IDEN|ID|I\\.D\\.|DL|D\\.L\\.|DR|O\\/L|O\\.L\\.|SSN|SS|S\\/S|CARD|DOCU|PASSP))|((?=.*(\\b|\\B)(BIR))(?=.*(\\b|\\B)(CE|REC)))|((?=.*(\\b|\\B)(SOC))(?=.*(\\b|\\B)(SEC)))))|(((?=.*(\\b|\\B)(IDENTITY|IDEN))|(?=.*(\\b)(ID)))(?=.*(\\b|\\B)(THEFT|THFT|THEF|FRAUD|ST(EA)?L|TAK|CRIM|OBTAIN|CONC))))(?!.*(\\b|\\B)(MEDICAID|RIDSTLVEH|AVOID|DILANDID|((?=.*(\\b|\\B)(PUB))(?=.*(\\b|\\B)(AID))))))';
+    SHARED COMMON_FALSE_STATEMENT_LIST := '((((?=.*(\\b|\\B)(FALS(E|LE)))(?=.*(\\b|\\B)(IDENTIF|PERSONAT|INFO|INO|STATE|REPORT|HOLD|ACT|PRESENT|SWEAR|DECLAR)))|(?=.*(\\b|\\B)(FICTICOUS|IMPERSON))|((?=.*(\\b|\\B)(ID))(?=.*(\\b|\\B)(MISREP))))(?!.*(\\b|\\B)(' + COMMON_IDENTITY_FRAUD_LIST + '|OWNER)))';
+    SHARED COMMON_FORGE_LIST := '((((?=.*(\\b|\\B)(UT))(?=.*(\\b|\\B)(FRG|INSTRU)))|(?=.*(\\b|\\B)(FORGR|FORG(E)?|FRGD|TRADEM|UT(T)?ER|UTEER|ALTER)))(?!.*(\\b|\\B)(COMPUTER)))';
+    SHARED COMMON_COUNTERFEIT_LIST := '(((?=.*(\\b|\\B)(ILL|MAKE|SUB|IMA|ALT(ER)?|COUN|CNT|FAKE))(?=.*(\\b|\\B)(MONEY|CURRENCY)))|(?=.*(\\b|\\B)(COUNTER|CNTERFEIT|CNTRFT)))';
     
     
+   
+    SHARED COMMON_ASSAULT_LIST := '((((?=.*(\\b|\\B)(MAL))(?=.*(\\b|\\B)(WOUND|INJ|SHOOT|STAB)))|((?=.*(\\b|\\B)(CRIM))(?=.*(\\b)(ASS)))|((?=.*(\\b|\\B)(BOD))(?=.*(\\b|\\B)(HARM)))|(?=.*(\\b|\\B)(ASSA(ULT)?|ASLT|ASU(A)?LT|ASAULT|ASSLT|ALST|ASSU(A)?LT|BATT|B(A)?TRY|STRANG(U|l)|LYNCH|FIGHT|BEAT|RESTRAINT|VIOLENT|MAIM|TORTURE))|(?=.*(\\b)(ASS)))(?!.*(\\b|\\B)(TRESPASS|CLASS|ASSESSMENT|PASSENGER|ASSEMBLY|' + COMMON_SEX_LIST + ')))';
+    
+    
+    SHARED COMMON_BANK_ROBBERY_LIST := '(((?=.*(\\b|\\B)(ROB))(?=.*(\\b|\\B)(BANK)))|((?=.*(\\b|\\B)(BAN))(?=.*(\\b|\\B)(ROBB|RBRY|' + COMMON_BURGLARY_LIST + ')))|((?=.*(\\b|\\B)(SAFE))(?=.*(\\b|\\B)(CRACK)))|(?=.*(\\b|\\B)(SAFECRACK)))';
+    SHARED COMMON_ROBBERY_LIST := '(((?=.*(\\b|\\B)(ATT|CONSP))(?=.*(\\b|\\B)(ROB)))|(?=.*(\\b|\\B)(ROBB|ROBER|RBRY)))';
+    
+  
+    SHARED COMMON_MONEY_TRANSMITTER_LIST := '(((?=.*(\\b|\\B)(TRANS))(?=.*(\\b|\\B)(EMB|MON|BUS)))|((?=.*(\\b|\\B)(TRAN))(?=.*(\\b|\\B)(LICEN)))|(?=.*(\\b|\\B)(TRANSMITTER|\\$TRANS)))';
+    SHARED COMMON_STRUCTURING_LIST := '((((?=.*(\\b|\\B)(STRUCT))(?=.*(\\b|\\B)(TRAN|FIN)))|(?=.*(\\b|\\B)(STRUCTUR(EF|ING)|STRUCTURESFINANCIALTRANSACTTOEVADEREPORT)))(?!.*(\\b|\\B)(DESTRUCT|BUILD|(OB|CON)STRUCT)))';
+    
+    SHARED COMMON_MISSAPPROP_EMBEZZLE_LIST := '((?=.*(\\b|\\B)(EMB(E)?Z))|((?=.*(\\b|\\B)(MISAP(L|LY|P)?|MISMAN))(?=.*(\\b|\\B)(FID(U|C)?|(\\/)?FIDUC|FUD(U|I)C|PROP|FUNDS|TRUST|PUBLIC|ASSIST|MON(EY|IES)|SECURITY)))|((?=.*(\\b|\\B)(DIVER))(?=.*(\\b|\\B)(FUND|GAMIN|CHARIT|BENE|STATE))))';
+    SHARED COMMON_TRANSPORT_PROCEEDS_LIST := '((((?=.*(\\b|\\B)(TRANSPORT))(?=.*(\\b|\\B)(VIOLATION)))|((?=.*(\\b|\\B)(TRANS))(?=.*(\\b|\\B)(PROCEED|STOLEN|UNLAW)))|((?=.*(\\b|\\B)(CURR))(?=.*(\\b|\\B)(EXCHA))))(?!.*(\\b|\\B)(PROBATION|' + COMMON_CHILD_LIST + ')))';
+    SHARED COMMON_OBTAIN_PROPERTY_LIST := '(((?=.*(\\b|\\B)(PRET))(?=.*(\\b|\\B)(FAL|FLS)))|((?=.*(\\b|\\B)(OBT))(?=.*(\\b|\\B)(MONEY|PROP|MERCH|CASH))))';
+    
+
+    SHARED SCHEDULE_DRUG_LIST := '(((?=.*(\\b|\\B)(SCH[EDUAL\\s]*((I|II|III|IV|V|1|2|3|4|5)\\b(?!.*(6|7|8|9|0|X))))))(?!.*(\\b|\\B)(M(I)?SCH)))';
+    SHARED WEIGHTS_LIST := '(?=.*(\\b|\\B)(\\d(\\s)?(G|LB|OZ)(\\b)))';
+    SHARED DRUGS_RAW_LIST := '((?=.*(\\b|\\B)(ACET(IC|ON(E)?|YL)|ACID|ALPHAZO|ALPRA(X)?|AMINE|AMMONIA|AMPH|ANALOG|ANHY|ATIVAN|AZINE|' +
+                              'BARBIT(U)?|BATHSALT|BENZ|BIPHET|BOLDEN|BUPREN|BUTANE|BUTY(L|R)|' +
+                              'CAINE|CANNA|CARFE|CARISOPR|CH(E)?M|CHLOR|CLONAZ|COCA|CODEIN|COKE|CONCERTA|CRA(N|C)K|CRYSTAL|CYCLIDI|' +
+                              'DARVO|DEMEROL|DESOX|DESTROMETH|DEX(ED|TRO)|DFZ|DGS|DIACET|DIAZEPA|DICANDED|DIETHYL|DIHY|DILAU|DIMETHYL|DIOX(Y)?|DIPHENO|DIVINOR|DOPE|DR(GS|UG)|DURGS|DXM|' +
+                              'ECSTASY|EPHED|EQUIPOI|ETHC|ENETH|' +
+                              'FENT|FLUNIT|' +
+                              'GAMMA|GHB|GRAMS|' +
+                              'HALLUC|HARIHUANA|HASH|HERION|HEROI|HOX|HYDRO(CH)?|HYDROMORPH|' +
+                              'IAZ|' + 
+                              'KETA|KLONOP|' +
+                              'L\\.S\\.D|LAUDAN|LORCET|LSD|LYS(ER)?G|' +
+                              'MA(H)?IJ|MAIRHUANA|MARI(JU)?|MAR(RI)?J|MARU|MDMA|MESCAL|METH(YL)?|MOLLY|MORPH(INE)?|MRHNA|MUSHRO|MXE|' +
+                              'NAL(LI|OR|OX)|NANDROLO|NARC|NEMBUT|NITROUS|NORCO|NORTEST|' +
+                              'OPI(ATE|OD|UM)|OX(AND|IDE|Y)|' +
+                              'PAREGORIC|PCP|PCRSR|PENTAZ|PENTEDR|PENTO(Z)?|PERC(A|O)CET|PERCOD|PETHID|PEYOTE|PHARM|PHEN(CYC|E(TH)?|LACET|O|TANYL|TER|YL)?|PHETAM|PHOSPH|PIPERA|PIPERONAL|POPPY|POXYP|PRECUR|PRESC|PROPANONE|PROPOX|PRSRSR|PSILO|PSUEDO|PSYCHOTOXIC|PSYLO|' +
+                              'QUA(AL|LU)|QUALONE|' + 
+                              'REAGENT|RESTORIL|RITALIN|ROCHE|ROCK|ROHY|ROOFI(E|NOL)|ROPHIE|ROPYL|ROXIC(ET|OD)|RX|' +
+                              'SALT|SALVIA|SCHEDULE|SECOBAR|SINSEM|SOMA|STEROID|STIMULANT|SUBOX|SYNTHETIC|' +
+                              'TEMPAZ|TESTOS|TETRAHYDRO|THORAZINE|TOLU(E|O)|TRAMADOL|TRIAZ|TRIFLU|TYLENOL|' +
+                              'VALIUM|VALPROI|VICODIN|' +
+                              'XANAX|' +
+                              'Z(EP|OL)AM))|' +
+                              '((?=.*(\\b|\\B)(GHA))(?!.*(\\b|\\B)(GHA(B|R|T))))|((?=.*(\\b|\\B)(THC))(?!.*(\\b|\\B)(THCA(RE|P)))))';
+                              
+    SHARED SCHED_WEIGHT_RAW_DRUG_LIST := '(' + SCHEDULE_DRUG_LIST + '|' + WEIGHTS_LIST + '|' + DRUGS_RAW_LIST + ')';
+
+    
+    SHARED COMMON_POSSESSION_LIST := '(((?=.*(\\b|\\B)(CONST))(?=.*(\\b|\\B)(POS)))|(?=.*(\\b|\\B)(POS(N)?|PCS)))';
+    SHARED COMMON_MANUF_LIST := '((?=.*(\\b|\\B)(MAN((U)?F|F(CTR)?)?|MAUF|MFG|MNF|MDP))(?!.*(\\b|\\B)(MANATEE)))';
+    SHARED COMMON_TRAFFICKING_TERMS_LIST := '(?=.*(\\b|\\B)(TRAF(\\.|\\/)|TRAFF(\\.|CK(G|ING|NG)|ICK(ING)?|IK(ING|GN)?|ING|KG|KICKING|KNG|RKG)?|TRAFICK(\\.|ING)?|TRAFIK(IN)?G|TRFFCKING|TRFFICKING|TRFFK(N)?G|TRFK((IN)?G)?|TRFF|SMUG|TRAFCK(G\\.|ING)))';
+    SHARED COMMON_CONTROLED_SUBSTANCE_LIST := '((((?=.*(\\b|\\B)(CON\\\'T|CN|CTL|CNT(L|R|R(O)?L|ROLLED)?))(?=.*(\\b|\\B)(SUB)))|((?=.*(\\b|\\B)(CONTROLLED))(?=.*(\\b|\\B)(SUBSTANCE)))|((?=.*(\\b|\\B)(CONTR))(?=.*(\\b|\\B)(S(U|T)B)))|((?=.*(\\b|\\B)(CONT|CTR))(?=.*(\\b|\\B)(SU)))|((?=.*(\\b|\\B)(CON))(?=.*(\\b|\\B)(SB)))|((?=.*(\\b|\\B)(CNTRLD))(?=.*(\\b|\\B)(SBSTNC)))|(?=.*(\\b|\\B)(C\\/S|CONT\\/SUB|C\\/SUBSTANCE|C\\-SUB|CONSUB|C\\.S\\.|CONT\\.SUB)))(?!.*(\\b|\\B)(DWLC\\/S)))';
+    SHARED COMMON_DRUGS_LIST := '((' + SCHED_WEIGHT_RAW_DRUG_LIST + '|' + COMMON_CONTROLED_SUBSTANCE_LIST + ')(?!.*(\\b|\\B)(SCHEME|CRACKING)))'; 
+    SHARED COMMON_DRUG_PARAPHERNALIA_LIST := '((((?=.*(\\b|\\B)(DR))(?=.*(\\b|\\B)(PAR)))|(?=.*(\\b|\\B)(PAR(A(PH)?|P)|DGPARA|PHARAPH|SYRING|NEEDLE|PIPE|HYPODERMIC))|((?=.*(\\b|\\B)(HYPO))(?=.*(\\b|\\B)(SYR))))(?!.*(\\b|\\B)(PARAGRAPH)))';
+    SHARED COMMON_SLIM_DRUG_LIST := '((((?=.*(\\b|\\B)(SC(\\/|\\.)?))(?=.*(\\b|\\B)(I|II|II|IV|V|1|2|3|4|5)))|((?=.*(\\b|\\B)(C))(?=.*(\\b|\\B)(SUB)))|(?=.*(\\b|\\B)(MJ|THC|C(S|D(S)?)|COC|MUSHR|SUB|SYNTH|TEST|MAR|SPEED|ICE|GLASS|CAN|SIM|IMITATION)))(?!.*(\\b|\\B)(SCISSORS)))';
+    SHARED COMMON_PRECURSOR_LIST := '((((?=.*(\\b|\\B)(PRECUR))(?=.*(\\b|\\B)(MAT|CHEM|REAG|SOLV|SUB)))|(?=.*(\\b|\\B)(PRECURSOR|REAGENT)))(?!.*(\\b|\\B)(INSOLVENT)))';
+    SHARED COMMON_PLANT_GROW_LIST := '(?=.*(\\b|\\B)(PLANT|GROW|CULTIV))';
+    SHARED COMMON_DRUGS_WITH_POSSESSION_LIST := '(' + COMMON_POSSESSION_LIST + '(' + COMMON_DRUGS_LIST + '|' + COMMON_SLIM_DRUG_LIST + '|' + COMMON_DRUG_PARAPHERNALIA_LIST + '))';
+    SHARED COMMON_DRUGS_WITOUT_POSSESSION_LIST := '((' + COMMON_DRUGS_LIST + '|' + COMMON_DRUG_PARAPHERNALIA_LIST + '|(' + COMMON_POSSESSION_LIST + COMMON_SLIM_DRUG_LIST + '))(?!.*' + COMMON_DUI_LIST + '))';
+    SHARED COMMON_LAB_LIST := '(((?=.*(\\b|\\B)(LAB))(?=.*(\\b|\\B)(OPER\\/MAIN|OPERAT|MAIN)))|((?=.*(\\b|\\B)(DRUG))(?=.*(\\b|\\B)(FACTORY))))';
+    SHARED COMMON_MANUF_DELIVER_SELL_LIST := '((?=.*(\\b|\\B)(' + COMMON_MANUF_LIST +'|ASSEMBL|ADVER|PRO(D|CS)|PREP|CONVERT|(\\-)?SELL|SALE|S\\/D|DEAL|DIST(RB|L)?|DST|DIS|DSPNS|DEL(IVERY)?|DLV|TRAN|SHP))(?!.*(\\b|\\B)(DISARMING|DISCHAR|DISPLAY|DISC|DISAB|CHILD|BRANDISH|SENT|CONVICTED)))';
+    SHARED COMMON_MANUF_ACRONYM_LIST := '(((?=.*(\\b|\\B)(MAN|MFG))(?=.*(\\b|\\B)(DEL|SELL|DST|DIST|SALE|PROD|POSS|TRAN|TRNS)))|((?=.*(\\b|\\B)(DEL))(?=.*(\\b|\\B)(TRAN|TRNS|SELL|MAN(U)?F)))|(?=.*(\\b|\\B)(MAN\\/DEL|MFG\\/DEL|(DIST\\/)?DEL\\/SELL|DEL\\/MAN|SL\\/DEL(\\/POS)?|S\\/M\\/D|POSS\\/SELL|DISTRIBUTE\\/PID|DISTRB\\/SELL|DIST\\/DEL|DIS(T)?\\/POSS|DIST\\,(\\s)?SELL|B\\/TRANS)))';
+    SHARED COMMON_EXPLOSIVES_LIST := '((((?=.*(\\b|\\B)(THRO|SHOOT))(?=.*(\\b|\\B)(MISS)))|((?=.*(\\b|\\B)(DES))(?=.*(\\b|\\B)(DEV|MASS)))|((?=.*(\\b|\\B)(WEAP))(?=.*(\\b|\\B)(MASS)))|((?=.*(\\b|\\B)(TEAR))(?=.*(\\b|\\B)(GAS)))|((?=.*(\\b|\\B)(BIO))(?=.*(\\b|\\B)(AGENT|TOXIN)))|((?=.*(\\b|\\B)(MOLOTOV))(?=.*(\\b|\\B)(COCK)))|(?=.*(\\b|\\B)(EXPLOS|NUCLEAR|BOMB|GRENADE|MISSILE|WMD|DYNAM)))(?!.*' + COMMON_ARSON_LIST + '))';
+    SHARED COMMON_WEAPONS_LIST := '((((?=.*(\\b|\\B)(UNLAW))(?=.*(\\b|\\B)(CARR)))|((?=.*(\\b|\\B)(SAW))(?=.*(\\b|\\B)(OFF)))|((?=.*(\\b|\\B)(SHO|SHRT))(?=.*(\\b|\\B)(BARR|BRL|GUN)))|((?=.*(\\b|\\B)(POSS))(?=.*(\\b|\\B)(FA)))|((?=.*(\\b|\\B)(MACHINE))(?=.*(\\b|\\B)(GUN)))|(?=.*(\\b|\\B)(AMM(O|UNI)|ARM(ED|O)|BLADE|BLUDSWITCH|CCW|C\\.C\\.W\\.|CONTRA|DISCHARG|F\\/A(RM)?|F\\-ARM|FIR(E)?ARM|FIREAMR|FREARM|FRIEARM|GUN|KNIFE|KNUCKLES|PIST(OL)?|RAZOR|RIFLE|RVOLV|SAWEDOFF|SHOTG|SHTGN|SWORD|U\\.U\\.W(\\.)?|U(\\s)?U(\\s)?W|UCW|WEA(P(ON)?)?|WEP|WPN)))(?!.*(\\b|\\B)(AMMONIA|(SUB)?CONTRACT|((?=.*(\\b|\\B)(ARM))(?=.*(\\b|\\B)(ROB)))|PARKING|UNARMED|WEAVING)))';
+    SHARED COMMON_POSSESSION_WITH_INTENT_LIST := '(?=.*(\\b|\\B)(PWI(T|D)|PSNW\\/I|(P|W)ID|W\\.I\\.T\\.D\\.))';
+    SHARED COMMON_WITH_INTENT_LIST := '(((?=.*(\\b|\\B)((W\\/)?INT(ENT|\\.)?|W\\.I\\.T\\.D|W\\/I(N)?))|((?=.*(\\b|\\B)(W\\/))(?=.*(\\b|\\B)(INTENT))))(?!.*(\\b|\\B)(WITH(IN|OUT)?|W\\/O(UT)?|W\\/INJURY|WILDLIFE|WIND)))';
+    SHARED COMMON_TRAFFICKING_HUMAN_LIST := '((((?=.*(\\b|\\B)(PROM|ADVER|PLACE))(?=.*(\\b|\\B)(PROS|POST|PORN|STAT|S(E)?X|OBSC|PHOTO|SOLIC|SOLCT|' + COMMON_CHILD_LIST + ')))|((?=.*(\\b|\\B)(' + COMMON_TRAFFICKING_TERMS_LIST + '|TRAF|TRANSP|MOVE|SALE|EXPLO|EXPLT))(?=.*(\\b|\\B)(ALIEN|ORGAN|S(E)?X|LABOR|LBR|HUMAN|PEOPLE|DOMESTIC|(FE)?MALE|' + COMMON_CHILD_LIST + ')))|(?=.*(\\b|\\B)(PAND|PIMP|PAMPER|PROM\\.PROST|PROM\\/PROS|TRAFFCHILD|SLAVE|CSEC)))(?!.*(\\b|\\B)(OFFENSE|BLOCK|CHAPTER|OBSTRUCTING|ABANDON|((?=.*(\\b|\\B)(SER))(?=.*(\\b|\\B)(REM)))|TRANSMIT|TOBAC|((?=.*(\\b|\\B)(MOVE))(?!.*(\\b|\\B)(REMOVE)))|ORGANIZED|' + COMMON_DRUGS_LIST + '|' + COMMON_DUI_LIST + '|' + COMMON_ALCOHOL_LIST + ')))';
+    SHARED COMMON_DRUG_DEA_DIVERSION_LIST := '((?=.*(\\b|\\B)(DEA\\s(\\#|NUMBER)))|((?=.*(\\b|\\B)(DEA))(?=.*(\\b|\\B)(REGIST))(?=.*(\\b|\\B)(\\#|NUM))))';
+    
+
+    SHARED COMMON_MONEY_LAUNDER_TAX_EVASION_LIST := '((((?=.*(\\b|\\B)(UNSTAMP))(?=.*(\\b|\\B)(SELL|SALE|TRANS)))|(((?=.*(\\b|\\B)((UN)?TAX|(UN)?STAM))|((?=.*(\\b|\\B)(TX))(?=.*(\\b|\\B)(STAM))))(?=.*(\\b|\\B)(CIG|TOB|ALC|LIQ|FOOD|' + COMMON_COUNTERFEIT_LIST + '|' + COMMON_FORGE_LIST + '))))(?!.*(\\b|\\B)(REDE(E)?M|MISAPPROP|USE|FALSE|' + COMMON_DRUGS_LIST + '|' + COMMON_SLIM_DRUG_LIST + ')))';
+    SHARED COMMON_AGG_ASSAULT_LIST := '((((?=.*(\\b|\\B)('+ COMMON_WITH_INTENT_LIST +'|AGG|AGRV|AG(A)?))(?=.*(\\b|\\B)(ASS(LT)?|BATT|B(A)?TRY|AS(L|T|LT)|ASU(A)?LT|ASAULT|ALST|INJ|UUW|ABUSE|TORTURE)))|(?=.*(\\b|\\B)(A(\\&|\\/)B|A\\s\\&\\sB|AA\\/(DW|PO|SBI)|AAWW|AWDW(ISI)?|AWDWWITKISI)))(?!.*(\\b|\\B)(TRESPASS|CLASS|INTRASTATE|' + COMMON_DUI_LIST + ')))';
+    SHARED COMMON_ASSAULT_DEADLY_INTENT_LIST := '((' + COMMON_ASSAULT_LIST + '(?=.*(\\b|\\B)(DEAD|DANG|' + COMMON_WEAPONS_LIST + ')))|((?=.*(\\b|\\B)(IMPED))(?=.*(\\b|\\B)(BR)))|((?=.*(\\b|\\B)(INT|ASS|ASA))(?=.*(\\b|\\B)(KILL)))|(?=.*(\\b|\\B)(AA\\/DW|AAWW|AWDWISI|SHOOTING|AWI(K|T|TK))))';
+    SHARED COMMON_ARM_ROBBERY_LIST := '(((((?=.*(\\bROB))|(?=.*(\\b|\\B)(RBRY))|' + COMMON_BURGLARY_LIST + ')(?=.*(\\b|\\B)(AGG|DEAD|DDL|DW|SER|BOD|' + COMMON_WEAPONS_LIST + ')))|(?=.*(\\b|\\B)(ARMED\\/ROB|A\\&ROB|A\\s\\&\\sROB)))(?!.*(\\b|\\B)(' + COMMON_CAR_JACK_LIST + '|PROBATION|\\bNO\\b)))';
+    SHARED COMMON_ASSULT_COMBINED_LIST := '((' + COMMON_ASSAULT_LIST + '|' + COMMON_ASSAULT_DEADLY_INTENT_LIST + '|' + COMMON_AGG_ASSAULT_LIST + ')(?!.*(\\b|\\B)(ASSIST(ANCE|ANT)?|ASSUR|ASSIGN|HARAS|ASST|ASSIS|MASSAGE|TRESPASS|ASSEMBLY|PASSENGER|' + COMMON_SEX_LIST + ')))';
+    
+    
+    
+    
+    //These are offense specific expressions
+    SHARED OFFENSE_FAMILY_PROVIDER_ABUSE := '((((?=.*(\\b|\\B)(AB(AN|ON|US|SE)|ABANDON|MSTR|MIST|CRUEL|ENDAN|NEG|INJ|RECK|VIOLENCE|WELF(R)?|DANGER|VULN|WLF))(?=.*(\\b|\\B)(FAMILY|DOMEST|SPOUSE|WIFE|DEPEND|ELDER|CARETAKER|ADULT|PARENT|CUST|RESIDENT|PATIENT|CH(D|LD|ILD)|MINO|MNR|JUV|WLF|((?=.*(\\b|\\B)(PERSON))(?=.*(\\b|\\B)(AGED|OLDER|VUL|VUNER|VLUN|CONFIN|DISAB|INCAP))))))|((?=.*(\\b|\\B)(DOMES))(?=.*(\\b|\\B)(VIOL)))|(?=.*(\\b|\\B)(CHILDEND|DOMESTIC)))(?!.*(\\b|\\B)(SECURITIES|DOMESTICALLY|TORTURE|AMENDED|PERSONAL|DEPENDENCY|' + COMMON_FISH_GAME_ANIMAL_LIST + '|' + COMMON_HUNT_TRAP_FISH_TERMS_LIST + '|' + COMMON_LIVESTOCK_ANIMAL_LIST + '|((?=.*(\\b|\\B)(AGG))(?=.*(\\b|\\B)(ABUSE)))|((?=.*(\\b|\\B)(RECK))(?=.*(\\b|\\B)(ENDA))))))';
+    SHARED OFFENSE_ELDER_EXPLOITATION := '((?=.*(\\b|\\B)(EXPLOIT|EXPLT))(?=.*(\\b|\\B)(ELDER|CARETAK|ADULT|PARENT|RESIDENT|PATIENT|CUST|DISABLE|((?=.*(\\b|\\B)(PERS))(?=.*(\\b|\\B)(AGED|OLDER|VU(L|NER)|VLUN|DISAB|INCAP|CONFIN))))))';
+    SHARED OFFENSE_LIVESTOCK_DOMESTIC_ANIMALS := COMMON_LIVESTOCK_ANIMAL_LIST;
+    SHARED OFFENSE_HUNT_FISH_GAME := '(' + COMMON_FISH_GAME_ANIMAL_LIST + '|' + COMMON_HUNT_TRAP_FISH_TERMS_LIST + ')';
+    SHARED OFFENSE_INFRACTION_AND_ORDINANCES := COMMON_INFRACTION_ORDINANCES_LIST;
+    
+    SHARED OFFENSE_ANIMAL_FIGHT := '(((?=.*(\\b|\\B)(ANIMA|COCK|DOG))(?=.*(\\b|\\B)(FIGHT)))|((?=.*(\\b|\\B)(DOG))(?=.*(\\b|\\B)(SPEC)))|(?=.*(\\b|\\B)(COCKFIGHT|DOGFIGHT)))';
+    SHARED OFFENSE_DUI := '(' + COMMON_DUI_LIST + '(?!.*(\\b|\\B)(REDUCED)))';
+    SHARED OFFENSE_ALCOHOL := '(' + COMMON_ALCOHOL_LIST + '(?!.*(\\b|\\B)(FTA)))';
+    
+    SHARED OFFENSE_EPA_WASTE := '(((?=.*(\\b|\\B)(HAZ|TOXIC))(?=.*(\\b|\\B)(WAST|POLLUT)))|((?=.*(\\b|\\B)(ILL))(?=.*(\\b|\\B)(DUMP)))|((?=.*(\\b|\\B)(DISCHAR|DISPO|RELEASE|POSS|STOR|TRAN|CONCEAL))(?=.*(\\b|\\B)(POLLUT|HAZARD|((?=.*(\\b|\\B)(HAZ))(?=.*(\\b|\\B)(WAST)))|((?=.*(\\b|\\B)(MEDIC))(?=.*(\\b|\\B)(WAST))))))|((?=.*(\\b|\\B)(DISCHAR|DISPO|RELEASE))(?=.*(\\b|\\B)(MEDIC)))|((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(DISP))(?=.*(\\b|\\B)(WAST)))|((?=.*(\\b|\\B)(ENDANG))(?=.*(\\b|\\B)(ENVIRO)))|((?=.*(\\b|\\B)(WATER|AIR|ENVIRO))(?=.*(\\b|\\B)(POLLUT|PETRO)))|(?=.*(\\b|\\B)(POLLUTION)))';
+    SHARED OFFENSE_POISONING := '(((?=.*(\\b|\\B)(POIS|TAMP))(?=.*(\\b|\\B)(FOOD|WATER|MED)))(?!.*(\\b|\\B)(METER|STAMP|' + COMMON_HUNT_TRAP_FISH_TERMS_LIST + '|' + COMMON_FISH_GAME_ANIMAL_LIST + ')))';
+    SHARED OFFENSE_ZONING_BUILDING := '(((?=.*(\\b|\\B)(BUILD))(?=.*(\\b|\\B)(CODE)))|(?=.*(\\b|\\B)(ZONING)))';
+    SHARED OFFENSE_FUGITIVE_WARRANT := '((((?=.*(\\b|\\B)(INTRASTATE))(?=.*(\\b|\\B)(CARR)))|(?=.*(\\b|\\B)(WARRANT|FUGITIVE|CAPIAS))|((?=.*(\\b|\\B)(WARR))(?=.*(\\b|\\B)(BENC|FUG))))(?!.*(\\b|\\B)(WARRANTLESS)))';
+    SHARED OFFENSE_RIOT_CIVIL_DISORDER := '((((?=.*(\\b|\\B)(CIVIL))(?=.*(\\b|\\B)(DISORDER)))|(?=.*(\\b|\\B)(RIOT)))(?!.*(\\b|\\B)(DISORDERLY)))';
+    SHARED OFFENSE_GANG := COMMON_GANG_LIST;
+    
+    SHARED OFFENSE_VIOLATING_ORDERS := '(((?=.*(\\b)(ORD))(?=.*(\\b)(RESTRAIN|PR(O)?T|VIOL|DISOBEY)))|((?=.*(\\b)(CIV))(?=.*(\\b)(PROT)))|((?=.*(\\b)(VIO))(?=.*(\\b)(TPO|CPO|TRO))))';
+    SHARED OFFENSE_PAROLE_PROBATION_VIOLATION := '(((?=.*(\\b|\\B)(PROB|PARO|SRA|PRE(\\-)?TRIAL|((?=.*(\\b|\\B)(SUSP))(?=.*(\\b|\\B)(SENT)))))(?=.*(\\b|\\B)(VIO)))|((?=.*(\\b|\\B)(ADJUD))(?=.*(\\b|\\B)(GUILT)))|((?=.*(\\b|\\B)(ABSCON))(?=.*(\\b|\\B)(PAROLE)))|((?=.*(\\b|\\B)(VOP))(?=.*(\\b|\\B)(FELONY)))|(?=.*(\\b|\\B)(PROBATION)))';
+    SHARED OFFENSE_MISCONDUCT := '(?=.*(\\b|\\B)(MISCONDUCT))';
+    SHARED OFFENSE_CYBER_COMPUTER_CRIMES := COMMON_COMPUTER_CYBER_LIST;
+    SHARED OFFENSE_CYBER_STALK := '(' + COMMON_COMPUTER_CYBER_LIST + COMMON_STALK_INTIM_LIST + ')';
+    SHARED OFFENSE_STALK_INTIM := '(' + COMMON_STALK_INTIM_LIST + '(?!.*' + COMMON_COMPUTER_CYBER_LIST + '))';
+    SHARED OFFENSE_TREASON_ESPIONAGE := '((((?=.*(\\b|\\B)(DEF))(?=.*(\\b|\\B)(INFO))(?=.*(\\b|\\B)(FOREIGN)))|((?=.*(\\b|\\B)(TRADE))(?=.*(\\b|\\B)(SECRET)))|(?=.*(\\b|\\B)(TREASO|ESPIO)))(?!.*(\\b|\\B)(NOTREASON|RESPIONS)))';
+    
+    SHARED OFFENSE_ARSON := COMMON_ARSON_LIST;
+    SHARED OFFENSE_BURGLARY := COMMON_BURGLARY_LIST;
+    SHARED OFFENSE_BREAK_AND_ENTER := COMMON_BREAK_ENTER_LIST;
+    SHARED OFFENSE_CAR_JACK := COMMON_CAR_JACK_LIST;
+    
+    SHARED OFFENSE_TRAFFIC_DRIVING := '(' + COMMON_TRAFFIC_GROUP_LIST + '|(?=.*(\\b|\\B)(DRIV|SPEED|LANE|PLATE|HIGHWAY|HWY|ACCIDENT))|(?=.*(\\bTRAFFIC\\b))|((?=.*(\\b|\\B)(NO))(?=.*(\\b|\\B)(INSURANCE))))';
+    
+    SHARED OFFENSE_KIDNAPPING := COMMON_KIDNAPPING_LIST;
+    SHARED OFFENSE_MURDER := '((?=.*(\\b|\\B)(M(A)?NSL|MSLGRT|MUR|MRDER|HOM(I|O)C|KILL))(?!.*(\\b|\\B)(MURATIC)))';
+    SHARED OFFENSE_RETALIATION := '(?=.*(\\b|\\B)(RETALIAT))';
+    SHARED OFFENSE_HATE_CRIME := '((((?=.*(\\b|\\B)(HATE))(?=.*(\\b|\\B)(CR)))|((?=.*(\\b|\\B)(BIAS))(?=.*(\\b|\\B)(INTIMID|CRIME)))|((?=.*(\\b|\\B)(RIGHT))(?=.*(\\b|\\B)(HUMAN|CIVIL)))|(?=.*(\\b|\\B)(ETHNIC|RACIAL|RELIGIOUS)))(?!.*(\\b|\\B)(PHOSPATE|MANSLAUGHATER|METHAMPHATEMINES|((?=.*(\\b|\\B)(RIGHT))(?=.*(\\b|\\B)(WAY))))))';
+    SHARED OFFENSE_SANCTIONS_GENERAL := COMMON_SANCTIONS_GENERAL_LIST;
+    SHARED OFFENSE_CRIMINAL_SYNDICALISM := COMMON_CRIMINAL_SYNDICALISM_LIST;
+    
+    SHARED OFFENSE_COURT_CHARGES := '((((?=.*(\\b|\\B)(FAIL))(?=.*(\\b|\\B)(APPEAR|SERV)))|((?=.*(\\b|\\B)(COURT))(?=.*(\\b|\\B)(ORDER)))|((?=.*(\\b|\\B)(COURT|PROMISE))(?=.*(\\b|\\B)(APPEAR)))|(?=.*(\\b|\\B)(FTA(\\/)?|JUMP|BAIL|BOND|CONTEMPT)))(?!.*(\\b|\\B)(OBSERV|CONSERV|FOOD)))';
+    SHARED OFFENSE_CHILD_SUPPORT_CUSTODY := '((' + COMMON_CHILD_SUPPORT_LIST + '|' + COMMON_CHILD_CUSTODY_LIST + ')(?!.*(\\b|\\B)((O|I|C|A)NSPT)))';
+    SHARED OFFENSE_BOOBY_TRAP := '((((?=.*(\\b|\\B)(TRAP))(?=.*(\\b|\\B)(BOOBY|DEVIC)))|(?=.*(\\b|\\B)(MANTRAP)))(?!.*(\\b|\\B)(RAPE|STAT)))';
+    SHARED OFFENSE_SABOTAGE := '((?=.*(\\b|\\B)(SABOTAGE))(?!.*(\\b|\\B)(ADVO|SYNDICA)))';
+    SHARED OFFENSE_VANDALISM := '((((?=.*(\\b|\\B)(VAND|GRAFFI|MISCHIEF))|((?=.*(\\b|\\B)(CRIMINAL|MALICOUS))(?=.*(\\b|\\B)(MISCHIEF|DAMAGE|D(A)?MG)))|((?=.*(\\b|\\B)(CR(I)?M|MAL))(?=.*(\\b|\\B)(MIS|MSCH|DAMA|D(A)?MG|DES|DST|DISTR|PRO|P(R)?P|DWELL|BUILD|BLDG)))|((?=.*(\\b|\\B)(PRO|P(R)?P|DWELL|BUILD|BLDG))(?=.*(\\b|\\B)(DAMA|D(A)?MG|DEST|DST|DISTRU))))(?!.*(\\b|\\B)(SERVAND|EVAND|DEV|ANIM|REG|' + COMMON_DUI_LIST + '|' + COMMON_ASSAULT_LIST + '))))';
+    SHARED OFFENSE_CORRUPTION_MINOR := '((?=.*(\\b|\\B)(CORRUP))(?=.*(\\b|\\B)(MINOR)))';
+    SHARED OFFENSE_RAPE := '(((?=.*(\\b|\\B)(STAT))(?=.*(\\b|\\B)(RAPE)))|(?=.*(\\b|\\B)(RAPE)))';
+    
+    SHARED OFFENSE_SEX_OFFENSES := '(' + COMMON_SEX_LIST + '(?!.*(\\b|\\B)(FAILURE)))';
+    SHARED OFFENSE_PORN := COMMON_PORN_LIST;
+    SHARED OFFENSE_PROSTITUTION := '(?=.*(\\b|\\B)(PROST|POSTITUTION))';
+    SHARED OFFENSE_SOLICITATION := '((?=.*(\\b|\\B)(SOL(IC|CT)))(?!.*(\\b|\\B)(' + COMMON_SEX_LIST + '|' + COMMON_PORN_LIST + '|' + COMMON_CHILD_LIST + ')))';
+    SHARED OFFENSE_SOLICITATION_SEX := '(((?=.*(\\b|\\B)(SOL))(?=.*(\\b|\\B)(FEMALE|' + COMMON_SEX_LIST + '|' + COMMON_PORN_LIST + '|' + COMMON_CHILD_LIST + ')))(?!.*(\\b|\\B)(PANHAN|PEDDL|TOWNSHIP|ROADWAY)))';
+    SHARED OFFENSE_FELONY_AGG_THEFT := '(((?=.*(\\b|\\B)(FEL|AGG|GRAND|GRD))' + COMMON_THEFT_LIST + ')|' + COMMON_GRAND_LARCENY_LIST + ')';
+    SHARED OFFENSE_THEFT_GENERAL := '((((?=.*(\\b|\\B)(UNA(U)?TH|ENTER))(?=.*(\\b|\\B)(VEH|AUTO)))|((?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(CONVER)))|' + COMMON_THEFT_LIST + '|' + COMMON_LARCENY_LIST + ')(?!.*(\\b|\\B)(IDENTITY|FELON|SHOPL|((?=.*(\\b|\\B)(ORG))(?=.*(\\b|\\B)(RET))))))';
+    
+    SHARED OFFENSE_DISORDERLY_CONDUCT := COMMON_DISORDERLY_CONDUCT_LIST;
+    SHARED OFFENSE_MONEY_LAUNDERING := '((?=.*(\\b|\\B)(LAU(ND(ER)?|DER|D)|LUADER))(?!.*(\\b|\\B)(DILAUDID)))';
+    SHARED OFFENSE_GAMING_CASINO := '(((?=.*(\\b|\\B)(PROM|DICE))(?=.*(\\b|\\B)(GAM)))|(?=.*(\\b|\\B)(GAMING|CASINO|GAMBL|PROM\\/GA(B)?M|LOTTERY)))';
+    SHARED OFFENSE_TERRORISM := '((((?=.*(\\b|\\B)(TERROR))(?=.*(\\b|\\B)(ORG|FORE|GLOBAL|GR(O)?|ATTA|NARC)))|((?=.*(\\b|\\B)(MATERIAL))(?=.*(\\b|\\B)(SUPP)))|((?=.*(\\b|\\B)(MILIT))(?=.*(\\b|\\B)(TRAIN)))|(((?=.*(\\b|\\B)(PLAN|ATT|CONSP|PERF|THREAT))(?=.*(\\b|\\B)(ACT|VIO)))(?!.*(\\b|\\B)(BATTERY|MANUFACTURE)))|((?=.*(\\b|\\B)(TEACH))(?=.*(\\b|\\B)(SYND|MILI)))|((?=.*(\\b|\\B)(THREAT))(?=.*(\\b|\\B)(CATAST)))|((?=.*(\\b|\\B)(AIRPL))(?=.*(\\b|\\B)(TAKE))(?=.*(\\b|\\B)(POSS)))|((?=.*(\\b|\\B)(GOV|GVT|POLIT))(?=.*(\\b|\\B)(ASSASSIN|KILL|' + COMMON_KIDNAPPING_LIST + ')))|(?=.*(\\b|\\B)(TERRORI(SM|ST)|PROLIF|SDGT|HIJACK)))(?!.*(\\b|\\B)(TERRORI(ZE|STIC)|' + COMMON_CAR_JACK_LIST + ')))';
+    
+    SHARED OFFENSE_ORGANIZED_CRIME := '(((((?=.*(\\b|\\B)(SYNDICATE|ORGAN|ORGIN|ORGN|ORG\\.|ORGN|ORGZ|ORGR|(\\-|\\/)(ORG|ORIG|OGR|ORI)|\\-ORA))|(?=.*(\\b)(OR(G|A|I(G)?)|OGR)))(?=.*(\\b|\\B)(ACT|CR(I)?M|CRM\\.|CIM)))|((?=.*(\\b|\\B)(OG))(?=.*(\\b|\\B)(CRIM))(?=.*(\\b|\\B)(ACT))))(?!.*(\\b|\\B)(RETAIL)))';
+    SHARED OFFENSE_PERJURY := '((?=.*(\\b|\\B)(P(E|U)RJ))|((?=.*(\\b|\\B)(FALSE))(?=.*(\\b|\\B)(TESTIM|OATH))))';
+    SHARED OFFENSE_TAMPERING := '((?=.*(\\b|\\B)(TAMP))(?!.*(\\b|\\B)(STAMP|METH|MEHT|META)))';
+    SHARED OFFENSE_OBSTRUCTION_HINDER_GENERAL := '((?=.*(\\b|\\B)(OBSTR|HINDER))(?!.*(\\b|\\B)(HIGH|FIRE|WINDSHIELD|' + COMMON_TRAFFIC_GROUP_LIST + ')))';
+    SHARED OFFENSE_CONSPIRACY_GENERAL := '(?=.*(\\b|\\B)(CONSPIR))';
+    SHARED OFFENSE_OBSTRUCTION_JUSTICE := '((((?=.*(\\b|\\B)(JUST))(?=.*(\\b|\\B)(OBST|IMPEDE|INFLU|TAMP)))|((?=.*(\\b|\\B)(DESTROY|TAMPER))(?=.*(\\b|\\B)(EVIDENCE|RECORD)))|((?=.*(\\b|\\B)(INTERF|INFLU|DELAY|PREVENT))(?=.*(\\b|\\B)(PROCEED|TESTIMONY)))|((?=.*(\\b|\\B)(TAMP|INTIM|OBSTRU|INJURE|THREAT|FORCE|CORRUPT|INFLU|BRIB|COERC|HINDER|OBSTRUCT))(?=.*(\\b|\\B)(WITN(SS)?|JURY|JUROR|JUDICIAL|VICTIM|INFORM|PROCEED|OFFIC|LAW|COURT|PROS|((?=.*(\\b|\\B)(JUD))(?=.*(\\b|\\B)(OFF)))))))(?!.*(\\b|\\B)(HIGH|FIRE|WINDSHIELD|ELECT|VOT(E|ING)|BALLOT|POLIT|' + COMMON_CHILD_LIST + ')))';
+    SHARED OFFENSE_ELECTION_CRIMES := '(((?=.*(\\b|\\B)(ELECTION|VOT(ER|ING)|BALLOT))|((?=.*(\\b|\\B)(ELECTOR))(?=.*(\\b|\\B)(VOTE)))|((?=.*(\\b|\\B)(BALLOT|ELECT|VOTE))(?=.*(\\b|\\B)(' + COMMON_FRAUD_LIST + '|VIOL|TAMP|SOLIC|FALS|LAW|INFLU|CORR|BRIB|BUY|COERC|INTERF|CONSPIR|REGISTR|DEVICE))))(?!.*(\\b|\\B)(SELECT(ION)?|ELECTRONIC|WITN(SS)?|JURY|JUROR|JUDICIAL|VICTIM|INFORM|PROCEED|OFFIC|COURT|' + COMMON_CHILD_LIST + ')))';
+    SHARED OFFENSE_CORRUPTION_BRIBERY := '((?=.*(\\b|\\B)(CORRUPT|BRIB|KICKBACK))(?!.*(\\b|\\B)(DISTRIBUTE|ELECT|VOT(E|ING)|BALLOT|WITN(SS)?|JURY|JURROR|JUDICIAL|VICTIM|INFORM|PROCEED|OOFIC|LAW|COURT|POLIT|CAMPAIGN|' + COMMON_CHILD_LIST + ')))';
+    SHARED OFFENSE_POLITICAL_CAMPAIGN_CRIMES := '((?=.*(\\b|\\B)(POLITICAL))|((?=.*(\\b|\\B)(CONTRIB))(?=.*(\\b|\\B)(UNLAWFUL)))|((?=.*(\\b|\\B)(POLIT|CAMPAIGN|CANDID|LEGISL))(?=.*(\\b|\\B)(' + COMMON_FRAUD_LIST + '|BRIB|ENDOR|CONTRI|ADVER|TAMP|SOLIC|INFLU|CORR|VIOL|COERC|INTERF|CONSPIR|UNLAWFUL))))';
+    SHARED OFFENSE_FRAUD_WIRE := '((' + COMMON_FRAUD_LIST + '(?=.*(\\b|\\B)(WIRE)))(?!.*' + COMMON_FRAUD_CHECK_LIST + '))';
+    SHARED OFFENSE_FRAUD_BANK := '(((' + COMMON_FRAUD_LIST + '((?=.*(\\b|\\B)(BANK))|((?=.*(\\b|\\B)(FIN))(?=.*(\\b|\\B)(INST)))))|((?=.*(\\b|\\B)(FALSE))(?=.*(\\b|\\B)(EMBOSS))))(?!.*(\\b|\\B)(' + COMMON_FRAUD_CHECK_LIST + ')))';
+    SHARED OFFENSE_FRAUD_CARD := '((' + COMMON_CREDIT_CARD_LIST + '|((?=.*(\\b|\\B)(CC))(?=.*(\\b|\\B)(ABUSE))))(?!.*' + COMMON_FRAUD_CHECK_LIST + '))';
+    SHARED OFFENSE_FRAUD_TAX := '(((' + COMMON_FRAUD_LIST + '|(?=.*(\\b|\\B)(EVAS|CONV)))(?=.*(\\b|\\B)(TAX)))(?!.*(\\b|\\B)(TAXI)))';
+    SHARED OFFENSE_FRAUD_MORTGAGE := '(' + COMMON_FRAUD_LIST + '(?=.*(\\b|\\B)(MORTGAGE)))';
+    SHARED OFFENSE_FRAUD_HEALTHCARE := '((' + COMMON_FRAUD_LIST + '(?=.*(\\b|\\B)(HEALTH)))|(?=.*(\\b|\\B)(MEDICAID))|((?=.*(\\b|\\B)(UNAUTH))(?=.*(\\b|\\B)(USE))(?=.*(\\b|\\B)(PROVIDER)))|((?=.*(\\b|\\B)(HEALTH))(?=.*(\\b|\\B)(FALSE|PLAN|CARE))))';
+    SHARED OFFENSE_FRAUD_EMPLOYMENT := '((' + COMMON_FRAUD_LIST + '(?=.*(\\b|\\B)(WORKER|COMPEN)))|((?=.*(\\b|\\B)(UNAUTH))(?=.*(\\b|\\B)(USE)))|((?=.*(\\b|\\B)(WORKER))(?=.*(\\b|\\B)(COMP))))';
+    SHARED OFFENSE_FRAUD_INSURANCE := '((' + COMMON_FRAUD_LIST + '(?=.*(\\b|\\B)(INSUR)))|((?=.*(\\b|\\B)(FALSE))(?=.*(\\b|\\B)(INSUR))))';
+    SHARED OFFENSE_FRAUD_ORGANIZED := '(((?=.*(\\b|\\B)(RETAIL|' + COMMON_FRAUD_LIST + '|' + COMMON_THEFT_LIST + '))((?=.*(\\b|\\B)(ORG(A|I)?N|ORG\\.|ORGZ|ORGR|(\\-|\\/)(ORG|ORIG|OGR|ORI)|\\-ORA))|(?=.*(\\b)(OR(G|A|I(G)?)|OGR))))(?!.*(\\b|\\B)(RETAL|ENDANGER|' + COMMON_FORGE_LIST + ')))';
+    SHARED OFFENSE_FRAUD_INVOICE := '((((' + COMMON_FRAUD_LIST + '|(?=.*(\\b|\\B)(FALS)))((?=.*(\\b|\\B)(INVOI|RECEIPT|PAYMENT))|((?=.*(\\b|\\B)(SALES))(?=.*(\\b|\\B)(SLIP)))|((?=.*(\\b|\\B)(BUS))(?=.*(\\b|\\B)(REC)))|((?=.*(\\b|\\B)(PAY))(?=.*(\\b|\\B)(STAT)))))|((?=.*(\\b|\\B)(SERV))(?!.*(\\b|\\B)(REND))))(?!.*(\\b|\\B)(' + COMMON_FRAUD_CHECK_LIST + '|' + COMMON_CREDIT_CARD_LIST + ')))';
+    SHARED OFFENSE_FRAUD_CHECK := '(' + COMMON_FRAUD_CHECK_LIST + '(?!.*(\\b|\\B)(' + COMMON_THEFT_LIST + '|' + COMMON_OBTAIN_PROPERTY_LIST + ')))';
+    SHARED OFFENSE_FRAUD_GENERAL := '((((?=.*(\\b|\\B)(FT\\/REPORT|CHG|WRONG|FRAUD))((?=.*(\\b|\\B)(PUBLIC|GOV|GVT))(?=.*(\\b|\\B)(AID|ASSIST))))|((?=.*(\\b|\\B)(FALS))(?=.*(\\b|\\B)(BENEFIT)))|' + COMMON_FRAUD_LIST + ')(?!.*' + COMMON_FRAUD_CHECK_LIST + '))';
+   
+    SHARED OFFENSE_FRAUD_IDENTITY := COMMON_IDENTITY_FRAUD_LIST;
+    SHARED OFFENSE_FALSE_STATEMENT := COMMON_FALSE_STATEMENT_LIST;
+    SHARED OFFENSE_FORGE_COUNTERFEIT := '((' + COMMON_FORGE_LIST + '|' + COMMON_COUNTERFEIT_LIST + '|((?=.*(\\b|\\B)(FIN))(?=.*(\\b|\\B)(DEVIC)))|((?=.*(\\b|\\B)(ILLEG))(?=.*(\\b|\\B)(PROCESS))(?=.*(\\b|\\B)(DOC))))(?!.*(\\b|\\B)(INVOICE|' + COMMON_FRAUD_CHECK_LIST + ')))';
+    SHARED OFFENSE_MONEY_LAUNDER_TAX_EVASION := COMMON_MONEY_LAUNDER_TAX_EVASION_LIST;
+
+    SHARED OFFENSE_RESIST_ESCAPE := '((((?=.*(\\b|\\B)(UNAUTH))(?=.*(\\b|\\B)(ABSEN))(?=.*(\\b|\\B)(CORRECTION|CCF)))|((?=.*(\\b|\\B)(HIND|AVOID))(?=.*(\\b|\\B)(APPR|ARREST|ARST|DETAIN)))|((?=.*(\\b|\\B)(EVAD|ELUD|EVD))(?=.*(\\b|\\B)(ARR|ARST|DET|FUGI|POL|OFFIC|APPR)))|((?=.*(\\b|\\B)(AID))(?=.*(\\b|\\B)(OFFENDER)))|((?=.*(\\b|\\B)(RES))(?=.*(\\b|\\B)(ARST|ARRST)))|(?=.*(\\b|\\B)(RESIST|(E)?SCAPE|ELUD(E|I)|FLEE|FLIGHT|ESC(A)?P|EVAD(E|ING)|HARBOR)))(?!.*(\\b|\\B)(RAPE|PERSISTENT|RESISTER|' + COMMON_SEX_LIST + '|' + COMMON_ALCOHOL_LIST + '|' + COMMON_DUI_LIST + ')))';
+    SHARED OFFENSE_ASSULT_COMBINED := COMMON_ASSULT_COMBINED_LIST;
+    SHARED OFFENSE_DEADLY_CONDUCT := '(((?=.*(\\b|\\B)(DEAD|DDLY))(?=.*(\\b|\\B)(CONDUCT)))|((?=.*(\\b|\\B)(RECK))(?=.*(\\b|\\B)(CONDUCT|ENDANG))))';
+    SHARED OFFENSE_CHOP_SHOP := '((((?=.*(\\b|\\B)(VEHIC))(?=.*(\\b|\\B)(DISMANTLE|DESTROY|DISASSEM|REASSEMB|DEFACE|DISGUISE)))|(?=.*(\\b|\\B)(CHOP)))(?!.*(\\b|\\B)(PSYCHOPATH)))';
+    SHARED OFFENSE_EXTORTION := '((((?=.*(\\b|\\B)(BLACK))(?=.*(\\b|\\B)(MAIL)))|((?=.*(\\b|\\B)(FIN))(?=.*(\\b|\\B)(EXPLOIT)))|(?=.*(\\b|\\B)(EXTOR|BLACKM|RANSOM|KFR|HOSTAG)))(?!.*(\\b|\\B)(NO|WITHOUT|TRANSOM|TRANSPORT|ADULT|ELDER|CARETA)))';
+    SHARED OFFENSE_DIGITAL_CURRENCY := '(((?=.*(\\b|\\B)(DIGIT))(?=.*(\\b|\\B)(CURR)))|(?=.*(\\b|\\B)(BITCOIN)))';
+    SHARED OFFENSE_ARM_ROBBERY := COMMON_ARM_ROBBERY_LIST;
+    SHARED OFFENSE_BANK_ROBBERY := COMMON_BANK_ROBBERY_LIST;
+    SHARED OFFENSE_ROBBERY := COMMON_ROBBERY_LIST;
+    
+    SHARED OFFENSE_ANTITRUST_VIOLATIONS := '(' + COMMON_FALSE_ADVERTISING_LIST + '|(?=.*(\\b|\\B)(ANTI(\\-)?TRUST|COLLUSION|MONOPOL(Y|IES)|MERGER|ACQUISITION|TAKEOVER|FINRA))|((?=.*(\\b|\\B)(PRICE))(?=.*(\\b|\\B)(FIX|DISCRIM|PREDAT)))|((?=.*(\\b|\\B)(VIOL))(?=.*(\\b|\\B)(BANK))(?=.*(\\b|\\B)(LAW)))|((?=.*(\\b|\\B)(VIOL))(?=.*(\\b|\\B)(CONS))(?=.*(\\b|\\B)(PROT)))|((?=.*(\\b|\\B)(CONSUM))(?=.*(\\b|\\B)(PROT|LAW)))|((?=.*(\\b|\\B)(VIOL))(?=.*(\\b|\\B)(UNFAIR|TRADE|LEND|MORTG)))|((?=.*(\\b|\\B)(BID))(?=.*(\\b|\\B)(RIGG|SUPRES|ROTAT|TAMP)))|((?=.*(\\b|\\B)(TRADE))(?=.*(\\b|\\B)(COMP)))|((?=.*(\\b|\\B)(PRACT))(?=.*(\\b|\\B)(TRADE|COMP)))|((?=.*(\\b|\\B)(UNLAW))(?=.*(\\b|\\B)(MERCH|PRAC|TRADE)))|((?=.*(\\b|\\B)(ACT))((?=.*(\\b|\\B)(UNFAIR))|((?=.*(\\b|\\B)(DEC|TRA))(?=.*(\\b|\\B)(PRAC)))))|((?=.*(\\b|\\B)(UNFAIR|DECEP|INFLUE|RESTR|MISREP))(?=.*(\\b|\\B)(COMP|BUS|BSN|TRADE|PRAC|ADVERT|MARKET|EXEC|((?=.*(\\b|\\B)(MARKET))(?=.*(\\b|\\B)(MANIP|DIVID|PRACT))))))|((?=.*(\\b|\\B)(REG))(?=.*(\\b|\\B)(FILING)))|((?=.*(\\b|\\B)(FIN))(?=.*(\\b|\\B)(AGEN)))|((?=.*(\\b|\\B)(FIN))(?=.*(\\b|\\B)(INST))(?=.*(\\b|\\B)(CRI))))';
+    SHARED OFFENSE_SECURITIES_COMMODITIES_BROKERS := '(((' + COMMON_FRAUD_LIST + '(?=.*(\\b|\\B)(SECUR|COMMOD)))|(?=.*(\\b|\\B)(COMMODIT(Y|IES)|SECURITIES))|((?=.*(\\b|\\B)(SECUR|COMMOD))((?=.*(\\b|\\B)(ACT|DEC))|((?=.*(\\b|\\B)(FALSE))(?=.*(\\b|\\B)(REP|STATE)))))|((?=.*(\\b|\\B)(INSIDER))(?=.*(\\b|\\B)(TRAD)))|((?=.*(\\b|\\B)(SALE))(?=.*(\\b|\\B)(UNREG))(?=.*(\\b|\\B)(SECURIT)))|((?=.*(\\b|\\B)((UN)?REG|(UN)?LIC))(?=.*(\\b|\\B)(LOAN|BROK|ADVIS|BROKER\\/DEALER|AGENT|INVEST|SECUR|STOCK|SHARE)))|((?=.*(\\b|\\B)(VIOL))(?=.*(\\b|\\B)(SECURIT))(?=.*(\\b|\\B)(ACT|LAW))))(?!.*(\\b|\\B)(SECURING|' + COMMON_FRAUD_CHECK_LIST + '|' + COMMON_FALSE_STATEMENT_LIST + ')))';
+    SHARED OFFENSE_RACKETEERING := '(((?=.*(\\b|\\B)(PRED))(?=.*(\\b|\\B)(LEND)))|((?=.*(\\b|\\B)(CORRUP))(?=.*(\\b|\\B)(ORG)))|((?=.*(\\b|\\B)(WRONG))(?=.*(\\b|\\B)(CREDIT))(?=.*(\\b|\\B)(PRACT)))|((?=.*(\\b|\\B)(INTERSTATE))(?=.*(\\b|\\B)(SHIP|CORR|TRANS)))|(?=.*(\\b|\\B)(RACKE|RICO|SHARK|USURY)))';
+    SHARED OFFENSE_MONEY_TRANSMITTER := COMMON_MONEY_TRANSMITTER_LIST;
+    SHARED OFFENSE_STRUCTURING := COMMON_STRUCTURING_LIST;
+    
+    SHARED OFFENSE_MISSAPPROP_EMBEZZLE := COMMON_MISSAPPROP_EMBEZZLE_LIST;
+    SHARED OFFENSE_CONCEAL_FUNDS := '(((?=.*(\\b|\\B)(ACQ|CONCEAL))(?=.*(\\b|\\B)(FUN|MONEY|PRO(C|P))))(?!.*' + COMMON_CHILD_LIST + '))';
+    SHARED OFFENSE_TAX_GENERAL := '((?=.*(\\b|\\B)(TAX))(?!.*(\\b|\\B)(TAXI)))';
+    SHARED OFFENSE_OPERATE_NO_LICENSE := '((((?=.*(\\b|\\B)(PRACT))(?=.*(\\b|\\B)(WITHOUT|LICENSE|FALSE|UNLIC)))|((?=.*(\\b|\\B)(ILLEG))(?=.*(\\b|\\B)(BUS|OCCUP)))|((?=.*(\\b|\\B)(UNLIC))(?=.*(\\b|\\B)(OPERATE|SALE|MANUF|DEALER)))|((?=.*(\\b|\\B)(W\\/O))(?=.*(\\b|\\B)(LICENSE)))|(?=.*(\\b|\\B)(UNLICENSED)))(?!.*' + COMMON_TRAFFIC_GROUP_LIST + '))';
+    SHARED OFFENSE_EXPORT_IMPORT := '(?=.*(\\b|\\B)(IMPORT|EXPORT))';
+    SHARED OFFENSE_TRANSPORT_PROCEEDS := COMMON_TRANSPORT_PROCEEDS_LIST;
+    SHARED OFFENSE_GENERAL_DAMAGE_DESTROY := '(?=.*(\\b|\\B)(DESTR(U|OY)|DAMAGE))';
+    SHARED OFFENSE_OBTAIN_PROPERTY := COMMON_OBTAIN_PROPERTY_LIST;
+    SHARED OFFENSE_SHOPLIFTING := '((' + COMMON_THEFT_LIST + '(?=.*(\\b|\\B)(RET)))|(?=.*(\\b|\\B)(SHOPL))|((?=.*(\\b|\\B)(CONCEAL|ALTER))(?=.*(\\b|\\B)(MERCH|PRICE))))';
+    SHARED OFFENSE_TRESPASSING := '((((?=.*(\\b|\\B)(ENTER))(?=.*(\\b|\\B)(B(UI)?LD|PREMISE)))|(?=.*(\\b|\\B)(TRES)))(?!.*(\\b|\\B)(MATTRESS|' + COMMON_BREAK_ENTER_LIST + ')))';
+    SHARED OFFENSE_COMMUNICATION_INTERCEPTION := '((((?=.*(\\b|\\B)(INTERCEPT))(?=.*(\\b|\\B)(MESS|WIRE|COMM|DEVICE)))|((?=.*(\\b|\\B)(DEV))(?=.*(\\b|\\B)(RECO|COMM)))|(?=.*(\\b|\\B)(WIRETAP|EAVESDROP)))(?!.*(\\b|\\B)(COP(PER)?|ELECTRICAL|PIPES|DAMAG|CELL|CABLE|WIRELESS|' + COMMON_FRAUD_LIST + '|' + COMMON_THEFT_LIST + ')))';
+    
+    SHARED OFFENSE_DRUGS := '((' + COMMON_DRUGS_WITH_POSSESSION_LIST + '|' + COMMON_DRUGS_WITOUT_POSSESSION_LIST + ')(?!.*(' + COMMON_TRAFFIC_GROUP_LIST + '|' + COMMON_ALCOHOL_LIST + '|' + COMMON_FRAUD_LIST + '|' + COMMON_DISORDERLY_CONDUCT_LIST + '|' + COMMON_ASSULT_COMBINED_LIST + '|' + COMMON_ROBBERY_LIST + '|' + COMMON_BANK_ROBBERY_LIST + '|' + COMMON_ARM_ROBBERY_LIST + '|' + COMMON_CAR_JACK_LIST + ')))';
+    SHARED OFFENSE_EXPLOSIVES := COMMON_EXPLOSIVES_LIST;
+    SHARED OFFENSE_WEAPONS := '(' + COMMON_WEAPONS_LIST + '(?!.*(' + COMMON_SEX_LIST + '|' + COMMON_TRAFFIC_GROUP_LIST + '|' + COMMON_THEFT_LIST + '|' + COMMON_ASSULT_COMBINED_LIST + '|' + COMMON_ROBBERY_LIST + '|' + COMMON_BANK_ROBBERY_LIST + '|' + COMMON_CAR_JACK_LIST + '|' + COMMON_KIDNAPPING_LIST + ')))';
+    SHARED OFFENSE_CRIMINAL_PROCEED := '((((?=.*(\\b|\\B)(PROCEED))(?=.*(\\b|\\B)(ACQ(UIR)?|CRIM|DRUG|ILLEG|' + COMMON_DRUGS_LIST + '|' + COMMON_WEAPONS_LIST +')))|((?=.*(\\b|\\B)(ACQ))(?=.*(\\b|\\B)(CRIM|CONCEAL))))(?!.*(\\b|\\B)(COURT)))';
+    SHARED OFFENSE_TRAFFICKING_HUMANS := COMMON_TRAFFICKING_HUMAN_LIST;
+    SHARED OFFENSE_TRAFFICKING_ARMS := '(((?=.*(\\b|\\B)(' + COMMON_TRAFFICKING_TERMS_LIST + '|TRAF))' + COMMON_WEAPONS_LIST + ')(?!.*(\\b|\\B)(OFFENSE|BLOCK|CHAPTER|OBSTRUCTING|ABANDON|((?=.*(\\b|\\B)(SER))(?=.*(\\b|\\B)(REM)))|TRANSMIT|' + COMMON_DUI_LIST + '|' + COMMON_ALCOHOL_LIST + ')))';
+    SHARED OFFENSE_TRAFFICKING_DRUGS := '(((?=.*(\\b|\\B)(' + COMMON_TRAFFICKING_TERMS_LIST + '|TRAF))(' + COMMON_SLIM_DRUG_LIST + '|' + COMMON_DRUGS_LIST + '))(?!.*(\\b|\\B)(OFFENSE|BLOCK|CHAPTER|OBSTRUCTING|ABANDON|((?=.*(\\b|\\B)(SER))(?=.*(\\b|\\B)(REM)))|TRANSMIT|' + COMMON_DUI_LIST + '|' + COMMON_ALCOHOL_LIST + ')))';
+    SHARED OFFENSE_TRAFFICKING_GENERAL := '((((?=.*(\\b|\\B)(TRAFFIC))(?=.*(\\b|\\B)(CONSPIR)))|((?=.*(\\b|\\B)(TRAF))(?=.*(\\b|\\B)(FOOD|CONTR(A|O))))|' + COMMON_TRAFFICKING_TERMS_LIST + ')(?!.*(\\b|\\B)(OFFENSE|BLOCK|CHAPTER|OBSTRUCTING|ABANDON|((?=.*(\\b|\\B)(SER))(?=.*(\\b|\\B)(REM)))|TRANSMIT' + COMMON_DUI_LIST + '|' + COMMON_ALCOHOL_LIST + '|' + COMMON_TRAFFIC_GROUP_LIST + ')))';
+    SHARED OFFENSE_ALIEN_IMMIGRATION := '((?=.*(\\b|\\B)(IMMIGR|ALIEN|NATURALIZATION|STOWAWAY))(?!.*(\\b|\\B)(SMUG)))';
+    SHARED OFFENSE_MANU_DIST_DRUGS_AND_WEAPONS := '(((' + COMMON_MANUF_ACRONYM_LIST + '|' + COMMON_LAB_LIST + '|' + COMMON_PRECURSOR_LIST + '|' + COMMON_DRUG_DEA_DIVERSION_LIST + ')|' +
+                                                  '(' + COMMON_WITH_INTENT_LIST + '(' + COMMON_MANUF_DELIVER_SELL_LIST + '|' + COMMON_PLANT_GROW_LIST + '))|' +
+                                                  '(((' + COMMON_POSSESSION_LIST + COMMON_WITH_INTENT_LIST + ')|' + COMMON_POSSESSION_WITH_INTENT_LIST + '|' + COMMON_WITH_INTENT_LIST + '|' + COMMON_MANUF_DELIVER_SELL_LIST + '|' + COMMON_PLANT_GROW_LIST + '|(?=.*(\\b|\\B)(DWELL|VEH|HOUSE|LAB)))(' + COMMON_DRUGS_LIST + '|' + COMMON_DRUG_PARAPHERNALIA_LIST + '|' + COMMON_SLIM_DRUG_LIST + '))|' +
+                                                  '(' + COMMON_MANUF_DELIVER_SELL_LIST + COMMON_WEAPONS_LIST + '))' +
+                                                  '(?!.*(\\b|\\B)(DRIV|DOMESTIC|INTOXICATION|DISORDERLY|((?=.*(\\b|\\B)(CONV))(?=.*(\\b|\\B)(FE)))|' + COMMON_DUI_LIST + '|' + COMMON_THEFT_LIST + '|' + COMMON_ALCOHOL_LIST + '|' + COMMON_ROBBERY_LIST + '|' + COMMON_BANK_ROBBERY_LIST + '|' + COMMON_ASSULT_COMBINED_LIST + '|' + COMMON_CAR_JACK_LIST + '|' + COMMON_BURGLARY_LIST + '|' + COMMON_TRAFFIC_GROUP_LIST + '|' + COMMON_SEX_LIST + ')))';
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //These are expressions used in logic
+    EXPORT HUNT_FISH_GAME_OFFENSES := STARTS_WITH + OFFENSE_HUNT_FISH_GAME + ENDS_WITH;
+    EXPORT LIVESTOCK_DOMESTIC_ANIMALS := STARTS_WITH + OFFENSE_LIVESTOCK_DOMESTIC_ANIMALS + ENDS_WITH;
+    EXPORT ORDINANCES_AND_INFRACTIONS := STARTS_WITH + OFFENSE_INFRACTION_AND_ORDINANCES + ENDS_WITH;
+    EXPORT ELDER_EXPLOITATION := STARTS_WITH + OFFENSE_ELDER_EXPLOITATION + ENDS_WITH;
+    EXPORT FAMILY_AND_PROVIDER_ABUSE := STARTS_WITH + OFFENSE_FAMILY_PROVIDER_ABUSE + ENDS_WITH;
+
+    EXPORT ANIMAL_FIGHTING := STARTS_WITH + OFFENSE_ANIMAL_FIGHT + ENDS_WITH;
+    EXPORT DUI := STARTS_WITH + OFFENSE_DUI + ENDS_WITH;
+    EXPORT ALCOHOL := STARTS_WITH + OFFENSE_ALCOHOL + ENDS_WITH;
+
+    EXPORT GANG_ACTIVITIES := STARTS_WITH + OFFENSE_GANG + ENDS_WITH;
+    EXPORT FUGITIVE_OR_WARRANT := STARTS_WITH + OFFENSE_FUGITIVE_WARRANT + ENDS_WITH;
+    EXPORT RIOTS_AND_CIVIL_DISORDER := STARTS_WITH + OFFENSE_RIOT_CIVIL_DISORDER + ENDS_WITH;
+    EXPORT POISONING := STARTS_WITH + OFFENSE_POISONING + ENDS_WITH;
+    EXPORT EPA_WASTE := STARTS_WITH + OFFENSE_EPA_WASTE + ENDS_WITH;
+    EXPORT ZONING_BUILDING_VIOLATIONS := STARTS_WITH + OFFENSE_ZONING_BUILDING + ENDS_WITH;
+
+    EXPORT TREASON_ESPIONAGE := STARTS_WITH + OFFENSE_TREASON_ESPIONAGE + ENDS_WITH;
+    EXPORT STALKING_TERRORIZE := STARTS_WITH + OFFENSE_STALK_INTIM + ENDS_WITH;
+    EXPORT CYBER_STALKING := STARTS_WITH + OFFENSE_CYBER_STALK + ENDS_WITH;
+    EXPORT VIOLATING_ORDERS := STARTS_WITH + OFFENSE_VIOLATING_ORDERS + ENDS_WITH;
+    EXPORT PROBATION_PAROLE_VIOLATION := STARTS_WITH + OFFENSE_PAROLE_PROBATION_VIOLATION + ENDS_WITH;
+    EXPORT MISCONDUCT := STARTS_WITH + OFFENSE_MISCONDUCT + ENDS_WITH;
+    EXPORT COMPUTER_AND_CYBER := STARTS_WITH + OFFENSE_CYBER_COMPUTER_CRIMES + ENDS_WITH;
+    
+    EXPORT ARSON := STARTS_WITH + OFFENSE_ARSON + ENDS_WITH;
+    EXPORT CAR_JACKING := STARTS_WITH + OFFENSE_CAR_JACK + ENDS_WITH;
+    EXPORT BURGLARY := STARTS_WITH + OFFENSE_BURGLARY + ENDS_WITH;
+    EXPORT BREAKING_AND_ENTERING := STARTS_WITH + OFFENSE_BREAK_AND_ENTER + ENDS_WITH;
+    
+    EXPORT TRAFFIC_RELATED := STARTS_WITH + OFFENSE_TRAFFIC_DRIVING + ENDS_WITH;
+    
+    EXPORT CRIMINAL_SYNDICALISM := STARTS_WITH + OFFENSE_CRIMINAL_SYNDICALISM + ENDS_WITH;
+    EXPORT SANCTIONS_GENERAL := STARTS_WITH + OFFENSE_SANCTIONS_GENERAL + ENDS_WITH;
+    EXPORT MURDER_HOMOCIDE := STARTS_WITH + OFFENSE_MURDER + ENDS_WITH;
+    EXPORT KIDNAPPING_FALSE_IMPRISONMENT := STARTS_WITH + OFFENSE_KIDNAPPING + ENDS_WITH;
+    EXPORT HATE_CRIME_AND_CIVIL_RIGHTS := STARTS_WITH + OFFENSE_HATE_CRIME + ENDS_WITH;
+    EXPORT RETALIATION := STARTS_WITH + OFFENSE_RETALIATION + ENDS_WITH;
+    
+    EXPORT CORRUPT_MINOR := STARTS_WITH + OFFENSE_CORRUPTION_MINOR + ENDS_WITH;
+    EXPORT RAPE := STARTS_WITH + OFFENSE_RAPE + ENDS_WITH;
+    EXPORT BOOBY_TRAP := STARTS_WITH + OFFENSE_BOOBY_TRAP + ENDS_WITH;
+    EXPORT SABOTAGE := STARTS_WITH + OFFENSE_SABOTAGE + ENDS_WITH;
+    EXPORT VANDALISM := STARTS_WITH + OFFENSE_VANDALISM + ENDS_WITH;
+    EXPORT CHILD_SUPPORT_AND_CUSTODY := STARTS_WITH + OFFENSE_CHILD_SUPPORT_CUSTODY + ENDS_WITH;
+    EXPORT COURT_CHARGES := STARTS_WITH + OFFENSE_COURT_CHARGES + ENDS_WITH;
+  
+    EXPORT FELONY_AGGRAVATED_THEFT := STARTS_WITH + OFFENSE_FELONY_AGG_THEFT + ENDS_WITH;
+    EXPORT GENERAL_THEFT := STARTS_WITH + OFFENSE_THEFT_GENERAL + ENDS_WITH;
+    EXPORT SOLICITATION := STARTS_WITH + OFFENSE_SOLICITATION + ENDS_WITH;
+    EXPORT SOLICITATION_SEX := STARTS_WITH + OFFENSE_SOLICITATION_SEX + ENDS_WITH;
+    EXPORT PORN := STARTS_WITH + OFFENSE_PORN + ENDS_WITH;
+    EXPORT PROSTITUTION := STARTS_WITH + OFFENSE_PROSTITUTION + ENDS_WITH;
+    EXPORT SEX_OFFENSES := STARTS_WITH + OFFENSE_SEX_OFFENSES + ENDS_WITH;
+    
+    EXPORT MONEY_LAUNDERING := STARTS_WITH + OFFENSE_MONEY_LAUNDERING + ENDS_WITH;
+    EXPORT GAMBLING_AND_CASINO := STARTS_WITH + OFFENSE_GAMING_CASINO + ENDS_WITH;
+    EXPORT DISORDERY_CONDUCT := STARTS_WITH + OFFENSE_DISORDERLY_CONDUCT + ENDS_WITH;
+    EXPORT TERRORISM := STARTS_WITH + OFFENSE_TERRORISM + ENDS_WITH;
+    
+    EXPORT ORGANIZED_CRIME := STARTS_WITH + OFFENSE_ORGANIZED_CRIME + ENDS_WITH;
+    EXPORT OBSTRUCTION_OF_JUSTICE := STARTS_WITH + OFFENSE_OBSTRUCTION_JUSTICE + ENDS_WITH;
+    EXPORT ELECTION_CRIMES_CORRUPTION := STARTS_WITH + OFFENSE_ELECTION_CRIMES + ENDS_WITH;
+    EXPORT POLITICAL_CRIMES_CORRUPTION := STARTS_WITH + OFFENSE_POLITICAL_CAMPAIGN_CRIMES + ENDS_WITH;
+    EXPORT CORRUPTION_BRIBERY_KICKBACKS := STARTS_WITH + OFFENSE_CORRUPTION_BRIBERY + ENDS_WITH;
+    EXPORT WIRE_FRAUD := STARTS_WITH + OFFENSE_FRAUD_WIRE + ENDS_WITH;
+    EXPORT BANK_FRAUD := STARTS_WITH + OFFENSE_FRAUD_BANK + ENDS_WITH;
+    EXPORT FINANCIAL_CARD_FRAUD := STARTS_WITH + OFFENSE_FRAUD_CARD + ENDS_WITH;
+    EXPORT TAX_FRAUD := STARTS_WITH + OFFENSE_FRAUD_TAX + ENDS_WITH;
+    EXPORT MORTGAGE_FRAUD := STARTS_WITH + OFFENSE_FRAUD_MORTGAGE + ENDS_WITH;
+    EXPORT HEALTHCARE_FRAUD := STARTS_WITH + OFFENSE_FRAUD_HEALTHCARE + ENDS_WITH;
+    EXPORT EMPLOYEMENT_WORK_COMP_FRAUD := STARTS_WITH + OFFENSE_FRAUD_EMPLOYMENT + ENDS_WITH;
+    EXPORT INSURANCE_FRAUD := STARTS_WITH + OFFENSE_FRAUD_INSURANCE + ENDS_WITH;
+    EXPORT ORGANIZED_FRAUD := STARTS_WITH + OFFENSE_FRAUD_ORGANIZED + ENDS_WITH;
+    EXPORT INVOICE_FRAUD := STARTS_WITH + OFFENSE_FRAUD_INVOICE + ENDS_WITH;
+    EXPORT CHECK_FRAUD := STARTS_WITH + OFFENSE_FRAUD_CHECK + ENDS_WITH;
+    EXPORT GENERAL_FRAUD := STARTS_WITH + OFFENSE_FRAUD_GENERAL + ENDS_WITH;
+    EXPORT CONSPIRACY := STARTS_WITH + OFFENSE_CONSPIRACY_GENERAL + ENDS_WITH;
+    EXPORT PERJURY := STARTS_WITH + OFFENSE_PERJURY + ENDS_WITH;
+    EXPORT OBSTRUCTION_HINDER := STARTS_WITH + OFFENSE_OBSTRUCTION_HINDER_GENERAL + ENDS_WITH;
+    EXPORT TAMPERING := STARTS_WITH + OFFENSE_TAMPERING + ENDS_WITH;
+    
+    EXPORT TAX_EVASION := STARTS_WITH + OFFENSE_MONEY_LAUNDER_TAX_EVASION + ENDS_WITH;
+    EXPORT FORGE_AND_COUNTERFEIT := STARTS_WITH + OFFENSE_FORGE_COUNTERFEIT + ENDS_WITH;
+    EXPORT ID_FRAUD_AND_THEFT := STARTS_WITH + OFFENSE_FRAUD_IDENTITY + ENDS_WITH;
+    EXPORT FALSE_STATEMENT_OR_IMPERSONATION := STARTS_WITH + OFFENSE_FALSE_STATEMENT + ENDS_WITH;
+    
+    EXPORT EXTORTION_AND_BLACKMAIL := STARTS_WITH + OFFENSE_EXTORTION + ENDS_WITH;
+    EXPORT CHOP_SHOP := STARTS_WITH + OFFENSE_CHOP_SHOP + ENDS_WITH;
+    EXPORT BANK_ROBBERY := STARTS_WITH + OFFENSE_BANK_ROBBERY + ENDS_WITH;
+    EXPORT ARMED_ROBBERY := STARTS_WITH + OFFENSE_ARM_ROBBERY + ENDS_WITH;
+    EXPORT ROBBERY := STARTS_WITH + OFFENSE_ROBBERY + ENDS_WITH;
+    EXPORT DEADLY_CONDUCT := STARTS_WITH + OFFENSE_DEADLY_CONDUCT + ENDS_WITH;
+    EXPORT ASSAULT := STARTS_WITH + OFFENSE_ASSULT_COMBINED + ENDS_WITH;
+    EXPORT RESIST_ARREST_OR_ESCAPE := STARTS_WITH + OFFENSE_RESIST_ESCAPE + ENDS_WITH;
+    EXPORT DIGITAL_CURRENCY := STARTS_WITH + OFFENSE_DIGITAL_CURRENCY + ENDS_WITH;
+    
+    EXPORT ANTITRUST_VIOLATIONS := STARTS_WITH + OFFENSE_ANTITRUST_VIOLATIONS + ENDS_WITH;
+    EXPORT SECURITIES_AND_COMMODITIES := STARTS_WITH + OFFENSE_SECURITIES_COMMODITIES_BROKERS + ENDS_WITH;
+    EXPORT RACKETEERING := STARTS_WITH + OFFENSE_RACKETEERING + ENDS_WITH;
+    EXPORT MONEY_TRANSMITTER := STARTS_WITH + OFFENSE_MONEY_TRANSMITTER + ENDS_WITH;
+    EXPORT STRUCTURING := STARTS_WITH + OFFENSE_STRUCTURING + ENDS_WITH;
+    
+    EXPORT IMPORT_EXPORT_OFFENSES := STARTS_WITH + OFFENSE_EXPORT_IMPORT + ENDS_WITH;
+    EXPORT TRANSPORTATION_VIOLATIONS := STARTS_WITH + OFFENSE_TRANSPORT_PROCEEDS + ENDS_WITH;
+    EXPORT COMMUNICATION_INTERCEPTION := STARTS_WITH + OFFENSE_COMMUNICATION_INTERCEPTION + ENDS_WITH;
+    EXPORT OPERATE_WITHOUT_LICENSE := STARTS_WITH + OFFENSE_OPERATE_NO_LICENSE + ENDS_WITH;
+    EXPORT EMBEZZLE_MISAPPROPRIATE_MISMANAGE_FUNDS := STARTS_WITH + OFFENSE_MISSAPPROP_EMBEZZLE + ENDS_WITH;
+    EXPORT TAX_OFFENSES := STARTS_WITH + OFFENSE_TAX_GENERAL + ENDS_WITH;
+    EXPORT CONCEAL_FUNDS_OR_PROPERTY := STARTS_WITH + OFFENSE_CONCEAL_FUNDS + ENDS_WITH;
+    EXPORT OBTAIN_PROPERTY_BY_FALSE_PRETENSE := STARTS_WITH + OFFENSE_OBTAIN_PROPERTY + ENDS_WITH;
+    EXPORT DAMAGE_AND_DESTROY := STARTS_WITH + OFFENSE_GENERAL_DAMAGE_DESTROY + ENDS_WITH;
+    EXPORT SHOPLIFTING := STARTS_WITH + OFFENSE_SHOPLIFTING + ENDS_WITH;
+    EXPORT TRESPASSING := STARTS_WITH + OFFENSE_TRESPASSING + ENDS_WITH;
+    
+    EXPORT CRIMINAL_PROCEEDS := STARTS_WITH + OFFENSE_CRIMINAL_PROCEED + ENDS_WITH;
+    EXPORT HUMAN_TRAFFICKING_SMUGGLING := STARTS_WITH + OFFENSE_TRAFFICKING_HUMANS + ENDS_WITH;
+    EXPORT DRUG_TRAFFICKING_SMUGGLING := STARTS_WITH + OFFENSE_TRAFFICKING_DRUGS + ENDS_WITH;
+    EXPORT ARMS_TRAFFICKING_SMUGGLING := STARTS_WITH + OFFENSE_TRAFFICKING_ARMS + ENDS_WITH;
+    EXPORT OTHER_TRAFFICKING_SMUGGLING := STARTS_WITH + OFFENSE_TRAFFICKING_GENERAL + ENDS_WITH;
+    EXPORT EXPLOSIVES_DEVICES := STARTS_WITH + OFFENSE_EXPLOSIVES + ENDS_WITH;
+    EXPORT WEAPONS := STARTS_WITH + OFFENSE_WEAPONS + ENDS_WITH;
+    EXPORT DRUGS := STARTS_WITH + OFFENSE_DRUGS + ENDS_WITH;
+    EXPORT IMMIGRATION_ALIEN := STARTS_WITH + OFFENSE_ALIEN_IMMIGRATION + ENDS_WITH;
+    EXPORT MANUFACTURE_DISTRIBUTE_DRUGS_WEAPONS := STARTS_WITH + OFFENSE_MANU_DIST_DRUGS_AND_WEAPONS + ENDS_WITH;
+    
+    
+    
+ 
     
     EXPORT NOT_PO_ADDRESS_EXPRESSION := '^((?!((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX).)*$';  //finds reference to anything other than po box or post office box
 
