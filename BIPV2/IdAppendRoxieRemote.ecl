@@ -5,25 +5,19 @@ export IdAppendRoxieRemote(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
 		,unsigned weightThreshold = 0
-		,boolean disableSaltForce = true
+		,boolean primForce = false
+		,boolean reAppend = true
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
-		,boolean reAppend = true
+		,string svcAppendUrl = ''
 	) := module
 
+	shared disableSaltForce := not primForce;
 
-	isProd := _Control.ThisEnvironment.RoxieEnv = 'Prod';
-	devUrl := 'http://' + IdConstants.DEV_ROXIE_URL;
-	certUrl := 'http://' + _control.RoxieEnv.boca_certvip;
-	prodUrl := 'http://' + _control.RoxieEnv.boca_prodvip;
-	idAppendSvcEnv := '' : STORED('BIP_APPEND_SVC_ENV');
-	shared urlBipAppend := map(
-		idAppendSvcEnv = 'DEV' => devUrl,
-		idAppendSvcEnv = 'CERT' => certUrl,
-		idAppendSvcEnv = 'PROD' => prodUrl,
-		isProd => prodUrl,
-		certUrl);
+	prodUrl := 'http://' + IdConstants.URL_ROXIE_PROD;
+	inputUrl := if(svcAppendUrl[1..4] = 'http', svcAppendUrl, 'http://' + svcAppendUrl);
+	shared urlBipAppend := if(svcAppendUrl = '', prodUrl, inputUrl);
 
 	shared serviceName := 'bizlinkfull.svcappend';
 
@@ -97,7 +91,7 @@ export IdAppendRoxieRemote(
 		self := [];
 	end;
 
-	export WithRecs(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean dnbFullRemove = false) := function
+	export WithRecords(string fetchLevel = BIPV2.IdConstants.fetch_level_proxid, boolean dnbFullRemove = false) := function
 		soapInputDs := soapInput(includeBest := false, includeRecords := true, 
 		                         fetchLevel := fetchLevel, dnbFullRemove := dnbFullRemove);
 		soapResult := soapcall(
