@@ -1,9 +1,7 @@
-IMPORT BatchShare,IP_Metadata,Std;
+IMPORT IP_Metadata, Std;
 
 EXPORT IP_Metadata_Records(
 	DATASET(BatchServices.IP_Metadata_Layouts.batch_in) batch_in
-	// no restrictions â€“ reserved for future use
-	// ,BatchShare.IParam.BatchParams in_mod
 	) := FUNCTION
 
 	srchRec := RECORD
