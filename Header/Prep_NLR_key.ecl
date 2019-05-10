@@ -374,4 +374,4 @@ r7_not := project(r7,to_not(left));
 
 r7_filtered := r7_not(not_in_bureau<>0);
 
-EXPORT Prep_NLR_key := r7_filtered;
+EXPORT Prep_NLR_key := header.fn_persistent_record_ID(r7_filtered);
