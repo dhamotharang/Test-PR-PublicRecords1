@@ -66,7 +66,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF.gc_id	:= (integer) L.AccountContext.Common.GlobalCompanyId;
  		SELF.billing_id	 := (integer)L.User.BillingId;
   		SELF.customer_reference_code := L.User.ReferenceCode; 			
-		SELF.i_unique_id	:=	L.Member.MemberID;
+		SELF.i_bus_addr	:=	L.Member.MemberID; //Since MemberID could be 50 characters, logging it in an unused field that is long enough.
 		SELF.i_person_name_prefix	:= L.Member.Name.Prefix;
 		SELF.i_person_last_name	:= L.Member.Name.Last;
 		SELF.i_person_first_name := L.Member.Name.First;
@@ -597,12 +597,12 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	   								SeMO_Score < Config[1].MotivationScore_category_1_Low AND isMotivationRequested => '2',
 	   								SeMO_Score >= Config[1].MotivationScore_category_1_Low AND isMotivationRequested => '1',
 	   								'N/A');
-			SELF.CareDrivers.High1 := CoreResults[1].MA_Driver_Hi1;
-			SELF.CareDrivers.High2 := CoreResults[1].MA_Driver_Hi2;
-			SELF.CareDrivers.High3 := CoreResults[1].MA_Driver_Hi3;
-			SELF.CareDrivers.Low1  := CoreResults[1].MA_Driver_Lo1;
-			SELF.CareDrivers.Low2  := CoreResults[1].MA_Driver_Lo2;
-			SELF.CareDrivers.Low3  := CoreResults[1].MA_Driver_Lo3;
+			SELF.CareDrivers.High1 := CoreResults[1].MO_Driver_Hi1;
+			SELF.CareDrivers.High2 := CoreResults[1].MO_Driver_Hi2;
+			SELF.CareDrivers.High3 := CoreResults[1].MO_Driver_Hi3;
+			SELF.CareDrivers.Low1  := CoreResults[1].MO_Driver_Lo1;
+			SELF.CareDrivers.Low2  := CoreResults[1].MO_Driver_Lo2;
+			SELF.CareDrivers.Low3  := CoreResults[1].MO_Driver_Lo3;
 		END;
 		MotivationScoreDS := dataset([formatMO()]);
 		
