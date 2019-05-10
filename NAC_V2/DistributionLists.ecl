@@ -1,9 +1,25 @@
-﻿rgxEmail := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
+﻿import Std, _Control;
+
+rgxEmail := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
 
 EXPORT DistributionLists := MODULE
+		export lfn_internal := '~nac::internaldistribution.csv';
 
+		export SprayInternal(string ip,string rootDir) := nothor(
+					Std.File.SprayVariable(ip
+							,rootDir + 'internaldistribution.csv'
+							,,,,
+							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','hthor')
+							,lfn_internal
+							,
+							,
+							,
+							,true
+							,true
+							,true
+						)
+					);
 
-		lfn_internal := '~file::bctlpedata12.risk.regn.net::data::temp::ubernac::EmailInternalDistribution.csv';
 
 		rInternal := RECORD
 			string			list {MAXLENGTH(16)};
@@ -18,7 +34,23 @@ EXPORT DistributionLists := MODULE
 																									, MAXLENGTH(1024)
 																									)
 																						)(REGEXFIND(rgxEmail,email));
-		lfn_external := '~file::bctlpedata12.risk.regn.net::data::temp::ubernac::EmailExternalDistribution.csv';
+																						
+		export lfn_external := '~nac::externaldistribution.csv';
+		export SprayExternal(string ip,string rootDir) := nothor(
+					Std.File.SprayVariable(ip
+							,rootDir + 'enternaldistribution.csv'
+							,,,,
+							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','hthor')
+							,lfn_external
+							,
+							,
+							,
+							,true
+							,true
+							,true
+						)
+					);
+
 		rExternal := RECORD
 			string1			program;
 			string2			state;
