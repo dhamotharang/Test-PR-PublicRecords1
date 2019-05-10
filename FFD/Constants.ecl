@@ -117,6 +117,10 @@ EXPORT Constants := MODULE
       DataGroups.MARRIAGE_SEARCH,  
       DataGroups.PERSON
       ];
+    EXPORT Paw := [
+      DataGroups.PAW,
+      DataGroups.PERSON
+      ];
     EXPORT Person := [
       DataGroups.PERSON
       ];
