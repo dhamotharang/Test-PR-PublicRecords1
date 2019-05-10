@@ -34,6 +34,11 @@ slim_layout := RECORD
 	/* Standard Additional Base Fields */
 	unsigned6 dt_first_seen:=0;
 	unsigned6 dt_last_seen:=0;
+	
+	//CCPA-9 Add CCPA fields
+	unsigned4 global_sid:=0;
+	unsigned8 record_sid:=0;
+
 end;
 
 // remove all seemingly unnecessary fields
