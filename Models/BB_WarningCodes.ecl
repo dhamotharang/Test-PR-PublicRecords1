@@ -1,4 +1,4 @@
-﻿IMPORT Models, Risk_Indicators,RiskWise, STD, Business_Risk_BIP, easi;
+﻿IMPORT Models, Risk_Indicators, STD, Business_Risk_BIP;
 
 EXPORT BB_Warningcodes ( GROUPED DATASET(risk_indicators.Layout_Boca_Shell) clam,
                            GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell,	
@@ -1163,11 +1163,16 @@ wc21p := inq_perssn >= 10;
 
 wc22p := fp_varrisktype >= '5';
 
-// wc23b := pop_bus_phone = '1' and hphnpop  and in_bus_phone10 != in_phone10 and inq_consumer_phone >= '6';/.44
-wc23b := (integer)pop_bus_phone = 1 and hphnpop  and in_bus_phone10 != in_phone10 and (integer)inq_consumer_phone >= 6;//
 
-//wc24b := pop_bus_addr = '1' and addrpop  and in_bus_streetaddress1 != in_streetaddress and inq_consumer_addr >= '6';
-wc24b := (integer)pop_bus_addr = 1 and addrpop  and in_bus_streetaddress1 != in_streetaddress and (integer)inq_consumer_addr >= 6;
+wc23b1 := (integer)pop_bus_phone = 1 and hphnpop  and in_bus_phone10 != in_phone10 and (integer)inq_consumer_phone >= 6;//  
+wc23b2 :=  (integer)pop_bus_phone = 1 and (integer)inq_consumer_phone >= 6;// for Business only models 
+
+wc23b := If(business_only, wc23b2,  wc23b1); 
+
+wc24b1 := (integer)pop_bus_addr = 1 and addrpop  and in_bus_streetaddress1 != in_streetaddress and (integer)inq_consumer_addr >= 6;
+wc24b2 := (integer)pop_bus_addr = 1 and  (integer)inq_consumer_addr >= 6;// for Business only models 
+
+wc24b := If(business_only, wc24b2,  wc24b1); 
 
 _sum_bureau := if(max((integer)ver_src_eq, (integer)ver_src_en, (integer)ver_src_tn) = NULL, NULL, sum((integer)ver_src_eq, (integer)ver_src_en, (integer)ver_src_tn));
 
