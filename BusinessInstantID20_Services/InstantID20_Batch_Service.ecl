@@ -279,6 +279,12 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		BusinessInstantID20_Services.Macros.mac_ReadOptionsBatch()
 			
 		// 4.  Load the Options and LinkingOptions modules.	
+		Gateway.Layouts.Config Options_gw_switch(iesp.businessinstantid20.t_BIID20Gateway le) := transform
+			self.servicename	:= if((le.servicename in BusinessInstantID20_Services.Constants.SET_TARGUS_SERVICENAMES AND NOT _DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission]='1'), '', le.servicename);
+			self.url 					:= if((le.servicename in BusinessInstantID20_Services.Constants.SET_TARGUS_SERVICENAMES AND NOT _DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission]='1'), '', le.url);
+			self 							:= le;
+			self 							:= [];
+    end;
 		Options := MODULE(BusinessInstantID20_Services.iOptions)
 			// Clean up the Options and make sure that defaults are enforced. RULE: For this product, 
 			// if we're retrieving SBFE data (DPM[12] value set to '1'), then we cannot retrieve Experian
@@ -298,7 +304,7 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			EXPORT REAL				Global_Watchlist_Threshold	     := MAX(MIN(_Global_Watchlist_Threshold, 1), 0);
 			EXPORT BOOLEAN    OverRideExperianRestriction      := MAP( _OverRideExperianRestriction = TRUE => TRUE, _DataPermissionMask[12] IN BusinessInstantID20_Services.Constants.RESTRICTED_SET => TRUE, FALSE );
 			EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting := _RunTargusGateway;
-      EXPORT DATASET   (Gateway.Layouts.Config) Gateways := PROJECT( _Gateways, TRANSFORM( Gateway.Layouts.Config, SELF := LEFT, SELF := [] ) );
+			EXPORT DATASET   (Gateway.Layouts.Config) Gateways := PROJECT(_Gateways, Options_gw_switch(left));
 			EXPORT BOOLEAN		include_ofac                     := if(ExcludeWatchLists = TRUE, FALSE, _include_ofac);
 		  EXPORT BOOLEAN		include_additional_watchlists    := if(ExcludeWatchLists = TRUE, FALSE, _include_additional_watchlists);
 			EXPORT BOOLEAN    DisableIntermediateShellLogging  := TRUE; // We never intermediate-log batch jobs.
