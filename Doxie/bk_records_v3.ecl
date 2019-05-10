@@ -313,9 +313,9 @@ end;
 f_main := 
 	join(f_main_raw, slim_pc_recs(datagroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN, acctno = FFD.Constants.SingleSearchAcctno),
 		left.input.did = (unsigned6) right.lexid 
-			and left.input.tmsid = right.recid1,				
+			and left.input.tmsid[3..] = trim(right.recid1) + trim(right.recid2),				
 		appendMainStatementIDs(left, right),
-		left outer, keep(1), limit(0));		
+		left outer, keep(1), limit(0));
 		 
 bankrupt.layout_bk_crs_search addDebtorStatementIds(bk_search_working l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
 	skip((~showDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))

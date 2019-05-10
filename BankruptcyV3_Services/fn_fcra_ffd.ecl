@@ -68,7 +68,7 @@ export fn_fcra_ffd(dataset(BankruptcyV3_Services.layouts.layout_rollup) ds_recs,
 			end;
 			
 	recs_fcra_ds := join(main_w_did, slim_pc_recs,
-											left.tmsid = right.RecID1 and
+											left.court_code = right.RecID1 and left.case_number = right.RecID2 and
 											left.matched_did  =  (unsigned6) right.lexid and 
 											(right.acctno = FFD.Constants.SingleSearchAcctno) and 
 											right.DataGroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN,

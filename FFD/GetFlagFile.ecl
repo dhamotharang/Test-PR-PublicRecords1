@@ -66,10 +66,7 @@ function
 	ds_file_flags := FCRA.GetFlagFile(ds_best);
 	
 	ds_pc_flags := project(pc_recs(recordtype=FFD.Constants.RecordType.SR), transform(fcra.Layout_override_flag,
-		rid := trim(left.RecId1)+trim(left.RecId2)+trim(left.RecId3)+trim(left.RecId4); // string100 enough?			
-		check_bk_exception := left.datagroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN;
-		// we only have 'bk' fids in flag file; main records do not have full TMSID as record_id. 
-		self.record_id := IF(check_bk_exception, rid[3..], rid);		
+		self.record_id := trim(left.RecId1)+trim(left.RecId2)+trim(left.RecId3)+trim(left.RecId4); // string100 enough?		
 		self.file_id := DataGroupToFileID(left.datagroup);
 		self.did := left.lexid;
 		self.flag_file_id := ''; // need a new record type in person context for overrides; recid would be file_id (?)
