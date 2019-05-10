@@ -51,7 +51,7 @@ EXPORT IParams := MODULE
   EXPORT SearchParams := INTERFACE(EmailParams)
   END;
  
-  EXPORT GetSearchParams(iesp.emailfinder.t_EmailFinderSearchOption in_optns) := FUNCTION
+  EXPORT GetSearchParams(iesp.emailsearchv2.t_EmailSearchV2Option in_optns) := FUNCTION
   
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
     
