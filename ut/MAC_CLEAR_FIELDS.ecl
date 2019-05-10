@@ -1,4 +1,4 @@
-﻿EXPORT MAC_CLEAR_FIELDS(infile,outfile,fieldList='') := MACRO  
+﻿EXPORT MAC_CLEAR_FIELDS(infile,outfile,fieldList='') := MACRO   
 		
 		LOADXML('<xml/>');
   #DECLARE(deprecateList)   #SET(deprecateList, '')

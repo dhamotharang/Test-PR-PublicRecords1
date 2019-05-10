@@ -116,11 +116,11 @@ STRING45	CaseLinkID	:=	'';
 string50 TMSID_old	:=	'';
 string50 RMSID_old	:=	'';
 BOOLEAN	CaseLinkID_Prop_Flag	:=	FALSE;
-//DF-24061	
-string7   AgencyID;
-String1   AgencyID_src; 
-unsigned4 global_sid;
-unsigned8 record_sid;
+//DF-24061	VC
+string7   AgencyID     :='';
+String1   AgencyID_src :=''; 
+unsigned4 global_sid   :=0 ;
+unsigned8 record_sid   :=0 ;
 
 end;
 
