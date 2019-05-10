@@ -1115,14 +1115,18 @@ export set_Marketing_Sources           := [
 		,src_SD_Corporations					 ,src_TN_Corporations					  ,src_TX_Corporations					 ,src_UT_Corporations					 
 		,src_VT_Corporations					 ,src_VA_Corporations					  ,src_WI_Corporations					 ,src_WV_Corporations
 		,src_WY_Corporations				
-    /*updated watercraft set*/
+    // updated watercraft set
     ,src_AL_Watercraft						 ,src_AR_Watercraft						  ,src_AZ_Watercraft						 ,src_CO_Watercraft 
 		,src_CT_Watercraft						 ,src_GA_Watercraft							,src_IA_Watercraft						 ,src_IL_Watercraft
 		,src_Infutor_Watercraft				 ,src_ME_Watercraft							,src_MA_Watercraft						 ,src_MN_Watercraft							
 		,src_MS_Watercraft						 ,src_NY_Watercraft						 	,src_NC_Watercraft						 ,src_NV_Watercraft
 		,src_NM_Watercraft						 ,src_OH_Watercraft						 	,src_OR_Watercraft						 ,src_TN_Watercraft
 		,src_TX_Watercraft						 ,src_WV_Watercraft							,src_WI_Watercraft						 ,src_WY_Watercraft		
-		,set_Marketing_Death					 ,set_Marketing_FBN						,set_Marketing_Liquor_Licenses
+		,set_Marketing_Death					 ,set_Marketing_FBN						  ,set_Marketing_Liquor_Licenses
+    // additional items
+    ,src_Edgar                     ,src_Bankruptcy_Trustee        ,src_Infutor_Veh               ,src_MS_Worker_Comp
+    ,src_Liens_v2_Chicago_Law      ,src_Liens_v2_ILFDLN           ,src_Liens_v2_Hogan            ,src_Liens_v2_MA
+    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN
 	]; 
 	
 export set_Marketing_Restricted := [
@@ -1746,6 +1750,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Employee_Directories      := [src_Employee_Directories      ];
 	export set_Enclarity								 := [src_Enclarity								 ];
 	export set_Entiera                   := [src_Entiera                   ];	
+	export set_Equifax_Business_Data     := [src_Equifax_Business_Data     ];	
 	export set_Equifax_Direct            := [src_Equifax                   ];
 	export set_Equifax_Quick             := [src_Equifax_Quick             ];
 	export set_Equifax_Weekly            := [src_Equifax_Weekly            ];
@@ -2267,6 +2272,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsEnclarity									(string  sr) := sr							 in set_Enclarity									 ;
 	export SourceIsEntiera                    (string  sr) := sr               in set_Entiera                    ;
 	export SourceIsEquifax                    (string  sr) := sr               in set_Equifax                    ;
+	export SourceIsEquifax_Business_Data      (string  sr) := sr               in set_Equifax_Business_Data      ;
 	export SourceIsEquifax_Direct             (string  sr) := sr               in set_Equifax_Direct             ;
 	export SourceIsEquifax_Quick              (string  sr) := sr               in set_Equifax_Quick              ;
 	export SourceIsEquifax_Weekly             (string  sr) := sr               in set_Equifax_Weekly             ;
@@ -2795,6 +2801,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Enclarity									,'Enclarity'																								 }
 		,{src_Entiera       						,'Entiera'                                       						 }
 		,{src_Equifax                   ,'Equifax'                                                   }
+		,{src_Equifax_Business_Data     ,'Equifax Business Data'                                     }
 		,{src_Equifax_Quick             ,'Equifax Quick'                                             }
 		,{src_Equifax_Weekly            ,'Equifax Weekly'                                            }
 		,{src_Eq_Employer               ,'Eq Employer'                                               }
@@ -3303,6 +3310,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Enclarity								 => 'Enclarity National Provider/Sanctions'
 		,src_Entiera       						 => 'Entiera'                                       				
 		,src_Equifax                   => 'Equifax'                                              
+		,src_Equifax_Business_Data     => 'Equifax Business Data'                                              
 		,src_Equifax_Quick             => 'Equifax Quick'                                        
 		,src_Equifax_Weekly            => 'Equifax Weekly'                                       
 		,src_Eq_Employer               => 'Eq Employer'
@@ -3728,8 +3736,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,'SA'	=>	src_Liens_v2_Service_Abstract
 		,'SU'	=>	src_Liens_v2_Superior_Party  
 		,					''													
-		));
-	*/
+	));
+  */
 
 	export fProperty(string pln_fares_id) := 
 	map(
