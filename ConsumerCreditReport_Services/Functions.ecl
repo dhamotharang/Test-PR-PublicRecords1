@@ -1,4 +1,4 @@
-﻿IMPORT Address, BatchShare, FFD, FCRA, iesp, PersonContext, Risk_Indicators, RiskView, Standard, Suppress, STD;
+﻿IMPORT Address, BatchShare, FFD, FCRA, iesp, Risk_Indicators, RiskView, Standard, Suppress, STD;
 
 EXPORT Functions := MODULE
 
@@ -166,15 +166,17 @@ EXPORT Functions := MODULE
     END;
 
     ds_didville_in:=PROJECT(ds_ccr_resp,didvilleReq(LEFT));
+
     BatchShare.MAC_AppendDidVilleDID(ds_didville_in,ds_didville_out,in_mod);
 
     iesp.consumercreditreport_fcra.t_FcraCCReport applyMasking(iesp.consumercreditreport_fcra.t_FcraCCReport L) := TRANSFORM
       SELF.ReportHeader.Subject.SSN:=Suppress.ssn_mask(L.ReportHeader.Subject.SSN,in_mod.SSN_Mask);
       DOB:=iesp.ECL2ESP.DateToInteger(L.ReportHeader.Subject.DOB);
-      dobMasked:=Suppress.date_mask(DOB,Suppress.date_mask_math.MaskIndicator(in_mod.DOBMask));
+      dobMasked:=Suppress.date_mask(DOB, in_mod.dob_mask);
       SELF.ReportHeader.Subject.DOB:=iesp.ECL2ESP.toDatestring8(dobMasked.Year+dobMasked.Month+dobMasked.day);
       SELF.IdentificationSSN.MDBSubject.SSN:=Suppress.ssn_mask(L.IdentificationSSN.MDBSubject.SSN,in_mod.SSN_Mask);
       SELF.IdentificationSSN.InquirySubject.SSN:=Suppress.ssn_mask(L.IdentificationSSN.InquirySubject.SSN,in_mod.SSN_Mask);
+      
       SELF:=L;
     END;
 

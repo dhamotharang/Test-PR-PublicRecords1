@@ -1,4 +1,4 @@
-EXPORT MAC_AppendDidVilleDID (batch_in, batch_out, in_mod, did_score_threshold=BatchShare.Constants.Defaults.didScoreThreshold) := MACRO
+﻿EXPORT MAC_AppendDidVilleDID (batch_in, batch_out, in_mod, did_score_threshold=BatchShare.Constants.Defaults.didScoreThreshold) := MACRO
 IMPORT Address, AutoKeyI, BatchShare, DidVille, Gateway, Standard, Suppress;
 
 	// do soap call for remote DidVille dids using Gateway.SoapCall_DidVille()
@@ -25,7 +25,11 @@ IMPORT Address, AutoKeyI, BatchShare, DidVille, Gateway, Standard, Suppress;
 
 	// fetch BatchShare params set values from input mod
 	#UNIQUENAME(dv_mod);
-	%dv_mod%:=MODULE(PROJECT(in_mod,Gateway.IParam.DidVilleParams,OPT))
+
+	#UNIQUENAME(in_mod_legacy);
+  %in_mod_legacy% := BatchShare.IParam.ConvertToLegacy(in_mod);
+
+	%dv_mod%:=MODULE(PROJECT(%in_mod_legacy%,Gateway.IParam.DidVilleParams,OPT))
 		EXPORT DATASET(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
 	END;
 
