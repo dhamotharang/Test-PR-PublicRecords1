@@ -38,6 +38,7 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                        SELF.OttoBankAccountId2 := HASH32(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
                        SELF.OttoDriversLicenseId := HASH32(LEFT.drivers_license),
                        SELF.Confidence_that_activity_was_deceitful_id := LEFT.classification_Activity.Confidence_that_activity_was_deceitful_id,
+											 SELF.event_date := MAP(LEFT.event_date = '' => MAP(LEFT.ln_report_date='' => '20100101', LEFT.ln_report_date), LEFT.event_date), 											 
                        // fake bank account and dl risk stuff for testing JP
                        /*
                        SELF.event_type_1 := MAP(LEFT.bank_account_number_1 != '' => CHOOSE((HASH32(LEFT.record_id) % 8)+1, '203','291','202','204','292','200','201','293'), ''),
@@ -50,7 +51,7 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
 
 Set_record_id:=[59386231,59812325,78505368,82750428,13496281,64149144,74043112,36862566,27306783,16682315,24115489,64277425,54716128,39415142,74043117,46852676,64700532,16682317,30490796,6310390,12222565,79991118,61730801,18596980,1810079,8817473,73619491,24755656,24967707,3722291,69378543,55354691,83175873,31128598,37075118,67675944,29643810,68953831];
 
-Set_did:=[87354652,199600630,802421875,1612657577,1375235801,1466482754,1215789174,2231445703,1056261901,464680867,102723930787,298166078,1752427243,1213942861,1970080308,1894039365,2248303771,529728450,1357828170,2578799228,2773009559,56371566];
+Set_did:=[2532801343, 87354652,199600630,802421875,1612657577,1375235801,1466482754,1215789174,2231445703,1056261901,464680867,102723930787,298166078,1752427243,1213942861,1970080308,1894039365,2248303771,529728450,1357828170,2578799228,2773009559,56371566];
 
 // filter out spurious transactions in the future.
 fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today() and did != 1);// and  (record_id in Set_record_id OR did % 10000 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or HASH32(ip_address) % 1000 = 1 or bank_account_number_1 != '' or drivers_license != '' or did in set_did OR classification_Activity.Confidence_that_activity_was_deceitful_id = 3));
