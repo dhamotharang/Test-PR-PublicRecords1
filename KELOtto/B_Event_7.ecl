@@ -4,8 +4,8 @@ IMPORT E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_7 := MODULE
   SHARED VIRTUAL TYPEOF(E_Event.__Result) __E_Event := E_Event.__Result;
-  SHARED __EE25437 := __E_Event;
-  EXPORT __ST23394_Layout := RECORD
+  SHARED __EE25468 := __E_Event;
+  EXPORT __ST23409_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -150,9 +150,9 @@ EXPORT B_Event_7 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST23394_Layout __ND26816__Project(E_Event.Layout __PP25440) := TRANSFORM
-    SELF.Event_Type_Count_ := KEL.Aggregates.CountN(__PP25440.Event_Types_);
-    SELF := __PP25440;
+  SHARED __ST23409_Layout __ND26847__Project(E_Event.Layout __PP25471) := TRANSFORM
+    SELF.Event_Type_Count_ := KEL.Aggregates.CountN(__PP25471.Event_Types_);
+    SELF := __PP25471;
   END;
-  EXPORT __ENH_Event_7 := PROJECT(__EE25437,__ND26816__Project(LEFT));
+  EXPORT __ENH_Event_7 := PROJECT(__EE25468,__ND26847__Project(LEFT));
 END;

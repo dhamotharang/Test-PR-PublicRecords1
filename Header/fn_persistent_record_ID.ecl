@@ -1,8 +1,9 @@
 import header;
 
-EXPORT fn_persistent_record_ID(dataset(header.Layout_Header) head_in, boolean is_QH = false) := function
+EXPORT fn_persistent_record_ID(head_in, is_QH = false) := functionmacro
 
-head_append_PID := project(head_in, transform(header.Layout_Header,
+#UNIQUENAME(head_append_PID);
+%head_append_PID% := project(head_in, transform({head_in},
 self.persistent_record_ID := HASH64(StringLib.Data2String(HASHMD5(
 									trim(left.fname)+','+
                                     trim(left.lname)+','+
@@ -25,6 +26,6 @@ self.persistent_record_ID := HASH64(StringLib.Data2String(HASHMD5(
 									trim(if(is_QH and left.src in ['QH', 'WH'], 'EQ', left.src))+','))),
                                     self := left));
 
-return head_append_PID;
+return %head_append_PID%;
 
-end;
+endmacro;

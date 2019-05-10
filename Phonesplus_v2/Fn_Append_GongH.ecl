@@ -1,7 +1,11 @@
-//****************Function to append flags/indicators when matching to Gong History***************
-import ut,gong;
+﻿//****************Function to append flags/indicators when matching to Gong History***************
+import ut,Gong_Neustar;
 export Fn_Append_GongH(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
-gongh	 	:=	Gong.File_History(current_record_flag <> 'Y');
+
+// VC - Using newer file DF-23004. As per Charles Gong.File_History redirects to Gong_Neustar.File_History
+// gongh	 	:=	Gong.File_History(current_record_flag <> 'Y');
+gongh	 	:=	Gong_Neustar.File_History(current_record_flag <> 'Y');
+
 
 phonesplus_v2.Mac_Filter_Bad_Phones (gongh,phone10,,,gongh_phones);
 
