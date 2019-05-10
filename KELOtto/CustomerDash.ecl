@@ -12,11 +12,12 @@
 
   // This is a 
   HighFrequencyExclusionList := 
-    PROJECT(KELOtto.Q__show_Customer_Address.Res0(event_count_ > 1000), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
-    PROJECT(KELOtto.Q__show_Customer_Social_Security_Number.Res0(event_count_ > 1000), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
-    PROJECT(KELOtto.Q__show_Customer_Email.Res0(event_count_ > 1000), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
-    PROJECT(KELOtto.Q__show_Customer_Phone.Res0(event_count_ > 1000), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
-    PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0(event_count_ > 1000), TRANSFORM(ExlusionRecord, SELF := LEFT));
+    PROJECT(KELOtto.Q__show_Customer_Address.Res0(event_count_ > 1000 OR identity_count_ > 50), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
+    PROJECT(KELOtto.Q__show_Customer_Social_Security_Number.Res0(event_count_ > 1000 OR identity_count_ > 50), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
+    PROJECT(KELOtto.Q__show_Customer_Email.Res0(event_count_ > 1000 OR identity_count_ > 50), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
+    PROJECT(KELOtto.Q__show_Customer_Phone.Res0(event_count_ > 1000 OR identity_count_ > 50), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
+    PROJECT(KELOtto.Q__show_Customer_Bank_Account.Res0(event_count_ > 1000 OR identity_count_ > 50), TRANSFORM(ExlusionRecord, SELF := LEFT)) + 
+    PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0(event_count_ > 1000 OR identity_count_ > 50), TRANSFORM(ExlusionRecord, SELF := LEFT));
 
   //topclusters
   OttoFullGraph := KELOtto.KelFiles.FullCluster(safe_flag_ = 0); //DATASET('~foreign::10.173.44.105::gov::otto::fullgraph', RECORDOF(KELOtto.KelFiles.FullCluster), THOR); 
@@ -27,7 +28,7 @@
   tempFullCluster := JOIN(OttoFullGraph, HighFrequencyExclusionList, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, LEFT ONLY, LOOKUP);
   
   //KELOtto.KelFiles.FullCluster
-  topstuff := tempFullCluster((cl_high_risk_pattern1_flag_ = 1 OR cl_high_risk_pattern2_flag_ = 1 OR cl_high_risk_pattern3_flag_ = 1 OR cl_high_risk_pattern4_flag_ = 1 OR cl_high_risk_pattern5_flag_ = 1) AND cl_identity_count_ < 30 AND tree_uid_=entity_context_uid_);
+  topstuff := tempFullCluster((cl_high_risk_pattern1_flag_ = 1 OR cl_high_risk_pattern2_flag_ = 1 OR cl_high_risk_pattern3_flag_ = 1 OR cl_high_risk_pattern4_flag_ = 1 OR cl_high_risk_pattern5_flag_ = 1) AND cl_identity_count_ < 51 AND tree_uid_=entity_context_uid_);
   //count(topstuff);
 
   topnormalstuff := topn(GROUP(SORT(tempFullCluster((cl_high_risk_pattern1_flag_ = 0 AND cl_high_risk_pattern2_flag_ = 1 AND cl_high_risk_pattern3_flag_ = 1) AND tree_uid_=entity_context_uid_), customer_id_, industry_type_, SKEW(1)), customer_id_, industry_type_, SKEW(1)), 10000, -cl_impact_weight_, SKEW(1));
@@ -58,7 +59,7 @@
 
   // Top Identities
   
-  TopIdentitiesPrep1 := tempFullCluster(tree_uid_=entity_context_uid_ AND entity_type_ = 1 AND score_ > 80  /*cl_event_count_percentile_ > 85*/ AND cl_identity_count_ < 20);
+  TopIdentitiesPrep1 := tempFullCluster(tree_uid_=entity_context_uid_ AND entity_type_ = 1 AND score_ > 80  /*cl_event_count_percentile_ > 85*/ AND cl_identity_count_ < 50);
   TopIdentitiesPrep2 := topn(GROUP(SORT(TopIdentitiesPrep1, customer_id_, industry_type_, skew(1)), customer_id_, industry_type_, SKEW(1)), 1000, customer_id_, industry_type_, -cl_impact_weight_, SKEW(1));
 
 
@@ -71,7 +72,7 @@
 
   ClustersAndElements := DEDUP(SORT(MainClusters + TopIdentitiesPrep2 + TopElementsPrep2, customer_id_, industry_type_, entity_context_uid_, SKEW(1)), customer_id_, industry_type_, entity_context_uid_)
       : INDEPENDENT;
-  
+
   EXPORT TopClustersAndElements := ClustersAndElements;
 
 
