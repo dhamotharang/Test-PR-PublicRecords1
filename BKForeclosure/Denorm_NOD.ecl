@@ -131,12 +131,13 @@ Layout_BK.base_nod SlimBase(Base_nod L) := TRANSFORM
 		SELF.name6.ultscore		:= L.name6_ultscore;
 		SELF.name6.ultweight	:= L.name6_ultweight;
 	SELF := L;
-	SELF := [];
+	//SELF := [];
 END;
 
 	pSlimBase	:= PROJECT(Base_nod, SlimBase(LEFT));
 
 	Layout_BK.base_nod denormalizeRecords(Layout_BK.base_nod l, Layout_BK.CleanFields_NOD r) := TRANSFORM
+		//SELF.delete_flag			:= IF(TRIM(L.bk_infile_type) = 'NOD_DELETE', 'DELETE', L.delete_flag);
 		SELF.name1_nid 				:= IF(r.Name_Type = 'BR', r.nid, l.name1_nid);
 		SELF.name1_prefix			:= IF(r.Name_Type = 'BR', r.cln_title, l.name1_prefix);
 		SELF.name1_first			:= IF(r.Name_Type = 'BR', r.cln_fname, l.name1_first);
@@ -362,21 +363,24 @@ END;
 		SELF.situs1_geo_blk			:= IF(r.AddrType = 'PF', r.geo_blk, l.situs1_geo_blk);
 		SELF.situs1_geo_match		:= IF(r.AddrType = 'PF', r.geo_match, l.situs1_geo_match);
 		SELF.situs1_err_stat		:= IF(r.AddrType = 'PF', r.err_stat, l.situs1_err_stat);
-		
 		SELF := L;
-		SELF := [];
+		//SELF := [];
 	END;
 	
 	//Distribute the data before denormalize to avoid skewing
-	NodInDist				:=	DISTRIBUTE(Norm_nod, HASH32(record_id));
-	NodBaseDist			:=	DISTRIBUTE(pSlimBase, HASH32(record_id));
+	NodInDist				:=	SORT(DISTRIBUTE(Norm_nod, HASH32(record_id)),record_id,LOCAL);
+	NodBaseDist			:=	SORT(DISTRIBUTE(pSlimBase(delete_flag <> 'DELETE'), HASH32(record_id)),record_id, -date_vendor_last_reported,LOCAL);
+	NodBaseDelete		:= 	pSlimBase(delete_flag = 'DELETE');
 
 	NodDeNorm := DENORMALIZE(NodBaseDist, NodInDist,
 														left.record_id = right.record_id,
-														denormalizeRecords(left,right), LOCAL);
-									
+														denormalizeRecords(left,right), LEFT OUTER, LOCAL);
+	
+	//Add back delete flagged records
+	NodAll	:= NodDeNorm + NodBaseDelete;
+	
 //removing situs1_RawAID from dedup because multiple borrowers have same property address and is causing duplication with different RawAID
-	NodBase	:= DEDUP(SORT(NodDeNorm,record_id,foreclosure_id,-process_date),ALL, EXCEPT situs1_RawAID); 
+	NodBase	:= DEDUP(SORT(NodAll,record_id,foreclosure_id,-process_date),ALL, EXCEPT situs1_RawAID); 
 	
 	//Translate codes
 	code_lkp := BKForeclosure.File_BK_Foreclosure.codes_table;
