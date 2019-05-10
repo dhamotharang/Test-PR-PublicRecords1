@@ -1,4 +1,4 @@
-﻿import fcra, ut, data_services;
+﻿import fcra, ut, data_services, AlloyMedia_student_list;
 
 EXPORT key_Override_Alloy_FFID := FUNCTION
 
@@ -21,11 +21,7 @@ EXPORT key_Override_Alloy_FFID := FUNCTION
   kf := dedup (sort (ds_base, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf, dailyds, DID, replaceds);
 	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::alloy::qa::ffid
-	fields_to_clear_alloy := 'address_info_code,clean_fips_county,clean_phone_number,clean_title,clean_v_city_name,' +
-																 'gender_code,home_housing_code,home_info_time_zone,home_phone_number,intl_exchange_student_code,' +
-																 'key_code,school_address_1_primary,school_address_2_secondary,school_city,school_housing_code,' +
-																 'school_info_time_zone,school_phone_number,school_state,school_zip4,school_zip5';
-	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, fields_to_clear_alloy);
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, AlloyMedia_student_list.Constants.fields_to_clear_alloy);
 	alloy_ffid := index(replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'ffid', OPT);	
 	RETURN alloy_ffid;
 	
