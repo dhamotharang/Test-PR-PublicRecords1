@@ -35,7 +35,7 @@ end;
 
 remove_dummy_project := join(Hogan_Main,Liensv2.File_Dummy_Main,
 															left.rmsid = right.rmsid and left.tmsid = right.tmsid,
-															remove_dummy(left,right),left only,local);
+															remove_dummy(left,right),left only,lookup); //DF-24061 VC
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -61,13 +61,10 @@ Liensv2.layout_liens_main_module_for_hogan.layout_liens_main change_dummy_ver(ma
 	self.filing_date := (string)STD.Date.Today();
 	self.orig_filing_date := (string)STD.Date.Today();
 	self.orig_rmsid := '';
-	self.agency_id_src := '';
 	self := d;
 end;
 
 dummy_project := project(main_dataset,change_dummy_ver(left));
-
-
 											 
 	//Patch to Populate date_first_seen fields - Bugzilla #67215
 	ds_party 			:= liensV2.Hogan_DID;
