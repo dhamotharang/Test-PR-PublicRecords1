@@ -23,5 +23,5 @@
 		// output(#TEXT(%'deprecateList'%), named('deprecateList'));
 		
 		outfile := project(infile, transform({infile}, #EXPAND(%'deprecateList'%)));
-	
+
 ENDMACRO;

@@ -5,7 +5,7 @@ EXPORT Layout_liens_party_SSN_BIPV2 := record
 	BIPV2.IDlayouts.l_xlink_ids;
 	string50  TMSID_old;
   string50  RMSID_old;
-	unsigned4 global_sid;//DF-24061 VC
+	unsigned4 global_sid;// DF-24061 VC
   unsigned8 record_sid;	
 	string10  orig_rmsid;
 
