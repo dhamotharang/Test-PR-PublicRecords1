@@ -45,7 +45,8 @@ SHARED Spray_REO  := STD.File.SprayVariable(pServerIP,filepath_reo + fn_reo,
   TransformFile_reo := FUNCTION
 	  dsraw := dataset(dst_reo_raw,
 										          BKForeclosure.Layout_BK.REO_Raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_UPDATE'; SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_UPDATE'; 
+																			SELF.APN := REGEXREPLACE('^([~]+)|([+])',LEFT.APN,''); SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
@@ -82,9 +83,7 @@ super_all
 	:=	
 	SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Nod'/*, TRUE*/),
 		AddToSuperfile_Nod,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Reo'/*, TRUE*/),
 		AddToSuperfile_reo,
 		STD.File.FinishSuperFileTransaction()
 	);	
