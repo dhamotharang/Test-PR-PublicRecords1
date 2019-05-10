@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, iesp, DueDiligence;
+﻿IMPORT BIPv2, DueDiligence, iesp;
 
 EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal) BusnData) := FUNCTION
                                              
@@ -16,46 +16,47 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
 	
 	
   //retrieve all names associated with the fein
-  assocNames := NORMALIZE(BusnData, LEFT.namesAssocWithFein, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.Layouts.Name, UNSIGNED4 dateLastSeen},
+  assocNames := NORMALIZE(BusnData, LEFT.namesAssocWithFein, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DueDiligence.Layouts.Name flatName, DATASET(iesp.duediligenceshared.t_DDRPersonNameWithLexID) personsAssocWithFEIN, DATASET(iesp.share.t_Name) names},
                                                                         SELF.seq := LEFT.seq;
                                                                         SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
                                                                         SELF.orgID := LEFT.Busn_info.BIP_IDS.orgID.LinkID;
                                                                         SELF.seleID := LEFT.Busn_info.BIP_IDS.seleID.LinkID;
-                                                                        SELF := RIGHT;
+                                                                        SELF.did := RIGHT.did;
+                                                                        SELF.flatName := RIGHT;
+                                                                        SELF.personsAssocWithFEIN := DATASET([TRANSFORM(iesp.duediligenceshared.t_DDRPersonNameWithLexID, 
+                                                                                                                        SELF.LexID := (STRING)RIGHT.did;
+                                                                                                                        SELF.Name := iesp.ECL2ESP.SetName(RIGHT.firstName, RIGHT.middleName, RIGHT.lastName, RIGHT.suffix, DueDiligence.Constants.EMPTY);)]);
+                                                                        //TO REMOVE AFTER EVOLUTION GOES TO PROD                                                
+                                                                        SELF.names := DATASET([TRANSFORM(iesp.share.t_Name, 
+                                                                                                          SELF := iesp.ECL2ESP.SetName(RIGHT.firstName, RIGHT.middleName, RIGHT.lastName, RIGHT.suffix, DueDiligence.Constants.EMPTY);)]);
                                                                         SELF := [];));
 	
-	sortGroupAssocNames := GROUP(SORT(assocNames, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+	sortGroupAssocNames := GROUP(SORT(assocNames, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
   
   //limit the number of associated names for a given fein
-  DueDiligence.LayoutsInternalReport.BusOpInfoAssociatedNamesByFein getMaxAssociatedNamesByFein(sortGroupAssocNames sgan, INTEGER nameCount) := TRANSFORM, SKIP(nameCount > iesp.constants.DDRAttributesConst.MaxSSNAssociations)
-    SELF.name := PROJECT(sgan, TRANSFORM(iesp.share.t_Name,
-                                          SELF.first := LEFT.firstName;
-                                          SELF.middle := LEFT.middleName;
-                                          SELF.last := LEFT.lastName;
-                                          SELF.suffix := LEFT.suffix;
-                                          SELF := [];));
-    SELF := sgan;
-    SELF := [];
-  END;
-  
-  limitedNames := SORT(UNGROUP(PROJECT(sortGroupAssocNames, getMaxAssociatedNamesByFein(LEFT, COUNTER))), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+  maxAssocNames := DueDiligence.Common.GetMaxRecords(sortGroupAssocNames, iesp.constants.DDRAttributesConst.MaxSSNAssociations);
+  limitedNames := SORT(maxAssocNames, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
   
   rollNames := ROLLUP(limitedNames,
                       #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()), 
                       TRANSFORM(RECORDOF(LEFT),
-                                SELF.name := LEFT.name + RIGHT.name;
+                                SELF.personsAssocWithFEIN := LEFT.personsAssocWithFEIN + RIGHT.personsAssocWithFEIN;
+                                //TO REMOVE AFTER EVOLUTION GOES TO PROD 
+                                SELF.names := LEFT.names + RIGHT.names;
                                 SELF := LEFT));
   
   addAssociatedNames := JOIN(addAllReportingSources, rollNames,
                              #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()), 
                              TRANSFORM(RECORDOF(LEFT),
-                                                        /*  IF TIN/FEIN is EXPERIAN RESTRICTED  then use the MASKED FEIN */ 
-                                                        /*  EXPERIAN is letting us know this FEIN may be an SSN - so it must be masked
-																										    /*  Expecting online request to have the SSN_MASK of '' and take care of masking in Evolution */
-                                                        /*  Expecting API request to have the SSN_MASK of ALL, NONE, FIRST5, LAST4 or '' based on customer's setting in MBS */  
+                                        //IF TIN/FEIN is EXPERIAN RESTRICTED  then use the MASKED FEIN
+                                        //EXPERIAN is letting us know this FEIN may be an SSN - so it must be masked
+                                        //Expecting online request to have the SSN_MASK of '' and take care of masking in Evolution
+                                        //Expecting API request to have the SSN_MASK of ALL, NONE, FIRST5, LAST4 or '' based on customer's setting in MBS 
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEIN := IF(LEFT.FEINSourceContainsE5 = true, LEFT.FEIN_Masked_For_Report, LEFT.busn_info.fein);
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.FEINIsSSN := LEFT.feinIsSSN;
-                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWith := RIGHT.name;
+                                        //TO REMOVE AFTER EVOLUTION GOES TO PROD
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWith := RIGHT.names;
+                                        SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.SSNAssociatedWithFEIN := RIGHT.personsAssocWithFEIN;
                                         SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.OperatesOutOfAHomeOffice := LEFT.busIsSOHO;
                                         SELF := LEFT;),
                              LEFT OUTER);
@@ -110,28 +111,29 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
   
   
   
-  //***This section is for Operating Information  ***//
-	AddOperInformationToReport   :=  addMiscInfo;  
+  //This section is for Operating Information
+  AddOperInformationToReport := addMiscInfo;  
 
 																													
 													 
-	// ********************
-	//   DEBUGGING OUTPUTS
-	// *********************
+  // ********************
+  //   DEBUGGING OUTPUTS
+  // *********************
+  // OUTPUT(BusnData, NAMED('BusnData'));
   // OUTPUT(allReportingSources, NAMED('allReportingSources'));
-  
+
   // OUTPUT(assocNames, NAMED('assocNames'));
   // OUTPUT(sortGroupAssocNames, NAMED('sortGroupAssocNames'));
   // OUTPUT(limitedNames, NAMED('limitedNames'));
   // OUTPUT(rollNames, NAMED('rollNames'));
   // OUTPUT(addAssociatedNames, NAMED('addAssociatedNames'));
-  
+
   // OUTPUT(dbaNames, NAMED('dbaNames'));
   // OUTPUT(maxDBANames, NAMED('maxDBANames'));
   // OUTPUT(rollDBANames, NAMED('rollDBANames'));
   // OUTPUT(addDBANames, NAMED('addDBANames'));
-  
+
   // OUTPUT(addMiscInfo, NAMED('addMiscInfo'));
 
-	RETURN AddOperInformationToReport;
+  RETURN AddOperInformationToReport;
 END;
