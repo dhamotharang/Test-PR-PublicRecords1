@@ -1,0 +1,8 @@
+EXPORT Constants := MODULE
+
+	EXPORT FCRA := MODULE
+		EXPORT UNSIGNED2 MaxGongPerDID  := 100;
+		EXPORT UNSIGNED2 MaxGongRecords := 10000;
+	END;
+
+END;
