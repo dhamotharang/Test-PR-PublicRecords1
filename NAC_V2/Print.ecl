@@ -29,16 +29,10 @@ END;
 			
 Missing := '{missing}';
 
-LF := '\n';
-
-	rText	:=
-		record
-			string	TextLine{maxlength(512000)};
-	end;
-
 EXPORT Print := MODULE
 	shared dRow := RECORD
-		string		text;
+		string99		text;
+		string1			eol := '\n';
 	END;
 	
 	shared dNcrRow := RECORD
@@ -127,17 +121,6 @@ EXPORT Print := MODULE
 							& Legend;
 				return ds;
 	END;
-	
-	export string NCR2_to_Test(string lfn) := FUNCTION
-			dNcr2 := dataset(lfn, dRow, thor);
-			dRow	tText(dRow l, dRow r)	:= 
-				transform
-					self.Text	:=	trim(l.Text) + LF + trim(r.Text);
-				end;
-		toText		:=	rollup(dNcr2, true, tText(left, right));
-		return toText.Text[1];
-	END;
-		
 	
 	export	rNCD	:=
 	record
