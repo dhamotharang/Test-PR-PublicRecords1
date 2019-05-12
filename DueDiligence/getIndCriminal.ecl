@@ -158,7 +158,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 																		SELF.offenseConviction := IF(LEFT.offenseConviction = DueDiligence.Constants.Yes, LEFT.offenseConviction, RIGHT.offenseConviction);
 																		SELF.offenseTrafficRelated := MAP((LEFT.offenseTrafficRelated = DueDiligence.Constants.YES OR RIGHT.offenseTrafficRelated = DueDiligence.Constants.YES) OR
 																																			(LEFT.offenseChargeLevelReported IN [DueDiligence.Constants.TRAFFIC, 'TRAFFIC'] OR RIGHT.offenseChargeLevelReported IN [DueDiligence.Constants.TRAFFIC, 'TRAFFIC']) OR
-																																			(LEFT.offenseDDLegalEventTypeCode = DueDiligence.translateExpression.ExpressionEnum.TRAFFIC_OFFENSES OR RIGHT.offenseDDLegalEventTypeCode = DueDiligence.translateExpression.ExpressionEnum.TRAFFIC_OFFENSES) OR
+																																			(LEFT.offenseDDLegalEventTypeCode = DueDiligence.translateExpression.OffensePriority.TRAFFIC_OFFENSES OR RIGHT.offenseDDLegalEventTypeCode = DueDiligence.translateExpression.OffensePriority.TRAFFIC_OFFENSES) OR
 																																			tempCalcdLevel = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.YES,
 																																			LEFT.offenseTrafficRelated = DueDiligence.Constants.EMPTY => RIGHT.offenseTrafficRelated,
 																																			LEFT.offenseTrafficRelated);

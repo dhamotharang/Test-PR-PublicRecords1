@@ -1,4 +1,4 @@
-IMPORT	PersonReports, Gateway;
+IMPORT	Gateway;
 
 export	IParam	:=
 module
@@ -12,8 +12,7 @@ module
   end;
 
 	export	SearchRecords	:=	interface(
-		Report,
-		PersonReports.input._report // defines all basic query's parameters with defaults values defined
+		Report
 	)
 	export boolean isHomeGateway;
 		//? need to store certain clean address components (used in logging)

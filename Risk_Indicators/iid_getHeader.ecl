@@ -33,7 +33,6 @@ dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
 EnableEmergingID := (BSOptions & risk_indicators.iid_constants.BSOptions.EnableEmergingID) > 0;
 FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
-RemoveQuickHeader := (BSOptions & risk_indicators.iid_constants.BSOptions.RemoveQuickHeader) > 0;
 
 // only use this variable in realtime mode to simulate the header build date rather than todays date
 dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
@@ -170,9 +169,8 @@ j_pre_roxie := join (g_inrec, header_key,
 														(right.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(right.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
 													 right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 ( (RIGHT.dt_first_seen < left.historydate and right.dt_first_seen <> 0) 
-															or
-															(right.dt_first_seen=0 and right.dt_vendor_first_reported < left.historydate) ) and // check date, only check vendor date if first seen date = 0
+													 RIGHT.dt_first_seen < left.historydate and // check dates
+                           right.dt_vendor_first_reported < left.historydate and // check dates
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -202,9 +200,8 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														(right.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(right.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
 													 right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 ( (RIGHT.dt_first_seen < left.historydate and right.dt_first_seen <> 0) 
-															or
-															(right.dt_first_seen=0 and right.dt_vendor_first_reported < left.historydate) ) and // check date, only check vendor date if first seen date = 0
+													 RIGHT.dt_first_seen < left.historydate and // check dates
+                           right.dt_vendor_first_reported < left.historydate and // check dates
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -252,9 +249,8 @@ j_quickpre_roxie := join (g_inrec, header_quick_key,
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 ( (RIGHT.dt_first_seen < left.historydate and right.dt_first_seen <> 0) 
-															or
-															(right.dt_first_seen=0 and right.dt_vendor_first_reported < left.historydate) ) and // check date, only check vendor date if first seen date = 0
+													 RIGHT.dt_first_seen < left.historydate and // check dates
+                           right.dt_vendor_first_reported < left.historydate and // check dates
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -284,9 +280,8 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 ( (RIGHT.dt_first_seen < left.historydate and right.dt_first_seen <> 0) 
-															or
-															(right.dt_first_seen=0 and right.dt_vendor_first_reported < left.historydate) ) and // check date, only check vendor date if first seen date = 0
+													 RIGHT.dt_first_seen < left.historydate and // check dates
+                           right.dt_vendor_first_reported < left.historydate and // check dates
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -315,7 +310,7 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 	j_quickpre := j_quickpre_roxie;
 #END
 
-header_recs_combined := if(RemoveQuickHeader, j_pre, j_pre + j_quickpre);  // adding new option to be able to toggle off quick header in archive mode			   
+header_recs_combined := j_pre + j_quickpre;  
 real_header_all_roxie := group( sort( ungroup(header_recs_combined), seq ,did), seq, did);	 
 real_header_all_thor := group( sort( distribute( ungroup(header_recs_combined), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
 real_header_all := if(onThor, real_header_all_thor, real_header_all_roxie);

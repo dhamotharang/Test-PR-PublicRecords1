@@ -30,14 +30,20 @@ layout_bocashell_neutral getInfutor(bs le, InfutorCID.Key_Infutor_Phone ri) := t
 	self := le;
 end;
 
+RECORDOF(InfutorCID.Key_Infutor_Phone) xform_Infutor_phone(FCRA.Key_Override_Infutor_FFID le) := TRANSFORM
+	SELF.global_sid:=0;
+	SELF.record_sid:=0;
+	SELF := le;
+END;
+
 
 infutor_correct_roxie := join(bs, FCRA.Key_Override_Infutor_FFID,
 												keyed(right.flag_file_id in left.infutor_correct_ffid),
-												getInfutor(left, row(right,recordof(InfutorCID.Key_Infutor_Phone))),/*left outer,*/ atmost(right.flag_file_id in left.infutor_correct_ffid, 100));
+												getInfutor(left, row(right, xform_Infutor_phone(LEFT))),/*left outer,*/ atmost(right.flag_file_id in left.infutor_correct_ffid, 100));
 
 infutor_correct_thor := join(bs(infutor_correct_ffid <> []), FCRA.Key_Override_Infutor_FFID,
 												right.flag_file_id in left.infutor_correct_ffid,
-												getInfutor(left, row(right,recordof(InfutorCID.Key_Infutor_Phone))),/*left outer,*/ atmost(right.flag_file_id in left.infutor_correct_ffid, 100));
+												getInfutor(left, row(right, xform_Infutor_phone(LEFT))),/*left outer,*/ atmost(right.flag_file_id in left.infutor_correct_ffid, 100));
 
 #IF(onThor)
 	infutor_correct := infutor_correct_thor;

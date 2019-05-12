@@ -120,7 +120,30 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		Options.IncludeSocialSecurityNumber OR
 		Options.IncludeSSNAddress OR
 		Options.IncludeZipCodePerson);
-	
+
+	EXPORT DoFDCJoin_Aircraft_Files__FAA__Aircraft_did :=
+		(Options.IncludeAircraft OR
+		Options.IncludeAircraftOwner); 
+
+	EXPORT DoFDCJoin_Aircraft_Files__FAA__Aircraft_ID :=
+		(Options.IncludeAircraft OR
+		Options.IncludeAircraftOwner);   
+
+	EXPORT DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_DID :=
+		NOT Options.isFCRA AND
+		(Options.IncludeVehicle OR
+		Options.IncludePersonVehicle); 
+
+	EXPORT DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_Party :=
+		NOT Options.isFCRA AND
+		(Options.IncludeVehicle OR
+		Options.IncludePersonVehicle);  
+
+	EXPORT DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_Main :=
+		NOT Options.isFCRA AND
+		(Options.IncludeVehicle OR
+		Options.IncludePersonVehicle); 
+
 	EXPORT DoFDCJoin_Tradeline_Files__Tradeline__Key_LinkIds := 
 		NOT Options.isFCRA AND 
 		(Options.IncludeTradeline or 
@@ -129,7 +152,6 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 	EXPORT DoFDCJoin_Business_Files__Business__Key_BH_Linking_Ids :=
 		NOT Options.isFCRA AND
 		 (Options.IncludeBusiness or
-		 Options.IncludeTradelineBusiness);
+		 Options.IncludeTradelineBusiness);  
 
-	
 END;

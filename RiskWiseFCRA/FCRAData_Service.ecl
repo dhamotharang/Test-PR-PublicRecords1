@@ -1079,7 +1079,9 @@ infutor_deduped := dedup(sort(infutor_main,record),all);
 
 infutor_recs1 := infutor_deduped + PROJECT( infutor_corr,
 												transform( Layout_Infutor,
-													self := LEFT
+													SELF.global_sid:=0;
+													SELF.record_sid:=0;
+													SELF := LEFT
 												  ) );
 
 infutor_recs := sort(infutor_recs1 , -dt_last_seen, -dt_first_seen);									

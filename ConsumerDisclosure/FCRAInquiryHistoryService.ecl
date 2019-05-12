@@ -1,5 +1,6 @@
 ﻿IMPORT iesp, doxie, InquiryHistory, STD, WSInput;
 
+/*--INFO-- This service returns all inquiries for a single LexID.*/
 EXPORT FCRAInquiryHistoryService() := FUNCTION
 
   isFCRA := TRUE;

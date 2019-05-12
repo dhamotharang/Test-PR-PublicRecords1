@@ -13,10 +13,12 @@ String neutralroxie_IP := RiskWise.shortcuts.staging_neutral_roxieIP;
 String roxieIP := Riskwise.shortcuts.staging_fcra_roxieIP ;
 
 // dt := ut.GetDate;
-tag:='~foreign::' + '10.173.44.105' + '::';
-nonfcra_bs_out_file_curr := tag + 'scoringqa::out::nonfcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
-fcra_bs_out_file_curr := tag + 'scoringqa::out::fcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
+// tag:='~foreign::' + '10.173.44.105' + '::';
+// nonfcra_bs_out_file_curr := tag + 'scoringqa::out::nonfcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
+// fcra_bs_out_file_curr := tag + 'scoringqa::out::fcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
 
+nonfcra_bs_out_file_curr := '~scoringqa::out::nonfcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
+fcra_bs_out_file_curr := '~scoringqa::out::fcra::bocashell_41_historydate_999999_prod_' + dt + '_1';
 
 nonfcra_runway_out_file_curr := '~Scoring_Project::out::nonfcra_runway_file_out_' + dt + '_1';
 fcra_runway_out_file_curr := '~Scoring_Project::out::fcra_runway_file_out_' + dt + '_1';

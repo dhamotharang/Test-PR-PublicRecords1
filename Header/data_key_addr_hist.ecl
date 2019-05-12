@@ -1,6 +1,8 @@
-import data_services,doxie, dx_Header;
+import data_services, doxie, dx_Header;
 
-export data_key_addr_hist(boolean isFCRA=false) := function
+export data_key_addr_hist(unsigned1 data_class = data_services.data_env.iNonFCRA) := function
+
+boolean isFCRA := data_class = data_services.data_env.iFCRA;
 
 ds:=header.proc_address_hist(isFCRA);
 

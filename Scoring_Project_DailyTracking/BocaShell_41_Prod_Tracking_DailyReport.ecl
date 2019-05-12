@@ -6,7 +6,8 @@ import std, Scoring_Project, ashirey,Scoring_Project_Macros;
 dt := ut.getdate;
 decimal19_2 thresh := 1.25;
 
-tag:='~foreign::' + '10.173.44.105' + '::';
+// tag:='~foreign::' + '10.173.44.105' + '::';
+tag:='~';
 // Layout3 := zz_bbraaten2.Boca_41_Non_Cert_lay_new;   //NonFCRA
 
 
