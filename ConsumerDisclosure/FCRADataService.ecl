@@ -7,7 +7,7 @@
   <part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
 </message>
 */
-
+/*--INFO-- This service returns all available data (raw) for a single LexID.*/
 EXPORT FCRADataService :=
 MACRO
   IMPORT doxie,ConsumerDisclosure,iesp,STD,WSInput;

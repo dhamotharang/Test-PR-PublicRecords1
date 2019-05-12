@@ -80,6 +80,16 @@ EXPORT Functions := MODULE
             LEFT.DID = (unsigned) right.LexID,
             TRANSFORM (FFD.Layouts.PersonContextBatch,
                        SELF.acctno := LEFT.acctno, 
+                       // BK main records in person context populated as either:
+                       // (deprecated) RecID1(tmsid)+RecID2(court_code)+RecID3(case_number) 
+                       // or (current) RecID1 = court_code; RecID2 = case_number
+                       // Here, we convert them all to (current) so we can handle them all the same way everywhere else.
+                       is_bk_main_exception := RIGHT.Datagroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN AND 
+                        RIGHT.RecID1[1..2] = 'BK' AND RIGHT.RecID2 <> '' AND RIGHT.RecID3 <> '';
+                       SELF.RecID1 := IF(is_bk_main_exception, RIGHT.RecID2, RIGHT.RecID1);
+                       SELF.RecID2 := IF(is_bk_main_exception, RIGHT.RecID3, RIGHT.RecID2);
+                       SELF.RecID3 := IF(is_bk_main_exception, '', RIGHT.RecID3);
+                       SELF.RecID4 := IF(is_bk_main_exception, '', RIGHT.RecID4);
                        SELF := RIGHT)); 
                        
   recs_filt := recs_all(~apply_group_filter OR datagroup in data_group_set);    

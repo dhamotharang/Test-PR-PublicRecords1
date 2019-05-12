@@ -1,13 +1,24 @@
-﻿IMPORT BankruptcyV3, Doxie, Doxie_Files, Header_Quick, BIPV2, Cortera_Tradeline, MDR, Header;
+﻿IMPORT BankruptcyV3, BIPV2, Cortera_Tradeline, Doxie, Doxie_Files, FAA, Header, Header_Quick, MDR, VehicleV2;
 
 EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input,
 									PublicRecords_KEL.Interface_Options Options,
 									DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) BusinessInput = DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII)
 									) := FUNCTION
+/* 
+    The following data sources are represented in the Federated Data Composite (FDC) below:
+      -  Consumer Header
+      -  Criminal Records
+      -  Bankruptcy
+      -  Aircraft
+      -  Vehicle
+      -  Business Header
+      -  Tradeline (Cortera)
+*/
 
 	Layouts_FDC     := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 	Common          := PublicRecords_KEL.ECL_Functions.Common(Options);
 	CFG_File        := PublicRecords_KEL.CFG_Compile;
+	Regulated       := TRUE;
 	NotRegulated    := FALSE;
 	BlankString     := '';
 	SetDPMBitmap    := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.SetValue;
@@ -39,6 +50,12 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 						SELF := []), FULL OUTER );
 	Input_FDC_Filtered := Input_FDC((LexIDBusExtendedFamilyAppend > 0 and LexIDBusLegalFamilyAppend > 0 and LexIDBusLegalEntityAppend > 0) or LexIDAppend > 0);	
 		
+
+	/* **************************************************************************
+			
+																CONSUMER SECTION
+
+	************************************************************************** */
 
 	// Doxie.Key_FCRA_Header/Doxie.Key_Header. FCRA/NonFCRA have the same layout.
 	Doxie__Key_Header := IF(Options.IsFCRA, Doxie.Key_FCRA_Header, Doxie.Key_Header);
@@ -226,7 +243,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 						SELF := LEFT,
 						SELF := []));		
 						
-
 	// --------------------[ Bankruptcy records ]--------------------
 	
 	// BankruptcyV3.key_bankruptcyV3_did has a parameter to say if FCRA or nonFCRA - same file layout
@@ -280,7 +296,113 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 						SELF := LEFT,
 						SELF := []));	
 
-/*************************************************Business Header ******************************************************/
+	// --------------------[ Aircraft records ]--------------------
+
+	// FAA.key_aircraft_did has a parameter to say if FCRA or nonFCRA - same file layout
+	Key_Aircraft_did_Records := IF( Common.DoFDCJoin_Aircraft_Files__FAA__Aircraft_did, 
+			JOIN(Input_FDC_Filtered, FAA.key_aircraft_did(Options.isFCRA),
+				KEYED(LEFT.LexIDAppend = RIGHT.did),
+				TRANSFORM(Layouts_FDC.Layout_FAA__key_aircraft_did,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF := RIGHT, 
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_FAA__key_aircraft_did));
+
+	// FAA.key_aircraft_id has a parameter to say if FCRA or nonFCRA - same file layout		
+	Key_Aircraft_ID_Records := IF( Common.DoFDCJoin_Aircraft_Files__FAA__Aircraft_ID,
+		JOIN(Key_Aircraft_did_Records, FAA.key_aircraft_id(Options.isFCRA),
+				KEYED(LEFT.aircraft_id != 0 AND 
+				LEFT.aircraft_id = RIGHT.aircraft_id),
+				TRANSFORM(Layouts_FDC.Layout_FAA__key_aircraft_id,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.Src := MDR.sourceTools.src_Aircrafts,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_Aircrafts, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_FAA__key_aircraft_id));
+
+	With_Aircraft_ID_Records := DENORMALIZE(With_Bankruptcy, Key_Aircraft_ID_Records,
+      LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexIDAppend = RIGHT.LexIDAppend, GROUP,
+      TRANSFORM(Layouts_FDC.Layout_FDC,
+          SELF.Dataset_FAA__Key_Aircraft_IDs := ROWS(RIGHT),
+          SELF := LEFT,
+          SELF := []));	
+
+	// --------------------[ Vehicle records ]--------------------
+
+	Key_Vehicle_did_Records := IF( Common.DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_DID, 
+			JOIN(Input_FDC_Filtered, VehicleV2.Key_Vehicle_DID,
+				KEYED(LEFT.LexIDAppend = RIGHT.append_did),
+				TRANSFORM(Layouts_FDC.Layout_VehicleV2__Key_Vehicle_DID,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF := RIGHT, 
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_VehicleV2__Key_Vehicle_DID));
+
+	Key_Vehicle_Party_Records := IF( Common.DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_Party,
+		JOIN(Key_Vehicle_did_Records, VehicleV2.Key_Vehicle_Party_Key,
+        KEYED(LEFT.vehicle_key = RIGHT.vehicle_key AND 
+          LEFT.iteration_key = RIGHT.iteration_key AND
+          LEFT.sequence_key = RIGHT.sequence_key),
+				TRANSFORM(Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Party_Key,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.Src := RIGHT.source_code,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.source_code, FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := Regulated, DPPA_State := RIGHT.orig_state, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Party_Key));
+
+	Key_Vehicle_Main_Records := IF( Common.DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_Main,
+		JOIN(Key_Vehicle_did_Records, VehicleV2.Key_Vehicle_Main_Key,
+        KEYED(LEFT.vehicle_key = RIGHT.vehicle_key AND 
+          LEFT.iteration_key = RIGHT.iteration_key) AND
+          RIGHT.orig_vin != '',
+				TRANSFORM(Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Main_Key,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.cleaned_brand_date_1 := (STRING)PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(RIGHT.brand_date_1)[1].result;
+					SELF.cleaned_brand_date_2 := (STRING)PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(RIGHT.brand_date_2)[1].result;
+					SELF.cleaned_brand_date_3 := (STRING)PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(RIGHT.brand_date_3)[1].result;
+					SELF.cleaned_brand_date_4 := (STRING)PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(RIGHT.brand_date_4)[1].result;
+					SELF.cleaned_brand_date_5 := (STRING)PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(RIGHT.brand_date_5)[1].result;
+					SELF.Src := RIGHT.source_code,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.source_code, FCRA_Restricted := FALSE, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := Regulated, DPPA_State := RIGHT.state_origin, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Main_Key));
+  
+	With_Vehicle_Party_Records := DENORMALIZE(With_Aircraft_ID_Records, Key_Vehicle_Party_Records,
+      LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexIDAppend = RIGHT.LexIDAppend, GROUP,
+      TRANSFORM(Layouts_FDC.Layout_FDC,
+          SELF.Dataset_VehicleV2__Key_Vehicle_Party_Key := ROWS(RIGHT),
+          SELF := LEFT,
+          SELF := []));	
+
+	With_Vehicle_Main_Records := DENORMALIZE(With_Vehicle_Party_Records, Key_Vehicle_Main_Records,
+      LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexIDAppend = RIGHT.LexIDAppend, GROUP,
+      TRANSFORM(Layouts_FDC.Layout_FDC,
+          SELF.Dataset_VehicleV2__Key_Vehicle_Main_Key := ROWS(RIGHT),
+          SELF := LEFT,
+          SELF := []));	
+  
+  
+	/* **************************************************************************
+			
+																BUSINESS SECTION
+
+	************************************************************************** */
+  
+	// --------------------[ Business Header records ]--------------------
+  
 	Business_Header_Key_Linking := if(Common.DoFDCJoin_Business_Files__Business__Key_BH_Linking_Ids,
 		Join(Input_FDC_Filtered, BIPV2.Key_BH_Linking_Ids.key,
 				KEYED(
@@ -298,7 +420,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Business_Header_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_BIPV2__Key_BH_Linking_Ids));
 		
-	With_Business_Header_Key_Linking := DENORMALIZE(With_Bankruptcy, Business_Header_Key_Linking,
+	With_Business_Header_Key_Linking := DENORMALIZE(With_Vehicle_Main_Records, Business_Header_Key_Linking,
 			LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend AND 
 			LEFT.LexIDBusExtendedFamilyAppend = RIGHT.LexIDBusExtendedFamilyAppend AND 
 			LEFT.LexIDBusLegalFamilyAppend = RIGHT.LexIDBusLegalFamilyAppend AND 
@@ -308,7 +430,8 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF := LEFT,
 					SELF := []));
 
-/*************************************************Tradeline ******************************************************/
+	// --------------------[ Tradeline records ]--------------------
+  
 	Tradeline_Key_LinkIds := if(Common.DoFDCJoin_Tradeline_Files__Tradeline__Key_LinkIds,
 		Join(Input_FDC_Filtered, Cortera_Tradeline.Key_LinkIds.Key,
 				KEYED(
@@ -335,8 +458,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF.Dataset_Cortera_Tradeline__Key_LinkIds := ROWS(RIGHT),
 					SELF := LEFT,
 					SELF := []));
-
+          
 	RETURN With_Tradeline_Key_LinkIds;
-
 
 END;

@@ -27,7 +27,7 @@ export t_SocioIndicatorsUDF := record
 end;
 		
 export t_SocioIndicatorsMember := record
-	string10 MemberID {xpath('MemberID')};
+	string50 MemberID {xpath('MemberID')};
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
 	iesp.share.t_Date DOB {xpath('DOB')};

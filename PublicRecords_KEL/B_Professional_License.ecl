@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Professional_License,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Professional_License(__in,__cfg).__Result) __E_Professional_License := E_Professional_License(__in,__cfg).__Result;
-  SHARED __EE485714 := __E_Professional_License;
-  EXPORT __ST30149_Layout := RECORD
+  SHARED __EE787084 := __E_Professional_License;
+  EXPORT __ST47223_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -16,16 +16,15 @@ EXPORT B_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     KEL.typ.ndataset(E_Professional_License(__in,__cfg).License_Dates_Layout) License_Dates_;
     KEL.typ.ndataset(E_Professional_License(__in,__cfg).Status_Layout) Status_;
     KEL.typ.ndataset(E_Professional_License(__in,__cfg).License_Description_Layout) License_Description_;
-    KEL.typ.ndataset(E_Professional_License(__in,__cfg).Mortgage_Licensing_System_Layout) Mortgage_Licensing_System_;
     KEL.typ.ndataset(E_Professional_License(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST30149_Layout __ND485970__Project(E_Professional_License(__in,__cfg).Layout __PP485530) := TRANSFORM
+  SHARED __ST47223_Layout __ND787268__Project(E_Professional_License(__in,__cfg).Layout __PP786927) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP485530;
+    SELF := __PP786927;
   END;
-  EXPORT __ENH_Professional_License := PROJECT(__EE485714,__ND485970__Project(LEFT));
+  EXPORT __ENH_Professional_License := PROJECT(__EE787084,__ND787268__Project(LEFT));
 END;

@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FFD, FCRA, ConsumerDisclosure, eMerges;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FFD, FCRA, ConsumerDisclosure, eMerges;
 
 layout_HuntFish_raw := RECORD(emerges.layout_hunters_out)
     UNSIGNED6 rid;

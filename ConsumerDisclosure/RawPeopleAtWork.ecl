@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, PAW, ConsumerDisclosure;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, PAW, ConsumerDisclosure;
 
 layout_PAW_raw := PAW.Layout.Employment_Out;  // recordof(PAW.Key_DID_FCRA)
 

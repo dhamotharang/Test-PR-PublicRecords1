@@ -1,4 +1,4 @@
-export layoutCanadianWhitepagesBase := 
+﻿﻿export layoutCanadianWhitepagesBase := 
 
  RECORD
   string8 Date_first_reported;
@@ -98,5 +98,14 @@ export layoutCanadianWhitepagesBase :=
 	string9  Postal_Mode;
 	string9  Postal_Bag_Bundle;	
 	string1  Transaction_Code;
-  string1  listing_type;
+    string1  listing_type;
+	string5  name_title := '';
+	string20 fname := '';
+	string20 mname := '';
+	string20 lname := '';
+	string5  name_suffix := '';
+	string3  name_score := '';
+	//Added for CCPA-88
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 END;

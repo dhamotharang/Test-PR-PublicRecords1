@@ -17,4 +17,6 @@ EXPORT Constants := MODULE
 	EXPORT DEFAULT_OFAC_VERSION := 2; // Change to "4" after MBS sweep.
   
 	EXPORT MAX_OFAC_VERSION := 4;
+	
+	EXPORT SET_TARGUS_SERVICENAMES := ['targus','targuse3220'];
 END;

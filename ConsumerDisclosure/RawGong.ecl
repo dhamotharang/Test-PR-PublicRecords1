@@ -1,4 +1,10 @@
-﻿IMPORT ConsumerDisclosure, doxie, Gong, FCRA, FFD;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT ConsumerDisclosure, doxie, Gong, FCRA, FFD;
 
 layout_Gong_raw := RECORD //RECORDOF(Gong.key_fcra_history_did)
     FCRA.Layout_Override_Gong -[flag_file_id];
