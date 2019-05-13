@@ -21,8 +21,8 @@
  </message>
 */
 /*--INFO-- Migrating fac1 and fac2 to boca.  */
-import address, AutoStandardI, Risk_Indicators, ut, suppress, AutoStandardI, didville,
-			 seed_files, gateway, Death_Master;
+import AutoStandardI, Risk_Indicators, ut, suppress, didville,
+			 seed_files, gateway, Death_Master, dx_header;
 
 export RiskWiseMainFA2O := MACRO
 
@@ -322,13 +322,14 @@ got_SSNDeath := join (got_SSNTable, deathSSNKey,
 
 //*********************************End changes
 
-xlayout get_wildcard_DID(xlayout le, doxie.key_header_wild_SSN rt) := transform
+index_wild_ssn := dx_header.key_wild_SSN();
+xlayout get_wildcard_DID(xlayout le, index_wild_ssn rt) := transform
 	self.did := if(le.did=0 and le.in_socs!='', rt.did, le.did);
 	self := le;
 end;
 
 // if for some reason we don't have a DID by this point and there was a social on input, use the wildcard ssn key for allegis
-allDIDs := join(got_SSNDeath, doxie.Key_Header_Wild_SSN, left.did=0 and left.in_socs!='' and
+allDIDs := join(got_SSNDeath, index_wild_ssn, left.did=0 and left.in_socs!='' and
 						 keyed(right.s1=left.in_socs[1]) and keyed(right.s2=left.in_socs[2]) and keyed(right.s3=left.in_socs[3]) and 
 						 keyed(right.s4=left.in_socs[4]) and keyed(right.s5=left.in_socs[5]) and keyed(right.s6=left.in_socs[6]) and 
 						 keyed(right.s7=left.in_socs[7]) and keyed(right.s8=left.in_socs[8]) and keyed(right.s9=left.in_socs[9]), 

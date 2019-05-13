@@ -1,5 +1,5 @@
-import ut,autokey, doxie, NID;
-i := doxie.Key_Header_StFnameLname;
+import doxie, dx_header, NID;
+i := dx_header.key_StFnameLname();
 
 doxie.layout_references xt(i r) := TRANSFORM
                                         SELF := r;
