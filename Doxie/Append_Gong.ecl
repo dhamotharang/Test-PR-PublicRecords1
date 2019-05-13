@@ -1,4 +1,4 @@
-import gong, Did_add, suppress, ut, risk_indicators, moxie_phonesplus_server, iesp, doxie, STD, address;
+import gong, dx_header, Did_add, suppress, ut, risk_indicators, moxie_phonesplus_server, iesp, doxie, STD, address;
 import lib_datalib, NID; // to be able to call a macro in a JOIN condition
 
 todays_date := (string) STD.Date.Today();
@@ -42,12 +42,13 @@ RECORD
 	boolean is_relat;
 END;
 
-layout_hhidmatch take_hhid(doxie.key_did_hdid le) := transform
+index_did_hdid := dx_header.key_did_hhid();
+layout_hhidmatch take_hhid(index_did_hdid le) := transform
   self.hhid := le.hhid_relat;
 	SELF.did2return2 := le.did;
 	SELF.is_relat := true;
 end;  
-rels2match_hhid := join(rels2match,doxie.key_did_hdid,
+rels2match_hhid := join(rels2match,index_did_hdid,
                         keyed (left.did=right.did) and 
                         keyed (right.ver = 1),
                         take_hhid(right), atmost (ut.limits.HHID_PER_PERSON), left outer);

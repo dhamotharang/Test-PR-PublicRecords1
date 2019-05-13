@@ -1,4 +1,4 @@
-import dnb, codes, business_header, doxie, ut;;
+﻿import dnb, codes, business_header, doxie, ut;;
 doxie_cbrs.mac_Selection_Declare()
 
 export DNB_records(dataset(doxie_cbrs.layout_references) in_bdids) := FUNCTION
@@ -49,7 +49,7 @@ k := dnb.key_DNB_DunsNum;
 
 layout_dnb :=
 RECORD
-	DNB.Layout_DNB_Base;
+	DNB.Layout_DNB_Base -[global_sid, record_sid]; //RR-15382 Suppressing CCPA fields in Doxie_cbrs.Business_Report_Service_Raw output
 	// unsigned1 zipMatch;
 	// unsigned1 addrMatch;
 	// unsigned1 coMatch; 

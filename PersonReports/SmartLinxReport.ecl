@@ -1,6 +1,6 @@
 // Simplified version of compreport, no distributed call to central records, no hash, no versioning of single sources, non-FCRA
 IMPORT $, Foreclosure_Services, PersonReports, doxie, doxie_crs, ATF_Services, iesp, 
-      AutoStandardI, ut, American_Student_Services,  
+      AutoStandardI, ut, American_Student_Services, dx_header, 
 			SmartRollup, FCRA, LN_PropertyV2_Services;
 iespOut := iesp.smartlinxreport;			
 out_rec := record(iespOut.t_SmartlinxReportIndividual)
@@ -13,6 +13,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 
   //this will be gone after all interfaces extend IDataAccess
   old_param := $.IParam.ConvertToOldSmartLinx(param);
+  mod_smartlinx := param;
 
   globals := AutoStandardI.GlobalModule();
   subject_did := dids[1].did; // DID should be atmost one (do we keep layout_references for legacy reasons?)
@@ -72,7 +73,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	end;
 	subject_addrs_plus := project(subject_addrs_rolled, fillPlus(left,counter));
 	
-	subject_addrs_hhid := join(subject_addrs_plus,doxie.Key_Did_HDid, 
+	subject_addrs_hhid := join(subject_addrs_plus,dx_header.key_did_hhid(),
                   keyed((integer)left.did = right.did), 
                   transform(tnt_rec, self.hhid := right.hhid_relat, self := left), left outer, atmost(ut.limits.HHID_PER_PERSON));
 	
@@ -325,7 +326,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   //INDIVIDUALS  relatives, neighbors are assigned above  
 
   //BUSINESS
-     pawRaw     := IF (param.include_peopleatwork, PersonReports.peopleatwork_records (dids,module (project (old_param, $.input.peopleatwork, opt))end, IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
+     pawRaw     := IF (param.include_peopleatwork, PersonReports.peopleatwork_records (dids,module (project (mod_smartlinx, $.IParam.peopleatwork, opt))end, IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
 		 pawMod     := SmartRollup.smart_paw(pawRaw);
 		 pawNonExec := SmartRollup.fn_smart_rollup_paw(pawMod.paw_nonExec);  //non-executives ONLY rolled up
 		 pawNonExec_count := count(pawNonExec);

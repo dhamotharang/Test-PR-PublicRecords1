@@ -64,9 +64,9 @@ pre_dobs_in_range := join(normed,gwl_key,keyed(left.pty_key=right.pty_key),
 											
 dobs_in_range := pre_dobs_in_range(pty_key<>'');
 											
-duped_dobs_in_range :=dedup(sort(dobs_in_range,acctno),acctno);	
+duped_dobs_in_range :=dedup(sort(dobs_in_range,acctno,pty_key),acctno, pty_key);	
 
-dob_normed := group(sort(join(normed,duped_dobs_in_range,left.acctno=right.acctno,transform(recordof(normed),self:=left) ,atmost(1)),acctno),acctno);
+dob_normed := group(sort(join(normed,duped_dobs_in_range,left.acctno=right.acctno and left.pty_key=right.pty_key,transform(recordof(normed),self:=left) ,atmost(1)),acctno),acctno);
 
 normed_Use := if(dob_radius=-1, normed,dob_normed);
 

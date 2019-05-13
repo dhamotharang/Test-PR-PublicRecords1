@@ -2,7 +2,7 @@
 RR-10931: checking in since QA testing-  for FCRA to use score >= 80
 */
 
-import didville, risk_indicators, doxie, suppress, watchdog, address,gateway, riskwise, autokey, header_quick;
+import didville, risk_indicators, doxie, suppress, gateway, riskwise, autokey, header_quick, dx_header;
 
 // this function will take the input data, append the DID and do all default values in layout output
 export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsigned1 dppa, unsigned1 glb, 
@@ -74,7 +74,7 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 			self.new_did_from_rid := 0; // to be set later if public_records didn't get a hit
 			self := left), atmost(riskwise.max_atmost), keep(1), left outer);
 
-	with_new_did := join(with_public_records_flag, doxie.Key_Did_Rid,
+	with_new_did := join(with_public_records_flag, dx_header.key_did_rid(),
 		left.did<>0 and ~left.public_records_hit and
 		keyed(left.did=right.rid), // search for incoming did in the RID list to xreff to new did.
 		transform(didResolveRec,
@@ -250,7 +250,7 @@ export iid_getDID_prepOutput(DATASET(risk_indicators.layout_input) indata, unsig
 	end;
 		
 	//Only search records that don't have a DID and have an input SSN
-	wildcard_dids := join(got_DIDbySSN_t1(ssn <> '' and DID=0), doxie.Key_Header_Wild_SSN,
+	wildcard_dids := join(got_DIDbySSN_t1(ssn <> '' and DID=0), dx_header.key_wild_SSN(),
 		keyed(right.s1=left.ssn[1]) and
 		keyed(right.s2=left.ssn[2]) and
 		keyed(right.s3=left.ssn[3]) and

@@ -1,4 +1,5 @@
-﻿import Address,Autokey_batch,BatchServices,doxie,gong,mdr,POE,PSS,risk_indicators,ut,Yellowpages, PAW_Services, paw, spoke, zoom, corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, std, DCA, doxie_cbrs, Prof_LicenseV2;
+﻿import Address, Autokey_batch, BatchServices, doxie, gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom, 
+       corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD;
 
 // NOTE: Within this module certain BatchServices.Workplace_* attributes are used.
 //       This is because the BatchServices.WorkPlace_BatchService was created first, 
@@ -599,7 +600,7 @@ export Functions := module
 		RETURN  isNonPersonalEmail;
 	END;	// end of checkNonPersonalEmail function 
 	
-	EXPORT	getDetailedWithEmail(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus)	ds_recs_in)	:= FUNCTION
+	EXPORT	getDetailedWithEmail(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus)	ds_recs_in, doxie.IDataAccess mod_access)	:= FUNCTION
 		
 		ds_recs_spoke     	:= ds_recs_in(MDR.sourceTools.SourceIsSpoke(source));
 		ds_recs_zoom    	  := ds_recs_in(MDR.sourceTools.SourceIsZoom(source));
@@ -624,7 +625,6 @@ export Functions := module
 																					
 		ds_detail_spoke := JOIN(ds_recs_spoke,spoke.keys().did.qa,
                             KEYED(LEFT.did = RIGHT.did) AND 
-														 MDR.sourceTools.SourceIsSpoke(LEFT.source) AND
 													  // Match on additional field in case multiple recs for the did
 													  LEFT.dt_last_seen = RIGHT.dt_last_seen,
 	                        TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
@@ -716,21 +716,30 @@ export Functions := module
 													   LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 
 	// Get the detailed data from the One_Click key did file.
-	ds_detail_oneclick := JOIN(ds_recs_oneclick,one_click_data.keys().did.qa,
+	ds_detail_oneclick_all := JOIN(ds_recs_oneclick,one_click_data.keys().did.qa,
                                KEYED(LEFT.did = RIGHT.did) AND 
 														   // match on additional field in case multiple recs for the did
 															 LEFT.dt_last_seen = RIGHT.dt_last_seen,
 	                           TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
 														   // fields from oneclick did key file, see oneclick_data.layouts.keybuild
-															 
 															 temp_email1 				 := IF(checkNonPersonalEmail(RIGHT.rawfields.EmailAddress),RIGHT.rawfields.EmailAddress,'');
                                SELF.email1 				 := temp_email1,
                                SELF.email_src1     := IF(temp_email1 <>'',LEFT.SOURCE,''),
+                               SELF.global_sid     := RIGHT.global_sid,
+                               SELF.record_sid     := RIGHT.record_sid,
 											         // rest of the fields from the LEFT (POE did key) converting some
-                               SELF                := LEFT), 
+                               SELF                := LEFT),
 														 LEFT OUTER, // keep rec from LEFT IF no match to RIGHT
 														 KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 														 LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
+
+  ds_detail_oneclick_suppressed := Suppress.MAC_FlagSuppressedSource(ds_detail_oneclick_all, mod_access); 
+  ds_detail_oneclick := PROJECT(ds_detail_oneclick_suppressed,
+    TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+       SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
+       SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);
+       SELF := LEFT;
+    ));
 
 	// Get the detailed data from the Sales Channel key did file.
 	ds_detail_saleschannel := JOIN(ds_recs_saleschannel, SalesChannel.keys().did.qa, 
@@ -781,7 +790,7 @@ export Functions := module
 									 + ds_detail_saleschannel
 									 + ds_detail_thrive
 									 + ds_detail_others;
-	
+
   ds_email_data := JOIN(ds_detail_all,Email_Data.Key_Did,
                            KEYED(LEFT.did = RIGHT.did),
 	                       TRANSFORM(BatchServices.WorkPlace_Layouts.email,
@@ -791,14 +800,19 @@ export Functions := module
 													 temp_email:= IF(RIGHT.clean_email <>'' AND checkNonPersonalEmail(RIGHT.clean_email), RIGHT.clean_email, '');
                            SELF.clean_email    := IF(temp_email<>'',temp_email, SKIP);
 													 SELF.email_src 		 := IF(temp_email<>'', RIGHT.email_src, ''),
-													 SELF.date_last_seen := IF(temp_email<>'',RIGHT.date_last_seen,'')),
+													 SELF.date_last_seen := IF(temp_email<>'',RIGHT.date_last_seen,''),
+                           SELF.global_sid     := 0; // TODO: when available -> IF(temp_email<>'',RIGHT.global_sid, 0),
+		                       SELF.record_sid     := 0; // TODO: when available -> IF(temp_email<>'',RIGHT.record_sid, 0)
+                           ),
 												 inner, // only ones in LEFT & RIGHT
 												 LIMIT(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
+
+  ds_email_data_suppressed := Suppress.MAC_SuppressSource(ds_email_data, mod_access);  
 
   // 		  First sort & dedup by did & email address to use only unique emails for each did.
 	//      Then reseort by did & descending date-last-seen AND then
 	//      dedup by did to keep the (up to) 3 most current recs.
-  ds_email_deduped := DEDUP(SORT(DEDUP(SORT(ds_email_data,
+  ds_email_deduped := DEDUP(SORT(DEDUP(SORT(ds_email_data_suppressed,
 	                                          did,clean_email,-date_last_seen,record),
 	                                     did,clean_email),
 	                               did,-date_last_seen,record),
@@ -826,7 +840,7 @@ export Functions := module
 	//      preferring any emails from the individual source detail files which are 
 	//      in the LEFT DATASET.
 	
-	uc(string x) := StringLib.StringToUpperCase(x);
+	uc(string x) := STD.Str.ToUpperCase(x);
 	
 	ds_detail_wemail := JOIN(ds_detail_all, ds_email_combined,
                             LEFT.did = (UNSIGNED6)RIGHT.did,
@@ -870,8 +884,9 @@ export Functions := module
                               SELF        := LEFT), 
 												    LEFT OUTER,  // keep all the recs from the LEFT ds
 													  ATMOST(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
-
-
+    
+    doxie.compliance.logSoldToSources (ds_detail_oneclick_suppressed(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_email_data_suppressed, mod_access);
 	  RETURN ds_detail_wemail;
   END; // end of getDetailedWithEmail function 
 	
@@ -1013,7 +1028,7 @@ export Functions := module
 		RETURN ds_detail_wpar_corpstat;
 	END;	// end of getParentCompany function
 	
-	EXPORT getProfLicInfo(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus) ds_recs_in):= FUNCTION
+	EXPORT getProfLicInfo(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus) ds_recs_in, doxie.IDataAccess mod_access):= FUNCTION
 		
 	// First get all the prof lic recs (if any exist) for each did.
 	ds_prolic_data := JOIN(ds_recs_in, Prof_LicenseV2.Key_Proflic_Did(),
@@ -1031,8 +1046,11 @@ export Functions := module
   //      Then dedup by the dt_last_seen to identify the most current record.
   ds_prolic_deduped := DEDUP(SORT(ds_prolic_data,did,-date_last_seen),did);
 
-	// 		 Finally JOIN the ds of detail recs to the deduped pl data recs.
-	ds_detail_wprolic := JOIN(ds_recs_in,ds_prolic_deduped ,
+  // CCPA suppression
+  ds_prolic_suppressed := suppress.MAC_SuppressSource (ds_prolic_deduped, mod_access);
+	
+  // 		 Finally JOIN the ds of detail recs to the deduped pl data recs.
+	ds_detail_wprolic := JOIN(ds_recs_in, ds_prolic_suppressed,
                             (STRING12)LEFT.did = RIGHT.did,
 	                          TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
 															// take 2 prof lic fields in output layout from RIGHT
@@ -1042,6 +1060,8 @@ export Functions := module
                               SELF                     := LEFT), 
 												    LEFT OUTER,  // keep all the recs from the LEFT ds
 													  ATMOST(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
+
+    doxie.compliance.logSoldToSources (ds_detail_wprolic, mod_access); 
 		RETURN ds_detail_wprolic;
 	END;	// end of getProfLicInfo function
 	

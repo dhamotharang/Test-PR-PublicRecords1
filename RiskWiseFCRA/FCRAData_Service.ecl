@@ -30,9 +30,9 @@
 </message>
 */
 /*--INFO-- Returns FCRA compliant data for a given person. <br/>*/
-IMPORT Risk_Indicators, RiskWise, doxie, doxie_files, FCRA, drivers, mdr, ut, targus,
-       avm_v2, american_student_list, gong, codes, impulse_email, infutorCID, email_data,
-       Advo, inquiry_AccLogs, header_quick, address, did_add, AlloyMedia_student_list;
+IMPORT Risk_Indicators, RiskWise, doxie, FCRA, mdr, ut, avm_v2, american_student_list, 
+  gong, codes, impulse_email, infutorCID, email_data, Advo, inquiry_AccLogs, header_quick, 
+  address, did_add, AlloyMedia_student_list, STD;
 
 export FCRAData_service := MACRO
 
@@ -71,7 +71,7 @@ boolean isVRU := NOT alpha_numeric;
 unsigned6 did_value := 0 : stored('DID'); //if we have did, no did-search is required, not currently in use
 
 // Numeric input
-string12  ssn_val    := '' : stored ('socs');
+string12 ssn_val     := '' : stored ('socs');
 string2  yob_val     := '' : stored ('yob');
 string5  hnumber_val := '' : stored ('housenum');
 string10 phone_val   := '' : stored ('hphone');
@@ -188,8 +188,8 @@ corr_recs := PROJECT (corr_latest, GetCorrections (Left));
 // validating input
 ph_trim := TRIM (phone_val);
 ph_trim_len := LENGTH (ph_trim);
-ph_filtered_len := LENGTH (StringLib.StringFilterOUT (ph_trim, '0123456789'));
-ph_zeros_len := LENGTH (StringLib.StringFilterOUT (ph_trim, '0'));
+ph_filtered_len := LENGTH (STD.Str.FilterOut (ph_trim, '0123456789'));
+ph_zeros_len := LENGTH (STD.Str.FilterOut (ph_trim, '0'));
 boolean phone_present := IF ((ph_zeros_len = 0) OR (ph_filtered_len <> 0) OR (ph_trim_len < 10), FALSE, TRUE);
 
 boolean hnumber_present := hnumber_val != '';
@@ -435,10 +435,10 @@ layout_didslim GetDidSlim (layout_output le, layout_person ri) := TRANSFORM
 	self.did := ri.did;   // comes from what is found in ID on neutral side
 	self.ssn := ssn_val;  // always using the input SSN
 
-	self.fname := IF(alpha_numeric, stringlib.stringtouppercase(first_val), ri.fname);
-	self.mname := IF(alpha_numeric, stringlib.stringtouppercase(middle_val), ri.mname);
-	self.lname := IF(alpha_numeric, stringlib.stringtouppercase(last_val), ri.lname);
-	self.name_suffix := IF(alpha_numeric, stringlib.stringtouppercase(suffix_val), '');  // bshell_w_flags doesn't have suffix field
+	self.fname := IF(alpha_numeric, STD.Str.ToUpperCase(first_val), ri.fname);
+	self.mname := IF(alpha_numeric, STD.Str.ToUpperCase(middle_val), ri.mname);
+	self.lname := IF(alpha_numeric, STD.Str.ToUpperCase(last_val), ri.lname);
+	self.name_suffix := IF(alpha_numeric, STD.Str.ToUpperCase(suffix_val), '');  // bshell_w_flags doesn't have suffix field
 
 	clean_input_addr := Risk_Indicators.MOD_AddressClean.clean_addr(address_val, city_val, state_val, zip9_val);
 	
@@ -517,8 +517,8 @@ ssn_inquiries_pre_pull := join(bshell2, Inquiry_AccLogs.Key_FCRA_SSN,
 					alpha_numeric and  // only search the inquiries DB on alpha_numeric input where we can check to see if the name matches
 					keyed(right.ssn=left.input[1].socs) 
 					and datalib.NameMatch (Left.input[1].first, left.input[1].middle, left.input[1].last, right.person_q.fname, right.person_q.mname, right.person_q.lname) < 3 
-					and ut.DaysApart(ut.GetDate,right.search_info.datetime[1..8]) < ut.DaysInNYears(1)
-					and trim(StringLib.StringToUpperCase(right.search_info.function_description)) in set_fcra_scoring_inquiries,	
+					and ut.DaysApart((STRING8)Std.Date.Today(),right.search_info.datetime[1..8]) < ut.DaysInNYears(1)
+					and trim(STD.Str.ToUpperCase(right.search_info.function_description)) in set_fcra_scoring_inquiries,	
 					transform(recordof(Inquiry_AccLogs.Key_FCRA_SSN), self := right) );
 
 // add pullID lookup to ensure this person with SSN inquiries is also not on the pullID list
@@ -535,7 +535,7 @@ header_recs := RiskWiseFCRA._header_data (dids, ds_flagfile);
 // dedup the records and show the earliest first seen and latest last seen
 RiskWiseFCRA.layouts.working dedupEm(RiskWiseFCRA.layouts.working le, RiskWiseFCRA.layouts.working ri) := transform
 	self.dt_first_seen := ut.Min2(le.dt_first_seen, ri.dt_first_seen);	// take the lowest non-zero?
-	self.dt_last_seen := ut.max2(le.dt_last_seen, ri.dt_last_seen);	// take the max of the 2
+	self.dt_last_seen := MAX(le.dt_last_seen, ri.dt_last_seen);	// take the max of the 2
 	self := le;
 end;
 
@@ -584,7 +584,7 @@ ssn_main1 := join(bshell_dids, Risk_Indicators.Key_SSN_Table_v4_filtered_FCRA,
 						KEEP(10), atmost(100));		
 // add the ssns from the inquiry records as well for display on the CDR					
 ssn_main2 := join(unique_inquiry_ssns, Risk_Indicators.Key_SSN_Table_v4_filtered_FCRA,	
-						left.ssn<>'' and keyed(left.ssn=right.ssn),
+						left.ssn<>'' and keyed(left.ssn=right.ssn) and trim((string12)right.ssn) not in ssn_ids,
 						transform( layout_ssn, self.death_sources := '', self := right ),
 						KEEP(10), atmost(100));						
 ssn_deduped := dedup(sort(ungroup(ssn_main1 + ssn_main2), record),all);
@@ -903,9 +903,9 @@ end;
 with_avm_medians := join(with_geolinks, avm_v2.Key_AVM_Medians_fcra, left.geolink=right.fips_geo_12, getMedians(left,right), left outer);
 							
 layout_avm_median_disclosure rollMedians(with_avm_medians le, with_avm_medians rt) := transform
-	self.median_county_value := ut.max2(le.median_county_value, rt.median_county_value);
-	self.median_tract_value := ut.max2(le.median_tract_value, rt.median_tract_value);
-	self.median_block_value := ut.max2(le.median_block_value, rt.median_block_value);
+	self.median_county_value := MAX(le.median_county_value, rt.median_county_value);
+	self.median_tract_value := MAX(le.median_tract_value, rt.median_tract_value);
+	self.median_block_value := MAX(le.median_block_value, rt.median_block_value);
   self.geolink := rt.geolink;
 	self := le;
 end;
@@ -1079,7 +1079,9 @@ infutor_deduped := dedup(sort(infutor_main,record),all);
 
 infutor_recs1 := infutor_deduped + PROJECT( infutor_corr,
 												transform( Layout_Infutor,
-													self := LEFT
+													SELF.global_sid:=0;
+													SELF.record_sid:=0;
+													SELF := LEFT
 												  ) );
 
 infutor_recs := sort(infutor_recs1 , -dt_last_seen, -dt_first_seen);									
@@ -1163,7 +1165,7 @@ layout_output doDeceased( bshell_w_flags le ) := TRANSFORM
     le.VRU_code
   );
   
-  msg := StringLib.StringFindReplace( le.VRU_Message, ' [deceased]', '' ); // remove the deceased indicator which can come from the VRU
+  msg := STD.Str.FindReplace( le.VRU_Message, ' [deceased]', '' ); // remove the deceased indicator which can come from the VRU
   SELF.VRU_message := map(
     im_not_dead => 'ssn: correction record utilized',
     isDeceased  => msg + ' [deceased]',

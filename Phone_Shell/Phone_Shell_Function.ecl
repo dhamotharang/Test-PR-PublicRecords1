@@ -197,13 +197,28 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
  BocaShellVersion := if(PhoneShellVersion >= 20, // PhoneShell V2 (2.0, 2.1, etc)
                         54, // If PhoneShell V2 then Boca Shell 5.4
                         41); // Else use Boca Shell 4.1
+                        
+ // If Phone Shell version 2.0+, then use some additional options for input to the InstantID_Function
+ // Else use the default (0)
+ unsigned8 BSOptions := if(PhoneShellVersion >= 20,
+                           risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary
+                         + risk_indicators.iid_constants.BSOptions.IncludeDoNotMail
+                         + risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
+                           0);
+ // If Phone Shell version 2.0+, then turn on runDLVerification for the InstantID_Function.
+ // Else use the default (false)
+ runDLVerification := if(PhoneShellVersion >= 20,
+                         true,
+                         false);
  
 	/* ************************************************************************
 	 *  Get IID and Boca Shell Data - This will also perform our DID append   *
 	 ************************************************************************ */
 	InstantID := Risk_Indicators.InstantID_Function(iid_prep, BocaShellGateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, ofac_only, suppressNearDups, require2ele, isFCRA, from_biid, 
 																						ExcludeWatchLists, from_IT1O, ofac_version, include_ofac, addtl_watchlists, watchlist_threshold, dob_radius, BocaShellVersion, 
-																						in_DataRestriction := DataRestrictionMask, in_append_best := AppendBest,                                             
+																						in_DataRestriction := DataRestrictionMask, in_append_best := AppendBest, 
+                      in_BSOptions := BSOptions,
+                      in_runDLVerification := runDLVerification,
                       in_DataPermission := DataPermissionMask);
 	
 	BocaShell := Risk_Indicators.Boca_Shell_Function(InstantID, BocaShellGateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, includeRel, includeDL, includeVeh, includeDerog, BocaShellVersion, 

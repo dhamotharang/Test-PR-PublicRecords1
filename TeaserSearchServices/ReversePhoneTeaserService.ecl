@@ -22,7 +22,7 @@
 IMPORT iesp, AutoStandardI, TeaserSearchServices, std;
 
 EXPORT ReversePhoneTeaserService := MACRO
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	rec_in := iesp.thinreversephoneteaser.t_ThinReversePhoneTeaserRequest;
 	ds_in := DATASET ([], rec_in) : STORED ('ThinReversePhoneTeaserRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;

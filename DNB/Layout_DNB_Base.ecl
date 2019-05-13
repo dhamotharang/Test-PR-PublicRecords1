@@ -1,4 +1,4 @@
-import Address;
+﻿import Address;
 
 export Layout_DNB_Base := record
 unsigned6 bdid := 0;
@@ -206,4 +206,8 @@ string1   record_type;           // 'C' Current
                                  // 'H' Historical
 string1   active_duns_number;    // 'Y' Active Duns Number
                                  // 'N' Inactive Duns Number (deleted)
+// Jira# CCPA-93, The below 2 fields are added for CCPA (California Consumer Protection Act) project.
+// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+unsigned4 global_sid := 0;
+unsigned8 record_sid := 0;
 end;

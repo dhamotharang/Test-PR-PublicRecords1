@@ -1,4 +1,10 @@
-﻿import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std, RiskWiseFCRA, ConsumerDisclosure, FFD;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std, RiskWiseFCRA, ConsumerDisclosure, FFD;
 // call full header, call full override
 // join them together by rid, left outer
 // override key will only have fields populated that were corrected (recordid is RID), such as SSN, this will also have a bitmap field that stores a 1 for a null corrected value

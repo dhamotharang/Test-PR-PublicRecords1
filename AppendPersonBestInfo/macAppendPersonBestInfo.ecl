@@ -2,7 +2,7 @@ EXPORT macAppendPersonBestInfo(dIn, inLexid, inGlb, inDrm,
   inUseNonBlank = 'false', inMarketing = 'false', inIncludeDod = 'false', inIncludeMinors= FALSE,
   appendPrefix = '\'\'', UseIndexThreshold=10000000) := FUNCTIONMACRO
   
-  IMPORT dx_BestRecords, doxie_files, doxie, ut, Suppress;
+  IMPORT dx_BestRecords, dx_header, doxie, ut, Suppress;
    
   LOCAL rSearch := {RECORDOF(dIn) OR {INTEGER _searchDid}};
   LOCAL dSearch := PROJECT(dIn, TRANSFORM(rSearch,
@@ -32,7 +32,7 @@ EXPORT macAppendPersonBestInfo(dIn, inLexid, inGlb, inDrm,
       SELF := LEFT));
   
 	// Filter out minors
-  LOCAL dWatchdogNoMinors := JOIN(dWatchdog, doxie_files.key_minors_hash, 
+  LOCAL dWatchdogNoMinors := JOIN(dWatchdog, dx_header.key_minors_hash(),
       LEFT.did != 0 AND KEYED(HASH32((UNSIGNED6)LEFT.did)=RIGHT.hash32_did) 
       AND KEYED(LEFT.did=RIGHT.did) AND ut.Age(RIGHT.dob) < 18,
       TRANSFORM({RECORDOF(LEFT)}, SELF := LEFT), 

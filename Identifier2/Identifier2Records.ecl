@@ -1,7 +1,7 @@
-﻿import iesp,identifier2,address,ut,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std;
-	
+﻿import iesp,identifier2,address,ut,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std, dx_header;
+
 	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-	finderParams := project (AutoStandardI.GlobalModule(), PersonReports.input._finderreport, opt);
+	personParams := project (AutoStandardI.GlobalModule(), PersonReports.input.personal, opt);
 
 	boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');
 	string20 Test_Data_Table_Name := ''  	: stored('TestDataTableName');
@@ -200,7 +200,7 @@
 		// SSN exists in Header....quick check return address
 		glb_ok := risk_indicators.iid_constants.glb_ok(GLB_Purpose, isFCRA);
 		dppa_ok := risk_indicators.iid_constants.dppa_ok(dppa_purpose, isFCRA);
-		didRec := Doxie.Key_Header_Wild_SSN(keyed(s1=le.ssn[1]),
+		didRec := dx_header.key_wild_SSN()(keyed(s1=le.ssn[1]),
 															keyed(s2=le.ssn[2]),
 															keyed(s3=le.ssn[3]),
 															keyed(s4=le.ssn[4]),
@@ -209,7 +209,7 @@
 															keyed(s7=le.ssn[7]),
 															keyed(s8=le.ssn[8]),
 															keyed(s9=le.ssn[9]));
-		hRecs := join (didRec, doxie.key_header,
+		hRecs := join (didRec, dx_header.key_header(),
 			LEFT.did<>0
 			AND (LEFT.s1+LEFT.s2+LEFT.s3+LEFT.s4+LEFT.s5+LEFT.s6+LEFT.s7+LEFT.s8+LEFT.s9)=right.ssn
 			AND RIGHT.prim_name<>''
@@ -217,7 +217,7 @@
 			AND right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, IsFCRA)
 			AND (header.isPreGLB(RIGHT) OR glb_ok)
 			AND (~mdr.Source_is_DPPA(RIGHT.src) OR
-					(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa_purpose,RIGHT.src)))
+					(dppa_ok AND drivers.state_dppa_ok(dx_header.Functions.translateSource(RIGHT.src),dppa_purpose,RIGHT.src)))
 			AND ~mdr.Source_is_on_Probation(RIGHT.src)  // we won't use probation data 
 			// we won't use experian dl's/vehicles (requires LN branding)
 			AND (ln_branded OR ~(dppa_ok AND (RIGHT.src in mdr.sourcetools.set_Experian_dl or RIGHT.src in mdr.sourcetools.set_Experian_vehicles))),
@@ -298,7 +298,7 @@
 	prop_details := getProperty(data_prep, owned_any_property, ever_owned_input_property, currently_own_input_property, 
 																	Ever_Owned_Input_Property_InPastNumberOfYears, Include_Prop_Data);
 
-	imposter_details := if(Include_Multiple_Identities, getImposters(data_prep, Include_Imposter_Data, IsFCRA,finderParams,dob_mask_value), data_prep);
+	imposter_details := if(Include_Multiple_Identities, getImposters(data_prep, Include_Imposter_Data, IsFCRA, personParams, dob_mask_value), data_prep);
 
 	dl_details := if(Include_Valid_Drivers_License, getDls(data_prep, Include_DL_Data, ssnMask, dob_mask_value, dlMask), data_prep);
 

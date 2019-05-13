@@ -32,7 +32,7 @@
 IMPORT iesp, TeaserSearchServices;
 
 EXPORT ReverseAddressTeaserService := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	rec_in := iesp.thinreverseAddressteaser.t_ThinReverseAddressTeaserRequest;
 	ds_in := DATASET ([], rec_in) : STORED ('ThinReverseAddressTeaserRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;

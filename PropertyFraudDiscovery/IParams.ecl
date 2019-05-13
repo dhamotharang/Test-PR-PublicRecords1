@@ -1,8 +1,8 @@
-IMPORT BatchShare,Relationship;
+﻿IMPORT BatchShare,Relationship;
 
 EXPORT IParams := MODULE
 
-	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams,Relationship.IParams.relationshipParams)
+	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2,Relationship.IParams.relationshipParams)
 		EXPORT INTEGER  NumberPropertyYears := 0;
 		EXPORT INTEGER  NumberInterval1Years := 0;
 		EXPORT INTEGER  NumberInterval2Years := 0;
@@ -14,7 +14,8 @@ EXPORT IParams := MODULE
 	// **************************************************************************************			
 	EXPORT getBatchParams() := FUNCTION
 			PFDC := PropertyFraudDiscovery.Constants;
-			base_params := BatchShare.IParam.getBatchParams();
+
+			base_params := BatchShare.IParam.getBatchParamsV2();
 			// Project the base params to read shared parameters from store. If necessary, you may 
 			// redefine default values for common parameters and/or define default values for domain-
 			// specific parameters

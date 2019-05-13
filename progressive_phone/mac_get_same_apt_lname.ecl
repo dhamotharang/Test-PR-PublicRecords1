@@ -1,14 +1,14 @@
 //this macro retrieves people live at the same apartment and having the same last name
 //as the input records
 
-import header, ut, mdr;
-
 export mac_get_same_apt_lname(f_in, f_out, diff_lname='false', data_restriction_mask='') := macro
+
+import ut, mdr, dx_header;
 
 #uniquename(header_key)
 #uniquename(header_addr_key)	
-%header_key% := doxie.key_header;
-%header_addr_key% := doxie.Key_Header_Wild_Address_EN;
+%header_key% := dx_header.key_header();
+%header_addr_key% := dx_header.key_wild_address_EN();
 	
 #uniquename(f_in_w_apt)
 %f_in_w_apt% := f_in(prim_name<>'', sec_range<>'', lname<>''); 	

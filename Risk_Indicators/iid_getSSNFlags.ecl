@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, suppress, ut, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship;
+﻿import _Control, risk_indicators, suppress, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship, dx_header;
 import STD;
 onThor := _Control.Environment.OnThor;
 
@@ -525,13 +525,14 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 			boolean isRelative;
 			ssn_table_results1;
 		end;
-		temprec getMultipleUseSSNs(ssn_table_results1 le, doxie.Key_Header_Wild_SSN ri) := transform
+    index_wild_ssn := dx_header.key_wild_SSN();
+		temprec getMultipleUseSSNs(ssn_table_results1 le, index_wild_ssn ri) := transform
 			self.wildcard_did := ri.did;
 			self.isRelative := false;
 			self := le;
 		end;
 		
-		multiple_use_ssns_with_wildcard_did_roxie := join(ssn_table_results1(adls_per_ssn_multiple_use>0), doxie.Key_Header_Wild_SSN,
+		multiple_use_ssns_with_wildcard_did_roxie := join(ssn_table_results1(adls_per_ssn_multiple_use>0), index_wild_ssn,
 			left.ssn<>'' and
 			keyed(right.s1=left.ssn[1]) and
 			keyed(right.s2=left.ssn[2]) and
@@ -548,7 +549,7 @@ ssn_table_results1 := if(isFCRA, got_SSNTable_corr_proj, got_death_nonfcra_proj	
 						atmost(riskwise.max_atmost), keep(100));
 						
 			multiple_use_ssns_with_wildcard_did_thor := join(distribute(ssn_table_results1(adls_per_ssn_multiple_use>0), hash64(ssn)), 
-			distribute(pull(doxie.Key_Header_Wild_SSN), hash64(s1+s2+s3+s4+s5+s6+s7+s8+s9)),
+			distribute(pull(dx_header.key_wild_SSN()), hash64(s1+s2+s3+s4+s5+s6+s7+s8+s9)),
 			left.ssn<>'' and
 			(right.s1=left.ssn[1]) and
 			(right.s2=left.ssn[2]) and

@@ -45,7 +45,7 @@ IMPORT iesp, doxie, AutoStandardI, AutoHeaderI, Relationship;
 
 
 EXPORT RNAReportService() := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonReports_RNAReportService();
 	#constant('IsCRS',true);

@@ -1,10 +1,9 @@
-import ut, doxie_crs, suppress;
+import doxie, doxie_crs, suppress;
 
-export header_presentation(DATASET(layout_presentation) presRecs) := FUNCTION
+export header_presentation(DATASET(doxie.layout_presentation) presRecs, doxie.IDataAccess mod_access) := FUNCTION
 
-doxie.MAC_Header_Field_Declare()
+doxie.MAC_Header_Field_Declare(); //ssn_value, score_threshold_value only!! 
 
-boolean bestonly := false : stored('BestOnly');
 boolean include_hri := false : stored('IncludeHRI');
 unsigned1 maxHriPer_value := 10 : stored('MaxHriPer');
 
@@ -13,7 +12,7 @@ boolean return_waf := true : STORED('ReturnAlsoFound');
 boolean include_wealsofound := return_waf AND ~negate_true_defaults;
 boolean includeBankruptcyCount := false : stored('IncludeBankruptcyCount');
 
-without_risk := base_presentation(presRecs);
+without_risk := doxie.base_presentation(presRecs);
 rolled := doxie.header_base_rollup(without_risk);
 
 doxie.mac_AddHRISSN(rolled, with_ssn_risk, ~include_hri)
@@ -41,15 +40,15 @@ srtdCnsmr := project(strdSortedCnsmr, TRANSFORM(RECORDOF(srtdSorted),
 							self.dt_vendor_first_reported := left.first_seen;							
 							self := left));
 
-srtd2 := if (ut.IndustryClass.is_Knowx, srtdCnsmr, srtdSorted);
+srtd2 := if (mod_access.isConsumer(), srtdCnsmr, srtdSorted);
 
-doxie.MAC_Add_WeAlsoFound(srtd2,srtd2_waf,glb_purpose,dppa_purpose)
+doxie.MAC_Add_WeAlsoFound(srtd2,srtd2_waf,mod_access)
 srtd3 := IF (include_wealsofound, srtd2_waf, srtd2);
 doxie.Mac_Bk_Count(srtd3, srtd4, did, bk_count, doxie_crs.str_typeDebtor);
 
 srtd5 := IF(includeBankruptcyCount, srtd4, srtd3);
 
-Suppress.MAC_Mask(srtd5, with_mask, ssn, null, true, false);
+Suppress.MAC_Mask(srtd5, with_mask, ssn, null, true, false, , , , mod_access.ssn_mask);
 RETURN with_mask;
 
 END;

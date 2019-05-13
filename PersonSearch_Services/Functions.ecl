@@ -1,6 +1,5 @@
-﻿﻿import iesp, ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, AutokeyI, NID, BankruptcyV3, FCRA, STD,
+import iesp, ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, NID, BankruptcyV3, FCRA, STD,
        BankruptcyV3_Services, PhonesFeedback_Services, PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
-
 export Functions := MODULE
 	
 	export string gender(string fname, string title) :=  function
@@ -249,7 +248,8 @@ export Functions := MODULE
 			 self.AgeAtDeath := IF(l.dod<>0 and l.dob<>0, (l.dod-l.dob) div 10000, 0);
 			 self.DeathVerificationCode := l.death_code;
 			 self.DOB := iesp.ECL2ESP.toDate(l.dob);
-			 self.DOD := iesp.ECL2ESP.toDate(l.dod);		
+			 self.DOD := iesp.ECL2ESP.toDate(l.dod);
+			 self.IsLimitedAccessDMF := l.IsLimitedAccessDMF;		
 			 self.deceased := l.deceased;
 		END;
 

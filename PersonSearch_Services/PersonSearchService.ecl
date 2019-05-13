@@ -154,7 +154,10 @@ EXPORT PersonSearchService () := MACRO
 	unsigned6 in_FDN_prodcode := 0 : stored('ProductCode');
 
 	input_params := AutoStandardI.GlobalModule();
-	tempmod := module(project(input_params,PersonSearch_Services.Search_Records.params,opt))
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
+	tempmod := module(input_params, mod_access)
+		export string DataPermissionMask := mod_access.DataPermissionMask; //conflicting definition
+		export string DataRestrictionMask := mod_access.DataRestrictionMask; //conflicting definition
 		export returnAlsoFound := in_returnAlsoFound;
 		export includeSSNHri := in_includeSSNHri;
 		export includeAddrHri := in_includeAddrHri;
@@ -174,11 +177,12 @@ EXPORT PersonSearchService () := MACRO
 	  export unsigned2 FDNinput_indtype  := in_FDN_indtype;
 	  export unsigned6 FDNinput_prodcode := in_FDN_prodcode;
 	end;
+	mod_search := PROJECT(tempmod, PersonSearch_Services.Search_Records.params, OPT);
 
-	tempresults := PersonSearch_Services.Search_Records.val(tempmod);
+	tempresults := PersonSearch_Services.Search_Records.val(mod_search);
 	FDN_check     := tempresults(FDNResultsFound=true);
   FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDN_check);
-  royalties     := if(tempmod.IncludeFraudDefenseNetwork, FDN_Royalties);
+  royalties     := if(mod_search.IncludeFraudDefenseNetwork, FDN_Royalties);
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults, results, 
                          iesp.bpssearch.t_BpsSearchResponse, Records, false, SubjectTotalCount);
 

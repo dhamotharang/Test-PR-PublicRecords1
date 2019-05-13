@@ -1,4 +1,4 @@
-import doxie, header, ut;
+import dx_header, ut;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -16,7 +16,7 @@ export fn_getSearchPassIgnoreHouseNumberCandidates(DATASET(LT.Clean.FullRecordNo
 															 SearchAddress.Prim_Name	!= '');
 																
 	searchpass_candidates_dids := join(			 
-			 searchDataLocal, doxie.Key_Header_piz,			  
+			 searchDataLocal, dx_header.key_piz(),			  
 			 keyed(ut.PizTools.reverseZip(trim(left.SearchAddress.zip5)) = right.piz) and
 			 keyed(left.SearchName.PhoneticLname[1..6] = right.dph_lname) and
 			 keyed(left.SearchName.lname = right.lname) and
@@ -37,7 +37,7 @@ export fn_getSearchPassIgnoreHouseNumberCandidates(DATASET(LT.Clean.FullRecordNo
 	searchpass_candidates_dids_sorted  := sort(searchpass_candidates_dids, InternalSeqNo, SearchAddress.ADDRESSID, did);
 	searchpass_candidates_dids_deduped := dedup(searchpass_candidates_dids_sorted, InternalSeqNo, SearchAddress.ADDRESSID, did);
 
-	dirty_header_records	:= join (searchpass_candidates_dids_deduped, doxie.key_header,
+	dirty_header_records	:= join (searchpass_candidates_dids_deduped, dx_header.key_header(),
 														keyed(LEFT.did = RIGHT.s_did) and
 														left.SearchAddress.Prim_Name	!= '' and		
 														// conditions from did search also apply here.. don't need the extra records

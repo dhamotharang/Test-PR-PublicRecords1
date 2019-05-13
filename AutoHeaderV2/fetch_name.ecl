@@ -1,4 +1,4 @@
-import ut,doxie,NID, AutoStandardI,AutoHeaderV2;
+import ut,doxie,dx_header,NID, AutoStandardI,AutoHeaderV2;
 
 export fetch_name (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 	_row := ds_search[1];
@@ -43,9 +43,9 @@ export fetch_name (dataset (AutoheaderV2.layouts.search) ds_search, integer sear
 	temp_lname_trailing_value := _row.tname.lname != '' and _row.tname.fname = '' and _row.tname.mname = '';
 	temp_fname_trailing_value := _row.tname.lname != '' and _row.tname.fname != '' and _row.tname.mname = '';
 
-	i := doxie.Key_Header_Name;
-	wi := doxie.Key_Header_Wild_Name;
-	i2:=doxie.Key_Header_Name_alt;
+	i := dx_header.key_name();
+	wi := dx_header.key_wild_name();
+	i2:=dx_header.key_name_alt();
 
 	first_fil := (temp_lname_value<>'') AND 
 								// To Prevent extra work

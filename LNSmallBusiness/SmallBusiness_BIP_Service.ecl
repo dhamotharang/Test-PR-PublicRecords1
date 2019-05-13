@@ -213,8 +213,8 @@ SmallBusinessAnalyticsRequest XML:
 //#option ('optimizelevel', 0); // do not release this option to prod !!!! it is usefull during deployment 
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
-IMPORT Address, Business_Risk_BIP, Cortera, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Indicators, Risk_Reporting, RiskWise,
-			 Royalty, Suspicious_Fraud_LN, UT, Royalty, Models, Inquiry_AccLogs, STD;
+IMPORT Address, Business_Risk_BIP, Cortera, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Reporting, 
+			 Royalty, Models, Inquiry_AccLogs, STD, LNSmallBusiness;
 
 EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	/* ************************************************************************

@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA_opt_out, ConsumerDisclosure;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA_opt_out, ConsumerDisclosure;
 
   layout_OptOut_raw := RECORDOF(fcra_opt_out.key_did);
 

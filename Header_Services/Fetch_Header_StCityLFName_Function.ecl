@@ -1,5 +1,5 @@
-import ut,autokey, doxie, NID;
-i := doxie.Key_Header_StCityLFname;
+import doxie, dx_header, NID;
+i := dx_header.key_StCityLFName();
 
 doxie.layout_references xt(i r) := TRANSFORM
                                         SELF := r;
@@ -33,3 +33,4 @@ export Fetch_Header_StCityLFName_Function(string20 fname_value
 	EXPORT outrec := idsp;
 
 	END;
+  

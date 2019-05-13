@@ -19,13 +19,16 @@ EXPORT E_Aircraft_Owner(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'Plane_(Plane_:0),owner(Owner_:0),registranttype(Registrant_Type_:0),certificateissuedate(Certificate_Issue_Date_:DATE),certification(Certification_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'Plane_(Plane_:0),did_out(Owner_:0),type_registrant(Registrant_Type_:0),cert_issue_date(Certificate_Issue_Date_:DATE),certification(Certification_:\'\'),src(Source_:\'\'),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_FAA__Key_Aircraft_IDs,TRANSFORM(RECORDOF(__in.Dataset_FAA__Key_Aircraft_IDs),SELF:=RIGHT));
+  EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)did_out != 0);
   SHARED __d0_Plane__Layout := RECORD
-    RECORDOF(__in);
+    RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Plane_;
   END;
-  SHARED __d0_Plane__Mapped := JOIN(__in,E_Aircraft(__in,__cfg).Lookup,TRIM((STRING)LEFT.NNumber) = RIGHT.KeyVal,TRANSFORM(__d0_Plane__Layout,SELF.Plane_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Plane__Mapped := JOIN(__d0_KELfiltered,E_Aircraft(__in,__cfg).Lookup,TRIM((STRING)LEFT.n_number) = RIGHT.KeyVal,TRANSFORM(__d0_Plane__Layout,SELF.Plane_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Plane__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -66,11 +69,11 @@ EXPORT E_Aircraft_Owner(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
   EXPORT SanityCheck := DATASET([{COUNT(Plane__Orphan),COUNT(Owner__Orphan)}],{KEL.typ.int Plane__Orphan,KEL.typ.int Owner__Orphan});
   EXPORT NullCounts := DATASET([
     {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Plane',COUNT(__d0(__NL(Plane_))),COUNT(__d0(__NN(Plane_)))},
-    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Owner',COUNT(__d0(__NL(Owner_))),COUNT(__d0(__NN(Owner_)))},
-    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrantType',COUNT(__d0(__NL(Registrant_Type_))),COUNT(__d0(__NN(Registrant_Type_)))},
-    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CertificateIssueDate',COUNT(__d0(__NL(Certificate_Issue_Date_))),COUNT(__d0(__NN(Certificate_Issue_Date_)))},
-    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Certification',COUNT(__d0(__NL(Certification_))),COUNT(__d0(__NN(Certification_)))},
-    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did_out',COUNT(__d0(__NL(Owner_))),COUNT(__d0(__NN(Owner_)))},
+    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','type_registrant',COUNT(__d0(__NL(Registrant_Type_))),COUNT(__d0(__NN(Registrant_Type_)))},
+    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','cert_issue_date',COUNT(__d0(__NL(Certificate_Issue_Date_))),COUNT(__d0(__NN(Certificate_Issue_Date_)))},
+    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','certification',COUNT(__d0(__NL(Certification_))),COUNT(__d0(__NN(Certification_)))},
+    {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'AircraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});

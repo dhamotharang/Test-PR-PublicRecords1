@@ -10,19 +10,13 @@
 // However the production POE keys were already built when it was decided to rename this 
 // product to WorkPlace, so the keys were left named as POE.
 
-IMPORT	Address, AutoStandardI, BatchShare, Corp2,
-				DCA, doxie, doxie_cbrs, Email_Data, Gong, MDR, PSS,
-				One_Click_Data, POE, POEsFromEmails, Prof_LicenseV2,
-				SalesChannel, Spoke, Suppress, thrive, ut, WorkPlace_Services, YellowPages, Zoom, STD;
+IMPORT BatchShare, doxie, doxie_cbrs, MDR, POE, Suppress, ut, WorkPlace_Services, STD;
 
 string todays_date := (string) STD.Date.Today ();
 
-EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION 
+EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = FALSE) := FUNCTION 
 
   // *** Stored soap input and temporary/internal constants
-	application_type_value := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
-	glb_purpose 					 := AutoStandardI.InterfaceTranslator.glb_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params));
-	
 	boolean IncludeSpouseAlways := false : STORED('IncludeSpouseAlways');
 	boolean IncludeSpouseOnly   := false : STORED('IncludeSpouseOnlyIfNoDebtor');
 	boolean IncludeCorp         := false : STORED('IncludeCorpInfo');
@@ -178,15 +172,11 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // 7.2 Filter to only include records for sources that are not restricted;
 	//     based upon the DataRestrictionMask positions associated with those sources.
   ds_all_recs_not_restricted := ds_all_recs_slimmed(
-	     // First, include the record if the source is not restricted.
-			 // NOTE1: As of 01/14/2011, Teletrack is the only source that might be 
-			 //                          restricted via the DataRestrictionMask.
-		   (MDR.sourceTools.SourceIsTeletrack(source) and ~doxie.DataRestriction.TT) OR
-       // OR include the record if the source is not Teletrack.
-			 ~MDR.sourceTools.SourceIsTeletrack(source));
+			 // NOTE1: As of 01/14/2011, Teletrack is the only source that might be restricted via the DataRestrictionMask.
+		   (~MDR.sourceTools.SourceIsTeletrack(source) OR ~doxie.compliance.isTTRestricted (mod_access.DataRestrictionMask)));
 
 	// 7.3 Applying GLB restrictions.
-	ds_all_recs_glb_ok := ds_all_recs_not_restricted(ut.PermissionTools.glb.SrcOk(glb_purpose, source, dt_first_seen, 0));
+	ds_all_recs_glb_ok := ds_all_recs_not_restricted(doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen, 0));
 
   // 7.3 Next do a "left only" join to the excluded_sources dataset to pass through
   //     all sources that are not excluded.
@@ -197,8 +187,8 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 															);
 
 	// 8. pull recs by ssn & did.
-  Suppress.MAC_Suppress(ds_all_recs_included,ds_dids_pulled,application_type_value,Suppress.Constants.LinkTypes.DID,did);
-  Suppress.MAC_Suppress(ds_dids_pulled,ds_ssns_pulled,application_type_value,Suppress.Constants.LinkTypes.SSN,subject_ssn);
+  Suppress.MAC_Suppress(ds_all_recs_included,ds_dids_pulled,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+  Suppress.MAC_Suppress(ds_dids_pulled,ds_ssns_pulled,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,subject_ssn);
 	doxie.MAC_PruneOldSSNs(ds_ssns_pulled, ds_all_recs_pulled, subject_ssn, did);
 
 	// 9.0 Remove invalid phone1 & company_name info in both POE & gateway recs.
@@ -425,7 +415,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 
   // 12. Get the detailed POE indivdual source data for each 1 best for did record.	
 	// Get the detailed data from all the sources and email addresses.	
-	ds_detail_w_email:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best1_for_did_wcs);
+	ds_detail_w_email:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best1_for_did_wcs, mod_access);
 	
 
   // 13. Get parent company info.
@@ -433,7 +423,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 
 
   // 15 Get any Professional License data.
-	temp_detail_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_detail_wpar_corpstat);
+	temp_detail_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_detail_wpar_corpstat, mod_access);
 	
 	ds_detail_wprolic:= PROJECT(temp_detail_wprolic,
 																TRANSFORM(WorkPlace_Layouts.final,

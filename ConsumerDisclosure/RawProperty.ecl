@@ -1,4 +1,10 @@
-﻿IMPORT LN_PropertyV2, ConsumerDisclosure, doxie, FCRA, FFD, Suppress, BIPV2;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT LN_PropertyV2, ConsumerDisclosure, doxie, FCRA, FFD, Suppress, BIPV2;
 
 BOOLEAN IsFCRA := TRUE;
 	

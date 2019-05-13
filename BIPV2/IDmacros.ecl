@@ -1,4 +1,4 @@
-//see also:  Business_Header_SS.MAC_Match_Flex_V2
+﻿//see also:  Business_Header_SS.MAC_Match_Flex_V2
 
 import ut;
 
@@ -103,7 +103,8 @@ MACRO
 		transform(
 			BizLinkFull.Process_Biz_Layouts.id_stream_layout,
 			self := left,
-			self.weight := 0
+			self.weight := 0,
+			self := [] // JA 20190511 changes to id_stream_layout associated with SALT 3.11 upgrade
 		)
 	);	
 	

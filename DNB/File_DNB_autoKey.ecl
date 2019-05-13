@@ -1,4 +1,4 @@
-IMPORT dnb,STANDARD;
+﻿IMPORT dnb,STANDARD;
 
 Layout_DNB_autokey := record
 		unsigned6 bdid := 0;
@@ -12,6 +12,11 @@ layout_autokey := record
   Layout_DNB_autokey;
   unsigned1 zero := 0;
   string1 blank := '';
+
+  // RR-15382 CCPA Fields added 	
+  unsigned4 global_sid:= 0;
+  unsigned8 record_sid:= 0;
+
 end;
 
 f1 := DNB.File_DNB_Base;

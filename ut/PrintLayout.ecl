@@ -9,11 +9,10 @@
 *          -It handles BOTH flat (batch) and nested (iesp) layouts. 
 *          -It also allows you to email the layout directly from the attribute as an email attachment [layoutNAME].txt. 
 * USEAGE: -It can be used both to view layouts while debugging or to inherit full layout structures. This is useful when supplying Batch or ESP with layouts.
-* EXAMPLE1: ut.PrintLayout(BenefitAssessment_Services.Layouts.layout_batch_out); // This outputs all 1000+ layout fields in a nice readable format with their default values.
-* EXAMPLE2: ut.PrintLayout(iesp.nac_search.t_NACSearchRequest); // This outputs all layout fields including the nested record and dataset structures.
-* EXAMPLE3: ut.PrintLayout(iesp.rnareport.t_RNAReport); // This outputs all layout fields including the nested record and dataset structures - really nested!.
-* EXAMPLE4: ut.PrintLayout(Header.key_AllPossibleSSNs,,'fn.ln@lexisnexis.com','additonal fields read from stored: includeAll\n\nDefault-TRUE.'); // This outputs all index fields including the nested records and dataset structures and emails it to the recipients .
-* EXAMPLE5: ut.PrintLayout(NAC_V2_Services.Layouts.Batch_in,TRUE,'fn.ln@lexisnexis.com'); // This outputs numbered fields and emails them out.
+* EXAMPLE1: ut.PrintLayout(iesp.nac_search.t_NACSearchRequest); // This outputs all layout fields including the nested record and dataset structures.
+* EXAMPLE2: ut.PrintLayout(iesp.rnareport.t_RNAReport); // This outputs all layout fields including the nested record and dataset structures - really nested!.
+* EXAMPLE3: ut.PrintLayout(Header.key_AllPossibleSSNs,,'fn.ln@lexisnexis.com','additonal fields read from stored: includeAll\n\nDefault-TRUE.'); // This outputs all index fields including the nested records and dataset structures and emails it to the recipients .
+* EXAMPLE4: ut.PrintLayout(NAC_V2_Services.Layouts.Batch_in,TRUE,'fn.ln@lexisnexis.com'); // This outputs numbered fields and emails them out.
 * IMPORTANT INFO: -For best nested layout visuals, please copy/paste the output in a text editor such as notepad++ or a new builder window.
 *									-This function does not handle Modules and Interfaces.
 *****************************************************************************************************************************************/

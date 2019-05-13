@@ -273,4 +273,15 @@ export interfaceOutputNeutral := record
 	boolean   isBusiness;
 end;
 
+EXPORT Suppress_inrec := RECORD
+	unsigned8 did1;
+	unsigned8 did2;
+END;
+
+EXPORT Suppress_outrec := RECORD
+	Suppress_inrec;
+	string25  userid;
+	unsigned4 dt_added;
+END;
+
 END;

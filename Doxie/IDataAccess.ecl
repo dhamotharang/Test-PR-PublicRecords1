@@ -16,6 +16,10 @@ EXPORT IDataAccess := INTERFACE
   EXPORT unsigned1 reseller_type := 0; // 0 - 'End User' (not reseller)| 1 - 'Reseller - We Bill'| 2 - 'Reseller - They Bill'| 3 - Integrator| 4 - Integrator Child| 5 - 'Sales Agent - They Sell'| 6 - 'Sales Agent - We Sell'| 7 - 'Billing Intermediary'| 8 - 'Reseller - LNAC'|
   EXPORT unsigned1 intended_use := 0; // a bit mask with first bit reserved for marketing
 
+  // this controls whether to skip logging (for instance, in Cert environment, to save diskspace)
+  EXPORT boolean log_record_source := TRUE; //save records' source info in Roxie logs
+  EXPORT boolean lexid_source_optout := TRUE; //suppress LexId by record's source (CCPA, for instance)
+
   // a combination of "include" and dppa; I don't like it, but need to keep for backward compatibility 
   //TODO: try rid of it completely, or at least of "include" part
   EXPORT boolean show_minors := FALSE;  //a.k.a. OKtoShowMinors
@@ -24,6 +28,10 @@ EXPORT IDataAccess := INTERFACE
   EXPORT string ssn_mask := suppress.constants.ssn_mask_type.ALL; // FIRST5, LAST4, NONE (string6?)
   EXPORT unsigned1 dl_mask := 1; // means, do mask
   EXPORT unsigned1 dob_mask := suppress.constants.dateMask.ALL;
+  
+  // ccpa logging
+  EXPORT string transaction_id := ''; // esp transaction id or batch uid
+  EXPORT unsigned6 global_company_id := 0; // mbs gcid
   
 
   // --------------------------------------------------------------------------------------------

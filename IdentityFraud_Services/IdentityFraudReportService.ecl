@@ -98,7 +98,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, IdentityFraud_Services, PersonReports, ut, seed_files, suppress;
 
 EXPORT IdentityFraudReportService () := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #onwarning(4207, warning);
 #constant('SelectIndividually', true); // we will setup all components explicitly
 
@@ -119,7 +119,6 @@ EXPORT IdentityFraudReportService () := MACRO
 string ssn_mask_overload := '' : stored ('SSNMask_Overload');
 boolean dl_mask_overload := false : stored ('DLMask_Overload');
 string dob_mask_overload := '' : stored ('DOBMask_Overload');
-string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 
   // for convenience only: to make it work from flat SOAP
   SetLegacyInput (iesp.identityfraudreport.t_IdentityFraudReportBy xml_in) := function
@@ -142,7 +141,7 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
 
   // there are not too much options for report, so I'll skip reading them separately for ESDL and SOAP modes
   tag_options := global (first_row.Options);
-  options := module (IdentityFraud_Services.IParam._identityfraudreport) 
+  options := module
     export boolean include_phonesplus := tag_options.IncludePhonesPlus	:	stored('IncludePhonesPlus');
 				export boolean include_identity_risk_level := tag_options.IncludeIdentityRisklevel : stored('IncludeIdentityRisklevel');
 				export boolean include_source_risk_level := tag_options.IncludeSourceRisklevel : stored('IncludeSourceRisklevel');
@@ -151,19 +150,19 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
   end;  
 
   // get search parameters from global #stored variables;
-  search_mod := module (project (AutoStandardI.GlobalModule(), PersonReports.input._didsearch, opt))
+  gmod := AutoStandardI.GlobalModule();
+  search_mod := module (project (gmod, PersonReports.input._didsearch, opt))
   end;
   t_user := global(first_row.User);
 
   // Now define all report parameters, redefine defaults
-  report_mod := module (options)
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(gmod);
+
+  report_mod := module (mod_access, options)
     max_imp := iesp.constants.IFR.MaxAssociatedIdentities : stored ('MaxImposters');
-    export max_imposters := min (iesp.constants.IFR.MaxAssociatedIdentities, max_imp);
+    export unsigned max_imposters := min (iesp.constants.IFR.MaxAssociatedIdentities, max_imp);
 
     // Do all required cleaning/translations here
-		export string32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val (search_mod);
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
     export boolean include_ri_uspis := true;
     export boolean include_ri_advo := true;
@@ -171,8 +170,8 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
     // set up masking restrictions: to be applied at the very end of the report
     // if no other than "default" values provided in User structure, use new masking parameters
     string ssn_mask_esdl := stringlib.StringToUpperCase (t_user.SSNMask);
-    export string6 ssn_mask := if (ssn_mask_esdl != '', ssn_mask_esdl, ssn_mask_overload);
-    export boolean mask_dl  := t_user.DLMask or dl_mask_overload;
+    export string ssn_mask := if (ssn_mask_esdl != '', ssn_mask_esdl, ssn_mask_overload);
+    export unsigned1 dl_mask  := if (t_user.DLMask or dl_mask_overload, 1, 0);
     export unsigned1 dob_mask := suppress.date_mask_math.MaskIndicator (if (t_user.DOBMask != '', t_user.DOBMask, dob_mask_overload));
 
     // debug:
@@ -180,8 +179,6 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
     export unsigned1 max_top_hri := 6 : stored ('MaxTopHRIs');
     export boolean include_summary := false : stored('IncludeSummary');
     export unsigned1 indicators_per_imposter := 3 : stored('MaxIndicatorsPerImposter');
-    export boolean probation_override := false : stored ('ProbationOverride');
-    export string DataRestrictionMask := AutoStandardI.Constants.DataRestrictionMask_default : STORED('DataRestrictionMask');
   end;
 
   // dids from input
@@ -200,7 +197,7 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
                dl_number != '' => dids_dl,
                dids_search);
 	
-	ifrReportMod	:=	IdentityFraud_Services.IdentityFraudReport (dids, project (report_mod, IdentityFraud_Services.IParam._identityfraudreport), FALSE, DataPermission);
+	ifrReportMod	:=	IdentityFraud_Services.IdentityFraudReport (dids, project (report_mod, IdentityFraud_Services.IParam._identityfraudreport, OPT), FALSE);
 	
   // main records
   main_results := ifrReportMod.results;

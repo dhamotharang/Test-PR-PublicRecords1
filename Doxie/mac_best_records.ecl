@@ -13,7 +13,7 @@
 												) := macro
 
 
-IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI, MDR;
+IMPORT ut, dx_BestRecords, dx_header, DeathV2_Services, AutoStandardI, MDR;
 #uniquename(deathparams)
 %deathparams% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 //If no minors_field value is set, use glb permission to determine if minors should be kept in record set.
@@ -50,7 +50,7 @@ IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI, MDR;
 
 	
 #uniquename(outfile_nominors)
-%outfile_nominors% := join(%outf%, doxie_files.key_minors_hash,
+%outfile_nominors% := join(%outf%, dx_header.key_minors_hash(),
 														LEFT.did != 0 AND
 														KEYED(hash32((UNSIGNED6)LEFT.did)=RIGHT.hash32_did) AND
 		                  			KEYED(LEFT.did = RIGHT.did) AND 

@@ -89,7 +89,7 @@ pre_dobs_in_range := join(normed(record_type='I'),globalwatchlists.Key_GlobalWat
 											
 dobs_in_range := pre_dobs_in_range(pty_key<>'');
 
-duped_dobs_in_range :=dedup(sort(dobs_in_range,acctno),acctno);	
+duped_dobs_in_range :=dedup(sort(dobs_in_range,acctno, pty_key),acctno, pty_key);	
 
 // rollup by key
 patriot.Layout_Base_Results.parent roll(patriot.Layout_Base_Results.parent le, 
@@ -100,7 +100,8 @@ TRANSFORM
 END;
 rolled := ROLLUP(SORT(normed, pty_key), LEFT.pty_key=RIGHT.pty_key, roll(LEFT,RIGHT));
 
-dob_rolled := group(sort(join(rolled,duped_dobs_in_range,left.acctno=right.acctno,transform(recordof(rolled),self:=left) ,atmost(1)),acctno),acctno);
+dob_rolled := group(sort(join(rolled,duped_dobs_in_range,left.acctno=right.acctno and left.pty_key=right.pty_key,
+							transform(recordof(rolled),self:=left) ,atmost(1)),acctno),acctno);
 
 rolled_Use := if(dob_radius=-1, rolled,dob_rolled);
 
@@ -165,7 +166,6 @@ END;
 aka_checked := PROJECT(filled_out, check_aka(LEFT));
 
 SearchOut :=  If(ofac_version = 4, ungroup(XG5Formatted(trim(pty_key, left, right) <> '')), ungroup(aka_checked));
-
 
 
 RETURN SearchOut;

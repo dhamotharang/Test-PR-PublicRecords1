@@ -1,9 +1,9 @@
-﻿import BatchServices,DCA,doxie,doxie_cbrs,iesp,MDR,POE,PSS,Prof_LicenseV2,risk_indicators,spoke,ut,suppress,AutoStandardI,Std;
+﻿import BatchServices, doxie, doxie_cbrs, iesp, MDR, POE, ut, suppress, AutoStandardI, Std;
 
 export ReportService_Records := module
 
-	export params := interface(AutoStandardI.InterfaceTranslator.application_type_val.params,
-														 AutoStandardI.InterfaceTranslator.glb_purpose.params)
+  //TODO: find out if there's a way to inherit just selected fields (or define them through some "parent" interface)
+	export params := interface(doxie.IDataAccess)
 	  // Fields passed in from ReportService via in_mod and used throughout this attribute.
     export string12 unique_id  := '';  // same as did
 		export boolean include_sos	:= false;
@@ -23,6 +23,8 @@ export ReportService_Records := module
     string in_excluded_sources  := in_mod.excluded_sources;
 		BOOLEAN IncludeCorp:= TRUE;	// Defined to use in WorkPlace_Services.Functions.getParentCompany for shared code  in Batch and Report Services
 		
+    mod_access := PROJECT (in_mod, doxie.IDataAccess);
+
 		// Edit the input ExcludedSources string as needed for processing below.
     in_excluded_sources_edited := TRIM(Stringlib.StringToUpperCase(in_excluded_sources),
 	                                     LEFT,RIGHT,ALL);
@@ -76,15 +78,11 @@ export ReportService_Records := module
     // 6. Filter to only include records for sources that are not restricted;
 	  //    based upon the DataRestrictionMask positions associated with those sources.
     ds_all_recs_not_restricted := ds_all_recs(
-	       // Include the record if the source is not restricted.
-			   // NOTE1: As of 01/14/2011, Teletrack is the only source that might be 
-			   //                          restricted via the DataRestrictionMask.
-		     (MDR.sourceTools.SourceIsTeletrack(source) and ~doxie.DataRestriction.TT) OR
-         // OR include the record if the source is not Teletrack.
-			   ~MDR.sourceTools.SourceIsTeletrack(source));
+			   // NOTE1: As of 01/14/2011, Teletrack is the only source that might be restricted via the DataRestrictionMask.
+		     (~MDR.sourceTools.SourceIsTeletrack(source) OR ~doxie.compliance.isTTRestricted (mod_access.DataRestrictionMask)));
 
 		// 7.1 Applying GLB restrictions to utility records.
-		ds_all_recs_glb_ok := ds_all_recs_not_restricted(ut.PermissionTools.glb.SrcOk(in_mod.GLBPurpose, source, dt_first_seen, 0));
+		ds_all_recs_glb_ok := ds_all_recs_not_restricted(doxie.compliance.source_ok(mod_access.glb, mod_access.DataRestrictionMask, source, dt_first_seen, 0));
 
     // 7. Next do a "left only" join to the excluded_sources dataset to pass through         ??? 
     //    all sources that are not excluded.
@@ -95,8 +93,8 @@ export ReportService_Records := module
 															  );
 
     // 8. pull recs by ssn & did.
-		Suppress.MAC_Suppress(ds_all_recs_included,ds_dids_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did);
-		Suppress.MAC_Suppress(ds_dids_pulled,ds_ssns_pulled,in_mod.applicationtype,Suppress.Constants.LinkTypes.SSN,subject_ssn);
+		Suppress.MAC_Suppress(ds_all_recs_included,ds_dids_pulled,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_dids_pulled,ds_ssns_pulled,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,subject_ssn);
 	  doxie.MAC_PruneOldSSNs(ds_ssns_pulled, ds_all_recs_pulled, subject_ssn, did);
 
     // 9.  Get "best" company name/address/phone if missing and then clean the data.
@@ -294,7 +292,7 @@ export ReportService_Records := module
 		// 18. Get some additional detailed POE data for specific sources from the 
 		//     individual sources' did key file.
 		//     As of 01/04/11, we only need to get:
-		temp_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat);
+		temp_best_cand_walldetail:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best_cand_wcorpstat, mod_access);
 		
 		ds_best_cand_walldetail:= DEDUP(SORT(temp_best_cand_walldetail, did), did);
 		
@@ -324,7 +322,7 @@ export ReportService_Records := module
 		ds_best_cand_wpar_corpstat:= WorkPlace_Services.Functions.getParentCompany(ds_best_cand_wcorpstat, IncludeCorp);		
  		
 		// 20. Get any Professional License data.
-		ds_best_cand_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_best_cand_wpar_corpstat);
+		ds_best_cand_wprolic:= WorkPlace_Services.Functions.getProfLicInfo(ds_best_cand_wpar_corpstat, mod_access);
 
 	  // 21. Project interim poe_didkey_plus layout onto the ReportService output layout.
 		ds_rs_final := project(ds_best_cand_wprolic,

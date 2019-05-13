@@ -87,7 +87,7 @@
 
 export ReportService := macro
 import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, IdentityManagement_Services, Relationship;
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		//All constants should be at start of service: Property constanats, Neighbors Constants
 		#CONSTANT('IncludeDetails', true);
 		#CONSTANT('DisplayMatchedParty', true);
@@ -174,17 +174,10 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 		Relationship.IParams.storeHighConfidence(global_mod.ApplicationType);
 
 		// set up default options
-		AI := AutoStandardI.InterfaceTranslator;
-		idm_mod := module (project (options_in, IdentityManagement_services.IParam._report, opt))
-			// all required report's options (cleaned/translated)
-			export unsigned1 GLBPurpose  := AI.glb_purpose.val (project(global_mod,AI.glb_purpose.params));
-			export unsigned1 DPPAPurpose := AI.dppa_purpose.val (project(global_mod,AI.dppa_purpose.params));
-			export string6 ssn_mask   := AI.ssn_mask_val.val (project(global_mod,AI.ssn_mask_val.params));
-			export unsigned1 dob_mask := suppress.date_mask_math.MaskIndicator (AI.dob_mask_val.val (project(global_mod,AI.dob_mask_val.params)));
-			export string DataRestrictionMask := global_mod.DataRestrictionMask;
-			export STRING DataPermissionMask := global_mod.DataPermissionMask;
-			// other parameters, if needed, are taken from globals by legacy code: ApplicationType, mask_dl, etc.
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(global_mod);
+		tmp_mod := module (options_in, mod_access)
 		end;
+		idm_mod :=PROJECT (tmp_mod, IdentityManagement_services.IParam._report, OPT);
 
 		SetInputLocalOptions(idm_mod);
 
@@ -196,7 +189,7 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 		dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
 		// #stored ('DID', dids[1].did);
 
-		recs := IdentityManagement_Services.Report(dids, idm_mod);
+		recs := IdentityManagement_Services.Report(dids,  idm_mod);
 
 		 // wrap it into output structure
 		iesp.identitymanagementreport.t_IdentityManagementReportResponse SetResponse (iesp.identitymanagementreport.t_IdentityManagementReportIndividual L) := transform
@@ -231,3 +224,4 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 endmacro;
 
  // IdentityManagement_Services.ReportService();
+ 

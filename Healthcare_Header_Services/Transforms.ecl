@@ -2751,7 +2751,7 @@ Export Layouts.CombinedHeaderResults build_hms_facility_base (Layouts.hms_base_w
 		self.ssn := inRec.ssn;
 		self.dob := if(ssnonly,'',inRec.dob);
 		self.phone10 := if(ssnonly,'',inRec.homephone);
-		self.fname := if(ssnonly,'',inRec.name_first[1]);//Making this allow first initial only to pick up name variations
+		self.fname := if(ssnonly,'',inRec.name_first);
 		self.mname := if(ssnonly,'',inRec.name_middle);
 		self.lname := if(ssnonly,'',inRec.name_last);
 		self.prim_range := if(ssnonly,'',inRec.prim_range);

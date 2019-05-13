@@ -1,4 +1,4 @@
-import ut,doxie,AutoheaderV2,lib_stringlib,lib_ziplib;
+import ut,doxie,dx_header,AutoheaderV2,lib_stringlib,lib_ziplib;
 
 export fetch_wild_street (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 	_row := ds_search[1];
@@ -33,7 +33,7 @@ export fetch_wild_street (dataset (AutoheaderV2.layouts.search) ds_search, integ
 	temp_rel_fname_value2 := _row.tname.fname_rel_2;
 	temp_lookup_value := _options._lookup;	
 
-	i := doxie.Key_Header_Wild_StreetZipName;
+	i := dx_header.key_wild_StreetZipName();
 
 	boolean just_addr := temp_lname_wild_val = '' and temp_fname_wild_val = '';
 	ec := 	if(just_addr, 11, 203);

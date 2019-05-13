@@ -2,15 +2,13 @@ import doxie,utilfile,census_data,suppress,ut;
 
 export Util_Daily_Raw(    
 						dataset(Doxie.layout_references_hh) dids,
-						unsigned3 dateVal = 0,
-						unsigned1 dppa_purpose = 0,
-						unsigned1 glb_purpose = 0,
-						string5 industry_class_value,
-				    string6 ssn_mask_value = 'NONE',
-						boolean dl_mask_value = false,
+						doxie.IDataAccess mod_access,
 						boolean ApplyBpsFilter = false
 ) :=
 FUNCTION
+//values used in suppress.MAC_Mask:
+ssn_mask_value := mod_access.ssn_mask;
+dl_mask_value := mod_access.dl_mask>0;
 
 key_did := utilfile.Key_Util_Daily_Did;
 
@@ -34,7 +32,7 @@ suppress.MAC_Mask(j2, j2_masked, ssn, drivers_license, true, true);
 
 census_data.MAC_Fips2County_Keyed(j2_masked,st,county[3..5],county_name,f2);
 
-glb_ok := ut.PermissionTools.glb.ok(glb_purpose);
+glb_ok := mod_access.isValidGLB ();//Doxie.Compliance.glb_ok(glb_purpose);
 
-return IF(~Doxie.Compliance.isUtilityRestricted(industry_class_value) and glb_ok,SORT(f2,RECORD));
+return IF(~mod_access.isUtility() and glb_ok,SORT(f2,RECORD));
 END;
