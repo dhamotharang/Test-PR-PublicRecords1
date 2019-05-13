@@ -47,55 +47,41 @@ EXPORT log := MODULE
     unsigned8 record_sid;
   END;
 
-  EXPORT logSoldToSources(ds_in, mod_access, did_field='did') := MACRO
-    IMPORT STD;
+  EXPORT logSoldToSources(ds_in, mod_access, did_field='did') := FUNCTIONMACRO
    
-    #uniquename(rec_log)
-    %rec_log% := doxie.log.layout_log_record_internal;
-
-    #uniquename(ds_slim)
-    #uniquename(toLogFormat)
-    #uniquename(l_lexid)
-    #uniquename(t_id)
-    %rec_log% %toLogFormat% (RECORDOF (ds_in) L) := TRANSFORM
-      %l_lexid% :=  (unsigned6) L.did_field;
+    rec_log := doxie.log.layout_log_record_internal;
+    rec_log toLogFormat (RECORDOF (ds_in) L) := TRANSFORM
+      l_lexid :=  (unsigned6) L.did_field;
       SELF.transaction_id := mod_access.transaction_id;
-      SELF.LexID :=  %l_lexid%;
+      SELF.LexID := l_lexid;
       SELF.global_sid:= L.global_sid; 
-      SELF.record_sid := IF ( %l_lexid% = 0, L.record_sid, 0); // if we have a lexid, we only need to log source ids
-      SELF.source_list := IF(%l_lexid% = 0,
+      SELF.record_sid := IF (l_lexid = 0, L.record_sid, 0); // if we have a lexid, we only need to log source ids
+      SELF.source_list := IF(l_lexid = 0,
         '{'+TOJSON(ROW({L.global_sid, L.record_sid}, {unsigned4 S; unsigned8 R;}))+'}',
         '{'+TOJSON(ROW({L.global_sid}, {unsigned4 S;}))+'}');
     END;
-    %ds_slim% := PROJECT (ds_in, %toLogFormat% (LEFT));
-    
-    #uniquename(ds_ddp)
-    %ds_ddp% := DEDUP(SORT (%ds_slim%, LexID, global_sid, record_sid), LexID, global_sid, record_sid);
+    ds_slim := PROJECT (ds_in, toLogFormat(LEFT));
+    ds_ddp := DEDUP(SORT (ds_slim, LexID, global_sid, record_sid), LexID, global_sid, record_sid);
          
-    #uniquename(rollToLog)
-    %rec_log% %rollToLog% (%rec_log% L, %rec_log% R) := TRANSFORM
+    rec_log rollToLog (rec_log L, rec_log R) := TRANSFORM
        SELF.source_list := IF (L.source_list != '', 
           L.source_list + IF(R.source_list != '', ','+R.source_list, ''),
           R.source_list);
       SELF := L;
     END;
-
-    #uniquename(ds_sold_to_sources)
-    %ds_sold_to_sources% := PROJECT(
-      ROLLUP(%ds_ddp%, LEFT.LexID > 0 AND LEFT.LexID = RIGHT.LexID, %rollToLog%(LEFT, RIGHT))
+    ds_sold_to_sources := PROJECT(
+      ROLLUP(ds_ddp, LEFT.LexID > 0 AND LEFT.LexID = RIGHT.LexID, rollToLog(LEFT, RIGHT))
       , TRANSFORM(doxie.log.layout_log_sold_to_sources_rec,
           SELF.source_list := '[' + LEFT.source_list + ']';
           SELF := LEFT;
         ));
+    ds_log_sold_to_sources := DATASET([{ds_sold_to_sources}], doxie.log.layout_log_sold_to_sources);
 
-    #uniquename(ds_log_sold_to_sources)
-    %ds_log_sold_to_sources% := DATASET([{%ds_sold_to_sources%}], doxie.log.layout_log_sold_to_sources);
-    
     // Below we should really be doing ds_in(global_sid<>0) to avoid logging "empty" records. 
     // It would also take care of cases where we may log empty records after 'left outer' joins.
     // TODO: replace this later, once data team starts populating global_sids.
-    IF(mod_access.log_record_source AND exists(ds_in), 
-      OUTPUT(%ds_log_sold_to_sources%, NAMED('LOG_privacy__logs_sold__to__sources'), EXTEND));
+    RETURN IF(mod_access.log_record_source AND exists(ds_in), 
+      OUTPUT(ds_log_sold_to_sources, NAMED('LOG_privacy__logs_sold__to__sources'), EXTEND));  
 
   ENDMACRO;
 
