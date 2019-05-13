@@ -159,7 +159,10 @@ EXPORT PersonRollupService () := MACRO
 	unsigned6 in_FDN_prodcode := 0 : stored('ProductCode');
 
 	input_params := AutoStandardI.GlobalModule();
-	tempmod := module(project(input_params,PersonSearch_Services.Rollup_Records.params,opt));
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
+	tempmod := module(input_params, mod_access);
+		export string DataPermissionMask := mod_access.DataPermissionMask; //conflicting definition
+		export string DataRestrictionMask := mod_access.DataRestrictionMask; //conflicting definition
 		export includeAlsoFound := in_includeAlsoFound;
 		export includeSSNHri := in_includeSSNHri;
 		export includeAddrHri := in_includeAddrHri;
@@ -178,10 +181,10 @@ EXPORT PersonRollupService () := MACRO
 	  export unsigned6 FDNinput_gcid     := in_FDN_gcid;
 	  export unsigned2 FDNinput_indtype  := in_FDN_indtype;
 	  export unsigned6 FDNinput_prodcode := in_FDN_prodcode;
-
 	end;
+	mod_report := PROJECT (tempmod, PersonSearch_Services.Rollup_Records.params, OPT);
 
-	tempresults   := PersonSearch_Services.Rollup_Records.val(tempmod);
+	tempresults   := PersonSearch_Services.Rollup_Records.val(mod_report);
 	FDN_check     := tempresults(FDNResultsFound = true);
   FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDN_check);
   royalties     := if(tempmod.IncludeFraudDefenseNetwork, FDN_Royalties);
@@ -193,99 +196,3 @@ EXPORT PersonRollupService () := MACRO
   output(results,named('Results'));
 
 ENDMACRO;
-// PersonRollupService()
-/*
-<RollupBpsSearchRequest>
-<row>
-<User>
-  <ReferenceCode></ReferenceCode>
-  <BillingCode></BillingCode>
-  <QueryId></QueryId>
-  <GLBPurpose></GLBPurpose>
-  <DLPurpose></DLPurpose>
-	<DataRestrictionMask>000000000000000000000000</DataRestrictionMask>
-	<DataPermissionMask>00000000001</DataPermissionMask>
-  <EndUser>
-    <CompanyName></CompanyName>
-    <StreetAddress1></StreetAddress1>
-    <City></City>
-    <State></State>
-    <Zip5></Zip5>
-  </EndUser>
-  <MaxWaitSeconds></MaxWaitSeconds>
-</User>	
-<FDNUser>
-  <GlobalCompanyId></GlobalCompanyId>
-  <IndustryType></IndustryType>
-  <ProductCode></ProductCode>
-</FDNUser>
-<SearchBy>
-  <Name>
-    <Full></Full>
-    <First></First>
-    <Middle></Middle>
-    <Last></Last>
-    <Suffix></Suffix>
-    <Prefix></Prefix>
-  </Name>
-  <Address>
-    <StreetName></StreetName>
-    <StreetNumber></StreetNumber>
-    <StreetPreDirection></StreetPreDirection>
-    <StreetPostDirection></StreetPostDirection>
-    <StreetSuffix></StreetSuffix>
-    <UnitDesignation></UnitDesignation>
-    <UnitNumber></UnitNumber>
-    <StreetAddress1></StreetAddress1>
-    <StreetAddress2></StreetAddress2>
-    <State></State>
-    <City></City>
-    <Zip5></Zip5>
-    <Zip4></Zip4>
-    <County></County>
-    <PostalCode></PostalCode>
-    <StateCityZip></StateCityZip>
-  </Address>
-  <UniqueID></UniqueID>
-  <SSN></SSN>
-  <SSNLast4></SSNLast4>
-  <SSNFirst5></SSNFirst5>
-  <Phone10></Phone10>
-	<Radius></Radius>
-  <DOB>
-    <Year></Year>
-    <Month></Month>
-    <Day></Day>
-  </DOB>	
-  <DateFirstSeen>
-    <Year></Year>
-    <Month></Month>
-    <Day></Day>
-  </DateFirstSeen>	
-  <DateLastSeen>
-    <Year></Year>
-    <Month></Month>
-    <Day></Day>
-  </DateLastSeen>	
-  <AgeRange>
-    <Low></Low>
-    <High></High>
-  </AgeRange>	
-</SearchBy>
-<Options>
-  <ReturnCount>10</ReturnCount>
-  <StartingRecord>1</StartingRecord>
-  <UseNicknames>1</UseNicknames>
-  <IncludeAlsoFound>0</IncludeAlsoFound>
-  <UsePhonetics>0</UsePhonetics>
-  <StrictMatch>0</StrictMatch>
-  <UsePartialSSNMatch>0</UsePartialSSNMatch>
-  <IncludeSourceDocCounts>0</IncludeSourceDocCounts>
-  <IncludeSourceList><Item>DECEASED</Item><Item>LOCATOR</Item><Item>UTILITY</Item></IncludeSourceList>
-	<IncludePhonesPlus></IncludePhonesPlus>
-	<IncludeAlternatePhonesCount></IncludeAlternatePhonesCount>
-	<IncludeFraudDefenseNetwork>0</IncludeFraudDefenseNetwork>
-</Options>
-</row>
-</RollupBpsSearchRequest>
-*/

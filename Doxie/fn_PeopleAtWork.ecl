@@ -71,7 +71,11 @@ EXPORT fn_PeopleAtWork(DATASET(doxie.Layout_Rollup.KeyRec) inKeyRecs) := FUNCTIO
 			
    setofcids := PAW_Services.PAW_Raw.getContactIDs.byDIDs(setofdids);
 
-   tempmod := MODULE(PROJECT(AutoStandardI.GlobalModule(),PAW_Services.PAWSearchService_Records.params,opt))
+   gmod := AutoStandardI.GlobalModule();
+   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(gmod);
+   tempmod := MODULE(gmod, mod_access)
+     EXPORT STRING DataPermissionMask := mod_access.DataPermissionMask; //conflicting definition
+     EXPORT STRING DataRestrictionMask := mod_access.DataRestrictionMask; //conflicting definition
 	   EXPORT UNSIGNED2 REQ_PHONES_PER_ADDR := PAW_Services.Constants.MAX_PHONES_PER_ADDR : STORED('ReqPhonesPerAddr');
 	   EXPORT UNSIGNED2 REQ_DATES_PER_POSITION := PAW_Services.Constants.MAX_DATES_PER_POSITION : STORED('ReqDatesPerPosition');
 	   EXPORT UNSIGNED2 REQ_DATES_PER_EMPLOYER := PAW_Services.Constants.MAX_DATES_PER_EMPLOYER : STORED('ReqDatesPerEmployer');
@@ -82,11 +86,12 @@ EXPORT fn_PeopleAtWork(DATASET(doxie.Layout_Rollup.KeyRec) inKeyRecs) := FUNCTIO
 	   EXPORT UNSIGNED2 REQ_SSNS_PER_PERSON := PAW_Services.Constants.MAX_SSNS_PER_PERSON : STORED('ReqSsnsPerPerson');
 	   EXPORT UNSIGNED2 REQ_NAMES_PER_PERSON := PAW_Services.Constants.MAX_NAMES_PER_PERSON : STORED('ReqNamesPerPerson');
 	   EXPORT UNSIGNED2 REQ_EMPLOYERS_PER_PERSON := PAW_Services.Constants.MAX_EMPLOYERS_PER_PERSON : STORED('ReqEmployersPerPerson');
-	   EXPORT PenaltThreshold := 10 : STORED('PenaltThreshold');
+	   EXPORT UNSIGNED2 PenaltThreshold := 10 : STORED('PenaltThreshold');
 	   EXPORT BOOLEAN IncludeCriminalIndicators := FALSE : STORED('IncludeCriminalIndicators');
    END;
+   mod_paw := PROJECT (tempmod, PAW_Services.PAWSearchService_Records.params, OPT);
 
-   searchservice_records := PAW_Services.PAWSearchService_Records.val(setofcids,tempmod);
+   searchservice_records := PAW_Services.PAWSearchService_Records.val(setofcids,mod_paw);
 
    doxie.Layout_Rollup.KeyRec pawTrans_V2(doxie.Layout_Rollup.KeyRec L, paw_services.PAW_OutRecsLayout R) := 
      TRANSFORM
@@ -102,4 +107,3 @@ EXPORT fn_PeopleAtWork(DATASET(doxie.Layout_Rollup.KeyRec) inKeyRecs) := FUNCTIO
 	 RETURN outKeyRecs;
 
 END;
-

@@ -1,7 +1,7 @@
-import Autokey_Batch, AutoStandardI, ut, business_header, doxie, paw_services, suppress;
+import Autokey_Batch, AutoStandardI, ut, doxie, paw_services, suppress;
 
 export Functions := module
-	export fnDate(dataset(Layouts.raw) in_recs) := function
+	shared fnDate(dataset(Layouts.raw) in_recs) := function
 		temp_filter := in_recs(dt_last_seen != '' or dt_first_seen != '');
 		temp_rollup := rollup(temp_filter,
 			true,
@@ -20,16 +20,16 @@ export Functions := module
 		temp_project := project(temp_rollup,Layouts.rptDtSeen);
 		return temp_project;
 	end;
-	export fnSsn(dataset(Layouts.raw) in_recs, AutoStandardI.InterfaceTranslator.ssn_mask_value.params in_mod) := function
+	shared fnSsn(dataset(Layouts.raw) in_recs, string ssnmask) := function
 		temp_filter := in_recs(ssn != '');
 		temp_sort := sort(temp_filter,ssn,-dt_last_seen,-dt_first_seen,-score,record);
 		temp_dedup := dedup(temp_sort,ssn);
 		temp_resort := sort(temp_dedup,-dt_last_seen,-dt_first_seen,-score,ssn,record);
 		temp_project := project(temp_resort,Layouts.rptSsn);
-		suppress.MAC_Mask (temp_project, temp_masked, SSN, null, true, false, , , , in_mod.ssnmask);
+		suppress.MAC_Mask (temp_project, temp_masked, SSN, null, true, false, , , , ssnmask);
 		return temp_masked;
 	end;
-	export fnFein(dataset(Layouts.raw) in_recs) := function
+	shared fnFein(dataset(Layouts.raw) in_recs) := function
 		temp_filter := in_recs(company_fein != '');
 		temp_sort := sort(temp_filter,company_fein,-dt_last_seen,-dt_first_seen,-score,record);
 		temp_dedup := dedup(temp_sort,company_fein);
@@ -38,7 +38,7 @@ export Functions := module
 			self.fein := left.company_fein));
 		return temp_project;
 	end;
-	export fnIndvName(dataset(Layouts.raw) in_recs) := function
+	shared fnIndvName(dataset(Layouts.raw) in_recs) := function
 		temp_filter := in_recs(title != '' or fname != '' or mname != '' or lname != '' or name_suffix != '');
 		temp_sort := sort(temp_filter,lname,fname,mname,name_suffix,title,-dt_last_seen,-dt_first_seen,-score,record);
 		temp_dedup := dedup(temp_sort,lname,fname,mname,name_suffix,title);
@@ -46,7 +46,7 @@ export Functions := module
 		temp_project := project(temp_resort,Layouts.rptIndvName);
 		return temp_project;
 	end;
-	export fnBizName(dataset(Layouts.raw) in_recs) := function
+	shared fnBizName(dataset(Layouts.raw) in_recs) := function
 		temp_filter := in_recs(company_name != '');
 		temp_sort := sort(temp_filter,company_name,-dt_last_seen,-dt_first_seen,-score,record);
 		temp_dedup := dedup(temp_sort,company_name);
@@ -54,7 +54,7 @@ export Functions := module
 		temp_project := project(temp_resort,Layouts.rptBizName);
 		return temp_project;
 	end;
-	export fnPhone(dataset(Layouts.raw) in_recs) := function
+	shared fnPhone(dataset(Layouts.raw) in_recs) := function
 		temp_filter := in_recs((integer)company_phone != 0);
 		temp_sort := sort(temp_filter,company_phone,-dt_last_seen,-dt_first_seen,-score,record);
 		temp_dedup := dedup(temp_sort,company_phone);
@@ -62,7 +62,7 @@ export Functions := module
 		temp_project := project(temp_resort,transform(Layouts.rptPhone,self.phone10 := left.company_phone,self.verified := false,self:=left) );
 		return temp_project;
 	end;
-	export fnAddr := module
+	shared fnAddr := module
 		export params := interface
 			export unsigned2 REQ_PHONES_PER_ADDR;
 		end;
@@ -76,7 +76,7 @@ export Functions := module
 			return temp_rollup;
 		end;
 	end;
-	export fnPosition := module
+	shared fnPosition := module
 		export params := interface
 			export unsigned2 REQ_DATES_PER_POSITION;
 		end;
@@ -91,8 +91,10 @@ export Functions := module
 			return temp_rollup;
 		end;
 	end;
-	export fnEmployer := module
-		export params := interface(fnPosition.params,fnAddr.params,AutoStandardI.InterfaceTranslator.ssn_mask_value.params)
+	shared fnEmployer := module
+		export params := interface(fnPosition.params,fnAddr.params)
+      export string ssn_mask;
+
 			export unsigned2 REQ_DATES_PER_EMPLOYER;
 			export unsigned2 REQ_FEINS_PER_EMPLOYER;
 			export unsigned2 REQ_COMPANY_NAMES_PER_EMPLOYER;
@@ -142,7 +144,7 @@ export Functions := module
 				self.did := left.did,
 				self.isDeepDive := if(exists(rows(left)(not isDeepDive)),false,true),
 				self.penalt := min(rows(left),penalt),
-				self.ssns := choosen(fnSsn(rows(left), in_mod),ut.min2(in_mod.REQ_SSNS_PER_PERSON,Constants.MAX_SSNS_PER_PERSON)),
+				self.ssns := choosen(fnSsn(rows(left), in_mod.ssn_mask),ut.min2(in_mod.REQ_SSNS_PER_PERSON,Constants.MAX_SSNS_PER_PERSON)),
 				self.names := choosen(fnIndvName(rows(left)),ut.min2(in_mod.REQ_NAMES_PER_PERSON,Constants.MAX_NAMES_PER_PERSON)),
 				self.employers := choosen(sort(fnEmployer.val(rows(left),in_mod),-dates[1].dt_last_seen,-dates[1].dt_first_seen,record),ut.min2(in_mod.REQ_EMPLOYERS_PER_PERSON,Constants.MAX_EMPLOYERS_PER_PERSON)),
         self.hasCriminalConviction := left.hasCriminalConviction,
