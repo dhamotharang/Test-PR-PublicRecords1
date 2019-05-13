@@ -5,7 +5,7 @@
 
 // Currently almost all of these are "fake": just synonyms of a superset input
 
-import AutoHeaderI, PAW_Services, AutoStandardI, Accident_Services,
+import AutoHeaderI, AutoStandardI, Accident_Services,
   Hunting_Fishing_Services, ATF_Services,
   Foreclosure_Services, InternetDomain_Services,
   suppress, relationship, FCRA;
@@ -147,9 +147,6 @@ EXPORT input := MODULE
   end;
 
   export internetdomains := INTERFACE (InternetDomain_Services.SearchService_Records.params)
-  end;
-
-  export peopleatwork := INTERFACE (PAW_Services.PAWSearchService_Records.params)
   end;
 
   // general (vs. productwise) phones options

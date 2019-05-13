@@ -6,7 +6,9 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 													 boolean addressOnlySort = false,
 													 boolean skipRelativePhoneAppend = false) := FUNCTION
 
-	doxie.MAC_Header_Field_Declare();
+	doxie.MAC_Header_Field_Declare(); //pname_value, phone_value, city_value, state_value, zip_value, ssn_value,
+                                    //reduced_data_value, score_threshold_value, all_dids, dial_bouncedistance_value,
+                                    //MaxResults_val, SkipRecords_val, MaxResultsThisTime_val
 	mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 	
 	high_valid_ssn := 100; // default high value; lowest is best
@@ -631,7 +633,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 	get_rel := doxie.relative_names(PROJECT(ta2_grouped,
 																		TRANSFORM(doxie.layout_references, 
 																				SELF.did := (unsigned)LEFT.did)),
-																			false,industry_class_value='CNSMR');
+																			false, mod_access.isConsumer());
  
 	bounce_orig addRelat(ta2 le, get_rel ri) := TRANSFORM
 		SELF.RelativeNames := project(ri.names,Standard.Name);
@@ -644,7 +646,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 			bounce_orig);
 			
 
-	doxie.MAC_Add_WeAlsoFound(bounce,bounce_waf,mod_access.glb,mod_access.dppa)
+	doxie.MAC_Add_WeAlsoFound(bounce,bounce_waf,mod_access)
 	outt1 := IF (include_wealsofound, bounce_waf, bounce);
 				
 	doxie.Mac_Bk_Count(outt1, outt2, did, bk_count, doxie_crs.str_typeDebtor);			
@@ -652,7 +654,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 	outt := IF(includeBankruptcyCount, outt2, outt1);
 
 	// mask the ssns	g
-	Suppress.MAC_Mask_dsSSN(outt, with_mask, ssnrecs, ssn);
+	Suppress.MAC_Mask_dsSSN(outt, with_mask, ssnrecs, ssn, , , mod_access.ssn_mask);
 
 
 	/* ******************** US SEARCH HACK ************************ */

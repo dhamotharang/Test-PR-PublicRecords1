@@ -64,7 +64,11 @@ export PAWSearchService := macro
 	tempmodids := module(project(AutoStandardI.GlobalModule(),PAW_Services.PAWSearchService_IDs.params,opt))
 	export ContactID := 0 : stored('ContactID');
 end;
-tempmod := module(project(AutoStandardI.GlobalModule(),PAW_Services.PAWSearchService_Records.params,opt))
+gmod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(gmod);
+tempmod := module(gmod, mod_access)
+	export string DataPermissionMask := mod_access.DataPermissionMask; //conflicting definition
+	export string DataRestrictionMask := mod_access.DataRestrictionMask; //conflicting definition
 	export unsigned2 REQ_PHONES_PER_ADDR := PAW_Services.Constants.MAX_PHONES_PER_ADDR : stored('ReqPhonesPerAddr');
 	export unsigned2 REQ_DATES_PER_POSITION := PAW_Services.Constants.MAX_DATES_PER_POSITION : stored('ReqDatesPerPosition');
 	export unsigned2 REQ_DATES_PER_EMPLOYER := PAW_Services.Constants.MAX_DATES_PER_EMPLOYER : stored('ReqDatesPerEmployer');
@@ -75,19 +79,20 @@ tempmod := module(project(AutoStandardI.GlobalModule(),PAW_Services.PAWSearchSer
 	export unsigned2 REQ_SSNS_PER_PERSON := PAW_Services.Constants.MAX_SSNS_PER_PERSON : stored('ReqSsnsPerPerson');
 	export unsigned2 REQ_NAMES_PER_PERSON := PAW_Services.Constants.MAX_NAMES_PER_PERSON : stored('ReqNamesPerPerson');
 	export unsigned2 REQ_EMPLOYERS_PER_PERSON := PAW_Services.Constants.MAX_EMPLOYERS_PER_PERSON : stored('ReqEmployersPerPerson');
-	export PenaltThreshold := 5;
+	export unsigned2 PenaltThreshold := 5;
 	export includeAlsoFound := return_waf AND ~negate_true_defaults;
 	export boolean IncludeCriminalIndicators := false : stored('IncludeCriminalIndicators');
 end;
+mod_paw := PROJECT(tempmod, PAW_Services.PAWSearchService_Records.params, OPT);
 
 // Bug: 45732 - 
 // removed retrieving IDs from the PAW_Services.PAWSearchService_Records.val
 // attribute to allow the Doxie.HFRS to call the attribute with its IDs 
 // allowing the doxie.hfrs to display a PAW-v2 child dataset in 
 // standard PAW rollup format
-ids := paw_services.PAWSearchService_IDs.val(tempmod);
+ids := paw_services.PAWSearchService_IDs.val(mod_paw);
 
-tempresults := PAW_Services.PAWSearchService_Records.val(ids,tempmod);
+tempresults := PAW_Services.PAWSearchService_Records.val(ids,mod_paw);
 
 //Suppress by SSN and DID.
 Suppress.MAC_Suppress_Child.keyLinked(tempresults, , ssn_suppressed, tempmod.applicationType, Suppress.Constants.LinkTypes.SSN, ssn, __seq, ssns, true);
@@ -99,4 +104,3 @@ doxie.MAC_Marshall_Results(did_suppressed,tempmarshalled);
 output(tempmarshalled,named('Results'));
 
 endmacro;
-

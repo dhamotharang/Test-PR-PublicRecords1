@@ -91,7 +91,8 @@
 <message name="headerFileSearchRequest" wuTimeout="300000">
 */
 
-IMPORT PhonesFeedback,PhonesFeedback_Services,doxie,Risk_Indicators,iesp,AddressFeedback,AddressFeedback_Services,WSInput,Royalty;
+IMPORT PhonesFeedback, PhonesFeedback_Services, doxie, AddressFeedback_Services, WSInput, Royalty;
+
 EXPORT HeaderFileSearchService := MACRO
 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		
@@ -102,7 +103,9 @@ EXPORT HeaderFileSearchService := MACRO
 		boolean  IncludePhonesFeedback := false : stored('IncludePhonesFeedback');
 		boolean  IncludeAddressFeedback := false : stored('IncludeAddressFeedback');
 		set of string Include_SourceList := [] : stored('IncludeSourceList'); // keeping name in sync with IncludeSourceList in Doxie.HeaderSource_Service
-		doxie.MAC_Header_Field_Declare()
+		
+    doxie.MAC_Header_Field_Declare() //date_first_seen_value, date_last_seen_value, allow_date_seen_value, allow_wildcard_val, some includes, etc.
+    mod_access := doxie.compliance.GetGlobalDataAccessModule();
 		unsigned seq_value := 0 : STORED('seq');
 
 		// Added for the FDN project, 1 new input option & 3 required input fields
@@ -114,7 +117,7 @@ EXPORT HeaderFileSearchService := MACRO
 		outf := doxie.header_records(true, allow_wildcard_val);
 		presRecs := PROJECT(outf, doxie.layout_presentation);
 
-		ta_ready := doxie.header_presentation(presRecs);
+		ta_ready := doxie.header_presentation(presRecs, mod_access);
 
 		doxie.MAC_Apply_DtSeen_Filter(ta_ready, ta_filtered, last_seen, first_seen);
 

@@ -11,9 +11,10 @@ export Raw := module
 			AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
 			AutoStandardI.InterfaceTranslator.score_threshold_value.params,
 			AutoStandardI.InterfaceTranslator.StrictMatch_value.params,
-			AutoStandardI.InterfaceTranslator.ssn_mask_value.params,
 			AutoStandardI.InterfaceTranslator.addr_suffix_value.params,
-			AutoStandardI.InterfaceTranslator.all_dids.params)
+			AutoStandardI.InterfaceTranslator.all_dids.params,
+      doxie.IDataAccess)
+      export string DataPermissionMask := ''; //conflicting definition; instead of '00000000000000' as in AutoStandardI.Constants.DataPermissionMask_default
 			export includeSSNHri := false;
 			export includeAddrHri := false;
 			export includePhoneHri := false;
@@ -27,7 +28,7 @@ export Raw := module
 		export byDID(dataset(doxie.layout_references_hh) in_dids, params in_mod) := FUNCTION
 
 			// needed for the macros below
-			ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
+			ssn_mask_value := in_mod.ssn_mask;
 			phone_value := AutoStandardI.InterfaceTranslator.phone_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.phone_value.params));
 			unsigned1 maxHriPer_value := 10;
 		
@@ -116,9 +117,10 @@ export Raw := module
 		  AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
 			AutoStandardI.InterfaceTranslator.score_threshold_value.params,
 			AutoStandardI.InterfaceTranslator.StrictMatch_value.params,
-			AutoStandardI.InterfaceTranslator.ssn_mask_value.params,
 			AutoStandardI.InterfaceTranslator.addr_suffix_value.params,
-			AutoStandardI.InterfaceTranslator.all_dids.params)
+			AutoStandardI.InterfaceTranslator.all_dids.params,
+      doxie.IDataAccess)
+      export string DataPermissionMask := ''; //conflicting definition; instead of '00000000000000' as in AutoStandardI.Constants.DataPermissionMask_default
 			export IncludeBankruptcies := false;
 			export includeSSNHri := false;
 			export includeAddrHri := false;
@@ -132,7 +134,7 @@ export Raw := module
 		export byDID(dataset(doxie.layout_references_hh) in_dids, params in_mod, boolean incSourceDocCounts=false) := FUNCTION
 
 			// needed for the macros below
-			ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
+			ssn_mask_value := in_mod.ssn_mask;
 			phone_value := AutoStandardI.InterfaceTranslator.phone_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.phone_value.params));
 			unsigned1 maxHriPer_value := 10;
 		
