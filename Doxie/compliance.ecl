@@ -204,7 +204,8 @@ EXPORT compliance := MODULE
     ENDMACRO;  
 
     shared restrictedSet := ['0',''];
-    EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
+    EXPORT use_Polk(string dpm)            := dpm [7] NOT IN restrictedSet;
+    EXPORT use_DM_SSA_updates(string dpm)  := dpm[10] NOT IN restrictedSet;
     EXPORT use_InsuranceDLData(string dpm) := dpm[13] NOT IN restrictedSet;
     EXPORT boolean isJuliRestricted(drm_type drm) := ~allowAll AND (drm[41] NOT IN restrictedSet);
 

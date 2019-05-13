@@ -2,20 +2,20 @@
 Changed scoring queries to use Bankruptcy V3 per Bug: 179687
 */
 
-IMPORT Advo, Autokey_batch, AutoStandardI, BankruptcyV3, Batchservices, Corp2,
+IMPORT Advo, AutoStandardI, BankruptcyV3, Batchservices, Corp2,
        Didville, doxie, doxie_files, Doxie_Raw, DriversV2,
        faa, LiensV2, NID, PAW, Prof_LicenseV2, Risk_Indicators, RiskWise, UCCV2, ut,
-			 VehicleV2_Services, Watercraft,header, BatchShare, SexOffender_Services, DeathV2_Services, Models, lib_stringlib;
+			 VehicleV2_Services, Watercraft,header, BatchShare, SexOffender_Services, DeathV2_Services, Models, STD;
 
   R_I := Risk_Indicators;
   PBF_Layout := Models.Layout_PostBeneficiaryFraud;
-  UCase := StringLib.StringToUpperCase;
+  UCase := STD.Str.ToUpperCase;
 
 EXPORT PostBeneficiaryFraud_Functions := MODULE
 	
 	// -------------[ Shared scalar values and functions ]--------------
 	SHARED STRING CURRENT          := 'C';
-	SHARED STRING8 todays_date_full := StringLib.GetDateYYYYMMDD();	
+	SHARED STRING8 todays_date_full := (string8)STD.Date.Today();	
 	SHARED STRING6 todays_date      := todays_date_full[1..6];
 	SHARED SET OF UNSIGNED3 datesConsideredCurrent := [0, 999999, (UNSIGNED3)todays_date];
 	
@@ -179,8 +179,8 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 		checkRNA := header.constants.checkRNA;
 
 	  // Get Relatives.
-	  doxie.MAC_best_records(f_rel_for_best, person2, f_rel_best, ut.dppa_ok(DPPA_Purpose,checkRNA),
-		                                    ut.glb_ok(GLB_Purpose,checkRNA),, doxie.DataRestriction.fixed_DRM,,,doxie.layout_best_ext);
+	  doxie.MAC_best_records(f_rel_for_best, person2, f_rel_best, doxie.compliance.dppa_ok(DPPA_Purpose,checkRNA),
+		                                    doxie.compliance.glb_ok(GLB_Purpose,checkRNA),, doxie.DataRestriction.fixed_DRM,,,doxie.layout_best_ext);
 	  f_rel_best_valid := f_rel_best(prim_name <> '' OR phone <> '');
 	  f_rel_best_dep := DEDUP(
 		                    SORT(
@@ -219,7 +219,7 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 
 	  // Get Roommates.
 	  doxie.MAC_best_records(f_roommie_for_best, person2, f_roommie_best,
-		                                    ut.dppa_ok(DPPA_Purpose,checkRNA), ut.glb_ok(GLB_Purpose,checkRNA),,
+		                                   doxie.compliance.dppa_ok(DPPA_Purpose,checkRNA), doxie.compliance.glb_ok(GLB_Purpose,checkRNA),,
 																				doxie.DataRestriction.fixed_DRM,,,doxie.layout_best_ext);
 	  f_roommie_best_valid := f_roommie_best(prim_name <> '' OR phone <> '');
 	  f_roommie_best_dep := DEDUP(
@@ -582,11 +582,11 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 		END;
 		
 	  mod := MODULE(VehicleV2_Services.IParam.RTBatch_V2_params)
-		  EXPORT UNSIGNED1 glb_purpose_value := GLB_Purpose;
+		  EXPORT UNSIGNED1 glb          := GLB_Purpose;
 			export BOOLEAN ReturnCurrent	:= Current_Only;
 			export BOOLEAN FullNameMatch 	:= false : Stored('FullNameMatch');
 			export boolean Is_UseDate			:= false; 
-			export string32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.InterfaceTranslator.application_type_val.params));
+			export string32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.InterfaceTranslator.application_type_val.params));
 	  END;
 		
     mvr_input_inhouse := PROJECT(current_result, xfm_to_mvr_input_inhouse(LEFT));
@@ -1255,8 +1255,8 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 		// (i.e. the archive date) falls anywhere during the time of incarceration.
 		layout_incarc_temp get_offenses(layout_incarc_temp l, layout_offensesKey r) := transform
 			// Parse incarceration or sentencing information out ofstc_desc fields
-			posBeg := stringlib.stringfind(r.stc_desc_2, 'Date:', 1);  // format is 'Sent Start Date: yyyymmdd Sent End Date: yyyymmdd'
-			posEnd := stringlib.stringfind(r.stc_desc_2, 'Date:', 2);
+			posBeg := STD.Str.Find(r.stc_desc_2, 'Date:', 1);  // format is 'Sent Start Date: yyyymmdd Sent End Date: yyyymmdd'
+			posEnd := STD.Str.Find(r.stc_desc_2, 'Date:', 2);
 			
 			beg_dt	:= if(posBeg <> 0, r.stc_desc_2[posBeg+6..posBeg+11], '');  // position at start date and grab yyyymm
 			end_dt	:= if(posEnd <> 0, r.stc_desc_2[posEnd+6..posEnd+11], '');  // position at end date and grab yyyymm

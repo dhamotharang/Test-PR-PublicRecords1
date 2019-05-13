@@ -91,16 +91,16 @@ EXPORT Raw := MODULE
 				export boolean   dedup_results_l   := true 	: stored('Deduped');
 				export string3   thresh_val        := ''    : stored('AppendThreshold');
 				export boolean   GLB_data          := false : stored('GLBData');
-				export unsigned1 glb_purpose_value := 8     : stored('glbpurpose');
+				export unsigned1 glb               := 8     : stored('glbpurpose');     //different from in_mod default
 				export boolean   patriotproc       := false : stored('PatriotProcess');
-				export boolean   include_minors    := false : stored('IncludeMinors');
+				export boolean   show_minors       := false : stored('IncludeMinors');  //different from in_mod default
 				// 127542 - GatewayNameMatch option works only for gateways - It filters by person's name who owns the vehicle at input address.
 				export boolean GatewayNameMatch    := false : stored('GatewayNameMatch');
-				export BOOLEAN AlwaysHitGateway    := ~doxie.DataPermission.use_Polk;		
+				export BOOLEAN AlwaysHitGateway    := ~doxie.compliance.use_Polk(in_mod.DataPermissionMask);		
 				export BOOLEAN ReturnCurrent			 := false : stored('ReturnCurrent');
 				export BOOLEAN FullNameMatch 			 := false : stored('FullNameMatch');
 				export boolean Is_UseDate					 := use_date; 
-				export string32 ApplicationType 	 := in_mod.application_type;
+				export string32 application_type 	 := in_mod.application_type;
 			END;
 			
 			ds_mvr_recs_raw := 
