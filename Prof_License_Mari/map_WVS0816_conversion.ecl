@@ -1,4 +1,4 @@
-//********************************************************************************
+﻿//********************************************************************************
 // Converting West Virginia Real Estate Appr Lic & Cert Board Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 //********************************************************************************
@@ -6,6 +6,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, NID, Lib_FileServices, lib_stringlib;
 
 EXPORT map_WVS0816_conversion(STRING pVersion) := FUNCTION
+#workunit('name','Yogurt:Prof License MARI - WVS0816 Build ' + pVersion);
 
 	code 								:= 'WVS0816';
 	src_cd							:= code[3..7];
@@ -22,88 +23,15 @@ EXPORT map_WVS0816_conversion(STRING pVersion) := FUNCTION
 	file_raw						:= Prof_License_Mari.file_WVS0816;
 	oRAW								:= OUTPUT(file_raw);
 
-	//concat all columns
-	layout_concat := RECORD
-		STRING all_columns;
-		STRING temp1;
-		STRING temp2;
-		STRING temp3;
-		STRING temp4;
-		STRING temp5;
-		STRING county;
-	END;
-
-	layout_concat concatAllColumns(file_raw L) := TRANSFORM
-		temp := //TRIM(REGEXREPLACE('[ ]+',L.COL_A,' '),LEFT,RIGHT)+'|'+
-		        TRIM(L.COL_A,LEFT,RIGHT)+'|'+
-		        TRIM(L.COL_B,LEFT,RIGHT)+'|'+
-						//TRIM(REGEXREPLACE('[ ]+',L.COL_C,' '),LEFT,RIGHT)+'|'+
-						//TRIM(REGEXREPLACE('[ ]+',L.COL_D,' '),LEFT,RIGHT)+'|'+
-		        TRIM(L.COL_C,LEFT,RIGHT)+'|'+
-		        TRIM(L.COL_D,LEFT,RIGHT)+'|'+
-						TRIM(L.COL_E,LEFT,RIGHT)+'|'+TRIM(L.COL_F,LEFT,RIGHT)+'|'+TRIM(L.COL_G,LEFT,RIGHT)+'|'+TRIM(L.COL_H,LEFT,RIGHT)+'|'+
-						TRIM(L.COL_I,LEFT,RIGHT)+'|'+
-						//TRIM(REGEXREPLACE('[ ]+',L.COL_J,' '),LEFT,RIGHT)+'|'+
-		        TRIM(L.COL_J,LEFT,RIGHT)+'|'+
-						TRIM(L.COL_K,LEFT,RIGHT)+'|'+TRIM(L.COL_L,LEFT,RIGHT)+'|'+
-						TRIM(L.COL_M,LEFT,RIGHT)+'|'+TRIM(L.COL_N,LEFT,RIGHT)+'|'+TRIM(L.COL_O,LEFT,RIGHT)+'|'+TRIM(L.COL_P,LEFT,RIGHT)+'|'+
-						TRIM(L.COL_Q,LEFT,RIGHT)+'|'+TRIM(L.COL_R,LEFT,RIGHT)+'|'+TRIM(L.COL_S,LEFT,RIGHT)+'|'+TRIM(L.COL_T,LEFT,RIGHT)+'|'+
-						TRIM(L.COL_U,LEFT,RIGHT)+'|'+TRIM(L.COL_V,LEFT,RIGHT)+'|'+TRIM(L.COL_W,LEFT,RIGHT)+'|'+TRIM(L.COL_X,LEFT,RIGHT)+'|'+
-						TRIM(L.COL_Y,LEFT,RIGHT);
-		SELF.temp1 := Prof_License_Mari.mod_clean_name_addr.TrimUpper(temp);			
-		//remove extra columns
-		SELF.temp2 := REGEXREPLACE('(\\|+)', SELF.temp1, '|');
-		//remove trailing |
-		SELF.temp3 := REGEXREPLACE('\\|$', SELF.temp2, '');
-		//Replace 2 and more spaces by |. This should convert lines like SMITH, JANE R.   2000 MAIN ... to SMITH, JANE R.|2000 MAIN..
-		SELF.temp4 := REGEXREPLACE('[ ]{4,}', SELF.temp3, '|');
-		SELF.temp5 := REGEXREPLACE('[ ]{2,}',SELF.temp4,' ');
-		SELF.all_columns := IF(REGEXFIND('CERT NO',SELF.temp5),'',SELF.temp5);
-		SELF.county := IF(REGEXFIND('\\|', SELF.temp5), '', SELF.temp5);
-		//SELF := [];
-	END;
-	file_concat := PROJECT(file_raw, concatAllColumns(LEFT));
-
-	oFConcat := OUTPUT(file_concat);
-	oOdd     := OUTPUT(file_concat(all_columns<>''));
-	
-	//Populate county
-	layout_concat populateCounty(layout_concat L, layout_concat R) := TRANSFORM
-		temp_county := MAP(L.all_columns='' => R.county,
-											 R.all_columns<>'' AND NOT REGEXFIND('\\|', R.all_columns) => R.county,
-											 L.county);
-		SELF.county := IF(REGEXFIND('Z[ ]+-[ ]+OTHER',temp_county), '', temp_county);									 
-		SELF := R;
-	END;
-	file_county  := ITERATE(file_concat(all_columns<>''), populateCounty(LEFT, RIGHT));
-	ofile_county := OUTPUT(file_county,,NAMED('ofile_county'));
-	
-	//format the the input file
-	//layout_inf formatData(layout_concat L) := TRANSFORM - used for debug
-	Prof_License_Mari.layout_WVS0816.LAYOUT_DATA  formatData(layout_concat L) := TRANSFORM
-		record_pattern 	:= '^(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)\\|(.*)$';
-		SELF.COUNTY			:= L.county;
-		SELF.NAME				:= TRIM(REGEXFIND(record_pattern, L.all_columns, 1), LEFT, RIGHT);
-		SELF.ADDRESS		:= TRIM(REGEXFIND(record_pattern, L.all_columns, 2), LEFT, RIGHT);
-		SELF.CITY				:= TRIM(REGEXFIND(record_pattern, L.all_columns, 3), LEFT, RIGHT);
-		SELF.ST					:= TRIM(REGEXFIND(record_pattern, L.all_columns, 4), LEFT, RIGHT);
-		SELF.ZIP				:= TRIM(REGEXFIND(record_pattern, L.all_columns, 5), LEFT, RIGHT);
-		SELF.PHONE			:= TRIM(REGEXFIND(record_pattern, L.all_columns, 6), LEFT, RIGHT);
-		SELF.LIC_TYPE		:= TRIM(REGEXFIND(record_pattern, L.all_columns, 7), LEFT, RIGHT);
-		SELF.LIC_NO			:= TRIM(REGEXFIND(record_pattern, L.all_columns, 8), LEFT, RIGHT);	
-		SELF						:= L;
-	END;
-
-	infile := PROJECT(file_county(REGEXFIND('\\|', all_columns)), formatData(LEFT));
-	oAPR   := OUTPUT(infile);	
 	
 	//Filtering out "BAD" records per requirements
-	GoodFilterRec	 			:= inFile(NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(NAME)) AND
-																LIC_NO<>'');
+	GoodFilterRec	 			:= file_raw(NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, ut.CleanSpacesAndUpper(NAME)) AND
+	                                NOT REGEXFIND(Prof_License_Mari.filters.BadLicenseFilter, ut.CleanSpacesAndUpper(LIC_NO)) AND
+																  TRIM(LIC_NO) != '');
   ut.CleanFields(GoodFilterRec,clnGoodFilterRec);
 
 	//Map Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(Prof_License_Mari.layout_WVS0816.LAYOUT_DATA pInput) := TRANSFORM
+	Prof_License_Mari.layouts.base xformToCommon(Prof_License_Mari.layout_WVS0816.LAYOUT_Raw pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -120,15 +48,15 @@ EXPORT map_WVS0816_conversion(STRING pVersion) := FUNCTION
 
 		SELF.TYPE_CD					:= 'MD';
 	
- 		TrimCounty						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COUNTY);
- 		TrimNAME_FULL					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.NAME);
-		TrimAddress1 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS);
-		TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
-		TrimState							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ST);
-		TrimZip								:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP);
-		TrimPhone							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.PHONE);
-		TrimLicType	 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_TYPE);
-		TrimLicNo		 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_NO);
+ 		TrimCounty						:= ut.CleanSpacesAndUpper(pInput.COUNTY);
+ 		TrimNAME_FULL					:= ut.CleanSpacesAndUpper(pInput.NAME);
+		TrimAddress1 					:= ut.CleanSpacesAndUpper(pInput.ADDRESS);
+		TrimCity							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		TrimState							:= ut.CleanSpacesAndUpper(pInput.ST);
+		TrimZip								:= ut.CleanSpacesAndUpper(pInput.ZIP);
+		TrimPhone							:= ut.CleanPhone(pInput.PHONE); 
+		TrimLicType	 					:= ut.CleanSpacesAndUpper(pInput.LIC_TYPE);
+		TrimLicNo		 					:= ut.CleanSpacesAndUpper(pInput.LIC_NO);
     //SuffixName Pattern
 		SuffixPattern         := ' JR.| SR.| JR | SR | III| II | VI | IV ';
     tempSufx              := IF(REGEXFIND(SuffixPattern,TrimNAME_FULL),REGEXFIND(SuffixPattern,TrimNAME_FULL,0),'');
@@ -225,7 +153,7 @@ EXPORT map_WVS0816_conversion(STRING pVersion) := FUNCTION
 		SELF := [];	
 		   
 	END;
-	inFileLic	:= PROJECT(clnGoodFilterRec,xformToCommon(LEFT));
+	inFileLic	:= PROJECT(clnGoodFilterRec(TRIM(LIC_NO) != ''),xformToCommon(LEFT));
 
 	// Populate STD_PROF_CD field via translation on license type field
 	Prof_License_Mari.layouts.base 	trans_lic_type(inFileLic L, cmvTransLkp R) := TRANSFORM
@@ -255,6 +183,6 @@ EXPORT map_WVS0816_conversion(STRING pVersion) := FUNCTION
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
 	
-	RETURN SEQUENTIAL(move_to_using, oRAW, oFConcat, oOdd, ofile_county, oAPR, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(move_to_using, oRAW, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
 	
 END;
