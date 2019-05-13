@@ -23,8 +23,9 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyNAC(version))\n'
-+'		,Scrubs_FraudGov.MAC_Scrubs_Report(filedate,\'Scrubs_FraudGov\',\'NAC\', Scrubs_FraudGov.NAC_In_NAC, FraudGovPlatform_Validation.Mailing_List().Alert)\n'
++'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyNAC(version)\n'
++'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'NAC\', Scrubs_FraudGov.NAC_In_NAC, FraudGovPlatform_Validation.Mailing_List().Alert)\n'
++'		)\n'
 +'	);\n'
 ;
 

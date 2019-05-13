@@ -4,6 +4,6 @@ IMPORT B_Email,E_Customer,E_Email FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Email := MODULE
   SHARED TYPEOF(B_Email.__ENH_Email) __ENH_Email := B_Email.__ENH_Email;
-  SHARED __EE686978 := __ENH_Email;
-  EXPORT Res0 := __UNWRAP(__EE686978);
+  SHARED __EE688176 := __ENH_Email;
+  EXPORT Res0 := __UNWRAP(__EE688176);
 END;
