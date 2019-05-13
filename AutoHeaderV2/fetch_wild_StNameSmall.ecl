@@ -1,4 +1,4 @@
-import ut,doxie,AutoheaderV2,lib_stringlib;
+import ut,doxie,dx_header,AutoheaderV2,lib_stringlib;
 
 export fetch_wild_StNameSmall (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	_row := ds_search[1];
@@ -24,7 +24,7 @@ export fetch_wild_StNameSmall (dataset (AutoheaderV2.layouts.search) ds_search) 
 	temp_rel_fname_value2 := _row.tname.fname_rel_2;
 	temp_score_threshold_value := _options.score_threshold;
 
-	i := doxie.Key_Header_Wild_StFnameLname;
+	i := dx_header.key_wild_StFnameLname();
 
 	res_final :=
 		project(  LIMIT (LIMIT(

@@ -1,4 +1,4 @@
-import ut,doxie,NID,AutoheaderV2, lib_ziplib;
+import dx_header, ut, doxie, AutoheaderV2, NID, lib_ziplib;
 
 export fetch_zip (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 
@@ -47,8 +47,8 @@ export fetch_zip (dataset (AutoheaderV2.layouts.search) ds_search, integer searc
 		temp_non_exclusion_value := _options.nonexclusion or _options.ln_branded and ~_options.strict_match;
 
 
-		i := doxie.Key_Header_Piz;
-		wi := doxie.Key_Header_Wild_Zip;
+		i := dx_header.key_piz();
+		wi := dx_header.key_wild_zip();
 
     //change: moved to the very end
     //change: by usage, this function is not called if DID, full SSN or phone are provided

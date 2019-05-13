@@ -63,11 +63,11 @@
  </message>
 */
 
-import AutoStandardI, ut, address, riskwise, risk_indicators, didville,gong,
+import AutoStandardI, ut, riskwise, risk_indicators, didville, gong,
 			 ln_propertyv2,business_risk,paw,driversv2,certegy,inquiry_acclogs,email_data,yellowpages,
 			 business_header_ss,advo,daybatchpcnsr,easi,avm_v2,avm_v2,utilfile,liensv2,business_header, 
 			 _Control, watercraft, AlloyMedia_student_list, American_student_list, doxie_files,  
-			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship;
+			 prof_licenseV2,BankruptcyV2, BankruptcyV3, gateway, Royalty,Relationship,dx_header;
 
 export ProdData := MACRO
 
@@ -352,7 +352,7 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 											keyed(right.ssn=left.ssn), left outer, atmost(100));
 	if(indata[1].ssn!='' and (include_all_files=true or include_ssntable=true), output(ssn_rec, named('ssn_table')) );
 	
-	dids := choosen(doxie.Key_Header_Wild_SSN(keyed(s1=indata[1].ssn[1]),
+	dids := choosen(dx_header.key_wild_SSN()(keyed(s1=indata[1].ssn[1]),
 							 keyed(s2=indata[1].ssn[2]),
 							 keyed(s3=indata[1].ssn[3]),
 							 keyed(s4=indata[1].ssn[4]),
@@ -374,7 +374,7 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 	
 	if(indata[1].ssn!='' and (include_all_files=true or include_ssntable=true), output(choosen(doxie.Key_SSN_Map(keyed(ssn5=indata[1].ssn[1..5]) and indata[1].ssn!=''), max_recs), named('ssn_map')) );
 	
-	if(indata[1].ssn != '' and (include_all_files=true or include_ssntable=true), OUTPUT(CHOOSEN(doxie.Key_legacy_ssn(KEYED(ssn = indata[1].ssn)), max_recs), NAMED('Frozen_SSN_Table')));
+	if(indata[1].ssn != '' and (include_all_files=true or include_ssntable=true), OUTPUT(CHOOSEN(dx_header.key_legacy_ssn()(KEYED(ssn = indata[1].ssn)), max_recs), NAMED('Frozen_SSN_Table')));
 	
 	// pluck the deceased value from ssn_table already done and send that through to ssnCodes function			
 	codes_in := ungroup( project(ssn_rec, transform(RiskWise.layouts.layout_ssn_in,
@@ -396,7 +396,7 @@ if((i_ct>=2 or in_did<>0) and (include_all_files=true or include_best_data=true)
 		unsigned6 did := 0;
 	end;
 
-	hdr_did := choosen(doxie.Key_Header(keyed(s_did=searchdid)), 500);
+	hdr_did := choosen(dx_header.key_header()(keyed(s_did=searchdid)), 500);
 	quick_hdr_did := choosen(header_quick.key_DID (keyed(did=searchdid)), 500);
 	header_recs := riskwise.getHeaderByDid(dataset([{searchdid}], d), dppa, glb, false, DataRestriction);
 	if(searchdid!=0 and include_all_header=false and (include_all_files=true or include_header=true), output(sort(header_recs, ssn, -dt_last_seen), named('header_records_by_did')) );

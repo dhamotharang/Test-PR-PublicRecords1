@@ -1,4 +1,4 @@
-import ut,doxie,AutoheaderV2, lib_stringlib,lib_ziplib;
+import ut,doxie,dx_header,AutoheaderV2, lib_stringlib,lib_ziplib;
 
 export fetch_wild_zip (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 	_row := ds_search[1];
@@ -29,7 +29,7 @@ export fetch_wild_zip (dataset (AutoheaderV2.layouts.search) ds_search, integer 
 	temp_rel_fname_value1 := _row.tname.fname_rel_1;
 	temp_rel_fname_value2 := _row.tname.fname_rel_2;
 
-	i := doxie.Key_Header_Wild_Zip;
+	i := dx_header.key_wild_zip();
 
 	first_fil := (temp_lname_wild_val<>'' AND temp_zip_value<>[]) AND
 								// To Prevent extra work

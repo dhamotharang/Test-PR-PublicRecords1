@@ -1,4 +1,4 @@
-import doxie, header_slimsort, header, ut;
+import dx_header, ut;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -23,7 +23,7 @@ export fn_assignFailureCode(DATASET(LT.Clean.FullRecordNorm) SearchData, UNSIGNE
 	END;
 		
 	one := join(			 
-	 SearchData, doxie.Key_Header_Name,	 
+	 SearchData, dx_header.key_name(),	 
 	 keyed(left.SearchName.PhoneticLname[1..6] = right.dph_lname) and
 	 keyed(left.SearchName.lname = right.lname) and
 	 keyed(left.SearchName.pfname = right.pfname or
@@ -39,7 +39,7 @@ export fn_assignFailureCode(DATASET(LT.Clean.FullRecordNorm) SearchData, UNSIGNE
 	 );	
 	 
 	 two := join(			 
-	 one, doxie.Key_Header_StFnameLName,	
+	 one, dx_header.key_StFnameLname(),	
 	 left.FoundFirstLast = true and
 	 keyed(left.SearchAddress.st = right.st) and
 	 keyed(left.SearchName.PhoneticLname[1..6] = right.dph_lname) and
@@ -57,7 +57,7 @@ export fn_assignFailureCode(DATASET(LT.Clean.FullRecordNorm) SearchData, UNSIGNE
 	 );	
 
 	 three := join(			 
-			 two, doxie.Key_Header_Piz,
+			 two, dx_header.key_piz(),
 			 left.FoundStateFirstLast = true and
 			 keyed(ut.PizTools.reverseZip(trim(left.SearchAddress.zip5)) = right.piz) and
 			 keyed(left.SearchName.PhoneticLname[1..6] = right.dph_lname) and
@@ -101,7 +101,7 @@ export fn_assignFailureCode(DATASET(LT.Clean.FullRecordNorm) SearchData, UNSIGNE
 																							SearchAddress.Prim_Name	!= '');
 	
 	searchpass_candidates_dids := join(			 
-			 searchDataLocal, doxie.Key_Header_Piz,
+			 searchDataLocal, dx_header.key_piz(),
 			 keyed((integer4)stringlib.stringreverse(trim(left.SearchAddress.zip5))= right.piz) and
 			 keyed(left.SearchName.PhoneticLname[1..6] = right.dph_lname) and
 			 keyed(left.SearchName.lname = right.lname) and
@@ -123,7 +123,7 @@ export fn_assignFailureCode(DATASET(LT.Clean.FullRecordNorm) SearchData, UNSIGNE
 	searchpass_candidates_dids_sorted  := sort(searchpass_candidates_dids, InternalSeqNo, SearchAddress.ADDRESSID, did);
 	searchpass_candidates_dids_deduped := dedup(searchpass_candidates_dids_sorted, InternalSeqNo, SearchAddress.ADDRESSID, did);
 
-	dirty_header_records	:= join (searchpass_candidates_dids_deduped, doxie.key_header,
+	dirty_header_records	:= join (searchpass_candidates_dids_deduped, dx_header.key_header(),
 														keyed(LEFT.did = RIGHT.s_did) and
 														left.SearchAddress.Prim_Name	!= '' and		
 														// conditions from did search also apply here.. don't need the extra records 

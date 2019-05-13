@@ -3,7 +3,7 @@ This attribute executes joins using input criteria to fetch DIDs/Identity.
 Dids from all joins are combined. This also handles error codes/On Fail.
 **/
 
-IMPORT IdentityManagement_Services, AutoHeaderV2, doxie, ut, NID, AutoStandardI, DriversV2;
+IMPORT IdentityManagement_Services, AutoHeaderV2, doxie, dx_header, ut, NID, AutoStandardI, DriversV2;
 
 EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_criteria) := FUNCTION
 	// ====== Add Common Code Here- all at one place only: ======= //
@@ -58,7 +58,7 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
   // =============================== by SSN ===============================
 
 	// Modified logic from AutoHeaderV2.fetch_SSN for IDM service
-  i_ssn := doxie.Key_Header_SSN;
+  i_ssn := dx_header.key_ssn();
 	
 	INTEGER MAX_DIDS_PER_SSNS := Constants.MAX_DIDS_PER_SSNS; //100.Deliberately much lower than in the library search
 	BOOLEAN is_full_ssn := LENGTH(TRIM(_ssn))= 9;
@@ -107,12 +107,12 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
 	
 	// Partial SSN Search
 	// We now always want to perform Partial SSN search with Full SSN as well
-	SSN4 := DEDUP(LIMIT(PROJECT(doxie.Key_Header_SSN4(KEYED(ssn4 = _ssn4) AND
+	SSN4 := DEDUP(LIMIT(PROJECT(dx_header.key_SSN4()(KEYED(ssn4 = _ssn4) AND
 																										KEYED(_lname = '' OR (lname IN _lname_set))),
 																										TRANSFORM(AutoHeaderV2.layouts.search_out, SELF.did := LEFT.did, SELF.fetch_hit := AutoHeaderV2.Constants.FetchHit.SSN_PARTIAL)),
 											MAX_DIDS_PER_SSNS, ONFAIL(SetErrors(AutoHeaderV2.Constants.FetchHit.SSN_PARTIAL, 203))),did, all);
 
-	SSN5 := DEDUP(LIMIT(PROJECT(doxie.Key_Header_SSN5(KEYED(ssn5 = _ssn5) AND
+	SSN5 := DEDUP(LIMIT(PROJECT(dx_header.key_SSN5()(KEYED(ssn5 = _ssn5) AND
 																										KEYED(_lname = '' OR (lname IN _lname_set))),
 																										TRANSFORM(AutoHeaderV2.layouts.search_out, SELF.did := LEFT.did, SELF.fetch_hit := AutoHeaderV2.Constants.FetchHit.SSN_PARTIAL)),
 											MAX_DIDS_PER_SSNS, ONFAIL(SetErrors(AutoHeaderV2.Constants.FetchHit.SSN_PARTIAL, 203))),did,all);
@@ -131,7 +131,7 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
   // ============================== by Name ===============================
 
 	// Modified logic from AutoHeaderV2.fetch_name for IDM service
-	Name_Hdr_Key := doxie.Key_Header_Name;
+	Name_Hdr_Key := dx_header.key_name();
 
 	temp_lname_trailing_value := _lname != '' AND _fname = '' AND _mname = '';
 	temp_fname_trailing_value := _lname != '' AND _fname != '' AND _mname = '';
@@ -156,7 +156,7 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
   // =============================== by DOB ===============================
 
 	// Modified logic from AutoHeaderV2.fetch_DOBName for IDM service
-  DOB_Hdr_Key := doxie.Key_Header_DOBName;
+  DOB_Hdr_Key := dx_header.key_DOBName();
 	IdentityManagement_Services.MAC_lname_fname(DOB_Hdr_Key,lname_fil,fname_fil);
 
 	UNSIGNED8 todays_date 	:= (UNSIGNED8)Stringlib.getDateYYYYMMDD();
@@ -181,8 +181,6 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
 																																											dob % 100   = 0 => dob + 99,
 																																											dob) AND
 																					temp_dob_val_high_true >= _dob))),
-																					// AND doxie.Key_Header_DOBName.st=_state OR _state=''
-																					// AND doxie.Key_Header_DOBName.zip IN _zip;
 																					TRANSFORM(AutoHeaderV2.layouts.search_out, SELF.did := LEFT.did, SELF.fetch_hit := AutoHeaderV2.Constants.FetchHit.DOBNAME)),
 																		Constants.MAX_DIDS_PER_DOBS, ONFAIL(SetErrors(AutoHeaderV2.Constants.FetchHit.DOBNAME, 203))), did, all);
 
@@ -193,7 +191,7 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
 
 
   // =============================== by DOB-fname ===============================
-  DOB_fname_hdr_key := 	doxie.Key_Header_Dob_PFname;
+  DOB_fname_hdr_key := 	dx_header.key_DOB_pfname();
 
 	// We need only Fuzzy DOB JOIN logic
   dobfname_fetch := PROJECT (DOB_fname_hdr_key (
@@ -220,7 +218,7 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
 	is_phone10 := LENGTH(TRIM(_phone))=10;
 
 	// TODO : Join Condition - Do we need (NAME + PHONE) OR only PHONE
-	dids_by_phone_found := DEDUP(LIMIT(PROJECT(doxie.key_header_phone(_phone<>'', //Limit= 100
+	dids_by_phone_found := DEDUP(LIMIT(PROJECT(dx_header.key_phone()(_phone<>'', //Limit= 100
 																							KEYED (p7=IF(is_phone10, _phone[4..10], (STRING7)_phone)),
 																							KEYED (~is_phone10 OR p3=_phone[1..3])),
 																							TRANSFORM(AutoHeaderV2.layouts.search_out, SELF.did := LEFT.did, SELF.fetch_hit := AutoHeaderV2.Constants.FetchHit.PHONE)),
@@ -233,7 +231,7 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
   // ========================= by Address-State ===========================
 
 	// Modified logic from AutoHeaderV2.fetch_StName for IDM Service
-	State_Hdr_Key := doxie.Key_Header_StFnameLname;
+	State_Hdr_Key := dx_header.key_StFnameLname();
 
 	IdentityManagement_Services.MAC_lname_fname(State_Hdr_Key,lname_fil_3,fname_fil_3);
 
@@ -255,7 +253,7 @@ EXPORT FetchDIDs(DATASET(IdentityManagement_Services.layouts.layout_cleaner) in_
   // ====================== by Address-Addr Components ====================
 
  // Modified logic from AutoHeaderV2.fetch_address for IDM Service
-	Addr_Hdr_Key := doxie.Key_Address;
+	Addr_Hdr_Key := dx_header.key_address();
 
 	temp_city_zip_value := ziplib.CityToZip5(_state, _city);
 	STRING sec_range_pattern := AutoHeaderV2.Functions.GetSecrangeAtomPattern (_sec_range); // regex pattern for type 2 fuzzy secrange search

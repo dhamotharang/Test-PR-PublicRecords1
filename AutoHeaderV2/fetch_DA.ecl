@@ -1,4 +1,4 @@
-IMPORT ut,doxie,NID,AutoHeaderV2;
+IMPORT ut,doxie,dx_header,NID,AutoHeaderV2;
 
 export fetch_DA (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	_row := ds_search[1];
@@ -22,7 +22,7 @@ export fetch_DA (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	temp_rel_fname_value1 := _row.tname.fname_rel_1;
 	temp_rel_fname_value2 := _row.tname.fname_rel_2;
 
-	i := doxie.Key_Header_DA;
+	i := dx_header.key_DA();
 
 	max_persons := ut.limits.DID_PER_PERSON * 5; //there are less than 1500 'JOH' 'SMIT' in Big Apple
 	
