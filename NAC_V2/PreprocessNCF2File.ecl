@@ -52,12 +52,12 @@ EXPORT PreprocessNCF2File(string ilfn) := function
 
 	ncx := $.Print.NCX2_Report(cases, clients, addr, contacts); 
 
-	SEQUENTIAL(
-		OUTPUT(ncr,,ReportFileName(ilfn,'ncr2'), compressed,OVERWRITE),
-		OUTPUT(ncd,,ReportFileName(ilfn,'ncd2'), csv(terminator('\n'), separator(','), quote([])), compressed,OVERWRITE),
-		OUTPUT(ncx,,ReportFileName(ilfn,'ncx2'), compressed,OVERWRITE)
-	);
+	//ORDERED(
+		OUTPUT(ncr,,ReportFileName(ilfn,'ncr2'), compressed,OVERWRITE);
+//		OUTPUT(ncd,,ReportFileName(ilfn,'ncd2'), csv(terminator('\n'), separator(','), quote([])), compressed,OVERWRITE);
+//		OUTPUT(ncx,,ReportFileName(ilfn,'ncx2'), compressed,OVERWRITE);
+	//);
 
 
-	return nErrors;
+	return (real)nErrors/(real)total;
 end;
