@@ -1,6 +1,6 @@
-import ut, doxie, NID, header;
+import ut, doxie, NID, header, dx_header;
 
-i := doxie.Key_Header_Wild_SSN_EN;
+i := dx_header.key_wild_SSN_EN();
 				
 doxie.layout_references xt(i r) := TRANSFORM
    SELF := r;

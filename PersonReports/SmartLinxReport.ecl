@@ -13,6 +13,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 
   //this will be gone after all interfaces extend IDataAccess
   old_param := $.IParam.ConvertToOldSmartLinx(param);
+  mod_smartlinx := param;
 
   globals := AutoStandardI.GlobalModule();
   subject_did := dids[1].did; // DID should be atmost one (do we keep layout_references for legacy reasons?)
@@ -325,7 +326,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   //INDIVIDUALS  relatives, neighbors are assigned above  
 
   //BUSINESS
-     pawRaw     := IF (param.include_peopleatwork, PersonReports.peopleatwork_records (dids,module (project (old_param, $.input.peopleatwork, opt))end, IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
+     pawRaw     := IF (param.include_peopleatwork, PersonReports.peopleatwork_records (dids,module (project (mod_smartlinx, $.IParam.peopleatwork, opt))end, IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
 		 pawMod     := SmartRollup.smart_paw(pawRaw);
 		 pawNonExec := SmartRollup.fn_smart_rollup_paw(pawMod.paw_nonExec);  //non-executives ONLY rolled up
 		 pawNonExec_count := count(pawNonExec);

@@ -21,7 +21,7 @@
 */
 
 export AddressPreFillService := macro
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #constant('AllowLeadingLname',true);
 #constant('IncludeZeroDIDRefs',true);
 #stored('ScoreThreshold',fedex_services.Contants.ScoreThreshold);

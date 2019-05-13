@@ -1,4 +1,4 @@
-import ut,doxie,AutoheaderV2, lib_stringlib;
+import ut,dx_header,AutoheaderV2, lib_stringlib;
 
 export fetch_wild_phone (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	
@@ -8,7 +8,7 @@ export fetch_wild_phone (dataset (AutoheaderV2.layouts.search) ds_search) := fun
 	temp_lname_wild_val := _row.tname.lname;
 	temp_phone_value := _row.tphone.phone10;
 	
-	i := doxie.Key_Header_Wild_Phone;
+	i := dx_header.key_wild_phone();
 
 	res_final := project(
 		LIMIT (LIMIT (i(temp_phone_value<>'',

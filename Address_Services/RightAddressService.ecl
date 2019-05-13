@@ -7,7 +7,7 @@
 
 export RightAddressService := MACRO
 	
-	#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#stored ('ScoreThreshold', UPS_Services.Constants.SCORE_THRESHOLD);
 	#constant('AllowWildcard',true);
 	#constant('isCP_V2',true);
