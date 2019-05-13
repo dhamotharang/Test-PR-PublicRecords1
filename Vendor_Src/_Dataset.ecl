@@ -2,7 +2,7 @@
 
 export _Dataset(boolean pUseProd = false) := module
 
-	export Name										:= 'vendorsrc';
+	export Name										:= 'vendor_src';
 	export thor_cluster_Files			:= 	if(pUseProd ,VersionControl.foreign_prod + 'thor_data400::','~thor_data400::');
 
 	export thor_cluster_Persists	:= thor_cluster_Files		;
