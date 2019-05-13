@@ -13,7 +13,7 @@ ds_curr := dataset(tag + 'scoringqa::out::fcra::bocashell_50_historydate_999999_
 // bs_cert_curr_choosen := choosen(bs_cert_curr, 10);
 // bs_cert_curr_choosen;
 
-filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_50_historydate_999999_prod_*_1', , , ,'10.173.44.105:7070' ));
+filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_50_historydate_999999_prod_*_1'));
 
 
 filelist := sort(filenames_details, -modified);
@@ -75,7 +75,7 @@ re_filter2:=SORT(re_filter1, -Difference_Percent);
 ds_curr_archive := dataset(tag + 'scoringqa::out::fcra::bocashell_50_historydate_201207_prod_' + dt + '_1', Scoring_Project_Macros.Global_Output_Layouts.BocaShell_Global_Layout, thor)(length(trim(errorcode,left,right))= 0 );
 // ds_curr_archive := dataset(tag + 'scoringqa::out::fcra::bocashell_50_historydate_201207_prod_' + dt + '_1', zz_bbraaten2.Boca_50_Cert_NonFCRA, thor)(length(trim(errorcode,left,right))= 0 );
 
-filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_50_historydate_201207_prod_*_1', , , ,'10.173.44.105:7070' ));
+filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::fcra::bocashell_50_historydate_201207_prod_*_1'));
 
 
 filelist_arch := sort(filenames_details_arch, -modified);
@@ -135,7 +135,7 @@ nonfcra_ds_curr := dataset(tag + 'scoringqa::out::nonfcra::bocashell_50_historyd
 // nonfcra_ds_curr := dataset(tag + 'scoringqa::out::nonfcra::bocashell_50_historydate_999999_prod_' + dt + '_1', zz_bbraaten2.Boca_50_Cert_NonFCRA, thor)(length(trim(errorcode,left,right))= 0 );
 
 
-nonfcra_filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_50_historydate_999999_prod_*_1', , , ,'10.173.44.105:7070' ));
+nonfcra_filenames_details :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_50_historydate_999999_prod_*_1'));
 
 
 nonfcra_filelist := sort(nonfcra_filenames_details, -modified);
@@ -197,7 +197,7 @@ nonfcra_ds_curr_arch := dataset(tag + 'scoringqa::out::nonfcra::bocashell_50_his
 // nonfcra_ds_curr_arch := dataset(tag + 'scoringqa::out::nonfcra::bocashell_50_historydate_201207_prod_' + dt + '_1', zz_bbraaten2.Boca_50_Cert_NonFCRA, thor)(length(trim(errorcode,left,right))= 0 );
 
 
-nonfcra_filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_50_historydate_201207_prod_*_1', , , ,'10.173.44.105:7070' ));
+nonfcra_filenames_details_arch :=  nothor(STD.File.LogicalFileList('scoringqa::out::nonfcra::bocashell_50_historydate_201207_prod_*_1'));
 
 
 nonfcra_filelist_arch := sort(nonfcra_filenames_details_arch, -modified);
