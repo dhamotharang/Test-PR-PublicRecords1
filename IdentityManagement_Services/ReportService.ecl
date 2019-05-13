@@ -87,7 +87,7 @@
 
 export ReportService := macro
 import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, IdentityManagement_Services, Relationship;
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		//All constants should be at start of service: Property constanats, Neighbors Constants
 		#CONSTANT('IncludeDetails', true);
 		#CONSTANT('DisplayMatchedParty', true);
