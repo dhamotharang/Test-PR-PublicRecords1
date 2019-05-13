@@ -122,7 +122,7 @@ EXPORT Bocashell_collections_fail_list :=
 					'benjamin.karnatz@lexisnexisrisk.com;Apaar.Sinha@lexisnexisrisk.com;Matthew.Ludewig@lexisnexisrisk.com;isabel.ma@lexisnexisrisk.com;Amy.Southard@lexisnexisrisk.com';
 
 EXPORT test_list :=
-					'Jonathan.Deurlein@lexisnexis.com';
+					'isabel.ma@lexisnexisrisk.com';
 
 EXPORT test_list_suman :=
 					'suman.burjukindi@lexisnexis.com';	

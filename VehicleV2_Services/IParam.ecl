@@ -475,6 +475,7 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 		export boolean FullNameMatch := false;
 	end;
 	
+  // just a few compliance fields are needed, so not inheriting from IDataAccess
 	export RTBatch_V2_params := interface(VehicleBatch_params)
 		export unsigned1 Operation           := 0;
 		export boolean   use_date            := false;
@@ -490,16 +491,16 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 		export boolean   dedup_results_l     := true;
 		export string3   thresh_val          := '';
 		export boolean   GLB_data            := false;
-		export unsigned1 glb_purpose_value   := 8;
+		export unsigned1 glb                 := 8;
 		export boolean   patriotproc         := false;
-		export boolean   include_minors      := false;
+		export boolean   show_minors         := false;
 		export boolean   GatewayNameMatch    := false;
 		export boolean   AlwaysHitGateway    := false;
-		export string32  ApplicationType	   := '';
-		export string5   IndustryClass	     := '';
-		export string50  DataRestriction     := BatchShare.Constants.Defaults.DataRestrictionMask;
+		export string32  application_type	   := '';
+		export string5   industry_class	     := '';
+		export string    DataRestrictionMask := BatchShare.Constants.Defaults.DataRestrictionMask;
 		export boolean   IncludeRanking	     := false;
-		export unsigned1 dppa_purpose_value  := 0;
+		export unsigned1 dppa  := 0;
 		export boolean   GetSSNBest      	   := false;
 		export string1   BIPFetchLevel			 := '';
 	end;

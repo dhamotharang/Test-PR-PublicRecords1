@@ -1,20 +1,13 @@
-import AutoStandardI, iesp, doxie, ut, Driversv2_Services, DriversV2, AddressFeedback_Services, AddressFeedback;
+import AutoStandardI, iesp, doxie, Driversv2_Services, DriversV2, AddressFeedback_Services, AddressFeedback;
 
 export Rollup_Records := module
 	export params := interface(
 		PersonSearch_Services.Search_IDs.params,
 		AutoStandardI.LIBIN.PenaltyI_Indv.base,
-		AutoStandardI.InterfaceTranslator.glb_purpose.params,
-		AutoStandardI.InterfaceTranslator.dppa_purpose.params,
-		AutoStandardI.InterfaceTranslator.ssn_mask_val.params,
-		AutoStandardI.InterfaceTranslator.probation_override_value.params,
-		AutoStandardI.InterfaceTranslator.industry_class_val.params,
-		AutoStandardI.InterfaceTranslator.no_scrub.params,
-    AutoStandardI.InterfaceTranslator.score_threshold_value.params,
-    AutoStandardI.InterfaceTranslator.StrictMatch_value.params,
-		AutoStandardI.InterfaceTranslator.dateval.params,
 		AutoStandardI.InterfaceTranslator.addr_suffix_value.params,
-		AutoStandardI.InterfaceTranslator.all_dids.params)
+		AutoStandardI.InterfaceTranslator.all_dids.params,
+    doxie.IDataAccess)
+    export string DataPermissionMask := ''; //conflicting definition; instead of '00000000000000' as in AutoStandardI.Constants.DataPermissionMask_default
 		export IncludeBankruptcies := false;
 		export IncludeSourceDocCounts := false;
 		export includeAlsoFound := false;
@@ -40,7 +33,7 @@ export Rollup_Records := module
 	
 	export val(params in_mod) := function
 
-
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 		// Need to perform checkNameVariants functionality on a conditional basis
 		//
 		// from the Moxie documentation:
@@ -109,14 +102,8 @@ export Rollup_Records := module
 		recs := if(temp_ssn_value <> '', ssn_recs_sort, other_recs_sort);
 
 		// needed for the macro
-		glb_purpose := AutoStandardI.InterfaceTranslator.glb_purpose.val(project(use_mod,AutoStandardI.InterfaceTranslator.glb_purpose.params));
-		dppa_purpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val(project(use_mod,AutoStandardI.InterfaceTranslator.dppa_purpose.params));
-		ln_branded_value := AutoStandardI.InterfaceTranslator.ln_branded_value.val(project(use_mod,AutoStandardI.InterfaceTranslator.ln_branded_value.params));
-		probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(use_mod,AutoStandardI.InterfaceTranslator.probation_override_value.params));
-		dateval := AutoStandardI.InterfaceTranslator.dateval.val(project(use_mod,AutoStandardI.InterfaceTranslator.dateval.params));
-		industry_class_value := AutoStandardI.InterfaceTranslator.industry_class_value.val(project(use_mod,AutoStandardI.InterfaceTranslator.industry_class_value.params)); 
 		score_threshold_value := AutoStandardI.InterfaceTranslator.score_threshold_value.val(project(use_mod,AutoStandardI.InterfaceTranslator.score_threshold_value.params)); 
-		doxie.MAC_Add_WeAlsoFound(recs,recs_waf,glb_purpose,dppa_purpose)
+		doxie.MAC_Add_WeAlsoFound(recs,recs_waf,mod_access);
 		recs_plus_waf := if(use_mod.includeAlsoFound, recs_waf, recs);
 		
 		MyDlDids := project(recs_plus_waf,transform(DriversV2_Services.layouts.did, Self.did :=(integer)left.did));
@@ -157,8 +144,8 @@ export Rollup_Records := module
 
     // This section of coding immediately below was added for the FDN project.
 		// Set shorter alias names to be passed into new function
-		boolean FDNContDataPermitted := doxie.DataPermission.use_FDNContributoryData;
-		boolean FDNInqDataPermitted  := ~doxie.DataRestriction.FDNInquiry;
+		boolean FDNContDataPermitted := doxie.compliance.use_FdnContributoryData(mod_access.DataPermissionMask);
+		boolean FDNInqDataPermitted  := ~doxie.compliance.isFdnInquiry(mod_access.DataRestrictionMask);
 		
     // Add coding to check for FDN data here, depending upon if FDN was asked for.
 		// If it was, call the new function to check for the data and set the new indicators.

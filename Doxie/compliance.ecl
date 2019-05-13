@@ -192,6 +192,10 @@ EXPORT compliance := MODULE
     // Customer allowed to see GLB protected data prior to June 2001 ('Pre GLB'), position 23.		
     EXPORT boolean isPreGLBRestricted(drm_type drm) := ~allowAll AND preGLBRestrict(drm);
 
+    EXPORT boolean isFdnInquiry(drm_type drm) := ~allowAll AND (drm[25] not in ['0','']);
+
+    EXPORT boolean isJuliRestricted(drm_type drm) := ~allowAll AND (drm[41] NOT IN ['0','']);
+
     // BriteVerify gateway for Email verification 
     EXPORT BOOLEAN isBriteVerifyRestricted(drm_type drm) := ~allowAll AND (drm[46] NOT IN ['0','']);
 
@@ -204,9 +208,11 @@ EXPORT compliance := MODULE
     ENDMACRO;  
 
     shared restrictedSet := ['0',''];
-    EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
-    EXPORT use_InsuranceDLData(string dpm) := dpm[13] NOT IN restrictedSet;
-    EXPORT boolean isJuliRestricted(drm_type drm) := ~allowAll AND (drm[41] NOT IN restrictedSet);
+
+    EXPORT boolean use_Polk(string dpm)                := dpm [7] NOT IN restrictedSet;
+    EXPORT boolean use_DM_SSA_updates(string dpm)      := dpm[10] NOT IN restrictedSet;
+    EXPORT boolean use_FdnContributoryData(string dpm) := dpm[11] NOT IN restrictedSet;	//Contributory Fraud and Test Fraud
+    EXPORT boolean use_InsuranceDLData(string dpm)     := dpm[13] NOT IN restrictedSet;
 
     // to exclude utility sources:
     EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';

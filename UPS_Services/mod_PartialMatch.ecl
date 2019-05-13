@@ -3,7 +3,7 @@ import doxie, AutoStandardI, ut, NID, dx_header;
 export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 
 	shared ResponseLayout := RECORD
-		doxie.key_header.did;
+		dx_header.key_header().did;
 		UNSIGNED4 score;
 	END;
 
@@ -161,7 +161,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	// a name + city/state search
 	export NameCityState := MODULE
 	  // key begins with city, state, (string6)dph_lname, lname, pfname, fname
-		idx := doxie.key_header_stcitylfname;
+		idx := dx_header.key_StCityLFName();
 
 		qryWithFirst := idx(KEYED(city_code in inCityCode) AND
 												KEYED(st = inState) AND
@@ -221,7 +221,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	// a name + zip search
 	export NameZip := MODULE
 		// key has: zip, (string6)dph_lname, lname, pfname, fname
-		idx := doxie.key_header_piz;
+		idx := dx_header.key_piz();
     inpiz5 := ut.PizTools.reverseZip((string5)inzip5);
 		qryWithFirst := idx(KEYED(piz = inpiz5) AND
 												KEYED(dph_lname = inPhoneticLastName) AND
@@ -277,7 +277,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	// a name + st search
 	export NameState := MODULE
 		// BZ 42358 - name/state search should use exact last + preferred first name.
-		idx := doxie.Key_Header_StFnameLname;
+		idx := dx_header.key_StFnameLname();
 
 		raw_recs := idx(KEYED(st = inState) AND
 										KEYED(dph_lname = inPhoneticLastName) AND
@@ -313,7 +313,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	
 	export StreetState := MODULE
 		// key has:  prim_name, prim_range, state, city_code, zip, dph_lname, lname, pfname, and fname
-		idx := doxie.key_header_dts_address;
+		idx := dx_header.key_DTS_address();
 
 		raw_recs := idx(KEYED(prim_name = inPrimName) AND
 										KEYED(prim_range = inPrimRange) AND
@@ -367,7 +367,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 
 	export NameStreet := MODULE
 		// key has:  prim_name, prim_range, state, city_code, zip, dph_lname, lname, pfname, and fname
-		idx := doxie.key_header_dts_address;
+		idx := dx_header.key_DTS_address();
 
 		raw_recs := idx(KEYED(prim_name = inPrimName) AND
 										KEYED(prim_range = inPrimRange) AND
@@ -469,7 +469,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	END;
 	
 	export StreetZipName := MODULE
-		idx_name := doxie.Key_Header_StreetZipName;
+		idx_name := dx_header.key_StreetZipName();
 		idx_noname := dx_header.key_header_address();
 
 		// if we have city and state inputs, we can build a set of zip codes for
@@ -568,7 +568,7 @@ export mod_PartialMatch(mod_Params.PersonSearch search_mod) := MODULE
 	END;	
 
 	export Phone := MODULE
-		idx := doxie.key_header_wild_phone;
+		idx := dx_header.key_wild_phone();
 
 		inP7 := MAP(length(inPhone) = 10 => inPhone[4..10],
 								length(inPhone) = 7 => inPhone[1..7],

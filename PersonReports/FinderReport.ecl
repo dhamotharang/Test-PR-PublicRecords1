@@ -8,6 +8,11 @@ EXPORT out_rec FinderReport (
   PersonReports.input._finderreport param,
   boolean IsFCRA = false) := FUNCTION
 
+  //Convert to the old _report style module:
+  mod_access := $.IParam.MAC_CreateIDataAccessReportModule(param);
+  mod_finder := MODULE (PROJECT (param, $.IParam._finderreport), mod_access)
+  END;
+
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
   isCNSMR := param.IndustryClass = D2C.Constants.CNSMR;
@@ -34,7 +39,7 @@ EXPORT out_rec FinderReport (
   p_proflic    := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
   bankrpt := bankruptcy_records (dids, module (project (param, input.bankruptcy, opt)) end, IsFCRA);
   p_bankruptcy := choosen (bankrpt.bankruptcy, iesp.Constants.BR.MaxBankruptcies);
-  p_at_work    := choosen (peopleatwork_records    (dids, module (project (param, input.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  p_at_work    := choosen (peopleatwork_records    (dids, module (project (mod_finder, $.IParam.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
   p_corp_aff   := choosen (corpaffiliation_records (dids, module (project (param, input.corpaffil)) end, IsFCRA), iesp.Constants.BR.MaxCorpAffiliations);
 
   p_dlsr := choosen (pers.dlsr, 1);

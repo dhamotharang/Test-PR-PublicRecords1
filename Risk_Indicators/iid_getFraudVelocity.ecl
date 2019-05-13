@@ -1,4 +1,4 @@
-﻿import risk_indicators, riskwise, doxie, header, relationship, std;
+﻿import risk_indicators, riskwise, header, relationship, std, dx_header;
 
 export iid_getFraudVelocity(
 	grouped 	dataset(risk_indicators.iid_constants.layout_outx) all_header,
@@ -445,7 +445,7 @@ with_NLR_flags := join(with_pii_on_file, rolled_NLR, left.did=right.did,
 			boolean isRelative;
 		end;
 					
-		multiple_use_ssns_with_wildcard_did := join(counts_per_ssn1(_ssns_per_adl>1), doxie.Key_Header_Wild_SSN,
+		multiple_use_ssns_with_wildcard_did := join(counts_per_ssn1(_ssns_per_adl>1), dx_header.key_wild_SSN(),
 			left.ssn_from_did<>'' and
 			keyed(right.s1=left.ssn_from_did[1]) and
 			keyed(right.s2=left.ssn_from_did[2]) and

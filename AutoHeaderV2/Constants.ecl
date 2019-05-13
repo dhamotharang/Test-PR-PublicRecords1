@@ -68,40 +68,40 @@
   // Not clear if we need codes for individual index hits
   export IndexHit := module
     //header indices:
-    export unsigned RID             :=     1;      //doxie.key_header_rid
-    export unsigned DID             :=     2;      //Doxie.Key_Did_Rid2
-    export unsigned SSN             :=     4;      //doxie.key_header_SSN
-    export unsigned ADDRESS         :=     8;      //doxie.key_address
-    export unsigned NAME            :=    16;      //doxie.key_header_Name
-    export unsigned STFNAMELNAME    :=    32;      //doxie.key_header_StFnameLname
-    export unsigned PHONE           :=    64;      //doxie.key_header_phone
-    export unsigned PIZ             :=   128;      //doxie.key_header_Piz
-    export unsigned DOB             :=   256;      //doxie.key_header_DOBName
-    export unsigned DA              :=   512;      //doxie.key_header_DA
-    export unsigned DOBF            :=  1024;      //doxie.key_header_Dob_Fname
-    export unsigned STREETZIPNAME   := 1<<11;      //doxie.key_header_StreetZipName
+    export unsigned RID             :=     1;
+    export unsigned DID             :=     2;
+    export unsigned SSN             :=     4;
+    export unsigned ADDRESS         :=     8;
+    export unsigned NAME            :=    16;
+    export unsigned STFNAMELNAME    :=    32;
+    export unsigned PHONE           :=    64;
+    export unsigned PIZ             :=   128;
+    export unsigned DOB             :=   256;
+    export unsigned DA              :=   512;
+    export unsigned DOBF            :=  1024;
+    export unsigned STREETZIPNAME   := 1<<11;
       //export unsigned ZIP_PRLname   := 1<<12; FEDEX, using autokeyi.FetchI_Indv_ZipPRLname
-    export unsigned FNAMESMALL      := 1<<13;      //doxie.key_header_FnameSmall
-    export unsigned STCITYLFNAME    := 1<<14;      //doxie.key_header_StCityLFName
+    export unsigned FNAMESMALL      := 1<<13;
+    export unsigned STCITYLFNAME    := 1<<14;
 
-    export unsigned DOB_PFNAME      := 1<<17;      //doxie.key_header_Dob_PFname
-    export unsigned DTS_FNAMESMALL  := 1<<18;      //doxie.key_header_DTS_FnameSmall
-    export unsigned NAME_ALT        := 1<<19;      //doxie.key_header_Name_alt
-    export unsigned DTS_ADDRESS     := 1<<20;      //doxie.key_header_DTS_Address
-    export unsigned DTS_STREETZIPNAME := 1<<21;      //doxie.key_header_DTS_StreetZipName
+    export unsigned DOB_PFNAME      := 1<<17;
+    export unsigned DTS_FNAMESMALL  := 1<<18;
+    export unsigned NAME_ALT        := 1<<19;
+    export unsigned DTS_ADDRESS     := 1<<20;
+    export unsigned DTS_STREETZIPNAME := 1<<21;
 
-    export unsigned W_SSN           := 1<<22;      //doxie.key_header_Wild_SSN
-    export unsigned W_ADDRESS       := 1<<23;      //doxie.key_header_Wild_Address
-    export unsigned W_NAME          := 1<<24;      //doxie.key_header_Wild_Name
-    export unsigned W_STFNAMELNAME  := 1<<25;      //doxie.key_header_Wild_StFnameLname
-    export unsigned W_PHONE         := 1<<26;      //doxie.key_header_Wild_Phone
-    export unsigned W_ZIP           := 1<<27;      //doxie.key_header_Wild_Zip
-    export unsigned W_STREETZIPNAME := 1<<28;      //doxie.key_header_Wild_StreetZipName
-    export unsigned W_FNAMESMALL    := 1<<29;      //doxie.key_header_Wild_FnameSmall
-    export unsigned W_STCITYLFNAME  := 1<<30;      //doxie.key_header_Wild_StCityLFName
+    export unsigned W_SSN           := 1<<22;
+    export unsigned W_ADDRESS       := 1<<23;
+    export unsigned W_NAME          := 1<<24;
+    export unsigned W_STFNAMELNAME  := 1<<25;
+    export unsigned W_PHONE         := 1<<26;
+    export unsigned W_ZIP           := 1<<27;
+    export unsigned W_STREETZIPNAME := 1<<28;
+    export unsigned W_FNAMESMALL    := 1<<29;
+    export unsigned W_STCITYLFNAME  := 1<<30;
 
-    export unsigned SSN4            := 1<<15;      //doxie.key_header_SSN4
-    export unsigned SSN5            := 1<<16;      //doxie.key_header_SSN5
+    export unsigned SSN4            := 1<<15;
+    export unsigned SSN5            := 1<<16;
     export unsigned QUICK_SSN := 4096;
     export unsigned HH        := 2048;
 

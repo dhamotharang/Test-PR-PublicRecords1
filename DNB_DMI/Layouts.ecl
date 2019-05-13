@@ -1,4 +1,4 @@
-/*2012-09-25T21:49:38Z (Julie Franzer)
+﻿/*2012-09-25T21:49:38Z (Julie Franzer)
 Modified for bipv2
 */
 import utilfile,address,standard,dnb,bipv2;
@@ -901,6 +901,14 @@ module
 	export Base :=
 	module
 	
+		// Jira# CCPA-93, The below layout with 2 new fields are added for CCPA (California Consumer Protection Act) project.
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		export CCPA_fields := 
+		record
+			unsigned4 													global_sid 		:= 0;
+			unsigned8 													record_sid 		:= 0;
+		end;
+	
 		export CompaniesChild := 
 		record
 
@@ -921,6 +929,7 @@ module
 			unsigned8 													mail_aceaid 	:= 0;
 			unsigned8 													rawaid 				:= 0;
 			unsigned8 													aceaid 				:= 0;
+			CCPA_fields;
 		end;    
 
 		export Companies := 
@@ -943,6 +952,7 @@ module
 			unsigned8 													mail_aceaid 	:= 0;
 			unsigned8 													rawaid 				:= 0;
 			unsigned8 													aceaid 				:= 0;
+			CCPA_fields;
 		end;   
 		
 		export CompaniesForBIP2 := 
@@ -965,7 +975,8 @@ module
 			unsigned8 													mail_aceaid 	:= 0;
 			unsigned8 													rawaid 				:= 0;
 			unsigned8 													aceaid 				:= 0;
-			BIPV2.IDlayouts.l_xlink_ids;			
+			BIPV2.IDlayouts.l_xlink_ids;
+			CCPA_fields;
 		end;  		
 
 		export Companies_ForStrata := 
@@ -988,7 +999,8 @@ module
 			unsigned8 													mail_aceaid 	:= 0;
 			unsigned8 													rawaid 				:= 0;
 			unsigned8 													aceaid 				:= 0;
-			BIPV2.IDlayouts.l_xlink_ids;	
+			BIPV2.IDlayouts.l_xlink_ids;
+			CCPA_fields;
 		end;    
 
 		export Companies_prev := 
@@ -1002,7 +1014,8 @@ module
 			Address.Layout_Clean182_fips				clean_address			;
 			string1   													record_type				; // 'C' Current or 'H' Historical
 			string1  														active_duns_number; // 'Y' Active Duns Number
-																													// 'N' Inactive Duns Number (deleted)
+																															// 'N' Inactive Duns Number (deleted)
+			CCPA_fields;																					
 		end;    
 		
 		export Contacts := 
@@ -1027,6 +1040,7 @@ module
 																																	// 'N' Inactive Duns Number (deleted)
 			unsigned8 											rawaid 							:= 0	;
 			unsigned8 											aceaid 							:= 0	;
+			CCPA_fields;
 		end;                                                		
 
 		export Contacts_forstrata := 
@@ -1051,6 +1065,7 @@ module
 																																	// 'N' Inactive Duns Number (deleted)
 			unsigned8 											rawaid 							:= 0	;
 			unsigned8 											aceaid 							:= 0	;
+			CCPA_fields;
 		end;                                                		
 
 		shared lcleanaddr := Address.Layout_Clean182_fips - 
@@ -1082,6 +1097,7 @@ module
 			string1   											record_type								; // 'C' Current or 'H' Historical
 			string1  												active_duns_number				; // 'Y' Active Duns Number
 																																	// 'N' Inactive Duns Number (deleted)
+			CCPA_fields;
 		end;                                                		
 
 		export CompaniesSPC := 
@@ -1226,6 +1242,7 @@ module
 			Layout_DNB_autokey;
 			unsigned1 zero := 0;
 			string1 blank := '';
+			Base.CCPA_fields;
 		end;
 		
 		export AppendCompanyInfo :=
