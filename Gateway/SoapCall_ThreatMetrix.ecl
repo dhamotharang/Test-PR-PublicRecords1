@@ -15,6 +15,11 @@ ThreatMetrix.gateway_trustdefender.t_TrustDefenderRequest into_in(inf L) := tran
 	self.GatewayParams.CheckVendorGatewayCall := true; 
 	self.GatewayParams.MakeVendorGatewayCall 	:= makeGatewayCall;
 	self.Options.Blind := Gateway.Configuration.GetBlindOption(gateway_cfg);
+	self.Options.TrustDefenderUserAccount.OrgId := TRIM(L.Options.TrustDefenderUserAccount.OrgId);
+	self.Options.TrustDefenderUserAccount.ApiKey := TRIM(L.Options.TrustDefenderUserAccount.ApiKey);
+	self.Options.Policy := TRIM(L.Options.Policy);
+	self.Options.ApiType := TRIM(L.Options.ApiType);
+	self.Options.serviceType := TRIM(L.Options.serviceType);
 	self := L;
 end;
 
