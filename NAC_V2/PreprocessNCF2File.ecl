@@ -1,63 +1,57 @@
 ﻿IMPORT STD;
 
-ReportFileName(string ilfn, string rpt) := Std.Str.SubstituteIncluded(ilfn, 'ncf2', rpt);
-ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
+AddDates(infile) := FUNCTIONMACRO
+	result := PROJECT(infile, TRANSFORM(recordof(infile),
+											self.Created := Std.Date.Today();
+											self.Updated := Std.Date.Today();
+											self := left;
+										));
+	return result;
+ENDMACRO;
 
-EXPORT PreprocessNCF2File(string ilfn) := function
 
-	ds := DATASET(ilfn,$.Layouts2.rNac2,thor);
-	
-	incases := PROJECT(ds(RecordCode = 'CA01'), TRANSFORM($.Layouts2.rCase,
+EXPORT PreprocessNCF2File(DATASET(Layouts2.rNac2) nacin = Nac_V2.Files('').dsNCF2) := MODULE
+
+	EXPORT cases := AddDates(
+						Nac_V2.mod_Validation.CaseFile(
+							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCase,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
-										));
+										)),
+								));
 
-	inclients := PROJECT(ds(RecordCode = 'CL01'), TRANSFORM($.Layouts2.rClient,
+	EXPORT clients := AddDates(
+								NAC_V2.proc_CleanClients(
+									Nac_V2.mod_Validation.ClientFile(
+										PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClient,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
 											)
-										);
+										),
+									)
+								));
 
-	inaddresses := PROJECT(ds(RecordCode = 'AD01'), TRANSFORM($.Layouts2.rAddress,
+	// address validation requires cleaned addresses
+	EXPORT addresses := 	AddDates(
+									Nac_V2.mod_Validation.AddressFile(
+										Nac_V2.proc_cleanAddr(
+											PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
-												self := []));
+												self := []))
+										)
+								));
 
-	incontacts := PROJECT(ds(RecordCode = 'SC01'), TRANSFORM($.Layouts2.rStateContact,
+	EXPORT contacts := 	AddDates(Nac_V2.mod_Validation.StateContactFile(
+										PROJECT(nacin(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContact,
 										self := LEFT.StateContactRec;
-										self.RecordCode := left.RecordCode;));
+										self.RecordCode := left.RecordCode;))));
 										
-	addr1 := $.PreprocessNCF2(ds).addresses;				// : PERSIST('~thor::nac2::test_addressesx');
-	clients1 := $.PreprocessNCF2(ds).clients;				// : PERSIST('~thor::nac2::test_clientsx');
-	cases := $.PreprocessNCF2(ds).cases;						// : PERSIST('~thor::nac2::test_casesx');
-	contacts := $.PreprocessNCF2(ds).contacts;			// : PERSIST('~thor::nac2::test_contactsx');
-	exceptions := $.PreprocessNCF2(ds).exceptions;	// : PERSIST('~thor::nac2::test_exceptionsx');
-	
-	clients := $.mod_Validation.VerifyRelatedClients(cases(errors=0), clients1);
-	addr := nac_v2.mod_Validation.VerifyRelatedAddresses(cases(errors=0), clients(errors=0), addr1(errors=0)) + addr1(errors<>0);
-	
-	errs := DISTRIBUTE((+)(addr.dsErrs,clients.dsErrs,cases.dsErrs,contacts.dsErrs,exceptions.dsErrs), RANDOM());
-	
-	total := COUNT(ds);
-	nErrors := COUNT(errs(Severity='E'));
-	nWarnings := COUNT(errs(Severity='W'));
-	nRejected := COUNT(addr(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(contacts(errors>0));
-	nWarned := COUNT(addr(warnings>0)) + COUNT(cases(warnings>0)) + COUNT(clients(warnings>0)) + COUNT(contacts(warnings>0));
-
-	lfn := ExtractFileName(ilfn);
-	
-	ncr := $.Print.NCR2_Report(lfn, errs, total, nErrors, nWarnings, 'XX', false);
-
-	ncd := $.Print.NCD2_Report(lfn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', false);
-
-	ncx := $.Print.NCX2_Report(cases, clients, addr, contacts); 
-
-	//ORDERED(
-		OUTPUT(ncr,,ReportFileName(ilfn,'ncr2'), compressed,OVERWRITE);
-//		OUTPUT(ncd,,ReportFileName(ilfn,'ncd2'), csv(terminator('\n'), separator(','), quote([])), compressed,OVERWRITE);
-//		OUTPUT(ncx,,ReportFileName(ilfn,'ncx2'), compressed,OVERWRITE);
-	//);
+	EXPORT exceptions := 	AddDates(Nac_V2.mod_Validation.ExceptionFile(
+										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rException,
+										self := LEFT.ExceptionRec;
+										self.RecordCode := left.RecordCode;))));
 
 
-	return (real)nErrors/(real)total;
-end;
+
+END;
