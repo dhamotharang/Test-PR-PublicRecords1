@@ -163,13 +163,16 @@ updatedops :=
 create_build := sequential(Orbit3.proc_Orbit3_CreateBuild('Bankruptcy Additional Events',filedate,'N'),
                 Orbit3.proc_Orbit3_CreateBuild('FCRA Bankruptcy Additional Events',filedate,'F'));
 
+df:=dataset('~thor::banko::filter::qa::additionalevents',Banko.BankoJoinRecord,thor);
+samples:= output(df(entereddate [1..8] = todaysdate),named('Bankruptcy_Additional_Events_Samples'));
+
 retval := sequential(//if(newCatEvent,Banko.Spray_CatEventLookupTable('edata12','/hds_2/bkevents/archive/process/*CATEVENTDESC',filedate),output('No New CatEvent File')), //If no new cateven file, no spray
 						sequential(
 							parallel(output_nonfcra,output_fcra),
 							parallel(nonfcrabase,fcrabase),Banko.fCheckNewCatEventClasses(filedate)),
 					 parallel(FilterBase,FilterFcraBase),notify('BK EVENT FILTER BASE COMPLETE','*'),
 					 parallel(nonfcrakey,fcrakey,nonfcrafullkey,fcrafullkey),updatedops,
-					 mvnonfcra,mvfcra,mvnonfcrafull,mvfcrafull,
+					 mvnonfcra,mvfcra,mvnonfcrafull,mvfcrafull,samples,
 					 if(ut.Weekday((integer)filedate[1..8]) <> 'SATURDAY' and ut.Weekday((integer)filedate[1..8]) <> 'SUNDAY',
 					 create_build,
 					 output('No Orbit Entries Needed for weekend builds'))
