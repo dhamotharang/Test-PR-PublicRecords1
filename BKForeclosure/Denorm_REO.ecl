@@ -173,12 +173,13 @@ Layout_BK.base_reo SlimBase(Base_reo L) := TRANSFORM
 	SELF.name8.ultscore		:= L.name8_ultscore;
 	SELF.name8.ultweight	:= L.name8_ultweight;
 	SELF := L;
-	SELF := [];
+//	SELF := [];
 END;
 
 	pSlimBase	:= PROJECT(Base_reo, SlimBase(LEFT));
 	
 Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanFields_REO r) := TRANSFORM
+		SELF.delete_flag			:= IF(TRIM(L.bk_infile_type) = 'REO_DELETE', 'DELETE', L.delete_flag);
 		SELF.name1_nid 				:= IF(r.Name_Type = 'B1', r.nid, l.name1_nid);
 		SELF.name1_prefix			:= IF(r.Name_Type = 'B1', r.cln_title, l.name1_prefix);
 		SELF.name1_first			:= IF(r.Name_Type = 'B1', r.cln_fname, l.name1_first);
@@ -472,18 +473,22 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.situs1_err_stat		:= IF(r.AddrType = 'PF', r.err_stat, l.situs1_err_stat);
 		
 		SELF := L;
-		SELF := [];
+//		SELF := [];
 	END;
 	
 	//Distribute the data before denormalize to avoid skewing
-	ReoInDist				:=	DISTRIBUTE(Norm_reo, HASH32(record_id));
-	ReoBaseDist			:=	DISTRIBUTE(pSlimBase, HASH32(record_id));
+	ReoInDist				:=	SORT(DISTRIBUTE(Norm_reo, HASH32(record_id)),record_id,LOCAL);
+	ReoBaseDist			:=	SORT(DISTRIBUTE(pSlimBase(delete_flag <> 'DELETE'), HASH32(record_id)),record_id, -date_vendor_last_reported,LOCAL);
+	ReoBaseDelete		:= 	pSlimBase(delete_flag = 'DELETE');
 
 	ReoDeNorm := DENORMALIZE(ReoBaseDist, ReoInDist,
 														left.record_id = right.record_id,
-														denormalizeRecords(left,right), LOCAL);
+														denormalizeRecords(left,right), LEFT OUTER, LOCAL);
 														
-	ReoBase	:= DEDUP(SORT(ReoDeNorm,record_id,foreclosure_id,-process_date),ALL); 
+//Add back delete flagged records
+	ReoAll	:= ReoDeNorm + ReoBaseDelete;
+	
+	ReoBase	:= DEDUP(SORT(ReoAll,record_id,foreclosure_id,-process_date),ALL); 
 	
 	//Translate codes
 	code_lkp := BKForeclosure.File_BK_Foreclosure.codes_table;

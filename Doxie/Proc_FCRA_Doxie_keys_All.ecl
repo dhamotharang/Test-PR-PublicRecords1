@@ -13,7 +13,7 @@ fcra_chk_build(string typ) := output('Checking Base::FCRA_HeaderKey_Building...'
 export Proc_FCRA_Doxie_keys_All(boolean pFastHeader=false, boolean inc = false, string filedate) := function
  
  fcra_fhb(boolean inc) := doxie_build.Proc_file_FCRA_header_building(filedate,inc);
-fcra_keys := doxie.proc_fcra_header_keys(filedate);
+fcra_keys := doxie.proc_fcra_header_keys_dx(filedate);
  fcra_mv2QA := header.Proc_FCRAacceptSK_toQA(filedate,false,inc);
 
  return sequential(
