@@ -164,7 +164,7 @@ create_build := sequential(Orbit3.proc_Orbit3_CreateBuild('Bankruptcy Additional
                 Orbit3.proc_Orbit3_CreateBuild('FCRA Bankruptcy Additional Events',filedate,'F'));
 
 df:=dataset('~thor::banko::filter::qa::additionalevents',Banko.BankoJoinRecord,thor);
-samples:= output(df(entereddate [1..8] = todaysdate),named('Bankruptcy_Additional_Events_Samples'));
+samples:= output(choosen(df(entereddate [1..8] = todaysdate),100),named('BK_Events_Samples'));
 
 retval := sequential(//if(newCatEvent,Banko.Spray_CatEventLookupTable('edata12','/hds_2/bkevents/archive/process/*CATEVENTDESC',filedate),output('No New CatEvent File')), //If no new cateven file, no spray
 						sequential(
