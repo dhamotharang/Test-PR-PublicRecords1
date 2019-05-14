@@ -3,7 +3,7 @@ IMPORT _control, versioncontrol, Vendor_src;
 
 EXPORT Build_Base(STRING pversion,BOOLEAN	pUseProd = FALSE) := MODULE
 	
-EXPORT build_base := Vendor_Src.UpdateBase(pversion, pUseProd).VendorSrc_Base;
+EXPORT build_base := Vendor_Src.UpdateBase(pversion, pUseProd).VendorSrc_Base:INDEPENDENT;
 
 
 VersionControl.macBuildNewLogicalFile(Filenames(pversion, pUseProd).base.new
@@ -21,7 +21,7 @@ Vendor_Src.Layouts.Base;
 END;
 
 PrevBase := Vendor_Src.Files().base.father;
-NewBase  := Vendor_Src.Files().base.built;
+NewBase  := build_base;
 
 PrevBaseLayout := RECORD
 	PrevBase.source_code;

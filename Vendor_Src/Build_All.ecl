@@ -9,12 +9,12 @@ PromoteSupers.MAC_SF_BuildProcess(orbitdump,'~thor_data400::in::vendor_src::orbi
 
 built := sequential(
           
-		      //Create_Super_Files, // Need un comment and run once in case if superfiles doesnt exist on thor
+		      Create_Super_Files,
 					
 					spray,
 					ExtractORBIT,
 					Vendor_Src.Build_Base(pversion,pUseProd).all,
-					Build_Keys(pversion,pUseProd).all,
+					Build_Keys(pversion,pUseProd),
 					Vendor_Src.Promote.Promote_vendorsrc(pversion,pUseProd).buildfiles.Built2QA,
 			    Build_Strata(pversion,pUseProd).all, 
 					// dops.updateversion('VendorSourceKeys',pversion,Vendor_Src.Email_Notification_Lists.developer,,'N');

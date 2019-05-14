@@ -1,21 +1,40 @@
-﻿import doxie, VersionControl;
+﻿//Build keys for Vendor_Src and move to QA.
+import ut, RoxieKeyBuild, _control;
 
-export Build_Keys(string pversion, boolean pUseProd = false) := module
+export Build_Keys(string pversion, boolean pUseProd = false) :=  
+function
 
-	VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).source_code.New,BuildDidKey	);
-																		  
-	export full_build :=
-	sequential(
-		 
-			BuildDidKey
-		 
-		,Promote.Promote_vendorsrc(pversion,pUseProd).buildfiles.New2Built
-	);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(
+											vendor_src.Key_DID,
+											'~thor_data400::key::vendor_src_info::vendor_source_@version@',
+											'~thor_data400::key::vendor_src_info::'+pversion+'_vendor_source',
+											Vendor_Src_KeyOut
+										   );
+											 
+										 
+											 
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2(
+									  '~thor_data400::key::vendor_src_info::vendor_source_@version@',
+									  '~thor_data400::key::vendor_src_info::'+pversion+'_vendor_source',
+									  Vendor_Src_key_built
+									  );
+								
+											 
+RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::vendor_src_info::vendor_source_@version@', 'Q', Vendor_src_key_QA);
+
+
+return sequential(
+				parallel(
+					Vendor_Src_KeyOut
 		
-	export All :=
-	if(VersionControl.IsValidVersion(pversion)
-		,full_build
-		,output('No Valid version parameter passed, skipping Vendor_Src.Build_Keys atribute')
-	);
-
-end;
+					),
+				parallel(
+					Vendor_Src_key_built
+	
+					),
+				parallel(
+					Vendor_src_key_QA
+		
+					)
+				);
+end;					
