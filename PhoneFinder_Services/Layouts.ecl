@@ -1,4 +1,4 @@
-﻿﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhonesInfo,PhoneFraud;
+﻿﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhonesInfo,PhoneFraud, ThreatMetrix;
 
 EXPORT Layouts :=
 MODULE
@@ -252,8 +252,10 @@ MODULE
 			INTEGER                                               imei_changedthis_time;
 			INTEGER                                               loststolen;
 			STRING8                                               loststolen_date;
-      BOOLEAN                                               is_verified;
-      STRING100                                             verification_desc;
+			BOOLEAN                                               is_verified;
+			STRING100                                             verification_desc;
+			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
+			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
 		END;
 		
 		EXPORT ExcludePhones :=
@@ -354,6 +356,8 @@ MODULE
 			INTEGER imei_changedthis_time;
 			INTEGER loststolen;
 			STRING8 loststolen_date;
+			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
+			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
 		END;
 		
 		EXPORT IdentityIesp :=

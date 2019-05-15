@@ -171,9 +171,9 @@ export t_CustomerSubjectInfo := record
 	iesp.share.t_Address Address {xpath('Address')};
 end;
 		
-export t_TagWithMessage := record, MAXLENGTH (255)
-	string _Value {xpath('@_Value')};
-	string Content_ {xpath('')};
+export t_TagWithMessage := record, MAXLENGTH (255) // Adding Slash('/') in front for the fields in t_TagWithMessage for ECL only to read them correctly. 
+  string _Value {xpath('/@_Value')}; // Please mantain this in future iterations.
+  string Content_ {xpath('/')};
 end;
 		
 export t_TmxVariable := record
