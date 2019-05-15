@@ -492,28 +492,27 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 	
 	//Translate codes
 	code_lkp := BKForeclosure.File_BK_Foreclosure.codes_table;
-	
-	Layout_BK.base_reo xfrmDocDesc(BKForeclosure.Layout_BK.base_reo L, BKForeclosure.layout_BK.CodeTable R) := TRANSFORM
-		SELF.document_desc := R.code_desc;
-		SELF := L;
-	END;
-	
-	AddDocDesc	:= JOIN(ReoBase, code_lkp,
-											TRIM(LEFT.src) = TRIM(RIGHT.src) AND
-											TRIM(LEFT.doc_type_cd) = TRIM(RIGHT.code),
-											xfrmDocDesc(LEFT,RIGHT),LEFT OUTER, LOOKUP);
 											
-	OtherCodes_dict	:= DICTIONARY(code_lkp, {code => code_desc});
+	OtherCodes_dict		:= DICTIONARY(code_lkp, {code => code_desc});
+	DocCodes_dict			:= DICTIONARY(code_lkp(src = 'I5' AND field_name = 'DOCUMENT_TYPE'), {code => code_desc});
+	LenderCodes_dict	:= DICTIONARY(code_lkp(field_name = 'LENDER_TYPE'), {code => code_desc});
+	LoanCodes_dict		:= DICTIONARY(code_lkp(field_name = 'LOAN_TYPE'), {code => code_desc});
 	
 	CodeLkp(string code)	:= OtherCodes_dict[code].code_desc;
+	DocumentCodeLkp(string code):= DocCodes_dict[code].code_desc;
+	LenderCodeLkp(string code)	:= LenderCodes_dict[code].code_desc;
+	LoanCodeLkp(string code)		:= LoanCodes_dict[code].code_desc;
 	
 	Layout_BK.base_reo xfrmCodeDesc(BKForeclosure.Layout_BK.base_reo L) := TRANSFORM
+		SELF.document_desc :=	DocumentCodeLkp(TRIM(L.doc_type_cd,LEFT,RIGHT));
 		SELF.property_desc := CodeLkp(TRIM(L.property_use_cd,LEFT,RIGHT));
 		SELF.use_desc 		 := CodeLkp(TRIM(L.asses_land_use,LEFT,RIGHT));
+		SELF.lender_type_desc	:= LenderCodeLkp(TRIM(L.concurrent_lender_type,LEFT,RIGHT));
+		SELF.loan_type_desc 	:= LoanCodeLkp(TRIM(L.concurrent_loan_type,LEFT,RIGHT));
 		SELF := L;
 	END;
 	
-	BaseOut	:= PROJECT(AddDocDesc, xfrmCodeDesc(LEFT));										
+	BaseOut	:= PROJECT(ReoBase, xfrmCodeDesc(LEFT));										
 	
 	RETURN BaseOut;
 END;
