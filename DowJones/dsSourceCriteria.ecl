@@ -1761,5 +1761,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'MFSA (Malta) Sanctions & Penalties','1748'},
 {'EC (CFSP) 2019/678 Myanmar/Burma List','1749'},
 {'EC 2019/672 Myanmar/Burma List','1750'},
-{'EC 2019/696 ISIL (Da\'esh) and Al-Qaida List','1751'}
+{'EC 2019/696 ISIL (Da\'esh) and Al-Qaida List','1751'},
+{'EC (CFSP) 2019/763 Central African Republic List','1752'},
+{'EC 2019/757 Central African Republic List','1753'}
 ],r);
