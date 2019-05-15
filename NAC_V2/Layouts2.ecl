@@ -131,7 +131,7 @@ export rCommonEx := RECORD
 		STD.Date.Date_t		replaced := 0;
 		unsigned4					errors := 0;
 		unsigned4					warnings := 0;
-		DATASET(nac_v2.ValidationCodes.rError)	dsErrs;
+		DATASET($.ValidationCodes.rError)	dsErrs;
 		string4						OrigGroupId := '';
 		string32					filename := '';
 END;

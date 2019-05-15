@@ -44,7 +44,7 @@ EXPORT PreprocessNCF2(string ilfn) := function
 										)),
 								));
 
-	 clients := AddDates(
+	 clients1 := AddDates(
 								NAC_V2.proc_CleanClients(
 									Nac_V2.mod_Validation.ClientFile(
 										PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClient,
@@ -56,7 +56,7 @@ EXPORT PreprocessNCF2(string ilfn) := function
 								));
 
 	// address validation requires cleaned addresses
-	 addresses := 	AddDates(
+	 addresses1 := 	AddDates(
 									Nac_V2.mod_Validation.AddressFile(
 										Nac_V2.proc_cleanAddr(
 											PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
@@ -75,32 +75,37 @@ EXPORT PreprocessNCF2(string ilfn) := function
 										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rException,
 										self := LEFT.ExceptionRec;
 										self.RecordCode := left.RecordCode;))));
+										
+	clients := nac_v2.mod_Validation.VerifyRelatedClients(cases(errors=0), clients1);
+	addresses := nac_v2.mod_Validation.VerifyRelatedAddresses(cases(errors=0), clients(errors=0), addresses1(errors=0)) + addresses1(errors<>0);
 
   recombined := PROJECT(cases, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.CaseRec := left;
+								self.RecordCode := left.RecordCode;
 								self := []) 
 							) &
 							PROJECT(clients, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.ClientRec := left;
+								self.RecordCode := left.RecordCode;
 								self := []) 
 							) &
 							PROJECT(addresses, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.AddressRec := left;
-								self := []) 
-							) &
-							PROJECT(clients, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
-								self.ClientRec := left;
+								self.RecordCode := left.RecordCode;
 								self := []) 
 							) &
 							PROJECT(contacts, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.StateContactRec := left;
-								self := []) 
+								self.RecordCode := left.RecordCode;
+								self := [])
 							) &
 							PROJECT(exceptions, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.ExceptionRec := left;
+								self.RecordCode := left.RecordCode;
 								self := []) 
 							)
 							;
+
 
 		return recombined;
 		

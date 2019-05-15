@@ -215,7 +215,7 @@ EXPORT Print := MODULE
 
 		rr_cases := PROJECT(cases(errors>0), transform(rNCX2,
 													err := left.dsErrs[1];
-													x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E106', skip, 0);
+													//x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E106', skip, 0);
 													self := left;
 													self.ClientId := '';
 													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
@@ -226,7 +226,7 @@ EXPORT Print := MODULE
 													
 		rr_clients := PROJECT(clients(errors>0), transform(rNCX2,
 													err := left.dsErrs[1];
-													x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E129', skip, 0);
+													//x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E129', skip, 0);
 													self := left;
 													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
 													self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);

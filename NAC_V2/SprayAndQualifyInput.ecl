@@ -1,7 +1,7 @@
 ﻿// updated for NAC2
 import _Control,tools,STD;
 
-EXPORT SprayAndQualifyInput(string version,string ip,string rootDir) := function
+EXPORT SprayAndQualifyInput(string version, string ip, string rootDirm, string lfn) := function
 
 ready    := rootDir+'ready/';
 done     := rootDir+'done/';
@@ -17,10 +17,10 @@ fNCR := regexreplace('ncf2',fname,'ncr2',nocase):independent;
 UpSt:=stringlib.stringtouppercase(fname[1..2]);
 rSize:=sizeof(Layouts.load);
 
-MoveReadyToSpraying := STD.File.MoveExternalFile(IP,ready+fname,spraying+fname);
-MoveReadyToError    := nothor(STD.File.MoveExternalFile(IP,ready+fname,err+fname));
-MoveSprayingToError := nothor(STD.File.MoveExternalFile(IP,spraying+fname,err+fname));
-MoveSprayingToDone  := nothor(STD.File.MoveExternalFile(IP,spraying+fname,done+fname));
+MoveReadyToSpraying := STD.File.MoveExternalFile(IP, ready+fname, spraying+fname);
+MoveReadyToError    := nothor(STD.File.MoveExternalFile(IP, ready+fname,err+fname));
+MoveSprayingToError := nothor(STD.File.MoveExternalFile(IP, spraying+fname,err+fname));
+MoveSprayingToDone  := nothor(STD.File.MoveExternalFile(IP, spraying+fname,done+fname));
 
 FileFound := exists(dsFileList);
 ReportFileFound:=if(FileFound
