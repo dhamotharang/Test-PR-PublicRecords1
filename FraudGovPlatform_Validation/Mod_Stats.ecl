@@ -1,4 +1,4 @@
-﻿IMPORT STD,FraudGovPlatform,FraudShared;
+﻿IMPORT STD,ut,FraudGovPlatform,FraudShared;
 EXPORT Mod_stats := MODULE
 
 	EXPORT ValidateDelimiter(string fname, string pSeparator, string pTerminator):= module
@@ -42,7 +42,7 @@ EXPORT Mod_stats := MODULE
 		withRC:=project(seqd,tr0(left));
 
 		r tr1(withRC l, integer c):=transform
-			self.err:= if(STD.Str.FindCount( l.line, pSeparator ) = 0,'F1','');
+			self.err:= if(STD.Str.FindCount( ut.fn_RemoveSpecialChars(l.line), pSeparator ) = 0,'F1','');
 			self:=l;
 		end;
 
@@ -126,8 +126,8 @@ END;
 			
 			r tr1(withRC l, integer c):=transform
 				self.err:= if(
-					STD.Str.FindCount( l.line, validDelimiter ) <> numberOfColumns 
-					 and STD.Str.FindCount( l.line, validDelimiter ) 
+					STD.Str.FindCount( ut.fn_RemoveSpecialChars(l.line), validDelimiter ) <> numberOfColumns 
+					 and STD.Str.FindCount( ut.fn_RemoveSpecialChars(l.line), validDelimiter ) 
 						> 0,'F2','');
 				self:=l;
 			end;
@@ -239,9 +239,7 @@ END;
 					,''	//fullname
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_First_name <>'' or l.raw_full_name <>''),'','E001')	
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_Last_Name <>'' or l.raw_full_name <>''),'','E001')
-					,if( (l.raw_full_name <> '' or (l.raw_First_name <>'' and l.raw_Last_Name <> '')) and 
-								(l.SSN <>''	OR	regexreplace('0',l.lexid,'')	<>'' OR	
-								(l.Drivers_License_Number<>'' AND	l.Drivers_License_State	<>'')),'','E006')
+					,''
 					,''	//full_address (Deltabase)
 					,''	//physical_address (Deltabase)
 					,''	//street_1
@@ -263,9 +261,7 @@ END;
 					,''	//fullname
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_First_name <>'' or l.raw_full_name <>''),'','E001')	
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_Last_Name <>'' or l.raw_full_name <>''),'','E001')
-					,if( (l.raw_full_name <> '' or (l.raw_First_name <>'' and l.raw_Last_Name <> '')) and 
-								(l.SSN <>''	OR	regexreplace('0',l.lexid,'')	<>'' OR	
-								(l.Drivers_License_Number<>'' AND	l.Drivers_License_State	<>'')),'','E006')
+					,''
 					,''	//full_address (Deltabase)
 					,''	//physical_address (Deltabase)
 					,''	//street_1
