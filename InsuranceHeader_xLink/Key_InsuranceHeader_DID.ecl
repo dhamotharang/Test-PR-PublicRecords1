@@ -1,4 +1,4 @@
-﻿IMPORT UT,_Control,doxie; 
+﻿IMPORT UT,_Control,doxie,header; 
 
 rm_score0  := header.fn_persistent_record_ID(doxie.header_pre_keybuild) ; 
 
