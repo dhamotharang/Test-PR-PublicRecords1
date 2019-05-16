@@ -267,6 +267,8 @@ dSuppressRecs				:=
     {'001122861464', 85, '20180806', ' ', ' ', '         ', 'YOLANDA             ', '    ', 'POPE           ', '               ', ' ', '        ', '        ', '53', '98178', '     ', 'WA', '033', '  ', 'N', 'TUN', /*'001122861464YTUN'*/'', 'TN', 'Y'},
 	//	LNK-1632	Lincoln Financial Group: Public Records Possible Overlinking (Deceased indicator)
     {'035499717130', 93, '20181008', ' ', ' ', '         ', 'CHIN                ', 'JR  ', 'PAUL           ', 'PHILIP         ', ' ', '        ', '        ', '51', '23454', '     ', 'VA', '810', '  ', 'N', 'TUN', /*'035499717130CTUN'*/'', 'TN', 'Y'},
+  //  LNK-1721 	
+	  {'001859697457', 100, '20190408', ' ', ' ', '     	 ', 'NYGAARD             ', '    ',	'BERNT          ', '	             ', ' ', '	 	    ', '   	    ', '36', '11360',	'     ', 'NY', '081', '	 ', 'N', 'TUN',	/*'001859697457NTUN'*/'',	'TN',	'Y'},
 	//	LNK-1733	Possible Overlink
     {'001961115336', 100, '20181105', ' ', ' ', '393549837', 'PETERSON            ', '    ', 'JAMES          ', 'M              ', ' ', '20150611', '        ', '55', '54701', '     ', 'WI', '035', '  ', 'N', 'ENC', /*'001961115336PENC'*/'', '64', 'N'}, 
 	// LNK-1782 Copy of 180329-001784: ACCURINT - 99136 - deceased indicator [Incident: 180706-000082]
@@ -290,7 +292,9 @@ dSuppressRecs				:=
   // LNK-2263/LNK-2662  Alive Consumer marked as deceased
 	  {'183216702996',	85,	'20190408', ' ', ' ',	' 	 	    ', 'HOWE                ', '	  ', 'DOUGLAS        ', 'B              ', ' ', '	       ', '19561106',	'26',	'48473', '     ', 'MI',	'049', '	', 'N',	'TUN', /*'183216702996HTUN'*/'', 'TN', 'Y'},   
 	// LNK-2664  H149: DOD Issue- William Athens JR		
-		{'000091337313', 100,	'20190415', '	', ' ', '         ', 'ATHENS              ', '	  ', 'WILLIAM        ', 'ARCHIE         ', ' ',	'20151130', '	       ', '26',	'48180', '	   ', 'MI',	'163', '	', 'N',	'ENC', /*'000091337313AENC'*/'', '64', 'N'}
+		{'000091337313', 100,	'20190415', '	', ' ', '         ', 'ATHENS              ', '	  ', 'WILLIAM        ', 'ARCHIE         ', ' ',	'20151130', '	       ', '26',	'48180', '	   ', 'MI',	'163', '	', 'N',	'ENC', /*'000091337313AENC'*/'', '64', 'N'},
+	// LNK-2737	RE: SHIRLEY PISTILLI -16047085/118038 [Incident: 190513-002031]
+		{'001983797870',  85,	'20190408', ' ', ' ', '	 	 	    ', 'PISTILLI            ', ' 	  ', 'SHIRLEY        ', '	              ', ' ', '	 	     ', '  	     ',	'42',	'19446', '	   ', 'PA',	'091', '	', 'N',	'TUN', /*'001983797870PTUN'*/'', 'TN', 'Y'}
 	 ], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;
