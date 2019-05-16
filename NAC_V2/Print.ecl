@@ -37,7 +37,7 @@ LF := '\n';
 	end;
 
 EXPORT Print := MODULE
-	shared dRow := RECORD
+	export dRow := RECORD
 		string		text;
 	END;
 	
