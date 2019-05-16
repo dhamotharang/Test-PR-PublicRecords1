@@ -3,10 +3,10 @@ IMPORT Scrubs_BKForeclosure_Reo; // Import modules for FieldTypes attribute defi
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 37;
-  EXPORT NumRulesFromFieldType := 37;
+  EXPORT NumRules := 39;
+  EXPORT NumRulesFromFieldType := 39;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 27;
+  EXPORT NumFieldsWithRules := 29;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_BKForeclosure_Reo)
@@ -34,6 +34,8 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 buyer_mail_zip4_Invalid;
     UNSIGNED1 property_use_cd_Invalid;
     UNSIGNED1 orig_contract_date_Invalid;
+    UNSIGNED1 concurrent_lender_type_Invalid;
+    UNSIGNED1 concurrent_loan_type_Invalid;
     UNSIGNED1 concurrent_due_dt_Invalid;
     UNSIGNED1 buyer_mail_full_addr_Invalid;
     UNSIGNED1 asses_land_use_Invalid;
@@ -67,6 +69,8 @@ EXPORT FromNone(DATASET(Layout_BKForeclosure_Reo) h) := MODULE
     SELF.buyer_mail_zip4_Invalid := Fields.InValid_buyer_mail_zip4((SALT311.StrType)le.buyer_mail_zip4);
     SELF.property_use_cd_Invalid := Fields.InValid_property_use_cd((SALT311.StrType)le.property_use_cd);
     SELF.orig_contract_date_Invalid := Fields.InValid_orig_contract_date((SALT311.StrType)le.orig_contract_date);
+    SELF.concurrent_lender_type_Invalid := Fields.InValid_concurrent_lender_type((SALT311.StrType)le.concurrent_lender_type);
+    SELF.concurrent_loan_type_Invalid := Fields.InValid_concurrent_loan_type((SALT311.StrType)le.concurrent_loan_type);
     SELF.concurrent_due_dt_Invalid := Fields.InValid_concurrent_due_dt((SALT311.StrType)le.concurrent_due_dt);
     SELF.buyer_mail_full_addr_Invalid := Fields.InValid_buyer_mail_full_addr((SALT311.StrType)le.buyer_mail_full_addr);
     SELF.asses_land_use_Invalid := Fields.InValid_asses_land_use((SALT311.StrType)le.asses_land_use);
@@ -75,7 +79,7 @@ EXPORT FromNone(DATASET(Layout_BKForeclosure_Reo) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_BKForeclosure_Reo);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.ln_filedate_Invalid << 0 ) + ( le.fips_cd_Invalid << 2 ) + ( le.prop_full_addr_Invalid << 3 ) + ( le.prop_addr_city_Invalid << 4 ) + ( le.prop_addr_state_Invalid << 5 ) + ( le.prop_addr_zip5_Invalid << 7 ) + ( le.prop_addr_zip4_Invalid << 9 ) + ( le.recording_date_Invalid << 11 ) + ( le.doc_type_cd_Invalid << 13 ) + ( le.apn_Invalid << 14 ) + ( le.seller1_fname_Invalid << 15 ) + ( le.seller1_lname_Invalid << 16 ) + ( le.seller2_fname_Invalid << 17 ) + ( le.seller2_lname_Invalid << 18 ) + ( le.buyer1_fname_Invalid << 19 ) + ( le.buyer1_lname_Invalid << 20 ) + ( le.buyer2_fname_Invalid << 21 ) + ( le.buyer2_lname_Invalid << 22 ) + ( le.buyer_mail_city_Invalid << 23 ) + ( le.buyer_mail_state_Invalid << 24 ) + ( le.buyer_mail_zip5_Invalid << 26 ) + ( le.buyer_mail_zip4_Invalid << 28 ) + ( le.property_use_cd_Invalid << 30 ) + ( le.orig_contract_date_Invalid << 31 ) + ( le.concurrent_due_dt_Invalid << 33 ) + ( le.buyer_mail_full_addr_Invalid << 35 ) + ( le.asses_land_use_Invalid << 36 );
+    SELF.ScrubsBits1 := ( le.ln_filedate_Invalid << 0 ) + ( le.fips_cd_Invalid << 2 ) + ( le.prop_full_addr_Invalid << 3 ) + ( le.prop_addr_city_Invalid << 4 ) + ( le.prop_addr_state_Invalid << 5 ) + ( le.prop_addr_zip5_Invalid << 7 ) + ( le.prop_addr_zip4_Invalid << 9 ) + ( le.recording_date_Invalid << 11 ) + ( le.doc_type_cd_Invalid << 13 ) + ( le.apn_Invalid << 14 ) + ( le.seller1_fname_Invalid << 15 ) + ( le.seller1_lname_Invalid << 16 ) + ( le.seller2_fname_Invalid << 17 ) + ( le.seller2_lname_Invalid << 18 ) + ( le.buyer1_fname_Invalid << 19 ) + ( le.buyer1_lname_Invalid << 20 ) + ( le.buyer2_fname_Invalid << 21 ) + ( le.buyer2_lname_Invalid << 22 ) + ( le.buyer_mail_city_Invalid << 23 ) + ( le.buyer_mail_state_Invalid << 24 ) + ( le.buyer_mail_zip5_Invalid << 26 ) + ( le.buyer_mail_zip4_Invalid << 28 ) + ( le.property_use_cd_Invalid << 30 ) + ( le.orig_contract_date_Invalid << 31 ) + ( le.concurrent_lender_type_Invalid << 33 ) + ( le.concurrent_loan_type_Invalid << 34 ) + ( le.concurrent_due_dt_Invalid << 35 ) + ( le.buyer_mail_full_addr_Invalid << 37 ) + ( le.asses_land_use_Invalid << 38 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -108,9 +112,11 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.buyer_mail_zip4_Invalid := (le.ScrubsBits1 >> 28) & 3;
     SELF.property_use_cd_Invalid := (le.ScrubsBits1 >> 30) & 1;
     SELF.orig_contract_date_Invalid := (le.ScrubsBits1 >> 31) & 3;
-    SELF.concurrent_due_dt_Invalid := (le.ScrubsBits1 >> 33) & 3;
-    SELF.buyer_mail_full_addr_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.asses_land_use_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.concurrent_lender_type_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.concurrent_loan_type_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.concurrent_due_dt_Invalid := (le.ScrubsBits1 >> 35) & 3;
+    SELF.buyer_mail_full_addr_Invalid := (le.ScrubsBits1 >> 37) & 1;
+    SELF.asses_land_use_Invalid := (le.ScrubsBits1 >> 38) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -161,12 +167,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     orig_contract_date_ALLOW_ErrorCount := COUNT(GROUP,h.orig_contract_date_Invalid=1);
     orig_contract_date_LENGTHS_ErrorCount := COUNT(GROUP,h.orig_contract_date_Invalid=2);
     orig_contract_date_Total_ErrorCount := COUNT(GROUP,h.orig_contract_date_Invalid>0);
+    concurrent_lender_type_CUSTOM_ErrorCount := COUNT(GROUP,h.concurrent_lender_type_Invalid=1);
+    concurrent_loan_type_CUSTOM_ErrorCount := COUNT(GROUP,h.concurrent_loan_type_Invalid=1);
     concurrent_due_dt_ALLOW_ErrorCount := COUNT(GROUP,h.concurrent_due_dt_Invalid=1);
     concurrent_due_dt_LENGTHS_ErrorCount := COUNT(GROUP,h.concurrent_due_dt_Invalid=2);
     concurrent_due_dt_Total_ErrorCount := COUNT(GROUP,h.concurrent_due_dt_Invalid>0);
     buyer_mail_full_addr_ALLOW_ErrorCount := COUNT(GROUP,h.buyer_mail_full_addr_Invalid=1);
     asses_land_use_CUSTOM_ErrorCount := COUNT(GROUP,h.asses_land_use_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.ln_filedate_Invalid > 0 OR h.fips_cd_Invalid > 0 OR h.prop_full_addr_Invalid > 0 OR h.prop_addr_city_Invalid > 0 OR h.prop_addr_state_Invalid > 0 OR h.prop_addr_zip5_Invalid > 0 OR h.prop_addr_zip4_Invalid > 0 OR h.recording_date_Invalid > 0 OR h.doc_type_cd_Invalid > 0 OR h.apn_Invalid > 0 OR h.seller1_fname_Invalid > 0 OR h.seller1_lname_Invalid > 0 OR h.seller2_fname_Invalid > 0 OR h.seller2_lname_Invalid > 0 OR h.buyer1_fname_Invalid > 0 OR h.buyer1_lname_Invalid > 0 OR h.buyer2_fname_Invalid > 0 OR h.buyer2_lname_Invalid > 0 OR h.buyer_mail_city_Invalid > 0 OR h.buyer_mail_state_Invalid > 0 OR h.buyer_mail_zip5_Invalid > 0 OR h.buyer_mail_zip4_Invalid > 0 OR h.property_use_cd_Invalid > 0 OR h.orig_contract_date_Invalid > 0 OR h.concurrent_due_dt_Invalid > 0 OR h.buyer_mail_full_addr_Invalid > 0 OR h.asses_land_use_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.ln_filedate_Invalid > 0 OR h.fips_cd_Invalid > 0 OR h.prop_full_addr_Invalid > 0 OR h.prop_addr_city_Invalid > 0 OR h.prop_addr_state_Invalid > 0 OR h.prop_addr_zip5_Invalid > 0 OR h.prop_addr_zip4_Invalid > 0 OR h.recording_date_Invalid > 0 OR h.doc_type_cd_Invalid > 0 OR h.apn_Invalid > 0 OR h.seller1_fname_Invalid > 0 OR h.seller1_lname_Invalid > 0 OR h.seller2_fname_Invalid > 0 OR h.seller2_lname_Invalid > 0 OR h.buyer1_fname_Invalid > 0 OR h.buyer1_lname_Invalid > 0 OR h.buyer2_fname_Invalid > 0 OR h.buyer2_lname_Invalid > 0 OR h.buyer_mail_city_Invalid > 0 OR h.buyer_mail_state_Invalid > 0 OR h.buyer_mail_zip5_Invalid > 0 OR h.buyer_mail_zip4_Invalid > 0 OR h.property_use_cd_Invalid > 0 OR h.orig_contract_date_Invalid > 0 OR h.concurrent_lender_type_Invalid > 0 OR h.concurrent_loan_type_Invalid > 0 OR h.concurrent_due_dt_Invalid > 0 OR h.buyer_mail_full_addr_Invalid > 0 OR h.asses_land_use_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -174,9 +182,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.ln_filedate_Total_ErrorCount > 0, 1, 0) + IF(le.fips_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_state_Total_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip5_Total_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip4_Total_ErrorCount > 0, 1, 0) + IF(le.recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.doc_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_state_Total_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip5_Total_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip4_Total_ErrorCount > 0, 1, 0) + IF(le.property_use_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_contract_date_Total_ErrorCount > 0, 1, 0) + IF(le.concurrent_due_dt_Total_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.asses_land_use_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.ln_filedate_Total_ErrorCount > 0, 1, 0) + IF(le.fips_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_state_Total_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip5_Total_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip4_Total_ErrorCount > 0, 1, 0) + IF(le.recording_date_Total_ErrorCount > 0, 1, 0) + IF(le.doc_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_state_Total_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip5_Total_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip4_Total_ErrorCount > 0, 1, 0) + IF(le.property_use_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_contract_date_Total_ErrorCount > 0, 1, 0) + IF(le.concurrent_lender_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.concurrent_loan_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.concurrent_due_dt_Total_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.asses_land_use_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.ln_filedate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ln_filedate_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fips_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip4_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.recording_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.doc_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip4_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.property_use_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_contract_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_contract_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.concurrent_due_dt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.concurrent_due_dt_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.asses_land_use_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.ln_filedate_ALLOW_ErrorCount > 0, 1, 0) + IF(le.ln_filedate_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.fips_cd_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prop_addr_zip4_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.recording_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recording_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.doc_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.apn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.seller2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer1_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer2_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_state_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip5_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip5_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip4_ALLOW_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_zip4_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.property_use_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_contract_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_contract_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.concurrent_lender_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.concurrent_loan_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.concurrent_due_dt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.concurrent_due_dt_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.buyer_mail_full_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.asses_land_use_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -191,8 +199,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.ln_filedate_Invalid,le.fips_cd_Invalid,le.prop_full_addr_Invalid,le.prop_addr_city_Invalid,le.prop_addr_state_Invalid,le.prop_addr_zip5_Invalid,le.prop_addr_zip4_Invalid,le.recording_date_Invalid,le.doc_type_cd_Invalid,le.apn_Invalid,le.seller1_fname_Invalid,le.seller1_lname_Invalid,le.seller2_fname_Invalid,le.seller2_lname_Invalid,le.buyer1_fname_Invalid,le.buyer1_lname_Invalid,le.buyer2_fname_Invalid,le.buyer2_lname_Invalid,le.buyer_mail_city_Invalid,le.buyer_mail_state_Invalid,le.buyer_mail_zip5_Invalid,le.buyer_mail_zip4_Invalid,le.property_use_cd_Invalid,le.orig_contract_date_Invalid,le.concurrent_due_dt_Invalid,le.buyer_mail_full_addr_Invalid,le.asses_land_use_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_ln_filedate(le.ln_filedate_Invalid),Fields.InvalidMessage_fips_cd(le.fips_cd_Invalid),Fields.InvalidMessage_prop_full_addr(le.prop_full_addr_Invalid),Fields.InvalidMessage_prop_addr_city(le.prop_addr_city_Invalid),Fields.InvalidMessage_prop_addr_state(le.prop_addr_state_Invalid),Fields.InvalidMessage_prop_addr_zip5(le.prop_addr_zip5_Invalid),Fields.InvalidMessage_prop_addr_zip4(le.prop_addr_zip4_Invalid),Fields.InvalidMessage_recording_date(le.recording_date_Invalid),Fields.InvalidMessage_doc_type_cd(le.doc_type_cd_Invalid),Fields.InvalidMessage_apn(le.apn_Invalid),Fields.InvalidMessage_seller1_fname(le.seller1_fname_Invalid),Fields.InvalidMessage_seller1_lname(le.seller1_lname_Invalid),Fields.InvalidMessage_seller2_fname(le.seller2_fname_Invalid),Fields.InvalidMessage_seller2_lname(le.seller2_lname_Invalid),Fields.InvalidMessage_buyer1_fname(le.buyer1_fname_Invalid),Fields.InvalidMessage_buyer1_lname(le.buyer1_lname_Invalid),Fields.InvalidMessage_buyer2_fname(le.buyer2_fname_Invalid),Fields.InvalidMessage_buyer2_lname(le.buyer2_lname_Invalid),Fields.InvalidMessage_buyer_mail_city(le.buyer_mail_city_Invalid),Fields.InvalidMessage_buyer_mail_state(le.buyer_mail_state_Invalid),Fields.InvalidMessage_buyer_mail_zip5(le.buyer_mail_zip5_Invalid),Fields.InvalidMessage_buyer_mail_zip4(le.buyer_mail_zip4_Invalid),Fields.InvalidMessage_property_use_cd(le.property_use_cd_Invalid),Fields.InvalidMessage_orig_contract_date(le.orig_contract_date_Invalid),Fields.InvalidMessage_concurrent_due_dt(le.concurrent_due_dt_Invalid),Fields.InvalidMessage_buyer_mail_full_addr(le.buyer_mail_full_addr_Invalid),Fields.InvalidMessage_asses_land_use(le.asses_land_use_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.ln_filedate_Invalid,le.fips_cd_Invalid,le.prop_full_addr_Invalid,le.prop_addr_city_Invalid,le.prop_addr_state_Invalid,le.prop_addr_zip5_Invalid,le.prop_addr_zip4_Invalid,le.recording_date_Invalid,le.doc_type_cd_Invalid,le.apn_Invalid,le.seller1_fname_Invalid,le.seller1_lname_Invalid,le.seller2_fname_Invalid,le.seller2_lname_Invalid,le.buyer1_fname_Invalid,le.buyer1_lname_Invalid,le.buyer2_fname_Invalid,le.buyer2_lname_Invalid,le.buyer_mail_city_Invalid,le.buyer_mail_state_Invalid,le.buyer_mail_zip5_Invalid,le.buyer_mail_zip4_Invalid,le.property_use_cd_Invalid,le.orig_contract_date_Invalid,le.concurrent_lender_type_Invalid,le.concurrent_loan_type_Invalid,le.concurrent_due_dt_Invalid,le.buyer_mail_full_addr_Invalid,le.asses_land_use_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_ln_filedate(le.ln_filedate_Invalid),Fields.InvalidMessage_fips_cd(le.fips_cd_Invalid),Fields.InvalidMessage_prop_full_addr(le.prop_full_addr_Invalid),Fields.InvalidMessage_prop_addr_city(le.prop_addr_city_Invalid),Fields.InvalidMessage_prop_addr_state(le.prop_addr_state_Invalid),Fields.InvalidMessage_prop_addr_zip5(le.prop_addr_zip5_Invalid),Fields.InvalidMessage_prop_addr_zip4(le.prop_addr_zip4_Invalid),Fields.InvalidMessage_recording_date(le.recording_date_Invalid),Fields.InvalidMessage_doc_type_cd(le.doc_type_cd_Invalid),Fields.InvalidMessage_apn(le.apn_Invalid),Fields.InvalidMessage_seller1_fname(le.seller1_fname_Invalid),Fields.InvalidMessage_seller1_lname(le.seller1_lname_Invalid),Fields.InvalidMessage_seller2_fname(le.seller2_fname_Invalid),Fields.InvalidMessage_seller2_lname(le.seller2_lname_Invalid),Fields.InvalidMessage_buyer1_fname(le.buyer1_fname_Invalid),Fields.InvalidMessage_buyer1_lname(le.buyer1_lname_Invalid),Fields.InvalidMessage_buyer2_fname(le.buyer2_fname_Invalid),Fields.InvalidMessage_buyer2_lname(le.buyer2_lname_Invalid),Fields.InvalidMessage_buyer_mail_city(le.buyer_mail_city_Invalid),Fields.InvalidMessage_buyer_mail_state(le.buyer_mail_state_Invalid),Fields.InvalidMessage_buyer_mail_zip5(le.buyer_mail_zip5_Invalid),Fields.InvalidMessage_buyer_mail_zip4(le.buyer_mail_zip4_Invalid),Fields.InvalidMessage_property_use_cd(le.property_use_cd_Invalid),Fields.InvalidMessage_orig_contract_date(le.orig_contract_date_Invalid),Fields.InvalidMessage_concurrent_lender_type(le.concurrent_lender_type_Invalid),Fields.InvalidMessage_concurrent_loan_type(le.concurrent_loan_type_Invalid),Fields.InvalidMessage_concurrent_due_dt(le.concurrent_due_dt_Invalid),Fields.InvalidMessage_buyer_mail_full_addr(le.buyer_mail_full_addr_Invalid),Fields.InvalidMessage_asses_land_use(le.asses_land_use_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.ln_filedate_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.fips_cd_Invalid,'ALLOW','UNKNOWN')
@@ -218,14 +226,16 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.buyer_mail_zip4_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.property_use_cd_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.orig_contract_date_Invalid,'ALLOW','LENGTHS','UNKNOWN')
+          ,CHOOSE(le.concurrent_lender_type_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.concurrent_loan_type_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.concurrent_due_dt_Invalid,'ALLOW','LENGTHS','UNKNOWN')
           ,CHOOSE(le.buyer_mail_full_addr_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.asses_land_use_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'ln_filedate','fips_cd','prop_full_addr','prop_addr_city','prop_addr_state','prop_addr_zip5','prop_addr_zip4','recording_date','doc_type_cd','apn','seller1_fname','seller1_lname','seller2_fname','seller2_lname','buyer1_fname','buyer1_lname','buyer2_fname','buyer2_lname','buyer_mail_city','buyer_mail_state','buyer_mail_zip5','buyer_mail_zip4','property_use_cd','orig_contract_date','concurrent_due_dt','buyer_mail_full_addr','asses_land_use','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_number','invalid_addr','invalid_AlphaNum','invalid_state','invalid_zip','invalid_zip','invalid_date','invalid_document_code','invalid_apn','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_AlphaNum','invalid_state','invalid_zip','invalid_zip','invalid_property_code','invalid_date','invalid_date','invalid_addr','invalid_land_use_code','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.ln_filedate,(SALT311.StrType)le.fips_cd,(SALT311.StrType)le.prop_full_addr,(SALT311.StrType)le.prop_addr_city,(SALT311.StrType)le.prop_addr_state,(SALT311.StrType)le.prop_addr_zip5,(SALT311.StrType)le.prop_addr_zip4,(SALT311.StrType)le.recording_date,(SALT311.StrType)le.doc_type_cd,(SALT311.StrType)le.apn,(SALT311.StrType)le.seller1_fname,(SALT311.StrType)le.seller1_lname,(SALT311.StrType)le.seller2_fname,(SALT311.StrType)le.seller2_lname,(SALT311.StrType)le.buyer1_fname,(SALT311.StrType)le.buyer1_lname,(SALT311.StrType)le.buyer2_fname,(SALT311.StrType)le.buyer2_lname,(SALT311.StrType)le.buyer_mail_city,(SALT311.StrType)le.buyer_mail_state,(SALT311.StrType)le.buyer_mail_zip5,(SALT311.StrType)le.buyer_mail_zip4,(SALT311.StrType)le.property_use_cd,(SALT311.StrType)le.orig_contract_date,(SALT311.StrType)le.concurrent_due_dt,(SALT311.StrType)le.buyer_mail_full_addr,(SALT311.StrType)le.asses_land_use,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'ln_filedate','fips_cd','prop_full_addr','prop_addr_city','prop_addr_state','prop_addr_zip5','prop_addr_zip4','recording_date','doc_type_cd','apn','seller1_fname','seller1_lname','seller2_fname','seller2_lname','buyer1_fname','buyer1_lname','buyer2_fname','buyer2_lname','buyer_mail_city','buyer_mail_state','buyer_mail_zip5','buyer_mail_zip4','property_use_cd','orig_contract_date','concurrent_lender_type','concurrent_loan_type','concurrent_due_dt','buyer_mail_full_addr','asses_land_use','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_number','invalid_addr','invalid_AlphaNum','invalid_state','invalid_zip','invalid_zip','invalid_date','invalid_document_code','invalid_apn','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_name','invalid_AlphaNum','invalid_state','invalid_zip','invalid_zip','invalid_property_code','invalid_date','invalid_lender_type_code','invalid_loan_type_code','invalid_date','invalid_addr','invalid_land_use_code','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.ln_filedate,(SALT311.StrType)le.fips_cd,(SALT311.StrType)le.prop_full_addr,(SALT311.StrType)le.prop_addr_city,(SALT311.StrType)le.prop_addr_state,(SALT311.StrType)le.prop_addr_zip5,(SALT311.StrType)le.prop_addr_zip4,(SALT311.StrType)le.recording_date,(SALT311.StrType)le.doc_type_cd,(SALT311.StrType)le.apn,(SALT311.StrType)le.seller1_fname,(SALT311.StrType)le.seller1_lname,(SALT311.StrType)le.seller2_fname,(SALT311.StrType)le.seller2_lname,(SALT311.StrType)le.buyer1_fname,(SALT311.StrType)le.buyer1_lname,(SALT311.StrType)le.buyer2_fname,(SALT311.StrType)le.buyer2_lname,(SALT311.StrType)le.buyer_mail_city,(SALT311.StrType)le.buyer_mail_state,(SALT311.StrType)le.buyer_mail_zip5,(SALT311.StrType)le.buyer_mail_zip4,(SALT311.StrType)le.property_use_cd,(SALT311.StrType)le.orig_contract_date,(SALT311.StrType)le.concurrent_lender_type,(SALT311.StrType)le.concurrent_loan_type,(SALT311.StrType)le.concurrent_due_dt,(SALT311.StrType)le.buyer_mail_full_addr,(SALT311.StrType)le.asses_land_use,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,27,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,29,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -260,6 +270,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'buyer_mail_zip4:invalid_zip:ALLOW','buyer_mail_zip4:invalid_zip:LENGTHS'
           ,'property_use_cd:invalid_property_code:CUSTOM'
           ,'orig_contract_date:invalid_date:ALLOW','orig_contract_date:invalid_date:LENGTHS'
+          ,'concurrent_lender_type:invalid_lender_type_code:CUSTOM'
+          ,'concurrent_loan_type:invalid_loan_type_code:CUSTOM'
           ,'concurrent_due_dt:invalid_date:ALLOW','concurrent_due_dt:invalid_date:LENGTHS'
           ,'buyer_mail_full_addr:invalid_addr:ALLOW'
           ,'asses_land_use:invalid_land_use_code:CUSTOM'
@@ -295,6 +307,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Fields.InvalidMessage_buyer_mail_zip4(1),Fields.InvalidMessage_buyer_mail_zip4(2)
           ,Fields.InvalidMessage_property_use_cd(1)
           ,Fields.InvalidMessage_orig_contract_date(1),Fields.InvalidMessage_orig_contract_date(2)
+          ,Fields.InvalidMessage_concurrent_lender_type(1)
+          ,Fields.InvalidMessage_concurrent_loan_type(1)
           ,Fields.InvalidMessage_concurrent_due_dt(1),Fields.InvalidMessage_concurrent_due_dt(2)
           ,Fields.InvalidMessage_buyer_mail_full_addr(1)
           ,Fields.InvalidMessage_asses_land_use(1)
@@ -330,6 +344,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.buyer_mail_zip4_ALLOW_ErrorCount,le.buyer_mail_zip4_LENGTHS_ErrorCount
           ,le.property_use_cd_CUSTOM_ErrorCount
           ,le.orig_contract_date_ALLOW_ErrorCount,le.orig_contract_date_LENGTHS_ErrorCount
+          ,le.concurrent_lender_type_CUSTOM_ErrorCount
+          ,le.concurrent_loan_type_CUSTOM_ErrorCount
           ,le.concurrent_due_dt_ALLOW_ErrorCount,le.concurrent_due_dt_LENGTHS_ErrorCount
           ,le.buyer_mail_full_addr_ALLOW_ErrorCount
           ,le.asses_land_use_CUSTOM_ErrorCount
@@ -365,6 +381,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.buyer_mail_zip4_ALLOW_ErrorCount,le.buyer_mail_zip4_LENGTHS_ErrorCount
           ,le.property_use_cd_CUSTOM_ErrorCount
           ,le.orig_contract_date_ALLOW_ErrorCount,le.orig_contract_date_LENGTHS_ErrorCount
+          ,le.concurrent_lender_type_CUSTOM_ErrorCount
+          ,le.concurrent_loan_type_CUSTOM_ErrorCount
           ,le.concurrent_due_dt_ALLOW_ErrorCount,le.concurrent_due_dt_LENGTHS_ErrorCount
           ,le.buyer_mail_full_addr_ALLOW_ErrorCount
           ,le.asses_land_use_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules

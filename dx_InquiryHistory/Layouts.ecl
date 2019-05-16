@@ -55,11 +55,9 @@ EXPORT Layouts := MODULE
 	    STRING20 customer_id;
 	    STRING20 company_id;
 	    STRING20 global_company_id;
-			
 	END;
 
 	EXPORT i_grouprid  := RECORD 
-
 			UNSIGNED8 group_rid;
 			
 			Inquiry -[product_id, transaction_id];
@@ -68,12 +66,8 @@ EXPORT Layouts := MODULE
 			STANDARD.NAME;							
 			STANDARD.ADDR;
 			
-			STRING9		appended_ssn := '';
+			STRING9	appended_ssn := '';
 			UNSIGNED6	appended_did := 0;
-
-      UNSIGNED4 global_sid   := 0;   
-			UNSIGNED8 record_sid   := 0; 			
-			
 	END;
 
 	EXPORT i_lexid  := RECORD 

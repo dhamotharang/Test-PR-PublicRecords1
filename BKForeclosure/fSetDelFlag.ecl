@@ -6,7 +6,7 @@ EXPORT fSetDelFlag := MODULE
 		layout_BK.base_reo FlagDelReo(layout_BK.base_reo L, Layout_BK.Delete_Reo R) := TRANSFORM
 			SELF.Delete_Flag := IF(R.Delete_Flag = 'DELETE',R.Delete_Flag,L.Delete_flag);
 			SELF.ln_filedate := IF(R.Delete_Flag = 'DELETE',R.ln_filedate,L.ln_filedate);
-			SELF.bk_infile_type := IF(R.Delete_Flag = 'DELETE', 'NOD_DELETE', L.bk_infile_type);
+			SELF.bk_infile_type := IF(R.Delete_Flag = 'DELETE', 'REO_DELETE', L.bk_infile_type);
 			SELF.date_vendor_last_reported := IF(R.Delete_Flag = 'DELETE',R.ln_filedate, L.date_vendor_last_reported);
 			SELF := L;
 		END;
