@@ -31,7 +31,7 @@ SHARED sprf_Delete_Reo      := '~thor_data400::in::BKForeclosure::delete_reo';
 SHARED Spray_Delete_Nod  := STD.File.SprayVariable(pServerIP,filepath_nod + fnod,
                                            maxRecordSize,'\t','\n',,group_name, dst_Delete_Nod_raw,,,,TRUE,FALSE,TRUE);
 SHARED Spray_Delete_Reo  := STD.File.SprayVariable(pServerIP,filepath_reo + freo,
-                                           maxRecordSize,'\t','\n',,group_name, dst_Delete_Reo_raw,,,,TRUE,FALSE,TRUE);
+                                           maxRecordSize,'\t','\r\n',,group_name, dst_Delete_Reo_raw,,,,TRUE,FALSE,TRUE);
 																					 
 	
   TransformFile_Nod := FUNCTION
@@ -43,7 +43,7 @@ SHARED Spray_Delete_Reo  := STD.File.SprayVariable(pServerIP,filepath_reo + freo
 	
   TransformFile_Reo := FUNCTION
 	  dsraw := DATASET(dst_Delete_Reo_raw,
-										          BKForeclosure.Layout_BK.Delete_Reo,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR('\n')));
+										          BKForeclosure.Layout_BK.Delete_Reo,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR('\r\n')));
 		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.layout_BK.Delete_Reo,SELF.ln_filedate := filedate; SELF.Delete_Flag := 'DELETE'; SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
