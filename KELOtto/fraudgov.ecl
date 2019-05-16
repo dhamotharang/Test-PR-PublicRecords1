@@ -1,7 +1,10 @@
 ﻿IMPORT Std, KELOtto, FraudShared, data_services;
 #CONSTANT ('Platform','FraudGov');
+RunKelDemo :=false:stored('RunKelDemo');
 
-fraudgov_dataset_base_prep := dataset(data_services.foreign_prod+'fraudgov::base::built::Main', FraudShared.Layouts.Base.Main, thor); 
+FileIn := If(RunKelDemo=false,'fraudgov::base::built::Main','fraudgov::in::sprayed::demodata');
+
+fraudgov_dataset_base_prep := dataset(data_services.foreign_prod+FileIn, FraudShared.Layouts.Base.Main, thor); 
 
 //PULL(FraudShared.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Main.built);
  

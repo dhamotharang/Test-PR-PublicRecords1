@@ -429,6 +429,8 @@ EXPORT base_reo  := RECORD
 	 STRING55 document_desc; //doc_type
 	 STRING55 property_desc; //property_use_cd
 	 STRING55 use_desc; //asses_land_use
+	 STRING55 lender_type_desc; //concurrent TD: lender type
+	 STRING60 loan_type_desc; //concurrent TD: loan type
 	 ClnFields;
 END;
 	
@@ -783,6 +785,8 @@ EXPORT base_reo_ext  := RECORD
 	 STRING55 document_desc; //doc_type
 	 STRING55 property_desc; //property_use_cd
 	 STRING55 use_desc; //asses_land_use
+	 STRING55 lender_type_desc; //concurrent TD: lender type
+	 STRING60 loan_type_desc; //concurrent TD: loan type
 	 ClnFields_ext;
 END;
 
