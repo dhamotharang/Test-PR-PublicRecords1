@@ -10,7 +10,8 @@
 import ut,wk_ut,_control,STD, header;
 #WORKUNIT('name', 'PersonHeader: Build_Header_Boolean');
 
-build_version:= header.version_build;
+fn:=nothor(fileservices.SuperFileContents('~thor_data400::base::header',1)[1].name);
+build_version := regexfind('[\\d]{8}', fn,0);
 
 valid_state := ['blocked','running','wait','submitted','compiling','compiled'];
 ikb_wuname 	:= '*MOVE, FCRA and BOOLEAN*';

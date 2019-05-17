@@ -1,6 +1,8 @@
 import doxie_build, doxie, header_services, data_services, dx_Header;
 
-export data_key_DID_SSN_date(boolean IsFCRA = false) := function
+export data_key_DID_SSN_date(unsigned1 data_class = data_services.data_env.iNonFCRA) := function
+
+boolean IsFCRA := data_class = data_services.data_env.iFCRA;
 
 Suppression_Layout 	:= header_services.Supplemental_Data.layout_in;
 

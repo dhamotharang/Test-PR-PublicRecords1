@@ -46,7 +46,8 @@ export IdAppendThorLocal(
 				self.cntr := counter,
 				self.%zipset% :=
 				#if('A' in matchset)
-					DATASET([{left.zip_field,100}],BizLinkFull.Process_Biz_layouts.layout_zip_cases);
+					if(left.zip_field != '', DATASET([{left.zip_field,100}],BizLinkFull.Process_Biz_layouts.layout_zip_cases),
+					   DATASET([],BizLinkFull.Process_Biz_layouts.layout_zip_cases));
 				#else
 					DATASET([],BizLinkFull.Process_Biz_layouts.layout_zip_cases);
 				#end
@@ -134,6 +135,7 @@ export IdAppendThorLocal(
 				,%OutFile1%.results.prim_Range, %OutFile1%.results.prim_Rangeweight, %OutFile1%.results.prim_name, %OutFile1%.results.prim_nameweight
 			//end hack
 				,%OutFile1%.results.cnp_nameweight
+				,BIPV2.IdAppendLayouts.parentIds
 		  },
 		  PG := left.results[counter].score >= (integer)score_threshold;
 		  SG := PG or left.results_seleid[counter].score >= (integer)score_threshold;
@@ -161,6 +163,18 @@ export IdAppendThorLocal(
 		  self.powweight := if(UG,left.results_powid[counter].weight,0);
 		  self.powscore := if(UG,left.results_powid[counter].score,0);
 		  self.powid := if(UG,IF(left.results_powid[counter].powid=0,LEFT.results[COUNTER].powid,left.results_powid[counter].powid),0);
+
+			self.parent_proxid := if(PG, left.results[counter].parent_proxid, 0);
+			self.sele_proxid := map(PG => left.results[counter].sele_proxid,
+			                        SG => left.results_seleid[counter].sele_proxid,
+			                        0);
+			self.org_proxid := map(PG => left.results[counter].org_proxid,
+			                        SG => left.results_seleid[counter].org_proxid,
+			                        0);
+			self.ultimate_proxid := map(PG => left.results[counter].ultimate_proxid,
+			                        SG => left.results_seleid[counter].ultimate_proxid,
+			                        0);
+
 		  self:= left.results[counter];    
 		)
 	)((score >= (integer)score_threshold or ultscore >= (integer)score_threshold), (proxid > 0 or ultid > 0));// proxid > 0 also because of case where threshold is zero (without this you get keep_count records even with no IDs on them)
@@ -215,6 +229,11 @@ export IdAppendThorLocal(
 		  self.empid := 0,
 		  self.empweight := 0,
 		  self.empscore := 0,   
+
+			self.parent_proxid := right.parent_proxid,
+			self.sele_proxid := right.sele_proxid,
+			self.org_proxid := right.org_proxid,
+			self.ultimate_proxid := right.ultimate_proxid,
 				
 		  self := left
 		),

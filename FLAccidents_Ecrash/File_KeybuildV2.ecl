@@ -399,9 +399,7 @@ pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
 	//End of Police Record/Claims Process
 	  
 		// BuyCrash
-		self.officer_id                     := L.officer_id;
-		//Appriss Integration
-		self.Releasable                     := '1'; 		
+		self.officer_id                     := L.officer_id;		
 		self								                := L;
 		self                                := [];
    

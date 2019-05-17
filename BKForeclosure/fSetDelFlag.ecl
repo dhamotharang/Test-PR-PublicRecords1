@@ -1,23 +1,25 @@
-﻿IMPORT $;
+﻿IMPORT $, Data_Services;
 
 EXPORT fSetDelFlag := MODULE
 
 	EXPORT REO(DATASET(RECORDOF(layout_BK.base_reo)) ds_reo) := FUNCTION
 		layout_BK.base_reo FlagDelReo(layout_BK.base_reo L, Layout_BK.Delete_Reo R) := TRANSFORM
-			SELF.Delete_Flag := R.Delete_Flag;
-			SELF.bk_infile_type := 'REO_DELETE';
+			SELF.Delete_Flag := IF(R.Delete_Flag = 'DELETE',R.Delete_Flag,L.Delete_flag);
+			SELF.ln_filedate := IF(R.Delete_Flag = 'DELETE',R.ln_filedate,L.ln_filedate);
+			SELF.bk_infile_type := IF(R.Delete_Flag = 'DELETE', 'REO_DELETE', L.bk_infile_type);
+			SELF.date_vendor_last_reported := IF(R.Delete_Flag = 'DELETE',R.ln_filedate, L.date_vendor_last_reported);
 			SELF := L;
 		END;
 		
 	//Set Delete flag for current matching base file records - Do not remove these records, only flag them for key filtering	
-		jDelReo	:= JOIN(BKForeclosure.File_BK_Foreclosure.fReo,
-										BKForeclosure.File_BK_Foreclosure.Reo_Delete,
-										TRIM(LEFT.fips_cd) = TRIM(RIGHT.fips_cd) AND
-										TRIM(LEFT.lps_internal_pid) = TRIM(RIGHT.pid),
-										FlagDelReo(LEFT,RIGHT), MANY LOOKUP);									
+		jDelReo	:= JOIN(SORT(ds_reo,fips_cd,lps_internal_pid),
+										SORT(BKForeclosure.File_BK_Foreclosure.Reo_Delete,fips_cd,pid),
+										TRIM(LEFT.fips_cd,LEFT,RIGHT) = TRIM(RIGHT.fips_cd,LEFT,RIGHT) AND
+										TRIM(LEFT.lps_internal_pid,LEFT,RIGHT) = TRIM(RIGHT.pid,LEFT,RIGHT),
+										FlagDelReo(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);									
 	
-	BOOLEAN REODelexists	:=	NOTHOR(fileservices.GetSuperFileSubCount('~thor_data400::in::BKForeclosure::delete_reo'))>0;
-	FlagSetREO	:= IF(REODelexists, jDelReo, BKForeclosure.File_BK_Foreclosure.fReo);
+	BOOLEAN REODelexists	:=	NOTHOR(fileservices.GetSuperFileSubCount(Data_Services.foreign_prod+'thor_data400::in::BKForeclosure::delete_reo'))>0;
+	FlagSetREO	:= IF(REODelexists, jDelReo, ds_reo);
 	
 	//Format to flat layout for Ingest
 	BKForeclosure.Layout_BK.base_REO_ext extREO(FlagSetREO L) := TRANSFORM
@@ -199,22 +201,24 @@ EXPORT fSetDelFlag := MODULE
 	
 	EXPORT NOD(DATASET(RECORDOF(layout_BK.base_nod)) ds_nod) := FUNCTION
 		layout_BK.base_nod FlagDelNod(layout_BK.base_nod L, Layout_BK.Delete_nod R) := TRANSFORM
-			SELF.Delete_Flag := R.Delete_Flag;
-			SELF.bk_infile_type := 'NOD_DELETE';
+			SELF.Delete_Flag := IF(R.Delete_Flag = 'DELETE',R.Delete_Flag,L.Delete_flag);
+			SELF.ln_filedate := IF(R.Delete_Flag = 'DELETE',R.ln_filedate,L.ln_filedate);
+			SELF.bk_infile_type := IF(R.Delete_Flag = 'DELETE', 'NOD_DELETE', L.bk_infile_type);
+			SELF.date_vendor_last_reported := IF(R.Delete_Flag = 'DELETE',R.ln_filedate, L.date_vendor_last_reported);
 			SELF := L;
 		END;
 		
 	//Set Delete flag for current matching base file records - Do not remove these records, only flag them for key filtering	
-		jDelNod	:= JOIN(BKForeclosure.File_BK_Foreclosure.fNod,
-										BKForeclosure.File_BK_Foreclosure.Nod_Delete,
-										TRIM(LEFT.fips_cd) = TRIM(RIGHT.fips_cd) AND
-										TRIM(LEFT.lps_internal_pid) = TRIM(RIGHT.pid) AND
+		jDelNod	:= JOIN(SORT(ds_nod,fips_cd,lps_internal_pid,nod_source),
+										SORT(BKForeclosure.File_BK_Foreclosure.Nod_Delete,fips_cd,pid,nod_source),
+										TRIM(LEFT.fips_cd,LEFT,RIGHT) = TRIM(RIGHT.fips_cd,LEFT,RIGHT) AND
+										TRIM(LEFT.lps_internal_pid,LEFT,RIGHT) = TRIM(RIGHT.pid,LEFT,RIGHT) AND
 										TRIM(LEFT.nod_Source) = TRIM(RIGHT.nod_Source),
-										FlagDelNod(LEFT,RIGHT), MANY LOOKUP);									
+										FlagDelNod(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);									
 	
-	BOOLEAN NODDelexists	:=	NOTHOR(fileservices.GetSuperFileSubCount('~thor_data400::in::BKForeclosure::delete_nod'))>0;
+	BOOLEAN NODDelexists	:=	NOTHOR(fileservices.GetSuperFileSubCount(Data_Services.foreign_prod+'thor_data400::in::BKForeclosure::delete_nod'))>0;
 	
-	FlagSetNod	:= IF(NODDelexists, jDelNod, BKForeclosure.File_BK_Foreclosure.fNod);
+	FlagSetNod	:= IF(NODDelexists, jDelNod, ds_nod);
 	
 	//Transform to flatten layout
 BKForeclosure.Layout_BK.base_nod_ext extNOD(FlagSetNod L) := TRANSFORM

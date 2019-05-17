@@ -1,8 +1,9 @@
 ﻿import _Control,FraudGovPlatform_Validation;
-EVERY_DAY_AT_1AM := '0 6 * * 1-5';
+EVERY_DAY_AT_1AM := '0 5 * * 1-5';
 
-IP			:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
+IP:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
+ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
+
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
@@ -11,7 +12,7 @@ lECL1 :=
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'#OPTION(\'defaultSkewError\', 1);\n'
 +'version:=ut.GetDate : independent;\n'
-+'wuname := \'FraudGov Build Base\';\n'
++'wuname := \'FraudGov Full Build\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -34,9 +35,11 @@ lECL1 :=
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov Build Base Schedule');
 
-_Control.fSubmitNewWorkunit(lECL1,ThorName)
-			: WHEN(CRON(EVERY_DAY_AT_1AM))
-			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
+SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipBuild;
+Run_ECL := if(SkipJob=false,lECL1, 'output(\'Build Skipped\');\n' );
+_Control.fSubmitNewWorkunit(Run_ECL,ThorName)
+			:WHEN(CRON(EVERY_DAY_AT_1AM))
+			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').BocaOps
 																			,'FraudGov Build Base Schedule failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));

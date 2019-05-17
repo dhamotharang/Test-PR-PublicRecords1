@@ -38,7 +38,8 @@ module
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		source_input := if (l.inquiry_source = '', 'Deltabase','Deltabase-' + l.inquiry_source);
 		self.source_input := source_input;
-		SELF.unique_id := 0;
+		self.unique_id := 0;
+		self.did := l.lexid;
 		self:=l;
 		self:=[];
 	end;
@@ -135,7 +136,9 @@ module
 	dAppendAID := Standardize_Entity.Clean_Address(Valid_Recs, new_addresses);
 	dappendName := Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
-	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
+	dWithLexid := dAppendPhone(did > 0);
+	dWithoutLexid := dAppendPhone(did = 0);
+	dAppendLexid := Standardize_Entity.Append_Lexid (dWithoutLexid) + dWithLexid;
 	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
 	input_file_1 := fn_dedup_delta(Deltabase_Sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 

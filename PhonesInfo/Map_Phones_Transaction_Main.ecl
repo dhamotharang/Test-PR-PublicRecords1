@@ -6,7 +6,7 @@
 	otpFile 		:= 	PhonesInfo.File_OTP.Main;																								//OTP
 	
 	//Concat Base Files Together	
-	concatFiles := 	portFile +
+	concatFiles := 	//portFile +
 									port2File +
 									deactFile +
 									deactGHFile +

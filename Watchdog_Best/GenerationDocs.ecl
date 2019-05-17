@@ -24,14 +24,28 @@ FIELDTYPE:alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:NAME:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ -'):ONFAIL(CLEAN)
 //Title
 BESTTYPE:BestTitle:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_valid_name_title)
+// first name
+FUZZY:PreferredName:RST:CUSTOM(Watchdog_Best.fn_PreferredName):TYPE(STRING20)
+BESTTYPE:BestFirstName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_fname_strict)
+BESTTYPE:CommonFirstName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_fname)
+BESTTYPE:AnyFirstName:BASIS(did):COMMONEST
+// middle name
+BESTTYPE:BestMiddleName:BASIS(did):LONGEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname_strict)
+BESTTYPE:CommonMiddleName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname)
+BESTTYPE:AnyMiddleName:BASIS(did):COMMONEST
+// last name
+BESTTYPE:BestLastName:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_best_lname)
+BESTTYPE:CommonLastName:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_valid_lname)
+BESTTYPE:AnyLastName:BASIS(did):COMMONEST
 //Suffix
-BESTTYPE:BestSuffix:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_name_suffix)
+BESTTYPE:BestSuffix:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_valid_name_suffix)
 //SSN
-BESTTYPE:BestSSN:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_ssn)
-BESTTYPE:SecondBestSSN:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_ok_ssn)
+BESTTYPE:BestSSN:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_valid_ssn)
+BESTTYPE:SecondBestSSN:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_ok_ssn)
 //Phone
 BESTTYPE:BestPhoneCurrentWithNpa:BASIS(did):RECENT(dt_last_seen):FUZZY:VALID(Watchdog_Best.fn_valid_phone)
 //DOB
+BESTTYPE:PrefferedDOB:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_preffered_dob)
 BESTTYPE:BestDOB:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_valid_dob)
 BESTTYPE:NoDayDOB:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_dob_noday)
 BESTTYPE:NoMonthDOB:BASIS(did):COMMONEST:VALID(Watchdog_Best.fn_dob_nomonth)
@@ -43,16 +57,6 @@ BESTTYPE:RecentAddressBySeen:BASIS(did):RECENT(dt_last_seen):VALID(Watchdog_Best
 BESTTYPE:BetterAddressByReported:BASIS(did):RECENT(dt_vendor_last_reported):VALID(Watchdog_Best.fn_better_address2)
 BESTTYPE:RecentAddressByReported:BASIS(did):RECENT(dt_vendor_last_reported):VALID(Watchdog_Best.fn_valid_address2)
 BESTTYPE:CommonestAddress:BASIS(did):COMMONEST
-// first name
-FUZZY:PreferredName:RST:CUSTOM(Watchdog_Best.fn_PreferredName):TYPE(STRING20)
-BESTTYPE:BestFirstName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_fname_strict)
-BESTTYPE:CommonFirstName:BASIS(did):COMMONEST:FUZZY:EXTEND:VALID(Watchdog_Best.fn_valid_fname)
-// middle name
-BESTTYPE:BestMiddleName:BASIS(did):LONGEST:MINIMUM(2):FUZZY:VALID(Watchdog_Best.fn_valid_mname_strict)
-BESTTYPE:CommonMiddleName:BASIS(did):COMMONEST:FUZZY:EXTEND:VALID(Watchdog_Best.fn_valid_mname)
-// last name
-BESTTYPE:BestLastName:BASIS(did):RECENT(dt_last_seen):FUZZY:VALID(Watchdog_Best.fn_valid_lname)
-BESTTYPE:CommonLastName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_lname)
 // fields
 //FIELD:did:TYPE(UNSIGNED6):1,1
 //FIELD:rid:TYPE(UNSIGNED6):1,1
@@ -60,7 +64,7 @@ FIELD:pflag1:TYPE(STRING1):44,2
 FIELD:pflag2:TYPE(STRING1):43,20
 FIELD:pflag3:TYPE(STRING1):7,1
 FIELD:src:TYPE(STRING2):311,93
-SOURCEFIELD:src:PERMITS(fn_sources)
+SOURCEFIELD:src:PERMITS(Watchdog_Best.fn_sources)
 //DATEFIELD:dt_first_seen:61,8
 //DATEFIELD:dt_last_seen:56,9
 //DATEFIELD:dt_vendor_last_reported:48,9
@@ -74,12 +78,12 @@ FIELD:dt_nonglb_last_seen:TYPE(unsigned3):64,8
 FIELD:rec_type:TYPE(STRING1):12,6
 FIELD:phone:TYPE(QSTRING8):LIKE(number):EDIT1:BestPhoneCurrentWithNpa:17,0
 FIELD:ssn:TYPE(QSTRING7):17,1
-FIELD:dob:TYPE(INTEGER4):BestDOB:NoDayDOB:NoMonthDOB:13,1
+FIELD:dob:TYPE(INTEGER4):PrefferedDOB:BestDOB:NoDayDOB:NoMonthDOB:13,1
 FIELD:title:TYPE(QSTRING4):BestTitle:1,0
-FIELD:fname:TYPE(QSTRING15):EDIT1:INITIAL:BestFirstName:CommonFirstName:1,1
-FIELD:mname:TYPE(QSTRING15):EDIT1:INITIAL:BestMiddleName:CommonMiddleName:1,1
-FIELD:lname:TYPE(QSTRING15):HYPHEN1:CommonLastName:1,1
-FIELD:name_suffix:TYPE(QSTRING4):BestSuffix:70,1
+FIELD:fname:TYPE(QSTRING15):EDIT1:INITIAL:BestFirstName:CommonFirstName:AnyFirstName:1,1
+FIELD:mname:TYPE(QSTRING15):EDIT1:INITIAL:BestMiddleName:CommonMiddleName:AnyMiddleName:1,1
+FIELD:lname:TYPE(QSTRING15):HYPHEN1:1,1
+FIELD:name_suffix:TYPE(QSTRING4):NULLS(REPLACE,):BestSuffix:70,1
 FIELD:prim_range:TYPE(QSTRING8):115,3
 FIELD:predir:TYPE(STRING2):38,3
 FIELD:prim_name:TYPE(QSTRING21):131,4
@@ -101,14 +105,15 @@ FIELD:dodgy_tracking:TYPE(STRING5):53,4
 FIELD:address_ind:TYPE(UNSIGNED2):1,0
 FIELD:name_ind:TYPE(UNSIGNED2):1,1
 FIELD:persistent_record_id:TYPE(UNSIGNED8):1,1
+CONCEPT:lastname:lname:name_ind:BestLastName:CommonLastName:AnyLastName:1,1
 CONCEPT:ssnum:ssn:valid_ssn:BestSSN:SecondBestSSN:56,5
-CONCEPT:address:prim_range:predir:prim_name:suffix:postdir:unit_desig:sec_range:city_name:st:zip:zip4:tnt:rawaid:dt_first_seen:dt_last_seen:dt_vendor_first_reported:dt_vendor_last_reported:BestAddress:GongAddressBySeen:BetterAddressBySeen:BetterAddressByReported:RecentAddressBySeen:RecentAddressByReported:CommonestAddress:170,5
+CONCEPT:address:prim_range:predir:prim_name:suffix:postdir:unit_desig:sec_range:city_name:st:zip:zip4:tnt:rawaid:dt_first_seen:dt_last_seen:dt_vendor_first_reported:dt_vendor_last_reported:BestAddress:BetterAddressBySeen:RecentAddressBySeen:GongAddressBySeen:BetterAddressByReported:RecentAddressByReported:CommonestAddress:170,5
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
 // SOURCEFIELD is used if a field of the file denotes a source of the records in that file
 // LINKPATH is used to define access paths for external linking
 
-Total available specificity:2376
+Total available specificity:2377
 Specificity number that should imply one record specified 31.
 Assuming an average of 1 records per cluster
 Specificity value at which N^2 joins will be tolerated: 25
@@ -240,12 +245,6 @@ but should average 1 points with a failed match subtracting 1 points.
 (This subtraction estimate is based upon 0% of clusters with 2 or more records have 2 or more values for title.)
 
 fname Scoring:
-
-Prior to matching the following rules are applied in a cascade in an attempt to fix or complete field values.
- 1. Gather together all records that match on (did,src,data_permits) removing any which are invalid according to Watchdog_Best.fn_valid_fname.
- The number of each field value are then counted, field values with a smaller count are used to re-enforce higher count fields that they fuzzy-match to.
- The best is then defined to be the one which is the most commonly occurring field value.
- If the value generated is non-null and the value currently in the field is a shorter form of it then the value currently in the field will be replaced.
 Two fname fields will be considered to match if:
   - they are identical
   - one is the leading part of the other
@@ -255,12 +254,6 @@ and the degree of fuzziness required but should average 1 points with a failed m
 (This subtraction estimate is based upon 0% of clusters with 2 or more records have 2 or more values for fname.)
 
 mname Scoring:
-
-Prior to matching the following rules are applied in a cascade in an attempt to fix or complete field values.
- 1. Gather together all records that match on (did,src,data_permits) removing any which are invalid according to Watchdog_Best.fn_valid_mname.
- The number of each field value are then counted, field values with a smaller count are used to re-enforce higher count fields that they fuzzy-match to.
- The best is then defined to be the one which is the most commonly occurring field value.
- If the value generated is non-null and the value currently in the field is a shorter form of it then the value currently in the field will be replaced.
 Two mname fields will be considered to match if:
   - they are identical
   - one is the leading part of the other
@@ -277,6 +270,8 @@ Two lname fields will be considered to match if:
 The exact number of points allocated to a match will depend upon the global scarcity of the lname
 and the degree of fuzziness required but should average 1 points with a failed match subtracting 0 points.
 (This subtraction estimate is based upon 0% of clusters with 2 or more records have 2 or more values for lname.)
+It should also be noted that lname is a child field of lastname. Therefore if lastname is a full match this field will score 0.
+This field is scaled to match with its parent lastname, on average that will mean multiplying by 50%
 
 name_suffix Scoring:
 Two name_suffix fields will be considered to match if:
@@ -452,6 +447,8 @@ Two name_ind fields will be considered to match if:
 The exact number of points allocated to a match will depend upon the global scarcity of the name_ind
 but should average 1 points with a failed match subtracting 0 points.
 (This subtraction estimate is based upon 0% of clusters with 2 or more records have 2 or more values for name_ind.)
+It should also be noted that name_ind is a child field of lastname. Therefore if lastname is a full match this field will score 0.
+This field is scaled to match with its parent lastname, on average that will mean multiplying by 50%
 
 persistent_record_id Scoring:
 Two persistent_record_id fields will be considered to match if:
@@ -459,6 +456,14 @@ Two persistent_record_id fields will be considered to match if:
 The exact number of points allocated to a match will depend upon the global scarcity of the persistent_record_id
 but should average 1 points with a failed match subtracting 0 points.
 (This subtraction estimate is based upon 0% of clusters with 2 or more records have 2 or more values for persistent_record_id.)
+
+lastname Scoring:
+Two lastname fields will be considered to match if:
+  - they are identical
+Note: lastname is an amalgam of (lname,name_ind)
+Points will only be allocated for a match, the amount depending upon the scarcity of lastname
+but should average 1 points.
+In the event of a non-match this field will score 0 (and the child fields will be allowed to score).
 
 ssnum Scoring:
 Two ssnum fields will be considered to match if:

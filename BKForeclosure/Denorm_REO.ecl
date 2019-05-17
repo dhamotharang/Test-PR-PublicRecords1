@@ -173,12 +173,13 @@ Layout_BK.base_reo SlimBase(Base_reo L) := TRANSFORM
 	SELF.name8.ultscore		:= L.name8_ultscore;
 	SELF.name8.ultweight	:= L.name8_ultweight;
 	SELF := L;
-	SELF := [];
+//	SELF := [];
 END;
 
 	pSlimBase	:= PROJECT(Base_reo, SlimBase(LEFT));
 	
 Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanFields_REO r) := TRANSFORM
+		SELF.delete_flag			:= IF(TRIM(L.bk_infile_type) = 'REO_DELETE', 'DELETE', L.delete_flag);
 		SELF.name1_nid 				:= IF(r.Name_Type = 'B1', r.nid, l.name1_nid);
 		SELF.name1_prefix			:= IF(r.Name_Type = 'B1', r.cln_title, l.name1_prefix);
 		SELF.name1_first			:= IF(r.Name_Type = 'B1', r.cln_fname, l.name1_first);
@@ -472,43 +473,46 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.situs1_err_stat		:= IF(r.AddrType = 'PF', r.err_stat, l.situs1_err_stat);
 		
 		SELF := L;
-		SELF := [];
+//		SELF := [];
 	END;
 	
 	//Distribute the data before denormalize to avoid skewing
-	ReoInDist				:=	DISTRIBUTE(Norm_reo, HASH32(record_id));
-	ReoBaseDist			:=	DISTRIBUTE(pSlimBase, HASH32(record_id));
+	ReoInDist				:=	SORT(DISTRIBUTE(Norm_reo, HASH32(record_id)),record_id,LOCAL);
+	ReoBaseDist			:=	SORT(DISTRIBUTE(pSlimBase(delete_flag <> 'DELETE'), HASH32(record_id)),record_id, -date_vendor_last_reported,LOCAL);
+	ReoBaseDelete		:= 	pSlimBase(delete_flag = 'DELETE');
 
 	ReoDeNorm := DENORMALIZE(ReoBaseDist, ReoInDist,
 														left.record_id = right.record_id,
-														denormalizeRecords(left,right), LOCAL);
+														denormalizeRecords(left,right), LEFT OUTER, LOCAL);
 														
-	ReoBase	:= DEDUP(SORT(ReoDeNorm,record_id,foreclosure_id,-process_date),ALL); 
+//Add back delete flagged records
+	ReoAll	:= ReoDeNorm + ReoBaseDelete;
+	
+	ReoBase	:= DEDUP(SORT(ReoAll,record_id,foreclosure_id,-process_date),ALL); 
 	
 	//Translate codes
 	code_lkp := BKForeclosure.File_BK_Foreclosure.codes_table;
-	
-	Layout_BK.base_reo xfrmDocDesc(BKForeclosure.Layout_BK.base_reo L, BKForeclosure.layout_BK.CodeTable R) := TRANSFORM
-		SELF.document_desc := R.code_desc;
-		SELF := L;
-	END;
-	
-	AddDocDesc	:= JOIN(ReoBase, code_lkp,
-											TRIM(LEFT.src) = TRIM(RIGHT.src) AND
-											TRIM(LEFT.doc_type_cd) = TRIM(RIGHT.code),
-											xfrmDocDesc(LEFT,RIGHT),LEFT OUTER, LOOKUP);
 											
-	OtherCodes_dict	:= DICTIONARY(code_lkp, {code => code_desc});
+	OtherCodes_dict		:= DICTIONARY(code_lkp, {code => code_desc});
+	DocCodes_dict			:= DICTIONARY(code_lkp(src = 'I5' AND field_name = 'DOCUMENT_TYPE'), {code => code_desc});
+	LenderCodes_dict	:= DICTIONARY(code_lkp(field_name = 'LENDER_TYPE'), {code => code_desc});
+	LoanCodes_dict		:= DICTIONARY(code_lkp(field_name = 'LOAN_TYPE'), {code => code_desc});
 	
 	CodeLkp(string code)	:= OtherCodes_dict[code].code_desc;
+	DocumentCodeLkp(string code):= DocCodes_dict[code].code_desc;
+	LenderCodeLkp(string code)	:= LenderCodes_dict[code].code_desc;
+	LoanCodeLkp(string code)		:= LoanCodes_dict[code].code_desc;
 	
 	Layout_BK.base_reo xfrmCodeDesc(BKForeclosure.Layout_BK.base_reo L) := TRANSFORM
+		SELF.document_desc :=	DocumentCodeLkp(TRIM(L.doc_type_cd,LEFT,RIGHT));
 		SELF.property_desc := CodeLkp(TRIM(L.property_use_cd,LEFT,RIGHT));
 		SELF.use_desc 		 := CodeLkp(TRIM(L.asses_land_use,LEFT,RIGHT));
+		SELF.lender_type_desc	:= LenderCodeLkp(TRIM(L.concurrent_lender_type,LEFT,RIGHT));
+		SELF.loan_type_desc 	:= LoanCodeLkp(TRIM(L.concurrent_loan_type,LEFT,RIGHT));
 		SELF := L;
 	END;
 	
-	BaseOut	:= PROJECT(AddDocDesc, xfrmCodeDesc(LEFT));										
+	BaseOut	:= PROJECT(ReoBase, xfrmCodeDesc(LEFT));										
 	
 	RETURN BaseOut;
 END;

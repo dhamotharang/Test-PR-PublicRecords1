@@ -1,8 +1,14 @@
 ﻿import DOPSGrowthCheck,dops;
 export IdentifyChangedDatasets := function 
-    CertList:=dops.GetDeployedDatasets('Q','B','F');
-    ProdList:=dops.GetDeployedDatasets('P','B','F');
-
+    CertListFCRA:=dops.GetDeployedDatasets('Q','B','F');
+    ProdListFCRA:=dops.GetDeployedDatasets('P','B','F');
+		
+		CertListNonFCRA:=dops.GetDeployedDatasets('Q','B','N');
+    ProdListNonFCRA:=dops.GetDeployedDatasets('P','B','N');
+		
+		CertList:=CertListFCRA+CertListNonFCRA;
+    ProdList:=ProdListFCRA+ProdListNonFCRA;
+		
 DopsRec:=Recordof(CertList);
 
 DopsGrowthCheck.layouts.Date_Compare_Layout tCompare(DopsRec L, DopsRec R) := transform

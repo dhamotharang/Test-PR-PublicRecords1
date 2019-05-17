@@ -45,7 +45,9 @@ module
 	// -- JIRA - DF-22311 - Cons. Adv. - Overlinking of PAW for LexID : 2376165181 Alexander
 	// -- JIRA - DF-23263 - Consumer Dispute - Paw and Bus Header Records to be Removed
 	// -- JIRA - DF-22559 - Consumer Dispute - PAW record to be removed
-	// -- JIRA - DF-23018 - Consumer Dispute - Paw Record to be removed	
+	// -- JIRA - DF-23018 - Consumer Dispute - Paw Record to be removed
+	// -- JIRA - DF-24482 - People at Work detail needs to be removed from individual
+	// -- JIRA - DF-24522 - Consumer Dispute - Unlink to PAW - zoom record
 	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
 																'1793702174   C355227920',
 																'1793716775   C355227920',
@@ -74,7 +76,9 @@ module
 																'1281160320C26201112',
 																'381789420     C26201112',
 																'1281160320    C26201112',
-																'1346792667C92292992'				  // JIRA - DF-23018																
+																'1346792667C92292992',				// JIRA - DF-23018
+																'1580842040C59082544',				// JIRA - DF-24482
+																'1924843383   C77627406'			// JIRA - DF-24522
 															 ];
 	
 	export Input :=
@@ -474,6 +478,8 @@ module
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1225991480    C204407405','1225991480C204407405'] and trim(pInput.lname) = 'MAKAROVA' and trim(pInput.prim_name) = 'LA SALLE')
 				// -- JIRA - DF-24406 - Business linked to wrong MARY HUBBARD
 				or  (trim(pInput.vendor_id) = '12-221573' and trim(pInput.lname) = 'HUBBARD' and trim(pInput.fname) = 'MARY' and trim(pInput.company_prim_name) = 'CENTRAL' and pInput.company_zip = 33713)
+				// -- JIRA - DF-24522 - Consumer Dispute - Unlink to PAW - zoom record
+				or  (trim(pInput.vendor_id) = '185398039' and trim(pInput.lname) = 'ROLSETH' and pInput.company_phone = 6516313237 and regexfind('YADA SYSTEMS',pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1069,6 +1075,8 @@ module
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1225991480    C204407405','1225991480C204407405'] and trim(pInput.lname) = 'MAKAROVA' and trim(pInput.prim_name) = 'LA SALLE')
 				// -- JIRA - DF-24406 - Business linked to wrong MARY HUBBARD
 				or  (trim(pInput.vendor_id) = '12-221573' and trim(pInput.lname) = 'HUBBARD' and trim(pInput.fname) = 'MARY' and trim(pInput.company_prim_name) = 'CENTRAL' and pInput.company_zip = 33713)
+				// -- JIRA - DF-24522 - Consumer Dispute - Unlink to PAW - zoom record
+				or  (trim(pInput.vendor_id) = '185398039' and trim(pInput.lname) = 'ROLSETH' and pInput.company_phone = 6516313237 and regexfind('YADA SYSTEMS',pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
