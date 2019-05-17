@@ -71,7 +71,7 @@ export Send_Email(string filedate='',string st='',string fn='') := MODULE
 						:= SendMail(
 								def
 								,'NCF2 Contributory File Validation Report'
-								,'NCR2 Report'		//$.Print.NCR2_to_Text(fn)
+								,$.Print.NCR2_to_Text(fn)
 							);
 
 

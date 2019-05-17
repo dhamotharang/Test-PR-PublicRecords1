@@ -135,7 +135,7 @@ EXPORT Print := MODULE
 					self.Text	:=	trim(l.Text) + LF + trim(r.Text);
 				end;
 		toText		:=	rollup(dNcr2, true, tText(left, right));
-		return toText.Text[1];
+		return toText[1].Text;
 	END;
 		
 	

@@ -3,11 +3,6 @@
 ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
 
-GetErrorRate(integer total, string lfn) := FUNCTION
-		errs := dataset(lfn, $.ValidationCodes, rError);
-		
-
-
 
 EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string lfn) := function
 
@@ -15,6 +10,7 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 		done     := rootDir+'done/';
 		err      := rootDir+'error/';
 		spraying := rootDir+'spraying/';
+		outgoing := rootDir+'outgoing/';
 		
 		ilfn := '~nac::uber::in::'+lfn;
 
@@ -44,22 +40,41 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 		
 		processed := $.PreprocessNCF2(ilfn);
 				
-
+		reports := $.GetReports(ModifyFileName(ilfn, 'xxx2'));
+		err_rate := reports.ErrorCount/reports.TotalRecords;
+		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
+		
+		MoveToTempOrReject := 	if(ExcessiveInvalidRecordsFound
+																,MoveSprayingToError
+																,MoveSprayingToDone
+															);
+		
+		out_NCF_reports := PARALLEL(
+					OUTPUT(reports.dsNcr2,,ModifyFileName(ilfn, 'ncr2'), COMPRESSED, OVERWRITE, named('ncr2')),
+					OUTPUT(reports.dsNcd2,,ModifyFileName(ilfn, 'ncd2'), COMPRESSED, OVERWRITE, named('ncd2')),
+					OUTPUT(reports.dsNcx2,,ModifyFileName(ilfn, 'ncx2'), COMPRESSED, OVERWRITE, named('ncx2'))
+					);
+		
+		despray_NCF_reports(string rep):=function
+			fn := ModifyFileName(ilfn, rep);
+			pDestinationFile:= outgoing + trim(fn);
+			return fileservices.Despray(fn,ip,pDestinationFile,,,,TRUE);
+		end;		
 		
 		doit := sequential(
 											MoveReadyToSpraying
 											,SprayIt										
 											,OUTPUT(processed,,ModifyFileName(ilfn, 'xxx2'), COMPRESSED, OVERWRITE)
+											,OUTPUT(reports.TotalRecords, named('total_records'))
+											,OUTPUT(reports.ErrorCount, named('Error_Count'))
 											//,Std.File.AddSuperFile('~nac::uber::in::pending', ModifyFileName(ilfn, 'xxx2')
 											//,OUTPUT(err_rate, named('err_rate'))
-											//,MoveToTempOrReject/
-											,$.Send_Email(st := lfn[6..7], fn := lfn).FileValidationReport
-											//,DeleteTemp
-											//,if(IsEmptyFile,$.Send_Email(st := UpSt,fn:=fname).FileEmptyErrorAlert)
-											//,out_NCF_reports
-											//,despray_NCF_reports('ncx2')
-											//,despray_NCF_reports('ncd2')
-											//,despray_NCF_reports('ncr2')
+											,MoveToTempOrReject
+											,out_NCF_reports
+											,$.Send_Email(st := lfn[6..7], fn := ModifyFileName(ilfn, 'ncr2')).FileValidationReport
+											,despray_NCF_reports('ncx2')
+											,despray_NCF_reports('ncd2')
+											,despray_NCF_reports('ncr2')
 
 						);
 						//: $.Send_Email(st := lfn[6..7], fn := lfn).FileErrorAlert);
