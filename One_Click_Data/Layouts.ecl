@@ -111,7 +111,8 @@ module
 		Address.Layout_Clean182_fips		    Clean_work_address    				;
 		Miscellaneous.Cleaned_Dates		    	Clean_dates    								;
 		Miscellaneous.Cleaned_Phones		    Clean_phones    							;
-		
+		unsigned4 global_sid;
+		unsigned8 record_sid;
 	end;
 
 	export Keybuild :=
@@ -135,7 +136,8 @@ module
 		Address.Layout_Clean182_fips		    Clean_work_address    				;
 		Miscellaneous.Cleaned_Dates		    	Clean_dates    								;
 		Miscellaneous.Cleaned_Phones		    Clean_phones    							;
-		
+		unsigned4 global_sid;
+		unsigned8 record_sid;
 	end;
 
 	////////////////////////////////////////////////////////////////////////
