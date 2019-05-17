@@ -28,13 +28,13 @@ return sequential(
 					Vendor_Src_KeyOut
 		
 					 ),
-				// parallel(
-					// Vendor_Src_key_built
+				parallel(
+					Vendor_Src_key_built
 	
-					// ),
-				// parallel(
-					// Vendor_src_key_QA
+					),
+				parallel(
+					Vendor_src_key_QA
 		
-					// )
+					)
 				);
 end;					
