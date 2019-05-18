@@ -61,7 +61,7 @@ cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(LiensV2.key_fcra_liens_autok
 																						['tax_id']));
 /***********************************************DF-24044******************************************************/
 Attachment := 	Liensv2.fn_email_attachment(choosen(Liensv2.File_TMSID_MappingFile,100));		
-mailfile	 :=	FileServices.SendEmailAttachData('vani.chikte@lexisnexis.com'
+mailfile	 :=	FileServices.SendEmailAttachData('vani.chikte@lexisnexis.com;Cheri.G.Nevin@lexisnexisrisk.com'
 																															 ,'Liens Mapping File' //subject
 																															 ,'Liens WU: '+WORKUNIT //body
 																															 ,(data)Attachment

@@ -1044,7 +1044,7 @@ Export CIID := RECORD
   integer8 __recordcount;
  END;
 
- Export customerdashtopclustersandelements	:= RECORD
+ Export customerdashtopclustersandelements := RECORD
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
   integer8 customer_id_;
@@ -1126,6 +1126,8 @@ Export CIID := RECORD
   unsigned1 __abbreviated_bankname__flags;
   string license_state_;
   unsigned1 __license_state__flags;
+  unsigned8 event_count_;
+  unsigned8 identity_count_;
   DATASET(flagsrec) flags;
  END;
  
@@ -1220,7 +1222,7 @@ Export CIID := RECORD
   integer8 weight;
  END;
  
- Export	fullgraph	:=	RECORD
+ Export	fullgraph	:= RECORD
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
   integer8 customer_id_;
@@ -1302,9 +1304,11 @@ Export CIID := RECORD
   unsigned1 __abbreviated_bankname__flags;
   string license_state_;
   unsigned1 __license_state__flags;
+  unsigned8 event_count_;
+  unsigned8 identity_count_;
   DATASET(flagsrec) flags;
  END;
-
+ 
  Export	personassociationsdetails	:=	RECORD
   unsigned8 associatedcustomerfileinfo;
   integer8 customer_id_;
