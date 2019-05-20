@@ -7,7 +7,7 @@
 
 watchtype := 'marketing';
 
-import watchdog,ut,RoxieKeyBuild,Orbit3;
+import watchdog,ut,RoxieKeyBuild,Orbit3,Watchdog_V2;
 
 boolean isnewheader := Watchdog.proc_Validate_NewHdr.out;
 
