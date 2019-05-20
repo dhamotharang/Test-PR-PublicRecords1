@@ -1,4 +1,4 @@
-IMPORT ut
+﻿IMPORT ut
 		 , address
 		 , AID
 		 , DID_Add
@@ -160,6 +160,9 @@ export proc_build_base(string file_date)
 																			0
 																		);
 				self.source						:= mdr.sourceTools.src_Impulse;
+				//Added for CCPA-108
+				self.global_sid       := 0;
+				self.record_sid       := 0;
 				self									:=	pInput;
 			END;
 

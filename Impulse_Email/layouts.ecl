@@ -1,4 +1,4 @@
-EXPORT layouts := MODULE
+﻿EXPORT layouts := MODULE
 
 IMPORT AID;
 
@@ -1225,6 +1225,9 @@ IMPORT AID;
 				integer		ln_ANNUALINCOME,
 				layout_Impulse_Email_In,
 				string2   source := '',
+				//Added for CCPA-108
+				unsigned4 global_sid;
+				unsigned8 record_sid;
 			END;
 		
 		EXPORT layout_Impulse_Email_Did_Key
@@ -1314,6 +1317,9 @@ IMPORT AID;
 					string KRAFTBLOCK,
 					string SCRAPED,
 					string2 SOURCE := '';
+					//Added for CCPA-108
+					unsigned4 global_sid;
+					unsigned8 record_sid;
 				END;
 		
 END;
