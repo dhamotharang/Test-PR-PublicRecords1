@@ -159,10 +159,10 @@ export proc_build_base(string file_date)
 																			pInput.TOTALINCOME != '' => (integer)pInput.TOTALINCOME,
 																			0
 																		);
-				self.source						:= mdr.sourceTools.src_Impulse;
+				self.source						:=  mdr.sourceTools.src_Impulse;
 				//Added for CCPA-108
-				self.global_sid       := 0;
-				self.record_sid       := 0;
+				self.global_sid       :=  25041;  //Added for CCPA-108.  Impulse_Email has a single source and global_sid lookup function not yet available.
+				self.record_sid       :=  0;
 				self									:=	pInput;
 			END;
 
