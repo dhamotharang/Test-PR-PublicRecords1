@@ -1,12 +1,12 @@
-﻿IMPORT AutoStandardI, Data_Services, mdr, codes;
+﻿IMPORT AutoStandardI, codes, data_services, mdr;
 
 EXPORT compliance := MODULE
  
   // from doxie.mac_header_field_declare() -- i.e. translated
-  EXPORT GetGlobalDataAccessModule () := FUNCTIONMACRO
+  EXPORT GetGlobalDataAccessModule (isFCRA = false) := FUNCTIONMACRO
     IMPORT STD;
     // a hack: DPM and DRM are not provided
-    local gm := AutoStandardI.GlobalModule();
+    local gm := AutoStandardI.GlobalModule(isFCRA);
     local access := MODULE (doxie.IDataAccess)
       EXPORT unsigned1 glb := GLB_Purpose;
       EXPORT unsigned1 dppa := DPPA_Purpose;
@@ -21,13 +21,15 @@ EXPORT compliance := MODULE
       EXPORT boolean suppress_dmv := suppressDMVInfo_value;
       EXPORT boolean lexid_source_optout := gm.LexIdSourceOptout;
       // "unsigned", so that we could accommodate different log levels, if needed
-      EXPORT boolean log_record_source := gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
+      EXPORT boolean log_record_source := ~gm.isFCRAval AND gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
       EXPORT boolean show_minors := gm.IncludeMinors OR (GLB_Purpose = 2);
       EXPORT string ssn_mask := ssn_mask_value;
       EXPORT unsigned1 dl_mask :=  dl_mask_val;
       EXPORT unsigned1 dob_mask := dob_mask_value;
+      EXPORT unsigned1 reseller_type := ^.reseller_type;
+      EXPORT unsigned1 intended_use := ^.intended_use;
       EXPORT string transaction_id := if(gm.TransactionID <> '', gm.TransactionID, gm.BatchUID); 
-      EXPORT unsigned6 global_company_id := gm.GlobalCompanyId; // mbs gcid
+      EXPORT unsigned6 global_company_id := gm.GlobalCompanyId;
     END;
     RETURN access;
   ENDMACRO;
@@ -50,11 +52,13 @@ EXPORT compliance := MODULE
       EXPORT boolean suppress_dmv := gm.SuppressDMVInfo;
       EXPORT boolean lexid_source_optout := gm.LexIdSourceOptout;
       // "unsigned", so that we could accommodate different log levels, if needed
-      EXPORT boolean log_record_source := gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
+      EXPORT boolean log_record_source := ~gm.isFCRAVal AND gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0); 
       EXPORT boolean show_minors := gm.IncludeMinors OR (glb_auto = 2);
       EXPORT string ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
       EXPORT unsigned1 dl_mask :=  AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.dl_mask_val.params));
       EXPORT unsigned1 dob_mask := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params));
+      EXPORT unsigned1 reseller_type := AutoStandardI.InterfaceTranslator.reseller_type_value.val(project(gm,AutoStandardI.InterfaceTranslator.reseller_type_value.params));;
+      EXPORT unsigned1 intended_use := AutoStandardI.InterfaceTranslator.intended_use_value.val(project(gm,AutoStandardI.InterfaceTranslator.intended_use_value.params));
       EXPORT string transaction_id := if(gm.TransactionID <> '', gm.TransactionID, gm.BatchUID); 
       EXPORT unsigned6 global_company_id := gm.GlobalCompanyId;
     END;
@@ -113,9 +117,16 @@ EXPORT compliance := MODULE
          preGLBRestrict (DataRestrictionMask) => FALSE,
          dateOK (nonglb_last_seen, first_seen));
 
+  //SrcOk from ut/PermissionTools; has DRM in addition to other parameters
+  EXPORT boolean source_ok (unsigned1 purpose, string DataRestrictionMask, string2 src, unsigned3 first_seen = 0, unsigned3 nonglb_last_seen = 0) :=
+                   glb_ok(purpose) OR HeaderIsPreGLB(nonglb_last_seen, first_seen, src, DataRestrictionMask);
+
+  EXPORT boolean minor_ok (unsigned1 age, boolean ok_to_show_minors) := //aka minorOK
+				ok_to_show_minors OR (age = 0) or (age >= 18);
+
 
   EXPORT MAC_FilterOutMinors (inrec, didfield = 'did', dobfield = '?', ok_to_show_minors) := FUNCTIONMACRO
-      IMPORT doxie_files, ut;
+      IMPORT dx_header, ut;
       
     // need to check for minors on zero DIDs that have a valid DOB.
     // if input layout to the macro doesn't contain a DOB field, just let the 
@@ -126,7 +137,7 @@ EXPORT compliance := MODULE
       local j0 := inrec ((unsigned6)didfield = 0);
     #END
         
-    local jj := JOIN (inrec((unsigned6)didfield > 0), doxie_files.key_minors_hash,
+    local jj := JOIN (inrec((unsigned6)didfield > 0), dx_header.key_minors_hash(),
                      KEYED (hash32((unsigned6)LEFT.didfield)=RIGHT.hash32_did) AND
                      KEYED ((unsigned6)LEFT.didfield = RIGHT.did) AND  //at build time, key contains only minors
                      ut.age (RIGHT.dob) < 18,            //check age since a few will turn 18 between builds
@@ -170,6 +181,7 @@ EXPORT compliance := MODULE
     // TCH = Transunion Credit Header data
     EXPORT boolean isTCHRestricted(drm_type drm) := ~allowAll AND (drm[10] NOT IN ['0','']);  
     //EXPORT boolean TCH := isTCHRestricted(drm);  
+    EXPORT boolean isTTRestricted(drm_type drm) := ~allowAll AND (drm[11] NOT IN ['0','']); //TeleTrack, a.k.a. TT
 
     EXPORT boolean isHeaderSourceRestricted (string src, drm_type drm) := MAP (
       MDR.sourceTools.SourceIsExperian_Credit_Header (src) => isECHRestricted(drm),
@@ -179,6 +191,10 @@ EXPORT compliance := MODULE
 
     // Customer allowed to see GLB protected data prior to June 2001 ('Pre GLB'), position 23.		
     EXPORT boolean isPreGLBRestricted(drm_type drm) := ~allowAll AND preGLBRestrict(drm);
+
+    EXPORT boolean isFdnInquiry(drm_type drm) := ~allowAll AND (drm[25] not in ['0','']);
+
+    EXPORT boolean isJuliRestricted(drm_type drm) := ~allowAll AND (drm[41] NOT IN ['0','']);
 
     // BriteVerify gateway for Email verification 
     EXPORT BOOLEAN isBriteVerifyRestricted(drm_type drm) := ~allowAll AND (drm[46] NOT IN ['0','']);
@@ -191,15 +207,25 @@ EXPORT compliance := MODULE
       RETURN infile (NOT doxie.compliance.isHeaderSourceRestricted (src_field, drm));
     ENDMACRO;  
 
-    restrictedSet := ['0',''];
-    EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
+    shared restrictedSet := ['0',''];
 
+    EXPORT boolean use_Polk(string dpm)                := dpm [7] NOT IN restrictedSet;
+    EXPORT boolean use_DM_SSA_updates(string dpm)      := dpm[10] NOT IN restrictedSet;
+    EXPORT boolean use_FdnContributoryData(string dpm) := dpm[11] NOT IN restrictedSet;	//Contributory Fraud and Test Fraud
+    EXPORT boolean use_InsuranceDLData(string dpm)     := dpm[13] NOT IN restrictedSet;
+
+    // to exclude utility sources:
+    EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';
+
+    // CCPA logging
     EXPORT logSoldToSources(ds_in, mod_access, did_field='did') := MACRO
       doxie.log.logSoldToSources(ds_in, mod_access, did_field);   
     ENDMACRO;
 
+     // CCPA logging
     EXPORT logSoldToTransaction(mod_access, env_flag = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
       RETURN doxie.log.logSoldToTransaction(mod_access, env_flag);
     ENDMACRO;
+
 
 END;

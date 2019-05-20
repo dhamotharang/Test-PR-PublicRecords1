@@ -345,9 +345,11 @@ export GlobalModule(boolean isFCRA = false) := module
 	export boolean SuppressDMVInfo := false : stored('ExcludeDMVPII');
 	export unsigned2 xadl2_weight_threshold := 0 : stored('xadl2_weight_threshold');
 	export boolean restrictPreGlb := DataRestrictionMask[23] = '1';
+	export unsigned1 ResellerType := 0 : stored('ResellerType');
+	export unsigned1 IntendedUse := 0 : stored('IntendedUse');
 	export boolean LogRecordSource := TRUE : STORED ('LogRecordSource');
 	export boolean LexIdSourceOptout := TRUE : STORED ('LexIdSourceOptout');
 	export string TransactionID := '' : stored ('_TransactionId');
 	export string BatchUID := '' : stored('_BatchUID');
-	export unsigned6 GlobalCompanyId := 0 : stored('GlobalCompanyId'); // we're already reading GlobalCompanyId in a few other places.
+	export unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 end;
