@@ -1,4 +1,4 @@
-﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools;
+﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV_Segmentation;
 EXPORT proc_segmentation(
    string                            pversion
   ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_BUILT
@@ -138,6 +138,8 @@ module
     BIPV2_PostProcess.macPartition(ds_set_status_seleid_public_test, ProxID, ProxFree_test, ProxProb_test)
     BIPV2_PostProcess.macPartition(ds_set_status_seleid_public_test, SELEID, SeleFree_test, SeleProb_test)
     
+    //Generate Segmentation File
+    export build_seg_file           := BIPV2_Segmentation.BuildSegmentationFile;
     // Gold Segmentation
     export modgoldSELEV2_test       := BIPV2_PostProcess.segmentation_gold(SeleFree_test,   'SELEID',pToday, 'V2'          + pGoldOutputModifier);
     export modgoldSELEV2P_test      := BIPV2_PostProcess.segmentation_gold(SeleProb_test,   'SELEID',pToday, 'V2Probation' + pGoldOutputModifier);    
@@ -580,6 +582,7 @@ module
          output(pToday                                      ,named('IngestDate'   ))
         ,output(pversion                                    ,named('BuildDate'    ))
         ,output(BIPV2.KeySuffix_mod2.MostRecentSprintNumber ,named('SprintNumber' ))
+        ,evaluate(build_seg_file)
         , output_segs_fixed_filtered
         , email_executive_dashboard
         , goldSELEV2
