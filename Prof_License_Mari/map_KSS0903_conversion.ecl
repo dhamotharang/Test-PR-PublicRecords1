@@ -35,7 +35,7 @@ RemovePattern	    := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.*NET$|^%.*$|^
 											'^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES' +
 											'^.* REALTORS$|^.* PROPERTIES$|^ATTN:.*$|^UNKNOWN$|^#N/A$' +
 											')';
-Sufx_Pattern      := '( SR.| SR | SR$|^SR$| JR.| JR |^JR$| JR$| III| II| IV | VI | VII)';
+Sufx_Pattern      := '( SR.| SR | SR$|^SR$| JR.| JR |^JR$| JR$| III| II| IV |IV$| VI | VII)';
 FilterNullRecord	:= ValidRLEFile(NOT REGEXFIND('[\\x00-\\x1F\\x7F]', TRIM(last_name)) and StringLib.StringCleanSpaces(FullName + EMAIL + LICENSE_NUMBER + COMPANY_NAME + ADDRESS + CITY + STATE) <> '');
 ut.CleanFields(FilterNullRecord, ClnFilterNullRecord);
 O_Filter          := OUTPUT(ClnFilterNullRecord);
