@@ -187,6 +187,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name1_last				:= IF(r.Name_Type = 'B1', r.cln_lname, l.name1_last);
 		SELF.name1_suffix			:= IF(r.Name_Type = 'B1', r.cln_suffix, l.name1_suffix);
 		SELF.name1_company		:= IF(r.Name_Type = 'B1', r.cname, l.name1_company);
+		SELF.name1_ssn				:= IF(r.Name_Type = 'B1', r.ssn, l.name1_ssn);
 		SELF.name1_did 				:= IF(r.Name_Type = 'B1', intformat(r.did,12,1), l.name1_did);
 		SELF.name1_did_score 	:= IF(r.Name_Type = 'B1', (string)r.did_score, l.name1_did_score);
 		SELF.name1_bdid 			:= IF(r.Name_Type = 'B1', intformat(r.bdid,12,1), l.name1_bdid);
@@ -220,6 +221,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name2_last				:= IF(r.Name_Type = 'B2', r.cln_lname, l.name2_last);
 		SELF.name2_suffix			:= IF(r.Name_Type = 'B2', r.cln_suffix, l.name2_suffix);
 		SELF.name2_company		:= IF(r.Name_Type = 'B2', r.cname, l.name2_company);
+		SELF.name2_ssn				:= IF(r.Name_Type = 'B2', r.ssn, l.name2_ssn);
 		SELF.name2_did 				:= IF(r.Name_Type = 'B2', intformat(r.did,12,1), l.name2_did);
 		SELF.name2_did_score 	:= IF(r.Name_Type = 'B2', (string)r.did_score, l.name2_did_score);
 		SELF.name2_bdid 			:= IF(r.Name_Type = 'B2', intformat(r.bdid,12,1), l.name2_bdid);
@@ -253,6 +255,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name3_last				:= IF(r.Name_Type = 'B1' AND r.cln_fname2 <> '', r.cln_lname2, l.name3_last);
 		SELF.name3_suffix			:= IF(r.Name_Type = 'B1' AND r.cln_fname2 <> '', r.cln_suffix2, l.name3_suffix);
 		SELF.name3_company		:= IF(r.Name_Type = 'B1' AND r.cln_fname2 <> '', '', l.name3_company);
+		SELF.name3_ssn				:= IF(r.Name_Type = 'B1' AND r.cln_fname2 <> '', r.ssn, l.name3_ssn);
 		SELF.name3_did 				:= IF(r.Name_Type = 'B1' AND r.cln_fname2 <> '', intformat(r.did,12,1), l.name3_did);
 		SELF.name3_did_score 	:= IF(r.Name_Type = 'B1' AND r.cln_fname2 <> '', (string)r.did_score, l.name3_did_score);
 		SELF.name3_bdid 			:= intformat(0,12,1);
@@ -286,6 +289,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name4_last				:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', r.cln_lname2, l.name4_last);
 		SELF.name4_suffix			:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', r.cln_suffix2, l.name4_suffix);
 		SELF.name4_company		:= '';
+		SELF.name4_ssn				:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', r.ssn, l.name4_ssn);
 		SELF.name4_did 				:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', intformat(r.did,12,1), l.name4_did);
 		SELF.name4_did_score 	:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', (string)r.did_score, l.name4_did_score);
 		SELF.name4_bdid 			:= intformat(0,12,1);
@@ -319,6 +323,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name5_last				:= IF(r.Name_Type = 'S1', r.cln_lname, l.name5_last);
 		SELF.name5_suffix			:= IF(r.Name_Type = 'S1', r.cln_suffix, l.name5_suffix);
 		SELF.name5_company		:= IF(r.Name_Type = 'S1', r.cname, l.name5_company);
+		SELF.name5_ssn				:= IF(r.Name_Type = 'S1', r.ssn, l.name5_ssn);
 		SELF.name5_did 				:= IF(r.Name_Type = 'S1', intformat(r.did,12,1), l.name5_did);
 		SELF.name5_did_score 	:= IF(r.Name_Type = 'S1', (string)r.did_score, l.name5_did_score);
 		SELF.name5_bdid 			:= IF(r.Name_Type = 'S1', intformat(r.bdid,12,1), l.name5_bdid);
@@ -352,6 +357,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name6_last				:= IF(r.Name_Type = 'S2', r.cln_lname, l.name6_last);
 		SELF.name6_suffix			:= IF(r.Name_Type = 'S2', r.cln_suffix, l.name6_suffix);
 		SELF.name6_company		:= IF(r.Name_Type = 'S2', r.cname, l.name6_company);
+		SELF.name6_ssn				:= IF(r.Name_Type = 'S2', r.ssn, l.name6_ssn);
 		SELF.name6_did 				:= IF(r.Name_Type = 'S2', intformat(r.did,12,1), l.name6_did);
 		SELF.name6_did_score 	:= IF(r.Name_Type = 'S2', (string)r.did_score, l.name6_did_score);
 		SELF.name6_bdid 			:= IF(r.Name_Type = 'S2', intformat(r.bdid,12,1), l.name6_bdid);
@@ -385,6 +391,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name7_last				:= IF(r.Name_Type = 'S1' AND r.cln_fname2 <> '', r.cln_lname2, l.name7_last);
 		SELF.name7_suffix			:= IF(r.Name_Type = 'S1' AND r.cln_fname2 <> '', r.cln_suffix2, l.name7_suffix);
 		SELF.name7_company		:= IF(r.Name_Type = 'S1' AND r.cln_fname2 <> '', '', l.name7_company);
+		SELF.name7_ssn				:= IF(r.Name_Type = 'S1' AND r.cln_fname2 <> '', r.ssn, l.name7_ssn);
 		SELF.name7_did 				:= IF(r.Name_Type = 'S1' AND r.cln_fname2 <> '', intformat(r.did,12,1), l.name7_did);
 		SELF.name7_did_score 	:= IF(r.Name_Type = 'S1' AND r.cln_fname2 <> '', (string)r.did_score, l.name7_did_score);
 		SELF.name7_bdid 			:= intformat(0,12,1);
@@ -418,6 +425,7 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.name8_last				:= IF(r.Name_Type = 'S2' AND r.cln_fname2 <> '', r.cln_lname2, l.name8_last);
 		SELF.name8_suffix			:= IF(r.Name_Type = 'S2' AND r.cln_fname2 <> '', r.cln_suffix2, l.name8_suffix);
 		SELF.name8_company		:= IF(r.Name_Type = 'S2' AND r.cln_fname2 <> '', '', l.name8_company);
+		SELF.name8_ssn				:= IF(r.Name_Type = 'S2' AND r.cln_fname2 <> '', r.ssn, l.name8_ssn);
 		SELF.name8_did 				:= IF(r.Name_Type = 'S2' AND r.cln_fname2 <> '', intformat(r.did,12,1), l.name8_did);
 		SELF.name8_did_score 	:= IF(r.Name_Type = 'S2' AND r.cln_fname2 <> '', (string)r.did_score, l.name8_did_score);
 		SELF.name8_bdid 			:= intformat(0,12,1);
