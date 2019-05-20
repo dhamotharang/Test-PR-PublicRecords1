@@ -293,8 +293,6 @@ EXPORT dRefreshAID(pInputFile) :=
 FUNCTIONMACRO
 	
 	// Clean only those addresses that in the past they weren't cleaned
-	
-	inputFile := distribute(pInputFile, hash32(unique_id));
 
 	pInputFile CleanAddress(pInputFile l) := TRANSFORM 
 	
