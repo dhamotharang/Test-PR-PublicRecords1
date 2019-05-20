@@ -1,4 +1,10 @@
-﻿IMPORT BankruptcyV2,BankruptcyV3,BankruptcyV3_Services,ConsumerDisclosure,doxie,FCRA,FFD,Suppress,STD;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT BankruptcyV2,BankruptcyV3,BankruptcyV3_Services,ConsumerDisclosure,doxie,FCRA,FFD,Suppress,STD;
 
 boolean IsFCRA := TRUE;
 
@@ -207,10 +213,11 @@ FUNCTION
 		join (bk_all_deduped, BankruptcyV3.key_bankruptcyV3_main_full(isFCRA),
 			left.case_number<>'' AND left.court_code<>'' AND left.tmsid<>''
 			and keyed (left.tmsid = right.tmsid), 
-			transform (layout_Bankruptcy_main_rawrec, 
-				self.subject_did := left.subject_did; 
-				self.combined_record_id := right.tmsid[3..]; // main record id = court_code + case_number
-				self.record_ids.RecId1 := right.tmsid;
+			transform (layout_Bankruptcy_main_rawrec,
+        self.subject_did := left.subject_did; 
+				self.combined_record_id := trim(right.court_code)+trim(right.case_number); // main record id = court_code + case_number
+				self.record_ids.RecId1 := right.court_code;
+        self.record_ids.RecId2 := right.case_number;
 				self := right;
 				self:=[]),
 			keep(1), limit(0));
@@ -225,8 +232,10 @@ FUNCTION
 					self.Compliance_Flags.IsSuppressed := ~_is_override;
 					self.subject_did := (unsigned6) left.did;
           // for overrides sometimes same flag_file_id is used for whole cluster of bk records including main and search, so we cannot rely on record_id for overrides from flag file
-				  self.combined_record_id := if(right.tmsid<>'', right.tmsid[3..], left.record_id); // main record id = court_code + case_number
-					self.record_ids.RecId1 := right.tmsid;
+				  combined_rec_id := trim(right.court_code)+trim(right.case_number);
+          self.combined_record_id := if(combined_rec_id<>'', combined_rec_id, left.record_id); // main record id = court_code + case_number
+					self.record_ids.RecId1 := right.court_code;
+          self.record_ids.RecId2 := right.case_number;
 					self := right;
 					self := left;
 					self:=[]),
@@ -259,9 +268,11 @@ FUNCTION
 					self := l;
 		end;
 
-	bk_main_statements_disputes := 
+  bk_main_statements_disputes := 
 		join(bk_main_filtered, slim_pc_recs(Datagroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN),
-			left.tmsid = right.RecID1 and left.subject_did = (unsigned6) right.lexid,
+      left.subject_did = (unsigned6) right.lexid and
+      left.record_ids.RecId1 = right.RecID1 and 
+      left.record_ids.RecId2 = right.RecId2,
 			xformMainStatements(left,right),
 			left outer, keep(1), limit(0));	
 		

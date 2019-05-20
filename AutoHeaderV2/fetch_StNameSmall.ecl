@@ -1,4 +1,4 @@
-import ut,doxie, NID,AutoHeaderV2, lib_metaphone;
+import ut,doxie, dx_header, NID,AutoHeaderV2, lib_metaphone;
 
 export fetch_StNameSmall  (dataset (AutoHeaderV2.layouts.search) ds_search) := function
 
@@ -30,7 +30,7 @@ export fetch_StNameSmall  (dataset (AutoHeaderV2.layouts.search) ds_search) := f
 	temp_rel_fname_value2 := _row.tname.fname_rel_2;
 	temp_score_threshold_value :=  _options.score_threshold;
 
-	i := doxie.Key_Header_StFnameLname;
+	i := dx_header.key_StFnameLname();
 	
 	first_fil := temp_lname_value != '' AND temp_fname_value != '';
 

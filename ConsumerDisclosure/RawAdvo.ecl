@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, Advo, ConsumerDisclosure;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, Advo, ConsumerDisclosure;
 
 layout_advo_raw := RECORD  // recordof(Advo.Key_Addr1_FCRA_history)
 	Advo.Layouts.Layout_Common_Out_k -[src];  

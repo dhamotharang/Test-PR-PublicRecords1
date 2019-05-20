@@ -1,8 +1,9 @@
-IMPORT $, STD;
+﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix;
 
 EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)     dSearchResults,
                 DATASET($.Layouts.BatchInAppendDID)      dInBestInfo,
-                PhoneFinder_Services.iParam.ReportParams inMod) :=
+                PhoneFinder_Services.iParam.ReportParams inMod,
+								        DATASET(Gateway.Layouts.Config) dGateways ) :=
 FUNCTION
   // Identities
   dIdentitiesInfo   := PhoneFinder_Services.GetIdentitiesFinal(dSearchResults, dInBestInfo, inMod);
@@ -14,6 +15,25 @@ FUNCTION
                                                                                       PhoneFinder_Services.Constants.PhoneSource.QSentGateway]));
 
   dPrimaryPhoneInfo := PhoneFinder_Services.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
+	
+	 // ThreatMetrix
+  dThreatMetrixIn  := dPrimaryPhoneInfo(phone<> '');
+                  
+  dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dThreatMetrixIn, phone), phone), Phones.Layouts.PhoneAcctno);
+  
+  dPrimaryThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
+                                
+  PhoneFinder_Services.Layouts.PhoneFinder.PhoneSlim getThreatMetrix(PhoneFinder_Services.Layouts.PhoneFinder.PhoneSlim l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
+   SELF.ReasonCodes := r.response.Summary.ReasonCodes;
+   SELF.TmxVariables := r.response._data.TmxVariables;
+   SELF := l;
+  END;
+ 
+  dPrepPrimaryThreatMetrix	:= IF (EXISTS(dPrimaryThreatMetrixRecs), 
+                               JOIN(dPrimaryPhoneInfo, dPrimaryThreatMetrixRecs,
+                               LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
+                               getThreatMetrix(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1)),
+                               dPrimaryPhoneInfo);
   
   // Other phones
   dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResults(~isPrimaryPhone));
@@ -41,7 +61,7 @@ FUNCTION
                                                   SELF                   := RIGHT)));
 
   dPrepPrimaryForRIs := JOIN( dPrepIdentityForRI(isPrimaryIdentity),
-                              dPrimaryPhoneInfo,
+                              dPrepPrimaryThreatMetrix,
                               LEFT.acctno = RIGHT.acctno,
                               TRANSFORM($.Layouts.PhoneFinder.Final,
                                         SELF.phone             := RIGHT.phone,
@@ -73,7 +93,7 @@ FUNCTION
                               LIMIT(0), KEEP(1));
   
   dPrepPrimaryPhoneOnlyForRIs := JOIN(dPrepPrimaryForRIs,
-                                      dPrimaryPhoneInfo,
+                                      dPrepPrimaryThreatMetrix,
                                       LEFT.acctno = RIGHT.acctno,
                                       TRANSFORM($.Layouts.PhoneFinder.Final,
                                                 SELF.isPrimaryPhone    := TRUE;
@@ -121,7 +141,7 @@ FUNCTION
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
                 inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,
-                dPrimaryForRIs + dPrepOtherPhonesForRIs);
+                dPrimaryForRIs + dPrepOtherPhonesForRIs + dOtherIdentities);
 
   #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'));

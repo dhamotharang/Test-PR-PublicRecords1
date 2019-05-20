@@ -79,23 +79,7 @@ END;
   ds_Format2AppInput := PROJECT(ds_batchSearch, AppendFormat(LEFT));
   
   // begin new code *********		to emulate	top biz ranking		
-  
-  in_mod2 := module(AutoStandardI.DataRestrictionI.params)  
-    export boolean AllowAll := false;
-    export boolean AllowDPPA := false;
-    export boolean AllowGLB := false;
-    export string DataRestrictionMask := inmod.datarestrictionmask;
-    export unsigned1 DPPAPurpose := inmod.dppapurpose;
-    export unsigned1 GLBPurpose := inmod.glbpurpose;
-    export boolean ignoreFares := false;
-    export boolean ignoreFidelity := false;
-    export boolean includeMinors := false;	
-  end;
-  maxRecsPerAcctno := inMod.MaxResultsPerAcct;
-  
-  tmpTopResultsScoredGrouped := BusinessBatch_BIP.Functions(inMod).getLINkidsAtProxidLevel(ds_Format2SearchInputAll, 
-                                                            maxRecsPerAcctno,
-                                                            in_mod2);
+  tmpTopResultsScoredGrouped := BusinessBatch_BIP.Functions(inMod).getLINkidsAtProxidLevel(ds_Format2SearchInputAll);
 
   // get linking info through idAppend
   ds_AppIds := PROJECT(BIPV2.IdAppendRoxie(ds_Format2AppInput, inMod.Score_Threshold, reAppend := false).IdsOnly(), BIPV2.IdAppendLayouts.IdsOnly);

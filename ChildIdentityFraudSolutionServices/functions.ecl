@@ -6,7 +6,7 @@
 export Functions := module
 
 //These are the common batch parameters that may be used to call other batch services. 
-shared BatchParams		:= IParam.getBatchParams();				 										 
+BatchParams := BatchShare.IParam.getBatchParams();				 										 
 // temporarily: until we move all batches to BatchShare.IParam.BatchParamsV2
 shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
 //---------------------------------------------------------------------------------------------------------//	
@@ -179,7 +179,7 @@ shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
 		end;					 
 	  RTMVBatchIn   := project(BatchIn , xformToRTMVBatchIn(left));
 		
-		RTMVBatchParams := module(project(BatchParams, VehicleV2_Services.IParam.RTBatch_V2_params,opt))
+		RTMVBatchParams := module(project(mod_batchV2, VehicleV2_Services.IParam.RTBatch_V2_params, OPT))
 			// 127542 - GatewayNameMatch option works only for gateways - It filters by person's name who owns the vehicle at input address.
 			export boolean GatewayNameMatch   := True;
 			export BOOLEAN AlwaysHitGateway   := ~doxie.DataPermission.use_Polk;
@@ -190,7 +190,7 @@ shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
 		//make sure to exclude no hit records to avoid count of 1 for records with no hit
 		dsRTMV_filt	:= dsRTMV_pre(vin <> '');
 		
-		returnDetailedRoyalties	:= BatchParams.ReturnDetailedRoyalties;
+		returnDetailedRoyalties	:= mod_batchV2.ReturnDetailedRoyalties;
 		Royalty.RoyaltyVehicles.MAC_Append(dsRTMV_filt, dsRTMV_Results, vin, hit_flag, true);
 		Royalty.RoyaltyVehicles.MAC_BatchSet(dsRTMV_Results, royalties,,returnDetailedRoyalties);
 		

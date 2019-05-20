@@ -1,4 +1,4 @@
-import ut, doxie, NID,AutoHeaderV2,lib_stringlib;
+import ut, doxie, dx_header, NID,AutoHeaderV2,lib_stringlib;
 
 export fetch_DOBFname (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 	_row := ds_search[1];
@@ -11,8 +11,8 @@ export fetch_DOBFname (dataset (AutoheaderV2.layouts.search) ds_search, integer 
 	temp_city_value := _row.taddress.city;
 	temp_state_value := _row.taddress.state;
 	
-	i1 := doxie.Key_Header_Dob_Fname;
-	i2 := doxie.Key_Header_Dob_PFname;
+	i1 := dx_header.key_DOB_fname();
+	i2 := dx_header.key_DOB_pfname();
 
 	unsigned1 fname_in_len := length(trim(temp_fname_value));
 	// absolutely required for this search

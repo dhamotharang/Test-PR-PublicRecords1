@@ -4,8 +4,8 @@ IMPORT B_Tradeline_2,CFG_Compile,E_Tradeline FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Tradeline_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2) __ENH_Tradeline_2 := B_Tradeline_2(__in,__cfg).__ENH_Tradeline_2;
-  SHARED __EE265971 := __ENH_Tradeline_2;
-  EXPORT __ST34267_Layout := RECORD
+  SHARED __EE512916 := __ENH_Tradeline_2;
+  EXPORT __ST55577_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -19,31 +19,48 @@ EXPORT B_Tradeline_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.nstr Status_;
     KEL.typ.nkdate First_Sale_Date_;
     KEL.typ.nkdate Last_Sale_Date_;
+    KEL.typ.nkdate A_R_Date_Group_;
+    KEL.typ.nint Aging1_To30_L_N_;
+    KEL.typ.nint Aging31_To60_L_N_;
+    KEL.typ.nint Aging61_To90_L_N_;
+    KEL.typ.nint Aging91_Plus_L_N_;
     KEL.typ.nbool Carrier_Segment_;
-    KEL.typ.nint Current___A_R___L_N_;
+    KEL.typ.nint Current_A_R_L_N_;
+    KEL.typ.nint D_P_D1_Total_;
+    KEL.typ.nint D_P_D31_Total_;
+    KEL.typ.nint D_P_D61_Total_;
+    KEL.typ.nint D_P_D91_Total_;
     KEL.typ.nbool Fleet_Segment_;
     KEL.typ.nbool Is1_Y_Record_;
+    KEL.typ.nbool Is_Most_Recent_Active_Record_;
+    KEL.typ.nbool Is_Most_Recent_Active_Record1_Y_;
+    KEL.typ.nbool Is_Two_Year_Full_Record_;
     KEL.typ.nbool Materials_Segment_;
+    KEL.typ.nint Months_From_First_Of_Current_Month_;
     KEL.typ.nbool Operations_Segment_;
     KEL.typ.nbool Other_Segment_;
+    KEL.typ.int Perf_Level_ := 0;
     KEL.typ.nint Record_Age_In_Days_;
     KEL.typ.nint Record_Age_In_Days1_Y_;
     KEL.typ.nkdate Record_Date_;
-    KEL.typ.nint Total___A_R___L_N_;
+    KEL.typ.nint Total_A_R_L_N_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST34260_Layout := RECORD
+  EXPORT __ST55570_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST34267_Layout) Records_;
+    KEL.typ.ndataset(__ST55577_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_;
+    KEL.typ.nkdate Current_Date_First_Of_Month_;
+    KEL.typ.nint Current_Month_;
+    KEL.typ.nint Current_Year_;
     KEL.typ.nbool Is_Active_;
     KEL.typ.nbool Is_Active1_Y_;
     KEL.typ.bool Is_Carrier_Segment_ := FALSE;
@@ -53,17 +70,18 @@ EXPORT B_Tradeline_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.bool Is_Other_Segment_ := FALSE;
     KEL.typ.nint Newest_Record_Age_In_Days_;
     KEL.typ.nint Newest_Record_Age_In_Days1_Y_;
-    KEL.typ.nint Total___A_R___L_N_;
+    KEL.typ.nint Total_A_R_L_N_;
     KEL.typ.nkdate Trade_Date_;
+    KEL.typ.nkdate Two_Year_Full_Date_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST34260_Layout __ND266214__Project(B_Tradeline_2(__in,__cfg).__ST36585_Layout __PP265696) := TRANSFORM
-    __EE265763 := __PP265696.Records_;
-    SELF.Records_ := __BN(PROJECT(__T(__EE265763),__ST34267_Layout),__NL(__EE265763));
-    SELF.Trade_Date_ := KEL.era.ToDate(__PP265696.Date_First_Seen_);
-    SELF := __PP265696;
+  SHARED __ST55570_Layout __ND513245__Project(B_Tradeline_2(__in,__cfg).__ST61577_Layout __PP512551) := TRANSFORM
+    __EE512626 := __PP512551.Records_;
+    SELF.Records_ := __BN(PROJECT(__T(__EE512626),__ST55577_Layout),__NL(__EE512626));
+    SELF.Trade_Date_ := KEL.era.ToDate(__PP512551.Date_First_Seen_);
+    SELF := __PP512551;
   END;
-  EXPORT __ENH_Tradeline_1 := PROJECT(__EE265971,__ND266214__Project(LEFT));
+  EXPORT __ENH_Tradeline_1 := PROJECT(__EE512916,__ND513245__Project(LEFT));
 END;

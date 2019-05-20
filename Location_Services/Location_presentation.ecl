@@ -1,7 +1,5 @@
 import ut, doxie, business_header;
 
-boolean nolookupsearch := false : stored('NoLookupSearch');
-boolean bestonly := false : stored('BestOnly');
 boolean include_hri := false : stored('IncludeHRI');
 unsigned1 maxHriPer_value := 10 : stored('MaxHriPer');
 

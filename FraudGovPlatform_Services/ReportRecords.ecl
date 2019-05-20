@@ -124,7 +124,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																																								=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(LEFT.fragment_value),
 																																							LEFT.fragment_value);
 																				SELF.ScoreDetails.Score := RIGHT.Score_,
-																				SELF.NoOfIdentities := RIGHT.cl_identity_count_,
+																				SELF.NoOfIdentities := (integer) RIGHT.flags(indicator = 'identity_count_')[1].value,
 																				SELF.NoOfRecentTransactions := numOfDeltabaseTransactions,
 																				SELF.NoOfClusters := COUNT(ds_raw_cluster_recs( entity_name = LEFT.fragment AND  
 																																												entity_value = LEFT.fragment_value)),
@@ -133,9 +133,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																											ds_recentTransactions_sorted[1].EventDate),
 																				SELF.ElementNVPs := PROJECT(RIGHT.flags, TRANSFORM(iesp.share.t_NameValuePair,
 																																									SELF.Name := LEFT.indicator,
-																																									SELF.Value := LEFT.value)),
-																				SELF := LEFT,
-																				SELF := []),
+																																									SELF.Value := LEFT.value))),
 																				LIMIT(FraudGovConst_.Limits.MAX_JOIN_LIMIT, SKIP));
 																				
 		/* Getting the related clusters */
@@ -170,13 +168,13 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																																		LEFT.tree_uid_[4..],
 																																		LEFT.label_), 
 															SELF.ScoreDetails.Score := LEFT.cluster_score_,
-															SELF.NoOfIdentities := LEFT.cl_identity_count_,
+															SELF.NoOfIdentities := (integer) LEFT.flags(indicator = 'cl_identity_count_')[1].value,
 															SELF.ClusterName := LEFT.label_,
 															SELF.ClusterNVPs := PROJECT(LEFT.flags, 
 																										TRANSFORM(iesp.share.t_NameValuePair,
 																											SELF.Name := LEFT.indicator,
-																											SELF.Value := LEFT.value)),
-															SELF := []));
+																											SELF.Value := LEFT.value))
+																			));
 		
 		ds_related_clusters_sorted := SORT(ds_related_clusters, -ScoreDetails.Score, ScoreDetails.ElementValue, -NoOfIdentities, RECORD);
 		
@@ -326,22 +324,23 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																		CHOOSEN(ds_score_breakdown,batch_params.MaxScoreBreakdown),
 																DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
 
-			SELF.AssociatedIdentities := IF(batch_params.IsOnline,
+			SELF.AssociatedIdentities := IF(batch_params.IsOnline AND ~IsRealTime,
 																			CHOOSEN(ds_contributoryBest_w_scores_sorted, batch_params.MaxAssociatedIdentities),
 																			DATASET([],iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
 			
-			SELF.AssociatedAddresses := IF(batch_params.IsOnline,
+			SELF.AssociatedAddresses := IF(batch_params.IsOnline AND ~IsRealTime,
 																			CHOOSEN(ds_associated_addresses, batch_params.MaxAssociatedAddresses),
 																			DATASET([],iesp.fraudgovreport.t_FraudGovAssociatedAddress));
 
-			SELF.RelatedClusters := IF(batch_params.IsOnline, 
+			SELF.RelatedClusters := IF(batch_params.IsOnline AND ~IsRealTime, 
 																	CHOOSEN(ds_related_clusters_sorted, batch_params.MaxRelatedClusters),
 																	DATASET([],iesp.fraudgovreport.t_FraudGovClusterCardDetails));
 																
-			SELF.TimeLineDetails := IF(batch_params.IsOnline, 
-																CHOOSEN(ds_timeline_sorted, batch_params.MaxTimelineDetails), 
+			SELF.TimeLineDetails := MAP(batch_params.IsOnline  AND ~IsRealTime => 
+																					CHOOSEN(ds_timeline_sorted, batch_params.MaxTimelineDetails), 
+																 batch_params.IsOnline  AND IsRealTime =>
+																					CHOOSEN(ds_recentTransactions_sorted, batch_params.MaxTimelineDetails),
 																DATASET([],iesp.fraudgovreport.t_FraudGovTimeLineDetails));
-			SELF := [];
 		END;
 		
 		// output(batch_params,named('batch_params'));

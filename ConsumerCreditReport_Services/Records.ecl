@@ -5,7 +5,9 @@ EXPORT Records (DATASET(ConsumerCreditReport_Services.Layouts.inputRec) ds_input
 								BOOLEAN isFCRA) := FUNCTION
 
 	BatchShare.MAC_SequenceInput(ds_input_recs,ds_seq_input);
-	IF(NOT isFCRA AND NOT in_mod.hasGlbPermissiblePurpose, FAIL(ConsumerCreditReport_Services.Constants.GLB_REQUIRED_MSG));
+  
+	IF(NOT isFCRA AND NOT in_mod.isValidGLB(), FAIL(ConsumerCreditReport_Services.Constants.GLB_REQUIRED_MSG));
+  
 	ds_orig_input := PROJECT(ds_seq_input,TRANSFORM(ConsumerCreditReport_Services.Layouts.workRec,SELF:=LEFT,SELF:=[]));
 
 	ds_cln_names := ConsumerCreditReport_Services.Functions.clean_Names(ds_input_recs);

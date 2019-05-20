@@ -227,7 +227,7 @@ EXPORT Transforms := MODULE
     SELF:=[];
   END;
   
-  EXPORT $.Layouts.batch_in_rec xfSearchIn(iesp.emailfinder.t_EmailFinderSearchBy rec_in)
+  EXPORT $.Layouts.batch_in_rec xfSearchIn(iesp.emailsearchv2.t_EmailSearchV2SearchBy rec_in)
   := TRANSFORM
     SELF.acctno  := $.Constants.Defaults.SingleSearchAccountNo;
     SELF.DID := rec_in.LexId;
@@ -254,7 +254,7 @@ EXPORT Transforms := MODULE
     SELF := [];
   END;
   
-  EXPORT iesp.emailfinder.t_EmailFinderSearchRecord  xfSearchOut($.Layouts.email_final_rec le, UNSIGNED dob_mask = 0)
+  EXPORT iesp.emailsearchv2.t_EmailSearchV2Record  xfSearchOut($.Layouts.email_final_rec le, UNSIGNED dob_mask = 0)
   := TRANSFORM
     SELF.Original.EmailAddress := le.Original.email;
     SELF.Original.FirstName := le.Original.first_name;
@@ -347,7 +347,7 @@ EXPORT Transforms := MODULE
                                                         SELF.Location := ''));
   END;
   
-  EXPORT iesp.emailfinder.t_EmailFinderInputSubject  xfInputEcho(iesp.emailfinder.t_EmailFinderSearchBy _in, UNSIGNED lexid)
+  EXPORT iesp.emailsearchv2.t_EmailSearchV2InputSubject  xfInputEcho(iesp.emailsearchv2.t_EmailSearchV2SearchBy _in, UNSIGNED lexid)
   := TRANSFORM
   
     SELF.InputEcho     := _in;

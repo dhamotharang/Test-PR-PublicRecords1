@@ -1,4 +1,4 @@
-import ut,doxie,AutoHeaderV2,lib_stringlib;
+import ut,doxie,dx_header,AutoHeaderV2,lib_stringlib;
 
 export fetch_wild_FnameSmall (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 
@@ -25,7 +25,7 @@ export fetch_wild_FnameSmall (dataset (AutoheaderV2.layouts.search) ds_search, i
 	temp_rel_fname_value1 := _row.tname.fname_rel_1;
 	temp_rel_fname_value2 := _row.tname.fname_rel_2;
 
-	i := doxie.Key_Header_Wild_FnameSmall;
+	i := dx_header.key_wild_FnameSmall();
 
 	first_fil := temp_lname_wild_val='' AND temp_fname_wild_val<>'' AND temp_ssn_value='';
 

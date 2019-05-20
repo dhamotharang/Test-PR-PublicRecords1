@@ -1,4 +1,4 @@
-import ut,doxie,AutoHeaderV2, lib_stringlib;
+import ut,doxie,dx_header,AutoHeaderV2, lib_stringlib;
 
 export fetch_wild_SSN (dataset (AutoHeaderV2.layouts.search) ds_search) := function
 		
@@ -12,7 +12,7 @@ export fetch_wild_SSN (dataset (AutoHeaderV2.layouts.search) ds_search) := funct
 	temp_fuzzy_ssn := _row.tssn.fuzzy_ssn;
 	temp_score_threshold_value := _options.score_threshold;
 
-	i := doxie.Key_Header_Wild_SSN;
+	i := dx_header.key_wild_SSN();
 
 	ds_header_non_fuzzy := 
 		LIMIT (i(keyed(s1=temp_ssn_value[1]),keyed(s2=temp_ssn_value[2]),keyed(s3=temp_ssn_value[3]),keyed(s4=temp_ssn_value[4]),keyed(s5=temp_ssn_value[5]),keyed(s6=temp_ssn_value[6]),keyed(s7=temp_ssn_value[7]),keyed(s8=temp_ssn_value[8]),keyed(s9=temp_ssn_value[9])), ut.limits.DID_PER_PERSON, SKIP);

@@ -1,4 +1,4 @@
-﻿IMPORT $, DidVille, doxie, dx_BestRecords, Codes, Royalty, Suppress, STD,EmailService;
+﻿IMPORT $, Data_Services, DidVille, doxie, dx_BestRecords, Codes, Royalty, Suppress, STD, EmailService;
 
 EXPORT Functions := MODULE
 
@@ -10,7 +10,7 @@ EXPORT Functions := MODULE
     fltrd_historic_recs := batch_in(in_mod.IncludeHistoricData OR is_current);  
     
     // filter by source, make sure data restrictions are enforced
-    restrict_DataMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase);
+    restrict_DataMarketing := in_mod.isDirectMarketing();
     
     restrict_reseller := in_mod.isResellerAccount() OR in_mod.isConsumer() OR // direct to consumer is subset of re-sellers 
                          $.Constants.RestrictedUseCase.isReseller(in_mod.RestrictedUseCase);
@@ -116,10 +116,12 @@ EXPORT Functions := MODULE
 
   EXPORT GetEmailData(DATASET($.Layouts.batch_in_rec) batch_in,
                       $.IParams.EmailParams in_mod,
-                      STRING5 search_by
-  ) := FUNCTION
-                        
-    email_raw_recs := $.Raw.getEmailRawData(batch_in,in_mod,search_by);
+                      STRING5 search_by,
+                      UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA
+  ) := FUNCTION     // this function currently doesn't apply FCRA overrides, if FCRA functionality is requested the overrides logic need to be added    
+  
+    email_raw_recs := $.Raw.getEmailRawData(batch_in,in_mod,search_by,data_environment);
+    
     email_fltrd_recs := FilterEmailData(email_raw_recs,in_mod);
     
     // in case of search by PII we need to apply penalties for fuzzy matching
@@ -237,7 +239,8 @@ EXPORT Functions := MODULE
   END;
   
   
-  EXPORT AppendSubjectLexid(DATASET($.Layouts.batch_in_rec) ds_batch_in) := FUNCTION
+  EXPORT AppendSubjectLexid(DATASET($.Layouts.batch_in_rec) ds_batch_in, 
+                            UNSIGNED1 _score_threshold = $.Constants.Defaults.DID_SCORE_THRESHOLD) := FUNCTION
   
     ds_for_dids_in := PROJECT(ds_batch_in(did=0), $.Transforms.toMacDidAppend(LEFT));
     BOOLEAN useonlybestdid := TRUE;
@@ -247,7 +250,7 @@ EXPORT Functions := MODULE
     ds_batch_with_lexid := JOIN(ds_batch_in, ds_dids_out,
                               LEFT.acctno = (STRING) RIGHT.seq,
                               TRANSFORM($.Layouts.batch_in_rec, 
-                                        SELF.subject_lexid := IF (RIGHT.score >= $.Constants.Defaults.DID_SCORE_THRESHOLD,RIGHT.did,LEFT.did),
+                                        SELF.subject_lexid := IF (RIGHT.score >= _score_threshold,RIGHT.did,LEFT.did),
                                         SELF := LEFT),
                               LEFT OUTER,  KEEP(1), LIMIT(0));
 

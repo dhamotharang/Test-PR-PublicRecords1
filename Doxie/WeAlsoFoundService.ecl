@@ -35,15 +35,14 @@
 /*--INFO-- This service searches the dids from header file.*/
 
 EXPORT WeAlsoFoundService := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   import doxie;
-  #CONSTANT('BestOnly', true);
 
   dids := doxie.Get_Dids ();
   boolean Err := count (dids) > 1;
   IF (Err, FAIL (11, doxie.ErrorCodes (11)));
 
-  doxie.MAC_Header_Field_Declare(); // read glb, dppa
+  doxie.MAC_Header_Field_Declare(); // score_threshold_value only!
   mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
   // slim down to required fields
@@ -70,7 +69,7 @@ EXPORT WeAlsoFoundService := MACRO
   best_recs := doxie.best_records(dids, doTimeZone := FALSE, useNonBlankKey := TRUE, modAccess := mod_access); 
   dids_adjust := join(dids,best_recs,left.did = right.did, transform (slim_rec, Self := Left, self := right, Self := []));
 
-  doxie.MAC_Add_WeAlsoFound (dids_adjust, res, mod_access.glb, mod_access.dppa, false);  // false: do not convert into string
+  doxie.MAC_Add_WeAlsoFound (dids_adjust, res, mod_access);  // false: do not convert into string
 
   IF (~ERR, OUTPUT (count (res), NAMED ('RecordsAvailable')));
   IF (~Err, OUTPUT (res, NAMED ('Results')));

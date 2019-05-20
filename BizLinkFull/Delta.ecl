@@ -1,21 +1,20 @@
-﻿EXPORT Delta(DATASET(Layout_BizHead)old_s, DATASET(Layout_BizHead) new_s) := MODULE//Routines to compute the differences between two instances of a file
-  Diff_Layout := RECORD(layout_BizHead)
-    BOOLEAN  Added;
-    BOOLEAN Deleted;
-    BOOLEAN Changed;
-  END;
+﻿IMPORT SALT311,STD;
+EXPORT Delta(DATASET(Layout_BizHead)old_s, DATASET(Layout_BizHead) new_s) := MODULE//Routines to compute the differences between two instances of a file
+  SHARED inFieldList := ['parent_proxid','sele_proxid','org_proxid','ultimate_proxid','has_lgid','empid','source','source_record_id','source_docid','company_name','company_name_prefix','cnp_name','cnp_number','cnp_btype','cnp_lowv','company_phone','company_phone_3','company_phone_3_ex','company_phone_7','company_fein','company_sic_code1','active_duns_number','prim_range','prim_name','sec_range','city','city_clean','st','zip','company_url','isContact','contact_did','title','fname','fname_preferred','mname','lname','name_suffix','contact_ssn','contact_email','sele_flag','org_flag','ult_flag','fallback_value'];
+  EXPORT Differences := SALT311.mod_Delta.mac_DifferencesByRIDField(old_s, new_s, inFieldList, rcid);
+  EXPORT DifferenceSummary := hygiene(old_s).Summary('Old') + hygiene(new_s).Summary('New') + hygiene(PROJECT(Differences(deleted), TRANSFORM(Layout_BizHead, SELF := LEFT.old_rec))).Summary('Deletions') + hygiene(PROJECT(Differences(added), TRANSFORM(Layout_BizHead, SELF := LEFT.new_rec))).Summary('Additions') + hygiene(PROJECT(Differences(changed), TRANSFORM(Layout_BizHead, SELF := LEFT.new_rec))).Summary('Updates_NewFile') + hygiene(PROJECT(Differences(changed), TRANSFORM(Layout_BizHead, SELF := LEFT.old_rec))).Summary('Updates_OldFile');
+  diffChanged := Differences(Changed);
+  EXPORT DifferencesFieldChanges := SALT311.mod_Delta.mac_DifferencesByRIDFieldChangeStats(diffChanged, inFieldList);
+  EXPORT StandardStats(BOOLEAN doHygieneSummaryGlobal = TRUE, BOOLEAN doFieldDiffsGlobal = TRUE) := FUNCTION
+    myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+    hygieneDiffOverall := DifferenceSummary;
+    SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(BizLinkFull, Fields, 'RECORDOF(hygieneDiffOverall)', FALSE);
+    hygieneDiffOverall_Standard := IF(doHygieneSummaryGlobal, NORMALIZE(hygieneDiffOverall, COUNT(inFieldList) * 6, xSummary(LEFT, COUNTER, myTimeStamp, LEFT.txt + '_all', LEFT.txt + '_all')));
  
-  Diff_Layout Take_Record(old_s le, new_s ri) := TRANSFORM
-    SELF.Added := le.rcid = (TYPEOF(le.rcid))'';
-    SELF.Deleted := ri.rcid = (TYPEOF(ri.rcid))'';
-    SELF.Changed := MAP ( le.rcid = (TYPEOF(le.rcid))'' OR ri.rcid = (TYPEOF(ri.rcid))'' => FALSE,
-       le.parent_proxid<>ri.parent_proxid OR  le.sele_proxid<>ri.sele_proxid OR  le.org_proxid<>ri.org_proxid OR  le.ultimate_proxid<>ri.ultimate_proxid OR  le.has_lgid<>ri.has_lgid OR  le.empid<>ri.empid OR  le.source<>ri.source OR  le.source_record_id<>ri.source_record_id OR  le.source_docid<>ri.source_docid OR  le.company_name<>ri.company_name OR  le.company_name_prefix<>ri.company_name_prefix OR  le.cnp_name<>ri.cnp_name OR  le.cnp_number<>ri.cnp_number OR  le.cnp_btype<>ri.cnp_btype OR  le.cnp_lowv<>ri.cnp_lowv OR  le.company_phone<>ri.company_phone OR  le.company_phone_3<>ri.company_phone_3 OR  le.company_phone_3_ex<>ri.company_phone_3_ex OR  le.company_phone_7<>ri.company_phone_7 OR  le.company_fein<>ri.company_fein OR  le.company_sic_code1<>ri.company_sic_code1 OR  le.active_duns_number<>ri.active_duns_number OR  le.prim_range<>ri.prim_range OR  le.prim_name<>ri.prim_name OR  le.sec_range<>ri.sec_range OR  le.city<>ri.city OR  le.city_clean<>ri.city_clean OR  le.st<>ri.st OR  le.zip<>ri.zip OR  le.company_url<>ri.company_url OR  le.isContact<>ri.isContact OR  le.contact_did<>ri.contact_did OR  le.title<>ri.title OR  le.fname<>ri.fname OR  le.fname_preferred<>ri.fname_preferred OR  le.mname<>ri.mname OR  le.lname<>ri.lname OR  le.name_suffix<>ri.name_suffix OR  le.contact_ssn<>ri.contact_ssn OR  le.contact_email<>ri.contact_email OR  le.sele_flag<>ri.sele_flag OR  le.org_flag<>ri.org_flag OR  le.ult_flag<>ri.ult_flag OR  le.fallback_value<>ri.fallback_value => TRUE,
-      SKIP );
-    SELF := if ( ri.rcid=(TYPEOF(ri.rcid))'', le, ri );
+    fieldDiffsOverall := DifferencesFieldChanges;
+    SALT311.mod_StandardStatsTransforms.mac_deltaDifferencesFieldChanges('RECORDOF(fieldDiffsOverall)', inFieldList, myTimeStamp, FALSE);
+    fieldDiffsOverall_Standard := IF(doFieldDiffsGlobal, NORMALIZE(fieldDiffsOverall, COUNT(inFieldList) * 3, xByRIDFieldChanges(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
+ 
+    RETURN hygieneDiffOverall_Standard & fieldDiffsOverall_Standard;
   END;
-  re := JOIN(old_s,new_s,left.rcid=right.rcid,Take_Record(LEFT,RIGHT),HASH,FULL OUTER);
-EXPORT Differences := re;
-  d := Differences;
-EXPORT DifferenceSummary := hygiene(old_s).Summary('Old') + hygiene(new_s).Summary('New') + hygiene(d(deleted)).Summary('Deletions') + hygiene(d(added)).Summary('Additions') + hygiene(d(changed)).Summary('Updates');
 END;
-

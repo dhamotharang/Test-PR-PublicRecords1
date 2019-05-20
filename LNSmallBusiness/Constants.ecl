@@ -83,4 +83,11 @@ EXPORT Constants :=
       EXPORT string1 XML_ONLY := 'X';    //Means ‘XML Only’
       EXPORT string1 BLANK := '';        // Empty/Nothing/NotPresent 
   end;
+	
+	EXPORT SET_TARGUS_SERVICENAMES := 
+		[
+			'targus',
+			'targuse3220'
+		];
+
   END;

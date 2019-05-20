@@ -1,4 +1,4 @@
-import doxie, Autokey_batch, VehicleV2_Services, Address, VehicleV2, BatchServices, AutokeyB2, AutoStandardI, VehicleV2_Services, lib_stringlib, lib_datalib, BIPV2;
+import Autokey_batch, VehicleV2_Services, Address, VehicleV2, BatchServices, AutokeyB2, AutoStandardI, BIPV2, STD;
 
 export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_BatchIn) data_in,
 																 VehicleV2_Services.IParam.RTBatch_V2_params in_param) := function
@@ -24,7 +24,7 @@ export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_Bat
 
 	// Functions
 	trimBoth(STRING input) := TRIM(input, LEFT, RIGHT);
-	toUpper(STRING input) := StringLib.StringToUpperCase(trimBoth(input));
+	toUpper(STRING input) := STD.Str.ToUpperCase(trimBoth(input));
 
 	// Records/Transforms
 	AutoKeyBatchInput cleanInput(VehicleV2_Services.Batch_Layout.VIN_BatchIn input) := TRANSFORM

@@ -37,6 +37,14 @@ Indicator ID	Risk Alert
 34  No First Seen and Last Seen Date associated to Phone #
 35  SIM Card Information has changed in the last “Input B” days.
 36  Device Information has changed in the last “Input B” days.
+37  Phone in Rejected Transaction.
+38  Phone on Global Blacklist.
+39  Phone Number Associated with Fraud.
+40  Digital ID Bad Reputation.
+41  Phone Number First Seen Recently in Digital Identity Network.
+42  High Count of Devices Associated to Phone Number in Past Month.
+43  High Count of Email Addresses Associated to Phone Number in Past Month.
+44  Phone Seen in High Number of Countries in Past Month.
 */
 
 IMPORT $, iesp, STD;
@@ -46,8 +54,9 @@ EXPORT CalculatePRIs( DATASET($.Layouts.PhoneFinder.Final) dIn,
 FUNCTION
   // If PHONERISKASSESSMENT, ONLY check OTP RI
   dRIs := IF(inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT,	
-              PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2] AND OTP),
-                      TRANSFORM(iesp.phonefinder.t_PhoneFinderRiskIndicator, SELF.Level := 'H', SELF.LevelCount := 1, SELF := LEFT)),
+              IF(inMod.UseThreatMetrixRules, PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2]), iesp.phonefinder.t_PhoneFinderRiskIndicator),
+                                             PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2] AND OTP),
+                                             TRANSFORM(iesp.phonefinder.t_PhoneFinderRiskIndicator, SELF.Level := 'H', SELF.LevelCount := 1, SELF := LEFT))),
               inMod.RiskIndicators);
 
   rRiskInd_Layout :=
@@ -63,6 +72,7 @@ FUNCTION
       dt_last_seen    := (UNSIGNED)pInput.dt_last_seen;
       dt_first_seen   := (UNSIGNED)pInput.dt_first_seen;
       currentDate     := STD.Date.Today();
+      monthstominutes := (le.Threshold*30*24*60); // Convert Months into Minutes.
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
                                 -1 => pInput.phone = '',
@@ -101,8 +111,21 @@ FUNCTION
                                       (pInput.imsi_changedthis_time = 1  AND STD.Date.DaysBetween((UNSIGNED)pInput.imsi_seensince, currentDate) <= le.Threshold) OR																																																																								
                                       (pInput.imei_changedthis_time = 1  AND STD.Date.DaysBetween((UNSIGNED)pInput.imei_seensince, currentDate) <= le.Threshold) OR																																																																								
                                       (pInput.iccid_changedthis_time = 1 AND STD.Date.DaysBetween((UNSIGNED)pInput.iccid_seensince, currentDate) <= le.Threshold),
-                                FALSE
-                              );
+                                37 => MAP(le.ThresholdB = 'Day' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One day')),
+                                          le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Week')),
+                                          le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Month')),
+                                           FALSE),
+                                38 => EXISTS(pInput.ReasonCodes(value = 'Phone Number in Global Blacklist')), 
+                                39 => MAP(le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One week')),
+                                          le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One month')),
+                                          le.ThresholdB = 'Three Months' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - Three Months')),
+                                           FALSE),
+                                40 => EXISTS(pInput.ReasonCodes(value = 'AssociatedDigitalID - Trust Score below Zero')),
+                                41 => EXISTS((pInput.TmxVariables(Name = 'timesincephonefirstseen' AND (INTEGER)Value <= MonthstoMinutes))),
+                                42 => EXISTS((pInput.TmxVariables(Name = 'countdeviceseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
+                                43 => EXISTS((pInput.TmxVariables(Name = 'countemailsseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
+                                44 => EXISTS((pInput.TmxVariables(Name = 'phoneseenmultiplecountry_month' AND (INTEGER)Value >= le.Threshold))),
+                                FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);
       SELF.OTPRIFailed := le.OTP AND isPRIFail;

@@ -1,4 +1,4 @@
-import watercraft, doxie, fcra, ut, Suppress, mdr;
+import watercraft, doxie, fcra, ut, Suppress, mdr, STD;
 
 boolean IsFCRA := true;
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
@@ -10,7 +10,7 @@ nss_const := Suppress.Constants.NonSubjectSuppression;
 
 // The above comment may have been stated to handle the unlikely scenario where 2 DIDs are listed as owners of the watercraft but only
 // one of them corrected their record. He should be the only one with the corrected record. As long as you join by DID 
-// before displaying your output then it will guarantee that only the valid DID will get the corrected record. see BenefitAssessment_Services.Raw.
+// before displaying your output then it will guarantee that only the valid DID will get the corrected record.
 
 EXPORT _watercraft_data (dataset (doxie.layout_references) dids, dataset (fcra.Layout_override_flag) flag_file,
                          integer nss = nss_const.doNothing     , unsigned1 year_limit = 0) := MODULE
@@ -71,7 +71,7 @@ EXPORT _watercraft_data (dataset (doxie.layout_references) dids, dataset (fcra.L
 	// translate the source code to be the header source code so it can be found in the vendor lookup service
 	owners2 := project(owners1, transform(rec_owner, self.source_code := mdr.sourcetools.fWatercraft(left.Source_Code, left.State_Origin), self := left));
 
-	todaysdate := ut.GetDate;
+	todaysdate := (string) STD.Date.Today();
 	//if called from benefitassessment_batchservicefcra, we only want records from the last 7 years
 	owners_filtered := owners2(ut.fn_date_is_ok(todaysdate, date_last_seen, year_limit));
 

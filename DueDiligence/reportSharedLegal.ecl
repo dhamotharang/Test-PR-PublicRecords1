@@ -53,7 +53,14 @@ EXPORT reportSharedLegal := MODULE
                                                            SELF.OffenseDDFirstReported := iesp.ECL2ESP.toDatestring8(LEFT.offenseDDFirstReportedActivity);
                                                            SELF.OffenseDDLastReportedActivity := iesp.ECL2ESP.toDate(LEFT.offenseDDLastReportedActivity);
                                                            SELF.OffenseDDMostRecentCourtDispDate := iesp.ECL2ESP.toDate(LEFT.offenseDDLastCourtDispDate);
-                                                           SELF.OffenseDDLegalEventTypeMapped := DueDiligence.translateExpression.expressionTextByEnum(LEFT.offenseDDLegalEventTypeCode);
+                                                           
+                                                           offenseTypeDetails := DueDiligence.translateExpression.dctByPriority[LEFT.offenseDDLegalEventTypeCode];
+                                                           
+                                                           SELF.OffenseID := offenseTypeDetails.id;
+                                                           SELF.OffensePriorityOrder := offenseTypeDetails.priorityOrder;
+                                                           SELF.offenseLevel := offenseTypeDetails.level;
+                                                           SELF.OffenseDDLegalEventTypeMapped := offenseTypeDetails.description;
+                                                           
                                                            SELF.OffenseCharge := LEFT.offenseCharge;
                                                            SELF.OffenseDDChargeLevelCalculated := DueDiligence.translateCodeToText.OffenseLevelText(LEFT.offenseDDChargeLevelCalculated);
                                                            SELF.OffenseChargeLevelReported := LEFT.offenseChargeLevelReported;

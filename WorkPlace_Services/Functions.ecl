@@ -1,4 +1,5 @@
-﻿import Address,Autokey_batch,BatchServices,doxie,gong,mdr,POE,PSS,risk_indicators,ut,Yellowpages, PAW_Services, paw, spoke, zoom, corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, std, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD;
+﻿import Address, Autokey_batch, BatchServices, doxie, gong, mdr, POE, PSS, ut, Yellowpages, PAW_Services, paw, spoke, zoom, 
+       corp2, POEsFromEmails, one_click_data, SalesChannel, thrive, Email_Data, DCA, doxie_cbrs, Prof_LicenseV2, suppress, STD;
 
 // NOTE: Within this module certain BatchServices.Workplace_* attributes are used.
 //       This is because the BatchServices.WorkPlace_BatchService was created first, 
@@ -732,7 +733,7 @@ export Functions := module
 														 KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 														 LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 
-  ds_detail_oneclick_suppressed := Suppress.MAC_SuppressSource(ds_detail_oneclick_all, mod_access, did, TRUE); 
+  ds_detail_oneclick_suppressed := Suppress.MAC_FlagSuppressedSource(ds_detail_oneclick_all, mod_access); 
   ds_detail_oneclick := PROJECT(ds_detail_oneclick_suppressed,
     TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
        SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
@@ -884,10 +885,8 @@ export Functions := module
 												    LEFT OUTER,  // keep all the recs from the LEFT ds
 													  ATMOST(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
     
-     ds_log_sold_to_srcs:= 
-        PROJECT(ds_detail_oneclick_suppressed(~is_suppressed), TRANSFORM(doxie.log.layout_sold_to_sources_common, SELF := LEFT;))
-      + PROJECT(ds_email_data_suppressed, TRANSFORM(doxie.log.layout_sold_to_sources_common, SELF.did := (UNSIGNED6) LEFT.did; SELF := LEFT;));
-     doxie.compliance.logSoldToSources (ds_log_sold_to_srcs, mod_access); 
+    doxie.compliance.logSoldToSources (ds_detail_oneclick_suppressed(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_email_data_suppressed, mod_access);
 	  RETURN ds_detail_wemail;
   END; // end of getDetailedWithEmail function 
 	

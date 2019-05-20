@@ -13,193 +13,240 @@ EXPORT translateExpression := MODULE
     EXPORT LEVEL_2 := 2;
     SHARED LEVEL_0 := 0;  //not actual level - used to catch if it doesn't fall into a level hit (ie UNCATEGORIZED)
     
-    //Enums - unique identifier for expressions, used as weight. When weight changes, just need to change order of the enum list here
-    //list in ascending order from least important to highest - largest offense will have highest weight
-    EXPORT ExpressionEnum := ENUM(UNCATEGORIZED = 0, NO_OFFENSE_PROVIDED, INFRACTIONS_AND_ORDINANCES, LIVESTOCK_AND_ANIMAL, HUNTING_AND_FISHING, ZONING, COURT_CHARGES, ALCOHOL_RELATED, 
-                                  TRAFFIC_OFFENSES, DUI, CHILD_SUPPORT, ALIEN_AND_IMMIGRATION, DISORDERLY_CONDUCT, TRESPASSING,
-                                  SHOPLIFTING, ORGANIZED_RETAIL_THEFT, GAMBLING_BITCOIN, COMPUTER, FALSE_STATEMENTS_IMPERSONATION_IDENTIFICATION, TAMPERING, OBSTRUCTION,
-                                  PERJURY, VANDALISM, DESTRUCTION_OF_PROPERTY, RESISTING_ARREST_ESCAPE_ELUDE, VIOLATING_ORDERS, FUGITIVE_OR_WARRANT, CYBER_STALKING,
-                                  STALKING_HARASSMENT_TERRORIZE, ANIMAL_FIGHTING, DOMESTIC_AND_FAMILY_VIOLENCE_OR_ABUSE, ASSAULT, BREAKING_AND_ENTERING,
-                                  BURGLARY, ARSON, KIDNAPPING_ABDUCTION, MURDER_MANSLAUGHTER, RAPE, STATUTORY_RAPE, SEX_OFFENSES, PROSTITUTION, PORNOGRAPHY, SOLICITATION,
-                                  LARCENY, THEFT, FELONY_OR_AGGRAVATED_THEFT, CAR_JACK, ROBBERY, ARMED_ROBBERY, BANK_ROBBERY, GRAND_LARCENY, OBTAIN_PROPERTY_BY_FALSE_PRETENSES,
-                                  CONCEALMENT_OF_FUNDS_OR_PROPERTY, TAX_OFFENSES, MISAPPROPRIATION_OF_FUNDS, EMBEZZLEMENT, FRAUD, CHECK_FRAUD_BAD_CHECK, IDENTITY_FRAUD_AND_THEFT,
-                                  ORGANIZED_FRAUD, INSURANCE_FRAUD, HEALTHCARE_FRAUD, MORTGAGE_FRAUD, TAX_FRAUD, CREDIT_CARD_FRAUD, BANK_FRAUD, WIRE_FRAUD, SECURITIES_FRAUD, 
-                                  FORGERY_AND_DEVICES, DRUGS, WEAPONS, DISTRIBUTION_DRUGS_OR_WEAPONS, EXPLOSIVES_DESTRUCTION_DEVICES, TRAFFICKING_SMUGGLING_NONHUMAN, TRAFFICKING_SMUGGLING_HUMAN, 
-                                  CHOP_SHOP, GANG, EXTORTION_BLACKMAIL_RANSOM, TREASON_ESPIONAGE, INSIDER_TRADING_MANIPULATION, INTERCEPTION_OF_COMMUNICATION_WIRETAPPING, TRANSPORTATION_VIOLATIONS, 
-                                  IMPORT_EXPORT, CRIMINAL_PROCEEDS, TERRORISM, RACKETEERING_OR_LOAN_SHARKING, ORGANIZED_CRIME, STRUCTURING, MONEY_TRANSMITTER, 
-                                  MONEY_LAUNDERING_TAX_EVASION, MONEY_OR_CREDIT_CARD_LAUNDERING, CORRUPTION_OR_BRIBERY);
+    //Unique ID used to identify a category - these should not change and new ones being added at the end
+    //DO NOT CHANGE ORDER OF THESE
+    SHARED OffenseID := ENUM(UNCATEGORIZED = 0, NO_OFFENSE_PROVIDED, HUNT_FISH, LIVESTOCK_DOMESTIC_ANIMAL, ORDINANCE_INFRACTION, 
+                                ELDER_EXPLOIT, FAMILY_PROVIDER_ABUSE, ANIMAL_FIGHT, DUI, ALCOHOL, GANG, FUGITIVE, RIOT, POISON, EPA, 
+                                ZONING, TREASON, HARASS, CYBER_STALK, VIOLATE_ORDER, PROBATION_VIOLATION, MISCONDUCT, CYBER, ARSON, 
+                                B_AND_E, BURGLARY, CARJACK, TRAFFIC, SYNDICALISM, SANCTION, HOMOCIDE, KIDNAP, HATE_CRIME, RETALIATION, 
+                                CORRUPT_MINOR, RAPE, BOOBY_TRAP, SABOTAGE, VANDALISM, CHILD_SUPPORT, COURT, AGG_THEFT, THEFT, SOLICITATION, 
+                                SOLICITATION_SEX, PORN, PROSTITUTION, SEX, MONEY_LAUNDER, GAMBLE, DISORDERLY_CONDUCT, TERRORISM, 
+                                ORGANIZED_CRIME, OBSTRUCT_JUSTICE, ELECTION_CORRUPTION, POLITICAL_CORRUPTION, CORRUPTION_BRIBERY, 
+                                FRAUD, WIRE_FRAUD, BANK_FRAUD, FINANCIAL_FRAUD, TAX_FRAUD, MORTGAGE_FRAUD, HEALTHCARE_FRAUD, 
+                                EMPLOYMENT_FRAUD, INSURANCE_FRAUD, ORGANIZED_FRAUD, INVOICE_FRAUD, CHECK_FRAUD, CONSPIRACY, PERJURY, 
+                                OBSTRUCTION, TAMPERING, TAX_EVASION, COUNTERFEIT, ID_FRAUD_THEFT, IMPERSONATION, BLACKMAIL, CHOP_SHOP, 
+                                ROBBERY, BANK_ROBBERY, ARMED_ROBBERY, DEADLY_CONDUCT, ASSAULT, RESISTING_ARREST, DIGITAL_CURRENCY, 
+                                ANTITRUST, SECURITIES_COMMODITIES, RACKETEERING, MONEY_TRANSMITTER, STRUCTURING, IMPORT_EXPORT, 
+                                TRANSPORTATION, COMMUNICATION_INTERCEPT, OPERATE_NO_LICENSE, EMBEZZLEMENT, TAX, CONCEAL_FUNDS_PROPERTY, 
+                                OBTAIN_PROP_FALSE_PRETENSE, DAMAGE_DESTROY, SHOPLIFTING, TRESPASSING, CRIMINAL_PROCEEDS, HUMAN_TRAFFICKING, 
+                                DRUG_TRAFFICKING, ARMS_TRAFFICKING, OTHER_TRAFFICKING, EXPLOSIVES, WEAPONS, DRUGS, IMMIGRATION, DIST_DRUGS_WEAPONS);
+    
+    //When weight/priority changes, just need to change order of the enum list here
+    //list in ascending order from least important to highest - largest offense will have highest weight/priority
+    EXPORT OffensePriority := ENUM(UNCATEGORIZED = 0, NO_OFFENSE_PROVIDED,  
+    
+                                  //Level 2 order
+                                  ORDINANCES_AND_INFRACTIONS, COURT_CHARGES, LIVESTOCK_DOMESTIC_ANIMALS, HUNT_FISH_GAME_OFFENSES,
+                                  ALCOHOL_RELATED, TRAFFIC_OFFENSES, ZONING, DUI, CHILD_SUPPORT,
+                                  ALIEN_AND_IMMIGRATION, DISORDERLY_CONDUCT, TRESPASSING, SHOPLIFTING, 
+
+                                  //Level 3 order
+                                  SANCTIONS, DAMAGE_DESTROY_ITEMS, TAMPERING, OBSTRUCTION_HINDER, PERJURY, CONSPIRACY,
+                                  DIGITAL_CURRENCY, GAMBLING, COMPUTER_AND_CYBER, MISCONDUCT, 
+                                  
+                                  //Level 4 order                            
+                                  RESISTING_ARREST_ESCAPE, PROBATION_PAROLE_VIOLATION, VIOLATING_ORDERS,
+                                  FUGITIVE_OR_WARRANT, EPA_WASTE, POISONING, VANDALISM, ARSON, 
+                                  FAMILY_AND_PROVIDER_ABUSE, ELDER_EXPLOITATION, SABOTAGE, RETALIATION, 
+                                  HATE_CRIME_AND_CIVIL_RIGHTS, BOOBY_TRAP, RIOT_CIVIL_DISORDER, CYBER_STALKING, STALK_HARASS_TERRORIZE,
+                                  ASSAULT, DEADLY_CONDUCT, KIDNAPPING_FALSE_IMPRISONMENT, MURDER_HOMOCIDE, ANIMAL_FIGHTING,
+                                  
+                                  //Level 5 order                            
+                                  RAPE, SEX_OFFENSES, PROSTITUTION, PORNOGRAPHY, SOLICITATION, SOLICITATION_SEX, CORRUPTION_OF_MINOR, 
+                                  
+                                  //Level 6 order
+                                  THEFT, FELONY_OR_AGGRAVATED_THEFT, BREAKING_AND_ENTERING, CAR_JACK, BURGLARY, ROBBERY, ARMED_ROBBERY, BANK_ROBBERY, 
+                                  
+                                  //Level 7 order
+                                  FALSE_STATEMENTS_IMPERSONATION, OBTAIN_PROP_BY_FALSE_PRETENSE, CONCEAL_FUNDS_OR_PROPERTY, TAX_OFFENSES, 
+                                  FRAUD, CHECK_FRAUD, IDENTITY_FRAUD_AND_THEFT, INVOICE_FRAUD, ORGANIZED_FRAUD, INSURANCE_FRAUD, 
+                                  EMPLOYMENT_WORK_COMP_FRAUD, HEALTHCARE_FRAUD, MORTGAGE_FRAUD, TAX_FRAUD, CREDIT_CARD_FRAUD, BANK_FRAUD,
+                                  WIRE_FRAUD, EMBEZZLEMENT, OPERATE_WITHOUT_LICENSE, FORGE_AND_COUNTERFEIT,
+                                  
+                                  //Level 8 order
+                                  DRUGS, WEAPONS, EXPLOSIVES_DESTRUCTION_DEVICES, DISTRIBUTION_DRUGS_OR_WEAPONS, TRAFFICKING_SMUGGLING_OTHER,
+                                  TRAFFICKING_SMUGGLING_ARMS, TRAFFICKING_SMUGGLING_DRUGS, TRAFFICKING_SMUGGLING_HUMAN,
+                                  
+                                  //Level 9 order
+                                  COMMUNICATION_INTERCEPTION, CHOP_SHOP, GANG_ACTIVITIES, TRANSPORTATION_VIOLATIONS, IMPORT_EXPORT,
+                                  STRUCTURING, MONEY_TRANSMITTER, CRIMINAL_PROCEEDS, CORRUPTION_OR_BRIBERY, POLITICAL_CORRUPTION, ELECTION_CORRUPTION, 
+                                  OBSTRUCTION_OF_JUSTICE, ORGANIZED_CRIME, EXTORTION_AND_BLACKMAIL, RACKETEERING, SECURITIES_AND_COMMODITIES, 
+                                  ANTITRUST_VIOLATIONS, TAX_EVASION, MONEY_LAUNDERING, CRIMINAL_SYNDICALISM, TREASON_ESPIONAGE, TERRORISM);
     
 
+                                  
+                                  
                                   
                                   
     SHARED ExpressionDSLayout := RECORD
-      UNSIGNED4 expressionWeight; //unique identifier used as a weight
+      UNSIGNED4 id; //this is a unique ID per offense - this should not change
+      UNSIGNED4 priorityOrder; //identifier used as a weight for picking priority
       STRING expressionToUse;
-      UNSIGNED1 expressionCategory; 
-      STRING100 expressionText;     
+      UNSIGNED1 level; 
+      STRING100 description;     
     END;
     
 
-    SHARED expressionDS := DATASET([{ExpressionEnum.UNCATEGORIZED, 				        DueDiligence.Constants.EMPTY,		                                        LEVEL_0, 	 'Uncategorized'},
-                                    {ExpressionEnum.NO_OFFENSE_PROVIDED,		      DueDiligence.Constants.EMPTY,		                                        LEVEL_2,	 'No Offense Provided'},
-                                    {ExpressionEnum.INFRACTIONS_AND_ORDINANCES,	  DueDiligence.RegularExpressions.EXPRESSION_INFRACTIONS_AND_ORDINANCES,	LEVEL_2,	 'Infractions and Ordinances'},
-                                    {ExpressionEnum.LIVESTOCK_AND_ANIMAL,	        DueDiligence.RegularExpressions.EXPRESSION_LIVESTOCK_AND_ANIMAL,	      LEVEL_2,	 'Livestock and Animal Related'},
-                                    {ExpressionEnum.HUNTING_AND_FISHING,	        DueDiligence.RegularExpressions.EXPRESSION_HUNTING_AND_FISHING,	        LEVEL_2,	 'Hunting and Fishing'},
-                                    {ExpressionEnum.ZONING,	                      DueDiligence.RegularExpressions.EXPRESSION_ZONING,	                    LEVEL_2,	 'Zoning'},
-                                    {ExpressionEnum.COURT_CHARGES,	              DueDiligence.RegularExpressions.EXPRESSION_COURT_CHARGES,	              LEVEL_2,	 'Court Charges'},
-                                    {ExpressionEnum.ALCOHOL_RELATED,	            DueDiligence.RegularExpressions.EXPRESSION_ALCOHOL_RELATED,	            LEVEL_2,	 'Alcohol Related'},
-                                    {ExpressionEnum.TRAFFIC_OFFENSES,	            DueDiligence.RegularExpressions.EXPRESSION_TRAFFIC_OFFENSES,	          LEVEL_2,	 'Traffic Offense'},
-                                    {ExpressionEnum.DUI,	                        DueDiligence.RegularExpressions.EXPRESSION_DUI,	                        LEVEL_2,	 'DUI'},
-                                    {ExpressionEnum.CHILD_SUPPORT,	              DueDiligence.RegularExpressions.EXPRESSION_CHILD_SUPPORT,	              LEVEL_2,	 'Child Support'},
-                                    {ExpressionEnum.ALIEN_AND_IMMIGRATION,	      DueDiligence.RegularExpressions.EXPRESSION_ALIEN_AND_IMMIGRATION,	      LEVEL_2,	 'Alien and Immigration'},
-                                    {ExpressionEnum.DISORDERLY_CONDUCT,	          DueDiligence.RegularExpressions.EXPRESSION_DISORDERLY_CONDUCT,	        LEVEL_2,	 'Disorderly Conduct'},
-                                    {ExpressionEnum.TRESPASSING,	                DueDiligence.RegularExpressions.EXPRESSION_TRESPASSING,	                LEVEL_2,	 'Trespassing'},
-                                    {ExpressionEnum.SHOPLIFTING,	                DueDiligence.RegularExpressions.EXPRESSION_SHOPLIFTING,	                LEVEL_2,	 'Shoplifting'},
-                                    {ExpressionEnum.ORGANIZED_RETAIL_THEFT,	      DueDiligence.RegularExpressions.EXPRESSION_ORGANIZED_RETAIL_THEFT,	    LEVEL_2,	 'Organized Retail Theft'},
-                                    {ExpressionEnum.GAMBLING_BITCOIN,	            DueDiligence.RegularExpressions.EXPRESSION_GAMBLING_BITCOIN,            LEVEL_3,	 'Gambling / Bitcoin'},
-                                    {ExpressionEnum.COMPUTER,	                    DueDiligence.RegularExpressions.EXPRESSION_COMPUTER,	                  LEVEL_3,	 'Computer'},
-                                    {ExpressionEnum.FALSE_STATEMENTS_IMPERSONATION_IDENTIFICATION,	 DueDiligence.RegularExpressions.EXPRESSION_FALSE_STATEMENTS_IMPERSONATION_IDENTIFICATION,	 LEVEL_3,	 'False Statements, Impersonation, Identification'},
-                                    {ExpressionEnum.TAMPERING,	                  DueDiligence.RegularExpressions.EXPRESSION_TAMPERING,	                  LEVEL_3,	 'Tampering'},
-                                    {ExpressionEnum.OBSTRUCTION,	                DueDiligence.RegularExpressions.EXPRESSION_OBSTRUCTION,	                LEVEL_3,	 'Obstruction'},
-                                    {ExpressionEnum.PERJURY,	                    DueDiligence.RegularExpressions.EXPRESSION_PERJURY,	                    LEVEL_3,	 'Perjury'},
-                                    {ExpressionEnum.VANDALISM,	                  DueDiligence.RegularExpressions.EXPRESSION_VANDALISM,	                  LEVEL_4,	 'Vandalism'},
-                                    {ExpressionEnum.DESTRUCTION_OF_PROPERTY,	    DueDiligence.RegularExpressions.EXPRESSION_DESTRUCTION_OF_PROPERTY,	    LEVEL_4,	 'Destruction of Property'},
-                                    {ExpressionEnum.RESISTING_ARREST_ESCAPE_ELUDE,	 DueDiligence.RegularExpressions.EXPRESSION_RESISTING_ARREST_ESCAPE_ELUDE,	 LEVEL_4,	 'Resisting Arrest / Escape'},
-                                    {ExpressionEnum.VIOLATING_ORDERS,	            DueDiligence.RegularExpressions.EXPRESSION_VIOLATING_ORDERS,	          LEVEL_4,	 'Violating Orders'},
-                                    {ExpressionEnum.FUGITIVE_OR_WARRANT,	        DueDiligence.RegularExpressions.EXPRESSION_FUGITIVE_OR_WARRANT,	        LEVEL_4,	 'Fugitive or Warrant'},
-                                    {ExpressionEnum.CYBER_STALKING,	              DueDiligence.RegularExpressions.EXPRESSION_CYBER_STALKING,	            LEVEL_4,	 'Cyber Stalking'},
-                                    {ExpressionEnum.STALKING_HARASSMENT_TERRORIZE,	 DueDiligence.RegularExpressions.EXPRESSION_STALKING_HARASSMENT_TERRORIZE,	 LEVEL_4,	 'Stalking / Harassment / Terrorize'},
-                                    {ExpressionEnum.ANIMAL_FIGHTING,	            DueDiligence.RegularExpressions.EXPRESSION_ANIMAL_FIGHTING,	            LEVEL_4,	 'Animal Fighting'},
-                                    {ExpressionEnum.DOMESTIC_AND_FAMILY_VIOLENCE_OR_ABUSE,	 DueDiligence.RegularExpressions.EXPRESSION_DOMESTIC_AND_FAMILY_VIOLENCE_OR_ABUSE,	 LEVEL_4,	 'Domestic / Family Violence or Abuse'},
-                                    {ExpressionEnum.ASSAULT,	                    DueDiligence.RegularExpressions.EXPRESSION_ASSAULT,	                    LEVEL_4,	 'Assault'},
-                                    {ExpressionEnum.BREAKING_AND_ENTERING,	      DueDiligence.RegularExpressions.EXPRESSION_BREAKING_AND_ENTERING,	      LEVEL_4,	 'Breaking and Entering'},
-                                    {ExpressionEnum.BURGLARY,	                    DueDiligence.RegularExpressions.EXPRESSION_BURGLARY,	                  LEVEL_4,	 'Burglary'},
-                                    {ExpressionEnum.ARSON,	                      DueDiligence.RegularExpressions.EXPRESSION_ARSON,	                      LEVEL_4,	 'Arson'},
-                                    {ExpressionEnum.KIDNAPPING_ABDUCTION,	        DueDiligence.RegularExpressions.EXPRESSION_KIDNAPPING_ABDUCTION,	      LEVEL_4,	 'Kidnapping / False Imprisonment'},
-                                    {ExpressionEnum.MURDER_MANSLAUGHTER,	        DueDiligence.RegularExpressions.EXPRESSION_MURDER_MANSLAUGHTER,	        LEVEL_4,	 'Murder / Homicide'},
-                                    {ExpressionEnum.RAPE,	                        DueDiligence.RegularExpressions.EXPRESSION_RAPE,	                      LEVEL_5,	 'Rape'},
-                                    {ExpressionEnum.STATUTORY_RAPE,	              DueDiligence.RegularExpressions.EXPRESSION_STATUTORY_RAPE,	            LEVEL_5,	 'Statutory Rape'},
-                                    {ExpressionEnum.SEX_OFFENSES,	                DueDiligence.RegularExpressions.EXPRESSION_SEX_OFFENSES,	              LEVEL_5,	 'Sex Offenses'},
-                                    {ExpressionEnum.PROSTITUTION,	                DueDiligence.RegularExpressions.EXPRESSION_PROSTITUTION,	              LEVEL_5,	 'Prostitution '},
-                                    {ExpressionEnum.PORNOGRAPHY,	                DueDiligence.RegularExpressions.EXPRESSION_PORNOGRAPHY,	                LEVEL_5,	 'Pornography'},
-                                    {ExpressionEnum.SOLICITATION,	                DueDiligence.RegularExpressions.EXPRESSION_SOLICITATION,	              LEVEL_5,	 'Solicitation'},
-                                    {ExpressionEnum.LARCENY,	                    DueDiligence.RegularExpressions.EXPRESSION_LARCENY,	                    LEVEL_6,	 'Larceny'},
-                                    {ExpressionEnum.THEFT,	                      DueDiligence.RegularExpressions.EXPRESSION_THEFT,	                      LEVEL_6,	 'Theft'},
-                                    {ExpressionEnum.FELONY_OR_AGGRAVATED_THEFT,	  DueDiligence.RegularExpressions.EXPRESSION_FELONY_OR_AGGRAVATED_THEFT,	LEVEL_6,	 'Felony or Aggravated Theft'},
-                                    {ExpressionEnum.CAR_JACK,	                    DueDiligence.RegularExpressions.EXPRESSION_CAR_JACK,	                  LEVEL_6,	 'Car Jack'},
-                                    {ExpressionEnum.ROBBERY,	                    DueDiligence.RegularExpressions.EXPRESSION_ROBBERY,	                    LEVEL_6,	 'Robbery'},
-                                    {ExpressionEnum.ARMED_ROBBERY,	              DueDiligence.RegularExpressions.EXPRESSION_ARMED_ROBBERY,	              LEVEL_6,	 'Armed Robbery'},
-                                    {ExpressionEnum.BANK_ROBBERY,	                DueDiligence.RegularExpressions.EXPRESSION_BANK_ROBBERY,	              LEVEL_6,	 'Bank Robbery'},
-                                    {ExpressionEnum.GRAND_LARCENY,	              DueDiligence.RegularExpressions.EXPRESSION_GRAND_LARCENY,	              LEVEL_6,	 'Grand Larceny'},
-                                    {ExpressionEnum.OBTAIN_PROPERTY_BY_FALSE_PRETENSES,	  DueDiligence.RegularExpressions.EXPRESSION_OBTAIN_PROPERTY_BY_FALSE_PRETENSES,	 LEVEL_7,	 'Obtaining Property by False Pretenses'},
-                                    {ExpressionEnum.CONCEALMENT_OF_FUNDS_OR_PROPERTY,	    DueDiligence.RegularExpressions.EXPRESSION_CONCEALMENT_OF_FUNDS_OR_PROPERTY,	 LEVEL_7,	 'Concealment of Funds or Property'},
-                                    {ExpressionEnum.TAX_OFFENSES,	                DueDiligence.RegularExpressions.EXPRESSION_TAX_OFFENSES,	              LEVEL_7,	 'Tax Offenses'},
-                                    {ExpressionEnum.MISAPPROPRIATION_OF_FUNDS,	  DueDiligence.RegularExpressions.EXPRESSION_MISAPPROPRIATION_OF_FUNDS,	  LEVEL_7,	 'Misappropriation of Funds'},
-                                    {ExpressionEnum.EMBEZZLEMENT,	                DueDiligence.RegularExpressions.EXPRESSION_EMBEZZLEMENT,	              LEVEL_7,	 'Embezzlement'},
-                                    {ExpressionEnum.FRAUD,	                      DueDiligence.RegularExpressions.EXPRESSION_FRAUD,	                      LEVEL_7,	 'Fraud'},
-                                    {ExpressionEnum.CHECK_FRAUD_BAD_CHECK,	      DueDiligence.RegularExpressions.EXPRESSION_CHECK_FRAUD_BAD_CHECK,	      LEVEL_7,	 'Check Fraud / Bad Check'},
-                                    {ExpressionEnum.IDENTITY_FRAUD_AND_THEFT,	    DueDiligence.RegularExpressions.EXPRESSION_IDENTITY_FRAUD_AND_THEFT,	  LEVEL_7,	 'Identity Fraud & Theft'},
-                                    {ExpressionEnum.ORGANIZED_FRAUD,	            DueDiligence.RegularExpressions.EXPRESSION_ORGANIZED_FRAUD,	            LEVEL_7,	 'Organized Fraud'},
-                                    {ExpressionEnum.INSURANCE_FRAUD,	            DueDiligence.RegularExpressions.EXPRESSION_INSURANCE_FRAUD,	            LEVEL_7,	 'Insurance Fraud'},
-                                    {ExpressionEnum.HEALTHCARE_FRAUD,	            DueDiligence.RegularExpressions.EXPRESSION_HEALTHCARE_FRAUD,	          LEVEL_7,	 'Healthcare Fraud'},
-                                    {ExpressionEnum.MORTGAGE_FRAUD,	              DueDiligence.RegularExpressions.EXPRESSION_MORTGAGE_FRAUD,	            LEVEL_7,	 'Mortgage Fraud'},
-                                    {ExpressionEnum.TAX_FRAUD,	                  DueDiligence.RegularExpressions.EXPRESSION_TAX_FRAUD,	                  LEVEL_7,	 'Tax Fraud'},
-                                    {ExpressionEnum.CREDIT_CARD_FRAUD,	          DueDiligence.RegularExpressions.EXPRESSION_CREDIT_CARD_FRAUD,	          LEVEL_7,	 'Credit Card Fraud'},
-                                    {ExpressionEnum.BANK_FRAUD,	                  DueDiligence.RegularExpressions.EXPRESSION_BANK_FRAUD,	                LEVEL_7,	 'Bank Fraud'},
-                                    {ExpressionEnum.WIRE_FRAUD,                   DueDiligence.RegularExpressions.EXPRESSION_WIRE_FRAUD,	                LEVEL_7,	 'Wire Fraud'},
-                                    {ExpressionEnum.SECURITIES_FRAUD,	            DueDiligence.RegularExpressions.EXPRESSION_SECURITIES_FRAUD,	          LEVEL_7,	 'Securities Fraud'},
-                                    {ExpressionEnum.FORGERY_AND_DEVICES,	        DueDiligence.RegularExpressions.EXPRESSION_FORGERY_AND_DEVICES,	        LEVEL_7,	 'Forgery & Devices'},
-                                    {ExpressionEnum.DRUGS,	                      DueDiligence.RegularExpressions.EXPRESSION_DRUGS,	                      LEVEL_8,	 'Drugs'},
-                                    {ExpressionEnum.WEAPONS,	                    DueDiligence.RegularExpressions.EXPRESSION_WEAPONS,	                    LEVEL_8,	 'Weapons'},
-                                    {ExpressionEnum.DISTRIBUTION_DRUGS_OR_WEAPONS,	 DueDiligence.RegularExpressions.EXPRESSION_DISTRIBUTION_DRUGS_OR_WEAPONS,	  LEVEL_8,	 'Distribution or Manufacturing of Drugs or Weapons'},
-                                    {ExpressionEnum.EXPLOSIVES_DESTRUCTION_DEVICES,	 DueDiligence.RegularExpressions.EXPRESSION_EXPLOSIVES_DESTRUCTION_DEVICES,	  LEVEL_8,	 'Explosives / Destruction Devices'},
-                                    {ExpressionEnum.TRAFFICKING_SMUGGLING_NONHUMAN,  DueDiligence.RegularExpressions.EXPRESSION_TRAFFICKING_SMUGGLING_NONHUMAN,	  LEVEL_8,	 'Trafficking / Smuggling - Non-Human'},
-                                    {ExpressionEnum.TRAFFICKING_SMUGGLING_HUMAN,	   DueDiligence.RegularExpressions.EXPRESSION_TRAFFICKING_SMUGGLING_HUMAN,	    LEVEL_8,	 'Trafficking / Smuggling - Human'},
-                                    {ExpressionEnum.CHOP_SHOP,	                  DueDiligence.RegularExpressions.EXPRESSION_CHOP_SHOP,	                  LEVEL_9,	 'Chop Shop'},
-                                    {ExpressionEnum.GANG,	                        DueDiligence.RegularExpressions.EXPRESSION_GANG,	                      LEVEL_9,	 'Gang'},
-                                    {ExpressionEnum.EXTORTION_BLACKMAIL_RANSOM,   DueDiligence.RegularExpressions.EXPRESSION_EXTORTION_BLACKMAIL_RANSOM,	LEVEL_9,	 'Extortion / Blackmail / Ransom'},
-                                    {ExpressionEnum.TREASON_ESPIONAGE,	          DueDiligence.RegularExpressions.EXPRESSION_TREASON_ESPIONAGE,	          LEVEL_9,	 'Treason /  Espionage'},
-                                    {ExpressionEnum.INSIDER_TRADING_MANIPULATION,	DueDiligence.RegularExpressions.EXPRESSION_INSIDER_TRADING_MANIPULATION,LEVEL_9,	 'Insider Trading / Manipulation'},
-                                    {ExpressionEnum.INTERCEPTION_OF_COMMUNICATION_WIRETAPPING,	 DueDiligence.RegularExpressions.EXPRESSION_INTERCEPTION_OF_COMMUNICATION_WIRETAPPING,	 LEVEL_9,	 'Interception of Communication / Wiretapping'},
-                                    {ExpressionEnum.TRANSPORTATION_VIOLATIONS,	  DueDiligence.RegularExpressions.EXPRESSION_TRANSPORTATION_VIOLATIONS,	  LEVEL_9,	 'Transportation Violations'},
-                                    {ExpressionEnum.IMPORT_EXPORT,	              DueDiligence.RegularExpressions.EXPRESSION_IMPORT_EXPORT,	              LEVEL_9,	 'Import / Export'},
-                                    {ExpressionEnum.CRIMINAL_PROCEEDS,	          DueDiligence.RegularExpressions.EXPRESSION_CRIMINAL_PROCEEDS,	          LEVEL_9,	 'Criminal Proceeds'},
-                                    {ExpressionEnum.TERRORISM,	                  DueDiligence.RegularExpressions.EXPRESSION_TERRORISM,	                  LEVEL_9,	 'Terrorism'},
-                                    {ExpressionEnum.RACKETEERING_OR_LOAN_SHARKING,	    DueDiligence.RegularExpressions.EXPRESSION_RACKETEERING_OR_LOAN_SHARKING,	    LEVEL_9,	 'Racketeering'},
-                                    {ExpressionEnum.ORGANIZED_CRIME,	            DueDiligence.RegularExpressions.EXPRESSION_ORGANIZED_CRIME,	            LEVEL_9,	 'Organized Crime'},
-                                    {ExpressionEnum.STRUCTURING,	                DueDiligence.RegularExpressions.EXPRESSION_STRUCTURING,	                LEVEL_9,	 'Structuring'},
-                                    {ExpressionEnum.MONEY_TRANSMITTER,	          DueDiligence.RegularExpressions.EXPRESSION_MONEY_TRANSMITTER,	          LEVEL_9,	 'Money Transmitter'},
-                                    {ExpressionEnum.MONEY_LAUNDERING_TAX_EVASION,	DueDiligence.RegularExpressions.EXPRESSION_MONEY_LAUNDERING_TAX_EVASION,            LEVEL_9,	 'Money Laundering Tax Evasion'},
-                                    {ExpressionEnum.MONEY_OR_CREDIT_CARD_LAUNDERING,	  DueDiligence.RegularExpressions.EXPRESSION_MONEY_OR_CREDIT_CARD_LAUNDERING,	  LEVEL_9,	 'Money or Credit Card Laundering'},
-                                    {ExpressionEnum.CORRUPTION_OR_BRIBERY,	      DueDiligence.RegularExpressions.EXPRESSION_CORRUPTION_OR_BRIBERY,	      LEVEL_9,	 'Corruption or Bribery'}], ExpressionDSLayout);
-                                
-                                
-                                
-    SHARED expressionDCT := DICTIONARY(expressionDS, {expressionWeight => expressionDS}); 
-    
-    
-    SHARED additionalChecksToExpression(UNSIGNED4 enumReference, STRING1 offenseScore, UNSIGNED offenseCategory, STRING1 trafficFlag) := FUNCTION
-                         
-       //Check if the offense category has a specific number 
-       offenseCategoryResult := CASE(offenseCategory,
-                                        1073741824 => ExpressionEnum.TRAFFIC_OFFENSES,
-                                        137438953472 => ExpressionEnum.ALCOHOL_RELATED,
-                                        ExpressionEnum.UNCATEGORIZED);
-                                        
-       //check if the traffic flag is set 
-       trafficResult := IF(trafficFlag = DueDiligence.Constants.YES, ExpressionEnum.TRAFFIC_OFFENSES, ExpressionEnum.UNCATEGORIZED);
-       
-       //check offense score
-       offenseScoreResult := MAP(offenseScore = DueDiligence.Constants.TRAFFIC => ExpressionEnum.TRAFFIC_OFFENSES,
-                                  offenseScore = DueDiligence.Constants.INFRACTION => ExpressionEnum.INFRACTIONS_AND_ORDINANCES,
-                                  offenseScore = DueDiligence.Constants.FELONY AND enumReference = ExpressionEnum.THEFT => ExpressionEnum.FELONY_OR_AGGRAVATED_THEFT,
-                                  ExpressionEnum.UNCATEGORIZED);
-       
+    SHARED expressionDS := DATASET([
+                                    {OffenseID.UNCATEGORIZED,              OffensePriority.UNCATEGORIZED,                  DueDiligence.Constants.EMPTY,                                            LEVEL_0,   'Uncategorized'},
+                                                                                                                                                                  
+                                    {OffenseID.NO_OFFENSE_PROVIDED,        OffensePriority.NO_OFFENSE_PROVIDED,            DueDiligence.Constants.EMPTY,                                            LEVEL_2,   'No Offense Provided'},
+                                    {OffenseID.HUNT_FISH,                  OffensePriority.HUNT_FISH_GAME_OFFENSES,        DueDiligence.RegularExpressions.HUNT_FISH_GAME_OFFENSES,                 LEVEL_2,   'Hunt, Fish and Game Offenses'},
+                                    {OffenseID.LIVESTOCK_DOMESTIC_ANIMAL,  OffensePriority.LIVESTOCK_DOMESTIC_ANIMALS,     DueDiligence.RegularExpressions.LIVESTOCK_DOMESTIC_ANIMALS,              LEVEL_2,   'Livestock and Domestic Animal Offenses'},
+                                    {OffenseID.ORDINANCE_INFRACTION,       OffensePriority.ORDINANCES_AND_INFRACTIONS,     DueDiligence.RegularExpressions.ORDINANCES_AND_INFRACTIONS,              LEVEL_2,   'Ordinances and Infractions'},
+                                    {OffenseID.DUI,                        OffensePriority.DUI,                            DueDiligence.RegularExpressions.DUI,                                     LEVEL_2,   'DUI'},
+                                    {OffenseID.ALCOHOL,                    OffensePriority.ALCOHOL_RELATED,                DueDiligence.RegularExpressions.ALCOHOL,                                 LEVEL_2,   'Alcohol Related'},
+                                    {OffenseID.ZONING,                     OffensePriority.ZONING,                         DueDiligence.RegularExpressions.ZONING_BUILDING_VIOLATIONS,              LEVEL_2,   'Zoning and Building Violations'},
+                                    {OffenseID.TRAFFIC,                    OffensePriority.TRAFFIC_OFFENSES,               DueDiligence.RegularExpressions.TRAFFIC_RELATED,                         LEVEL_2,   'Traffic Related'},
+                                    {OffenseID.CHILD_SUPPORT,              OffensePriority.CHILD_SUPPORT,                  DueDiligence.RegularExpressions.CHILD_SUPPORT_AND_CUSTODY,               LEVEL_2,   'Child Support and Custody'},
+                                    {OffenseID.COURT,                      OffensePriority.COURT_CHARGES,                  DueDiligence.RegularExpressions.COURT_CHARGES,                           LEVEL_2,   'Court Charges'},
+                                    {OffenseID.DISORDERLY_CONDUCT,         OffensePriority.DISORDERLY_CONDUCT,             DueDiligence.RegularExpressions.DISORDERY_CONDUCT,                       LEVEL_2,   'Disorderly Conduct'},
+                                    {OffenseID.SHOPLIFTING,                OffensePriority.SHOPLIFTING,                    DueDiligence.RegularExpressions.SHOPLIFTING,                             LEVEL_2,   'Shoplifting'},
+                                    {OffenseID.TRESPASSING,                OffensePriority.TRESPASSING,                    DueDiligence.RegularExpressions.TRESPASSING,                             LEVEL_2,   'Trespassing'},
+                                    {OffenseID.IMMIGRATION,                OffensePriority.ALIEN_AND_IMMIGRATION,          DueDiligence.RegularExpressions.IMMIGRATION_ALIEN,                       LEVEL_2,   'Immigration and Alien'},
+                                                                                                                                                                                                      
+                                    {OffenseID.MISCONDUCT,                 OffensePriority.MISCONDUCT,                     DueDiligence.RegularExpressions.MISCONDUCT,                              LEVEL_3,   'Misconduct'},
+                                    {OffenseID.CYBER,                      OffensePriority.COMPUTER_AND_CYBER,             DueDiligence.RegularExpressions.COMPUTER_AND_CYBER,                      LEVEL_3,   'Computer and Cyber'},
+                                    {OffenseID.SANCTION,                   OffensePriority.SANCTIONS,                      DueDiligence.RegularExpressions.SANCTIONS_GENERAL,                       LEVEL_3,   'Sanctions'},
+                                    {OffenseID.GAMBLE,                     OffensePriority.GAMBLING,                       DueDiligence.RegularExpressions.GAMBLING_AND_CASINO,                     LEVEL_3,   'Gambling and Casino'},
+                                    {OffenseID.CONSPIRACY,                 OffensePriority.CONSPIRACY,                     DueDiligence.RegularExpressions.CONSPIRACY,                              LEVEL_3,   'Conspiracy - General'},
+                                    {OffenseID.PERJURY,                    OffensePriority.PERJURY,                        DueDiligence.RegularExpressions.PERJURY,                                 LEVEL_3,   'Perjury - General'},
+                                    {OffenseID.OBSTRUCTION,                OffensePriority.OBSTRUCTION_HINDER,             DueDiligence.RegularExpressions.OBSTRUCTION_HINDER,                      LEVEL_3,   'Obstruction and Hinder - General'},
+                                    {OffenseID.TAMPERING,                  OffensePriority.TAMPERING,                      DueDiligence.RegularExpressions.TAMPERING,                               LEVEL_3,   'Tampering - General'},
+                                    {OffenseID.DIGITAL_CURRENCY,           OffensePriority.DIGITAL_CURRENCY,               DueDiligence.RegularExpressions.DIGITAL_CURRENCY,                        LEVEL_3,   'Digital Currency'},
+                                    {OffenseID.DAMAGE_DESTROY,             OffensePriority.DAMAGE_DESTROY_ITEMS,           DueDiligence.RegularExpressions.DAMAGE_AND_DESTROY,                      LEVEL_3,   'Damage and Destroy Items - General'},
+                                                                                                                                                                                                      
+                                    {OffenseID.ELDER_EXPLOIT,              OffensePriority.ELDER_EXPLOITATION,             DueDiligence.RegularExpressions.ELDER_EXPLOITATION,                      LEVEL_4,   'Elder Exploitation'},
+                                    {OffenseID.FAMILY_PROVIDER_ABUSE,      OffensePriority.FAMILY_AND_PROVIDER_ABUSE,      DueDiligence.RegularExpressions.FAMILY_AND_PROVIDER_ABUSE,               LEVEL_4,   'Family and Provider Abuse'},
+                                    {OffenseID.ANIMAL_FIGHT,               OffensePriority.ANIMAL_FIGHTING,                DueDiligence.RegularExpressions.ANIMAL_FIGHTING,                         LEVEL_4,   'Animal Fighting'},
+                                    {OffenseID.FUGITIVE,                   OffensePriority.FUGITIVE_OR_WARRANT,            DueDiligence.RegularExpressions.FUGITIVE_OR_WARRANT,                     LEVEL_4,   'Fugitive or Warrant'},
+                                    {OffenseID.RIOT,                       OffensePriority.RIOT_CIVIL_DISORDER,            DueDiligence.RegularExpressions.RIOTS_AND_CIVIL_DISORDER,                LEVEL_4,   'Riot and Civil Disorder'},
+                                    {OffenseID.POISON,                     OffensePriority.POISONING,                      DueDiligence.RegularExpressions.POISONING,                               LEVEL_4,   'Poisoning'},
+                                    {OffenseID.EPA,                        OffensePriority.EPA_WASTE,                      DueDiligence.RegularExpressions.EPA_WASTE,                               LEVEL_4,   'EPA and Waste'},
+                                    {OffenseID.HARASS,                     OffensePriority.STALK_HARASS_TERRORIZE,         DueDiligence.RegularExpressions.STALKING_TERRORIZE,                      LEVEL_4,   'Stalking and Terrorize'},
+                                    {OffenseID.CYBER_STALK,                OffensePriority.CYBER_STALKING,                 DueDiligence.RegularExpressions.CYBER_STALKING,                          LEVEL_4,   'Cyber Stalking'},
+                                    {OffenseID.VIOLATE_ORDER,              OffensePriority.VIOLATING_ORDERS,               DueDiligence.RegularExpressions.VIOLATING_ORDERS,                        LEVEL_4,   'Violating Orders'},
+                                    {OffenseID.PROBATION_VIOLATION,        OffensePriority.PROBATION_PAROLE_VIOLATION,     DueDiligence.RegularExpressions.PROBATION_PAROLE_VIOLATION,              LEVEL_4,   'Probation or Parole Violation'},
+                                    {OffenseID.ARSON,                      OffensePriority.ARSON,                          DueDiligence.RegularExpressions.ARSON,                                   LEVEL_4,   'Arson'},
+                                    {OffenseID.HOMOCIDE,                   OffensePriority.MURDER_HOMOCIDE,                DueDiligence.RegularExpressions.MURDER_HOMOCIDE,                         LEVEL_4,   'Murder and Homicide'},
+                                    {OffenseID.KIDNAP,                     OffensePriority.KIDNAPPING_FALSE_IMPRISONMENT,  DueDiligence.RegularExpressions.KIDNAPPING_FALSE_IMPRISONMENT,           LEVEL_4,   'Kidnapping and False Imprisonment'},
+                                    {OffenseID.HATE_CRIME,                 OffensePriority.HATE_CRIME_AND_CIVIL_RIGHTS,    DueDiligence.RegularExpressions.HATE_CRIME_AND_CIVIL_RIGHTS,             LEVEL_4,   'Hate Crime and Civil Rights'},
+                                    {OffenseID.RETALIATION,                OffensePriority.RETALIATION,                    DueDiligence.RegularExpressions.RETALIATION,                             LEVEL_4,   'Retaliation'},
+                                    {OffenseID.BOOBY_TRAP,                 OffensePriority.BOOBY_TRAP,                     DueDiligence.RegularExpressions.BOOBY_TRAP,                              LEVEL_4,   'Booby Trap'},
+                                    {OffenseID.SABOTAGE,                   OffensePriority.SABOTAGE,                       DueDiligence.RegularExpressions.SABOTAGE,                                LEVEL_4,   'Sabotage'},
+                                    {OffenseID.VANDALISM,                  OffensePriority.VANDALISM,                      DueDiligence.RegularExpressions.VANDALISM,                               LEVEL_4,   'Vandalism and Criminal Mischief'},
+                                    {OffenseID.DEADLY_CONDUCT,             OffensePriority.DEADLY_CONDUCT,                 DueDiligence.RegularExpressions.DEADLY_CONDUCT,                          LEVEL_4,   'Deadly Conduct'},
+                                    {OffenseID.ASSAULT,                    OffensePriority.ASSAULT,                        DueDiligence.RegularExpressions.ASSAULT,                                 LEVEL_4,   'Assault'},
+                                    {OffenseID.RESISTING_ARREST,           OffensePriority.RESISTING_ARREST_ESCAPE,        DueDiligence.RegularExpressions.RESIST_ARREST_OR_ESCAPE,                 LEVEL_4,   'Resist Arrest or Escape'},
+                                                                                                                                                                                                      
+                                    {OffenseID.CORRUPT_MINOR,              OffensePriority.CORRUPTION_OF_MINOR,            DueDiligence.RegularExpressions.CORRUPT_MINOR,                           LEVEL_5,   'Corruption of Minor'},
+                                    {OffenseID.RAPE,                       OffensePriority.RAPE,                           DueDiligence.RegularExpressions.RAPE,                                    LEVEL_5,   'Rape'},
+                                    {OffenseID.SOLICITATION,               OffensePriority.SOLICITATION,                   DueDiligence.RegularExpressions.SOLICITATION,                            LEVEL_5,   'Solicitation - General'},
+                                    {OffenseID.SOLICITATION_SEX,           OffensePriority.SOLICITATION_SEX,               DueDiligence.RegularExpressions.SOLICITATION_SEX,                        LEVEL_5,   'Solicitation - Sex Offense Related'},
+                                    {OffenseID.PORN,                       OffensePriority.PORNOGRAPHY,                    DueDiligence.RegularExpressions.PORN,                                    LEVEL_5,   'Pornography'},
+                                    {OffenseID.PROSTITUTION,               OffensePriority.PROSTITUTION,                   DueDiligence.RegularExpressions.PROSTITUTION,                            LEVEL_5,   'Prostitution'},
+                                    {OffenseID.SEX,                        OffensePriority.SEX_OFFENSES,                   DueDiligence.RegularExpressions.SEX_OFFENSES,                            LEVEL_5,   'Sex Offenses'},
+                                                                                                                                                                                                      
+                                    {OffenseID.B_AND_E,                    OffensePriority.BREAKING_AND_ENTERING,          DueDiligence.RegularExpressions.BREAKING_AND_ENTERING,                   LEVEL_6,   'Breaking and Entering'},
+                                    {OffenseID.BURGLARY,                   OffensePriority.BURGLARY,                       DueDiligence.RegularExpressions.BURGLARY,                                LEVEL_6,   'Burglary'},
+                                    {OffenseID.CARJACK,                    OffensePriority.CAR_JACK,                       DueDiligence.RegularExpressions.CAR_JACKING,                             LEVEL_6,   'Car Jacking'},
+                                    {OffenseID.AGG_THEFT,                  OffensePriority.FELONY_OR_AGGRAVATED_THEFT,     DueDiligence.RegularExpressions.FELONY_AGGRAVATED_THEFT,                 LEVEL_6,   'Felony and Aggravated Theft'},
+                                    {OffenseID.THEFT,                      OffensePriority.THEFT,                          DueDiligence.RegularExpressions.GENERAL_THEFT,                           LEVEL_6,   'General Theft'},
+                                    {OffenseID.BANK_ROBBERY,               OffensePriority.BANK_ROBBERY,                   DueDiligence.RegularExpressions.BANK_ROBBERY,                            LEVEL_6,   'Bank Robbery'},
+                                    {OffenseID.ARMED_ROBBERY,              OffensePriority.ARMED_ROBBERY,                  DueDiligence.RegularExpressions.ARMED_ROBBERY,                           LEVEL_6,   'Armed Robbery'},
+                                    {OffenseID.ROBBERY,                    OffensePriority.ROBBERY,                        DueDiligence.RegularExpressions.ROBBERY,                                 LEVEL_6,   'Robbery'},
+                                                                                                                                                                                                      
+                                    {OffenseID.WIRE_FRAUD,                 OffensePriority.WIRE_FRAUD,                     DueDiligence.RegularExpressions.WIRE_FRAUD,                              LEVEL_7,   'Wire Fraud'},
+                                    {OffenseID.BANK_FRAUD,                 OffensePriority.BANK_FRAUD,                     DueDiligence.RegularExpressions.BANK_FRAUD,                              LEVEL_7,   'Bank Fraud'},
+                                    {OffenseID.FINANCIAL_FRAUD,            OffensePriority.CREDIT_CARD_FRAUD,              DueDiligence.RegularExpressions.FINANCIAL_CARD_FRAUD,                    LEVEL_7,   'Financial Card Fraud'},
+                                    {OffenseID.TAX_FRAUD,                  OffensePriority.TAX_FRAUD,                      DueDiligence.RegularExpressions.TAX_FRAUD,                               LEVEL_7,   'Tax Fraud'},
+                                    {OffenseID.MORTGAGE_FRAUD,             OffensePriority.MORTGAGE_FRAUD,                 DueDiligence.RegularExpressions.MORTGAGE_FRAUD,                          LEVEL_7,   'Mortgage Fraud'},
+                                    {OffenseID.HEALTHCARE_FRAUD,           OffensePriority.HEALTHCARE_FRAUD,               DueDiligence.RegularExpressions.HEALTHCARE_FRAUD,                        LEVEL_7,   'Healthcare Fraud'},
+                                    {OffenseID.EMPLOYMENT_FRAUD,           OffensePriority.EMPLOYMENT_WORK_COMP_FRAUD,     DueDiligence.RegularExpressions.EMPLOYEMENT_WORK_COMP_FRAUD,             LEVEL_7,   'Employment and Work Comp Fraud'},
+                                    {OffenseID.INSURANCE_FRAUD,            OffensePriority.INSURANCE_FRAUD,                DueDiligence.RegularExpressions.INSURANCE_FRAUD,                         LEVEL_7,   'Insurance Fraud'},
+                                    {OffenseID.ORGANIZED_FRAUD,            OffensePriority.ORGANIZED_FRAUD,                DueDiligence.RegularExpressions.ORGANIZED_FRAUD,                         LEVEL_7,   'Organized Fraud'},
+                                    {OffenseID.INVOICE_FRAUD,              OffensePriority.INVOICE_FRAUD,                  DueDiligence.RegularExpressions.INVOICE_FRAUD,                           LEVEL_7,   'Invoice Fraud'},
+                                    {OffenseID.CHECK_FRAUD,                OffensePriority.CHECK_FRAUD,                    DueDiligence.RegularExpressions.CHECK_FRAUD,                             LEVEL_7,   'Check Fraud'},
+                                    {OffenseID.FRAUD,                      OffensePriority.FRAUD,                          DueDiligence.RegularExpressions.GENERAL_FRAUD,                           LEVEL_7,   'General Fraud'},
+                                    {OffenseID.COUNTERFEIT,                OffensePriority.FORGE_AND_COUNTERFEIT,          DueDiligence.RegularExpressions.FORGE_AND_COUNTERFEIT,                   LEVEL_7,   'Forge and Counterfeit'},
+                                    {OffenseID.ID_FRAUD_THEFT,             OffensePriority.IDENTITY_FRAUD_AND_THEFT,       DueDiligence.RegularExpressions.ID_FRAUD_AND_THEFT,                      LEVEL_7,   'Identity Fraud and Theft'},
+                                    {OffenseID.IMPERSONATION,              OffensePriority.FALSE_STATEMENTS_IMPERSONATION, DueDiligence.RegularExpressions.FALSE_STATEMENT_OR_IMPERSONATION,        LEVEL_7,   'False Statement or Impersonation'},
+                                    {OffenseID.OPERATE_NO_LICENSE,         OffensePriority.OPERATE_WITHOUT_LICENSE,        DueDiligence.RegularExpressions.OPERATE_WITHOUT_LICENSE,                 LEVEL_7,   'Operate Without License'},
+                                    {OffenseID.EMBEZZLEMENT,               OffensePriority.EMBEZZLEMENT,                   DueDiligence.RegularExpressions.EMBEZZLE_MISAPPROPRIATE_MISMANAGE_FUNDS, LEVEL_7,   'Embezzle, Misappropriate, and Mismanagement of Funds'},
+                                    {OffenseID.TAX,                        OffensePriority.TAX_OFFENSES,                   DueDiligence.RegularExpressions.TAX_OFFENSES,                            LEVEL_7,   'Tax Offenses - General'},
+                                    {OffenseID.CONCEAL_FUNDS_PROPERTY,     OffensePriority.CONCEAL_FUNDS_OR_PROPERTY,      DueDiligence.RegularExpressions.CONCEAL_FUNDS_OR_PROPERTY,               LEVEL_7,   'Concealment of Funds or Property'},
+                                    {OffenseID.OBTAIN_PROP_FALSE_PRETENSE, OffensePriority.OBTAIN_PROP_BY_FALSE_PRETENSE,  DueDiligence.RegularExpressions.OBTAIN_PROPERTY_BY_FALSE_PRETENSE,       LEVEL_7,   'Obtain Property by False Pretense'},
 
-        additionalChecks := MAX(offenseCategoryResult, trafficResult, offenseScoreResult);
+                                    {OffenseID.HUMAN_TRAFFICKING,          OffensePriority.TRAFFICKING_SMUGGLING_HUMAN,    DueDiligence.RegularExpressions.HUMAN_TRAFFICKING_SMUGGLING,             LEVEL_8,   'Human Trafficking and Smuggling'},
+                                    {OffenseID.DRUG_TRAFFICKING,           OffensePriority.TRAFFICKING_SMUGGLING_DRUGS,    DueDiligence.RegularExpressions.DRUG_TRAFFICKING_SMUGGLING,              LEVEL_8,   'Drugs Trafficking and Smuggling'},
+                                    {OffenseID.ARMS_TRAFFICKING,           OffensePriority.TRAFFICKING_SMUGGLING_ARMS,     DueDiligence.RegularExpressions.ARMS_TRAFFICKING_SMUGGLING,              LEVEL_8,   'Arms Trafficking and Smuggling'},
+                                    {OffenseID.OTHER_TRAFFICKING,          OffensePriority.TRAFFICKING_SMUGGLING_OTHER,    DueDiligence.RegularExpressions.OTHER_TRAFFICKING_SMUGGLING,             LEVEL_8,   'Other Trafficking and Smuggling'},
+                                    {OffenseID.EXPLOSIVES,                 OffensePriority.EXPLOSIVES_DESTRUCTION_DEVICES, DueDiligence.RegularExpressions.EXPLOSIVES_DEVICES,                      LEVEL_8,   'Explosives and Devices'},
+                                    {OffenseID.WEAPONS,                    OffensePriority.WEAPONS,                        DueDiligence.RegularExpressions.WEAPONS,                                 LEVEL_8,   'Weapons'},
+                                    {OffenseID.DRUGS,                      OffensePriority.DRUGS,                          DueDiligence.RegularExpressions.DRUGS,                                   LEVEL_8,   'Drugs'},
+                                    {OffenseID.DIST_DRUGS_WEAPONS,         OffensePriority.DISTRIBUTION_DRUGS_OR_WEAPONS,  DueDiligence.RegularExpressions.MANUFACTURE_DISTRIBUTE_DRUGS_WEAPONS,    LEVEL_8,   'Manufacture and Distribute Drugs and Weapons'},
 
-        RETURN additionalChecks;
-    END;
-    
+                                    {OffenseID.GANG,                       OffensePriority.GANG_ACTIVITIES,                DueDiligence.RegularExpressions.GANG_ACTIVITIES,                         LEVEL_9,   'Gang Activities'},
+                                    {OffenseID.TREASON,                    OffensePriority.TREASON_ESPIONAGE,              DueDiligence.RegularExpressions.TREASON_ESPIONAGE,                       LEVEL_9,   'Treason and Espionage'},
+                                    {OffenseID.SYNDICALISM,                OffensePriority.CRIMINAL_SYNDICALISM,           DueDiligence.RegularExpressions.CRIMINAL_SYNDICALISM,                    LEVEL_9,   'Criminal Syndicalism'},
+                                    {OffenseID.MONEY_LAUNDER,              OffensePriority.MONEY_LAUNDERING,               DueDiligence.RegularExpressions.MONEY_LAUNDERING,                        LEVEL_9,   'Money Laundering'},
+                                    {OffenseID.TERRORISM,                  OffensePriority.TERRORISM,                      DueDiligence.RegularExpressions.TERRORISM,                               LEVEL_9,   'Terrorism'},
+                                    {OffenseID.ORGANIZED_CRIME,            OffensePriority.ORGANIZED_CRIME,                DueDiligence.RegularExpressions.ORGANIZED_CRIME,                         LEVEL_9,   'Organized Crime'},
+                                    {OffenseID.OBSTRUCT_JUSTICE,           OffensePriority.OBSTRUCTION_OF_JUSTICE,         DueDiligence.RegularExpressions.OBSTRUCTION_OF_JUSTICE,                  LEVEL_9,   'Obstruction of Justice'},
+                                    {OffenseID.ELECTION_CORRUPTION,        OffensePriority.ELECTION_CORRUPTION,            DueDiligence.RegularExpressions.ELECTION_CRIMES_CORRUPTION,              LEVEL_9,   'Election Crimes and Corruption'},
+                                    {OffenseID.POLITICAL_CORRUPTION,       OffensePriority.POLITICAL_CORRUPTION,           DueDiligence.RegularExpressions.POLITICAL_CRIMES_CORRUPTION,             LEVEL_9,   'Political Crimes and Corruption'},
+                                    {OffenseID.CORRUPTION_BRIBERY,         OffensePriority.CORRUPTION_OR_BRIBERY,          DueDiligence.RegularExpressions.CORRUPTION_BRIBERY_KICKBACKS,            LEVEL_9,   'Corruption, Bribery and Kickbacks'},
+                                    {OffenseID.TAX_EVASION,                OffensePriority.TAX_EVASION,                    DueDiligence.RegularExpressions.TAX_EVASION,                             LEVEL_9,   'Money Laundering - Product Tax Evasion'},
+                                    {OffenseID.BLACKMAIL,                  OffensePriority.EXTORTION_AND_BLACKMAIL,        DueDiligence.RegularExpressions.EXTORTION_AND_BLACKMAIL,                 LEVEL_9,   'Extortion and Blackmail'},
+                                    {OffenseID.CHOP_SHOP,                  OffensePriority.CHOP_SHOP,                      DueDiligence.RegularExpressions.CHOP_SHOP,                               LEVEL_9,   'Chop Shop'},
+                                    {OffenseID.ANTITRUST,                  OffensePriority.ANTITRUST_VIOLATIONS,           DueDiligence.RegularExpressions.ANTITRUST_VIOLATIONS,                    LEVEL_9,   'Antitrust Violations'},
+                                    {OffenseID.SECURITIES_COMMODITIES,     OffensePriority.SECURITIES_AND_COMMODITIES,     DueDiligence.RegularExpressions.SECURITIES_AND_COMMODITIES,              LEVEL_9,   'Securities and Commodities'},
+                                    {OffenseID.RACKETEERING,               OffensePriority.RACKETEERING,                   DueDiligence.RegularExpressions.RACKETEERING,                            LEVEL_9,   'Racketeering'},
+                                    {OffenseID.MONEY_TRANSMITTER,          OffensePriority.MONEY_TRANSMITTER,              DueDiligence.RegularExpressions.MONEY_TRANSMITTER,                       LEVEL_9,   'Money Transmitter'},
+                                    {OffenseID.STRUCTURING,                OffensePriority.STRUCTURING,                    DueDiligence.RegularExpressions.STRUCTURING,                             LEVEL_9,   'Structuring'},
+                                    {OffenseID.IMPORT_EXPORT,              OffensePriority.IMPORT_EXPORT,                  DueDiligence.RegularExpressions.IMPORT_EXPORT_OFFENSES,                  LEVEL_9,   'Import and Export Offenses'},
+                                    {OffenseID.TRANSPORTATION,             OffensePriority.TRANSPORTATION_VIOLATIONS,      DueDiligence.RegularExpressions.TRANSPORTATION_VIOLATIONS,               LEVEL_9,   'Transportation Violations'},
+                                    {OffenseID.COMMUNICATION_INTERCEPT,    OffensePriority.COMMUNICATION_INTERCEPTION,     DueDiligence.RegularExpressions.COMMUNICATION_INTERCEPTION,              LEVEL_9,   'Communication Interception'},
+                                    {OffenseID.CRIMINAL_PROCEEDS,          OffensePriority.CRIMINAL_PROCEEDS,              DueDiligence.RegularExpressions.CRIMINAL_PROCEEDS,                       LEVEL_9,   'Criminal Proceeds'}], ExpressionDSLayout);
+
+                                
+    SHARED expressionDCT := DICTIONARY(expressionDS, {id => expressionDS}); 
+    EXPORT dctByPriority := DICTIONARY(expressionDS, {priorityOrder => expressionDS}); 
+  
     
     
     //Common routine to determine if the text contains the definition of the expression
-		SHARED doesTextContainExpression(UNSIGNED4 enumReference, STRING textToSearch) := FUNCTION
+		SHARED getOffensePriorityByLevel(UNSIGNED4 enumReferenceByID, STRING textToSearch) := FUNCTION
     
         trimTextToSearch := TRIM(textToSearch, LEFT, RIGHT);
         
-        expressionDetails := expressionDCT[enumReference];
+        expressionDetails := expressionDCT[enumReferenceByID];
         
-        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => IF(expressionDetails.expressionCategory = LEVEL_2, ExpressionEnum.NO_OFFENSE_PROVIDED, ExpressionEnum.UNCATEGORIZED),
-                                 STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => IF(expressionDetails.expressionCategory = LEVEL_2, ExpressionEnum.NO_OFFENSE_PROVIDED, ExpressionEnum.UNCATEGORIZED),
-                                 expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
-                                 IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.expressionWeight, ExpressionEnum.UNCATEGORIZED));                        
+        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => IF(expressionDetails.level = LEVEL_2, OffensePriority.NO_OFFENSE_PROVIDED, OffensePriority.UNCATEGORIZED),
+                                 STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => IF(expressionDetails.level = LEVEL_2, OffensePriority.NO_OFFENSE_PROVIDED, OffensePriority.UNCATEGORIZED),
+                                 expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => OffensePriority.UNCATEGORIZED,
+                                 IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.priorityOrder, OffensePriority.UNCATEGORIZED));                        
                                
        
         RETURN expressionResults;
 		END;
     
     
-    
-    
 
-    EXPORT expressionDetails(ExpressionEnum expressionReference) := expressionDCT[expressionReference];
-    EXPORT expressionTextByEnum(ExpressionEnum expressionReference) := expressionDCT[expressionReference].expressionText;
-    EXPORT expressionDictionary := expressionDCT;
+    EXPORT expressionTextByEnum(OffensePriority expressionReference) := expressionDCT[expressionReference].description;
+
     
     
-    EXPORT getMaxLevel(STRING charge, STRING1 offenseScore, UNSIGNED offenseCategory, STRING1 trafficFlag, UNSIGNED1 level) := FUNCTION
+    EXPORT getMaxLevel(STRING charge, STRING1 offenseScore, UNSIGNED offenseCategory, STRING1 trafficFlag, UNSIGNED1 inLevel) := FUNCTION
         
-        tempCharge := charge + ' '; //adding blank to account for charges that end with schedule I/II/III/IV, etc.. (have to be surrounded by blanks)
-          
-        allInLevel := expressionDS(expressionCategory = level);
+        allInLevel := expressionDS(level = inLevel);
         
         determineMaxLevel := PROJECT(allInLevel, TRANSFORM({RECORDOF(LEFT), UNSIGNED levelResult},
-																														resultedWeight := doesTextContainExpression(LEFT.expressionWeight, tempCharge);
+																														resultedWeight := getOffensePriorityByLevel(LEFT.id, charge);
 																														SELF.levelResult := resultedWeight;
 																														SELF := LEFT;));
         
-        getMaxLevelByLevel := DEDUP(SORT(determineMaxLevel, -levelResult, -expressionWeight), expressionCategory);
+        getMaxLevelByLevel := DEDUP(SORT(determineMaxLevel, -levelResult, -priorityOrder), level);
 
         RETURN getMaxLevelByLevel[1].levelResult;
     END;

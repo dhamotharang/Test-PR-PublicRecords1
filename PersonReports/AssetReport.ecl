@@ -8,6 +8,11 @@ EXPORT  AssetReport (
   PersonReports.input._assetreport param,
   boolean IsFCRA = false) := FUNCTION
 
+  //Convert to the old _report style module:
+  mod_access := $.IParam.MAC_CreateIDataAccessReportModule(param);
+  mod_asset := MODULE (PROJECT (param, $.IParam._assetreport), mod_access)
+  END;
+
  // DID should be atmost one (do we keep layout_references for legacy reasons?)
   did := dids[1].did;
 
@@ -75,7 +80,8 @@ EXPORT  AssetReport (
   p_aircrafts   := choosen (PersonReports.aircraft_records(dids, module (project (param, PersonReports.input.aircrafts)) end, IsFCRA, ds_flags, 
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Aircraft
                                      )), iesp.Constants.BR.MaxAircrafts);
-  p_paw         := choosen (PersonReports.peopleatwork_records(dids, module (project (param, PersonReports.input.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+
+  p_paw         := choosen (PersonReports.peopleatwork_records(dids, PROJECT (mod_asset, $.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
 
   // -----------------------------------------------------------------------
   // COUNTS (cannot use doxie.key_did_lookups_v2 -- not always in sync);

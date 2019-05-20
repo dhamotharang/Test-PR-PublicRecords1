@@ -8,7 +8,7 @@ out_rec := iesp.peopleatwork.t_PeopleAtWorkRecord;
 
 EXPORT out_rec peopleatwork_records (
   dataset (doxie.layout_references) dids,
-  input.peopleatwork in_params = module (input.peopleatwork) end,
+  $.IParam.peopleatwork in_params = module ($.IParam.peopleatwork) end,
   boolean IsFCRA = false) := FUNCTION
 
   // this is copy/paste from paw_services/PAWSearchService_Records; shouldn't be this way:
@@ -102,4 +102,3 @@ EXPORT out_rec peopleatwork_records (
   // generally defined in different order. So, I'll jsut choose some making-sense-fields
   RETURN sort (res, -DateLastSeen, -DateFirstSeen, CompanyName, Phone10, Title, Name, record);
 END;
-

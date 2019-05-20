@@ -1,4 +1,4 @@
-import business_header, bipv2,_control;
+﻿import business_header, bipv2,_control;
 EXPORT MAC_Match_Flex_V2
 (
    infile
@@ -33,6 +33,7 @@ EXPORT MAC_Match_Flex_V2
   ,pSource                 = ''
   ,pSource_record_id       = ''
   ,src_matching_is_priority = FALSE
+  ,bGetAllScores=TRUE
 ) :=
 MACRO
 import _control;
@@ -58,6 +59,7 @@ import _control;
     STRING80   company_url;
     STRING9    contact_ssn;
     STRING60   contact_email;
+    UNSIGNED6  entered_proxid;
   END;
   #UNIQUENAME(lBatchOutput)
   %lBatchOutput%:=  RECORD
@@ -74,6 +76,7 @@ import _control;
     UNSIGNED6  dotid;
     UNSIGNED6  parent_proxid;
     UNSIGNED6  sele_proxid;
+    UNSIGNED6  org_proxid;
     UNSIGNED6  ultimate_proxid;
     BOOLEAN    has_lgid;
     STRING120  company_name;
@@ -105,6 +108,7 @@ import _control;
     UNSIGNED4  dt_first_seen;
     UNSIGNED4  dt_last_seen;
     UNSIGNED4  dt_vendor_last_reported;
+    STRING9    duns_number;
     UNSIGNED6  company_bdid;
     STRING9    company_fein;
     STRING10   company_phone;
@@ -210,14 +214,12 @@ import _control;
     #IF(#TEXT(pEmail)<>'')             SELF.contact_email:=LEFT.pEmail;               #END
     SELF:=[];
   ));
-
   // For testing on the 190, change "roxiecertossvip.sc.seisint.com:9876" to "roxiedevvip.sc.seisint.com:9876"
   #UNIQUENAME(dResults)
   %dResults%:=PIPE(%dInputFormatted%,
     'roxiepipe -iw '+ SIZEOF(%lBatchInput%)+' -t 1 -ow '+ SIZEOF(%lBatchOutput%)+' -b 1000 -mr 2 -h roxiecertossvip.sc.seisint.com:9876 -vip -r Results '+
     '-q "<BizLinkFull.svcbatch format=\'raw\'><best_level>FULLRESULTS</best_level><batch_in id=\'id\' format=\'raw\'></batch_in></BizLinkFull.svcbatch>"',
     %lBatchOutput%);
-
   // The #IF block below is a manual force on address elements if those fields
   // are present in the call
   Outfile2:=JOIN
@@ -235,11 +237,16 @@ import _control;
           )
         )
       #end
-    ,TRANSFORM(outrec,SELF.proxweight:=RIGHT.weight;SELF.proxscore:=RIGHT.score;SELF.proxid:=RIGHT.proxid;SELF:=LEFT;),LEFT OUTER
+    ,TRANSFORM(outrec,
+      SELF.proxweight:=RIGHT.weight;
+      SELF.proxscore:=RIGHT.score;
+      SELF.proxid:=RIGHT.proxid;
+      SELF.seleid := right.seleid;
+      SELF.orgid := RIGHT.orgid;
+      SELF.ultid := RIGHT.ultid;      
+      SELF:=LEFT;),LEFT OUTER
   );
-
 #ELSE
-
 import BIPV2_Company_Names, BizLinkFull,ut,_Control;
 //add counter
 #uniquename(zipset)
@@ -254,7 +261,7 @@ project(
     self.cntr := counter,
     self.%zipset% :=
       #if('A' in matchset)
-        DATASET([{left.zip_field,100}],BizLinkFull.Process_Biz_layouts.layout_zip_cases);
+        If(left.zip_field <> '', DATASET([{left.zip_field,100}],BizLinkFull.Process_Biz_layouts.layout_zip_cases), DATASET([],BizLinkFull.Process_Biz_layouts.layout_zip_cases));
       #else
         DATASET([],BizLinkFull.Process_Biz_layouts.layout_zip_cases);
       #end
@@ -409,15 +416,7 @@ boolean %ThorForced% := %force% = 'thor';
     // ); 
   outfile2 := %outfile20%; //USE OF SUCCES AND FAILURE HERE CAUSES AN EXTRA LINKING GRAPH (W20130204-090200)
 #else
-/*
-OLD (infile,Ref='',Input_empid = '',Input_powid = '',Input_proxid = '',Input_orgid = '',Input_ultid = '',Input_company_name = '',Input_cnp_name = '',Input_company_phone = '',Input_company_fein = '',Input_company_sic_code = '',Input_company_prim_range = '',Input_company_prim_name = '',Input_company_p_city_name = '',Input_company_st = '',Input_company_zip5 = '',Input_isContact = '',Input_contact_title = '',Input_contact_fname = '',Input_contact_mname = '',Input_contact_lname = '',Input_contact_name_suffix = '',OutFile,AsIndex='true',Stats='')
-NEW (infile,Ref='',Input_orgid = '',Input_ultid = '',Input_pSource_record_id = '',Input_company_phone = '',Input_company_fein = '',Input_company_url = '',Input_company_name = '',Input_cnp_name = '',
-Input_CONTACTNAME = '',Input_STREETADDRESS = '',Input_prim_name = '',Input_zip = '',Input_prim_range = '',Input_sec_range = '',Input_p_city_name = '',Input_company_sic_code1 = '',
-Input_lname = '',Input_mname = '',Input_fname = '',Input_name_suffix = '',Input_st = '',Input_pSource = '',Input_isContact = '',Input_title = '',
-Input_parent_proxid = '',Input_ultimate_proxid = '',Input_has_lgid = '',Input_empid = '',Input_powid = '',Input_contact_email = '',OutFile,AsIndex='true',Stats='')
-*/
   Business_Header_SS.MAC_MEOW_Biz_Batch_version_BIP(
-  //(infile,Ref='',Input_empid = '',Input_powid = '',Input_proxid = '',Input_orgid = '',Input_ultid = '',Input_company_name = '',Input_cnp_name = '',Input_company_phone = '',Input_company_fein = '',Input_company_sic_code = '',Input_company_prim_range = '',Input_company_prim_name = '',Input_company_p_city_name = '',Input_company_st = '',Input_company_zip5 = '',Input_isContact = '',Input_contact_title = '',Input_contact_fname = '',Input_contact_mname = '',Input_contact_lname = '',Input_contact_name_suffix = '',OutFile,AsIndex='true',Stats='') := MACRO
     %infilecnp%             //infile
     ,cntr                   //Ref=''
     ,                       //Input_SELEid = ''
@@ -470,13 +469,14 @@ Input_parent_proxid = '',Input_ultimate_proxid = '',Input_has_lgid = '',Input_em
     ,                       //Input_has_lgid = ''
     ,                       //Input_empid = ''
     ,                       //Input_powid = ''
-    ,pContact_ssn            //Input_pContact_ssn = ''        // ****     NEEDS NEW VERSION OF BIZLINKFULL
+    ,pContact_ssn            //Input_pContact_ssn = ''        // ****     NEEDS NEW VERSION OF BizLinkFull
     ,                       //Input_contact_email = ''
     ,src_matching_is_priority                               // ****     WE CAN DROP THIS HERE FOR NOW SINCE WE ARENT USING IT YET
     
     ,%OutFile1%             //OutFile
     ,%useKeyedJoins%        //AsIndex='true'
     ,                       //Stats=''
+    ,bGetAllScores
   )
   
   // output(%OutFile1%, named('OutFile1'));
@@ -506,19 +506,19 @@ Input_parent_proxid = '',Input_ultimate_proxid = '',Input_has_lgid = '',Input_em
       
       self.seleweight := if(SG,left.results_seleid[counter].weight,0);
       self.selescore  := if(SG,left.results_seleid[counter].score,0);
-      self.seleid := if(SG,left.results_seleid[counter].seleid,0);
+      self.seleid := if(SG,IF(left.results_seleid[counter].seleid=0,LEFT.results[COUNTER].seleid,left.results_seleid[counter].seleid),0);
       
       self.orgweight := if(OG,left.results_orgid[counter].weight,0);
       self.orgscore := if(OG,left.results_orgid[counter].score,0);
-      self.orgid := if(OG,left.results_orgid[counter].orgid,0);
+      self.orgid := if(OG,IF(left.results_orgid[counter].orgid=0,LEFT.results[COUNTER].orgid,left.results_orgid[counter].orgid),0);
       
       self.ultweight := if(UG,left.results_ultid[counter].weight,0);
       self.ultscore := if(UG,left.results_ultid[counter].score,0);
-      self.ultid := if(UG,left.results_ultid[counter].ultid,0);
+      self.ultid := if(UG,IF(left.results_ultid[counter].ultid=0,LEFT.results[COUNTER].ultid,left.results_ultid[counter].ultid),0);
       
       self.powweight := if(UG,left.results_powid[counter].weight,0);
       self.powscore := if(UG,left.results_powid[counter].score,0);
-      self.powid := if(UG,left.results_powid[counter].powid,0);
+      self.powid := if(UG,IF(left.results_powid[counter].powid=0,LEFT.results[COUNTER].powid,left.results_powid[counter].powid),0);
       self:= left.results[counter];    
     )
   )((score >= (integer)score_threshold or ultscore >= (integer)score_threshold), (proxid > 0 or ultid > 0));// proxid > 0 also because of case where threshold is zero (without this you get keep_count records even with no IDs on them)
@@ -636,6 +636,3 @@ Input_parent_proxid = '',Input_ultimate_proxid = '',Input_has_lgid = '',Input_em
 // output(%outfHasSELE%, named('outfHasSELE'));
 // output(score_threshold, named('score_threshold'));
 ENDMACRO;
-
-
-

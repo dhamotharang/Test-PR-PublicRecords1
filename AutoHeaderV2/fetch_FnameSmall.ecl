@@ -1,4 +1,4 @@
-import ut,doxie,NID,AutoHeaderV2;
+import ut,doxie,dx_header,NID,AutoHeaderV2;
 
 export fetch_FnameSmall (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 	_row := ds_search[1];
@@ -26,8 +26,8 @@ export fetch_FnameSmall (dataset (AutoheaderV2.layouts.search) ds_search, intege
 	temp_date_last_seen_value := _row.taddress.date_lastseen;
 	temp_allow_date_seen_value := _row.taddress.allow_dateseen;
 
-	i := doxie.Key_Header_FnameSmall;
-	dti := doxie.Key_Header_DTS_FnameSmall;
+	i := dx_header.key_FnameSmall();
+	dti := dx_header.key_DTS_FnameSmall();
 
 	first_fil := temp_lname_value='' AND temp_fname_value<>'';
 

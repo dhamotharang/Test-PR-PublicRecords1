@@ -101,10 +101,11 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered(__in,__cfg).__Result;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__in,__cfg_Local).__ENH_Person;
-  SHARED __EE497067 := __ENH_Person;
-  SHARED __EE501369 := __EE497067(__T(__OP2(__EE497067.UID,IN,__CN(__PLexIDs))));
-  SHARED __ST19288_Layout := RECORD
+  SHARED __EE798747 := __ENH_Person;
+  SHARED __EE803074 := __EE798747(__T(__OP2(__EE798747.UID,IN,__CN(__PLexIDs))));
+  SHARED __ST26330_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
+    KEL.typ.str Lex_I_D_Seen_ := '';
     KEL.typ.int Felony_Cnt1_Y_ := 0;
     KEL.typ.int Felony_Cnt7_Y_ := 0;
     KEL.typ.nstr Felony_New1_Y_;
@@ -150,9 +151,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     KEL.typ.int Bk_Cnt1_Y_ := 0;
     KEL.typ.int Bk_Cnt7_Y_ := 0;
     KEL.typ.int Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST17426_Layout) Dt_Of_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST17448_Layout) Dt_Of_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST17470_Layout) Dt_Of_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24468_Layout) Dt_Of_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24490_Layout) Dt_Of_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24512_Layout) Dt_Of_Bks_List10_Y_;
     KEL.typ.nstr Bk_New1_Y_;
     KEL.typ.nstr Bk_New7_Y_;
     KEL.typ.nstr Bk_New10_Y_;
@@ -165,9 +166,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt1_Y_;
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt7_Y_;
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt10_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST17655_Layout) Ch_For_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST17686_Layout) Ch_For_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST17717_Layout) Ch_For_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24697_Layout) Ch_For_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24728_Layout) Ch_For_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24759_Layout) Ch_For_Bks_List10_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Ch1_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Ch7_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Ch10_Y_;
@@ -183,9 +184,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     KEL.typ.nstr Mon_Since_Newest_Bk_Update_Cnt1_Y_;
     KEL.typ.nstr Mon_Since_Newest_Bk_Update_Cnt7_Y_;
     KEL.typ.nstr Mon_Since_Newest_Bk_Update_Cnt10_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST18464_Layout) Disp_Of_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST18492_Layout) Disp_Of_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST18520_Layout) Disp_Of_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25506_Layout) Disp_Of_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25534_Layout) Disp_Of_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25562_Layout) Disp_Of_Bks_List10_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Disp1_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Disp7_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Disp10_Y_;
@@ -204,9 +205,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     KEL.typ.int Bk_Discharged_Cnt1_Y_ := 0;
     KEL.typ.int Bk_Discharged_Cnt7_Y_ := 0;
     KEL.typ.int Bk_Discharged_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST19015_Layout) Type_Of_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST19053_Layout) Type_Of_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST19091_Layout) Type_Of_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26057_Layout) Type_Of_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26095_Layout) Type_Of_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26133_Layout) Type_Of_Bks_List10_Y_;
     KEL.typ.nstr Bk_Having_Bus_Type_Flag1_Y_;
     KEL.typ.nstr Bk_Having_Bus_Type_Flag7_Y_;
     KEL.typ.nstr Bk_Having_Bus_Type_Flag10_Y_;
@@ -215,5 +216,5 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE501369,TRANSFORM(__ST19288_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE803074,TRANSFORM(__ST26330_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
 END;

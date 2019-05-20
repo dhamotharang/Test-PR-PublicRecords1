@@ -26,19 +26,19 @@ EXPORT WorkPlace_BatchService(useCannedRecs = 'false') := MACRO
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #stored('useOnlyBestDID',true); // used to determine the 1 "best" did for the input criteria
 
-  Pre_result := BatchServices.WorkPlace_Records(useCannedRecs);
-	ut.mac_TrimFields(Pre_result, 'Pre_result', result);	
 
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+
+  Pre_result := BatchServices.WorkPlace_Records(mod_access, useCannedRecs);
+	ut.mac_TrimFields(Pre_result, 'Pre_result', result);	
+
   IF (exists(result), doxie.compliance.logSoldToTransaction(mod_access)); 
 
 	returnDetailedRoyalties	:= false : stored('ReturnDetailedRoyalties');	
 	royalties := Royalty.RoyaltyWorkplace.GetBatchRoyaltySet(result,,returnDetailedRoyalties);
 	
 	OUTPUT(result, NAMED('Results'));	
-	OUTPUT(royalties, NAMED('RoyaltySet'));	
-	
-
+	OUTPUT(royalties, NAMED('RoyaltySet'));
 	
 ENDMACRO;
 

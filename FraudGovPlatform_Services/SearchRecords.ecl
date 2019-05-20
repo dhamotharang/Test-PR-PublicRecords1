@@ -25,12 +25,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 
 	EXPORT ds_adl_in := PROJECT(ds_input_with_adl_did, 
 												TRANSFORM(DidVille.Layout_Did_OutBatch,
-													SELF.fname	:= LEFT.name_first,
-													SELF.mname	:= LEFT.name_middle,
-													SELF.lname	:= LEFT.name_last,
-													SELF.suffix	:= LEFT.name_suffix,
-													SELF.phone10:= LEFT.phoneno,
-													SELF	:= LEFT,
+													SELF.Seq := COUNTER, 
+													SELF.did := LEFT.did, 													
 													SELF	:= []));
 	
 	ds_contributory_in := PROJECT(ds_allPayloadRecs , 
@@ -106,7 +102,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																		SELF.ClusterName := RIGHT.label_,
 																		SELF.NumberOfClusters := COUNT(ds_raw_cluster_recs(	entity_name = LEFT.fragment AND
 																																												entity_value = LEFT.fragment_value)),
-																		SELF.NumberOfIdentities := RIGHT.cl_identity_count_,
+																		SELF.NumberOfIdentities := (integer) RIGHT.flags(indicator = 'identity_count_')[1].value,
 																		SELF.NVPs := CHOOSEN( PROJECT(RIGHT.flags, 
 																														TRANSFORM(iesp.share.t_NameValuePair,
 																															SELF.Name := LEFT.indicator,
@@ -130,7 +126,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																							LEFT.entity_value);
 											SELF.score := LEFT.cluster_score_,
 											SELF.ClusterName := LEFT.label_,
-											SELF.NoOfIdentities := LEFT.cl_identity_count_,
+											SELF.NoOfIdentities := (integer) LEFT.flags(indicator = 'cl_identity_count_')[1].value,
 											SELF.NVPs := CHOOSEN(PROJECT(LEFT.flags, 
 																						TRANSFORM(iesp.share.t_NameValuePair,
 																							SELF.Name := LEFT.indicator,
@@ -256,6 +252,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 														SELF.NoOfRecentTransactions := COUNT(ds_delta_recentTransactions(UniqueId = (string)LEFT.LexID)),
 														SELF := []));														
 
+	// output(ds_batch_in, named('ds_batch_in'));
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
 	// output(ds_input_with_adl_did, named('ds_input_with_adl_did'));
 	// output(adlDIDFound, named('adlDIDFound'));
@@ -266,22 +263,23 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_elements_dids, named('ds_elements_dids'));
 	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
 	// output(ds_fragment_recs_w_value, named('ds_fragment_recs_w_value'));
-	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));
 	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
+	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_entityNameUID, named('ds_entityNameUID'));
 	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
+	// output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));	
+	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
 	// output(ds_clusters, named('ds_clusters'));
 	// output(ds_elementsInformation, named('ds_elementsInformation'));
 	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));
 	// output(ds_GovBest, named('ds_GovBest'));
 	// output(ds_contributoryBest, named('ds_contributoryBest'));
 	// output(isRealtimeRecord, named('isRealtimeRecord'));
-	// output(ds_realtimescoring_rec, named('ds_realtimescoring_rec'));
-	// output(ds_realtimerecord, named('ds_realtimerecord'));
-	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
-	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
 	// output(ds_ExternalServices_recs, named('ds_ExternalServices_recs'));	
+	// output(ds_realtimescoring_rec, named('ds_realtimescoring_rec'));
+	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));	
+	// output(ds_realtimerecord, named('ds_realtimerecord'));
 	
 	EXPORT ds_results := SORT(IF(~isRealtimeRecord, (ds_ElementsNIdentities + ds_clusters), ds_realtimerecord), ElementType, ElementValue);
 END; 

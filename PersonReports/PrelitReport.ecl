@@ -9,6 +9,11 @@ EXPORT PrelitReport (
   PersonReports.input._prelitreport param,
   boolean IsFCRA = false) := FUNCTION
 
+  //Convert to the old _report style module:
+  mod_access := $.IParam.MAC_CreateIDataAccessReportModule(param);
+  mod_prelit := MODULE (PROJECT (param, $.IParam._prelitreport), mod_access)
+  END;
+
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
 
@@ -107,7 +112,7 @@ EXPORT PrelitReport (
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Watercraft
                           )).wtr_recs, iesp.Constants.BR.MaxWatercrafts);
 
-  p_at_work     := choosen (PersonReports.peopleatwork_records (dids, module (project (param, PersonReports.input.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  p_at_work     := choosen (PersonReports.peopleatwork_records (dids, module (project (mod_prelit, $.IParam.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
 
   // -----------------------------------------------------------------------
   // COUNTS (cannot use doxie.key_did_lookups_v2 -- not always in sync);

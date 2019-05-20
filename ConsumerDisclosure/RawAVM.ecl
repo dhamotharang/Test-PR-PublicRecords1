@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, AVM_v2, ConsumerDisclosure, UT, 
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, AVM_v2, ConsumerDisclosure, UT, 
 risk_indicators; // for macro to work
 
 layout_avm_base_raw := RECORD  // recordof(AVM_V2.Key_AVM_Address_FCRA) - has history section missing in FCRA.Layout_Override_AVM

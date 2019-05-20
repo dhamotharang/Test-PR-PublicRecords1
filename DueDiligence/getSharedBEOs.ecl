@@ -39,7 +39,7 @@ EXPORT getSharedBEOs(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                 firstSeenVendor := (UNSIGNED4)LEFT.dt_vendor_first_reported;
                                                 firstSeen := IF(firstSeenDate = DueDiligence.Constants.NUMERIC_ZERO, firstSeenVendor, firstSeenDate);	
                                                 
-                                                SELF.partyFirstSeen := (UNSIGNED4)LEFT.dt_first_seen;
+                                                SELF.partyFirstSeen := firstSeen;
                                                 
                                                 lastSeenDate := (UNSIGNED4)LEFT.dt_last_seen;
                                                 lastSeenVendor := (UNSIGNED4)LEFT.dt_vendor_last_reported;

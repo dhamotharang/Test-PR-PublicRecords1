@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Input_P_I_I,E_Person,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE43419 := __E_Input_P_I_I;
-  EXPORT __ST39876_Layout := RECORD
+  SHARED __EE81170 := __E_Input_P_I_I;
+  EXPORT __ST70983_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr Input_Account_Echo_;
@@ -63,6 +63,14 @@ EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_S_S_N_Clean_;
     KEL.typ.nint Input_Archive_Date_Clean_;
     KEL.typ.nint Bus_Input_U_I_D_Append_;
+    KEL.typ.nstr Phone_Verification_Bureau_;
+    KEL.typ.nstr Dial_Indicator_;
+    KEL.typ.nstr Point_I_D_;
+    KEL.typ.nstr N_X_X_Type_;
+    KEL.typ.nbool Z_I_P_Match_;
+    KEL.typ.nstr C_O_C_Type_;
+    KEL.typ.nstr S_S_C_;
+    KEL.typ.nstr Wireless_Indicator_;
     KEL.typ.nint Rep_Number_;
     KEL.typ.bool Addr_Not_Populated_ := FALSE;
     KEL.typ.nbool City_State_Zip_Not_Populated_;
@@ -70,10 +78,10 @@ EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST39876_Layout __ND43417__Project(E_Input_P_I_I(__in,__cfg).Layout __PP43105) := TRANSFORM
-    SELF.Addr_Not_Populated_ := FN_Compile.FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP43105.Input_Street_Echo_));
-    SELF.City_State_Zip_Not_Populated_ := FN_Compile.FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP43105.Input_City_Echo_),__ECAST(KEL.typ.nstr,__PP43105.Input_State_Echo_),__ECAST(KEL.typ.nstr,__PP43105.Input_Zip_Echo_));
-    SELF := __PP43105;
+  SHARED __ST70983_Layout __ND81168__Project(E_Input_P_I_I(__in,__cfg).Layout __PP80816) := TRANSFORM
+    SELF.Addr_Not_Populated_ := FN_Compile.FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP80816.Input_Street_Echo_));
+    SELF.City_State_Zip_Not_Populated_ := FN_Compile.FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP80816.Input_City_Echo_),__ECAST(KEL.typ.nstr,__PP80816.Input_State_Echo_),__ECAST(KEL.typ.nstr,__PP80816.Input_Zip_Echo_));
+    SELF := __PP80816;
   END;
-  EXPORT __ENH_Input_P_I_I_6 := PROJECT(__EE43419,__ND43417__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_6 := PROJECT(__EE81170,__ND81168__Project(LEFT));
 END;

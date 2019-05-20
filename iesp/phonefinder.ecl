@@ -47,8 +47,15 @@ export t_PhoneFinderRiskIndicator := record
 	string100 RiskDescription {xpath('RiskDescription')};
 	integer Threshold {xpath('Threshold')};
 	integer ThresholdA {xpath('ThresholdA')};
+	string ThresholdB {xpath('ThresholdB')};
 	boolean OTP {xpath('OTP')};
 	boolean Active {xpath('Active')};
+end;
+		
+export t_PhoneFinderSwitchModeOptions := record
+	boolean Enabled {xpath('Enabled')};
+	string AccountNumber {xpath('AccountNumber')};
+	string Workflow {xpath('Workflow')};
 end;
 		
 export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
@@ -80,6 +87,7 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean AllowFuzzyNameAddrMatch {xpath('AllowFuzzyNameAddrMatch')};//hidden[internal]
 	boolean IsRDPRequest {xpath('IsRDPRequest')};//hidden[internal]
 	string PrimarySearchCriteria {xpath('PrimarySearchCriteria')}; //values['Phone','PII','']
+	t_PhoneFinderSwitchModeOptions RDPSwitchModeOptions {xpath('RDPSwitchModeOptions')};//hidden[internal]
 end;
 		
 export t_SpoofCommon := record
