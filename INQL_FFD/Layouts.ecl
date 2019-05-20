@@ -1,8 +1,8 @@
-﻿IMPORT STANDARD;
+﻿import standard, dx_InquiryHistory;
 
-EXPORT Layouts := MODULE
+EXPORT Layouts := Module
 
-	EXPORT Inquiry := RECORD 
+EXPORT Input := RECORD 
 
 			STRING30	lex_id;
 			STRING30	product_id;
@@ -31,9 +31,10 @@ EXPORT Layouts := MODULE
 			STRING9	eu1_customer_account;
 			STRING5	eu2_customer_number;
 			STRING9	eu2_customer_account;
+			
 	END; 
 
-	EXPORT Inquiry_Extended :=   RECORD
+EXPORT	Input_Extended :=   RECORD
 
 			STRING state_id_number;
 			STRING state_id_state;
@@ -55,34 +56,27 @@ EXPORT Layouts := MODULE
 	    STRING20 customer_id;
 	    STRING20 company_id;
 	    STRING20 global_company_id;
-			
+
+			unsigned4 filedate;
+
 	END;
 
-	EXPORT i_grouprid  := RECORD 
+EXPORT Base    := record
 
-			UNSIGNED8 group_rid;
-			
-			Inquiry -[product_id, transaction_id];
-			Inquiry_extended;
+    Input;
+		Input_extended - filedate;
 
-			STANDARD.NAME;							
-			STANDARD.ADDR;
-			
-			STRING9		appended_ssn := '';
-			UNSIGNED6	appended_did := 0;
+		STANDARD.NAME;				
+		
+		STANDARD.ADDR;
+		
+		string    datetime ; 
+		UNSIGNED6	appended_did := 0;
+		STRING		appended_ssn := '';
 
-      UNSIGNED4 global_sid   := 0;   
-			UNSIGNED8 record_sid   := 0; 			
-			
-	END;
+		string9 version     := '';
+		unsigned4 filedate  := 0;
+		
+end;
 
-	EXPORT i_lexid  := RECORD 
-			UNSIGNED6 appended_did;
-			Inquiry.product_id;
-			Inquiry.transaction_id;
-			STRING	  datetime;
-			UNSIGNED8 group_rid;			
-	END;
-
-
-END;
+end;
