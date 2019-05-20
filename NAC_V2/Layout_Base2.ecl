@@ -1,4 +1,4 @@
-import	Std,Address;
+﻿import	Std,Address;
 
 EXPORT Layout_Base2 := RECORD
 
@@ -113,6 +113,7 @@ EXPORT Layout_Base2 := RECORD
 		,address.Layout_Clean182.geo_blk
 		,address.Layout_Clean182.geo_match
 		,address.Layout_Clean182.err_stat
+		,string32 FileName := ''
 ;
 
 

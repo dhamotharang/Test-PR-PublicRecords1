@@ -1,6 +1,5 @@
 ﻿IMPORT Std;
 
-rgxEmail := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
 
 Layout_Base2 xContact(Layout_Base2 src, Layouts2.rStateContactEx contact) := TRANSFORM
 		// fill in contact fields, but do not overwrite if there is a more specific contact
@@ -63,7 +62,7 @@ AddContacts(DATASET(layout_Base2) base, DATASET(Layouts2.rStateContactEx) contac
 	return b6;
 END;
 
-	Layout_Base2 xAddress(Layout_Base2 src, Layouts2.rAddressEx addr) := TRANSFORM
+	$.Layout_Base2 xAddress($.Layout_Base2 src, $.Layouts2.rAddressEx addr) := TRANSFORM
 	
 							self.Physical_AddressCategory := IF(addr.AddressType in ['P','B'],addr.AddressCategory,src.Physical_AddressCategory);	
 							self.Physical_Street1 := IF(addr.AddressType in ['P','B'],addr.Street1,src.Physical_Street1);
@@ -114,12 +113,12 @@ END;
 	
 	END;
 
-JoinAddresses(DATASET(layout_Base2) base, DATASET(Layouts2.rAddressEx) addresses) := FUNCTION
+JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addresses) := FUNCTION
 
 		b1 := DISTRIBUTE(base, HASH64(ProgramState, ProgramCode, CaseId));
 		addr := DISTRIBUTE(addresses, HASH64(ProgramState, ProgramCode, CaseId));
 		// Match client specific addresses first
-		ds1m := JOIN(b1, addr(clientId<>'',AddressType in ['P','M']),
+		ds1m := JOIN(b1, addr(clientId<>'',AddressType in ['M','B']),
 					left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
@@ -137,18 +136,16 @@ JoinAddresses(DATASET(layout_Base2) base, DATASET(Layouts2.rAddressEx) addresses
 		ds1 := ds1m + ds1p;
 
 		// Match on caseid
-		ds2m := JOIN(b1, addr(clientId='',AddressType in ['P','M']),
+		ds2m := JOIN(b1, addr(clientId='',AddressType in ['M','B']),
 					left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId
-					and left.startdate BETWEEN right.created and right.updated,
+					and left.CaseId=right.CaseId,
 					xAddress(LEFT,RIGHT),
 					LEFT OUTER, KEEP(1), LOCAL);
 		ds2 := JOIN(ds2m, addr(clientId='',AddressType in ['P','B']),
 					left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
-					and left.CaseId=right.CaseId
-					and left.startdate BETWEEN right.created and right.updated,
+					and left.CaseId=right.CaseId,
 					xAddress(LEFT,RIGHT),
 					LEFT OUTER, KEEP(1), LOCAL);
 
@@ -156,7 +153,7 @@ JoinAddresses(DATASET(layout_Base2) base, DATASET(Layouts2.rAddressEx) addresses
 END;
 
 
-EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds) := FUNCTION
+EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 version) := FUNCTION
 
 	cases := PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
@@ -193,6 +190,10 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds) := FUNCTION
 								self.RegionCode := left.RegionCode;
 								self.CountyCode := left.CountyCode;
 								self.CountyName := left.CountyName;
+								self.ProcessDate := (unsigned4)Version;
+								self.filename := left.filename;
+								self.NCF_FileDate := (unsigned4)left.filename[11..18];
+								self.NCF_FileTime := left.filename[20..26];
 								self := [];
 								));
 
@@ -225,7 +226,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds) := FUNCTION
 					self.Certificate_id_type := right.Certificate;
 					self.ABAWDIndicator := right.ABAWDIndicator;
 					self.client_phone := right.phone;
-					self.client_email := REGEXFIND(rgxEmail, right.email);
+					self.client_email := REGEXFIND(rgxEmail, right.email, 1);
 					
 					// add date information
 					self.StartDate_Raw := right.StartDate;
@@ -234,7 +235,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds) := FUNCTION
 					self.EndDate := fn_LastDayOfMonth(right.EndDate);
 					
 					self := right;
-					self := [];
+					self := left;
 					), INNER, LOCAL);
 					
 	// add head of household as case name

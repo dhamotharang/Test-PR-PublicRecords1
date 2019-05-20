@@ -121,7 +121,7 @@ EXPORT rNac2 := RECORD
 	IFBLOCK(self.RecordCode NOT IN ['CA01','CL01','AD01','SC01','EX01'])
 		string		BadRecord {maxlength(256)};
 	END;
-	string	eol := '\n';
+	string1	eol := '\n';
 END;
 
 export rCommonEx := RECORD
@@ -234,7 +234,6 @@ EXPORT rNac2Ex := RECORD
 	IFBLOCK(self.RecordCode NOT IN ['CA01','CL01','AD01','SC01','EX01'])
 		string		BadRecord {maxlength(256)};
 	END;
-	string	eol := '\n';
 END;	
 
 END;

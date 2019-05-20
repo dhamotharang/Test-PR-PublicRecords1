@@ -26,7 +26,8 @@ EXPORT PreprocessNCF2(string ilfn) := function
 
 	nacin := PROJECT(ds, TRANSFORM(Nac_V2.Layouts2.rNac2,
 				string4 rc := left.text[1..4];
-				string350 text := left.text[5..];
+				len := MIN(LENGTH(left.text), 484);
+				string484 text := left.text[5..len] + IF(len < 484, Std.Str.Repeat(' ', 484-len), '');
 				self.CaseRec := IF(rc='CA01', TRANSFER(text, Nac_V2.Layouts2.rCase - RecordCode));
 				self.ClientRec := IF(rc='CL01', TRANSFER(text, Nac_V2.Layouts2.rClient - RecordCode));
 				self.AddressRec := IF(rc='AD01', TRANSFER(text, Nac_V2.Layouts2.rAddress - RecordCode));
