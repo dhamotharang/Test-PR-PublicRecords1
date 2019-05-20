@@ -8,15 +8,15 @@
 
 */
 
-AddDates(infile) := FUNCTIONMACRO
-	result := PROJECT(infile, TRANSFORM(recordof(infile),
-											self.Created := Std.Date.Today();
-											self.Updated := Std.Date.Today();
-											self := left;
-										));
-	return result;
-ENDMACRO;
 
+RightNow := Std.Date.Today();
+
+GetFileName(string ilfn) := FUNCTION
+		s1 := Std.Str.FindReplace(ilfn, '::', ' ');
+		n := Std.Str.WordCount(s1);
+		return Std.Str.GetNthWord(s1, n);
+END;
+																	
 EXPORT PreprocessNCF2(string ilfn) := function
 
 	r1 := RECORD
@@ -35,49 +35,74 @@ EXPORT PreprocessNCF2(string ilfn) := function
 				self.BadRecord := IF(rc NOT IN Nac_V2.Layouts2.validRecordCodes, left.text, '');
 				self.RecordCode := rc;
 				));
+				
+	fname := GetFileName(ilfn);
+	gid := Std.Str.ToUpperCase(fname[6..9]);
 
-	 cases := AddDates(
-						Nac_V2.mod_Validation.CaseFile(
-							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCase,
+	cases := 	Nac_V2.mod_Validation.CaseFile(
+							PROJECT(nacin(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
 										self := LEFT.CaseRec;
 										self.RecordCode := left.RecordCode;
+										self.GroupId := gid;
+										self.OrigGroupId := gid;
+										self.filename := fname;
+										self.Created := RightNow;
+										self.Updated := RightNow;
+										self := [];
 										)),
-								));
+							);
 
-	 clients1 := AddDates(
-								NAC_V2.proc_CleanClients(
+	 clients1 := 	NAC_V2.proc_CleanClients(
 									Nac_V2.mod_Validation.ClientFile(
-										PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClient,
+										PROJECT(nacin(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
 											self := LEFT.ClientRec;
 											self.RecordCode := left.RecordCode;
+											self.GroupId := gid;
+											self.OrigGroupId := gid;
+											self.filename := fname;
+											self.Created := RightNow;
+											self.Updated := RightNow;
+											self := [];
 											)
 										),
 									)
-								));
+								);
 
 	// address validation requires cleaned addresses
-	 addresses1 := 	AddDates(
-									Nac_V2.mod_Validation.AddressFile(
+	 addresses1 := 	Nac_V2.mod_Validation.AddressFile(
 										Nac_V2.proc_cleanAddr(
 											PROJECT(nacin(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
 												self := LEFT.AddressRec;
 												self.RecordCode := left.RecordCode;
+												self.GroupId := gid;
+												self.OrigGroupId := gid;
+												self.filename := fname;
+												self.Created := RightNow;
+												self.Updated := RightNow;
 												self := []))
 										)
-								));
+								);
 
-	 contacts := 	AddDates(Nac_V2.mod_Validation.StateContactFile(
-										PROJECT(nacin(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContact,
+	 contacts := 	Nac_V2.mod_Validation.StateContactFile(
+										PROJECT(nacin(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContactEx,
 										self := LEFT.StateContactRec;
-										self.RecordCode := left.RecordCode;))));
-										
-	 exceptions := 	AddDates(Nac_V2.mod_Validation.ExceptionFile(
+										self.RecordCode := left.RecordCode;
+										self.GroupId := gid;
+										self.OrigGroupId := gid;
+										self.filename := fname;
+										self.Created := RightNow;
+										self.Updated := RightNow;
+										self := [];
+										)));
+									
+	 exceptions := 	Nac_V2.mod_Validation.ExceptionFile(
 										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rException,
 										self := LEFT.ExceptionRec;
-										self.RecordCode := left.RecordCode;))));
+										self.RecordCode := left.RecordCode;
+										)));
 										
-	clients := nac_v2.mod_Validation.VerifyRelatedClients(cases(errors=0), clients1);
-	addresses := nac_v2.mod_Validation.VerifyRelatedAddresses(cases(errors=0), clients(errors=0), addresses1(errors=0)) + addresses1(errors<>0);
+	clients := nac_v2.mod_Validation.VerifyRelatedClients(cases, clients1);
+	addresses := nac_v2.mod_Validation.VerifyRelatedAddresses(cases, clients, addresses1);
 
   recombined := PROJECT(cases, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.CaseRec := left;

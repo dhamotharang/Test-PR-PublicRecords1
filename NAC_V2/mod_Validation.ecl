@@ -97,7 +97,7 @@ EXPORT mod_Validation := MODULE
 	shared boolean HasInvalidChar(string s) := REGEXFIND('[^ -~]+', s);
 	shared string ReplaceInvalidChar(string s) := s;	//REGEXREPLACE('([^ -~])', s, '?');
 
-	EXPORT ClientFile(Dataset(Layouts2.rClient) ds) := 
+	EXPORT ClientFile(Dataset(Layouts2.rClientEx) ds) := 
 			PROJECT(ds, TRANSFORM(Layouts2.rClientEx,
 				// error processing
 					self.dsErrs := 
@@ -156,7 +156,7 @@ EXPORT mod_Validation := MODULE
 					self := [];
 				));
 				
-	EXPORT CaseFile(Dataset(Layouts2.rCase) ds) := 
+	EXPORT CaseFile(Dataset(Layouts2.rCaseEx) ds) := 
 			PROJECT(ds, TRANSFORM(Layouts2.rCaseEx,
 				// error processing
 					self.dsErrs := 
@@ -219,7 +219,7 @@ EXPORT mod_Validation := MODULE
 					self := [];
 				));
 				
-	EXPORT StateContactFile(Dataset(Layouts2.rStateContact) ds) := 
+	EXPORT StateContactFile(Dataset(Layouts2.rStateContactEx) ds) := 
 				PROJECT(ds, TRANSFORM(Layouts2.rStateContactEx,
 					self.dsErrs := 
 							validProgramState(left.ProgramState, left.ProgramState, left.RecordCode)

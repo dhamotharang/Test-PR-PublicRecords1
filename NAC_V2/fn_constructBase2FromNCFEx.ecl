@@ -1,22 +1,6 @@
-IMPORT Std;
+﻿IMPORT Std;
 
-
-/*
-rStateContact := RECORD
-	string4			RecordCode;
-	string2			ProgramState;
-	string1			ProgramCode;
-	string3			ProgramRegion;
-	string3			ProgramCounty;
-	string20		CaseID;
-	string20		ClientId;
-	string1			UpdateType;			// U = Add/Update, D = Delete, O = Override
-	string50		ContactName;
-	string10		ContactPhone;
-	string10		ContactExt;
-	string256		ContactEmail;
-END;
-*/
+rgxEmail := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
 
 Layout_Base2 xContact(Layout_Base2 src, Layouts2.rStateContactEx contact) := TRANSFORM
 		// fill in contact fields, but do not overwrite if there is a more specific contact
@@ -172,17 +156,33 @@ JoinAddresses(DATASET(layout_Base2) base, DATASET(Layouts2.rAddressEx) addresses
 END;
 
 
-EXPORT fn_constructBase2FromNCFEx := FUNCTION
+EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds) := FUNCTION
 
+	cases := PROJECT(ds(RecordCode = 'CA01'), TRANSFORM(Nac_V2.Layouts2.rCaseEx,
+										self := LEFT.CaseRec;
+										self.RecordCode := left.RecordCode;
+										));
 
-	cases := Nac_V2.Files('').dsCaseRecords;
-	clients := Nac_V2.Files('').dsClientRecords;
-	addresses := Nac_V2.Files('').dsAddressRecords;
-	contacts := Nac_V2.Files('').dsContactRecords;
+	clients := PROJECT(ds(RecordCode = 'CL01'), TRANSFORM(Nac_V2.Layouts2.rClientEx,
+											self := LEFT.ClientRec;
+											self.RecordCode := left.RecordCode;
+											)
+										);
+
+	addresses := PROJECT(ds(RecordCode = 'AD01'), TRANSFORM(Nac_V2.Layouts2.rAddressEx,
+												self := LEFT.AddressRec;
+												self.RecordCode := left.RecordCode;
+												self := []));
+
+	contacts := PROJECT(ds(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContactEx,
+										self := LEFT.StateContactRec;
+										self.RecordCode := left.RecordCode;));
+										
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,
 								self.ProgramState := left.ProgramState;
 								self.ProgramCode := left.ProgramCode;
+								self.GroupId :=  left.GroupId;
 								self.CaseId := left.CaseId;
 								self.StartDate := left.created;
 								self.EndDate := left.updated;
@@ -225,7 +225,7 @@ EXPORT fn_constructBase2FromNCFEx := FUNCTION
 					self.Certificate_id_type := right.Certificate;
 					self.ABAWDIndicator := right.ABAWDIndicator;
 					self.client_phone := right.phone;
-					self.client_email := right.email;
+					self.client_email := REGEXFIND(rgxEmail, right.email);
 					
 					// add date information
 					self.StartDate_Raw := right.StartDate;
