@@ -1225,7 +1225,7 @@ IMPORT AID;
 				integer		ln_ANNUALINCOME,
 				layout_Impulse_Email_In,
 				string2   source := '',
-				//Added for CCPA-108
+				//Added for CCPA-108 
 				unsigned4 global_sid;
 				unsigned8 record_sid;
 			END;

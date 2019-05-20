@@ -15,7 +15,7 @@ layouts.layout_Impulse_Email_Did_Key	tBasetoKey(layouts.layout_Impulse_Email_fin
 			self.cln_SEC_RANGE						:=	pInput.sec_range;
 			self.cln_ST										:=	pInput.st;
 			self.cln_ZIP									:=	pInput.zip5;	
-			//Added for CCPA-108
+			//Added for CCPA-108 
 			self.global_sid               :=  pInput.global_sid;
 			self.record_sid               :=  pInput.record_sid;
 			self													:=	pInput;
