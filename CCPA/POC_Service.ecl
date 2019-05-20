@@ -1,4 +1,4 @@
-EXPORT POC_Service() := MACRO  
+EXPORT POC_Service() := MACRO
 
   g_mod := AutoStandardI.GlobalModule();
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (g_mod);
@@ -11,15 +11,19 @@ EXPORT POC_Service() := MACRO
   CCPA.Layouts.l_input xtIn(CCPA.Layouts.l_input L, integer c) := TRANSFORM
     SELF.did := L.did+(1000*(c-1)); // random dids
     SELF.seq := c;
-  END; 
+  END;
   dids := normalize(dataset([{did_in}], CCPA.Layouts.l_input), MIN(did_count, 10), xtIn(LEFT, COUNTER));
 
+  //conditional choice of modules (IF and so on) won't work;
+  //if we want to suppress logging, we will need to create a module for each dataset.
   mod_pl_recs := MODULE (mod_access)
     EXPORT boolean log_record_source := mod_access.log_record_source AND include_pl;
+    EXPORT boolean lexid_source_optout := mod_access.lexid_source_optout AND include_pl;
   END;
   pl_recs_raw := IF(include_pl, CCPA.Raw.getProfLic(dids, mod_pl_recs));
   mod_oc_recs := MODULE (mod_access)
     EXPORT boolean log_record_source := mod_access.log_record_source AND include_oc;
+    EXPORT boolean lexid_source_optout := mod_access.lexid_source_optout AND include_oc;
   END;
   oc_recs_raw := IF(include_oc, CCPA.Raw.getOneClick(dids, mod_oc_recs));
   
