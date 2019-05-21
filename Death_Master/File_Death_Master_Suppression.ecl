@@ -278,7 +278,19 @@ dSuppressRecs				:=
 	// LNK-2103 Alive person marked as deceased
     {'000880859745', 100, '20181105', ' ', ' ', '334549109', 'LINDENMUTH          ', '    ', 'KRYSTYNA       ', 'MARIA          ', ' ', '        ', '19480612', '08', '80002', '     ', 'CO', '059', '  ', 'N', 'ENC', /*'000880859745LENC'*/'', '64', 'N'}, 
 	// LNK-2124 FW: Deceased record comingle possibility
-    {'000566764672', 100, '20090807', 'A', 'A', '608746456', 'NGUYEN              ', '    ', 'THE            ', '               ', 'P', '20090724', '19440515', '45', '75052', '     ', 'TX', '113', '  ', 'N', 'SSA', /*'608746456N090724'*/'', 'DE', 'N'}
-	], Header.Layout_Did_Death_MasterV3);
+    {'000566764672', 100, '20090807', 'A', 'A', '608746456', 'NGUYEN              ', '    ', 'THE            ', '               ', 'P', '20090724', '19440515', '45', '75052', '     ', 'TX', '113', '  ', 'N', 'SSA', /*'608746456N090724'*/'', 'DE', 'N'},
+  // LNK-2547 Non-FCRA Possible Over Linking of Death Record LexID 002664383215 Watts
+    {'238121936659', 100,	'20190408', ' ', ' ',	'372623282', 'WATTS               ', '    ', 'RUTH           ', 'ANNETTE        ', ' ',	'20160907', '        ', '26',	'48244', '	   ',	'MI',	'163', '	', 'N',	'ENC', /*'238121936659WENC'*/'', '64', 'N'},
+	// LNK-2019 9/11 DQ reivew Fredrick Jones / Accurint-Dispute-Ticket ID: 99860 [Incident: 180901-000097]
+		{'001275152362', 100,	'20190408',	' ', ' ', '	 	      ', 'JONES               ', '	  ', 'FREDERICK      ', '	              ', ' ', ' 	     ', '19631205',	'26',	'48203', '	   ', 'MI',	'163', '	', 'N',	'TUN', /*'001275152362JTUN'*/'', 'TN', 'Y'},
+  // LNK-2449  Alive Consumer marked as deceased
+	  {'045899339355', 100,	'20190408',	' ', ' ', '	 	      ', 'SHARPTON            ', '	  ', 'KEVIN          ',	'C              ', ' ', ' 	     ', '   	   ', '47',	'37087', '	   ', 'TN',	'189', '	', 'N',	'TUN', /*'045899339355STUN'*/'', 'TN', 'Y'},
+	// LNK-2450  Alive Consumer marked as deceased
+		{/*'000301044952'*/'',  96,	'20130515',	' ', ' ', ' 	      ', 'BROWNE              ', '	  ', 'PETER          ',	'CARROLL        ', ' ', '20070304',	'        ',	'36',	'12986', '	   ', 'NY',	'033', '	', 'N', 'TRB', 'TR00000079931328', 'TR', 'N'},
+  // LNK-2263/LNK-2662  Alive Consumer marked as deceased
+	  {'183216702996',	85,	'20190408', ' ', ' ',	' 	 	    ', 'HOWE                ', '	  ', 'DOUGLAS        ', 'B              ', ' ', '	       ', '19561106',	'26',	'48473', '     ', 'MI',	'049', '	', 'N',	'TUN', /*'183216702996HTUN'*/'', 'TN', 'Y'},   
+	// LNK-2664  H149: DOD Issue- William Athens JR		
+		{'000091337313', 100,	'20190415', '	', ' ', '         ', 'ATHENS              ', '	  ', 'WILLIAM        ', 'ARCHIE         ', ' ',	'20151130', '	       ', '26',	'48180', '	   ', 'MI',	'163', '	', 'N',	'ENC', /*'000091337313AENC'*/'', '64', 'N'}
+	 ], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

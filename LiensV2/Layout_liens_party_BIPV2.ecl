@@ -1,4 +1,4 @@
-import address, BIPV2;
+﻿import address, BIPV2; 
 
 EXPORT Layout_liens_party_BIPv2 := record
 string50 tmsid;

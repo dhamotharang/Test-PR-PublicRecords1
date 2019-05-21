@@ -21,4 +21,8 @@ EXPORT Layout_LocationID := record
 			string2 rec_type;
 			string4 err_stat;
 			unsigned8 cntprimname;
+			string28 prim_name_normalized;
+			string4 predir_derived;
+			string28 prim_name_derived;
+			string4 addr_suffix_derived;
 end;

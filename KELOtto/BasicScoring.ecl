@@ -46,8 +46,7 @@
                         ) : PERSIST('~temp::deleteme45');
 
   EXPORT IPAddressStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Internet_Protocol.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
-                        'score_,cluster_score_,event_count_,' + 
-                        'kr_high_risk_flag_,kr_medium_risk_flag_,' +
+                        'score_,cluster_score_,event_count_,identity_count_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_,' +
                         'ip_not_us_,ip_vpn_,ip_high_risk_city_,ip_hosted_,ip_tor_,' +
@@ -217,7 +216,7 @@
   END;
 
   FinalRec := RECORD
-   RECORDOF(ScoredGraphPrep1) AND NOT [event_count_,identity_count_]; // Remove these fields to keep the layout consistent with previous version for roxie/esp
+   RECORDOF(ScoredGraphPrep1);// AND NOT [event_count_,identity_count_]; // field exclusion list to keep the layout consistent with previous version for roxie/esp
    DATASET(FlagsRec) Flags;
   END;
        

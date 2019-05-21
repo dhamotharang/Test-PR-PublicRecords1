@@ -1,4 +1,4 @@
-﻿import header_services, business_header, AID, infutor, header, ut ;
+﻿import header_services, business_header, AID, infutor, header, ut,STD ;
 
 
 EXPORT infutor_reflection_header(dataset(header.layout_header) ds_Xform) := function
@@ -31,7 +31,10 @@ header_services.Supplemental_Data.mac_verify(	'file_infutor_inj.txt',
 	header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l, integer c) := transform
 
 /* //check date validity by length, number values, and between 1901 and today */  
-  cversion_dev := infutor._config.get_cversion_dev; 
+loadfile:=STD.File.SUPERFILECONTENTS(infutor.filename_infutor);
+
+SearchPattern:='thor_dell400::in::infutor::([^ ]*)::';
+cversion_dev:=regexfind(SearchPattern,loadfile[1].name,1);  
 
 Valid_Date_Range(string in_date) := in_date[1..6] between '190101' and ut.GetDate[1..6];
 	self.did := l.did;

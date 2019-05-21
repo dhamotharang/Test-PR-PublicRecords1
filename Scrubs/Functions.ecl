@@ -46,7 +46,7 @@ EXPORT Functions := MODULE
   //****************************************************************************
   EXPORT fn_alphanum(STRING alphanum, UNSIGNED1 size = 0) := FUNCTION
     RETURN IF(IF(size = 0, LENGTH(TRIM(alphanum, ALL)) > 0, LENGTH(TRIM(alphanum, ALL)) = size) AND
-              Stringlib.StringFilterOut(alphanum, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') = '',1,0);
+              Stringlib.StringFilterOut(alphanum, '0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz') = '',1,0);
   END;
   
   //****************************************************************************

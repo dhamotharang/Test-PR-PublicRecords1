@@ -116,7 +116,7 @@
 																							//Landline				 //Wireless
 		self.is_land_to_cell	:= if(l.coc_type in ['EOC','VOI'] and (l.serv='1' and l.line='1'), TRUE, FALSE);											//Landline-to-Wireless
 		self.is_current				:= if(l.transaction_code='PA', TRUE, FALSE);																													//Port Add		
-		self.dt_first_seen		:= l.transaction_dt;
+		self.dt_first_seen		:= l.transaction_start_dt;
 		self.dt_last_seen			:= l.vendor_last_reported_dt;
 		self.dt_last_seen_time:= l.vendor_last_reported_time;
 		
