@@ -1227,6 +1227,8 @@
 				trim(kword, left, right) = 'HUDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_HUDPA,
 				trim(kword, left, right) = 'ICDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ICDPA,
 				trim(kword, left, right) = 'MDBP-W' =>SubGroup_Constants.numKeywordsID.KEYWORD_MDBP_W,
+				trim(kword, left, right) = 'NLACM' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLACM,
+				trim(kword, left, right) = 'NONBIM' =>SubGroup_Constants.numKeywordsID.KEYWORD_NONBIM,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
