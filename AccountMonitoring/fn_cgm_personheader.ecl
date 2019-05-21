@@ -10,7 +10,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 		// 
 		Key_DID := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.doxie_key_header_slim, 
+				AccountMonitoring.product_files.header_files.r_doxie_key_header_slim, 
 				HASH64(did)
 			);
 	
