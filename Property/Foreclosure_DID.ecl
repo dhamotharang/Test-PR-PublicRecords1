@@ -1,4 +1,4 @@
-import bipv2, ut;
+﻿import bipv2, ut, MDR;
 
 foreclosureIn := property.File_Foreclosure_In;  //contains both new and base file data
 layout_foreclosureIn := recordof(foreclosureIn);
@@ -238,8 +238,16 @@ foreclosureBase := denormalize(foreclosureInDist, foreclosureNormalizedDist,
 // output(choosen(denormalizeForeclosure,100), named('DenormalizedForeclosureOutput'));
 // output(count(denormalizeForeclosure), named('DenormalizedForeclosureCount'));
 
+//Combine BlackKnight base files, mapped to Foreclosure_base layout, with Core Logic base file. Project CL into base and add source code
+ForceclosureBaseV2 := PROJECT(foreclosureBase,TRANSFORM(Property.Layout_Fares_Foreclosure_v2, 
+																												SELF.SOURCE := MDR.sourceTools.src_Foreclosures;
+																												SELF := LEFT; SELF := [])); //To combine BK and CL
 
-ut.mac_suppress_by_phonetype(foreclosureBase,attorney_phone_nbr,state,                   phone_out1);
+// BKforeclosureBase	:= BKForeclosure.Fn_Map_BK2Foreclosure;
+
+// CombineAll	:= ForceclosureBaseV2 + BKforeclosureBase;
+
+ut.mac_suppress_by_phonetype(ForceclosureBaseV2,attorney_phone_nbr,state,                   phone_out1);
 ut.mac_suppress_by_phonetype(phone_out1,     lender_phone,      lender_beneficiary_state,phone_out2);
 ut.mac_suppress_by_phonetype(phone_out2,     trustee_phone,     trustee_state,           phone_out3);
 
@@ -268,6 +276,6 @@ j1 := join(ta1,phone_out3_dist,left.foreclosure_id=right.foreclosure_id and
 							   
 output(choosen(j1,100),named('phones_that_should_be_suppressed_in_the_output'));
 
-FC_proj := project(phone_out3,Property.Layout_Fares_Foreclosure_v2);
+FC_proj := phone_out3;
 
 export Foreclosure_DID := FC_proj; // : persist('~thor_data400::persist::foreclosure_did');

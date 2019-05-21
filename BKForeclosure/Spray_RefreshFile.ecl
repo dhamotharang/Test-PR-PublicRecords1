@@ -8,8 +8,8 @@ EXPORT Spray_refreshFile(STRING filedate, STRING	pServerIP	= _control.IPAddress.
 
 #workunit('name','Spray Foreclosure Refresh');
 
-SHARED filepath_nod       := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Refresh/NOD/';
-SHARED filepath_reo       := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Refresh/REO/';
+SHARED filepath_nod       := '/data/data_build_2/property/ln/epic/bk/foreclosure/data' +filedate+1 +'/Managed_Refresh/NOD' +filedate+ '/';
+SHARED filepath_reo       := '/data/data_build_2/property/ln/epic/bk/foreclosure/data' +filedate+1 +'/Managed_Refresh/REO' +filedate+ '/';
 SHARED group_name	        := STD.System.Thorlib.Group ( );
 SHARED fn_nod_Orph        := '*_NOD_Orphan_Refresh_*.txt';
 SHARED fn_nod_Ref         := '*_NOD_Refresh_*.txt';
