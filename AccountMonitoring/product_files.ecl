@@ -1414,7 +1414,7 @@ EXPORT product_files := MODULE
 // Linkid key
 // Duplicate of Roxie Key 
 	
-		EXPORT r_sbfeLinkid_superkeyname_raw := 'batchr3::monitor::sbfe::linkids::' + doxie.Version_SuperKey;
+		EXPORT r_sbfeLinkid_superkeyname_raw := 'batchr3::monitor::sbfe::linkids_' + doxie.Version_SuperKey;
 		EXPORT r_sbfeLinkid_superkeyname     := Data_Services.Default_Data_Location + r_sbfeLinkid_superkeyname_raw;
 
 		SHARED r_sbfeLinkid_key_undist := 
@@ -1433,7 +1433,7 @@ EXPORT product_files := MODULE
 // Tradeline Key	
 // Duplicate of Roxie Key	
   
-		EXPORT r_sbfeTrade_superkeyname_raw := 'batchr3::monitor::sbfe::tradeline' + doxie.Version_SuperKey;
+		EXPORT r_sbfeTrade_superkeyname_raw := 'batchr3::monitor::sbfe::tradeline_' + doxie.Version_SuperKey;
 		EXPORT r_sbfeTrade_superkeyname     := Data_Services.Default_Data_Location + r_sbfeTrade_superkeyname_raw;
 
 		SHARED r_sbfeTrade_key_undist := 
@@ -1451,7 +1451,7 @@ EXPORT product_files := MODULE
 // Credit Score Key	
 // Duplicate of Roxie Key	
 		
-		EXPORT r_sbfeScore_superkeyname_raw := 'batchr3::monitor::sbfescoring::scoringindex' + doxie.Version_SuperKey ;
+		EXPORT r_sbfeScore_superkeyname_raw := 'batchr3::monitor::sbfescoring::scoringindex_' + doxie.Version_SuperKey ;
 		EXPORT r_sbfeScore_superkeyname     := Data_Services.Default_Data_Location + r_sbfeScore_superkeyname_raw;
 
 		SHARED r_sbfeScore_key_undist := 
