@@ -11,7 +11,7 @@ EXPORT Proc_FirstData_buildall(
 	BOOLEAN pOverwrite = FALSE
 ) := MODULE
 
-	// Spray files.
+	// Spray Files.
 	EXPORT SprayFiles := IF(pDirectory != '',FirstData.fSprayFiles(
 			pVersion,
 			pServerIP,
