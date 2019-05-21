@@ -141,6 +141,34 @@ module
 		export kel_CustomerDashTopEntityStats				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats'),pversion);
 		export kel_CustomerDashTopClustersAndElements				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements'),pversion);
 		
+		//Kel files demo
+		export kel_customeraddress_Demo	:= tools.mod_FilenamesBuild(Template('kel::customeraddress_Demo'),pversion);
+		export kel_personstats_Demo			:= tools.mod_FilenamesBuild(Template('kel::personstats_Demo'),pversion);
+		export kel_personevents_Demo		:= tools.mod_FilenamesBuild(Template('kel::personevents_Demo'),pversion);
+		export kel_customerstats_Demo		:= tools.mod_FilenamesBuild(Template('kel::customerstats_Demo'),pversion);
+		export kel_fullgraph_Demo			:= tools.mod_FilenamesBuild(Template('kel::fullgraph_Demo'),pversion);
+		export kel_entitystats_Demo			:= tools.mod_FilenamesBuild(Template('kel::entitystats_Demo'),pversion);
+		export kel_person_associations_stats_Demo		:= tools.mod_FilenamesBuild(Template('kel::person_associations_stats_Demo'),pversion);
+		export kel_person_associations_details_Demo	:= tools.mod_FilenamesBuild(Template('kel::person_associations_details_Demo'),pversion);
+		export kel_entity_scorebreakdown_Demo				:= tools.mod_FilenamesBuild(Template('kel::entity_scorebreakdown_Demo'),pversion);
+		export kel_CustomerStatsPivot_Demo				:= tools.mod_FilenamesBuild(Template('kel::CustomerStatsPivot_Demo'),pversion);
+		export kel_CustomerDashTopEntityStats_Demo				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats_Demo'),pversion);
+		export kel_CustomerDashTopClustersAndElements_Demo				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements_Demo'),pversion);
+		
+		//kel files delta
+		export kel_customeraddress_Delta	:= tools.mod_FilenamesBuild(Template('kel::customeraddress_Delta'),pversion);
+		export kel_personstats_Delta			:= tools.mod_FilenamesBuild(Template('kel::personstats_Delta'),pversion);
+		export kel_personevents_Delta		:= tools.mod_FilenamesBuild(Template('kel::personevents_Delta'),pversion);
+		export kel_customerstats_Delta		:= tools.mod_FilenamesBuild(Template('kel::customerstats_Delta'),pversion);
+		export kel_fullgraph_Delta			:= tools.mod_FilenamesBuild(Template('kel::fullgraph_Delta'),pversion);
+		export kel_entitystats_Delta			:= tools.mod_FilenamesBuild(Template('kel::entitystats_Delta'),pversion);
+		export kel_person_associations_stats_Delta		:= tools.mod_FilenamesBuild(Template('kel::person_associations_stats_Delta'),pversion);
+		export kel_person_associations_details_Delta	:= tools.mod_FilenamesBuild(Template('kel::person_associations_details_Delta'),pversion);
+		export kel_entity_scorebreakdown_Delta				:= tools.mod_FilenamesBuild(Template('kel::entity_scorebreakdown_Delta'),pversion);
+		export kel_CustomerStatsPivot_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerStatsPivot_Delta'),pversion);
+		export kel_CustomerDashTopEntityStats_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats_Delta'),pversion);
+		export kel_CustomerDashTopClustersAndElements_Delta				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements_Delta'),pversion);
+		
 		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
 		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main_anon'),pversion);
 
@@ -168,6 +196,7 @@ module
 			Crim.dAll_filenames +
 			Death.dAll_filenames +
 			FraudPoint.dAll_filenames +
+			//kel base
 			kel_customeraddress.dAll_filenames +
 			kel_personstats.dAll_filenames +
 			kel_personevents.dAll_filenames + 
@@ -180,6 +209,32 @@ module
 			kel_CustomerStatsPivot.dAll_filenames + 
 			kel_CustomerDashTopEntityStats.dAll_filenames + 
 			kel_CustomerDashTopClustersAndElements.dAll_filenames + 
+			//kel demo files
+			kel_customeraddress_Demo.dAll_filenames +
+			kel_personstats_Demo.dAll_filenames +
+			kel_personevents_Demo.dAll_filenames + 
+			kel_customerstats_Demo.dAll_filenames +
+			kel_fullgraph_Demo.dAll_filenames +
+			kel_entitystats_Demo.dAll_filenames + 			
+			kel_person_associations_stats_Demo.dAll_filenames +
+			kel_person_associations_details_Demo.dAll_filenames +
+			kel_entity_scorebreakdown_Demo.dAll_filenames + 
+			kel_CustomerStatsPivot_Demo.dAll_filenames + 
+			kel_CustomerDashTopEntityStats_Demo.dAll_filenames + 
+			kel_CustomerDashTopClustersAndElements_Demo.dAll_filenames + 
+			//kel delta files			
+			kel_customeraddress_Delta.dAll_filenames +
+			kel_personstats_Delta.dAll_filenames +
+			kel_personevents_Delta.dAll_filenames + 
+			kel_customerstats_Delta.dAll_filenames +
+			kel_fullgraph_Delta.dAll_filenames +
+			kel_entitystats_Delta.dAll_filenames + 			
+			kel_person_associations_stats_Delta.dAll_filenames +
+			kel_person_associations_details_Delta.dAll_filenames +
+			kel_entity_scorebreakdown_Delta.dAll_filenames + 
+			kel_CustomerStatsPivot_Delta.dAll_filenames + 
+			kel_CustomerDashTopEntityStats_Delta.dAll_filenames + 
+			kel_CustomerDashTopClustersAndElements_Delta.dAll_filenames + 
  			Main_Orig.dAll_filenames + 
 			Main_Anon.dAll_filenames + 
 			Pii_Demo.dAll_filenames + 

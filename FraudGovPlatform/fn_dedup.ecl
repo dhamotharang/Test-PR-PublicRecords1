@@ -1,4 +1,4 @@
-
+﻿
 EXPORT fn_dedup(inputs):=FUNCTIONMACRO
     in_dst := DISTRIBUTE(inputs,hash(customer_account_number, FileName));
     in_srt := sort(in_dst , customer_account_number, FileName, record, except ProcessDate,unique_id, local);
@@ -15,5 +15,5 @@ EXPORT fn_dedup(inputs):=FUNCTIONMACRO
         ,except ProcessDate,unique_id
         ,local
     );
-    return in_ddp;
+    return distribute(in_ddp,hash(unique_id));
 ENDMACRO;

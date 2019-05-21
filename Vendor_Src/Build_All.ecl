@@ -1,4 +1,4 @@
-﻿import versioncontrol, _control, ut, tools,promotesupers,std,Vendor_Src;
+﻿import versioncontrol, _control, ut, tools,promotesupers,std,Vendor_Src,dops,Orbit3,Scrubs_Vendor_Src;
 
 EXPORT Build_all(STRING pversion,STRING LogicalName, STRING SourceIP, STRING Directory, BOOLEAN pUseProd = TRUE ) := FUNCTION
 
@@ -9,15 +9,17 @@ PromoteSupers.MAC_SF_BuildProcess(orbitdump,'~thor_data400::in::vendor_src::orbi
 
 built := sequential(
           
-		      //Create_Super_Files, // Need un comment and run once in case if superfiles doesnt exist on thor
+		      Create_Super_Files,
 					
 					spray,
 					ExtractORBIT,
 					Vendor_Src.Build_Base(pversion,pUseProd).all,
-					//Build_Keys(pversion,pUseProd).all,
+					Build_Keys(pversion,pUseProd),
 					Vendor_Src.Promote.Promote_vendorsrc(pversion,pUseProd).buildfiles.Built2QA,
 			    Build_Strata(pversion,pUseProd).all, 
-					
+					Scrubs_Vendor_Src.Vendor_Src_ScrubsPlus(pversion,Vendor_Src.Email_Notification_Lists.developer),
+					//dops.updateversion('VendorSourceKeys',pversion,Vendor_Src.Email_Notification_Lists.developer,,'N');
+				  //Orbit3.proc_Orbit3_CreateBuild_AddItem('VendorSourceKeys',pversion,'N',false, false,false,true,false,Vendor_Src.Email_Notification_Lists.developer),
 				  ): success(Send_Email(pversion,pUseProd).BuildSuccess),
 				  failure(send_email(pversion,pUseProd).BuildFailure) ;
 

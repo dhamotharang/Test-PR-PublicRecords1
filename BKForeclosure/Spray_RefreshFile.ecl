@@ -50,7 +50,7 @@ SHARED sprf_reo_ref      := '~thor_data400::in::BKForeclosure::refresh_reo';
   TransformFile_Nod_Orphan := FUNCTION
 	  dsraw := DATASET(dst_nod_Orph_raw,
 										          BKForeclosure.Layout_BK.Nod_raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'NOD_ORPHAN';SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'NOD_ORPHAN'; SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
@@ -64,14 +64,16 @@ SHARED sprf_reo_ref      := '~thor_data400::in::BKForeclosure::refresh_reo';
   TransformFile_Reo_Orphan := FUNCTION
 	  dsraw := DATASET(dst_reo_orph_raw,
 										          BKForeclosure.Layout_BK.REO_Raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_ORPHAN';SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_ORPHAN';
+																			SELF.APN := REGEXREPLACE('^([~]+)|([+])',LEFT.APN,'');SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
   TransformFile_Reo_refresh := FUNCTION
 	  dsraw := DATASET(dst_reo_ref_raw,
 										          BKForeclosure.Layout_BK.Reo_Raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_REFRESH';SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_REFRESH';
+																		SELF.APN := REGEXREPLACE('^([~]+)|([+])',LEFT.APN,'');SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;	
 	
@@ -120,13 +122,9 @@ super_all
 	:=	
 	SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod_orphan'/*, TRUE*/),
 		AddToSuperfile_Nod_Orph,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod'/*, TRUE*/),
 		AddToSuperfile_Nod_Ref,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo_orphan'/*, TRUE*/),
 		AddToSuperfile_Reo_Orph,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo'/*, TRUE*/),
 		AddToSuperfile_Reo_Ref,
 		STD.File.FinishSuperFileTransaction()
 	);	

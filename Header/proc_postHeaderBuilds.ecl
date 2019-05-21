@@ -157,7 +157,7 @@ export proc_postHeaderBuilds(string8 pBldVer = '') := module
 		#stored ('buildname', 'PersonHeader'   );		        
         BldVer := if(pBldVer <> '', pBldVer, header.version_build);
 		
-		step:=Header.version_build+' Move header_raw and source keys to prod';
+		step:= BldVer +' Move header_raw and source keys to prod';
 		
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -183,7 +183,7 @@ export proc_postHeaderBuilds(string8 pBldVer = '') := module
 		#stored ('buildname', 'PersonHeader'   ); 
 		BldVer := if(pBldVer <> '', pBldVer, header.version_build);
 		
-		step:=Header.version_build+' FCRA Header and keys';
+		step := BldVer+' FCRA Header and keys';
 		
         cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -204,7 +204,7 @@ export proc_postHeaderBuilds(string8 pBldVer = '') := module
 		#stored ('buildname', 'PersonHeader'   ); 
 		BldVer := if(pBldVer <> '', pBldVer, header.version_build);
         
-		step:=Header.version_build+' PowerSearch Keys';
+		step := BldVer+' PowerSearch Keys';
 		
 		cmpltd:=step+' completed';
 		failed:=step+' failed';

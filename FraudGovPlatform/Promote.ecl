@@ -71,4 +71,6 @@ module
 			//Remove the Demo file from father sf, which was moved from qa as a promote routeine
 			, STD.File.RemoveSuperFile(FraudShared.Filenames().Base.Main.Father,	Filenames().Input.DemoData.Sprayed)
 	);
+	
+	Export Clear_DemoData := STD.File.RemoveSuperFile(FraudShared.Filenames().Base.Main.Built,	Filenames().Input.DemoData.Sprayed);
 end;

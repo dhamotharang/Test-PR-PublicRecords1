@@ -24,6 +24,7 @@ Customer := ENTITY(FLAT(UID=TargetCustomerHash,
 Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     Customer rCustomer=AssociatedCustomerFileInfo,
     Customer rSourceCustomer=SourceCustomerFileInfo,
+    DATE EventDate,
     INTEGER LexId,
 		DATE DateOfBirth,
 		STRING Title=NULL(),
@@ -112,7 +113,7 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     LexId,
     SourceCustomers{rSourceCustomer},
 		ReportedDateOfBirth{DateOfBirth},
-		FullName{Title,FirstName,MiddleName,LastName,NameSuffix},
+		FullName{EventDate, Title,FirstName,MiddleName,LastName,NameSuffix},
 
     DeceasedDate,
     DeceasedDateOfBirth,
@@ -798,6 +799,7 @@ USE KELOtto.fraudgovshared(FLAT,
 	Person(FILTER((UNSIGNED)did <> 0),
     LexId = did,
 		DateOfBirth = dob,
+    EventDate = event_date,
 		Title = cleaned_name.title,
 		FirstName = cleaned_name.fname,
 		MiddleName =cleaned_name.mname,
@@ -1411,7 +1413,8 @@ Person: => AssociatedWithIncarceratedFlag := MAP(name_ssn_dob_match = 0 AND curr
 Person: => AssociatedWithFraudOffensesFlag := MAP(name_ssn_dob_match = 0 AND FraudOffenseCount > 0 => 1, 0);
 
 // NOTE: This is "best" from the contributed not Best Best.
-Person: => BestFullName := ONLY(TOPN(FullName(NOT FirstName:Null AND NOT LastName:Null), 1, FirstName, LastName));
+
+Person: => BestFullName := ONLY(TOPN(FullName(NOT FirstName:Null AND NOT LastName:Null), 1, -EventDate));
 Person: => Label := TRIM(BestFullName.FirstName) + ' ' + TRIM(BestFullName.LastName);
 
 Person: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
@@ -1965,7 +1968,7 @@ InternetProtocol: => EntityType := 18;
 InternetProtocol: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 
 
-InternetProtocol: => IdentityCount := COUNT(PersonIpAddress);
+InternetProtocol: => IdentityCount := COUNT(PersonIpAddress{Subject});
 InternetProtocol: => EventCount := COUNT(InternetProtocolEvent);
 
 InternetProtocol: => IpNotUs := MAP(COUNT(InternetProtocolEvent.Transaction(IpNotUs=1))>0 => 1, 0); 
@@ -2050,7 +2053,7 @@ Address: => EntityType := 9;
 
 Address: => EventCount := COUNT(AddressEvent);
 
-Address: => IdentityCount := COUNT(PersonAddress(Subject.InCustomerPopulation=1));
+Address: => IdentityCount := COUNT(PersonAddress{Subject});
 Address: => HighFrequencyFlag := MAP(IdentityCount >= 20 => 1, 0);
 
 Address: => AllPersonCount := COUNT(PersonAddress);

@@ -25,7 +25,7 @@ EXPORT Constants := MODULE
  EXPORT DO_EmailAddresses := 'InsDataOps@lexisnexis.com';
  EXPORT PRD_EmailAddresses := 'RIS-BI-AnalyticsRepository@lexisnexis.com,Vault.Logistics@risk.lexisnexis.com,a&rdata.engineering.support@lexisnexisrisk.com,InsDataOps@lexisnexis.com';
  EXPORT DEV_EmailAddresses := 'melissa.newport@lexisnexisrisk.com,sanjay.narla@lexisnexisrisk.com';
-	EXPORT TeamEmailList := if (_control.ThisEnvironment.name='Prod',PRD_EmailAddresses,DEV_EmailAddresses);
+	EXPORT TeamEmailList := if (_control.ThisEnvironment.name='Prod_Thor',PRD_EmailAddresses,DEV_EmailAddresses);
 	
 
 

@@ -7,7 +7,7 @@ EXPORT File_BK_Foreclosure := MODULE
                                 BKForeclosure.layout_BK.nod_in,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
 
  EXPORT Nod_Delete       := DATASET('~thor_data400::in::BKForeclosure::delete_nod',
-                                BKForeclosure.layout_BK.Delete_Nod, THOR);
+                                BKForeclosure.layout_BK.Delete_Nod,THOR);
 
  EXPORT Reo_Delete       := DATASET('~thor_data400::in::BKForeclosure::delete_reo',
                                 BKForeclosure.layout_BK.Delete_Reo,THOR);
