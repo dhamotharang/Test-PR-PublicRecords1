@@ -273,6 +273,8 @@ dSuppressRecs				:=
     {'001961115336', 100, '20181105', ' ', ' ', '393549837', 'PETERSON            ', '    ', 'JAMES          ', 'M              ', ' ', '20150611', '        ', '55', '54701', '     ', 'WI', '035', '  ', 'N', 'ENC', /*'001961115336PENC'*/'', '64', 'N'}, 
 	// LNK-1782 Copy of 180329-001784: ACCURINT - 99136 - deceased indicator [Incident: 180706-000082]
     {'000154038387', 100, '20181008', ' ', ' ', '         ', 'BATISTE             ', '    ', 'ORANEE         ', '               ', ' ', '        ', '19440408', '06', '93635', '     ', 'CA', '047', '  ', 'N', 'TUN', /*'000154038387BTUN'*/'', 'TN', 'Y'}, 
+	// LNK-1859 Customer Dispute Number -  1151670 Community Choice Credit Union 
+    {'002708976984', 100,	'20190408',	' ', ' ', '	        ', 'WILEY               ', '	  ', 'ANICE          ',	'V              ', ' ',	' 	     ', '   	   ',	'19',	'50313', '	   ', 'IA',	'153', '	', 'N',	'TUN', /*'002708976984WTUN'*/'', 'TN', 'Y'}, 
 	// LNK-2044 Copy of 180831-000613: Copy of 180831-000560: Accurint – deceased indicator [WILLIAM P DOYLE] [ticket#106193] [Incident: 180910-001177]
     {'000680057632', 100, '20181008', ' ', ' ', '426204079', 'DOYLE               ', '    ', 'WILLIAM        ', 'P              ', ' ', '        ', '19481227', '12', '33172', '     ', 'FL', '086', '  ', 'N', 'TUN', /*'000680057632DTUN'*/'', 'TN', 'Y'}, 
 	// LNK-2088 non-fcra decease indicator- 106883 [Incident: 180920-000580]
