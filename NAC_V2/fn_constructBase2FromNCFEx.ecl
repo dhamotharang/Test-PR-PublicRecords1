@@ -80,6 +80,7 @@ END;
 							
 							self.Prepped_addr1 := addr.Prepped_addr1;
 							self.Prepped_addr2 := addr.Prepped_addr2;
+							self.AddressType := addr.AddressType;
 
 							self.prim_range := addr.prim_range;
 							self.predir := addr.predir;
@@ -226,7 +227,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					self.Certificate_id_type := right.Certificate;
 					self.ABAWDIndicator := right.ABAWDIndicator;
 					self.client_phone := right.phone;
-					self.client_email := REGEXFIND(rgxEmail, right.email, 1);
+					self.client_email := right.email;
 					
 					// add date information
 					self.StartDate_Raw := right.StartDate;

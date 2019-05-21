@@ -85,6 +85,8 @@ EXPORT Layout_Base2 := RECORD
 		,address.Layout_Clean_Name.mname
 		,address.Layout_Clean_Name.lname
 		,address.Layout_Clean_Name.name_suffix
+		
+		,string1	addressType := ''
 
 		,address.Layout_Clean182.prim_range
 		,address.Layout_Clean182.predir

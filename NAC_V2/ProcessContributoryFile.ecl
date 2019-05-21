@@ -57,7 +57,7 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 		
 		despray_NCF_reports(string rep):=function
 			fn := ModifyFileName(ilfn, rep);
-			pDestinationFile:= outgoing + trim(fn);
+			pDestinationFile:= outgoing + trim(ExtractFileName(fn));
 			return fileservices.Despray(fn,ip,pDestinationFile,,,,TRUE);
 		end;		
 		
