@@ -50,8 +50,7 @@ export proc_postHeaderBuilds(string8 pBldVer = '') := module
            getVname(InsuranceHeader_xLink.Key_InsuranceHeader_SSN().KeyName)<>build_version OR
            getVname(InsuranceHeader_xLink.Key_InsuranceHeader_SSN4().KeyName)<>build_version OR
            getVname(InsuranceHeader_xLink.Key_InsuranceHeader_ZIP_PR().KeyName)<>build_version OR
-           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_PH().KeyName)<>build_version OR
-           getVname(seg_key_name)<>build_version
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_DOBF().KeyName)<>build_version
        
         ,fail('Header linking keys does not match version'));
 
@@ -166,7 +165,6 @@ export proc_postHeaderBuilds(string8 pBldVer = '') := module
                             header.LogBuild.single('Started :'+step)
                             ,if(BldVer<>fn[sub..sub+7],fail('Header base does not match version'))
                             ,if(exists(wl),fail('QUICK HEADER is running'))
-                            ,checkLinkingVersion(BldVer)
                             ,header.Proc_AcceptSK_toQA(BldVer)
                             ,nothor(Header.move_header_raw_to_prod())
                             ,Header.Proc_Copy_From_Alpha(BldVer).MoveToQA
