@@ -119,38 +119,37 @@ JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addre
 		b1 := DISTRIBUTE(base, HASH64(ProgramState, ProgramCode, CaseId));
 		addr := DISTRIBUTE(addresses, HASH64(ProgramState, ProgramCode, CaseId));
 		// Match client specific addresses first
-		ds1m := JOIN(b1, addr(clientId<>'',AddressType in ['M','B']),
+		ds_cl_match := JOIN(b1, addr(clientId<>'',(integer)clientid<>0),
 					left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
 					and left.ClientId=right.ClientId,
 					xAddress(LEFT,RIGHT),
-					LEFT OUTER, KEEP(1), LOCAL);
-		ds1p := JOIN(ds1m, addr(clientId<>'',AddressType in ['P','B']),
+					Inner, KEEP(2), LOCAL);
+		// No client matches
+		ds_cl_nomatch := JOIN(b1, addr(clientId<>'',(integer)clientid<>0),
 					left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId
 					and left.ClientId=right.ClientId,
-					xAddress(LEFT,RIGHT),
-					LEFT OUTER, KEEP(1), LOCAL);
-					
-		ds1 := ds1m + ds1p;
-
-		// Match on caseid
-		ds2m := JOIN(b1, addr(clientId='',AddressType in ['M','B']),
+					TRANSFORM(nac_v2.Layout_Base2, self := left;),
+					LEFT Only, LOCAL);
+		// case matched
+		ds_ca_match := JOIN(ds_cl_nomatch, addr(clientId='' OR (integer)clientid=0),
 					left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId,
 					xAddress(LEFT,RIGHT),
-					LEFT OUTER, KEEP(1), LOCAL);
-		ds2 := JOIN(ds2m, addr(clientId='',AddressType in ['P','B']),
+					Inner, KEEP(2), LOCAL);
+		// No case matches
+		ds_ca_nomatch := JOIN(ds_cl_nomatch, addr(clientId<>'' Or (integer)clientid=0),
 					left.ProgramState=right.ProgramState
 					and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId,
-					xAddress(LEFT,RIGHT),
-					LEFT OUTER, KEEP(1), LOCAL);
-
-		return ds2;
+					TRANSFORM(nac_v2.Layout_Base2, self := left;),
+					LEFT Only, LOCAL);
+		
+		return ds_cl_match + ds_ca_match + ds_ca_nomatch;
 END;
 
 
