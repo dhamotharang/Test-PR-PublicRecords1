@@ -1,4 +1,4 @@
-import didville, doxie, header, header_quick, utilfile, STD;
+import didville, doxie, header, header_quick, utilfile, STD, dx_header;
 
   doxie.MAC_Header_Field_Declare(); //score_threshold_value, phonetics
   mod_access := doxie.compliance.GetGlobalDataAccessModule (); 
@@ -10,7 +10,7 @@ import didville, doxie, header, header_quick, utilfile, STD;
 	end;
 
 	//hdr+qk&util: match against quick header key
-	header.layout_header get_qk_hdr_by_did(acc_did_rec l, header_quick.key_DID r) := transform
+	dx_header.layout_header get_qk_hdr_by_did(acc_did_rec l, header_quick.key_DID r) := transform
 		self.rid := (unsigned6)l.acctno,
 		self.did := l.did,
 		self := r,
@@ -68,7 +68,8 @@ export All_recs := MODULE
 		string20 mname;
 	end;
 			
-	name_did_rec get_name_dids(didville.layout_bestInfo_batchin l, doxie.Key_Header_Wild_Name r) := transform
+	index_wild_name := dx_header.key_wild_name();
+	name_did_rec get_name_dids(didville.layout_bestInfo_batchin l, index_wild_name r) := transform
 		self.acctno := l.acctno;
 		self.lname := l.name_last;
 		self.fname := l.name_first;
@@ -76,7 +77,7 @@ export All_recs := MODULE
 		self.did := r.did;
 	end;		
 			
-	dids_rt_pre := join(f_in_triple_rt, doxie.Key_Header_Wild_Name,
+	dids_rt_pre := join(f_in_triple_rt, index_wild_name,
 					keyed(left.name_last = right.lname) and 
 											keyed(trim(left.name_first) = right.fname[1..length(trim(left.name_first))]) and
 					keyed(left.name_middle[1]=right.minit or left.name_middle='' or right.minit=''),
@@ -96,7 +97,8 @@ export All_recs := MODULE
 
 	fixed_DRM := Doxie.DataRestriction.fixed_DRM;
 
-	dids_rt_flt2 := dedup(sort(join(dids_rt_flt1, doxie.key_header, 
+	index_header := dx_header.key_header();
+	dids_rt_flt2 := dedup(sort(join(dids_rt_flt1, index_header,
 		left.did = right.s_did and ~Doxie.DataRestriction.isHeaderSourceRestricted(right.src, fixed_DRM),
 		get_unique(left), limit(50, skip)), record), record);
 							
@@ -118,13 +120,13 @@ export All_recs := MODULE
 	dids_all_dep := dedup(sort((dids_w_wo_rt)(did<>0), record), record);
 
 	//hdr+qk&util: match against header key
-	header.layout_header get_hdr(acc_did_rec l, doxie.key_header r) := transform
+	dx_header.layout_header get_hdr(acc_did_rec l, index_header r) := transform
 		self.rid := (unsigned6)l.acctno,
 		self.did := l.did,
 		self := r,
 	end;
 				
-	tpl_hdr_rl_recs := join(dids_all_dep, doxie.key_header, 
+	tpl_hdr_rl_recs := join(dids_all_dep, index_header, 
 		keyed(left.did = right.s_did) and 
 		~Doxie.DataRestriction.isHeaderSourceRestricted(right.src, fixed_DRM),
 		get_hdr(left, right), LIMIT(500,SKIP));
@@ -140,7 +142,7 @@ export All_recs := MODULE
 	unsigned3 todaydate := (unsigned3)(STD.Date.Today () div 100);
 	unsigned3 lesser(unsigned3 dt2) := if (add4(dt2) < todaydate, add4(dt2),todaydate);
 
-	header.layout_header get_util_by_did(acc_did_rec l, utilfile.Key_Util_Daily_Did r) := transform
+	dx_header.layout_header get_util_by_did(acc_did_rec l, utilfile.Key_Util_Daily_Did r) := transform
 		self.rid := (unsigned6)l.acctno,
 		self.did := l.did,
 		self.rec_type := '1';
@@ -179,7 +181,7 @@ export All_recs := MODULE
 	
 	// switch did and rid fields so that mac_monitoring_best_addr works properly, i.e it
 	// dedups on the did field which is not really a did and the did is preserved in the rid field
-	tpl_best_ready := project(tpl_clean_recs, transform({header.layout_header}, 
+	tpl_best_ready := project(tpl_clean_recs, transform({dx_header.layout_header}, 
 																										 self.did := left.rid,
 																										 self.rid := left.did, self := left));	
 
@@ -197,7 +199,7 @@ export get_dbl(dataset(didville.layout_bestInfo_batchin) f_in_double) := FUNCTIO
 													keyed(left.did = right.did),
 								get_qk_hdr_by_did(left, right), LIMIT(500,SKIP));	
 		
-	header.layout_header get_qk_hdr_by_fdid(acc_did_rec l, header_quick.key_AutokeyPayload r) := transform
+	dx_header.layout_header get_qk_hdr_by_fdid(acc_did_rec l, header_quick.key_AutokeyPayload r) := transform
 		self.rid := (unsigned6)l.acctno,
 		self.did := l.did,
 		self := r,
@@ -214,7 +216,7 @@ export get_dbl(dataset(didville.layout_bestInfo_batchin) f_in_double) := FUNCTIO
 	dbl_flt_recs := didville.fun_filter_by_best_ssn(dbl_raw_recs, f_in_double, score_threshold_value);
 				 
 	header.MAC_GlbClean_Header(dbl_flt_recs, dbl_clean_recs, , , mod_access);
-	dbl_best_ready := project(dbl_clean_recs, transform({header.layout_header}, 
+	dbl_best_ready := project(dbl_clean_recs, transform({dx_header.layout_header}, 
 																										 self.did := left.rid, self := left));
 	return dbl_best_ready;
 	
@@ -230,7 +232,7 @@ export get_sgl(dataset(didville.layout_bestInfo_batchin) f_in_single) := FUNCTIO
 
 	header.MAC_GlbClean_Header(sgl_flt_recs, sgl_clean_recs, , , mod_access);
 	sgl_ready := project(sgl_clean_recs, 
-											 transform({header.layout_header},
+											 transform({dx_header.layout_header},
 													 self.did := left.rid,self:=left));
 
 	return sgl_ready;	

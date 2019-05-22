@@ -15,7 +15,7 @@ EXPORT SmallBusiness_BIP_Function (
 											UNSIGNED1	OFAC_Version					= Business_Risk_BIP.Constants.Default_OFAC_Version,
 											REAL			Global_Watchlist_Threshold	= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold,
 											DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested = Business_Risk_BIP.Constants.Default_Watchlists_Requested,
-											DATASET(Gateway.Layouts.Config) Gateways = Business_Risk_BIP.Constants.Default_Gateways_Requested,
+											DATASET(Gateway.Layouts.Config) Gateways_in = Business_Risk_BIP.Constants.Default_Gateways_Requested,
 											DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested = DATASET([], LNSmallBusiness.Layouts.AttributeGroupRec),
 											DATASET(LNSmallBusiness.Layouts.ModelNameRec) ModelsRequested = DATASET([], LNSmallBusiness.Layouts.ModelNameRec),
 											DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions = DATASET([], LNSmallBusiness.Layouts.ModelOptionsRec),
@@ -29,6 +29,12 @@ EXPORT SmallBusiness_BIP_Function (
 																							) := FUNCTION
 
 	RESTRICTED_SET := ['0', ''];
+	
+	Gateway.Layouts.Config gw_switch(Gateway.Layouts.Config le) := TRANSFORM
+		SELF.servicename := IF((le.servicename IN LNSmallBusiness.Constants.SET_TARGUS_SERVICENAMES AND NOT DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission]='1'), '', le.servicename);
+		SELF.url 				 := IF((le.servicename IN LNSmallBusiness.Constants.SET_TARGUS_SERVICENAMES AND NOT DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission]='1'), '', le.url);
+	END;
+	Gateways := PROJECT(Gateways_in, gw_switch(left));
 
 	// Use the SBFE restriction to return Scores or not.
 	allow_SBFE_scores := DataPermissionMask[12] NOT IN RESTRICTED_SET;

@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, Email_Data, ConsumerDisclosure, STD, UT;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, Email_Data, ConsumerDisclosure, STD, UT;
 
 layout_email_raw := RECORD(Email_Data.Layout_Email.Keys)  
 END;

@@ -1,6 +1,6 @@
 ﻿/*--SOAP--
 <message name="SearchService"  wuTimeout="300000">
-  <part name="EmailFinderSearchRequest" type="tns:XmlDataSet" cols="70" rows="25"/>
+  <part name="EmailSearchV2SearchRequest" type="tns:XmlDataSet" cols="70" rows="25"/>
   <separator />
   <part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
 </message>
@@ -11,12 +11,12 @@ MACRO
   IMPORT iesp,EmailV2_Services;
   
   #WEBSERVICE(FIELDS(
-    'EmailFinderSearchRequest',
+    'EmailSearchV2Request',
     'gateways'
   ));
   
   // Input request
-  in_req := DATASET([], iesp.emailfinder.t_EmailFinderSearchRequest) : STORED('EmailFinderSearchRequest');
+  in_req := DATASET([], iesp.emailsearchv2.t_EmailSearchV2Request) : STORED('EmailSearchV2Request');
   
   first_row := in_req[1] : INDEPENDENT;
   search_by := GLOBAL(first_row.SearchBy);

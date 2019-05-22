@@ -1,4 +1,4 @@
-import ut, doxie, AutoStandardI, NID, AutoHeaderV2, lib_metaphone, lib_stringlib;
+import ut, doxie, dx_header, AutoStandardI, NID, AutoHeaderV2, lib_metaphone, lib_stringlib;
 
 export fetch_address (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 
@@ -38,9 +38,9 @@ export fetch_address (dataset (AutoheaderV2.layouts.search) ds_search, integer s
 	temp_prim_range_set := _row.taddress.prim_range_set;
 	temp_FuzzySecRange_value := _row.taddress.sec_range_fuzziness;
 			
-	i := doxie.Key_Address;
-	wi := doxie.Key_Header_Wild_Address;
-	dti := doxie.Key_Header_DTS_Address;
+	i := dx_header.key_address();
+	wi := dx_header.key_wild_address();
+	dti := dx_header.key_DTS_address();
  
 	boolean doSkipFname := LENGTH(TRIM(temp_fname_value))<2;
 	boolean just_addr := temp_lname_value = '' and doSkipFname;

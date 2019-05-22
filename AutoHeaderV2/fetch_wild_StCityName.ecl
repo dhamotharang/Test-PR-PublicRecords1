@@ -1,4 +1,4 @@
-import ut, doxie,AutoheaderV2, lib_stringlib;
+import ut, doxie, dx_header, AutoheaderV2, lib_stringlib;
 
 export fetch_wild_StCityName (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
 	_row := ds_search[1];
@@ -27,7 +27,7 @@ export fetch_wild_StCityName (dataset (AutoheaderV2.layouts.search) ds_search, i
 	temp_rel_fname_value1 := _row.tname.fname_rel_1;
 	temp_rel_fname_value2 := _row.tname.fname_rel_2;
 
-	i := doxie.Key_Header_Wild_StCityLFName;
+	i := dx_header.key_wild_StCityLFName();
 
 	first_fil := (temp_city_value != '' AND temp_lname_value != '') AND
 								// To Prevent extra work

@@ -1,4 +1,10 @@
-﻿IMPORT LiensV2, ConsumerDisclosure, doxie, FCRA, FFD, Suppress, STD, BIPV2;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT LiensV2, ConsumerDisclosure, doxie, FCRA, FFD, Suppress, STD, BIPV2;
 
 todaysdate := (STRING8) STD.Date.Today();
 

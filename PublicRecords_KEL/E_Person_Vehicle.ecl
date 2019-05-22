@@ -47,13 +47,22 @@ EXPORT E_Person_Vehicle(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'subject(Subject_:0),Automobile_(Automobile_:0),isminor(Is_Minor_),registrationfirstdate(Registration_First_Date_:DATE),registrationearliesteffectivedate(Registration_Earliest_Effective_Date_:DATE),registrationlatesteffectivedate(Registration_Latest_Effective_Date_:DATE),registrationlatestexpirationedate(Registration_Latest_Expiratione_Date_:DATE),registrationrecordcount(Registration_Record_Count_:0),registrationdecalnumber(Registration_Decal_Number_:\'\'),registratoindecalyear(Registratoin_Decal_Year_:0),registrationstatuscode(Registration_Status_Code_:\'\'),registrationstatusdescription(Registration_Status_Description_:\'\'),registrationtruelicenseplate(Registration_True_License_Plate_:\'\'),registrationlicenseplate(Registration_License_Plate_:\'\'),registrationlicensestate(Registration_License_State_:\'\'),registrationlicenseplatetypecode(Registration_License_Plate_Type_Code_:\'\'),registrationlicenseplatetypedescription(Registration_License_Plate_Type_Description_:\'\'),registrationpreviouslicensestate(Registration_Previous_License_State_:\'\'),registrationpreviouslicenseplate(Registration_Previous_License_Plate_:\'\'),titlenumber(Title_Number_:\'\'),titleearliestissuedate(Title_Earliest_Issue_Date_:DATE),titlelatestissuedate(Title_Latest_Issue_Date_:DATE),titlepreviousissuedate(Title_Previous_Issue_Date_:DATE),titlerecordcount(Title_Record_Count_:0),titlestatuscode(Title_Status_Code_:\'\'),titlestatusdescription(Title_Status_Description_:\'\'),titleodometermileage(Title_Odometer_Mileage_:0),titleodometerstatuscode(Title_Odometer_Status_Code_:\'\'),titleodometerstatusdescription(Title_Odometer_Status_Description_:\'\'),titleodometerdate(Title_Odometer_Date_:DATE),sequencekey(Sequence_Key_:\'\'),history(History_:\'\'),historysource(History_Source_),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED __Mapping0 := 'append_did(Subject_:0),Automobile_(Automobile_:0),isminor(Is_Minor_),reg_first_date(Registration_First_Date_:DATE),reg_earliest_effective_date(Registration_Earliest_Effective_Date_:DATE),reg_latest_effective_date(Registration_Latest_Effective_Date_:DATE),reg_latest_expiration_date(Registration_Latest_Expiratione_Date_:DATE),reg_rollup_count(Registration_Record_Count_:0),reg_decal_number(Registration_Decal_Number_:\'\'),reg_decal_year(Registratoin_Decal_Year_:0),reg_status_code(Registration_Status_Code_:\'\'),reg_status_desc(Registration_Status_Description_:\'\'),reg_true_license_plate(Registration_True_License_Plate_:\'\'),reg_license_plate(Registration_License_Plate_:\'\'),reg_license_state(Registration_License_State_:\'\'),reg_license_plate_type_code(Registration_License_Plate_Type_Code_:\'\'),reg_license_plate_type_desc(Registration_License_Plate_Type_Description_:\'\'),reg_previous_license_state(Registration_Previous_License_State_:\'\'),reg_previous_license_plate(Registration_Previous_License_Plate_:\'\'),ttl_number(Title_Number_:\'\'),ttl_earliest_issue_date(Title_Earliest_Issue_Date_:DATE),ttl_latest_issue_date(Title_Latest_Issue_Date_:DATE),ttl_previous_issue_date(Title_Previous_Issue_Date_:DATE),ttl_rollup_count(Title_Record_Count_:0),ttl_status_code(Title_Status_Code_:\'\'),ttl_status_desc(Title_Status_Description_:\'\'),ttl_odometer_mileage(Title_Odometer_Mileage_:0),ttl_odometer_status_code(Title_Odometer_Status_Code_:\'\'),ttl_odometer_status_desc(Title_Odometer_Status_Description_:\'\'),ttl_odometer_date(Title_Odometer_Date_:DATE),sequence_key(Sequence_Key_:\'\'),history(History_:\'\'),src(Source_:\'\'),date_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),date_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),DPMBitmap(__Permits:PERMITS)';
+  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
+    SELF.History_Source_ := __CN(TRUE);
+    SELF := __r;
+  END;
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_VehicleV2__Key_Vehicle_Party_Key,TRANSFORM(RECORDOF(__in.Dataset_VehicleV2__Key_Vehicle_Party_Key),SELF:=RIGHT));
+  EXPORT __d0_KELfiltered := __d0_Norm((STRING20)vehicle_key <> '' AND (UNSIGNED)append_did != 0);
   SHARED __d0_Automobile__Layout := RECORD
-    RECORDOF(__in);
+    RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Automobile_;
   END;
-  SHARED __d0_Automobile__Mapped := JOIN(__in,E_Vehicle(__in,__cfg).Lookup,TRIM((STRING)LEFT.VehicleKey) = RIGHT.KeyVal,TRANSFORM(__d0_Automobile__Layout,SELF.Automobile_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Automobile__Mapped := JOIN(__d0_KELfiltered,E_Vehicle(__in,__cfg).Lookup,TRIM((STRING)LEFT.vehicle_key) = RIGHT.KeyVal,TRANSFORM(__d0_Automobile__Layout,SELF.Automobile_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Automobile__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
+  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
   EXPORT InData := __d0;
   EXPORT Minor_Layout := RECORD
     KEL.typ.nbool Is_Minor_;
@@ -153,40 +162,39 @@ EXPORT E_Person_Vehicle(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
   EXPORT Automobile__Orphan := JOIN(InData(__NN(Automobile_)),E_Vehicle(__in,__cfg).__Result,__EEQP(LEFT.Automobile_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Subject__Orphan),COUNT(Automobile__Orphan)}],{KEL.typ.int Subject__Orphan,KEL.typ.int Automobile__Orphan});
   EXPORT NullCounts := DATASET([
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Subject',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','append_did',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
     {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Automobile',COUNT(__d0(__NL(Automobile_))),COUNT(__d0(__NN(Automobile_)))},
     {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','IsMinor',COUNT(__d0(__NL(Is_Minor_))),COUNT(__d0(__NN(Is_Minor_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationFirstDate',COUNT(__d0(__NL(Registration_First_Date_))),COUNT(__d0(__NN(Registration_First_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationEarliestEffectiveDate',COUNT(__d0(__NL(Registration_Earliest_Effective_Date_))),COUNT(__d0(__NN(Registration_Earliest_Effective_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationLatestEffectiveDate',COUNT(__d0(__NL(Registration_Latest_Effective_Date_))),COUNT(__d0(__NN(Registration_Latest_Effective_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationLatestExpirationeDate',COUNT(__d0(__NL(Registration_Latest_Expiratione_Date_))),COUNT(__d0(__NN(Registration_Latest_Expiratione_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationRecordCount',COUNT(__d0(__NL(Registration_Record_Count_))),COUNT(__d0(__NN(Registration_Record_Count_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationDecalNumber',COUNT(__d0(__NL(Registration_Decal_Number_))),COUNT(__d0(__NN(Registration_Decal_Number_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistratoinDecalYear',COUNT(__d0(__NL(Registratoin_Decal_Year_))),COUNT(__d0(__NN(Registratoin_Decal_Year_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationStatusCode',COUNT(__d0(__NL(Registration_Status_Code_))),COUNT(__d0(__NN(Registration_Status_Code_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationStatusDescription',COUNT(__d0(__NL(Registration_Status_Description_))),COUNT(__d0(__NN(Registration_Status_Description_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationTrueLicensePlate',COUNT(__d0(__NL(Registration_True_License_Plate_))),COUNT(__d0(__NN(Registration_True_License_Plate_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationLicensePlate',COUNT(__d0(__NL(Registration_License_Plate_))),COUNT(__d0(__NN(Registration_License_Plate_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationLicenseState',COUNT(__d0(__NL(Registration_License_State_))),COUNT(__d0(__NN(Registration_License_State_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationLicensePlateTypeCode',COUNT(__d0(__NL(Registration_License_Plate_Type_Code_))),COUNT(__d0(__NN(Registration_License_Plate_Type_Code_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationLicensePlateTypeDescription',COUNT(__d0(__NL(Registration_License_Plate_Type_Description_))),COUNT(__d0(__NN(Registration_License_Plate_Type_Description_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationPreviousLicenseState',COUNT(__d0(__NL(Registration_Previous_License_State_))),COUNT(__d0(__NN(Registration_Previous_License_State_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RegistrationPreviousLicensePlate',COUNT(__d0(__NL(Registration_Previous_License_Plate_))),COUNT(__d0(__NN(Registration_Previous_License_Plate_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleNumber',COUNT(__d0(__NL(Title_Number_))),COUNT(__d0(__NN(Title_Number_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleEarliestIssueDate',COUNT(__d0(__NL(Title_Earliest_Issue_Date_))),COUNT(__d0(__NN(Title_Earliest_Issue_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleLatestIssueDate',COUNT(__d0(__NL(Title_Latest_Issue_Date_))),COUNT(__d0(__NN(Title_Latest_Issue_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitlePreviousIssueDate',COUNT(__d0(__NL(Title_Previous_Issue_Date_))),COUNT(__d0(__NN(Title_Previous_Issue_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleRecordCount',COUNT(__d0(__NL(Title_Record_Count_))),COUNT(__d0(__NN(Title_Record_Count_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleStatusCode',COUNT(__d0(__NL(Title_Status_Code_))),COUNT(__d0(__NN(Title_Status_Code_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleStatusDescription',COUNT(__d0(__NL(Title_Status_Description_))),COUNT(__d0(__NN(Title_Status_Description_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleOdometerMileage',COUNT(__d0(__NL(Title_Odometer_Mileage_))),COUNT(__d0(__NN(Title_Odometer_Mileage_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleOdometerStatusCode',COUNT(__d0(__NL(Title_Odometer_Status_Code_))),COUNT(__d0(__NN(Title_Odometer_Status_Code_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleOdometerStatusDescription',COUNT(__d0(__NL(Title_Odometer_Status_Description_))),COUNT(__d0(__NN(Title_Odometer_Status_Description_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TitleOdometerDate',COUNT(__d0(__NL(Title_Odometer_Date_))),COUNT(__d0(__NN(Title_Odometer_Date_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SequenceKey',COUNT(__d0(__NL(Sequence_Key_))),COUNT(__d0(__NN(Sequence_Key_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','History',COUNT(__d0(__NL(History_))),COUNT(__d0(__NN(History_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','HistorySource',COUNT(__d0(__NL(History_Source_))),COUNT(__d0(__NN(History_Source_)))},
-    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_first_date',COUNT(__d0(__NL(Registration_First_Date_))),COUNT(__d0(__NN(Registration_First_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_earliest_effective_date',COUNT(__d0(__NL(Registration_Earliest_Effective_Date_))),COUNT(__d0(__NN(Registration_Earliest_Effective_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_latest_effective_date',COUNT(__d0(__NL(Registration_Latest_Effective_Date_))),COUNT(__d0(__NN(Registration_Latest_Effective_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_latest_expiration_date',COUNT(__d0(__NL(Registration_Latest_Expiratione_Date_))),COUNT(__d0(__NN(Registration_Latest_Expiratione_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_rollup_count',COUNT(__d0(__NL(Registration_Record_Count_))),COUNT(__d0(__NN(Registration_Record_Count_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_decal_number',COUNT(__d0(__NL(Registration_Decal_Number_))),COUNT(__d0(__NN(Registration_Decal_Number_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_decal_year',COUNT(__d0(__NL(Registratoin_Decal_Year_))),COUNT(__d0(__NN(Registratoin_Decal_Year_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_status_code',COUNT(__d0(__NL(Registration_Status_Code_))),COUNT(__d0(__NN(Registration_Status_Code_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_status_desc',COUNT(__d0(__NL(Registration_Status_Description_))),COUNT(__d0(__NN(Registration_Status_Description_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_true_license_plate',COUNT(__d0(__NL(Registration_True_License_Plate_))),COUNT(__d0(__NN(Registration_True_License_Plate_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_license_plate',COUNT(__d0(__NL(Registration_License_Plate_))),COUNT(__d0(__NN(Registration_License_Plate_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_license_state',COUNT(__d0(__NL(Registration_License_State_))),COUNT(__d0(__NN(Registration_License_State_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_license_plate_type_code',COUNT(__d0(__NL(Registration_License_Plate_Type_Code_))),COUNT(__d0(__NN(Registration_License_Plate_Type_Code_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_license_plate_type_desc',COUNT(__d0(__NL(Registration_License_Plate_Type_Description_))),COUNT(__d0(__NN(Registration_License_Plate_Type_Description_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_previous_license_state',COUNT(__d0(__NL(Registration_Previous_License_State_))),COUNT(__d0(__NN(Registration_Previous_License_State_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','reg_previous_license_plate',COUNT(__d0(__NL(Registration_Previous_License_Plate_))),COUNT(__d0(__NN(Registration_Previous_License_Plate_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_number',COUNT(__d0(__NL(Title_Number_))),COUNT(__d0(__NN(Title_Number_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_earliest_issue_date',COUNT(__d0(__NL(Title_Earliest_Issue_Date_))),COUNT(__d0(__NN(Title_Earliest_Issue_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_latest_issue_date',COUNT(__d0(__NL(Title_Latest_Issue_Date_))),COUNT(__d0(__NN(Title_Latest_Issue_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_previous_issue_date',COUNT(__d0(__NL(Title_Previous_Issue_Date_))),COUNT(__d0(__NN(Title_Previous_Issue_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_rollup_count',COUNT(__d0(__NL(Title_Record_Count_))),COUNT(__d0(__NN(Title_Record_Count_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_status_code',COUNT(__d0(__NL(Title_Status_Code_))),COUNT(__d0(__NN(Title_Status_Code_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_status_desc',COUNT(__d0(__NL(Title_Status_Description_))),COUNT(__d0(__NN(Title_Status_Description_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_odometer_mileage',COUNT(__d0(__NL(Title_Odometer_Mileage_))),COUNT(__d0(__NN(Title_Odometer_Mileage_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_odometer_status_code',COUNT(__d0(__NL(Title_Odometer_Status_Code_))),COUNT(__d0(__NN(Title_Odometer_Status_Code_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_odometer_status_desc',COUNT(__d0(__NL(Title_Odometer_Status_Description_))),COUNT(__d0(__NN(Title_Odometer_Status_Description_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ttl_odometer_date',COUNT(__d0(__NL(Title_Odometer_Date_))),COUNT(__d0(__NN(Title_Odometer_Date_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','sequence_key',COUNT(__d0(__NL(Sequence_Key_))),COUNT(__d0(__NN(Sequence_Key_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','history',COUNT(__d0(__NL(History_))),COUNT(__d0(__NN(History_)))},
+    {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'PersonVehicle','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});

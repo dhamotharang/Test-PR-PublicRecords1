@@ -103,7 +103,7 @@ MODULE
   EXPORT BOOLEAN NameAddressValidation        := FALSE;
   EXPORT BOOLEAN IncludeNameAddressValidation := FALSE;
   EXPORT BOOLEAN NameAddressInfo              := FALSE;
-  EXPORT BOOLEAN IncludeNameAddressInfo              := FALSE;
+  EXPORT BOOLEAN IncludeNameAddressInfo       := FALSE;
   EXPORT BOOLEAN AccountInfo                  := FALSE;
   EXPORT BOOLEAN CallHandlingInfo             := FALSE;
   EXPORT BOOLEAN IncludeCallHandlingInfo      := FALSE;
@@ -114,10 +114,8 @@ MODULE
   EXPORT BOOLEAN DeviceHistory                := FALSE;
   EXPORT BOOLEAN IncludeDeviceHistory         := FALSE;
   EXPORT BOOLEAN IncludeZumigoOptions         := FALSE;
-  EXPORT BOOLEAN InputZumigoOptions         := FALSE;
-  
-    
- 
+  EXPORT BOOLEAN InputZumigoOptions           := FALSE;
+  EXPORT BOOLEAN UseThreatMetrixRules         := FALSE;
 	END;
     
 		EXPORT PhoneVerificationParams := 
@@ -217,7 +215,7 @@ MODULE
     EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators				:= IncludeRiskIndicators_internal OR pfOptions.IncludeOtherPhoneRiskIndicators;	
 	  
    	UserRules							:= pfOptions.RiskIndicators;	
-   	allRules := IF(IncludeRiskIndicators AND EXISTS(UserRules), PhoneFinder_Services.Constants.defaultRules + UserRules,
+   	allRules := IF(IncludeRiskIndicators AND EXISTS(UserRules), PhoneFinder_Services.Constants.defaultRiskIndicatorRules  + UserRules,
    										                                                           DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator));
    	EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
    		                                                                                  UserRules, allRules);
@@ -311,8 +309,9 @@ MODULE
     EXPORT BOOLEAN InputZumigoOptions         := NameAddressValidation OR NameAddressInfo OR
                                                  CallHandlingInfo OR DeviceInfo OR 
                                                  DeviceChangeInfo OR DeviceHistory;
+				EXPORT BOOLEAN   UseThreatMetrixRules     := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId  IN $.Constants.AllThreatMetrixRules) AND active));																				 
    
-		END;
+		 END;
 			
 			RETURN in_params;
 		END;
@@ -394,7 +393,7 @@ MODULE
     EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators:= FALSE : STORED('IncludeOtherPhoneRiskIndicators');
 	  
    	UserRules  				 := DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator) : STORED('RiskIndicators');
-   	allRules := IF(IncludeRiskIndicators AND EXISTS(UserRules), PhoneFinder_Services.Constants.defaultRules + UserRules,
+   	allRules := IF(IncludeRiskIndicators AND EXISTS(UserRules), PhoneFinder_Services.Constants.defaultRiskIndicatorRules + UserRules,
    										                                                           DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator));
    	EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
    		                                                                                  UserRules, allRules);	

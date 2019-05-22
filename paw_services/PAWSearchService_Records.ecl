@@ -2,17 +2,13 @@ import AutoStandardI,PAW,ut,doxie,CriminalRecords_Services;
 
 export PAWSearchService_Records := module
 	export params := interface(
-	PAWSearchService_IDs.params,
+	$.PAWSearchService_IDs.params,
 	AutoStandardI.LIBIN.PenaltyI_Indv.base,
 	AutoStandardI.LIBIN.PenaltyI_Biz.base,
-	Functions.fnPerson.params,
-	AutoStandardI.InterfaceTranslator.glb_purpose.params,
-	AutoStandardI.InterfaceTranslator.dppa_purpose.params,
-	AutoStandardI.InterfaceTranslator.probation_override_value.params,
-	AutoStandardI.InterfaceTranslator.industry_class_value.params,
-	AutoStandardI.InterfaceTranslator.dateval.params,
-	AutoStandardI.InterfaceTranslator.ln_branded_value.params,
-	AutoStandardI.InterfaceTranslator.ssn_mask_value.params)
+	$.Functions.fnPerson.params,
+  doxie.IDataAccess)
+  export string DataPermissionMask := ''; //conflicting definition
+      //-- because of the conflict with $.PAWSearchService_IDs.params -> $.AutoKey_IDs.params -> (AutoKeyI.AutoKeyStandardFetchBaseInterface
 	export unsigned2 penaltThreshold;
 	export includeAlsoFound := false;
 	export boolean IncludeCriminalIndicators:=false;
@@ -26,6 +22,8 @@ end;
 // output (Doxie.HFRS in particular).
 
 export val(dataset(layouts.search) ids, params in_mod) := function
+
+  mod_access := PROJECT (in_mod, doxie.IDataAccess);
 	// Get the IDs, pull the payload records and add Group ID to them.
 	recs := join(ids,paw.Key_contactID,keyed(left.contact_id=right.contact_id), atmost(ut.limits.PAW_PER_CONTACTID)); // < 25 recs per contact
 	recs_plus_best := project(recs,transform(Layouts.Raw,self.timezone:=[],self:=left));
@@ -124,7 +122,7 @@ export val(dataset(layouts.search) ids, params in_mod) := function
   CriminalRecords_Services.MAC_Indicators(recsIn,recsOut);
   recs_crimInd := PROJECT(IF(in_mod.IncludeCriminalIndicators,recsOut,recsIn),Layouts.raw);
 
-	recs_fmt := Functions.fnPerson.val(recs_crimInd,in_mod);
+	recs_fmt := $.Functions.fnPerson.val(recs_crimInd,in_mod);
 
 	add_seq := project(recs_fmt,transform({unsigned __seq,recs_fmt},
 		self.__seq := counter,
@@ -171,20 +169,12 @@ export val(dataset(layouts.search) ids, params in_mod) := function
 	temp_waf := project(recs_sort,PAW_OutRecsLayout);
 
 	// Add We Also Found.
-	ln_branded_value := AutoStandardI.InterfaceTranslator.ln_branded_value.val(in_mod);
-	probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(in_mod);
-	industry_class_value := AutoStandardI.InterfaceTranslator.industry_class_value.val(in_mod);
-	dppa_purpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val(in_mod);
-	glb_purpose := AutoStandardI.InterfaceTranslator.glb_purpose.val(in_mod);
-	dateval := AutoStandardI.InterfaceTranslator.dateval.val(in_mod);
 	score_threshold_value := AutoStandardI.InterfaceTranslator.score_threshold_value.val(in_mod); 
 
-	doxie.MAC_Add_WeAlsoFound(temp_waf,recs_waf,glb_purpose,dppa_purpose);
+	doxie.MAC_Add_WeAlsoFound(temp_waf,recs_waf,mod_access);
 
 	recs_res := if(in_mod.includeAlsoFound, recs_waf, temp_waf);
 
 	return recs_res;
 	end;
 end;
-
-

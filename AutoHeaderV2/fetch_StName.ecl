@@ -1,4 +1,4 @@
-import ut,doxie,NID,AutoHeaderV2;
+import ut,doxie,dx_header,NID,AutoHeaderV2;
 
 export fetch_StName (dataset (AutoHeaderV2.layouts.search) ds_search, integer search_code=0) := function
 	_row := ds_search[1];
@@ -40,9 +40,9 @@ export fetch_StName (dataset (AutoHeaderV2.layouts.search) ds_search, integer se
 	temp_lname_trailing_value := _row.tname.lname != '' and _row.tname.fname = '' and _row.tname.mname = '';
 	temp_fname_trailing_value := _row.tname.lname != '' and _row.tname.fname != '' and _row.tname.mname = '';
 
-	i := doxie.Key_Header_StFnameLname;
+	i := dx_header.key_StFnameLname();
 	// use wild key for level 1 fetch 
-	wi := doxie.Key_Header_Wild_StFnameLname;
+	wi := dx_header.key_wild_StFnameLname();
 
 	first_fil := (temp_lname_value != '') AND
 								// To Prevent extra work

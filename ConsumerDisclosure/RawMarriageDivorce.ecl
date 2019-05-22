@@ -1,4 +1,10 @@
-﻿IMPORT Marriage_Divorce_v2, ConsumerDisclosure, doxie, FCRA, FFD, Suppress;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT Marriage_Divorce_v2, ConsumerDisclosure, doxie, FCRA, FFD, Suppress;
 
 BOOLEAN IsFCRA := TRUE;
 

@@ -365,7 +365,11 @@ EXPORT Layouts := MODULE
 	 BOOLEAN vacant;
    STRING1 addressType;
 	END;	
-	
+  
+   EXPORT DIDAndName := RECORD
+    UNSIGNED6 did;
+    Name;
+  END;	
 	
 	EXPORT LayoutAgent := RECORD
 		UNSIGNED4 dateFirstSeen;
@@ -407,11 +411,6 @@ EXPORT Layouts := MODULE
 		BOOLEAN blastPilot;
 		BOOLEAN other;
 	END;
-    
-  EXPORT DIDAndName := RECORD
-    UNSIGNED6 did;
-    Name;
-  END;
   
   EXPORT SlimIndividual := RECORD
 		DIDAndName;
@@ -663,7 +662,7 @@ EXPORT Layouts := MODULE
     DATASET(BusSourceLayout) sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
     UNSIGNED4 dateVendorFirstReported;
-    DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
+    DATASET(DIDAndName) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
     DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
     STRING parentCompanyName;
     UNSIGNED2 DIDlessBEOCount; 

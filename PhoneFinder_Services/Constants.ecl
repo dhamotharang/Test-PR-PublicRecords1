@@ -96,8 +96,9 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	EXPORT RiskLevel		 := ENUM(PASS=1,WARN=2,FAILED=3);
 	EXPORT UNSIGNED1 OTPRiskLimit := 5;
 	EXPORT UNSIGNED1 InquiryDayLimit := 1;
-	EXPORT defaultRules	 := DATASET([{'Phone Association','H','1','0','No Identity',0,0,true,true}, {'Phone Association','H','1','-1','No phone associated with subject',0,0,true,true}],
-	                                iesp.phonefinder.t_PhoneFinderRiskIndicator);
+	EXPORT defaultRiskIndicatorRules	 := DATASET([{'Phone Association','H','1','0','No Identity',0,0,'',true,true},
+	                                              {'Phone Association','H','1','-1','No phone associated with subject',0,0,'',true,true}],
+	                                              iesp.phonefinder.t_PhoneFinderRiskIndicator);
 	EXPORT SET OF STRING enumCategory := ['Phone Association','Phone Activity','Phone Criteria'];
 	
 	EXPORT SpoofPhoneOrigin :=
@@ -126,7 +127,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 					'Unspecified Failure');
 		
 	EXPORT PhoneRiskAssessmentGateways  := [Gateway.Constants.ServiceName.PhonesMetaData, Gateway.Constants.ServiceName.AccuDataOCN,
-                                            Gateway.Constants.ServiceName.ZumigoIdentity]; // phonerisk assessment gateways
+                                            Gateway.Constants.ServiceName.ZumigoIdentity, Gateway.Constants.ServiceName.ThreatMetrix]; // phonerisk assessment gateways
 	// Debugging
 	EXPORT Debug :=
 	MODULE
@@ -148,7 +149,16 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT STRING10 optInType   := 'Whitelist';
 		EXPORT STRING5 	optInMethod := 'TCO';
 		EXPORT STRING3 	optinDuration := 'ONG';
-    EXPORT UNSIGNED1 IdentityDateThreshold := 61;
+		EXPORT UNSIGNED1 IdentityDateThreshold := 61;
+	END;
+	
+	EXPORT ThreatMetrixConstants := MODULE
+		EXPORT STRING20 OrgId    := 'ymyo6b64';
+		EXPORT STRING50 ApiKey   := 'ivdshxsu3m5xmoom';
+		EXPORT STRING30 Policy   := 'Digital Insights';
+		EXPORT STRING30 ApiType  := 'AttributeQuery';
+		EXPORT STRING20 serviceType := 'all';
+		EXPORT BOOLEAN 	NoPIIPersistence := TRUE;
 	END;
 	
 	EXPORT ConsentLevels := MODULE
@@ -160,6 +170,27 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	  EXPORT UNSIGNED1 SimCardInfo  := 35;
 	  EXPORT UNSIGNED1 DeviceInfo   := 36;
 	END;
+	
+	EXPORT ThreatMetrixRiskRules := MODULE
+	  //DIN = Digital Identity Network
+	  EXPORT UNSIGNED1 RejectedTransaction  := 37;
+	  EXPORT UNSIGNED1 Blacklist            := 38;
+	  EXPORT UNSIGNED1 FraudInDIN           := 39;
+	  EXPORT UNSIGNED1 BadReputation        := 40;
+	  EXPORT UNSIGNED1 FirstSeenInDIN       := 41;
+	  EXPORT UNSIGNED1 HighDeviceCount      := 42;
+	  EXPORT UNSIGNED1 HighEmailCount       := 43;
+	  EXPORT UNSIGNED1 HighCountriesCount   := 44;
+	END;
+	
+	EXPORT AllThreatMetrixRules :=[ThreatMetrixRiskRules.RejectedTransaction,
+                       ThreatMetrixRiskRules.Blacklist,
+                       ThreatMetrixRiskRules.FraudInDIN,
+                       ThreatMetrixRiskRules.BadReputation,
+                       ThreatMetrixRiskRules.FirstSeenInDIN,
+                       ThreatMetrixRiskRules.HighDeviceCount,
+                       ThreatMetrixRiskRules.HighEmailCount,
+                       ThreatMetrixRiskRules.HighCountriesCount];
    
    EXPORT PfResSnapshotErrorMessages := module
 		 EXPORT STRING50 Companyid := 'Too Many Transactions by CompanyId';

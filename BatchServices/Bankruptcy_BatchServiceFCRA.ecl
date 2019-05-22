@@ -51,18 +51,18 @@
 */
 IMPORT AutoStandardI, BatchShare, BatchServices, BankruptcyV3_Services, FFD, UT;
 
-export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
+EXPORT Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
 
   #OPTION('optimizeProjects', TRUE);
 
   // Imitate in part the constants and stored variables found in the bankruptcy search service.
-  #constant('SearchIgnoresAddressOnly',true);
-  #stored('ScoreThreshold',10);
-  #stored('PenaltThreshold',20);
+  #CONSTANT('SearchIgnoresAddressOnly',true);
+  #STORED('ScoreThreshold',10);
+  #STORED('PenaltThreshold',20);
 
-  #constant('DisplayMatchedParty',true);
-  #constant('isFCRA', true);
-  #constant('noDeepDive', true);
+  #CONSTANT('DisplayMatchedParty',true);
+  #CONSTANT('isFCRA', true);
+  #CONSTANT('noDeepDive', true);
 
   BOOLEAN isFCRA           := true    : STORED('IsFCRA');
   BOOLEAN isDeepDive         := false  : STORED('IsDeepDive');
@@ -72,7 +72,7 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
   BOOLEAN match_creditors        := FALSE   : STORED('Match_Creditors');
   BOOLEAN match_debtors          := TRUE   : STORED('Match_Debtors');
 
-  boolean use_namessnlast4      := true   : stored('UseNameSSNLast4');
+  BOOLEAN use_namessnlast4      := true   : stored('UseNameSSNLast4');
 
   STRING1 BIPFetchLevel    := 'S'   : STORED('BIPFetchLevel');
   BOOLEAN BIPSkipMatch    := true  : STORED('BIPSkipMatch');
@@ -129,13 +129,26 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
     TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF.inquiry_lexID := (STRING)RIGHT.did, SELF := LEFT),
     KEEP(1), LIMIT(0));
 
-  //Any inquiry without a single match is sent to remote linking.
-  ds_batch_for_remote_linking := JOIN(ds_batch, ds_batch_validated_lexID,
+  //Any inquiry without a single match has results checked for match codes which are allowed to bypass validation.
+  ds_batch_for_mc_bypass_check := JOIN(ds_batch, ds_batch_validated_lexID,
     LEFT.acctno = RIGHT.acctno, LEFT ONLY);
 
-  //Get remote linking matches and concat them to the lexID validated results.
+  //Get records which are considered FCRA compliant via match code.
+  _ds_batch_mc_matches := BatchServices.MatchCodes.fn_get_FFD_compliant_matches(ds_batch_for_mc_bypass_check);
+
+  //Set inquiry_lexID for matchcode matches.
+  ds_batch_mc_matches := JOIN(_ds_batch_mc_matches, ds_batch_in, LEFT.acctno = RIGHT.acctno,
+    TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out,
+      SELF.inquiry_lexID := IF(RIGHT.did > 0, (STRING)RIGHT.did, LEFT.debtor_did),
+      SELF := LEFT), KEEP(1), LIMIT(0));
+
+  //Any inquiry that still has no match is sent to remote linking.
+  ds_batch_for_remote_linking := JOIN(ds_batch_for_mc_bypass_check, ds_batch_mc_matches,
+    LEFT.acctno = RIGHT.acctno, LEFT ONLY);
+
+  //Get remote linking matches and concat them to the lexID validated and MC compliant results.
   ds_remote_linking_matches := BankruptcyV3_Services.fn_get_remote_linking_matches(ds_batch_in, ds_batch_for_remote_linking, batch_params.gateways);
-  ds_batch_all_validated := ds_batch_validated_lexID + ds_remote_linking_matches;
+  ds_batch_all_validated := ds_batch_validated_lexID + ds_remote_linking_matches + ds_batch_mc_matches;
 
   //Find records on input which have no results but a did > 0 and extract the dids.
   dids_no_results := JOIN(ds_batch_in(did > 0), ds_batch_all_validated, LEFT.acctno = RIGHT.acctno,
@@ -165,6 +178,8 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
 
 //DEBUG--------------------------------------------
   // OUTPUT(ds_batch, NAMED('ds_batch'));
+  // OUTPUT(ds_batch_for_mc_bypass_check, NAMED('ds_batch_for_mc_bypass_check'));
+  // OUTPUT(ds_batch_mc_matches, NAMED('ds_batch_mc_matches'));
   // OUTPUT(ds_batch_for_remote_linking, NAMED('ds_batch_for_remote_linking'));
   // OUTPUT(ds_remote_linking_matches, NAMED('ds_remote_linking_matches'));
   // OUTPUT(dids, NAMED('dids'));
@@ -176,5 +191,5 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
   OUTPUT(results, NAMED('Results'));
   OUTPUT(consumer_statements, NAMED('CSDResults'));
 
-  ENDMACRO;
+ENDMACRO;
 // BatchServices.Bankruptcy_BatchServiceFCRA();

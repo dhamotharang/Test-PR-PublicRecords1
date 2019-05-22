@@ -1,10 +1,11 @@
 
-IMPORT AutoStandardI, BatchServices, iesp, PAW_Services;
+IMPORT AutoStandardI, BatchServices, iesp, PAW_Services, doxie;
 
 EXPORT Plus_SearchService_Records() := 
 	MODULE
 
 		SHARED input_params := AutoStandardI.GlobalModule();
+    SHARED mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 
 		EXPORT params := INTERFACE
 			EXPORT BOOLEAN include_spouse;
@@ -13,7 +14,7 @@ EXPORT Plus_SearchService_Records() :=
 		END;
 	
 		// Formal parameter for WorkPlace Locator (WPL).
-		EXPORT tempmod_for_WPL_Search(params in_mod) := 
+		SHARED tempmod_for_WPL_Search(params in_mod) := 
 			MODULE(PROJECT(input_params,WorkPlace_Services.Search_Records.params,OPT));
 				SHARED application_type := AutoStandardI.InterfaceTranslator.application_type_val;
 				EXPORT BOOLEAN include_spouse   := in_mod.include_spouse; 
@@ -25,8 +26,10 @@ EXPORT Plus_SearchService_Records() :=
 		// Plus Search Service, i.e. having no child datasets, we need to set most of the cardinalities listed 
 		// below to '1'. The only cardinality we'll set to something other than '1' will be the number of
 		// employers, which will themselves consistute separate records and not any particular child dataset.
-		EXPORT tempmod_for_PAW_Search(params in_mod) := 
-			MODULE(PROJECT(input_params,PAW_Services.PAWSearchService_Records.params,OPT))
+		SHARED tempmod_for_PAW_Search(params in_mod) := FUNCTION
+			mod_temp := MODULE(input_params, mod_access)
+				EXPORT string DataPermissionMask := mod_access.DataPermissionMask; //conflicting definition
+				EXPORT string DataRestrictionMask := mod_access.DataRestrictionMask; //conflicting definition
 				EXPORT UNSIGNED2 REQ_PHONES_PER_ADDR            := 1; 
 				EXPORT UNSIGNED2 REQ_DATES_PER_POSITION         := 1; 
 				EXPORT UNSIGNED2 REQ_DATES_PER_EMPLOYER         := 1; 
@@ -43,6 +46,8 @@ EXPORT Plus_SearchService_Records() :=
 				EXPORT PenaltThreshold   := in_mod.PenaltThreshold;
 				EXPORT includeAlsoFound  := FALSE; 
 			END;
+			RETURN PROJECT(mod_temp, PAW_Services.PAWSearchService_Records.params, OPT);
+		END;
 
 		EXPORT get_PAW_records(params in_mod) := 
 			FUNCTION

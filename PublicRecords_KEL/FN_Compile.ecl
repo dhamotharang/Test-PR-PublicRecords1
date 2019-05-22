@@ -44,6 +44,13 @@ EXPORT FN_Compile := MODULE
     __Value := STD.Str.EditDistance(field1,field2);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
+  EXPORT KEL.typ.nint FN_Find_Count(KEL.typ.nstr __Psource, KEL.typ.nstr __Ptarget) := FUNCTION
+    source := __T(__Psource);
+    target := __T(__Ptarget);
+    __IsNull := __NL(__Psource) OR __NL(__Ptarget);
+    __Value := STD.Str.FindCount(source,target);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
+  END;
   EXPORT KEL.typ.nstr FN_Source_Group(KEL.typ.nstr __PRawSource) := FUNCTION
     RawSource := __T(__PRawSource);
     __IsNull := __NL(__PRawSource);

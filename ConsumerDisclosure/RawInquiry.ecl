@@ -1,4 +1,10 @@
-﻿IMPORT doxie, ConsumerDisclosure, FCRA, FFD, Inquiry_AccLogs, RiskWiseFCRA, STD, UT;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, ConsumerDisclosure, FCRA, FFD, Inquiry_AccLogs, RiskWiseFCRA, STD, UT;
 
 layout_inquiry_disclosure_raw := RECORD  // recordof(FCRA.key_override_inquiries_ffid)
 	Inquiry_AccLogs.Layout.Layout_inquiry_disclosure;  

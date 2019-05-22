@@ -1,8 +1,8 @@
-﻿IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, riskview;
+﻿IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, riskview,models;
 
 EXPORT RVT1705_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boolean isCalifornia = False) := FUNCTION
 
-		//MODEL_DEBUG := TRUE;
+		// MODEL_DEBUG := TRUE;
 	  MODEL_DEBUG := FALSE;
 
 	#if(MODEL_DEBUG)
@@ -183,7 +183,7 @@ BOOLEAN      riskview_222s;
 INTEGER      base;
 INTEGER      pts;
 REAL      odds;
-INTEGER      rvt1705_1_0;
+INTEGER      rvt1705_1_1;
 STRING       o_rc1;
 STRING       o_rc2;
 STRING       o_rc3;
@@ -876,7 +876,8 @@ o_aacd_0 := map(
     5 <= iv_src_property_adl_count                                     => '',
                                                                           '');
 
-o_dist_0 := o_subscore0 - 0.625396;
+
+o_DIST_0 := o_subScore0 - (0.059684);
 
 o_aacd_1 := map(
     NULL < iv_sr001_source_profile AND iv_sr001_source_profile < 76.7  => '36',
@@ -888,7 +889,8 @@ o_aacd_1 := map(
     89.2 <= iv_sr001_source_profile                                    => '36',
                                                                           '');
 
-o_dist_1 := o_subscore1 - 0.655823;
+
+o_DIST_1 := o_subScore1 - (    0.033887);
 
 o_aacd_2 := map(
     NULL < iv_inq_adls_per_addr AND iv_inq_adls_per_addr < 1 => '9Q',
@@ -897,7 +899,8 @@ o_aacd_2 := map(
     3 <= iv_inq_adls_per_addr                                => '9Q',
                                                                 '');
 
-o_dist_2 := o_subscore2 - 0.121244;
+ 
+o_DIST_2 := o_subScore2 - (    0.023493);
 
 o_aacd_3 := map(
     NULL < iv_inq_addrs_per_adl AND iv_inq_addrs_per_adl < 1 => '9Q',
@@ -907,7 +910,8 @@ o_aacd_3 := map(
     4 <= iv_inq_addrs_per_adl                                => '9Q',
                                                                 '');
 
-o_dist_3 := o_subscore3 - 0.138493;
+
+o_DIST_3 := o_subScore3 - (    0.027082);
 
 o_aacd_4 := map(
     NULL < iv_sr001_m_hdr_fs AND iv_sr001_m_hdr_fs < 0   => '9J',
@@ -922,7 +926,8 @@ o_aacd_4 := map(
     398 <= iv_sr001_m_hdr_fs                             => '9J',
                                                             '');
 
-o_dist_4 := o_subscore4 - 0.44398;
+
+o_DIST_4 := o_subScore4 - (     0.029433);
 
 o_aacd_5 := map(
     NULL < iv_unreleased_liens_ct AND iv_unreleased_liens_ct < 1 => '98',
@@ -931,7 +936,8 @@ o_aacd_5 := map(
     3 <= iv_unreleased_liens_ct                                  => '98',
                                                                     '');
 
-o_dist_5 := o_subscore5 - 0.093466;
+
+o_DIST_5 := o_subScore5 - (    0.020528);
 
 o_aacd_6 := map(
     NULL < iv_addrs_10yr AND iv_addrs_10yr < 0 => '',
@@ -945,7 +951,8 @@ o_aacd_6 := map(
     9 <= iv_addrs_10yr                         => '9D',
                                                   '');
 
-o_dist_6 := o_subscore6 - 0.336626;
+
+o_DIST_6 := o_subScore6 - (    0.029592);
 
 o_aacd_7 := map(
     NULL < iv_pv001_inp_avm_autoval AND iv_pv001_inp_avm_autoval < 1         => 'PV',
@@ -958,7 +965,8 @@ o_aacd_7 := map(
     232097 <= iv_pv001_inp_avm_autoval                                       => 'PV',
                                                                                 '');
 
-o_dist_7 := o_subscore7 - 0.32492;
+
+o_DIST_7 := o_subScore7 - (     0.025233);
 
 o_aacd_8 := map(
     (iv_bst_addr_naprop in [' '])                                   => '36',
@@ -970,14 +978,16 @@ o_aacd_8 := map(
     (iv_bst_addr_naprop in ['4'])                                   => '',
                                                                        '');
 
-o_dist_8 := o_subscore8 - 0.263711;
+
+o_DIST_8 := o_subScore8 - (    0.02825);
 
 o_aacd_9 := map(
     NULL < iv_inq_highriskcredit_count12 AND iv_inq_highriskcredit_count12 < 1 => '9P',
     1 <= iv_inq_highriskcredit_count12                                         => '9P',
                                                                                   '');
 
-o_dist_9 := o_subscore9 - 0.045169;
+
+o_DIST_9 := o_subScore9 - (    0.015054);
 
 o_aacd_10 := map(
     NULL < iv_adls_per_sfd_addr AND iv_adls_per_sfd_addr < 0 => '',
@@ -992,7 +1002,8 @@ o_aacd_10 := map(
     33 <= iv_adls_per_sfd_addr                               => '',
                                                                 '');
 
-o_dist_10 := o_subscore10 - 0.251167;
+
+o_DIST_10 := o_subScore10 - (    0.022337);
 
 o_aacd_11 := map(
     (iv_criminal_x_felony in [' '])                                      => '36',
@@ -1002,7 +1013,8 @@ o_aacd_11 := map(
     (iv_criminal_x_felony in ['1-1', '2-1', '2-2', '3-1', '3-2', '3-3']) => '97',
                                                                             '');
 
-o_dist_11 := o_subscore11 - 0.035752;
+
+o_DIST_11 := o_subScore11 - (    0.010965);
 
 o_aacd_12 := map(
     NULL < iv_prv_addr_avm_auto_val AND iv_prv_addr_avm_auto_val < 1        => 'PV',
@@ -1014,15 +1026,16 @@ o_aacd_12 := map(
     192099 <= iv_prv_addr_avm_auto_val                                      => 'PV',
                                                                                '');
 
-o_dist_12 := o_subscore12 - 0.253403;
 
+o_DIST_12 := o_subScore12 - (    0.01238);
 o_aacd_13 := map(
     (iv_ed001_college_ind in [' ']) => '36',
     (iv_ed001_college_ind in ['0']) => '9I',
     (iv_ed001_college_ind in ['1']) => '9I',
                                        '');
 
-o_dist_13 := o_subscore13 - 0.293109;
+
+o_DIST_13 := o_subScore13 - (    0.004285);
 
 o_aacd_14 := map(
     ((STRING)iv_input_addr_not_most_recent in [' ']) => '36',
@@ -1036,7 +1049,9 @@ o_aacd_14 := map(
     // ((STRING)iv_input_addr_not_most_recent in ['1']) => '99',
                                                 // '');
 
-o_dist_14 := o_subscore14 - 0.053466;
+
+o_DIST_14 := o_subScore14 - (    0.005258);
+
 
 o_aacd_15 := map(
     NULL < iv_pv001_bst_avm_autoval AND iv_pv001_bst_avm_autoval < 1         => 'PV',
@@ -1049,7 +1064,9 @@ o_aacd_15 := map(
     242033 <= iv_pv001_bst_avm_autoval                                       => 'PV',
                                                                                 '');
 
-o_dist_15 := o_subscore15 - 0.299037;
+
+
+o_DIST_15 := o_subScore15 - (    0.013371);
 
 o_aacd_16 := map(
     NULL < iv_ms001_ssns_per_adl AND iv_ms001_ssns_per_adl < 2 => 'MS',
@@ -1058,7 +1075,8 @@ o_aacd_16 := map(
     4 <= iv_ms001_ssns_per_adl                                 => 'MS',
                                                                   '');
 
-o_dist_16 := o_subscore16 - 0.04166;
+
+o_DIST_16 := o_subScore16 - (     0.00479);
 
 o_aacd_17 := map(
     NULL < iv_eviction_count AND iv_eviction_count < 1 => 'EV',
@@ -1067,14 +1085,16 @@ o_aacd_17 := map(
     3 <= iv_eviction_count                             => 'EV',
                                                           '');
 
-o_dist_17 := o_subscore17 - 0.029495;
+
+o_DIST_17 := o_subScore17 - (    0.010113);
 
 o_aacd_18 := map(
     NULL < iv_inq_communications_count12 AND iv_inq_communications_count12 < 1 => '9Q',
     1 <= iv_inq_communications_count12                                         => '9Q',
                                                                                   '');
 
-o_dist_18 := o_subscore18 - 0.019662;
+
+o_DIST_18 := o_subScore18 - (    0.006747);
 
 o_aacd_19 := map(
     (iv_bst_addr_mortgage_type in [' '])                                                                                                                       => '36',
@@ -1082,14 +1102,16 @@ o_aacd_19 := map(
     (iv_bst_addr_mortgage_type in ['Commercial', 'Equity Loan', 'Government', 'High-Risk', 'No Mortgage', 'Non-Traditional', 'Other', 'Piggyback', 'Unknown']) => '',
                                                                                                                                                                   '');
 
-o_dist_19 := o_subscore19 - 0.205288;
+
+o_DIST_19 := o_subScore19 - (    0.003612);
 
 o_aacd_20 := map(
     NULL < iv_va040_add_prison_hist AND iv_va040_add_prison_hist < 1 => '50',
     1 <= iv_va040_add_prison_hist                                    => '50',
                                                                         '');
 
-o_dist_20 := o_subscore20 - 0.00603;
+
+o_DIST_20 := o_subScore20 - (     0.002566);
 
 o_aacd_21 := map(
     (iv_db001_bankruptcy in [' '])                                              => '36',
@@ -1097,7 +1119,8 @@ o_aacd_21 := map(
     (iv_db001_bankruptcy in ['2 - BK Dismissed'])                               => '9W',
                                                                                    '');
 
-o_dist_21 := o_subscore21 - 0.004035;
+
+o_DIST_21 := o_subScore21 - (    0.000899);
 
 o_aacd_22 := map(
     ((STRING)iv_prof_license_flag in [' ']) => '36',
@@ -1111,14 +1134,16 @@ o_aacd_22 := map(
     // ((STRING)iv_prof_license_flag in ['1']) => '36',
                                        // '');
 
-o_dist_22 := o_subscore22 - 0.207157;
+
+o_DIST_22 := o_subScore22 - (    0.003238);
 
 o_aacd_23 := map(
     NULL < iv_inq_other_count12 AND iv_inq_other_count12 < 1 => '9Q',
     1 <= iv_inq_other_count12                                => '9Q',
                                                                 '');
 
-o_dist_23 := o_subscore23 - 0.007036;
+
+o_DIST_23 := o_subScore23 - (    0.001967);
 
 o_rcvalue9i := (integer)(o_aacd_0 = '9I') * o_dist_0 +
     (integer)(o_aacd_1 = '9I') * o_dist_1 +
@@ -1510,7 +1535,7 @@ odds := (REAL)((1 - .0857) / .0857);
     // ssn_deceased = 1  => 200,
     // riskview_222s = 1 => 222,
        // min(if(max(round(pts * (ln(o_probscore / (1 - o_probscore)) - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(pts * (ln(o_probscore / (1 - o_probscore)) - ln(odds)) / ln(2) + base), 501)), 900));
-rvt1705_1_0 := map(
+rvt1705_1_1 := map(
     (INTEGER)ssn_deceased = 1  => 200,
     (INTEGER)riskview_222s = 1 => 222,
        min(if(max(round(pts * (ln(o_probscore / (1 - o_probscore)) - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(pts * (ln(o_probscore / (1 - o_probscore)) - ln(odds)) / ln(2) + base), 501)), 900));
@@ -1626,33 +1651,33 @@ rc5_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and no
 // rc2_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and not((rc3_2 in ['9Q', '9P'])) and not((rc4_2 in ['9Q', '9P'])), rc2_c98, rc2_2);
 
 rc2 := map(
-    rvt1705_1_0 = 200 => '',
-    rvt1705_1_0 = 222 => '',
-    rvt1705_1_0 = 900 => '',
+    rvt1705_1_1 = 200 => '',
+    rvt1705_1_1 = 222 => '',
+    rvt1705_1_1 = 900 => '',
                          rc2_2);
 
 rc5 := map(
-    rvt1705_1_0 = 200 => '',
-    rvt1705_1_0 = 222 => '',
-    rvt1705_1_0 = 900 => '',
+    rvt1705_1_1 = 200 => '',
+    rvt1705_1_1 = 222 => '',
+    rvt1705_1_1 = 900 => '',
                          rc5_1);
 
 rc1 := map(
-    rvt1705_1_0 = 200 => '02',
-    rvt1705_1_0 = 222 => '9X',
-    rvt1705_1_0 = 900 => '',
+    rvt1705_1_1 = 200 => '02',
+    rvt1705_1_1 = 222 => '9X',
+    rvt1705_1_1 = 900 => '',
                          rc1_2);
 
 rc3 := map(
-    rvt1705_1_0 = 200 => '',
-    rvt1705_1_0 = 222 => '',
-    rvt1705_1_0 = 900 => '',
+    rvt1705_1_1 = 200 => '',
+    rvt1705_1_1 = 222 => '',
+    rvt1705_1_1 = 900 => '',
                          rc3_2);
 
 rc4 := map(
-    rvt1705_1_0 = 200 => '',
-    rvt1705_1_0 = 222 => '',
-    rvt1705_1_0 = 900 => '',
+    rvt1705_1_1 = 200 => '',
+    rvt1705_1_1 = 222 => '',
+    rvt1705_1_1 = 900 => '',
                          rc4_2);
 
 
@@ -1683,11 +1708,11 @@ rc4 := map(
 
 	reasonsOverrides := MAP(
 													inCalif           =>	DATASET([{'35'}], HRILayout),
-													rvt1705_1_0 = 200 =>	DATASET([{'02'}], HRILayout),
-													rvt1705_1_0 = 222 =>	DATASET([{'9X'}], HRILayout),
-													rvt1705_1_0 = 900 =>	DATASET([{' '}], HRILayout),
-													rvt1705_1_0 BETWEEN 501 AND 720 AND reasons[1].HRI NOT IN ['', '36'] AND reasons[2].HRI = '' => DATASET([{reasons[1].HRI}, {'36'}], HRILayout),
-													rvt1705_1_0 BETWEEN 501 AND 720 AND reasons[1].HRI != '9E' AND reasons[2].HRI = ''					 => DATASET([{reasons[1].HRI}, {'9E'}], HRILayout),
+													rvt1705_1_1 = 200 =>	DATASET([{'02'}], HRILayout),
+													rvt1705_1_1 = 222 =>	DATASET([{'9X'}], HRILayout),
+													rvt1705_1_1 = 900 =>	DATASET([{' '}], HRILayout),
+													rvt1705_1_1 BETWEEN 501 AND 720 AND reasons[1].HRI NOT IN ['', '36'] AND reasons[2].HRI = '' => DATASET([{reasons[1].HRI}, {'36'}], HRILayout),
+													rvt1705_1_1 BETWEEN 501 AND 720 AND reasons[1].HRI != '9E' AND reasons[2].HRI = ''					 => DATASET([{reasons[1].HRI}, {'9E'}], HRILayout),
 																								DATASET([], HRILayout)
 													);
 	// If we have corrections reason codes, use them, otherwise if we have score overrides use them, else use the normal reason codes
@@ -1880,7 +1905,7 @@ rc4 := map(
                     self.base                             := base;
                     self.pts                              := pts;
                     self.odds                             := odds;
-                    self.rvt1705_1_0                      := rvt1705_1_0;
+                    self.rvt1705_1_1                      := rvt1705_1_1;
                     self.o_rc1                            := o_rc1;
                     self.o_rc2                            := o_rc2;
                     self.o_rc3                            := o_rc3;
@@ -1909,7 +1934,7 @@ rc4 := map(
 																					));
 		SELF.score := MAP(reasonCodes[1].HRI IN ['91','92','93','94'] => (STRING3)((INTEGER)reasonCodes[1].HRI + 10),
 											reasonCodes[1].HRI = '35'										=> '100',
-																																		 (STRING)RVT1705_1_0);	
+																																		 (STRING)RVT1705_1_1);	
   
   SELF.seq := le.seq;
   #end

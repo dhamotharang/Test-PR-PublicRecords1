@@ -1,4 +1,10 @@
-﻿IMPORT doxie, FCRA, FFD, American_Student_List, AlloyMedia_student_list, ConsumerDisclosure;
+﻿/*
+  ***********************************************************************************************************
+  * NOTE: This attribute is to be used for Consumer Disclosure only. It is not "batch safe" and not meant to
+  * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
+  ***********************************************************************************************************
+*/
+IMPORT doxie, FCRA, FFD, American_Student_List, AlloyMedia_student_list, ConsumerDisclosure;
 
 layout_ASL_raw := RECORD(American_student_list.layout_american_student_base_v2) //RECORDOF(American_Student_List.key_DID_FCRA)
     UNSIGNED6 l_did;  

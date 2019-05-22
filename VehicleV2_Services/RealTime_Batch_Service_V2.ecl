@@ -54,7 +54,7 @@
 </table>
 */
 
-import address, autokey_batch, doxie, DidVille, ut, risk_indicators, AutoStandardI, Royalty, VehicleV2_Services;
+import address, doxie, AutoStandardI, Royalty, VehicleV2_Services;
 
 export RealTime_Batch_Service_V2 := macro
  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -62,6 +62,9 @@ export RealTime_Batch_Service_V2 := macro
 	
 	STRING1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');
 	
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+
+  //Note, some fields have default values different from mod_access.
 	mod := module(VehicleV2_Services.IParam.RTBatch_V2_params)
 		export unsigned1 Operation           := 0     : stored('Operation');
 		export boolean   use_date            := false : stored('usedate');
@@ -77,21 +80,19 @@ export RealTime_Batch_Service_V2 := macro
 		export boolean   dedup_results_l     := true 	: stored('Deduped');
 		export string3   thresh_val          := '' 		: stored('AppendThreshold');
 		export boolean   GLB_data            := false : stored('GLBData');
-		export unsigned1 glb_purpose_value   := 8     : stored('glbpurpose');
-	  export unsigned1 dppa_purpose_value  := 0     : stored('dppapurpose');
+		export unsigned1 glb                 := 8     : stored('glbpurpose');
+	  export unsigned1 dppa                := mod_access.dppa;
 		export boolean   patriotproc         := false : stored('PatriotProcess');
-		export boolean   include_minors      := false : stored('IncludeMinors');
+		export boolean   show_minors         := false : stored('IncludeMinors');
 		// 127542 - GatewayNameMatch option works only for gateways - It filters
 		//by person's name who owns the vehicle at input address.
 		export boolean   GatewayNameMatch    := false : stored('GatewayNameMatch');
-	  export boolean   AlwaysHitGateway    := ~doxie.DataPermission.use_Polk;
+	  export boolean   AlwaysHitGateway    := ~doxie.compliance.use_Polk(mod_access.DataPermissionMask);
 		export boolean   ReturnCurrent	     := false : stored('ReturnCurrent');
 		export boolean   FullNameMatch       := false : stored('FullNameMatch');
-		export string32  ApplicationType	   := AutoStandardI.InterfaceTranslator.application_type_val.val(
-		                                        project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
-		export string5   IndustryClass       := AutoStandardI.InterfaceTranslator.industry_class_val.val(
-																						project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.industry_class_val.params));
-		export string50  DataRestriction     := doxie.DataRestriction.fixed_DRM;
+		export string32  application_type	   := mod_access.application_type;
+		export string5   industry_class      := mod_access.industry_class;
+		export string    DataRestrictionMask := mod_access.DataRestrictionMask;
 		export boolean   Is_UseDate          := use_date;
 		export boolean   IncludeRanking  	   := false : stored('IncludeRanking');
 		//unlike other services, we purposely set GetSSNBest to false by default

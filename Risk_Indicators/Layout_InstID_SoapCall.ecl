@@ -44,5 +44,4 @@ export Layout_InstID_SoapCall := RECORD
 	boolean ADL_Based_Shell := false;
 	boolean PreScreen := false;
 	unsigned3 LastSeenThreshold := 0; 
-	boolean RemoveQuickHeader := false; 
 END;

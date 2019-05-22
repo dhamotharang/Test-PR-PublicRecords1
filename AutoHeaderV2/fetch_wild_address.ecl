@@ -1,4 +1,4 @@
-import ut,doxie,AutoStandardI,AutoHeaderV2,lib_stringlib;
+import ut,doxie,dx_header,AutoStandardI,AutoHeaderV2,lib_stringlib;
 
 export fetch_wild_address (dataset (AutoHeaderV2.layouts.search) ds_search):= function
 	
@@ -32,7 +32,7 @@ export fetch_wild_address (dataset (AutoHeaderV2.layouts.search) ds_search):= fu
 
 	srange := AutoStandardI.Constants.SECRANGE;
 
-	i_rg_only := doxie.Key_Header_Wild_Address (temp_pname_wild_val != '',
+	i_rg_only := dx_header.key_wild_address() (temp_pname_wild_val != '',
 					keyed((temp_pname_wild and prim_name[1..3]=temp_pname_wild_val[1..3]) OR (~temp_pname_wild AND  prim_name=temp_pname_wild_val)),
 					(~temp_pname_wild OR stringlib.StringWildMatch(prim_name, temp_pname_wild_val, true)), 
 			 keyed(temp_prange_value = '' OR 

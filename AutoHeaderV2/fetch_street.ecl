@@ -1,4 +1,4 @@
-IMPORT ut,doxie,NID,AutoHeaderV2, lib_stringlib, lib_ziplib;
+IMPORT ut,doxie,dx_header,NID,AutoHeaderV2, lib_stringlib, lib_ziplib;
 
 // used only in search library
 export dataset (AutoheaderV2.layouts.search_out) fetch_street (dataset (AutoheaderV2.layouts.search) ds_search, integer search_code=0) := function
@@ -45,9 +45,9 @@ export dataset (AutoheaderV2.layouts.search_out) fetch_street (dataset (Autohead
 		temp_fname_trailing_value := _row.tname.lname != '' and _row.tname.fname != '' and _row.tname.mname = '';
     temp_prim_range_set := _row.taddress.prim_range_set;
 		
-		i := doxie.Key_Header_StreetZipName;
-		wi := doxie.Key_Header_Wild_StreetZipName;
-		dti := doxie.Key_Header_DTS_StreetZipName;
+		i := dx_header.key_StreetZipName();
+		wi := dx_header.key_wild_StreetZipName();
+		dti := dx_header.key_DTS_StreetZipName();
 		
 		boolean just_addr := temp_lname_value = '' and temp_fname_value = '';
 

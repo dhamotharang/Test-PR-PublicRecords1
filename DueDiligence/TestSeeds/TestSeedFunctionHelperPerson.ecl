@@ -148,6 +148,11 @@ EXPORT TestSeedFunctionHelperPerson := MODULE
                                             SELF.offenseDDFirstReported := iesp.ECL2ESP.toDate(topLevel.offenseDDFirstReported);
                                             SELF.offenseDDLastReportedActivity := iesp.ECL2ESP.toDate(topLevel.offenseDDLastReportedActivity);
                                             SELF.offenseDDMostRecentCourtDispDate := iesp.ECL2ESP.toDate(topLevel.offenseDDMostRecentCourtDispDate);
+                                            //TODO: POPULATE
+                                            SELF.offenseID := 0;
+                                            SELF.offensePriorityOrder := 0;
+                                            SELF.offenseLevel := 0;
+                                            //END TODO
                                             SELF.offenseDDLegalEventTypeMapped := topLevel.offenseDDLegalEventTypeMapped;
                                             SELF.offenseCharge := topLevel.offenseCharge;
                                             SELF.offenseDDChargeLevelCalculated := topLevel.offenseDDChargeLevelCalculated;

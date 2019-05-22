@@ -59,6 +59,8 @@
 
 EXPORT BatchService() := MACRO
  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('useonlybestdid', TRUE);
+ 
  #WEBSERVICE(DESCRIPTION('This service pulls from the Criminal Offenders & 2 Offenses files.'));
 
 	ds_xml_in		    := DATASET([], CriminalRecords_BatchService.Layouts.batch_in) : STORED('batch_in');

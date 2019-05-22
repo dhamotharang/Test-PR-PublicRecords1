@@ -23,10 +23,20 @@ shared  getFieldName2(string1 inChar)
                         'D' => 'DAYTN',
                         '');	
                                                 
-EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2SearchInput,
-  unsigned8 MaxResultsPerAcct,
-  AutoStandardI.DataRestrictionI.params in_mod2   ) := FUNCTION
+EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2SearchInput) := FUNCTION
   
+  in_mod2 := MODULE(AutoStandardI.DataRestrictionI.params)  
+    EXPORT boolean AllowAll := FALSE;
+    EXPORT boolean AllowDPPA := FALSE;
+    EXPORT boolean AllowGLB := FALSE;
+    EXPORT string DataRestrictionMask := inMod.datarestrictionmask;
+    EXPORT unsigned1 DPPAPurpose := inMod.dppa;
+    EXPORT unsigned1 GLBPurpose := inMod.glb;
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
+    EXPORT boolean includeMinors := FALSE;	
+  END;
+
   ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).data2_;
   
   TopBusiness_Services.functions.MAC_IsRestricted(ds_bestInfoProxIdNonRestricted,
@@ -56,7 +66,7 @@ EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Fo
                                 if (company_fein <> '', 0, 1),	 if (company_phone <> '9999999999', 0, 1),                                   
                           record);  
   
-      tmpTopResultsScoredGrouped := PROJECT(ungroup(topn(group(tmpTopresultsScored,acctno),inmod.MaxResultsPerAcct,acctno)),
+      tmpTopResultsScoredGrouped := PROJECT(ungroup(topn(group(tmpTopresultsScored,acctno),inMod.MaxResultsPerAcct,acctno)),
                                               TRANSFORM(LEFT));																								     																							   																								
   RETURN (tmpTopResultsScoredGrouped);
 END;
@@ -710,10 +720,16 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
     dLiensRaw := LiensV2.Key_Linkids.KeyFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);								
     RawRecordType := RECORDOF(dLiensRaw);
 
-    // Currently, all liens records are marketing-restricted.  This may change in the future
-    dLiensMark := DATASET([], RawRecordType);
+    // we can filter based on the first two characters of the tmsid
+    dLiensSrc := PROJECT(dLiensRaw, 
+      TRANSFORM({RawRecordType, string _src}, 
+        SELF._src := TRIM(LEFT.tmsid[1..2]), 
+        SELF := LEFT));
 
-    dLiens := IF (inMod.ExcludeMarketing, dLiensMark, dLiensRaw);
+    // keep just the marketing allowed recs
+    dLiensMark := Codes.fmac_filterDirectMarketing(dLiensSrc, 'LIEN_SOURCES', 'TMSID', _src);
+
+    dLiens := IF (inMod.ExcludeMarketing, PROJECT(dLiensMark, RawRecordType), dLiensRaw);
 
     //OUTPUT(dLiensRaw, named('dLiensRaw'));
     //OUTPUT(dLiensMark, named('dLiensMark'));
@@ -1232,8 +1248,8 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
     dExecutives := dContacts(executive_ind);
     
     // Suppression code
-    Suppress.MAC_Suppress(dExecutives,dExecutivesDIDSuppress,inMod.ApplicationType,'DID',contact_did);
-    Suppress.MAC_Suppress(dExecutivesDIDSuppress,dExecutivesSuppress,inMod.ApplicationType,'SSN',contact_ssn);
+    Suppress.MAC_Suppress(dExecutives,dExecutivesDIDSuppress,inMod.application_type,'DID',contact_did);
+    Suppress.MAC_Suppress(dExecutivesDIDSuppress,dExecutivesSuppress,inMod.application_type,'SSN',contact_ssn);
     
     // Set isCurrent flag
     rExecsAppendCurrentFlag :=
