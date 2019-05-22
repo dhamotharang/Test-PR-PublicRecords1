@@ -18,8 +18,8 @@ built := sequential(
 					Vendor_Src.Promote.Promote_vendorsrc(pversion,pUseProd).buildfiles.Built2QA,
 			    Build_Strata(pversion,pUseProd).all, 
 					Scrubs_Vendor_Src.Vendor_Src_ScrubsPlus(pversion,Vendor_Src.Email_Notification_Lists.developer),
-					//dops.updateversion('VendorSourceKeys',pversion,Vendor_Src.Email_Notification_Lists.developer,,'N');
-				  //Orbit3.proc_Orbit3_CreateBuild_AddItem('VendorSourceKeys',pversion,'N',false, false,false,true,false,Vendor_Src.Email_Notification_Lists.developer),
+					DOPS.updateversion('VendorSourceKeys',pversion,Vendor_Src.Email_Notification_Lists.developer,,'N',,,,,,'F');
+				  Orbit3.proc_Orbit3_CreateBuild_AddItem('Vendor Source Code Master List Lookup',pversion,'N',false, false,false,true,false,Vendor_Src.Email_Notification_Lists.developer),
 				  ): success(Send_Email(pversion,pUseProd).BuildSuccess),
 				  failure(send_email(pversion,pUseProd).BuildFailure) ;
 
