@@ -9,7 +9,6 @@ EXPORT Records := MODULE
 
 		ds_dids:=DEDUP(SORT(PROJECT(ds_work_recs,TRANSFORM(doxie.layout_references,SELF:=LEFT)),did),did);
 		ds_FlagFile:=FFD.GetFlagFile(PROJECT(ds_dids,doxie.layout_best),ds_PersonContext)(file_id=FCRA.FILE_ID.PAW);
-		override_ids:=SET(ds_FlagFile,TRIM(record_id));
 
 		// get any override records
 		ds_override_recs:=JOIN(ds_FlagFile,FCRA.key_override_paw_ffid,
@@ -20,7 +19,7 @@ EXPORT Records := MODULE
 		// get paw records less overwritten records
 		ds_paw_recs:=JOIN(ds_dids,PAW.Key_DID_FCRA,
 			KEYED(LEFT.did=RIGHT.did)
-			AND RIGHT.contact_id>0 AND TRIM((STRING)RIGHT.contact_id) NOT IN override_ids,
+			AND RIGHT.contact_id>0 AND TRIM((STRING)RIGHT.contact_id) NOT IN SET(ds_FlagFile((UNSIGNED)did=LEFT.did),TRIM(record_id)),
 			TRANSFORM(Paw.Layout.Employment_Out,SELF:=RIGHT),
 			KEEP(paw_services.Constants.FCRA.MaxPawPerDID),
 			LIMIT(paw_services.Constants.FCRA.MaxPawRecords,SKIP));
