@@ -37,8 +37,8 @@ EXPORT Append_RinID(
 				(length(STD.Str.CleanSpaces(ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =true )) 
 			or
 			((raw_first_name !='' and raw_last_name !='' and dob != '' and street_1 != '') and 
-				(city != '' and length(trim(Zip,left,right)) in [9,5]) or
-				(State in FraudGovPlatform_Validation.Mod_Sets.States and length(trim(Zip,left,right)) in [9,5]))
+				((city != '' and length(trim(Zip,left,right)) in [9,5]) or
+				(State in FraudGovPlatform_Validation.Mod_Sets.States and length(trim(Zip,left,right)) in [9,5])))
 		);
 
 	//4.sequence those records in #2 with pii that did not match anything in #3
