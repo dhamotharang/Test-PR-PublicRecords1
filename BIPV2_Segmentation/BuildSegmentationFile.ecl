@@ -87,7 +87,7 @@ export BuildSegmentationFile(
 	                     left.seleid = right.seleid, 
                           transform(Layouts.SegmentationLayout,
                                     self.contacts := right.contacts;
-                                    self:=left), keep(1), local);
+                                    self:=left), keep(1), left outer, local);
                                                                                                                                                                                
      go := sequential(
 	     output(withContacts,,outputFileName,overwrite,compressed) 
