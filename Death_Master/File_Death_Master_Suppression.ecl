@@ -287,6 +287,8 @@ dSuppressRecs				:=
     {'238121936659', 100,	'20190408', ' ', ' ',	'372623282', 'WATTS               ', '    ', 'RUTH           ', 'ANNETTE        ', ' ',	'20160907', '        ', '26',	'48244', '	   ',	'MI',	'163', '	', 'N',	'ENC', /*'238121936659WENC'*/'', '64', 'N'},
 	// LNK-2019 9/11 DQ reivew Fredrick Jones / Accurint-Dispute-Ticket ID: 99860 [Incident: 180901-000097]
 		{'001275152362', 100,	'20190408',	' ', ' ', '	 	      ', 'JONES               ', '	  ', 'FREDERICK      ', '	              ', ' ', ' 	     ', '19631205',	'26',	'48203', '	   ', 'MI',	'163', '	', 'N',	'TUN', /*'001275152362JTUN'*/'', 'TN', 'Y'},
+  // LNK-2082 Copy of 180920-001909: Accurint Clarification - Ticket 107064 MARTIN, IDELLE [Incident: 180921-000146]
+    {'001614635657', 100,	'20190408', ' ', ' ',	' 	 	    ', 'MARTIN              ', '	  ', 'IDELLE         ', '	              ', ' ', '	 	     ',	'19461028',	'29',	'65202', '	   ', 'MO',	'019', '	', 'N',	'TUN', /*'001614635657MTUN'*/'', 'TN', 'Y'},
   // LNK-2449  Alive Consumer marked as deceased
 	  {'045899339355', 100,	'20190408',	' ', ' ', '	 	      ', 'SHARPTON            ', '	  ', 'KEVIN          ',	'C              ', ' ', ' 	     ', '   	   ', '47',	'37087', '	   ', 'TN',	'189', '	', 'N',	'TUN', /*'045899339355STUN'*/'', 'TN', 'Y'},
 	// LNK-2450  Alive Consumer marked as deceased
