@@ -1,4 +1,4 @@
-export Layout_Watercraft_Coastguard_Base
+﻿export Layout_Watercraft_Coastguard_Base
  :=
   record
   string30 watercraft_key;
@@ -70,4 +70,7 @@ export Layout_Watercraft_Coastguard_Base
   string10 party_database_key;
   string1 itc_tons_cod_ind;
   unsigned8 persistent_record_id := 0;
-  end;
+	//CCPA-206 Add 2 CCPA fields
+	UNSIGNED4	global_sid:=0;
+	UNSIGNED8	record_sid:=0;
+end;
