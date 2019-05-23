@@ -59,6 +59,8 @@ skipPackage:= if(ikbShouldUpdate,'0','1')+  // 'skipPackage[1]'
 // calls deployment with skip parameters
 doIt :=   sequential(
            rpt
+          ,if(skipPackage <> '000', std.system.Email.SendEmail(emailList,'SKIPPING SOME OR ALL IKB DEPLOYMENTS',
+                                                                         'Skip Deployment: lab,fcra,weekly='+skipPackage+' See:'+workunit))
           ,if(skipPackage = '111'
            ,output('No New Data Available for Deployment')
            ,header.Proc_Copy_From_Alpha_Incrementals().deploy(emailList,rpt_qa_email_list,skipPackage)
