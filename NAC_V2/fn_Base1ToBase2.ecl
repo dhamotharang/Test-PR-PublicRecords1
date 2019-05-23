@@ -103,9 +103,16 @@ END;
 EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 		b1_flat := nac_v2.fn_flatten(b);			// first, roll up all the records to make a date range;
 		
-		b1_sameaddr := b1_flat((Phys_addr1=Mail_addr1 AND Phys_addr2=Mail_addr2) OR Phys_addr1='' OR Mail_addr1='');	// physical = mailing
+		b1_sameaddr := PROJECT(b1_flat((Phys_addr1=Mail_addr1 AND Phys_addr2=Mail_addr2) OR Phys_addr1='' OR Mail_addr1=''),	// physical = mailing
+											TRANSFORM({b1_flat},
+												self.AddressType := MAP(
+														left.Phys_addr1 = left.Mail_addr1 AND left.Phys_addr2 = left.Mail_addr2 => 'B',
+														left.Phys_addr1 = '' => 'M',
+														'P');
+												self := left;));
 		b1_diffaddr := NORMALIZE(b1_flat(Phys_addr1<>Mail_addr1 OR Phys_addr2<>Mail_addr2,Phys_addr1<>'', Mail_addr1<>''), 2, 
 											TRANSFORM({b1_flat},
+												self.AddressType := CHOOSE(COUNTER, 'P', 'M');
 												self.Prepped_addr1 := CHOOSE(COUNTER, left.Phys_addr1, left.Mail_addr1);
 												self.Prepped_addr2 := CHOOSE(COUNTER, left.Phys_addr2, left.Mail_addr2);
 												self := LEFT;));

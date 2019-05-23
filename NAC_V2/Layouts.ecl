@@ -149,6 +149,7 @@ export Layouts := MODULE
 		String45  Phys_addr2:='';
 		String60  mail_addr1:='';
 		String45  mail_addr2:='';
+		string1		AddressType := '';
 		base - [case_id];
 		string4	GroupId;
 	END;

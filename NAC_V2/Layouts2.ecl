@@ -236,4 +236,13 @@ EXPORT rNac2Ex := RECORD
 	END;
 END;	
 
+EXPORT rExceptionRecord := RECORD
+		rException;
+		unsigned4 created;
+		unsigned4 updated;
+		unsigned4 replaced;
+		unsigned8 errors;
+		unsigned4 warnings;
+END;		
+
 END;
