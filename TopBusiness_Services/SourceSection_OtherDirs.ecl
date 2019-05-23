@@ -22,7 +22,7 @@ TBD:
                                          NPPES, 
                                          Vickers
 */
-IMPORT BIPV2, iesp, MDR, TopBusiness_Services;
+IMPORT BIPV2, iesp, MDR, TopBusiness_Services, doxie;
 
 EXPORT SourceSection_OtherDirs := MODULE
 
@@ -36,7 +36,7 @@ EXPORT SourceSection_OtherDirs := MODULE
    ):= function 
  
   FETCH_LEVEL := rs_options.fetch_level;
-
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
   // ***** Get ABIUS (aka InfoUSA USABiz) counts
   TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
 	   tf_abius_count(Layouts.rec_input_ids_wSrc l) :=transform
@@ -506,13 +506,18 @@ EXPORT SourceSection_OtherDirs := MODULE
   ds_ska_counts := project(ds_in_ids_srcrecs_inlayout,tf_ska_count(left));
 
   // ***** Get Spoke counts
+	BOOLEAN IncludeSourceCounts 								:= false : stored('IncludeSourceCounts');
+	Spoke_mod_access := MODULE(mod_access)
+		EXPORT boolean log_record_source := mod_access.log_record_source AND IncludeSourceCounts;
+	END;	
+	
   TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
 	   tf_spoke_count(Layouts.rec_input_ids_wSrc l) :=transform
         self.category_desc     := TopBusiness_Services.Constants.OtherDirCategoryName, 
 	      self.category_doccount := TopBusiness_Services.SpokeSource_Records(
 			     //create dataset with 1 rec in the layout input to all ***Source_Records
  					 dataset([l],TopBusiness_Services.Layouts.rec_input_ids_wSrc),
-					 rs_options,false).SourceView_RecCount;
+					 rs_options, Spoke_mod_access, false).SourceView_RecCount;
 				self.Section           := ''; //section name N/A
 				self.Source            := MDR.sourceTools.src_Spoke; // but need source code
 				self                   := l; // to assign all linkids

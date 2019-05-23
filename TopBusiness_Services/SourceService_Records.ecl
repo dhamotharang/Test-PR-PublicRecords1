@@ -1,11 +1,11 @@
 ﻿//NOTE: The coding in this attribute needs to be kept in sync with the datasets in
 //      iesp.topbusinesssourcedoc.t_TopBusinessSourceDocRecord
 
-import BIPV2,iesp;
+import BIPV2,iesp, doxie;
 
 export SourceService_Records(
 	dataset(TopBusiness_Services.SourceService_Layouts.InputLayout) indata,
-	BIPV2.mod_sources.iParams inmod,
+	doxie.IDataAccess mod_access,
 	TopBusiness_Services.SourceService_Layouts.OptionsLayout inoptions) := function
 	
 	FETCH_LEVEL := inoptions.fetch_Level;
@@ -485,7 +485,7 @@ export SourceService_Records(
 																						
 	// SPOKE 
 	spoke_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptSpoke(source,section));	
-	spoke_docs := CHOOSEN(TopBusiness_Services.SpokeSource_Records(spoke_source_docids,inoptions,false)
+	spoke_docs := CHOOSEN(TopBusiness_Services.SpokeSource_Records(spoke_source_docids,inoptions, mod_access,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_SPOKE_RECORD);
 	spoke_prepared := PROJECT(spoke_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),

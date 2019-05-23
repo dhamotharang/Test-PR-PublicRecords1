@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SourceService">
 	
 	<!-- COMPLIANCE/USER SETTINGS -->
@@ -32,7 +32,7 @@
 */
 
 /*--INFO-- This service produces a set of source documents for a report.*/
-import iesp, TopBusiness_Services;
+import iesp, TopBusiness_Services, doxie, AutoStandardI;
 export SourceService() := macro
 #constant('NoDeepDive', true);
 #constant ('CaseNumber', '');
@@ -106,8 +106,8 @@ export SourceService() := macro
 	
 	options := row(search_options());
 
-	tempmod := PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt);
-	initial_results := TopBusiness_Services.SourceService_Records(inputs,tempmod,options);
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	initial_results := TopBusiness_Services.SourceService_Records(inputs,mod_access,options);
 
 	// Project to remove the acctno from the SourceService_Records output
 	projected_results := project(initial_results, 
@@ -123,7 +123,8 @@ export SourceService() := macro
   end;
 	
 	results := dataset([format()]);
-
+	
+    IF(EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access));
 	output(results,named('Results'));
 
 endmacro;

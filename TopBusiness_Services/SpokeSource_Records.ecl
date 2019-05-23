@@ -1,11 +1,12 @@
-// ================================================================================
+﻿// ================================================================================
 // ===== RETURNS Spoke member Source Doc and Source Count Info
 // ================================================================================
-IMPORT BIPV2, Spoke, ut, iesp, MDR;
+IMPORT BIPV2, Spoke, ut, iesp, MDR, doxie, AutoStandardI, Suppress;
 
 EXPORT SpokeSource_Records (
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
   SourceService_Layouts.OptionsLayout inoptions, 
+	doxie.IDataAccess mod_access,
 	boolean IsFCRA = false) 
  := MODULE
 	
@@ -15,11 +16,13 @@ EXPORT SpokeSource_Records (
 																																		SELF := LEFT,
 																																		SELF := []));
 	// *** Key fetch to get bspoke data
-  spoke_recs := Spoke.Key_Spoke_Linkids.kfetch(DEDUP(in_docs_linkonly,ALL),inoptions.fetch_level,,
+  spoke_recs_all := Spoke.Key_Spoke_Linkids.kfetch(DEDUP(in_docs_linkonly,ALL),inoptions.fetch_level,,
 	TopBusiness_Services.Constants.SpokeKfetchMaxLimit);
-									
-  // Spoke does not have a vl_id or source_rec_id to filter on.	
-	SHARED spoke_idValue := JOIN(spoke_recs,in_docids,
+	
+	ds_spoke_recs_suppressed := Suppress.MAC_SuppressSource(spoke_recs_all, mod_access);
+	
+	// Spoke does not have a vl_id or source_rec_id to filter on.	
+	SHARED spoke_idValue := JOIN(ds_spoke_recs_suppressed,in_docids,
 										BIPV2.IDmacros.mac_JoinLinkids(inoptions.fetch_level),
 										TRANSFORM(LEFT));
 										
@@ -52,11 +55,12 @@ EXPORT SpokeSource_Records (
 			self.dt_last_seen := ut.NormDate((unsigned)L.dt_last_seen);
 			self := [];
 	END;
-
-	EXPORT SourceDetailInfo := PROJECT(spoke_idValue,xform_Details(LEFT));
-	SourceView_RecsIesp := PROJECT(spoke_idValue, toOut(left));
-	EXPORT SourceView_Recs := DEDUP(SourceView_RecsIesp,ALL,HASH,EXCEPT businessIds.ultid,businessIds.orgid,businessIds.seleid,businessIds.proxid,
-																							businessIds.dotid,businessIds.empid,businessIds.powid);
-  EXPORT SourceView_RecCount := COUNT(SourceView_Recs);
+doxie.compliance.logSoldToSources(spoke_idValue, mod_access);
+EXPORT SourceDetailInfo := PROJECT(spoke_idValue,xform_Details(LEFT));
+SourceView_RecsIesp := PROJECT(spoke_idValue, toOut(left));
+doxie.compliance.logSoldToSources(spoke_idValue, mod_access);								
+EXPORT SourceView_Recs := DEDUP(SourceView_RecsIesp,ALL,HASH,EXCEPT businessIds.ultid,businessIds.orgid,businessIds.seleid,businessIds.proxid,
+                                              businessIds.dotid,businessIds.empid,businessIds.powid);
+EXPORT SourceView_RecCount := COUNT(SourceView_Recs);
 
 END;
