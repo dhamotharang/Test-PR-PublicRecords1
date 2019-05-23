@@ -115,9 +115,10 @@ EXPORT Layout_Base2 := RECORD
 		,address.Layout_Clean182.msa
 		,address.Layout_Clean182.geo_blk
 		,address.Layout_Clean182.geo_match
-		,address.Layout_Clean182.err_stat
-		,string32 FileName := ''
-;
-
+		,address.Layout_Clean182.err_stat,
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		string32 					FileName := '';
 
 END;

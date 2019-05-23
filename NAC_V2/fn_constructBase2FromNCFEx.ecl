@@ -256,7 +256,6 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 	
 	ds6 := AddContacts(ds5, contacts);
 
-
 	return ds6;
 
 END;

@@ -209,6 +209,8 @@ EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 						SELF.fips_state 			:= left.fips_county;
 						SELF.fips_county 			:= left.county;
 
+						self.created := Std.Date.Today();
+						self.updated := Std.Date.Today();
 						self := left;
 						//self := [];
 				));
