@@ -47,6 +47,7 @@ EXPORT Layout_Base2 := RECORD
 	string10		case_Phone2;
 	string256		case_Email;
 	string10		case_Monthly_Allotment := '0';	// whole dollar
+	string4			OrigGroupId;
 	// address data
 	string1			Physical_AddressCategory;	
 	string65		Physical_Street1;

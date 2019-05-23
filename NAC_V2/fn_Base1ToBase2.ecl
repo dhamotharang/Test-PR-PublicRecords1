@@ -1,4 +1,4 @@
-import STD, address;
+﻿import STD, address;
 
 reclean(DATASET(Nac_v2.Layouts.baseHistorical) filein) := FUNCTION
 	
@@ -119,6 +119,7 @@ EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 						self.ProgramState := left.Case_State_Abbreviation;
 						self.ProgramCode := IF(left.Case_Benefit_Type='R','S',left.Case_Benefit_Type);
 						self.GroupId := left.Case_State_Abbreviation + '01';	// default group for v1
+						self.OrigGroupId := left.Case_State_Abbreviation + '01';	// default group for v1
 						self.CaseID := left.Case_Identifier;
 						self.ClientID := left.Client_Identifier;
 						self.MonthlyAllotment := '0';	// whole dollar
