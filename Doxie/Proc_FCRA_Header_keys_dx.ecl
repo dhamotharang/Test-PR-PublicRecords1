@@ -6,7 +6,8 @@ unsigned1 data_class := data_services.data_env.iFCRA;
 EXPORT Proc_FCRA_Header_keys_dx(string filedate) := FUNCTION
 
 dsname := dx_Header.Constants.DataSetName;
-prefix := '~thor_data400::key::' + dsname + '::fcra::header::' + filedate + '::';
+// prefix := '~thor_data400::key::' + dsname + '::fcra::header::' + filedate + '::';
+prefix := '~thor_data400::key::fcra::header::'+ filedate + '::';
 
 //logical file names
 name_header := prefix + 'data';
