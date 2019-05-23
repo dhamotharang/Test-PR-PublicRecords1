@@ -42,7 +42,7 @@ EXPORT Mod_stats := MODULE
 		withRC:=project(seqd,tr0(left));
 
 		r tr1(withRC l, integer c):=transform
-			self.err:= if(STD.Str.FindCount( ut.fn_RemoveSpecialChars(l.line), pSeparator ) = 0,'F1','');
+			self.err:= if(STD.Str.FindCount( l.line, pSeparator ) = 0,'F1','');
 			self:=l;
 		end;
 
