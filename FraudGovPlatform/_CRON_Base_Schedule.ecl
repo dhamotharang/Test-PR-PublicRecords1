@@ -7,6 +7,7 @@ ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',FraudGovPlatform_Valid
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
++'#CONSTANT(\'RunKelDemo\',false);\n' 
 +'#STORED(\'_Validate_Year_Range_Low\',1900);\n'
 +'#STORED(\'_Validate_Year_Range_High\',2018);\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
