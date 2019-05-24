@@ -1,5 +1,7 @@
 /*** Generated Code do not hand edit ***/
 
+EXPORT MonitorESP_create_PersonSlimReport() := MACRO
+
 IMPORT cassandra;
 
 
@@ -116,14 +118,22 @@ request := MODULE
   END;
 
   EXPORT _lt_PersonSlimReportOption := RECORD (_lt_BaseReportOption)
+    boolean IncludeMinors {xpath('IncludeMinors')};
+    boolean IncludeFullPhonesPlus {xpath('IncludeFullPhonesPlus')};
+    boolean IncludeBlankDOD {xpath('IncludeBlankDOD')};
     boolean EnableNationalAccidents {xpath('EnableNationalAccidents')};
     boolean EnableExtraAccidents {xpath('EnableExtraAccidents')};
     boolean IncludePriorProperties {xpath('IncludePriorProperties')};
     boolean IncludeNonRegulatedWatercraftSources {xpath('IncludeNonRegulatedWatercraftSources')};
     boolean IncludeNonRegulatedVehicleSources {xpath('IncludeNonRegulatedVehicleSources')};
+    boolean IncludeNonRegulatedDMVSources {xpath('IncludeNonRegulatedDMVSources')};
     string RealTimePermissibleUse {xpath('RealTimePermissibleUse')};
     boolean IncludeAddresses {xpath('IncludeAddresses')};
     boolean IncludePhones {xpath('IncludePhones')};
+    boolean IncludeDeaths {xpath('IncludeDeaths')};
+    boolean IncludeNames {xpath('IncludeNames')};
+    boolean IncludeSSNs {xpath('IncludeSSNs')};
+    boolean IncludeDOBs {xpath('IncludeDOBs')};
     boolean IncludeProfessionalLicenses {xpath('IncludeProfessionalLicenses')};
     boolean IncludePeopleAtWork {xpath('IncludePeopleAtWork')};
     boolean IncludeAircrafts {xpath('IncludeAircrafts')};
@@ -148,7 +158,6 @@ request := MODULE
     boolean IncludeEducation {xpath('IncludeEducation')};
     boolean IncludeAKAs {xpath('IncludeAKAs')};
     boolean IncludeImposters {xpath('IncludeImposters')};
-    boolean IncludeDeaths {xpath('IncludeDeaths')};
     boolean IncludeUtility {xpath('IncludeUtility')};
   END;
 
@@ -237,19 +246,7 @@ layouts := MODULE
     integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
-  EXPORT _lt_Date := RECORD (DiffMetaRec)
-    integer2 Year {xpath('Year')};
-    integer2 Month {xpath('Month')};
-    integer2 Day {xpath('Day')};
-  END;
-
-  EXPORT _lt_row_Date := RECORD  (_lt_Date)
-    integer _diff_ord {xpath('@diff_ord')} := 0;
-  END;
-
   EXPORT _lt_PersonSlimReportAddress := RECORD (_lt_Address)
-    string7 GeoBlk {xpath('GeoBlk')};
-    _lt_Date DateLastSeen {xpath('DateLastSeen')};
   END;
 
   EXPORT _lt_row_PersonSlimReportAddress := RECORD  (_lt_PersonSlimReportAddress)
@@ -269,20 +266,54 @@ layouts := MODULE
     integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
-  EXPORT _lt_PhonesPlusRecord := RECORD
-    string120 ListedName {xpath('ListedName')};
-    _lt_Name Name {xpath('Name')};
-    _lt_Address Address {xpath('Address')};
-    string10 PhoneNumber {xpath('PhoneNumber')};
-    string4 TimeZone {xpath('TimeZone')};
-    string12 PhoneType {xpath('PhoneType')};
-    string30 CarrierName {xpath('CarrierName')};
-    string25 CarrierCity {xpath('CarrierCity')};
-    string2 CarrierState {xpath('CarrierState')};
-    DATASET (DiffString) ListingTypes {xpath('ListingTypes/Type'), MAXCOUNT(CONSTANTS.DAW.MAX_LISTING_TYPES * 2)};
+  EXPORT _lt_PersonSlimReportName := RECORD (_lt_Name)
   END;
 
-  EXPORT _lt_BusinessIdentity := RECORD
+  EXPORT _lt_row_PersonSlimReportName := RECORD  (_lt_PersonSlimReportName)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_PersonSlimReportPhone := RECORD (DiffMetaRec)
+    string10 Phone {xpath('Phone')};
+  END;
+
+  EXPORT _lt_row_PersonSlimReportPhone := RECORD  (_lt_PersonSlimReportPhone)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_Date := RECORD (DiffMetaRec)
+    integer2 Year {xpath('Year')};
+    integer2 Month {xpath('Month')};
+    integer2 Day {xpath('Day')};
+  END;
+
+  EXPORT _lt_row_Date := RECORD  (_lt_Date)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_PersonSlimReportDeath := RECORD (_lt_Date)
+  END;
+
+  EXPORT _lt_row_PersonSlimReportDeath := RECORD  (_lt_PersonSlimReportDeath)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_PersonSlimReportDOB := RECORD (_lt_Date)
+  END;
+
+  EXPORT _lt_row_PersonSlimReportDOB := RECORD  (_lt_PersonSlimReportDOB)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_PersonSlimReportSSN := RECORD (DiffMetaRec)
+    string9 SSN {xpath('SSN')};
+  END;
+
+  EXPORT _lt_row_PersonSlimReportSSN := RECORD  (_lt_PersonSlimReportSSN)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_BusinessIdentity := RECORD (DiffMetaRec)
     unsigned6 DotID {xpath('DotID')}; // Xsd type: long
     unsigned6 EmpID {xpath('EmpID')}; // Xsd type: long
     unsigned6 POWID {xpath('POWID')}; // Xsd type: long
@@ -310,7 +341,7 @@ layouts := MODULE
     string15 DatesAttended {xpath('DatesAttended')};
   END;
 
-  EXPORT _lt_ProfessionalLicenseRecord := RECORD
+  EXPORT _lt_ProfessionalLicenseRecord := RECORD (DiffMetaRec)
     _lt_BusinessIdentity BusinessIds {xpath('BusinessIds')};
     string100 IdValue {xpath('IdValue')};
     string60 LicenseType {xpath('LicenseType')};
@@ -356,7 +387,11 @@ layouts := MODULE
     string15 TaxId {xpath('TaxId')};
   END;
 
-  EXPORT _lt_PeopleAtWorkRecord := RECORD
+  EXPORT _lt_row_ProfessionalLicenseRecord := RECORD  (_lt_ProfessionalLicenseRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_PeopleAtWorkRecord := RECORD (DiffMetaRec)
     _lt_BusinessIdentity BusinessIds {xpath('BusinessIds')};
     string100 IdValue {xpath('IdValue')};
     string1 ConfidenceLevel {xpath('ConfidenceLevel')};
@@ -379,7 +414,11 @@ layouts := MODULE
     _lt_Date DateLastSeen {xpath('DateLastSeen')};
   END;
 
-  EXPORT _lt_AircraftReportRecordBase := RECORD
+  EXPORT _lt_row_PeopleAtWorkRecord := RECORD  (_lt_PeopleAtWorkRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_AircraftReportRecordBase := RECORD (DiffMetaRec)
     string20 Status {xpath('Status')};
     string8 AircraftNumber {xpath('AircraftNumber')};
     _lt_Date DateFirstSeen {xpath('DateFirstSeen')};
@@ -388,7 +427,7 @@ layouts := MODULE
     _lt_Date CertificationDate {xpath('CertificationDate')};
   END;
 
-  EXPORT _lt_AircraftReportRegistrant := RECORD
+  EXPORT _lt_AircraftReportRegistrant := RECORD (DiffMetaRec)
     string1 _Type {xpath('Type')};
     string50 CompanyName {xpath('CompanyName')};
     _lt_Name Name {xpath('Name')};
@@ -427,6 +466,10 @@ layouts := MODULE
     _lt_AircraftReportRegistrant Registrant {xpath('Registrant')};
     _lt_AircraftReportAircraft AircraftInfo {xpath('AircraftInfo')};
     _lt_AircraftReportEngine EngineInfo {xpath('EngineInfo')};
+  END;
+
+  EXPORT _lt_row_AircraftReportRecord := RECORD  (_lt_AircraftReportRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_BaseBpsFAACertification := RECORD (DiffMetaRec)
@@ -532,7 +575,7 @@ layouts := MODULE
     string20 Model {xpath('Model')};
   END;
 
-  EXPORT _lt_BaseWaterCraftReportRecord := RECORD
+  EXPORT _lt_BaseWaterCraftReportRecord := RECORD (DiffMetaRec)
     _lt_WaterCraftDescriptionEx Description {xpath('Description')};
     _lt_WaterCraftRegistration Registration {xpath('Registration')};
     _lt_WaterCraftTitle Title {xpath('Title')};
@@ -550,7 +593,7 @@ layouts := MODULE
     dataset(_lt_WaterCraftEngine) Engines {xpath('Engines/Engine'), MAXCOUNT(iesp.Constants.WATERCRAFTS.MaxEngines * 2)};
   END;
 
-  EXPORT _lt_WaterCraftOwner := RECORD
+  EXPORT _lt_WaterCraftOwner := RECORD (DiffMetaRec)
     _lt_Name Name {xpath('Name')};
     _lt_Address Address {xpath('Address')};
     string9 SSN {xpath('SSN')};
@@ -559,11 +602,19 @@ layouts := MODULE
     string12 UniqueId {xpath('UniqueId')};
   END;
 
+  EXPORT _lt_row_WaterCraftOwner := RECORD  (_lt_WaterCraftOwner)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_WaterCraftReportRecord := RECORD (_lt_BaseWaterCraftReportRecord)
     dataset(_lt_WaterCraftOwner) Owners {xpath('Owners/Owner'), MAXCOUNT(iesp.Constants.WATERCRAFTS.MaxOwners * 2)};
   END;
 
-  EXPORT _lt_UCCParsedParty := RECORD
+  EXPORT _lt_row_WaterCraftReportRecord := RECORD  (_lt_WaterCraftReportRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_UCCParsedParty := RECORD (DiffMetaRec)
     _lt_BusinessIdentity BusinessIds {xpath('BusinessIds')};
     string100 IdValue {xpath('IdValue')};
     string12 BusinessId {xpath('BusinessId')};
@@ -577,13 +628,13 @@ layouts := MODULE
     string30 CorporateType {xpath('CorporateType')};
   END;
 
+  EXPORT _lt_row_UCCParsedParty := RECORD  (_lt_UCCParsedParty)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_AddressWithRawInfo := RECORD (_lt_Address)
     string OrigStreetAddress1 {xpath('OrigStreetAddress1'), maxlength(128)};
     string OrigStreetAddress2 {xpath('OrigStreetAddress2'), maxlength(128)};
-  END;
-
-  EXPORT _lt_row_AddressWithRawInfo := RECORD  (_lt_AddressWithRawInfo)
-    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_UniversalAndRawAddress := RECORD (_lt_Address)
@@ -609,10 +660,14 @@ layouts := MODULE
     boolean IsForeign {xpath('IsForeign')};
   END;
 
-  EXPORT _lt_UCCReport2Person := RECORD
+  EXPORT _lt_UCCReport2Person := RECORD (DiffMetaRec)
     string120 OriginName {xpath('OriginName')};
     dataset(_lt_UCCParsedParty) ParsedParties {xpath('ParsedParties/Party'), MAXCOUNT(iesp.Constants.UCCF.MaxPersonParsedParties * 2)};
     dataset(_lt_UniversalAndRawAddress) Addresses {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.UCCF.MaxPersonAddresses * 2)};
+  END;
+
+  EXPORT _lt_row_UCCReport2Person := RECORD  (_lt_UCCReport2Person)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_UCCCollateral := RECORD
@@ -675,7 +730,7 @@ layouts := MODULE
     _lt_UniversalAddress Address2 {xpath('Address2')};
   END;
 
-  EXPORT _lt_UCCReport2Record := RECORD
+  EXPORT _lt_UCCReport2Record := RECORD (DiffMetaRec)
     _lt_BusinessIdentity BusinessIds {xpath('BusinessIds')};
     string100 IdValue {xpath('IdValue')};
     string31 TMSId {xpath('TMSId')};
@@ -696,6 +751,10 @@ layouts := MODULE
     dataset(_lt_UCCSigner) Signers {xpath('Signers/Signer'), MAXCOUNT(iesp.Constants.UCCF.MaxSigners * 2)};
     dataset(_lt_UCCReport2Filing) Filings2 {xpath('Filings2/Filing'), MAXCOUNT(iesp.Constants.UCCF.MaxFilings * 2)};
     dataset(_lt_UCCFilingOffice) FilingOffices {xpath('FilingOffices/Office'), MAXCOUNT(iesp.Constants.UCCF.MaxFilingOffices * 2)};
+  END;
+
+  EXPORT _lt_row_UCCReport2Record := RECORD  (_lt_UCCReport2Record)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_SexOffReportPoliceAgency := RECORD
@@ -785,7 +844,7 @@ layouts := MODULE
     boolean BestAddressIsDifferent {xpath('BestAddressIsDifferent')};
   END;
 
-  EXPORT _lt_BaseSexOffReportRecord := RECORD
+  EXPORT _lt_BaseSexOffReportRecord := RECORD (DiffMetaRec)
     string60 PrimaryKey {xpath('PrimaryKey')};
     string10 RecordType {xpath('RecordType')};
     _lt_Name Name {xpath('Name')};
@@ -844,7 +903,11 @@ layouts := MODULE
     boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
   END;
 
-  EXPORT _lt_BaseCrimReportRecord := RECORD
+  EXPORT _lt_row_SexOffReportRecord := RECORD  (_lt_SexOffReportRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_BaseCrimReportRecord := RECORD (DiffMetaRec)
     string OffenderId {xpath('OffenderId')};
     string35 CaseNumber {xpath('CaseNumber')};
     string30 CountyOfOrigin {xpath('CountyOfOrigin')};
@@ -1036,7 +1099,11 @@ layouts := MODULE
     boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
   END;
 
-  EXPORT _lt_CCWPermit := RECORD
+  EXPORT _lt_row_CrimReportRecord := RECORD  (_lt_CrimReportRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_CCWPermit := RECORD (DiffMetaRec)
     string15 PermitNumber {xpath('PermitNumber')};
     string46 PermitType {xpath('PermitType')};
     string15 WeaponType {xpath('WeaponType')};
@@ -1044,7 +1111,7 @@ layouts := MODULE
     _lt_Date ExpirationDate {xpath('ExpirationDate')};
   END;
 
-  EXPORT _lt_WeaponRecord := RECORD
+  EXPORT _lt_WeaponRecord := RECORD (DiffMetaRec)
     string2 StateCode {xpath('StateCode')};
     string25 StateName {xpath('StateName')};
     string30 Occupation {xpath('Occupation')};
@@ -1056,6 +1123,10 @@ layouts := MODULE
     _lt_Date DOB {xpath('DOB')};
     _lt_Name Name {xpath('Name')};
     _lt_Address Address {xpath('Address')};
+  END;
+
+  EXPORT _lt_row_WeaponRecord := RECORD  (_lt_WeaponRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_HuntFishRecord := RECORD (DiffMetaRec)
@@ -1297,7 +1368,7 @@ layouts := MODULE
     integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
-  EXPORT _lt_MotorVehicleReportVehicleInfo := RECORD
+  EXPORT _lt_MotorVehicleReportVehicleInfo := RECORD (DiffMetaRec)
     string15 IterationKey {xpath('IterationKey')};//hidden[internal]
     string15 SequenceKey {xpath('SequenceKey')};//hidden[internal]
     string30 VehicleRecordId {xpath('VehicleRecordId')};
@@ -1404,12 +1475,16 @@ layouts := MODULE
     integer OdometerMileage {xpath('OdometerMileage')};
   END;
 
-  EXPORT _lt_MotorVehicleReportOwner := RECORD
+  EXPORT _lt_MotorVehicleReportOwner := RECORD (DiffMetaRec)
     string30 HistoryDescription {xpath('HistoryDescription')};
     _lt_MotorVehicleReportPersonOrBusiness OwnerInfo {xpath('OwnerInfo')};
     _lt_MotorVehicleReportTitleInfo TitleInfo {xpath('TitleInfo')};
     _lt_Date SourceDateFirstSeen {xpath('SourceDateFirstSeen')};
     _lt_Date SourceDateLastSeen {xpath('SourceDateLastSeen')};
+  END;
+
+  EXPORT _lt_row_MotorVehicleReportOwner := RECORD  (_lt_MotorVehicleReportOwner)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_MotorVehicleReportLienHolder := RECORD
@@ -1551,7 +1626,7 @@ layouts := MODULE
     string40 AlcoholDrug {xpath('AlcoholDrug')};
   END;
 
-  EXPORT _lt_AccidentReportInvestigationAgent := RECORD
+  EXPORT _lt_AccidentReportInvestigationAgent := RECORD (DiffMetaRec)
     string15 AgentReportNumber {xpath('AgentReportNumber')};
     string25 AgentName {xpath('AgentName')};
     string15 AgentRank {xpath('AgentRank')};
@@ -1559,7 +1634,7 @@ layouts := MODULE
     string25 AgentDepartmentName {xpath('AgentDepartmentName')};
   END;
 
-  EXPORT _lt_AccidentReportInvestigation := RECORD
+  EXPORT _lt_AccidentReportInvestigation := RECORD (DiffMetaRec)
     _lt_AccidentReportInvestigationAgent InvestigationAgent {xpath('InvestigationAgent')};
     string25 InvestMaede {xpath('InvestMaede')};
     string25 InvestComplete {xpath('InvestComplete')};
@@ -1640,7 +1715,7 @@ layouts := MODULE
     string25 LicenseType {xpath('LicenseType')};
   END;
 
-  EXPORT _lt_AccidentReportIndividualInvolved := RECORD
+  EXPORT _lt_AccidentReportIndividualInvolved := RECORD (DiffMetaRec)
     string12 UniqueId {xpath('UniqueId')};
     _lt_Name Name {xpath('Name')};
     _lt_Date DOB {xpath('DOB')};
@@ -1663,7 +1738,7 @@ layouts := MODULE
     DATASET (DiffString) Citations {xpath('Citations/Item'), MAXCOUNT(iesp.constants.ACCIDENTS_MAX_COUNT_CITATIONS * 2)};
   END;
 
-  EXPORT _lt_AccidentReportDriver := RECORD
+  EXPORT _lt_AccidentReportDriver := RECORD (DiffMetaRec)
     string2 ResidentState {xpath('ResidentState')};
     string30 FirstSafety {xpath('FirstSafety')};
     string30 SecondSafety {xpath('SecondSafety')};
@@ -1679,7 +1754,7 @@ layouts := MODULE
     string25 InsurancePolicyNumber {xpath('InsurancePolicyNumber')};
   END;
 
-  EXPORT _lt_AccidentReportVehicle := RECORD
+  EXPORT _lt_AccidentReportVehicle := RECORD (DiffMetaRec)
     string2 Vehicle {xpath('Vehicle')};
     string20 OwnerDriver {xpath('OwnerDriver')};
     string20 DriverAction {xpath('DriverAction')};
@@ -1725,6 +1800,10 @@ layouts := MODULE
     dataset(_lt_AccidentReportPassenger) Passengers {xpath('Passengers/Item'), MAXCOUNT(iesp.constants.ACCIDENTS_MAX_COUNT_PASSENGERS * 2)};
   END;
 
+  EXPORT _lt_row_AccidentReportVehicle := RECORD  (_lt_AccidentReportVehicle)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_AccidentReportPropertyOwner := RECORD
     _lt_Name Name {xpath('Name')};
     string6 Gender {xpath('Gender')};
@@ -1746,7 +1825,7 @@ layouts := MODULE
     _lt_AccidentReportIndividualInvolved Individual {xpath('Individual')};
   END;
 
-  EXPORT _lt_AccidentReportRecord := RECORD
+  EXPORT _lt_AccidentReportRecord := RECORD (DiffMetaRec)
     _lt_Date AccidentDate {xpath('AccidentDate')};
     string3 DhsmvVehicleCrash {xpath('DhsmvVehicleCrash')};
     string1 FormType {xpath('FormType')};
@@ -1761,6 +1840,10 @@ layouts := MODULE
     dataset(_lt_AccidentReportVehicle) Vehicles {xpath('Vehicles/Item'), MAXCOUNT(iesp.constants.ACCIDENTS_MAX_COUNT_VEHICLES * 2)};
     dataset(_lt_AccidentReportPropertyDamage) PropertyDamages {xpath('PropertyDamages/Item'), MAXCOUNT(iesp.constants.ACCIDENTS_MAX_COUNT_PROP_DAMAGES * 2)};
     dataset(_lt_AccidentReportPedestrian) Pedestrians {xpath('Pedestrians/Item'), MAXCOUNT(iesp.constants.ACCIDENTS_MAX_COUNT_PEDESTRIANS * 2)};
+  END;
+
+  EXPORT _lt_row_AccidentReportRecord := RECORD  (_lt_AccidentReportRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_Bankruptcy2Meeting := RECORD
@@ -2419,6 +2502,10 @@ layouts := MODULE
     integer LinkingWeight {xpath('LinkingWeight')};//hidden[internal]
   END;
 
+  EXPORT _lt_row_Property2Name := RECORD  (_lt_Property2Name)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_GeoLocation := RECORD
     string10 Latitude {xpath('Latitude')};
     string11 Longitude {xpath('Longitude')};
@@ -2440,7 +2527,7 @@ layouts := MODULE
     integer LinkingWeight {xpath('LinkingWeight')};//hidden[internal]
   END;
 
-  EXPORT _lt_Property2Entity := RECORD
+  EXPORT _lt_Property2Entity := RECORD (DiffMetaRec)
     dataset(_lt_Property2Name) Names {xpath('Names/Name'), MAXCOUNT(iesp.Constants.Prop.MaxNames * 2)};
     DATASET (DiffString) OriginalNames {xpath('OriginalNames/Name'), MAXCOUNT(iesp.Constants.Prop.MaxOriginalNames * 2)};
     dataset(_lt_OriginalName) OriginalNames2 {xpath('OriginalNames2/OriginalName'), MAXCOUNT(iesp.Constants.Prop.MaxOriginalNames * 2)};
@@ -2455,7 +2542,11 @@ layouts := MODULE
     integer LinkingWeight {xpath('LinkingWeight')};//hidden[internal]
   END;
 
-  EXPORT _lt_PropertyReport2Record := RECORD
+  EXPORT _lt_row_Property2Entity := RECORD  (_lt_Property2Entity)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_PropertyReport2Record := RECORD (DiffMetaRec)
     _lt_BusinessIdentity BusinessIds {xpath('BusinessIds')};
     string100 IdValue {xpath('IdValue')};
     string1 DataSource {xpath('DataSource')};
@@ -2470,7 +2561,11 @@ layouts := MODULE
     dataset(_lt_Property2Entity) Entities {xpath('Entities/Entity'), MAXCOUNT(iesp.Constants.Prop.MaxEntities * 2)};
   END;
 
-  EXPORT _lt_BaseMarriageSearch2Record := RECORD
+  EXPORT _lt_row_PropertyReport2Record := RECORD  (_lt_PropertyReport2Record)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_BaseMarriageSearch2Record := RECORD (DiffMetaRec)
     boolean AlsoFound {xpath('AlsoFound')};
     string15 RecordId {xpath('RecordId')};
     string10 FilingType {xpath('FilingType')};
@@ -2511,6 +2606,10 @@ layouts := MODULE
     _lt_MarriageSearch2Party Party2 {xpath('Party2')};
   END;
 
+  EXPORT _lt_row_MarriageSearch2Record := RECORD  (_lt_MarriageSearch2Record)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_CollegeData := RECORD
     string50 Name {xpath('Name')};
     string50 Major {xpath('Major')};
@@ -2532,7 +2631,7 @@ layouts := MODULE
     string2 CollegeEducationProgramTier2 {xpath('CollegeEducationProgramTier2')};
   END;
 
-  EXPORT _lt_StudentRecord := RECORD
+  EXPORT _lt_StudentRecord := RECORD (DiffMetaRec)
     _lt_Name Name {xpath('Name')};
     string12 UniqueId {xpath('UniqueId')};//hidden[internal]
     _lt_Date FirstReported {xpath('FirstReported')};
@@ -2553,7 +2652,11 @@ layouts := MODULE
     boolean AlsoFound {xpath('AlsoFound')};
   END;
 
-  EXPORT _lt_SSNInfoBase := RECORD
+  EXPORT _lt_row_StudentRecord := RECORD  (_lt_StudentRecord)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
+  EXPORT _lt_SSNInfoBase := RECORD (DiffMetaRec)
     string9 SSN {xpath('SSN')};
     string5 Valid {xpath('Valid')};
     string32 IssuedLocation {xpath('IssuedLocation')};
@@ -2574,7 +2677,7 @@ layouts := MODULE
     dataset(_lt_RiskIndicator) HighRiskIndicators {xpath('HighRiskIndicators/HighRiskIndicator'), MAXCOUNT(Constants.MaxCountHRI * 2)};
   END;
 
-  EXPORT _lt_Identity := RECORD
+  EXPORT _lt_Identity := RECORD (DiffMetaRec)
     string12 UniqueId {xpath('UniqueId')};
     _lt_Name Name {xpath('Name')};
     string6 Gender {xpath('Gender')};
@@ -2862,77 +2965,11 @@ layouts := MODULE
     string SubjectSSNIndicator {xpath('SubjectSSNIndicator')}; 
   END;
 
-  EXPORT _lt_BpsReportImposter := RECORD
-    dataset(_lt_BpsReportIdentity) AKAs {xpath('AKAs/Identity'), MAXCOUNT(iesp.Constants.BR.MaxImposters_AKA * 2)};
+  EXPORT _lt_row_BpsReportIdentity := RECORD  (_lt_BpsReportIdentity)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
-  EXPORT _lt_DeathReportDecedent := RECORD
-    _lt_Name Name {xpath('Name')};
-    _lt_Address Address {xpath('Address')};
-    _lt_Date DOB {xpath('DOB')};
-    _lt_Date DOD {xpath('DOD')};
-    string Sex {xpath('Sex')};
-    string Race {xpath('Race')};
-    string UniqueId {xpath('UniqueId')};
-    string SSN {xpath('SSN')};
-    string BirthPlace {xpath('BirthPlace')};
-    integer DeathAge {xpath('DeathAge')};
-    string DeathAgeUnit {xpath('DeathAgeUnit')};
-    string BirthCertificateNumber {xpath('BirthCertificateNumber')};
-    string BirthVolYear {xpath('BirthVolYear')};
-    string Education {xpath('Education')};
-    string Occupation {xpath('Occupation')};
-    string MaritalStatus {xpath('MaritalStatus')};
-    string ArmedForces {xpath('ArmedForces')}; 
-  END;
-
-  EXPORT _lt_DeathReportDecedentFamily := RECORD
-    string Father {xpath('Father')};
-    string Mother {xpath('Mother')};
-  END;
-
-  EXPORT _lt_DeathReportDeathInfo := RECORD
-    string IssuingAuthority {xpath('IssuingAuthority')};
-    string CertificateNumber {xpath('CertificateNumber')};
-    _lt_Date CertificateFileDate {xpath('CertificateFileDate')};
-    string CertificateVolNumber {xpath('CertificateVolNumber')};
-    integer CertificateVolYear {xpath('CertificateVolYear')};
-    string LocalFileNumber {xpath('LocalFileNumber')};
-    string FuneralHomeLicenseNumber {xpath('FuneralHomeLicenseNumber')};
-    string EmbalmerLicenseNumber {xpath('EmbalmerLicenseNumber')};
-    string ZipLastPayment {xpath('ZipLastPayment')};
-    string CauseOfDeath {xpath('CauseOfDeath')};
-    string TimeOfDeath {xpath('TimeOfDeath')};
-    string DeathLocation {xpath('DeathLocation')};
-    string Facilty {xpath('Facilty')};
-    string DeathType {xpath('DeathType')};
-    string Disposition {xpath('Disposition')};
-    _lt_Date DispositionDate {xpath('DispositionDate')};
-    string Autopsy {xpath('Autopsy')};
-    string AutopsyFindings {xpath('AutopsyFindings')};
-    string MedicalExamination {xpath('MedicalExamination')};
-    _lt_Date InjuryDate {xpath('InjuryDate')};
-    string InjuryLocation {xpath('InjuryLocation')};
-    _lt_Date SurgeryDate {xpath('SurgeryDate')};
-    string Pregnancy {xpath('Pregnancy')};
-    string Certifier {xpath('Certifier')};
-    string HospitalStatus {xpath('HospitalStatus')};
-    string WorkInjury {xpath('WorkInjury')}; 
-    string SurgeryPerformed {xpath('SurgeryPerformed')}; 
-  END;
-
-  EXPORT _lt_DeathReportRecord := RECORD
-    string StateDeathId {xpath('StateDeathId')};
-    string SourceState {xpath('SourceState')};
-    string County {xpath('County')};
-    string VerifiedOrProved {xpath('VerifiedOrProved')};
-    string Source {xpath('Source')};//hidden[internal]
-    _lt_DeathReportDecedent Decedent {xpath('Decedent')};
-    _lt_DeathReportDecedentFamily Family {xpath('Family')};
-    _lt_DeathReportDeathInfo DeathInfo {xpath('DeathInfo')};
-  END;
-
-  EXPORT _lt_PersonSlimReportUtility := RECORD
+  EXPORT _lt_PersonSlimReportUtility := RECORD (DiffMetaRec)
     string1 UtilType {xpath('UtilType')};
     string20 UtilCategory {xpath('UtilCategory')};
     string20 UtilTypeDescription {xpath('UtilTypeDescription')};
@@ -2950,11 +2987,19 @@ layouts := MODULE
     dataset(_lt_Address) Addresses {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAddresses * 2)};
   END;
 
+  EXPORT _lt_row_PersonSlimReportUtility := RECORD  (_lt_PersonSlimReportUtility)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_PersonSlimReportResponse := RECORD
     _lt_ResponseHeader _Header {xpath('Header')};
     string12 UniqueId {xpath('UniqueId')};
     dataset(_lt_PersonSlimReportAddress) Addresses {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAddresses * 2)};
-    dataset(_lt_PhonesPlusRecord) Phones {xpath('Phones/Phone'), MAXCOUNT(iesp.constants.PersonSlim.MaxPhones * 2)};
+    dataset(_lt_PersonSlimReportName) Names {xpath('Names/Name'), MAXCOUNT(iesp.Constants.PersonSlim.MaxNames * 2)};
+    dataset(_lt_PersonSlimReportPhone) Phones {xpath('Phones/Entry'), MAXCOUNT(iesp.Constants.PersonSlim.MaxPhones * 2)};
+    dataset(_lt_PersonSlimReportDeath) Deaths {xpath('Deaths/Death'), MAXCOUNT(iesp.Constants.PersonSlim.MaxDeaths * 2)};
+    dataset(_lt_PersonSlimReportDOB) DOBs {xpath('DOBs/DOB'), MAXCOUNT(iesp.constants.PersonSlim.MaxDOBs * 2)};
+    dataset(_lt_PersonSlimReportSSN) SSNs {xpath('SSNs/Entry'), MAXCOUNT(iesp.constants.PersonSlim.MaxSSNs * 2)};
     dataset(_lt_ProfessionalLicenseRecord) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(iesp.Constants.PersonSlim.MaxProfLic * 2)};
     dataset(_lt_PeopleAtWorkRecord) PeopleAtWorks {xpath('PeopleAtWorks/PeopleAtWork'), MAXCOUNT(iesp.constants.PersonSlim.MaxPeopleAtWork * 2)};
     dataset(_lt_AircraftReportRecord) Aircrafts {xpath('Aircrafts/Aircraft'), MAXCOUNT(iesp.constants.PersonSlim.MaxAircrafts * 2)};
@@ -2976,9 +3021,8 @@ layouts := MODULE
     dataset(_lt_PropertyReport2Record) Properties {xpath('Properties/Property'), MAXCOUNT(iesp.Constants.PersonSlim.MaxProperties * 2)};
     dataset(_lt_MarriageSearch2Record) MarriageDivorces {xpath('MarriageDivorces/MarriageDivorce'), MAXCOUNT(iesp.Constants.PersonSlim.MaxMarriageDiv * 2)};
     dataset(_lt_StudentRecord) Educations {xpath('Educations/Education'), MAXCOUNT(iesp.Constants.PersonSlim.MaxStudent * 2)};
-    dataset(_lt_BpsReportIdentity) AKAs {xpath('AKAs/Identity'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAKA * 2)};
-    dataset(_lt_BpsReportImposter) Imposters {xpath('Imposters/Imposter'), MAXCOUNT(iesp.Constants.PersonSlim.MaxImposters * 2)};
-    dataset(_lt_DeathReportRecord) Deaths {xpath('Deaths/Death'), MAXCOUNT(iesp.Constants.PersonSlim.MaxDeaths * 2)};
+    dataset(_lt_BpsReportIdentity) AKAs {xpath('AKAs/AKA'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAKA * 2)};
+    dataset(_lt_BpsReportIdentity) Imposters {xpath('Imposters/Imposter'), MAXCOUNT(iesp.Constants.PersonSlim.MaxImposters * 2)};
     dataset(_lt_PersonSlimReportUtility) Utilities {xpath('Utilities/Utility'), MAXCOUNT(iesp.Constants.PersonSlim.MaxUtilities * 2)};
   END;
 
@@ -2991,15 +3035,35 @@ END;
 difference := MODULE
 
   EXPORT boolean MonitorAddress := FALSE : STORED('Monitor_Address', FORMAT(sequence(11)));
-  EXPORT boolean MonitorCertification := FALSE : STORED('Monitor_Certification', FORMAT(sequence(12)));
-  EXPORT boolean MonitorHuntingFishingLicense := FALSE : STORED('Monitor_HuntingFishingLicense', FORMAT(sequence(13)));
-  EXPORT boolean MonitorFirearmExplosive := FALSE : STORED('Monitor_FirearmExplosive', FORMAT(sequence(14)));
-  EXPORT boolean MonitorControlledSubstance := FALSE : STORED('Monitor_ControlledSubstance', FORMAT(sequence(15)));
-  EXPORT boolean MonitorVoterRegistration := FALSE : STORED('Monitor_VoterRegistration', FORMAT(sequence(16)));
-  EXPORT boolean MonitorDriver := FALSE : STORED('Monitor_Driver', FORMAT(sequence(17)));
-  EXPORT boolean MonitorVehicle := FALSE : STORED('Monitor_Vehicle', FORMAT(sequence(18)));
-  EXPORT boolean MonitorBankruptcy := FALSE : STORED('Monitor_Bankruptcy', FORMAT(sequence(19)));
-  EXPORT boolean MonitorLienJudgment := FALSE : STORED('Monitor_LienJudgment', FORMAT(sequence(20)));
+  EXPORT boolean MonitorName := FALSE : STORED('Monitor_Name', FORMAT(sequence(12)));
+  EXPORT boolean MonitorPhones := FALSE : STORED('Monitor_Phones', FORMAT(sequence(13)));
+  EXPORT boolean MonitorDeath := FALSE : STORED('Monitor_Death', FORMAT(sequence(14)));
+  EXPORT boolean MonitorDOB := FALSE : STORED('Monitor_DOB', FORMAT(sequence(15)));
+  EXPORT boolean MonitorSSNs := FALSE : STORED('Monitor_SSNs', FORMAT(sequence(16)));
+  EXPORT boolean MonitorProfessionalLicense := FALSE : STORED('Monitor_ProfessionalLicense', FORMAT(sequence(17)));
+  EXPORT boolean MonitorPeopleAtWork := FALSE : STORED('Monitor_PeopleAtWork', FORMAT(sequence(18)));
+  EXPORT boolean MonitorAircraft := FALSE : STORED('Monitor_Aircraft', FORMAT(sequence(19)));
+  EXPORT boolean MonitorCertification := FALSE : STORED('Monitor_Certification', FORMAT(sequence(20)));
+  EXPORT boolean MonitorWaterCraft := FALSE : STORED('Monitor_WaterCraft', FORMAT(sequence(21)));
+  EXPORT boolean MonitorUCCFiling := FALSE : STORED('Monitor_UCCFiling', FORMAT(sequence(22)));
+  EXPORT boolean MonitorSexualOffense := FALSE : STORED('Monitor_SexualOffense', FORMAT(sequence(23)));
+  EXPORT boolean MonitorCriminal := FALSE : STORED('Monitor_Criminal', FORMAT(sequence(24)));
+  EXPORT boolean MonitorWeaponPermit := FALSE : STORED('Monitor_WeaponPermit', FORMAT(sequence(25)));
+  EXPORT boolean MonitorHuntingFishingLicense := FALSE : STORED('Monitor_HuntingFishingLicense', FORMAT(sequence(26)));
+  EXPORT boolean MonitorFirearmExplosive := FALSE : STORED('Monitor_FirearmExplosive', FORMAT(sequence(27)));
+  EXPORT boolean MonitorControlledSubstance := FALSE : STORED('Monitor_ControlledSubstance', FORMAT(sequence(28)));
+  EXPORT boolean MonitorVoterRegistration := FALSE : STORED('Monitor_VoterRegistration', FORMAT(sequence(29)));
+  EXPORT boolean MonitorDriver := FALSE : STORED('Monitor_Driver', FORMAT(sequence(30)));
+  EXPORT boolean MonitorVehicle := FALSE : STORED('Monitor_Vehicle', FORMAT(sequence(31)));
+  EXPORT boolean MonitorAccident := FALSE : STORED('Monitor_Accident', FORMAT(sequence(32)));
+  EXPORT boolean MonitorBankruptcy := FALSE : STORED('Monitor_Bankruptcy', FORMAT(sequence(33)));
+  EXPORT boolean MonitorLienJudgment := FALSE : STORED('Monitor_LienJudgment', FORMAT(sequence(34)));
+  EXPORT boolean MonitorProperty := FALSE : STORED('Monitor_Property', FORMAT(sequence(35)));
+  EXPORT boolean MonitorMarriageDivorce := FALSE : STORED('Monitor_MarriageDivorce', FORMAT(sequence(36)));
+  EXPORT boolean MonitorEducation := FALSE : STORED('Monitor_Education', FORMAT(sequence(37)));
+  EXPORT boolean MonitorAKA := FALSE : STORED('Monitor_AKA', FORMAT(sequence(38)));
+  EXPORT boolean MonitorImposter := FALSE : STORED('Monitor_Imposter', FORMAT(sequence(39)));
+  EXPORT boolean MonitorUtility := FALSE : STORED('Monitor_Utility', FORMAT(sequence(40)));
 
 
 
@@ -3051,52 +3115,19 @@ END;
 
   EXPORT DiffScalars (layouts._lt_Address L, layouts._lt_Address R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
-    shared boolean updated_StreetPreDirection := (L.StreetPreDirection != R.StreetPreDirection);
     shared boolean updated_StreetName := (L.StreetName != R.StreetName);
-    shared boolean updated_StreetSuffix := (L.StreetSuffix != R.StreetSuffix);
-    shared boolean updated_StreetPostDirection := (L.StreetPostDirection != R.StreetPostDirection);
-    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), is_active);
-    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
     shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
-    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), is_active);
-    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
-    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), is_active);
-    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
     shared boolean updated_City := (L.City != R.City);
     shared boolean updated_State := (L.State != R.State);
     shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
-    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), is_active);
-    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
-    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), is_active);
-    shared boolean updated_County := County_active AND (L.County != R.County);
-    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), is_active);
-    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
-    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), is_active);
-    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
-    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), is_active);
-    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
-    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), is_active);
-    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
 
     shared is_updated := false
       OR updated_StreetNumber
-      OR updated_StreetPreDirection
       OR updated_StreetName
-      OR updated_StreetSuffix
-      OR updated_StreetPostDirection
-      OR updated_UnitDesignation
       OR updated_UnitNumber
-      OR updated_StreetAddress1
-      OR updated_StreetAddress2
       OR updated_City
       OR updated_State
-      OR updated_Zip5
-      OR updated_Zip4
-      OR updated_County
-      OR updated_PostalCode
-      OR updated_StateCityZip
-      OR updated_Latitude
-      OR updated_Longitude;
+      OR updated_Zip5;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3106,23 +3137,11 @@ END;
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
          +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
-         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
-         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
          +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
          +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
          +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
-         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
-         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
-         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
-         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
-         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
-         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
-         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow));
+         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3157,62 +3176,29 @@ END;
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-END;
+  EXPORT  integer1 CheckOuter_citystatestreetnamestreetnumberunitnumberzip5(layouts._lt_Address L, layouts._lt_Address R) := FUNCTION
+    boolean IsInner :=  (L.UnitNumber = R.UnitNumber AND L.StreetNumber = R.StreetNumber AND L.Zip5 = R.Zip5 AND L.StreetName = R.StreetName AND L.City = R.City AND L.State = R.State);
 
-EXPORT _df_Date(boolean is_active, string path) := MODULE
-
-  EXPORT DiffScalars (layouts._lt_Date L, layouts._lt_Date R, boolean is_deleted, boolean is_added) := MODULE
-    shared boolean updated_Year := (L.Year != R.Year);
-    shared boolean updated_Month := (L.Month != R.Month);
-    shared boolean updated_Day := (L.Day != R.Day);
-
-    shared is_updated := false
-      OR updated_Year
-      OR updated_Month
-      OR updated_Day;
-
-    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
-                      is_added    => DiffStatus.State.ADDED,
-                      is_updated  => DiffStatus.State.UPDATED,
-                      DiffStatus.State.UNCHANGED);
-
-    EXPORT _diff := DiffStatus.Convert (_change);
-    // Get update information for all scalars
-      _meta :=   IF (updated_Year, DATASET ([{'Year', R.Year}], layouts.DiffMetaRow))
-         +  IF (updated_Month, DATASET ([{'Month', R.Month}], layouts.DiffMetaRow))
-         +  IF (updated_Day, DATASET ([{'Day', R.Day}], layouts.DiffMetaRow));
-
-    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+    boolean IsOuterRight :=   (L.UnitNumber = '' AND L.StreetNumber = '' AND L.Zip5 = '' AND L.StreetName = '' AND L.City = '' AND L.State = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
+  EXPORT  AsDataset_citystatestreetnamestreetnumberunitnumberzip5 (dataset(layouts._lt_Address) _n, dataset(layouts._lt_Address) _o) := FUNCTION
 
-  EXPORT layouts._lt_Date ProcessTx(layouts._lt_Date L, layouts._lt_Date R, boolean is_deleted, boolean is_added) :=TRANSFORM
-      m := DiffScalars(L, R, is_deleted, is_added);
-
-      SELF._diff := IF(is_active, m._diff, '');
-      SELF._diffmeta := IF(is_active, m._diffmeta);
-  
-
-      SELF := IF (is_deleted, R, L);
-
-    END;
-
-
-  EXPORT layouts._lt_row_Date ProcessTxRow(layouts._lt_row_Date L, layouts._lt_row_Date R, integer1 joinRowType) :=TRANSFORM
-    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
-    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
-    m := DiffScalars(L, R, is_deleted, is_added);
-
-    SELF._diff := IF(is_active, m._diff, '');
-    SELF._diffmeta := IF(is_active, m._diffmeta);
-   
-    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
-    SELF := IF (is_deleted, R, L);
-
-  END;
-
-
-  EXPORT AsRecord (layouts._lt_Date _new, layouts._lt_Date _old) := FUNCTION
-    RETURN ROW (ProcessTx(_new, _old, false, false));
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Address, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Address, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5 AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_citystatestreetnamestreetnumberunitnumberzip5(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5 AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_citystatestreetnamestreetnumberunitnumberzip5(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Address);
   END;
   
 END;
@@ -3221,54 +3207,19 @@ EXPORT _df_PersonSlimReportAddress(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_PersonSlimReportAddress L, layouts._lt_PersonSlimReportAddress R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
-    shared boolean updated_StreetPreDirection := (L.StreetPreDirection != R.StreetPreDirection);
     shared boolean updated_StreetName := (L.StreetName != R.StreetName);
-    shared boolean updated_StreetSuffix := (L.StreetSuffix != R.StreetSuffix);
-    shared boolean updated_StreetPostDirection := (L.StreetPostDirection != R.StreetPostDirection);
-    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), is_active);
-    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
     shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
-    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), is_active);
-    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
-    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), is_active);
-    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
     shared boolean updated_City := (L.City != R.City);
     shared boolean updated_State := (L.State != R.State);
     shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
-    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), is_active);
-    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
-    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), is_active);
-    shared boolean updated_County := County_active AND (L.County != R.County);
-    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), is_active);
-    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
-    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), is_active);
-    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
-    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), is_active);
-    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
-    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), is_active);
-    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
-    shared boolean updated_GeoBlk := (L.GeoBlk != R.GeoBlk);
 
     shared is_updated := false
       OR updated_StreetNumber
-      OR updated_StreetPreDirection
       OR updated_StreetName
-      OR updated_StreetSuffix
-      OR updated_StreetPostDirection
-      OR updated_UnitDesignation
       OR updated_UnitNumber
-      OR updated_StreetAddress1
-      OR updated_StreetAddress2
       OR updated_City
       OR updated_State
-      OR updated_Zip5
-      OR updated_Zip4
-      OR updated_County
-      OR updated_PostalCode
-      OR updated_StateCityZip
-      OR updated_Latitude
-      OR updated_Longitude
-      OR updated_GeoBlk;
+      OR updated_Zip5;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3278,23 +3229,11 @@ EXPORT _df_PersonSlimReportAddress(boolean is_active, string path) := MODULE
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
          +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
-         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
-         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
          +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
          +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
          +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
-         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
-         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
-         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
-         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
-         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
-         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
-         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow))+ IF (updated_GeoBlk, DATASET ([{'GeoBlk', R.GeoBlk}], layouts.DiffMetaRow));
+         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3304,8 +3243,7 @@ EXPORT _df_PersonSlimReportAddress(boolean is_active, string path) := MODULE
 
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
-        SELF.DateLastSeen  := L.DateLastSeen;
-
+  
 
       SELF := IF (is_deleted, R, L);
 
@@ -3319,8 +3257,7 @@ EXPORT _df_PersonSlimReportAddress(boolean is_active, string path) := MODULE
 
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
-         SELF.DateLastSeen  := L.DateLastSeen;
-
+   
     SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
     SELF := IF (is_deleted, R, L);
 
@@ -3331,26 +3268,26 @@ EXPORT _df_PersonSlimReportAddress(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(layouts._lt_PersonSlimReportAddress L, layouts._lt_PersonSlimReportAddress R) := FUNCTION
-    boolean IsInner :=  (L.StreetPreDirection = R.StreetPreDirection AND L.StreetName = R.StreetName AND L.City = R.City AND L.State = R.State AND L.UnitNumber = R.UnitNumber AND L.StreetNumber = R.StreetNumber AND L.Zip5 = R.Zip5);
+  EXPORT  integer1 CheckOuter_citystatestreetnamestreetnumberunitnumberzip5(layouts._lt_PersonSlimReportAddress L, layouts._lt_PersonSlimReportAddress R) := FUNCTION
+    boolean IsInner :=  (L.UnitNumber = R.UnitNumber AND L.StreetNumber = R.StreetNumber AND L.Zip5 = R.Zip5 AND L.StreetName = R.StreetName AND L.City = R.City AND L.State = R.State);
 
-    boolean IsOuterRight :=   (L.StreetPreDirection = '' AND L.StreetName = '' AND L.City = '' AND L.State = '' AND L.UnitNumber = '' AND L.StreetNumber = '' AND L.Zip5 = '');
+    boolean IsOuterRight :=   (L.UnitNumber = '' AND L.StreetNumber = '' AND L.Zip5 = '' AND L.StreetName = '' AND L.City = '' AND L.State = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5 (dataset(layouts._lt_PersonSlimReportAddress) _n, dataset(layouts._lt_PersonSlimReportAddress) _o) := FUNCTION
+  EXPORT  AsDataset_citystatestreetnamestreetnumberunitnumberzip5 (dataset(layouts._lt_PersonSlimReportAddress) _n, dataset(layouts._lt_PersonSlimReportAddress) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PersonSlimReportAddress, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PersonSlimReportAddress, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.StreetPreDirection = RIGHT.StreetPreDirection AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State AND LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5,
+                  LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5 AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(LEFT, RIGHT)),
+                  CheckOuter_citystatestreetnamestreetnumberunitnumberzip5(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.StreetPreDirection = RIGHT.StreetPreDirection AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State AND LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5,
+                  LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5 AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(LEFT, RIGHT)),
+                  CheckOuter_citystatestreetnamestreetnumberunitnumberzip5(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PersonSlimReportAddress);
@@ -3413,13 +3350,15 @@ EXPORT _df_Name(boolean is_active, string path) := MODULE
   
 END;
 
-EXPORT _df_BpsFAACertification(boolean is_active, string path) := MODULE
+EXPORT _df_PersonSlimReportName(boolean is_active, string path) := MODULE
 
-  EXPORT DiffScalars (layouts._lt_BpsFAACertification L, layouts._lt_BpsFAACertification R, boolean is_deleted, boolean is_added) := MODULE
-    shared boolean updated_Gender := (L.Gender != R.Gender);
+  EXPORT DiffScalars (layouts._lt_PersonSlimReportName L, layouts._lt_PersonSlimReportName R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_First := (L.First != R.First);
+    shared boolean updated_Last := (L.Last != R.Last);
 
     shared is_updated := false
-      OR updated_Gender;
+      OR updated_First
+      OR updated_Last;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3428,7 +3367,956 @@ EXPORT _df_BpsFAACertification(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_Gender, DATASET ([{'Gender', R.Gender}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PersonSlimReportName ProcessTx(layouts._lt_PersonSlimReportName L, layouts._lt_PersonSlimReportName R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PersonSlimReportName ProcessTxRow(layouts._lt_row_PersonSlimReportName L, layouts._lt_row_PersonSlimReportName R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PersonSlimReportName _new, layouts._lt_PersonSlimReportName _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_firstlast(layouts._lt_PersonSlimReportName L, layouts._lt_PersonSlimReportName R) := FUNCTION
+    boolean IsInner :=  (L.Last = R.Last AND L.First = R.First);
+
+    boolean IsOuterRight :=   (L.Last = '' AND L.First = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_firstlast (dataset(layouts._lt_PersonSlimReportName) _n, dataset(layouts._lt_PersonSlimReportName) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PersonSlimReportName, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PersonSlimReportName, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_firstlast(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_firstlast(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PersonSlimReportName);
+  END;
+  
+END;
+
+EXPORT _df_PersonSlimReportPhone(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_PersonSlimReportPhone L, layouts._lt_PersonSlimReportPhone R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_Phone := (L.Phone != R.Phone);
+
+    shared is_updated := false
+      OR updated_Phone;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_Phone, DATASET ([{'Phone', R.Phone}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PersonSlimReportPhone ProcessTx(layouts._lt_PersonSlimReportPhone L, layouts._lt_PersonSlimReportPhone R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PersonSlimReportPhone ProcessTxRow(layouts._lt_row_PersonSlimReportPhone L, layouts._lt_row_PersonSlimReportPhone R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PersonSlimReportPhone _new, layouts._lt_PersonSlimReportPhone _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_phone(layouts._lt_PersonSlimReportPhone L, layouts._lt_PersonSlimReportPhone R) := FUNCTION
+    boolean IsInner :=  (L.Phone = R.Phone);
+
+    boolean IsOuterRight :=   (L.Phone = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_phone (dataset(layouts._lt_PersonSlimReportPhone) _n, dataset(layouts._lt_PersonSlimReportPhone) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PersonSlimReportPhone, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PersonSlimReportPhone, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Phone = RIGHT.Phone,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_phone(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Phone = RIGHT.Phone,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_phone(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PersonSlimReportPhone);
+  END;
+  
+END;
+
+EXPORT _df_Date(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_Date L, layouts._lt_Date R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_Year := (L.Year != R.Year);
+    Month_active := CASE(path + '/Month', '/Accidents/Accident/AccidentDate/Month' => (false), is_active);
+    shared boolean updated_Month := Month_active AND (L.Month != R.Month);
+    Day_active := CASE(path + '/Day', '/Accidents/Accident/AccidentDate/Day' => (false), is_active);
+    shared boolean updated_Day := Day_active AND (L.Day != R.Day);
+
+    shared is_updated := false
+      OR updated_Year
+      OR updated_Month
+      OR updated_Day;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_Year, DATASET ([{'Year', R.Year}], layouts.DiffMetaRow))
+         +  IF (updated_Month, DATASET ([{'Month', R.Month}], layouts.DiffMetaRow))
+         +  IF (updated_Day, DATASET ([{'Day', R.Day}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_Date ProcessTx(layouts._lt_Date L, layouts._lt_Date R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_Date ProcessTxRow(layouts._lt_row_Date L, layouts._lt_row_Date R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_Date _new, layouts._lt_Date _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_PersonSlimReportDeath(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_PersonSlimReportDeath L, layouts._lt_PersonSlimReportDeath R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_Year := (L.Year != R.Year);
+    Month_active := CASE(path + '/Month', '/Accidents/Accident/AccidentDate/Month' => (false), is_active);
+    shared boolean updated_Month := Month_active AND (L.Month != R.Month);
+    Day_active := CASE(path + '/Day', '/Accidents/Accident/AccidentDate/Day' => (false), is_active);
+    shared boolean updated_Day := Day_active AND (L.Day != R.Day);
+
+    shared is_updated := false
+      OR updated_Year
+      OR updated_Month
+      OR updated_Day;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_Year, DATASET ([{'Year', R.Year}], layouts.DiffMetaRow))
+         +  IF (updated_Month, DATASET ([{'Month', R.Month}], layouts.DiffMetaRow))
+         +  IF (updated_Day, DATASET ([{'Day', R.Day}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PersonSlimReportDeath ProcessTx(layouts._lt_PersonSlimReportDeath L, layouts._lt_PersonSlimReportDeath R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PersonSlimReportDeath ProcessTxRow(layouts._lt_row_PersonSlimReportDeath L, layouts._lt_row_PersonSlimReportDeath R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PersonSlimReportDeath _new, layouts._lt_PersonSlimReportDeath _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_daymonthyear(layouts._lt_PersonSlimReportDeath L, layouts._lt_PersonSlimReportDeath R) := FUNCTION
+    boolean IsInner :=  (L.Year = R.Year AND L.Day = R.Day AND L.Month = R.Month);
+
+    boolean IsOuterRight :=   (L.Year = 0 AND L.Day = 0 AND L.Month = 0);
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_daymonthyear (dataset(layouts._lt_PersonSlimReportDeath) _n, dataset(layouts._lt_PersonSlimReportDeath) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PersonSlimReportDeath, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PersonSlimReportDeath, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Year = RIGHT.Year AND LEFT.Day = RIGHT.Day AND LEFT.Month = RIGHT.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_daymonthyear(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Year = RIGHT.Year AND LEFT.Day = RIGHT.Day AND LEFT.Month = RIGHT.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_daymonthyear(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PersonSlimReportDeath);
+  END;
+  
+END;
+
+EXPORT _df_PersonSlimReportDOB(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_PersonSlimReportDOB L, layouts._lt_PersonSlimReportDOB R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_Year := (L.Year != R.Year);
+    Month_active := CASE(path + '/Month', '/Accidents/Accident/AccidentDate/Month' => (false), is_active);
+    shared boolean updated_Month := Month_active AND (L.Month != R.Month);
+    Day_active := CASE(path + '/Day', '/Accidents/Accident/AccidentDate/Day' => (false), is_active);
+    shared boolean updated_Day := Day_active AND (L.Day != R.Day);
+
+    shared is_updated := false
+      OR updated_Year
+      OR updated_Month
+      OR updated_Day;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_Year, DATASET ([{'Year', R.Year}], layouts.DiffMetaRow))
+         +  IF (updated_Month, DATASET ([{'Month', R.Month}], layouts.DiffMetaRow))
+         +  IF (updated_Day, DATASET ([{'Day', R.Day}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PersonSlimReportDOB ProcessTx(layouts._lt_PersonSlimReportDOB L, layouts._lt_PersonSlimReportDOB R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PersonSlimReportDOB ProcessTxRow(layouts._lt_row_PersonSlimReportDOB L, layouts._lt_row_PersonSlimReportDOB R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PersonSlimReportDOB _new, layouts._lt_PersonSlimReportDOB _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_daymonthyear(layouts._lt_PersonSlimReportDOB L, layouts._lt_PersonSlimReportDOB R) := FUNCTION
+    boolean IsInner :=  (L.Year = R.Year AND L.Day = R.Day AND L.Month = R.Month);
+
+    boolean IsOuterRight :=   (L.Year = 0 AND L.Day = 0 AND L.Month = 0);
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_daymonthyear (dataset(layouts._lt_PersonSlimReportDOB) _n, dataset(layouts._lt_PersonSlimReportDOB) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PersonSlimReportDOB, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PersonSlimReportDOB, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Year = RIGHT.Year AND LEFT.Day = RIGHT.Day AND LEFT.Month = RIGHT.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_daymonthyear(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Year = RIGHT.Year AND LEFT.Day = RIGHT.Day AND LEFT.Month = RIGHT.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_daymonthyear(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PersonSlimReportDOB);
+  END;
+  
+END;
+
+EXPORT _df_PersonSlimReportSSN(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_PersonSlimReportSSN L, layouts._lt_PersonSlimReportSSN R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_SSN := (L.SSN != R.SSN);
+
+    shared is_updated := false
+      OR updated_SSN;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PersonSlimReportSSN ProcessTx(layouts._lt_PersonSlimReportSSN L, layouts._lt_PersonSlimReportSSN R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PersonSlimReportSSN ProcessTxRow(layouts._lt_row_PersonSlimReportSSN L, layouts._lt_row_PersonSlimReportSSN R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PersonSlimReportSSN _new, layouts._lt_PersonSlimReportSSN _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_ssn(layouts._lt_PersonSlimReportSSN L, layouts._lt_PersonSlimReportSSN R) := FUNCTION
+    boolean IsInner :=  (L.SSN = R.SSN);
+
+    boolean IsOuterRight :=   (L.SSN = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_ssn (dataset(layouts._lt_PersonSlimReportSSN) _n, dataset(layouts._lt_PersonSlimReportSSN) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PersonSlimReportSSN, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PersonSlimReportSSN, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.SSN = RIGHT.SSN,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_ssn(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.SSN = RIGHT.SSN,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_ssn(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PersonSlimReportSSN);
+  END;
+  
+END;
+
+EXPORT _df_BusinessIdentity(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_BusinessIdentity L, layouts._lt_BusinessIdentity R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_SeleID := (L.SeleID != R.SeleID);
+    shared boolean updated_OrgID := (L.OrgID != R.OrgID);
+    shared boolean updated_UltID := (L.UltID != R.UltID);
+
+    shared is_updated := false
+      OR updated_SeleID
+      OR updated_OrgID
+      OR updated_UltID;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_SeleID, DATASET ([{'SeleID', R.SeleID}], layouts.DiffMetaRow))
+         +  IF (updated_OrgID, DATASET ([{'OrgID', R.OrgID}], layouts.DiffMetaRow))
+         +  IF (updated_UltID, DATASET ([{'UltID', R.UltID}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_BusinessIdentity ProcessTx(layouts._lt_BusinessIdentity L, layouts._lt_BusinessIdentity R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_BusinessIdentity _new, layouts._lt_BusinessIdentity _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_ProfessionalLicenseRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_ProfessionalLicenseRecord L, layouts._lt_ProfessionalLicenseRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_LicenseNumber := (L.LicenseNumber != R.LicenseNumber);
+    shared boolean updated_SourceState := (L.SourceState != R.SourceState);
+    shared boolean updated_ProlicSeqId := (L.ProlicSeqId != R.ProlicSeqId);
+
+    shared is_updated := false
+      OR updated_LicenseNumber
+      OR updated_SourceState
+      OR updated_ProlicSeqId;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_LicenseNumber, DATASET ([{'LicenseNumber', R.LicenseNumber}], layouts.DiffMetaRow))
+         +  IF (updated_SourceState, DATASET ([{'SourceState', R.SourceState}], layouts.DiffMetaRow))
+         +  IF (updated_ProlicSeqId, DATASET ([{'ProlicSeqId', R.ProlicSeqId}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_ProfessionalLicenseRecord ProcessTx(layouts._lt_ProfessionalLicenseRecord L, layouts._lt_ProfessionalLicenseRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.BusinessIds  := L.BusinessIds;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.StatusEffectiveDate  := L.StatusEffectiveDate;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+      SELF.OriginalName  := L.OriginalName;
+      SELF.AdditionalOrigName  := L.AdditionalOrigName;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.OriginalAddress  := L.OriginalAddress;
+      SELF.AdditionalOrigAddress  := L.AdditionalOrigAddress;
+      SELF.DOB  := L.DOB;
+      SELF.IssuedDate  := L.IssuedDate;
+      SELF.ExpirationDate  := L.ExpirationDate;
+      SELF.LastRenewalDate  := L.LastRenewalDate;
+      SELF.Action  := L.Action;
+      SELF.Education1  := L.Education1;
+      SELF.Education2  := L.Education2;
+      SELF.Education3  := L.Education3;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_ProfessionalLicenseRecord ProcessTxRow(layouts._lt_row_ProfessionalLicenseRecord L, layouts._lt_row_ProfessionalLicenseRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.BusinessIds  := L.BusinessIds;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.StatusEffectiveDate  := L.StatusEffectiveDate;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+      SELF.OriginalName  := L.OriginalName;
+      SELF.AdditionalOrigName  := L.AdditionalOrigName;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.OriginalAddress  := L.OriginalAddress;
+      SELF.AdditionalOrigAddress  := L.AdditionalOrigAddress;
+      SELF.DOB  := L.DOB;
+      SELF.IssuedDate  := L.IssuedDate;
+      SELF.ExpirationDate  := L.ExpirationDate;
+      SELF.LastRenewalDate  := L.LastRenewalDate;
+      SELF.Action  := L.Action;
+      SELF.Education1  := L.Education1;
+      SELF.Education2  := L.Education2;
+      SELF.Education3  := L.Education3;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_ProfessionalLicenseRecord _new, layouts._lt_ProfessionalLicenseRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_licensenumbersourcestate(layouts._lt_ProfessionalLicenseRecord L, layouts._lt_ProfessionalLicenseRecord R) := FUNCTION
+    boolean IsInner :=  (L.LicenseNumber = R.LicenseNumber AND L.SourceState = R.SourceState);
+
+    boolean IsOuterRight :=   (L.LicenseNumber = '' AND L.SourceState = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_licensenumbersourcestate (dataset(layouts._lt_ProfessionalLicenseRecord) _n, dataset(layouts._lt_ProfessionalLicenseRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_ProfessionalLicenseRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_ProfessionalLicenseRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.LicenseNumber = RIGHT.LicenseNumber AND LEFT.SourceState = RIGHT.SourceState,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_licensenumbersourcestate(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.LicenseNumber = RIGHT.LicenseNumber AND LEFT.SourceState = RIGHT.SourceState,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_licensenumbersourcestate(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_ProfessionalLicenseRecord);
+  END;
+  
+END;
+
+EXPORT _df_PeopleAtWorkRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_PeopleAtWorkRecord L, layouts._lt_PeopleAtWorkRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_Title := (L.Title != R.Title);
+    shared boolean updated_SSN := (L.SSN != R.SSN);
+    shared boolean updated_Phone10 := (L.Phone10 != R.Phone10);
+
+    shared is_updated := false
+      OR updated_Title
+      OR updated_SSN
+      OR updated_Phone10;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_Title, DATASET ([{'Title', R.Title}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow))
+         +  IF (updated_Phone10, DATASET ([{'Phone10', R.Phone10}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PeopleAtWorkRecord ProcessTx(layouts._lt_PeopleAtWorkRecord L, layouts._lt_PeopleAtWorkRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_BusinessIds := path + '/BusinessIds';
+    
+      updated_BusinessIds := _df_BusinessIdentity(is_active, path_BusinessIds).AsRecord(L.BusinessIds, R.BusinessIds);
+        
+      checked_BusinessIds := MAP (is_deleted => R.BusinessIds,
+                              is_added => L.BusinessIds,
+                              updated_BusinessIds);
+      SELF.BusinessIds := checked_BusinessIds;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.DateFirstSeen  := L.DateFirstSeen;
+      SELF.DateLastSeen  := L.DateLastSeen;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PeopleAtWorkRecord ProcessTxRow(layouts._lt_row_PeopleAtWorkRecord L, layouts._lt_row_PeopleAtWorkRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_BusinessIds := path + '/BusinessIds';
+    
+      updated_BusinessIds := _df_BusinessIdentity(is_active, path_BusinessIds).AsRecord(L.BusinessIds, R.BusinessIds);
+        
+      checked_BusinessIds := MAP (is_deleted => R.BusinessIds,
+                              is_added => L.BusinessIds,
+                              updated_BusinessIds);
+      SELF.BusinessIds := checked_BusinessIds;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.DateFirstSeen  := L.DateFirstSeen;
+      SELF.DateLastSeen  := L.DateLastSeen;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PeopleAtWorkRecord _new, layouts._lt_PeopleAtWorkRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_businessids_orgidbusinessids_seleidbusinessids_ultidcompanynametitle(layouts._lt_PeopleAtWorkRecord L, layouts._lt_PeopleAtWorkRecord R) := FUNCTION
+    boolean IsInner :=  (L.BusinessIds.OrgID = R.BusinessIds.OrgID AND L.BusinessIds.SeleID = R.BusinessIds.SeleID AND L.BusinessIds.UltID = R.BusinessIds.UltID AND L.CompanyName = R.CompanyName AND L.Title = R.Title);
+
+    boolean IsOuterRight :=   (L.BusinessIds.OrgID = 0 AND L.BusinessIds.SeleID = 0 AND L.BusinessIds.UltID = 0 AND L.CompanyName = '' AND L.Title = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_businessids_orgidbusinessids_seleidbusinessids_ultidcompanynametitle (dataset(layouts._lt_PeopleAtWorkRecord) _n, dataset(layouts._lt_PeopleAtWorkRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PeopleAtWorkRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PeopleAtWorkRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.BusinessIds.OrgID = RIGHT.BusinessIds.OrgID AND LEFT.BusinessIds.SeleID = RIGHT.BusinessIds.SeleID AND LEFT.BusinessIds.UltID = RIGHT.BusinessIds.UltID AND LEFT.CompanyName = RIGHT.CompanyName AND LEFT.Title = RIGHT.Title,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_businessids_orgidbusinessids_seleidbusinessids_ultidcompanynametitle(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.BusinessIds.OrgID = RIGHT.BusinessIds.OrgID AND LEFT.BusinessIds.SeleID = RIGHT.BusinessIds.SeleID AND LEFT.BusinessIds.UltID = RIGHT.BusinessIds.UltID AND LEFT.CompanyName = RIGHT.CompanyName AND LEFT.Title = RIGHT.Title,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_businessids_orgidbusinessids_seleidbusinessids_ultidcompanynametitle(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PeopleAtWorkRecord);
+  END;
+  
+END;
+
+EXPORT _df_AircraftReportRegistrant(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AircraftReportRegistrant L, layouts._lt_AircraftReportRegistrant R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AircraftReportRegistrant ProcessTx(layouts._lt_AircraftReportRegistrant L, layouts._lt_AircraftReportRegistrant R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+      SELF.Address  := L.Address;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_AircraftReportRegistrant _new, layouts._lt_AircraftReportRegistrant _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_AircraftReportRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AircraftReportRecord L, layouts._lt_AircraftReportRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_AircraftNumber := (L.AircraftNumber != R.AircraftNumber);
+
+    shared is_updated := false
+      OR updated_AircraftNumber;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_AircraftNumber, DATASET ([{'AircraftNumber', R.AircraftNumber}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AircraftReportRecord ProcessTx(layouts._lt_AircraftReportRecord L, layouts._lt_AircraftReportRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.DateFirstSeen  := L.DateFirstSeen;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.LastActionDate  := L.LastActionDate;
+      SELF.CertificationDate  := L.CertificationDate;
+      SELF.BusinessIds  := L.BusinessIds;
+
+      path_Registrant := path + '/Registrant';
+    
+      updated_Registrant := _df_AircraftReportRegistrant(is_active, path_Registrant).AsRecord(L.Registrant, R.Registrant);
+        
+      checked_Registrant := MAP (is_deleted => R.Registrant,
+                              is_added => L.Registrant,
+                              updated_Registrant);
+      SELF.Registrant := checked_Registrant;
+      SELF.AircraftInfo  := L.AircraftInfo;
+      SELF.EngineInfo  := L.EngineInfo;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_AircraftReportRecord ProcessTxRow(layouts._lt_row_AircraftReportRecord L, layouts._lt_row_AircraftReportRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.DateFirstSeen  := L.DateFirstSeen;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.LastActionDate  := L.LastActionDate;
+      SELF.CertificationDate  := L.CertificationDate;
+      SELF.BusinessIds  := L.BusinessIds;
+
+      path_Registrant := path + '/Registrant';
+    
+      updated_Registrant := _df_AircraftReportRegistrant(is_active, path_Registrant).AsRecord(L.Registrant, R.Registrant);
+        
+      checked_Registrant := MAP (is_deleted => R.Registrant,
+                              is_added => L.Registrant,
+                              updated_Registrant);
+      SELF.Registrant := checked_Registrant;
+      SELF.AircraftInfo  := L.AircraftInfo;
+      SELF.EngineInfo  := L.EngineInfo;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_AircraftReportRecord _new, layouts._lt_AircraftReportRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_aircraftnumber(layouts._lt_AircraftReportRecord L, layouts._lt_AircraftReportRecord R) := FUNCTION
+    boolean IsInner :=  (L.AircraftNumber = R.AircraftNumber);
+
+    boolean IsOuterRight :=   (L.AircraftNumber = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_aircraftnumber (dataset(layouts._lt_AircraftReportRecord) _n, dataset(layouts._lt_AircraftReportRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_AircraftReportRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_AircraftReportRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.AircraftNumber = RIGHT.AircraftNumber,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_aircraftnumber(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.AircraftNumber = RIGHT.AircraftNumber,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_aircraftnumber(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_AircraftReportRecord);
+  END;
+  
+END;
+
+EXPORT _df_BpsFAACertification(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_BpsFAACertification L, layouts._lt_BpsFAACertification R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3532,56 +4420,13 @@ EXPORT _df_BpsFAACertification(boolean is_active, string path) := MODULE
   
 END;
 
-EXPORT _df_AddressWithRawInfo(boolean is_active, string path) := MODULE
+EXPORT _df_WaterCraftOwner(boolean is_active, string path) := MODULE
 
-  EXPORT DiffScalars (layouts._lt_AddressWithRawInfo L, layouts._lt_AddressWithRawInfo R, boolean is_deleted, boolean is_added) := MODULE
-    shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
-    shared boolean updated_StreetPreDirection := (L.StreetPreDirection != R.StreetPreDirection);
-    shared boolean updated_StreetName := (L.StreetName != R.StreetName);
-    shared boolean updated_StreetSuffix := (L.StreetSuffix != R.StreetSuffix);
-    shared boolean updated_StreetPostDirection := (L.StreetPostDirection != R.StreetPostDirection);
-    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), is_active);
-    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
-    shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
-    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), is_active);
-    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
-    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), is_active);
-    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
-    shared boolean updated_City := (L.City != R.City);
-    shared boolean updated_State := (L.State != R.State);
-    shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
-    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), is_active);
-    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
-    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), is_active);
-    shared boolean updated_County := County_active AND (L.County != R.County);
-    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), is_active);
-    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
-    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), is_active);
-    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
-    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), is_active);
-    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
-    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), is_active);
-    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
+  EXPORT DiffScalars (layouts._lt_WaterCraftOwner L, layouts._lt_WaterCraftOwner R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
 
     shared is_updated := false
-      OR updated_StreetNumber
-      OR updated_StreetPreDirection
-      OR updated_StreetName
-      OR updated_StreetSuffix
-      OR updated_StreetPostDirection
-      OR updated_UnitDesignation
-      OR updated_UnitNumber
-      OR updated_StreetAddress1
-      OR updated_StreetAddress2
-      OR updated_City
-      OR updated_State
-      OR updated_Zip5
-      OR updated_Zip4
-      OR updated_County
-      OR updated_PostalCode
-      OR updated_StateCityZip
-      OR updated_Latitude
-      OR updated_Longitude;
+      OR updated_UniqueId;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3590,41 +4435,43 @@ EXPORT _df_AddressWithRawInfo(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
-         +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
-         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
-         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
-         +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
-         +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
-         +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
-         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
-         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
-         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
-         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
-         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
-         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
-         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
 
-  EXPORT layouts._lt_AddressWithRawInfo ProcessTx(layouts._lt_AddressWithRawInfo L, layouts._lt_AddressWithRawInfo R, boolean is_deleted, boolean is_added) :=TRANSFORM
+  EXPORT layouts._lt_WaterCraftOwner ProcessTx(layouts._lt_WaterCraftOwner L, layouts._lt_WaterCraftOwner R, boolean is_deleted, boolean is_added) :=TRANSFORM
       m := DiffScalars(L, R, is_deleted, is_added);
 
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
   
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.DOB  := L.DOB;
+
 
       SELF := IF (is_deleted, R, L);
 
     END;
 
 
-  EXPORT layouts._lt_row_AddressWithRawInfo ProcessTxRow(layouts._lt_row_AddressWithRawInfo L, layouts._lt_row_AddressWithRawInfo R, integer1 joinRowType) :=TRANSFORM
+  EXPORT layouts._lt_row_WaterCraftOwner ProcessTxRow(layouts._lt_row_WaterCraftOwner L, layouts._lt_row_WaterCraftOwner R, integer1 joinRowType) :=TRANSFORM
     boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
     boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
     m := DiffScalars(L, R, is_deleted, is_added);
@@ -3632,39 +4479,263 @@ EXPORT _df_AddressWithRawInfo(boolean is_active, string path) := MODULE
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
    
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.DOB  := L.DOB;
+
     SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
     SELF := IF (is_deleted, R, L);
 
   END;
 
 
-  EXPORT AsRecord (layouts._lt_AddressWithRawInfo _new, layouts._lt_AddressWithRawInfo _old) := FUNCTION
+  EXPORT AsRecord (layouts._lt_WaterCraftOwner _new, layouts._lt_WaterCraftOwner _old) := FUNCTION
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(layouts._lt_AddressWithRawInfo L, layouts._lt_AddressWithRawInfo R) := FUNCTION
-    boolean IsInner :=  (L.StreetPreDirection = R.StreetPreDirection AND L.StreetName = R.StreetName AND L.City = R.City AND L.State = R.State AND L.UnitNumber = R.UnitNumber AND L.StreetNumber = R.StreetNumber AND L.Zip5 = R.Zip5);
+  EXPORT  integer1 CheckOuter_uniqueid(layouts._lt_WaterCraftOwner L, layouts._lt_WaterCraftOwner R) := FUNCTION
+    boolean IsInner :=  (L.UniqueId = R.UniqueId);
 
-    boolean IsOuterRight :=   (L.StreetPreDirection = '' AND L.StreetName = '' AND L.City = '' AND L.State = '' AND L.UnitNumber = '' AND L.StreetNumber = '' AND L.Zip5 = '');
+    boolean IsOuterRight :=   (L.UniqueId = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5 (dataset(layouts._lt_AddressWithRawInfo) _n, dataset(layouts._lt_AddressWithRawInfo) _o) := FUNCTION
+  EXPORT  AsDataset_uniqueid (dataset(layouts._lt_WaterCraftOwner) _n, dataset(layouts._lt_WaterCraftOwner) _o) := FUNCTION
 
-    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_AddressWithRawInfo, SELF._diff_ord := COUNTER, SELF := LEFT));
-    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_AddressWithRawInfo, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_WaterCraftOwner, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_WaterCraftOwner, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.StreetPreDirection = RIGHT.StreetPreDirection AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State AND LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5,
+                  LEFT.UniqueId = RIGHT.UniqueId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(LEFT, RIGHT)),
+                  CheckOuter_uniqueid(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.StreetPreDirection = RIGHT.StreetPreDirection AND LEFT.StreetName = RIGHT.StreetName AND LEFT.City = RIGHT.City AND LEFT.State = RIGHT.State AND LEFT.UnitNumber = RIGHT.UnitNumber AND LEFT.StreetNumber = RIGHT.StreetNumber AND LEFT.Zip5 = RIGHT.Zip5,
+                  LEFT.UniqueId = RIGHT.UniqueId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(LEFT, RIGHT)),
+                  CheckOuter_uniqueid(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
-    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_AddressWithRawInfo);
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_WaterCraftOwner);
+  END;
+  
+END;
+
+EXPORT _df_WaterCraftReportRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_WaterCraftReportRecord L, layouts._lt_WaterCraftReportRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_StateOfOrigin := (L.StateOfOrigin != R.StateOfOrigin);
+    shared boolean updated_HullNumber := (L.HullNumber != R.HullNumber);
+
+    shared is_updated := false
+      OR updated_StateOfOrigin
+      OR updated_HullNumber;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_StateOfOrigin, DATASET ([{'StateOfOrigin', R.StateOfOrigin}], layouts.DiffMetaRow))
+         +  IF (updated_HullNumber, DATASET ([{'HullNumber', R.HullNumber}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_WaterCraftReportRecord ProcessTx(layouts._lt_WaterCraftReportRecord L, layouts._lt_WaterCraftReportRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.Description  := L.Description;
+      SELF.Registration  := L.Registration;
+      SELF.Title  := L.Title;
+      SELF.Purchase  := L.Purchase;
+      SELF.Manufacture  := L.Manufacture;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.LienHolders  := L.LienHolders;
+      SELF.Engines  := L.Engines;
+
+      updated_Owners := _df_WaterCraftOwner(is_active, path + '/Owners/Owner').AsDataset_uniqueid(L.Owners, R.Owners);
+      checked_Owners := MAP (is_deleted => R.Owners,
+                              is_added => L.Owners,
+                              updated_Owners);
+      SELF.Owners  := checked_Owners;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_WaterCraftReportRecord ProcessTxRow(layouts._lt_row_WaterCraftReportRecord L, layouts._lt_row_WaterCraftReportRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.Description  := L.Description;
+      SELF.Registration  := L.Registration;
+      SELF.Title  := L.Title;
+      SELF.Purchase  := L.Purchase;
+      SELF.Manufacture  := L.Manufacture;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.LienHolders  := L.LienHolders;
+      SELF.Engines  := L.Engines;
+
+      updated_Owners := _df_WaterCraftOwner(is_active, path + '/Owners/Owner').AsDataset_uniqueid(L.Owners, R.Owners);
+      checked_Owners := MAP (is_deleted => R.Owners,
+                              is_added => L.Owners,
+                              updated_Owners);
+      SELF.Owners  := checked_Owners;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_WaterCraftReportRecord _new, layouts._lt_WaterCraftReportRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_hullnumberstateoforigin(layouts._lt_WaterCraftReportRecord L, layouts._lt_WaterCraftReportRecord R) := FUNCTION
+    boolean IsInner :=  (L.HullNumber = R.HullNumber AND L.StateOfOrigin = R.StateOfOrigin);
+
+    boolean IsOuterRight :=   (L.HullNumber = '' AND L.StateOfOrigin = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_hullnumberstateoforigin (dataset(layouts._lt_WaterCraftReportRecord) _n, dataset(layouts._lt_WaterCraftReportRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_WaterCraftReportRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_WaterCraftReportRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.HullNumber = RIGHT.HullNumber AND LEFT.StateOfOrigin = RIGHT.StateOfOrigin,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_hullnumberstateoforigin(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.HullNumber = RIGHT.HullNumber AND LEFT.StateOfOrigin = RIGHT.StateOfOrigin,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_hullnumberstateoforigin(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_WaterCraftReportRecord);
+  END;
+  
+END;
+
+EXPORT _df_UCCParsedParty(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_UCCParsedParty L, layouts._lt_UCCParsedParty R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
+
+    shared is_updated := false
+      OR updated_UniqueId;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_UCCParsedParty ProcessTx(layouts._lt_UCCParsedParty L, layouts._lt_UCCParsedParty R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.BusinessIds  := L.BusinessIds;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_UCCParsedParty ProcessTxRow(layouts._lt_row_UCCParsedParty L, layouts._lt_row_UCCParsedParty R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.BusinessIds  := L.BusinessIds;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_UCCParsedParty _new, layouts._lt_UCCParsedParty _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_uniqueid(layouts._lt_UCCParsedParty L, layouts._lt_UCCParsedParty R) := FUNCTION
+    boolean IsInner :=  (L.UniqueId = R.UniqueId);
+
+    boolean IsOuterRight :=   (L.UniqueId = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_uniqueid (dataset(layouts._lt_UCCParsedParty) _n, dataset(layouts._lt_UCCParsedParty) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_UCCParsedParty, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_UCCParsedParty, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.UniqueId = RIGHT.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.UniqueId = RIGHT.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_UCCParsedParty);
   END;
   
 END;
@@ -3673,52 +4744,19 @@ EXPORT _df_UniversalAddress(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_UniversalAddress L, layouts._lt_UniversalAddress R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
-    shared boolean updated_StreetPreDirection := (L.StreetPreDirection != R.StreetPreDirection);
     shared boolean updated_StreetName := (L.StreetName != R.StreetName);
-    shared boolean updated_StreetSuffix := (L.StreetSuffix != R.StreetSuffix);
-    shared boolean updated_StreetPostDirection := (L.StreetPostDirection != R.StreetPostDirection);
-    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), is_active);
-    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
     shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
-    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), is_active);
-    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
-    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), is_active);
-    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
     shared boolean updated_City := (L.City != R.City);
     shared boolean updated_State := (L.State != R.State);
     shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
-    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), is_active);
-    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
-    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), is_active);
-    shared boolean updated_County := County_active AND (L.County != R.County);
-    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), is_active);
-    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
-    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), is_active);
-    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
-    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), is_active);
-    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
-    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), is_active);
-    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
 
     shared is_updated := false
       OR updated_StreetNumber
-      OR updated_StreetPreDirection
       OR updated_StreetName
-      OR updated_StreetSuffix
-      OR updated_StreetPostDirection
-      OR updated_UnitDesignation
       OR updated_UnitNumber
-      OR updated_StreetAddress1
-      OR updated_StreetAddress2
       OR updated_City
       OR updated_State
-      OR updated_Zip5
-      OR updated_Zip4
-      OR updated_County
-      OR updated_PostalCode
-      OR updated_StateCityZip
-      OR updated_Latitude
-      OR updated_Longitude;
+      OR updated_Zip5;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3728,23 +4766,11 @@ EXPORT _df_UniversalAddress(boolean is_active, string path) := MODULE
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
          +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
-         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
-         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
-         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
          +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
-         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
          +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
          +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
-         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
-         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
-         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
-         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
-         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
-         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
-         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow));
+         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3767,11 +4793,13 @@ EXPORT _df_UniversalAddress(boolean is_active, string path) := MODULE
   
 END;
 
-EXPORT _df_HuntFishRecord(boolean is_active, string path) := MODULE
+EXPORT _df_UCCReport2Person(boolean is_active, string path) := MODULE
 
-  EXPORT DiffScalars (layouts._lt_HuntFishRecord L, layouts._lt_HuntFishRecord R, boolean is_deleted, boolean is_added) := MODULE
+  EXPORT DiffScalars (layouts._lt_UCCReport2Person L, layouts._lt_UCCReport2Person R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_OriginName := (L.OriginName != R.OriginName);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_OriginName;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3780,7 +4808,751 @@ EXPORT _df_HuntFishRecord(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_OriginName, DATASET ([{'OriginName', R.OriginName}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_UCCReport2Person ProcessTx(layouts._lt_UCCReport2Person L, layouts._lt_UCCReport2Person R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      updated_ParsedParties := _df_UCCParsedParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
+      checked_ParsedParties := MAP (is_deleted => R.ParsedParties,
+                              is_added => L.ParsedParties,
+                              updated_ParsedParties);
+      SELF.ParsedParties  := checked_ParsedParties;
+      SELF.Addresses  := L.Addresses;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_UCCReport2Person ProcessTxRow(layouts._lt_row_UCCReport2Person L, layouts._lt_row_UCCReport2Person R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      updated_ParsedParties := _df_UCCParsedParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
+      checked_ParsedParties := MAP (is_deleted => R.ParsedParties,
+                              is_added => L.ParsedParties,
+                              updated_ParsedParties);
+      SELF.ParsedParties  := checked_ParsedParties;
+      SELF.Addresses  := L.Addresses;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_UCCReport2Person _new, layouts._lt_UCCReport2Person _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_originname(layouts._lt_UCCReport2Person L, layouts._lt_UCCReport2Person R) := FUNCTION
+    boolean IsInner :=  (L.OriginName = R.OriginName);
+
+    boolean IsOuterRight :=   (L.OriginName = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_originname (dataset(layouts._lt_UCCReport2Person) _n, dataset(layouts._lt_UCCReport2Person) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_UCCReport2Person, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_UCCReport2Person, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.OriginName = RIGHT.OriginName,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_originname(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.OriginName = RIGHT.OriginName,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_originname(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_UCCReport2Person);
+  END;
+  
+END;
+
+EXPORT _df_UCCReport2Record(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_UCCReport2Record L, layouts._lt_UCCReport2Record R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_FilingJurisdiction := (L.FilingJurisdiction != R.FilingJurisdiction);
+    shared boolean updated_OriginFilingNumber := (L.OriginFilingNumber != R.OriginFilingNumber);
+
+    shared is_updated := false
+      OR updated_FilingJurisdiction
+      OR updated_OriginFilingNumber;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_FilingJurisdiction, DATASET ([{'FilingJurisdiction', R.FilingJurisdiction}], layouts.DiffMetaRow))
+         +  IF (updated_OriginFilingNumber, DATASET ([{'OriginFilingNumber', R.OriginFilingNumber}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_UCCReport2Record ProcessTx(layouts._lt_UCCReport2Record L, layouts._lt_UCCReport2Record R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.BusinessIds  := L.BusinessIds;
+      SELF.OriginFilingDate  := L.OriginFilingDate;
+      SELF.CommentEffectiveDate  := L.CommentEffectiveDate;
+
+      updated_Debtors2 := _df_UCCReport2Person(is_active, path + '/Debtors2/Debtor').AsDataset_originname(L.Debtors2, R.Debtors2);
+      checked_Debtors2 := MAP (is_deleted => R.Debtors2,
+                              is_added => L.Debtors2,
+                              updated_Debtors2);
+      SELF.Debtors2  := checked_Debtors2;
+
+      updated_Creditors2 := _df_UCCReport2Person(is_active, path + '/Creditors2/Creditor').AsDataset_originname(L.Creditors2, R.Creditors2);
+      checked_Creditors2 := MAP (is_deleted => R.Creditors2,
+                              is_added => L.Creditors2,
+                              updated_Creditors2);
+      SELF.Creditors2  := checked_Creditors2;
+
+      updated_Secureds2 := _df_UCCReport2Person(is_active, path + '/Secureds2/Secured').AsDataset_originname(L.Secureds2, R.Secureds2);
+      checked_Secureds2 := MAP (is_deleted => R.Secureds2,
+                              is_added => L.Secureds2,
+                              updated_Secureds2);
+      SELF.Secureds2  := checked_Secureds2;
+
+      updated_Assignees2 := _df_UCCReport2Person(is_active, path + '/Assignees2/Assignee').AsDataset_originname(L.Assignees2, R.Assignees2);
+      checked_Assignees2 := MAP (is_deleted => R.Assignees2,
+                              is_added => L.Assignees2,
+                              updated_Assignees2);
+      SELF.Assignees2  := checked_Assignees2;
+      SELF.Collaterals2  := L.Collaterals2;
+      SELF.Signers  := L.Signers;
+      SELF.Filings2  := L.Filings2;
+      SELF.FilingOffices  := L.FilingOffices;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_UCCReport2Record ProcessTxRow(layouts._lt_row_UCCReport2Record L, layouts._lt_row_UCCReport2Record R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.BusinessIds  := L.BusinessIds;
+      SELF.OriginFilingDate  := L.OriginFilingDate;
+      SELF.CommentEffectiveDate  := L.CommentEffectiveDate;
+
+      updated_Debtors2 := _df_UCCReport2Person(is_active, path + '/Debtors2/Debtor').AsDataset_originname(L.Debtors2, R.Debtors2);
+      checked_Debtors2 := MAP (is_deleted => R.Debtors2,
+                              is_added => L.Debtors2,
+                              updated_Debtors2);
+      SELF.Debtors2  := checked_Debtors2;
+
+      updated_Creditors2 := _df_UCCReport2Person(is_active, path + '/Creditors2/Creditor').AsDataset_originname(L.Creditors2, R.Creditors2);
+      checked_Creditors2 := MAP (is_deleted => R.Creditors2,
+                              is_added => L.Creditors2,
+                              updated_Creditors2);
+      SELF.Creditors2  := checked_Creditors2;
+
+      updated_Secureds2 := _df_UCCReport2Person(is_active, path + '/Secureds2/Secured').AsDataset_originname(L.Secureds2, R.Secureds2);
+      checked_Secureds2 := MAP (is_deleted => R.Secureds2,
+                              is_added => L.Secureds2,
+                              updated_Secureds2);
+      SELF.Secureds2  := checked_Secureds2;
+
+      updated_Assignees2 := _df_UCCReport2Person(is_active, path + '/Assignees2/Assignee').AsDataset_originname(L.Assignees2, R.Assignees2);
+      checked_Assignees2 := MAP (is_deleted => R.Assignees2,
+                              is_added => L.Assignees2,
+                              updated_Assignees2);
+      SELF.Assignees2  := checked_Assignees2;
+      SELF.Collaterals2  := L.Collaterals2;
+      SELF.Signers  := L.Signers;
+      SELF.Filings2  := L.Filings2;
+      SELF.FilingOffices  := L.FilingOffices;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_UCCReport2Record _new, layouts._lt_UCCReport2Record _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_filingjurisdictionoriginfilingnumber(layouts._lt_UCCReport2Record L, layouts._lt_UCCReport2Record R) := FUNCTION
+    boolean IsInner :=  (L.FilingJurisdiction = R.FilingJurisdiction AND L.OriginFilingNumber = R.OriginFilingNumber);
+
+    boolean IsOuterRight :=   (L.FilingJurisdiction = '' AND L.OriginFilingNumber = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_filingjurisdictionoriginfilingnumber (dataset(layouts._lt_UCCReport2Record) _n, dataset(layouts._lt_UCCReport2Record) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_UCCReport2Record, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_UCCReport2Record, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.FilingJurisdiction = RIGHT.FilingJurisdiction AND LEFT.OriginFilingNumber = RIGHT.OriginFilingNumber,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_filingjurisdictionoriginfilingnumber(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.FilingJurisdiction = RIGHT.FilingJurisdiction AND LEFT.OriginFilingNumber = RIGHT.OriginFilingNumber,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_filingjurisdictionoriginfilingnumber(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_UCCReport2Record);
+  END;
+  
+END;
+
+EXPORT _df_SexOffReportRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_SexOffReportRecord L, layouts._lt_SexOffReportRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_PrimaryKey := (L.PrimaryKey != R.PrimaryKey);
+    shared boolean updated_SSN := (L.SSN != R.SSN);
+
+    shared is_updated := false
+      OR updated_PrimaryKey
+      OR updated_SSN;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_PrimaryKey, DATASET ([{'PrimaryKey', R.PrimaryKey}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_SexOffReportRecord ProcessTx(layouts._lt_SexOffReportRecord L, layouts._lt_SexOffReportRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+
+      path_DOB := path + '/DOB';
+    
+      updated_DOB := _df_Date(is_active, path_DOB).AsRecord(L.DOB, R.DOB);
+        
+      checked_DOB := MAP (is_deleted => R.DOB,
+                              is_added => L.DOB,
+                              updated_DOB);
+      SELF.DOB := checked_DOB;
+      SELF.DOB2  := L.DOB2;
+      SELF.DateFirstSeen  := L.DateFirstSeen;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.DateOffenderLastUpdated  := L.DateOffenderLastUpdated;
+      SELF.PoliceAgency  := L.PoliceAgency;
+      SELF.School  := L.School;
+      SELF.Employer  := L.Employer;
+      SELF.Registration  := L.Registration;
+      SELF.Vehicle1  := L.Vehicle1;
+      SELF.Vehicle2  := L.Vehicle2;
+      SELF.PhysicalCharacteristics  := L.PhysicalCharacteristics;
+      SELF.IdNumbers  := L.IdNumbers;
+      SELF.BestAddress  := L.BestAddress;
+      SELF.AKAs  := L.AKAs;
+      SELF.Convictions  := L.Convictions;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_SexOffReportRecord ProcessTxRow(layouts._lt_row_SexOffReportRecord L, layouts._lt_row_SexOffReportRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+
+      path_DOB := path + '/DOB';
+    
+      updated_DOB := _df_Date(is_active, path_DOB).AsRecord(L.DOB, R.DOB);
+        
+      checked_DOB := MAP (is_deleted => R.DOB,
+                              is_added => L.DOB,
+                              updated_DOB);
+      SELF.DOB := checked_DOB;
+      SELF.DOB2  := L.DOB2;
+      SELF.DateFirstSeen  := L.DateFirstSeen;
+      SELF.DateLastSeen  := L.DateLastSeen;
+      SELF.DateOffenderLastUpdated  := L.DateOffenderLastUpdated;
+      SELF.PoliceAgency  := L.PoliceAgency;
+      SELF.School  := L.School;
+      SELF.Employer  := L.Employer;
+      SELF.Registration  := L.Registration;
+      SELF.Vehicle1  := L.Vehicle1;
+      SELF.Vehicle2  := L.Vehicle2;
+      SELF.PhysicalCharacteristics  := L.PhysicalCharacteristics;
+      SELF.IdNumbers  := L.IdNumbers;
+      SELF.BestAddress  := L.BestAddress;
+      SELF.AKAs  := L.AKAs;
+      SELF.Convictions  := L.Convictions;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_SexOffReportRecord _new, layouts._lt_SexOffReportRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_primarykey(layouts._lt_SexOffReportRecord L, layouts._lt_SexOffReportRecord R) := FUNCTION
+    boolean IsInner :=  (L.PrimaryKey = R.PrimaryKey);
+
+    boolean IsOuterRight :=   (L.PrimaryKey = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_primarykey (dataset(layouts._lt_SexOffReportRecord) _n, dataset(layouts._lt_SexOffReportRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_SexOffReportRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_SexOffReportRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.PrimaryKey = RIGHT.PrimaryKey,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_primarykey(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.PrimaryKey = RIGHT.PrimaryKey,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_primarykey(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_SexOffReportRecord);
+  END;
+  
+END;
+
+EXPORT _df_CrimReportRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_CrimReportRecord L, layouts._lt_CrimReportRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_OffenderId := (L.OffenderId != R.OffenderId);
+    shared boolean updated_SSN := (L.SSN != R.SSN);
+
+    shared is_updated := false
+      OR updated_OffenderId
+      OR updated_SSN;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_OffenderId, DATASET ([{'OffenderId', R.OffenderId}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_CrimReportRecord ProcessTx(layouts._lt_CrimReportRecord L, layouts._lt_CrimReportRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.CaseFilingDate  := L.CaseFilingDate;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_DOB := path + '/DOB';
+    
+      updated_DOB := _df_Date(is_active, path_DOB).AsRecord(L.DOB, R.DOB);
+        
+      checked_DOB := MAP (is_deleted => R.DOB,
+                              is_added => L.DOB,
+                              updated_DOB);
+      SELF.DOB := checked_DOB;
+      SELF.AKAs  := L.AKAs;
+      SELF.Offenses  := L.Offenses;
+      SELF.PrisonSentences  := L.PrisonSentences;
+      SELF.ParoleSentences  := L.ParoleSentences;
+      SELF.Activities  := L.Activities;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_CrimReportRecord ProcessTxRow(layouts._lt_row_CrimReportRecord L, layouts._lt_row_CrimReportRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.CaseFilingDate  := L.CaseFilingDate;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_DOB := path + '/DOB';
+    
+      updated_DOB := _df_Date(is_active, path_DOB).AsRecord(L.DOB, R.DOB);
+        
+      checked_DOB := MAP (is_deleted => R.DOB,
+                              is_added => L.DOB,
+                              updated_DOB);
+      SELF.DOB := checked_DOB;
+      SELF.AKAs  := L.AKAs;
+      SELF.Offenses  := L.Offenses;
+      SELF.PrisonSentences  := L.PrisonSentences;
+      SELF.ParoleSentences  := L.ParoleSentences;
+      SELF.Activities  := L.Activities;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_CrimReportRecord _new, layouts._lt_CrimReportRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_offenderid(layouts._lt_CrimReportRecord L, layouts._lt_CrimReportRecord R) := FUNCTION
+    boolean IsInner :=  (L.OffenderId = R.OffenderId);
+
+    boolean IsOuterRight :=   (L.OffenderId = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_offenderid (dataset(layouts._lt_CrimReportRecord) _n, dataset(layouts._lt_CrimReportRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_CrimReportRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_CrimReportRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.OffenderId = RIGHT.OffenderId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_offenderid(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.OffenderId = RIGHT.OffenderId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_offenderid(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_CrimReportRecord);
+  END;
+  
+END;
+
+EXPORT _df_CCWPermit(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_CCWPermit L, layouts._lt_CCWPermit R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_PermitNumber := (L.PermitNumber != R.PermitNumber);
+    shared boolean updated_PermitType := (L.PermitType != R.PermitType);
+
+    shared is_updated := false
+      OR updated_PermitNumber
+      OR updated_PermitType;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_PermitNumber, DATASET ([{'PermitNumber', R.PermitNumber}], layouts.DiffMetaRow))
+         +  IF (updated_PermitType, DATASET ([{'PermitType', R.PermitType}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_CCWPermit ProcessTx(layouts._lt_CCWPermit L, layouts._lt_CCWPermit R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.RegistrationDate  := L.RegistrationDate;
+      SELF.ExpirationDate  := L.ExpirationDate;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_CCWPermit _new, layouts._lt_CCWPermit _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_WeaponRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_WeaponRecord L, layouts._lt_WeaponRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_StateCode := (L.StateCode != R.StateCode);
+    shared boolean updated_SSN := (L.SSN != R.SSN);
+
+    shared is_updated := false
+      OR updated_StateCode
+      OR updated_SSN;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_StateCode, DATASET ([{'StateCode', R.StateCode}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_WeaponRecord ProcessTx(layouts._lt_WeaponRecord L, layouts._lt_WeaponRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_Permit := path + '/Permit';
+    
+      updated_Permit := _df_CCWPermit(is_active, path_Permit).AsRecord(L.Permit, R.Permit);
+        
+      checked_Permit := MAP (is_deleted => R.Permit,
+                              is_added => L.Permit,
+                              updated_Permit);
+      SELF.Permit := checked_Permit;
+
+      path_DOB := path + '/DOB';
+    
+      updated_DOB := _df_Date(is_active, path_DOB).AsRecord(L.DOB, R.DOB);
+        
+      checked_DOB := MAP (is_deleted => R.DOB,
+                              is_added => L.DOB,
+                              updated_DOB);
+      SELF.DOB := checked_DOB;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_WeaponRecord ProcessTxRow(layouts._lt_row_WeaponRecord L, layouts._lt_row_WeaponRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_Permit := path + '/Permit';
+    
+      updated_Permit := _df_CCWPermit(is_active, path_Permit).AsRecord(L.Permit, R.Permit);
+        
+      checked_Permit := MAP (is_deleted => R.Permit,
+                              is_added => L.Permit,
+                              updated_Permit);
+      SELF.Permit := checked_Permit;
+
+      path_DOB := path + '/DOB';
+    
+      updated_DOB := _df_Date(is_active, path_DOB).AsRecord(L.DOB, R.DOB);
+        
+      checked_DOB := MAP (is_deleted => R.DOB,
+                              is_added => L.DOB,
+                              updated_DOB);
+      SELF.DOB := checked_DOB;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_WeaponRecord _new, layouts._lt_WeaponRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_permit_permitnumberpermit_permittypestatecode(layouts._lt_WeaponRecord L, layouts._lt_WeaponRecord R) := FUNCTION
+    boolean IsInner :=  (L.StateCode = R.StateCode AND L.Permit.PermitType = R.Permit.PermitType AND L.Permit.PermitNumber = R.Permit.PermitNumber);
+
+    boolean IsOuterRight :=   (L.StateCode = '' AND L.Permit.PermitType = '' AND L.Permit.PermitNumber = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_permit_permitnumberpermit_permittypestatecode (dataset(layouts._lt_WeaponRecord) _n, dataset(layouts._lt_WeaponRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_WeaponRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_WeaponRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.StateCode = RIGHT.StateCode AND LEFT.Permit.PermitType = RIGHT.Permit.PermitType AND LEFT.Permit.PermitNumber = RIGHT.Permit.PermitNumber,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_permit_permitnumberpermit_permittypestatecode(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.StateCode = RIGHT.StateCode AND LEFT.Permit.PermitType = RIGHT.Permit.PermitType AND LEFT.Permit.PermitNumber = RIGHT.Permit.PermitNumber,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_permit_permitnumberpermit_permittypestatecode(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_WeaponRecord);
+  END;
+  
+END;
+
+EXPORT _df_HuntFishRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_HuntFishRecord L, layouts._lt_HuntFishRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_LicenseNumber := (L.LicenseNumber != R.LicenseNumber);
+    shared boolean updated_LicenseType := (L.LicenseType != R.LicenseType);
+    shared boolean updated_LicenseState := (L.LicenseState != R.LicenseState);
+
+    shared is_updated := false
+      OR updated_LicenseNumber
+      OR updated_LicenseType
+      OR updated_LicenseState;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_LicenseNumber, DATASET ([{'LicenseNumber', R.LicenseNumber}], layouts.DiffMetaRow))
+         +  IF (updated_LicenseType, DATASET ([{'LicenseType', R.LicenseType}], layouts.DiffMetaRow))
+         +  IF (updated_LicenseState, DATASET ([{'LicenseState', R.LicenseState}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3808,7 +5580,15 @@ EXPORT _df_HuntFishRecord(boolean is_active, string path) := MODULE
                               is_added => L.Address,
                               updated_Address);
       SELF.Address := checked_Address;
-      SELF.MailAddress  := L.MailAddress;
+
+      path_MailAddress := path + '/MailAddress';
+    
+      updated_MailAddress := _df_Address(is_active, path_MailAddress).AsRecord(L.MailAddress, R.MailAddress);
+        
+      checked_MailAddress := MAP (is_deleted => R.MailAddress,
+                              is_added => L.MailAddress,
+                              updated_MailAddress);
+      SELF.MailAddress := checked_MailAddress;
       SELF.LicenseDate  := L.LicenseDate;
 
       path_DOB := path + '/DOB';
@@ -3851,7 +5631,15 @@ EXPORT _df_HuntFishRecord(boolean is_active, string path) := MODULE
                               is_added => L.Address,
                               updated_Address);
       SELF.Address := checked_Address;
-      SELF.MailAddress  := L.MailAddress;
+
+      path_MailAddress := path + '/MailAddress';
+    
+      updated_MailAddress := _df_Address(is_active, path_MailAddress).AsRecord(L.MailAddress, R.MailAddress);
+        
+      checked_MailAddress := MAP (is_deleted => R.MailAddress,
+                              is_added => L.MailAddress,
+                              updated_MailAddress);
+      SELF.MailAddress := checked_MailAddress;
       SELF.LicenseDate  := L.LicenseDate;
 
       path_DOB := path + '/DOB';
@@ -3873,26 +5661,26 @@ EXPORT _df_HuntFishRecord(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_licensedate_yearlicensenumberlicensetype(layouts._lt_HuntFishRecord L, layouts._lt_HuntFishRecord R) := FUNCTION
-    boolean IsInner :=  (L.LicenseDate.Year = R.LicenseDate.Year AND L.LicenseNumber = R.LicenseNumber AND L.LicenseType = R.LicenseType);
+  EXPORT  integer1 CheckOuter_licensenumberlicensestatelicensetype(layouts._lt_HuntFishRecord L, layouts._lt_HuntFishRecord R) := FUNCTION
+    boolean IsInner :=  (L.LicenseState = R.LicenseState AND L.LicenseType = R.LicenseType AND L.LicenseNumber = R.LicenseNumber);
 
-    boolean IsOuterRight :=   (L.LicenseDate.Year = 0 AND L.LicenseNumber = '' AND L.LicenseType = '');
+    boolean IsOuterRight :=   (L.LicenseState = '' AND L.LicenseType = '' AND L.LicenseNumber = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_licensedate_yearlicensenumberlicensetype (dataset(layouts._lt_HuntFishRecord) _n, dataset(layouts._lt_HuntFishRecord) _o) := FUNCTION
+  EXPORT  AsDataset_licensenumberlicensestatelicensetype (dataset(layouts._lt_HuntFishRecord) _n, dataset(layouts._lt_HuntFishRecord) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_HuntFishRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_HuntFishRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.LicenseDate.Year = RIGHT.LicenseDate.Year AND LEFT.LicenseNumber = RIGHT.LicenseNumber AND LEFT.LicenseType = RIGHT.LicenseType,
+                  LEFT.LicenseState = RIGHT.LicenseState AND LEFT.LicenseType = RIGHT.LicenseType AND LEFT.LicenseNumber = RIGHT.LicenseNumber,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_licensedate_yearlicensenumberlicensetype(LEFT, RIGHT)),
+                  CheckOuter_licensenumberlicensestatelicensetype(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.LicenseDate.Year = RIGHT.LicenseDate.Year AND LEFT.LicenseNumber = RIGHT.LicenseNumber AND LEFT.LicenseType = RIGHT.LicenseType,
+                  LEFT.LicenseState = RIGHT.LicenseState AND LEFT.LicenseType = RIGHT.LicenseType AND LEFT.LicenseNumber = RIGHT.LicenseNumber,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_licensedate_yearlicensenumberlicensetype(LEFT, RIGHT)),
+                  CheckOuter_licensenumberlicensestatelicensetype(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_HuntFishRecord);
@@ -3903,8 +5691,12 @@ END;
 EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_FirearmRecord L, layouts._lt_FirearmRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_LicenseIssueState := (L.LicenseIssueState != R.LicenseIssueState);
+    shared boolean updated_LicenseNumber := (L.LicenseNumber != R.LicenseNumber);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_LicenseIssueState
+      OR updated_LicenseNumber;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3913,7 +5705,8 @@ EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_LicenseIssueState, DATASET ([{'LicenseIssueState', R.LicenseIssueState}], layouts.DiffMetaRow))
+         +  IF (updated_LicenseNumber, DATASET ([{'LicenseNumber', R.LicenseNumber}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3934,7 +5727,15 @@ EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
                               is_added => L.LicenseName,
                               updated_LicenseName);
       SELF.LicenseName := checked_LicenseName;
-      SELF.MailingAddress  := L.MailingAddress;
+
+      path_MailingAddress := path + '/MailingAddress';
+    
+      updated_MailingAddress := _df_Address(is_active, path_MailingAddress).AsRecord(L.MailingAddress, R.MailingAddress);
+        
+      checked_MailingAddress := MAP (is_deleted => R.MailingAddress,
+                              is_added => L.MailingAddress,
+                              updated_MailingAddress);
+      SELF.MailingAddress := checked_MailingAddress;
 
       path_PremiseAddress := path + '/PremiseAddress';
     
@@ -3970,7 +5771,15 @@ EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
                               is_added => L.LicenseName,
                               updated_LicenseName);
       SELF.LicenseName := checked_LicenseName;
-      SELF.MailingAddress  := L.MailingAddress;
+
+      path_MailingAddress := path + '/MailingAddress';
+    
+      updated_MailingAddress := _df_Address(is_active, path_MailingAddress).AsRecord(L.MailingAddress, R.MailingAddress);
+        
+      checked_MailingAddress := MAP (is_deleted => R.MailingAddress,
+                              is_added => L.MailingAddress,
+                              updated_MailingAddress);
+      SELF.MailingAddress := checked_MailingAddress;
 
       path_PremiseAddress := path + '/PremiseAddress';
     
@@ -4022,8 +5831,10 @@ END;
 EXPORT _df_DEAControlledSubstanceRecord(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_DEAControlledSubstanceRecord L, layouts._lt_DEAControlledSubstanceRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_SSN := (L.SSN != R.SSN);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_SSN;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -4032,7 +5843,7 @@ EXPORT _df_DEAControlledSubstanceRecord(boolean is_active, string path) := MODUL
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -4105,13 +5916,40 @@ EXPORT _df_DEAControlledSubstanceRecord(boolean is_active, string path) := MODUL
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
+  EXPORT  integer1 CheckOuter_ssn(layouts._lt_DEAControlledSubstanceRecord L, layouts._lt_DEAControlledSubstanceRecord R) := FUNCTION
+    boolean IsInner :=  (L.SSN = R.SSN);
+
+    boolean IsOuterRight :=   (L.SSN = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_ssn (dataset(layouts._lt_DEAControlledSubstanceRecord) _n, dataset(layouts._lt_DEAControlledSubstanceRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_DEAControlledSubstanceRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_DEAControlledSubstanceRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.SSN = RIGHT.SSN,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_ssn(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.SSN = RIGHT.SSN,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_ssn(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_DEAControlledSubstanceRecord);
+  END;
+  
 END;
 
 EXPORT _df_DEAControlledSubstanceSearch2Record(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_DEAControlledSubstanceSearch2Record L, layouts._lt_DEAControlledSubstanceSearch2Record R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_RegistrationNumber := (L.RegistrationNumber != R.RegistrationNumber);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_RegistrationNumber;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -4120,7 +5958,7 @@ EXPORT _df_DEAControlledSubstanceSearch2Record(boolean is_active, string path) :
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_RegistrationNumber, DATASET ([{'RegistrationNumber', R.RegistrationNumber}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -4131,7 +5969,12 @@ EXPORT _df_DEAControlledSubstanceSearch2Record(boolean is_active, string path) :
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
         SELF.BusinessIds  := L.BusinessIds;
-      SELF.ControlledSubstancesInfo  := L.ControlledSubstancesInfo;
+
+      updated_ControlledSubstancesInfo := _df_DEAControlledSubstanceRecord(is_active, path + '/ControlledSubstancesInfo/ControlledSubstanceInfo').AsDataset_ssn(L.ControlledSubstancesInfo, R.ControlledSubstancesInfo);
+      checked_ControlledSubstancesInfo := MAP (is_deleted => R.ControlledSubstancesInfo,
+                              is_added => L.ControlledSubstancesInfo,
+                              updated_ControlledSubstancesInfo);
+      SELF.ControlledSubstancesInfo  := checked_ControlledSubstancesInfo;
 
 
       SELF := IF (is_deleted, R, L);
@@ -4147,7 +5990,12 @@ EXPORT _df_DEAControlledSubstanceSearch2Record(boolean is_active, string path) :
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
          SELF.BusinessIds  := L.BusinessIds;
-      SELF.ControlledSubstancesInfo  := L.ControlledSubstancesInfo;
+
+      updated_ControlledSubstancesInfo := _df_DEAControlledSubstanceRecord(is_active, path + '/ControlledSubstancesInfo/ControlledSubstanceInfo').AsDataset_ssn(L.ControlledSubstancesInfo, R.ControlledSubstancesInfo);
+      checked_ControlledSubstancesInfo := MAP (is_deleted => R.ControlledSubstancesInfo,
+                              is_added => L.ControlledSubstancesInfo,
+                              updated_ControlledSubstancesInfo);
+      SELF.ControlledSubstancesInfo  := checked_ControlledSubstancesInfo;
 
     SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
     SELF := IF (is_deleted, R, L);
@@ -4238,7 +6086,15 @@ EXPORT _df_VoterReport2Record(boolean is_active, string path) := MODULE
                               is_added => L.ResidentAddress,
                               updated_ResidentAddress);
       SELF.ResidentAddress := checked_ResidentAddress;
-      SELF.MailingAddress  := L.MailingAddress;
+
+      path_MailingAddress := path + '/MailingAddress';
+    
+      updated_MailingAddress := _df_Address(is_active, path_MailingAddress).AsRecord(L.MailingAddress, R.MailingAddress);
+        
+      checked_MailingAddress := MAP (is_deleted => R.MailingAddress,
+                              is_added => L.MailingAddress,
+                              updated_MailingAddress);
+      SELF.MailingAddress := checked_MailingAddress;
       SELF.VoterDistrictInfo  := L.VoterDistrictInfo;
       SELF.VotingHistories  := L.VotingHistories;
 
@@ -4284,7 +6140,15 @@ EXPORT _df_VoterReport2Record(boolean is_active, string path) := MODULE
                               is_added => L.ResidentAddress,
                               updated_ResidentAddress);
       SELF.ResidentAddress := checked_ResidentAddress;
-      SELF.MailingAddress  := L.MailingAddress;
+
+      path_MailingAddress := path + '/MailingAddress';
+    
+      updated_MailingAddress := _df_Address(is_active, path_MailingAddress).AsRecord(L.MailingAddress, R.MailingAddress);
+        
+      checked_MailingAddress := MAP (is_deleted => R.MailingAddress,
+                              is_added => L.MailingAddress,
+                              updated_MailingAddress);
+      SELF.MailingAddress := checked_MailingAddress;
       SELF.VoterDistrictInfo  := L.VoterDistrictInfo;
       SELF.VotingHistories  := L.VotingHistories;
 
@@ -4328,10 +6192,14 @@ END;
 EXPORT _df_DLEmbeddedReport2Record(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_DLEmbeddedReport2Record L, layouts._lt_DLEmbeddedReport2Record R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_DriverLicense := (L.DriverLicense != R.DriverLicense);
     shared boolean updated_SSN := (L.SSN != R.SSN);
+    shared boolean updated_OriginState := (L.OriginState != R.OriginState);
 
     shared is_updated := false
-      OR updated_SSN;
+      OR updated_DriverLicense
+      OR updated_SSN
+      OR updated_OriginState;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -4340,7 +6208,9 @@ EXPORT _df_DLEmbeddedReport2Record(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_DriverLicense, DATASET ([{'DriverLicense', R.DriverLicense}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow))
+         +  IF (updated_OriginState, DATASET ([{'OriginState', R.OriginState}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -4500,13 +6370,59 @@ EXPORT _df_DLEmbeddedReport2Record(boolean is_active, string path) := MODULE
   
 END;
 
+EXPORT _df_MotorVehicleReportVehicleInfo(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_MotorVehicleReportVehicleInfo L, layouts._lt_MotorVehicleReportVehicleInfo R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_VIN := (L.VIN != R.VIN);
+    shared boolean updated_Make := (L.Make != R.Make);
+    shared boolean updated_Model := (L.Model != R.Model);
+
+    shared is_updated := false
+      OR updated_VIN
+      OR updated_Make
+      OR updated_Model;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_VIN, DATASET ([{'VIN', R.VIN}], layouts.DiffMetaRow))
+         +  IF (updated_Make, DATASET ([{'Make', R.Make}], layouts.DiffMetaRow))
+         +  IF (updated_Model, DATASET ([{'Model', R.Model}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_MotorVehicleReportVehicleInfo ProcessTx(layouts._lt_MotorVehicleReportVehicleInfo L, layouts._lt_MotorVehicleReportVehicleInfo R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_MotorVehicleReportVehicleInfo _new, layouts._lt_MotorVehicleReportVehicleInfo _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
 EXPORT _df_MotorVehicleReportPersonOrBusiness(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_MotorVehicleReportPersonOrBusiness L, layouts._lt_MotorVehicleReportPersonOrBusiness R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
     shared boolean updated_SSN := (L.SSN != R.SSN);
     shared boolean updated_DriverLicenseNumber := (L.DriverLicenseNumber != R.DriverLicenseNumber);
 
     shared is_updated := false
+      OR updated_UniqueId
       OR updated_SSN
       OR updated_DriverLicenseNumber;
 
@@ -4517,7 +6433,8 @@ EXPORT _df_MotorVehicleReportPersonOrBusiness(boolean is_active, string path) :=
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow))
+      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow))
          +  IF (updated_DriverLicenseNumber, DATASET ([{'DriverLicenseNumber', R.DriverLicenseNumber}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
@@ -4727,6 +6644,105 @@ EXPORT _df_MotorVehicleReportRegistrant(boolean is_active, string path) := MODUL
   
 END;
 
+EXPORT _df_MotorVehicleReportOwner(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_MotorVehicleReportOwner L, layouts._lt_MotorVehicleReportOwner R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_MotorVehicleReportOwner ProcessTx(layouts._lt_MotorVehicleReportOwner L, layouts._lt_MotorVehicleReportOwner R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_OwnerInfo := path + '/OwnerInfo';
+    
+      updated_OwnerInfo := _df_MotorVehicleReportPersonOrBusiness(is_active, path_OwnerInfo).AsRecord(L.OwnerInfo, R.OwnerInfo);
+        
+      checked_OwnerInfo := MAP (is_deleted => R.OwnerInfo,
+                              is_added => L.OwnerInfo,
+                              updated_OwnerInfo);
+      SELF.OwnerInfo := checked_OwnerInfo;
+      SELF.TitleInfo  := L.TitleInfo;
+      SELF.SourceDateFirstSeen  := L.SourceDateFirstSeen;
+      SELF.SourceDateLastSeen  := L.SourceDateLastSeen;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_MotorVehicleReportOwner ProcessTxRow(layouts._lt_row_MotorVehicleReportOwner L, layouts._lt_row_MotorVehicleReportOwner R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_OwnerInfo := path + '/OwnerInfo';
+    
+      updated_OwnerInfo := _df_MotorVehicleReportPersonOrBusiness(is_active, path_OwnerInfo).AsRecord(L.OwnerInfo, R.OwnerInfo);
+        
+      checked_OwnerInfo := MAP (is_deleted => R.OwnerInfo,
+                              is_added => L.OwnerInfo,
+                              updated_OwnerInfo);
+      SELF.OwnerInfo := checked_OwnerInfo;
+      SELF.TitleInfo  := L.TitleInfo;
+      SELF.SourceDateFirstSeen  := L.SourceDateFirstSeen;
+      SELF.SourceDateLastSeen  := L.SourceDateLastSeen;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_MotorVehicleReportOwner _new, layouts._lt_MotorVehicleReportOwner _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_ownerinfo_uniqueid(layouts._lt_MotorVehicleReportOwner L, layouts._lt_MotorVehicleReportOwner R) := FUNCTION
+    boolean IsInner :=  (L.OwnerInfo.UniqueId = R.OwnerInfo.UniqueId);
+
+    boolean IsOuterRight :=   (L.OwnerInfo.UniqueId = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_ownerinfo_uniqueid (dataset(layouts._lt_MotorVehicleReportOwner) _n, dataset(layouts._lt_MotorVehicleReportOwner) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_MotorVehicleReportOwner, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_MotorVehicleReportOwner, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.OwnerInfo.UniqueId = RIGHT.OwnerInfo.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_ownerinfo_uniqueid(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.OwnerInfo.UniqueId = RIGHT.OwnerInfo.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_ownerinfo_uniqueid(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_MotorVehicleReportOwner);
+  END;
+  
+END;
+
 EXPORT _df_MotorVehicleReport2Record(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_MotorVehicleReport2Record L, layouts._lt_MotorVehicleReport2Record R, boolean is_deleted, boolean is_added) := MODULE
@@ -4751,7 +6767,15 @@ EXPORT _df_MotorVehicleReport2Record(boolean is_active, string path) := MODULE
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
         SELF.BusinessIds  := L.BusinessIds;
-      SELF.VehicleInfo  := L.VehicleInfo;
+
+      path_VehicleInfo := path + '/VehicleInfo';
+    
+      updated_VehicleInfo := _df_MotorVehicleReportVehicleInfo(is_active, path_VehicleInfo).AsRecord(L.VehicleInfo, R.VehicleInfo);
+        
+      checked_VehicleInfo := MAP (is_deleted => R.VehicleInfo,
+                              is_added => L.VehicleInfo,
+                              updated_VehicleInfo);
+      SELF.VehicleInfo := checked_VehicleInfo;
       SELF.VinaData  := L.VinaData;
 
       updated_Registrants := _df_MotorVehicleReportRegistrant(is_active, path + '/Registrants/Registrant').AsDataset_registrantinfo_uniqueid(L.Registrants, R.Registrants);
@@ -4759,7 +6783,12 @@ EXPORT _df_MotorVehicleReport2Record(boolean is_active, string path) := MODULE
                               is_added => L.Registrants,
                               updated_Registrants);
       SELF.Registrants  := checked_Registrants;
-      SELF.Owners  := L.Owners;
+
+      updated_Owners := _df_MotorVehicleReportOwner(is_active, path + '/Owners/Owner').AsDataset_ownerinfo_uniqueid(L.Owners, R.Owners);
+      checked_Owners := MAP (is_deleted => R.Owners,
+                              is_added => L.Owners,
+                              updated_Owners);
+      SELF.Owners  := checked_Owners;
       SELF.LienHolders  := L.LienHolders;
       SELF.Lessees  := L.Lessees;
       SELF.Lessors  := L.Lessors;
@@ -4779,7 +6808,15 @@ EXPORT _df_MotorVehicleReport2Record(boolean is_active, string path) := MODULE
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
          SELF.BusinessIds  := L.BusinessIds;
-      SELF.VehicleInfo  := L.VehicleInfo;
+
+      path_VehicleInfo := path + '/VehicleInfo';
+    
+      updated_VehicleInfo := _df_MotorVehicleReportVehicleInfo(is_active, path_VehicleInfo).AsRecord(L.VehicleInfo, R.VehicleInfo);
+        
+      checked_VehicleInfo := MAP (is_deleted => R.VehicleInfo,
+                              is_added => L.VehicleInfo,
+                              updated_VehicleInfo);
+      SELF.VehicleInfo := checked_VehicleInfo;
       SELF.VinaData  := L.VinaData;
 
       updated_Registrants := _df_MotorVehicleReportRegistrant(is_active, path + '/Registrants/Registrant').AsDataset_registrantinfo_uniqueid(L.Registrants, R.Registrants);
@@ -4787,7 +6824,12 @@ EXPORT _df_MotorVehicleReport2Record(boolean is_active, string path) := MODULE
                               is_added => L.Registrants,
                               updated_Registrants);
       SELF.Registrants  := checked_Registrants;
-      SELF.Owners  := L.Owners;
+
+      updated_Owners := _df_MotorVehicleReportOwner(is_active, path + '/Owners/Owner').AsDataset_ownerinfo_uniqueid(L.Owners, R.Owners);
+      checked_Owners := MAP (is_deleted => R.Owners,
+                              is_added => L.Owners,
+                              updated_Owners);
+      SELF.Owners  := checked_Owners;
       SELF.LienHolders  := L.LienHolders;
       SELF.Lessees  := L.Lessees;
       SELF.Lessors  := L.Lessors;
@@ -4826,6 +6868,457 @@ EXPORT _df_MotorVehicleReport2Record(boolean is_active, string path) := MODULE
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_MotorVehicleReport2Record);
+  END;
+  
+END;
+
+EXPORT _df_AccidentReportInvestigationAgent(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AccidentReportInvestigationAgent L, layouts._lt_AccidentReportInvestigationAgent R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_AgentReportNumber := (L.AgentReportNumber != R.AgentReportNumber);
+
+    shared is_updated := false
+      OR updated_AgentReportNumber;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_AgentReportNumber, DATASET ([{'AgentReportNumber', R.AgentReportNumber}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AccidentReportInvestigationAgent ProcessTx(layouts._lt_AccidentReportInvestigationAgent L, layouts._lt_AccidentReportInvestigationAgent R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_AccidentReportInvestigationAgent _new, layouts._lt_AccidentReportInvestigationAgent _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_AccidentReportInvestigation(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AccidentReportInvestigation L, layouts._lt_AccidentReportInvestigation R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AccidentReportInvestigation ProcessTx(layouts._lt_AccidentReportInvestigation L, layouts._lt_AccidentReportInvestigation R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_InvestigationAgent := path + '/InvestigationAgent';
+    
+      updated_InvestigationAgent := _df_AccidentReportInvestigationAgent(is_active, path_InvestigationAgent).AsRecord(L.InvestigationAgent, R.InvestigationAgent);
+        
+      checked_InvestigationAgent := MAP (is_deleted => R.InvestigationAgent,
+                              is_added => L.InvestigationAgent,
+                              updated_InvestigationAgent);
+      SELF.InvestigationAgent := checked_InvestigationAgent;
+      SELF.SearchDate  := L.SearchDate;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_AccidentReportInvestigation _new, layouts._lt_AccidentReportInvestigation _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_AccidentReportIndividualInvolved(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AccidentReportIndividualInvolved L, layouts._lt_AccidentReportIndividualInvolved R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
+
+    shared is_updated := false
+      OR updated_UniqueId;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AccidentReportIndividualInvolved ProcessTx(layouts._lt_AccidentReportIndividualInvolved L, layouts._lt_AccidentReportIndividualInvolved R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_DOB := path + '/DOB';
+    
+      updated_DOB := _df_Date(is_active, path_DOB).AsRecord(L.DOB, R.DOB);
+        
+      checked_DOB := MAP (is_deleted => R.DOB,
+                              is_added => L.DOB,
+                              updated_DOB);
+      SELF.DOB := checked_DOB;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+
+      updated_ChargedOffenses := _df_DiffString(CASE(path + '/ChargedOffenses', '/Accidents/Accident/Vehicles/Item/Driver/Individual/ChargedOffenses' => (false), is_active), path + '/ChargedOffenses/Item').AsDataset(L.ChargedOffenses, R.ChargedOffenses);
+      checked_ChargedOffenses := MAP (is_deleted => R.ChargedOffenses,
+                              is_added => L.ChargedOffenses,
+                              updated_ChargedOffenses);
+      SELF.ChargedOffenses := checked_ChargedOffenses;
+    
+      updated_FRDLCharges := _df_DiffString(CASE(path + '/FRDLCharges', '/Accidents/Accident/Vehicles/Item/Driver/Individual/FRDLCharges' => (false), is_active), path + '/FRDLCharges/Item').AsDataset(L.FRDLCharges, R.FRDLCharges);
+      checked_FRDLCharges := MAP (is_deleted => R.FRDLCharges,
+                              is_added => L.FRDLCharges,
+                              updated_FRDLCharges);
+      SELF.FRDLCharges := checked_FRDLCharges;
+    
+      updated_Citations := _df_DiffString(CASE(path + '/Citations', '/Accidents/Accident/Vehicles/Item/Driver/Individual/Citations' => (false), is_active), path + '/Citations/Item').AsDataset(L.Citations, R.Citations);
+      checked_Citations := MAP (is_deleted => R.Citations,
+                              is_added => L.Citations,
+                              updated_Citations);
+      SELF.Citations := checked_Citations;
+    
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_AccidentReportIndividualInvolved _new, layouts._lt_AccidentReportIndividualInvolved _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_AccidentReportDriver(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AccidentReportDriver L, layouts._lt_AccidentReportDriver R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AccidentReportDriver ProcessTx(layouts._lt_AccidentReportDriver L, layouts._lt_AccidentReportDriver R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.DriverLicense  := L.DriverLicense;
+
+      path_Individual := path + '/Individual';
+    
+      updated_Individual := _df_AccidentReportIndividualInvolved(is_active, path_Individual).AsRecord(L.Individual, R.Individual);
+        
+      checked_Individual := MAP (is_deleted => R.Individual,
+                              is_added => L.Individual,
+                              updated_Individual);
+      SELF.Individual := checked_Individual;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_AccidentReportDriver _new, layouts._lt_AccidentReportDriver _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_AccidentReportVehicle(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AccidentReportVehicle L, layouts._lt_AccidentReportVehicle R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AccidentReportVehicle ProcessTx(layouts._lt_AccidentReportVehicle L, layouts._lt_AccidentReportVehicle R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.Owner  := L.Owner;
+      SELF.TowedTrailer  := L.TowedTrailer;
+
+      path_Driver := path + '/Driver';
+    
+      updated_Driver := _df_AccidentReportDriver(is_active, path_Driver).AsRecord(L.Driver, R.Driver);
+        
+      checked_Driver := MAP (is_deleted => R.Driver,
+                              is_added => L.Driver,
+                              updated_Driver);
+      SELF.Driver := checked_Driver;
+      SELF.Passengers  := L.Passengers;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_AccidentReportVehicle ProcessTxRow(layouts._lt_row_AccidentReportVehicle L, layouts._lt_row_AccidentReportVehicle R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.Owner  := L.Owner;
+      SELF.TowedTrailer  := L.TowedTrailer;
+
+      path_Driver := path + '/Driver';
+    
+      updated_Driver := _df_AccidentReportDriver(is_active, path_Driver).AsRecord(L.Driver, R.Driver);
+        
+      checked_Driver := MAP (is_deleted => R.Driver,
+                              is_added => L.Driver,
+                              updated_Driver);
+      SELF.Driver := checked_Driver;
+      SELF.Passengers  := L.Passengers;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_AccidentReportVehicle _new, layouts._lt_AccidentReportVehicle _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_driver_individual_uniqueid(layouts._lt_AccidentReportVehicle L, layouts._lt_AccidentReportVehicle R) := FUNCTION
+    boolean IsInner :=  (L.Driver.Individual.UniqueId = R.Driver.Individual.UniqueId);
+
+    boolean IsOuterRight :=   (L.Driver.Individual.UniqueId = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_driver_individual_uniqueid (dataset(layouts._lt_AccidentReportVehicle) _n, dataset(layouts._lt_AccidentReportVehicle) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_AccidentReportVehicle, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_AccidentReportVehicle, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Driver.Individual.UniqueId = RIGHT.Driver.Individual.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_driver_individual_uniqueid(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Driver.Individual.UniqueId = RIGHT.Driver.Individual.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_driver_individual_uniqueid(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_AccidentReportVehicle);
+  END;
+  
+END;
+
+EXPORT _df_AccidentReportRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_AccidentReportRecord L, layouts._lt_AccidentReportRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_AccidentState := (L.AccidentState != R.AccidentState);
+
+    shared is_updated := false
+      OR updated_AccidentState;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_AccidentState, DATASET ([{'AccidentState', R.AccidentState}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_AccidentReportRecord ProcessTx(layouts._lt_AccidentReportRecord L, layouts._lt_AccidentReportRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_AccidentDate := path + '/AccidentDate';
+    
+      updated_AccidentDate := _df_Date(is_active, path_AccidentDate).AsRecord(L.AccidentDate, R.AccidentDate);
+        
+      checked_AccidentDate := MAP (is_deleted => R.AccidentDate,
+                              is_added => L.AccidentDate,
+                              updated_AccidentDate);
+      SELF.AccidentDate := checked_AccidentDate;
+      SELF.AccidentLocation  := L.AccidentLocation;
+      SELF.AccidentTime  := L.AccidentTime;
+      SELF.DotInfo  := L.DotInfo;
+      SELF.Conditions  := L.Conditions;
+
+      path_Investigation := path + '/Investigation';
+    
+      updated_Investigation := _df_AccidentReportInvestigation(is_active, path_Investigation).AsRecord(L.Investigation, R.Investigation);
+        
+      checked_Investigation := MAP (is_deleted => R.Investigation,
+                              is_added => L.Investigation,
+                              updated_Investigation);
+      SELF.Investigation := checked_Investigation;
+      SELF.Statistics  := L.Statistics;
+
+      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_driver_individual_uniqueid(L.Vehicles, R.Vehicles);
+      checked_Vehicles := MAP (is_deleted => R.Vehicles,
+                              is_added => L.Vehicles,
+                              updated_Vehicles);
+      SELF.Vehicles  := checked_Vehicles;
+      SELF.PropertyDamages  := L.PropertyDamages;
+      SELF.Pedestrians  := L.Pedestrians;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_AccidentReportRecord ProcessTxRow(layouts._lt_row_AccidentReportRecord L, layouts._lt_row_AccidentReportRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_AccidentDate := path + '/AccidentDate';
+    
+      updated_AccidentDate := _df_Date(is_active, path_AccidentDate).AsRecord(L.AccidentDate, R.AccidentDate);
+        
+      checked_AccidentDate := MAP (is_deleted => R.AccidentDate,
+                              is_added => L.AccidentDate,
+                              updated_AccidentDate);
+      SELF.AccidentDate := checked_AccidentDate;
+      SELF.AccidentLocation  := L.AccidentLocation;
+      SELF.AccidentTime  := L.AccidentTime;
+      SELF.DotInfo  := L.DotInfo;
+      SELF.Conditions  := L.Conditions;
+
+      path_Investigation := path + '/Investigation';
+    
+      updated_Investigation := _df_AccidentReportInvestigation(is_active, path_Investigation).AsRecord(L.Investigation, R.Investigation);
+        
+      checked_Investigation := MAP (is_deleted => R.Investigation,
+                              is_added => L.Investigation,
+                              updated_Investigation);
+      SELF.Investigation := checked_Investigation;
+      SELF.Statistics  := L.Statistics;
+
+      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_driver_individual_uniqueid(L.Vehicles, R.Vehicles);
+      checked_Vehicles := MAP (is_deleted => R.Vehicles,
+                              is_added => L.Vehicles,
+                              updated_Vehicles);
+      SELF.Vehicles  := checked_Vehicles;
+      SELF.PropertyDamages  := L.PropertyDamages;
+      SELF.Pedestrians  := L.Pedestrians;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_AccidentReportRecord _new, layouts._lt_AccidentReportRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_accidentdate_yearaccidentstateinvestigation_investigationagent_agentreportnumber(layouts._lt_AccidentReportRecord L, layouts._lt_AccidentReportRecord R) := FUNCTION
+    boolean IsInner :=  (L.Investigation.InvestigationAgent.AgentReportNumber = R.Investigation.InvestigationAgent.AgentReportNumber AND L.AccidentState = R.AccidentState AND L.AccidentDate.Year = R.AccidentDate.Year);
+
+    boolean IsOuterRight :=   (L.Investigation.InvestigationAgent.AgentReportNumber = '' AND L.AccidentState = '' AND L.AccidentDate.Year = 0);
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_accidentdate_yearaccidentstateinvestigation_investigationagent_agentreportnumber (dataset(layouts._lt_AccidentReportRecord) _n, dataset(layouts._lt_AccidentReportRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_AccidentReportRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_AccidentReportRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Investigation.InvestigationAgent.AgentReportNumber = RIGHT.Investigation.InvestigationAgent.AgentReportNumber AND LEFT.AccidentState = RIGHT.AccidentState AND LEFT.AccidentDate.Year = RIGHT.AccidentDate.Year,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_accidentdate_yearaccidentstateinvestigation_investigationagent_agentreportnumber(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Investigation.InvestigationAgent.AgentReportNumber = RIGHT.Investigation.InvestigationAgent.AgentReportNumber AND LEFT.AccidentState = RIGHT.AccidentState AND LEFT.AccidentDate.Year = RIGHT.AccidentDate.Year,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_accidentdate_yearaccidentstateinvestigation_investigationagent_agentreportnumber(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_AccidentReportRecord);
   END;
   
 END;
@@ -4924,26 +7417,26 @@ EXPORT _df_BankruptcySearch2Name(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_firstlasttype(layouts._lt_BankruptcySearch2Name L, layouts._lt_BankruptcySearch2Name R) := FUNCTION
-    boolean IsInner :=  (L.Last = R.Last AND L._Type = R._Type AND L.First = R.First);
+  EXPORT  integer1 CheckOuter_firstlast(layouts._lt_BankruptcySearch2Name L, layouts._lt_BankruptcySearch2Name R) := FUNCTION
+    boolean IsInner :=  (L.Last = R.Last AND L.First = R.First);
 
-    boolean IsOuterRight :=   (L.Last = '' AND L._Type = '' AND L.First = '');
+    boolean IsOuterRight :=   (L.Last = '' AND L.First = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_firstlasttype (dataset(layouts._lt_BankruptcySearch2Name) _n, dataset(layouts._lt_BankruptcySearch2Name) _o) := FUNCTION
+  EXPORT  AsDataset_firstlast (dataset(layouts._lt_BankruptcySearch2Name) _n, dataset(layouts._lt_BankruptcySearch2Name) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_BankruptcySearch2Name, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_BankruptcySearch2Name, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.Last = RIGHT.Last AND LEFT._Type = RIGHT._Type AND LEFT.First = RIGHT.First,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_firstlasttype(LEFT, RIGHT)),
+                  CheckOuter_firstlast(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.Last = RIGHT.Last AND LEFT._Type = RIGHT._Type AND LEFT.First = RIGHT.First,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_firstlasttype(LEFT, RIGHT)),
+                  CheckOuter_firstlast(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_BankruptcySearch2Name);
@@ -4954,9 +7447,11 @@ END;
 EXPORT _df_BankruptcyPerson2(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_BankruptcyPerson2 L, layouts._lt_BankruptcyPerson2 R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
     shared boolean updated_SSN := (L.SSN != R.SSN);
 
     shared is_updated := false
+      OR updated_UniqueId
       OR updated_SSN;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
@@ -4966,7 +7461,8 @@ EXPORT _df_BankruptcyPerson2(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -4978,18 +7474,18 @@ EXPORT _df_BankruptcyPerson2(boolean is_active, string path) := MODULE
       SELF._diffmeta := IF(is_active, m._diffmeta);
         SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlasttype(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
-      SELF.Addresses  := L.Addresses;
 
-      updated_AddressesEx := _df_AddressWithRawInfo(is_active, path + '/AddressesEx/Address').AsDataset_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(L.AddressesEx, R.AddressesEx);
-      checked_AddressesEx := MAP (is_deleted => R.AddressesEx,
-                              is_added => L.AddressesEx,
-                              updated_AddressesEx);
-      SELF.AddressesEx  := checked_AddressesEx;
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
+      SELF.AddressesEx  := L.AddressesEx;
 
       updated_Phones := _df_DiffString(CASE(path + '/Phones', '/Bankruptcies/Bankruptcy/Debtors/Debtor/Phones' => (false), is_active), path + '/Phones/Phone10').AsDataset(L.Phones, R.Phones);
       checked_Phones := MAP (is_deleted => R.Phones,
@@ -5019,18 +7515,18 @@ EXPORT _df_BankruptcyPerson2(boolean is_active, string path) := MODULE
     SELF._diffmeta := IF(is_active, m._diffmeta);
          SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlasttype(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
-      SELF.Addresses  := L.Addresses;
 
-      updated_AddressesEx := _df_AddressWithRawInfo(is_active, path + '/AddressesEx/Address').AsDataset_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(L.AddressesEx, R.AddressesEx);
-      checked_AddressesEx := MAP (is_deleted => R.AddressesEx,
-                              is_added => L.AddressesEx,
-                              updated_AddressesEx);
-      SELF.AddressesEx  := checked_AddressesEx;
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
+      SELF.AddressesEx  := L.AddressesEx;
 
       updated_Phones := _df_DiffString(CASE(path + '/Phones', '/Bankruptcies/Bankruptcy/Debtors/Debtor/Phones' => (false), is_active), path + '/Phones/Phone10').AsDataset(L.Phones, R.Phones);
       checked_Phones := MAP (is_deleted => R.Phones,
@@ -5060,9 +7556,11 @@ END;
 EXPORT _df_BankruptcyReport2Debtor(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_BankruptcyReport2Debtor L, layouts._lt_BankruptcyReport2Debtor R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
     shared boolean updated_SSN := (L.SSN != R.SSN);
 
     shared is_updated := false
+      OR updated_UniqueId
       OR updated_SSN;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
@@ -5072,7 +7570,8 @@ EXPORT _df_BankruptcyReport2Debtor(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -5084,18 +7583,18 @@ EXPORT _df_BankruptcyReport2Debtor(boolean is_active, string path) := MODULE
       SELF._diffmeta := IF(is_active, m._diffmeta);
         SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlasttype(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
-      SELF.Addresses  := L.Addresses;
 
-      updated_AddressesEx := _df_AddressWithRawInfo(is_active, path + '/AddressesEx/Address').AsDataset_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(L.AddressesEx, R.AddressesEx);
-      checked_AddressesEx := MAP (is_deleted => R.AddressesEx,
-                              is_added => L.AddressesEx,
-                              updated_AddressesEx);
-      SELF.AddressesEx  := checked_AddressesEx;
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
+      SELF.AddressesEx  := L.AddressesEx;
 
       updated_Phones := _df_DiffString(CASE(path + '/Phones', '/Bankruptcies/Bankruptcy/Debtors/Debtor/Phones' => (false), is_active), path + '/Phones/Phone10').AsDataset(L.Phones, R.Phones);
       checked_Phones := MAP (is_deleted => R.Phones,
@@ -5128,18 +7627,18 @@ EXPORT _df_BankruptcyReport2Debtor(boolean is_active, string path) := MODULE
     SELF._diffmeta := IF(is_active, m._diffmeta);
          SELF.BusinessIds  := L.BusinessIds;
 
-      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlasttype(L.Names, R.Names);
+      updated_Names := _df_BankruptcySearch2Name(is_active, path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
       checked_Names := MAP (is_deleted => R.Names,
                               is_added => L.Names,
                               updated_Names);
       SELF.Names  := checked_Names;
-      SELF.Addresses  := L.Addresses;
 
-      updated_AddressesEx := _df_AddressWithRawInfo(is_active, path + '/AddressesEx/Address').AsDataset_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(L.AddressesEx, R.AddressesEx);
-      checked_AddressesEx := MAP (is_deleted => R.AddressesEx,
-                              is_added => L.AddressesEx,
-                              updated_AddressesEx);
-      SELF.AddressesEx  := checked_AddressesEx;
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
+      SELF.AddressesEx  := L.AddressesEx;
 
       updated_Phones := _df_DiffString(CASE(path + '/Phones', '/Bankruptcies/Bankruptcy/Debtors/Debtor/Phones' => (false), is_active), path + '/Phones/Phone10').AsDataset(L.Phones, R.Phones);
       checked_Phones := MAP (is_deleted => R.Phones,
@@ -5197,8 +7696,14 @@ END;
 EXPORT _df_BankruptcyReport2Record(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_BankruptcyReport2Record L, layouts._lt_BankruptcyReport2Record R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_FilingJurisdiction := (L.FilingJurisdiction != R.FilingJurisdiction);
+    shared boolean updated_CaseType := (L.CaseType != R.CaseType);
+    shared boolean updated_CaseNumber := (L.CaseNumber != R.CaseNumber);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_FilingJurisdiction
+      OR updated_CaseType
+      OR updated_CaseNumber;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -5207,7 +7712,9 @@ EXPORT _df_BankruptcyReport2Record(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_FilingJurisdiction, DATASET ([{'FilingJurisdiction', R.FilingJurisdiction}], layouts.DiffMetaRow))
+         +  IF (updated_CaseType, DATASET ([{'CaseType', R.CaseType}], layouts.DiffMetaRow))
+         +  IF (updated_CaseNumber, DATASET ([{'CaseNumber', R.CaseNumber}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -5316,9 +7823,11 @@ END;
 EXPORT _df_LienJudgmentParty(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_LienJudgmentParty L, layouts._lt_LienJudgmentParty R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
     shared boolean updated_SSN := (L.SSN != R.SSN);
 
     shared is_updated := false
+      OR updated_UniqueId
       OR updated_SSN;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
@@ -5328,7 +7837,8 @@ EXPORT _df_LienJudgmentParty(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -5413,8 +7923,12 @@ END;
 EXPORT _df_LienJudgmentDebtor(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_LienJudgmentDebtor L, layouts._lt_LienJudgmentDebtor R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_OriginName := (L.OriginName != R.OriginName);
+    shared boolean updated_SSN := (L.SSN != R.SSN);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_OriginName
+      OR updated_SSN;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -5423,7 +7937,8 @@ EXPORT _df_LienJudgmentDebtor(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_OriginName, DATASET ([{'OriginName', R.OriginName}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -5522,8 +8037,12 @@ END;
 EXPORT _df_LienJudgmentReportRecord(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_LienJudgmentReportRecord L, layouts._lt_LienJudgmentReportRecord R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_TMSId := (L.TMSId != R.TMSId);
+    shared boolean updated_OriginFilingNumber := (L.OriginFilingNumber != R.OriginFilingNumber);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_TMSId
+      OR updated_OriginFilingNumber;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -5532,7 +8051,8 @@ EXPORT _df_LienJudgmentReportRecord(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_TMSId, DATASET ([{'TMSId', R.TMSId}], layouts.DiffMetaRow))
+         +  IF (updated_OriginFilingNumber, DATASET ([{'OriginFilingNumber', R.OriginFilingNumber}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -5601,29 +8121,873 @@ EXPORT _df_LienJudgmentReportRecord(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_tmsid(layouts._lt_LienJudgmentReportRecord L, layouts._lt_LienJudgmentReportRecord R) := FUNCTION
-    boolean IsInner :=  (L.TMSId = R.TMSId);
+  EXPORT  integer1 CheckOuter_originfilingnumbertmsid(layouts._lt_LienJudgmentReportRecord L, layouts._lt_LienJudgmentReportRecord R) := FUNCTION
+    boolean IsInner :=  (L.OriginFilingNumber = R.OriginFilingNumber AND L.TMSId = R.TMSId);
 
-    boolean IsOuterRight :=   (L.TMSId = '');
+    boolean IsOuterRight :=   (L.OriginFilingNumber = '' AND L.TMSId = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_tmsid (dataset(layouts._lt_LienJudgmentReportRecord) _n, dataset(layouts._lt_LienJudgmentReportRecord) _o) := FUNCTION
+  EXPORT  AsDataset_originfilingnumbertmsid (dataset(layouts._lt_LienJudgmentReportRecord) _n, dataset(layouts._lt_LienJudgmentReportRecord) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_LienJudgmentReportRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_LienJudgmentReportRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.TMSId = RIGHT.TMSId,
+                  LEFT.OriginFilingNumber = RIGHT.OriginFilingNumber AND LEFT.TMSId = RIGHT.TMSId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_tmsid(LEFT, RIGHT)),
+                  CheckOuter_originfilingnumbertmsid(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.TMSId = RIGHT.TMSId,
+                  LEFT.OriginFilingNumber = RIGHT.OriginFilingNumber AND LEFT.TMSId = RIGHT.TMSId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_tmsid(LEFT, RIGHT)),
+                  CheckOuter_originfilingnumbertmsid(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_LienJudgmentReportRecord);
+  END;
+  
+END;
+
+EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_Property2Name L, layouts._lt_Property2Name R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_First := (L.First != R.First);
+    shared boolean updated_Last := (L.Last != R.Last);
+    shared boolean updated_IdValue := (L.IdValue != R.IdValue);
+    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
+    shared boolean updated_BusinessId := (L.BusinessId != R.BusinessId);
+    shared boolean updated_AppendedSSN := (L.AppendedSSN != R.AppendedSSN);
+    shared boolean updated_LinkingWeight := (L.LinkingWeight != R.LinkingWeight);
+
+    shared is_updated := false
+      OR updated_First
+      OR updated_Last
+      OR updated_IdValue
+      OR updated_UniqueId
+      OR updated_BusinessId
+      OR updated_AppendedSSN
+      OR updated_LinkingWeight;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))+ IF (updated_IdValue, DATASET ([{'IdValue', R.IdValue}], layouts.DiffMetaRow))
+         +  IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
+         +  IF (updated_BusinessId, DATASET ([{'BusinessId', R.BusinessId}], layouts.DiffMetaRow))
+         +  IF (updated_AppendedSSN, DATASET ([{'AppendedSSN', R.AppendedSSN}], layouts.DiffMetaRow))
+         +  IF (updated_LinkingWeight, DATASET ([{'LinkingWeight', R.LinkingWeight}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_Property2Name ProcessTx(layouts._lt_Property2Name L, layouts._lt_Property2Name R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.BusinessIds  := L.BusinessIds;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_Property2Name ProcessTxRow(layouts._lt_row_Property2Name L, layouts._lt_row_Property2Name R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.BusinessIds  := L.BusinessIds;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_Property2Name _new, layouts._lt_Property2Name _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_uniqueid(layouts._lt_Property2Name L, layouts._lt_Property2Name R) := FUNCTION
+    boolean IsInner :=  (L.UniqueId = R.UniqueId);
+
+    boolean IsOuterRight :=   (L.UniqueId = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_uniqueid (dataset(layouts._lt_Property2Name) _n, dataset(layouts._lt_Property2Name) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Property2Name, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Property2Name, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.UniqueId = RIGHT.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.UniqueId = RIGHT.UniqueId,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_uniqueid(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Property2Name);
+  END;
+  
+END;
+
+EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_Property2Entity L, layouts._lt_Property2Entity R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_Property2Entity ProcessTx(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_uniqueid(L.Names, R.Names);
+      checked_Names := MAP (is_deleted => R.Names,
+                              is_added => L.Names,
+                              updated_Names);
+      SELF.Names  := checked_Names;
+
+      updated_OriginalNames := _df_DiffString(is_active, path + '/OriginalNames/Name').AsDataset(L.OriginalNames, R.OriginalNames);
+      checked_OriginalNames := MAP (is_deleted => R.OriginalNames,
+                              is_added => L.OriginalNames,
+                              updated_OriginalNames);
+      SELF.OriginalNames := checked_OriginalNames;
+          SELF.OriginalNames2  := L.OriginalNames2;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.GeoLocation  := L.GeoLocation;
+      SELF.Phone  := L.Phone;
+      SELF.OriginalAddress  := L.OriginalAddress;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_Property2Entity ProcessTxRow(layouts._lt_row_Property2Entity L, layouts._lt_row_Property2Entity R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      updated_Names := _df_Property2Name(is_active, path + '/Names/Name').AsDataset_uniqueid(L.Names, R.Names);
+      checked_Names := MAP (is_deleted => R.Names,
+                              is_added => L.Names,
+                              updated_Names);
+      SELF.Names  := checked_Names;
+
+      updated_OriginalNames := _df_DiffString(is_active, path + '/OriginalNames/Name').AsDataset(L.OriginalNames, R.OriginalNames);
+      checked_OriginalNames := MAP (is_deleted => R.OriginalNames,
+                              is_added => L.OriginalNames,
+                              updated_OriginalNames);
+      SELF.OriginalNames := checked_OriginalNames;
+          SELF.OriginalNames2  := L.OriginalNames2;
+
+      path_Address := path + '/Address';
+    
+      updated_Address := _df_Address(is_active, path_Address).AsRecord(L.Address, R.Address);
+        
+      checked_Address := MAP (is_deleted => R.Address,
+                              is_added => L.Address,
+                              updated_Address);
+      SELF.Address := checked_Address;
+      SELF.GeoLocation  := L.GeoLocation;
+      SELF.Phone  := L.Phone;
+      SELF.OriginalAddress  := L.OriginalAddress;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_Property2Entity _new, layouts._lt_Property2Entity _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R) := FUNCTION
+    boolean IsInner :=  (L.Address.UnitNumber = R.Address.UnitNumber AND L.Address.StreetNumber = R.Address.StreetNumber AND L.Address.Zip5 = R.Address.Zip5 AND L.Address.StreetName = R.Address.StreetName AND L.Address.City = R.Address.City AND L.Address.State = R.Address.State);
+
+    boolean IsOuterRight :=   (L.Address.UnitNumber = '' AND L.Address.StreetNumber = '' AND L.Address.Zip5 = '' AND L.Address.StreetName = '' AND L.Address.City = '' AND L.Address.State = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5 (dataset(layouts._lt_Property2Entity) _n, dataset(layouts._lt_Property2Entity) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Property2Entity);
+  END;
+  
+END;
+
+EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_PropertyReport2Record L, layouts._lt_PropertyReport2Record R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_RecordType := (L.RecordType != R.RecordType);
+    shared boolean updated_ParcelNumber := (L.ParcelNumber != R.ParcelNumber);
+
+    shared is_updated := false
+      OR updated_RecordType
+      OR updated_ParcelNumber;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_RecordType, DATASET ([{'RecordType', R.RecordType}], layouts.DiffMetaRow))
+         +  IF (updated_ParcelNumber, DATASET ([{'ParcelNumber', R.ParcelNumber}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PropertyReport2Record ProcessTx(layouts._lt_PropertyReport2Record L, layouts._lt_PropertyReport2Record R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.BusinessIds  := L.BusinessIds;
+      SELF.Assessment  := L.Assessment;
+      SELF.Deed  := L.Deed;
+
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(L.Entities, R.Entities);
+      checked_Entities := MAP (is_deleted => R.Entities,
+                              is_added => L.Entities,
+                              updated_Entities);
+      SELF.Entities  := checked_Entities;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PropertyReport2Record ProcessTxRow(layouts._lt_row_PropertyReport2Record L, layouts._lt_row_PropertyReport2Record R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.BusinessIds  := L.BusinessIds;
+      SELF.Assessment  := L.Assessment;
+      SELF.Deed  := L.Deed;
+
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(L.Entities, R.Entities);
+      checked_Entities := MAP (is_deleted => R.Entities,
+                              is_added => L.Entities,
+                              updated_Entities);
+      SELF.Entities  := checked_Entities;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PropertyReport2Record _new, layouts._lt_PropertyReport2Record _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_parcelnumberrecordtype(layouts._lt_PropertyReport2Record L, layouts._lt_PropertyReport2Record R) := FUNCTION
+    boolean IsInner :=  (L.ParcelNumber = R.ParcelNumber AND L.RecordType = R.RecordType);
+
+    boolean IsOuterRight :=   (L.ParcelNumber = '' AND L.RecordType = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_parcelnumberrecordtype (dataset(layouts._lt_PropertyReport2Record) _n, dataset(layouts._lt_PropertyReport2Record) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PropertyReport2Record, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PropertyReport2Record, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.ParcelNumber = RIGHT.ParcelNumber AND LEFT.RecordType = RIGHT.RecordType,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_parcelnumberrecordtype(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.ParcelNumber = RIGHT.ParcelNumber AND LEFT.RecordType = RIGHT.RecordType,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_parcelnumberrecordtype(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PropertyReport2Record);
+  END;
+  
+END;
+
+EXPORT _df_MarriageSearch2Record(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_MarriageSearch2Record L, layouts._lt_MarriageSearch2Record R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_FilingTypeCode := (L.FilingTypeCode != R.FilingTypeCode);
+    shared boolean updated_StateOrigin := (L.StateOrigin != R.StateOrigin);
+    shared boolean updated_FilingNumber := (L.FilingNumber != R.FilingNumber);
+
+    shared is_updated := false
+      OR updated_FilingTypeCode
+      OR updated_StateOrigin
+      OR updated_FilingNumber;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_FilingTypeCode, DATASET ([{'FilingTypeCode', R.FilingTypeCode}], layouts.DiffMetaRow))
+         +  IF (updated_StateOrigin, DATASET ([{'StateOrigin', R.StateOrigin}], layouts.DiffMetaRow))
+         +  IF (updated_FilingNumber, DATASET ([{'FilingNumber', R.FilingNumber}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_MarriageSearch2Record ProcessTx(layouts._lt_MarriageSearch2Record L, layouts._lt_MarriageSearch2Record R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.FilingDate  := L.FilingDate;
+      SELF.MarriageDate  := L.MarriageDate;
+      SELF.DivorceDate  := L.DivorceDate;
+      SELF.Party1  := L.Party1;
+      SELF.Party2  := L.Party2;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_MarriageSearch2Record ProcessTxRow(layouts._lt_row_MarriageSearch2Record L, layouts._lt_row_MarriageSearch2Record R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.FilingDate  := L.FilingDate;
+      SELF.MarriageDate  := L.MarriageDate;
+      SELF.DivorceDate  := L.DivorceDate;
+      SELF.Party1  := L.Party1;
+      SELF.Party2  := L.Party2;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_MarriageSearch2Record _new, layouts._lt_MarriageSearch2Record _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_filingnumberfilingtypecodestateorigin(layouts._lt_MarriageSearch2Record L, layouts._lt_MarriageSearch2Record R) := FUNCTION
+    boolean IsInner :=  (L.FilingNumber = R.FilingNumber AND L.FilingTypeCode = R.FilingTypeCode AND L.StateOrigin = R.StateOrigin);
+
+    boolean IsOuterRight :=   (L.FilingNumber = '' AND L.FilingTypeCode = '' AND L.StateOrigin = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_filingnumberfilingtypecodestateorigin (dataset(layouts._lt_MarriageSearch2Record) _n, dataset(layouts._lt_MarriageSearch2Record) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_MarriageSearch2Record, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_MarriageSearch2Record, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.FilingNumber = RIGHT.FilingNumber AND LEFT.FilingTypeCode = RIGHT.FilingTypeCode AND LEFT.StateOrigin = RIGHT.StateOrigin,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_filingnumberfilingtypecodestateorigin(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.FilingNumber = RIGHT.FilingNumber AND LEFT.FilingTypeCode = RIGHT.FilingTypeCode AND LEFT.StateOrigin = RIGHT.StateOrigin,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_filingnumberfilingtypecodestateorigin(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_MarriageSearch2Record);
+  END;
+  
+END;
+
+EXPORT _df_StudentRecord(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_StudentRecord L, layouts._lt_StudentRecord R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_StudentRecord ProcessTx(layouts._lt_StudentRecord L, layouts._lt_StudentRecord R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_FirstReported := path + '/FirstReported';
+    
+      updated_FirstReported := _df_Date(is_active, path_FirstReported).AsRecord(L.FirstReported, R.FirstReported);
+        
+      checked_FirstReported := MAP (is_deleted => R.FirstReported,
+                              is_added => L.FirstReported,
+                              updated_FirstReported);
+      SELF.FirstReported := checked_FirstReported;
+      SELF.LastReported  := L.LastReported;
+
+      path_AddressAtCollege := path + '/AddressAtCollege';
+    
+      updated_AddressAtCollege := _df_Address(is_active, path_AddressAtCollege).AsRecord(L.AddressAtCollege, R.AddressAtCollege);
+        
+      checked_AddressAtCollege := MAP (is_deleted => R.AddressAtCollege,
+                              is_added => L.AddressAtCollege,
+                              updated_AddressAtCollege);
+      SELF.AddressAtCollege := checked_AddressAtCollege;
+      SELF.DOB  := L.DOB;
+      SELF.CollegeData  := L.CollegeData;
+      SELF.StudentData  := L.StudentData;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_StudentRecord ProcessTxRow(layouts._lt_row_StudentRecord L, layouts._lt_row_StudentRecord R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_FirstReported := path + '/FirstReported';
+    
+      updated_FirstReported := _df_Date(is_active, path_FirstReported).AsRecord(L.FirstReported, R.FirstReported);
+        
+      checked_FirstReported := MAP (is_deleted => R.FirstReported,
+                              is_added => L.FirstReported,
+                              updated_FirstReported);
+      SELF.FirstReported := checked_FirstReported;
+      SELF.LastReported  := L.LastReported;
+
+      path_AddressAtCollege := path + '/AddressAtCollege';
+    
+      updated_AddressAtCollege := _df_Address(is_active, path_AddressAtCollege).AsRecord(L.AddressAtCollege, R.AddressAtCollege);
+        
+      checked_AddressAtCollege := MAP (is_deleted => R.AddressAtCollege,
+                              is_added => L.AddressAtCollege,
+                              updated_AddressAtCollege);
+      SELF.AddressAtCollege := checked_AddressAtCollege;
+      SELF.DOB  := L.DOB;
+      SELF.CollegeData  := L.CollegeData;
+      SELF.StudentData  := L.StudentData;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_StudentRecord _new, layouts._lt_StudentRecord _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(layouts._lt_StudentRecord L, layouts._lt_StudentRecord R) := FUNCTION
+    boolean IsInner :=  (L.AddressAtCollege.Zip5 = R.AddressAtCollege.Zip5 AND L.AddressAtCollege.State = R.AddressAtCollege.State AND L.FirstReported.Year = R.FirstReported.Year AND L.FirstReported.Day = R.FirstReported.Day AND L.FirstReported.Month = R.FirstReported.Month);
+
+    boolean IsOuterRight :=   (L.AddressAtCollege.Zip5 = '' AND L.AddressAtCollege.State = '' AND L.FirstReported.Year = 0 AND L.FirstReported.Day = 0 AND L.FirstReported.Month = 0);
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year (dataset(layouts._lt_StudentRecord) _n, dataset(layouts._lt_StudentRecord) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_StudentRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_StudentRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.AddressAtCollege.Zip5 = RIGHT.AddressAtCollege.Zip5 AND LEFT.AddressAtCollege.State = RIGHT.AddressAtCollege.State AND LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.AddressAtCollege.Zip5 = RIGHT.AddressAtCollege.Zip5 AND LEFT.AddressAtCollege.State = RIGHT.AddressAtCollege.State AND LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_StudentRecord);
+  END;
+  
+END;
+
+EXPORT _df_SSNInfoEx(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_SSNInfoEx L, layouts._lt_SSNInfoEx R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_SSN := (L.SSN != R.SSN);
+
+    shared is_updated := false
+      OR updated_SSN;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_SSNInfoEx ProcessTx(layouts._lt_SSNInfoEx L, layouts._lt_SSNInfoEx R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.IssuedStartDate  := L.IssuedStartDate;
+      SELF.IssuedEndDate  := L.IssuedEndDate;
+      SELF.HighRiskIndicators  := L.HighRiskIndicators;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT AsRecord (layouts._lt_SSNInfoEx _new, layouts._lt_SSNInfoEx _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_BpsReportIdentity L, layouts._lt_BpsReportIdentity R, boolean is_deleted, boolean is_added) := MODULE
+
+    shared is_updated := false;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_BpsReportIdentity ProcessTx(layouts._lt_BpsReportIdentity L, layouts._lt_BpsReportIdentity R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_SSNInfoEx := path + '/SSNInfoEx';
+    
+      updated_SSNInfoEx := _df_SSNInfoEx(CASE(path_SSNInfoEx, '/Imposters/Imposter/SSNInfoEx' => (false), is_active), path_SSNInfoEx).AsRecord(L.SSNInfoEx, R.SSNInfoEx);
+        
+      checked_SSNInfoEx := MAP (is_deleted => R.SSNInfoEx,
+                              is_added => L.SSNInfoEx,
+                              updated_SSNInfoEx);
+      SELF.SSNInfoEx := checked_SSNInfoEx;
+      SELF.DOB  := L.DOB;
+      SELF.DOD  := L.DOD;
+      SELF.UtilityFactorDate  := L.UtilityFactorDate;
+      SELF.DriverLicenses  := L.DriverLicenses;
+      SELF.DriverLicenses2  := L.DriverLicenses2;
+      SELF.CriminalHistories  := L.CriminalHistories;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_BpsReportIdentity ProcessTxRow(layouts._lt_row_BpsReportIdentity L, layouts._lt_row_BpsReportIdentity R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+
+      path_SSNInfoEx := path + '/SSNInfoEx';
+    
+      updated_SSNInfoEx := _df_SSNInfoEx(CASE(path_SSNInfoEx, '/Imposters/Imposter/SSNInfoEx' => (false), is_active), path_SSNInfoEx).AsRecord(L.SSNInfoEx, R.SSNInfoEx);
+        
+      checked_SSNInfoEx := MAP (is_deleted => R.SSNInfoEx,
+                              is_added => L.SSNInfoEx,
+                              updated_SSNInfoEx);
+      SELF.SSNInfoEx := checked_SSNInfoEx;
+      SELF.DOB  := L.DOB;
+      SELF.DOD  := L.DOD;
+      SELF.UtilityFactorDate  := L.UtilityFactorDate;
+      SELF.DriverLicenses  := L.DriverLicenses;
+      SELF.DriverLicenses2  := L.DriverLicenses2;
+      SELF.CriminalHistories  := L.CriminalHistories;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_BpsReportIdentity _new, layouts._lt_BpsReportIdentity _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_name_firstname_lastssninfoex_ssn(layouts._lt_BpsReportIdentity L, layouts._lt_BpsReportIdentity R) := FUNCTION
+    boolean IsInner :=  (L.Name.Last = R.Name.Last AND L.Name.First = R.Name.First AND L.SSNInfoEx.SSN = R.SSNInfoEx.SSN);
+
+    boolean IsOuterRight :=   (L.Name.Last = '' AND L.Name.First = '' AND L.SSNInfoEx.SSN = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_name_firstname_lastssninfoex_ssn (dataset(layouts._lt_BpsReportIdentity) _n, dataset(layouts._lt_BpsReportIdentity) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_BpsReportIdentity, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_BpsReportIdentity, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Name.Last = RIGHT.Name.Last AND LEFT.Name.First = RIGHT.Name.First AND LEFT.SSNInfoEx.SSN = RIGHT.SSNInfoEx.SSN,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_name_firstname_lastssninfoex_ssn(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Name.Last = RIGHT.Name.Last AND LEFT.Name.First = RIGHT.Name.First AND LEFT.SSNInfoEx.SSN = RIGHT.SSNInfoEx.SSN,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_name_firstname_lastssninfoex_ssn(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_BpsReportIdentity);
+  END;
+  
+END;
+
+EXPORT _df_PersonSlimReportUtility(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_PersonSlimReportUtility L, layouts._lt_PersonSlimReportUtility R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_UtilType := (L.UtilType != R.UtilType);
+
+    shared is_updated := false
+      OR updated_UtilType;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_UtilType, DATASET ([{'UtilType', R.UtilType}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_PersonSlimReportUtility ProcessTx(layouts._lt_PersonSlimReportUtility L, layouts._lt_PersonSlimReportUtility R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+        SELF.ConnectDate  := L.ConnectDate;
+      SELF.DateFirstSeen  := L.DateFirstSeen;
+
+      path_RecordDate := path + '/RecordDate';
+    
+      updated_RecordDate := _df_Date(is_active, path_RecordDate).AsRecord(L.RecordDate, R.RecordDate);
+        
+      checked_RecordDate := MAP (is_deleted => R.RecordDate,
+                              is_added => L.RecordDate,
+                              updated_RecordDate);
+      SELF.RecordDate := checked_RecordDate;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+      SELF.DOB  := L.DOB;
+
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_PersonSlimReportUtility ProcessTxRow(layouts._lt_row_PersonSlimReportUtility L, layouts._lt_row_PersonSlimReportUtility R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+         SELF.ConnectDate  := L.ConnectDate;
+      SELF.DateFirstSeen  := L.DateFirstSeen;
+
+      path_RecordDate := path + '/RecordDate';
+    
+      updated_RecordDate := _df_Date(is_active, path_RecordDate).AsRecord(L.RecordDate, R.RecordDate);
+        
+      checked_RecordDate := MAP (is_deleted => R.RecordDate,
+                              is_added => L.RecordDate,
+                              updated_RecordDate);
+      SELF.RecordDate := checked_RecordDate;
+
+      path_Name := path + '/Name';
+    
+      updated_Name := _df_Name(is_active, path_Name).AsRecord(L.Name, R.Name);
+        
+      checked_Name := MAP (is_deleted => R.Name,
+                              is_added => L.Name,
+                              updated_Name);
+      SELF.Name := checked_Name;
+      SELF.DOB  := L.DOB;
+
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_PersonSlimReportUtility _new, layouts._lt_PersonSlimReportUtility _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+  EXPORT  integer1 CheckOuter_recorddate_dayrecorddate_monthrecorddate_yearutiltype(layouts._lt_PersonSlimReportUtility L, layouts._lt_PersonSlimReportUtility R) := FUNCTION
+    boolean IsInner :=  (L.UtilType = R.UtilType AND L.RecordDate.Year = R.RecordDate.Year AND L.RecordDate.Day = R.RecordDate.Day AND L.RecordDate.Month = R.RecordDate.Month);
+
+    boolean IsOuterRight :=   (L.UtilType = '' AND L.RecordDate.Year = 0 AND L.RecordDate.Day = 0 AND L.RecordDate.Month = 0);
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_recorddate_dayrecorddate_monthrecorddate_yearutiltype (dataset(layouts._lt_PersonSlimReportUtility) _n, dataset(layouts._lt_PersonSlimReportUtility) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PersonSlimReportUtility, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PersonSlimReportUtility, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.UtilType = RIGHT.UtilType AND LEFT.RecordDate.Year = RIGHT.RecordDate.Year AND LEFT.RecordDate.Day = RIGHT.RecordDate.Day AND LEFT.RecordDate.Month = RIGHT.RecordDate.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_recorddate_dayrecorddate_monthrecorddate_yearutiltype(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.UtilType = RIGHT.UtilType AND LEFT.RecordDate.Year = RIGHT.RecordDate.Year AND LEFT.RecordDate.Day = RIGHT.RecordDate.Day AND LEFT.RecordDate.Month = RIGHT.RecordDate.Month,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_recorddate_dayrecorddate_monthrecorddate_yearutiltype(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PersonSlimReportUtility);
   END;
   
 END;
@@ -5636,29 +9000,37 @@ EXPORT _df_PersonSlimReportResponse(boolean is_active, string path) := MODULE
   
       SELF.UniqueId := L.UniqueId;
 
-      SELF.Addresses  := _df_PersonSlimReportAddress(CASE(path + '/Addresses', '/Addresses' => (MonitorAddress), is_active), path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberstreetpredirectionunitnumberzip5(L.Addresses, R.Addresses);
+      SELF.Addresses  := _df_PersonSlimReportAddress(CASE(path + '/Addresses', '/Addresses' => (MonitorAddress), is_active), path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
 
-        SELF.Phones := L.Phones;
+      SELF.Names  := _df_PersonSlimReportName(CASE(path + '/Names', '/Names' => (MonitorName), is_active), path + '/Names/Name').AsDataset_firstlast(L.Names, R.Names);
 
-        SELF.ProfessionalLicenses := L.ProfessionalLicenses;
+      SELF.Phones  := _df_PersonSlimReportPhone(CASE(path + '/Phones', '/Phones' => (MonitorPhones), is_active), path + '/Phones/Entry').AsDataset_phone(L.Phones, R.Phones);
 
-        SELF.PeopleAtWorks := L.PeopleAtWorks;
+      SELF.Deaths  := _df_PersonSlimReportDeath(CASE(path + '/Deaths', '/Deaths' => (MonitorDeath), is_active), path + '/Deaths/Death').AsDataset_daymonthyear(L.Deaths, R.Deaths);
 
-        SELF.Aircrafts := L.Aircrafts;
+      SELF.DOBs  := _df_PersonSlimReportDOB(CASE(path + '/DOBs', '/DOBs' => (MonitorDOB), is_active), path + '/DOBs/DOB').AsDataset_daymonthyear(L.DOBs, R.DOBs);
+
+      SELF.SSNs  := _df_PersonSlimReportSSN(CASE(path + '/SSNs', '/SSNs' => (MonitorSSNs), is_active), path + '/SSNs/Entry').AsDataset_ssn(L.SSNs, R.SSNs);
+
+      SELF.ProfessionalLicenses  := _df_ProfessionalLicenseRecord(CASE(path + '/ProfessionalLicenses', '/ProfessionalLicenses' => (MonitorProfessionalLicense), is_active), path + '/ProfessionalLicenses/ProfessionalLicense').AsDataset_licensenumbersourcestate(L.ProfessionalLicenses, R.ProfessionalLicenses);
+
+      SELF.PeopleAtWorks  := _df_PeopleAtWorkRecord(CASE(path + '/PeopleAtWorks', '/PeopleAtWorks' => (MonitorPeopleAtWork), is_active), path + '/PeopleAtWorks/PeopleAtWork').AsDataset_businessids_orgidbusinessids_seleidbusinessids_ultidcompanynametitle(L.PeopleAtWorks, R.PeopleAtWorks);
+
+      SELF.Aircrafts  := _df_AircraftReportRecord(CASE(path + '/Aircrafts', '/Aircrafts' => (MonitorAircraft), is_active), path + '/Aircrafts/Aircraft').AsDataset_aircraftnumber(L.Aircrafts, R.Aircrafts);
 
       SELF.FAACertifications  := _df_BpsFAACertification(CASE(path + '/FAACertifications', '/FAACertifications' => (MonitorCertification), is_active), path + '/FAACertifications/Certification').AsDataset_address_countyaddress_state(L.FAACertifications, R.FAACertifications);
 
-        SELF.WaterCrafts := L.WaterCrafts;
+      SELF.WaterCrafts  := _df_WaterCraftReportRecord(CASE(path + '/WaterCrafts', '/WaterCrafts' => (MonitorWaterCraft), is_active), path + '/WaterCrafts/WaterCraft').AsDataset_hullnumberstateoforigin(L.WaterCrafts, R.WaterCrafts);
 
-        SELF.UCCFilings := L.UCCFilings;
+      SELF.UCCFilings  := _df_UCCReport2Record(CASE(path + '/UCCFilings', '/UCCFilings' => (MonitorUCCFiling), is_active), path + '/UCCFilings/UCCFiling').AsDataset_filingjurisdictionoriginfilingnumber(L.UCCFilings, R.UCCFilings);
 
-        SELF.SexualOffenses := L.SexualOffenses;
+      SELF.SexualOffenses  := _df_SexOffReportRecord(CASE(path + '/SexualOffenses', '/SexualOffenses' => (MonitorSexualOffense), is_active), path + '/SexualOffenses/SexualOffense').AsDataset_primarykey(L.SexualOffenses, R.SexualOffenses);
 
-        SELF.Criminals := L.Criminals;
+      SELF.Criminals  := _df_CrimReportRecord(CASE(path + '/Criminals', '/Criminals' => (MonitorCriminal), is_active), path + '/Criminals/Criminal').AsDataset_offenderid(L.Criminals, R.Criminals);
 
-        SELF.WeaponPermits := L.WeaponPermits;
+      SELF.WeaponPermits  := _df_WeaponRecord(CASE(path + '/WeaponPermits', '/WeaponPermits' => (MonitorWeaponPermit), is_active), path + '/WeaponPermits/WeaponPermit').AsDataset_permit_permitnumberpermit_permittypestatecode(L.WeaponPermits, R.WeaponPermits);
 
-      SELF.HuntingFishingLicenses  := _df_HuntFishRecord(CASE(path + '/HuntingFishingLicenses', '/HuntingFishingLicenses' => (MonitorHuntingFishingLicense), is_active), path + '/HuntingFishingLicenses/HuntingFishingLicense').AsDataset_licensedate_yearlicensenumberlicensetype(L.HuntingFishingLicenses, R.HuntingFishingLicenses);
+      SELF.HuntingFishingLicenses  := _df_HuntFishRecord(CASE(path + '/HuntingFishingLicenses', '/HuntingFishingLicenses' => (MonitorHuntingFishingLicense), is_active), path + '/HuntingFishingLicenses/HuntingFishingLicense').AsDataset_licensenumberlicensestatelicensetype(L.HuntingFishingLicenses, R.HuntingFishingLicenses);
 
       SELF.FirearmExplosives  := _df_FirearmRecord(CASE(path + '/FirearmExplosives', '/FirearmExplosives' => (MonitorFirearmExplosive), is_active), path + '/FirearmExplosives/FirearmExplosive').AsDataset_licenseissuestatelicensenumber(L.FirearmExplosives, R.FirearmExplosives);
 
@@ -5670,25 +9042,23 @@ EXPORT _df_PersonSlimReportResponse(boolean is_active, string path) := MODULE
 
       SELF.Vehicles  := _df_MotorVehicleReport2Record(CASE(path + '/Vehicles', '/Vehicles' => (MonitorVehicle), is_active), path + '/Vehicles/Vehicle').AsDataset_vehicleinfo_makevehicleinfo_modelvehicleinfo_vin(L.Vehicles, R.Vehicles);
 
-        SELF.Accidents := L.Accidents;
+      SELF.Accidents  := _df_AccidentReportRecord(CASE(path + '/Accidents', '/Accidents' => (MonitorAccident), is_active), path + '/Accidents/Accident').AsDataset_accidentdate_yearaccidentstateinvestigation_investigationagent_agentreportnumber(L.Accidents, R.Accidents);
 
       SELF.Bankruptcies  := _df_BankruptcyReport2Record(CASE(path + '/Bankruptcies', '/Bankruptcies' => (MonitorBankruptcy), is_active), path + '/Bankruptcies/Bankruptcy').AsDataset_casenumbercasetypefilingjurisdiction(L.Bankruptcies, R.Bankruptcies);
 
-      SELF.LiensJudgments  := _df_LienJudgmentReportRecord(CASE(path + '/LiensJudgments', '/LiensJudgments' => (MonitorLienJudgment), is_active), path + '/LiensJudgments/LienJudgment').AsDataset_tmsid(L.LiensJudgments, R.LiensJudgments);
+      SELF.LiensJudgments  := _df_LienJudgmentReportRecord(CASE(path + '/LiensJudgments', '/LiensJudgments' => (MonitorLienJudgment), is_active), path + '/LiensJudgments/LienJudgment').AsDataset_originfilingnumbertmsid(L.LiensJudgments, R.LiensJudgments);
 
-        SELF.Properties := L.Properties;
+      SELF.Properties  := _df_PropertyReport2Record(CASE(path + '/Properties', '/Properties' => (MonitorProperty), is_active), path + '/Properties/Property').AsDataset_parcelnumberrecordtype(L.Properties, R.Properties);
 
-        SELF.MarriageDivorces := L.MarriageDivorces;
+      SELF.MarriageDivorces  := _df_MarriageSearch2Record(CASE(path + '/MarriageDivorces', '/MarriageDivorces' => (MonitorMarriageDivorce), is_active), path + '/MarriageDivorces/MarriageDivorce').AsDataset_filingnumberfilingtypecodestateorigin(L.MarriageDivorces, R.MarriageDivorces);
 
-        SELF.Educations := L.Educations;
+      SELF.Educations  := _df_StudentRecord(CASE(path + '/Educations', '/Educations' => (MonitorEducation), is_active), path + '/Educations/Education').AsDataset_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(L.Educations, R.Educations);
 
-        SELF.AKAs := L.AKAs;
+      SELF.AKAs  := _df_BpsReportIdentity(CASE(path + '/AKAs', '/AKAs' => (MonitorAKA), is_active), path + '/AKAs/AKA').AsDataset_name_firstname_lastssninfoex_ssn(L.AKAs, R.AKAs);
 
-        SELF.Imposters := L.Imposters;
+      SELF.Imposters  := _df_BpsReportIdentity(CASE(path + '/Imposters', '/Imposters' => (MonitorImposter), is_active), path + '/Imposters/Imposter').AsDataset_name_firstname_lastssninfoex_ssn(L.Imposters, R.Imposters);
 
-        SELF.Deaths := L.Deaths;
-
-        SELF.Utilities := L.Utilities;
+      SELF.Utilities  := _df_PersonSlimReportUtility(CASE(path + '/Utilities', '/Utilities' => (MonitorUtility), is_active), path + '/Utilities/Utility').AsDataset_recorddate_dayrecorddate_monthrecorddate_yearutiltype(L.Utilities, R.Utilities);
 END;
 
     EXPORT AsRecord (layouts._lt_PersonSlimReportResponse _new, layouts._lt_PersonSlimReportResponse _old) := FUNCTION
@@ -5828,5 +9198,7 @@ END;
     boolean active {xpath('@active')};
   END;
 
-    OUTPUT(DATASET([{'Address', difference.MonitorAddress},{'Certification', difference.MonitorCertification},{'HuntingFishingLicense', difference.MonitorHuntingFishingLicense},{'FirearmExplosive', difference.MonitorFirearmExplosive},{'ControlledSubstance', difference.MonitorControlledSubstance},{'VoterRegistration', difference.MonitorVoterRegistration},{'Driver', difference.MonitorDriver},{'Vehicle', difference.MonitorVehicle},{'Bankruptcy', difference.MonitorBankruptcy},{'LienJudgment', difference.MonitorLienJudgment}], SelectorRec), NAMED('Selected'));
-  /*** Generated Code do not hand edit ***/
+    OUTPUT(DATASET([{'Address', difference.MonitorAddress},{'Name', difference.MonitorName},{'Phones', difference.MonitorPhones},{'Death', difference.MonitorDeath},{'DOB', difference.MonitorDOB},{'SSNs', difference.MonitorSSNs},{'ProfessionalLicense', difference.MonitorProfessionalLicense},{'PeopleAtWork', difference.MonitorPeopleAtWork},{'Aircraft', difference.MonitorAircraft},{'Certification', difference.MonitorCertification},{'WaterCraft', difference.MonitorWaterCraft},{'UCCFiling', difference.MonitorUCCFiling},{'SexualOffense', difference.MonitorSexualOffense},{'Criminal', difference.MonitorCriminal},{'WeaponPermit', difference.MonitorWeaponPermit},{'HuntingFishingLicense', difference.MonitorHuntingFishingLicense},{'FirearmExplosive', difference.MonitorFirearmExplosive},{'ControlledSubstance', difference.MonitorControlledSubstance},{'VoterRegistration', difference.MonitorVoterRegistration},{'Driver', difference.MonitorDriver},{'Vehicle', difference.MonitorVehicle},{'Accident', difference.MonitorAccident},{'Bankruptcy', difference.MonitorBankruptcy},{'LienJudgment', difference.MonitorLienJudgment},{'Property', difference.MonitorProperty},{'MarriageDivorce', difference.MonitorMarriageDivorce},{'Education', difference.MonitorEducation},{'AKA', difference.MonitorAKA},{'Imposter', difference.MonitorImposter},{'Utility', difference.MonitorUtility}], SelectorRec), NAMED('Selected'));
+  
+ENDMACRO;
+/*** Generated Code do not hand edit ***/

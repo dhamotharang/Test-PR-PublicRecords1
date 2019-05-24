@@ -2,7 +2,6 @@
 EXPORT ReportService() := FUNCTION
   //to use the new salt library version
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-  #CONSTANT('IncludeNonDMVSources', TRUE);
 
   ds_in     := DATASET([], iesp.personslimreport.t_PersonSlimReportRequest) : STORED('PersonSlimReportRequest',FEW);
   first_row := ds_in[1] : INDEPENDENT;
