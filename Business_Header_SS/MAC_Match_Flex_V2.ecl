@@ -1,4 +1,4 @@
-import business_header, bipv2,_control;
+﻿import business_header, bipv2,_control;
 EXPORT MAC_Match_Flex_V2
 (
    infile
@@ -261,7 +261,7 @@ project(
     self.cntr := counter,
     self.%zipset% :=
       #if('A' in matchset)
-        DATASET([{left.zip_field,100}],BizLinkFull.Process_Biz_layouts.layout_zip_cases);
+        If(left.zip_field <> '', DATASET([{left.zip_field,100}],BizLinkFull.Process_Biz_layouts.layout_zip_cases), DATASET([],BizLinkFull.Process_Biz_layouts.layout_zip_cases));
       #else
         DATASET([],BizLinkFull.Process_Biz_layouts.layout_zip_cases);
       #end
@@ -469,7 +469,7 @@ boolean %ThorForced% := %force% = 'thor';
     ,                       //Input_has_lgid = ''
     ,                       //Input_empid = ''
     ,                       //Input_powid = ''
-    ,pContact_ssn            //Input_pContact_ssn = ''        // ****     NEEDS NEW VERSION OF BIZLINKFULL
+    ,pContact_ssn            //Input_pContact_ssn = ''        // ****     NEEDS NEW VERSION OF BizLinkFull
     ,                       //Input_contact_email = ''
     ,src_matching_is_priority                               // ****     WE CAN DROP THIS HERE FOR NOW SINCE WE ARENT USING IT YET
     
