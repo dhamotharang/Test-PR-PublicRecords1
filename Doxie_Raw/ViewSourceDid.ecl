@@ -1,12 +1,12 @@
 ﻿import Doxie, Doxie_Raw, doxie_ln, utilfile, header_quick, autokeyb, ut, moxie_phonesplus_server, 
-       LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services,American_Student_Services;
+       LN_PropertyV2_Services, mdr, iesp, AutoStandardI, CriminalRecords_Services, American_Student_Services;
 
 doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare ();
 
 export ViewSourceDid(
     dataset(Doxie_Raw.Layout_input) input,
-    doxie.IDataAccess mod_access,
+    doxie.IDataAccess modAccess,
     boolean IsCRS = false,
     BankruptcyVersion = 0,
     JudgmentLienVersion = 0,
@@ -20,6 +20,7 @@ export ViewSourceDid(
 ) := FUNCTION
 
 global_mod := AutoStandardI.GlobalModule();
+mod_access := PROJECT (modAccess, doxie.IDataAccess); //Code Generator sometimes doesn't recongize the "type" of an input module
 
 //================== Section Select ==========================
 boolean IncludeBlankDOD := false : stored('IncludeBlankDOD');
@@ -198,14 +199,17 @@ Doxie_raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
     ds_targ_child := if(viewTargus(fileL.section), Doxie_raw.Targus_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.industry_class));
     ds_pp_child := if(viewPP(fileL.section), moxie_phonesplus_server.phonesplus_did_records(dids, ut.limits.CRS_SOURCE_COUNT.default, score_threshold_value,mod_access.glb,mod_access.dppa,,true).wo_timezone);
     ds_fbn_v2_child := if(viewFBNv2(fileL.section), iesp.transform_FBN(Doxie_Raw.FBNV2_Raw(dids)));
-    studentMod:= MODULE(PROJECT(global_mod, American_Student_Services.IParam.searchParams,opt))		
+    studentMod:= MODULE(mod_access, global_mod)
+      EXPORT string DataPermissionMask := mod_access.DataPermissionMask; //conflicting definition;
+      EXPORT string DataRestrictionMask :=  mod_access.DataRestrictionMask; //conflicting definition;
+
       EXPORT unsigned2 penalty_threshold := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(project(global_mod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params)); ;
       EXPORT STRING14  didValue := input[1].id;
       EXPORT BOOLEAN 	 isDeepDive := false;
-      EXPORT unsigned1 dob_mask_value := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(global_mod, AutoStandardI.InterfaceTranslator.dob_mask_value.params));      				
-      EXPORT STRING32  ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(global_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
+      EXPORT STRING32  ApplicationType := mod_access.application_type;
     END;
-    ds_student := if (viewStudent(fileL.section), American_Student_Services.SearchRecords(studentMod, 3));
+    ds_student := if (viewStudent(fileL.section), American_Student_Services.SearchRecords(PROJECT (studentMod, American_Student_Services.IParam.searchParams, OPT), 3));
+
 
     self.death_child := CHOOSEN (ds_death_child, ut.limits.CRS_SOURCE_COUNT.default);
     self.state_death_child := CHOOSEN (ds_state_death_child, ut.limits.CRS_SOURCE_COUNT.default);

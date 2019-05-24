@@ -1,4 +1,4 @@
-IMPORT DOXIE, American_student_list, AutoheaderI, American_Student_Services;
+IMPORT doxie, AutoheaderI, American_Student_Services;
 
 EXPORT SearchRecords(American_Student_Services.IParam.searchParams aInputData, unsigned1 ds_exclusion = 0) := FUNCTION
 	

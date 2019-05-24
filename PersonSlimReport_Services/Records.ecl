@@ -147,7 +147,7 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
                            iesp.Constants.PersonSlim.MaxMarriageDiv));
 													 
  //***STUDENT EDUCATION RECS***\\ // DATASET([],iesp.student.t_StudentRecord);
- student_mod := module(project(globalMod, American_Student_Services.IParam.reportParams,opt)) end;	
+ student_mod := module(project(mod_access, American_Student_Services.IParam.reportParams)) end;							
  eduStudentV2 := if(in_mod.IncludeEducation,
                  CHOOSEN(PersonSlimReport_Services.Functions(did_safe).studentRecsByDid(student_mod),
                         iesp.Constants.PersonSlim.MaxStudent));

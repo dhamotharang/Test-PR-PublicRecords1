@@ -1,4 +1,4 @@
-﻿import iesp, AutoStandardI, ut, doxie, suppress,American_student_list,American_student_services, standard,codes,risk_indicators,American_Student_Services,lib_stringlib, std;
+﻿import iesp, AutoStandardI, ut, doxie, suppress, American_student_list, American_student_services, standard, risk_indicators, std;
 
 export Functions := MODULE
 
@@ -41,14 +41,11 @@ export Functions := MODULE
 	
 	EXPORT apply_restrictions(DATASET(American_Student_Services.Layouts.finalRecs) ds_recs, 													
 													American_Student_Services.IParam.reportParams aInputData) := FUNCTION
-		// DPPA CHECKING.		
-		dppa_purpose := aInputData.dppaPurpose;
-		Suppress.MAC_Suppress(ds_recs,pull_ssns,aInputData.applicationType,Suppress.Constants.LinkTypes.SSN,ssn);
-		Suppress.MAC_Suppress(pull_ssns,ds_recs_out,aInputData.applicationType,Suppress.Constants.LinkTypes.DID,did);
+
+		Suppress.MAC_Suppress(ds_recs,pull_ssns,aInputData.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+		Suppress.MAC_Suppress(pull_ssns,ds_recs_out,aInputData.application_type,Suppress.Constants.LinkTypes.DID,did);
  
-		ssn_mask_value := aInputData.ssnMask;
-      
-    suppress.mac_mask(ds_recs_out, ds_recs_out_0, ssn, '', true, false);  
+    suppress.mac_mask(ds_recs_out, ds_recs_out_0, ssn, '', true, false, , , , aInputData.ssn_mask);  
 		
 		layout_dobmask := record
 			ds_recs_out;
@@ -64,10 +61,7 @@ export Functions := MODULE
 		
 		pre_dobmask_ready := project(ds_recs_out_0,pre_dm_trans(left));
 		
-		
-	  unsigned1  mask := aInputData.dob_mask_value;
-		
-		Suppress.MAC_Mask_Date(pre_dobmask_ready, post_dobmask_ready, dob_unmasked, dob_masked, mask);
+		Suppress.MAC_Mask_Date(pre_dobmask_ready, post_dobmask_ready, dob_unmasked, dob_masked, aInputData.dob_mask);
 		
 		ds_recs_out_0 xform_out(layout_dobmask l) := transform
 			self.dob_formatted := l.dob_masked.year + l.dob_masked.month + l.dob_masked.day;
@@ -78,7 +72,7 @@ export Functions := MODULE
 		RETURN records;
 	END;
 	
-	Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
+	SHARED Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
 		now		:= (STRING8)Std.Date.Today();
 		high	:= (unsigned)now[1..4] + delta;
 		test	:= yy + ((unsigned)now[1..2]*100);
@@ -178,16 +172,6 @@ export Functions := MODULE
 	 sortedrecs := sort(recsA, did, class, class_score, college_name, college_code, college_type);
 	 doutrecs := dedup(sortedrecs, did, class, class_score, college_name, college_code, college_type);
 	 soutrecs := sort(doutrecs, class_score);
-	 
-	 // this isnt' in prod repository yet..  ut.date_yy_to_YYYY, so i'll just use it locally for now 
-	Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
-		now		:= (STRING8)Std.Date.Today();
-		high	:= (unsigned)now[1..4] + delta;
-		test	:= yy + ((unsigned)now[1..2]*100);
-		yyyy	:= if(test<=high, test, test-100);
-		return yyyy;
-		// NOTE: Pass yy<100 and delta<100 or craziness ensues
-	end;
 	 
 	 highSchool_info := record
 		soutrecs;
@@ -403,27 +387,18 @@ EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 	END;	
 	EXPORT	get_report_recs(dataset(doxie.layout_references) dids, 
 	                        American_Student_Services.IParam.reportParams aInputData, boolean onlyCurrent = true) := FUNCTION		
-														 // this isnt' in prod repository yet..  ut.date_yy_to_YYYY, so i'll just use it locally for now 
-	  Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
-		  now		:= (STRING8)Std.Date.Today();
-		  high	:= (unsigned)now[1..4] + delta;
-		  test	:= yy + ((unsigned)now[1..2]*100);
-		  yyyy	:= if(test<=high, test, test-100);
-		  return yyyy;
-		// NOTE: Pass yy<100 and delta<100 or craziness ensues
-	  end;
- student_rec:= record
- iesp.student.t_StudentRecord;
- string2 src;
- end;
+
+    student_rec:= record
+      iesp.student.t_StudentRecord;
+      string2 src;
+    end;
 		
     all_dids := project(dids,transform(American_student_services.layouts.deepDids, self.isDeepDive := false, self := left));													
 	  recs_by_dids := American_student_services.Raw.getPayloadByDIDS(all_dids);
 	  sup_recs_by_dids := American_student_services.Raw.getSupplementalStudentInfobyDIDs(all_dids);
 	  all_recs := recs_by_dids + sup_recs_by_dids;
 		//ds_rollup := rollup_recs(all_recs);
-	  commonParam := PROJECT(aInputData, American_Student_Services.IParam.reportParams);
-	  studentrecs := apply_restrictions(all_recs, commonParam);		
+	  studentrecs := apply_restrictions(all_recs, aInputData);		
     student_w_indicators := add_college_indicators(studentrecs, all_dids);
 		student_rec iesp_format(student_w_indicators l) := transform
 			self._Penalty := 0;//l.record_penalty;  //no penalty for report records.
