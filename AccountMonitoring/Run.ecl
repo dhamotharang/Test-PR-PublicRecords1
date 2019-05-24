@@ -7,10 +7,13 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 						STRING           despray_path = '',        // the /path including filename of the destination file
 						UNSIGNED1        pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT,
 						BOOLEAN          use_daily_file = FALSE,
-						SET OF UNSIGNED6 run_pids = []
+						SET OF UNSIGNED6 run_pids = [],
+           BOOLEAN          doUpdateSuperFiles = TRUE
           ) :=	    
 	FUNCTION
-		
+		 //We first create some of our own superfiles that match the Roxie super files. 
+     UpdateRoxieLikeSuperfiles:= if(doUpdateSuperFiles,AccountMonitoring.fn_UpdateSuperFiles(product_mask),-1);
+    
 		// Get the already sorted and distributed main portfolio records and assign them to pf_AllRecords
 		// *** TODO *** Since we're saving the portfolio "already deduped", we don't need the -timestamp for: SORTED (because there is only one record for each pid/rid)
 		pf_AllRecords := SORTED( 
@@ -211,7 +214,7 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 													 IF(product_config.personheader.product_is_in_mask,update_history_file_personheader)
 													);
 		
-		RETURN SEQUENTIAL(
+		RETURN SEQUENTIAL(UpdateRoxieLikeSuperfiles,
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,
 				FAIL('Must provide valid pseudo-environment.')),
 			output_results,

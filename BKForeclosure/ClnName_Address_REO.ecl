@@ -25,8 +25,8 @@ ClnName_reo      := PROJECT(FileClnName,TRANSFORM(Layout_BK.CleanFields_REO,
 																									SELF.cln_mname2				:=	IF(IsName, LEFT.cln_mname2, '');
 																									SELF.cln_lname2				:=	IF(IsName, LEFT.cln_lname2, '');
 																									SELF.cln_suffix2			:=	IF(IsName, LEFT.cln_suffix2, '');
-																									SELF.cname						:=  IF(LEFT.nametype IN business_flags AND trim(LEFT.cln_fname) = '',
-																																								LEFT.name_full,'');
+																									SELF.cname						:=  IF(LEFT.nametype IN business_flags AND trim(LEFT.cln_fname) = '',LEFT.name_full,
+																																							IF(TRIM(LEFT.cln_fname) = '' AND TRIM(LEFT.cln_lname) = '',LEFT.name_full,''));
 																									SELF := LEFT));
 
 //Clean address for REO 

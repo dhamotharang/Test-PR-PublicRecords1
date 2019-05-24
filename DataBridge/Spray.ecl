@@ -3,7 +3,7 @@
 EXPORT Spray(
 	 STRING		pversion			= ''
 	,STRING		pServerIP			= 'uspr-edata11.risk.regn.net'
-	,STRING		pDirectory		= '/data/business/databridge/' + pversion[1..8] 
+	,STRING		pDirectory		= '/data/hds_180/databridge/' + pversion[1..8] 
 	,STRING		pFileType			= 'LN_*_database.txt'
 	,STRING		pGroupName		= STD.System.Thorlib.Group( )
 	,BOOLEAN	pIsTesting		= FALSE

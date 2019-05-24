@@ -1,4 +1,4 @@
-IMPORT dx_Header, header, RoxieKeyBuild, data_services;
+﻿IMPORT dx_Header, header, RoxieKeyBuild, data_services;
 
 //this procedure is for FCRA only:
 unsigned1 data_class := data_services.data_env.iFCRA;
@@ -6,7 +6,8 @@ unsigned1 data_class := data_services.data_env.iFCRA;
 EXPORT Proc_FCRA_Header_keys_dx(string filedate) := FUNCTION
 
 dsname := dx_Header.Constants.DataSetName;
-prefix := '~thor_data400::key::' + dsname + '::fcra::header::' + filedate + '::';
+// prefix := '~thor_data400::key::' + dsname + '::fcra::header::' + filedate + '::';
+prefix := '~thor_data400::key::fcra::header::'+ filedate + '::';
 
 //logical file names
 name_header := prefix + 'data';
@@ -21,7 +22,7 @@ name_addr_hist := prefix + 'address_rank';
 //Build keys
 RoxieKeybuild.MAC_build_logical(dx_Header.key_header(data_class), header.data_key_header_fcra, dx_Header.names('').i_header_fcra, name_header, fcra_head_data);
 RoxieKeybuild.MAC_build_logical(dx_Header.key_AptBuildings(data_class), header.data_key_AptBuildings_fcra(filedate), dx_Header.names('').i_aptbuildings_fcra, name_aptbuildings, fcra_apt_blg);
-RoxieKeybuild.MAC_build_logical(dx_Header.key_AptBuildings_EN(data_class), header.data_key_AptBuildings_fcra_en, dx_Header.names('').i_aptbuildings_fcra_en, name_aptbuildings_en, fcra_en_apt_blg);
+RoxieKeybuild.MAC_build_logical(dx_Header.key_AptBuildings_EN(data_class), header.data_key_AptBuildings_fcra_en(filedate), dx_Header.names('').i_aptbuildings_fcra_en, name_aptbuildings_en, fcra_en_apt_blg);
 RoxieKeybuild.MAC_build_logical(dx_Header.key_header_address(data_class), header.data_key_header_address_fcra, dx_Header.names('').i_header_address_fcra, name_header_address, fcra_address_payload);
 RoxieKeybuild.MAC_build_logical(dx_Header.key_max_dt_last_seen(data_class), header.data_key_max_dt_last_seen_fcra, dx_Header.names('').i_max_date_fcra, name_max_dt_last_seen, fcra_max_dt_last_seen);
 RoxieKeybuild.MAC_build_logical(dx_Header.key_legacy_ssn(data_class), header.data_key_legacy_ssn_fcra, dx_Header.names('').i_legacy_ssn_fcra, name_legacy_ssn, fcra_legacy_ssn);

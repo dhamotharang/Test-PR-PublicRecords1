@@ -6,7 +6,7 @@
 //Map Phone Base Files to Phone Type Layout - Append Serv/Line/Carrier Names from Carrier Reference Table///////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	dsICPort		:= PhonesInfo.File_iConectiv.Main;																																																										//Source = PK; iConectiv Ported Phone Base File
+	dsICPort		:= PhonesInfo.File_iConectiv.Main(transaction_code not in ['PD']);																																																										//Source = PK; iConectiv Ported Phone Base File
 	dsLIDB 			:= PhonesInfo.File_LIDB.Response_Processed;																																																						//Source = PB; LIDB - AT&T Gateway Base File
 	dsLIDBDelt	:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); 	//Source = PB; Deltabase Gateway File (LIDB) - Pull Only Good Records
 	dsL6Phones	:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), dx_PhonesInfo.Layouts.Phones_Type_Main);	

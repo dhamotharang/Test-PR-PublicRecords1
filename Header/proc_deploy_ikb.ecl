@@ -46,10 +46,10 @@ wklyShouldUpdate:= ( dontskip_wkly AND lastestWklyversionOnThor > ver_wkly_cert_
 
 // Generates a report prior to deployment
 rpt := output(dataset([
-    {'labKeys',ver_lab_cert_ver,ver_lab_prod_ver,lastestIkbVersionOnThor,ikbShouldUpdate},
-    {'fcraKeys',ver_fcra_cert_ver,ver_fcra_prod_ver,lastestFCRAversionOnThor,fcraShouldUpdate},
-    {'wklyKeys',ver_wkly_cert_ver,ver_wkly_prod_ver,lastestWklyversionOnThor,wklyShouldUpdate}
-],{string package, string cert, string prod_roxie, string latestThorVersion,string dopsToUpdate}),named('decision_report'));
+    {'labKeys',ver_lab_cert_ver,ver_lab_prod_ver,lastestIkbVersionOnThor,ver_lab_TBD,dontskip_ikb,ikbShouldUpdate},
+    {'fcraKeys',ver_fcra_cert_ver,ver_fcra_prod_ver,lastestFCRAversionOnThor,ver_fcra_TBD,dontskip_fcra,fcraShouldUpdate},
+    {'wklyKeys',ver_wkly_cert_ver,ver_wkly_prod_ver,lastestWklyversionOnThor,ver_wkly_TBD,dontskip_wkly,wklyShouldUpdate}
+],{string40 package, string10 cert, string10 prod_roxie, string10 latestThorVersion,string10 ver_TBD,Boolean dontskip,boolean dopsToUpdate}),named('decision_report'));
 
 noSkip:='000';
 skipPackage:= if(ikbShouldUpdate,'0','1')+  // 'skipPackage[1]'
@@ -59,6 +59,8 @@ skipPackage:= if(ikbShouldUpdate,'0','1')+  // 'skipPackage[1]'
 // calls deployment with skip parameters
 doIt :=   sequential(
            rpt
+          ,if(skipPackage <> '000', std.system.Email.SendEmail(emailList,'SKIPPING SOME OR ALL IKB DEPLOYMENTS',
+                                                                         'Skip Deployment: lab,fcra,weekly='+skipPackage+' See:'+workunit))
           ,if(skipPackage = '111'
            ,output('No New Data Available for Deployment')
            ,header.Proc_Copy_From_Alpha_Incrementals().deploy(emailList,rpt_qa_email_list,skipPackage)
