@@ -1,4 +1,4 @@
-import autokeyb2, doxie,Data_Services;
+﻿import autokeyb2, doxie,Data_Services;
 
 rec := RECORD
    unsigned6 fakeid;
@@ -52,6 +52,9 @@ rec := RECORD
   unsigned8 foreign_nmls_id;
   string150 regulator;
   string150 federal_regulator;
+	 //CCPA-110 Add 2 CCPA fields
+	 UNSIGNED4	global_sid;
+	 UNSIGNED8	record_sid;
  END;
 
 
