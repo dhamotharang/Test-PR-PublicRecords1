@@ -22,6 +22,7 @@
 		STRING		State;
 		STRING		ZipCode;
 		STRING10	Phone;
+		STRING    County;
 		STRING10  Date_first_seen;
 		STRING10  Date_last_seen;
 		STRING1   Current_rec;

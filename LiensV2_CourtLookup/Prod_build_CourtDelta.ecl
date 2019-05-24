@@ -4,7 +4,8 @@ STRING8 GetDate := (STRING8)Std.Date.Today();
 CourtIn_Proj				:= Project(LiensV2_CourtLookup.Files().CourtIn,                 
                                                           transform(Layouts.rBaseCourtLookup,self.Date_first_seen := GetDate;
 																																								self.Date_last_seen  := GetDate;
-																																								self.Current_rec         := 'Y';
+																																								self.Current_rec     := 'Y';
+																																								self.county          := ''; //once OKC provides county remove this.
 																																								self := left;
 																																								));
 
