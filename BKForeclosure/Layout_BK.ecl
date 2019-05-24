@@ -224,6 +224,7 @@ EXPORT Norm_Name_addr := RECORD
 	STRING5   Orig_Zip5;
 	STRING4   Orig_Zip4;	
   STRING15  AddrType;
+	STRING9 	ssn := ''; //Appended via DID
 END;	
  
 EXPORT  ClnName:= RECORD
@@ -281,6 +282,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name1_last;
 		STRING5		name1_suffix;
 		STRING60	name1_company;
+		STRING9		name1_ssn := '';
 		STRING		name1_did_score	:= '0';
 		STRING12	name1_did	:= intformat(0,12,1);
 		STRING3		name1_bdid_score	:= '0';
@@ -293,6 +295,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name2_last;
 		STRING5		name2_suffix;
 		STRING60	name2_company;
+		STRING9		name2_ssn := '';
 		STRING		name2_did_score	:= '0';
 		STRING12	name2_did	:= intformat(0,12,1);
 		STRING3		name2_bdid_score	:= '0';
@@ -305,6 +308,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name3_last;
 		STRING5		name3_suffix;
 		STRING60	name3_company;
+		STRING9		name3_ssn := '';
 		STRING		name3_did_score	:= '0';
 		STRING12	name3_did	:= intformat(0,12,1);
 		STRING3		name3_bdid_score	:= '0';
@@ -317,6 +321,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name4_last;
 		STRING5		name4_suffix;
 		STRING60	name4_company;
+		STRING9		name4_ssn := '';
 		STRING		name4_did_score	:= '0';
 		STRING12	name4_did	:= intformat(0,12,1);
 		STRING3		name4_bdid_score	:= '0';
@@ -329,6 +334,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name5_last;
 		STRING5		name5_suffix;
 		STRING60	name5_company;
+		STRING9		name5_ssn := '';
 		STRING		name5_did_score	:= '0';
 		STRING12	name5_did	:= intformat(0,12,1);
 		STRING3		name5_bdid_score	:= '0';
@@ -341,6 +347,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name6_last;
 		STRING5		name6_suffix;
 		STRING60	name6_company;
+		STRING9		name6_ssn := '';
 		STRING		name6_did_score	:= '0';
 		STRING12	name6_did	:= intformat(0,12,1);
 		STRING3		name6_bdid_score	:= '0';
@@ -353,6 +360,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name7_last;
 		STRING5		name7_suffix;
 		STRING60	name7_company;
+		STRING9		name7_ssn := '';
 		STRING		name7_did_score	:= '0';
 		STRING12	name7_did	:= intformat(0,12,1);
 		STRING3		name7_bdid_score	:= '0';
@@ -365,6 +373,7 @@ EXPORT ClnFields	:= RECORD
 		STRING20	name8_last;
 		STRING5		name8_suffix;
 		STRING60	name8_company;
+		STRING9		name8_ssn := '';
 		STRING		name8_did_score	:= '0';
 		STRING12	name8_did	:= intformat(0,12,1);
 		STRING3		name8_bdid_score	:= '0';
@@ -429,6 +438,8 @@ EXPORT base_reo  := RECORD
 	 STRING55 document_desc; //doc_type
 	 STRING55 property_desc; //property_use_cd
 	 STRING55 use_desc; //asses_land_use
+	 STRING55 lender_type_desc; //concurrent TD: lender type
+	 STRING60 loan_type_desc; //concurrent TD: loan type
 	 ClnFields;
 END;
 	
@@ -475,6 +486,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name1_last;
 		STRING5		name1_suffix;
 		STRING60	name1_company;
+		STRING9		name1_ssn := '';
 		STRING		name1_did_score	:= '0';
 		STRING12	name1_did	:= intformat(0,12,1);
 		STRING3		name1_bdid_score	:= '0';
@@ -507,6 +519,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name2_last;
 		STRING5		name2_suffix;
 		STRING60	name2_company;
+		STRING9		name2_ssn := '';
 		STRING		name2_did_score	:= '0';
 		STRING12	name2_did	:= intformat(0,12,1);
 		STRING3		name2_bdid_score	:= '0';
@@ -539,6 +552,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name3_last;
 		STRING5		name3_suffix;
 		STRING60	name3_company;
+		STRING9		name3_ssn := '';
 		STRING		name3_did_score	:= '0';
 		STRING12	name3_did	:= intformat(0,12,1);
 		STRING3		name3_bdid_score	:= '0';
@@ -571,6 +585,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name4_last;
 		STRING5		name4_suffix;
 		STRING60	name4_company;
+		STRING9		name4_ssn := '';
 		STRING		name4_did_score	:= '0';
 		STRING12	name4_did	:= intformat(0,12,1);
 		STRING3		name4_bdid_score	:= '0';
@@ -603,6 +618,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name5_last;
 		STRING5		name5_suffix;
 		STRING60	name5_company;
+		STRING9		name5_ssn := '';
 		STRING		name5_did_score	:= '0';
 		STRING12	name5_did	:= intformat(0,12,1);
 		STRING3		name5_bdid_score	:= '0';
@@ -635,6 +651,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name6_last;
 		STRING5		name6_suffix;
 		STRING60	name6_company;
+		STRING9		name6_ssn := '';
 		STRING		name6_did_score	:= '0';
 		STRING12	name6_did	:= intformat(0,12,1);
 		STRING3		name6_bdid_score	:= '0';
@@ -667,6 +684,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name7_last;
 		STRING5		name7_suffix;
 		STRING60	name7_company;
+		STRING9		name7_ssn := '';
 		STRING		name7_did_score	:= '0';
 		STRING12	name7_did	:= intformat(0,12,1);
 		STRING3		name7_bdid_score	:= '0';
@@ -699,6 +717,7 @@ EXPORT ClnFields_ext	:= RECORD
 		STRING20	name8_last;
 		STRING5		name8_suffix;
 		STRING60	name8_company;
+		STRING9		name8_ssn := '';
 		STRING		name8_did_score	:= '0';
 		STRING12	name8_did	:= intformat(0,12,1);
 		STRING3		name8_bdid_score	:= '0';
@@ -783,6 +802,8 @@ EXPORT base_reo_ext  := RECORD
 	 STRING55 document_desc; //doc_type
 	 STRING55 property_desc; //property_use_cd
 	 STRING55 use_desc; //asses_land_use
+	 STRING55 lender_type_desc; //concurrent TD: lender type
+	 STRING60 loan_type_desc; //concurrent TD: loan type
 	 ClnFields_ext;
 END;
 

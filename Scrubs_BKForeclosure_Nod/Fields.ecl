@@ -24,20 +24,20 @@ EXPORT InValidFT_invalid_alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_invalid_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' <>{}[]-^=!+&,()#.;/'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_AlphaNum(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -'); // Only allow valid symbols
-  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -.'); // Only allow valid symbols
+  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -.',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -'))));
-EXPORT InValidMessageFT_invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -.'))));
+EXPORT InValidMessageFT_invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -.'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_apn(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*'); // Only allow valid symbols
-  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ()-,\'=&_.\\/:*',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -,;.:|`~/+#'); // Only allow valid symbols
+  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -,;.:|`~/+#',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_apn(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*'))));
-EXPORT InValidMessageFT_invalid_apn(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_apn(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -,;.:|`~/+#'))));
+EXPORT InValidMessageFT_invalid_apn(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -,;.:|`~/+#'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_zip(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -50,8 +50,8 @@ EXPORT MakeFT_invalid_date(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 10));
-EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,8,10'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 4 OR LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 10));
+EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,4,8,10'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_phone(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -96,12 +96,12 @@ EXPORT InValidFT_invalid_case(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGT
 EXPORT InValidMessageFT_invalid_case(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' {}-&,.():+#/'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_name(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#;"\\/'); // Only allow valid symbols
-  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -&,.():\'#;"\\/',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#+;"\\/*@'); // Only allow valid symbols
+  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -&,.():\'#+;"\\/*@',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_name(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#;"\\/'))));
-EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#;"\\/'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_name(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#+;"\\/*@'))));
+EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#+;"\\/*@'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_NodSourceCode(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -112,7 +112,7 @@ EXPORT InValidMessageFT_Invalid_NodSourceCode(UNSIGNED1 wh) := CHOOSE(wh,SALT311
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'foreclosure_id','ln_filedate','bk_infile_type','src_county','src_state','fips_cd','doc_type','recording_dt','recording_doc_num','book_number','page_number','loan_number','trustee_sale_number','case_number','orig_contract_date','unpaid_balance','past_due_amt','as_of_dt','contact_fname','contact_lname','attention_to','contact_mail_full_addr','contact_mail_unit','contact_mail_city','contact_mail_state','contact_mail_zip5','contact_mail_zip4','contact_telephone','due_date','trustee_fname','trustee_lname','trustee_mail_full_addr','trustee_mail_unit','trustee_mail_city','trustee_mail_state','trustee_mail_zip5','trustee_mail_zip4','trustee_telephone','borrower1_fname','borrower1_lname','borrower1_id_cd','borrower2_fname','borrower2_lname','borrower2_id_cd','orig_lender_name','orig_lender_type','curr_lender_name','curr_lender_type','mers_indicator','loan_recording_date','loan_doc_num','loan_book','loan_page','orig_loan_amt','legal_lot_num','legal_block','legal_subdivision_name','legal_brief_desc','auction_date','auction_time','auction_location','auction_min_bid_amt','trustee_mail_careof','property_addr_cd','auction_city','original_nod_recording_date','original_nod_doc_num','original_nod_book','original_nod_page','nod_apn','property_full_addr','prop_addr_unit_type','prop_addr_unit_no','prop_addr_city','prop_addr_state','prop_addr_zip5','prop_addr_zip4','apn','sam_pid','deed_pid','lps_internal_pid','nod_source');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'foreclosure_id','ln_filedate','bk_infile_type','src_county','src_state','fips_cd','doc_type','recording_dt','recording_doc_num','book_number','page_number','loan_number','trustee_sale_number','case_number','orig_contract_date','unpaid_balance','past_due_amt','as_of_dt','contact_fname','contact_lname','attention_to','contact_mail_full_addr','contact_mail_unit','contact_mail_city','contact_mail_state','contact_mail_zip5','contact_mail_zip4','contact_telephone','due_date','trustee_fname','trustee_lname','trustee_mail_full_addr','trustee_mail_unit','trustee_mail_city','trustee_mail_state','trustee_mail_zip5','trustee_mail_zip4','trustee_telephone','borrower1_fname','borrower1_lname','borrower1_id_cd','borrower2_fname','borrower2_lname','borrower2_id_cd','orig_lender_name','orig_lender_type','curr_lender_name','curr_lender_type','mers_indicator','loan_recording_date','loan_doc_num','loan_book','loan_page','orig_loan_amt','legal_lot_num','legal_block','legal_subdivision_name','legal_brief_desc','auction_date','auction_time','auction_location','auction_min_bid_amt','trustee_mail_careof','property_addr_cd','auction_city','original_nod_recording_date','original_nod_doc_num','original_nod_book','original_nod_page','nod_apn','property_full_addr','prop_addr_unit_type','prop_addr_unit_no','prop_addr_city','prop_addr_state','prop_addr_zip5','prop_addr_zip4','apn','sam_pid','deed_pid','lps_internal_pid','nod_source');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'foreclosure_id' => 0,'ln_filedate' => 1,'bk_infile_type' => 2,'src_county' => 3,'src_state' => 4,'fips_cd' => 5,'doc_type' => 6,'recording_dt' => 7,'recording_doc_num' => 8,'book_number' => 9,'page_number' => 10,'loan_number' => 11,'trustee_sale_number' => 12,'case_number' => 13,'orig_contract_date' => 14,'unpaid_balance' => 15,'past_due_amt' => 16,'as_of_dt' => 17,'contact_fname' => 18,'contact_lname' => 19,'attention_to' => 20,'contact_mail_full_addr' => 21,'contact_mail_unit' => 22,'contact_mail_city' => 23,'contact_mail_state' => 24,'contact_mail_zip5' => 25,'contact_mail_zip4' => 26,'contact_telephone' => 27,'due_date' => 28,'trustee_fname' => 29,'trustee_lname' => 30,'trustee_mail_full_addr' => 31,'trustee_mail_unit' => 32,'trustee_mail_city' => 33,'trustee_mail_state' => 34,'trustee_mail_zip5' => 35,'trustee_mail_zip4' => 36,'trustee_telephone' => 37,'borrower1_fname' => 38,'borrower1_lname' => 39,'borrower1_id_cd' => 40,'borrower2_fname' => 41,'borrower2_lname' => 42,'borrower2_id_cd' => 43,'orig_lender_name' => 44,'orig_lender_type' => 45,'curr_lender_name' => 46,'curr_lender_type' => 47,'mers_indicator' => 48,'loan_recording_date' => 49,'loan_doc_num' => 50,'loan_book' => 51,'loan_page' => 52,'orig_loan_amt' => 53,'legal_lot_num' => 54,'legal_block' => 55,'legal_subdivision_name' => 56,'legal_brief_desc' => 57,'auction_date' => 58,'auction_time' => 59,'auction_location' => 60,'auction_min_bid_amt' => 61,'trustee_mail_careof' => 62,'property_addr_cd' => 63,'auction_city' => 64,'original_nod_recording_date' => 65,'original_nod_doc_num' => 66,'original_nod_book' => 67,'original_nod_page' => 68,'nod_apn' => 69,'property_full_addr' => 70,'prop_addr_unit_type' => 71,'prop_addr_unit_no' => 72,'prop_addr_city' => 73,'prop_addr_state' => 74,'prop_addr_zip5' => 75,'prop_addr_zip4' => 76,'apn' => 77,'sam_pid' => 78,'deed_pid' => 79,'lps_internal_pid' => 80,'nod_source' => 81,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],['ALLOW','LENGTHS'],[],[],['ALLOW','LENGTHS'],['ALLOW'],['CUSTOM'],['ALLOW','LENGTHS'],[],[],[],[],[],['ALLOW'],['ALLOW','LENGTHS'],[],[],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],[],['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],[],['ALLOW'],[],[],[],['ALLOW'],['ALLOW','LENGTHS'],[],[],[],['ALLOW'],[],[],['ALLOW'],[],['ALLOW','LENGTHS'],[],[],[],[],[],[],['ALLOW','LENGTHS'],[],[],[],['ALLOW'],['ALLOW'],[],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],[],[],[],['ENUM'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],['ALLOW','LENGTHS'],[],[],['ALLOW','LENGTHS'],['ALLOW'],['CUSTOM'],['ALLOW','LENGTHS'],[],[],[],[],[],['ALLOW'],['ALLOW','LENGTHS'],[],[],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],[],['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],['ALLOW','LENGTHS'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],[],['ALLOW'],[],[],[],['ALLOW'],['ALLOW','LENGTHS'],[],[],[],['ALLOW'],[],[],['ALLOW'],[],['ALLOW','LENGTHS'],[],[],[],[],[],[],['ALLOW','LENGTHS'],[],[],[],[],['ALLOW'],[],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW'],[],[],[],['ENUM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -393,9 +393,9 @@ EXPORT Make_original_nod_page(SALT311.StrType s0) := s0;
 EXPORT InValid_original_nod_page(SALT311.StrType s) := 0;
 EXPORT InValidMessage_original_nod_page(UNSIGNED1 wh) := '';
  
-EXPORT Make_nod_apn(SALT311.StrType s0) := MakeFT_invalid_apn(s0);
-EXPORT InValid_nod_apn(SALT311.StrType s) := InValidFT_invalid_apn(s);
-EXPORT InValidMessage_nod_apn(UNSIGNED1 wh) := InValidMessageFT_invalid_apn(wh);
+EXPORT Make_nod_apn(SALT311.StrType s0) := s0;
+EXPORT InValid_nod_apn(SALT311.StrType s) := 0;
+EXPORT InValidMessage_nod_apn(UNSIGNED1 wh) := '';
  
 EXPORT Make_property_full_addr(SALT311.StrType s0) := MakeFT_invalid_alpha(s0);
 EXPORT InValid_property_full_addr(SALT311.StrType s) := InValidFT_invalid_alpha(s);

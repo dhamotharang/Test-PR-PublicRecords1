@@ -1,10 +1,14 @@
-import liensv2, Doxie, ut, BIPV2,Data_Services;
+﻿import liensv2, Doxie, ut, BIPV2,Data_Services;
 
 get_recs := LiensV2.file_liens_party_keybuild;
 
 Layout_liens_party_linkids := record
   liensv2.layout_liens_party;
 	BIPV2.IDlayouts.l_xlink_ids;
+	unsigned4 global_sid;// DF-24061 VC
+  unsigned8 record_sid;
+	string10  orig_rmsid;
+
 end;
 
 Layout_liens_party_linkids tformat(get_recs L) := transform

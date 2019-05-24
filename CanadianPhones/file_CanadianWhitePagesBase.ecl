@@ -1,18 +1,31 @@
-import ut;
+﻿import ut;
 
-iu_infiles := 							dataset(CanadianPhones.thor_cluster +'base::canadianWP',
+iu_infiles := PROJECT(			
+                      dataset(CanadianPhones.thor_cluster +'base::canadianWP',
+										          CanadianPhones.layoutCanadianWhitepagesBase - [global_sid,record_sid],thor)
 //infousa files											
-										CanadianPhones.layoutCanadianWhitepagesBase,thor)
 									  + dataset(CanadianPhones.thor_cluster +'base::infousaBiz',
-											CanadianPhones.layoutCanadianWhitepagesBase,thor);
+											CanadianPhones.layoutCanadianWhitepagesBase - [global_sid,record_sid],thor),
+											TRANSFORM(CanadianPhones.layoutCanadianWhitepagesBase,
+											          SELF.global_sid := 0;
+																SELF.record_sid := 0;
+																SELF            := LEFT
+											         )
+										 );
 //iu_infiles has one record per person/phone combination/vendor
 											
-ax_infiles := 						
+ax_infiles := PROJECT( 						
 //axiom files
 									    distribute(dataset(CanadianPhones.thor_cluster +'base::axciomres',
-											CanadianPhones.layoutCanadianWhitepagesBase,thor)
+											CanadianPhones.layoutCanadianWhitepagesBase - [global_sid,record_sid],thor)
 									  + dataset(CanadianPhones.thor_cluster +'base::axciombus',
-											CanadianPhones.layoutCanadianWhitepagesBase,thor),hash(phonenumber));
+											CanadianPhones.layoutCanadianWhitepagesBase - [global_sid,record_sid],thor),hash(phonenumber)),
+											TRANSFORM(CanadianPhones.layoutCanadianWhitepagesBase,
+											          SELF.global_sid := 0;
+																SELF.record_sid := 0;
+																SELF            := LEFT
+											         )
+										 );
 //ax_infiles (axciom files) are ff replace but we are keeping history which causes several dupes											
 
 dd_ax := dedup(ax_infiles,phonenumber

@@ -161,12 +161,12 @@ export Proc_build_Keys := sequential(wchk,build_keys,move_to_built,move_keys
 			,parallel(eighth_key,eighthDotOne_key),mv8,mv8_1,move8,move8_1 // builds off seventh key and uses MOXIE out file that will be deleted
 		  /*k9,k10,mv9,mv10,move9,move10*/
 			// build universal key after all the other keys are built
-			,Watchdog_V2.Proc_Build_Merged_Key(filedate),
+			//,Watchdog_V2.Proc_Build_Merged_Key(filedate),
 			// then update DOPS
-			update_version,
-			create_build,
+			//update_version,
+			//create_build,
 			/*,create_build,update_idops,*/
-			temp_file,
+			,temp_file,
 			/*,fSendMail('WATCHDOG_KEYS_COMPLETE','Watchdog keys complete on prod400'),*/
 		  /*file_despray,*/file_remove
 			) : 
