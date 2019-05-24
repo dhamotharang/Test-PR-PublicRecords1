@@ -27,14 +27,14 @@ header_services.Supplemental_Data.mac_verify(	'file_infutor_inj.txt',
 	Bfile_in := attr();
 	
 	UNSIGNED6 endMax := MAX(ds_Xform(intformat(rid, 14, 0)[1..2] = '15' and length(trim(intformat(rid, 14, 0))) = 14), rid);
-	
+	loadfile:=nothor(STD.File.SUPERFILECONTENTS(infutor.filename_infutor));
+
+SearchPattern:='thor_dell400::in::infutor::([^ ]*)::';
+cversion_dev:=regexfind(SearchPattern,loadfile[1].name,1); 
 	header.layout_header reformat(infutor.infutor_layout_main.layout_base_tracker l, integer c) := transform
 
 /* //check date validity by length, number values, and between 1901 and today */  
-loadfile:=STD.File.SUPERFILECONTENTS(infutor.filename_infutor);
-
-SearchPattern:='thor_dell400::in::infutor::([^ ]*)::';
-cversion_dev:=regexfind(SearchPattern,loadfile[1].name,1);  
+ 
 
 Valid_Date_Range(string in_date) := in_date[1..6] between '190101' and ut.GetDate[1..6];
 	self.did := l.did;

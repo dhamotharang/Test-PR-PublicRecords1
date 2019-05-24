@@ -1,4 +1,4 @@
-import autokeyb2,doxie,ut,corp2,address,watercraft;
+﻿import autokeyb2,doxie,ut,corp2,address,watercraft;
 
 export proc_autokeybuild(string filedate) := FUNCTION
 
@@ -76,6 +76,9 @@ Watercraft.Layout_Watercraft_Search_Base.company_name;
 	string5 bzip5 :='';
 	string9 fein_use :='';
 	string9 ssn_use := '';
+  //CCPA-206 Add 2 CCPA fields
+  UNSIGNED4	global_sid:=0;
+  UNSIGNED8	record_sid:=0;
 END;
 
 layout_watercraft_use w_bState(layout_watercraft le):=transform
