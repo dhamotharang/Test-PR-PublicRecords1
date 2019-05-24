@@ -1,4 +1,4 @@
-import doxie, ut, property;
+﻿import doxie, ut, property;
 
 // Foreclosure_Address := property.file_Foreclosure;
 
@@ -15,7 +15,7 @@ Layout_Foreclosure_In_Slim :=  record
   string3  deed_category;
   string55 deed_desc;
   string3  document_type;
-  string40 document_desc;
+  string55 document_desc;
   string8  recording_date;
   string4  document_year;
   string12 document_nbr;
@@ -225,6 +225,14 @@ Layout_Foreclosure_In_Slim :=  record
   // string4  situs2_err_stat;
 
   string8 process_date;
+	string1		lender_type;
+	string55	lender_type_desc;
+	string10	loan_amount;
+	string1		loan_type;
+	string60	loan_type_desc;
+	string2		source;	//FR = CL, 'B7' = BK_NOD, 'I5' = BK_REO
+	unsigned4 global_sid;	//CCPA field
+	unsigned8 record_sid;	//CCPA field
   // string2 crlf;
 end;
 

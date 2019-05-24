@@ -1,4 +1,4 @@
-﻿import bipv2, ut, MDR;
+﻿import bipv2, ut, MDR, BKForeclosure;
 
 foreclosureIn := property.File_Foreclosure_In;  //contains both new and base file data
 layout_foreclosureIn := recordof(foreclosureIn);
@@ -243,9 +243,9 @@ ForceclosureBaseV2 := PROJECT(foreclosureBase,TRANSFORM(Property.Layout_Fares_Fo
 																												SELF.SOURCE := MDR.sourceTools.src_Foreclosures;
 																												SELF := LEFT; SELF := [])); //To combine BK and CL
 
-// BKforeclosureBase	:= BKForeclosure.Fn_Map_BK2Foreclosure;
+//BKforeclosureBase	:= BKForeclosure.Fn_Map_BK2Foreclosure;
 
-// CombineAll	:= ForceclosureBaseV2 + BKforeclosureBase;
+//CombineAll	:= ForceclosureBaseV2 + BKforeclosureBase;
 
 ut.mac_suppress_by_phonetype(ForceclosureBaseV2,attorney_phone_nbr,state,                   phone_out1);
 ut.mac_suppress_by_phonetype(phone_out1,     lender_phone,      lender_beneficiary_state,phone_out2);

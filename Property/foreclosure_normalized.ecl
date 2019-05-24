@@ -5,7 +5,7 @@
 Normalizing by Name, Company name and address. The normalized file is used for did, bdid and ssn append.
 This file is used for building autokeys
 */
-import bipv2, property, ut, header_slimsort, DID_Add, Business_Header_SS, MDR, Business_header, Address, Header, Watchdog, lib_stringlib;
+import bipv2, property, ut, header_slimsort, DID_Add, Business_Header_SS, MDR, Business_header, Address, Header, Watchdog, lib_stringlib, BKForeclosure;
 
 foreclosureIn := property.File_Foreclosure_In;
 
@@ -112,8 +112,8 @@ DID_Add.MAC_Add_SSN_By_DID(foreclosureDID_BDID,did,ssn,appendSSN);
 
 appendSSNSortDist	:=	SORT(DISTRIBUTE(appendSSN, HASH(foreclosure_id)), RECORD, LOCAL);
 
-/*//Normalize BKL file prior to append
-BKforeclosureIn	:= BKForeclosure.Fn_Map_BK2Foreclosure;
+//Normalize BKL file prior to append
+/*BKforeclosureIn	:= BKForeclosure.Fn_Map_BK2Foreclosure;
 
 Layout_Foreclosure_Base_Normalized normalizeBK(BKforeclosureIn l, unsigned1 nameCounter) := TRANSFORM
 	self.name_first := choose(nameCounter,l.name1_first,l.name2_first,l.name3_first,l.name4_first,l.name5_first,l.name6_first,l.name7_first,l.name8_first);
@@ -144,6 +144,7 @@ ds_BK_normalized := NORMALIZE(BKforeclosureIn,8,normalizeBK(LEFT,COUNTER));
 SrtBKNorm	:= SORT(DISTRIBUTE(ds_BK_normalized(name_first != '' OR name_last != '' OR name_company != ''), HASH(foreclosure_id)), RECORD, LOCAL);
 
 CombineAll	:= appendSSNSortDist + SrtBKNorm;
-EXPORT foreclosure_normalized := dedup(CombineAll,RECORD,LOCAL);
 */
-EXPORT foreclosure_normalized := dedup(appendSSNSortDist,RECORD,LOCAL);	//: persist('~thor_data400::persist::file_foreclosure_normalized'); // use persist here, if needed
+EXPORT foreclosure_normalized := dedup(appendSSNSortDist,RECORD,LOCAL);
+
+//EXPORT foreclosure_normalized := dedup(appendSSNSortDist,RECORD,LOCAL);	//: persist('~thor_data400::persist::file_foreclosure_normalized'); // use persist here, if needed
