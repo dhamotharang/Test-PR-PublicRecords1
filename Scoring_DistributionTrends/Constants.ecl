@@ -8,6 +8,8 @@
 	EXPORT ScoringQA := '~scoringqa::out::';
 	EXPORT NonFCRA := 'nonfcra::';
 	EXPORT FCRA := 'fcra::';
+	EXPORT forblank := '';
+
 	EXPORT Auto := 'Auto_';
 	EXPORT Bank := 'Bank_';
 	EXPORT Retail := 'Retail_';
@@ -25,13 +27,16 @@
 	EXPORT cvi := 'cvi_';
 	EXPORT nap := 'nap_';
 	EXPORT nas := 'nas_';
+	EXPORT CBBLfd := 'ecovariables_';
+	EXPORT CBBLfp := 'cmpyaddrscore_';
+	EXPORT fp_score := 'fp_score_';
 	
 	//score names in files
 	EXPORT Genbnap := 'bnap';
 	EXPORT Genbnas := 'bnas';
 	EXPORT Genbnat := 'bnat';
 	EXPORT Genbvi := 'bvi';
-	export RV_Auto := 'rv_score_auto';
+	EXPORT RV_Auto := 'rv_score_auto';
 	export RV_Bank := 'rv_score_bank';
 	export RV_Retail := 'rv_score_retail';
 	export RV_Telecom := 'rv_score_telecom';
@@ -42,11 +47,17 @@
 	export RV5_Auto := 'auto_score';	
 	export RV5_Bank := 'bankcard_score';	
 	export RV5_Telecom := 'telecommunications_score';	
-	export forblank := '';
 	export BNK4 := 'ecovariables';
 	export PI02 := 'estincome';
 	export LIv4 := 'score';
-	
+	EXPORT CBBL_fd := 'ecovariables';
+	EXPORT CBBL_fp := 'cmpyaddrscore';
+	EXPORT FP := 'fp_score';
+	EXPORT IT61 := 'score';
+	EXPORT Gencvi := 'cvi';
+	EXPORT Gennap := 'nap_summary';
+	EXPORT Gennas := 'nas_summary';
+
 	//HistoryFile
 	EXPORT HistoryFile_Prefix := '~distributionTrend::rawScores::';
 	EXPORT HistoryFile_Tag := '_1';

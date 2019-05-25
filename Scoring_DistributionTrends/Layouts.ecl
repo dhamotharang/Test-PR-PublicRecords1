@@ -2,6 +2,7 @@
 
 	EXPORT min_Scores_layout := RECORD
 		string8 date;
+		// unsigned3 score;
 		string3 score;
 	END;
 	

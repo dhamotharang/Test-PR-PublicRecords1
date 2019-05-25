@@ -5,7 +5,8 @@ IMPORT Scoring_DistributionTrends.Constants as C;
 getData(string date1) := function   //Change the score field name in transform and FCRA/NonFCRA	
 		filename := filename_in + date1 + C.FileTag;
 		ds := dataset(filename,layout,thor);
-		dsAddDate := PROJECT(ds,transform(L.min_Scores_layout,self.date:=date1;self.score:= left.#expand(mname_in);;self:=left;self:=[];));
+		// dsAddDate := PROJECT(ds,transform(L.min_Scores_layout,self.date:=date1;self.score:= left.#expand(mname_in);;self:=left;self:=[];));
+		dsAddDate := PROJECT(ds,transform(L.min_Scores_layout,self.date:=date1;self.score:= (string3)left.#expand(mname_in);;self:=left;self:=[];));
 		return dsAddDate;
 End;	 
 
