@@ -53,7 +53,6 @@ string legal_borough := '';
 string certificate_number := '';
 BOOLEAN	bCBFlag	:=	FALSE;
 unsigned8 persistent_record_id :=0 ; 
-
 dataset(layout_filing_status) filing_status;
 	STRING2		Filing_Type_ID		:=	'';
 	STRING8		Collection_Date	:=	'';
@@ -61,5 +60,12 @@ dataset(layout_filing_status) filing_status;
 	STRING50 TMSID_old							:=	'';
 	STRING50 RMSID_old							:=	'';
 	BOOLEAN		CaseLinkID_Prop_Flag	:=	FALSE;
+// DF-24061 VC
+unsigned4 global_sid;
+unsigned8 record_sid;
+string10  orig_rmsid;
+string7   AgencyID;
+String1   AgencyID_src;
+	
 end;
 end;	

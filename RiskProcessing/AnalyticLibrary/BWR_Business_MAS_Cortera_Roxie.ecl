@@ -55,7 +55,7 @@ Output_Master_Results := FALSE;
 Output_SALT_Profile := FALSE;
 // Output_SALT_Profile := TRUE;
 
-Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
+Exclude_Consumer_Shell := TRUE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
 RecordsToRun := 0;
 eyeball := 120;
@@ -231,6 +231,14 @@ END;
 
 Layout_Business := RECORD
     STRING BusInputAccountEcho;
+		INTEGER7 LexIDBusExtendedFamilyAppend;
+		INTEGER7 LexIDBusLegalFamilyAppend;
+		INTEGER7 LexIDBusLegalEntityAppend;
+		INTEGER7 LexIDBusPlaceGroupAppend;
+		INTEGER7 LexIDBusPlaceAppend;
+		INTEGER3 BusLexIDScoreAppend;
+		INTEGER3 BusLexIDWeightAppend;	
+		STRING20 BusInputArchiveDateClean; 
 		STRING10	B2bHistoryBuild;
 		INTEGER3	B2bTLCntEv;
 		INTEGER3	B2bTLCnt2Y;

@@ -1,4 +1,4 @@
-import address, BIPV2;
+﻿﻿import address, BIPV2; 
 
 EXPORT Layout_liens_party_BIPv2 := record
 string50 tmsid;
@@ -32,4 +32,11 @@ string8  date_vendor_first_reported := '';
 string8  date_vendor_last_reported := '';
 unsigned8 persistent_record_id := 0 ; 
 BIPV2.IDlayouts.l_xlink_ids;
+UNSIGNED4	xadl2_keys_used			:=	0 ;
+STRING		xadl2_keys_desc			:=	'';
+INTEGER2	xadl2_weight				:=	0 ;
+UNSIGNED2	xadl2_Score					:=	0 ;
+UNSIGNED2	xadl2_distance			:=	0 ;
+STRING22	xadl2_matches				:=	'';
+STRING		xadl2_matches_desc	:=	'';
 end;
