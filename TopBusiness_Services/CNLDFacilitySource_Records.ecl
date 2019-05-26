@@ -1,4 +1,4 @@
-IMPORT iesp, doxie, SearchPoint_Services, CNLD_Facilities, BIPV2, ut;
+IMPORT iesp, CNLD_Facilities, BIPV2;
 
 EXPORT CNLDFacilitySource_Records ( 
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
