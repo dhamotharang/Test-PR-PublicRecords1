@@ -71,7 +71,9 @@ EXPORT Layouts := MODULE
 		string8		bsec_range;
 		string5 bzip5; 
 		string9 fein_use; 
-		string9 ssn_use; 
+		string9 ssn_use;
+		Watercraft.Layout_Watercraft_Search_Base.global_sid;
+		Watercraft.Layout_Watercraft_Search_Base.record_sid;	
 	END;
 	
 	export flat_s := record

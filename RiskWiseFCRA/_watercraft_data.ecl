@@ -1,4 +1,4 @@
-import watercraft, doxie, fcra, ut, Suppress, mdr, STD;
+﻿import watercraft, doxie, fcra, ut, Suppress, mdr, STD;
 
 boolean IsFCRA := true;
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
@@ -64,7 +64,7 @@ EXPORT _watercraft_data (dataset (doxie.layout_references) dids, dataset (fcra.L
                       LIMIT(ut.limits.OWNERS_PER_WATERCRAFT, SKIP));
 
   owners_over := choosen (FCRA.Key_Override_Watercraft.sid (keyed (flag_file_id in ffids_sid)), MAX_OVERRIDE_LIMIT);
-  owners_corrected := owners_raw + PROJECT (owners_over, transform (rec_owner, self := LEFT));
+  owners_corrected := owners_raw + PROJECT (owners_over, transform (rec_owner, SELF.global_sid:= 0, SELF.record_sid:= 0,self := LEFT));
 	
 	owners1 := sort(owners_corrected, -date_last_seen, -date_first_seen);		
 	
@@ -95,7 +95,7 @@ EXPORT _watercraft_data (dataset (doxie.layout_references) dids, dataset (fcra.L
                    LIMIT (ut.limits.MAX_COASTGUARD_PER_WATERCRAFT, skip));
 
   cid_over := choosen (FCRA.key_override_watercraft.cid (keyed (flag_file_id in ffids_cid)), MAX_OVERRIDE_LIMIT);
-  cid_corrected := cid_raw + PROJECT (cid_over, transform (layout_cid, self := LEFT));
+  cid_corrected := cid_raw + PROJECT (cid_over, transform (layout_cid, SELF.global_sid:= 0, SELF.record_sid:= 0,self := LEFT));
 
   coastguard1 := sort(cid_corrected, -date_expires, -date_issued);
 	// translate the source code to be the header source code so it can be found in the vendor lookup service
@@ -121,7 +121,7 @@ EXPORT _watercraft_data (dataset (doxie.layout_references) dids, dataset (fcra.L
 
   wid_over := choosen (FCRA.key_override_watercraft.wid (keyed (flag_file_id in ffids_wid)), MAX_OVERRIDE_LIMIT);
 	
-	details1 := wid_raw + PROJECT (wid_over, transform (layout_wid, self := LEFT));
+	details1 := wid_raw + PROJECT (wid_over, transform (layout_wid, SELF.global_sid:= 0, SELF.record_sid:= 0,self := LEFT));
 	// translate the source code to be the header source code so it can be found in the vendor lookup service
 	EXPORT details := project(details1, transform(layout_wid, self.source_code := mdr.sourcetools.fWatercraft(left.Source_Code, left.State_Origin), self := left));
 
