@@ -158,6 +158,7 @@ MODULE
 			STRING20                                          acctno;
 			UNSIGNED8                                         seq;
 			UNSIGNED6                                         did;
+			UNSIGNED6                                         InputDID;
 			UNSIGNED2                                         penalt;
 			STRING2                                           vendor_id;
 			STRING2                                           src;
@@ -268,6 +269,7 @@ MODULE
 		RECORD
 			STRING20  acctno;
 			UNSIGNED6 did;
+			UNSIGNED6 InputDID;
 			UNSIGNED2 penalt;
 			STRING2   vendor_id;
 			STRING2   src;
