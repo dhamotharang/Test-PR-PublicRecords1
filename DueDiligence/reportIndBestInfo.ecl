@@ -1,4 +1,4 @@
-﻿IMPORT advo, DueDiligence, iesp, STD, Suppress;
+﻿IMPORT advo, DueDiligence, iesp, STD, Suppress, ut;
 
 EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData, 
                          STRING6 ssnMask) := FUNCTION
@@ -48,10 +48,10 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                     
                                                     inputDOB := (UNSIGNED4)LEFT.indvRawInput.dob;
                                                     
-                                                    validInputDOB := STD.Date.IsValidDate(inputDOB);
+                                                    validInputDOB := DueDiligence.Common.IsValidDOB(inputDOB);
                                                     validHistDate := STD.Date.IsValidDate(LEFT.historyDate);
                                                     
-                                                    SELF.personalInfo.InputAge := IF(validInputDOB AND validHistDate, STD.Date.YearsBetween(inputDOB, LEFT.historyDate), 0);
+                                                    SELF.personalInfo.InputAge := IF(validInputDOB AND validHistDate, ut.Age(inputDOB, LEFT.historyDate), 0);
                                                     SELF.personalInfo.BestAge := LEFT.estimatedAge;
                                                     SELF := [];));
 
