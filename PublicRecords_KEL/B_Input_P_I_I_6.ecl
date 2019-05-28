@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Input_P_I_I,E_Person,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE81170 := __E_Input_P_I_I;
-  EXPORT __ST70983_Layout := RECORD
+  SHARED __EE81653 := __E_Input_P_I_I;
+  EXPORT __ST71339_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr Input_Account_Echo_;
@@ -78,10 +78,10 @@ EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST70983_Layout __ND81168__Project(E_Input_P_I_I(__in,__cfg).Layout __PP80816) := TRANSFORM
-    SELF.Addr_Not_Populated_ := FN_Compile.FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP80816.Input_Street_Echo_));
-    SELF.City_State_Zip_Not_Populated_ := FN_Compile.FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP80816.Input_City_Echo_),__ECAST(KEL.typ.nstr,__PP80816.Input_State_Echo_),__ECAST(KEL.typ.nstr,__PP80816.Input_Zip_Echo_));
-    SELF := __PP80816;
+  SHARED __ST71339_Layout __ND81651__Project(E_Input_P_I_I(__in,__cfg).Layout __PP81299) := TRANSFORM
+    SELF.Addr_Not_Populated_ := FN_Compile.FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP81299.Input_Street_Echo_));
+    SELF.City_State_Zip_Not_Populated_ := FN_Compile.FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP81299.Input_City_Echo_),__ECAST(KEL.typ.nstr,__PP81299.Input_State_Echo_),__ECAST(KEL.typ.nstr,__PP81299.Input_Zip_Echo_));
+    SELF := __PP81299;
   END;
-  EXPORT __ENH_Input_P_I_I_6 := PROJECT(__EE81170,__ND81168__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_6 := PROJECT(__EE81653,__ND81651__Project(LEFT));
 END;

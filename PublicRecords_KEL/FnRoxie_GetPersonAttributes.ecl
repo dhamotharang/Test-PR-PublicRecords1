@@ -10,17 +10,17 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	RecordsWithLexID := InputData(LexidAppend > 0);
 	RecordsWithoutLexID := InputData(LexidAppend <= 0);
 	
-	LayoutFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1([], 0, 0).res0);
-	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1([], 0, 0).res0);
+	LayoutFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1(0, 0, 0).res0);
+	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1(0, 0, 0).res0);
 	
 	NonFCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
 		SELF.InputUIDAppend := LEFT.InputUIDAppend;
-		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
+		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1(LEFT.LexIDAppend, (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := NonFCRAPersonResults[1]));	
 
 	FCRAPersonAttributesRaw := PROJECT(RecordsWithLexID, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
 		SELF.InputUIDAppend := LEFT.InputUIDAppend;
-		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
+		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1(LEFT.LexIDAppend, (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := FCRAPersonResults[1],
 		SELF := []));	
 		
