@@ -40,4 +40,10 @@ export Constants := module
                                    ];
  
   export isRestrictedRelationSource(string __source) := __source IN setRestrictedRelationSources;	                           
+
+	EXPORT FCRA := MODULE
+		EXPORT UNSIGNED2 MaxEmailPerDID  := 100;
+		EXPORT UNSIGNED2 MaxEmailRecords := 10000;
+	END;
+
 end;
