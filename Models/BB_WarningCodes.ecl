@@ -1,10 +1,10 @@
 ﻿IMPORT Models, Risk_Indicators, STD, Business_Risk_BIP;
 
-EXPORT BB_Warningcodes ( GROUPED DATASET(risk_indicators.Layout_Boca_Shell) clam,
-                           GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell,	
-                          INTEGER num_reasons = 4,
-                          BOOLEAN business_only = False
-                          ) := FUNCTION
+EXPORT BB_Warningcodes ( ROW(risk_indicators.Layout_Boca_Shell) clam,
+                         ROW(Business_Risk_BIP.Layouts.Shell) busShell,	
+                         INTEGER num_reasons = 4,
+                         BOOLEAN business_only = False
+                       ) := FUNCTION
   
 
 HRILayout := RECORD
@@ -15,17 +15,9 @@ HRI_DS_Layout := Record
 DATASET(HRILAYOUT) HRIs;
 END;
 
-
-businessplus_layout := record 
-risk_indicators.Layout_Boca_Shell clam;
-Business_Risk_BIP.Layouts.Shell busShell;
-
-end;
-
-busshellplusclam := join ( busShell ,clam,
-left.seq = right.seq,
-transform (businessplus_layout, self.busShell := left, self.clam :=right),atmost (1),left outer);
-
+empty_record := RECORD
+  UNSIGNED a;
+END;
 
 
  	MODEL_DEBUG := FALSE;
@@ -399,11 +391,11 @@ Risk_Indicators.Layout_Boca_Shell clam;
 Business_Risk_BIP.Layouts.OutputLayout busShell;
 
 END;
-   Layout_Debug doModel(businessplus_layout le)  := TRANSFORM 
+   Layout_Debug doModel(empty_record le)  := TRANSFORM 
 #else   
      
     
-     HRI_DS_Layout doModel(businessplus_layout le) := TRANSFORM
+     HRI_DS_Layout doModel(empty_record le) := TRANSFORM
   
   #end  
   
@@ -417,99 +409,99 @@ END;
 
 
   
-   ver_src_id_count                 := le.busShell.Verification.SourceCountID;
-	 bankruptcy_chapter               := le.busShell.Bankruptcy.BankruptcyChapter;
-	 sos_standing                     := le.busShell.SOS.SOSStanding;
-	 pop_bus_phone                    := le.busShell.Input.InputCheckBusPhone;
-	 in_bus_phone10                   := le.busShell.Input_Echo.phone10;
-	 inq_consumer_phone               := le.busShell.Inquiry.inquiryconsumerphone;
-	 pop_bus_addr                     := le.busShell.Input.InputCheckBusAddr;
-	 in_bus_streetaddress1            := le.busShell.Input_Echo.streetaddress1;
-	 inq_consumer_addr                := le.busShell.Inquiry.inquiryconsumeraddress;
-	 ver_src_id_mth_since_fs          := le.busShell.Business_Activity.SourceBusinessRecordTimeOldestID;
-	 pop_bus_state                    := le.busShell.Input.InputCheckBusState;
-	 sos_inc_filing_count             := le.busShell.SOS.SOSIncorporationCount;
-	 sos_state_input_match            := le.busShell.SOS.SOSIncorporationStateInput;
-	 pop_bus_fein                     := le.busShell.Input.InputCheckBusFEIN;
-	 fein_input_valid                 := le.busShell.Verification.InputFEINValidNoID;
-	 pop_rep1_first                   := le.busShell.Input.InputCheckAuthRepFirstName;
-	 pop_rep1_last                    := le.busShell.Input.InputCheckAuthRepLastName;
-	 e2b_rep1_name_on_file            := le.busShell.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile;
-	 assoc_count                      := le.busShell.Associates.AssociateCount;
-	 liens_unreleased_count84         := le.clam.bjl.liens_unreleased_count84;
-	 attr_eviction_count84            := le.clam.BJL.eviction_count84;
-	 filing_count120                  := le.clam.bjl.filing_count120;
-	 inq_total_count03                := le.busShell.Inquiry.Inquiry03Month;
-	 addr_input_type_advo             := le.busShell.Input_Characteristics.InputAddrTypeNoID;
-   tin_match_cons_name              := le.busShell.Verification.FEINPersonNameMatch;
-	 cons_record_match_addr           := le.busShell.Business_To_Person_Link.BusFEINPersonAddrOverlap;
-	 ver_phn_src_count                := le.busShell.Verification.PhoneMatchSourceCount;
-	 ver_phn_src_id_count             := le.busShell.Verification.PhoneMatchSourceCountID;
-	 addr_input_vacancy               := le.busShell.Verification.InputAddrVacancyNoID;
-	 ver_addr_src_count               := le.busShell.Verification.AddrVerificationSourceCount;
-	 pop_bus_name                     := le.busShell.Input.InputCheckBusName;
-	 fein_input_contradictory_in      := le.busShell.Verification.FEINAddrNameMismatch;
-	 ver_fein_src_count               := le.busShell.Verification.FEINMatchSourceCount;
-	 ver_name_src_count               := le.busShell.Verification.NameMatchSourceCount;
-	 ver_altnm_src_count              := le.busShell.Verification.AltNameMatchSourceCount;
-	 phn_input_contradictory          := le.busShell.Verification.PhoneNameMismatch;
-	 pop_bus_city                     := le.busShell.Input.InputCheckBusCity;
-	 pop_bus_zip                      := le.busShell.Input.InputCheckBusZip;
-	 addr_input_zipcode_mismatch      := le.busShell.Verification.AddrZipMismatch;
-	 pop_bus_altname                  := le.busShell.Input.InputCheckBusAltName;
-	 phn_input_valid                  := le.busShell.Verification.InputPhoneValidNoID;
-	 addr_input_valid                 := le.busShell.Verification.InputAddrValidNoID;
-	 addr_input_pobox                 := le.busShell.Verification.AddrPOBox;
-	 addr_input_zipcode_type          := le.busShell.Verification.AddrZipType;
-	 phn_input_residential            := le.busShell.Verification.PhoneResidential;
-	 phn_input_distance_addr          := le.busShell.Verification.PhoneDistance;
-	 truedid                          := le.clam.truedid;
-	 in_streetaddress                 := le.clam.shell_input.in_streetaddress;
-	 out_addr_type                    := le.clam.shell_input.addr_type;
-	 in_phone10                       := le.clam.shell_input.phone10;
-	 nas_summary                      := le.clam.iid.nas_summary;
-	 nap_summary                      := le.clam.iid.nap_summary;
-	 rc_phonevalflag                  := le.clam.iid.phonevalflag;
-	 rc_decsflag                      := le.clam.iid.decsflag;
-	 rc_ssnvalflag                    := le.clam.iid.socsvalflag;
-	 rc_addrvalflag                   := le.clam.iid.addrvalflag;
-	 ver_sources                      := le.clam.header_summary.ver_sources;
-	 ver_sources_first_seen           := le.clam.header_summary.ver_sources_first_seen_date;
-	 ver_sources_last_seen            := le.clam.header_summary.ver_sources_last_seen_date;
-	 ver_sources_count                := le.clam.header_summary.ver_sources_recordcount;
-	 fnamepop                         := le.clam.input_validation.firstname;
-	 lnamepop                         := le.clam.input_validation.lastname;
-	 addrpop                          := le.clam.input_validation.address;
-	 ssnlength                        := le.clam.input_validation.ssn_length;
-	 dobpop                           := le.clam.input_validation.dateofbirth;
-	 hphnpop                          := le.clam.input_validation.homephone;
-	 add_input_advo_vacancy           := le.clam.advo_input_addr.Address_Vacancy_Indicator;
-	 avg_lres                         := le.clam.other_address_info.avg_lres;
-	 ssns_per_adl                     := le.clam.velocity_counters.ssns_per_adl;
-	 addrs_per_adl_c6                 := le.clam.velocity_counters.addrs_per_adl_created_6months;
-	 inq_peradl                       := le.clam.acc_logs.inquiryperadl;
-	 inq_perssn                       := if(isFCRA, 0, le.clam.acc_logs.inquiryPerSSN );
-	 inq_adlsperssn                   := if(isFCRA, 0, le.clam.acc_logs.inquiryADLsPerSSN );
-	 inq_lnamesperssn                 := if(isFCRA, 0, le.clam.acc_logs.inquiryLNamesPerSSN );
-	 inq_addrsperssn                  := if(isFCRA, 0, le.clam.acc_logs.inquiryAddrsPerSSN );
-	 inq_dobsperssn                   := if(isFCRA, 0, le.clam.acc_logs.inquiryDOBsPerSSN );
-	 inq_peraddr                      := if(isFCRA, 0, le.clam.acc_logs.inquiryPerAddr );
-	 inq_adlsperaddr                  := if(isFCRA, 0, le.clam.acc_logs.inquiryADLsPerAddr );
-	 inq_lnamesperaddr                := if(isFCRA, 0, le.clam.acc_logs.inquiryLNamesPerAddr );
-	 inq_ssnsperaddr                  := if(isFCRA, 0, le.clam.acc_logs.inquirySSNsPerAddr );
-	 inq_perphone                     := if(isFCRA, 0, le.clam.acc_logs.inquiryPerPhone );
-	 inq_adlsperphone                 := if(isFCRA, 0, le.clam.acc_logs.inquiryADLsPerPhone );
-	 fp_varrisktype                   := le.clam.fdattributesv2.variationrisklevel;
-	 fp_srchunvrfdssncount            := le.clam.fdattributesv2.searchunverifiedssncountyear;
-	 fp_srchunvrfdaddrcount           := le.clam.fdattributesv2.searchunverifiedaddrcountyear;
-	 fp_srchunvrfddobcount            := le.clam.fdattributesv2.searchunverifieddobcountyear;
-	 fp_srchunvrfdphonecount          := le.clam.fdattributesv2.searchunverifiedphonecountyear;
-	 fp_divrisktype                   := le.clam.fdattributesv2.divrisklevel;
-	 fp_srchcomponentrisktype         := le.clam.fdattributesv2.searchcomponentrisklevel;
-	 felony_count                     := le.clam.bjl.felony_count;
-	inferred_age                     := le.clam.inferred_age;
-  input_bus_fein                    := le.busshell.input_echo.fein;
-  input_rep_ssn                   := le.busshell.input_echo.rep_ssn;
+   ver_src_id_count                 := busShell.Verification.SourceCountID;
+	 bankruptcy_chapter               := busShell.Bankruptcy.BankruptcyChapter;
+	 sos_standing                     := busShell.SOS.SOSStanding;
+	 pop_bus_phone                    := busShell.Input.InputCheckBusPhone;
+	 in_bus_phone10                   := busShell.Input_Echo.phone10;
+	 inq_consumer_phone               := busShell.Inquiry.inquiryconsumerphone;
+	 pop_bus_addr                     := busShell.Input.InputCheckBusAddr;
+	 in_bus_streetaddress1            := busShell.Input_Echo.streetaddress1;
+	 inq_consumer_addr                := busShell.Inquiry.inquiryconsumeraddress;
+	 ver_src_id_mth_since_fs          := busShell.Business_Activity.SourceBusinessRecordTimeOldestID;
+	 pop_bus_state                    := busShell.Input.InputCheckBusState;
+	 sos_inc_filing_count             := busShell.SOS.SOSIncorporationCount;
+	 sos_state_input_match            := busShell.SOS.SOSIncorporationStateInput;
+	 pop_bus_fein                     := busShell.Input.InputCheckBusFEIN;
+	 fein_input_valid                 := busShell.Verification.InputFEINValidNoID;
+	 pop_rep1_first                   := busShell.Input.InputCheckAuthRepFirstName;
+	 pop_rep1_last                    := busShell.Input.InputCheckAuthRepLastName;
+	 e2b_rep1_name_on_file            := busShell.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile;
+	 assoc_count                      := busShell.Associates.AssociateCount;
+	 liens_unreleased_count84         := clam.bjl.liens_unreleased_count84;
+	 attr_eviction_count84            := clam.BJL.eviction_count84;
+	 filing_count120                  := clam.bjl.filing_count120;
+	 inq_total_count03                := busShell.Inquiry.Inquiry03Month;
+	 addr_input_type_advo             := busShell.Input_Characteristics.InputAddrTypeNoID;
+   tin_match_cons_name              := busShell.Verification.FEINPersonNameMatch;
+	 cons_record_match_addr           := busShell.Business_To_Person_Link.BusFEINPersonAddrOverlap;
+	 ver_phn_src_count                := busShell.Verification.PhoneMatchSourceCount;
+	 ver_phn_src_id_count             := busShell.Verification.PhoneMatchSourceCountID;
+	 addr_input_vacancy               := busShell.Verification.InputAddrVacancyNoID;
+	 ver_addr_src_count               := busShell.Verification.AddrVerificationSourceCount;
+	 pop_bus_name                     := busShell.Input.InputCheckBusName;
+	 fein_input_contradictory_in      := busShell.Verification.FEINAddrNameMismatch;
+	 ver_fein_src_count               := busShell.Verification.FEINMatchSourceCount;
+	 ver_name_src_count               := busShell.Verification.NameMatchSourceCount;
+	 ver_altnm_src_count              := busShell.Verification.AltNameMatchSourceCount;
+	 phn_input_contradictory          := busShell.Verification.PhoneNameMismatch;
+	 pop_bus_city                     := busShell.Input.InputCheckBusCity;
+	 pop_bus_zip                      := busShell.Input.InputCheckBusZip;
+	 addr_input_zipcode_mismatch      := busShell.Verification.AddrZipMismatch;
+	 pop_bus_altname                  := busShell.Input.InputCheckBusAltName;
+	 phn_input_valid                  := busShell.Verification.InputPhoneValidNoID;
+	 addr_input_valid                 := busShell.Verification.InputAddrValidNoID;
+	 addr_input_pobox                 := busShell.Verification.AddrPOBox;
+	 addr_input_zipcode_type          := busShell.Verification.AddrZipType;
+	 phn_input_residential            := busShell.Verification.PhoneResidential;
+	 phn_input_distance_addr          := busShell.Verification.PhoneDistance;
+	 truedid                          := clam.truedid;
+	 in_streetaddress                 := clam.shell_input.in_streetaddress;
+	 out_addr_type                    := clam.shell_input.addr_type;
+	 in_phone10                       := clam.shell_input.phone10;
+	 nas_summary                      := clam.iid.nas_summary;
+	 nap_summary                      := clam.iid.nap_summary;
+	 rc_phonevalflag                  := clam.iid.phonevalflag;
+	 rc_decsflag                      := clam.iid.decsflag;
+	 rc_ssnvalflag                    := clam.iid.socsvalflag;
+	 rc_addrvalflag                   := clam.iid.addrvalflag;
+	 ver_sources                      := clam.header_summary.ver_sources;
+	 ver_sources_first_seen           := clam.header_summary.ver_sources_first_seen_date;
+	 ver_sources_last_seen            := clam.header_summary.ver_sources_last_seen_date;
+	 ver_sources_count                := clam.header_summary.ver_sources_recordcount;
+	 fnamepop                         := clam.input_validation.firstname;
+	 lnamepop                         := clam.input_validation.lastname;
+	 addrpop                          := clam.input_validation.address;
+	 ssnlength                        := clam.input_validation.ssn_length;
+	 dobpop                           := clam.input_validation.dateofbirth;
+	 hphnpop                          := clam.input_validation.homephone;
+	 add_input_advo_vacancy           := clam.advo_input_addr.Address_Vacancy_Indicator;
+	 avg_lres                         := clam.other_address_info.avg_lres;
+	 ssns_per_adl                     := clam.velocity_counters.ssns_per_adl;
+	 addrs_per_adl_c6                 := clam.velocity_counters.addrs_per_adl_created_6months;
+	 inq_peradl                       := clam.acc_logs.inquiryperadl;
+	 inq_perssn                       := if(isFCRA, 0, clam.acc_logs.inquiryPerSSN );
+	 inq_adlsperssn                   := if(isFCRA, 0, clam.acc_logs.inquiryADLsPerSSN );
+	 inq_lnamesperssn                 := if(isFCRA, 0, clam.acc_logs.inquiryLNamesPerSSN );
+	 inq_addrsperssn                  := if(isFCRA, 0, clam.acc_logs.inquiryAddrsPerSSN );
+	 inq_dobsperssn                   := if(isFCRA, 0, clam.acc_logs.inquiryDOBsPerSSN );
+	 inq_peraddr                      := if(isFCRA, 0, clam.acc_logs.inquiryPerAddr );
+	 inq_adlsperaddr                  := if(isFCRA, 0, clam.acc_logs.inquiryADLsPerAddr );
+	 inq_lnamesperaddr                := if(isFCRA, 0, clam.acc_logs.inquiryLNamesPerAddr );
+	 inq_ssnsperaddr                  := if(isFCRA, 0, clam.acc_logs.inquirySSNsPerAddr );
+	 inq_perphone                     := if(isFCRA, 0, clam.acc_logs.inquiryPerPhone );
+	 inq_adlsperphone                 := if(isFCRA, 0, clam.acc_logs.inquiryADLsPerPhone );
+	 fp_varrisktype                   := clam.fdattributesv2.variationrisklevel;
+	 fp_srchunvrfdssncount            := clam.fdattributesv2.searchunverifiedssncountyear;
+	 fp_srchunvrfdaddrcount           := clam.fdattributesv2.searchunverifiedaddrcountyear;
+	 fp_srchunvrfddobcount            := clam.fdattributesv2.searchunverifieddobcountyear;
+	 fp_srchunvrfdphonecount          := clam.fdattributesv2.searchunverifiedphonecountyear;
+	 fp_divrisktype                   := clam.fdattributesv2.divrisklevel;
+	 fp_srchcomponentrisktype         := clam.fdattributesv2.searchcomponentrisklevel;
+	 felony_count                     := clam.bjl.felony_count;
+	inferred_age                     := clam.inferred_age;
+  input_bus_fein                    := busshell.input_echo.fein;
+  input_rep_ssn                   := busshell.input_echo.rep_ssn;
 
 
 
@@ -522,7 +514,7 @@ NULL := -999999999;
 INTEGER contains_i( string haystack, string needle ) := __common__(  (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0) )  ;
 
 
-sysdate := __common__(  common.sas_date(if(le.clam.historydate=999999, (string)std.date.today(), (string6)le.clam.historydate+'01')))  ;
+sysdate := __common__(  common.sas_date(if(clam.historydate=999999, (string)std.date.today(), (string6)clam.historydate+'01')))  ;
 
 
 
@@ -1162,7 +1154,6 @@ wc20p := inq_adlsperssn > 2;
 wc21p := inq_perssn >= 10;
 
 wc22p := fp_varrisktype >= '5';
-
 
 wc23b1 := (integer)pop_bus_phone = 1 and hphnpop  and in_bus_phone10 != in_phone10 and (integer)inq_consumer_phone >= 6;//  
 wc23b2 :=  (integer)pop_bus_phone = 1 and (integer)inq_consumer_phone >= 6;// for Business only models 
@@ -1889,8 +1880,8 @@ TopWarningCodes := PROJECT(ds_TopRiskIndicators, TRANSFORM(HRILayout,
                     self.wc81p                            := wc81p;
                     self.wc82p                            := wc82p;
                     self.wc83p                            := wc83p;
-                    self.clam                              :=le.clam;
-                    self.Busshell                        := le.Busshell ;
+                    self.clam                              :=clam;
+                    self.Busshell                        := Busshell ;
                     self.bbfm_wc1                         := bbfm_wc1;
                     self.bbfm_wc2                         := bbfm_wc2;
                     self.bbfm_wc3                         := bbfm_wc3;
@@ -1906,7 +1897,7 @@ self.HRIs := TopWarningCodes;
         
 #end 
 END;
-model := project(busshellplusclam, doModel(left));
+model := project(risk_indicators.iid_constants.ds_Record, doModel(left));
 
 return model;
 END;
