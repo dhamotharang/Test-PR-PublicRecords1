@@ -1,10 +1,10 @@
 ﻿IMPORT $, doxie, dx_Email, DidVille, Royalty;
 EXPORT Layouts := MODULE
 
-    EXPORT batch_email_input := RECORD
-      STRING email;
-      doxie.layout_inBatchMaster - [dl,dlstate,vin,Plate,PlateState,MatchCode,searchType,score,max_results];                
-    END;
+  EXPORT batch_email_input := RECORD
+    STRING email;
+    doxie.layout_inBatchMaster - [dl,dlstate,vin,Plate,PlateState,MatchCode,searchType,score,max_results];                
+  END;
 
   EXPORT batch_in_rec := RECORD
     STRING20    acctno := '';
@@ -164,9 +164,29 @@ EXPORT Layouts := MODULE
     DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
   END;
   
-  EXPORT GatewayData := MODULE
+  EXPORT event_history_rec := RECORD
+    STRING200 email := '';
+    STRING10  email_status := '';
+    STRING100 email_status_reason := '';
+    STRING40	error_code := '';
+    BOOLEAN   is_disposable_address := FALSE;
+    BOOLEAN   is_role_address := FALSE;
+    STRING100 email_username := '';  
+    STRING100 email_domain := ''; 
+    STRING8		date_added;   
+  END;
+
+  EXPORT domain_rec := RECORD
+    STRING100	email_domain;
+    STRING8	  expire_date;
+    STRING8	  date_last_verified;
+    STRING50	domain_status;
+    BOOLEAN   accept_all;
+  END;
+
+  EXPORT Gateway_Data := MODULE
     EXPORT batch_in_bv_rec := RECORD
-      STRING      email := '';
+      STRING   email := '';
     END;
     
     EXPORT bv_history_rec := RECORD
@@ -192,10 +212,10 @@ EXPORT Layouts := MODULE
     END;
     
      EXPORT bv_history_response_rec := RECORD
-      DATASET (bv_history_deltabase_rec) Records  {XPATH('Records/Rec'), MAXCOUNT($.Constants.GatewayValues.SQLSelectLimit)};
-      STRING  RecsReturned {XPATH('RecsReturned')};
-      STRING  Latency {XPATH('Latency')};
-      STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
+       DATASET (bv_history_deltabase_rec) Records  {XPATH('Records/Rec'), MAXCOUNT($.Constants.GatewayValues.SQLSelectLimit)};
+       STRING  RecsReturned {XPATH('RecsReturned')};
+       STRING  Latency {XPATH('Latency')};
+       STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
     END;
   END;
 
