@@ -33,12 +33,8 @@ EXPORT layout_best := RECORD
 	integer4 total_records := 0;
 	unsigned1 age := 0;
 	string1 valid_ssn := '';
-	string10 ADL_ind := '';	
-	unsigned3 addr_dt_first_seen := 0;	
-	AID.Common.xAID	RawAID := 0; 	
-	string1 glb_name := '';
-	string1 glb_address := '';
-	string1 glb_dob := '';
-	string1 glb_ssn := '';
-	string1 glb_phone := '';
+	string10 ADL_ind := '';
+	unsigned3 addr_dt_first_seen := 0;
+	AID.Common.xAID	RawAID := 0;
+  dx_BestRecords.Layout_best_flags;
 END;
