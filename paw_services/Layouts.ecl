@@ -1,4 +1,5 @@
-import PAW,doxie, BIPV2;
+import PAW,doxie, BIPV2, BatchShare, FFD;
+
 export Layouts := module
 	export search := record
 		unsigned6 contact_id;
@@ -237,4 +238,81 @@ export Layouts := module
 			string60  pawk_5_email ;
 			
 	ENd;
+
+	EXPORT FCRA := MODULE
+
+		EXPORT inputRec:=RECORD
+			BatchShare.Layouts.ShareAcct;
+			BatchShare.Layouts.ShareDid;
+			BatchShare.Layouts.ShareName;
+			BatchShare.Layouts.SharePII;
+			BatchShare.Layouts.ShareAddress;
+		END;
+
+		EXPORT workRec:=RECORD
+			inputRec;
+			TYPEOF(BatchShare.Layouts.ShareAcct.acctno) orig_acctno;
+			Batchshare.Layouts.ShareErrors;
+		END;
+
+		// DISCLOSE ONLY
+		EXPORT pawRec := RECORD
+			Paw.Layout.Employment_Out.dt_first_seen;
+			Paw.Layout.Employment_Out.dt_last_seen;
+			Paw.Layout.Employment_Out.source;
+			Paw.Layout.Employment_Out.company_name;
+			Paw.Layout.Employment_Out.company_prim_range;
+			Paw.Layout.Employment_Out.company_predir;
+			Paw.Layout.Employment_Out.company_prim_name;
+			Paw.Layout.Employment_Out.company_addr_suffix;
+			Paw.Layout.Employment_Out.company_postdir;
+			Paw.Layout.Employment_Out.company_unit_desig;
+			Paw.Layout.Employment_Out.company_sec_range;
+			Paw.Layout.Employment_Out.company_city;
+			Paw.Layout.Employment_Out.company_state;
+			Paw.Layout.Employment_Out.company_zip;
+			Paw.Layout.Employment_Out.company_zip4;
+			Paw.Layout.Employment_Out.company_title;
+			Paw.Layout.Employment_Out.company_phone;
+			Paw.Layout.Employment_Out.company_status;
+			Paw.Layout.Employment_Out.active_phone_flag;
+			Paw.Layout.Employment_Out.fname;
+			Paw.Layout.Employment_Out.mname;
+			Paw.Layout.Employment_Out.lname;
+			Paw.Layout.Employment_Out.name_suffix;
+			Paw.Layout.Employment_Out.phone;
+			Paw.Layout.Employment_Out.email_address;
+			Paw.Layout.Employment_Out.prim_range;
+			Paw.Layout.Employment_Out.predir;
+			Paw.Layout.Employment_Out.prim_name;
+			Paw.Layout.Employment_Out.addr_suffix;
+			Paw.Layout.Employment_Out.postdir;
+			Paw.Layout.Employment_Out.unit_desig;
+			Paw.Layout.Employment_Out.sec_range;
+			Paw.Layout.Employment_Out.city;
+			Paw.Layout.Employment_Out.state;
+			Paw.Layout.Employment_Out.zip;
+			Paw.Layout.Employment_Out.zip4;
+			Paw.Layout.Employment_Out.county;
+		END;
+
+		EXPORT pawBatchOutRec:=RECORD
+			BatchShare.Layouts.ShareAcct;
+			UNSIGNED SequenceNumber;
+			BatchShare.Layouts.ShareDid;
+			BatchShare.Layouts.ShareErrors.error_code;
+			pawRec;
+			FFD.Layouts.ConsumerFlags;
+			STRING12 inquiry_lexid;
+		END;
+
+		EXPORT pawWorkRec := RECORD
+			pawBatchOutRec;
+			Paw.Layout.Employment_Out.contact_id;
+			DATASET(FFD.Layouts.ConsumerStatementBatch) StatementsAndDisputes;
+			FFD.Layouts.CommonRawRecordElements;
+		END;
+
+	END;
+
 end;
