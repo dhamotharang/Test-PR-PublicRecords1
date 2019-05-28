@@ -98,9 +98,9 @@ EXPORT Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(KEL.typ.int __PUlt
     SHARED TYPEOF(B_Tradeline_Business_1(__in,__cfg).__ENH_Tradeline_Business_1) __ENH_Tradeline_Business_1 := B_Tradeline_Business_1_Local(__in,__cfg).__ENH_Tradeline_Business_1;
   END;
   SHARED TYPEOF(B_Business(__in).__ENH_Business) __ENH_Business := B_Business_Local(__in).__ENH_Business;
-  SHARED __EE818672 := __ENH_Business;
-  SHARED __EE818769 := __EE818672(__T(__AND(__OP2(__EE818672.Ult_I_D_,=,__CN(__PUltID_in)),__AND(__OP2(__EE818672.Org_I_D_,=,__CN(__POrgID_in)),__OP2(__EE818672.Sele_I_D_,=,__CN(__PSeleID_in))))));
-  SHARED __ST32257_Layout := RECORD
+  SHARED __EE824314 := __ENH_Business;
+  SHARED __EE824411 := __EE824314(__T(__AND(__OP2(__EE824314.Ult_I_D_,=,__CN(__PUltID_in)),__AND(__OP2(__EE824314.Org_I_D_,=,__CN(__POrgID_in)),__OP2(__EE824314.Sele_I_D_,=,__CN(__PSeleID_in))))));
+  SHARED __ST32422_Layout := RECORD
     KEL.typ.nint Lex_I_D_Bus_Extended_Family_Append_;
     KEL.typ.nint Lex_I_D_Bus_Legal_Family_Append_;
     KEL.typ.nint Lex_I_D_Bus_Legal_Entity_Append_;
@@ -109,11 +109,11 @@ EXPORT Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1(KEL.typ.int __PUlt
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST32257_Layout __ND818774__Project(B_Business(__in).__ST41142_Layout __PP818770) := TRANSFORM
-    SELF.Lex_I_D_Bus_Extended_Family_Append_ := __PP818770.Ult_I_D_;
-    SELF.Lex_I_D_Bus_Legal_Family_Append_ := __PP818770.Org_I_D_;
-    SELF.Lex_I_D_Bus_Legal_Entity_Append_ := __PP818770.Sele_I_D_;
-    SELF := __PP818770;
+  SHARED __ST32422_Layout __ND824416__Project(B_Business(__in).__ST41486_Layout __PP824412) := TRANSFORM
+    SELF.Lex_I_D_Bus_Extended_Family_Append_ := __PP824412.Ult_I_D_;
+    SELF.Lex_I_D_Bus_Legal_Family_Append_ := __PP824412.Org_I_D_;
+    SELF.Lex_I_D_Bus_Legal_Entity_Append_ := __PP824412.Sele_I_D_;
+    SELF := __PP824412;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE818769,__ND818774__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Lex_I_D_Bus_Extended_Family_Append_,Lex_I_D_Bus_Legal_Family_Append_,Lex_I_D_Bus_Legal_Entity_Append_,Lex_I_D_Bus_Legal_Entity_Restricted_},Lex_I_D_Bus_Extended_Family_Append_,Lex_I_D_Bus_Legal_Family_Append_,Lex_I_D_Bus_Legal_Entity_Append_,Lex_I_D_Bus_Legal_Entity_Restricted_,MERGE),__ST32257_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE824411,__ND824416__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Lex_I_D_Bus_Extended_Family_Append_,Lex_I_D_Bus_Legal_Family_Append_,Lex_I_D_Bus_Legal_Entity_Append_,Lex_I_D_Bus_Legal_Entity_Restricted_},Lex_I_D_Bus_Extended_Family_Append_,Lex_I_D_Bus_Legal_Family_Append_,Lex_I_D_Bus_Legal_Entity_Append_,Lex_I_D_Bus_Legal_Entity_Restricted_,MERGE),__ST32422_Layout));
 END;

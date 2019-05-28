@@ -2,14 +2,14 @@
 IMPORT KEL011 AS KEL;
 IMPORT B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Bankruptcy_6,B_Bankruptcy_7,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Person,B_Person_1,B_Person_2,B_Person_3,CFG_Compile,E_Bankruptcy,E_Criminal_Offense,E_Person,E_Person_Bankruptcy,E_Person_Offenses FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
-EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdate __PInputArchiveDateClean, UNSIGNED8 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
+EXPORT Q_F_C_R_A_Person_Attributes_V1(KEL.typ.uid __PLexID_in, KEL.typ.kdate __PInputArchiveDateClean, UNSIGNED8 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
     EXPORT KEL.typ.kdate CurrentDate := __PInputArchiveDateClean;
   END;
   SHARED E_Person_Filtered_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(E_Person(__in,__cfg))
     SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__PInputArchiveDateClean))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds((__ds.__Permits & __PDPM) = __ds.__Permits);
-    SHARED __GroupTest(DATASET(InLayout) __g) := EXISTS(__g(__T(__OP2(__g.UID,IN,__CN(__PLexIDs)))));
+    SHARED __GroupTest(DATASET(InLayout) __g) := EXISTS(__g(__T(__OP2(__g.UID,=,__CN(__PLexID_in)))));
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
     SHARED __GroupedFilter(GROUPED DATASET(InLayout) __ds) := HAVING(__ds,__GroupTest(ROWS(LEFT)));
   END;
@@ -28,9 +28,8 @@ EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdat
   SHARED E_Bankruptcy_Filtered(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(E_Bankruptcy(__in,__cfg))
     SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__PInputArchiveDateClean))));
     SHARED __UsingFitler(DATASET(InLayout) __ds) := __ds((__ds.__Permits & __PDPM) = __ds.__Permits);
-    SHARED __GroupTest(DATASET(InLayout) __g) := EXISTS(__g(__T(__OP2(__FN1(KEL.Routines.TrimAll,__g.Case_Number_),<>,__CN(''))))) AND EXISTS(__g(__T(__NOT(__NT(__g.Case_Number_)))));
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
-    SHARED __GroupedFilter(GROUPED DATASET(InLayout) __ds) := JOIN(HAVING(__ds,__GroupTest(ROWS(LEFT))),E_Person_Bankruptcy_Filtered_1(__in,__cfg).__PostFilter,__EEQP(LEFT.UID,RIGHT.Bankrupt_),TRANSFORM(InLayout,SELF:=LEFT),HASH,GROUPED,KEEP(1));
+    SHARED __GroupedFilter(GROUPED DATASET(InLayout) __ds) := JOIN(__ds,E_Person_Bankruptcy_Filtered_1(__in,__cfg).__PostFilter,__EEQP(LEFT.UID,RIGHT.Bankrupt_),TRANSFORM(InLayout,SELF:=LEFT),HASH,GROUPED,KEEP(1));
   END;
   SHARED E_Criminal_Offense_Filtered(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(E_Criminal_Offense(__in,__cfg))
     SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__PInputArchiveDateClean))));
@@ -101,9 +100,9 @@ EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdat
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered(__in,__cfg).__Result;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__in,__cfg_Local).__ENH_Person;
-  SHARED __EE805419 := __ENH_Person;
-  SHARED __EE809496 := __EE805419(__T(__OP2(__EE805419.UID,IN,__CN(__PLexIDs))));
-  SHARED __ST26628_Layout := RECORD
+  SHARED __EE811061 := __ENH_Person;
+  SHARED __EE815138 := __EE811061(__T(__OP2(__EE811061.UID,=,__CN(__PLexID_in))));
+  SHARED __ST26793_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str Lex_I_D_Seen_ := '';
     KEL.typ.int Felony_Cnt1_Y_ := 0;
@@ -141,9 +140,9 @@ EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdat
     KEL.typ.int Bk_Cnt1_Y_ := 0;
     KEL.typ.int Bk_Cnt7_Y_ := 0;
     KEL.typ.int Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24468_Layout) Dt_Of_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24490_Layout) Dt_Of_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24512_Layout) Dt_Of_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24597_Layout) Dt_Of_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24619_Layout) Dt_Of_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24641_Layout) Dt_Of_Bks_List10_Y_;
     KEL.typ.nstr Bk_New1_Y_;
     KEL.typ.nstr Bk_New7_Y_;
     KEL.typ.nstr Bk_New10_Y_;
@@ -156,9 +155,9 @@ EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdat
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt1_Y_;
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt7_Y_;
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt10_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24697_Layout) Ch_For_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24728_Layout) Ch_For_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24759_Layout) Ch_For_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24826_Layout) Ch_For_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24857_Layout) Ch_For_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST24888_Layout) Ch_For_Bks_List10_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Ch1_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Ch7_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Ch10_Y_;
@@ -174,9 +173,9 @@ EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdat
     KEL.typ.nstr Mon_Since_Newest_Bk_Update_Cnt1_Y_;
     KEL.typ.nstr Mon_Since_Newest_Bk_Update_Cnt7_Y_;
     KEL.typ.nstr Mon_Since_Newest_Bk_Update_Cnt10_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25506_Layout) Disp_Of_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25534_Layout) Disp_Of_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25562_Layout) Disp_Of_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25671_Layout) Disp_Of_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25699_Layout) Disp_Of_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST25727_Layout) Disp_Of_Bks_List10_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Disp1_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Disp7_Y_;
     KEL.typ.nstr Bk_With_Newest_Date_Disp10_Y_;
@@ -195,9 +194,9 @@ EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdat
     KEL.typ.int Bk_Discharged_Cnt1_Y_ := 0;
     KEL.typ.int Bk_Discharged_Cnt7_Y_ := 0;
     KEL.typ.int Bk_Discharged_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26057_Layout) Type_Of_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26095_Layout) Type_Of_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26133_Layout) Type_Of_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26222_Layout) Type_Of_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26260_Layout) Type_Of_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST26298_Layout) Type_Of_Bks_List10_Y_;
     KEL.typ.nstr Bk_Having_Bus_Type_Flag1_Y_;
     KEL.typ.nstr Bk_Having_Bus_Type_Flag7_Y_;
     KEL.typ.nstr Bk_Having_Bus_Type_Flag10_Y_;
@@ -206,5 +205,5 @@ EXPORT Q_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdat
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE809496,TRANSFORM(__ST26628_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE815138,TRANSFORM(__ST26793_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
 END;

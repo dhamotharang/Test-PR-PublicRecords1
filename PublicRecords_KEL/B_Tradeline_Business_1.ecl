@@ -4,6 +4,6 @@ IMPORT B_Tradeline_Business_2,B_Tradeline_Business_3,CFG_Compile,E_Business,E_Tr
 IMPORT * FROM KEL011.Null;
 EXPORT B_Tradeline_Business_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_Business_2(__in,__cfg).__ENH_Tradeline_Business_2) __ENH_Tradeline_Business_2 := B_Tradeline_Business_2(__in,__cfg).__ENH_Tradeline_Business_2;
-  SHARED __EE513429 := __ENH_Tradeline_Business_2;
-  EXPORT __ENH_Tradeline_Business_1 := __EE513429;
+  SHARED __EE515722 := __ENH_Tradeline_Business_2;
+  EXPORT __ENH_Tradeline_Business_1 := __EE515722;
 END;
