@@ -11,11 +11,11 @@
  * @returns - the input dataset minus suppressed records.
  *
 */
-EXPORT MAC_SuppressSource (ds_in, mod_access, did_field = 'did', data_env = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
+EXPORT MAC_SuppressSource (ds_in, mod_access, did_field = 'did', gcid_field = 'global_sid', data_env = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
 
   LOCAL suppressed_recs := JOIN(ds_in, suppress.key_OptOutSrc(data_env), 
     KEYED((UNSIGNED6) LEFT.did_field = RIGHT.lexid) AND
-      LEFT.global_sid IN RIGHT.global_sids AND
+      LEFT.gcid_field IN RIGHT.global_sids AND
       RIGHT.exemptions &  (Suppress.optout_exemption.bit_glb(mod_access.glb) | Suppress.optout_exemption.bit_dppa(mod_access.dppa)) = 0,
       TRANSFORM(LEFT), LEFT ONLY);
 

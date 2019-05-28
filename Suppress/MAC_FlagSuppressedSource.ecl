@@ -11,7 +11,7 @@ IMPORT Suppress, data_services;
  * @returns - the input dataset with flagged suppressed records.
  *
 */
-EXPORT MAC_FlagSuppressedSource (ds_in, mod_access, did_field = 'did', data_env = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
+EXPORT MAC_FlagSuppressedSource (ds_in, mod_access, did_field = 'did', gsid_field = 'global_sid', data_env = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
 
   LOCAL l_out := RECORD
    ds_in;
@@ -20,7 +20,7 @@ EXPORT MAC_FlagSuppressedSource (ds_in, mod_access, did_field = 'did', data_env 
   
   LOCAL suppressed_recs := JOIN(ds_in, suppress.key_OptOutSrc(data_env), 
     KEYED((UNSIGNED6) LEFT.did_field = RIGHT.lexid) AND
-    LEFT.global_sid IN RIGHT.global_sids AND
+    LEFT.gsid_field IN RIGHT.global_sids AND
     RIGHT.exemptions &  
         (Suppress.optout_exemption.bit_glb(mod_access.glb) | Suppress.optout_exemption.bit_dppa(mod_access.dppa)) = 0, 
     TRANSFORM(l_out,
