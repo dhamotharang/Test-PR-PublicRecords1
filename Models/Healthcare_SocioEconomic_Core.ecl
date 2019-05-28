@@ -1,8 +1,9 @@
 ﻿﻿
-import risk_indicators, models, std, Profilebooster;
-IMPORT LUCI, ut, STD;
+import risk_indicators, models, Profilebooster;
+IMPORT LUCI, STD;
 IMPORT HCSE_GE_18_LUCI_MODEL;
 IMPORT HCSE_LT_18_LUCI_MODEL;
+IMPORT HCSE_SERA_GBM_M0_V1_model_LUCI;
 
 
 export Healthcare_SocioEconomic_Core(isCoreRequestValid ,batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Options_in, ofac_version_in, gateways_in_ds, CoreResults) := MACRO
@@ -219,10 +220,12 @@ export Healthcare_SocioEconomic_Core(isCoreRequestValid ,batch_in, DPPAPurpose_i
 	
 	SeRs_PreProc_Patterns_Applied := Models.Healthcare_SocioEconomic_Transforms_Core.SeRs_Preprocessing_and_Patterns_M0_M1(Combined_LI_PB_Prep_Pre_Proc,Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed);
 	
-	SeRs_PreProc_Patterns_Validated := join(SeRs_PreProc_Patterns_Applied,icdkey.key().ref_icd10_diag_key.qa,
+	SeRs_PreProc_Patterns_Validated := join(SeRs_PreProc_Patterns_Applied,icdkey.key().ref_icd10.qa,
 											keyed(STD.Str.ToUpperCase(std.Str.FilterOut(left.admit_diagnosis_code, '.')) = right.diag_cd),
 											Transform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed,
-											self.isSeRsInvalidDiag := if(right.desc_short<>'',0,1);
+											self.isSeRsInvalidDiag := map (left.ADMIT_DIAGNOSIS_CODE = ''  => 0, 
+                                               (unsigned8)left.ADMIT_DATE >= (unsigned8)right.effective_dt and (unsigned8)left.ADMIT_DATE <= (unsigned8)right.termination_dt and right.diag_cd <> '' => 0, 
+                                                1);
 											self := left;
 											), left outer, atmost(1));
 	// OUTPUT(SeRs_PreProc_Patterns_Validated, NAMED('SeRs_PreProc_Patterns_Validated'));
