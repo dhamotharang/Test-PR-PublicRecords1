@@ -1,4 +1,4 @@
-﻿import _Control, ut, did_add, address, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
+﻿import _Control, ut, did_add, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
 onThor := _Control.Environment.OnThor;
 
 export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) ssnrecs, 
@@ -9,8 +9,8 @@ export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) s
 								string50 DataRestriction=iid_constants.default_DataRestriction) := function	
 								
 
-ExactAddrRequired := ExactMatchLevel[iid_constants.posExactAddrMatch]=iid_constants.sTrue;								
-ExactAddrZip5andPrimRange := ExactMatchLevel[iid_constants.posExactAddrZip5andPrimRange]=iid_constants.sTrue;
+ExactAddrRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrMatch]=iid_constants.sTrue;								
+ExactAddrZip5andPrimRange := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrZip5andPrimRange]=iid_constants.sTrue;
 
 nonblank(f) := MACRO
 	SELF.f := IF(le.f='',ri.f,le.f)
@@ -40,7 +40,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.zipscore := le.zipscore;
 	self.socsscore := le.socsscore;
 	// choose the higher of header dob or inquiry dob
-	self.dobscore := if(iid_constants.tscore(le.dobscore)>=iid_constants.tscore(ri.inquiryNAPdobScore), le.dobscore, ri.inquiryNAPdobScore);
+	self.dobscore := if(risk_indicators.iid_constants.tscore(le.dobscore)>=risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore), le.dobscore, ri.inquiryNAPdobScore);
 	self.verfirst := 	le.verfirst;
 	self.verlast := 	le.verlast;
 	self.vercmpy := 	le.vercmpy;
@@ -59,7 +59,15 @@ temp combo(temp le, temp ri) := TRANSFORM
 	self.verhphone := 	le.verhphone;
 	self.verwphone := 	le.verwphone;
 	self.versocs := 	le.versocs;
-	self.verdob := if(iid_constants.tscore(le.dobscore)>=iid_constants.tscore(ri.inquiryNAPdobScore), le.verdob, ri.inquiryNAPdob);
+	self.verdob := map(
+		risk_indicators.iid_constants.tscore(le.dobscore) = 255                                         => ri.inquiryNAPdob,
+		risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
+			AND TRIM(le.verdob[5..8]) IN ['','0000']
+			AND ri.inquiryNAPdob[1..4]=le.verdob[1..4]                                    => ri.inquiryNAPdob,
+		risk_indicators.iid_constants.tscore(le.dobscore)<risk_indicators.iid_constants.tscore(ri.inquiryNAPdobScore)
+			AND TRIM(le.verdob[7..8]) IN ['','00']
+			AND ri.inquiryNAPdob[1..6]=le.verdob[1..6]                                    => ri.inquiryNAPdob,
+																							 le.verdob);
 	self.pullidflag := le.pullidflag;
 	self.watchlists := le.watchlists;
 	
