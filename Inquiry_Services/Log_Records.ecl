@@ -1,4 +1,4 @@
-IMPORT ADDRESS, BatchServices, doxie, iesp, Inquiry_AccLogs, lib_stringlib,Inquiry_Services, Business_Risk_BIP, ut, RiskWise;
+﻿IMPORT ADDRESS, BatchServices, doxie, iesp, Inquiry_AccLogs, std, Inquiry_Services, Business_Risk_BIP, ut, RiskWise;
 /*
   This service was designed to combine the results from 4 existing services and return the combined output.
   NO SOAPCALL()s are made.
@@ -19,14 +19,14 @@ industry_out := if (in_params.company_ID <> '',
 														project(choosen(Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(keyed(s_company_id=in_params.company_id)), 1), 
 														Inquiry_Services.Log_Layouts.temp_layout), dataset([], Inquiry_Services.Log_Layouts.temp_layout));
 
-keyval_product_ID := if (trim(industry_out[1].Product_ID) <> '', stringlib.stringtouppercase(trim(industry_out[1].Product_ID)),'');
-keyval_transaction_type := stringlib.stringtouppercase(trim(in_params.transaction_type));
-keyval_function_name := stringlib.stringtouppercase(trim(in_params.Function_Name));
-allkeyvals := (keyval_product_ID <> '') and (keyval_transaction_type <> '') and (keyval_function_name <> '');
+keyval_product_ID := if (trim(industry_out[1].Product_ID) <> '', std.Str.ToUpperCase(trim(industry_out[1].Product_ID)),'');
+keyval_transaction_type := std.Str.ToUpperCase(trim(in_params.transaction_type));
+keyval_function_name := std.Str.ToUpperCase(trim(in_params.Function_Name));
+allkeyvals := (keyval_product_ID <> '') and (keyval_function_name <> '');
 //get the function description Inquiry_AccLogs.Function_Description_Lookup_Service
 function_out := if (allkeyvals, project(choosen(Inquiry_AccLogs.key_lookup_function_desc(
 																											 keyed(s_product_id=keyval_product_ID and 
-																											 s_transaction_type=keyval_transaction_type and 
+																											 s_transaction_type IN [keyval_transaction_type, ''] and 
 																											 s_function_name=keyval_function_name)), 1),
 																								Inquiry_Services.Log_Layouts.temp_layout), 
 																				dataset([],Inquiry_Services.Log_Layouts.temp_layout));
@@ -94,11 +94,11 @@ Business_Risk_BIP.Layouts.Input prepForBIPAppend(address.Layout_Batch_Out le) :=
 	self.City := le.v_city_name;
 	self.State := le.st;
 	self.Phone10 := RiskWise.CleanPhone(in_params.company_phone);
-	filteredFEIN := StringLib.StringFilter(in_params.company_fein, '0123456789');
+	filteredFEIN := std.Str.filter(in_params.company_fein, '0123456789');
 	self.FEIN := if(length(filteredFEIN) != 9 or (integer)filteredFEIN <= 0, '', filteredFEIN);
-	self.Rep_Email := StringLib.StringToUpperCase(TRIM(in_params.email, LEFT, RIGHT));
-	self.Rep_FirstName := TRIM(StringLib.StringToUpperCase(in_params.firstname), LEFT, RIGHT);
-	self.Rep_LastName := TRIM(StringLib.StringToUpperCase(in_params.lastname), LEFT, RIGHT);
+	self.Rep_Email := std.Str.ToUpperCase(TRIM(in_params.email, LEFT, RIGHT));
+	self.Rep_FirstName := TRIM(std.Str.ToUpperCase(in_params.firstname), LEFT, RIGHT);
+	self.Rep_LastName := TRIM(std.Str.ToUpperCase(in_params.lastname), LEFT, RIGHT);
 	filteredSSN := StringLib.StringFilter(in_params.ssn, '0123456789');
 	self.Rep_SSN := IF(LENGTH(filteredSSN) != 9 OR (INTEGER)filteredSSN <= 0, '', filteredSSN);
 	self.Rep_LexID := did_out_sort[1].did;
