@@ -102,6 +102,9 @@
     BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3
     BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2
     BOOLEAN     BEONoEvidenceOfStateCriminal;
+    //BusSales
+    INTEGER			sales;																							//populated in DueDiligence.getBusSales
+    STRING4			salesYearReported;																	//populated in DueDiligence.getBusSales
   END;
   
   
