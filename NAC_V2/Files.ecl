@@ -61,8 +61,8 @@ export Files(string st='') := module;
 			0, ''}
 			], NAC_V2.Layouts.base);
 				
-	export dsContactRecords := DATASET(Superfile_List('').sfContactRecords, Layouts2.rStateContactEx, THOR);
-	export dsExceptionRecords := DATASET(Superfile_List('').sfExceptionRecords, Layouts2.rExceptionEx, THOR);	
+	export dsContactRecords := DATASET(Superfile_List('').sfContactRecords, Layouts2.rStateContactEx, THOR, opt);
+	export dsExceptionRecords := DATASET(Superfile_List('').sfExceptionRecords, Layouts2.rExceptionRecord, THOR, opt);	
 	export dsClientRecords := DATASET(Superfile_List('').sfClientRecords, Layouts2.rClientEx, THOR);	
 	export dsAddressRecords := DATASET(Superfile_List('').sfAddressRecords, Layouts2.rAddressEx, THOR);	
 	export dsCaseRecords := DATASET(Superfile_List('').sfCaseRecords, Layouts2.rCaseEx, THOR);	

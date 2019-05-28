@@ -15,7 +15,7 @@ END;
 
 AddContacts(DATASET(layout_Base2) base, DATASET(Layouts2.rStateContactEx) contacts) := FUNCTION
 		b1 := DISTRIBUTE(base);	//, HASH64(ProgramState, ProgramCode));
-		c1 := contacts;	//, HASH64(ProgramState, ProgramCode));
+		c1 := contacts(UpdateType<>'D');	//, HASH64(ProgramState, ProgramCode));
 		// add client specific contacts
 		b2 := IF(EXISTS(c1(clientId<>'')),		
 						JOIN(b1, c1(clientId<>''),
@@ -171,9 +171,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 												self.RecordCode := left.RecordCode;
 												self := []));
 
-	contacts := PROJECT(ds(RecordCode = 'SC01'), TRANSFORM(Nac_V2.Layouts2.rStateContactEx,
-										self := LEFT.StateContactRec;
-										self.RecordCode := left.RecordCode;));
+	contacts := $.Files().dsContactRecords;
 										
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,

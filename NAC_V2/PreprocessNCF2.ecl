@@ -104,7 +104,7 @@ EXPORT PreprocessNCF2(string ilfn) := function
 										
 	clients := nac_v2.mod_Validation.VerifyRelatedClients(cases, clients1);
 	addresses := nac_v2.mod_Validation.VerifyRelatedAddresses(cases, clients, addresses1);
-
+	
   recombined := PROJECT(cases, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.CaseRec := left;
 								self.RecordCode := left.RecordCode;

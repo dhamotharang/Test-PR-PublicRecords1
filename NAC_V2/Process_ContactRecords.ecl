@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 /*
 
 Update Logic
@@ -98,7 +98,7 @@ EXPORT Process_ContactRecords(DATASET(Layouts2.rStateContactEx) inrec) := FUNCTI
 								self.Errors := IF(RIGHT.ProgramState='',LEFT.Errors,RIGHT.Errors);
 								self.Warnings := IF(RIGHT.ProgramState='',LEFT.Warnings,RIGHT.Warnings);
 									
-								//self := LEFT;
+								self := LEFT;
 							),
 							LEFT OUTER, KEEP(1), MANY LOOKUP),
 						c2);
