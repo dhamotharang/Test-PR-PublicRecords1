@@ -3,7 +3,7 @@ IMPORT SALT311,STD;
 EXPORT match_candidates(DATASET(layout_LGID3) ih) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
   h00 := BIPV2_LGID3.BasicMatch(ih).input_file;
-SHARED thin_table := DISTRIBUTE(TABLE(h00(SALT_Partition<>'*'),{rcid,sbfe_id,nodes_below_st,Lgid3IfHrchy,OriginalSeleId,OriginalOrgId,company_name,cnp_number,active_duns_number,duns_number,duns_number_concept,company_fein,company_inc_state,company_charter_number,cnp_btype,company_name_type_derived,hist_duns_number,active_domestic_corp_key,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,cnp_name,cnp_hasNumber,cnp_lowv,cnp_translated,cnp_classid,prim_range,prim_name,sec_range,v_city_name,st,zip,has_lgid,is_sele_level,is_org_level,is_ult_level,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,levels_from_top,nodes_total,dt_first_seen,dt_last_seen,SALT_Partition,ultid,orgid,seleid,LGID3}),HASH(LGID3));
+SHARED thin_table := DISTRIBUTE(TABLE(h00(SALT_Partition<>'*'),{rcid,sbfe_id,nodes_below_st,Lgid3IfHrchy,OriginalSeleId,OriginalOrgId,company_name,cnp_number,active_duns_number,duns_number,duns_number_concept,company_fein,company_inc_state,company_charter_number,cnp_btype,company_name_type_derived,hist_duns_number,active_domestic_corp_key,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,cnp_name,cnp_hasNumber,cnp_lowv,cnp_translated,cnp_classid,prim_range,prim_name,sec_range,v_city_name,st,zip,has_lgid,is_sele_level,is_org_level,is_ult_level,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,levels_from_top,nodes_total,cortera_id,dt_first_seen,dt_last_seen,SALT_Partition,ultid,orgid,seleid,LGID3}),HASH(LGID3));
  
 //Prepare for field propagations ...
 PrePropCounts := RECORD
@@ -38,9 +38,11 @@ SHARED layout_withpropvars := RECORD
 END;
 SHARED with_props := TABLE(thin_table,layout_withpropvars);
 SHARED UnderLinks_prop0 := DISTRIBUTE( Specificities(ih).UnderLinks_values_persisted(Basis_cnt<10000), HASH(LGID3)); // Not guaranteed distributed by LGID3 :(
+SHARED CorteraAccounts_prop0 := DISTRIBUTE( Specificities(ih).CorteraAccounts_values_persisted(Basis_cnt<10000), HASH(LGID3)); // Not guaranteed distributed by LGID3 :(
  
 SALT311.mac_prop_field(thin_table(sbfe_id NOT IN SET(s.nulls_sbfe_id,sbfe_id)),sbfe_id,LGID3,sbfe_id_props); // For every DID find the best FULL sbfe_id
 SHARED UnderLinks_prop1 := JOIN(UnderLinks_prop0,sbfe_id_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+SHARED CorteraAccounts_prop1 := JOIN(CorteraAccounts_prop0,sbfe_id_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(Lgid3IfHrchy NOT IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy)),Lgid3IfHrchy,LGID3,Lgid3IfHrchy_props); // For every DID find the best FULL Lgid3IfHrchy
 layout_withpropvars take_Lgid3IfHrchy(with_props le,Lgid3IfHrchy_props ri) := TRANSFORM
@@ -50,6 +52,7 @@ layout_withpropvars take_Lgid3IfHrchy(with_props le,Lgid3IfHrchy_props ri) := TR
   END;
 SHARED pj2 := JOIN(with_props,Lgid3IfHrchy_props,left.LGID3=right.LGID3,take_Lgid3IfHrchy(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/);
 SHARED UnderLinks_prop2 := JOIN(UnderLinks_prop1,Lgid3IfHrchy_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+SHARED CorteraAccounts_prop2 := JOIN(CorteraAccounts_prop1,Lgid3IfHrchy_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(company_name NOT IN SET(s.nulls_company_name,company_name)),company_name,LGID3,company_name_props); // For every DID find the best FULL company_name
 layout_withpropvars take_company_name(with_props le,company_name_props ri) := TRANSFORM
@@ -67,6 +70,7 @@ layout_withpropvars take_cnp_number(with_props le,cnp_number_props ri) := TRANSF
   END;
 SHARED pj6 := JOIN(pj5,cnp_number_props,left.LGID3=right.LGID3,take_cnp_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/);
 SHARED UnderLinks_prop3 := JOIN(UnderLinks_prop2,cnp_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+SHARED CorteraAccounts_prop3 := JOIN(CorteraAccounts_prop2,cnp_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(active_duns_number NOT IN SET(s.nulls_active_duns_number,active_duns_number)),active_duns_number,LGID3,active_duns_number_props); // For every DID find the best FULL active_duns_number
 layout_withpropvars take_active_duns_number(with_props le,active_duns_number_props ri) := TRANSFORM
@@ -76,6 +80,7 @@ layout_withpropvars take_active_duns_number(with_props le,active_duns_number_pro
   END;
 SHARED pj7 := JOIN(pj6,active_duns_number_props,left.LGID3=right.LGID3,take_active_duns_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/);
 SHARED UnderLinks_prop4 := JOIN(UnderLinks_prop3,active_duns_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+SHARED CorteraAccounts_prop4 := JOIN(CorteraAccounts_prop3,active_duns_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(duns_number NOT IN SET(s.nulls_duns_number,duns_number)),duns_number,LGID3,duns_number_props); // For every DID find the best FULL duns_number
 layout_withpropvars take_duns_number(with_props le,duns_number_props ri) := TRANSFORM
@@ -85,9 +90,11 @@ layout_withpropvars take_duns_number(with_props le,duns_number_props ri) := TRAN
   END;
 SHARED pj8 := JOIN(pj7,duns_number_props,left.LGID3=right.LGID3,take_duns_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/);
 SHARED UnderLinks_prop5 := JOIN(UnderLinks_prop4,duns_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+SHARED CorteraAccounts_prop5 := JOIN(CorteraAccounts_prop4,duns_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(company_fein NOT IN SET(s.nulls_company_fein,company_fein)),company_fein,LGID3,company_fein_props); // For every DID find the best FULL company_fein
 SHARED UnderLinks_prop6 := JOIN(UnderLinks_prop5,company_fein_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+SHARED CorteraAccounts_prop6 := JOIN(CorteraAccounts_prop5,company_fein_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(company_inc_state NOT IN SET(s.nulls_company_inc_state,company_inc_state)),company_inc_state,LGID3,company_inc_state_props); // For every DID find the best FULL company_inc_state
 layout_withpropvars take_company_inc_state(with_props le,company_inc_state_props ri) := TRANSFORM
@@ -97,6 +104,7 @@ layout_withpropvars take_company_inc_state(with_props le,company_inc_state_props
   END;
 SHARED pj11 := JOIN(pj8,company_inc_state_props,left.LGID3=right.LGID3,take_company_inc_state(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/);
 /*HACKmatch_candidates01*/ SHARED UnderLinks_prop7 := JOIN(UnderLinks_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER, LOCAL);
+/*HACKmatch_candidates04*/ SHARED CorteraAccounts_prop7 := JOIN(CorteraAccounts_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER, LOCAL);
  
 SALT311.mac_prop_field(thin_table(company_charter_number NOT IN SET(s.nulls_company_charter_number,company_charter_number)),company_charter_number,LGID3,company_charter_number_props); // For every DID find the best FULL company_charter_number
 layout_withpropvars take_company_charter_number(with_props le,company_charter_number_props ri) := TRANSFORM
@@ -106,6 +114,7 @@ layout_withpropvars take_company_charter_number(with_props le,company_charter_nu
   END;
 SHARED pj12 := JOIN(pj11,company_charter_number_props,left.LGID3=right.LGID3,take_company_charter_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/);
 SHARED UnderLinks_prp := UnderLinks_prop7;
+SHARED CorteraAccounts_prp := CorteraAccounts_prop7;
  
 pj12 do_computes(pj12 le) := TRANSFORM
   SELF.duns_number_concept := IF (Fields.InValid_duns_number_concept((SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.duns_number)>0,0,HASH32((SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.duns_number)); // Combine child fields into 1 for specificity counting
@@ -176,6 +185,24 @@ EXPORT Layout_UnderLinks_Candidates := RECORD
   BOOLEAN company_inc_state_isnull := (UnderLinks_prp.company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state) OR UnderLinks_prp.company_inc_state = (TYPEOF(UnderLinks_prp.company_inc_state))''); // Simplify later processing 
 END;
 /*HACKmatch_candidates02*/ SHARED UnderLinks_pp := TABLE(UnderLinks_prp,Layout_UnderLinks_Candidates)((~company_inc_state_isnull OR ~active_duns_number_isnull OR ~duns_number_isnull OR ~(active_duns_number_isnull AND duns_number_isnull) OR ~company_fein_isnull OR ~sbfe_id_isnull));
+EXPORT Layout_CorteraAccounts_Candidates := RECORD
+  {CorteraAccounts_prp};
+  INTEGER2 sbfe_id_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN sbfe_id_isnull := (CorteraAccounts_prp.sbfe_id  IN SET(s.nulls_sbfe_id,sbfe_id) OR CorteraAccounts_prp.sbfe_id = (TYPEOF(CorteraAccounts_prp.sbfe_id))''); // Simplify later processing 
+  INTEGER2 Lgid3IfHrchy_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN Lgid3IfHrchy_isnull := (CorteraAccounts_prp.Lgid3IfHrchy  IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy) OR CorteraAccounts_prp.Lgid3IfHrchy = (TYPEOF(CorteraAccounts_prp.Lgid3IfHrchy))''); // Simplify later processing 
+  INTEGER2 cnp_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN cnp_number_isnull := (CorteraAccounts_prp.cnp_number  IN SET(s.nulls_cnp_number,cnp_number) OR CorteraAccounts_prp.cnp_number = (TYPEOF(CorteraAccounts_prp.cnp_number))''); // Simplify later processing 
+  INTEGER2 active_duns_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN active_duns_number_isnull := (CorteraAccounts_prp.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number) OR CorteraAccounts_prp.active_duns_number = (TYPEOF(CorteraAccounts_prp.active_duns_number))''); // Simplify later processing 
+  INTEGER2 duns_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN duns_number_isnull := (CorteraAccounts_prp.duns_number  IN SET(s.nulls_duns_number,duns_number) OR CorteraAccounts_prp.duns_number = (TYPEOF(CorteraAccounts_prp.duns_number))''); // Simplify later processing 
+  INTEGER2 company_fein_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN company_fein_isnull := (CorteraAccounts_prp.company_fein  IN SET(s.nulls_company_fein,company_fein) OR CorteraAccounts_prp.company_fein = (TYPEOF(CorteraAccounts_prp.company_fein))''); // Simplify later processing 
+  INTEGER2 company_inc_state_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN company_inc_state_isnull := (CorteraAccounts_prp.company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state) OR CorteraAccounts_prp.company_inc_state = (TYPEOF(CorteraAccounts_prp.company_inc_state))''); // Simplify later processing 
+END;
+/*HACKmatch_candidates03*/ SHARED CorteraAccounts_pp := TABLE(CorteraAccounts_prp,Layout_CorteraAccounts_Candidates)((~company_inc_state_isnull OR ~active_duns_number_isnull OR ~duns_number_isnull OR ~(active_duns_number_isnull AND duns_number_isnull) OR ~company_fein_isnull OR ~sbfe_id_isnull OR account_id>0));
 EXPORT Layout_Candidates := RECORD // A record to hold weights of each field value
   {h0} AND NOT [company_name]; // remove wordbag fields which need to be expanded
   INTEGER2 sbfe_id_weight100 := 0; // Contains 100x the specificity
@@ -202,7 +229,7 @@ EXPORT Layout_Candidates := RECORD // A record to hold weights of each field val
   INTEGER2 cnp_btype_weight100 := 0; // Contains 100x the specificity
   BOOLEAN cnp_btype_isnull := (h0.cnp_btype  IN SET(s.nulls_cnp_btype,cnp_btype) OR h0.cnp_btype = (TYPEOF(h0.cnp_btype))''); // Simplify later processing 
 END;
-h1 := TABLE(h0,layout_candidates)((~company_inc_state_isnull OR ~active_duns_number_isnull OR ~duns_number_isnull OR ~(duns_number_concept_isnull OR active_duns_number_isnull AND duns_number_isnull) OR ~company_fein_isnull OR ~sbfe_id_isnull));
+/*HACKmatch_candidates05*/ h1 := TABLE(h0,layout_candidates)((~company_inc_state_isnull OR ~active_duns_number_isnull OR ~duns_number_isnull OR ~(duns_number_concept_isnull OR active_duns_number_isnull AND duns_number_isnull) OR ~company_fein_isnull OR ~sbfe_id_isnull) or cortera_id!='');
 //Now add the weights of each field one by one
  
 //Would also create auto-id fields here
@@ -306,6 +333,44 @@ layout_UnderLinks_candidates add_UnderLinks_company_inc_state(layout_UnderLinks_
 END;
 jUnderLinks_9 := JOIN(jUnderLinks_8,PULL(Specificities(ih).company_inc_state_values_persisted),LEFT.company_inc_state=RIGHT.company_inc_state,add_UnderLinks_company_inc_state(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
 EXPORT UnderLinks_candidates := jUnderLinks_9 : PERSIST('~temp::LGID3::BIPV2_LGID3::mc::UnderLinks',EXPIRE(BIPV2_LGID3.Config.PersistExpire));
+ 
+//Now prepare candidate file for CorteraAccounts attribute file
+layout_CorteraAccounts_candidates add_CorteraAccounts_sbfe_id(layout_CorteraAccounts_candidates le,Specificities(ih).sbfe_id_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.sbfe_id_weight100 := MAP (le.sbfe_id_isnull => 0, patch_default and ri.field_specificity=0 => s.sbfe_id_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(CorteraAccounts_pp,s.nulls_sbfe_id,Specificities(ih).sbfe_id_values_persisted,sbfe_id,sbfe_id_weight100,add_CorteraAccounts_sbfe_id,jCorteraAccounts_0);
+layout_CorteraAccounts_candidates add_CorteraAccounts_Lgid3IfHrchy(layout_CorteraAccounts_candidates le,Specificities(ih).Lgid3IfHrchy_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.Lgid3IfHrchy_weight100 := MAP (le.Lgid3IfHrchy_isnull => 0, patch_default and ri.field_specificity=0 => s.Lgid3IfHrchy_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jCorteraAccounts_0,s.nulls_Lgid3IfHrchy,Specificities(ih).Lgid3IfHrchy_values_persisted,Lgid3IfHrchy,Lgid3IfHrchy_weight100,add_CorteraAccounts_Lgid3IfHrchy,jCorteraAccounts_1);
+layout_CorteraAccounts_candidates add_CorteraAccounts_active_duns_number(layout_CorteraAccounts_candidates le,Specificities(ih).active_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.active_duns_number_weight100 := MAP (le.active_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_duns_number_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jCorteraAccounts_1,s.nulls_active_duns_number,Specificities(ih).active_duns_number_values_persisted,active_duns_number,active_duns_number_weight100,add_CorteraAccounts_active_duns_number,jCorteraAccounts_2);
+layout_CorteraAccounts_candidates add_CorteraAccounts_duns_number(layout_CorteraAccounts_candidates le,Specificities(ih).duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.duns_number_weight100 := MAP (le.duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jCorteraAccounts_2,s.nulls_duns_number,Specificities(ih).duns_number_values_persisted,duns_number,duns_number_weight100,add_CorteraAccounts_duns_number,jCorteraAccounts_3);
+layout_CorteraAccounts_candidates add_CorteraAccounts_company_fein(layout_CorteraAccounts_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jCorteraAccounts_3,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_CorteraAccounts_company_fein,jCorteraAccounts_6);
+layout_CorteraAccounts_candidates add_CorteraAccounts_cnp_number(layout_CorteraAccounts_candidates le,Specificities(ih).cnp_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.cnp_number_weight100 := MAP (le.cnp_number_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_number_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jCorteraAccounts_6,s.nulls_cnp_number,Specificities(ih).cnp_number_values_persisted,cnp_number,cnp_number_weight100,add_CorteraAccounts_cnp_number,jCorteraAccounts_8);
+layout_CorteraAccounts_candidates add_CorteraAccounts_company_inc_state(layout_CorteraAccounts_candidates le,Specificities(ih).company_inc_state_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_inc_state_weight100 := MAP (le.company_inc_state_isnull => 0, patch_default and ri.field_specificity=0 => s.company_inc_state_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+jCorteraAccounts_9 := JOIN(jCorteraAccounts_8,PULL(Specificities(ih).company_inc_state_values_persisted),LEFT.company_inc_state=RIGHT.company_inc_state,add_CorteraAccounts_company_inc_state(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
+EXPORT CorteraAccounts_candidates := jCorteraAccounts_9 : PERSIST('~temp::LGID3::BIPV2_LGID3::mc::CorteraAccounts',EXPIRE(BIPV2_LGID3.Config.PersistExpire));
 //Now see if these records are actually linkable
 TotalWeight := Annotated.sbfe_id_weight100 + Annotated.Lgid3IfHrchy_weight100 + Annotated.duns_number_concept_weight100 + Annotated.company_name_weight100 + Annotated.company_fein_weight100 + Annotated.company_charter_number_weight100 + Annotated.cnp_number_weight100 + Annotated.company_inc_state_weight100 + Annotated.cnp_btype_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;

@@ -63,12 +63,12 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   INTEGER2 duns_number_concept_score_ext := SALT311.ClipScore(MAX(duns_number_concept_score_pre,0) + active_duns_number_score + duns_number_score);// Score in surrounding context
   INTEGER2 duns_number_concept_score_res := MAX(0,duns_number_concept_score_pre); // At least nothing
   INTEGER2 duns_number_concept_score := duns_number_concept_score_res;
-  INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force*100, cnp_number_score_temp, SKIP ); // Enforce FORCE parameter
+  INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR sbfe_id_score > /*HACKMatches05*/Config.cnp_number_OR1_sbfe_id_Force*100 OR outside>0, cnp_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 company_inc_state_score_temp := MAP(
                         le.company_inc_state_isnull OR ri.company_inc_state_isnull OR le.company_inc_state_weight100 = 0 => 0,
                         le.company_inc_state = ri.company_inc_state  => le.company_inc_state_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.company_inc_state_weight100,ri.company_inc_state_weight100),s.company_inc_state_switch));
-  INTEGER2 company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100, company_inc_state_score_temp, SKIP ); // Enforce FORCE parameter
+  INTEGER2 company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR /*HACKMatches04*/sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100 OR outside>0, company_inc_state_score_temp, SKIP ); // Enforce FORCE parameter
   // Get propagation scores for individual propagated fields
   INTEGER2 company_inc_state_score_prop := MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*company_inc_state_score; // Score if either field propogated
   INTEGER2 Lgid3IfHrchy_score_prop := MAX(le.Lgid3IfHrchy_prop,ri.Lgid3IfHrchy_prop)*Lgid3IfHrchy_score; // Score if either field propogated
@@ -113,7 +113,7 @@ SHARED all_mjs := MAC_DoJoins(h,match_join);
  
 //Now construct candidates based upon attribute & relationship files
  
-AllAttrMatches := SORT(MOD_Attr_UnderLinks(ih).Match,LGID31,LGID32,Rule,-(Conf+Conf_Prop),LOCAL);
+AllAttrMatches := SORT(MOD_Attr_UnderLinks(ih).Match+MOD_Attr_CorteraAccounts(ih).Match,LGID31,LGID32,Rule,-(Conf+Conf_Prop),LOCAL);
 match_candidates(ih).Layout_Attribute_Matches CombineResults(match_candidates(ih).Layout_Attribute_Matches le,match_candidates(ih).Layout_Attribute_Matches ri) := TRANSFORM
   SELF.Conf := le.Conf+ri.Conf;
   SELF.Source_Id := le.Source_ID + '|' + ri.Source_ID;
@@ -129,7 +129,7 @@ attr_match := JOIN(DISTRIBUTE(j1,HASH(LGID31)),hd,LEFT.LGID31 = RIGHT.LGID3 AND 
 with_attr := attr_match + all_mjs;
 not_blocked := JOIN(with_attr,LinkBlockers(ih).Block,left.LGID31=right.LGID31 and left.LGID32=right.LGID32,TRANSFORM(LEFT),LEFT ONLY, SMART); // Remove all blocked links
 EXPORT All_Matches := not_blocked : PERSIST('~temp::LGID3::BIPV2_LGID3::all_m',EXPIRE(BIPV2_LGID3.Config.PersistExpire)); // To by used by rcid and LGID3
-//  /*HACKMatches02 - disable default salt mac_avoid_transitives*/
+// SALT311.mac_avoid_transitives(All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o); /*HACKMatches02 - disable default salt mac_avoid_transitives*/
 import BIPV2_Tools; /*HACKMatches02 - import for new transitives macro*/
 BIPV2_Tools.mac_avoid_transitives(All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o); // HACKMatches02 - Use new transitives macro*/
 
