@@ -107,6 +107,8 @@ EXPORT reportBusOperatingInformation(DATASET(DueDiligence.layouts.Busn_Internal)
   addMiscInfo := PROJECT(addDBANames, TRANSFORM(RECORDOF(LEFT),
                                                 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.ParentCompany := LEFT.parentCompanyName;
                                                 SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.StructureType := IF(LEFT.hdBusnType = DueDiligence.Constants.EMPTY, LEFT.adrBusnType, LEFT.hdBusnType);
+																								SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.AnnualSales := LEFT.sales;
+																								SELF.BusinessReport.BusinessAttributeDetails.Operating.BusinessInformation.AnnualSalesYearReported := LEFT.salesYearReported;
                                                 SELF := LEFT;));
   
   

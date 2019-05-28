@@ -55,46 +55,6 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 
-	// ---------------- EBR - Experian Business Records ------------------
-	ebr5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(linkIDs,
-																															 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
-																															 0, //ScoreThreshold --> 0 = Give me everything
-																															 linkingOptions,
-																															 Business_Risk_BIP.Constants.Limit_Default,
-																															 Options.KeepLargeBusinesses);
-																															 
-	// Add back our Seq numbers
-	ebr5600RawSeq := DueDiligence.CommonBusiness.AppendSeq(ebr5600Raw, indata, TRUE);
-
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
-	ebrDateClean := DueDiligence.Common.CleanDatasetDateFields(ebr5600RawSeq, 'date_last_seen, date_first_seen');
-	
-	// Filter out records after our history date.
-	ebrFilt := DueDiligence.Common.FilterRecordsSingleDate(ebrDateClean, date_first_seen);
-	
-	//retrieve SIC and NAIC codes with dates
-	outEbrSic := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_1_code, TRUE, TRUE, date_first_seen, date_last_seen);
-	outEbrSic2 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_2_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	outEbrSic3 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_3_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	outEbrSic4 := DueDiligence.CommonBusiness.getSicNaicCodes(ebrFilt, DueDiligence.Constants.EMPTY, DueDiligence.Constants.SOURCE_EBR, sic_4_code, TRUE, FALSE, date_first_seen, date_last_seen);
-	
-	
-	allEbrSicNaic := outEbrSic + outEbrSic2 + outEbrSic3 + outEbrSic4;
-	sortEbrRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addOshaSicNaic, allEbrSicNaic);
-		
-	addEbrSicNaic := JOIN(addOshaSicNaic, sortEbrRollSicNaic,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-													LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																		SELF.SicNaicSources := RIGHT.sources;
-																		SELF := LEFT;),
-													LEFT OUTER,
-													ATMOST(1));	
-													
-													
-													
 	// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
 	dcaRaw := DCAV2.Key_LinkIds.kFetch2(linkIDs,
 																			 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
@@ -141,9 +101,9 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 									 outDcaSic9 + outDcaSic10 + outDcaNaic + outDcaNaic2 + outDcaNaic3 + outDcaNaic4 + outDcaNaic5 + outDcaNaic6 +
 									 outDcaNaic7 + outDcaNaic8 + outDcaNaic9 + outDcaNaic10;
 									 
-	sortDcaRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addEbrSicNaic, allDcaSicNaic);
+	sortDcaRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addOshaSicNaic, allDcaSicNaic);
 		
-	addDcaSicNaic := JOIN(addEbrSicNaic, sortDcaRollSicNaic,
+	addDcaSicNaic := JOIN(addOshaSicNaic, sortDcaRollSicNaic,
 													LEFT.seq = RIGHT.seq AND
 													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
 													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
