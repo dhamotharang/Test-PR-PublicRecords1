@@ -12,7 +12,8 @@
 // bool - Y to get the boolean keys in addition to nonfcra keys, N to get only nonfcra keys
 import dops;
 export GetRoxieKeys(string datasetname,string location,string eflag, string bool = 'N',string template = 'Y'
-											,string dopsenv = dops.constants.dopsenvironment) := function
+											,string dopsenv = dops.constants.dopsenvironment
+											,string l_testenv = 'NA') := function
 	InputRec := record
 		string datasetname{xpath('datasetname')} := datasetname;
 		string location{xpath('location')} := location;
@@ -28,7 +29,7 @@ export GetRoxieKeys(string datasetname,string location,string eflag, string bool
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,eflag,location),
+				dops.constants.prboca.serviceurl(dopsenv,eflag,location,l_testenv),
 				'GetRoxieKeys',
 				InputRec,
 				dataset(outrec),
