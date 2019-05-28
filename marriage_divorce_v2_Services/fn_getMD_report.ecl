@@ -150,9 +150,22 @@ export dataset(l_result) fn_getMD_report(
     self.lname := if (isSubject, L.lname, fcra.constants.FCRA_Restricted);
     self := if (isSubject, L);
   end;  
+	
+	rec_party_raw returnNameOnlyNonsubject (rec_party_raw L) := transform
+      boolean isSubject := L.did = L.search_did;
+    self.record_id := L.record_id;
+    self.which_party := L.which_party;
+    self.search_did := l.search_did;
+    self.fname := L.fname;
+    self.mname := L.mname;
+    self.lname := L.lname;
+    self.name_suffix := L.name_suffix;
+    self := if (isSubject, L);
+  end;
                                           
   nss_party := map (nss_val = nss_ind.returnBlank => party_raw (search_did = did),
                     nss_val = nss_ind.returnRestrictedDescription => project (party_raw, RestrictNonsubject (Left)),
+                    nss_val = nss_ind.returnNameOnly => project (party_raw, returnNameOnlyNonsubject (Left)),
                     party_raw);
   
 	// populate county_name in party data

@@ -38,10 +38,18 @@ EXPORT WatercraftSearch(WatercraftV2_services.Interfaces.Search_Params in_params
 																	transform(WatercraftV2_Services.Layouts.owner_search_rec,
 																						self.orig_name := '',
 																						self := left));
-		owners_restricted := owners_supp + project(L.owners(~((integer)did = (integer)in_params.did or (bdid <> '' or company_name <> ''))), 
+		owners_restricted := project(L.owners(~((integer)did = (integer)in_params.did or (bdid <> '' or company_name <> ''))), 
 																							 transform(WatercraftV2_Services.Layouts.owner_search_rec,
 																												 self.lname := FCRA.Constants.FCRA_Restricted, self := []));
-		self.owners := map(in_params.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => owners_restricted, 
+		owners_returnNameOnly := project(L.owners(~((integer)did = (integer)in_params.did or (bdid <> '' or company_name <> ''))), 
+																							 transform(WatercraftV2_Services.Layouts.owner_search_rec,
+																												 self.fname := left.fname, 
+																												 self.mname := left.mname, 
+																												 self.lname := left.lname, 
+																												 self.name_suffix := left.name_suffix, 
+																												 self := []));
+		self.owners := map(in_params.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => owners_supp+ owners_restricted, 
+											 in_params.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnNameOnly => owners_supp + owners_returnNameOnly, 
 											 in_params.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnBlank => owners_supp,
 											 L.owners);
 		self := L;
