@@ -151,7 +151,7 @@ module
 		LEFT.Unique_Id = RIGHT.Unique_Id,
 		TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
 		LEFT ONLY,
-		LOCAL);
+		LOOKUP);
 
 	shared new_addresses := Functions.New_Addresses(Valid_Recs);
 
