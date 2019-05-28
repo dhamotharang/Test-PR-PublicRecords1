@@ -762,7 +762,7 @@ REGEXFIND(Assault3+'|INJURY'       ,poffense)
 => 'Y',							 
 
 REGEXFIND(Battery                  ,poffense)   and
-REGEXFIND(aggravated               ,poffense)   => 'Y',		
+REGEXFIND(aggravated+'|DEADLY WEAP',poffense)   => 'Y',		
 
 REGEXFIND(aggravated               ,poffense)   and
 REGEXFIND(Battery                  ,poffense)   and 
@@ -1150,7 +1150,7 @@ BreakAndEnter := 'BREAK[ING]* [&] EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* AND EN[T
                  'B [&] E [&] L|BREAKING INTO|HOUSE(.*)BREAK|INVASION|BREAK[/]ENTERING FELONY|^[ ]*BREAKING AND OR ENTERING[ ]*$';   
 //Roger's comment - QA Update - Burglary Residential Round 3 8/26. Added BANK, BUIDL,GTMV, and BLD to BBE_exc
 BBE_exc       := 'AUTO|[/\\. ]M[/]*V[H/ ]+| M[/]*V |[/\\. ]M\\.[ ]*V[/\\. ]|BUS|VE[C]*H|BUILD|BLDG|COMMERC|COMMER[IC]+AL|[/ ]BUS[/\\. ]|BU[S]+IN|BUS[INS]+|B\\&EMV| CHURCH|BLD|GTMV|BANK|'+
-                 'BUIDL|BLDNG|BLDING|[/\\. ]BUSM[/\\. ]|[/\\. ]BLD[/\\. ]|BLDDG|[/\\. ]BLD[SHTBF2][/\\. ]';
+                 'BUIDL|BLDNG|BLDING|[/\\. ]BUSM[/\\. ]|[/\\. ]BLD[/\\. ]|BLDDG|[/\\. ]BLD[SHTBF2][/\\. ]|SPARTANBURG';
 //Roger's comment - QA Update - Burglary Residential Round 3 8/26. Remove Driving W... 
 //Roger's comment - QA update - Theft Round 5 remove TRES and TRSP from the list
 BBE_exc1      := 'PRIVACY|BREAKAGE|DRIVING[ ]?W[/|\\.|H|I|L| ]';
@@ -1237,7 +1237,7 @@ poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 Burglary      := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURGLK|[/\\. ]B[OUR]+[GR]+[GLAEY]+R[Y]*|^[ ]BUR[/ ]|^[ ]*BURG[L]? | BURG ';	
 BreakAndEnter := 'BREAK[ING]* [&] EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* AND EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* OR EN[T]{1,2}[E]{1,2}R[ING]*|B[&][ ]*E|[/ ]B[ ]*AND[ ]E| BANDE |B[&]E |B[/]E |'+
                  'BREAKING INTO|INVASION|^[ ]*B & E BLDG[ ]*$';   
-BBE_exc       := 'AUTO|[/\\. ]M[/]*V[H/ ]+| M[/]*V |[/\\. ]M\\.[ ]*V[/\\. ]|VE[C]*H|[/ ]HAB[IT]*[/ ]|HABI[A]*TAT|[/ ]RES[ID]*[/ ]|RESIDENCE|HOUSE|HOME';
+BBE_exc       := 'AUTO|[/\\. ]M[/]*V[H/ ]+| M[/]*V |[/\\. ]M\\.[ ]*V[/\\. ]|VE[C]*H|[/ ]HAB[IT]*[/ ]|HABI[A]*TAT|[/ ]RES[ID]*[/ ]|RESIDENCE|HOUSE|HOME|SPARTANBURG';
 //Roger's comment - QA update - Theft Round 5 remove TRES and TRSP from the list
 BBE_exc1      := 'PRIVACY|BREAKAGE';                                                        
 					 
@@ -1326,7 +1326,7 @@ BreakAndEnter := 'BREAK[ING]* [&] EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* AND EN[T
 
 
 //DF-18286 code review comment #4, BLD should be added to BBE_exc in Is_Burglary_BreakAndEnter_Veh
-BBE_exc       := 'BLDNG|BLDING|[/\\. ]BUSM[/\\. ]|[/\\. ]BLD[/\\. ]|BLDDG|[/\\. ]BLD[SHTBF2][/\\. ]|BUILD|BUIDL|BANK|BLDG|BLD|COMMERC|COMMER[IC]+AL|'+
+BBE_exc       := 'BLDNG|BLDING|[/\\. ]BUSM[/\\. ]|[/\\. ]BLD[/\\. ]|BLDDG|[/\\. ]BLD[SHTBF2][/\\. ]|BUILD|BUIDL|BANK|BLDG|BLD|COMMERC|COMMER[IC]+AL|SPARTANBURG|'+
                  '[-/ ]BUS[-/\\. ]|BU[S]+IN|BUS[INS]+|[/ ]HAB[IT]*[/ ]|HABI[A]*TAT|[/ ]RES[ID]*[/ ]|RESIDENCE|HOUSE|HOME| CHURCH[ |$]';
 BBE_exc1      := 'PRIVACY|TRES|TRSP|BREAKAGE';
 
@@ -3326,7 +3326,6 @@ end;
 	  
 //--------------------------------------------------------------------------------------------------------------------------------------
 export Is_BadChecks(string poffense_in) := function //done
-
 special_characters:= '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
