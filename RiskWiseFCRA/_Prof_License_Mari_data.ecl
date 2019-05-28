@@ -21,7 +21,7 @@ EXPORT _Prof_License_Mari_data(	dataset (doxie.layout_references) dids,
 
   // overrides
   override_records := choosen (FCRA.Key_Override_Proflic_Mari_ffid.proflic_mari(keyed (flag_file_id in main_ffids)), FCRA.compliance.max_override_limit);
-  all_together := raw_data + project (override_records, transform (rec_main, self.s_did := (unsigned)left.did, Self := Left));
+  all_together := raw_data + project (override_records, transform (rec_main, self.s_did := (unsigned)left.did, Self := Left, self := []));
   
 	final := sort(all_together, -date_first_seen, -date_last_seen, -persistent_record_id);
 	
