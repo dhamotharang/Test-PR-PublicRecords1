@@ -1,7 +1,7 @@
 ﻿IMPORT Doxie, Gateway, Iesp, Phones, PhonesInfo, STD, UT, dx_PhonesInfo;
 
 EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
-	Phones.IParam.PhoneAttributes.BatchParams in_mod) := FUNCTION
+	Phones.IParam.BatchParams in_mod) := FUNCTION
 
 	Consts := Phones.Constants.PhoneAttributes;
 	Layout_BatchOut := Phones.Layouts.PhoneAttributes.BatchOut;
