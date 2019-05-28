@@ -2,7 +2,7 @@
 // ====== RETURNS PROPERTY DATA FOR A GIVEN LN_FARES_ID IN ESP-COMPLIANT WAY. =====
 // ================================================================================
 //
-import iesp, LN_PropertyV2, LN_PropertyV2_Services, BIPV2, PersonReports,Suppress, address, fcra, ut;
+import iesp, LN_PropertyV2, LN_PropertyV2_Services, BIPV2, Suppress, address, fcra, ut;
 
 EXPORT PropertySource_Records(
   dataset(Layouts.rec_input_ids_wSrc) in_docids,
@@ -65,9 +65,9 @@ EXPORT PropertySource_Records(
 	SHARED prop_sourceview_sorted := sort(prop_sourceview_wLinkIds,-recording_date);
 	
   // Uses an exsiting transform onto iesp.property.t_PropertyReport2Record layout 
-	// found within PersonReports.Property_Records.
+	// found within PersonReports\Property_Records.
 	// NOTE: had to make the FormatReport2Records transform within 
-	// PersonReports.Property_Records "exported", so could use it here.
+	// PersonReports\Property_Records "exported", so could use it here.
 	iesp.property.t_OriginalName xform_orig_names2(LN_PropertyV2_Services.layouts.parties.orig L) := transform
 		Self.NameSeq := (string) L.name_seq;
 		Self.Name := L.orig_name;

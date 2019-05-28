@@ -48,7 +48,7 @@
 Valid models: csn1007_0_0
 </pre>
 */
-import AutoStandardI, risk_indicators, ut, riskwise, progressive_phone, addrbest, doxie, mdr, watchdog, paw, models, address;
+import AutoStandardI, risk_indicators, models, address;
  
 export Contactability_Batch_Service := MACRO
   // Can't have duplicate definitions of Stored with different default values, 
