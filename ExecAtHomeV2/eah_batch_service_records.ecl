@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2,BipV2_Best,BIPV2_Build,ExecAtHomeV2,MDR,paw;  
+﻿IMPORT BatchShare,BIPV2,BipV2_Best,BIPV2_Build,ExecAtHomeV2,MDR,paw;  
 
 EXPORT eah_batch_service_records (ExecAtHomeV2.Iparams.BatchParams inMod,
                                   DATASET(execathomev2.Layouts.layoutBatchIn) batchIn) := 
@@ -26,8 +26,12 @@ FUNCTION
     TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
               SELF.uniqueId := 0,
               SELF := LEFT));
-  marketingInMod := PROJECT(inMod,BIPV2.mod_sources.iParams,OPT);
-  
+
+  Legacy_inMod   := BatchShare.IParam.ConvertToLegacy(inMod);
+  marketingInMod := MODULE (PROJECT(Legacy_inmod,BIPV2.mod_sources.iParams,OPT))
+                      EXPORT BOOLEAN lnbranded := inMod.ln_branded; // Store doxie.IDataAccess name in ASI_IT expected name 
+                    END;
+
   // Fetch marketing best to get company info
   dsMarketingBest := BipV2_Best.Key_LinkIds.kFetch2Marketing(dsBestMrktLinkIdsLayout,
 	                                                           BIPV2.IDconstants.Fetch_Level_SELEID,, 
