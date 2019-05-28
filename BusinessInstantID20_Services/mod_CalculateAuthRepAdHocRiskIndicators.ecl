@@ -189,21 +189,24 @@ EXPORT mod_CalculateAuthRepAdHocRiskIndicators( BusinessInstantID20_Services.iOp
         ),
         LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);  
       
+			SHARED boolean IncludeAllRC     := false : stored('IncludeAllRiskIndicators');
+			SHARED unsigned1 NumReturnCodes := if(IncludeAllRC, cnt, risk_indicators.iid_constants.DefaultNumCodes);
+			
       SHARED riAuthRep1sorted := PROJECT(DEDUP(SORT(riAuthRep1combined, (integer)seq),seq,hri,desc),TRANSFORM(risk_indicators.layout_desc, SELF := LEFT));
       risk_indicators.mac_add_sequence(riAuthRep1sorted, riAuthRep1seq);
-      SHARED riAuthRep1 := CHOOSEN(DEDUP(riAuthRep1seq,seq,hri,desc),cnt);
+      SHARED riAuthRep1 := CHOOSEN(DEDUP(riAuthRep1seq,seq,hri,desc),NumReturnCodes);
       SHARED riAuthRep2sorted := PROJECT(DEDUP(SORT(riAuthRep2combined, (integer)seq),seq,hri,desc),TRANSFORM(risk_indicators.layout_desc, SELF := LEFT));
       risk_indicators.mac_add_sequence(riAuthRep2sorted, riAuthRep2seq);
-      SHARED riAuthRep2 := CHOOSEN(DEDUP(riAuthRep2seq,seq,hri,desc),cnt);
+      SHARED riAuthRep2 := CHOOSEN(DEDUP(riAuthRep2seq,seq,hri,desc),NumReturnCodes);
       SHARED riAuthRep3sorted := PROJECT(DEDUP(SORT(riAuthRep3combined, (integer)seq),seq,hri,desc),TRANSFORM(risk_indicators.layout_desc, SELF := LEFT));
       risk_indicators.mac_add_sequence(riAuthRep3sorted, riAuthRep3seq);
-      SHARED riAuthRep3 := CHOOSEN(DEDUP(riAuthRep3seq,seq,hri,desc),cnt);
+      SHARED riAuthRep3 := CHOOSEN(DEDUP(riAuthRep3seq,seq,hri,desc),NumReturnCodes);
       SHARED riAuthRep4sorted := PROJECT(DEDUP(SORT(riAuthRep4combined, (integer)seq),seq,hri,desc),TRANSFORM(risk_indicators.layout_desc, SELF := LEFT));
       risk_indicators.mac_add_sequence(riAuthRep4sorted, riAuthRep4seq);
-      SHARED riAuthRep4 := CHOOSEN(DEDUP(riAuthRep4seq,seq,hri,desc),cnt);
+      SHARED riAuthRep4 := CHOOSEN(DEDUP(riAuthRep4seq,seq,hri,desc),NumReturnCodes);
       SHARED riAuthRep5sorted := PROJECT(DEDUP(SORT(riAuthRep5combined, (integer)seq),seq,hri,desc),TRANSFORM(risk_indicators.layout_desc, SELF := LEFT));
       risk_indicators.mac_add_sequence(riAuthRep5sorted, riAuthRep5seq);
-      SHARED riAuthRep5 := CHOOSEN(DEDUP(riAuthRep5seq,seq,hri,desc),cnt);
+      SHARED riAuthRep5 := CHOOSEN(DEDUP(riAuthRep5seq,seq,hri,desc),NumReturnCodes);
       
       EXPORT riAuthRep  := CASE(Rep_Whichone,
                                '1' => riAuthRep1,
