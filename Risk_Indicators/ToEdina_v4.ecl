@@ -1,4 +1,4 @@
-includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.Layout_Boca_Shell_Edina_v4!
+﻿includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.Layout_Boca_Shell_Edina_v4!
 
 import risk_indicators;
 
