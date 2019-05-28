@@ -1,4 +1,4 @@
-IMPORT BatchShare, BIPV2, STD;
+﻿IMPORT BatchShare, BIPV2, STD;
 
 EXPORT IParam := MODULE
 
