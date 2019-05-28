@@ -213,6 +213,7 @@ EXPORT compliance := MODULE
     EXPORT boolean use_DM_SSA_updates(string dpm)      := dpm[10] NOT IN restrictedSet;
     EXPORT boolean use_FdnContributoryData(string dpm) := dpm[11] NOT IN restrictedSet;	//Contributory Fraud and Test Fraud
     EXPORT boolean use_InsuranceDLData(string dpm)     := dpm[13] NOT IN restrictedSet;
+    EXPORT boolean use_AccuityBankData(string dpm)     := dpm[24] NOT IN restrictedSet;
 
     // to exclude utility sources:
     EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';
