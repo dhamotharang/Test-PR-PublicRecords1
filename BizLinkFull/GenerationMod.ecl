@@ -1,7 +1,44 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-EXPORT GenerationMod := MODULE
+IMPORT SALT311;
+EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
+ 
+  // SALT Version info
+  EXPORT salt_VERSION := 'V3.11.8';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
+ 
+  // Core module configuration values
+  EXPORT spc_MODULE := 'BizLinkFull';
+  EXPORT spc_NAMESCOPE := '';
+  EXPORT spc_PROCESS := 'Biz';
+  EXPORT spc_PROCLAYOUTS := 'Process_Biz_Layouts';
+  EXPORT spc_IDNAME := 'proxid'; // cluster id (input)
+  EXPORT spc_IDFIELD := 'proxid'; // cluster id (output)
+  EXPORT spc_RIDFIELD := 'rcid'; // record id
+  EXPORT spc_CONFIG := 'Config_BIP';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
+  EXPORT spc_FILEPREFIX := 'File_';
+  EXPORT spc_FILENAME := 'BizHead';
+  EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rcid,zip_cases:zip';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_proxid */,/* MY_seleid */,/* MY_orgid */,/* MY_ultid */,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,has_lgid,empid,source,source_record_id,source_docid,company_name,company_name_prefix,cnp_name,cnp_number,cnp_btype,cnp_lowv,company_phone,company_phone_3,company_phone_3_ex,company_phone_7,company_fein,company_sic_code1,active_duns_number,prim_range,prim_name,sec_range,city,city_clean,st,zip_cases,company_url,isContact,contact_did,title,fname,fname_preferred,mname,lname,name_suffix,contact_ssn,contact_email,sele_flag,org_flag,ult_flag,fallback_value,CONTACTNAME,STREETADDRESS';
+  EXPORT spc_HAS_TWOSTEP := TRUE;
+  EXPORT spc_HAS_PARTITION := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
+  EXPORT spc_HAS_INCREMENTAL := FALSE;
+  EXPORT spc_HAS_ASOF := FALSE;
+  EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
+  EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := TRUE;
+  EXPORT spc_HAS_PARENTS := TRUE;
+  EXPORT spc_HAS_FORCE := TRUE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
+ 
+  // The entire spec file
   EXPORT spcString :=
-    'OPTIONS:-ma\n'
+    'OPTIONS:-ma -gs2\n'
     + '\n'
     + 'MODULE:BizLinkFull\n'
     + 'FILENAME:BizHead\n'
@@ -65,13 +102,17 @@ EXPORT GenerationMod := MODULE
     + 'FIELD:name_suffix:NormSuffix:LIKE(T_ALPHANUM):8,68\n'
     + 'FIELD:contact_ssn:27,134\n'
     + 'FIELD:contact_email:LIKE(T_ALLCAPS):27,87\n'
-    + 'FIELD:sele_flag:WEIGHT(0.001):0,0\n'
-    + 'FIELD:org_flag:WEIGHT(0.001):0,0\n'
-    + 'FIELD:ult_flag:WEIGHT(0.001):0,0\n'
+    + 'FIELD:sele_flag:WEIGHT(0.001):1,0\n'
+    + 'FIELD:org_flag:WEIGHT(0.001):1,0\n'
+    + 'FIELD:ult_flag:WEIGHT(0.001):1,0\n'
     + 'FIELD:fallback_value:FALLBACK(3):1,0\n'
     + '\n'
     + 'CONCEPT:CONTACTNAME:fname:mname:lname:SCALE(NEVER):23,492\n'
     + 'CONCEPT:STREETADDRESS:prim_range:prim_name:sec_range:SCALE(NEVER):23,96\n'
+    + '\n'
+    + 'EXTERNALFILE:Ext_Data:NAMED(File_Ext_Data):DIVE(NEVER):SEARCH:IGNORE(sele_flag,org_flag,ult_flag):CLEAN\n'
+    + '\n'
+    + 'HACK:IMPROVE_EF_WEIGHTS\n'
     + '\n'
     + 'LINKPATH:L_CNPNAME_ZIP:cnp_name:zip:?:prim_name:st(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_CNPNAME_ST:cnp_name:st:?:prim_name:zip(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CNPNAME_ZIP)\n'
@@ -91,7 +132,8 @@ EXPORT GenerationMod := MODULE
     + 'LINKPATH:L_CONTACT_DID:contact_did\n'
     ;
  
-  EXPORT xlinkpaths := DATASET([
+  // Structured values
+  EXPORT linkpaths := DATASET([
     {'L_CNPNAME_ZIP','cnp_name,zip','prim_name,st(HASBASE),city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_CNPNAME_ST','cnp_name,st','prim_name,zip(HASBASE),city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','L_CNPNAME_ZIP',''}
     ,{'L_CNPNAME','cnp_name','prim_name,st,city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip(HASBASE)','L_CNPNAME_ST',''}
@@ -111,3 +153,4 @@ EXPORT GenerationMod := MODULE
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

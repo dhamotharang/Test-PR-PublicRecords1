@@ -8,6 +8,7 @@ function
   shared specs  := specificities(File_BizHead);
   shared knames := keynames(pversion);
   
+  BuildSpec                     := specificities(File_Bizhead).Build;
   BuildSpecs                     := tools.macf_writeindex('Keys(File_BizHead).Specificities_Key',,true);
   Buildmeow                      := tools.macf_writeindex('Process_Biz_Layouts.Key         ,knames.meow                     .new'      );
   Buildsup_proxid                := tools.macf_writeindex('Process_Biz_Layouts.KeyproxidUp ,knames.sup_proxid               .new'      );
@@ -37,11 +38,11 @@ function
   Buildwheel_city_clean          := tools.macf_writeindex('Wheel.Key_city_clean            ,knames.wheel_city_clean         .new'      );
   Buildwheel_quick_city_clean    := tools.macf_writeindex('Wheel.KeyQuick_city_clean       ,knames.wheel_quick_city_clean   .new'      );
   returnresult := sequential(
-     if(pDo_Strata = true  ,bizlinkfull._dostrata_ID_Check(File_BizHead,pversion))
-    ,BuildSpecs
+     if(pDo_Strata = true, BizLinkFull._dostrata_ID_Check(File_BizHead,pversion))
     ,if(not tools.fun_DoAllFilesExist.fNamesBuilds(knames.dall_filenames)
-      ,sequential(
-        parallel(
+      ,sequential(    
+        BuildSpec
+        ,parallel(
            BuildSpecs                   
           ,Buildmeow                    
           ,Buildsup_proxid              
@@ -82,4 +83,3 @@ function
   return returnresult;
     
 end;
-
