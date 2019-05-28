@@ -8,7 +8,122 @@ ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
 
 FUNCTION: CleanSpaces(STRING s) <= ECL(STD.Str.CleanSpaces(s)) FROM Std RETURNS STRING;
 
+Legal := ENTITY(FLAT(UID(seleid),
+  STRING bestultcompanyname,
+  STRING bestultfein,
+  STRING bestultprimaryrange,
+  STRING bestultpredirectional,
+  STRING bestultprimaryname,
+  STRING bestultaddresssuffix,
+  STRING bestultpostdirectional,
+  STRING bestultunitdesignation,
+  STRING bestultsecondaryrange,
+  STRING bestultpostalcity,
+  STRING bestultvanitycity,
+  STRING bestultstate,
+  STRING bestultzip,
+  STRING bestultzip4,
+  STRING bestultcounty,
+  STRING bestultphone,
+  INTEGER bestultdatefirstseen,
+  INTEGER bestultdatelastseen,
+  INTEGER bestultincorporationdate,
+  STRING bestultsic,
+  STRING bestultnaics,
+  STRING bestselecompanyname,
+  STRING bestselefein,
+  STRING bestseleprimaryrange,
+  STRING bestselepredirectional,
+  STRING bestseleprimaryname,
+  STRING bestseleaddresssuffix,
+  STRING bestselepostdirectional,
+  STRING bestseleunitdesignation,
+  STRING bestselesecondaryrange,
+  STRING bestselepostalcity,
+  STRING bestselevanitycity,
+  STRING bestselestate,
+  STRING bestselezip,
+  STRING bestselezip4,
+  STRING bestselecounty,
+  STRING bestselephone,
+  DATE bestseledatefirstseen,
+  DATE bestseledatelastseen,
+  DATE bestseleincorporationdate,
+  STRING bestselesic,
+  STRING bestselenaics,
+  BOOLEAN bestseleisactive,
+  BOOLEAN bestseleisdefunct,
+  INTEGER ultid,
+  INTEGER orgid,
+  INTEGER seleid,
+  INTEGER proxid,
+  INTEGER powid,
+  INTEGER dotid,
+  INTEGER empid,
+  INTEGER score,
+  INTEGER weight, 
+	INTEGER acctno),
+	MODEL(
+	  UID,
+	  AccountNumbers{acctno},
+    bestultcompanyname,
+    bestultfein,
+    bestultprimaryrange,
+    bestultpredirectional,
+    bestultprimaryname,
+    bestultaddresssuffix,
+    bestultpostdirectional,
+    bestultunitdesignation,
+    bestultsecondaryrange,
+    bestultpostalcity,
+    bestultvanitycity,
+    bestultstate,
+    bestultzip,
+    bestultzip4,
+    bestultcounty,
+    bestultphone,
+    bestultdatefirstseen,
+    bestultdatelastseen,
+    bestultincorporationdate,
+    bestultsic,
+    bestultnaics,
+    bestselecompanyname,
+    bestselefein,
+    bestseleprimaryrange,
+    bestselepredirectional,
+    bestseleprimaryname,
+    bestseleaddresssuffix,
+    bestselepostdirectional,
+    bestseleunitdesignation,
+    bestselesecondaryrange,
+    bestselepostalcity,
+    bestselevanitycity,
+    bestselestate,
+    bestselezip,
+    bestselezip4,
+    bestselecounty,
+    bestselephone,
+    bestseledatefirstseen,
+    bestseledatelastseen,
+    bestseleincorporationdate,
+    bestselesic,
+    bestselenaics,
+    bestseleisactive,
+    bestseleisdefunct,
+    ultid,
+    orgid,
+    seleid,
+    proxid,
+    powid,
+    dotid,
+    empid,
+    score,
+    weight));
+
+
+
 Employer := ENTITY(FLAT(UID(acctno),
+	Legal rLegal=UID(seleid),
   STRING dummycode,
   INTEGER acctno, // claim_sep_emp_no in claims
   STRING checkdigit,
@@ -17,7 +132,7 @@ Employer := ENTITY(FLAT(UID(acctno),
   STRING areacd,
   STRING status,
   STRING liabcd,
-  STRING datefirstemp,
+  DATE datefirstemp,
   STRING dateliabest,
   STRING compyr,
   STRING timelapsecd,
@@ -30,7 +145,7 @@ Employer := ENTITY(FLAT(UID(acctno),
   STRING bankruptcydate,
   STRING legalactioncd,
   STRING letofassessment,
-  STRING statusreceiptdate,
+  DATE statusreceiptdate,
   STRING acquiredbyacctno,
   STRING unpaidbalcd,
   STRING warrantsissued,
@@ -65,7 +180,19 @@ Employer := ENTITY(FLAT(UID(acctno),
   STRING altzipcode,
   STRING country,
   STRING leaseclientind,
-  STRING aggregateleasingno
+  STRING aggregateleasingno,
+
+  INTEGER ultid,
+  INTEGER orgid,
+  INTEGER seleid,
+  INTEGER proxid,
+  INTEGER powid,
+  INTEGER dotid,
+  INTEGER empid,
+  INTEGER score,
+  INTEGER weight
+	
+	
 	/*
   STRING leasesic6,
   STRING leaseavgwages,
@@ -730,7 +857,7 @@ Employer := ENTITY(FLAT(UID(acctno),
    */
 		),
 	MODEL(
-UID,dummycode,acctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno	));
+UID,rLegal,dummycode,acctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno,ultid,orgid,seleid,proxid,powid,dotid,empid,score,weight));
   
 Claim := ENTITY(FLAT(UID(bizrecid),
    /*
@@ -752,7 +879,8 @@ Claim := ENTITY(FLAT(UID(bizrecid),
   INTEGER acctno, // claim_sep_emp_no in claims
   STRING claim_sep_emp_name,
   INTEGER claim_sep_emp_no,
-	INTEGER bizrecid// this joins to trum,
+	INTEGER bizrecid,// this joins to trum,
+  DATE claim_submit_ccyymmdd
 	/*
   STRING claim_decision_code,
   STRING application_id,
@@ -1019,27 +1147,56 @@ Claim := ENTITY(FLAT(UID(bizrecid),
   INTEGER selegsaflag,
   INTEGER proxgsaflag*/
 		),
-	MODEL(UID, rEmployer,bizrecid, acctno,claim_sep_emp_name, claim_sep_emp_no));
+	MODEL(UID, rEmployer, claim_submit_ccyymmdd, bizrecid, acctno,claim_sep_emp_name, claim_sep_emp_no));
+
+LegalEmployer := ASSOCIATION(FLAT(
+    Legal rLegal=UID(seleid),
+    Employer rEmployer=UID(acctno)
+    //DATE claim_submit_ccyymmdd
+   ));
 
 EmployerClaim := ASSOCIATION(FLAT(
     Employer rEmployer=UID(acctno),
 		Claim rClaim=UID(bizrecid)
     //DATE claim_submit_ccyymmdd
    ));
+
+LegalClaim := ASSOCIATION(FLAT(
+    Legal rLegal=UID(seleid),
+		Claim rClaim=UID(bizrecid)
+    //DATE claim_submit_ccyymmdd
+   ));
 		
 USE FRAUDGovUIKEL.Files.Employer(FLAT,
-  Employer(FILTER((UNSIGNED)acctno != 0)));
+    Employer(FILTER((UNSIGNED)acctno != 0)),
+	  Legal(FILTER((UNSIGNED)acctno != 0)),
+		LegalEmployer(FILTER((UNSIGNED)acctno != 0))
+	);
+	
 USE FraudGovUIKEL.Files.Claims(FLAT, 
   Claim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
-	EmployerClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0)));
+	EmployerClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
+	LegalClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0))
+	);
 	
 /* Logic Statements \ Attr */	
 	
+Legal: => AccountNumberCount := COUNT(AccountNumbers);
+Legal: => LegalClaimDateMax := MAX(LegalClaim.rClaim, claim_submit_ccyymmdd);
+//Legal: => BisIncorpMSince := MAP(bestseleincorporationdate=NULL(0) => -99998, DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen));
+Legal: => BisIncorpMSince := DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen);
+	
 Employer: => ClaimCount := COUNT(EmployerClaim);
+Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
+// Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
+Employer: => BisIncorpMSince := rLegal.BisIncorpMSince;
+	
+Employer: => LegalClaimDateMax := rLegal.LegalClaimDateMax;
 
-Claim: => EmployerClaimCount := MAX(EmployerClaim.rEmployer, ClaimCount);
-Claim: => EmployerClaimCountAlt := rEmployer.ClaimCount;
+Claim: => EmployerClaimCount := rEmployer.ClaimCount;
+
 
 QUERY: showEmployers <= Employer;	
+QUERY: showLegal <= Legal;	
 QUERY: showClaims <= Claim; 
 QUERY: showEmployerClaims <= EmployerClaim;

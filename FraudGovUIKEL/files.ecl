@@ -829,7 +829,12 @@ EXPORT files := MODULE
  END;
  
  EmployerPrep := DATASET('~fraudgov::tndata::ts999_output', TrumpRec, THOR);
- EXPORT Employer := PROJECT(EmployerPrep, TRANSFORM(RECORDOF(LEFT), SELF.acctno := std.str.CleanSpaces(std.str.FindReplace(LEFT.acctno, '"', '\'')), SELF := LEFT)); 
+ EXPORT Employer := PROJECT(EmployerPrep, 
+                      TRANSFORM(RECORDOF(LEFT), 
+											SELF.acctno := std.str.CleanSpaces(std.str.FindReplace(LEFT.acctno, '"', '\'')), 
+											SELF.statusreceiptdate := MAP((UNSIGNED)LEFT.statusreceiptdate[5..6] < 2020 => '19', '20') + LEFT.statusreceiptdate[5..6] + LEFT.statusreceiptdate[1..2] + LEFT.statusreceiptdate[3..4],
+											SELF.datefirstemp := MAP((UNSIGNED)LEFT.datefirstemp[5..6] < 2020 => '19', '20') + LEFT.datefirstemp[5..6] + LEFT.datefirstemp[1..2] + LEFT.datefirstemp[3..4],
+											SELF := LEFT)); 
  
  ClaimsRec := RECORD
   string claim_ssn;
