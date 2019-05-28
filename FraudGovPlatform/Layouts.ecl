@@ -1316,7 +1316,7 @@ Export CIID := RECORD
   unsigned8 addresshash;
   unsigned6 frompersonlexid;
   unsigned6 topersonlexid;
-  integer8 highfrequencyaddressflag;
+  unsigned1 highfrequencyaddressflag;
   integer1 sameaddressemailmatch;
   integer1 sameaddressssnmatch;
   integer1 sameaddressphonenumbermatch;
