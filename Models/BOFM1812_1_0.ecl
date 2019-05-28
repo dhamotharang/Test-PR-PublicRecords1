@@ -456,7 +456,7 @@ bofm1812_1_0 :=   __common__( round(max((real)300, min(999, if(base + pts * (ony
                     self.pts                              := pts;
                     self.lgt                              := lgt;
                     self.bofm1812_1_0                     := bofm1812_1_0;
-                    reasonCodes := Models.BB_WarningCodes(clam, Busshell , num_reasons,business_only)[1].hris;
+                    reasonCodes := Models.BB_WarningCodes('', le.Busshell , num_reasons,business_only)[1].hris;
                     self.bbfm_wc1                         := reasonCodes[1].hri;//bbfm_wc
                     self.bbfm_wc2                         := reasonCodes[2].hri;
                     self.bbfm_wc3                         := reasonCodes[3].hri;
@@ -467,7 +467,7 @@ bofm1812_1_0 :=   __common__( round(max((real)300, min(999, if(base + pts * (ony
   
   #else
      
-     reasonCodes := Models.BB_WarningCodes(clam, Busshell , num_reasons,business_only)[1].hris;
+     reasonCodes := Models.BB_WarningCodes(ROW([],risk_indicators.Layout_Boca_Shell), le, num_reasons,business_only)[1].hris;
   
   
   	 SELF.ri := PROJECT(reasonCodes, TRANSFORM(Risk_Indicators.Layout_Desc,
@@ -488,7 +488,6 @@ bofm1812_1_0 :=   __common__( round(max((real)300, min(999, if(base + pts * (ony
 
       END;
 
-  // model :=   project(busshell, doModel(left) );
    model :=   project(busshell, doModel(left) );
 	
  
