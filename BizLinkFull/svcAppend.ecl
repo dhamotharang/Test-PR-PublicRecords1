@@ -55,6 +55,8 @@
 		,contact_ssn // pContact_ssn = ''
 		,source // pSource = ''
 		,source_record_id // pSource_record_id = ''
+		,use_fuzzy
+		,prim_force_post
 	);
 
 	withAppend := if(from_thor, withAppendThor, withAppendRoxie);
