@@ -11,7 +11,7 @@ EXPORT attrvparo := 'fraudpointattrvparo';
 
 //***Enter your valid FP3 custom model here
 EXPORT fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2',
-                                     'fp1607_1', 'fp1712_0', 'fp1508_1', 'fp1802_1', 'fp1705_1','fp1801_1','fp1806_1', 'fp1710_1','fp1803_1','fp1704_1'];
+                                     'fp1607_1', 'fp1712_0', 'fp1508_1', 'fp1802_1', 'fp1705_1','fp1801_1','fp1806_1', 'fp1710_1','fp1803_1','fp1704_1','fp1902_1'];
 																		 
 EXPORT Paro_models := ['msn1803_1', 'rsn804_1', 'msnrsn_1'];																		 
 																		 
@@ -22,7 +22,7 @@ EXPORT XML_custom_models := ['fp3710_0', 'fp3904_1', 'fp3905_1', 'idn6051', 'fd5
 									'fp1403_2',	'fp1409_2', 'fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1509_2','fp1509_1',
 									'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2',
                   'fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1','fp1705_1','fp1801_1', 'fp1806_1',
-                             'fp1710_1', Paro_models,'fp1803_1','fp1704_1'];
+                             'fp1710_1', Paro_models,'fp1803_1','fp1704_1','fp1902_1'];
 									
 									
 //***Does your model have any vehicle fields (from Boca Shell).
@@ -30,7 +30,7 @@ EXPORT DoVechicle_List  := ['fp31105_1','fp3904_1', 'fp1407_1', 'fp1407_2', 'fp1
                                     'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1610_1', 
 																		'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1',
                                     'fp1706_1', 'fp1609_2', 'fp1607_1', 'fp1508_1','fp1705_1','fp1801_1',
-                                    'fp1806_1']; 
+                                    'fp1806_1','fp1902_1']; 
 																		
 //***Does your model use fields from Boca Shell 53.																		
 EXPORT BS_Version53_List := ['fp1712_0','fp1508_1','fp1802_1','fp1801_1', 'fp1806_1', 'fp1710_1', Paro_models,'fp1803_1'];  
@@ -42,7 +42,7 @@ EXPORT ThisSet_for_BSOPTIONS :=  ['fp31203_1', 'fp1303_1', 'fp1310_1', 'fp1401_1
 																					'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1506_1', 'fp1509_2','fp1509_1', 'fp31505_0',
 																					'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1511_1','fp1512_1', 'fp1610_1', 
 																					'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1706_1','fp1609_2',
-                                          'fp1607_1','fp1508_1','fp1802_1','fp1705_1','fp1801_1', 'fp1806_1', 'fp1710_1','fp1803_1','fp1704_1']; 
+                                          'fp1607_1','fp1508_1','fp1802_1','fp1705_1','fp1801_1', 'fp1806_1', 'fp1710_1','fp1803_1','fp1704_1','fp1902_1']; 
 																					
 																					
 //***The standard # of Reason Codes are 6 so enter your model here to override the default of 4 reason codes
@@ -51,13 +51,13 @@ EXPORT ThisSet_for_Reason_Code_Temps  := ['fp3710_0', 'fp3904_1', 'fp3905_1', 'f
 		                     'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1403_2', 'fp1506_1', 'fp1509_2','fp1509_1',
 												 'fp1510_2','fp1511_1', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1606_1','fp1702_2',
 												 'fp1702_1','fp1706_1','fp1609_2','fp1607_1','fp1802_1','fp1705_1','fp1801_1', 
-												 'fp1806_1', 'fp1710_1','fp1803_1','fp1704_1']; 
+												 'fp1806_1', 'fp1710_1','fp1803_1','fp1704_1','fp1902_1']; 
 												 
 												 
 //***If the customer requests the Fraud Point Risk indexes (example stolenidenty Index) enter your model
 EXPORT List_Include_RiskIndices  :=  ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1',
                                       'fp1609_2','fp1607_1','fp1508_1',
-                                      'fp1802_1','fp1705_1','fp1801_1','fp1806_1', 'fp1710_1','fp1803_1','fp1704_1'];
+                                      'fp1802_1','fp1705_1','fp1801_1','fp1806_1', 'fp1710_1','fp1803_1','fp1704_1','fp1902_1'];
 																								
 																								
  //***All Models will get a short description sent back with the response    
@@ -90,6 +90,7 @@ EXPORT getModel_Description( STRING model_name) := FUNCTION
                                  model_name = 'fp1710_1'	=> 'FraudPointFP1710_1',
                                  model_name = 'fp1803_1'	=> 'FraudPointFP1803_1',
                                  model_name = 'fp1704_1'	=> 'FraudPointFP1704_1',
+                                 model_name = 'fp1902_1'	=> 'FraudPointFP1902_1',
                           																	 'FraudPoint');
 			RETURN FP_Model_Description;
 	END;  //***Ends the FUNCTION
@@ -154,6 +155,7 @@ EXPORT getBilling_Index (STRING model_name)  := FUNCTION
                                 'msnrsn_1'     => Risk_Indicators.BillingIndex.MSNRSN_1,
                                 'fp1803_1'     => Risk_Indicators.BillingIndex.FP1803_1, 
                                 'fp1704_1'     => Risk_Indicators.BillingIndex.FP1704_1, 
+                                'fp1902_1'     => Risk_Indicators.BillingIndex.FP1902_1, 
 		                       ''
                );
 	    RETURN FP_BillingIndex;

@@ -317,6 +317,14 @@ cmSegment         := cmIn[1].ModelOptions(StringLib.StringToLowerCase(TRIM(Optio
 cmSegmentValue    := StringLib.StringToUpperCase(TRIM(cmSegment[1].OptionValue));
 cmLexID           := cmIn[1].ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'lexid');
 cmLexIDValue      := StringLib.StringToUpperCase(TRIM(cmLexID[1].OptionValue));
+//for the Elevate model, also return the FP3 flagship model if it was requested
+cmModelName2      := StringLib.StringToLowerCase(ModelOptions_In[2].ModelName);
+cmName2           := cmIn[2].ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'custom');
+cmNameValue2      := StringLib.StringToLowerCase(TRIM(cmName2[1].OptionValue));
+model_name2       := if(cmNameValue2='' or cmNameValue2 = 'fp31505_0', cmNameValue2, error('Invalid fraud version/model input combination'));
+
+
+
 
 isWFS34 := (cmNameValue = 'ain801_1');
 	
@@ -343,7 +351,9 @@ model_lc := IF(TRIM(Model) <> '', StringLib.StringToLowerCase(trim(Model)), cmNa
 
 model_name1 := if( (model_lc='' or model_lc in Models.FraudAdvisor_Constants.XML_custom_models OR isWFS34) AND invalidCustomRequest=false, IF(isWFS34, 'ain801_1', model_lc), error('Invalid fraud version/model input combination'));
 
-InvalidFP3GLBRequest := model_name1 in fraudpoint3_models and ~glb_ok; 
+
+InvalidFP3GLBRequest := (model_name1 in fraudpoint3_models and ~glb_ok) or (model_name2 in fraudpoint3_models and ~glb_ok); 
+//InvalidFP3GLBRequest := model_name1 in fraudpoint3_models and ~glb_ok; 
 
 // Bureau Fraud Flags Models needs to be requested on it's own with no other scores/attributes.
 InvalidFraudFlagsRequest := model_lc = 'fp1712_0' AND 
@@ -547,8 +557,13 @@ test_prep := PROJECT(d,into_test_prep(LEFT));
 doRelatives      := true;
 doDL             := false;
 //***If your model uses vehicle data - then you must add it to this list
-doVehicle        := (model_name IN Models.FraudAdvisor_Constants.DoVechicle_List)
-																or doAttributesVersion2;
+// doVehicle        := (model_name IN Models.FraudAdvisor_Constants.DoVechicle_List)
+																// or doAttributesVersion2;
+doVehicle        := (model_name IN Models.FraudAdvisor_Constants.DoVechicle_List or
+                     model_name2 IN Models.FraudAdvisor_Constants.DoVechicle_List)or
+                     doAttributesVersion2;
+                               
+                                
 doDerogs         := true;
 isLn             := false;     // set ln branded to activate exp dl sources in iid getheader in < 5 shells.
 suppressNearDups := model_name in ['idn6051', 'fd5609_2'] OR isWFS34 OR doIDAttributes;
@@ -567,6 +582,7 @@ isUtility					:= IF(isWFS34 OR doIDAttributes, FALSE, inIsUtility);
 // new options for fp attributes 2.0
 IncludeDLverification := if(doAttributesVersion2, true, false);
 bsVersion := map(
+  model_name IN ['fp1902_1'] => 54,
   model_name IN Models.FraudAdvisor_Constants.BS_Version53_List or doParoAttributes or doAttributesVersion203 or doAttributesVersion202 => 53,
 	model_name IN ['fp1706_1','fp1705_1','fp1704_1'] => 52,
 	model_name IN ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1','fp1512_1',
@@ -659,11 +675,29 @@ clam_BtSt :=
                                 self.geo_blk:=left.geo_blk,
                                 self := right));
   //End for Paro
+  
+ ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value ) );
+ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose); 
+  
+ bs_with_ip := record
+	risk_indicators.Layout_Boca_Shell bs;
+	riskwise.Layout_IP2O ip;
+end;
+
+clam_ip := join( clam, ipdata, left.seq=right.seq,
+	transform( bs_with_ip,
+		self.bs := left,
+		self.ip := right
+	),
+	left outer
+);
+ 
+  
 
 #if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 	
     /* This is for ROUND 2 Validation ONLY */
- 	  ModelValidationResults := Models.FP1704_1_0(ungroup(clam), 6);
+ 	  ModelValidationResults := Models.FP1902_1_0(ungroup(clam_ip), 6);
  	  OUTPUT(ModelValidationResults, named('Results'));
     
 #ELSE
@@ -678,8 +712,7 @@ clam_BtSt :=
 // ************ End Logging ************
 
 
-ip_prep := project( ungroup(iid), transform( riskwise.Layout_IPAI, self.seq := left.seq, self.ipaddr := ip_value ) );
-ipdata := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose);
+
 
 model_indicator := IF(doParoAttributes, Paroattributes, model_name);
 
@@ -2237,18 +2270,7 @@ ret3 := Models.FD9510_0_0(clam, ofacSearching, nugen, addtl_watchlists);
 Paro_ret  := Models.MSN1803_1_0( ungroup(clam) );
 Paro_ret2 := Models.RSN804_1_0( clam, full_skiptrace, easi_census );
 
-bs_with_ip := record
-	risk_indicators.Layout_Boca_Shell bs;
-	riskwise.Layout_IP2O ip;
-end;
 
-clam_ip := join( clam, ipdata, left.seq=right.seq,
-	transform( bs_with_ip,
-		self.bs := left,
-		self.ip := right
-	),
-	left outer
-);
 
 ret_custom := case( model_name,   //This set does not return risk indices
 	'fp3710_0' => Models.FP3710_0_0( clam_ip, 6, false),
@@ -2272,7 +2294,7 @@ ret_custom := case( model_name,   //This set does not return risk indices
 	'fp1509_1' => Models.FP1509_1_0( ungroup(clam), 6),
 	'fp1510_2' => Models.FP1510_2_0( ungroup(clam), 6),
 	'fp1511_1' => Models.FP1511_1_0( ungroup(clam), 6),
-  // 'fp1704_1' => Models.FP1704_1_0( ungroup(clam), 6 ),
+  //'fp1704_1' => Models.FP1704_1_0( ungroup(clam), 6 ),
 	dataset( [], Models.Layout_ModelOut )
 );
 
@@ -2285,6 +2307,7 @@ model_fp1509_2   := Models.FP1509_2_0( ungroup(clam_BtSt), cmLoadAmountValue);
 model_fp1512_1   := Models.FP1512_1_0( ungroup(clam), 6 );
 model_fp31604_0  := Models.FP31604_0_0( ungroup(clam), 6 );
 model_fp1704_1 := Models.FP1704_1_0( ungroup(clam), 6 );
+model_fp1902_1 := Models.FP1902_1_0( ungroup(clam_ip), 6 );
 
 ret_fraudpoint2 := case( model_name,
 	'fp1109_0' => model_fp1109_0, 
@@ -2422,6 +2445,7 @@ ret_fraudpoint3 := case( model_name,
   'fp1806_1' => Models.FP1806_1_0( ungroup(clam), 6),
 	'fp1710_1' => Models.FP1710_1_0( ungroup(clam), 6),
 	'fp1803_1' => Models.FP1803_1_0( ungroup(clam), 6),
+   'fp1902_1' 		=> Models.FP1902_1_0( clam_ip, 6),  
   'fp1704_1' => join(model_fp1704_1, Models.FP31505_0_Base( clam_ip, 6, false), //fp31505_0 returns the indices from fp1109_0 score
 									left.seq = right.seq,
 										transform(models.layouts.layout_fp1109, 
@@ -2433,10 +2457,17 @@ ret_fraudpoint3 := case( model_name,
 											self.SuspiciousActivityIndex := left.SuspiciousActivityIndex,
                        self.ri := right.ri;
                       self.score := right.score;
-                      self := right)),
+                      self := right)),                    
+                                  dataset( [], Models.Layouts.layout_fp1109 )
+                                              );
+
+//when the Elevate custom model is requested, also need to return the FP3 flagship model so run it here
+ret_model2 := case( model_name2,
+	'fp31505_0' 		=> Models.FP31505_0_Base( clam_ip, 6, false), 
 dataset( [], Models.Layouts.layout_fp1109 )
 );
 
+ret_fraudpoint3_plusModel2 := if(model_name2 = 'fp31505_0', ret_fraudpoint3 + ret_model2, ret_fraudpoint3);
 
 
 
@@ -2618,43 +2649,44 @@ fraudpoint2_model := if(input_ok,
 	dataset([], models.layouts.FP_layout_model) );
 
 //new for FraudPoint 3.0
-Models.Layouts.Layout_Score_FP form_fp3score(ret_fraudpoint3 le) :=
+Models.Layouts.Layout_Score_FP form_fp3score(ret_fraudpoint3 le, integer C) :=
 TRANSFORM
-	//***Fraudpoint score and Reason codes
-	SELF.i := le.Score;
-	SELF.description := '0 to 999';
-	// get the le into layout_modelout to re-use the form_rc function
-	le_temp := project(le, transform(Models.Layout_ModelOut, self := left));
-	reason_codes_temp := PROJECT(le_temp,form_rc(LEFT)) + PROJECT(le_temp,form_rc2(LEFT)) + PROJECT(le_temp,form_rc3(LEFT)) + PROJECT(le_temp,form_rc4(LEFT)) + PROJECT(le_temp,form_rc5(LEFT)) + PROJECT(le_temp,form_rc6(LEFT));
-	risk_indicators.MAC_add_sequence(reason_codes_temp(reason_code<>''), reason_codes_with_seq);
-	self.reason_codes := reason_codes_with_seq;
-	//***These are Billing index
-	self.index  := Models.FraudAdvisor_Constants.getBilling_Index(model_name);
-	IncludeRiskIndicesFinal := if( model_name in Models.FraudAdvisor_Constants.List_Include_RiskIndices, true, IncludeRiskIndices);	
+               //***Fraudpoint score and Reason codes
+               SELF.i := le.Score;
+               SELF.description := '0 to 999';
+               // get the le into layout_modelout to re-use the form_rc function
+               le_temp := project(le, transform(Models.Layout_ModelOut, self := left));
+               reason_codes_temp := PROJECT(le_temp,form_rc(LEFT)) + PROJECT(le_temp,form_rc2(LEFT)) + PROJECT(le_temp,form_rc3(LEFT)) + PROJECT(le_temp,form_rc4(LEFT)) + PROJECT(le_temp,form_rc5(LEFT)) + PROJECT(le_temp,form_rc6(LEFT));
+               risk_indicators.MAC_add_sequence(reason_codes_temp(reason_code<>''), reason_codes_with_seq);
+               self.reason_codes := reason_codes_with_seq;
+               //***These are Billing index
+               self.index  := Models.FraudAdvisor_Constants.getBilling_Index(if(C = 1, model_name, model_name2));
+               IncludeRiskIndicesFinal := if( model_name in Models.FraudAdvisor_Constants.List_Include_RiskIndices, true, IncludeRiskIndices);          
   //***These are the Fraud Point Indices - Customer must ask for them
-	self.StolenIdentityIndex        := if(IncludeRiskIndicesFinal, le.StolenIdentityIndex, '');
-	self.SyntheticIdentityIndex     := if(IncludeRiskIndicesFinal, le.SyntheticIdentityIndex, '');
-	self.ManipulatedIdentityIndex   := if(IncludeRiskIndicesFinal, le.ManipulatedIdentityIndex, '');
-	self.VulnerableVictimIndex      := if(IncludeRiskIndicesFinal, le.VulnerableVictimIndex, '');
-	self.FriendlyFraudIndex         := if(IncludeRiskIndicesFinal, le.FriendlyFraudIndex, '');
-	self.SuspiciousActivityIndex    := if(IncludeRiskIndicesFinal, le.SuspiciousActivityIndex, ''); 
+               self.StolenIdentityIndex        := if(IncludeRiskIndicesFinal, le.StolenIdentityIndex, '');
+               self.SyntheticIdentityIndex     := if(IncludeRiskIndicesFinal, le.SyntheticIdentityIndex, '');
+               self.ManipulatedIdentityIndex   := if(IncludeRiskIndicesFinal, le.ManipulatedIdentityIndex, '');
+               self.VulnerableVictimIndex      := if(IncludeRiskIndicesFinal, le.VulnerableVictimIndex, '');
+               self.FriendlyFraudIndex         := if(IncludeRiskIndicesFinal, le.FriendlyFraudIndex, '');
+               self.SuspiciousActivityIndex    := if(IncludeRiskIndicesFinal, le.SuspiciousActivityIndex, ''); 
 end;
 
 Models.layouts.FP_Layout_Model form_fraudpoint3_model(ret_fraudpoint3 le) := 
 TRANSFORM
-	self.accountnumber := account_value;
- 
-	self.description  := Models.FraudAdvisor_Constants.getModel_Description(model_name);   
+               self.accountnumber := account_value;
 
-	self.scores := project(le, form_fp3score(left));
+               self.description  := Models.FraudAdvisor_Constants.getModel_Description(model_name);   
+
+               self.scores := project(ret_fraudpoint3_plusModel2, form_fp3score(left, counter));
 
 END;
 fraudpoint3_model := if(input_ok, 
-	project(if(test_data_enabled, fp_test_seed, ret_fraudpoint3), form_fraudpoint3_model(LEFT)), 
-	// project(ret_fraudpoint3, form_fraudpoint3_model(LEFT)), 
-	dataset([], models.layouts.FP_layout_model) );
+               project(if(test_data_enabled, fp_test_seed, ret_fraudpoint3), form_fraudpoint3_model(LEFT)), 
+               // project(ret_fraudpoint3, form_fraudpoint3_model(LEFT)), 
+               dataset([], models.layouts.FP_layout_model) );
 
 //end FP 3.0 code
+
 
 Models.layouts.FP_Layout_Model form_model2(final le, ret3 ri) := 
 TRANSFORM
