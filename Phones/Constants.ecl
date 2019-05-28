@@ -4,6 +4,8 @@ EXPORT Constants :=
 MODULE
 	EXPORT UNSIGNED  MAX_RECORDS := 10000;
 	EXPORT UNSIGNED  STRING_MATCH_THRESHOLD := 2; 
+	export unsigned8 	MaxResults 						:= 2000;
+	export unsigned2	PenaltThreshold 			:= 10;
   // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above the line".
 	EXPORT InsVeriBelow := 'Ins-Verified-Below';
 

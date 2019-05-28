@@ -4,10 +4,9 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
                        PhoneFinder_Services.iParam.ReportParams inMod)
 											           := FUNCTION
 
-  tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
-		   EXPORT UNSIGNED		max_age_days					:= PhoneFinder_Services.Constants.LERG6_LastActivityThreshold; 
-	   	EXPORT DATASET (Gateway.Layouts.Config) gateways := dGateways; 
-	 END;
+  tempMod := MODULE(Phones.IParam.BatchParams)
+		EXPORT UNSIGNED max_age_days := PhoneFinder_Services.Constants.LERG6_LastActivityThreshold; 
+	END;
 	
 	dsPhonesAttr_recs:= Phones.GetPhoneMetadata_wLIDB(dInPhones, tempMod);
 																														

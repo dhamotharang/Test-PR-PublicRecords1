@@ -7,16 +7,7 @@ IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,Em
 
 EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwnership.IParams.BatchParams inMod) :=FUNCTION //
 
-  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
-      EXPORT unsigned1 glb := inMod.glbpurpose;
-      EXPORT unsigned1 dppa := inMod.dppapurpose;
-      EXPORT string DataPermissionMask := inMod.DataPermissionMask;
-      EXPORT string DataRestrictionMask := inMod.DataRestrictionMask;
-      EXPORT string5 industry_class := inMod.industryclass;
-      EXPORT string32 application_type := inMod.applicationtype;
-      EXPORT string ssn_mask := inMod.ssn_mask;
-      EXPORT unsigned1 dl_mask :=	IF (inMod.mask_dl, 1, 0);
-		END;	
+  mod_access := PROJECT(inmod,doxie.IDataAccess);
 
 	Constants := PhoneOwnership.Constants;
 	//REA Utilities
@@ -192,7 +183,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 	sequencedREAB	:= ITERATE(sortedREAB,seqREAB(LEFT,RIGHT));
 	//append Email for relative
 	dsEmails := doxie.email_records (PROJECT(sequencedREAB,doxie.layout_references),
-														inMod.ssn_mask, inMod.ApplicationType,FALSE,inMod.industryclass);
+														mod_access.ssn_mask, mod_access.application_type,FALSE,mod_access.industry_class);
 	nonRoyaltyEmails := dsEmails(src NOT in	SET(codes.Key_Codes_V3(file_name	=	'EMAIL_SOURCES',field_name	=	'ROYALTY'),code));
 	layout_emails := RECORD
 		dsEmails.did;
