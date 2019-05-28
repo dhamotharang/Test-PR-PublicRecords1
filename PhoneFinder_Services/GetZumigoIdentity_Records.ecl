@@ -110,7 +110,7 @@ MODULE
      EXPORT BOOLEAN CallHandlingInfo      := inMod.IncludeCallHandlingInfo;
      EXPORT BOOLEAN DeviceInfo            := inMod.IncludeDeviceInfo;  
      EXPORT BOOLEAN DeviceHistory         := inMod.IncludeDeviceHistory;
-     EXPORT BOOLEAN DeviceChangeOption    := inMod.IncludeDeviceChangeInfo;
+     EXPORT BOOLEAN DeviceChangeInfo      := inMod.IncludeDeviceChangeInfo;
      EXPORT STRING10 optInType            := PhoneFinder_Services.Constants.ZumigoConstants.optInType;
      EXPORT STRING5  optInMethod         := PhoneFinder_Services.Constants.ZumigoConstants.optInMethod;
      EXPORT STRING3  optinDuration       := PhoneFinder_Services.Constants.ZumigoConstants.optinDuration;

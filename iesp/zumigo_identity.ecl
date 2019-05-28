@@ -19,6 +19,7 @@ export t_ZIdIdentityOptions := record (iesp.share.t_BaseOption)
 	boolean CallHandlingInfo {xpath('CallHandlingInfo')};
 	boolean DeviceInfo {xpath('DeviceInfo')};
 	boolean DeviceChangeOption {xpath('DeviceChangeOption')};
+	boolean DeviceChangeInfo {xpath('DeviceChangeInfo')};
 	boolean DeviceHistory {xpath('DeviceHistory')};
 end;
 		
