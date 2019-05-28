@@ -250,22 +250,19 @@ export WA := MODULE;
 		Main_TranslateBitMap			:= output(Main_T);
 
     //Submits Profile's stats to Orbit
-    Main_SubmitStats          := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').SubmitStats;
+    Main_SubmitStats          := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').SubmitStats;
 
-		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').CompareToProfile_with_Examples;
+		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').CompareToProfile_with_Examples;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_WA Report' //subject
 																																	 ,'Scrubs CorpMain_WA Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpWAMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																	);
 																															
 		Main_BadRecords := Main_T.ExpandedInFile(	dt_vendor_first_reported_invalid 	   <> 0 or
 																							dt_vendor_last_reported_invalid 	   <> 0 or

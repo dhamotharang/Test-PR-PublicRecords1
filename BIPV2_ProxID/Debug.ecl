@@ -9,6 +9,7 @@ SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for 
 EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   INTEGER2 Attribute_Conf := 0; // Score provided by attribute files
   SALT311.StrType   Matching_Attributes := ''; // Keys from attribute files which match
+	string cnp_name_match_info := '';
 	string2 left_salt_partition;
   string2 right_salt_partition;
   INTEGER2 salt_partition_score;/*HACKDebug01*/
@@ -436,9 +437,10 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         SALT311.Fn_Fail_Scale(AVE(le.zip_weight100,ri.zip_weight100),s.zip_switch))*IF(company_csz_score_scale=0,1,company_csz_score_scale)*IF(company_address_score_scale=0,1,company_address_score_scale);
   SELF.support_cnp_name := cnp_name_support0; // Add support
   INTEGER2 cnp_name_score_supp := MIN(IF(SELF.support_cnp_name>0,MAX(cnp_name_score_temp,SELF.support_cnp_name*100),cnp_name_score_temp),s.cnp_name_MAXIMUM*100); // Add support
-  SELF.cnp_name_score := MAP ( le.cnp_name = ri.cnp_name
+    self.cnp_name_match_info := 'cnp_name_score_supp:' + (string)cnp_name_score_supp + ' cnp_name_support0:' + (string)cnp_name_support0 + ' cnp_name_score_temp:' + (string)cnp_name_score_temp;
+SELF.cnp_name_score := MAP ( le.cnp_name = ri.cnp_name
     or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 = 0)
-    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_score_temp < Config.cnp_name_Force * 100 and cnp_name_support0 > 0 /*and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)*/)  
+    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 /*and cnp_name_score_temp < Config.cnp_name_Force * 100*/ and cnp_name_support0 > 0 /*and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)*/)  
     => cnp_name_score_supp
     ,SELF.active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100  and ~(regexfind('legal',le.company_name_type_derived,nocase) and regexfind('legal',ri.company_name_type_derived,nocase) )
     => 0
@@ -501,13 +503,15 @@ SHARED AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(
     SELF.Attribute_Conf := ri.Conf;
     SELF.Matching_Attributes := ri.Source_Id;
     SELF.Conf := le.Conf + ri.Conf;
-  SELF.support_cnp_name := le.support_cnp_name+ri.support_cnp_name;
+  // SELF.support_cnp_name := le.support_cnp_name+ri.support_cnp_name;
+  SELF.support_cnp_name := le.support_cnp_name;
     SELF := le;
   END;
   RETURN JOIN(am,ia,LEFT.Proxid1=RIGHT.Proxid1 AND LEFT.Proxid2=RIGHT.Proxid2,add_attr(LEFT,RIGHT),LEFT OUTER,HASH);
 END;
   
-/*HACKDebug03*/EXPORT AnnotateMatchesFromRecordData(DATASET(match_candidates(ih).layout_candidates) in_data  ,DATASET(match_candidates(ih).layout_matches)  im,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION//Faster form when rcid known
+/*HACKDebug03*/
+EXPORT AnnotateMatchesFromRecordData(DATASET(match_candidates(ih).layout_candidates) in_data  ,DATASET(match_candidates(ih).layout_matches)  im,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION//Faster form when rcid known
 
   p0 := project(im,transform(match_candidates(ih).layout_attribute_matches,self := left,self := []));
   j0 := join(p0,ia,left.proxid1 = right.proxid1 and left.proxid2 = right.proxid2,transform(match_candidates(ih).layout_attribute_matches,self.support_cnp_name := right.support_cnp_name,self.source_id := right.source_id,self := left,self := []),left outer,hash);
@@ -522,25 +526,34 @@ END;
 //  output(choosen(p0(rule = 10000),100),named('p0_rule10000'));
 //  output(choosen(j0,100),named('j0'));
 //  output(choosen(j0(support_cnp_name > 0),100),named('j0_withsupport'));
-  returndataset := JOIN(j1,in_data,LEFT.rcid2 = RIGHT.rcid  ,sample_match_join( PROJECT(LEFT,strim(LEFT)) ,RIGHT,,left.support_cnp_name) ,HASH);
+  returndataset := JOIN(j1,in_data,LEFT.rcid2 = RIGHT.rcid  ,sample_match_join( PROJECT(LEFT,strim(LEFT)) ,RIGHT,left.rule,,left.support_cnp_name) ,HASH); //-- NEED RULE HERE
 //  output(choosen(returndataset(support_cnp_name > 0),100),named('returndataset'));
   
   RETURN returndataset;
 END;
-  
+
+// -- USED BY THE KEYS ATTRIBUTE TO BUILD THE MATCH SAMPLE KEY
 EXPORT AnnotateMatches(DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
   RETURN AppendAttribs( AnnotateMatchesFromRecordData(h,im,ia), ia );
 END;
 ///////////////
 
+// -- USED BY SALT_REGRESSION_TESTING.mac_Rollup_Match_Scores TO GET EXAMPLES
 EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
   j1 := JOIN(in_data,im,LEFT.Proxid = RIGHT.Proxid1,HASH);
   match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
     SELF := le;
   END;
-  r := JOIN(j1,in_data,LEFT.Proxid2 = RIGHT.Proxid,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),HASH);
-  d := DEDUP( SORT( r, Proxid1, Proxid2, -Conf, LOCAL ), Proxid1, Proxid2, LOCAL ); // Proxid2 distributed by join
+
+  r1 := JOIN(j1,in_data,LEFT.Proxid2 = RIGHT.Proxid,transform({unsigned6 proxid1,unsigned6 proxid2,recordof(left) leftrec,recordof(right) rightrec},self.leftrec := left,self.rightrec := right,self := left),HASH);  //new hack
+  
+  r := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,if(right.proxid1 != 0,right.rule,left.leftrec.rule),,right.support_cnp_name),HASH,left outer);
+  // r := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,left.leftrec.rule,,right.support_cnp_name),HASH,left outer);
+  // d := DEDUP( SORT( r, Proxid1, Proxid2, -Conf, LOCAL ), Proxid1, Proxid2, LOCAL ); // Proxid2 distributed by join
+  d := DEDUP( SORT( r, Proxid1, Proxid2, -map(Conf between 30 and 7000 => conf ,conf > 7000  => 29 ,conf - 1), LOCAL ), Proxid1, Proxid2, LOCAL ); // Proxid2 distributed by join
   RETURN AppendAttribs( d, ia );
+
+  // RETURN AppendAttribs( AnnotateMatchesFromRecordData(in_data,im,ia), ia );
 END;
 
 EXPORT AnnotateClusterMatches(DATASET(match_candidates(ih).layout_candidates) in_data,SALT311.UIDType BaseRecord) := FUNCTION//Faster form when rcid known
@@ -551,24 +564,25 @@ EXPORT AnnotateClusterMatches(DATASET(match_candidates(ih).layout_candidates) in
   RETURN JOIN(in_data(rcid<>BaseRecord),j1,TRUE,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),ALL);
 END;
 
-EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
+EXPORT Layout_RolledEntity /*HACKDebug_Layout_RolledEntity*/:= RECORD,MAXLENGTH(63000)
   SALT311.UIDType Proxid;
-  DATASET(SALT311.Layout_FieldValueList) cnp_number_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_name_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_address_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) active_domestic_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_fein_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) hist_enterprise_number_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) ebr_file_number_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) active_enterprise_number_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) hist_domestic_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) foreign_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) unk_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) active_domestic_corp_key_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) hist_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_phone_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_fein_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) hist_duns_number_Values := DATASET([],SALT311.Layout_FieldValueList); 
   DATASET(SALT311.Layout_FieldValueList) cnp_name_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) cnp_number_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) company_phone_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) cnp_btype_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_name_type_derived_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_name_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_name_type_raw_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) cnp_hasnumber_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) cnp_lowv_Values := DATASET([],SALT311.Layout_FieldValueList);
@@ -576,12 +590,12 @@ EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
   DATASET(SALT311.Layout_FieldValueList) cnp_classid_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_foreign_domestic_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) company_bdid_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) prim_name_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) prim_range_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) company_address_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) prim_name_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) dt_first_seen_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) dt_last_seen_Values := DATASET([],SALT311.Layout_FieldValueList);
 END;
+
  
 SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
   Layout_RolledEntity RollValues(Layout_RolledEntity le,Layout_RolledEntity ri) := TRANSFORM

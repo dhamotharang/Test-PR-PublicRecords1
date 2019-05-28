@@ -9,11 +9,11 @@
 // Expected execution time -> Estimated 24-48 hrs
 	
 import ut,wk_ut,_control,STD, header;
-#WORKUNIT('name', 'Header Ingest Scheduler');
+#WORKUNIT('name', 'PersonHeader: Build_Header_Ingest');
 			
 ECL0:=  
 '// Header_ops._CRON_Header_Ingest_Scheduler\n\n'
-+'// scheduler job name -> Header Ingest Scheduler\n\n'
++'// scheduler job name -> PersonHeader: Build_Header_Ingest\n\n'
 +'// ON_NOTIFY: Header_Ops.hdr_bld_ingest\n\n'
 +'// ACTIONS:\n'
 +'// -------------\n'
@@ -25,11 +25,6 @@ ECL0:=
 +'// Expected execution time -> Estimated 24-48 hrs\n'	
 +'\n'
 ;
-wuname := '*Header Ingest';
-valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
-d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=wuname))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
-active_workunit :=  exists(d);
-run_build          := if(active_workunit, 'false', 'true');
 
 today := (STRING8)Std.Date.Today() : independent;
 
@@ -51,8 +46,12 @@ status := Header.LogBuildStatus(sf_name).Read[1].status;
 build_version := if(status <> 0, ver, today); // 0 -> Completed
 
 incremental := if(isMonthly, 'false', 'true');
+ingestType := if(isMonthly, 'monthly', 'incremental');
 
-ECL1 := '\n'
+days := ut.DaysApart(today, ver);
+norun := days <= 5 and status = 0;
+
+ECL := '\n'
 +'#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -66,18 +65,11 @@ ECL1 := '\n'
 +'#OPTION (\'implicitGroupSubSort\',FALSE);\n\n'
 
 +'#stored (\'versionBuild\',\''+ build_version + '\');\n'
-+'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest\');\n\n'
++'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest ' + ingestType + if(status <> 0, ' RECOVER ', '') + '\');\n\n'
 
-+'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n';
++ if(norun, 'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest for this week completed - Try to run next week\');\n', 'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n');
 
-ECL := ECL0
-     + if(run_build='true'
-         ,ECL1
-	     ,'wuname := \'Header Ingest is RUNNING Right now, Please try to run once the current build completes\';\n'
-	       + '#WORKUNIT(\'name\', wuname);\n'
-	 );
-
-THOR := if (active_workunit,'hthor_eclcc','thor400_44_eclcc');
+THOR := 'thor400_44_eclcc';
 
 NOC_MSG
 	:=
@@ -100,7 +92,7 @@ NOC_MSG
 	;
     
 #WORKUNIT('protect',true);
-wk_ut.CreateWuid(ECL,THOR,wk_ut._constants.ProdEsp) : when('Header Ingest Scheduler')
+wk_ut.CreateWuid(ECL,THOR,wk_ut._constants.ProdEsp) : when('Build_Header_Ingest')
                             ,FAILURE(fileservices.sendemail(Header.email_list.BocaDevelopersEx
                                 ,'*** ALERT **** Header Ingest Scheduler Failure'
                                 ,NOC_MSG

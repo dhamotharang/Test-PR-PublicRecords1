@@ -1,3 +1,4 @@
+﻿import ut;
 export getdfuinfo(string filename, string esp = '10.173.84.202') := function
 
 	checkoutAttributeInRecord := record
@@ -14,6 +15,7 @@ export getdfuinfo(string filename, string esp = '10.173.84.202') := function
 											checkoutAttributeInRecord, checkoutAttributeOutRecord,
 											
 											xpath('DFUInfoResponse')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 
 	return results;

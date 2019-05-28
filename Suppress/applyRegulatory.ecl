@@ -2,9 +2,13 @@
 import std, header_services, vehiclev2, Watercraft;
 
 export applyRegulatory := module
-			export IP := header_services.ProductionLZ.IP_Loc; 
-			export thor_path := header_services.ProductionLZ.Directory_Loc;
-			shared unix_path := header_services.ProductionLZ.Directory_Loc1;
+
+			export debug_ar := false : stored('debug_ar');
+			
+			export IP := header_services.ProductionLZ.IP_Loc; 	
+			export unix_path := header_services.ProductionLZ.Directory_Loc1 : stored('unix_path_override');
+			export thor_path := header_services.ProductionLZ.Directory_Loc  : stored('thor_path_override');
+
 			export enhFileName := 'file_enhanced_fnames.txt';
 			
 			export notification_email_addr := header_services.ProductionLZ.notification_email; 
@@ -53,7 +57,8 @@ export applyRegulatory := module
 
 			export determine_file( fname, layout) := 
 					functionmacro
-				
+							debug_ar := false : stored('debug_ar');
+
 							enhanced_layout := 
 										record 
 												unsigned8 record_source_id; 
@@ -67,15 +72,7 @@ export applyRegulatory := module
 									transform(layout,
 											self := left;
 											self := []));
-
-							// output('isenhancedfile = /' + is_enhancedfile + '/');
-							// d:= enh_base_file;
-							// e:= base_file;
-							// b:= output('need to unenhance');
-							// c:= output('no need');
-							// if (is_enhancedFile, b, c);
-							// if (is_enhancedFile, output(d), output(e));
-						
+					
 							final_file := if(is_enhancedFile, unenhanced_base_ds, base_file); 
 								
 							return final_file;
@@ -192,7 +189,26 @@ export applyRegulatory := module
 
 							return base_ds + Base_file_append;						
 					endmacro; // CR_simple_append_Punish	
+					
+			export CCW_simple_append(base_ds, filename, Drop_Layout, endrec=false) := 
+					functionmacro
+							import std;
+							Base_File_Append_In := suppress.applyregulatory.getFile(filename, Drop_Layout);
+			
+							max_unique_id := max(base_ds, unique_id);
+							
+							recordof(base_ds) reformat_append(Base_File_Append_In L, UNSIGNED c ) := 
+									transform
+											// obviously this equation is a little weak, but will give us a unique id
+											self.unique_id :=  intformat((c*thorlib.nodes() + (integer) max_unique_id), 8, 1); 
+											self := L;
+											self := [];
+									end;
+			
+							Base_File_Append := project(Base_File_Append_In, reformat_append(left, counter));															
 
+							return base_ds + Base_file_append;						
+					endmacro; // CCW_simple_append		
 
 					
       export simple_sup(base_ds, filename, hashFunc) := 
@@ -527,7 +543,8 @@ export applyRegulatory := module
 
 							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_ccw_sup.txt', CCW_Hash1, CCW_Hash2, CCW_Hash3);
 
-							return Suppress.applyRegulatory.simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
+							return Suppress.applyRegulatory.CCW_simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
+							// return Suppress.applyRegulatory.simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
 					endmacro; // applyCCW
 
 

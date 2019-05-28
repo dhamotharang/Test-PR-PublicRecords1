@@ -1,22 +1,26 @@
-import doxie;
+﻿import Relationship;
 
 // This allows for relationships to be assymetric. IOW 1->2 does not imply 2->1
 // Thus if your relationships are symmetric you need to insert two records for each one (one of which is reversed)
 // All of the incoming LAB1s will be assigned a cluster
 
-rels_1sided := doxie.File_Relatives_Plus(current_relatives = true, person1>0, person2>0, number_cohabits>=6);
 
-doxie.Layout_Relatives_Plus swap(doxie.Layout_Relatives_Plus le) := transform
-  self.person1 := le.person2;
-  self.person2 := le.person1;
+//rels_1sided := doxie.File_Relatives_Plus(current_relatives = true, person1>0, person2>0, number_cohabits>=6);
+rels_1sided := Relationship.file_relative(confidence in ['MEDIUM','HIGH']);
+
+rels_lsided_rec := RECORDOF(rels_1sided);
+
+relationship.layout_output.titled swap(rels_lsided_rec le) := transform
+  self.did1 := le.did1;
+  self.did2 := le.did2;
   self := le;
 end;
 
 rels := rels_1sided + project(rels_1sided,swap(left));
 
 crec := RECORD
-	unsigned8 cluster_id := rels.person1;
-	unsigned8 associated_did := rels.person2;
+	unsigned8 cluster_id := rels.did1;
+	unsigned8 associated_did := rels.did2;
 	REAL4 degree := 1;
 END;
 

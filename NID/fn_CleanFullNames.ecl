@@ -154,9 +154,13 @@ END;
 						LEFT.__nid = RIGHT.NID,
 						xform1(LEFT, RIGHT),
 						LOOKUP, FEW, LEFT OUTER);
-					
-		matches2 := JOIN(DISTRIBUTE(matches1(namType=''),nameid), 
-											if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
+#if(useV2)
+	  repository := Nid.NameRepository;
+#else
+	  repository := Nid.NameRepositoryV1;
+#end;
+		matches2 := JOIN(DISTRIBUTE(matches1(namType=''),nameid), repository(derivation=0),
+//											if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
 						LEFT.nameid = RIGHT.NID,
 						xform(LEFT, RIGHT),
 						LOCAL, KEEP(1), LEFT OUTER);
@@ -212,8 +216,8 @@ END;
 
 	
 #IF(includeInRepository=true)
-//newnames := DEDUP(nomatches,nid,local);
-Nid.MAC_IncludeInRepository(nomatches,
+Nid.MAC_IncludeInRepository(
+  nomatches,
 	Field,
 	nameid,
 	namtype,		// name type field
@@ -226,7 +230,8 @@ Nid.MAC_IncludeInRepository(nomatches,
 	_fname2,		// cleaned first name for name 2
 	_mname2,		// cleaned middle name for name 2
 	_lname2,		// cleaned last name for name 2
-	_suffix2		// cleaned suffix for name 2
+	_suffix2,		// cleaned suffix for name 2
+	useV2
 	);
 #END
 

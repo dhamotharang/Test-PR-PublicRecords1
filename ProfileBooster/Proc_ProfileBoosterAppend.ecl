@@ -22,8 +22,9 @@ IMPORT risk_indicators, profilebooster, address, data_services;
 #option('embeddedWarningsAsErrors', 0);
 
 
-onThor := true;
-// onThor := false;
+onThor := true;  
+// onThor := false; // after March 5, 2019, also toggle the _control.Environment.OnThor variable to match this
+
 // #workunit('name', 'profile booster ' + 	if(onThor, 'thor ', 'roxie ') );
 
 

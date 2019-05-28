@@ -1,6 +1,7 @@
+﻿OPTIONS:-gh -ga
 MODULE:BIPV2_Best_Seleid
 FILENAME:Base
-// Uncomment up to NINES for internal or external adl
+// Uncomment up to NINES for internal or external adl 
 IDFIELD:EXISTS:Seleid
 RIDFIELD:rcid
 RECORDS:3000000000
@@ -66,6 +67,23 @@ BESTTYPE:BestDunsCommon:BASIS(Seleid):COMMONEST:FUZZY:MINIMUM(2):VALID(fn_valid_
 BESTTYPE:BestDunsCurrent:BASIS(Seleid):RECENT(dt_last_seen):FUZZY:MINIMUM(2):VALID(fn_valid_duns):EXTEND
 BESTTYPE:BestDunsCurrent2:BASIS(Seleid):RECENT(dt_last_seen):VALID(fn_valid_duns):EXTEND
 BESTTYPE:BestDunsVotedUnrestricted:BASIS(Seleid):VOTED(fn_Best_Source_Unrestricted_Votes,2):VALID(fn_valid_duns):EXTEND
+//SIC
+BESTTYPE:BestSicCommon:BASIS(Seleid):COMMONEST:MINIMUM(2):EXTEND
+BESTTYPE:BestSicCurrent:BASIS(Seleid):RECENT(dt_last_seen):MINIMUM(2):EXTEND
+//NAICS
+BESTTYPE:BestNaicsCommon:BASIS(Seleid):COMMONEST:MINIMUM(2):EXTEND
+BESTTYPE:BestNaicsCurrent:BASIS(Seleid):RECENT(dt_last_seen):MINIMUM(2):EXTEND
+//DBA Name
+BESTTYPE:BestDbaNameLegal:BASIS(Seleid):VOTED(fn_Best_Name_Legal_Votes):FUZZY:VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameVotedSeleLevel:BASIS(Seleid):VOTED(fn_Best_Sele_Level_Votes,2):VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameCommon:BASIS(Seleid):COMMONEST:FUZZY:MINIMUM(2):VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameCurrent:BASIS(Seleid):RECENT(dt_last_seen):FUZZY:MINIMUM(2):VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameVoted:BASIS(Seleid):VOTED(fn_Best_Name_Source_Votes,2):VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameLength:BASIS(Seleid):LONGEST:FUZZY:VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameStrong:BASIS(Seleid):UNIQUE:FUZZY:VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameCurrent2:BASIS(Seleid):RECENT(dt_last_seen):VALID(fn_valid_cname):EXTEND
+BESTTYPE:BestDbaNameVotedUnrestricted:BASIS(Seleid):VOTED(fn_Best_Source_Unrestricted_Votes,2):VALID(fn_valid_cname):EXTEND
+
 // FUZZY can be used to create new types of FUZZY linking
 FUZZY:Right4:RST:CUSTOM(fn_Right4):TYPE(STRING4)
 FUZZY:PreferredName:RST:CUSTOM(fn_PreferredName):TYPE(STRING20)
@@ -83,6 +101,10 @@ FIELD:company_name:LIKE(cname):BestCompanyNameLegal:BestCompanyNameVotedSeleLeve
 FIELD:company_fein:LIKE(number):right4:EDIT1:BestFeinStrong:BestFeinCommon:BestFeinCurrent:BestFeinVotedUnrestricted:BestFeinMin:BestFeinMax:OWNED:FLAG:27,136
 FIELD:company_phone:LIKE(number):EDIT1:BestPhoneVotedSeleLevelWithNpa:BestPhoneCurrentWithNpa:BestPhoneCurrent:BestPhoneVoted:BestPhoneLongest:BestPhoneStrong:BestPhoneVotedUnrestricted:BestPhoneCommon:FLAG:26,295
 FIELD:company_url:BestUrlCommon:BestUrlCurrent:BestUrlLength:BestUrlStrong:BestUrlVotedUnrestricted:FLAG:27,27
+FIELD:duns_number:EDIT1:LIKE(number):BestDunsCommon:BestDunsCurrent:BestDunsCurrent2:BestDunsVotedUnrestricted:FLAG:27,77
+FIELD:company_sic_code1:BestSicCommon:BestSicCurrent:FLAG:11,324
+FIELD:company_naics_code1:BestNaicsCommon:BestNaicsCurrent:FLAG:11,132
+FIELD:dba_name:LIKE(cname):BestDbaNameLegal:BestDbaNameVotedSeleLevel:BestDbaNameCommon:BestDbaNameCurrent:BestDbaNameVoted:BestDbaNameLength:BestDbaNameStrong:BestDbaNameCurrent2:BestDbaNameVotedUnrestricted:FLAG:26,148
 // ------------------------------------
 //  2. company Address fields
 // ------------------------------------
@@ -101,7 +123,6 @@ FIELD:zip4:LIKE(number):13,177
 FIELD:fips_state:LIKE(number):5,16
 FIELD:fips_county:LIKE(number):7,89
 CONCEPT:address:prim_range:predir:prim_name:addr_suffix:postdir:unit_desig:sec_range:st:zip:BestCompanyAddressVotedSeleLevel:BestCompanyAddressVoted:BestCompanyAddressCurrent:BestCompanyAddressVotedSrc:BestCompanyAddressCommon:BestCompanyAddressStrong:BestCompanyAddressCurrent2:BestCompanyAddressVotedUnrestricted:FLAG:25,226
-FIELD:duns_number:EDIT1:LIKE(number):BestDunsCommon:BestDunsCurrent:BestDunsCurrent2:BestDunsVotedUnrestricted:FLAG:0,0
 // BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters

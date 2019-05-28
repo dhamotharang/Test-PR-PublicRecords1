@@ -13,7 +13,7 @@ module
 	//////////////////////////////////////////////////////////////////
 	export Input := module
 	
-		shared Template(string tag) := Platform.InputTemplate(false) + tag;
+		shared Template(string tag) := Platform.InputTemplate(pUseOtherEnvironment) + tag;
 		export MBS                           := tools.mod_FilenamesInput(Template('mbs'                              ),pversion);
 		export MbsNewGcIdExclusion           := tools.mod_FilenamesInput(Template('MbsNewGcIdExclusion'              ),pversion); //In this new file gcid is replaced by exclusion_id and exclusion_type
 		export MbsIndTypeExclusion           := tools.mod_FilenamesInput(Template('MbsIndTypeExclusion'              ),pversion);
@@ -52,7 +52,7 @@ module
 	//////////////////////////////////////////////////////////////////
 	export Base := module
 	
-		shared Template(string tag) := Platform.FileTemplate(false) + tag;
+		shared Template(string tag) := Platform.FileTemplate(pUseOtherEnvironment) + tag;
 		export Main                  := tools.mod_FilenamesBuild(Template('Main'                ),pversion);
 
 		export dAll_filenames :=

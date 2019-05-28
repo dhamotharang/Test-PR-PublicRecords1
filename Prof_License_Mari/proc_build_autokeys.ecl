@@ -1,4 +1,4 @@
-import autokey,AutoKeyB2,AutoKeyI,Prof_License_Mari; 
+﻿import autokey,AutoKeyB2,AutoKeyI,Prof_License_Mari; 
 
 
 export proc_build_autokeys(string pVersion) := function
@@ -51,6 +51,9 @@ Layouts.SlimRec  	xformSearch(Prof_License_Mari.layouts.final L, integer cnt) :=
 			self.nmls_id							:= L.nmls_id;
 			self.foreign_nmls_id			:= L.foreign_nmls_id;
 			self.federal_regulator		:= L.federal_regulator;
+			//CCPA-110
+			self.global_sid		:= L.global_sid;
+			self.record_sid		:= L.record_sid;
 			self	:=L;
 		end;
 

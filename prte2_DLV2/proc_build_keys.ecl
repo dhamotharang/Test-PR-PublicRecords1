@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2, prte2_DLV2;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2, prte2_DLV2,prte,_control;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -182,7 +182,7 @@ RoxieKeyBuild.MAC_SK_Move_v2(Constants.ak_keyname+'UberRefs',
 	'Q', 
 	move_qa_UberRefs);
 
-//updatedops   		 := PRTE.UpdateVersion('DLV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+updatedops   		 := PRTE.UpdateVersion('DLV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
 
 
 RETURN 		sequential(	
@@ -224,7 +224,7 @@ RETURN 		sequential(
 			move_qa_key_dl2_wildcard, 
 			move_qa_UberWords,
 			move_qa_UberRefs,
-			//updatedops
+			updatedops
 			);
 
 END;

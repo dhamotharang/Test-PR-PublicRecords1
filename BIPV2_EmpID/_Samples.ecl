@@ -1,4 +1,4 @@
-import BIPV2_EmpID, tools, std;
+﻿import BIPV2_EmpID, tools, std,bipv2;
 
 export _Samples(dataset(BIPV2_EmpID.Layout_EmpID)ih=BIPV2_EmpID.In_EmpID) := module
 		
@@ -11,12 +11,12 @@ export _Samples(dataset(BIPV2_EmpID.Layout_EmpID)ih=BIPV2_EmpID.In_EmpID) := mod
 	end;
 
 	export ReviewSamples := module
-		shared psetReviewers					:= ['TL','CM','LB','DW','SS','TR','FN','DB','JL'];
+		shared psetReviewers					:= BIPV2._Config.Set_Sample_Reviewers;
 		shared pNumSamplesPerReviewer	:= 20;
 		shared ConfThreshold					:= '41';
 		shared kmtch									:= BIPV2_EmpID.Keys(ih).MatchSample;
 		shared kcand									:= BIPV2_EmpID.Keys(ih).Candidates;
-		export out										:= BIPV2_EmpID._mac_GetSALTReviewSamples(kmtch,kcand,BIPV2_EmpID.In_EmpID,EmpID,ConfThreshold,pNumSamplesPerReviewer,psetReviewers);
+		export out										:= Tools.mac_GetSALTReviewSamples(kmtch,kcand,BIPV2_EmpID.In_EmpID,EmpID,ConfThreshold,pNumSamplesPerReviewer,psetReviewers);
 	end;
 
 	export out := parallel(ReviewSamples.out, BasicSamp.out);

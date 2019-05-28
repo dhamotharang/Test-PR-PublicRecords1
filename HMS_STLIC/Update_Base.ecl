@@ -429,11 +429,11 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 									,dLnpidOut,false,38 //38 for providers
 				);
 				
-				// with_lnpid:=dLnpidOut(lnpid>0); // reappend lnpid for all records with each build
-				// no_lnpid:=dLnpidOut(lnpid=0);
+				with_lnpid:=dLnpidOut(lnpid>0);
+				no_lnpid:=dLnpidOut(lnpid=0);
 				
 				Health_Facility_Services.mac_get_best_lnpid_on_thor (
-										dLnpidOut
+										no_lnpid
 										,lnpid
 										,clean_company_name											
 										,prim_range
@@ -466,7 +466,7 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 					 
 				
 			
-				final_base := result;
+				final_base := with_lnpid + result;
 				
 				// ********************************Set clean dates and phones to blank where all 0's and all 8's***************************
 			

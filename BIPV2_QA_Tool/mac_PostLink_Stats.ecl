@@ -67,9 +67,11 @@ functionmacro
   wuid_result := map(
      regexfind('proxid',lID,nocase)  => 'ProxSegmentationStatsV2'
     ,regexfind('seleid',lID,nocase)  => 'SeleSegmentationStatsV2'
+    ,regexfind('powid' ,lID,nocase)  => 'PowSegmentationStatsV2'
+    ,regexfind('empid' ,lID,nocase)  => 'EmpSegmentationStatsV2'
     ,''
   );
-	SegmentationStatsV2                         :=Dataset(WorkUnit(wuid_segstats,wuid_result),ProxSegmentationStatsV2_rec);
+	SegmentationStatsV2                         :=Dataset(WorkUnit(trim(wuid_segstats),trim(wuid_result)),ProxSegmentationStatsV2_rec);
   count_gold                                  := Workman.get_Scalar_Result(wuid_segstats ,'count_Gold_SELEID V2');
   count_Total_Active                          := SegmentationStatsV2(trim(segtype,left,right) = 'TOTAL'        ,trim(segsubtype,left,right) = 'Active'              )[1].total;
   count_Core_Tricore                          := SegmentationStatsV2(trim(segtype) = 'CORE'         ,trim(segsubtype) = 'TriCore'             )[1].total;

@@ -1,4 +1,4 @@
-﻿export svcAppend := function
+﻿export svcAppend() := macro
 	import BIPV2;
 	import BIPV2_Best;
 
@@ -14,13 +14,10 @@
 	boolean do_zip_expansion := true : stored('do_zip_expansion');
 	boolean from_thor := false : stored('from_thor');
 	boolean includeRecords := false : stored('include_records');
+	boolean isMarketing := false : stored('is_marketing');
+	boolean dnbFullRemove := false : stored('dnb_full_remove');
 
 	inputDs := dataset([], BIPV2.IdAppendLayouts.AppendInput) : stored('append_input');
-
-	postAppendLayout := {
-		inputDs.request_id,
-		BIPV2.IDlayouts.l_xlink_ids
-	};
 
 	withAppendRoxie := BIPV2.IdAppendRoxieLocal(inputDs
 		,scoreThreshold := score_threshold
@@ -63,24 +60,36 @@
 	withAppend := if(from_thor, withAppendThor, withAppendRoxie);
 
 	postAppend := project(withAppend,
-		transform(BIPV2.IDAppendLayouts.svcAppendOut,
+		transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
 			self := left,
 			self := []));
 
-	postBest := BIPV2.IdAppendLocal.AppendBest(withAppend, fetchLevel := fetchLevel, allBest := allBest);
+	postBest := BIPV2.IdAppendLocal.AppendBest(withAppend, fetchLevel := fetchLevel,
+	                                           allBest := allBest, isMarketing := isMarketing);
 
 	res := if(includeBest, postBest, postAppend);
+	resv1 := project(res, transform(BIPV2.IdAppendLayouts.svcAppendOut, self := left));
 
-	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel);
+	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove);
 
 	emptyHeader := dataset([], BIPV2.IdAppendLayouts.svcAppendRecsOut);
+
+	// Catch failures so roxiepipe won't fail.
+	// Return dataset with request ids in case of failure, turning an error into a no hit.
+	catchRes := catch(res, skip);
+	failResultv1 := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOut,
+	                      self.request_id := left.request_id, self := []));
+	failResult := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
+	                      self.request_id := left.request_id, self := []));
 				
-	return parallel(
-		output(res, named('Results'));
+	parallel(
+		output(if(not exists(catchRes), failResult, res), named('Results_v2'));
 		output(if(includeRecords, postHeader, emptyHeader), named('Header'));
+		output(if(not exists(catchRes), failResultv1, resv1), named('Results'));
+
 	);
 
-	// return parallel(
+	// parallel(
 		// output(preBest, named('preBest'));
 		// output(withBest, named('withBest'));
 		// output(withAppend, named('withappend'));
@@ -88,4 +97,4 @@
 		// output(postAppend, named('postAppend'));
 		// output(res, named('Results'));
 	// );
-end;
+endmacro;

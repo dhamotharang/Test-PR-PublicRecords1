@@ -20,8 +20,11 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
 	end;
 
-	shared associate_Base						:= project(Files(pversion,pUseProd).associate_Base.Built, revised_assoc_layout);
-	shared assoc_Base_gk						:= associate_Base(group_key <> '');
+	shared associate_Base0					:= project(Files(pversion,pUseProd).associate_Base.Built, revised_assoc_layout):persist('~thor_data400::persist::enclarity::associate_mod_layout');												
+	shared associate_base						:= dedup(associate_base0, all):persist('~thor_data400::persist::enclarity::associte_base_for_keys');
+
+	shared assoc_Base_gk						:= associate_base(group_key <> '');
+																					
 	shared assoc_Base_ak						:= associate_Base(addr_key <> '');
 	shared assoc_Base_bill_tin			:= dedup(associate_Base((unsigned)bill_tin > 0),bill_tin,group_key,sloc_group_key,billing_group_key,all);
 	shared associate_base_bk				:= associate_Base(billing_group_key <> '');
@@ -102,8 +105,9 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	tools.mac_FilesIndex('individual_base(lnpid>0)		,{lnpid			}	  ,{ind_Base_lnpid	}'	,keynames(pversion,pUseProd).individual_lnpid		,individual_lnpid	 );
 
 	// associate keys - group_key, addr_key
-	tools.mac_FilesIndex('associate_base		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
-	tools.mac_FilesIndex('associate_base		,{addr_key	}	  ,{assoc_Base_ak	}'	,keynames(pversion,pUseProd).associate_addr_key		,associate_addr_key	 );
+	// tools.mac_FilesIndex('associate_base		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
+	tools.mac_FilesIndex('assoc_base_gk		,{group_key	}	  ,{assoc_Base_gk	}'	,keynames(pversion,pUseProd).associate_group_key		,associate_group_key	 );
+	tools.mac_FilesIndex('assoc_base_ak		,{addr_key	}	  ,{assoc_Base_ak	}'	,keynames(pversion,pUseProd).associate_addr_key		,associate_addr_key	 );
 	tools.mac_FilesIndex('assoc_Base_bill_tin,{bill_tin},{group_key,sloc_group_key,billing_group_key}'	,keynames(pversion,pUseProd).associate_bill_tin		,associate_bill_tin	 );
 	tools.mac_FilesIndex('associate_base_bk ,{billing_group_key},{associate_base_bk}'	,keynames(pversion,pUseProd).associate_bgk		,associate_bgk	 );
 		

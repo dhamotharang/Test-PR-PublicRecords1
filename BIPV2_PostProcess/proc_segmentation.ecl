@@ -205,6 +205,7 @@ module
     BIPV2_PostProcess.macPartition(pInput, SELEID, SeleFree, SeleProb)
     BIPV2_PostProcess.macPartition(pInput, OrgID,  OrgFree,  OrgProb)
     BIPV2_PostProcess.macPartition(pInput, UltID,  UltFree,  UltProb)
+    BIPV2_PostProcess.macPartition(pInput, Empid,  EmpFree,  EmpProb)
     
     // Gold Segmentation
     export modgoldSELEV2      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier);
@@ -221,6 +222,9 @@ module
     shared modPowV2P          := BIPv2_PostProcess.segmentation(PowProb,  'POWID',pToday);
     export modSeleV2          := BIPv2_PostProcess.segmentation(SeleFree, 'SELEID',pToday);
     export modSeleV2P         := BIPv2_PostProcess.segmentation(SeleProb, 'SELEID',pToday);
+
+    export modEmpV2           := BIPv2_PostProcess.segmentation(EmpFree , 'EMPID',pToday);
+    shared modEmpV2P          := BIPv2_PostProcess.segmentation(EmpProb , 'EMPID',pToday);
     
     shared modorgV2           := BIPv2_PostProcess.segmentation(OrgFree, 'ORGID',pToday);
     shared modorgV2P          := BIPv2_PostProcess.segmentation(OrgProb, 'ORGID',pToday);
@@ -245,16 +249,19 @@ module
     // shared createOrgFile     := tools.macf_writefile(fnames.OrgidSegs.logical  ,modOrg.result  ,,,pOverwrite);
     // shared createUltFile     := tools.macf_writefile(fnames.UltidSegs.logical  ,modUlt.result  ,,,pOverwrite);
     // Output to workunit Seg Stats
-    shared outputProxStatsV2  := output(modProxV2.stats ,named('ProxSegmentationStatsV2'));
-    shared outputProxStatsV2P := output(modProxV2P.stats ,named('ProxSegmentationStatsV2Probation'));
+    export outputProxStatsV2  := output(modProxV2.stats ,named('ProxSegmentationStatsV2'));
+    export outputProxStatsV2P := output(modProxV2P.stats ,named('ProxSegmentationStatsV2Probation'));
     
-    shared outputPowStatsV2   := output(modPowV2.stats  ,named('PowSegmentationStatsV2'));
-    shared outputPowStatsV2P  := output(modPowV2P.stats ,named('PowSegmentationStatsV2Probation'));
-    shared outputSeleStatsV2  := output(modSeleV2.stats  ,named('SeleSegmentationStatsV2'));
-    shared outputSeleStatsV2P := output(modSeleV2P.stats ,named('SeleSegmentationStatsV2Probation'));
+    export outputPowStatsV2   := output(modPowV2.stats  ,named('PowSegmentationStatsV2'));
+    export outputPowStatsV2P  := output(modPowV2P.stats ,named('PowSegmentationStatsV2Probation'));
+    export outputSeleStatsV2  := output(modSeleV2.stats  ,named('SeleSegmentationStatsV2'));
+    export outputSeleStatsV2P := output(modSeleV2P.stats ,named('SeleSegmentationStatsV2Probation'));
+
+    export outputEmpStatsV2   := output(modEmpV2.stats  ,named('EmpSegmentationStatsV2'));
+    export outputEmpStatsV2P  := output(modEmpV2P.stats ,named('EmpSegmentationStatsV2Probation'));
     
-    shared outputOrgStatsV2   := output(modOrgV2.stats  ,named('OrgSegmentationStatsV2' ));
-    shared outputOrgStatsV2P  := output(modOrgV2P.stats  ,named('OrgSegmentationStatsV2Probation' ));
+    export outputOrgStatsV2   := output(modOrgV2.stats  ,named('OrgSegmentationStatsV2' ));
+    export outputOrgStatsV2P  := output(modOrgV2P.stats  ,named('OrgSegmentationStatsV2Probation' ));
     
     // shared outputUltStats    := output(modUlt.stats  ,named('UltSegmentationStats' ));
     // setup field stats and counts
@@ -456,7 +463,8 @@ module
       ,self.pct_sameProxIDs  := (unsigned)(left.pct_sameProxIDs  * 100)
       ,self.pct_samePOWIDs   := (unsigned)(left.pct_samePOWIDs   * 100)
       ,self.pct_sameEmpIDs   := (unsigned)(left.pct_sameEmpIDs   * 100)
-      ,self := left));
+      ,self := left))
+       : independent;
     
     lay_id_counts := record
       string    BIP_ID                        ;
@@ -480,7 +488,8 @@ module
       unsigned6 count_1000000_plus        ;
     end;   
     
-    ds_idcounts := project(pIDCountBuckets  ,transform(lay_id_counts,self.average_count := (unsigned)(left.average_count * 100.0),self.countGroup := left.total_count,self.BIP_ID := left.id,self := left));
+    ds_idcounts := project(pIDCountBuckets  ,transform(lay_id_counts,self.average_count := (unsigned)(left.average_count * 100.0),self.countGroup := left.total_count,self.BIP_ID := left.id,self := left))
+     : independent;
     
     // ----- prox seg v2 stats
     joinProxV2 := sort(join(pProxStatsV2  ,pProxStatsV2P  ,left.segtype = right.segtype and left.segsubtype = right.segsubtype  ,transform({string segtype,string segsubtype,unsigned countGroup,unsigned Regular,unsigned Probation}
@@ -489,7 +498,8 @@ module
       ,self.Probation     := right.total
       ,self.segtype       := trim(left.segtype    ,all)
       ,self.segsubtype    := trim(left.segsubtype ,all)
-    ),full outer),segtype,segsubtype);
+    ),full outer),segtype,segsubtype)
+     : independent;
           
     // ----- Sele seg v2 stats
     joinSeleV2 := sort(join(pSeleStatsV2  ,pSeleStatsV2P  ,left.segtype = right.segtype and left.segsubtype = right.segsubtype  ,transform({string segtype,string segsubtype,unsigned countGroup,unsigned Regular,unsigned Probation}
@@ -498,7 +508,8 @@ module
       ,self.Probation     := right.total
       ,self.segtype       := trim(left.segtype    ,all)
       ,self.segsubtype    := trim(left.segsubtype ,all)
-    ),full outer),segtype,segsubtype);
+    ),full outer),segtype,segsubtype)
+     : independent;
     
     
     // -- BIP 2.2 stats, status per ID of businesses with residential addresses
@@ -510,7 +521,7 @@ module
       table(bip_22_status_per_id     ,{status,BIP_ID,string address_type := 'All'         ,countgroup,cnt})
     + table(bip_22_status_per_id_res ,{status,BIP_ID,string address_type := 'Residential' ,countgroup,cnt})
     + table(bip_22_status_per_id_biz ,{status,BIP_ID,string address_type := 'Business'    ,countgroup,cnt})
-    ,status,bip_id,address_type);
+    ,status,bip_id,address_type) : independent;
     return parallel(
     
        Strata.macf_CreateXMLStats(ds_IDChange   ,'BIPV2','Segmentation' ,pversion ,BIPV2_Build.mod_email.emailList  ,'Change'           ,'ID'             ,pIsTesting,pOverwrite) //group on idtype
@@ -580,6 +591,8 @@ module
         , outputPowStatsV2P
         , outputSeleStatsV2 
         , outputSeleStatsV2P
+        , outputEmpStatsV2 
+        , outputEmpStatsV2P
         
         , outputOrgStatsV2 
         , outputOrgStatsV2P

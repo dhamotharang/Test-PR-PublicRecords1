@@ -7,7 +7,7 @@ export Proc_Build_All(string filedate, string version) := function
 														, (string) version[1..8]
 														, ERROR('Error: Version must be a valid date and cannot be a future date, but can have a letter appended: ' + version)
 													 );
-																				 
+	// Added Michael.Gould@lexisnexisrisk.com																			 
 	spray_files 				:= oshair.spray_oshair_inputfile(filedate);
 	clean_data 					:= oshair.clean_oshair_data(version, process_date):FAILURE(FileServices.SendEmail('michael.gould@lexisnexisrisk.com;cguyton@seisint.com; charlene.ros@lexisnexisrisk.com; darren.knowles@lexisnexisrisk.com','Oshair Build Failure/CLEAN DATA: ' + version +' - '+ Thorlib.WUID(),FAILMESSAGE));
 	build_keys 					:= oshair.proc_build_oshair_keys(version):FAILURE(FileServices.SendEmail('michael.gould@lexisnexisrisk.com;cguyton@seisint.com; charlene.ros@lexisnexisrisk.com; darren.knowles@lexisnexisrisk.com','Oshair Build Failure/BUILD KEYS: ' + version +' - '+ Thorlib.WUID(),FAILMESSAGE));
@@ -27,7 +27,7 @@ export Proc_Build_All(string filedate, string version) := function
 																					,do_strata);
 
 	//Update DOPS
-	dops_update :=dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + 'michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com',,'N|B'); 
+	dops_update :=dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + ';michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com',,'N|B'); 
 
 	//Update ORBIT MAG
 	// Changed from CreateBuild to use CreateBuild_AddItem so that it adds the item at build time

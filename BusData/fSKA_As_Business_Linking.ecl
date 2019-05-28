@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, address, mdr, _Validate;
+﻿IMPORT Business_Header, ut, address, mdr, _Validate;
 
 EXPORT fSKA_As_Business_Linking(
 
@@ -8,28 +8,11 @@ EXPORT fSKA_As_Business_Linking(
 ) :=
 FUNCTION
 
-	// Layout_SKA_Verified_Local := RECORD
-	  // UNSIGNED6 record_id := 0;
-	  // Layout_SKA_Verified_Bdid;
-	// END;
-
 	Layout_BLF_Local := RECORD
 	  Business_Header.Layout_Business_Linking.Linking_Interface;
-	  // UNSIGNED6 orig_id;
-	  // UNSIGNED6 split_id := 0;
 	END;
 
-	// Add unique RECORD id to SKA Verified file
-	// Layout_SKA_Verified_Local AddRecordID(Layout_SKA_Verified_bdid l) := TRANSFORM
-	  // SELF := l;
-	// END;
-
-	// SKA_Verified_Init := PROJECT(pSka_Verified_Base, AddRecordID(LEFT));
-
-	// ut.MAC_Sequence_Records(SKA_Verified_Init, record_id, SKA_Verified_Seq)
-
 	Layout_BLF_Local  Translate_SKA_Verified_to_BLF(Layout_SKA_Verified_bdid l, INTEGER CTR) := TRANSFORM
-	  // SELF.orig_id := l.record_id;
 	  SELF.source := MDR.sourceTools.src_SKA;
 		SELF.source_record_id := l.source_rec_id;
 	  SELF.dt_first_seen := (UNSIGNED4)Stringlib.GetDateYYYYMMDD();
@@ -37,7 +20,7 @@ FUNCTION
 	  SELF.dt_vendor_first_reported := (UNSIGNED4)Stringlib.GetDateYYYYMMDD();
 	  SELF.dt_vendor_last_reported := (UNSIGNED4)Stringlib.GetDateYYYYMMDD();
 	  SELF.company_bdid := (UNSIGNED6)l.bdid;
-	  SELF.company_name := Stringlib.StringToUpperCase(l.company_name);
+	  SELF.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
  	  SELF.company_address.prim_range := CHOOSE(CTR, l.mail_prim_range, l.alt_prim_range);
 	  SELF.company_address.predir := CHOOSE(CTR, l.mail_predir, l.alt_predir);
 	  SELF.company_address.prim_name := CHOOSE(CTR, l.mail_prim_name, l.alt_prim_name);
@@ -119,46 +102,6 @@ FUNCTION
 								                          RollupSKAVerifiedNorm(LEFT, RIGHT),
 								                          LOCAL);
 								  
-	// Group by vl_id
-	// from_ska_verified_dist := DISTRIBUTE(from_ska_verified_norm_rollup, HASH(vl_id));
-	// from_ska_verified_sort := SORT(from_ska_verified_dist, vl_id, LOCAL);
-	// from_ska_verified_grpd := GROUP(from_ska_verified_sort, vl_id, LOCAL);
-	// from_ska_verified_grpd_sort := SORT(from_ska_verified_grpd, split_id);
-
-	// Layout_BLF_Local SetGroupId(Layout_BLF_Local l, Layout_BLF_Local r) := TRANSFORM
-	  // SELF.group1_id := IF(l.group1_id <> 0, l.group1_id, r.split_id);
-	  // SELF := r;
-	// END;
-
-	// Set GROUP id
-	// from_ska_verified_iter := GROUP(iterate(from_ska_verified_grpd_sort, SetGroupId(LEFT, RIGHT)));
-
-	// Calculate stat to determine COUNT by group_id
-	// Layout_Group_List := RECORD
-	  // from_ska_verified_iter.group1_id;
-	// END;
-
-	// ska_verified_group_list := TABLE(from_ska_verified_iter, Layout_Group_List);
-
-	// Layout_Group_Stat := RECORD
-	  // ska_verified_group_list.group1_id;
-	  // cnt := COUNT(GROUP);
-	// END;
-
-	// ska_verified_group_stat := TABLE(ska_verified_group_list, Layout_Group_Stat, group1_id);
-
-	// Clean single GROUP ids AND format
-	// Business_Header.Layout_Business_Header_New FormatToBLF(Layout_BLF_Local l, Layout_Group_Stat r) := TRANSFORM
-	  // SELF.group1_id := r.group1_id;
-	  // SELF := l;
-	// END;
-
-	// ska_verified_group_clean := JOIN(from_ska_verified_iter,
-							                     // ska_verified_group_stat(cnt > 1),
-							                     // LEFT.group1_id = RIGHT.group1_id,
-							                     // FormatToBLF(LEFT, RIGHT),
-							                     // LEFT OUTER,
-							                     // LOOKUP);
 
 	Layout_BLF_Local  Translate_SKA_Nixie_to_BLF(Layout_SKA_Nixie_bdid l) := TRANSFORM
 	  SELF.source := MDR.sourceTools.src_SKA;
@@ -170,7 +113,7 @@ FUNCTION
 	  SELF.dt_vendor_last_reported := IF((INTEGER)l.NIXIE_DATE <> 0, (UNSIGNED4)l.NIXIE_DATE,
 									                     (UNSIGNED4)Stringlib.GetDateYYYYMMDD());
 	  SELF.company_bdid := (UNSIGNED6)l.bdid;
-	  SELF.company_name := Stringlib.StringToUpperCase(l.company_name);
+	  SELF.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
  	  SELF.company_address.prim_range := l.mail_prim_range;
 	  SELF.company_address.predir := l.mail_predir;
 	  SELF.company_address.prim_name := l.mail_prim_name;
@@ -198,17 +141,17 @@ FUNCTION
 	  SELF.company_address.geo_blk := l.mail_geo_blk;
 	  SELF.company_address.geo_match := l.mail_geo_match;
 	  SELF.company_address.err_stat := l.mail_err_stat;
-	  SELF.company_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.phone);
+	  SELF.company_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.NUMBER);
 	  SELF.vl_id := 'SKAN' + l.id;
     SELF.current := TRUE;
-	  SELF.phone_score := IF((INTEGER)l.phone = 0, 0, 1);
+	  SELF.phone_score := IF((INTEGER)l.NUMBER = 0, 0, 1);
 	  SELF.contact_name.title := l.title;
  	  SELF.contact_name.fname := l.fname;
  	  SELF.contact_name.mname := l.mname;
  	  SELF.contact_name.lname := l.lname;
  	  SELF.contact_name.name_suffix := l.name_suffix;
  	  SELF.contact_name.name_score := l.name_score;
-	  SELF.contact_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.phone);
+	  SELF.contact_phone := address.CleanPhone(IF(l.area_code <> '', l.area_code, '000') + l.NUMBER);
 	  SELF.cid := (UNSIGNED8)l.persid;
     SELF.contact_score := IF(l.persid = '', 0, 1);
     SELF.company_department := l.dept_code;
@@ -223,9 +166,9 @@ FUNCTION
 	Layout_BLF_Local RollupBR(Layout_BLF_Local l, Layout_BLF_Local r) := TRANSFORM
 	  SELF.dt_first_seen := ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 				                                  ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
-	  SELF.dt_last_seen := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
-	  SELF.dt_vendor_last_reported := ut.LatestDate(l.dt_vendor_last_reported, 
-                                                  r.dt_vendor_last_reported);
+	  SELF.dt_last_seen := MAX(l.dt_last_seen,r.dt_last_seen);
+	  SELF.dt_vendor_last_reported := MAX(l.dt_vendor_last_reported, 
+                                        r.dt_vendor_last_reported);
 	  SELF.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported,
                                                      r.dt_vendor_first_reported);
 	  SELF.company_name := IF(l.company_name = '', r.company_name, l.company_name);
@@ -288,7 +231,6 @@ FUNCTION
     SELF := L;
 	END;
 
-	// ska_clean_dist := DISTRIBUTE(ska_verified_group_clean + ska_nixie_init,
 	ska_clean_dist := DISTRIBUTE(from_ska_verified_norm_rollup + ska_nixie_init,
 						        HASH(company_address.zip, TRIM(company_address.prim_name), TRIM(company_address.prim_range),
                     TRIM(company_name)));

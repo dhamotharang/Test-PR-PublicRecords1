@@ -182,9 +182,11 @@ EXPORT map_ARS0835_conversion(STRING pVersion) := FUNCTION
   	//Use default date of 17530101 for blank dates. Use this instead of norm_date2->date_slashed_mmddyyy_to_yyymmdd
 		SELF.CURR_ISSUE_DTE			:= IF(L.IssueDate != '',
 											            Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.IssueDate),'17530101');//yyyymmdd
-		tmpOrigIssueDate				:= IF(L.FirstLicenseDate != '',
-											            Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.FirstLicenseDate),'17530101'); //yyyymmdd									
-		SELF.ORIG_ISSUE_DTE			:= IF(REGEXFIND('^[0-9]{8}$',tmpOrigIssueDate),tmpOrigIssueDate,'17530101');
+		// tmpOrigIssueDate				:= IF(L.FirstLicenseDate != '',
+											            // Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.FirstLicenseDate),'17530101'); //yyyymmdd									
+		// SELF.ORIG_ISSUE_DTE			:= IF(REGEXFIND('^[0-9]{8}$',tmpOrigIssueDate),tmpOrigIssueDate,'17530101');
+		SELF.ORIG_ISSUE_DTE			:= '17530101'; // 2019/05/22 the new first issue date is the first issue date for current year, not the original issue date
+		
  		SELF.EXPIRE_DTE					:= IF(L.ExpirationDate != '',
    											          Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.ExpirationDate),'17530101'); //yyyymmdd
 	

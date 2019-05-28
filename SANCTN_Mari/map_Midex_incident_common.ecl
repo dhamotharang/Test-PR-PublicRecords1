@@ -1,4 +1,4 @@
-//The purpose of this process will be to map the Non-Public and FreddieMac common layout
+﻿//The purpose of this process will be to map the Non-Public and FreddieMac common layout
 //incident data to the Sanction incident dataset
 
 IMPORT SANCTN_Mari, Ut, Lib_FileServices, Address, lib_stringlib;
@@ -49,6 +49,12 @@ SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_base clnIncidentToCommon(dLayo
 		self.JURISDICTION				:= input.jurisdiction;
 		self.CASE_NUM						:= ut.CleanSpacesAndUpper(input.case_number);
 		self.SOURCE_DOC					:= input.source_doc;
+		
+		//CCPA-97 Initialize new fields
+		self.date_vendor_first_reported := '';
+		self.date_vendor_last_reported 	:= '';
+		self.global_sid											 	:= 0;
+		self.record_sid											 	:= 0;
 		
 		self	:= input;
 		// self := [];

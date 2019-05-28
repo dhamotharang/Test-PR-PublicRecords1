@@ -29,7 +29,7 @@ functionmacro
   layout_result := BIPV2_QA_Tool.Layouts.entity_stats;
 
   // -- execute BIPV2_Strata.mac_Single_Multi_Sourced_IDS to get singletons and total ids per source
-  ds_singletons_and_total_ids_per_source      := BIPV2_Strata.mac_Single_Multi_Sourced_IDS(pversion,pDs_Base,pBIP_ID,pOutputDatasetOnly := true);
+  ds_singletons_and_total_ids_per_source      := project(BIPV2_Strata.mac_Single_Multi_Sourced_IDS(pversion,pDs_Base,pBIP_ID,pOutputDatasetOnly := true)  ,transform(recordof(left),self.source := if(trim(left.source) = 'Totals','Total',left.source),self := left));
   ds_singletons_and_total_ids_per_source_slim := table(ds_singletons_and_total_ids_per_source ,{source,countgroup,cnt_single_source});
   
   // -- Get new ids by source   : clusters that contain source and did not exist in father file

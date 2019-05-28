@@ -1,4 +1,4 @@
-// spray MSS0815 Mississippi Appraiser Licenses Files for MARI	   
+﻿// spray MSS0815 Mississippi Appraiser Licenses Files for MARI	   
 IMPORT ut
 	   ,_control
        ,Prof_License_Mari
@@ -11,7 +11,7 @@ EXPORT spray_MSS0815 (STRING filedate) := MODULE
 
 SHARED filepath		    :=	'/data/data_build_5_2/MARI/in/MSS0815/' + filedate +'/';
 SHARED sourcepath			:=	'/data/data_build_5_2/MARI/';
-SHARED group_name			:=	'thor400_20';
+SHARED group_name			:=	Common_Prof_Lic_Mari.group_name;
 SHARED maxRecordSize	:=	8192;
 SHARED destination := Common_Prof_Lic_Mari.SourcesFolder + 'mss0815::' + filedate + '::';
 SHARED superfile_apr := '~thor_data400::in::proflic_mari::mss0815::using::apr';

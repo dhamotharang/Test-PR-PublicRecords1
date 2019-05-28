@@ -30,8 +30,9 @@ function
   Build_proxid_specs             := tools.macf_writeindex('PRTE2_BIPV2_BusHeader.Keys(pversion,puseotherenvironment).Key_ProxID_Specificities  		,knames.proxid_specificities_debug.new'    );
   Build_proxid_atts              := tools.macf_writeindex('PRTE2_BIPV2_BusHeader.Keys(pversion,puseotherenvironment).Key_ProxID_Attribute_Matches ,knames.proxid_Attribute_Matches.new'      );
   Build_lgid3_mtch_cand          := tools.macf_writeindex('PRTE2_BIPV2_BusHeader.Keys(pversion,puseotherenvironment).Key_lgid3_Candidates 		 		,knames.lgid3_match_candidates_debug.new'	 );
-  Build_lgid3_specs              := tools.macf_writeindex('PRTE2_BIPV2_BusHeader.Keys(pversion,puseotherenvironment).Key_lgid3_Specificities	 		,knames.lgid3_specificities_debug.new'	 	 );
 	
+	 Build_lgid3_matches           := tools.macf_writeindex('PRTE2_BIPV2_BusHeader.Keys(pversion,puseotherenvironment).Key_lgid3_Matches	          ,knames.lgid3_matches.new'	      	 );
+
 	Build_Proxid_rel_assoc         := tools.macf_writeindex('PRTE2_BIPV2_BusHeader.Keys(pversion,puseotherenvironment).Key_proxid_relative			 		,knames.assoc.new'												 );
 	
 	Build_AML_Addr                 := tools.macf_writeindex('PRTE2_BIPV2_BusHeader.Key_AML_addr              			 																	,knames.aml_addr.new'        							 );
@@ -40,21 +41,20 @@ function
 	
 	resurnBuildKeys := sequential(
 												parallel(
-														Build_strnbr
+												    Build_lgid3_matches
+													,	Build_strnbr
 													 ,Build_license_linkids
 													 ,Build_industry_linkids
 													 ,Build_linkids
 													 ,Build_translations
 													 ,Build_ZipCitySt
 													 ,Build_Status
-													 ,Build_proxid_mtch_cand
-													 ,Build_proxid_specs
 													 ,Build_proxid_atts
 													 ,Build_lgid3_mtch_cand
-													 ,Build_lgid3_specs
 													 ,Build_Proxid_rel_assoc
 													 ,Build_AML_Addr
-													 ,Build_biz_preferred													 
+													 ,Build_biz_preferred	
+													 ,copy_seeds(pversion)
 													)
 											);
 											

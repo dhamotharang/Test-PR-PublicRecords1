@@ -158,21 +158,18 @@ addrProject 	:= project(all_names_addresses, addrPop(left),local):INDEPENDENT ;
 		v_stid_num              := IF(v_stid_num1 in _functions.Filterlist,'',v_stid_num1);
 		
 		self.offender_key				:= MAP(l.name_type_hd not in ['A'] and vVendor in [
-																	'DA','DB','DH','DJ','DI',
-																	'DP','DM','DQ','DN','SB',
-																	'DS','DU','EU','DY','DV',
-																	'DX','EV','WG','EW','EX',
-																	'EF','WH','WK','EP','ER',
-																	'ET','DF','6X','ZB','6W'] and v_doc_num <> ''  => trim(vVendor) + v_doc_num, 
+																	'DA','DB','DH','DJ','DI','DP','DM','DQ','DN','SB',
+																	'DS','DU','EU','DY','DV','DX','EV','WG','EW','EX',
+																	'EF','WH','WK','EP','ER','ET','DF','6X','ZB','6W',
+																	'I0050','I0052'] and v_doc_num <> ''  => trim(vVendor) + v_doc_num, 
 																	
 																l.name_type_hd not in ['A'] and vVendor in [
-																	'DD','DG','WL','DD','VE',
-																	'WD','EA','WC','ED','WF',
-																	'EE','EG','EI','EJ','EO',
-																	'EQ'] and v_inm_num <> ''	=> trim(vVendor) + v_inm_num,
+																	'DD','DG','WL','DD','VE','WD','EA','WC','ED','WF',
+																	'EE','EG','EI','EJ','EO','EQ',
+																	'I0046','I0047','I0051'] and v_inm_num <> ''	=> trim(vVendor) + v_inm_num,
 																	
 																vVendor in [
-																	'EL','DW','6H','6Z'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num +trim(l.dob, all),
+																	'EL','DW','6H','6Z','I0048','I0049'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num +trim(l.dob, all),
 																	
 																vVendor in [
 																	'DR','DZ','WE','EK','ES','EM'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num,
@@ -371,13 +368,14 @@ ds_offender 	:= result_common2(pty_nm <> '' and trim(vendor, left, right)<>'');
 		self.zip5             	:= if(l.zip5             	= '', r.zip5 , l.zip5);
 		SELF 					:= L; 
 	END;
+                                                
 
 Rollup_offender := ROLLUP(sort(distribute(ds_offender,HASH(offender_key,vendor,state_origin)),
                           offender_key,dob,fname,lname,mname,name_suffix ,vendor,state_origin,source_file ,
                           case_filing_dt ,case_number ,doc_num,id_num ,dle_num,ins_num,fbi_num,dl_num ,dl_state    ,
                           race ,race_desc,sex  ,weight ,height ,hair_color  ,hair_color_desc,eye_color   ,eye_color_desc ,
                           skin_color  ,skin_color_desc,party_status,party_status_desc	,prim_range  ,predir ,prim_name   ,addr_suffix ,
-                          postdir,unit_desig  ,sec_range   ,v_city_name ,state,zip5,pty_typ, local),		
+                          postdir,unit_desig  ,sec_range   ,v_city_name ,state,zip5,pty_typ,-src_upload_date, local),		
 
 
 													 left.offender_key            = right.offender_key and 
@@ -422,5 +420,34 @@ Rollup_offender := ROLLUP(sort(distribute(ds_offender,HASH(offender_key,vendor,s
 													(left.state             = ''   or right.state       = '' or trim(left.state)      = trim(right.state)) and
 													(left.zip5              = ''   or right.zip5        = '' or trim(left.zip5)       = trim(right.zip5)) ,
 													 rollupdef(LEFT,RIGHT),local);
-		
-export proc_build_DOC_Offender_base := Rollup_offender : persist ('persist::out::crim::HD::DOC::offender'); 
+													 
+primaryIErecord	 := Rollup_offender(vendor in ['I0044','I0048','I0049'] and pty_typ ='0'); 
+Restoftherecords := Rollup_offender(~(vendor in ['I0044','I0048','I0049'] and pty_typ ='0'));
+
+
+primaryIErecordsorted := sort(distribute(primaryIErecord,HASH(offender_key,vendor,state_origin)),
+                          offender_key,dob,fname,lname,mname,name_suffix ,vendor,state_origin,source_file ,
+                          case_filing_dt ,case_number ,doc_num,id_num ,dle_num,ins_num,fbi_num,dl_num ,dl_state,
+                          prim_range  ,predir ,prim_name ,addr_suffix ,
+                          postdir,unit_desig  ,sec_range ,v_city_name ,state,zip5,pty_typ,-src_upload_date,  local);
+LatestprimaryIErecord :=  dedup(distribute(primaryIErecordsorted,HASH(offender_key,vendor,state_origin)),
+                          offender_key,dob,fname,lname,mname,name_suffix ,vendor,state_origin,source_file ,
+                          case_filing_dt ,case_number ,doc_num,id_num ,dle_num,ins_num,fbi_num,dl_num ,dl_state,
+                          prim_range  ,predir ,prim_name ,addr_suffix ,
+                          postdir,unit_desig  ,sec_range ,v_city_name ,state,zip5,pty_typ,  local);	
+													
+// output(count(Rollup_offender));													
+// output(count(primaryIErecord),named('primaryIE'));
+// output(count(Restoftherecords),named('Restoftherecords')); 
+// output(count(Rollup_offender),named('total'));													
+// output(count(LatestprimaryIErecord),named('LatestprimaryIErecord'));
+				
+
+// bef := table(Rollup_offender(vendor[1..2] ='I0' and pty_typ ='0'),{source_file,offender_key,count(group)},source_file,offender_key,few);
+// aft := table(LatestprimaryIErecord+Restoftherecords(vendor[1..2] ='I0' and pty_typ ='0'),{source_file,offender_key,count(group)},source_file,offender_key,few);
+// output(table(bef(_unnamed_cnt_3 >1 ),{source_file,count(group)},source_file,few));
+// output(table(aft(_unnamed_cnt_3 >1 ),{source_file,count(group)},source_file,few));
+
+
+													
+export proc_build_DOC_Offender_base := LatestprimaryIErecord+Restoftherecords : persist ('persist::out::crim::HD::DOC::offender'); 

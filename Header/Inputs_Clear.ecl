@@ -60,6 +60,7 @@ updt_in(base_status,'DLV2Keys','~thor_data400::BASE::dl2::DLHeader_Building','~t
 ,if(base_status(pk='transunion')[1].update,cleanSuper('~thor_data400::base::transunioncredheader_building'),output('SKIPPING transunioncredheader_building'))
 ,if(base_status(pk='eq_hist')[1].update,cleanSuper('~thor_data400::base::eq_histHeader_building'))                         // STALE
 ,if(base_status(pk='alloymedia')[1].update,cleanSuper('~thor_data400::base::alloymedia_student_list_Header_Building'))        // STALE
+,if(base_status(pk='cd_seed')[1].update, cleanSuper('~thor_data::base::cd_seed_building'))        // always clear cd_seed building sf
 ,updt_in(base_status,'TargusKeys'  ,'~thor_data400::base::consumer_targusHeader_Building','~thor_data400::base::consumer_targus')
               
 );

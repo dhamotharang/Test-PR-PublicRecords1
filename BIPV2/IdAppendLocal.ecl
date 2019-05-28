@@ -1,10 +1,15 @@
-﻿import BIPV2;
+﻿import AutoStandardI;
+import BIPV2;
 import BIPV2_Best;
+import BIPV2_Build;
+import BIPV2_Company_Names;
+import doxie;
+import ut;
 
 export IdAppendLocal := module
 
 	export AppendBest(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend, string fetchLevel,
-	                  boolean allBest) := function
+	                  boolean allBest, boolean isMarketing = false) := function
 		isSeleBest := fetchLevel = BIPV2.IdConstants.fetch_level_seleid;
 		preBest :=
 			project(withAppend(proxid != 0 or (isSeleBest and seleid != 0)),
@@ -12,7 +17,8 @@ export IdAppendLocal := module
 					self.uniqueid := left.request_id,
 					self := left));
 
-		withBest0 := BIPV2_Best.Key_LinkIds.kfetch2(preBest, fetchLevel);
+		withBest0 := if(isMarketing, BIPV2_Best.Key_linkIds.kfetch2Marketing(preBest, fetchlevel),
+		                BIPV2_Best.Key_LinkIds.kfetch2(preBest, fetchLevel));
 		withBest := dedup(withBest0, seleid, proxid, uniqueid, all);
 
 		postBest := 
@@ -45,16 +51,62 @@ export IdAppendLocal := module
 					self.duns_number := right.duns_number[1].duns_number,
 					self.company_sic_code1 := right.sic_code[1].company_sic_code1,
 					self.company_naics_code1 := right.naics_code[1].company_naics_code1,
+// get new best fields for dba_name, contact_fname, contact_mname, contact_lname, contact_job_title, contact_did
+					self.dba_name := right.dba_name[1].dba_name,
+					self.company_btype := '',
+					self.contact_fname := '',
+					self.contact_mname := '',
+					self.contact_lname := '',
+					self.contact_job_title := '',
+					self.contact_did := 0,
 					self := left,
 					self := right),
 				left outer);
 
-		return postBest;
+		postBestWithId := project(postBest, transform({recordof(left), unsigned _btype_id}, self._btype_id := counter, self := left));
+
+		BIPV2_Company_Names.functions.mac_go(postBestWithId, outBtype, _btype_id, company_name);
+		withBType :=
+			join(postBestWithId, outBtype,
+				left._btype_id = right._btype_id,
+				transform(recordof(postBest),
+					self.company_btype := right.cnp_btype,
+					self := left),
+				keep(1), left outer);
+
+		preContact := preBest;
+		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel);
+		withContact :=
+			join(withBType, getContact,
+				left.request_id = right.uniqueid
+					and left.proxid = right.proxid,
+				transform(recordof(withBType),
+					self.contact_did := right.contact_title[1].contact_did,
+					self.contact_job_title := trim(right.contact_title[1].contact_job_title_derived),
+					self := left),
+				left outer, keep(1));
+
+		// use did to get contact names from person header
+		gm := AutoStandardI.GlobalModule();												 
+		doxie.mac_best_records(withContact, contact_did, getNames, ut.dppa_ok(gm.DPPAPurpose), ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
+		withNames :=
+			join(withContact(contact_did != 0), getNames,
+				left.contact_did = right.did,
+				transform(recordof(withContact),
+					self.contact_fname := right.fname,
+					self.contact_mname := right.mname,
+					self.contact_lname := right.lname,
+					self := left),
+				left outer, keep(1))
+			 + withContact(contact_did = 0);
+
+		return withNames;
 
 	end;
 
 	export FetchRecords(dataset(BIPV2.IdAppendLayouts.IdsOnly) withAppend,
-	                    string fetchLevel = BIPV2.IdConstants.fetch_level_proxid) := function
+	                    string fetchLevel = BIPV2.IdConstants.fetch_level_proxid,
+	                    boolean dnbFullRemove = false) := function
 
 		isProxLevel := fetchlevel = BIPV2.IdConstants.fetch_level_proxid;
 
@@ -63,7 +115,7 @@ export IdAppendLocal := module
 				transform(BIPV2.IdLayouts.l_xlink_ids2,
 					self.uniqueid := left.request_id,
 					self := left));
-		headerFetch := BIPV2.Key_BH_Linking_Ids.kfetch2(preHeaderFetch, level := fetchLevel, dnbFullRemove := true);
+		headerFetch := BIPV2.Key_BH_Linking_Ids.kfetch2(preHeaderFetch, level := fetchLevel, dnbFullRemove := dnbFullRemove);
 			
 		postHeader := 
 			join(withAppend, headerFetch,

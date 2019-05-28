@@ -1,11 +1,11 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.0
 IMPORT KEL011 AS KEL;
-IMPORT E_Customer,E_Person FROM KELOtto;
+IMPORT B_Person_8,E_Customer,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_7 := MODULE
-  SHARED VIRTUAL TYPEOF(E_Person.__Result) __E_Person := E_Person.__Result;
-  SHARED __EE14630 := __E_Person;
-  EXPORT __ST14460_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(B_Person_8.__ENH_Person_8) __ENH_Person_8 := B_Person_8.__ENH_Person_8;
+  SHARED __EE27379 := __ENH_Person_8;
+  EXPORT __ST23627_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -50,7 +50,6 @@ EXPORT B_Person_7 := MODULE
     KEL.typ.nstr _additional__lname__3_;
     KEL.typ.nstr _additional__lname__date__last__3_;
     KEL.typ.nint _subjectssncount_;
-    KEL.typ.ndataset(E_Person.Hri_List_Layout) Hri_List_;
     KEL.typ.nstr _dobmatchlevel_;
     KEL.typ.nbool _ssnfoundforlexid_;
     KEL.typ.nstr _cvicustomscore_;
@@ -73,13 +72,16 @@ EXPORT B_Person_7 := MODULE
     KEL.typ.nint _name__ssn__dob__match_;
     KEL.typ.ndataset(E_Person.Offenses_Layout) Offenses_;
     KEL.typ.int Deceased_ := 0;
+    KEL.typ.int Deceased_Dob_Match_ := 0;
+    KEL.typ.int Deceased_Match_ := 0;
+    KEL.typ.int Deceased_Name_Match_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST14460_Layout __ND15463__Project(E_Person.Layout __PP14633) := TRANSFORM
-    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP14633.Deceased_Date_))=>1,0);
-    SELF := __PP14633;
+  SHARED __ST23627_Layout __ND28142__Project(B_Person_8.__ST23782_Layout __PP27382) := TRANSFORM
+    SELF.Deceased_Match_ := MAP(__PP27382.Deceased_ = 1 AND __PP27382.Deceased_Name_Match_ = 1 AND __PP27382.Deceased_Dob_Match_ = 1=>1,0);
+    SELF := __PP27382;
   END;
-  EXPORT __ENH_Person_7 := PROJECT(__EE14630,__ND15463__Project(LEFT));
+  EXPORT __ENH_Person_7 := PROJECT(__EE27379,__ND28142__Project(LEFT));
 END;

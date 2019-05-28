@@ -1,11 +1,11 @@
-﻿import std;
+﻿import std, _control;
 
 		dXg5 := SORT(DowJones.MakePersons & DowJones.MakeEntities, id, local)
 							:	PERSIST('~thor::dowjones::persist::allrecords');		
 							
 		coDespray(string logicalname, string outfile) :=
 			Std.File.Despray(logicalname,
-				'bctlpedata10.risk.regn.net',
+				_Control.IPAddress.bctlpedata10,
 				'/data/hds_3/DowJones/caponeout/' + outfile +'.xml',
 				allowoverwrite := true);
 

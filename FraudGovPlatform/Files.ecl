@@ -15,10 +15,10 @@ module
 		 
 		export IdentityData := dataset(Filenames().Sprayed.IdentityData, 
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.IdentityData},
-											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));
+											CSV(heading(1),separator(['~|~']),quote(''),terminator('~<EOL>~')));
 		export KnownFraud := dataset(Filenames().Sprayed.KnownFraud,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.KnownFraud},
-											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));		
+											CSV(heading(1),separator(['~|~']),quote(''),terminator('~<EOL>~')));		
 		export Deltabase := dataset(Filenames().Sprayed.Deltabase,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.Deltabase},
 											CSV(separator(['|\t|']),quote(''),terminator('|\n')));	
@@ -46,7 +46,6 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_Deltabase,Layouts.Base.AddressCache,AddressCache_Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
 
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.SourcesToAnonymize,Layouts.Input.SourcesToAnonymize,SourcesToAnonymize);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
 		
@@ -77,14 +76,47 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Demo,Layouts.Crim,Crim_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Demo,Layouts.Death,Death_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint_Demo,Layouts.FraudPoint,FraudPoint_Demo);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData_Demo,Layouts.IPMetaData,IPMetaData_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Orig,Layouts.CIID,CIID_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Orig,Layouts.Crim,Crim_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Orig,Layouts.Death,Death_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
+		//KEL Files
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_customeraddress_demo,Layouts.CustomerAddress,kel_customeraddress_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_personstats_demo,Layouts.PersonStats, kel_personstats_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_personevents_demo,Layouts.PersonEvents, kel_personevents_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_customerstats_demo,Layouts.CustomerStats, kel_customerstats_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerStatsPivot_demo,Layouts.CustomerStatsPivot, kel_CustomerStatsPivot_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_fullgraph_demo,Layouts.Fullgraph, kel_fullgraph_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_entitystats_demo,Layouts.EntityStats, kel_entitystats_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_person_associations_stats_demo,Layouts.PersonAssociationsStats, kel_person_associations_stats_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_person_associations_details_demo,Layouts.PersonAssociationsDetails, kel_person_associations_details_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_entity_scorebreakdown_demo,Layouts.entityScoreBreakdown, kel_entity_scorebreakdown_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopEntityStats_demo,Layouts.CustomerDashTopEntityStats, kel_CustomerDashTopEntityStats_demo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClustersAndElements_demo,Layouts.CustomerDashTopClustersAndElements, kel_CustomerDashTopClustersAndElements_demo,,,,,,true);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_customeraddress_delta,Layouts.CustomerAddress,kel_customeraddress_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_personstats_delta,Layouts.PersonStats, kel_personstats_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_personevents_delta,Layouts.PersonEvents, kel_personevents_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_customerstats_delta,Layouts.CustomerStats, kel_customerstats_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerStatsPivot_delta,Layouts.CustomerStatsPivot, kel_CustomerStatsPivot_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_fullgraph_delta,Layouts.Fullgraph, kel_fullgraph_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_entitystats_delta,Layouts.EntityStats, kel_entitystats_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_person_associations_stats_delta,Layouts.PersonAssociationsStats, kel_person_associations_stats_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_person_associations_details_delta,Layouts.PersonAssociationsDetails, kel_person_associations_details_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_entity_scorebreakdown_delta,Layouts.entityScoreBreakdown, kel_entity_scorebreakdown_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopEntityStats_delta,Layouts.CustomerDashTopEntityStats, kel_CustomerDashTopEntityStats_delta);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_CustomerDashTopClustersAndElements_delta,Layouts.CustomerDashTopClustersAndElements, kel_CustomerDashTopClustersAndElements_delta);
+		
 	end;
 
-	export OutputF := module
-		export FraudgovInfoFile	:= dataset(Filenames().OutputF.FraudgovInfoFn,Layouts.OutputF.FraudgovInfoRec,thor,opt);
+	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
+	export CustomerMappings := dataset(Filenames().CustomerMappings,Layouts.CustomerMappings,thor,opt);
+
+	export Flags := module
+		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
+		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
 	end;
+
 	
 end;
