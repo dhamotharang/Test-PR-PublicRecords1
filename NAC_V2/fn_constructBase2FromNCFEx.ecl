@@ -171,7 +171,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 												self.RecordCode := left.RecordCode;
 												self := []));
 
-	contacts := $.Files().dsContactRecords;
+	contacts := $.Files2.dsContactRecords;
 										
 
 	ds1 := PROJECT(cases, TRANSFORM(layout_Base2,

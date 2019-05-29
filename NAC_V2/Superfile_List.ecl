@@ -29,7 +29,9 @@ EXPORT Superfile_List := module
 /*
 		new base file sequence: ready, processing, processed, father, delete
 */
-	export sfReady := '~nac::out::ready';
+	export sfReady := '~nac::out::ready';			// New Base2 file prepped for ingest
+	export sfProcessing := '~nac::out::processing';			// New Base2 file being processed for ingest
+	export sfProcesed := '~nac::out::processed';			// New Base2 file archived after ingest
 	
 	//export 
 	

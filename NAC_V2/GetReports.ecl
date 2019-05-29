@@ -29,6 +29,8 @@ EXPORT GetReports(string lfn) := function
 										self.RecordCode := left.RecordCode;
 										self := LEFT.ExceptionRec;
 										));
+										
+		exceptionArchive := PROJECT(exceptions, $.Layouts2.rExceptionRecord);
 
 		errs := DISTRIBUTE((+)(addresses.dsErrs,clients.dsErrs,cases.dsErrs,contacts.dsErrs,exceptions.dsErrs), RANDOM());
 
@@ -56,6 +58,8 @@ EXPORT GetReports(string lfn) := function
 			EXPORT	integer WarningCount := nWarnings;
 			EXPORT	integer WarnedCount := nWarned;
 			EXPORT	integer	TotalRecords := total;
+			EXPORT	DATASET($.Layouts2.rStateContactEx) dsContacts := contacts;
+			EXPORT	DATASET($.Layouts2.rExceptionRecord) dsExceptions := exceptionArchive;
 		END; 
 
 END;

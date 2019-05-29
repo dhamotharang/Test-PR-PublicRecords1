@@ -12,7 +12,7 @@ EXPORT Process_ExceptionRecords(DATASET(Layouts2.rExceptionRecord) inrec) := FUN
   deletes := inrec(updateType='D');
 	updates := inrec(updateType='U');
 
-	exceptions := Files('').dsExceptionRecords; 
+	exceptions := $.Files2.dsExceptionRecords; 
 	j1 := IF(EXISTS(deletes),
 				JOIN(exceptions, deletes,
 						left.SourceProgramState=right.SourceProgramState and left.SourceProgramCode=right.SourceProgramCode 

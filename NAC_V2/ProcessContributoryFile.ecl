@@ -71,10 +71,12 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 											//,OUTPUT(err_rate, named('err_rate'))
 											,MoveToTempOrReject
 											,out_NCF_reports
-											,$.Send_Email(st := lfn[6..7], fn := ModifyFileName(ilfn, 'ncr2')).FileValidationReport
+											,IF(EXISTS(reports.dsContacts), fn_ProcessContactRecord(reports.dsContacts))
+											,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
 											,despray_NCF_reports('ncx2')
 											,despray_NCF_reports('ncd2')
 											,despray_NCF_reports('ncr2')
+											,$.Send_Email(st := lfn[6..7], fn := ModifyFileName(ilfn, 'ncr2')).FileValidationReport
 
 						);
 						//: $.Send_Email(st := lfn[6..7], fn := lfn).FileErrorAlert);
