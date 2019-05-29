@@ -1,4 +1,4 @@
-﻿﻿EXPORT AC_automated_file(unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO
+﻿﻿EXPORT AC_automated_file(unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO  
 
 
 IMPORT STD;
