@@ -8,7 +8,6 @@ EXPORT fn_valid_address(string s, string src) := FUNCTION
 
 	fields := Std.Str.SplitWords(s, '|', true);
 	zip4 := fields[11];
-	alldates := Std.Str.SplitWords(fields[14], '$');
 	dt_first_seen := TRIM(fields[14]);
 	
 	return iF(zip4='' OR dt_first_seen='0', false, true);		// field 11 is zip4

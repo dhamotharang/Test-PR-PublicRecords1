@@ -7,6 +7,7 @@ export IdAppendRoxie(
 		,boolean primForce = false
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
+		,string svcAppendUrl = ''
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -23,8 +24,9 @@ export IdAppendRoxie(
 			inputDs
 			,scoreThreshold := scoreThreshold
 			,weightThreshold := weightThreshold
-			,disableSaltForce := not primForce
-			,reAppend := reAppend);
+			,primForce := primForce
+			,reAppend := reAppend
+			,svcAppendUrl := svcAppendUrl);
 
 	export IdsOnly() := function
 		#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -57,7 +59,7 @@ export IdAppendRoxie(
 			res0 := BIPV2.IdAppendLocal.FetchRecords(localAppend, fetchLevel, dnbFullRemove);
 			res := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
 		#ELSE
-			res := remoteAppend.WithRecs(fetchLevel := fetchLevel);
+			res := remoteAppend.WithRecords(fetchLevel := fetchLevel);
 		#END
 		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
 			res,

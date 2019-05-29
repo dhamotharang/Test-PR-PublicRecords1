@@ -1,17 +1,17 @@
 ﻿IMPORT address, ut, HEADER, NID, AID, BusData;
 
 
-EXPORT Proc_Spray_Preprocess_ska_a(String filedate) := FUNCTION
+EXPORT Proc_Spray_Preprocess_ska_a(String filedate, string OM_number, string filedate_m_d_yyyy) := FUNCTION
 
 ds_ska := BusData.File_In_SKA_A;
-// output(ds_ska,named('ska'));
 trim2Upper( string incode ) := function
 	return StringLib.StringToUpperCase ( trim(incode));
 end;
 
 temprec := record
 	layouts_ska.raw;
-	string73 name;
+	// string73 name;
+	string91 name;
 end;
 
 temprec t_Name_ska(ds_ska le) := TRANSFORM
@@ -22,7 +22,7 @@ end;
 d_ska_name := project(ds_ska,t_Name_ska(left));
 
 Clean_Name_ska(DATASET(temprec) pInput) := FUNCTION
-	NID.Mac_CleanFullNames(pInput, cleaned_names,name);
+	NID.Mac_CleanFullNames(pInput, cleaned_names,name,,,,,,,,,,,,,,,,,,,TRUE);
 	RETURN cleaned_names;
 end;
 
@@ -126,7 +126,6 @@ end;
 la_parserecddr := project(la_clean2_addr_ska_a, get_parserecd_addr2(left)) ;
 
 BusData.Layout_SKA_Verified_In t_Convfinal( la_parserecddr l) := transform
-  // self.title                   := l.clntitle;                      
   self.mail_prim_range          := l.clean_address[1..10]      ;	 
   self.mail_predir              := l.clean_address[11..12]     ;	 
   self.mail_prim_name           := l.clean_address[13..40]     ;	 
@@ -174,17 +173,14 @@ BusData.Layout_SKA_Verified_In t_Convfinal( la_parserecddr l) := transform
   self.alt_chk_digit            := l.clean2_address[138]     	 ;   
   self.alt_rec_type             := l.clean2_address[139..140]   ;  
   self.alt_ace_fips_state       := l.clean2_address[141..142]   ;  
-  self.alt_county              := l.clean2_address[143..145]  	;  
-  self.alt_geo_lat             := l.clean2_address[146..155]  	;  
-  self.alt_geo_long            := l.clean2_address[156..166]   ;   
-  self.alt_msa                 := l.clean2_address[167..170]  	;  
-  self.alt_geo_blk             := l.clean2_address[171..177]   ;   
-  self.alt_geo_match           := l.clean2_address[178]     	 ;	 
-  self.alt_err_stat            := l.clean2_address[179..182] ;     
-  // self.company_title            := l.T1;                        
-  // self.company_name             := l.company1;                      
-  // self.address1                 := l.address;                      
-  self.lf                       := '';                             
+  self.alt_county               := l.clean2_address[143..145]  	;  
+  self.alt_geo_lat              := l.clean2_address[146..155]  	;  
+  self.alt_geo_long             := l.clean2_address[156..166]   ;   
+  self.alt_msa                  := l.clean2_address[167..170]  	;  
+  self.alt_geo_blk              := l.clean2_address[171..177]   ;   
+  self.alt_geo_match            := l.clean2_address[178]     	 ;	 
+  self.alt_err_stat             := l.clean2_address[179..182] ;     
+
   self                          := l;                                                       
   self                          := [];                                                       
 
@@ -200,7 +196,7 @@ super_file := sequential(
 							FileServices.addSuperFile('~thor_data400::base::ska','~thor_data400::base::ska_'+filedate)
 				);
 
-return Sequential(BusData.Proc_SKA_Spray_In(filedate).spray_all_a, ska_final, super_file);
+return Sequential(BusData.Proc_SKA_Spray_In(filedate, OM_number, filedate_m_d_yyyy).spray_all_a, ska_final, super_file);
 
 end;
 

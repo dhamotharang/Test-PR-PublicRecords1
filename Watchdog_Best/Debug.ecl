@@ -151,12 +151,10 @@ EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   TYPEOF(h.fname) left_fname;
   INTEGER1 fname_match_code;
   INTEGER2 fname_score;
-  INTEGER2 fname_score_prop;
   TYPEOF(h.fname) right_fname;
   TYPEOF(h.mname) left_mname;
   INTEGER1 mname_match_code;
   INTEGER2 mname_score;
-  INTEGER2 mname_score_prop;
   TYPEOF(h.mname) right_mname;
   TYPEOF(h.lname) left_lname;
   INTEGER1 lname_match_code;
@@ -174,6 +172,10 @@ EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   INTEGER1 persistent_record_id_match_code;
   INTEGER2 persistent_record_id_score;
   TYPEOF(h.persistent_record_id) right_persistent_record_id;
+  TYPEOF(h.lastname) left_lastname;
+  INTEGER1 lastname_match_code;
+  INTEGER2 lastname_score;
+  TYPEOF(h.lastname) right_lastname;
 END;
 EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candidates le,match_candidates(ih).layout_candidates ri,UNSIGNED c=0,UNSIGNED outside=0) := TRANSFORM
   SELF.Rule := c;
@@ -559,15 +561,6 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         LENGTH(TRIM(ri.mname))>0 and ri.mname = le.mname[1..LENGTH(TRIM(ri.mname))] => ri.mname_weight100, // An initial match - take initial specificity
                         Config.WithinEditN(le.mname,le.mname_len,ri.mname,ri.mname_len,1,0) =>  SALT311.fn_fuzzy_specificity(le.mname_weight100,le.mname_cnt, le.mname_e1_cnt,ri.mname_weight100,ri.mname_cnt,ri.mname_e1_cnt),
                         SALT311.Fn_Fail_Scale(AVE(le.mname_weight100,ri.mname_weight100),s.mname_switch));
-  SELF.left_lname := le.lname;
-  SELF.right_lname := ri.lname;
-  SELF.lname_match_code := MAP(
-                        le.lname_isnull OR ri.lname_isnull => SALT311.MatchCode.OneSideNull,
-                        match_methods(ih).match_lname(le.lname,ri.lname));
-  SELF.lname_score := MAP(
-                        le.lname_isnull OR ri.lname_isnull => 0,
-                        le.lname = ri.lname OR SALT311.HyphenMatch(le.lname,ri.lname,1)<=1  => MIN(le.lname_weight100,ri.lname_weight100),
-                        SALT311.Fn_Fail_Scale(AVE(le.lname_weight100,ri.lname_weight100),s.lname_switch));
   SELF.left_address_ind := le.address_ind;
   SELF.right_address_ind := ri.address_ind;
   SELF.address_ind_match_code := MAP(
@@ -577,15 +570,6 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         le.address_ind_isnull OR ri.address_ind_isnull => 0,
                         le.address_ind = ri.address_ind  => le.address_ind_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.address_ind_weight100,ri.address_ind_weight100),s.address_ind_switch));
-  SELF.left_name_ind := le.name_ind;
-  SELF.right_name_ind := ri.name_ind;
-  SELF.name_ind_match_code := MAP(
-                        le.name_ind_isnull OR ri.name_ind_isnull => SALT311.MatchCode.OneSideNull,
-                        match_methods(ih).match_name_ind(le.name_ind,ri.name_ind));
-  SELF.name_ind_score := MAP(
-                        le.name_ind_isnull OR ri.name_ind_isnull => 0,
-                        le.name_ind = ri.name_ind  => le.name_ind_weight100,
-                        SALT311.Fn_Fail_Scale(AVE(le.name_ind_weight100,ri.name_ind_weight100),s.name_ind_switch));
   SELF.left_persistent_record_id := le.persistent_record_id;
   SELF.right_persistent_record_id := ri.persistent_record_id;
   SELF.persistent_record_id_match_code := MAP(
@@ -595,6 +579,37 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         le.persistent_record_id_isnull OR ri.persistent_record_id_isnull => 0,
                         le.persistent_record_id = ri.persistent_record_id  => le.persistent_record_id_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.persistent_record_id_weight100,ri.persistent_record_id_weight100),s.persistent_record_id_switch));
+  REAL lastname_score_scale := ( le.lastname_weight100 + ri.lastname_weight100 ) / (le.lname_weight100 + ri.lname_weight100 + le.name_ind_weight100 + ri.name_ind_weight100); // Scaling factor for this concept
+  SELF.lastname_match_code := MAP(
+                        (le.lastname_isnull OR le.lname_isnull AND le.name_ind_isnull) OR (ri.lastname_isnull OR ri.lname_isnull AND ri.name_ind_isnull) => SALT311.MatchCode.OneSideNull,
+                        match_methods(ih).match_lastname(le.lastname,ri.lastname,FALSE));
+  INTEGER2 lastname_score_pre := MAP( (le.lastname_isnull OR le.lname_isnull AND le.name_ind_isnull) OR (ri.lastname_isnull OR ri.lname_isnull AND ri.name_ind_isnull) => 0,
+                        le.lastname = ri.lastname  => le.lastname_weight100,
+                        0);
+  SELF.left_lastname := le.lastname;
+  SELF.right_lastname := ri.lastname;
+  SELF.left_lname := le.lname;
+  SELF.right_lname := ri.lname;
+  SELF.lname_match_code := MAP(
+                        le.lname_isnull OR ri.lname_isnull => SALT311.MatchCode.OneSideNull,
+                        lastname_score_pre > 0 => SALT311.MatchCode.ParentInvolved, // Ancestor has found solution so child keeps quiet
+                        match_methods(ih).match_lname(le.lname,ri.lname));
+  SELF.lname_score := MAP(
+                        le.lname_isnull OR ri.lname_isnull => 0,
+                        lastname_score_pre > 0 => 0, // Ancestor has found solution so child keeps quiet
+                        le.lname = ri.lname OR SALT311.HyphenMatch(le.lname,ri.lname,1)<=1  => MIN(le.lname_weight100,ri.lname_weight100),
+                        SALT311.Fn_Fail_Scale(AVE(le.lname_weight100,ri.lname_weight100),s.lname_switch))*IF(lastname_score_scale=0,1,lastname_score_scale);
+  SELF.left_name_ind := le.name_ind;
+  SELF.right_name_ind := ri.name_ind;
+  SELF.name_ind_match_code := MAP(
+                        le.name_ind_isnull OR ri.name_ind_isnull => SALT311.MatchCode.OneSideNull,
+                        lastname_score_pre > 0 => SALT311.MatchCode.ParentInvolved, // Ancestor has found solution so child keeps quiet
+                        match_methods(ih).match_name_ind(le.name_ind,ri.name_ind));
+  SELF.name_ind_score := MAP(
+                        le.name_ind_isnull OR ri.name_ind_isnull => 0,
+                        lastname_score_pre > 0 => 0, // Ancestor has found solution so child keeps quiet
+                        le.name_ind = ri.name_ind  => le.name_ind_weight100,
+                        SALT311.Fn_Fail_Scale(AVE(le.name_ind_weight100,ri.name_ind_weight100),s.name_ind_switch))*IF(lastname_score_scale=0,1,lastname_score_scale);
 // Compute the score for the concept address
   INTEGER2 address_score_ext := SALT311.ClipScore(MAX(address_score_pre,0) + self.prim_range_score + self.predir_score + self.prim_name_score + self.suffix_score + self.postdir_score + self.unit_desig_score + self.sec_range_score + self.city_name_score + self.st_score + self.zip_score + self.zip4_score + self.tnt_score + self.rawaid_score + self.dt_first_seen_score + self.dt_last_seen_score + self.dt_vendor_first_reported_score + self.dt_vendor_last_reported_score);// Score in surrounding context
   INTEGER2 address_score_res := MAX(0,address_score_pre); // At least nothing
@@ -603,11 +618,13 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   INTEGER2 ssnum_score_ext := SALT311.ClipScore(MAX(ssnum_score_pre,0) + self.ssn_score + self.valid_ssn_score);// Score in surrounding context
   INTEGER2 ssnum_score_res := MAX(0,ssnum_score_pre); // At least nothing
   SELF.ssnum_score := ssnum_score_res;
+// Compute the score for the concept lastname
+  INTEGER2 lastname_score_ext := SALT311.ClipScore(MAX(lastname_score_pre,0) + self.lname_score + self.name_ind_score);// Score in surrounding context
+  INTEGER2 lastname_score_res := MAX(0,lastname_score_pre); // At least nothing
+  SELF.lastname_score := lastname_score_res;
   // Get propagation scores for individual propagated fields
-  SELF.fname_score_prop := (MAX(le.fname_prop,ri.fname_prop)/MAX(LENGTH(TRIM(le.fname)),LENGTH(TRIM(ri.fname))))*SELF.fname_score; // Proportion of longest string propogated
-  SELF.mname_score_prop := (MAX(le.mname_prop,ri.mname_prop)/MAX(LENGTH(TRIM(le.mname)),LENGTH(TRIM(ri.mname))))*SELF.mname_score; // Proportion of longest string propogated
-  SELF.Conf_Prop := (0 + SELF.fname_score_prop + SELF.mname_score_prop) / 100; // Score based on propogated fields
-  SELF.Conf := (SELF.src_score + IF(SELF.address_score>0,MAX(SELF.address_score,SELF.prim_range_score + SELF.predir_score + SELF.prim_name_score + SELF.suffix_score + SELF.postdir_score + SELF.unit_desig_score + SELF.sec_range_score + SELF.city_name_score + SELF.st_score + SELF.zip_score + SELF.zip4_score + SELF.tnt_score + SELF.rawaid_score + SELF.dt_first_seen_score + SELF.dt_last_seen_score + SELF.dt_vendor_first_reported_score + SELF.dt_vendor_last_reported_score),SELF.prim_range_score + SELF.predir_score + SELF.prim_name_score + SELF.suffix_score + SELF.postdir_score + SELF.unit_desig_score + SELF.sec_range_score + SELF.city_name_score + SELF.st_score + SELF.zip_score + SELF.zip4_score + SELF.tnt_score + SELF.rawaid_score + SELF.dt_first_seen_score + SELF.dt_last_seen_score + SELF.dt_vendor_first_reported_score + SELF.dt_vendor_last_reported_score) + SELF.name_suffix_score + SELF.dt_nonglb_last_seen_score + IF(SELF.ssnum_score>0,MAX(SELF.ssnum_score,SELF.ssn_score + SELF.valid_ssn_score),SELF.ssn_score + SELF.valid_ssn_score) + SELF.dodgy_tracking_score + SELF.pflag1_score + SELF.pflag2_score + SELF.jflag2_score + SELF.jflag3_score + SELF.jflag1_score + SELF.phone_score + SELF.dob_score + SELF.rec_type_score + SELF.pflag3_score + SELF.title_score + SELF.fname_score + SELF.mname_score + SELF.lname_score + SELF.address_ind_score + SELF.name_ind_score + SELF.persistent_record_id_score) / 100 + outside;
+  SELF.Conf_Prop := (0) / 100; // Score based on propogated fields
+  SELF.Conf := (SELF.src_score + IF(SELF.address_score>0,MAX(SELF.address_score,SELF.prim_range_score + SELF.predir_score + SELF.prim_name_score + SELF.suffix_score + SELF.postdir_score + SELF.unit_desig_score + SELF.sec_range_score + SELF.city_name_score + SELF.st_score + SELF.zip_score + SELF.zip4_score + SELF.tnt_score + SELF.rawaid_score + SELF.dt_first_seen_score + SELF.dt_last_seen_score + SELF.dt_vendor_first_reported_score + SELF.dt_vendor_last_reported_score),SELF.prim_range_score + SELF.predir_score + SELF.prim_name_score + SELF.suffix_score + SELF.postdir_score + SELF.unit_desig_score + SELF.sec_range_score + SELF.city_name_score + SELF.st_score + SELF.zip_score + SELF.zip4_score + SELF.tnt_score + SELF.rawaid_score + SELF.dt_first_seen_score + SELF.dt_last_seen_score + SELF.dt_vendor_first_reported_score + SELF.dt_vendor_last_reported_score) + SELF.name_suffix_score + SELF.dt_nonglb_last_seen_score + IF(SELF.ssnum_score>0,MAX(SELF.ssnum_score,SELF.ssn_score + SELF.valid_ssn_score),SELF.ssn_score + SELF.valid_ssn_score) + SELF.dodgy_tracking_score + SELF.pflag1_score + SELF.pflag2_score + SELF.jflag2_score + SELF.jflag3_score + SELF.jflag1_score + SELF.phone_score + SELF.dob_score + SELF.rec_type_score + SELF.pflag3_score + SELF.title_score + SELF.fname_score + SELF.mname_score + SELF.address_ind_score + SELF.persistent_record_id_score + IF(SELF.lastname_score>0,MAX(SELF.lastname_score,SELF.lname_score + SELF.name_ind_score),SELF.lname_score + SELF.name_ind_score)) / 100 + outside;
 END;
 
 EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION
@@ -666,10 +683,9 @@ EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
   DATASET(SALT311.Layout_FieldValueList) title_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) fname_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) mname_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) lname_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) address_ind_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) name_ind_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) persistent_record_id_Values := DATASET([],SALT311.Layout_FieldValueList);
+  DATASET(SALT311.Layout_FieldValueList) lastname_Values := DATASET([],SALT311.Layout_FieldValueList);
 END;
 
 SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
@@ -693,10 +709,9 @@ SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
     SELF.title_values := SALT311.fn_combine_fieldvaluelist(le.title_values,ri.title_values);
     SELF.fname_values := SALT311.fn_combine_fieldvaluelist(le.fname_values,ri.fname_values);
     SELF.mname_values := SALT311.fn_combine_fieldvaluelist(le.mname_values,ri.mname_values);
-    SELF.lname_values := SALT311.fn_combine_fieldvaluelist(le.lname_values,ri.lname_values);
     SELF.address_ind_values := SALT311.fn_combine_fieldvaluelist(le.address_ind_values,ri.address_ind_values);
-    SELF.name_ind_values := SALT311.fn_combine_fieldvaluelist(le.name_ind_values,ri.name_ind_values);
     SELF.persistent_record_id_values := SALT311.fn_combine_fieldvaluelist(le.persistent_record_id_values,ri.persistent_record_id_values);
+    SELF.lastname_values := SALT311.fn_combine_fieldvaluelist(le.lastname_values,ri.lastname_values);
   END;
   ds_roll := ROLLUP( SORT( DISTRIBUTE( infile, HASH(did) ), did, LOCAL ), LEFT.did = RIGHT.did, RollValues(LEFT,RIGHT),LOCAL);
   Layout_RolledEntity SortValues(Layout_RolledEntity le) := TRANSFORM
@@ -719,10 +734,9 @@ SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
     SELF.title_values := SORT(le.title_values, -cnt, val, LOCAL);
     SELF.fname_values := SORT(le.fname_values, -cnt, val, LOCAL);
     SELF.mname_values := SORT(le.mname_values, -cnt, val, LOCAL);
-    SELF.lname_values := SORT(le.lname_values, -cnt, val, LOCAL);
     SELF.address_ind_values := SORT(le.address_ind_values, -cnt, val, LOCAL);
-    SELF.name_ind_values := SORT(le.name_ind_values, -cnt, val, LOCAL);
     SELF.persistent_record_id_values := SORT(le.persistent_record_id_values, -cnt, val, LOCAL);
+    SELF.lastname_values := SORT(le.lastname_values, -cnt, val, LOCAL);
   END;
   ds_sort := PROJECT(ds_roll, SortValues(LEFT));
   RETURN ds_sort;
@@ -750,10 +764,9 @@ Layout_RolledEntity into(in_data le) := TRANSFORM
   SELF.title_Values := IF ( (le.title  IN SET(s.nulls_title,title) OR le.title = (TYPEOF(le.title))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.title)}],SALT311.Layout_FieldValueList));
   SELF.fname_Values := IF ( (le.fname  IN SET(s.nulls_fname,fname) OR le.fname = (TYPEOF(le.fname))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.fname)}],SALT311.Layout_FieldValueList));
   SELF.mname_Values := IF ( (le.mname  IN SET(s.nulls_mname,mname) OR le.mname = (TYPEOF(le.mname))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.mname)}],SALT311.Layout_FieldValueList));
-  SELF.lname_Values := IF ( (le.lname  IN SET(s.nulls_lname,lname) OR le.lname = (TYPEOF(le.lname))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.lname)}],SALT311.Layout_FieldValueList));
   SELF.address_ind_Values := IF ( (le.address_ind  IN SET(s.nulls_address_ind,address_ind) OR le.address_ind = (TYPEOF(le.address_ind))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.address_ind)}],SALT311.Layout_FieldValueList));
-  SELF.name_ind_Values := IF ( (le.name_ind  IN SET(s.nulls_name_ind,name_ind) OR le.name_ind = (TYPEOF(le.name_ind))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.name_ind)}],SALT311.Layout_FieldValueList));
   SELF.persistent_record_id_Values := IF ( (le.persistent_record_id  IN SET(s.nulls_persistent_record_id,persistent_record_id) OR le.persistent_record_id = (TYPEOF(le.persistent_record_id))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.persistent_record_id)}],SALT311.Layout_FieldValueList));
+  SELF.lastname_Values := IF ( (le.lname  IN SET(s.nulls_lname,lname) OR le.lname = (TYPEOF(le.lname))'') AND (le.name_ind  IN SET(s.nulls_name_ind,name_ind) OR le.name_ind = (TYPEOF(le.name_ind))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.lname) + ' ' + TRIM((SALT311.StrType)le.name_ind)}],SALT311.Layout_FieldValueList));
 END;
 AsFieldValues := PROJECT(in_data,into(LEFT));
   RETURN RollEntities(AsFieldValues);
@@ -779,22 +792,15 @@ Layout_RolledEntity into(ih le) := TRANSFORM
   SELF.title_Values := IF ( (le.title  IN SET(s.nulls_title,title) OR le.title = (TYPEOF(le.title))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.title)}],SALT311.Layout_FieldValueList));
   SELF.fname_Values := IF ( (le.fname  IN SET(s.nulls_fname,fname) OR le.fname = (TYPEOF(le.fname))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.fname)}],SALT311.Layout_FieldValueList));
   SELF.mname_Values := IF ( (le.mname  IN SET(s.nulls_mname,mname) OR le.mname = (TYPEOF(le.mname))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.mname)}],SALT311.Layout_FieldValueList));
-  SELF.lname_Values := IF ( (le.lname  IN SET(s.nulls_lname,lname) OR le.lname = (TYPEOF(le.lname))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.lname)}],SALT311.Layout_FieldValueList));
   SELF.address_ind_Values := IF ( (le.address_ind  IN SET(s.nulls_address_ind,address_ind) OR le.address_ind = (TYPEOF(le.address_ind))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.address_ind)}],SALT311.Layout_FieldValueList));
-  SELF.name_ind_Values := IF ( (le.name_ind  IN SET(s.nulls_name_ind,name_ind) OR le.name_ind = (TYPEOF(le.name_ind))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.name_ind)}],SALT311.Layout_FieldValueList));
   SELF.persistent_record_id_Values := IF ( (le.persistent_record_id  IN SET(s.nulls_persistent_record_id,persistent_record_id) OR le.persistent_record_id = (TYPEOF(le.persistent_record_id))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.persistent_record_id)}],SALT311.Layout_FieldValueList));
+  SELF.lastname_Values := IF ( (le.lname  IN SET(s.nulls_lname,lname) OR le.lname = (TYPEOF(le.lname))'') AND (le.name_ind  IN SET(s.nulls_name_ind,name_ind) OR le.name_ind = (TYPEOF(le.name_ind))''),DATASET([],SALT311.Layout_FieldValueList),DATASET([{TRIM((SALT311.StrType)le.lname) + ' ' + TRIM((SALT311.StrType)le.name_ind)}],SALT311.Layout_FieldValueList));
 END;
 AsFieldValues := PROJECT(ih,into(left));
 EXPORT InFile_Rolled := RollEntities(AsFieldValues);
 EXPORT RemoveProps(DATASET(match_candidates(ih).layout_candidates) im) := FUNCTION
 
   im rem(im le) := TRANSFORM
-    self.fname := le.fname[1..LENGTH(TRIM(le.fname))-le.fname_prop]; // Clip propogated chars
-    self.fname_isnull := self.fname='' OR le.fname_isnull;
-    self.fname_prop := 0; // Avoid reducing score later
-    self.mname := le.mname[1..LENGTH(TRIM(le.mname))-le.mname_prop]; // Clip propogated chars
-    self.mname_isnull := self.mname='' OR le.mname_isnull;
-    self.mname_prop := 0; // Avoid reducing score later
     SELF := le;
   END;
   RETURN PROJECT(im,rem(LEFT));
@@ -823,10 +829,9 @@ Layout_Chubbies0 := RECORD,MAXLENGTH(63000)
   UNSIGNED1 title_size := 0;
   UNSIGNED1 fname_size := 0;
   UNSIGNED1 mname_size := 0;
-  UNSIGNED1 lname_size := 0;
   UNSIGNED1 address_ind_size := 0;
-  UNSIGNED1 name_ind_size := 0;
   UNSIGNED1 persistent_record_id_size := 0;
+  UNSIGNED1 lastname_size := 0;
 END;
 t0 := TABLE(AllRolled,Layout_Chubbies0);
 Layout_Chubbies0 NoteSize(Layout_Chubbies0 le) := TRANSFORM
@@ -848,15 +853,14 @@ Layout_Chubbies0 NoteSize(Layout_Chubbies0 le) := TRANSFORM
   SELF.title_size := SALT311.Fn_SwitchSpec(s.title_switch,count(le.title_values));
   SELF.fname_size := SALT311.Fn_SwitchSpec(s.fname_switch,count(le.fname_values));
   SELF.mname_size := SALT311.Fn_SwitchSpec(s.mname_switch,count(le.mname_values));
-  SELF.lname_size := SALT311.Fn_SwitchSpec(s.lname_switch,count(le.lname_values));
   SELF.address_ind_size := SALT311.Fn_SwitchSpec(s.address_ind_switch,count(le.address_ind_values));
-  SELF.name_ind_size := SALT311.Fn_SwitchSpec(s.name_ind_switch,count(le.name_ind_values));
   SELF.persistent_record_id_size := SALT311.Fn_SwitchSpec(s.persistent_record_id_switch,count(le.persistent_record_id_values));
+  SELF.lastname_size := SALT311.Fn_SwitchSpec(s.lastname_switch,count(le.lastname_values));
   SELF := le;
 END;  t := PROJECT(t0,NoteSize(LEFT));
 Layout_Chubbies := RECORD,MAXLENGTH(63000)
   t;
-  UNSIGNED2 Size := t.src_size+t.address_size+t.name_suffix_size+t.dt_nonglb_last_seen_size+t.ssnum_size+t.dodgy_tracking_size+t.pflag1_size+t.pflag2_size+t.jflag2_size+t.jflag3_size+t.jflag1_size+t.phone_size+t.dob_size+t.rec_type_size+t.pflag3_size+t.title_size+t.fname_size+t.mname_size+t.lname_size+t.address_ind_size+t.name_ind_size+t.persistent_record_id_size;
+  UNSIGNED2 Size := t.src_size+t.address_size+t.name_suffix_size+t.dt_nonglb_last_seen_size+t.ssnum_size+t.dodgy_tracking_size+t.pflag1_size+t.pflag2_size+t.jflag2_size+t.jflag3_size+t.jflag1_size+t.phone_size+t.dob_size+t.rec_type_size+t.pflag3_size+t.title_size+t.fname_size+t.mname_size+t.address_ind_size+t.persistent_record_id_size+t.lastname_size;
 END;
 EXPORT Chubbies := TABLE(t,Layout_Chubbies);
 END;

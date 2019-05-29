@@ -15,6 +15,7 @@ file_version(string super) := function
   return super[sub+4..sub+5];        
 end;
 
+
 sf_name := '~thor_data400::out::header_post_move_status';
 status := Header.LogBuildStatus(sf_name).Read[1].status;
 run := if(status <> 0, true, false);

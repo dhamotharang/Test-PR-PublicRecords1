@@ -28,8 +28,8 @@ IMPORT LeadIntegrity_Vault;
 
 #CONSTANT('ExtraPrefix','');      
 
-STRING8  Build_Period := '20180815';
-unsigned1 LIProcToRun 	:= 1;
+STRING8  Build_Period := '20190415';
+unsigned1 LIProcToRun 	:= 12;
 
 #workunit('name', 'LeadIntegrity Append');
 

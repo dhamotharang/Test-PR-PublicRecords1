@@ -1,4 +1,4 @@
-﻿IMPORT Data_Services, doxie, DueDiligence, Risk_Indicators, Seed_Files;
+﻿IMPORT Data_Services, doxie, DueDiligence, Risk_Indicators, Seed_Files, STD;
 
 EXPORT keys_DueDiligencePersonReport := MODULE
 
@@ -15,12 +15,12 @@ EXPORT keys_DueDiligencePersonReport := MODULE
   
   SHARED GetIndex(seed, fileName) := FUNCTIONMACRO
     newRecord := RECORD
-      DATA16 hashvalue := seed_files.Hash_InstantID(StringLib.StringToUpperCase(trim(seed.inFirstName)), // fname,
-                                                    StringLib.StringToUpperCase(trim(seed.inLastName)),  // lname,
-                                                    StringLib.StringToUpperCase(trim(seed.inSSN)), // ssn,
+      DATA16 hashvalue := seed_files.Hash_InstantID(STD.Str.ToUpperCase(TRIM(seed.inFirstName)), // fname,
+                                                    STD.Str.ToUpperCase(TRIM(seed.inLastName)),  // lname,
+                                                    STD.Str.ToUpperCase(TRIM(seed.inSSN)), // ssn,
                                                     Risk_Indicators.nullstring, // fein -- not used in person,
-                                                    StringLib.StringToUpperCase(trim(seed.inZip5)), // zip,
-                                                    StringLib.StringToUpperCase(trim(seed.inPhone)), // phone,
+                                                    STD.Str.ToUpperCase(TRIM(seed.inZip5)), // zip,
+                                                    STD.Str.ToUpperCase(TRIM(seed.inPhone)), // phone,
                                                     Risk_Indicators.nullstring); // company_name -- not used in person
       seed;
     END;

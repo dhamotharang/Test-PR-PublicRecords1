@@ -27,52 +27,40 @@ ECL:='FraudGovPlatform_Validation._CRON_InputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_InputPrepSchedule:=if(d=0,Go,noGo);
 
-//5AM
+//9AM
 wuname:='FraudGov MBS Input Prep Schedule';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
 ECL:='FraudGovPlatform_Validation._CRON_MBSInputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_MBSInputPrepSchedule:=if(d=0,Go,noGo);
 
-//6AM
+//10AM
 wuname:='FraudGov Deltabase Input Prep Schedule';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
 ECL:='FraudGovPlatform_Validation._CRON_DeltabaseInputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_DeltabaseInputPrepSchedule:=if(d=0,Go,noGo);
 
+//10AM
 wuname:='FraudGov InquiryLogs Input Prep Schedule';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
 ECL:='FraudGovPlatform_Validation._CRON_InquiryLogsInputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_InquiryLogsInputPrepSchedule:=if(d=0,Go,noGo);
 
+//10AM
 wuname:='FraudGov NAC Input Prep Schedule';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
 ECL:='FraudGovPlatform_Validation._CRON_NACInputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_NACInputPrepSchedule:=if(d=0,Go,noGo);
-
-//5:30PM
+//1AM
 wuname:='FraudGov Build Base Schedule';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
-ECL:='FraudGovPlatform._CRON_Base_Schedule;';
+ECL:='FraudGovPlatform._CRON_Base_Schedule';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_Base_Schedule:=if(d=0,Go,noGo);
 
-
-//AFTER BASE COMPLETED CALL CONTROLLERS
-wuname:='FraudGov Build Keys Controller';
-d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
-ECL:='FraudGovPlatform._CRON_Keys_Controller;';
-Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
-EXPORT CRON_Keys_Controller:=if(d=0,Go,noGo);
-
-wuname:='FraudGov PII SOAP Appends Controller';
-d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
-ECL:='FraudGovPlatform._CRON_SoapAppendsSchedule;';
-Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
-EXPORT CRON_SoapAppends_Controller:=if(d=0,Go,noGo);
 
 Go:=sequential(
 						 CRON_DeltabaseInputPrepSchedule
@@ -81,19 +69,7 @@ Go:=sequential(
 						,CRON_MBSInputPrepSchedule
 						,CRON_NACInputPrepSchedule
 						,CRON_Base_Schedule
-						);
-EXPORT Schedules := Go;
-
-Go:=sequential(
-						 CRON_Keys_Controller
-						,true
-						);
-EXPORT Controllers := Go;
-
-Go:=sequential(
-						 Schedules
-						 ,Controllers
-						);
+);
 
 EXPORT all := Go;
 

@@ -9,7 +9,8 @@ export key_override_watercraft := MODULE
   // SID
   export sid_rec := record
 	  string20 flag_file_id;
-    recordof (watercraft.key_watercraft_sid (true));
+		 //CCPA-206 exclude CCPA fields in override keys for now
+    recordof (watercraft.key_watercraft_sid (true)) - [global_sid,record_sid];
   end;
 
   ds_sid := dataset (fname_prefix + 'watercraft', sid_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
@@ -24,7 +25,8 @@ export key_override_watercraft := MODULE
   // CID (coast guard)
   cid_rec := record
 	  string20 flag_file_id;
-    recordof (watercraft.key_watercraft_cid (true));
+		 //CCPA-206 exclude CCPA fields in override keys for now
+    recordof (watercraft.key_watercraft_cid (true))- [global_sid,record_sid];
   end;
 
   ds_cguard := dataset (fname_prefix + 'watercraft_cguard', cid_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
@@ -38,7 +40,8 @@ export key_override_watercraft := MODULE
 
   wid_rec := record
 	  string20 flag_file_id;
-    recordof (watercraft.key_watercraft_wid (true));
+		 //CCPA-206 exclude CCPA fields in override keys for now
+    recordof (watercraft.key_watercraft_wid (true)) - [global_sid,record_sid];
   end;
 
   ds_wid := dataset (fname_prefix + 'watercraft_details', wid_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);

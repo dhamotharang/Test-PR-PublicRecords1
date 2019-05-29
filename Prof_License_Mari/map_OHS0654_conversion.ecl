@@ -29,10 +29,10 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	
 	C_O_Ind := '(C/O |ATTN: |ATTN )';
 	//Following license types are defined as GR in Rodney's input file - REBO, MLO, SMCU, MBMBE, MBMBE
-	GR_Ind	:= ['SM','SMBO','SMCUSO','MB','MBBO','MBCUSO','MBMBE', 'MBMBEB','REC','FREDC','FREDI', 'REBO','TP','NP','SMCU','CILA','CILAB'];
+	GR_Ind	:= ['AMC','CILA','CILAB','FREDC','FREDI','MB','MBBO','MBCUSO','MBMBE', 'MBMBEB','REC','REBO','NP','SMBO','SMCUSO','SM','SMCU','TP'];
 	
-	MD_Ind	:= ['LO','MLO','CGREAR','CGREA','CGREAT','CRREAR','CRREA','LRREAR','LRREA','RREAA','BRKM',
-	            'REB','REPB','REAB','REMS','FRES','RES','OM','LRREAT','SOLE','CRREAT','TLO', 'ACGO','ACRO','TMLO','ALRO'];
+	MD_Ind	:= ['ACGO','ACRO','ALRO','BRKM','LO','CGREAR','CGREA','CGREAT','CRREA','CRREAR','CRREAT','FRES','MLO','LRREAR','LRREA',
+	            'LRREAT','RREAA','REB','REPB','REAB','REMS','RES','OM','SOLE','TLO', 'TMLO'];
 		
 	RemovePattern	  := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|^.* CORP\\.$|' +
@@ -58,11 +58,12 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 
 	pre_inFile_prof := Prof_License_Mari.files_OHS0654.prof_file(CREDENTIAL_NUMBER[1..3]<>'CRC' AND    	//Cemetery related licenses
 																														CREDENTIAL_NUMBER[1..3]<>'CBR' AND    	//Cemetery Benevolent / Religious Registration
-																														CREDENTIAL_NUMBER[1..3]<>'CGR' AND    	//Cemetery related licenses
+																														CREDENTIAL_NUMBER[1..3]<>'CGR' AND    	//Cemetery related licenses / Cemetery Government Registration
 																														CREDENTIAL_NUMBER[1..3]<>'CEO' AND    	//Cemetery related licenses
 																														CREDENTIAL_NUMBER[1..4]<>'RECE' AND   	//Continuing Education Instructor
 																														CREDENTIAL_NUMBER[1..3]<>'FRC' AND			//Foreign Corporation
-																														CREDENTIAL_NUMBER[1..3]<>'FPR'	AND		//Foreign Property Registration
+																														CREDENTIAL_NUMBER[1..3]<>'FPR'	AND		  //Foreign Property Registration
+																														CREDENTIAL_NUMBER[1..3]<>'LPR'	AND     //Land Professional Registration
 																														//CREDENTIAL_NUMBER[1..3]<>'EXH'	 AND		//Exhibition Permit Registration
 																														TRIM(FIRST_NAME+MIDDLE_NAME+LAST_NAME+FULL_NAME,LEFT,RIGHT) NOT IN ['','.','\r','\n','\n\r','\r\n']);
 	oRE					:= OUTPUT(pre_inFile_prof);																												
@@ -82,42 +83,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	
    inFile_prof:= PROJECT(pre_inFile_prof,correct_partial_records(LEFT));
 	 oPROF       := OUTPUT(inFile_prof);	
-/*
-   pre_inFile_mtg := Prof_License_Mari.files_OHS0654.mortgage_file(CREDENTIAL_NUMBER[1..3]<>'EXH');
-	 oMTG			    	:= OUTPUT(pre_inFile_mtg);
-	
-	//The mortgage file has many records that are broken into 2 lines.
-	Prof_License_Mari.layout_OHS0654.layout_mortgage merge_partial_records(pre_inFile_mtg L, pre_inFile_mtg R) := TRANSFORM
-	
-   	SELF.DBA3 						 	:= IF(L.DBA3<>'' AND R.DBA1<>'',R.DBA1,L.DBA3);
-   	SELF.CREDENTIAL_NUMBER 	:= IF(L.DBA3<>'',R.DBA1,R.DBA2);
-   	SELF.CREDENTIAL_TYPE 	 	:= IF(L.DBA3<>'',R.DBA2,R.DBA3);
-   	SELF.FIRST_ISSUANCE_DATE:= IF(L.DBA3<>'',R.DBA3,R.CREDENTIAL_NUMBER);
-   	SELF.EMAIL 							:= IF(L.DBA3<>'',R.CREDENTIAL_NUMBER,R.CREDENTIAL_TYPE);
-   	SELF.PHONE 							:= IF(L.DBA3<>'',R.CREDENTIAL_TYPE,R.FIRST_ISSUANCE_DATE);
-   	SELF.ADDRESS1 				:= IF(L.DBA3<>'',R.FIRST_ISSUANCE_DATE,R.EMAIL);
-   	SELF.ADDRESS2 				:= IF(L.DBA3<>'',R.EMAIL,R.PHONE);
-   	SELF.CITY 							 := IF(L.DBA3<>'',R.PHONE,R.ADDRESS1);
-   	SELF.STATE 							:= IF(L.DBA3<>'',R.ADDRESS1,R.ADDRESS2);
-   	SELF.ZIP 								 := IF(L.DBA3<>'',R.ADDRESS2,R.CITY);
-   	SELF.COUNTY 						:= IF(L.DBA3<>'',R.CITY,R.STATE);
-   	SELF.OFF_SLNUM 			:= IF(L.DBA3<>'',R.STATE,R.ZIP);
-   	SELF.OFFICENAME 		:= IF(L.DBA3<>'',R.ZIP,R.COUNTY);
-   	SELF := L;
-   END;
-   
-   merged_mtg := ROLLUP(pre_inFile_mtg,LEFT.credential_number=' ',merge_partial_records(LEFT,RIGHT));
-	 
-   // deb := OUTPUT(CHOOSEN(merged_mtg,1000));
-	 
-	 inFile_mtg := merged_mtg(CREDENTIAL_NUMBER[1..3]<>'PB.'	AND				//PAWN BROKER AND PAWN BROKER BRANCH
-										  			 CREDENTIAL_NUMBER[1..3]<>'PM.'	AND				//PRECIOUS METALS DEALERS AND PRECIOUS METALS DEALERS BRANCH
-													   CREDENTIAL_NUMBER[1..3]<>'PF.'	AND				//PREMIUM FINANCE AND PREMIUM FINANCE BRANCH OFFICE
-													   CREDENTIAL_NUMBER[1..3]<>'SL.'  AND				//SMALL LOAN AND SMALL LOAN BRANCH OFFICE
-													   CREDENTIAL_NUMBER[1..3]<>'CS.'  AND				//CREDIT SERVICES ORGANIZATION
-													   CREDENTIAL_NUMBER[1..3]<>'CC.'						//CASH CHECKING and CASH CHECKING BRANCH
-													   );
-*/
+
 	rLayout_License	:= RECORD, maxsize(5000)
 		Prof_License_Mari.layout_OHS0654.layout_profession;
 		STRING20  PHONE;
@@ -158,13 +124,8 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	END;
 
 	FilePROF	 := PROJECT(inFile_prof,reToCommon(LEFT));
-	/*
-	FileMTG   := PROJECT(inFile_mtg,TRANSFORM(rLayout_License,
-																				 	SELF.FILE_TYPE:= 'MTG';
-																				 	SELF := LEFT;
-																					 SELF := []));*/
-	// oFileMTG   := OUTPUT(CHOOSEN(FileMTG, 1000));
-	inFileComb := FilePROF /*+ FileMTG*/;
+
+	inFileComb := FilePROF ;
 
 
 	//Filtering out BAD RECORDS
@@ -224,7 +185,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 		TrimBusAddress2				:= StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.ADDRESS2),'="');
 		TrimBusCity 				 	:= ut.CleanSpacesAndUpper(pInput.CITY);
 		TrimLIC_TYPE 				 	:= ut.CleanSpacesAndUpper(pInput.CREDENTIAL_TYPE);
-	 TrimZip                := StringLib.StringFilterOut(trim(pInput.Zip,All),'="');
+	  TrimZip                := StringLib.StringFilterOut(trim(pInput.Zip,All),'="');
 		// License Information
 		SELF.LICENSE_NBR	   	:= ut.CleanSpacesAndUpper(pInput.CREDENTIAL_NUMBER);
 		SELF.OFF_LICENSE_NBR	:= ut.CleanSpacesAndUpper(pInput.OFF_SLNUM);
@@ -245,71 +206,68 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 		SELF.RAW_LICENSE_TYPE	:= TrimLIC_TYPE;
 		prepLIC_TYPE 					:= StringLib.StringFilterOut(TrimLIC_TYPE, '.');
  		tmpLIC_TYPE						:= TRIM(CASE(prepLIC_TYPE,
-   																			'SOLE PROPRIETOR' => 'SOLE',
-   																			'CERT GENERAL R E APPRAISER - RECIPROCITY' => 'CGREAR',
-   																			'CERT. GENERAL R. E. APPRAISER - RECIPROCITY' => 'CGREAR',
-   																			'CERTIFIED GENERAL REAL ESTATE APPRAISER - TEMPORARY' => 'CGREAT',
-   																			'CERTIFIED GENERAL REAL ESTATE APPRAISER - TEMPORAR'  => 'CGREAT',         
-   																			'CERTIFIED GENERAL REAL ESTATE APPRAISER' => 'CGREA',
-   																			'CERTIFIED RESIDENTIAL R E APPRAISER - RECIPROCITY' => 'CRREAR',
-   																			'CERTIFIED RESIDENTIAL R E APPRAISER - RECIPROCIT' => 'CRREAR',
+		                                    'APPRAISAL MANAGEMENT COMPANY' => 'AMC',
+																				'CERT GENERAL R E APPRAISER - OUT OF STATE' => 'ACGO',
+   																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STA'   => 'ACRO',
+   																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STATE' => 'ACRO',
+																				'LICENSED RESIDENTIAL R E APPRAISER - OUT OF STAT'   => 'ALRO',  
+																				'REAL ESTATE MANAGEMENT LEVEL BROKER' => 'BRKM',
+																				// 'LICENSED RESIDENTIAL R. E. APPRAISER - RECIPROCITY' => 'ALRR',
+																				'CERTIFIED GENERAL REAL ESTATE APPRAISER'            => 'CGREA',
+																				'CERTIFIED RESIDENTIAL REAL ESTATE APPRAISER'        => 'CRREA',
+   																			'CERT GENERAL R E APPRAISER - RECIPROCITY'           => 'CGREAR',
+   																			'CERT. GENERAL R. E. APPRAISER - RECIPROCITY'        => 'CGREAR',
+																				'CERTIFIED RESIDENTIAL R E APPRAISER - RECIPROCITY'  => 'CRREAR',
+   																			'CERTIFIED RESIDENTIAL R E APPRAISER - RECIPROCIT'   => 'CRREAR',
+   																			'CERTIFIED GENERAL REAL ESTATE APPRAISER - TEMPORARY'     => 'CGREAT',
+   																			'CERTIFIED GENERAL REAL ESTATE APPRAISER - TEMPORAR'      => 'CGREAT',         
    																			'CERTIFIED RESIDENTIAL REAL ESTATE APPRAISER - TEMPORARY' => 'CRREAT',
-   																			'CERTIFIED RESIDENTIAL REAL ESTATE APPRAISER - TEMP' => 'CRREAT',
-   																			'CERTIFIED RESIDENTIAL REAL ESTATE APPRAISER' => 'CRREA',
-   																			'CREDIT SERVICES ORGANIZATION' => 'CSO',
-   																			'LICENSED RESIDENTIAL R E APPRAISER - RECIPROCITY' => 'LRREAR', 
-   																			'LICENSED RESIDENTIAL REAL ESTATE APPRAISER - TEMPORARY' => 'LRREAT',
-   																			'LICENSED RESIDENTIAL REAL ESTATE APPRAISER - TEMPO' => 'LRREAT',
-   																			'LICENSED RESIDENTIAL REAL ESTATE APPRAISER' => 'LRREA',
-   																			'REGISTERED REAL ESTATE APPRAISER ASSISTANT' => 'RREAA',
-   																			'REAL ESTATE BROKER' => 'REB',
-   																			'FOREIGN CORPORATION' => 'FC',
+   																			'CERTIFIED RESIDENTIAL REAL ESTATE APPRAISER - TEMP'      => 'CRREAT',
+   																			// 'CREDIT SERVICES ORGANIZATION' => 'CSO',
+																				'CONSUMER INSTALLMENT LOAN ACT' => 'CILA',
+																				'CONSUMER INSTALLMENT LOAN ACT BRANCH OFFICE' => 'CILAB',
+																			  'CONSUMER INSTALLMENT LOAN ACT BRANCH'        => 'CILAB',
+																				'FOREIGN CORPORATION' => 'FC',
    																			'FOREIGN REAL ESTATE DEALER - CORPORATE' => 'FREDC',
    																			'FOREIGN REAL ESTATE DEALER - INDIVIDUAL' => 'FREDI',
    																			'FOREIGN REAL ESTATE SALESPERSON' => 'FRES',
+																				// 'GENERAL LOAN LAW' => 'GLL',                                                                                   
+																				// 'GENERAL LOAN LAW BRANCH'  => 'GLLB',   
+																				'LOAN ORIGINATOR' => 'LO',
+   																			'LICENSED RESIDENTIAL R E APPRAISER - RECIPROCITY'  => 'LRREAR', 
+																				'LICENSED RESIDENTIAL REAL ESTATE APPRAISER'  => 'LRREA',
+   																			'LICENSED RESIDENTIAL REAL ESTATE APPRAISER - TEMPORARY' => 'LRREAT',
+   																			'LICENSED RESIDENTIAL REAL ESTATE APPRAISER - TEMPO'     => 'LRREAT',
+																				'MORTGAGE BROKER' => 'MB',
+																				'MORTGAGE BROKER BRANCH OFFICE' => 'MBBO',  
+																				'MORTGAGE BROKER MORTGAGE BANKER EXEMPTION' => 'MBMBE',			//From dfi file.
+   																			'MORTGAGE BROKER MORTGAGE BANKER EXEMPTION BRANCH' => 'MBMBEB',
+																				'MORTGAGE BROKER CREDIT UNION SERVICE ORGANIZATION'  => 'MBCUSO',  
+																				'MORTGAGE LOAN ORIGINATOR' => 'MLO',
+																				'NOT FOR PROFIT 501C3' => 'NP',
+																				// 'NONPROFIT 501C3' => 'NPR',                                                                                    
+																				'OPERATIONS MANAGER' => 'OM',
+																				// 'PREMIUM FINANCE BRANCH OFFICE' => 'PFBR',
+																				'REAL ESTATE BROKER'  => 'REB',
+																				'REAL ESTATE BRANCH OFFICE' => 'REBO', 
    																			'REAL ESTATE COMPANY' => 'REC',
    																			'REAL ESTATE SALESPERSON' => 'RES',
-   																			'MORTGAGE BROKER BRANCH OFFICE' => 'MBBO',                    
-   																			'MORTGAGE BROKER' => 'MB',
-   																			'SECOND MORTGAGE BRANCH OFFICE' => 'SMBO',
-   																			'SECOND MORTGAGE' => 'SM',
-   																			'LOAN ORIGINATOR' => 'LO',
-   																			'OPERATIONS MANAGER' => 'OM',
-   																			//Use the first qualifier of license # as license type.
-   																			'REAL ESTATE BRANCH OFFICE' => 'REBO', 
-   																			'MORTGAGE LOAN ORIGINATOR' => 'MLO',
-   																			'SECOND MORTGAGE CREDIT UNION SERVICE ORGANIZATION' => 'SMCUSO',
-   																			'MORTGAGE BROKER CREDIT UNION SERVICE ORGANIZATION'  => 'MBCUSO',         
-   																			'FOREIGN PROPERTY REGISTRATION' => 'FPR',
-   																			'LICENSED RESIDENTIAL R. E. APPRAISER - RECIPROCITY' => 'ALRR',
-   																			'MORTGAGE BROKER MORTGAGE BANKER EXEMPTION' => 'MBMBE',			//From dfi file.
-   																			'MORTGAGE BROKER MORTGAGE BANKER EXEMPTION BRANCH' => 'MBMBEB',
-   																			'PREMIUM FINANCE BRANCH OFFICE' => 'PFBR',
-   																			'CERT GENERAL R E APPRAISER - OUT OF STATE' => 'ACGO',
-   																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STA' => 'ACRO',
-   																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STATE' => 'ACRO',
-																		  	'TEMPORARY LOAN ORIGINATOR' => 'TLO',
-	                                      'TEMPORARY MORTGAGE LOAN ORIGINATOR' => 'TMLO', // Add new type 10/21/2014	
-                                        'LICENSED RESIDENTIAL R E APPRAISER - OUT OF STAT' => 'ALRO',  
-																			  'THIRD PARTY PROCESSER' => 'TP',
-																			  'NOT FOR PROFIT 501C3' => 'NP',
-																		  	'REAL ESTATE PRINCIPAL BROKER' => 'REPB',
+																				'REAL ESTATE PRINCIPAL BROKER' => 'REPB',
 																		  	'REAL ESTATE ASSOCIATE BROKER' => 'REAB',
-																	  		'REAL ESTATE MANAGEMENT LEVEL SALESPERSON' => 'REMS',
-																  			'REAL ESTATE MANAGEMENT LEVEL BROKER' => 'BRKM',
-																  			'SECOND MORTGAGE CREDIT UNION SERVICE ORG EXEMPTION' => 'SMCU',
-																				'CONSUMER INSTALLMENT LOAN ACT' => 'CILA',
-																				'CONSUMER INSTALLMENT LOAN ACT BRANCH OFFICE' => 'CILAB',
-																				// new license type
-																				'CONSUMER INSTALLMENT LOAN ACT BRANCH' => 'CILAB',
-																				//test
-																				'GENERAL LOAN LAW' => 'GLL',                                                                                   
-																				'GENERAL LOAN LAW BRANCH'    => 'GLLB',                                                                         
-																				'NONPROFIT 501C3' => 'NPR',                                                                                    
-																				'RESIDENTIAL MORTGAGE LENDING ACT'  => 'RMLA',                                                                  
-																				'RESIDENTIAL MORTGAGE LENDING ACT BRANCH'  => 'RMLAB',                                                           
-																				'THIRD PARTY PROCESSING AND/OR UNDERWRITING COMPANY'  => 'TPPUC',                                               
-  															 				''),LEFT,RIGHT);
+   																			'REAL ESTATE MANAGEMENT LEVEL SALESPERSON' => 'REMS',
+																				// 'RESIDENTIAL MORTGAGE LENDING ACT'   => 'RMLA',                                                                  
+																				// 'RESIDENTIAL MORTGAGE LENDING ACT BRANCH'  => 'RMLAB',  
+   																			'REGISTERED REAL ESTATE APPRAISER ASSISTANT'  => 'RREAA',
+   																			'SOLE PROPRIETOR' => 'SOLE',
+   																			'SECOND MORTGAGE' => 'SM',
+   																			'SECOND MORTGAGE BRANCH OFFICE' => 'SMBO',
+   																			'SECOND MORTGAGE CREDIT UNION SERVICE ORGANIZATION' => 'SMCUSO',
+   																			'SECOND MORTGAGE CREDIT UNION SERVICE ORG EXEMPTION' => 'SMCU',
+																				'TEMPORARY LOAN ORIGINATOR' => 'TLO',
+	                                      'TEMPORARY MORTGAGE LOAN ORIGINATOR' => 'TMLO', // Add new type 10/21/2014	
+                                        'THIRD PARTY PROCESSER' => 'TP',
+																				// 'THIRD PARTY PROCESSING AND/OR UNDERWRITING COMPANY'  => 'TPPUC', 
+																			  ''),LEFT,RIGHT);
     // SELF.std_license_desc := prepLIC_TYPE;
 	  //Use the first qualifier of license # as std license type
 		SELF.STD_LICENSE_TYPE 	 := tmpLIC_TYPE;

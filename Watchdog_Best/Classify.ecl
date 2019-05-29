@@ -57,7 +57,8 @@ EXPORT MultiTokenKeyName := '~'+'key::Watchdog_best::did::Token::MultiTokenKey';
 EXPORT MultiTokenKey := INDEX(all_tokens0(SALT311.WordCount(TokenValue)>1),{UNSIGNED4 TokenHash := HASH32(TokenValue),TokenType},{all_tokens0},MultiTokenKeyName);
   address_tokens := PROJECT(Specificities(h).address_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.address; SELF.TokenType := 2; SELF.Spc := LEFT.field_Specificity ));
   ssnum_tokens := PROJECT(Specificities(h).ssnum_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.ssnum; SELF.TokenType := 16; SELF.Spc := LEFT.field_Specificity ));
-SHARED all_tokens1 := address_tokens + ssnum_tokens;
+  lastname_tokens := PROJECT(Specificities(h).lastname_values_persisted,TRANSFORM(SALT311.Layout_Classify_Concept,SELF.ConceptHash := LEFT.lastname; SELF.TokenType := 42; SELF.Spc := LEFT.field_Specificity ));
+SHARED all_tokens1 := address_tokens + ssnum_tokens + lastname_tokens;
 
 EXPORT ConceptKeyName := '~'+'key::Watchdog_best::did::Token::ConceptKey';
 
@@ -172,7 +173,27 @@ shared ssnum_combinations := o_tot;
     SELF := le;
   END;
 shared ssnum_templates := project(ssnum_combinations,Into(LEFT));
-SHARED all_templates := address_templates + ssnum_templates;
+  lastname_filled_rec := RECORD
+    boolean lname_filled :=(TYPEOF(ih.lname))ih.lname != (TYPEOF(ih.lname))'';
+    boolean name_ind_filled :=(TYPEOF(ih.name_ind))ih.name_ind != (TYPEOF(ih.name_ind))'';
+  END;
+  t := table(ih,lastname_filled_rec);
+  lastname_filled_rec_totals := RECORD
+    UNSIGNED2 TokenType := 42;
+    t.lname_filled;
+    t.name_ind_filled;
+    UNSIGNED Cnt := COUNT(GROUP);
+  END;
+  t_tot := table(t,lastname_filled_rec_totals,lname_filled,name_ind_filled,few);
+  SALT311.MAC_Field_Specificities(t_tot,o_tot);
+shared lastname_combinations := o_tot;
+  Layout_ConceptTemplate Into(lastname_combinations le) := TRANSFORM
+    SELF.FieldNumber1 := MAP ( le.lname_filled => 38, le.name_ind_filled => 40,0);
+    SELF.FieldNumber2 := MAP ( le.name_ind_filled AND SELF.FieldNumber1 != 40 => 40,0);
+    SELF := le;
+  END;
+shared lastname_templates := project(lastname_combinations,Into(LEFT));
+SHARED all_templates := address_templates + ssnum_templates + lastname_templates;
 
 EXPORT ConceptTemplatesKey := '~'+'key::Watchdog_best::did::Token::ConceptTemplatesKey';
 

@@ -1,10 +1,11 @@
-export map_axciomCanRes(string8 aresFileDate) := function
+﻿export map_axciomCanRes(string8 aresFileDate) := function
 
 import CanadianPhones,Address,VersionControl;
 dacr := distribute(CanadianPhones.file_axciomCanRes.v2,random());
 
+layoutCanadianWhitepagesBaseWOCCPA := layoutCanadianWhitepagesBase -[global_sid,record_sid];
 
-layoutCanadianWhitepagesBase tacr(dacr input) := Transform
+layoutCanadianWhitepagesBaseWOCCPA tacr(dacr input) := Transform
 
 self.Date_first_reported	:=aresFileDate;
 self.Date_last_reported		:=aresFileDate;

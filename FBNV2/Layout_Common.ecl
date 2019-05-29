@@ -1,4 +1,4 @@
-IMPORT standard, aid,BIPV2;
+﻿IMPORT standard, aid,BIPV2;
 EXPORT Layout_Common:=
   module
    EXPORT Bus:=RECORD
@@ -72,6 +72,14 @@ EXPORT Layout_Common:=
 		unsigned8   		source_rec_id 					 :=0 ;
 		BIPV2.IDlayouts.l_xlink_ids ;
 	 END;
+	 
+		// Jira# CCPA-102, The below layout with 2 new fields are added for CCPA (California Consumer Protection Act) project.
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		export CCPA_fields := 
+		record
+			unsigned4 				global_sid 		:= 0;
+			unsigned8 				record_sid 		:= 0;
+		end;
 
 	 EXPORT Business := RECORD
 			STRING38 		Tmsid								:='';
@@ -107,14 +115,13 @@ EXPORT Layout_Common:=
 			mailing_adr_fip_geo;
 			unsigned6		bdid 								:=0 ;
 			unsigned6   bdid_score 					:=0 ;
+			CCPA_fields;
 	 END;
 
-  EXPORT Business_AID := RECORD
-		Business;
-		Bus_Addr_AID;
-		
-	END;
-	
+   EXPORT Business_AID := RECORD
+	   Business;
+	   Bus_Addr_AID;		
+   END;
 	
 	
 	EXPORT cont_info  :=RECORD
@@ -171,11 +178,12 @@ EXPORT Layout_Common:=
 		unsigned6		did_score 				:=0 ;
 		unsigned6		bdid 							:=0 ;
 		unsigned6   bdid_score 				:=0 ;
+		CCPA_fields;
 	END ;
 	
 	EXPORT Contact_AID := RECORD
 		Contact;
-		Contact_Addr_AID;
+		Contact_Addr_AID;		
 	END ;	
 
 	
