@@ -39,8 +39,8 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 		treshld_  := $.Mod_Sets.threshld;
 		
 		processed := $.PreprocessNCF2(ilfn);
-				
-		reports := $.GetReports(ModifyFileName(ilfn, 'xxx2'));
+		base2 := $.fn_constructBase2FromNCFEx(processed, version);				
+		reports := $.GetReports(ModifyFileName(ilfn, 'nac2'));
 		err_rate := reports.ErrorCount/reports.TotalRecords;
 		ExcessiveInvalidRecordsFound :=	err_rate	> treshld_;
 		
@@ -64,7 +64,7 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 		doit := sequential(
 											MoveReadyToSpraying
 											,SprayIt										
-											,OUTPUT(processed,,ModifyFileName(ilfn, 'xxx2'), COMPRESSED, OVERWRITE)
+											,OUTPUT(processed,,ModifyFileName(ilfn, 'nac2'), COMPRESSED, OVERWRITE)
 											,OUTPUT(reports.TotalRecords, named('total_records'))
 											,OUTPUT(reports.ErrorCount, named('Error_Count'))
 											//,Std.File.AddSuperFile('~nac::uber::in::pending', ModifyFileName(ilfn, 'xxx2')
@@ -73,6 +73,8 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 											,out_NCF_reports
 											,IF(EXISTS(reports.dsContacts), fn_ProcessContactRecord(reports.dsContacts))
 											,IF(EXISTS(reports.dsExceptions), fn_ProcessExceptionRecord(reports.dsExceptions))
+											,OUTPUT(base2,,ModifyFileName(ilfn, 'bas2'), COMPRESSED, OVERWRITE)
+											,NOTHOR(Std.File.AddSuperFIle($.Superfile_List.sfReady, ModifyFileName(ilfn, 'bas2')))
 											,despray_NCF_reports('ncx2')
 											,despray_NCF_reports('ncd2')
 											,despray_NCF_reports('ncr2')
