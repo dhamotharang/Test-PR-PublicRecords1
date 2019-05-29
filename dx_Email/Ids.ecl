@@ -34,7 +34,7 @@ EXPORT Ids := MODULE
       dx_Email.layouts.i_DID.email_rec_key;
     END;
     
-    LOCAL email_ids := JOIN(ds_batch_in,dx_Email.Key_Email_Address, 
+    LOCAL email_ids := JOIN(ds_batch_in,dx_Email.Key_Email_Address(), 
                           KEYED(STD.Str.ToUpperCase(TRIM(LEFT.d_field, ALL)) = RIGHT.clean_email), 
                           TRANSFORM(out_rec,
                               SELF.email_rec_key := RIGHT.email_rec_key,                                
