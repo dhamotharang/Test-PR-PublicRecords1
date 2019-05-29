@@ -1,4 +1,4 @@
-﻿import tools, _control, ut, std, Scrubs, Scrubs_Infutor_NARB;
+﻿import tools, _control, ut, std, Scrubs, Scrubs_Infutor_NARB, dops;
 						
 export Build_All(
 
@@ -24,6 +24,7 @@ function
 		,Build_Strata(pversion,pOverwrite,,,pIsTesting)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
+		,dops.updateversion('InfutorNARBKeys',pversion,Email_Notification_Lists(pIsTesting).Roxie)
 		//,BIPStats (pversion) -- commenting out until the BIP team moves the code to Production
 		,QA_Records()
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
