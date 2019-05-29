@@ -6,7 +6,6 @@
 FC_ids := ['058118BANKOFAMERICA', '058118ESCOBARCARLOSG', '1079290090820TRUCAPREOCORP', '1079290090820TRUCAPGRANTORTRUST2010-1','14944559950000SOUTHERNBK&TRUST', '14944559950000RABIMIKE'];
 Foreclosure_Address := property.file_Foreclosure(Trim(foreclosure_id, left, right) not in FC_ids);
 
-
 Layout_Foreclosure_In_Slim :=  record
   string70 foreclosure_id;
   string2  state;
