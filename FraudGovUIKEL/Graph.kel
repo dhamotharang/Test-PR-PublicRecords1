@@ -133,13 +133,13 @@ Employer := ENTITY(FLAT(UID(acctno),
   STRING status,
   STRING liabcd,
   DATE datefirstemp,
-  STRING dateliabest,
+  DATE dateliabest,
   STRING compyr,
   STRING timelapsecd,
   STRING ownershipcd,
   STRING reinstatedate,
   STRING unitaddeddate,
-  STRING liabtermdate,
+  DATE liabtermdate,
   STRING dateacquired,
   STRING bkstopcode,
   STRING bankruptcydate,
@@ -191,7 +191,6 @@ Employer := ENTITY(FLAT(UID(acctno),
   INTEGER empid,
   INTEGER score,
   INTEGER weight
-	
 	
 	/*
   STRING leasesic6,
@@ -1185,12 +1184,12 @@ Legal: => AccountNumberCount := COUNT(AccountNumbers);
 Legal: => LegalClaimDateMax := MAX(LegalClaim.rClaim, claim_submit_ccyymmdd);
 //Legal: => BisIncorpMSince := MAP(bestseleincorporationdate=NULL(0) => -99998, DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen));
 Legal: => BisIncorpMSince := DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen);
-	
+
+
 Employer: => ClaimCount := COUNT(EmployerClaim);
 Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
 // Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
 Employer: => BisIncorpMSince := rLegal.BisIncorpMSince;
-	
 Employer: => LegalClaimDateMax := rLegal.LegalClaimDateMax;
 
 Claim: => EmployerClaimCount := rEmployer.ClaimCount;

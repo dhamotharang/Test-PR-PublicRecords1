@@ -832,8 +832,10 @@ EXPORT files := MODULE
  EXPORT Employer := PROJECT(EmployerPrep, 
                       TRANSFORM(RECORDOF(LEFT), 
 											SELF.acctno := std.str.CleanSpaces(std.str.FindReplace(LEFT.acctno, '"', '\'')), 
-											SELF.statusreceiptdate := MAP((UNSIGNED)LEFT.statusreceiptdate[5..6] < 2020 => '19', '20') + LEFT.statusreceiptdate[5..6] + LEFT.statusreceiptdate[1..2] + LEFT.statusreceiptdate[3..4],
-											SELF.datefirstemp := MAP((UNSIGNED)LEFT.datefirstemp[5..6] < 2020 => '19', '20') + LEFT.datefirstemp[5..6] + LEFT.datefirstemp[1..2] + LEFT.datefirstemp[3..4],
+											SELF.statusreceiptdate := MAP((UNSIGNED)LEFT.statusreceiptdate[5..6] < 20 => '19', '20') + LEFT.statusreceiptdate[5..6] + LEFT.statusreceiptdate[1..2] + LEFT.statusreceiptdate[3..4],
+											SELF.datefirstemp := MAP((UNSIGNED)LEFT.datefirstemp[5..6] < 20 => '19', '20') + LEFT.datefirstemp[5..6] + LEFT.datefirstemp[1..2] + LEFT.datefirstemp[3..4],
+											SELF.dateliabest := MAP((UNSIGNED)LEFT.dateliabest[5..6] < 20 => '19', '20') + LEFT.dateliabest[5..6] + LEFT.dateliabest[1..2] + LEFT.dateliabest[3..4],
+											SELF.liabtermdate := MAP((UNSIGNED)LEFT.liabtermdate[5..6] < 20 => '19', '20') + LEFT.liabtermdate[5..6] + LEFT.liabtermdate[1..2] + LEFT.liabtermdate[3..4],											
 											SELF := LEFT)); 
  
  ClaimsRec := RECORD
