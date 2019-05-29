@@ -1179,21 +1179,63 @@ USE FraudGovUIKEL.Files.Claims(FLAT,
 	LegalClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0))
 	);
 	
-/* Logic Statements \ Attr */	
+/* Logic Statements \ Attr*/	
+
 	
 Legal: => AccountNumberCount := COUNT(AccountNumbers);
 Legal: => LegalClaimDateMax := MAX(LegalClaim.rClaim, claim_submit_ccyymmdd);
 //Legal: => BisIncorpMSince := MAP(bestseleincorporationdate=NULL(0) => -99998, DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen));
 Legal: => BisIncorpMSince := DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen);
 	
-Employer: => ClaimCount := COUNT(EmployerClaim);
-Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
+// Employer: => ClaimCount := COUNT(EmployerClaim);
+// Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
 // Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
-Employer: => BisIncorpMSince := rLegal.BisIncorpMSince;
-	
-Employer: => LegalClaimDateMax := rLegal.LegalClaimDateMax;
 
-Claim: => EmployerClaimCount := rEmployer.ClaimCount;
+Employer: => BusAcctUIDEcho := acctno; // fixme
+Employer: => BusAcctUltIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			 ultid=0 => -99998,
+																			 ultid);
+Employer: => BusAcctOrgIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																				orgid=0 => -99998,
+																				orgid);
+Employer: => BusAcctSeleIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			 seleid=0 => -99998,
+																			 seleid);
+Employer: => BusAcctProxIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			 proxid=0 => -99998,
+																			 proxid);
+Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
+																			 powid=0 => -99998,
+																			 powid);
+																			 
+// Employer: => BusAcctPowIDAppend
+// Employer: => BusAcctNewestUpdateMasterDt
+// Employer: => BusAcctNewestRecordDt
+// Employer: => BusNewestRecordDt
+// Employer: => BusAcctStatusTypeEcho
+// Employer: => BusAcctDtEmployerBeganEcho
+// Employer: => BusAcctTaxLiabStartDtEcho
+// Employer: => BusAcctTaxLiabEndDtEcho
+// Employer: => BusOldestTaxLiabStartDt
+// Employer: => BusNewestTaxLiabStartDt
+// Employer: => BusOldestTaxLiabEndDt
+// Employer: => BusNewestTaxLiabEndDt
+// Employer: => BusTaxLiabOngoingFlag
+// Employer: => BusAcctTaxLiabStartMsince
+// Employer: => BusAcctTaxLiabEndMsince
+// Employer: => BusOldestTaxLiabStartMsince
+// Employer: => BusNewestTaxLiabEndMsince
+// Employer: => BusAcctOldestUnemClmDt
+// Employer: => BusAcctNewestUnemClmDt
+// Employer: => BusOldestUnemClmDt
+// Employer: => BusNewestUnemClmDt
+// Employer: => BusIncorpDt
+// Employer: => BusIncorpStatusType
+// Employer: => BisIncorpMSince := rLegal.BisIncorpMSince;
+	
+// Employer: => LegalClaimDateMax := rLegal.LegalClaimDateMax;
+
+// Claim: => EmployerClaimCount := rEmployer.ClaimCount;
 
 
 QUERY: showEmployers <= Employer;	
