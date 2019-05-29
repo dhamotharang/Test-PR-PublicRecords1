@@ -10,7 +10,7 @@ Layout_Foreclosure_In_Slim :=  record
   string3  deed_category;
   string55 deed_desc;
   string3  document_type;
-  string40 document_desc;
+  string55 document_desc;
   string8  recording_date;
   string4  document_year;
   string12 document_nbr;
