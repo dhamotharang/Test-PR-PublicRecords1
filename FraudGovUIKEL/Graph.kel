@@ -1179,7 +1179,11 @@ USE FraudGovUIKEL.Files.Claims(FLAT,
 	LegalClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0))
 	);
 	
-/* Logic Statements \ Attr*/	
+/* Logic Statements \ Attr
+
+	Some of these attributs are at the business level, some are at the business legal entity level 
+	Should these attributes be in their own entity?
+*/	
 
 	
 Legal: => AccountNumberCount := COUNT(AccountNumbers);
@@ -1212,7 +1216,9 @@ Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 // Employer: => BusAcctNewestUpdateMasterDt
 // Employer: => BusAcctNewestRecordDt
 // Employer: => BusNewestRecordDt
-// Employer: => BusAcctStatusTypeEcho
+Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					status='' => -99998,
+																					status); // fixme. Need status from most recent master record
 // Employer: => BusAcctDtEmployerBeganEcho
 // Employer: => BusAcctTaxLiabStartDtEcho
 // Employer: => BusAcctTaxLiabEndDtEcho
