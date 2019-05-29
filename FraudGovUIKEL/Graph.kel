@@ -1195,7 +1195,9 @@ Legal: => BisIncorpMSince := DAYSBETWEEN(bestseleincorporationdate, bestseledate
 // Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
 // Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
 
-Employer: => BusAcctUIDEcho := acctno; // fixme
+Employer: => BusAcctUIDEcho := MAP(fltradename:Null OR flstreetaddr:Null OR zip:Null => -99999,
+                                   fltradename:Null OR flstreetaddr:Null OR citystate:Null => -99999,
+                                   acctno);
 Employer: => BusAcctUltIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																			 ultid=0 => -99998,
 																			 ultid);
