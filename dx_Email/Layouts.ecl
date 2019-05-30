@@ -116,7 +116,7 @@ END;
 
 EXPORT i_Event_lkp := RECORD
 	STRING16	transaction_id;
-	STRING120 email_address;
+	STRING200 email_address;
 	STRING100 account;
 	STRING100	domain;
 	STRING10	status;
@@ -124,7 +124,7 @@ EXPORT i_Event_lkp := RECORD
 	STRING10	role_address;
 	STRING40	error_code;
 	STRING100	error_desc;
-	STRING20	source;
+	STRING2 	source;
 	STRING8		date_added;
 	STRING8		process_date;
 	STRING2		source_cd;	//Needed for populating field(s) below
