@@ -4,6 +4,7 @@
 //NormalizeName(string s) := (string)Std.Uni.CleanAccents(Std.Str.FindReplace(Std.Str.CleanSpaces(s),'¿','?'));
 
 fixupMsg(string msg) := If(msg[1]='\n', msg[2..], msg);
+rgxEmail := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
 
 EXPORT mod_Validation := MODULE
 	shared errcodes := Nac_V2.ValidationCodes.errcodes;
@@ -140,6 +141,8 @@ EXPORT mod_Validation := MODULE
 									DATASET([{warningCodes.W109, 'W', 'F', FieldCode('W', warningCodes.W109), left.MonthlyAllotment, left.ProgramState, left.RecordCode}], rErr))
 							+ IF(NOT isOptionalInteger(left.HistoricalBenefitCount), 
 									DATASET([{warningCodes.W110, 'W', 'F', FieldCode('W', warningCodes.W110), left.HistoricalBenefitCount, left.ProgramState, left.RecordCode}], rErr))
+							+ IF(left.email <> '' AND NOT REGEXFIND(rgxEmail, left.email, NOCASE), 
+									DATASET([{warningCodes.W118, 'W', 'F', FieldCode('W', warningCodes.W118), left.email, left.ProgramState, left.RecordCode}], rErr))
 							;
 					self.errors := COUNT(self.dsErrs(severity='E'));
 					self.warnings := COUNT(self.dsErrs(severity='W'));
@@ -169,6 +172,8 @@ EXPORT mod_Validation := MODULE
 
 							+ IF(NOT isOptionalInteger(left.MonthlyAllotment), 
 									DATASET([{warningCodes.W109, 'W', 'F', FieldCode('W', warningCodes.W109), left.MonthlyAllotment, left.ProgramState, left.RecordCode}], rErr))														
+							+ IF(left.email <> '' AND NOT REGEXFIND(rgxEmail, left.email, NOCASE), 
+									DATASET([{warningCodes.W118, 'W', 'F', FieldCode('W', warningCodes.W118), left.email, left.ProgramState, left.RecordCode}], rErr))
 							;
 					self.errors := COUNT(self.dsErrs(severity='E'));
 					self.warnings := COUNT(self.dsErrs(severity='W'));
@@ -228,6 +233,8 @@ EXPORT mod_Validation := MODULE
 							+ IF(left.ClientId<>'', validClientId(left.ClientId, left.ProgramState, left.RecordCode))
 							+ IF(left.UpdateType not in ['U','D','O'], 
 											DATASET([{errCodes.E119, 'E', 'F', FieldCode('E', errCodes.E119), left.UpdateType, left.ProgramState, left.RecordCode}], rErr))							
+							+ IF(left.ContactEmail <> '' AND NOT REGEXFIND(rgxEmail, left.ContactEmail, NOCASE), 
+									DATASET([{warningCodes.W118, 'W', 'F', '2042', left.ContactEmail, left.ProgramState, left.RecordCode}], rErr))
 							;
 
 					self.errors := COUNT(self.dsErrs(severity='E'));

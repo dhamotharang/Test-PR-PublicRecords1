@@ -98,7 +98,8 @@
 			W114 = 114,				// Invalid/Missing Address State
 			W115 = 115,				// Invalid/Missing Address Zip
 			W116 = 116,				// Invalid Postal Address
-			W117 = 117				// Invalid/Missing County/Parish Code
+			W117 = 117,				// Invalid/Missing County/Parish Code
+			W118 = 118				// Invalid Email Address
 		);
 
 
@@ -119,7 +120,8 @@
 		{warningcodes.W114,'W114','F','2035','Invalid/Missing Address State'},
 		{warningcodes.W115,'W115','F','2036','Invalid/Missing Address Zip'},
 		{warningcodes.W116,'W116','R','3005','Invalid Postal Address'},
-		{warningcodes.W117,'W117','F','2006','Invalid/Missing County/Parish Code'}
+		{warningcodes.W117,'W117','F','2006','Invalid/Missing County/Parish Code'},
+		{warningcodes.W118,'W118','F','2010','Invalid Email Address'}
 	], rCodeTable);
 	
 	EXPORT dsFieldNames := DATASET([
