@@ -638,8 +638,8 @@ export Functions := module
 													KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 													LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 	
-	ds_detail_spoke_suppressed := Suppress.MAC_FlagSuppressedSource(ds_detail_spoke_all, mod_access); 
-	ds_detail_spoke := PROJECT(ds_detail_spoke_suppressed,
+	ds_detail_spoke_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_spoke_all, mod_access); 
+	ds_detail_spoke := PROJECT(ds_detail_spoke_flagged,
 								TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
 									 SELF.company_description := IF(LEFT.is_suppressed, '', LEFT.company_description);
 									 SELF := LEFT;
@@ -665,8 +665,8 @@ export Functions := module
 													KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 													LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 	
-	ds_detail_zoom_suppressed := Suppress.MAC_FlagSuppressedSource(ds_detail_zoom_all, mod_access); 
-	ds_detail_zoom := PROJECT(ds_detail_zoom_suppressed,
+	ds_detail_zoom_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_zoom_all, mod_access); 
+	ds_detail_zoom := PROJECT(ds_detail_zoom_flagged,
 								TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
 									 SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
 									 SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);
@@ -752,8 +752,8 @@ export Functions := module
 														 KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 														 LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 
-  ds_detail_oneclick_suppressed := Suppress.MAC_FlagSuppressedSource(ds_detail_oneclick_all, mod_access); 
-  ds_detail_oneclick := PROJECT(ds_detail_oneclick_suppressed,
+  ds_detail_oneclick_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_oneclick_all, mod_access); 
+  ds_detail_oneclick := PROJECT(ds_detail_oneclick_flagged,
     TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
        SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
        SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);
@@ -777,8 +777,8 @@ export Functions := module
 														 KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 														 LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));	
 	
-	ds_detail_saleschannel_suppressed := Suppress.MAC_FlagSuppressedSource(ds_detail_saleschannel_all, mod_access); 
-	ds_detail_saleschannel := PROJECT(ds_detail_saleschannel_suppressed,
+	ds_detail_saleschannel_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_saleschannel_all, mod_access); 
+	ds_detail_saleschannel := PROJECT(ds_detail_saleschannel_flagged,
 															TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
 																 SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
 																 SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);
@@ -914,10 +914,10 @@ export Functions := module
 												    LEFT OUTER,  // keep all the recs from the LEFT ds
 													  ATMOST(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
     
-    doxie.compliance.logSoldToSources (ds_detail_spoke_suppressed(~is_suppressed), mod_access);
-    doxie.compliance.logSoldToSources (ds_detail_zoom_suppressed(~is_suppressed), mod_access);
-    doxie.compliance.logSoldToSources (ds_detail_oneclick_suppressed(~is_suppressed), mod_access);
-    doxie.compliance.logSoldToSources (ds_detail_saleschannel_suppressed(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_spoke_flagged(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_zoom_flagged(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_oneclick_flagged(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_saleschannel_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_email_data_suppressed, mod_access);
 	  RETURN ds_detail_wemail;
   END; // end of getDetailedWithEmail function 
