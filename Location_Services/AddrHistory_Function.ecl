@@ -1,5 +1,5 @@
-﻿import location_services, address, ut, risk_indicators, property, doxie, doxie_raw, doxie_ln,
-       AutoStandardI, DeathV2_Services, LN_PropertyV2_Services, LN_PropertyV2, STD, Watchdog;
+﻿import location_services, address, ut, risk_indicators, property, dx_BestRecords, doxie, doxie_raw, doxie_ln,
+       AutoStandardI, DeathV2_Services, LN_PropertyV2_Services, LN_PropertyV2, STD;
 
 todays_date := (string) STD.Date.Today();
 
@@ -622,7 +622,7 @@ doxie.mac_best_records(currentdids,
                        doxie.DataRestriction.fixed_DRM,
                        include_DOD:=true);
 
-currentbests0 := project(outfile, transform(watchdog.Layout_Best,
+currentbests0 := project(outfile, transform(dx_BestRecords.Layout_Best,
                                       self.name_suffix := if (left.name_suffix ='UNK','',left.name_suffix);
                                       self := left));
 

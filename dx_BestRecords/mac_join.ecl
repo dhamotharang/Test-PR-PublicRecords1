@@ -1,4 +1,5 @@
 EXPORT mac_join (ds, d_field, key, use_distributed, left_outer) := FUNCTIONMACRO
+  IMPORT ut;
 
   LOCAL out_rec := RECORD(RECORDOF(ds))
     dx_BestRecords.layout_best _best;
