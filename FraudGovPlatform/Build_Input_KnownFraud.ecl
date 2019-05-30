@@ -1,4 +1,4 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut; 
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut,_Validate; 
 EXPORT Build_Input_KnownFraud(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
@@ -101,24 +101,10 @@ module
 		LEFT ONLY,
 		LOOKUP);
 
-	shared EnforceValidations := join(
-		  rs_unique_id
-		, pCustomerSettings
-		, left.Customer_Account_Number = right.Customer_Account_Number and 
-		  left.Customer_State = right.Customer_State and
-		  left.file_type = right.file_type and //3=transactions
-		  left.ind_type = right.ind_type and //program
-		  right.validate_data = true
-		, TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),INNER, LOOKUP);
-
-
-	shared f1_errors:=EnforceValidations
+	shared f1_errors:=rs_unique_id
 		(
-				Customer_Account_Number =''
-			or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
-			or 	(Customer_Program_fn in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
-			or 	customer_event_id = ''
-			or 	reported_date = ''
+			customer_event_id = ''
+			or (_Validate.Date.fIsValid(reported_date) = false  or (unsigned)reported_date > (unsigned)(STRING8)Std.Date.Today())
 			or 	reported_time = ''
 			or 	reported_by = ''
 		);
