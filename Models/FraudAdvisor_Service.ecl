@@ -2677,7 +2677,7 @@ TRANSFORM
 
                self.description  := Models.FraudAdvisor_Constants.getModel_Description(model_name);   
 
-               self.scores := project(ret_fraudpoint3_plusModel2, form_fp3score(left, counter));
+               self.scores := project(if(test_data_enabled, fp_test_seed, ret_fraudpoint3_plusModel2), form_fp3score(left, counter));
 
 END;
 fraudpoint3_model := if(input_ok, 
