@@ -6,7 +6,9 @@
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
 
+
 FUNCTION: CleanSpaces(STRING s) <= ECL(STD.Str.CleanSpaces(s)) FROM Std RETURNS STRING;
+FUNCTION: PrependZeros(STRING s, INTEGER len) <= ECL( STD.Str.Repeat('0', len - LENGTH(s))+ s) FROM Std RETURNS STRING;
 
 Legal := ENTITY(FLAT(UID(seleid),
   STRING bestultcompanyname,
@@ -1213,17 +1215,20 @@ Employer: => BusAcctProxIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																			 powid=0 => -99998,
 																			 powid);
-																			 
-// Employer: => BusAcctPowIDAppend
+																		
 // Employer: => BusAcctNewestUpdateMasterDt
 // Employer: => BusAcctNewestRecordDt
 // Employer: => BusNewestRecordDt
-Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
-																					status='' => -99998,
+Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
+																					status='' => '-99998',
 																					status); // fixme. Need status from most recent master record
-// Employer: => BusAcctDtEmployerBeganEcho
+Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
+																							 ISVALIDDATE(datefirstemp) => YEAR(datefirstemp) + '' + PrependZeros(MONTH(datefirstemp), 2) + '' + PrependZeros(DAY(datefirstemp), 2), // In YYYYMMDD format
+																							 '-99998');
 // Employer: => BusAcctTaxLiabStartDtEcho
-// Employer: => BusAcctTaxLiabEndDtEcho
+Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
+																							 ISVALIDDATE(liabtermdate) => YEAR(liabtermdate) + ''+ PrependZeros(MONTH(liabtermdate), 2) +''+ PrependZeros(DAY(liabtermdate), 2), // In YYYYMMDD format
+																							 '-99998');
 // Employer: => BusOldestTaxLiabStartDt
 // Employer: => BusNewestTaxLiabStartDt
 // Employer: => BusOldestTaxLiabEndDt
