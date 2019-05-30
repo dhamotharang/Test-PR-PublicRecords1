@@ -195,13 +195,36 @@ DDResults := SOAPCALL(reqInput_dist,
 	
 
 
-
+standardLayout := RECORD
+  STRING Account;
+  STRING FirstName;
+  STRING MiddleName;
+  STRING LastName;
+  STRING inStreetAddress;
+  STRING inCity;
+  STRING2 inState;
+  STRING inZip;
+  STRING HomePhone;
+  STRING SSN;
+  STRING DateOfBirth;
+  STRING WorkPhone;
+  STRING Income;  
+  STRING DLNumber;
+  STRING DLState;                                                                                                                                                                                                              
+  STRING Balance; 
+  STRING ChargeOffd;  
+  STRING FormerName;
+  STRING Email;  
+  STRING EmployerName;
+  STRING HistoryDate;   //Expecting YYYYMMDD or YYYYMM or 999999
+  STRING LexID;
+end;
 
 
 InputWithReqLayout := RECORD
    UNSIGNED seq;
    xlayout;
-   layout input;
+   standardLayout input;
 end;
 	
 
@@ -213,9 +236,9 @@ droppedInput := JOIN(inputRecords, DDResults,
                       LEFT.inState = TRIM(RIGHT.result.inputEcho.person.address.state) AND
                       STD.Str.Filter(LEFT.inzip, DueDiligence.Constants.NUMERIC_VALUES) = TRIM(RIGHT.result.inputEcho.person.address.zip5 + RIGHT.result.inputEcho.person.address.zip4) AND
                       LEFT.SSN = TRIM(RIGHT.result.inputEcho.person.ssn) AND
-                      LEFT.FirstName = TRIM(RIGHT.result.inputEcho.person.name.first) AND
-                      LEFT.MiddleName = TRIM(RIGHT.result.inputEcho.person.name.middle) AND
-                      LEFT.LastName = TRIM(RIGHT.result.inputEcho.person.name.last),
+                      LEFT.FirstName[..20] = TRIM(RIGHT.result.inputEcho.person.name.first) AND
+                      LEFT.MiddleName[..20] = TRIM(RIGHT.result.inputEcho.person.name.middle) AND
+                      LEFT.LastName[..20] = TRIM(RIGHT.result.inputEcho.person.name.last),
                       TRANSFORM({RECORDOF(LEFT) -seq}, SELF := LEFT;), 
                       LEFT ONLY); //These are in the format as input to be reprocessed		
 
@@ -228,20 +251,20 @@ base := JOIN(inputRecords, DDResults(errorCode = ''),
               LEFT.inState = TRIM(RIGHT.result.inputEcho.person.address.state) AND
               STD.Str.Filter(LEFT.inzip, DueDiligence.Constants.NUMERIC_VALUES) = TRIM(RIGHT.result.inputEcho.person.address.zip5 + RIGHT.result.inputEcho.person.address.zip4) AND
               LEFT.SSN = TRIM(RIGHT.result.inputEcho.person.ssn) AND
-              LEFT.FirstName = TRIM(RIGHT.result.inputEcho.person.name.first) AND
-              LEFT.MiddleName = TRIM(RIGHT.result.inputEcho.person.name.middle) AND
-              LEFT.LastName = TRIM(RIGHT.result.inputEcho.person.name.last),
+              LEFT.FirstName[..20] = TRIM(RIGHT.result.inputEcho.person.name.first) AND
+              LEFT.MiddleName[..20] = TRIM(RIGHT.result.inputEcho.person.name.middle) AND
+              LEFT.LastName[..20] = TRIM(RIGHT.result.inputEcho.person.name.last),
               TRANSFORM(InputWithReqLayout,
                         SELF.input := LEFT;
                         SELF.seq := LEFT.seq;
-                        SELF := RIGHT;),
-              LEFT OUTER);
+                        SELF := RIGHT;
+                        SELF := [];));
                         
 
 
 PersonIdentifiers := RECORD
   UNSIGNED seq;
-  layout;
+  standardLayout;
   STRING errorCode;
   STRING calcdLexID;
 END;                        
