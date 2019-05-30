@@ -5,8 +5,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 100;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_number','invalid_alpha','invalid_AlphaNum','invalid_apn','invalid_date','invalid_addr','invalid_state','invalid_zip','invalid_name','invalid_document_code','invalid_property_code','invalid_land_use_code');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_number' => 1,'invalid_alpha' => 2,'invalid_AlphaNum' => 3,'invalid_apn' => 4,'invalid_date' => 5,'invalid_addr' => 6,'invalid_state' => 7,'invalid_zip' => 8,'invalid_name' => 9,'invalid_document_code' => 10,'invalid_property_code' => 11,'invalid_land_use_code' => 12,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_number','invalid_alpha','invalid_AlphaNum','invalid_apn','invalid_date','invalid_addr','invalid_state','invalid_zip','invalid_name','invalid_document_code','invalid_property_code','invalid_land_use_code','invalid_lender_type_code','invalid_loan_type_code');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_number' => 1,'invalid_alpha' => 2,'invalid_AlphaNum' => 3,'invalid_apn' => 4,'invalid_date' => 5,'invalid_addr' => 6,'invalid_state' => 7,'invalid_zip' => 8,'invalid_name' => 9,'invalid_document_code' => 10,'invalid_property_code' => 11,'invalid_land_use_code' => 12,'invalid_lender_type_code' => 13,'invalid_loan_type_code' => 14,0);
  
 EXPORT MakeFT_invalid_number(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -32,12 +32,12 @@ EXPORT InValidFT_invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>L
 EXPORT InValidMessageFT_invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -.,'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_apn(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*#~'); // Only allow valid symbols
-  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ()-,\'=&_.\\/:*#~',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -,;.:|`~/+#'); // Only allow valid symbols
+  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -,;.:|`~/+#',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_apn(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*#~'))));
-EXPORT InValidMessageFT_invalid_apn(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*#~'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_apn(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -,;.:|`~/+#'))));
+EXPORT InValidMessageFT_invalid_apn(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -,;.:|`~/+#'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_date(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -94,10 +94,22 @@ END;
 EXPORT InValidFT_invalid_land_use_code(SALT311.StrType s) := WHICH(~Scrubs_BKForeclosure_Reo.fn_valid_codes(s,'LAND_USE')>0);
 EXPORT InValidMessageFT_invalid_land_use_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_BKForeclosure_Reo.fn_valid_codes'),SALT311.HygieneErrors.Good);
  
+EXPORT MakeFT_invalid_lender_type_code(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_lender_type_code(SALT311.StrType s) := WHICH(~Scrubs_BKForeclosure_Reo.fn_valid_codes(s,'LENDER_TYPE')>0);
+EXPORT InValidMessageFT_invalid_lender_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_BKForeclosure_Reo.fn_valid_codes'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_loan_type_code(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_loan_type_code(SALT311.StrType s) := WHICH(~Scrubs_BKForeclosure_Reo.fn_valid_codes(s,'LOAN_TYPE')>0);
+EXPORT InValidMessageFT_invalid_loan_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_BKForeclosure_Reo.fn_valid_codes'),SALT311.HygieneErrors.Good);
+ 
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'foreclosure_id','ln_filedate','bk_infile_type','fips_cd','prop_full_addr','prop_addr_city','prop_addr_state','prop_addr_zip5','prop_addr_zip4','prop_addr_unit_type','prop_addr_unit_no','prop_addr_house_no','prop_addr_predir','prop_addr_street','prop_addr_suffix','prop_addr_postdir','prop_addr_carrier_rt','recording_date','recording_book_num','recording_page_num','recording_doc_num','doc_type_cd','apn','multi_apn','partial_interest_trans','seller1_fname','seller1_lname','seller1_id','seller2_fname','seller2_lname','buyer1_fname','buyer1_lname','buyer1_id_cd','buyer2_fname','buyer2_lname','buyer_vesting_cd','concurrent_doc_num','buyer_mail_city','buyer_mail_state','buyer_mail_zip5','buyer_mail_zip4','legal_lot_cd','legal_lot_num','legal_block','legal_section','legal_district','legal_land_lot','legal_unit','legacl_city','legal_subdivision','legal_phase_num','legal_tract_num','legal_brief_desc','legal_township','recorder_map_ref','prop_buyer_mail_addr_cd','property_use_cd','orig_contract_date','sales_price','sales_price_cd','city_xfer_tax','county_xfer_tax','total_xfer_tax','concurrent_lender_name','concurrent_lender_type','concurrent_loan_amt','concurrent_loan_type','concurrent_type_fin','concurrent_interest_rate','concurrent_due_dt','concurrent_2nd_loan_amt','buyer_mail_full_addr','buyer_mail_unit_type','buyer_mail_unit_no','lps_internal_pid','buyer_mail_careof','title_co_name','legal_desc_cd','adj_rate_rider','adj_rate_index','change_index','rate_change_freq','int_rate_ngt','int_rate_nlt','max_int_rate','int_only_period','fixed_rate_rider','first_chg_dt_yy','first_chg_dt_mmdd','prepayment_rider','prepayment_term','asses_land_use','res_indicator','construction_loan','inter_family','cash_purchase','stand_alone_refi','equity_credit_line','reo_flag','distressedsaleflag');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'foreclosure_id','ln_filedate','bk_infile_type','fips_cd','prop_full_addr','prop_addr_city','prop_addr_state','prop_addr_zip5','prop_addr_zip4','prop_addr_unit_type','prop_addr_unit_no','prop_addr_house_no','prop_addr_predir','prop_addr_street','prop_addr_suffix','prop_addr_postdir','prop_addr_carrier_rt','recording_date','recording_book_num','recording_page_num','recording_doc_num','doc_type_cd','apn','multi_apn','partial_interest_trans','seller1_fname','seller1_lname','seller1_id','seller2_fname','seller2_lname','buyer1_fname','buyer1_lname','buyer1_id_cd','buyer2_fname','buyer2_lname','buyer_vesting_cd','concurrent_doc_num','buyer_mail_city','buyer_mail_state','buyer_mail_zip5','buyer_mail_zip4','legal_lot_cd','legal_lot_num','legal_block','legal_section','legal_district','legal_land_lot','legal_unit','legacl_city','legal_subdivision','legal_phase_num','legal_tract_num','legal_brief_desc','legal_township','recorder_map_ref','prop_buyer_mail_addr_cd','property_use_cd','orig_contract_date','sales_price','sales_price_cd','city_xfer_tax','county_xfer_tax','total_xfer_tax','concurrent_lender_name','concurrent_lender_type','concurrent_loan_amt','concurrent_loan_type','concurrent_type_fin','concurrent_interest_rate','concurrent_due_dt','concurrent_2nd_loan_amt','buyer_mail_full_addr','buyer_mail_unit_type','buyer_mail_unit_no','lps_internal_pid','buyer_mail_careof','title_co_name','legal_desc_cd','adj_rate_rider','adj_rate_index','change_index','rate_change_freq','int_rate_ngt','int_rate_nlt','max_int_rate','int_only_period','fixed_rate_rider','first_chg_dt_yy','first_chg_dt_mmdd','prepayment_rider','prepayment_term','asses_land_use','res_indicator','construction_loan','inter_family','cash_purchase','stand_alone_refi','equity_credit_line','reo_flag','distressedsaleflag');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'foreclosure_id' => 0,'ln_filedate' => 1,'bk_infile_type' => 2,'fips_cd' => 3,'prop_full_addr' => 4,'prop_addr_city' => 5,'prop_addr_state' => 6,'prop_addr_zip5' => 7,'prop_addr_zip4' => 8,'prop_addr_unit_type' => 9,'prop_addr_unit_no' => 10,'prop_addr_house_no' => 11,'prop_addr_predir' => 12,'prop_addr_street' => 13,'prop_addr_suffix' => 14,'prop_addr_postdir' => 15,'prop_addr_carrier_rt' => 16,'recording_date' => 17,'recording_book_num' => 18,'recording_page_num' => 19,'recording_doc_num' => 20,'doc_type_cd' => 21,'apn' => 22,'multi_apn' => 23,'partial_interest_trans' => 24,'seller1_fname' => 25,'seller1_lname' => 26,'seller1_id' => 27,'seller2_fname' => 28,'seller2_lname' => 29,'buyer1_fname' => 30,'buyer1_lname' => 31,'buyer1_id_cd' => 32,'buyer2_fname' => 33,'buyer2_lname' => 34,'buyer_vesting_cd' => 35,'concurrent_doc_num' => 36,'buyer_mail_city' => 37,'buyer_mail_state' => 38,'buyer_mail_zip5' => 39,'buyer_mail_zip4' => 40,'legal_lot_cd' => 41,'legal_lot_num' => 42,'legal_block' => 43,'legal_section' => 44,'legal_district' => 45,'legal_land_lot' => 46,'legal_unit' => 47,'legacl_city' => 48,'legal_subdivision' => 49,'legal_phase_num' => 50,'legal_tract_num' => 51,'legal_brief_desc' => 52,'legal_township' => 53,'recorder_map_ref' => 54,'prop_buyer_mail_addr_cd' => 55,'property_use_cd' => 56,'orig_contract_date' => 57,'sales_price' => 58,'sales_price_cd' => 59,'city_xfer_tax' => 60,'county_xfer_tax' => 61,'total_xfer_tax' => 62,'concurrent_lender_name' => 63,'concurrent_lender_type' => 64,'concurrent_loan_amt' => 65,'concurrent_loan_type' => 66,'concurrent_type_fin' => 67,'concurrent_interest_rate' => 68,'concurrent_due_dt' => 69,'concurrent_2nd_loan_amt' => 70,'buyer_mail_full_addr' => 71,'buyer_mail_unit_type' => 72,'buyer_mail_unit_no' => 73,'lps_internal_pid' => 74,'buyer_mail_careof' => 75,'title_co_name' => 76,'legal_desc_cd' => 77,'adj_rate_rider' => 78,'adj_rate_index' => 79,'change_index' => 80,'rate_change_freq' => 81,'int_rate_ngt' => 82,'int_rate_nlt' => 83,'max_int_rate' => 84,'int_only_period' => 85,'fixed_rate_rider' => 86,'first_chg_dt_yy' => 87,'first_chg_dt_mmdd' => 88,'prepayment_rider' => 89,'prepayment_term' => 90,'asses_land_use' => 91,'res_indicator' => 92,'construction_loan' => 93,'inter_family' => 94,'cash_purchase' => 95,'stand_alone_refi' => 96,'equity_credit_line' => 97,'reo_flag' => 98,'distressedsaleflag' => 99,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],['ALLOW','LENGTHS'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],[],[],[],[],[],[],[],['ALLOW','LENGTHS'],[],[],[],['CUSTOM'],['ALLOW'],[],[],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],[],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],['CUSTOM'],['ALLOW','LENGTHS'],[],[],[],[],[],[],[],[],[],[],[],['ALLOW','LENGTHS'],[],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],['CUSTOM'],[],[],[],[],[],[],[],[],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],['ALLOW','LENGTHS'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],[],[],[],[],[],[],[],['ALLOW','LENGTHS'],[],[],[],['CUSTOM'],['ALLOW'],[],[],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],[],['ALLOW'],['ALLOW'],[],[],['ALLOW'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],['CUSTOM'],['ALLOW','LENGTHS'],[],[],[],[],[],[],['CUSTOM'],[],['CUSTOM'],[],[],['ALLOW','LENGTHS'],[],['ALLOW'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],['CUSTOM'],[],[],[],[],[],[],[],[],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
@@ -358,17 +370,17 @@ EXPORT Make_concurrent_lender_name(SALT311.StrType s0) := s0;
 EXPORT InValid_concurrent_lender_name(SALT311.StrType s) := 0;
 EXPORT InValidMessage_concurrent_lender_name(UNSIGNED1 wh) := '';
  
-EXPORT Make_concurrent_lender_type(SALT311.StrType s0) := s0;
-EXPORT InValid_concurrent_lender_type(SALT311.StrType s) := 0;
-EXPORT InValidMessage_concurrent_lender_type(UNSIGNED1 wh) := '';
+EXPORT Make_concurrent_lender_type(SALT311.StrType s0) := MakeFT_invalid_lender_type_code(s0);
+EXPORT InValid_concurrent_lender_type(SALT311.StrType s) := InValidFT_invalid_lender_type_code(s);
+EXPORT InValidMessage_concurrent_lender_type(UNSIGNED1 wh) := InValidMessageFT_invalid_lender_type_code(wh);
  
 EXPORT Make_concurrent_loan_amt(SALT311.StrType s0) := s0;
 EXPORT InValid_concurrent_loan_amt(SALT311.StrType s) := 0;
 EXPORT InValidMessage_concurrent_loan_amt(UNSIGNED1 wh) := '';
  
-EXPORT Make_concurrent_loan_type(SALT311.StrType s0) := s0;
-EXPORT InValid_concurrent_loan_type(SALT311.StrType s) := 0;
-EXPORT InValidMessage_concurrent_loan_type(UNSIGNED1 wh) := '';
+EXPORT Make_concurrent_loan_type(SALT311.StrType s0) := MakeFT_invalid_loan_type_code(s0);
+EXPORT InValid_concurrent_loan_type(SALT311.StrType s) := InValidFT_invalid_loan_type_code(s);
+EXPORT InValidMessage_concurrent_loan_type(UNSIGNED1 wh) := InValidMessageFT_invalid_loan_type_code(wh);
  
 EXPORT Make_concurrent_type_fin(SALT311.StrType s0) := s0;
 EXPORT InValid_concurrent_type_fin(SALT311.StrType s) := 0;

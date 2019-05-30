@@ -163,14 +163,15 @@ EXPORT Functions :=  MODULE
 	EXPORT nullset := ['none','NONE','','NULL','null','UNKNOWN','unknown', 'UKNOWN', 'Null', '\\N'];
 
 	EXPORT CleanFields(inputFile,outputFile) := macro
-
+			import ut;
+			
 			LOADXML('<xml/>');
 
 			#EXPORTXML(doCleanFieldMetaInfo, recordof(inputFile))
 
 			#uniquename(myCleanFunction)
 
-			STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in FraudGovPlatform.Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(x)));
+			STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in FraudGovPlatform.Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(ut.fn_RemoveSpecialChars(x))));
 			
 				#uniquename(tra)
 			inputFile %tra%(inputFile le) :=

@@ -429,5 +429,35 @@ export source_file(string vendor = '')   := map(vendor = mdr.sourceTools.src_Pcn
 												
 export fFlagIsOn(unsigned pValue, unsigned bitmap_match)	:=	pValue & bitmap_match = bitmap_match;
 
-export cellphone_types := ['CELL', 'LNDLN PRTD TO CELL'];												
+export cellphone_types := ['CELL', 'LNDLN PRTD TO CELL'];			
+
+export fClearNeustarRules(unsigned8 bitmap_rules):= function
+			NeustarRulesSet := if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-A')), rules_bitmap_code('NeustarWireless-Verified-A'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-B')), rules_bitmap_code('NeustarWireless-Verified-B'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-C')), rules_bitmap_code('NeustarWireless-Verified-C'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-D')), rules_bitmap_code('NeustarWireless-Verified-D'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-E')), rules_bitmap_code('NeustarWireless-Verified-E'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A1')), rules_bitmap_code('NeustarWireless-Activity-Status-A1'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A2')), rules_bitmap_code('NeustarWireless-Activity-Status-A2'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A3')), rules_bitmap_code('NeustarWireless-Activity-Status-A3'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A4')), rules_bitmap_code('NeustarWireless-Activity-Status-A4'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A5')), rules_bitmap_code('NeustarWireless-Activity-Status-A5'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A6')), rules_bitmap_code('NeustarWireless-Activity-Status-A6'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A7')), rules_bitmap_code('NeustarWireless-Activity-Status-A7'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I1')), rules_bitmap_code('NeustarWireless-Activity-Status-I1'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I2')), rules_bitmap_code('NeustarWireless-Activity-Status-I2'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I3')), rules_bitmap_code('NeustarWireless-Activity-Status-I3'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I4')), rules_bitmap_code('NeustarWireless-Activity-Status-I4'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I5')), rules_bitmap_code('NeustarWireless-Activity-Status-I5'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I6')), rules_bitmap_code('NeustarWireless-Activity-Status-I6'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I7')), rules_bitmap_code('NeustarWireless-Activity-Status-I7'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-U')), rules_bitmap_code('NeustarWireless-Activity-Status-U'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Prepaid-Y')), rules_bitmap_code('NeustarWireless-Prepaid-Y'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Prepaid-N')), rules_bitmap_code('NeustarWireless-Prepaid-N'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Cord-Cutter-Y')), rules_bitmap_code('NeustarWireless-Cord-Cutter-Y'),0)
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Cord-Cutter-N')), rules_bitmap_code('NeustarWireless-Cord-Cutter-N'),0);
+										 
+	return	bitmap_rules - NeustarRulesSet;
+end;
+									
 end;

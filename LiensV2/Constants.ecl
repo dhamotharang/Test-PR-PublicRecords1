@@ -22,6 +22,5 @@ export Constants := module
 																			'judg_vacated_date,judge,lapse_date,legal_block,legal_borough,legal_lot,sherrif_indc,' +
 																						 'tax_code,vendor_entry_date';
 	//DF-22188 - Deprecate followings in thor_data400::key::liensv2::fcra::party::tmsid.rmsid_qa
-	EXPORT fields_to_clear_party_id_fcra := 'phone,tax_id';
-  
+	EXPORT fields_to_clear_party_id_fcra := 'phone,tax_id';  
 end;

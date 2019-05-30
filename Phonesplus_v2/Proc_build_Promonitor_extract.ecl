@@ -1,4 +1,4 @@
-import phonesplus,_control,ut,watchdog, mdr;
+﻿import phonesplus,_control,ut,watchdog, mdr;
 
 /*
 
@@ -9,7 +9,7 @@ import phonesplus,_control,ut,watchdog, mdr;
  5) Despray the (new records and updated records) to be sent to Promonitor.
  
 */
-#workunit('name','Phonesplus Promonitor Extract');
+
 DestinationIP         := _control.IPAddress.bctlpedata11; 
 string v_process_date := ut.GetDate[1..8];
 // string v_process_date := '20111204';

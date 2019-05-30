@@ -44,6 +44,25 @@ module
   export Xlinksup_rcid                  := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.KeyIDHistory   ' ,bizknames.sup_rcid                );
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key              ' ,bizknames.refs_l_sic               );
 
+//External File Key Definitions
+	export Xlinkext_data_payload          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.PayloadByproxid       ' ,bizknames.ext_data_payload        );
+	export Xlinkext_data_l_cnpname        := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME          ' ,bizknames.ext_data_l_cnpname      );
+  export Xlinkext_data_l_cnpname_zip    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME_ZIP      ' ,bizknames.ext_data_l_cnpname_zip  );
+  export Xlinkext_data_l_cnpname_st     := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME_ST       ' ,bizknames.ext_data_l_cnpname_st   );
+  export Xlinkext_data_l_cnpname_fuzzy  := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME_FUZZY    ' ,bizknames.ext_data_l_cnpname_fuzzy);
+  export Xlinkext_data_l_address1       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_ADDRESS1         ' ,bizknames.ext_data_l_address1     );
+  export Xlinkext_data_l_address2       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_ADDRESS2         ' ,bizknames.ext_data_l_address2     );
+  export Xlinkext_data_l_address3       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_ADDRESS3         ' ,bizknames.ext_data_l_address3     );
+  export Xlinkext_data_l_phone          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_PHONE            ' ,bizknames.ext_data_l_phone        );
+  export Xlinkext_data_l_sic            := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_SIC              ' ,bizknames.ext_data_l_sic          );
+  export Xlinkext_data_l_fein           := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_FEIN             ' ,bizknames.ext_data_l_fein         );
+  export Xlinkext_data_l_contact        := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CONTACT          ' ,bizknames.ext_data_l_contact      );
+  export Xlinkext_data_l_url            := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_URL              ' ,bizknames.ext_data_l_url          );
+  export Xlinkext_data_l_email          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_EMAIL            ' ,bizknames.ext_data_l_email        );
+  export Xlinkext_data_l_contact_did    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CONTACT_DID      ' ,bizknames.ext_data_l_contact_did  );
+  export Xlinkext_data_l_contact_ssn    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CONTACT_SSN      ' ,bizknames.ext_data_l_contact_ssn  );
+  export Xlinkext_data_l_source         := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_SOURCE           ' ,bizknames.ext_data_l_source       );
+
   export outputkeys := 
   parallel(
      output('______________________________________________________________________________')
@@ -74,5 +93,24 @@ module
     ,output(choosen(Xlinksup_orgid               .logical ,100),named('Xlinksup_orgid'                ))
     ,output(choosen(Xlinksup_rcid                .logical ,100),named('Xlinksup_rcid'                 ))
     ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))
+
+		,output(choosen(Xlinkext_data_payload        .logical ,100),named('Xlinkext_data_payload'         ))
+    ,output(choosen(Xlinkext_data_l_cnpname      .logical ,100),named('Xlinkext_data_l_cnpname'       ))
+    ,output(choosen(Xlinkext_data_l_cnpname_zip  .logical ,100),named('Xlinkext_data_l_cnpname_zip'   ))
+    ,output(choosen(Xlinkext_data_l_cnpname_st   .logical ,100),named('Xlinkext_data_l_cnpname_st'    ))
+    ,output(choosen(Xlinkext_data_l_cnpname_fuzzy.logical ,100),named('Xlinkext_data_l_cnpname_fuzzy' ))
+    ,output(choosen(Xlinkext_data_l_address1     .logical ,100),named('Xlinkext_data_l_address1'      ))
+    ,output(choosen(Xlinkext_data_l_address2     .logical ,100),named('Xlinkext_data_l_address2'      ))
+    ,output(choosen(Xlinkext_data_l_address3     .logical ,100),named('Xlinkext_data_l_address3'      ))
+    ,output(choosen(Xlinkext_data_l_phone        .logical ,100),named('Xlinkext_data_l_phone'         ))
+    ,output(choosen(Xlinkext_data_l_sic          .logical ,100),named('Xlinkext_data_l_sic'           ))
+    ,output(choosen(Xlinkext_data_l_fein         .logical ,100),named('Xlinkext_data_l_fein'          ))
+    ,output(choosen(Xlinkext_data_l_contact      .logical ,100),named('Xlinkext_data_l_contact'       ))
+    ,output(choosen(Xlinkext_data_l_url          .logical ,100),named('Xlinkext_data_l_url'           ))
+    ,output(choosen(Xlinkext_data_l_email        .logical ,100),named('Xlinkext_data_l_email'         ))
+    ,output(choosen(Xlinkext_data_l_contact_did  .logical ,100),named('Xlinkext_data_l_contact_did'   ))
+    ,output(choosen(Xlinkext_data_l_contact_ssn  .logical ,100),named('Xlinkext_data_l_contact_ssn'   ))
+    ,output(choosen(Xlinkext_data_l_source       .logical ,100),named('Xlinkext_data_l_source'        ))
+		
   );       
 end;

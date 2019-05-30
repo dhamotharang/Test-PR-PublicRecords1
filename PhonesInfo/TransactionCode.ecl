@@ -12,5 +12,6 @@
   //Port
 	EXPORT PortAdd				:= 'PA';
 	EXPORT PortDelete			:= 'PD';
+	EXPORT PortUpdate			:= 'PU';
 
 END;

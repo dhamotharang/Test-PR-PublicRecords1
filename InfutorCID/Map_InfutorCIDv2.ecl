@@ -352,6 +352,9 @@ infutorcid.Layout_InfutorCID_Base jnTrApndHdr(INSTANTdidFile l, recordof(hdr_add
   self.append_only_glb := r.only_glb;
   self.append_addr_in_zip := r.addr_in_zip;
   self.append_prange_srange_in_zip := r.prange_srange_in_zip;
+	//CCPA-9
+	self.global_sid := 0;
+	self.record_sid := 0;
 	self := l;
 end;	
 

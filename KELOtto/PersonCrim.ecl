@@ -1,6 +1,10 @@
 ﻿IMPORT KELOtto, FraudGovPlatform;
- 
-PersonCrimPrep1 := PROJECT(FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Crim.built,
+RunKelDemo :=false:stored('RunKelDemo');
+
+FileIn := If(RunKelDemo=false,FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Crim.built
+									,FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Crim_Demo.built); 
+									
+PersonCrimPrep1 := PROJECT(FileIn,
        TRANSFORM({RECORDOF(LEFT), STRING off_cat_list}, 
                  SELF.off_cat_list :=                  
                     TRIM(LEFT.off_cat_1_1) + '|' + TRIM(LEFT.off_cat_2_1) + '|' + TRIM(LEFT.off_cat_3_1) + '|' + TRIM(LEFT.off_cat_4_1) + '|' + TRIM(LEFT.off_cat_5_1) + '|' + TRIM(LEFT.off_cat_1_2) + '|' + TRIM(LEFT.off_cat_2_2) + '|' + TRIM(LEFT.off_cat_3_2) + '|' + 

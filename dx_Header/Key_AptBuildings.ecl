@@ -1,3 +1,4 @@
+IMPORT data_services;
 IMPORT $;
 
 rec := $.layouts.i_aptbuildings;
@@ -17,5 +18,9 @@ payload := RECORD
   rec.did_cnt;
 END;
 
+fname (integer data_category) := IF (data_category = data_services.data_env.iFCRA,
+                                     $.names().i_aptbuildings_fcra,
+                                     $.names().i_aptbuildings); 
+
 EXPORT key_AptBuildings (integer data_category = 0) := 
-         INDEX (keyed_fields, payload, $.names().i_aptbuildings);
+         INDEX (keyed_fields, payload, fname(data_category));
