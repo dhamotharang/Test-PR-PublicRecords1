@@ -4,8 +4,7 @@
 
 EXPORT append(did_ds, did_field, permission_type, left_outer = 'true', use_distributed = 'false') := FUNCTIONMACRO
 
-  // ut is used in mac_join macros. mac_joins should never be called directly.
-  IMPORT ut, infutor, dx_BestRecords;
+  IMPORT infutor, dx_BestRecords;
 
   //Infutor data not included in the new key.
   LOCAL best_data := IF(permission_type = dx_BestRecords.Constants.PERM_TYPE.infutor,

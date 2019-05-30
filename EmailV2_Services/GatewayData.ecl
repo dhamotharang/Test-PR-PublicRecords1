@@ -27,10 +27,13 @@ EXPORT GatewayData := MODULE
     RETURN with_domain_status;
   END;
 
-  GetBVhistory(DATASET($.Layouts.Gateway_Data.batch_in_bv_rec) in_emails) := FUNCTION 
+  GetBVhistory(DATASET($.Layouts.email_final_rec) in_emails) := FUNCTION 
 
     prior_month_date := (STRING8) STD.Date.AdjustDate(STD.Date.Today(), 0,-1,0);
-    all_events := $.Raw.GetEventHistory(in_emails(email!=''),$.Constants.GatewayValues.SourceBV); 
+    emails_for_hist := DEDUP(PROJECT(in_emails(cleaned.clean_email!='', email_status=''), TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
+                                                        SELF.email := TRIM(LEFT.cleaned.clean_email,ALL))
+                                      ), ALL);
+    all_events := $.Raw.GetEventHistory(emails_for_hist,$.Constants.GatewayValues.SourceBV); 
 
     // for email addresses found in events key we keep only up to 1 month old data for addresses previously known to be valid
     // BV data older than 1 month need to be re-checked unless email address is invalid or domain accepts all incoming emails
@@ -39,14 +42,21 @@ EXPORT GatewayData := MODULE
     srtd_events := GROUP(SORT(latest_events, email, -date_added, email_status_reason, -email_status), email);
     // we only need 1 latest status for each email address
     top_events := TOPN(srtd_events, 1, -date_added);
-    email_events := PROJECT(UNGROUP(top_events), 
-                            TRANSFORM($.Layouts.Gateway_Data.bv_history_rec,
-                              error_desc := $.Constants.GatewayValues.get_error_desc(LEFT.error_code);
-                              SELF.email_status_reason := IF(error_desc<>'', error_desc, LEFT.email_status_reason);
-                              SELF.additional_status_info := MAP(LEFT.is_disposable_address AND LEFT.is_role_address => $.Constants.GatewayValues.RoleAddress+' / '+$.Constants.GatewayValues.DisposableAddress,
-                                                                 LEFT.is_role_address => $.Constants.GatewayValues.RoleAddress,
-                                                                 LEFT.is_disposable_address => $.Constants.GatewayValues.DisposableAddress,'');
-                              SELF := LEFT));
+    email_events := JOIN(in_emails,UNGROUP(top_events), 
+                        LEFT.cleaned.clean_email=RIGHT.email,
+                        TRANSFORM($.Layouts.email_final_rec,
+                              error_desc := $.Constants.GatewayValues.get_error_desc(RIGHT.error_code);
+                              SELF.email_status_reason := MAP(error_desc<>''=> error_desc, 
+                                                              RIGHT.email_status_reason<>'' => RIGHT.email_status_reason,
+                                                              LEFT.email_status_reason),
+                              SELF.additional_status_info := MAP(RIGHT.is_disposable_address AND RIGHT.is_role_address => $.Constants.GatewayValues.RoleAddress+' / '+$.Constants.GatewayValues.DisposableAddress,
+                                                                 RIGHT.is_role_address => $.Constants.GatewayValues.RoleAddress,
+                                                                 RIGHT.is_disposable_address => $.Constants.GatewayValues.DisposableAddress,
+                                                                 LEFT.additional_status_info),
+                              SELF.email_status := IF(RIGHT.email_status<>'', RIGHT.email_status, LEFT.email_status),
+                              SELF := LEFT),
+                              LEFT OUTER,
+                              KEEP(1), LIMIT(0));
 
     RETURN email_events;
   END;
@@ -135,9 +145,13 @@ EXPORT GatewayData := MODULE
     ds_email_in := ds_batch_in + input_only_emails;
 
     // we need to check in domain lookup first to identify invalid domains and populate status for those:
-    ds_email_all := CheckDomainStatus(ds_email_in);
+    ds_email_with_domain := CheckDomainStatus(ds_email_in);
 
-    // now we filter out emails with invalid domains or domains accepting all incoming emails as these emails won't be sent for BV verification
+    // check against historical records in keys
+    // we use all email recs where status is not identified by domain for this check
+    ds_email_all := IF(is_BV_allowed, GetBVHistory(ds_email_with_domain), ds_email_with_domain); 
+    
+    // now we filter out emails with invalid status or domains accepting all incoming emails as these emails won't be sent for BV verification GW calls
     with_domain_fltrd := ds_email_all(~$.Constants.isUndeliverableEmail(email_status)
                                        ANd ~$.Constants.isUnverifiableEmail(email_status));
 
@@ -150,25 +164,22 @@ EXPORT GatewayData := MODULE
     ds_email_srtd := $.Functions.SortResults(ds_batch_clnd, in_mod);
     ds_email_chsn := UNGROUP(TOPN(GROUP(ds_email_srtd, acctno), in_mod.MaxEmailsForDeliveryCheck, acctno));
     
-    ds_batch_ddpd := DEDUP(PROJECT(ds_email_chsn, TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
-                                                        SELF.email := TRIM(LEFT.cleaned.clean_email,ALL))
+    // we keep emails for delivery check where we have no status from domain/events lookup
+    ds_batch_ddpd := DEDUP(PROJECT(ds_email_chsn(email_status=''), 
+                           TRANSFORM($.Layouts.Gateway_Data.batch_in_bv_rec,
+                                     SELF.email := TRIM(LEFT.cleaned.clean_email,ALL))
                                       ), ALL);
                                                         
-    // TO DO: check against historical records in keys
-    bv_hist_recs := IF(is_BV_allowed, GetBVHistory(ds_batch_ddpd)); 
-    
-    ds_bv_to_check := JOIN(ds_batch_ddpd, bv_hist_recs, LEFT.email=RIGHT.email, TRANSFORM(LEFT), LEFT ONLY);
-   
     // then we check against historical records in deltabase
-    gw_deltabase_recs := IF(is_BV_allowed, GetBVDeltabase(ds_bv_to_check, in_mod.gateways)); 
+    gw_deltabase_recs := IF(is_BV_allowed, GetBVDeltabase(ds_batch_ddpd, in_mod.gateways)); 
     
-    ds_bw_gw_to_call := JOIN(ds_bv_to_check, gw_deltabase_recs, LEFT.email=RIGHT.email, TRANSFORM(LEFT), LEFT ONLY);
+    ds_bw_gw_to_call := JOIN(ds_batch_ddpd, gw_deltabase_recs, LEFT.email=RIGHT.email, TRANSFORM(LEFT), LEFT ONLY);
     
     // then we make external gateway call for remaining email recs and count royalties for them  
     gw_soapcal_recs := IF(is_BV_allowed AND EXISTS(ds_bw_gw_to_call), GetBVGatewayData(ds_bw_gw_to_call, in_mod)); 
        
     // combine all BV results back with ds_email_all  appending delivery status
-    all_gw_recs := bv_hist_recs + gw_deltabase_recs + gw_soapcal_recs.BVRecords;
+    all_gw_recs := gw_deltabase_recs + gw_soapcal_recs.BVRecords;
     
     ds_email_res := JOIN(ds_email_all, all_gw_recs, LEFT.cleaned.clean_email = RIGHT.email, 
                         TRANSFORM($.Layouts.email_final_rec,

@@ -1,5 +1,5 @@
 IMPORT doxie, dx_BestRecords;
-EXPORT get_batch_service := MACRO
+EXPORT test_get_batch_service := MACRO
   //This is a test service which iterates through all permission types for dx_BestRecords.append
   //The idea is to deploy this service with an alias before and after changes are made.
   //Then run both services with a set of dids and look for differences on the same cluster.

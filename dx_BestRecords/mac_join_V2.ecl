@@ -1,5 +1,7 @@
 //This FM supports key: dx_BestRecords.key_watchdog() and returns results based on a permissions bitmask.
 EXPORT mac_join_V2 (ds, d_field, key, use_distributed, left_outer, permission_type) := FUNCTIONMACRO
+  IMPORT ut;
+
   LOCAL out_rec := RECORD(RECORDOF(ds))
     dx_BestRecords.layout_best _best;
   END;
@@ -15,7 +17,7 @@ EXPORT mac_join_V2 (ds, d_field, key, use_distributed, left_outer, permission_ty
   #IF (use_distributed)
     LOCAL ds_res := JOIN (DISTRIBUTE (ds, hash(d_field)), DISTRIBUTE(PULL(key), hash(did)),
       ((unsigned)LEFT.d_field = RIGHT.did) AND
-      (boolean)(RIGHT.permissions & permission_type),
+      ((RIGHT.permissions & permission_type) > 0),
       _xform(LEFT, RIGHT),
       #IF (left_outer)
         LEFT OUTER,
@@ -24,8 +26,11 @@ EXPORT mac_join_V2 (ds, d_field, key, use_distributed, left_outer, permission_ty
   #ELSE
     LOCAL ds_res := JOIN (ds, key,
       KEYED((unsigned)LEFT.d_field = RIGHT.did)
-      AND (boolean)(RIGHT.permissions & permission_type),
+      AND ((RIGHT.permissions & permission_type) > 0),
       _xform(LEFT, RIGHT),
+      #IF (left_outer)
+        LEFT OUTER,
+      #END
       KEEP(1), LIMIT(0));
   #END
 
