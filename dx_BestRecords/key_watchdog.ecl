@@ -6,4 +6,4 @@ rec_key := $.layout_watchdog_merged;
 STRING lfn := data_services.data_location.prefix ('Watchdog_Best') +
   'thor_data400::key::watchdog_' + doxie.Version_SuperKey;
 
-EXPORT key_watchdog(INTEGER data_category = 0) := INDEX({rec_key.did}, rec_key-did, lfn, OPT);
+EXPORT key_watchdog(INTEGER data_category = 0) := INDEX({rec_key.did}, rec_key-did, lfn);
