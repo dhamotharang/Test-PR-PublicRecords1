@@ -143,7 +143,7 @@ EXPORT Functions := MODULE
     ds_srtd_identity := SORT(ds_batch_in, acctno, -did_score, isRoyaltySource,-date_last_seen, date_first_seen, -num_sources, -latest_orig_login_date, -process_date, num_email_per_did, email_quality_mask, record);
     ds_srtd_email := SORT(ds_batch_in, acctno, -num_sources, -date_last_seen, date_first_seen, -latest_orig_login_date, -did_score, isRoyaltySource, num_did_per_email, penalt,-process_date, email_quality_mask, record);
    
-    ds_srtd := IF($.Constants.SearchType.isEIA(in_mod.SearchType),ds_srtd_identity, ds_srtd_email);
+    ds_srtd := IF($.Constants.SearchType.isEAA(in_mod.SearchType), ds_srtd_email, ds_srtd_identity);
 
     RETURN ds_srtd;
   END;
