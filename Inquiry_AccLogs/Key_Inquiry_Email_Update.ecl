@@ -1,4 +1,4 @@
-import doxie;
+﻿import doxie;
 
 df := Inquiry_AccLogs.File_Inquiry_Base.Update(bus_intel.industry <> '' and 
 						trim(person_q.email_address) <> '' and 
@@ -11,6 +11,7 @@ slim := record
 	df.person_q;
 	df.search_info;
 	df.fraudpoint_score;
+	inquiry_acclogs.Layout.ccpaLayout ccpa;
 end;
 
 p := project(df, transform(slim, 
