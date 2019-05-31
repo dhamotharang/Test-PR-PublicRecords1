@@ -1,14 +1,14 @@
-﻿// Logic to handle the matching around UnderLinks
+﻿// Logic to handle the matching around CorteraAccounts
  
 IMPORT SALT311,std;
-EXPORT MOD_Attr_UnderLinks(DATASET(layout_LGID3) ih,UNSIGNED MatchThreshold = Config.MatchThreshold) := MODULE
-SHARED Cands := match_candidates(ih).UnderLinks_candidates;
+EXPORT MOD_Attr_CorteraAccounts(DATASET(layout_LGID3) ih,UNSIGNED MatchThreshold = Config.MatchThreshold) := MODULE
+SHARED Cands := match_candidates(ih).CorteraAccounts_candidates;
 SHARED s := Specificities(ih).Specificities[1];
  
 // Generate match candidates based upon this attribute file
  
 match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED company_inc_state_support0 = 0) := TRANSFORM
-  SELF.rule := 10000; // Signify Attribute File #0
+  SELF.rule := 10001; // Signify Attribute File #1
   SELF.LGID31 := le.LGID3;
   SELF.LGID32 := ri.LGID3;
   SELF.source_id := le.Basis;
@@ -24,14 +24,14 @@ match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED c
                         le.company_fein_isnull OR ri.company_fein_isnull => 0,
                         le.company_fein = ri.company_fein  => le.company_fein_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.company_fein_weight100,ri.company_fein_weight100),s.company_fein_switch));
-   /*HACKMOD_Attr_UnderLinks02*/ INTEGER2 Lgid3IfHrchy_score := IF ( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force * 100, Lgid3IfHrchy_score_temp,0);
+  INTEGER2 Lgid3IfHrchy_score := IF ( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force * 100, Lgid3IfHrchy_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 cnp_number_score_temp := MAP(
                         le.cnp_number_isnull OR ri.cnp_number_isnull => 0,
                         le.cnp_number = ri.cnp_number  => le.cnp_number_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.cnp_number_weight100,ri.cnp_number_weight100),s.cnp_number_switch));
-   /*HACKMOD_Attr_UnderLinks03*/ INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR ( sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force*100), cnp_number_score_temp,0);
+  INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force*100, cnp_number_score_temp, SKIP ); // Enforce FORCE parameter
   SELF.Conf_Prop := (Lgid3IfHrchy_score + sbfe_id_score + company_fein_score + cnp_number_score) / 100; // Score based on forced fields
-   /*HACKMOD_Attr_UnderLinks04*/ SELF.Conf := Config.MatchThreshold+1;
+  SELF.support_company_inc_state := ri.Basis_weight100/100;
 END;
 Matches0 := DISTRIBUTE(JOIN(Cands,Cands,LEFT.Basis = RIGHT.Basis AND LEFT.LGID3 > RIGHT.LGID3,Score(LEFT,RIGHT)),LGID31+LGID32);
  
