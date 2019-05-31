@@ -1,4 +1,4 @@
-﻿tempRec := RECORD
+﻿RecV1 := RECORD
   integer8 id;
   unsigned6 rcid;
   string2 source;
@@ -54,7 +54,7 @@
  END;
 
 EXPORT file_overlink_LGID3 :=  project(
-                                       DATASET('~thor_data400::BIPV2_BlockLink::LGID3::overlink::qa',tempRec,THOR),
+                                       DATASET('~thor_data400::BIPV2_BlockLink::LGID3::overlink::qa',RecV1,THOR),
 					              transform(BIPV2_BlockLink.ManualOverlinksLGID3.recLayout, 
 							              self            := left,
 									    self.cortera_id := ''));

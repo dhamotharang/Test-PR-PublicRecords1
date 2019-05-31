@@ -98,5 +98,5 @@ BLOCKLINK:NAMED(OverLinks):BASIS(company_name)
 
 //Underlinks
 ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):IDFIELD(LGID3):41,0
-ATTRIBUTEFILE:CorteraAccounts:NAMED(file_cortera_accounts):VALUES(account_id):IDFIELD(lgid3):27,0
+ATTRIBUTEFILE:CorteraAccounts:NAMED(file_cortera_accounts):VALUES(account_id):IDFIELD(lgid3):SUPPORTS(company_inc_state):27,0
 

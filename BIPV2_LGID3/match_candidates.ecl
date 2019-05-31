@@ -103,8 +103,8 @@ layout_withpropvars take_company_inc_state(with_props le,company_inc_state_props
   SELF := le;
   END;
 SHARED pj11 := JOIN(pj8,company_inc_state_props,left.LGID3=right.LGID3,take_company_inc_state(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/);
-/*HACKmatch_candidates01*/ SHARED UnderLinks_prop7 := JOIN(UnderLinks_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER, LOCAL);
-/*HACKmatch_candidates04*/ SHARED CorteraAccounts_prop7 := JOIN(CorteraAccounts_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER, LOCAL);
+SHARED UnderLinks_prop7 := JOIN(UnderLinks_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+SHARED CorteraAccounts_prop7 := JOIN(CorteraAccounts_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(company_charter_number NOT IN SET(s.nulls_company_charter_number,company_charter_number)),company_charter_number,LGID3,company_charter_number_props); // For every DID find the best FULL company_charter_number
 layout_withpropvars take_company_charter_number(with_props le,company_charter_number_props ri) := TRANSFORM
@@ -166,6 +166,7 @@ EXPORT Layout_Matches := RECORD//in this module for because of ,foward bug
 END;
 EXPORT Layout_Attribute_Matches := RECORD(layout_matches),MAXLENGTH(32000)
   SALT311.StrType source_id;
+  UNSIGNED2 support_company_inc_state := 0; // Add support (either external of field) for company_inc_state
 END;
 EXPORT Layout_UnderLinks_Candidates := RECORD
   {UnderLinks_prp};
