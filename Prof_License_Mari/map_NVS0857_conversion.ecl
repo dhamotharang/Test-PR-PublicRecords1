@@ -66,7 +66,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 																	                    
 
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base 		xformToCommon(Prof_License_Mari.layout_NVS0857 pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in 		xformToCommon(Prof_License_Mari.layout_NVS0857 pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -84,30 +84,30 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 		//Standardize Fields
 		//Check the length of org name to fix a typo in vendor provided file
 		TrimNAME_ORG					:= IF(LENGTH(pInput.ORG_NAME)=1,
-																Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.OFFICENAME),
-																Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ORG_NAME));
-		TrimNAME_OFFICE				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.OFFICENAME);
-		TrimAddress1					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1_1);
-		TrimCity 							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY_1);
+																ut.CleanSpacesAndUpper(pInput.OFFICENAME),
+																ut.CleanSpacesAndUpper(pInput.ORG_NAME));
+		TrimNAME_OFFICE				:= ut.CleanSpacesAndUpper(pInput.OFFICENAME);
+		TrimAddress1					:= ut.CleanSpacesAndUpper(pInput.ADDRESS1_1);
+		TrimCity 							:= ut.CleanSpacesAndUpper(pInput.CITY_1);
 			
 				
 		// License Information
 		SELF.TYPE_CD					:= 'MD';
 		SELF.LICENSE_NBR	  	:= pInput.SLNUM;
 		SELF.LICENSE_STATE	 	:= src_st;
-		tmpLIC_TYPE := MAP(REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)) 
-		                   => REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),1),
-											 REGEXFIND('(^[A-z]+)[\\.]([0-9]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM))
-		                    =>REGEXFIND('(^[A-z]+)[\\.]([0-9]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),1),
-											 REGEXFIND('A[\\.]([0-9]+)[\\-]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM))
-		                    =>REGEXFIND('A[\\.]([0-9]+)[\\-]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),2),
-											 REGEXFIND('A[\\.]([0-9]+)[\\.]([A-z]+)[\\-]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)) //A.0206899.CG-CG
-		                    =>REGEXFIND('A[\\.]([0-9]+)[\\.]([A-z]+)[\\-]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),3),
-											 REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.](.+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)) //BS.0032399.PC MGR, BUSB.0000114.-BKR
-		                    =>REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.](.+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),1),
-											 REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)) //BS.0032399.PC MGR, BUSB.0000114.-BKR
-		                    =>REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),1),
-											 Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)
+		tmpLIC_TYPE := MAP(REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM)) 
+		                   => REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),1),
+											 REGEXFIND('(^[A-z]+)[\\.]([0-9]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM))
+		                    =>REGEXFIND('(^[A-z]+)[\\.]([0-9]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),1),
+											 REGEXFIND('A[\\.]([0-9]+)[\\-]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM))
+		                    =>REGEXFIND('A[\\.]([0-9]+)[\\-]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),2),
+											 REGEXFIND('A[\\.]([0-9]+)[\\.]([A-z]+)[\\-]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM)) //A.0206899.CG-CG
+		                    =>REGEXFIND('A[\\.]([0-9]+)[\\.]([A-z]+)[\\-]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),3),
+											 REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.](.+$)',ut.CleanSpacesAndUpper(pInput.SLNUM)) //BS.0032399.PC MGR, BUSB.0000114.-BKR
+		                    =>REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.](.+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),1),
+											 REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM)) //BS.0032399.PC MGR, BUSB.0000114.-BKR
+		                    =>REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',ut.CleanSpacesAndUpper(pInput.SLNUM),1),
+											 ut.CleanSpacesAndUpper(pInput.SLNUM)
 		                  );
 		SELF.RAW_LICENSE_TYPE	:= tmpLIC_TYPE;
 		SELF.STD_LICENSE_TYPE := CASE(TRIM(SELF.RAW_LICENSE_TYPE), 'B' => 'BK',
@@ -220,10 +220,10 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 																StringLib.StringCleanSpaces(tmpADDR_ADDR1_1));	
 		SELF.ADDR_ADDR2_1			:= IF(AddrWithContact != '','',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1)); 
 		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),TrimCity);
-		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE_1));
+		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),ut.CleanSpacesAndUpper(pInput.STATE_1));
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),tmpZip[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
-  	SELF.ADDR_CNTY_1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COUNTY);
+  	SELF.ADDR_CNTY_1			:= ut.CleanSpacesAndUpper(pInput.COUNTY);
 
 		//Expected codes [CO,BR,IN], Set during business/individual filter
 		SELF.AFFIL_TYPE_CD		:= MAP(SELF.TYPE_CD = 'MD' => 'IN',
@@ -235,9 +235,9 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 																		+TRIM(SELF.std_license_type,LEFT,RIGHT)
 																		+TRIM(SELF.std_source_upd,LEFT,RIGHT)
 																		+TRIM(SELF.NAME_ORG,LEFT,RIGHT)
-																		+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1_1)
-																		+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY_1)
-																		+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP));																	
+																		+ut.CleanSpacesAndUpper(pInput.ADDRESS1_1)
+																		+ut.CleanSpacesAndUpper(pInput.CITY_1)
+																		+ut.CleanSpacesAndUpper(pInput.ZIP));																	
 																										 
 		SELF.PCMC_SLPK				:= 0;
 		SELF := [];	
@@ -247,7 +247,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(GoodNameRec,xformToCommon(LEFT));
 
 	//Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS :=  StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));														
 		SELF := L;
 	END;
@@ -259,7 +259,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 
 
   //Populate STD_PROF_CD field via translation on license type field
-  Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
+  Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := TRANSFORM
 	 SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 	 SELF := L;
   END;
@@ -272,7 +272,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 		
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(ds_map_lic_trans L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(ds_map_lic_trans L) := TRANSFORM
 		SELF.NAME_OFFICE		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
 		SELF.NAME_MARI_ORG	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));
 		SELF.ADDR_ADDR1_1		:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.ADDR_ADDR1_1));

@@ -4,7 +4,7 @@
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, NID;
 
 EXPORT map_RIS0811_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Yogurt:Prof License MARI- RIS0811   ' + pVersion);
 	code 								:= 'RIS0811';
 	src_cd							:= code[3..7];
 	src_st							:= code[1..2];	//License state
@@ -54,7 +54,7 @@ EXPORT map_RIS0811_conversion(STRING pVersion) := FUNCTION
 															);
   ut.CleanFields(GoodNameRec,ClnNameRec);
  	//Map Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(rLayout_License pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(rLayout_License pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -272,7 +272,7 @@ EXPORT map_RIS0811_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(ClnNameRec,xformToCommon(LEFT));
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(inFileLic L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type(inFileLic L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 		SELF := L;
 	END;
@@ -286,7 +286,7 @@ EXPORT map_RIS0811_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(ds_map_lic_trans L) := transform
+	Prof_License_Mari.layout_base_in xTransToBase(ds_map_lic_trans L) := transform
 		SELF.NAME_ORG_SUFX 	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, ' ');
 		SELF.NAME_OFFICE		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
 		SELF.NAME_MARI_ORG	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));
