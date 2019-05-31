@@ -1,4 +1,4 @@
-import bipv2_proxid,tools;
+﻿import bipv2_proxid,tools;
 EXPORT AggregateProxidElements(
 	  pDataset
    ,pID                         = 'proxid'
@@ -61,7 +61,7 @@ functionmacro
 
     self.sbfe_id           := if(mdr.sourcetools.SourceIsBusiness_Credit(left.source),left.vl_id ,'');
     self.source            :=                                 left.source + '- ' + trim(mdr.sourceTools.translatesource(left.source));
-    self.cnp_name          :=                                 left.source + '- ' + trim(left.cnp_name                               );
+    self.cnp_name          :=                                 left.source + '- ' + trim(left.ingest_status) + '- '+ trim(left.cnp_name                               );
     self.vl_id             := if(trim(left.vl_id)      != '' ,left.source + '- ' + trim(left.vl_id                                  ) ,'');
     self.source_record_id  := if(left.source_record_id != 0  ,left.source + '- ' + trim((string)left.source_record_id               ) ,'');
     self.cnp_name_raw      := left.cnp_name;

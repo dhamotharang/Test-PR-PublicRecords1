@@ -86,6 +86,18 @@ EXPORT CommonBase := MODULE
 	EXPORT DS_LOCAL_CLEAN           := clean(DS_LOCAL         );
 	EXPORT DS_LOCAL_STATIC_CLEAN    := clean(DS_LOCAL_STATIC  );
 	
+	EXPORT clean2(ds) := FUNCTIONMACRO
+		IMPORT Bipv2_Suppression;
+		ds_exorcise := ds(ingest_status<>'Old'); // Exorcise all ghosts, which _can_ remove cluster base records!
+		ds_exclude  := ds_exorcise(BIPV2.mod_sources.srcInBase(source));
+		ds_suppress := Bipv2_Suppression.suppressClean(ds_exclude);
+		RETURN ds_suppress;
+	ENDMACRO;
+
+	EXPORT DS_CLEAN2                 := clean2(DS_BUILT         );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
+	EXPORT DS_CLEAN2_BASE            := clean2(DS_BASE          );//USED OUTSIDE OF THE BUILD  
+	EXPORT DS_FATHER_CLEAN2          := clean2(DS_FATHER        );
+
 	EXPORT xlink(ds) := FUNCTIONMACRO
 		IMPORT Suppress;
 		ds_exorcise := ds(ingest_status<>'Old'); // Exorcise all ghosts, which _can_ remove cluster base records!

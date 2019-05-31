@@ -33,7 +33,7 @@ Tools.fun_DeleteFiles(
 ////////////////////////////////////////////////////////////////////////////
 #option ('globalAutoHoist', false);	// added because of bug 28526
 #option('maxLength', 131072); 				// have to increase for the remote directory child datasets
-import ut,wk_ut,WsDFU;
+import ut,wk_ut,WsDFU,std;
 
 export fun_DeleteFiles(
 	 string			pOwner							= ''		// regex to filter the file owner
@@ -57,24 +57,43 @@ function
   
   file_list          := wk_ut.get_DFUQuery(,pCluster,pOwner := lowner,pFirstN := 300000).largest;  //hack
 
-	file_list2				 := fileservices.LogicalFileList(includenormal := pIncludeNormalFiles,includesuper := pIncludeSuperFiles);
+	file_list2				 := STD.File.LogicalFileList(includenormal := pIncludeNormalFiles,includesuper := pIncludeSuperFiles);
 	
-	owner_filter						:= if(pOwner 				!= '', regexfind(pOwner			, file_list.owner		    , nocase), true);
-	filename_filter					:= if(pFilename			!= '', regexfind(pFilename	, file_list.name		    , nocase), true);
-	cluster_filter					:= if(pCluster			!= '', regexfind(pCluster		, file_list.ClusterName	, nocase), true);
-	modified_filter					:= if(pModified			!= '', regexfind(pModified	, file_list.modified    , nocase), true);
-	size_filter							:= if(pSizeMinimum	!= 0 , file_list.longsize >= pSizeMinimum						, true);
-	size_max_filter				  := if(pSizeMaximum	!= 0 , file_list.longsize <= pSizeMaximum						, true);
+	// owner_filter						:= if(pOwner 				!= '', regexfind(pOwner			, file_list.owner		    , nocase), true);
+	// filename_filter					:= if(pFilename			!= '', regexfind(pFilename	, file_list.name		    , nocase), true);
+	// cluster_filter					:= if(pCluster			!= '', regexfind(pCluster		, file_list.ClusterName	, nocase), true);
+	// modified_filter					:= if(pModified			!= '', regexfind(pModified	, file_list.modified    , nocase), true);
+	// size_filter							:= if(pSizeMinimum	!= 0 , file_list.longsize >= pSizeMinimum						, true);
+	// size_max_filter				  := if(pSizeMaximum	!= 0 , file_list.longsize <= pSizeMaximum						, true);
 	
-	myfile_list1							:= file_list(owner_filter
+	// myfile_list1							:= file_list(owner_filter
+																			// ,filename_filter
+																			// ,cluster_filter
+																			// ,modified_filter
+																			// ,size_filter
+                                      // ,size_max_filter
+																			// );
+  //get uncompressed file size
+  // myfile_list             := join(myfile_list1,file_list2 ,left.name = right.name,transform(recordof(left),self.longsize := right.size,self.realsize := if(left.realsize = 0,right.size,left.realsize),self := right,self := left),hash,right outer);
+
+	owner_filter						:= if(pOwner 				!= '', regexfind(pOwner			, file_list2.owner		    , nocase), true);
+	filename_filter					:= if(pFilename			!= '', regexfind(pFilename	, file_list2.name		    , nocase), true);
+	// cluster_filter					:= if(pCluster			!= '', regexfind(pCluster		, file_list2.ClusterName	, nocase), true); //need this
+	modified_filter					:= if(pModified			!= '', regexfind(pModified	, file_list2.modified    , nocase), true);  
+	size_filter							:= if(pSizeMinimum	!= 0 , file_list2.size >= pSizeMinimum						, true);
+	size_max_filter				  := if(pSizeMaximum	!= 0 , file_list2.size <= pSizeMaximum						, true);
+
+	myfile_list2_filtered							:= file_list2(owner_filter
 																			,filename_filter
-																			,cluster_filter
+																			// ,cluster_filter
 																			,modified_filter
 																			,size_filter
                                       ,size_max_filter
 																			);
-  //get uncompressed file size
-  myfile_list             := join(myfile_list1,file_list2 ,left.name = right.name,transform(recordof(left),self.longsize := right.size,self.realsize := if(left.realsize = 0,right.size,left.realsize),self := left),hash);
+
+  myfile_list             := project(myfile_list2_filtered ,transform({recordof(left),string ClusterName,integer8 longsize,integer8 realsize},self.ClusterName := STD.File.GetLogicalFileAttribute('~' + trim(left.name),'clusterName'),self.longsize := left.size,self.realsize := left.size,self := left))
+  (pCluster			= '' or  regexfind(pCluster		,ClusterName	, nocase)) 
+  : independent;
                                       
 	myfile_list_notinsupers := myfile_list(fileservices.fileexists('~' + name), pIncludeSubfiles or count(fileservices.LogicalFileSuperOwners('~' + name)) = 0) ;	
   
