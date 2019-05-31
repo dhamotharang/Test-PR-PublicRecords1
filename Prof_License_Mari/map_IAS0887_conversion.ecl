@@ -48,7 +48,7 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 	ValidFile	    	:= rle_preClean(TRIM(full_name,LEFT,RIGHT)+TRIM(last_Name,left,right) != ' ');
 
 	//raw to MARIBASE layout
-	Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.Layout_IAS0887.common pInput) :=TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(Prof_License_Mari.Layout_IAS0887.common pInput) :=TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -317,7 +317,7 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ValidFile, transformToCommon(LEFT));
 
 	// Clean-up Fields
-	Prof_License_Mari.layouts.base	transformClean(ds_map pInput) :=TRANSFORM
+	Prof_License_Mari.layout_base_in	transformClean(ds_map pInput) :=TRANSFORM
 			SELF.ADDR_ADDR1_1		:= MAP(StringLib.stringfind(pInput.ADDR_ADDR1_1,'.',1) > 0 => StringLib.StringFilterOut(pInput.ADDR_ADDR1_1, '.'),
 											 StringLib.stringfind(pInput.ADDR_ADDR1_1,',',1) > 0 => StringLib.StringFilterOut(pInput.ADDR_ADDR1_1, ','),
 											 StringLib.stringfind(pInput.ADDR_ADDR1_1,'#',1) > 0 => StringLib.StringFilterOut(pInput.ADDR_ADDR1_1, '#'),	
@@ -338,7 +338,7 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 							   
 	//Skip county id to name conversion because the result is not consistant with what vendor provided in previous updates and
 	// Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-	Prof_License_Mari.layouts.base trans_lic_status(ds_map_clean L, Cmvtranslation R) :=TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(ds_map_clean L, Cmvtranslation R) :=TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -351,7 +351,7 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) :=TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) :=TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -366,7 +366,7 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) :=TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) :=TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;
@@ -378,7 +378,7 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 							AND LEFT.AFFIL_TYPE_CD IN ['IN', 'BR'],
 							assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'This is not a main office.  It is a branch office without an associated main office from this source.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

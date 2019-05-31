@@ -1,4 +1,4 @@
-// Purpose : map IDS0658 / Idaho Dept of Finance / Multiple Professions // raw data to common layout for MARI and PL use
+﻿// Purpose : map IDS0658 / Idaho Dept of Finance / Multiple Professions // raw data to common layout for MARI and PL use
 //Source file location - \\Tapeload02b\k\professional_licenses\mari\id\idaho_mortgage_lenders_(en)\
 IMPORT Prof_License, Prof_License_Mari, Address, Lib_FileServices, lib_stringlib,ut;
 
@@ -45,7 +45,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 	ut.CleanFields(ValidFile,clnValidFile);
 
 	maribase_plus_dbas := RECORD,MAXLENGTH(5200)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba;
 		STRING60 dba1;
 		STRING60 dba2;
@@ -72,14 +72,14 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 
 		SELF.TYPE_CD      		:= 'GR';
 
-		tempLicNum           	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.license_number);
+		tempLicNum           	:= ut.CleanSpacesAndUpper(pInput.license_number);
 		SELF.LICENSE_NBR	   	:= tempLicNum;
 		// initialize office license number
-		tempOffSlnum 					:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.home_office_numr);
+		tempOffSlnum 					:= ut.CleanSpacesAndUpper(pInput.home_office_numr);
 		SELF.OFF_LICENSE_NBR 	:= tempOffSlnum;
 		
 		// initialize raw_license_type from raw data
-		tempRawType 					:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.company_type);										 
+		tempRawType 					:= ut.CleanSpacesAndUpper(pInput.company_type);										 
 		SELF.RAW_LICENSE_TYPE := tempRawType;
 																																				
 		// map raw license type to standard license type before profcode translations
@@ -113,7 +113,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 		// 2.) Handle AKA Names to First, Middle Last Format
 		// 3.) Standardized corporation suffixes
 
-		tempTrimName					:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.company_name);
+		tempTrimName					:= ut.CleanSpacesAndUpper(pInput.company_name);
 		prepNAME_ORG    			:= tempTrimName;						
 		StdNAME_ORG						:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(prepNAME_ORG);
 		mariParse							:= IF(REGEXFIND('^[A-Z]+, ',tempTrimName) AND NOT REGEXFIND('^.* INC[.]?$|^.*, LLC$',tempTrimName),'MD','GR');
@@ -153,7 +153,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 		
 		// assign mari_org with semi-clean name data per business rules
 		SELF.NAME_MARI_ORG		:= StdNAME_ORG; 
-		SELF.NAME_DBA_ORIG    := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(TRIM(pInput.DBA,LEFT,RIGHT));
+		SELF.NAME_DBA_ORIG    := ut.CleanSpacesAndUpper(TRIM(pInput.DBA,LEFT,RIGHT));
 					 
 
 		//Use address cleaner to clean address
@@ -166,9 +166,9 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 					 '^.* BUILDING$|^.* LAKE RESORT$|ATTN LICENSING' +
 					 ')';
 
-    trimAddress1        	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STREET_ADDR);
-		trimCity							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.CITY);
-		trimState							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STATE);
+    trimAddress1        	:= ut.CleanSpacesAndUpper(pInput.STREET_ADDR);
+		trimCity							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		trimState							:= ut.CleanSpacesAndUpper(pInput.STATE);
 		tmpZip	            	:= MAP(LENGTH(TRIM(pInput.ZIP))=3 => '00'+TRIM(pInput.ZIP),
 																 LENGTH(TRIM(pInput.ZIP))=4 => '0'+TRIM(pInput.ZIP),
 																 TRIM(pInput.ZIP));
@@ -204,7 +204,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 		SELF.PHN_MARI_FAX_1 	:= ut.CleanPhone(pInput.FAX);				
 						
 		// Business rules to parse contacts							   
-		prepContact						:= Prof_License_Mari.mod_clean_name_addr.trimupper(pInput.attention);
+		prepContact						:= ut.CleanSpacesAndUpper(pInput.attention);
 		stripTitle						:= MAP(StringLib.stringfind(prepContact,'RECEIVER',1)>0 => StringLib.StringFindReplace(prepContact,'RECEIVER',''),
 																 StringLib.stringfind(prepContact,'CONSERVATOR',1)>0 => StringLib.StringFindReplace(prepContact,'CONSERVATOR',''),
 																 StringLib.stringfind(prepContact,'BROKER',1)>0 => StringLib.StringFindReplace(prepContact,'BROKER',''),
@@ -235,7 +235,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 								
 		// Business rules to standardize DBA(s) for splitting into multiple records
 		// Populate if DBA exist in ORG_NAME field
-		trimDBA       				:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.DBA);
+		trimDBA       				:= ut.CleanSpacesAndUpper(pInput.DBA);
 		tempDBA1      				:= IF(trimDBA=tempTrimName,'',trimDBA);
 		tempDBA2      				:= stringlib.stringfindreplace(tempDBA1,';','/');
 		tempDBA3      				:= stringlib.stringfindreplace(tempDBA2,'AND/OR','/');
@@ -295,9 +295,9 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 		mltreckeyHash 				:= HASH64(TRIM(tempLicNum,LEFT,RIGHT) 
 																	 +TRIM(tempStdLicType,LEFT,RIGHT)
 																	 +TRIM(src_cd,LEFT,RIGHT)
-																	 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(tempTrimName)
-																	 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STREET_ADDR)
-																	 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StripDBA)); 		
+																	 +ut.CleanSpacesAndUpper(tempTrimName)
+																	 +ut.CleanSpacesAndUpper(pInput.STREET_ADDR)
+																	 +ut.CleanSpacesAndUpper(StripDBA)); 		
 		SELF.mltreckey 				:= IF(SELF.DBA1 != ' ',mltreckeyHash, 0);
 				
 		// fields used to create unique key are:
@@ -309,9 +309,9 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 		SELF.cmc_slpk         := hash64(trim(tempLicNum,LEFT,RIGHT) 
 																	 +trim(tempStdLicType,LEFT,RIGHT)
 																	 +trim(src_cd,LEFT,RIGHT)
-																	 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(tempTrimName)
-																	 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STREET_ADDR)
-																	 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ZIP)
+																	 +ut.CleanSpacesAndUpper(tempTrimName)
+																	 +ut.CleanSpacesAndUpper(pInput.STREET_ADDR)
+																	 +ut.CleanSpacesAndUpper(pInput.ZIP)
 																	 );
 		SELF := [];		 
 				
@@ -376,7 +376,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 		SELF.NAME_ORG_SUFX	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, '.');
 		TrimDBASufx1				:= MAP(REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => StringLib.StringFindReplace(L.TMP_DBA,'CO',''),
 														   NOT REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanFName(L.TMP_DBA), 
@@ -402,7 +402,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;
@@ -412,7 +412,7 @@ EXPORT map_IDS0658_conversion(STRING pVersion) := FUNCTION
 							AND LEFT.AFFIL_TYPE_CD IN ['IN', 'BR'],
 							assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'THIS IS NOT A MAIN OFFICE.  IT IS A BRANCH OFFICE WITHOUT AN ASSOCIATED MAIN OFFICE FROM THIS SOURCE.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
