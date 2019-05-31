@@ -1,4 +1,4 @@
-﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV_Segmentation;
+﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV2_Segmentation;
 EXPORT proc_segmentation(
    string                            pversion
   ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_BUILT
@@ -582,7 +582,7 @@ module
          output(pToday                                      ,named('IngestDate'   ))
         ,output(pversion                                    ,named('BuildDate'    ))
         ,output(BIPV2.KeySuffix_mod2.MostRecentSprintNumber ,named('SprintNumber' ))
-        ,evaluate(build_seg_file)
+        ,evaluate(build_seg_file(pversion))
         , output_segs_fixed_filtered
         , email_executive_dashboard
         , goldSELEV2
