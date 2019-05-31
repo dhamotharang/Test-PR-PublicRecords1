@@ -302,7 +302,7 @@ naics_code_base                 := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.
 dba_base                        := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.dba_name_case_layout) dba_name;};
 //****************Denormalize name
 company_name_flat_ded := DEDUP(SORT(DISTRIBUTE(company_name_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-company_name_grp      := GROUP(SORT(DISTRIBUTE(company_name_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+company_name_grp      := SORT(DISTRIBUTE(company_name_flat,HASH(linkid)),linkid,LOCAL);
 company_name_base t_name_denorm(company_name_grp le,DATASET(RECORDOF(company_name_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.company_name_case_layout t_name(company_name_grp le,DATASET(RECORDOF(company_name_grp)) ri) := TRANSFORM
     BIPV2_Best.Layouts.Source t_sources_name (company_name_grp le) := TRANSFORM
@@ -319,7 +319,7 @@ end;
 name_denorm := DENORMALIZE(company_name_flat_ded,company_name_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_name_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize DBA
 dba_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_dba,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-dba_grp      := GROUP(SORT(DISTRIBUTE(norm_dba,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+dba_grp      := SORT(DISTRIBUTE(norm_dba,HASH(linkid)),linkid,LOCAL);
 dba_base t_dba_denorm(dba_grp le,DATASET(RECORDOF(dba_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.dba_name_case_layout t_dba(dba_grp le,DATASET(RECORDOF(dba_grp)) ri) := TRANSFORM 
     SELF := le;
@@ -330,7 +330,7 @@ end;
 dba_denorm := DENORMALIZE(dba_flat_ded,dba_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_dba_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize Address
 company_address_flat_ded := DEDUP(SORT(DISTRIBUTE(company_address_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-company_address_grp      := GROUP(SORT(DISTRIBUTE(company_address_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+company_address_grp      := SORT(DISTRIBUTE(company_address_flat,HASH(linkid)),linkid,LOCAL);
 company_address_base t_address_denorm(company_address_grp le,DATASET(RECORDOF(company_address_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.company_address_case_layout t_address (company_address_grp le,DATASET(RECORDOF(company_address_grp)) ri) := TRANSFORM
     SELF.company_prim_range := TRIM(le.address_prim_range,LEFT,RIGHT);
@@ -364,7 +364,7 @@ end;
 address_denorm := DENORMALIZE(company_address_flat_ded,company_address_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_address_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize Phone
 company_phone_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_phone,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-company_phone_grp      := GROUP(SORT(DISTRIBUTE(norm_phone,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+company_phone_grp      := SORT(DISTRIBUTE(norm_phone,HASH(linkid)),linkid,LOCAL);
 company_phone_base t_phone_denorm(company_phone_grp le,DATASET(RECORDOF(company_phone_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.company_phone_case_layout t_phone(company_phone_grp le,DATASET(RECORDOF(company_phone_grp)) ri) := TRANSFORM
     SELF := le;
@@ -375,7 +375,7 @@ END;
 phone_denorm := DENORMALIZE(company_phone_flat_ded,company_phone_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_phone_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize Fein
 company_fein_flat_ded := DEDUP(SORT(DISTRIBUTE(company_fein_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-company_fein_grp      := GROUP(SORT(DISTRIBUTE(company_fein_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+company_fein_grp      := SORT(DISTRIBUTE(company_fein_flat,HASH(linkid)),linkid,LOCAL);
 company_fein_base t_fein_denorm(company_fein_grp le,DATASET(RECORDOF(company_fein_grp)) ri) := transform
   BIPV2_Best.Layouts.company_fein_case_layout t_fein(company_fein_grp le,DATASET(RECORDOF(company_fein_grp)) ri) := TRANSFORM
     BIPV2_Best.Layouts.Source t_sources_fein(company_fein_grp le) := transform
@@ -392,7 +392,7 @@ end;
 fein_denorm := DENORMALIZE(company_fein_flat_ded,company_fein_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_fein_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize URL
 company_url_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_url,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-company_url_grp      := GROUP(SORT(DISTRIBUTE(norm_url,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+company_url_grp      := SORT(DISTRIBUTE(norm_url,HASH(linkid)),linkid,LOCAL);
 company_url_base t_url_denorm(company_url_grp le, DATASET(RECORDOF(company_url_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.company_url_case_layout t_url(company_url_grp le,DATASET(RECORDOF(company_url_grp)) ri) := TRANSFORM
     SELF.company_url := TRIM(le.company_url,LEFT,RIGHT);
@@ -404,7 +404,7 @@ end;
 url_denorm := DENORMALIZE(company_url_flat_ded,company_url_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_url_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize Incorporaton Date
 company_inc_date_flat_ded := DEDUP(SORT(DISTRIBUTE(company_inc_date_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-company_inc_date_grp      := GROUP(SORT(DISTRIBUTE(company_inc_date_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+company_inc_date_grp      := SORT(DISTRIBUTE(company_inc_date_flat,HASH(linkid)),linkid,LOCAL);
 company_incorporation_date_base t_inc_date_denorm(company_inc_date_grp le,DATASET(RECORDOF(company_inc_date_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.company_incorporation_date_layout t_inc_date(company_inc_date_grp le,DATASET(RECORDOF(company_inc_date_grp)) ri) := transform
     BIPV2_Best.Layouts.Source t_sources_inc_date (company_inc_date_grp le) := TRANSFORM
@@ -421,7 +421,7 @@ END;
 inc_date_denorm := DENORMALIZE(company_inc_date_flat_ded,company_inc_date_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_inc_date_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize duns Number
 duns_number_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_duns,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-duns_number_grp      := GROUP(SORT(DISTRIBUTE(norm_duns,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+duns_number_grp      := SORT(DISTRIBUTE(norm_duns,HASH(linkid)),linkid,LOCAL);
 company_duns_number_base t_duns_denorm(duns_number_grp le,DATASET(RECORDOF(duns_number_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.duns_number_case_layout t_duns(duns_number_grp le,DATASET(RECORDOF(duns_number_grp)) ri) := TRANSFORM
     SELF := le;
@@ -432,7 +432,7 @@ end;
 duns_denorm := DENORMALIZE(duns_number_flat_ded,duns_number_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_duns_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize SIC code
 sic_code_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_sic,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-sic_code_grp      := GROUP(SORT(DISTRIBUTE(norm_sic,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+sic_code_grp      := SORT(DISTRIBUTE(norm_sic,HASH(linkid)),linkid,LOCAL);
 sic_code_base t_sic_denorm(sic_code_grp le,DATASET(RECORDOF(sic_code_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.sic_code_case_layout t_sic(sic_code_grp le,DATASET(RECORDOF(sic_code_grp)) ri) := TRANSFORM
     SELF := le;
@@ -443,7 +443,7 @@ end;
 sic_denorm := DENORMALIZE(sic_code_flat_ded,sic_code_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_sic_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize NAICS code
 naics_code_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_naics,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
-naics_code_grp      := GROUP(SORT(DISTRIBUTE(norm_naics,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+naics_code_grp      := SORT(DISTRIBUTE(norm_naics,HASH(linkid)),linkid,LOCAL);
 naics_code_base t_naics_denorm(naics_code_grp le,DATASET(RECORDOF(naics_code_grp)) ri) := TRANSFORM
   BIPV2_Best.Layouts.naics_code_case_layout t_naics(naics_code_grp le,DATASET(RECORDOF(naics_code_grp)) ri) := TRANSFORM
     SELF := le;
