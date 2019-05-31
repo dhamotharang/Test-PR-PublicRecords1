@@ -64,8 +64,8 @@ EXPORT CommonBase := MODULE
 	
   // -- Allow specific versions to be accessed directly(logical files)
   import tools;
-  export Common_Base        (string pversion = '') := tools.macf_FilesBase(BIPV2.Filenames(pversion).Common_Base ,Layout       );
-  export Common_Base_Static (string pversion = '') := tools.macf_FilesBase(BIPV2.Filenames(pversion).Common_Base ,Layout_Static);
+  export Common_Base        (string pversion = '',boolean	pUseOtherEnvironment	= false) := tools.macf_FilesBase(BIPV2.Filenames(pversion,pUseOtherEnvironment).Common_Base ,Layout       );
+  export Common_Base_Static (string pversion = '',boolean	pUseOtherEnvironment	= false) := tools.macf_FilesBase(BIPV2.Filenames(pversion,pUseOtherEnvironment).Common_Base ,Layout_Static);
 	
 	// Apply any necessary post-processing to the header, before things like XLink pick it up
 	EXPORT clean(ds) := FUNCTIONMACRO

@@ -6,6 +6,7 @@ EXPORT AggregateProxidElements(
    ,pPrepend_Source_to_Address  = 'true'
    ,pPrepend_Source_to_Phone    = 'true'
    ,pAddDotid                   = 'false'
+   ,pOnlyPassedInID             = 'false'
 ) :=
 functionmacro
 
@@ -24,21 +25,22 @@ functionmacro
     ,pDataset.dotid
    #END
 
-   #IF(#TEXT(pID) not in ['proxid'])
-    ,pDataset.proxid
-   #END
-
-   #IF(#TEXT(pID) not in ['lgid3'])
-    ,pDataset.lgid3
-   #END
-   #IF(#TEXT(pID) not in ['seleid'])
-    ,pDataset.seleid
-   #END
-   #IF(#TEXT(pID) not in ['orgid'])
-    ,pDataset.orgid
-   #END
-   #IF(#TEXT(pID) not in ['ultid'])
-    ,pDataset.ultid
+   #IF(pOnlyPassedInID = false)
+     #IF(#TEXT(pID) not in ['proxid'])
+      ,pDataset.proxid
+     #END
+     #IF(#TEXT(pID) not in ['lgid3'])
+      ,pDataset.lgid3
+     #END
+     #IF(#TEXT(pID) not in ['seleid'])
+      ,pDataset.seleid
+     #END
+     #IF(#TEXT(pID) not in ['orgid'])
+      ,pDataset.orgid
+     #END
+     #IF(#TEXT(pID) not in ['ultid'])
+      ,pDataset.ultid
+     #END
    #END
   ,pDataset.cnp_name
   ,string cnp_name_raw
