@@ -7,21 +7,21 @@ EXPORT Spray_UpdateFile(STRING filedate, STRING	pServerIP	= _control.IPAddress.b
 																															 // _control.IPAddress.bctlpedata11)) := MODULE
 
 #workunit('name','Spray BKForeclosure Update File');
-
-SHARED filepath_nod  := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Update/NOD/';
-SHARED filepath_reo  := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Update/REO/';
+SHARED version := STD.Date.AdjustDate((integer)filedate,,,-1); //Folder date is a day after version date
+SHARED filepath_nod  := '/data/data_build_2/property/ln/epic/bk/foreclosure/data/' +(string)filedate+'/Managed_Update/NOD' +(string)version+ '/';
+SHARED filepath_reo  := '/data/data_build_2/property/ln/epic/bk/foreclosure/data/' +(string)filedate+'/Managed_Update/REO' +(string)version+ '/';
 SHARED group_name	   := STD.System.Thorlib.Group ( );
 SHARED fn_nod        := '*_NOD_Update_*.txt';
 SHARED fn_reo        := '*_REO_Update_*.txt';
 SHARED maxRecordSize := 8192;
 
 //Sprayed raw files
-SHARED dst_nod_raw   := '~thor_data400::in::BKForeclosure::Update_Nod::' + filedate + '::raw';
-SHARED dst_reo_raw   := '~thor_data400::in::BKForeclosure::Update_Reo::' + filedate + '::raw';
+SHARED dst_nod_raw   := '~thor_data400::in::BKForeclosure::Update_Nod::' + (string)version + '::raw';
+SHARED dst_reo_raw   := '~thor_data400::in::BKForeclosure::Update_Reo::' + (string)version + '::raw';
 
 //Raw files with filedate and file_type added
-SHARED dst_nod       := '~thor_data400::in::BKForeclosure::Update_Nod::' + filedate;
-SHARED dst_reo       := '~thor_data400::in::BKForeclosure::Update_Reo::' + filedate;
+SHARED dst_nod       := '~thor_data400::in::BKForeclosure::Update_Nod::' + (string)version;
+SHARED dst_reo       := '~thor_data400::in::BKForeclosure::Update_Reo::' + (string)version;
 
 //Final input superfiles used for build process
 SHARED sprf_nod      := '~thor_data400::in::BKForeclosure::Update_Nod';
@@ -38,14 +38,15 @@ SHARED Spray_REO  := STD.File.SprayVariable(pServerIP,filepath_reo + fn_reo,
   TransformFile_Nod := FUNCTION
 	  dsraw := dataset(dst_nod_raw,
 										          BKForeclosure.Layout_BK.Nod_raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'NOD_UPDATE'; SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := (string)version; SELF.bk_infile_type := 'NOD_UPDATE'; SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
   TransformFile_reo := FUNCTION
 	  dsraw := dataset(dst_reo_raw,
 										          BKForeclosure.Layout_BK.REO_Raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_UPDATE'; SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := (string)version; SELF.bk_infile_type := 'REO_UPDATE'; 
+																			SELF.APN := REGEXREPLACE('^([~]+)|([+])',LEFT.APN,''); SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
@@ -82,9 +83,7 @@ super_all
 	:=	
 	SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Nod'/*, TRUE*/),
 		AddToSuperfile_Nod,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Reo'/*, TRUE*/),
 		AddToSuperfile_reo,
 		STD.File.FinishSuperFileTransaction()
 	);	

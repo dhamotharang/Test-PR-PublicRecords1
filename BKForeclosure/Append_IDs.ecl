@@ -83,7 +83,9 @@ did_add.MAC_Match_Flex
  nod_IDs := did_out_nod + bip_out_nod;
  // ds_nod  := PROJECT(nod_IDs, TRANSFORM(layout_BK.did_nod_plus,
                            // SELF:=LEFT)):persist('~thor_data400::BKForeclosure_Append_ID_NOD');
-dedNOD_IDs	:= DEDUP(nod_IDs,ALL,RECORD);													 
+ DID_Add.MAC_Add_SSN_By_DID(nod_IDs,did,ssn,appendSSN);
+
+ dedNOD_IDs	:= DEDUP(appendSSN,ALL,RECORD);													 
 
 RETURN dedNOD_IDs;
 END;
@@ -170,8 +172,12 @@ did_add.MAC_Match_Flex
 //BUILD 
 //-----------------------------------------------------------------
  reo_IDs := did_out_reo + bip_out_reo;
+ 
+ DID_Add.MAC_Add_SSN_By_DID(reo_IDs,did,ssn,appendSSN);
+ 
+ dedReo_IDs	:= DEDUP(appendSSN,ALL,RECORD);
 
-RETURN reo_IDs;													 
+RETURN dedReo_IDs;													 
 END;
 
 

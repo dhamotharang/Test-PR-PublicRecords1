@@ -67,7 +67,7 @@ EXPORT incident_LinkIds := MODULE
 	// DEFINE THE INDEX
 	shared superfile_name	:= Data_Services.Data_location.Prefix('sanctn')+ constants.key_prefix + doxie.Version_SuperKey+'::incident_linkids';
 		
-	Base := files.base_incident;
+	Base := files.incident_linkids;
 	
 		
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(base, k, superfile_name)
@@ -96,7 +96,7 @@ EXPORT party_LinkIds := MODULE
 	// DEFINE THE INDEX
 	shared superfile_name	:= Data_Services.Data_location.Prefix('sanctn')+ constants.key_prefix + doxie.Version_SuperKey+'::party_linkids';
 		
-	Base := files.base_party;
+	Base := files.party_linkids;
 	
 		
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(base, k, superfile_name)

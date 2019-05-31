@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE2_DEA;//,DEA;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE2_DEA,Prte2_common,Prte,_control;//,DEA;
 
 EXPORT proc_build_key(string filedate) := FUNCTION
 
@@ -82,7 +82,13 @@ EXPORT proc_build_key(string filedate) := FUNCTION
 	AutoKeyB2.MAC_AcceptSK_to_QA(constants.ak_keyname, mymove,, skip_set)
 
 	retval := 	sequential(outaction,mymove);
+	
+	//---------- making DOPS optional and only in PROD build -------------------------------
+	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
+	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
+	updatedops					:= PRTE.UpdateVersion('DEAkeys', filedate, _control.MyInfo.EmailAddressNormal,'B','N','N');
+	PerformUpdateOrNot	:= IF(is_running_in_prod,updatedops,NoUpdate);
 		
-	RETURN 		sequential(b,c,d,e,b1,c1,d1,e1,b2,c2,d2,e2,retval);
+	RETURN 		sequential(b,c,d,e,b1,c1,d1,e1,b2,c2,d2,e2,retval,PerformUpdateOrNot);
 
 END;

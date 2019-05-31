@@ -130,13 +130,14 @@ Layout_BK.base_nod SlimBase(Base_nod L) := TRANSFORM
 		SELF.name6.ultid			:= L.name6_ultid;
 		SELF.name6.ultscore		:= L.name6_ultscore;
 		SELF.name6.ultweight	:= L.name6_ultweight;
-	SELF := L;
-	SELF := [];
+		SELF := L;
+	//SELF := [];
 END;
 
 	pSlimBase	:= PROJECT(Base_nod, SlimBase(LEFT));
 
 	Layout_BK.base_nod denormalizeRecords(Layout_BK.base_nod l, Layout_BK.CleanFields_NOD r) := TRANSFORM
+		//SELF.delete_flag			:= IF(TRIM(L.bk_infile_type) = 'NOD_DELETE', 'DELETE', L.delete_flag);
 		SELF.name1_nid 				:= IF(r.Name_Type = 'BR', r.nid, l.name1_nid);
 		SELF.name1_prefix			:= IF(r.Name_Type = 'BR', r.cln_title, l.name1_prefix);
 		SELF.name1_first			:= IF(r.Name_Type = 'BR', r.cln_fname, l.name1_first);
@@ -144,6 +145,7 @@ END;
 		SELF.name1_last				:= IF(r.Name_Type = 'BR', r.cln_lname, l.name1_last);
 		SELF.name1_suffix			:= IF(r.Name_Type = 'BR', r.cln_suffix, l.name1_suffix);
 		SELF.name1_company		:= IF(r.Name_Type = 'BR', r.cname, l.name1_company);
+		SELF.name1_ssn				:= IF(r.Name_Type = 'BR', r.ssn, l.name1_ssn);
 		SELF.name1_did 				:= IF(r.Name_Type = 'BR', intformat(r.did,12,1), l.name1_did);
 		SELF.name1_did_score 	:= IF(r.Name_Type = 'BR', (string)r.did_score, l.name1_did_score);
 		SELF.name1_bdid 			:= IF(r.Name_Type = 'BR', intformat(r.bdid,12,1), l.name1_bdid);
@@ -177,6 +179,7 @@ END;
 		SELF.name2_last				:= IF(r.Name_Type = 'B2', r.cln_lname, l.name2_last);
 		SELF.name2_suffix			:= IF(r.Name_Type = 'B2', r.cln_suffix, l.name2_suffix);
 		SELF.name2_company		:= IF(r.Name_Type = 'B2', r.cname, l.name2_company);
+		SELF.name2_ssn				:= IF(r.Name_Type = 'B2', r.ssn, l.name2_ssn);
 		SELF.name2_did 				:= IF(r.Name_Type = 'B2', intformat(r.did,12,1), l.name2_did);
 		SELF.name2_did_score 	:= IF(r.Name_Type = 'B2', (string)r.did_score, l.name2_did_score);
 		SELF.name2_bdid 			:= IF(r.Name_Type = 'B2', intformat(r.bdid,12,1), l.name2_bdid);
@@ -210,6 +213,7 @@ END;
 		SELF.name3_last				:= IF(r.Name_Type = 'BR' AND r.cln_fname2 <> '', r.cln_lname2, l.name3_last);
 		SELF.name3_suffix			:= IF(r.Name_Type = 'BR' AND r.cln_fname2 <> '', r.cln_suffix2, l.name3_suffix);
 		SELF.name3_company		:= IF(r.Name_Type = 'BR' AND r.cln_fname2 <> '', '', l.name3_company);
+		SELF.name3_ssn				:= IF(r.Name_Type = 'BR' AND r.cln_fname2 <> '', r.ssn, l.name3_ssn);
 		SELF.name3_did 				:= IF(r.Name_Type = 'BR' AND r.cln_fname2 <> '', intformat(r.did,12,1), l.name3_did);
 		SELF.name3_did_score 	:= IF(r.Name_Type = 'BR' AND r.cln_fname2 <> '', (string)r.did_score, l.name3_did_score);
 		SELF.name3_bdid 			:= intformat(0,12,1);
@@ -243,6 +247,7 @@ END;
 		SELF.name4_last				:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', r.cln_lname2, l.name4_last);
 		SELF.name4_suffix			:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', r.cln_suffix2, l.name4_suffix);
 		SELF.name4_company		:= '';
+		SELF.name4_ssn				:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', r.ssn, l.name4_ssn);
 		SELF.name4_did 				:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', intformat(r.did,12,1), l.name4_did);
 		SELF.name4_did_score 	:= IF(r.Name_Type = 'B2' AND r.cln_fname2 <> '', (string)r.did_score, l.name4_did_score);
 		SELF.name4_bdid 			:= intformat(0,12,1);
@@ -276,6 +281,7 @@ END;
 		SELF.name5_last				:= IF(r.Name_Type = 'CT', r.cln_lname, l.name5_last);
 		SELF.name5_suffix			:= IF(r.Name_Type = 'CT', r.cln_suffix, l.name5_suffix);
 		SELF.name5_company		:= IF(r.Name_Type = 'CT', r.cname, l.name5_company);
+		SELF.name5_ssn				:= IF(r.Name_Type = 'CT', r.ssn, l.name5_ssn);
 		SELF.name5_did 				:= IF(r.Name_Type = 'CT', intformat(r.did,12,1), l.name5_did);
 		SELF.name5_did_score 	:= IF(r.Name_Type = 'CT', (string)r.did_score, l.name5_did_score);
 		SELF.name5_bdid 			:= IF(r.Name_Type = 'CT', intformat(r.bdid,12,1), l.name5_bdid);
@@ -309,6 +315,7 @@ END;
 		SELF.name6_last				:= IF(r.Name_Type = 'TR', r.cln_lname, l.name6_last);
 		SELF.name6_suffix			:= IF(r.Name_Type = 'TR', r.cln_suffix, l.name6_suffix);
 		SELF.name6_company		:= IF(r.Name_Type = 'TR', r.cname, l.name6_company);
+		SELF.name6_ssn				:= IF(r.Name_Type = 'TR', r.ssn, l.name6_ssn);
 		SELF.name6_did 				:= IF(r.Name_Type = 'TR', intformat(r.did,12,1), l.name6_did);
 		SELF.name6_did_score 	:= IF(r.Name_Type = 'TR', (string)r.did_score, l.name6_did_score);
 		SELF.name6_bdid 			:= IF(r.Name_Type = 'TR', intformat(r.bdid,12,1), l.name6_bdid);
@@ -362,21 +369,24 @@ END;
 		SELF.situs1_geo_blk			:= IF(r.AddrType = 'PF', r.geo_blk, l.situs1_geo_blk);
 		SELF.situs1_geo_match		:= IF(r.AddrType = 'PF', r.geo_match, l.situs1_geo_match);
 		SELF.situs1_err_stat		:= IF(r.AddrType = 'PF', r.err_stat, l.situs1_err_stat);
-		
 		SELF := L;
-		SELF := [];
+		//SELF := [];
 	END;
 	
 	//Distribute the data before denormalize to avoid skewing
-	NodInDist				:=	DISTRIBUTE(Norm_nod, HASH32(record_id));
-	NodBaseDist			:=	DISTRIBUTE(pSlimBase, HASH32(record_id));
+	NodInDist				:=	SORT(DISTRIBUTE(Norm_nod, HASH32(record_id)),record_id,LOCAL);
+	NodBaseDist			:=	SORT(DISTRIBUTE(pSlimBase(delete_flag <> 'DELETE'), HASH32(record_id)),record_id, -date_vendor_last_reported,LOCAL);
+	NodBaseDelete		:= 	pSlimBase(delete_flag = 'DELETE');
 
 	NodDeNorm := DENORMALIZE(NodBaseDist, NodInDist,
 														left.record_id = right.record_id,
-														denormalizeRecords(left,right), LOCAL);
-									
+														denormalizeRecords(left,right), LEFT OUTER, LOCAL);
+	
+	//Add back delete flagged records
+	NodAll	:= NodDeNorm + NodBaseDelete;
+	
 //removing situs1_RawAID from dedup because multiple borrowers have same property address and is causing duplication with different RawAID
-	NodBase	:= DEDUP(SORT(NodDeNorm,record_id,foreclosure_id,-process_date),ALL, EXCEPT situs1_RawAID); 
+	NodBase	:= DEDUP(SORT(NodAll,record_id,foreclosure_id,-process_date),ALL, EXCEPT situs1_RawAID); 
 	
 	//Translate codes
 	code_lkp := BKForeclosure.File_BK_Foreclosure.codes_table;

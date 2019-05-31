@@ -8,7 +8,8 @@ shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'t
 
 // Professional License MARI record
   export proflic_mari_rec := RECORD
-    recordof(Prof_License_Mari.key_did(true));
+			//CCPA-110 Exclude new CCPA fields from override MARI key
+    recordof(Prof_License_Mari.key_did(true)) - [global_sid,record_sid];
     string20 flag_file_id;
   end;
 

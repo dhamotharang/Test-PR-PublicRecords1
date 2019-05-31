@@ -35,6 +35,6 @@ MODULE
 	
 	EXPORT validDelimiter		:= '~|~';
 	EXPORT validTerminators	:= '~<EOL>~';
-	EXPORT validQuotes			:= '\'\'';
+	EXPORT validQuotes			:= '';
 
 END;

@@ -1,4 +1,4 @@
-import ut,fbnv2,address, lib_stringlib, VersionControl;
+﻿import ut,fbnv2,address, lib_stringlib, VersionControl;
 
 export Standardize_FBN_CA_Santa_Clara(	 
 	string									pversion
@@ -93,11 +93,6 @@ function
 																								l.name_flag = 'U' => l.owner_name_suffix, 
 																								''
 																							);
-
-		// self.CName			:= if(l.name_flag = 'B',
-													// trim(l.Owner_Name,left,right),
-													// ''
-												 // );	
 		self						:=	l;
 		self						:=	[];
 	end;		
@@ -109,7 +104,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,Clean_Filings_Names	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	sequential(filing_out);
-	source					:= 'Santa_Clara';
+	source					:= 'SANTA_CLARA';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source); 
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	
@@ -117,6 +112,7 @@ function
 		sequential(
 			mapped_Filing
 			,if(~FileServices.FileExists(superfilename), Create_Super)
+			,fileservices.clearSuperFile( superfilename)
 			,fileservices.addsuperfile( superfilename,logicalfile)								  
 		);
 	

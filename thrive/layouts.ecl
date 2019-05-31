@@ -1,4 +1,4 @@
-IMPORT thrive,address,AID,Bipv2;
+﻿IMPORT thrive,address,AID,Bipv2;
 
 EXPORT layouts := MODULE
 
@@ -139,6 +139,9 @@ EXPORT layouts := MODULE
 			string10 clean_Phone_Cell;		
 			string8 clean_DOB;	
 			BIPV2.IDlayouts.l_xlink_ids;
+			// The below 2 fields are added for CCPA (California Consumer Protection Act) project enhancements - JIRA# CCPA-8
+			unsigned4 global_sid := 0;
+			unsigned8 record_sid := 0;
 	END;
 
 Export BaseOld	:=	record
