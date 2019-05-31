@@ -5,12 +5,12 @@
 // Defining the ERA to allow for ASOF functionality
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
-
-
 FUNCTION: CleanSpaces(STRING s) <= ECL(STD.Str.CleanSpaces(s)) FROM Std RETURNS STRING;
 FUNCTION: PrependZeros(STRING s, INTEGER len) <= ECL( STD.Str.Repeat('0', len - LENGTH(s))+ s) FROM Std RETURNS STRING;
 
-Legal := ENTITY(FLAT(UID(seleid),
+
+Legal :=  ENTITY
+(FLAT(UID(seleid),
   STRING bestultcompanyname,
   STRING bestultfein,
   STRING bestultprimaryrange,
@@ -124,7 +124,9 @@ Legal := ENTITY(FLAT(UID(seleid),
 
 
 
-Employer := ENTITY(FLAT(UID(acctno),
+
+Employer :=  ENTITY
+(FLAT(UID(acctno),
 	Legal rLegal=UID(seleid),
   STRING dummycode,
   INTEGER acctno, // claim_sep_emp_no in claims
@@ -859,8 +861,10 @@ Employer := ENTITY(FLAT(UID(acctno),
 		),
 	MODEL(
 UID,rLegal,dummycode,acctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno,ultid,orgid,seleid,proxid,powid,dotid,empid,score,weight));
+
   
-Claim := ENTITY(FLAT(UID(bizrecid),
+Claim :=  ENTITY
+(FLAT(UID(bizrecid),
    /*
   STRING claim_ssn,
   STRING col_monetary_determination_id,
@@ -1150,94 +1154,119 @@ Claim := ENTITY(FLAT(UID(bizrecid),
 		),
 	MODEL(UID, rEmployer, claim_submit_ccyymmdd, bizrecid, acctno,claim_sep_emp_name, claim_sep_emp_no));
 
-LegalEmployer := ASSOCIATION(FLAT(
+
+LegalEmployer :=  ASSOCIATION
+(FLAT(
     Legal rLegal=UID(seleid),
     Employer rEmployer=UID(acctno)
     //DATE claim_submit_ccyymmdd
    ));
 
-EmployerClaim := ASSOCIATION(FLAT(
+
+EmployerClaim :=  ASSOCIATION
+(FLAT(
     Employer rEmployer=UID(acctno),
 		Claim rClaim=UID(bizrecid)
     //DATE claim_submit_ccyymmdd
    ));
 
-LegalClaim := ASSOCIATION(FLAT(
+
+LegalClaim :=  ASSOCIATION
+(FLAT(
     Legal rLegal=UID(seleid),
 		Claim rClaim=UID(bizrecid)
     //DATE claim_submit_ccyymmdd
    ));
-		
 USE FRAUDGovUIKEL.Files.Employer(FLAT,
     Employer(FILTER((UNSIGNED)acctno != 0)),
 	  Legal(FILTER((UNSIGNED)acctno != 0)),
 		LegalEmployer(FILTER((UNSIGNED)acctno != 0))
 	);
-	
 USE FraudGovUIKEL.Files.Claims(FLAT, 
   Claim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
 	EmployerClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
 	LegalClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0))
 	);
-	
-/* Logic Statements \ Attr
+/*Logic Statements \ Attr
 
 	Some of these attributs are at the business level, some are at the business legal entity level 
 	Should these attributes be in their own entity?
-*/	
-
-	
+*/
 Legal: => AccountNumberCount := COUNT(AccountNumbers);
 Legal: => LegalClaimDateMax := MAX(LegalClaim.rClaim, claim_submit_ccyymmdd);
+
 //Legal: => BisIncorpMSince := MAP(bestseleincorporationdate=NULL(0) => -99998, DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen));
 Legal: => BisIncorpMSince := DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen);
+
 
 	
 // Employer: => ClaimCount := COUNT(EmployerClaim);
 // Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
 // Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
-
 Employer: => BusAcctUIDEcho := MAP(fltradename:Null OR flstreetaddr:Null OR zip:Null => -99999,
                                    fltradename:Null OR flstreetaddr:Null OR citystate:Null => -99999,
                                    acctno);
 Employer: => BusAcctUltIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
-																			 ultid=0 => -99998,
+																			 ultid:Null => -99998,
 																			 ultid);
 Employer: => BusAcctOrgIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																				orgid=0 => -99998,
 																				orgid);
 Employer: => BusAcctSeleIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
-																			 seleid=0 => -99998,
+																			 seleid:Null => -99998,
 																			 seleid);
 Employer: => BusAcctProxIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																			 proxid=0 => -99998,
 																			 proxid);
 Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
-																			 powid=0 => -99998,
+																			 powid:Null => -99998,
 																			 powid);
+
 																		
 // Employer: => BusAcctNewestUpdateMasterDt
-// Employer: => BusAcctNewestRecordDt
+// Employer: => BusAcctNewestRecordDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+//																					 BusAcctNewestUpdateMasterDt$Max); // Needs NewestUpdateMasterDt to work
 // Employer: => BusNewestRecordDt
-Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
-																					status='' => '-99998',
+Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					status:Null => -99998,
 																					status); // fixme. Need status from most recent master record
+// Employer: => BusAcctDtEmployerBeganEcho
+Employer: => BusAcctTaxLiabStartDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							ISVALIDDATE(dateliabest) => INTEGER(dateliabest),
+																							-99998);
+// Employer: => BusAcctTaxLiabEndDtEcho
+Employer: => BusOldestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																						BusAcctTaxLiabStartDtEcho=-99998 => -99998,
+																						BusAcctTaxLiabStartDtEcho$Min);
 Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
 																							 ISVALIDDATE(datefirstemp) => YEAR(datefirstemp) + '' + PrependZeros(MONTH(datefirstemp), 2) + '' + PrependZeros(DAY(datefirstemp), 2), // In YYYYMMDD format
 																							 '-99998');
-// Employer: => BusAcctTaxLiabStartDtEcho
+Employer: => BusAcctTaxLiabStartDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							ISVALIDDATE(dateliabest) => INTEGER(dateliabest),
+																							-99998);
 Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
 																							 ISVALIDDATE(liabtermdate) => YEAR(liabtermdate) + ''+ PrependZeros(MONTH(liabtermdate), 2) +''+ PrependZeros(DAY(liabtermdate), 2), // In YYYYMMDD format
 																							 '-99998');
-// Employer: => BusOldestTaxLiabStartDt
+Employer: => BusOldestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																						BusAcctTaxLiabStartDtEcho=-99998 => -99998,
+																						BusAcctTaxLiabStartDtEcho$Min);
 // Employer: => BusNewestTaxLiabStartDt
-// Employer: => BusOldestTaxLiabEndDt
+//Employer: => BusOldestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+//																					BusAcctTaxLiabEndDtEcho=-99998 => -99998,
+//																					BusAcctTaxLiabEndDtEcho$Min); // Needs TaxLiabEndDtEcho to work
 // Employer: => BusNewestTaxLiabEndDt
-// Employer: => BusTaxLiabOngoingFlag
+//Employer: => BusTaxLiabOngoingFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+//																					BusAcctTaxLiabStartDtEcho=-99998 => -99998,
+//																					BusAcctTaxLiabEndDtEcho=-99998 => 1,
+//																					0); // Needs TaxLiabEndDtEcho to work
 // Employer: => BusAcctTaxLiabStartMsince
-// Employer: => BusAcctTaxLiabEndMsince
-// Employer: => BusOldestTaxLiabStartMsince
-// Employer: => BusNewestTaxLiabEndMsince
+//Employer: => BusAcctTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
+//																					  BusAcctTaxLiabEndDtEcho=-99998 => -99998,
+//																						MONTHSBETWEEN(BusAcctTaxLiabEndDtEcho,BusAcctNewestRecordDt)); // Needs TaxLiabEndDtEcho & BusAcctNewestRecordDt to work
+// Employer: => BusOldestTaxLiabStartMsinced
+//Employer: => BusNewestTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
+//																					    BusNewestTaxLiabEndDt=-99998 => -99998,
+//																						  MONTHSBETWEEN(BusNewestTaxLiabEndDt,BusNewestRecordDt)); // Needs BusNewestTaxLiabEndDt & BusNewestRecordDt to work
 // Employer: => BusAcctOldestUnemClmDt
 // Employer: => BusAcctNewestUnemClmDt
 // Employer: => BusOldestUnemClmDt
@@ -1248,11 +1277,8 @@ Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
 	
 // Employer: => LegalClaimDateMax := rLegal.LegalClaimDateMax;
 
-
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
-
-
-QUERY: showEmployers <= Employer;	
-QUERY: showLegal <= Legal;	
-QUERY: showClaims <= Claim; 
+QUERY: showEmployers <= Employer;
+QUERY: showLegal <= Legal;
+QUERY: showClaims <= Claim;
 QUERY: showEmployerClaims <= EmployerClaim;
