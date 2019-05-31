@@ -130,37 +130,47 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
     ParsedName := Prof_License_Mari.mod_clean_name_addr.cleanFMLName(rmvSufxName);
 		// ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(GoodLastName +' '+GoodFirstName);
     StdNAME_ORG			:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimFullName);	
+		
    	SELF.NAME_FIRST				:= IF(rmvSufxFName = '',TRIM(ParsedName[6..25],LEFT,RIGHT),rmvSufxFName);
    	SELF.NAME_MID					:= IF(rmvSufxMName = '',TRIM(ParsedName[26..45],LEFT,RIGHT),rmvSufxMName);
    	SELF.NAME_LAST				:= IF(rmvSufxLName = '',TRIM(ParsedName[46..65],LEFT,RIGHT),rmvSufxLName);
    	SELF.NAME_SUFX				:= IF(tmp_Suffix = '',TRIM(ParsedName[66..70],LEFT,RIGHT),tmp_Suffix);
 		SELF.NAME_Nick  := tempNick;	
 	  ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(SELF.NAME_LAST +' '+SELF.NAME_FIRST);
-		SELF.NAME_ORG_PREFX		:= '';
-		SELF.NAME_ORG				   	:= IF(ConcatNAME_FULL <> ' ', ConcatNAME_FULL,
-		                           Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',TrimFullName,' CO')));
-		SELF.NAME_ORG_SUFX	  := '';
-		SELF.NAME_ORG_ORIG    := IF(TrimFullName!= '',TrimFullName,TrimFirstName + ' ' + TrimMidName + ' ' +TrimLastName);	
-		SELF.NAME_FORMAT  := 'F';
+
 		
 		// assign officename and office parse field : GR if company, MD if individual 
 		// TrimOffice          := REGEXFIND('^(.*) ((.*))$',ut.CleanSpacesAndUpper(pInput.FIRM_NAME),1);
 		TrimOffice          := ut.CleanSpacesAndUpper(pInput.FIRM_NAME);
-		OffieName         	:= IF(Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimOffice)<>'',
-		               TRIM(Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimOffice),LEFT,RIGHT),
-															 	TRIM(TrimOffice,LEFT,RIGHT));
-		SELF.NAME_OFFICE    	:= MAP(tempTypeCd = 'MD' AND REGEXFIND(TRIM(SELF.NAME_ORG,LEFT,RIGHT), OffieName)=> '', 
-		                             TRIM(OffieName,ALL) = TRIM(SELF.NAME_ORG,ALL) => '',
-																 TRIM(OffieName,ALL) = TRIM(SELF.NAME_ORG_ORIG,ALL) =>'', 
-																 TRIM(OffieName,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL) =>'', 
-																 TRIM(OffieName,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID + SELF.NAME_LAST,ALL) =>'', 
-																 TRIM(OffieName,ALL) = TRIM(REGEXREPLACE(',',SELF.NAME_ORG_ORIG,' '),ALL) => '',
-																 OffieName);													
+
+		tempdba             := IF(REGEXFIND(dbaPattern,TrimOffice), Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimOffice),'');
+		rmvdba              := IF(REGEXFIND(dbaPattern,TrimOffice), Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimOffice),TrimOffice);														 
+
+		stdNAME_OFFICE		  := IF(rmvdba<>'',
+		                          StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctMisc(rmvdba)),'');
+		SELF.NAME_ORG_PREFX		:= '';
+		SELF.NAME_ORG			   	:= IF(ConcatNAME_FULL <> ' ', ConcatNAME_FULL,
+		                           Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',stdNAME_OFFICE,' CO')));
+		SELF.NAME_ORG_SUFX	  := '';
+		SELF.NAME_ORG_ORIG    := IF(TrimFullName!= '',TrimFullName,TrimFirstName + ' ' + TrimMidName + ' ' +TrimLastName);	
+		SELF.NAME_FORMAT  := 'F';
+		SELF.NAME_OFFICE    	:= MAP(tempTypeCd = 'MD' AND REGEXFIND(TRIM(SELF.NAME_ORG,LEFT,RIGHT), stdNAME_OFFICE)=> '', 
+		                             TRIM(stdNAME_OFFICE,ALL) = TRIM(SELF.NAME_ORG,ALL) => '',
+																 TRIM(stdNAME_OFFICE,ALL) = TRIM(SELF.NAME_ORG_ORIG,ALL) =>'', 
+																 TRIM(stdNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL) =>'', 
+																 TRIM(stdNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID + SELF.NAME_LAST,ALL) =>'', 
+																 TRIM(stdNAME_OFFICE,ALL) = TRIM(REGEXREPLACE(',',SELF.NAME_ORG_ORIG,' '),ALL) => '',
+																 stdNAME_OFFICE);													
 		SELF.OFFICE_PARSE   := IF(SELF.NAME_OFFICE != '',
-		                          IF(Prof_License_Mari.func_is_company(OffieName),'GR','MD'),'');													
+		                          IF(Prof_License_Mari.func_is_company(stdNAME_OFFICE),'GR','MD'),'');													
+
+
 
 		SELF.NAME_MARI_ORG		:= IF(mariParse = 'GR' ,StdNAME_ORG, IF(SELF.NAME_OFFICE != '',SELF.NAME_OFFICE,'')); //only business names
 		
+		SELF.NAME_DBA       := tempdba;
+		SELF.DBA_FLAG			  := IF(SELF.NAME_DBA != '',1,0);
+		SELF.NAME_MARI_DBA	:= IF(SELF.name_dba != '',SELF.name_dba,' ');		
 		// Reformatting dates from MM/DD/YYYY to YYYYMMDD
 		//The date format has changed from yyyy-mm-dd to mm/dd/yyyy in 20130329 input. 4/4/13 Cathy
 		tempIssueDt         	:= prof_license_mari.DateCleaner.ToYYYYMMDD(pInput.issue_date);
@@ -183,7 +193,7 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 
 		//Prepare the input to address cleaner
 		temp_preaddr1 				:= StringLib.StringCleanSpaces(clnAddress); 
-		temp_preaddr2 				:= StringLib.StringCleanSpaces(pInput.CITY+' '+pInput.STATE +' '+pInput.ZIP); 
+		temp_preaddr2 				:= StringLib.StringCleanSpaces(pInput.CITY_ST_ZIP); 
 		clnAddrAddr1				 	:= Prof_License_Mari.mod_clean_name_addr.cleanAddress(temp_preaddr1,temp_preaddr2); //Address cleaner to remove 'c/o' and 'attn' from address
 		tmpADDR_ADDR1_1				:= TRIM(clnAddrAddr1[1..10],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[11..12],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[13..40],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[41..44],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[45..46],LEFT,RIGHT);																	
 		tmpADDR_ADDR2_1				:= TRIM(clnAddrAddr1[47..56],LEFT,RIGHT)+' '+TRIM(clnAddrAddr1[57..64],LEFT,RIGHT);
@@ -192,9 +202,9 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_ADDR1_1		:= IF(AddrWithContact != ' ' AND tmpADDR_ADDR2_1 != '',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1),
 																           StringLib.StringCleanSpaces(tmpADDR_ADDR1_1));	
 		SELF.ADDR_ADDR2_1		:= IF(AddrWithContact != '','',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1)); 
-		SELF.ADDR_CITY_1		 := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),ut.CleanSpacesAndUpper(pInput.CITY));
-		SELF.ADDR_STATE_1		:= IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),ut.CleanSpacesAndUpper(pInput.STATE));
-		SELF.ADDR_ZIP5_1		 := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),TRIM(pInput.ZIP,LEFT,RIGHT)[1..5]);
+		SELF.ADDR_CITY_1		 := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),'');
+		SELF.ADDR_STATE_1		:= IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),'');
+		SELF.ADDR_ZIP5_1		 := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),'');
 		SELF.ADDR_ZIP4_1		 := clnAddrAddr1[122..125];
 
 		SELF.ADDR_CNTY_1   := ut.CleanSpacesAndUpper(pInput.COUNTY);

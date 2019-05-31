@@ -59,6 +59,8 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs(flc_ss L, FLAccidents.basefile_
 		self.Report_Has_Coversheet		:= '0';
 		self.date_vendor_last_reported := L.accident_date; // need to create date field...
 		//self.IdField 								:=	R.IdField;
+		//Appriss Integration
+		self.Releasable                     := '1'; 	
 		self 								:= L;
 		self 								:= R;
 		self                := []; 
@@ -77,6 +79,8 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs1(pflc_ss L,FLAccidents.BaseFile
 	self.carrier_name := if(l.carrier_name <> '', l.carrier_name,  R.ins_company_name);
 	self.Policy_num   := if(l.Policy_num <>'',l.Policy_num, R.ins_policy_nbr); 
 	//self.IdField 			:=	R.IdField;
+	//Appriss Integration
+	self.Releasable                     := '1'; 	
 	self 							:= L;
 end;
 
@@ -93,6 +97,8 @@ pflc_ss1 := dedup(distribute(join(distribute(pflc_ss,hash(accident_nbr))
 FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs2(pflc_ss1 L,FLAccidents.basefile_flcrash0 R) := transform
 
 	self.vehicle_incident_city			:= stringlib.stringtouppercase(if(L.accident_nbr= R.accident_nbr,R.city_town_name,''));
+	//Appriss Integration
+	self.Releasable                     := '1'; 	
 	self 														:= L;
 end;
 
@@ -176,6 +182,8 @@ pflc_ss slimrec(ntlFile L) := transform
                                            7000000000000 );  // national accidents 
        SELF.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
 */
+		//Appriss Integration
+		self.Releasable                     := '1'; 	
 		self						:= L;
 		self						:= [];
 end;
@@ -283,7 +291,10 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 slimrec2(inqFile L ,unsigned1 cnt) := tr
                                            7000000000000 );  // national accidents 
        self.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
 */ 
-  		self						:= L;
+  				
+		//Appriss Integration
+		self.Releasable                     := '1'; 	
+		self						:= L;
 
 		self						:= [];
 
@@ -399,7 +410,10 @@ pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
 	//End of Police Record/Claims Process
 	  
 		// BuyCrash
-		self.officer_id                     := L.officer_id;		
+		self.officer_id                     := L.officer_id;
+		
+		//Appriss Integration
+		self.Releasable                     := IF(TRIM(L.Releasable,left,right) IN ['\\N', 'NULL', ''],  '1', L.Releasable); 			
 		self								                := L;
 		self                                := [];
    
