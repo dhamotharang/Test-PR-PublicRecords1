@@ -1210,13 +1210,13 @@ Employer: => BusAcctUltIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 																			 ultid:Null => -99998,
 																			 ultid);
 Employer: => BusAcctOrgIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
-																				orgid=0 => -99998,
+																				orgid:Null => -99998,
 																				orgid);
 Employer: => BusAcctSeleIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																			 seleid:Null => -99998,
 																			 seleid);
 Employer: => BusAcctProxIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
-																			 proxid=0 => -99998,
+																			 proxid:Null => -99998,
 																			 proxid);
 Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																			 powid:Null => -99998,
@@ -1225,50 +1225,45 @@ Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 																		
 // Employer: => BusAcctNewestUpdateMasterDt
 // Employer: => BusAcctNewestRecordDt := MAP(BusAcctUIDEcho=-99999 => -99999,
-//																					 BusAcctNewestUpdateMasterDt$Max); // Needs NewestUpdateMasterDt to work
+//																					 BusAcctNewestUpdateMasterDt$Max); //not sure about logic for this & Needs NewestUpdateMasterDt to work
 // Employer: => BusNewestRecordDt
 Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					status:Null => -99998,
 																					status); // fixme. Need status from most recent master record
-// Employer: => BusAcctDtEmployerBeganEcho
+Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							 ISVALIDDATE(datefirstemp) => INTEGER(datefirstemp)
+																							 -99998);
 Employer: => BusAcctTaxLiabStartDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							ISVALIDDATE(dateliabest) => INTEGER(dateliabest),
 																							-99998);
-// Employer: => BusAcctTaxLiabEndDtEcho
+Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																							 ISVALIDDATE(liabtermdate) => INTEGER(liabtermdate)
+																							 -99998);
 Employer: => BusOldestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																						BusAcctTaxLiabStartDtEcho=-99998 => -99998,
 																						BusAcctTaxLiabStartDtEcho$Min);
-Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
-																							 ISVALIDDATE(datefirstemp) => YEAR(datefirstemp) + '' + PrependZeros(MONTH(datefirstemp), 2) + '' + PrependZeros(DAY(datefirstemp), 2), // In YYYYMMDD format
-																							 '-99998');
-Employer: => BusAcctTaxLiabStartDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
-																							ISVALIDDATE(dateliabest) => INTEGER(dateliabest),
-																							-99998);
-Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => '-99999',
-																							 ISVALIDDATE(liabtermdate) => YEAR(liabtermdate) + ''+ PrependZeros(MONTH(liabtermdate), 2) +''+ PrependZeros(DAY(liabtermdate), 2), // In YYYYMMDD format
-																							 '-99998');
-Employer: => BusOldestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 => -99999,
-																						BusAcctTaxLiabStartDtEcho=-99998 => -99998,
-																						BusAcctTaxLiabStartDtEcho$Min);
+																						
 // Employer: => BusNewestTaxLiabStartDt
-//Employer: => BusOldestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 => -99999,
-//																					BusAcctTaxLiabEndDtEcho=-99998 => -99998,
-//																					BusAcctTaxLiabEndDtEcho$Min); // Needs TaxLiabEndDtEcho to work
+Employer: => BusOldestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					BusAcctTaxLiabEndDtEcho=-99998 => -99998,
+																					BusAcctTaxLiabEndDtEcho$Min);
 // Employer: => BusNewestTaxLiabEndDt
-//Employer: => BusTaxLiabOngoingFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
-//																					BusAcctTaxLiabStartDtEcho=-99998 => -99998,
-//																					BusAcctTaxLiabEndDtEcho=-99998 => 1,
-//																					0); // Needs TaxLiabEndDtEcho to work
-// Employer: => BusAcctTaxLiabStartMsince
+Employer: => BusTaxLiabOngoingFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+																					BusAcctTaxLiabStartDtEcho=-99998 => -99998,
+																					BusAcctTaxLiabEndDtEcho=-99998 => 1,
+																					0);
+//Employer: => BusAcctTaxLiabStartMsince
 //Employer: => BusAcctTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 //																					  BusAcctTaxLiabEndDtEcho=-99998 => -99998,
 //																						MONTHSBETWEEN(BusAcctTaxLiabEndDtEcho,BusAcctNewestRecordDt)); // Needs TaxLiabEndDtEcho & BusAcctNewestRecordDt to work
-// Employer: => BusOldestTaxLiabStartMsinced
+//Employer: => BusOldestTaxLiabStartMsinced
 //Employer: => BusNewestTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 //																					    BusNewestTaxLiabEndDt=-99998 => -99998,
 //																						  MONTHSBETWEEN(BusNewestTaxLiabEndDt,BusNewestRecordDt)); // Needs BusNewestTaxLiabEndDt & BusNewestRecordDt to work
 // Employer: => BusAcctOldestUnemClmDt
-// Employer: => BusAcctNewestUnemClmDt
+//Employer: => BusAcctNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999, // need to figure out logic for -99998
+//																					 claim_submit_ccyymmdd:Null => -99997,
+//																					 claim_submit_ccyymmdd$Max); //need to figure out how to attach claim/claim dates																					 
 // Employer: => BusOldestUnemClmDt
 // Employer: => BusNewestUnemClmDt
 // Employer: => BusIncorpDt
