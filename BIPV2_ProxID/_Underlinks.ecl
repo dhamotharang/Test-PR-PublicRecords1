@@ -285,6 +285,16 @@ functionmacro
   ds_rollup_match_scores_BOW_Most_borderline  := tools.mac_Rollup_Match_Scores(mtch_score2_BOW_Most_borderline                    ,'(cnp_name|company_name_type_derived|company_name)');
   ds_rollup_match_scores_biggest_substring    := tools.mac_Rollup_Match_Scores(mtch_score2_BOW_Most_add_common_substring_biggest  ,'(cnp_name|company_name_type_derived|company_name)');
 
+  ds_rollup_match_scores_BOW_Most_borderline_slim := project(ds_rollup_match_scores_BOW_Most_borderline ,transform({unsigned match_rank,string summary,unsigned cnt,dataset(recordof(left.child)) child}
+    ,self.child := left.child
+    ,self       := left
+  ));
+
+  ds_rollup_match_scores_biggest_substring_slim := project(ds_rollup_match_scores_biggest_substring ,transform({unsigned match_rank,string summary,unsigned cnt,dataset(recordof(left.child)) child}
+    ,self.child := left.child
+    ,self       := left
+  ));
+
   ds_rollup_match_scores_most           := tools.mac_Rollup_Match_Scores(mtch_score2_BOW_Most         ,'(cnp_name|company_name_type_derived|company_name)');
   ds_rollup_match_scores_many           := tools.mac_Rollup_Match_Scores(mtch_score2_BOW_Many         ,'(cnp_name|company_name_type_derived|company_name)');
   ds_rollup_match_scores_all            := tools.mac_Rollup_Match_Scores(mtch_score2_BOW_All          ,'(cnp_name|company_name_type_derived|company_name)');
@@ -577,6 +587,10 @@ functionmacro
   ds_prep_xlink_matches2        := project(xlink_proxid_diffs_table_sample  ,transform(layout_matches ,self.proxid1 := left.proxid1,self.proxid2 := left.proxid2  ,self := []))   : persist('~persist::BIPV2_ProxID::_Underlinks::ds_prep_xlink_matches2');
   ds_xlink_match_join1          := project(annotate_matches(ds_mc_table_dedup ,ds_prep_xlink_matches2 ,ds_att),transform({unsigned rid,recordof(left)},self.rid := counter,self := left))   : persist('~persist::BIPV2_ProxID::_Underlinks::ds_xlink_match_join1');
   ds_rollup_xlink_match_scores  := tools.mac_Rollup_Match_Scores(ds_xlink_match_join1                  ,'(cnp_name|company_name_type_derived|company_name)');
+  ds_rollup_xlink_match_scores_slim := project(ds_rollup_xlink_match_scores ,transform({unsigned6 proxid1,unsigned6 proxid2,dataset(recordof(left.child)) child}
+    ,self.child := left.child
+    ,self       := left
+  ));
 
 // -----
   // -- Filter returned xlink dataset for only non-populated proxids, and then join to our match samples to find those orig proxids and what they want to join to.  this can find underlinking(ambiguous results)
@@ -589,6 +603,10 @@ functionmacro
   xlink_proxid_no_xlink_append_matches2   := join(mtch_score2_BOW_Most  ,xlink_proxid_no_xlink_append_table_sample ,left.proxid1 = right.proxid ,transform(left) ,lookup);
   ds_rollup_no_xlink_append_match_scores  := tools.mac_Rollup_Match_Scores(xlink_proxid_no_xlink_append_matches2                  ,'(cnp_name|company_name_type_derived|company_name)');
 
+  ds_rollup_no_xlink_append_match_scores_slim := project(ds_rollup_no_xlink_append_match_scores ,transform({unsigned6 proxid1,unsigned6 proxid2,dataset(recordof(left.child)) child}
+    ,self.child := left.child
+    ,self       := left
+  ));
 
 
 
@@ -654,9 +672,14 @@ functionmacro
     ,output(choosen(ds_rollup_match_scores_add_summary(match_rank = 19)   ,300) ,named('Number_19_Underlink_Reason_Match_Samples') ,all)
     ,output(choosen(ds_rollup_match_scores_add_summary(match_rank = 20)   ,300) ,named('Number_20_Underlink_Reason_Match_Samples') ,all)
     
+    ,output('----------------------Samples of Xlink Append Differences------------------------------'  ,named('____________________'))
+    ,output(enth(ds_rollup_xlink_match_scores_slim                       ,300     ) ,named('Xlink_append_Potential_Underlinks_Because_Diff_Proxid_Appended'     ) ,all)     
+    ,output(enth(ds_rollup_no_xlink_append_match_scores_slim             ,300     ) ,named('Xlink_appends_Possible_Ambiguity_Because_No_Proxid_Appended'        ) ,all)     
+    ,output(topn(ds_agg_xlink_append                                     ,300,-cnt) ,named('Xlink_appends_with_Most_IL_Proxids'                                 ) ,all)     
+
     ,output('----------------------BOW Many, Most, All & Any examples------------------------------'  ,named('_________'))
-    ,output(enth(ds_rollup_match_scores_BOW_Most_borderline                      ,300) ,named('BOW_Most_Borderlines_3_to_5_score') ,all)
-    ,output(enth(ds_rollup_match_scores_biggest_substring                        ,300) ,named('BOW_Most_Mismatches_With_Biggest_Common_Substrings') ,all)
+    ,output(enth(ds_rollup_match_scores_BOW_Most_borderline_slim                 ,300) ,named('BOW_Most_Borderlines_3_to_5_score') ,all)
+    ,output(enth(ds_rollup_match_scores_biggest_substring_slim                   ,300) ,named('BOW_Most_Mismatches_With_Biggest_Common_Substrings') ,all)
     ,output(enth(ds_rollup_match_scores_Most_not_Many_side_by_side_add_Summary   ,300) ,named('BOW_Most_Not_Many_Examples') ,all)
     ,output(enth(ds_rollup_match_scores_Most_not_All_side_by_side_add_Summary    ,300) ,named('BOW_Most_Not_All_Examples' ) ,all)
     ,output(enth(ds_rollup_match_scores_Most_not_Any_side_by_side_add_Summary    ,300) ,named('BOW_Most_Not_Any_Examples' ) ,all)
@@ -683,12 +706,6 @@ functionmacro
     ,output(choosen(ds_rejected_singletons                                  ,300) ,named('Rejected_Singletons'                                         ) ,all)     
     ,output(choosen(ds_unlinkable_singletons                                ,300) ,named('Unlinkable_Singletons'                                       ) ,all)     
     ,output(choosen(ds_unlinkable_or_rejected_singletons                    ,300) ,named('Unlinkable_Or_Rejected_Ringletons'                           ) ,all)     
-
-
-    ,output('----------------------Samples of Xlink Append Differences------------------------------'  ,named('____________________'))
-    ,output(enth(ds_rollup_xlink_match_scores                            ,300     ) ,named('Xlink_append_Potential_Underlinks__Because_Diff_Proxid_Appended'     ) ,all)     
-    ,output(enth(ds_rollup_no_xlink_append_match_scores                  ,300     ) ,named('Xlink_appends_Possible_Ambiguity__Because_No_Proxid_Appended'        ) ,all)     
-    ,output(topn(ds_agg_xlink_append                                     ,300,-cnt) ,named('Xlink_appends_with_Most_IL_Proxids'                         ) ,all)     
 
 
     ,output('----------------------Samples of Addresses with Most Proxids------------------------------'  ,named('_______________'))
