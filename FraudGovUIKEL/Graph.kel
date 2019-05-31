@@ -6,7 +6,6 @@
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
 FUNCTION: CleanSpaces(STRING s) <= ECL(STD.Str.CleanSpaces(s)) FROM Std RETURNS STRING;
-FUNCTION: PrependZeros(STRING s, INTEGER len) <= ECL( STD.Str.Repeat('0', len - LENGTH(s))+ s) FROM Std RETURNS STRING;
 
 
 Legal :=  ENTITY
@@ -1197,7 +1196,7 @@ Legal: => ClaimCount := COUNT(LegalClaim);
 Legal: => LegalClaimDateMax := MAX(LegalClaim.rClaim, claim_submit_ccyymmdd);
 
 //Legal: => BisIncorpMSince := MAP(bestseleincorporationdate=NULL(0) => -99998, DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen));
-Legal: => BisIncorpMSince := DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen);
+// Legal: => BisIncorpMSince := DAYSBETWEEN(bestseleincorporationdate, bestseledatelastseen);
 
 
 
@@ -1226,8 +1225,10 @@ Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 
 																		
 // Nate
-// Employer: => BusAcctNewestUpdateMasterDt
-// Employer: => BusNewestRecordDt
+Employer: => BusAcctNewestUpdateMasterDt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								20190213); // fixme. Need to put in an "lastupdated" date into the entities. Do we keep multiple versions?
+Employer: => BusNewestRecordDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																			20190213); // fixme
 Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							 ISVALIDDATE(datefirstemp) => INTEGER(datefirstemp), // In YYYYMMDD format
 																							 -99998);
@@ -1238,9 +1239,10 @@ Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 // Employer: => BusNewestTaxLiabEndDt := rLegal.NewestTaxLiabEndDt;
 // Employer: => BusAcctTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							// BusAcctTaxLiabStartDtEcho=-99998 => -99998,
-																							// BusAcctNewestRecordDt=-99999 => -99997, // Unable to calculate - due to no field here
-																							// DAYSBETWEEN(BusAcctTaxLiabStartDtEcho, BusAcctNewestRecordDt));
-// Employer: => BusOldestTaxLiabStartMsince
+																							// MONTHSBETWEEN(BusAcctTaxLiabStartDtEcho, BusAcctNewestRecordDt));
+// Employer: => BusOldestTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																								// BusOldestTaxLiabDt=-99998 => -99998,
+																								// MONTHSBETWEEN(BusOldestTaxLiabStartDt, BusNewestRecordDt));
 Employer: => BusAcctOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 ClaimCount=0 => -99998,
 																					 ALL(EmployerClaim.rClaim, NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99997, // All claim dates are invalid
@@ -1253,7 +1255,10 @@ Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																NOT ISVALIDDATE(rLegal.bestseleincorporationdate) => -99997, // SOS incorp date is invalid
 																//DAYSBETWEEN(rLegal.bestseleincorporationdate, BusNewestRecordDt) < 0 => -99998, // No SOS incorporation on file prior to BusNewestRecordDt
 																INTEGER(rLegal.bestseleincorporationdate)); // I believe this is the SOS incorporation date
-// Employer: => BisIncorpMSince := rLegal.BisIncorpMSince;
+// Employer: => BisIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+																		// BusIncorpDt=-99997 => -99997, // Or unable to calculate
+																		//DAYSBETWEEN(rLegal.bestseleincorporationdate, BusNewestRecordDt) < 0 => -99998,
+																		// MONTHSBETWEEN(BusIncorpDt, BusNewestRecordDt));
 	
 	
 /* Nicole	*/													
