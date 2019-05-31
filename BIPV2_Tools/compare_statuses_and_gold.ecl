@@ -22,18 +22,20 @@ import BIPV2,Advo;
 
 EXPORT compare_statuses_and_gold(
 
-   pBase_Sprint   = 'BIPV2.KeySuffix'
-  ,pFather_Sprint = 'BIPV2.KeySuffix_mod2.PreviousBuildDate'
-  ,pDs_Base       = 'bipv2.CommonBase.DS_CLEAN2'
-  ,pDs_Father     = 'bipv2.CommonBase.DS_CLEAN2_BASE'  
-  ,pOutputDebug   = 'false'
+   pCurrent_Version   = 'BIPV2.KeySuffix'
+  ,pFather_Version    = 'BIPV2.KeySuffix_mod2.PreviousBuildDate'
+  ,pDs_Base           = 'bipv2.CommonBase.DS_CLEAN2'
+  ,pDs_Father         = 'bipv2.CommonBase.DS_CLEAN2_BASE'  
 ) :=
 functionmacro
 
   import tools,BIPV2,Advo,BIPV2_Tools;
   
-  old_version := pFather_Sprint;
-  new_version := pBase_Sprint;
+  old_version := pFather_Version;
+  new_version := pCurrent_Version;
+
+  old_sprint := BIPV2.KeySuffix_mod2.SprintNumber(old_version);
+  new_sprint := BIPV2.KeySuffix_mod2.SprintNumber(new_version);
 
   ds_new  := pDs_Base  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_new'); 
   ds_old  := pDs_Father : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_old');
@@ -328,24 +330,24 @@ functionmacro
   // modgoldSELEV2.Gold// + modgoldSELEV2.NotGold
   contributory_sources_gold_prep := project(ds_norm_gold_calc_sources_diff_table  ,transform({string source,unsigned cnt},self.source := trim(left.tier) + ' ' + left.source,self.cnt := left.cnt));
 
-  lay_contributory_sources := {string source,string cnt};
+  lay_contributory_sources := {string Source,string Count_Seleids};
 
-  top10_contributory_sources_gold     := project(topn(contributory_sources_gold_prep            ,10,-cnt) ,transform(lay_contributory_sources ,self.cnt := ut.fIntWithCommas(left.cnt),self := left));
-  top10_contributory_sources_active   := project(topn(top10_contributory_active_sources_table   ,10,-cnt) ,transform(lay_contributory_sources ,self.cnt := ut.fIntWithCommas(left.cnt),self := left));
-  top10_contributory_sources_inactive := project(topn(top10_contributory_inactive_sources_table ,10,-cnt) ,transform(lay_contributory_sources ,self.cnt := ut.fIntWithCommas(left.cnt),self := left));
-  top10_contributory_sources_defunct  := project(topn(top10_contributory_defunct_sources_table  ,10,-cnt) ,transform(lay_contributory_sources ,self.cnt := ut.fIntWithCommas(left.cnt),self := left));
+  top10_contributory_sources_gold     := project(topn(contributory_sources_gold_prep            ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
+  top10_contributory_sources_active   := project(topn(top10_contributory_active_sources_table   ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
+  top10_contributory_sources_inactive := project(topn(top10_contributory_inactive_sources_table ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
+  top10_contributory_sources_defunct  := project(topn(top10_contributory_defunct_sources_table  ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
 
 
-  lay_child_stats := {string statname ,string statvalue := ''};
+  lay_child_stats := {string Stat_Description ,string Count_Seleids := ''};
   
   ds_gold_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'Total clusters new file'           ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = true) )) }
-    ,{'Total clusters old file'           ,ut.fIntWithCommas(count(ds_append_gold_field_old(isgold = true) )) }  
-    ,{'Overall difference(+/-)'           ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = true) ) - count(ds_append_gold_field_old(isgold = true) )) }
-    ,{'Total Clusters gained'             ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = true   ,isgold_old = false )))  }
-    ,{'Total clusters lost'               ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = true   ,isgold_new = false )))  }
-    ,{'Total Gold Clusters in common'     ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = true   ,isgold_old = true  )))  }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = true) )) }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_append_gold_field_old(isgold = true) )) }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = true) ) - count(ds_append_gold_field_old(isgold = true) )) }
+    ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = true   ,isgold_old = false )))  }
+    ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = true   ,isgold_new = false )))  }
+    ,{'Total Gold Clusters in common'                                         ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = true   ,isgold_old = true  )))  }
                                           
     ,{'------Gained Stats breakdown-------------','---------------'}
     ,{'Brand new gold clusters'                           ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = true   ,exists(new_sources)  ,~exists(old_sources)) )) }
@@ -360,12 +362,12 @@ functionmacro
 
   ds_active_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'Total clusters new file'           ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = '')))  }
-    ,{'Total clusters old file'           ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = '')))  }  
-    ,{'Overall difference(+/-)'           ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = '')) - count(ds_get_statuses_base (trim(seleid_status) = '')))  }
-    ,{'Total Clusters gained'             ,ut.fIntWithCommas(count(ds_proj_all((trim(new_status) = '' and exists(new_recs(seleid != 0))) and ((trim(old_status) != '' and exists(old_recs(seleid != 0))) or ~exists(old_recs(seleid != 0)  )))))  }
-    ,{'Total clusters lost'               ,ut.fIntWithCommas(count(ds_proj_all((trim(old_status) = '' and exists(old_recs(seleid != 0))) and ((trim(new_status) != '' and exists(new_recs(seleid != 0))) or ~exists(new_recs(seleid != 0)  )))))  }
-    ,{'Total Active Clusters in common'   ,ut.fIntWithCommas(count(ds_proj_all (trim(new_status) = '' and trim(old_status) = '' and exists(new_recs(seleid != 0)) and exists(old_recs(seleid != 0)))))  }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = '')))  }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = '')))  }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = '')) - count(ds_get_statuses_base (trim(seleid_status) = '')))  }
+    ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_proj_all((trim(new_status) = '' and exists(new_recs(seleid != 0))) and ((trim(old_status) != '' and exists(old_recs(seleid != 0))) or ~exists(old_recs(seleid != 0)  )))))  }
+    ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_proj_all((trim(old_status) = '' and exists(old_recs(seleid != 0))) and ((trim(new_status) != '' and exists(new_recs(seleid != 0))) or ~exists(new_recs(seleid != 0)  )))))  }
+    ,{'Total Active Clusters in common'                                       ,ut.fIntWithCommas(count(ds_proj_all (trim(new_status) = '' and trim(old_status) = '' and exists(new_recs(seleid != 0)) and exists(old_recs(seleid != 0)))))  }
                                           
     ,{'------Gained Stats breakdown-------------','---------------'}
     ,{'Brand new active clusters'                             ,ut.fIntWithCommas(count(ds_seleid_new_active_cluster                 )) }
@@ -381,12 +383,12 @@ functionmacro
 
   ds_inactive_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'Total clusters new file'                     ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'I')))  }
-    ,{'Total clusters old file'                     ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = 'I')))  }  
-    ,{'Overall difference(+/-)'                     ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'I')) - count(ds_get_statuses_base(trim(seleid_status) = 'I')) ) }
-    ,{'Total Clusters gained'                       ,ut.fIntWithCommas(count(ds_seleid_new_inactive_cluster) + count(ds_seleid_changed_status_active_To_inActive) + count(ds_seleid_changed_status_Defunct_To_inActive))  }
-    ,{'Total clusters lost'                         ,ut.fIntWithCommas(count(ds_seleid_lost_inactive_cluster) +  count(ds_seleid_changed_status_Inactive_To_Active) + count(ds_seleid_changed_status_Inactive_To_Defunct)) }
-    ,{'Total Inactive Clusters in common'           ,ut.fIntWithCommas(count(ds_proj_all(trim(new_status) = 'I' and trim(old_status) = 'I')))  }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'I')))  }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = 'I')))  }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'I')) - count(ds_get_statuses_base(trim(seleid_status) = 'I')) ) }
+    ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_seleid_new_inactive_cluster) + count(ds_seleid_changed_status_active_To_inActive) + count(ds_seleid_changed_status_Defunct_To_inActive))  }
+    ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_seleid_lost_inactive_cluster) +  count(ds_seleid_changed_status_Inactive_To_Active) + count(ds_seleid_changed_status_Inactive_To_Defunct)) }
+    ,{'Total Inactive Clusters in common'                                     ,ut.fIntWithCommas(count(ds_proj_all(trim(new_status) = 'I' and trim(old_status) = 'I')))  }
                                           
     ,{'------Gained Stats breakdown-------------','---------------'}
     ,{'Brand new inactive clusters'                           ,ut.fIntWithCommas(count(ds_seleid_new_inactive_cluster               )) }
@@ -402,12 +404,12 @@ functionmacro
 
   ds_defunct_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'Total clusters new file'           ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'D'))) }
-    ,{'Total clusters old file'           ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = 'D'))) }  
-    ,{'Overall difference(+/-)'           ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'D')) - count(ds_get_statuses_base (trim(seleid_status) = 'D')) ) }
-    ,{'Total Clusters gained'             ,ut.fIntWithCommas(count(ds_seleid_new_defunct_cluster) + count(ds_seleid_changed_status_active_To_Defunct + ds_seleid_changed_status_inactive_To_defunct) ) }
-    ,{'Total clusters lost'               ,ut.fIntWithCommas(count(ds_seleid_lost_defunct_cluster) +  count(ds_seleid_changed_status_defunct_To_Active) + count(ds_seleid_changed_status_defunct_To_Inactive) )}
-    ,{'Total Defunct Clusters in common'  ,ut.fIntWithCommas(count(ds_proj_all(trim(new_status) = 'D' and trim(old_status) = 'D')) ) }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'D'))) }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_get_statuses_base (trim(seleid_status) = 'D'))) }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_get_statuses_built(trim(seleid_status) = 'D')) - count(ds_get_statuses_base (trim(seleid_status) = 'D')) ) }
+    ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_seleid_new_defunct_cluster) + count(ds_seleid_changed_status_active_To_Defunct + ds_seleid_changed_status_inactive_To_defunct) ) }
+    ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_seleid_lost_defunct_cluster) +  count(ds_seleid_changed_status_defunct_To_Active) + count(ds_seleid_changed_status_defunct_To_Inactive) )}
+    ,{'Total Defunct Clusters in common'                                      ,ut.fIntWithCommas(count(ds_proj_all(trim(new_status) = 'D' and trim(old_status) = 'D')) ) }
                                           
     ,{'------Gained Stats breakdown-------------','---------------'}
     ,{'Brand new Defunct clusters'                            ,ut.fIntWithCommas(count(ds_seleid_new_defunct_cluster                )) }
@@ -423,33 +425,31 @@ functionmacro
 
 
   ds_cluster_stats := dataset([
-    { 'Gold'                                                                                        // string   status      
+    { 'Gold'                                                                                            
       ,ds_gold_stats   
-      ,top10_contributory_sources_gold                                                              // dataset({string source,unsigned cnt}) top10_contributory_sources}
+      ,top10_contributory_sources_gold                                                              
     }
 
-   ,{  'Active'                                                                                                                                   // string status                                                                                
-      ,ds_active_stats                                                                                                       // unsigned lost_clusters 
-      ,top10_contributory_sources_active                                                                                                          // dataset({string source,unsigned cnt}) top10_contributory_sources}
+   ,{  'Active'                                                                                                                                                                                                                 
+      ,ds_active_stats                                                                                                       
+      ,top10_contributory_sources_active                                                                                                          
     }                                                                                                                                             
 
-   ,{ 'Inactive'                                                                                               // string status                                                                                 
-      ,ds_inactive_stats                                                                  // unsigned lost_clusters 
-      ,top10_contributory_sources_inactive                                                                     // dataset({string source,unsigned cnt}) top10_contributory_sources}
+   ,{ 'Inactive'                                                                                                                                                                               
+      ,ds_inactive_stats                                                                 
+      ,top10_contributory_sources_inactive                                                                     
     }
 
-   ,{ 'Defunct'                                                                                                 // string status  
-      ,ds_defunct_stats                                                                    // unsigned lost_clusters 
-      ,top10_contributory_sources_defunct                                                                       // dataset({string source,unsigned cnt}) top10_contributory_sources}
+   ,{ 'Defunct'                                                                                                   
+      ,ds_defunct_stats                                                                    
+      ,top10_contributory_sources_defunct                                                                       
   }
   ]  ,{
      string                             Status  
-    ,dataset(lay_child_stats          ) Stats
-    ,dataset(lay_contributory_sources ) Top10_Contributory_Sources_For_The_Gained_Stats
+    ,dataset(lay_child_stats          ) Comparison_Stats
+    ,dataset(lay_contributory_sources ) Top_10_Sources_of_Gained_Seleids
+
     });
-
-
-
 
   // string status  
   // unsigned cnt_new_file  
