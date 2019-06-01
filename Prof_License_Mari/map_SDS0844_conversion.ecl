@@ -1,6 +1,6 @@
 ﻿IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard;
 EXPORT map_SDS0844_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name',' Yogurt:Prof License MARI- SDS0844   ' + pVersion);
 	code 										:= 'SDS0844';
 	src_cd									:= code[3..7];
 	src_st									:= code[1..2];	//License state
@@ -24,7 +24,7 @@ EXPORT map_SDS0844_conversion(STRING pVersion) := FUNCTION
 	oFile										:= OUTPUT(SAMPLE(GoodNameRec, 2,1));
 																			
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base		xformToCommon(Prof_License_Mari.layout_SDS0844.raw pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in		xformToCommon(Prof_License_Mari.layout_SDS0844.raw pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
@@ -210,7 +210,7 @@ EXPORT map_SDS0844_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(GoodTypeRec,xformToCommon(LEFT));
 	
 	// Populate STD_LICENSE_TYPE field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_std_lic(inFileLic L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_std_lic(inFileLic L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_TYPE := IF(R.DM_VALUE2 = '','BROKER', StringLib.stringtouppercase(TRIM(R.DM_VALUE2,LEFT,RIGHT)));
 		SELF := L;
 	END;
@@ -221,7 +221,7 @@ EXPORT map_SDS0844_conversion(STRING pVersion) := FUNCTION
 							trans_std_lic(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_std_lic L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_std_lic L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1));											
 		SELF := L;
 	END;

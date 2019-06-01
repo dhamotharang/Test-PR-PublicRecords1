@@ -141,7 +141,7 @@ ds_AKocc_ProfDesc	:= JOIN(ds_AKocc_LicDesc, ds_Prof_Desc,
 													jAKocc_ProfCd(LEFT,RIGHT),LEFT OUTER, LOOKUP);
 
 maribase_plus_dbas := RECORD, maxsize(5000)
-  Prof_License_Mari.layouts.base;	
+  Prof_License_Mari.layout_base_in;	
 	STRING60 dba1;
 	STRING60 dba2;
 	STRING60 dba3;
@@ -382,7 +382,7 @@ FilteredRecs  := DBARecs + NoDBARecs;
 
 
 // Transform expanded dataset to MARIBASE layout
-Prof_License_Mari.layouts.base	 xTransToBase(FilteredRecs L) := TRANSFORM		
+Prof_License_Mari.layout_base_in	 xTransToBase(FilteredRecs L) := TRANSFORM		
 	matchDBA_ORG                    := IF(TRIM(L.TMP_DBA) = TRIM(L.NAME_ORG_ORIG),'', L.TMP_DBA); //Remove any dba name that matches NAME_ORG_Orig name
   StdNAME_DBA                     := Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(matchDBA_ORG);
 	tmpDBASufx := Prof_License_Mari.mod_clean_name_addr.strippunctName(Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_DBA));
