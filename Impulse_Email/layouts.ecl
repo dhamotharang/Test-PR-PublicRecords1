@@ -1318,8 +1318,8 @@ IMPORT AID;
 					string SCRAPED,
 					string2 SOURCE := '';
 					//Added for CCPA-108
-					unsigned4 global_sid;
-					unsigned8 record_sid;
+					//unsigned4 global_sid;
+					//unsigned8 record_sid;
 				END;
 		
 END;
