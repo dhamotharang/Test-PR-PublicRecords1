@@ -1205,8 +1205,7 @@ Legal: => LegalClaimDateMax := MAX(LegalClaim.rClaim, claim_submit_ccyymmdd);
 Employer: => ClaimCount := COUNT(EmployerClaim);
 // Employer: => StatusReceiptFirstEmploymentDiff := DAYSBETWEEN(datefirstemp, statusreceiptdate);
 // Add flag for if the date is in the last 2 years... and the StatusReceiptFirstEmploymentDiff < 0
-Employer: => BusAcctUIDEcho := MAP(fltradename:Null OR flstreetaddr:Null OR zip:Null => -99999,
-                                   fltradename:Null OR flstreetaddr:Null OR citystate:Null => -99999,
+Employer: => BusAcctUIDEcho := MAP((fltradename:Null OR flstreetaddr:Null OR zip:Null) AND (fltradename:Null OR flstreetaddr:Null OR citystate:Null) => -99999,
                                    acctno);
 Employer: => BusAcctUltIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																			 ultid:Null => -99998,
