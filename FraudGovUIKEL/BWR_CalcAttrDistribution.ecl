@@ -7,17 +7,16 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 
 		// TODO - create macro for this
 
-		// fn_macro(dsMac, attributeStr, attribute) := FUNCTIONMACRO
-				// RETURN SORT(TABLE(dsMac, {STRING30 attribute_name := attributeStr, STRING30 attribute_value := (STRING)attribute, cnt:=COUNT(GROUP)}, attribute), -cnt);
-		// ENDMACRO;
+		EXPORT fn_macro(dsMac, attributeStr, attribute) := FUNCTIONMACRO
+				RETURN SORT(TABLE(dsMac, {STRING30 attribute_name := attributeStr, STRING30 attribute_value := (STRING)attribute, cnt:=COUNT(GROUP)}, attribute), -cnt);
+		ENDMACRO;
 
-		// ds_BusAcctUIDEcho := fn_macro(ds, 'BusAcctUIDEcho', Bus_Acct_U_I_D_Echo_);
-		SHARED ds_BusAcctUIDEcho := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctUIDEcho', STRING30 attribute_value:=(string)Bus_Acct_U_I_D_Echo_, cnt:=COUNT(GROUP)}, Bus_Acct_U_I_D_Echo_), -cnt);
-		SHARED ds_BusAcctUltIDAppend := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctUltIDAppend', STRING30 attribute_value:=(string)Bus_Acct_Ult_I_D_Append_, cnt:=COUNT(GROUP)}, Bus_Acct_Ult_I_D_Append_), -cnt);
-		SHARED ds_BusAcctOrgIDAppend := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctOrgIDAppend', STRING30 attribute_value:=(string)Bus_Acct_Org_I_D_Append_, cnt:=COUNT(GROUP)}, Bus_Acct_Org_I_D_Append_), -cnt);
-		SHARED ds_BusAcctSeleIDAppend := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctSeleIDAppend', STRING30 attribute_value:=(string)Bus_Acct_Sele_I_D_Append_, cnt:=COUNT(GROUP)}, Bus_Acct_Sele_I_D_Append_), -cnt);
-		SHARED ds_BusAcctProxIDAppend:= SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctProxIDAppend', STRING30 attribute_value:=(string)Bus_Acct_Prox_I_D_Append_, cnt:=COUNT(GROUP)}, Bus_Acct_Prox_I_D_Append_), -cnt);
-		SHARED ds_BusAcctPowIDAppend := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctPowIDAppend', STRING30 attribute_value:=(string)Bus_Acct_Pow_I_D_Append_, cnt:=COUNT(GROUP)}, Bus_Acct_Pow_I_D_Append_), -cnt);
+		SHARED ds_BusAcctUIDEcho := fn_macro(ds, 'BusAcctUIDEcho', Bus_Acct_U_I_D_Echo_);
+		SHARED ds_BusAcctUltIDAppend := fn_macro(ds, 'BusAcctUltIDAppend', Bus_Acct_Ult_I_D_Append_);
+		SHARED ds_BusAcctOrgIDAppend := fn_macro(ds, 'BusAcctOrgIDAppend', Bus_Acct_Org_I_D_Append_);
+		SHARED ds_BusAcctSeleIDAppend := fn_macro(ds, 'BusAcctSeleIDAppend', Bus_Acct_Sele_I_D_Append_);
+		SHARED ds_BusAcctProxIDAppend:= fn_macro(ds, 'BusAcctProxIDAppend', Bus_Acct_Prox_I_D_Append_);
+		SHARED ds_BusAcctPowIDAppend := fn_macro(ds, 'BusAcctPowIDAppend', Bus_Acct_Pow_I_D_Append_);
 
 
 		// OUTPUT(ds_BusAcctUIDEcho, NAMED('ds_BusAcctUIDEcho'));
@@ -28,20 +27,20 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 		// OUTPUT(ds_BusAcctPowIDAppend, NAMED('ds_BusAcctPowIDAppend'));
 
 		// Nate Attributes
-		SHARED ds_BusAcctNewestUpdateMasterDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctNewestUpdateMasterDt', STRING30 attribute_value:=(string)Bus_Acct_Newest_Update_Master_Dt_, cnt:=COUNT(GROUP)}, Bus_Acct_Newest_Update_Master_Dt_), -cnt);
-		SHARED ds_BusNewestRecordDt:= SORT(TABLE(ds, {STRING30 attribute_name:= 'BusNewestRecordDt', STRING30 attribute_value:=(string)Bus_Newest_Record_Dt_, cnt:=COUNT(GROUP)}, Bus_Newest_Record_Dt_), -cnt);
-		SHARED ds_BusAcctDtEmployerBeganEcho := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctDtEmployerBeganEcho', STRING30 attribute_value:=(string)Bus_Acct_Dt_Employer_Began_Echo_, cnt:=COUNT(GROUP)}, Bus_Acct_Dt_Employer_Began_Echo_), -cnt);
-		SHARED ds_BusAcctTaxLiabEndDtEcho := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctTaxLiabEndDtEcho', STRING30 attribute_value:=(string)Bus_Acct_Tax_Liab_End_Dt_Echo_, cnt:=COUNT(GROUP)}, Bus_Acct_Tax_Liab_End_Dt_Echo_), -cnt);
-		SHARED ds_BusNewestTaxLiabStartDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusNewestTaxLiabStartDt', STRING30 attribute_value:=(string)Bus_Newest_Tax_Liab_Start_Dt_, cnt:=COUNT(GROUP)}, Bus_Newest_Tax_Liab_Start_Dt_), -cnt);
+		SHARED ds_BusAcctNewestUpdateMasterDt := fn_macro(ds, 'BusAcctNewestUpdateMasterDt', Bus_Acct_Newest_Update_Master_Dt_);
+		SHARED ds_BusNewestRecordDt:= fn_macro(ds, 'BusNewestRecordDt', Bus_Newest_Record_Dt_);
+		SHARED ds_BusAcctDtEmployerBeganEcho := fn_macro(ds, 'BusAcctDtEmployerBeganEcho', Bus_Acct_Dt_Employer_Began_Echo_);
+		SHARED ds_BusAcctTaxLiabEndDtEcho := fn_macro(ds, 'BusAcctTaxLiabEndDtEcho', Bus_Acct_Tax_Liab_End_Dt_Echo_);
+		SHARED ds_BusNewestTaxLiabStartDt := fn_macro(ds, 'BusNewestTaxLiabStartDt', Bus_Newest_Tax_Liab_Start_Dt_);
 
-		SHARED ds_BusNewestTaxLiabEndDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusNewestTaxLiabEndDt', STRING30 attribute_value:=(string)Bus_Newest_Tax_Liab_End_Dt_, cnt:=COUNT(GROUP)}, Bus_Newest_Tax_Liab_End_Dt_), -cnt);
-		SHARED ds_BusAcctTaxLiabStartMsince := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctTaxLiabStartMsince', STRING30 attribute_value:=(string)Bus_Acct_Tax_Liab_Start_Msince_, cnt:=COUNT(GROUP)}, Bus_Acct_Tax_Liab_Start_Msince_), -cnt);
-		SHARED ds_BusOldestTaxLiabStartMsince := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusOldestTaxLiabStartMsince', STRING30 attribute_value:=(string)Bus_Oldest_Tax_Liab_Start_Msince_, cnt:=COUNT(GROUP)}, Bus_Oldest_Tax_Liab_Start_Msince_), -cnt);
-		SHARED ds_BusAcctOldestUnemClmDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctOldestUnemClmDt', STRING30 attribute_value:=(string)Bus_Acct_Oldest_Unem_Clm_Dt_, cnt:=COUNT(GROUP)}, Bus_Acct_Oldest_Unem_Clm_Dt_), -cnt);
-		SHARED ds_BusOldestUnemClmDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusOldestUnemClmDt', STRING30 attribute_value:=(string)Bus_Oldest_Unem_Clm_Dt_, cnt:=COUNT(GROUP)}, Bus_Oldest_Unem_Clm_Dt_), -cnt);
+		SHARED ds_BusNewestTaxLiabEndDt := fn_macro(ds, 'BusNewestTaxLiabEndDt', Bus_Newest_Tax_Liab_End_Dt_);
+		SHARED ds_BusAcctTaxLiabStartMsince := fn_macro(ds, 'BusAcctTaxLiabStartMsince', Bus_Acct_Tax_Liab_Start_Msince_);
+		SHARED ds_BusOldestTaxLiabStartMsince := fn_macro(ds, 'BusOldestTaxLiabStartMsince', Bus_Oldest_Tax_Liab_Start_Msince_);
+		SHARED ds_BusAcctOldestUnemClmDt := fn_macro(ds, 'BusAcctOldestUnemClmDt', Bus_Acct_Oldest_Unem_Clm_Dt_);
+		SHARED ds_BusOldestUnemClmDt := fn_macro(ds, 'BusOldestUnemClmDt', Bus_Oldest_Unem_Clm_Dt_);
 
-		SHARED ds_BusIncorpDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusIncorpDt', STRING30 attribute_value:=(string)Bus_Incorp_Dt_, cnt:=COUNT(GROUP)}, Bus_Incorp_Dt_), -cnt);
-		SHARED ds_BisIncorpMSince := SORT(TABLE(ds, {STRING30 attribute_name:= 'BisIncorpMSince', STRING30 attribute_value:=(string)Bis_Incorp_M_Since_, cnt:=COUNT(GROUP)}, Bis_Incorp_M_Since_), -cnt);
+		SHARED ds_BusIncorpDt := fn_macro(ds, 'BusIncorpDt', Bus_Incorp_Dt_);
+		SHARED ds_BisIncorpMSince := fn_macro(ds, 'BisIncorpMSince', Bis_Incorp_M_Since_);
 
 
 		// OUTPUT(ds_BusAcctNewestUpdateMasterDt, NAMED('ds_BusAcctNewestUpdateMasterDt'));
@@ -60,19 +59,19 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 		// OUTPUT(ds_BisIncorpMSince, NAMED('ds_BisIncorpMSince'));
 
 		// Nicole Attributes
-		SHARED ds_BusAcctNewestRecordDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctNewestRecordDt', STRING30 attribute_value:=(string)Bus_Acct_Newest_Record_Dt_, cnt:=COUNT(GROUP)}, Bus_Acct_Newest_Record_Dt_), -cnt);
-		SHARED ds_BusAcctStatusTypeEcho := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctStatusTypeEcho', STRING30 attribute_value:=(string)Bus_Acct_Status_Type_Echo_, cnt:=COUNT(GROUP)}, Bus_Acct_Status_Type_Echo_), -cnt);
-		SHARED ds_BusAcctTaxLiabStartDtEcho := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctTaxLiabStartDtEcho', STRING30 attribute_value:=(string)Bus_Acct_Tax_Liab_Start_Dt_Echo_, cnt:=COUNT(GROUP)}, Bus_Acct_Tax_Liab_Start_Dt_Echo_), -cnt);
-		SHARED ds_BusOldestTaxLiabStartDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusOldestTaxLiabStartDt', STRING30 attribute_value:=(string)Bus_Oldest_Tax_Liab_Start_Dt_, cnt:=COUNT(GROUP)}, Bus_Oldest_Tax_Liab_Start_Dt_), -cnt);
-		SHARED ds_BusOldestTaxLiabEndDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusOldestTaxLiabEndDt', STRING30 attribute_value:=(string)Bus_Oldest_Tax_Liab_End_Dt_, cnt:=COUNT(GROUP)}, Bus_Oldest_Tax_Liab_End_Dt_), -cnt);
+		SHARED ds_BusAcctNewestRecordDt := fn_macro(ds, 'BusAcctNewestRecordDt', Bus_Acct_Newest_Record_Dt_);
+		SHARED ds_BusAcctStatusTypeEcho := fn_macro(ds, 'BusAcctStatusTypeEcho', Bus_Acct_Status_Type_Echo_);
+		SHARED ds_BusAcctTaxLiabStartDtEcho := fn_macro(ds, 'BusAcctTaxLiabStartDtEcho', Bus_Acct_Tax_Liab_Start_Dt_Echo_);
+		SHARED ds_BusOldestTaxLiabStartDt := fn_macro(ds, 'BusOldestTaxLiabStartDt', Bus_Oldest_Tax_Liab_Start_Dt_);
+		SHARED ds_BusOldestTaxLiabEndDt := fn_macro(ds, 'BusOldestTaxLiabEndDt', Bus_Oldest_Tax_Liab_End_Dt_);
 
-		SHARED ds_BusTaxLiabOngoingFlag := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusTaxLiabOngoingFlag', STRING30 attribute_value:=(string)Bus_Tax_Liab_Ongoing_Flag_, cnt:=COUNT(GROUP)}, Bus_Tax_Liab_Ongoing_Flag_), -cnt);
-		SHARED ds_BusAcctTaxLiabEndMsince := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctTaxLiabEndMsince', STRING30 attribute_value:=(string)Bus_Acct_Tax_Liab_End_Msince_, cnt:=COUNT(GROUP)}, Bus_Acct_Tax_Liab_End_Msince_), -cnt);
-		SHARED ds_BusNewestTaxLiabEndMsince := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusNewestTaxLiabEndMsince', STRING30 attribute_value:=(string)Bus_Newest_Tax_Liab_End_Msince_, cnt:=COUNT(GROUP)}, Bus_Newest_Tax_Liab_End_Msince_), -cnt);
-		SHARED ds_BusAcctNewestUnemClmDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusAcctNewestUnemClmDt', STRING30 attribute_value:=(string)Bus_Acct_Newest_Unem_Clm_Dt_, cnt:=COUNT(GROUP)}, Bus_Acct_Newest_Unem_Clm_Dt_), -cnt);
-		SHARED ds_BusNewestUnemClmDt := SORT(TABLE(ds, {STRING30 attribute_name:= 'BusNewestUnemClmDt', STRING30 attribute_value:=(string)Bus_Newest_Unem_Clm_Dt_, cnt:=COUNT(GROUP)}, Bus_Newest_Unem_Clm_Dt_), -cnt);
+		SHARED ds_BusTaxLiabOngoingFlag := fn_macro(ds, 'BusTaxLiabOngoingFlag', Bus_Tax_Liab_Ongoing_Flag_);
+		SHARED ds_BusAcctTaxLiabEndMsince := fn_macro(ds, 'BusAcctTaxLiabEndMsince', Bus_Acct_Tax_Liab_End_Msince_);
+		SHARED ds_BusNewestTaxLiabEndMsince := fn_macro(ds, 'BusNewestTaxLiabEndMsince', Bus_Newest_Tax_Liab_End_Msince_);
+		SHARED ds_BusAcctNewestUnemClmDt := fn_macro(ds, 'BusAcctNewestUnemClmDt', Bus_Acct_Newest_Unem_Clm_Dt_);
+		SHARED ds_BusNewestUnemClmDt := fn_macro(ds, 'BusNewestUnemClmDt', Bus_Newest_Unem_Clm_Dt_);
 
-		SHARED ds_BusIncorpStatusType:= SORT(TABLE(ds, {STRING30 attribute_name:= 'BusIncorpStatusType', STRING30 attribute_value:=(string)Bus_Incorp_Status_Type_, cnt:=COUNT(GROUP)}, Bus_Incorp_Status_Type_), -cnt);
+		SHARED ds_BusIncorpStatusType:= fn_macro(ds, 'BusIncorpStatusType', Bus_Incorp_Status_Type_);
 
 		// OUTPUT(ds_BusAcctNewestRecordDt, NAMED('ds_BusAcctNewestRecordDt'));
 		// OUTPUT(ds_BusAcctStatusTypeEcho, NAMED('ds_BusAcctStatusTypeEcho'));
