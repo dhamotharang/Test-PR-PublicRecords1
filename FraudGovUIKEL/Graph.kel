@@ -1191,9 +1191,9 @@ USE FraudGovUIKEL.Files.Claims(FLAT,
 // Legal Attributes
 Legal: => AccountNumberCount := COUNT(AccountNumbers);
 Legal: => ClaimCount := COUNT(LegalClaim);
-Legal: => NewestUnemClmDt := MAP(ALL(LegalClaim.rClaim, NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99997, // No valid claim dates
+Legal: => NewestUnemClmDt := MAP(ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // No valid claim dates
 																 INTEGER(MAX(LegalClaim.rClaim, claim_submit_ccyymmdd)));
-Legal: => OldestUnemClmDt := MAP(ALL(LegalClaim.rClaim, NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99997, // No valid claim dates
+Legal: => OldestUnemClmDt := MAP(ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // No valid claim dates
 																 INTEGER(MIN(LegalClaim.rClaim, claim_submit_ccyymmdd)));
 
 
@@ -1245,15 +1245,13 @@ Employer: => BusOldestTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:
 																								MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt), DATE(BusNewestRecordDt)));
 Employer: => BusAcctOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 ClaimCount=0 => -99998,
-																					 ALL(EmployerClaim.rClaim, NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99997, // All claim dates are invalid
+																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
 																					 INTEGER(MIN(EmployerClaim.rClaim, claim_submit_ccyymmdd)));
 Employer: => BusOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																			 rLegal.ClaimCount=0 => -99998,
 																			 rLegal.OldestUnemClmDt); // Will have -99997 if no dates
-																			 // ALL(LegalClaim.rClaim, NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99997, // All invalid dates
-																			 // INTEGER(MIN(LegalClaim.rClaim, claim_submit_ccyymmdd)));
 Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
-																(NOT ISVALIDDATE(rLegal.bestseleincorporationdate)) => -99997, // SOS incorp date is invalid
+																rLegal.bestseleincorporationdate:Null OR (NOT ISVALIDDATE(rLegal.bestseleincorporationdate)) => -99997, // SOS incorp date is invalid
 																DAYSBETWEEN(rLegal.bestseleincorporationdate, DATE(BusNewestRecordDt)) < 0 => -99998, // No SOS incorporation on file prior to BusNewestRecordDt
 																INTEGER(rLegal.bestseleincorporationdate)); // I believe this is the SOS incorporation date
 Employer: => BisIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
@@ -1289,25 +1287,18 @@ Employer: => BusNewestTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Nu
 																						  MONTHSBETWEEN(DATE(BusNewestTaxLiabEndDt),DATE(BusNewestRecordDt))); // Needs BusNewestTaxLiabEndDt to work
 Employer: => BusAcctNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 ClaimCount=0 => -99998,
-																					 ALL(EmployerClaim.rClaim, NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99997, // All claim dates are invalid
+																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
 																					 INTEGER(MAX(EmployerClaim.rClaim, claim_submit_ccyymmdd)));
 																					 																					 
 Employer: => BusNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																			 ClaimCount=0 => -99998,
 																			 rLegal.NewestUnemClmDt); // Will have -99997 if no valid dates
-																			 // ALL(LegalClaim.rClaim, NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99997, // All claim dates are invalid
-																			 // INTEGER(MAX(LegalClaim.rClaim, claim_submit_ccyymmdd)));
-
+																	
 Employer: => BusIncorpStatusType := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
                                         DAYSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestRecordDt))<0 => -99998,
 																				biscorporatestatus:Null => -99997,
 																				biscorporatestatus);
 
-// Attributes that need fixed
-// BusIncorpDt
-// BusIncorpMSinceDt
-// BusTaxLiabOngoingFlag
-// NOT ISVALIDDATE expressions
 
 
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
