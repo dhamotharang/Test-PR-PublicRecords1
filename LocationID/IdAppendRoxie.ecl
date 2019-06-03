@@ -1,8 +1,18 @@
 ﻿import LocationID;
 import LocationId_xLink;
 import SALT37;
-	
-export IdAppendRoxie(dataset(LocationID.IdAppendLayouts.AppendInput) inputDs) := function	
+
+/**
+	inputDs  - Address Fields - with a uniqueID for each record
+	minScore - Higher Score means higher precision. Lower Score means higher recall.
+               NOTE: Any score below 51 will return an empty dataset as this is ambiguous
+	debug    - NOTE: Do no use this. This will result in mutliple matches for each address.
+**/	
+export IdAppendRoxie(dataset(LocationID.IdAppendLayouts.AppendInput) inputDs 
+                    ,integer minScore    = 75
+				,integer minWeight   = 19
+				,boolean debug       = false) := function	
+				 
      SALTInput := project(inputDs,
                           transform(LocationId_xLink.Process_LocationID_Layouts.InputLayout,                               
                                    POBoxIndex               := left.prim_name[1..6]='PO BOX';
@@ -20,20 +30,39 @@ export IdAppendRoxie(dataset(LocationID.IdAppendLayouts.AppendInput) inputDs) :=
 							self.addr_suffix_derived := left.addr_suffix;
                                    self                     := left));
               
-     pm := LocationId_xLink.MEOW_LocationID(SALTInput); 
-     ds := pm.Data_;
-
-     FieldNumber(SALT37.StrType fn) := CASE(fn,'prim_range' => 1,'predir' => 2,'prim_name' => 3,'addr_suffix' => 4,'postdir' => 5,'unit_desig' => 6,'sec_range' => 7,'v_city_name' => 8,'st' => 9,'zip5' => 10,11);
-     result := CHOOSE(FieldNumber(''),SORT(ds,-weight,LocId,prim_range,RECORD),SORT(ds,-weight,LocId,predir_derived,RECORD),SORT(ds,-weight,LocId,prim_name_derived,RECORD),SORT(ds,-weight,LocId,addr_suffix_derived,RECORD),SORT(ds,-weight,LocId,postdir,RECORD),SORT(ds,-weight,LocId,unit_desig,RECORD),SORT(ds,-weight,LocId,sec_range,RECORD),SORT(ds,-weight,LocId,v_city_name,RECORD),SORT(ds,-weight,LocId,st,RECORD),SORT(ds,-weight,LocId,zip5,RECORD),SORT(ds,-weight,LocId,RECORD));
-		
-     dedupResult := dedup(result, uniqueid, all);
+     result := LocationId_xLink.MEOW_LocationID(SALTInput).raw_results; 
 	
-	svcResult   := join(inputDs, dedupResult,
+	FlatRec := record
+		result.results.locid;
+		result.results.score;
+		result.results.weight;
+		result.uniqueid;
+		result.resolved;
+	end;
+
+	flattendDs := normalize(result, left.results, 
+	                        transform(FlatRec,
+	                                  self := left,
+	                                  self := right));
+
+	resolvedDs := flattendDs(resolved and score > minScore and weight > minWeight);
+	
+	svcResulta   := join(inputDs, resolvedDs,
+	                     left.request_id = right.uniqueid,
+			 		 transform(LocationID.IdAppendLayouts.svcAppendOut,
+					           self.locid := right.locid,
+							 self       := left), limit(1000));
+
+	emptyDs     := dataset([],LocationID.IdAppendLayouts.svcAppendOut);
+	
+	svcResult   := if(minScore<51, emptyDs, svcResulta);
+	
+     debugResult := join(inputDs, flattendDs,
 	                    left.request_id = right.uniqueid,
 					transform(LocationID.IdAppendLayouts.svcAppendOut,
-					          self.locid := right.locid,
-							self       := left));
-	
-     return svcResult;
+					          self.locid  := right.locid,
+							self        := left), limit(1000));
+
+     return if(debug, debugResult, svcResult);
 
 end;
