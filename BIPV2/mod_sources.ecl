@@ -61,7 +61,7 @@ export mod_sources := module
 		
 	export unsigned code2bmap(code c) := ut.bit_set(0,(unsigned)c);
 	
- export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Restricted, 0, code2bmap(code.MARKETING_UNRESTRICTED));
+ export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Sources, code2bmap(code.MARKETING_UNRESTRICTED), 0);
               
 	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(exclusiveSrc2code(src,vl_id)) | inclusiveSrc2bmap(src); // called by SALT - becomes *_data_permits
 	

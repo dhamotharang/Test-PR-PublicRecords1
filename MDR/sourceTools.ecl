@@ -1043,9 +1043,23 @@ MODULE
 	export set_Marketing_FBN       				:= [  /* Fictitious Business Name sources allowed for Marketing */
 		 src_FBNV2_CA_San_Bernadino 	 ,src_FBNV2_CA_Orange_county		,src_FBNV2_TX_Harris					 ,src_FBNV2_CA_Ventura
 		,src_FBNV2_FL 								 ,src_FBNV2_CA_Santa_Clara			,src_FBNV2_New_York						 ,src_FBNV2_CA_San_Diego
+		,src_FBNV2_Hist_Choicepoint
 	];
 
-	export set_Marketing_Header           := [
+	export set_Marketing_Death       				:= [  /* Death sources allowed for Marketing */
+		 src_Death_State 	 						 ,src_Death_Tributes						,src_Death_CT									 ,src_Death_FL
+		 ,src_Death_GA								 ,src_Death_KY								  ,src_Death_MA									 ,src_Death_ME									 
+		 ,src_Death_MN								 ,src_Death_MT								  ,src_Death_NC									 ,src_Death_NV
+		 ,src_Death_OH
+	   ,src_Death_VA									
+	];
+	
+	export set_Marketing_Liquor_Licenses            := [  /* Liquor sources allowed for Marketing */
+		 src_CA_Liquor_Licenses        ,src_CT_Liquor_Licenses        ,src_LA_Liquor_Licenses				 ,src_OH_Liquor_Licenses        
+		,src_PA_Liquor_Licenses        ,src_TX_Liquor_Licenses        
+	];
+	
+		export set_Marketing_Header           := [
 		 set_Marketing_Veh             ,src_Aircrafts                 ,src_Airmen						         ,set_Marketing_WC              
 		,src_AK_Busreg    						 ,set_Marketing_Corp            ,set_Marketing_FBN             ,src_DEA 
 		,src_Death_Master							 ,src_Death_CA									,src_Death_CT  								 ,src_Death_FL
@@ -1072,6 +1086,29 @@ MODULE
 		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
+// Marketing approved soources as of 3/2019.
+export set_Marketing_Sources           := [
+		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
+		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
+		,src_AlloyMedia_student_list   ,src_American_Students_List    ,src_BBB_Member								 ,src_BBB_Non_Member						 
+		,src_Bankruptcy								 ,src_Bankruptcy_Attorney  		  ,src_CA_Liquor_Licenses				 ,src_CA_Sales_Tax							 
+		,src_DEA									 		 ,src_Datagence								  ,src_Diversity_Cert						 ,src_Divorce									 
+		,src_Dunn_Bradstreet_Fein			 ,src_EMerge_CCW								,src_Employee_Directories			 ,src_Experian_Phones					 
+		,src_EMerge_Fish							 ,src_EMerge_Hunt							  ,src_EMerge_Boat							 ,src_FCC_Radio_Licenses 			 
+		,src_FDIC											 ,src_Foreclosures						  ,src_Federal_Firearms					 ,src_Gong_Neustar						  
+		,src_GSA											 ,src_IRS_5500									,src_Impulse									 ,src_IA_Sales_Tax     				  
+		,src_IRS_Non_Profit    				 ,src_InfutorNarc								,src_InfutorTRK  							 ,src_InfutorCID    						
+		,src_Infutor_Motorcycle_Veh 	 ,src_InfutorNare 							,src_Ingenix_Sanctions				 ,src_LaborActions_EBSA					
+		,src_LaborActions_WHD				   /*,src_Liens										  ,src_Liens_v2  */  					 ,src_LnPropV2_Fares_Asrs			 
+		,src_LnPropV2_Lexis_Deeds_Mtgs ,src_Lobbyists								  ,src_MO_DL   
+		,src_Marriage 								 ,src_MediaOne								  ,src_NaturalDisaster_Readiness ,src_NJ_Gaming_Licenses			 
+		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
+		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
+		,src_Vickers									 ,src_ZOOM											,src_Cortera										
+		,set_Marketing_Corp					   ,set_Marketing_Death					  ,set_Marketing_FBN						 ,set_Marketing_Liquor_Licenses
+		,set_Marketing_WC
+	]; 
+	
 export set_Marketing_Restricted := [
   src_Aircrafts,             src_AK_Corporations,        src_AL_Corporations,        src_AL_Watercraft,             src_AR_Corporations,
   src_AR_Watercraft,         src_AZ_Corporations,        src_AZ_Watercraft,          src_BBB_Member,                src_BBB_Non_Member,

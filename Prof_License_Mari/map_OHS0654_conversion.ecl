@@ -141,7 +141,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	ut.CleanFields(GoodFilterRec,clnFilterRec);	
 		
 	maribase_plus_dbas := RECORD, maxsize(5200)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING160 dba1;
 		STRING160 dba2;
 		STRING160 dba3;
@@ -769,7 +769,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 		SELF.NAME_ORG_SUFX 	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, ' ');
 		
 		StdNAME_DBA	:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(L.TMP_DBA);

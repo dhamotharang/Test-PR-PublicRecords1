@@ -88,7 +88,7 @@ EXPORT map_NJS0033_conversion(STRING pVersion) := FUNCTION
 													')';		
 													
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(Prof_License_Mari.layout_NJS0033.common pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(Prof_License_Mari.layout_NJS0033.common pInput) := TRANSFORM
 	 	SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
 		SELF.LAST_UPD_DTE			:= pVersion;							//it was set to process_date before
@@ -368,7 +368,7 @@ EXPORT map_NJS0033_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(ClnLicRec,xformToCommon(LEFT));
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base trans_lic_status(inFileLic L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(inFileLic L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS :=  IF(L.STD_LICENSE_STATUS = '',StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT)),
 																			L.STD_LICENSE_STATUS);
 		SELF := L;
@@ -380,7 +380,7 @@ EXPORT map_NJS0033_conversion(STRING pVersion) := FUNCTION
 							trans_lic_status(LEFT,RIGHT),LEFT OUTER,MANY LOOKUP);
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_status_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_status_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 		SELF := L;
 	END;

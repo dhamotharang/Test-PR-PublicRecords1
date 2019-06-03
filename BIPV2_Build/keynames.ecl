@@ -35,6 +35,7 @@ module
 	export biz_preferred             := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::biz_preferred'                               ,pversion    );
 
   export BIPV2FullKeys := 
+    (
       linkids                 .dall_filenames
 		+ linkids_hidden					.dall_filenames //newly added	
     + translations            .dall_filenames
@@ -57,6 +58,8 @@ module
     // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     + TopBusiness_BIPV2.KeyNames      (pversion,pUseOtherEnvironment).dall_filenames
+    )
+    (~regexfind('ext_data',logicalname,nocase)) //remove external xlink keys because they are not in this package
     ;
     
   export BIPV2WeeklyKeys := 

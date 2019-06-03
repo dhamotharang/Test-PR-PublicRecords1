@@ -1,4 +1,4 @@
-/* Converting Utah Department of Financial Institutions / Mortgage Lenders // Professions Licenses File to MARI common layout
+﻿/* Converting Utah Department of Financial Institutions / Mortgage Lenders // Professions Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 
@@ -57,7 +57,7 @@ GoodFilterRec := FilterHeaderRec(NAME != '' AND ADDRESS != '');
 
 
 //Real Estate License to common MARIBASE layout
-Prof_License_Mari.layouts.base 		xformToCommon(GoodFilterRec pInput) 
+Prof_License_Mari.layout_base_in 		xformToCommon(GoodFilterRec pInput) 
 	:= 
 	 TRANSFORM
 		self.PRIMARY_KEY	    := 0;  
@@ -274,7 +274,7 @@ OFileLic := output(inFileLic);
 
 
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(inFileLic L, cmvTransLkp R) := transform
+Prof_License_Mari.layout_base_in 	trans_lic_type(inFileLic L, cmvTransLkp R) := transform
 	self.STD_PROF_CD := StringLib.stringtouppercase(trim(R.DM_VALUE1,LEFT,RIGHT));
 	self := L;
 end;

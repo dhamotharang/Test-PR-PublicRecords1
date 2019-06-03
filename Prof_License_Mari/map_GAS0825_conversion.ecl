@@ -134,7 +134,7 @@ EXPORT map_GAS0825_conversion(STRING pVersion) := FUNCTION
 	DBATypeAddl	:= '(ATT |CARE OF)';
 
 	maribase_plus_dbas := RECORD,MAXLENGTH(5000)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba;
 		STRING60 dba1;
 		STRING60 dba2;
@@ -275,7 +275,7 @@ EXPORT map_GAS0825_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_ZIP5_1		 := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),TRIM(pInput.ZIP,LEFT,RIGHT)[1..5]);
 		SELF.ADDR_ZIP4_1		 := clnAddrAddr1[122..125];
 		
-		SELF.ADDR_CNTY_1    := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.county);
+		SELF.ADDR_CNTY_1    := ut.CleanSpacesAndUpper(pInput.county);
 
 		// assign business address indicator to true (B) if business address fields are not empty
 		SELF.ADDR_BUS_IND	:= IF(TRIM(pInput.address1 + pInput.address2 + pInput.city + pInput.state + pInput.zip) != '','B','');
@@ -568,7 +568,7 @@ EXPORT map_GAS0825_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 			
 		TrimDBASufx			:= MAP(REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => StringLib.StringFindReplace(L.TMP_DBA,'CO',''),
 												 NOT REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanFName(L.TMP_DBA), 
