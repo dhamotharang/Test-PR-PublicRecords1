@@ -1,4 +1,4 @@
-import doxie,Data_Services,UT;
+﻿import doxie,Data_Services,UT;
 
 df := Inquiry_AccLogs.File_Inquiry_Base.history(bus_intel.industry <> '' and 
 						trim(person_q.IPaddr) <> '' and 
@@ -10,6 +10,7 @@ slim := record
 	df.bus_intel;
 	df.person_q;
 	df.search_info;
+	inquiry_acclogs.layout.ccpaLayout ccpa;
 end;
 
 p := project(df, transform(slim, 
