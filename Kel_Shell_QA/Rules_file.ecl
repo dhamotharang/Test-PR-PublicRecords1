@@ -43,7 +43,7 @@ string	ECLFieldname;
 // string	KELFieldname;
 string	Category;
 // string	AttributeDefinition;
-// string	SourceDescription;
+string	SourceDescription;
 // string	NumericCharactersallowed;
 // string	Type;
 string	Min;
@@ -78,7 +78,7 @@ self.ECLFieldname:=left.field1;
 // self.KELFieldname:=left.field2;
 self.Category:=left.field3;
 // self.AttributeDefinition:=left.field4;
-// self.SourceDescription:=left.field5;
+self.SourceDescription:=left.field5;
 // self.NumericCharactersallowed:=left.field6;
 // self.Type:=left.field7;
 self.Min:=left.field8;
@@ -110,4 +110,4 @@ self.DefaultValues:=(SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(lef
 self:=[];
 ));
 
-EXPORT Rules_file := p(Category in ['Assets','B2B Trade','Bankruptcy History','Inquiry History',	'Criminal History',	'Business Input Clean ',	'Business Input Clean Populated',	'Business Input Echo Populated',	'Input Clean Populated',	'Input Clean',	'Input Echo Populated',	'Business Input Echo','Input Echo']);
+EXPORT Rules_file:= p(Category in ['Assets','B2B Trade','Bankruptcy History','Inquiry History',	'Criminal History',	'Business Input Clean ',	'Business Input Clean Populated',	'Business Input Echo Populated',	'Input Clean Populated',	'Input Clean',	'Input Echo Populated',	'Business Input Echo','Input Echo']);

@@ -9,7 +9,7 @@ Kel_Shell_QA.Data_change_macro2(inut_file_records,test,fileop);
 
 Kel_Shell_QA.Distribution_Module.Dis_Macro(unique_field, fileop, op, op2)
 
-final_report:=output(op,,'~kel_shell::out::Distribution_Report_'+ tag, CSV(heading(single), quote('"')), overwrite);
+final_report:=output(op,,'~kel_shell::out::Distribution_Report_'+ tag, CSV(heading(single), quote('"')), overwrite, EXPIRE(30));
 
 final_report_excel := Kel_Shell_QA.Email_Report('~kel_shell::out::Distribution_Report_'+ tag , ' Distribution Report ' , tag  );
 

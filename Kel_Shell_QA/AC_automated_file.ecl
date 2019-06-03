@@ -1,4 +1,4 @@
-﻿EXPORT AC_automated_file(unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO
+﻿﻿EXPORT AC_automated_file(unique_field, inut_file_records, Tag, Lay_para, Category_par) := FUNCTIONMACRO  
 
 
 IMPORT STD;
@@ -6,7 +6,7 @@ IMPORT STD;
 projected_input_file:= project(inut_file_records,transform(recordof(inut_file_records),
                        self.inputarchivedateecho:=left.inputarchivedateecho[1..8];
 											 self.InputArchiveDateClean:=left.InputArchiveDateClean[1..8];
-                       self.BusInputArchiveDateClean:=left.BusInputArchiveDateClean[1..8];
+                       // self.BusInputArchiveDateClean:=left.BusInputArchiveDateClean[1..8];
 											 self:=left;
                        ));
 	 

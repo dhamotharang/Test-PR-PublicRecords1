@@ -14,6 +14,7 @@
 		Layout_file2:=RECORD
 			string attribute;
 			string category;
+			STRING SourceDescription;
 			string distribution_type;
 			string attribute_value;
 			integer8 result_cnt;
@@ -43,6 +44,7 @@
 			decimal20_4 matched_file_count;
 			string attribute;
 			string Category;
+			STRING SourceDescription;
 			string distribution_type;
 			STRING50 attribute_value; 
 			decimal20_4 p_frequency;
@@ -61,6 +63,7 @@
 										 // left.file_version = right.file_version and
 								      left.attribute = right.attribute and
 											left.Category = right.Category and
+											left.SourceDescription = right.SourceDescription and
 											left.distribution_type = right.distribution_type and
 											left.attribute_value = right.attribute_value 
 											,transform(	compare_layout,
@@ -70,6 +73,7 @@
 													 self.current_file:= new_Tag;
 													 self.attribute:=if(left.attribute='',right.attribute,left.attribute),
 													 self.Category:=if(left.Category='',right.Category,left.Category),
+													 self.SourceDescription:=if(left.SourceDescription='',right.SourceDescription,left.SourceDescription),
 													 self.distribution_type:=if(left.distribution_type='',right.distribution_type,left.distribution_type),
 													 self.p_file_count:= count(old_input_file_records),
 													 self.c_file_count:= count(new_input_file_records),
@@ -113,6 +117,7 @@
 			decimal20_4 matched_file_count;
 			string100 attribute;
 			string Category;
+			string SourceDescription;
 			string30 distribution_type;
 			STRING50 attribute_value; 
 			decimal20_4 p_frequency;
