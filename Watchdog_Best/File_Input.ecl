@@ -1,7 +1,8 @@
 ﻿import utilfile, header, gong_neustar;
 
-qlfn := '~thor400_36::persist::qh_did_into_watchdog';
-q := dataset(qlfn, header.Layout_Header, thor);
+//qlfn := '~thor400_36::persist::qh_did_into_watchdog';
+//q := dataset(qlfn, header.Layout_Header, thor);
+q :=  DATASET('~thor_data400::base::quick_header', header.Layout_Header, thor);
 
 
 base1 := Header.File_Headers;

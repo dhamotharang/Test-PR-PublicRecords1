@@ -141,7 +141,7 @@ EXPORT mod_Validation := MODULE
 									DATASET([{warningCodes.W109, 'W', 'F', FieldCode('W', warningCodes.W109), left.MonthlyAllotment, left.ProgramState, left.RecordCode}], rErr))
 							+ IF(NOT isOptionalInteger(left.HistoricalBenefitCount), 
 									DATASET([{warningCodes.W110, 'W', 'F', FieldCode('W', warningCodes.W110), left.HistoricalBenefitCount, left.ProgramState, left.RecordCode}], rErr))
-							+ IF(left.email <> '' AND NOT REGEXFIND(rgxEmail, left.email, NOCASE), 
+							+ IF(left.email <> '' AND NOT REGEXFIND(rgxEmail, TRIM(left.email), NOCASE), 
 									DATASET([{warningCodes.W118, 'W', 'F', FieldCode('W', warningCodes.W118), left.email, left.ProgramState, left.RecordCode}], rErr))
 							;
 					self.errors := COUNT(self.dsErrs(severity='E'));
@@ -173,7 +173,7 @@ EXPORT mod_Validation := MODULE
 							+ IF(NOT isOptionalInteger(left.MonthlyAllotment), 
 									DATASET([{warningCodes.W109, 'W', 'F', FieldCode('W', warningCodes.W109), left.MonthlyAllotment, left.ProgramState, left.RecordCode}], rErr))														
 							+ IF(left.email <> '' AND NOT REGEXFIND(rgxEmail, left.email, NOCASE), 
-									DATASET([{warningCodes.W118, 'W', 'F', FieldCode('W', warningCodes.W118), left.email, left.ProgramState, left.RecordCode}], rErr))
+									DATASET([{warningCodes.W118, 'W', 'F', FieldCode('W', warningCodes.W118), TRIM(left.email), left.ProgramState, left.RecordCode}], rErr))
 							;
 					self.errors := COUNT(self.dsErrs(severity='E'));
 					self.warnings := COUNT(self.dsErrs(severity='W'));
@@ -233,7 +233,7 @@ EXPORT mod_Validation := MODULE
 							+ IF(left.ClientId<>'', validClientId(left.ClientId, left.ProgramState, left.RecordCode))
 							+ IF(left.UpdateType not in ['U','D','O'], 
 											DATASET([{errCodes.E119, 'E', 'F', FieldCode('E', errCodes.E119), left.UpdateType, left.ProgramState, left.RecordCode}], rErr))							
-							+ IF(left.ContactEmail <> '' AND NOT REGEXFIND(rgxEmail, left.ContactEmail, NOCASE), 
+							+ IF(left.ContactEmail <> '' AND NOT REGEXFIND(rgxEmail, TRIM(left.ContactEmail), NOCASE), 
 									DATASET([{warningCodes.W118, 'W', 'F', '2042', left.ContactEmail, left.ProgramState, left.RecordCode}], rErr))
 							;
 
