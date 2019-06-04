@@ -228,7 +228,7 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					
 					// add date information
 					self.StartDate_Raw := right.StartDate;
-					self.EndDate_Raw := right.StartDate;
+					self.EndDate_Raw := right.EndDate;
 					self.StartDate := fn_FirstDayOfMonth(right.StartDate);
 					self.EndDate := fn_LastDayOfMonth(right.EndDate);
 					
