@@ -886,7 +886,8 @@ Claim :=  ENTITY
   STRING claim_sep_emp_name,
   INTEGER claim_sep_emp_no,
 	INTEGER bizrecid,// this joins to trum,
-  DATE claim_submit_ccyymmdd
+  DATE claim_submit_ccyymmdd,
+	STRING claim_status
 	/*
   STRING claim_decision_code,
   STRING application_id,
@@ -1344,6 +1345,11 @@ Employer: => BusLiabToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:N
 																							 BusOldestTaxLiabStartDt=-99998 OR BusNewestUnemClmDt=-99998 => -99998,
 																							 BusOldestTaxLiabStartDt=-99997 OR BusNewestUnemClmDt=-99997 => -99997,
 																							 MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusNewestUnemClmDt)));
+Employer: => BusAcctUnemClaimCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																									ClaimCount=0 => -99998,
+																									ALL(EmployerClaim.rClaim, claim_status:Null ) => -99997,
+																									COUNT(EmployerClaim(Claim.claim_status = 'Regular Active')));
+																									
 
 
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
