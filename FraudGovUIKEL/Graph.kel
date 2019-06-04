@@ -865,7 +865,8 @@ UID,rLegal,dummycode,acctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirst
   
 Claim :=  ENTITY
 (FLAT(UID(bizrecid),
-  STRING claim_ssn,
+  Employer rEmployer=UID(acctno),
+  Claimant rClaimant=UID(application_id),
   STRING claim_status,
    /*
   STRING col_monetary_determination_id,
@@ -881,13 +882,11 @@ Claim :=  ENTITY
   REAL claim_max_earn_allowed,
   INTEGER claim_weeks,
   */
-	Employer rEmployer=UID(acctno),
   INTEGER acctno, // claim_sep_emp_no in claims
   STRING claim_sep_emp_name,
   INTEGER claim_sep_emp_no,
 	INTEGER bizrecid,// this joins to trum,
-  DATE claim_submit_ccyymmdd,
-	STRING claim_status
+  DATE claim_submit_ccyymmdd
 	/*
   STRING claim_decision_code,
   STRING application_id,
@@ -1153,7 +1152,16 @@ Claim :=  ENTITY
   INTEGER selegsaflag,
   INTEGER proxgsaflag*/
 		),
-	MODEL(UID, claim_ssn, claim_status, rEmployer, claim_submit_ccyymmdd, bizrecid, acctno,claim_sep_emp_name, claim_sep_emp_no));
+	MODEL(UID, rEmployer, rClaimant, claim_status, claim_submit_ccyymmdd, bizrecid, acctno,claim_sep_emp_name, claim_sep_emp_no));
+
+
+Claimant :=  ENTITY
+(FLAT(UID(application_id),
+	STRING claimant_ssn),
+                MODEL(
+                  UID, claimant_ssn));
+
+
 
 
 LegalEmployer :=  ASSOCIATION
@@ -1188,6 +1196,11 @@ USE FraudGovUIKEL.Files.Claims(FLAT,
 	EmployerClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
 	LegalClaim(FILTER((UNSIGNED)claim_sep_emp_no != 0))
 	);
+	
+
+USE FraudGovUIKEL.Files.Claimant(FLAT,
+  Claimant(FILTER((UNSIGNED)application_id != 0)));                        
+
 
 // Legal Attributes
 Legal: => AccountNumberCount := COUNT(AccountNumbers);
@@ -1198,7 +1211,7 @@ Legal: => OldestUnemClmDt := MAP(ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Nu
 																 INTEGER(MIN(LegalClaim.rClaim, claim_submit_ccyymmdd)));
 
 // Claim Attributes
-Claim: => ClaimantID := claim_ssn;
+Claim: => ClaimantID := rClaimant.claimant_ssn;
 
 	
 Employer: => ClaimCount := COUNT(EmployerClaim);
@@ -1263,6 +1276,7 @@ Employer: => BusIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -999
 																		MIN(MONTHSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)), 999));
 	
 // Claim History Attributes
+/*
 Employer: => BusAcctUnemClmAcctCurActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									 ClaimCount=0 OR (ALL(EmployerClaim.rClaim, ClaimantID:Null)) => -99998, // No unemployment claims or no claimant IDs found
 																									 ALL(EmployerClaim.rClaim, claim_status:Null) => -99997,
@@ -1275,7 +1289,7 @@ Employer: => BusAcctUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999
 																								 ClaimCount=0 OR (ALL(EmployerClaim.rClaim, ClaimantID:Null)) => -99998, // No unemployment claims or no claimant IDs found
 																								 ALL(EmployerClaim.rClaim, claim_status:Null) => -99997,
 																								 MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(UPCASE(claim_status)='REGULAR ACTIVE'), LEFT.ClaimantID=RIGHT.ClaimantID, ClaimantID)), 9999)); // Count the number of unique claimants that are regular active
-
+*/
 
 
 	
@@ -1351,9 +1365,9 @@ Employer: => BusAcctUnemClaimCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 => -9999
 																									COUNT(EmployerClaim(Claim.claim_status = 'Regular Active')));
 																									
 
-
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
 QUERY: showEmployers <= Employer;
 QUERY: showLegal <= Legal;
 QUERY: showClaims <= Claim;
 QUERY: showEmployerClaims <= EmployerClaim;
+QUERY: showClaimant <= Claimant;
