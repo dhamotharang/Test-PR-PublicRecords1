@@ -1323,7 +1323,7 @@ Employer: => BusAcctNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
 																					 INTEGER(MAX(EmployerClaim.rClaim, claim_submit_ccyymmdd)));																		 																					
 Employer: => BusNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
-																			 ClaimCount=0 => -99998,
+																			 rLegal.ClaimCount=0 => -99998,
 																			 rLegal.NewestUnemClmDt); // Will have -99997 if no valid dates
 																	
 Employer: => BusIncorpStatusType := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
