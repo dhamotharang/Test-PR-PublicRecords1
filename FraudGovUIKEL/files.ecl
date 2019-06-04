@@ -832,6 +832,7 @@ EXPORT files := MODULE
  EXPORT Employer := PROJECT(EmployerPrep, 
                       TRANSFORM(RECORDOF(LEFT), 
 											SELF.acctno := std.str.CleanSpaces(std.str.FindReplace(LEFT.acctno, '"', '\'')), 
+											SELF.status := IF(LEFT.status in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18'], LEFT.status, '');
 											SELF.statusreceiptdate := MAP((UNSIGNED)LEFT.statusreceiptdate[5..6] > 20 => '19', '20') + LEFT.statusreceiptdate[5..6] + LEFT.statusreceiptdate[1..2] + LEFT.statusreceiptdate[3..4],
 											SELF.datefirstemp := MAP((UNSIGNED)LEFT.datefirstemp[5..6] > 20 => '19', '20') + LEFT.datefirstemp[5..6] + LEFT.datefirstemp[1..2] + LEFT.datefirstemp[3..4],
 											SELF.dateliabest := MAP((UNSIGNED)LEFT.dateliabest[5..6] > 20 => '19', '20') + LEFT.dateliabest[5..6] + LEFT.dateliabest[1..2] + LEFT.dateliabest[3..4],

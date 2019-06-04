@@ -40,7 +40,7 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 		SHARED ds_BusOldestUnemClmDt := fn_macro(ds, 'BusOldestUnemClmDt', Bus_Oldest_Unem_Clm_Dt_);
 
 		SHARED ds_BusIncorpDt := fn_macro(ds, 'BusIncorpDt', Bus_Incorp_Dt_);
-		SHARED ds_BisIncorpMSince := fn_macro(ds, 'BisIncorpMSince', Bis_Incorp_M_Since_);
+		SHARED ds_BusIncorpMSince := fn_macro(ds, 'BusIncorpMSince', Bus_Incorp_M_Since_);
 
 
 		// OUTPUT(ds_BusAcctNewestUpdateMasterDt, NAMED('ds_BusAcctNewestUpdateMasterDt'));
@@ -92,7 +92,7 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 
 							ds_BusAcctNewestUpdateMasterDt + ds_BusNewestRecordDt + ds_BusAcctDtEmployerBeganEcho + ds_BusAcctTaxLiabEndDtEcho +
 							ds_BusNewestTaxLiabStartDt + ds_BusNewestTaxLiabEndDt + ds_BusAcctTaxLiabStartMsince + ds_BusOldestTaxLiabStartMsince + 
-							ds_BusAcctOldestUnemClmDt + ds_BusOldestUnemClmDt + ds_BusIncorpDt + ds_BisIncorpMSince +
+							ds_BusAcctOldestUnemClmDt + ds_BusOldestUnemClmDt + ds_BusIncorpDt + ds_BusIncorpMSince +
 
 							ds_BusAcctNewestRecordDt + ds_BusAcctStatusTypeEcho + ds_BusAcctTaxLiabStartDtEcho + ds_BusOldestTaxLiabStartDt +
 							ds_BusOldestTaxLiabEndDt + ds_BusTaxLiabOngoingFlag + ds_BusAcctTaxLiabEndMsince + ds_BusNewestTaxLiabEndMsince +
