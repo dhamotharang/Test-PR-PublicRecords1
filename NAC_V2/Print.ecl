@@ -211,7 +211,7 @@ EXPORT Print := MODULE
 												,DATASET(nac_v2.Layouts2.rClientEx) clients
 												,DATASET(nac_v2.Layouts2.rAddressEx) addresses
 												,DATASET(nac_v2.Layouts2.rStateContactEx) contacts
-												/*,DATASET(nac_v2.Layouts2.rExceptionEx) exceptions*/) := FUNCTION
+												,DATASET(nac_v2.Layouts2.rExceptionEx) exceptions) := FUNCTION
 
 		rr_cases := PROJECT(cases(errors>0), transform(rNCX2,
 													err := left.dsErrs[1];
@@ -252,8 +252,20 @@ EXPORT Print := MODULE
 													self.SampleValue := if(err.badValue='', Missing, err.badValue);
 													self := err;));
 
+		rr_exceptions := PROJECT(exceptions(errors>0), transform(rNCX2,
+													err := left.dsErrs[1];
+													self.caseid := '';
+													self.clientid := left.SourceClientId;
+													self.programstate := left.SourceProgramState;
+													self.programcode := left.SourceProgramCode;
+													self := left;
+													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
+													self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
+													self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
+													self.SampleValue := if(err.badValue='', Missing, err.badValue);
+													self := err;));
 
-		records := DISTRIBUTE(rr_cases + rr_clients + rr_addresses + rr_contacts, RANDOM());
+		records := rr_cases + rr_clients + rr_addresses + rr_contacts + rr_exceptions;
 
 		
 		return SORT(CHOOSEN(records, 1000),errorcode);		// HHSCO-35

@@ -37,16 +37,20 @@ EXPORT GetReports(string lfn) := function
 		total := COUNT(nac2);
 		nErrors := COUNT(errs(Severity='E'));
 		nWarnings := COUNT(errs(Severity='W'));
-		nRejected := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(contacts(errors>0));
-		nWarned := COUNT(addresses(warnings>0)) + COUNT(cases(warnings>0)) + COUNT(clients(warnings>0)) + COUNT(contacts(warnings>0));
-		
+		nRejected := COUNT(addresses(errors>0)) + COUNT(cases(errors>0)) + COUNT(clients(errors>0)) + COUNT(contacts(errors>0)) + COUNT(exceptions(errors>0));
+		nWarned := COUNT(addresses(warnings>0)) + COUNT(cases(warnings>0)) + COUNT(clients(warnings>0)) + COUNT(contacts(warnings>0)) + COUNT(exceptions(warnings>0));
+
+		err_rate := nRejected/total;
+		ExcessiveInvalidRecordsFound :=	err_rate	> $.Mod_Sets.threshld;
+
+	
 		fn := ExtractFileName(ModifyFileName(lfn, 'ncf2'));
 
-		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', false);
+		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound);
 
 		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', false);
 
-		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts); 
+		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions); 
 
 		return MODULE
 			EXPORT	DATASET($.ValidationCodes.rError) dsErrs := errs;

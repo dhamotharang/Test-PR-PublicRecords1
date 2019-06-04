@@ -21,7 +21,7 @@ EXPORT mod_Validation := MODULE
 																			(integer)date[5..6] BETWEEN 1 and 12,
 						false);
 		
-	shared validProgramState(string2 st, string2 state, string4 RecordCode) := IF(st not in Mod_Sets.Consortium, 
+	shared validProgramState(string2 st, string2 state, string4 RecordCode) := IF(st not in Mod_Sets.States,	//    Consortium, 
 											DATASET([{errcodes.E102, 'E', 'F', FieldCode('E',errcodes.E102), st, state, RecordCode}], rErr));
 										//DATASET([{errcodes.E102, 'E', 'F', FieldCode('E',errcodes.E102), st}], rErr)); 
 										//ROW({errcodes.E102, 'E', 'F', FieldCode('E',errcodes.E102), st}, rErr)); 
@@ -172,7 +172,7 @@ EXPORT mod_Validation := MODULE
 
 							+ IF(NOT isOptionalInteger(left.MonthlyAllotment), 
 									DATASET([{warningCodes.W109, 'W', 'F', FieldCode('W', warningCodes.W109), left.MonthlyAllotment, left.ProgramState, left.RecordCode}], rErr))														
-							+ IF(left.email <> '' AND NOT REGEXFIND(rgxEmail, left.email, NOCASE), 
+							+ IF(left.email <> '' AND NOT REGEXFIND(rgxEmail, TRIM(left.email), NOCASE), 
 									DATASET([{warningCodes.W118, 'W', 'F', FieldCode('W', warningCodes.W118), TRIM(left.email), left.ProgramState, left.RecordCode}], rErr))
 							;
 					self.errors := COUNT(self.dsErrs(severity='E'));
