@@ -1,5 +1,5 @@
-﻿IMPORT Address, ut, NID, AddrBest, BatchShare, DidVille, progressive_phone, BatchServices, Royalty,
-       PhoneFinder_Services, Gateway, MemberPoint, iesp, Std;
+﻿IMPORT Address, ut, progressive_phone, Royalty,
+       PhoneFinder_Services, MemberPoint, Std;
 
 	export BatchRecords(dataset(MemberPoint.Layouts.batchIn) rawBatchIn, MemberPoint.IParam.BatchParams BParams) := function
 		//------------------------------------------------------------------------------------------------//
@@ -333,3 +333,4 @@
 
 		return finalRecords;
 	end;
+  

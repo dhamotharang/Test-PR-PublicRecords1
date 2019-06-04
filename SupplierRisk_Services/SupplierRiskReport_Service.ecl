@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SupplierRiskReport_Service" wuTimeout="300000">
   <!-- COMPLIANCE/USER SETTINGS -->
 	<part name="GLBPurpose" type="xsd:byte"/>
@@ -60,7 +60,7 @@
 </message>
 */
 /*--INFO-- This service produces a full business report.*/
-IMPORT iesp, autostandardi,risk_indicators;
+IMPORT iesp, autostandardi,risk_indicators, doxie;
 EXPORT SupplierRiskReport_Service() := MACRO
 
 	#constant('NoDeepDive', true);
@@ -236,6 +236,7 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	
 	ds := dataset([initialize()]);
 	
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	tempmod := module(AutoStandardI.DataRestrictionI.params)
 		export boolean AllowAll := false;
 		export boolean AllowDPPA := false;
@@ -272,6 +273,7 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	royalties := dataset([], Royalty.Layouts.Royalty) +
 		IF(BusinessCreditRisk or BusinessFailureRiskLevel or CustomBCIR, inv_royalties);
 	
+	IF(EXISTS(Results), doxie.compliance.logSoldToTransaction(mod_access));
 	output(Results,named('Results'));
 	output(royalties, named('RoyaltySet'));
 	

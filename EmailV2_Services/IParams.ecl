@@ -64,7 +64,7 @@ EXPORT IParams := MODULE
       EXPORT BOOLEAN RequireLexidMatch := ~in_optns.IncludeNoLexIdMatch; 
       
       EXPORT UNSIGNED EmailQualityRulesMask := IF(in_optns.EmailQualityRulesMask != '', GetEmailRulesMask(in_optns.EmailQualityRulesMask), 0); 
-      EXPORT STRING   BVAPIkey := in_optns.BVAPIkey;   
+      EXPORT STRING   BVAPIkey := IF(in_optns.BVAPIkey != '', in_optns.BVAPIkey, $.Constants.GatewayValues.BVAPIkey);;   
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := IF(in_optns.MaxEmailsForDeliveryCheck > 0, in_optns.MaxEmailsForDeliveryCheck, $.Constants.Defaults.MaxEmailsToCheckDeliverable);   
       EXPORT BOOLEAN  CheckEmailDeliverable := in_optns.CheckEmailDeliverable;  
       EXPORT BOOLEAN  KeepUndeliverableEmail := in_optns.KeepUndeliverableEmail; 

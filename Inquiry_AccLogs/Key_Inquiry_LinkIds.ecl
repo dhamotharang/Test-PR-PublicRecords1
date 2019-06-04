@@ -1,4 +1,4 @@
-IMPORT BIPV2, inquiry_Acclogs, Data_services, doxie, BIPV2,Inquiry_AccLogs_Append;
+﻿IMPORT BIPV2, inquiry_Acclogs, Data_services, doxie, BIPV2,Inquiry_AccLogs_Append;
 
 EXPORT Key_Inquiry_LinkIds := MODULE
 
@@ -10,7 +10,15 @@ EXPORT Key_Inquiry_LinkIds := MODULE
 		 bipv2.IDlayouts.l_xlink_ids;	 //Added for BIP project
 		 end;
 	Base_ := Inquiry_AccLogs_Append.FN_Append_Bip(inquiry_acclogs.File_Inquiry_BaseSourced.history);											
-	shared Base := Inquiry_AccLogs.FN_Append_SBA(Base_);	
+	shared BaseNoCCPA := Inquiry_AccLogs.FN_Append_SBA(Base_);	
+	
+  r:= record
+			recordof(BaseNoCCPA);
+			Inquiry_AccLogs.Layout.ccpaLayout ccpa;
+	end;
+	
+	shared Base := project(BaseNoCCPA, transform(r,self:=left));
+		
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	export Key := k;
 

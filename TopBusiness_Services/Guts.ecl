@@ -1,4 +1,4 @@
-import topBusiness_services, iesp, AutoStandardI, BIPV2;
+﻿import topBusiness_services, iesp, AutoStandardI, BIPV2, Doxie;
 
 export Guts := MODULE
  
@@ -12,7 +12,7 @@ export Guts := MODULE
 		) := function
 // inputs -- ultid, orgid, seleid, proxid, powid, empid, dotid
 //  options
-
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 // output rows from the various base files
  
 	section_aircraft      := in_options.IncludeAircrafts; 
@@ -250,10 +250,14 @@ export Guts := MODULE
 						in_mod)
 				);
 				
+				source_mod_access := module(mod_access)
+	    	  export boolean log_record_source := mod_access.log_record_source AND section_sources;
+        end;
+
 				SourceSection := if (section_sources, TopBusiness_Services.SourceSection.fn_FullView(
 						ds_input_data,
 						project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-						in_mod,ds_busHeaderRecs)
+						source_mod_access,ds_busHeaderRecs)
 				);
 				
  				

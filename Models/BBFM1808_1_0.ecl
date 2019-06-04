@@ -32055,7 +32055,7 @@ bbfm1808_1_0 := round(max((real)300, min(999, if(base + pts * (can_lgt - lgt) / 
   
   #else
      
-     reasonCodes := Models.BB_WarningCodes(clam, Busshell , num_reasons)[1].hris;
+     reasonCodes := Models.BB_WarningCodes(le.clam, le.Busshell , num_reasons)[1].hris;
   
   
   	 SELF.ri := PROJECT(reasonCodes, TRANSFORM(Risk_Indicators.Layout_Desc,

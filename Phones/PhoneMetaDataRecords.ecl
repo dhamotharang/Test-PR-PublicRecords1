@@ -1,11 +1,12 @@
 ﻿IMPORT Phones, STD, UT, iesp;
 
 EXPORT PhoneMetaDataRecords(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)   dBatchPhonesIn,
-	                                   Phones.IParam.PhoneAttributes.ReportParams in_mod) 
+	                                   Phones.IParam.ReportParams in_mod) 
 := FUNCTION 
 
-    batch_mod := MODULE(PROJECT(in_mod, Phones.IParam.PhoneAttributes.BatchParams, opt))
+    batch_mod := MODULE(PROJECT(in_mod, Phones.IParam.BatchParams, opt))
     END;
+		
  
     dRecs := Phones.PhoneAttributes_BatchRecords(dBatchPhonesIn, batch_mod);
       
@@ -41,6 +42,6 @@ EXPORT PhoneMetaDataRecords(DATASET(Phones.Layouts.PhoneAttributes.BatchIn)   dB
                   		
      dPhonesOut := PROJECT(CHOOSEN(dRecs, iesp.Constants.PhoneMetadata.MaxPhoneMetadataRecords), tFormat2PhoneMetadata(LEFT));
  
-  return dPhonesOut;
+	return dPhonesOut;
 
 END;

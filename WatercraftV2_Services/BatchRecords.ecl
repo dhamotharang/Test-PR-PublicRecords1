@@ -46,10 +46,18 @@ EXPORT BatchRecords(WatercraftV2_Services.Interfaces.batch_params configData,
 		owners_supp := project(L.owners((unsigned6)did = R.ldid or (bdid <> '' or company_name <> '' or ultId <> 0)), transform(WatercraftV2_Services.Layouts.owner_report_rec,
 																																																						  self.orig_name := '', self := left));
 		//adding FCRA restriction tag to non-subject owners
-		owners_restricted := owners_supp + project(L.owners(~((unsigned6)did = R.ldid or (bdid <> '' or company_name <> '' or ultId <> 0))), 
+		owners_restricted :=  project(L.owners(~((unsigned6)did = R.ldid or (bdid <> '' or company_name <> '' or ultId <> 0))), 
 																							 transform(WatercraftV2_Services.Layouts.owner_report_rec,
 																												 self.lname := FCRA.Constants.FCRA_Restricted, self := []));
-		self.owners := map(configData.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => owners_restricted, 
+		owners_returnNameOnly := project(L.owners(~((unsigned6)did = R.ldid or (bdid <> '' or company_name <> '' or ultId <> 0))), 
+																							 transform(WatercraftV2_Services.Layouts.owner_report_rec,
+																												 self.fname := left.fname, 
+																												 self.mname := left.mname, 
+																												 self.lname := left.lname, 
+																												 self.name_suffix := left.name_suffix, 
+																												 self := []));
+		self.owners := map(configData.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => owners_supp + owners_restricted, 
+											 configData.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnNameOnly => owners_supp + owners_returnNameOnly,
 											 configData.non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnBlank => owners_supp,
 											 L.owners); //default: configData.non_subject_suppresson = Suppress.Constants.NonSubjectSuppression.doNothing
 		self := L;

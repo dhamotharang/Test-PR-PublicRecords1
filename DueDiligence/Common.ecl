@@ -362,6 +362,20 @@ EXPORT Common := MODULE
        RETURN returnDateToUse; 
 
     END;
+		
+		EXPORT IsValidDOB(UNSIGNED inputDOB) := FUNCTION
+		  validDOB := MAP(
+				//just year (no month, no day)
+				LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[5..6]='00' AND ((STRING8)inputDOB)[7..8]='00' 	=> STD.Date.IsValidDate((UNSIGNED4)(((STRING8)inputDOB)[1..4]+'0101')),
+				//year + day (no month)
+				LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[5..6]='00' AND ((STRING8)inputDOB)[7..8]<>'00'  => STD.Date.IsValidDate((UNSIGNED4)(((STRING8)inputDOB)[1..4]+'01'+((STRING8)inputDOB)[7..8])),
+				//just year + month (no day)
+				LENGTH((STRING8)inputDOB)=6 OR (LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[7..8]='00') 		=> STD.Date.IsValidDate((UNSIGNED4)(((STRING8)inputDOB)[1..6]+'01')),
+				//full populated date
+				LENGTH((STRING8)inputDOB)=8 AND ((STRING8)inputDOB)[7..8]<>'00'	                                    => STD.Date.IsValidDate(inputDOB),
+																																																							 FALSE);
+      RETURN validDOB;
+    END;
 
     // ------                                                                                -----
     // ------   THIS FUNCTION IS EXPECTED TO PRODUCE the GEOBLK information                  -----

@@ -1,4 +1,4 @@
-﻿IMPORT doxie, DueDiligence, Risk_Indicators, STD;
+﻿IMPORT doxie, DueDiligence, Risk_Indicators, STD, ut;
 
 
 EXPORT getIndBestData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
@@ -65,11 +65,11 @@ EXPORT getIndBestData(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                   SELF.bestAddress.zip4 := RIGHT.zip4;
                                   
                                   
-                                  validDOB := STD.Date.IsValidDate(RIGHT.dob);
+																	validDOB := DueDiligence.Common.IsValidDOB(RIGHT.dob);
                                   validHistDate := STD.Date.IsValidDate(LEFT.historyDate);
 
                                   
-                                  SELF.estimatedAge := IF(validDOB AND validHistDate, STD.Date.YearsBetween(RIGHT.dob, LEFT.historyDate), 0);
+                                  SELF.estimatedAge := IF(validDOB AND validHistDate, ut.Age(RIGHT.dob, LEFT.historyDate), 0);
                                                                     
                                   SELF := LEFT;
                                   SELF := [];),

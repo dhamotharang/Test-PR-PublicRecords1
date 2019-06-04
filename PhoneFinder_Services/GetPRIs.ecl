@@ -1,9 +1,11 @@
-﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix;
+﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch, BatchShare;
 
 EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)     dSearchResults,
                 DATASET($.Layouts.BatchInAppendDID)      dInBestInfo,
                 PhoneFinder_Services.iParam.ReportParams inMod,
-								        DATASET(Gateway.Layouts.Config) dGateways ) :=
+                DATASET(Gateway.Layouts.Config) dGateways,
+                DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dProcessInput
+                ) :=
 FUNCTION
   // Identities
   dIdentitiesInfo   := PhoneFinder_Services.GetIdentitiesFinal(dSearchResults, dInBestInfo, inMod);
@@ -52,8 +54,9 @@ FUNCTION
                                                 SELF := LEFT, SELF := []));
   
   // Identify Primary identity and pass only the top identity record for RI calculation
-  dIdentityInfoGrp := SORT(GROUP(SORT(dIdentitiesFormat2Final, acctno), acctno),
-                            IF(did != 0, 0, 1), IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(dt_first_seen != '', dt_first_seen, '99999999'), phone_source, RECORD);
+	// Input did should be on top of identities
+  dIdentityInfoGrp := SORT(GROUP(SORT(dIdentitiesFormat2Final, acctno), acctno), IF(did != 0, 0, 1),
+                           IF(InputDID !=0, did != InputDID, FALSE), IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(dt_first_seen != '', dt_first_seen, '99999999'), phone_source, RECORD);
   
   dPrepIdentityForRI := UNGROUP(ITERATE(dIdentityInfoGrp,
                                         TRANSFORM($.Layouts.PhoneFinder.Final,
@@ -135,8 +138,11 @@ FUNCTION
                                     LIMIT(0), KEEP(1));
 
   // Send primary and other phones for RI calculation
-  dPrepForRIs := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
-  
+  dPrepForRIs_pre := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
+  	
+  dPrepForRIs := IF(EXISTS(dPrepForRIs_pre), dPrepForRIs_pre, PROJECT(dProcessInput, TRANSFORM($.Layouts.PhoneFinder.Final, 
+	                                                                                 SELF.batch_in := LEFT, SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for no identity adn no phone
+	                                                                                 SELF := [])));
   dRIs := IF(inMod.IncludeRiskIndicators, PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod));
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,

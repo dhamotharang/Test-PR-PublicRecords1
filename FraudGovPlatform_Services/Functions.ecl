@@ -155,12 +155,7 @@ EXPORT Functions := MODULE
 																											  LEFT.batchin_rec.dob = RIGHT.dob AND
 																												LEFT.batchin_rec.ssn = RIGHT.ssn;
 
-																	SELF.known_risk_reason :=	MAP(name_ssn_dob_match AND RIGHT.curr_incar_flag = 'Y' => 'Identity is Incarcerated',
-																																name_ssn_dob_match AND RIGHT.curr_incar_flag <> 'Y' => 'Identity has been convicted of fraud', 
-																																~name_ssn_dob_match AND RIGHT.curr_incar_flag = 'Y' => 'Identity is associated with an incarcerated individual',
-																																~name_ssn_dob_match AND RIGHT.curr_incar_flag <> 'Y' AND 
-																																(RIGHT.fname <> '' OR RIGHT.lname <> '' OR RIGHT.ssn <> '') => 'Identity is associated with an individual convicted of fraud',
-																															 '');
+																	SELF.known_risk_reason :=	IF(name_ssn_dob_match AND RIGHT.curr_incar_flag = 'Y','Identity is Incarcerated','');
 																	SELF.event_date := RIGHT.offense_date;
 																	SELF.event_type := 'Criminal'));				
 																	
@@ -308,7 +303,7 @@ EXPORT Functions := MODULE
 		known_risk_ds := sort(patriot_knownrisk_ds + 
 																								death_knownrisk_ds + 
 																								crim_knownrisk_ds + 
-																								knfd_knownrisk_ds + 
+																								knfd_knownrisk_ds(known_risk_reason <> '') + 
 																								red_flag_knownrisk_ds + 
 																								fdn_knownrisk_ds +
 																								CIID_knownrisk_ds, acctno, -event_date)(known_risk_reason <> '');

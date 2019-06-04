@@ -1,24 +1,22 @@
-import dx_BestRecords;
+﻿EXPORT Constants := MODULE
 
-export Constants := module
-
-	export perm_type := enum(unsigned4, 
-		glb																			= 1, 
-		glb_nonexperian													= 1 << 1, 
-		glb_nonequifax													= 1 << 2, 
-		glb_nonexperian_nonequifax							= 1 << 3, 
-		glb_nonblank														= 1 << 4, 
-		glb_nonexperian_nonblank								= 1 << 5, 
-		glb_nonequifax_nonblank									= 1 << 6, 
-		glb_nonexperian_nonequifax_nonblank			= 1 << 7, 
-		glb_nonutil															= 1 << 8, 
-		glb_nonutil_nonblank										= 1 << 9, 
-		nonglb																	= 1 << 10, 
-		nonglb_preglb														= 1 << 11, 
-		nonglb_nonblank													= 1 << 12, 
-		nonglb_nonblank_preglb									= 1 << 13, 
-		marketing																= 1 << 14, 
-		marketing_preglb												= 1 << 15, 
-		infutor																	= 1 << 16);
-
+  // defines permissions required for accessing individual best record or fields
+  EXPORT PERM_TYPE := ENUM(UNSIGNED4,
+    GLB                                 = 1b,
+    GLB_NONBLANK                        = 10b,
+    GLB_NONUTIL                         = 100b,
+    GLB_NONUTIL_NONBLANK                = 1000b,
+    GLB_NONEXPERIAN                     = 10000b, //would "glb_nonexp" be better?
+    GLB_NONEXPERIAN_NONBLANK            = 100000b,
+    GLB_NONEQUIFAX                      = 1000000b,
+    GLB_NONEQUIFAX_NONBLANK             = 10000000b,
+    GLB_NONEXPERIAN_NONEQUIFAX          = 100000000b,
+    GLB_NONEXPERIAN_NONEQUIFAX_NONBLANK = 1000000000b,
+    NONGLB                              = 10000000000b,
+    NONGLB_NONBLANK                     = 100000000000b,
+    NONGLB_PREGLB                       = 1000000000000b,
+    NONGLB_NONBLANK_PREGLB              = 10000000000000b,
+    MARKETING                           = 100000000000000b,
+    MARKETING_PREGLB                    = 1000000000000000b,
+    INFUTOR                             = 10000000000000000b);
 end;

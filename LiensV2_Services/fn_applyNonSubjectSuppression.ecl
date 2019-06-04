@@ -1,4 +1,4 @@
-import FCRA, Suppress;
+﻿import FCRA, Suppress;
 
 // Handle non_subject suppression
 EXPORT fn_applyNonSubjectSuppression(dataset(liensv2_services.layout_lien_rollup) raw_rec,
@@ -10,20 +10,34 @@ EXPORT fn_applyNonSubjectSuppression(dataset(liensv2_services.layout_lien_rollup
 																																					skip(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnBlank 
 																																							 and not exists(L.parsed_parties((unsigned6)did = subject_did or (bdid <> '' or cname <> ''))))
 		//blanking orig_name if return subject only
-		self.orig_name 			:= if(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.doNothing, L.orig_name, '');
+		self.orig_name 			:= map(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.doNothing => L.orig_name,
+															 non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnNameOnly => L.orig_name,
+																'');
 		//suppressing debtors that are not the subject searched on and are not a company
 		party_supp := project(L.parsed_parties((unsigned6)did = subject_did or (bdid <> '' or cname <> '')), liensv2_services.layout_lien_party_parsed);
 		//adding FCRA restriction tag to non-subject parties
-		fcra_restricted := project(L.parsed_parties(~((unsigned6)did = subject_did or (bdid <> '' or cname <> ''))),
+		
+		nonSubjects := L.parsed_parties(~((unsigned6)did = subject_did or (bdid <> '' or cname <> '')));
+		
+		fcra_restricted := project(nonSubjects,
 															 transform(liensv2_services.layout_lien_party_parsed,
 																				 self.lname := FCRA.Constants.FCRA_Restricted, 
 																				 self := []));
-		party_restricted := party_supp + fcra_restricted;
-		self.parsed_parties := map(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => party_restricted, 
+		// Insider Threat RR-15409, return name only
+		fcra_returnNameOnly := project(nonSubjects,
+															 transform(liensv2_services.layout_lien_party_parsed,
+																				 self.fname := left.fname, 
+																				 self.mname := left.mname, 
+																				 self.lname := left.lname, 
+																				 self.name_suffix := left.name_suffix, 
+																				 self := []));
+		
+		self.parsed_parties := map(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => party_supp + fcra_restricted, 
+															 non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnNameOnly => party_supp + fcra_returnNameOnly, 
 															 non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnBlank => party_supp,
 															 L.parsed_parties); //default: non_subject_suppresson = Suppress.Constants.NonSubjectSuppression.doNothing
 		self.addresses := map(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.doNothing => L.addresses, 
-													exists(fcra_restricted) => dataset([], liensv2_services.layout_lien_party_address),
+													exists(fcra_restricted) or exists(fcra_returnNameOnly) => dataset([], liensv2_services.layout_lien_party_address),
 													L.addresses);
 		self.persistent_record_id := L.persistent_record_id;
 	end;

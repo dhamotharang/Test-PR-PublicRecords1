@@ -2,7 +2,7 @@
 
 EXPORT PhoneAttributes_BatchRecords(
 	DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
-	Phones.IParam.PhoneAttributes.BatchParams in_mod)
+	Phones.IParam.BatchParams in_mod)
 	:= FUNCTION
 
 	Consts := Phones.Constants.PhoneAttributes;

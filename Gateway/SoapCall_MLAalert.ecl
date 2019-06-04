@@ -1,4 +1,4 @@
-
+﻿
 import iesp, gateway, Royalty;
 
 export SoapCall_MLAalert(dataset(iesp.equifax_sts.t_EquifaxSTSRequest) Input, Gateway.Layouts.Config gateway_cfg, boolean makeGatewayCall = FALSE) := function
@@ -27,7 +27,7 @@ end;
 
 results := if (makeGatewayCall, soapcall(Input, gateway_cfg.url, 'EquifaxSTS', iesp.equifax_sts.t_EquifaxSTSRequest, into_in(LEFT),
 			   dataset(iesp.equifax_sts.t_EquifaxSTSResponseEx),XPATH('EquifaxSTSResponseEx'),
-			   onfail(failx()), timeout(4)));
+			   onfail(failx()), timeout(4), retry(0)));
 
 return results;
   

@@ -31,6 +31,8 @@ export IdAppendThorLocal(
 		,pSource_record_id = ''
 		,src_matching_is_priority = FALSE
 		,bGetAllScores=TRUE
+		,useFuzzy = false
+		,primForcePost = false
 	) := functionmacro
 
 	import BIPV2_Company_Names, BizLinkFull,ut,_Control;
@@ -62,6 +64,7 @@ export IdAppendThorLocal(
 	#uniquename(InfileSmall)
 	#uniquename(ThorForced)
 	#uniquename(useKeyedJoins)
+	#uniquename(company_name_prefix)
 	string4 %force% := '' : stored('did_add_force');
 	boolean %NodesUnder400% := thorlib.nodes() < 400;
 	boolean %InfileSmall% := count(infile) < 10000000;
@@ -69,8 +72,9 @@ export IdAppendThorLocal(
 	%useKeyedJoins% := (%NodesUnder400%) and not %ThorForced%;  //motivated by bug 112406
 
 	local infile_augmented := PROJECT(%infilecnp%,
-		TRANSFORM({RECORDOF(left); STRING input_company_phone_3 := '',
+		TRANSFORM({RECORDOF(left); string %company_name_prefix% := '', STRING input_company_phone_3 := '',
 		           STRING input_company_phone_7 := ''; STRING Input_fname_preferred := '';},
+			self.%company_name_prefix% := BizLinkFull.fn_company_name_prefix(left.cnp_name);
 			#if('P' in matchset and #text(phone_field) != '')
 				SELF.phone_field:=TRIM(LEFT.phone_field);
 				SELF.input_company_phone_3:=IF(LENGTH(TRIM(LEFT.phone_field))=10,
@@ -91,6 +95,7 @@ export IdAppendThorLocal(
 		input_source := pSource,
 		Input_source_record_id := pSource_record_id,
 		Input_company_name := company_name_field,
+		Input_company_name_prefix := #if(useFuzzy) %company_name_prefix%, #else , #end
 		Input_cnp_name := cnp_name,
 		Input_cnp_number := cnp_number,
 		Input_cnp_btype := cnp_btype,
@@ -192,13 +197,13 @@ export IdAppendThorLocal(
 		%outnorm%,
 		left.cntr = right.reference
 			#if('A' in matchset)
-				and( 
+				and (NOT primForcePost OR ( 
 					(left.prange_field <> '' and left.prange_field = right.prim_Range) //exact nonblank pr match
 						or not(                                                            //or just not a complete miss on both pr and pn
 							(left.prange_field <> '' and right.prim_Range <> '' and right.prim_Rangeweight <= 0)
 						OR
 							(left.pname_field <> '' and right.prim_name <> '' and right.prim_nameweight <= 0)
-					)
+					))
 				)
 			#end
         

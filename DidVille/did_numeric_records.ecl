@@ -179,8 +179,7 @@ br_permission_check := doxie.best_records(did, doSuppress:=false, modAccess := m
 // address score reflect the best address. We will only display the address that user is permitted to see, this
 // is done by calling header.MAC_GlbClean_Header
   mod_access_unrestricted := MODULE (mod_access)
-    EXPORT unsigned1 dppa := 255;
-    EXPORT unsigned1 glb := 255;
+    EXPORT unsigned1 unrestricted := doxie.compliance.ALLOW.GLB + doxie.compliance.ALLOW.DPPA;
   END;
   br := doxie.best_records (did, doSuppress:=false, modAccess := mod_access_unrestricted);
 

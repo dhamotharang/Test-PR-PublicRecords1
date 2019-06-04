@@ -44,9 +44,11 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	busReg := DueDiligence.getBusRegistration(busVehicle, options, includeAllBusinessData);
 	
 	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
+	
+	busSales := DueDiligence.getBusSales(busGeoRisk, options, linkingOptions);
 
 	//attributes taking in inquired and linked businesses
-	busHeader := DueDiligence.getBusHeader(busGeoRisk, options, linkingOptions, includeAllBusinessData, includeReport);
+	busHeader := DueDiligence.getBusHeader(busSales, options, linkingOptions, includeAllBusinessData, includeReport);
 	
 	busSOS := DueDiligence.getBusSOSDetail(busHeader, options, includeAllBusinessData, includeReport);
 
@@ -87,6 +89,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
   IF(debugMode, OUTPUT(busVehicle, NAMED('busVehicle')));	
 	IF(debugMode, OUTPUT(busReg, NAMED('busReg')));	
 	IF(debugMode, OUTPUT(busGeoRisk, NAMED('busGeoRisk')));	
+	IF(debugMode, OUTPUT(busSales, NAMED('busSales')));
 	
 	IF(debugMode, OUTPUT(busHeader, NAMED('busHeader')));
 	IF(debugMode, OUTPUT(busSOS, NAMED('busSOS')));

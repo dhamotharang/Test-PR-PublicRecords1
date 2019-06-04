@@ -1,4 +1,4 @@
-import doxie,doxie_cbrs,suppress,watercraft,ut, fcra,FFD;
+﻿import doxie,doxie_cbrs,suppress,watercraft,ut, fcra,FFD;
 
 EXPORT WatercraftV2_raw := MODULE
 
@@ -117,12 +117,23 @@ EXPORT WatercraftV2_raw := MODULE
 															 transform(WatercraftV2_Services.Layouts.owner_report_rec,
 																				 self.orig_name := '', 
 																				 self := left)); //only keep the subjects that have a DID in incoming in_dids or are a company
-				owners_restricted := owners_supp + join(L.owners, in_dids, 
-																								(integer)left.did = right.did, 
-																								transform(WatercraftV2_Services.Layouts.owner_report_rec,
-																													self.lname := FCRA.Constants.FCRA_Restricted, self := []), 
-																								LEFT ONLY); //add the subjects that do not have a DID in incoming in_dids and do override of lname
-				self.owners := map(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => owners_restricted, 
+				
+				owners_returnNameOnly := join(L.owners, in_dids, 
+																			(integer)left.did = right.did, 
+																			transform(WatercraftV2_Services.Layouts.owner_report_rec,
+																				self.fname := left.fname, 
+																				self.mname := left.mname, 
+																				self.lname := left.lname, 
+																				self.name_suffix := left.name_suffix, 
+																				self := []),LEFT ONLY);
+																				
+        owners_restricted := project(owners_returnNameOnly,
+																	transform(WatercraftV2_Services.Layouts.owner_report_rec,
+																						self.lname := FCRA.Constants.FCRA_Restricted,
+																						self := []));
+				
+				self.owners := map(non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription => owners_supp + owners_restricted, 
+													 non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnNameOnly => owners_supp + owners_returnNameOnly, 
 													 non_subject_suppression = Suppress.Constants.NonSubjectSuppression.returnBlank => owners_supp,
 													 isFCRA => owners_restricted, //if we have isFCRA and we didn't specify 2 or 3 let's do an override of co-owners. 
 													 //The goal here is not to force the isFCRA = true to enter a non_subject_suppression... 

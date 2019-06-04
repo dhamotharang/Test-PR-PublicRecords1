@@ -67,13 +67,7 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagemen
 // =======================================================================
 			students_raw := American_Student_Services.Raw.getPayloadByDIDS(PROJECT(dids, American_Student_Services.Layouts.deepDids));
 			
-      //Can't project modules, have to copy the content manually:
-			students_rest_mod := MODULE (American_Student_Services.IParam.reportParams) 
-        American_Student_Services.IParam.MAC_CopyDataAccessParams(in_params);
- 
- 				EXPORT UNSIGNED1 	dob_mask_value := in_params.dob_mask; 
-				EXPORT STRING6 ssnmask := in_params.ssn_mask;
-			END;
+			students_rest_mod := PROJECT (in_params, American_Student_Services.IParam.reportParams);
 
 			studentsr := American_Student_Services.Functions.apply_restrictions(students_raw, students_rest_mod);
 			studentsf := IdentityManagement_Services.Functions.debatable_names(studentsr,American_Student_Services.Layouts.finalrecs,LN_college_name);

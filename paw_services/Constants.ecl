@@ -15,4 +15,10 @@ export Constants := module
 	export unsigned2 MAX_EMPLOYERS_PER_PERSON := 20;
 	export string1   IS_CURRENT_RECORD := 'C';
 	export unsigned  CONTACTID_LIMIT := 5000;
+
+	EXPORT FCRA := MODULE
+		EXPORT UNSIGNED2 MaxPawPerDID  := 100;
+		EXPORT UNSIGNED2 MaxPawRecords := 10000;
+	END;
+
 end;

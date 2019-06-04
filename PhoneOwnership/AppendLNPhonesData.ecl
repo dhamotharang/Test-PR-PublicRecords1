@@ -1,4 +1,4 @@
-/*
+﻿/*
 This function compares input records with inhouse phones data to identify a match.
 Otherwise, if no match then populate output with known inhouse phone info.
 */
@@ -13,7 +13,7 @@ EXPORT AppendLNPhonesData(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batch_in,
 																							SELF:=LEFT,SELF:=[]));
 	
 	//passing through phones to get latest LN phone associates. Trying to match with relatives identified or append known phone record.
-	dsLNIdentities := SORT(Phones.GetLNIdentity_byPhone(dsLNPhonesRequest,inMod.GLBPurpose,inMod.DPPAPurpose,inMod.DataRestrictionMask,inMod.Industryclass),acctno,phone,lname='',fname='',-dt_last_seen,dt_first_seen);
+	dsLNIdentities := SORT(Phones.GetLNIdentity_byPhone(dsLNPhonesRequest,inMod.glb,inMod.dppa,inMod.DataRestrictionMask,inMod.industry_class),acctno,phone,lname='',fname='',-dt_last_seen,dt_first_seen);
 
 	// Note that ownership is defined by relationship with input - this will be replaced with a scoring model later.
 	PhoneOwnership.Layouts.BatchOut appendLNData(PhoneOwnership.Layouts.BatchOut l, Phones.Layouts.PhoneIdentity r) := TRANSFORM

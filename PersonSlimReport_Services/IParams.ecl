@@ -12,16 +12,22 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN   mask_dl                 := FALSE; //for accidents
 		EXPORT STRING    RealTimePermissibleUse  := '';
 		EXPORT BOOLEAN   IncludeNonRegulatedVehicleSources      := FALSE;
+		EXPORT BOOLEAN   IncludeNonRegulatedDMVSources          := FALSE;
 		//underscores to match the watercraft mod
 		EXPORT BOOLEAN   include_NonRegulated_WatercraftSources := FALSE;
 		EXPORT BOOLEAN   IncludePriorProperties  := FALSE; // NOT NECESSARILY SUBJECT PROPERTY!
 		EXPORT BOOLEAN   EnableNationalAccidents := FALSE;
 		EXPORT BOOLEAN   EnableExtraAccidents    := FALSE;
 		EXPORT BOOLEAN   IncludeBlankDOD         := FALSE;
+		EXPORT BOOLEAN   IncludeFullPhonesPlus   := FALSE;
 		EXPORT STRING1   ucc_party_type          := PersonSlimReport_Services.Constants.DEBTOR;
 
 		EXPORT BOOLEAN IncludeAddresses            := FALSE;
 		EXPORT BOOLEAN IncludePhones               := FALSE;
+		EXPORT BOOLEAN IncludeNames                := FALSE;
+		EXPORT BOOLEAN IncludeDeaths               := FALSE;
+		EXPORT BOOLEAN IncludeSSNs                 := FALSE;
+		EXPORT BOOLEAN IncludeDOBs                 := FALSE;
 		EXPORT BOOLEAN IncludeProfessionalLicenses := FALSE;
 		EXPORT BOOLEAN IncludePeopleAtWork         := FALSE;
 		EXPORT BOOLEAN IncludeAircrafts            := FALSE;
@@ -46,7 +52,6 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN IncludeEducation            := FALSE;
 		EXPORT BOOLEAN IncludeAKAs                 := FALSE;
 		EXPORT BOOLEAN IncludeImposters            := FALSE;
-		EXPORT BOOLEAN IncludeDeaths               := FALSE;
 		EXPORT BOOLEAN IncludeUtility              := FALSE;
 	END;
 	
@@ -79,6 +84,10 @@ EXPORT IParams := MODULE
 
 			EXPORT BOOLEAN IncludeAddresses            := inIesp.Options.IncludeAddresses;
 			EXPORT BOOLEAN IncludePhones               := inIesp.Options.IncludePhones;
+            EXPORT BOOLEAN IncludeNames                := inIesp.Options.IncludeNames;
+            EXPORT BOOLEAN IncludeDeaths               := inIesp.Options.IncludeDeaths;
+            EXPORT BOOLEAN IncludeSSNs                 := inIesp.Options.IncludeSSNs;
+            EXPORT BOOLEAN IncludeDOBs                 := inIesp.Options.IncludeDOBs;		
 			EXPORT BOOLEAN IncludeProfessionalLicenses := inIesp.Options.IncludeProfessionalLicenses;
 			EXPORT BOOLEAN IncludePeopleAtWork         := inIesp.Options.IncludePeopleAtWork;
 			EXPORT BOOLEAN IncludeAircrafts            := inIesp.Options.IncludeAircrafts;
@@ -100,8 +109,11 @@ EXPORT IParams := MODULE
 			EXPORT BOOLEAN EnableNationalAccidents     := inIesp.Options.EnableNationalAccidents;
 			EXPORT BOOLEAN EnableExtraAccidents        := inIesp.Options.EnableExtraAccidents;
 			EXPORT BOOLEAN IncludeBlankDOD             := inIesp.Options.IncludeBlankDOD;
+			EXPORT BOOLEAN IncludeMinors               := inIesp.Options.IncludeMinors;
+			EXPORT BOOLEAN IncludeFullPhonesPlus       := inIesp.Options.IncludeFullPhonesPlus;
 			EXPORT BOOLEAN include_NonRegulated_WatercraftSources := inIesp.Options.IncludeNonRegulatedWatercraftSources;
 			EXPORT BOOLEAN IncludeNonRegulatedVehicleSources      := inIesp.Options.IncludeNonRegulatedVehicleSources;
+			EXPORT BOOLEAN IncludeNonRegulatedDMVSources          := inIesp.Options.IncludeNonRegulatedDMVSources;
 			EXPORT BOOLEAN IncludeAccidents            := inIesp.Options.IncludeAccidents;
 			EXPORT BOOLEAN IncludeBankruptcies         := inIesp.Options.IncludeBankruptcies;
 			EXPORT BOOLEAN IncludeLiens                := inIesp.Options.IncludeLiens;
@@ -110,7 +122,6 @@ EXPORT IParams := MODULE
 			EXPORT BOOLEAN IncludeEducation            := inIesp.Options.IncludeEducation;
 			EXPORT BOOLEAN IncludeAKAs                 := inIesp.Options.IncludeAKAs;
 			EXPORT BOOLEAN IncludeImposters            := inIesp.Options.IncludeImposters;
-			EXPORT BOOLEAN IncludeDeaths               := inIesp.Options.IncludeDeaths;
 			EXPORT BOOLEAN IncludeUtility              := inIesp.Options.IncludeUtility;
 		END;
 		RETURN in_mod;
@@ -130,6 +141,8 @@ EXPORT IParams := MODULE
 		#STORED('IncludePriorProperties', IncludePriorProperties);
 		BOOLEAN IncludeNonRegulatedVehicleSources := global(inIesp.Options).IncludeNonRegulatedVehicleSources;
 		#STORED('IncludeNonRegulatedVehicleSources', IncludeNonRegulatedVehicleSources);
+		BOOLEAN IncludeNonRegulatedDMVSources := global(inIesp.Options).IncludeNonRegulatedDMVSources;
+		#STORED('IncludeNonDMVSources', IncludeNonRegulatedDMVSources);
 		BOOLEAN EnableNationalAccidents := global(inIesp.Options).EnableNationalAccidents;
 		#STORED('EnableNationalAccidents', EnableNationalAccidents);
 		BOOLEAN EnableExtraAccidents := global(inIesp.Options).EnableExtraAccidents;

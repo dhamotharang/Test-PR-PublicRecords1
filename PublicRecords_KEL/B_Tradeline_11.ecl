@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Tradeline,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Tradeline_11(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Tradeline(__in,__cfg).__Result) __E_Tradeline := E_Tradeline(__in,__cfg).__Result;
-  SHARED __EE72602 := __E_Tradeline;
-  EXPORT __ST71788_Layout := RECORD
+  SHARED __EE73085 := __E_Tradeline;
+  EXPORT __ST72144_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -19,9 +19,9 @@ EXPORT B_Tradeline_11(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST71788_Layout __ND72730__Project(E_Tradeline(__in,__cfg).Layout __PP72473) := TRANSFORM
+  SHARED __ST72144_Layout __ND73213__Project(E_Tradeline(__in,__cfg).Layout __PP72956) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('cortera_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP72473;
+    SELF := __PP72956;
   END;
-  EXPORT __ENH_Tradeline_11 := PROJECT(__EE72602,__ND72730__Project(LEFT));
+  EXPORT __ENH_Tradeline_11 := PROJECT(__EE73085,__ND73213__Project(LEFT));
 END;

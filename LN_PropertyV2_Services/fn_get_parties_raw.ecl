@@ -109,28 +109,37 @@ export dataset(l_raw) fn_get_parties_raw(
 	
   ds_rawfinal := if(isFCRA, ds_raw1_ds, ds_raw); 
 
-  nss_raw := if(nonSS = suppress.constants.NonSubjectSuppression.doNothing,
-									ds_rawfinal,
-								  project(ds_rawfinal(search_did<>did and bdid = 0 and cname = ''),
-												transform(recordof(l_raw),
-												     self.ln_fares_id := left.ln_fares_id, 
-												     self.search_did := left.search_did,
-														 self.source_code_1 := left.source_code_1,
-														 self.source_code_2 := left.source_code_2,
-														 self.source_code := left.source_code,
-														 self.persistent_record_id := left.persistent_record_id,
-														 self.which_orig := left.which_orig,
-  											     self.lname := if(nonSS = suppress.constants.NonSubjectSuppression.returnRestrictedDescription,fcra.constants.FCRA_Restricted,''),
-														 self:=[])) +
-								     ds_rawfinal(~(search_did<>did and bdid = 0 and cname = ''))
-								 );	
+  nss_raw := project(ds_rawfinal(search_did<>did and bdid = 0 and cname = ''),
+										transform(l_raw,
+											self.ln_fares_id := left.ln_fares_id, 
+											self.search_did := left.search_did,
+											self.source_code_1 := left.source_code_1,
+											self.source_code_2 := left.source_code_2,
+											self.source_code := left.source_code,
+											self.persistent_record_id := left.persistent_record_id,
+											self.which_orig := left.which_orig,
+											self.title := if(nonSS = suppress.constants.NonSubjectSuppression.returnNameOnly,left.title,''),
+  										self.fname := if(nonSS = suppress.constants.NonSubjectSuppression.returnNameOnly,left.fname,''),
+											self.mname := if(nonSS = suppress.constants.NonSubjectSuppression.returnNameOnly,left.mname,''),
+											self.lname := map(nonSS = suppress.constants.NonSubjectSuppression.returnRestrictedDescription => fcra.constants.FCRA_Restricted,
+																			 nonSS = suppress.constants.NonSubjectSuppression.returnNameOnly => left.lname,
+																			''),
+											self.name_suffix := if(nonSS = suppress.constants.NonSubjectSuppression.returnNameOnly,left.name_suffix,''),
+											self:=[]) 
+										 );	
+								 
+	ds_final := if(nonSS = suppress.constants.NonSubjectSuppression.doNothing,ds_rawfinal,
+								 nss_raw + ds_rawfinal(~(search_did<>did and bdid = 0 and cname = ''))) ;
+	
+	
  // output(in_fids,named('in_fids'));
 // output(ds_raw,named('parties_raw_no_over'));
 // output(s_over,named('searchover'));
 // output(search_over,named('actual_overrides'));
 //output(ds_raw1,named('parties_rawwithoverrides'));
-//output(ds_rawfinal,named('parties_ds_rawfinal'));
+// output(ds_rawfinal,named('parties_ds_rawfinal'));
 // output(nss_raw,named('parties_nss'));
-	return nss_raw;
+// output(ds_final,named('ds_final'));
+	return ds_final;
 
 end;

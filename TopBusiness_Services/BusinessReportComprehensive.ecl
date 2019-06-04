@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessReportComprehensive BIP 2.0 Report">
 	<!-- COMPLIANCE/USER SETTINGS -->
 	<part name="GLBPurpose" type="xsd:byte"/>
@@ -48,7 +48,7 @@
 </message>
 */
 /*--INFO-- This service produces a full business report.*/
-import iesp, autostandardi;
+import iesp, autostandardi, Doxie;
 export BusinessReportComprehensive() := macro
 
 	#constant('NoDeepDive', true);
@@ -241,6 +241,8 @@ export BusinessReportComprehensive() := macro
 	
 	ds := dataset([initialize()]);
 	
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	
 	tempmod := module(AutoStandardI.DataRestrictionI.params)
 		export boolean 		AllowAll 						:= false;
 		export boolean 		AllowDPPA 					:= false;
@@ -267,6 +269,7 @@ export BusinessReportComprehensive() := macro
 	
 	results := dataset([format()]);
 
+    IF(EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access));
 	output(Results,named('Results'));
 
 endmacro;
