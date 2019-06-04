@@ -1265,11 +1265,17 @@ Employer: => BisIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -999
 Employer: => BusAcctUnemClmAcctCurActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									 ClaimCount=0 OR (ALL(EmployerClaim.rClaim, ClaimantID:Null)) => -99998, // No unemployment claims or no claimant IDs found
 																									 ALL(EmployerClaim.rClaim, claim_status:Null) => -99997,
-																									 COUNT(Sequence.Dedup(EmployerClaim.rClaim(UPCASE(claim_status)='REGULAR ACTIVE'), LEFT.ClaimantID=RIGHT.ClaimantID, ClaimantID))); // Count the number of unique claimants
+																									 MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(UPCASE(claim_status)='REGULAR ACTIVE'), LEFT.ClaimantID=RIGHT.ClaimantID, ClaimantID)), 9999)); // Count the number of unique claimants that are regular active
 Employer: => BusAcctUnemClmAcctFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
 																								 ClaimCount=0 OR (ALL(EmployerClaim.rClaim, ClaimantID:Null)) => -99998, // No unemployment claims or no claimant IDs found
 																								 ALL(EmployerClaim.rClaim, claim_status:Null) => -99997,
-																								 COUNT(Sequence.Dedup(EmployerClaim.rClaim, LEFT.ClaimantID=RIGHT.ClaimantID, ClaimantID))); // Count the number of unique claimants
+																								 MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim, LEFT.ClaimantID=RIGHT.ClaimantID, ClaimantID)), 9999)); // Count the number of unique claimants
+Employer: => BusAcctUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (ALL(EmployerClaim.rClaim, ClaimantID:Null)) => -99998, // No unemployment claims or no claimant IDs found
+																								 ALL(EmployerClaim.rClaim, claim_status:Null) => -99997,
+																								 MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(UPCASE(claim_status)='REGULAR ACTIVE'), LEFT.ClaimantID=RIGHT.ClaimantID, ClaimantID)), 9999)); // Count the number of unique claimants that are regular active
+
+
 
 	
 /* Nicole	*/													
