@@ -38,7 +38,7 @@ Roxiekeybuild.MAC_SK_Move ('~thor_data400::key::liensv2::fcra::@version@::main::
 
 bld_autokeys := LiensV2.Proc_build_autokeys_fcra(filedate); 
 
-create_build := Orbit3.proc_Orbit3_CreateBuild ( 'FCRA Liens & Judgements',filedate,'F');
+create_build := Orbit3.proc_Orbit3_CreateBuild ( 'FCRA Liens and Judgements',filedate,'F');
 
 GetDops:=dops.GetDeployedDatasets('P','B','F');
 OnlyLiens:=GetDops(datasetname='FCRA_LiensV2Keys');

@@ -9,7 +9,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_Did(),																//
 																					'~thor_200::key::email_datav2::'+(string)filedate+'::did', //key logical file      
 																					email_data_did_key);
 																					
-RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_Email_Address,
+RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_Email_Address(),
 																					 Email_DataV2.Files.Email_Address_File, 
 																					 '~thor_200::key::email_datav2::@version@::email_addresses',  
 																					 '~thor_200::key::email_datav2::'+(string)filedate+'::email_addresses', 
