@@ -5,10 +5,9 @@ import std;
 EXPORT BWR_CalcAttrDistribution := MODULE
 		SHARED ds := FraudgovUIKel.Q__show_Employers.Res0;
 
-		// TODO - create macro for this
-
 		EXPORT fn_macro(dsMac, attributeStr, attribute) := FUNCTIONMACRO
-				RETURN SORT(TABLE(dsMac, {STRING30 attribute_name := attributeStr, STRING30 attribute_value := (STRING)attribute, cnt:=COUNT(GROUP)}, attribute), -cnt);
+				ds_cnt := COUNT(dsMac);
+				RETURN SORT(TABLE(dsMac, {STRING30 attribute_name := attributeStr, STRING30 attribute_value := (STRING)attribute, cnt:=COUNT(GROUP), pct_of_file := COUNT(GROUP)/ds_cnt}, attribute), attribute_value);
 		ENDMACRO;
 
 		SHARED ds_BusAcctUIDEcho := fn_macro(ds, 'BusAcctUIDEcho', Bus_Acct_U_I_D_Echo_);
@@ -98,6 +97,59 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 							ds_BusOldestTaxLiabEndDt + ds_BusTaxLiabOngoingFlag + ds_BusAcctTaxLiabEndMsince + ds_BusNewestTaxLiabEndMsince +
 							ds_BusAcctNewestUnemClmDt + ds_BusNewestUnemClmDt + ds_BusIncorpStatusType;
 							
+							
+		// Show tables that verify for SeleID level variables that every record with the same SeleID receives the same attribute value
+		/*
+				BusNewestRecordDt
+				BusOldestTaxLiabStartDt
+				BusNewestTaxLiabStartDt
+
+				BusOldestTaxLiabEndDt
+				BusNewestTaxLiabEndDt
+				BusTaxLiabOngoingFlag
+
+				BusOldestTaxLiabStartMsince
+				BusNewestTaxLiabEndMsince
+				BusOldestUnemClmDt
+
+				BusNewestUnemClmDt
+				BusIncorpDt
+				BusIncorpStatusType
+				BusIncorpMsince
+		*/
+		
+		EXPORT fn_seleCheck(dsMac, attr_str, attr_name) := FUNCTIONMACRO	
+				// Check that every employer with the same seleid shares the same sele attributes			
+				// First table rolls up by seleid and attribute name. Gets number of counts
+				xt1 := TABLE(dsMac, {STRING30 sele:=(STRING30)Bus_Acct_Sele_I_D_Append_, STRING30 atr:=(STRING30)attr_name, cnt:=COUNT(GROUP)}, Bus_Acct_Sele_I_D_Append_, attr_name);
+				// Second table rolls up by seleid to find out how many seleis multiple attributes - failing the test
+				xt2 := TABLE(xt1, {sele, cntt:=COUNT(GROUP)}, sele);
+				
+				// Return a PASS/FAIL 
+				// RETURN xt2;
+				pass_cnt := COUNT(xt2(cntt=1));
+				RETURN ROW({attr_str, pass_cnt, COUNT(xt2)-pass_cnt}, {STRING30 attr_name, INTEGER npass, INTEGER nfail});	
+		ENDMACRO;
+		
+		
+		SHARED dsSeleBusNewestRecordDt := fn_seleCheck(ds, 'BusNewestRecordDt', Bus_Newest_Record_Dt_);
+		SHARED dsSeleBusOldestTaxLiabStartDt := fn_seleCheck(ds, 'BusOldestTaxLiabStartDt', Bus_Oldest_Tax_Liab_Start_Dt_);
+		SHARED dsSeleBusNewestTaxLiabStartDt := fn_seleCheck(ds, 'BusNewestTaxLiabStartDt', Bus_Newest_Tax_Liab_Start_Dt_);
+		SHARED dsSeleBusOldestTaxLiabEndDt := fn_seleCheck(ds, 'BusOldestTaxLiabEndDt', Bus_Oldest_Tax_Liab_End_Dt_);
+		SHARED dsSeleBusNewestTaxLiabEndDt := fn_seleCheck(ds, 'BusNewestTaxLiabEndDt', Bus_Newest_Tax_Liab_End_Dt_);
+		SHARED dsSeleBusTaxLiabOngoingFlag := fn_seleCheck(ds, 'BusTaxLiabOngoingFlag', Bus_Tax_Liab_Ongoing_Flag_);
+		SHARED dsSeleBusOldestTaxLiabStartMsince := fn_seleCheck(ds, 'BusOldestTaxLiabStartMsince', Bus_Oldest_Tax_Liab_Start_Msince_);
+		SHARED dsSeleBusNewestTaxLiabEndMsince := fn_seleCheck(ds, 'BusNewestTaxLiabEndMsince', Bus_Newest_Tax_Liab_End_Msince_);
+		SHARED dsSeleBusOldestUnemClmDt := fn_seleCheck(ds, 'BusOldestUnemClmDt', Bus_Oldest_Unem_Clm_Dt_);
+		SHARED dsSeleBusNewestUnemClmDt := fn_seleCheck(ds, 'BusNewestUnemClmDt', Bus_Newest_Unem_Clm_Dt_);
+		SHARED dsSeleBusIncorpDt := fn_seleCheck(ds, 'BusIncorpDt', Bus_Incorp_Dt_);
+		SHARED dsSeleBusIncorpStatusType := fn_seleCheck(ds, 'BusIncorpStatusType', Bus_Incorp_Status_Type_);
+		SHARED dsSeleBusIncorpMSince := fn_seleCheck(ds, 'BusIncorpMSince', Bus_Incorp_M_Since_);
+		
+		SHARED dsSeleChecks := dsSeleBusNewestRecordDt + dsSeleBusOldestTaxLiabStartDt + dsSeleBusNewestTaxLiabStartDt + 
+													 dsSeleBusOldestTaxLiabEndDt + dsSeleBusNewestTaxLiabEndDt + dsSeleBusTaxLiabOngoingFlag + 
+													 dsSeleBusOldestTaxLiabStartMsince + dsSeleBusNewestTaxLiabEndMsince + dsSeleBusOldestUnemClmDt + 
+													 dsSeleBusNewestUnemClmDt + dsSeleBusIncorpDt + dsSeleBusIncorpStatusType + dsSeleBusIncorpMSince;
 
 		EXPORT writeFile(dsMac, reportName) := FUNCTIONMACRO
 			// If landing zone is on the same server as the Dali
@@ -112,5 +164,6 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 			RETURN SEQUENTIAL(std.file.CreateExternalDirectory(lzip, lz_dir), thor_out, std.file.Despray(thor_file, lzip,lz_path,,,,true));
 		ENDMACRO;
 
-		EXPORT main := writeFile(SORT(ds_All, attribute_name, -cnt), 'AttributesDistribution');
+		EXPORT main := OUTPUT(dsSeleChecks, NAMED('dsSeleChecks'));
+		// EXPORT main := writeFile(ds_All, 'AttributesDistribution');
 END;
