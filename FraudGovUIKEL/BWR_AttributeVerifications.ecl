@@ -10,4 +10,6 @@ OUTPUT(SORT(TABLE(dsEmp, {acctno, cnt:=COUNT(GROUP)}, acctno), -cnt), NAMED('Dup
 OUTPUT(SORT(TABLE(dsEmp, {datefirstemp, cnt:=COUNT(GROUP)}, datefirstemp), -datefirstemp), NAMED('BusAcctDtEmployerBeganEcho')); // BusAcctDtEmployerBeganEcho
 OUTPUT(SORT(TABLE(dsEmp, {dateliabest, cnt:=COUNT(GROUP)}, dateliabest), -dateliabest), NAMED('BusAcctTaxLiabStartDtEcho')); // BusAcctDtEmployerBeganEcho
 
+// Issue 4
+OUTPUT(SORT(TABLE(dsEmp, {dateliabest, cnt:=COUNT(GROUP)}, dateliabest), -cnt), NAMED('BusAcctTaxLiabStartDtEchoHighCnts')); // BusAcctDtEmployerBeganEcho
 
