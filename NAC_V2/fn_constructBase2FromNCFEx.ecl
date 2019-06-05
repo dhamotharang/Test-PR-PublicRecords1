@@ -116,8 +116,8 @@ END;
 
 JoinAddresses(DATASET($.layout_Base2) base, DATASET($.Layouts2.rAddressEx) addresses) := FUNCTION
 
-		b1 := DISTRIBUTE(base, HASH64(ProgramState, ProgramCode, CaseId));
-		addr := DISTRIBUTE(addresses, HASH64(ProgramState, ProgramCode, CaseId));
+		b1 := DISTRIBUTE(base, HASH32(ProgramState, ProgramCode, CaseId));
+		addr := DISTRIBUTE(addresses, HASH32(ProgramState, ProgramCode, CaseId));
 		// Match client specific addresses first
 		ds_cl_match := JOIN(b1, addr(clientId<>'',(integer)clientid<>0),
 					left.ProgramState=right.ProgramState
@@ -195,8 +195,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 								self := [];
 								));
 
-	ds2 := JOIN(DISTRIBUTE(ds1, HASH64(ProgramState,ProgramCode,CaseId)),
-				DISTRIBUTE(clients, HASH64(ProgramState,ProgramCode,CaseId)),
+	ds2 := JOIN(DISTRIBUTE(ds1, HASH32(ProgramState,ProgramCode,CaseId)),
+				DISTRIBUTE(clients, HASH32(ProgramState,ProgramCode,CaseId)),
 				left.ProgramState=right.ProgramState AND left.ProgramCode=right.ProgramCode AND left.CaseId=right.CaseId,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);
@@ -237,8 +237,8 @@ EXPORT fn_constructBase2FromNCFEx(DATASET($.Layouts2.rNac2Ex) ds, string8 versio
 					), INNER, LOCAL);
 					
 	// add head of household as case name
-	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH64(ProgramState,ProgramCode,CaseId)),
-				DISTRIBUTE(clients(HHIndicator='Y'), HASH64(ProgramState,ProgramCode,CaseId)),
+	ds3 := JOIN(DISTRIBUTE(ds2(case_last_name=''), HASH32(ProgramState,ProgramCode,CaseId)),
+				DISTRIBUTE(clients(HHIndicator='Y'), HASH32(ProgramState,ProgramCode,CaseId)),
 				left.ProgramState=right.ProgramState AND left.ProgramCode=right.ProgramCode AND left.CaseId=right.CaseId,
 				TRANSFORM(layout_Base2,
 					self.case_Last_Name := if(right.HHIndicator='Y', right.LastName, left.LastName);

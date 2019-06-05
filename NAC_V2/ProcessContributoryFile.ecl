@@ -81,8 +81,6 @@ EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string
 											,$.Send_Email(st := lfn[6..7], fn := ModifyFileName(ilfn, 'ncr2')).FileValidationReport
 
 						);
-						//: $.Send_Email(st := lfn[6..7], fn := lfn).FileErrorAlert);
-
 
 	return doit;
 END;

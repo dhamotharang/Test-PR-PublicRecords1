@@ -77,6 +77,54 @@ Let’s say there’s some case reorganization or something else that causes a n
 
 
 */
+// update with new client fields
+$.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
+	self.StartDate 	:=	newbase.StartDate;
+	self.EndDate		:=	newbase.EndDate;
+	self.StartDate_Raw		:=	newbase.StartDate_Raw;
+	self.EndDate_Raw		:=	newbase.EndDate_Raw;
+	self.LastName		:=	newbase.LastName;
+	self.FirstName		:=	newbase.FirstName;
+	self.MiddleName		:=	newbase.MiddleName;
+	self.NameSuffix		:=	newbase.NameSuffix;
+	self.Gender		:=	newbase.Gender;
+	self.Race		:=	newbase.Race;
+	self.Ethnicity		:=	newbase.Ethnicity;
+	
+	self.ssn		:=	newbase.ssn;
+	self.ssn_Type_indicator		:=	newbase.ssn_Type_indicator;
+	self.dob		:=	newbase.Ethnicity;
+	self.dob_Type_indicator		:=	newbase.dob_Type_indicator;
+	self.Certificate_id_type		:=	newbase.Certificate_id_type;
+	
+	self.Relationship		:=	newbase.Relationship;
+	self.ABAWDIndicator		:=	newbase.ABAWDIndicator;
+	self.MonthlyAllotment		:=	newbase.MonthlyAllotment;
+	self.eligibility_status_indicator		:=	newbase.eligibility_status_indicator;
+	self.eligibility_status_date		:=	newbase.eligibility_status_date;
+
+	self.PeriodType		:=	newbase.PeriodType;
+	self.HistoricalBenefitCount		:=	newbase.HistoricalBenefitCount;
+	self.client_Phone		:=	newbase.client_Phone;
+	self.client_Email		:=	newbase.client_Email;
+	// derived fields
+	self.clean_ssn		:=	newbase.clean_ssn;
+	self.best_ssn		:=	newbase.best_ssn;
+	self.clean_dob		:=	newbase.clean_dob;
+	self.age		:=	newbase.age;
+	self.best_dob		:=	newbase.best_dob;
+	self.title		:=	newbase.title;
+	self.prefname		:=	newbase.prefname;
+	self.fname		:=	newbase.fname;
+	self.mname		:=	newbase.mname;
+	self.lname		:=	newbase.lname;
+	self.name_suffix		:=	newbase.name_suffix;
+	
+	self.updated := newbase.created;
+
+	self := base;
+
+END;
 
 EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 	clients := DISTRIBUTE(newbase, HASH32(ProgramState, ProgramCode, CaseID, ClientId));
@@ -94,6 +142,7 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 					left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
 					and left.CaseId=right.CaseId and left.ClientId=right.ClientId,
 					TRANSFORM($.Layout_Base2,
+							self.Created := RIGHT.Created;
 							self := right;
 						), right only, local);
 						
@@ -108,11 +157,7 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 					and left.CaseId=right.CaseId and left.ClientId=right.ClientId
 					and left.StartDate=right.StartDate and left.EndDate=right.EndDate
 					and left.eligibility_status_indicator=right.eligibility_status_indicator,
-					TRANSFORM($.Layout_Base2,
-							self.Created := LEFT.Created;
-							self.Updated := RIGHT.Updated;
-							self.FileName := RIGHT.FileName;
-							self := right;),
+					xForm(RIGHT, LEFT),
 					inner, local);
 						
 	// handle change to eligibility status
@@ -123,11 +168,7 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 					and left.CaseId=right.CaseId and left.ClientId=right.ClientId
 					and (left.StartDate<>right.StartDate OR left.EndDate<>right.EndDate
 					or left.eligibility_status_indicator<>right.eligibility_status_indicator),
-					TRANSFORM($.Layout_Base2,
-							self.Created := LEFT.Created;
-							self.Updated := RIGHT.Updated;
-							self.FileName := RIGHT.FileName;
-							self := right;),
+					xForm(RIGHT, LEFT),
 					inner, local);
 
 	result := unchanged + directUpdates + remaining + newClients;
