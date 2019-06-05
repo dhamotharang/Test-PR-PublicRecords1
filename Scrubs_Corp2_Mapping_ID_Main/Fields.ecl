@@ -59,18 +59,16 @@ EXPORT InValidFT_invalid_charter(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LE
 EXPORT InValidMessageFT_invalid_charter(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('10'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_date(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  s1;
+  RETURN  s0;
 END;
-EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_pastDate(s)>0,~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 8));
-EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT311.HygieneErrors.NotLength('0..8'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_pastDate(s)>0);
+EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_pastDate'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_exp_date(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
-  RETURN  s1;
+  RETURN  s0;
 END;
-EXPORT InValidFT_invalid_exp_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~Scrubs.fn_valid_GeneralDate(s)>0,~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 8));
-EXPORT InValidMessageFT_invalid_exp_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_GeneralDate'),SALT311.HygieneErrors.NotLength('0..8'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_exp_date(SALT311.StrType s) := WHICH(~Scrubs.fn_valid_GeneralDate(s)>0);
+EXPORT InValidMessageFT_invalid_exp_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs.fn_valid_GeneralDate'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_term_exist_cd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
@@ -138,7 +136,7 @@ EXPORT InValidMessageFT_invalid_org_structure_desc(UNSIGNED1 wh) := CHOOSE(wh,SA
 EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_status_desc','corp_status_date','corp_inc_state','corp_inc_date','corp_foreign_domestic_ind','corp_forgn_state_desc','corp_forgn_date','corp_term_exist_cd','corp_term_exist_desc','corp_orig_org_structure_desc','corp_for_profit_ind','corp_name_reservation_expiration_date','corp_orig_bus_type_desc','corp_management_desc','corp_fiscal_year_month','corp_agent_county','InternalField1','InternalField2','InternalField3','recordorigin');
 EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_status_desc','corp_status_date','corp_inc_state','corp_inc_date','corp_foreign_domestic_ind','corp_forgn_state_desc','corp_forgn_date','corp_term_exist_cd','corp_term_exist_desc','corp_orig_org_structure_desc','corp_for_profit_ind','corp_name_reservation_expiration_date','corp_orig_bus_type_desc','corp_management_desc','corp_fiscal_year_month','corp_agent_county','InternalField1','InternalField2','InternalField3','recordorigin');
 EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_vendor_first_reported' => 0,'dt_vendor_last_reported' => 1,'dt_first_seen' => 2,'dt_last_seen' => 3,'corp_ra_dt_first_seen' => 4,'corp_ra_dt_last_seen' => 5,'corp_key' => 6,'corp_vendor' => 7,'corp_state_origin' => 8,'corp_process_date' => 9,'corp_orig_sos_charter_nbr' => 10,'corp_legal_name' => 11,'corp_ln_name_type_cd' => 12,'corp_ln_name_type_desc' => 13,'corp_status_desc' => 14,'corp_status_date' => 15,'corp_inc_state' => 16,'corp_inc_date' => 17,'corp_foreign_domestic_ind' => 18,'corp_forgn_state_desc' => 19,'corp_forgn_date' => 20,'corp_term_exist_cd' => 21,'corp_term_exist_desc' => 22,'corp_orig_org_structure_desc' => 23,'corp_for_profit_ind' => 24,'corp_name_reservation_expiration_date' => 25,'corp_orig_bus_type_desc' => 26,'corp_management_desc' => 27,'corp_fiscal_year_month' => 28,'corp_agent_county' => 29,'InternalField1' => 30,'InternalField2' => 31,'InternalField3' => 32,'recordorigin' => 33,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','LENGTHS'],['ENUM'],['ENUM'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','LENGTHS'],['LENGTHS'],['ENUM'],['ENUM'],['ENUM'],['ALLOW','CUSTOM','LENGTHS'],['ENUM'],['ALLOW','CUSTOM','LENGTHS'],['ENUM'],['ALLOW'],['ALLOW','CUSTOM','LENGTHS'],['ENUM'],['ENUM'],['ALLOW'],['ENUM'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW'],['ENUM'],['ENUM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ENUM'],[]);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW','LENGTHS'],['ENUM'],['ENUM'],['CUSTOM'],['ALLOW','LENGTHS'],['LENGTHS'],['ENUM'],['ENUM'],['ENUM'],['CUSTOM'],['ENUM'],['CUSTOM'],['ENUM'],['ALLOW'],['CUSTOM'],['ENUM'],['ENUM'],['ALLOW'],['ENUM'],['CUSTOM'],['ALLOW'],['ENUM'],['ENUM'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ENUM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

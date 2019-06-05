@@ -83,7 +83,7 @@ Export ID := MODULE;
 			self.corp_ra_full_name						  := choose(ctr, Corp2_Mapping.fCleanBusinessName(state_origin ,state_desc,corp2.t2u(l.first_name+' '+l.middle_name+' '+l.last_name)).BusinessName
 			                                                 , Corp2_Mapping.fCleanBusinessName(state_origin ,state_desc,l.org_name).BusinessName);													   
 			temp_country := if(Corp2_Raw_ID.Functions.CountryDesc(l.country)[1..2]<> '**',Corp2_Raw_ID.Functions.CountryDesc(l.country),'');
-			temp_addr1   := if(corp2.t2u(l.addr1) in ['AGENT RESIGNED','INVALID'] ,'' ,l.addr1);
+			temp_addr1   := if(corp2.t2u(l.addr1) in ['AGENT RESIGNED OR INVALID'] ,'' ,l.addr1);
 			self.corp_ra_address_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,temp_addr1,l.addr2,l.city,l.state,l.postal_code).AddressLine1;
 			self.corp_ra_address_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,temp_addr1,l.addr2,l.city,l.state,l.postal_code).AddressLine2;
 			self.corp_ra_address_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,temp_addr1,l.addr2,l.city,l.state,l.postal_code,temp_country).AddressLine3;
@@ -166,13 +166,13 @@ Export ID := MODULE;
 		// Map Stock records
 		//********************************************************************	
 		Corp2_mapping.LayoutsCommon.Stock StockTrf(Corp2_Raw_ID.Layouts.FilingLayoutIn l) := transform
-		   ,skip(corp2.t2u(l.control_no) = '' or (string)(integer)corp2.t2u(l.common_shares)='0')
+		   ,skip(corp2.t2u(l.control_no) = '' or stringlib.stringfilterout(l.common_shares,'0123456789')='')
 			self.corp_key													:= state_fips +'-' + corp2.t2u(l.control_no);
 			self.corp_vendor 											:= state_fips;
 			self.corp_state_origin 								:= state_origin;
 			self.corp_process_date 								:= fileDate;
 			self.corp_sos_charter_nbr 						:= corp2.t2u(l.control_no);			
-			self.stock_shares_issued         			:= (string)(integer)corp2.t2u(l.common_shares);
+			self.stock_shares_issued         			:= if(stringlib.stringfilterout(l.common_shares,'0123456789')='' ,(string)(integer)l.common_shares ,'');
 			self                            			:= [];
 		end;
 
@@ -198,7 +198,7 @@ Export ID := MODULE;
 		Main_CreateBitMaps				:= output(Main_N.BitmapInfile,,'~thor_data::corp_ID_main_scrubs_bits',overwrite,compressed);	//long term storage
 		Main_TranslateBitMap			:= output(Main_T);
 		//Creates Profile's alert template for Orbit - can be copied and imported into Orbit; Only required if rules in Orbit change
-		Main_AlertsCSVTemplate		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').ProfileAlertsTemplate;
+		// Main_AlertsCSVTemplate		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').ProfileAlertsTemplate;
 		//Submits Profile's stats to Orbit
 		Main_SubmitStats 			  	:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').SubmitStats;
 		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').CompareToProfile_with_Examples;
