@@ -1,4 +1,4 @@
-﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools;
+﻿import BIPv2_Files, ut, BIPv2_PostProcess, BIPV2_PROX_SALT_int_fullfile,tools,BIPv2_HRCHY,BIPV2,tools,BIPV2_Tools, BIPV2_Segmentation;
 EXPORT proc_segmentation(
    string                            pversion
   ,dataset(BIPV2.CommonBase.layout ) pInputDirty          = BIPV2.CommonBase.DS_BUILT
@@ -8,10 +8,15 @@ EXPORT proc_segmentation(
   ,boolean                           pTurnOffStrata       = false
   ,string                            pGoldOutputModifier  = ''
   ,boolean                           pPopulateStatus      = false
+  ,boolean                           pUseClean2           = false //for testing so that persists will not have to be rebuilt each time(the regulatory suppression causes that to happen)
   
 ) := 
 module
-    shared ds_Input_clean := BIPV2.CommonBase.clean(pInputDirty         ) : persist('~persist::BIPV2_PostProcess::proc_segmentation.ds_Input_clean' + pGoldOutputModifier);
+    shared ds_Input_clean := if(pUseClean2 = false
+                                ,BIPV2.CommonBase.clean (pInputDirty         ) 
+                                ,BIPV2.CommonBase.clean2(pInputDirty         ) 
+                             )
+                                : persist('~persist::BIPV2_PostProcess::proc_segmentation.ds_Input_clean' + pGoldOutputModifier);
     // shared ds_Input_clean := pInputDirty         ;
     lrec := {ds_Input_clean.ultid ,ds_Input_clean.orgid ,ds_Input_clean.seleid  ,ds_Input_clean.proxid ,ds_Input_clean.powid  ,ds_Input_clean.source  ,ds_Input_clean.company_status_derived  ,ds_Input_clean.dt_first_seen ,ds_Input_clean.dt_last_seen  ,ds_Input_clean.dt_vendor_first_reported  ,ds_Input_clean.dt_vendor_last_reported       };
     ds_set_status_prep  :=   table(ds_Input_clean  ,lrec  ,ultid   ,orgid   ,seleid    ,proxid   ,powid    ,source    ,company_status_derived    ,dt_first_seen   ,dt_last_seen    ,dt_vendor_first_reported    ,dt_vendor_last_reported   ,merge);
@@ -138,6 +143,8 @@ module
     BIPV2_PostProcess.macPartition(ds_set_status_seleid_public_test, ProxID, ProxFree_test, ProxProb_test)
     BIPV2_PostProcess.macPartition(ds_set_status_seleid_public_test, SELEID, SeleFree_test, SeleProb_test)
     
+    //Generate Segmentation File
+    export build_seg_file           := BIPV2_Segmentation.BuildSegmentationFile;
     // Gold Segmentation
     export modgoldSELEV2_test       := BIPV2_PostProcess.segmentation_gold(SeleFree_test,   'SELEID',pToday, 'V2'          + pGoldOutputModifier);
     export modgoldSELEV2P_test      := BIPV2_PostProcess.segmentation_gold(SeleProb_test,   'SELEID',pToday, 'V2Probation' + pGoldOutputModifier);    
@@ -580,6 +587,7 @@ module
          output(pToday                                      ,named('IngestDate'   ))
         ,output(pversion                                    ,named('BuildDate'    ))
         ,output(BIPV2.KeySuffix_mod2.MostRecentSprintNumber ,named('SprintNumber' ))
+        ,evaluate(build_seg_file(pversion))
         , output_segs_fixed_filtered
         , email_executive_dashboard
         , goldSELEV2

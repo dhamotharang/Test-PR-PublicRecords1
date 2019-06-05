@@ -7,7 +7,7 @@ SHARED s := Specificities(ih).Specificities[1];
  
 // Generate match candidates based upon this attribute file
  
-match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri) := TRANSFORM
+match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED company_inc_state_support0 = 0) := TRANSFORM
   SELF.rule := 10000; // Signify Attribute File #0
   SELF.LGID31 := le.LGID3;
   SELF.LGID32 := ri.LGID3;
@@ -29,16 +29,11 @@ match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri) := TRANSF
                         le.cnp_number_isnull OR ri.cnp_number_isnull => 0,
                         le.cnp_number = ri.cnp_number  => le.cnp_number_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.cnp_number_weight100,ri.cnp_number_weight100),s.cnp_number_switch));
-  INTEGER2 company_inc_state_score_temp := MAP(
-                        le.company_inc_state_isnull OR ri.company_inc_state_isnull OR le.company_inc_state_weight100 = 0 => 0,
-                        le.company_inc_state = ri.company_inc_state  => le.company_inc_state_weight100,
-                        SALT311.Fn_Fail_Scale(AVE(le.company_inc_state_weight100,ri.company_inc_state_weight100),s.company_inc_state_switch));
    /*HACKMOD_Attr_UnderLinks03*/ INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR ( sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force*100), cnp_number_score_temp,0);
-   /*HACKMOD_Attr_UnderLinks01*/ INTEGER2 company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR ( company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100) OR ( sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100), company_inc_state_score_temp,0);
-  SELF.Conf_Prop := (company_inc_state_score + Lgid3IfHrchy_score + sbfe_id_score + company_fein_score + cnp_number_score) / 100; // Score based on forced fields
+  SELF.Conf_Prop := (Lgid3IfHrchy_score + sbfe_id_score + company_fein_score + cnp_number_score) / 100; // Score based on forced fields
    /*HACKMOD_Attr_UnderLinks04*/ SELF.Conf := Config.MatchThreshold+1;
 END;
 Matches0 := DISTRIBUTE(JOIN(Cands,Cands,LEFT.Basis = RIGHT.Basis AND LEFT.LGID3 > RIGHT.LGID3,Score(LEFT,RIGHT)),LGID31+LGID32);
  
-EXPORT Match := DEDUP( SORT(Matches0,LGID31,LGID32,-(Conf+Conf_Prop),Source_Id,LOCAL),LGID31,LGID32,KEEP(1),LOCAL ); // Keep 1 source_ids per match
+EXPORT Match := DEDUP( SORT(Matches0,LGID31,LGID32,-(Conf+Conf_Prop+support_company_inc_state),Source_Id,LOCAL),LGID31,LGID32,KEEP(1),LOCAL ); // Keep 1 source_ids per match
 END;

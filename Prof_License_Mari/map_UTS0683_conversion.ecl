@@ -1,10 +1,10 @@
-/* Converting Utah Division of Real Estate Professional License File to MARI common layout
+﻿/* Converting Utah Division of Real Estate Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib,STD;
 
 export  map_UTS0683_conversion(string pVersion) := function
-#workunit('name','Prof License MARI- UTS0683 ' + pVersion);
+#workunit('name','Yogurt:Prof License MARI- UTS0683 ' + pVersion);
 
 code 					:= 'UTS0683';  	 
 src_cd				:= code[3..7];
@@ -40,7 +40,7 @@ corp_list := ['MLDC','IDBA','MCBO','MDBA','REC','REB','RPMC'];
 officename := '(RE/MAX |WORK/PLACE |COLDWELL BANKER |SAIL/ON |RE/PRO |GOLDEN BEAR |RICHFIELD/SEVIER )';
 
 maribase_plus_dbas := record, maxsize(5000)
-  Prof_License_Mari.layouts.base;
+  Prof_License_Mari.layout_base_in;
 	string60 dba1;
 	string60 dba2;
 	string60 dba3;
@@ -400,7 +400,7 @@ OutRecs := project(comb_affil, xTransPROVNOTE(left));
 
 //Transform expanded dataset to MARIBASE layout
 //Apply DBA Business Rules
-Prof_License_Mari.layouts.base 	xTransToBase(OutRecs L) := transform
+Prof_License_Mari.layout_base_in 	xTransToBase(OutRecs L) := transform
 	self.NAME_ORG_SUFX 	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX,' ');
 	self.NAME_OFFICE		:= StringLib.StringCleanSpaces(L.NAME_OFFICE);
 	// self.ADDR_ADDR1_1		:= Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.ADDR_ADDR1_1);

@@ -65,7 +65,7 @@ EXPORT map_MAS0021_conversion(STRING pVersion) := FUNCTION
 	ut.CleanFields(GoodFilterRec,clnGoodFilterRec);
 	
 	//Map Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(layout_MAS0021.common pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(layout_MAS0021.common pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -354,7 +354,7 @@ EXPORT map_MAS0021_conversion(STRING pVersion) := FUNCTION
 	inFileLic	:= PROJECT(clnGoodFilterRec,xformToCommon(LEFT));
 										
 	// Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-	Prof_License_Mari.layouts.base trans_lic_status(inFileLic L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(inFileLic L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		self := L;
 	END;
@@ -366,7 +366,7 @@ EXPORT map_MAS0021_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_PROF_CD field via translation on license type field
- 	Prof_License_Mari.layouts.base trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) := TRANSFORM
+ 	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_stat_trans L, Cmvtranslation R) := TRANSFORM
    		SELF.STD_PROF_CD := R.DM_VALUE1;
    		SELF := L;
    	END;

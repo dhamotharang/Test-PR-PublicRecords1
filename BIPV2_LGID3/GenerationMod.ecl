@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.3';
+  EXPORT salt_VERSION := 'V3.11.4';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'LGID3';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rcid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_LGID3 */,/* MY_seleid */,/* MY_orgid */,/* MY_ultid */,sbfe_id,nodes_below_st,Lgid3IfHrchy,OriginalSeleId,OriginalOrgId,company_name,cnp_number,active_duns_number,duns_number,duns_number_concept,company_fein,company_inc_state,company_charter_number,cnp_btype,company_name_type_derived,hist_duns_number,active_domestic_corp_key,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,cnp_name,cnp_hasNumber,cnp_lowv,cnp_translated,cnp_classid,prim_range,prim_name,sec_range,v_city_name,st,zip,has_lgid,is_sele_level,is_org_level,is_ult_level,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,levels_from_top,nodes_total,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_LGID3 */,/* MY_seleid */,/* MY_orgid */,/* MY_ultid */,sbfe_id,nodes_below_st,Lgid3IfHrchy,OriginalSeleId,OriginalOrgId,company_name,cnp_number,active_duns_number,duns_number,duns_number_concept,company_fein,company_inc_state,company_charter_number,cnp_btype,company_name_type_derived,hist_duns_number,active_domestic_corp_key,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,cnp_name,cnp_hasNumber,cnp_lowv,cnp_translated,cnp_classid,prim_range,prim_name,sec_range,v_city_name,st,zip,has_lgid,is_sele_level,is_org_level,is_ult_level,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,levels_from_top,nodes_total,cortera_id,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
   EXPORT spc_HAS_TWOSTEP := TRUE;
   EXPORT spc_HAS_PARTITION := TRUE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -38,7 +38,8 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // The entire spec file
   EXPORT spcString :=
-    'OPTIONS:-gh -ga -p2 -gs2\n'
+    '//SALTVERSION:311\n'
+    + 'OPTIONS:-gh -ga -p2 -gs2\n'
     + 'MODULE:BIPV2_LGID3 \n'
     + 'FILENAME:LGID3\n'
     + ' \n'
@@ -77,7 +78,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:OriginalOrgId:CARRY:0,0\n'
     + '// Legal Name\n'
     + '// FIELD:company_name:LIKE(multiword):BAGOFWORDS(MOST):EDIT1(2):PROP:FORCE(+):TYPE(string250):25,147\n'
-    + 'FIELD:company_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1(2):PROP:TYPE(string250):26,398\n'
+    + 'FIELD:company_name:LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1(2):PROP:TYPE(string250):26,398\n'
     + 'FIELD:cnp_number:PROP:FORCE(--,OR(sbfe_id)):13,2\n'
     + '// NOTE: This assumes we hack the data to blank company_name except when it\'s a Legal Name.\n'
     + '// Given field specificities and the THRESHOLD we\'ve set above, we in-effect require\n'
@@ -126,6 +127,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:ultimate_proxid:CARRY:0,0\n'
     + 'FIELD:levels_from_top:CARRY:0,0\n'
     + 'FIELD:nodes_total:CARRY:0,0\n'
+    + 'FIELD:cortera_id:CARRY:0,0\n'
     + '// ------------------------------------\n'
     + '//  Metadata\n'
     + '// ------------------------------------\n'
@@ -136,6 +138,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + '\n'
     + '//Underlinks\n'
     + 'ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):IDFIELD(LGID3):41,0\n'
+    + 'ATTRIBUTEFILE:CorteraAccounts:NAMED(file_cortera_accounts):VALUES(account_id):IDFIELD(lgid3):27,0\n'
     + '\n'
     ;
  
