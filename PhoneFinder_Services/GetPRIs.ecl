@@ -141,8 +141,10 @@ FUNCTION
   dPrepForRIs_pre := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
   	
   dPrepForRIs := IF(EXISTS(dPrepForRIs_pre), dPrepForRIs_pre, PROJECT(dProcessInput, TRANSFORM($.Layouts.PhoneFinder.Final, 
-	                                                                                 SELF.batch_in := LEFT, SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for no identity adn no phone
-	                                                                                 SELF := [])));
+                                                                                     SELF.phone := LEFT.homephone, SELF.fname :=LEFT.name_first,
+                                                                                     SELF.lname := LEFT.name_last, SELF.prim_name := LEFT.prim_name, 
+                                                                                     SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
+                                                                                     SELF := [])));
   dRIs := IF(inMod.IncludeRiskIndicators, PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod));
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
