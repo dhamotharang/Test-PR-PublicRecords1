@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take ID Mortgage Arppraisers raw file and convert it to a 
 //  common professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */
@@ -39,7 +39,7 @@ EXPORT map_IDS0262_conversion(STRING pVersion) := FUNCTION
 											AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(SORT_NAME)));
 
 	//ID Mortgage Brokers layout to Common
-	Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_IDS0262 L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(Prof_License_Mari.layout_IDS0262 L) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -198,7 +198,7 @@ EXPORT map_IDS0262_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ValidAppraiser, transformToCommon(LEFT));
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -208,7 +208,7 @@ EXPORT map_IDS0262_conversion(STRING pVersion) := FUNCTION
 													trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
  
 	// look up standard license status
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, Cmvtranslation R) := transform
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;

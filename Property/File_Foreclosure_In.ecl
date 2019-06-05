@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT ut;
 foreclosurein := dataset('~thor_data400::in::foreclosure', property.Layout_Foreclosure_In, THOR);
 // foreclosurein := property.Foreclosure_Clean_AID;
 

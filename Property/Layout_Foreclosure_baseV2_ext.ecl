@@ -1,4 +1,4 @@
-IMPORT $, BIPV2, AID;
+﻿IMPORT $, BIPV2, AID;
 
 //Extra fields added to accomodate Black Knight data. Source added to distinguish BK and CoreLogic.
 EXPORT Layout_Foreclosure_baseV2_ext := RECORD

@@ -1,4 +1,5 @@
 ﻿IMPORT Address,BKForeclosure,codes,Property;
+#option('multiplePersistInstances',FALSE);
 
 EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
 
@@ -7,16 +8,16 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
   dEmptyReo := ROW([], BKForeclosure.layout_BK.base_reo );
   dEmptyNod := ROW([], BKForeclosure.layout_BK.base_nod );
 
-	code_lkp := Address.County_Names;
-	StateCodes_dict	:= DICTIONARY(code_lkp, {state_code => state_alpha});
-	CountyCodes_dict := DICTIONARY(code_lkp, {county_code => county_name});
-  StCodeLkp(STRING code ) := StateCodes_dict[code].state_alpha;
-	CntyCodeLkp(STRING code ) := CountyCodes_dict[code].county_name;
+	// code_lkp := Address.County_Names;
+	// StateCodes_dict	:= DICTIONARY(code_lkp, {state_code => state_alpha});
+	// CountyCodes_dict := DICTIONARY(code_lkp, {county_code => county_name});
+  // StCodeLkp(STRING code ) := StateCodes_dict[code].state_alpha;
+	// CntyCodeLkp(STRING code ) := CountyCodes_dict[code].county_name;
 
-  Property.Layout_Foreclosure_baseV2_ext tMapForeclosure(RECORDOF(DReoBaseFile ) lreo, RECORDOF(DNodBaseFile ) lnod, UNSIGNED uReoNod ) := TRANSFORM
+  Property.Layout_Fares_Foreclosure_V2 tMapForeclosure(RECORDOF(DReoBaseFile ) lreo, RECORDOF(DNodBaseFile ) lnod, UNSIGNED uReoNod ) := TRANSFORM
     SELF.foreclosure_id := CHOOSE(uReoNod, lreo.foreclosure_id, lnod.foreclosure_id );
-    SELF.State := CHOOSE(uReoNod, StCodeLkp(lreo.fips_cd[1..2]), lnod.src_state );
-    SELF.County := CHOOSE(uReoNod, CntyCodeLkp(lreo.fips_cd[3..5]), lnod.src_county );
+    SELF.State := CHOOSE(uReoNod, lreo.fips_cd[1..2], lnod.fips_cd[1..2] );
+    SELF.County := CHOOSE(uReoNod, lreo.fips_cd[3..5], lnod.fips_cd[3..5] );
     SELF.deed_category := CHOOSE(uReoNod, 'U', 'N' );
     SELF.deed_desc := CHOOSE(uReoNod, 'Foreclosure', 'Notice of Default' );
     SELF.document_type := CHOOSE(uReoNod, lreo.doc_type_cd, lnod.doc_type );
@@ -27,13 +28,15 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.document_pages := CHOOSE(uReoNod, lreo.recording_page_num, lnod.page_number );
     SELF.title_company_name := CHOOSE(uReoNod, lreo.title_co_name, '' );
     SELF.first_defendant_borrower_owner_first_name := CHOOSE(uReoNod, lreo.buyer1_fname, lnod.borrower1_fname );
-    SELF.first_defendant_borrower_owner_last_name := CHOOSE(uReoNod, lreo.buyer1_lname, lnod.borrower1_lname );
-    SELF.first_defendant_borrower_company_name := CHOOSE(uReoNod, IF( lreo.buyer1_fname = '' AND lreo.buyer1_lname <> '', lreo.buyer1_lname, '' ),
-                                                                  IF( lnod.borrower1_fname = '' AND lnod.borrower1_lname <> '', lnod.borrower1_lname, '' ));
+    SELF.first_defendant_borrower_owner_last_name := CHOOSE(uReoNod, IF(lreo.name1_first = '', '',lreo.buyer1_lname),
+																																		 IF(lnod.name1_first = '', '', lnod.borrower1_lname));
+    SELF.first_defendant_borrower_company_name := CHOOSE(uReoNod, IF( lreo.name1_first = '' AND lreo.buyer1_lname <> '', lreo.buyer1_lname, '' ),
+                                                                  IF( lnod.name1_first = '' AND lnod.borrower1_lname <> '', lnod.borrower1_lname, '' ));
     SELF.second_defendant_borrower_owner_first_name := CHOOSE(uReoNod, lreo.buyer2_fname, lnod.borrower2_fname );
-    SELF.second_defendant_borrower_owner_last_name := CHOOSE(uReoNod, lreo.buyer2_lname, lnod.borrower2_lname );
-    SELF.second_defendant_borrower_company_name := CHOOSE(uReoNod,IF(lreo.buyer2_fname = '' AND lreo.buyer2_lname <> '', lreo.buyer2_lname, ''),
-                                                                  IF( lnod.borrower2_fname = '' AND lnod.borrower2_lname <> '', lnod.borrower2_lname, '' ));
+    SELF.second_defendant_borrower_owner_last_name := CHOOSE(uReoNod, IF(lreo.name2_first = '', '', lreo.buyer2_lname), 
+																																				IF(lnod.name2_first = '', '', lnod.borrower2_lname ));
+    SELF.second_defendant_borrower_company_name := CHOOSE(uReoNod,IF(lreo.name2_first = '' AND lreo.buyer2_lname <> '', lreo.buyer2_lname, ''),
+                                                                  IF( lnod.name2_first = '' AND lnod.borrower2_lname <> '', lnod.borrower2_lname, '' ));
     SELF.date_of_default := CHOOSE(uReoNod, '', lnod.as_of_dt );
     SELF.amount_of_default := CHOOSE(uReoNod, '', lnod.unpaid_balance );
     SELF.court_case_nbr := CHOOSE(uReoNod, '', lnod.case_number );
@@ -91,9 +94,9 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.name1_last := CHOOSE(uReoNod, lreo.name1_last, lnod.name1_last );
     SELF.name1_suffix := CHOOSE(uReoNod, lreo.name1_suffix, lnod.name1_suffix );
     SELF.name1_company := CHOOSE(uReoNod, lreo.name1_company, lnod.name1_company );
-    SELF.name1_did_score := CHOOSE(uReoNod, '', lnod.name1_did_score );
+    SELF.name1_did_score := CHOOSE(uReoNod, lreo.name1_did_score, lnod.name1_did_score );
     SELF.name1_did := CHOOSE(uReoNod, lreo.name1_did, lnod.name1_did );
-    SELF.name1_bdid_score := CHOOSE(uReoNod, '', lnod.name1_bdid_score );
+    SELF.name1_bdid_score := CHOOSE(uReoNod, lreo.name1_bdid_score, lnod.name1_bdid_score );
     SELF.name1_bdid := CHOOSE(uReoNod, lreo.name1_bdid, lnod.name1_bdid );
     SELF.name1_ssn := CHOOSE(uReoNod, lreo.name1_ssn, lnod.name1_ssn );
     SELF.name2_prefix := CHOOSE(uReoNod, lreo.name2_prefix, lnod.name2_prefix );
@@ -102,9 +105,9 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.name2_last := CHOOSE(uReoNod, lreo.name2_last, lnod.name2_last );
     SELF.name2_suffix := CHOOSE(uReoNod, lreo.name2_suffix, lnod.name2_suffix );
     SELF.name2_company := CHOOSE(uReoNod, lreo.name2_company, lnod.name2_company );
-    SELF.name2_did_score := CHOOSE(uReoNod, '', lnod.name2_did_score );
+    SELF.name2_did_score := CHOOSE(uReoNod, lreo.name2_did_score, lnod.name2_did_score );
     SELF.name2_did := CHOOSE(uReoNod, lreo.name2_did, lnod.name2_did );
-    SELF.name2_bdid_score := CHOOSE(uReoNod, '', lnod.name2_bdid_score );
+    SELF.name2_bdid_score := CHOOSE(uReoNod, lreo.name2_bdid_score, lnod.name2_bdid_score );
     SELF.name2_bdid	:= CHOOSE(uReoNod, lreo.name2_bdid, lnod.name2_bdid );
     SELF.name2_ssn := CHOOSE(uReoNod, lreo.name2_ssn, lnod.name2_ssn );
     SELF.name3_prefix := CHOOSE(uReoNod, lreo.name3_prefix, lnod.name3_prefix );
@@ -176,13 +179,15 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.situs1_msa := CHOOSE(uReoNod, lreo.situs1_msa, lnod.situs1_msa );	
     SELF.situs1_geo_blk := CHOOSE(uReoNod, lreo.situs1_geo_blk, lnod.situs1_geo_blk );	
     SELF.situs1_geo_match := CHOOSE(uReoNod, lreo.situs1_geo_match, lnod.situs1_geo_match );	
-    SELF.situs1_err_stat := CHOOSE(uReoNod, lreo.situs1_err_stat, lnod.situs1_err_stat );	
+    SELF.situs1_err_stat := CHOOSE(uReoNod, lreo.situs1_err_stat, lnod.situs1_err_stat );
+		SELF.source_rec_id	 := CHOOSE(uReoNod, lreo.record_id, lnod.record_id );
     SELF.Lender_type := CHOOSE(uReoNod, lreo.concurrent_lender_type, '' );
     SELF.lender_type_desc := CHOOSE(uReoNod, lreo.lender_type_desc, '' );
     SELF.loan_amount := CHOOSE(uReoNod, lreo.concurrent_loan_amt, '' );
     SELF.loan_type := CHOOSE(uReoNod, lreo.concurrent_loan_type, '' );
     SELF.loan_type_desc := CHOOSE(uReoNod, lreo.loan_type_desc, '' );
     SELF.source := CHOOSE(uReoNod, lreo.src, lnod.src );
+		SELF.process_date := CHOOSE(uReoNod, lreo.process_date, lnod.process_date );
     SELF := lreo;
     SELF := lnod;
     SELF := []
@@ -191,8 +196,8 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
   
   dReoBaseForeclosure := PROJECT(dReoBaseFile,tMapForeclosure(LEFT,dEmptyNod,1));
   dNodBaseForeclosure := PROJECT(dNodBaseFile,tMapForeclosure(dEmptyReo,LEFT,2));
-  dBKasCLForeclosure := dReoBaseForeclosure+dNodBaseForeclosure;
-
+  dBKasCLForeclosure := dReoBaseForeclosure+dNodBaseForeclosure : PERSIST('~thor_data400::base::BKForeclosure::foreclosure_basev2');
+	
   RETURN dBKasCLForeclosure;
 
 END;

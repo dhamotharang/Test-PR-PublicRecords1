@@ -1766,5 +1766,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2019/757 Central African Republic List','1753'},
 {'EC (CFSP) 2019/806 Syria List','1754'},
 {'EC 2019/791 ISIL (Da\'esh) and Al-Qaida List','1755'},
-{'EC 2019/798 Syria List','1756'}
+{'EC 2019/798 Syria List','1756'},
+{'EC (CFSP) 2019/870 Iran List','1757'},
+{'EC 2019/855 Iran List','1758'},
+{'US Defense Trade Controls Statutorily Debarred Parties','1759'},
+{'US Department of State - Public Designation under Section 7031(c) of Foreign Operations and Related Programs Act','1760'}
 ],r);

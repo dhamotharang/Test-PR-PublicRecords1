@@ -1,4 +1,4 @@
-//California Real Estate Appraisers - CAS0847
+﻿//California Real Estate Appraisers - CAS0847
 import ut, Prof_License_Mari, lib_stringlib, lib_datalib;
 
 EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
@@ -20,7 +20,7 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 	oFile					:= OUTPUT(ValidMTGFile);
 	
 	maribase_plus_dbas := record,maxlength(5000)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		string60 dba;
 		string60 dba1;
 		string60 dba2;
@@ -50,12 +50,12 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 
 		SELF.TYPE_CD		  		:= 'MD';
 																			 			
-		trimFName							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.FIRST_NAME);
-		trimLName							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.LAST_NAME);
-		trimAddress      			:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_address);
-		trimCity							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_city);	
-		trimState							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_state);	
-		trimZip								:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_zip);	
+		trimFName							:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
+		trimLName							:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);
+		trimAddress      			:= ut.CleanSpacesAndUpper(pInput.mail_address);
+		trimCity							:= ut.CleanSpacesAndUpper(pInput.mail_city);	
+		trimState							:= ut.CleanSpacesAndUpper(pInput.mail_state);	
+		trimZip								:= ut.CleanSpacesAndUpper(pInput.mail_zip);	
 			
 		// Identify NICKNAME in the various format 
 		/*tempFNick							:= MAP(StringLib.stringfind(trimFName,'""',1) >0 
@@ -104,7 +104,7 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 		// 3.) Standardized corporation suffixes
 				
 		// Populate if DBA exist in OFFICE NAME field	
-		//trimOFFICE          	:= Prof_License_Mari.mod_clean_name_addr.TrimUPPER(pInput.company_name);
+		//trimOFFICE          	:= ut.CleanSpacesAndUpper(pInput.company_name);
 		//Company name is not provided in the vendor file
 /* 		trimOFFICE						:= ' ';
    		prepNAME_OFFICE				:= MAP(StringLib.StringFind(trimOffice,'N/I',1)>0 => '',
@@ -141,15 +141,15 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 											
 				
 			self.NAME_FIRST 		:= cleanFName;
-			self.NAME_MID   		:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.MID_NAME);
+			self.NAME_MID   		:= ut.CleanSpacesAndUpper(pInput.MID_NAME);
 			self.NAME_LAST  		:= cleanLName;
 			
 			stripNick						:= IF(StringLib.stringfind(tempLNick,'AKA',1)> 0,REGEXREPLACE('(AKA)',tempLNick,''),tempFNick);
 			self.NAME_NICK			:= StringLib.StringCleanSpaces(stripNick);
 
-			self.LICENSE_NBR	  := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.lic_num);
+			self.LICENSE_NBR	  := ut.CleanSpacesAndUpper(pInput.lic_num);
 			self.LICENSE_STATE	:= src_st;
-			self.RAW_LICENSE_TYPE := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.lic_lev);
+			self.RAW_LICENSE_TYPE := ut.CleanSpacesAndUpper(pInput.lic_lev);
 			self.STD_LICENSE_TYPE := self.raw_license_type; 
 				
 			//Reformatting date from MM/DD/YYYY to YYYYMMDD	 									
@@ -163,10 +163,10 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 			SELF.RAW_LICENSE_STATUS := IF(self.EXPIRE_DTE >= pVersion,
 																		'ACTIVE',
 																		'LICENSE EXPIRED');
-			//self.RAW_LICENSE_STATUS := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.license_status);
+			//self.RAW_LICENSE_STATUS := ut.CleanSpacesAndUpper(pInput.license_status);
 
 			self.ADDR_BUS_IND		:= IF(TRIM(pInput.mail_address + pInput.mail_zip,LEFT,RIGHT) != '','B','');
-			//self.NAME_ORG_ORIG	:= IF(pInput.FULL_NAME != ' ',Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.FULL_NAME),
+			//self.NAME_ORG_ORIG	:= IF(pInput.FULL_NAME != ' ',ut.CleanSpacesAndUpper(pInput.FULL_NAME),
 			//Full name is not in the input file. 1/22/13 Cathy Tio
 			self.NAME_ORG_ORIG	:= StringLib.StringCleanSpaces(TRIM(trimFName,LEFT,RIGHT) + IF(trimFName <> ' ',' ',' ')
 																													+ TRIM(self.NAME_MID ,LEFT,RIGHT) + IF(self.NAME_MID  <> ' ',' ',' ')
@@ -243,13 +243,13 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
    																			=> REGEXFIND('^([0-9A-Za-z ][^\\,]+)[\\,][ ]([0-9A-Za-z ][^\\,]+)[\\,]?[ ]([0-9A-Za-z ][^\\,]+)', trimAddress,3),
    																			' ');
    				self.ADDR_ADDR4_1    	:= '';
-   				self.ADDR_CITY_1			:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_city);
-   				self.ADDR_STATE_1			:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_state);
+   				self.ADDR_CITY_1			:= ut.CleanSpacesAndUpper(pInput.mail_city);
+   				self.ADDR_STATE_1			:= ut.CleanSpacesAndUpper(pInput.mail_state);
    				 
-   				tmpZIPCODE 						:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_zip);
+   				tmpZIPCODE 						:= ut.CleanSpacesAndUpper(pInput.mail_zip);
    				self.ADDR_ZIP5_1			:= tmpZIPCODE[1..5];
    				self.ADDR_ZIP4_1			:= tmpZIPCODE[7..10];
-   				self.addr_cnty_1 			:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.county);
+   				self.addr_cnty_1 			:= ut.CleanSpacesAndUpper(pInput.county);
 */
 				//following code is commented out because compilance is not provided in vendor input file any more 1/22/13 Cathy Tio			
 				//self.disp_type_cd 		:= if(pInput.compliance <> '', pInput.compliance, '');
@@ -266,10 +266,10 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 																				+trim(self.std_license_type,left,right)
 																				+trim(self.std_source_upd,left,right)
 																				+trim(self.name_org_orig,left,right)
-																				+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_address)
-																				+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_city)
-																				+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_state)
-																				+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.mail_zip));
+																				+ut.CleanSpacesAndUpper(pInput.mail_address)
+																				+ut.CleanSpacesAndUpper(pInput.mail_city)
+																				+ut.CleanSpacesAndUpper(pInput.mail_state)
+																				+ut.CleanSpacesAndUpper(pInput.mail_zip));
 				//Full name is no longer provided in vendor's input file 1/22/13 Cathy Tio
 				//Company name is no longer provided in vendor's input file 1/22/13 Cathy Tio
 											 
@@ -382,7 +382,7 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 
 
 	// Transform expanded dataset to MARIBASE layout
-	Prof_License_Mari.layouts.base 	xTransToBase(OutRecs L) := transform
+	Prof_License_Mari.layout_base_in 	xTransToBase(OutRecs L) := transform
 			DBA_SUFX				:= Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(L.NAME_DBA);						   
 		self.NAME_DBA_SUFX		:= StringLib.StringFilterOut(DBA_SUFX, '.'); 
 		
