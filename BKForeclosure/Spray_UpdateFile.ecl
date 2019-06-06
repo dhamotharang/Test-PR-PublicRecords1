@@ -1,6 +1,6 @@
 ﻿IMPORT STD,_control;
 
-//Files for S0376 are Located  //
+//Raw file location
 EXPORT Spray_UpdateFile(STRING filedate, STRING	pServerIP	= _control.IPAddress.bctlpedata12) := MODULE
 // IF(_control.thisenvironment.name = 'Dataland',
 																															 // _control.IPAddress.bctlpedata12,

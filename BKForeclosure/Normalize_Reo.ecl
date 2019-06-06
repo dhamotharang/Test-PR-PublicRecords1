@@ -27,7 +27,7 @@ Co_Pattern  := '( AND | ASSOCIATES|ASSOCIATION| PC$| OF | PLLC$| PLC$| PA$| FIRM
 							 'FINANCIAL|NATIONAL|PARTNERS| LTD$|LTD |FAMILY|REAL ESTATE|NETWORK|UNITED|CLUB|^ASSET |ASSET|MANAGEMENT| AT | CREDIT| FINANCE|EVERBANK|'+
 							 'FANNIE MAE| UNION| AUTHORITY|COUNTY|^FNMA|CONDOMINIUM|AMERICA|BUSINESS|COMMUNITIES|SCHOOL| LOAN|CERTIFICATE|FEDERAL| FUND| CHURCH|'+
 							 ' BRANCH| FCU$| PROFIT|PRIVATE|COMMERCIAL|ANNUNITY|FIRST| CNTY$)';
-invalid_Pattern := '(NOT PROVIDED|NOT GIVEN|NO PROVIDED| NONE)';
+invalid_Pattern := '(NOT PROVIDED|NOT GIVEN|NO PROVIDED| NONE|(NOT P\\[ROVIDED)|(NOT \\[PROVIDED)|(NOT PROVIDED \\|))';
 
 // Normalized Name records
 Layout_BK.CleanFields_REO t_norm_reo (Layout_BK.Base_Reo_ext  le, INTEGER C) := TRANSFORM
@@ -41,21 +41,21 @@ Layout_BK.CleanFields_REO t_norm_reo (Layout_BK.Base_Reo_ext  le, INTEGER C) := 
 	trim_seller_lname2     := ut.CleanSpacesAndUpper(le.seller2_lname);	
 
 	buyer_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname1) AND NOT REGEXFIND('[0-9/]', trim_buyer_fname1) 
-													AND trim_buyer_fname1 != '',trim_buyer_fname1,'');
+													AND trim_buyer_fname1 != '',REGEXREPLACE('=',trim_buyer_fname1,' '),'');
 	buyer_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname1) AND NOT REGEXFIND('[0-9/]', trim_buyer_lname1) 
-													AND trim_buyer_lname1 != '',trim_buyer_lname1,'');
+													AND trim_buyer_lname1 != '',REGEXREPLACE('=',trim_buyer_lname1,' '),'');
 	buyer_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname2) AND NOT REGEXFIND('[0-9/]', trim_buyer_fname2) 
-													AND trim_buyer_fname2 != '',trim_buyer_fname2,'');
+													AND trim_buyer_fname2 != '',REGEXREPLACE('=',trim_buyer_fname2,' '),'');
 	buyer_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname2) AND NOT REGEXFIND('[0-9/]', trim_buyer_lname2) 
-													AND trim_buyer_lname2 != '',trim_buyer_lname2,'');  
+													AND trim_buyer_lname2 != '',REGEXREPLACE('=',trim_buyer_lname2,' '),'');  
 	seller_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname1) AND NOT REGEXFIND('[0-9/]', trim_seller_fname1) 
-													AND trim_seller_fname1 != '',trim_seller_fname1,'');
+													AND trim_seller_fname1 != '',REGEXREPLACE('=',trim_seller_fname1,' '),'');
 	seller_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname1) AND NOT REGEXFIND('[0-9/]', trim_seller_lname1) 
-													AND trim_seller_lname1 != '',trim_seller_lname1,'');
+													AND trim_seller_lname1 != '',REGEXREPLACE('=',trim_seller_lname1,' '),'');
 	seller_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname2) AND NOT REGEXFIND('[0-9/]', trim_seller_fname2) 
-													AND trim_seller_fname2 != '',trim_seller_fname2,'');
+													AND trim_seller_fname2 != '',REGEXREPLACE('=',trim_seller_fname2,' '),'');
 	seller_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname2) AND NOT REGEXFIND('[0-9/]', trim_seller_lname2) 
-													AND trim_seller_lname2 != '',trim_seller_lname2,'');  
+													AND trim_seller_lname2 != '',REGEXREPLACE('=',trim_seller_lname2,' '),'');  
 																																		
 	SELF.Name_First   := CHOOSE(C,buyer_fname1,buyer_fname2,seller_fname1,seller_fname2);
 	SELF.Name_Last		:= CHOOSE(C,buyer_lname1,buyer_lname2,seller_lname1,seller_lname2);
