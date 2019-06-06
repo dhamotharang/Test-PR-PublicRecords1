@@ -62,7 +62,7 @@ Layout_BK.CleanFields_NOD t_norm_nod (layout_BK.base_nod_ext le, INTEGER C) := T
 	trustee_phone				:= STD.Str.Filter(le.trustee_telephone,'1234567890');
 			 
   SELF.NAME_FIRST       := CHOOSE(C,borrower1_fname,borrower2_fname,contact_fname,trustee_fname);
-	SELF.NAME_LAST				:= CHOOSE(C,trim_borrower1_lname,trim_borrower2_lname,contact_lname,trustee_lname);
+	SELF.NAME_LAST				:= CHOOSE(C,borrower1_lname,borrower2_lname,contact_lname,trustee_lname);
 	SELF.NAME_FULL        := STD.Str.CleanSpaces(TRIM(SELF.NAME_FIRST,LEFT,RIGHT)+' '+TRIM(SELF.NAME_LAST,LEFT,RIGHT));
 	SELF.NAME_TYPE        := CHOOSE(C,'BR','B2','CT','TR');
 	SELF.phone						:= CHOOSE(C,'','',contact_phone,trustee_phone);
