@@ -38,7 +38,7 @@ Roxiekeybuild.MAC_SK_Move ('~thor_data400::key::liensv2::fcra::@version@::main::
 
 bld_autokeys := LiensV2.Proc_build_autokeys_fcra(filedate); 
 
-create_build := Orbit3.proc_Orbit3_CreateBuild ( 'FCRA Liens & Judgements',filedate,'F');
+create_build := Orbit3.proc_Orbit3_CreateBuild ( 'FCRA Liens and Judgements',filedate,'F');
 
 GetDops:=dops.GetDeployedDatasets('P','B','F');
 OnlyLiens:=GetDops(datasetname='FCRA_LiensV2Keys');
@@ -61,7 +61,7 @@ cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(LiensV2.key_fcra_liens_autok
 																						['tax_id']));
 /***********************************************DF-24044******************************************************/
 Attachment := 	Liensv2.fn_email_attachment(choosen(Liensv2.File_TMSID_MappingFile,100));		
-mailfile	 :=	FileServices.SendEmailAttachData('vani.chikte@lexisnexis.com'
+mailfile	 :=	FileServices.SendEmailAttachData('vani.chikte@lexisnexis.com;Cheri.G.Nevin@lexisnexisrisk.com'
 																															 ,'Liens Mapping File' //subject
 																															 ,'Liens WU: '+WORKUNIT //body
 																															 ,(data)Attachment

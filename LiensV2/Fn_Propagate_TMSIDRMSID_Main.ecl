@@ -32,17 +32,17 @@ dHoganMain     := Dedup(Sort(Distribute(dMain(TMSID<>'' AND CaseLinkID<>'' ),HAS
 dHoganMainslim := Project(dHoganMain(),rHoganMainslim);
 
 //Get Court ID from TMSID, Court Lookup and OKC Backfill files
-dMainWCourt := LiensV2.Fn_GetCourtID(dMain);
+// dMainWCourt := LiensV2.Fn_GetCourtID(dMain); //DF-24061 not needed as courtid is in the base and input
 
 //Extract the court id from TMSID and retain valid ones. Propagate caselink id where missing.
-rHoganMainwithNewIds tLiensHoganMainWithCaseLinkID(dHoganMainslim l, dMainWCourt r) :=  TRANSFORM
+rHoganMainwithNewIds tLiensHoganMainWithCaseLinkID(dHoganMainslim l, dMain r) :=  TRANSFORM
 
   // STRING7 CourtId      :=  r.tmsid[length(TRIM(r.tmsid,LEFT,RIGHT))-6..];
 	// STRING7 ValidCourtid :=  MAP(regexfind('[A-Z\\.]{6}[A-Z0-9]',CourtId ) and courtid[1..2] in ut.Set_State_Abbrev => CourtId,
 	                             // CourtId in ['IAO\'BD1','IAO\'BC1'] => CourtId,
 															 // '');
 	  
-	// self.CourtId          :=  ValidCourtid;
+	self.CourtId          :=  r.AgencyID;
 	// self.ValidCourtid  :=  ValidCourtid;
 	self.CaseLinkID_temp  :=  l.CaseLinkID; //oldest caselinkid
 	self.CaseLinkID_temp2 :=  Map(r.CaseLinkID ='' => l.CaseLinkID, r.CaseLinkID); //populated blank caselinkids with oldest	                             
@@ -50,7 +50,7 @@ rHoganMainwithNewIds tLiensHoganMainWithCaseLinkID(dHoganMainslim l, dMainWCourt
 	self                 :=  [];
 END;
 
-dHoganMainWCaselink    :=  Join(distribute(dHoganMainslim,HASH(TMSID)),distribute(dMainWCourt,HASH(TMSID)),
+dHoganMainWCaselink    :=  Join(distribute(dHoganMainslim,HASH(TMSID)),distribute(dMain,HASH(TMSID)),
                                 left.TMSID =right.TMSID,
                                 tLiensHoganMainWithCaseLinkID(LEFT,RIGHT),Right outer, local
                                 );

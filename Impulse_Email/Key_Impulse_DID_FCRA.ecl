@@ -1,4 +1,4 @@
-Import Data_Services, doxie;
+﻿Import Data_Services, doxie;
 
 //Remove Impulse Data from FCRA Keys
 base_file			:=	DATASET([], layouts.layout_Impulse_Email_final);
@@ -14,7 +14,10 @@ layouts.layout_Impulse_Email_Did_Key	tBasetoKey(layouts.layout_Impulse_Email_fin
 			self.cln_PRIM_NAME						:=	pInput.prim_name;
 			self.cln_SEC_RANGE						:=	pInput.sec_range;
 			self.cln_ST										:=	pInput.st;
-			self.cln_ZIP									:=	pInput.zip5;			
+			self.cln_ZIP									:=	pInput.zip5;	
+			//Added for CCPA-108 
+			//self.global_sid               :=  pInput.global_sid;
+			//self.record_sid               :=  pInput.record_sid;
 			self													:=	pInput;
 		END;
 		

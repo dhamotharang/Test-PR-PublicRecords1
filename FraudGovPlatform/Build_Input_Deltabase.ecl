@@ -1,4 +1,4 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate;
 EXPORT Build_Input_Deltabase(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
@@ -51,7 +51,7 @@ module
 
 	MAC_Sequence_Records( f1, unique_id, f1_unique_id, max_uid);
 	
-	shared rs_unique_id := f1_unique_id;
+	shared rs_unique_id := distribute(f1_unique_id,hash(unique_id));
 	
 	shared MBS_Deltabase	:= MBS_Sprayed(status = 1 and regexfind('DELTA', fdn_file_code, nocase));
 
@@ -61,22 +61,11 @@ module
 		left.Customer_Account_Number =(string)right.gc_id,
 		TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),LEFT ONLY, lookup);
 
-
-	shared EnforceValidations := join(
-		  rs_unique_id
-		, pCustomerSettings
-		, left.Customer_Account_Number = right.Customer_Account_Number and 
-		  left.Customer_State = right.Customer_State and
-		  left.file_type = right.file_type and //3=transactions
-		  left.ind_type = right.ind_type and //program
-		  right.validate_data = true
-		, TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),INNER, LOOKUP);
-
-	
-	shared f1_errors:=EnforceValidations
-		(Customer_Account_Number = '' or reported_date = '' or file_type = 0
-			or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE	);
-
+	shared f1_errors:=rs_unique_id
+		(	InqLog_ID = 0 
+			or (_Validate.Date.fIsValid(STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8]) = false  
+			or (unsigned)STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8] > (unsigned)(STRING8)Std.Date.Today())
+			or user_added = '');
 
 	EXPORT fn_dedup_delta(inputs):=FUNCTIONMACRO
 		in_dst := DISTRIBUTE(inputs, InqLog_ID);
@@ -93,11 +82,10 @@ module
 			,InqLog_ID
 			,local
 		);
-		return in_ddp;
+		return distribute(in_ddp,hash(unique_id));
 	ENDMACRO;
 	//Exclude Errors
-	shared ByPassed_records := NotInMbs + f1_errors;
-	f1_bypass_dedup := fn_dedup_delta(ByPassed_Deltabase_Sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.Deltabase)); 
+	shared f1_bypass_dedup := fn_dedup_delta(ByPassed_Deltabase_Sprayed + project(NotInMbs + f1_errors,FraudGovPlatform.Layouts.Input.Deltabase)); 
 	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_Deltabase.New(pversion),
 		f1_bypass_dedup,
@@ -113,7 +101,7 @@ module
 	//Move only Valid Records
 	shared Valid_Recs :=	join (	
 		rs_unique_id,
-		ByPassed_records,
+		f1_bypass_dedup,
 		left.Unique_Id = right.Unique_Id,
 		TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),
 		left only);
@@ -143,21 +131,8 @@ module
 	
 	input_file_1 := fn_dedup_delta(Deltabase_Sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 
 
-	// Refresh Addresses every 90 days
-	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
-	dRefreshAID := Standardize_Entity.dRefreshAID(input_file_1);
-	input_file_2 := if(	IsTimeForRefresh,
-					dRefreshAID,
-					input_file_1); 
-	// Refresh Lexid when new header is released
-	IsNewHeader := HeaderInfo.IsNew;
-	dRefreshLexid := Standardize_Entity.dRefreshLexid(input_file_2);
-	input_file_3 := if(	IsNewHeader,
-					dRefreshLexid,
-					input_file_2); 
-
 	tools.mac_WriteFile(Filenames(pversion).Input.Deltabase.New(pversion),
-		input_file_3,
+		input_file_1,
 		Build_Input_File,
 		pCompress	:= true,
 		pHeading := false,

@@ -8,7 +8,7 @@ EXPORT proc_EntityReport(
 functionmacro
 
   ecl		  := '#workunit(\'name\',\'BIPV2_PostProcess.Build_EntityReport @version@\');\n#workunit(\'protect\' ,true);\n' + 'BIPV2_PostProcess.Build_EntityReport(\'' + pversion + '\').run;\n';
-  cluster := _Control.Config.LocalHthor;
+  cluster := BIPV2_Build._Constants().Groupname;
   
   kickBuild := wk_ut.mac_ChainWuids(ecl,1,1,pversion,,cluster,pOutputEcl := false,pUniqueOutput := 'Build_EntityReport',pNotifyEmails := BIPV2_Build.mod_email.emailList
   ,pOutputFilename   := '~bipv2_build::' + pversion + '::workunit_history::proc_EntityReport'

@@ -14,8 +14,9 @@ BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(ClnRawNodIn L, seqNum) := TRAN
 	SELF.DATE_VENDOR_LAST_REPORTED	:= L.ln_filedate;
 	SELF.PROCESS_DATE						 := thorlib.wuid()[2..9];
 	SELF.src  									 := mdr.sourceTools.src_BKFS_Nod;
+	ClnAPN											 := REGEXREPLACE('(\\+|`|~|;)',L.APN,'');
 	SELF.foreclosure_id					 :=	IF(L.APN <> '',
-																		 StringLib.StringFindReplace(TRIM(L.APN,LEFT,RIGHT) + TRIM(L.borrower1_lname,LEFT,RIGHT) + TRIM(L.borrower1_fname,LEFT,RIGHT), ' ', ''),
+																		 StringLib.StringFindReplace(TRIM(ClnAPN,LEFT,RIGHT) + TRIM(L.borrower1_lname,LEFT,RIGHT) + TRIM(L.borrower1_fname,LEFT,RIGHT), ' ', ''),
 																		 StringLib.StringFindReplace('FC' + INTFORMAT(seqNum, 8, 1) + TRIM(L.borrower1_lname,LEFT,RIGHT) + TRIM(L.borrower1_fname,LEFT,RIGHT), ' ', '')																
 																		);
  	SELF.src_county          := ut.CleanSpacesAndUpper(L.src_county);
@@ -46,7 +47,7 @@ BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(ClnRawNodIn L, seqNum) := TRAN
 	SELF.due_date            := ut.CleanSpacesAndUpper(L.due_date);
 	SELF.trustee_fname       := ut.CleanSpacesAndUpper(L.trustee_fname);
 	SELF.trustee_lname       := ut.CleanSpacesAndUpper(L.trustee_lname);
-	SELF.trustee_mail_full_addr := ut.CleanSpacesAndUpper(REGEXREPLACE('[`]$',L.trustee_mail_full_addr,''));
+	SELF.trustee_mail_full_addr := ut.CleanSpacesAndUpper(REGEXREPLACE('([`]$|^[`])',L.trustee_mail_full_addr,''));
 	SELF.trustee_mail_unit   := ut.CleanSpacesAndUpper(L.trustee_mail_unit);
 	SELF.trustee_mail_city   := ut.CleanSpacesAndUpper(L.trustee_mail_city);
 	SELF.trustee_mail_state  := ut.CleanSpacesAndUpper(L.trustee_mail_state);
@@ -84,7 +85,7 @@ BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(ClnRawNodIn L, seqNum) := TRAN
 	SELF.original_nod_doc_num:= ut.CleanSpacesAndUpper(L.original_nod_doc_num);
 	SELF.original_nod_book   := ut.CleanSpacesAndUpper(L.original_nod_book);
 	SELF.original_nod_page   := ut.CleanSpacesAndUpper(L.original_nod_page);
-	SELF.nod_apn             := L.nod_apn;
+	SELF.nod_apn             := REGEXREPLACE('(\\+|`|~)',L.nod_apn,'');
 	SELF.property_full_addr  := ut.CleanSpacesAndUpper(REGEXREPLACE('[`]$',L.property_full_addr,''));
 	SELF.prop_addr_unit_type := ut.CleanSpacesAndUpper(L.prop_addr_unit_type);
 	SELF.prop_addr_unit_no   := ut.CleanSpacesAndUpper(L.prop_addr_unit_no);
@@ -92,7 +93,7 @@ BKForeclosure.Layout_BK.base_nod_ext CleanTrimNod(ClnRawNodIn L, seqNum) := TRAN
 	SELF.prop_addr_state     := ut.CleanSpacesAndUpper(L.prop_addr_state);
 	SELF.prop_addr_zip5      := L.prop_addr_zip5;
 	SELF.prop_addr_zip4      := L.prop_addr_zip4;
-	SELF.APN                 := L.APN;
+	SELF.APN                 := ClnAPN;
 	SELF.sam_pid             := L.sam_pid;
 	SELF.deed_pid            := L.deed_pid;
 	SELF.lps_internal_pid    := ut.CleanSpacesAndUpper(L.lps_internal_pid);

@@ -1,4 +1,4 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut; 
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut,_Validate; 
 EXPORT Build_Input_KnownFraud(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
@@ -16,7 +16,7 @@ module
 		+ 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0, 
 				Build_Prepped_NAC(pversion).NACKNFDUpdate,
 				dataset([],{string75 fn { virtual(logicalfilename)}, FraudGovPlatform.Layouts.Sprayed.KnownFraud})
-			);
+	);
 	
 	Functions.CleanFields(inKnownFraudUpdate ,inKnownFraudUpdateUpper); 
 	
@@ -41,9 +41,9 @@ module
 
 		Customer_Account_Number := STD.Str.FindReplace(fn[1],'FRAUDGOV::IN::','');
 		Customer_State := fn[2];
-		Customer_Agency_Vertical_Type := fn[3]; // ignore
+		Customer_Agency_Vertical_Type := fn[3];
 		Customer_Program_fn := fn[4];
-		FileType := fn[5]; // ignore 
+		FileType := fn[5];
 		FileDate := (unsigned)fn[6];
 		FileTime := fn[7];
 		MemberID := fn[8];
@@ -86,7 +86,7 @@ module
 	
 	MAC_Sequence_Records( f1, unique_id, f1_unique_id, max_uid);
 	
-	shared rs_unique_id := f1_unique_id;
+	shared rs_unique_id := distribute(f1_unique_id,hash(unique_id));
 
 	shared NotInMbs := join(	
 		rs_unique_id,
@@ -101,51 +101,18 @@ module
 		LEFT ONLY,
 		LOOKUP);
 
-	shared EnforceValidations := join(
-		  rs_unique_id
-		, pCustomerSettings
-		, left.Customer_Account_Number = right.Customer_Account_Number and 
-		  left.Customer_State = right.Customer_State and
-		  left.file_type = right.file_type and //3=transactions
-		  left.ind_type = right.ind_type and //program
-		  right.validate_data = true
-		, TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),INNER, LOOKUP);
-
-
-	shared f1_errors:=EnforceValidations
+	shared f1_errors:=rs_unique_id
 		(
-				Customer_Account_Number =''
-			or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
-			or 	(Customer_Program_fn in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
-			or 	customer_event_id = ''
-			or 	reported_date = ''
+			customer_event_id = ''
+			or (_Validate.Date.fIsValid(reported_date) = false  or (unsigned)reported_date > (unsigned)(STRING8)Std.Date.Today())
 			or 	reported_time = ''
 			or 	reported_by = ''
-			// https://jira.rsi.lexisnexis.com/browse/GRP-203
-			// 26/Oct/17 Sundeep Commented:
-			// lets say we have name and address only but no ssn, dl, lexid, the entire record will be in the payload keys but not in the ssn key, dl key, or the lexid key.
-			// The only records that we can truly discard are the ones that dont have a name, address, and any identifying information. 
-			// If we get an inquiry with only an IP address and nothing else, we will still keep that inquiry.			
-			//
-			or (
-					(	raw_Full_Name = '' and 
-						(raw_First_name = '' or raw_Last_Name='') and 
-						(Street_1='' and City='' and State='' and Zip='')
-					) and (
-						(SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and 
-						(Drivers_License_Number='' and Drivers_License_State='') and
-						LexID = 0
-					) and 
-					//DOB = '' and ??
-					IP_Address = ''
-			)		
 		);
 
 
 	//Exclude Errors
-	shared ByPassed_records := NotInMbs + f1_errors;
-	f1_bypass_dedup := fn_dedup(ByPassed_KnownFraud_Sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud));
-
+	shared f1_bypass_dedup:= fn_dedup(ByPassed_KnownFraud_Sprayed + PROJECT(NotInMbs + f1_errors,FraudGovPlatform.Layouts.Input.KnownFraud));
+	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_KnownFraud.New(pversion),
 		f1_bypass_dedup,
 		Build_Bypass_Records,
@@ -159,15 +126,14 @@ module
 
 
 	//Move only Valid Records
-	shared f1_dedup :=	join (
+	shared Valid_Recs :=	join (
 		rs_unique_id,
-		ByPassed_records,
-		left.Customer_Account_Number = right.Customer_Account_Number and
+		f1_bypass_dedup,
 		left.Unique_Id = right.Unique_Id,
 		TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
 		left only);	
 																							
-	shared new_addresses := Functions.New_Addresses(f1_dedup);
+	shared new_addresses := Functions.New_Addresses(Valid_Recs);
 
 	tools.mac_WriteFile(Filenames().Input.AddressCache_KNFD.New(pversion),
 		new_addresses,
@@ -180,7 +146,7 @@ module
 		pTerminator := Constants().validTerminators,
 		pQuote:= Constants().validQuotes);
 									
-	dAppendAID := Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
+	dAppendAID := Standardize_Entity.Clean_Address(Valid_Recs, new_addresses);
 	dappendName := Standardize_Entity.Clean_Name(dAppendAID);	
 	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
 	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
@@ -189,20 +155,17 @@ module
 	input_file_1 := fn_dedup(KnownFraud_Sprayed  + project(dCleanInputFields,Layouts.Input.KnownFraud));
 
 	// Refresh Addresses every 90 days
-	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
-	dRefreshAID := Standardize_Entity.dRefreshAID(input_file_1);
-	input_file_2 := if(	IsTimeForRefresh,
-					dRefreshAID,
-					input_file_1);  
+	// IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
+	// dRefreshAID := Standardize_Entity.dRefreshAID(input_file_1);
+	// input_file_2 := if(	IsTimeForRefresh, dRefreshAID,input_file_1);  
 	// Refresh Lexid when new header is released
-	IsNewHeader := HeaderInfo.IsNew;
-	dRefreshLexid := Standardize_Entity.dRefreshLexid(input_file_2);
-	input_file_3 := if(	IsNewHeader,
-					dRefreshLexid,
-					input_file_2); 
+	// IsNewHeader := HeaderInfo.IsNew;
+	// dRefreshLexid := Standardize_Entity.dRefreshLexid(input_file_2);
+	// input_file_3 := if(IsNewHeader, dRefreshLexid, input_file_2); 
 
-	tools.mac_WriteFile(Filenames(pversion).Input.KnownFraud.New(pversion),
-		input_file_3,
+	tools.mac_WriteFile(
+		Filenames(pversion).Input.KnownFraud.New(pversion),
+		input_file_1,
 		Build_Input_File,
 		pCompress	:= true,
 		pHeading := false,

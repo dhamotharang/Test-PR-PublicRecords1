@@ -126,7 +126,7 @@ MODULE
 
 			SELF.reported_date := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]);
 			SELF.reported_time := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]);
-			
+			SELF.reported_by   := 'NAC-MSH';
 			SELF.customer_event_id := L.SequenceNumber + '_' + L.activitysource ;
 
 			SELF.event_type_1 := map(	L.matchcodes in Level_1 => '14000',

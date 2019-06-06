@@ -216,7 +216,7 @@
   END;
 
   FinalRec := RECORD
-   RECORDOF(ScoredGraphPrep1) AND NOT [event_count_,identity_count_]; // Remove these fields to keep the layout consistent with previous version for roxie/esp
+   RECORDOF(ScoredGraphPrep1);// AND NOT [event_count_,identity_count_]; // field exclusion list to keep the layout consistent with previous version for roxie/esp
    DATASET(FlagsRec) Flags;
   END;
        

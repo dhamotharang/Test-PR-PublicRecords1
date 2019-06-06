@@ -112,12 +112,12 @@ end;
 	
 	
 	// NewRiskviews
-	EXPORT RiskviewFFD	:= FUNCTION
+	EXPORT OrbitFFD	:= FUNCTION
 	
 
 	
-	RiskviewFFD	:= Files(filedate,pUseProd).RiskviewFFD_input;  
-	layouts.Base MapRiskviewFFDInput(layouts.Riskview_FFD L) := TRANSFORM 
+	OrbitFFD	:= Files(filedate,pUseProd).Orbit_input;  
+	layouts.Base MapRiskviewFFDInput(layouts.Orbit L) := TRANSFORM 
 	
 	
 		SELF.item_source					:= ut.fn_RemoveSpecialChars(TRIM(Stringlib.StringToUpperCase(L.item_source_code), LEFT, RIGHT));
@@ -149,11 +149,11 @@ end;
 		SELF											:= [];
 	END;
 	
-	CleanRiskViewFile	:= PROJECT(RiskviewFFD, MapRiskviewFFDInput(LEFT));
+	CleanOrbitFile	:= PROJECT(OrbitFFD, MapRiskviewFFDInput(LEFT));
 	
 	
 	//Clean RiskView
-	layouts.Base	FixDesc(CleanRiskViewFile L)	:= TRANSFORM
+	layouts.Base	FixDesc(CleanOrbitFile L)	:= TRANSFORM
 	
 			SELF.display_name			:= CASE(L.source_code, 'PL' => 'SEE PROFESSIONAL LICENSE RECORDS BELOW',
 															                     'DS' => 'SEE SSN RECORDS',
@@ -174,8 +174,8 @@ end;
 		SELF:= L;
 	END;
 		
-	FixedRiskViewFile	:= PROJECT(CleanRiskViewFile, FixDesc(LEFT));
-	CleanFixedRiskViewFile := clean_addr(FixedRiskViewFile); 
+	FixedOrbitFile	:= PROJECT(CleanOrbitFile, FixDesc(LEFT));
+	CleanFixedRiskViewFile := clean_addr(FixedOrbitFile); 
 	RETURN CleanFixedRiskViewFile;
 	END;
   
