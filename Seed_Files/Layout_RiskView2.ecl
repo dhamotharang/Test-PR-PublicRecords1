@@ -23,6 +23,7 @@ CountForDatasets := 2;
 							'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
 							'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
 							'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
+							'STRING7 Liens' + %'cntLiens'% + '_AgencyID;' +
 							'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
 							'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
 							'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
@@ -57,6 +58,7 @@ CountForDatasets := 2;
 						'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
 						'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
 						'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
+						'STRING7 Jgmts' + %'cntJgmts'% + '_AgencyID;' +
 						'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
 						'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
 						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' +	

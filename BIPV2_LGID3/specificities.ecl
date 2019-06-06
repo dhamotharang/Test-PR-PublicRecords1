@@ -54,6 +54,7 @@ EXPORT input_layout := RECORD // project out required fields
   h.ultimate_proxid;
   h.levels_from_top;
   h.nodes_total;
+  h.cortera_id;
   h.dt_first_seen;
   h.dt_last_seen;
   Config.PartitionFieldType SALT_Partition := BIPV2.Mod_Sources.src2partition(h.source); // Computed & Carry partition information
@@ -420,7 +421,34 @@ SALT311.MAC_Choose_JoinType(non_null_atts,UnderLinks_nulls,UnderLinks_values,Bas
 EXPORT UnderLinks_values_index := INDEX(UnderLinks_v,{Basis},{UnderLinks_v},UnderLinksValuesIndexKeyName);
 EXPORT UnderLinks_values_persisted := UnderLinks_values_index;
  
-EXPORT BuildAttributes := BUILDINDEX(UnderLinks_values_index, OVERWRITE);
+  infile := file_cortera_accounts;
+ r := RECORD
+    Config.AttrValueType Basis := TRIM((SALT311.StrType)infile.account_id);
+    infile.account_id; // Easy way to get component values
+    INTEGER2 account_id_weight100 := 0; // Easy place to store weight
+    SALT311.UIDType LGID3 := infile.lgid3;
+    UNSIGNED Basis_cnt := 0;
+    INTEGER2 Basis_weight100 := 0;
+  END;
+  t := TABLE(infile,r);
+SHARED CorteraAccounts_attributes := DEDUP( SORT( DISTRIBUTE( t, LGID3 ), LGID3, Basis, LOCAL), LGID3, Basis, LOCAL) : PERSIST('~temp::LGID3::BIPV2_LGID3::values::CorteraAccounts',EXPIRE(BIPV2_LGID3.Config.PersistExpire));
+  SALT311.Mac_Specificity_Local(CorteraAccounts_attributes,Basis,LGID3,CorteraAccounts_nulls,Layout_Specificities.CorteraAccounts_ChildRec,CorteraAccounts_specificity,CorteraAccounts_switch,CorteraAccounts_values);
+EXPORT CorteraAccounts_max := MAX(CorteraAccounts_values,field_specificity);
+ 
+EXPORT CorteraAccountsValuesIndexKeyName := '~'+'key::BIPV2_LGID3::LGID3::Word::CorteraAccounts';
+  TYPEOF(CorteraAccounts_attributes) take(CorteraAccounts_attributes le,CorteraAccounts_values ri,BOOLEAN patch_default) := TRANSFORM
+    SELF.Basis_cnt := ri.cnt;
+    SELF.Basis_weight100 := ri.field_specificity*100;
+    SELF.account_id_weight100 := SELF.Basis_weight100 / 1;
+    SELF := le;
+  END;
+  non_null_atts := CorteraAccounts_attributes(Basis NOT IN SET(CorteraAccounts_nulls,Basis));
+SALT311.MAC_Choose_JoinType(non_null_atts,CorteraAccounts_nulls,CorteraAccounts_values,Basis,Basis_weight100,take,CorteraAccounts_v);
+ 
+EXPORT CorteraAccounts_values_index := INDEX(CorteraAccounts_v,{Basis},{CorteraAccounts_v},CorteraAccountsValuesIndexKeyName);
+EXPORT CorteraAccounts_values_persisted := CorteraAccounts_values_index;
+ 
+EXPORT BuildAttributes := PARALLEL(BUILDINDEX(UnderLinks_values_index, OVERWRITE),BUILDINDEX(CorteraAccounts_values_index, OVERWRITE));
 EXPORT Layout_Uber_Plus := RECORD(SALT311.Layout_Uber_Record0)
   SALT311.Str30Type word;
 END;
@@ -429,17 +457,17 @@ SHARED Fn_Reduce_Uber_Local(DATASET(Layout_Uber_Plus) in_ds) := FUNCTION
   RETURN DEDUP(SORT(in_ds,uid,word,field,LOCAL),uid,word,field,LOCAL);
 END;
 Layout_Uber_Plus IntoInversion(input_file le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT311.StrType)le.sbfe_id,(SALT311.StrType)le.nodes_below_st,(SALT311.StrType)le.Lgid3IfHrchy,(SALT311.StrType)le.OriginalSeleId,(SALT311.StrType)le.OriginalOrgId,'',(SALT311.StrType)le.cnp_number,(SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.duns_number,SKIP,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.company_inc_state,(SALT311.StrType)le.company_charter_number,(SALT311.StrType)le.cnp_btype,(SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.hist_duns_number,(SALT311.StrType)le.active_domestic_corp_key,(SALT311.StrType)le.hist_domestic_corp_key,(SALT311.StrType)le.foreign_corp_key,(SALT311.StrType)le.unk_corp_key,(SALT311.StrType)le.cnp_name,(SALT311.StrType)le.cnp_hasNumber,(SALT311.StrType)le.cnp_lowv,(SALT311.StrType)le.cnp_translated,(SALT311.StrType)le.cnp_classid,(SALT311.StrType)le.prim_range,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.has_lgid,(SALT311.StrType)le.is_sele_level,(SALT311.StrType)le.is_org_level,(SALT311.StrType)le.is_ult_level,(SALT311.StrType)le.parent_proxid,(SALT311.StrType)le.sele_proxid,(SALT311.StrType)le.org_proxid,(SALT311.StrType)le.ultimate_proxid,(SALT311.StrType)le.levels_from_top,(SALT311.StrType)le.nodes_total,'','',SKIP);
+  SELF.word := CHOOSE(c,(SALT311.StrType)le.sbfe_id,(SALT311.StrType)le.nodes_below_st,(SALT311.StrType)le.Lgid3IfHrchy,(SALT311.StrType)le.OriginalSeleId,(SALT311.StrType)le.OriginalOrgId,'',(SALT311.StrType)le.cnp_number,(SALT311.StrType)le.active_duns_number,(SALT311.StrType)le.duns_number,SKIP,(SALT311.StrType)le.company_fein,(SALT311.StrType)le.company_inc_state,(SALT311.StrType)le.company_charter_number,(SALT311.StrType)le.cnp_btype,(SALT311.StrType)le.company_name_type_derived,(SALT311.StrType)le.hist_duns_number,(SALT311.StrType)le.active_domestic_corp_key,(SALT311.StrType)le.hist_domestic_corp_key,(SALT311.StrType)le.foreign_corp_key,(SALT311.StrType)le.unk_corp_key,(SALT311.StrType)le.cnp_name,(SALT311.StrType)le.cnp_hasNumber,(SALT311.StrType)le.cnp_lowv,(SALT311.StrType)le.cnp_translated,(SALT311.StrType)le.cnp_classid,(SALT311.StrType)le.prim_range,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.has_lgid,(SALT311.StrType)le.is_sele_level,(SALT311.StrType)le.is_org_level,(SALT311.StrType)le.is_ult_level,(SALT311.StrType)le.parent_proxid,(SALT311.StrType)le.sele_proxid,(SALT311.StrType)le.org_proxid,(SALT311.StrType)le.ultimate_proxid,(SALT311.StrType)le.levels_from_top,(SALT311.StrType)le.nodes_total,(SALT311.StrType)le.cortera_id,'','',SKIP);
   SELF.field := c;
   SELF.uid := le.LGID3;
   SELF := le;
 END;
-nfields_r := Fn_Reduce_UBER_Local(NORMALIZE(input_file,43,IntoInversion(LEFT,COUNTER))(word<>''));
+nfields_r := Fn_Reduce_UBER_Local(NORMALIZE(input_file,44,IntoInversion(LEFT,COUNTER))(word<>''));
 SALT311.MAC_Expand_Wordbag_Field(input_file,company_name,6,LGID3,layout_uber_plus,nfields6);
 SALT311.MAC_Expand_Normal_Field(input_file,active_duns_number,10,LGID3,layout_uber_plus,nfields2330);
 SALT311.MAC_Expand_Normal_Field(input_file,duns_number,10,LGID3,layout_uber_plus,nfields2331);
 nfields10 := nfields2330+nfields2331;//Collect wordbags for parts of concept field
-NumberBaseFields := 43;
+NumberBaseFields := 44;
  
 infileUnderLinks := file_underLink;
 Layout_Uber_Plus IntoInversion0(infileUnderLinks le,UNSIGNED2 c,UNSIGNED el=1) := TRANSFORM
@@ -449,7 +477,16 @@ Layout_Uber_Plus IntoInversion0(infileUnderLinks le,UNSIGNED2 c,UNSIGNED el=1) :
   SELF := le;
 END;
 afields0 := NORMALIZE(infileUnderLinks,1,IntoInversion0(LEFT,COUNTER))(word<>'');
-SHARED invert_records := nfields_r + nfields6 + afields0;
+ 
+infileCorteraAccounts := file_cortera_accounts;
+Layout_Uber_Plus IntoInversion1(infileCorteraAccounts le,UNSIGNED2 c,UNSIGNED el=1) := TRANSFORM
+  SELF.word := CHOOSE(c,(SALT311.StrType)le.account_id,SKIP);
+  SELF.field := c+1+NumberBaseFields; // Field number is attr file + Fields from attr files + BaseFields
+  SELF.uid := le.lgid3;
+  SELF := le;
+END;
+afields1 := NORMALIZE(infileCorteraAccounts,1,IntoInversion1(LEFT,COUNTER))(word<>'');
+SHARED invert_records := nfields_r + nfields6 + afields0 + afields1;
 uber_values_deduped0 := Fn_Reduce_UBER_Local( DISTRIBUTE(invert_records,HASH(uid)));
 // minimize otherwise required changes to the macros used by uber and specificities!
 Layout_Uber_Plus_Spec := RECORD(Layout_Uber_Plus AND NOT uid)
@@ -472,8 +509,8 @@ SALT311.MAC_Field_Specificity(uber_values_persisted_temp,word,uber_nulls,ol) // 
 EXPORT uber_specificity := ol;
 EXPORT BuildAll := PARALLEL(BuildFields, BuildAttributes, BuildUber);
  
-EXPORT SpecIndexKeyName := '~'+'key::BIPV2_LGID3::LGID3::Specificities';
-iSpecificities := DATASET([{0,sbfe_id_specificity,sbfe_id_switch,sbfe_id_max,sbfe_id_nulls,Lgid3IfHrchy_specificity,Lgid3IfHrchy_switch,Lgid3IfHrchy_max,Lgid3IfHrchy_nulls,company_name_specificity,company_name_switch,company_name_max,company_name_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,duns_number_specificity,duns_number_switch,duns_number_max,duns_number_nulls,duns_number_concept_specificity,duns_number_concept_switch,duns_number_concept_max,duns_number_concept_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,company_inc_state_specificity,company_inc_state_switch,company_inc_state_max,company_inc_state_nulls,company_charter_number_specificity,company_charter_number_switch,company_charter_number_max,company_charter_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,dt_first_seen_specificity,dt_first_seen_switch,dt_first_seen_max,dt_first_seen_nulls,dt_last_seen_specificity,dt_last_seen_switch,dt_last_seen_max,dt_last_seen_nulls,UnderLinks_specificity,UnderLinks_switch,UnderLinks_max,UnderLinks_nulls,uber_specificity,uber_switch,uber_max,uber_nulls}],Layout_Specificities.R);
+EXPORT SpecIndexKeyName := '~'+'key::bipv2_lgid3::lgid3::specificities';
+iSpecificities := DATASET([{0,sbfe_id_specificity,sbfe_id_switch,sbfe_id_max,sbfe_id_nulls,Lgid3IfHrchy_specificity,Lgid3IfHrchy_switch,Lgid3IfHrchy_max,Lgid3IfHrchy_nulls,company_name_specificity,company_name_switch,company_name_max,company_name_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,duns_number_specificity,duns_number_switch,duns_number_max,duns_number_nulls,duns_number_concept_specificity,duns_number_concept_switch,duns_number_concept_max,duns_number_concept_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,company_inc_state_specificity,company_inc_state_switch,company_inc_state_max,company_inc_state_nulls,company_charter_number_specificity,company_charter_number_switch,company_charter_number_max,company_charter_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,dt_first_seen_specificity,dt_first_seen_switch,dt_first_seen_max,dt_first_seen_nulls,dt_last_seen_specificity,dt_last_seen_switch,dt_last_seen_max,dt_last_seen_nulls,UnderLinks_specificity,UnderLinks_switch,UnderLinks_max,UnderLinks_nulls,CorteraAccounts_specificity,CorteraAccounts_switch,CorteraAccounts_max,CorteraAccounts_nulls,uber_specificity,uber_switch,uber_max,uber_nulls}],Layout_Specificities.R);
  
 EXPORT Specificities_Index := INDEX(iSpecificities,{1},{iSpecificities},SpecIndexKeyName);
 EXPORT BuildSpec := BUILDINDEX(Specificities_Index, OVERWRITE, FEW);
@@ -513,6 +550,8 @@ SpcShiftR := RECORD
   integer2 dt_last_seen_switch_shift0 := ROUND(1000*Specificities[1].dt_last_seen_switch - 0);
   INTEGER1 UnderLinks_shift0 := ROUND(Specificities[1].UnderLinks_specificity - 41);
   INTEGER2 UnderLinks_switch_shift0 := ROUND(1000*Specificities[1].UnderLinks_switch - 0);
+  INTEGER1 CorteraAccounts_shift0 := ROUND(Specificities[1].CorteraAccounts_specificity - 27);
+  INTEGER2 CorteraAccounts_switch_shift0 := ROUND(1000*Specificities[1].CorteraAccounts_switch - 0);
   END;
  
 EXPORT SpcShift := TABLE(Specificities,SpcShiftR);

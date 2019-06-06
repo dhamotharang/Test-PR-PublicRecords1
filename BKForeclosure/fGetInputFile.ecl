@@ -1,7 +1,8 @@
 ﻿IMPORT BKForeclosure, STD;
 
 EXPORT fGetInputFile(STRING filedate) := MODULE
-  
+  SHARED version := STD.Date.AdjustDate((integer)filedate,,,-1); //Folder(filedate) date is a day after version date
+	
   SHARED superfile_nod := '~thor_data400::in::BKForeclosure::nod_infile';
   SHARED superfile_reo := '~thor_data400::in::BKForeclosure::reo_infile';
 
@@ -28,26 +29,26 @@ EXPORT fGetInputFile(STRING filedate) := MODULE
  Ded_Reo := DEDUP(SORT(InFile_Reo,RECORD,LOCAL),RECORD,ALL,LOCAL);
  Ded_Nod := DEDUP(SORT(InFile_Nod,RECORD,LOCAL),RECORD,ALL,LOCAL);
  
- d_Reo   := OUTPUT(Ded_Reo, ,'~thor_data400::in::BKForeclosure::Reo_Infile::' + filedate, OVERWRITE, COMPRESSED);
- d_Nod   := OUTPUT(Ded_Nod, ,'~thor_data400::in::BKForeclosure::Nod_Infile::' + filedate, OVERWRITE, COMPRESSED); 
+ d_Reo   := OUTPUT(Ded_Reo, ,'~thor_data400::in::BKForeclosure::Reo_Infile::' + (string)version, OVERWRITE, COMPRESSED);
+ d_Nod   := OUTPUT(Ded_Nod, ,'~thor_data400::in::BKForeclosure::Nod_Infile::' + (string)version, OVERWRITE, COMPRESSED); 
 
 AddToSuperfile_reo := FUNCTION
 	RETURN 	
-			STD.File.AddSuperFile(superfile_reo, '~thor_data400::in::BKForeclosure::Reo_Infile::' + filedate);
+			STD.File.AddSuperFile(superfile_reo, '~thor_data400::in::BKForeclosure::Reo_Infile::' + (string)version);
 END;
 
 AddToSuperfile_Nod := FUNCTION
 	RETURN 	
-			STD.File.AddSuperFile(superfile_nod, '~thor_data400::in::BKForeclosure::Nod_Infile::' + filedate);
+			STD.File.AddSuperFile(superfile_nod, '~thor_data400::in::BKForeclosure::Nod_Infile::' + (string)version);
 END;			
 	
 super_all	
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::reo_infile', TRUE),
+		//STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::reo_infile'/*, TRUE*/),
 		AddToSuperfile_Reo,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::nod_infile', TRUE),
+		//STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::nod_infile'/*, TRUE*/),
 		AddToSuperfile_Nod,
 		FileServices.FinishSuperFileTransaction()
 	);		

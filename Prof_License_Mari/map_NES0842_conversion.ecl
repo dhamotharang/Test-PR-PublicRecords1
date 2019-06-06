@@ -46,7 +46,7 @@ EXPORT map_NES0842_conversion(STRING pVersion) := FUNCTION
 	ValidNEFile	:= ds_NE_RealEstate(TRIM(NAME) <> ' ' AND NOT REGEXFIND('^[0-9]',NAME));
 	ut.CleanFields(ValidNEFile,ClnInFile);
 	
-	Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NES0842.common L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(Prof_License_Mari.layout_NES0842.common L) := TRANSFORM
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
 		SELF.LAST_UPD_DTE			:= L.ln_filedate;							//it was set to process_date before
@@ -284,7 +284,7 @@ license expires on 1231 of the next year, unless it is issued after Nov 30.
 	ds_map_addr2 := PROJECT(ClnInFile, transformToCommon(LEFT));
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_addr2 L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_addr2 L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -293,7 +293,7 @@ license expires on 1231 of the next year, unless it is issued after Nov 30.
 																LEFT.STD_SOURCE_UPD=RIGHT.source_upd AND RIGHT.fld_name='LIC_TYPE' AND StringLib.StringToUpperCase(TRIM(LEFT.STD_LICENSE_TYPE,LEFT,RIGHT))=TRIM(RIGHT.fld_value,LEFT,RIGHT),
 																			trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 	// look up standard license status 
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -303,7 +303,7 @@ license expires on 1231 of the next year, unless it is issued after Nov 30.
 																			trans_status_trans(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 	
 	// populate disp_type code field via translation on license status field
-	Prof_License_Mari.layouts.base trans_disp_type(ds_map_status_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_disp_type(ds_map_status_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.DISP_TYPE_CD := R.DM_VALUE2;
 		SELF := L;
 	END;

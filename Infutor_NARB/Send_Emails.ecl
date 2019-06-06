@@ -10,7 +10,7 @@ EXPORT Send_Emails(
 	,STRING								pEmailList							= Infutor_NARB.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).BuildSuccess
 	,STRING								pRoxieEmailList					= Infutor_NARB.Email_Notification_Lists(NOT pShouldUpdateRoxiePage).Roxie
 	,STRING								pBuildName							= Infutor_NARB._Constants().Name
-	,STRING								pPackageName						= 'Infutor_NARBKeys'
+	,STRING								pPackageName						= 'InfutorNARBKeys'
 	,STRING								pBuildMessage						= 'Base Files Finished'
 ) := tools.mod_SendEmails(pversion
 		                     ,pBuildFilenames					

@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take CO Real Estate Appraiser AND Broker raw files AND convert them to a 
 //  common professional license (MARIFLAT_out) layout to be used for MARI, AND PL_BASE development.
 //************************************************************************************************************* */
@@ -64,7 +64,7 @@ EXPORT map_COS0821_conversion(STRING pVersion) := FUNCTION
 	ut.CleanFields(ds_AllBroker,clnds_AllBroker);
 
 	//CO Real Estate layout to Common
-	Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_COS0821.Broker_Common L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(Prof_License_Mari.layout_COS0821.Broker_Common L) := TRANSFORM
 
 			SELF.PRIMARY_KEY	  	:= 0;
 			SELF.CREATE_DTE		  	:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -321,7 +321,7 @@ EXPORT map_COS0821_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(clnds_AllBroker, transformToCommon(LEFT));
 
 	// populate std_license_status field via translation on raw_license_status field
-	Prof_License_Mari.layouts.base trans_lic_status(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_status(ds_map L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -333,7 +333,7 @@ EXPORT map_COS0821_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_stat_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_stat_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 		END;
