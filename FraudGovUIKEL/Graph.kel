@@ -1262,21 +1262,11 @@ Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							 ISVALIDDATE(liabtermdate) => INTEGER(liabtermdate), // In YYYYMMDD format
 																							 -99998);																							 
-<<<<<<< HEAD
-																							 
-Employer: => BusNewestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999, // fixme. Need to get most recent master record tied to seleid
-																						BusAcctTaxLiabStartDtEcho=-99998 => -99998,
-																						MAX(LegalEmployer.rEmployer, BusAcctTaxLiabStartDtEcho));
-Employer: => BusNewestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999, // fixme. Need to get most recent master record tied to seleid
-																					BusAcctTaxLiabEndDtEcho=-99998 => -99998,
-																					MAX(LegalEmployer.rEmployer, BusAcctTaxLiabEndDtEcho));
-																				
-=======
+
 Employer: => BusNewestTaxLiabStartDt := MAP(rLegal:Null => -99999,
 																					  rLegal.NewestTaxLiabStartDt);
 Employer: => BusNewestTaxLiabEndDt := MAP(rLegal:Null => -99999,
 																					rLegal.NewestTaxLiabEndDt);
->>>>>>> d256f563c2363c95fd83bb2d3ec10ee613b094c3
 Employer: => BusAcctTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							BusAcctTaxLiabStartDtEcho=-99998 => -99998,
 																							MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho), DATE(BusAcctNewestRecordDt)), 999));
