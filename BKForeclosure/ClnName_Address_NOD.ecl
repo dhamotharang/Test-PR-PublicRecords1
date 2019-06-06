@@ -6,7 +6,7 @@
 //Clean Names for NOD
 EXPORT ClnName_Address_NOD(DATASET(RECORDOF(Layout_BK.CleanFields_NOD)) dNormFile) := FUNCTION
 NID.Mac_CleanFullNames(dNormFile, FileClnName, NAME_FULL
-												,includeInRepository := false, normalizeDualNames := true, useV2 := true);
+												,includeInRepository := true, normalizeDualNames := true, useV2 := true);
 												
 //Name flags
 person_flags := ['P', 'D'];
@@ -25,8 +25,8 @@ ClnName_NOD      := PROJECT(FileClnName,TRANSFORM(Layout_BK.CleanFields_NOD,
 																									SELF.cln_mname2				:=	IF(IsName, LEFT.cln_mname2, '');
 																									SELF.cln_lname2				:=	IF(IsName, LEFT.cln_lname2, '');
 																									SELF.cln_suffix2			:=	IF(IsName, LEFT.cln_suffix2, '');
-																									SELF.cname						:=  IF(LEFT.nametype IN business_flags AND trim(LEFT.cln_fname) = '',
-																																								LEFT.name_full,'');
+																									SELF.cname						:=  IF(LEFT.nametype IN business_flags AND trim(LEFT.cln_fname) = '',LEFT.name_full,
+																																							IF(TRIM(LEFT.cln_fname) = '' AND TRIM(LEFT.cln_lname) = '',LEFT.name_full,''));
 																									SELF := LEFT));
 
 //Clean address for Nod

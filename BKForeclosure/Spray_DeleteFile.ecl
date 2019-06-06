@@ -78,9 +78,7 @@ super_all
 	:=	
 	SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::delete_nod'),
 		AddToSuperfile_Nod,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::delete_reo'),
 		AddToSuperfile_Reo,		
 		STD.File.FinishSuperFileTransaction()
 	);

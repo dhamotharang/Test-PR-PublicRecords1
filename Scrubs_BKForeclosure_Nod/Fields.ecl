@@ -24,20 +24,20 @@ EXPORT InValidFT_invalid_alpha(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_invalid_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' <>{}[]-^=!+&,()#.;/'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_AlphaNum(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -'); // Only allow valid symbols
-  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -.'); // Only allow valid symbols
+  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -.',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -'))));
-EXPORT InValidMessageFT_invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_AlphaNum(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -.'))));
+EXPORT InValidMessageFT_invalid_AlphaNum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -.'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_apn(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*'); // Only allow valid symbols
-  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ()-,\'=&_.\\/:*',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,;\'=&_.\\/:+#*'); // Only allow valid symbols
+  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' ()-,;\'=&_.\\/:+#*',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_apn(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*'))));
-EXPORT InValidMessageFT_invalid_apn(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,\'=&_.\\/:*'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_apn(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,;\'=&_.\\/:+#*'))));
+EXPORT InValidMessageFT_invalid_apn(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ()-,;\'=&_.\\/:+#*'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_zip(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -50,8 +50,8 @@ EXPORT MakeFT_invalid_date(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 10));
-EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,8,10'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 4 OR LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 10));
+EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('0123456789'),SALT311.HygieneErrors.NotLength('0,4,8,10'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_phone(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -96,12 +96,12 @@ EXPORT InValidFT_invalid_case(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGT
 EXPORT InValidMessageFT_invalid_case(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' {}-&,.():+#/'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_name(SALT311.StrType s0) := FUNCTION
-  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#;"\\/'); // Only allow valid symbols
-  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -&,.():\'#;"\\/',' ') ); // Insert spaces but avoid doubles
+  s1 := SALT311.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#+;"\\/*@'); // Only allow valid symbols
+  s2 := SALT311.stringcleanspaces( SALT311.stringsubstituteout(s1,' -&,.():\'#+;"\\/*@',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_name(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#;"\\/'))));
-EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#;"\\/'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid_name(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#+;"\\/*@'))));
+EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\' -&,.():\'#+;"\\/*@'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_Invalid_NodSourceCode(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
