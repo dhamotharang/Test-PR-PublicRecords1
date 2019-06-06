@@ -28,7 +28,7 @@ IMPORT Std;
 								self.Physical_Zip := Coalesce(newbase.Physical_Zip, base.Physical_Zip);
 								// Mailing Address Fields
 								self.Mailing_AddressCategory := Coalesce(newbase.Mailing_AddressCategory, base.Mailing_AddressCategory);
-								self.Mailing_Street1 := Coalesce(newbase.Mailing_Street1, base.Physical_Street1);
+								self.Mailing_Street1 := Coalesce(newbase.Mailing_Street1, base.Mailing_Street1);
 								self.Mailing_Street2 := Coalesce(newbase.Mailing_Street2, base.Mailing_Street2);
 								self.Mailing_City := Coalesce(newbase.Mailing_City, base.Mailing_City);
 								self.Mailing_State := Coalesce(newbase.Mailing_State, base.Mailing_State);
@@ -68,14 +68,40 @@ IMPORT Std;
 					self := base;
 END;
 
+fn_MergeClientAddresses(DATASET($.Layout_Base2) clientAddr, DATASET($.Layout_Base2) current) := FUNCTION
 
-EXPORT fn_MergeAddresses(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
-	
-	// addresses that apply to cases, not clients (ClientId='')
-	caseAddr := DISTRIBUTE(newbase(addresstype<>''), HASH32(ProgramState, ProgramCode, CaseID));
+	/*
+		Determine which address records are unchanged
+		Do not process records that have previously been replaced
+	*/
+	unchanged := JOIN(current, clientAddr,
+							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
+										and LEFT.CaseId = RIGHT.CaseId
+										AND LEFT.ClientId = RIGHT.ClientId,
+								TRANSFORM($.Layout_Base2, self := LEFT),
+								LEFT ONLY, LOCAL);
+								
+	newAddress := JOIN(current, clientAddr,
+							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
+										and LEFT.CaseId = RIGHT.CaseId
+										AND LEFT.ClientId = RIGHT.ClientId,
+								xForm(RIGHT, LEFT),
+								RIGHT ONLY, LOCAL);
 
-	current := DISTRIBUTE(base,HASH32(ProgramState, ProgramCode, CaseID)); 
-	
+	updatedAddress := JOIN(current, clientAddr,
+							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
+										and LEFT.CaseId = RIGHT.CaseId
+										AND LEFT.ClientId = RIGHT.ClientId,
+								xForm(RIGHT, LEFT),
+								INNER, LOCAL);
+
+
+	return unchanged + newAddress + updatedAddress;
+
+END;
+
+fn_MergeCaseAddresses(DATASET($.Layout_Base2) caseAddr, DATASET($.Layout_Base2) current) := FUNCTION
+
 	/*
 		Determine which address records are unchanged
 		Do not process records that have previously been replaced
@@ -86,19 +112,40 @@ EXPORT fn_MergeAddresses(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2
 								TRANSFORM($.Layout_Base2, self := LEFT),
 								LEFT ONLY, LOCAL);
 								
-	newCaseAddress := JOIN(current, caseAddr,
+	newAddress := JOIN(current, caseAddr,
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
 										and LEFT.CaseId = RIGHT.CaseId,
 								xForm(RIGHT, LEFT),
 								RIGHT ONLY, LOCAL);
 
-	updatedCaseAddress := JOIN(current, caseAddr,
+	updatedAddress := JOIN(current, caseAddr,
 							LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode
 										and LEFT.CaseId = RIGHT.CaseId,
 								xForm(RIGHT, LEFT),
 								INNER, LOCAL);
 
 
-	return unchanged + newCaseAddress + updatedCaseAddress;		// unchanged addresses + replaced + new addresses
+	return unchanged + newAddress + updatedAddress;
+
+
+END;
+
+EXPORT fn_MergeAddresses(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
+	
+	// addresses that apply to cases, not clients (ClientId='')
+	caseAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId=''), HASH32(ProgramState, ProgramCode, CaseID));
+
+	current := DISTRIBUTE(base,HASH32(ProgramState, ProgramCode, CaseID)); 
+	
+	CaseAddressesUpdated := IF(EXISTS(caseAddr), fn_MergeCaseAddresses(caseAddr, current), current);
+	
+													
+	// addresses that apply to clients (ClientId<>'')
+	clientAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId<>''), HASH32(ProgramState, ProgramCode, CaseID));
+		
+	ClientAddressesUpdated := IF(EXISTS(clientAddr), fn_MergeClientAddresses(clientAddr, CaseAddressesUpdated), CaseAddressesUpdated);
+	
+
+	return ClientAddressesUpdated;
 
 END;
