@@ -1286,7 +1286,7 @@ Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																INTEGER(rLegal.bestseleincorporationdate)); // I believe this is the SOS incorporation date
 Employer: => BusIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																		BusIncorpDt=-99997 => -99997, // Or unable to calculate
-																		DAYSBETWEEN(rLegal.bestseleincorporationdate, DATE(BusNewestRecordDt)) < 0 => -99998,
+																		DAYSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)) < 0 => -99998,
 																		MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)), 999), 0));
 	
 // Claim History Attributes
