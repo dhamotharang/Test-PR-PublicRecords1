@@ -59,7 +59,7 @@ EXPORT IParams := MODULE
 	//temporarily until Vlad completes the IDataAccess work and updates the whole mod
   EXPORT convertToDataAccess (PersonSlimReportOptions mod) := FUNCTION
     //note: using (most restrictive) defaults for fields not defined in the current module
-    mod_access := MODULE (doxie.IDataAccess)
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated(AutostandardI.GlobalModule()))
       EXPORT unsigned1 glb := mod.GLBPurpose;
       EXPORT unsigned1 dppa := mod.DPPAPurpose;
       EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
@@ -69,7 +69,7 @@ EXPORT IParams := MODULE
       EXPORT string ssn_mask := mod.ssn_mask;
       EXPORT unsigned1 dl_mask := IF (mod.mask_dl, 1, 0);
     END;
-    RETURN mod_access;
+    RETURN PROJECT (mod_access, doxie.IDataAccess);
   END;
 
 	EXPORT getOptions(iesp.personslimreport.t_PersonSlimReportRequest inIesp) := FUNCTION
