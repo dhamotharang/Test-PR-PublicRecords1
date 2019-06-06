@@ -1206,6 +1206,7 @@ USE FraudGovUIKEL.Files.Claimant(FLAT,
 // Legal Attributes
 Legal: => AccountNumberCount := COUNT(AccountNumbers);
 Legal: => ClaimCount := COUNT(LegalClaim);
+Legal: => BusNewestRecordDt := 20190213; // fixme. Need updated when new iterations of data come in
 Legal: => NewestUnemClmDt := MAP(ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // No valid claim dates
 																 INTEGER(MAX(LegalClaim.rClaim, claim_submit_ccyymmdd)));
 Legal: => OldestUnemClmDt := MAP(ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // No valid claim dates
@@ -1231,6 +1232,10 @@ Claimant: => LexID := claimantlexid;
 
 //	EmployerClaim attributes
 EmployerClaim: => ClmDt2BusAcctNewDtDelta := DAYSBETWEEN(rClaim.claim_submit_ccyymmdd, DATE(rEmployer.BusAcctNewestRecordDt));
+
+// LegalClaim attributes
+LegalClaim: => ClmDt2BusAcctNewDtDelta := DAYSBETWEEN(rClaim.claim_submit_ccyymmdd, DATE(rLegal.BusNewestRecordDt));
+
 
 // Employer attributes
 Employer: => ClaimCount := COUNT(EmployerClaim);
@@ -1259,7 +1264,7 @@ Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 Employer: => BusAcctNewestUpdateMasterDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																								20190213); // fixme. Need to put in an "lastupdated" date into the entities. Do we keep multiple versions?
 Employer: => BusNewestRecordDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
-																			20190213); // fixme
+																			rLegal.BusNewestRecordDt); // fixme
 Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							 ISVALIDDATE(datefirstemp) => INTEGER(datefirstemp), // In YYYYMMDD format
 																							 -99998);
@@ -1310,15 +1315,15 @@ Employer: => BusAcctUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365){rClaim.rClaimant.ClaimantID}), 9999), 0));
 Employer: => BusAcctUnemClmAcctFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120){rClaim.rClaimant.ClaimantID}), 9999), 0));
 Employer: => BusAcctUnemClmAcctFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90){rClaim.rClaimant.ClaimantID}), 9999), 0));	
 Employer: => BusAcctUnemClmAcctFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30){rClaim.rClaimant.ClaimantID}), 9999), 0));
 
@@ -1327,22 +1332,74 @@ Employer: => BusAcctUnemClmLexIDFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -9999
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0){rClaim.rClaimant.LexID}), 9999), 0));																							 
 Employer: => BusAcctUnemClmLexIDFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365){rClaim.rClaimant.LexID}), 9999), 0));
 Employer: => BusAcctUnemClmLexIDFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120){rClaim.rClaimant.LexID}), 9999), 0));
 Employer: => BusAcctUnemClmLexIDFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90){rClaim.rClaimant.LexID}), 9999), 0));	
 Employer: => BusAcctUnemClmLexIDFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
 																								 MAX(MIN(COUNT(EmployerClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30){rClaim.rClaimant.LexID}), 9999), 0));
 
+// Insert missing attributes here
+/*
+Employer: => BusUnemClmAcctCurActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
+																									 ClaimCount=0 OR (ALL(LegalClaim.rClaim, rClaimant.ClaimantID:Null)) => -99998, // No unemployment claims or no claimant IDs found
+																									 ALL(LegalClaim.rClaim, claim_status:Null) => -99997,
+																									 MAX(MIN(COUNT(LegalClaim(UPCASE(rClaim.claim_status)='REGULAR ACTIVE'){rClaim.rClaimant.ClaimantID}), 9999), 0));
+
+Employer: => BusUnemClmAcctFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0){rClaim.rClaimant.ClaimantID}), 9999), 0));
+																								 
+Employer: => BusUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365){rClaim.rClaimant.ClaimantID}), 9999), 0));
+Employer: => BusUnemClmAcctFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120){rClaim.rClaimant.ClaimantID}), 9999), 0));
+Employer: => BusUnemClmAcctFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90){rClaim.rClaimant.ClaimantID}), 9999), 0));	
+Employer: => BusUnemClmAcctFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30){rClaim.rClaimant.ClaimantID}), 9999), 0));
+
+Employer: => BusUnemClmLexIDFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0){rClaim.rClaimant.LexID}), 9999), 0));																							 
+Employer: => BusUnemClmLexIDFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 365){rClaim.rClaimant.LexID}), 9999), 0));
+Employer: => BusUnemClmLexIDFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 120){rClaim.rClaimant.LexID}), 9999), 0));
+Employer: => BusUnemClmLexIDFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 ClaimCount=0 OR (COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90))=0) => -99998, 
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 90){rClaim.rClaimant.LexID}), 9999), 0));	
+Employer: => BusUnemClmLexIDFiledCnt30D := MAP(rLegal:Null => -99999,
+																								 COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30))=0 => -99998, // There are no claims within 30 days
+																								 ALL(LegalClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, 
+																								 MAX(MIN(COUNT(LegalClaim(ClmDt2BusAcctNewDtDelta > 0 AND ClmDt2BusAcctNewDtDelta <= 30){rClaim.rClaimant.LexID}), 9999), 0));
+*/
+// Fix can't join by LegalClaim. Need a legal instance to do that
+// Insert remaining missing attributes here
 	
 /* Nicole	*/													
 Employer: => BusAcctNewestRecordDt := MAP(BusAcctUIDEcho=-99999 => -99999,
