@@ -239,20 +239,11 @@ EXPORT Layouts := MODULE
 		END;
 	
 		EXPORT validate_record := record
-			string75	reported_date	:= '';
-			string20	lexid	:= '';
-			string100	raw_full_name	:= '';
-			string25 	raw_First_name	:= '';
-			string30 	raw_Last_Name	:= '';
-			string9 	SSN	:= '';
-			string  	full_address	:= '';
-			string100	physical_address	:= '';
-			string100	Street_1	:= '';
-			string100	city	:= '';
-			string2 	State	:= '';
-			string9 	Zip	:= '';
-			string25	Drivers_License_Number	:= '';
-			string2		Drivers_License_State	:= '';			
+			string	field1	:= '';
+			string	field2	:= '';
+			string	field3	:= '';
+			string 	field4	:= '';
+			string  field5	:= '';
 		END;
 		
 		

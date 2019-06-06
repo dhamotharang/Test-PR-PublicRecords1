@@ -1,4 +1,4 @@
-﻿IMPORT Header, FraudShared, ut, STD,FraudGovPlatform_Validation;
+﻿IMPORT Header, FraudShared, ut, STD,FraudGovPlatform_Validation,_Validate;
 //1.Send main dataset to append lexid
 EXPORT Append_RinID(
 	dataset(FraudShared.Layouts.Base.Main) FileBase
@@ -33,13 +33,21 @@ EXPORT Append_RinID(
 
 	shared with_pii := without_did
 		(   
-			(raw_first_name !='' and raw_last_name !='' and dob != '' and 
-				(length(STD.Str.CleanSpaces(ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =true )) 
+			(raw_first_name !='' and raw_last_name !='' and 
+				_Validate.Date.fIsValid(dob) and (unsigned)dob <= (unsigned)(STRING8)Std.Date.Today() and	dob != '' and dob != '00000000' and
+				(length(STD.Str.CleanSpaces(ssn))=9 and regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =true ))
+				
 			or
-			((raw_first_name !='' and raw_last_name !='' and dob != '' and street_1 != '') and 
-				(city != '' and length(trim(Zip,left,right)) in [9,5]) or
-				(State in FraudGovPlatform_Validation.Mod_Sets.States and length(trim(Zip,left,right)) in [9,5]))
-		);
+
+		(
+			(raw_first_name !='' and raw_last_name !='' and
+				_Validate.Date.fIsValid(dob) and (unsigned)dob <= (unsigned)(STRING8)Std.Date.Today() and	dob != '' and dob != '00000000' and clean_address.prim_range != '' and clean_address.prim_name != '') and 
+				(
+					(clean_address.v_city_name != '' and clean_address.st != '')
+					or
+					(clean_address.zip != '')
+				)
+		));
 
 	//4.sequence those records in #2 with pii that did not match anything in #3
 	seed:= if (LastRinID > 0 , LastRinID+1, FirstRinID);
