@@ -3,7 +3,8 @@
 EXPORT Functions := MODULE
 
   FilterEmailData(DATASET($.Layouts.email_raw_rec) batch_in,
-                         $.IParams.EmailParams in_mod
+                         $.IParams.EmailParams in_mod,
+                         STRING5 search_by
   ) := FUNCTION
   
     // filter out historic records if requested
@@ -32,9 +33,10 @@ EXPORT Functions := MODULE
                                  KEEP(1), LIMIT(0)), 
                              fltrd_reseller_recs);
      
-    // filter suspicious emails
+    // filter suspicious emails if search was't intitiated by email address
     EmailRulesExclusionMask := BNOT(in_mod.EmailQualityRulesMask);
-    fltrd_email_recs := IF(EmailRulesExclusionMask > 0, with_fltrd_sources(rules & EmailRulesExclusionMask = 0), with_fltrd_sources);
+    fltrd_email_recs := IF(EmailRulesExclusionMask > 0 AND ~search_by = $.Constants.SearchBy.ByEmail,
+                           with_fltrd_sources(rules & EmailRulesExclusionMask = 0), with_fltrd_sources);
 
     // apply suppressions
     Suppress.MAC_Suppress(fltrd_email_recs,ds_raw_pulled_did,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
@@ -122,7 +124,7 @@ EXPORT Functions := MODULE
   
     email_raw_recs := $.Raw.getEmailRawData(batch_in,in_mod,search_by,data_environment);
     
-    email_fltrd_recs := FilterEmailData(email_raw_recs,in_mod);
+    email_fltrd_recs := FilterEmailData(email_raw_recs,in_mod,search_by);
     
     // in case of search by PII we need to apply penalties for fuzzy matching
     email_matching_recs := IF(search_by = $.Constants.SearchBy.ByPII, 
@@ -141,7 +143,7 @@ EXPORT Functions := MODULE
     ds_srtd_identity := SORT(ds_batch_in, acctno, -did_score, isRoyaltySource,-date_last_seen, date_first_seen, -num_sources, -latest_orig_login_date, -process_date, num_email_per_did, email_quality_mask, record);
     ds_srtd_email := SORT(ds_batch_in, acctno, -num_sources, -date_last_seen, date_first_seen, -latest_orig_login_date, -did_score, isRoyaltySource, num_did_per_email, penalt,-process_date, email_quality_mask, record);
    
-    ds_srtd := IF($.Constants.SearchType.isEIA(in_mod.SearchType),ds_srtd_identity, ds_srtd_email);
+    ds_srtd := IF($.Constants.SearchType.isEAA(in_mod.SearchType), ds_srtd_email, ds_srtd_identity);
 
     RETURN ds_srtd;
   END;
@@ -298,7 +300,7 @@ EXPORT Functions := MODULE
     
     // now combine all results 
     all_email_rels := recs_with_rels_by_lexid + recs_with_fuzzy_rels;
-
+    
     email_rels_ready := PROJECT(all_email_rels, 
                                 TRANSFORM($.Layouts.email_final_rec, 
                                   SELF.relationship := IF(LEFT.relationship='',$.Constants.Relationship.NotFound, LEFT.relationship),

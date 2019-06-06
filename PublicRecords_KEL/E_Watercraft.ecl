@@ -23,7 +23,7 @@ EXPORT E_Watercraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
-  SHARED __d0_Trim := PROJECT(__in,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.WatercraftKey)));
+  SHARED __d0_Trim := PROJECT(__in.Dataset_Watercraft__Key_Watercraft_SID,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.watercraft_key)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
@@ -35,14 +35,16 @@ EXPORT E_Watercraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  SHARED __Mapping0 := 'UID(UID),date_vendor_first_reported(Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(Date_Vendor_Last_Reported_:DATE),watercraft_key(Watercraft_Key_:\'\'),sequence_key(Sequence_Key_:\'\'),state_origin(Origin_State_:\'\'),src(Source_:\'\'),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Watercraft__Key_Watercraft_SID,TRANSFORM(RECORDOF(__in.Dataset_Watercraft__Key_Watercraft_SID),SELF:=RIGHT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC.Dataset_Watercraft__Key_Watercraft_SID);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__in,Lookup,TRIM((STRING)LEFT.WatercraftKey) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid := __d0_UID_Mapped(UID = 0);
+  SHARED __d0_UID_Mapped := JOIN(__d0_Norm,Lookup,TRIM((STRING)LEFT.watercraft_key) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Key_Watercraft_SID_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
   EXPORT Date_Information_Layout := RECORD
     KEL.typ.nkdate Date_Vendor_First_Reported_;
@@ -99,15 +101,15 @@ EXPORT E_Watercraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Watercraft_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Watercraft_Key_);
   EXPORT Sequence_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Sequence_Key_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(Watercraft_Key__SingleValue_Invalid),COUNT(Sequence_Key__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid,KEL.typ.int Watercraft_Key__SingleValue_Invalid,KEL.typ.int Sequence_Key__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Key_Watercraft_SID_Invalid),COUNT(Watercraft_Key__SingleValue_Invalid),COUNT(Sequence_Key__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Key_Watercraft_SID_Invalid,KEL.typ.int Watercraft_Key__SingleValue_Invalid,KEL.typ.int Sequence_Key__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
-    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(__d0)},
-    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d0(__NL(Date_Vendor_First_Reported_))),COUNT(__d0(__NN(Date_Vendor_First_Reported_)))},
-    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(__NL(Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Date_Vendor_Last_Reported_)))},
-    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','WatercraftKey',COUNT(__d0(__NL(Watercraft_Key_))),COUNT(__d0(__NN(Watercraft_Key_)))},
-    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SequenceKey',COUNT(__d0(__NL(Sequence_Key_))),COUNT(__d0(__NN(Sequence_Key_)))},
-    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginState',COUNT(__d0(__NL(Origin_State_))),COUNT(__d0(__NN(Origin_State_)))},
-    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Watercraft__Key_Watercraft_SID_Invalid),COUNT(__d0)},
+    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_first_reported',COUNT(__d0(__NL(Date_Vendor_First_Reported_))),COUNT(__d0(__NN(Date_Vendor_First_Reported_)))},
+    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_last_reported',COUNT(__d0(__NL(Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Date_Vendor_Last_Reported_)))},
+    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','watercraft_key',COUNT(__d0(__NL(Watercraft_Key_))),COUNT(__d0(__NN(Watercraft_Key_)))},
+    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','sequence_key',COUNT(__d0(__NL(Sequence_Key_))),COUNT(__d0(__NN(Sequence_Key_)))},
+    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','state_origin',COUNT(__d0(__NL(Origin_State_))),COUNT(__d0(__NN(Origin_State_)))},
+    {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'Watercraft','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});

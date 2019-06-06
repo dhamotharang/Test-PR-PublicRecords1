@@ -1,4 +1,4 @@
-import doxie, fcra, thrive, riskwise, ut, mdr;
+﻿import doxie, fcra, thrive, riskwise, ut, mdr;
 
 EXPORT _Thrive_data(	dataset (doxie.layout_references) dids, 
                       dataset (fcra.Layout_override_flag) flag_file
@@ -24,7 +24,7 @@ EXPORT _Thrive_data(	dataset (doxie.layout_references) dids,
   // overrides
   override_records := choosen(FCRA.Key_Override_Thrive_ffid.thrive(keyed(flag_file_id in main_ffids)), FCRA.compliance.max_override_limit);
 
-  all_together := raw_data + project (override_records, transform (rec_main, Self := Left));
+  all_together := raw_data + project (override_records, transform (rec_main, SELF.global_sid:= 0, SELF.record_sid:= 0,Self := Left));
   	  
 	final := sort(all_together, -dt_first_seen, -dt_last_seen, src, -persistent_record_id);
   return final;

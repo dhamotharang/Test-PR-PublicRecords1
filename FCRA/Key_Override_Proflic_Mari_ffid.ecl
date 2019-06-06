@@ -9,7 +9,8 @@ shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::k
 
 // Professional License MARI record
   proflic_mari_rec := RECORD
-    recordof(Prof_License_Mari.key_did(true));
+    //CCPA-110 Exclude new CCPA fields from override MARI key
+    recordof(Prof_License_Mari.key_did(true)) - [global_sid,record_sid];
     string20 flag_file_id;
   end;
 

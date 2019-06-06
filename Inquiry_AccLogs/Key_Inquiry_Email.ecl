@@ -11,6 +11,7 @@ slim := record
 	df.person_q;
 	df.search_info;
 	df.fraudpoint_score;
+	inquiry_acclogs.Layout.ccpaLayout ccpa;
 end;
 
 p := project(df, transform(slim, 

@@ -18,7 +18,7 @@ EXPORT E_Tradeline_Business(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
   SHARED __Mapping := 'Company_(Company_:0),Account_(Account_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Mapping0 := 'Company_(Company_:0),Account_(Account_:0),source(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH),dt_last_seen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Cortera_Tradeline__Key_LinkIds,TRANSFORM(RECORDOF(__in.Dataset_Cortera_Tradeline__Key_LinkIds),SELF:=RIGHT));
-  EXPORT __d0_KELfiltered := __d0_Norm(status != 'D');
+  EXPORT __d0_KELfiltered := __d0_Norm(status NOT IN ['D', 'R']);
   SHARED __d0_Company__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Company_;

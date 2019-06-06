@@ -1,6 +1,6 @@
 ﻿import doxie, Doxie_Raw, Doxie_crs, suppress, ut, mdr, watercraft, 
        census_data, DEAV2_Services, DeathV2_Services,
-       VotersV2_services, Header, faa;
+       Property, VotersV2_services, Header, faa;
 
 export HeaderShowSources(
     dataset(Doxie.Layout_ref_rid) rid_data,
@@ -185,14 +185,14 @@ for_rid := IF ('FR' IN sources,
                 join(en_rid,header.Key_Src_for,
                       left.src='FR' and 
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),
-                      transform(rid_rec, self.for_child := right.for_child, self := left),
+                      transform(rid_rec, self.for_child := project(right.for_child, property.Layout_Fares_Foreclosure), self := left),
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 en_rid);
 
 nod_rid := IF ('NT' IN sources,
                 join(for_rid,header.Key_Src_NOD,left.src='NT' and 
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),
-                      transform(rid_rec, self.nod_child := right.nod_child, self := left),
+                      transform(rid_rec, self.nod_child := project(right.nod_child, property.Layout_Fares_Foreclosure), self := left),
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 for_rid);
 

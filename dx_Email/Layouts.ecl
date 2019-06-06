@@ -114,4 +114,36 @@ EXPORT i_Payload	:= RECORD
 	base;
 END;
 
+EXPORT i_Event_lkp := RECORD
+	STRING16	transaction_id;
+	STRING200 email_address;
+	STRING100 account;
+	STRING100	domain;
+	STRING10	status;
+	STRING10	disposable;
+	STRING10	role_address;
+	STRING40	error_code;
+	STRING100	error_desc;
+	STRING2 	source;
+	STRING8		date_added;
+	STRING8		process_date;
+	STRING2		source_cd;	//Needed for populating field(s) below
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
+END;
+
+EXPORT i_Domain_lkp := RECORD
+	STRING100	domain_name;
+	STRING8	  create_date;
+	STRING8	  expire_date;
+	STRING8	  date_first_seen;
+	STRING8	  date_last_seen;
+	STRING8	  date_first_verified;
+	STRING8	  date_last_verified;
+	STRING50	domain_status;
+	STRING10	verifies_account;
+	STRING8   process_date;
+	UNSIGNED  email_rec_key;
+END;
+
 END;

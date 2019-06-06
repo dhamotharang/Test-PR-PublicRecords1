@@ -23,7 +23,7 @@ EXPORT PhoneMetaDataSearchService() := MACRO
  iesp.ECL2ESP.SetInputBaseRequest(first_row);
  report_opt	 := global (first_row.Options);
  
- in_mod := Phones.IParam.PhoneAttributes.getReportParams(report_opt);
+ in_mod := Phones.IParam.getReportParams(report_opt);
 
 	Phones.Layouts.PhoneAttributes.BatchIn t_input(iesp.phonemetadatasearch.t_PhoneMetaDataSearchRequest l) := TRANSFORM
 		self.acctno := '1';

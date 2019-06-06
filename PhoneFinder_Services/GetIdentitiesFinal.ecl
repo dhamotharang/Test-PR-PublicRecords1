@@ -1,4 +1,4 @@
-IMPORT $, iesp, Phones, STD, ut;
+﻿IMPORT $, iesp, Phones, STD, ut;
 
 EXPORT GetIdentitiesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                           DATASET($.Layouts.BatchInAppendDID)  dInBestInfo,
@@ -78,6 +78,7 @@ FUNCTION
     BOOLEAN isInputDID := ri.did != 0;
 
     SELF.did         := le.did;
+    SELF.InputDID    := ri.did;
     SELF.fname       := IF(isInputDID, ri.name_first, le.fname);
     SELF.mname       := IF(isInputDID, ri.name_middle, le.mname);
     SELF.lname       := IF(isInputDID, ri.name_last, le.lname);

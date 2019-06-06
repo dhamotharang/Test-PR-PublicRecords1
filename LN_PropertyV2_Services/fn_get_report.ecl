@@ -251,7 +251,9 @@ assess	:= fn_get_assessments(assess_paged);
 		addl_fmt		:= project(addl_names, transform(
 			LN_PropertyV2_Services.layouts.parties.orig,
 			self.name_seq		:= (unsigned2)left.name_seq+addl_offset;
-			self.orig_name	:= if(nonSS = suppress.constants.NonSubjectSuppression.doNothing,left.name,'');
+			self.orig_name	:= map(nonSS = suppress.constants.NonSubjectSuppression.doNothing => left.name,
+														 nonSS = suppress.constants.NonSubjectSuppression.returnNameOnly => left.name,
+														'');
 			self.id_code		:= left.id_code;
 			self.id_desc		:= Codes.KeyCodes(consts.deeds_codefile, 'BUYER1_ID_CODE', '', left.id_code);
 			));
@@ -280,7 +282,7 @@ assess	:= fn_get_assessments(assess_paged);
 											], LN_PropertyV2_Services.layouts.parties.orig),
 			isCareOfD	=> dataset([{1, d.mailing_care_of, '', ''}], LN_PropertyV2_Services.layouts.parties.orig)
 		) & addl_fmt;
-		self.orig_names := if(nonSS = suppress.constants.NonSubjectSuppression.doNothing,
+		self.orig_names := if(nonSS = suppress.constants.NonSubjectSuppression.doNothing or nonSS = suppress.constants.NonSubjectSuppression.returnNameOnly,
 													choosen( sort(all_names(orig_name<>''), name_seq, record), consts.max_names));
 		
 		self := le;

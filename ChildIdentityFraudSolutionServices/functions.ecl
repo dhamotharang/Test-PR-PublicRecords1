@@ -42,9 +42,7 @@ shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
 				self.name_suffix 	:= left.best_name_suffix,
 				self := [] ));									
 
-		BatchParams	:= ChildIdentityFraudSolutionServices.IParam.getBatchParams();
-
-		AddrParams  := module(project(BatchParams,AddrBest.IParams.SearchParams,opt))
+		AddrParams  := module(AddrBest.IParams.SearchParams)
 			export ReturnLatLong				:= TRUE;
 		end;
 		

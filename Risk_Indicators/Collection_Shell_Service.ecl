@@ -25,7 +25,7 @@
 /*--INFO-- Puts Waterfall Phones and Bocashell together for collections modeling */
 /*--HELP-- Valid models: 'csn1007_0' */
 
-import AutoStandardI, risk_indicators, ut, riskwise, progressive_phone, addrbest, doxie, mdr, watchdog, paw, models;
+import AutoStandardI, risk_indicators, models;
 
 export Collection_Shell_Service := MACRO
 
@@ -55,7 +55,7 @@ export Collection_Shell_Service := MACRO
 	string10  in_DataRestriction := AutoStandardI.GlobalModule().DataRestrictionMask; 
   string 	  in_DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	string    in_model := '' : stored('model');
-	model := stringlib.stringtolowercase(trim(in_model));
+	model := STD.Str.ToLowerCase(trim(in_model));
 		
 	rec := record
 	  unsigned4 seq;
@@ -73,10 +73,10 @@ export Collection_Shell_Service := MACRO
 		self.dob := dob_value;
 		
 		self.phone10 := phone_value;
-		self.fname := stringlib.stringtouppercase(fname_val);
-		self.mname := stringlib.stringtouppercase(mname_val);
-		self.lname := stringlib.stringtouppercase(lname_val);
-		self.suffix := stringlib.stringtouppercase(suffix_val);
+		self.fname := STD.Str.ToUpperCase(fname_val);
+		self.mname := STD.Str.ToUpperCase(mname_val);
+		self.lname := STD.Str.ToUpperCase(lname_val);
+		self.suffix := STD.Str.ToUpperCase(suffix_val);
 		
 		clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(addr1_val, city_val, state_val, zip_value[1..5]);
 		self.prim_range := clean_a2[1..10];

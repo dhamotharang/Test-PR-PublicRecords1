@@ -14,7 +14,7 @@ FUNCTION
 
 con := doxie_crs.constants;
 
-doxie.MAC_Header_Field_Declare(IsFCRA);
+doxie.MAC_Header_Field_Declare(IsFCRA); //versions, party_type_bk, score_threshold_value, some PII. 
 doxie.MAC_Selection_Declare();
 
 // header data (remote or local) we need for calculations of single-sources 
@@ -26,6 +26,7 @@ dids := project (besr, doxie.layout_references); //dids has no more than 1 recor
 
 // contains global input parameters
 global_mod := AutoStandardI.GlobalModule (IsFCRA);
+mod_access := $.compliance.GetGlobalDataAccessModuleTranslated(global_mod);
 
 // Individual single-source data (use version, include, etc. selectors here)
 PatA := if(IncludePatriot_val,doxie.CompPatriotSearch);
@@ -119,11 +120,13 @@ Include_PhoneSummary_val := Include_Them_All or Include_PhoneSummary;
 biid := Business_Risk.business_instantid_records;
 verification := if (Include_Verification_val, doxie.fn_get_verification(biid, fname_val, lname_val));
 phone_summary := if (Include_PhoneSummary_val, doxie.fn_get_phone_summary(biid));
-american_student_input := MODULE(PROJECT(global_mod, American_Student_Services.IParam.reportParams,opt)) end;
+
+american_student_input := PROJECT(mod_access, American_Student_Services.IParam.reportParams);
 boolean onlyCurrent := true;  //request only current student records.
 american_studentV2 := if(include_StudentInformation_val,
      choosen(American_Student_Services.Functions.get_report_recs(dids,american_student_input, onlyCurrent),iesp.Constants.MaxCountASLSearch));
 american_student := if(include_StudentInformation_val,American_Student_Services.Functions.get_report_slim(american_studentV2));
+
 
 check_cond := ~IsFCRA and ~ ut.IndustryClass.is_knowx;
 

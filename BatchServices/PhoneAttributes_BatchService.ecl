@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="PhoneAttributes_BatchService">
 	<part name="batch_in"              					type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -17,12 +17,12 @@
 						The search requires an account number and a phone.
 */
 
-IMPORT BatchShare,Phones,Royalty,ut;
+IMPORT BatchShare,Phones,ut;
 
 EXPORT PhoneAttributes_BatchService(useCannedRecs = 'false') := 
 	MACRO
 
-		batch_params		:= Phones.IParam.PhoneAttributes.getBatchParams();	
+		batch_params		:= Phones.IParam.getBatchParams();	
 		// Grab the input XML and throw into a dataset.	
 		ds_xml_in_raw  	:= DATASET([], Phones.Layouts.PhoneAttributes.BatchIn) : STORED('batch_in', FEW);
 		ds_xml_in 			:= IF( useCannedRecs, Phones.BatchCannedInput.PhonesAttribute, ds_xml_in_raw);	

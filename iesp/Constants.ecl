@@ -2117,8 +2117,14 @@ EXPORT Constants := MODULE
 	
 	//Person Slim alerting query
   export PersonSlim := module
+	//decision made to return only the latest rec per Virtual ID (entity)
+    export UNSIGNED2 MaxAlertsPerVID := 1;
     export UNSIGNED2 MaxAddresses    := 100;
-    export UNSIGNED2 MaxPhones       := 50;
+    export UNSIGNED2 MaxNames        := 50;
+    export UNSIGNED2 MaxPhones       := 100;
+    export UNSIGNED2 MaxDeaths       := 50;
+    export UNSIGNED2 MaxDOBs         := 10;
+    export UNSIGNED2 MaxSSNs         := 10;
     export UNSIGNED2 MaxProfLic      := 50;
     export UNSIGNED2 MaxPeopleAtWork := 50;
     export UNSIGNED2 MaxAircrafts    := 25;
@@ -2142,7 +2148,6 @@ EXPORT Constants := MODULE
     export UNSIGNED2 MaxVehicles     := 50;
     export UNSIGNED2 MaxAKA          := 50;
     export UNSIGNED2 MaxImposters    := 50;
-    export UNSIGNED2 MaxDeaths       := 50;
     export UNSIGNED2 MaxUtilities    := 100;
   end;
 	

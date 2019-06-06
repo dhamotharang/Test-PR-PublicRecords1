@@ -1,4 +1,4 @@
-/*
+﻿/*
 This function sends up to 15 identities to zumigo and surveys the returned scores for firstnames, lastnames, and addresss.
 If any of the 3 fields has a score between 80 to 100 inclusively, it is deemed validated/passing.
 Hence there is some connection with the input phone.  
@@ -66,7 +66,7 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		EXPORT DATASET(Gateway.Layouts.Config) gateways := inMod.gateways(Gateway.Configuration.IsZumigoIdentity(servicename));
 	END;
 	
-	dsZumigoScores := IF(EXISTS(dsZumigoRequest),Phones.GetZumigoIdentity(dsZumigoRequest,zMod,inMod.GLBPurpose,inMod.DPPAPurpose,inMod.DataRestrictionMask,inMod.Industryclass,inMod.ApplicationType),
+	dsZumigoScores := IF(EXISTS(dsZumigoRequest),Phones.GetZumigoIdentity(dsZumigoRequest,zMod,inMod.glb,inMod.dppa,inMod.DataRestrictionMask,inMod.industry_class,inMod.application_type),
 												DATASET([],Phones.Layouts.ZumigoIdentity.zOut));
 	// fields are only populated for output when Zumigo matches
 	// otherwise REAB data is preserved for Accudata search

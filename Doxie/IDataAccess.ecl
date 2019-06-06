@@ -2,6 +2,9 @@
 IMPORT $;
 
 EXPORT IDataAccess := INTERFACE
+  EXPORT unsigned1 unrestricted := 0; // bitmask for ignoring certain restrictions (a.k.a. "allow");
+                                      // should be used with extreme caution and almost exclusively for debug purposes.
+                                      // currently allow-all encompases glb/dppa
   EXPORT unsigned1 glb := 0;
   EXPORT unsigned1 dppa := 0;
   EXPORT string DataPermissionMask := '';
@@ -41,15 +44,15 @@ EXPORT IDataAccess := INTERFACE
   //     the idea is to replace ut/* and AutostandardI/Permission_Tools
   // --------------------------------------------------------------------------------------------
    
-  EXPORT boolean isValidGLB (boolean RNA=false) := $.compliance.glb_ok (glb, RNA); 
-  EXPORT boolean isValidDPPA (boolean RNA=false) := $.compliance.dppa_ok (dppa, RNA);
+  EXPORT boolean isValidGLB (boolean RNA=false) := $.compliance.glb_ok (glb, RNA, unrestricted);
+  EXPORT boolean isValidDPPA (boolean RNA=false) := $.compliance.dppa_ok (dppa, RNA, unrestricted); 
 
   // used by Header/MAC_GLB_DPPA_Clean_RNA
   EXPORT boolean isRnaRestrictedGLB () := $.compliance.is_glb_RNA (glb);
   EXPORT boolean isRnaRestrictedDPPA () := $.compliance.is_dppa_RNA (dppa);
 
   EXPORT boolean isValidDPPAState (string2 st, string2 header_source='', string2 source_code='') :=
-           $.compliance.dppa_state_ok (st, dppa, header_source, source_code);
+           $.compliance.dppa_state_ok (st, dppa, header_source, source_code, unrestricted);
   EXPORT boolean isHeaderPreGLB (unsigned3 nonglb_last_seen, unsigned3 first_seen, string2 src) := 
            $.compliance.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
 
@@ -61,11 +64,16 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isUtility () := industry_class = 'UTILI' OR isDirectMarketing(); // indicates restriction of utility sources 
 
   // restrictions based on data restriction mask flags
-  EXPORT boolean isPreGLBRestricted () := $.compliance.isPreGLBRestricted (DataRestrictionMask);
-  EXPORT boolean isECHRestricted () := $.compliance.isECHRestricted (DataRestrictionMask);
-  EXPORT boolean isEQCHRestricted () := $.compliance.isEQCHRestricted (DataRestrictionMask);
+  EXPORT boolean isECHRestricted ()         := $.compliance.isECHRestricted         (DataRestrictionMask);
+  EXPORT boolean isEQCHRestricted ()        := $.compliance.isEQCHRestricted        (DataRestrictionMask);
+  EXPORT boolean isTCHRestricted ()         := $.compliance.isTCHRestricted         (DataRestrictionMask);
+  EXPORT boolean isTTRestricted ()          := $.compliance.isTTRestricted          (DataRestrictionMask); //TeleTrack
+  EXPORT boolean isPreGLBRestricted ()      := $.compliance.isPreGLBRestricted      (DataRestrictionMask);
+  EXPORT boolean isFdnInquiry ()            := $.compliance.isFdnInquiry            (DataRestrictionMask);
+  EXPORT boolean isJuliRestricted ()        := $.compliance.isJuliRestricted        (DataRestrictionMask);
+  EXPORT BOOLEAN isBriteVerifyRestricted () := $.compliance.isBriteVerifyRestricted (DataRestrictionMask); // BriteVerify gateway for Email verification 
 
-    EXPORT boolean isHeaderSourceRestricted (string2 src) := 
+  EXPORT boolean isHeaderSourceRestricted (string2 src) := 
            $.compliance.isHeaderSourceRestricted (src, DataRestrictionMask);
 
 END;
