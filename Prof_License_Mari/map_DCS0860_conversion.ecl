@@ -48,7 +48,7 @@ cmvTransLkp	:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD = sr
 OCmvLkp	:= OUTPUT(cmvTransLkp);
 
 maribase_plus_DBAs := RECORD, maxsize(8000)
-  Prof_License_Mari.layouts.base;
+  Prof_License_Mari.layout_base_in;
 	STRING60 DBA1;
 	STRING60 DBA2;
 	STRING60 DBA3;
@@ -374,7 +374,7 @@ DBARecs 	:= NormDBAs(Tmp_DBA != '');
 FilteredRecs  := DBARecs + NoDBARecs;
 
 // Transform expanded dataset to MARIBASE layout and Dedup on complete record
-ds_map_base :=DEDUP(SORT(DISTRIBUTE(PROJECT(FilteredRecs, Prof_License_Mari.layouts.base), HASH32(STD_LICENSE_TYPE)), STD_LICENSE_TYPE, LOCAL), ALL, RECORD, LOCAL);
+ds_map_base :=DEDUP(SORT(DISTRIBUTE(PROJECT(FilteredRecs, Prof_License_Mari.layout_base_in), HASH32(STD_LICENSE_TYPE)), STD_LICENSE_TYPE, LOCAL), ALL, RECORD, LOCAL);
 
 // Adding to Superfile
 d_final := OUTPUT(ds_map_base, ,'~thor_data400::in::proflic_mari::'+pVersion+'::'+src_cd,__COMPRESSED__,OVERWRITE);

@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take KY Real Estate License raw file and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -37,7 +37,7 @@ EXPORT map_KYS0831_conversion(STRING pVersion) := FUNCTION
 
 
 //KY Real Estate layout to Common
-Prof_License_Mari.layouts.base	transformToCommon(layout_KYS0831.Common pInput) := TRANSFORM
+Prof_License_Mari.layout_base_in	transformToCommon(layout_KYS0831.Common pInput) := TRANSFORM
 	SELF.PRIMARY_KEY								:= 0;											//Generate sequence number (not yet initiated)
 	SELF.CREATE_DTE									:= thorlib.wuid()[2..9];	//yyyymmdd
 	SELF.LAST_UPD_DTE								:= pVersion;							//it was set to process_date before
@@ -53,35 +53,35 @@ Prof_License_Mari.layouts.base	transformToCommon(layout_KYS0831.Common pInput) :
 	
 	//Standardize Fields
 	//Check the length of org name to fix a typo in vendor provided file
-	TrimNAME_FIRST				:= 	Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_First_Name);
-	TrimNAME_LAST					:=	Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Last_Name);
-	TrimNAME_MID					:= 	Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Middle_Init);
-	TrimNAME_OFFICE				:=  Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Firm_Name);
+	TrimNAME_FIRST				:= 	ut.CleanSpacesAndUpper(pInput.Licensee_First_Name);
+	TrimNAME_LAST					:=	ut.CleanSpacesAndUpper(pInput.Licensee_Last_Name);
+	TrimNAME_MID					:= 	ut.CleanSpacesAndUpper(pInput.Licensee_Middle_Init);
+	TrimNAME_OFFICE				:=  ut.CleanSpacesAndUpper(pInput.Firm_Name);
 	
-	TrimBRKR_FIRST				:= 	Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Broker_First_Name);
-	TrimBRKR_LAST					:=	Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Broker_Last_Name);
+	TrimBRKR_FIRST				:= 	ut.CleanSpacesAndUpper(pInput.Broker_First_Name);
+	TrimBRKR_LAST					:=	ut.CleanSpacesAndUpper(pInput.Broker_Last_Name);
 	
 
 //Branch Address
   // EscrowRec := if(TrimNAME_OFFICE = 'LICENSEE IN ESCROW','Y','');
-	TrimBrchAddress1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Firm_Branch_Address1);
-	TrimBrchAddress2			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Firm_Branch_Address2);
-	TrimBrchCity 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Firm_Branch_City);
-  TrimBrchState					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Firm_Branch_State);
+	TrimBrchAddress1			:= ut.CleanSpacesAndUpper(pInput.Firm_Branch_Address1);
+	TrimBrchAddress2			:= ut.CleanSpacesAndUpper(pInput.Firm_Branch_Address2);
+	TrimBrchCity 					:= ut.CleanSpacesAndUpper(pInput.Firm_Branch_City);
+  TrimBrchState					:= ut.CleanSpacesAndUpper(pInput.Firm_Branch_State);
 	BrchZip								:= pInput.Firm_Branch_Zip;
 	BrchZip4							:= pInput.Firm_Branch_Zip4;
-	TrimBrchCnty					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Firm_Branch_County_Desc);
-	TrimBrchCntry					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Firm_Branch_Cntry);
+	TrimBrchCnty					:= ut.CleanSpacesAndUpper(pInput.Firm_Branch_County_Desc);
+	TrimBrchCntry					:= ut.CleanSpacesAndUpper(pInput.Firm_Branch_Cntry);
 
 //Home Address	
-	TrimHomeAddress1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Home_Address1);
-	TrimHomeAddress2			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Home_Address2);
-	TrimHomeCity 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Home_City);
-	TrimHomeState					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Home_State);
+	TrimHomeAddress1			:= ut.CleanSpacesAndUpper(pInput.Licensee_Home_Address1);
+	TrimHomeAddress2			:= ut.CleanSpacesAndUpper(pInput.Licensee_Home_Address2);
+	TrimHomeCity 					:= ut.CleanSpacesAndUpper(pInput.Licensee_Home_City);
+	TrimHomeState					:= ut.CleanSpacesAndUpper(pInput.Licensee_Home_State);
 	HomeZip								:= pInput.Licensee_Home_Zip;
 	HomeZip4							:= pInput.Licensee_Home_Zip4;
-	TrimHomeCnty					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Home_County_Desc);
-	TrimHomeCntry					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Licensee_Home_Cntry);
+	TrimHomeCnty					:= ut.CleanSpacesAndUpper(pInput.Licensee_Home_County_Desc);
+	TrimHomeCntry					:= ut.CleanSpacesAndUpper(pInput.Licensee_Home_Cntry);
  
  //Consolidate Address Fields for Escrow Records
   EscrowRec := if(TrimNAME_OFFICE = 'LICENSEE IN ESCROW','Y',
@@ -249,7 +249,7 @@ RemovePattern	  := '(^INC D/B/A.*$|^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.*
 
 	
 	// Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-	Prof_License_Mari.layouts.base trans_lic_status(inFileLic L, cmvTransLkp R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_status(inFileLic L, cmvTransLkp R) := transform
 		self.STD_LICENSE_STATUS := IF(L.STD_LICENSE_STATUS = '', R.DM_VALUE1, L.STD_LICENSE_STATUS);
 		self := L;
 	end;
@@ -261,7 +261,7 @@ RemovePattern	  := '(^INC D/B/A.*$|^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.*
 
 
 	// Populate STD_PROF_CD field via translation on license type field
- 	Prof_License_Mari.layouts.base trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := transform
+ 	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := transform
    		self.STD_PROF_CD := R.DM_VALUE1;
    		self := L;
    	end;

@@ -2,6 +2,9 @@
 	Maps NeustarWireless to a common layout 
 	Jira: DF-24336
 */
+
+//Jira DF-24903 - added mapping of geo_ fields and err_stat
+
 import NeustarWireless, ut, _validate;
 
 phone_f := NeustarWireless.Files.Base.Main(current_rec=true);
@@ -83,6 +86,11 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.lot_order := input.clean_address.lot_order;
 	self.dpbc := input.clean_address.dbpc;
 	self.chk_digit := input.clean_address.chk_digit;
+	self.geo_lat := input.clean_address.geo_lat;
+	self.geo_long := input.clean_address.geo_long;
+	self.geo_blk := input.clean_address.geo_blk;
+	self.geo_match := input.clean_address.geo_match;
+	self.err_stat := input.clean_address.err_stat;
 	self.rec_type := input.clean_address.rec_type;
 	self.ace_fips_st := input.clean_address.county[1..2]; 
 	self.ace_fips_county := input.clean_address.county[3..5]; 
@@ -101,6 +109,45 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.activeflag := '';
 	self.rawaid := input.rawaid;
 	self.cleanaid := input.aceaid;
+	//nuestar only rules
+	activity_status_rule := MAP
+													(	input.activity_status= 'A1' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A1'),
+														input.activity_status= 'A2' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A2'),
+														input.activity_status= 'A3' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A3'),
+														input.activity_status= 'A4' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A4'),
+														input.activity_status= 'A5' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A5'),
+														input.activity_status= 'A6' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A6'),
+														input.activity_status= 'A7' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-A7'),
+														input.activity_status= 'I1' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I1'),
+														input.activity_status= 'I2' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I2'),
+														input.activity_status= 'I3' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I3'),
+														input.activity_status= 'I4' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I4'),
+														input.activity_status= 'I5' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I5'),
+														input.activity_status= 'I6' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I6'),
+														input.activity_status= 'I7' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-I7'),
+														input.activity_status= 'U'  => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Activity-Status-U'),
+														0b);
+
+	prepaid_rule := MAP 
+									( input.prepaid= 'Y' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Prepaid-Y'),
+										input.prepaid= 'N' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Prepaid-N'),
+										0b);
+
+	verified_rule	:= MAP
+									( input.verified = 'A' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-A'),
+										input.verified = 'B' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-B'),
+										input.verified = 'C' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-C'),
+										input.verified = 'D' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-D'),
+										input.verified = 'E' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Verified-E'),
+										0b);
+
+	cord_cutter_rule := MAP									
+											( input.cord_cutter= 'Y' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Cord-Cutter-Y'),
+												input.cord_cutter= 'N' => PhonesPlus_V2.Translation_Codes.rules_bitmap_code('NeustarWireless-Cord-Cutter-N'),
+												0b);	
+	
+	self.rules := activity_status_rule | prepaid_rule | verified_rule | cord_cutter_rule;
+	
 	self := input;
 end;
 

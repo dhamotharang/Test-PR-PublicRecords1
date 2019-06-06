@@ -1,6 +1,7 @@
-IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
+﻿IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 		 
 EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
+#workunit('name',' Yogurt:Prof License MARI - NMS0822 Build     ' + pVersion);
 
 	code 								:= 'NMS0822';
 	src_cd							:= code[3..7];
@@ -35,7 +36,7 @@ EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
  
 	maribase_plus_dbas := RECORD, maxsize(5200)
 		//Prof_License_Mari.layouts_reference.MARIBASE;
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba1;
 		STRING60 dba2;
 		STRING60 dba3;
@@ -59,23 +60,23 @@ EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
 		SELF.TYPE_CD					:= 'MD';
 
 		//Standardize Fields
-		TrimNAME_PREFIX 			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.NAME_PREFIX);			
-		TrimNAME_LAST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LAST_NAME);		
-		TrimNAME_MID 			  	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MID_NAME);	
-		TrimNAME_FIRST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.FIRST_NAME);
+		TrimNAME_PREFIX 			:= ut.CleanSpacesAndUpper(pInput.NAME_PREFIX);			
+		TrimNAME_LAST 				:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);		
+		TrimNAME_MID 			  	:= ut.CleanSpacesAndUpper(pInput.MID_NAME);	
+		TrimNAME_FIRST 				:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
 		TrimNAME_OFFICE				:= IF(pInput.OFFICENAME='',
 																' ',
-																Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.OFFICENAME));
-		TrimLIC_TYPE 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_TYPE);
-		TrimLIC_STATUS 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LICSTAT);
-		TrimAddress1 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1_1);
-		TrimAddress2 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1_2);		
-		TrimCity 							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
-		TrimCounty						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COUNTY);
-		TrimState							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE);
+																ut.CleanSpacesAndUpper(pInput.OFFICENAME));
+		TrimLIC_TYPE 					:= ut.CleanSpacesAndUpper(pInput.LIC_TYPE);
+		TrimLIC_STATUS 				:= ut.CleanSpacesAndUpper(pInput.LICSTAT);
+		TrimAddress1 					:= ut.CleanSpacesAndUpper(pInput.ADDRESS1_1);
+		TrimAddress2 					:= ut.CleanSpacesAndUpper(pInput.ADDRESS1_2);		
+		TrimCity 							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		TrimCounty						:= ut.CleanSpacesAndUpper(pInput.COUNTY);
+		TrimState							:= ut.CleanSpacesAndUpper(pInput.STATE);
 		
 		// License Information
-		SELF.LICENSE_NBR	  	:= IF(pInput.SLNUM = '', 'NR',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM));
+		SELF.LICENSE_NBR	  	:= IF(pInput.SLNUM = '', 'NR',ut.CleanSpacesAndUpper(pInput.SLNUM));
 		SELF.LICENSE_STATE	 	:= src_st;
 		SELF.RAW_LICENSE_TYPE	:= TrimLIC_TYPE;
 		SELF.STD_LICENSE_TYPE := IF(SELF.RAW_LICENSE_TYPE= 'ASSOCIATE BROKER','AB',SELF.RAW_LICENSE_TYPE);		
@@ -87,7 +88,7 @@ EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
 		SELF.EXPIRE_DTE				:= IF(pInput.EXPDT != '', Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EXPDT),'17530101');
 		SELF.RENEWAL_DTE			:= IF(pInput.LAST_RENEWED_DT != '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.LAST_RENEWED_DT),'17530101');	
 		SELF.BIRTH_DTE				:= IF(pInput.DOB != '', Prof_License_Mari.DateCleaner.ToYYYYMMDD(pInput.DOB),'');
-		SELF.PROVNOTE_3       := IF(pInput.APPL_RECEIVED_DT != '','APPLICATION RECEIVED AT '+ Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.APPL_RECEIVED_DT),'');	
+		SELF.PROVNOTE_3       := IF(pInput.APPL_RECEIVED_DT != '','APPLICATION RECEIVED AT '+ ut.CleanSpacesAndUpper(pInput.APPL_RECEIVED_DT),'');	
 		// Identify NICKNAME in the various format 
 		tempFNick 						:= Prof_License_Mari.fGetNickname(TrimNAME_FIRST,'nick');
 		tempMNick							:= Prof_License_Mari.fGetNickname(TrimNAME_MID,'nick');	
@@ -231,7 +232,7 @@ EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
 					 ')';
 		RemovePattern	  := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
-					 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
+					 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|ATTN:|' +
 					 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
 					 '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$|GENERAL DELIVERY|^.*QUALIFIES FOR UPGRADE TO QB|' +
 					 '^.* BUILDING$|^C/O .*,|^C/O .*\\-' +
@@ -272,7 +273,7 @@ EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
 		SELF.PHN_PHONE_1			:= SELF.PHN_MARI_1;
 						
 		SELF.EMAIL						:= IF(pInput.EMAIL_1!='',
-																Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.EMAIL_1),
+																ut.CleanSpacesAndUpper(pInput.EMAIL_1),
 																'');
 	//Expected codes [CO,BR,IN], Set during business/individual filter
 		SELF.AFFIL_TYPE_CD	:= MAP(SELF.TYPE_CD = 'MD' => 'IN',
@@ -355,7 +356,7 @@ EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 		StdNAME_DBA := Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(L.TMP_DBA);
 		CleanNAME_DBA	:= MAP(REGEXFIND('(.COM|.NET|.ORG)',StdNAME_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_DBA),
 														REGEXFIND('^([A-Za-z ]*)(CORP)[ ](INC)',TRIM(StdNAME_DBA,LEFT,RIGHT))
@@ -379,7 +380,7 @@ EXPORT map_NMS0822_conversion(STRING pVersion) := FUNCTION
 	//Remove duplicated records. Because the input data are from 2 files, there are dup records.
 	//Rollup the data from residential licensee files (email address) 3/26/2013
 	ds_map_sorted				:= SORT(ds_map_base, cmc_slpk, name_office);
-	Prof_License_Mari.layouts.base tr_rollup(ds_map_sorted L, ds_map_sorted R) := TRANSFORM
+	Prof_License_Mari.layout_base_in tr_rollup(ds_map_sorted L, ds_map_sorted R) := TRANSFORM
 		SELF.EMAIL 						:= R.EMAIL;
 		SELF 									:= L;
 	END;

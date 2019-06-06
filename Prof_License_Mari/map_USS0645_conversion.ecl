@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take the Department of Housing and Urban Development raw files and convert 
 //   to a common professional license (MARIFLAT_out) layout to be used for MARI, and PL_BASE development.
 //************************************************************************************************************* */
@@ -11,7 +11,7 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 	src_st									:= code[1..2];	//License state
 	mari_dest								:= '~thor_data400::in::proflic_mari::';	
 	IPpattern								:= '^(.*)(\\.COM[,]* |\\.NET |\\.ORG |\\.GOV |\\.EDU |\\.MIL |\\.INT )(.*)';
-	#workunit('name','Prof License MARI- '+code);
+	#workunit('name','Yogurt:Prof License MARI- '+code + ' ' +pVersion);
 
 	//Dataset reference files for lookup joins
 	Cmvtranslation					:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
@@ -65,7 +65,7 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 	GoodFilterRec	:= j1_main(TRIM(INSTIT_NAME) <> '' AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(INSTIT_NAME)));
 	
 	maribase_plus_dbas := RECORD,MAXLENGTH(7000)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba1;
 		STRING60 dba2;
 		STRING60 dba3;
@@ -270,7 +270,7 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 																		+TRIM(pInput.INSTIT_TYPE,LEFT,RIGHT)
 																		+TRIM(src_cd,LEFT,RIGHT)
 																		+TrimNameOrg
-																		+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(ClnSpaceDBA)
+																		+ut.CleanSpacesAndUpper(ClnSpaceDBA)
 																		+TrimAddress1
 																		+TrimCity
 																		+TrimState
@@ -332,7 +332,7 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 
 	FilteredRecs  := DBARecs + NoDBARecs;
 
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 	
 		fixDBA								:= IF(TRIM(L.TMP_DBA)='M I FINANCIAL CORP','M/I FINANCIAL CORP',TRIM(L.TMP_DBA));
 		fix1DBA								:= REGEXREPLACE('(^HTTPPP)',fixDBA,'HTTP://');
@@ -345,7 +345,7 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_DBA);
 		SELF.NAME_DBA					:= IF(TRIM(StdNAME_DBA,LEFT,RIGHT) != TRIM(L.NAME_MARI_ORG,LEFT,RIGHT), Cln1DBA,'');
 		SELF.DBA_FLAG       	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',1,0); // 1: true  0: FALSE
-		SELF.NAME_DBA_SUFX		:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
+		SELF.NAME_DBA_SUFX		:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
 		SELF.NAME_MARI_DBA		:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',TRIM(StdNAME_DBA,LEFT,RIGHT),'');
 		SELF.NAME_DBA_ORIG		:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',TRIM(fix1DBA,LEFT,RIGHT),'');
 		SELF.MLTRECKEY 				:= IF(TRIM(SELF.NAME_DBA,LEFT,RIGHT) = '',0,L.MLTRECKEY);
@@ -358,7 +358,7 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
 	//Perform affiliation lookup for affil_type_cd = 'BR'
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := IF(TRIM(L.affil_type_cd,LEFT,RIGHT) = 'BR',R.cmc_slpk,L.pcmc_slpk);
 		SELF := L;
 	END;

@@ -1,4 +1,4 @@
-export Layout_Fares_Foreclosure := record
+﻿export Layout_Fares_Foreclosure := record
 string70	foreclosure_id;
 string2		state;
 string3		county;
@@ -6,7 +6,7 @@ string18	batch_date_and_seq_nbr;
 string3		deed_category;
 string55	deed_desc;
 string3		document_type;
-string40	document_desc;
+string55	document_desc;
 string8		recording_date;
 string4		document_year;
 string12	document_nbr;
@@ -228,6 +228,14 @@ string4		situs2_msa;
 string7		situs2_geo_blk;
 string1		situs2_geo_match;
 string4		situs2_err_stat;
-string8     process_date;
+string8   process_date;
 string2		crlf;
+string1		lender_type := '';
+string55	lender_type_desc	:= '';
+string10	loan_amount	:= '';
+string1		loan_type	:= '';
+string60	loan_type_desc	:= '';
+string2		source	:= '';	//FR = CL, 'B7' = BK_NOD, 'I5' = BK_REO
+unsigned4 global_sid	:= 0;	//CCPA field
+unsigned8 record_sid	:= 0;	//CCPA field
 end;

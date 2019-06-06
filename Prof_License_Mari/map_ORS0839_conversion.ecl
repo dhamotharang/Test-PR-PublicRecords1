@@ -4,6 +4,7 @@
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard;
 
 EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
+ #workunit('name',' Yogurt:Prof License MARI - ORS0839 Build   ' + pVersion);
 
 	code 								:= 'ORS0839';
 	src_cd							:= code[3..7];
@@ -73,7 +74,7 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 	// GoodNameRec 		:= FilterBadName(NOT REGEXFIND('(ENTERED IN ERROR|IN ERROR|INPUT ERROR|ERROR|REQUIRED C E COURSE)', StringLib.StringToUpperCase(trim(ORG_NAME,left,right))));
 																		
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(rLayout_License pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(rLayout_License pInput) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
@@ -90,24 +91,24 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 		self.LICENSE_STATE	 	:= src_st;
 
 		//Standardize Fields
-		TrimNAME_LAST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LAST_NAME);
-		TrimNAME_FIRST 				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.FIRST_NAME);
-		TrimNAME_MID 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.MID_NAME);
-		tmpNameOrg						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ORG_NAME);
+		TrimNAME_LAST 				:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);
+		TrimNAME_FIRST 				:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
+		TrimNAME_MID 					:= ut.CleanSpacesAndUpper(pInput.MID_NAME);
+		tmpNameOrg						:= ut.CleanSpacesAndUpper(pInput.ORG_NAME);
 		noquoteORG1      			:= stringlib.stringfindreplace(tmpNameOrg,'"','');
 		TrimNAME_ORG      			:= stringlib.stringfindreplace(noquoteORG1,'\'','');
 
-		TrimAddress1_prep			:= stringlib.stringfindreplace(Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1),'"','');
+		TrimAddress1_prep			:= stringlib.stringfindreplace(ut.CleanSpacesAndUpper(pInput.ADDRESS1),'"','');
 		TrimAddress1					:= IF(TrimAddress1_prep[1]='`' OR TrimAddress1_prep[1]='=',TrimAddress1_prep[2..],TrimAddress1_prep);
-		TrimAddress2_prep			:= stringlib.stringfindreplace(Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS2),'"','');
+		TrimAddress2_prep			:= stringlib.stringfindreplace(ut.CleanSpacesAndUpper(pInput.ADDRESS2),'"','');
 		TrimAddress2					:= IF(TrimAddress2_prep[1]='`' OR TrimAddress2_prep[1]='=',TrimAddress2_prep[2..],TrimAddress2_prep);
-		TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
-		TrimCnty							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COUNTY);
-		TrimLicType						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_TYPE);
+		TrimCity							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		TrimCnty							:= ut.CleanSpacesAndUpper(pInput.COUNTY);
+		TrimLicType						:= ut.CleanSpacesAndUpper(pInput.LIC_TYPE);
 			
 		// License Information
 		self.TYPE_CD					:= IF(pInput.LIC_TYPE = 'COMPANY','GR','MD');
-		self.LICENSE_NBR	  	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_NUMBER);
+		self.LICENSE_NBR	  	:= ut.CleanSpacesAndUpper(pInput.LIC_NUMBER);
 		self.OFF_LICENSE_NBR	:= '';
 		SELF.RAW_LICENSE_TYPE	:= REGEXFIND('^([A-Z]+)\\.',self.LICENSE_NBR,1);
 		// self.STD_LICENSE_TYPE := CASE(self.RAW_LICENSE_TYPE,
@@ -126,13 +127,13 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 		SELF.STD_LICENSE_TYPE	:= CASE(TRIM(SELF.RAW_LICENSE_TYPE),
 																	'COMPANY' => 'C',
 																	//secondary_lic_type is no longer provided. Use the last character of the license number
-																	//'MCC' => 'MCC' + Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SECONDARY_LIC_TYPE),
+																	//'MCC' => 'MCC' + ut.CleanSpacesAndUpper(pInput.SECONDARY_LIC_TYPE),
 																	'MCC' => 'MCC' + REGEXFIND('.*-(.{1})$',TRIM(self.LICENSE_NBR),1),
 																	'PBLN' => 'PB',
 																	'PMLN' => 'PM',
 																	TRIM(SELF.RAW_LICENSE_TYPE));
 		
-		SELF.RAW_LICENSE_STATUS := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_STATUS);
+		SELF.RAW_LICENSE_STATUS := ut.CleanSpacesAndUpper(pInput.LIC_STATUS);
 				
 		//Reformatting date to YYYYMMDD	
 		issue_dte 						:= MAP(REGEXFIND('(N/A)',pInput.LIC_ISSUE_DATE) => '00000000',
@@ -369,7 +370,7 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 															            	StringLib.StringCleanSpaces(GoodADDR_ADDR1_1));	
 		SELF.ADDR_ADDR2_1			:= IF(AddrWithContact != '','',StringLib.StringCleanSpaces(tmpADDR_ADDR2_1)); 
 		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),trimCity);
-		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE));
+		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),ut.CleanSpacesAndUpper(pInput.STATE));
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),tmpZip[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
 		//self.provnote_1 := trimAddress1+'|'+trimAddress2;
@@ -394,10 +395,10 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 														 + self.std_source_upd
 														 + self.NAME_ORG
 														 + CleanNAME_OFFICE
-														 + Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1)
-														 + Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS2)
-														 + Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY)
-														 + Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP);
+														 + ut.CleanSpacesAndUpper(pInput.ADDRESS1)
+														 + ut.CleanSpacesAndUpper(pInput.ADDRESS2)
+														 + ut.CleanSpacesAndUpper(pInput.CITY)
+														 + ut.CleanSpacesAndUpper(pInput.ZIP);
 		//tmpCmcSlpk_4 := regexreplace('('+x'00'+'|'+x'0a'+'|'+x'0d'+'|'+' '+')', tmpCmcSlpk,''); - this does not work. don't know why.
  		tmpCmcSlpk_1				:= regexreplace(x'00',tmpCmcSlpk,'');
    	tmpCmcSlpk_2				:= regexreplace(x'0a',tmpCmcSlpk_1,'');
@@ -415,7 +416,7 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, Cmvtranslation R) := transform
 		self.STD_LICENSE_STATUS :=  StringLib.stringtouppercase(trim(R.DM_VALUE1,left,right));
 																
 		self := L;
@@ -427,7 +428,7 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 							trans_lic_status(left,right),left outer,lookup);
 
 	// Populate STD_PROF_CD field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := transform
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map_status_trans L, Cmvtranslation R) := transform
 		self.STD_PROF_CD := StringLib.stringtouppercase(trim(R.DM_VALUE1,LEFT,RIGHT));
 		self := L;
 	end;
@@ -441,7 +442,7 @@ EXPORT map_ORS0839_conversion(STRING pVersion) := FUNCTION
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
 	//Prof_License_Mari.layouts_reference.MARIBASE xTransToBase(ds_map_source_desc L) := transform
-	Prof_License_Mari.layouts.base xTransToBase(ds_map_lic_trans L) := transform
+	Prof_License_Mari.layout_base_in xTransToBase(ds_map_lic_trans L) := transform
 		self.NAME_ORG_SUFX 	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, ' ');
 		self.NAME_OFFICE		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
 		self.NAME_MARI_ORG	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));

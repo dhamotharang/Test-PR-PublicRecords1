@@ -1,4 +1,4 @@
-/* Converting Federal Deposit Insurance Corporation Professional License File to MARI common layout
+﻿/* Converting Federal Deposit Insurance Corporation Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, STD, standard;
@@ -10,7 +10,7 @@ EXPORT map_USS0643_conversion(STRING pVersion) := FUNCTION
 	src_cd									:= code[3..7];
 	src_st									:= code[1..2];	//License state
 	mari_dest								:= '~thor_data400::in::proflic_mari::';	
-	#workunit('name','Prof License MARI- '+code);
+	#workunit('name','Yogurt:Prof License MARI- '+code + ' ' +pVersion);
 	AddrExceptions := '(DRIVE|CENTER|BUILDING)';
 	
 	//Dataset reference files for lookup joins
@@ -68,7 +68,7 @@ END;
   REF_URL := OUTPUT(norm_url_filtered, ,'~thor_data400::in::proflic_mari::uss0643::url_ref',overwrite);
 	 
 		maribase_plus_dbas := RECORD,MAXLENGTH(5500)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba1;
 		STRING60 dba2;
 		STRING60 dba3;
@@ -97,16 +97,16 @@ END;
 		SELF.TYPE_CD					:= 'GR';
 		
 		//Standardize Fields
-		TrimNAME_ORG					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.NAME);
-		TrimAddress 					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS);
-		TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
-		TrimState							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STALP);
-		TrimZip								:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP);
-		TrimBK_CLASS	    		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.BKCLASS); 														
-		TrimREG_AGENT					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.REGAGNT);
-		TrimHQTR_CITY					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITYHCR);
-		TrimHQTR_NAME					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.NAMEHCR);
-		TrimHCR_LOCATION			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STALPHCR);
+		TrimNAME_ORG					:= ut.CleanSpacesAndUpper(pInput.NAME);
+		TrimAddress 					:= ut.CleanSpacesAndUpper(pInput.ADDRESS);
+		TrimCity							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		TrimState							:= ut.CleanSpacesAndUpper(pInput.STALP);
+		TrimZip								:= ut.CleanSpacesAndUpper(pInput.ZIP);
+		TrimBK_CLASS	    		:= ut.CleanSpacesAndUpper(pInput.BKCLASS); 														
+		TrimREG_AGENT					:= ut.CleanSpacesAndUpper(pInput.REGAGNT);
+		TrimHQTR_CITY					:= ut.CleanSpacesAndUpper(pInput.CITYHCR);
+		TrimHQTR_NAME					:= ut.CleanSpacesAndUpper(pInput.NAMEHCR);
+		TrimHCR_LOCATION			:= ut.CleanSpacesAndUpper(pInput.STALPHCR);
 		
 		// License Information
 		SELF.LICENSE_NBR	  	:= pInput.CERT;
@@ -245,7 +245,7 @@ END;
    	SELF.ADDR_ZIP4_1			:= clnAddrAddr[122..125];
 	  SELF.ADDR_BUS_IND			:= IF(clnAddrAddr!='','B','');
 	
-		SELF.ADDR_CNTY_1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COUNTY);
+		SELF.ADDR_CNTY_1			:= ut.CleanSpacesAndUpper(pInput.COUNTY);
 		SELF.PHN_PHONE_1			:= '';
 		
 		SELF.OOC_IND_1				:= 0;    
@@ -315,9 +315,9 @@ END;
 																			+TRIM(SELF.std_license_type,LEFT,RIGHT)
 																			+TRIM(SELF.std_source_upd,LEFT,RIGHT)
 																			+TRIM(SELF.NAME_ORG,LEFT,RIGHT)
-																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.Address)
-																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY)
-																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP));
+																			+ut.CleanSpacesAndUpper(pInput.Address)
+																			+ut.CleanSpacesAndUpper(pInput.CITY)
+																			+ut.CleanSpacesAndUpper(pInput.ZIP));
 																								   
 		SELF.PCMC_SLPK				:= 0;
 		SELF.PROVNOTE_1				:= StringLib.StringCleanSpaces(
@@ -383,7 +383,7 @@ END;
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := transform
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := transform
 	  set_Invalid_dba  := ['NULL','NR','NA','NONE','0','+','N/A'];
 	  ClnDBA           := IF(L.TMP_DBA in set_Invalid_dba,'',L.TMP_DBA);
 		TrimDBASufx			 := MAP(REGEXFIND('([Cc][Oo][\\.]?)$',ClnDBA) => StringLib.StringFindReplace(ClnDBA,'CO',''),

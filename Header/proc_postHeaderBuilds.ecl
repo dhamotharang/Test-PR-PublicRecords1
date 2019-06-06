@@ -3,7 +3,7 @@ import Scrubs_HeaderSlimSortSrc_Monthly;
 import Scrubs_FileRelative_Monthly;
 import Scrubs_Headers_Monthly;
 
-export proc_postHeaderBuilds(string8 pBldVer = '') := module
+export proc_postHeaderBuilds(string pBldVer = '') := module
 
 		
 		shared elist_owners 				:=   'gabriel.marcan@lexisnexisrisk.com'

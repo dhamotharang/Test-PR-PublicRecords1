@@ -1,4 +1,4 @@
-/* Converting Wyoming Division of Banking License File to MARI common layout
+﻿/* Converting Wyoming Division of Banking License File to MARI common layout
 // Logic linking DBA to Corp needs additonal business logic which should be resolve with NMLS system
 */
 IMPORT ut
@@ -36,7 +36,7 @@ isNonBlankRec 	:= inFile(TRIM(ENTITYNAME,LEFT,RIGHT)+ TRIM(ADDRESS1,LEFT,RIGHT) 
 isGoodRecs	:= isNonBlankRec(NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(ENTITYNAME)));
 
 maribase_plus_dbas := RECORD, maxsize(5000)
-  Prof_License_Mari.layouts.base;
+  Prof_License_Mari.layout_base_in;
 	STRING60 dba1;
 	STRING60 dba2;
 	STRING60 dba3;
@@ -302,7 +302,7 @@ DBARecs 	:= NormDBAs(TMP_DBA != '');
 FilteredRecs  := DBARecs + NoDBARecs;
 
 // Transform expanded dataset to MARIBASE layout
-Prof_License_Mari.layouts.base	 xTransToBase(FilteredRecs L) := TRANSFORM
+Prof_License_Mari.layout_base_in	 xTransToBase(FilteredRecs L) := TRANSFORM
 	
 	SELF.NAME_ORG_SUFX		:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, '.');
 	StdNAME_DBA	:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(L.TMP_DBA);

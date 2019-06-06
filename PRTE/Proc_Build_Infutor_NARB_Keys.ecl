@@ -178,7 +178,7 @@ export Proc_Build_Infutor_NARB_Keys(STRING pIndexVersion) := function
 	return	sequential(	
 								build(linkid_IN, update),
 								
-								PRTE.UpdateVersion('Infutor_NARBKeys',				   		//	Package name
+								PRTE.UpdateVersion('InfutorNARBKeys',				   		  //	Package name
 																pIndexVersion,											//	Package version
 																_control.MyInfo.EmailAddressNormal,	//	Who to email with specifics
 																 'B',																//	B = Boca, A = Alpharetta
