@@ -128,7 +128,7 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 				// Return a PASS/FAIL 
 				// RETURN xt2;
 				pass_cnt := COUNT(xt2(cntt=1));
-				RETURN ROW({attr_str, pass_cnt, COUNT(xt2)-pass_cnt}, {STRING30 attr_name, INTEGER npass, INTEGER nfail});	
+				RETURN ROW({attr_str, pass_cnt, COUNT(xt2)-pass_cnt}, {STRING30 attribute_name, INTEGER npass, INTEGER nfail});	
 		ENDMACRO;
 		
 		
