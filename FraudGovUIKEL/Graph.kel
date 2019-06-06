@@ -1219,7 +1219,7 @@ Legal: => NewestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:N
 Legal: => OldestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null OR (NOT ISVALIDDATE(dateliabest))) => -99998, // No valid dateliabest
 																 INTEGER(MIN(LegalEmployer.rEmployer, dateliabest)));			
 Legal: => TaxLiabOngoingFlag := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null OR (NOT ISVALIDDATE(dateliabest))) => -99998, // No valid dateliabest
-																				 ALL(LegalEmployer.rEmployer, NOT liabtermdate:Null) => 0,
+																				 ALL(LegalEmployer.rEmployer, NOT liabtermdate:Null) OR (NewestTaxLiabStartDt < NewestTaxLiabEndDt) => 0,
 																				 1);
 Legal: => IncorpStatusType := MAP(biscorporatestatus:Null => -99997,
 																	biscorporatestatus);
