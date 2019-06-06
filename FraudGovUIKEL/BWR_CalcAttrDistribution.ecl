@@ -164,6 +164,7 @@ EXPORT BWR_CalcAttrDistribution := MODULE
 			RETURN SEQUENTIAL(std.file.CreateExternalDirectory(lzip, lz_dir), thor_out, std.file.Despray(thor_file, lzip,lz_path,,,,true));
 		ENDMACRO;
 
-		EXPORT main := OUTPUT(dsSeleChecks, NAMED('dsSeleChecks'));
-		// EXPORT main := writeFile(ds_All, 'AttributesDistribution');
+		// EXPORT main := OUTPUT(dsSeleChecks, NAMED('dsSeleChecks'));
+		EXPORT main := SEQUENTIAL(writeFile(ds_All, 'AttributesDistribution'),
+															writeFile(dsSeleChecks, 'SelePassFailTests'));
 END;
