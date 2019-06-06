@@ -1269,10 +1269,10 @@ Employer: => BusNewestTaxLiabEndDt := MAP(rLegal:Null => -99999,
 																					rLegal.NewestTaxLiabEndDt);
 Employer: => BusAcctTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							BusAcctTaxLiabStartDtEcho=-99998 => -99998,
-																							MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho), DATE(BusAcctNewestRecordDt)), 999));
+																							MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho), DATE(BusAcctNewestRecordDt)), 999), 0));
 Employer: => BusOldestTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								BusOldestTaxLiabStartDt=-99998 => -99998,
-																								MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt), DATE(BusNewestRecordDt)), -999));
+																								MAX(MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt), DATE(BusNewestRecordDt)), -999), 0));
 Employer: => BusAcctOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 ClaimCount=0 => -99998,
 																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
@@ -1287,7 +1287,7 @@ Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 Employer: => BusIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																		BusIncorpDt=-99997 => -99997, // Or unable to calculate
 																		DAYSBETWEEN(rLegal.bestseleincorporationdate, DATE(BusNewestRecordDt)) < 0 => -99998,
-																		MIN(MONTHSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)), 999));
+																		MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)), 999), 0));
 	
 // Claim History Attributes
 /*
@@ -1324,10 +1324,10 @@ Employer: => BusTaxLiabOngoingFlag := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null =
 																					rLegal.TaxLiabOngoingFlag);
 Employer: => BusAcctTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					  BusAcctTaxLiabEndDtEcho=-99998 => -99998,
-																						MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabEndDtEcho),DATE(BusAcctNewestRecordDt)), 999));
+																						MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabEndDtEcho),DATE(BusAcctNewestRecordDt)), 999), 0));
 Employer: => BusNewestTaxLiabEndMsince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																					    BusNewestTaxLiabEndDt=-99998 => -99998,
-																						  MIN(MONTHSBETWEEN(DATE(BusNewestTaxLiabEndDt),DATE(BusNewestRecordDt)), 999)); // Needs BusNewestTaxLiabEndDt to work
+																						  MAX(MIN(MONTHSBETWEEN(DATE(BusNewestTaxLiabEndDt),DATE(BusNewestRecordDt)), 999), 0)); // Needs BusNewestTaxLiabEndDt to work
 Employer: => BusAcctNewestUnemClmDt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 ClaimCount=0 => -99998,
 																					 ALL(EmployerClaim.rClaim, claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd))) => -99997, // All claim dates are invalid
