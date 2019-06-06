@@ -1,8 +1,8 @@
-// ==================================================================================
+﻿// ==================================================================================
 // ====== RETURNS PEOPLE@WORK RECORDS FOR A GIVEN PERSON IN ESP-COMPLIANT WAY =======
 // ==================================================================================
 
-IMPORT iesp, doxie, paw_services, paw, ut;
+IMPORT iesp, doxie, paw_services, paw, ut, Suppress;
 
 out_rec := iesp.peopleatwork.t_PeopleAtWorkRecord;
 
@@ -95,10 +95,12 @@ EXPORT out_rec peopleatwork_records (
     Self.DateLastSeen  := iesp.ECL2ESP.toDatestring8 (L.dt_last_seen);
   end;
   res := if (~IsFCRA, project (recs_plus_best_w_tzone, FormatReport (Left)));
-
-
+  
+  // add SSN Mask to the output result 
+  suppress.MAC_Mask (res, res_out, SSN, null, true, false, , , , in_params.ssn_mask);
+ 
   // IMPORTANT: keeping the same sort as in CRS is tedious (last/first + whole record), since this sorting order
   // is defined by ECL record definition (the order of fields in the attribute), and fields in "iesp" layouts are
   // generally defined in different order. So, I'll jsut choose some making-sense-fields
-  RETURN sort (res, -DateLastSeen, -DateFirstSeen, CompanyName, Phone10, Title, Name, record);
+  RETURN sort (res_out, -DateLastSeen, -DateFirstSeen, CompanyName, Phone10, Title, Name, record);
 END;

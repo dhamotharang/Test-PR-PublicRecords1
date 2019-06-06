@@ -52,8 +52,9 @@ EXPORT IParam := MODULE
     EXPORT string50 tmsid_value := ''; // reserved for future needs if any
   END;
 
-  EXPORT peopleatwork := INTERFACE (PAW_Services.PAWSearchService_Records.params)
+  EXPORT peopleatwork := INTERFACE (_report) // changed to just include _report for ssn_mask information
   END;
+
 
   // general (vs. productwise) phones options
   EXPORT phones := INTERFACE
