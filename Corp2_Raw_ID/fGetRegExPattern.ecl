@@ -1,4 +1,4 @@
-export fGetRegExPattern := module
+﻿export fGetRegExPattern := module
 
 	export Address := module
 	
@@ -7,7 +7,7 @@ export fGetRegExPattern := module
 		shared PatternInvalidChar2		:= '(\\")*(\\.)*(\\,)*(\\:)*(\\=)*(\\|)*(\\;)*(\\()*(\\))*';
 		export InvalidChars						:= PatternInvalidChar1  + PatternInvalidChar2;
 		
-		shared PatternInvalidWords1	 	:= '^SAME$|^NONE$|^UNKNOWN$';
+		shared PatternInvalidWords1	 	:= '^SAME$|^NONE$|^UNKNOWN$|AGENT RESIGNED OR INVALID';
 		export InvalidWords						:= PatternInvalidWords1;
 		
 	end;
