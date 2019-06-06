@@ -16,13 +16,16 @@ EXPORT E_Watercraft_Owner(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'W_Craft_(W_Craft_:0),owner(Owner_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'W_Craft_(W_Craft_:0),did(Owner_:0),src(Source_:\'\'),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH),DPMBitmap(__Permits:PERMITS)';
+  SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Watercraft__Key_Watercraft_SID,TRANSFORM(RECORDOF(__in.Dataset_Watercraft__Key_Watercraft_SID),SELF:=RIGHT));
+  EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)did > 0);
   SHARED __d0_W_Craft__Layout := RECORD
-    RECORDOF(__in);
+    RECORDOF(__d0_KELfiltered);
     KEL.typ.uid W_Craft_;
   END;
-  SHARED __d0_W_Craft__Mapped := JOIN(__in,E_Watercraft(__in,__cfg).Lookup,TRIM((STRING)LEFT.WatercraftKey) = RIGHT.KeyVal,TRANSFORM(__d0_W_Craft__Layout,SELF.W_Craft_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_W_Craft__Mapped := JOIN(__d0_KELfiltered,E_Watercraft(__in,__cfg).Lookup,TRIM((STRING)LEFT.watercraft_key) = RIGHT.KeyVal,TRANSFORM(__d0_W_Craft__Layout,SELF.W_Craft_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_W_Craft__Mapped;
-  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;
@@ -60,8 +63,8 @@ EXPORT E_Watercraft_Owner(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
   EXPORT SanityCheck := DATASET([{COUNT(W_Craft__Orphan),COUNT(Owner__Orphan)}],{KEL.typ.int W_Craft__Orphan,KEL.typ.int Owner__Orphan});
   EXPORT NullCounts := DATASET([
     {'WatercraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','WCraft',COUNT(__d0(__NL(W_Craft_))),COUNT(__d0(__NN(W_Craft_)))},
-    {'WatercraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Owner',COUNT(__d0(__NL(Owner_))),COUNT(__d0(__NN(Owner_)))},
-    {'WatercraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'WatercraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','did',COUNT(__d0(__NL(Owner_))),COUNT(__d0(__NN(Owner_)))},
+    {'WatercraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','src',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
     {'WatercraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'WatercraftOwner','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});

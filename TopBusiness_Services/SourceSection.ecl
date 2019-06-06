@@ -1,4 +1,4 @@
-/* Status as of 10/20/2015, coding is DONE to count source docs for these categories & sources: 
+﻿/* Status as of 10/20/2015, coding is DONE to count source docs for these categories & sources: 
        (NOTE: Category numbers below match BIP report requirement BIZ2.0-1430)
        1. LNCA (fka DCA)
        2. EBR
@@ -155,7 +155,7 @@ TBD:
                            (for a NOD example, see ult/org/sele ids=1643)
 end of version 2b comments
 */
-IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services;
+IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services, Doxie;
 
 EXPORT SourceSection := MODULE
 
@@ -163,7 +163,7 @@ EXPORT SourceSection := MODULE
  export fn_FullView(
    dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids
 	 ,TopBusiness_Services.Layouts.rec_input_options in_options 
-	 ,AutoStandardI.DataRestrictionI.params in_mod
+	 ,Doxie.IDataAccess mod_access
 	 ,dataset(TopBusiness_Services.Layouts.rec_busHeaderLayout) ds_bh_keyrecs
                    ):= function 
 									   		 
@@ -584,7 +584,8 @@ EXPORT SourceSection := MODULE
 		 ds_in_ids_woacctno,
 		 ds_in_ids_srcrecs_inlayout,		 
 		 rs_options,
-		 ds_bh_keyrecs
+		 ds_bh_keyrecs,
+		 mod_access
     );
 
 

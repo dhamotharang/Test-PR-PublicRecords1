@@ -22,7 +22,8 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     KEL.typ.nstr License_Profession_Description_;
     KEL.typ.nstr License_Status_;
     KEL.typ.nstr License_Description_;
-    KEL.typ.nkdate Date_Of_Issuance_;
+    KEL.typ.nkdate Original_Date_Of_Issuance_;
+    KEL.typ.nkdate Current_Date_Of_Issuance_;
     KEL.typ.nkdate Date_Of_Expiration_;
     KEL.typ.nkdate Date_Of_License_Renewal_;
     KEL.typ.nstr Affiliated_Type_Code_;
@@ -36,7 +37,7 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),datecreated(Date_Created_:DATE),licensestate(License_State_:\'\'),dateprocessed(Date_Processed_:DATE),legacyresultcode(Legacy_Result_Code_:\'\'),sourcedescription(Source_Description_:\'\'),sourcecode(Source_Code_:\'\'),datefirstreported(Date_First_Reported_:DATE),datelastreported(Date_Last_Reported_:DATE),datelastupdated(Date_Last_Updated_:DATE),licensenumber(License_Number_:\'\'),licensebusinessflag(License_Business_Flag_:\'\'),licenseprofessioncode(License_Profession_Code_:\'\'),licenseprofessiondescription(License_Profession_Description_:\'\'),licensestatus(License_Status_:\'\'),licensedescription(License_Description_:\'\'),dateofissuance(Date_Of_Issuance_:DATE),dateofexpiration(Date_Of_Expiration_:DATE),dateoflicenserenewal(Date_Of_License_Renewal_:DATE),affiliatedtypecode(Affiliated_Type_Code_:\'\'),startdate(Start_Date_:DATE),licensecategory(License_Category_:0),occupation(Occupation_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),datecreated(Date_Created_:DATE),licensestate(License_State_:\'\'),dateprocessed(Date_Processed_:DATE),legacyresultcode(Legacy_Result_Code_:\'\'),sourcedescription(Source_Description_:\'\'),sourcecode(Source_Code_:\'\'),datefirstreported(Date_First_Reported_:DATE),datelastreported(Date_Last_Reported_:DATE),datelastupdated(Date_Last_Updated_:DATE),licensenumber(License_Number_:\'\'),licensebusinessflag(License_Business_Flag_:\'\'),licenseprofessioncode(License_Profession_Code_:\'\'),licenseprofessiondescription(License_Profession_Description_:\'\'),licensestatus(License_Status_:\'\'),licensedescription(License_Description_:\'\'),originaldateofissuance(Original_Date_Of_Issuance_:DATE),currentdateofissuance(Current_Date_Of_Issuance_:DATE),dateofexpiration(Date_Of_Expiration_:DATE),dateoflicenserenewal(Date_Of_License_Renewal_:DATE),affiliatedtypecode(Affiliated_Type_Code_:\'\'),startdate(Start_Date_:DATE),licensecategory(License_Category_:0),occupation(Occupation_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -62,7 +63,8 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
   EXPORT InData := __d0;
   EXPORT License_Dates_Layout := RECORD
-    KEL.typ.nkdate Date_Of_Issuance_;
+    KEL.typ.nkdate Original_Date_Of_Issuance_;
+    KEL.typ.nkdate Current_Date_Of_Issuance_;
     KEL.typ.nkdate Date_Of_Expiration_;
     KEL.typ.nkdate Date_Of_License_Renewal_;
     KEL.typ.nkdate Date_First_Reported_;
@@ -123,7 +125,7 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     SELF.Legacy_Result_Code_ := KEL.Intake.SingleValue(__recs,Legacy_Result_Code_);
     SELF.Source_Description_ := KEL.Intake.SingleValue(__recs,Source_Description_);
     SELF.Source_Code_ := KEL.Intake.SingleValue(__recs,Source_Code_);
-    SELF.License_Dates_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Date_Of_Issuance_,Date_Of_Expiration_,Date_Of_License_Renewal_,Date_First_Reported_,Date_Last_Reported_,Date_Last_Updated_,Start_Date_},Date_Of_Issuance_,Date_Of_Expiration_,Date_Of_License_Renewal_,Date_First_Reported_,Date_Last_Reported_,Date_Last_Updated_,Start_Date_),License_Dates_Layout)(__NN(Date_Of_Issuance_) OR __NN(Date_Of_Expiration_) OR __NN(Date_Of_License_Renewal_) OR __NN(Date_First_Reported_) OR __NN(Date_Last_Reported_) OR __NN(Date_Last_Updated_) OR __NN(Start_Date_)));
+    SELF.License_Dates_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Original_Date_Of_Issuance_,Current_Date_Of_Issuance_,Date_Of_Expiration_,Date_Of_License_Renewal_,Date_First_Reported_,Date_Last_Reported_,Date_Last_Updated_,Start_Date_},Original_Date_Of_Issuance_,Current_Date_Of_Issuance_,Date_Of_Expiration_,Date_Of_License_Renewal_,Date_First_Reported_,Date_Last_Reported_,Date_Last_Updated_,Start_Date_),License_Dates_Layout)(__NN(Original_Date_Of_Issuance_) OR __NN(Current_Date_Of_Issuance_) OR __NN(Date_Of_Expiration_) OR __NN(Date_Of_License_Renewal_) OR __NN(Date_First_Reported_) OR __NN(Date_Last_Reported_) OR __NN(Date_Last_Updated_) OR __NN(Start_Date_)));
     SELF.Status_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),License_Status_,Date_Processed_},License_Status_,Date_Processed_),Status_Layout)(__NN(License_Status_) OR __NN(Date_Processed_)));
     SELF.License_Description_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),License_Profession_Code_,License_Profession_Description_,License_Description_,Affiliated_Type_Code_,License_Business_Flag_,License_Category_,Occupation_},License_Profession_Code_,License_Profession_Description_,License_Description_,Affiliated_Type_Code_,License_Business_Flag_,License_Category_,Occupation_),License_Description_Layout)(__NN(License_Profession_Code_) OR __NN(License_Profession_Description_) OR __NN(License_Description_) OR __NN(Affiliated_Type_Code_) OR __NN(License_Business_Flag_) OR __NN(License_Category_) OR __NN(Occupation_)));
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
@@ -133,7 +135,7 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     SELF := __r;
   END;
   Layout Professional_License__Single_Rollup(InLayout __r) := TRANSFORM
-    SELF.License_Dates_ := __CN(PROJECT(DATASET(__r),TRANSFORM(License_Dates_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Date_Of_Issuance_) OR __NN(Date_Of_Expiration_) OR __NN(Date_Of_License_Renewal_) OR __NN(Date_First_Reported_) OR __NN(Date_Last_Reported_) OR __NN(Date_Last_Updated_) OR __NN(Start_Date_)));
+    SELF.License_Dates_ := __CN(PROJECT(DATASET(__r),TRANSFORM(License_Dates_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Original_Date_Of_Issuance_) OR __NN(Current_Date_Of_Issuance_) OR __NN(Date_Of_Expiration_) OR __NN(Date_Of_License_Renewal_) OR __NN(Date_First_Reported_) OR __NN(Date_Last_Reported_) OR __NN(Date_Last_Updated_) OR __NN(Start_Date_)));
     SELF.Status_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Status_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(License_Status_) OR __NN(Date_Processed_)));
     SELF.License_Description_ := __CN(PROJECT(DATASET(__r),TRANSFORM(License_Description_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(License_Profession_Code_) OR __NN(License_Profession_Description_) OR __NN(License_Description_) OR __NN(Affiliated_Type_Code_) OR __NN(License_Business_Flag_) OR __NN(License_Category_) OR __NN(Occupation_)));
     SELF.Data_Sources_ := __CN(PROJECT(DATASET(__r),TRANSFORM(Data_Sources_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(Source_)));
@@ -167,7 +169,8 @@ EXPORT E_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LicenseProfessionDescription',COUNT(__d0(__NL(License_Profession_Description_))),COUNT(__d0(__NN(License_Profession_Description_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LicenseStatus',COUNT(__d0(__NL(License_Status_))),COUNT(__d0(__NN(License_Status_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LicenseDescription',COUNT(__d0(__NL(License_Description_))),COUNT(__d0(__NN(License_Description_)))},
-    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfIssuance',COUNT(__d0(__NL(Date_Of_Issuance_))),COUNT(__d0(__NN(Date_Of_Issuance_)))},
+    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginalDateOfIssuance',COUNT(__d0(__NL(Original_Date_Of_Issuance_))),COUNT(__d0(__NN(Original_Date_Of_Issuance_)))},
+    {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CurrentDateOfIssuance',COUNT(__d0(__NL(Current_Date_Of_Issuance_))),COUNT(__d0(__NN(Current_Date_Of_Issuance_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfExpiration',COUNT(__d0(__NL(Date_Of_Expiration_))),COUNT(__d0(__NN(Date_Of_Expiration_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateOfLicenseRenewal',COUNT(__d0(__NL(Date_Of_License_Renewal_))),COUNT(__d0(__NN(Date_Of_License_Renewal_)))},
     {'ProfessionalLicense','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AffiliatedTypeCode',COUNT(__d0(__NL(Affiliated_Type_Code_))),COUNT(__d0(__NN(Affiliated_Type_Code_)))},

@@ -125,7 +125,7 @@ MODULE
                                       dZum_final);
 
   // Phone verfication, calculate PRIs
-  SHARED dFinalResults := PhoneFinder_Services.GetPRIs(dPhoneMetadataResults, dInBestInfo, tmpMod, dGateways);
+  SHARED dFinalResults := PhoneFinder_Services.GetPRIs(dPhoneMetadataResults, dInBestInfo, tmpMod, dGateways, dProcessInput);
 
   inputOptionCheck := tmpMod.IncludeInhousePhones OR tmpMod.IncludeTargus OR tmpMod.IncludeAccudataOCN OR 
                       tmpMod.IncludeEquifax OR tmpMod.IncludeTransUnionIQ411 OR tmpMod.IncludeTransUnionPVS OR 

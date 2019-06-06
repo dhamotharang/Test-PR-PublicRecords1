@@ -22,7 +22,7 @@ TBD:
                                          NPPES, 
                                          Vickers
 */
-IMPORT BIPV2, iesp, MDR, TopBusiness_Services;
+IMPORT BIPV2, iesp, MDR, TopBusiness_Services, doxie;
 
 EXPORT SourceSection_OtherDirs := MODULE
 
@@ -33,6 +33,7 @@ EXPORT SourceSection_OtherDirs := MODULE
 	 ,dataset(TopBusiness_Services.Layouts.rec_input_ids_wSrc) ds_in_ids_srcrecs_inlayout
    ,TopBusiness_Services.SourceService_Layouts.OptionsLayout rs_options
 	 ,dataset(TopBusiness_Services.Layouts.rec_busHeaderLayout) ds_bh_keyrecs
+	 ,Doxie.IDataAccess mod_access
    ):= function 
  
   FETCH_LEVEL := rs_options.fetch_level;
@@ -512,7 +513,7 @@ EXPORT SourceSection_OtherDirs := MODULE
 	      self.category_doccount := TopBusiness_Services.SpokeSource_Records(
 			     //create dataset with 1 rec in the layout input to all ***Source_Records
  					 dataset([l],TopBusiness_Services.Layouts.rec_input_ids_wSrc),
-					 rs_options,false).SourceView_RecCount;
+					 rs_options, mod_access, false).SourceView_RecCount;
 				self.Section           := ''; //section name N/A
 				self.Source            := MDR.sourceTools.src_Spoke; // but need source code
 				self                   := l; // to assign all linkids

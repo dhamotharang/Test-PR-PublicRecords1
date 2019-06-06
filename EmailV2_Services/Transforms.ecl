@@ -190,13 +190,16 @@ EXPORT Transforms := MODULE
     SELF:=_indiv;
   END;
 
-  EXPORT $.Layouts.GatewayData.bv_history_rec xfBVDeltabaseResp($.Layouts.GatewayData.bv_history_deltabase_rec le)
+  EXPORT $.Layouts.Gateway_Data.bv_history_rec xfBVDeltabaseResp($.Layouts.Gateway_Data.bv_history_deltabase_rec le)
   := TRANSFORM
       SELF.email := STD.Str.ToUpperCase(TRIM(le.email_address, ALL));
       SELF.email_username := STD.Str.ToUpperCase(le.Account);
       SELF.email_domain := STD.Str.ToUpperCase(le.Domain);
-      SELF.email_status := le.Status;
-      SELF.email_status_reason := IF(le.Error='(null)', '', le.Error);  // ESP is returning (null) in case of blank, we need to clean up
+      SELF.email_status := STD.Str.ToLowerCase(le.Status);
+      error_desc := $.Constants.GatewayValues.get_error_desc(STD.Str.ToUpperCase(le.error_code));
+      SELF.email_status_reason := MAP(error_desc<>''=> error_desc, 
+                                      le.Error ='(null)' => '', // ESP is returning (null) in case of blank, we need to clean up
+                                      STD.Str.ToTitleCase(le.Error));
       isDisposableAddress := STD.Str.ToLowerCase(le.disposable) = $.Constants.STR_TRUE;
       isRoleAddress := STD.Str.ToLowerCase(le.role_address) = $.Constants.STR_TRUE;
       additional_status := MAP(isDisposableAddress AND isRoleAddress => $.Constants.GatewayValues.RoleAddress+' / '+$.Constants.GatewayValues.DisposableAddress,
@@ -205,13 +208,14 @@ EXPORT Transforms := MODULE
       SELF.additional_status_info := additional_status;
   END;
 
-  EXPORT $.Layouts.GatewayData.bv_history_rec xfBVSoapResp(iesp.briteverify_email.t_BriteVerifyEmailResponse le)
+  EXPORT $.Layouts.Gateway_Data.bv_history_rec xfBVSoapResp(iesp.briteverify_email.t_BriteVerifyEmailResponse le)
   := TRANSFORM
       SELF.email := STD.Str.ToUpperCase(TRIM(le.Result.Address, ALL));
       SELF.email_username := STD.Str.ToUpperCase(le.Result.Account);
       SELF.email_domain := STD.Str.ToUpperCase(le.Result.Domain);
-      SELF.email_status := le.Result.Status;
-      SELF.email_status_reason := le.Result.Error;
+      SELF.email_status := STD.Str.ToLowerCase(le.Result.Status);
+      error_desc := $.Constants.GatewayValues.get_error_desc(STD.Str.ToUpperCase(le.Result.ErrorCode));
+      SELF.email_status_reason := IF(error_desc<>'', error_desc, STD.Str.ToTitleCase(le.Result.Error));
       isDisposableAddress := STD.Str.ToLowerCase(le.Result.Disposable) = $.Constants.STR_TRUE;
       isRoleAddress := STD.Str.ToLowerCase(le.Result.RoleAddress) = $.Constants.STR_TRUE;
       additional_status := MAP(isDisposableAddress AND isRoleAddress => $.Constants.GatewayValues.RoleAddress+' / '+$.Constants.GatewayValues.DisposableAddress,
@@ -220,7 +224,7 @@ EXPORT Transforms := MODULE
       SELF.additional_status_info := additional_status;
   END;
    
-  EXPORT iesp.briteverify_email.t_BriteVerifyEmailRequest xfBVSoapRequest($.Layouts.GatewayData.batch_in_bv_rec L, STRING apikey)
+  EXPORT iesp.briteverify_email.t_BriteVerifyEmailRequest xfBVSoapRequest($.Layouts.Gateway_Data.batch_in_bv_rec L, STRING apikey)
   := TRANSFORM
     SELF.SearchBy.EmailAddress  := L.email;
     SELF.Options.JSONServiceAPIKey := apikey;

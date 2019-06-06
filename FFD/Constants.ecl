@@ -99,7 +99,11 @@ EXPORT Constants := MODULE
       DataGroups.GONG,
       DataGroups.PERSON
       ];
-    EXPORT Hunting_Fishing := [
+     EXPORT EmailData := [
+      DataGroups.EMAIL_DATA,
+      DataGroups.PERSON
+      ];
+   EXPORT Hunting_Fishing := [
       DataGroups.HUNTING_FISHING,
       DataGroups.PERSON
       ];
@@ -115,6 +119,10 @@ EXPORT Constants := MODULE
     EXPORT Marriage_Divorce := [
       DataGroups.MARRIAGE, 
       DataGroups.MARRIAGE_SEARCH,  
+      DataGroups.PERSON
+      ];
+    EXPORT Paw := [
+      DataGroups.PAW,
       DataGroups.PERSON
       ];
     EXPORT Person := [

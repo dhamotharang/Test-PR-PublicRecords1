@@ -1,5 +1,7 @@
 ﻿IMPORT PublicRecords_KEL;
 
+// NOTE: These are meant to be turned on or off at compile time (NOT run-time)
+// for the sake of optimizing joins for a particular product.
 EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 
 	EXPORT DoFDCJoin_Doxie__Key_Header :=
@@ -144,6 +146,14 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 		(Options.IncludeVehicle OR
 		Options.IncludePersonVehicle); 
 
+	EXPORT DoFDCJoin_Watercraft_Files__Watercraft_DID :=
+		(Options.IncludeWatercraft OR
+		Options.IncludeWatercraftOwner); 
+
+	EXPORT DoFDCJoin_Watercraft_Files__Watercraft_SID :=
+		(Options.IncludeWatercraft OR
+		Options.IncludeWatercraftOwner);
+		
 	EXPORT DoFDCJoin_Tradeline_Files__Tradeline__Key_LinkIds := 
 		NOT Options.isFCRA AND 
 		(Options.IncludeTradeline or 

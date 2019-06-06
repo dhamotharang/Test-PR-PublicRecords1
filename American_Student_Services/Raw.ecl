@@ -1,4 +1,4 @@
-﻿import Appriss, doxie, AutoStandardI, iesp,American_student_services,American_student_list,codes,AlloyMedia_student_list,American_Student_Services, lib_stringlib;
+﻿import doxie, iesp, American_student_services, American_student_list, codes, AlloyMedia_student_list, STD;
 
 export Raw := MODULE
 	
@@ -6,7 +6,7 @@ export Raw := MODULE
 	shared CodesV3_Alloy := codes.Key_Codes_V3(file_name='ALLOY_STUDENT_LIST');
 	
 	shared explodeClassRank(string2 class_name_code) := FUNCTION		
-	  class_name_val := trim(stringlib.StringToUpperCase(class_name_code));
+	  class_name_val := trim( STD.Str.ToUpperCase (class_name_code));
 	  class_name_desc := map(class_name_val='0' 	=> Constants.CLASS_RANK.HIGHSCHOOL,
 		                        class_name_val='1' 	=> Constants.CLASS_RANK.FRESHMAN,
 		                        class_name_val='2' 	=> Constants.CLASS_RANK.SOPHMORE,                                                                                     
@@ -35,7 +35,7 @@ export Raw := MODULE
 	American_Student_Services.Layouts.finalRecs get_results(search_key L) := transform
 		self.college_major := L.college_major;
 		self.college_major_exploded := if(L.college_major <> '',CodesV3_ASL(field_name='COLLEGE_MAJOR' AND code=L.college_major)[1].long_desc,'');
-		self.isCurrent := if(stringlib.stringtouppercase(L.HISTORICAL_FLAG)='C',True,false);
+		self.isCurrent := if( STD.Str.ToUpperCase (L.HISTORICAL_FLAG)='C',True,false);
 		self.ClassRank := L.college_class;
 		self.ClassRankExploded := explodeClassRank(L.college_class);
 		self.SchoolPeriod := '';
@@ -62,7 +62,7 @@ export Raw := MODULE
 	American_Student_Services.Layouts.finalRecs get_results(American_Student_Services.layouts.deepDids R, search_key L ) := transform
 		self.college_major := L.college_major;
 		self.college_major_exploded := if(L.college_major <> '',CodesV3_ASL(field_name='COLLEGE_MAJOR' AND code=L.college_major)[1].long_desc,'');
-		self.isCurrent := if(stringlib.stringtouppercase(L.HISTORICAL_FLAG)='C',True,false);
+		self.isCurrent := if( STD.Str.ToUpperCase (L.HISTORICAL_FLAG)='C',True,false);
 		self.ClassRank := L.college_class;
 		self.ClassRankExploded := explodeClassRank(L.college_class);
 		self.SchoolPeriod := '';
@@ -134,7 +134,7 @@ export Raw := MODULE
 									LIMIT(American_Student_Services.Constants.MAX_RECS_ON_JOIN, fail(203, doxie.ErrorCodes(203))));			
 
 	American_Student_Services.Layouts.finalRecs translate_codes(American_Student_Services.Layouts.finalRecs L) := transform
-		self.college_major_exploded := if(L.college_major <> '',stringlib.StringToUpperCase(CodesV3_Alloy(field_name='MAJOR_CODE' AND code=L.college_major)[1].long_desc),''),
+		self.college_major_exploded := if(L.college_major <> '', STD.Str.ToUpperCase (CodesV3_Alloy(field_name='MAJOR_CODE' AND code=L.college_major)[1].long_desc),''),
 		
 		// Regarding college code and college type mapping below:
 		//	ASL data contains college_code and college_type. In alloy data, we only have public_private_code. 		
@@ -153,7 +153,7 @@ export Raw := MODULE
 			'3'	=> '2',
 			L.public_private_code
 		);
-		self.college_code_exploded := if(L.public_private_code <> '',stringlib.StringToUpperCase(CodesV3_ASL(field_name='COLLEGE_CODE' AND code=_college_code)[1].long_desc),'');
+		self.college_code_exploded := if(L.public_private_code <> '', STD.Str.ToUpperCase (CodesV3_ASL(field_name='COLLEGE_CODE' AND code=_college_code)[1].long_desc),'');
 
 		_college_type := case( L.public_private_code,
 			'2' => 'P',
@@ -161,7 +161,7 @@ export Raw := MODULE
 			'3' => 'U',
 			L.public_private_code
 		);
-		self.college_type_exploded 	:= if(L.public_private_code <> '',stringlib.StringToUpperCase(CodesV3_ASL(field_name='COLLEGE_TYPE' AND code=_college_type)[1].long_desc),'');
+		self.college_type_exploded 	:= if(L.public_private_code <> '', STD.Str.ToUpperCase (CodesV3_ASL(field_name='COLLEGE_TYPE' AND code=_college_type)[1].long_desc),'');
 		_class := case( trim(L.ClassRank),
 			''  => '',
 			'0' => 'HS',

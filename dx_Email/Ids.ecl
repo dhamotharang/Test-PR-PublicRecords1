@@ -33,9 +33,12 @@ EXPORT Ids := MODULE
     LOCAL out_rec := RECORD(RECORDOF(ds_in))
       dx_Email.layouts.i_DID.email_rec_key;
     END;
+
+    LOCAL ds_prpd := PROJECT(ds_in, TRANSFORM(RECORDOF(ds_in), 
+                            SELF.d_field := STD.Str.ToUpperCase(TRIM(LEFT.d_field, ALL)), SELF:=LEFT));
     
-    LOCAL email_ids := JOIN(ds_batch_in,dx_Email.Key_Email_Address, 
-                          KEYED(STD.Str.ToUpperCase(TRIM(LEFT.d_field, ALL)) = RIGHT.clean_email), 
+    LOCAL email_ids := JOIN(ds_prpd,dx_Email.Key_Email_Address(), 
+                          KEYED(LEFT.d_field = RIGHT.clean_email), 
                           TRANSFORM(out_rec,
                               SELF.email_rec_key := RIGHT.email_rec_key,                                
                               SELF := LEFT),

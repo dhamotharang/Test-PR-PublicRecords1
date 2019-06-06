@@ -623,21 +623,30 @@ export Functions := module
 																);		
 																					
 																					
-		ds_detail_spoke := JOIN(ds_recs_spoke,spoke.keys().did.qa,
+		ds_detail_spoke_all := JOIN(ds_recs_spoke,spoke.keys().did.qa,
                             KEYED(LEFT.did = RIGHT.did) AND 
 													  // Match on additional field in case multiple recs for the did
 													  LEFT.dt_last_seen = RIGHT.dt_last_seen,
 	                        TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
 														// fields from right spoke did key file, see spoke.layouts.keybuild
 														SELF.company_description := RIGHT.rawfields.Company_Business_Description,
+														SELF.global_sid     := RIGHT.global_sid,
+													    SELF.record_sid     := RIGHT.record_sid,
 											      // rest of the fields from the LEFT (POE payload) converting some
                             SELF                := LEFT), 
 													LEFT OUTER,
 													KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 													LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
+	
+	ds_detail_spoke_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_spoke_all, mod_access); 
+	ds_detail_spoke := PROJECT(ds_detail_spoke_flagged,
+								TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+									 SELF.company_description := IF(LEFT.is_suppressed, '', LEFT.company_description);
+									 SELF := LEFT;
+								));
 													
 		// Get the detailed data from the Zoom key did file.
-	ds_detail_zoom := JOIN(ds_recs_zoom,zoom.keys().did.qa,
+	ds_detail_zoom_all := JOIN(ds_recs_zoom,zoom.keys().did.qa,
                            KEYED(LEFT.did = RIGHT.did) AND 
 												   // match on additional field in case multiple recs for the did
 												   LEFT.dt_last_seen = RIGHT.dt_last_seen,
@@ -648,11 +657,21 @@ export Functions := module
 														
                             SELF.email1         := temp_email,
 														SELF.email_src1			:= IF(temp_email<>'',LEFT.SOURCE,''),
+														SELF.global_sid     := RIGHT.global_sid,
+													    SELF.record_sid     := RIGHT.record_sid,
 														// rest of the fields from the LEFT (POE payload) converting some							
                             SELF                := LEFT), 
 													LEFT OUTER,
 													KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 													LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
+	
+	ds_detail_zoom_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_zoom_all, mod_access); 
+	ds_detail_zoom := PROJECT(ds_detail_zoom_flagged,
+								TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+									 SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
+									 SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);
+									 SELF := LEFT;
+								));
 
 
 	// 				Get the detailed data from the Corp2 key cont corp_key file.
@@ -733,8 +752,8 @@ export Functions := module
 														 KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 														 LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 
-  ds_detail_oneclick_suppressed := Suppress.MAC_FlagSuppressedSource(ds_detail_oneclick_all, mod_access); 
-  ds_detail_oneclick := PROJECT(ds_detail_oneclick_suppressed,
+  ds_detail_oneclick_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_oneclick_all, mod_access); 
+  ds_detail_oneclick := PROJECT(ds_detail_oneclick_flagged,
     TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
        SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
        SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);
@@ -742,7 +761,7 @@ export Functions := module
     ));
 
 	// Get the detailed data from the Sales Channel key did file.
-	ds_detail_saleschannel := JOIN(ds_recs_saleschannel, SalesChannel.keys().did.qa, 
+	ds_detail_saleschannel_all := JOIN(ds_recs_saleschannel, SalesChannel.keys().did.qa, 
                                KEYED(LEFT.did = RIGHT.did) AND
 																LEFT.dt_last_seen = RIGHT.date_last_seen AND
 																LEFT.bdid = RIGHT.bdid,
@@ -751,10 +770,20 @@ export Functions := module
 															 temp_email1 				 := IF(checkNonPersonalEmail(RIGHT.rawfields.email),RIGHT.rawfields.email,'');
                                SELF.email1 				 := temp_email1,
                                SELF.email_src1     := IF(temp_email1 <>'',LEFT.SOURCE,''),
+							   SELF.global_sid     := RIGHT.global_sid,
+                               SELF.record_sid     := RIGHT.record_sid,
                                SELF                := LEFT), 
 														 LEFT OUTER, // keep rec from LEFT IF no match to RIGHT
 														 KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
 														 LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));	
+	
+	ds_detail_saleschannel_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_saleschannel_all, mod_access); 
+	ds_detail_saleschannel := PROJECT(ds_detail_saleschannel_flagged,
+															TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+																 SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
+																 SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);
+																 SELF := LEFT;
+															));													 
 
 	// Get the detailed data from the Thrive key did file.
 	ds_detail_thrive := JOIN(ds_recs_thrive,thrive.keys().did.qa,
@@ -885,7 +914,10 @@ export Functions := module
 												    LEFT OUTER,  // keep all the recs from the LEFT ds
 													  ATMOST(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
     
-    doxie.compliance.logSoldToSources (ds_detail_oneclick_suppressed(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_spoke_flagged(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_zoom_flagged(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_oneclick_flagged(~is_suppressed), mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_saleschannel_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_email_data_suppressed, mod_access);
 	  RETURN ds_detail_wemail;
   END; // end of getDetailedWithEmail function 

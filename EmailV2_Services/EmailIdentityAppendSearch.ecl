@@ -24,7 +24,7 @@ EXPORT EmailIdentityAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   email_with_best_recs := $.Functions.AddBestInfo(email_with_num_recs,in_mod);
   
   // check email delivery status
-  email_recs_valdtd := $.EmailGatewayData.VerifyDeliveryStatus(email_with_best_recs, in_mod, clnd_input_email);
+  email_recs_valdtd := $.GatewayData.VerifyDeliveryStatus(email_with_best_recs, in_mod, clnd_input_email);
   email_recs_ready := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Records,
                           email_with_best_recs);
 

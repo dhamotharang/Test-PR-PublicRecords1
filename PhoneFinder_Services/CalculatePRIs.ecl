@@ -75,8 +75,8 @@ FUNCTION
       monthstominutes := (le.Threshold*30*24*60); // Convert Months into Minutes.
 
       BOOLEAN isPRIFail := CASE(le.RiskId,
-                                -1 => pInput.phone = '',
-                                0  => pInput.fname = '' AND pInput.lname = '' AND pInput.listed_name = '' AND pInput.prim_name = '' AND pInput.phone <> '',
+                                -1 => pInput.isPrimaryPhone AND pInput.phone = '',
+                                0  => pInput.isPrimaryPhone AND (pInput.fname = '' AND pInput.lname = '' AND pInput.listed_name = '' AND pInput.prim_name = '' AND pInput.phone <> ''),
                                 1  => pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
                                 2  => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
                                 3  => dt_last_seen <> 0 AND STD.Date.DaysBetween(dt_last_seen, currentDate) > le.Threshold,
@@ -111,13 +111,13 @@ FUNCTION
                                       (pInput.imsi_changedthis_time = 1  AND STD.Date.DaysBetween((UNSIGNED)pInput.imsi_seensince, currentDate) <= le.Threshold) OR																																																																								
                                       (pInput.imei_changedthis_time = 1  AND STD.Date.DaysBetween((UNSIGNED)pInput.imei_seensince, currentDate) <= le.Threshold) OR																																																																								
                                       (pInput.iccid_changedthis_time = 1 AND STD.Date.DaysBetween((UNSIGNED)pInput.iccid_seensince, currentDate) <= le.Threshold),
-                                37 => MAP(le.ThresholdB = 'Day' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One day')),
+                                37 => MAP(le.ThresholdB = 'Day' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Day')),
                                           le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Week')),
                                           le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Month')),
                                            FALSE),
                                 38 => EXISTS(pInput.ReasonCodes(value = 'Phone Number in Global Blacklist')), 
-                                39 => MAP(le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One week')),
-                                          le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One month')),
+                                39 => MAP(le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One Week')),
+                                          le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One Month')),
                                           le.ThresholdB = 'Three Months' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - Three Months')),
                                            FALSE),
                                 40 => EXISTS(pInput.ReasonCodes(value = 'AssociatedDigitalID - Trust Score below Zero')),

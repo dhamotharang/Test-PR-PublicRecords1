@@ -1137,8 +1137,26 @@ Dataset_BIPV2__Key_BH_Linking_Ids(
 			// VehicleKey = vehicle_key),
 		PERMITS(DPMBitmap)),
 
+	Dataset_Watercraft__Key_Watercraft_SID(
+		Watercraft(
+			WatercraftKey = watercraft_key,
+			SequenceKey = sequence_key,
+			OriginState = state_origin,
+			DateFirstSeen = date_first_seen, // Contains information for ASOF
+			DateLastSeen = date_last_seen, // Contains information for ASOF
+			DateVendorFirstReported = date_vendor_first_reported,
+			DateVendorLastReported = date_vendor_last_reported,
+			Source = src),
+		WatercraftOwner(FILTER((UNSIGNED)did > 0),
+			DateFirstSeen = date_first_seen, // Contains information for ASOF
+			DateLastSeen = date_last_seen, // Contains information for ASOF
+			WatercraftKey = watercraft_key,
+			Owner = did,
+			Source = src),
+		PERMITS(DPMBitmap)),
+
 	Dataset_Cortera_Tradeline__Key_LinkIds(
-		Tradeline(FILTER(status != 'D'),// excluding records “D” (deleted record)
+		Tradeline(FILTER(status NOT IN ['D', 'R']),// excluding records 'D' (deleted record) and 'R' (replaced by newer record)
 			UltID = ultid,    
 			OrgID = orgid,   
 			SeleID = seleid,			
@@ -1161,7 +1179,7 @@ Dataset_BIPV2__Key_BH_Linking_Ids(
 			DtVendorFirstReported = dt_vendor_first_reported,
 			DtVendorLastReported = dt_vendor_last_reported,
 			Source = source), 
-		TradelineBusiness(FILTER(status != 'D'),// excluding records “D” (deleted record)
+		TradelineBusiness(FILTER(status NOT IN ['D', 'R']),//  excluding records 'D' (deleted record) and 'R' (replaced by newer record)
 			UltID = ultid,   
 			OrgID = orgid,   
 			SeleID = seleid,   
@@ -1179,7 +1197,6 @@ Dataset_BIPV2__Key_BH_Linking_Ids(
     AccidentDriversLicense,
     PersonAccident,
     Neighborhood,
-    Watercraft,
     Email,
     Household,
     Education,
@@ -1197,7 +1214,6 @@ Dataset_BIPV2__Key_BH_Linking_Ids(
     FirstDegreeAssociations,   
     SecondDegreeAssociations,
     FirstDegreeRelative,
-    WatercraftOwner,
     PersonEmail,
     HouseholdMember,
     PersonProperty,

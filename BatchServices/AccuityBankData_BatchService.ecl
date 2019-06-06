@@ -7,17 +7,14 @@
 </message>
 */
 
-IMPORT BatchServices,BatchShare,AutoStandardI,STD,Royalty;
+IMPORT BatchServices,BatchShare,STD,Royalty;
 
 EXPORT AccuityBankData_BatchService := MACRO
 
 	CNST:=BatchServices.AccuityBankData_Constants;
 
-	in_mod := BatchShare.IParam.getBatchParams();
-	dpmMod := MODULE(AutoStandardI.DataPermissionI.params)
-		EXPORT dataPermissionMask:=in_mod.DataPermissionMask;
-	END;
-	BOOLEAN use_AccuityBankData := AutoStandardI.DataPermissionI.val(dpmMod).use_AccuityBankData;
+	in_mod := BatchShare.IParam.getBatchParamsV2();
+	BOOLEAN use_AccuityBankData := doxie.compliance.use_AccuityBankData(in_mod.DataPermissionMask);
 	BOOLEAN IncludeGeotriangulationComparison := FALSE : STORED('IncludeGeotriangulationComparison');
 
 	ds_batch_in := DATASET([],BatchServices.AccuityBankData_Layouts.batch_in) : STORED('batch_in',FEW);

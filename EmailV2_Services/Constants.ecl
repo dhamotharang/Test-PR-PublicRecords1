@@ -1,4 +1,4 @@
-﻿IMPORT STD;
+﻿IMPORT dx_Email, STD;
 
 EXPORT Constants := MODULE
 
@@ -23,12 +23,24 @@ EXPORT Constants := MODULE
     EXPORT STRING20 SingleSearchAccountNo := '0';
   END;
   
-  EXPORT UNSIGNED EmailQualityRulesForBVCall := 0;
+  EXPORT UNSIGNED EmailQualityRulesForBVCall := 0
+                                               | dx_Email.Translation_Codes.rules_bitmap_code('role_address')        // role address is valid email address for the purpose of email delivery check
+                                               | dx_Email.Translation_Codes.rules_bitmap_code('disposable_address'); // disposable address is valid email address for the purpose of email delivery check
   
   EXPORT UNSIGNED SEARCH_JOIN_LIMIT := 1000;
   EXPORT STRING EMAIL_SOURCES := 'EMAIL_SOURCES';
   EXPORT STRING STR_TRUE := 'true';
+  EXPORT STRING STR_FALSE := 'false';
   
+  STRING StatusInvalid := 'invalid';
+  EXPORT BOOLEAN isUndeliverableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = StatusInvalid;
+  EXPORT STRING DomainAcceptAll := 'accept_all';
+  EXPORT BOOLEAN isUnverifiableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = DomainAcceptAll;
+  STRING StatusValid := 'valid';
+  EXPORT BOOLEAN isValid(STRING _status) := STD.Str.ToLowerCase(_status) = StatusValid;
+  EXPORT STRING StatusUnknown := 'unknown';
+  EXPORT BOOLEAN isUnknown(STRING _status) := STD.Str.ToLowerCase(_status) = StatusUnknown;
+
   EXPORT RestrictedUseCase := MODULE
     EXPORT STRING Standard           := 'STANDARD'; // or blank, no use case restrictions
     EXPORT STRING Reseller           := 'RESELLER';  
@@ -55,10 +67,18 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED1 requestTimeout  := 5;
     EXPORT UNSIGNED1 requestRetries  := 1;
     EXPORT STRING    SourceBriteVerifyEmail := 'BriteVerify_Email';
+    EXPORT STRING    SourceBV := 'BV';
     EXPORT STRING    RoleAddress  := 'Role Address';
     EXPORT STRING    DisposableAddress  := 'Disposable Address';
+    EXPORT STRING    EMAIL_DOMAIN_INVALID  := 'EMAIL_DOMAIN_INVALID';
+    EXPORT STRING    BVAPIkey  := '498acc88-a5a4-4dbc-942d-4bd9ac265ae1';
+
+    dict_email_address_invalid := DICTIONARY([
+      {'EMAIL_ACCOUNT_INVALID' => 'Email Account Invalid'},
+      {'EMAIL_ADDRESS_INVALID' => 'Email Address Invalid'},
+      {EMAIL_DOMAIN_INVALID  => 'Email Domain Invalid'}],
+      {STRING error_code => STRING error_desc});
+    EXPORT get_error_desc(STRING _code) := dict_email_address_invalid[_code].error_desc;
     
-    STRING EmailStatusInvalid := 'invalid';
-    EXPORT BOOLEAN isUndeliverableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = EmailStatusInvalid;
   END;
 END;

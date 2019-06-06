@@ -1,20 +1,12 @@
-﻿﻿IMPORT BatchShare,Gateway,Phones, AutoStandardI, iesp, suppress;
+﻿﻿IMPORT BatchShare,Gateway,Phones, AutoStandardI, iesp, suppress,doxie;
 
 EXPORT IParam := MODULE
 	
-	EXPORT PhoneAttributes := MODULE
+ SHARED mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
- // Global module
-	SHARED globalMod := AutoStandardI.GlobalModule(): GLOBAL;
-
- EXPORT ReportParams := INTERFACE (AutoStandardI.DataPermissionI.params, AutoStandardI.DataRestrictionI.params, AutoStandardI.PermissionI_Tools.params)
-   export string32  ApplicationType	  := AutoStandardI.InterfaceTranslator.application_type_val.val(project(globalMod, AutoStandardI.InterfaceTranslator.application_type_val.params));
-   export STRING5   IndustryClass     := AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(globalMod, AutoStandardI.InterfaceTranslator.industry_class_val.params));	// D2C - consumer restriction
-   export STRING6   DOBMask           := AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod, AutoStandardI.InterfaceTranslator.dob_mask_val.params));
-   export STRING6   SSNMask           := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod, AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
-   export Boolean   dl_mask           := AutoStandardI.InterfaceTranslator.dl_mask_value.val(PROJECT(globalMod, AutoStandardI.InterfaceTranslator.dl_mask_value.params)); 
-   export UNSIGNED2 PenaltThreshold   := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(project(globalMod, AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
-   export UNSIGNED8 MaxResults        := AutoStandardI.InterfaceTranslator.maxResults_val.val(project(globalMod, AutoStandardI.InterfaceTranslator.maxResults_val.params));	
+ EXPORT ReportParams := INTERFACE (doxie.IDataAccess)
+   export UNSIGNED2 PenaltThreshold   := Phones.Constants.PenaltThreshold;
+	 export UNSIGNED8 MaxResults        := Phones.Constants.MaxResults;	
    export boolean 		ReturnCurrentOnly	:= false;
    export boolean 		RunDeepDive			:= false;
    export BOOLEAN 		return_current		:= true;
@@ -24,7 +16,8 @@ EXPORT IParam := MODULE
 
  EXPORT getReportParams(iesp.phonemetadatasearch.t_PhoneMetadataSearchOption  report_opt) := 
    		FUNCTION
-     in_mod := MODULE(PROJECT(globalMod, ReportParams, opt));								
+     in_mod := MODULE(PROJECT(mod_access, ReportParams, opt));					
+			 EXPORT UNSIGNED8 	MaxResults	:= report_opt.MaxResults;
        EXPORT BOOLEAN  return_current         := report_opt.ReturnCurrent;														
        EXPORT UNSIGNED  max_age_days     := IF(report_opt.MaxAgeDays <> 0, report_opt.MaxAgeDays, Phones.Constants.PhoneAttributes.LastActivityThreshold);							
        EXPORT DATASET (Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
@@ -32,18 +25,18 @@ EXPORT IParam := MODULE
  	 RETURN in_mod;
   END;
 
-  EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams)
+  EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2)
     EXPORT BOOLEAN 		return_current                 := TRUE;
     EXPORT BOOLEAN		include_temp_susp_reactivate   := FALSE;
     EXPORT UNSIGNED		max_lidb_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold; 
-	EXPORT UNSIGNED		max_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+		EXPORT UNSIGNED		max_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold;
     EXPORT DATASET(Gateway.Layouts.Config) gateways    := DATASET ([], Gateway.Layouts.Config);
   END;	
 
 		EXPORT getBatchParams() := 
 		FUNCTION
 			
-			mBaseParams := BatchShare.IParam.getBatchParams();
+			mBaseParams := BatchShare.IParam.getBatchParamsV2();
 			
 			in_mod := MODULE(PROJECT(mBaseParams, BatchParams, OPT))							
 				EXPORT BOOLEAN return_current								:= TRUE 	: STORED('return_current');									
@@ -55,8 +48,6 @@ EXPORT IParam := MODULE
 			
 			RETURN in_mod;
 		END;	
-	END;
-
 	
 	EXPORT inZumigoParams := INTERFACE
 		EXPORT STRING20 useCase := '';
@@ -71,7 +62,7 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN	CarrierInfo := FALSE;
 		EXPORT BOOLEAN	CallHandlingInfo := FALSE;
 		EXPORT BOOLEAN	DeviceInfo := FALSE;
-		EXPORT BOOLEAN 	DeviceChangeOption := FALSE;
+		EXPORT BOOLEAN 	DeviceChangeInfo := FALSE;
 		EXPORT BOOLEAN 	DeviceHistory := FALSE;
 		EXPORT STRING10 optInType := '';
 		EXPORT STRING5 	optInMethod := '';

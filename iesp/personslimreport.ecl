@@ -7,15 +7,22 @@ import iesp;
 export personslimreport := MODULE
 			
 export t_PersonSlimReportOption := record (iesp.share.t_BaseReportOption)
-  boolean IncludeBlankDOD {xpath('IncludeBlankDOD')};
+	boolean IncludeMinors {xpath('IncludeMinors')};
+	boolean IncludeFullPhonesPlus {xpath('IncludeFullPhonesPlus')};
+	boolean IncludeBlankDOD {xpath('IncludeBlankDOD')};
 	boolean EnableNationalAccidents {xpath('EnableNationalAccidents')};
 	boolean EnableExtraAccidents {xpath('EnableExtraAccidents')};
 	boolean IncludePriorProperties {xpath('IncludePriorProperties')};
 	boolean IncludeNonRegulatedWatercraftSources {xpath('IncludeNonRegulatedWatercraftSources')};
 	boolean IncludeNonRegulatedVehicleSources {xpath('IncludeNonRegulatedVehicleSources')};
-	string  RealTimePermissibleUse {xpath('RealTimePermissibleUse')}; //values['','Government','LawEnforcement','Parking','VerifyFraudOrDebt','Litigation','InsuranceClaims','InsuranceUnderwriting','TowedAndImpounded','PrivateToll','PrivateInvestigative','PrivateInvestigativeLitigation','EmployerVerify','']
+	boolean IncludeNonRegulatedDMVSources {xpath('IncludeNonRegulatedDMVSources')};
+	string RealTimePermissibleUse {xpath('RealTimePermissibleUse')};
 	boolean IncludeAddresses {xpath('IncludeAddresses')};
 	boolean IncludePhones {xpath('IncludePhones')};
+	boolean IncludeDeaths {xpath('IncludeDeaths')};
+	boolean IncludeNames {xpath('IncludeNames')};
+	boolean IncludeSSNs {xpath('IncludeSSNs')};
+	boolean IncludeDOBs {xpath('IncludeDOBs')};
 	boolean IncludeProfessionalLicenses {xpath('IncludeProfessionalLicenses')};
 	boolean IncludePeopleAtWork {xpath('IncludePeopleAtWork')};
 	boolean IncludeAircrafts {xpath('IncludeAircrafts')};
@@ -40,7 +47,6 @@ export t_PersonSlimReportOption := record (iesp.share.t_BaseReportOption)
 	boolean IncludeEducation {xpath('IncludeEducation')};
 	boolean IncludeAKAs {xpath('IncludeAKAs')};
 	boolean IncludeImposters {xpath('IncludeImposters')};
-	boolean IncludeDeaths {xpath('IncludeDeaths')};
 	boolean IncludeUtility {xpath('IncludeUtility')};
 end;
 		
@@ -49,25 +55,40 @@ export t_PersonSlimReportBy := record
 end;
 		
 export t_PersonSlimReportAddress := record (iesp.share.t_Address)
-	string7 GeoBlk {xpath('GeoBlk')};
-	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 end;
-
-export t_PersonSlimReportUtility := record 
-	string1  	UtilType {xpath('UtilType')};
-	string20 	UtilCategory {xpath('UtilCategory')};
-	string20 	UtilTypeDescription {xpath('UtilTypeDescription')};
+		
+export t_PersonSlimReportName := record (iesp.share.t_Name)
+end;
+		
+export t_PersonSlimReportDeath := record (iesp.share.t_Date)
+end;
+		
+export t_PersonSlimReportDOB := record (iesp.share.t_Date)
+end;
+		
+export t_PersonSlimReportSSN := record
+	string9 SSN {xpath('SSN')};
+end;
+		
+export t_PersonSlimReportPhone := record
+	string10 Phone {xpath('Phone')};
+end;
+		
+export t_PersonSlimReportUtility := record
+	string1 UtilType {xpath('UtilType')};
+	string20 UtilCategory {xpath('UtilCategory')};
+	string20 UtilTypeDescription {xpath('UtilTypeDescription')};
 	iesp.share.t_Date ConnectDate {xpath('ConnectDate')};
 	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
 	iesp.share.t_Date RecordDate {xpath('RecordDate')};
 	iesp.share.t_Name Name {xpath('Name')};
-	string9  	SSN {xpath('SSN')};
+	string9 SSN {xpath('SSN')};
 	iesp.share.t_Date DOB {xpath('DOB')};
-	string2  	DriversLicenseStateCode {xpath('DriversLicenseStateCode')};
-	string22 	DriversLicense {xpath('DriversLicense')};
-	string10 	WorkPhone {xpath('WorkPhone')};
-	string10 	Phone {xpath('Phone')};
-	string1  	AddrDual {xpath('AddrDual')};
+	string2 DriversLicenseStateCode {xpath('DriversLicenseStateCode')};
+	string22 DriversLicense {xpath('DriversLicense')};
+	string10 WorkPhone {xpath('WorkPhone')};
+	string10 Phone {xpath('Phone')};
+	string1 AddrDual {xpath('AddrDual')};
 	dataset(iesp.share.t_Address) Addresses {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAddresses)};
 end;
 		
@@ -75,7 +96,11 @@ export t_PersonSlimReportResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
 	string12 UniqueId {xpath('UniqueId')};
 	dataset(t_PersonSlimReportAddress) Addresses {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAddresses)};
-	dataset(iesp.dirassistwireless.t_PhonesPlusRecord) Phones {xpath('Phones/Phone'), MAXCOUNT(iesp.constants.PersonSlim.MaxPhones)};
+	dataset(t_PersonSlimReportName) Names {xpath('Names/Name'), MAXCOUNT(iesp.Constants.PersonSlim.MaxNames)};
+	dataset(t_PersonSlimReportPhone) Phones {xpath('Phones/Entry'), MAXCOUNT(iesp.Constants.PersonSlim.MaxPhones)};
+	dataset(t_PersonSlimReportDeath) Deaths {xpath('Deaths/Death'), MAXCOUNT(iesp.Constants.PersonSlim.MaxDeaths)};
+	dataset(t_PersonSlimReportDOB) DOBs {xpath('DOBs/DOB'), MAXCOUNT(iesp.constants.PersonSlim.MaxDOBs)};
+	dataset(t_PersonSlimReportSSN) SSNs {xpath('SSNs/Entry'), MAXCOUNT(iesp.constants.PersonSlim.MaxSSNs)};
 	dataset(iesp.proflicense.t_ProfessionalLicenseRecord) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(iesp.Constants.PersonSlim.MaxProfLic)};
 	dataset(iesp.peopleatwork.t_PeopleAtWorkRecord) PeopleAtWorks {xpath('PeopleAtWorks/PeopleAtWork'), MAXCOUNT(iesp.constants.PersonSlim.MaxPeopleAtWork)};
 	dataset(iesp.faaaircraft.t_AircraftReportRecord) Aircrafts {xpath('Aircrafts/Aircraft'), MAXCOUNT(iesp.constants.PersonSlim.MaxAircrafts)};
@@ -97,9 +122,8 @@ export t_PersonSlimReportResponse := record
 	dataset(iesp.property.t_PropertyReport2Record) Properties {xpath('Properties/Property'), MAXCOUNT(iesp.Constants.PersonSlim.MaxProperties)};
 	dataset(iesp.marriagedivorce.t_MarriageSearch2Record) MarriageDivorces {xpath('MarriageDivorces/MarriageDivorce'), MAXCOUNT(iesp.Constants.PersonSlim.MaxMarriageDiv)};
 	dataset(iesp.student.t_StudentRecord) Educations {xpath('Educations/Education'), MAXCOUNT(iesp.Constants.PersonSlim.MaxStudent)};
-	dataset(iesp.bps_share.t_BpsReportIdentity) AKAs {xpath('AKAs/Identity'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAKA)};
-	dataset(iesp.bps_share.t_BpsReportImposter) Imposters {xpath('Imposters/Imposter'), MAXCOUNT(iesp.Constants.PersonSlim.MaxImposters)};
-	dataset(iesp.death.t_DeathReportRecord) Deaths {xpath('Deaths/Death'), MAXCOUNT(iesp.Constants.PersonSlim.MaxDeaths)};
+	dataset(iesp.bps_share.t_BpsReportIdentity) AKAs {xpath('AKAs/AKA'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAKA)};
+	dataset(iesp.bps_share.t_BpsReportIdentity) Imposters {xpath('Imposters/Imposter'), MAXCOUNT(iesp.Constants.PersonSlim.MaxImposters)};
 	dataset(t_PersonSlimReportUtility) Utilities {xpath('Utilities/Utility'), MAXCOUNT(iesp.Constants.PersonSlim.MaxUtilities)};
 end;
 		

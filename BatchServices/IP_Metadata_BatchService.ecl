@@ -17,7 +17,6 @@ IMPORT BatchServices,BatchShare,Std;
 EXPORT IP_Metadata_BatchService() := FUNCTION
 
 	// no restrictions â€“ reserved for future use
-	// batch_params := BatchShare.IParam.getBatchParams();
 	ds_batch_in_raw := DATASET([],BatchServices.IP_Metadata_Layouts.batch_in_raw) : STORED('batch_in',FEW);
 
 	BatchShare.MAC_SequenceInput(ds_batch_in_raw,ds_batch_in_seq);

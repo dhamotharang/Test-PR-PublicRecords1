@@ -349,7 +349,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		 s_associates     := SmartRollup.fn_smart_OtherPersonAssoc(associates,subject_did,param);
 		 s_associates_count := count(s_associates);
      p_associates     := choosen (s_associates, iesp.constants.SMART.MaxAssociates);
-		  american_student_input := MODULE(PROJECT(globals, American_Student_Services.IParam.reportParams,opt)) end;
+     american_student_input := PROJECT (mod_smartlinx, American_Student_Services.IParam.reportParams);
  
 		 boolean onlyCurrent := true;  //request only current student records.
      p_education := if(param.include_students,

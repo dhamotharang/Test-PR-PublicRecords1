@@ -1,9 +1,9 @@
 ﻿
-import risk_indicators, models, std, Profilebooster;
-IMPORT LUCI, ut, STD;
+import risk_indicators, models, Profilebooster;
+IMPORT LUCI, STD;
 IMPORT HCSE_GE_18_LUCI_MODEL;
 IMPORT HCSE_LT_18_LUCI_MODEL;
-
+IMPORT HCSE_SERA_GBM_M0_V1_model_LUCI;
 
 export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 
@@ -220,12 +220,14 @@ if(ofacVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(R
 		
 	SeRs_PreProc_Patterns_Excluded := SeRs_PreProc_Patterns_Applied(isSeRsExcludedDiag =1 or isSeRsMinor =1 or ADMIT_DATE ='');
 	
- SeRs_PreProc_Patterns_Filtered_Validated := join(SeRs_PreProc_Patterns_Filtered,icdkey.key().ref_icd10_diag_key.qa,
+ SeRs_PreProc_Patterns_Filtered_Validated := join(SeRs_PreProc_Patterns_Filtered,icdkey.key().ref_icd10.qa,
 																																																	keyed(STD.Str.ToUpperCase(std.Str.FilterOut(left.admit_diagnosis_code, '.')) = right.diag_cd),
 																																																	Transform(Models.Layouts_Healthcare_V3.layout_SocioEconomic_LI_PB_flat_typed,
-																																																	self.isSeRsInvalidDiag := if(right.desc_short<>'',0,1);
-																																																	self := left;
-																																																	), left outer, atmost(1));
+																																																	self.isSeRsInvalidDiag := map (left.ADMIT_DIAGNOSIS_CODE = ''  => 0, 
+																																																	(unsigned8)left.ADMIT_DATE >= (unsigned8)right.effective_dt and (unsigned8)left.ADMIT_DATE <= (unsigned8)right.termination_dt and right.diag_cd <> '' => 0,
+                                                                                                  1);
+                                                                                                  self := left;
+                                                                                                  ), left outer, atmost(1));
 	
 	M0_SeRs_PreProc_Patterns_Filtered_Validated_Mapped := Models.Healthcare_SocioEconomic_Transforms_V3.SeRs_M0_doMapping(SeRs_PreProc_Patterns_Filtered(isSeRsM1ModelUsed < 1));
  

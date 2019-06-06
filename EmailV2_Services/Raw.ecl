@@ -29,9 +29,11 @@ EXPORT Raw := MODULE
   END;  
   
   
-  EXPORT getEmailPayload(DATASET($.Layouts.email_ids_rec) ids_batch_in, UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA) := FUNCTION
+  EXPORT getEmailPayload(DATASET($.Layouts.email_ids_rec) ids_batch_in, 
+                         $.IParams.EmailParams mod_access,
+                         UNSIGNED1 data_environment=Data_Services.data_env.iNonFCRA) := FUNCTION
     
-    email_payload := PROJECT(dx_Email.Get.mac_payload(ids_batch_in, email_rec_key, data_environment), 
+    email_payload := PROJECT(dx_Email.Append(ids_batch_in, email_rec_key, mod_access, data_environment), 
                             $.Transforms.addRawPayload(LEFT,LEFT._email_data));
     RETURN email_payload;                                           
   END;  
@@ -101,7 +103,7 @@ EXPORT Raw := MODULE
                  $.Constants.SearchBy.ByPII   => search_by_input_pii,
                  DATASET([], $.Layouts.email_ids_rec) );
                  
-    payload_recs := getEmailPayload(id_recs, data_environment); 
+    payload_recs := getEmailPayload(id_recs, in_mod, data_environment); 
     
     //output(search_by_email, named('search_by_email'),EXTEND);
     //output(search_by_lexid, named('search_by_lexid'),EXTEND);
@@ -114,5 +116,42 @@ EXPORT Raw := MODULE
     RETURN payload_recs;
   END;
   
+EXPORT GetEventHistory(DATASET($.Layouts.Gateway_Data.batch_in_bv_rec) in_emails,
+                          STRING in_source='') := FUNCTION 
+
+    prior_year_date := (STRING8) STD.Date.AdjustDate(STD.Date.Today(), -1,0,0);
+    //email_events := DATASET([],$.Layouts.event_history_rec);
+     
+    email_events := PROJECT(dx_Email.Raw.get_event(in_emails(email!=''), email, prior_year_date, in_source), 
+                          TRANSFORM($.Layouts.event_history_rec,
+                              SELF.email := LEFT.email_address,                                
+                              SELF.date_added := LEFT.date_added,                                
+                              SELF.email_username := STD.Str.ToUpperCase(LEFT.Account),
+                              SELF.email_domain := STD.Str.ToUpperCase(LEFT.Domain),
+                              SELF.email_status := STD.Str.ToLowerCase(LEFT.Status),
+                              SELF.error_code := STD.Str.ToUpperCase(LEFT.error_code),
+                              SELF.email_status_reason := STD.Str.ToTitleCase(LEFT.Error_desc),  
+                              SELF.is_disposable_address := STD.Str.ToLowerCase(LEFT.disposable) = $.Constants.STR_TRUE,
+                              SELF.is_role_address := STD.Str.ToLowerCase(LEFT.role_address) = $.Constants.STR_TRUE)
+                           );
+
+    RETURN email_events;
+  END;
+EXPORT GetDomainStatus(DATASET($.Layouts.domain_rec) in_emails) := FUNCTION 
+
+   domains_in := DEDUP(SORT(in_emails, email_domain), email_domain);
+   email_events := PROJECT(dx_Email.Raw.get_domain(domains_in, email_domain), 
+                          TRANSFORM($.Layouts.domain_rec,
+                              SELF.email_domain := STD.Str.ToUpperCase(LEFT.domain_name),
+                              SELF.domain_status := STD.Str.ToLowerCase(LEFT.domain_status),
+                              SELF.accept_all := STD.Str.ToLowerCase(LEFT.verifies_account)=$.Constants.STR_FALSE;
+                              SELF.date_last_verified := LEFT.date_last_verified,
+                              SELF.expire_date := LEFT.expire_date)
+                           );
+
+    RETURN email_events;
+  END;
+
+
 
 END;

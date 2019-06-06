@@ -403,6 +403,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.FilingNumber   							:= ri.Liens1_FilingNumber;
 		self.FilingBook     							:= ri.Liens1_FilingBook;
 		self.FilingPage     							:= ri.Liens1_FilingPage;
+		self.AgencyID       							:= ri.Liens1_AgencyID;
 		self.Agency         							:= ri.Liens1_Agency;
 		self.AgencyCounty   							:= ri.Liens1_AgencyCounty;
 		self.AgencyState	   							:= ri.Liens1_AgencyState;
@@ -422,6 +423,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.FilingNumber   						:= ri.Liens2_FilingNumber;
 		self.FilingBook     						:= ri.Liens2_FilingBook;
 		self.FilingPage     						:= ri.Liens2_FilingPage;
+		self.AgencyID        						:= ri.Liens2_AgencyID;
 		self.Agency         						:= ri.Liens2_Agency;
 		self.AgencyCounty   						:= ri.Liens2_AgencyCounty;
 		self.AgencyState	   						:= ri.Liens2_AgencyState;
@@ -449,6 +451,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.FilingBook     						:= ri.Jgmts1_FilingBook;
 		self.FilingPage     						:= ri.Jgmts1_FilingPage;
 		self.Eviction             := ri.Jgmts1_Eviction;
+		self.AgencyID        						:= ri.Jgmts1_AgencyID;
 		self.Agency         						:= ri.Jgmts1_Agency;
 		self.AgencyCounty   						:= ri.Jgmts1_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts1_AgencyState;
@@ -473,6 +476,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.FilingBook     						:= ri.Jgmts2_FilingBook;
 		self.FilingPage     						:= ri.Jgmts2_FilingPage;
 		self.Eviction             := ri.Jgmts2_Eviction;
+		self.AgencyID        						:= ri.Jgmts2_AgencyID;
 		self.Agency         						:= ri.Jgmts2_Agency;
 		self.AgencyCounty   						:= ri.Jgmts2_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts2_AgencyState;
@@ -540,6 +544,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	
 
 	// ------------------ DEBUGGING SECTION --------------------
+	// OUTPUT(SeedKey, NAMED('TS_SeedKey'));
 	// OUTPUT(inData, NAMED('TS_inData'));
 	// OUTPUT(Seed_Files.Hash_InstantID(StringLib.StringToUpperCase(TRIM(inData[1].FName, LEFT, RIGHT)), StringLib.StringToUpperCase(TRIM(inData[1].LName, LEFT, RIGHT)), TRIM(inData[1].SSN, LEFT, RIGHT), Risk_Indicators.nullstring, TRIM(inData[1].in_Zipcode[1..5], LEFT, RIGHT), TRIM(inData[1].Phone10, LEFT, RIGHT), Risk_Indicators.nullstring), NAMED('TS_Hashdata'));
 	// OUTPUT(TestDataTableName_in, NAMED('TS_TestDataTableName'));

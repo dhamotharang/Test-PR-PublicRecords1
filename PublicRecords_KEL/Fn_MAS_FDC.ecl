@@ -1,4 +1,5 @@
-﻿IMPORT BankruptcyV3, BIPV2, Cortera_Tradeline, Doxie, Doxie_Files, FAA, Header, Header_Quick, MDR, VehicleV2;
+﻿IMPORT BankruptcyV3, BIPV2, Cortera_Tradeline, Doxie, Doxie_Files, FAA, Header, Header_Quick, 
+		MDR, VehicleV2, Watercraft;
 
 EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input,
 									PublicRecords_KEL.Interface_Options Options,
@@ -11,6 +12,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
       -  Bankruptcy
       -  Aircraft
       -  Vehicle
+      -  Watercraft
       -  Business Header
       -  Tradeline (Cortera)
 */
@@ -50,7 +52,6 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 						SELF := []), FULL OUTER );
 	Input_FDC_Filtered := Input_FDC((LexIDBusExtendedFamilyAppend > 0 and LexIDBusLegalFamilyAppend > 0 and LexIDBusLegalEntityAppend > 0) or LexIDAppend > 0);	
 		
-
 	/* **************************************************************************
 			
 																CONSUMER SECTION
@@ -394,7 +395,46 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
           SELF := LEFT,
           SELF := []));	
   
-  
+	// --------------------[ Watercraft records ]--------------------
+
+	// Watercraft.key_watercraft_did has a parameter to say if FCRA or nonFCRA - same file layout
+	Key_Watercraft_did_Records := IF( Common.DoFDCJoin_Watercraft_Files__Watercraft_DID, 
+			JOIN(Input_FDC_Filtered, Watercraft.key_watercraft_did(Options.isFCRA),
+				KEYED(LEFT.LexIDAppend = RIGHT.l_did),
+				TRANSFORM(Layouts_FDC.Layout_Watercraft__key_watercraft_DID,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF := RIGHT, 
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_Watercraft__key_watercraft_DID));
+
+	// Watercraft.key_watercraft_sid has a parameter to say if FCRA or nonFCRA - same file layout		
+	//
+	// See WatercraftV2_Services.get_owner_records for other possible Join restrictions/criteria.
+	//
+	Key_Watercraft_sid_Records := IF( Common.DoFDCJoin_Watercraft_Files__Watercraft_SID,
+		JOIN(Key_Watercraft_did_Records, Watercraft.key_watercraft_sid(Options.isFCRA),
+					KEYED(LEFT.watercraft_key = RIGHT.watercraft_key) AND
+					KEYED(LEFT.sequence_key = '' OR LEFT.sequence_key = RIGHT.sequence_key) AND
+					KEYED(LEFT.state_origin = '' OR LEFT.state_origin = RIGHT.state_origin),
+				TRANSFORM(Layouts_FDC.Layout_Watercraft__Key_Watercraft_SID,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.Src := RIGHT.source_code,
+					SELF.DPMBitmap := SetDPMBitmap( Source := RIGHT.source_code, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					SELF := RIGHT,
+					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_Watercraft__Key_Watercraft_SID));
+
+	With_Watercraft_Records := DENORMALIZE(With_Vehicle_Main_Records, Key_Watercraft_sid_Records,
+      LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexIDAppend = RIGHT.LexIDAppend, GROUP,
+      TRANSFORM(Layouts_FDC.Layout_FDC,
+          SELF.Dataset_Watercraft__Key_Watercraft_SID := ROWS(RIGHT),
+          SELF := LEFT,
+          SELF := []));	
+
 	/* **************************************************************************
 			
 																BUSINESS SECTION
@@ -420,7 +460,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Business_Header_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_BIPV2__Key_BH_Linking_Ids));
 		
-	With_Business_Header_Key_Linking := DENORMALIZE(With_Vehicle_Main_Records, Business_Header_Key_Linking,
+	With_Business_Header_Key_Linking := DENORMALIZE(With_Watercraft_Records, Business_Header_Key_Linking,
 			LEFT.BusInputUIDAppend = RIGHT.BusInputUIDAppend AND 
 			LEFT.LexIDBusExtendedFamilyAppend = RIGHT.LexIDBusExtendedFamilyAppend AND 
 			LEFT.LexIDBusLegalFamilyAppend = RIGHT.LexIDBusLegalFamilyAppend AND 
@@ -458,7 +498,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 					SELF.Dataset_Cortera_Tradeline__Key_LinkIds := ROWS(RIGHT),
 					SELF := LEFT,
 					SELF := []));
-          
+	
 	RETURN With_Tradeline_Key_LinkIds;
 
 END;
