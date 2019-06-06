@@ -81,8 +81,10 @@ EXPORT  AssetReport (
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Aircraft
                                      )), iesp.Constants.BR.MaxAircrafts);
 
-  p_paw         := choosen (PersonReports.peopleatwork_records(dids, PROJECT (mod_asset, $.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
-
+  
+  p_paw         := choosen (PersonReports.peopleatwork_records(dids, Module(PROJECT (mod_asset,PersonReports.IParam.peopleatwork, OPT))end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  
+ 
   // -----------------------------------------------------------------------
   // COUNTS (cannot use doxie.key_did_lookups_v2 -- not always in sync);
   // something similar to doxie.MAC_Add_WeAlsoFound can be used here, 
