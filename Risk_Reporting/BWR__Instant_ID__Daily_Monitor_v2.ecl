@@ -1,7 +1,7 @@
-#workunit('name', 'Instant_ID_Daily_Monitor_v2');
+﻿#workunit('name', 'Instant_ID_Daily_Monitor_v2');
 
-#option('allowedClusters', 'thor400_20,thor400_30,thor400_60'); // This workunit can run on these clusters
-#option('AllowAutoSwitchQueue', TRUE); // If the current queue is full, use an available cluster from above
+// #option('allowedClusters', 'thor400_20,thor400_44,thor400_60'); // This workunit can run on these clusters
+// #option('AllowAutoQueueSwitch', TRUE); // If the current queue is full, use an available cluster from above
 
 IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT;
 
@@ -9,6 +9,9 @@ IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT;
 EndDate := ut.GetDate;
 BeginDateTemp := ut.date_math(EndDate, -365);
 BeginDate := IF(BeginDateTemp >= '20130512', BeginDateTemp, '20130512'); // Tracking didn't fully start until this date, eliminate the "test" days before this date.
+
+BadEndDate := '20170516';
+BadBeginDate := '20170622';
 
 eyeball := 100;
 
@@ -20,41 +23,79 @@ eyeball := 100;
 
 LogFile := Score_Logs.Key_ScoreLogs_XMLTransactionID;
 
-LogsRaw := DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['INSTANTID'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs)));
+LogsRaw := DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['INSTANTID'] AND 
+	((datetime[1..8] BETWEEN BeginDate AND BadEndDate) OR
+	(datetime[1..8] BETWEEN BadBeginDate AND EndDate)) 
+	AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs)));
 
 // In order to join the parsed input and output together I need to force the transaction id into the inputxml, and I needed a root XML node for the outputxml.  This seemed like the most reasonable way to do that.
-Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+Logs_1 := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
 				SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<InstantID>', '<InstantID><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>'); 
 				SELF.outputxml := '<InstantID>' + LEFT.outputxml + '</InstantID>';
 				SELF.TransactionID := LEFT.Transaction_ID;
 				SELF.AccountID := LEFT.customer_id;
 				SELF.TransactionDate := LEFT.DateTime[1..8];
-				SELF := LEFT));
-				
-OUTPUT(CHOOSEN(Logs, eyeball), NAMED('Sample_Raw_Logs'));
+				SELF := LEFT));	
+OUTPUT(CHOOSEN(Logs_1, eyeball), NAMED('Sample_Raw_Logs_1'));
 
 Risk_Reporting.Layouts.Parsed_InstantID_Layout parseInput () := TRANSFORM
-	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
-	SELF.CompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
-	SELF.FirstName			:= TRIM(XMLTEXT('SearchBy/Name/First'));
-	SELF.LastName				:= TRIM(XMLTEXT('SearchBy/Name/Last'));
-	SELF.FullName				:= TRIM(XMLTEXT('SearchBy/Name/Full'));
-	SELF.SSN						:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/SSN'));
-	SELF.DOB						:= TRIM(XMLTEXT('SearchBy/DOB')) + Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/DOB/Year'), XMLTEXT('SearchBy/DOB/Month'), XMLTEXT('SearchBy/DOB/Day'));
-	SELF.Address				:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/Address/StreetAddress1'), XMLTEXT('SearchBy/Address/StreetAddress2'), XMLTEXT('SearchBy/Address/StreetNumber'), XMLTEXT('SearchBy/Address/StreetPreDirection'), XMLTEXT('SearchBy/Address/StreetName'),
-															XMLTEXT('SearchBy/Address/StreetSuffix'), XMLTEXT('SearchBy/Address/StreetPostDirection'), XMLTEXT('SearchBy/Address/UnitDesignation'), XMLTEXT('SearchBy/Address/UnitNumber'));
-	SELF.City						:= TRIM(XMLTEXT('SearchBy/Address/City'));
-	SELF.State					:= TRIM(XMLTEXT('SearchBy/Address/State'));
-	SELF.Zip						:= Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/Address/Zip5'));
-	SELF.DL							:= TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
-	SELF.HomePhone			:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/HomePhone'));
-	SELF.WorkPhone			:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/WorkPhone'));
+	SELF.TransactionID	    := TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.EndUserCompanyName := TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.FirstName			    := TRIM(XMLTEXT('SearchBy/Name/First'));
+	SELF.LastName				    := TRIM(XMLTEXT('SearchBy/Name/Last'));
+	SELF.FullName				    := TRIM(XMLTEXT('SearchBy/Name/Full'));
+	SELF.SSN						    := Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/SSN'));
+	SELF.DOB						    := TRIM(XMLTEXT('SearchBy/DOB')) + Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/DOB/Year'), XMLTEXT('SearchBy/DOB/Month'), XMLTEXT('SearchBy/DOB/Day'));
+	SELF.Address			     	:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/Address/StreetAddress1'), XMLTEXT('SearchBy/Address/StreetAddress2'), XMLTEXT('SearchBy/Address/StreetNumber'), XMLTEXT('SearchBy/Address/StreetPreDirection'), XMLTEXT('SearchBy/Address/StreetName'),
+                                  XMLTEXT('SearchBy/Address/StreetSuffix'), XMLTEXT('SearchBy/Address/StreetPostDirection'), XMLTEXT('SearchBy/Address/UnitDesignation'), XMLTEXT('SearchBy/Address/UnitNumber'));
+	SELF.City						    := TRIM(XMLTEXT('SearchBy/Address/City'));
+	SELF.State					    := TRIM(XMLTEXT('SearchBy/Address/State'));
+	SELF.Zip						    := Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/Address/Zip5'));
+	SELF.DL							    := TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
+	SELF.HomePhone			    := Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/HomePhone'));
+	SELF.WorkPhone		    	:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/WorkPhone'));
 	
 	SELF := [];
 END;
-parsedInput := PARSE(Logs, inputxml, parseInput(), XML('InstantID'));
+parsedInput_1 := PARSE(Logs_1, inputxml, parseInput(), XML('InstantID'));
+OUTPUT(CHOOSEN(parsedInput_1, eyeball), NAMED('Sample_parsedInput_1'));
+LOGS_11 := JOIN(DISTRIBUTE(parsedInput_1, HASH64(TransactionID)), DISTRIBUTE(Logs_1, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
+Logs_2 := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+				SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<InstantIDRequest>', '<InstantIDRequest><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>'); 
+				SELF.outputxml := '<InstantID>' + LEFT.outputxml + '</InstantID>';
+				SELF.TransactionID := LEFT.Transaction_ID;
+				SELF.AccountID := LEFT.customer_id;
+				SELF.TransactionDate := LEFT.DateTime[1..8];
+				SELF := LEFT));	
+OUTPUT(CHOOSEN(Logs_2, eyeball), NAMED('Sample_Raw_Logs_2'));
 
-OUTPUT(CHOOSEN(parsedInput, eyeball), NAMED('Sample_Parsed_Input'));
+Risk_Reporting.Layouts.Parsed_InstantID_Layout parseInput2 () := TRANSFORM
+	SELF.TransactionID	    := TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.EndUserCompanyName := TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.FirstName		    	:= TRIM(XMLTEXT('SearchBy/Name/First'));
+	SELF.LastName		    		:= TRIM(XMLTEXT('SearchBy/Name/Last'));
+	SELF.FullName			    	:= TRIM(XMLTEXT('SearchBy/Name/Full'));
+	SELF.SSN					    	:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/SSN'));
+	SELF.DOB					    	:= TRIM(XMLTEXT('SearchBy/DOB')) + Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/DOB/Year'), XMLTEXT('SearchBy/DOB/Month'), XMLTEXT('SearchBy/DOB/Day'));
+	SELF.Address			    	:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/Address/StreetAddress1'), XMLTEXT('SearchBy/Address/StreetAddress2'), XMLTEXT('SearchBy/Address/StreetNumber'), XMLTEXT('SearchBy/Address/StreetPreDirection'), XMLTEXT('SearchBy/Address/StreetName'),
+                                  XMLTEXT('SearchBy/Address/StreetSuffix'), XMLTEXT('SearchBy/Address/StreetPostDirection'), XMLTEXT('SearchBy/Address/UnitDesignation'), XMLTEXT('SearchBy/Address/UnitNumber'));
+	SELF.City					    	:= TRIM(XMLTEXT('SearchBy/Address/City'));
+	SELF.State				     	:= TRIM(XMLTEXT('SearchBy/Address/State'));
+	SELF.Zip					     	:= Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/Address/Zip5'));
+	SELF.DL						    	:= TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
+	SELF.HomePhone	    		:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/HomePhone'));
+	SELF.WorkPhone	    		:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/WorkPhone'));
+	
+	SELF := [];
+END;
+parsedInput_2 := PARSE(Logs_2, inputxml, parseInput2(), XML('InstantIDRequest'));
+OUTPUT(CHOOSEN(parsedInput_2, eyeball), NAMED('Sample_parsedInput_2'));
+LOGS_22 := JOIN(DISTRIBUTE(parsedInput_2, HASH64(TransactionID)), DISTRIBUTE(Logs_2, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
+Logs := Logs_11 + LOGS_22; //since the rawlog_1 has all the records, we only want the records with the correct XML tags we could link them to
 
 Risk_Reporting.Layouts.Parsed_InstantID_Layout parseOutput () := TRANSFORM
 	SELF.TransactionID	:= TRIM(XMLTEXT('Header/TransactionId')); // Forced into the record so I can join it all together
@@ -75,8 +116,9 @@ Risk_Reporting.Layouts.Parsed_InstantID_Layout parseOutput () := TRANSFORM
 
 	SELF := [];
 END;
-parsedOutputTemp := PARSE(Logs, outputxml, parseOutput(), XML('InstantID'));
-
+parsedOutputTemp_1 := PARSE(Logs_11, outputxml, parseOutput(), XML('InstantID'));
+parsedOutputTemp_2 := PARSE(Logs_22, outputxml, parseOutput(), XML('InstantID'));
+parsedOutputTemp:=parsedOutputTemp_1 + parsedOutputTemp_2;
 OUTPUT(CHOOSEN(parsedOutputTemp, eyeball), NAMED('Sample_Parsed_Output'));
 
 Risk_Reporting.Layouts.Parsed_InstantID_Layout normScores(Risk_Reporting.Layouts.Parsed_InstantID_Layout le, UNSIGNED1 t) := TRANSFORM
@@ -157,7 +199,8 @@ Risk_Reporting.Layouts.Parsed_InstantID_Layout combineParsedRecords(Risk_Reporti
 END;
 
 // Join the parsed input/output and then filter out the results where no model was requested or where this was an income estimated model and not a true RiskView model
-parsedRecordsTemp := JOIN(parsedInput, parsedOutput, LEFT.TransactionID = RIGHT.TransactionID, combineParsedRecords(LEFT, RIGHT), KEEP(1), ATMOST(RiskWise.max_atmost));
+parsedRecordsTemp_in := parsedInput_1+parsedInput_2 ;
+parsedRecordsTemp := JOIN(parsedRecordsTemp_in, parsedOutput, LEFT.TransactionID = RIGHT.TransactionID, combineParsedRecords(LEFT, RIGHT), KEEP(1), ATMOST(RiskWise.max_atmost));
 
 parsedRecords := JOIN(parsedRecordsTemp, Logs, LEFT.TransactionID = RIGHT.TransactionID, TRANSFORM(RECORDOF(LEFT), SELF.TransactionDate := RIGHT.TransactionDate; SELF.AccountID := RIGHT.AccountID; SELF := LEFT));
 
@@ -433,6 +476,8 @@ stats := JOIN(mainStats, uniqueIDs, LEFT.Date_Of_Report = RIGHT.Date_Of_Report, 
 MostRecent := SORT(stats, -Date_Of_Report); // Sort most recent dates to the front
 Oldest := SORT(stats, Date_Of_Report);
 
+output(Oldest,,'~SCOUTtemp::out::InstantID_yearstats_' + thorlib.wuid(),csv(heading(single),quote('"'))); 
+
 day1 := MostRecent[1];
 day2 := MostRecent[2];
 day3 := MostRecent[3];
@@ -442,6 +487,476 @@ day6 := MostRecent[6];
 day7 := MostRecent[7];
 
 OUTPUT(CHOOSEN(MostRecent, eyeball), NAMED('Sample_Stats'));
+
+// Handle generation of the CSV File
+csvHeading := (DATA)
+'Date_Of_Report,' + 
+'Total_Number_Of_Transactions,' + 
+'Number_Of_Unique_Account_IDs_Transacted,' + 
+'Percent_First_Name_Populated,' + 
+'Percent_Last_Name_Populated,' + 
+'Percent_Full_Name_Populated,' + 
+'Percent_SSN_Populated,' + 
+'Percent_DOB_Populated,' + 
+'Percent_Address_Populated,' + 
+'Percent_City_Populated,' + 
+'Percent_State_Populated,' + 
+'Percent_Zip_Populated,' + 
+'Percent_DL_Populated,' + 
+'Percent_Home_Phone_Populated,' + 
+'Percent_CVI_00,' + 
+'Percent_CVI_10,' + 
+'Percent_CVI_20,' + 
+'Percent_CVI_30,' + 
+'Percent_CVI_40,' + 
+'Percent_CVI_50,' + 
+'Percent_NAP_0,' + 
+'Percent_NAP_1,' + 
+'Percent_NAP_2,' + 
+'Percent_NAP_3,' + 
+'Percent_NAP_4,' + 
+'Percent_NAP_5,' + 
+'Percent_NAP_6,' + 
+'Percent_NAP_7,' + 
+'Percent_NAP_8,' + 
+'Percent_NAP_9,' + 
+'Percent_NAP_10,' + 
+'Percent_NAP_11,' + 
+'Percent_NAP_12,' + 
+'Percent_NAS_0,' + 
+'Percent_NAS_1,' + 
+'Percent_NAS_2,' + 
+'Percent_NAS_3,' + 
+'Percent_NAS_4,' + 
+'Percent_NAS_5,' + 
+'Percent_NAS_6,' + 
+'Percent_NAS_7,' + 
+'Percent_NAS_8,' + 
+'Percent_NAS_9,' + 
+'Percent_NAS_10,' + 
+'Percent_NAS_11,' + 
+'Percent_NAS_12,' + 
+'Percent_RC_01,' +
+'Percent_RC_02,' +
+'Percent_RC_03,' +
+'Percent_RC_04,' +
+'Percent_RC_05,' +
+'Percent_RC_06,' +
+'Percent_RC_07,' +
+'Percent_RC_08,' +
+'Percent_RC_09,' +
+'Percent_RC_10,' +
+'Percent_RC_11,' +
+'Percent_RC_12,' +
+'Percent_RC_13,' +
+'Percent_RC_14,' +
+'Percent_RC_15,' +
+'Percent_RC_16,' +
+'Percent_RC_17,' +
+'Percent_RC_19,' +
+'Percent_RC_20,' +
+'Percent_RC_21,' +
+'Percent_RC_22,' +
+'Percent_RC_23,' +
+'Percent_RC_24,' +
+'Percent_RC_25,' +
+'Percent_RC_26,' +
+'Percent_RC_27,' +
+'Percent_RC_28,' +
+'Percent_RC_29,' +
+'Percent_RC_30,' +
+'Percent_RC_31,' +
+'Percent_RC_32,' +
+'Percent_RC_33,' +
+'Percent_RC_34,' +
+'Percent_RC_35,' +
+'Percent_RC_36,' +
+'Percent_RC_37,' +
+'Percent_RC_38,' +
+'Percent_RC_39,' +
+'Percent_RC_40,' +
+'Percent_RC_41,' +
+'Percent_RC_42,' +
+'Percent_RC_43,' +
+'Percent_RC_44,' +
+'Percent_RC_45,' +
+'Percent_RC_46,' +
+'Percent_RC_47,' +
+'Percent_RC_48,' +
+'Percent_RC_49,' +
+'Percent_RC_50,' +
+'Percent_RC_51,' +
+'Percent_RC_52,' +
+'Percent_RC_53,' +
+'Percent_RC_54,' +
+'Percent_RC_55,' +
+'Percent_RC_56,' +
+'Percent_RC_57,' +
+'Percent_RC_58,' +
+'Percent_RC_59,' +
+'Percent_RC_5Q,' +
+'Percent_RC_60,' +
+'Percent_RC_61,' +
+'Percent_RC_62,' +
+'Percent_RC_63,' +
+'Percent_RC_64,' +
+'Percent_RC_65,' +
+'Percent_RC_66,' +
+'Percent_RC_67,' +
+'Percent_RC_68,' +
+'Percent_RC_69,' +
+'Percent_RC_70,' +
+'Percent_RC_71,' +
+'Percent_RC_72,' +
+'Percent_RC_73,' +
+'Percent_RC_74,' +
+'Percent_RC_75,' +
+'Percent_RC_76,' +
+'Percent_RC_77,' +
+'Percent_RC_78,' +
+'Percent_RC_79,' +
+'Percent_RC_80,' +
+'Percent_RC_81,' +
+'Percent_RC_82,' +
+'Percent_RC_83,' +
+'Percent_RC_84,' +
+'Percent_RC_85,' +
+'Percent_RC_86,' +
+'Percent_RC_87,' +
+'Percent_RC_88,' +
+'Percent_RC_89,' +
+'Percent_RC_90,' +
+'Percent_RC_91,' +
+'Percent_RC_92,' +
+'Percent_RC_93,' +
+'Percent_RC_94,' +
+'Percent_RC_95,' +
+'Percent_RC_96,' +
+'Percent_RC_97,' +
+'Percent_RC_98,' +
+'Percent_RC_99,' +
+'Percent_RC_9A,' +
+'Percent_RC_9B,' +
+'Percent_RC_9C,' +
+'Percent_RC_9D,' +
+'Percent_RC_9E,' +
+'Percent_RC_9F,' +
+'Percent_RC_9G,' +
+'Percent_RC_9H,' +
+'Percent_RC_9I,' +
+'Percent_RC_9J,' +
+'Percent_RC_9K,' +
+'Percent_RC_9L,' +
+'Percent_RC_9M,' +
+'Percent_RC_9N,' +
+'Percent_RC_9O,' +
+'Percent_RC_9P,' +
+'Percent_RC_9Q,' +
+'Percent_RC_9R,' +
+'Percent_RC_9S,' +
+'Percent_RC_9T,' +
+'Percent_RC_9U,' +
+'Percent_RC_9V,' +
+'Percent_RC_9W,' +
+'Percent_RC_9X,' +
+'Percent_RC_A0,' +
+'Percent_RC_A1,' +
+'Percent_RC_A2,' +
+'Percent_RC_A3,' +
+'Percent_RC_A4,' +
+'Percent_RC_A5,' +
+'Percent_RC_A6,' +
+'Percent_RC_A7,' +
+'Percent_RC_A8,' +
+'Percent_RC_A9,' +
+'Percent_RC_B0,' +
+'Percent_RC_BO,' +
+'Percent_RC_CL,' +
+'Percent_RC_CO,' +
+'Percent_RC_CR,' +
+'Percent_RC_CZ,' +
+'Percent_RC_DD,' +
+'Percent_RC_DF,' +
+'Percent_RC_DM,' +
+'Percent_RC_DV,' +
+'Percent_RC_EV,' +
+'Percent_RC_FB,' +
+'Percent_RC_FM,' +
+'Percent_RC_FQ,' +
+'Percent_RC_FR,' +
+'Percent_RC_FV,' +
+'Percent_RC_IA,' +
+'Percent_RC_IB,' +
+'Percent_RC_IC,' +
+'Percent_RC_ID,' +
+'Percent_RC_IE,' +
+'Percent_RC_IF,' +
+'Percent_RC_IG,' +
+'Percent_RC_IH,' +
+'Percent_RC_II,' +
+'Percent_RC_IJ,' +
+'Percent_RC_IK,' +
+'Percent_RC_IS,' +
+'Percent_RC_IT,' +
+'Percent_RC_MI,' +
+'Percent_RC_MN,' +
+'Percent_RC_MO,' +
+'Percent_RC_MS,' +
+'Percent_RC_PA,' +
+'Percent_RC_PO,' +
+'Percent_RC_PV,' +
+'Percent_RC_RS,' +
+'Percent_RC_SR,' +
+'Percent_RC_U1,' +
+'Percent_RC_U2,' +
+'Percent_RC_WL,' +
+'Percent_RC_ZI,' +
+'Percent_RC_CA,' +
+'Percent_RC_DI,' +
+'Percent_RC_NB,' +
+'Percent_RC_NF,' +
+'Percent_RC_SD,' +
+'Percent_RC_VA,' +
+'\r\n';
+attachmentLayout := RECORD
+	DATA thisRow;
+END;
+attachmentLayout getData(recordof (day1) le) := TRANSFORM
+thisRowS := (STRING)le.Date_Of_Report + ',' + 
+						(STRING)le.Total_Number_Of_Transactions + ',' +
+						(STRING)le.Number_Of_Unique_Account_IDs_Transacted + ',' +
+						(STRING)le.Percent_First_Name_Populated + ',' +
+						(STRING)le.Percent_Last_Name_Populated	 + ',' +
+						(STRING)le.Percent_Full_Name_Populated	 + ',' +
+						(STRING)le.Percent_SSN_Populated				 + ',' +
+						(STRING)le.Percent_DOB_Populated				 + ',' +
+						(STRING)le.Percent_Address_Populated		 + ',' +
+						(STRING)le.Percent_City_Populated			 + ',' +
+						(STRING)le.Percent_State_Populated			 + ',' +
+						(STRING)le.Percent_Zip_Populated				 + ',' +
+						(STRING)le.Percent_DL_Populated				 + ',' +
+						(STRING)le.Percent_Home_Phone_Populated + ',' +
+						(STRING)le.Percent_CVI_00 + ',' +
+						(STRING)le.Percent_CVI_10 + ',' +
+						(STRING)le.Percent_CVI_20 + ',' +
+						(STRING)le.Percent_CVI_30 + ',' +
+						(STRING)le.Percent_CVI_40 + ',' +
+						(STRING)le.Percent_CVI_50 + ',' +
+						(STRING)le.Percent_NAP_0 + ',' +
+						(STRING)le.Percent_NAP_1 + ',' +
+						(STRING)le.Percent_NAP_2 + ',' +
+						(STRING)le.Percent_NAP_3 + ',' +
+						(STRING)le.Percent_NAP_4 + ',' +
+						(STRING)le.Percent_NAP_5 + ',' +
+						(STRING)le.Percent_NAP_6 + ',' +
+						(STRING)le.Percent_NAP_7 + ',' +
+						(STRING)le.Percent_NAP_8 + ',' +
+						(STRING)le.Percent_NAP_9 + ',' +
+						(STRING)le.Percent_NAP_10 + ',' +
+						(STRING)le.Percent_NAP_11 + ',' +
+						(STRING)le.Percent_NAP_12 + ',' +
+						(STRING)le.Percent_NAS_0 + ',' +
+						(STRING)le.Percent_NAS_1 + ',' +
+						(STRING)le.Percent_NAS_2 + ',' +
+						(STRING)le.Percent_NAS_3 + ',' +
+						(STRING)le.Percent_NAS_4 + ',' +
+						(STRING)le.Percent_NAS_5 + ',' +
+						(STRING)le.Percent_NAS_6 + ',' +
+						(STRING)le.Percent_NAS_7 + ',' +
+						(STRING)le.Percent_NAS_8 + ',' +
+						(STRING)le.Percent_NAS_9 + ',' +
+						(STRING)le.Percent_NAS_10 + ',' +
+						(STRING)le.Percent_NAS_11 + ',' +
+						(STRING)le.Percent_NAS_12 + ',' +
+						(STRING)le.Percent_RC_01 + ',' +
+						(STRING)le.Percent_RC_02 + ',' +
+						(STRING)le.Percent_RC_03 + ',' +
+						(STRING)le.Percent_RC_04 + ',' +
+						(STRING)le.Percent_RC_05 + ',' +
+						(STRING)le.Percent_RC_06 + ',' +
+						(STRING)le.Percent_RC_07 + ',' +
+						(STRING)le.Percent_RC_08 + ',' +
+						(STRING)le.Percent_RC_09 + ',' +
+						(STRING)le.Percent_RC_10 + ',' +
+						(STRING)le.Percent_RC_11 + ',' +
+						(STRING)le.Percent_RC_12 + ',' +
+						(STRING)le.Percent_RC_13 + ',' +
+						(STRING)le.Percent_RC_14 + ',' +
+						(STRING)le.Percent_RC_15 + ',' +
+						(STRING)le.Percent_RC_16 + ',' +
+						(STRING)le.Percent_RC_17 + ',' +
+						(STRING)le.Percent_RC_19 + ',' +
+						(STRING)le.Percent_RC_20 + ',' +
+						(STRING)le.Percent_RC_21 + ',' +
+						(STRING)le.Percent_RC_22 + ',' +
+						(STRING)le.Percent_RC_23 + ',' +
+						(STRING)le.Percent_RC_24 + ',' +
+						(STRING)le.Percent_RC_25 + ',' +
+						(STRING)le.Percent_RC_26 + ',' +
+						(STRING)le.Percent_RC_27 + ',' +
+						(STRING)le.Percent_RC_28 + ',' +
+						(STRING)le.Percent_RC_29 + ',' +
+						(STRING)le.Percent_RC_30 + ',' +
+						(STRING)le.Percent_RC_31 + ',' +
+						(STRING)le.Percent_RC_32 + ',' +
+						(STRING)le.Percent_RC_33 + ',' +
+						(STRING)le.Percent_RC_34 + ',' +
+						(STRING)le.Percent_RC_35 + ',' +
+						(STRING)le.Percent_RC_36 + ',' +
+						(STRING)le.Percent_RC_37 + ',' +
+						(STRING)le.Percent_RC_38 + ',' +
+						(STRING)le.Percent_RC_39 + ',' +
+						(STRING)le.Percent_RC_40 + ',' +
+						(STRING)le.Percent_RC_41 + ',' +
+						(STRING)le.Percent_RC_42 + ',' +
+						(STRING)le.Percent_RC_43 + ',' +
+						(STRING)le.Percent_RC_44 + ',' +
+						(STRING)le.Percent_RC_45 + ',' +
+						(STRING)le.Percent_RC_46 + ',' +
+						(STRING)le.Percent_RC_47 + ',' +
+						(STRING)le.Percent_RC_48 + ',' +
+						(STRING)le.Percent_RC_49 + ',' +
+						(STRING)le.Percent_RC_50 + ',' +
+						(STRING)le.Percent_RC_51 + ',' +
+						(STRING)le.Percent_RC_52 + ',' +
+						(STRING)le.Percent_RC_53 + ',' +
+						(STRING)le.Percent_RC_54 + ',' +
+						(STRING)le.Percent_RC_55 + ',' +
+						(STRING)le.Percent_RC_56 + ',' +
+						(STRING)le.Percent_RC_57 + ',' +
+						(STRING)le.Percent_RC_58 + ',' +
+						(STRING)le.Percent_RC_59 + ',' +
+						(STRING)le.Percent_RC_5Q + ',' +
+						(STRING)le.Percent_RC_60 + ',' +
+						(STRING)le.Percent_RC_61 + ',' +
+						(STRING)le.Percent_RC_62 + ',' +
+						(STRING)le.Percent_RC_63 + ',' +
+						(STRING)le.Percent_RC_64 + ',' +
+						(STRING)le.Percent_RC_65 + ',' +
+						(STRING)le.Percent_RC_66 + ',' +
+						(STRING)le.Percent_RC_67 + ',' +
+						(STRING)le.Percent_RC_68 + ',' +
+						(STRING)le.Percent_RC_69 + ',' +
+						(STRING)le.Percent_RC_70 + ',' +
+						(STRING)le.Percent_RC_71 + ',' +
+						(STRING)le.Percent_RC_72 + ',' +
+						(STRING)le.Percent_RC_73 + ',' +
+						(STRING)le.Percent_RC_74 + ',' +
+						(STRING)le.Percent_RC_75 + ',' +
+						(STRING)le.Percent_RC_76 + ',' +
+						(STRING)le.Percent_RC_77 + ',' +
+						(STRING)le.Percent_RC_78 + ',' +
+						(STRING)le.Percent_RC_79 + ',' +
+						(STRING)le.Percent_RC_80 + ',' +
+						(STRING)le.Percent_RC_81 + ',' +
+						(STRING)le.Percent_RC_82 + ',' +
+						(STRING)le.Percent_RC_83 + ',' +
+						(STRING)le.Percent_RC_84 + ',' +
+						(STRING)le.Percent_RC_85 + ',' +
+						(STRING)le.Percent_RC_86 + ',' +
+						(STRING)le.Percent_RC_87 + ',' +
+						(STRING)le.Percent_RC_88 + ',' +
+						(STRING)le.Percent_RC_89 + ',' +
+						(STRING)le.Percent_RC_90 + ',' +
+						(STRING)le.Percent_RC_91 + ',' +
+						(STRING)le.Percent_RC_92 + ',' +
+						(STRING)le.Percent_RC_93 + ',' +
+						(STRING)le.Percent_RC_94 + ',' +
+						(STRING)le.Percent_RC_95 + ',' +
+						(STRING)le.Percent_RC_96 + ',' +
+						(STRING)le.Percent_RC_97 + ',' +
+						(STRING)le.Percent_RC_98 + ',' +
+						(STRING)le.Percent_RC_99 + ',' +
+						(STRING)le.Percent_RC_9A + ',' +
+						(STRING)le.Percent_RC_9B + ',' +
+						(STRING)le.Percent_RC_9C + ',' +
+						(STRING)le.Percent_RC_9D + ',' +
+						(STRING)le.Percent_RC_9E + ',' +
+						(STRING)le.Percent_RC_9F + ',' +
+						(STRING)le.Percent_RC_9G + ',' +
+						(STRING)le.Percent_RC_9H + ',' +
+						(STRING)le.Percent_RC_9I + ',' +
+						(STRING)le.Percent_RC_9J + ',' +
+						(STRING)le.Percent_RC_9K + ',' +
+						(STRING)le.Percent_RC_9L + ',' +
+						(STRING)le.Percent_RC_9M + ',' +
+						(STRING)le.Percent_RC_9N + ',' +
+						(STRING)le.Percent_RC_9O + ',' +
+						(STRING)le.Percent_RC_9P + ',' +
+						(STRING)le.Percent_RC_9Q + ',' +
+						(STRING)le.Percent_RC_9R + ',' +
+						(STRING)le.Percent_RC_9S + ',' +
+						(STRING)le.Percent_RC_9T + ',' +
+						(STRING)le.Percent_RC_9U + ',' +
+						(STRING)le.Percent_RC_9V + ',' +
+						(STRING)le.Percent_RC_9W + ',' +
+						(STRING)le.Percent_RC_9X + ',' +
+						(STRING)le.Percent_RC_A0 + ',' +
+						(STRING)le.Percent_RC_A1 + ',' +
+						(STRING)le.Percent_RC_A2 + ',' +
+						(STRING)le.Percent_RC_A3 + ',' +
+						(STRING)le.Percent_RC_A4 + ',' +
+						(STRING)le.Percent_RC_A5 + ',' +
+						(STRING)le.Percent_RC_A6 + ',' +
+						(STRING)le.Percent_RC_A7 + ',' +
+						(STRING)le.Percent_RC_A8 + ',' +
+						(STRING)le.Percent_RC_A9 + ',' +
+						(STRING)le.Percent_RC_B0 + ',' +
+						(STRING)le.Percent_RC_BO + ',' +
+						(STRING)le.Percent_RC_CL + ',' +
+						(STRING)le.Percent_RC_CO + ',' +
+						(STRING)le.Percent_RC_CR + ',' +
+						(STRING)le.Percent_RC_CZ + ',' +
+						(STRING)le.Percent_RC_DD + ',' +
+						(STRING)le.Percent_RC_DF + ',' +
+						(STRING)le.Percent_RC_DM + ',' +
+						(STRING)le.Percent_RC_DV + ',' +
+						(STRING)le.Percent_RC_EV + ',' +
+						(STRING)le.Percent_RC_FB + ',' +
+						(STRING)le.Percent_RC_FM + ',' +
+						(STRING)le.Percent_RC_FQ + ',' +
+						(STRING)le.Percent_RC_FR + ',' +
+						(STRING)le.Percent_RC_FV + ',' +
+						(STRING)le.Percent_RC_IA + ',' +
+						(STRING)le.Percent_RC_IB + ',' +
+						(STRING)le.Percent_RC_IC + ',' +
+						(STRING)le.Percent_RC_ID + ',' +
+						(STRING)le.Percent_RC_IE + ',' +
+						(STRING)le.Percent_RC_IF + ',' +
+						(STRING)le.Percent_RC_IG + ',' +
+						(STRING)le.Percent_RC_IH + ',' +
+						(STRING)le.Percent_RC_II + ',' +
+						(STRING)le.Percent_RC_IJ + ',' +
+						(STRING)le.Percent_RC_IK + ',' +
+						(STRING)le.Percent_RC_IS + ',' +
+						(STRING)le.Percent_RC_IT + ',' +
+						(STRING)le.Percent_RC_MI + ',' +
+						(STRING)le.Percent_RC_MN + ',' +
+						(STRING)le.Percent_RC_MO + ',' +
+						(STRING)le.Percent_RC_MS + ',' +
+						(STRING)le.Percent_RC_PA + ',' +
+						(STRING)le.Percent_RC_PO + ',' +
+						(STRING)le.Percent_RC_PV + ',' +
+						(STRING)le.Percent_RC_RS + ',' +
+						(STRING)le.Percent_RC_SR + ',' +
+						(STRING)le.Percent_RC_U1 + ',' +
+						(STRING)le.Percent_RC_U2 + ',' +
+						(STRING)le.Percent_RC_WL + ',' +
+						(STRING)le.Percent_RC_ZI + ',' +
+						(STRING)le.Percent_RC_CA + ',' +						
+						(STRING)le.Percent_RC_DI + ',' +						
+						(STRING)le.Percent_RC_NB + ',' +						
+						(STRING)le.Percent_RC_NF + ',' +						
+						(STRING)le.Percent_RC_SD + ',' +						
+						(STRING)le.Percent_RC_VA + ',' +	
+						'\r\n';
+	SELF.thisRow := (DATA)thisRowS;
+END;
+rowified := PROJECT(day1, getData(LEFT));
+
+attachment := csvHeading + rowified.thisRow;
+// End of the CSV File Generation
+
 
 averageTrackingLayout := RECORD
 	// General Statistics
@@ -1704,8 +2219,13 @@ OUTPUT(emailBody, NAMED('E_Mail_Body'));
 
 subject := 'Instant ID Daily Monitor';
 
-FileServices.SendEmail(Risk_Reporting.Constants.emailv2InstantIDReportsTo, subject,
+FileServices.SendEmailAttachData(Risk_Reporting.Constants.emailv2InstantIDReportsTo, subject,
 																		emailBody,
+																		(DATA)attachment,
+																		'text/csv',
+																		'InstantID Daily Stats - ' + ut.getDate + '.csv',
 																		GETENV('SMTPserver'),
 																		(UNSIGNED4)GETENV('SMTPport', '25'),
-																		'ThorReport@lexisnexis.com');		
+																		'ThorReport@lexisnexis.com');
+
+	
