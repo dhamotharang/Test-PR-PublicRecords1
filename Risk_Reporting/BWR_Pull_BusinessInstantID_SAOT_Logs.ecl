@@ -1,4 +1,4 @@
-#workunit('name', 'Business_Instant_ID_Pull_SAOT_Logs');
+﻿#workunit('name', 'Business_Instant_ID_Pull_SAOT_Logs');
 
 IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT;
 
@@ -14,13 +14,11 @@ outputFile := '~bpahl::out::Business_InstantID_SAOT_' + BeginDate + '-' + EndDat
 LogFile := Score_Logs.Key_ScoreLogs_XMLTransactionID;
 
 // The files are exported from MySQL the following day, which means the data isn't loaded to THOR until 2 days after.
-LogsRaw := IF(AccountIDs[1] != '', DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['BUSINESSINSTANTID'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND customer_id IN AccountIDs AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs))),
+LogsRaw_1 := IF(AccountIDs[1] != '', DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['BUSINESSINSTANTID'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND customer_id IN AccountIDs AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs))),
 																	 DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['BUSINESSINSTANTID'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs))));
 
-linerec := {STRING line};
-
 // In order to join the parsed input and output together I need to force the transaction id into the inputxml, and I needed a root XML node for the outputxml.  This seemed like the most reasonable way to do that.
-Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+Logs_1 := PROJECT(LogsRaw_1, TRANSFORM({RECORDOF(LogsRaw_1), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
 																		SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<BusinessInstantID>', '<BusinessInstantID><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>');
 																		SELF.outputxml := '<BusinessInstantID>' + LEFT.outputxml + '</BusinessInstantID>';
 																		SELF.TransactionID := LEFT.Transaction_ID;
@@ -28,7 +26,7 @@ Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, S
 																		SELF.TransactionDate := LEFT.DateTime[1..8];
 																		SELF := LEFT));
 																												
-OUTPUT(CHOOSEN(Logs, eyeball), NAMED('Sample_Yesterday_Logs'));
+OUTPUT(CHOOSEN(Logs_1 , eyeball), NAMED('Sample_Yesterday_Logs_1'));
 
 Risk_Reporting.Layouts.Parsed_BusinessIID_Layout parseInput () := TRANSFORM
 	SELF.TransactionID				:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
@@ -54,9 +52,54 @@ Risk_Reporting.Layouts.Parsed_BusinessIID_Layout parseInput () := TRANSFORM
 	
 	SELF := [];
 END;
-parsedInput := DISTRIBUTE(PARSE(Logs, inputxml, parseInput(), XML('BusinessInstantID')), HASH64(TransactionID));
+parsedInput_1 := DISTRIBUTE(PARSE(Logs_1, inputxml, parseInput(), XML('BusinessInstantID')), HASH64(TransactionID));
+OUTPUT(CHOOSEN(parsedInput_1, eyeball), NAMED('Sample_Parsed_Input_1'));
+LOGS_11 := JOIN(DISTRIBUTE(parsedInput_1, HASH64(TransactionID)), DISTRIBUTE(Logs_1, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
 
-OUTPUT(CHOOSEN(parsedInput, eyeball), NAMED('Sample_Parsed_Input'));
+//new xml tags for request
+Logs_2 := PROJECT(LogsRaw_1, TRANSFORM({RECORDOF(LogsRaw_1), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+																		SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<BusinessInstantIDRequest>', '<BusinessInstantIDRequest><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>');
+																		SELF.outputxml := '<BusinessInstantID>' + LEFT.outputxml + '</BusinessInstantID>';
+																		SELF.TransactionID := LEFT.Transaction_ID;
+																		SELF.AccountID := LEFT.customer_id;
+																		SELF.TransactionDate := LEFT.DateTime[1..8];
+																		SELF := LEFT));
+																												
+OUTPUT(CHOOSEN(Logs_2, eyeball), NAMED('Sample_Yesterday_Logs_2'));
+
+Risk_Reporting.Layouts.Parsed_BusinessIID_Layout parseInput_2 () := TRANSFORM
+	SELF.TransactionID				:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.EndUserCompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.CompanyName					:= TRIM(XMLTEXT('SearchBy/CompanyName'));
+	SELF.CompanyAddress				:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/CompanyAddress/StreetAddress1'), XMLTEXT('SearchBy/CompanyAddress/StreetAddress2'));
+	SELF.CompanyCity					:= TRIM(XMLTEXT('SearchBy/CompanyAddress/City'));
+	SELF.CompanyState					:= TRIM(XMLTEXT('SearchBy/CompanyAddress/State'));
+	SELF.CompanyZIP						:= Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/CompanyAddress/Zip5'));
+	SELF.FEIN									:= TRIM(XMLTEXT('SearchBy/FEIN'));
+	SELF.CompanyPhone10				:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/CompanyPhone'));
+	SELF.RepFirstName					:= TRIM(XMLTEXT('SearchBy/AuthorizedRepresentative/Name/First'));
+	SELF.RepLastName					:= TRIM(XMLTEXT('SearchBy/AuthorizedRepresentative/Name/Last'));
+	SELF.RepSSN								:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/AuthorizedRepresentative/SSN'));
+	SELF.RepDOB								:= Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/AuthorizedRepresentative/DOB/Year'), XMLTEXT('SearchBy/AuthorizedRepresentative/DOB/Month'), XMLTEXT('SearchBy/AuthorizedRepresentative/DOB/Day'));
+	SELF.RepAddress						:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/AuthorizedRepresentative/Address/StreetAddress1'), XMLTEXT('SearchBy/AuthorizedRepresentative/Address/StreetAddress2'));
+	SELF.RepCity							:= TRIM(XMLTEXT('SearchBy/AuthorizedRepresentative/Address/City'));
+	SELF.RepState							:= TRIM(XMLTEXT('SearchBy/AuthorizedRepresentative/Address/State'));
+	SELF.RepZip								:= Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/AuthorizedRepresentative/Address/Zip5'));
+	SELF.RepDL								:= TRIM(XMLTEXT('SearchBy/AuthorizedRepresentative/DriverLicenseNumber'));
+	SELF.RepDLState						:= TRIM(XMLTEXT('SearchBy/AuthorizedRepresentative/DriverLicenseState'));
+	SELF.RepPhone10						:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/AuthorizedRepresentative/Phone10'));
+	
+	SELF := [];
+END;
+parsedInput_2 := DISTRIBUTE(PARSE(Logs_2, inputxml, parseInput_2(), XML('BusinessInstantIDRequest')), HASH64(TransactionID));
+OUTPUT(CHOOSEN(parsedInput_2, eyeball), NAMED('Sample_Parsed_Input_2'));
+
+LOGS_22 := JOIN(DISTRIBUTE(parsedInput_2, HASH64(TransactionID)), DISTRIBUTE(Logs_2, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
+Logs := Logs_11 + LOGS_22; //since the rawlog_1 has all the records, we only want the records with the correct XML tags we could link them to
 
 Risk_Reporting.Layouts.Parsed_BusinessIID_Layout parseOutput () := TRANSFORM
 	SELF.TransactionID	:= TRIM(XMLTEXT('Header/TransactionId')); // Forced into the record so I can join it all together
@@ -147,8 +190,9 @@ Risk_Reporting.Layouts.Parsed_BusinessIID_Layout parseOutput () := TRANSFORM
 
 	SELF := [];
 END;
-parsedOutput := PARSE(Logs, outputxml, parseOutput(), XML('BusinessInstantID'));
-
+parsedOutputTemp_1 := PARSE(Logs_11, outputxml, parseOutput(), XML('BusinessInstantID'));
+parsedOutputTemp_2 := PARSE(Logs_22, outputxml, parseOutput(), XML('BusinessInstantID'));
+parsedOutput := parsedOutputTemp_1 + parsedOutputTemp_2;
 OUTPUT(CHOOSEN(parsedOutput, eyeball), NAMED('Sample_Parsed_Output'));
 
 Risk_Reporting.Layouts.Parsed_BusinessIID_Layout combineParsedRecords(Risk_Reporting.Layouts.Parsed_BusinessIID_Layout le, Risk_Reporting.Layouts.Parsed_BusinessIID_Layout ri) := TRANSFORM
@@ -237,7 +281,8 @@ Risk_Reporting.Layouts.Parsed_BusinessIID_Layout combineParsedRecords(Risk_Repor
 END;
 
 // Join the parsed input/output and then filter out the results where no model was requested or where this was an income estimated model and not a true RiskView model
-parsedRecordsTemp := JOIN(DISTRIBUTE(parsedInput, HASH64(TransactionID)), DISTRIBUTE(parsedOutput, HASH64(TransactionID)), LEFT.TransactionID = RIGHT.TransactionID, combineParsedRecords(LEFT, RIGHT), KEEP(1), ATMOST(RiskWise.max_atmost), LOCAL);
+parsedRecordsTemp_in := parsedInput_1+parsedInput_2;
+parsedRecordsTemp := JOIN(DISTRIBUTE(parsedRecordsTemp_in, HASH64(TransactionID)), DISTRIBUTE(parsedOutput, HASH64(TransactionID)), LEFT.TransactionID = RIGHT.TransactionID, combineParsedRecords(LEFT, RIGHT), KEEP(1), ATMOST(RiskWise.max_atmost), LOCAL);
 
 parsedRecords := JOIN(DISTRIBUTE(parsedRecordsTemp, HASH64(TransactionID)), DISTRIBUTE(Logs, HASH64(TransactionID)), LEFT.TransactionID = RIGHT.TransactionID, TRANSFORM(RECORDOF(LEFT), SELF.TransactionDate := RIGHT.TransactionDate; SELF.AccountID := RIGHT.AccountID; SELF := LEFT), LOCAL);
 
@@ -249,7 +294,8 @@ finalRecords := SORT(DISTRIBUTE(parsedRecords, HASH64(AccountID, TransactionDate
 OUTPUT(CHOOSEN(finalRecords, eyeball), NAMED('Sample_Final_Records'));
 
 OUTPUT(finalRecords,, outputFile + '_' + ThorLib.Wuid() + '.csv', CSV(HEADING(single), QUOTE('"')), EXPIRE(30), OVERWRITE);
-
+// table(finalRecords(AccountID = '1488800' and TransactionDate between BeginDate and enddate), {TransactionDate,  cnt := count(group)}, TransactionDate,  few);
+  
 /* ***********************************************************************************************
  *************************************************************************************************
  *             MODIFY EVERYTHING BELOW AS NEEDED TO PERFORM SAOT ANALYSIS                        *

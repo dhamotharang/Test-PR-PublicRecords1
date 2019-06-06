@@ -1,7 +1,7 @@
-#workunit('name', 'Scoring_Account_Monitoring');
+﻿#workunit('name', 'Scoring_Account_Monitoring');
 
-#option('allowedClusters', 'thor400_20,thor400_30,thor400_60'); // This workunit can run on these clusters
-#option('AllowAutoSwitchQueue', TRUE); // If the current queue is full, use an available cluster from above
+// #option('allowedClusters', 'thor400_20,thor400_44,thor400_60'); // This workunit can run on these clusters
+// #option('AllowAutoQueueSwitch', TRUE); // If the current queue is full, use an available cluster from above
 
 IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT;
 
@@ -42,24 +42,24 @@ LogFile := Score_Logs.Key_ScoreLogs_XMLTransactionID;
 LogFileFCRA := Score_Logs.Key_FCRA_ScoreLogs_XMLTransactionID;
 
 Parsed_Layout := RECORD
-	STRING30	Product				:= ''; // Such as INSTANTID, RISKVIEW, FRAUDPOINT
-	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
-	STRING30	AccountID			:= '';
-	STRING30	LoginID				:= '';
-	STRING8		TransactionDate := '';
-	STRING150	CompanyName		:= '';
-	STRING30	FirstName			:= '';
-	STRING30	LastName			:= '';
-	STRING90	FullName			:= '';
-	STRING9		SSN						:= '';
-	STRING8		DOB						:= '';
-	STRING120	Address				:= '';
-	STRING25	City					:= '';
-	STRING2		State					:= '';
-	STRING9		Zip						:= '';
-	STRING20	DL						:= '';
-	STRING10	HomePhone			:= '';
-	STRING10	WorkPhone			:= '';
+	STRING30	Product				      := ''; // Such as INSTANTID, RISKVIEW, FRAUDPOINT
+	STRING30	TransactionID	      := ''; // Forced into the record so I can join it all together
+	STRING30	AccountID			      := '';
+	STRING30	LoginID				      := '';
+	STRING8		TransactionDate     := '';
+	STRING150	EndUserCompanyName  := '';
+	STRING30	FirstName		      	:= '';
+	STRING30	LastName		      	:= '';
+	STRING90	FullName		      	:= '';
+	STRING9		SSN					      	:= '';
+	STRING8		DOB				      		:= '';
+	STRING120	Address		      		:= '';
+	STRING25	City				      	:= '';
+	STRING2		State				      	:= '';
+	STRING9		Zip				      		:= '';
+	STRING20	DL				      		:= '';
+	STRING10	HomePhone	      		:= '';
+	STRING10	WorkPhone	      		:= '';
 END;
 
 RVLogsRaw := DISTRIBUTE(PULL(LogFileFCRA (StringLib.StringToUpperCase(TRIM(Product)) IN ['RISKVIEW', 'RISKVIEWATTRIBUTES'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins)));
@@ -78,26 +78,26 @@ RVLogs := PROJECT(RVLogsRaw, TRANSFORM({RECORDOF(RVLogsRaw) - outputxml, STRING3
 // OUTPUT(CHOOSEN(RVLogs, eyeball), NAMED('Sample_Raw_RV_Logs'));
 
 Parsed_Layout parseRVInput () := TRANSFORM
-	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
-	SELF.CompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
-	SELF.FirstName			:= TRIM(XMLTEXT('SearchBy/Name/First'));
-	SELF.LastName				:= TRIM(XMLTEXT('SearchBy/Name/Last'));
-	SELF.SSN						:= TRIM(XMLTEXT('SearchBy/SSN'));
-	DOBMonthTemp := TRIM(XMLTEXT('SearchBy/DOB/Month'));
-	DOBMonth := INTFORMAT((INTEGER)DOBMonthTemp, 2, 1);
-	DOBDayTemp := TRIM(XMLTEXT('SearchBy/DOB/Day'));
-	DOBDay := INTFORMAT((INTEGER)DOBDayTemp, 2, 1);
-	DOBYear := TRIM(XMLTEXT('SearchBy/DOB/Year'));
-	DOB := TRIM(XMLTEXT('SearchBy/DOB'));
-	DOBCombined := DOB + IF((INTEGER)DOBYear = 0 OR (INTEGER)DOBMonth = 0 OR (INTEGER)DOBDay = 0, '', DOBYear + DOBMonth + DOBDay); // Make sure YYYYMMDD are populated, if not, blank it out
-	SELF.DOB						:=  DOBCombined;
-	SELF.Address				:= TRIM(XMLTEXT('SearchBy/Address/StreetNumber')) + TRIM(XMLTEXT('SearchBy/Address/StreetAddress1')); // Catch if it is full or parsed
-	SELF.City						:= TRIM(XMLTEXT('SearchBy/Address/City'));
-	SELF.State					:= TRIM(XMLTEXT('SearchBy/Address/State'));
-	SELF.Zip						:= TRIM(XMLTEXT('SearchBy/Address/Zip5')) + TRIM(XMLTEXT('SearchBy/Address/Zip4'));
-	SELF.DL							:= TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
-	SELF.HomePhone			:= TRIM(XMLTEXT('SearchBy/HomePhone'));
-	SELF.WorkPhone			:= TRIM(XMLTEXT('SearchBy/WorkPhone'));
+	SELF.TransactionID	    := TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.EndUserCompanyName := TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.FirstName	    		:= TRIM(XMLTEXT('SearchBy/Name/First'));
+	SELF.LastName			    	:= TRIM(XMLTEXT('SearchBy/Name/Last'));
+	SELF.SSN			    			:= TRIM(XMLTEXT('SearchBy/SSN'));
+	DOBMonthTemp            := TRIM(XMLTEXT('SearchBy/DOB/Month'));
+	DOBMonth                := INTFORMAT((INTEGER)DOBMonthTemp, 2, 1);
+	DOBDayTemp              := TRIM(XMLTEXT('SearchBy/DOB/Day'));
+	DOBDay                  := INTFORMAT((INTEGER)DOBDayTemp, 2, 1);
+	DOBYear                 := TRIM(XMLTEXT('SearchBy/DOB/Year'));
+	DOB                     := TRIM(XMLTEXT('SearchBy/DOB'));
+	DOBCombined             := DOB + IF((INTEGER)DOBYear = 0 OR (INTEGER)DOBMonth = 0 OR (INTEGER)DOBDay = 0, '', DOBYear + DOBMonth + DOBDay); // Make sure YYYYMMDD are populated, if not, blank it out
+	SELF.DOB						    :=  DOBCombined;
+	SELF.Address				    := TRIM(XMLTEXT('SearchBy/Address/StreetNumber')) + TRIM(XMLTEXT('SearchBy/Address/StreetAddress1')); // Catch if it is full or parsed
+	SELF.City						    := TRIM(XMLTEXT('SearchBy/Address/City'));
+	SELF.State				  	  := TRIM(XMLTEXT('SearchBy/Address/State'));
+	SELF.Zip						    := TRIM(XMLTEXT('SearchBy/Address/Zip5')) + TRIM(XMLTEXT('SearchBy/Address/Zip4'));
+	SELF.DL							    := TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
+	SELF.HomePhone			    := TRIM(XMLTEXT('SearchBy/HomePhone'));
+	SELF.WorkPhone			    := TRIM(XMLTEXT('SearchBy/WorkPhone'));
 	
 	SELF := [];
 END;
@@ -118,27 +118,27 @@ IIDLogs := PROJECT(IIDLogsRaw, TRANSFORM({RECORDOF(IIDLogsRaw) - outputxml, STRI
 // OUTPUT(CHOOSEN(IIDLogs, eyeball), NAMED('Sample_Raw_IID_Logs'));
 
 Parsed_Layout parseIIDInput () := TRANSFORM
-	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
-	SELF.CompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
-	SELF.FirstName			:= TRIM(XMLTEXT('SearchBy/Name/First'));
-	SELF.LastName				:= TRIM(XMLTEXT('SearchBy/Name/Last'));
-	SELF.FullName				:= TRIM(XMLTEXT('SearchBy/Name/Full'));
-	SELF.SSN						:= TRIM(XMLTEXT('SearchBy/SSN'));
-	DOBMonthTemp := TRIM(XMLTEXT('SearchBy/DOB/Month'));
-	DOBMonth := INTFORMAT((INTEGER)DOBMonthTemp, 2, 1);
-	DOBDayTemp := TRIM(XMLTEXT('SearchBy/DOB/Day'));
-	DOBDay := INTFORMAT((INTEGER)DOBDayTemp, 2, 1);
-	DOBYear := TRIM(XMLTEXT('SearchBy/DOB/Year'));
-	DOB := TRIM(XMLTEXT('SearchBy/DOB'));
-	DOBCombined := DOB + IF((INTEGER)DOBYear = 0 OR (INTEGER)DOBMonth = 0 OR (INTEGER)DOBDay = 0, '', DOBYear + DOBMonth + DOBDay); // Make sure YYYYMMDD are populated, if not, blank it out
-	SELF.DOB						:=  DOBCombined;
-	SELF.Address				:= TRIM(XMLTEXT('SearchBy/Address/StreetNumber')) + TRIM(XMLTEXT('SearchBy/Address/StreetAddress1')); // Catch if it is full or parsed
-	SELF.City						:= TRIM(XMLTEXT('SearchBy/Address/City'));
-	SELF.State					:= TRIM(XMLTEXT('SearchBy/Address/State'));
-	SELF.Zip						:= TRIM(XMLTEXT('SearchBy/Address/Zip5')) + TRIM(XMLTEXT('SearchBy/Address/Zip4'));
-	SELF.DL							:= TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
-	SELF.HomePhone			:= TRIM(XMLTEXT('SearchBy/HomePhone'));
-	SELF.WorkPhone			:= TRIM(XMLTEXT('SearchBy/WorkPhone'));
+	SELF.TransactionID      := TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.EndUserCompanyName	:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.FirstName			    := TRIM(XMLTEXT('SearchBy/Name/First'));
+	SELF.LastName			  	  := TRIM(XMLTEXT('SearchBy/Name/Last'));
+	SELF.FullName				    := TRIM(XMLTEXT('SearchBy/Name/Full'));
+	SELF.SSN						    := TRIM(XMLTEXT('SearchBy/SSN'));
+	DOBMonthTemp            := TRIM(XMLTEXT('SearchBy/DOB/Month'));
+	DOBMonth                := INTFORMAT((INTEGER)DOBMonthTemp, 2, 1);
+	DOBDayTemp              := TRIM(XMLTEXT('SearchBy/DOB/Day'));
+	DOBDay                  := INTFORMAT((INTEGER)DOBDayTemp, 2, 1);
+	DOBYear                 := TRIM(XMLTEXT('SearchBy/DOB/Year'));
+	DOB                     := TRIM(XMLTEXT('SearchBy/DOB'));
+	DOBCombined             := DOB + IF((INTEGER)DOBYear = 0 OR (INTEGER)DOBMonth = 0 OR (INTEGER)DOBDay = 0, '', DOBYear + DOBMonth + DOBDay); // Make sure YYYYMMDD are populated, if not, blank it out
+	SELF.DOB						    :=  DOBCombined;
+	SELF.Address				    := TRIM(XMLTEXT('SearchBy/Address/StreetNumber')) + TRIM(XMLTEXT('SearchBy/Address/StreetAddress1')); // Catch if it is full or parsed
+	SELF.City						    := TRIM(XMLTEXT('SearchBy/Address/City'));
+	SELF.State					    := TRIM(XMLTEXT('SearchBy/Address/State'));
+	SELF.Zip						    := TRIM(XMLTEXT('SearchBy/Address/Zip5')) + TRIM(XMLTEXT('SearchBy/Address/Zip4'));
+	SELF.DL							    := TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
+	SELF.HomePhone		    	:= TRIM(XMLTEXT('SearchBy/HomePhone'));
+	SELF.WorkPhone		    	:= TRIM(XMLTEXT('SearchBy/WorkPhone'));
 	
 	SELF := [];
 END;
@@ -160,26 +160,26 @@ FPLogs := PROJECT(FPLogsRaw, TRANSFORM({RECORDOF(FPLogsRaw) - outputxml, STRING3
 // OUTPUT(CHOOSEN(FPLogs, eyeball), NAMED('Sample_Raw_FP_Logs'));
 
 Parsed_Layout parseFPInput () := TRANSFORM
-	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
-	SELF.CompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
-	SELF.FirstName			:= TRIM(XMLTEXT('SearchBy/Name/First'));
-	SELF.LastName				:= TRIM(XMLTEXT('SearchBy/Name/Last'));
-	SELF.SSN						:= TRIM(XMLTEXT('SearchBy/SSN'));
-	DOBMonthTemp := TRIM(XMLTEXT('SearchBy/DOB/Month'));
-	DOBMonth := INTFORMAT((INTEGER)DOBMonthTemp, 2, 1);
-	DOBDayTemp := TRIM(XMLTEXT('SearchBy/DOB/Day'));
-	DOBDay := INTFORMAT((INTEGER)DOBDayTemp, 2, 1);
-	DOBYear := TRIM(XMLTEXT('SearchBy/DOB/Year'));
-	DOB := TRIM(XMLTEXT('SearchBy/DOB'));
-	DOBCombined := DOB + IF((INTEGER)DOBYear = 0 OR (INTEGER)DOBMonth = 0 OR (INTEGER)DOBDay = 0, '', DOBYear + DOBMonth + DOBDay); // Make sure YYYYMMDD are populated, if not, blank it out
-	SELF.DOB						:=  DOBCombined;
-	SELF.Address				:= TRIM(XMLTEXT('SearchBy/Address/StreetNumber')) + TRIM(XMLTEXT('SearchBy/Address/StreetAddress1')); // Catch if it is full or parsed
-	SELF.City						:= TRIM(XMLTEXT('SearchBy/Address/City'));
-	SELF.State					:= TRIM(XMLTEXT('SearchBy/Address/State'));
-	SELF.Zip						:= TRIM(XMLTEXT('SearchBy/Address/Zip5')) + TRIM(XMLTEXT('SearchBy/Address/Zip4'));
-	SELF.DL							:= TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
-	SELF.HomePhone			:= TRIM(XMLTEXT('SearchBy/Phone10'));
-	SELF.WorkPhone			:= TRIM(XMLTEXT('SearchBy/WPhone10'));
+	SELF.TransactionID	    := TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.EndUserCompanyName	:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.FirstName			    := TRIM(XMLTEXT('SearchBy/Name/First'));
+	SELF.LastName				    := TRIM(XMLTEXT('SearchBy/Name/Last'));
+	SELF.SSN						    := TRIM(XMLTEXT('SearchBy/SSN'));
+	DOBMonthTemp            := TRIM(XMLTEXT('SearchBy/DOB/Month'));
+	DOBMonth                := INTFORMAT((INTEGER)DOBMonthTemp, 2, 1);
+	DOBDayTemp              := TRIM(XMLTEXT('SearchBy/DOB/Day'));
+	DOBDay                  := INTFORMAT((INTEGER)DOBDayTemp, 2, 1);
+	DOBYear                 := TRIM(XMLTEXT('SearchBy/DOB/Year'));
+	DOB                     := TRIM(XMLTEXT('SearchBy/DOB'));
+	DOBCombined             := DOB + IF((INTEGER)DOBYear = 0 OR (INTEGER)DOBMonth = 0 OR (INTEGER)DOBDay = 0, '', DOBYear + DOBMonth + DOBDay); // Make sure YYYYMMDD are populated, if not, blank it out
+	SELF.DOB						    :=  DOBCombined;
+	SELF.Address				    := TRIM(XMLTEXT('SearchBy/Address/StreetNumber')) + TRIM(XMLTEXT('SearchBy/Address/StreetAddress1')); // Catch if it is full or parsed
+	SELF.City						    := TRIM(XMLTEXT('SearchBy/Address/City'));
+	SELF.State					    := TRIM(XMLTEXT('SearchBy/Address/State'));
+	SELF.Zip						    := TRIM(XMLTEXT('SearchBy/Address/Zip5')) + TRIM(XMLTEXT('SearchBy/Address/Zip4'));
+	SELF.DL						    	:= TRIM(XMLTEXT('SearchBy/DriverLicenseNumber'));
+	SELF.HomePhone		    	:= TRIM(XMLTEXT('SearchBy/Phone10'));
+	SELF.WorkPhone		    	:= TRIM(XMLTEXT('SearchBy/WPhone10'));
 	
 	SELF := [];
 END;
