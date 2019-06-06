@@ -28,6 +28,14 @@ Co_Pattern  := '( AND | ASSOCIATES|ASSOCIATION| PC$| OF | PLLC$| PLC$| PA$| FIRM
 							 'FANNIE MAE| UNION| AUTHORITY|COUNTY|^FNMA|CONDOMINIUM|AMERICA|BUSINESS|COMMUNITIES|SCHOOL| LOAN|CERTIFICATE|FEDERAL| FUND| CHURCH|'+
 							 ' BRANCH| FCU$| PROFIT|PRIVATE|COMMERCIAL|ANNUNITY|FIRST| CNTY$)';
 invalid_Pattern := '(NOT PROVIDED|NOT GIVEN|NO PROVIDED| NONE|(NOT P\\[ROVIDED)|(NOT \\[PROVIDED)|(NOT PROVIDED \\|))';
+DBApattern	:= '^(.*)(DBA - |/ DBA | DBA/|DBA | DBA:|D/B/A:| D/B/A |D/B/A | DBA| D/B/A|C/O |C/0 |ATTN:|ATT:|ATTN - |ATTN |ATTENTION:|ATN:| A/K/A | A/K/A|T/A | F/K/A )(.*)';
+
+//Get name w/o DBA/AKA name from name field
+ varstring GetName(string dname)	:= FUNCTION
+				string uppername	:= STD.Str.ToUpperCase(dname);
+				string temp_name	:= regexfind(DBApattern,uppername,1);
+				return STD.Str.CleanSpaces(trim(temp_name,left,right));
+END;
 
 // Normalized Name records
 Layout_BK.CleanFields_REO t_norm_reo (Layout_BK.Base_Reo_ext  le, INTEGER C) := TRANSFORM
@@ -40,27 +48,27 @@ Layout_BK.CleanFields_REO t_norm_reo (Layout_BK.Base_Reo_ext  le, INTEGER C) := 
 	trim_seller_fname2     := ut.CleanSpacesAndUpper(le.seller2_fname);
 	trim_seller_lname2     := ut.CleanSpacesAndUpper(le.seller2_lname);	
 
-	buyer_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname1) AND NOT REGEXFIND('[0-9/]', trim_buyer_fname1) 
+	buyer_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname1)
 													AND trim_buyer_fname1 != '',REGEXREPLACE('=',trim_buyer_fname1,' '),'');
-	buyer_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname1) AND NOT REGEXFIND('[0-9/]', trim_buyer_lname1) 
+	buyer_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname1) 
 													AND trim_buyer_lname1 != '',REGEXREPLACE('=',trim_buyer_lname1,' '),'');
-	buyer_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname2) AND NOT REGEXFIND('[0-9/]', trim_buyer_fname2) 
+	buyer_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_fname2) 
 													AND trim_buyer_fname2 != '',REGEXREPLACE('=',trim_buyer_fname2,' '),'');
-	buyer_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname2) AND NOT REGEXFIND('[0-9/]', trim_buyer_lname2) 
+	buyer_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_buyer_lname2) 
 													AND trim_buyer_lname2 != '',REGEXREPLACE('=',trim_buyer_lname2,' '),'');  
-	seller_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname1) AND NOT REGEXFIND('[0-9/]', trim_seller_fname1) 
+	seller_fname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname1)
 													AND trim_seller_fname1 != '',REGEXREPLACE('=',trim_seller_fname1,' '),'');
-	seller_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname1) AND NOT REGEXFIND('[0-9/]', trim_seller_lname1) 
+	seller_lname1	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname1) 
 													AND trim_seller_lname1 != '',REGEXREPLACE('=',trim_seller_lname1,' '),'');
-	seller_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname2) AND NOT REGEXFIND('[0-9/]', trim_seller_fname2) 
+	seller_fname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_fname2) 
 													AND trim_seller_fname2 != '',REGEXREPLACE('=',trim_seller_fname2,' '),'');
-	seller_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname2) AND NOT REGEXFIND('[0-9/]', trim_seller_lname2) 
+	seller_lname2	    := IF(NOT REGEXFIND(invalid_pattern, trim_seller_lname2) 
 													AND trim_seller_lname2 != '',REGEXREPLACE('=',trim_seller_lname2,' '),'');  
 																																		
 	SELF.Name_First   := CHOOSE(C,buyer_fname1,buyer_fname2,seller_fname1,seller_fname2);
 	SELF.Name_Last		:= CHOOSE(C,buyer_lname1,buyer_lname2,seller_lname1,seller_lname2);
 	SELF.name_type    := CHOOSE(C,'B1','B2','S1','S2'); 
-	SELF.NAME_FULL    := STD.Str.CleanSpaces(TRIM(SELF.NAME_FIRST,LEFT,RIGHT)+' '+TRIM(SELF.NAME_LAST,LEFT,RIGHT));
+	SELF.NAME_FULL    := GetName(STD.Str.CleanSpaces(TRIM(SELF.NAME_FIRST,LEFT,RIGHT)+' '+TRIM(SELF.NAME_LAST,LEFT,RIGHT)));
 	prop_full_addr        := ut.CleanSpacesAndUpper(le.prop_full_addr);
 	prop_addr_city        := ut.CleanSpacesAndUpper(le.prop_addr_city);
 	prop_addr_state       := ut.CleanSpacesAndUpper(le.prop_addr_state);

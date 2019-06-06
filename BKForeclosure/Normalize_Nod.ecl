@@ -29,6 +29,14 @@ Co_Pattern  := '( AND | ASSOCIATES|ASSOCIATION| PC$| OF | PLLC$| PLC$| PA$| FIRM
 							 'FANNIE MAE| UNION| AUTHORITY|COUNTY|^FNMA|CONDOMINIUM|AMERICA|BUSINESS|COMMUNITIES|SCHOOL| LOAN|CERTIFICATE|FEDERAL| FUND| CHURCH|'+
 							 ' BRANCH| FCU$| PROFIT|PRIVATE|COMMERCIAL|ANNUNITY|FIRST| CNTY$)';
 invalid_Pattern := '(NOT PROVIDED|NOT GIVEN|NO PROVIDED| NONE|(NOT P\\[ROVIDED)|(NOT \\[PROVIDED)|(NOT PROVIDED \\|))';
+DBApattern	:= '^(.*)(DBA - |/ DBA | DBA/|DBA | DBA:|D/B/A:| D/B/A |D/B/A | DBA| D/B/A|C/O |C/0 |ATTN:|ATT:|ATTN - |ATTN |ATTENTION:|ATN:| A/K/A | A/K/A|T/A | F/K/A )(.*)';
+
+//Get name w/o DBA/AKA name from name field
+ varstring GetName(string dname)	:= FUNCTION
+				string uppername	:= STD.Str.ToUpperCase(dname);
+				string temp_name	:= regexfind(DBApattern,uppername,1);
+				return STD.Str.CleanSpaces(trim(temp_name,left,right));
+END;
 
 // Normalized Name records
 Layout_BK.CleanFields_NOD t_norm_nod (layout_BK.base_nod_ext le, INTEGER C) := TRANSFORM
@@ -63,7 +71,7 @@ Layout_BK.CleanFields_NOD t_norm_nod (layout_BK.base_nod_ext le, INTEGER C) := T
 			 
   SELF.NAME_FIRST       := CHOOSE(C,borrower1_fname,borrower2_fname,contact_fname,trustee_fname);
 	SELF.NAME_LAST				:= CHOOSE(C,borrower1_lname,borrower2_lname,contact_lname,trustee_lname);
-	SELF.NAME_FULL        := STD.Str.CleanSpaces(TRIM(SELF.NAME_FIRST,LEFT,RIGHT)+' '+TRIM(SELF.NAME_LAST,LEFT,RIGHT));
+	SELF.NAME_FULL        := GetName(STD.Str.CleanSpaces(TRIM(SELF.NAME_FIRST,LEFT,RIGHT)+' '+TRIM(SELF.NAME_LAST,LEFT,RIGHT)));
 	SELF.NAME_TYPE        := CHOOSE(C,'BR','B2','CT','TR');
 	SELF.phone						:= CHOOSE(C,'','',contact_phone,trustee_phone);
 	contact_addr:= ut.CleanSpacesAndUpper(le.contact_mail_full_addr);
