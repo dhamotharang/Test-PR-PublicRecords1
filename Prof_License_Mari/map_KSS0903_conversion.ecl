@@ -40,7 +40,7 @@ FilterNullRecord	:= ValidRLEFile(NOT REGEXFIND('[\\x00-\\x1F\\x7F]', TRIM(last_n
 ut.CleanFields(FilterNullRecord, ClnFilterNullRecord);
 O_Filter          := OUTPUT(ClnFilterNullRecord);
 
-Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) := TRANSFORM
+Prof_License_Mari.layout_base_in	TRANSFORMToCommon(layout_KSS0903.common pInput) := TRANSFORM
 			SELF.PRIMARY_KEY			:= 0;
 			SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
 			SELF.LAST_UPD_DTE			:= pVersion;							//it was set to process_date before
@@ -305,7 +305,7 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 	ds_map := PROJECT(ClnFilterNullRecord, TRANSFORMToCommon(LEFT));
 
 // Populate STD_LICENSE_STATUS field via translation on RAW_LICENSE_STATUS field
-Prof_License_Mari.layouts.base 	trans_lic_status(ds_map L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_status(ds_map L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 	SELF := L;
 END;
@@ -317,7 +317,7 @@ ds_map_stat_trans := JOIN(ds_map, cmvTransLkp,
 O_ds1 := OUTPUT(ds_map_stat_trans);
 	
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := TRANSFORM
+Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_stat_trans L, cmvTransLkp R) := TRANSFORM
 	SELF.STD_PROF_CD := R.DM_VALUE1;
 	SELF := L;
 END;

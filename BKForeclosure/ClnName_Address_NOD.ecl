@@ -26,7 +26,7 @@ ClnName_NOD      := PROJECT(FileClnName,TRANSFORM(Layout_BK.CleanFields_NOD,
 																									SELF.cln_lname2				:=	IF(IsName, LEFT.cln_lname2, '');
 																									SELF.cln_suffix2			:=	IF(IsName, LEFT.cln_suffix2, '');
 																									SELF.cname						:=  IF(LEFT.nametype IN business_flags AND trim(LEFT.cln_fname) = '',LEFT.name_full,
-																																							IF(TRIM(LEFT.cln_fname) = '' AND TRIM(LEFT.cln_lname) = '',LEFT.name_full,''));
+																																							IF(TRIM(SELF.cln_fname) = '' AND TRIM(SELF.cln_lname) = '',LEFT.name_full,''));
 																									SELF := LEFT));
 
 //Clean address for Nod
