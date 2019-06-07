@@ -80,11 +80,11 @@ EXPORT iesp.memberpointreport.t_MemberPointReportResponse makeESDLOutput(dataset
 			end;
 
 			iesp.share.t_StringArrayItem normXformEmails(MemberPoint.Layouts.BatchOut l,integer c) := transform
-				self.value:= CHOOSE(c, l.email1, l.email2, l.email3, l.email4, l.email5, '');
+				self.value:= CHOOSE(c, l.email1, l.email2, l.email3, l.email4, l.email5,l.email6, l.email7, l.email8, l.email9, l.email10, '');
 			end;
 
 			PhonesChild := normalize(BatchOut,3,normXformPhones(left,counter));
-			EmailChild := normalize(BatchOut,5,normXformEmails(left,counter));
+			EmailChild := normalize(BatchOut,10,normXformEmails(left,counter));
 			header_row 	 :=  iesp.ECL2ESP.GetHeaderRow();
 
 			 iesp.memberpointreport.t_MemberPointReportResponse xformESDL(BatchOut l) := transform
