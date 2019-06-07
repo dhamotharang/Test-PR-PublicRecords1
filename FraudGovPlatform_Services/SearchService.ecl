@@ -166,9 +166,10 @@ EXPORT SearchService() := MACRO
 	IF(~isValidDate, FAIL(303,doxie.ErrorCodes(303)));
 
 	IF (isMinimumInput, 
-				PARALLEL( OUTPUT(results, named('Results')), 
-									OUTPUT(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity'))),
+				OUTPUT(results, named('Results')), 
 				FAIL(301,doxie.ErrorCodes(301))
 			);
+			
+	IF(~Options.Blind, OUTPUT(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 		
 ENDMACRO;
