@@ -1,4 +1,4 @@
-IMPORT Address, AutoStandardI, TopBusiness_Services, iesp, bipv2;
+﻿IMPORT Address, AutoStandardI, TopBusiness_Services, iesp, bipv2;
 
 EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod , 
 													 DATASET(TopBusiness_Services.Layouts.rec_busHeaderLayout) ds_busheaderRecs,
@@ -20,7 +20,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 	in_options 					:= ROW(xform_topbusiness_options());
 	in_topbusiness_mod	:= MODULE(PROJECT(inmod, AutoStandardI.DataRestrictionI.params, OPT)) END;	
 	
-
+     
 	add_best := TopBusiness_Services.BestSection.fn_fullView(	in_topbusiness_ds, 
 																														PROJECT(DATASET(in_options),TRANSFORM(TopBusiness_Services.BestSection_Layouts.rec_OptionsLayout, self := left, self := []))[1],
 																														in_topbusiness_mod,
@@ -198,7 +198,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
       CHOOSEN(PROJECT(add_ConnectedBusinesses[1].ConnectedBusinessRecords, 
                TRANSFORM(iesp.businesscreditreport.t_BusinessCreditConnectedBusiness,
                          SELF := LEFT,
-                         SELF.BusinessCreditIndicator := BusinessCredit_Services.Functions.fn_BuzCreditIndicator(LEFT.BusinessIds.UltId, 
+                         SELF.BusinessCreditIndicator := BusinessCredit_Services.Functions.fn_BuzCreditIndicator2(LEFT.BusinessIds.UltId, 
                                                                                                                  LEFT.BusinessIds.OrgID,
                                                                                                                  LEFT.BusinessIds.SeleID,
                                                                                                                  inmod.DataPermissionMask,
@@ -238,10 +238,23 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 		SELF.ParentSection						:= ds_add_parent[1];
 		SELF.ConnectedBusinessSection	:= add_ConnectedBusinesses_final[1];
 		SELF.ContactSection						:= add_contact[1];
-		SELF.OperationsSitesSection		:= add_opssites[1];
+		SELF.OperationsSitesSection		:= add_opssites[1];		
+	END;
+	
+	BusinessCredit_Services.Layouts.TopBusinessRecord transform_TopBusinessRecsLNOnlyCreditReport() := TRANSFORM
+		SELF.acctno 									:= '1';
+		SELF.BestSection							:= ds_denorm_best[1];	
+		SELF.IncorporationSection			:= ds_incorporation_sorted[1];	
+		SELF.ParentSection						:= ds_add_parent[1];
+		SELF.OperationsSitesSection		:= add_opssites[1];			
+		SELF := []
 	END;
 
-	final_recs := DATASET([transform_TopBusinessRecs()]);
+	final_recsDefault := DATASET([transform_TopBusinessRecs()]);
+	final_recsLNOnlyCreditReport := DATASET([transform_TopBusinessRecsLNOnlyCreditReport()]);
+	final_recs := if (inmod.BusinessCreditReportType = BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport, final_recsDefault, 
+	                                   if ( (inmod.BusinessCreditReportType = BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport
+																		  and  ~(buzCreditAccess)), final_recsLNOnlyCreditReport));
 
 // OUTPUT(add_parent, NAMED('add_parent_MAX_COUNT_CONNECTED_BUSINESSES'));
 // OUTPUT(add_bankruptcy[1], NAMED('add_bankruptcy'));
