@@ -45,6 +45,7 @@ EXPORT IParam :=
         EXPORT STRING1  FetchLevel 						          := BIPV2.IDconstants.Fetch_Level_SELEID;
         EXPORT BOOLEAN  IncludeCreditReport             := FALSE; 
 	   EXPORT BOOLEAN  LimitPaymentHistory24Months                   := FALSE; 
+	  EXPORT STRING1 BusinessCreditReportType :=   LNSmallBusiness.Constants.SBFEDataBusinessCreditReport;
 	  EXPORT STRING       SBFEContributorIds         :=  ''; 
         EXPORT BOOLEAN  MinInputMetForAuthRepPopulated  := FALSE; 
 				EXPORT BOOLEAN UseInputDataAsIs                 := FALSE;

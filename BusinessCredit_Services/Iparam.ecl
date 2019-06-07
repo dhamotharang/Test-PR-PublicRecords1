@@ -57,6 +57,7 @@ EXPORT IParam := MODULE
 		EXPORT STRING	 DataRestrictionMask 		:= AutoStandardI.Constants.DataRestrictionMask_default;
 		EXPORT BOOLEAN Include_BusinessCredit := FALSE;
 		EXPORT BOOLEAN LimitPaymentHistory24Months := FALSE;
+		EXPORT STRING1 BusinessCreditReportType := BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; // default  bus credit report with SBFE DATA
 		EXPORT STRING SBFEContributorIds := '';  
 		EXPORT STRING1 FetchLevel 						:= BIPV2.IDconstants.Fetch_Level_SELEID;
     EXPORT BOOLEAN IncludeScores          := TRUE; // Always TRUE unless called from LNSmallBusiness.SmallBusiness_BIP_Combined_Service 
