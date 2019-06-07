@@ -1166,7 +1166,7 @@ EXPORT Constants := MODULE
 
 	export MemberPoint := MODULE
 		export unsigned2 MAX_PHONES := 3;
-		export unsigned2 MAX_EMAILS := 5;
+		export unsigned2 MAX_EMAILS := 10;
 	end;
 
 	// Mortgage Industry Data Exchange(MIDEX) from Mortgage Asset Research Institute(MARI)
