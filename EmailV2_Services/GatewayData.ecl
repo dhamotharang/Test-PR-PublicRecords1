@@ -186,7 +186,7 @@ EXPORT GatewayData := MODULE
                                   SELF.email_status := MAP(RIGHT.email_status<>''=> RIGHT.email_status, 
                                                            LEFT.email_status<>'' => LEFT.email_status,
                                                            $.Constants.StatusUnknown), 
-                                  SELF.additional_status_info := RIGHT.additional_status_info, 
+                                  SELF.additional_status_info := IF(RIGHT.additional_status_info<>'',RIGHT.additional_status_info,LEFT.additional_status_info), 
                                   SELF.email_status_reason := IF(RIGHT.email_status_reason<>'',RIGHT.email_status_reason,LEFT.email_status_reason),
                                   SELF := LEFT), 
                          KEEP(1), LIMIT(0),
