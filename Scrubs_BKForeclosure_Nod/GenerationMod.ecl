@@ -45,7 +45,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_number:ALLOW(0123456789):\n'
     + 'FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\'):SPACES( <>{}[]-^=!+&,()#.;/)\n'
     + 'FIELDTYPE:invalid_AlphaNum:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\'):SPACES( -.)\n'
-    + 'FIELDTYPE:invalid_apn:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( -,;.:|`~/+#)\n'
+    + 'FIELDTYPE:invalid_apn:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):SPACES( -,()&;.:|`~/\\+#*_)\n'
     + 'FIELDTYPE:invalid_zip:ALLOW(0123456789):LENGTHS(0,4,5)\n'
     + 'FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(0,4,8,10)\n'
     + 'FIELDTYPE:invalid_phone:ALLOW(0123456789):LENGTHS(0,7,10)\n'
