@@ -46,9 +46,9 @@ super_all
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		//STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::reo_infile'/*, TRUE*/),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::reo_infile'/*, TRUE*/),
 		AddToSuperfile_Reo,
-		//STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::nod_infile'/*, TRUE*/),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::nod_infile'/*, TRUE*/),
 		AddToSuperfile_Nod,
 		FileServices.FinishSuperFileTransaction()
 	);		

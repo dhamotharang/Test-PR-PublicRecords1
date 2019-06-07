@@ -431,7 +431,7 @@ EXPORT base_reo  := RECORD
 	 STRING8 date_vendor_first_reported;
 	 STRING8 date_vendor_last_reported;
 	 STRING8 process_date;
-   STRING25 src;
+   STRING2 src;
 	 STRING6 Delete_Flag;
    reo_in;
 //Add code description fields
@@ -447,6 +447,7 @@ END;
 //Slimmed for normalizing and cleaning names and addresses
 EXPORT CleanFields_REO := RECORD
 	UNSIGNED6 record_id;
+	STRING2 src;
 	Norm_Name_addr;
 	ClnName;
 	UNSIGNED8 did 			:= 0;
@@ -459,6 +460,7 @@ END;
 
 EXPORT CleanFields_NOD	:= RECORD
 	UNSIGNED6 record_id;
+	STRING2 src;
 	Norm_Name_addr;
 	ClnName;
 	UNSIGNED8 did 			:= 0;
