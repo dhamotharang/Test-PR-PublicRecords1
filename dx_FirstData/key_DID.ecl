@@ -9,5 +9,5 @@ payload := RECORD
 	$.layouts.i_did.DL_ID;
 END;
 
-EXPORT key_DID(boolean isFCRA = true) := 
+EXPORT key_DID() := 
          INDEX ({keyed_fields}, {payload}, $.names().i_did_FCRA, OPT);
