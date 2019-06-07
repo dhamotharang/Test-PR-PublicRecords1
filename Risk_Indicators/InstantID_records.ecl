@@ -1,5 +1,5 @@
-﻿import address, ADVO, Business_Header_SS, Doxie, models, riskwise, ut, USPIS_HotList, codes, Suppress, AutoStandardI, seed_files, iesp,
-			 IntlIID, YellowPages, gateway, Royalty, MDR, census_data, OFAC_XG5, Risk_Reporting, STD, Inquiry_AccLogs, STD;
+﻿import address, Doxie, models, riskwise, ut, codes, Suppress, AutoStandardI, seed_files, iesp,
+			 IntlIID, gateway, Royalty, census_data, OFAC_XG5, STD;
 // NOTE! If you make any logic changes here, please change also BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs.
 
 Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -81,11 +81,11 @@ boolean ExcludeWatchLists := false 		: stored('ExcludeWatchLists');
 set_validOFACVersions := Risk_Indicators.iid_constants.set_validOFACVersions;
 unsigned1 OFAC_version_Null := 0 			: stored('OFACversion');
 unsigned1 OFAC_version_temp := if(OFAC_version_Null NOT IN set_validOFACVersions, 1, OFAC_version_Null);
-OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
+OFAC_version := if(trim(STD.STR.ToLowerCase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 boolean Include_Additional_watchlists := FALSE	: stored('IncludeAdditionalWatchlists');
 boolean Include_Ofac := FALSE										: stored('IncludeOfac');
 real global_watchlist_threshold_temp := 0 			: stored('GlobalWatchlistThreshold');
-		 global_watchlist_threshold := Map( trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0  	=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
+		 global_watchlist_threshold := Map( trim(STD.STR.ToLowerCase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0  	=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFAC_version >= 4	and global_watchlist_threshold_temp = 0																													=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFAC_version < 4  and global_watchlist_threshold_temp = 0 																												=> OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
 																		global_watchlist_threshold_temp);
@@ -261,7 +261,7 @@ rec := record
 d := dataset([{(unsigned)account_value}],rec);
 
 //Check to see if new custom CVI field is populated with a valid value
-Custom_Model_Name := trim(StringLib.StringToUppercase(In_CustomCVIModelName));
+Custom_Model_Name := trim(STD.STR.ToUpperCase(In_CustomCVIModelName));
 
 Valid_CCVI := Custom_Model_Name in ['','CCVI1501_1','CCVI1609_1','CCVI1810_1'];
 CustomCVIModelName := if(Valid_CCVI, Custom_Model_Name, error('Invalid Custom CVI model name.')):INDEPENDENT;
@@ -278,13 +278,13 @@ RedFlagsReq := redflag_version > 0;
 FraudDefenderReq := EXISTS(model_url(name='Models.FraudAdvisor_Service'));
 
 // check to see if custom CVI requested
-customCVIparams := project(model_url(StringLib.StringToLowerCase(name)='risk_indicators.instantid'), transform(models.layout_parameters, self := left.parameters[1]));
-customCVIvalue := trim(StringLib.StringToLowercase(customCVIparams(StringLib.StringToLowerCase(name)='custom')[1].value));
+customCVIparams := project(model_url(STD.STR.ToLowerCase(name)='risk_indicators.instantid'), transform(models.layout_parameters, self := left.parameters[1]));
+customCVIvalue := trim(STD.STR.ToLowerCase(customCVIparams(STD.STR.ToLowerCase(name)='custom')[1].value));
 
 
 
-customfraud_params := project(model_url(StringLib.StringToLowerCase(name) in ['models.customfa_service', 'models.fraudadvisor_service']), transform(models.layout_parameters, self := left.parameters[1]));
-customfraud_modelname := trim(StringLib.StringToUppercase(customfraud_params(StringLib.StringToLowerCase(name) in ['custom', 'version'])[1].value));
+customfraud_params := project(model_url(STD.STR.ToLowerCase(name) in ['models.customfa_service', 'models.fraudadvisor_service']), transform(models.layout_parameters, self := left.parameters[1]));
+customfraud_modelname := trim(STD.STR.ToUpperCase(customfraud_params(STD.STR.ToLowerCase(name) in ['custom', 'version'])[1].value));
 
 risk_indicators.Layout_Input into(rec l) := transform
 	
@@ -306,12 +306,12 @@ risk_indicators.Layout_Input into(rec l) := transform
 	self.phone10 := phone_value;
 	self.wphone10 := wphone_value;
 	
-	self.title := stringlib.stringtouppercase(title_val);
+	self.title := STD.STR.ToUpperCase(title_val);
 
-	self.fname := stringlib.stringtouppercase(fname_val);
-	self.mname := stringlib.stringtouppercase(mname_val);
-	self.lname := stringlib.stringtouppercase(lname_val);
-	self.suffix := stringlib.stringtouppercase(suffix_val);
+	self.fname := STD.STR.ToUpperCase(fname_val);
+	self.mname := STD.STR.ToUpperCase(mname_val);
+	self.lname := STD.STR.ToUpperCase(lname_val);
+	self.suffix := STD.STR.ToUpperCase(suffix_val);
 	
 	SELF.in_streetAddress := addr_value;
 	SELF.in_city := city_val;
@@ -340,14 +340,14 @@ risk_indicators.Layout_Input into(rec l) := transform
 		
 	self.country := country_value;
 	
-	SELF.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	SELF.dl_state := stringlib.stringtouppercase(dl_state_value);
+	SELF.dl_number := STD.STR.ToUpperCase(dl_num_clean);
+	SELF.dl_state := STD.STR.ToUpperCase(dl_state_value);
 	
 	SELF.email_address := email_value;
 	SELF.ip_address := ip_value;
 	
-	SELF.employer_name := stringlib.stringtouppercase(employe_name_value);
-	SELF.lname_prev := stringlib.stringtouppercase(prev_lname_value);
+	SELF.employer_name := STD.STR.ToUpperCase(employe_name_value);
+	SELF.lname_prev := STD.STR.ToUpperCase(prev_lname_value);
 end;
 prep := PROJECT(d,into(LEFT));
 
@@ -418,8 +418,8 @@ risk_indicators.layout_input into_test_prep(risk_indicators.Layout_InstantID_NuG
 	self.seq := l.seq;	// take seq from the ret_test_seed data as we will need it for joining to scores later.
 	self.ssn := ssn_value;
 	self.phone10 := phone_value;
-	self.fname := stringlib.stringtouppercase(fname_val);
-	self.lname := stringlib.stringtouppercase(lname_val);
+	self.fname := STD.STR.ToUpperCase(fname_val);
+	self.lname := STD.STR.ToUpperCase(lname_val);
 	SELF.in_zipCode := zip_value;
 	self := [];
 end;
@@ -433,7 +433,7 @@ TRANSFORM
 	SELF.acctNo := account_value;
 	SELF.transaction_id := 0;
 
-	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression, TRIM(STD.STR.ToUpperCase(fname_val)), NOCASE), TRUE, FALSE), FALSE);
+	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(fname_val)), NOCASE), TRUE, FALSE), FALSE);
 	// for chase checking fname for busienss relations.  
 	
 	verfirst := Map(ischase AND isFirstExpressionFound => '',
@@ -830,7 +830,7 @@ formed := if(fromIIDModel and EXISTS(model_url), project(d, intoEmpty(LEFT)), re
 
 // this is not ideal to index into the datasets by position number, as the position can change,
 // but I can't figure out how to reference the row in the parameters dataset that is named 'isstudent'
-student_params := project(model_url(StringLib.StringToLowerCase(name)='models.studentadvisor_service'), transform(models.layout_parameters, self := left.parameters[1]));
+student_params := project(model_url(STD.STR.ToLowerCase(name)='models.studentadvisor_service'), transform(models.layout_parameters, self := left.parameters[1]));
 student_boolean := student_params[1].value='1';
 
 ModelRequests1 := project(Risk_Indicators.iid_constants.ds_Record, 
@@ -852,11 +852,11 @@ modelRequests := if(customfraud_modelname in set_custom_models_requiring_custom_
 	modelRequests1, 
 	dataset([], models.layouts.Layout_Model_Request_In));
 	
-fa_params := model_url(StringLib.StringToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
-model_version := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='version')[1].value));
-custom_modelname := trim(StringLib.StringToUppercase(fa_params(StringLib.StringToLowerCase(name)='custom')[1].value));
+fa_params := model_url(STD.STR.ToLowerCase(name)='models.fraudadvisor_service')[1].parameters;
+model_version := trim(STD.STR.ToUpperCase(fa_params(STD.STR.ToLowerCase(name)='version')[1].value));
+custom_modelname := trim(STD.STR.ToUpperCase(fa_params(STD.STR.ToLowerCase(name)='custom')[1].value));
 modelname := if(model_version='', custom_modelname, model_version);
-includeRiskIndices := fa_params(StringLib.StringToLowerCase(name)='includeriskindices')[1].value='1';
+includeRiskIndices := fa_params(STD.STR.ToLowerCase(name)='includeriskindices')[1].value='1';
 
 //Check to see if the FP model requested requires a valid GLB 
 FP3_models_requiring_GLB	:= ['FP31505_0', 'FP3FDN1505_0', 'FP31505_9', 'FP3FDN1505_9']; //these models require valid GLB, else fail

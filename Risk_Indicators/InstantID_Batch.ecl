@@ -140,7 +140,7 @@ export InstantID_Batch := macro
 unsigned1 DPPA_Purpose := 0 : stored('DPPAPurpose');
 unsigned1 GLB_Purpose := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 STRING5 industry_class_val := '' : STORED('IndustryClass');
-industry_class_value := StringLib.StringToUpperCase(industry_class_val);
+industry_class_value := STD.Str.ToUpperCase(industry_class_val);
 boolean ln_branded_value := false : STORED('LnBranded');
 boolean ofac_only := true : stored('OfacOnly');
 unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
@@ -162,7 +162,7 @@ integer2 dob_radius := 2 :stored('DobRadius');
 unsigned1 RedFlag_version := 0 : stored('RedFlag_version');
 boolean RedFlagsOnly := false : stored('RedFlagsOnly');
 string Model_in := '' : stored('Model');
-model_name := StringLib.StringToLowerCase( model_in );
+model_name := STD.Str.ToLowerCase( model_in );
 boolean	IncludeTargus := TRUE			: stored('Targus');	// default to TRUE so existing batch jobs work the same as they were
 boolean IncludeTargus3220 := false : stored('IncludeTargusE3220');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
@@ -303,7 +303,7 @@ unsigned1 maxAllowedVersion := 1;	// maximum allowed version as of 1/28/2014
 // to choose the version they want to use.  This version cannot be lower than the lowest allowed version unless the override tag is set to true, in which case
 // the customer can choose any version and if no version is passed in, it will be considered version 0.
 actualIIDVersion := map((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
-												IIDVersionOverride = false => ut.imin2(ut.max2((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
+												IIDVersionOverride = false => MIN(MAX((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
 												(unsigned)IIDversion); // they can override, give them whatever they asked for
 if(actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
 
@@ -317,7 +317,7 @@ dob_radius_use := if(use_dob_filter,dob_radius,-1);
 
 gateways_in := Gateway.Configuration.Get();
 
-Custom_Model_Name := trim(StringLib.StringToUppercase(CustomCVIModelName));
+Custom_Model_Name := trim(STD.Str.ToUpperCase(CustomCVIModelName));
 Valid_CCVI := Custom_Model_Name in ['','CCVI1810_1'];
 CustomCVIModelName_in := if(Valid_CCVI, Custom_Model_Name, error('Invalid Custom CVI model name.'));
 ischase := if(CustomCVIModelName_in = 'CCVI1810_1', TRUE,FALSE);
@@ -428,23 +428,23 @@ risk_indicators.Layout_Input into(fs le) := transform
 	self.seq := le.seq;	
 	self.ssn := IF(le.ssn='000000000','',le.ssn);	// blank out social if it is all 0's
 	self.dob := dob_val;
-	self.age := if ((integer)le.age = 0 and (integer)dob_val != 0,(STRING3)ut.GetAgeI((integer)dob_val), (le.age));
+	self.age := if ((integer)le.age = 0 and (integer)dob_val != 0,(STRING3)ut.Age((integer)dob_val), (le.age));
 	
 	self.phone10 := le.Home_Phone;
 	self.wphone10 := le.Work_Phone;
 
-	cleaned_name := Stringlib.StringToUppercase(
-										map(trim(Stringlib.StringToUppercase(NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
-												trim(Stringlib.StringToUppercase(NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
+	cleaned_name := STD.Str.ToUpperCase(
+										map(trim(STD.Str.ToUpperCase(NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
+												trim(STD.Str.ToUpperCase(NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
 																																										 Address.CleanPerson73(le.UnParsedFullName)));
 	
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 	
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+	self.fname := STD.Str.ToUpperCase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+	self.lname := STD.Str.ToUpperCase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+	self.mname := STD.Str.ToUpperCase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+	self.suffix := STD.Str.ToUpperCase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+	self.title := STD.Str.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
 
 	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 	clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;		
@@ -473,8 +473,8 @@ risk_indicators.Layout_Input into(fs le) := transform
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 	
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.dl_state);
+	self.dl_number := STD.Str.ToUpperCase(dl_num_clean);
+	self.dl_state := STD.Str.ToUpperCase(le.dl_state);
 	
 	self.ip_address := le.ip_addr;
 	self.email_address := le.email;
@@ -541,7 +541,7 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	
 	SELF.transaction_id := 0;
 
-	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression, TRIM(STD.STR.ToUpperCase(r.Name_First)), NOCASE), TRUE, FALSE), FALSE);
+	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(r.Name_First)), NOCASE), TRUE, FALSE), FALSE);
 	verfirst := Map(ischase AND isFirstExpressionFound => '',
 											 le.combo_firstcount>0 => le.combo_first,
 											 '');
