@@ -340,7 +340,7 @@ export Healthcare_SocioEconomic_Core(isCoreRequestValid ,batch_in, DPPAPurpose_i
 	SeMO_V1_results_Post_Proc := PROJECT(SeMO_V1_LUCI_results_base, TRANSFORM(Models.Layouts_Healthcare_Core.SeMO_Model_Output_Layout, 
 																			SELF.seq := (integer)LEFT.TransactionID;
 																			SELF.SeMO_Raw_Score := (string) LEFT.score;
-																			post_proc_score := MIN(((real8)LEFT.score-70)/60, 1);
+																			post_proc_score := MAX(0,MIN(((real8)LEFT.score-70)/60, 1));
 																			DECIMAL7_4 vScore :=  TRUNCATE(post_proc_score*1000000)/10000; //4 decimal places needed
 																			self.SeMO_Score := (string) vScore;
 																			SELF := LEFT));
