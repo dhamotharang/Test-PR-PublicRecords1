@@ -1,5 +1,8 @@
-﻿EXPORT macAppendProviderAttributesV2 (Infile, InputLnpid, InputState, UseIndexThreshold=5000000, appendPrefix = '\'\'') := FUNCTIONMACRO
-		IMPORT hipie_ecl;
+EXPORT macAppendProviderAttributesV3 (Infile, InputLnpid, InputState, UseIndexThreshold=5000000, appendPrefix = '\'\'') := FUNCTIONMACRO
+		IMPORT hipie_ecl, STD;
+		
+		STRING8 Current_Date := (STRING8) STD.DATE.Today();
+		
 		OutputRecord := RECORD
 			RECORDOF (Infile);
 			UNSIGNED8 #EXPAND(appendPrefix + 'LexID');
@@ -75,8 +78,11 @@
 			STRING2	  #EXPAND(appendPrefix + 'StateExclusionReinstatedState');
 			STRING8		#EXPAND(appendPrefix + 'StateExclusionReinstatedDate');
 			STRING1	  #EXPAND(appendPrefix + 'hasOIGExclusioinReinstated');
+			STRING8		#EXPAND(appendPrefix + 'OIGExclusionBeginDate');						
 			STRING8		#EXPAND(appendPrefix + 'OIGExclusionReinstatedDate');			
 			STRING1	  #EXPAND(appendPrefix + 'hasOPMExclusioinReinstated');
+			STRING8		#EXPAND(appendPrefix + 'StateExclusionBeginDate');						
+			STRING8		#EXPAND(appendPrefix + 'OPMExclusionBeginDate');						
 			STRING8		#EXPAND(appendPrefix + 'OPMExclusionReinstatedDate');			
 			STRING10  #EXPAND(appendPrefix + 'ResidentialPrimaryRange');
 			STRING2   #EXPAND(appendPrefix + 'ResidentialPreDirectional');
@@ -117,11 +123,23 @@
 			STRING1		#EXPAND(appendPrefix + 'hasDeceased');
 			STRING8		#EXPAND(appendPrefix + 'DeceasedDate');
 			STRING1		#EXPAND(appendPrefix + 'ClientStateExclusionInd');
+			STRING2		#EXPAND(appendPrefix + 'ClientStateExclusionState');
 			STRING8   #EXPAND(appendPrefix + 'ClientStateExclusionDate');  
 			STRING1		#EXPAND(appendPrefix + 'ClientStateLicenseRevokedInd');
+			STRING2		#EXPAND(appendPrefix + 'ClientStateLicenseRevokedState');
 			STRING8		#EXPAND(appendPrefix + 'ClientStateLicenseRevokedDate');
-			STRING1		#EXPAND(appendPrefix + 'ClientStateLicenseExpiredInd');
-			STRING8		#EXPAND(appendPrefix + 'ClientStateLicenseExpiredDate');
+			STRING8		#EXPAND(appendPrefix + 'ClientPastStateExclusionDate');
+			STRING8		#EXPAND(appendPrefix + 'ClientPastStateExclusionReinstDate');
+			STRING8		#EXPAND(appendPrefix + 'ClientPastLicRevokedDate');
+			STRING8		#EXPAND(appendPrefix + 'ClientPastLicRevokedReinstDate');
+			STRING1	  #EXPAND(appendPrefix + 'ClientExpiredLicenseInd');			
+			STRING2	  #EXPAND(appendPrefix + 'ClientExpiredLicenseState');			
+			STRING25  #EXPAND(appendPrefix + 'ClientExpiredLicenseNumber');
+			UNSIGNED4 #EXPAND(appendPrefix + 'ClientExpiredLicenseDate');
+			STRING1	  #EXPAND(appendPrefix + 'ClientInactiveLicenseInd');			
+			STRING2	  #EXPAND(appendPrefix + 'ClientInactiveLicenseState');			
+			STRING25  #EXPAND(appendPrefix + 'ClientInactiveLicenseNumber');
+			UNSIGNED4 #EXPAND(appendPrefix + 'ClientInactiveLicenseDate');
 		END;		
 		
 		//concatenate these in the output
@@ -137,7 +155,7 @@
 		joinKeyDs := PROJECT(validLnpidDsDist, joinKeyRecord, LOCAL);
 		joinKeyDsDedup := DEDUP(SORT(joinKeyDs, InputLnpid, LOCAL), InputLnpid, LOCAL);
 		
-		joinDs := hipie_ecl.macJoinKey(joinKeyDsDedup, AppendProviderAttributes.Key_Provider_Attributes_v2,
+		joinDs := hipie_ecl.macJoinKey(joinKeyDsDedup, AppendProviderAttributes.Key_Provider_Attributes_v3,
 			'KEYED(LEFT.' + #TEXT(InputLnpid) + ' = RIGHT.LNPID)', 
 			'RIGHT.' + #TEXT(InputLnpid) + ' = LEFT.LNPID', 
 			UseIndexThreshold,'INNER',true,1,,,TRUE);
@@ -203,7 +221,8 @@
 			SELF.#EXPAND(appendPrefix + 'GroupKey')						     := R.GroupKey;
 
 			SELF.#EXPAND(appendPrefix + 'hasActiveLicenseRevocation')			 	:= R.hasActiveLicenseRevocation;	
-			SELF.#EXPAND(appendPrefix + 'ActiveLicenseRevocationState')		 	:= R.ActiveLicenseRevocationState;			
+			SELF.#EXPAND(appendPrefix + 'ActiveLicenseRevocationState')		 	:= R.ActiveLicenseRevocationState;
+			
 			SELF.#EXPAND(appendPrefix + 'hasActiveStateExclusion')		 			:= R.hasActiveStateExclusion;			
 			SELF.#EXPAND(appendPrefix + 'ActiveLicenseExclusionState')		 	:= R.ActiveLicenseExclusionState;			
 			SELF.#EXPAND(appendPrefix + 'ActiveStateExclusionDate')		 			:= R.ActiveStateExclusionDate;			
@@ -211,7 +230,9 @@
 			SELF.#EXPAND(appendPrefix + 'ActiveOIGExclusionDate')		 				:= R.ActiveOIGExclusionDate;			
 			SELF.#EXPAND(appendPrefix + 'hasActiveOPMExclusion')						:= R.hasActiveOPMExclusion;			
 			SELF.#EXPAND(appendPrefix + 'ActiveOPMExclusionDate')		 				:= R.ActiveOPMExclusionDate;			
+
 			SELF.#EXPAND(appendPrefix + 'ActiveLicenseRevocationDate')		 	:= R.ActiveLicenseRevocationDate;			
+
 			SELF.#EXPAND(appendPrefix + 'ActiveStateSanctionExclusionDate')	:= R.ActiveStateExclusionDate;			
 			SELF.#EXPAND(appendPrefix + 'ActiveOIGSanctionExclusionDate')		:= R.ActiveOIGExclusionDate;			
 			SELF.#EXPAND(appendPrefix + 'ActiveOPMSanctionExclusionDate')		:= R.ActiveOPMExclusionDate;			
@@ -222,8 +243,12 @@
 			SELF.#EXPAND(appendPrefix + 'StateExclusionReinstatedState')		:= R.StateExclusionReinstatedState_Past5Y;			
 			SELF.#EXPAND(appendPrefix + 'StateExclusionReinstatedDate')		 	:= R.StateExclusionReinstatedDate_Past5Y;			
 			SELF.#EXPAND(appendPrefix + 'hasOIGExclusioinReinstated')		 		:= R.hasActiveOIGExclusionReinstated_Past5Y;			
+			SELF.#EXPAND(appendPrefix + 'OIGExclusionBeginDate')		 				:= R.OIGExclusionReinstatedBeginDate_Past5y;			
 			SELF.#EXPAND(appendPrefix + 'OIGExclusionReinstatedDate')		 		:= R.OIGExclusionReinstatedDate_Past5Y;			
 			SELF.#EXPAND(appendPrefix + 'hasOPMExclusioinReinstated')		 		:= R.hasActiveOPMExclusionReinstated_Past5Y;			
+			
+			SELF.#EXPAND(appendPrefix + 'StateExclusionBeginDate')		 			:= R.StateExclusionReinstatedBeginDate_Past5Y;						
+			SELF.#EXPAND(appendPrefix + 'OPMExclusionBeginDate')		 				:= R.OPMExclusionReinstatedBeginDate_Past5Y;						
 			SELF.#EXPAND(appendPrefix + 'OPMExclusionReinstatedDate')		 		:= R.OPMExclusionReinstatedDate_Past5Y;			
 			
 			SELF.#EXPAND(appendPrefix + 'ResidentialPrimaryRange')				     						:= R.ResidentialPrimaryRange;
@@ -264,12 +289,31 @@
 			SELF.#EXPAND(appendPrefix + 'hasAssocCriminalHistory')			 						   		:= R.hasAssocCriminalHistory;
 			SELF.#EXPAND(appendPrefix + 'hasDeceased')																		:= R.hasDeceased;
 			SELF.#EXPAND(appendPrefix + 'DeceasedDate')																		:= R.DeceasedDate;			
+			
 			SELF.#EXPAND(appendPrefix + 'ClientStateExclusionInd')												:= IF(EXISTS(R.CurrentExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.CurrentExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)),'Y','N');
+			SELF.#EXPAND(appendPrefix + 'ClientStateExclusionState')											:= R.CurrentExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.CurrentExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)[1].State;
 			SELF.#EXPAND(appendPrefix + 'ClientStateExclusionDate')												:= R.CurrentExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.CurrentExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)[1].Sanction_Date;
+
 			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseRevokedInd')										:= IF(EXISTS(R.RevokedExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.RevokedExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)),'Y','N');
+			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseRevokedState')									:= R.RevokedExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.RevokedExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)[1].State;
 			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseRevokedDate')									:= R.RevokedExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.RevokedExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)[1].Sanction_Date;
-			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseExpiredInd')										:= IF(EXISTS(R.ExpiredLicenseStates(L.InputState = State and L.InputState <> '')),'Y','N');
-			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseExpiredDate')									:= INTFORMAT(R.ExpiredLicenseStates(L.InputState = State and L.InputState <> '')[1].DT_LIC_EXPIRATION,8,1);
+
+			SELF.#EXPAND(appendPrefix + 'ClientPastStateExclusionDate')										:= SORT(R.PastExclusionStates,REINSTATEMENT_DATE)[1].Sanction_Date;
+			SELF.#EXPAND(appendPrefix + 'ClientPastStateExclusionReinstDate')							:= SORT(R.PastExclusionStates,REINSTATEMENT_DATE)[1].REINSTATEMENT_DATE;
+			
+			SELF.#EXPAND(appendPrefix + 'ClientPastLicRevokedDate')												:= SORT(R.PastRevokedStates,REINSTATEMENT_DATE)[1].Sanction_Date;
+			SELF.#EXPAND(appendPrefix + 'ClientPastLicRevokedReinstDate')									:= SORT(R.PastRevokedStates,REINSTATEMENT_DATE)[1].REINSTATEMENT_DATE;
+			
+			ClientExpiredLicenseFlag																											:= IF(COUNT (R.expiredlicensestates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)) > 0,'Y','N');
+			SELF.#EXPAND(appendPrefix + 'ClientExpiredLicenseInd')												:= IF(ClientExpiredLicenseFlag = 'Y' AND R.ExpiredLicenseFlag = 'Y','Y','N');
+			SELF.#EXPAND(appendPrefix + 'ClientExpiredLicenseState')											:= R.expiredlicensestates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].State;
+			SELF.#EXPAND(appendPrefix + 'ClientExpiredLicenseNumber')											:= R.expiredlicensestates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].LIC_NBR;
+			SELF.#EXPAND(appendPrefix + 'ClientExpiredLicenseDate')											  := R.expiredlicensestates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].DT_LIC_EXPIRATION;
+
+			SELF.#EXPAND(appendPrefix + 'ClientInactiveLicenseInd')												:= IF(COUNT (R.InactiveLicenseStates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)) > 0 AND R.InactiveLicenseFlag = 'Y','Y','N');
+			SELF.#EXPAND(appendPrefix + 'ClientInactiveLicenseState')											:= R.InactiveLicenseStates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].State;
+			SELF.#EXPAND(appendPrefix + 'ClientInactiveLicenseNumber')										:= R.InactiveLicenseStates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].LIC_NBR;
+			SELF.#EXPAND(appendPrefix + 'ClientInactiveLicenseDate')										  := R.InactiveLicenseStates(L.InputState = State and L.InputState <> '' and DT_LIC_EXPIRATION > 0 and DT_LIC_EXPIRATION < (integer) CURRENT_DATE)[1].DT_LIC_EXPIRATION;
 			SELF :=  L;
 			SELF :=  R;
 			SELF :=  [];
