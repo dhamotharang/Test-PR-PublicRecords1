@@ -3,6 +3,8 @@ doxie_cbrs.mac_Selection_Declare()
 
 export proflic_records_dayton(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
 
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
 //GET ADDRESSES AND COMPANY NAME TUPLES FOR THE BDID
 subadd := doxie_Cbrs.best_address_full(bdids)(Include_ProfessionalLicenses_val);
 
@@ -46,7 +48,6 @@ baf3 := join(baf2,baf,left.seq2=right.seq2,keepbaf(right),right only);
 // KEY INTO PROFESSIONAL LICENSES
 kap := Prof_LicenseV2.key_addr_proflic;
 
-
 // RR-14975 REMOVING CCPA RELATED FIELDS FROM QUERY OUTPUT
 // DEFINING LAYOUT USING ACTUAL LAYOUT INSTEAD OF THE DATASET
 kap_layout := RECORD
@@ -55,21 +56,25 @@ END;
 
 
 // TRANSFORM TO CAPTURE PROLIC RECORDS MATCHING OUR ADDR-NAME TUPLES
-kap_layout keepk(kap r) := transform
+Prof_LicenseV2.Layouts_ProfLic.Layout_Base keepk(kap r) := transform
 	self := r;
 end;
 
 // USE ADDR-NAME TO CAPTURE PROFESSIONAL LICENSES
-sn := join(baf3, kap,
+_sn := join(baf3, kap,
 					 LEFT.prim_name<>'' AND
 					 keyed(left.prim_name = right.prim_name) and
 					 keyed(left.prim_range = right.prim_range) and
 					 keyed(left.zip = right.zip) and
-					 companies_match(left.company_name,right.company_name) and					 
+					 companies_match(left.company_name,right.company_name) and
 					 ut.NNEQ(left.sec_range, right.sec_range),
 					 keepk(right),
 					 limit(50000));
-					 
+
+sn_suppressed := Suppress.MAC_SuppressSource(_sn, mod_access);
+Doxie.compliance.logSoldToSources(sn_suppressed, mod_access);
+sn := PROJECT(sn_suppressed, kap_layout);
+
 // MASK SSN
 doxie_Cbrs.mac_mask_ssn(sn, msk1, best_ssn)
 
@@ -84,9 +89,9 @@ srtd rollem(srtd l, srtd r) := transform
 end;
 
 // ROLLUP DFS AND DLS ON PROLIC ID AND ADDRESS
-rlld := rollup(srtd, 
+rlld := rollup(srtd,
 							 left.prolic_key = right.prolic_key and
-							 left.prim_range = right.prim_range and 
+							 left.prim_range = right.prim_range and
 							 left.prim_name = right.prim_name and
 							 left.zip = right.zip,
 							 rollem(left, right));
