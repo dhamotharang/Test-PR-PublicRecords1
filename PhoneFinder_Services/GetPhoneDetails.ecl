@@ -8,7 +8,7 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
 		EXPORT UNSIGNED max_age_days := PhoneFinder_Services.Constants.LERG6_LastActivityThreshold; 
 	END;
 	
-	dsPhonesAttr_recs:= Phones.GetPhoneMetadata_wLIDB(dInPhones, tempMod);
+	dsPhonesAttr_recs:= Phones.GetPhoneMetadata_wLERG6(dInPhones, tempMod);
 																														
  Doxie_Raw.PhonesPlus_Layouts.t_QSentCISOCAddress_out addr_format(string contact_address1,string contact_address2,string contact_city,string contact_state,string contact_zip) := TRANSFORM
 				

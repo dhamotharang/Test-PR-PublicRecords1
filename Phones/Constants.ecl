@@ -178,28 +178,45 @@ MODULE
 	END;
 
 	//Phone Ownership (Phone Attributes) and Phone Finder
-	EXPORT PhoneAttributes :=
+	EXPORT Sources :=
 	MODULE
-		EXPORT MaxRecsPerPhone 		:= 500; //Actual limit as of 4/18/2016 is 57 - W20160418-095049
-		EXPORT LastActivityThreshold:= 30; //tolerance threshold for record age; for Lerg6
-		EXPORT PORTED_PHONE			:= 'C';
-		EXPORT DISCONNECTED			:= 'D';
-		EXPORT PORTED_LINE			:= 'L';
-		EXPORT REACTIVATED			:= 'R';
-		EXPORT NUMBER_SWAPPED		:= 'DS'; // swap identifies both a disconnect and a number swap
-		EXPORT SUSPENDED			:= 'U';
-		EXPORT VERFICATION	        := 'V';
-		EXPORT ATT_LIDB_Delta		:=  'PD'; // temporarily used to distinguish deltabase records
 		EXPORT LERG6		        :=  MDR.sourceTools.src_Phones_Lerg6; 
 		EXPORT ATT_LIDB_SRC			:= MDR.sourceTools.src_Phones_LIDB;
 		export set_VERIFICATION		:= [LERG6, ATT_LIDB_SRC];
 		EXPORT ICONECTIV_SRC		:= MDR.sourceTools.src_PhonesPorted_iConectiv;
 		EXPORT DISCONNECT_SRC		:= MDR.sourceTools.src_Phones_Disconnect;
 		EXPORT GONG_DISCONNECT_SRC	:= MDR.sourceTools.src_Phones_Gong_History_Disconnect;
-		EXPORT SUSPENDED_CODE		:= 'SU';
-		EXPORT DISCONNECTED_CODE:= 'DE';
-		EXPORT DEFAULT_BLOCK_ID:= 'A';
+		EXPORT PHONEFRAUD_OTP		:= MDR.sourceTools.src_PhoneFraud_OTP;
+		EXPORT PHONESPORTED_TCPA_CL	:= MDR.sourceTools.src_PhonesPorted_TCPA_CL;
+
 
 	END;
- 	
+	EXPORT TransactionCodes :=
+	MODULE	
+		EXPORT REACTIVATED			:= 'RE';
+		EXPORT PORT_DELETE			:=  'PD'; 
+		EXPORT PORT_ADD 			:= 'PA';
+		EXPORT ACTIVE_STATUS		:= 'AS';
+		EXPORT SWAP_ACTIVATION 		:= 'SA';
+		EXPORT SWAP_DEACTIVATION 	:= 'SD';
+	 	EXPORT SUSPENDED_CODE		:= 'SU';
+		EXPORT DISCONNECTED_CODE	:= 'DE';
+	END;
+ 	EXPORT PhoneAttributes :=
+	 	MODULE
+	 	EXPORT MaxRecsPerPhone 		:= 500; //Actual limit as of 4/18/2016 is 57 - W20160418-095049
+		EXPORT LastActivityThreshold:= 30; //tolerance threshold for record age; for Lerg6
+		EXPORT PORT_UPPER_THRESHOLD 		:= 5;
+		EXPORT PORT_LOWER_THRESHOLD 		:= -1;
+		EXPORT DISCONNECT_LOWER_THRESHOLD 		:= 6;
+		EXPORT DISCONNECT_UPPER_THRESHOLD 		:= 30;
+		EXPORT PORTED_PHONE			:= 'C';
+		EXPORT DISCONNECTED			:= 'D';
+		EXPORT PORTED_LINE			:= 'L';  //Line type is ported
+		EXPORT NUMBER_SWAPPED		:= 'DS'; // swap identifies both a disconnect and a number swap
+		EXPORT SUSPENDED			:= 'U';
+		EXPORT VERFICATION	        := 'V';
+		EXPORT DEFAULT_BLOCK_ID:= 'A';
+		EXPORT PORTED := 'P';  //phone number is ported
+	END;
 END;

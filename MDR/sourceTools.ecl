@@ -335,6 +335,8 @@ MODULE
 	export src_Phones_Accudata_CNAM_CNM2 := 'PZ';
 	export src_Phones_Disconnect		 		 := 'PX';
 	export src_Phones_Gong_History_Disconnect := 'PG';
+	export src_PhonesPorted_TCPA_CL			 := 'PM';			// Cellphone-to-Landline
+	export src_PhoneFraud_OTP						 := 'OT';
 	export src_Phones_Lerg6							 := 'L6';
 	export src_Phones_LIDB				 			 := 'PB';
 	export src_PhonesPorted_TCPA				 := 'PJ';
@@ -1342,7 +1344,9 @@ export set_NonDerog_FCRA_sources_v50 := [
 	,src_thrive_lt									 , src_thrive_pd								   	,src_AlloyMedia_student_list	, src_Link2tek             , src_NeustarWireless];
 	
 	export set_Phonesplus_Royalty := [src_Wired_Assets_Royalty];
-	
+
+	export set_PhoneFraud								 := [src_PhoneFraud_OTP];
+
 	export set_Prolic											:= [
 			src_Professional_License		,src_AMIDIR
 	];
@@ -1875,7 +1879,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Phones_Accudata_CNAM_CNM2 := [src_Phones_Accudata_CNAM_CNM2 ];
 	export set_Phones_Lerg6							 := [src_Phones_Lerg6							 ];
 	export set_Phones_LIDB				 			 := [src_Phones_LIDB				 			 ];
-	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
+	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_TCPA_CL, src_PhonesPorted_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
 	export set_POS                       := [src_POS                       ];  			
 	export set_Professional_License      := [src_Professional_License      ];
 	export set_PSS								       := [src_PSS									     ];
