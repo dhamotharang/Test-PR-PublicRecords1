@@ -132,11 +132,8 @@ FUNCTION
                                 42 => EXISTS((pInput.TmxVariables(Name = 'countdeviceseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
                                 43 => EXISTS((pInput.TmxVariables(Name = 'countemailsseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
                                 44 => EXISTS((pInput.TmxVariables(Name = 'phoneseenmultiplecountry_month' AND (INTEGER)Value >= le.Threshold))),
-<<<<<<< HEAD
                                 45 => pInput.identity_count > le.Threshold,
-=======
-                                47 => (pInput.phone_inresponse_count > le.Threshold),
->>>>>>> 0f52f29534cf67a4f3465856552215003b2a6f02
+                                47 => pInput.phone_inresponse_count > le.Threshold,
                                 FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);

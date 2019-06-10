@@ -140,20 +140,6 @@ FUNCTION
                                     LIMIT(0), KEEP(1));
   
   // Send primary and other phones for RI calculation
-<<<<<<< HEAD
-  dPrepForRIs_pre := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
-  	
-  dPrepForRIs := IF(EXISTS(dPrepForRIs_pre),
-                    dPrepForRIs_pre,
-                    PROJECT(dProcessInput, TRANSFORM($.Layouts.PhoneFinder.Final, 
-                                                      SELF.phone          := LEFT.homephone,
-                                                      SELF.fname          := LEFT.name_first,
-                                                      SELF.lname          := LEFT.name_last,
-                                                      SELF.prim_name      := LEFT.prim_name, 
-                                                      SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
-                                                      SELF                := [])));
-    
-=======
   dPrepForRIs_pre_info := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
 
   //Calculte the count of phones in response
@@ -161,22 +147,22 @@ FUNCTION
   
   ThresholdA_PhoneTransactionCount := inMod.RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount)[1].ThresholdA;
 
-  dPhoneTransactionsCount := IF(inMod.hasActivePhoneTransactionCountRule, 
-                  $.GetPhoneTransactionCount(dPhonesIn(phone != ''), ThresholdA_PhoneTransactionCount)); 
+  dPhoneTransactionsCount := IF(inMod.hasActivePhoneTransactionCountRule, $.GetPhoneTransactionCount(dPhonesIn(phone != ''), ThresholdA_PhoneTransactionCount)); 
 
   dPrepForRIs_pre := JOIN(dPrepForRIs_pre_info, dPhoneTransactionsCount,
                         LEFT.phone = RIGHT.phone,
                         TRANSFORM($.Layouts.PhoneFinder.Final, SELF.phone_inresponse_count := RIGHT.phonecount, SELF:= LEFT),
                         LEFT OUTER);
 
-  dPrepForRIs := IF(EXISTS(dPrepForRIs_pre), dPrepForRIs_pre, PROJECT(dProcessInput, TRANSFORM($.Layouts.PhoneFinder.Final, 
-                                                                                     SELF.phone := LEFT.homephone, SELF.fname :=LEFT.name_first,
-                                                                                     SELF.lname := LEFT.name_last, SELF.prim_name := LEFT.prim_name, 
-                                                                                     SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
-                                                                                     SELF := [])));
+  dPrepForRIs := IF(EXISTS(dPrepForRIs_pre),
+                    dPrepForRIs_pre, PROJECT(dProcessInput,
+                                              TRANSFORM($.Layouts.PhoneFinder.Final, 
+                                                        SELF.phone          := LEFT.homephone, SELF.fname :=LEFT.name_first,
+                                                        SELF.lname          := LEFT.name_last, SELF.prim_name := LEFT.prim_name, 
+                                                        SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
+                                                        SELF                := [])));
 
 
->>>>>>> 0f52f29534cf67a4f3465856552215003b2a6f02
   dRIs := IF(inMod.IncludeRiskIndicators, PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod));
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
