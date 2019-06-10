@@ -1,7 +1,7 @@
 ﻿IMPORT Autokey_Batch,BatchShare,Doxie,Gateway,iesp,MDR,Phones,Royalty,Suppress,STD;
 
 EXPORT PhoneFinder_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dIn,
-														PhoneFinder_Services.iParam.ReportParams         inMod,
+														PhoneFinder_Services.iParam.SearchParams         inMod,
 														DATASET(Gateway.Layouts.Config)                  dGateways,
 														iesp.phonefinder.t_PhoneFinderSearchBy           pSearchBy,
 														iesp.phonefinder.t_PhoneFinderSearchBy           InputEcho
@@ -17,7 +17,7 @@ MODULE
 	BatchShare.MAC_CapitalizeInput(dIn, SHARED dProcessInput);
   
   // Modify IsPrimarySearchPII depending on input if value not provided
-  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.ReportParams, OPT))
+  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.SearchParams, OPT))
       EXPORT BOOLEAN IsPrimarySearchPII := inMod.IsPrimarySearchPII OR vPhoneBlank;
   END;
 
@@ -105,14 +105,16 @@ MODULE
   dDupAccuIn := PROJECT(DEDUP(SORT(dAccuIn, acctno), acctno), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in);
 									 
   AccuDataGateway := IF(tmpMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
-  SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(dDupAccuIn, AccuDataGateway[1]);		   
+  
+  SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(dDupAccuIn, AccuDataGateway[1]);
+  
   dAccu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);
 	
 	// get ported info
 	SHARED dPorted_Phones := IF(tmpMod.IsGetPortedData, 
                               PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs, tmpMod, dGateways, dSubjectInfo, dAccu_inport(port_end_dt <> 0)),
                               dSearchRecs);
-	 
+	
 	// zumigo call														 
 	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_Phones, dInBestInfo, tmpMod, dGateways);
 	SHARED dZumigo_recs:= dZum_gw_recs.Zumigo_GLI; // zumigo records

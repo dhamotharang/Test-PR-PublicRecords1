@@ -1,7 +1,7 @@
 IMPORT iesp;
 
 EXPORT PhonePickList_Records( DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dIn,
-															PhoneFinder_Services.iParam.ReportParams               inMod) :=
+															PhoneFinder_Services.iParam.SearchParams               inMod) :=
 FUNCTION	
 	// Inhouse phone records
 	dPhonesAll := PhoneFinder_Services.GetPhones(dIn,inMod);
