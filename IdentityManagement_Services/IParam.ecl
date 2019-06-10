@@ -33,6 +33,11 @@ export IParam := module
 	export _report := INTERFACE (PersonReports.IParam._report, PersonReports.IParam.relatives,
 															 PersonReports.IParam.neighbors, _include)
 		export boolean SuppressCompromisedDLs := false;
+
+    // I need to keep those here temporarily, till all person reports compoenents are switched to IDataAccess;
+    // (ignores will be moved to Property interface at that time, where they do belong to).
+    export boolean ignoreFares := false;
+    export boolean ignoreFidelity:= false;
 	end;
 
 	export _search := INTERFACE

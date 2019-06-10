@@ -21,6 +21,11 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN   IncludeCombination := TRUE;
 		EXPORT BOOLEAN   IncludeFootPrint := TRUE;
 		EXPORT BOOLEAN   UseTestData := FALSE;
+
+    // I need to keep those here temporarily, till all person reports compoenents are switched to IDataAccess;
+    // (ignores will be moved to Property interface at that time, where they do belong to).
+    export boolean ignoreFares := false;
+    export boolean ignoreFidelity:= false;
 	END;
 	
 END;
