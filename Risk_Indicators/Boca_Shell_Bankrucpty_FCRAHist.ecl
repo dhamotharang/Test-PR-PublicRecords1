@@ -1,4 +1,4 @@
-﻿import _Control, doxie_files, ut, doxie, fcra, riskwise, bankruptcyv3, Risk_Indicators;
+﻿﻿import _Control, doxie_files, ut, doxie, fcra, riskwise, bankruptcyv3, Risk_Indicators;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0,
@@ -8,7 +8,8 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 	bans_Withdrawn_Status := BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(,,TRUE);	
 	bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip(true);
 
-	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_bk_allow_10yr := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr) > 0;
+	insurance_fcra_filter :=  ((BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0) AND (NOT insurance_bk_allow_10yr);
 	insurance_bk_chapter_exception := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException) > 0;
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process := RECORD
