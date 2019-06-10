@@ -233,7 +233,6 @@ EXPORT functions := MODULE
     {'    DPPAPurpose', options.DPPAPurpose},
     {'    ssn_mask', options.ssn_mask},
     {'    legacy_verified', options.legacy_verified},
-    {'    record_by_date', options.record_by_date},
     {'    ln_branded', options.ln_branded},
     {'    score_threshold', options.score_threshold},
     {'    exact_sec_range_match', options.exact_sec_range_match},

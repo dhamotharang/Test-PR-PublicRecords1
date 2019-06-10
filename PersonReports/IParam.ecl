@@ -3,7 +3,7 @@
 
 // Currently almost all of these are "fake": just synonyms of a superset input
 
-IMPORT AutoHeaderI, doxie, suppress, relationship, FCRA, PAW_Services;
+IMPORT AutoHeaderI, doxie, suppress, relationship, FCRA, PAW_Services, AutoStandardI;
 
 EXPORT IParam := MODULE
 
@@ -63,6 +63,8 @@ EXPORT IParam := MODULE
   END;
 
   EXPORT property := INTERFACE
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
     EXPORT boolean use_nonsubjectproperty     := FALSE; // former "include_priorproperties"
     EXPORT boolean use_currentlyownedproperty := FALSE; //meaning, current ONLY!
   
@@ -238,11 +240,15 @@ EXPORT IParam := MODULE
   EXPORT _sources := INTERFACE (include, versions)
   END;
 
+  //IParam._report isn't compatible with input._report, projecting from new to old will not work.
+  //To facilitate converting the modules until we make all PersonReports components
+  //compatible with IDataAccess, I will define a set of "old_report" interfaces
+  //-- same as original interfaces, minus _report part.
+  //Thus, "new" report module can be projected to the "old",
+  //and _report can be copied manually.
   
-  //Same as input/_assetreport, minus _report part, so that I could copy all fields from the input module
-  //(having different field types -- ssn_mask, for instance -- prevents it otherwise).
-  //To migrate AssetReport to use IDataAccess, I will add _report back to this interface.
-  EXPORT _assetreport := INTERFACE (address, bankruptcy, property, vehicles, watercrafts, imposters, relatives, include, dl, ucc)
+  //Same as $.input._assetreport, minus _report part
+  EXPORT old_assetreport := INTERFACE (address, bankruptcy, property, vehicles, watercrafts, imposters, relatives, include, dl, ucc)
     EXPORT boolean use_bestaka_ra := false;
     EXPORT boolean use_NonDMVSources := TRUE;
     EXPORT boolean include_relativeaddresses := TRUE; // if include relatives, then addresses must be included
@@ -259,12 +265,21 @@ EXPORT IParam := MODULE
     EXPORT boolean include_peopleatwork := TRUE;
   END;
 
-  //Same as input/_finderreport, minus _report part
-  EXPORT _finderreport := INTERFACE (personal, include, vehicles, dl)
+  EXPORT _assetreport := INTERFACE (_report, old_assetreport)
   END;
 
-  //Same as input/_prelitreport, minus _report part
-  EXPORT _prelitreport := INTERFACE (address, include, property, vehicles, imposters, relatives, dl, bankruptcy, watercrafts)
+  //Same as $.input._finderreport, minus _report part
+  EXPORT old_finderreport := INTERFACE (personal, include, vehicles, dl)
+    //these are not used by Finder; will be removed eventually.
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
+  END;
+
+  EXPORT _finderreport := INTERFACE (_report, old_finderreport)
+  END;
+
+  //Same as $.input._prelitreport, minus _report part
+  EXPORT old_prelitreport := INTERFACE (address, include, property, vehicles, imposters, relatives, dl, bankruptcy, watercrafts)
     EXPORT boolean use_NonDMVSources       := TRUE;
     EXPORT boolean include_relativeaddresses := TRUE; // if include relatives, then addresses must be included
 
@@ -285,8 +300,24 @@ EXPORT IParam := MODULE
     EXPORT unsigned1 bankruptcy_version := 1;
     EXPORT unsigned1 liensjudgments_version := 1;
   end;
+  
+  EXPORT _prelitreport := INTERFACE (_report, old_prelitreport)
+  END;
 
-  EXPORT _smartlinxreport := INTERFACE (_report, _sources, personal,  providers, dl, property, criminal, liens, bankruptcy, watercrafts)
+  //Same as $.input._rnareport, minus _report part
+  EXPORT old_rnareport := INTERFACE (AutoStandardI.InterfaceTranslator.clean_address.params, include, personal)
+    EXPORT boolean use_verified_address_nb := TRUE;
+    EXPORT boolean nbrs_with_phones := TRUE;
+    EXPORT unsigned1 neighbors_per_address := 6;
+    //these are not used by RNA; will be removed eventually.
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
+  END;
+  EXPORT _rnareport := INTERFACE (_report, old_rnareport)
+  END;
+
+  //Same as $.input._smartlinxreport, minus _report part
+  EXPORT old_smartlinxreport := INTERFACE (_sources, personal, providers, dl, property, criminal, liens, bankruptcy, watercrafts)
     // define defaults for those just declared
     //EXPORT boolean include_bpsaddress      := TRUE;
     EXPORT boolean include_BlankDOD := TRUE;
@@ -311,18 +342,15 @@ EXPORT IParam := MODULE
     EXPORT unsigned1 neighbors_per_address := 20;
     EXPORT unsigned1 neighbors_per_na := 2;
     EXPORT boolean sort_deeds_by_ownership := TRUE; //sets property ownership flag that is needed for determining Current/Prior
+  END;  
+
+  EXPORT _smartlinxreport := INTERFACE (_report, old_smartlinxreport)
+    EXPORT boolean include_BlankDOD := TRUE;
+    EXPORT boolean smart_rollup := TRUE;
   END;
 
-  //Temporarily, until we make all PersonReports interfaces compatible with IDataAccess, I will need a function
-  //to convert new _smartlinxreport module to the module in the old format.
-
-  //New module cannot be project to the old interface directly (because of some fields' incompatibility in _report),
-  //so I will exclude _report portion, project the new module, and then copy _report fields manually.
-  //The resulting module doesn't implementing any specific interface, but has all the fields as the old module would have.
-  old_interface := INTERFACE (_sources, personal, providers, dl, property, criminal, liens, bankruptcy, watercrafts) END;
-
   EXPORT ConvertToOldSmartLinx (_smartlinxreport mod_smartlinx) := FUNCTION
-    mod_res := MODULE (PROJECT (mod_smartlinx, old_interface))
+    mod_res := MODULE (PROJECT (mod_smartlinx, old_smartlinxreport))
       EXPORT INTEGER FCRAPurpose := mod_smartlinx.FCRAPurpose;
       EXPORT integer8 FFDOptionsMask := mod_smartlinx.FFDOptionsMask;
     
@@ -349,7 +377,6 @@ EXPORT IParam := MODULE
       EXPORT integer1 non_subject_suppression := mod_smartlinx.non_subject_suppression;
 
       //fields that are likely should be removed
-      EXPORT string8 record_by_date := ''; // aka DateVal
       EXPORT boolean AllowAll := FALSE;
       EXPORT boolean AllowGLB := FALSE;
       EXPORT boolean AllowDPPA := FALSE;

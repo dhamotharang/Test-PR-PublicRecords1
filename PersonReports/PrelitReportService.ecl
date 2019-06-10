@@ -128,25 +128,16 @@ WSInput.MAC_PersonReports_PrelitReportService();
   end;
 
   // Now define all report parameters
-  report_mod := module (options)
-    // Do all required translations here
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-		export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-		export string DataPermissionMask := gm.dataPermissionMask;
-    export string DataRestrictionMask := gm.dataRestrictionMask;
-    export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
-    export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
-    //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
+  report_mod := module (options, mod_access)
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-		export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
   end;
 
   // execute search
   dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
 
   // main records
-  prelit_mod := module (project (report_mod, PersonReports.input._prelitreport, opt)) end;
+  prelit_mod := module (project (report_mod, PersonReports.IParam._prelitreport, opt)) end;
   recs := PersonReports.PrelitReport (dids, prelit_mod, FALSE).Records;
   // output (recs);
 
@@ -160,61 +151,6 @@ WSInput.MAC_PersonReports_PrelitReportService();
   IF (count (dids) > 1,
       fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria')
       output (results, named ('Results')));
-/*
-  // debug
-  print_mod := module (project (prelit_mod, PersonReports.input._compoptions, opt))
-  end;
-  res := PersonReports.functions.GetCRSOptionsDataset (print_mod);
-  output (res, named ('Options'));
-*/
+
 ENDMACRO;
 //PrelitReportService ();
-
-/*
-<PrelitigationReportRequest>
-<row>
-<User>
-  <ReferenceCode>ref_code_str</ReferenceCode>
-  <BillingCode>billing_code</BillingCode>
-  <QueryId>query_id</QueryId>
-  <GLBPurpose>1</GLBPurpose>
-  <DLPurpose>1</DLPurpose>
-  <EndUser/>
-</User>
-<Options>
-	<ReturnAlsoFound></ReturnAlsoFound>
-	<IncludeRelatives></IncludeRelatives>
-	<IncludeAssociates></IncludeAssociates>
-	<IncludePhonesPlus></IncludePhonesPlus>
-	<IncludeProfessionalLicenses></IncludeProfessionalLicenses>
-	<IncludeDriversLicenses></IncludeDriversLicenses>
-</Options>
-<ReportBy>
-  <Name>
-    <Full></Full>
-    <First></First>
-    <Middle></Middle>
-    <Last></Last>
-  </Name>
-  <Address>
-    <StreetName></StreetName>
-    <StreetNumber></StreetNumber>
-    <StreetSuffix></StreetSuffix>
-    <UnitNumber></UnitNumber>
-    <State></State>
-    <City></City>
-    <Zip5></Zip5>
-  </Address>
-  <SSN></SSN>
-  <UniqueId></UniqueId>
-  <DOB>
-    <Year></Year>
-    <Month></Month>
-    <Day></Day>
-   </DOB>
-  <Phone10></Phone10>
-</ReportBy>
-</row>
-</PrelitigationReportRequest>
-*/
-

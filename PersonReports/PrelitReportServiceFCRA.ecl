@@ -90,12 +90,13 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   // options := options_esdl;  
 
   // define search parameters; in "pure" ESDL mode this must be replaced with a module created from XML input
-  globals := AutoStandardI.GlobalModule();
-  search_mod := module (project (globals, PersonReports.input._didsearch, opt))
+  gm := AutoStandardI.GlobalModule();
+  search_mod := module (project (gm, PersonReports.IParam._didsearch, opt))
   end;
 
   // Now define all report parameters
-  report_mod := module (options)
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
+  report_mod := module (options, mod_access)
     export unsigned1 liensjudgments_version := 2; // latest available
     export unsigned1 bankruptcy_version := 3;
     // those are not yet in the report (so far report is for project July only)
@@ -111,18 +112,8 @@ EXPORT PrelitReportServiceFCRA () := MACRO
     export boolean include_corpaffiliations := false;
     // export boolean include_liensjudgments  := true;
 
-
     // Do all required translations here
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-    export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-    export string DataPermissionMask := search_mod.dataPermissionMask;
-    export string DataRestrictionMask := globals.dataRestrictionMask;
-    export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
-    export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
-    //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-    export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
     export integer1 non_subject_suppression := options_esdl.non_subject_suppression;
     export boolean bk_include_dockets := options_esdl.bk_include_dockets;
     export boolean bk_suppress_withdrawn := options_esdl.bk_suppress_withdrawn;
@@ -134,7 +125,7 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   dids := dataset ([(unsigned6) search_mod.did], doxie.layout_references);
 
   // main records
-  prelit_mod := module (project (report_mod, PersonReports.input._prelitreport, opt)) end;
+  prelit_mod := module (project (report_mod, PersonReports.IParam._prelitreport, opt)) end;
   recs_combined := PersonReports.PrelitReport (dids, prelit_mod, TRUE);
   recs := project(recs_combined.Records, transform(iesp.prelitigationreport_fcra.t_FcraPreLitigationReportIndividual,
        Self := Left));  // it is single record coming as dataset
@@ -156,63 +147,5 @@ EXPORT PrelitReportServiceFCRA () := MACRO
          fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria')
          output (results, named ('Results')));
 
-
-/*
-  // debug
-  print_mod := module (project (prelit_mod, PersonReports.input._compoptions, opt))
-  end;
-  res := PersonReports.functions.GetCRSOptionsDataset (print_mod);
-  output (res, named ('Options'));
-*/
 ENDMACRO;
 //PrelitReportService ();
-
-/*
-<FcraPrelitigationReportRequest>
-<row>
-<User>
-  <ReferenceCode>ref_code_str</ReferenceCode>
-  <BillingCode>billing_code</BillingCode>
-  <QueryId>query_id</QueryId>
-  <GLBPurpose>1</GLBPurpose>
-  <DLPurpose>1</DLPurpose>
-  <EndUser/>
-  <NonSubjectSuppression/>
-</User>
-<Options>
-  <ReturnAlsoFound></ReturnAlsoFound>
-  <IncludeRelatives></IncludeRelatives>
-  <IncludeAssociates></IncludeAssociates>
-  <IncludePhonesPlus></IncludePhonesPlus>
-  <IncludeProfessionalLicenses></IncludeProfessionalLicenses>
-  <IncludeDriversLicenses></IncludeDriversLicenses>
-</Options>
-<ReportBy>
-  <Name>
-    <Full></Full>
-    <First></First>
-    <Middle></Middle>
-    <Last></Last>
-  </Name>
-  <Address>
-    <StreetName></StreetName>
-    <StreetNumber></StreetNumber>
-    <StreetSuffix></StreetSuffix>
-    <UnitNumber></UnitNumber>
-    <State></State>
-    <City></City>
-    <Zip5></Zip5>
-  </Address>
-  <SSN></SSN>
-  <UniqueId></UniqueId>
-  <DOB>
-    <Year></Year>
-    <Month></Month>
-    <Day></Day>
-   </DOB>
-  <Phone10></Phone10>
-</ReportBy>
-</row>
-</FcraPrelitigationReportRequest>
-*/
-

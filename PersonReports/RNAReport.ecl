@@ -4,10 +4,14 @@ out_rec := iesp.rnareport.t_RNAReport;
 
 EXPORT out_rec RNAReport (
   dataset (doxie.layout_references) dids,
-  PersonReports.input._rnareport param,
+  PersonReports.IParam._rnareport mod_rna,
   boolean IsFCRA = false) := FUNCTION
 
-  mod_access := $.functions.GetDataAccessModulePersonReports (param);
+  //Convert to the old _report style module: $.input._rnareport
+  mod_access := PROJECT (mod_rna, doxie.IDataAccess);
+  param := MODULE (PROJECT (mod_rna, $.IParam.old_rnareport))
+    $.input.mac_copy_report_fields(mod_rna);
+  END;
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
