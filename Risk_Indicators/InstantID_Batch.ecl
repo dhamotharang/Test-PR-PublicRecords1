@@ -709,10 +709,19 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	chrono_zip4_3 := if(IncludeDPBC, clean_chrono_address3[122..125], le.chronozip4_3);
 	// delivery point barcode = zip5 + zip5 + barcode[136..137] + check_digit[138]
 	chrono3_dpbc := if(IncludeDPBC and chrono_zip4_3<>'',chrono_zipz5_3 + chrono_zip4_3 + clean_chrono_address3[136..138], '');  // include the 2 character code and 1 character check_digit
-	
+
+  //per RQ-15834: if the verified address is not first in the chronology and the first address has an older last seen date than the verified address, make the chrono1 last seen date the same 
+ 	//as the verified address last seen date.
+	verifiedAddr2   := le.chronoprim_range2 = le.verprim_range and le.chronopredir2 = le.verpredir and le.chronoprim_name2 = le.verprim_name and 
+                     le.chronosuffix2 = le.versuffix and le.chronopostdir2 = le.verpostdir and le.chronosec_range2 = le.versec_range;
+	verifiedAddr3   := le.chronoprim_range3 = le.verprim_range and le.chronopredir3 = le.verpredir and le.chronoprim_name3 = le.verprim_name and 
+                     le.chronosuffix3 = le.versuffix and le.chronopostdir3 = le.verpostdir and le.chronosec_range3 = le.versec_range;
+  chronodate_last := map(verifiedAddr2 and le.chronodate_last < le.chronodate_last2  => le.chronodate_last2,
+                         verifiedAddr3 and le.chronodate_last < le.chronodate_last3  => le.chronodate_last3,
+                         le.chronodate_last);
 	
 	Chronology := DATASET([{1, addr1, le.chronoprim_range, le.chronopredir, le.chronoprim_name, le.chronosuffix, le.chronopostdir, le.chronounit_desig, le.chronosec_range, 
-										le.chronocity, le.chronostate, le.chronozip, le.chronozip4, le.chronophone, le.chronodate_first, le.chronodate_last, le.chronoaddr_isbest, if(IncludeDPBC,chrono1_dpbc,'')},
+										le.chronocity, le.chronostate, le.chronozip, le.chronozip4, le.chronophone, le.chronodate_first, chronodate_last, le.chronoaddr_isbest, if(IncludeDPBC,chrono1_dpbc,'')},
 									{2, addr2, le.chronoprim_range2, le.chronopredir2, le.chronoprim_name2, le.chronosuffix2, le.chronopostdir2, le.chronounit_desig2, le.chronosec_range2, 
 											le.chronocity2, le.chronostate2, le.chronozip2, le.chronozip4_2, le.chronophone2, le.chronodate_first2, le.chronodate_last2, le.chronoaddr_isbest2, if(IncludeDPBC,chrono2_dpbc,'')},
 									{3, addr3, le.chronoprim_range3, le.chronopredir3, le.chronoprim_name3, le.chronosuffix3, le.chronopostdir3, le.chronounit_desig3, le.chronosec_range3, 
