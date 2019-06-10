@@ -106,6 +106,7 @@ EXPORT Functions := MODULE
 										
 			tempdmod := MODULE(PROJECT(args, AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, opt))
 				EXPORT lastname           := le.name_last;  
+        EXPORT middlename         := le.name_middle;
 				EXPORT firstname          := le.name_first; 
 				EXPORT prim_name          := le.prim_name;
 				EXPORT prim_range         := le.prim_range;
