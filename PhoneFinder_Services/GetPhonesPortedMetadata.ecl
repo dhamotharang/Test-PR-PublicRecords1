@@ -1,7 +1,7 @@
 ﻿IMPORT  Gateway, MDR, PhoneFinder_Services, PhonesInfo, STD, ut;
 
 EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs0,
-													     PhoneFinder_Services.iParam.ReportParams inMod,
+													     PhoneFinder_Services.iParam.SearchParams inMod,
 													     DATASET(Gateway.Layouts.Config) dGateways,
 													     DATASET(	PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo,
 													     DATASET(PhoneFinder_Services.Layouts.PortedMetadata) accu_rpt = DATASET([], PhoneFinder_Services.Layouts.PortedMetadata)) :=

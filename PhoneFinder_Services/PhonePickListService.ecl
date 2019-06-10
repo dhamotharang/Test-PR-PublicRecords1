@@ -57,7 +57,7 @@ MACRO
 	dReqBatch := DATASET([tFormat2Batch()]);
 	
 	// Report module
-	reportMod := MODULE(PhoneFinder_Services.iParam.ReportParams)
+	reportMod := MODULE(PhoneFinder_Services.iParam.SearchParams)
 		EXPORT STRING32  ApplicationType     := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
 		EXPORT STRING5   IndustryClass       := AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.industry_class_val.params));
 		EXPORT UNSIGNED1 GLBPurpose          := AutoStandardI.InterfaceTranslator.glb_purpose.val(searchMod);

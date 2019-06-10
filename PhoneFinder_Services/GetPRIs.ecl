@@ -2,11 +2,11 @@
 
 EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)     dSearchResults,
                 DATASET($.Layouts.BatchInAppendDID)      dInBestInfo,
-                PhoneFinder_Services.iParam.ReportParams inMod,
+                PhoneFinder_Services.iParam.SearchParams inMod,
                 DATASET(Gateway.Layouts.Config) dGateways,
                 DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dProcessInput
                 ) :=
-FUNCTION
+FUNCTION   
   // Identities
   dIdentitiesInfo   := PhoneFinder_Services.GetIdentitiesFinal(dSearchResults, dInBestInfo, inMod);
 
@@ -16,12 +16,10 @@ FUNCTION
                                     dSearchResults(isPrimaryPhone AND phone_source in [PhoneFinder_Services.Constants.PhoneSource.Waterfall,
                                                                                       PhoneFinder_Services.Constants.PhoneSource.QSentGateway]));
 
-  dPrimaryPhoneInfo := PhoneFinder_Services.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
+  dPrimaryPhoneInfo_pre := PhoneFinder_Services.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
 	
-	 // ThreatMetrix
-  dThreatMetrixIn  := dPrimaryPhoneInfo(phone<> '');
-                  
-  dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dThreatMetrixIn, phone), phone), Phones.Layouts.PhoneAcctno);
+	// ThreatMetrix                  
+  dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrimaryPhoneInfo_pre, phone), phone), Phones.Layouts.PhoneAcctno);
   
   dPrimaryThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
                                 
@@ -31,11 +29,13 @@ FUNCTION
    SELF := l;
   END;
  
-  dPrepPrimaryThreatMetrix	:= IF (EXISTS(dPrimaryThreatMetrixRecs), 
-                               JOIN(dPrimaryPhoneInfo, dPrimaryThreatMetrixRecs,
-                               LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
-                               getThreatMetrix(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1)),
-                               dPrimaryPhoneInfo);
+  dPrepPrimaryThreatMetrix	:= JOIN(dPrimaryPhoneInfo_pre,
+                                    dPrimaryThreatMetrixRecs,
+                                    LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
+                                    getThreatMetrix(LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
+                         
+                         
+  dPrimaryPhoneInfo := IF(inMod.UseThreatMetrixRules, dPrepPrimaryThreatMetrix, dPrimaryPhoneInfo_pre);
   
   // Other phones
   dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResults(~isPrimaryPhone));
@@ -64,7 +64,7 @@ FUNCTION
                                                   SELF                   := RIGHT)));
 
   dPrepPrimaryForRIs := JOIN( dPrepIdentityForRI(isPrimaryIdentity),
-                              dPrepPrimaryThreatMetrix,
+                              dPrimaryPhoneInfo,
                               LEFT.acctno = RIGHT.acctno,
                               TRANSFORM($.Layouts.PhoneFinder.Final,
                                         SELF.phone             := RIGHT.phone,
@@ -72,6 +72,8 @@ FUNCTION
                                         // Need this mapping as SELF := RIGHT happens first before SELF := LEFT mapping
                                         SELF.dt_first_seen     := IF(LEFT.dt_first_seen != '', LEFT.dt_first_seen, (STRING)RIGHT.dt_first_seen),
                                         SELF.dt_last_seen      := IF(LEFT.dt_last_seen != '', LEFT.dt_last_seen, (STRING)RIGHT.dt_last_seen),
+                                        SELF.fname             := LEFT.fname,
+                                        SELF.lname             := LEFT.lname,
                                         SELF.prim_range        := LEFT.prim_range,
                                         SELF.predir            := LEFT.predir,
                                         SELF.prim_name         := LEFT.prim_name,
@@ -96,7 +98,7 @@ FUNCTION
                               LIMIT(0), KEEP(1));
   
   dPrepPrimaryPhoneOnlyForRIs := JOIN(dPrepPrimaryForRIs,
-                                      dPrepPrimaryThreatMetrix,
+                                      dPrimaryPhoneInfo,
                                       LEFT.acctno = RIGHT.acctno,
                                       TRANSFORM($.Layouts.PhoneFinder.Final,
                                                 SELF.isPrimaryPhone    := TRUE;
@@ -138,6 +140,20 @@ FUNCTION
                                     LIMIT(0), KEEP(1));
   
   // Send primary and other phones for RI calculation
+<<<<<<< HEAD
+  dPrepForRIs_pre := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
+  	
+  dPrepForRIs := IF(EXISTS(dPrepForRIs_pre),
+                    dPrepForRIs_pre,
+                    PROJECT(dProcessInput, TRANSFORM($.Layouts.PhoneFinder.Final, 
+                                                      SELF.phone          := LEFT.homephone,
+                                                      SELF.fname          := LEFT.name_first,
+                                                      SELF.lname          := LEFT.name_last,
+                                                      SELF.prim_name      := LEFT.prim_name, 
+                                                      SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
+                                                      SELF                := [])));
+    
+=======
   dPrepForRIs_pre_info := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
 
   //Calculte the count of phones in response
@@ -160,6 +176,7 @@ FUNCTION
                                                                                      SELF := [])));
 
 
+>>>>>>> 0f52f29534cf67a4f3465856552215003b2a6f02
   dRIs := IF(inMod.IncludeRiskIndicators, PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod));
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,

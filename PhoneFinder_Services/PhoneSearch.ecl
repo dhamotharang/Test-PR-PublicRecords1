@@ -7,7 +7,7 @@ lExcludePhones := PhoneFinder_Services.Layouts.PhoneFinder.ExcludePhones;
 lPPResponse    := Doxie_Raw.PhonesPlus_Layouts.PhoneplusSearchResponse_Ext;
 
 EXPORT PhoneSearch( DATASET(lBatchIn)                        dIn,
-										PhoneFinder_Services.iParam.ReportParams inMod,
+										PhoneFinder_Services.iParam.SearchParams inMod,
 										DATASET(Gateway.Layouts.Config)          dGateways) :=
 FUNCTION
 
@@ -26,7 +26,7 @@ FUNCTION
 	
 	// Search by PII - Don't use royalty based sources when searching on PII when phone is also sent in
 	// Experian File One and Waterfall process
-	wfMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.ReportParams,OPT))
+	wfMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.SearchParams,OPT))
 		EXPORT BOOLEAN UseQSent      := FALSE;
 		EXPORT BOOLEAN UseLastResort := FALSE;
 		EXPORT BOOLEAN UseInHousePhoneMetadata := FALSE;
@@ -46,12 +46,12 @@ FUNCTION
 		SELF.phone         := pInput.phone; // populating phone and dates
 		SELF.dt_first_seen := pInput.dt_first_seen;
 		SELF.dt_last_seen  := pInput.dt_last_seen;
-		SELF.penalt       := 0;
-		SELF.src          := pInput.src;
-		SELF.vendor_id    := pInput.vendor_id;
-		SELF.phone_source := pInput.phone_source;
-		SELF.batch_in     := pInput.batch_in;
-		SELF              := [];
+		SELF.penalt        := 0;
+		SELF.src           := pInput.src;
+		SELF.vendor_id     := pInput.vendor_id;
+		SELF.phone_source  := pInput.phone_source;
+		SELF.batch_in      := pInput.batch_in;
+		SELF               := [];
 	END;
 	
 	dWFPhonesFilter := PROJECT(dWFPhonesFilter_,tWFIdentity(LEFT));
@@ -61,7 +61,7 @@ FUNCTION
 	dWFDIDs := DEDUP(SORT(PROJECT(dWFDedup,doxie.layout_references),did),did);
 	
 	// Best information
-	dWFBestInfo := Doxie.best_records(dWFDIDs, includeDOD:=true, modAccess := mod_access);
+	dWFBestInfo := Doxie.best_records(dWFDIDs, includeDOD:=TRUE, modAccess := mod_access);
 	
 	lFinal tAppendBestInfo(dWFDedup le,dWFBestInfo ri) :=
 	TRANSFORM
@@ -73,86 +73,90 @@ FUNCTION
 	END;
 	
 	dWFAppendBest := JOIN(dWFDedup,
-																dWFBestInfo,
-																LEFT.did = RIGHT.did,
-																tAppendBestInfo(LEFT,RIGHT),
-																LEFT OUTER,
-																LIMIT(1,SKIP));
+                        dWFBestInfo,
+                        LEFT.did = RIGHT.did,
+                        tAppendBestInfo(LEFT,RIGHT),
+                        LEFT OUTER,
+                        LIMIT(1,SKIP));
 	
 	// Add WF/Experian records to records searched by phone only if there is a match on the phone number
 	dWFOnly := JOIN(dResultsByPhone,
-													dWFAppendBest,
-													LEFT.acctno = RIGHT.acctno and
-													LEFT.did    = RIGHT.did,
-													TRANSFORM(RIGHT),
-													RIGHT ONLY);
+                  dWFAppendBest,
+                  LEFT.acctno = RIGHT.acctno and
+                  LEFT.did    = RIGHT.did,
+                  TRANSFORM(RIGHT),
+                  RIGHT ONLY);
 	
 	dAll := dResultsByPhone + dWFOnly;
 	
 	// Append DIDs
 	dAppendDIDs := PhoneFinder_Services.Functions.AppendDIDs(dAll);
 	
-		rec_w_newseq := record
-	 lFinal;
-	 UNSIGNED8     new_seq;
-	end;
-	
-	// adding new seq with counter values
- dAppendDIDs_w_new_seq := project(dAppendDIDs, transform(recordof(rec_w_newseq), self.new_seq := counter, self := left));
-	
- file_in_filter := dAppendDIDs_w_new_seq(did = 0 and (listing_type_bus = '' and fname <>'' and lname<>'' and prim_name<>''));
-	
- file_in := project(file_in_filter, transform(didville.Layout_Did_OutBatch,
-																							 self.did := left.did,								 														 
-																							 self.seq := left.new_seq,				// passing in new_seq				 														 
-																							 self.suffix := left.name_suffix,
-																							 self.addr_suffix := left.suffix,
-																							 self.p_city_name := left.city_name,
-																							 self.st := left.st,
-																							 self.z5  := left.zip,
-																							 self.phone10 := left.phone,																						 
-																							 self.email := '',																						 
-																							 self.dob := (string)left.dob,																						 
-																							 self := left, self := []));
+	rec_w_newseq :=
+  RECORD(lFinal)
+	 UNSIGNED8 new_seq;
+	END;
 
-	BOOLEAN glb_ok := mod_access.isValidGLB ();
+  // adding new seq with counter values
+  dAppendDIDs_w_new_seq := PROJECT(dAppendDIDs, TRANSFORM(rec_w_newseq, SELF.new_seq := COUNTER, SELF := LEFT));
+	
+  file_in_filter := dAppendDIDs_w_new_seq(did = 0 and (listing_type_bus = '' and fname <> '' and lname <> '' and prim_name <> ''));
+	
+  file_in := project(file_in_filter, TRANSFORM(didville.Layout_Did_OutBatch,
+																							 SELF.did := LEFT.did,								 														 
+																							 SELF.seq := LEFT.new_seq,				// passing in new_seq				 														 
+																							 SELF.suffix := LEFT.name_suffix,
+																							 SELF.addr_suffix := LEFT.suffix,
+																							 SELF.p_city_name := LEFT.city_name,
+																							 SELF.st := LEFT.st,
+																							 SELF.z5  := LEFT.zip,
+																							 SELF.phone10 := LEFT.phone,																						 
+																							 SELF.email := '',																						 
+																							 SELF.dob := (string)LEFT.dob,																						 
+																							 SELF := LEFT, SELF := []));
+
+  BOOLEAN glb_ok := mod_access.isValidGLB ();
 	DIDsAdded := didville.did_service_common_function(file_in,
-																							 glb_flag := glb_ok, 
-																							 glb_purpose_value := mod_access.glb,
-																							 appType := mod_access.application_type,
-																							 IndustryClass_val := mod_access.industry_class);		
+                                                    glb_flag := glb_ok, 
+                                                    glb_purpose_value := mod_access.glb,
+                                                    appType := mod_access.application_type,
+                                                    IndustryClass_val := mod_access.industry_class);		
 																							 
-	dAll_wDIDs := JOIN(dAppendDIDs_w_new_seq,DIDsAdded,
-										LEFT.new_seq = RIGHT.seq,
-										TRANSFORM(RECORDOF(dAppendDIDs),SELF.DID:=IF(LEFT.DID = 0,RIGHT.DID,LEFT.DID),SELF:=LEFT),
-										LEFT OUTER, LIMIT(0), KEEP(1));			
-																						 
-											
-	// Deceased flag	
-	lFinal tDeceasedFlag(dAll_wDIDs le,Doxie.key_death_masterV2_ssa_DID ri) :=
+	dAll_wDIDs := JOIN(dAppendDIDs_w_new_seq,
+                      DIDsAdded,
+                      LEFT.new_seq = RIGHT.seq,
+                      TRANSFORM(lFinal,SELF.DID:=IF(LEFT.DID = 0,RIGHT.DID,LEFT.DID),SELF:=LEFT),
+                      LEFT OUTER, LIMIT(0), KEEP(1));			
+	
+  Suppress.MAC_Suppress(dAll_wDIDs,dSuppress,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did,'','',TRUE,'',TRUE);
+	
+	// Deceased flag
+  deathParams := DeathV2_Services.IParam.GetRestrictions(mod_access);
+
+	lFinal tDeceasedFlag(lFinal le,RECORDOF(Doxie.key_death_masterV2_ssa_DID) ri) :=
 	TRANSFORM
 		SELF.deceased := IF(ri.l_did != 0,'Y','N');
 		SELF.dod      := (UNSIGNED)ri.dod8;
 		SELF          := le;
 	END;
 	
-	deathParams := DeathV2_Services.IParam.GetRestrictions(mod_access);
-	
-	dDeceased := JOIN(dAll_wDIDs,
+	dDeceased := JOIN(dSuppress,
 										Doxie.key_death_masterV2_ssa_DID,
 										KEYED(LEFT.did = RIGHT.l_did) and
-										not DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, glb_ok, deathParams),
+										NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, glb_ok, deathParams),
 										tDeceasedFlag(LEFT,RIGHT),
 										LEFT OUTER,
 										LIMIT(0),KEEP(1));
 	
-	Suppress.MAC_Suppress(dDeceased,dSuppress,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did,'','',TRUE,'',TRUE);
-	
+	// Count the number of identities for each phone to calculate RI
+  dCntPhoneIdentities := IF(inMod.hasActiveIdentityCountRules,
+                            PhoneFinder_Services.GetIdentitiesCount(dDeceased),
+                            dDeceased);
+
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.PhoneNoSearch)
 		OUTPUT(dIn,NAMED('dPhoneSearchIn'));
 		OUTPUT(dResultsByPhone,NAMED('dResultsByPhone'));
-		OUTPUT(wfMod);
 		OUTPUT(dWaterfallPhonesByDID,NAMED('dWaterfallPhonesByDID'));
 		OUTPUT(dWFPhonesFilter,NAMED('dWFPhonesFilter'));
 		OUTPUT(dAll,NAMED('dAll'));
@@ -162,10 +166,10 @@ FUNCTION
 		OUTPUT(file_in,NAMED('file_in'));
 		OUTPUT(DIDsAdded,NAMED('DIDsAdded'));
 		OUTPUT(dAll_wDIDs,NAMED('dAll_wDIDs'));
-		OUTPUT(glb_ok,NAMED('glb_ok'));
-		OUTPUT(dDeceased,NAMED('dDeceased'));
 		OUTPUT(dSuppress,NAMED('dPhoneSearchSuppress'));
+		OUTPUT(dDeceased,NAMED('dDeceased'));
+		OUTPUT(dCntPhoneIdentities,NAMED('dPhoneSearchCntIdentities'));
 	#END
 
-	RETURN dSuppress;
+	RETURN dCntPhoneIdentities;
 END;

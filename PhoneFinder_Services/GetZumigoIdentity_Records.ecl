@@ -1,7 +1,7 @@
 ﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD;
 EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)  dPhoneRecs,
                                  DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
-                                 PhoneFinder_Services.iParam.ReportParams         inMod,
+                                 PhoneFinder_Services.iParam.SearchParams         inMod,
                                  DATASET(Gateway.Layouts.Config) dGateways) := 
 
 MODULE

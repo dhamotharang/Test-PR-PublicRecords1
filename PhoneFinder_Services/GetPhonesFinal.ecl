@@ -1,7 +1,7 @@
 IMPORT $, Phones, Std;
 
 EXPORT GetPhonesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
-                      $.iParam.ReportParams                inMod,
+                      $.iParam.SearchParams                inMod,
                       BOOLEAN                              isPrimaryPhone = FALSE) :=
 FUNCTION  
   // Primary phones
