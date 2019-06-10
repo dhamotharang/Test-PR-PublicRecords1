@@ -136,15 +136,30 @@ FUNCTION
                                             SELF.RealTimePhone_Ext := LEFT,
                                             SELF := LEFT, SELF := []),
                                     LIMIT(0), KEEP(1));
-
+  
   // Send primary and other phones for RI calculation
-  dPrepForRIs_pre := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
-  	
+  dPrepForRIs_pre_info := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
+
+  //Calculte the count of phones in response
+  dPhonesIn := PROJECT(dPrepForRIs_pre_info, TRANSFORM({$.Layouts.PhoneFinder.Final.phone}, SELF.phone := LEFT.phone));
+  
+  ThresholdA_PhoneTransactionCount := inMod.RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount)[1].ThresholdA;
+
+  dPhoneTransactionsCount := IF(inMod.hasActivePhoneTransactionCountRule, 
+                  $.GetPhoneTransactionCount(dPhonesIn(phone != ''), ThresholdA_PhoneTransactionCount)); 
+
+  dPrepForRIs_pre := JOIN(dPrepForRIs_pre_info, dPhoneTransactionsCount,
+                        LEFT.phone = RIGHT.phone,
+                        TRANSFORM($.Layouts.PhoneFinder.Final, SELF.phone_inresponse_count := RIGHT.phonecount, SELF:= LEFT),
+                        LEFT OUTER);
+
   dPrepForRIs := IF(EXISTS(dPrepForRIs_pre), dPrepForRIs_pre, PROJECT(dProcessInput, TRANSFORM($.Layouts.PhoneFinder.Final, 
                                                                                      SELF.phone := LEFT.homephone, SELF.fname :=LEFT.name_first,
                                                                                      SELF.lname := LEFT.name_last, SELF.prim_name := LEFT.prim_name, 
                                                                                      SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
                                                                                      SELF := [])));
+
+
   dRIs := IF(inMod.IncludeRiskIndicators, PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod));
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,

@@ -257,6 +257,7 @@ MODULE
 			STRING100                                             verification_desc;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
+			INTEGER phone_inresponse_count;
 		END;
 		
 		EXPORT ExcludePhones :=

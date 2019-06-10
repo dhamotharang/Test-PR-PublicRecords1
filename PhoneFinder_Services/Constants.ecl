@@ -169,6 +169,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	EXPORT RiskRules := MODULE
 	  EXPORT UNSIGNED1 SimCardInfo  := 35;
 	  EXPORT UNSIGNED1 DeviceInfo   := 36;
+		EXPORT UNSIGNED1 PhoneTransactionCount := 47;
 		EXPORT UNSIGNED1 CallForwarding   := 31;
 	END;
 	
