@@ -85,6 +85,7 @@ EXPORT phone_noreconn_search := MACRO
 
 	doxie.MAC_Header_Field_Declare();
 	globalmod := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalmod);
 	IsCNSMR := ut.IndustryClass.is_Knowx;
 	srchMod := MODULE(PROJECT(globalmod,doxie.phone_noreconn_param.searchParams,OPT))
 			EXPORT UNSIGNED1 DPPAPurpose := DPPA_Purpose;
@@ -583,6 +584,10 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	// output(ds_ported_servtype,named('ds_ported_servtype'));
 	// output(ds_results_ported_checked,named('ds_results_ported_checked'));
 	// output(resultsPreFB,named('resultsPreFB'));
+
+  
+  IF (EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access)); 
+    
 
 	if(~batch_friendly, 
 		 if(use_tg or use_qt or call_PVS or use_LR, parallel(disp_cnt, out_royal, out_rslt), parallel(disp_cnt, out_rslt)),out_rslt);
