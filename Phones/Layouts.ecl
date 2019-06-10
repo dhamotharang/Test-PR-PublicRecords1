@@ -167,6 +167,69 @@ MODULE
 		UNSIGNED1 availabilityIndicator;
 		STRING error_desc;
 	END;
+	
+	EXPORT rec_phoneLayout := RECORD
+	   STRING10 phone;
+    END;
+
+	EXPORT portedMetadata_Main := RECORD
+		string30 		reference_id;
+		string5			source;
+		unsigned8 		dt_first_reported;
+		unsigned8		dt_last_reported;
+		string10 		phone;
+		string2			phonetype;
+		string3 		reply_code;
+		string10 		local_routing_number;
+		string6			account_owner;
+		string60 		carrier_name;
+		string10 		carrier_category;
+		string5 		local_area_transport_area;
+		string10 		point_code; 
+		string3			country_code;
+		string1			dial_type;
+		string10 		routing_code;
+		unsigned8		porting_dt;
+		string6			porting_time;
+		string2			country_abbr;
+		unsigned8		vendor_first_reported_dt;
+		string6			vendor_first_reported_time;
+		unsigned8		vendor_last_reported_dt;
+		string6			vendor_last_reported_time;
+		unsigned8		port_start_dt;
+		string6			port_start_time;
+		unsigned8		port_end_dt;
+		string6			port_end_time;
+		boolean			is_ported;
+		string1 		serv;
+		string1 		line;
+		string10 		spid;
+		string60		operator_fullname;
+		string5			number_in_service;
+		string2			high_risk_indicator;
+		string2			prepaid;
+		string10 		phone_swap;
+		unsigned8		swap_start_dt;
+		string6			swap_start_time;
+		unsigned8		swap_end_dt;
+		string6			swap_end_time;
+		string2			deact_code;
+		unsigned8		deact_start_dt;
+		string6			deact_start_time;
+		unsigned8		deact_end_dt;
+		string6			deact_end_time;
+		unsigned8		react_start_dt;
+		string6			react_start_time;
+		unsigned8		react_end_dt;
+		string6			react_end_time;
+		string2			is_deact;
+		string2			is_react;
+		unsigned8		call_forward_dt;
+		string15		caller_id;
+		unsigned8 	event_date;
+		string4 	event_type;
+		unsigned8   remove_port_dt;
+	END;
 
 	EXPORT PhoneAttributes := MODULE
 		EXPORT gatewayQuery:=RECORD
@@ -227,7 +290,7 @@ MODULE
 		
 		EXPORT Raw := RECORD
 			BatchShare.Layouts.ShareAcct;
-			recordof(PhonesInfo.Key_Phones.Ported_Metadata);
+			portedMetadata_Main;
 			BatchOut;
 		 Carrier_Reference;//Added for Phone Finder inhousemetadata
 		END;

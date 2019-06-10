@@ -5,15 +5,15 @@ EXPORT PhoneAttributes_BatchRecords(
 	Phones.IParam.BatchParams in_mod)
 	:= FUNCTION
 
-	Consts := Phones.Constants.PhoneAttributes;
 	Layout_BatchOut := Phones.Layouts.PhoneAttributes.BatchOut;
 	Layout_BatchRaw	:= Phones.Layouts.PhoneAttributes.Raw;
 
- 	dIntermediateBatchPhones := Phones.GetPhoneMetadata_wLIDB(dBatchPhonesIn,in_mod);
+ 	dIntermediateBatchPhones := Phones.GetPhoneMetadata_wLERG6(dBatchPhonesIn,in_mod);
    
   dFilterBatchPhones	:= if(in_mod.include_temp_susp_reactivate,
   dIntermediateBatchPhones,
-  dIntermediateBatchPhones(event_type NOT IN [Consts.SUSPENDED, Consts.REACTIVATED, Consts.REACTIVATED+Consts.SUSPENDED]));
+  dIntermediateBatchPhones(event_type NOT IN 
+  		[Phones.Constants.PhoneAttributes.SUSPENDED, Phones.Constants.TransactionCodes.REACTIVATED, Phones.Constants.TransactionCodes.REACTIVATED+Phones.Constants.PhoneAttributes.SUSPENDED]));
 
 	//Check previous records to mark PORTED_LINE events
 	//A PORTED_PHONE event becomes a PORTED_PHONE+PORTED_LINE event when the most recent historic record
@@ -48,15 +48,15 @@ EXPORT PhoneAttributes_BatchRecords(
 
 	Layout_BatchOut tMarkPortedLines(dPhonesMostRecentRecord L, dPhonesMostRecentRecord R, INTEGER C) := TRANSFORM
 		boolean is_same_account := L.acctno = R.acctno and L.phoneno = R.phoneno;
-		boolean is_ported_event	:= R.event_type = Consts.PORTED_PHONE;
+		boolean is_ported_event	:= R.event_type = Phones.Constants.PhoneAttributes.PORTED_PHONE;
 		boolean exists_hist_line:= L.phone_line_type <> '';
 		boolean exists_hist_serv:= L.phone_serv_type <> '';
 		boolean is_line_match := L.phone_line_type = R.phone_line_type;
 		boolean is_serv_match := L.phone_serv_type = R.phone_serv_type;
 		boolean is_line_ported := is_same_account and is_ported_event and ((~is_line_match or ~is_serv_match) or (~exists_hist_line and ~exists_hist_serv));
-		SELF.event_type := MAP( R.source IN Consts.set_VERIFICATION and is_line_match => Consts.VERFICATION,
-			R.source IN Consts.set_VERIFICATION and ~is_line_match and C <> 1 => Consts.PORTED_LINE,
-			is_line_ported => TRIM(R.event_type) + Consts.PORTED_LINE,
+		SELF.event_type := MAP( R.source IN Phones.Constants.Sources.set_VERIFICATION and is_line_match => Phones.Constants.PhoneAttributes.VERFICATION,
+			R.source IN Phones.Constants.Sources.set_VERIFICATION and ~is_line_match and C <> 1 => Phones.Constants.PhoneAttributes.PORTED_LINE,
+			is_line_ported => TRIM(R.event_type) + Phones.Constants.PhoneAttributes.PORTED_LINE,
 			R.event_type);
 		SELF := R;
 	END;

@@ -1,31 +1,37 @@
 ﻿IMPORT Doxie, Gateway, Iesp, Phones, PhonesInfo, STD, UT, dx_PhonesInfo;
 
-EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
+EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
 	Phones.IParam.BatchParams in_mod) := FUNCTION
 
-	Consts := Phones.Constants.PhoneAttributes;
 	Layout_BatchOut := Phones.Layouts.PhoneAttributes.BatchOut;
 	Layout_BatchRaw	:= Phones.Layouts.PhoneAttributes.Raw;
 	today := STD.Date.Today();
 	earliestAllowedDate := (UNSIGNED)ut.date_math((STRING)today, -in_mod.max_age_days);
 
 	//Get phone data from Roxie
-	dPortedMetadataPhones := JOIN(dBatchPhonesIn, PhonesInfo.Key_Phones.Ported_Metadata,
-	KEYED(LEFT.phoneno = RIGHT.phone),
-	TRANSFORM(Layout_BatchRaw,
-		SELF.acctno := LEFT.acctno,
-		SELF.error_desc := '',
-		SELF.carrier_city := '',
-		SELF.carrier_state := '',
-		SELF := RIGHT,
-		SELF := []),
-	LIMIT(0), KEEP(Consts.MaxRecsPerPhone));
 
+phoneInfo := DEDUP(SORT(PROJECT(dBatchPhonesIn, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.phoneno)), phone), phone);
 
-dPhone_wCurrentCarrierInfo := dPortedMetadataPhones(is_ported OR source = Consts.Lerg6);//Should look up Lerg6 index only if there is no active port or L6 in ported_metadata index														 
+dPortedMetadataPhones := JOIN(dBatchPhonesIn, Phones.GetPhoneMetaData.CombineRawPhoneData(phoneInfo), 
+													LEFT.phoneno = RIGHT.phone,
+													TRANSFORM(Layout_BatchRaw,
+													SELF.acctno := LEFT.acctno,
+													SELF.phoneno := LEFT.phoneno,
+													SELF := RIGHT,
+													SELF := []),
+													LIMIT(0), LEFT OUTER, KEEP(Phones.Constants.PhoneAttributes.MaxRecsPerPhone));
 
-Layout_BatchRaw transformLerg6(Phones.Layouts.PhoneAttributes.BatchIn l, recordof(dx_PhonesInfo.Key_Phones_Lerg6) r) := TRANSFORM
-		is_block := (r.block_id = Consts.DEFAULT_BLOCK_ID);
+dPhone_wCurrentCarrierInfo := dPortedMetadataPhones(is_ported OR source = Phones.Constants.Sources.Lerg6);
+
+dPhone_wOldCarrierInfo := JOIN(dPortedMetadataPhones, dPhone_wCurrentCarrierInfo,
+														LEFT.phoneno = RIGHT.phone,
+														TRANSFORM(Layout_BatchRaw,
+														SELF.acctno := LEFT.acctno,
+														SELF := LEFT),
+														LEFT ONLY);		//Should look up Lerg6 index only if that data is not available in ported_metadata index														 
+
+Layout_BatchRaw transformLerg6(Layout_BatchRaw l, recordof(dx_PhonesInfo.Key_Phones_Lerg6) r) := TRANSFORM
+		is_block := (r.block_id = Phones.Constants.PhoneAttributes.DEFAULT_BLOCK_ID);
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phoneno;
 		SELF.source := r.source;  
@@ -38,17 +44,18 @@ Layout_BatchRaw transformLerg6(Phones.Layouts.PhoneAttributes.BatchIn l, recordo
 		SELF := [];
 	END;
 	
-dLerg6Phones := JOIN(dBatchPhonesIn, dx_PhonesInfo.Key_Phones_Lerg6, (LEFT.phoneno[1..3] =RIGHT.npa and left.phoneno[4..6]=RIGHT.nxx 
-																    and (left.phoneno[7]=RIGHT.block_id or RIGHT.block_id = Consts.DEFAULT_BLOCK_ID) 
+dLerg6Phones := JOIN(dPhone_wOldCarrierInfo, dx_PhonesInfo.Key_Phones_Lerg6, (LEFT.phone[1..3] =RIGHT.npa and left.phone[4..6]=RIGHT.nxx 
+																    and (left.phone[7]=RIGHT.block_id or RIGHT.block_id = Phones.Constants.PhoneAttributes.DEFAULT_BLOCK_ID) 
 																	   and RIGHT.is_current = TRUE),
-		                  transformLerg6(LEFT, RIGHT),LEFT OUTER, LIMIT(0),KEEP(Consts.MaxRecsPerPhone));
+		                  transformLerg6(LEFT, RIGHT),LEFT OUTER, LIMIT(0),KEEP(Phones.Constants.PhoneAttributes.MaxRecsPerPhone));
 
-filteredLerg6Phones_info := DEDUP(SORT(dLerg6Phones,acctno,phone,-dt_last_reported), acctno,phone);
-filteredLerg6Phones := JOIN(filteredLerg6Phones_info, dPhone_wCurrentCarrierInfo,
-																LEFT.phone = RIGHT.phone, LEFT ONLY);
+filteredLerg6Phones := DEDUP(SORT(dLerg6Phones,acctno,phone,-dt_last_reported), acctno,phone);
+
    
 
-dPortedPhones := dPortedMetadataPhones + filteredLerg6Phones;
+dPortedPhones_with_LERG6 := dPortedMetadataPhones + filteredLerg6Phones;
+dPortedPhones_without_LERG6 := dPortedMetadataPhones;
+dPortedPhones := IF(EXISTS(dPhone_wCurrentCarrierInfo), dPortedPhones_without_LERG6, dPortedPhones_with_LERG6);
 
 	//Add additional carrier info to Lerg6 records. They don't contain this information.
 	//However records retrieved from the metadata file should be left alone.
@@ -77,7 +84,7 @@ Layout_BatchRaw tAppendCarrierRefInfo1(Layout_BatchRaw le, RECORDOF(dx_PhonesInf
     SELF.contact_fax             := IF(is_carrier_info, ri.contact_fax, le.contact_fax);
     SELF.contact_email           := IF(is_carrier_info, ri.contact_email, le.contact_email);
 
- 	recNeedsLineServ := (le.source = Consts.LERG6);
+ 	recNeedsLineServ := (le.source = Phones.Constants.Sources.LERG6);
 	//Add the remaining information only to Lerg6 records.
 	SELF.line:=IF(recNeedsLineServ, ri.line, le.line);
 	SELF.serv:=IF(recNeedsLineServ, ri.serv, le.serv);
@@ -96,7 +103,7 @@ dPortedPhonesFinal := DENORMALIZE(dPortedPhones, dx_PhonesInfo.Key_Source_Refere
 									LEFT OUTER, LIMIT(100, SKIP));			
 	//prioritize PORTED
 dPortedPhonesSorted := SORT(dPortedPhonesFinal, acctno, phone, -vendor_last_reported_dt, 
-								vendor_first_reported_dt, -dt_last_reported, dt_first_reported, source <> Consts.ICONECTIV_SRC,
+								vendor_first_reported_dt, -dt_last_reported, dt_first_reported, source <> Phones.Constants.Sources.ICONECTIV_SRC,
 								record);
 
 		
@@ -110,23 +117,23 @@ Layout_BatchRaw  ProcessRecs(Layout_BatchRaw L) := TRANSFORM
 		// * Swap Phone Number event_date = swap_start_dt
 		// * Suspended Number event_date = deact_start_dt
 		// * Reactivated Number event_date = react_start_dt
-		boolean ported_phone := L.source = Consts.ICONECTIV_SRC;
+		boolean ported_phone := L.source = Phones.Constants.Sources.ICONECTIV_SRC;
 
 
 		//identifies both historic and current disconnect records
 		//is_deact can also be P - Ported - we want to ignore P records because they don't represent true disconnects.
-		boolean disconnected := L.deact_code = Consts.DISCONNECTED_CODE and (L.is_deact = 'Y' OR L.is_deact = 'N');
+		boolean disconnected := L.deact_code = Phones.Constants.TransactionCodes.DISCONNECTED_CODE and (L.is_deact = 'Y' OR L.is_deact = 'N');
 		boolean number_swapped := L.phone_swap <> '';
-		boolean suspended := L.deact_code = Consts.SUSPENDED_CODE and in_mod.include_temp_susp_reactivate;
+		boolean suspended := L.deact_code = Phones.Constants.TransactionCodes.SUSPENDED_CODE and in_mod.include_temp_susp_reactivate;
 		boolean reactivated := L.is_react = 'Y'; //remove L.deact_code=Consts.SUSPENDED_CODE to include PX(suspension reacts) and PG(Gong additions)
-		boolean VERFICATION := L.source IN Consts.SET_VERIFICATION;
-		event_type := if(ported_phone, Consts.PORTED_PHONE, '') +
-						if(disconnected and not ported_phone, Consts.DISCONNECTED, '') +
-						if(reactivated, Consts.REACTIVATED, '') +
-						if(number_swapped, Consts.NUMBER_SWAPPED, '') +
-						if(suspended, Consts.SUSPENDED, '') +
-						if(VERFICATION, Consts.VERFICATION, '');
-		event_date := if(VERFICATION,L.dt_last_reported,MAX(L.port_start_dt, L.swap_start_dt, L.deact_start_dt, L.react_start_dt));
+		boolean VERFICATION := L.source IN Phones.Constants.Sources.SET_VERIFICATION;
+		event_type := if(ported_phone, Phones.Constants.PhoneAttributes.PORTED_PHONE, '') +
+						if(disconnected and not ported_phone, Phones.Constants.PhoneAttributes.DISCONNECTED, '') +
+						if(reactivated, Phones.Constants.TransactionCodes.REACTIVATED, '') +
+						if(number_swapped, Phones.Constants.PhoneAttributes.NUMBER_SWAPPED, '') +
+						if(suspended, Phones.Constants.PhoneAttributes.SUSPENDED, '') +
+						if(VERFICATION, Phones.Constants.PhoneAttributes.VERFICATION, '');
+		event_date := if(VERFICATION,L.vendor_last_reported_dt,MAX(L.port_start_dt, L.swap_start_dt, L.deact_start_dt, L.react_start_dt));
 		SELF.event_type := event_type;
 		SELF.event_date	:= if(event_type <> '', event_date, 0);
 
@@ -142,10 +149,10 @@ Layout_BatchRaw  ProcessRecs(Layout_BatchRaw L) := TRANSFORM
 		SELF.operator_id := L.spid;
 		SELF.operator_name := if(L.operator_fullname <> '', L.operator_fullname, L.carrier_name);
 		SELF.line_type_last_seen := CASE(L.source,
-										Consts.ATT_LIDB_SRC => L.dt_last_reported,
-										Consts.LERG6 => L.dt_last_reported, 
-										Consts.ICONECTIV_SRC => L.port_start_dt, //probably should include port_end_dt
-										Consts.GONG_DISCONNECT_SRC => MAX(L.deact_start_dt,L.deact_end_dt,L.react_start_dt,L.react_end_dt),
+										Phones.Constants.Sources.ATT_LIDB_SRC => L.dt_last_reported,
+										Phones.Constants.Sources.LERG6 => L.dt_last_reported, 
+										Phones.Constants.Sources.ICONECTIV_SRC => L.port_start_dt, //probably should include port_end_dt
+										Phones.Constants.Sources.GONG_DISCONNECT_SRC => MAX(L.deact_start_dt,L.deact_end_dt,L.react_start_dt,L.react_end_dt),
 										0);
 		SELF.phone_serv_type := if(ported_phone or VERFICATION, L.serv, ''); // PG are not always shown as landlines even though they came from gong ???
 		SELF.phone_line_type := if(ported_phone or VERFICATION, L.line, '');
@@ -161,7 +168,7 @@ Layout_BatchRaw  ProcessRecs(Layout_BatchRaw L) := TRANSFORM
 
 		//Check if the current record is outdated, from L6, if so we mark dialable false.
 		boolean is_outdated := SELF.event_date < earliestAllowedDate;
-		SELF.dialable := ~is_outdated AND L.source <> Consts.DISCONNECT_SRC;
+		SELF.dialable := ~is_outdated AND L.source <> Phones.Constants.Sources.DISCONNECT_SRC;
 
 		//These values are assigned below when all the most recent data is combined so they match what is being displayed.
 		SELF.phone_line_type_desc := '';
