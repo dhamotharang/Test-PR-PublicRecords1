@@ -1129,6 +1129,7 @@
 		export string KEYWORD_NONBIM								:= '815';
 		export string KEYWORD_SLGAZ_PO							:= '816';
 		export string KEYWORD_NIB										:= '817';
+		export string KEYWORD_BRIBAMA								:= '818';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

@@ -1231,6 +1231,7 @@
 				trim(kword, left, right) = 'NONBIM' =>SubGroup_Constants.numKeywordsID.KEYWORD_NONBIM,
 				trim(kword, left, right) = 'SLGAZ-PO' =>SubGroup_Constants.numKeywordsID.KEYWORD_SLGAZ_PO,
 				trim(kword, left, right) = 'NIB' =>SubGroup_Constants.numKeywordsID.KEYWORD_NIB,
+				trim(kword, left, right) = 'BRIBAMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRIBAMA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
