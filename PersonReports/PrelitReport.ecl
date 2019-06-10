@@ -6,12 +6,13 @@ out_rec := personreports.layouts.CommonPreLitigationReportIndividual;
 // accepts atmost one DID, actually
 EXPORT PrelitReport (
   dataset (doxie.layout_references) dids,
-  PersonReports.input._prelitreport param,
+  PersonReports.IParam._prelitreport mod_prelit,
   boolean IsFCRA = false) := FUNCTION
 
-  //Convert to the old _report style module:
-  mod_access := $.IParam.MAC_CreateIDataAccessReportModule(param);
-  mod_prelit := MODULE (PROJECT (param, $.IParam._prelitreport), mod_access)
+  //Convert to the old _report style module: $.input._prelitreport
+  //mod_access := PROJECT (mod_prelit, doxie.IDataAccess);
+  param := MODULE (PROJECT (mod_prelit, $.IParam.old_prelitreport))
+    $.input.mac_copy_report_fields(mod_prelit);
   END;
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
