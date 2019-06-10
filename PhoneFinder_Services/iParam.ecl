@@ -98,7 +98,6 @@ MODULE
 		EXPORT BOOLEAN IncludeInhousePhones   := FALSE;
 		EXPORT BOOLEAN UseInhousePhones       := FALSE;
 		
-<<<<<<< HEAD
     //zumigo options
     EXPORT BOOLEAN NameAddressValidation        := FALSE;
     EXPORT BOOLEAN IncludeNameAddressValidation := FALSE;
@@ -117,30 +116,10 @@ MODULE
     EXPORT BOOLEAN InputZumigoOptions           := FALSE;
     // zumigo end
 
-    EXPORT BOOLEAN UseThreatMetrixRules         := FALSE;
-    EXPORT BOOLEAN hasActiveIdentitycountRules  := FALSE;
-=======
-  //zumigo options
- 
-  EXPORT BOOLEAN NameAddressValidation        := FALSE;
-  EXPORT BOOLEAN IncludeNameAddressValidation := FALSE;
-  EXPORT BOOLEAN NameAddressInfo              := FALSE;
-  EXPORT BOOLEAN IncludeNameAddressInfo       := FALSE;
-  EXPORT BOOLEAN AccountInfo                  := FALSE;
-  EXPORT BOOLEAN CallHandlingInfo             := FALSE;
-  EXPORT BOOLEAN IncludeCallHandlingInfo      := FALSE;
-  EXPORT BOOLEAN DeviceInfo                   := FALSE;
-  EXPORT BOOLEAN IncludeDeviceInfo            := FALSE;
-  EXPORT BOOLEAN DeviceChangeInfo             := FALSE;
-  EXPORT BOOLEAN IncludeDeviceChangeInfo      := FALSE;
-  EXPORT BOOLEAN DeviceHistory                := FALSE;
-  EXPORT BOOLEAN IncludeDeviceHistory         := FALSE;
-  EXPORT BOOLEAN IncludeZumigoOptions         := FALSE;
-  EXPORT BOOLEAN InputZumigoOptions           := FALSE;
-  EXPORT BOOLEAN UseThreatMetrixRules         := FALSE;
-  EXPORT BOOLEAN hasActivePhoneTransactionCountRule   := FALSE;
->>>>>>> 0f52f29534cf67a4f3465856552215003b2a6f02
-	END;
+    EXPORT BOOLEAN UseThreatMetrixRules               := FALSE;
+    EXPORT BOOLEAN hasActiveIdentitycountRules        := FALSE;
+    EXPORT BOOLEAN hasActivePhoneTransactionCountRule := FALSE;
+  END;
     
   EXPORT PhoneVerificationParams := 
   INTERFACE
@@ -219,7 +198,6 @@ MODULE
       EXPORT INTEGER  MaxOtherPhones	:= IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, $.Constants.MaxOtherPhones);
                     
 //*****************************		RE-DESIGN data source options **************************
-<<<<<<< HEAD
       SHARED displayAll := TransactionType in [$.Constants.TransType.PREMIUM,
                                               $.Constants.TransType.ULTIMATE,
                                               $.Constants.TransType.PHONERISKASSESSMENT];	
@@ -309,131 +287,9 @@ MODULE
       EXPORT BOOLEAN InputZumigoOptions          := NameAddressValidation OR NameAddressInfo OR CallHandlingInfo OR DeviceInfo OR DeviceChangeInfo OR DeviceHistory;
       EXPORT BOOLEAN UseThreatMetrixRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId  IN $.Constants.AllThreatMetrixRules) AND Active));																				 
 
-      EXPORT BOOLEAN hasActiveIdentityCountRules := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
+      EXPORT BOOLEAN hasActiveIdentityCountRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
+      EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
     END;
-=======
-    
-    SHARED displayAll := TransactionType in [PhoneFinder_Services.Constants.TransType.PREMIUM,
-																						PhoneFinder_Services.Constants.TransType.ULTIMATE,
-																						PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];	
-                                            
-			 EXPORT BOOLEAN IncludePorting           := pfOptions.IncludePorting;
-			 EXPORT BOOLEAN ReturnPortingInfo        := (IncludePhoneMetadata AND displayAll) OR IncludePorting;
-       
-			 EXPORT BOOLEAN IncludeSpoofing          := pfOptions.IncludeSpoofing;
-			 EXPORT BOOLEAN ReturnSpoofingInfo       := (IncludePhoneMetadata AND TransactionType IN [PhoneFinder_Services.Constants.TransType.ULTIMATE,
-																																					       PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT]) OR IncludeSpoofing;
-       
-			 EXPORT BOOLEAN IncludeOTP               := pfOptions.IncludeOTP;
-			 EXPORT BOOLEAN ReturnOTPInfo            := (IncludePhoneMetadata AND displayAll) OR IncludeOTP;
-       
-    
-    SHARED IncludeRiskIndicators_internal        := pfOptions.IncludeRiskIndicators;
-			 EXPORT BOOLEAN   IncludeRiskIndicators       := ((IncludePhoneMetadata AND displayAll) OR IncludeRiskIndicators_internal);
-   
-    EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators				:= IncludeRiskIndicators_internal OR pfOptions.IncludeOtherPhoneRiskIndicators;	
-	  
-   	UserRules							:= pfOptions.RiskIndicators;	
-   	allRules := IF(IncludeRiskIndicators AND EXISTS(UserRules), PhoneFinder_Services.Constants.defaultRiskIndicatorRules  + UserRules,
-   										                                                           DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator));
-   	EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
-   		                                                                                  UserRules, allRules);
-   	EXPORT BOOLEAN   IsGetPortedData                    := ReturnPortingInfo OR IncludePhoneMetadata; 
-		  EXPORT BOOLEAN   IsGetMetaData                      := IsGetPortedData OR ReturnSpoofingInfo OR ReturnOTPInfo OR IncludeRiskIndicators; 
-			        BOOLEAN   RealTimedata 			 		                := pfOptions.UseDeltabase;						 	
-			 EXPORT BOOLEAN   UseDeltabase 					                 := IF(IsGetMetaData
-			                                                          ,RealTimedata
-																							                                        ,FALSE);		
-    
-    EXPORT BOOLEAN IncludeAccudataOCN                   := pfOptions.IncludeAccudataOCN;
-    EXPORT BOOLEAN   UseAccuData_OCN                    := ((IncludePhoneMetadata AND displayAll) OR IncludeAccudataOCN) AND 
-                                                           ~Doxie.DataRestriction.AccuData; 
-                                                           
-    EXPORT BOOLEAN IncludeTargus                        := pfOptions.IncludeTargus;    
-    EXPORT BOOLEAN   UseTargus          		              := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR IncludeTargus) AND 
-                                                           ~doxie.DataRestriction.PhoneFinderTargus;   
-    
-    EXPORT BOOLEAN IncludeEquifax                        := pfOptions.IncludeEquifax;    
-    EXPORT BOOLEAN   UseEquifax         		               := (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR IncludeEquifax) AND
-                                                            ~doxie.DataRestriction.EquifaxPhoneMart;
-    
-    EXPORT BOOLEAN IncludeTransUnionIQ411                := pfOptions.IncludeTransUnionIQ411;   
-    EXPORT BOOLEAN IncludeTransUnionPVS                  := pfOptions.IncludeTransUnionPVS; 
-    
-    EXPORT BOOLEAN UseTransUnionIQ411                    := (TransactionType IN [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate] OR 
-                                                             IncludeTransUnionIQ411) AND
-                                                            ~doxie.DataRestriction.QSent;  
-    EXPORT BOOLEAN UseTransUnionPVS                      :=  (TransactionType IN [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate] OR 
-                                                             IncludeTransUnionPVS) AND
-                                                            ~doxie.DataRestriction.QSent;
-                                                            
-    EXPORT BOOLEAN   UseQSent           		               := UseTransUnionIQ411 OR UseTransUnionPVS;  
-                                                            
-   	EXPORT BOOLEAN   UseInHousePhoneMetadata	 := pfOptions.UseInHousePhoneMetadata;
-    EXPORT BOOLEAN   UseAccuData_CNAM         := UseInHousePhoneMetadata AND ~Doxie.DataRestriction.AccuData; 
-      
-    EXPORT BOOLEAN IncludeInhousePhones      := pfOptions.IncludeInhousePhones;
-    EXPORT BOOLEAN   UseInhousePhones        := IncludeInhousePhones OR 
-                                                 (displayAll OR TransactionType = PhoneFinder_Services.Constants.TransType.BASIC);
-    EXPORT BOOLEAN   UseLastResort      		   := (IncludeInhousePhones OR TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT) AND 
-                                                  doxie.DataPermission.use_LastResort;
-   	EXPORT BOOLEAN   UseInHouseQSent    	   	:= (IncludeInhousePhones OR TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT)  AND 
-                                                  doxie.DataPermission.use_QSent;	  	  
-   
-    SHARED BOOLEAN full_consent   := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer;
-    SHARED BOOLEAN single_consent := LineIdentityConsentLevel = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer;
-    
-    SHARED BOOLEAN ValidZumigoConsents             := (full_consent OR single_consent);
-    
-    BOOLEAN hasActiveDeviceRules              := EXISTS(RiskIndicators((RiskId = PhoneFinder_Services.Constants.RiskRules.SimCardInfo OR 
-                                                                         RiskId = PhoneFinder_Services.Constants.RiskRules.DeviceInfo) AND active));
-                                    
-    SHARED BOOLEAN ValidDeviceConsentInquiry   := ValidZumigoConsents AND hasActiveDeviceRules;	
-    
-    EXPORT BOOLEAN NameAddressInfo                   := pfOptions.IncludeZumigoOptions.NameAddressInfo;   
-    EXPORT BOOLEAN IncludeNameAddressInfo            := ValidZumigoConsents AND 
-                                                        (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR NameAddressInfo);   
-    
-    EXPORT BOOLEAN NameAddressValidation             := pfOptions.IncludeZumigoOptions.NameAddressValidation;
-    EXPORT BOOLEAN IncludeNameAddressValidation      := IncludeNameAddressInfo OR (full_consent AND 
-                                                        (TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR 
-                                                        NameAddressValidation));   // when NameAddressInfo is requested, NameAddressValidation should also be selected
-                                                        
-    EXPORT BOOLEAN AccountInfo                       := pfOptions.IncludeZumigoOptions.AccountInfo;  
-    
-    EXPORT BOOLEAN CallHandlingInfo                  := pfOptions.IncludeZumigoOptions.CallHandlingInfo;
-    EXPORT BOOLEAN IncludeCallHandlingInfo           := full_consent AND
-                                                        (TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
-		                                                             PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] OR CallHandlingInfo) AND
-																												EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.CallForwarding) AND active));    
-                                                                                                                                        
-    // zumigo gateway is configured to turn deviceinfo to true when devicehistory is true
-    EXPORT BOOLEAN DeviceHistory              := pfOptions.IncludeZumigoOptions.DeviceHistory;     
-    EXPORT BOOLEAN IncludeDeviceHistory       :=(TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceHistory) AND
-                                                 ValidDeviceConsentInquiry; 
-    
-    EXPORT BOOLEAN DeviceInfo                 := pfOptions.IncludeZumigoOptions.DeviceInfo;   
-    EXPORT BOOLEAN IncludeDeviceInfo          :=(TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceHistory OR DeviceInfo) AND
-                                                 ValidDeviceConsentInquiry;    
-    
-    EXPORT BOOLEAN DeviceChangeInfo           := pfOptions.IncludeZumigoOptions.DeviceChangeInfo;   
-    EXPORT BOOLEAN IncludeDeviceChangeInfo    :=(TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate OR DeviceChangeInfo) AND
-                                                 ValidDeviceConsentInquiry;   
-		
-    EXPORT BOOLEAN IncludeZumigoOptions       := IncludeNameAddressValidation OR IncludeNameAddressInfo OR
-                                                 IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
-                                                 IncludeDeviceInfo OR IncludeDeviceChangeInfo;                                        	
-		
-    EXPORT BOOLEAN   UseZumigoIdentity	       := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity; 
-     
-    EXPORT BOOLEAN InputZumigoOptions         := NameAddressValidation OR NameAddressInfo OR
-                                                 CallHandlingInfo OR DeviceInfo OR 
-                                                 DeviceChangeInfo OR DeviceHistory;
-				EXPORT BOOLEAN   UseThreatMetrixRules     := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId  IN $.Constants.AllThreatMetrixRules) AND active));																				 
-
-  	EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
-		END;
->>>>>>> 0f52f29534cf67a4f3465856552215003b2a6f02
 			
     RETURN in_params;
   END;
