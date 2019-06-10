@@ -1,4 +1,6 @@
-﻿   export reasonCodes(layout, cnt, rc_settings) := 
+﻿
+
+   export reasonCodes(layout, cnt, rc_settings) := 
 
 
 MACRO
@@ -13,7 +15,9 @@ CHOOSEN(
 	IF(Risk_Indicators.rcSet.isCode03(layout.socsdobflag),DATASET([{'03',risk_indicators.getHRIDesc('03')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodePO(layout.addr_type) AND (rc_settings[1].IsInstantID AND rc_settings[1].IIDVersion>=1), DATASET([{'PO',risk_indicators.getHRIDesc('PO')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeCA(layout.ADVODropIndicator, layout.hrisksic) AND rc_settings[1].IIDVersion>=1,DATASET([{'CA',risk_indicators.getHRIDesc('CA')}],risk_indicators.Layout_Desc)) &
-	IF(Risk_Indicators.rcSet.isCodePA(layout.inputAddrNotMostRecent),DATASET([{'PA',risk_indicators.getHRIDesc('PA')}],risk_indicators.Layout_Desc)) &
+	IF(Risk_Indicators.rcSet.isCodePA(layout.inputAddrNotMostRecent) AND (~rc_settings[1].IsInstantID OR
+    ~((layout.verprim_range = layout.chronoprim_range2 and layout.verprim_name = layout.chronoprim_name2 and layout.verzip[1..5] = layout.chronozip2 and layout.chronodate_last2 >= layout.chronodate_last) or
+      (layout.verprim_range = layout.chronoprim_range3 and layout.verprim_name = layout.chronoprim_name3 and layout.verzip[1..5] = layout.chronozip3 and layout.chronodate_last3 >= layout.chronodate_last))),DATASET([{'PA',risk_indicators.getHRIDesc('PA')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode50(layout.hriskaddrflag, layout.hrisksic, layout.hriskphoneflag, layout.hrisksicphone),DATASET([{'50',risk_indicators.getHRIDesc('50')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode06(layout.socsvalflag, layout.ssn),DATASET([{'06',risk_indicators.getHRIDesc('06')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeIS(layout.ssn, layout.socsvalflag, layout.socllowissue, layout.socsRCISflag),DATASET([{'IS',risk_indicators.getHRIDesc('IS')}],risk_indicators.Layout_Desc)) &
@@ -114,5 +118,6 @@ CHOOSEN(
 	IF(Risk_Indicators.rcSet.isCodeDF(layout.dl_searched, layout.dl_exists, layout.verified_dl, layout.drlcvalflag) AND rc_settings[1].IsInstantID,
 																		DATASET([{'DF',risk_indicators.getHRIDesc(IF(rc_settings[1].IIDVersion>0,'DFN','DF'))}],risk_indicators.Layout_Desc)),	// call the new description for versions > 0
 cnt)
+
 
 ENDMACRO;
