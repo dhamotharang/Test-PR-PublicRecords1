@@ -116,6 +116,7 @@ MODULE
   EXPORT BOOLEAN IncludeZumigoOptions         := FALSE;
   EXPORT BOOLEAN InputZumigoOptions           := FALSE;
   EXPORT BOOLEAN UseThreatMetrixRules         := FALSE;
+  EXPORT BOOLEAN hasActivePhoneTransactionCountRule   := FALSE;
 	END;
     
 		EXPORT PhoneVerificationParams := 
@@ -211,7 +212,7 @@ MODULE
     
     SHARED IncludeRiskIndicators_internal        := pfOptions.IncludeRiskIndicators;
 			 EXPORT BOOLEAN   IncludeRiskIndicators       := ((IncludePhoneMetadata AND displayAll) OR IncludeRiskIndicators_internal);
-       
+   
     EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators				:= IncludeRiskIndicators_internal OR pfOptions.IncludeOtherPhoneRiskIndicators;	
 	  
    	UserRules							:= pfOptions.RiskIndicators;	
@@ -311,8 +312,9 @@ MODULE
                                                  CallHandlingInfo OR DeviceInfo OR 
                                                  DeviceChangeInfo OR DeviceHistory;
 				EXPORT BOOLEAN   UseThreatMetrixRules     := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId  IN $.Constants.AllThreatMetrixRules) AND active));																				 
-   
-		 END;
+
+  	EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
+		END;
 			
 			RETURN in_params;
 		END;
