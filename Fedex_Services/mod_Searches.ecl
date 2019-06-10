@@ -1,16 +1,15 @@
-import gong_services, doxie, business_header, phonesplus, drivers, 
-	autokey, doxie_files, ut, doxie_cbrs, AutoStandardI, CanadianPhones,
-	can_ph, Business_Header_SS, fedex, autokeyb2, header;
+import gong_services, doxie, business_header, 
+	autokey, doxie_cbrs, AutoStandardI, CanadianPhones,
+	can_ph, Business_Header_SS, fedex, autokeyb2, Suppress;
 
 
 export mod_Searches := 
 MODULE;
 //***** INPUTS
-shared dppa_purpose 					:= AutoStandardI.InterfaceTranslator.dppa_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.dppa_purpose.params));
-shared glb_purpose 						:= AutoStandardI.InterfaceTranslator.glb_purpose.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_purpose.params));
-shared industry_class_value 	:= AutoStandardI.InterfaceTranslator.industry_class_value.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.industry_class_value.params));
-shared score_threshold_value 	:= AutoStandardI.InterfaceTranslator.score_threshold_value.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.score_threshold_value.params));
-shared dppa_ok  							:= AutoStandardI.InterfaceTranslator.dppa_ok.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.dppa_ok.params));
+SHARED mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+shared dppa_purpose := mod_access.dppa;
+shared score_threshold_value := AutoStandardI.InterfaceTranslator.score_threshold_value.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.score_threshold_value.params));
+shared dppa_ok := mod_access.isValidDPPA();
 
 
 //***** FEDEX NO-HIT FILE
@@ -23,7 +22,7 @@ export FedexNoHit := byak;
 //***** CANADA
 ck := CanadianPhones.key_fdids;
 cids := CAN_PH.Get_IDs(workhard := true, nofail := true);
-export Canada := 
+can_all := 
 	join(
 		cids,
 		ck,
@@ -34,6 +33,8 @@ export Canada :=
 		),
 		keep(1)
 	);
+export Canada := Suppress.MAC_SuppressSource(can_all, mod_access, fdid);
+doxie.compliance.logSoldToSources (Canada, mod_access, fdid);
 
 //***** GONG
 results := gong_services.Fetch_Gong_History(
@@ -46,7 +47,7 @@ results := gong_services.Fetch_Gong_History(
 	AllowLeadingLnameMatch := AutoKey.skipSetTools(fedex_services.Contants.autokey_skipset).AddZipL,
 	AllowFallBack := fedex_services.Contants.AllowGongFallBack
 );
-ut.PermissionTools.GLB.mac_FilterOutMinors(results,results_fil)
+results_fil := doxie.compliance.MAC_FilterOutMinors (results, , , mod_access.show_minors);
 export GongSearch := results_fil;
 		
 		
@@ -56,15 +57,15 @@ doxie.MAC_Get_GLB_DPPA_PhonesPlus(
 	results,
 	true,//is_roxie=false, 
 	false,//skipAutokeys = false,
-	glb_purpose,
-	dppa_purpose,
-	industry_class_value,
+	mod_access.glb,
+	mod_access.dppa,
+	mod_access.industry_class,
 	,//min_confidencescore = 11
 	,//company_name_value = ''
 	,// autokey_skipset = '[]' // i actually want to pass this in as blank because phones+ does not have the zipprlname key because we only search it with phone# input
-	,doxie.DataRestriction.fixed_DRM
+	,mod_access.DataRestrictionMask
 )
-ut.PermissionTools.GLB.mac_FilterOutMinors(results,results_fil)
+results_fil := doxie.compliance.MAC_FilterOutMinors (results, , , mod_access.show_minors);
 export PhonesPlusSearch := results_fil;
 
 
@@ -138,7 +139,7 @@ export BusinessSearch :=
 
 //***** HEADER
 results := doxie.header_records(include_Dailies := true, allow_wildcard := false,daily_autokey_skipset := fedex_services.Contants.autokey_skipset, noFail := true);
-ut.PermissionTools.GLB.mac_FilterOutMinors(results,results_fil)
+results_fil := doxie.compliance.MAC_FilterOutMinors (results, , , mod_access.show_minors);
 export HeaderSearch := results_fil;
 
 
