@@ -285,7 +285,8 @@ MODULE
     EXPORT BOOLEAN CallHandlingInfo                  := pfOptions.IncludeZumigoOptions.CallHandlingInfo;
     EXPORT BOOLEAN IncludeCallHandlingInfo           := full_consent AND
                                                         (TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
-		                                                             PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] OR CallHandlingInfo);    
+		                                                             PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] OR CallHandlingInfo) AND
+																												EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.CallForwarding) AND active));    
                                                                                                                                         
     // zumigo gateway is configured to turn deviceinfo to true when devicehistory is true
     EXPORT BOOLEAN DeviceHistory              := pfOptions.IncludeZumigoOptions.DeviceHistory;     
