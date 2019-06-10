@@ -403,6 +403,8 @@ versionChange := alerters.versionChange;
 
 use_records := IF(sendHashes, changedSections, all_records);
 
+IF (EXISTS(all_records), doxie.compliance.logSoldToTransaction(mod_access));
+
 DO_ALL := 
 	parallel(
   IF(sendResults,
