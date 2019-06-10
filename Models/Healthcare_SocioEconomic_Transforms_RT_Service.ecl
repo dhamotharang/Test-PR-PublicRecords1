@@ -437,6 +437,8 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF.HealthAttributesV3.InputAddress.ResInputMortgageAmount := IF(Config[1].SuppressInputAddress = false, le.ResInputMortgageAmount , _blank);
 		SELF.HealthAttributesV3.InputAddress.ResInputOwnershipIndex := IF(Config[1].SuppressInputAddress = false, le.ResInputOwnershipIndex , _blank);
 		SELF.HealthAttributesV3.InputAddress.SFDUAddrIdentitiesCount := IF(Config[1].SuppressInputAddress = false, le.SFDUAddrIdentitiesCount , _blank);
+		SELF.HealthAttributesV3.InputAddress.SFDUAddrIdentitiesCount_12 := IF(Config[1].SuppressInputAddress = false, le.SFDUAddrIdentitiesCount_12 , _blank);
+		SELF.HealthAttributesV3.InputAddress.SFDUAddrIdentitiesCount_24 := IF(Config[1].SuppressInputAddress = false, le.SFDUAddrIdentitiesCount_24 , _blank);
 		SELF.HealthAttributesV3.InputAddress.SFDUAddrSSNCount := IF(Config[1].SuppressInputAddress = false, le.SFDUAddrSSNCount , _blank); 
 		SELF.HealthAttributesV3.InputSSN.DivSSNAddrMSourceCount := IF(Config[1].SuppressInputSSN = false, le.DivSSNAddrMSourceCount , _blank);
 		SELF.HealthAttributesV3.InputSSN.DivSSNIdentityMSourceCount := IF(Config[1].SuppressInputSSN = false, le.DivSSNIdentityMSourceCount , _blank);

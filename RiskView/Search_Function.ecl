@@ -1,4 +1,4 @@
-﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA, personcontext;
+﻿﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA, personcontext;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -34,7 +34,10 @@ EXPORT Search_Function(
 	integer2 ReportingPeriod, 
 	boolean IncludeLnJ,
 	boolean RetainInputDID,
-	boolean exception_score_reason = FALSE) := function
+	boolean exception_score_reason = FALSE,
+  boolean InsuranceMode = FALSE, //BF _ This value is set to true for insurance only.
+	boolean InsuranceBankruptcyAllow10Yr = FALSE //Value is true for insurance only.
+  ) := function
 
 
 boolean   isPreScreenPurpose := StringLib.StringToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -214,6 +217,7 @@ LexIDOnlyOnInput := IF(onThor, FALSE,
 										
 Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);									
 
+// BF _ Custom models are set to blank for insurance, therefore version 50 is selected.
 bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or 
                 Custom_model_name in  ['RVP1702_1'] or 
                 Custom2_model_name in ['RVP1702_1'] or 
@@ -250,7 +254,12 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		if( FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) +//DRM to drive Liens/Judgments
 		if( IncludeRecordsWithSSN, risk_indicators.iid_constants.BSOptions.SSNLienFtlr, 0 ) +
 		if( IncludeBureauRecs, risk_indicators.iid_constants.BSOptions.BCBLienFtlr, 0 )	 + 
-		if( RetainInputDID or LexIDOnlyOnInput, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 );
+		if( RetainInputDID or LexIDOnlyOnInput, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
+   //BF _ Followings are added only for insurnace
+    if(InsuranceMode, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode +
+                      Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException, 0) +
+		if(InsuranceMode and InsuranceBankruptcyAllow10Yr, Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr, 0);
+
 		
 	// In prescreen mode or if Lex ID is the only input run the ADL Based shell to append inputs
 	ADL_Based_Shell := isPreScreenPurpose OR LexIDOnlyOnInput;

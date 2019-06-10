@@ -1,11 +1,12 @@
-﻿import _Control, doxie_files, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators, STD;
+﻿﻿import _Control, doxie_files, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators, STD;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0, 
 				GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections) := function
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
-	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_bk_allow_10yr := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr) > 0;
+	insurance_fcra_filter :=  ((BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0) AND (NOT insurance_bk_allow_10yr);
 	Insurance_bk_chapter_exception := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException) > 0;
 
 	bans_did := BankruptcyV3.key_bankruptcyV3_did(true);

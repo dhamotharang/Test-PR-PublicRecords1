@@ -17,6 +17,7 @@ EXPORT ProductID := MODULE
 	EXPORT Models__RiskView_Service   := Riskwise;
 	EXPORT RiskView__Search_Service   := RiskWise;
 	EXPORT ISS_FcraInsurView__Service := Riskwise;
+	EXPORT ISS_FcraInsurView2__Service := Riskwise;
 	EXPORT RiskWise__RiskWiseMainBC1O := Riskwise;
 	EXPORT RiskWise__RiskWiseMainPRIO := Riskwise;
 	EXPORT RiskWise__RiskWiseMainSC1O := Riskwise;
