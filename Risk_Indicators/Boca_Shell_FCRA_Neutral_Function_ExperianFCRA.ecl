@@ -1,22 +1,22 @@
-﻿import doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile;
+﻿import doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile, risk_indicators;
 
-export Boca_Shell_FCRA_Neutral_Function_ExperianFCRA(grouped DATASET(Layout_output) iid,
+export Boca_Shell_FCRA_Neutral_Function_ExperianFCRA(grouped DATASET(risk_indicators.Layout_output) iid,
 								unsigned1 dppa, unsigned1 glb,
 								boolean isUtility = false,
 								boolean isLN=false,
 								boolean includeRelativeInfo = false,
 								boolean IsFCRA = FALSE,
 								unsigned1 BSversion = 1, boolean nugen = false,
-								string50 DataRestriction=iid_constants.default_DataRestriction,
+								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 								unsigned8 BSOptions
 								) := function
 
 glb_ok := glb > 0 and glb < 8 or glb=11 or glb=12;
 dppa_ok := dppa > 0 and dppa < 8;
 
-ids := GROUP(SORT(Boca_Shell_Ids(iid, includeRelativeInfo, DataRestriction, BSOptions),seq),seq);
+ids := GROUP(SORT(risk_indicators.Boca_Shell_Ids(iid, includeRelativeInfo, DataRestriction, BSOptions),seq),seq);
 
-relrec := layout_bocashell_neutral;
+relrec := risk_indicators.layout_bocashell_neutral;
 
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 unsigned1 IIDVersion := 0;	// version 0 will not get the new v1 reason codes
@@ -34,7 +34,7 @@ TRANSFORM
 	SELF.ADLCategory := le.ADLCategory;
 	SELF.trueDID := le.trueDID;
 
-	SELF.Shell_Input := ROW(le,TRANSFORM(Layout_Input,SELF := LEFT));
+	SELF.Shell_Input := ROW(le,TRANSFORM(risk_indicators.Layout_Input,SELF := LEFT));
 	SELF.iid.NAS_summary := le.socsverlevel;
 	SELF.iid.NAP_summary := le.phoneverlevel;
 	
@@ -61,8 +61,8 @@ TRANSFORM
 																																 0);
 	self.iid := le;
 
-	SELF.Available_Sources.DL := Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st));
-	SELF.Available_Sources.Voter := Source_Available.VoterSrcSt(le.st, bsversion, isFCRA, le.historydate);
+	SELF.Available_Sources.DL := risk_indicators.Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st));
+	SELF.Available_Sources.Voter := risk_indicators.Source_Available.VoterSrcSt(le.st, bsversion, isFCRA, le.historydate);
 
 	// Input Check
 	SELF.Input_Validation.FirstName := le.fname<>'';

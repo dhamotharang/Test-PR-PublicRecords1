@@ -1,10 +1,10 @@
 ﻿
 import ut, riskwise, dx_header, LN_PropertyV2, paw, Inquiry_AccLogs, liensv2, doxie_files, 
-BankruptcyV3, american_student_list, AlloyMedia_student_list, prof_licenseV2, Impulse_Email, thrive, mdr;
+BankruptcyV3, american_student_list, AlloyMedia_student_list, prof_licenseV2, Impulse_Email, thrive, mdr, risk_indicators;
 
 // this function gives a high level overview of different public records attributes at the household level
 EXPORT Boca_Shell_HHID_Summary(grouped DATASET(risk_indicators.iid_constants.layout_outx) all_header,
-unsigned1 dppa, string50 DataRestriction=iid_constants.default_DataRestriction, integer bsVersion
+unsigned1 dppa, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, integer bsVersion
 
 )  := function
 
@@ -107,7 +107,7 @@ with_impulse := join(with_collection_inquiries, Impulse_Email.Key_Impulse_DID,
 
 with_thrive := join(with_impulse, thrive.keys().did.qa, 
 									keyed(left.did=right.did) and 
-									((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) AND
+									((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) AND
 									right.src = mdr.sourceTools.src_Thrive_PD, 
 									transform(layout_hhid_temp,
 										self.hh_payday_loan_users := if(right.did<>0 or left.hh_payday_loan_users=1, 1, 0);

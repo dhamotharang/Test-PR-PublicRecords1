@@ -1,5 +1,5 @@
-
-IMPORT Doxie, Drivers, Riskwise, ut, VehicleV2, VehicleV2_Services;
+﻿
+IMPORT Doxie, Drivers, Riskwise, ut, VehicleV2, VehicleV2_Services, risk_indicators;
 
 EXPORT Boca_Shell_Vehicles_All := MODULE
 
@@ -279,8 +279,8 @@ EXPORT Boca_Shell_Vehicles_All := MODULE
 		kv := as_Key_BocaShell_Vehicles( ids, dppa, dppa_ok, includeRel, BSversion );
 
 		vehrec := RECORD
-			Layout_Boca_Shell_ids;
-			Layout_Vehicles.Vehicle_Set;
+			risk_indicators.Layout_Boca_Shell_ids;
+			risk_indicators.Layout_Vehicles.Vehicle_Set;
 			unsigned1 relative_owned_count;
 		END;
 
