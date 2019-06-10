@@ -1,4 +1,4 @@
-﻿import _Control, american_student_list, FCRA, Riskwise, AlloyMedia_student_list;
+﻿import _Control, american_student_list, FCRA, Riskwise, AlloyMedia_student_list, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion) := FUNCTION
@@ -28,7 +28,7 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
-		self.student.date_last_seen := min( iid_constants.mygetdate(le.historydate), ri.date_last_seen );
+		self.student.date_last_seen := min( risk_indicators.iid_constants.mygetdate(le.historydate), ri.date_last_seen );
 		self.student.file_type2 := ri.file_type;
 		//NOTE: the student FCRA income level code will now be overwritten in Risk_Indicators.getAllBocaShellData as census data can't be used in FCRA 
 		self.student := row(ri, transform( Riskwise.Layouts.Layout_American_Student, self := left, self.file_type2 := ri.file_type, self.college_tier := if(bsversion>=50, ri.tier2, ri.tier) ) );
@@ -53,14 +53,14 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
 	student_file_roxie := join(ids_only, american_student_list.key_DID_FCRA, 
 			left.did!=0
 			and keyed(left.did=right.l_did)
-			and right.date_first_seen < iid_constants.myGetDate(left.historydate)
+			and right.date_first_seen < risk_indicators.iid_constants.myGetDate(left.historydate)
 			and (string)right.key not in left.student_correct_record_id,
 			student(left, right), atmost(keyed(left.did=right.l_did), 100));
 
 	student_file_thor := join(distribute(ids_only(did!=0), hash64(did)), 
 			distribute(pull(american_student_list.key_DID_FCRA), hash64(l_did)), 
 			left.did=right.l_did
-			and right.date_first_seen < iid_constants.myGetDate(left.historydate)
+			and right.date_first_seen < risk_indicators.iid_constants.myGetDate(left.historydate)
 			and (string)right.key not in left.student_correct_record_id,
 			student(left, right), atmost(left.did=right.l_did, 100), LOCAL);
 			
@@ -172,7 +172,7 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
 			);
 
 		self.student.date_first_seen := ri.date_vendor_first_reported;
-		self.student.date_last_seen := min( iid_constants.mygetdate(le.historydate), ri.date_vendor_last_reported );
+		self.student.date_last_seen := min( risk_indicators.iid_constants.mygetdate(le.historydate), ri.date_vendor_last_reported );
 
 		self.student.college_name := ri.school_name;
 		self.student.college_tier := if(bsversion>=50, ri.tier2, ri.tier);
@@ -202,14 +202,14 @@ export Boca_Shell_Student_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell
 	alloy_file_roxie := join(ids_only, AlloyMedia_student_list.Key_DID_FCRA, 
 		left.did!=0
 		and keyed(left.did=right.did)
-		and right.date_vendor_first_reported < iid_constants.myGetDate(left.historydate)
+		and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate)
     and (trim(right.sequence_number) + trim(right.key_code) + (string)right.rawaid) not in left.student_correct_record_id,
 		alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
 	
 	alloy_file_thor := join(distribute(ids_only(did!=0), hash64(did)), 
 		distribute(pull(AlloyMedia_student_list.Key_DID_FCRA), hash64(did)), 
 		(left.did=right.did)
-		and right.date_vendor_first_reported < iid_constants.myGetDate(left.historydate)
+		and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate)
     and (trim(right.sequence_number) + trim(right.key_code) + (string)right.rawaid) not in left.student_correct_record_id,
 		alloy_main(left, right), atmost(left.did=right.did, 100), LOCAL);	
 

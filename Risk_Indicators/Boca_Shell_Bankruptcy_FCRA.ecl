@@ -69,7 +69,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
   
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus get_bankrupt_FCRA (Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, 
 		bans_search ri) := TRANSFORM
-		myGetDate := iid_constants.myGetDate(le.historydate);
+		myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		SELF.BJL.bankrupt := ri.case_number<>'';
 		date_last_seen := if(bsversion<50, MAX((INTEGER)ri.date_filed, if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0)), (INTEGER) ri.date_filed);//only use the disposed date if not in the future
 		SELF.BJL.date_last_seen := date_last_seen;

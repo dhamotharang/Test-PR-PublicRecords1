@@ -1,5 +1,5 @@
-#workunit('name','nonfcrashell');
-import ut, riskwise, risk_indicators;
+﻿#workunit('name','nonfcrashell');
+import ut, riskwise, risk_indicators, Data_Services;
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -14,7 +14,7 @@ import ut, riskwise, risk_indicators;
 
 // IMPORT Risk_Indicators, RiskWise, ut;
 
-unsigned record_limit :=   10;    //number of records to read from input file; 0 means ALL
+unsigned record_limit :=   75000;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 2;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 25;
 boolean RemoveFares := false;	// change this to TRUE for FARES filtering
@@ -25,7 +25,7 @@ unsigned1 glba := 1;
 unsigned1 dppa := 3;
 
 //===================  input-output files  ======================
-infile_name :=  ut.foreign_prod+'dvstemp::in::audit_input_file_w20140701-122932';
+infile_name :=  Data_Services.foreign_prod+'dvstemp::in::audit_input_file_w20140701-122932';
 
 outfile_name := '~dvstemp::out::audit::nonfcrashell_test_' + thorlib.wuid();
 
@@ -60,11 +60,11 @@ layout_input := RECORD
 //====================================================
 // Regular BocaShell service
 
-bs_service := 'risk_indicators.boca_shell.27';
+bs_service := 'risk_indicators.boca_shell.61';
 // bs_service := 'risk_indicators.boca_shell.12';
 // bs_service := 'risk_indicators.boca_shell_11_4bugs';
 // bs_service := 'risk_indicators.boca_shell_11_18bugs';
-roxieIP := RiskWise.Shortcuts.dev194;    // Roxiebatch
+roxieIP := RiskWise.Shortcuts.dev156;    // Roxiebatch
 // roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
 
 
@@ -121,14 +121,14 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
   SELF.IncludeScore := true;
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.RemoveFares := RemoveFares;
-	self.bsversion := 52;				
+	self.bsversion := 54;				
   SELF := le;
   SELF := [];
 END;
 p_f1 := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
 
 // duplicate the same inputs, but change the history dates
-p_f2 := project(p_f1, transform(l, self.accountnumber := (string)(100000 + (unsigned)left.accountnumber), self.historydateyyyymm := 201703; self := left));
+p_f2 := project(p_f1, transform(l, self.accountnumber := (string)(100000 + (unsigned)left.accountnumber), self.historydateyyyymm := 201905; self := left));
 p_f3 := project(p_f1, transform(l, self.accountnumber := (string)(200000 + (unsigned)left.accountnumber), self.historydateyyyymm := 201010; self := left));
 
 // duplicate the same inputs, but change the bsversion and the history dates
@@ -145,7 +145,8 @@ p_f9 := project(p_f1, transform(l, self.accountnumber := (string)(800000 + (unsi
 // p_f := p_f1 + p_f2 + p_f3 + p_f4 + p_f5 + p_f6;
 // p_f := p_f1 + p_f3 + p_f4 + p_f6;  // heather doesn't need history mode with current date unless it's the beginning of the month
 // p_f := p_f1 ;  // just run 5.0 for this test
-p_f := p_f1 + p_f2 + p_f3 + p_f4 + p_f5 + p_f6 + p_f7 + p_f8 + p_f9 ;  // run the gamut
+p_f := p_f1 + p_f2 + p_f3;
+//+ p_f4 + p_f5 + p_f6 + p_f7 + p_f8 + p_f9 ;  // run the gamut
 output(choosen(p_f,eyeball), named('BSInput'));
 								
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),

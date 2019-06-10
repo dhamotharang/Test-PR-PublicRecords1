@@ -1,4 +1,4 @@
-/*2016-01-08T01:08:11Z (Andi Koenen)
+﻿/*2016-01-08T01:08:11Z (Andi Koenen)
 RR: 192631: CBD 5.0 new attributes
 */
 /*
@@ -11,17 +11,17 @@ btst_bt_addr_bip_match - whether or not searching the Business Header by the BT 
 btst_st_addr_bip_match - whether or not searching the Business Header by the ST inputs returns a matching business entity
 */
 
-import BIPV2, MDR, Header, riskwise;
+import BIPV2, MDR, Header, riskwise, risk_indicators;
 
 export Boca_Shell_BtSt_Bus_Header(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input,
-	unsigned1 glb, unsigned1 dppa, string50 DataRestriction=iid_constants.default_DataRestriction,
+	unsigned1 glb, unsigned1 dppa, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 	string50 DataPermission = risk_indicators.iid_constants.default_DataPermission) := FUNCTION
 
 bus_input := ungroup(input);
 isFCRA := false;
 
 layout_bocashell_btst_out_working := record
-	layout_bocashell_btst_out;
+	risk_indicators.layout_bocashell_btst_out;
   unsigned6 powid;
   unsigned6 proxid;
   unsigned6 seleid;
@@ -101,7 +101,7 @@ end;
 
 	bt_bus_info := JOIN(bus_input, tbl_bt_with_bus_addr_dp,
 		LEFT.Bill_To_Output.Seq = Right.seq,
-		transform(layout_bocashell_btst_out, 
+		transform(risk_indicators.layout_bocashell_btst_out, 
 			BTInputPopulated := if(left.Bill_To_Output.prim_range != '' or left.Bill_To_Output.prim_name != '' 
 			or left.Bill_To_Output.sec_range != '' or left.Bill_To_Output.z5 != '' or left.Bill_To_Output.st != '', true, false);
 			
@@ -136,7 +136,7 @@ end;
 
 	btst_bus_info := JOIN(bt_bus_info, tbl_st_with_bus_addr_dp,
 		LEFT.Bill_To_Out.Seq = Right.seq - 1,
-		transform(layout_bocashell_btst_out,
+		transform(risk_indicators.layout_bocashell_btst_out,
 			STInputPopulated := if(left.Ship_To_Out.Shell_Input.prim_range != '' or left.Ship_To_Out.Shell_Input.prim_name != '' 
 				or left.Ship_To_Out.Shell_Input.sec_range != '' or left.Ship_To_Out.Shell_Input.z5 != '' or left.Ship_To_Out.Shell_Input.st != '', true, false);
 			self.btst_st_bip_addr_ct := if(STInputPopulated, right.seleIdCnt, -1);
@@ -153,7 +153,7 @@ end;
 
 	postBusHeader_TMP :=	join(btst_bus_info, tbl_SeleCounts,
 			left.bill_to_out.seq = right.seq,
-			transform(layout_bocashell_btst_out, 
+			transform(risk_indicators.layout_bocashell_btst_out, 
 				self.btst_businesses_in_common := if(left.Bill_To_Out.did != 0 and left.Ship_To_Out.did != 0 and
 					left.Ship_To_Out.did != left.Bill_To_Out.did, right.seleIdCnt, -1);
 				STInputandBTdid := if((left.Ship_To_Out.Shell_Input.prim_range != '' or left.Ship_To_Out.Shell_Input.prim_name != '' or 

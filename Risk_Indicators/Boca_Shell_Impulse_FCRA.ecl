@@ -1,20 +1,20 @@
-﻿Import _Control, Impulse_Email, ut, FCRA, thrive, riskwise, mdr;
+﻿Import _Control, Impulse_Email, ut, FCRA, thrive, riskwise, mdr, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Impulse_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide, integer bsversion, 
+export Boca_Shell_Impulse_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, integer bsversion, 
 		boolean isDirectToConsumerPurpose = false) := FUNCTION
 
 Layout_Impulse := RECORD
 	unsigned4 seq;
 	unsigned3 historydate;
-	Layouts.Layout_Impulse;
+	risk_indicators.Layouts.Layout_Impulse;
 	string50 siteidsrc;	// internal
 END;
 
 
 // get corrections
 Layout_Impulse impulse_corr(ids_wide le, FCRA.Key_Override_Impulse_FFID ri) := TRANSFORM
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := ri.did<>0;
 	self.count := (integer)hit;
 	self.first_seen_date := (unsigned)stringlib.stringfilterout(ri.created[1..10],'-');
@@ -53,7 +53,7 @@ impulse_correct_thor := join(ids_wide, pull(FCRA.Key_Override_Impulse_FFID),
 #END
 
 Layout_Impulse addImpulse(ids_wide le, Impulse_Email.Key_Impulse_DID_FCRA ri) := transform
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := ri.did<>0;
 	self.count := (integer)hit;
 	self.first_seen_date := (unsigned)stringlib.stringfilterout(ri.created[1..10],'-');
@@ -80,7 +80,7 @@ wImpulse_roxie := join(ids_wide, Impulse_Email.Key_Impulse_DID_FCRA,
 														trim((string)right.did)+trim(right.created) not in left.impulse_correct_record_id and
 														keyed(left.did=right.did) and
 														(ut.daysapart(stringlib.stringfilterout(right.lastmodified[1..10],'-'), 
-																						iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+																						risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 														isDirectToConsumerPurpose = false,
 														addImpulse(left,right), left outer, atmost(riskwise.max_atmost));
 
@@ -91,7 +91,7 @@ wImpulse_thor := join(distribute(ids_wide, hash64(did)),
 														trim((string)right.did)+trim(right.created) not in left.impulse_correct_record_id and
 														(left.did=right.did) and
 														(ut.daysapart(stringlib.stringfilterout(right.lastmodified[1..10],'-'), 
-																						iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+																						risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 														isDirectToConsumerPurpose = false,
 														addImpulse(left,right), left outer, LOCAL);
 
@@ -103,7 +103,7 @@ wImpulse_thor := join(distribute(ids_wide, hash64(did)),
 
 //for BS 5.3 - join to Impulse a second time using history date + 2 years in order to populate the offset history date counts
 Layout_Impulse addImpulseOffset(ids_wide le, Impulse_Email.Key_Impulse_DID_FCRA ri) := transform
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := ri.did<>0;
 	dt_first_seen	 			:= stringlib.stringfilterout(ri.created[1..10],'-');
 	dt_last_seen 				:= stringlib.stringfilterout(ri.lastmodified[1..10],'-');
@@ -133,7 +133,7 @@ wImpulseOffset_roxie := join(ids_wide, Impulse_Email.Key_Impulse_DID_FCRA,
 														trim((string)right.did)+trim(right.created) not in left.impulse_correct_record_id and
 														keyed(left.did=right.did) and
 														(ut.daysapart(stringlib.stringfilterout(right.lastmodified[1..10],'-'), 
-																						iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+																						risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 														isDirectToConsumerPurpose = false,
 														addImpulseOffset(left,right), left outer, atmost(riskwise.max_atmost));
 
@@ -144,7 +144,7 @@ wImpulseOffset_thor := join(distribute(ids_wide, hash64(did)),
 														trim((string)right.did)+trim(right.created) not in left.impulse_correct_record_id and
 														(left.did=right.did) and
 														(ut.daysapart(stringlib.stringfilterout(right.lastmodified[1..10],'-'), 
-																						iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+																						risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 														isDirectToConsumerPurpose = false,
 														addImpulseOffset(left,right), left outer, LOCAL);
 
@@ -163,7 +163,7 @@ key_main := thrive.keys().Did_fcra.qa;
 Layout_Impulse append_thrive(ids_wide le, key_main rt) := transform
 	self.seq := le.seq;
 		
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := rt.did<>0;
 	self.count := (integer)hit;
 	dt_first_seen := rt.dt_first_seen;
@@ -194,8 +194,8 @@ wThrive_roxie := join (ids_wide, key_main,
 		left.did<>0 and
     keyed (left.did = right.did) and
 		right.src = mdr.sourceTools.src_Thrive_PD  and
-		((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) AND
-		(ut.daysapart((string)right.dt_first_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
+		((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) AND
+		(ut.daysapart((string)right.dt_first_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
 		append_thrive(left, right),
     atmost(riskwise.max_atmost)
   );
@@ -219,7 +219,7 @@ wThrive_thor := join (distribute(ids_wide(did<>0), hash64(did)),
 Layout_Impulse append_thrive_offset(ids_wide le, key_main rt) := transform
 	self.seq := le.seq;
 		
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := rt.did<>0;
 
 	self.count := 0;
@@ -275,7 +275,7 @@ paydayrecords := map(bsversion>=53	=> ungroup(combo_impulse + wThrive + wThriveO
 sorted_payday := group(sort(paydayrecords,seq, siteid, -last_seen_date),seq);
 
 Layout_Impulse rollImpulse(Layout_Impulse le, Layout_Impulse ri) := transform
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.count := le.count + ri.count;
 	self.first_seen_date := ut.Min2(le.first_seen_date,ri.first_seen_date);
 	self.last_seen_date := if(MAX(le.last_seen_date,ri.last_seen_date) > (unsigned)myGetDate, (unsigned)myGetDate, MAX(le.last_seen_date,ri.last_seen_date));

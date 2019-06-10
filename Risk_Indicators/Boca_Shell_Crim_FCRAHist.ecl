@@ -27,7 +27,7 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
       dismissed := dismissed_roxie;
     #END
     
-		myGetDate := iid_constants.myGetDate(le.historydate);
+		myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		criminal_count := (INTEGER)((unsigned6)ri.did<>0 and not dismissed);
 		SELF.BJL.criminal_count := criminal_count;
 		SELF.BJL.last_criminal_date := if(criminal_count > 0, (unsigned)ri.fcra_date, 0);
@@ -64,7 +64,7 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 	doc_added_crim_roxie := JOIN (w_BankLiens, fcra_offenders_key, 
 										 (LEFT.did != 0) AND keyed(LEFT.did=RIGHT.sdid) AND
 											(unsigned3)(RIGHT.fcra_date[1..6]) < left.historydate AND
-											FCRA.crim_is_ok(iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
+											FCRA.crim_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
 											// for shell version 3 or higher, only allow criminal records with offense_score = M or F
 											( (bsversion >= 3 and RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores) or
 											RIGHT.offense_score NOT IN ['I'] ),
@@ -78,7 +78,7 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 											distribute(fcra_offenders_key_thor, hash64(sdid)), 
 										 (LEFT.did=RIGHT.sdid) AND
 											(unsigned3)(RIGHT.fcra_date[1..6]) < left.historydate AND
-											FCRA.crim_is_ok(iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
+											FCRA.crim_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
 											// for shell version 3 or higher, only allow criminal records with offense_score = M or F
 											( (bsversion >= 3 and RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores) or
 											RIGHT.offense_score NOT IN ['I'] ),
@@ -129,7 +129,7 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
       dismissed := dismissed_roxie;
     #END
     
-		myGetDate := iid_constants.myGetDate(le.historydate);
+		myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		
 		SELF.crim_case_num:= ri.case_num;
 		
@@ -144,7 +144,7 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 	doc_added_crim_offset_roxie := JOIN (w_BankLiens, fcra_offenders_key, 
 										 (LEFT.did != 0) AND keyed(LEFT.did=RIGHT.sdid) AND
 											(unsigned3)(RIGHT.fcra_date[1..6]) < (left.historydate + 200) AND
-											FCRA.crim_is_ok(iid_constants.myGetDate(left.historydate + 200),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
+											FCRA.crim_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate + 200),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
 											// for shell version 3 or higher, only allow criminal records with offense_score = M or F
 											( (bsversion >= 3 and RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores) or
 											RIGHT.offense_score NOT IN ['I'] ),
@@ -156,7 +156,7 @@ export Boca_Shell_Crim_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 											distribute(fcra_offenders_key_thor, hash64(sdid)), 
 										 (LEFT.did=RIGHT.sdid) AND
 											(unsigned3)(RIGHT.fcra_date[1..6]) < (left.historydate + 200) AND
-											FCRA.crim_is_ok(iid_constants.myGetDate(left.historydate + 200),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
+											FCRA.crim_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate + 200),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag) AND
 											// for shell version 3 or higher, only allow criminal records with offense_score = M or F
 											( (bsversion >= 3 and RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores) or
 											RIGHT.offense_score NOT IN ['I'] ),

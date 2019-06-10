@@ -1,4 +1,6 @@
-export Boca_Shell_Pipe(dataset(Layout_Batch_In) indataset,
+﻿import risk_indicators;
+
+export Boca_Shell_Pipe(dataset(risk_indicators.Layout_Batch_In) indataset,
 												unsigned dppa_purpose='0', unsigned glb_purpose, STRING industry_class='',
 												boolean ln_branded, STRING6 history_date='999999') := function
 	

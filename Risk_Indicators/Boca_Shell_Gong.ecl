@@ -1,4 +1,4 @@
-import riskwise, ut, gong;
+﻿import riskwise, ut, gong, risk_indicators;
 
 export Boca_Shell_Gong(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
 
@@ -40,9 +40,9 @@ Layout_Gong addPhone(ids_wide le, gong.Key_History_did ri) := transform
 	
 	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');		
 	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and 
-		risk_indicators.iid_constants.checkdays(iid_constants.myGetDate(le.historydate),
+		risk_indicators.iid_constants.checkdays(risk_indicators.iid_constants.myGetDate(le.historydate),
 														ri.dt_first_seen,
-														iid_constants.oneyear, 
+														risk_indicators.iid_constants.oneyear, 
 														le.historydate), ri.phone10 + ',', '');		
 														
 	// set these 3 later	in their own join after we've rolled up unique phones

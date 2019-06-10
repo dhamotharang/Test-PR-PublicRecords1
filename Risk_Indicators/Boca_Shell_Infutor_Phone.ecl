@@ -1,26 +1,26 @@
-﻿import _Control, InfutorCID, ut, riskwise, FCRA;
+﻿import _Control, InfutorCID, ut, riskwise, FCRA, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Infutor_Phone(GROUPED DATASET(layout_bocashell_neutral) bs, boolean isFCRA, INTEGER BSVersion) := FUNCTION
+export Boca_Shell_Infutor_Phone(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) bs, boolean isFCRA, INTEGER BSVersion) := FUNCTION
 
-layout_bocashell_neutral getInfutor(bs le, InfutorCID.Key_Infutor_Phone ri) := transform	
-	firstscore := FnameScore(le.shell_input.fname, ri.fname);
-	firstmatch := iid_constants.g(firstscore);
-	lastscore := LnameScore(le.shell_input.lname, ri.lname);
-	lastmatch := iid_constants.g(lastscore);
+risk_indicators.layout_bocashell_neutral getInfutor(bs le, InfutorCID.Key_Infutor_Phone ri) := transform	
+	firstscore := risk_indicators.FnameScore(le.shell_input.fname, ri.fname);
+	firstmatch := risk_indicators.iid_constants.g(firstscore);
+	lastscore := risk_indicators.LnameScore(le.shell_input.lname, ri.lname);
+	lastmatch := risk_indicators.iid_constants.g(lastscore);
 	zip_score := Risk_Indicators.AddrScore.zip_score(le.shell_input.in_zipcode, ri.zip);
 	cityst_score := Risk_Indicators.AddrScore.citystate_score(le.shell_input.in_city, le.shell_input.in_state, ri.p_city_name, ri.st, le.iid.cityzipflag);
-	addrmatch := iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
+	addrmatch := risk_indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						zip_score, cityst_score) );
-	phonescore := PhoneScore(le.shell_input.phone10, ri.phone);
-	phonematch := iid_constants.gn(phonescore);
+	phonescore := risk_indicators.PhoneScore(le.shell_input.phone10, ri.phone);
+	phonematch := risk_indicators.iid_constants.gn(phonescore);
 
 	self.infutor_phone.infutor_date_first_seen := ri.dt_first_seen;
 	myGetDate := (unsigned)risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.infutor_phone.infutor_date_last_seen  := if(ri.dt_last_seen > myGetDate, myGetDate, ri.dt_last_seen);
 
-	self.infutor_phone.infutor_nap := iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
+	self.infutor_phone.infutor_nap := risk_indicators.iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
 	
 	// only add IR to sources if it matches at least 2 elements
 	goodHit := IF(((INTEGER)firstmatch+(INTEGER)lastmatch+(INTEGER)addrmatch+(INTEGER)phonematch)>1,true,false);	
@@ -56,14 +56,14 @@ Infutor_key := if(isFCRA, InfutorCID.Key_Infutor_Phone_FCRA, InfutorCID.Key_Infu
 wInfutor_roxie := join(	bs,Infutor_key ,	// need to make sure this populates in the current layout edina infutor fields and not the DID results
 			trim(left.shell_input.phone10)<>'' and
 			keyed(left.shell_input.phone10=right.phone) and
-			right.dt_first_seen < (unsigned)iid_constants.myGetDate(left.historydate) and 
+			right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate) and 
 			(~isFCRA or trim((string)right.did)+trim(right.phone)+trim((string)right.dt_first_seen) not in left.infutor_correct_record_id),
 			getInfutor(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));
 
 wInfutor_thor_phone := join(distribute(	bs(trim(shell_input.phone10) <> ''), hash64(shell_input.phone10)),
 			distribute(pull(Infutor_key), hash64(phone)) ,	// need to make sure this populates in the current layout edina infutor fields and not the DID results
 			(left.shell_input.phone10=right.phone) and
-			right.dt_first_seen < (unsigned)iid_constants.myGetDate(left.historydate) and 
+			right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate) and 
 			(~isFCRA or trim((string)right.did)+trim(right.phone)+trim((string)right.dt_first_seen) not in left.infutor_correct_record_id),
 			getInfutor(left,right), left outer, atmost(left.shell_input.phone10=right.phone, riskwise.max_atmost), KEEP(100), LOCAL);						
 
@@ -85,7 +85,7 @@ combo_thor := group(sort(distribute(combined, hash64(seq)), seq, local), seq, lo
 	combo := combo_roxie;
 #END
 
-layout_bocashell_neutral rollInfutor(layout_bocashell_neutral le, layout_bocashell_neutral ri) := transform
+risk_indicators.layout_bocashell_neutral rollInfutor(risk_indicators.layout_bocashell_neutral le, risk_indicators.layout_bocashell_neutral ri) := transform
 	self.infutor_phone.infutor_date_first_seen := MIN(le.infutor_phone.infutor_date_first_seen, ri.infutor_phone.infutor_date_first_seen);
 	self.infutor_phone.infutor_date_last_seen := MAX(le.infutor_phone.infutor_date_last_seen, ri.infutor_phone.infutor_date_last_seen);
 	self.infutor_phone.infutor_nap := MAX(le.infutor_phone.infutor_nap, ri.infutor_phone.infutor_nap);
@@ -104,7 +104,7 @@ rolledInfutor := rollup(combo, true, rollInfutor(left,right));
 
 // added for JIRA MS 42
 
-infutor_final :=  PROJECT (rolledInfutor, TRANSFORM (layout_bocashell_neutral, 
+infutor_final :=  PROJECT (rolledInfutor, TRANSFORM (risk_indicators.layout_bocashell_neutral, 
 									napLT9 := left.infutor_phone.infutor_nap < 9;
 									self.infutor_phone.infutor_date_first_seen := if(napLT9 and BSVersion >=50 ,0, left.infutor_phone.infutor_date_first_seen);
 									self.infutor_phone.infutor_date_last_seen := if(napLT9 and BSVersion >=50 ,0, left.infutor_phone.infutor_date_last_seen);

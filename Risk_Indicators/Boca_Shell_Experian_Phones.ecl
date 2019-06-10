@@ -1,6 +1,6 @@
-import experian_phones, riskwise;
+﻿import experian_phones, riskwise, risk_indicators;
 
-EXPORT Boca_Shell_Experian_Phones(GROUPED DATASET(layout_bocashell_neutral) ids_wide, boolean isFCRA, 
+EXPORT Boca_Shell_Experian_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, boolean isFCRA, 
 integer glb, string50 DataRestriction) := function
 
 temp_layout := record

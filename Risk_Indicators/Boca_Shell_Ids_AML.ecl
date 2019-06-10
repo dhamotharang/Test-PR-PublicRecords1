@@ -1,14 +1,14 @@
-import doxie,watchdog,doxie_raw,ut,std,Header, Relationship, riskwise;
+﻿import doxie,watchdog,doxie_raw,ut,std,Header, Relationship, riskwise, risk_indicators;
 
 export Boca_Shell_Ids_AML(GROUPED DATASET(Risk_Indicators.Layout_Output) iid_res,
                        boolean includeRelativeInfo=true,
-											 string50 DataRestriction=iid_constants.default_DataRestriction,
+											 string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 											 unsigned8 BSOptions) :=
 FUNCTION
 
-IsAML  := (BSOptions & iid_constants.BSOptions.IsAML) > 0;
+IsAML  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsAML) > 0;
 
-Layout_Boca_Shell_ids get_all_dids(Risk_Indicators.Layout_Output le, unsigned6 in_did, 
+risk_indicators.Layout_Boca_Shell_ids get_all_dids(Risk_Indicators.Layout_Output le, unsigned6 in_did, 
                 boolean relat, STRING20 f_name, STRING20 l_name,unsigned1 titleNo=0) :=
 TRANSFORM
                 SELF.seq := le.seq;

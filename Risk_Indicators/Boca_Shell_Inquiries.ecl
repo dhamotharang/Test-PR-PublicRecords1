@@ -1,9 +1,9 @@
-﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master;
+﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, risk_indicators;
 
 isFCRA := false;
 
 export Boca_Shell_Inquiries(
-	GROUPED DATASET(layout_bocashell_neutral) clam_pre_Inquiries,  
+	GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_Inquiries,  
 	unsigned8 BSOptions,
 	integer bsVersion,
 	dataset(Gateway.Layouts.Config) gateways,
@@ -12,7 +12,7 @@ export Boca_Shell_Inquiries(
 // when running in FCRA historical mode, this function will call over to neutral roxie
 // to count up collection transactions that happened prior to project july moving
 // collection inquiries to the FCRA roxie
-isCollectionRetro :=  (BSOptions & iid_constants.BSOptions.Collections_Neutral_Service) > 0;
+isCollectionRetro :=  (BSOptions & risk_indicators.iid_constants.BSOptions.Collections_Neutral_Service) > 0;
 FDN_ok := Risk_Indicators.iid_constants.FDNcftf_ok(DataPermission); //per FP3 CR#8, use DPM instead of DRM to determine permission to virtual fraud
 
 high_risk_fraud_cutoff := 575;  // b)	High Risk = 575 and below
@@ -36,7 +36,7 @@ layout_temp := record
 	string func;
 	string	Transaction_ID := '';
 	string	Sequence_Number := '';
-	layouts.layout_inquiries_53;	//MS-104 and MS-105 
+	risk_indicators.layouts.layout_inquiries_53;	//MS-104 and MS-105 
 
 	// for calculating velocity counters per ADL
 	string9 inquirySSNsFromADL := '';  
@@ -101,7 +101,7 @@ clam_pre_Inquiries_deltabase := ungroup(clam_pre_Inquiries);
 
 MAC_raw_did_transform (trans_name, key_did) := MACRO
 
-layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
+layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
 	self.seq := le.seq;
 	self.did := le.did;
 	self.truedid := le.truedid;	//MS-104 and MS-105 
@@ -153,7 +153,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	
 	ecompare := risk_indicators.EmailCompare(le.shell_input.email_address, rt.person_q.email_address, le.shell_input.fname, le.shell_input.lname);
 	emailmatch_score := ecompare.EmailScore; 
-	emailmatch := iid_constants.g(emailmatch_score);
+	emailmatch := risk_indicators.iid_constants.g(emailmatch_score);
 	
 	self.Inquiry_addr_ver_ct := if(le.shell_input.in_streetaddress='' or rt.person_q.address='' or ~inquiry_hit, 255, if(addrmatch, 1, 0));
 	self.Inquiry_fname_ver_ct := if(le.shell_input.fname='' or rt.person_q.fname='' or ~inquiry_hit, 255, if(firstmatch,1,0));
@@ -2045,7 +2045,7 @@ with_suspcious_ids := join(addr_raw, suspicious_identities,
 															self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
 // only do the suspicious identity searching in fraudpoint
-isFraudpoint :=  (BSOptions & iid_constants.BSOptions.IncludeFraudVelocity) > 0;
+isFraudpoint :=  (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity) > 0;
 address_velocity_raw := if(isFraudpoint or bsversion>=41, with_suspcious_ids, addr_raw);
 grouped_addr_raw := group(sort(address_velocity_raw, seq, -inquiryADLsFromAddr), seq);
 

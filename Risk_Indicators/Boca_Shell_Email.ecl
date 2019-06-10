@@ -1,17 +1,17 @@
-﻿import _Control, email_data, riskwise, ut, fcra, mdr;
+﻿import _Control, email_data, riskwise, ut, fcra, mdr, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Email(GROUPED DATASET(layout_bocashell_neutral) clam_pre_email_in, 
+export Boca_Shell_Email(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_email_in, 
 	boolean isFCRA, 
 	integer bsversion,
-	unsigned3 LastSeenThreshold = iid_constants.oneyear,
+	unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
 	unsigned8 BSOptions=0
   ) := FUNCTION
 
 
 
 // clean the email address before doing anything else
-clam_pre_email := project(clam_pre_email_in, transform(layout_bocashell_neutral, 
+clam_pre_email := project(clam_pre_email_in, transform(risk_indicators.layout_bocashell_neutral, 
 	self.shell_input.email_address := stringlib.stringtouppercase(trim(left.shell_input.email_address)), self := left));
 
 SetSources_old := [mdr.sourceTools.src_Acquiredweb,
@@ -120,7 +120,7 @@ emailrec add_email_raw(clam_pre_email le, ekey rt) := transform
 	// new logic for shell 5.0
 	ecompare := risk_indicators.EmailCompare(le.shell_input.email_address, rt.clean_email, le.shell_input.fname, le.shell_input.lname);
 	emailmatch_score := ecompare.EmailScore; 
-	emailmatch := iid_constants.g(emailmatch_score);
+	emailmatch := risk_indicators.iid_constants.g(emailmatch_score);
 	
 	Email_First_level := ecompare.Email_First_Level;
 	Email_Last_level := ecompare.Email_Last_Level;
@@ -199,7 +199,7 @@ emailfile_raw_fcra_roxie := join(clam_pre_email, email_data.Key_Did_FCRA,
 						keyed(left.did=right.did) and
 					  right.email_src IN setsources	
 						and (unsigned)right.date_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						(string100)right.email_rec_key not in left.email_data_correct_record_id,  // don't include records in the raw which have been corrected
 						add_email_raw(left, right),
 						left outer,
@@ -211,7 +211,7 @@ emailfile_raw_fcra_thor := join(distribute(clam_pre_email, hash64(did)),
 						left.did=right.did and
 					  right.email_src IN setsources	
 						and (unsigned)right.date_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						(string100)right.email_rec_key not in left.email_data_correct_record_id,  // don't include records in the raw which have been corrected
 						add_email_raw(left, right),
 						left outer,
@@ -242,7 +242,7 @@ emailrec add_email_corrections(clam_pre_email le, fcra.Key_Override_Email_Data_f
 	// new logic for shell 5.0
 	ecompare := risk_indicators.EmailCompare(le.shell_input.email_address, rt.clean_email, le.shell_input.fname, le.shell_input.lname);
 	emailmatch_score := ecompare.EmailScore; 
-	emailmatch := iid_constants.g(emailmatch_score);
+	emailmatch := risk_indicators.iid_constants.g(emailmatch_score);
 	
 	Email_First_level := ecompare.Email_First_Level;
 	Email_Last_level := ecompare.Email_Last_Level;
@@ -270,7 +270,7 @@ emailfile_corrections_fcra_roxie := join(clam_pre_email, fcra.Key_Override_Email
 						keyed(right.flag_file_id in left.email_data_correct_ffid) and
 				    right.email_src IN setsources	
 						and (unsigned)right.date_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						(string100)right.email_rec_key not in left.email_data_correct_record_id,
 						add_email_corrections(left, right),
 						atmost(riskwise.max_atmost), keep(1000));
@@ -280,7 +280,7 @@ emailfile_corrections_fcra_thor := join(clam_pre_email,
 						right.flag_file_id in left.email_data_correct_ffid and
 				    right.email_src IN setsources	
 						and (unsigned)right.date_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						(string100)right.email_rec_key not in left.email_data_correct_record_id,
 						add_email_corrections(left, right),
 						keep(1000), LOCAL, ALL);
@@ -372,18 +372,18 @@ with_identity_email_summary := join(clam_pre_Email, rolled_Identity_source_count
 emailrec add_reverse_email_verification(clam_pre_email le, emailaddr_key rt) := transform
 	self.seq := le.seq;
 	
-	isrecent := iid_constants.myDaysApart(le.historydate, rt.date_last_seen, LastSeenThreshold);
+	isrecent := risk_indicators.iid_constants.myDaysApart(le.historydate, rt.date_last_seen, LastSeenThreshold);
 	
 	firstmatch_score := Risk_Indicators.FnameScore(le.shell_input.fname,rt.clean_name.fname);
-	firstmatch := iid_constants.g(firstmatch_score);
+	firstmatch := risk_indicators.iid_constants.g(firstmatch_score);
 	lastmatch_score := Risk_Indicators.LnameScore(le.shell_input.lname, rt.clean_name.lname);
-	lastmatch := iid_constants.g(lastmatch_score);
+	lastmatch := risk_indicators.iid_constants.g(lastmatch_score);
 	
 	zip_score := Risk_Indicators.AddrScore.zip_score(le.shell_input.in_zipcode, rt.clean_address.zip);
 	addrmatchscore := Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
 																						rt.clean_address.prim_range, rt.clean_address.prim_name, rt.clean_address.sec_range,
 																						zip_score);
-	addrmatch := iid_constants.ga(addrmatchscore);
+	addrmatch :=risk_indicators.iid_constants.ga(addrmatchscore);
 	emailmatch := rt.clean_email<>'';
 	self.reverse_email.emailcount := if(emailmatch, 1, 0);
 	self.reverse_email.fnamecount := if(firstmatch, 1, 0);
