@@ -1,4 +1,4 @@
-﻿import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
+﻿﻿import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
 
 // line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.  
 // to toggle the system date, update both of them to the date you want the system to be.
@@ -507,7 +507,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		Eviction = 1										<< 27,
 		SSNLienFtlr = 1									<< 28,
 		BCBLienFtlr = 1									<< 29,
-		InsuranceFCRABankruptcyException = 1 << 30
+		InsuranceFCRABankruptcyException = 1 << 30,
+		InsuranceFCRABankruptcyAllow10Yr = 1 << 31
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
