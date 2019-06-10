@@ -26,7 +26,7 @@ lECL1 :=
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
 +'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInquiryLogs(version)\n'
 +'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'InquiryLogs\', Scrubs_FraudGov.InquiryLogs_In_InquiryLogs, FraudGovPlatform_Validation.Mailing_List().Alert))\n'
-+'	);\n'
++'	):failure(email(\'FraudGov InquiryLogs Input Prep Failed\'));\n'
 ;
 
 #WORKUNIT('protect',true);

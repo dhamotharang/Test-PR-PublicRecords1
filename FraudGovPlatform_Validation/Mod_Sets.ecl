@@ -5,8 +5,8 @@ EXPORT threshld:=0.05;
 EXPORT validDelimiter := '~|~';
 EXPORT validTerminators := '~<EOL>~';
 
-EXPORT validDelimiterDeltabase := '|\\t|';
-EXPORT validTerminatorsDeltabase := '|\\n';
+EXPORT validDelimiterDeltabase := '|\t|';
+EXPORT validTerminatorsDeltabase := '|\n';
 
 EXPORT IdentityData_numberOfColumns := 51;
 EXPORT KnownFraud_numberOfColumns	:= 111;

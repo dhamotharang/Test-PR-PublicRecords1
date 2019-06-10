@@ -26,7 +26,7 @@ lECL1 :=
 +'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyNAC(version)\n'
 +'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'NAC\', Scrubs_FraudGov.NAC_In_NAC, FraudGovPlatform_Validation.Mailing_List().Alert)\n'
 +'		)\n'
-+'	);\n'
++'	):failure(email(\'FraudGov NAC Input Prep Failed\'));\n'
 ;
 
 #WORKUNIT('protect',true);
