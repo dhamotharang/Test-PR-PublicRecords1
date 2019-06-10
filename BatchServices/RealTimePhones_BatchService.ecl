@@ -49,7 +49,10 @@ export RealTimePhones_BatchService := macro
 		 export boolean	strictSSN := false : stored('StrictSSN'); // option to set strict match  FALSE means to WATERFALL
 		 export string UID := '' : stored('UID'); // Job Id coming in from batch for tracking the gateway hits
 	end;
-	g_mod := PROJECT(AutoStandardI.GlobalModule(), in_mod, OPT);	
+  g_raw := AutoStandardI.GlobalModule();
+  g_mod := PROJECT(g_raw, in_mod, OPT);	
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(g_raw);
+  
 	f_in upper_trans ( f_in L, integer c) := transform
 	   self.phoneno  := if (L.phoneno[1] = '1', L.phoneno[2..15], L.phoneno);
      cleaned_name 			:= address.CleanPerson73(L.unparsedfullname);
@@ -104,7 +107,11 @@ export RealTimePhones_BatchService := macro
 	dRoyaltiesByAcctno 	:= Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(f_in, dRoyaltiesQSent,,,, acctno);
 	dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
 	// ----
-	
+
+
+  IF (EXISTS(results_best), doxie.compliance.logSoldToTransaction(mod_access)); 
+    
+   
 	Output(final_res , NAMED('Results') );		
 	Output(dRoyalties , NAMED('RoyaltySet') );		
 endmacro;

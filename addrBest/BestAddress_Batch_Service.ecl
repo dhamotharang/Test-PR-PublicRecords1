@@ -89,7 +89,10 @@ export BestAddress_Batch_Service := macro
 	
 	input_mod := AddrBest.Iparams.DefaultParams; 
 	pre_out_recs := AddrBest.Records(ds_input, input_mod).best_records;
-	
+ 
+   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+  IF (EXISTS(pre_out_recs), doxie.compliance.logSoldToTransaction(mod_access)); 
+  
 	BatchShare.MAC_RestoreAcctno(ds_input, pre_out_recs, out_recs,,false);		
 
 	output(out_recs, named('Results'));

@@ -13,6 +13,7 @@ FUNCTION
 	targusGateway := dGateways(inMod.useTargus and Gateway.Configuration.isTargus(servicename))[1];
 	qSentPVSGateway  := dGateways(inMod.UseTransUnionPVS and Gateway.Configuration.isQSentV2(servicename))[1];
 	
+  
 	// Create module with autokey paramaters to pass to the batch function
 	akMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.AKParams,OPT))
 		EXPORT SET OF STRING1 skip_set := ['B'];

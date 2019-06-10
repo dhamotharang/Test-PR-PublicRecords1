@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Phone_NoReconn_Service">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>  
   <part name="ExcludeCurrentGong" type="xsd:boolean"/>
@@ -23,6 +23,8 @@ export phonesplus_reverse_batch_service := macro
 	optionsModule:= phonesplus_batch.options.getOptions();
 	recsOut:= phonesplus_batch.phonesplus_reverse_batch_records(batchIn, optionsModule);
 
+
+  IF (exists(recsOut.Results), doxie.compliance.logSoldToTransaction(optionsModule)); 
   OUTPUT(recsOut.Results, NAMED('Results'));    
 	OUTPUT(recsOut.RoyaltySet, NAMED('RoyaltySet'));
 	

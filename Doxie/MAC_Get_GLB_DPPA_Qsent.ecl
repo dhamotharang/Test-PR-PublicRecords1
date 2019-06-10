@@ -1,14 +1,14 @@
-import doxie, ut, doxie_files, autokey, cellphone, drivers;
+﻿
 
 //this function should be called after doxie.MAC_Header_Field_Declare 
 export MAC_Get_GLB_DPPA_Qsent(dids_in, 
                               qsent_out, 
-					     is_roxie=false, 
-					     skipAutokeys = false,
-					     glb_purpose = 0,
-					     dppa_purpose = 0,
-					     industry_class_value='',
-						company_name_value='\'\'') := macro
+                              mod_access,
+					                    is_roxie=false, 
+					                    skipAutokeys = false, 
+                              company_name_value='\'\'') := macro
+
+import AutoStandardI, doxie, ut, doxie_files, autokey, cellphone, drivers, Suppress;
 
 #uniquename(qsent_did_key)
 #uniquename(qsent_fdid_key)
@@ -19,6 +19,8 @@ export MAC_Get_GLB_DPPA_Qsent(dids_in,
 %prec% := record
 	Phonesplus.layoutCommonOut;
 	string120 listed_name;
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
 end;
 
 #uniquename(makelistedname)
@@ -26,12 +28,14 @@ end;
 
 #uniquename(get_by_did)
 %prec% %get_by_did%(%qsent_did_key% l) := transform
-	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~Doxie.Compliance.glb_ok(glb_purpose) => skip,
-	                          l.glb_dppa_flag in ['D','B'] and ~(Doxie.Compliance.dppa_ok(dppa_purpose) and 
-						 drivers.state_dppa_ok(l.origstate,dppa_purpose,'')) => skip,
-						 l.glb_dppa_flag='U' and Doxie.Compliance.isUtilityRestricted(industry_class_value) => skip,
+	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~mod_access.isValidGLB() => skip,
+	                          l.glb_dppa_flag in ['D','B'] and ~(mod_access.isValidDPPA() and 
+						 mod_access.isValidDPPAState(l.origstate)) => skip,
+						 l.glb_dppa_flag='U' and mod_access.isUtility() => skip,
 						 l.glb_dppa_flag);
 	self.listed_name := %makelistedname%(l.company, l.origname);
+	self.global_sid     := l.global_sid;
+  self.record_sid     := l.record_sid;
 	self := l;
 end;
 
@@ -52,12 +56,14 @@ end;
 					    
 #uniquename(get_by_fdid)							    
 %prec% %get_by_fdid%(%qsent_fdid_key% l) := transform
-	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~Doxie.Compliance.glb_ok(glb_purpose) => skip,
-	                          l.glb_dppa_flag in ['D','B'] and ~(Doxie.Compliance.dppa_ok(dppa_purpose) and 
-						 drivers.state_dppa_ok(l.origstate,dppa_purpose,'')) => skip,
-						 l.glb_dppa_flag='U' and Doxie.Compliance.isUtilityRestricted(industry_class_value) => skip,
+	self.glb_dppa_flag := map(l.glb_dppa_flag in ['G','B'] and ~mod_access.isValidGLB() => skip,
+	                          l.glb_dppa_flag in ['D','B'] and ~(mod_access.isValidDPPA() and 
+						 mod_access.isValidDPPAState(l.origstate)) => skip,
+						 l.glb_dppa_flag='U' and mod_access.isUtility() => skip,
 						 l.glb_dppa_flag);
 	self.listed_name := %makelistedname%(l.company, l.origname);
+  self.global_sid     := l.global_sid;
+  self.record_sid     := l.record_sid;
 	self := l;
 end;
 
@@ -65,9 +71,12 @@ end;
 %qsent_by_fdid% := join(%fake_dids% + if(company_name_value<>'',%fake_dids_ext%),%qsent_fdid_key%,
                        keyed(left.did=right.fdid),
                        %get_by_fdid%(right), limit(10000,skip)); 
-      
+                        
+#uniquename(qsent_pre_suppressed)	
+%qsent_pre_suppressed% := if(skipAutokeys, %qsent_by_did%, %qsent_by_did% + %qsent_by_fdid%);		
+
 #uniquename(choice)	
-%choice% := if(skipAutokeys, %qsent_by_did%, %qsent_by_did% + %qsent_by_fdid%);		
+%choice% := Suppress.MAC_SuppressSource(%qsent_pre_suppressed%, mod_access); 
 		
 #uniquename(qsent_recs)				 				 
 %qsent_recs% := dedup(sort((%choice%), record), record)((confidencescore>10));
@@ -113,6 +122,7 @@ end;
 
 #uniquename(qsent_roxie_fltd)
 %qsent_roxie_fltd% := project(%qsent_roxie_recs%, %get_penalt%(left))(penalt<score_threshold_value);
+
 
 qsent_out := 
 	#if(is_roxie)

@@ -38,7 +38,8 @@ MACRO
 	
 	// Global module
 	globalMod := AutoStandardI.GlobalModule();
-	
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
+  
 	STRING15 vPhone := pickListSearchBy.PhoneNumber : STORED('Phone');
 	
 	// Search module
@@ -76,7 +77,10 @@ MACRO
 	dPhonePickList := PhoneFinder_Services.PhonePickList_Records(dReqBatch,reportMod);
 	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(dPhonePickList,dMarshallResults,iesp.phonepicklist.t_PhonePickListResponse,,,,InputEcho,pickListSearchBy);
-	
+	  
+  
+  IF (EXISTS(dPhonePickList), doxie.compliance.logSoldToTransaction(mod_access)); 
+     
 	MAP(vPhone = '' or LENGTH(TRIM(vPhone)) != 7                         => FAIL(301,doxie.ErrorCodes(301)),
 			COUNT(dPhonePickList) > PhoneFinder_Services.Constants.MaxPhones => FAIL(203,doxie.ErrorCodes(203)),
 			OUTPUT(dMarshallResults,named('Results')));

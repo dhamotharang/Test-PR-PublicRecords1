@@ -19,7 +19,7 @@
 /*--INFO-- Reverse Phone Teaser Service.
 */
 
-IMPORT iesp, AutoStandardI, TeaserSearchServices, std;
+IMPORT iesp, AutoStandardI, TeaserSearchServices, std, doxie;
 
 EXPORT ReversePhoneTeaserService := MACRO
 	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -61,7 +61,10 @@ EXPORT ReversePhoneTeaserService := MACRO
 	 OutRec := TeaserSearchServices.ReversePhoneTeaserRecords.records(tempmod,
 	  stored_Application_type);
  
-	 iesp.ECL2ESP.Marshall.MAC_Marshall_Results(outRec, results,                        
+   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+   IF (EXISTS(OutRec), doxie.compliance.logSoldToTransaction(mod_access));
+   
+   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(outRec, results,                        
 												 iesp.thinreversephoneteaser.t_ThinReversePhoneTeaserResponse, Records,
 												 false, RecordCount,,,iesp.Constants.ThinRpsExt.MaxRespRecords);
 		Map( 

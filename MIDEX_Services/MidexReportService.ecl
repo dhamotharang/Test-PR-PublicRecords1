@@ -205,6 +205,8 @@ EXPORT MidexReportService  :=
   // *** call service records
   ds_results := Midex_Services.MidexReport_Records(tempmod);
   
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
+  IF (EXISTS(ds_results), doxie.compliance.logSoldToTransaction(mod_access)); 
   OUTPUT(ds_results, named('Results')); 
 
 ENDMACRO;
