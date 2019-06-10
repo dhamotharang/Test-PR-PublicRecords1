@@ -25,11 +25,11 @@ MACRO
   // For legacy purposes
   iesp.ECL2ESP.SetInputBaseRequest(first_row);
   iesp.ECL2ESP.SetInputReportBy(ROW(report_by, TRANSFORM(iesp.bpsreport.t_BpsReportBy, SELF := LEFT, SELF := [])));
-  ConsumerDisclosure.IParams.SetInputUser(first_row.User);
+  ConsumerDisclosure.DataReport.IParams.SetInputUser(first_row.User);
 
-  in_mod := ConsumerDisclosure.IParams.GetParams(report_options);
+  in_mod := ConsumerDisclosure.DataReport.IParams.GetParams(report_options);
   in_dids := DATASET([{report_by.LexID}], doxie.layout_references);
-  rpt := ConsumerDisclosure.ReportRecords(in_dids, in_mod);
+  rpt := ConsumerDisclosure.DataReport.ReportRecords(in_dids, in_mod);
   service_header := iesp.ECL2ESP.GetHeaderRow();
     
   iesp.fcradataservice.t_FcraDataServiceReportResponse xform() := TRANSFORM
