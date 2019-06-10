@@ -166,13 +166,13 @@ Export ID := MODULE;
 		// Map Stock records
 		//********************************************************************	
 		Corp2_mapping.LayoutsCommon.Stock StockTrf(Corp2_Raw_ID.Layouts.FilingLayoutIn l) := transform
-		   ,skip(corp2.t2u(l.control_no) = '' or stringlib.stringfilterout(l.common_shares,'0123456789')='')
+		   ,skip(corp2.t2u(l.control_no) = '' or stringlib.stringfilterout(l.common_shares,'0123456789')<>'' or (string)(integer)l.common_shares = '0')
 			self.corp_key													:= state_fips +'-' + corp2.t2u(l.control_no);
 			self.corp_vendor 											:= state_fips;
 			self.corp_state_origin 								:= state_origin;
 			self.corp_process_date 								:= fileDate;
 			self.corp_sos_charter_nbr 						:= corp2.t2u(l.control_no);			
-			self.stock_shares_issued         			:= if(stringlib.stringfilterout(l.common_shares,'0123456789')='' ,(string)(integer)l.common_shares ,'');
+			self.stock_shares_issued         			:= (string)(integer)l.common_shares;
 			self                            			:= [];
 		end;
 
