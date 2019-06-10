@@ -36,7 +36,7 @@ export Files := module;
 									,self:=left));	
 									
 									
-	export Base2 := DATASET(Superfile_List.sfBase2, nac_v2.Layout_Base2, thor);
+	export Base2 := DATASET(Superfile_List.sfBase2, nac_v2.Layout_Base2, thor, OPT);
 
 	export Base_prev := DATASET(Superfile_List.Base_prev,Layouts.base, THOR);
 	export Collisions  := DATASET(Superfile_List.Collisions,Layouts.Collisions, THOR,opt);

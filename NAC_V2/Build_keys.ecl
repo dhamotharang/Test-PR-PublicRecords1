@@ -2,7 +2,7 @@
 
 
 
-payload := Nac_V2.Files().Payload;
+payload := Nac_V2.Files.Payload;
 
 
 export Build_keys(string filedate='dummy') := function
