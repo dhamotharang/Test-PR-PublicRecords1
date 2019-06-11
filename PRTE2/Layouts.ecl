@@ -2642,4 +2642,15 @@ Export Linkid_Rec:=Record
 		// string err_stat := '';
 // End;
 		
+	export ccpa_global_sid := record
+		unsigned4 DatasetId;	
+		string100 DatasetName;	
+		string10 	SourceCodes;	
+		string100 CompanyName;	
+		unsigned4 UniqueSourceIdentifier;
+		string60	BuildTemplateName;
+		string10 	MaxLevel;	
+		string60	RoxiePackages;
+	end;
+	
 END;
