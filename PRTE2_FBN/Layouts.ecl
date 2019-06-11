@@ -1,4 +1,4 @@
-Import FBNV2, NID, address;
+﻿Import FBNV2, NID, address, PRTE2, BIPV2;
 EXPORT Layouts := module
 
 Export Business:=FBNV2.Layout_Common.Business;
@@ -32,7 +32,13 @@ unsigned3 SEQ_NO;
 unsigned4 WITHDRAWAL_DATE;
 string200 cust_name;
 string10  bug_num;
-End;
+string9		link_ssn;
+string8		link_dob;
+string9 	link_fein;
+string8		link_inc_date;
+string		link_bus_name;
+END;
+
 
 Export Business_Base := RECORD
 string38 TMSID;
@@ -73,11 +79,17 @@ string10 MAIL_ZIP;
 unsigned3 SEQ_NO;
 string200 cust_name;
 string10 bug_num;
+string9 	link_fein;
+string8		link_inc_date;
+string		link_bus_name;
 END;
 
-EXPORT Combined_Business_Base := RECORD
+
+EXPORT Combined_Business_Base_ext := RECORD
 		Business_Base;
-		address.Layout_Clean_Name;
+		string9		link_ssn;
+    string8		link_dob;
+   	address.Layout_Clean_Name;
 		address.Layout_Clean182;
 		UNSIGNED8	raw_aid								:=  0;
 		UNSIGNED8	ace_aid								:=  0;
@@ -85,11 +97,27 @@ EXPORT Combined_Business_Base := RECORD
 		STRING50	prep_addr_line_last		:= '';
 		UNSIGNED8	source_rec_id 		    :=  0;
 		Unsigned6 Bdid;
+		BIPV2.IDlayouts.l_xlink_ids ;
+    PRTE2.Layouts.DEFLT_CPA;   // CCPA Project
 	END;
 
-EXPORT Combined_Contact_Base := RECORD
+
+EXPORT Combined_Business_Base := RECORD
+  Combined_Business_Base_ext and not [link_bus_name] - {BIPV2.IDlayouts.l_xlink_ids};
+		// Business_Base;
+		// address.Layout_Clean_Name;
+		// address.Layout_Clean182;
+		// UNSIGNED8	raw_aid								:=  0;
+		// UNSIGNED8	ace_aid								:=  0;
+		// STRING100 prep_addr_line1				:= '';
+		// STRING50	prep_addr_line_last		:= '';
+		// UNSIGNED8	source_rec_id 		    :=  0;
+		// Unsigned6 Bdid;
+	END;
+
+EXPORT Combined_Contact_Base_ext := RECORD
 		contact_Base;
-		address.Layout_Clean_Name;
+    address.Layout_Clean_Name;
 		address.Layout_Clean182;
 		UNSIGNED8	raw_aid								:=  0;
 		UNSIGNED8	ace_aid								:=  0;
@@ -98,6 +126,22 @@ EXPORT Combined_Contact_Base := RECORD
 		UNSIGNED8	source_rec_id 		    :=  0;
 		Unsigned6 Did;
 		Unsigned6 Bdid;
+    PRTE2.Layouts.DEFLT_CPA;   // CCPA Project
+	END;
+  
+  
+EXPORT Combined_Contact_Base := RECORD
+    Combined_Contact_Base_ext and not link_bus_name;
+		// contact_Base;
+		// address.Layout_Clean_Name;
+		// address.Layout_Clean182;
+		// UNSIGNED8	raw_aid								:=  0;
+		// UNSIGNED8	ace_aid								:=  0;
+		// STRING100 prep_addr_line1				:= '';
+		// STRING50	prep_addr_line_last		:= '';
+		// UNSIGNED8	source_rec_id 		    :=  0;
+		// Unsigned6 Did;
+		// Unsigned6 Bdid;
 	END;
 	
 Export clean_Layout:=record

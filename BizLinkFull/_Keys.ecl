@@ -45,23 +45,23 @@ module
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key              ' ,bizknames.refs_l_sic               );
 
 //External File Key Definitions
-	export Xlinkext_data_payload          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.PayloadByproxid       ' ,bizknames.ext_data_payload        );
-	export Xlinkext_data_l_cnpname        := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME          ' ,bizknames.ext_data_l_cnpname      );
-  export Xlinkext_data_l_cnpname_zip    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME_ZIP      ' ,bizknames.ext_data_l_cnpname_zip  );
-  export Xlinkext_data_l_cnpname_st     := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME_ST       ' ,bizknames.ext_data_l_cnpname_st   );
-  export Xlinkext_data_l_cnpname_fuzzy  := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CNPNAME_FUZZY    ' ,bizknames.ext_data_l_cnpname_fuzzy);
-  export Xlinkext_data_l_address1       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_ADDRESS1         ' ,bizknames.ext_data_l_address1     );
-  export Xlinkext_data_l_address2       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_ADDRESS2         ' ,bizknames.ext_data_l_address2     );
-  export Xlinkext_data_l_address3       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_ADDRESS3         ' ,bizknames.ext_data_l_address3     );
-  export Xlinkext_data_l_phone          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_PHONE            ' ,bizknames.ext_data_l_phone        );
-  export Xlinkext_data_l_sic            := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_SIC              ' ,bizknames.ext_data_l_sic          );
-  export Xlinkext_data_l_fein           := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_FEIN             ' ,bizknames.ext_data_l_fein         );
-  export Xlinkext_data_l_contact        := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CONTACT          ' ,bizknames.ext_data_l_contact      );
-  export Xlinkext_data_l_url            := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_URL              ' ,bizknames.ext_data_l_url          );
-  export Xlinkext_data_l_email          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_EMAIL            ' ,bizknames.ext_data_l_email        );
-  export Xlinkext_data_l_contact_did    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CONTACT_DID      ' ,bizknames.ext_data_l_contact_did  );
-  export Xlinkext_data_l_contact_ssn    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_CONTACT_SSN      ' ,bizknames.ext_data_l_contact_ssn  );
-  export Xlinkext_data_l_source         := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data.KeyL_SOURCE           ' ,bizknames.ext_data_l_source       );
+	export Xlinkext_data_payload          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().PayloadByproxid       ' ,bizknames.ext_data_payload        );
+	export Xlinkext_data_l_cnpname        := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_CNPNAME          ' ,bizknames.ext_data_l_cnpname      );
+  export Xlinkext_data_l_cnpname_zip    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_CNPNAME_ZIP      ' ,bizknames.ext_data_l_cnpname_zip  );
+  export Xlinkext_data_l_cnpname_st     := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_CNPNAME_ST       ' ,bizknames.ext_data_l_cnpname_st   );
+  export Xlinkext_data_l_cnpname_fuzzy  := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_CNPNAME_FUZZY    ' ,bizknames.ext_data_l_cnpname_fuzzy);
+  export Xlinkext_data_l_address1       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_ADDRESS1         ' ,bizknames.ext_data_l_address1     );
+  export Xlinkext_data_l_address2       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_ADDRESS2         ' ,bizknames.ext_data_l_address2     );
+  export Xlinkext_data_l_address3       := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_ADDRESS3         ' ,bizknames.ext_data_l_address3     );
+  export Xlinkext_data_l_phone          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_PHONE            ' ,bizknames.ext_data_l_phone        );
+  export Xlinkext_data_l_sic            := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_SIC              ' ,bizknames.ext_data_l_sic          );
+  export Xlinkext_data_l_fein           := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_FEIN             ' ,bizknames.ext_data_l_fein         );
+  export Xlinkext_data_l_contact        := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_CONTACT          ' ,bizknames.ext_data_l_contact      );
+  export Xlinkext_data_l_url            := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_URL              ' ,bizknames.ext_data_l_url          );
+  export Xlinkext_data_l_email          := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_EMAIL            ' ,bizknames.ext_data_l_email        );
+  export Xlinkext_data_l_contact_did    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_CONTACT_DID      ' ,bizknames.ext_data_l_contact_did  );
+  export Xlinkext_data_l_contact_ssn    := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_CONTACT_SSN      ' ,bizknames.ext_data_l_contact_ssn  );
+  export Xlinkext_data_l_source         := tools.macf_FilesIndex('BizLinkFull.Mod_Ext_Data().KeyL_SOURCE           ' ,bizknames.ext_data_l_source       );
 
   export outputkeys := 
   parallel(

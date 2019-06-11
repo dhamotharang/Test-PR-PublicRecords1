@@ -1,6 +1,6 @@
 ﻿IMPORT STD,_control;
 	   
-//Files for S0376 are Located  //
+////Raw file location
 EXPORT Spray_DeleteFile(STRING filedate, STRING	pServerIP	= _control.IPAddress.bctlpedata12) := MODULE //Use folder date
 // IF(_control.thisenvironment.name = 'Dataland',
 																																	// _control.IPAddress.bctlpedata12,

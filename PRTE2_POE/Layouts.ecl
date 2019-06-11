@@ -1,4 +1,4 @@
-Import POE;
+﻿Import POE;
 EXPORT Layouts := module
 
 Export source_hierarchy:= Poe.Layouts.source_hierarchy;
@@ -49,6 +49,16 @@ unsigned8 company_aceaid;
 string20  CustomerID;
 string10 cust_name;
 String10  bug_num;
+string9		link_ssn;
+string8		link_dob;
+string9		link_fein;
+string8		link_inc_date;
+string5		name_format;
+string50	raw_indv_name;
+string40	raw_subj_addr1;
+string30	raw_subj_addr2;
+string40	raw_cmpy_addr1;
+string30	raw_cmpy_addr2;	
 END;
 
 END;
