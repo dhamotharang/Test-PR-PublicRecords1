@@ -36,10 +36,6 @@ EXPORT proflic_records (
 
   mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
     EXPORT log_record_source := ~isFCRA;
-    EXPORT dppa := in_params.DPPAPurpose;
-    EXPORT glb := in_params.GLBPurpose;
-    EXPORT DataPermissionMask := in_params.DataPermissionMask;
-    EXPORT application_type := in_params.ApplicationType;
   END;
 
   ds_raw := prof_LicenseV2_Services.Prof_Lic_Raw.source_view.by_did(dids, mod_access := mod_access, isFCRA := isFCRA);
