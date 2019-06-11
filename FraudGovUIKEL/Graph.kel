@@ -1158,7 +1158,7 @@ Claim :=  ENTITY
 Claimant :=  ENTITY
 (FLAT(UID(application_id),
 	STRING claimant_ssn,
-	STRING claimantlexid),
+	INTEGER claimantlexid),
 	MODEL(UID, claimant_ssn, claimantlexid));
 
 /*
@@ -1261,56 +1261,57 @@ Legal: => BusUnemClmAcctCurActiveCnt := MAP(ClaimCount=0 OR (ALL(LegalClaim.rCla
 // Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
 Legal: => BusUnemClmAcctFiledCntEv := MAP(ClaimCount=0 => -99998, 
 																				  ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																				  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));						 
-Legal: => BusUnemClmAcctFiledCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365))=0) => -99998, 
+																				  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));						 
+Legal: => BusUnemClmAcctFiledCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
 																				  ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																				  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
-Legal: => BusUnemClmAcctFiledCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120))=0) => -99998, 
+																				  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Legal: => BusUnemClmAcctFiledCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
 																					  ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																					  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
-Legal: => BusUnemClmAcctFiledCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90))=0) => -99998, 
+																					  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+Legal: => BusUnemClmAcctFiledCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
 																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));	
-Legal: => BusUnemClmAcctFiledCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30))=0) => -99998, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));	
+Legal: => BusUnemClmAcctFiledCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
 																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
 
 // second batch
 // Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt
+
 Legal: => BusUnemClmLexIDFiledCntEv := MAP(ClaimCount=0 => -99998, 
 																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																							 
-Legal: => BusUnemClmLexIDFiledCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365))=0) => -99998, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																							 
+Legal: => BusUnemClmLexIDFiledCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
 																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
-Legal: => BusUnemClmLexIDFiledCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120))=0) => -99998, 
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Legal: => BusUnemClmLexIDFiledCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
 																						 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																						 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
-Legal: => BusUnemClmLexIDFiledCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90))=0) => -99998, 
+																						 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+Legal: => BusUnemClmLexIDFiledCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
 																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));	
-Legal: => BusUnemClmLexIDFiledCnt30D := MAP(COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30))=0 => -99998, // There are no claims within 30 days
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));	
+Legal: => BusUnemClmLexIDFiledCnt30D := MAP(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0 => -99998, // There are no claims within 30 days
 																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
-/*
+																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+
 // third batch
 // Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt
 Legal: => BusAcctLexIDMultiUnemClmCntEv := MAP(ClaimCount=0 => -99998, 
 																							 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																							 COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
-Legal: => BusAcctLexIDMultiUnemClmCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365))=0) => -99998, 
+																							 COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
+Legal: => BusAcctLexIDMultiUnemClmCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
 																							 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																							 COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
-Legal: => BusAcctLexIDMultiUnemClmCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120))=0) => -99998, 
+																							 COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
+Legal: => BusAcctLexIDMultiUnemClmCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
 																								 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
-Legal: => BusAcctLexIDMultiUnemClmCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90))=0) => -99998, 
+																								 COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
+Legal: => BusAcctLexIDMultiUnemClmCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
 																								ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
-Legal: => BusAcctLexIDMultiUnemClmCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30))=0) => -99998, 
+																								COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
+Legal: => BusAcctLexIDMultiUnemClmCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
 																								ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
-*/
+																								COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
+
 // Claim Attributes
 Claim: => ClaimAge := MAP(claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99998,
                           DAYSBETWEEN(claim_submit_ccyymmdd,  DATE(rEmployer.BusAcctNewestRecordDt)));
@@ -1391,70 +1392,73 @@ Employer: => BusAcctUnemClmAcctCurActiveCnt := MAP(BusAcctUIDEcho=-99999 => -999
 																									 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(UPCASE(claim_status)='REGULAR ACTIVE').rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
 
 // Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
+
 Employer: => BusAcctUnemClmAcctFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
 																								 ClaimCount=0 => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																								 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																								 
 Employer: => BusAcctUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365))=0) => -99998, // There are no claims within 1 year
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, // There are no claims within 1 year
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																								 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																								 
 Employer: => BusAcctUnemClmAcctFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120))=0) => -99998, 
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																								 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																								 
 Employer: => BusAcctUnemClmAcctFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90))=0) => -99998, 
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																									 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));																									 
 Employer: => BusAcctUnemClmAcctFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30))=0) => -99998, 
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));
 
-// Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt
+
+// Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt 
+
 Employer: => BusAcctUnemClmLexIDFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
 																								 ClaimCount=0 => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																							 																							 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
 Employer: => BusAcctUnemClmLexIDFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365))=0) => -99998, 
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																					 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																					 
 Employer: => BusAcctUnemClmLexIDFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120))=0) => -99998, 
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																								 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																								 
 Employer: => BusAcctUnemClmLexIDFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90))=0) => -99998, 
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																									 
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																									 
 Employer: => BusAcctUnemClmLexIDFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30))=0) => -99998, 
+																								 ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
 																								 ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
+																								 MAX(MIN(COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30){LexID:=rClaimant.LexID}, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));
 
 // Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt
 Employer: => BusAcctLexIDMultiUnemClmCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
 																								  ClaimCount=0 => -99998, 
 																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0){LexID:=rClaimant.LexID, cnt:=GROUP:Count}/*(cnt>=2)*/, LEFT.LexID=RIGHT.LexID, LexID)));
+																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
 Employer: => BusAcctLexIDMultiUnemClmCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365))=0) => -99998, 
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
 																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 365){LexID:=rClaimant.LexID, cnt:=GROUP:Count}/*(cnt>=2)*/, LEFT.LexID=RIGHT.LexID, LexID)));
+																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
 Employer: => BusAcctLexIDMultiUnemClmCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120))=0) => -99998, 
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
 																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 120){LexID:=rClaimant.LexID, cnt:=GROUP:Count}/*(cnt>=2)*/, LEFT.LexID=RIGHT.LexID, LexID)));
+																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
 Employer: => BusAcctLexIDMultiUnemClmCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90))=0) => -99998, 
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
 																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 90){LexID:=rClaimant.LexID, cnt:=GROUP:Count}/*(cnt>=2)*/, LEFT.LexID=RIGHT.LexID, LexID)));
+																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
 Employer: => BusAcctLexIDMultiUnemClmCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30))=0) => -99998, 
+																								  ClaimCount=0 OR (COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
 																								  ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99997, 
-																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge > 0 AND ClaimAge <= 30){LexID:=rClaimant.LexID, cnt:=GROUP:Count}/*(cnt>=2)*/, LEFT.LexID=RIGHT.LexID, LexID)));
+																								  COUNT(Sequence.Dedup(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30){LexID:=rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
 
 // The same attributes as before, just on the legal business entitiy instead of the actual business.			
 Employer: => BusUnemClmAcctCurActiveCnt := MAP(rLegal:Null => -99999,
@@ -1473,6 +1477,7 @@ Employer: => BusUnemClmAcctFiledCnt30D := MAP(rLegal:Null => -99999,
 																							rLegal.BusUnemClmAcctFiledCnt30D);	
 
 // Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt
+
 Employer: => BusUnemClmLexIDFiledCntEv := MAP(rLegal:Null => -99999,
 																							rLegal.BusUnemClmLexIDFiledCntEv);																							
 Employer: => BusUnemClmLexIDFiledCnt1Y := MAP(rLegal:Null => -99999,
@@ -1483,7 +1488,7 @@ Employer: => BusUnemClmLexIDFiledCnt90D := MAP(rLegal:Null => -99999,
 																							 rLegal.BusUnemClmLexIDFiledCnt90D); 																							 
 Employer: => BusUnemClmLexIDFiledCnt30D := MAP(rLegal:Null => -99999,
 																							 rLegal.BusUnemClmLexIDFiledCnt30D);
-/*																			
+																										
 // Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt																			
 Employer: => BusLexIDMultiUnemClmCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									rLegal.BusAcctLexIDMultiUnemClmCntEv);
@@ -1495,7 +1500,7 @@ Employer: => BusLexIDMultiUnemClmCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									 rLegal.BusAcctLexIDMultiUnemClmCnt90D);
 Employer: => BusLexIDMultiUnemClmCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									 rLegal.BusAcctLexIDMultiUnemClmCnt30D);
-*/
+
 				
 
 
@@ -1624,8 +1629,8 @@ Employer: => BusUnemClaimApprvCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null
 Employer: => BusUnemClaimApprvCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
                                                 rLegal.UnemClaimApprvCnt30D);
 
-																						 
-
+																						
+																						
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
 QUERY: showEmployers <= Employer;
 QUERY: showLegal <= Legal;
