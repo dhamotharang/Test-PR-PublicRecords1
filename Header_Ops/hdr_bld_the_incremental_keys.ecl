@@ -9,6 +9,7 @@ wk:=workunit;
 wServer:= _control.ThisEnvironment.ESP_IPAddress;
 wLink := 'http://'+wServer+':8010/?Widget=WUDetailsWidget&Wuid='+wk+'#/stub/Summary';
 
+#WORKUNIT('protect',true);
 
 hdr_prod_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','P'); //prod boca fcra
 hdr_cert_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','C'); //cert boca fcra
