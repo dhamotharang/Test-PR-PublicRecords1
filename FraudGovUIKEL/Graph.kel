@@ -1225,6 +1225,31 @@ Legal: => TaxLiabOngoingFlag := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Nul
 																				 1);
 Legal: => IncorpStatusType := MAP(biscorporatestatus:Null => -99997,
 																	biscorporatestatus);
+Legal: => UnemClaimCurrActiveCount := MAP(ClaimCount=0 => -99998,
+                                          ALL(LegalClaim.rClaim, claim_status:Null OR claim_status='' ) => -99997,
+																					COUNT(LegalClaim.rClaim(claim_status = 'Regular Active')));
+Legal: => UnemClaimFiledCntEv := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge != -99998)));
+Legal: => UnemClaimFiledCnt1Y := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365)));
+Legal: => UnemClaimFiledCnt120D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120)));
+Legal: => UnemClaimFiledCnt90D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90)));
+Legal: => UnemClaimFiledCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30)));
+																		 
+Legal: => UnemClaimApprvCntEv := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge != -99998)));
+Legal: => UnemClaimApprvCnt1Y := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 365)));
+Legal: => UnemClaimApprvCnt120D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 120)));
+Legal: => UnemClaimApprvCnt90D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 90)));
+Legal: => UnemClaimApprvCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
+																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 30)));
+																		 
 
 // Legal claim history attributes
 // Count the number of unique claimant ids with claims having a "regular active" status
@@ -1287,6 +1312,11 @@ Legal: => BusAcctLexIDMultiUnemClmCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClai
 																								COUNT(Sequence.Dedup(LegalClaim(ClmDt2BsDt > 0 AND ClmDt2BsDt <= 30){LexID:=rClaim.rClaimant.LexID, cnt:=GROUP:Count}(cnt>=2), LEFT.LexID=RIGHT.LexID, LexID)));
 */
 // Claim Attributes
+Claim: => ClaimAge := MAP(NOT ISVALIDDATE(claim_submit_ccyymmdd) => -99998,
+                          DAYSBETWEEN(claim_submit_ccyymmdd,  DATE(rEmployer.BusAcctNewestRecordDt)));
+
+
+// Claimant Attributes
 Claimant: => ClaimantID := claimant_ssn;
 Claimant: => LexID := claimantlexid;
 
@@ -1529,10 +1559,12 @@ Employer: => BusIncorpToLiabSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => 
 Employer: => BusIncorpToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								 BusIncorpDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
 																								 BusIncorpDt=-99997 OR BusOldestUnemClmDt=-99997 => -99997,
+																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt))>999 => 999,
 																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt)));
 Employer: => BusIncorpToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								 BusIncorpDt=-99998 OR BusNewestUnemClmDt=-99998 => -99998,
 																								 BusIncorpDt=-99997 OR BusNewestUnemClmDt=-99997 => -99997,
+																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt))>999 => 999,
 																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt)));
 Employer: => BusLiabToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 BusOldestTaxLiabStartDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
@@ -1545,8 +1577,61 @@ Employer: => BusLiabToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:N
 Employer: => BusAcctUnemClaimCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									ClaimCount=0 => -99998,
 																									ALL(EmployerClaim.rClaim, claim_status:Null ) => -99997,
-																									COUNT(EmployerClaim(Claim.claim_status = 'Regular Active')));
-																									
+																									COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active')));
+Employer: => BusAcctUnemClaimFiledCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge != -99998)));
+Employer: => BusAcctUnemClaimFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365)));
+Employer: => BusAcctUnemClaimFiledCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120)));
+Employer: => BusAcctUnemClaimFiledCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90)));
+Employer: => BusAcctUnemClaimFiledCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) => -99998,
+																							 COUNT(EmployerClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30)));
+Employer: => BusAcctUnemClaimApprvCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active')));
+Employer: => BusAcctUnemClaimApprvCnt1Y := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 365)));
+Employer: => BusAcctUnemClaimApprvCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 120)));
+Employer: => BusAcctUnemClaimApprvCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 90)));
+Employer: => BusAcctUnemClaimApprvCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                               ALL(EmployerClaim.rClaim, ClaimAge=-99998) OR ALL(EmployerClaim.rClaim, claim_status:Null) => -99998,
+																							 COUNT(EmployerClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 30)));
+Employer: => BusUnemClaimCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimCurrActiveCount);
+Employer: => BusUnemClaimFiledCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCntEv);
+Employer: => BusUnemClaimFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt1Y);
+Employer: => BusUnemClaimFiledCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt120D);
+Employer: => BusUnemClaimFiledCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt90D);
+Employer: => BusUnemClaimFiledCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimFiledCnt30D);
+Employer: => BusUnemClaimApprvCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCntEv);
+Employer: => BusUnemClaimApprvCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt1Y);
+Employer: => BusUnemClaimApprvCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt120D);
+Employer: => BusUnemClaimApprvCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt90D);
+Employer: => BusUnemClaimApprvCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                                rLegal.UnemClaimApprvCnt30D);
+
+																						 
 
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
 QUERY: showEmployers <= Employer;
