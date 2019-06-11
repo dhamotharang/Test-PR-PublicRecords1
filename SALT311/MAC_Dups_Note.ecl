@@ -26,15 +26,17 @@ export MAC_Dups_Note(infile,outformat,outfile,outdups,uniqueIDField='uniqueid',m
   %r0% %tra%(%wider% le,%wider% ri) := 	TRANSFORM
 	  SELF.__shadow_ref := IF (
 #EXPORTXML(AllFields, RECORDOF(%ds_in%))
-#EXPAND(REGEXREPLACE('[|]',REGEXREPLACE('([^|]+)',REGEXREPLACE('¶_[^¶]+_¶',
+#EXPAND(REGEXREPLACE(u'[|]',REGEXREPLACE(u'([^|]+)',REGEXREPLACE(u'\266_[^\266]+_\266',
 	#FOR (AllFields)
 		#FOR (Field)
-			#IF(%'@isDataset'%='1' OR %'@isRecord'%='1')
-				'¶_'+
+			#IF(%'@isRecord'%='1')
+				u'\266_'+
 			#ELSIF(%'@isEnd'%='1')
-				'_¶'+
+				u'_\266'+
+			#ELSIF(%'@isDataset'%='1')
+				u'|'+%'@name'%+u'\266_'+
 			#ELSIF(StringLib.StringToLowerCase(%'@name'%)<>StringLib.StringToLowerCase(#TEXT(uniqueIDField)))
-        '|'+%'@name'%+
+        u'|'+%'@name'%+
 	    #END
 		#END
 	#END
