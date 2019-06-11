@@ -1,7 +1,7 @@
-EXPORT RawFiles := MODULE
+﻿EXPORT RawFiles := MODULE
   IMPORT SALTTOOLS22;
 // RawFile handling for btlt
-  Full := 'edata10-bld.br.seisint.com/prod_data_build_13/eval_data/dca/test/l*txt';
+  Full := '_control.IPAddress.bctlpedata10/prod_data_build_13/eval_data/dca/test/l*txt';
   EXPORT btlt_Names := SALTTOOLS22.mod_FilenamesInput('ingest_data::DCAV2::btlt::@version@','',SALTTOOLS22.mod_utilities.IpFromFull(Full),SALTTOOLS22.mod_utilities.DirectoryFromFull(Full),SALTTOOLS22.mod_utilities.WildCardFromFull(Full),0,,,,,'VARIABLE',,,,'\r\n',);
 // The below can be used to note the 'hand spraying' of a particular file
   EXPORT btlt_NoteSpray(STRING name) := fileservices.addsuperfile(btlt_Names.sprayed, '~' + name);

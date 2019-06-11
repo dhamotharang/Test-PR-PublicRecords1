@@ -10,4 +10,5 @@
 	STRING6 Federal_Reserve_District_Code := '';
 	STRING8 Filler_Code_Activation_Date := '';
 	STRING35 Filler_2 := '';
+	String2 crlf := '\r\n'; 
 End;

@@ -1,4 +1,4 @@
-﻿import _Control,RoxieKeybuild,Scrubs_Vina,ORBIT3;
+﻿import _Control,RoxieKeybuild,Scrubs_Vina,ORBIT3, dops,Orbit3Insurance;
 
 export Proc_Build_All(string filedate,string inFilename = 'no file', string EmailList='') := function
 
@@ -19,12 +19,15 @@ strata_infile := PROJECT(VINA.file_vina_base,TRANSFORM({VINA.layout_vina_infile}
 
 // dops update
 
-dops_update := RoxieKeybuild.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N',,,'B');																	
-idops_update:= RoxieKeybuild.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F',,,'A');																	
+dops_update := dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N',,,'B');																	
+//DF-23793 Add T to inenvment parameter to update Dops of Insurance customer test environment after build completes 
+idops_update:= dops.updateversion('Vina_VinKeys',filedate,VINA.Email_Notification_Lists().buildsuccess,,'N|F|T',,,'A');																	
 
 //Orbit update
 orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('VINA',(filedate),'N'); 
 
+//Orbiti Update
+orbiti_update := Orbit3Insurance.Proc_Orbit3I_CreateBuild ('VINA', filedate,'N','Melanie.Jackson@lexisnexisrisk.com' ) ;
 
 
 // sample records for QA
@@ -44,7 +47,9 @@ retval := sequential(
 													dops_update,
 													idops_update,													//DF-16616
 													orbit_update,
+													orbiti_update,
 													new_records_sample_for_qa,
+													CopyKey2Alpha('thor_data400::key::vina::vin_qa'),
 													//move the new file to processed
 													FileServices.clearsuperfile(processedSuperFile),
 													FileServices.addsuperfile(processedSuperFile,'~thor_data400::in::vintelligence::vin',,true),

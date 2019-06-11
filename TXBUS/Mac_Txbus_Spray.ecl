@@ -1,4 +1,4 @@
-import Txbus;
+﻿import Txbus;
 //*********************************************************************************
 //*** USAGE :-
 //*** Txbus.Mac_Txbus_Spray
@@ -17,9 +17,12 @@ macro
 #uniquename(cleaned_ds)
 #uniquename(CreateSuperfile)
 #uniquename(CreateSuperIfNotExist)
+#uniquename(CreateRawSuperfile)
+#uniquename(CreateRawSuperIfNotExist)
 #uniquename(super_Clean_main)
 #uniquename(add_Clean_super)
 #uniquename(do_super)
+#uniquename(add_Raw_super)
 #uniquename(add_super)
 #uniquename(out_clen)
 #uniquename(recSize)
@@ -39,17 +42,26 @@ macro
 %cleaned_ds% 					 := if (not FileServices.FileExists(Txbus.constants.cluster + 'in::Txbus::'+filedate+'::stact_cleaned'),%out_clen%,%Message_clean_file%);
                                      
 
-%CreateSuperfile%      := FileServices.CreateSuperFile(Txbus.Constants.Cluster + 'in::Txbus::Superfile',false);
-%CreateSuperIfNotExist%:= if (~FileServices.SuperFileExists(Txbus.Constants.Cluster + 'in::Txbus::Superfile'),%CreateSuperfile%); 
+%CreateSuperfile%         := FileServices.CreateSuperFile(Txbus.Constants.Cluster + 'in::Txbus::qa::Clean_updates::Superfile',false);
+%CreateSuperIfNotExist%   := if (~FileServices.SuperFileExists(Txbus.Constants.Cluster + 'in::Txbus::qa::Clean_updates::Superfile'),%CreateSuperfile%); 
+%CreateRawSuperfile%      := FileServices.CreateSuperFile(Txbus.Constants.Cluster + 'in::Txbus::Raw::Superfile',false);
+%CreateRawSuperIfNotExist%:= if (~FileServices.SuperFileExists(Txbus.Constants.Cluster + 'in::Txbus::Raw::Superfile'),%CreateRawSuperfile%);
+
+%add_Raw_super% 		   := sequential(FileServices.StartSuperFileTransaction(),					
+																		 FileServices.AddSuperFile(Txbus.Constants.Cluster + 'in::Txbus::Raw::Superfile', 
+																															 Txbus.Constants.Cluster + 'in::Txbus::'+ filedate +'::stact_raw'), 
+																		 FileServices.FinishSuperFileTransaction(),
+																		 output(Txbus.constants.cluster +'in::Txbus::'+ filedate +'::stact_raw  --' + '\n Raw file has been added to the superFile')
+																		 );
 %add_Clean_super% 		 := sequential(FileServices.StartSuperFileTransaction(),					
-																		 FileServices.AddSuperFile(Txbus.Constants.Cluster + 'in::Txbus::Superfile', 
+																		 FileServices.AddSuperFile(Txbus.Constants.Cluster + 'in::Txbus::qa::Clean_updates::Superfile', 
 																															 Txbus.Constants.Cluster + 'in::Txbus::'+filedate+'::stact_cleaned'), 
 																		 FileServices.FinishSuperFileTransaction(),
 																		 output(Txbus.constants.cluster +'in::Txbus::'+filedate+'::stact_cleaned  --' + '\n Cleaned file has been added to the superFile')
 																		 );
 
-%super_Clean_main% 		 :=if(FileServices.FindSuperFileSubName(Txbus.Constants.Cluster + 'in::Txbus::Superfile',Txbus.Constants.Cluster + 'in::Txbus::'+filedate+'::stact_cleaned') = 0, %add_Clean_super%,%Message_super_file%);
-%do_super% 						 := sequential(%CreateSuperIfNotExist%, %check_rawFile_exist%, %cleaned_ds%, %super_Clean_main%);
+%super_Clean_main% 		 :=if(FileServices.FindSuperFileSubName(Txbus.Constants.Cluster + 'in::Txbus::qa::Clean_updates::Superfile',Txbus.Constants.Cluster + 'in::Txbus::'+filedate+'::stact_cleaned') = 0, %add_Clean_super%,%Message_super_file%);
+%do_super% 						 := sequential(%CreateSuperIfNotExist%, %check_rawFile_exist%, %CreateRawSuperIfNotExist%, %cleaned_ds%, %add_Raw_super%, %super_Clean_main%);
 retval 						 	   := %do_super%;
 
 endmacro;

@@ -50,6 +50,8 @@ export mod_sources := module
 		MDR.sourceTools.SourceIsDPPA(src)									=> code.DPPA,
 		MDR.sourceTools.SourceIsDunn_Bradstreet(src)			=> code.DNB,
 		MDR.sourceTools.SourceIsEBR(src)									=> code.EBR,
+		MDR.sourceTools.SourceIsExperian_CRDB(src)				=> code.EBR,
+		MDR.sourceTools.SourceIsFBNV2_Experian_Direct(src) => code.EBR,
 		MDR.sourceTools.SourceIsLnPropV2_Fares_Asrs(src)	=> code.PROP_FARES, // a subset of SourceIsProperty
 		MDR.sourceTools.SourceIsLnPropV2_Fares_Deeds(src)	=> code.PROP_FARES, // a subset of SourceIsProperty
 		MDR.sourceTools.SourceIsProperty(src)							=> if(isDayton_vlid(vl_id), code.PROP_DAYTON, code.PROP_FIDELITY),
@@ -59,7 +61,7 @@ export mod_sources := module
 		
 	export unsigned code2bmap(code c) := ut.bit_set(0,(unsigned)c);
 	
- export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Restricted, 0, code2bmap(code.MARKETING_UNRESTRICTED));
+ export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Sources, code2bmap(code.MARKETING_UNRESTRICTED), 0);
               
 	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(exclusiveSrc2code(src,vl_id)) | inclusiveSrc2bmap(src); // called by SALT - becomes *_data_permits
 	
@@ -260,6 +262,8 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages         
     + MDR.sourceTools.set_Cortera         
+    + MDR.sourceTools.set_DataBridge         
+    + MDR.sourceTools.set_Equifax_Business_Data         
     + MDR.sourceTools.set_Infutor_NARB        
   ;
   
@@ -312,6 +316,8 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages                  
     + MDR.sourceTools.set_Cortera                 
+    + MDR.sourceTools.set_DataBridge                 
+    + MDR.sourceTools.set_Equifax_Business_Data                 
     + MDR.sourceTools.set_Infutor_NARB                 
   ;
 
@@ -392,7 +398,9 @@ export mod_sources := module
 		MDR.sourceTools.SourceIsCClue                 (src) => '37',
 		MDR.sourceTools.SourceIsBusiness_Credit       (src) => '38',
 		MDR.sourceTools.SourceIsCortera               (src) => '39',
-		MDR.sourceTools.SourceIsInfutor_NARB               (src) => '40',
+		MDR.sourceTools.SourceIsInfutor_NARB          (src) => '40',
+		MDR.sourceTools.SourceIsEquifax_Business_Data (src) => '41',
+		MDR.sourceTools.SourceIsDataBridge            (src) => '42',
 		nonCode
 	);
 	export boolean srcInBIPV2Header(string2 src) := src2numCode(src) <> nonCode;
@@ -423,6 +431,8 @@ export mod_sources := module
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
     ,MDR.sourceTools.set_Cortera        // S61(BH-501)
+    ,MDR.sourceTools.set_DataBridge     // S70(BH-644)
+    ,MDR.sourceTools.set_Equifax_Business_Data   // S65 (BH-584)
     ,MDR.sourceTools.set_Infutor_NARB        // S61(BH-528)
     ,MDR.sourceTools.set_Workers_Compensation // S62a(BH-502)
     ,MDR.sourceTools.set_CClue                // S62a
@@ -520,6 +530,8 @@ export mod_sources := module
 		'37' => MDR.sourceTools.set_CClue[1],
 		'39' => MDR.sourceTools.set_Cortera[1],
 		'40' => MDR.sourceTools.set_Infutor_NARB[1],
+		'41' => MDR.sourceTools.set_Equifax_Business_Data[1],
+		'42' => MDR.sourceTools.set_DataBridge[1],
 		nonCode
 	);
 	export TranslateCode(string2 code) := TranslateSource_aggregate(code2src1(code));

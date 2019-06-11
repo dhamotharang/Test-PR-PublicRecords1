@@ -53,7 +53,7 @@ macro
 
 //#workunit('name','DrvLic '+ state + ' Spray & CLean');
 
-%sourceCsvSeparater% := if (state='NC','$','\\|');
+%sourceCsvSeparater% := if (state='NC','$',if (state='MA','\\|\\|','\\|'));
 %sourceCsvTeminater% := '\\n,\\r\\n';
 %sourceCsvQuote% := '\"';
 
@@ -79,7 +79,7 @@ macro
 
 	%recSize% := map(%subname% = 'CT'        => 196,
 					 %subname% = 'LA'        => 151,
-					 %subname% = 'MA'        => 227,
+					//%subname% = 'MA'        => 227,
 					//%subname% = 'ME'        => 309,
 					 %subname% = 'ME_MEDCERT' => 519,
 					 //%subname% = 'MI'        => 211,
@@ -106,7 +106,7 @@ macro
 	//re-instated MO per Jill Luber 20090716
 	//%spray_raw% := if (%st% in ['CT', 'ME', 'MI', 'MN', 'MO', 'OH', 'TN', 'TX', 'WI', 'WV', 'WY'],
 	//%spray_raw% := if (%st% in ['CT', 'LA','ME', 'MI', 'MN','MO','NE','NV','OH', 'TN', 'TX', 'WI', 'WV', 'WY'],
-	%spray_raw% := if (%st% in ['CT', 'LA','MA','ME', 'MI', 'MN','NE','NV','OH', 'TN', 'WI', 'WV', 'WY'] OR
+	%spray_raw% := if (%st% in ['CT', 'LA','ME', 'MI', 'MN','NE','NV','OH', 'TN', 'WI', 'WV', 'WY'] OR
 	                   %subname% = 'MO_BASIC' OR %subname% = 'MO_ICISSU',
 						FileServices.SprayFixed(Source_IP
 												,source_path + file_name
@@ -223,7 +223,7 @@ macro
 	                     ,'ME_MEDCERT'     => DriversV2.Scrub_DL(filedate).ME_MEDCERT
 	                     ,'MI'             => DriversV2.Scrub_DL(filedate).MI
 	                     // ,'MO'             => DriversV2.Scrub_DL(filedate).MO
-	                     ,'MO_MEDCERT'     => DriversV2.Scrub_DL(filedate).MO_MEDCERT
+	                     // ,'MO_MEDCERT'     => DriversV2.Scrub_DL(filedate).MO_MEDCERT
 	                     ,'NE'             => DriversV2.Scrub_DL(filedate).NE
 	                     ,'NC'             => DriversV2.Scrub_DL(filedate).NC
 	                     ,'NV'             => DriversV2.Scrub_DL(filedate).NV											 

@@ -264,7 +264,43 @@ dSuppressRecs				:=
 	// LNK-987 FW: Deceased data
     {'000602512896', 100, '20180806', ' ', ' ', '         ', 'DE JORIA            ', 'II  ', 'JOHN           ', 'PAUL           ', ' ', '        ', '19650731', '41', '97132', '     ', 'OR', '071', '  ', 'N', 'TUN', /*'000602512896DTUN'*/'', 'TN', 'Y'},
 	//	LNK-579 Health Equity - Yolanda White - Showing DECEASED and is NOT
-    {'001122861464', 85, '20180806', ' ', ' ', '         ', 'YOLANDA             ', '    ', 'POPE           ', '               ', ' ', '        ', '        ', '53', '98178', '     ', 'WA', '033', '  ', 'N', 'TUN', /*'001122861464YTUN'*/'', 'TN', 'Y'}
-	], Header.Layout_Did_Death_MasterV3);
+    {'001122861464', 85, '20180806', ' ', ' ', '         ', 'YOLANDA             ', '    ', 'POPE           ', '               ', ' ', '        ', '        ', '53', '98178', '     ', 'WA', '033', '  ', 'N', 'TUN', /*'001122861464YTUN'*/'', 'TN', 'Y'},
+	//	LNK-1632	Lincoln Financial Group: Public Records Possible Overlinking (Deceased indicator)
+    {'035499717130', 93, '20181008', ' ', ' ', '         ', 'CHIN                ', 'JR  ', 'PAUL           ', 'PHILIP         ', ' ', '        ', '        ', '51', '23454', '     ', 'VA', '810', '  ', 'N', 'TUN', /*'035499717130CTUN'*/'', 'TN', 'Y'},
+  //  LNK-1721 	
+	  {'001859697457', 100, '20190408', ' ', ' ', '     	 ', 'NYGAARD             ', '    ',	'BERNT          ', '	             ', ' ', '	 	    ', '   	    ', '36', '11360',	'     ', 'NY', '081', '	 ', 'N', 'TUN',	/*'001859697457NTUN'*/'',	'TN',	'Y'},
+	//	LNK-1733	Possible Overlink
+    {'001961115336', 100, '20181105', ' ', ' ', '393549837', 'PETERSON            ', '    ', 'JAMES          ', 'M              ', ' ', '20150611', '        ', '55', '54701', '     ', 'WI', '035', '  ', 'N', 'ENC', /*'001961115336PENC'*/'', '64', 'N'}, 
+	// LNK-1782 Copy of 180329-001784: ACCURINT - 99136 - deceased indicator [Incident: 180706-000082]
+    {'000154038387', 100, '20181008', ' ', ' ', '         ', 'BATISTE             ', '    ', 'ORANEE         ', '               ', ' ', '        ', '19440408', '06', '93635', '     ', 'CA', '047', '  ', 'N', 'TUN', /*'000154038387BTUN'*/'', 'TN', 'Y'}, 
+  // LNK-1802 07/12/2018 DEASEASED INDICATOR -CDD#: 103309 MBS#: 13073755 ML [Incident: 180710-001687]
+    {'001513685919', 100, '20190513', ' ', ' ', '         ', 'LEWIS               ', '    ', 'SAMUEL         ', 'K              ', ' ', '        ', '        ', '17', '60126', '     ', 'IL', '043', '  ', 'N', 'ENC', /*'001513685919LENC'*/'', '64', 'N'},
+	// LNK-1859 Customer Dispute Number -  1151670 Community Choice Credit Union 
+    {'002708976984', 100,	'20190408',	' ', ' ', '	        ', 'WILEY               ', '	  ', 'ANICE          ',	'V              ', ' ',	' 	     ', '   	   ',	'19',	'50313', '	   ', 'IA',	'153', '	', 'N',	'TUN', /*'002708976984WTUN'*/'', 'TN', 'Y'}, 
+	// LNK-2044 Copy of 180831-000613: Copy of 180831-000560: Accurint – deceased indicator [WILLIAM P DOYLE] [ticket#106193] [Incident: 180910-001177]
+    {'000680057632', 100, '20181008', ' ', ' ', '426204079', 'DOYLE               ', '    ', 'WILLIAM        ', 'P              ', ' ', '        ', '19481227', '12', '33172', '     ', 'FL', '086', '  ', 'N', 'TUN', /*'000680057632DTUN'*/'', 'TN', 'Y'}, 
+	// LNK-2088 non-fcra decease indicator- 106883 [Incident: 180920-000580]
+    {/*'000486500382'*/'', 100, '20180906', ' ', ' ', '         ', 'COLLINS             ', '    ', 'BONNIE         ', '               ', ' ', '20180727', '19460112', '48', '77372', '     ', 'TX', '339', '  ', 'N', 'OBD', 'OB00000041401284', 'OB', 'N'}, 
+	// LNK-2103 Alive person marked as deceased
+    {'000880859745', 100, '20181105', ' ', ' ', '334549109', 'LINDENMUTH          ', '    ', 'KRYSTYNA       ', 'MARIA          ', ' ', '        ', '19480612', '08', '80002', '     ', 'CO', '059', '  ', 'N', 'ENC', /*'000880859745LENC'*/'', '64', 'N'}, 
+	// LNK-2124 FW: Deceased record comingle possibility
+    {'000566764672', 100, '20090807', 'A', 'A', '608746456', 'NGUYEN              ', '    ', 'THE            ', '               ', 'P', '20090724', '19440515', '45', '75052', '     ', 'TX', '113', '  ', 'N', 'SSA', /*'608746456N090724'*/'', 'DE', 'N'},
+  // LNK-2547 Non-FCRA Possible Over Linking of Death Record LexID 002664383215 Watts
+    {'238121936659', 100,	'20190408', ' ', ' ',	'372623282', 'WATTS               ', '    ', 'RUTH           ', 'ANNETTE        ', ' ',	'20160907', '        ', '26',	'48244', '	   ',	'MI',	'163', '	', 'N',	'ENC', /*'238121936659WENC'*/'', '64', 'N'},
+	// LNK-2019 9/11 DQ reivew Fredrick Jones / Accurint-Dispute-Ticket ID: 99860 [Incident: 180901-000097]
+		{'001275152362', 100,	'20190408',	' ', ' ', '	 	      ', 'JONES               ', '	  ', 'FREDERICK      ', '	              ', ' ', ' 	     ', '19631205',	'26',	'48203', '	   ', 'MI',	'163', '	', 'N',	'TUN', /*'001275152362JTUN'*/'', 'TN', 'Y'},
+  // LNK-2082 Copy of 180920-001909: Accurint Clarification - Ticket 107064 MARTIN, IDELLE [Incident: 180921-000146]
+    {'001614635657', 100,	'20190408', ' ', ' ',	' 	 	    ', 'MARTIN              ', '	  ', 'IDELLE         ', '	              ', ' ', '	 	     ',	'19461028',	'29',	'65202', '	   ', 'MO',	'019', '	', 'N',	'TUN', /*'001614635657MTUN'*/'', 'TN', 'Y'},
+  // LNK-2449  Alive Consumer marked as deceased
+	  {'045899339355', 100,	'20190408',	' ', ' ', '	 	      ', 'SHARPTON            ', '	  ', 'KEVIN          ',	'C              ', ' ', ' 	     ', '   	   ', '47',	'37087', '	   ', 'TN',	'189', '	', 'N',	'TUN', /*'045899339355STUN'*/'', 'TN', 'Y'},
+	// LNK-2450  Alive Consumer marked as deceased
+		{/*'000301044952'*/'',  96,	'20130515',	' ', ' ', ' 	      ', 'BROWNE              ', '	  ', 'PETER          ',	'CARROLL        ', ' ', '20070304',	'        ',	'36',	'12986', '	   ', 'NY',	'033', '	', 'N', 'TRB', 'TR00000079931328', 'TR', 'N'},
+  // LNK-2263/LNK-2662  Alive Consumer marked as deceased
+	  {'183216702996',	85,	'20190408', ' ', ' ',	' 	 	    ', 'HOWE                ', '	  ', 'DOUGLAS        ', 'B              ', ' ', '	       ', '19561106',	'26',	'48473', '     ', 'MI',	'049', '	', 'N',	'TUN', /*'183216702996HTUN'*/'', 'TN', 'Y'},   
+	// LNK-2664  H149: DOD Issue- William Athens JR		
+		{'000091337313', 100,	'20190415', '	', ' ', '         ', 'ATHENS              ', '	  ', 'WILLIAM        ', 'ARCHIE         ', ' ',	'20151130', '	       ', '26',	'48180', '	   ', 'MI',	'163', '	', 'N',	'ENC', /*'000091337313AENC'*/'', '64', 'N'},
+	// LNK-2737	RE: SHIRLEY PISTILLI -16047085/118038 [Incident: 190513-002031]
+		{'001983797870',  85,	'20190408', ' ', ' ', '	 	 	    ', 'PISTILLI            ', ' 	  ', 'SHIRLEY        ', '	              ', ' ', '	 	     ', '  	     ',	'42',	'19446', '	   ', 'PA',	'091', '	', 'N',	'TUN', /*'001983797870PTUN'*/'', 'TN', 'Y'}
+	 ], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

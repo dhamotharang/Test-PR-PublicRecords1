@@ -138,7 +138,7 @@ jPEP_out := IF(MissingPEP > 0,FAIL(MissingPEP + ' PoliticallyExposedPersons_InRa
 output(jPEP,named('PoliticallyExposedPersons_InRaw_notbase'));
 //9============================================================================================
 // World Bank Ineligible Firms 
-  WBIFRaw   := GlobalWatchLists_Preprocess.Files.dsWorldBank(orig_firm_name <> '');
+  WBIFRaw   := GlobalWatchLists_Preprocess.Files.dsWorldBank( (regexfind('^[Name|  ] ', TRIM(orig_firm_name, left, right) )   ));
   WBIFBase  := ProdBase(source = 'World Bank Ineligible Firms');	
 	
 	ClnRawName(string InName)	:= FUNCTION

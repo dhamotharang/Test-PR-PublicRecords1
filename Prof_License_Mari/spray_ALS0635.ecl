@@ -1,4 +1,4 @@
-// spray ALS0635 Professional Licenses Files for MARI	   
+﻿// spray ALS0635 Professional Licenses Files for MARI	   
 
 
 import ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib, Lib_date;
@@ -11,7 +11,7 @@ export spray_ALS0635 (string filedate) := MODULE
 
 shared filepath		    :=	'/data/data_build_5_2/MARI/in/ALS0635/' + filedate +'/';
 shared sourcepath			:=	'/data/data_build_5_2/MARI/';
-shared group_name			:=	'thor400_20';
+shared group_name			:=	Common_Prof_Lic_Mari.group_name;
 shared maxRecordSize	:=	8192;
 shared destination := Common_Prof_Lic_Mari.SourcesFolder + 'ALS0635::' + filedate + '::';
 shared superfile_mtg := '~thor_data400::in::proflic_mari::alS0635::using::mtg_license';

@@ -1,4 +1,4 @@
-import Business_Header, ut, address,mdr;
+﻿import Business_Header, ut, address,mdr;
 
 export fSKA_As_Business_Header(
 
@@ -30,7 +30,7 @@ function
 
 	Layout_BHF_Local  Translate_SKA_Verified_to_BHF(Layout_SKA_Verified_Local l, integer CTR) := transform
 	self.orig_id := l.record_id;
-	self.company_name := Stringlib.StringToUpperCase(l.company_name);
+	self.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
 	self.vl_id := 'SKAV' + l.id;
 	self.vendor_id := 'SKAV' + l.id;
 	self.source := MDR.sourceTools.src_SKA;
@@ -132,13 +132,13 @@ function
 
 	Business_Header.Layout_Business_Header_New  Translate_SKA_Nixie_to_BHF(Layout_SKA_Nixie_BDID l) := transform
 	self.group1_id := 0;
-	self.company_name := Stringlib.StringToUpperCase(l.company_name);
+	self.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
 	self.vl_id := 'SKAN' + l.id;
 	self.vendor_id := 'SKAN' + l.id;
 	self.source := MDR.sourceTools.src_SKA;
 	self.source_group := '';
-	self.phone := (unsigned6)address.CleanPhone(if(l.area_code <> '', l.area_code, '000') + l.phone);
-	self.phone_score := if((integer)l.phone = 0, 0, 1);
+	self.phone := (unsigned6)address.CleanPhone(if(l.area_code <> '', l.area_code, '000') + l.NUMBER);
+	self.phone_score := if((integer)l.NUMBER = 0, 0, 1);
 	self.prim_range := l.mail_prim_range;
 	self.predir := l.mail_predir;
 	self.prim_name := l.mail_prim_name;
@@ -172,8 +172,8 @@ function
 	self.dt_first_seen := 
 				ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 				ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
-	self.dt_last_seen := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
-	self.dt_vendor_last_reported := ut.LatestDate(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
+	self.dt_last_seen := MAX(l.dt_last_seen,r.dt_last_seen);
+	self.dt_vendor_last_reported := MAX(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
 	self.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
 	self.company_name := IF(l.company_name = '', r.company_name, l.company_name);
 	self.group1_id := IF(l.group1_id = 0, r.group1_id, l.group1_id);

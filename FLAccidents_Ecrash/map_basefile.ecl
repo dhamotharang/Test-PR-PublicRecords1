@@ -3,7 +3,8 @@
 import FLAccidents, Address, ut, did_add, header_slimsort, driversv2,lib_StringLib,AID,scrubs,scrubs_ecrash,nid,PromoteSupers;
 
  d      := FLAccidents_Ecrash.Infiles.cmbnd;
- dvina	:= FLAccidents.File_VINA;
+ vina	:= DISTRIBUTE(FLAccidents.File_VINA, HASH32(Vin_Input));
+ dvina := DEDUP(SORT(vina, Vin_Input, -((UNSIGNED)Model_Year), RECORD, LOCAL), Vin_Input, LOCAL) :PERSIST('~thor_data400::persist::ecrash_vina');
  acmbnd := FLAccidents_Ecrash.Infiles.agencycmbnd;
  
 ////////////////////////////////////////////////////////////////////////////
@@ -236,7 +237,7 @@ end;
 	
 end;
 
-  jrecs := join(distribute(fPreclean(vin!=''),hash(vin)),distribute(dvina,hash(vin_input)),
+  jrecs := join(distribute(fPreclean(vin!=''),hash(vin)), dvina,
 				left.vin = right.vin_input,
 				trecs2(left,right),left outer,local);
 				

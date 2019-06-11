@@ -1,9 +1,9 @@
-import BIPV2_ProxID,BIPV2,tools,bipv2_build;
+﻿import BIPV2_ProxID,BIPV2,tools,bipv2_build;
 
 export proc_proxid_mj6(
 
-   pstartiter
-  ,pnumiters 
+   pstartiter       = '\'\''
+  ,pnumiters        = '3'
   ,pversion         = 'BIPV2.KeySuffix'
   ,pdoPreprocess    = 'true'
   ,pdoSpecs         = 'true'
@@ -13,6 +13,8 @@ export proc_proxid_mj6(
   ,pUniqueOut       = '\'ProxidMJ6\''
   ,pDotFilename     = 'BIPV2_Proxid.filenames().base.built'                        //'BIPV2_Files.files_dotid.FILE_BASE' //by default it will start where it left off
   ,pMatchThreshold  = '\'0\''
+  ,pEmailList       = 'BIPV2_Build.mod_email.emailList'     // -- for testing, make sure to put in your email address to receive the emails
+  ,pCompileTest     = 'false'
 
 ) :=
 functionmacro
@@ -32,6 +34,8 @@ functionmacro
     ,pUniqueOut     
     ,pDotFilename   
     ,pMatchThreshold
+    ,pEmailList
+    ,pCompileTest
   );
 
 endmacro;

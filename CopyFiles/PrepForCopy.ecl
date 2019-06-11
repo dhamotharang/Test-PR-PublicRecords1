@@ -1,4 +1,4 @@
-import ut, STD;
+﻿import ut, STD;
 export PrepForCopy(string sourceespip, string destespip, string destcluster, string srcdali, string jobowner = thorlib.jobowner()) := module
 	
 	export getsuperlist := sort(Fileservices.LogicalFileSuperSubList()(~regexfind('insuranceheader:name_count',supername)), subname);
@@ -30,6 +30,7 @@ export PrepForCopy(string sourceespip, string destespip, string destcluster, str
 		results := SOAPCALL('http://'+sourceespip+':8010/WsWorkunits', 'WUInfo', 
 											InRecord, dataset(OutRecord),
 											xpath('WUInfoResponse/Workunit')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 		filenames := record
 			string20 wuid := wid;

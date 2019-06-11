@@ -1,4 +1,4 @@
-import Business_Header, ut,mdr;
+﻿import Business_Header, ut, mdr, _validate;
 
 export fFL_Non_Profit_As_Business_Contact(dataset(Layout_FL_Non_Profit_Corp_In) pInputfile) :=
 function
@@ -15,27 +15,31 @@ function
 								 '');
 
 	// output(choosen(govdata.File_FL_Non_Profit_Corp_In, 100));
-	DDMMYYYY_2_YYYYMMDD(STRING8 s) := (INTEGER)(s[5..8] + s[3..4] + s[1..2]);
-	firstDate(r file) := ut.Min2(
-						 ut.Min2(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_1), 
-								 DDMMYYYY_2_YYYYMMDD(file.annual_report_date_2)),
-						 ut.Min2(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_3),
-								 DDMMYYYY_2_YYYYMMDD(file.annual_cor_file_date)));
-	lastDate(r file)  := Max(
-						 Max(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_1), 
-								 DDMMYYYY_2_YYYYMMDD(file.annual_report_date_2)),
-						 Max(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_3),
-								 DDMMYYYY_2_YYYYMMDD(file.annual_last_trx_date))); 
+	// Modified code to fix the dates that were wrongly parsed as per 
+	// JIRA DF-20838 Incorrect Date Last Seen in FL FBN Record in old Business Header BDID 48554866
+	MMDDYYYY_2_YYYYMMDD(STRING8 s) := (INTEGER)(s[5..8] + s[1..2] + s[3..4]);
+	firstDate(r file) := ut.Min2(ut.Min2(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_1), 
+																			 MMDDYYYY_2_YYYYMMDD(file.annual_report_date_2)),
+															 ut.Min2(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_3),
+																			 MMDDYYYY_2_YYYYMMDD(file.annual_cor_file_date)));
+	lastDate(r file)  := Max(Max(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_1), 
+															 MMDDYYYY_2_YYYYMMDD(file.annual_report_date_2)),
+													 Max(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_3),
+															 MMDDYYYY_2_YYYYMMDD(file.annual_last_trx_date))); 
 
 	Business_Header.Layout_Business_Contact_Full_New cleaner(f L, INTEGER C) :=
 	TRANSFORM
 		// General Record Data
+		temp_firstdate := intformat(firstDate(L),8,1);
+		temp_lastdate := intformat(lastDate(L),8,1);
 		SELF.bdid := 0;
 		SELF.did := 0;
 		SELF.vl_id := L.annual_cor_number;
 		SELF.vendor_id := L.annual_cor_number;
-		SELF.dt_first_seen := firstDate(L);
-		SELF.dt_last_seen := lastDate(L);
+		SELF.dt_first_seen := if (_validate.date.fIsValid(temp_firstdate) and 
+															_validate.date.fIsValid(temp_firstdate,_validate.date.rules.DateInPast), firstDate(L),0);
+		SELF.dt_last_seen := if (_validate.date.fIsValid(temp_lastdate) and 
+														 _validate.date.fIsValid(temp_lastdate,_validate.date.rules.DateInPast), lastDate(L),0);
 		SELF.source := MDR.sourceTools.src_FL_Non_Profit;
 		SELF.record_type := 'C';
 		// Person Data

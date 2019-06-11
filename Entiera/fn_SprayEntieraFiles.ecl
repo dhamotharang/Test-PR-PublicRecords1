@@ -6,7 +6,7 @@ export	fn_SprayEntieraFiles(
 															string	pSourceFileName,
 															string	pThorFileName,
 															string	pProcessDate,
-															string	pSourceIP				=	'_Control.IPAddress.bctlpedata11',
+															string	pSourceIP				=	_Control.IPAddress.bctlpedata11,
 															boolean	pOverwriteFlag	= false
 														)
  :=

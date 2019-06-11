@@ -274,6 +274,7 @@ EXPORT InputEcho := RECORD
 		string3  PaySumm_PastDueAgingAmount91PlusPercent ;
 
 	// AccountDetail1
+	     
 		string30 AcctDet1_BusinessContributorNumber ;
 		string50 AcctDet1_BusinessAccountNumber ;
 		string30 AcctDet1_AccountStatus ;
@@ -328,7 +329,20 @@ EXPORT InputEcho := RECORD
 		string15 AcctDet1_Pay_Hist_PaymentStatus;
 		string12 AcctDet1_Pay_Hist_PastDueAmount;
 		boolean AcctDet1_Pay_Hist_IsExtendedOverdue;
+		 // small bus credit report with SBFE data additions
+		unsigned8 AcctDet1_UniqueAccountDetailNumber;
+		string1 AcctDet1_ChargedOff;
+		string25 AcctDet1_PaymentStatus;
+		integer2  AcctDet1_ChargedOffDate_Year;
+		integer2  AcctDet1_ChargedOffDate_Month;
+		integer2  AcctDet1_ChargedOffDate_Day;
+	     string12 AcctDet1_ChargedOffAmount;
+	     string3    AcctDet1_ChargedOffType_Code;
+	     string35 AcctDet1_ChargedOffType_Description;
+	     string12 AcctDet1_TotalChargedOffRecoveries;
+         string1  AcctDet1_ContributedByInquirer;
 	// AccountDetail2
+	      
 		string30 AcctDet2_BusinessContributorNumber ;
 		string50 AcctDet2_BusinessAccountNumber ;
 		string30 AcctDet2_AccountStatus ;
@@ -383,7 +397,18 @@ EXPORT InputEcho := RECORD
 		string15 AcctDet2_Pay_Hist_PaymentStatus;
 		string12 AcctDet2_Pay_Hist_PastDueAmount;
 		boolean AcctDet2_Pay_Hist_IsExtendedOverdue;
-
+           // small bus credit report with SBFE data additions
+           unsigned8 AcctDet2_UniqueAccountDetailNumber;					 
+		string1 AcctDet2_ChargedOff;
+		string25 AcctDet2_PaymentStatus;
+		integer2  AcctDet2_ChargedOffDate_Year;
+		integer2  AcctDet2_ChargedOffDate_Month;
+		integer2  AcctDet2_ChargedOffDate_Day;
+	     string12 AcctDet2_ChargedOffAmount;
+	     string3    AcctDet2_ChargedOffType_code;
+	     string35 AcctDet2_ChargedOffType_Description;
+	     string12 AcctDet2_TotalChargedOffRecoveries;
+             string1  AcctDet2_ContributedByInquirer;
 	// CreditUtils1
 		string12 Cred_Util1_CreditLimit ;
 		string12 Cred_Util1_CreditUtilized ;
@@ -4289,7 +4314,26 @@ EXPORT InputEcho := RECORD
 		unsigned4 Phone2_RecordCount ;
 	
 	END;	
-
+    // small business Credit report with SBFE data project addition
+      EXPORT MatchInfo := record	
+	 // MatchInfo
+	  in_key;
+       string120 CompanyName;
+       string9  Tin;
+       string10 CompanyPhone;
+	  string10 StreetNumber; // not used
+	  string2 StreetPreDirection;   // not used
+	  string28 StreetName;   // not used
+	  string4 StreetSuffix;  // not used
+	   string2 StreetPostDirection;  // not used
+	   string10 UnitDesignation;   // not used
+	   string8 UnitNumber;  // not used
+	   string120 StreetAddress;
+	   string60 StreetAddress2;  // not used
+        string25 city;
+        string2   state; 
+        string5 zip;
+	END;
 	
 	EXPORT Flat_BusinessCreditReport := record
 	  InputEcho;                //Section 1
@@ -4311,6 +4355,7 @@ EXPORT InputEcho := RECORD
 	  TopBusConnected;          //Section 17
 	  TopBusContacts;           //Section 18 
     OtherBusInfo;             //Section 19
+	MatchInfo;                  //Section 20  
 
 END;
 

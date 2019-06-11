@@ -9,6 +9,7 @@ EXPORT UpdateDOPSForPkgValidation(
 										,string l_dopsenv = dops.constants.dopsenvironment
 										,string l_daliip = ''
 										,string l_email = ''
+										,string l_testenv = 'NA'
 										) := module
 
 	export rKeyInfo := record
@@ -26,7 +27,7 @@ EXPORT UpdateDOPSForPkgValidation(
 
 	export GetKeyInfo() := function
 		
-		dGetKeyswithVersion := dops.GetRoxieKeys(l_dopsdatasetname,l_locationflag,l_clusterflag,dopsenv := l_dopsenv);
+		dGetKeyswithVersion := dops.GetRoxieKeys(l_dopsdatasetname,l_locationflag,l_clusterflag,dopsenv := l_dopsenv,l_testenv := l_testenv);
 	
 		
 	
@@ -111,7 +112,7 @@ EXPORT UpdateDOPSForPkgValidation(
 		
 		rSOAPResponse := SOAPCALL(
 				
-				dops.constants.prboca.serviceurl(l_dopsenv),
+				dops.constants.prboca.serviceurl(l_dopsenv,l_clusterflag,l_locationflag,if (l_testenv <> '',l_testenv,'NA')),
 				////////////////////////////////////////////////
 				// to check the soap xml use local machine IP and run soapplus -s -p 4546
 				// 'http://10.176.152.60:4546/',

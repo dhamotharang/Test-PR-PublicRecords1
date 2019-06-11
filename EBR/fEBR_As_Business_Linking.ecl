@@ -1,4 +1,4 @@
-IMPORT Address,Business_Header,Business_HeaderV2,MDR,lib_stringlib, UT;
+﻿IMPORT Address,Business_Header,Business_HeaderV2,MDR,lib_stringlib, UT;
 
 EXPORT fEBR_As_Business_Linking(
 			 dataset(Layout_0010_Header_Base_AID) 			pInput0010HeaderBase	= EBR.File_0010_Header_Base_AID, 				//business data
@@ -235,7 +235,7 @@ EXPORT fEBR_As_Business_Linking(
 				self.contact_name.name_score     := Business_Header.CleanName(self.contact_name.fname,self.contact_name.mname,self.contact_name.lname,self.contact_name.name_suffix)[142];			
 				self.contact_type_raw						 := '';
 				self.contact_job_title_raw       := l.officer_title;
-				self.contact_ssn			           := (string9)l.ssn;
+				self.contact_ssn			           := if(l.ssn<>0, (string9)l.ssn, '');
 				self.contact_dob								 :=	0;
 				self.contact_status_raw					 := '';
 				self.contact_email							 :=	'';

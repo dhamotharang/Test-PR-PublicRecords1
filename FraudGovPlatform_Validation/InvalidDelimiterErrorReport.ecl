@@ -1,4 +1,4 @@
-﻿IMPORT FraudGovPlatform;
+﻿IMPORT FraudGovPlatform,ut;
 EXPORT InvalidDelimiterErrorReport(string fname, string pSeparator, string pTerminator):=module
 
 rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator([]),quote([]),terminator(pTerminator))));
@@ -14,10 +14,10 @@ rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fnam
 			 
 		p1	:=	project(dDelimiter
 							,transform(rText
-								,self.TextLine	:=(string7)left.FileState
-															+ (string20)regexfind('([0-9])\\w+',fname, 0)
-															+ (string8)left.seq
-															+ (string50)left.line[1..50]
+								,self.TextLine	:=(string15)left.FileState
+															+ (string16)(trim((string)left.FileDate)+'_'+trim((string)left.FileTime))
+															+ (string11)left.seq
+															+ (string50)ut.fn_RemoveSpecialChars(left.line)[1..50]
 															+ (string3)'   '
 															+ (string10)left.err
 															+ (string10)left.err_cnt
@@ -39,7 +39,7 @@ rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fnam
 										;
 		string130		HeaderLine2
 										:=	
-											(string8)'STATE'
+											(string15)'ACCOUNT'
 										+ (string16)'FILE DATE_TIME'
 										+ (string11)'SMP REC#'
 										+ (string50)'SAMPLE DATA'

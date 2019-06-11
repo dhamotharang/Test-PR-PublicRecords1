@@ -21,10 +21,33 @@ zVerifyTXData	:=	if (count(zTXData(length(trim(dl_number)) = 10 and trim(dl_numb
 											);
 
 // Split the restricted DL information out of the data.
-dl_patched    := Driversv2.DL(source_code != MDR.sourceTools.src_MN_RESTRICTED_DL);
-dl_restricted := Driversv2.DL(source_code = MDR.sourceTools.src_MN_RESTRICTED_DL);
+dl_nonRestricted	:= Driversv2.DL(source_code != MDR.sourceTools.src_MN_RESTRICTED_DL);
+dl_restricted 		:= Driversv2.DL(source_code = MDR.sourceTools.src_MN_RESTRICTED_DL);
 
-// The restricted DL information has already been removed at this point
+// We need to work with just the WI data for opt out purposes. 
+dl_WIOnly	:=	distribute(dl_nonRestricted(orig_state='WI' and source_code = 'AD'),hash(dl_number));
+dl_Rest		:=	dl_nonRestricted(orig_state<>'WI' or (orig_state = 'WI' and source_code <> 'AD'));
+
+// Determine the latest time a record was opted out. All records including and prior will be supressed.
+dl_WIOptOut		:=	dedup(sort(dl_WIOnly(Opt_Out	=	'S'),dl_number,-dateReceived,local),dl_number,local);
+
+recordof(dl_WIOnly) tremoveOptOut(dl_WIOnly le, dl_WIOptOut ri) :=
+transform
+	self := le;
+end;
+
+dWIFinal := join( dl_WIOnly,
+									dl_WIOptOut,
+									left.dl_number = right.dl_number and 
+									left.dateReceived<=right.dateReceived,
+									tremoveoptout(left,right),
+									left only,
+									local
+								);
+
+// Bring the non WI data back in.								
+dl_patched		:=	dWIFinal + dl_rest;
+
 d := dl_patched;
 
 //** general check
@@ -77,6 +100,10 @@ DriversV2.Layout_DL_For_Insurance trfSlim(DriversV2.File_DL_Extended input) := T
 														input.dl_number
 												 );
 	self.ssn				:=	'';
+	// December 2018 - DF-23661:  Insurance team requested that for FL records, orig_county be populated with 
+	// values from state field if 01-67 because those are actually county codes. 
+	self.orig_county := if(input.orig_state = 'FL' and (integer)input.state >= 01 and (integer)input.state <= 67
+												 ,input.state, '');
 	SELF 						:= 	input;
 END;
 											 

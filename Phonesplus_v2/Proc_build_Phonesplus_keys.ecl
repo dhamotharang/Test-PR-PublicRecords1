@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus,Phonesplus_v2,NID;
+﻿import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus,Phonesplus_v2,NID;
 
 export proc_build_phonesplus_keys(string filedate) := 
 function
@@ -50,7 +50,7 @@ DS_phonesplus := PROJECT(multiCityPhonesplus,xpand_phonesplus(LEFT,COUNTER)) : P
 
 dist_DSphonesplus := distribute(DS_phonesplus,random());
 
-Phonesplus_v2.MAC_Build('Phonesplusv2', dist_DSphonesplus,fname,mname,lname,
+Phonesplus_v2.MAC_Build('Phonesplusv2', filedate, dist_DSphonesplus,fname,mname,lname,
 				 blk,
 				 zero,
 				 cellphone,

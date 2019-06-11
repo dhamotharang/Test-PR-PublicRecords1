@@ -1,6 +1,6 @@
-﻿import tools,BIPV2_Files;
+﻿import tools,BIPV2_Files,BIPV2_LGID3;
 
-ih                      :=BIPV2_LGID3.In_LGID3;
+ih                      := BIPV2_LGID3.In_LGID3;
 psetReviewers					  := ['TL','CM','LB','DW'];
 pNumSamplesPerReviewer	:= 150;
 ConfThreshold					  := '41';

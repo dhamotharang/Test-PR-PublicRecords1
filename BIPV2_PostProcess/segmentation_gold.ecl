@@ -25,6 +25,7 @@ EXPORT segmentation_gold(
 			string addr_type := '';
 			pInfile.has_lgid;
 			boolean has_lgid3_cand := false;
+      
 			// string fein;
 			// string duns;
 			// string lnca;
@@ -175,8 +176,8 @@ WithHeader0 :=
 			map
 				(right.source in BIPV2_PostProcess.constants.tricore 						=> '(**CORE**): ', 
 				 right.source in BIPV2_PostProcess.constants.secondTierSources  => '(*2nd Tier*): ',
-				'') + mdr.sourceTools.fTranslateSource(right.source),
-			self.company_status_derived_w_date := if(right.company_status_derived = '', '', trim(right.company_status_derived, left, right) + ' ' + ((string)right.dt_last_seen)[1..6] + ' ' + mdr.sourceTools.fTranslateSource(right.source)),
+				'') + mdr.sourceTools.TranslateSource(right.source),
+			self.company_status_derived_w_date := if(right.company_status_derived = '', '', trim(right.company_status_derived, left, right) + ' ' + ((string)right.dt_last_seen)[1..6] + ' ' + mdr.sourceTools.TranslateSource(right.source)),
 			// self.fein := if(right.company_fein <> '', 'Y', ''); 
 			// self.ebr := if(right.ebr_file_number <> '', 'Y', ''); 
 			// self.duns := if(right.active_duns_number <> '', 'A', if(right.hist_duns_number <> '', 'H', '')); 
@@ -230,7 +231,7 @@ WithHeader_keyed :=
 		left outer
 	);
 	
-WithHeader := if(count(WithHeader0) > 1000000, WithHeader_pull, WithHeader_keyed);
+export WithHeader := if(count(WithHeader0) > 1000000, WithHeader_pull, WithHeader_keyed);
 // lksd.oc(WithHeader)
 WithHeaderDatesRolledGrpd :=
 iterate(
@@ -242,12 +243,34 @@ iterate(
 		self := right
 	)
 );
-WithHeaderDatesRolled := ungroup(WithHeaderDatesRolledGrpd);
+export WithHeaderDatesRolled := ungroup(WithHeaderDatesRolledGrpd);
 // lksd.oc(WithHeaderDatesRolled)
 	// parallel(
-		// output(choosen(enth(myk, 1000), 1000), named('full_flat_enth1K_'+s)),
-WithHeaderRolled1 :=tools.mac_AggregateFieldsPerID( WithHeaderDatesRolled, ID,,FALSE);
-WithHeaderRolled0 := WithHeaderRolled1 : persist('~thor_data400::BIPV2_PostProcess.segmentation_gold_'+idName+outputNameModifier);
+		// output(choosen(enth(myk, 1000), 1000), named('full_flat_enth1K_'+s))
+export ds_src_status_dt_table        := table(WithHeader ,{ID ,string tier := 
+          map(   source in BIPV2_PostProcess.constants.SuperCore 			  => '(**SUPER CORE**)'
+                ,source in BIPV2_PostProcess.constants.tricore 					 => '(**CORE**)'
+                ,source in BIPV2_PostProcess.constants.secondTierSources => '(*2nd Tier*)'
+                ,                                                                ''
+           ) ,source,unsigned dt_last_seen := max(group,dt_last_seen),company_status_derived,unsigned cnt_recs := count(group)} ,ID  ,source,company_status_derived ,merge);
+           
+export ds_src_status_dt_sort := dedup(sort(distribute(ds_src_status_dt_table ,ID) ,ID ,map(tier = '(**SUPER CORE**)' => 1  ,tier = '(**CORE**)' => 2  ,tier = '(*2nd Tier*)' => 3  ,4),-dt_last_seen,source,company_status_derived  ,local) ,ID ,tier,keep(5),local);
+       
+ds_src_status_dt_rollup_prep  := project(ds_src_status_dt_sort ,transform({ds_src_status_dt_table.ID ,dataset({string tier,string source,unsigned6 dt_last_seen,string company_status_derived}) src_dt_status }
+  ,self.ID            := left.ID
+  ,self.src_dt_status := dataset([{left.tier,mdr.sourceTools.TranslateSource(left.source),left.dt_last_seen,left.company_status_derived}] ,{string tier,string source,unsigned6 dt_last_seen,string company_status_derived})
+),local);
+export ds_src_status_dt_rollup := rollup(ds_src_status_dt_rollup_prep ,left.id = right.id ,transform(recordof(left) 
+  ,self.ID := left.ID
+  ,self.src_dt_status := left.src_dt_status + right.src_dt_status 
+)  ,local);
+
+WithHeaderRolled1 := tools.mac_AggregateFieldsPerID( WithHeaderDatesRolled, ID,,FALSE);
+WithHeaderRolled0 := join(WithHeaderRolled1 ,ds_src_status_dt_rollup  ,left.ID = right.ID ,transform({recordof(left),dataset({string tier,string source,unsigned6 dt_last_seen,string company_status_derived}) src_dt_status }
+  ,self.src_dt_status := right.src_dt_status
+  ,self               := left
+)  ,hash)
+ : persist('~thor_data400::BIPV2_PostProcess.segmentation_gold_'+idName+outputNameModifier);
 // lksd.ec(WithHeaderRolled1)
 // lksd.ec(WithHeaderRolled0)
 WithHeaderRolled := 
@@ -304,10 +327,35 @@ shared isGold :=
 	AND (
 		hasSuperCoreSrc 
 		OR 
-		((hasOtherCoreSrc or has2TSrc) and (hasMultipleSources or hasBizAddr))
+		((hasOtherCoreSrc or has2TSrc) and hasMultipleSources)
 	);			
 shared Gold := AddBackNew(isGold);
 shared NotGold := AddBackNew(~isGold);
+export ds_append_gold_field :=  project(Gold     ,transform({boolean isgold,dataset({string calculation ,boolean result}) gold_calculation,recordof(AddBackNew)}
+  ,self.isgold := true
+  ,self.gold_calculation := dataset([
+                              {'isActive'                         ,~exists(left.inactives(inactive != ''))  }
+                             ,{'AND isNotJustPOBox'               ,~(exists(left.prim_names(prim_name[1..6] = 'PO BOX')) and count(left.prim_names) = count(left.prim_names(prim_name[1..6] = 'PO BOX')));  }
+                             ,{'AND (inHrchy OR isLgid3Linkable)' ,exists(left.has_lgids(has_lgid)) or exists(left.has_lgid3_cands(has_lgid3_cand)) }
+                             ,{'AND (\n'
+                              +'hasSuperCoreSrc \n'
+                              +'OR \n'
+                              +'((hasOtherCoreSrc or has2TSrc) and hasMultipleSources)' , left.cnt_core_sources_super > 0 or ((left.cnt_core_sources_other > 0 or ~left.cnt_2t_sources = 0) and left.cnt_sources > 1)}
+                            ]  ,{string calculation ,boolean result})
+,self := left))
+                              + project(NotGold  ,transform({boolean isgold,dataset({string calculation ,boolean result}) gold_calculation,recordof(AddBackNew)}
+  ,self.isgold := false
+  ,self.gold_calculation := dataset([
+                              {'isActive'                         ,~exists(left.inactives(inactive != ''))  }
+                             ,{'AND isNotJustPOBox'               ,~exists(left.prim_names(prim_name[1..6] = 'PO BOX')) and count(left.prim_names) = count(left.prim_names(prim_name[1..6] = 'PO BOX'));  }
+                             ,{'AND (inHrchy OR isLgid3Linkable)' ,exists(left.has_lgids(has_lgid)) or exists(left.has_lgid3_cands(has_lgid3_cand)) }
+                             ,{'AND (\n'
+                              +'hasSuperCoreSrc \n'
+                              +'OR \n'
+                              +'((hasOtherCoreSrc or has2TSrc) and hasMultipleSources)' , left.cnt_core_sources_super > 0 or ((left.cnt_core_sources_other > 0 or ~left.cnt_2t_sources = 0) and left.cnt_sources > 1)}
+                            ]  ,{string calculation ,boolean result})
+                              ,self := left));
+
 shared abn := table(AddBackNew, {AddBackNew, isGold, isActive, isNotJustPOBox, hasSuperCoreSrc, hasOtherCoreSrc, has2TSrc, hasMultipleSources, hasBizAddr});
 shared attrec := record
 	abn.isGold;

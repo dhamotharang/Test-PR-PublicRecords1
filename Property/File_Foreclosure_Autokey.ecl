@@ -27,6 +27,7 @@ Autokey_layout:=record
 	string2		site_st;
 	string5		site_zip;
 	string4		site_zip4;
+	string2		source;
 	unsigned 		zero :=0;
 	string1		blank :='';
 end;

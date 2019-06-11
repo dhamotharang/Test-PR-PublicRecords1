@@ -1,8 +1,8 @@
-/*Raw professional license file from the source NES0842
+﻿/*Raw professional license file from the source NES0842
 Replace all Quotes (") to single (') as it is messing up
 the conversion.  Convert from xls file to tab delimited txt file
 */
-#workunit('name','Files NES0842');
+#workunit('name','Yogurt: Files NES0842');
 IMPORT _control, Prof_License_Mari;
 
 export file_NES0842 := dataset(Common_Prof_Lic_Mari.SourcesFolder + 'NES0842' + '::' + 'using' + '::' + 're', 

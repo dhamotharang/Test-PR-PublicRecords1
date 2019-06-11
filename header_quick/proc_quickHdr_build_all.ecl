@@ -90,6 +90,7 @@ export proc_quickHdr_build_all (string sourceIP) := function
                     ,notify('Header Ingest Scheduler', '*')
                     ,Inputs_Clear
                     ,Inputs_Set(filedate)
+                    ,notify('Build_Header_Ingest', '*')
                     ,buildAll
                     ,QA_sample/*,Source_Check_rep*/
                     );

@@ -1,4 +1,4 @@
-/*
+﻿/*
   BIPV2_Tools.Propagate_DID -- propagate the DID field throughout another ID only if there is only 1 DID in that BIP ID
 */
 import Strata,BIPV2_Build,bipv2;
@@ -100,7 +100,8 @@ functionmacro
     ,integer  cnt_BIP_IDs_w_1_DID_before          
     ,integer  cnt_BIP_IDs_w_1_DID_after
     ,integer  cnt_single_DID_diff0                
-  });
+  })
+  : independent;
   
   //so for propagation, what do I care about?
   /*

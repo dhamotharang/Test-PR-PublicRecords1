@@ -6,8 +6,11 @@ EXPORT Files := 	MODULE
 	EXPORT DS_prolicv2_IN 	:= DATASET('~prte::in::prolicv2',
 		     Layouts.Layout_file_prof_license_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
  
-  EXPORT DS_File_prolicv2_Base_ext := DATASET(constants.prolicv2_base, 
-	       Layouts.Layout_file_prof_license_in, FLAT );
+  // EXPORT DS_File_prolicv2_Base_ext := DATASET(constants.prolicv2_base, 
+	       // Layouts.Layout_file_prof_license_in, FLAT );
+				 
+	  EXPORT DS_File_prolicv2_Base_ext := DATASET(constants.prolicv2_base, 
+	        Layouts.Layout_out, FLAT );			 
 
 
   Export DS_File_prolicv2_Base := project(DS_File_prolicv2_Base_ext, 

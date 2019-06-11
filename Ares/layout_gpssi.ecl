@@ -32,5 +32,5 @@
 	STRING35	Filler5                         := '';
 	STRING35	Filler6                         := '';
 	STRING35	Filler7                         := '';
-	
+	String2 crlf := '\r\n'; 
 END;

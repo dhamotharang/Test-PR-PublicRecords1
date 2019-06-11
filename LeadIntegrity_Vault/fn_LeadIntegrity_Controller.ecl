@@ -15,9 +15,9 @@ inputFileName := LeadIntegrity_Vault.Constants.MMPrefix + TRIM(date_in) + '_' + 
 outputFileName := LeadIntegrity_Vault.Constants.ARPrefix + TRIM(date_in) + '::lead_integrity_attrib::p' + TRIM(part_nbr); 
 
 LeadIntegrity_Vault.fn_LeadIntegrity_Service(TRIM(date_in), TRIM(part_nbr), inputFileName, outputFileName)
-		: SUCCESS(fileservices.SendEMail(Constants.TeamEmailList, 'LeadIntegrity Attributes Build on Boca Prod Completed For Part Number: ' + TRIM(part_nbr) +  
+		: SUCCESS(fileservices.SendEMail(LeadIntegrity_Vault.Constants.TeamEmailList, 'LeadIntegrity Attributes Build on Boca Prod Completed For Part Number: ' + TRIM(part_nbr) +  
 							' And For the Build Period: ' + TRIM(date_in), 'The Work Unit is: ' + workunit)),
-	    FAILURE(fileservices.SendEMail(Constants.TeamEmailList, 'LeadIntegrity Attributes Build on Boca Prod Failed For Part Number: ' + TRIM(part_nbr) +  
+	    FAILURE(fileservices.SendEMail(LeadIntegrity_Vault.Constants.TeamEmailList, 'LeadIntegrity Attributes Build on Boca Prod Failed For Part Number: ' + TRIM(part_nbr) +  
 							' And For the Build Period: ' + TRIM(date_in), 'The Work Unit is: ' + workunit + '\n' + FAILMESSAGE));
 
 RETURN (outputFileName);

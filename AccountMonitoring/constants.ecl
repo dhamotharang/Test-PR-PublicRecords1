@@ -1,8 +1,8 @@
-﻿IMPORT AccountMonitoring, lib_thorlib, Data_Services;
+﻿IMPORT AccountMonitoring, lib_thorlib, Data_Services, STD;
 
 EXPORT constants := MODULE
 	// The file cluster name
-	EXPORT STRING SPRAY_GROUPNAME  := lib_thorlib.thorlib.cluster();
+	EXPORT STRING SPRAY_GROUPNAME  := STD.System.Thorlib.Group();
 	EXPORT STRING DATA_LOCATION 	 := IF(SPRAY_GROUPNAME in ['thor400_30','thor400_20','thor400_44','thor400_198_a','thor400_198_eclcc'],
 																			 '~', 							// thor400_30 and thor400_20
 																			 Data_Services.foreign_prod); 	// thorwatch and thor_10_219 
@@ -50,6 +50,7 @@ EXPORT constants := MODULE
 	EXPORT UNSIGNED8 PM_MVR							:= AccountMonitoring.types.productMask.mvr;
 	EXPORT UNSIGNED8 PM_AIRCRAFT				:= AccountMonitoring.types.productMask.aircraft;
 	EXPORT UNSIGNED8 PM_WATERCRAFT			:= AccountMonitoring.types.productMask.watercraft;
+	EXPORT UNSIGNED8 PM_PERSONHEADER			:= AccountMonitoring.types.productMask.personheader;
 	
 	// This special value provides the user with a shortcut for utilities to say ALL.
 	EXPORT UNSIGNED8 PM_ALL        := -1;

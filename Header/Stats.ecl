@@ -1,4 +1,5 @@
-﻿IMPORT PromoteSupers,ut;
+﻿IMPORT $,std;
+IMPORT PromoteSupers,ut,InsuranceHeader_PostProcess,IDL_Header;
 EXPORT Stats := module
 
 		export _rec := record
@@ -32,4 +33,22 @@ EXPORT Stats := module
                            return out_;
         end;
         export get(string variable_) := project(_file(variable=variable_),{{_file} - variable});
+
+		// -------------------------------------------------------------------------------------------------------------------
+
+		// PublicRecords Linking Stats
+
+		chdr:=project($.File_Headers,			TRANSFORM(IDL_Header.Layout_Header_Link,SELF:=LEFT,SELF:=[]));
+		phdr:=project($.file_header_previous,	TRANSFORM(IDL_Header.Layout_Header_Link,SELF:=LEFT,SELF:=[]));
+
+		isForPublicRecords:=TRUE;
+
+		filedate:=regexfind('[0-9]{8}',std.file.SuperFileContents(header.Filename_Header)[1].name,0);
+
+		EXPORT GenerateLinkingStats:=sequential(
+		
+				InsuranceHeader_PostProcess.fn_persistenceStats(chdr,phdr,filedate[1..6],TRUE),
+				InsuranceHeader_PostProcess.fn_EntityStats(chdr,phdr,filedate[1..6],TRUE)
+				
+		);
 end;

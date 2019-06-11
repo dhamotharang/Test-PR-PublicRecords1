@@ -708,7 +708,8 @@ export layouts:= Module
 	END;
 
 	EXPORT autokey_common	:= RECORD
-			individual_base;
+			individual_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
 			facility_input.dept_group_key;
 			facility_input.prac_company_name;
 			facility_input.pv_addr_ind;

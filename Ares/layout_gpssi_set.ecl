@@ -4,5 +4,5 @@
 	INTEGER8	SSI_Primary_Key;
 	STRING3 Sub_Category_Type	:= '';
 	STRING35	Filler	:= '';
-	
+	String2 crlf := '\r\n'; 
 END;

@@ -21,10 +21,14 @@
 		STRING30 Section_Number1;
 		STRING10 Court_Date;
 		STRING9 Court_Time;
-		STRING200 Citation_Detail1;
+		//PRTCC update datatype
+		STRING100 Citation_Detail1;
+		
 		STRING3 Local_Code;
-		STRING30 Violation_Code1;
-		STRING30 Violation_Code2;
+		//PRTCC update datatype
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
+		
 		STRING7 Multiple_Charges_Indicator;
 		STRING7 DUI_Indicator;
 		STRING9 Court_Time_AM;
@@ -33,6 +37,10 @@
 		STRING7 Type_Hazardous;
 		STRING7 Type_Other;
 		STRING64 Citation_Status;
+		//PRtCC new fields
+		STRING7 Citation_Type;
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
 	END;
 
 	EXPORT commercl := RECORD
@@ -264,8 +272,10 @@
 		STRING60 Injured_Taken_By;
 		STRING60 Injured_Taken_To;
 		STRING7 Incident_Transported_for_Medical_Care;
-		STRING7 Photographs_Taken;
-		STRING60 Photographed_By;
+		//PRTCC update datatype
+		STRING1 Photographs_Taken;
+		STRING100 Photographed_By;
+		
 		STRING20 Photographer_ID;
 		STRING50 Photography_Agency_Name;
 		STRING100 Agency_Name;
@@ -426,9 +436,11 @@
 		STRING Report_Property_Damage;	
 		STRING Report_Collision_Type;	
 		STRING Report_First_Harmful_Event;	
-		STRING Report_Light_Condition;	
+		STRING Report_Light_Condition;
+		//PRtcc datatype update for code and description
 		STRING Report_Weather_Condition;
 		STRING Report_Road_Condition;
+		
 		STRING20 cru_agency_id;
 		STRING100 cru_agency_name;
 		STRING20 VENDor_Report_Id	;
@@ -448,8 +460,17 @@
 		//Nucleus 
 		STRING50 Platform;
 		STRING40 Agency_Report_Number;
+		//PRtCC new fields
+		STRING20 Dispatch_Time;
+		STRING100 Photograph_Type;
+		STRING1 Ready_To_Sell_Data;
+		STRING10 Posted_Satutory_Speed_Limit;
+		//Data Ingestion New fields
+		STRING10 Dispatch_Date;
+		STRING10 Drug_Involvement;
+		STRING7 Alcohol_Involved;
 	END;
-
+	
 	EXPORT persn := RECORD
 		STRING11 Person_ID;
 		STRING19 Creation_Date;
@@ -460,7 +481,9 @@
 		STRING30 Injury_Status;
 		STRING3 Vehicle_Unit_Number;
 		STRING50 Seating_Position1;
-		STRING40 Safety_Equipment_Restraint1;
+		//PRtcc datatype update for code and description
+		STRING Safety_Equipment_Restraint1;
+		
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
@@ -477,19 +500,25 @@
 		STRING50 Condition_at_Time_of_Crash1;
 		STRING50 Condition_at_Time_of_Crash2;
 		STRING50 Law_Enforcement_Suspects_Alcohol_Use;
-		STRING25 Alcohol_Test_Status;
-		STRING25 Alcohol_Test_Type;
+		//PRtcc datatype update for code and description
+		STRING Alcohol_Test_Status;
+		STRING Alcohol_Test_Type;
+		
 		STRING25 Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash2;
-		STRING100 Non_Motorist_Actions_at_Time_of_Crash;
+		//PRtcc datatype update for code and description
+		STRING Non_Motorist_Actions_at_Time_of_Crash;
+		
 		STRING50 Non_Motorist_Location_at_Time_of_Crash;
 		STRING50 Non_Motorist_Safety_Equipment1;
 		STRING3 Age;
 		STRING50 Driver_License_Restrictions1;
-		STRING10 Drug_Test_Type;
+		//PRtcc datatype update for code and description
+		STRING Drug_Test_Type;
+		
 		STRING25 Drug_Test_Result1;
 		STRING50 Drug_Test_Result2;
 		STRING50 Drug_Test_Result3;
@@ -531,7 +560,9 @@
 		STRING10 Death_Date;
 		STRING9 Death_TIme;
 		STRING7 Extricated;
-		STRING40 Alcohol_Drug_Use;
+		//PRtcc datatype update for code and description
+		STRING Alcohol_Drug_Use;
+		
 		STRING40 Physical_Defects;
 		STRING40 Driver_Residence;
 		STRING30 ID_Type;
@@ -542,7 +573,9 @@
 		STRING3 Violent_Crime_Victim_Notified;
 		STRING10 Insurance_Company_Code;
 		STRING3 Refused_Medical_Treatment;
-		STRING10 Safety_Equipment_Available_or_Used;
+		//PRtcc datatype update
+		STRING25 Safety_Equipment_Available_or_Used;
+		
 		STRING10 Apartment_Number;
 		STRING10 Licensed_Driver;
 		STRING30 Physical_Emotional_Status;
@@ -573,8 +606,10 @@
 		STRING7 Motorcycle_Over_Ankle_Boots;
 		STRING40 Contributing_Circumstances_Environmental_Non_Incident1;
 		STRING40 Contributing_Circumstances_Environmental_Non_Incident2;
-		STRING7 Alcohol_Drug_Test_Given;
-		STRING10 Alcohol_Drug_Test_Type;
+		//PRtcc datatype update for code and description
+		STRING Alcohol_Drug_Test_Given;
+		STRING Alcohol_Drug_Test_Type;
+		
 		STRING20 Alcohol_Drug_Test_Result;
 		STRING10 Law_Enforcement_Suspects_Alcohol_Use1;
 		STRING10 Law_Enforcement_Suspects_Drug_Use1;
@@ -595,7 +630,9 @@
 		STRING7 interlock_device_in_use	;
 		STRING7 drug_test_type_blood	;
 		STRING7 drug_test_type_urine;
-		STRING64 driver_distracted_by;	
+		//PRtcc datatype update for code and description
+		STRING driver_distracted_by;	
+		
 		STRING64 non_motorist_type;	
 		STRING64 seating_position_row;	
 		STRING64 seating_position_seat	;
@@ -603,8 +640,25 @@
 		STRING64 transported_id_number;	
 		STRING10 witness_number	;
 		STRING20 date_of_birth_derived;
+		//PRtcc datatype update for code and description
 		STRING Report_Injury_Status;
+		
 		STRING100 Address2;
+		//PRtCC new Enum fields
+		STRING Condition_At_Time_Of_Crash;
+		STRING Drug_Use_Suspected;
+		STRING Alcohol_Use_Suspected;
+		STRING Drug_Test_Status;
+		STRING Report_Contributing_Circumstances_P;
+		STRING Driver_Actions_At_Time_Of_Crash;
+		STRING Prior_Nonmotorist_Action;
+		STRING Pedestrian_Actions_At_Time_Of_Crash;
+		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
+		STRING Passenger_Actions_At_Time_Of_Crash;
+		//Data Ingestion New fields
+		STRING10 Dui_Suspected;
+		//Data Ingestion New Enum fields
+		STRING Drug_Test_Result;
 	END;
 
 	EXPORT vehicl := RECORD
@@ -630,7 +684,9 @@
 		STRING30 Special_Function_in_Transport;
 		STRING30 Special_Function_in_Transport_Other_Unit;
 		STRING7 Emergency_Use;
-		STRING2 Posted_Satutory_Speed_Limit;
+		//PRTCC update datatype
+		STRING10 Posted_Satutory_Speed_Limit;
+		
 		STRING15 Direction_of_Travel_Before_Crash;
 		STRING60 Trafficway_Description;
 		STRING50 Traffic_Control_Device_Type;
@@ -827,10 +883,14 @@
 		STRING20 speed_limit_posted;
 		STRING Report_Damage_Extent	;
 		STRING Report_Vehicle_Type	;
-		STRING Report_Traffic_Control_Device_Type;	
-		STRING Report_Contributing_Circumstances_v;	
+		STRING Report_Traffic_Control_Device_Type;
+		//PRtcc datatype update for code and description
+		STRING Report_Contributing_Circumstances_v;
+		
 		STRING Report_Vehicle_Maneuver_Action_Prior;	
 		STRING Report_Vehicle_Body_Type;
+		//PRtCC new Enum fields
+		STRING Report_Road_Condition;
 	END;
 
 	EXPORT cmbnd := RECORD 
@@ -844,10 +904,14 @@
 		STRING30 Section_Number1;
 		STRING10 Court_Date;
 		STRING9 Court_Time;
-		STRING200 Citation_Detail1;
+		//PRTCC update datatype
+		STRING100 Citation_Detail1;
+		
 		STRING3 Local_Code;
-		STRING30 Violation_Code1;
-		STRING30 Violation_Code2;
+		//PRTCC update datatype
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
+		
 		STRING7 Multiple_Charges_Indicator;
 		STRING7 DUI_Indicator;
 		STRING9 Court_Time_AM;
@@ -1070,8 +1134,10 @@
 		STRING60 Injured_Taken_By;
 		STRING60 Injured_Taken_To;
 		STRING7 Incident_Transported_for_Medical_Care;
-		STRING7 Photographs_Taken;
-		STRING60 Photographed_By;
+		//PRTCC update datatype
+		STRING1 Photographs_Taken;		
+		STRING100 Photographed_By;
+		
 		STRING20 Photographer_ID;
 		STRING50 Photography_Agency_Name;
 		STRING100 Agency_Name;
@@ -1200,7 +1266,9 @@
 		STRING30 Injury_Status;
 		STRING3 Vehicle_Unit_Number;
 		STRING50 Seating_Position1;
-		STRING40 Safety_Equipment_Restraint1;
+		//PRtcc datatype update for code and description
+		STRING Safety_Equipment_Restraint1;
+		
 		STRING40 Safety_Equipment_Restraint2;
 		STRING40 Safety_Equipment_Helmet;
 		STRING100 Air_Bag_Deployed;
@@ -1217,19 +1285,25 @@
 		STRING50 Condition_at_Time_of_Crash1;
 		STRING50 Condition_at_Time_of_Crash2;
 		STRING50 Law_Enforcement_Suspects_Alcohol_Use;
-		STRING25 Alcohol_Test_Status;
-		STRING25 Alcohol_Test_Type;
+		//PRtcc datatype update for code and description
+		STRING Alcohol_Test_Status;
+		STRING Alcohol_Test_Type;
+		
 		STRING25 Alcohol_Test_Result;
 		STRING7 Law_Enforcement_Suspects_Drug_Use;
 		STRING20 Drug_Test_Given;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash1;
 		STRING100 Non_Motorist_Actions_Prior_to_Crash2;
-		STRING100 Non_Motorist_Actions_at_Time_of_Crash;
+		//PRtcc datatype update for code and description
+		STRING Non_Motorist_Actions_at_Time_of_Crash;
+		
 		STRING50 Non_Motorist_Location_at_Time_of_Crash;
 		STRING50 Non_Motorist_Safety_Equipment1;
 		STRING3 Age;
 		STRING50 Driver_License_Restrictions1;
-		STRING10 Drug_Test_Type;
+		//PRtcc datatype update for code and description
+		STRING Drug_Test_Type;
+		
 		STRING25 Drug_Test_Result1;
 		STRING50 Drug_Test_Result2;
 		STRING50 Drug_Test_Result3;
@@ -1272,7 +1346,9 @@
 		STRING10 Death_Date;
 		STRING9 Death_TIme;
 		STRING7 Extricated;
-		STRING40 Alcohol_Drug_Use;
+		//PRtcc datatype update for code and description
+		STRING Alcohol_Drug_Use;
+		
 		STRING40 Physical_Defects;
 		STRING40 Driver_Residence;
 		STRING30 ID_Type;
@@ -1283,7 +1359,9 @@
 		STRING3 Violent_Crime_Victim_Notified;
 		STRING10 Insurance_Company_Code;
 		STRING3 Refused_Medical_Treatment;
-		STRING10 Safety_Equipment_Available_or_Used;
+		//PRtcc datatype update
+		STRING25 Safety_Equipment_Available_or_Used;
+		
 		STRING10 Apartment_Number;
 		STRING10 Licensed_Driver;
 		STRING30 Physical_Emotional_Status;
@@ -1314,8 +1392,10 @@
 		STRING7 Motorcycle_Over_Ankle_Boots;
 		STRING40 Contributing_Circumstances_Environmental_Non_Incident1;
 		STRING40 Contributing_Circumstances_Environmental_Non_Incident2;
-		STRING7 Alcohol_Drug_Test_Given;
-		STRING10 Alcohol_Drug_Test_Type;
+		//PRtcc datatype update for code and description
+		STRING Alcohol_Drug_Test_Given;
+		STRING Alcohol_Drug_Test_Type;
+		
 		STRING20 Alcohol_Drug_Test_Result;
 		STRING30 VIN;
 		STRING5 VIN_Status;
@@ -1336,7 +1416,9 @@
 		STRING30 Special_Function_in_Transport;
 		STRING30 Special_Function_in_Transport_Other_Unit;
 		STRING7 Emergency_Use;
-		STRING2 Posted_Satutory_Speed_Limit;
+		//PRTCC update datatype
+		STRING10 Posted_Satutory_Speed_Limit;
+		
 		STRING15 Direction_of_Travel_Before_Crash;
 		STRING60 Trafficway_Description;
 		STRING50 Traffic_Control_Device_Type;
@@ -1508,7 +1590,6 @@
 		STRING7 interlock_device_in_use;
 		STRING7 drug_test_type_blood;
 		STRING7 drug_test_type_urine;
-
 		STRING30 traffic_control_condition;
 		STRING7 intersection_related;
 		STRING7 special_study_local;
@@ -1578,7 +1659,8 @@
 		STRING30 other_unit_type3;
 		STRING70 damaged_areas3;
 		//STRING20 speed_limit_posted;
-		STRING64 driver_distracted_by;	
+		//PRtcc datatype update for code and description
+		STRING driver_distracted_by;	
 		STRING64 non_motorist_type;	
 		STRING64 seating_position_row;	
 		STRING64 seating_position_seat;
@@ -1597,14 +1679,18 @@
 		STRING1 Report_Property_Damage;	
 		STRING Report_Collision_Type;	
 		STRING Report_First_Harmful_Event;	
-		STRING Report_Light_Condition;	
-		STRING Report_Weather_Condition;
-		STRING Report_Road_Condition;
+		STRING Report_Light_Condition;
+		//PRtcc datatype update for code and description
+		STRING Report_Weather_Condition;	
+		STRING Report_Road_Condition;	
 		STRING Report_Injury_Status;
+		
 		STRING Report_Damage_Extent;
 		STRING Report_Vehicle_Type;
-		STRING Report_Traffic_Control_Device_Type;	
+		STRING Report_Traffic_Control_Device_Type;
+		//PRtcc datatype update for code and description
 		STRING Report_Contributing_Circumstances_v;	
+		
 		STRING Report_Vehicle_Maneuver_Action_Prior;	
 		STRING Report_Vehicle_Body_Type;
 		STRING20  cru_agency_id;
@@ -1629,6 +1715,32 @@
 		//Nucleus 
 		STRING50 Platform;
 		STRING40 Agency_Report_Number;
+		
+		//PRtCC new fields
+		STRING7 Citation_Type;
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
+		STRING20 Dispatch_Time;
+		STRING100 Photograph_Type;
+		STRING1 Ready_To_Sell_Data;
+		//PRtcc new Enum fields
+		STRING Condition_At_Time_Of_Crash;
+		STRING Drug_Use_Suspected;
+		STRING Alcohol_Use_Suspected;
+		STRING Drug_Test_Status;
+		STRING Report_Contributing_Circumstances_P;
+		STRING Driver_Actions_At_Time_Of_Crash;
+		STRING Prior_Nonmotorist_Action;
+		STRING Pedestrian_Actions_At_Time_Of_Crash;
+		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
+		STRING Passenger_Actions_At_Time_Of_Crash;
+		//Data Ingestion New fields
+		STRING10 Dispatch_Date;
+		STRING10 Drug_Involvement;
+		STRING7 Alcohol_Involved;
+		STRING10 Dui_Suspected;
+		//Data Ingestion New Enum fields
+		STRING Drug_Test_Result;
 	END;
 	
 	EXPORT property_damage := RECORD

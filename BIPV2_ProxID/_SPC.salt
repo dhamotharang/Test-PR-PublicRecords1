@@ -1,4 +1,5 @@
-﻿OPTIONS:-gh -ga -gs2
+﻿//SALTVERSION:311
+OPTIONS:-gh -ga -gs2
 
 MODULE:BIPV2_ProxID
 FILENAME:DOT_Base
@@ -40,7 +41,7 @@ FIELD:unk_corp_key:SWITCH0:PROP:19,133
 FIELD:ebr_file_number:PROP:20,427
 FIELD:company_fein:PROP:EDIT1:17,227
 FIELD:company_name:CARRY:0,0
-FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:TYPE(string250):12,334
+FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334
 // FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137
 //FIELD:source:CARRY:0,0
 FIELD:company_name_type_raw:CARRY:0,0
@@ -115,6 +116,7 @@ ATTRIBUTEFILE:SrcRidVlid:NAMED(file_SrcRidVlid):VALUES(source:source_record_id:v
 ATTRIBUTEFILE:ForeignCorpkey:NAMED(file_Foreign_Corpkey):VALUES(company_charter_number<company_inc_state):FORCE(--,ALL):IDFIELD(Proxid):19,321
 ATTRIBUTEFILE:RAAddresses:NAMED(file_RA_Addresses):VALUES(cname):FORCE:IDFIELD(Proxid):18,196
 ATTRIBUTEFILE:FilterPrimNames:NAMED(file_filter_Prim_names):VALUES(pname_digits):FORCE:IDFIELD(Proxid):12,5
+ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):SUPPORTS(cnp_name):IDFIELD(ProxID):20,0
 // ------------------------------------
 //  ID Parents
 // ------------------------------------

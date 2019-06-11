@@ -1,9 +1,9 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.TX;
 
 //Trim and uppercase all fields prior to mapping
-Watercraft.layout_tx_new CleanTrimRaw(fIn_raw L) := TRANSFORM
+Watercraft.layout_tx_new_18q3 CleanTrimRaw(fIn_raw L) := TRANSFORM
 	self.STATEABREV	:= ut.CleanSpacesAndUpper(L.STATEABREV);
 	self.REG_NUM		:= ut.CleanSpacesAndUpper(L.REG_NUM);
 	self.HULL_ID 		:= ut.CleanSpacesAndUpper(L.HULL_ID);
@@ -48,6 +48,7 @@ Watercraft.layout_tx_new CleanTrimRaw(fIn_raw L) := TRANSFORM
 	self.BOAT_CLASS								:= ut.CleanSpacesAndUpper(L.BOAT_CLASS);
 	self.BOAT_TYPE_OTHER					:= ut.CleanSpacesAndUpper(L.BOAT_TYPE_OTHER);
 	self.ADMINISTRATIVE_NOTIFICATION	:= ut.CleanSpacesAndUpper(L.ADMINISTRATIVE_NOTIFICATION);
+	self.STATE_OF_PRINCIPAL_OP		:= ut.CleanSpacesAndUpper(L.STATE_OF_PRINCIPAL_OP);
 	self.MTR_1_OUTDRIVE						:= ut.CleanSpacesAndUpper(REGEXREPLACE('^[^A-Z0-9_]',L.MTR_1_OUTDRIVE,''));
 	self.MTR_1_SERIAL							:= ut.CleanSpacesAndUpper(REGEXREPLACE('^[^A-Z0-9_]',L.MTR_1_SERIAL,''));
 	self.MTR_2_SERIAL							:= ut.CleanSpacesAndUpper(REGEXREPLACE('^[^A-Z0-9_]',L.MTR_2_SERIAL,''));

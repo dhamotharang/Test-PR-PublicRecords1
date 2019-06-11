@@ -44,6 +44,10 @@
 		STRING Type_Hazardous;
 		STRING Type_Other;
 		STRING Citation_Status;
+		//PRtCC new fields
+		STRING Citation_Type;
+		STRING Violation_Code3;
+		STRING Violation_Code4;
 	END;
 
 
@@ -460,6 +464,15 @@
 		//Nucleus 
 		STRING Platform;
 		STRING Agency_Report_Number;
+		//PRtCC new fields
+		STRING Dispatch_Time;
+		STRING Photograph_Type;
+		STRING Ready_To_Sell_Data;
+		STRING Posted_Satutory_Speed_Limit;
+		//Data Ingestion New fields
+		STRING Dispatch_Date;
+		STRING Drug_Involvement;
+		STRING Alcohol_Involved;
 	END;
 
 	EXPORT persn_NEW := RECORD ,MAXLENGTH(20000)
@@ -618,9 +631,23 @@
 		STRING date_of_birth_derived;
 		STRING Report_Injury_Status; 
 		STRING Address2;
+		//PRtCC new fields
+		STRING Condition_At_Time_Of_Crash;
+		STRING Drug_Use_Suspected;
+		STRING Alcohol_Use_Suspected;
+		STRING Drug_Test_Status;
+		STRING Report_Contributing_Circumstances_P;
+		STRING Driver_Actions_At_Time_Of_Crash;
+		STRING Prior_Nonmotorist_Action;
+		STRING Pedestrian_Actions_At_Time_Of_Crash;
+		STRING Pedalcyclist_Actions_At_Time_Of_Crash;
+		STRING Passenger_Actions_At_Time_Of_Crash;
+		//Data Ingestion New fields
+		STRING Dui_Suspected;
+		STRING Drug_Test_Result;
 	END;
 
-	EXPORT vehicl_NEW:= RECORD,MAXLENGTH(20000)
+	EXPORT vehicl_NEW := RECORD,MAXLENGTH(20000)
 		STRING Vehicle_ID;
 		STRING Creation_Date;
 		STRING Incident_ID;
@@ -841,6 +868,8 @@
 		STRING Report_Contributing_Circumstances_v;	
 		STRING Report_Vehicle_Maneuver_Action_Prior;	
 		STRING Report_Vehicle_Body_Type;
+		//PRtCC new fields
+		STRING Report_Road_Condition;
 	END;
 
 	EXPORT property_damage := RECORD

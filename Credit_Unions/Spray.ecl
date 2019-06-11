@@ -3,9 +3,9 @@
 export Spray(
 
 	 string		pversion			= ''
-	,string		pServerIP			= _control.IPAddress.bctlpedata10
-	,string		pDirectory		= '/data_build_5_2/credit_union/data'
-	,string		pFilename			= '*txt'
+	,string		pServerIP			= _control.IPAddress.bctlpedata11
+	,string		pDirectory		= '/data/data_build_5_2/credit_union/data/'+pversion+'/'
+	,string		pFilename			= 'Credit_Union_Branch_Information.txt'
 	,string		pGroupName		= _Constants().groupname	
 	,boolean	pIsTesting		= false
 	,boolean	pOverwrite		= false

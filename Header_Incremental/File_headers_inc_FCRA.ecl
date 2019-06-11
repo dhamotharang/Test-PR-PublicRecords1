@@ -15,8 +15,8 @@ end;
  hr  := DISTRIBUTE(hdr(header.Blocked_data()), HASH(rid));
  
 // latest no incremental (LEFT ONLY)
-nonIncpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_rid))
-                                  ,LEFT.rid = RIGHT.source_rid AND 
+unmatchedOld := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(rid))
+                                  ,LEFT.rid = RIGHT.rid AND 
                                    LEFT.src = RIGHT.src[4..5]
                                   ,TRANSFORM ({hr}, SELF := LEFT)
                                   ,LEFT ONLY
@@ -24,8 +24,8 @@ nonIncpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_r
                                   , LOCAL);
 
 // latest incrementals and suppressions (inner) - transfer flags and setup effective dates
- Incpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_rid))
-                                  ,LEFT.rid = RIGHT.source_rid AND 
+ MatchedOldToUpdate := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(rid))
+                                  ,LEFT.rid = RIGHT.rid AND 
                                    LEFT.src = RIGHT.src[4..5]
                                   ,TRANSFORM(layout_hdr_with_effective_dates,
                                    SELF.did := RIGHT.did;
@@ -82,9 +82,15 @@ nonIncpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_r
 
                                    ),local) ; 
 
-suppressed := SALT37.MAC_DatasetAsOf(Incpayload, RID, DID,, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST,, 'YYYYMMDD', TRUE);
+IncPayLoad := project(
+      header.fn_incremental_payload(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V'),
+      layout_hdr_with_effective_dates);
+
+allNewAndUpdated:=IncPayLoad + MatchedOldToUpdate;
+
+suppressed := SALT37.MAC_DatasetAsOf(allNewAndUpdated, RID, DID,, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST,, 'YYYYMMDD', TRUE);
  
- all_fcra := nonIncpayload + project(suppressed,{{suppressed}-[DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST] });
+ all_fcra := unmatchedOld + project(suppressed,{{suppressed}-[DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST] });
 
 return all_fcra;
 END;

@@ -18,6 +18,7 @@ module
 
   //weekly keys
 	export contact_linkids           := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::contact_linkids'            ,pversion    );
+	export contact_title_linkids     := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::contact_title_linkids'      ,pversion    );
 	export directories_linkids       := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::business_header::@version@::directories_linkids'        ,pversion    );
 
   //misc keys
@@ -34,6 +35,7 @@ module
 	export biz_preferred             := tools.mod_FilenamesBuild(lcluster + 'key::bipv2::@version@::biz_preferred'                               ,pversion    );
 
   export BIPV2FullKeys := 
+    (
       linkids                 .dall_filenames
 		+ linkids_hidden					.dall_filenames //newly added	
     + translations            .dall_filenames
@@ -56,11 +58,14 @@ module
     // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     + TopBusiness_BIPV2.KeyNames      (pversion,pUseOtherEnvironment).dall_filenames
+    )
+    (~regexfind('ext_data',logicalname,nocase)) //remove external xlink keys because they are not in this package
     ;
     
   export BIPV2WeeklyKeys := 
       directories_linkids         .dall_filenames
     + contact_linkids             .dall_filenames
+    + contact_title_linkids       .dall_filenames
       ;
   
   export BIPV2DatalandKeys := BIPV2FullKeys;

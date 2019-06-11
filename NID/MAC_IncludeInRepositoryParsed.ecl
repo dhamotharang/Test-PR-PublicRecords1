@@ -1,4 +1,4 @@
-export MAC_IncludeInRepositoryParsed(inFile, 
+﻿export MAC_IncludeInRepositoryParsed(inFile, 
 		_firstname='fname',_middlename='mname',_lastname='lname',_namesuffix='name_suffix',
 nameid = 'nid',
 namtype = 'nametype',		// name type field
@@ -11,7 +11,8 @@ title2 = 'cln_title2',		// cleaned title for name 2
 fname2 = 'cln_fname2',		// cleaned first name for name 2
 mname2 = 'cln_mname2',		// cleaned middle name for name 2
 lname2 = 'cln_lname2',		// cleaned last name for name 2
-suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
+suffix2 = 'cln_suffix2',		// cleaned suffix for name 2
+useV2
 ) := MACRO
 
 #UNIQUENAME(xform)
@@ -47,36 +48,7 @@ suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
 	%dsOut% := 	PROJECT(DEDUP(SORT(inFile,_firstname,_middlename,_lastname,_namesuffix,LOCAL),
 						_firstname,_middlename,_lastname,_namesuffix,LOCAL),
 					%xform%(LEFT));
-	//%dsOut% := 	PROJECT(inFile, NID.Layouts.rNameCache);
-	/*
-#UNIQUENAME(dualxform)
-	NID.Layout_Repository %dualxform%(NID.Layout_Repository L, integer c) := TRANSFORM
-		SELF.NameType := IF(L.NameType='D','P',SKIP);
-		//SELF.NID := L.NID[1..16] + IntFormat(c,2,1);
-		self.NID := NID.Common.fGetNIDParsed(L.fname,L.mname,L.lname,L.suffix,c);
 
-		self.derivation := c;
-		
-		SELF.cln_title := IF(c=1,L.cln_title, L.cln_title2);
-		SELF.cln_fname := IF(c=1,L.cln_fname, L.cln_fname2);
-		SELF.cln_mname := IF(c=1,L.cln_mname, L.cln_mname2);
-		SELF.cln_lname := IF(c=1,L.cln_lname, L.cln_lname2);
-		SELF.cln_suffix := IF(c=1,L.cln_suffix, L.cln_suffix2);
-		self.gender		:= Address.NameTester.GenderEx(SELF.cln_fname,SELF.cln_mname);
-		self.nameind := Nid.NameIndicators.fn_setNameIndicator('P',c,
-					Address.NameTester.GenderEx(SELF.cln_fname,SELF.cln_mname),
-					LENGTH(TRIM(SELF.cln_fname))=1);
-		
-		SELF.cln_title2 := '';
-		SELF.cln_fname2 := '';
-		SELF.cln_mname2 := '';
-		SELF.cln_lname2 := '';
-		SELF.cln_suffix2 := '';
-		SELF := L;	
-	END;
-#UNIQUENAME(dual)
-	%dual% := Distribute(NORMALIZE(%dsOut%(NameType='D'), 2, %dualxform%(LEFT, COUNTER)),Nid);
-*/				
 #UNIQUENAME(outfile)
     %outfile% := %dsOut%;	// & %dual%;
 					//		: INDEPENDENT;
@@ -84,7 +56,7 @@ suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
 #UNIQUENAME(filename)
 #UNIQUENAME(fp, '#$');
 	%filename% := Nid.CreateRepositoryFilename(#TEXT(%fp%));
-		NID.AddToCache(%outfile%, %filename%);
+		NID.AddToCache(%outfile%, %filename%, useV2);
 		
 
 ENDMACRO;

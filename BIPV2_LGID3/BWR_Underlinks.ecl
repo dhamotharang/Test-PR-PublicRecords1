@@ -1,4 +1,4 @@
-// WARNING: This is a fairly slow module, it does debug level analysis on ALL your matches
+﻿// WARNING: This is a fairly slow module, it does debug level analysis on ALL your matches
 // Should be used sparingly to get the 'last n' of matches out of a system
 //---------------------------------------------------------------------------------------------
 // NOTE: Uncomment the following line only if the cleave related keys have not been built.

@@ -5,8 +5,8 @@ EXPORT proc_build_all(STRING filedate, STRING filename) := FUNCTION
  #workunit('name','bank_routing Build');
  GroupName := VersionControl.GroupName('44');
 
- bank_routing.Mac_spray_accuity_bank_routing(_control.IPAddress.bctlpedata12,
-  '/data/hds_180/accuity/indata/',
+ bank_routing.Mac_spray_accuity_bank_routing(_control.IPAddress.bctlpedata11,
+  '/data/hds_180/accuity/indata/data/'+filedate+'/',
   filedate,
   filename,
   GroupName,

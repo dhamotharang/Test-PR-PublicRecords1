@@ -1,6 +1,6 @@
 ﻿Import AID, AID_Support, _control;
 
-pversion 	:= '20150601'								 ;		// modify to current date
+pversion 	:= '20181113'								 ;		// modify to current date
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation
 // -- 	1. Put the Build Date in the pversion attribute above
@@ -13,7 +13,5 @@ pversion 	:= '20150601'								 ;		// modify to current date
 
 #workunit('name', Equifax_Business_Data._Dataset().Name + ' Build ' + pversion);
 
-Equifax_Business_Data.Build_All(pversion, 
-                                '/data/hds_180/Equifax_Business_Data', 
-																_control.IPAddress.bctlpedata11, 
-																'*.txt');
+Equifax_Business_Data.Build_All(pversion); 
+                                

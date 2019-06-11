@@ -1,4 +1,4 @@
-import ut, Business_Header,mdr;
+﻿import ut, Business_Header, mdr, _validate;
 
 export fFL_Non_Profit_As_Business_Header(dataset(Layout_FL_Non_Profit_Corp_In) pInputfile) :=
 function
@@ -7,20 +7,22 @@ function
 	r := govdata.Layout_FL_Non_Profit_Corp_In;
 
 	// output(choosen(govdata.File_FL_Non_Profit_Corp_In, 100));
-	DDMMYYYY_2_YYYYMMDD(STRING8 s) := (INTEGER)(s[5..8] + s[3..4] + s[1..2]);
-	firstDate(f file) := ut.Min2(
-						 ut.Min2(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_1), 
-								 DDMMYYYY_2_YYYYMMDD(file.annual_report_date_2)),
-						 ut.Min2(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_3),
-								 DDMMYYYY_2_YYYYMMDD(file.annual_cor_file_date)));
-	lastDate(f file)  := Max(
-						 Max(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_1), 
-								 DDMMYYYY_2_YYYYMMDD(file.annual_report_date_2)),
-						 Max(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_3),
-								 DDMMYYYY_2_YYYYMMDD(file.annual_last_trx_date))); 
+	// Modified code to fix the dates that were wrongly parsed as per 
+	// JIRA DF-20838 Incorrect Date Last Seen in FL FBN Record in old Business Header BDID 48554866
+	MMDDYYYY_2_YYYYMMDD(STRING8 s) := (INTEGER)(s[5..8] + s[1..2] + s[3..4]);
+	firstDate(f file) := ut.Min2(ut.Min2(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_1), 
+																			 MMDDYYYY_2_YYYYMMDD(file.annual_report_date_2)),
+															 ut.Min2(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_3),
+																			 MMDDYYYY_2_YYYYMMDD(file.annual_cor_file_date)));
+	lastDate(f file)  := Max(Max(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_1), 
+															 MMDDYYYY_2_YYYYMMDD(file.annual_report_date_2)),
+													 Max(MMDDYYYY_2_YYYYMMDD(file.annual_report_date_3),
+															 MMDDYYYY_2_YYYYMMDD(file.annual_last_trx_date))); 
 
 	Business_Header.Layout_Business_Header_New cleaner(f L) :=
 	TRANSFORM
+		temp_firstdate := intformat(firstDate(L),8,1);
+		temp_lastdate := intformat(lastDate(L),8,1);
 	  SELF.rcid := 0;
 	  SELF.bdid := 0;
 	  SELF.source := MDR.sourceTools.src_FL_Non_Profit;
@@ -29,10 +31,15 @@ function
 	  SELF.group1_id := 0;
 		SELF.vl_id := L.annual_cor_number;
 	  SELF.vendor_id := L.annual_cor_number;
-	  SELF.dt_first_seen := firstDate(L);
-	  SELF.dt_last_seen := lastDate(L);
-	  SELF.dt_vendor_first_reported := firstDate(L);
-	  SELF.dt_vendor_last_reported := lastDate(L);
+		
+	  SELF.dt_first_seen := if (_validate.date.fIsValid(temp_firstdate) and 
+															_validate.date.fIsValid(temp_firstdate,_validate.date.rules.DateInPast), firstDate(L),0);
+	  SELF.dt_last_seen := if (_validate.date.fIsValid(temp_lastdate) and 
+														 _validate.date.fIsValid(temp_lastdate,_validate.date.rules.DateInPast), lastDate(L),0);
+	  SELF.dt_vendor_first_reported := if (_validate.date.fIsValid(temp_firstdate) and 
+																				 _validate.date.fIsValid(temp_firstdate,_validate.date.rules.DateInPast), firstDate(L),0);
+	  SELF.dt_vendor_last_reported := if (_validate.date.fIsValid(temp_lastdate) and 
+																				_validate.date.fIsValid(temp_lastdate,_validate.date.rules.DateInPast), lastDate(L),0);
 	  SELF.company_name := L.ANNUAL_COR_NAME;
 	  SELF.prim_range := L.corp_prim_range;
 	  SELF.predir := L.corp_predir;

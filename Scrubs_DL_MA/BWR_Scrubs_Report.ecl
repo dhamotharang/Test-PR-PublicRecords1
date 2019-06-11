@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 #WORKUNIT('name','Scrubs_DL_MA.BWR_Scrubs_Report');
 /*******************************************************************************/
 /*	datasetName:=<Dataset>                                                     */

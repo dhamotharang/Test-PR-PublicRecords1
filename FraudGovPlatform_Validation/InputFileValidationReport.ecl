@@ -4,13 +4,15 @@ EXPORT InputFileValidationReport(string fname, string pSeparator, string pTermin
 rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator([pSeparator]),quote(''),terminator(pTerminator))));
 dAllRecords := Mod_Stats.ValidateInputFields(fname,pSeparator,pTerminator).ValidationResults:independent;
 RecWithErrors := Mod_Stats.ValidateInputFields(fname,pSeparator,pTerminator).RecordsRejected:independent;
-output(dAllRecords);
+
 treshld_:=Mod_Sets.threshld;
 
 CriticalFieldError := MAP (
-			 STD.Str.Contains( fname, 'IdentityData',	true )	=> Mod_Sets.CriticalFieldError_IdentityData
-			,STD.Str.Contains( fname, 'KnownFraud'	,	true )	=> Mod_Sets.CriticalFieldError_KnownFraud,
-			[]
+			 STD.Str.Contains( fname, 'Identity',	true )	=> Mod_Sets.CriticalFieldError_IdentityData
+			,STD.Str.Contains( fname, 'KnownRisk'	,	true )	=> Mod_Sets.CriticalFieldError_KnownFraud
+			,STD.Str.Contains( fname, 'SafeList'		,	true )	=> Mod_Sets.CriticalFieldError_SafeList
+			,STD.Str.Contains( fname, 'Delta'		,	true )	=> Mod_Sets.CriticalFieldError_Deltabase
+			,[]
 		);
 																		
 RecordsRejected  := count(dedup(sort(dAllRecords(err[1]='E',field in CriticalFieldError),seq),seq));
@@ -23,12 +25,23 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 
 		p1	:=	project(dAllRecords
 							,transform(rText
-								,self.TextLine	:=(string7)left.FileState
-															+ (string20)regexfind('([0-9])\\w+',fname, 0)
-															+ (string8)left.seq
-															+ Map(stringlib.stringtouppercase((string35)left.field[1..34]) ='SSN'	=>'SSN:LEXID:DRIVERSLICENSE'
-																	 ,stringlib.stringtouppercase((string35)left.field[1..34]) ='CITY' => 'ADDRESS'
-																	 ,(string35)left.field[1..34])
+								,self.TextLine	:=(string15)left.FileState
+															+ (string16)if(regexfind( 'Delta',fname,	nocase ), trim((string)left.FileDate), trim((string)left.FileDate)+'_'+trim((string)left.FileTime))
+															+ (string11)left.seq
+															+ (string35)Map(
+																		regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD1'	=>'Customer_Job_ID'
+																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD2' => 'Batch_Record_ID'
+																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD3' => 'Transaction_ID_Number'
+																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD4' => 'Reason_for_Transaction_Activity'
+																	 ,regexfind( 'Identity',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD5' => 'Date_of_Transaction'
+																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD1'	=>'customer_event_id'
+																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD2' => 'reported_date'
+																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD3' => 'reported_time'
+																	 ,regexfind( 'KnownRisk|SafeList',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD4' => 'reported_by'
+																	 ,regexfind( 'Delta',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD1'	=>'InqLog_ID'
+																	 ,regexfind( 'Delta',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD2' => 'reported_date'
+																	 ,regexfind( 'Delta',fname,	nocase ) and stringlib.stringtouppercase(left.field[1..34]) ='FIELD3' => 'user_added'
+																	 ,stringlib.stringtouppercase(left.field[1..34]))
 															+ (string20)left.value[1..19]
 															+ (string10)left.err
 															+ (string10)left.err_cnt
@@ -51,7 +64,7 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 										;
 		string130		HeaderLine2
 										:=	
-											(string8)'STATE'
+											(string15)'ACCOUNT'
 										+ (string16)'FILE DATE_TIME'
 										+ (string11)'SMP REC#'
 										+ (string35)'FIELD'
@@ -62,7 +75,7 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 										;
 		string130		HeaderLine2a
 										:=	
-											(string8)'STATE'
+											(string15)'ACCOUNT'
 										+ (string16)'FILE DATE_TIME'
 										+ (string11)'SMP REC#'
 										+ (string13)'FIELD'
@@ -104,14 +117,7 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 											'LEGEND\n'
 										+ '======\n'
 										+ 'E001 = ERROR - BLANK\n'
-										+ 'E002 = ERROR - INVALID DATE\n'																				
-										+ 'E003 = ERROR - INVALID STATE\n'
-										+ 'E004 = ERROR - INVALID VERTICAL TYPE\n'
-										+ 'E005 = ERROR - INVALID PROGRAM\n'
-										+ 'E006 = ERROR - NO IDENTIFICATION PROVIDED (SSN, LEXID, DRIVER LICENSE)\n'						
-										+ '\n'
-										+ 'W002 = WARNING - INVALID ADDRESS\n'													
-										
+										+ 'E002 = ERROR - INVALID DATE\n'										
 										;
 
 EXPORT BODY := if(regexfind('inquirylog',fname,nocase),regexreplace('\\_[a-z0-9]*',fname,'',nocase),fname)

@@ -1,6 +1,6 @@
-﻿import didville, Gong_v2, watchdog, phonesplus, ut, mdr, Address, STD;
-#option('multiplePersistInstances',FALSE); //email_data attributes is overwriting this to false so setting it again here. DF-22765
-export Proc_build_base(string pversion,string emailList=''):=function
+﻿import didville, Gong_v2, watchdog, phonesplus, mdr, Address, STD, PromoteSupers;
+
+export Proc_build_base(string pversion,string emailList='', boolean isTest = false):=function
 //-------Concatenate all Pplus sources in a common layout---------------------------------
 pplus_sources := 
          Map_Cellphone_as_Phonesplus +
@@ -17,7 +17,9 @@ pplus_sources :=
 				 // Map_IBehavior_as_Phonesplus +
 				 Map_Thrive_as_Phonesplus +
 				 Map_AlloyMedia_as_Phonesplus +
-				 Map_NVerified_as_Phonesplus;
+				 Map_NVerified_as_Phonesplus +
+				 Map_NeustarWireless_as_Phonesplus //Jira: DF-24336
+				 ;
 
 pplus_royalty := Map_WiredAssets_as_Phonesplus(false);	
 
@@ -96,7 +98,7 @@ Eliminate_duplications := Fn_Eliminate_Duplications(Propagate_rules2)
 :persist('~thor_data400::persist::Phonesplus::eliminate_duplications');
 
 //-------Verify with Insurance and File One 
-Verify_With_Ins_File1 := Fn_Phone_Verification(Eliminate_duplications);
+Verify_With_Ins_File1 := Fn_Phone_Verification(Eliminate_duplications, pversion);
 
 //-------Add other household members for landlines------------------------------------------
 Add_Header_Household := Fn_Add_Header_Household(Verify_With_Ins_File1);
@@ -119,29 +121,48 @@ supress_data := Add_Header_Household (cellphone not in Phonesplus_v2.Set_Supress
 																 ~IsObsceneWord(mname) and
 																 ~IsObsceneWord(lname));
 //-------Map v2 fields---------------------------------------------------------------------
-Map_v1_Fields := Fn_Map_v1_Fields(supress_data);
+Map_v1_Fields := Fn_Map_v1_Fields(supress_data)
+:persist('~thor_data400::persist::Phonesplus::Map_v1_Fields');
+
+
+//DF-24903 remove Nuestar Wireless rules that may have been propagated to non-nuestar wireless sources
+recordof(Map_v1_Fields) t_n2_clean(Map_v1_Fields le) := transform 
+	self.rules 	:= if(~PhonesPlus_V2.Translation_Codes.fFlagIsOn(le.src_all, phonesplus_V2.Translation_Codes.source_bitmap_code(mdr.sourceTools.src_NeustarWireless)),
+										phonesplus_v2.Translation_codes.fClearNeustarRules(le.rules),
+										le.rules);;
+							
+  self := le;
+end;
+
+Neustar_Wireless_Rules_Cleanup := project(Map_v1_Fields, t_n2_clean(left));
+//----------------------------------------------------------------------------------------
 
 //------Invoke Scrubs---------------------------------------------------------------------l
 
-scrubscall := Phonesplus_v2.Fn_Invoke_scrubs(Map_v1_Fields, pversion,emailList); 
+scrubscall := Phonesplus_v2.Fn_Invoke_scrubs(Neustar_Wireless_Rules_Cleanup, pversion,emailList); 
 //-------Rollup previous base file and current file
 
-split_Phonesplus := Map_v1_Fields(~(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty))));
+split_Phonesplus := Neustar_Wireless_Rules_Cleanup(~(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty))));
 
-split_Royalty := Map_v1_Fields(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
+split_Royalty := Neustar_Wireless_Rules_Cleanup(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
 
-Rollup_base := Fn_Rollup_Base(split_Phonesplus, 'phonesplus_main');
+Rollup_base := Fn_Rollup_Base(split_Phonesplus, 'phonesplus_main', pversion);
 
-Rollup_royalty_base := Fn_Rollup_Base(split_Royalty, 'royalty');
+Rollup_royalty_base := Fn_Rollup_Base(split_Royalty, 'royalty', pversion);
 
 Transform_to_old_layout := Fn_Transform_to_Old_Layout(Rollup_base);
 
-ut.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, Phonesplus_v2.version);
-ut.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, Phonesplus_v2.version);
-ut.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, Phonesplus_v2.version);
+PromoteSupers.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, pversion);
+create_base_files_and_promote := sequential(scrubscall, pplus_base,	pplusv2_base, pplus_royalty_v2_base);
 
-return sequential(scrubscall,
-                                     pplus_base,
-																		 pplusv2_base, pplus_royalty_v2_base);
+pplusv2_base_test := output(Rollup_base,,'~thor_data400::base::phonesplusv2_test_' + pversion,overwrite,compressed);
+pplus_royalty_v2_base_test := output(Rollup_royalty_base,,'~thor_data400::base::phonesplusv2_royalty_test_' + pversion,overwrite,compressed);
+pplus_base_test := output(Transform_to_old_layout,,'~thor_data400::base::phonesplus_test_' + pversion,overwrite,compressed);
+create_test_files := sequential(pplus_base_test, pplusv2_base_test, pplus_royalty_v2_base_test);
+									
+return if(isTest, create_test_files, create_base_files_and_promote);
+
 end;
-																		
+								

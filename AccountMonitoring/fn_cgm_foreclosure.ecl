@@ -1,4 +1,4 @@
-
+﻿
 IMPORT BatchServices, Header;
 
 EXPORT DATASET(layouts.history) fn_cgm_foreclosure(
@@ -63,7 +63,7 @@ EXPORT DATASET(layouts.history) fn_cgm_foreclosure(
 			local);
 																		
 		// Pivot on Address
-		temp_port_dist_2 := distribute(in_portfolio(prim_name != ''),HASH64(prim_range,prim_name,p_city_name,st,z5));
+		temp_port_dist_2 := distribute(in_portfolio(prim_name != ''),HASH64(z5,prim_range,prim_name,addr_suffix,predir));
 		temp_base_dist_2 := distributed(base_file(situs1_prim_name != ''),HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir));
 		temp_join_2 := join(temp_port_dist_2,temp_base_dist_2,
 			left.z5          = right.situs1_zip and

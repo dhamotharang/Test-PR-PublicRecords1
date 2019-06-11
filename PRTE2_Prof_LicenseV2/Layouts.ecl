@@ -169,8 +169,14 @@ RECORD
   string8 link_inc_date;
  END;
  
-Export LayoutLinkID:= {Prof_LicenseV2.Layouts_ProfLic.Layout_Base_With_Tiers - lnpid}; 
+ EXPORT Layout_out := RECORD
+ Layout_file_prof_license_in;
+ unsigned4 global_sid;
+ unsigned8 record_sid;
+ end;
  
+Export LayoutLinkID:= {Prof_LicenseV2.Layouts_ProfLic.Layout_Base_With_Tiers - [lnpid,xadl2_weight, xadl2_score, xadl2_distance,xadl2_keys_used, xadl2_keys_desc, xadl2_matches,xadl2_matches_desc]}; 
+
 Export Layout_ProfLic_LicenseType_lookup := Prof_LicenseV2.Layout_ProfLic_LicenseType_lookup;  
  
 Export Layout_Base :=Prof_LicenseV2.Layouts_ProfLic.Layout_Base;

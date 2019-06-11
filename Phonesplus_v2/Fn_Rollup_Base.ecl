@@ -1,10 +1,10 @@
-import Phonesplus, ut, header,mdr;
-export Fn_Rollup_Base(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in, string file_type = '') := function
+﻿import Phonesplus, ut, header,mdr;
+export Fn_Rollup_Base(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in, string file_type = '', string pversion) := function
 
 //New weekly file - set current record flag to true
 set_curr_version := project(phplus_in, transform(recordof(phplus_in), self.current_rec := true,
-																																			self.first_build_date := (unsigned)Phonesplus.version,
-                                                                 			self.last_build_date := (unsigned)Phonesplus.version,
+																																			self.first_build_date := (unsigned)pversion,
+                                                                 			self.last_build_date := (unsigned)pversion,
 																																			self := left));
 																																			
 																
@@ -19,7 +19,7 @@ reset_prev_base := if(file_type = 'phonesplus_main',
                                                            self := left)));
 
 //Concatenate new and previous base
-prev_without_old_util := reset_prev_base(~header.IsOldUtil(Phonesplus_v2.version,,DateVendorLastReported));
+prev_without_old_util := reset_prev_base(~header.IsOldUtil(pversion,,DateVendorLastReported));
 current_and_prev := set_curr_version + prev_without_old_util;
 
 

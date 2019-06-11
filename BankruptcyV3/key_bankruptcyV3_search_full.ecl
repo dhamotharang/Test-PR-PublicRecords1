@@ -30,7 +30,11 @@ export key_bankruptcyV3_search_full(boolean isFCRA=false) := function
 								local
 							);
 
+	// DF-22108 FCRA Consumer Data Deprecation for FCRA_BankruptcyKeys - thor_data400::key::bankruptcyv3::fcra::search::tmsid_linkids_qa
+	ut.MAC_CLEAR_FIELDS(joinedForLatest, joinedForLatest_cleared, BankruptcyV3.Constants().fields_to_clear.search_tmsid_linkids);
+	joinedForLatest_final := IF(isFCRA, joinedForLatest_cleared, joinedForLatest);
+	
 	key_name := BuildKeyName(isFCRA, 'search::tmsid');	
 
-	return index(joinedForLatest,{tmsid},{joinedForLatest},key_name);
+	return index(joinedForLatest_final,{tmsid},{joinedForLatest_final},key_name);
 end;

@@ -61,7 +61,7 @@ two_name_cities   := ['LAKE OSWEGO', 'GRANTS PASS','THE DALLES','WEST LINN','HAP
 												];					
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 //Real Estate License to common MARIBASE layout
-Prof_License_Mari.layouts.base 		xformToCommon(Prof_License_Mari.layout_ORS0818.common pInput) 
+Prof_License_Mari.layout_base_in 		xformToCommon(Prof_License_Mari.layout_ORS0818.common pInput) 
 	:= 
 	 TRANSFORM
 		self.PRIMARY_KEY	    					:= 0;  
@@ -155,7 +155,9 @@ Prof_License_Mari.layouts.base 		xformToCommon(Prof_License_Mari.layout_ORS0818.
 		ConcatNAME_FULL 			:= 	StringLib.StringCleanSpaces(LastName +' '+FirstName);	
 		
 	 tmpNameOrg			   := 	IF(SELF.TYPE_CD = 'MD',TRIM(LastName,LEFT,RIGHT)+' '+TRIM(FirstName,LEFT,RIGHT)
-													        	    	,Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_ORG));  //business name with standard corp abbr.
+													        	,IF(SELF.TYPE_CD = 'GR' and TrimNAME_ORG = '' and TrimNAME_OFFICE!='' 
+																		 ,Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_OFFICE)
+																		 ,Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_ORG)));  //business name with standard corp abbr.
 	                           
 	 getCorpOnly			  :=  IF(REGEXFIND(DBA_Ind, tmpNameOrg),Prof_License_Mari.mod_clean_name_addr.GetCorpName(tmpNameOrg)
 											              ,StringLib.StringFindReplace(tmpNameOrg,'/',' '));		 //get names without DBA prefix
@@ -315,7 +317,7 @@ inFileLic	:= project(inFile,xformToCommon(left));
 
 
 // Populate STD_STATUS_CD field via translation on statu field
-Prof_License_Mari.layouts.base 	trans_lic_status(inFileLic L, cmvTransLkp R) := transform
+Prof_License_Mari.layout_base_in 	trans_lic_status(inFileLic L, cmvTransLkp R) := transform
 	self.STD_LICENSE_STATUS :=  if(L.STD_LICENSE_STATUS != '', L.STD_LICENSE_STATUS,
 																	StringLib.stringtouppercase(trim(R.DM_VALUE1,left,right))
 																 );
@@ -329,7 +331,7 @@ ds_map_status_trans := JOIN(inFileLic, cmvTransLkp,
 
 
 // Populate STD_PROF_CD field via translation on license type field
-Prof_License_Mari.layouts.base 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := transform
+Prof_License_Mari.layout_base_in 	trans_lic_type(ds_map_status_trans L, cmvTransLkp R) := transform
 	self.STD_PROF_CD := StringLib.stringtouppercase(trim(R.DM_VALUE1,LEFT,RIGHT));
 	self := L;
 end;
@@ -342,7 +344,7 @@ ds_map_lic_trans := JOIN(ds_map_status_trans, cmvTransLkp,
 																		
 // Transform expanded dataset to MARIBASE layout
 // Apply DBA Business Rules
-Prof_License_Mari.layouts.base xTransToBase(ds_map_lic_trans L) := transform
+Prof_License_Mari.layout_base_in xTransToBase(ds_map_lic_trans L) := transform
 	self.NAME_OFFICE		:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_OFFICE,'/',' '));
 	self.NAME_MARI_ORG	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_ORG,'/',' '));
 	self.NAME_MARI_DBA	:= StringLib.StringCleanSpaces(StringLib.StringFindReplace(L.NAME_MARI_DBA,'/',' '));

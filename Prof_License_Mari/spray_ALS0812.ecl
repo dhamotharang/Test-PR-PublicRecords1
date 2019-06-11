@@ -15,7 +15,7 @@ export spray_ALS0812 (string filedate) := MODULE
 
 shared filepath		    :=	'/data/data_build_5_2/MARI/in/ALS0812/' + filedate +'/';
 shared sourcepath			:=	'/data/data_build_5_2/MARI/';
-shared group_name			:=	'thor400_66';
+shared group_name			:=	Common_Prof_Lic_Mari.group_name;
 shared maxRecordSize	:=	8192;
 shared destination := Common_Prof_Lic_Mari.SourcesFolder + 'ALS0812::' + filedate + '::';
 shared superfile_cmpny := '~thor_data400::in::proflic_mari::als0812::using::company_personel';

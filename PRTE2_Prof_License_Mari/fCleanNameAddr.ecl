@@ -125,7 +125,7 @@ SELF.did :=  prte2.fn_AppendFakeID.did(self.fname, self.lname, self.link_ssn, se
 
 
 SELF.bdid := prte2.fn_AppendFakeID.bdid(self.name_company,	self.BUS_PRIM_RANGE,	self.BUS_PRIM_NAME, self.BUS_V_CITY_NAME, self.BUS_STATE, (string5)self.BUS_ZIP5, self.Cust_name);
-                                             vLinkingIds := prte2.fn_AppendFakeID.LinkIds(self.name_company, (string9)self.link_fein, self.link_inc_date, self.MAIL_PRIM_RANGE, self.BUS_PRIM_NAME, 
+                                             vLinkingIds := prte2.fn_AppendFakeID.LinkIds(self.name_company, (string9)self.link_fein, self.link_inc_date, self.BUS_PRIM_RANGE, self.BUS_PRIM_NAME, 
                                                             self.BUS_SEC_RANGE, self.BUS_V_CITY_NAME, self.BUS_STATE, (string5)self.BUS_ZIP5, 'LN_PR');
                                         
                                             SELF.powid	:= vLinkingIds.powid;

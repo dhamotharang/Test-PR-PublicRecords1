@@ -1,0 +1,82 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_EBR
+FILENAME:EBR
+NAMESCOPE:Base_5600
+//--------------------------
+//FIELDTYPE DEFINITIONS
+//--------------------------
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_EBR.Functions.fn_numeric>0)
+FIELDTYPE:invalid_numeric_or_allzeros:CUSTOM(Scrubs_EBR.Functions.fn_numeric_or_allzeros>0)
+FIELDTYPE:invalid_pastdate:CUSTOM(Scrubs_EBR.Functions.fn_past_yyyymmdd>0)
+FIELDTYPE:invalid_dt_first_seen:CUSTOM(Scrubs_EBR.Functions.fn_dt_first_seen>0)
+FIELDTYPE:invalid_record_type:ENUM(H|C)
+FIELDTYPE:invalid_segment:ENUM(5600|5600)
+FIELDTYPE:invalid_file_number:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(9)
+FIELDTYPE:invalid_sic_code:CUSTOM(Scrubs_EBR.Functions.fn_sic_code>0)
+FIELDTYPE:invalid_bustyp_code:CUSTOM(Scrubs_EBR.Functions.fn_bustyp_code>0)
+FIELDTYPE:invalid_bustyp_desc:CUSTOM(Scrubs_EBR.Functions.fn_bustyp_desc>0)
+FIELDTYPE:invalid_ownertyp_code:CUSTOM(Scrubs_EBR.Functions.fn_ownertyp_code>0)
+FIELDTYPE:invalid_ownertyp_desc:CUSTOM(Scrubs_EBR.Functions.fn_ownertyp_desc>0)
+FIELDTYPE:invalid_location_code:CUSTOM(Scrubs_EBR.Functions.fn_location_code>0)
+FIELDTYPE:invalid_location_desc:CUSTOM(Scrubs_EBR.Functions.fn_location_desc>0)
+FIELDTYPE:invalid_sales:ALLOW(0123456789ABCDEFGHI-{)
+
+//------------------------------------------------------
+//FIELDS:  Commented out fields are not being scrubbed
+//------------------------------------------------------
+// FIELD:dotid:TYPE(UNSIGNED6):0,0
+// FIELD:dotscore:TYPE(UNSIGNED2):0,0
+// FIELD:dotweight:TYPE(UNSIGNED2):0,0
+// FIELD:empid:TYPE(UNSIGNED6):0,0
+// FIELD:empscore:TYPE(UNSIGNED2):0,0
+// FIELD:empweight:TYPE(UNSIGNED2):0,0
+FIELD:powid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0
+// FIELD:powscore:TYPE(UNSIGNED2):0,0
+// FIELD:powweight:TYPE(UNSIGNED2):0,0
+FIELD:proxid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0
+// FIELD:proxscore:TYPE(UNSIGNED2):0,0
+// FIELD:proxweight:TYPE(UNSIGNED2):0,0
+FIELD:seleid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0
+// FIELD:selescore:TYPE(UNSIGNED2):0,0
+// FIELD:seleweight:TYPE(UNSIGNED2):0,0
+FIELD:orgid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0
+// FIELD:orgscore:TYPE(UNSIGNED2):0,0
+// FIELD:orgweight:TYPE(UNSIGNED2):0,0
+FIELD:ultid:TYPE(UNSIGNED6):LIKE(invalid_mandatory):0,0
+// FIELD:ultscore:TYPE(UNSIGNED2):0,0
+// FIELD:ultweight:TYPE(UNSIGNED2):0,0
+FIELD:bdid:TYPE(UNSIGNED6):LIKE(invalid_numeric):0,0
+FIELD:date_first_seen:TYPE(STRING8):LIKE(invalid_dt_first_seen):0,0
+FIELD:date_last_seen:TYPE(STRING8):LIKE(invalid_pastdate):0,0
+FIELD:process_date_first_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0
+FIELD:process_date_last_seen:TYPE(UNSIGNED4):LIKE(invalid_pastdate):0,0
+FIELD:record_type:TYPE(STRING1):LIKE(invalid_record_type):0,0
+FIELD:process_date:TYPE(STRING8):LIKE(invalid_pastdate):0,0
+FIELD:file_number:TYPE(STRING10):LIKE(invalid_file_number):0,0
+FIELD:segment_code:TYPE(STRING4):LIKE(invalid_segment):0,0
+FIELD:sequence_number:TYPE(STRING5):LIKE(invalid_numeric_or_allzeros):0,0
+FIELD:sic_1_code:TYPE(STRING4):LIKE(invalid_sic_code):0,0
+FIELD:sic_1_desc:TYPE(STRING34):LIKE(invalid_mandatory):0,0
+FIELD:sic_2_code:TYPE(STRING4):LIKE(invalid_sic_code):0,0
+FIELD:sic_2_desc:TYPE(STRING34):LIKE(invalid_mandatory):0,0
+FIELD:sic_3_code:TYPE(STRING4):LIKE(invalid_sic_code):0,0
+FIELD:sic_3_desc:TYPE(STRING34):LIKE(invalid_mandatory):0,0
+FIELD:sic_4_code:TYPE(STRING4):LIKE(invalid_sic_code):0,0
+FIELD:sic_4_desc:TYPE(STRING34):LIKE(invalid_mandatory):0,0
+// FIELD:yrs_in_bus_code:TYPE(STRING1):0,0
+// FIELD:yrs_in_bus_desc:TYPE(STRING20):0,0
+FIELD:yrs_in_bus_actual:TYPE(STRING3):LIKE(invalid_numeric):0,0
+// FIELD:sales_code:TYPE(STRING1):0,0
+// FIELD:sales_desc:TYPE(STRING29):0,0
+FIELD:sales_actual:TYPE(STRING7):LIKE(invalid_sales):0,0
+// FIELD:empl_size_code:TYPE(STRING1):0,0
+// FIELD:empl_size_desc:TYPE(STRING20):0,0
+FIELD:empl_size_actual:TYPE(STRING7):LIKE(invalid_numeric_or_allzeros):0,0
+FIELD:bus_type_code:TYPE(STRING1):LIKE(invalid_bustyp_code):0,0
+FIELD:bus_type_desc:TYPE(STRING20):LIKE(invalid_bustyp_desc):0,0
+FIELD:owner_type_code:TYPE(STRING1):LIKE(invalid_ownertyp_code):0,0
+FIELD:owner_type_desc:TYPE(STRING20):LIKE(invalid_ownertyp_desc):0,0
+FIELD:location_code:TYPE(STRING1):LIKE(invalid_location_code):0,0
+FIELD:location_desc:TYPE(STRING20):LIKE(invalid_location_desc):0,0
+// FIELD:lf:TYPE(STRING1):0,0

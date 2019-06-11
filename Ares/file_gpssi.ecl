@@ -4,8 +4,8 @@
 	
 	expanded_ssi_layout := recordof(ssi);
 	
-	output(	sort(ssi, id), named('ssi_extended_ds'));
-	output(	count(ssi), named('ssi_extended_ds_count'));
+	// output(	sort(ssi, id), named('ssi_extended_ds'));
+	// output(	count(ssi), named('ssi_extended_ds_count'));
 	
 	// ssi to  currency join
 	ssi_currency_ds := join(ssi, Ares.Files.ds_currency, left.currency_id = right.id, 
@@ -60,16 +60,16 @@
 	ssi_clear_route_dist_ds := join(ssi_clear_routing_dist, routing_codes_dist, left.clearer_routing_code_id = right.id, 
 																				transform(expanded_ssi_layout, self.clearer_bic_code := right.codeValue; self := left;), local, left outer);
 	
-	output(	sort(ssi_clear_route_dist_ds, id), named('ssi_clear_route_dist_ds'));
-	output(	count(ssi_clear_route_dist_ds), named('ssi_clear_route_dist_ds_count'));	
+	// output(	sort(ssi_clear_route_dist_ds, id), named('ssi_clear_route_dist_ds'));
+	// output(	count(ssi_clear_route_dist_ds), named('ssi_clear_route_dist_ds_count'));	
 	
 	// ssi to intermediary routing code id join
 	ssi_intermediary_routing_dist :=  DISTRIBUTE(ssi_clear_route_dist_ds, HASH(intermediary_routing_code_id));
 	ssi_intermediary_route_dist_ds := join(ssi_intermediary_routing_dist, routing_codes_dist, left.intermediary_routing_code_id = right.id, 
 																				transform(expanded_ssi_layout, self.holder_bic_code := right.codeValue; self := left;), local, left outer);
 	
-	output(	sort(ssi_intermediary_route_dist_ds, id), named('ssi_intermediary_route_dist_ds'));
-	output(	count(ssi_intermediary_route_dist_ds), named('ssi_intermediary_route_dist_ds_count'));	
+	// output(	sort(ssi_intermediary_route_dist_ds, id), named('ssi_intermediary_route_dist_ds'));
+	// output(	count(ssi_intermediary_route_dist_ds), named('ssi_intermediary_route_dist_ds_count'));	
 	
 	// ssi to beneficiary routing code id join
 	ssi_beneficiary_routing_dist :=  DISTRIBUTE(ssi_intermediary_route_dist_ds, HASH(beneficiary_routing_code_id));
@@ -118,9 +118,9 @@
 		self.Further_2_BIC                   := if (l.further2_bic_code != '' and length(l.further2_bic_code) < 11, Ares.str_functions.pad(l.further2_bic_code, '>', 'X', 11), l.further2_bic_code);
 		self.Further_2_BIC_Without_Padding   := l.further2_bic_code;
 		self.Correspondent_Effective_Date    := l.created_on_date;
-		self.Correspondent_Deactivation_Date := '';
+		self.Correspondent_Deactivation_Date := l.deleted_on_date;
 		self.Correspondent_Update_Date       := l.validationDate;
-		self.SSI_Notes                       := '';
+		self.SSI_Notes                       := l.additional_info;
 	End;
 
 	final := Project(ssi_full_ds, final_xform(left));

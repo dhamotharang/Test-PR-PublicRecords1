@@ -269,7 +269,7 @@ dSetJFlagForPropertyFragments := join(merged_dist,did_counts,
 									  left outer, local
 									 );
 									 
-fix_dates  := header.fn_fix_dates(dSetJFlagForPropertyFragments);
+fix_dates  := header.fn_fix_dates(dSetJFlagForPropertyFragments,,filedate);
 set_titles := header.fn_apply_title(fix_dates);
 append_PID := header.fn_persistent_record_ID(set_titles);
  

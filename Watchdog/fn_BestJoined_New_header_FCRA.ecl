@@ -157,8 +157,8 @@ lbest exclude_minors(result_wdob_ l, wdob r) := transform
 	self := l;
 end;
 
-result_wdob := join(result_wdob_, wdob, left.did = right.did,
-			 exclude_minors(left, right), left outer, local);				
+result_wdob := join(distribute(result_wdob_,did), wdob, left.did = right.did,
+			 exclude_minors(left, right), left outer, local);								
 			 
 return result_wdob ; 
 end; 

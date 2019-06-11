@@ -15,4 +15,6 @@ EXPORT Constants := module
  EXPORT KeyName_phones_ported_metadata := 	'phones_ported_metadata'; 
  EXPORT KeyName_carrier_reference:= 	'phonesmetadata::carrier_reference'; 
  
+ Export KeyName_lerg6 :='phones_lerg6';
+	 
 END;

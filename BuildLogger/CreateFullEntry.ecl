@@ -1,4 +1,4 @@
-
+﻿
 import buildlogger, _control, std;
 
 EXPORT CreateFullEntry (dataset(BuildLogger.Layouts.layout_log) new_raw,string PackageName)	:= function
@@ -46,21 +46,18 @@ end;
 NewEntries := rollup(SecondGroup,GROUP,tCreateRecord(left,ROWS(left)));
 
 SuperFile:='~thor_data400::datasets::fullbuildlogs::temp';
-Super_Log_File:='~thor_data400::'+dataset_name+'::FullBuildLogs';
+Super_Log_File:='~thor_data400::datasets::fullbuildlogs::temp'+workunit;
 
-IndividLog:=dataset(Super_Log_File,BuildLogger.Layouts.Process_Record,thor,opt);
-Newlog:=output(IndividLog+NewEntries,,Super_Log_File+'_temp',thor,overwrite);
+IndividLog:=dataset(SuperFile,BuildLogger.Layouts.Process_Record,thor,opt);
+Newlog:=output(IndividLog+NewEntries,,Super_Log_File,thor,overwrite);
 
-return 	sequential(Newlog,
-				_control.fSubmitNewWorkunit('nothor(global(sequential(if(std.file.FileExists(\''+Super_Log_File+'\'),sequential(STD.File.FinishSuperFileTransaction(),\r\n'+
-																							 'STD.File.RemoveSuperFile(\''+SuperFile+'\',\''+Super_Log_File+'\',true),\r\n'+
-																							 'STD.File.FinishSuperFileTransaction())),\r\n'+
-				
-						'fileservices.deleteLogicalFile(\''+Super_Log_File+'\'),\r\n'+
-						'fileservices.renameLogicalFile(\''+Super_Log_File+'_temp\',\''+Super_Log_File+'\'),\r\n'+
-						'STD.File.StartSuperFileTransaction(),\r\n'+
-						'STD.File.AddSuperFile(\''+SuperFile+'\',\''+Super_Log_File+'\'),\r\n'+
-						'STD.File.FinishSuperFileTransaction())))',std.system.job.target()));
+return 	sequential(
+						Newlog,
+						nothor(global(sequential(
+						STD.File.StartSuperFileTransaction(),
+						STD.File.ClearSuperFile(SuperFile,true),
+						STD.File.AddSuperFile(SuperFile,Super_Log_File),
+						STD.File.FinishSuperFileTransaction()))));
 
 
 end;
