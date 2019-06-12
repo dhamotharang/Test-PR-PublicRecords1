@@ -8,7 +8,7 @@ EXPORT fn_getPL(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
 
   Ded_PL_In := DEDUP(SORT(PL_In, did), did);
 
-  PL_recs := Doxie_Raw.PL_Raw(Ded_PL_In, DATASET([],Doxie.Layout_ref_bdid), mod_access := mod_params_in);
+  PL_recs := Doxie_Raw.PL_Raw(Ded_PL_In, mod_params_in);
 
   TodaysDate := Residency_Services.Constants.TodaysDate;
 
