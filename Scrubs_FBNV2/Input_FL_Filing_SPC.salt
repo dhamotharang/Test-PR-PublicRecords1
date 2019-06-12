@@ -71,35 +71,46 @@ FIELDTYPE:invalid_contact_name_format:ENUM(C|P)
 //FIELDS TO SCRUB -- Commented out fields are not being scrubbed
 //---------------------------------------------------------------
 
+//Fields to SCRUB
 FIELD:fic_fil_name:TYPE(STRING192):LIKE(invalid_mandatory):0,0
 FIELD:fic_owner_name:TYPE(STRING192):LIKE(invalid_mandatory):0,0
-//FIELD:filing_jurisdiction:TYPE(STRING3):LIKE(invalid_mandatory):0,0
 FIELD:fic_fil_date:TYPE(STRING8):LIKE(invalid_general_date):0,0
-// FIELD:start_date:TYPE(STRING8):LIKE(invalid_general_date):0,0
-// FIELD:abandondate:TYPE(STRING8):LIKE(invalid_general_date):0,0
-// FIELD:orig_filed_date:TYPE(STRING8):LIKE(invalid_general_date):0,0
 FIELD:fic_fil_doc_num:TYPE(STRING20):LIKE(invalid_mandatory):0,00
 FIELD:fic_owner_doc_num:TYPE(STRING20):LIKE(invalid_mandatory):0,0
-// FIELD:orig_fbn_num:TYPE(STRING20):LIKE(invalid_mandatory):0,0
-// FIELD:filing_type:TYPE(STRING48):LIKE(invalid_mandatory):0,0
-// FIELD:street_address1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:street_address2:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:city:TYPE(STRING50):LIKE(invalid_mandatory):0,0
-// FIELD:state:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:prep_mail_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
 
-// FIELD:fic_owner_name:TYPE(STRING55):LIKE(invalid_mandatory):0,0
 FIELD:p_owner_name:TYPE(STRING73):LIKE(invalid_mandatory):0,0
 FIELD:c_owner_name:TYPE(STRING70):LIKE(invalid_mandatory):0,0
-// FIELD:last_name_company:TYPE(STRING55):LIKE(invalid_mandatory):0,0
-// FIELD:street_address1:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-// FIELD:owner_city:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-// FIELD:owner_state:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-//FIELD:contact_phone:TYPE(STRING10):LIKE(invalid_phone):0,0
-// FIELD:contact_phone:TYPE(STRING10):LIKE(invalid_mandatory):0,0
 FIELD:prep_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
 FIELD:prep_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
-// FIELD:prep_new_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:prep_new_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
 FIELD:prep_owner_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
 FIELD:prep_owner_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+FIELD:seq:TYPE(STRING):LIKE(invalid_mandatory):0,0
+
+//Additional Fields for SALT		  
+FIELD:FIC_FIL_COUNTY:TYPE(STRING):0,0
+FIELD:FIC_FIL_ADDR1:TYPE(STRING):0,0
+FIELD:FIC_FIL_ADDR2:TYPE(STRING):0,0
+FIELD:FIC_FIL_CITY:TYPE(STRING):0,0
+FIELD:FIC_FIL_STATE:TYPE(STRING):0,0
+FIELD:FIC_FIL_ZIP5:TYPE(STRING):0,0
+FIELD:FIC_FIL_ZIP4:TYPE(STRING):0,0
+FIELD:FIC_FIL_COUNTRY:TYPE(STRING):0,0
+FIELD:FIC_FIL_COUNTRY_DEC:TYPE(STRING):0,0
+FIELD:FIC_FIL_PAGES:TYPE(STRING):0,0
+FIELD:FIC_FIL_STATUS:TYPE(STRING):0,0
+FIELD:FIC_FIL_STATUS_DEC:TYPE(STRING):0,0
+FIELD:FIC_FIL_CANCELLATION_DATE:TYPE(STRING):0,0
+FIELD:FIC_FIL_EXPIRATION_DATE:TYPE(STRING):0,0
+FIELD:FIC_FIL_TOTAL_OWN_CUR_CTR:TYPE(STRING):0,0
+FIELD:FIC_FIL_FEI_NUM:TYPE(STRING):0,0
+FIELD:FIC_GREATER_THAN__OWNERS:TYPE(STRING):0,0
+FIELD:FIC_OWNER_NAME_FORMAT:TYPE(STRING):0,0
+FIELD:FIC_OWNER_ADDR:TYPE(STRING):0,0
+FIELD:FIC_OWNER_CITY:TYPE(STRING):0,0
+FIELD:FIC_OWNER_STATE:TYPE(STRING):0,0
+FIELD:FIC_OWNER_ZIP5:TYPE(STRING):0,0
+FIELD:FIC_OWNER_ZIP4:TYPE(STRING):0,0
+FIELD:FIC_OWNER_COUNTRY:TYPE(STRING):0,0
+FIELD:FIC_OWNER_COUNTRY_DEC:TYPE(STRING):0,0
+FIELD:FIC_OWNER_FEI_NUM:TYPE(STRING):0,0
+FIELD:FIC_OWNER_CHARTER_NUM:TYPE(STRING):0,0

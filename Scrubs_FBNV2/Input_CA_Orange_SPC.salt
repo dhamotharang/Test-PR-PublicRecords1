@@ -36,7 +36,7 @@ FIELDTYPE:invalid_zip4:CUSTOM(Scrubs_FBNV2.Functions.fn_verify_zip4>0)
 FIELDTYPE:invalid_bus_name:ALLOW( #&'(),-./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZaeino)
 FIELDTYPE:invalid_long_bus_name:ALLOW( #&',-./0123459ABCDEFGHIJKLMNOPQRSTUVWXYZacdeghilmnoprstuy)
 FIELDTYPE:invalid_bus_status:ENUM(CURRENT|NEW|RENEWAL| )
-FIELDTYPE:invalid_filing_type:ENUM(BUSINESS LICENSE|TRADENAME; CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME)
+FIELDTYPE:invalid_filing_type:ENUM(BUSINESS LICENSE|TRADENAMETYPE(STRING):0,0 CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME)
 FIELDTYPE:invalid_seq_no:ALLOW( 01234)
 FIELDTYPE:invalid_bus_type_desc:ALLOW( &'(),-./0123459ABCDEFGHIJKLMNOPQRSTUVWXYZacehilmnorstu)
 FIELDTYPE:invalid_alpha_neg_num:ALLOW( -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)
@@ -50,7 +50,7 @@ FIELDTYPE:invalid_naics:CUSTOM(Scrubs_FBNV2.Functions.fn_naics > 0)
 //FIELDTYPE:invalid_url:CUSTOM(Scrubs_FBNV2.Functions.fn_url > 0)
 FIELDTYPE:invalid_address_type_code:ENUM(P|M)
 FIELDTYPE:invalid_norm_type:ENUM(D|L)
-FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;'&)
+FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,TYPE(STRING):0,0'&)
 FIELDTYPE:invalid_yes_blank:ENUM(Y| )
 FIELDTYPE:invalid_business_size:ENUM(L|S|X)
 FIELDTYPE:invalid_cert_or_class:ENUM(Certified|Classified|CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|Classification|Certification|SELF-CLASSIFIED/NON VERIFIED| )
@@ -71,11 +71,10 @@ FIELDTYPE:invalid_contact_name_format:ENUM(C|P)
 //FIELDS TO SCRUB -- Commented out fields are not being scrubbed
 //---------------------------------------------------------------
 
+//Fields for Scrubs
 FIELD:business_name:TYPE(STRING192):LIKE(invalid_mandatory):0,0
-//FIELD:filing_jurisdiction:TYPE(STRING3):LIKE(invalid_mandatory):0,0
 FIELD:file_date:TYPE(STRING8):LIKE(invalid_general_date):0,0
 FIELD:regis_nbr:TYPE(STRING20):LIKE(invalid_mandatory):0,0
-//FIELD:filing_type:TYPE(STRING48):LIKE(invalid_mandatory):0,0
 FIELD:prep_bus_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
 FIELD:prep_bus_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
 FIELD:prep_owner_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
@@ -86,9 +85,24 @@ FIELD:first_name:TYPE(STRING55):LIKE(invalid_mandatory):0,0
 FIELD:middle_name:TYPE(STRING55):LIKE(invalid_mandatory):0,0
 FIELD:last_name_company:TYPE(STRING55):LIKE(invalid_mandatory):0,0
 FIELD:owner_address:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-FIELD:owner_city:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-FIELD:owner_state:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-//FIELD:contact_phone:TYPE(STRING10):LIKE(invalid_phone):0,0
 FIELD:phone_nbr:TYPE(STRING10):LIKE(invalid_phone):0,0
-// FIELD:prep_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:prep_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+
+
+//Additional fields for SALT
+FIELD:BUSINESS_LETTER:TYPE(STRING):0,0	
+FIELD:ADDRESS:TYPE(STRING):0,0	
+FIELD:CITY:TYPE(STRING):0,0	
+FIELD:STATE:TYPE(STRING):0,0	
+FIELD:ZIP_CODE:TYPE(STRING):0,0	
+FIELD:DOCETYEP:TYPE(STRING):0,0	
+FIELD:OWNER_NBR:TYPE(STRING):0,0	
+FIELD:OWNER_CITY:TYPE(STRING):0,0	
+FIELD:OWNER_STATE:TYPE(STRING):0,0	
+FIELD:OWNER_ZIP_CODE:TYPE(STRING):0,0	
+FIELD:BUSINESS_TYPE:TYPE(STRING):0,0
+FIELD:title:TYPE(STRING):0,0
+FIELD:fname:TYPE(STRING):0,0
+FIELD:mname:TYPE(STRING):0,0
+FIELD:lname:TYPE(STRING):0,0
+FIELD:name_suffix:TYPE(STRING):0,0
+FIELD:name_score:TYPE(STRING):0,0

@@ -36,7 +36,7 @@ FIELDTYPE:invalid_zip4:CUSTOM(Scrubs_FBNV2.Functions.fn_verify_zip4>0)
 FIELDTYPE:invalid_bus_name:ALLOW( #&'(),-./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZaeino)
 FIELDTYPE:invalid_long_bus_name:ALLOW( #&',-./0123459ABCDEFGHIJKLMNOPQRSTUVWXYZacdeghilmnoprstuy)
 FIELDTYPE:invalid_bus_status:ENUM(CURRENT|NEW|RENEWAL| )
-FIELDTYPE:invalid_filing_type:ENUM(BUSINESS LICENSE|TRADENAME; CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME)
+FIELDTYPE:invalid_filing_type:ENUM(BUSINESS LICENSE|TRADENAME:TYPE(STRING):0,0 CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME)
 FIELDTYPE:invalid_seq_no:ALLOW( 01234)
 FIELDTYPE:invalid_bus_type_desc:ALLOW( &'(),-./0123459ABCDEFGHIJKLMNOPQRSTUVWXYZacehilmnorstu)
 FIELDTYPE:invalid_alpha_neg_num:ALLOW( -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)
@@ -50,7 +50,7 @@ FIELDTYPE:invalid_naics:CUSTOM(Scrubs_FBNV2.Functions.fn_naics > 0)
 //FIELDTYPE:invalid_url:CUSTOM(Scrubs_FBNV2.Functions.fn_url > 0)
 FIELDTYPE:invalid_address_type_code:ENUM(P|M)
 FIELDTYPE:invalid_norm_type:ENUM(D|L)
-FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;'&)
+FIELDTYPE:invalid_email:ALLOW( 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0'&)
 FIELDTYPE:invalid_yes_blank:ENUM(Y| )
 FIELDTYPE:invalid_business_size:ENUM(L|S|X)
 FIELDTYPE:invalid_cert_or_class:ENUM(Certified|Classified|CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|Classification|Certification|SELF-CLASSIFIED/NON VERIFIED| )
@@ -71,34 +71,58 @@ FIELDTYPE:invalid_contact_name_format:ENUM(C|P)
 //FIELDS TO SCRUB -- Commented out fields are not being scrubbed
 //---------------------------------------------------------------
 
+//Fields for Scrubs
 FIELD:action_OWN_name:TYPE(STRING192):LIKE(invalid_mandatory):0,0
-//FIELD:filing_jurisdiction:TYPE(STRING3):LIKE(invalid_mandatory):0,0
 FIELD:event_date:TYPE(STRING8):LIKE(invalid_general_date):0,0
-// FIELD:start_date:TYPE(STRING8):LIKE(invalid_general_date):0,0
-// FIELD:abandondate:TYPE(STRING8):LIKE(invalid_general_date):0,0
-// FIELD:orig_filed_date:TYPE(STRING8):LIKE(invalid_general_date):0,0
 FIELD:event_doc_number:TYPE(STRING20):LIKE(invalid_mandatory):0,00
 FIELD:event_orig_doc_number:TYPE(STRING20):LIKE(invalid_mandatory):0,0
-// FIELD:orig_fbn_num:TYPE(STRING20):LIKE(invalid_mandatory):0,0
-// FIELD:filing_type:TYPE(STRING48):LIKE(invalid_mandatory):0,0
-// FIELD:street_address1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:street_address2:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:city:TYPE(STRING50):LIKE(invalid_mandatory):0,0
-// FIELD:state:TYPE(STRING100):LIKE(invalid_mandatory):0,0
-// FIELD:prep_mail_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
-
-// FIELD:owner_name:TYPE(STRING55):LIKE(invalid_mandatory):0,0
-// FIELD:first_name:TYPE(STRING55):LIKE(invalid_mandatory):0,0
-// FIELD:middle_name:TYPE(STRING55):LIKE(invalid_mandatory):0,0
-// FIELD:last_name_company:TYPE(STRING55):LIKE(invalid_mandatory):0,0
-// FIELD:street_address1:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-// FIELD:owner_city:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-// FIELD:owner_state:TYPE(STRING40):LIKE(invalid_mandatory):0,0
-//FIELD:contact_phone:TYPE(STRING10):LIKE(invalid_phone):0,0
-// FIELD:contact_phone:TYPE(STRING10):LIKE(invalid_mandatory):0,0
 FIELD:prep_old_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
 FIELD:prep_old_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
 FIELD:prep_new_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
 FIELD:prep_new_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
 FIELD:prep_owner_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
 FIELD:prep_owner_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+
+//Additional fields for SALT:TYPE(STRING):0,0
+FIELD:EVENT_FIC_NAME:TYPE(STRING):0,0
+FIELD:EVENT_ACTION_CTR:TYPE(STRING):0,0 
+FIELD:EVENT_SEQ_NUMBER:TYPE(STRING):0,0
+FIELD:EVENT_PAGES:TYPE(STRING):0,0
+FIELD:ACTION_SEQ_NUMBER:TYPE(STRING):0,0
+FIELD:ACTION_CODE:TYPE(STRING):0,0
+FIELD:ACTION_VERBAGE:TYPE(STRING):0,0
+FIELD:ACTION_OLD_FEI:TYPE(STRING):0,0
+FIELD:ACTION_OLD_COUNTY:TYPE(STRING):0,0
+FIELD:ACTION_OLD_ADDR1:TYPE(STRING):0,0
+FIELD:ACTION_OLD_ADDR2:TYPE(STRING):0,0
+FIELD:ACTION_OLD_CITY:TYPE(STRING):0,0
+FIELD:ACTION_OLD_STATE:TYPE(STRING):0,0
+FIELD:ACTION_OLD_ZIP5:TYPE(STRING):0,0
+FIELD:ACTION_OLD_ZIP4:TYPE(STRING):0,0
+FIELD:ACTION_OLD_COUNTRY:TYPE(STRING):0,0
+FIELD:ACTION_OLD_COUNTRY_DESC:TYPE(STRING):0,0
+FIELD:ACTION_NEW_FEI:TYPE(STRING):0,0
+FIELD:ACTION_NEW_COUNTY:TYPE(STRING):0,0
+FIELD:ACTION_NEW_ADDR1:TYPE(STRING):0,0
+FIELD:ACTION_NEW_ADDR2:TYPE(STRING):0,0
+FIELD:ACTION_NEW_CITY:TYPE(STRING):0,0
+FIELD:ACTION_NEW_STATE:TYPE(STRING):0,0
+FIELD:ACTION_NEW_ZIP5:TYPE(STRING):0,0
+FIELD:ACTION_NEW_ZIP4:TYPE(STRING):0,0
+FIELD:ACTION_NEW_COUNTRY:TYPE(STRING):0,0
+FIELD:ACTION_NEW_COUNTRY_DESC:TYPE(STRING):0,0
+FIELD:ACTION_OWN_ADDRESS:TYPE(STRING):0,0
+FIELD:ACTION_OWN_CITY:TYPE(STRING):0,0
+FIELD:ACTION_OWN_STATE:TYPE(STRING):0,0
+FIELD:ACTION_OWN_ZIP5:TYPE(STRING):0,0
+FIELD:ACTION_OWN_FEI:TYPE(STRING):0,0
+FIELD:ACTION_OWN_CHARTER_NUMBER:TYPE(STRING):0,0
+FIELD:ACTION_OLD_NAME_SEQ:TYPE(STRING):0,0
+FIELD:ACTION_NEW_NAME_SEQ:TYPE(STRING):0,0
+FIELD:Owner_title:TYPE(STRING):0,0
+FIELD:Owner_fname:TYPE(STRING):0,0
+FIELD:Owner_mname:TYPE(STRING):0,0
+FIELD:Owner_lname:TYPE(STRING):0,0
+FIELD:Owner_name_suffix:TYPE(STRING):0,0
+FIELD:Owner_name_score:TYPE(STRING):0,0
+FIELD:cname:TYPE(STRING):0,0

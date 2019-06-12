@@ -12,8 +12,6 @@ EXPORT Input_CA_Ventura_Scrubs := MODULE
     UNSIGNED1 owner_name_Invalid;
     UNSIGNED1 prep_bus_addr_line1_Invalid;
     UNSIGNED1 prep_bus_addr_line_last_Invalid;
-    UNSIGNED1 prep_mail_addr_line1_Invalid;
-    UNSIGNED1 prep_mail_addr_line_last_Invalid;
     UNSIGNED1 prep_owner_addr_line1_Invalid;
     UNSIGNED1 prep_owner_addr_line_last_Invalid;
   END;
@@ -30,8 +28,6 @@ EXPORT FromNone(DATASET(Input_CA_Ventura_Layout_FBNV2) h) := MODULE
     SELF.owner_name_Invalid := Input_CA_Ventura_Fields.InValid_owner_name((SALT37.StrType)le.owner_name);
     SELF.prep_bus_addr_line1_Invalid := Input_CA_Ventura_Fields.InValid_prep_bus_addr_line1((SALT37.StrType)le.prep_bus_addr_line1);
     SELF.prep_bus_addr_line_last_Invalid := Input_CA_Ventura_Fields.InValid_prep_bus_addr_line_last((SALT37.StrType)le.prep_bus_addr_line_last);
-    SELF.prep_mail_addr_line1_Invalid := Input_CA_Ventura_Fields.InValid_prep_mail_addr_line1((SALT37.StrType)le.prep_mail_addr_line1);
-    SELF.prep_mail_addr_line_last_Invalid := Input_CA_Ventura_Fields.InValid_prep_mail_addr_line_last((SALT37.StrType)le.prep_mail_addr_line_last);
     SELF.prep_owner_addr_line1_Invalid := Input_CA_Ventura_Fields.InValid_prep_owner_addr_line1((SALT37.StrType)le.prep_owner_addr_line1);
     SELF.prep_owner_addr_line_last_Invalid := Input_CA_Ventura_Fields.InValid_prep_owner_addr_line_last((SALT37.StrType)le.prep_owner_addr_line_last);
     SELF := le;
@@ -39,7 +35,7 @@ EXPORT FromNone(DATASET(Input_CA_Ventura_Layout_FBNV2) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Input_CA_Ventura_Layout_FBNV2);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.business_name_Invalid << 0 ) + ( le.recorded_date_Invalid << 1 ) + ( le.start_date_Invalid << 2 ) + ( le.abandondate_Invalid << 3 ) + ( le.file_number_Invalid << 4 ) + ( le.owner_name_Invalid << 5 ) + ( le.prep_bus_addr_line1_Invalid << 6 ) + ( le.prep_bus_addr_line_last_Invalid << 7 ) + ( le.prep_mail_addr_line1_Invalid << 8 ) + ( le.prep_mail_addr_line_last_Invalid << 9 ) + ( le.prep_owner_addr_line1_Invalid << 10 ) + ( le.prep_owner_addr_line_last_Invalid << 11 );
+    SELF.ScrubsBits1 := ( le.business_name_Invalid << 0 ) + ( le.recorded_date_Invalid << 1 ) + ( le.start_date_Invalid << 2 ) + ( le.abandondate_Invalid << 3 ) + ( le.file_number_Invalid << 4 ) + ( le.owner_name_Invalid << 5 ) + ( le.prep_bus_addr_line1_Invalid << 6 ) + ( le.prep_bus_addr_line_last_Invalid << 7 ) + ( le.prep_owner_addr_line1_Invalid << 8 ) + ( le.prep_owner_addr_line_last_Invalid << 9 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -56,10 +52,8 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.owner_name_Invalid := (le.ScrubsBits1 >> 5) & 1;
     SELF.prep_bus_addr_line1_Invalid := (le.ScrubsBits1 >> 6) & 1;
     SELF.prep_bus_addr_line_last_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.prep_mail_addr_line1_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.prep_mail_addr_line_last_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.prep_owner_addr_line1_Invalid := (le.ScrubsBits1 >> 10) & 1;
-    SELF.prep_owner_addr_line_last_Invalid := (le.ScrubsBits1 >> 11) & 1;
+    SELF.prep_owner_addr_line1_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.prep_owner_addr_line_last_Invalid := (le.ScrubsBits1 >> 9) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -76,8 +70,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     owner_name_LENGTH_ErrorCount := COUNT(GROUP,h.owner_name_Invalid=1);
     prep_bus_addr_line1_LENGTH_ErrorCount := COUNT(GROUP,h.prep_bus_addr_line1_Invalid=1);
     prep_bus_addr_line_last_LENGTH_ErrorCount := COUNT(GROUP,h.prep_bus_addr_line_last_Invalid=1);
-    prep_mail_addr_line1_LENGTH_ErrorCount := COUNT(GROUP,h.prep_mail_addr_line1_Invalid=1);
-    prep_mail_addr_line_last_LENGTH_ErrorCount := COUNT(GROUP,h.prep_mail_addr_line_last_Invalid=1);
     prep_owner_addr_line1_LENGTH_ErrorCount := COUNT(GROUP,h.prep_owner_addr_line1_Invalid=1);
     prep_owner_addr_line_last_LENGTH_ErrorCount := COUNT(GROUP,h.prep_owner_addr_line_last_Invalid=1);
   END;
@@ -92,8 +84,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.business_name_Invalid,le.recorded_date_Invalid,le.start_date_Invalid,le.abandondate_Invalid,le.file_number_Invalid,le.owner_name_Invalid,le.prep_bus_addr_line1_Invalid,le.prep_bus_addr_line_last_Invalid,le.prep_mail_addr_line1_Invalid,le.prep_mail_addr_line_last_Invalid,le.prep_owner_addr_line1_Invalid,le.prep_owner_addr_line_last_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_CA_Ventura_Fields.InvalidMessage_business_name(le.business_name_Invalid),Input_CA_Ventura_Fields.InvalidMessage_recorded_date(le.recorded_date_Invalid),Input_CA_Ventura_Fields.InvalidMessage_start_date(le.start_date_Invalid),Input_CA_Ventura_Fields.InvalidMessage_abandondate(le.abandondate_Invalid),Input_CA_Ventura_Fields.InvalidMessage_file_number(le.file_number_Invalid),Input_CA_Ventura_Fields.InvalidMessage_owner_name(le.owner_name_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_bus_addr_line1(le.prep_bus_addr_line1_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_bus_addr_line_last(le.prep_bus_addr_line_last_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_mail_addr_line1(le.prep_mail_addr_line1_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_mail_addr_line_last(le.prep_mail_addr_line_last_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_owner_addr_line1(le.prep_owner_addr_line1_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_owner_addr_line_last(le.prep_owner_addr_line_last_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.business_name_Invalid,le.recorded_date_Invalid,le.start_date_Invalid,le.abandondate_Invalid,le.file_number_Invalid,le.owner_name_Invalid,le.prep_bus_addr_line1_Invalid,le.prep_bus_addr_line_last_Invalid,le.prep_owner_addr_line1_Invalid,le.prep_owner_addr_line_last_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_CA_Ventura_Fields.InvalidMessage_business_name(le.business_name_Invalid),Input_CA_Ventura_Fields.InvalidMessage_recorded_date(le.recorded_date_Invalid),Input_CA_Ventura_Fields.InvalidMessage_start_date(le.start_date_Invalid),Input_CA_Ventura_Fields.InvalidMessage_abandondate(le.abandondate_Invalid),Input_CA_Ventura_Fields.InvalidMessage_file_number(le.file_number_Invalid),Input_CA_Ventura_Fields.InvalidMessage_owner_name(le.owner_name_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_bus_addr_line1(le.prep_bus_addr_line1_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_bus_addr_line_last(le.prep_bus_addr_line_last_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_owner_addr_line1(le.prep_owner_addr_line1_Invalid),Input_CA_Ventura_Fields.InvalidMessage_prep_owner_addr_line_last(le.prep_owner_addr_line_last_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.business_name_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.recorded_date_Invalid,'CUSTOM','UNKNOWN')
@@ -103,15 +95,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.owner_name_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.prep_bus_addr_line1_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.prep_bus_addr_line_last_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.prep_mail_addr_line1_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.prep_mail_addr_line_last_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.prep_owner_addr_line1_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.prep_owner_addr_line_last_Invalid,'LENGTH','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'business_name','recorded_date','start_date','abandondate','file_number','owner_name','prep_bus_addr_line1','prep_bus_addr_line_last','prep_mail_addr_line1','prep_mail_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_mandatory','invalid_general_date','invalid_general_date','invalid_general_date','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.business_name,(SALT37.StrType)le.recorded_date,(SALT37.StrType)le.start_date,(SALT37.StrType)le.abandondate,(SALT37.StrType)le.file_number,(SALT37.StrType)le.owner_name,(SALT37.StrType)le.prep_bus_addr_line1,(SALT37.StrType)le.prep_bus_addr_line_last,(SALT37.StrType)le.prep_mail_addr_line1,(SALT37.StrType)le.prep_mail_addr_line_last,(SALT37.StrType)le.prep_owner_addr_line1,(SALT37.StrType)le.prep_owner_addr_line_last,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'business_name','recorded_date','start_date','abandondate','file_number','owner_name','prep_bus_addr_line1','prep_bus_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_mandatory','invalid_general_date','invalid_general_date','invalid_general_date','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.business_name,(SALT37.StrType)le.recorded_date,(SALT37.StrType)le.start_date,(SALT37.StrType)le.abandondate,(SALT37.StrType)le.file_number,(SALT37.StrType)le.owner_name,(SALT37.StrType)le.prep_bus_addr_line1,(SALT37.StrType)le.prep_bus_addr_line_last,(SALT37.StrType)le.prep_owner_addr_line1,(SALT37.StrType)le.prep_owner_addr_line_last,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,12,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,10,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -129,8 +119,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'owner_name:invalid_mandatory:LENGTH'
           ,'prep_bus_addr_line1:invalid_mandatory:LENGTH'
           ,'prep_bus_addr_line_last:invalid_mandatory:LENGTH'
-          ,'prep_mail_addr_line1:invalid_mandatory:LENGTH'
-          ,'prep_mail_addr_line_last:invalid_mandatory:LENGTH'
           ,'prep_owner_addr_line1:invalid_mandatory:LENGTH'
           ,'prep_owner_addr_line_last:invalid_mandatory:LENGTH','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
@@ -142,8 +130,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Input_CA_Ventura_Fields.InvalidMessage_owner_name(1)
           ,Input_CA_Ventura_Fields.InvalidMessage_prep_bus_addr_line1(1)
           ,Input_CA_Ventura_Fields.InvalidMessage_prep_bus_addr_line_last(1)
-          ,Input_CA_Ventura_Fields.InvalidMessage_prep_mail_addr_line1(1)
-          ,Input_CA_Ventura_Fields.InvalidMessage_prep_mail_addr_line_last(1)
           ,Input_CA_Ventura_Fields.InvalidMessage_prep_owner_addr_line1(1)
           ,Input_CA_Ventura_Fields.InvalidMessage_prep_owner_addr_line_last(1),'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
@@ -155,8 +141,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.owner_name_LENGTH_ErrorCount
           ,le.prep_bus_addr_line1_LENGTH_ErrorCount
           ,le.prep_bus_addr_line_last_LENGTH_ErrorCount
-          ,le.prep_mail_addr_line1_LENGTH_ErrorCount
-          ,le.prep_mail_addr_line_last_LENGTH_ErrorCount
           ,le.prep_owner_addr_line1_LENGTH_ErrorCount
           ,le.prep_owner_addr_line_last_LENGTH_ErrorCount,0);
       SELF.rulepcnt := 100 * CHOOSE(c
@@ -168,12 +152,10 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.owner_name_LENGTH_ErrorCount
           ,le.prep_bus_addr_line1_LENGTH_ErrorCount
           ,le.prep_bus_addr_line_last_LENGTH_ErrorCount
-          ,le.prep_mail_addr_line1_LENGTH_ErrorCount
-          ,le.prep_mail_addr_line_last_LENGTH_ErrorCount
           ,le.prep_owner_addr_line1_LENGTH_ErrorCount
           ,le.prep_owner_addr_line_last_LENGTH_ErrorCount,0) / le.TotalCnt + 0.5;
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,12,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,10,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;

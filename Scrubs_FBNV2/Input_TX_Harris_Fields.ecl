@@ -198,8 +198,8 @@ EXPORT InValidMessageFT_invalid_bus_status(UNSIGNED1 wh) := CHOOSE(wh,SALT37.Hyg
 EXPORT MakeFT_invalid_filing_type(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME; CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
-EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME; CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME:TYPE(STRING):0,0 CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
+EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME:TYPE(STRING):0,0 CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_seq_no(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,' 01234'); // Only allow valid symbols
@@ -267,11 +267,11 @@ EXPORT InValidFT_invalid_norm_type(SALT37.StrType s) := WHICH(((SALT37.StrType) 
 EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('D|L'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_email(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'))));
-EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_yes_blank(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -339,8 +339,8 @@ END;
 EXPORT InValidFT_invalid_contact_name_format(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['C','P']);
 EXPORT InValidMessageFT_invalid_contact_name_format(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('C|P'),SALT37.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'name1','name2','date_filed','file_number','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'name1' => 0,'name2' => 1,'date_filed' => 2,'file_number' => 3,'prep_addr1_line1' => 4,'prep_addr1_line_last' => 5,'prep_addr2_line1' => 6,'prep_addr2_line_last' => 7,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'name1','name2','date_filed','file_number','prep_addr1_line1','prep_addr1_line_last','prep_addr2_line1','prep_addr2_line_last','RECORD_TYPE','STREET_ADD1','CITY1','STATE1','ZIP1','TERM','STREET_ADD2','CITY2','STATE2','ZIP2','FILM_CODE','BUS_TYPE','ANNEX_CODE','NUM_PAGES','EXPIRED_TERM','INCORPORATED','ASSUMED_NAME','name1_title','name1_fname','name1_mname','name1_lname','name1_name_suffix','name1_name_score','name2_title','name2_fname','name2_mname','name2_lname','name2_name_suffix','name2_name_score');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'name1' => 0,'name2' => 1,'date_filed' => 2,'file_number' => 3,'prep_addr1_line1' => 4,'prep_addr1_line_last' => 5,'prep_addr2_line1' => 6,'prep_addr2_line_last' => 7,'RECORD_TYPE' => 8,'STREET_ADD1' => 9,'CITY1' => 10,'STATE1' => 11,'ZIP1' => 12,'TERM' => 13,'STREET_ADD2' => 14,'CITY2' => 15,'STATE2' => 16,'ZIP2' => 17,'FILM_CODE' => 18,'BUS_TYPE' => 19,'ANNEX_CODE' => 20,'NUM_PAGES' => 21,'EXPIRED_TERM' => 22,'INCORPORATED' => 23,'ASSUMED_NAME' => 24,'name1_title' => 25,'name1_fname' => 26,'name1_mname' => 27,'name1_lname' => 28,'name1_name_suffix' => 29,'name1_name_score' => 30,'name2_title' => 31,'name2_fname' => 32,'name2_mname' => 33,'name2_lname' => 34,'name2_name_suffix' => 35,'name2_name_score' => 36,0);
  
 //Individual field level validation
  
@@ -376,6 +376,122 @@ EXPORT Make_prep_addr2_line_last(SALT37.StrType s0) := MakeFT_invalid_mandatory(
 EXPORT InValid_prep_addr2_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_addr2_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
+EXPORT Make_RECORD_TYPE(SALT37.StrType s0) := s0;
+EXPORT InValid_RECORD_TYPE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_RECORD_TYPE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_STREET_ADD1(SALT37.StrType s0) := s0;
+EXPORT InValid_STREET_ADD1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_STREET_ADD1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_CITY1(SALT37.StrType s0) := s0;
+EXPORT InValid_CITY1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_CITY1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_STATE1(SALT37.StrType s0) := s0;
+EXPORT InValid_STATE1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_STATE1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ZIP1(SALT37.StrType s0) := s0;
+EXPORT InValid_ZIP1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ZIP1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_TERM(SALT37.StrType s0) := s0;
+EXPORT InValid_TERM(SALT37.StrType s) := 0;
+EXPORT InValidMessage_TERM(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_STREET_ADD2(SALT37.StrType s0) := s0;
+EXPORT InValid_STREET_ADD2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_STREET_ADD2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_CITY2(SALT37.StrType s0) := s0;
+EXPORT InValid_CITY2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_CITY2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_STATE2(SALT37.StrType s0) := s0;
+EXPORT InValid_STATE2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_STATE2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ZIP2(SALT37.StrType s0) := s0;
+EXPORT InValid_ZIP2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ZIP2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FILM_CODE(SALT37.StrType s0) := s0;
+EXPORT InValid_FILM_CODE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FILM_CODE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUS_TYPE(SALT37.StrType s0) := s0;
+EXPORT InValid_BUS_TYPE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUS_TYPE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ANNEX_CODE(SALT37.StrType s0) := s0;
+EXPORT InValid_ANNEX_CODE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ANNEX_CODE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_NUM_PAGES(SALT37.StrType s0) := s0;
+EXPORT InValid_NUM_PAGES(SALT37.StrType s) := 0;
+EXPORT InValidMessage_NUM_PAGES(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_EXPIRED_TERM(SALT37.StrType s0) := s0;
+EXPORT InValid_EXPIRED_TERM(SALT37.StrType s) := 0;
+EXPORT InValidMessage_EXPIRED_TERM(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_INCORPORATED(SALT37.StrType s0) := s0;
+EXPORT InValid_INCORPORATED(SALT37.StrType s) := 0;
+EXPORT InValidMessage_INCORPORATED(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ASSUMED_NAME(SALT37.StrType s0) := s0;
+EXPORT InValid_ASSUMED_NAME(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ASSUMED_NAME(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name1_title(SALT37.StrType s0) := s0;
+EXPORT InValid_name1_title(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name1_title(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name1_fname(SALT37.StrType s0) := s0;
+EXPORT InValid_name1_fname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name1_fname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name1_mname(SALT37.StrType s0) := s0;
+EXPORT InValid_name1_mname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name1_mname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name1_lname(SALT37.StrType s0) := s0;
+EXPORT InValid_name1_lname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name1_lname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name1_name_suffix(SALT37.StrType s0) := s0;
+EXPORT InValid_name1_name_suffix(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name1_name_suffix(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name1_name_score(SALT37.StrType s0) := s0;
+EXPORT InValid_name1_name_score(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name1_name_score(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name2_title(SALT37.StrType s0) := s0;
+EXPORT InValid_name2_title(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name2_title(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name2_fname(SALT37.StrType s0) := s0;
+EXPORT InValid_name2_fname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name2_fname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name2_mname(SALT37.StrType s0) := s0;
+EXPORT InValid_name2_mname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name2_mname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name2_lname(SALT37.StrType s0) := s0;
+EXPORT InValid_name2_lname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name2_lname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name2_name_suffix(SALT37.StrType s0) := s0;
+EXPORT InValid_name2_name_suffix(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name2_name_suffix(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_name2_name_score(SALT37.StrType s0) := s0;
+EXPORT InValid_name2_name_score(SALT37.StrType s) := 0;
+EXPORT InValidMessage_name2_name_score(UNSIGNED1 wh) := '';
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
   IMPORT SALT37,Scrubs_FBNV2;
@@ -405,6 +521,35 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_prep_addr1_line_last;
     BOOLEAN Diff_prep_addr2_line1;
     BOOLEAN Diff_prep_addr2_line_last;
+    BOOLEAN Diff_RECORD_TYPE;
+    BOOLEAN Diff_STREET_ADD1;
+    BOOLEAN Diff_CITY1;
+    BOOLEAN Diff_STATE1;
+    BOOLEAN Diff_ZIP1;
+    BOOLEAN Diff_TERM;
+    BOOLEAN Diff_STREET_ADD2;
+    BOOLEAN Diff_CITY2;
+    BOOLEAN Diff_STATE2;
+    BOOLEAN Diff_ZIP2;
+    BOOLEAN Diff_FILM_CODE;
+    BOOLEAN Diff_BUS_TYPE;
+    BOOLEAN Diff_ANNEX_CODE;
+    BOOLEAN Diff_NUM_PAGES;
+    BOOLEAN Diff_EXPIRED_TERM;
+    BOOLEAN Diff_INCORPORATED;
+    BOOLEAN Diff_ASSUMED_NAME;
+    BOOLEAN Diff_name1_title;
+    BOOLEAN Diff_name1_fname;
+    BOOLEAN Diff_name1_mname;
+    BOOLEAN Diff_name1_lname;
+    BOOLEAN Diff_name1_name_suffix;
+    BOOLEAN Diff_name1_name_score;
+    BOOLEAN Diff_name2_title;
+    BOOLEAN Diff_name2_fname;
+    BOOLEAN Diff_name2_mname;
+    BOOLEAN Diff_name2_lname;
+    BOOLEAN Diff_name2_name_suffix;
+    BOOLEAN Diff_name2_name_score;
     UNSIGNED Num_Diffs;
     SALT37.StrType Val {MAXLENGTH(1024)};
   END;
@@ -418,8 +563,37 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_prep_addr1_line_last := le.prep_addr1_line_last <> ri.prep_addr1_line_last;
     SELF.Diff_prep_addr2_line1 := le.prep_addr2_line1 <> ri.prep_addr2_line1;
     SELF.Diff_prep_addr2_line_last := le.prep_addr2_line_last <> ri.prep_addr2_line_last;
+    SELF.Diff_RECORD_TYPE := le.RECORD_TYPE <> ri.RECORD_TYPE;
+    SELF.Diff_STREET_ADD1 := le.STREET_ADD1 <> ri.STREET_ADD1;
+    SELF.Diff_CITY1 := le.CITY1 <> ri.CITY1;
+    SELF.Diff_STATE1 := le.STATE1 <> ri.STATE1;
+    SELF.Diff_ZIP1 := le.ZIP1 <> ri.ZIP1;
+    SELF.Diff_TERM := le.TERM <> ri.TERM;
+    SELF.Diff_STREET_ADD2 := le.STREET_ADD2 <> ri.STREET_ADD2;
+    SELF.Diff_CITY2 := le.CITY2 <> ri.CITY2;
+    SELF.Diff_STATE2 := le.STATE2 <> ri.STATE2;
+    SELF.Diff_ZIP2 := le.ZIP2 <> ri.ZIP2;
+    SELF.Diff_FILM_CODE := le.FILM_CODE <> ri.FILM_CODE;
+    SELF.Diff_BUS_TYPE := le.BUS_TYPE <> ri.BUS_TYPE;
+    SELF.Diff_ANNEX_CODE := le.ANNEX_CODE <> ri.ANNEX_CODE;
+    SELF.Diff_NUM_PAGES := le.NUM_PAGES <> ri.NUM_PAGES;
+    SELF.Diff_EXPIRED_TERM := le.EXPIRED_TERM <> ri.EXPIRED_TERM;
+    SELF.Diff_INCORPORATED := le.INCORPORATED <> ri.INCORPORATED;
+    SELF.Diff_ASSUMED_NAME := le.ASSUMED_NAME <> ri.ASSUMED_NAME;
+    SELF.Diff_name1_title := le.name1_title <> ri.name1_title;
+    SELF.Diff_name1_fname := le.name1_fname <> ri.name1_fname;
+    SELF.Diff_name1_mname := le.name1_mname <> ri.name1_mname;
+    SELF.Diff_name1_lname := le.name1_lname <> ri.name1_lname;
+    SELF.Diff_name1_name_suffix := le.name1_name_suffix <> ri.name1_name_suffix;
+    SELF.Diff_name1_name_score := le.name1_name_score <> ri.name1_name_score;
+    SELF.Diff_name2_title := le.name2_title <> ri.name2_title;
+    SELF.Diff_name2_fname := le.name2_fname <> ri.name2_fname;
+    SELF.Diff_name2_mname := le.name2_mname <> ri.name2_mname;
+    SELF.Diff_name2_lname := le.name2_lname <> ri.name2_lname;
+    SELF.Diff_name2_name_suffix := le.name2_name_suffix <> ri.name2_name_suffix;
+    SELF.Diff_name2_name_score := le.name2_name_score <> ri.name2_name_score;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_name1,1,0)+ IF( SELF.Diff_name2,1,0)+ IF( SELF.Diff_date_filed,1,0)+ IF( SELF.Diff_file_number,1,0)+ IF( SELF.Diff_prep_addr1_line1,1,0)+ IF( SELF.Diff_prep_addr1_line_last,1,0)+ IF( SELF.Diff_prep_addr2_line1,1,0)+ IF( SELF.Diff_prep_addr2_line_last,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_name1,1,0)+ IF( SELF.Diff_name2,1,0)+ IF( SELF.Diff_date_filed,1,0)+ IF( SELF.Diff_file_number,1,0)+ IF( SELF.Diff_prep_addr1_line1,1,0)+ IF( SELF.Diff_prep_addr1_line_last,1,0)+ IF( SELF.Diff_prep_addr2_line1,1,0)+ IF( SELF.Diff_prep_addr2_line_last,1,0)+ IF( SELF.Diff_RECORD_TYPE,1,0)+ IF( SELF.Diff_STREET_ADD1,1,0)+ IF( SELF.Diff_CITY1,1,0)+ IF( SELF.Diff_STATE1,1,0)+ IF( SELF.Diff_ZIP1,1,0)+ IF( SELF.Diff_TERM,1,0)+ IF( SELF.Diff_STREET_ADD2,1,0)+ IF( SELF.Diff_CITY2,1,0)+ IF( SELF.Diff_STATE2,1,0)+ IF( SELF.Diff_ZIP2,1,0)+ IF( SELF.Diff_FILM_CODE,1,0)+ IF( SELF.Diff_BUS_TYPE,1,0)+ IF( SELF.Diff_ANNEX_CODE,1,0)+ IF( SELF.Diff_NUM_PAGES,1,0)+ IF( SELF.Diff_EXPIRED_TERM,1,0)+ IF( SELF.Diff_INCORPORATED,1,0)+ IF( SELF.Diff_ASSUMED_NAME,1,0)+ IF( SELF.Diff_name1_title,1,0)+ IF( SELF.Diff_name1_fname,1,0)+ IF( SELF.Diff_name1_mname,1,0)+ IF( SELF.Diff_name1_lname,1,0)+ IF( SELF.Diff_name1_name_suffix,1,0)+ IF( SELF.Diff_name1_name_score,1,0)+ IF( SELF.Diff_name2_title,1,0)+ IF( SELF.Diff_name2_fname,1,0)+ IF( SELF.Diff_name2_mname,1,0)+ IF( SELF.Diff_name2_lname,1,0)+ IF( SELF.Diff_name2_name_suffix,1,0)+ IF( SELF.Diff_name2_name_score,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -440,6 +614,35 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_prep_addr1_line_last := COUNT(GROUP,%Closest%.Diff_prep_addr1_line_last);
     Count_Diff_prep_addr2_line1 := COUNT(GROUP,%Closest%.Diff_prep_addr2_line1);
     Count_Diff_prep_addr2_line_last := COUNT(GROUP,%Closest%.Diff_prep_addr2_line_last);
+    Count_Diff_RECORD_TYPE := COUNT(GROUP,%Closest%.Diff_RECORD_TYPE);
+    Count_Diff_STREET_ADD1 := COUNT(GROUP,%Closest%.Diff_STREET_ADD1);
+    Count_Diff_CITY1 := COUNT(GROUP,%Closest%.Diff_CITY1);
+    Count_Diff_STATE1 := COUNT(GROUP,%Closest%.Diff_STATE1);
+    Count_Diff_ZIP1 := COUNT(GROUP,%Closest%.Diff_ZIP1);
+    Count_Diff_TERM := COUNT(GROUP,%Closest%.Diff_TERM);
+    Count_Diff_STREET_ADD2 := COUNT(GROUP,%Closest%.Diff_STREET_ADD2);
+    Count_Diff_CITY2 := COUNT(GROUP,%Closest%.Diff_CITY2);
+    Count_Diff_STATE2 := COUNT(GROUP,%Closest%.Diff_STATE2);
+    Count_Diff_ZIP2 := COUNT(GROUP,%Closest%.Diff_ZIP2);
+    Count_Diff_FILM_CODE := COUNT(GROUP,%Closest%.Diff_FILM_CODE);
+    Count_Diff_BUS_TYPE := COUNT(GROUP,%Closest%.Diff_BUS_TYPE);
+    Count_Diff_ANNEX_CODE := COUNT(GROUP,%Closest%.Diff_ANNEX_CODE);
+    Count_Diff_NUM_PAGES := COUNT(GROUP,%Closest%.Diff_NUM_PAGES);
+    Count_Diff_EXPIRED_TERM := COUNT(GROUP,%Closest%.Diff_EXPIRED_TERM);
+    Count_Diff_INCORPORATED := COUNT(GROUP,%Closest%.Diff_INCORPORATED);
+    Count_Diff_ASSUMED_NAME := COUNT(GROUP,%Closest%.Diff_ASSUMED_NAME);
+    Count_Diff_name1_title := COUNT(GROUP,%Closest%.Diff_name1_title);
+    Count_Diff_name1_fname := COUNT(GROUP,%Closest%.Diff_name1_fname);
+    Count_Diff_name1_mname := COUNT(GROUP,%Closest%.Diff_name1_mname);
+    Count_Diff_name1_lname := COUNT(GROUP,%Closest%.Diff_name1_lname);
+    Count_Diff_name1_name_suffix := COUNT(GROUP,%Closest%.Diff_name1_name_suffix);
+    Count_Diff_name1_name_score := COUNT(GROUP,%Closest%.Diff_name1_name_score);
+    Count_Diff_name2_title := COUNT(GROUP,%Closest%.Diff_name2_title);
+    Count_Diff_name2_fname := COUNT(GROUP,%Closest%.Diff_name2_fname);
+    Count_Diff_name2_mname := COUNT(GROUP,%Closest%.Diff_name2_mname);
+    Count_Diff_name2_lname := COUNT(GROUP,%Closest%.Diff_name2_lname);
+    Count_Diff_name2_name_suffix := COUNT(GROUP,%Closest%.Diff_name2_name_suffix);
+    Count_Diff_name2_name_score := COUNT(GROUP,%Closest%.Diff_name2_name_score);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;

@@ -15,6 +15,7 @@ EXPORT Input_FL_Filing_Scrubs := MODULE
     UNSIGNED1 prep_addr_line_last_Invalid;
     UNSIGNED1 prep_owner_addr_line1_Invalid;
     UNSIGNED1 prep_owner_addr_line_last_Invalid;
+    UNSIGNED1 seq_Invalid;
   END;
   EXPORT  Bitmap_Layout := RECORD(Input_FL_Filing_Layout_FBNV2)
     UNSIGNED8 ScrubsBits1;
@@ -32,12 +33,13 @@ EXPORT FromNone(DATASET(Input_FL_Filing_Layout_FBNV2) h) := MODULE
     SELF.prep_addr_line_last_Invalid := Input_FL_Filing_Fields.InValid_prep_addr_line_last((SALT37.StrType)le.prep_addr_line_last);
     SELF.prep_owner_addr_line1_Invalid := Input_FL_Filing_Fields.InValid_prep_owner_addr_line1((SALT37.StrType)le.prep_owner_addr_line1);
     SELF.prep_owner_addr_line_last_Invalid := Input_FL_Filing_Fields.InValid_prep_owner_addr_line_last((SALT37.StrType)le.prep_owner_addr_line_last);
+    SELF.seq_Invalid := Input_FL_Filing_Fields.InValid_seq((SALT37.StrType)le.seq);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Input_FL_Filing_Layout_FBNV2);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.fic_fil_name_Invalid << 0 ) + ( le.fic_owner_name_Invalid << 1 ) + ( le.fic_fil_date_Invalid << 2 ) + ( le.fic_fil_doc_num_Invalid << 3 ) + ( le.fic_owner_doc_num_Invalid << 4 ) + ( le.p_owner_name_Invalid << 5 ) + ( le.c_owner_name_Invalid << 6 ) + ( le.prep_addr_line1_Invalid << 7 ) + ( le.prep_addr_line_last_Invalid << 8 ) + ( le.prep_owner_addr_line1_Invalid << 9 ) + ( le.prep_owner_addr_line_last_Invalid << 10 );
+    SELF.ScrubsBits1 := ( le.fic_fil_name_Invalid << 0 ) + ( le.fic_owner_name_Invalid << 1 ) + ( le.fic_fil_date_Invalid << 2 ) + ( le.fic_fil_doc_num_Invalid << 3 ) + ( le.fic_owner_doc_num_Invalid << 4 ) + ( le.p_owner_name_Invalid << 5 ) + ( le.c_owner_name_Invalid << 6 ) + ( le.prep_addr_line1_Invalid << 7 ) + ( le.prep_addr_line_last_Invalid << 8 ) + ( le.prep_owner_addr_line1_Invalid << 9 ) + ( le.prep_owner_addr_line_last_Invalid << 10 ) + ( le.seq_Invalid << 11 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -57,6 +59,7 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.prep_addr_line_last_Invalid := (le.ScrubsBits1 >> 8) & 1;
     SELF.prep_owner_addr_line1_Invalid := (le.ScrubsBits1 >> 9) & 1;
     SELF.prep_owner_addr_line_last_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.seq_Invalid := (le.ScrubsBits1 >> 11) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -76,6 +79,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     prep_addr_line_last_LENGTH_ErrorCount := COUNT(GROUP,h.prep_addr_line_last_Invalid=1);
     prep_owner_addr_line1_LENGTH_ErrorCount := COUNT(GROUP,h.prep_owner_addr_line1_Invalid=1);
     prep_owner_addr_line_last_LENGTH_ErrorCount := COUNT(GROUP,h.prep_owner_addr_line_last_Invalid=1);
+    seq_LENGTH_ErrorCount := COUNT(GROUP,h.seq_Invalid=1);
   END;
   EXPORT SummaryStats := TABLE(h,r);
   r := RECORD
@@ -88,8 +92,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.fic_fil_name_Invalid,le.fic_owner_name_Invalid,le.fic_fil_date_Invalid,le.fic_fil_doc_num_Invalid,le.fic_owner_doc_num_Invalid,le.p_owner_name_Invalid,le.c_owner_name_Invalid,le.prep_addr_line1_Invalid,le.prep_addr_line_last_Invalid,le.prep_owner_addr_line1_Invalid,le.prep_owner_addr_line_last_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_FL_Filing_Fields.InvalidMessage_fic_fil_name(le.fic_fil_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_owner_name(le.fic_owner_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_fil_date(le.fic_fil_date_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_fil_doc_num(le.fic_fil_doc_num_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_owner_doc_num(le.fic_owner_doc_num_Invalid),Input_FL_Filing_Fields.InvalidMessage_p_owner_name(le.p_owner_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_c_owner_name(le.c_owner_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_addr_line1(le.prep_addr_line1_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_addr_line_last(le.prep_addr_line_last_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_owner_addr_line1(le.prep_owner_addr_line1_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_owner_addr_line_last(le.prep_owner_addr_line_last_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.fic_fil_name_Invalid,le.fic_owner_name_Invalid,le.fic_fil_date_Invalid,le.fic_fil_doc_num_Invalid,le.fic_owner_doc_num_Invalid,le.p_owner_name_Invalid,le.c_owner_name_Invalid,le.prep_addr_line1_Invalid,le.prep_addr_line_last_Invalid,le.prep_owner_addr_line1_Invalid,le.prep_owner_addr_line_last_Invalid,le.seq_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Input_FL_Filing_Fields.InvalidMessage_fic_fil_name(le.fic_fil_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_owner_name(le.fic_owner_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_fil_date(le.fic_fil_date_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_fil_doc_num(le.fic_fil_doc_num_Invalid),Input_FL_Filing_Fields.InvalidMessage_fic_owner_doc_num(le.fic_owner_doc_num_Invalid),Input_FL_Filing_Fields.InvalidMessage_p_owner_name(le.p_owner_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_c_owner_name(le.c_owner_name_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_addr_line1(le.prep_addr_line1_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_addr_line_last(le.prep_addr_line_last_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_owner_addr_line1(le.prep_owner_addr_line1_Invalid),Input_FL_Filing_Fields.InvalidMessage_prep_owner_addr_line_last(le.prep_owner_addr_line_last_Invalid),Input_FL_Filing_Fields.InvalidMessage_seq(le.seq_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.fic_fil_name_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.fic_owner_name_Invalid,'LENGTH','UNKNOWN')
@@ -101,12 +105,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.prep_addr_line1_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.prep_addr_line_last_Invalid,'LENGTH','UNKNOWN')
           ,CHOOSE(le.prep_owner_addr_line1_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.prep_owner_addr_line_last_Invalid,'LENGTH','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'fic_fil_name','fic_owner_name','fic_fil_date','fic_fil_doc_num','fic_owner_doc_num','p_owner_name','c_owner_name','prep_addr_line1','prep_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_mandatory','invalid_mandatory','invalid_general_date','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.fic_fil_name,(SALT37.StrType)le.fic_owner_name,(SALT37.StrType)le.fic_fil_date,(SALT37.StrType)le.fic_fil_doc_num,(SALT37.StrType)le.fic_owner_doc_num,(SALT37.StrType)le.p_owner_name,(SALT37.StrType)le.c_owner_name,(SALT37.StrType)le.prep_addr_line1,(SALT37.StrType)le.prep_addr_line_last,(SALT37.StrType)le.prep_owner_addr_line1,(SALT37.StrType)le.prep_owner_addr_line_last,'***SALTBUG***');
+          ,CHOOSE(le.prep_owner_addr_line_last_Invalid,'LENGTH','UNKNOWN')
+          ,CHOOSE(le.seq_Invalid,'LENGTH','UNKNOWN'),'UNKNOWN'));
+    SELF.FieldName := CHOOSE(c,'fic_fil_name','fic_owner_name','fic_fil_date','fic_fil_doc_num','fic_owner_doc_num','p_owner_name','c_owner_name','prep_addr_line1','prep_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last','seq','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_mandatory','invalid_mandatory','invalid_general_date','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_mandatory','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.fic_fil_name,(SALT37.StrType)le.fic_owner_name,(SALT37.StrType)le.fic_fil_date,(SALT37.StrType)le.fic_fil_doc_num,(SALT37.StrType)le.fic_owner_doc_num,(SALT37.StrType)le.p_owner_name,(SALT37.StrType)le.c_owner_name,(SALT37.StrType)le.prep_addr_line1,(SALT37.StrType)le.prep_addr_line_last,(SALT37.StrType)le.prep_owner_addr_line1,(SALT37.StrType)le.prep_owner_addr_line_last,(SALT37.StrType)le.seq,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,11,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,12,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -126,7 +131,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'prep_addr_line1:invalid_mandatory:LENGTH'
           ,'prep_addr_line_last:invalid_mandatory:LENGTH'
           ,'prep_owner_addr_line1:invalid_mandatory:LENGTH'
-          ,'prep_owner_addr_line_last:invalid_mandatory:LENGTH','UNKNOWN');
+          ,'prep_owner_addr_line_last:invalid_mandatory:LENGTH'
+          ,'seq:invalid_mandatory:LENGTH','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
           ,Input_FL_Filing_Fields.InvalidMessage_fic_fil_name(1)
           ,Input_FL_Filing_Fields.InvalidMessage_fic_owner_name(1)
@@ -138,7 +144,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Input_FL_Filing_Fields.InvalidMessage_prep_addr_line1(1)
           ,Input_FL_Filing_Fields.InvalidMessage_prep_addr_line_last(1)
           ,Input_FL_Filing_Fields.InvalidMessage_prep_owner_addr_line1(1)
-          ,Input_FL_Filing_Fields.InvalidMessage_prep_owner_addr_line_last(1),'UNKNOWN');
+          ,Input_FL_Filing_Fields.InvalidMessage_prep_owner_addr_line_last(1)
+          ,Input_FL_Filing_Fields.InvalidMessage_seq(1),'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.fic_fil_name_LENGTH_ErrorCount
           ,le.fic_owner_name_LENGTH_ErrorCount
@@ -150,7 +157,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.prep_addr_line1_LENGTH_ErrorCount
           ,le.prep_addr_line_last_LENGTH_ErrorCount
           ,le.prep_owner_addr_line1_LENGTH_ErrorCount
-          ,le.prep_owner_addr_line_last_LENGTH_ErrorCount,0);
+          ,le.prep_owner_addr_line_last_LENGTH_ErrorCount
+          ,le.seq_LENGTH_ErrorCount,0);
       SELF.rulepcnt := 100 * CHOOSE(c
           ,le.fic_fil_name_LENGTH_ErrorCount
           ,le.fic_owner_name_LENGTH_ErrorCount
@@ -162,9 +170,10 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.prep_addr_line1_LENGTH_ErrorCount
           ,le.prep_addr_line_last_LENGTH_ErrorCount
           ,le.prep_owner_addr_line1_LENGTH_ErrorCount
-          ,le.prep_owner_addr_line_last_LENGTH_ErrorCount,0) / le.TotalCnt + 0.5;
+          ,le.prep_owner_addr_line_last_LENGTH_ErrorCount
+          ,le.seq_LENGTH_ErrorCount,0) / le.TotalCnt + 0.5;
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,11,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,12,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;

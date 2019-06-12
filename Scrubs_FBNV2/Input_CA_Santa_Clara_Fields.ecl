@@ -198,8 +198,8 @@ EXPORT InValidMessageFT_invalid_bus_status(UNSIGNED1 wh) := CHOOSE(wh,SALT37.Hyg
 EXPORT MakeFT_invalid_filing_type(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME; CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
-EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME; CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME:TYPE(STRING):0,0 CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
+EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME:TYPE(STRING):0,0 CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_seq_no(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,' 01234'); // Only allow valid symbols
@@ -267,11 +267,11 @@ EXPORT InValidFT_invalid_norm_type(SALT37.StrType s) := WHICH(((SALT37.StrType) 
 EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('D|L'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_email(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'))));
-EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_yes_blank(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -339,8 +339,8 @@ END;
 EXPORT InValidFT_invalid_contact_name_format(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['C','P']);
 EXPORT InValidMessageFT_invalid_contact_name_format(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('C|P'),SALT37.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'business_name','filed_date','orig_filed_date','fbn_num','orig_fbn_num','filing_type','owner_name','prep_addr_line1','prep_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'business_name' => 0,'filed_date' => 1,'orig_filed_date' => 2,'fbn_num' => 3,'orig_fbn_num' => 4,'filing_type' => 5,'owner_name' => 6,'prep_addr_line1' => 7,'prep_addr_line_last' => 8,'prep_owner_addr_line1' => 9,'prep_owner_addr_line_last' => 10,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'business_name','filed_date','orig_filed_date','fbn_num','filing_type','owner_name','prep_addr_line1','prep_addr_line_last','status','FBN_TYPE','BUSINESS_TYPE','ORIG_FBN_NUM','RECORD_CODE1','BUSINESS_ADDR1','RECORD_CODE2','BUSINESS_ADDR2','RECORD_CODE3','BUS_CITY','BUS_ST','BUS_ZIP','RECORD_CODE4','ADDTL_BUSINESS','RECORD_CODE5','OWNER_TYPE','RECORD_CODE6','OWNER_ADDR1','OWNER_CITY','OWNER_ST','OWNER_ZIP','Owner_title','Owner_fname','Owner_mname','Owner_lname','Owner_name_suffix','Owner_name_score','prep_owner_addr_line1','prep_owner_addr_line_last');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'business_name' => 0,'filed_date' => 1,'orig_filed_date' => 2,'fbn_num' => 3,'filing_type' => 4,'owner_name' => 5,'prep_addr_line1' => 6,'prep_addr_line_last' => 7,'status' => 8,'FBN_TYPE' => 9,'BUSINESS_TYPE' => 10,'ORIG_FBN_NUM' => 11,'RECORD_CODE1' => 12,'BUSINESS_ADDR1' => 13,'RECORD_CODE2' => 14,'BUSINESS_ADDR2' => 15,'RECORD_CODE3' => 16,'BUS_CITY' => 17,'BUS_ST' => 18,'BUS_ZIP' => 19,'RECORD_CODE4' => 20,'ADDTL_BUSINESS' => 21,'RECORD_CODE5' => 22,'OWNER_TYPE' => 23,'RECORD_CODE6' => 24,'OWNER_ADDR1' => 25,'OWNER_CITY' => 26,'OWNER_ST' => 27,'OWNER_ZIP' => 28,'Owner_title' => 29,'Owner_fname' => 30,'Owner_mname' => 31,'Owner_lname' => 32,'Owner_name_suffix' => 33,'Owner_name_score' => 34,'prep_owner_addr_line1' => 35,'prep_owner_addr_line_last' => 36,0);
  
 //Individual field level validation
  
@@ -360,10 +360,6 @@ EXPORT Make_fbn_num(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_fbn_num(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_fbn_num(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_orig_fbn_num(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_orig_fbn_num(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_orig_fbn_num(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
- 
 EXPORT Make_filing_type(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_filing_type(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_filing_type(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
@@ -380,13 +376,121 @@ EXPORT Make_prep_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_mandatory(s
 EXPORT InValid_prep_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_prep_owner_addr_line1(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_prep_owner_addr_line1(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_prep_owner_addr_line1(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+EXPORT Make_status(SALT37.StrType s0) := s0;
+EXPORT InValid_status(SALT37.StrType s) := 0;
+EXPORT InValidMessage_status(UNSIGNED1 wh) := '';
  
-EXPORT Make_prep_owner_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_prep_owner_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_prep_owner_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+EXPORT Make_FBN_TYPE(SALT37.StrType s0) := s0;
+EXPORT InValid_FBN_TYPE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FBN_TYPE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUSINESS_TYPE(SALT37.StrType s0) := s0;
+EXPORT InValid_BUSINESS_TYPE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUSINESS_TYPE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ORIG_FBN_NUM(SALT37.StrType s0) := s0;
+EXPORT InValid_ORIG_FBN_NUM(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ORIG_FBN_NUM(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_RECORD_CODE1(SALT37.StrType s0) := s0;
+EXPORT InValid_RECORD_CODE1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_RECORD_CODE1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUSINESS_ADDR1(SALT37.StrType s0) := s0;
+EXPORT InValid_BUSINESS_ADDR1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUSINESS_ADDR1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_RECORD_CODE2(SALT37.StrType s0) := s0;
+EXPORT InValid_RECORD_CODE2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_RECORD_CODE2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUSINESS_ADDR2(SALT37.StrType s0) := s0;
+EXPORT InValid_BUSINESS_ADDR2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUSINESS_ADDR2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_RECORD_CODE3(SALT37.StrType s0) := s0;
+EXPORT InValid_RECORD_CODE3(SALT37.StrType s) := 0;
+EXPORT InValidMessage_RECORD_CODE3(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUS_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_BUS_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUS_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUS_ST(SALT37.StrType s0) := s0;
+EXPORT InValid_BUS_ST(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUS_ST(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUS_ZIP(SALT37.StrType s0) := s0;
+EXPORT InValid_BUS_ZIP(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUS_ZIP(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_RECORD_CODE4(SALT37.StrType s0) := s0;
+EXPORT InValid_RECORD_CODE4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_RECORD_CODE4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ADDTL_BUSINESS(SALT37.StrType s0) := s0;
+EXPORT InValid_ADDTL_BUSINESS(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ADDTL_BUSINESS(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_RECORD_CODE5(SALT37.StrType s0) := s0;
+EXPORT InValid_RECORD_CODE5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_RECORD_CODE5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_OWNER_TYPE(SALT37.StrType s0) := s0;
+EXPORT InValid_OWNER_TYPE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_OWNER_TYPE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_RECORD_CODE6(SALT37.StrType s0) := s0;
+EXPORT InValid_RECORD_CODE6(SALT37.StrType s) := 0;
+EXPORT InValidMessage_RECORD_CODE6(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_OWNER_ADDR1(SALT37.StrType s0) := s0;
+EXPORT InValid_OWNER_ADDR1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_OWNER_ADDR1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_OWNER_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_OWNER_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_OWNER_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_OWNER_ST(SALT37.StrType s0) := s0;
+EXPORT InValid_OWNER_ST(SALT37.StrType s) := 0;
+EXPORT InValidMessage_OWNER_ST(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_OWNER_ZIP(SALT37.StrType s0) := s0;
+EXPORT InValid_OWNER_ZIP(SALT37.StrType s) := 0;
+EXPORT InValidMessage_OWNER_ZIP(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_title(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_title(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_title(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_fname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_fname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_fname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_mname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_mname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_mname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_lname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_lname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_lname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_name_suffix(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_name_suffix(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_name_suffix(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_name_score(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_name_score(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_name_score(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_prep_owner_addr_line1(SALT37.StrType s0) := s0;
+EXPORT InValid_prep_owner_addr_line1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_prep_owner_addr_line1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_prep_owner_addr_line_last(SALT37.StrType s0) := s0;
+EXPORT InValid_prep_owner_addr_line_last(SALT37.StrType s) := 0;
+EXPORT InValidMessage_prep_owner_addr_line_last(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
@@ -413,11 +517,37 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_filed_date;
     BOOLEAN Diff_orig_filed_date;
     BOOLEAN Diff_fbn_num;
-    BOOLEAN Diff_orig_fbn_num;
     BOOLEAN Diff_filing_type;
     BOOLEAN Diff_owner_name;
     BOOLEAN Diff_prep_addr_line1;
     BOOLEAN Diff_prep_addr_line_last;
+    BOOLEAN Diff_status;
+    BOOLEAN Diff_FBN_TYPE;
+    BOOLEAN Diff_BUSINESS_TYPE;
+    BOOLEAN Diff_ORIG_FBN_NUM;
+    BOOLEAN Diff_RECORD_CODE1;
+    BOOLEAN Diff_BUSINESS_ADDR1;
+    BOOLEAN Diff_RECORD_CODE2;
+    BOOLEAN Diff_BUSINESS_ADDR2;
+    BOOLEAN Diff_RECORD_CODE3;
+    BOOLEAN Diff_BUS_CITY;
+    BOOLEAN Diff_BUS_ST;
+    BOOLEAN Diff_BUS_ZIP;
+    BOOLEAN Diff_RECORD_CODE4;
+    BOOLEAN Diff_ADDTL_BUSINESS;
+    BOOLEAN Diff_RECORD_CODE5;
+    BOOLEAN Diff_OWNER_TYPE;
+    BOOLEAN Diff_RECORD_CODE6;
+    BOOLEAN Diff_OWNER_ADDR1;
+    BOOLEAN Diff_OWNER_CITY;
+    BOOLEAN Diff_OWNER_ST;
+    BOOLEAN Diff_OWNER_ZIP;
+    BOOLEAN Diff_Owner_title;
+    BOOLEAN Diff_Owner_fname;
+    BOOLEAN Diff_Owner_mname;
+    BOOLEAN Diff_Owner_lname;
+    BOOLEAN Diff_Owner_name_suffix;
+    BOOLEAN Diff_Owner_name_score;
     BOOLEAN Diff_prep_owner_addr_line1;
     BOOLEAN Diff_prep_owner_addr_line_last;
     UNSIGNED Num_Diffs;
@@ -429,15 +559,41 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_filed_date := le.filed_date <> ri.filed_date;
     SELF.Diff_orig_filed_date := le.orig_filed_date <> ri.orig_filed_date;
     SELF.Diff_fbn_num := le.fbn_num <> ri.fbn_num;
-    SELF.Diff_orig_fbn_num := le.orig_fbn_num <> ri.orig_fbn_num;
     SELF.Diff_filing_type := le.filing_type <> ri.filing_type;
     SELF.Diff_owner_name := le.owner_name <> ri.owner_name;
     SELF.Diff_prep_addr_line1 := le.prep_addr_line1 <> ri.prep_addr_line1;
     SELF.Diff_prep_addr_line_last := le.prep_addr_line_last <> ri.prep_addr_line_last;
+    SELF.Diff_status := le.status <> ri.status;
+    SELF.Diff_FBN_TYPE := le.FBN_TYPE <> ri.FBN_TYPE;
+    SELF.Diff_BUSINESS_TYPE := le.BUSINESS_TYPE <> ri.BUSINESS_TYPE;
+    SELF.Diff_ORIG_FBN_NUM := le.ORIG_FBN_NUM <> ri.ORIG_FBN_NUM;
+    SELF.Diff_RECORD_CODE1 := le.RECORD_CODE1 <> ri.RECORD_CODE1;
+    SELF.Diff_BUSINESS_ADDR1 := le.BUSINESS_ADDR1 <> ri.BUSINESS_ADDR1;
+    SELF.Diff_RECORD_CODE2 := le.RECORD_CODE2 <> ri.RECORD_CODE2;
+    SELF.Diff_BUSINESS_ADDR2 := le.BUSINESS_ADDR2 <> ri.BUSINESS_ADDR2;
+    SELF.Diff_RECORD_CODE3 := le.RECORD_CODE3 <> ri.RECORD_CODE3;
+    SELF.Diff_BUS_CITY := le.BUS_CITY <> ri.BUS_CITY;
+    SELF.Diff_BUS_ST := le.BUS_ST <> ri.BUS_ST;
+    SELF.Diff_BUS_ZIP := le.BUS_ZIP <> ri.BUS_ZIP;
+    SELF.Diff_RECORD_CODE4 := le.RECORD_CODE4 <> ri.RECORD_CODE4;
+    SELF.Diff_ADDTL_BUSINESS := le.ADDTL_BUSINESS <> ri.ADDTL_BUSINESS;
+    SELF.Diff_RECORD_CODE5 := le.RECORD_CODE5 <> ri.RECORD_CODE5;
+    SELF.Diff_OWNER_TYPE := le.OWNER_TYPE <> ri.OWNER_TYPE;
+    SELF.Diff_RECORD_CODE6 := le.RECORD_CODE6 <> ri.RECORD_CODE6;
+    SELF.Diff_OWNER_ADDR1 := le.OWNER_ADDR1 <> ri.OWNER_ADDR1;
+    SELF.Diff_OWNER_CITY := le.OWNER_CITY <> ri.OWNER_CITY;
+    SELF.Diff_OWNER_ST := le.OWNER_ST <> ri.OWNER_ST;
+    SELF.Diff_OWNER_ZIP := le.OWNER_ZIP <> ri.OWNER_ZIP;
+    SELF.Diff_Owner_title := le.Owner_title <> ri.Owner_title;
+    SELF.Diff_Owner_fname := le.Owner_fname <> ri.Owner_fname;
+    SELF.Diff_Owner_mname := le.Owner_mname <> ri.Owner_mname;
+    SELF.Diff_Owner_lname := le.Owner_lname <> ri.Owner_lname;
+    SELF.Diff_Owner_name_suffix := le.Owner_name_suffix <> ri.Owner_name_suffix;
+    SELF.Diff_Owner_name_score := le.Owner_name_score <> ri.Owner_name_score;
     SELF.Diff_prep_owner_addr_line1 := le.prep_owner_addr_line1 <> ri.prep_owner_addr_line1;
     SELF.Diff_prep_owner_addr_line_last := le.prep_owner_addr_line_last <> ri.prep_owner_addr_line_last;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_business_name,1,0)+ IF( SELF.Diff_filed_date,1,0)+ IF( SELF.Diff_orig_filed_date,1,0)+ IF( SELF.Diff_fbn_num,1,0)+ IF( SELF.Diff_orig_fbn_num,1,0)+ IF( SELF.Diff_filing_type,1,0)+ IF( SELF.Diff_owner_name,1,0)+ IF( SELF.Diff_prep_addr_line1,1,0)+ IF( SELF.Diff_prep_addr_line_last,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_business_name,1,0)+ IF( SELF.Diff_filed_date,1,0)+ IF( SELF.Diff_orig_filed_date,1,0)+ IF( SELF.Diff_fbn_num,1,0)+ IF( SELF.Diff_filing_type,1,0)+ IF( SELF.Diff_owner_name,1,0)+ IF( SELF.Diff_prep_addr_line1,1,0)+ IF( SELF.Diff_prep_addr_line_last,1,0)+ IF( SELF.Diff_status,1,0)+ IF( SELF.Diff_FBN_TYPE,1,0)+ IF( SELF.Diff_BUSINESS_TYPE,1,0)+ IF( SELF.Diff_ORIG_FBN_NUM,1,0)+ IF( SELF.Diff_RECORD_CODE1,1,0)+ IF( SELF.Diff_BUSINESS_ADDR1,1,0)+ IF( SELF.Diff_RECORD_CODE2,1,0)+ IF( SELF.Diff_BUSINESS_ADDR2,1,0)+ IF( SELF.Diff_RECORD_CODE3,1,0)+ IF( SELF.Diff_BUS_CITY,1,0)+ IF( SELF.Diff_BUS_ST,1,0)+ IF( SELF.Diff_BUS_ZIP,1,0)+ IF( SELF.Diff_RECORD_CODE4,1,0)+ IF( SELF.Diff_ADDTL_BUSINESS,1,0)+ IF( SELF.Diff_RECORD_CODE5,1,0)+ IF( SELF.Diff_OWNER_TYPE,1,0)+ IF( SELF.Diff_RECORD_CODE6,1,0)+ IF( SELF.Diff_OWNER_ADDR1,1,0)+ IF( SELF.Diff_OWNER_CITY,1,0)+ IF( SELF.Diff_OWNER_ST,1,0)+ IF( SELF.Diff_OWNER_ZIP,1,0)+ IF( SELF.Diff_Owner_title,1,0)+ IF( SELF.Diff_Owner_fname,1,0)+ IF( SELF.Diff_Owner_mname,1,0)+ IF( SELF.Diff_Owner_lname,1,0)+ IF( SELF.Diff_Owner_name_suffix,1,0)+ IF( SELF.Diff_Owner_name_score,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -454,11 +610,37 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_filed_date := COUNT(GROUP,%Closest%.Diff_filed_date);
     Count_Diff_orig_filed_date := COUNT(GROUP,%Closest%.Diff_orig_filed_date);
     Count_Diff_fbn_num := COUNT(GROUP,%Closest%.Diff_fbn_num);
-    Count_Diff_orig_fbn_num := COUNT(GROUP,%Closest%.Diff_orig_fbn_num);
     Count_Diff_filing_type := COUNT(GROUP,%Closest%.Diff_filing_type);
     Count_Diff_owner_name := COUNT(GROUP,%Closest%.Diff_owner_name);
     Count_Diff_prep_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_addr_line1);
     Count_Diff_prep_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_addr_line_last);
+    Count_Diff_status := COUNT(GROUP,%Closest%.Diff_status);
+    Count_Diff_FBN_TYPE := COUNT(GROUP,%Closest%.Diff_FBN_TYPE);
+    Count_Diff_BUSINESS_TYPE := COUNT(GROUP,%Closest%.Diff_BUSINESS_TYPE);
+    Count_Diff_ORIG_FBN_NUM := COUNT(GROUP,%Closest%.Diff_ORIG_FBN_NUM);
+    Count_Diff_RECORD_CODE1 := COUNT(GROUP,%Closest%.Diff_RECORD_CODE1);
+    Count_Diff_BUSINESS_ADDR1 := COUNT(GROUP,%Closest%.Diff_BUSINESS_ADDR1);
+    Count_Diff_RECORD_CODE2 := COUNT(GROUP,%Closest%.Diff_RECORD_CODE2);
+    Count_Diff_BUSINESS_ADDR2 := COUNT(GROUP,%Closest%.Diff_BUSINESS_ADDR2);
+    Count_Diff_RECORD_CODE3 := COUNT(GROUP,%Closest%.Diff_RECORD_CODE3);
+    Count_Diff_BUS_CITY := COUNT(GROUP,%Closest%.Diff_BUS_CITY);
+    Count_Diff_BUS_ST := COUNT(GROUP,%Closest%.Diff_BUS_ST);
+    Count_Diff_BUS_ZIP := COUNT(GROUP,%Closest%.Diff_BUS_ZIP);
+    Count_Diff_RECORD_CODE4 := COUNT(GROUP,%Closest%.Diff_RECORD_CODE4);
+    Count_Diff_ADDTL_BUSINESS := COUNT(GROUP,%Closest%.Diff_ADDTL_BUSINESS);
+    Count_Diff_RECORD_CODE5 := COUNT(GROUP,%Closest%.Diff_RECORD_CODE5);
+    Count_Diff_OWNER_TYPE := COUNT(GROUP,%Closest%.Diff_OWNER_TYPE);
+    Count_Diff_RECORD_CODE6 := COUNT(GROUP,%Closest%.Diff_RECORD_CODE6);
+    Count_Diff_OWNER_ADDR1 := COUNT(GROUP,%Closest%.Diff_OWNER_ADDR1);
+    Count_Diff_OWNER_CITY := COUNT(GROUP,%Closest%.Diff_OWNER_CITY);
+    Count_Diff_OWNER_ST := COUNT(GROUP,%Closest%.Diff_OWNER_ST);
+    Count_Diff_OWNER_ZIP := COUNT(GROUP,%Closest%.Diff_OWNER_ZIP);
+    Count_Diff_Owner_title := COUNT(GROUP,%Closest%.Diff_Owner_title);
+    Count_Diff_Owner_fname := COUNT(GROUP,%Closest%.Diff_Owner_fname);
+    Count_Diff_Owner_mname := COUNT(GROUP,%Closest%.Diff_Owner_mname);
+    Count_Diff_Owner_lname := COUNT(GROUP,%Closest%.Diff_Owner_lname);
+    Count_Diff_Owner_name_suffix := COUNT(GROUP,%Closest%.Diff_Owner_name_suffix);
+    Count_Diff_Owner_name_score := COUNT(GROUP,%Closest%.Diff_Owner_name_score);
     Count_Diff_prep_owner_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line1);
     Count_Diff_prep_owner_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line_last);
   END;

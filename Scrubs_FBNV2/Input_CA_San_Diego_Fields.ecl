@@ -198,8 +198,8 @@ EXPORT InValidMessageFT_invalid_bus_status(UNSIGNED1 wh) := CHOOSE(wh,SALT37.Hyg
 EXPORT MakeFT_invalid_filing_type(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME; CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
-EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME; CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME:TYPE(STRING):0,0 CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
+EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME:TYPE(STRING):0,0 CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_seq_no(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,' 01234'); // Only allow valid symbols
@@ -267,11 +267,11 @@ EXPORT InValidFT_invalid_norm_type(SALT37.StrType s) := WHICH(((SALT37.StrType) 
 EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('D|L'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_email(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'))));
-EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_yes_blank(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -339,8 +339,8 @@ END;
 EXPORT InValidFT_invalid_contact_name_format(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['C','P']);
 EXPORT InValidMessageFT_invalid_contact_name_format(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('C|P'),SALT37.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'business_name','file_date','prev_file_date','file_number','prev_file_number','filing_type','owner_name','prep_addr_line1','prep_addr_line_last','prep_mail_addr_line1','prep_mail_addr_line_last');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'business_name' => 0,'file_date' => 1,'prev_file_date' => 2,'file_number' => 3,'prev_file_number' => 4,'filing_type' => 5,'owner_name' => 6,'prep_addr_line1' => 7,'prep_addr_line_last' => 8,'prep_mail_addr_line1' => 9,'prep_mail_addr_line_last' => 10,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'business_name','file_date','prev_file_date','file_number','prev_file_number','filing_type','prep_addr_line1','prep_addr_line_last','TYPE_OF_RECORD','OWNER_NAME','fbn_type','PNAME','EXPIRATION_DATE','BUSINESS_START_DATE','OWNERSHIP_TYPE','TYPE_OF_NAME','TYPE_OF_NAME_SEQ_NUM','STREET_ADDRESS1','STREET_ADDRESS2','CITY','STATE','ZIP_CODE','COUNTRY','MAILING_ADDRESS1','MAILING_ADDRESS2','MAILING_CITY','MAILING_STATE','MAILING_ZIP_CODE','MAILING_COUNTRY','prep_mail_addr_line1','prep_mail_addr_line_last');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'business_name' => 0,'file_date' => 1,'prev_file_date' => 2,'file_number' => 3,'prev_file_number' => 4,'filing_type' => 5,'prep_addr_line1' => 6,'prep_addr_line_last' => 7,'TYPE_OF_RECORD' => 8,'OWNER_NAME' => 9,'fbn_type' => 10,'PNAME' => 11,'EXPIRATION_DATE' => 12,'BUSINESS_START_DATE' => 13,'OWNERSHIP_TYPE' => 14,'TYPE_OF_NAME' => 15,'TYPE_OF_NAME_SEQ_NUM' => 16,'STREET_ADDRESS1' => 17,'STREET_ADDRESS2' => 18,'CITY' => 19,'STATE' => 20,'ZIP_CODE' => 21,'COUNTRY' => 22,'MAILING_ADDRESS1' => 23,'MAILING_ADDRESS2' => 24,'MAILING_CITY' => 25,'MAILING_STATE' => 26,'MAILING_ZIP_CODE' => 27,'MAILING_COUNTRY' => 28,'prep_mail_addr_line1' => 29,'prep_mail_addr_line_last' => 30,0);
  
 //Individual field level validation
  
@@ -368,10 +368,6 @@ EXPORT Make_filing_type(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_filing_type(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_filing_type(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_owner_name(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_owner_name(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_owner_name(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
- 
 EXPORT Make_prep_addr_line1(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_prep_addr_line1(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_addr_line1(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
@@ -380,13 +376,97 @@ EXPORT Make_prep_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_mandatory(s
 EXPORT InValid_prep_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_prep_mail_addr_line1(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_prep_mail_addr_line1(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_prep_mail_addr_line1(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+EXPORT Make_TYPE_OF_RECORD(SALT37.StrType s0) := s0;
+EXPORT InValid_TYPE_OF_RECORD(SALT37.StrType s) := 0;
+EXPORT InValidMessage_TYPE_OF_RECORD(UNSIGNED1 wh) := '';
  
-EXPORT Make_prep_mail_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_prep_mail_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_prep_mail_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+EXPORT Make_OWNER_NAME(SALT37.StrType s0) := s0;
+EXPORT InValid_OWNER_NAME(SALT37.StrType s) := 0;
+EXPORT InValidMessage_OWNER_NAME(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_fbn_type(SALT37.StrType s0) := s0;
+EXPORT InValid_fbn_type(SALT37.StrType s) := 0;
+EXPORT InValidMessage_fbn_type(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_PNAME(SALT37.StrType s0) := s0;
+EXPORT InValid_PNAME(SALT37.StrType s) := 0;
+EXPORT InValidMessage_PNAME(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_EXPIRATION_DATE(SALT37.StrType s0) := s0;
+EXPORT InValid_EXPIRATION_DATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_EXPIRATION_DATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_BUSINESS_START_DATE(SALT37.StrType s0) := s0;
+EXPORT InValid_BUSINESS_START_DATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_BUSINESS_START_DATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_OWNERSHIP_TYPE(SALT37.StrType s0) := s0;
+EXPORT InValid_OWNERSHIP_TYPE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_OWNERSHIP_TYPE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_TYPE_OF_NAME(SALT37.StrType s0) := s0;
+EXPORT InValid_TYPE_OF_NAME(SALT37.StrType s) := 0;
+EXPORT InValidMessage_TYPE_OF_NAME(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_TYPE_OF_NAME_SEQ_NUM(SALT37.StrType s0) := s0;
+EXPORT InValid_TYPE_OF_NAME_SEQ_NUM(SALT37.StrType s) := 0;
+EXPORT InValidMessage_TYPE_OF_NAME_SEQ_NUM(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_STREET_ADDRESS1(SALT37.StrType s0) := s0;
+EXPORT InValid_STREET_ADDRESS1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_STREET_ADDRESS1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_STREET_ADDRESS2(SALT37.StrType s0) := s0;
+EXPORT InValid_STREET_ADDRESS2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_STREET_ADDRESS2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_STATE(SALT37.StrType s0) := s0;
+EXPORT InValid_STATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_STATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ZIP_CODE(SALT37.StrType s0) := s0;
+EXPORT InValid_ZIP_CODE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ZIP_CODE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_COUNTRY(SALT37.StrType s0) := s0;
+EXPORT InValid_COUNTRY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_COUNTRY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_MAILING_ADDRESS1(SALT37.StrType s0) := s0;
+EXPORT InValid_MAILING_ADDRESS1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_MAILING_ADDRESS1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_MAILING_ADDRESS2(SALT37.StrType s0) := s0;
+EXPORT InValid_MAILING_ADDRESS2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_MAILING_ADDRESS2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_MAILING_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_MAILING_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_MAILING_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_MAILING_STATE(SALT37.StrType s0) := s0;
+EXPORT InValid_MAILING_STATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_MAILING_STATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_MAILING_ZIP_CODE(SALT37.StrType s0) := s0;
+EXPORT InValid_MAILING_ZIP_CODE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_MAILING_ZIP_CODE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_MAILING_COUNTRY(SALT37.StrType s0) := s0;
+EXPORT InValid_MAILING_COUNTRY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_MAILING_COUNTRY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_prep_mail_addr_line1(SALT37.StrType s0) := s0;
+EXPORT InValid_prep_mail_addr_line1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_prep_mail_addr_line1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_prep_mail_addr_line_last(SALT37.StrType s0) := s0;
+EXPORT InValid_prep_mail_addr_line_last(SALT37.StrType s) := 0;
+EXPORT InValidMessage_prep_mail_addr_line_last(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
@@ -415,9 +495,29 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_file_number;
     BOOLEAN Diff_prev_file_number;
     BOOLEAN Diff_filing_type;
-    BOOLEAN Diff_owner_name;
     BOOLEAN Diff_prep_addr_line1;
     BOOLEAN Diff_prep_addr_line_last;
+    BOOLEAN Diff_TYPE_OF_RECORD;
+    BOOLEAN Diff_OWNER_NAME;
+    BOOLEAN Diff_fbn_type;
+    BOOLEAN Diff_PNAME;
+    BOOLEAN Diff_EXPIRATION_DATE;
+    BOOLEAN Diff_BUSINESS_START_DATE;
+    BOOLEAN Diff_OWNERSHIP_TYPE;
+    BOOLEAN Diff_TYPE_OF_NAME;
+    BOOLEAN Diff_TYPE_OF_NAME_SEQ_NUM;
+    BOOLEAN Diff_STREET_ADDRESS1;
+    BOOLEAN Diff_STREET_ADDRESS2;
+    BOOLEAN Diff_CITY;
+    BOOLEAN Diff_STATE;
+    BOOLEAN Diff_ZIP_CODE;
+    BOOLEAN Diff_COUNTRY;
+    BOOLEAN Diff_MAILING_ADDRESS1;
+    BOOLEAN Diff_MAILING_ADDRESS2;
+    BOOLEAN Diff_MAILING_CITY;
+    BOOLEAN Diff_MAILING_STATE;
+    BOOLEAN Diff_MAILING_ZIP_CODE;
+    BOOLEAN Diff_MAILING_COUNTRY;
     BOOLEAN Diff_prep_mail_addr_line1;
     BOOLEAN Diff_prep_mail_addr_line_last;
     UNSIGNED Num_Diffs;
@@ -431,13 +531,33 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_file_number := le.file_number <> ri.file_number;
     SELF.Diff_prev_file_number := le.prev_file_number <> ri.prev_file_number;
     SELF.Diff_filing_type := le.filing_type <> ri.filing_type;
-    SELF.Diff_owner_name := le.owner_name <> ri.owner_name;
     SELF.Diff_prep_addr_line1 := le.prep_addr_line1 <> ri.prep_addr_line1;
     SELF.Diff_prep_addr_line_last := le.prep_addr_line_last <> ri.prep_addr_line_last;
+    SELF.Diff_TYPE_OF_RECORD := le.TYPE_OF_RECORD <> ri.TYPE_OF_RECORD;
+    SELF.Diff_OWNER_NAME := le.OWNER_NAME <> ri.OWNER_NAME;
+    SELF.Diff_fbn_type := le.fbn_type <> ri.fbn_type;
+    SELF.Diff_PNAME := le.PNAME <> ri.PNAME;
+    SELF.Diff_EXPIRATION_DATE := le.EXPIRATION_DATE <> ri.EXPIRATION_DATE;
+    SELF.Diff_BUSINESS_START_DATE := le.BUSINESS_START_DATE <> ri.BUSINESS_START_DATE;
+    SELF.Diff_OWNERSHIP_TYPE := le.OWNERSHIP_TYPE <> ri.OWNERSHIP_TYPE;
+    SELF.Diff_TYPE_OF_NAME := le.TYPE_OF_NAME <> ri.TYPE_OF_NAME;
+    SELF.Diff_TYPE_OF_NAME_SEQ_NUM := le.TYPE_OF_NAME_SEQ_NUM <> ri.TYPE_OF_NAME_SEQ_NUM;
+    SELF.Diff_STREET_ADDRESS1 := le.STREET_ADDRESS1 <> ri.STREET_ADDRESS1;
+    SELF.Diff_STREET_ADDRESS2 := le.STREET_ADDRESS2 <> ri.STREET_ADDRESS2;
+    SELF.Diff_CITY := le.CITY <> ri.CITY;
+    SELF.Diff_STATE := le.STATE <> ri.STATE;
+    SELF.Diff_ZIP_CODE := le.ZIP_CODE <> ri.ZIP_CODE;
+    SELF.Diff_COUNTRY := le.COUNTRY <> ri.COUNTRY;
+    SELF.Diff_MAILING_ADDRESS1 := le.MAILING_ADDRESS1 <> ri.MAILING_ADDRESS1;
+    SELF.Diff_MAILING_ADDRESS2 := le.MAILING_ADDRESS2 <> ri.MAILING_ADDRESS2;
+    SELF.Diff_MAILING_CITY := le.MAILING_CITY <> ri.MAILING_CITY;
+    SELF.Diff_MAILING_STATE := le.MAILING_STATE <> ri.MAILING_STATE;
+    SELF.Diff_MAILING_ZIP_CODE := le.MAILING_ZIP_CODE <> ri.MAILING_ZIP_CODE;
+    SELF.Diff_MAILING_COUNTRY := le.MAILING_COUNTRY <> ri.MAILING_COUNTRY;
     SELF.Diff_prep_mail_addr_line1 := le.prep_mail_addr_line1 <> ri.prep_mail_addr_line1;
     SELF.Diff_prep_mail_addr_line_last := le.prep_mail_addr_line_last <> ri.prep_mail_addr_line_last;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_business_name,1,0)+ IF( SELF.Diff_file_date,1,0)+ IF( SELF.Diff_prev_file_date,1,0)+ IF( SELF.Diff_file_number,1,0)+ IF( SELF.Diff_prev_file_number,1,0)+ IF( SELF.Diff_filing_type,1,0)+ IF( SELF.Diff_owner_name,1,0)+ IF( SELF.Diff_prep_addr_line1,1,0)+ IF( SELF.Diff_prep_addr_line_last,1,0)+ IF( SELF.Diff_prep_mail_addr_line1,1,0)+ IF( SELF.Diff_prep_mail_addr_line_last,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_business_name,1,0)+ IF( SELF.Diff_file_date,1,0)+ IF( SELF.Diff_prev_file_date,1,0)+ IF( SELF.Diff_file_number,1,0)+ IF( SELF.Diff_prev_file_number,1,0)+ IF( SELF.Diff_filing_type,1,0)+ IF( SELF.Diff_prep_addr_line1,1,0)+ IF( SELF.Diff_prep_addr_line_last,1,0)+ IF( SELF.Diff_TYPE_OF_RECORD,1,0)+ IF( SELF.Diff_OWNER_NAME,1,0)+ IF( SELF.Diff_fbn_type,1,0)+ IF( SELF.Diff_PNAME,1,0)+ IF( SELF.Diff_EXPIRATION_DATE,1,0)+ IF( SELF.Diff_BUSINESS_START_DATE,1,0)+ IF( SELF.Diff_OWNERSHIP_TYPE,1,0)+ IF( SELF.Diff_TYPE_OF_NAME,1,0)+ IF( SELF.Diff_TYPE_OF_NAME_SEQ_NUM,1,0)+ IF( SELF.Diff_STREET_ADDRESS1,1,0)+ IF( SELF.Diff_STREET_ADDRESS2,1,0)+ IF( SELF.Diff_CITY,1,0)+ IF( SELF.Diff_STATE,1,0)+ IF( SELF.Diff_ZIP_CODE,1,0)+ IF( SELF.Diff_COUNTRY,1,0)+ IF( SELF.Diff_MAILING_ADDRESS1,1,0)+ IF( SELF.Diff_MAILING_ADDRESS2,1,0)+ IF( SELF.Diff_MAILING_CITY,1,0)+ IF( SELF.Diff_MAILING_STATE,1,0)+ IF( SELF.Diff_MAILING_ZIP_CODE,1,0)+ IF( SELF.Diff_MAILING_COUNTRY,1,0)+ IF( SELF.Diff_prep_mail_addr_line1,1,0)+ IF( SELF.Diff_prep_mail_addr_line_last,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -456,9 +576,29 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_file_number := COUNT(GROUP,%Closest%.Diff_file_number);
     Count_Diff_prev_file_number := COUNT(GROUP,%Closest%.Diff_prev_file_number);
     Count_Diff_filing_type := COUNT(GROUP,%Closest%.Diff_filing_type);
-    Count_Diff_owner_name := COUNT(GROUP,%Closest%.Diff_owner_name);
     Count_Diff_prep_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_addr_line1);
     Count_Diff_prep_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_addr_line_last);
+    Count_Diff_TYPE_OF_RECORD := COUNT(GROUP,%Closest%.Diff_TYPE_OF_RECORD);
+    Count_Diff_OWNER_NAME := COUNT(GROUP,%Closest%.Diff_OWNER_NAME);
+    Count_Diff_fbn_type := COUNT(GROUP,%Closest%.Diff_fbn_type);
+    Count_Diff_PNAME := COUNT(GROUP,%Closest%.Diff_PNAME);
+    Count_Diff_EXPIRATION_DATE := COUNT(GROUP,%Closest%.Diff_EXPIRATION_DATE);
+    Count_Diff_BUSINESS_START_DATE := COUNT(GROUP,%Closest%.Diff_BUSINESS_START_DATE);
+    Count_Diff_OWNERSHIP_TYPE := COUNT(GROUP,%Closest%.Diff_OWNERSHIP_TYPE);
+    Count_Diff_TYPE_OF_NAME := COUNT(GROUP,%Closest%.Diff_TYPE_OF_NAME);
+    Count_Diff_TYPE_OF_NAME_SEQ_NUM := COUNT(GROUP,%Closest%.Diff_TYPE_OF_NAME_SEQ_NUM);
+    Count_Diff_STREET_ADDRESS1 := COUNT(GROUP,%Closest%.Diff_STREET_ADDRESS1);
+    Count_Diff_STREET_ADDRESS2 := COUNT(GROUP,%Closest%.Diff_STREET_ADDRESS2);
+    Count_Diff_CITY := COUNT(GROUP,%Closest%.Diff_CITY);
+    Count_Diff_STATE := COUNT(GROUP,%Closest%.Diff_STATE);
+    Count_Diff_ZIP_CODE := COUNT(GROUP,%Closest%.Diff_ZIP_CODE);
+    Count_Diff_COUNTRY := COUNT(GROUP,%Closest%.Diff_COUNTRY);
+    Count_Diff_MAILING_ADDRESS1 := COUNT(GROUP,%Closest%.Diff_MAILING_ADDRESS1);
+    Count_Diff_MAILING_ADDRESS2 := COUNT(GROUP,%Closest%.Diff_MAILING_ADDRESS2);
+    Count_Diff_MAILING_CITY := COUNT(GROUP,%Closest%.Diff_MAILING_CITY);
+    Count_Diff_MAILING_STATE := COUNT(GROUP,%Closest%.Diff_MAILING_STATE);
+    Count_Diff_MAILING_ZIP_CODE := COUNT(GROUP,%Closest%.Diff_MAILING_ZIP_CODE);
+    Count_Diff_MAILING_COUNTRY := COUNT(GROUP,%Closest%.Diff_MAILING_COUNTRY);
     Count_Diff_prep_mail_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_mail_addr_line1);
     Count_Diff_prep_mail_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_mail_addr_line_last);
   END;

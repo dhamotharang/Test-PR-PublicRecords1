@@ -198,8 +198,8 @@ EXPORT InValidMessageFT_invalid_bus_status(UNSIGNED1 wh) := CHOOSE(wh,SALT37.Hyg
 EXPORT MakeFT_invalid_filing_type(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME; CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
-EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME; CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME:TYPE(STRING):0,0 CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
+EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME:TYPE(STRING):0,0 CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_seq_no(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,' 01234'); // Only allow valid symbols
@@ -267,11 +267,11 @@ EXPORT InValidFT_invalid_norm_type(SALT37.StrType s) := WHICH(((SALT37.StrType) 
 EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('D|L'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_email(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'))));
-EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_yes_blank(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -339,8 +339,8 @@ END;
 EXPORT InValidFT_invalid_contact_name_format(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['C','P']);
 EXPORT InValidMessageFT_invalid_contact_name_format(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('C|P'),SALT37.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'action_OWN_name','event_date','event_doc_number','event_orig_doc_number','prep_old_addr_line1','prep_old_addr_line_last','prep_new_addr_line1','prep_new_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'action_OWN_name' => 0,'event_date' => 1,'event_doc_number' => 2,'event_orig_doc_number' => 3,'prep_old_addr_line1' => 4,'prep_old_addr_line_last' => 5,'prep_new_addr_line1' => 6,'prep_new_addr_line_last' => 7,'prep_owner_addr_line1' => 8,'prep_owner_addr_line_last' => 9,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'action_OWN_name','event_date','event_doc_number','event_orig_doc_number','prep_old_addr_line1','prep_old_addr_line_last','prep_new_addr_line1','prep_new_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last','EVENT_FIC_NAME','EVENT_ACTION_CTR','EVENT_SEQ_NUMBER','EVENT_PAGES','ACTION_SEQ_NUMBER','ACTION_CODE','ACTION_VERBAGE','ACTION_OLD_FEI','ACTION_OLD_COUNTY','ACTION_OLD_ADDR1','ACTION_OLD_ADDR2','ACTION_OLD_CITY','ACTION_OLD_STATE','ACTION_OLD_ZIP5','ACTION_OLD_ZIP4','ACTION_OLD_COUNTRY','ACTION_OLD_COUNTRY_DESC','ACTION_NEW_FEI','ACTION_NEW_COUNTY','ACTION_NEW_ADDR1','ACTION_NEW_ADDR2','ACTION_NEW_CITY','ACTION_NEW_STATE','ACTION_NEW_ZIP5','ACTION_NEW_ZIP4','ACTION_NEW_COUNTRY','ACTION_NEW_COUNTRY_DESC','ACTION_OWN_ADDRESS','ACTION_OWN_CITY','ACTION_OWN_STATE','ACTION_OWN_ZIP5','ACTION_OWN_FEI','ACTION_OWN_CHARTER_NUMBER','ACTION_OLD_NAME_SEQ','ACTION_NEW_NAME_SEQ','Owner_title','Owner_fname','Owner_mname','Owner_lname','Owner_name_suffix','Owner_name_score','cname');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'action_OWN_name' => 0,'event_date' => 1,'event_doc_number' => 2,'event_orig_doc_number' => 3,'prep_old_addr_line1' => 4,'prep_old_addr_line_last' => 5,'prep_new_addr_line1' => 6,'prep_new_addr_line_last' => 7,'prep_owner_addr_line1' => 8,'prep_owner_addr_line_last' => 9,'EVENT_FIC_NAME' => 10,'EVENT_ACTION_CTR' => 11,'EVENT_SEQ_NUMBER' => 12,'EVENT_PAGES' => 13,'ACTION_SEQ_NUMBER' => 14,'ACTION_CODE' => 15,'ACTION_VERBAGE' => 16,'ACTION_OLD_FEI' => 17,'ACTION_OLD_COUNTY' => 18,'ACTION_OLD_ADDR1' => 19,'ACTION_OLD_ADDR2' => 20,'ACTION_OLD_CITY' => 21,'ACTION_OLD_STATE' => 22,'ACTION_OLD_ZIP5' => 23,'ACTION_OLD_ZIP4' => 24,'ACTION_OLD_COUNTRY' => 25,'ACTION_OLD_COUNTRY_DESC' => 26,'ACTION_NEW_FEI' => 27,'ACTION_NEW_COUNTY' => 28,'ACTION_NEW_ADDR1' => 29,'ACTION_NEW_ADDR2' => 30,'ACTION_NEW_CITY' => 31,'ACTION_NEW_STATE' => 32,'ACTION_NEW_ZIP5' => 33,'ACTION_NEW_ZIP4' => 34,'ACTION_NEW_COUNTRY' => 35,'ACTION_NEW_COUNTRY_DESC' => 36,'ACTION_OWN_ADDRESS' => 37,'ACTION_OWN_CITY' => 38,'ACTION_OWN_STATE' => 39,'ACTION_OWN_ZIP5' => 40,'ACTION_OWN_FEI' => 41,'ACTION_OWN_CHARTER_NUMBER' => 42,'ACTION_OLD_NAME_SEQ' => 43,'ACTION_NEW_NAME_SEQ' => 44,'Owner_title' => 45,'Owner_fname' => 46,'Owner_mname' => 47,'Owner_lname' => 48,'Owner_name_suffix' => 49,'Owner_name_score' => 50,'cname' => 51,0);
  
 //Individual field level validation
  
@@ -384,6 +384,174 @@ EXPORT Make_prep_owner_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_manda
 EXPORT InValid_prep_owner_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_owner_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
+EXPORT Make_EVENT_FIC_NAME(SALT37.StrType s0) := s0;
+EXPORT InValid_EVENT_FIC_NAME(SALT37.StrType s) := 0;
+EXPORT InValidMessage_EVENT_FIC_NAME(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_EVENT_ACTION_CTR(SALT37.StrType s0) := s0;
+EXPORT InValid_EVENT_ACTION_CTR(SALT37.StrType s) := 0;
+EXPORT InValidMessage_EVENT_ACTION_CTR(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_EVENT_SEQ_NUMBER(SALT37.StrType s0) := s0;
+EXPORT InValid_EVENT_SEQ_NUMBER(SALT37.StrType s) := 0;
+EXPORT InValidMessage_EVENT_SEQ_NUMBER(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_EVENT_PAGES(SALT37.StrType s0) := s0;
+EXPORT InValid_EVENT_PAGES(SALT37.StrType s) := 0;
+EXPORT InValidMessage_EVENT_PAGES(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_SEQ_NUMBER(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_SEQ_NUMBER(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_SEQ_NUMBER(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_CODE(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_CODE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_CODE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_VERBAGE(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_VERBAGE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_VERBAGE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_FEI(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_FEI(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_FEI(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_COUNTY(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_COUNTY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_COUNTY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_ADDR1(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_ADDR1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_ADDR1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_ADDR2(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_ADDR2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_ADDR2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_STATE(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_STATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_STATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_ZIP5(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_ZIP5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_ZIP5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_ZIP4(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_ZIP4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_ZIP4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_COUNTRY(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_COUNTRY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_COUNTRY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_COUNTRY_DESC(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_COUNTRY_DESC(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_COUNTRY_DESC(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_FEI(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_FEI(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_FEI(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_COUNTY(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_COUNTY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_COUNTY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_ADDR1(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_ADDR1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_ADDR1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_ADDR2(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_ADDR2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_ADDR2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_STATE(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_STATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_STATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_ZIP5(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_ZIP5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_ZIP5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_ZIP4(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_ZIP4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_ZIP4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_COUNTRY(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_COUNTRY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_COUNTRY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_COUNTRY_DESC(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_COUNTRY_DESC(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_COUNTRY_DESC(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OWN_ADDRESS(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OWN_ADDRESS(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OWN_ADDRESS(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OWN_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OWN_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OWN_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OWN_STATE(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OWN_STATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OWN_STATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OWN_ZIP5(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OWN_ZIP5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OWN_ZIP5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OWN_FEI(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OWN_FEI(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OWN_FEI(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OWN_CHARTER_NUMBER(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OWN_CHARTER_NUMBER(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OWN_CHARTER_NUMBER(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_OLD_NAME_SEQ(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_OLD_NAME_SEQ(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_OLD_NAME_SEQ(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_ACTION_NEW_NAME_SEQ(SALT37.StrType s0) := s0;
+EXPORT InValid_ACTION_NEW_NAME_SEQ(SALT37.StrType s) := 0;
+EXPORT InValidMessage_ACTION_NEW_NAME_SEQ(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_title(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_title(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_title(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_fname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_fname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_fname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_mname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_mname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_mname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_lname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_lname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_lname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_name_suffix(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_name_suffix(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_name_suffix(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_name_score(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_name_score(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_name_score(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_cname(SALT37.StrType s0) := s0;
+EXPORT InValid_cname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_cname(UNSIGNED1 wh) := '';
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
   IMPORT SALT37,Scrubs_FBNV2;
@@ -415,6 +583,48 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_prep_new_addr_line_last;
     BOOLEAN Diff_prep_owner_addr_line1;
     BOOLEAN Diff_prep_owner_addr_line_last;
+    BOOLEAN Diff_EVENT_FIC_NAME;
+    BOOLEAN Diff_EVENT_ACTION_CTR;
+    BOOLEAN Diff_EVENT_SEQ_NUMBER;
+    BOOLEAN Diff_EVENT_PAGES;
+    BOOLEAN Diff_ACTION_SEQ_NUMBER;
+    BOOLEAN Diff_ACTION_CODE;
+    BOOLEAN Diff_ACTION_VERBAGE;
+    BOOLEAN Diff_ACTION_OLD_FEI;
+    BOOLEAN Diff_ACTION_OLD_COUNTY;
+    BOOLEAN Diff_ACTION_OLD_ADDR1;
+    BOOLEAN Diff_ACTION_OLD_ADDR2;
+    BOOLEAN Diff_ACTION_OLD_CITY;
+    BOOLEAN Diff_ACTION_OLD_STATE;
+    BOOLEAN Diff_ACTION_OLD_ZIP5;
+    BOOLEAN Diff_ACTION_OLD_ZIP4;
+    BOOLEAN Diff_ACTION_OLD_COUNTRY;
+    BOOLEAN Diff_ACTION_OLD_COUNTRY_DESC;
+    BOOLEAN Diff_ACTION_NEW_FEI;
+    BOOLEAN Diff_ACTION_NEW_COUNTY;
+    BOOLEAN Diff_ACTION_NEW_ADDR1;
+    BOOLEAN Diff_ACTION_NEW_ADDR2;
+    BOOLEAN Diff_ACTION_NEW_CITY;
+    BOOLEAN Diff_ACTION_NEW_STATE;
+    BOOLEAN Diff_ACTION_NEW_ZIP5;
+    BOOLEAN Diff_ACTION_NEW_ZIP4;
+    BOOLEAN Diff_ACTION_NEW_COUNTRY;
+    BOOLEAN Diff_ACTION_NEW_COUNTRY_DESC;
+    BOOLEAN Diff_ACTION_OWN_ADDRESS;
+    BOOLEAN Diff_ACTION_OWN_CITY;
+    BOOLEAN Diff_ACTION_OWN_STATE;
+    BOOLEAN Diff_ACTION_OWN_ZIP5;
+    BOOLEAN Diff_ACTION_OWN_FEI;
+    BOOLEAN Diff_ACTION_OWN_CHARTER_NUMBER;
+    BOOLEAN Diff_ACTION_OLD_NAME_SEQ;
+    BOOLEAN Diff_ACTION_NEW_NAME_SEQ;
+    BOOLEAN Diff_Owner_title;
+    BOOLEAN Diff_Owner_fname;
+    BOOLEAN Diff_Owner_mname;
+    BOOLEAN Diff_Owner_lname;
+    BOOLEAN Diff_Owner_name_suffix;
+    BOOLEAN Diff_Owner_name_score;
+    BOOLEAN Diff_cname;
     UNSIGNED Num_Diffs;
     SALT37.StrType Val {MAXLENGTH(1024)};
   END;
@@ -430,8 +640,50 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_prep_new_addr_line_last := le.prep_new_addr_line_last <> ri.prep_new_addr_line_last;
     SELF.Diff_prep_owner_addr_line1 := le.prep_owner_addr_line1 <> ri.prep_owner_addr_line1;
     SELF.Diff_prep_owner_addr_line_last := le.prep_owner_addr_line_last <> ri.prep_owner_addr_line_last;
+    SELF.Diff_EVENT_FIC_NAME := le.EVENT_FIC_NAME <> ri.EVENT_FIC_NAME;
+    SELF.Diff_EVENT_ACTION_CTR := le.EVENT_ACTION_CTR <> ri.EVENT_ACTION_CTR;
+    SELF.Diff_EVENT_SEQ_NUMBER := le.EVENT_SEQ_NUMBER <> ri.EVENT_SEQ_NUMBER;
+    SELF.Diff_EVENT_PAGES := le.EVENT_PAGES <> ri.EVENT_PAGES;
+    SELF.Diff_ACTION_SEQ_NUMBER := le.ACTION_SEQ_NUMBER <> ri.ACTION_SEQ_NUMBER;
+    SELF.Diff_ACTION_CODE := le.ACTION_CODE <> ri.ACTION_CODE;
+    SELF.Diff_ACTION_VERBAGE := le.ACTION_VERBAGE <> ri.ACTION_VERBAGE;
+    SELF.Diff_ACTION_OLD_FEI := le.ACTION_OLD_FEI <> ri.ACTION_OLD_FEI;
+    SELF.Diff_ACTION_OLD_COUNTY := le.ACTION_OLD_COUNTY <> ri.ACTION_OLD_COUNTY;
+    SELF.Diff_ACTION_OLD_ADDR1 := le.ACTION_OLD_ADDR1 <> ri.ACTION_OLD_ADDR1;
+    SELF.Diff_ACTION_OLD_ADDR2 := le.ACTION_OLD_ADDR2 <> ri.ACTION_OLD_ADDR2;
+    SELF.Diff_ACTION_OLD_CITY := le.ACTION_OLD_CITY <> ri.ACTION_OLD_CITY;
+    SELF.Diff_ACTION_OLD_STATE := le.ACTION_OLD_STATE <> ri.ACTION_OLD_STATE;
+    SELF.Diff_ACTION_OLD_ZIP5 := le.ACTION_OLD_ZIP5 <> ri.ACTION_OLD_ZIP5;
+    SELF.Diff_ACTION_OLD_ZIP4 := le.ACTION_OLD_ZIP4 <> ri.ACTION_OLD_ZIP4;
+    SELF.Diff_ACTION_OLD_COUNTRY := le.ACTION_OLD_COUNTRY <> ri.ACTION_OLD_COUNTRY;
+    SELF.Diff_ACTION_OLD_COUNTRY_DESC := le.ACTION_OLD_COUNTRY_DESC <> ri.ACTION_OLD_COUNTRY_DESC;
+    SELF.Diff_ACTION_NEW_FEI := le.ACTION_NEW_FEI <> ri.ACTION_NEW_FEI;
+    SELF.Diff_ACTION_NEW_COUNTY := le.ACTION_NEW_COUNTY <> ri.ACTION_NEW_COUNTY;
+    SELF.Diff_ACTION_NEW_ADDR1 := le.ACTION_NEW_ADDR1 <> ri.ACTION_NEW_ADDR1;
+    SELF.Diff_ACTION_NEW_ADDR2 := le.ACTION_NEW_ADDR2 <> ri.ACTION_NEW_ADDR2;
+    SELF.Diff_ACTION_NEW_CITY := le.ACTION_NEW_CITY <> ri.ACTION_NEW_CITY;
+    SELF.Diff_ACTION_NEW_STATE := le.ACTION_NEW_STATE <> ri.ACTION_NEW_STATE;
+    SELF.Diff_ACTION_NEW_ZIP5 := le.ACTION_NEW_ZIP5 <> ri.ACTION_NEW_ZIP5;
+    SELF.Diff_ACTION_NEW_ZIP4 := le.ACTION_NEW_ZIP4 <> ri.ACTION_NEW_ZIP4;
+    SELF.Diff_ACTION_NEW_COUNTRY := le.ACTION_NEW_COUNTRY <> ri.ACTION_NEW_COUNTRY;
+    SELF.Diff_ACTION_NEW_COUNTRY_DESC := le.ACTION_NEW_COUNTRY_DESC <> ri.ACTION_NEW_COUNTRY_DESC;
+    SELF.Diff_ACTION_OWN_ADDRESS := le.ACTION_OWN_ADDRESS <> ri.ACTION_OWN_ADDRESS;
+    SELF.Diff_ACTION_OWN_CITY := le.ACTION_OWN_CITY <> ri.ACTION_OWN_CITY;
+    SELF.Diff_ACTION_OWN_STATE := le.ACTION_OWN_STATE <> ri.ACTION_OWN_STATE;
+    SELF.Diff_ACTION_OWN_ZIP5 := le.ACTION_OWN_ZIP5 <> ri.ACTION_OWN_ZIP5;
+    SELF.Diff_ACTION_OWN_FEI := le.ACTION_OWN_FEI <> ri.ACTION_OWN_FEI;
+    SELF.Diff_ACTION_OWN_CHARTER_NUMBER := le.ACTION_OWN_CHARTER_NUMBER <> ri.ACTION_OWN_CHARTER_NUMBER;
+    SELF.Diff_ACTION_OLD_NAME_SEQ := le.ACTION_OLD_NAME_SEQ <> ri.ACTION_OLD_NAME_SEQ;
+    SELF.Diff_ACTION_NEW_NAME_SEQ := le.ACTION_NEW_NAME_SEQ <> ri.ACTION_NEW_NAME_SEQ;
+    SELF.Diff_Owner_title := le.Owner_title <> ri.Owner_title;
+    SELF.Diff_Owner_fname := le.Owner_fname <> ri.Owner_fname;
+    SELF.Diff_Owner_mname := le.Owner_mname <> ri.Owner_mname;
+    SELF.Diff_Owner_lname := le.Owner_lname <> ri.Owner_lname;
+    SELF.Diff_Owner_name_suffix := le.Owner_name_suffix <> ri.Owner_name_suffix;
+    SELF.Diff_Owner_name_score := le.Owner_name_score <> ri.Owner_name_score;
+    SELF.Diff_cname := le.cname <> ri.cname;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_action_OWN_name,1,0)+ IF( SELF.Diff_event_date,1,0)+ IF( SELF.Diff_event_doc_number,1,0)+ IF( SELF.Diff_event_orig_doc_number,1,0)+ IF( SELF.Diff_prep_old_addr_line1,1,0)+ IF( SELF.Diff_prep_old_addr_line_last,1,0)+ IF( SELF.Diff_prep_new_addr_line1,1,0)+ IF( SELF.Diff_prep_new_addr_line_last,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_action_OWN_name,1,0)+ IF( SELF.Diff_event_date,1,0)+ IF( SELF.Diff_event_doc_number,1,0)+ IF( SELF.Diff_event_orig_doc_number,1,0)+ IF( SELF.Diff_prep_old_addr_line1,1,0)+ IF( SELF.Diff_prep_old_addr_line_last,1,0)+ IF( SELF.Diff_prep_new_addr_line1,1,0)+ IF( SELF.Diff_prep_new_addr_line_last,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0)+ IF( SELF.Diff_EVENT_FIC_NAME,1,0)+ IF( SELF.Diff_EVENT_ACTION_CTR,1,0)+ IF( SELF.Diff_EVENT_SEQ_NUMBER,1,0)+ IF( SELF.Diff_EVENT_PAGES,1,0)+ IF( SELF.Diff_ACTION_SEQ_NUMBER,1,0)+ IF( SELF.Diff_ACTION_CODE,1,0)+ IF( SELF.Diff_ACTION_VERBAGE,1,0)+ IF( SELF.Diff_ACTION_OLD_FEI,1,0)+ IF( SELF.Diff_ACTION_OLD_COUNTY,1,0)+ IF( SELF.Diff_ACTION_OLD_ADDR1,1,0)+ IF( SELF.Diff_ACTION_OLD_ADDR2,1,0)+ IF( SELF.Diff_ACTION_OLD_CITY,1,0)+ IF( SELF.Diff_ACTION_OLD_STATE,1,0)+ IF( SELF.Diff_ACTION_OLD_ZIP5,1,0)+ IF( SELF.Diff_ACTION_OLD_ZIP4,1,0)+ IF( SELF.Diff_ACTION_OLD_COUNTRY,1,0)+ IF( SELF.Diff_ACTION_OLD_COUNTRY_DESC,1,0)+ IF( SELF.Diff_ACTION_NEW_FEI,1,0)+ IF( SELF.Diff_ACTION_NEW_COUNTY,1,0)+ IF( SELF.Diff_ACTION_NEW_ADDR1,1,0)+ IF( SELF.Diff_ACTION_NEW_ADDR2,1,0)+ IF( SELF.Diff_ACTION_NEW_CITY,1,0)+ IF( SELF.Diff_ACTION_NEW_STATE,1,0)+ IF( SELF.Diff_ACTION_NEW_ZIP5,1,0)+ IF( SELF.Diff_ACTION_NEW_ZIP4,1,0)+ IF( SELF.Diff_ACTION_NEW_COUNTRY,1,0)+ IF( SELF.Diff_ACTION_NEW_COUNTRY_DESC,1,0)+ IF( SELF.Diff_ACTION_OWN_ADDRESS,1,0)+ IF( SELF.Diff_ACTION_OWN_CITY,1,0)+ IF( SELF.Diff_ACTION_OWN_STATE,1,0)+ IF( SELF.Diff_ACTION_OWN_ZIP5,1,0)+ IF( SELF.Diff_ACTION_OWN_FEI,1,0)+ IF( SELF.Diff_ACTION_OWN_CHARTER_NUMBER,1,0)+ IF( SELF.Diff_ACTION_OLD_NAME_SEQ,1,0)+ IF( SELF.Diff_ACTION_NEW_NAME_SEQ,1,0)+ IF( SELF.Diff_Owner_title,1,0)+ IF( SELF.Diff_Owner_fname,1,0)+ IF( SELF.Diff_Owner_mname,1,0)+ IF( SELF.Diff_Owner_lname,1,0)+ IF( SELF.Diff_Owner_name_suffix,1,0)+ IF( SELF.Diff_Owner_name_score,1,0)+ IF( SELF.Diff_cname,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -454,6 +706,48 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_prep_new_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_new_addr_line_last);
     Count_Diff_prep_owner_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line1);
     Count_Diff_prep_owner_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line_last);
+    Count_Diff_EVENT_FIC_NAME := COUNT(GROUP,%Closest%.Diff_EVENT_FIC_NAME);
+    Count_Diff_EVENT_ACTION_CTR := COUNT(GROUP,%Closest%.Diff_EVENT_ACTION_CTR);
+    Count_Diff_EVENT_SEQ_NUMBER := COUNT(GROUP,%Closest%.Diff_EVENT_SEQ_NUMBER);
+    Count_Diff_EVENT_PAGES := COUNT(GROUP,%Closest%.Diff_EVENT_PAGES);
+    Count_Diff_ACTION_SEQ_NUMBER := COUNT(GROUP,%Closest%.Diff_ACTION_SEQ_NUMBER);
+    Count_Diff_ACTION_CODE := COUNT(GROUP,%Closest%.Diff_ACTION_CODE);
+    Count_Diff_ACTION_VERBAGE := COUNT(GROUP,%Closest%.Diff_ACTION_VERBAGE);
+    Count_Diff_ACTION_OLD_FEI := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_FEI);
+    Count_Diff_ACTION_OLD_COUNTY := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_COUNTY);
+    Count_Diff_ACTION_OLD_ADDR1 := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_ADDR1);
+    Count_Diff_ACTION_OLD_ADDR2 := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_ADDR2);
+    Count_Diff_ACTION_OLD_CITY := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_CITY);
+    Count_Diff_ACTION_OLD_STATE := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_STATE);
+    Count_Diff_ACTION_OLD_ZIP5 := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_ZIP5);
+    Count_Diff_ACTION_OLD_ZIP4 := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_ZIP4);
+    Count_Diff_ACTION_OLD_COUNTRY := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_COUNTRY);
+    Count_Diff_ACTION_OLD_COUNTRY_DESC := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_COUNTRY_DESC);
+    Count_Diff_ACTION_NEW_FEI := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_FEI);
+    Count_Diff_ACTION_NEW_COUNTY := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_COUNTY);
+    Count_Diff_ACTION_NEW_ADDR1 := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_ADDR1);
+    Count_Diff_ACTION_NEW_ADDR2 := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_ADDR2);
+    Count_Diff_ACTION_NEW_CITY := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_CITY);
+    Count_Diff_ACTION_NEW_STATE := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_STATE);
+    Count_Diff_ACTION_NEW_ZIP5 := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_ZIP5);
+    Count_Diff_ACTION_NEW_ZIP4 := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_ZIP4);
+    Count_Diff_ACTION_NEW_COUNTRY := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_COUNTRY);
+    Count_Diff_ACTION_NEW_COUNTRY_DESC := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_COUNTRY_DESC);
+    Count_Diff_ACTION_OWN_ADDRESS := COUNT(GROUP,%Closest%.Diff_ACTION_OWN_ADDRESS);
+    Count_Diff_ACTION_OWN_CITY := COUNT(GROUP,%Closest%.Diff_ACTION_OWN_CITY);
+    Count_Diff_ACTION_OWN_STATE := COUNT(GROUP,%Closest%.Diff_ACTION_OWN_STATE);
+    Count_Diff_ACTION_OWN_ZIP5 := COUNT(GROUP,%Closest%.Diff_ACTION_OWN_ZIP5);
+    Count_Diff_ACTION_OWN_FEI := COUNT(GROUP,%Closest%.Diff_ACTION_OWN_FEI);
+    Count_Diff_ACTION_OWN_CHARTER_NUMBER := COUNT(GROUP,%Closest%.Diff_ACTION_OWN_CHARTER_NUMBER);
+    Count_Diff_ACTION_OLD_NAME_SEQ := COUNT(GROUP,%Closest%.Diff_ACTION_OLD_NAME_SEQ);
+    Count_Diff_ACTION_NEW_NAME_SEQ := COUNT(GROUP,%Closest%.Diff_ACTION_NEW_NAME_SEQ);
+    Count_Diff_Owner_title := COUNT(GROUP,%Closest%.Diff_Owner_title);
+    Count_Diff_Owner_fname := COUNT(GROUP,%Closest%.Diff_Owner_fname);
+    Count_Diff_Owner_mname := COUNT(GROUP,%Closest%.Diff_Owner_mname);
+    Count_Diff_Owner_lname := COUNT(GROUP,%Closest%.Diff_Owner_lname);
+    Count_Diff_Owner_name_suffix := COUNT(GROUP,%Closest%.Diff_Owner_name_suffix);
+    Count_Diff_Owner_name_score := COUNT(GROUP,%Closest%.Diff_Owner_name_score);
+    Count_Diff_cname := COUNT(GROUP,%Closest%.Diff_cname);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;

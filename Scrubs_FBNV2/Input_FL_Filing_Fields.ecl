@@ -339,8 +339,8 @@ END;
 EXPORT InValidFT_invalid_contact_name_format(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['C','P']);
 EXPORT InValidMessageFT_invalid_contact_name_format(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('C|P'),SALT37.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'fic_fil_name','fic_owner_name','fic_fil_date','fic_fil_doc_num','fic_owner_doc_num','p_owner_name','c_owner_name','prep_addr_line1','prep_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'fic_fil_name' => 0,'fic_owner_name' => 1,'fic_fil_date' => 2,'fic_fil_doc_num' => 3,'fic_owner_doc_num' => 4,'p_owner_name' => 5,'c_owner_name' => 6,'prep_addr_line1' => 7,'prep_addr_line_last' => 8,'prep_owner_addr_line1' => 9,'prep_owner_addr_line_last' => 10,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'fic_fil_name','fic_owner_name','fic_fil_date','fic_fil_doc_num','fic_owner_doc_num','p_owner_name','c_owner_name','prep_addr_line1','prep_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last','seq','FIC_FIL_COUNTY','FIC_FIL_ADDR1','FIC_FIL_ADDR2','FIC_FIL_CITY','FIC_FIL_STATE','FIC_FIL_ZIP5','FIC_FIL_ZIP4','FIC_FIL_COUNTRY','FIC_FIL_COUNTRY_DEC','FIC_FIL_PAGES','FIC_FIL_STATUS','FIC_FIL_STATUS_DEC','FIC_FIL_CANCELLATION_DATE','FIC_FIL_EXPIRATION_DATE','FIC_FIL_TOTAL_OWN_CUR_CTR','FIC_FIL_FEI_NUM','FIC_GREATER_THAN__OWNERS','FIC_OWNER_NAME_FORMAT','FIC_OWNER_ADDR','FIC_OWNER_CITY','FIC_OWNER_STATE','FIC_OWNER_ZIP5','FIC_OWNER_ZIP4','FIC_OWNER_COUNTRY','FIC_OWNER_COUNTRY_DEC','FIC_OWNER_FEI_NUM','FIC_OWNER_CHARTER_NUM');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'fic_fil_name' => 0,'fic_owner_name' => 1,'fic_fil_date' => 2,'fic_fil_doc_num' => 3,'fic_owner_doc_num' => 4,'p_owner_name' => 5,'c_owner_name' => 6,'prep_addr_line1' => 7,'prep_addr_line_last' => 8,'prep_owner_addr_line1' => 9,'prep_owner_addr_line_last' => 10,'seq' => 11,'FIC_FIL_COUNTY' => 12,'FIC_FIL_ADDR1' => 13,'FIC_FIL_ADDR2' => 14,'FIC_FIL_CITY' => 15,'FIC_FIL_STATE' => 16,'FIC_FIL_ZIP5' => 17,'FIC_FIL_ZIP4' => 18,'FIC_FIL_COUNTRY' => 19,'FIC_FIL_COUNTRY_DEC' => 20,'FIC_FIL_PAGES' => 21,'FIC_FIL_STATUS' => 22,'FIC_FIL_STATUS_DEC' => 23,'FIC_FIL_CANCELLATION_DATE' => 24,'FIC_FIL_EXPIRATION_DATE' => 25,'FIC_FIL_TOTAL_OWN_CUR_CTR' => 26,'FIC_FIL_FEI_NUM' => 27,'FIC_GREATER_THAN__OWNERS' => 28,'FIC_OWNER_NAME_FORMAT' => 29,'FIC_OWNER_ADDR' => 30,'FIC_OWNER_CITY' => 31,'FIC_OWNER_STATE' => 32,'FIC_OWNER_ZIP5' => 33,'FIC_OWNER_ZIP4' => 34,'FIC_OWNER_COUNTRY' => 35,'FIC_OWNER_COUNTRY_DEC' => 36,'FIC_OWNER_FEI_NUM' => 37,'FIC_OWNER_CHARTER_NUM' => 38,0);
  
 //Individual field level validation
  
@@ -388,6 +388,118 @@ EXPORT Make_prep_owner_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_manda
 EXPORT InValid_prep_owner_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_owner_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
+EXPORT Make_seq(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
+EXPORT InValid_seq(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
+EXPORT InValidMessage_seq(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+ 
+EXPORT Make_FIC_FIL_COUNTY(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_COUNTY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_COUNTY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_ADDR1(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_ADDR1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_ADDR1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_ADDR2(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_ADDR2(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_ADDR2(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_STATE(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_STATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_STATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_ZIP5(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_ZIP5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_ZIP5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_ZIP4(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_ZIP4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_ZIP4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_COUNTRY(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_COUNTRY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_COUNTRY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_COUNTRY_DEC(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_COUNTRY_DEC(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_COUNTRY_DEC(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_PAGES(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_PAGES(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_PAGES(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_STATUS(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_STATUS(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_STATUS(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_STATUS_DEC(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_STATUS_DEC(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_STATUS_DEC(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_CANCELLATION_DATE(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_CANCELLATION_DATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_CANCELLATION_DATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_EXPIRATION_DATE(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_EXPIRATION_DATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_EXPIRATION_DATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_TOTAL_OWN_CUR_CTR(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_TOTAL_OWN_CUR_CTR(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_TOTAL_OWN_CUR_CTR(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_FIL_FEI_NUM(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_FIL_FEI_NUM(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_FIL_FEI_NUM(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_GREATER_THAN__OWNERS(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_GREATER_THAN__OWNERS(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_GREATER_THAN__OWNERS(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_NAME_FORMAT(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_NAME_FORMAT(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_NAME_FORMAT(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_ADDR(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_ADDR(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_ADDR(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_CITY(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_CITY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_CITY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_STATE(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_STATE(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_STATE(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_ZIP5(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_ZIP5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_ZIP5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_ZIP4(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_ZIP4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_ZIP4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_COUNTRY(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_COUNTRY(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_COUNTRY(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_COUNTRY_DEC(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_COUNTRY_DEC(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_COUNTRY_DEC(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_FEI_NUM(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_FEI_NUM(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_FEI_NUM(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_FIC_OWNER_CHARTER_NUM(SALT37.StrType s0) := s0;
+EXPORT InValid_FIC_OWNER_CHARTER_NUM(SALT37.StrType s) := 0;
+EXPORT InValidMessage_FIC_OWNER_CHARTER_NUM(UNSIGNED1 wh) := '';
+ 
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
   IMPORT SALT37,Scrubs_FBNV2;
@@ -420,6 +532,34 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_prep_addr_line_last;
     BOOLEAN Diff_prep_owner_addr_line1;
     BOOLEAN Diff_prep_owner_addr_line_last;
+    BOOLEAN Diff_seq;
+    BOOLEAN Diff_FIC_FIL_COUNTY;
+    BOOLEAN Diff_FIC_FIL_ADDR1;
+    BOOLEAN Diff_FIC_FIL_ADDR2;
+    BOOLEAN Diff_FIC_FIL_CITY;
+    BOOLEAN Diff_FIC_FIL_STATE;
+    BOOLEAN Diff_FIC_FIL_ZIP5;
+    BOOLEAN Diff_FIC_FIL_ZIP4;
+    BOOLEAN Diff_FIC_FIL_COUNTRY;
+    BOOLEAN Diff_FIC_FIL_COUNTRY_DEC;
+    BOOLEAN Diff_FIC_FIL_PAGES;
+    BOOLEAN Diff_FIC_FIL_STATUS;
+    BOOLEAN Diff_FIC_FIL_STATUS_DEC;
+    BOOLEAN Diff_FIC_FIL_CANCELLATION_DATE;
+    BOOLEAN Diff_FIC_FIL_EXPIRATION_DATE;
+    BOOLEAN Diff_FIC_FIL_TOTAL_OWN_CUR_CTR;
+    BOOLEAN Diff_FIC_FIL_FEI_NUM;
+    BOOLEAN Diff_FIC_GREATER_THAN__OWNERS;
+    BOOLEAN Diff_FIC_OWNER_NAME_FORMAT;
+    BOOLEAN Diff_FIC_OWNER_ADDR;
+    BOOLEAN Diff_FIC_OWNER_CITY;
+    BOOLEAN Diff_FIC_OWNER_STATE;
+    BOOLEAN Diff_FIC_OWNER_ZIP5;
+    BOOLEAN Diff_FIC_OWNER_ZIP4;
+    BOOLEAN Diff_FIC_OWNER_COUNTRY;
+    BOOLEAN Diff_FIC_OWNER_COUNTRY_DEC;
+    BOOLEAN Diff_FIC_OWNER_FEI_NUM;
+    BOOLEAN Diff_FIC_OWNER_CHARTER_NUM;
     UNSIGNED Num_Diffs;
     SALT37.StrType Val {MAXLENGTH(1024)};
   END;
@@ -436,8 +576,36 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_prep_addr_line_last := le.prep_addr_line_last <> ri.prep_addr_line_last;
     SELF.Diff_prep_owner_addr_line1 := le.prep_owner_addr_line1 <> ri.prep_owner_addr_line1;
     SELF.Diff_prep_owner_addr_line_last := le.prep_owner_addr_line_last <> ri.prep_owner_addr_line_last;
+    SELF.Diff_seq := le.seq <> ri.seq;
+    SELF.Diff_FIC_FIL_COUNTY := le.FIC_FIL_COUNTY <> ri.FIC_FIL_COUNTY;
+    SELF.Diff_FIC_FIL_ADDR1 := le.FIC_FIL_ADDR1 <> ri.FIC_FIL_ADDR1;
+    SELF.Diff_FIC_FIL_ADDR2 := le.FIC_FIL_ADDR2 <> ri.FIC_FIL_ADDR2;
+    SELF.Diff_FIC_FIL_CITY := le.FIC_FIL_CITY <> ri.FIC_FIL_CITY;
+    SELF.Diff_FIC_FIL_STATE := le.FIC_FIL_STATE <> ri.FIC_FIL_STATE;
+    SELF.Diff_FIC_FIL_ZIP5 := le.FIC_FIL_ZIP5 <> ri.FIC_FIL_ZIP5;
+    SELF.Diff_FIC_FIL_ZIP4 := le.FIC_FIL_ZIP4 <> ri.FIC_FIL_ZIP4;
+    SELF.Diff_FIC_FIL_COUNTRY := le.FIC_FIL_COUNTRY <> ri.FIC_FIL_COUNTRY;
+    SELF.Diff_FIC_FIL_COUNTRY_DEC := le.FIC_FIL_COUNTRY_DEC <> ri.FIC_FIL_COUNTRY_DEC;
+    SELF.Diff_FIC_FIL_PAGES := le.FIC_FIL_PAGES <> ri.FIC_FIL_PAGES;
+    SELF.Diff_FIC_FIL_STATUS := le.FIC_FIL_STATUS <> ri.FIC_FIL_STATUS;
+    SELF.Diff_FIC_FIL_STATUS_DEC := le.FIC_FIL_STATUS_DEC <> ri.FIC_FIL_STATUS_DEC;
+    SELF.Diff_FIC_FIL_CANCELLATION_DATE := le.FIC_FIL_CANCELLATION_DATE <> ri.FIC_FIL_CANCELLATION_DATE;
+    SELF.Diff_FIC_FIL_EXPIRATION_DATE := le.FIC_FIL_EXPIRATION_DATE <> ri.FIC_FIL_EXPIRATION_DATE;
+    SELF.Diff_FIC_FIL_TOTAL_OWN_CUR_CTR := le.FIC_FIL_TOTAL_OWN_CUR_CTR <> ri.FIC_FIL_TOTAL_OWN_CUR_CTR;
+    SELF.Diff_FIC_FIL_FEI_NUM := le.FIC_FIL_FEI_NUM <> ri.FIC_FIL_FEI_NUM;
+    SELF.Diff_FIC_GREATER_THAN__OWNERS := le.FIC_GREATER_THAN__OWNERS <> ri.FIC_GREATER_THAN__OWNERS;
+    SELF.Diff_FIC_OWNER_NAME_FORMAT := le.FIC_OWNER_NAME_FORMAT <> ri.FIC_OWNER_NAME_FORMAT;
+    SELF.Diff_FIC_OWNER_ADDR := le.FIC_OWNER_ADDR <> ri.FIC_OWNER_ADDR;
+    SELF.Diff_FIC_OWNER_CITY := le.FIC_OWNER_CITY <> ri.FIC_OWNER_CITY;
+    SELF.Diff_FIC_OWNER_STATE := le.FIC_OWNER_STATE <> ri.FIC_OWNER_STATE;
+    SELF.Diff_FIC_OWNER_ZIP5 := le.FIC_OWNER_ZIP5 <> ri.FIC_OWNER_ZIP5;
+    SELF.Diff_FIC_OWNER_ZIP4 := le.FIC_OWNER_ZIP4 <> ri.FIC_OWNER_ZIP4;
+    SELF.Diff_FIC_OWNER_COUNTRY := le.FIC_OWNER_COUNTRY <> ri.FIC_OWNER_COUNTRY;
+    SELF.Diff_FIC_OWNER_COUNTRY_DEC := le.FIC_OWNER_COUNTRY_DEC <> ri.FIC_OWNER_COUNTRY_DEC;
+    SELF.Diff_FIC_OWNER_FEI_NUM := le.FIC_OWNER_FEI_NUM <> ri.FIC_OWNER_FEI_NUM;
+    SELF.Diff_FIC_OWNER_CHARTER_NUM := le.FIC_OWNER_CHARTER_NUM <> ri.FIC_OWNER_CHARTER_NUM;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_fic_fil_name,1,0)+ IF( SELF.Diff_fic_owner_name,1,0)+ IF( SELF.Diff_fic_fil_date,1,0)+ IF( SELF.Diff_fic_fil_doc_num,1,0)+ IF( SELF.Diff_fic_owner_doc_num,1,0)+ IF( SELF.Diff_p_owner_name,1,0)+ IF( SELF.Diff_c_owner_name,1,0)+ IF( SELF.Diff_prep_addr_line1,1,0)+ IF( SELF.Diff_prep_addr_line_last,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_fic_fil_name,1,0)+ IF( SELF.Diff_fic_owner_name,1,0)+ IF( SELF.Diff_fic_fil_date,1,0)+ IF( SELF.Diff_fic_fil_doc_num,1,0)+ IF( SELF.Diff_fic_owner_doc_num,1,0)+ IF( SELF.Diff_p_owner_name,1,0)+ IF( SELF.Diff_c_owner_name,1,0)+ IF( SELF.Diff_prep_addr_line1,1,0)+ IF( SELF.Diff_prep_addr_line_last,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0)+ IF( SELF.Diff_seq,1,0)+ IF( SELF.Diff_FIC_FIL_COUNTY,1,0)+ IF( SELF.Diff_FIC_FIL_ADDR1,1,0)+ IF( SELF.Diff_FIC_FIL_ADDR2,1,0)+ IF( SELF.Diff_FIC_FIL_CITY,1,0)+ IF( SELF.Diff_FIC_FIL_STATE,1,0)+ IF( SELF.Diff_FIC_FIL_ZIP5,1,0)+ IF( SELF.Diff_FIC_FIL_ZIP4,1,0)+ IF( SELF.Diff_FIC_FIL_COUNTRY,1,0)+ IF( SELF.Diff_FIC_FIL_COUNTRY_DEC,1,0)+ IF( SELF.Diff_FIC_FIL_PAGES,1,0)+ IF( SELF.Diff_FIC_FIL_STATUS,1,0)+ IF( SELF.Diff_FIC_FIL_STATUS_DEC,1,0)+ IF( SELF.Diff_FIC_FIL_CANCELLATION_DATE,1,0)+ IF( SELF.Diff_FIC_FIL_EXPIRATION_DATE,1,0)+ IF( SELF.Diff_FIC_FIL_TOTAL_OWN_CUR_CTR,1,0)+ IF( SELF.Diff_FIC_FIL_FEI_NUM,1,0)+ IF( SELF.Diff_FIC_GREATER_THAN__OWNERS,1,0)+ IF( SELF.Diff_FIC_OWNER_NAME_FORMAT,1,0)+ IF( SELF.Diff_FIC_OWNER_ADDR,1,0)+ IF( SELF.Diff_FIC_OWNER_CITY,1,0)+ IF( SELF.Diff_FIC_OWNER_STATE,1,0)+ IF( SELF.Diff_FIC_OWNER_ZIP5,1,0)+ IF( SELF.Diff_FIC_OWNER_ZIP4,1,0)+ IF( SELF.Diff_FIC_OWNER_COUNTRY,1,0)+ IF( SELF.Diff_FIC_OWNER_COUNTRY_DEC,1,0)+ IF( SELF.Diff_FIC_OWNER_FEI_NUM,1,0)+ IF( SELF.Diff_FIC_OWNER_CHARTER_NUM,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -461,6 +629,34 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_prep_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_addr_line_last);
     Count_Diff_prep_owner_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line1);
     Count_Diff_prep_owner_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line_last);
+    Count_Diff_seq := COUNT(GROUP,%Closest%.Diff_seq);
+    Count_Diff_FIC_FIL_COUNTY := COUNT(GROUP,%Closest%.Diff_FIC_FIL_COUNTY);
+    Count_Diff_FIC_FIL_ADDR1 := COUNT(GROUP,%Closest%.Diff_FIC_FIL_ADDR1);
+    Count_Diff_FIC_FIL_ADDR2 := COUNT(GROUP,%Closest%.Diff_FIC_FIL_ADDR2);
+    Count_Diff_FIC_FIL_CITY := COUNT(GROUP,%Closest%.Diff_FIC_FIL_CITY);
+    Count_Diff_FIC_FIL_STATE := COUNT(GROUP,%Closest%.Diff_FIC_FIL_STATE);
+    Count_Diff_FIC_FIL_ZIP5 := COUNT(GROUP,%Closest%.Diff_FIC_FIL_ZIP5);
+    Count_Diff_FIC_FIL_ZIP4 := COUNT(GROUP,%Closest%.Diff_FIC_FIL_ZIP4);
+    Count_Diff_FIC_FIL_COUNTRY := COUNT(GROUP,%Closest%.Diff_FIC_FIL_COUNTRY);
+    Count_Diff_FIC_FIL_COUNTRY_DEC := COUNT(GROUP,%Closest%.Diff_FIC_FIL_COUNTRY_DEC);
+    Count_Diff_FIC_FIL_PAGES := COUNT(GROUP,%Closest%.Diff_FIC_FIL_PAGES);
+    Count_Diff_FIC_FIL_STATUS := COUNT(GROUP,%Closest%.Diff_FIC_FIL_STATUS);
+    Count_Diff_FIC_FIL_STATUS_DEC := COUNT(GROUP,%Closest%.Diff_FIC_FIL_STATUS_DEC);
+    Count_Diff_FIC_FIL_CANCELLATION_DATE := COUNT(GROUP,%Closest%.Diff_FIC_FIL_CANCELLATION_DATE);
+    Count_Diff_FIC_FIL_EXPIRATION_DATE := COUNT(GROUP,%Closest%.Diff_FIC_FIL_EXPIRATION_DATE);
+    Count_Diff_FIC_FIL_TOTAL_OWN_CUR_CTR := COUNT(GROUP,%Closest%.Diff_FIC_FIL_TOTAL_OWN_CUR_CTR);
+    Count_Diff_FIC_FIL_FEI_NUM := COUNT(GROUP,%Closest%.Diff_FIC_FIL_FEI_NUM);
+    Count_Diff_FIC_GREATER_THAN__OWNERS := COUNT(GROUP,%Closest%.Diff_FIC_GREATER_THAN__OWNERS);
+    Count_Diff_FIC_OWNER_NAME_FORMAT := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_NAME_FORMAT);
+    Count_Diff_FIC_OWNER_ADDR := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_ADDR);
+    Count_Diff_FIC_OWNER_CITY := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_CITY);
+    Count_Diff_FIC_OWNER_STATE := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_STATE);
+    Count_Diff_FIC_OWNER_ZIP5 := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_ZIP5);
+    Count_Diff_FIC_OWNER_ZIP4 := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_ZIP4);
+    Count_Diff_FIC_OWNER_COUNTRY := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_COUNTRY);
+    Count_Diff_FIC_OWNER_COUNTRY_DEC := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_COUNTRY_DEC);
+    Count_Diff_FIC_OWNER_FEI_NUM := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_FEI_NUM);
+    Count_Diff_FIC_OWNER_CHARTER_NUM := COUNT(GROUP,%Closest%.Diff_FIC_OWNER_CHARTER_NUM);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;

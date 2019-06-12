@@ -198,8 +198,8 @@ EXPORT InValidMessageFT_invalid_bus_status(UNSIGNED1 wh) := CHOOSE(wh,SALT37.Hyg
 EXPORT MakeFT_invalid_filing_type(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME; CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
-EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME; CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_filing_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['BUSINESS LICENSE','TRADENAME:TYPE(STRING):0,0 CORPORATION','ASSUMED NAME','DBA','FICTITIOUS NAME']);
+EXPORT InValidMessageFT_invalid_filing_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('BUSINESS LICENSE|TRADENAME:TYPE(STRING):0,0 CORPORATION|ASSUMED NAME|DBA|FICTITIOUS NAME'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_seq_no(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,' 01234'); // Only allow valid symbols
@@ -267,11 +267,11 @@ EXPORT InValidFT_invalid_norm_type(SALT37.StrType s) := WHICH(((SALT37.StrType) 
 EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('D|L'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_email(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'))));
-EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,:TYPE(STRING):0,0\'&'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_yes_blank(SALT37.StrType s0) := FUNCTION
   RETURN  s0;
@@ -339,8 +339,8 @@ END;
 EXPORT InValidFT_invalid_contact_name_format(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['C','P']);
 EXPORT InValidMessageFT_invalid_contact_name_format(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('C|P'),SALT37.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'business_name','recorded_date','start_date','abandondate','file_number','owner_name','prep_bus_addr_line1','prep_bus_addr_line_last','prep_mail_addr_line1','prep_mail_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'business_name' => 0,'recorded_date' => 1,'start_date' => 2,'abandondate' => 3,'file_number' => 4,'owner_name' => 5,'prep_bus_addr_line1' => 6,'prep_bus_addr_line_last' => 7,'prep_mail_addr_line1' => 8,'prep_mail_addr_line_last' => 9,'prep_owner_addr_line1' => 10,'prep_owner_addr_line_last' => 11,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'business_name','recorded_date','start_date','abandondate','file_number','owner_name','prep_bus_addr_line1','prep_bus_addr_line_last','prep_owner_addr_line1','prep_owner_addr_line_last','instrument_id','recorded_time','business_street','business_city','business_state','business_zip5','business_zip4','mail_street','mail_city','mail_state','mail_zip5','mail_zip4','owner_firstname','owner_address','owner_city','owner_state','owner_zipcode5','owner_zipcode4','short_legal','file_year','file_seq','pname','Owner_cln_title','Owner_cln_fname','Owner_cln_mname','Owner_cln_lname','Owner_cln_name_suffix','Owner_cln_name_score','cname','prep_mail_addr_line1','prep_mail_addr_line_last');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'business_name' => 0,'recorded_date' => 1,'start_date' => 2,'abandondate' => 3,'file_number' => 4,'owner_name' => 5,'prep_bus_addr_line1' => 6,'prep_bus_addr_line_last' => 7,'prep_owner_addr_line1' => 8,'prep_owner_addr_line_last' => 9,'instrument_id' => 10,'recorded_time' => 11,'business_street' => 12,'business_city' => 13,'business_state' => 14,'business_zip5' => 15,'business_zip4' => 16,'mail_street' => 17,'mail_city' => 18,'mail_state' => 19,'mail_zip5' => 20,'mail_zip4' => 21,'owner_firstname' => 22,'owner_address' => 23,'owner_city' => 24,'owner_state' => 25,'owner_zipcode5' => 26,'owner_zipcode4' => 27,'short_legal' => 28,'file_year' => 29,'file_seq' => 30,'pname' => 31,'Owner_cln_title' => 32,'Owner_cln_fname' => 33,'Owner_cln_mname' => 34,'Owner_cln_lname' => 35,'Owner_cln_name_suffix' => 36,'Owner_cln_name_score' => 37,'cname' => 38,'prep_mail_addr_line1' => 39,'prep_mail_addr_line_last' => 40,0);
  
 //Individual field level validation
  
@@ -376,14 +376,6 @@ EXPORT Make_prep_bus_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_mandato
 EXPORT InValid_prep_bus_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_bus_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_prep_mail_addr_line1(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_prep_mail_addr_line1(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_prep_mail_addr_line1(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
- 
-EXPORT Make_prep_mail_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_prep_mail_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
-EXPORT InValidMessage_prep_mail_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
- 
 EXPORT Make_prep_owner_addr_line1(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_prep_owner_addr_line1(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_owner_addr_line1(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
@@ -391,6 +383,130 @@ EXPORT InValidMessage_prep_owner_addr_line1(UNSIGNED1 wh) := InValidMessageFT_in
 EXPORT Make_prep_owner_addr_line_last(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
 EXPORT InValid_prep_owner_addr_line_last(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_prep_owner_addr_line_last(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
+ 
+EXPORT Make_instrument_id(SALT37.StrType s0) := s0;
+EXPORT InValid_instrument_id(SALT37.StrType s) := 0;
+EXPORT InValidMessage_instrument_id(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_recorded_time(SALT37.StrType s0) := s0;
+EXPORT InValid_recorded_time(SALT37.StrType s) := 0;
+EXPORT InValidMessage_recorded_time(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_business_street(SALT37.StrType s0) := s0;
+EXPORT InValid_business_street(SALT37.StrType s) := 0;
+EXPORT InValidMessage_business_street(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_business_city(SALT37.StrType s0) := s0;
+EXPORT InValid_business_city(SALT37.StrType s) := 0;
+EXPORT InValidMessage_business_city(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_business_state(SALT37.StrType s0) := s0;
+EXPORT InValid_business_state(SALT37.StrType s) := 0;
+EXPORT InValidMessage_business_state(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_business_zip5(SALT37.StrType s0) := s0;
+EXPORT InValid_business_zip5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_business_zip5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_business_zip4(SALT37.StrType s0) := s0;
+EXPORT InValid_business_zip4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_business_zip4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_mail_street(SALT37.StrType s0) := s0;
+EXPORT InValid_mail_street(SALT37.StrType s) := 0;
+EXPORT InValidMessage_mail_street(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_mail_city(SALT37.StrType s0) := s0;
+EXPORT InValid_mail_city(SALT37.StrType s) := 0;
+EXPORT InValidMessage_mail_city(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_mail_state(SALT37.StrType s0) := s0;
+EXPORT InValid_mail_state(SALT37.StrType s) := 0;
+EXPORT InValidMessage_mail_state(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_mail_zip5(SALT37.StrType s0) := s0;
+EXPORT InValid_mail_zip5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_mail_zip5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_mail_zip4(SALT37.StrType s0) := s0;
+EXPORT InValid_mail_zip4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_mail_zip4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_owner_firstname(SALT37.StrType s0) := s0;
+EXPORT InValid_owner_firstname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_owner_firstname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_owner_address(SALT37.StrType s0) := s0;
+EXPORT InValid_owner_address(SALT37.StrType s) := 0;
+EXPORT InValidMessage_owner_address(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_owner_city(SALT37.StrType s0) := s0;
+EXPORT InValid_owner_city(SALT37.StrType s) := 0;
+EXPORT InValidMessage_owner_city(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_owner_state(SALT37.StrType s0) := s0;
+EXPORT InValid_owner_state(SALT37.StrType s) := 0;
+EXPORT InValidMessage_owner_state(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_owner_zipcode5(SALT37.StrType s0) := s0;
+EXPORT InValid_owner_zipcode5(SALT37.StrType s) := 0;
+EXPORT InValidMessage_owner_zipcode5(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_owner_zipcode4(SALT37.StrType s0) := s0;
+EXPORT InValid_owner_zipcode4(SALT37.StrType s) := 0;
+EXPORT InValidMessage_owner_zipcode4(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_short_legal(SALT37.StrType s0) := s0;
+EXPORT InValid_short_legal(SALT37.StrType s) := 0;
+EXPORT InValidMessage_short_legal(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_file_year(SALT37.StrType s0) := s0;
+EXPORT InValid_file_year(SALT37.StrType s) := 0;
+EXPORT InValidMessage_file_year(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_file_seq(SALT37.StrType s0) := s0;
+EXPORT InValid_file_seq(SALT37.StrType s) := 0;
+EXPORT InValidMessage_file_seq(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_pname(SALT37.StrType s0) := s0;
+EXPORT InValid_pname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_pname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_cln_title(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_cln_title(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_cln_title(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_cln_fname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_cln_fname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_cln_fname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_cln_mname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_cln_mname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_cln_mname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_cln_lname(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_cln_lname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_cln_lname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_cln_name_suffix(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_cln_name_suffix(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_cln_name_suffix(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_Owner_cln_name_score(SALT37.StrType s0) := s0;
+EXPORT InValid_Owner_cln_name_score(SALT37.StrType s) := 0;
+EXPORT InValidMessage_Owner_cln_name_score(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_cname(SALT37.StrType s0) := s0;
+EXPORT InValid_cname(SALT37.StrType s) := 0;
+EXPORT InValidMessage_cname(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_prep_mail_addr_line1(SALT37.StrType s0) := s0;
+EXPORT InValid_prep_mail_addr_line1(SALT37.StrType s) := 0;
+EXPORT InValidMessage_prep_mail_addr_line1(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_prep_mail_addr_line_last(SALT37.StrType s0) := s0;
+EXPORT InValid_prep_mail_addr_line_last(SALT37.StrType s) := 0;
+EXPORT InValidMessage_prep_mail_addr_line_last(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
@@ -421,10 +537,39 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_owner_name;
     BOOLEAN Diff_prep_bus_addr_line1;
     BOOLEAN Diff_prep_bus_addr_line_last;
-    BOOLEAN Diff_prep_mail_addr_line1;
-    BOOLEAN Diff_prep_mail_addr_line_last;
     BOOLEAN Diff_prep_owner_addr_line1;
     BOOLEAN Diff_prep_owner_addr_line_last;
+    BOOLEAN Diff_instrument_id;
+    BOOLEAN Diff_recorded_time;
+    BOOLEAN Diff_business_street;
+    BOOLEAN Diff_business_city;
+    BOOLEAN Diff_business_state;
+    BOOLEAN Diff_business_zip5;
+    BOOLEAN Diff_business_zip4;
+    BOOLEAN Diff_mail_street;
+    BOOLEAN Diff_mail_city;
+    BOOLEAN Diff_mail_state;
+    BOOLEAN Diff_mail_zip5;
+    BOOLEAN Diff_mail_zip4;
+    BOOLEAN Diff_owner_firstname;
+    BOOLEAN Diff_owner_address;
+    BOOLEAN Diff_owner_city;
+    BOOLEAN Diff_owner_state;
+    BOOLEAN Diff_owner_zipcode5;
+    BOOLEAN Diff_owner_zipcode4;
+    BOOLEAN Diff_short_legal;
+    BOOLEAN Diff_file_year;
+    BOOLEAN Diff_file_seq;
+    BOOLEAN Diff_pname;
+    BOOLEAN Diff_Owner_cln_title;
+    BOOLEAN Diff_Owner_cln_fname;
+    BOOLEAN Diff_Owner_cln_mname;
+    BOOLEAN Diff_Owner_cln_lname;
+    BOOLEAN Diff_Owner_cln_name_suffix;
+    BOOLEAN Diff_Owner_cln_name_score;
+    BOOLEAN Diff_cname;
+    BOOLEAN Diff_prep_mail_addr_line1;
+    BOOLEAN Diff_prep_mail_addr_line_last;
     UNSIGNED Num_Diffs;
     SALT37.StrType Val {MAXLENGTH(1024)};
   END;
@@ -438,12 +583,41 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_owner_name := le.owner_name <> ri.owner_name;
     SELF.Diff_prep_bus_addr_line1 := le.prep_bus_addr_line1 <> ri.prep_bus_addr_line1;
     SELF.Diff_prep_bus_addr_line_last := le.prep_bus_addr_line_last <> ri.prep_bus_addr_line_last;
-    SELF.Diff_prep_mail_addr_line1 := le.prep_mail_addr_line1 <> ri.prep_mail_addr_line1;
-    SELF.Diff_prep_mail_addr_line_last := le.prep_mail_addr_line_last <> ri.prep_mail_addr_line_last;
     SELF.Diff_prep_owner_addr_line1 := le.prep_owner_addr_line1 <> ri.prep_owner_addr_line1;
     SELF.Diff_prep_owner_addr_line_last := le.prep_owner_addr_line_last <> ri.prep_owner_addr_line_last;
+    SELF.Diff_instrument_id := le.instrument_id <> ri.instrument_id;
+    SELF.Diff_recorded_time := le.recorded_time <> ri.recorded_time;
+    SELF.Diff_business_street := le.business_street <> ri.business_street;
+    SELF.Diff_business_city := le.business_city <> ri.business_city;
+    SELF.Diff_business_state := le.business_state <> ri.business_state;
+    SELF.Diff_business_zip5 := le.business_zip5 <> ri.business_zip5;
+    SELF.Diff_business_zip4 := le.business_zip4 <> ri.business_zip4;
+    SELF.Diff_mail_street := le.mail_street <> ri.mail_street;
+    SELF.Diff_mail_city := le.mail_city <> ri.mail_city;
+    SELF.Diff_mail_state := le.mail_state <> ri.mail_state;
+    SELF.Diff_mail_zip5 := le.mail_zip5 <> ri.mail_zip5;
+    SELF.Diff_mail_zip4 := le.mail_zip4 <> ri.mail_zip4;
+    SELF.Diff_owner_firstname := le.owner_firstname <> ri.owner_firstname;
+    SELF.Diff_owner_address := le.owner_address <> ri.owner_address;
+    SELF.Diff_owner_city := le.owner_city <> ri.owner_city;
+    SELF.Diff_owner_state := le.owner_state <> ri.owner_state;
+    SELF.Diff_owner_zipcode5 := le.owner_zipcode5 <> ri.owner_zipcode5;
+    SELF.Diff_owner_zipcode4 := le.owner_zipcode4 <> ri.owner_zipcode4;
+    SELF.Diff_short_legal := le.short_legal <> ri.short_legal;
+    SELF.Diff_file_year := le.file_year <> ri.file_year;
+    SELF.Diff_file_seq := le.file_seq <> ri.file_seq;
+    SELF.Diff_pname := le.pname <> ri.pname;
+    SELF.Diff_Owner_cln_title := le.Owner_cln_title <> ri.Owner_cln_title;
+    SELF.Diff_Owner_cln_fname := le.Owner_cln_fname <> ri.Owner_cln_fname;
+    SELF.Diff_Owner_cln_mname := le.Owner_cln_mname <> ri.Owner_cln_mname;
+    SELF.Diff_Owner_cln_lname := le.Owner_cln_lname <> ri.Owner_cln_lname;
+    SELF.Diff_Owner_cln_name_suffix := le.Owner_cln_name_suffix <> ri.Owner_cln_name_suffix;
+    SELF.Diff_Owner_cln_name_score := le.Owner_cln_name_score <> ri.Owner_cln_name_score;
+    SELF.Diff_cname := le.cname <> ri.cname;
+    SELF.Diff_prep_mail_addr_line1 := le.prep_mail_addr_line1 <> ri.prep_mail_addr_line1;
+    SELF.Diff_prep_mail_addr_line_last := le.prep_mail_addr_line_last <> ri.prep_mail_addr_line_last;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_business_name,1,0)+ IF( SELF.Diff_recorded_date,1,0)+ IF( SELF.Diff_start_date,1,0)+ IF( SELF.Diff_abandondate,1,0)+ IF( SELF.Diff_file_number,1,0)+ IF( SELF.Diff_owner_name,1,0)+ IF( SELF.Diff_prep_bus_addr_line1,1,0)+ IF( SELF.Diff_prep_bus_addr_line_last,1,0)+ IF( SELF.Diff_prep_mail_addr_line1,1,0)+ IF( SELF.Diff_prep_mail_addr_line_last,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_business_name,1,0)+ IF( SELF.Diff_recorded_date,1,0)+ IF( SELF.Diff_start_date,1,0)+ IF( SELF.Diff_abandondate,1,0)+ IF( SELF.Diff_file_number,1,0)+ IF( SELF.Diff_owner_name,1,0)+ IF( SELF.Diff_prep_bus_addr_line1,1,0)+ IF( SELF.Diff_prep_bus_addr_line_last,1,0)+ IF( SELF.Diff_prep_owner_addr_line1,1,0)+ IF( SELF.Diff_prep_owner_addr_line_last,1,0)+ IF( SELF.Diff_instrument_id,1,0)+ IF( SELF.Diff_recorded_time,1,0)+ IF( SELF.Diff_business_street,1,0)+ IF( SELF.Diff_business_city,1,0)+ IF( SELF.Diff_business_state,1,0)+ IF( SELF.Diff_business_zip5,1,0)+ IF( SELF.Diff_business_zip4,1,0)+ IF( SELF.Diff_mail_street,1,0)+ IF( SELF.Diff_mail_city,1,0)+ IF( SELF.Diff_mail_state,1,0)+ IF( SELF.Diff_mail_zip5,1,0)+ IF( SELF.Diff_mail_zip4,1,0)+ IF( SELF.Diff_owner_firstname,1,0)+ IF( SELF.Diff_owner_address,1,0)+ IF( SELF.Diff_owner_city,1,0)+ IF( SELF.Diff_owner_state,1,0)+ IF( SELF.Diff_owner_zipcode5,1,0)+ IF( SELF.Diff_owner_zipcode4,1,0)+ IF( SELF.Diff_short_legal,1,0)+ IF( SELF.Diff_file_year,1,0)+ IF( SELF.Diff_file_seq,1,0)+ IF( SELF.Diff_pname,1,0)+ IF( SELF.Diff_Owner_cln_title,1,0)+ IF( SELF.Diff_Owner_cln_fname,1,0)+ IF( SELF.Diff_Owner_cln_mname,1,0)+ IF( SELF.Diff_Owner_cln_lname,1,0)+ IF( SELF.Diff_Owner_cln_name_suffix,1,0)+ IF( SELF.Diff_Owner_cln_name_score,1,0)+ IF( SELF.Diff_cname,1,0)+ IF( SELF.Diff_prep_mail_addr_line1,1,0)+ IF( SELF.Diff_prep_mail_addr_line_last,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -464,10 +638,39 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_owner_name := COUNT(GROUP,%Closest%.Diff_owner_name);
     Count_Diff_prep_bus_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_bus_addr_line1);
     Count_Diff_prep_bus_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_bus_addr_line_last);
-    Count_Diff_prep_mail_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_mail_addr_line1);
-    Count_Diff_prep_mail_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_mail_addr_line_last);
     Count_Diff_prep_owner_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line1);
     Count_Diff_prep_owner_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_owner_addr_line_last);
+    Count_Diff_instrument_id := COUNT(GROUP,%Closest%.Diff_instrument_id);
+    Count_Diff_recorded_time := COUNT(GROUP,%Closest%.Diff_recorded_time);
+    Count_Diff_business_street := COUNT(GROUP,%Closest%.Diff_business_street);
+    Count_Diff_business_city := COUNT(GROUP,%Closest%.Diff_business_city);
+    Count_Diff_business_state := COUNT(GROUP,%Closest%.Diff_business_state);
+    Count_Diff_business_zip5 := COUNT(GROUP,%Closest%.Diff_business_zip5);
+    Count_Diff_business_zip4 := COUNT(GROUP,%Closest%.Diff_business_zip4);
+    Count_Diff_mail_street := COUNT(GROUP,%Closest%.Diff_mail_street);
+    Count_Diff_mail_city := COUNT(GROUP,%Closest%.Diff_mail_city);
+    Count_Diff_mail_state := COUNT(GROUP,%Closest%.Diff_mail_state);
+    Count_Diff_mail_zip5 := COUNT(GROUP,%Closest%.Diff_mail_zip5);
+    Count_Diff_mail_zip4 := COUNT(GROUP,%Closest%.Diff_mail_zip4);
+    Count_Diff_owner_firstname := COUNT(GROUP,%Closest%.Diff_owner_firstname);
+    Count_Diff_owner_address := COUNT(GROUP,%Closest%.Diff_owner_address);
+    Count_Diff_owner_city := COUNT(GROUP,%Closest%.Diff_owner_city);
+    Count_Diff_owner_state := COUNT(GROUP,%Closest%.Diff_owner_state);
+    Count_Diff_owner_zipcode5 := COUNT(GROUP,%Closest%.Diff_owner_zipcode5);
+    Count_Diff_owner_zipcode4 := COUNT(GROUP,%Closest%.Diff_owner_zipcode4);
+    Count_Diff_short_legal := COUNT(GROUP,%Closest%.Diff_short_legal);
+    Count_Diff_file_year := COUNT(GROUP,%Closest%.Diff_file_year);
+    Count_Diff_file_seq := COUNT(GROUP,%Closest%.Diff_file_seq);
+    Count_Diff_pname := COUNT(GROUP,%Closest%.Diff_pname);
+    Count_Diff_Owner_cln_title := COUNT(GROUP,%Closest%.Diff_Owner_cln_title);
+    Count_Diff_Owner_cln_fname := COUNT(GROUP,%Closest%.Diff_Owner_cln_fname);
+    Count_Diff_Owner_cln_mname := COUNT(GROUP,%Closest%.Diff_Owner_cln_mname);
+    Count_Diff_Owner_cln_lname := COUNT(GROUP,%Closest%.Diff_Owner_cln_lname);
+    Count_Diff_Owner_cln_name_suffix := COUNT(GROUP,%Closest%.Diff_Owner_cln_name_suffix);
+    Count_Diff_Owner_cln_name_score := COUNT(GROUP,%Closest%.Diff_Owner_cln_name_score);
+    Count_Diff_cname := COUNT(GROUP,%Closest%.Diff_cname);
+    Count_Diff_prep_mail_addr_line1 := COUNT(GROUP,%Closest%.Diff_prep_mail_addr_line1);
+    Count_Diff_prep_mail_addr_line_last := COUNT(GROUP,%Closest%.Diff_prep_mail_addr_line_last);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;
