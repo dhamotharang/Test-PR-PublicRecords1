@@ -2,13 +2,13 @@
 EXPORT Constants :=
 MODULE
 
-	// below limits are defined here due to requirement of this FCRA service to return ALL payload records for subject
+  // below limits are defined here due to requirement of this FCRA service to return ALL payload records for subject
   EXPORT Limits :=
   MODULE
-		EXPORT UNSIGNED2 MaxATFPerDID 		 	 := 200; // atf_services.constants.MAX_RECS_PER_ATF_ID  -- as of 11/10/2017 maxcnt=43
-		EXPORT UNSIGNED2 MaxAircraftsPerDID  := 1000; // ut.limits.AIRCRAFTS_PER_DID   -- as of 11/10/2017 maxcnt=975
-		EXPORT UNSIGNED2 MaxAirmenPerDID 		 := 200; // ut.limits.AIRMAN_PER_DID       -- as of 11/10/2017 maxcnt=66
-		EXPORT UNSIGNED2 MaxAirmanCertificates := 100; // ut.limits.AIRMAN_CERTIFICATES_MAX  -- as of 11/10/2017 maxcnt=32
+    EXPORT UNSIGNED2 MaxATFPerDID 		 	 := 200; // atf_services.constants.MAX_RECS_PER_ATF_ID  -- as of 11/10/2017 maxcnt=43
+    EXPORT UNSIGNED2 MaxAircraftsPerDID  := 1000; // ut.limits.AIRCRAFTS_PER_DID   -- as of 11/10/2017 maxcnt=975
+    EXPORT UNSIGNED2 MaxAirmenPerDID 		 := 200; // ut.limits.AIRMAN_PER_DID       -- as of 11/10/2017 maxcnt=66
+    EXPORT UNSIGNED2 MaxAirmanCertificates := 100; // ut.limits.AIRMAN_CERTIFICATES_MAX  -- as of 11/10/2017 maxcnt=32
     EXPORT UNSIGNED2 MaxAdvoPerAddress   := 1000; // -- as of 11/9/2017 maxcnt=1919, drops below 1K except 109 rec
     EXPORT UNSIGNED2 MaxAVMPerAddress    := 100; // -- as of 11/9/2017 maxcnt=9
     EXPORT UNSIGNED2 MaxBKParties        := 200;  // -- as of 11/9/2017 maxcnt=411 (single rec), followed by cnt=192
@@ -20,12 +20,12 @@ MODULE
     EXPORT UNSIGNED2 MaxCrimPunishments  := 150;   // -- as of 11/9/2017 maxcnt=104
     EXPORT UNSIGNED2 MaxCrimCourtOffenses := 900;   // -- as of 11/9/2017 maxcnt=850
     EXPORT UNSIGNED2 MaxDeathPerDID 		 := 100;  // -- as of 11/9/2017 maxcnt=14
-		EXPORT UNSIGNED2 MaxEmailPerDID      := 1000;   // -- maxcnt=5490 as of 11/10/2017, drops below 1K after 44 recs
+    EXPORT UNSIGNED2 MaxEmailPerDID      := 1000;   // -- maxcnt=5490 as of 11/10/2017, drops below 1K after 44 recs
     EXPORT UNSIGNED2 MaxGongPerDID 		 	 := 1000;   // -- maxcnt=7033 as of 11/10/2017, drops below 1K after 37 recs
     EXPORT UNSIGNED2 MaxHeaderPerDID     := 1000;  // ut.limits.HEADER_PER_DID
     EXPORT UNSIGNED2 MaxHuntersPerDID    := 700;  // ut.limits.HUNTERS_PER_DID --maxcnt=652 as of 11/10/2017, 4 recs above 350
-		EXPORT UNSIGNED2 MaxInfutorPerDID    := 1000; // -- maxcnt=60369 as of 11/10/2017, drops below 1K after 5 recs
-		EXPORT UNSIGNED2 MaxInquiriesPerDID  := 5000; // -- as of 11/9/2017 maxcnt=325049, drops below 10K except 7 recs, below 5K except 20 recs
+    EXPORT UNSIGNED2 MaxInfutorPerDID    := 1000; // -- maxcnt=60369 as of 11/10/2017, drops below 1K after 5 recs
+    EXPORT UNSIGNED2 MaxInquiriesPerDID  := 5000; // -- as of 11/9/2017 maxcnt=325049, drops below 10K except 7 recs, below 5K except 20 recs
     EXPORT UNSIGNED1 MaxLiensPerDID      := 1000; // -- as of 11/14/2017 maxcnt=3001, drops below 1K except 4 recs
     EXPORT UNSIGNED2 MaxLiens            := 1500; // -- as of 11/14/2017 maxcnt=1270 for parties, 
     EXPORT UNSIGNED2 MaxMDPerDID         := 150;  //ut.limits.MARRIAGEDIVORCE_PER_DID=100  -- maxcnt=116 as of 11/14/2017
@@ -38,10 +38,10 @@ MODULE
     EXPORT UNSIGNED2 MaxPropPerAddress   := 1000;
     EXPORT UNSIGNED2 MaxPropPerFID       := 100;  //-- maxcnt=1 as of 11/14/2017
     EXPORT UNSIGNED2 MaxPropPartiesPerFID := 700; //-- maxcnt=605 as of 11/15/2017
-		EXPORT UNSIGNED2 MaxStudentPerDID    := 100; //-- maxcnt=55 as of 11/14/2017
-		EXPORT UNSIGNED2 MaxSOffenderPerDID  := 100; //SexOffender_Services.Constants.MAX_RECS_PERDID -- maxcnt=7 as of 11/14/2017
-		EXPORT UNSIGNED2 MaxSOPerSSPK        := 200; //-- maxcnt=99 as of 11/14/2017
-		EXPORT UNSIGNED2 MaxSSN			         := 100; // -- maxcnt=5 as of 11/14/2017
+    EXPORT UNSIGNED2 MaxStudentPerDID    := 100; //-- maxcnt=55 as of 11/14/2017
+    EXPORT UNSIGNED2 MaxSOffenderPerDID  := 100; //SexOffender_Services.Constants.MAX_RECS_PERDID -- maxcnt=7 as of 11/14/2017
+    EXPORT UNSIGNED2 MaxSOPerSSPK        := 200; //-- maxcnt=99 as of 11/14/2017
+    EXPORT UNSIGNED2 MaxSSN			         := 100; // -- maxcnt=5 as of 11/14/2017
     EXPORT UNSIGNED2 MaxThrivePerDID     := 250; // -- maxcnt=195 as of 11/10/2017,
     EXPORT UNSIGNED2 MaxUCCPerDID        := 10000; // -- maxcnt=35849 as of 11/14/2017, drops below !0K except 8 recs,below 2K after 88 recs, below 1K after 188 recs
     EXPORT UNSIGNED2 MaxUCCPerTmsid      := 2500; // -- maxcnt=608429 as of 11/14/2017, drops below 2500 except 2 recs
