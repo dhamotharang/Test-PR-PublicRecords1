@@ -1770,5 +1770,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/870 Iran List','1757'},
 {'EC 2019/855 Iran List','1758'},
 {'US Defense Trade Controls Statutorily Debarred Parties','1759'},
-{'US Department of State - Public Designation under Section 7031(c) of Foreign Operations and Related Programs Act','1760'}
+{'US Department of State - Public Designation under Section 7031(c) of Foreign Operations and Related Programs Act','1760'},
+{'French Economy Ministry - EU and UN Asset Freezing Measures','1761'},
+{'French Economy Ministry - National Asset Freezing Measures','1762'}
 ],r);
