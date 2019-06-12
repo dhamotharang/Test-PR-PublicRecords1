@@ -197,7 +197,7 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 
 //	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep4;                	
        
-  SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep4, FromPersonLexId, ToPersonLexId, 'VerifiedPR', 2, 2000000) 
+  SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep4, FromPersonLexId, ToPersonLexId, 'VerifiedPR', 2, 25000000) 
          : PERSIST('~deletemefraudgov1');
          
   SHARED HighFrequencyFroms := TABLE(LexidAssociationsPrep, {FromPersonLexId, recs := COUNT(GROUP)}, FromPersonLexId, MERGE);
