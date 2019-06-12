@@ -147,11 +147,6 @@ FUNCTION
 										tDeceasedFlag(LEFT,RIGHT),
 										LEFT OUTER,
 										LIMIT(0),KEEP(1));
-	
-	// Count the number of identities for each phone to calculate RI
-  dCntPhoneIdentities := IF(inMod.hasActiveIdentityCountRules,
-                            PhoneFinder_Services.GetIdentitiesCount(dDeceased),
-                            dDeceased);
 
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.PhoneNoSearch)
@@ -168,8 +163,7 @@ FUNCTION
 		OUTPUT(dAll_wDIDs,NAMED('dAll_wDIDs'));
 		OUTPUT(dSuppress,NAMED('dPhoneSearchSuppress'));
 		OUTPUT(dDeceased,NAMED('dDeceased'));
-		OUTPUT(dCntPhoneIdentities,NAMED('dPhoneSearchCntIdentities'));
 	#END
 
-	RETURN dCntPhoneIdentities;
+	RETURN dDeceased;
 END;
