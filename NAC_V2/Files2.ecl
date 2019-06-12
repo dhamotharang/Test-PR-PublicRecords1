@@ -7,6 +7,8 @@
 	export dsCaseRecords := DATASET(Superfile_List.sfCaseRecords, Layouts2.rCaseEx, THOR);	
 	
 	export dsNCF2 := DATASET(Superfile_List.sfNCF2, Layouts2.rNac2, THOR);
+	export dsNCF2Base := DATASET(Superfile_List.sfNCF2Base, $.Layout_Base2, THOR);
+	
 	
 	export dsProcessing := DATASET($.Superfile_list.sfProcessing, $.Layout_Base2, thor);
 
