@@ -12,7 +12,7 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
 
 phoneInfo := DEDUP(SORT(PROJECT(dBatchPhonesIn, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.phoneno)), phone), phone);
 
-dPortedMetadataPhones := JOIN(dBatchPhonesIn, Phones.GetPhoneMetaData.CombineRawPhoneData(phoneInfo), 
+dPortedMetadataPhones := JOIN(dBatchPhonesIn,PhonesInfo.Key_Phones.Ported_Metadata, 
 													LEFT.phoneno = RIGHT.phone,
 													TRANSFORM(Layout_BatchRaw,
 													SELF.acctno := LEFT.acctno,
