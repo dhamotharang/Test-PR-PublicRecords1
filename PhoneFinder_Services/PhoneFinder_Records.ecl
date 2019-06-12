@@ -97,34 +97,34 @@ MODULE
   SHARED dSearchRecs := IF(IsPhoneRiskAssessment, 
                             PROJECT(IF(EXISTS(dSearchRecs_pre), dSearchRecs_pre, dInputPhone), withInputphone(LEFT)),
                             dSearchRecs_pre_a);
- 
-  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, tmpMod);
 
-  dAccuIn  := dSearchRecs(isprimaryphone OR batch_in.homephone<>'');
-                   
+  // zumigo call														 
+	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dSearchRecs, dInBestInfo, tmpMod, dGateways);
+	dZumigo_recs := dZum_gw_recs.Zumigo_GLI; // zumigo records
+	
+	SHARED dZum_final := IF(tmpMod.UseZumigoIdentity, dZumigo_recs, dSearchRecs);
+
+  // Accudata OCN
+  dAccuIn  := dZum_final(isprimaryphone OR batch_in.homephone <> '');
   dDupAccuIn := PROJECT(DEDUP(SORT(dAccuIn, acctno), acctno), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in);
 									 
   AccuDataGateway := IF(tmpMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
   
   SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(dDupAccuIn, AccuDataGateway[1]);
   
-  dAccu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);
+  SHARED dAccu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);
 	
 	// get ported info
+  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dZum_final, tmpMod);
+
 	SHARED dPorted_Phones := IF(tmpMod.IsGetPortedData, 
-                              PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs, tmpMod, dGateways, dSubjectInfo, dAccu_inport(port_end_dt <> 0)),
-                              dSearchRecs);
-	
-	// zumigo call														 
-	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_Phones, dInBestInfo, tmpMod, dGateways);
-	SHARED dZumigo_recs:= dZum_gw_recs.Zumigo_GLI; // zumigo records
-	
-	SHARED dZum_final := IF(tmpMod.UseZumigoIdentity, dZumigo_recs, dPorted_Phones);
+                              PhoneFinder_Services.GetPhonesPortedMetadata(dZum_final, tmpMod, dGateways, dSubjectInfo, dAccu_inport(port_end_dt <> 0)),
+                              dZum_final);
 
   // get remaining phone metadata
   SHARED dPhoneMetadataResults := IF(tmpMod.IsGetMetaData,
-                                      PhoneFinder_Services.GetPhonesMetadata(dZum_final, tmpMod, dGateways, dInBestInfo, dSubjectInfo),
-                                      dZum_final);
+                                      PhoneFinder_Services.GetPhonesMetadata(dPorted_Phones, tmpMod, dGateways, dInBestInfo, dSubjectInfo),
+                                      dPorted_Phones);
 
   // Phone verfication, calculate PRIs
   SHARED dFinalResults := PhoneFinder_Services.GetPRIs(dPhoneMetadataResults, dInBestInfo, tmpMod, dGateways, dProcessInput);
@@ -138,9 +138,9 @@ MODULE
     OUTPUT(dPIISearch, NAMED('dPIISearch'));
     OUTPUT(dInBest, NAMED('dInBest'));
     OUTPUT(dSearchRecs, NAMED('dSearchRecs'));
+    OUTPUT(dZum_final, NAMED('dZum_final'));
     OUTPUT(dSubjectInfo, NAMED('dSubjectInfo'));
     OUTPUT(dPorted_Phones, NAMED('dPorted_Phones'));
-    OUTPUT(dZum_final, NAMED('dZum_final'));
     OUTPUT(dPhoneMetadataResults, NAMED('dPhoneMetadataResults'));
     OUTPUT(dFinalResults, NAMED('dFinalResults'));
   #END
