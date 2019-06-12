@@ -107,7 +107,7 @@ EXPORT E_Bank := MODULE
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Bank_Group,COUNT(ROWS(LEFT))=1),GROUP,Bank__Single_Rollup(LEFT)) + ROLLUP(HAVING(Bank_Group,COUNT(ROWS(LEFT))>1),GROUP,Bank__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::KELOtto::Bank::Result',EXPIRE(30));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT _r_Customer__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_r_Customer_);
   EXPORT Routing_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Routing_Number_);
