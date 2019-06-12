@@ -1,29 +1,57 @@
-﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch, BatchShare;
+﻿IMPORT $, STD, Gateway, Phones, ThreatMetrix, Autokey_batch;
 
-EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)     dSearchResults,
-                DATASET($.Layouts.BatchInAppendDID)      dInBestInfo,
-                PhoneFinder_Services.iParam.SearchParams inMod,
-                DATASET(Gateway.Layouts.Config) dGateways,
+EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)             dSearchResults,
+                DATASET($.Layouts.BatchInAppendDID)              dInBestInfo,
+                $.iParam.SearchParams                            inMod,
+                DATASET(Gateway.Layouts.Config)                  dGateways,
                 DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dProcessInput
                 ) :=
-FUNCTION   
+FUNCTION
+  // Calculate the identity counts - count the number of identities for each phone to calculate RI
+  dCntPhoneIdentities := IF(inMod.hasActiveIdentityCountRules,
+                            $.GetIdentitiesCount(dSearchResults),
+                            dSearchResults);
+
+  // Assign the primary phone flag
+	$.Layouts.PhoneFinder.Final tPrimaryPhoneHist($.Layouts.PhoneFinder.Final le, $.Layouts.PhoneFinder.Final ri) :=
+	TRANSFORM
+		SELF.isPrimaryPhone    := TRUE;
+		SELF.isPrimaryIdentity := FALSE;
+		SELF.batch_in          := PROJECT(le.batch_in, TRANSFORM($.Layouts.BatchInAppendDID, SELF.did := ri.batch_in.did, SELF.homephone := '', SELF := LEFT));
+		SELF                   := le;
+	END;
+	
+	dPrimaryPhoneHist := JOIN(dCntPhoneIdentities(~isPrimaryIdentity),
+                            dSearchResults(isPrimaryPhone),
+                            LEFT.acctno = RIGHT.acctno AND
+                            LEFT.phone  = RIGHT.phone,
+                            tPrimaryPhoneHist(LEFT, RIGHT),
+                            LIMIT(0), KEEP(1));
+
+  dPrimaryIdentityRecs := dCntPhoneIdentities(isPrimaryIdentity);
+
+	dSearchResultsCombined := dPrimaryIdentityRecs(~isPrimaryPhone) + dPrimaryIdentityRecs(isPrimaryPhone) + dPrimaryPhoneHist;
+  
+  // Remove phone history records for other phones
+  // Need to revisit for Batch
+  dSearchResultsWCnt := IF(inMod.isPrimarySearchPII, dSearchResultsCombined, dCntPhoneIdentities);
+  
   // Identities
-  dIdentitiesInfo   := PhoneFinder_Services.GetIdentitiesFinal(dSearchResults, dInBestInfo, inMod);
+  dIdentitiesInfo   := $.GetIdentitiesFinal(dSearchResultsWCnt, dInBestInfo, inMod);
 
   // Primary phone
   dSearchResultsPrimaryPhone := IF(~inMod.IsPrimarySearchPII,
-                                    dSearchResults,
-                                    dSearchResults(isPrimaryPhone AND phone_source in [PhoneFinder_Services.Constants.PhoneSource.Waterfall,
-                                                                                      PhoneFinder_Services.Constants.PhoneSource.QSentGateway]));
+                                    dSearchResultsWCnt,
+                                    dSearchResultsWCnt(isPrimaryPhone AND phone_source in [$.Constants.PhoneSource.Waterfall, $.Constants.PhoneSource.QSentGateway]));
 
-  dPrimaryPhoneInfo_pre := PhoneFinder_Services.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
+  dPrimaryPhoneInfo_pre := $.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
 	
 	// ThreatMetrix                  
   dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrimaryPhoneInfo_pre, phone), phone), Phones.Layouts.PhoneAcctno);
   
   dPrimaryThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
                                 
-  PhoneFinder_Services.Layouts.PhoneFinder.PhoneSlim getThreatMetrix(PhoneFinder_Services.Layouts.PhoneFinder.PhoneSlim l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
+  $.Layouts.PhoneFinder.PhoneSlim getThreatMetrix($.Layouts.PhoneFinder.PhoneSlim l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
    SELF.ReasonCodes := r.response.Summary.ReasonCodes;
    SELF.TmxVariables := r.response._data.TmxVariables;
    SELF := l;
@@ -38,9 +66,9 @@ FUNCTION
   dPrimaryPhoneInfo := IF(inMod.UseThreatMetrixRules, dPrepPrimaryThreatMetrix, dPrimaryPhoneInfo_pre);
   
   // Other phones
-  dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResults(~isPrimaryPhone));
+  dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResultsWCnt(~isPrimaryPhone));
   
-  dOtherPhoneInfo := PhoneFinder_Services.GetPhonesFinal(dSearchResultsOtherPhones, inMod, FALSE);
+  dOtherPhoneInfo := $.GetPhonesFinal(dSearchResultsOtherPhones, inMod, FALSE);
 
   // Prep for Risk indicator calculation
   // Format identities to Final layout
@@ -155,21 +183,28 @@ FUNCTION
                         LEFT OUTER);
 
   dPrepForRIs := IF(EXISTS(dPrepForRIs_pre),
-                    dPrepForRIs_pre, PROJECT(dProcessInput,
-                                              TRANSFORM($.Layouts.PhoneFinder.Final, 
-                                                        SELF.phone          := LEFT.homephone, SELF.fname :=LEFT.name_first,
-                                                        SELF.lname          := LEFT.name_last, SELF.prim_name := LEFT.prim_name, 
-                                                        SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
-                                                        SELF                := [])));
+                    dPrepForRIs_pre,
+                    PROJECT(dProcessInput,
+                            TRANSFORM($.Layouts.PhoneFinder.Final, 
+                                      SELF.phone          := LEFT.homephone,
+                                      SELF.fname          := LEFT.name_first,
+                                      SELF.lname          := LEFT.name_last,
+                                      SELF.prim_name      := LEFT.prim_name, 
+                                      SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
+                                      SELF                := [])));
 
 
-  dRIs := IF(inMod.IncludeRiskIndicators, PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod));
+  dRIs := IF(inMod.IncludeRiskIndicators, $.CalculatePRIs(dPrepForRIs, inMod));
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
                 inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,
                 dPrimaryForRIs + dPrepOtherPhonesForRIs + dOtherIdentities);
 
   #IF($.Constants.Debug.Main)
+		OUTPUT(dCntPhoneIdentities, NAMED('dCntPhoneIdentities'));
+		OUTPUT(dPrimaryPhoneHist, NAMED('dPrimaryPhoneHist'));
+		OUTPUT(dPrimaryIdentityRecs, NAMED('dPrimaryIdentityRecs'));
+		OUTPUT(dSearchResultsCombined, NAMED('dSearchResultsCombined'));
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'));
     OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone_PRI'));
     IF(inMod.isPrimarySearchPII, OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI')));

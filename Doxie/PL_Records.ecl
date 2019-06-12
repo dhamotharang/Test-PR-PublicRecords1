@@ -17,8 +17,7 @@ export PL_Records (
   //This is only used for score_threshold_value in doxie.MAC_Header_Result_Rank.
   doxie.MAC_Header_Field_Declare (IsFCRA);
 
-  bdids := dataset([], doxie.layout_ref_bdid); // no need in comp report
-  fetched := Doxie_Raw.PL_Raw(dids, bdids, '', mod_access, IsFCRA, flagfile);
+  fetched := Doxie_Raw.PL_Raw(dids, mod_access, '', IsFCRA, flagfile);
 
   outrec xformAddStatementIDs(recordof(fetched) l, FFD.Layouts.PersonContextBatchSlim r) := transform,
     skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))

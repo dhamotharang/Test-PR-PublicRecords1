@@ -2,7 +2,7 @@
 
 EXPORT GetIdentitiesCount(DATASET($.Layouts.PhoneFinder.Final) dIn) :=
 FUNCTION
-  dInDedup := DEDUP(SORT(dIn, acctno, phone, did, fname, lname), acctno, phone, IF(did != 0, (STRING)did, TRIM(fname) + ' ' + TRIM(lname)));
+  dInDedup := DEDUP(SORT(dIn(did != 0 OR lname != ''), acctno, phone, did, fname, lname), acctno, phone, IF(did != 0, (STRING)did, TRIM(fname) + ' ' + TRIM(lname)));
 
   rCntIdentity_Layout :=
   RECORD
