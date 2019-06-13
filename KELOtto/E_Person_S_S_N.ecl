@@ -25,7 +25,7 @@ EXPORT E_Person_S_S_N := MODULE
     RECORDOF(__d0_Subject__Mapped);
     KEL.typ.uid Social_;
   END;
-  SHARED __d0_Social__Mapped := JOIN(__d0_Subject__Mapped,E_Social_Security_Number.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Ssn) = RIGHT.KeyVal,TRANSFORM(__d0_Social__Layout,SELF.Social_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Social__Mapped := JOIN(__d0_Subject__Mapped,E_Social_Security_Number.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoSSNId) = RIGHT.KeyVal,TRANSFORM(__d0_Social__Layout,SELF.Social_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Social__Mapped;
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
@@ -38,7 +38,7 @@ EXPORT E_Person_S_S_N := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   EXPORT __PreResult := PROJECT(TABLE(InData,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,Subject_,Social_},_r_Customer_,Subject_,Social_,MERGE),Layout);
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::KELOtto::Person_S_S_N::Result',EXPIRE(30));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person.__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

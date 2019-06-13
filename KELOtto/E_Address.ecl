@@ -49,15 +49,17 @@ EXPORT E_Address := MODULE
     STRING KeyVal;
   END;
   SHARED __d0_KELfiltered := KELOtto.fraudgovshared((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0);
-  SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_address.prim_range) + '|' + TRIM((STRING)LEFT.clean_address.predir) + '|' + TRIM((STRING)LEFT.clean_address.prim_name) + '|' + TRIM((STRING)LEFT.clean_address.addr_suffix) + '|' + TRIM((STRING)LEFT.clean_address.postdir) + '|' + TRIM((STRING)LEFT.clean_address.zip) + '|' + TRIM((STRING)LEFT.clean_address.sec_range)));
+  SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoAddressId)));
   EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
-  EXPORT Lookup := PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Address::UidLookup',EXPIRE(30));
+  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)0);
+  SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
+  SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Address::UidLookup',EXPIRE(30));
   EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::KELOtto::Address');
   EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::KELOtto::Address');
   EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
@@ -72,7 +74,7 @@ EXPORT E_Address := MODULE
     RECORDOF(KELOtto.fraudgovshared);
     KEL.typ.uid UID := 0;
   END;
-  SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_address.prim_range) + '|' + TRIM((STRING)LEFT.clean_address.predir) + '|' + TRIM((STRING)LEFT.clean_address.prim_name) + '|' + TRIM((STRING)LEFT.clean_address.addr_suffix) + '|' + TRIM((STRING)LEFT.clean_address.postdir) + '|' + TRIM((STRING)LEFT.clean_address.zip) + '|' + TRIM((STRING)LEFT.clean_address.sec_range) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
+  SHARED __d0_UID_Mapped := JOIN(__d0_KELfiltered,Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.OttoAddressId) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
   EXPORT KELOtto_fraudgovshared_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
@@ -167,7 +169,7 @@ EXPORT E_Address := MODULE
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Address_Group,COUNT(ROWS(LEFT))=1),GROUP,Address__Single_Rollup(LEFT)) + ROLLUP(HAVING(Address_Group,COUNT(ROWS(LEFT))>1),GROUP,Address__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::KELOtto::Address::Result',EXPIRE(30));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT _r_Customer__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_r_Customer_);
   EXPORT _addresspobox__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_addresspobox_);

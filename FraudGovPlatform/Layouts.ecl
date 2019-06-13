@@ -1400,6 +1400,8 @@ Export CIID := RECORD
    integer8 __recordcount;
   END) event_types_;
   unsigned1 __event_types__flags;
+  integer8 otto_address_id_;
+  unsigned1 __otto_address_id__flags;
   unsigned4 date_of_birth_;
   unsigned1 __date_of_birth__flags;
   unsigned4 deceased_date_;
