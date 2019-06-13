@@ -138,6 +138,7 @@
 'DP', // IOWA_DEPARTMENT_OF_CORRECTIONS_PROBATION                                                            
 'DR', // KENTUCKY_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DT', // MAINE_DEPARTMENT_OF_CORRECTIONS                                                                     
+'DU', // MARYLAND_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
@@ -206,6 +207,7 @@
 'HX', // MASSACHUSETTS_WRENTHAM_POLICE_ARRESTS                                                               
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
+'I0031', // SC JASPER SUMMARY COURT_IE                                                                          
 'I0032', // TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE                                                      
 'I0048', // TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE                                                            
 'I0049', // TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE                                                         
@@ -451,6 +453,7 @@
 'ZX', // SOUTH_CAROLINA_COLLETON_COUNTY_SUMMARY_COURTS                                                       
 'ZY', // SOUTH_CAROLINA_DARLINGTON_COUNTY_CIRCUIT_COURTS                                                     
 'ZZ', // SOUTH_CAROLINA_DARLINGTON_COUNTY_SUMMARY_COURTS                                                     
+
 
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
