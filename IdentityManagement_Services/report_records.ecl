@@ -146,7 +146,7 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagemen
 // =======================================================================
 // ======================  People At Work	 ===============================
 // =======================================================================	
-			paw_recs := PersonReports.peopleatwork_records(dids);
+			paw_recs := PersonReports.peopleatwork_records(dids,Module(PROJECT (in_params,PersonReports.IParam.peopleatwork, OPT))end);
 			EXPORT peopleatwork := IdentityManagement_Services.Functions.debatable_names(paw_recs,iesp.peopleatwork.t_PeopleAtWorkRecord, CompanyName);
 
 // =======================================================================
