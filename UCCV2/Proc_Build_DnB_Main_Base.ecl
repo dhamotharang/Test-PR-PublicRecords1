@@ -191,17 +191,19 @@ dAddCollateral    := Join(dFiling , distribute(dJoinCollateral,hash(rmsid)),
 													Trans_add_collateral(left, right),
 													Left outer,local
 												 );
-													 
-dDedup            := dedup(distribute(dAddCollateral + Project(dFile,Trans_rollback_Rmsid(left)),hash(rmsid)),
-													 except process_date,vendor_entry_date,vendor_upd_date, all, local
-													);	
-														
-dGroup            := group(sort(distribute(ddedup,hash(tmsid,rmsid)),tmsid,rmsid,local),
-													 tmsid,rmsid,local
-													);
-														
-dMainBase         := ungroup(Project(dGroup ,Trans_Rmsid(left,(string2) counter),local));
+												 
+FullFile		:=	distribute(dAddCollateral+Project(dFile,Trans_rollback_Rmsid(left)),hash(rmsid));
 
-AddRecordID       := uccv2.fnAddPersistentRecordID_Main(dMainBase);
+AddRecordID := 	distribute(uccv2.fnAddPersistentRecordID_Main(FullFile),hash(rmsid));
+													
+dDedup	:=  dedup(sort(AddRecordID,-process_date,local),except process_date,vendor_entry_date,vendor_upd_date, local);													 
+													
+// dGroup            := group(sort(distribute(ddedup,hash(tmsid,rmsid)),tmsid,rmsid,local),
+													 // tmsid,rmsid,local
+													// );
+														
+// dMainBase         := ungroup(Project(dGroup ,Trans_Rmsid(left,(string2) counter),local));
 
-export Proc_Build_DnB_Main_Base := AddRecordID;
+// AddRecordID       := uccv2.fnAddPersistentRecordID_Main(dMainBase);
+
+export Proc_Build_DnB_Main_Base := dDedup;
