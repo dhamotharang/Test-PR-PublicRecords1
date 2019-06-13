@@ -444,11 +444,14 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       RETURN voter_duped_sorted;
 	END;
 	
-	EXPORT pawRecsByDid(string6 ssn_mask):= FUNCTION
-       // standard restrictions - glb, dppa etc not enforced on PAW data					 
-       paw_raw := PersonReports.peopleatwork_records(in_did);
-       Suppress.MAC_Mask(paw_raw, recs_masked,ssn,none,true,false,,,,ssn_mask);
-       paw_raw_sorted:= sort(recs_masked,-businessids.ultid,-businessids.orgid,-businessids.seleid,
+	EXPORT pawRecsByDid(string6 ssnmask):= FUNCTION
+       // standard restrictions - glb, dppa etc not enforced on PAW data
+       param := Module(PersonReports.IParam.peopleatwork)
+          Export ssn_mask := (string)ssnmask;
+       End;					 
+       paw_raw := PersonReports.peopleatwork_records(in_did, param);
+       
+       paw_raw_sorted:= sort(paw_raw,-businessids.ultid,-businessids.orgid,-businessids.seleid,
                             -companyname,-title,-d2i(datelastseen),-d2i(datefirstseen));
        paw_rolled := rollup(paw_raw_sorted,
                             LEFT.businessids.ultid  = RIGHT.businessids.ultid and LEFT.businessids.orgid = RIGHT.businessids.orgid and
