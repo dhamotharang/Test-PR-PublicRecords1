@@ -44,5 +44,6 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 	export Alert				:= fn_mail_recipiant('Alert');
 	export BocaOps			:= fn_mail_recipiant('BocaOps');
 	export Analytics		:= fn_mail_recipiant('Analytics');
+	export RinNetwork		:= fn_mail_recipiant('RinNetwork');
 
 end;

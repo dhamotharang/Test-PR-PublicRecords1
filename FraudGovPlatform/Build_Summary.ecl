@@ -363,13 +363,8 @@ EXPORT Build_Summary(string pversion) := MODULE
 	+ 'THIS IS AN AUTOMATED MESSAGE - PLEASE DO NOT REPLY DIRECTLY TO THIS EMAIL'
 	;
 
-	// export Send_Email:=fileservices.sendemail(
-		// FraudGovPlatform_Validation.Mailing_List().RinNetwork,
-		// 'RIN Data Build ' + pversion,
-		// msg);
-
 	export Send_Email := fileservices.SendEmailAttachText( 
-			'oscar.barrientos@lexisnexisrisk.com; sesha.nookala@lexisnexisrisk.com', 
+			FraudGovPlatform_Validation.Mailing_List().RinNetwork, 
 			'RIN Data Build' + pversion,
       msg,
 			html,
