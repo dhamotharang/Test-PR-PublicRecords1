@@ -174,7 +174,11 @@ EXPORT map_SCS0852_conversion(STRING pVersion) := FUNCTION
 																 	 StdNAME_OFFICE,
 																	 Prof_License_Mari.mod_clean_name_addr.strippunctMisc(StdNAME_OFFICE))); 
 				
-		SELF.NAME_OFFICE	    := CleanNAME_OFFICE;
+		SELF.NAME_OFFICE	  	:= MAP(CleanNAME_OFFICE<>'' AND REGEXFIND(DBApattern,CleanNAME_OFFICE)=>StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.GetCorpName(CleanNAME_OFFICE)),
+                                 CleanNAME_OFFICE!='' AND TRIM(CleanNAME_OFFICE,ALL)= TRIM(SELF.name_first,ALL) + TRIM(SELF.name_last,ALL)=>'', 															     
+																 CleanNAME_OFFICE!='' AND TRIM(CleanNAME_OFFICE,ALL)= TRIM(SELF.name_first,ALL) + TRIM(SELF.name_mid,ALL) + TRIM(SELF.name_last,ALL)=>'',
+																 CleanNAME_OFFICE);		
+																 
 		SELF.OFFICE_PARSE			:= IF(SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'GR',
 																IF(SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),
 																   'MD',
