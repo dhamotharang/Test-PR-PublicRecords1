@@ -311,7 +311,8 @@ EXPORT Transforms := MODULE
 		SELF.PhysicalAddress := iesp.ECL2ESP.SetAddress(L.clean_address.prim_name, L.clean_address.prim_range, L.clean_address.predir, L.clean_address.postdir, 
 																										L.clean_address.addr_suffix, L.clean_address.unit_desig, L.clean_address.sec_range, 
 																										L.clean_address.p_city_name, L.clean_address.st, L.clean_address.zip, L.clean_address.zip4, 
-																										'', '', L.address_1, L.address_2,'');
+																										'', '', STD.Str.CleanSpaces(L.Street_1 + ' ' + L.Street_2), 
+																										STD.Str.CleanSpaces(Address.Addr2FromComponents(TRIM(L.City), TRIM(L.State), L.Zip)),'');
 		SELF.MailingAddress := iesp.ECL2ESP.SetAddress(L.additional_address.clean_address.prim_name, L.additional_address.clean_address.prim_range, L.additional_address.clean_address.predir, L.additional_address.clean_address.postdir, 
 																										L.additional_address.clean_address.addr_suffix, L.additional_address.clean_address.unit_desig, L.additional_address.clean_address.sec_range, 
 																										L.additional_address.clean_address.p_city_name, L.additional_address.clean_address.st, L.additional_address.clean_address.zip, L.additional_address.clean_address.zip4, 
