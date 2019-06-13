@@ -1,4 +1,4 @@
-﻿IMPORT PRTE2_Liens, LiensV2, Address, BIPV2;
+﻿IMPORT PRTE2_Liens, LiensV2, Address, BIPV2, prte2;
 
 EXPORT Layouts := MODULE
 
@@ -53,6 +53,8 @@ END;
 EXPORT party_base_ext := RECORD //Contains DI added fields
 LiensV2.layout_liens_party;
 BIPV2.IDlayouts.l_xlink_ids;
+prte2.Layouts.DEFLT_CPA;
+string10	orig_rmsid;
 string10	bug_num;
 string20	cust_name;
 STRING8		link_dob;
@@ -64,8 +66,11 @@ END;
 EXPORT party_base := RECORD
 LiensV2.layout_liens_party;
 BIPV2.IDlayouts.l_xlink_ids;
+prte2.Layouts.DEFLT_CPA;
+string10	orig_rmsid;
 END;
 
+	
 //LinkIDs key layout
 EXPORT LinkIDSKey:= RECORD
   unsigned6 ultid;
@@ -151,6 +156,26 @@ EXPORT LinkIDSKey:= RECORD
   unsigned8 persistent_record_id;
   string9 app_ssn := '';
   string9 app_tax_id := '';
+	prte2.Layouts.DEFLT_CPA;
+	string10	orig_rmsid;
  END;
+
+//Due to the Prod Layout changes
+EXPORT alpha_main_in := RECORD
+	main_base_ext and not [global_sid,
+												 record_sid,
+												 orig_rmsid,
+												 AgencyID,
+												 AgencyID_src
+												 ];
+	end;
+	
+EXPORT alpha_party_in := RECORD
+	party_base_ext and not [global_sid,
+													record_sid,
+													orig_rmsid
+													];
+end;
+
  
 END;

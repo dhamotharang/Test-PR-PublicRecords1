@@ -5,6 +5,7 @@ EXPORT proc_build_base(STRING fileVersion) := FUNCTION
 
 //Alpharetta Base file - Input base file put out by Insurance PRTE process
 ds_Alpha_Base	:= PRTE2_Watercraft.Files.Alpha_Base(watercraft_key <> '');
+//Export ds_Alpha_Base	:= PRTE2_Watercraft.Files.Alpha_Base(watercraft_key <> '')
 
 //Spreadsheet updated by Data Insight
 ds_Boca_in := PRTE2_Watercraft.Files.Boca_in(watercraft_key <> '');

@@ -4,8 +4,8 @@ IMPORT B_Event_3,B_Event_4,E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_2 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_3.__ENH_Event_3) __ENH_Event_3 := B_Event_3.__ENH_Event_3;
-  SHARED __EE123056 := __ENH_Event_3;
-  EXPORT __ST20705_Layout := RECORD
+  SHARED __EE123512 := __ENH_Event_3;
+  EXPORT __ST20696_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -14,6 +14,7 @@ EXPORT B_Event_2 := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
+    KEL.typ.nint Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -150,6 +151,7 @@ EXPORT B_Event_2 := MODULE
     KEL.typ.nint Deceased_To_Event_Year_Diff_;
     KEL.typ.nbool Demo_Customer_;
     KEL.typ.nint Event_Type_Count_;
+    KEL.typ.int Id_Nas9_Flag_ := 0;
     KEL.typ.int In_Customer_Population_ := 0;
     KEL.typ.int Ip_High_Risk_City_ := 0;
     KEL.typ.int Ip_Hosted_ := 0;
@@ -162,9 +164,9 @@ EXPORT B_Event_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST20705_Layout __ND124508__Project(B_Event_4.__ST22020_Layout __PP123059) := TRANSFORM
-    SELF.Ip_High_Risk_City_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP123059._edgecity_),IN,__CN(['MIAMI'])))=>1,0);
-    SELF := __PP123059;
+  SHARED __ST20696_Layout __ND124982__Project(B_Event_4.__ST22017_Layout __PP123515) := TRANSFORM
+    SELF.Ip_High_Risk_City_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP123515._edgecity_),IN,__CN(['MIAMI'])))=>1,0);
+    SELF := __PP123515;
   END;
-  EXPORT __ENH_Event_2 := PROJECT(__EE123056,__ND124508__Project(LEFT));
+  EXPORT __ENH_Event_2 := PROJECT(__EE123512,__ND124982__Project(LEFT));
 END;
