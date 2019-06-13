@@ -196,7 +196,7 @@ FullFile		:=	distribute(dAddCollateral+Project(dFile,Trans_rollback_Rmsid(left))
 
 AddRecordID := 	distribute(uccv2.fnAddPersistentRecordID_Main(FullFile),hash(rmsid));
 													
-dDedup	:=  dedup(AddRecordID,except process_date,vendor_entry_date,vendor_upd_date, all, local);													 
+dDedup	:=  dedup(sort(AddRecordID,-process_date,local),except process_date,vendor_entry_date,vendor_upd_date, local);													 
 													
 // dGroup            := group(sort(distribute(ddedup,hash(tmsid,rmsid)),tmsid,rmsid,local),
 													 // tmsid,rmsid,local
