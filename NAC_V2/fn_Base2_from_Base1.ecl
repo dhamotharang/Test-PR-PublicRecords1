@@ -2,8 +2,8 @@
 import Nac, dops, ut;
 export fn_Base2_from_Base1(string version) := FUNCTION
 b1 := nac.Files().Base;
-
-b2 := nac_v2.fn_Base1ToBase2(b1) : INDEPENDENT;
+testdata := dataset('~nac::uber::base2_testdata', nac_V2.layout_Base2, thor);
+b2 := nac_v2.fn_Base1ToBase2(b1) + testdata : INDEPENDENT;
 lfn_base := Nac_V2.Superfile_List().sfBase2 + '::' + workunit;
 
 collisions := NAC_V2.Mod_Collisions2(b2).AllCollisions;
