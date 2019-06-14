@@ -634,7 +634,8 @@ MODULE
 	
 	// Ohio Death Records
 	EXPORT Ohio := RECORD
-		STRING19	lname;
+		UNSIGNED	filedate;
+		STRING19  lname;
 		STRING17	fname;
 		STRING22	mname;
 		STRING3		name_suffix;
@@ -647,6 +648,7 @@ MODULE
 		STRING45	res_city;
 		STRING5		res_zip;
 		STRING10	res_county;
+		STRING10  res_state;
 		// STRING54	funeral_home_name := '';
 	END;
 	
