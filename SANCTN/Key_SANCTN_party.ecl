@@ -1,9 +1,9 @@
-Import Data_Services, doxie_files, doxie,ut, codes;
+﻿Import Data_Services, doxie_files, doxie,ut, codes;
 
 f_sanctn_party := SANCTN.file_base_party;
 
-layout_SANCTN_party_key := SANCTN.layout_SANCTN_party_clean_orig;
-
+//CCPA-283 Add 2 CCPA fields
+layout_SANCTN_party_key := SANCTN.Layout_SANCTN_Party_New;
 
 /* Mask the SSNs found within the freeform text field */
 layout_SANCTN_party_key tSANCTN_key(f_sanctn_party L) := transform
