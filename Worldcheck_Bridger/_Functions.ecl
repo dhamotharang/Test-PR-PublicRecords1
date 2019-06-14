@@ -1232,6 +1232,8 @@
 				trim(kword, left, right) = 'SLGAZ-PO' =>SubGroup_Constants.numKeywordsID.KEYWORD_SLGAZ_PO,
 				trim(kword, left, right) = 'NIB' =>SubGroup_Constants.numKeywordsID.KEYWORD_NIB,
 				trim(kword, left, right) = 'BRIBAMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRIBAMA,
+				trim(kword, left, right) = 'CARBQ' =>SubGroup_Constants.numKeywordsID.KEYWORD_CARBQ,
+				trim(kword, left, right) = 'AZFMS-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_AZFMS_NAT,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
