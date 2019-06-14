@@ -4,10 +4,19 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 	shared Dev_list :=	'Oscar.Barrientos@lexisnexisrisk.com'
 										+	';Sesha.Nookala@lexisnexisrisk.com'
 										;
+
+	shared Data_QA_list := 'Prasanna.Kolli@lexisnexisrisk.com'
+										;
+
 	shared Batch_list	:=	Dev_list
 										+	';roberto.perez@lexisnexisrisk.com'
 										;
-	shared Roxie_list := 'riskintelligencenetwork.support@lexisnexisrisk.com';
+
+	shared Roxie_list :=	'Vishesh.Ved@lexisnexisrisk.com'
+										+	';'+Data_QA_list
+										+	';'+Dev_list
+										;
+	shared RinNetwork_list := 'riskintelligencenetwork.support@lexisnexisrisk.com'
 										;										
 	shared Boca_Ops	:= 	'SupercomputerOps@lexisnexisrisk.com'
 										+	';'+Dev_list										
@@ -34,5 +43,6 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 	export Alert				:= fn_mail_recipiant('Alert');
 	export BocaOps			:= fn_mail_recipiant('BocaOps');
 	export Analytics		:= fn_mail_recipiant('Analytics');
+	export RinNetwork		:= fn_mail_recipiant('RinNetwork');
 
 end;

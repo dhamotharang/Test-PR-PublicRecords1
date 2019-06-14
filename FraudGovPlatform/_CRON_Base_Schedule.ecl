@@ -6,13 +6,13 @@ ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',FraudGovPlatform_Valid
 
 lECL1 :=
  'import ut;\n'
++'version:=ut.GetDate : independent;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'#CONSTANT(\'RunKelDemo\',false);\n' 
 +'#STORED(\'_Validate_Year_Range_Low\',1900);\n'
-+'#STORED(\'_Validate_Year_Range_High\',2018);\n'
++'#STORED(\'_Validate_Year_Range_High\',version[1..4]);\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'#OPTION(\'defaultSkewError\', 1);\n'
-+'version:=ut.GetDate : independent;\n'
 +'wuname := \'FraudGov Full Build\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
