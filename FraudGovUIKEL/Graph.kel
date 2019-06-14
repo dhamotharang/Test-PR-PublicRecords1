@@ -1260,8 +1260,19 @@ Legal: => OldestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp
 																 INTEGER(MIN(LegalEmployer.rEmployer, datefirstemp)));
 Legal: => NewestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp:Null OR (NOT ISVALIDDATE(datefirstemp))) => -99998, // No valid datefirstemp
 																 INTEGER(MAX(LegalEmployer.rEmployer, datefirstemp)));
-																 
-Legal: => BusAcctPerBusLegalEntCnt := COUNT(EmployerClaim{rEmployer}); //need to fix
+
+//Legal Fictitious Business attributes															 
+Legal: => BusAcctPerBusLegalEntCnt := COUNT(LegalEmployer{rEmployer}); 
+Legal: => EmpBeganToAcctOpenLT12MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>=0 AND rEmployer.BusAcctEmpBeganToOpenDtSpan<=12))); 
+Legal: => EmpBeganToAcctOpenLT6MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>=0 AND rEmployer.BusAcctEmpBeganToOpenDtSpan<=6))); 
+Legal: => EmpBeganToAcctOpenGT12MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>12))); 
+
+
+
+
 
 
 // Legal claim history attributes
@@ -1675,9 +1686,16 @@ Employer: => BusIncorpToOldestAcctOpenSpan := MAP(BusAcctUIDEcho=-99999 OR rLega
 																								  MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestAcctOpenDt))>999 => 999,
 																								  MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestAcctOpenDt))<-999 => -999,
 																								  MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestAcctOpenDt)));
-Employer: => BusAcctPerBusLegalEntCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
-                                             rLegal.BusAcctPerBusLegalEntCnt); //need to fix
 
+//Bus SasFlags attributes
+Employer: => BusAcctPerBusLegalEntCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                             rLegal.BusAcctPerBusLegalEntCnt);																				
+Employer: => BusEmpBeganToAcctOpenLT12MCnt:= MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenLT12MCnt);
+Employer: => BusEmpBeganToAcctOpenLT6MCnt:= MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenLT6MCnt);
+Employer: => BusEmpBeganToAcctOpenGT12MCnt:= MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenGT12MCnt);
 																		 
 																						 
 
