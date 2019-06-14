@@ -10,8 +10,9 @@ export Build_All(
 ) :=
 module
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.hthor_Dev,	FraudGovPlatform_Validation.Constants.hthor_Prod);
+ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
-ECL := 
+GenerateDashboards := 
  'import ut,FraudGovPlatform_Analytics;\n'
 +'wuname := \'FraudGov Cert Dashboards Refresh\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
@@ -24,6 +25,21 @@ ECL :=
 +' 	 );\n\n'
 +'FraudGovPlatform_Analytics.GenerateDashboards(False,True):failure(email(\'Cert dashboards failed\'));\n'
 ;
+
+BuildStatusReport := 
+ 'import ut,FraudGovPlatform,FraudGovPlatform_Validation;\n'
++'wuname := \'FraudGov Build Status Report\';\n'
++'#WORKUNIT(\'name\', wuname);\n'
++'#WORKUNIT(\'protect\', true);\n'
++'email(string msg):=fileservices.sendemail(\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
++' 	 ,\'FraudGov Build Status Report\'\n'
++' 	 ,msg\n'
++' 	 +\'Build wuid \'+workunit\n'
++' 	 );\n\n'
++'FraudGovPlatform.Build_Summary(\''+version+'\').send:failure(email(\'Build Status Report failed\'));\n'
+;
+
 	export build_all := sequential(
 		FraudGovPlatform.Build_Input(version).ALL,
 		FraudGovPlatform.Build_Base(version).ALL,
@@ -40,7 +56,8 @@ ECL :=
 					FraudGovPlatform.Build_Kel(version).All,
 					FraudGovPlatform.Promote(version).promote_keys,
 					Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',version),
-					_Control.fSubmitNewWorkunit(ECL,ThorName),
+					_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName),
+					_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName),
 					FraudGovPlatform.Send_Emails(version).Roxie),
 				FAIL('Unit Test Failed'))
 	): success(FraudGovPlatform.Send_Emails(version).BuildSuccess), failure(FraudGovPlatform.Send_Emails(version).BuildFailure);
