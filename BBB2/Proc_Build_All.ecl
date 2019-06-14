@@ -1,4 +1,4 @@
-IMPORT $, RoxieKeyBuild, business_header, strata, _control,VersionControl, Orbit3;
+﻿IMPORT $, RoxieKeyBuild, business_header, strata, _control,VersionControl, Orbit3 ,Scrubs_BBB2, Scrubs;
 
 	
 EXPORT Proc_Build_All(
@@ -25,8 +25,13 @@ EXPORT Proc_Build_All(
 			pOverwrite
 		)
 	);
+  
+	MemberScrubReport     := Scrubs.ScrubsPlus('BBB2','Scrubs_BBB2','Scrubs_BBB2_Raw_Member','Raw_Member' ,pversion, Email_Notification_Lists.Scrubs,false);
+  NonMemberScrubReport  := Scrubs.ScrubsPlus('BBB2','Scrubs_BBB2','Scrubs_BBB2_Raw_NonMember','Raw_NonMember' ,pversion, Email_Notification_Lists.Scrubs,false);
 
-	EXPORT full_build := sequential(
+  EXPORT full_build := sequential(
+	  MemberScrubReport,
+		NonMemberScrubReport,
 		spray_files,
 		Proc_Build_Base(pversion).all,
 		Proc_Build_Keys(pversion).all,
