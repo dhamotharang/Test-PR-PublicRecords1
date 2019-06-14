@@ -1,4 +1,4 @@
-Import Data_Services, autokeyb2,doxie;
+﻿Import Data_Services, autokeyb2,doxie;
 
 rec := RECORD
   unsigned6 fakeid;
@@ -49,6 +49,9 @@ rec := RECORD
 	string9   ssn_appended;
   integer8 zero;
   string0 blk;
+	//CCPA-283 Adding CCPA new fields
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid:=0;
   unsigned8 __internal_fpos__;
 
 END;
