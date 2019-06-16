@@ -1,8 +1,7 @@
 ﻿/*2018-05-25T15:50:30Z (jprichard)
 C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\KELOtto\Graph\2018-05-25T15_50_30Z.ecl
 */
-#OPTION(persistexpire, 30)
-#OPTION(persistlevel, 0)
+#OPTION(persistexpire, 7)
 #OPTION(codegen, 'nosmartjoins')
 #OPTION(codegen, 'nolookupjoins')
 
@@ -927,6 +926,7 @@ USE KELOtto.fraudgovshared(FLAT,
   ),
   PersonEvent(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0),
     LexId = did,
+    EventDate = event_date,
     Transaction = record_id    
   ),
   PersonAddress(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0),
@@ -2115,7 +2115,7 @@ Customer: => HighFrequencyAddressCount := SUM(PersonAddress(Location.InCustomerP
 Customer: => AllHighFrequencyAddressCount := SUM(PersonAddress{Location}, Location.HighFrequencyFlag);
 Customer: => HighFrequencyAddressPercent := HighFrequencyAddressCount / AddressCount;
 Customer: => AllHighFrequencyAddressPercent := AllHighFrequencyAddressCount / AllAddressCount;
-Customer: => EventDateMax := MAX(PersonEvent(Transaction.EventTypeCount=0), EventDate); // only count non-performance data rows. The reason is that after the fact people will be validating and that will move the max date.
+Customer: => EventDateMax := MAX(PersonEvent/*(Transaction.EventTypeCount=0)*/, EventDate); // only count non-performance data rows. The reason is that after the fact people will be validating and that will move the max date.
 
 
 QUERY: Temp <= Event;

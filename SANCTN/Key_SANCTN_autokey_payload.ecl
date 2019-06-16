@@ -52,7 +52,6 @@ rec := RECORD
 	//CCPA-283 Adding CCPA new fields
 	UNSIGNED4 global_sid := 0;
 	UNSIGNED8 record_sid:=0;
-  unsigned8 __internal_fpos__;
 
 END;
 

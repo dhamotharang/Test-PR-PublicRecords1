@@ -4,8 +4,8 @@ IMPORT B_Event_5,E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_4 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_5.__ENH_Event_5) __ENH_Event_5 := B_Event_5.__ENH_Event_5;
-  SHARED __EE50991 := __ENH_Event_5;
-  EXPORT __ST22017_Layout := RECORD
+  SHARED __EE48174 := __ENH_Event_5;
+  EXPORT __ST22007_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -150,7 +150,6 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.int Deceased_Prior_To_Event_ := 0;
     KEL.typ.nint Deceased_To_Event_Year_Diff_;
     KEL.typ.nbool Demo_Customer_;
-    KEL.typ.nint Event_Type_Count_;
     KEL.typ.int Id_Nas9_Flag_ := 0;
     KEL.typ.int In_Customer_Population_ := 0;
     KEL.typ.int Ip_Hosted_ := 0;
@@ -163,15 +162,15 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST22017_Layout __ND50826__Project(B_Event_5.__ST22494_Layout __PP48730) := TRANSFORM
-    SELF.Id_Nas9_Flag_ := MAP(__T(__OP2(__CAST(KEL.typ.str,__PP48730._nas__summary_),=,__CN('9')))=>1,0);
-    SELF.Ip_Hosted_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48730._proxytype_),=,__CN('HOSTING')))=>1,0);
-    SELF.Ip_Not_Us_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48730._edgecountry_),IN,__CN(['USA',''])))=>0,1);
-    SELF.Ip_Tor_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48730._proxydescription_),IN,__CN(['TOR EXIT','TOR RELAY'])))=>1,0);
-    SELF.Ip_Vpn_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP48730._proxydescription_),=,__CN('VPN')))=>1,0);
-    __BS50767 := __T(__PP48730.Event_Types_);
-    SELF.Kr_High_Risk_Identity_Flag_ := MAP(__PP48730.Kr_Identity_Risk_ = 1 OR EXISTS(__BS50767(__T(__OP2(__T(__PP48730.Event_Types_).Event_Type_,IN,__CN(['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400'])))))=>1,0);
-    SELF := __PP48730;
+  SHARED __ST22007_Layout __ND48010__Project(B_Event_5.__ST22483_Layout __PP45926) := TRANSFORM
+    SELF.Id_Nas9_Flag_ := MAP(__T(__AND(__OP2(__CAST(KEL.typ.str,__PP45926._nas__summary_),=,__CN('9')),__OP2(__PP45926._relativeaddressmatch_,=,__CN(0))))=>1,0);
+    SELF.Ip_Hosted_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP45926._proxytype_),=,__CN('HOSTING')))=>1,0);
+    SELF.Ip_Not_Us_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP45926._edgecountry_),IN,__CN(['USA',''])))=>0,1);
+    SELF.Ip_Tor_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP45926._proxydescription_),IN,__CN(['TOR EXIT','TOR RELAY'])))=>1,0);
+    SELF.Ip_Vpn_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP45926._proxydescription_),=,__CN('VPN')))=>1,0);
+    __BS47951 := __T(__PP45926.Event_Types_);
+    SELF.Kr_High_Risk_Identity_Flag_ := MAP(__PP45926.Kr_Identity_Risk_ = 1 OR EXISTS(__BS47951(__T(__OP2(__T(__PP45926.Event_Types_).Event_Type_,IN,__CN(['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400'])))))=>1,0);
+    SELF := __PP45926;
   END;
-  EXPORT __ENH_Event_4 := PROJECT(__EE50991,__ND50826__Project(LEFT));
+  EXPORT __ENH_Event_4 := PROJECT(__EE48174,__ND48010__Project(LEFT));
 END;
