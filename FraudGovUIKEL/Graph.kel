@@ -1223,6 +1223,8 @@ Legal: => OldestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:N
 Legal: => TaxLiabOngoingFlag := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null OR (NOT ISVALIDDATE(dateliabest))) => -99998, // No valid dateliabest
 																				 ALL(LegalEmployer.rEmployer, NOT liabtermdate:Null) OR (NewestTaxLiabStartDt < NewestTaxLiabEndDt) => 0,
 																				 1);
+Legal: => IncorpDt := MAP(NOT ISVALIDDATE(bestseleincorporationdate) OR bestseleincorporationdate:Null => -99997, // SOS incorp date is invalid
+													INTEGER(bestseleincorporationdate)); // I believe this is the SOS incorporation date
 Legal: => IncorpStatusType := MAP(biscorporatestatus:Null => -99997,
 																	biscorporatestatus);
 Legal: => UnemClaimCurrActiveCount := MAP(ClaimCount=0 => -99998,
@@ -1250,6 +1252,28 @@ Legal: => UnemClaimApprvCnt90D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) =>
 Legal: => UnemClaimApprvCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99998,
 																		 COUNT(LegalClaim.rClaim(claim_status = 'Regular Active' AND ClaimAge >= 0 AND ClaimAge <= 30)));
 																		 
+Legal: => OldestAcctOpenDt := MAP(ALL(LegalEmployer.rEmployer, statusreceiptdate:Null OR (NOT ISVALIDDATE(statusreceiptdate))) => -99998, // No valid statusreceiptdate
+																 INTEGER(MIN(LegalEmployer.rEmployer, statusreceiptdate)));
+Legal: => NewestAcctOpenDt := MAP(ALL(LegalEmployer.rEmployer, statusreceiptdate:Null OR (NOT ISVALIDDATE(statusreceiptdate))) => -99998, // No valid statusreceiptdate
+																 INTEGER(MAX(LegalEmployer.rEmployer, statusreceiptdate)));
+Legal: => OldestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp:Null OR (NOT ISVALIDDATE(datefirstemp))) => -99998, // No valid datefirstemp
+																 INTEGER(MIN(LegalEmployer.rEmployer, datefirstemp)));
+Legal: => NewestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp:Null OR (NOT ISVALIDDATE(datefirstemp))) => -99998, // No valid datefirstemp
+																 INTEGER(MAX(LegalEmployer.rEmployer, datefirstemp)));
+
+//Legal Fictitious Business attributes															 
+Legal: => BusAcctPerBusLegalEntCnt := COUNT(LegalEmployer{rEmployer}); 
+Legal: => EmpBeganToAcctOpenLT12MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>=0 AND rEmployer.BusAcctEmpBeganToOpenDtSpan<=12))); 
+Legal: => EmpBeganToAcctOpenLT6MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>=0 AND rEmployer.BusAcctEmpBeganToOpenDtSpan<=6))); 
+Legal: => EmpBeganToAcctOpenGT12MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
+                                            COUNT(LegalEmployer{rEmployer}(rEmployer.BusAcctEmpBeganToOpenDtSpan>12))); 
+
+
+
+
+
 
 // Legal claim history attributes
 // Count the number of unique claimant ids with claims having a "regular active" status
@@ -1376,9 +1400,8 @@ Employer: => BusOldestUnemClmDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -
 																			 rLegal.ClaimCount=0 => -99998,
 																			 rLegal.OldestUnemClmDt); // Will have -99997 if no dates
 Employer: => BusIncorpDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
-																rLegal.bestseleincorporationdate:Null OR (NOT ISVALIDDATE(rLegal.bestseleincorporationdate)) => -99997, // SOS incorp date is invalid
-																DAYSBETWEEN(rLegal.bestseleincorporationdate, DATE(BusNewestRecordDt)) < 0 => -99998, // No SOS incorporation on file prior to BusNewestRecordDt
-																INTEGER(rLegal.bestseleincorporationdate)); // I believe this is the SOS incorporation date
+                                rLegal.IncorpDt > BusNewestRecordDt => -99998, // No SOS incorporation on file prior to BusNewestRecordDt
+                                rLegal.IncorpDt);
 Employer: => BusIncorpMSince := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																		BusIncorpDt=-99997 => -99997, // Or unable to calculate
 																		DAYSBETWEEN(DATE(BusIncorpDt), DATE(BusNewestRecordDt)) < 0 => -99998,
@@ -1464,7 +1487,7 @@ Employer: => BusAcctLexIDMultiUnemClmCnt30D := MAP(BusAcctUIDEcho=-99999 => -999
 
 // The same attributes as before, just on the legal business entitiy instead of the actual business.			
 Employer: => BusUnemClmAcctCurActiveCnt := MAP(rLegal:Null => -99999,
-																							 rLegal.BusUnemClmAcctCurActiveCnt);																								 
+																							 rLegal.BusUnemClmAcctCurActiveCnt);	
 
 // Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
 Employer: => BusUnemClmAcctFiledCntEv := MAP(rLegal:Null => -99999,
@@ -1474,7 +1497,7 @@ Employer: => BusUnemClmAcctFiledCnt1Y := MAP(rLegal:Null => -99999,
 Employer: => BusUnemClmAcctFiledCnt120D := MAP(rLegal:Null => -99999,
 																							 rLegal.BusUnemClmAcctFiledCnt120D);																							 
 Employer: => BusUnemClmAcctFiledCnt90D := MAP(rLegal:Null => -99999,
-																							rLegal.BusUnemClmAcctFiledCnt90D);																								
+																							rLegal.BusUnemClmAcctFiledCnt90D);	
 Employer: => BusUnemClmAcctFiledCnt30D := MAP(rLegal:Null => -99999,
 																							rLegal.BusUnemClmAcctFiledCnt30D);	
 
@@ -1483,13 +1506,13 @@ Employer: => BusUnemClmLexIDFiledCntEv := MAP(rLegal:Null => -99999,
 																							rLegal.BusUnemClmLexIDFiledCntEv);																							
 Employer: => BusUnemClmLexIDFiledCnt1Y := MAP(rLegal:Null => -99999,
 																							rLegal.BusUnemClmLexIDFiledCnt1Y);																							
-Employer: => BusUnemClmLexIDFiledCnt120D := MAP(rLegal:Null => -99999,
-																								rLegal.BusUnemClmLexIDFiledCnt120D); 																								
-Employer: => BusUnemClmLexIDFiledCnt90D := MAP(rLegal:Null => -99999,
-																							 rLegal.BusUnemClmLexIDFiledCnt90D); 																							 
-Employer: => BusUnemClmLexIDFiledCnt30D := MAP(rLegal:Null => -99999,
-																							 rLegal.BusUnemClmLexIDFiledCnt30D);
-																								
+// Employer: => BusUnemClmLexIDFiledCnt120D := MAP(rLegal:Null => -99999,
+																								// rLegal.BusUnemClmLexIDFiledCnt120D); 
+// Employer: => BusUnemClmLexIDFiledCnt90D := MAP(rLegal:Null => -99999,
+																							 // rLegal.BusUnemClmLexIDFiledCnt90D); 
+// Employer: => BusUnemClmLexIDFiledCnt30D := MAP(rLegal:Null => -99999,
+																							 // rLegal.BusUnemClmLexIDFiledCnt30D);
+																			
 // Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt																		
 Employer: => BusLexIDMultiUnemClmCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									rLegal.BusLexIDMultiUnemClmCntEv);
@@ -1538,7 +1561,7 @@ Employer: => BusIncorpStatusType := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => 
                                         DAYSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestRecordDt))<0 => -99998,
 																				rLegal.IncorpStatusType);
 														
-/* unem claim history attributes */
+/* unem claim history pt 1 attributes */
 														
 Employer: => BusAcctLiabToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									 BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctOldestUnemClmDt=-99998 => -99998,
@@ -1555,13 +1578,11 @@ Employer: => BusIncorpToLiabSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => 
 Employer: => BusIncorpToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								 BusIncorpDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
 																								 BusIncorpDt=-99997 OR BusOldestUnemClmDt=-99997 => -99997,
-																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt))>999 => 999,
-																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt)));
+																								 MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt)),999));
 Employer: => BusIncorpToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								 BusIncorpDt=-99998 OR BusNewestUnemClmDt=-99998 => -99998,
 																								 BusIncorpDt=-99997 OR BusNewestUnemClmDt=-99997 => -99997,
-																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt))>999 => 999,
-																								 MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt)));
+																								 MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt)),999));
 Employer: => BusLiabToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 BusOldestTaxLiabStartDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
 																							 BusOldestTaxLiabStartDt=-99997 OR BusOldestUnemClmDt=-99997 => -99997,
@@ -1626,8 +1647,58 @@ Employer: => BusUnemClaimApprvCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null
                                                 rLegal.UnemClaimApprvCnt90D);
 Employer: => BusUnemClaimApprvCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
                                                 rLegal.UnemClaimApprvCnt30D);
+																								
+/* bus backdating attributes */ 
 
-																						
+Employer: => BusAcctOpenDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                      NOT ISVALIDDATE(statusreceiptdate) OR statusreceiptdate:Null => -99998,
+																		  INTEGER(statusreceiptdate));
+Employer: => BusAcctEmpBeganToOpenDtSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                BusAcctDtEmployerBeganEcho=-99998 OR BusAcctOpenDtEcho=-99998 => -99998,
+																								MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho))>999 => 999,
+																								MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho))<-999 => -999,
+																								MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho)));
+Employer: => BusAcctLiabStartToOpenDtSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctOpenDtEcho=-99998 => -99998,
+																								MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho))>999 => 999,
+																								MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho))<-999 => -999,
+																								MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho)));
+Employer: => BusOldestAcctOpenDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.OldestAcctOpenDt);
+Employer: => BusNewestAcctOpenDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.NewestAcctOpenDt);		
+Employer: => BusOldestEmployerBeganDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.OldestEmployerBeganDt);
+Employer: => BusNewestEmployerBeganDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
+                                           rLegal.NewestEmployerBeganDt);
+Employer: => BusOldestEmpBegantoAcctOpenSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                    BusOldestEmployerBeganDt=-99998 OR BusOldestAcctOpenDt=-99998 => -99998,
+																								    MONTHSBETWEEN(DATE(BusOldestEmployerBeganDt),DATE(BusOldestAcctOpenDt))>999 => 999,
+																								    MONTHSBETWEEN(DATE(BusOldestEmployerBeganDt),DATE(BusOldestAcctOpenDt))<-999 => -999,
+																								    MONTHSBETWEEN(DATE(BusOldestEmployerBeganDt),DATE(BusOldestAcctOpenDt)));
+Employer: => BusOldestLiabStartToAcctOpenSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                     BusOldestTaxLiabStartDt=-99998 OR BusOldestAcctOpenDt=-99998 => -99998,
+																								     MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusOldestAcctOpenDt))>999 => 999,
+																								     MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusOldestAcctOpenDt))<-999 => -999,
+																								     MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusOldestAcctOpenDt)));
+Employer: => BusIncorpToOldestAcctOpenSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                  BusOldestAcctOpenDt=-99998 OR BusIncorpDt =-99998 => -99998,
+																								  MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestAcctOpenDt))>999 => 999,
+																								  MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestAcctOpenDt))<-999 => -999,
+																								  MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestAcctOpenDt)));
+
+//Bus SasFlags attributes
+Employer: => BusAcctPerBusLegalEntCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                             rLegal.BusAcctPerBusLegalEntCnt);																				
+Employer: => BusEmpBeganToAcctOpenLT12MCnt:= MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenLT12MCnt);
+Employer: => BusEmpBeganToAcctOpenLT6MCnt:= MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenLT6MCnt);
+Employer: => BusEmpBeganToAcctOpenGT12MCnt:= MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+                                                 rLegal.EmpBeganToAcctOpenGT12MCnt);
+																		 
+																						 
+
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
 QUERY: showEmployers <= Employer;
 QUERY: showLegal <= Legal;
