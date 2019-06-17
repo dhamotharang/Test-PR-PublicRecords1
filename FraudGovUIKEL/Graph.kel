@@ -1506,12 +1506,12 @@ Employer: => BusUnemClmLexIDFiledCntEv := MAP(rLegal:Null => -99999,
 																							rLegal.BusUnemClmLexIDFiledCntEv);																							
 Employer: => BusUnemClmLexIDFiledCnt1Y := MAP(rLegal:Null => -99999,
 																							rLegal.BusUnemClmLexIDFiledCnt1Y);																							
-// Employer: => BusUnemClmLexIDFiledCnt120D := MAP(rLegal:Null => -99999,
-																								// rLegal.BusUnemClmLexIDFiledCnt120D); 
-// Employer: => BusUnemClmLexIDFiledCnt90D := MAP(rLegal:Null => -99999,
-																							 // rLegal.BusUnemClmLexIDFiledCnt90D); 
-// Employer: => BusUnemClmLexIDFiledCnt30D := MAP(rLegal:Null => -99999,
-																							 // rLegal.BusUnemClmLexIDFiledCnt30D);
+Employer: => BusUnemClmLexIDFiledCnt120D := MAP(rLegal:Null => -99999,
+																								rLegal.BusUnemClmLexIDFiledCnt120D); 
+Employer: => BusUnemClmLexIDFiledCnt90D := MAP(rLegal:Null => -99999,
+																							 rLegal.BusUnemClmLexIDFiledCnt90D); 
+Employer: => BusUnemClmLexIDFiledCnt30D := MAP(rLegal:Null => -99999,
+																							 rLegal.BusUnemClmLexIDFiledCnt30D);
 																			
 // Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt																		
 Employer: => BusLexIDMultiUnemClmCntEv := MAP(BusAcctUIDEcho=-99999 => -99999,
