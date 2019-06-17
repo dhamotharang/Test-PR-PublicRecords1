@@ -87,7 +87,9 @@ EXPORT Print := MODULE
 													self.FieldName := nac_v2.ValidationCodes.GetFieldName(left.FieldCode);
 													self.cnt := intformat(left.n, 8, 0);
 													self.pct := fmt_pct6(left.n, nTotal);
-													self.SampleValue := if(right.badValue='', '{missing}', right.badValue);
+													self.SampleValue := if(right.badValue='', '{missing}', 
+																				IF(self.TextValue = 'W116', $.ValidationCodes.addr_errors(right.badValue),
+																						right.badValue));
 													self.RecordCode := right.RecordCode;
 													self := left;),
 													KEEP(1), INNER);
@@ -122,7 +124,7 @@ EXPORT Print := MODULE
 												{''}
 												], dRow)
 							& IF(reject,
-										DATASET([{'FILE CONTAINS TOO MANY ERROR.   ****   FILE WAS REJECTED   ********'},{''}], dRow),
+										DATASET([{'FILE CONTAINS TOO MANY ERRORS AND CANNOT BE ACCEPTED FOR PROCESSING.   ****   FILE WAS REJECTED   ********'},{''}], dRow),
 										DATASET([{'FILE CONTENT IS ACCEPTABLE.   ****   FILE WILL BE PROCESSED   ********'},{''}], dRow))
 							& Legend;
 				return ds;
@@ -216,7 +218,9 @@ EXPORT Print := MODULE
 									self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
 									self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
 									self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
-									self.SampleValue := if(err.badValue='', Missing, err.badValue);
+									self.SampleValue := if(err.badValue='', Missing, 
+														IF(self.ErrorCode = 'W116', $.ValidationCodes.addr_errors(err.badValue),
+											err.badValue));
 									self := err;
 							END;
 

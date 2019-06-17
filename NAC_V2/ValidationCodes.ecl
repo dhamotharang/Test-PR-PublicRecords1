@@ -186,6 +186,35 @@
 		
 	], {string4 FieldCode, string32 FieldName});
 	
+	EXPORT addr_errors(string4 err_stat) := '{' + TRIM(CASE(err_stat,
+			'E101'	=> 'Last line is bad or missing',
+			'E212'	=> 'No city and bad ZIP code',
+			'E213'	=> 'Bad city and no ZIP code',
+			'E214'	=> 'Bad city and bad ZIP code',
+			'E216'	=> 'Bad ZIP code',
+			'E302'	=> 'No primary address line',
+			'E412'	=> 'Street name not found', 
+			'E413'	=> 'Possible street-name matches',
+			'E420'	=> 'Primary range is missing', 
+			'E421'	=> 'Primary range is invalid',
+			'E422'	=> 'Predirectional is wrong or missing',
+			'E423'	=> 'Suffix needed is wrong or missing',
+			'E425'	=> 'Suffix and directional needed',
+			'E427'	=> 'Directional is wrong or missing',
+			'E428'	=> 'Bad ZIP',
+			'E429'	=> 'Bad city', 
+			'E430'	=> 'Possible address-line matches',
+			'E431'	=> 'Urbanization is wrong or missing',
+			'E439'	=> 'Exact match made in EWS directory',
+			'E500'	=> 'Other error',
+			'E501'	=> 'Foreign address',
+			'E502'	=> 'Input record entirely blank',
+			'E503'	=> 'ZIP not in area covered',
+			'E504'	=> 'Overlapping ranges',
+			'E505'	=> 'Undeliverable address',
+			'E600'	=> 'Unsuitable for delivery of mail',
+			'Other address error'
+	)) + '}';
 	export dErrCodeToFieldCode :=  DICTIONARY(dsErrorCodes, {errCode=>fieldCode});
 	export dWarnCodeToFieldCode :=  DICTIONARY(dsWarningCodes, {errCode=>fieldCode});	
 	export GetFieldCode(string Severity, integer code) := IF(Severity='E',dErrCodeToFieldCode[code].fieldCode,dWarnCodeToFieldCode[code].fieldCode);
