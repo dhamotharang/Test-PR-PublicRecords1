@@ -118,9 +118,9 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
     SHARED ds_BusAcctUnemClmAcctFiledCnt := fn_dateCheck(ds, Bus_Acct_Unem_Clm_Acct_Filed_Cnt_Ev_, Bus_Acct_Unem_Clm_Acct_Filed_Cnt1_Y_, Bus_Acct_Unem_Clm_Acct_Filed_Cnt120_D_, Bus_Acct_Unem_Clm_Acct_Filed_Cnt90_D_, Bus_Acct_Unem_Clm_Acct_Filed_Cnt30_D_, 'BusAcctUnemClmAcctFiledCnt');
 		SHARED ds_BusAcctUnemClmLexIDFiled := fn_dateCheck(ds, Bus_Acct_Unem_Clm_Lex_I_D_Filed_Cnt_Ev_, Bus_Acct_Unem_Clm_Lex_I_D_Filed_Cnt1_Y_, Bus_Acct_Unem_Clm_Lex_I_D_Filed_Cnt120_D_, Bus_Acct_Unem_Clm_Lex_I_D_Filed_Cnt90_D_, Bus_Acct_Unem_Clm_Lex_I_D_Filed_Cnt30_D_, 'BusAcctUnemClmLexIDFiled');
 		SHARED ds_BusAcctLexIDMultiUnemClm := fn_dateCheck(ds, Bus_Acct_Lex_I_D_Multi_Unem_Clm_Cnt_Ev_, Bus_Acct_Lex_I_D_Multi_Unem_Clm_Cnt1_Y_, Bus_Acct_Lex_I_D_Multi_Unem_Clm_Cnt120_D_, Bus_Acct_Lex_I_D_Multi_Unem_Clm_Cnt90_D_, Bus_Acct_Lex_I_D_Multi_Unem_Clm_Cnt30_D_, 'BusAcctLexIDMultiUnemClm');
-	  SHARED ds_BusUnemClmAcctFiledCnt := fn_dateCheck(ds, Bus_Unem_Clm_Acct_Filed_Cnt_Ev_, Bus_Unem_Clm_Acct_Filed_Cnt1_Y_, Bus_Unem_Clm_Acct_Filed_Cnt120_D_, Bus_Unem_Clm_Acct_Filed_Cnt90_D_, Bus_Unem_Clm_Acct_Filed_Cnt30_D_, 'BusAcctUnemClmAcctFiledCnt');
-		SHARED ds_BusUnemClmLexIDFiled := fn_dateCheck(ds, Bus_Unem_Clm_Lex_I_D_Filed_Cnt_Ev_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt1_Y_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt120_D_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt90_D_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt30_D_, 'BusAcctUnemClmLexIDFiled');
-		SHARED ds_BusLexIDMultiUnemClm := fn_dateCheck(ds, Bus_Lex_I_D_Multi_Unem_Clm_Cnt_Ev_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt1_Y_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt120_D_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt90_D_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt30_D_, 'BusAcctLexIDMultiUnemClm');
+	  SHARED ds_BusUnemClmAcctFiledCnt := fn_dateCheck(ds, Bus_Unem_Clm_Acct_Filed_Cnt_Ev_, Bus_Unem_Clm_Acct_Filed_Cnt1_Y_, Bus_Unem_Clm_Acct_Filed_Cnt120_D_, Bus_Unem_Clm_Acct_Filed_Cnt90_D_, Bus_Unem_Clm_Acct_Filed_Cnt30_D_, 'BusUnemClmAcctFiledCnt');
+		SHARED ds_BusUnemClmLexIDFiled := fn_dateCheck(ds, Bus_Unem_Clm_Lex_I_D_Filed_Cnt_Ev_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt1_Y_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt120_D_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt90_D_, Bus_Unem_Clm_Lex_I_D_Filed_Cnt30_D_, 'BusUnemClmLexIDFiled');
+		SHARED ds_BusLexIDMultiUnemClm := fn_dateCheck(ds, Bus_Lex_I_D_Multi_Unem_Clm_Cnt_Ev_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt1_Y_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt120_D_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt90_D_, Bus_Lex_I_D_Multi_Unem_Clm_Cnt30_D_, 'BusLexIDMultiUnemClm');
 	
     SHARED dsDateChecks := ds_BusAcctUnemClmAcctFiledCnt + ds_BusAcctUnemClmLexIDFiled + ds_BusAcctLexIDMultiUnemClm + ds_BusUnemClmAcctFiledCnt + ds_BusUnemClmLexIDFiled + ds_BusLexIDMultiUnemClm;
 
@@ -137,6 +137,7 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
 			RETURN SEQUENTIAL(std.file.CreateExternalDirectory(lzip, lz_dir), thor_out, std.file.Despray(thor_file, lzip,lz_path,,,,true));
 		ENDMACRO;
 		
+		// EXPORT main := ds_BusAcctUnemClmLexIDFiledCntEv + ds_BusAcctUnemClmAcctFiledCntEv;
 		// EXPORT main := OUTPUT(dsDateChecks, NAMED('dsDateChecks'));
 		EXPORT main := SEQUENTIAL(writeFile(ds_All, 'UnemClaimPt2_AttributesDistribution'),
 															writeFile(dsSeleChecks, 'UnemClaimPt2_SelePassFailTests'),
