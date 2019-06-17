@@ -354,7 +354,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='119926570' and l.did=79982138483) or
 									(l.ssn_appended='584621400' and l.did=2232356551) or
 									(l.ssn_appended='401358777' and l.did=1034909614) or
-									(l.ssn_appended='056465978' and l.did=2363964777) ,
+									(l.ssn_appended='056465978' and l.did=2363964777) or
+									(l.ssn_appended='412376589' and l.did=329196451) ,
 								'',
 								l.ssn_appended);
 		self.did			:= if((l.ssn_appended='353561176' and l.did=2275932305) or 
@@ -374,7 +375,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='119926570' and l.did=79982138483) or
 									(l.ssn_appended='584621400' and l.did=2232356551) or
 									(l.ssn_appended='401358777' and l.did=1034909614) or
-									(l.ssn_appended='056465978' and l.did=2363964777) ,
+									(l.ssn_appended='056465978' and l.did=2363964777) or
+									(l.ssn_appended='412376589' and l.did=329196451) ,
 
 								0,
 								l.did);
@@ -395,7 +397,8 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='119926570' and l.did=79982138483) or
 									(l.ssn_appended='584621400' and l.did=2232356551) or
 									(l.ssn_appended='401358777' and l.did=1034909614) or
-									(l.ssn_appended='056465978' and l.did=2363964777) ,
+									(l.ssn_appended='056465978' and l.did=2363964777) or
+									(l.ssn_appended='412376589' and l.did=329196451) ,
 
 								0,
 								l.score);
