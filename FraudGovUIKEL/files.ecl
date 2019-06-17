@@ -830,10 +830,11 @@ EXPORT files := MODULE
  
  EmployerPrep := DATASET('~fraudgov::tndata::ts999_output', TrumpRec, THOR);
  EXPORT Employer := PROJECT(EmployerPrep, 
-                      TRANSFORM(RECORDOF(LEFT), 
+                      TRANSFORM({RECORDOF(LEFT), UNSIGNED uacctno}, 
 											// Acctno has some garbage data in it. Some of these are incorrectly getting cast to account numbers. Fix that
 											acctno := std.str.CleanSpaces(std.str.FindReplace(LEFT.acctno, '"', '\''));
-											SELF.acctno := IF(REGEXFIND('[a-z]', acctno, NOCASE), '', acctno);
+											SELF.acctno := IF(REGEXFIND('[a-z+ ]', acctno, NOCASE), '0', acctno);
+											SELF.uacctno := (UNSIGNED)SELF.acctno; 
 											SELF.status := IF(LEFT.status in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'], LEFT.status, '');
 											SELF.statusreceiptdate := MAP((UNSIGNED)LEFT.statusreceiptdate[5..6] > 20 => '19', '20') + LEFT.statusreceiptdate[5..6] + LEFT.statusreceiptdate[1..2] + LEFT.statusreceiptdate[3..4],
 											SELF.datefirstemp := MAP((UNSIGNED)LEFT.datefirstemp[5..6] > 20 => '19', '20') + LEFT.datefirstemp[5..6] + LEFT.datefirstemp[1..2] + LEFT.datefirstemp[3..4],
@@ -1124,7 +1125,7 @@ EXPORT files := MODULE
  END;
  
  ClaimsBase := DATASET('~fraudgov::tndata::claims_output', ClaimsRec, THOR);
- EXPORT Claims := PROJECT(ClaimsBase, TRANSFORM({RECORDOF(LEFT), UNSIGNED acctno}, SELF.acctno := (UNSIGNED)std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF.claim_sep_emp_no := std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF := LEFT)); 
+ EXPORT Claims := PROJECT(ClaimsBase, TRANSFORM({RECORDOF(LEFT), UNSIGNED uacctno}, SELF.uacctno := (UNSIGNED)std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF.claim_sep_emp_no := std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF := LEFT)); 
  
  ClaimantsRec := RECORD
   string claimant_ssn;
