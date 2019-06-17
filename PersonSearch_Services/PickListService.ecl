@@ -131,7 +131,7 @@ export PickListService := MACRO
 	
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonSearch_Services_PickListService();
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   #CONSTANT ('UsingKeepSSNs',true);
   #CONSTANT ('GONG_SEARCHTYPE','PERSON');
   #CONSTANT ('IncludePhonesFeedback','false');

@@ -315,7 +315,7 @@ to be relatively harmless anyway). <br />
 IMPORT iesp, doxie, AutoStandardI, Royalty;
 
 EXPORT SmartLinxReportService () := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   #onwarning(4207, ignore);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonReports_SmartLinxReportService();
