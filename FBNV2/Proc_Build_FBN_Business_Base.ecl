@@ -13,8 +13,15 @@ Previous_Base	  := distribute(FBNV2.File_FBN_Business_Base_AID, hash64(tmsid));
 dBusinessBaseInputs :=  
                 ungroup(Mapping_FBN_BUSREG_Business)+	
 								Previous_Base;
-
-dBusiness :=  dBusinessInputs + dBusinessBaseInputs;
+								
+//Cleaning UTF-8 Characters  from all FBN inputs as per Jira/DF-24933, EX: RMSID/G18000022488!!! 
+dFBNV2Inputs := project(dBusinessInputs ,transform(FBNV2.Layout_Common.Business_AID,
+																							 self.bus_name      := regexreplace('', left.bus_name, ''); 
+																							 self.long_bus_name := regexreplace('', left.long_bus_name, ''); 
+																							 self               := left;)
+										    );
+										
+dBusiness :=  dFBNV2Inputs + dBusinessBaseInputs;
 
 Layout_Bus_temp := record
 	unsigned8		unique_id;

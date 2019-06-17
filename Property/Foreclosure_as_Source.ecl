@@ -1,4 +1,4 @@
-import header,business_header,business_header_ss,ut,did_add;
+﻿import header,business_header,business_header_ss,ut,did_add;
 
 export Foreclosure_as_Source(dataset(Property.Layout_Fares_Foreclosure_v2) pForeclosure = dataset([],Property.Layout_Fares_Foreclosure_v2), boolean pForHeaderBuild=false)
  :=
@@ -10,7 +10,13 @@ export Foreclosure_as_Source(dataset(Property.Layout_Fares_Foreclosure_v2) pFore
 
 	src_rec := header.layouts_SeqdSrc.FR_src_rec;
 
-	header.Mac_Set_Header_Source(dSourceData(trim(deed_category)='U'),Property.Layout_Fares_Foreclosure,src_rec,'FR',withUID)
+	//Core Logic Records - FR
+	header.Mac_Set_Header_Source(dSourceData(trim(deed_category)='U' and source = 'FR'),Property.Layout_Fares_Foreclosure,src_rec,'FR',withUID1_fr);
+    
+    //BlackKnight Records - FR
+	header.Mac_Set_Header_Source(dSourceData(trim(deed_category)='U' and source = 'I5'),Property.Layout_Fares_Foreclosure,src_rec,'I5',withUID2_fr);
+    
+    withUID := withUID1_fr + withUID2_fr;
 
 	return withUID;
   end
