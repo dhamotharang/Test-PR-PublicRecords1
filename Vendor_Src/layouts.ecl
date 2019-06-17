@@ -17,6 +17,7 @@ EXPORT layouts := MODULE
 	
 	EXPORT Bank_Court	:= RECORD
 	  STRING    lncourtcode;
+		STRING    county_text;
 		STRING		court_code;
 		STRING		court_name;
 		STRING		address1;
@@ -29,6 +30,7 @@ EXPORT layouts := MODULE
 	
 	EXPORT Lien_Court	:= RECORD
 	  STRING    lncourtcode;
+		STRING    county_text;
 		STRING 		court_code;
 		STRING		court_name;
 		STRING		address1;
@@ -97,7 +99,8 @@ EXPORT layouts := MODULE
 
 	EXPORT MergedSrc_Base	:= RECORD
 																				// Bank/Lien Court Match				// Riskview/FFD
-		STRING		item_source;							//  court_code 		(col A)				//	item_source_code			
+		STRING		item_source;							//  court_code 		(col A)				//	item_source_code		
+		STRING    county_text;
 		STRING75	source_code;							//	court_code 		(col A)				//	item_source_code			
 		STRING		display_name;							//	court_name 		(col B)				//	source_name							
 		STRING		description;							//	court_name 		(col B)				//	item_description			
