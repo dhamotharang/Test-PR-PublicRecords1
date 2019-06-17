@@ -177,6 +177,7 @@
 		{'2050',	'Matched State Code'},
 		{'2051',	'Matched Client Identifier'},
 		{'2052',	'Matched GroupId'},
+		{'2053',	'Matched Program Code'},
 		{'3001',	'Invalid Record Code'},
 		{'3002',	'Invalid Update Type'},
 		{'3003',	'Missing Related Case Record'},

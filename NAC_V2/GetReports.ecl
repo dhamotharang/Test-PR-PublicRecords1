@@ -1,6 +1,6 @@
 ﻿import STD;
 
-ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'xxx2', rpt);
+ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'nac2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
 
 EXPORT GetReports(string lfn) := function
@@ -48,7 +48,7 @@ EXPORT GetReports(string lfn) := function
 
 		ncr := nac_v2.Print.NCR2_Report(fn, errs, total, nErrors, nWarnings, 'XX', ExcessiveInvalidRecordsFound);
 
-		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', false);
+		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', ExcessiveInvalidRecordsFound);
 
 		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions); 
 

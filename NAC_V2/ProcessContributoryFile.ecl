@@ -4,26 +4,26 @@ ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
 
 
-EXPORT ProcessContributoryFile(string version, string ip, string rootDir, string lfn) := function
+EXPORT ProcessContributoryFile(string ip, string rootDir, string lfn, string maintenance, string version) := function
 
-		ready    := rootDir+'ready/';
-		done     := rootDir+'done/';
-		err      := rootDir+'error/';
-		spraying := rootDir+'spraying/';
+		ready    := rootDir+'incoming/';
+		done     := maintenance+'done/';
+		err      := maintenance+'error/';
+		spraying := maintenance+'spraying/';
 		outgoing := rootDir+'outgoing/';
 		
 		ilfn := '~nac::uber::in::'+lfn;
 
-		MoveReadyToSpraying := STD.File.MoveExternalFile(IP, ready+lfn, spraying+lfn);
-		MoveReadyToError    := nothor(STD.File.MoveExternalFile(IP, ready+lfn, err+lfn));
-		MoveSprayingToError := nothor(STD.File.MoveExternalFile(IP, spraying+lfn, err+lfn));
-		MoveSprayingToDone  := nothor(STD.File.MoveExternalFile(IP, spraying+lfn, done+lfn));
+		MoveReadyToSpraying := nothor(STD.File.MoveExternalFile(ip, ready+lfn, spraying+lfn));
+		MoveReadyToError    := nothor(STD.File.MoveExternalFile(ip, ready+lfn, err+lfn));
+		MoveSprayingToError := nothor(STD.File.MoveExternalFile(ip, spraying+lfn, err+lfn));
+		MoveSprayingToDone  := nothor(STD.File.MoveExternalFile(ip, spraying+lfn, done+lfn));
 		
 		SprayIt := sequential(
-						output('Spraying: '+ ip + spraying + lfn + ' -> ' + '~nac::uber::in::'+lfn)
+						output('Spraying: '+ ip + ready + lfn + ' -> ' + '~nac::uber::in::'+lfn)
 						,nothor(STD.File.SprayVariable(
 							 IP
-							,spraying + lfn
+							,ready + lfn
 							,,,,
 							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','thor400_36_02')
 							,ilfn

@@ -91,7 +91,7 @@ EXPORT Print := MODULE
 													self.RecordCode := right.RecordCode;
 													self := left;),
 													KEEP(1), INNER);
-					return samples;
+					return SORT(samples, textValue);
 	END;
 	
 	export NCR2_Summary(integer cnt, integer nErrors, integer nWarnings) := DATASET([
@@ -205,6 +205,20 @@ EXPORT Print := MODULE
 				string32		SampleValue;
 				string1			eol := '\n'
 		END;
+		
+		rNcx2 toNcx2(nac_v2.ValidationCodes.rError err, string4 RecordCode, string2 ProgramState, string1 ProgramCode,
+										string20 CaseId, string20 ClientId) := TRANSFORM
+									self.RecordCode := RecordCode;
+									self.ProgramState := ProgramState;
+									self.ProgramCode := ProgramCode;
+									self.CaseId := CaseId;
+									self.ClientId := ClientId;
+									self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
+									self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
+									self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
+									self.SampleValue := if(err.badValue='', Missing, err.badValue);
+									self := err;
+							END;
 
 	
 	export NCX2_Report( DATASET(nac_v2.Layouts2.rCaseEx) cases
@@ -213,63 +227,35 @@ EXPORT Print := MODULE
 												,DATASET(nac_v2.Layouts2.rStateContactEx) contacts
 												,DATASET(nac_v2.Layouts2.rExceptionEx) exceptions) := FUNCTION
 
-		rr_cases := PROJECT(cases(errors>0), transform(rNCX2,
-													err := left.dsErrs[1];
-													//x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E106', skip, 0);
-													self := left;
-													self.ClientId := '';
-													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
-													self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
-													self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
-													self.SampleValue := if(err.badValue='', Missing, err.badValue);
-													self := err;));
-													
-		rr_clients := PROJECT(clients(errors>0), transform(rNCX2,
-													err := left.dsErrs[1];
-													//x := IF(nac_V2.ValidationCodes.GetErrorText('E', err.errCode) = 'E129', skip, 0);
-													self := left;
-													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
-													self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
-													self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
-													self.SampleValue := if(err.badValue='', Missing, err.badValue);
-													self := err;));
+		rr_cases := NORMALIZE(cases(errors>0 OR warnings>0), left.dsErrs, toNcx2(RIGHT,
+														'CA01',
+														left.ProgramState, left.ProgramCode, left.CaseId, ''
+														));
 
-		rr_addresses := PROJECT(addresses(errors>0), transform(rNCX2,
-													err := left.dsErrs[1];
-													self := left;
-													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
-													self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
-													self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
-													self.SampleValue := if(err.badValue='', Missing, err.badValue);
-													self := err;));
+		rr_clients := NORMALIZE(clients(errors>0 OR warnings>0), LEFT.dsErrs, toNcx2(RIGHT,
+														'CL01',
+														left.ProgramState, left.ProgramCode, left.CaseId, left.ClientId
+														));
 
-		rr_contacts := PROJECT(contacts(errors>0), transform(rNCX2,
-													err := left.dsErrs[1];
-													self := left;
-													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
-													self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
-													self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
-													self.SampleValue := if(err.badValue='', Missing, err.badValue);
-													self := err;));
+		rr_addresses := NORMALIZE(addresses(errors>0 OR warnings>0), left.dsErrs, toNcx2(RIGHT,
+														'AD01',
+														left.ProgramState, left.ProgramCode, left.CaseId, left.ClientId
+														));
 
-		rr_exceptions := PROJECT(exceptions(errors>0), transform(rNCX2,
-													err := left.dsErrs[1];
-													self.caseid := '';
-													self.clientid := left.SourceClientId;
-													self.programstate := left.SourceProgramState;
-													self.programcode := left.SourceProgramCode;
-													self := left;
-													self.ErrorMessage := nac_V2.ValidationCodes.GetErrorMsg(err.Severity, err.errCode);
-													self.ErrorCode := nac_V2.ValidationCodes.GetErrorText(err.Severity, err.errCode);
-													self.FieldName := nac_v2.ValidationCodes.GetFieldName(err.FieldCode);
-													self.SampleValue := if(err.badValue='', Missing, err.badValue);
-													self := err;));
+		rr_contacts := NORMALIZE(contacts(errors>0 OR warnings>0), LEFT.dsErrs, toNcx2(RIGHT,
+														'SC01',
+														left.ProgramState, left.ProgramCode, left.CaseId, left.ClientId
+													));
+
+		rr_exceptions := NORMALIZE(exceptions(errors>0 OR warnings>0), LEFT.dsErrs, toNcx2(RIGHT,
+													'EX01',
+													left.SourceProgramState, left.SourceProgramCode, '', left.SourceClientId
+													));
 
 		records := rr_cases + rr_clients + rr_addresses + rr_contacts + rr_exceptions;
-
-		
+	
 		return SORT(CHOOSEN(records, 1000),errorcode);		// HHSCO-35
-				
+			
 	END;
 
 END;
