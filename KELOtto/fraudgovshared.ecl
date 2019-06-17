@@ -11,11 +11,12 @@ Set_associated91 :=[3635312545, 1026679856];
 
 Set_associated81 :=[3005794324, 866735130];
 
-Set_DCF := [324153257]; // Make DCF look like SUI contributed, this is the DCF hash.
+Set_DCF := [324153257];  // SUI Account
 
-SetFLSnap := [324153257];
-SetFLDsnap := [240265095];
-SetTNUnemployment := [2481802344];
+SetFLSnap := [324153257]; // SUI Account
+SetFLDsnap := [240265095]; // SUI Account
+SetTNUnemployment := [1613712331]; // SUI Account
+
 SetFLIrma := [2274708080];
 
 DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
@@ -40,7 +41,7 @@ CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgovprep(/*clean_address.prim_ran
                                         MAP(RIGHT.targetcustomerhash in Set_DCF AND RIGHT.sourcecustomerhash = 2937728982 => RIGHT.targetcustomerhash, // DCF
                                         MAP(RIGHT.targetcustomerhash in SetFLSnap AND RIGHT.sourcecustomerhash = 2937728982 => RIGHT.targetcustomerhash, // DCF
                                         MAP(RIGHT.targetcustomerhash in SetFLDsnap AND RIGHT.sourcecustomerhash = 2887396112 => RIGHT.targetcustomerhash, // DCF
-                                        MAP(RIGHT.targetcustomerhash in SetTNUnemployment AND RIGHT.sourcecustomerhash = 1613712331 => RIGHT.targetcustomerhash, // TN UI
+                                        MAP(RIGHT.targetcustomerhash in SetTNUnemployment AND RIGHT.sourcecustomerhash = 2481802344 => RIGHT.targetcustomerhash, // TN UI
                                         MAP(RIGHT.targetcustomerhash in SetFLIrma AND RIGHT.sourcecustomerhash = 1454157906 => RIGHT.targetcustomerhash, // FL IRMA
 													                      RIGHT.sourcecustomerhash))))))));
 

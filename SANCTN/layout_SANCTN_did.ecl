@@ -1,4 +1,4 @@
-IMPORT standard, bipv2;
+﻿IMPORT standard, bipv2;
 
 export layout_SANCTN_did := record
   SANCTN.layout_SANCTN_party_clean_orig;
@@ -12,5 +12,7 @@ export layout_SANCTN_did := record
 	string60 dba_name;
   string30 contact_name;
 	string1	enh_did_src:='';					//Ehanced did source; M for Mari, S for SANCTN, N for SANCTN Non-public
-	
+	//CCPA-283 Adding CCPA new fields
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid:=0;
 end;
