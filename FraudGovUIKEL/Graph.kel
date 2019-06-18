@@ -1385,8 +1385,21 @@ Legal: => BusLegalActionFlag := MAP(ALL(LegalEmployer.rEmployer, BusAcctLegalAct
 																		0);
 Legal: => BusWarrantIssuedSum := MAP(ALL(LegalEmployer.rEmployer, BusAcctWarrantIssuedCntEcho IN [-99998, -99997]) => -99998,
 																			MAX(MIN(SUM(LegalEmployer.rEmployer(BusAcctWarrantIssuedCntEcho >= 0), BusAcctWarrantIssuedCntEcho),9999),0));	// Remove special values
-	
-	
+Legal: => BusAcctPerBusWithWarrantCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctWarrantIssuedCntEcho IN [-99998, -99997]) => -99998,
+																						 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctWarrantIssuedFlag=1)), 9999), 0));	
+Legal: => BusWarrantIssuedFlag := MAP(BusAcctPerBusWithWarrantCnt=-99998 => -99998,
+																			BusAcctPerBusWithWarrantCnt=0 => 0,
+																			1);
+Legal: => BusAcctPerBusTaxLiabBlceDebCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctTaxLiabBlceStatusEcho=-99997) => -99998,
+																								MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctTaxLiabBlceStatusEcho=2)), 9999), 0));
+Legal: => BusAcctPerBusTaxLiabBlceCredCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctTaxLiabBlceStatusEcho=-99997) => -99998,
+																								 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctTaxLiabBlceStatusEcho=1)), 9999), 0));
+Legal: => BusAcctPerBusTaxLiabBlceOthCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctTaxLiabBlceStatusEcho=-99997) => -99998,
+																								 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctTaxLiabBlceStatusEcho=3)), 9999), 0));
+Legal: => BusTaxLiabBlceDebitFlag := MAP(BusAcctPerBusTaxLiabBlceDebCnt=-99998 => -99998,
+																				 BusAcctPerBusTaxLiabBlceDebCnt=0 => 0);
+																				 
+																				 
 // Claim Attributes
 Claim: => ClaimAge := MAP(claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99998,
 													rEmployer:Null => -99997,
@@ -1649,11 +1662,11 @@ Employer: => BusAcctPerBusAddressPOBoxFlag := MAP(BusAcctUIDEcho=-99999 OR BusAc
 
 Employer: => BusAcctLegalActionTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							legalactioncd:Null OR legalactioncd='' => -99998,
-																							NOT (UPCASE(legalactioncd) IN ['A', 'L', 'P', 'I']) => -99997,
 																							UPCASE(legalactioncd) = 'A' => 1,
 																							UPCASE(legalactioncd) = 'L' => 2,
 																							UPCASE(legalactioncd) = 'P' => 3,
-																							UPCASE(legalactioncd) = 'I' => 4);
+																							UPCASE(legalactioncd) = 'I' => 4,
+																							-99997);
 Employer: => BusAcctLegalActionFlag:= MAP(BusAcctUIDEcho=-99999 => -99999,
 																				 BusAcctLegalActionTypeEcho=-99997 => -99997,
 																				 BusAcctLegalActionTypeEcho IN [-99998, 3, 4] => 0,
@@ -1680,9 +1693,30 @@ Employer: => BusAcctWarrantIssuedFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
 																						 1);
 Employer: => BusWarrantIssuedSum := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																				 rLegal.BusWarrantIssuedSum);																						 
-																						 
-																						 
-																						 
+Employer: => BusAcctPerBusWithWarrantCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																								rLegal.BusAcctPerBusWithWarrantCnt);																						 
+Employer: => BusWarrantIssuedFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																				 rLegal.BusWarrantIssuedFlag);																						 
+Employer: => BusAcctTaxLiabBlceStatusEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								 unpaidbalcd:Null OR unpaidbalcd='' => -99998,
+																								 UPCASE(unpaidbalcd)='C' => 1,
+																								 UPCASE(unpaidbalcd)='D' => 2,
+																								 UPCASE(unpaidbalcd)='O' => 3,
+																								 -99997);	
+Employer: => BusAcctTaxLiabBlceDebitFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
+																								BusAcctTaxLiabBlceStatusEcho=-99997 => -99997,
+																								BusAcctTaxLiabBlceStatusEcho IN [-99998, 1, 3] => 0,
+																								BusAcctTaxLiabBlceStatusEcho=2 => 1);	
+Employer: => BusAcctPerBusTaxLiabBlceDebCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									 rLegal.BusAcctPerBusTaxLiabBlceDebCnt);
+Employer: => BusAcctPerBusTaxLiabBlceCredCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									  rLegal.BusAcctPerBusTaxLiabBlceCredCnt);
+Employer: => BusAcctPerBusTaxLiabBlceOthCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																									 rLegal.BusAcctPerBusTaxLiabBlceOthCnt);	
+Employer: => BusTaxLiabBlceDebitFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
+																						rLegal.BusTaxLiabBlceDebitFlag);	
+			
+
 /*
 
 	This section is Nicole's attributes. Keeping these separate to prevent code merging issues.
