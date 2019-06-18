@@ -93,7 +93,7 @@ $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
 	
 	self.ssn		:=	newbase.ssn;
 	self.ssn_Type_indicator		:=	newbase.ssn_Type_indicator;
-	self.dob		:=	newbase.Ethnicity;
+	self.dob		:=	newbase.dob;
 	self.dob_Type_indicator		:=	newbase.dob_Type_indicator;
 	self.Certificate_id_type		:=	newbase.Certificate_id_type;
 	
