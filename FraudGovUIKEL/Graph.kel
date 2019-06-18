@@ -1283,8 +1283,8 @@ Legal: => BusUnemClmAcctCurActiveCnt := MAP(ClaimCount=0 OR (ALL(LegalClaim.rCla
 
 // first batch
 // Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
-Legal: => BusUnemClmAcctFiledCntEv := MAP(ClaimCount=0 => -99998, 
-																				  ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+Legal: => BusUnemClmAcctFiledCntEv := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					ClaimCount=0 => -99998, 
 																				  MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0).rClaimant, LEFT.ID=RIGHT.ID, ID)), 9999), 0));						 
 Legal: => BusUnemClmAcctFiledCnt1Y := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997,
 																					ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
@@ -1301,8 +1301,8 @@ Legal: => BusUnemClmAcctFiledCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-9999
 
 // second batch
 // Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt
-Legal: => BusUnemClmLexIDFiledCntEv := MAP(ClaimCount=0 => -99998, 
-																					 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+Legal: => BusUnemClmLexIDFiledCntEv := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																					 ClaimCount=0 => -99998, 
 																					 MAX(MIN(COUNT(Sequence.Dedup(LegalClaim.rClaim(ClaimAge >= 0, rClaimant.LexID!=0).rClaimant, LEFT.LexID=RIGHT.LexID, LexID)), 9999), 0));																							 
 Legal: => BusUnemClmLexIDFiledCnt1Y := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
 																					 ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
@@ -1320,20 +1320,20 @@ Legal: => BusUnemClmLexIDFiledCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-999
 // third batch
 // Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt
 
-Legal: => BusLexIDMultiUnemClmCntEv := MAP(ClaimCount=0 => -99998, 
-																							 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+Legal: => BusLexIDMultiUnemClmCntEv := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																							 ClaimCount=0 => -99998, 
 																							 MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
-Legal: => BusLexIDMultiUnemClmCnt1Y := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
-																							 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+Legal: => BusLexIDMultiUnemClmCnt1Y := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																							 ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365))=0) => -99998, 
 																							 MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 365, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
-Legal: => BusLexIDMultiUnemClmCnt120D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
-																								 ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+Legal: => BusLexIDMultiUnemClmCnt120D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								 ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120))=0) => -99998, 
 																								 MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 120, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
-Legal: => BusLexIDMultiUnemClmCnt90D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
-																								ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+Legal: => BusLexIDMultiUnemClmCnt90D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90))=0) => -99998, 
 																								MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 90, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
-Legal: => BusLexIDMultiUnemClmCnt30D := MAP(ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
-																								ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+Legal: => BusLexIDMultiUnemClmCnt30D := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, 
+																								ClaimCount=0 OR (COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30))=0) => -99998, 
 																								MAX(MIN(COUNT(LegalClaim.rClaim(ClaimAge >= 0 AND ClaimAge <= 30, rClaimant.LexID!=0).rClaimant{LexID_Cnt:=GROUP{LexID}:Count}(LexID_Cnt>=2)), 9999), 0));
 
 // Claim Attributes

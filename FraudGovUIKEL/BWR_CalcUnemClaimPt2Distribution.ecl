@@ -137,7 +137,7 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
 			RETURN SEQUENTIAL(std.file.CreateExternalDirectory(lzip, lz_dir), thor_out, std.file.Despray(thor_file, lzip,lz_path,,,,true));
 		ENDMACRO;
 		
-		// EXPORT main := ds_BusAcctUnemClmLexIDFiledCntEv + ds_BusAcctUnemClmAcctFiledCntEv;
+		// EXPORT main := ds_BusUnemClmLexIDFiledCntEv + ds_BusUnemClmLexIDFiledCnt1Y + ds_BusUnemClmLexIDFiledCnt120D + ds_BusUnemClmLexIDFiledCnt90D + ds_BusUnemClmLexIDFiledCnt30D;
 		// EXPORT main := OUTPUT(dsDateChecks, NAMED('dsDateChecks'));
 		EXPORT main := SEQUENTIAL(writeFile(ds_All, 'UnemClaimPt2_AttributesDistribution'),
 															writeFile(dsSeleChecks, 'UnemClaimPt2_SelePassFailTests'),
