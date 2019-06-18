@@ -104,6 +104,6 @@ MACRO
   END;
 
   // calculated for the first row only on purpose: otherwise same (heavy) processing will be executed multiple times
-  outputs := PROJECT(inputs[1], add_counts(LEFT)) & inputs[2..];
+  outputs := PROJECT(CHOOSEN(inputs, 1), add_counts(LEFT)) & inputs[2..];
 
 ENDMACRO;
