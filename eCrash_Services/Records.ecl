@@ -468,24 +468,28 @@ EXPORT Records(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 			// final_records:= if(in_mod.RequestHashKey,hash_key_recs_dedup,choosen(sorted_final_recs,iesp.constants.eCrashMod.MaxRecords));
 			final_records:= if(in_mod.RequestHashKey,hash_key_recs_dedup,sorted_final_recs);									 
 			
+			//associated_reports := Raw_in.getAssociatedReports(final_records);
+			
+			//final_associated_reports := associated_reports + final_records;								
+			
+			recs_result := eCrash_Services.functions.InvolvedPartyTransform(final_records,in_mod,direct_match);
+		
 			boolean has_vin := in_mod.VehicleVin <> '';
 			boolean has_drivers_license_num := in_mod.driversLicenseNumber <> '';
 			boolean has_license_plate := in_mod.LicensePlate <> '';
 			boolean has_officer_badge := in_mod.OfficerBadgeNumber <> '';
 		
-			recs_result := eCrash_Services.functions.InvolvedPartyTransform(final_records, in_mod, direct_match);
-			
 			//filter involved party records by presence of each vehicle search parameter (vin/lic_num/tag_nbr)
 			input_first_name_upper_cased := STD.Str.ToUpperCase(in_mod.firstname);
 			input_last_name_upper_cased := STD.Str.ToUpperCase(in_mod.lastname);
 			results_vin_filtered := IF(has_vin,
-					recs_result(EXISTS(InvolvedParties((Vehicle.Vin = in_mod.VehicleVin) and 
-											      (input_first_name_upper_cased = '' OR input_first_name_upper_cased = Name.First) and
-												    (input_last_name_upper_cased = '' OR input_last_name_upper_cased = Name.Last)))),
+					recs_result (EXISTS(InvolvedParties((Vehicle.Vin = in_mod.VehicleVin) and 
+																(input_first_name_upper_cased = '' OR input_first_name_upper_cased = Name.First) and
+																(input_last_name_upper_cased = '' OR input_last_name_upper_cased = Name.Last)))),
 					recs_result);
 					
 			results_lic_filtered := IF(has_drivers_license_num,
-					results_vin_filtered (EXISTS(InvolvedParties((DriverLicenseNumber = in_mod.driversLicenseNumber) and 
+					results_vin_filtered (EXISTS(InvolvedParties((DriverLicenseNumber = in_mod.driversLicenseNumber)and 
 																(input_first_name_upper_cased = '' OR input_first_name_upper_cased = Name.First) and
 																(input_last_name_upper_cased = '' OR input_last_name_upper_cased = Name.Last)))), 
 					results_vin_filtered);

@@ -63,8 +63,6 @@ EXPORT ImageSearchService() := FUNCTION
 	
 	ErrorCodeImageOverflow := 404;
 	ErrorCodeImageRetrievalIssue := 405;
-	ErrorCodeImageNonReleasable := 406;
-	
 	SuperReportIdToReportId := CHOOSEN(
 		FLAccidents_Ecrash.Key_eCrashV2_ReportId(KEYED(report_id = RequestReportId)),
 		1
@@ -161,8 +159,6 @@ EXPORT ImageSearchService() := FUNCTION
 		AND (EXISTS(SuperReportRow) OR RequestVendorCode = eCrash_Services.Constants.VENDOR_CRASHLOGIC),
 		FAIL(ErrorCodeImageRetrievalIssue, 'Image retrieval issue')
 	);
-	
-	IF(ReportsAll[1].Releasable != '1', FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));
 
 	EmptyHeader := ROW(
 		TRANSFORM(
@@ -171,7 +167,6 @@ EXPORT ImageSearchService() := FUNCTION
 		)
 	);
 	
-	// Header for when the image is bigger than the max size.
 	iesp.retrieveimage.t_ECrashRetrieveImageResponse._Header ExceptionImageOverflowLayout := TRANSFORM
 		SELF.Status := ErrorCodeImageOverflow;
 		SELF.Exceptions := DATASET([
@@ -185,29 +180,11 @@ EXPORT ImageSearchService() := FUNCTION
 	END;
 	
 	HeaderImageOverflow := ROW(ExceptionImageOverflowLayout);
-	
-  // Header for when the image is non-releasable.
-	iesp.retrieveimage.t_ECrashRetrieveImageResponse._Header ExceptionImageNonReleasableLayout := TRANSFORM
-	  SELF.Status := ErrorCodeImageNonReleasable;
-	  SELF.Exceptions := DATASET([
-			{'Roxie', 
-				ErrorCodeImageNonReleasable, 
-				'eCrashServices.ImageSearchService', 
-				'Image is non-releasable'
-			}
-		], iesp.share.t_WsException);
-		SELF := [];
-	END;
-	
-	HeaderImageNonReleasable := ROW(ExceptionImageNonReleasableLayout);
-
-	// Compose the response header.
-  BOOLEAN IsImageTooLarge      := LENGTH(ImageRetrievalResponse[1].response.ImageData) >= iesp.Constants.Retrieve_Image.MaxImageSize;
-	BOOLEAN IsImageNonReleasable := ReportsAll[1].Releasable != '1';
-	
-	ResponseHeader := MAP(IsImageTooLarge      => HeaderImageOverflow,
-		                    IsImageNonReleasable => HeaderImageNonReleasable,
-		                    EmptyHeader);
+	ResponseHeader := IF(
+		LENGTH(ImageRetrievalResponse[1].response.ImageData) = iesp.Constants.Retrieve_Image.MaxImageSize,
+		HeaderImageOverflow,
+		EmptyHeader
+	);
 	
   iesp.retrieveimage.t_ECrashRetrieveImageResponse GenerateResponse(
 		iesp.accident_image.t_AccidentImageResponseEx L,
@@ -217,7 +194,7 @@ EXPORT ImageSearchService() := FUNCTION
 		SELF._Header := H;
 		SELF.InitialPurchase := InitialPurchase;
 		SELF.ImageData := IF(
-			H.Exceptions[1].Code IN [ErrorCodeImageOverflow, ErrorCodeImageNonReleasable],
+			H.Exceptions[1].Code = ErrorCodeImageOverflow,
 			'',
 			L.response.ImageData
 		);
