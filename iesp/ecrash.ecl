@@ -98,7 +98,6 @@ export t_ECrashSearchRecordData := record (t_ECrashSearchShared)
 	string DateReportCreated {xpath('DateReportCreated')};
 	string OfficerBadgeNumber {xpath('OfficerBadgeNumber')};
 	iesp.share.t_Date DateReportSubmitted {xpath('DateReportSubmitted')};
-	boolean IsReleasable {xpath('IsReleasable')};
 end;
 		
 export t_ECrashSearchRecord := record
@@ -130,7 +129,6 @@ export t_ECrashSearchRecord := record
 	string DateReportCreated {xpath('DateReportCreated')};
 	string OfficerBadgeNumber {xpath('OfficerBadgeNumber')};
 	iesp.share.t_Date DateReportSubmitted {xpath('DateReportSubmitted')};
-	boolean IsReleasable {xpath('IsReleasable')};
 end;
 		
 export t_ECrashSearchResponse := record
