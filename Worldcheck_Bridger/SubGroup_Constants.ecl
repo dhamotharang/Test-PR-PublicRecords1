@@ -1132,6 +1132,7 @@
 		export string KEYWORD_BRIBAMA								:= '818';
 		export string KEYWORD_CARBQ									:= '819';
 		export string KEYWORD_AZFMS_NAT							:= '820';
+		export string KEYWORD_BECA									:= '821';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
