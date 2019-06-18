@@ -8,7 +8,7 @@ SHARED split_patch := LinkBlockers(ih).Patches;
 SHARED h := match_candidates(ih).candidates;
 SHARED s := Specificities(ih).Specificities[1];
  
-SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layout_candidates le,match_candidates(ih).layout_candidates ri,UNSIGNED c=0,UNSIGNED outside=0,UNSIGNED company_inc_state_support0 = 0) := TRANSFORM
+SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layout_candidates le,match_candidates(ih).layout_candidates ri,UNSIGNED c=0,UNSIGNED outside=0) := TRANSFORM
   SELF.Rule := c;
   SELF.LGID31 := le.LGID3;
   SELF.LGID32 := ri.LGID3;
@@ -68,11 +68,9 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.company_inc_state_isnull OR ri.company_inc_state_isnull OR le.company_inc_state_weight100 = 0 => 0,
                         le.company_inc_state = ri.company_inc_state  => le.company_inc_state_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.company_inc_state_weight100,ri.company_inc_state_weight100),s.company_inc_state_switch));
-  INTEGER2 support_company_inc_state := company_inc_state_support0; // Add support
-  INTEGER2 company_inc_state_score_supp := MIN(IF(support_company_inc_state>0,MAX(company_inc_state_score_temp,support_company_inc_state*100),company_inc_state_score_temp),s.company_inc_state_MAXIMUM*100); // Add support
-  INTEGER2 company_inc_state_score := IF ( company_inc_state_score_supp > Config.company_inc_state_Force * 100 OR active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100, company_inc_state_score_supp, SKIP ); // Enforce FORCE parameter
+  INTEGER2 company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100, company_inc_state_score_temp, SKIP ); // Enforce FORCE parameter
   // Get propagation scores for individual propagated fields
-  INTEGER2 company_inc_state_score_prop := MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*company_inc_state_score_temp; // Score if either field propogated
+  INTEGER2 company_inc_state_score_prop := MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*company_inc_state_score; // Score if either field propogated
   INTEGER2 Lgid3IfHrchy_score_prop := MAX(le.Lgid3IfHrchy_prop,ri.Lgid3IfHrchy_prop)*Lgid3IfHrchy_score; // Score if either field propogated
   INTEGER2 active_duns_number_score_prop := MAX(le.active_duns_number_prop,ri.active_duns_number_prop)*active_duns_number_score; // Score if either field propogated
   INTEGER2 duns_number_score_prop := MAX(le.duns_number_prop,ri.duns_number_prop)*duns_number_score; // Score if either field propogated
@@ -115,10 +113,9 @@ SHARED all_mjs := MAC_DoJoins(h,match_join);
  
 //Now construct candidates based upon attribute & relationship files
  
-AllAttrMatches := SORT(MOD_Attr_UnderLinks(ih).Match+MOD_Attr_CorteraAccounts(ih).Match,LGID31,LGID32,Rule,-(Conf+Conf_Prop+support_company_inc_state),LOCAL);
+AllAttrMatches := SORT(MOD_Attr_UnderLinks(ih).Match,LGID31,LGID32,Rule,-(Conf+Conf_Prop),LOCAL);
 match_candidates(ih).Layout_Attribute_Matches CombineResults(match_candidates(ih).Layout_Attribute_Matches le,match_candidates(ih).Layout_Attribute_Matches ri) := TRANSFORM
   SELF.Conf := le.Conf+ri.Conf;
-  SELF.support_company_inc_state := le.support_company_inc_state+ri.support_company_inc_state;
   SELF.Source_Id := le.Source_ID + '|' + ri.Source_ID;
   SELF := le;
 END;
@@ -128,11 +125,11 @@ j1 := JOIN(DISTRIBUTE(All_Attribute_Matches,HASH(LGID32)),hd,LEFT.LGID32=RIGHT.L
 match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
   SELF := le;
 END;
-attr_match := JOIN(DISTRIBUTE(j1,HASH(LGID31)),hd,LEFT.LGID31 = RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ),match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_company_inc_state),LOCAL); // Will be distributed by DID1
+attr_match := JOIN(DISTRIBUTE(j1,HASH(LGID31)),hd,LEFT.LGID31 = RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ),match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf),LOCAL); // Will be distributed by DID1
 with_attr := attr_match + all_mjs;
 not_blocked := JOIN(with_attr,LinkBlockers(ih).Block,left.LGID31=right.LGID31 and left.LGID32=right.LGID32,TRANSFORM(LEFT),LEFT ONLY, SMART); // Remove all blocked links
 EXPORT All_Matches := not_blocked : PERSIST('~temp::LGID3::BIPV2_LGID3::all_m',EXPIRE(BIPV2_LGID3.Config.PersistExpire)); // To by used by rcid and LGID3
-// SALT311.mac_avoid_transitives(All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o); /*HACKMatches02 - disable default salt mac_avoid_transitives*/
+//  /*HACKMatches02 - disable default salt mac_avoid_transitives*/
 import BIPV2_Tools; /*HACKMatches02 - import for new transitives macro*/
 BIPV2_Tools.mac_avoid_transitives(All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o); // HACKMatches02 - Use new transitives macro*/
 

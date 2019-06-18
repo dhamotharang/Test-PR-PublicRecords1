@@ -124,8 +124,6 @@ EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   TYPEOF(h.levels_from_top) right_levels_from_top;
   TYPEOF(h.nodes_total) left_nodes_total;
   TYPEOF(h.nodes_total) right_nodes_total;
-  TYPEOF(h.cortera_id) left_cortera_id;
-  TYPEOF(h.cortera_id) right_cortera_id;
   TYPEOF(h.dt_first_seen) left_dt_first_seen;
   TYPEOF(h.dt_first_seen) right_dt_first_seen;
   TYPEOF(h.dt_last_seen) left_dt_last_seen;
@@ -263,8 +261,6 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.right_levels_from_top := ri.levels_from_top;
   SELF.left_nodes_total := le.nodes_total;
   SELF.right_nodes_total := ri.nodes_total;
-  SELF.left_cortera_id := le.cortera_id;
-  SELF.right_cortera_id := ri.cortera_id;
   SELF.left_dt_first_seen := le.dt_first_seen;
   SELF.right_dt_first_seen := ri.dt_first_seen;
   SELF.left_dt_last_seen := le.dt_last_seen;
@@ -306,7 +302,7 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   INTEGER2 duns_number_concept_score_ext := SALT311.ClipScore(MAX(duns_number_concept_score_pre,0) + self.active_duns_number_score + self.duns_number_score);// Score in surrounding context
   INTEGER2 duns_number_concept_score_res := MAX(0,duns_number_concept_score_pre); // At least nothing
   SELF.duns_number_concept_score := duns_number_concept_score_res;
-  SELF.cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR SELF.sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force*100 or outside > 0, cnp_number_score_temp, -9999 ); // Enforce FORCE parameter
+  SELF.cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR SELF.sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force*100, cnp_number_score_temp, -9999 ); // Enforce FORCE parameter
   SELF.cnp_number_skipped := SELF.cnp_number_score < -5000;// Enforce FORCE parameter
   SELF.left_company_inc_state := le.company_inc_state;
   SELF.right_company_inc_state := ri.company_inc_state;
@@ -317,7 +313,7 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         le.company_inc_state_isnull OR ri.company_inc_state_isnull OR le.company_inc_state_weight100 = 0 => 0,
                         le.company_inc_state = ri.company_inc_state  => le.company_inc_state_weight100,
                         SALT311.Fn_Fail_Scale(AVE(le.company_inc_state_weight100,ri.company_inc_state_weight100),s.company_inc_state_switch));
-  SELF.company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR SELF.active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR SELF.duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR SELF.duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR SELF.company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR SELF.sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100 or outside > 0, company_inc_state_score_temp, -9999 ); // Enforce FORCE parameter
+  SELF.company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR SELF.active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force*100 OR SELF.duns_number_score > Config.company_inc_state_OR2_duns_number_Force*100 OR SELF.duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force*100 OR SELF.company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100 OR SELF.sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100, company_inc_state_score_temp, -9999 ); // Enforce FORCE parameter
   SELF.company_inc_state_skipped := SELF.company_inc_state_score < -5000;// Enforce FORCE parameter
   // Get propagation scores for individual propagated fields
   SELF.company_inc_state_score_prop := MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*SELF.company_inc_state_score; // Score if either field propogated
@@ -417,7 +413,6 @@ EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
   DATASET(SALT311.Layout_FieldValueList) ultimate_proxid_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) levels_from_top_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) nodes_total_Values := DATASET([],SALT311.Layout_FieldValueList);
-  DATASET(SALT311.Layout_FieldValueList) cortera_id_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) dt_first_seen_Values := DATASET([],SALT311.Layout_FieldValueList);
   DATASET(SALT311.Layout_FieldValueList) dt_last_seen_Values := DATASET([],SALT311.Layout_FieldValueList);
 END;
@@ -464,7 +459,6 @@ SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
     SELF.ultimate_proxid_values := SALT311.fn_combine_fieldvaluelist(le.ultimate_proxid_values,ri.ultimate_proxid_values);
     SELF.levels_from_top_values := SALT311.fn_combine_fieldvaluelist(le.levels_from_top_values,ri.levels_from_top_values);
     SELF.nodes_total_values := SALT311.fn_combine_fieldvaluelist(le.nodes_total_values,ri.nodes_total_values);
-    SELF.cortera_id_values := SALT311.fn_combine_fieldvaluelist(le.cortera_id_values,ri.cortera_id_values);
     SELF.dt_first_seen_values := SALT311.fn_combine_fieldvaluelist(le.dt_first_seen_values,ri.dt_first_seen_values);
     SELF.dt_last_seen_values := SALT311.fn_combine_fieldvaluelist(le.dt_last_seen_values,ri.dt_last_seen_values);
   END;
@@ -510,7 +504,6 @@ SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
     SELF.ultimate_proxid_values := SORT(le.ultimate_proxid_values, -cnt, val, LOCAL);
     SELF.levels_from_top_values := SORT(le.levels_from_top_values, -cnt, val, LOCAL);
     SELF.nodes_total_values := SORT(le.nodes_total_values, -cnt, val, LOCAL);
-    SELF.cortera_id_values := SORT(le.cortera_id_values, -cnt, val, LOCAL);
     SELF.dt_first_seen_values := SORT(le.dt_first_seen_values, -cnt, val, LOCAL);
     SELF.dt_last_seen_values := SORT(le.dt_last_seen_values, -cnt, val, LOCAL);
   END;
@@ -561,7 +554,6 @@ Layout_RolledEntity into(in_data le) := TRANSFORM
   SELF.ultimate_proxid_Values := DATASET([{TRIM((SALT311.StrType)le.ultimate_proxid)}],SALT311.Layout_FieldValueList);
   SELF.levels_from_top_Values := DATASET([{TRIM((SALT311.StrType)le.levels_from_top)}],SALT311.Layout_FieldValueList);
   SELF.nodes_total_Values := DATASET([{TRIM((SALT311.StrType)le.nodes_total)}],SALT311.Layout_FieldValueList);
-  SELF.cortera_id_Values := DATASET([{TRIM((SALT311.StrType)le.cortera_id)}],SALT311.Layout_FieldValueList);
   SELF.dt_first_seen_Values := DATASET([{TRIM((SALT311.StrType)le.dt_first_seen)}],SALT311.Layout_FieldValueList);
   SELF.dt_last_seen_Values := DATASET([{TRIM((SALT311.StrType)le.dt_last_seen)}],SALT311.Layout_FieldValueList);
 END;
@@ -610,7 +602,6 @@ Layout_RolledEntity into(ih le) := TRANSFORM
   SELF.ultimate_proxid_Values := DATASET([{TRIM((SALT311.StrType)le.ultimate_proxid)}],SALT311.Layout_FieldValueList);
   SELF.levels_from_top_Values := DATASET([{TRIM((SALT311.StrType)le.levels_from_top)}],SALT311.Layout_FieldValueList);
   SELF.nodes_total_Values := DATASET([{TRIM((SALT311.StrType)le.nodes_total)}],SALT311.Layout_FieldValueList);
-  SELF.cortera_id_Values := DATASET([{TRIM((SALT311.StrType)le.cortera_id)}],SALT311.Layout_FieldValueList);
   SELF.dt_first_seen_Values := DATASET([{TRIM((SALT311.StrType)le.dt_first_seen)}],SALT311.Layout_FieldValueList);
   SELF.dt_last_seen_Values := DATASET([{TRIM((SALT311.StrType)le.dt_last_seen)}],SALT311.Layout_FieldValueList);
 END;

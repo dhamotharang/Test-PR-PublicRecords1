@@ -241,7 +241,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,'ultimate_proxid:' + getFieldTypeText(h.ultimate_proxid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'levels_from_top:' + getFieldTypeText(h.levels_from_top) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'nodes_total:' + getFieldTypeText(h.nodes_total) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'cortera_id:' + getFieldTypeText(h.cortera_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'dt_first_seen:' + getFieldTypeText(h.dt_first_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'dt_last_seen:' + getFieldTypeText(h.dt_last_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
@@ -285,7 +284,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_ultimate_proxid_cnt
           ,le.populated_levels_from_top_cnt
           ,le.populated_nodes_total_cnt
-          ,le.populated_cortera_id_cnt
           ,le.populated_dt_first_seen_cnt
           ,le.populated_dt_last_seen_cnt,0);
       SELF.rulepcnt := CHOOSE(c
@@ -329,12 +327,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
           ,le.populated_ultimate_proxid_pcnt
           ,le.populated_levels_from_top_pcnt
           ,le.populated_nodes_total_pcnt
-          ,le.populated_cortera_id_pcnt
           ,le.populated_dt_first_seen_pcnt
           ,le.populated_dt_last_seen_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,43,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,42,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -350,7 +347,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h, BOOLEAN Glob = FALSE) := MODULE
  
     mod_Delta := Delta(prevDS, PROJECT(h, Layout_LGID3));
     deltaHygieneSummary := mod_Delta.DifferenceSummary(Glob);
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),43,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),42,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
