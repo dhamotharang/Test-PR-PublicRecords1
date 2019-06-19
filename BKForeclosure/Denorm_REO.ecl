@@ -472,7 +472,8 @@ Layout_BK.base_reo denormalizeRecords(Layout_BK.base_reo l, Layout_BK.CleanField
 		SELF.situs1_dpbc				:= IF(r.AddrType = 'PF', r.dbpc, l.situs1_dpbc);
 		SELF.situs1_chk_digit		:= IF(r.AddrType = 'PF', r.chk_digit, l.situs1_chk_digit);
 		SELF.situs1_record_type	:= IF(r.AddrType = 'PF', r.rec_type, l.situs1_record_type);
-		SELF.situs1_fipscounty	:= IF(r.AddrType = 'PF', r.county, l.situs1_fipscounty);
+		SELF.situs1_ace_fips_st	:= IF(r.AddrType = 'PF', r.county[1..2], l.situs1_ace_fips_st);
+		SELF.situs1_fipscounty	:= IF(r.AddrType = 'PF', r.county[3..5], l.situs1_fipscounty);
 		SELF.situs1_geo_lat			:= IF(r.AddrType = 'PF', r.geo_lat, l.situs1_geo_lat);
 		SELF.situs1_geo_long		:= IF(r.AddrType = 'PF', r.geo_long, l.situs1_geo_long);
 		SELF.situs1_msa					:= IF(r.AddrType = 'PF', r.msa, l.situs1_msa);
