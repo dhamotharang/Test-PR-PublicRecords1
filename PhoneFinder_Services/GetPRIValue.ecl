@@ -1,7 +1,7 @@
 ﻿﻿IMPORT iesp, PhoneFinder_Services,std,ut;
 
 EXPORT GetPRIValue(PhoneFinder_Services.Layouts.PhoneFinder.Final SubjectPhone,
-										PhoneFinder_Services.iParam.ReportParams inMod):= FUNCTION
+										PhoneFinder_Services.iParam.SearchParams inMod):= FUNCTION
 Constants := PhoneFinder_Services.Constants;
 
 	//**********************************************************************************************************************************************

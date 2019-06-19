@@ -1,7 +1,7 @@
 ﻿
-import american_student_list, Riskwise, AlloyMedia_student_list, MDR;
+import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators;
 
-export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing) := FUNCTION
+export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing) := FUNCTION
 		
 	Layout_AS_Plus := RECORD
 		Riskwise.Layouts.Layout_American_Student student;
@@ -15,7 +15,7 @@ export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integ
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
-		self.student.date_last_seen := min( iid_constants.mygetdate(le.historydate), ri.date_last_seen );
+		self.student.date_last_seen := min( risk_indicators.iid_constants.mygetdate(le.historydate), ri.date_last_seen );
 		self.student.file_type2 := ri.file_type;
 		self.student := ri;
 		self.student.college_tier := if(bsversion>=50, ri.tier2, ri.tier);
@@ -132,7 +132,7 @@ export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integ
 			);
 
 		self.student.date_first_seen := ri.date_vendor_first_reported; 
-		self.student.date_last_seen := min( iid_constants.mygetdate(le.historydate), ri.date_vendor_last_reported );
+		self.student.date_last_seen := min( risk_indicators.iid_constants.mygetdate(le.historydate), ri.date_vendor_last_reported );
 
 		self.student.college_name := ri.school_name;
 		self.student.college_tier := if(bsversion>=50, ri.tier2, ri.tier);
@@ -147,7 +147,7 @@ export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integ
 	alloy_file := join(ids_only, AlloyMedia_student_list.Key_DID, 
 			left.did!=0
 			and keyed(left.did=right.did)
-			and right.date_vendor_first_reported < iid_constants.myGetDate(left.historydate),
+			and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
 			alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
 
 

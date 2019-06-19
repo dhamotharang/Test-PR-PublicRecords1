@@ -6,7 +6,7 @@ modPenalty := PhoneFinder_Services.GetPenalty;
 
 // Targus gateway data
 EXPORT GetTargusPhones( DATASET(lBatchIn)                        dIn,
-												PhoneFinder_Services.iParam.ReportParams inMod,
+												PhoneFinder_Services.iParam.SearchParams inMod,
 												BOOLEAN                                  doPhoneOnlySearch = FALSE,
 												Gateway.Layouts.Config                   pGateway) :=
 FUNCTION

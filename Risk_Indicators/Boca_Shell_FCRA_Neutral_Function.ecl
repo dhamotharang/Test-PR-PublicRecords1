@@ -1,15 +1,15 @@
 ﻿import _Control, doxie, ut, mdr, header, drivers, census_data, riskwise, VotersV2, 
-	models, AID_Build;
+	models, AID_Build, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_FCRA_Neutral_Function(grouped DATASET(Layout_output) iid,
+export Boca_Shell_FCRA_Neutral_Function(grouped DATASET(risk_indicators.Layout_output) iid,
 								unsigned1 dppa, unsigned1 glb,
 								boolean isUtility = false,
 								boolean isLN=false,
 								boolean includeRelativeInfo = true,
 								boolean IsFCRA = FALSE,
 								unsigned1 BSversion = 1, boolean nugen = false,
-								string50 DataRestriction=iid_constants.default_DataRestriction,
+								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 								unsigned8 BSOptions
 								) := function
 
@@ -18,9 +18,9 @@ dppa_ok := dppa > 0 and dppa < 8;
 
 ids := GROUP(SORT(Risk_Indicators.Boca_Shell_Ids(iid, includeRelativeInfo, DataRestriction, BSOptions),seq),seq);
 
-relrec := layout_bocashell_neutral;
+relrec := risk_indicators.layout_bocashell_neutral;
 relrecWRawAid := record
-	layout_bocashell_neutral;
+	risk_indicators.layout_bocashell_neutral;
 	unsigned8 rawaid_1 := 0;
 	unsigned8 rawaid_2 := 0;
 	unsigned8 rawaid_3 := 0;	
@@ -41,7 +41,7 @@ TRANSFORM
 	SELF.ADLCategory := le.ADLCategory;
 	SELF.trueDID := le.trueDID;
 
-	SELF.Shell_Input := ROW(le,TRANSFORM(Layout_Input,SELF := LEFT));
+	SELF.Shell_Input := ROW(le,TRANSFORM(risk_indicators.Layout_Input,SELF := LEFT));
 	SELF.iid.NAS_summary := le.socsverlevel;
 	SELF.iid.NAP_summary := le.phoneverlevel;
 	
@@ -837,7 +837,7 @@ END;
 			
 idheader1_roxie :=  JOIN(pre_relatives(isrelat), doxie.Key_Header, 
 														keyed(LEFT.did=RIGHT.s_did) AND
-														right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
+														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < left.historydate AND
 														// check permissions	
 														(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
@@ -848,13 +848,13 @@ idheader1_roxie :=  JOIN(pre_relatives(isrelat), doxie.Key_Header,
 														(~mdr.Source_is_DPPA(RIGHT.src) OR
 															(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
-														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
+														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID));
 
 idheader1_thor :=  group(sort(JOIN(distribute(pre_relatives(isrelat), hash64(did)), 
 														distribute(pull(doxie.Key_Header), hash64(s_did)), 
 														LEFT.did=RIGHT.s_did AND
-														right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
+														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < left.historydate AND
 														// check permissions	
 														(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
@@ -865,7 +865,7 @@ idheader1_thor :=  group(sort(JOIN(distribute(pre_relatives(isrelat), hash64(did
 														(~mdr.Source_is_DPPA(RIGHT.src) OR
 															(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
-														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
+														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID), LOCAL),seq),seq);
 
 #IF(onThor)
@@ -934,7 +934,7 @@ relatives_with_suspcious_ids := join(idroll_slim, suspicious_identities,
 															self.relative_bureau_only_count_created_6months := if(right.bureau_only_last_6months, 1, 0);	
 															self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-isFraudpoint :=  (BSOptions & iid_constants.BSOptions.IncludeFraudVelocity) > 0;
+isFraudpoint :=  (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity) > 0;
 
 // idroll := if(isFCRA, group(idroll_slim,seq), if(isFraudPoint, group(relatives_with_suspcious_ids, seq), group(idroll_slim,seq)));
 

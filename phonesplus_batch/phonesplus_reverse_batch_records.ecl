@@ -58,7 +58,8 @@
 													 left only);
 			
 		boolean use_qt := doxie.DataPermission.use_qsent and include_qt;
-		phonesplus_batch.mac_get_qsent_by_phone(f_in_seq_qsent, f_out_qsent, use_qsent_flag:=use_qt)
+  
+		phonesplus_batch.mac_get_qsent_by_phone(f_in_seq_qsent, f_out_qsent,,use_qt,optionsIn);
 			
 		f_in_pp3 := f_in_pp2 + f_out_qsent;	
 		
@@ -183,6 +184,6 @@
 			if(use_qt, dRoyaltiesQSent) + // inhouse qsent only
 			if(use_tg, dRoyaltiesTargus);
 		dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
-
+ 
 		RETURN ROW({dResults, dRoyalties},phonesplus_batch.layout_phonesplus_reverse_batch_records_out);
 	END;

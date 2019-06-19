@@ -3,17 +3,18 @@
 out_rec := personreports.layouts.CommonAssetReportIndividual;
 
 // accepts atmost one DID, actually
-EXPORT  AssetReport (
+EXPORT AssetReport (
   dataset (doxie.layout_references) dids,
-  PersonReports.input._assetreport param,
+  PersonReports.IParam._assetreport mod_asset,
   boolean IsFCRA = false) := FUNCTION
 
-  //Convert to the old _report style module:
-  mod_access := $.IParam.MAC_CreateIDataAccessReportModule(param);
-  mod_asset := MODULE (PROJECT (param, $.IParam._assetreport), mod_access)
+  //Convert to the old _report style module: $.input._assetreport
+  //mod_access := PROJECT (mod_asset, doxie.IDataAccess);
+  param := MODULE (PROJECT (mod_asset, $.IParam.old_assetreport))
+    $.input.mac_copy_report_fields(mod_asset);
   END;
 
- // DID should be atmost one (do we keep layout_references for legacy reasons?)
+  // DID should be atmost one (do we keep layout_references for legacy reasons?)
   did := dids[1].did;
 
   // Suppression/correction data (FCRA side only)
@@ -81,8 +82,10 @@ EXPORT  AssetReport (
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Aircraft
                                      )), iesp.Constants.BR.MaxAircrafts);
 
-  p_paw         := choosen (PersonReports.peopleatwork_records(dids, PROJECT (mod_asset, $.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
-
+  
+  p_paw         := choosen (PersonReports.peopleatwork_records(dids, Module(PROJECT (mod_asset,PersonReports.IParam.peopleatwork, OPT))end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  
+ 
   // -----------------------------------------------------------------------
   // COUNTS (cannot use doxie.key_did_lookups_v2 -- not always in sync);
   // something similar to doxie.MAC_Add_WeAlsoFound can be used here, 
@@ -147,18 +150,5 @@ EXPORT  AssetReport (
   FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, consumer_alerts, 
                              out_rec);
   
-/*    FFD
-      output(slim_pc_recs,named('slim_pc_recs'));
-      output(p_aircrafts,named('Aircrafts'));
-      output(p_akas,named('AKAs'));
-      output(p_faa_cert,named('FAACertifications'));
-      output(p_watercrafts,named('WaterCrafts'));
-      output(p_assessments,named('AssessRecords'));
-      output(p_deeds,named('DeedRecords'));
-      
-     
-     output(ShowConsumerStatements,named('AR_ShowConsumerStatements'));
-*/
-
   return individual_combined;
 end;

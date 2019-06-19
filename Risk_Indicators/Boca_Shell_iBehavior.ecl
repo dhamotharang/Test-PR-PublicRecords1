@@ -1,4 +1,4 @@
-import riskwise, ut, fcra, ibehavior, risk_indicators;
+﻿import riskwise, ut, fcra, ibehavior, risk_indicators;
 
 export Boca_Shell_iBehavior(GROUPED DATASET(layout_bocashell_neutral) clam_pre_iBehavior, boolean isFCRA,
 	unsigned8 BSOptions, boolean onThor=false) := FUNCTION

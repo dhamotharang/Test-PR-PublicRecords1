@@ -1,6 +1,6 @@
 ﻿import Risk_Indicators, Riskview;
 
-export Boca_Shell_Derogs_Hist_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids, 
+export Boca_Shell_Derogs_Hist_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, 
 				integer bsVersion, unsigned8 BSOptions=0,
 				boolean IncludeLnJ = false,
 				integer2 ReportingPeriod = 84

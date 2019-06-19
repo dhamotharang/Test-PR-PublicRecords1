@@ -103,6 +103,10 @@ export ResidentsService := Macro
   	end;
 
 		ds_Residents := BatchServices.Residents_Records(final_batch_in,in_mod);
+    
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+    IF (EXISTS(ds_Residents), doxie.compliance.logSoldToTransaction(mod_access)); 
+    
 
 		OUTPUT(project(ds_Residents,BatchServices.Layouts.Resident.batch_out), NAMED('Results'));
 endMacro;

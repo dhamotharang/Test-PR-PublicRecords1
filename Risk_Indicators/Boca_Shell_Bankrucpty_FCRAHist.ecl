@@ -1,4 +1,4 @@
-﻿import _Control, doxie_files, ut, doxie, fcra, riskwise, bankruptcyv3, Risk_Indicators;
+﻿﻿import _Control, doxie_files, ut, doxie, fcra, riskwise, bankruptcyv3, Risk_Indicators;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0,
@@ -8,7 +8,8 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 	bans_Withdrawn_Status := BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(,,TRUE);	
 	bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip(true);
 
-	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_bk_allow_10yr := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyAllow10Yr) > 0;
+	insurance_fcra_filter :=  ((BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0) AND (NOT insurance_bk_allow_10yr);
 	insurance_bk_chapter_exception := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException) > 0;
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process := RECORD
@@ -17,7 +18,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 			Risk_Indicators.Layouts.Layout_Liens Liens;
 	END;
 
-	Risk_Indicators.Layouts_Derog_Info.layout_extended add_bankrupt (layouts.layout_derogs_input le, bans_did ri) := TRANSFORM
+	Risk_Indicators.Layouts_Derog_Info.layout_extended add_bankrupt (risk_indicators.layouts.layout_derogs_input le, bans_did ri) := TRANSFORM
 		self.bk_tmsid := ri.tmsid;
 		SELF.court_code := ri.court_code;
 		SELF.case_num := ri.case_number;
@@ -208,7 +209,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		
 //For BS 5.3 - do process over again using history date + 2 years in order to populate the new offset count12 fields
 	Risk_Indicators.Layouts_Derog_Info.layout_extended get_bankrupt_FCRA_offset (Risk_Indicators.Layouts_Derog_Info.layout_extended le, bans_search ri) := TRANSFORM
-		myGetDate 			:= iid_constants.myGetDate(le.historydate);
+		myGetDate 			:= risk_indicators.iid_constants.myGetDate(le.historydate);
 		hit := ri.case_number<>'';
 		
 		SELF.BJL.bankrupt := false;
@@ -248,8 +249,8 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 						 trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, insurance_bk_chapter_exception) and
 						 (unsigned)(RIGHT.date_filed[1..6]) < (left.historydate + 200) and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
-								FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
-								FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
+								FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
+								FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
 							get_bankrupt_FCRA_offset (LEFT,RIGHT),
 							LEFT OUTER, ATMOST(Riskwise.max_atmost), keep(100));
 
@@ -260,8 +261,8 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < (left.historydate + 200) and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
-								FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
-								FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
+								FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
+								FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
 							get_bankrupt_FCRA_offset (LEFT,RIGHT),
 							LEFT OUTER, ATMOST(LEFT.bk_tmsid = RIGHT.tmsid, Riskwise.max_atmost), keep(100), LOCAL) +
               bankrupt_added(bk_tmsid='');

@@ -1,8 +1,8 @@
-﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster;
+﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_address,
-                                  GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, 
+EXPORT Boca_Shell_Property_Common(GROUPED DATASET(risk_indicators.Layout_PropertyRecord) p_address,
+                                  GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
 																  BOOLEAN includeRelatives = TRUE,
 																  BOOLEAN filter_out_fares = FALSE,
 																  BOOLEAN is_FCRA = FALSE,
@@ -181,7 +181,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 			loan_type_code := TRIM(stringlib.stringtouppercase(mortgage_loan_type_code));
 			is_fares       := vendor_source_flag = FARES;
 			is_fidelity    := vendor_source_flag = FIDELITY;
-			mortgage_type  := iid_constants.mortgage_type(is_fidelity, is_fares, loan_type_code);
+			mortgage_type  := risk_indicators.iid_constants.mortgage_type(is_fidelity, is_fares, loan_type_code);
 			RETURN mortgage_type;
 		END;
 
@@ -190,7 +190,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 			finance_type_cd := TRIM(stringlib.stringtouppercase(finance_type_code));
 			is_fares        := vendor_source_flag = FARES;
 			is_fidelity     := vendor_source_flag = FIDELITY;
-			mortgage_type   := iid_constants.type_financing(is_fidelity, is_fares, finance_type_cd);
+			mortgage_type   := risk_indicators.iid_constants.type_financing(is_fidelity, is_fares, finance_type_cd);
 			RETURN mortgage_type;
 		END;
 	
@@ -199,23 +199,23 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 			// NOTE: Someone who's "family" has the same last name but a different first name.
 			is_good_match := Risk_Indicators.g;
 			
-			fname_match_owner1 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[1].fname));
-			lname_match_owner1 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[1].lname));
-			fname_match_owner2 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[2].fname));
-			lname_match_owner2 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[2].lname));
-			fname_match_owner3 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[3].fname));
-			lname_match_owner3 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[3].lname));
-			fname_match_owner4 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[4].fname));
-			lname_match_owner4 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[4].lname));
+			fname_match_owner1 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[1].fname));
+			lname_match_owner1 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[1].lname));
+			fname_match_owner2 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[2].fname));
+			lname_match_owner2 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[2].lname));
+			fname_match_owner3 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[3].fname));
+			lname_match_owner3 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[3].lname));
+			fname_match_owner4 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = OWNER)[1].entity[4].fname));
+			lname_match_owner4 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = OWNER)[1].entity[4].lname));
 
-			fname_match_sellr1 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[1].fname));
-			lname_match_sellr1 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[1].lname));
-			fname_match_sellr2 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[2].fname));
-			lname_match_sellr2 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[2].lname));
-			fname_match_sellr3 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[3].fname));
-			lname_match_sellr3 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[3].lname));
-			fname_match_sellr4 := is_good_match(FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[4].fname));
-			lname_match_sellr4 := is_good_match(LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[4].lname));
+			fname_match_sellr1 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[1].fname));
+			lname_match_sellr1 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[1].lname));
+			fname_match_sellr2 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[2].fname));
+			lname_match_sellr2 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[2].lname));
+			fname_match_sellr3 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[3].fname));
+			lname_match_sellr3 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[3].lname));
+			fname_match_sellr4 := is_good_match(risk_indicators.FnameScore(le.inp_fname,le.parties(party_type = SELLER)[1].entity[4].fname));
+			lname_match_sellr4 := is_good_match(risk_indicators.LnameScore(le.inp_lname,le.parties(party_type = SELLER)[1].entity[4].lname));
 		
 			property_status :=
 				MAP(

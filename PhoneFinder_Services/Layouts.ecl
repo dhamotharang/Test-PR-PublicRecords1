@@ -29,6 +29,7 @@ MODULE
 
 		UNSIGNED6 did;
 	END;
+  
 	EXPORT BatchInAppendAcctno :=
 	RECORD(BatchIn)
 		STRING20 orig_acctno; // [internal]
@@ -257,6 +258,8 @@ MODULE
 			STRING100                                             verification_desc;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
+      UNSIGNED2                                             identity_count := 0;
+			INTEGER                                               phone_inresponse_count;
 		END;
 		
 		EXPORT ExcludePhones :=
@@ -360,6 +363,7 @@ MODULE
 			STRING8 loststolen_date;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
+      UNSIGNED2  identity_count := 0;
 		END;
 		
 		EXPORT IdentityIesp :=

@@ -4,7 +4,7 @@ onThor := _Control.Environment.OnThor;
 export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_BankLiensCrim) := FUNCTION
 
-	insurance_fcra_filter := (BSOptions & iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_fcra_filter := (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
 	//Adding Sex Offenders
 	fcra_sex_offender_did_key := SexOffender.Key_SexOffender_DID(true);
 	fcra_sex_offender_spk_key := SexOffender.Key_SexOffender_SPK(true);
@@ -35,7 +35,7 @@ export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 	doc_added_soff_roxie := JOIN (spk_ids, fcra_sex_offender_spk_key, 
 										 keyed(LEFT.seisint_primary_key=RIGHT.sspk) AND
 										(unsigned3)(RIGHT.fcra_date[1..6]) < left.historydate AND
-										FCRA.crim_is_ok(iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag),
+										FCRA.crim_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag),
 										add_doc_FCRA_SO(LEFT,RIGHT),
 										KEEP(10), ATMOST(keyed(LEFT.seisint_primary_key=RIGHT.sspk), 
 										riskwise.max_atmost));
@@ -44,7 +44,7 @@ export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 										distribute(pull(fcra_sex_offender_spk_key), hash64(sspk)), 
 										LEFT.seisint_primary_key=RIGHT.sspk AND
 										(unsigned3)(RIGHT.fcra_date[1..6]) < left.historydate AND
-										FCRA.crim_is_ok(iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag),
+										FCRA.crim_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),RIGHT.fcra_date,RIGHT.fcra_conviction_flag,RIGHT.fcra_traffic_flag),
 										add_doc_FCRA_SO(LEFT,RIGHT),
 										KEEP(10), ATMOST(LEFT.seisint_primary_key=RIGHT.sspk, 
 										riskwise.max_atmost), LOCAL);

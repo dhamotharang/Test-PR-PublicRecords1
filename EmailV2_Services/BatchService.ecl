@@ -73,7 +73,7 @@ IMPORT AutoheaderV2, AutoKeyI, BatchShare, EmailV2_Services, Royalty;
   BatchShare.MAC_RestoreAcctno(ds_batch_in,batch_recs.Records, ds_output,,false);
   Royalty.MAC_RestoreAcctno(ds_batch_in, batch_recs.Royalties, royalties);
   
-
+  IF(EXISTS(ds_output), doxie.compliance.logSoldToTransaction(batch_params));
   OUTPUT( ds_output, NAMED('Results'));
   OUTPUT( royalties, NAMED('RoyaltySet'));
 ENDMACRO;

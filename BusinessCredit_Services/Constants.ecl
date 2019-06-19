@@ -14,6 +14,9 @@ EXPORT Constants := MODULE
 		EXPORT INTEGER 		NINE_MONTHS							:= -270;
 		EXPORT INTEGER 		ONE_YEAR								:= -365; 
 		
+		EXPORT STRING1        SBFEDataBusinessCreditReport := '1'; // default
+		EXPORT STRING1        LNOnlyBusinessCreditReport := '2';
+		
 		EXPORT UNSIGNED1	TWO_YR_PAYMENT_HISTORY      := 24;  // Small Bus credit Report SBFE Addition
 		EXPORT UNSIGNED1  TOPCHARGEOFFCOUNT := 10; // Small Bus credit Report SBFE Addition
 		EXPORT UNSIGNED1  TOTALTRADELINECOUNT := 50; // Small Bus credit Report SBFE Addition

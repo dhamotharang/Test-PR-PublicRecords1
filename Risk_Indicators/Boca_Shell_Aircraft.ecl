@@ -1,6 +1,6 @@
-import doxie_files, riskwise, ut, faa;
+﻿import doxie_files, riskwise, ut, faa, risk_indicators;
 
-export Boca_Shell_Aircraft(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only) := FUNCTION
+export Boca_Shell_Aircraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
 aircraft_build_date := Risk_Indicators.get_Build_date('faa_build_version');	    
 
@@ -17,23 +17,23 @@ aircraftIDs := join(ids_only, key_did,
 
 key_ids := faa.key_aircraft_id();
 RiskWise.Layouts.Layout_Aircraft_plus addAircraft(aircraftIDs le, key_ids ri) := transform
-                myGetDate := if(le.historydate=999999, aircraft_build_date, iid_constants.full_history_date(le.historydate));
+                myGetDate := if(le.historydate=999999, aircraft_build_date, risk_indicators.iid_constants.full_history_date(le.historydate));
                 self.date_first_seen := if(ri.date_first_seen='', '999999', ri.date_first_seen);
                 self.aircraft_count := if(trim(ri.n_number)!='', 1, 0);
-                self.aircraft_count30 := if(trim(ri.n_number)!='' and iid_constants.checkDays(myGetDate,ri.date_first_seen,30, le.historydate), 1, 0);
-                self.aircraft_count90 := if(trim(ri.n_number)!='' and iid_constants.checkDays(myGetDate,ri.date_first_seen,90, le.historydate), 1, 0);
-                self.aircraft_count180 := if(trim(ri.n_number)!='' and iid_constants.checkDays(myGetDate,ri.date_first_seen,180, le.historydate), 1, 0);
-                self.aircraft_count12 := if(trim(ri.n_number)!='' and iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(1), le.historydate), 1, 0);
-                self.aircraft_count24 := if(trim(ri.n_number)!='' and iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(2), le.historydate), 1, 0);
-                self.aircraft_count36 := if(trim(ri.n_number)!='' and iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(3), le.historydate), 1, 0);
-                self.aircraft_count60 := if(trim(ri.n_number)!='' and iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(5), le.historydate), 1, 0);
+                self.aircraft_count30 := if(trim(ri.n_number)!='' and risk_indicators.iid_constants.checkDays(myGetDate,ri.date_first_seen,30, le.historydate), 1, 0);
+                self.aircraft_count90 := if(trim(ri.n_number)!='' and risk_indicators.iid_constants.checkDays(myGetDate,ri.date_first_seen,90, le.historydate), 1, 0);
+                self.aircraft_count180 := if(trim(ri.n_number)!='' and risk_indicators.iid_constants.checkDays(myGetDate,ri.date_first_seen,180, le.historydate), 1, 0);
+                self.aircraft_count12 := if(trim(ri.n_number)!='' and risk_indicators.iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(1), le.historydate), 1, 0);
+                self.aircraft_count24 := if(trim(ri.n_number)!='' and risk_indicators.iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(2), le.historydate), 1, 0);
+                self.aircraft_count36 := if(trim(ri.n_number)!='' and risk_indicators.iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(3), le.historydate), 1, 0);
+                self.aircraft_count60 := if(trim(ri.n_number)!='' and risk_indicators.iid_constants.checkDays(myGetDate,ri.date_first_seen,ut.DaysInNYears(5), le.historydate), 1, 0);
 								self.aircraft_build_date := aircraft_build_date;             
 								self := le;
 end;
                                                                                                                                                                                 
 aircraftRecs := join(aircraftIDs, key_ids,
 							left.aircraft_ID!=0 and keyed(left.aircraft_id=right.aircraft_id) and
-							(unsigned)right.date_first_seen < (unsigned)iid_constants.myGetDate(left.historydate),
+							(unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
 							addAircraft(left,right), left outer, atmost(riskwise.max_atmost));
                                                 
 Riskwise.Layouts.Layout_Aircraft_Plus roll_aircraft(Riskwise.Layouts.Layout_Aircraft_Plus le, Riskwise.Layouts.Layout_Aircraft_Plus ri) := transform

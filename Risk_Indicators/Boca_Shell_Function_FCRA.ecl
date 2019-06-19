@@ -67,7 +67,7 @@ seq_map := join( pre_iid1, pre_iid,
   
 
 #if(USE_BOCA_SHELL_LIBRARY)
-	args := MODULE(BS_LIBIN)
+	args := MODULE(risk_indicators.BS_LIBIN)
 			export unsigned1 bs_dppa     := dppa;
 			export unsigned1 bs_glb      := glb;
 			export boolean bs_isUtility  := isUtility;

@@ -1,6 +1,6 @@
-import risk_indicators, riskwise, doxie_files, ingenix_natlprof;
+﻿import risk_indicators, riskwise, doxie_files, ingenix_natlprof;
 
-EXPORT Boca_Shell_Ingenix(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only) := FUNCTION
+EXPORT Boca_Shell_Ingenix(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
 temp := record
 	risk_indicators.Layout_Boca_Shell_ids;

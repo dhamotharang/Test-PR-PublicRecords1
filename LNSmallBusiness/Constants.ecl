@@ -13,6 +13,9 @@ EXPORT Constants :=
     
     EXPORT CURRENT_FLAG       := 'C';
     EXPORT HISTORICAL_FLAG    := 'H';
+		
+	EXPORT STRING1        SBFEDataBusinessCreditReport := '1'; // default
+	EXPORT STRING1        LNOnlyBusinessCreditReport := '2';
 
     EXPORT SMALL_BIZ_ATTR_V1_NAME   	:= 'SmallBusinessAttrV1';
     EXPORT SMALL_BIZ_ATTR_V2_NAME   	:= 'SmallBusinessAttrV2';

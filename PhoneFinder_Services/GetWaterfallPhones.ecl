@@ -8,7 +8,7 @@ lExcludePhones := PhoneFinder_Services.Layouts.PhoneFinder.ExcludePhones;
 lPPResponse    := Doxie_Raw.PhonesPlus_Layouts.PhoneplusSearchResponse_Ext;
 
 EXPORT GetWaterfallPhones(DATASET(lBatchIn)                        dIn,
-													PhoneFinder_Services.iParam.ReportParams inMod,
+													PhoneFinder_Services.iParam.SearchParams inMod,
 													DATASET(Gateway.Layouts.Config)          dGateways     = DATASET([],Gateway.Layouts.Config),
 													BOOLEAN                                  isPhoneExists = FALSE,
 													DATASET(lBatchIn)                        dInBestInfo   = DATASET([],lBatchIn)) :=
@@ -36,11 +36,11 @@ FUNCTION
 		
 	BOOLEAN isWaterfallphonesearch := inMod.useWaterfallv6 OR isPhoneExists;
 	
- Progressive_phone.layout_progressive_batch_in tFormat2ProgressivePhone(dIn pInput) :=
+  Progressive_phone.layout_progressive_batch_in tFormat2ProgressivePhone(dIn pInput) :=
 	TRANSFORM
 	
-	 SELF.acctno  := pInput.acctno;
-	 SELF.did     := pInput.did;
+	  SELF.acctno  := pInput.acctno;
+	  SELF.did     := pInput.did;
 		SELF.phoneno := IF(isWaterfallphonesearch, pInput.homephone, '');
 		SELF.suffix  := IF(isWaterfallphonesearch, pInput.addr_suffix, '');
 		SELF.z4      := IF(isWaterfallphonesearch, pInput.zip4, '');
@@ -49,8 +49,10 @@ FUNCTION
 	END;
 	
 	dFormat2ProgressivePhone := PROJECT(dIn,tFormat2ProgressivePhone(LEFT));	
+
 	WFConstants := PhoneFinder_Services.Constants.WFConstants;				
-	 // sending in lexid only as the input to WF in a PII search
+	
+  // sending in lexid only as the input to WF in a PII search
 	dWaterfallPIISearch 	:= AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,,,TRUE,
 															TRUE,,progressive_phone.Constants.WFP_V8_CP_V3_MODEL_NAMES[2],,,,,,,
 															WFConstants.MaxSubjects,,inMod.UseEquifax,WFConstants.MaxPremiumSource);																										
@@ -58,16 +60,17 @@ FUNCTION
 	
 	dWaterfallPhones_pre := IF(isWaterfallphonesearch,dWaterfallPhoneSearch,dWaterfallPIISearch);
   
- dWaterfallPhones := IF(inMod.UseInhousePhones, dWaterfallPhones_pre, dWaterfallPhones_pre(subj_phone_type_new = MDR.sourceTools.src_EQUIFAX));
+  dWaterfallPhones := IF(inMod.UseInhousePhones, dWaterfallPhones_pre, dWaterfallPhones_pre(subj_phone_type_new = MDR.sourceTools.src_EQUIFAX));
 	
 	// Format to common layout
 	lFinal tWaterfall2Common(dIn le,dWaterfallPhones ri) :=
 	TRANSFORM
 		SELF.batch_in          := le;
+    SELF.isPrimaryIdentity := ~isWaterfallphonesearch;
 		SELF.did               := IF(ri.p_did>0,ri.p_did,ri.did);
 		SELF.fname             := IF(ri.subj_first <> '', ri.subj_first, ri.p_name_first);
-  SELF.mname             := ri.subj_middle;
-  SELF.lname             := IF(ri.subj_last <> '', ri.subj_last,ri.p_name_last);
+    SELF.mname             := ri.subj_middle;
+    SELF.lname             := IF(ri.subj_last <> '', ri.subj_last,ri.p_name_last);
 		SELF.city_name         := ri.p_city_name;
 		SELF.zip               := ri.zip5;
 		SELF.phone             := ri.subj_phone10;
@@ -151,30 +154,35 @@ FUNCTION
 																																												inMod,phone,acctno,
 																																												TRUE,qSentPVSV2Gateway));
 	
-	dInhousePhoneDetail	:= IF(EXISTS(dPrimaryPhones),PhoneFinder_Services.GetPhoneDetails(PROJECT(dPrimaryPhones,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
-																																											SELF.acctno:=LEFT.acctno,SELF.phoneno:=LEFT.phone,SELF:=[])), dGateways, inMod));
+	dInhousePhoneDetail	:= IF(EXISTS(dPrimaryPhones),
+                            PhoneFinder_Services.GetPhoneDetails(PROJECT(dPrimaryPhones,
+                                                                          TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
+																																										SELF.acctno:=LEFT.acctno,SELF.phoneno:=LEFT.phone,SELF:=[])),
+                                                                  dGateways, inMod));
 																																											
 	dInhousePhoneDetailWBatchIn := JOIN(dInhousePhoneDetail, dIn,
-																																					LEFT.acctno = RIGHT.acctno,
-																			 TRANSFORM(lFinal,
-																			 SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
+																			LEFT.acctno = RIGHT.acctno,
+																			TRANSFORM(lFinal, SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
 
- dPrimaryPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn, dWFQSentPrimaryPhoneDetail);	
-																																																												
+  dPrimaryPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn, dWFQSentPrimaryPhoneDetail);	
+	
+  // dPrimaryPhones + dPrimaryPhoneDetail - Primary phones including Qsent if no Waterfall phones found
+  // dWFQSentOtherPhones - If no phones found in waterfall, Qsent other phones
+  // dWFQSentMatches - If phones found in waterfall, all Qsent phones other than Primary
 	dWFQSentCombined := dPrimaryPhones + dPrimaryPhoneDetail + dWFQSentOtherPhones + dWFQSentMatches;
 	
 	BOOLEAN vHitQSent := inMod.useQSent AND (qSentPVSV2Gateway.url != '' OR qSentIQ411V2Gateway.url != '');
 	
 	dWFQSentRecs := IF(vHitQSent,dWFQSentCombined);
 	
-			
   dWaterfallCombined := IF(~isPhoneExists AND vHitQSent,
                           dWaterfallOtherPhones + dWFQSentRecs,
-                          dWaterfallPrimaryPhone + dWaterfallOtherPhones+ IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn));
+                          dWaterfallPrimaryPhone + dWaterfallOtherPhones + IF(inMod.UseInHousePhoneMetadata, dInhousePhoneDetailWBatchIn));
 	 
-	 	dDidRecs := PROJECT(dWaterfallCombined, TRANSFORM(lFinal,
-																					                       SELF.phonestatus :=  PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode), 
-																																             SELF := LEFT));
+	dDidRecs := PROJECT(PhoneFinder_Services.Functions.AppendDIDs(dWaterfallCombined),
+                      TRANSFORM(lFinal,
+                                SELF.phonestatus := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode), 
+                                SELF := LEFT));
 	
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.Waterfall)

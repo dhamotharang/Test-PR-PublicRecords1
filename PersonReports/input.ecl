@@ -41,7 +41,6 @@ EXPORT input := MODULE
     export unsigned1 dob_mask := suppress.Constants.dateMask.NONE;
     export boolean include_hri := false;
     export boolean legacy_verified := true;
-    export string8 record_by_date := ''; // aka DateVal
     export unsigned1 score_threshold := 10; //needed in phones+    : stored('ScoreThreshold');
     export unsigned2 penalty_threshold := 10;
     export boolean ln_branded := false;
@@ -748,27 +747,36 @@ end;
 
   // Until we switch all reports to the $.IParam._report interface: an utility macro to copy report's fields 
   EXPORT mac_copy_report_fields (mod_new) := MACRO
+    export boolean AllowAll := mod_new.unrestricted = doxie.compliance.ALLOW.ALL; //TODO: use "unrestricted" field.
+    export boolean AllowGLB := mod_new.unrestricted & doxie.compliance.ALLOW.GLB = doxie.compliance.ALLOW.GLB;
+    export boolean AllowDPPA := mod_new.unrestricted & doxie.compliance.ALLOW.DPPA = doxie.compliance.ALLOW.DPPA;
     EXPORT unsigned1 GLBPurpose := mod_new.glb;
     EXPORT unsigned1 DPPAPurpose := mod_new.dppa;
     EXPORT boolean IncludeMinors := mod_new.show_minors;
-    EXPORT string32 ApplicationType := mod_new.application_type;    
-      //? restrictPreGLB
+    EXPORT boolean restrictPreGLB := mod_new.isPreGLBRestricted();
+    EXPORT string32 ApplicationType := mod_new.application_type;
+    EXPORT string5 industryclass := mod_new.industry_class;
+    EXPORT string DataPermissionMask := mod_new.DataPermissionMask;
     EXPORT string DataRestrictionMask := mod_new.DataRestrictionMask;
-      // export boolean ignoreFares := false;
-      // export boolean ignoreFidelity:= false;
+    EXPORT boolean probation_override := mod_new.probation_override; //Note: it is not defined in _report (old style _report)
+
+    EXPORT boolean ignoreFares := mod_new.ignoreFares;
+    EXPORT boolean ignoreFidelity := mod_new.ignoreFidelity;
     EXPORT INTEGER FCRAPurpose := mod_new.FCRAPurpose;  
     EXPORT integer8 FFDOptionsMask := mod_new.FFDOptionsMask;
     EXPORT string6 ssn_mask := mod_new.ssn_mask;
     EXPORT boolean mask_dl := mod_new.dl_mask = 1;
     EXPORT unsigned1 dob_mask := mod_new.dob_mask;
+    EXPORT boolean ln_branded := mod_new.ln_branded;
+    EXPORT unsigned3 dateval := mod_new.date_threshold;
+
+    // Other fields:
     EXPORT boolean include_hri := mod_new.include_hri;
     EXPORT boolean legacy_verified := mod_new.legacy_verified;
     EXPORT unsigned1 score_threshold := mod_new.score_threshold;
     EXPORT unsigned2 penalty_threshold := mod_new.penalty_threshold;
-    EXPORT boolean ln_branded := mod_new.ln_branded;
     EXPORT unsigned1 max_hri := mod_new.max_hri;
     EXPORT boolean include_BlankDOD := mod_new.include_BlankDOD;
-    EXPORT unsigned3 dateval := mod_new.date_threshold;
     EXPORT boolean smart_rollup := mod_new.smart_rollup;
     EXPORT integer1 non_subject_suppression := mod_new.non_subject_suppression;
   ENDMACRO;    

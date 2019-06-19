@@ -651,7 +651,7 @@ EXPORT ScoringAlgorithmsV3 := MODULE
 
     EXPORT EvalPastLicenseRevocation (STRING1 PastLicenseRevocation, STRING1 PastLicenseRevocationSwitch,  UNSIGNED1 PastLicenseRevocationScore, STRING2 PastLicenseRevocationState = '', STRING8 PastLicenseRevocationDate = '', INTEGER8 PastLicenseImpactAmount, STRING8 ActiveLicenseRevocationDate = '') := FUNCTION
 
-				STRING Value := IF(PastLicenseRevocationState <> '' AND PastLicenseRevocationDate <> '' and ActiveLicenseRevocationDate <> '' and (INTEGER) PastLicenseRevocationDate > (INTEGER) ActiveLicenseRevocationDate, '(' + ActiveLicenseRevocationDate[5..6] + '/' + ActiveLicenseRevocationDate[7..8] + '/' + ActiveLicenseRevocationDate[3..4] + ',' + PastLicenseRevocationDate[5..6] + '/' + PastLicenseRevocationDate[7..8] + '/' + PastLicenseRevocationDate[3..4] +  ',' + PastLicenseRevocationState + ' ,$' + PastLicenseImpactAmount + ')','(00/00/00,' + PastLicenseRevocationDate[5..6] + '/' + PastLicenseRevocationDate[7..8] + '/' + PastLicenseRevocationDate[3..4] +  ',' + PastLicenseRevocationState + ',6MPRIORREINST-$' + PastLicenseImpactAmount + ')'); 
+				STRING Value := IF(PastLicenseRevocationState <> '' AND PastLicenseRevocationDate <> '' and ActiveLicenseRevocationDate <> '' and (INTEGER) PastLicenseRevocationDate >= (INTEGER) ActiveLicenseRevocationDate, '(' + ActiveLicenseRevocationDate[5..6] + '/' + ActiveLicenseRevocationDate[7..8] + '/' + ActiveLicenseRevocationDate[3..4] + ',' + PastLicenseRevocationDate[5..6] + '/' + PastLicenseRevocationDate[7..8] + '/' + PastLicenseRevocationDate[3..4] +  ',' + PastLicenseRevocationState + ' ,$' + PastLicenseImpactAmount + ')','(00/00/00,' + PastLicenseRevocationDate[5..6] + '/' + PastLicenseRevocationDate[7..8] + '/' + PastLicenseRevocationDate[3..4] +  ',' + PastLicenseRevocationState + ',6MPRIORREINST-$' + PastLicenseImpactAmount + ')'); 
 				UNSIGNED1 Score := MAP (PastLicenseRevocationScore > 0 and PastLicenseRevocationSwitch = 'Y' =>  PastLicenseRevocationScore, 
 															  PastLicenseRevocationScore = 0 and PastLicenseRevocationSwitch = 'Y' =>  MAX_ACTIVE_EXCLUSION, 0);
 
@@ -664,7 +664,7 @@ EXPORT ScoringAlgorithmsV3 := MODULE
         RETURN r;
     END;
 
-    EXPORT EvalLicenseExpired (STRING1 LicenseExpiredFlag, STRING1 LicenseExpiredSwitch,  UNSIGNED1 ExpiredLicenseScore, UNSIGNED4 iLicenseExpiredDate = 0, STRING25 LicenseExpired = '', STRING2 LicenseExpiredState = '', UNSIGNED8 TotalChargeAmount = 0, INTEGER8 LicenseExpiredImpactAmount) := FUNCTION
+    EXPORT EvalLicenseExpired (STRING1 LicenseExpiredFlag, STRING1 LicenseExpiredSwitch,  UNSIGNED1 ExpiredLicenseScore, INTEGER4 iLicenseExpiredDate = 0, STRING25 LicenseExpired = '', STRING2 LicenseExpiredState = '', UNSIGNED8 TotalChargeAmount = 0, INTEGER8 LicenseExpiredImpactAmount) := FUNCTION
 				STRING8 LicenseExpiredDate := INTFORMAT(iLicenseExpiredDate,8,1);
 				STRING Value := IF(LicenseExpiredDate <> '' AND LicenseExpired <> '' AND LicenseExpiredState <> '', '(' + LicenseExpiredDate[5..6] + '/' + LicenseExpiredDate[7..8] + '/' + LicenseExpiredDate[3..4] + ',' + TRIM(LicenseExpired,ALL) + ',' + LicenseExpiredState + ',$' + LicenseExpiredImpactAmount + ')','(00/00/00, ' + LicenseExpiredDate[5..6] + '/' + LicenseExpiredDate[7..8] + '/' + LicenseExpiredDate[3..4] + ',' + TRIM(LicenseExpired,ALL) + ',' + LicenseExpiredState  + ', ' + 'Past6M-$' + LicenseExpiredImpactAmount + ')'); 
 				UNSIGNED1 Score := MAP (ExpiredLicenseScore > 0 and LicenseExpiredSwitch = 'Y' =>  ExpiredLicenseScore, 
@@ -1175,5 +1175,3 @@ EXPORT ScoringAlgorithmsV3 := MODULE
         RETURN r;
     END;
 END;
-
-

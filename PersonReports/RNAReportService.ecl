@@ -87,38 +87,40 @@ EXPORT RNAReportService() := MACRO
   include_stored := PersonReports.GlobalIncludes ();
 
   // define parameters (so far all standard ones)
-  in_standard := project (AutoStandardI.GlobalModule(), PersonReports.input._didsearch, opt);
+	gm := AutoStandardI.GlobalModule();
 
-  report_mod := module (in_standard)
-    export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated"
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
 
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (in_standard);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (in_standard);
-		export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (in_standard);
+  mod_addr := PROJECT (gm, AutoStandardI.InterfaceTranslator.clean_address.params);
 
+  report_mod := module (mod_addr, mod_access)
     export boolean include_relatives       := include_stored.include_relatives;
     export boolean include_neighbors       := include_stored.include_neighbors;
     export boolean include_associates      := include_stored.include_associates;
     export boolean include_censusdata      := false;
     export boolean include_criminalindicators   := include_stored.include_criminalindicators;
+    // these are not used in RNA, will be removed when all components are switched to IDataAccess.
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
   end;
 
+
   // only needed for search
-  search_mod := module (project (report_mod, PersonReports.input._didsearch, opt))
+  search_mod := module (project (gm, PersonReports.IParam._didsearch, opt))
   end;
  
- dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
+  dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
 	
   neighbors_only := include_stored.include_neighbors and 
                  not include_stored.include_relatives and 
                  not include_stored.include_associates;
-  valid_addr:=(report_mod.prim_name<>'' or report_mod.prim_range<>'' or report_mod.addr<>'') and report_mod.zip<>'';
+  valid_addr:=(search_mod.prim_name<>'' or search_mod.prim_range<>'' or search_mod.addr<>'') and report_mod.zip<>'';
   return_blank:= not valid_addr and neighbors_only;
   ds_blank:=dataset([],iesp.rnareport.t_RNAReport);
  
   // main records
-	Relationship.IParams.storeParams(first_row.Options.RelationshipOption,in_standard.ApplicationType);
-  rna_mod := Relationship.IParams.getParams(report_mod,PersonReports.input._rnareport);
+	Relationship.IParams.storeParams(first_row.Options.RelationshipOption,report_mod.application_type);
+  rna_mod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._rnareport);
   recs_data := PersonReports.RNAReport (dids, rna_mod, FALSE);
  
  recs:=if(return_blank,ds_blank,recs_data);

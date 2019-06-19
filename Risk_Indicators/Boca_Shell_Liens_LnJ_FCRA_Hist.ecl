@@ -106,7 +106,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
   SELF.VendorDateLastSeen := ri.collection_date;	
   SELF.date_first_seen := (unsigned) OrigDateFiled;
 		SELF.date_last_seen :=(unsigned)  releasedDate;
-		myGetDate := iid_constants.myGetDate(le.historydate);
+		myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		isRecent := ut.DaysApart((string8)OrigDateFiled,myGetDate)<365*2+1;
 
 		tmp_lnj_recent_unreleased_count := (INTEGER)(ri.rmsid<>'' AND 
@@ -170,28 +170,28 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		unreleased := (integer) releasedDate > (integer) myGetDate or (integer) releasedDate=0;
 		released := (integer) releasedDate <= (integer) myGetDate and (integer) releasedDate <>0;
 		// only count evictions in the liens buckets if you are running version prior to 50
-		isCivilJudgment := ftd in iid_constants.setCivilJudgment_50 and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA) );
-		isCivilJudgmentReleased := ftd in iid_constants.setCivilJudgment_50 and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isFederalTax := ftd in iid_constants.setFederalTax and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isFederalTaxReleased := ftd in iid_constants.setFederalTax and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isForeclosure := ftd in iid_constants.setForeclosure_50 and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isForeclosureReleased := ftd in iid_constants.setForeclosure_50 and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLandlordTenant := ftd in iid_constants.setLandlordTenant_50 and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLandlordTenantReleased := ftd in iid_constants.setLandlordTenant_50 and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendens := ftd in iid_constants.setLisPendens and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendensReleased := ftd in iid_constants.setLisPendens and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherLJ := ftd not in iid_constants.setPROther and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherLJReleased := ftd not in iid_constants.setPROther and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherTax := ftd in iid_constants.setOtherTax and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherTaxReleased := ftd in iid_constants.setOtherTax and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isSmallClaims := ftd in iid_constants.setSmallClaims_50 and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isSmallClaimsReleased := ftd in iid_constants.setSmallClaims_50 and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isSuits := ftd in iid_constants.setSuitsFCRA and goodResult and unreleased and ((~isEviction));
-		isSuitsReleased := ftd in iid_constants.setSuitsFCRA and goodResult and released and ((~isEviction));
-		isStateTax := ftd in iid_constants.setStateTax and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA) );
-		isStateTaxReleased := ftd in iid_constants.setStateTax and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA) );
-	  isAllTax :=ftd in iid_constants.setAllTax and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA) );
-		isAllTaxReleased := ftd in iid_constants.setAllTax and goodResult and released and ((~isEviction and ftd not in iid_constants.setSuitsFCRA) );
+		isCivilJudgment := ftd in risk_indicators.iid_constants.setCivilJudgment_50 and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA) );
+		isCivilJudgmentReleased := ftd in risk_indicators.iid_constants.setCivilJudgment_50 and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isFederalTax := ftd in risk_indicators.iid_constants.setFederalTax and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isFederalTaxReleased := ftd in risk_indicators.iid_constants.setFederalTax and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isForeclosure := ftd in risk_indicators.iid_constants.setForeclosure_50 and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isForeclosureReleased := ftd in risk_indicators.iid_constants.setForeclosure_50 and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLandlordTenant := ftd in risk_indicators.iid_constants.setLandlordTenant_50 and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLandlordTenantReleased := ftd in risk_indicators.iid_constants.setLandlordTenant_50 and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLisPendens := ftd in risk_indicators.iid_constants.setLisPendens and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLisPendensReleased := ftd in risk_indicators.iid_constants.setLisPendens and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherLJ := ftd not in risk_indicators.iid_constants.setPROther and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherLJReleased := ftd not in risk_indicators.iid_constants.setPROther and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherTax := ftd in risk_indicators.iid_constants.setOtherTax and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherTaxReleased := ftd in risk_indicators.iid_constants.setOtherTax and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isSmallClaims := ftd in risk_indicators.iid_constants.setSmallClaims_50 and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isSmallClaimsReleased := ftd in risk_indicators.iid_constants.setSmallClaims_50 and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isSuits := ftd in risk_indicators.iid_constants.setSuitsFCRA and goodResult and unreleased and ((~isEviction));
+		isSuitsReleased := ftd in risk_indicators.iid_constants.setSuitsFCRA and goodResult and released and ((~isEviction));
+		isStateTax := ftd in risk_indicators.iid_constants.setStateTax and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA) );
+		isStateTaxReleased := ftd in risk_indicators.iid_constants.setStateTax and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA) );
+	  isAllTax :=ftd in risk_indicators.iid_constants.setAllTax and goodResult and unreleased and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA) );
+		isAllTaxReleased := ftd in risk_indicators.iid_constants.setAllTax and goodResult and released and ((~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA) );
 		
 		SELF.lnj_unreleased_civil_judgment_cnt:= (integer)isCivilJudgment;
 		SELF.lnj_unreleased_civil_judgment_amt:= if(isCivilJudgment, (real)ri.amount, 0);
@@ -454,7 +454,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 
 	liens_filtered_DF_date := liensTmsidDF4_total(FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(historydate),(string) DF4));
 	// make sure date_first_seen is within ReportingPeriod months of the historydate 
- liens_filtered_DF_ := liens_filtered_DF_date(ut.monthsapart((string) date_first_seen[1..6],(string)iid_constants.myGetDate(historydate)[1..6]) <= ReportingPeriod);
+ liens_filtered_DF_ := liens_filtered_DF_date(ut.monthsapart((string) date_first_seen[1..6],(string)risk_indicators.iid_constants.myGetDate(historydate)[1..6]) <= ReportingPeriod);
 
 	//drop off the DF date
 	liens_filtered_DF := project(liens_filtered_DF_, transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,

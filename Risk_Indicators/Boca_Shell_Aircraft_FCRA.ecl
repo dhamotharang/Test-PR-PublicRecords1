@@ -1,7 +1,7 @@
-﻿import _Control, faa, FCRA, riskwise, ut;
+﻿import _Control, faa, FCRA, riskwise, ut, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Aircraft_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only) := FUNCTION
+export Boca_Shell_Aircraft_FCRA(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
 // for riskview attributes v5 requirements, modify version 3,4,5 attributes to calculate the age of aircraft attributes based upon build dates instead of today's date.
 aircraft_build_date := Risk_Indicators.get_Build_date('faa_build_version');
@@ -13,9 +13,9 @@ checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days
 // temporary layout; for linking only.
 layout_reg_ids := RECORD (Riskwise.Layouts.Layout_Aircraft_Plus)
   // set of flag file IDs to get override records
-  Layout_Boca_Shell_ids.air_correct_ffid;
+  risk_indicators.Layout_Boca_Shell_ids.air_correct_ffid;
   // set of persistent record IDs: identifies registration records in a raw file which need suppression/correction
-  Layout_Boca_Shell_ids.air_correct_record_id;
+  risk_indicators.Layout_Boca_Shell_ids.air_correct_record_id;
                 unsigned6 aircraft_id; // unique (but not persistent) registration record identifier
 END;
 
@@ -83,7 +83,7 @@ reg_raw_thor := group(sort(reg_raw_thor_pre + project(reg_ids(aircraft_id=0), tr
 #END
 
 // Get corrections (same transform as above, just different input)
-Riskwise.Layouts.Layout_Aircraft_Plus GetCorrections (Layout_Boca_Shell_ids le, fcra.key_override_faa.aircraft ri) := transform
+Riskwise.Layouts.Layout_Aircraft_Plus GetCorrections (risk_indicators.Layout_Boca_Shell_ids le, fcra.key_override_faa.aircraft ri) := transform
                 self.seq := le.seq;
   self.did := le.did;
                 self.n_number := ri.n_number;
