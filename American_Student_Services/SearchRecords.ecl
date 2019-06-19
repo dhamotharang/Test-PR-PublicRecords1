@@ -1,11 +1,11 @@
-IMPORT doxie, AutoheaderI, American_Student_Services;
+﻿IMPORT doxie, AutoheaderI, American_Student_Services;
 
 EXPORT SearchRecords(American_Student_Services.IParam.searchParams aInputData, unsigned1 ds_exclusion = 0) := FUNCTION
 	
 	// get asl id's from autokeys for name, address, and ssn etc.Functions.apply_restrictions
 	asl_ids_byak := American_Student_Services.AutoKeyIds(aInputData);	
 	all_ids := dedup(sort(asl_ids_byak,id),id);
-	
+	mod_access := project(aInputData,doxie.IDataAccess);
 	// get more did's by deep dive
 	tempmod := module(project(aInputData,AutoheaderI.LIBIN.FetchI_Hdr_Indv.full,opt))
 			export noFail := true;
@@ -13,7 +13,7 @@ EXPORT SearchRecords(American_Student_Services.IParam.searchParams aInputData, u
 	deep_dids	:= limit( AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tempmod), 100, skip);
 	
 	//get payload data by asl id's (key).
-	recs_by_ids := American_Student_Services.Raw.getPayloadByIDS(all_ids);
+	recs_by_ids := American_Student_Services.Raw.getPayloadByIDS(all_ids, mod_access);
 	
 	//accumulate dids by autokeys, input and autoheaderi lookups.
 	in_did := dataset ([(unsigned6) aInputData.didValue],doxie.layout_references);
@@ -23,7 +23,7 @@ EXPORT SearchRecords(American_Student_Services.IParam.searchParams aInputData, u
 	all_dids := dedup(sort(ds_dids + if(ds_exclusion <> 3, dids_from_recs_by_ids) + if(aInputData.isDeepDive,ds_deep_dids),did),did);
 			
 	//get payload data by dids
-	recs_by_dids := American_Student_Services.Raw.getPayloadByDIDS(all_dids);
+	recs_by_dids := American_Student_Services.Raw.getPayloadByDIDS(all_dids, mod_access);
 	sup_recs_by_dids := American_Student_Services.Raw.getSupplementalStudentInfobyDIDs(all_dids);
 	
 	all_recs := map(ds_exclusion=1 => recs_by_ids + recs_by_dids, 			// DatasourceExclusion=1, no Alloy, keep ASL
@@ -40,7 +40,7 @@ EXPORT SearchRecords(American_Student_Services.IParam.searchParams aInputData, u
 	studentrecs := American_Student_Services.Functions.apply_restrictions(ds_filter_by_pen, commonParam);		
 
 	//Add college indicators
- outputRec := American_Student_Services.functions.add_college_indicators(studentrecs, all_dids);
+ outputRec := American_Student_Services.functions.add_college_indicators(studentrecs, all_dids, mod_access);
 
 /* Debug*/
 	// output(ds_sorted,named('ds_sorted'));

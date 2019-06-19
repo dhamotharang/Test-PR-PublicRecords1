@@ -1,4 +1,4 @@
-﻿import doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list, dx_header;
+﻿import AutoStandardI, doxie, iesp, standard, ut, Header, NID, Address, Suppress, Email_Data, std, American_student_list, dx_header;
 
 export Functions := MODULE
 	
@@ -318,7 +318,13 @@ export Functions := MODULE
 														boolean IncludeEmailAddress,	
 														boolean IncludeEducationInformation,
 														string32 application_Type_value) := function
-	
+    
+    glb_mod := AutoStandardI.GlobalModule();
+    mod_access := module(doxie.compliance.GetGlobalDataAccessModuleTranslated (glb_mod))
+                   EXPORT string32 application_type := application_Type_value;
+                  end;
+
+
 		/*--- Sequence results to preserve order from tempresults ---*/
 		seq_records := record(TeaserSearchServices.Layouts.records)
 			unsigned seq;
@@ -538,9 +544,25 @@ export Functions := MODULE
 											 SELF := LEFT;
 											 SELF := []));
 											      													
-	    // now hit the email did key and get back email addressess and mask them.			
-			// did suppression already done.
-			sort_recs_WithEmail := PROJECT(AddressesTmp,
+	  //Student data routines
+    college_name_rec := record
+                         unsigned6 DID;
+                         string50 LN_COLLEGE_NAME;
+                         unsigned4 global_sid;
+                         unsigned8 record_sid;
+                        end;  
+                            
+    student_data := join(dedup(sort(AddressesTmp,UniqueID),UniqueID),American_student_list.key_DID,
+                          keyed((integer)right.L_DID = (integer)left.UniqueID) and 
+                          right.LN_college_name <> '',
+                          transform(recordof(college_name_rec), self := right),
+                          limit(0), keep(iesp.Constants.ThinRpsExt.MaxCountCollegeAddresses)) ;
+                          
+    student_data_suppressed := Suppress.MAC_SuppressSource(student_data,mod_access,did);
+     
+  // now hit the email did key and get back email addressess and mask them.			
+	// did suppression already done.
+     sort_recs_WithEmail := PROJECT(AddressesTmp,
 			                         TRANSFORM(iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord,
 															    didValDS := DATASET([{(UNSIGNED6) LEFT.uniqueID}],
 																	                   doxie.layout_references);
@@ -570,13 +592,11 @@ export Functions := MODULE
 																							),
 																						DATASET([], IESP.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchEmail)
 																					);																					
-															 CollegeInfoSlim := TRIM(PROJECT(American_student_list.key_DID(keyed(l_did = DIDval)),
-															                     TRANSFORM({STRING50 LN_COLLEGE_NAME;}, SELF := LEFT))
-																										(LN_college_name <> '')[1].ln_college_name, LEFT, RIGHT);
+                               college_name := TRIM(student_data_suppressed(did = DIDval)[1].ln_college_name,LEFT,RIGHT);
                                SELF.CollegeAddresses := CHOOSEN(
 															                           IF (IncludeEducationInformation,
 																												    PROJECT(
-																												     PROJECT(American_student_list.key_Address_List(keyed(LN_COLLEGE_NAME = collegeInfoSlim)),
+																												     PROJECT(American_student_list.key_Address_List(keyed(LN_COLLEGE_NAME = college_name)),
 																														         TRANSFORM(LEFT)),                                                            											 
 																															TRANSFORM(IESP.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchCollegeAddress,																							 
 																																SELF.city  := LEFT.v_city_name;
@@ -589,7 +609,9 @@ export Functions := MODULE
                               )); 																		 
 		// output(sort_recs, named('sort_recs'));	
 		// output(addressesTmp, named('AddressesTmp'));	 			 
-		 // output(sort_recs_WithEmail, named('sort_recs_WithEmail'));						
+		 // output(sort_recs_WithEmail, named('sort_recs_WithEmail'));
+   
+    doxie.compliance.logSoldToSources(if(IncludeEducationInformation,student_data_suppressed),mod_access,did);  
 		RETURN sort_recs_WithEmail;
 	end;
 	export getCounts(dataset(iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord) inrecs,
