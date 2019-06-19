@@ -121,7 +121,7 @@ export Functions := module
 
   // This function combines subject and optional spouse dids, sorts & dedups them, 
 	// then "looks" them up on the POE did key file.
-	export getPoeRecs(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_subject_dids):= function
+	export getPoeRecs(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_subject_dids, doxie.IDataAccess mod_access):= function
  
     // 1. Combine the subject dids and spouse dids into 1 dataset and then sort and 
 	  //     dedup by lookup did in case 1 subject did is another subject's spouse did.
@@ -182,8 +182,8 @@ export Functions := module
 																	SELF :=[]),
 												        inner, // use all recs from right that match left
 												        LIMIT(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
-
-    return ds_poe_recs_slimmed;
+		ds_poe_recs_suppressed := Suppress.MAC_SuppressSource(ds_poe_recs_slimmed, mod_access);
+    return ds_poe_recs_suppressed;
 
   end; // end of getPoeRecs function
 
