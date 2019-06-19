@@ -1606,23 +1606,23 @@ Employer: => BusAcctOwnerCntEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																				numownssn:Null OR numownssn='' => -99998,
 																				IsNonIntegerStr(numownssn) => -99997,
 																				INTEGER(numownssn));
-Employer: => BusAcctOwner1NamePop := MAP(ownername1:Null OR ownername1='' => 0, 1);
-Employer: => BusAcctOwner1SSNPop := MAP(LENGTH(ownerssn1) < 9 => -99997,
+Employer: => BusAcctOwnerName1Pop := MAP(ownername1:Null OR ownername1='' => 0, 1);
+Employer: => BusAcctOwnerSSN1Pop := MAP(LENGTH(ownerssn1) < 9 => -99997,
 																				ownerssn1:Null OR ownerssn1='' => 0,1);
-Employer: => BusAcctOwner2NamePop := MAP(ownername2:Null OR ownername2='' => 0, 1);
-Employer: => BusAcctOwner2SSNPop := MAP(LENGTH(ownerssn2) < 9 => -99997,
+Employer: => BusAcctOwnerName2Pop := MAP(ownername2:Null OR ownername2='' => 0, 1);
+Employer: => BusAcctOwnerSSN2Pop := MAP(LENGTH(ownerssn2) < 9 => -99997,
 																				ownerssn2:Null OR ownerssn2='' => 0,1);
-Employer: => BusAcctOwner3NamePop := MAP(ownername3:Null OR ownername3='' => 0, 1);
-Employer: => BusAcctOwner3SSNPop := MAP(LENGTH(ownerssn3) < 9 => -99997,
+Employer: => BusAcctOwnerName3Pop := MAP(ownername3:Null OR ownername3='' => 0, 1);
+Employer: => BusAcctOwnerSSN3Pop := MAP(LENGTH(ownerssn3) < 9 => -99997,
 																				ownerssn3:Null OR ownerssn3='' => 0,1);
 Employer: => BusAcctOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 // -99997 unable to calculate
-																					 BusAcctOwnerCntEcho > 0 OR (BusAcctOwner1NamePop=1 AND BusAcctOwner1SSNPop=1) OR 
-																							(BusAcctOwner2NamePop=1 AND BusAcctOwner2SSNPop=1) OR 
-																							(BusAcctOwner3NamePop=1 AND BusAcctOwner3SSNPop=1) => 0,
-																					 BusAcctOwnerCntEcho = 0 AND (BusAcctOwner1NamePop=1 OR BusAcctOwner1SSNPop=1) AND 
-																							(BusAcctOwner2NamePop=1 OR BusAcctOwner2SSNPop=1) AND 
-																							(BusAcctOwner3NamePop=1 OR BusAcctOwner3SSNPop=1) => 1,
+																					 BusAcctOwnerCntEcho > 0 OR (BusAcctOwnerName1Pop=1 AND BusAcctOwnerSSN1Pop=1) OR 
+																							(BusAcctOwnerName2Pop=1 AND BusAcctOwnerSSN2Pop=1) OR 
+																							(BusAcctOwnerName3Pop=1 AND BusAcctOwnerSSN3Pop=1) => 0,
+																					 BusAcctOwnerCntEcho = 0 AND (BusAcctOwnerName1Pop=1 OR BusAcctOwnerSSN1Pop=1) AND 
+																							(BusAcctOwnerName2Pop=1 OR BusAcctOwnerSSN2Pop=1) AND 
+																							(BusAcctOwnerName3Pop=1 OR BusAcctOwnerSSN3Pop=1) => 1,
 																					 -99997);
 Employer: => BusAcctPerBusOwnerNotPopCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																								rLegal.BusAcctPerBusOwnerNotPopCnt);
@@ -1656,7 +1656,15 @@ Employer: => BusAcctPerBusAddressPOBoxCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcc
 Employer: => BusAcctPerBusAddressPOBoxFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																									rLegal.BusAcctPerBusAddressPOBoxFlag);
 // Employer: => VelBusAcctPerAddrInProgCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - Need to use latest master record for each business when coded
-																							 // );
+																							 // COUNT(Employer(BusAcctUIDEcho != -99999)) = 0 => -99998);
+																							 // COUNT(Employer(BusAcctUIDEcho != -99999){progState := ProgramStateEcho, 
+																																												// addr := physicaladdresscleanedaddress, 
+																																												// uidCnt := BusAcctUIDEcho$GROUP{ProgramStateEcho,physicaladdresscleanedaddress}:Count}
+																																												// (progState=ProgramStateEcho AND addr=physicaladdresscleanedaddress)) = 0 => -99998, // Filter out no valid acct ids, 
+																							 // MAX(MIN(COUNT(Employer(BusAcctUIDEcho != -99999){progState := ProgramStateEcho, 
+																																																// addr := physicaladdresscleanedaddress, 
+																																																// uidCnt := BusAcctUIDEcho$GROUP{ProgramStateEcho,physicaladdresscleanedaddress}:Count}
+																																																// (progState=ProgramStateEcho AND addr=physicaladdresscleanedaddress)), 9999), 0));
 
 // Employer: => VelBusAcctPerAddrInBusLegEntCnt := MAP
 
