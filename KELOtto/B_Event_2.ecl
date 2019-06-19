@@ -4,8 +4,8 @@ IMPORT B_Event_3,B_Event_4,E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_2 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_3.__ENH_Event_3) __ENH_Event_3 := B_Event_3.__ENH_Event_3;
-  SHARED __EE120645 := __ENH_Event_3;
-  EXPORT __ST20688_Layout := RECORD
+  SHARED __EE120633 := __ENH_Event_3;
+  EXPORT __ST20683_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -163,9 +163,9 @@ EXPORT B_Event_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST20688_Layout __ND122106__Project(B_Event_4.__ST22007_Layout __PP120648) := TRANSFORM
-    SELF.Ip_High_Risk_City_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP120648._edgecity_),IN,__CN(['MIAMI'])))=>1,0);
-    SELF := __PP120648;
+  SHARED __ST20683_Layout __ND122094__Project(B_Event_4.__ST22002_Layout __PP120636) := TRANSFORM
+    SELF.Ip_High_Risk_City_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP120636._edgecity_),IN,__CN(['MIAMI'])))=>1,0);
+    SELF := __PP120636;
   END;
-  EXPORT __ENH_Event_2 := PROJECT(__EE120645,__ND122106__Project(LEFT));
+  EXPORT __ENH_Event_2 := PROJECT(__EE120633,__ND122094__Project(LEFT));
 END;
