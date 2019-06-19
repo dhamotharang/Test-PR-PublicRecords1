@@ -368,7 +368,9 @@ EXPORT Build_Summary(string pversion) := MODULE
 			'RIN Data Build' + pversion,
       msg,
 			html,
-      'text/plain; charset=ISO-8859-3',  'RINBuildStatusReport-'+pversion+'.html');
+      'text/plain; charset=ISO-8859-3',  
+			'RINBuildStatusReport-'+pversion+'.html',
+			sender := 'RINsupport@lexisnexisrisk.com');
 		
 	export send := Send_Email; 
 
