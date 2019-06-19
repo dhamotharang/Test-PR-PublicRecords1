@@ -12,7 +12,7 @@ EXPORT Functions :=
 MODULE
 
  EXPORT GetSubjectInfo(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs,
-											           PhoneFinder_Services.iParam.ReportParams      inMod) := FUNCTION
+											           PhoneFinder_Services.iParam.SearchParams      inMod) := FUNCTION
 
 	
   //phone searches do not generate other phones related to the subject, hence all phone searches are subject related.
@@ -757,7 +757,7 @@ MODULE
 	END;
 	
 	// Format search results to IESP layout
-	EXPORT FormatResults2IESP(DATASET(lFinal) dIn, PhoneFinder_Services.iParam.ReportParams inMod) :=
+	EXPORT FormatResults2IESP(DATASET(lFinal) dIn, PhoneFinder_Services.iParam.SearchParams inMod) :=
 	FUNCTION
 	  today := STD.Date.Today();
 

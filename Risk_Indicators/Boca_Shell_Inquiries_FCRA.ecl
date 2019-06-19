@@ -1,4 +1,4 @@
-﻿import _Control, inquiry_acclogs, ut, did_add, riskwise, fcra, riskwisefcra, gateway;
+﻿import _Control, inquiry_acclogs, ut, did_add, riskwise, fcra, riskwisefcra, gateway, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 isFCRA := True;
@@ -89,7 +89,7 @@ end;
 
 MAC_raw_did_transform (trans_name, key_did) := MACRO
 
-layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
+layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
 	self.seq := le.seq;
 	self.did := le.did;
 	self.truedid := le.truedid;	//MS-104 and MS-105
@@ -146,7 +146,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	
 	ecompare := risk_indicators.EmailCompare(le.shell_input.email_address, rt.person_q.email_address, le.shell_input.fname, le.shell_input.lname);
 	emailmatch_score := ecompare.EmailScore; 
-	emailmatch := iid_constants.g(emailmatch_score);
+	emailmatch := risk_indicators.iid_constants.g(emailmatch_score);
 	
 	self.Inquiry_addr_ver_ct := if(le.shell_input.in_streetaddress='' or rt.person_q.address='' or ~inquiry_hit, 255, if(addrmatch, 1, 0));
 	self.Inquiry_fname_ver_ct := if(le.shell_input.fname='' or rt.person_q.fname='' or ~inquiry_hit, 255, if(firstmatch,1,0));
@@ -684,7 +684,7 @@ j_fcra := j_raw_fcra + j_fcra_corrections; // add the raw + corrections together
 
 MAC_raw_did_transform_offset (trans_name, key_did) := MACRO
 
-layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
+layout_temp trans_name(risk_indicators.layout_bocashell_neutral le, key_did rt) := transform
 	self.seq := le.seq;
 	self.did := le.did;
 	self.truedid := le.truedid;	//MS-104 and MS-105
@@ -735,7 +735,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 				and methodFltr;  
 
 	// populate these new offset history date fields that will indicate future inquiry hits
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 
 	self.Collection.Count12_6mos 	:= if(le.archive_date_6mo = '99999999', -1, (integer)(isCollection AND risk_indicators.iid_constants.checkdays(le.archive_date_6mo,(STRING8)logdate,ut.DaysInNYears(1), le.historydate)));
 	self.Collection.Count12_12mos := if(le.archive_date_12mo = '99999999', -1, (integer)(isCollection AND risk_indicators.iid_constants.checkdays(le.archive_date_12mo,(STRING8)logdate,ut.DaysInNYears(1), le.historydate)));

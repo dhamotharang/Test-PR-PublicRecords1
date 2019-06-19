@@ -1,12 +1,12 @@
-/*2016-06-29T00:08:38Z (Andrea Koenen)
+﻿/*2016-06-29T00:08:38Z (Andrea Koenen)
 RR-10396: officially removing the relatives V2 key
 */
-import _control, Gateway;
+import _control, Gateway, risk_indicators;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
 
 
-EXPORT Boca_Shell_Function (GROUPED DATASET (Layout_output) iid1,
+EXPORT Boca_Shell_Function (GROUPED DATASET (risk_indicators.Layout_output) iid1,
                             DATASET (Gateway.Layouts.Config) gateways,
                             unsigned1 dppa, unsigned1 glb, boolean isUtility=false, boolean isLN=false,
 
@@ -14,9 +14,9 @@ EXPORT Boca_Shell_Function (GROUPED DATASET (Layout_output) iid1,
                             boolean includeRelativeInfo=true, boolean includeDLInfo=true,
                             boolean includeVehInfo=true, boolean includeDerogInfo=true, unsigned1 BSversion=1,
 														boolean doScore=false, boolean nugen = false, boolean filter_out_fares = false,
-														string50 DataRestriction=iid_constants.default_DataRestriction,
+														string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 														unsigned8 BSOptions = 0,
-														string50 DataPermission=iid_constants.default_DataPermission) :=  
+														string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) :=  
 FUNCTION
 
 // for batch queries, dedup the input to reduce searching
@@ -47,7 +47,7 @@ seq_map := join( iid1, iid_deduped,
 iid := group(iid_deduped, seq);
 	
 #if(USE_BOCA_SHELL_LIBRARY)
-	args := MODULE(BS_LIBIN)
+	args := MODULE(risk_indicators.BS_LIBIN)
 			export unsigned1 bs_dppa     := dppa;
 			export unsigned1 bs_glb      := glb;
 			export boolean bs_isUtility  := isUtility;
@@ -67,14 +67,14 @@ iid := group(iid_deduped, seq);
 			export string50 bs_DataPermission    	:= DataPermission;
 	END;
 
-	shell_results := library('Risk_Indicators.LIB_Boca_Shell_Function', IBoca_Shell_Function(iid, gateways, args)).results;
+	shell_results := library('Risk_Indicators.LIB_Boca_Shell_Function', risk_indicators.IBoca_Shell_Function(iid, gateways, args)).results;
 
 #else
   ids_wide := boca_shell_FCRA_Neutral_Function (iid, dppa, glb,  
                                                 isUtility, isLN, includeRelativeInfo, false, BSversion, nugen := nugen, 
 																								DataRestriction:=DataRestriction, BSOptions := BSOptions);
  	
-  p := dedup(group(sort(project(ids_wide(~isrelat), transform (Layout_Boca_Shell, self := LEFT)), seq), seq), seq);
+  p := dedup(group(sort(project(ids_wide(~isrelat), transform (risk_indicators.Layout_Boca_Shell, self := LEFT)), seq), seq), seq);
 
   dppa_ok := dppa > 0 and dppa < 8;
   per_prop := getAllBocaShellData (iid, ids_wide, p,
@@ -87,7 +87,7 @@ iid := group(iid_deduped, seq);
 #end
 
 // join the results back to the original input so that every record on input has a response populated
-full_response := join( seq_map, shell_results, left.deduped_seq=right.seq, transform( Layout_Boca_Shell, self.seq := left.input_seq, self.shell_input.seq := left.input_seq, self := right ), keep(1) );
+full_response := join( seq_map, shell_results, left.deduped_seq=right.seq, transform( risk_indicators.Layout_Boca_Shell, self.seq := left.input_seq, self.shell_input.seq := left.input_seq, self := right ), keep(1) );
 
 return group(full_response, seq);
   

@@ -55,6 +55,9 @@ MACRO
     royalties	 := modBatchRecords.dRoyalties;
    	results   	:= modBatchRecords.dBatchOut;
    	Zumigo_Log	:= modBatchRecords.Zumigo_History_Recs;
+    
+     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+     IF (EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access)); 
  
    OUTPUT(results,named('Results'));
    OUTPUT(royalties,named('RoyaltySet'));

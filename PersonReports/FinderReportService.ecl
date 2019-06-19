@@ -48,7 +48,6 @@
   (either by exact secondary range or by person's last name as a listed name). Associates' addresses can be
   verified by subject's one, if the same and recent enough.
 */
-/*--USES-- ut.input_xslt */
 
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, Relationship;
 
@@ -150,18 +149,14 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   end;
 
   // Now define all report parameters
-  report_mod := module (options)
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(gm);
+  report_mod := module (options, mod_access)
     // Do all required translations here
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-		export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-		export string DataPermissionMask := gm.dataPermissionMask;
-    export string DataRestrictionMask := gm.dataRestrictionMask;
-    export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
-    export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
-    //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
 		EXPORT UNSIGNED1 neighborhoods := 10;
+    // these are not used in Finder, will be removed when all components are switched to IDataAccess.
+    EXPORT boolean ignoreFares := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
   end;
 
   // execute search
@@ -169,7 +164,7 @@ unsigned1 n_phones := 40 : stored('_n_phones');
 
   // main records
 	Relationship.IParams.storeParams(first_row.Options.RelationshipOption);
-	finder_mod := Relationship.IParams.getParams(report_mod,PersonReports.input._finderreport);
+	finder_mod := Relationship.IParams.getParams(report_mod,PersonReports.IParam._finderreport);
   recs := PersonReports.FinderReport (dids, finder_mod, FALSE);
 //  output (recs);
 
@@ -192,38 +187,3 @@ unsigned1 n_phones := 40 : stored('_n_phones');
 */
 ENDMACRO;
 //FinderReportService ();
-
-/*
-<PeopleReportRequest>
-<row>
-<User>
-  <ReferenceCode>ref_code_str</ReferenceCode>
-  <BillingCode>billing_code</BillingCode>
-  <QueryId>query_id</QueryId>
-  <GLBPurpose>1</GLBPurpose>
-  <DLPurpose>1</DLPurpose>
-  <EndUser/>
-</User>
-<Options>
-  <IncludePeopleAtWork>true</IncludePeopleAtWork>
-  <IncludeMotorVehicle>true</IncludeMotorVehicle>
-  <IncludePhonesPlus>true</IncludePhonesPlus>
-  <IncludeProfessionalLicenses>true</IncludeProfessionalLicenses>
-  <IncludePhonesFeedback>true</IncludePhonesFeedback>
-  <IncludeDriversLicenses>true</IncludeDriversLicenses>
-</Options>
-<ReportBy>
-  <Name>
-    <Full></Full><First></First><Middle></Middle><Last></Last>
-  </Name>
-  <Address>
-    <StreetName></StreetName><StreetNumber></StreetNumber><StreetSuffix></StreetSuffix><UnitNumber></UnitNumber>
-    <State></State><City></City><Zip5></Zip5></Address>
-  <SSN></SSN>
-  <UniqueId></UniqueId>
-  <DOB><Year></Year><Month></Month><Day></Day></DOB>
-  <Phone10></Phone10>
-</ReportBy>
-</row>
-</PeopleReportRequest>
-*/

@@ -1,4 +1,4 @@
-import FCRA, gateway;
+﻿import FCRA, gateway, risk_indicators;
 
 export BocaShell_BtSt_Function_FCRA(dataset(risk_indicators.Layout_BocaShell_BtSt_In) inf, dataset(Gateway.Layouts.Config) gateways,
 													unsigned1 dppa, unsigned1 glb, boolean isUtility=false, boolean isLN=false,
@@ -15,7 +15,7 @@ export BocaShell_BtSt_Function_FCRA(dataset(risk_indicators.Layout_BocaShell_BtS
 
 FUNCTION
 
-Layout_BocaShell_BtSt_In into_seq(inf le) := TRANSFORM
+risk_indicators.Layout_BocaShell_BtSt_In into_seq(inf le) := TRANSFORM
 	self.seq := le.seq * 2;
 	self := le;
 END;
@@ -33,11 +33,11 @@ pre_iid2 := normalize(df, 2, into_in(LEFT,COUNTER));
 ids_wide := group(sort(FCRA.Boca_Shell_FCRA_Neutral_DID_Soapcall (pre_iid2, gateways, dppa, glb, 
 													isUtility, isLN, includeRelativeInfo, require2Ele, IN_ExcludeWatchLists:=excludewatchlists, in_bsversion:=bsversion,datarestriction:=datarestriction,datapermission:=datapermission), seq), seq);
 
-p := dedup(group(sort(project(ids_wide(~isrelat), transform (Layout_Boca_Shell, self := LEFT)), seq), seq), seq);
+p := dedup(group(sort(project(ids_wide(~isrelat), transform (risk_indicators.Layout_Boca_Shell, self := LEFT)), seq), seq), seq);
   
 
 
-layout_output into_iid(p L) := transform
+risk_indicators.layout_output into_iid(p L) := transform
 	self.fname := L.shell_input.fname;
 	self.lname := L.shell_input.lname;
 	self.dl_number := l.shell_input.dl_number;
@@ -55,7 +55,7 @@ iid := project(p, into_iid(LEFT));
 
 dppa_ok := dppa > 0 and dppa < 8;
 filter_out_fares := true;
-per_prop := getAllBocaShellData (iid, ids_wide, p,
+per_prop := risk_indicators.getAllBocaShellData (iid, ids_wide, p,
                                    TRUE, isLN, dppa, dppa_ok,
                                    includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo,
 								   BSVersion, isPreScreen, doScore, filter_out_fares, DataRestriction, 0, glb, gateways, DataPermission);
@@ -64,7 +64,7 @@ per_prop := getAllBocaShellData (iid, ids_wide, p,
 
 outseq := record
 	unsigned4	seq;
-	layout_bocashell_btst_out;
+	risk_indicators.layout_bocashell_btst_out;
 end;
 
 outseq into_out1(per_prop L) := transform
@@ -74,7 +74,7 @@ outseq into_out1(per_prop L) := transform
 end;
 outf2 := project(per_prop, into_out1(LEFT));
 
-layout_bocashell_btst_out into_out2(outf2 L, per_prop R) := transform
+risk_indicators.layout_bocashell_btst_out into_out2(outf2 L, per_prop R) := transform
 	self.ship_to_out := R;
 	self := L;
 end;

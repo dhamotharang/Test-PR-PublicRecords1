@@ -14,6 +14,11 @@ EXPORT Transforms := MODULE
     SELF := _input;
   END;
   
+  hasCityStateorZip($.Layouts.batch_in_rec _input) := FUNCTION
+    has_address := (_input.p_city_name != '' AND _input.st != '') OR _input.z5 != '';
+    RETURN has_address;
+  END;
+  
   hasFullAddress($.Layouts.batch_in_rec _input) := FUNCTION
     str_addr := STD.Str.CleanSpaces(Address.Addr1FromComponents(_input.prim_range,_input.predir,_input.prim_name,
                                               _input.addr_suffix,_input.postdir,_input.unit_desig,_input.sec_range));
@@ -25,21 +30,23 @@ EXPORT Transforms := MODULE
   hasFullName($.Layouts.batch_in_rec _input) := TRIM(_input.name_first,ALL) <> '' AND TRIM(_input.name_last,ALL) <> '';
   hasFullSSN($.Layouts.batch_in_rec _input) := LENGTH(STD.Str.Filter(_input.ssn,'0123456789')) = 9;
   
-  hasSufficientIdentityInput($.Layouts.batch_in_rec _input) := FUNCTION
+  hasSufficientIdentityInput($.Layouts.batch_in_rec _input, BOOLEAN require_full_address) := FUNCTION
   
     has_full_address := hasFullAddress(_input);
+    has_address := hasCityStateorZip(_input);
     has_full_name := hasFullName(_input);
 
     has_ssn := hasFullSSN(_input);
     has_lexid := _input.DID>0;
-    BOOLEAN has_sufficient_input := has_lexid OR (has_ssn AND has_full_name) OR (has_full_name AND has_full_address);
+    BOOLEAN has_sufficient_input := has_lexid OR (has_ssn AND has_full_name) OR (has_full_name AND has_full_address)
+                                    OR (~require_full_address AND (has_full_name AND has_address));
     
     RETURN has_sufficient_input;
   END;
   
-  EXPORT $.Layouts.batch_in_ext_rec checkIdentityInput($.Layouts.batch_in_rec le) := TRANSFORM
+  EXPORT $.Layouts.batch_in_ext_rec checkIdentityInput($.Layouts.batch_in_rec le, BOOLEAN full_address_check = FALSE) := TRANSFORM
   
-    insufficient_input := ~hasSufficientIdentityInput(le);
+    insufficient_input := ~hasSufficientIdentityInput(le, full_address_check);
     SELF.is_rejected_rec := insufficient_input;
     SELF.record_err_msg := IF(insufficient_input,AutoKeyI.errorcodes._msgs(AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT),'');
     SELF.record_err_code := IF(insufficient_input,AutoKeyI.errorcodes._codes.INSUFFICIENT_INPUT,0);

@@ -28,7 +28,7 @@ MODULE
 
 	// Enum for TransactionType and Phone source
 	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3, Blank = 255);
- SHARED TransTypeCodes := DATASET([
+  SHARED TransTypeCodes := DATASET([
        {TransType.Basic, 'BASIC'},
        {TransType.Premium, 'PREMIUM'},
        {TransType.Ultimate, 'ULTIMATE'},                    
@@ -44,7 +44,7 @@ EXPORT MapTransType2Code(STRING t) := TransTypeCodeDCT[ut.CleanSpacesAndUpper(t)
 
 EXPORT PrimarySearchCriteria := 'PII';
 
-EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
+EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,EquifaxPhones,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
 	
 	// Phone types
 	EXPORT PhoneType :=
@@ -55,15 +55,17 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT VoIP     := 'POSSIBLE VoIP';
 		EXPORT Other    := 'OTHER/UNKNOWN';
 	END;
+
 	EXPORT serviceType   := ENUM(LandLine = 0,Wireless = 1,VOIP = 2,Unknown = 3);
 	EXPORT STRING PhoneActiveStatus := '13'; //'Active-Unknown Line Type'
 	EXPORT STRING PhoneInactiveStatus := '33'; //'Inactive-Unknown Line Type'
-	EXPORT PhoneStatus := 
-		MODULE
-			EXPORT Inactive := 'INACTIVE';
-			EXPORT Active 	:= 'ACTIVE';
-			EXPORT NotAvailable 	:= 'NOT AVAILABLE';
-		END;
+	
+  EXPORT PhoneStatus := 
+  MODULE
+    EXPORT Inactive := 'INACTIVE';
+    EXPORT Active 	:= 'ACTIVE';
+    EXPORT NotAvailable 	:= 'NOT AVAILABLE';
+  END;
 	
 	// Listing types
 	EXPORT ListingType :=
@@ -96,9 +98,10 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	EXPORT RiskLevel		 := ENUM(PASS=1,WARN=2,FAILED=3);
 	EXPORT UNSIGNED1 OTPRiskLimit := 5;
 	EXPORT UNSIGNED1 InquiryDayLimit := 1;
-	EXPORT defaultRiskIndicatorRules	 := DATASET([{'Phone Association','H','1','0','No Identity',0,0,'',true,true},
-	                                              {'Phone Association','H','1','-1','No phone associated with subject',0,0,'',true,true}],
-	                                              iesp.phonefinder.t_PhoneFinderRiskIndicator);
+	EXPORT DefaultRiskIndicatorRules := DATASET([ {'Phone Association','H','1','0','No Identity',0,0,'',true,true},
+                                                {'Phone Association','H','1','-1','No phone associated with subject',0,0,'',true,true}
+                                              ],
+	                                            iesp.phonefinder.t_PhoneFinderRiskIndicator);
 	EXPORT SET OF STRING enumCategory := ['Phone Association','Phone Activity','Phone Criteria'];
 	
 	EXPORT SpoofPhoneOrigin :=
@@ -121,9 +124,10 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		END;
 		
 	EXPORT VARSTRING ErrorCodes(INTEGER c) :=
-		CASE(c,	100 => 'More than one verification type selected',
-						101 => 'No Phone number was entered for the verification request',
-      102 => 'No transaction type specified',
+		CASE(c,
+          100 => 'More than one verification type selected',
+					101 => 'No Phone number was entered for the verification request',
+          102 => 'No transaction type specified',
 					'Unspecified Failure');
 		
 	EXPORT PhoneRiskAssessmentGateways  := [Gateway.Constants.ServiceName.PhonesMetaData, Gateway.Constants.ServiceName.AccuDataOCN,
@@ -138,6 +142,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT Waterfall    := FALSE;
 		EXPORT Gong         := FALSE;
 		EXPORT QSent        := FALSE;
+		EXPORT EquifaxPhones:= FALSE;
 		EXPORT Targus       := FALSE;
 		EXPORT PhoneMetadata:= FALSE;
 	END;
@@ -167,8 +172,11 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	END;
 	
 	EXPORT RiskRules := MODULE
-	  EXPORT UNSIGNED1 SimCardInfo  := 35;
-	  EXPORT UNSIGNED1 DeviceInfo   := 36;
+		EXPORT UNSIGNED1 CallForwarding:= 31;
+	  EXPORT UNSIGNED1 SimCardInfo   := 35;
+	  EXPORT UNSIGNED1 DeviceInfo    := 36;
+    EXPORT UNSIGNED1 IdentityCount := 45;
+		EXPORT UNSIGNED1 PhoneTransactionCount := 47;
 	END;
 	
 	EXPORT ThreatMetrixRiskRules := MODULE
@@ -183,31 +191,32 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	  EXPORT UNSIGNED1 HighCountriesCount   := 44;
 	END;
 	
-	EXPORT AllThreatMetrixRules :=[ThreatMetrixRiskRules.RejectedTransaction,
-                       ThreatMetrixRiskRules.Blacklist,
-                       ThreatMetrixRiskRules.FraudInDIN,
-                       ThreatMetrixRiskRules.BadReputation,
-                       ThreatMetrixRiskRules.FirstSeenInDIN,
-                       ThreatMetrixRiskRules.HighDeviceCount,
-                       ThreatMetrixRiskRules.HighEmailCount,
-                       ThreatMetrixRiskRules.HighCountriesCount];
-   
-   EXPORT PfResSnapshotErrorMessages := module
-		 EXPORT STRING50 Companyid := 'Too Many Transactions by CompanyId';
-		 EXPORT STRING50 UserId := 'Too Many Transactions by UserId';
-		 EXPORT STRING50 ReferenceCode := 'Too Many Transactions by ReferenceCode';
-		 EXPORT STRING50 PhoneNumber := 'Too Many Transactions by PhoneNumber';
-		 EXPORT STRING50 LexId := 'Too Many Transactions by LexId';
-		 EXPORT STRING50 CmpId_Refrcode := 'Too Many Transactions by Companyid and Reference Code';
-    END;
+	EXPORT AllThreatMetrixRules :=[ ThreatMetrixRiskRules.RejectedTransaction,
+                                  ThreatMetrixRiskRules.Blacklist,
+                                  ThreatMetrixRiskRules.FraudInDIN,
+                                  ThreatMetrixRiskRules.BadReputation,
+                                  ThreatMetrixRiskRules.FirstSeenInDIN,
+                                  ThreatMetrixRiskRules.HighDeviceCount,
+                                  ThreatMetrixRiskRules.HighEmailCount,
+                                  ThreatMetrixRiskRules.HighCountriesCount];
+
+  EXPORT PfResSnapshotErrorMessages := module
+    EXPORT STRING50 Companyid := 'Too Many Transactions by CompanyId';
+    EXPORT STRING50 UserId := 'Too Many Transactions by UserId';
+    EXPORT STRING50 ReferenceCode := 'Too Many Transactions by ReferenceCode';
+    EXPORT STRING50 PhoneNumber := 'Too Many Transactions by PhoneNumber';
+    EXPORT STRING50 LexId := 'Too Many Transactions by LexId';
+    EXPORT STRING50 CmpId_Refrcode := 'Too Many Transactions by Companyid and Reference Code';
+  END;
 	
-    EXPORT PfResSnapshot := module
-		 EXPORT UNSIGNED2 MaxSearchRecords := 10000;
-		 EXPORT UNSIGNED2 MaxRecords := 50000;
-		 EXPORT UNSIGNED2 MaxRIs := 100;
-		 EXPORT UNSIGNED2 MaxIdentities := 100;
-		 EXPORT UNSIGNED2 MaxOtherPhones := 100;
-    END;
+  EXPORT PfResSnapshot := module
+    EXPORT UNSIGNED2 MaxSearchRecords := 10000;
+    EXPORT UNSIGNED2 MaxRecords := 50000;
+    EXPORT UNSIGNED2 MaxRIs := 100;
+    EXPORT UNSIGNED2 MaxIdentities := 100;
+    EXPORT UNSIGNED2 MaxOtherPhones := 100;
+  END;
+
 	// Batch only
 	EXPORT BatchRestrictedDirectMarketingSourcesSet :=  
 	                                    [MDR.sourceTools.src_AL_Experian_Veh,                                    

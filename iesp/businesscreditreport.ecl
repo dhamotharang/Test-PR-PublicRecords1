@@ -326,8 +326,9 @@ end;
 		
 export t_BusinessCreditReportOption := record (iesp.share.t_BaseReportOption)
 	boolean IncludeBusinessCredit {xpath('IncludeBusinessCredit')};
+	string BusinessCreditReportType {xpath('BusinessCreditReportType')}; //values['0','1','2','3','']
 	boolean LimitPaymentHistory24Months {xpath('LimitPaymentHistory24Months')};
-	string ContributorIds {xpath('ContributorIds')};//hidden[internal]
+	string ContributorIds {xpath('ContributorIds')};//hidden[internal]	
 end;
 		
 export t_BusinessCreditReportBy := record

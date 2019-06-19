@@ -1,5 +1,6 @@
+﻿import risk_indicators;
 
-EXPORT Boca_Shell_data_build_dates(DATASET (Layout_Boca_Shell) clam, boolean isFCRA) := function
+EXPORT Boca_Shell_data_build_dates(DATASET (risk_indicators.Layout_Boca_Shell) clam, boolean isFCRA) := function
 
 	// string8 aircraft_build_date := Risk_Indicators.get_Build_date('faa_build_version');
 	// string8 watercraft_build_date := Risk_Indicators.get_Build_date('watercraft_build_version');
@@ -10,7 +11,7 @@ EXPORT Boca_Shell_data_build_dates(DATASET (Layout_Boca_Shell) clam, boolean isF
 	string8 property_build_date := Risk_Indicators.get_Build_date(prop_string);
 	
 	clam_with_dates := project(clam, 
-	transform(layout_boca_shell,
+	transform(risk_indicators.layout_boca_shell,
 		// aircraft, watercraft and profic are already fetched in their respective sections of the shell
 		// self.aircraft_build_date := aircraft_build_date;
 		// self.watercraft_build_date := watercraft_build_date;

@@ -3,7 +3,7 @@
 EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids, 
 																	String DatapermissionMask, 
 																	Boolean IncludeBusinessCredit = FALSE, //data team always pass in IncludeBusinessCredit = TRUE for this.
-																	STRING FETCHLEVEL = BIPV2.IDconstants.Fetch_Level_SELEID
+																	STRING FETCHLEVEL = BIPV2.IDconstants.Fetch_Level_SELEID																
 																	) := MODULE
 																	// note:  in addition to this module being called from BusinessCredit_Services.CreditReport_Records
 																	// Business_Credit_Scoring.fn_GetDBTAverage calls this BusinessCredit_Services.fn_getPrimaryIndustry from thor side
@@ -73,9 +73,15 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 
 	recs_rollup := ROLLUP(SORT(Recs((INTEGER)Best_Code > 0 AND Source <> ''), #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), Source, best_code),
 												BIPV2.IDmacros.mac_JoinTop3Linkids() AND LEFT.Best_Code = RIGHT.Best_Code, rollSICNAICSource(LEFT, RIGHT));
-	
-	EXPORT recs_rollup_sort := SORT(recs_rollup, 
+
+    // output(ds_SicNaicsRecsToUse, named('ds_SicNaicsRecsToUse'));
+	// output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));												
+	//output(choosen(ds_BIPSICNAICSRecs, named('ds_BIPSICNAICSRecs'));
+		
+    EXPORT  recs_rollup_sort  := SORT(recs_rollup, 
 																		#expand(BIPV2.IDmacros.mac_ListTop3Linkids()), 
+																		-(Source = MDR.Sourcetools.src_Equifax_business_data),
+																		-(Source = MDR.SourceTools.src_Cortera),
 																		-(Source = MDR.sourceTools.str_convert_DL), 
 																		-(Source = MDR.sourceTools.src_EBR), 
 																		-(Source = MDR.sourceTools.src_Yellow_Pages), 
@@ -87,12 +93,10 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 																		-dt_last_seen, 
 																		-dt_first_seen, 
 																		RecordCount,
-																		RECORD);
-	
+																		RECORD);		
+																		
+
 	EXPORT bestIndustryCode := DEDUP(recs_rollup_sort,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()));
-	// output(ds_SicNaicsRecsToUse, named('ds_SicNaicsRecsToUse'));
-	// output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));
-	// output(ds_BIPSICNAICSRecs, named('ds_BIPSICNAICSRecs'));
 	
   //return (recs_rollup_sort);
 END;

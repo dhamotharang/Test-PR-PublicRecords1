@@ -5,7 +5,7 @@ lCommon    := PhoneFinder_Services.Layouts.PhoneFinder.Common;
 
 // Gong and gong history data
 EXPORT GetGongPhones( DATASET(lBatchIn)                        dIn,
-											PhoneFinder_Services.iParam.ReportParams inMod) :=
+											PhoneFinder_Services.iParam.SearchParams inMod) :=
 FUNCTION
 	// Split the phone number into phone7 and area code
 	rBatchInSplitPhone_Layout :=

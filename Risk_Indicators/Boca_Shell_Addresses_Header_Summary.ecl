@@ -1,6 +1,6 @@
-import Inquiry_AccLogs;
+﻿import Inquiry_AccLogs, risk_indicators;
 
-EXPORT Boca_Shell_Addresses_Header_Summary( grouped dataset(iid_constants.layout_outx) all_header, grouped dataset(risk_indicators.Layout_Output) rolled_header ) := function
+EXPORT Boca_Shell_Addresses_Header_Summary( grouped dataset(risk_indicators.iid_constants.layout_outx) all_header, grouped dataset(risk_indicators.Layout_Output) rolled_header ) := function
 
 // get stats for each address like record count per source, dates first seen at source			
 address_source_stats := table(all_header, 

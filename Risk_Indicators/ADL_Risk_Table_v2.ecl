@@ -1,4 +1,4 @@
-import header, ut, doxie, watchdog, doxie_files, emerges, daybatchpcnsr, american_student_list, infutor, driversv2, gong, mdr, fcra;
+﻿import header, ut, doxie, watchdog, doxie_files, emerges, daybatchpcnsr, american_student_list, infutor, driversv2, gong, mdr, fcra, risk_indicators;
 
 export ADL_Risk_Table_v2(boolean isFCRA) := function
 

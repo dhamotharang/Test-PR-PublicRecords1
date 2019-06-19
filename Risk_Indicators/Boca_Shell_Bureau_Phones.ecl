@@ -1,8 +1,8 @@
 ﻿//nonFCRA only 
 //grabs the verified phone info from Equifax - which we call bureau in case we change sources later on
-import PhoneMart, riskwise, Phone_Shell;
+import PhoneMart, riskwise, Phone_Shell, risk_indicators;
 
-EXPORT Boca_Shell_Bureau_Phones(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := function
+EXPORT Boca_Shell_Bureau_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := function
 
 temp_layout := record
 	unsigned seq;

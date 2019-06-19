@@ -1,7 +1,7 @@
-/*2014-12-03T01:08:27Z (David Schlangen)
+﻿/*2014-12-03T01:08:27Z (David Schlangen)
 changes for bug 156869 and 165691
 */
-Import Utilfile, Riskwise, ut;
+Import Utilfile, Riskwise, ut, risk_indicators;
 
 export Boca_Shell_Utility(GROUPED dataset(risk_indicators.layout_bocashell_neutral) bs_neutral, unsigned1 glb, boolean isFCRA = false, integer bsversion=40) := FUNCTION
 
@@ -35,8 +35,8 @@ Layout_Utility_Plus getUtilADL(bs_neutral le, Utilfile.Key_DID ri) := transform
 	self.Utility.utili_adl_dt_first_seen := if(util_type_mapped<>'', ri.date_first_seen+',', '');					
 	self.Utility.utili_adl_count := (integer)((unsigned)ri.did<>0);
 	
-	firstmatch := risk_indicators.iid_constants.g(FnameScore(le.shell_input.fname, ri.fname));
-	lastmatch := risk_indicators.iid_constants.g(LnameScore(le.shell_input.lname, ri.lname));
+	firstmatch := risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.shell_input.fname, ri.fname));
+	lastmatch := risk_indicators.iid_constants.g(risk_indicators.LnameScore(le.shell_input.lname, ri.lname));
 	
 	zip_score := Risk_Indicators.AddrScore.zip_score(le.shell_input.in_zipcode, ri.zip);
 	cityst_score := Risk_Indicators.AddrScore.citystate_score(le.shell_input.in_city, le.shell_input.in_state, ri.p_city_name, ri.st, le.iid.cityzipflag);
@@ -44,7 +44,7 @@ Layout_Utility_Plus getUtilADL(bs_neutral le, Utilfile.Key_DID ri) := transform
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						zip_score, cityst_score) );
 	
-	phonematch := risk_indicators.iid_constants.gn(PhoneScore(le.shell_input.phone10, ri.phone));
+	phonematch := risk_indicators.iid_constants.gn(risk_indicators.PhoneScore(le.shell_input.phone10, ri.phone));
 	self.Utility.utili_adl_nap := risk_indicators.iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
 	self := le;
 	self := [];
@@ -104,8 +104,8 @@ Layout_Utility_Plus getUtilAddr2(bs_neutral le, utilfile.Key_Address ri) := tran
 	self.Utility.utili_addr2_type := if(util_type_mapped<>'' and valid_utility, trim(util_type_mapped)+',', '');
 	self.Utility.utili_addr2_dt_first_seen := if(util_type_mapped<>'' and valid_utility, trim(ri.date_first_seen)+',', '');
 	
-	firstmatch := risk_indicators.iid_constants.g(FnameScore(le.shell_input.fname, ri.fname));
-	lastmatch := risk_indicators.iid_constants.g(LnameScore(le.shell_input.lname, ri.lname));
+	firstmatch := risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.shell_input.fname, ri.fname));
+	lastmatch := risk_indicators.iid_constants.g(risk_indicators.LnameScore(le.shell_input.lname, ri.lname));
 	
 	zip_score := Risk_Indicators.AddrScore.zip_score(le.address_verification.address_history_1.zip5, ri.zip);
 	cityst_score := Risk_Indicators.AddrScore.citystate_score(le.address_verification.address_history_1.city_name, le.address_verification.address_history_1.st, 
@@ -114,7 +114,7 @@ Layout_Utility_Plus getUtilAddr2(bs_neutral le, utilfile.Key_Address ri) := tran
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						zip_score, cityst_score) );
 	
-	phonematch := risk_indicators.iid_constants.gn(PhoneScore(le.shell_input.phone10, ri.phone));
+	phonematch := risk_indicators.iid_constants.gn(risk_indicators.PhoneScore(le.shell_input.phone10, ri.phone));
 	self.Utility.utili_addr2_nap := risk_indicators.iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
 	self := le;
 	self := [];

@@ -1,4 +1,4 @@
-﻿IMPORT iesp, doxie, InquiryHistory, STD, WSInput;
+﻿IMPORT iesp, doxie, STD, WSInput;
 
 /*--INFO-- This service returns all inquiries for a single LexID.*/
 EXPORT FCRAInquiryHistoryService() := FUNCTION
@@ -17,9 +17,9 @@ EXPORT FCRAInquiryHistoryService() := FUNCTION
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
 
   in_dids := DATASET([{(UNSIGNED)report_by.LexID}], doxie.layout_references);
-  in_mod := InquiryHistory.IParams.GetParams(report_options);
+  in_mod := ConsumerDisclosure.InquiryHistory.IParams.GetParams(report_options);
 
-  IHResponse := InquiryHistory.ReportRecords(in_dids, in_mod, isFCRA)[1];
+  IHResponse := ConsumerDisclosure.InquiryHistory.ReportRecords(in_dids, in_mod, isFCRA)[1];
   service_header := iesp.ECL2ESP.GetHeaderRow();
 
   iesp.fcrainquiryhistory.t_FCRAInquiryHistoryResponse xform(InquiryHistory.Layouts.inquiry_history_out L) := TRANSFORM

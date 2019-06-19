@@ -721,7 +721,9 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and (actualIIDVersion=1 or FromFlexID);
 				self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and (actualIIDVersion=1 or FromFlexID);
 					
-				self.SSNFoundForLexID := le.bestssn<>'' and actualIIDVersion=1;
+				self.SSNFoundForLexID := Map (le.socsverlevel in [4,6,7,9,10,11,12] and actualIIDVersion=1 => TRUE,
+                                                    le.header_summary.ssns_on_file <>'' and actualIIDVersion=1 => TRUE,
+                                                      FALSE);
 				
 				self.ADVODoNotDeliver := le.ADVODoNotDeliver;
 				self.ADVODropIndicator := le.ADVODropIndicator;

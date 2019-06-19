@@ -264,10 +264,10 @@
 			SELF.#EXPAND(appendPrefix + 'hasAssocCriminalHistory')			 						   		:= R.hasAssocCriminalHistory;
 			SELF.#EXPAND(appendPrefix + 'hasDeceased')																		:= R.hasDeceased;
 			SELF.#EXPAND(appendPrefix + 'DeceasedDate')																		:= R.DeceasedDate;			
-			SELF.#EXPAND(appendPrefix + 'ClientStateExclusionInd')												:= IF(EXISTS(R.CurrentExclusionStates(L.InputState = State and L.InputState <> '')),'Y','N');
-			SELF.#EXPAND(appendPrefix + 'ClientStateExclusionDate')												:= R.CurrentExclusionStates(L.InputState = State and L.InputState <> '')[1].Sanction_Date;
-			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseRevokedInd')										:= IF(EXISTS(R.RevokedExclusionStates(L.InputState = State and L.InputState <> '')),'Y','N');
-			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseRevokedDate')									:= INTFORMAT(R.RevokedLicenseStates(L.InputState = State and L.InputState <> '')[1].DT_LIC_EXPIRATION,8,1);
+			SELF.#EXPAND(appendPrefix + 'ClientStateExclusionInd')												:= IF(EXISTS(R.CurrentExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.CurrentExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)),'Y','N');
+			SELF.#EXPAND(appendPrefix + 'ClientStateExclusionDate')												:= R.CurrentExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.CurrentExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)[1].Sanction_Date;
+			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseRevokedInd')										:= IF(EXISTS(R.RevokedExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.RevokedExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)),'Y','N');
+			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseRevokedDate')									:= R.RevokedExclusionStates(L.InputState = State and L.InputState <> '' and (INTEGER)R.RevokedExclusionStates(L.InputState = State)[1].REINSTATEMENT_DATE = 0)[1].Sanction_Date;
 			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseExpiredInd')										:= IF(EXISTS(R.ExpiredLicenseStates(L.InputState = State and L.InputState <> '')),'Y','N');
 			SELF.#EXPAND(appendPrefix + 'ClientStateLicenseExpiredDate')									:= INTFORMAT(R.ExpiredLicenseStates(L.InputState = State and L.InputState <> '')[1].DT_LIC_EXPIRATION,8,1);
 			SELF :=  L;

@@ -117,7 +117,7 @@ Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_TOGETHER trans_name
 		released := le.date_last_seen<>0;
 
 		//for 50 don't show evictions if they are a suit
-		isEviction := ri.eviction='Y' and (bsversion<50 or ftd not in iid_constants.setSuitsFCRA);
+		isEviction := ri.eviction='Y' and (bsversion<50 or ftd not in risk_indicators.iid_constants.setSuitsFCRA);
 		self.evictionInd := isEviction;	
 		//set variables for these fields and take from party key as that has the defendant info. Where as main has all the parties info
 		releasedDate := (string) le.date_last_seen ;
@@ -127,7 +127,7 @@ Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_TOGETHER trans_name
 		
 		SELF.date_first_seen := (unsigned) OrigDateFiled;
 		SELF.date_last_seen :=(unsigned)  releasedDate;
-		myGetDate := iid_constants.myGetDate(le.historydate);
+		myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 		isRecent := ut.DaysApart((string8)OrigDateFiled,myGetDate)<365*2+1;
 		SELF.ProcessDate := ri.Process_Date;
 		SELF.Filingnumber := ri.Filing_number;
@@ -164,24 +164,24 @@ Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_TOGETHER trans_name
 		SELF.BJL.last_eviction_date := if(isEviction, (unsigned)OrigDateFiled, 0);
 		
 		// only count evictions in the liens buckets if you are running version prior to 50
-		isCivilJudgment := ftd in if(bsversion<50, iid_constants.setCivilJudgment, iid_constants.setCivilJudgment_50) and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA) );
-		isCivilJudgmentReleased := ftd in if(bsversion<50, iid_constants.setCivilJudgment, iid_constants.setCivilJudgment_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isFederalTax := ftd in iid_constants.setFederalTax and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isFederalTaxReleased := ftd in iid_constants.setFederalTax and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isForeclosure := ftd in if(bsversion<50, iid_constants.setForeclosure, iid_constants.setForeclosure_50) and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isForeclosureReleased := ftd in if(bsversion<50, iid_constants.setForeclosure, iid_constants.setForeclosure_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLandlordTenant := ftd in if(bsversion<50, iid_constants.setLandlordTenant, iid_constants.setLandlordTenant_50)  and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLandlordTenantReleased := ftd in if(bsversion<50, iid_constants.setLandlordTenant, iid_constants.setLandlordTenant_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendens := ftd in iid_constants.setLisPendens and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isLisPendensReleased := ftd in iid_constants.setLisPendens and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherLJ := ftd not in if(bsversion<50, iid_constants.setOtherLJ, iid_constants.setPROther) and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherLJReleased := ftd not in if(bsversion<50, iid_constants.setOtherLJ, iid_constants.setPROther) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherTax := ftd in iid_constants.setOtherTax and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isOtherTaxReleased := ftd in iid_constants.setOtherTax and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isSmallClaims := ftd in if(bsversion<50, iid_constants.setSmallClaims, iid_constants.setSmallClaims_50)  and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isSmallClaimsReleased := ftd in if(bsversion<50, iid_constants.setSmallClaims, iid_constants.setSmallClaims_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
-		isSuits := ftd in iid_constants.setSuitsFCRA and goodResult and unreleased and (bsversion<50 or (~isEviction));
-		isSuitsReleased := ftd in iid_constants.setSuitsFCRA and goodResult and released and (bsversion<50 or (~isEviction));
+		isCivilJudgment := ftd in if(bsversion<50, risk_indicators.iid_constants.setCivilJudgment, risk_indicators.iid_constants.setCivilJudgment_50) and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA) );
+		isCivilJudgmentReleased := ftd in if(bsversion<50,risk_indicators.iid_constants.setCivilJudgment, risk_indicators.iid_constants.setCivilJudgment_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isFederalTax := ftd in risk_indicators.iid_constants.setFederalTax and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isFederalTaxReleased := ftd in risk_indicators.iid_constants.setFederalTax and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isForeclosure := ftd in if(bsversion<50, risk_indicators.iid_constants.setForeclosure, risk_indicators.iid_constants.setForeclosure_50) and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isForeclosureReleased := ftd in if(bsversion<50, risk_indicators.iid_constants.setForeclosure, risk_indicators.iid_constants.setForeclosure_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLandlordTenant := ftd in if(bsversion<50, risk_indicators.iid_constants.setLandlordTenant, risk_indicators.iid_constants.setLandlordTenant_50)  and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLandlordTenantReleased := ftd in if(bsversion<50,risk_indicators.iid_constants.setLandlordTenant, risk_indicators.iid_constants.setLandlordTenant_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLisPendens := ftd in risk_indicators.iid_constants.setLisPendens and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isLisPendensReleased := ftd in risk_indicators.iid_constants.setLisPendens and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherLJ := ftd not in if(bsversion<50, risk_indicators.iid_constants.setOtherLJ, risk_indicators.iid_constants.setPROther) and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherLJReleased := ftd not in if(bsversion<50, risk_indicators.iid_constants.setOtherLJ, risk_indicators.iid_constants.setPROther) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherTax := ftd in risk_indicators.iid_constants.setOtherTax and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isOtherTaxReleased := ftd in risk_indicators.iid_constants.setOtherTax and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isSmallClaims := ftd in if(bsversion<50, risk_indicators.iid_constants.setSmallClaims, risk_indicators.iid_constants.setSmallClaims_50)  and goodResult and unreleased and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isSmallClaimsReleased := ftd in if(bsversion<50,risk_indicators.iid_constants.setSmallClaims, risk_indicators.iid_constants.setSmallClaims_50) and goodResult and released and (bsversion<50 or (~isEviction and ftd not in risk_indicators.iid_constants.setSuitsFCRA));
+		isSuits := ftd in risk_indicators.iid_constants.setSuitsFCRA and goodResult and unreleased and (bsversion<50 or (~isEviction));
+		isSuitsReleased := ftd in risk_indicators.iid_constants.setSuitsFCRA and goodResult and released and (bsversion<50 or (~isEviction));
 		//the 3 variables below are for 5.3 only, which is why I'm not checking the version in here
 		isWithin84 := risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(7),le.historydate);
 		isAnyUnreleased := (isCivilJudgment or isFederalTax or isForeclosure or isLandlordTenant or isLisPendens or isOtherLJ or isOtherTax or isSmallClaims) and  not isSuits;

@@ -28,9 +28,11 @@ export AddressPreFillService := macro
 
 #constant('IsPRP', true);
 doxie.MAC_Header_Field_Declare();
-
+mod_access := doxie.compliance.GetGlobalDataAccessModule();
 res_unm := Fedex_Services.mod_AddressPreFill.Records;
-doxie.MAC_Marshall_Results(res_unm, res)
+doxie.MAC_Marshall_Results(res_unm, res);
+
+IF (EXISTS(res), doxie.compliance.logSoldToTransaction(mod_access));
 output(res, named(doxie.strResultsName));
 output(Fedex_Services.mod_AddressPreFill.isMultiStateReturn, named('isMultiStateReturn'));
 

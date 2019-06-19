@@ -1,7 +1,7 @@
-﻿import _Control, prof_licenseV2, riskwise, ut, RiskView;
+﻿import _Control, prof_licenseV2, riskwise, ut, RiskView, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Proflic_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsversion, 
+export Boca_Shell_Proflic_Hist_FCRA(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, 
 			boolean isPrescreen, boolean isDirectToConsumerPurpose = false) := FUNCTION
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
@@ -20,15 +20,15 @@ end;
 
 PL_Plus_temp PL_FCRA(ids_only le, key_did rt) := transform
 	hit := trim(rt.prolic_key)!='';	// make sure we have a good record
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.prolic_key := if(hit, rt.prolic_key, '');
 	self.source_st := if(hit, rt.source_st, '');
 	self.date_first_seen := if(hit, rt.date_first_seen, '');
 	self.professional_license_flag := hit;
 	license_type := if(hit, rt.license_type, '');
 	self.license_type := license_type;
-	self.jobCategory := getPLinfo(license_type).jobCategory;
-	self.PLcategory := getPLinfo(license_type).PLcategory;
+	self.jobCategory := risk_indicators.getPLinfo(license_type).jobCategory;
+	self.PLcategory := risk_indicators.getPLinfo(license_type).PLcategory;
 	expire_date := if(hit, (unsigned)rt.expiration_date, 0);
 	isExpired := expire_date<(unsigned)myGetDate and expire_date<>0;
 
@@ -92,14 +92,14 @@ mari_recs := join (ids_only, mari_data,
 		left.seq=right.seq,
 		transform (PL_Plus_temp, 			
 			hit := trim(right.license_nbr)!='';	// check to see that we have a good record
-			myGetDate := iid_constants.myGetDate(left.historydate);
+			myGetDate := risk_indicators.iid_constants.myGetDate(left.historydate);
 			self.prolic_key := right.license_nbr;
 			self.date_first_seen := if(hit, (string)right.date_first_seen, '');
 			self.professional_license_flag := hit;
 			license_type := if(hit, right.most_recent_license_type, '');
 			self.license_type := license_type;
-			self.jobCategory := getPLinfo(license_type).jobCategory;
-			self.PLcategory := getPLinfo(license_type).PLcategory;
+			self.jobCategory := risk_indicators.getPLinfo(license_type).jobCategory;
+			self.PLcategory := risk_indicators.getPLinfo(license_type).PLcategory;
 			self.proflic_count := if(hit and right.expiration_date>=(unsigned)myGetDate, 1, 0);	
 			self.date_most_recent := if(hit, right.date_first_seen, 0);
 			self.expiration_date := if(hit, right.expiration_date, 0);

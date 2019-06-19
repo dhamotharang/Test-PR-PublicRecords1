@@ -1,10 +1,11 @@
 ﻿IMPORT $, AutoKeyI, Suppress;
 
 EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
-                                 $.IParams.EmailParams in_mod
+                                 $.IParams.EmailParams in_mod,
+                                 BOOLEAN require_full_address_check = FALSE
 ) := FUNCTION
                       
-  marked_input_recs := PROJECT(batch_in, $.Transforms.checkIdentityInput(LEFT));  
+  marked_input_recs := PROJECT(batch_in, $.Transforms.checkIdentityInput(LEFT, require_full_address_check));  
                                     
   clnd_input_pii := PROJECT(marked_input_recs(~is_rejected_rec),$.Layouts.batch_in_rec);
   
