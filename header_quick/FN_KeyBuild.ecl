@@ -244,7 +244,7 @@ return sequential(
 														,sequential(B4,M4,MQ4)
 														,sequential(B5,M5,MQ5)
 														)
-									//,build_source_key_prep(filedate)
+									,build_source_key_prep(filedate)
 								);
 
 END;

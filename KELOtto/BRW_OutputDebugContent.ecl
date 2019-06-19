@@ -2,7 +2,7 @@
 
 #option('multiplePersistInstances', false);
 #option('defaultSkewError', 1);
-#option('freezepersists', true);
+//#option('freezepersists', true);
 
 
 output(KELOtto.BasicScoring.FullEntityStatsPrep,, '~gov::otto::customerscoringdebug', overwrite);
