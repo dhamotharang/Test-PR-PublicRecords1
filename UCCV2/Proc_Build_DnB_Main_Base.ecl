@@ -74,9 +74,9 @@ Layout_UCC_Common.Filing Trans_add_signer(dFinancingStatement pLeft, dSigner pRi
 	self.expiration_date 		 := fn_general_date(pLeft.FILG_EXPN_DT) ;
 	self.Signer_Name 		     := pRight.INDV_NME;
 	self.Title 				       := if(trim(title,left,right) =';', '',title);
-	self.Filing_agency 		   := pLeft.FILG_OFC_NME;
-	self.address			       := pLeft.FILG_OFC_STR_ADR;
-	self.city 				       := pLeft.FILG_OFC_CITY_NME;
+	self.Filing_agency 		   := ut.CleanSpacesAndUpper(pLeft.FILG_OFC_NME);
+	self.address			       := ut.CleanSpacesAndUpper(pLeft.FILG_OFC_STR_ADR);
+	self.city 				       := ut.CleanSpacesAndUpper(pLeft.FILG_OFC_CITY_NME);
 	self.county 				     := pLeft.FILG_OFC_CNTY_NME;
 	self.state 				       := pLeft.FILG_OFC_ST_NME;
 	self.zip 					       := pLeft.FILG_OFC_POST_CD;
@@ -192,11 +192,21 @@ dAddCollateral    := Join(dFiling , distribute(dJoinCollateral,hash(rmsid)),
 													Left outer,local
 												 );
 												 
-FullFile		:=	distribute(dAddCollateral+Project(dFile,Trans_rollback_Rmsid(left)),hash(rmsid));
+FullFile		:=	distribute(dAddCollateral+Project(dFile,Trans_rollback_Rmsid(left)),hash(tmsid));
 
-AddRecordID := 	distribute(uccv2.fnAddPersistentRecordID_Main(FullFile),hash(rmsid));
+AddRecordID := 	distribute(uccv2.fnAddPersistentRecordID_Main(FullFile),hash(tmsid));
+
+SortFile		:=	sort(	AddRecordID,tmsid,rmsid,static_value,date_vendor_removed,date_vendor_changed,filing_jurisdiction,
+											orig_filing_number,orig_filing_type,orig_filing_date,orig_filing_time,filing_number,
+											filing_number_indc,filing_type,filing_date,filing_time,filing_status,status_type,page,
+											expiration_date,contract_type,statements_filed,continuious_expiration,microfilm_number,amount,
+											irs_serial_number,effective_date,signer_name,title,address,city,state,county,zip,
+											duns_number,cmnt_effective_date,description,collateral_desc,prim_machine,sec_machine,
+											manufacturer_code,manufacturer_name,model,model_year,model_desc,collateral_count,manufactured_year,
+											new_used,serial_number,property_desc,borough,block,lot,collateral_address,air_rights_indc,
+											subterranean_rights_indc,easment_indc,volume,persistent_record_id,-process_date,local);
 													
-dDedup	:=  dedup(sort(AddRecordID,-process_date,local),except process_date,vendor_entry_date,vendor_upd_date, local);													 
+dDedup	:=  dedup(SortFile,except process_date,vendor_entry_date,vendor_upd_date, local);													 
 													
 // dGroup            := group(sort(distribute(ddedup,hash(tmsid,rmsid)),tmsid,rmsid,local),
 													 // tmsid,rmsid,local
