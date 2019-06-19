@@ -55,7 +55,7 @@ export SearchService := MACRO
 	iesp_output := American_Student_Services.Functions.xform_iesp_output(recs);
 	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(iesp_output, results, iesp.student.t_StudentSearchResponse, Records, false,,,,iesp.Constants.MaxCountASLSearch);
-
+  IF (exists(recs), doxie.compliance.logSoldToTransaction(mod_access)); 
 	output(results, named('Results'));
 	
 ENDMACRO;

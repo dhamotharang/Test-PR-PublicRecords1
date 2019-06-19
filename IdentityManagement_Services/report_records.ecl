@@ -1,4 +1,4 @@
-/***
+﻿/***
  ** Module calls each individual service and exports each dataset returned.
 ***/
 
@@ -65,10 +65,8 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagemen
 // =======================================================================
 // =============================   Student   =============================
 // =======================================================================
-			students_raw := American_Student_Services.Raw.getPayloadByDIDS(PROJECT(dids, American_Student_Services.Layouts.deepDids));
-			
-			students_rest_mod := PROJECT (in_params, American_Student_Services.IParam.reportParams);
-
+     students_rest_mod := PROJECT (in_params, American_Student_Services.IParam.reportParams);
+     students_raw := American_Student_Services.Raw.getPayloadByDIDS(PROJECT(dids, American_Student_Services.Layouts.deepDids),students_rest_mod);
 			studentsr := American_Student_Services.Functions.apply_restrictions(students_raw, students_rest_mod);
 			studentsf := IdentityManagement_Services.Functions.debatable_names(studentsr,American_Student_Services.Layouts.finalrecs,LN_college_name);
 			

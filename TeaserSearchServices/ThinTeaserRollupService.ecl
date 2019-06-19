@@ -116,6 +116,7 @@ export ThinTeaserRollupService := MACRO
 	boolean InFROMESP_DtcPhoneAddressTeaserMask := false : stored('DtcPhoneAddressTeaserMask');
   boolean In_DtcPhoneAddressTeaserMask := NOT(InFROMESP_DtcPhoneAddressTeaserMask);
 	input_params := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (input_params);
 	tempmod := module(project(input_params,TeaserSearchServices.Search_Records.params,opt))
 		export IncludeAllAddresses := in_IncludeAllAddresses;
 		export IncludeFullHistory := IF(IncludeAllAddresses, true, in_IncludeFullHistory);
@@ -169,7 +170,7 @@ export ThinTeaserRollupService := MACRO
 	// output(w_addition_data_counts, named('w_addition_data_counts'));
 	//output(dtcCounts, named('dtcCounts'));
 	output(results, named('Results'));
-	
+	IF (exists(results), doxie.compliance.logSoldToTransaction(mod_access));
 	// Generate Royalty Billing information if this is ForceLogging event
 	Royalty.MAC_RoyaltyTeaser(getExtendedFakeAddress, royalties, lastID);
 	if(forceLogging, output(royalties, named('RoyaltySet')));

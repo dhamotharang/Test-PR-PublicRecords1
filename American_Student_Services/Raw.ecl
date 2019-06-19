@@ -1,4 +1,4 @@
-﻿import doxie, iesp, American_student_services, American_student_list, codes, AlloyMedia_student_list, STD;
+﻿import doxie, iesp, American_student_services, American_student_list, codes, AlloyMedia_student_list, STD, Suppress;
 
 export Raw := MODULE
 	
@@ -28,7 +28,8 @@ export Raw := MODULE
 	  return class_name_desc;
   END;		
 	
-	EXPORT getPayloadByIDS(Dataset(American_Student_Services.layouts.id) ids) := FUNCTION
+	EXPORT getPayloadByIDS(Dataset(American_Student_Services.layouts.id) ids,
+                        doxie.IDataAccess mod_access) := FUNCTION
 	
 	search_key := American_student_list.Key_ASL_Autokey_Payload;
 	
@@ -47,15 +48,19 @@ export Raw := MODULE
 		self := L;
 	end;
 	
-	ds_recs := join(ids,search_key,
+	ds_recs_pre := join(ids,search_key,
 									keyed(left.id=right.fakeid),
 									get_results(right),
 									LIMIT(American_Student_Services.Constants.MAX_RECS_ON_JOIN, fail(203, doxie.ErrorCodes(203))));									
+  ds_recs := Suppress.MAC_SuppressSource(ds_recs_pre, mod_access,did);
+  doxie.compliance.logSoldToSources(ds_recs,mod_access);
+                
 	RETURN ds_recs;
 	
 	END;
 	
-	EXPORT getPayloadByDIDS(Dataset(American_Student_Services.layouts.deepDids) dids) := FUNCTION
+	EXPORT getPayloadByDIDS(Dataset(American_Student_Services.layouts.deepDids) dids,
+                         doxie.IDataAccess mod_access) := FUNCTION
 	
 	search_key := American_student_list.Key_did;
 	
@@ -75,11 +80,13 @@ export Raw := MODULE
 		self := L;
 	end;
 	
-	ds_recs := join(dids,search_key,
+	ds_recs_pre := join(dids,search_key,
 									keyed(left.did=right.l_did),
 									get_results(left,right),
 									LIMIT(American_Student_Services.Constants.MAX_RECS_ON_JOIN, fail(203, doxie.ErrorCodes(203))));									
-								
+  ds_recs := Suppress.MAC_SuppressSource(ds_recs_pre, mod_access,did);
+  doxie.compliance.logSoldToSources(ds_recs,mod_access,did);
+
 	RETURN ds_recs;
 	
 	END;
