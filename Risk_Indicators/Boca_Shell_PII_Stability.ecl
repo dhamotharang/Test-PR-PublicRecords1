@@ -1,9 +1,9 @@
 ﻿// this attribute is only for beta testing for 5.2.  
 // when we put this into the real shell, the macro call to pii_stability can probably replace the DIDAppend macro in iid_getDIDprepOutput to be most efficient
 
-import didville;
+import didville, risk_indicators;
 
-EXPORT Boca_Shell_PII_Stability(GROUPED DATASET (Layout_Boca_Shell) clam) := function
+EXPORT Boca_Shell_PII_Stability(GROUPED DATASET (risk_indicators.Layout_Boca_Shell) clam) := function
 
 weights_input := project(clam, 
 	transform(DidVille.Layout_Did_InBatch, 

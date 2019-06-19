@@ -1,6 +1,6 @@
-﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, risk_indicators, targus, ut, Gateway, Census_data, std;
+﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, risk_indicators, targus, ut, Gateway, Census_data, std, doxie;
 
-EXPORT phone_noreconn_records(phone_noreconn_param.searchParams inMod) := module
+EXPORT phone_noreconn_records($.phone_noreconn_param.searchParams inMod) := module
 																																							
 EXPORT val (dataset(doxie.layout_references) dids,
 						dataset(gateway.Layouts.Config)gateways = dataset([],gateway.Layouts.Config)):= FUNCTION
@@ -60,9 +60,17 @@ h_targus := if(~call_PVS,doxie.MAC_Get_GLB_DPPA_Targus(phoneOnlySearch,
                                           inMod.Zip, '', inMod.GLBPurpose, inMod.DPPAPurpose,
                                           score_threshold_value, targus_cfg, inMod.CompanyName)(phone<>'',penalt<score_threshold_value));
 
+  mod_access  := module(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+		export unsigned1 dppa := inMod.DPPAPurpose;
+		export unsigned1 glb :=  inMod.GLBPurpose;
+		export string5   industry_class := inMod.IndustryClass;
+		export string32   application_type := inMod.ApplicationType;
+                
+  end;
+
+
 //In house QSent
-doxie.MAC_Get_GLB_DPPA_Qsent(dids, h_qsent, true,,
-                             inMod.GLBPurpose, inMod.DPPAPurpose, inMod.IndustryClass, inMod.CompanyName);
+doxie.MAC_Get_GLB_DPPA_Qsent(dids, h_qsent, mod_access, true,,inMod.CompanyName);
 
 h_Last_Resort := PhonesPlus_Services.AppendLR_bydid(dids,doxie.DataRestriction.fixed_DRM);
 
@@ -242,6 +250,9 @@ ut.getTimeZone(resultOut,phone,timezone,resultOut_w_tzone);
 // OUTPUT(h_qsent,NAMED('QSENT'));
 // OUTPUT(h_Last_Resort,NAMED('LASTRESORT'));
 // OUTPUT(resultOut_w_tzone,NAMED('RESULTOUT'));
+   
+
+doxie.compliance.logSoldToSources(h_qsent, mod_access);
 
 RETURN resultOut_w_tzone;
 

@@ -140,7 +140,8 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
     ds_SBA_Input_withCompPhone := 
       MAP( SmallBizCombined_inmod.ds_SBA_Input[1].SeleID != 0  
              => LNSmallBusiness.fn_addBestInfo(SmallBizCombined_inmod, LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.SELEID),
-           SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID != 0  OR
+           // can comment out for testing so that fn_addBestInfo is not called twice in order to output debug attrs within fn_addBestInfo function.
+		SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID != 0  OR
            SmallBizCombined_inmod.ds_SBA_Input[1].Rep_2_LexID != 0  OR
            SmallBizCombined_inmod.ds_SBA_Input[1].Rep_3_LexID != 0 
              => LNSmallBusiness.fn_addBestInfo(SmallBizCombined_inmod, LNSmallBusiness.Constants.BEST_INFO_REQ_TYPE.LEXID_ONLY),
@@ -226,6 +227,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
         EXPORT BOOLEAN   Include_BusinessCredit := TRUE; // Always true when called from here
 	 EXPORT BOOLEAN  LimitPaymentHistory24Months  :=  SmallBizCombined_inmod. LimitPaymentHistory24Months; // small bus Credit Report w SBFE addition
 	  EXPORT STRING     SBFEContributorIds  := SmallBizCombined_inmod.SBFEContributorIds; // small bus Credit Report w SBFE addition
+	  EXPORT STRING1 BusinessCreditReportType :=  SmallBizCombined_inmod.BusinessCreditReportType;  // use input iparam for requirement 1.3.3 
         EXPORT STRING1   FetchLevel 					  := BIPV2.IDconstants.Fetch_Level_SELEID;
         EXPORT BOOLEAN   IncludeScores          := FALSE; // Don't return scores becasue we are getting them from LNSmallBizAna 
         EXPORT BOOLEAN   AllowAll               := FALSE;

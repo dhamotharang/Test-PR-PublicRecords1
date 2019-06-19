@@ -15,7 +15,11 @@ end;
 export t_BcdBusinessCreditReportRecord := record (iesp.businesscreditreport.t_BusinessCreditReportRecord)
 end;
 		
-export t_BcdSmallBusinessBipCombinedReportOption := record (iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportOption)
+export t_BcdSmallBusinessBipCombinedReportOption := record (iesp.share.t_BaseReportOption)
+	dataset(iesp.share.t_StringArrayItem) AttributesVersionRequest {xpath('AttributesVersionRequest/Name'), MAXCOUNT(iesp.constants.SBAnalytics.MaxAttributeVersionCount)};
+	iesp.smallbusinessanalytics.t_SBAModels IncludeModels {xpath('IncludeModels')};
+	boolean IncludeCreditReport {xpath('IncludeCreditReport')};	
+	boolean LimitPaymentHistory24Months {xpath('LimitPaymentHistory24Months')}; 	
 end;
 		
 export t_BcdSmallBusinessCombinedReportResponse := record

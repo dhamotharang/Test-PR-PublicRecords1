@@ -58,7 +58,7 @@
   <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
 </message>
 */
-IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut;
+IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie;
 
 EXPORT PhoneFinderReportService() :=
 MACRO	
@@ -90,7 +90,8 @@ MACRO
 	
 	// Global module
 	globalMod := AutoStandardI.GlobalModule();
-	
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
+  
 	// Search module
 	searchMod := PROJECT(globalMod,PhoneFinder_Services.iParam.DIDParams,OPT);
 	reportMod := PhoneFinder_Services.iParam.GetSearchParams(pfOptions,pfUser);
@@ -175,6 +176,8 @@ iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
    	
  Zumigo_Log := modRecords.Zumigo_History_Recs; 
  PF_Reporting_Dataset := modRecords.ReportingDataset;
+ 
+  IF (EXISTS(modRecords.dFormat2IESP), doxie.compliance.logSoldToTransaction(mod_access)); 
     
  OUTPUT(results, named('Results'));
  OUTPUT(royalties, named('RoyaltySet'));

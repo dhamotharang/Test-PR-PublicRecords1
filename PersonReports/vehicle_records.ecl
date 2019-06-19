@@ -1,6 +1,3 @@
-/*2012-01-13T16:21:16Z (vmyullyari)
-C:\Documents and Settings\vmyullyari\Application Data\LexisNexis\querybuilder\vmyullyari\qb5_Dataland\PersonReports\vehicle_records\2012-01-13T16_21_16Z.ecl
-*/
 IMPORT iesp, doxie, VehicleV2_Services;
 
 EXPORT  vehicle_records (

@@ -1,4 +1,4 @@
-﻿IMPORT American_Student_Services, ATF_Services, doxie, doxie_crs, Gateway, iesp,
+﻿IMPORT American_Student_Services, ATF_Services, DidVille, doxie, doxie_crs, Gateway, iesp,
        PersonReports, PersonSlimReport_Services, SmartRollup, STD, suppress, ut;
 
 EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
@@ -145,17 +145,94 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       pl_duped  := dedup(pl_sorted, sourcestate, licensenumber);
       pl_duped_sorted := sort(pl_duped,-d2i(datelastseen));
       RETURN pl_duped_sorted;
-    END;
-	
+  END;
+
+ //this function also adds did's to the RTV records to be used in alerting platform
+  SHARED getRealTimeVehicles(Ioptions in_mod, DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)) := FUNCTION
+  
+      mod_access:= PersonSlimReport_Services.IParams.convertToDataAccess(in_mod);
+  
+      rec_reg_seq := record(iesp.motorvehicle.t_MotorVehicleReportRegistrant)
+        unsigned4 seq := 0;
+        string25  vin := '';
+      end;
+  
+      w_best_addr := project(bestRecs,TRANSFORM(doxie.Layout_Comp_Addresses,SELF:=LEFT,SELF:=[]));
+      w_best_name := project(w_best_addr,doxie.layout_NameDID);
+  
+      //hit RTV GW - experian - DATASET(iesp.motorvehicle.t_MotorVehicleReport2Record) 
+      rtv_raw := doxie.Comp_RealTime_Vehicles(in_did,w_best_addr,w_best_name).do;   
+      rtv     := SmartRollup.fn_smart_rollup_veh(rtv_raw,in_did[1].did);      
+      
+      //extract nested registrants portion and add outer vin to each record as identitifer
+      registrants := NORMALIZE(rtv, LEFT.registrants,
+                              TRANSFORM(rec_reg_seq,
+                                SELF.vin := LEFT.vehicleinfo.vin,
+                                SELF     := RIGHT));
+  
+      //add ordered sequence number before hitting ADL best, 
+      //can't add seq in normalize or it will group the sequence numbers
+      reg_w_seq := ITERATE(registrants,
+                          TRANSFORM(rec_reg_seq,
+                             SELF.seq := counter,
+                             SELF     := RIGHT)); 
+    
+      DidVille.Layout_Did_OutBatch prepare_layout(rec_reg_seq l) := TRANSFORM
+          SELF.title        := l.registrantinfo.name.prefix;
+          SELF.fname        := l.registrantinfo.name.first;
+          SELF.mname        := l.registrantinfo.name.middle;
+          SELF.lname        := l.registrantinfo.name.last;
+          SELF.suffix       := l.registrantinfo.name.suffix;
+          SELF.prim_range   := l.registrantinfo.address.streetnumber;
+          SELF.predir       := l.registrantinfo.address.streetpredirection;
+          SELF.prim_name    := l.registrantinfo.address.streetname;
+          SELF.addr_suffix  := l.registrantinfo.address.streetsuffix;
+          SELF.postdir      := l.registrantinfo.address.streetpostdirection;
+          SELF.unit_desig   := l.registrantinfo.address.unitdesignation;
+          SELF.sec_range    := l.registrantinfo.address.unitnumber;
+          SELF.p_city_name  := l.registrantinfo.address.city;
+          SELF.st           := l.registrantinfo.address.state;
+          SELF.z5           := l.registrantinfo.address.zip5;
+          SELF.zip4         := l.registrantinfo.address.zip4;
+          SELF              := l;
+          SELF              := [];
+      END;
+  
+      //prepare the layout for ADL_BEST DID call
+      ds_with_ADL_Layout := PROJECT(reg_w_seq,prepare_layout(LEFT));
+    
+      //we call ADL_BEST just to get the scored dids....not to get the best data
+      recsWithScoredDIDs := didville.did_service_common_function(ds_with_ADL_Layout
+                                                ,glb_flag          := mod_access.isValidGLB()
+                                                ,glb_purpose_value := mod_access.glb
+                                                ,appType           := mod_access.application_type
+                                                ,IndustryClass_val := mod_access.industry_class);
+
+      registrants_wdids := JOIN(reg_w_seq,recsWithScoredDIDs
+                               ,LEFT.seq = RIGHT.seq
+                               ,TRANSFORM(rec_reg_seq
+                               ,SELF.registrantinfo.uniqueid := INTFORMAT(RIGHT.did,12,1)
+                               ,SELF := LEFT)
+                               ,LIMIT(0),KEEP(1));
+                               
+      //Put inner registrants back into parent record
+      rtv_w_dids := DENORMALIZE(rtv, registrants_wdids,
+                                LEFT.vehicleinfo.vin = RIGHT.vin,
+                                GROUP,
+                                TRANSFORM(iesp.motorvehicle.t_MotorVehicleReport2Record,
+                                   SELF.registrants := project(ROWS(RIGHT),
+                                            iesp.motorvehicle.t_MotorVehicleReportRegistrant),
+                                   SELF:=LEFT));                  
+    RETURN rtv_w_dids;
+  END;
+
 	EXPORT vehicleRecsByDid(Ioptions in_mod,
 	                        DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)):= FUNCTION											
       vehicles_mod := module (project (in_mod, PersonReports.input.vehicles, opt)) end;
       vehicles_v2  := PersonReports.vehicle_records(in_did,vehicles_mod).vehicles_v2;
-      w_best_addr := project(bestRecs,TRANSFORM(doxie.Layout_Comp_Addresses,SELF:=LEFT,SELF:=[]));
-      w_best_name := project(w_best_addr,doxie.layout_NameDID);
       //hit RTV GW - experian
-      rtv := if(in_mod.IncludeRealTimeVehicles,
-                doxie.Comp_RealTime_Vehicles(in_did,w_best_addr,w_best_name).do);
+      rtv := if(in_mod.IncludeRealTimeVehicles,getRealTimeVehicles(in_mod, bestRecs));				
+				
       //combine all vehicle recs
       vehicle_raw := vehicles_v2 + rtv;
 
@@ -185,7 +262,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
 	
 	EXPORT uccRecsByDid(Ioptions in_mod):= FUNCTION
-      ucc_mod   := module (project (in_mod, PersonReports.input.ucc, opt)) end;
+      ucc_mod  := module (project (in_mod, PersonReports.input.ucc, opt)) end;
       ucc_raw  := PersonReports.ucc_records(in_did,ucc_mod).ucc_v2;
       //SmartRollup.fn_smart_rollup_ucc
       ucc_sorted := sort(ucc_raw, filingJurisdiction, originFilingNumber, -d2i(OriginFilingDate));
@@ -246,7 +323,7 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
     EXPORT studentRecsByDid(American_Student_Services.IParam.reportParams student_mod):= FUNCTION
       student_raw := American_Student_Services.Functions.get_report_recs(in_did,
                         student_mod,PersonSlimReport_Services.Constants.onlyCurrentStudentRecs);							 
-	  student_raw_sorted:= sort(student_raw, -d2i(firstreported), -iscurrent);
+      student_raw_sorted:= sort(student_raw, -d2i(firstreported), -iscurrent);
       student_duped := dedup(student_raw_sorted, firstreported.year, firstreported.month, 
                              firstreported.day, addressatcollege.state, addressatcollege.zip5);									 
       student_duped_sorted := sort(student_duped, -d2i(lastreported ));
@@ -287,9 +364,15 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
             LEFT.conditions.investigationagent <> RIGHT.conditions.investigationagent),
             TRANSFORM(iesp.accident.t_AccidentReportRecord,
                 SELF.accidentdate := pickLatestDate(LEFT.accidentdate,RIGHT.accidentdate),
-                SELF.accidentlocation.stateroadhighwayname := pickLongestStr(LEFT.accidentlocation.stateroadhighwayname,RIGHT.accidentlocation.stateroadhighwayname),
-                SELF.accidentlocation.ofintersectof := pickLongestStr(LEFT.accidentlocation.ofintersectof,RIGHT.accidentlocation.ofintersectof),
-                SELF.investigation.investigationagent.agentreportnumber := pickLongestStr(      LEFT.investigation.investigationagent.agentreportnumber,RIGHT.investigation.investigationagent.agentreportnumber),
+                SELF.accidentlocation.stateroadhighwayname := 
+                     pickLongestStr(LEFT.accidentlocation.stateroadhighwayname,
+                                    RIGHT.accidentlocation.stateroadhighwayname),
+                SELF.accidentlocation.ofintersectof := 
+                    pickLongestStr(LEFT.accidentlocation.ofintersectof,
+                                   RIGHT.accidentlocation.ofintersectof),
+                SELF.investigation.investigationagent.agentreportnumber := 
+                    pickLongestStr(LEFT.investigation.investigationagent.agentreportnumber,
+                                   RIGHT.investigation.investigationagent.agentreportnumber),
                 SELF := LEFT)	);
 		
     EXPORT accidentRecsByDid(PersonReports.input.accidents acc_mod):= FUNCTION
@@ -361,11 +444,14 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       RETURN voter_duped_sorted;
 	END;
 	
-	EXPORT pawRecsByDid(string6 ssn_mask):= FUNCTION
-       // standard restrictions - glb, dppa etc not enforced on PAW data					 
-       paw_raw := PersonReports.peopleatwork_records(in_did);
-       Suppress.MAC_Mask(paw_raw, recs_masked,ssn,none,true,false,,,,ssn_mask);
-       paw_raw_sorted:= sort(recs_masked,-businessids.ultid,-businessids.orgid,-businessids.seleid,
+	EXPORT pawRecsByDid(string6 ssnmask):= FUNCTION
+       // standard restrictions - glb, dppa etc not enforced on PAW data
+       param := Module(PersonReports.IParam.peopleatwork)
+          Export ssn_mask := (string)ssnmask;
+       End;					 
+       paw_raw := PersonReports.peopleatwork_records(in_did, param);
+       
+       paw_raw_sorted:= sort(paw_raw,-businessids.ultid,-businessids.orgid,-businessids.seleid,
                             -companyname,-title,-d2i(datelastseen),-d2i(datefirstseen));
        paw_rolled := rollup(paw_raw_sorted,
                             LEFT.businessids.ultid  = RIGHT.businessids.ultid and LEFT.businessids.orgid = RIGHT.businessids.orgid and

@@ -6,7 +6,7 @@ export BocaShell_BtSt_Function(grouped dataset(risk_indicators.layout_ciid_btst_
 													// optimization options
 													boolean includeRelativeInfo=true, boolean includeDLInfo=true, boolean includeVehInfo=true,
 													boolean includeDerogInfo = true, unsigned1 BSversion=1, boolean doScore=false, boolean nugen=false,
-													string50 DataRestriction=iid_constants.default_DataRestriction, unsigned8 inBSOptions = 0,
+													string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, unsigned8 inBSOptions = 0,
 													string50 DataPermission = risk_indicators.iid_constants.default_DataPermission,
 													dataset(Risk_Indicators.Layout_BocaShell_BtSt.input_Scores) input_Scores = dataset( [], Risk_Indicators.Layout_BocaShell_BtSt.input_Scores),
 													boolean NetAcuity_v4 = true, boolean ipid_only = false,
@@ -121,7 +121,7 @@ transform(risk_indicators.layout_bocashell_btst_out,
 		self := [];
 				));
 
-btst_wBusHdr := Boca_Shell_BtSt_Bus_Header(iid_btst, glb, dppa, DataRestriction, DataPermission);
+btst_wBusHdr := risk_indicators.Boca_Shell_BtSt_Bus_Header(iid_btst, glb, dppa, DataRestriction, DataPermission);
 //verify if did is populated that this works
 btst_wDidSum_original := JOIN(btst_wBusHdr, btst_wBusHdr,
 	left.bill_to_out.seq = right.ship_to_out.seq - 1,
@@ -308,7 +308,7 @@ btst_with3rdPrtyScores := join(btst_wDeeds_Addrs, input_Scores,
 //CBD 5.0 END //except relative changes below for it;
 
 //get relative info for cbd attributes
-relatives := getBTSTrelInfo(iid_btst);
+relatives := risk_indicators.getBTSTrelInfo(iid_btst);
 
 risk_indicators.layout_bocashell_btst_out addRels(wIPs2 le, relatives ri) := TRANSFORM
 	self.eddo.btst_are_relatives := ri.billto_shipto_are_relative;
@@ -375,7 +375,7 @@ wRels2 := group(sort(iid_btstWithNeg1s, bill_to_out.seq),bill_to_out.seq);
 
 final_tmp := if(bsVersion>=3, wRels2, wIPs2);
 
-risk_indicators.layout_bocashell_btst_out addBTSTInfo (layout_bocashell_btst_out l, layout_bocashell_btst_out r) := transform
+risk_indicators.layout_bocashell_btst_out addBTSTInfo (risk_indicators.layout_bocashell_btst_out l, risk_indicators.layout_bocashell_btst_out r) := transform
 	//self.btst_closest_association := l.btst_closest_association;
 	self.btst_did_summary := if(l.btst_did_summary > 0, l.btst_did_summary, r.btst_did_summary);	
 	UseRight := if(self.btst_did_summary >= 4, true, false);

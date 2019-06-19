@@ -1,9 +1,9 @@
-import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr;
+﻿import header, ut, avm_v2, fcra, header_quick, doxie_build, mdr, risk_indicators;
 
 export Address_Table_v4(boolean isFCRA) := function
 	
-h_full := if(isFCRA,doxie_build.file_FCRA_header_building,doxie_build.file_header_building)(trim(prim_name)<>'' and length(trim(zip))=5 and (integer)zip<>0 and ~iid_constants.filtered_source(src, st));
-h_quick := project( header_quick.file_header_quick(trim(prim_name)<>'' and length(trim(zip))=5 and (integer)zip<>0 and ~iid_constants.filtered_source(src, st)), 
+h_full := if(isFCRA,doxie_build.file_FCRA_header_building,doxie_build.file_header_building)(trim(prim_name)<>'' and length(trim(zip))=5 and (integer)zip<>0 and ~risk_indicators.iid_constants.filtered_source(src, st));
+h_quick := project( header_quick.file_header_quick(trim(prim_name)<>'' and length(trim(zip))=5 and (integer)zip<>0 and ~risk_indicators.iid_constants.filtered_source(src, st)), 
 													transform(header.Layout_Header, self.src := IF(left.src in ['QH', 'WH'], MDR.sourceTools.src_Equifax, left.src), self := left));
 headerprod_building := ungroup(h_full + h_quick);
 
@@ -21,10 +21,10 @@ valid_header := IF(isFCRA, valid_header_corrected, valid_header_uncorrected);
 /* ****************************************************
  * Corrections have been applied - Continue as normal *
  ****************************************************** */
-combo := Address_Table_Function(valid_header);				// full header
-eq := Address_Table_Function(valid_header(src not in [mdr.sourceTools.src_Experian_Credit_Header, mdr.sourceTools.src_TU_CreditHeader]));	// header for use in equifax products
-en := Address_Table_Function(valid_header(src not in [mdr.sourceTools.src_Equifax, mdr.sourceTools.src_TU_CreditHeader]));	// header for use in experian products
-tn := Address_Table_Function(valid_header(src not in [mdr.sourceTools.src_Equifax, mdr.sourceTools.src_Experian_Credit_Header]));	// header for use in transunion products
+combo := risk_indicators.Address_Table_Function(valid_header);				// full header
+eq := risk_indicators.Address_Table_Function(valid_header(src not in [mdr.sourceTools.src_Experian_Credit_Header, mdr.sourceTools.src_TU_CreditHeader]));	// header for use in equifax products
+en := risk_indicators.Address_Table_Function(valid_header(src not in [mdr.sourceTools.src_Equifax, mdr.sourceTools.src_TU_CreditHeader]));	// header for use in experian products
+tn := risk_indicators.Address_Table_Function(valid_header(src not in [mdr.sourceTools.src_Equifax, mdr.sourceTools.src_Experian_Credit_Header]));	// header for use in transunion products
 
 layout_counts := record
 	unsigned2 ssn_ct;

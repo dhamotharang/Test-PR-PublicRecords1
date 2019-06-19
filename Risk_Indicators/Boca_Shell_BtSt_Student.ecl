@@ -1,10 +1,10 @@
-/*
+﻿/*
 Used in the BTST shell
 Common School Link (btst_schools_in_common) - Number of unique schools in intersection of BT schools and ST schools
 */
-import american_student_list, Riskwise, AlloyMedia_student_list, Business_Risk;
+import american_student_list, Riskwise, AlloyMedia_student_list, Business_Risk, risk_indicators;
 
-export Boca_Shell_BtSt_Student(GROUPED DATASET(Layout_Boca_Shell) student_info) := FUNCTION
+export Boca_Shell_BtSt_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell) student_info) := FUNCTION
 		
 	btst_student:= record
 		string8 bt_date_first_seen ;
@@ -23,7 +23,7 @@ export Boca_Shell_BtSt_Student(GROUPED DATASET(Layout_Boca_Shell) student_info) 
 	student_info_ungrpd := ungroup(student_info);
 	
 	//history date was already applied at the boca shell level
-	btst_student splitBTST(Layout_Boca_Shell l, integer c) := transform
+	btst_student splitBTST(risk_indicators.Layout_Boca_Shell l, integer c) := transform
 		bt := if(c = 1, true, false);
 		self.bt_seq := if(bt, l.seq, 0);
 		self.bt_date_first_seen := if(bt, l.student.date_first_seen, '0');

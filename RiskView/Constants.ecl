@@ -11,7 +11,7 @@ export batch := 'batch';
 export online := 'online';
 export no_riskview_report := false; //default to false as don't want to run the report
 
-export valid_attributes := ['riskviewattrv5'];
+export valid_attributes := ['riskviewattrv5', 'insurview2attr'];
 
 //student
 export Public_schl := 'PUBLIC';

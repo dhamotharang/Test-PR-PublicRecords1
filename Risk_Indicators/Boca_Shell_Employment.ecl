@@ -1,7 +1,7 @@
-﻿import _Control, paw, riskwise, ut, mdr, fcra;
+﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Employment(GROUPED DATASET(layout_bocashell_neutral) clam_pre_employment, 
+export Boca_Shell_Employment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_employment, 
 															boolean isFCRA, 
 															boolean isPreScreen, 
 															integer bsVersion) := FUNCTION
@@ -23,7 +23,7 @@ patw := record
 // last seen date was removed from the final layout 12/21/2010, but still need it for the rollups
 	unsigned4 Last_seen_date := 0;
 	
-	layouts.layout_employment;
+	risk_indicators.layouts.layout_employment;
 	
 end;
 
@@ -134,7 +134,7 @@ pawfile_raw_FCRA_roxie := join(clam_pre_employment, paw.Key_DID_FCRA,
 						left.did<>0 and 
 						keyed(left.did=right.did) 
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.dt_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.dt_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						~(isPreScreen and right.source in restricted_prescreen_sources) and
 						(right.from_hdr='N' or bsVersion < 50) and  // if from_hdr='Y', this means the PAW association between consumer and business is a shared address only, filter those out for shell 5.0 and higher
 						(string100)right.contact_id not in left.PAW_correct_record_id,  // don't include any records from raw data that have been corrected
@@ -147,7 +147,7 @@ pawfile_raw_FCRA_thor := join(distribute(clam_pre_employment, hash64(did)),
 						left.did<>0 and 
 						left.did=right.did
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.dt_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.dt_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						~(isPreScreen and right.source in restricted_prescreen_sources) and
 						(right.from_hdr='N' or bsVersion < 50) and  // if from_hdr='Y', this means the PAW association between consumer and business is a shared address only, filter those out for shell 5.0 and higher
 						(string100)right.contact_id not in left.PAW_correct_record_id,  // don't include any records from raw data that have been corrected
@@ -186,7 +186,7 @@ END;
 paw_corrections_FCRA_roxie := join(clam_pre_employment, fcra.Key_Override_PAW_ffid,
 						keyed(right.flag_file_id in left.PAW_correct_ffid) 
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.dt_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.dt_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						(right.from_hdr='N' or bsVersion < 50) and
 						~(isPreScreen and right.source in restricted_prescreen_sources),
 						getPAWCorrections(LEFT, RIGHT),
@@ -195,7 +195,7 @@ paw_corrections_FCRA_roxie := join(clam_pre_employment, fcra.Key_Override_PAW_ff
 paw_corrections_FCRA_thor := join(clam_pre_employment, pull(fcra.Key_Override_PAW_ffid),
 						right.flag_file_id in left.PAW_correct_ffid
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate and
-						(ut.daysapart(RIGHT.dt_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+						(ut.daysapart(RIGHT.dt_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 						(right.from_hdr='N' or bsVersion < 50) and
 						~(isPreScreen and right.source in restricted_prescreen_sources),
 						getPAWCorrections(LEFT, RIGHT), keep(1000), LOCAL, ALL);			

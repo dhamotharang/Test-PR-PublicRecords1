@@ -4,8 +4,11 @@ in_layout := BatchServices.Layouts.RTPhones.rec_batch_RTPhones_input;
 
 export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 									dataset(in_layout) f_in):= FUNCTION
+                  
 	  doxie.MAC_Header_Field_Declare()
-		GM := AutoStandardI.GlobalModule();							
+		GM := AutoStandardI.GlobalModule();		
+    mod_access := doxie.compliance.GetGlobalDataAccessModule();
+    
   	flat_out := BatchServices.Layouts.RTPhones.rec_output_internal;
 		dataset(doxie.layout_pp_raw_common) call_phones_macro(dataset(doxie.layout_references) dids,
 																													unsigned1 GLB_Purpose,
@@ -39,9 +42,8 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 			dids := if (Lout.resultcount >= in_mod.maxResults,dataset([],doxie.layout_references_hh),AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tempmod));
   		data_restriction_mask := doxie.DataRestriction.fixed_DRM;
 	  	IncludeFullPhonesPlus := true;
-  		ds_pp := call_phones_macro(dids, GLB_Purpose, DPPA_Purpose, industry_class_value,IncludeFullPhonesPlus, company_name,data_restriction_mask);
-			doxie.MAC_Get_GLB_DPPA_Qsent(dids, ds_qsent, true,,
-															 GLB_Purpose, DPPA_Purpose, industry_class_value, company_name);
+  		ds_pp := call_phones_macro(dids, mod_access.glb, mod_access.dppa, mod_access.industry_class, IncludeFullPhonesPlus, company_name, mod_access.DataRestrictionMask);
+			doxie.MAC_Get_GLB_DPPA_Qsent(dids, ds_qsent, mod_access, true,, company_name);
 			unsigned1 lengthSSN := length(trim(SSN_value));
 			UseAllDids := lengthSSN > 0; // if there is a ssn then use all dids
 			gong_dids := if (UseAllDids, dids, dataset([{(unsigned6)did_value}],doxie.layout_references_hh));
@@ -106,7 +108,11 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 			self.results := ds_sort_results; 
 			self.resultcount := count(ds_sort_results);
 			self := Lout;
+     
 		end;
-		ds_response := project( f_in, SearchLocalTrans(left));
+		ds_response := project(f_in, SearchLocalTrans(left));
+    
+    doxie.compliance.logSoldToSources(ds_response.results, mod_access);
+    
 		return ds_response;
 END;

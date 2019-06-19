@@ -1,38 +1,38 @@
 ﻿IMPORT doxie, Doxie_Raw, iesp, Gateway, MDR, Phones, STD;
-EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones,
-	                      DATASET(Gateway.Layouts.Config) dGateways     = DATASET([],Gateway.Layouts.Config),
-                       PhoneFinder_Services.iParam.ReportParams inMod)
-											           := FUNCTION
 
+EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones,
+	                     DATASET(Gateway.Layouts.Config) dGateways = DATASET([],Gateway.Layouts.Config),
+                       PhoneFinder_Services.iParam.SearchParams inMod) :=
+FUNCTION
   tempMod := MODULE(Phones.IParam.BatchParams)
-		EXPORT UNSIGNED max_age_days := PhoneFinder_Services.Constants.LERG6_LastActivityThreshold; 
+		EXPORT UNSIGNED	max_age_days := PhoneFinder_Services.Constants.LERG6_LastActivityThreshold;
 	END;
 	
-	dsPhonesAttr_recs:= Phones.GetPhoneMetadata_wLIDB(dInPhones, tempMod);
+	dsPhonesAttr_recs:= Phones.GetPhoneMetadata_wLERG6(dInPhones, tempMod);
 																														
- Doxie_Raw.PhonesPlus_Layouts.t_QSentCISOCAddress_out addr_format(string contact_address1,string contact_address2,string contact_city,string contact_state,string contact_zip) := TRANSFORM
-				
-				
-				string s3 := IF(contact_zip<>'',contact_zip
-		         ,IF(contact_state<>'',contact_state
-          ,IF(contact_city<>'',contact_city,'')));
-          addr1 := doxie.CleanAddress182(contact_address1,s3);
+  Doxie_Raw.PhonesPlus_Layouts.t_QSentCISOCAddress_out addr_format(string contact_address1,string contact_address2,string contact_city,string contact_state,string contact_zip) :=
+  TRANSFORM
+    string s3 := MAP(contact_zip <> ''   => contact_zip,
+                     contact_state <> '' => contact_state,
+                     contact_city <> ''  => contact_city,
+                     '');
+    
+    addr1 := doxie.CleanAddress182(contact_address1, s3);
 
-				SELF.StreetNumber := addr1[1..10];
-				SELF.StreetPreDirection := addr1[11..12];
-				SELF.StreetName := addr1[13..40];
-				SELF.Streetsuffix := addr1[41..44];			
-				SELF.Streetpostdirection := addr1[45..46];
-				SELF.unitdesignation := addr1[47..56];
-				SELF.unitNumber := addr1[57..64];
-				SELF.city := contact_city;
-				SELF.state := contact_state;
-				SELF.zip5 := contact_zip;
-				SELF.zip4 := '';
-				SELF.streetAddress1 :=contact_address1;
-				SELF.streetAddress2 := contact_address2;
-				
-  end;
+    SELF.StreetNumber := addr1[1..10];
+    SELF.StreetPreDirection := addr1[11..12];
+    SELF.StreetName := addr1[13..40];
+    SELF.Streetsuffix := addr1[41..44];			
+    SELF.Streetpostdirection := addr1[45..46];
+    SELF.unitdesignation := addr1[47..56];
+    SELF.unitNumber := addr1[57..64];
+    SELF.city := contact_city;
+    SELF.state := contact_state;
+    SELF.zip5 := contact_zip;
+    SELF.zip4 := '';
+    SELF.streetAddress1 :=contact_address1;
+    SELF.streetAddress2 := contact_address2;
+  END;
 
   dsPhonesAttrRecsGrp := GROUP(SORT(dsPhonesAttr_recs, acctno, phone, carrier_city = '', contact_name = ''), acctno, phone);
 
@@ -72,30 +72,31 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
 	
 	 // call accudata cname for callerid and listing name
 	dPrimaryPhones := DEDUP(SORT(PROJECT(dInPhones,TRANSFORM(Phones.Layouts.PhoneAcctno, SELF.phone := LEFT.phoneno, SELF.acctno := LEFT.acctno)),
-	                      phone, acctno),
-												      phone);		
+	                              phone, acctno),
+												  phone);
+  
 	gateway_cfg := dGateways(Gateway.Configuration.IsAccuDataCNAM(servicename))[1];
- gateway_URL := gateway_cfg.url;	 
+  gateway_URL := gateway_cfg.url;	 
 	boolean makeGatewayCall := gateway_URL != '';
+
 	dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones,gateway_cfg,inMod.UseAccuData_CNAM AND makeGatewayCall);
 	
 	PhoneFinder_Services.Layouts.PhoneFinder.Final getaccu_data(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
-	                                                            iesp.accudata_accuname.t_AccudataCnamResponseEx r) := TRANSFORM
-	
-	callerName	:= STD.Str.ToUpperCase(r.response.AccudataReport.Reply.CallingName);
-	errorMessage := IF(r.response._header.Message<>'',r.response._header.Message,r.response.AccudataReport.ErrorMessage);
- SELF.RealTimePhone_Ext.GenericName := callerName;
- SELF.RealTimePhone_Ext.ListingName := callerName;
-	SELF.subj_phone_type_new := IF(errorMessage='',MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2,''); // royalty count
-	SELF := l;
-	
-	END; 
- dDetailedPhoneInfo	  := IF (EXISTS(dAccuDataCNAM), 
-                         JOIN(dDetailedCarrierInfo, dAccuDataCNAM,
-                         LEFT.phone    = RIGHT.response.AccudataReport.Phone,
-												             getaccu_data(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1)),
-                         dDetailedCarrierInfo);
-                                     
+	                                                            iesp.accudata_accuname.t_AccudataCnamResponseEx r) :=
+  TRANSFORM
+    callerName	:= STD.Str.ToUpperCase(r.response.AccudataReport.Reply.CallingName);
+    errorMessage := IF(r.response._header.Message<>'',r.response._header.Message,r.response.AccudataReport.ErrorMessage);
+    SELF.RealTimePhone_Ext.GenericName := callerName;
+    SELF.RealTimePhone_Ext.ListingName := callerName;
+    SELF.subj_phone_type_new := IF(errorMessage='',MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2,''); // royalty count
+    SELF := l;
+	END;
+
+  dDetailedPhoneInfo := IF (EXISTS(dAccuDataCNAM), 
+                            JOIN(dDetailedCarrierInfo, dAccuDataCNAM,
+                                  LEFT.phone = RIGHT.response.AccudataReport.Phone,
+												          getaccu_data(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1)),
+                            dDetailedCarrierInfo);
 
 	RETURN dDetailedPhoneInfo;
-	END;
+END;

@@ -1,6 +1,6 @@
-﻿import prof_licenseV2, riskwise, ut, Prof_License_Mari;
+﻿import prof_licenseV2, riskwise, ut, Prof_License_Mari, risk_indicators;
 
-export Boca_Shell_Proflic(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsVersion) := FUNCTION
+export Boca_Shell_Proflic(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsVersion) := FUNCTION
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 
@@ -50,8 +50,8 @@ PL_Plus_temp PL_nonFCRA(ids_only le, key_did rt) := transform
 	self.proflic_source := if(hit, 'PL', '');
 	self.proflic_build_date := proflic_build_date;
 	self.license_number := if(hit, rt.license_number, '');		
-	self.jobCategory := if(hit, getPLinfo(rt.license_type).jobCategory, '');
-	self.PLcategory := if(hit, getPLinfo(rt.license_type).PLcategory, '');
+	self.jobCategory := if(hit, risk_indicators.getPLinfo(rt.license_type).jobCategory, '');
+	self.PLcategory := if(hit, risk_indicators.getPLinfo(rt.license_type).PLcategory, '');
 	self.license_number_cleaned := if(hit, Risk_Indicators.iid_constants.stripLeadingZeros(rt.license_number), '');	
   self.tmp_MostRecent := self.date_most_recent;
 	self := le;
@@ -74,7 +74,7 @@ mari_recs := join (ids_only, mari_data,
 		left.seq=right.seq,
 		transform (PL_Plus_temp, 			
 			hit := trim(right.license_nbr)!='';	// check to see that we have a good record
-			myGetDate := iid_constants.myGetDate(left.historydate);
+			myGetDate := risk_indicators.iid_constants.myGetDate(left.historydate);
 			self.prolic_key := right.license_nbr;
 			self.date_first_seen := if(hit, (string)right.date_first_seen, '');
 			self.professional_license_flag := hit;
@@ -98,7 +98,7 @@ ingenix_recs := join (ids_only, ingenix_data,
 		left.seq=right.seq,
 		transform (PL_Plus_temp, 			
 			hit := right.provider_license_count!=0;	// check to see that we have a good record
-			myGetDate := iid_constants.myGetDate(left.historydate);
+			myGetDate := risk_indicators.iid_constants.myGetDate(left.historydate);
 			self.prolic_key := (string)right.provider_license_count;  //  only have 1 record returned from ingenix, just use the count here
 			self.date_first_seen := if(hit, (string)right.provider_date_first_reported, '');
 			self.professional_license_flag := hit;

@@ -5,17 +5,19 @@ out_rec := iesp.peoplereport.t_PeopleReportIndividual;
 // accepts atmost one DID, actually
 EXPORT out_rec FinderReport (
   dataset (doxie.layout_references) dids,
-  PersonReports.input._finderreport param,
+  PersonReports.IParam._finderreport mod_finder,
   boolean IsFCRA = false) := FUNCTION
 
-  //Convert to the old _report style module:
-  mod_access := $.IParam.MAC_CreateIDataAccessReportModule(param);
-  mod_finder := MODULE (PROJECT (param, $.IParam._finderreport), mod_access)
+  //Convert to the old _report style module: $.input._finderreport
+  param := MODULE (PROJECT (mod_finder, $.IParam.old_finderreport))
+    $.input.mac_copy_report_fields(mod_finder);
   END;
+
+  mod_access := PROJECT (mod_finder, doxie.IDataAccess);
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
-  isCNSMR := param.IndustryClass = D2C.Constants.CNSMR;
+  isCNSMR := mod_access.isConsumer();
   // person records 
   pers := Person_records (dids, module (project (param, input.personal, opt)) end, IsFCRA);
 
@@ -52,7 +54,7 @@ EXPORT out_rec FinderReport (
   // TODO: All "counts" logic must be eventually moved to corresponding data attribute(s),
   // this service must not know anything about underlying data.
   // -----------------------------------------------------------------------
-  cnt := counts (dids, project (param, input.count_param, opt), IsFCRA);
+  cnt := counts (dids, project (param, $.input.count_param, OPT), IsFCRA);
 
   // Combine all them together
   out_rec Format () := TRANSFORM

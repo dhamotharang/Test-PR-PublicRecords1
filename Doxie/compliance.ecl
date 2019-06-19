@@ -228,10 +228,13 @@ EXPORT compliance := MODULE
     // to exclude utility sources:
     EXPORT isUtilityRestricted(string _industry) := _industry = 'UTILI' OR _industry='DRMKT';
 
+  // NOTE: CCPA logging will likely be deprecated. Just commenting the calls below out for now, pending final decision for removal.
+
   // CCPA logging
   EXPORT logSoldToSources(ds_in, mod_access, did_field='did') := MACRO
-    doxie.log.logSoldToSources(ds_in, mod_access, did_field);   
-  ENDMACRO;
+    #uniquename(dummy); %dummy% := 0; // just to make ECL compiler happy.
+    //doxie.log.logSoldToSources(ds_in, mod_access, did_field);   
+  ENDMACRO; 
 
   // CCPA logging
   EXPORT logSoldToTransaction(mod_access, env_flag = data_services.data_env.iNonFCRA) := FUNCTIONMACRO

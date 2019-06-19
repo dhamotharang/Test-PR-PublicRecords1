@@ -1,7 +1,7 @@
-﻿import _Control, watercraft, riskwise, ut, fcra;
+﻿import _Control, watercraft, riskwise, ut, fcra, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Watercraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, boolean isPreScreen, integer bsVersion) := FUNCTION
+export Boca_Shell_Watercraft_Hist_FCRA(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, boolean isPreScreen, integer bsVersion) := FUNCTION
 
 restrictedStates := fcra.compliance.watercrafts.restricted_states;	// need consumer permission
 string8 watercraft_build_date := Risk_Indicators.get_Build_date('watercraft_build_version');
@@ -10,7 +10,7 @@ checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days
 
 key_did := watercraft.key_watercraft_did (true); //fcra-version
 riskwise.layouts.Layout_Watercraft_Plus watercraft_FCRA(ids_only le, key_did ri) := transform
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.watercraft_key := ri.watercraft_key;
 	self.sequence_key := ri.sequence_key;
 	lenDate := length(trim(ri.sequence_key));

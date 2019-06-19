@@ -1,4 +1,4 @@
-/*
+﻿/*
 Used in the BTST shell
 Common Email Link - btst_emails_in_common - Number of unique emails in intersection of BT emails and ST emails
 Common e-mail Num Free - btst_free_emails_in_common - Number of unique Free emails in intersection of BT emails and ST emails
@@ -7,7 +7,7 @@ Common e-mail Num EDU - btst_edu_emails_in_common - Number of unique EDU emails 
 Common e-mail Num Corp - btst_corp_emails_in_common - Number of unique Corp emails in intersection of BT emails and ST emails
 */
 
-import email_data, riskwise, ut, mdr;
+import email_data, riskwise, ut, mdr, risk_indicators;
 
 export Boca_Shell_BtSt_Email(grouped dataset(Risk_Indicators.layout_ciid_btst_Output) input) := FUNCTION
 

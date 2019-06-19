@@ -105,17 +105,28 @@ MODULE
 														isPhone7Search    = FALSE
 													) :=
 	FUNCTIONMACRO
-		IMPORT Autokey_Batch,AutokeyB2_batch,Data_Services,Header,MDR,Phones,Phonesplus,Phonesplus_v2,ut;
-
+		IMPORT Autokey_Batch,AutokeyB2_batch,Data_Services,Doxie, Header,MDR,Phones,Phonesplus,Phonesplus_v2,ut, Suppress;
+		
 		l_BatchIn := Phones.Layouts.BatchIn;
 		l_Common  := Phones.Layouts.PhonesCommon;
 
 		modpenalty := Phones.GetPenalty;
-
-		// BOOLEAN variables for phone sources
-		BOOLEAN isPhonesPlus   := phoneSrc = MDR.SourceTools.src_Phones_Plus;
-		BOOLEAN isLastResort   := phoneSrc = MDR.SourceTools.src_wired_Assets_Royalty;
-		BOOLEAN isInHouseQSent := phoneSrc = MDR.SourceTools.src_InHouse_QSent;
+    
+    mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+        EXPORT UNSIGNED1 dppa := inAKMod.DPPAPurpose;
+		    EXPORT UNSIGNED1 glb :=  inAKMod.GLBPurpose;
+		    EXPORT STRING5   industry_class := inAKMod.IndustryClass;
+		    EXPORT STRING32  application_type := inAKMod.ApplicationType;
+		    EXPORT STRING    ssn_mask := inAKMod.SSNMask;
+		    EXPORT UNSIGNED1 dob_mask := (UNSIGNED)inAKMod.DOBMask;
+		    EXPORT STRING    transaction_id := inAKMod.TransactionID;
+    
+    END;
+     
+ 	// BOOLEAN variables for phone sources
+   		BOOLEAN isPhonesPlus   := phoneSrc = MDR.SourceTools.src_Phones_Plus;
+   		BOOLEAN isLastResort   := phoneSrc = MDR.SourceTools.src_wired_Assets_Royalty;
+   		BOOLEAN isInHouseQSent := phoneSrc = MDR.SourceTools.src_InHouse_QSent;
 
 		// doOnlyPhoneSearch - check to search by only phone number or not
 		#IF(doPhoneOnlySearch)
@@ -152,11 +163,13 @@ MODULE
 			l_BatchIn batch_in;
 			STRING120 listed_name;
 			BOOLEAN   isDeepDive := FALSE;
+      UNSIGNED8 global_sid := 0;
+	    UNSIGNED8 record_sid := 0;
 		END;
-
+    
 		// Search by DID
 		#IF(~doPhoneOnlySearch)
-			rPhones_Layout tGetByDID(dInReformat le,keyDID	ri) :=
+			rPhones_Layout tGetByDID(dInReformat le,RECORDOF(keyDID)	ri) :=
 			TRANSFORM
 				SELF.glb_dppa_flag :=
 				                   #IF(isPhonesPlus or isLastResort)
@@ -180,6 +193,10 @@ MODULE
 				SELF.listed_name   := IF(ri.origname != '',ri.origname,ri.company);
 				SELF.isDeepDive    := TRUE;
 				SELF.batch_in      := le;
+        #IF(isInHouseQSent)
+        SELF.global_sid    := ri.global_sid;
+        SELF.record_sid    := ri.record_sid;
+        #END
 				SELF               := ri;
 			END;
 
@@ -188,6 +205,7 @@ MODULE
 										KEYED(LEFT.did = RIGHT.l_did),
 										tGetByDID(LEFT,RIGHT),
 										LIMIT(ut.Limits.PHONE_PER_PERSON,SKIP));
+                    
 		#END
 
 		// Autokey Fake DIDs
@@ -219,7 +237,7 @@ MODULE
 		#END
 
 		// JOIN to the payload key to get the phone data
-		rPhones_Layout tGetByFDID(dFDIDsAll le,keyFDID ri) :=
+		rPhones_Layout tGetByFDID(dFDIDsAll le, RECORDOF(keyFDID) ri) :=
 		TRANSFORM
 			SELF.batch_in.acctno := le.acctno;
 			SELF.vendor          := ri.vendor;
@@ -243,6 +261,10 @@ MODULE
 													  ri.glb_dppa_flag;
 													 #END
 			SELF.listed_name     := IF(ri.origname != '',ri.origname,ri.company);
+     #IF(isInHouseQSent)
+        SELF.global_sid    := ri.global_sid;
+        SELF.record_sid    := ri.record_sid;
+        #END
 			SELF                 := ri;
 			SELF                 := [];
 		END;
@@ -252,7 +274,7 @@ MODULE
 													KEYED(LEFT.id = RIGHT.fdid),
 													tGetByFDID(LEFT,RIGHT),
 													LIMIT(ut.Limits.PHONE_PER_PERSON,SKIP));
-
+                           
 		// Append input data to the phone recs for use in penalty calculations
 		rPhones_Layout tAppendInputData(dInReformat le,dFDIDsPayload ri) :=
 		TRANSFORM
@@ -274,7 +296,9 @@ MODULE
 										PROJECT(dInReformat,TRANSFORM(rPhones_Layout,SELF.batch_in := LEFT,SELF := [])),
 										dPayloadWInput);
 		#ELSE
-			dPPRecs := IF(skipAutoKeys,dDIDs,dDIDs + dPayloadWInput);
+			dPPRecs_pre := IF(skipAutoKeys,dDIDs,dDIDs + dPayloadWInput);
+      dPPRecs := Suppress.MAC_SuppressSource(dPPRecs_pre, mod_access);  
+      
 		#END
 
 		// Filter records below the confidence score threshold
@@ -369,6 +393,13 @@ MODULE
 			OUTPUT(dPPPenalty,NAMED('dPPPenalty'),EXTEND);
 		#END
 
+
+     
+     #IF(~doPhoneOnlySearch)
+         doxie.compliance.logSoldToSources (dPPRecs, mod_access);
+     #END;
+
+    
 		RETURN dPPPenaltyFilter;
 	ENDMACRO;
 

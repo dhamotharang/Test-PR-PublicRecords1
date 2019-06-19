@@ -1,6 +1,6 @@
 ﻿import FCRA, Risk_Indicators, RiskView, ut;
 
-export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids, 
+export Boca_Shell_Derogs_FCRA (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, 
 	integer bsVersion, unsigned8 BSOptions=0, 
 	boolean IncludeLnJ = false,
 	GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext,
@@ -9,7 +9,7 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids,
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 
 	checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
-	insurance_fcra_filter :=  (BSOptions & iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_fcra_filter :=  (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
 
   // Pull all derog corrections; filter by corresponding fcra-compliance
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus fetch_corrections(ids le) := TRANSFORM

@@ -1,17 +1,17 @@
-Import Impulse_Email, ut, thrive, riskwise, mdr;
+﻿Import Impulse_Email, ut, thrive, riskwise, mdr, risk_indicators;
 
-export Boca_Shell_Impulse(GROUPED DATASET(layout_bocashell_neutral) ids_wide, integer bsversion) := FUNCTION
+export Boca_Shell_Impulse(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, integer bsversion) := FUNCTION
 
 Layout_Impulse := RECORD
 	unsigned4 seq;
 	unsigned3 historydate;
-	Layouts.Layout_Impulse;
+	risk_indicators.Layouts.Layout_Impulse;
 	string50 siteidsrc;	// internal
 END;
 
 
 Layout_Impulse addImpulse(ids_wide le, Impulse_Email.Key_Impulse_DID ri) := transform
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := ri.did<>0;
 	self.count := (integer)hit;
 	self.first_seen_date := (unsigned)stringlib.stringfilterout(ri.created[1..10],'-');
@@ -43,7 +43,7 @@ key_main := thrive.keys().did.qa;
 Layout_Impulse append_thrive(ids_wide le, key_main rt) := transform
 	self.seq := le.seq;
 		
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	hit := rt.did<>0;
 	self.count := (integer)hit;
 	dt_first_seen := rt.dt_first_seen;
@@ -73,7 +73,7 @@ end;
 wThrive := join (ids_wide, key_main,
 		left.did<>0 and
     keyed (left.did = right.did) and
-		((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) AND
+		((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) AND
 		right.src = mdr.sourceTools.src_Thrive_PD, 
 		// and ((string)right.persistent_record_id not in main_rids),  // don't need to worry about corrections in nonFCRA
 		append_thrive(left, right),
@@ -84,7 +84,7 @@ paydayrecords := if(bsversion>=50, ungroup(wImpulse + wThrive), ungroup(wImpulse
 sorted_payday := group(sort(paydayrecords,seq, siteid, -last_seen_date),seq);
 
 Layout_Impulse rollImpulse(Layout_Impulse le, Layout_Impulse ri) := transform
-	myGetDate := iid_constants.myGetDate(le.historydate);
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.count := le.count + ri.count;
 	self.first_seen_date := ut.Min2(le.first_seen_date,ri.first_seen_date);
 	self.last_seen_date := if(max(le.last_seen_date,ri.last_seen_date) > (unsigned)myGetDate, (unsigned)myGetDate, max(le.last_seen_date,ri.last_seen_date));

@@ -83,12 +83,13 @@ EXPORT AssetReportServiceFCRA () := MACRO
   // options := options_esdl;  
 
   // define search parameters; in "pure" ESDL mode this must be replaced with a module created from XML input
-   globals := AutoStandardI.GlobalModule();
-  search_mod := module (project (globals, PersonReports.input._didsearch, opt))
+  gm := AutoStandardI.GlobalModule();
+  search_mod := module (project (gm, PersonReports.IParam._didsearch, opt))
   end;
 
   // Now define all report parameters
-  report_mod := module (options)
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(gm);
+  report_mod := module (options, mod_access)
     // those are not yet in the report (so far report is for project July only)
     export boolean include_alsofound := false;
     export boolean include_motorvehicles := false;
@@ -99,16 +100,7 @@ EXPORT AssetReportServiceFCRA () := MACRO
     export boolean include_peopleatwork := false;
 
     // Do all required translations here
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-    export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-    export string DataPermissionMask := search_mod.dataPermissionMask;
-    export string DataRestrictionMask := globals.dataRestrictionMask;
-    export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
-    export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
-    //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-    export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
     export integer1 non_subject_suppression := options_esdl.non_subject_suppression;
     export boolean bk_suppress_withdrawn := options_esdl.bk_suppress_withdrawn;
     export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.Options.FFDOptionsMask);
@@ -119,7 +111,7 @@ EXPORT AssetReportServiceFCRA () := MACRO
   dids := dataset ([(unsigned6) search_mod.did], doxie.layout_references);
 
   // main records
-  asset_mod := module (project (report_mod, PersonReports.input._assetreport, opt)) end;
+  asset_mod := module (project (report_mod, PersonReports.IParam._assetreport, opt)) end;
   recs_combined := PersonReports.AssetReport(dids, asset_mod, TRUE);
   recs := recs_combined.Records[1];  // single row coming as dataset here
 //  output (recs);

@@ -1,7 +1,7 @@
-﻿import _Control, avm_v2, census_data, FCRA, riskwise, ut, codes;
+﻿import _Control, avm_v2, census_data, FCRA, riskwise, ut, codes, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_AVM_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := FUNCTION
+export Boca_Shell_AVM_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
 
 // full_history_date := risk_indicators.iid_constants.full_history_date(history_date);
 
@@ -12,8 +12,8 @@ Layout_AVM := RECORD
 END;
 
 Layout_AVM_Plus := RECORD
-	Layout_Address_Information Address_History_1;
-	Layout_Address_Information Address_History_2;
+	risk_indicators.Layout_Address_Information Address_History_1;
+	risk_indicators.Layout_Address_Information Address_History_2;
 	Layout_AVM AVM;
 END;
 
@@ -39,7 +39,7 @@ avm_corr_thor := join(ids_wide, pull(FCRA.Key_Override_AVM_FFID),
 #END
 
 Layout_AVM_Plus add_AVM(ids_wide le, avm_v2.Key_AVM_Address_FCRA ri) := transform
-	full_history_date := iid_constants.full_history_date(le.historydate);
+	full_history_date := risk_indicators.iid_constants.full_history_date(le.historydate);
 
 	AVM_V2.MOD_get_AVM_from_History.MAC_get_AVM(ri, full_history_date, avm_record);	// updated version to return full history before history date 
 	
@@ -115,7 +115,7 @@ avms1 := rollup(all_avms1, true, transform(Layout_AVM_Plus, self := left));
 
 
 Layout_AVM_Plus add_AVM2(Layout_AVM_Plus le, avm_v2.Key_AVM_Address_FCRA ri) := transform
-	full_history_date := iid_constants.full_history_date(le.avm.historydate);
+	full_history_date :=risk_indicators.iid_constants.full_history_date(le.avm.historydate);
 	
 	AVM_V2.MOD_get_AVM_from_History.MAC_get_AVM(ri, full_history_date, avm_record);
 	
@@ -189,7 +189,7 @@ avms2 := rollup(all_avms2, true, transform(Layout_AVM_Plus, self := left));
 
 
 Layout_AVM_Plus add_AVM3(Layout_AVM_Plus le, avm_v2.Key_AVM_Address_FCRA ri) := transform
-	full_history_date := iid_constants.full_history_date(le.avm.historydate);
+	full_history_date := risk_indicators.iid_constants.full_history_date(le.avm.historydate);
 	AVM_V2.MOD_get_AVM_from_History.MAC_get_AVM(ri, full_history_date, avm_record);
 	
 	SELF.AVM.Address_History_2.avm_land_use_code := avm_record.land_use;
@@ -327,7 +327,7 @@ END;
 fipsNorm := NORMALIZE(ids_wide,9,get_fips (LEFT,COUNTER));										
 
 Layout_AVM getMedians(fipsNorm le, avm_v2.Key_AVM_Medians_fcra ri) := transform
-	full_history_date := iid_constants.full_history_date(le.historydate);
+	full_history_date := risk_indicators.iid_constants.full_history_date(le.historydate);
 	AVM_V2.MOD_get_AVM_from_History.MAC_get_Medians(ri, full_history_date, median_record);
 	self.Input_Address_Information.avm_median_fips_level := if(le.fips_code[1..5]=median_record.fips_geo_12 and le.whichaddr='1', median_record.median_valuation, 0);
 	self.Input_Address_Information.avm_median_geo11_level := if(le.fips_code[1..11]=median_record.fips_geo_12 and le.whichaddr='2', median_record.median_valuation, 0);
@@ -404,7 +404,7 @@ fullavm_thor := join(distribute(avms3, hash64(avm.seq)),
 	fullavm := fullavm_roxie;
 #END
 
-Layout_Address_AVM intoblank(fullavm le, integer i) := transform
+risk_indicators.Layout_Address_AVM intoblank(fullavm le, integer i) := transform
 	self.avm_median_fips_level := CHOOSE(i, le.input_Address_Information.avm_median_fips_level,
 																					le.Address_history_1.avm_median_fips_level,
 																					le.Address_history_2.avm_median_fips_level);

@@ -29,7 +29,7 @@ MACRO
   in_mod := EmailV2_Services.IParams.getSearchParams(search_options);
   
   rpt := EmailV2_Services.Search_Records(search_by, in_mod);
- 
+  IF(EXISTS(rpt.Response.Records), doxie.Compliance.logSoldToTransaction(in_mod));
   OUTPUT(rpt.Response, named('Results'));
   OUTPUT(rpt.Royalties, named('RoyaltySet'));
   

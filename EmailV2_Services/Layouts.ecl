@@ -107,6 +107,16 @@ EXPORT Layouts := MODULE
     clean_email_rec cleaned;
     BOOLEAN   isdeepdive := FALSE; 
     UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input  
+    STRING    orig_CompanyName;
+    STRING    cln_CompanyName;
+    STRING    CompanyTitle;
+    UNSIGNED6 DotID;
+    UNSIGNED6 EmpID;
+    UNSIGNED6 POWID;
+    UNSIGNED6 ProxID;
+    UNSIGNED6 SELEID;
+    UNSIGNED6 OrgID;
+    UNSIGNED6 UltID;
     UNSIGNED4 global_sid := 0;  //  GlobalSourceId  
     UNSIGNED8 record_sid := 0;  //  SourceSpecificRecordId  
    // UNSIGNED8 gdp_rules_mask := 0;  //  global data protection mask - to indicate which rules apply  
@@ -168,20 +178,20 @@ EXPORT Layouts := MODULE
     STRING200 email := '';
     STRING10  email_status := '';
     STRING100 email_status_reason := '';
-    STRING40	error_code := '';
+    STRING40  error_code := '';
     BOOLEAN   is_disposable_address := FALSE;
     BOOLEAN   is_role_address := FALSE;
     STRING100 email_username := '';  
     STRING100 email_domain := ''; 
-    STRING8		date_added;   
+    STRING8   date_added;   
   END;
 
   EXPORT domain_rec := RECORD
-    STRING100	email_domain;
-    STRING8	  expire_date;
-    STRING8	  date_last_verified;
-    STRING50	domain_status;
-    BOOLEAN   accept_all;
+    STRING100  email_domain;
+    STRING8    expire_date;
+    STRING8    date_last_verified;
+    STRING50   domain_status;
+    BOOLEAN    accept_all;
   END;
 
   EXPORT Gateway_Data := MODULE

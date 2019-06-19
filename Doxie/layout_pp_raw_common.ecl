@@ -1,4 +1,4 @@
-export layout_pp_raw_common := record
+﻿export layout_pp_raw_common := record
   unsigned2    penalt;
   unsigned6    did := 0;
   string2      src;
@@ -43,4 +43,6 @@ export layout_pp_raw_common := record
   boolean      confirmed_flag := false;
   boolean      vendor_dt_last_seen_used := false;
 	boolean      isDeepDive := false;
+  unsigned4    global_sid := 0;
+	unsigned8    record_sid := 0;
 end;

@@ -1,4 +1,4 @@
-﻿import _Control, riskwise, ut, gong, FCRA;
+﻿import _Control, riskwise, ut, gong, FCRA, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Gong_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
@@ -25,7 +25,7 @@ END;
 
 // check corrections
 Layout_Gong gong_corr(ids_wide le, FCRA.Key_Override_Gong_FFID ri) := TRANSFORM
-	myGetDate := iid_constants.myGetDate(le.historyDate);
+	myGetDate :=risk_indicators.iid_constants.myGetDate(le.historyDate);
 	self.gong_did.gong_ADL_dt_first_seen_full := ri.dt_first_seen;
 	self.gong_did.gong_ADL_dt_last_seen_full := if(ri.dt_last_seen>myGetDate, myGetDate, ri.dt_last_seen);	//set date last seen to history date if in future
 	self.gong_did.gong_did_phone_ct := if(ri.phone10<>'', 1, 0);
@@ -40,9 +40,9 @@ Layout_Gong gong_corr(ids_wide le, FCRA.Key_Override_Gong_FFID ri) := TRANSFORM
 	self.did := le.did;
 	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');	
 	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and 
-		risk_indicators.iid_constants.checkdays(iid_constants.myGetDate(le.historydate),
+		risk_indicators.iid_constants.checkdays(risk_indicators.iid_constants.myGetDate(le.historydate),
 														ri.dt_first_seen,
-														iid_constants.oneyear, 
+														risk_indicators.iid_constants.oneyear, 
 														le.historydate), ri.phone10 + ',', '');	
 
 		// set these 3 later	in their own join after we've rolled up unique phones
@@ -83,9 +83,9 @@ Layout_Gong addPhone(ids_wide le, gong.Key_FCRA_History_did ri) := transform
 	self.did := le.did;
 	self.phones_on_file := if(trim(ri.phone10)='', '', ri.phone10 + ',');		
 	self.phones_on_file_created12months := if(trim(ri.phone10)<>'' and 
-		risk_indicators.iid_constants.checkdays(iid_constants.myGetDate(le.historydate),
+		risk_indicators.iid_constants.checkdays(risk_indicators.iid_constants.myGetDate(le.historydate),
 														ri.dt_first_seen,
-														iid_constants.oneyear, 
+														risk_indicators.iid_constants.oneyear, 
 														le.historydate), ri.phone10 + ',', '');			
 														
 		// set these 3 later	in their own join after we've rolled up unique phones

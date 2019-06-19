@@ -1,7 +1,7 @@
 ﻿IMPORT Autokey_Batch,BatchShare,Gateway,MDR,Phones,PhoneFinder_Services,Royalty,Suppress, Ut;
 
 EXPORT PhoneFinder_BatchRecords(DATASET(PhoneFinder_Services.Layouts.BatchIn) dIn,
-																PhoneFinder_Services.iParam.ReportParams      inMod,
+																PhoneFinder_Services.iParam.SearchParams      inMod,
 																DATASET(Gateway.Layouts.Config)               dGateways
 																) :=
 MODULE

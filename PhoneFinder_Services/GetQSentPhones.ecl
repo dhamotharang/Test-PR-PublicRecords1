@@ -119,7 +119,7 @@ MODULE
 	// QSent gateway data - iQ411
 	EXPORT GetQSentiQ411Data( DATASET(lBatchIn)                        dIn,
 														DATASET(lExcludePhones)                  dExcludePhones,
-														PhoneFinder_Services.iParam.ReportParams inMod,
+														PhoneFinder_Services.iParam.SearchParams inMod,
 														Gateway.Layouts.Config                   pGateway) :=
 	FUNCTION
 	
@@ -172,20 +172,22 @@ MODULE
 		// NORMALIZE the qsent gateway records to flatten the child DATASET
 		lFinal tNormIQ411Recs(rQSent_Layout le,lPPResponse ri,INTEGER cnt) :=
 		TRANSFORM
-			SELF.acctno         := le.batch_in.acctno;
-			SELF.dt_first_seen  := iesp.ECL2ESP.t_DateToString8(ri.RealTimePhone_Ext.ListingCreationDate);
-			SELF.dt_last_seen   := today[1..6] + '00';
-			SELF.phone_source   := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
-			SELF.did            := (UNSIGNED)ri.did;
-			SELF.telcordia_only := ri.telcordia_only = 'Y';
-			SELF.sort_order     := cnt;
-			SELF.isPrimaryPhone := (cnt = 1);
+			SELF.acctno            := le.batch_in.acctno;
+			SELF.dt_first_seen     := iesp.ECL2ESP.t_DateToString8(ri.RealTimePhone_Ext.ListingCreationDate);
+			SELF.dt_last_seen      := today[1..6] + '00';
+			SELF.phone_source      := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
+			SELF.did               := (UNSIGNED)ri.did;
+			SELF.telcordia_only    := ri.telcordia_only = 'Y';
+			SELF.sort_order        := cnt;
+			SELF.isPrimaryIdentity := TRUE;
+			SELF.isPrimaryPhone    := (cnt = 1);
+
  			fn_len := length(trim(ri.fname));
       fn_parsed := if(fn_len > 3 and ri.fname[fn_len-1] = ' ', ri.fname[1..fn_len-2], ri.fname);
-   		SELF.fname          := fn_parsed;
-			SELF                := ri;
-			SELF                := le;
-			SELF                := [];
+   		SELF.fname             := fn_parsed;
+			SELF                   := ri;
+			SELF                   := le;
+			SELF                   := [];
 		END;
 		
 		dNormIQ411Recs := NORMALIZE(dIQ411Recs,LEFT.qsent_recs,tNormIQ411Recs(LEFT,RIGHT,COUNTER));

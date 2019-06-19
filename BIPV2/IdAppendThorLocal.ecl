@@ -74,7 +74,7 @@ export IdAppendThorLocal(
 	local infile_augmented := PROJECT(%infilecnp%,
 		TRANSFORM({RECORDOF(left); string %company_name_prefix% := '', STRING input_company_phone_3 := '',
 		           STRING input_company_phone_7 := ''; STRING Input_fname_preferred := '';},
-			self.%company_name_prefix% := BizLinkFull.fn_company_name_prefix(left.cnp_name);
+			self.%company_name_prefix% := if(useFuzzy, BizLinkFull.fn_company_name_prefix(left.cnp_name), '');
 			#if('P' in matchset and #text(phone_field) != '')
 				SELF.phone_field:=TRIM(LEFT.phone_field);
 				SELF.input_company_phone_3:=IF(LENGTH(TRIM(LEFT.phone_field))=10,
@@ -95,7 +95,7 @@ export IdAppendThorLocal(
 		input_source := pSource,
 		Input_source_record_id := pSource_record_id,
 		Input_company_name := company_name_field,
-		Input_company_name_prefix := #if(useFuzzy) %company_name_prefix%, #else , #end
+		Input_company_name_prefix := %company_name_prefix%,
 		Input_cnp_name := cnp_name,
 		Input_cnp_number := cnp_number,
 		Input_cnp_btype := cnp_btype,
@@ -116,6 +116,7 @@ export IdAppendThorLocal(
 			Input_st := state_field,
 			Input_zip := %zipset%,
 		#end
+		Input_company_url := pURL,
 		Input_fname := pContact_fname,
 		Input_fname_preferred := Input_fname_preferred,
 		Input_mname := pContact_mname,
