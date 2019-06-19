@@ -492,6 +492,7 @@ EXPORT Layouts := MODULE
 		unsigned6	fdn_file_info_id;
 		string20	contribution_source;
 		string		contribution_gc_id;
+		integer8	contribution_billing_id;
 	END;
 	export Flags := module
 
