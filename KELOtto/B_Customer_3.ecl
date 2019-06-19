@@ -4,6 +4,6 @@ IMPORT B_Customer_4,B_Customer_6 FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Customer_3 := MODULE
   SHARED VIRTUAL TYPEOF(B_Customer_4.__ENH_Customer_4) __ENH_Customer_4 := B_Customer_4.__ENH_Customer_4;
-  SHARED __EE59996 := __ENH_Customer_4;
-  EXPORT __ENH_Customer_3 := __EE59996;
+  SHARED __EE59984 := __ENH_Customer_4;
+  EXPORT __ENH_Customer_3 := __EE59984;
 END;
