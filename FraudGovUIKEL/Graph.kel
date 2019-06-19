@@ -1692,8 +1692,8 @@ Employer: => BusAcctWarrantIssuedCntEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																								IsNonIntegerStr(warrantsissued) => -99997,
 																								MAX(MIN(INTEGER(warrantsissued), 999), 0));
 Employer: => BusAcctWarrantIssuedDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
-																							 NOT ISVALIDDATE(DATE(datewarrantissued)) => -99998,
-																							 datewarrantissued);
+																							 ISVALIDDATE(DATE(datewarrantissued)) => datewarrantissued,
+																							 -99998);
 Employer: => BusAcctWarrantIssuedFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
 																						 BusAcctWarrantIssuedCntEcho=-99998 => -99998,
 																						 BusAcctWarrantIssuedCntEcho=-99997 => -99997,
