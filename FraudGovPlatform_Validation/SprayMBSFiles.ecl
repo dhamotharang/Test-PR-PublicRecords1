@@ -97,7 +97,7 @@ function
 
 	return sequential(
 		  FraudShared.Promote().Inputfiles.Sprayed2Using
-		, FraudShared.Promote().Inputfiles.Using2Used				
+		, FraudShared.Promote(pdelete := true).Inputfiles.Using2Used				
 		, FraudShared.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSServerIP,pDirectory := pMBSFraudGovDirectory)
 		, if(not FraudShared._Flags.FileExists.Input.MBSmarketAppend or pOverwrite , SprayTheFile(FilesToSprayMBSmarketAppend ))
 		, if(not FraudShared._Flags.FileExists.Input.MBSFdnCCID or pOverwrite , SprayTheFile(FilesToSprayMBSFdnCCID ))
