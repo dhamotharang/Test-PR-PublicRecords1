@@ -1,4 +1,4 @@
-IMPORT standard, business_header, bipv2;
+﻿IMPORT standard, business_header, bipv2;
 EXPORT Layout:=
   module
 
@@ -216,6 +216,9 @@ EXPORT Layout:=
 		string vendor_id;
 		unsigned8 RawAID := 0;    // Added for Address_id
 		unsigned8	Company_RawAID	:= 0;    // Added for Address_id
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) project enhancements - JIRA# CCPA-111
+		unsigned4 global_sid := 0;
+		unsigned8 record_sid := 0;
 	end;
 	
 	EXPORT Employment_Out_BIPv2 := RECORD		
