@@ -131,7 +131,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//     full did key layout into a slimmmed format of just the fields needed for 
 	//     choosing a candidate record below.
 	
-	ds_poe_recs := WorkPlace_Services.Functions.getPoeRecs(ds_combined_dids_sorted);
+	ds_poe_recs := WorkPlace_Services.Functions.getPoeRecs(ds_combined_dids_sorted, mod_access);
 	
 	// Bring back to the slimmed POE layout													 
 	ds_poe_recs_slimmed:= PROJECT(ds_poe_recs, WorkPlace_Layouts.poe_didkey_slimmed);													 

@@ -54,7 +54,7 @@ export ReportService_Records := module
     ds_did_in := dataset([xfm_make_single_record()]);
 
 	  //  3. Get all the POE recs for the passed in did.
-    ds_poe_recs := WorkPlace_Services.Functions.getPoeRecs(ds_did_in);
+    ds_poe_recs := WorkPlace_Services.Functions.getPoeRecs(ds_did_in, mod_access);
 		
 		//		Get all the PSS recs for the passed in did.
 		ds_pss_recs	:=	WorkPlace_Services.Functions.getPSSRecs(ds_did_in);

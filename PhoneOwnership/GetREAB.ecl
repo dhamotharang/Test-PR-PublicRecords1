@@ -62,7 +62,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										 
 	relativesDid := DEDUP(PROJECT(dsRelatives(did<>0),doxie.layout_references),did,ALL);
 	dsRelativeBestRecs := Doxie.best_records(relativesDid, modAccess := mod_access);
-	ut.PermissionTools.GLB.mac_FilterOutMinors(dsRelativeBestRecs,dsRABest_noMinors,did,,dob);		
+	dsRABest_noMinors := doxie.compliance.MAC_FilterOutMinors(dsRelativeBestRecs, did, dob, mod_access.show_minors);
 	dsRelativesInfo := JOIN(dsRelatives,dsRABest_noMinors,
 							LEFT.did = RIGHT.did,
 							TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
@@ -73,7 +73,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF:=[]),
 							LIMIT(Constants.MAX_RECORDS,SKIP));
 	// *** Employers										
-	dsPOE 			:= JOIN(needREA,POE.Keys().did.qa,
+	dsPOE_all 			:= JOIN(needREA,POE.Keys().did.qa,
 							KEYED(LEFT.did = RIGHT.did),	
 							TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 										SELF.acctno := LEFT.acctno,
@@ -91,7 +91,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF:=LEFT,
 										SELF:=[]),
 							LIMIT(Constants.MAX_RECORDS,SKIP));
-										 
+	dsPOE := Suppress.MAC_SuppressSource(dsPOE_all, mod_access);									 
 	dsPAWContact 	:= JOIN(needREA,PAW.Key_Did,
 							KEYED(LEFT.did = RIGHT.did),	
 							LIMIT(Constants.MAX_RECORDS,SKIP));	
