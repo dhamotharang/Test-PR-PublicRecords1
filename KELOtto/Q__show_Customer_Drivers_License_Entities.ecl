@@ -5,8 +5,8 @@ IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
   SHARED TYPEOF(E_Customer.__Result) __E_Customer := E_Customer.__Result;
   SHARED TYPEOF(B_Drivers_License.__ENH_Drivers_License) __ENH_Drivers_License := B_Drivers_License.__ENH_Drivers_License;
-  SHARED __EE756210 := __ENH_Drivers_License;
-  SHARED __ST756671_Layout := RECORD
+  SHARED __EE756198 := __ENH_Drivers_License;
+  SHARED __ST756659_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nstr State_;
     KEL.typ.int Cl_Element_Count_ := 0;
@@ -31,23 +31,23 @@ EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE756693 := PROJECT(TABLE(PROJECT(__EE756210,__ST756671_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,State_,Cl_Element_Count_,Cl_Event_Count_,Cl_Event_Count_Percentile_,Cl_Identity_Count_,Cl_Identity_Count_Percentile_,Cl_Impact_Weight_,Cluster_Score_,Contributor_Safe_Flag_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_,Score_},_r_Customer_,State_,Cl_Element_Count_,Cl_Event_Count_,Cl_Event_Count_Percentile_,Cl_Identity_Count_,Cl_Identity_Count_Percentile_,Cl_Impact_Weight_,Cluster_Score_,Contributor_Safe_Flag_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_,Score_,MERGE),__ST756671_Layout);
-  SHARED __EE756267 := __E_Customer;
-  SHARED __ST756703_Layout := RECORD
+  SHARED __EE756681 := PROJECT(TABLE(PROJECT(__EE756198,__ST756659_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,State_,Cl_Element_Count_,Cl_Event_Count_,Cl_Event_Count_Percentile_,Cl_Identity_Count_,Cl_Identity_Count_Percentile_,Cl_Impact_Weight_,Cluster_Score_,Contributor_Safe_Flag_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_,Score_},_r_Customer_,State_,Cl_Element_Count_,Cl_Event_Count_,Cl_Event_Count_Percentile_,Cl_Identity_Count_,Cl_Identity_Count_Percentile_,Cl_Impact_Weight_,Cluster_Score_,Contributor_Safe_Flag_,Entity_Context_Uid_,Entity_Type_,Identity_Count_,In_Customer_Population_,Kr_High_Risk_Flag_,Kr_Low_Risk_Flag_,Kr_Medium_Risk_Flag_,Label_,Safe_Flag_,Score_,MERGE),__ST756659_Layout);
+  SHARED __EE756255 := __E_Customer;
+  SHARED __ST756691_Layout := RECORD
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.nint Customer_Id__1_;
     KEL.typ.nint Industry_Type__1_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST756703_Layout __ND756696__Project(E_Customer.Layout __PP756695) := TRANSFORM
-    SELF.U_I_D__1_ := __PP756695.UID;
-    SELF.Customer_Id__1_ := __PP756695.Customer_Id_;
-    SELF.Industry_Type__1_ := __PP756695.Industry_Type_;
-    SELF := __PP756695;
+  SHARED __ST756691_Layout __ND756684__Project(E_Customer.Layout __PP756683) := TRANSFORM
+    SELF.U_I_D__1_ := __PP756683.UID;
+    SELF.Customer_Id__1_ := __PP756683.Customer_Id_;
+    SELF.Industry_Type__1_ := __PP756683.Industry_Type_;
+    SELF := __PP756683;
   END;
-  SHARED __EE756708 := PROJECT(__EE756267,__ND756696__Project(LEFT));
-  SHARED __ST756743_Layout := RECORD
+  SHARED __EE756696 := PROJECT(__EE756255,__ND756684__Project(LEFT));
+  SHARED __ST756731_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nstr State_;
     KEL.typ.int Cl_Element_Count_ := 0;
@@ -75,13 +75,13 @@ EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC756715(__ST756671_Layout __EE756693, __ST756703_Layout __EE756708) := __EEQP(__EE756693._r_Customer_,__EE756708.U_I_D__1_);
-  __ST756743_Layout __JT756715(__ST756671_Layout __l, __ST756703_Layout __r) := TRANSFORM
+  __JC756703(__ST756659_Layout __EE756681, __ST756691_Layout __EE756696) := __EEQP(__EE756681._r_Customer_,__EE756696.U_I_D__1_);
+  __ST756731_Layout __JT756703(__ST756659_Layout __l, __ST756691_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE756741 := JOIN(__EE756693,__EE756708,__JC756715(LEFT,RIGHT),__JT756715(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __ST17380_Layout := RECORD
+  SHARED __EE756729 := JOIN(__EE756681,__EE756696,__JC756703(LEFT,RIGHT),__JT756703(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __ST17375_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) Source_Customer_;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
@@ -108,13 +108,13 @@ EXPORT Q__show_Customer_Drivers_License_Entities := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST17380_Layout __ND756771__Project(__ST756743_Layout __PP756742) := TRANSFORM
-    SELF.Source_Customer_ := __PP756742._r_Customer_;
-    SELF.Customer_Id_ := __PP756742.Customer_Id__1_;
-    SELF.Industry_Type_ := __PP756742.Industry_Type__1_;
-    SELF.Person_Count_ := __PP756742.Identity_Count_;
-    SELF.License_State_ := __PP756742.State_;
-    SELF := __PP756742;
+  SHARED __ST17375_Layout __ND756759__Project(__ST756731_Layout __PP756730) := TRANSFORM
+    SELF.Source_Customer_ := __PP756730._r_Customer_;
+    SELF.Customer_Id_ := __PP756730.Customer_Id__1_;
+    SELF.Industry_Type_ := __PP756730.Industry_Type__1_;
+    SELF.Person_Count_ := __PP756730.Identity_Count_;
+    SELF.License_State_ := __PP756730.State_;
+    SELF := __PP756730;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE756741,__ND756771__Project(LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE756729,__ND756759__Project(LEFT)));
 END;

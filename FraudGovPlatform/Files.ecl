@@ -1,4 +1,4 @@
-﻿import tools, FraudShared, NAC, Inquiry_AccLogs;
+﻿import tools, FraudShared, NAC, Inquiry_AccLogs,INQL_v2;
 export Files(
 
 	 string		pversion = ''
@@ -28,6 +28,10 @@ module
 		export InquiryLogs := dataset(Filenames().Sprayed.InquiryLogs,
 											Inquiry_AccLogs.Layout.Common_ThorAdditions,
 											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));												
+		export RDP := dataset(Filenames().Sprayed.RDP,
+											INQL_v2.layouts.rSBA_In, 
+											CSV( separator('~~'), terminator(['\n', '\r\n'])));										
+
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Input File Versions
