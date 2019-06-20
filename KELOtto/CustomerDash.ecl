@@ -68,9 +68,12 @@
 
 
   // Top Identities
-  
+
   TopIdentitiesPrep1 := tempFullCluster(tree_uid_=entity_context_uid_ AND entity_type_ = 1 AND score_ > 60  /*cl_event_count_percentile_ > 85*/ AND cl_identity_count_ < 50);
-  TopIdentitiesPrep2 := topn(GROUP(SORT(TopIdentitiesPrep1, customer_id_, industry_type_, skew(1)), customer_id_, industry_type_, SKEW(1)), 1000, customer_id_, industry_type_, -cl_impact_weight_, SKEW(1));
+  // FILTER OUT MINORS
+	TopIdentitiesPrep1_1 := JOIN(TopIdentitiesPrep1, KELOtto.Q__show_Customer_Person.Res0(Age_ < 20), LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_=RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, SMART);
+  
+  EXPORT TopIdentitiesPrep2 := topn(GROUP(SORT(TopIdentitiesPrep1_1, customer_id_, industry_type_, skew(1)), customer_id_, industry_type_, SKEW(1)), 1000, customer_id_, industry_type_, -cl_impact_weight_, SKEW(1));
 
 
   //count(TopIdentitiesPrep2);
