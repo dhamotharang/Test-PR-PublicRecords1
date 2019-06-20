@@ -8,7 +8,7 @@ EXPORT BWR_CalcSasFlagsPt2Distribution := MODULE
 
 		EXPORT fn_macro(dsMac, attributeStr, attribute) := FUNCTIONMACRO
 				ds_cnt := COUNT(dsMac);
-				RETURN SORT(TABLE(dsMac, {STRING30 attribute_name := attributeStr, STRING attribute_value := (STRING)attribute, cnt:=COUNT(GROUP), pct_of_file := COUNT(GROUP)/ds_cnt}, attribute), attribute_value);
+				RETURN SORT(TABLE(dsMac, {STRING attribute_name := attributeStr, STRING attribute_value := (STRING)attribute, cnt:=COUNT(GROUP), pct_of_file := COUNT(GROUP)/ds_cnt}, attribute), attribute_value);
 		ENDMACRO;
 
 		// Nate Attributes 

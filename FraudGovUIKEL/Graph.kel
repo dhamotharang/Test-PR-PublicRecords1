@@ -1397,7 +1397,8 @@ Legal: => BusAcctPerBusTaxLiabBlceCredCnt := MAP(ALL(LegalEmployer.rEmployer, Bu
 Legal: => BusAcctPerBusTaxLiabBlceOthCnt := MAP(ALL(LegalEmployer.rEmployer, BusAcctTaxLiabBlceStatusEcho=-99997) => -99998,
 																								 MAX(MIN(COUNT(LegalEmployer.rEmployer(BusAcctTaxLiabBlceStatusEcho=3)), 9999), 0));
 Legal: => BusTaxLiabBlceDebitFlag := MAP(BusAcctPerBusTaxLiabBlceDebCnt=-99998 => -99998,
-																				 BusAcctPerBusTaxLiabBlceDebCnt=0 => 0);
+																				 BusAcctPerBusTaxLiabBlceDebCnt=0 => 0,
+																				 BusAcctPerBusTaxLiabBlceDebCnt > 0 => 1);
 																				 
 																				 
 // Claim Attributes
@@ -1608,13 +1609,13 @@ Employer: => BusAcctOwnerCntEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																				INTEGER(numownssn));
 Employer: => BusAcctOwnerName1Pop := MAP(ownername1:Null OR ownername1='' => 0, 1);
 Employer: => BusAcctOwnerSSN1Pop := MAP(LENGTH(ownerssn1) < 9 => -99997,
-																				ownerssn1:Null OR ownerssn1='' => 0,1);
+																				ownerssn1:Null OR ownerssn1='' OR (INTEGER(ownerssn1)=0) => 0,1);
 Employer: => BusAcctOwnerName2Pop := MAP(ownername2:Null OR ownername2='' => 0, 1);
 Employer: => BusAcctOwnerSSN2Pop := MAP(LENGTH(ownerssn2) < 9 => -99997,
-																				ownerssn2:Null OR ownerssn2='' => 0,1);
+																				ownerssn2:Null OR ownerssn2='' OR (INTEGER(ownerssn2)=0) => 0,1);
 Employer: => BusAcctOwnerName3Pop := MAP(ownername3:Null OR ownername3='' => 0, 1);
 Employer: => BusAcctOwnerSSN3Pop := MAP(LENGTH(ownerssn3) < 9 => -99997,
-																				ownerssn3:Null OR ownerssn3='' => 0,1);
+																				ownerssn3:Null OR ownerssn3='' OR (INTEGER(ownerssn3)=0)=> 0,1);
 Employer: => BusAcctOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 // -99997 unable to calculate
 																					 BusAcctOwnerCntEcho > 0 OR (BusAcctOwnerName1Pop=1 AND BusAcctOwnerSSN1Pop=1) OR 
