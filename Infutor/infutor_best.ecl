@@ -1,4 +1,4 @@
-import doxie_build,mdr,watchdog,doxie,address,ut,PRTE2_Header,PromoteSupers;
+﻿import doxie_build,mdr,watchdog,doxie,address,ut,PRTE2_Header,PromoteSupers;
 
 r1 := RECORD
   unsigned6 did;
@@ -62,7 +62,7 @@ key_watchdog_best :=dedup(distribute(index(watchdog.Key_Prep_Watchdog_GLB(),'~pr
 #ELSE
 infutor_into_header := if(excludeForeclosure, 
 	//distribute(infutor.infutor_header_filtered(true), hash(did)),
-	distribute(DATASET('~thor::spokeo::infutor_header',r1,thor), hash(did)),
+	distribute(PROJECT(DATASET('~thor::spokeo::infutor_header',r1,thor),RECORDOF(infutor.infutor_header)), hash(did)),
 	distribute(infutor.infutor_header, hash(did)));
 key_watchdog_best :=dedup(distribute(watchdog.Key_Prep_Watchdog_GLB(),hash(did)),did,all,local);
 #END;
