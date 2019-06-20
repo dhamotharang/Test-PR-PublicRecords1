@@ -18,6 +18,7 @@ export Build_All(  string													fileDate
 													 ,QA_Record_Samples()
 													 ,Orbit3.proc_Orbit3_CreateBuild ('Experian_CRDB',pversion,'N')
 													 ,Scrubs.ScrubsPlus('Experian_CRDB','Scrubs_Experian_CRDB','Scrubs_Experian_CRDB_Base', 'Base', pVersion,Experian_CRDB.Email_Notification_Lists().Stats,false)
+													 ,fDOPSGrowthCheck(pversion).GrowthCheck
 												  ) : success(Send_Emails(pversion,,not pIsTesting).Roxie),
 														  failure(send_emails(pversion,,not pIsTesting).buildfailure);
 													
