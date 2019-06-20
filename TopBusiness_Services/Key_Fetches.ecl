@@ -11,16 +11,17 @@
 	//       IRS990(nonprofit), MSWork, NDR/Natural Disaster Readiness, OIG, ORWork, ProfLicense, 
 	//       SEC_BD, Txbus & WorkersCompensation
 	//    c. SourceSection Other Directories sources:
-	//       Amidir, BBBNonMem, BBB, CNLDFacility, DiversityCert, InfoUSA_ABIUS, InfoUSA_DEADCO, 
+	//       Amidir, BBBNonMem, BBB, CNLDFacility, DiversityCert,InfoUSA_ABIUS, InfoUSA_DEADCO, 
 	//       LaborActionsWHD, Ncpdp, Sheila Greco, Spoke
 	//    d. Revise the OtherSource_Records attribute to use key_fetches from here.  
-	//       Will have to uncomment the Bus Hdr (discuss with Don) & "Directories" EXPORTs below???
+	//       Will have to uncomment the Bus Hdr  & "Directories" EXPORTs below???
 
   // 2. Add other common BIP linkids keys, i.e. BusHdr, Directories, Best, others???
 
-IMPORT AMS, ATF, BankruptcyV3, BIPV2, BIPV2_Build, BusReg, Corp2, Cortera, DCAV2, DEA, DNB_FEINV2, EBR, 
-       Experian_CRDB, Experian_FEIN, faa, FBNV2, FCC, Frandx, Gong, LiensV2, LN_PropertyV2, 
-			 OSHAIR, Prof_LicenseV2, Property, Sheila_Greco, TopBusiness_BIPV2, UCCV2, VehicleV2, 
+IMPORT AMS, ATF, BankruptcyV3, BIPV2, BIPV2_Build, BusReg, Corp2, Cortera, DCAV2, DEA, DNB_FEINV2,  
+                dx_Equifax_business_data, dx_Infutor_NARB,             
+			EBR, Experian_CRDB, Experian_FEIN, faa, FBNV2, FCC, Frandx, Gong, LiensV2, 
+			 LN_PropertyV2, OSHAIR, Prof_LicenseV2, Property, Sheila_Greco, TopBusiness_BIPV2, UCCV2, VehicleV2, 
 			 Watercraft, YellowPages;
 
 EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
@@ -74,11 +75,11 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
   EXPORT ds_busreg_linkidskey_recs := BusReg.key_busreg_company_linkids.kFetch(ds_in_linkids,
 	                                                                             FETCH_LEVEL,,FETCH_LIMIT);
    
-	// *** Key fetch to get cortera Linkids key records
-	EXPORT ds_cortera_linkidskey_recs := Cortera.Key_LinkIds.kFetch2(project(ds_in_linkids, 
+  // *** Key fetch to get cortera Linkids key records
+ EXPORT ds_cortera_linkidskey_recs := Cortera.Key_LinkIds.kFetch2(project(ds_in_linkids, 
 	                                                                    transform(BIPV2.IDlayouts.l_xlink_ids2,
-																																			  SELF := LEFT, SELF := [])),
-																																		FETCH_LEVEL,,FETCH_LIMIT);
+																	 SELF := LEFT, SELF := [])),
+																	FETCH_LEVEL,,FETCH_LIMIT);
   // *** Key fetch to get Corp/Incorporation linkids key records
   EXPORT ds_corp_linkidskey_recs := Corp2.Key_Linkids.Corp.kFetch(ds_in_linkids,FETCH_LEVEL);
 
@@ -100,6 +101,10 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
   // *** Key fetch to get EBR 5600 (Demographic data) linkids key records
   EXPORT ds_ebr5600_linkidskey_recs := EBR.Key_5600_Demographic_Data_LinkIds.kFetch(ds_in_linkids,
 	                                                                                  FETCH_LEVEL,,,FETCH_LIMIT);
+																																										
+  // *** key fetch to get equifax Business Data linkids key records																																										
+ EXPORT ds_equifax_bus_data_linkidskey_recs := dx_Equifax_business_data.key_LinkIds.kFetch(ds_in_linkids,
+	                                                                                  FETCH_LEVEL, ,FETCH_LIMIT);	
 
   // *** Key fetch to get Experian CRDB linkids key records
   EXPORT ds_expcrdb_linkidskey_recs := Experian_CRDB.Key_LinkIDs.kFetch(ds_in_linkids,FETCH_LEVEL);
@@ -124,6 +129,11 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
   // *** Key fetch to get Gong history linkids key records
 	EXPORT ds_gong_linkidskey_recs := Gong.Key_History_LinkIDs.KFetch(ds_in_linkids, FETCH_LEVEL,,FETCH_LIMIT);
 
+// *** key fetch to get Infutor Narb linkids key records
+
+ EXPORT ds_infutor_narb_linkidskey_recs := dx_Infutor_NARB.Key_Linkids.Kfetch(ds_in_linkids, 
+		                                                                                                              FETCH_LEVEL, ,FETCH_LIMIT);																																																									
+		
 	// *** Key fetch to get Liens & Judgments linkids key records
 	// NOTE: This one will need to use a passed in fetch limit
   EXPORT ds_liens_linkidskey_recs := LiensV2.Key_Linkids.KeyFetch(ds_in_linkids,
@@ -140,8 +150,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 	// NOTE: This one will need to use a passed in fetch limit other than default one in 
 	//       BIPV2.IDmacros.mac_IndexFetch.
   EXPORT ds_prop_linkidskey_recs := LN_propertyv2.key_Linkids.kfetch(ds_in_linkids, 
-								                                                     FETCH_LEVEL,,,
-																																		 FETCH_LIMIT);
+								                                                     FETCH_LEVEL,,, FETCH_LIMIT);
 	
 	// *** Key fetch to get Notice of Default/NOD linkids key records
 	// NOTE: This one will need to use a passed in fetch limit

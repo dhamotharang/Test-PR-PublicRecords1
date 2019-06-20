@@ -242,7 +242,17 @@ export SourceService_Records(
 																						self.acctno := 'SINGLE',
 																						self := []));		
 
-  // FICTITIOUS BUSINESS NAMES (FBNs) - source_docid = tmsid(38?)+ '//' + rmsid(35?)
+	// EQUIFAX Bus data Records- source= 'Z1' source_docid=effx_1
+	equifax_bus_data_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptEquifaxBusData(source,section));
+	
+	equifax_bus_data_docs     := CHOOSEN(TopBusiness_Services.EquifaxBusinessDataSource_Records(equifax_bus_data_source_docids,inoptions,false)
+																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_EQUIFAXBUSDATA_RECORD);
+	equifax_bus_data_prepared := PROJECT(equifax_bus_data_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
+																						self.EquifaxBusinessDataRecords := dataset(left),
+																						self.acctno := 'SINGLE',
+																						self := []));			
+																						
+     // FICTITIOUS BUSINESS NAMES (FBNs) - source_docid = tmsid(38?)+ '//' + rmsid(35?)
 	fbn_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptFBN(source,section));
 	fbn_docs     := CHOOSEN(TopBusiness_Services.FBNSource_Records(fbn_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_FBN_RECORD);
@@ -331,8 +341,16 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-
-	
+																						
+   // infutorNarb Records- source= 'Z2' source_docid=record_id (vl_id in bip header is composed of both 'pid' and 'record_id' fields)
+	infutor_narb_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptInfutorNarb(source,section));
+	infutor_narb_docs     := CHOOSEN(TopBusiness_Services.InfutorNARBSource_Records(infutor_narb_source_docids,inoptions,false)
+																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_INFUTOR_NARB_RECORD);
+	infutorNarb_prepared := PROJECT(infutor_narb_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
+																						self.InfutorNarbRecords := dataset(left),
+																						self.acctno := 'SINGLE',
+																						self := []));																									
+																						
 		// Insurance Certification
 	insCert_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptInsuranceCert(source,section));
 	insCert_docs := CHOOSEN(TopBusiness_Services.InsuranceCertSource_Records(insCert_source_docids,inoptions,false)
@@ -582,11 +600,13 @@ export SourceService_Records(
 		+ ebr_prepared  
 		+ expcrdb_prepared
 		+ expfein_prepared
+		  + equifax_bus_data_prepared
 		+ fbn_prepared
 		+ fcc_prepared
 		+ forec_prepared
 		+ frandx_prepared
 		+ gong_prepared
+		+ infutorNarb_prepared
 		+ insCert_prepared
 		+ lien_prepared        
 		+ mvr_prepared         
@@ -620,11 +640,13 @@ export SourceService_Records(
 			self.EbrRecords := left.EbrRecords + right.EbrRecords,
 			self.ExpCRDBRecords := left.ExpCRDBRecords + right.ExpCRDBRecords,
 			self.ExpFeinRecords := left.ExpFeinRecords + right.ExpFeinRecords,
+			self.EquifaxBusinessDataRecords := left.EquifaxBusinessDataRecords + right.EquifaxBusinessDataRecords,
 			self.FbnRecords := left.FbnRecords + right.FbnRecords,
 			self.FccRecords := left.FccRecords + right.FccRecords,
 			self.FranchiseRecords := left.FranchiseRecords + right.FranchiseRecords,
 			self.Foreclosures := left.Foreclosures + right.Foreclosures,
 			self.GongRecords  := left.GongRecords + right.GongRecords,
+			self.InfutorNarbRecords := left.InfutorNarbRecords + right.InfutorNarbRecords,
 			self.InsuranceCertRecords := left.InsuranceCertRecords + right.InsuranceCertRecords,
       self.LiensJudgments := left.LiensJudgments + right.LiensJudgments,
       self.MotorVehicles := left.MotorVehicles + right.MotorVehicles,
