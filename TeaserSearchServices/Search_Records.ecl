@@ -220,7 +220,10 @@ export Search_Records := module
 		recs_grp := group(sort(recs_pull_tsr, did, -isCurrent), did);
 		recs := rollup(recs_grp, GROUP, Functions.combine(LEFT,ROWS(LEFT), in_mod.IncludeAllAddresses));
 		
-		recs_ageChecked := recs(exists(dobs(age >= agelow_val and 
+		// filter out minors from the final result 
+		recs_nominors := Doxie.compliance.MAC_FilterOutMinors(recs,uniqueid,dob_val,False);
+
+		recs_ageChecked := recs_nominors(exists(dobs(age >= agelow_val and 
 																	(agehigh_val = 0 or age <= agehigh_val))));
 													
 		recs_top := topn(recs_ageChecked,maxReturnCount, 
@@ -245,8 +248,9 @@ export Search_Records := module
 		final_sorted := SORT(final_res, 		                    
 												  if((integer)UniqueId = (integer)in_mod.PreferredUniqueId, 0, 1), penalt, -Addresses[1].DateLastSeen.Year,
 						-Addresses[1].DateLastSeen.Month,-Addresses[1].DateLastSeen.Day, -totalRecords, record);		
-
- 		final_out := PROJECT(final_sorted, Layouts.records);
+		
+ 		
+		final_out := PROJECT(final_sorted, Layouts.records);
 	  //output(recs_clean_tsr, named('recs_clean_tsr'));
 		//output(did_value, named('did_value'));
 		return final_out;
