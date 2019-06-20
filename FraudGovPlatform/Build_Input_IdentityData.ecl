@@ -19,7 +19,11 @@ module
 		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0, 
 				Build_Prepped_InquiryLogs(pversion),
 				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-	);
+		)		
+		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.RDP)) > 0, 
+				Build_Prepped_RDP(pversion),
+				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})		
+		);
 
 	Functions.CleanFields(inIdentityDataUpdate ,inIdentityDataUpdateUpper); 
 

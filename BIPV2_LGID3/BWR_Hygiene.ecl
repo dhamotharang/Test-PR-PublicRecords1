@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_LGID3.BWR_Hygiene - Hygiene & Stats - SALT V3.11.4');
+#workunit('name','BIPV2_LGID3.BWR_Hygiene - Hygiene & Stats - SALT V3.11.3');
 IMPORT BIPV2_LGID3,SALT311;
 // First create an instantiated hygiene module
   infile := BIPV2_LGID3.In_LGID3;
@@ -83,6 +83,5 @@ IMPORT BIPV2_LGID3,SALT311;
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,ultimate_proxid,Examples),NAMED('ultimate_proxidBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,levels_from_top,Examples),NAMED('levels_from_topBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,nodes_total,Examples),NAMED('nodes_totalBysource'));
-  //  OUTPUT(SALT311.MAC_CrossTab(infile,source,cortera_id,Examples),NAMED('cortera_idBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,dt_first_seen,Examples),NAMED('dt_first_seenBysource'));
   //  OUTPUT(SALT311.MAC_CrossTab(infile,source,dt_last_seen,Examples),NAMED('dt_last_seenBysource'));

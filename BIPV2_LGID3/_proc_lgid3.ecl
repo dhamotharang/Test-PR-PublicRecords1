@@ -22,7 +22,6 @@ export _proc_lgid3(
 			SELF.company_name				:= if(isLegal, L.company_name, '');	// BLANK except for Legal Names
 			SELF.cnp_number					:= if(isLegal, L.cnp_number, '');		// BLANK except for legal Names
       self.sbfe_id            := if(mdr.sourceTools.SourceIsBusiness_Credit(l.source) ,l.vl_id ,'');
-               self.cortera_id            := if(mdr.sourceTools.SourceIsCortera(l.source) ,l.vl_id ,'');
 			SELF.seleid							:= if(L.seleid > 0, L.seleid, L.lgid3);
 			SELF.orgid							:= if(L.orgid > 0, L.orgid, L.lgid3);
 			SELF.ultid							:= if(L.ultid > 0, L.ultid, L.lgid3);
@@ -51,7 +50,6 @@ export _proc_lgid3(
 			SELF.company_name				:= if(isLegal, L.company_name, '');	// BLANK except for Legal Names
 			SELF.cnp_number					:= if(isLegal, L.cnp_number, '');		// BLANK except for legal Names
       self.sbfe_id            := if(mdr.sourceTools.SourceIsBusiness_Credit(l.source) ,l.vl_id ,'');
-	          self.cortera_id            := if(mdr.sourceTools.SourceIsCortera(l.source) ,l.vl_id ,'');
 			SELF.seleid							:= if(L.seleid > 0, L.seleid, L.lgid3);
 			SELF.orgid							:= if(L.orgid > 0, L.orgid, L.lgid3);
 			SELF.ultid							:= if(L.ultid > 0, L.ultid, L.lgid3);
