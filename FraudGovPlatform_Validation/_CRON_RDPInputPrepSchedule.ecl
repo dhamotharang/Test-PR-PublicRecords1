@@ -24,7 +24,7 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyRDP(version)\n'
++'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyRDP(version))\n'
 //+'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'RDP\', Scrubs_FraudGov.RDP_In_RDP, FraudGovPlatform_Validation.Mailing_List().Alert))\n'
 +'	):failure(email(\'FraudGov RDP Input Prep Failed\'));\n'
 ;
