@@ -58,10 +58,12 @@ export t_TopBusinessSourceDocRecord := record
 	dataset(franchise.t_FranchiseRecord) FranchiseRecords {xpath('FranchiseRecords/FranchiseRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_FRANDX_RECORD)};
 	dataset(topbusinessothersources.t_OtherSourceRecord) OtherSourceRecords {xpath('OtherSourceRecords/OtherSourceRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_OTHER_RECORD)};
 	dataset(topbusinessothersources.t_OtherSourceRecord) OSHAIRRecords {xpath('OSHAIRRecords/OSHAIRRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_OSHAIR_RECORD)};
-  dataset(topbusinessothersources.t_OtherSourceRecord) CorteraRecords {xpath('CorteraRecords/CorteraRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_CORTERA_RECORD)};
-  dataset(topbusinessothersources.t_OtherSourceRecord) YellowPages {xpath('YellowPages/YellowPage'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_YP_RECORD)};
+     dataset(topbusinessothersources.t_OtherSourceRecord) CorteraRecords {xpath('CorteraRecords/CorteraRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_CORTERA_RECORD)};
+     dataset(topbusinessothersources.t_OtherSourceRecord) YellowPages {xpath('YellowPages/YellowPage'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_YP_RECORD)};
 	dataset(topbusinessothersources.t_OtherSourceRecord) GongRecords {xpath('GongRecords/GongRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_GONG_RECORD)};
 	dataset(topbusinessothersources.t_OtherSourceRecord) CrashCarriers {xpath('CrashCarriers/CrashCarrier'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_CRASH_RECORD)};
+	dataset(topbusinessothersources.t_OtherSourceRecord) InfutorNarbRecords {xpath('InfutorNarbRecords/InFutorNarbRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_INFUTOR_NARB_RECORD)};
+	dataset(topbusinessothersources.t_OtherSourceRecord) EquifaxBusinessDataRecords {xpath('EquifaxBusinessDataRecords/EquifaxBusinessDataRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_EQUIFAXBUSDATA_RECORD)};
 	dataset(proflicense.t_ProfessionalLicenseRecord) CNLDFacilities {xpath('CNLDFacilities/CNLDFacility'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_CNLD_RECORD)};
 	dataset(americanmedicalservices.t_AmericanMedicalServicesProvider) AMSLicenses {xpath('AMSLicenses/AMSLicense'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_AMSLIC_RECORD)};
 	dataset(osha.t_OSHAReportRecord) OSHAReportRecords {xpath('OSHAReportRecords/OSHAReportRecord'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_OSHAIR_RECORD)}; 

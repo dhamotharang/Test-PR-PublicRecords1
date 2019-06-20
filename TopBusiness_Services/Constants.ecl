@@ -1,4 +1,4 @@
-import MDR, TopBusiness, BIPV2;
+﻿import MDR, TopBusiness, BIPV2;
 
 export constants:= module;
 
@@ -106,6 +106,8 @@ export constants:= module;
 		MDR.SourceTools.SourceIsSheila_Greco(src),
 		MDR.SourceTools.SourceIsINFOUSA_DEAD_COMPANIES(src),
 		MDR.SourceTools.SourceIsSpoke(src),
+		MDR.SourceTools.SourceIsEquifax_Business_Data(src),
+		MDR.SourceTools.SourceIsInfutor_NARB (src),
 		true);
 
 	export unsigned2 CompanyNameSourceOrder(string2 src) := which(
@@ -151,6 +153,8 @@ export constants:= module;
 		MDR.SourceTools.SourceIsIRS_Non_Profit(src),
 		MDR.SourceTools.SourceIsSheila_Greco(src),
 		MDR.SourceTools.SourceIsZoom(src),
+		MDR.SourceTools.SourceIsEquifax_Business_Data(src),
+		MDR.SourceTools.SourceIsInfutor_NARB (src),
 		true);
 
 	export unsigned2 PhoneSourceOrder(string2 src) := which(
@@ -281,6 +285,7 @@ export constants:= module;
 	 export string corpkey          := 'corpkey';          // for Corp/Incorporation data
 	 export string enterprisenumber := 'enterprisenumber'; // for DCAV2/LNCA
 	 export string filenumber       := 'filenumber';       // for EBR
+	 export string efxid := 'efx_id';  // for Experian bus data
 	 export string foreclosureid    := 'foreclosureid';    // for foreclosure & nod
 	 export string propertykeys     := 'ln_fares_id';      // for real property
 	 export string sourcerecid      := 'source_rec_id';    // for BusRegs & ???
