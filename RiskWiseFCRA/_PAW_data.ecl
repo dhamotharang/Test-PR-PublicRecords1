@@ -1,8 +1,8 @@
-IMPORT doxie, fcra, paw, ut, riskwise;
+﻿IMPORT doxie, fcra, paw, ut, riskwise, Std;
 
 EXPORT _PAW_data(dataset (doxie.layout_references) dids, dataset (fcra.Layout_override_flag) flag_file, unsigned1 year_limit = 0) := FUNCTION
 
-	Layout_PAW := recordof(paw.Key_DID_FCRA);
+	Layout_PAW := recordof(paw.Key_DID_FCRA) - [global_sid, record_sid];
 
 	paw_ffids := SET(flag_file(file_id = FCRA.FILE_ID.paw), flag_file_id );
 	paw_correction_keys  := SET(flag_file(file_id = FCRA.FILE_ID.paw), trim(record_id) );
@@ -18,7 +18,7 @@ EXPORT _PAW_data(dataset (doxie.layout_references) dids, dataset (fcra.Layout_ov
 
 	paw_recs1 := paw_deduped + PROJECT( paw_corr, transform( Layout_PAW, self := LEFT) );	
 		
-	todaysdate := ut.GetDate;
+	todaysdate := (STRING8)Std.Date.Today();
 	//if called from benefitassessment_batchservicefcra, we get records from the last 12 months ~ 1 year
 	paw_recs_filtered := paw_recs1(ut.fn_date_is_ok(todaysdate, dt_last_seen , year_limit));
 
