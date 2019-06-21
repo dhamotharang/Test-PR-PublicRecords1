@@ -517,15 +517,15 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 
     //BUSINESS EXECUTIVE OFFICER US RESIDENCY
-    beoResidencyFlag9 := IF(le.atleastOneBEOInvalidSSN , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag8 := IF(le.atleastOneBEOAssocITINOrImmigrantSSN , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag7 := IF(le.atleastOneBEODOBPriorToParentSSN , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag6 := IF(le.atleastOneBEOParentWithITINOrImmigrantSSN , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag5 := IF(le.atleastOneBEONoParentsOrNeitherHaveSSNITIN , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag4 := IF(le.atleastOneBEOPublicRecordsLess3YrsWithNoVote , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag3 := IF(le.atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag2 := IF(le.atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    beoResidencyFlag1 := IF(le.execCount = 0 OR le.atleastOneBEOOrParentRegisteredVoter , DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag9 := IF(le.atleastOneBEOInvalidSSN, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag8 := IF(le.atleastOneBEOAssocITINOrImmigrantSSN, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag7 := IF(le.atleastOneBEODOBPriorToParentSSN, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag6 := IF(le.atleastOneBEOParentWithITINOrImmigrantSSN, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag5 := IF(le.atleastOneBEONoParentsOrNeitherHaveSSNITIN, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag4 := IF(le.atleastOneBEOPublicRecordsLess3YrsWithNoVote, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag3 := IF(le.atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag2 := IF(le.atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    beoResidencyFlag1 := IF(le.execCount = 0 OR le.atleastOneBEOOrParentRegisteredVoter, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
                         
     beoResidencyConcat_Final := DueDiligence.Common.calcFinalFlagField(beoResidencyFlag9,
                                                                         beoResidencyFlag8,
@@ -540,6 +540,30 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
     SELF.BusBEOUSResidency_Flag := beoResidencyConcat_Final;
     SELF.BusBEOUSResidency := (STRING)(10-STD.Str.Find(beoResidencyConcat_Final, DueDiligence.Constants.T_INDICATOR, 1));
 
+
+    //BUSINESS ACCESS TO FUNDS SALES
+    busSalesFlag9 := IF(le.sales >= 10000000, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag8 := IF(le.sales BETWEEN 1000000 AND 9999999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag7 := IF(le.sales BETWEEN 500000 AND 999999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag6 := IF(le.sales BETWEEN 250000 AND 499999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag5 := IF(le.sales BETWEEN 100000 AND 249999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag4 := IF(le.sales BETWEEN 50000 AND 99999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag3 := IF(le.sales BETWEEN 25000 AND 49999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag2 := IF(le.sales BETWEEN 1 AND 24999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    busSalesFlag1 := IF(le.sales = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+                        
+    busSalesConcat_Final := DueDiligence.Common.calcFinalFlagField(busSalesFlag9,
+                                                                    busSalesFlag8,
+                                                                    busSalesFlag7,
+                                                                    busSalesFlag6,
+                                                                    busSalesFlag5,
+                                                                    busSalesFlag4,
+                                                                    busSalesFlag3,
+                                                                    busSalesFlag2,
+                                                                    busSalesFlag1);
+
+    SELF.BusAccessToFundsSales_Flag := busSalesConcat_Final;
+    SELF.BusAccessToFundSales := (STRING)(10-STD.Str.Find(busSalesConcat_Final, DueDiligence.Constants.T_INDICATOR, 1));
       
     SELF := le;
 	END;
@@ -589,8 +613,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
                                                     SELF.BusBEOProfLicense_Flag := INVALID_BUSINESS_FLAGS;
                                                     SELF.BusBEOUSResidency := INVALID_BUSINESS_SCORE;
                                                     SELF.BusBEOUSResidency_Flag := INVALID_BUSINESS_FLAGS;
-                                                    // SELF.BusAccessToFundSales := INVALID_BUSINESS_SCORE;
-                                                    // SELF.BusAccessToFundsSales_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusAccessToFundSales := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusAccessToFundsSales_Flag := INVALID_BUSINESS_FLAGS;
                                                     // SELF.BusBEOAccessToFundsProperty := INVALID_BUSINESS_SCORE;
                                                     // SELF.BusBEOAccessToFundsProperty_Flag := INVALID_BUSINESS_FLAGS;
                                                     // SELF.BusLinkedBusinesses := INVALID_BUSINESS_SCORE;
