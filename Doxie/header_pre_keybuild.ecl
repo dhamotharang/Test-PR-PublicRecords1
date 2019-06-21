@@ -1,4 +1,4 @@
-import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build,mdr,PRTE2_Header;
+import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build,mdr,PRTE2_Header,dx_header;
 
 head0 := doxie_build.file_header_building; 
 head:=project(head0,transform({head0}
@@ -10,7 +10,7 @@ head:=project(head0,transform({head0}
 /* **************** get County Name from Count Code ****************** */
 xHead_Layout :=
 RECORD
-	head;
+	dx_header.layout_header;
 	string1 valid_dob := '';
 	unsigned6 hhid := 0;
 	STRING18 county_name := '';

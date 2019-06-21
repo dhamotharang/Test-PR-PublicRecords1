@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Data_Services;
+IMPORT BIPV2, Data_Services;
 EXPORT files_lgid3 := MODULE
 	/*----------------- Reduced layout for internal use only -----------------*/
 	EXPORT Layout_LGID3 := RECORD
@@ -39,7 +39,6 @@ EXPORT files_lgid3 := MODULE
 		BIPV2.CommonBase.Layout.dt_first_seen;
 		BIPV2.CommonBase.Layout.dt_last_seen;
 		typeof(BIPV2.CommonBase.Layout.vl_id) sbfe_id;
-		typeof(BIPV2.CommonBase.Layout.vl_id) cortera_id;
 		
  		BIPV2.CommonBase.Layout.has_lgid;					//For the postprocess update
    		BIPV2.CommonBase.Layout.is_sele_level;  	//For the postprocess update

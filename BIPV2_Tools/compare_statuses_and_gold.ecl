@@ -17,15 +17,28 @@
     ones that 
   
 */
-
+/*
+BIPV2_Tools.compare_statuses_and_gold(
+   BIPV2.KeySuffix
+  ,BIPV2.KeySuffix_mod2.PreviousBuildDate
+  ,bipv2.CommonBase.DS_CLEAN2 
+  ,bipv2.CommonBase.CLEAN2(bipv2.CommonBase.Common_Base('20190501').logical)
+  ,BIPV2.KeySuffix
+  ,'20190501d'  //old version key was diff layout, so had to recreate it using the new layout and new name
+  ,true
+);
+*/
 import BIPV2,Advo;
 
 EXPORT compare_statuses_and_gold(
 
-   pCurrent_Version   = 'BIPV2.KeySuffix'
-  ,pFather_Version    = 'BIPV2.KeySuffix_mod2.PreviousBuildDate'
-  ,pDs_Base           = 'bipv2.CommonBase.DS_CLEAN2'
-  ,pDs_Father         = 'bipv2.CommonBase.DS_CLEAN2_BASE'  
+   pCurrent_Version           = 'BIPV2.KeySuffix'
+  ,pFather_Version            = 'BIPV2.KeySuffix_mod2.PreviousBuildDate'
+  ,pDs_Base                   = 'bipv2.CommonBase.DS_CLEAN'
+  ,pDs_Father                 = 'bipv2.CommonBase.DS_CLEAN_BASE'  
+  ,pCurrentLgid3KeyVersion    = 'BIPV2.KeySuffix'
+  ,pFatherLgid3KeyVersion     = 'BIPV2.KeySuffix_mod2.PreviousBuildDate'
+  ,pTesting                   = 'false'                                   //if testing, then use clean2 which doesn't do suppression.  this allows the persists to not recalculate on reruns.  makes it quicker for testing.
 ) :=
 functionmacro
 
@@ -51,9 +64,9 @@ functionmacro
 
 
   // -- Set the statuses for those files, showing underlying sources and dates used for each ID
-  ds_get_statuses_built := BIPV2_Tools.mac_Set_Statuses(ds_built  ,pShow_Work := true                     ) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_built');
+  ds_get_statuses_built := BIPV2_Tools.mac_Set_Statuses(ds_built  ,pShow_Work := true                      ) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_built');
   // ds_get_statuses_base  := dataset('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base__p499438766' ,recordof(ds_get_statuses_built),flat);
-  ds_get_statuses_base  := BIPV2_Tools.mac_Set_Statuses(ds_base   ,pShow_Work := true,pToday := '20190304') : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base' );  //keeps rebuilding this even though nothing has changed
+  ds_get_statuses_base  := BIPV2_Tools.mac_Set_Statuses(ds_base   ,pShow_Work := true,pToday := old_version) : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_get_statuses_base' );  //keeps rebuilding this even though nothing has changed
 
 
 
@@ -75,8 +88,8 @@ functionmacro
 
   ds_proj_all := project(ds_join_all  ,transform(
     {unsigned6 seleid,string1 new_status,string1 old_status,dataset(recordof(ds_get_statuses_built.active_calculation)) calc_diffs,dataset(recordof(ds_get_statuses_built.src_recs)) src_diffs ,set of string set_diff_sources,recordof(left) - seleid - new_status - old_status}
-    ,src_diffs  := join(left.new_recs[1].src_recs           ,left.old_recs[1].src_recs           ,left.source = right.source and left.dt_last_seen = right.dt_last_seen and left.company_status_derived = right.company_status_derived ,transform(left),left only);
-     calc_diffs := join(left.new_recs[1].active_calculation ,left.old_recs[1].active_calculation ,left.calculation = right.calculation and left.result = right.result ,transform(left),left only);
+    ,src_diffs  := join(left.new_recs[1].src_recs           ,left.old_recs[1].src_recs           ,left.source      = right.source      and left.dt_last_seen = right.dt_last_seen and left.company_status_derived = right.company_status_derived  ,transform(left),left only);
+     calc_diffs := join(left.new_recs[1].active_calculation ,left.old_recs[1].active_calculation ,left.calculation = right.calculation and left.result       = right.result                                                                       ,transform(left),left only);
       self.src_diffs         := src_diffs;
       self.calc_diffs        := calc_diffs;
       self.set_diff_sources  := set(sort(table(src_diffs,{source},source),source) ,source);
@@ -117,8 +130,8 @@ functionmacro
   ));
 
 
-  ds_src_status_breakdown_table1 := table(ds_src_status_breakdown_prep    ,{seleid,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive  ,source} ,seleid,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive ,source  ,merge);
-  ds_src_status_breakdown_table  := table(ds_src_status_breakdown_table1  ,{cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive  ,source ,unsigned cnt := count(group)}  ,cluster_type ,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive  ,source  ,merge);
+  ds_src_status_breakdown_table1 := table(ds_src_status_breakdown_prep    ,{seleid,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive  ,source                              } ,seleid ,cluster_type ,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive ,source  ,merge);
+  ds_src_status_breakdown_table  := table(ds_src_status_breakdown_table1  ,{       cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive  ,source ,unsigned cnt := count(group)}         ,cluster_type ,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive ,source  ,merge);
   ds_src_status_breakdown_table_sort := sort(ds_src_status_breakdown_table ,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive   ,-cnt,source);
 
   ds_src_status_breakdown_table_prep := project(ds_src_status_breakdown_table_sort ,transform({recordof(left) - source - cnt,dataset({string source,unsigned cnt}) source_differences}
@@ -131,8 +144,8 @@ functionmacro
     ,self                    := left
   )   ,cluster_type ,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive  );
 
-  ds_src_status_breakdown_seleids_prep := table(ds_src_status_breakdown_table1        ,{seleid,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive } ,seleid ,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive   ,merge);
-  ds_src_status_breakdown_seleids      := table(ds_src_status_breakdown_seleids_prep  ,{       cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive ,unsigned cnt := count(group)}         ,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive   ,merge);
+  ds_src_status_breakdown_seleids_prep := table(ds_src_status_breakdown_table1        ,{seleid,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive                               } ,seleid ,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive   ,merge);
+  ds_src_status_breakdown_seleids      := table(ds_src_status_breakdown_seleids_prep  ,{       cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive ,unsigned cnt := count(group) }         ,cluster_type,new_status ,old_status ,Reported_Defunct  ,Over_2_years_old  ,Reported_Inactive   ,merge);
 
   ds_src_status_breakdown := join(ds_src_status_breakdown_prep2 ,ds_src_status_breakdown_seleids
   ,     left.cluster_type       = right.cluster_type
@@ -208,17 +221,18 @@ functionmacro
   ,left.src_diffs ,transform({string source},self.source := right.source));
   top10_contributory_defunct_sources_table := table(top10_contributory_defunct_sources  ,{source,unsigned cnt := count(group)} ,source ,merge);
 
-  /* -- gold stuff
+  /* 
+      -------------------------------------- GOLD STUFF ----------------------------------------------
   */
-  new_segs := BIPV2_PostProcess.proc_segmentation(new_version,ds_new,pPopulateStatus := false,pUseClean2 := true);
-  old_segs := BIPV2_PostProcess.proc_segmentation(old_version,ds_old,pPopulateStatus := false,pToday := '20190304',pGoldOutputModifier := '_Old',pUseClean2 := true);
+  new_segs := BIPV2_PostProcess.proc_segmentation(new_version,ds_new,pPopulateStatus := false                                                     ,pUseClean2 := pTesting,pLgid3KeyVersion := pCurrentLgid3KeyVersion);
+  old_segs := BIPV2_PostProcess.proc_segmentation(old_version,ds_old,pPopulateStatus := false,pToday := old_version,pGoldOutputModifier := '_Old' ,pUseClean2 := pTesting,pLgid3KeyVersion := pFatherLgid3KeyVersion );
 
   // ds_new_golds := new_segs.modgoldSELEV2.Gold;
   // ds_old_golds := old_segs.modgoldSELEV2.Gold;
 
   // test_gold_summarys  := new_segs.modgoldSELEV2.ds_src_status_dt_rollup;
-  ds_append_gold_field_new := new_segs.modgoldSELEV2.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_new');
-  ds_append_gold_field_old := old_segs.modgoldSELEV2.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_old');
+  ds_append_gold_field_new := new_segs.modgoldSELEV2_all.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_new');
+  ds_append_gold_field_old := old_segs.modgoldSELEV2_all.ds_append_gold_field  : persist('~persist::BIPV2_Tools::compare_statuses_and_gold::ds_append_gold_field_old');
 
 
   ds_find_gold_diffs := join(ds_append_gold_field_new ,ds_append_gold_field_old ,left.id = right.id ,transform(
@@ -254,18 +268,33 @@ functionmacro
   ds_norm_gold_calculations_table_diff  := table(ds_norm_gold_calculations_diff ,{calculation,result  ,unsigned cnt := count(group)}  ,calculation,result ,merge);
   ds_norm_gold_calc_sources_diff_table  := table(table(ds_norm_gold_calc_sources_diff ,{tier,source ,seleid},tier,source ,seleid,merge) ,{tier,source         ,unsigned cnt := count(group)}  ,tier,source        ,merge);
 
+  // -- 
+  ds_norm_notgold_calc_sources_diff  := normalize(ds_find_gold_diffs_all((isgold_new = false and exists(new_sources) and ~exists(old_sources)) or (isgold_new = false and isgold_old = true and exists(old_sources) and exists(new_sources))) ,left.gold_calc_sources_diff  
+    ,transform({unsigned6 seleid,recordof(left.gold_calc_sources_diff )},self.seleid := left.seleid,self := right));
+  ds_norm_notgold_calc_sources_diff_table  := table(table(ds_norm_notgold_calc_sources_diff ,{tier,source ,seleid},tier,source ,seleid,merge) ,{tier,source         ,unsigned cnt := count(group)}  ,tier,source        ,merge);
+
 
   isactive_string             := 'isActive'                                                                       ;
   isnotjustpobox_string       := 'AND isNotJustPOBox'                                                             ;
   isinhrchy_or_lgid3linkable  := 'AND (inHrchy OR isLgid3Linkable)'                                               ;
+
+  isinhrchy                   := 'AND inHrchy'                                               ;
+  islgid3linkable             := 'AND isLgid3Linkable'                                               ;
+
+
   is_supercore_etc            := 'AND ( hasSuperCoreSrc OR ((hasOtherCoreSrc or has2TSrc) and hasMultipleSources)';
 
 
-  ds_gold_calculations_summary_slim  := normalize(ds_find_gold_diffs_all  ,left.gold_calc_sources_diff  ,transform({unsigned6 seleid,string cluster_type,boolean isgold_new  ,boolean isgold_old ,string is_Active  ,string is_Not_Just_PO_Box  ,string is_In_Hrchy_Or_Is_Lgid3_Linkable ,string is_supercore_or_othercore_or_multiple_sources ,string source}
-    ,self.is_Active                                     := if(exists(left.gold_calc_diff(calculation = isactive_string           )) ,if(left.gold_calc_diff(calculation = isactive_string           )[1].result = true  ,'true' ,'false') ,'')
-    ,self.is_Not_Just_PO_Box                            := if(exists(left.gold_calc_diff(calculation = isnotjustpobox_string     )) ,if(left.gold_calc_diff(calculation = isnotjustpobox_string     )[1].result = true  ,'true' ,'false') ,'')
-    ,self.is_In_Hrchy_Or_Is_Lgid3_Linkable              := if(exists(left.gold_calc_diff(calculation = isinhrchy_or_lgid3linkable)) ,if(left.gold_calc_diff(calculation = isinhrchy_or_lgid3linkable)[1].result = true  ,'true' ,'false') ,'')
-    ,self.is_supercore_or_othercore_or_multiple_sources := if(exists(left.gold_calc_diff(regexfind('hasSuperCoreSrc',calculation,nocase)          )) ,if(left.gold_calc_diff(regexfind('hasSuperCoreSrc',calculation,nocase)          )[1].result = true  ,'true' ,'false') ,'')
+  ds_gold_calculations_summary_slim  := normalize(ds_find_gold_diffs_all  ,left.gold_calc_sources_diff  ,transform({unsigned6 seleid,string cluster_type,boolean isgold_new  ,boolean isgold_old ,string is_Active  ,string is_Not_Just_PO_Box  ,string is_In_Hrchy_Or_Is_Lgid3_Linkable ,string is_In_Hrchy,string Is_Lgid3_Linkable,string is_supercore_or_othercore_or_multiple_sources ,string source}
+    ,self.is_Active                                     := if(exists(left.gold_calc_diff(calculation = isactive_string                    )) ,if(left.gold_calc_diff(calculation = isactive_string                    )[1].result = true  ,'true' ,'false') ,'')
+    ,self.is_Not_Just_PO_Box                            := if(exists(left.gold_calc_diff(calculation = isnotjustpobox_string              )) ,if(left.gold_calc_diff(calculation = isnotjustpobox_string              )[1].result = true  ,'true' ,'false') ,'')
+    ,self.is_In_Hrchy_Or_Is_Lgid3_Linkable              := if(exists(left.gold_calc_diff(calculation = isinhrchy_or_lgid3linkable         )) ,if(left.gold_calc_diff(calculation = isinhrchy_or_lgid3linkable         )[1].result = true  ,'true' ,'false') ,'')
+
+    ,self.is_In_Hrchy                                   := if(exists(left.gold_calc_diff(calculation = isinhrchy                          )) ,if(left.gold_calc_diff(calculation = isinhrchy         )[1].result = true  ,'true' ,'false') ,'')
+    ,self.Is_Lgid3_Linkable                             := if(exists(left.gold_calc_diff(calculation = islgid3linkable                    )) ,if(left.gold_calc_diff(calculation = islgid3linkable   )[1].result = true  ,'true' ,'false') ,'')
+
+
+    ,self.is_supercore_or_othercore_or_multiple_sources := if(exists(left.gold_calc_diff(regexfind('hasSuperCoreSrc',calculation,nocase)  )) ,if(left.gold_calc_diff(regexfind('hasSuperCoreSrc',calculation,nocase)  )[1].result = true  ,'true' ,'false') ,'')
     ,self.source                                        := trim(right.tier) + ' ' + right.source
     ,self.isgold_new                                    := left.isgold_new
     ,self.isgold_old                                    := left.isgold_old
@@ -285,9 +314,9 @@ functionmacro
     ,self.seleid := left.seleid
   ));
 
-  ds_gold_calculations_summary_table1 := table(ds_gold_calculations_summary_slim    ,{seleid,cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source                              } ,seleid,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source  ,merge);
-  ds_gold_calculations_summary_table  := table(ds_gold_calculations_summary_table1  ,{       cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source ,unsigned cnt := count(group)}        ,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source  ,merge);
-  ds_gold_calculations_summary_table_sort := sort(ds_gold_calculations_summary_table ,cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources  ,-cnt,source);
+  ds_gold_calculations_summary_table1 := table(ds_gold_calculations_summary_slim    ,{seleid,cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source                              } ,seleid,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source  ,merge);
+  ds_gold_calculations_summary_table  := table(ds_gold_calculations_summary_table1  ,{       cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source ,unsigned cnt := count(group)}        ,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources ,source  ,merge);
+  ds_gold_calculations_summary_table_sort := sort(ds_gold_calculations_summary_table ,cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources  ,-cnt,source);
 
   ds_gold_calculations_summary_table_prep := project(ds_gold_calculations_summary_table_sort ,transform({recordof(left) - source - cnt,dataset({string source,unsigned cnt}) source_differences}
     ,self.source_differences  := dataset([{left.source,left.cnt}] ,{string source,unsigned cnt})
@@ -297,10 +326,10 @@ functionmacro
   ds_gold_calculations_summary_prep := rollup(ds_gold_calculations_summary_table_prep  ,transform(recordof(left)
     ,self.source_differences := left.source_differences + right.source_differences
     ,self                    := left
-  )   ,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources );
+  )   ,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources );
 
-  ds_gold_calculations_summary_seleids_prep := table(ds_gold_calculations_summary_table1    ,{seleid,cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources} ,seleid,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources  ,merge);
-  ds_gold_calculations_summary_seleids      := table(ds_gold_calculations_summary_seleids_prep    ,{cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources,unsigned cnt := count(group)} ,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources  ,merge);  
+  ds_gold_calculations_summary_seleids_prep := table(ds_gold_calculations_summary_table1    ,{seleid,cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources} ,seleid,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources  ,merge);
+  ds_gold_calculations_summary_seleids      := table(ds_gold_calculations_summary_seleids_prep    ,{cluster_type,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources,unsigned cnt := count(group)} ,cluster_type ,isgold_new ,isgold_old ,is_Active  ,is_Not_Just_PO_Box  ,is_In_Hrchy_Or_Is_Lgid3_Linkable,is_In_Hrchy,Is_Lgid3_Linkable ,is_supercore_or_othercore_or_multiple_sources  ,merge);  
 
   ds_gold_calculations_summary := join(ds_gold_calculations_summary_prep  ,ds_gold_calculations_summary_seleids 
   ,     left.cluster_type                                   = right.cluster_type 
@@ -309,15 +338,23 @@ functionmacro
     and left.is_Active                                      = right.is_Active  
     and left.is_Not_Just_PO_Box                             = right.is_Not_Just_PO_Box 
     and left.is_In_Hrchy_Or_Is_Lgid3_Linkable               = right.is_In_Hrchy_Or_Is_Lgid3_Linkable 
+    and left.is_In_Hrchy                                      = right.is_In_Hrchy 
+    and left.Is_Lgid3_Linkable                                = right.Is_Lgid3_Linkable 
     and left.is_supercore_or_othercore_or_multiple_sources  = right.is_supercore_or_othercore_or_multiple_sources
   
   ,transform({string total_seleids,string cluster_type,dataset({string calculation,string result}) gold_calculation_differences,dataset({string source,string cnt_seleids}) source_differences}
     ,self.total_seleids                 := ut.fIntWithCommas(right.cnt)
     ,self.source_differences            := project(topn(left.source_differences ,10,-cnt) ,transform({string source,string cnt_seleids},self.cnt_seleids := ut.fIntWithCommas(left.cnt),self := left))
     ,self.gold_calculation_differences  := 
-        if(trim(left.is_Active                                    ) != '' ,dataset([{isactive_string              ,left.is_Active                                    }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
-      + if(trim(left.is_Not_Just_PO_Box                           ) != '' ,dataset([{isnotjustpobox_string        ,left.is_Not_Just_PO_Box                           }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
-      + if(trim(left.is_In_Hrchy_Or_Is_Lgid3_Linkable             ) != '' ,dataset([{isinhrchy_or_lgid3linkable   ,left.is_In_Hrchy_Or_Is_Lgid3_Linkable             }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
+        if(trim(left.is_Active                                    ) != '' ,dataset([{isactive_string              ,left.is_Active                                     }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
+      + if(trim(left.is_Not_Just_PO_Box                           ) != '' ,dataset([{isnotjustpobox_string        ,left.is_Not_Just_PO_Box                            }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
+      + if(trim(left.is_In_Hrchy_Or_Is_Lgid3_Linkable             ) != '' ,dataset([{isinhrchy_or_lgid3linkable   ,left.is_In_Hrchy_Or_Is_Lgid3_Linkable              }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
+
+      + if(trim(left.is_In_Hrchy                                    ) != '' ,dataset([{isinhrchy                    ,left.is_In_Hrchy                                     }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
+      + if(trim(left.Is_Lgid3_Linkable                              ) != '' ,dataset([{islgid3linkable              ,left.Is_Lgid3_Linkable                               }],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
+
+
+
       + if(trim(left.is_supercore_or_othercore_or_multiple_sources) != '' ,dataset([{is_supercore_etc             ,left.is_supercore_or_othercore_or_multiple_sources}],{string calculation,string result}) ,dataset([],{string calculation,string result})  )
     ,self                               := left
   ));
@@ -328,11 +365,15 @@ functionmacro
   // output( choosen(ds_append_gold_field  ,300)  ,named('ds_append_gold_field'),all);
   // output( choosen(test_gold_summarys  ,300)  ,named('test_gold_summarys'),all);
   // modgoldSELEV2.Gold// + modgoldSELEV2.NotGold
-  contributory_sources_gold_prep := project(ds_norm_gold_calc_sources_diff_table  ,transform({string source,unsigned cnt},self.source := trim(left.tier) + ' ' + left.source,self.cnt := left.cnt));
+  contributory_sources_gold_prep    := project(ds_norm_gold_calc_sources_diff_table     ,transform({string source,unsigned cnt},self.source := trim(left.tier) + ' ' + left.source,self.cnt := left.cnt));
+  contributory_sources_notgold_prep := project(ds_norm_notgold_calc_sources_diff_table  ,transform({string source,unsigned cnt},self.source := trim(left.tier) + ' ' + left.source,self.cnt := left.cnt));
+
+
 
   lay_contributory_sources := {string Source,string Count_Seleids};
 
   top10_contributory_sources_gold     := project(topn(contributory_sources_gold_prep            ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
+  top10_contributory_sources_notgold  := project(topn(contributory_sources_notgold_prep         ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
   top10_contributory_sources_active   := project(topn(top10_contributory_active_sources_table   ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
   top10_contributory_sources_inactive := project(topn(top10_contributory_inactive_sources_table ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
   top10_contributory_sources_defunct  := project(topn(top10_contributory_defunct_sources_table  ,10,-cnt) ,transform(lay_contributory_sources ,self.Count_Seleids := ut.fIntWithCommas(left.cnt),self := left));
@@ -356,6 +397,25 @@ functionmacro
     ,{'--------Lost Stats breakdown-------------','---------------'}
     ,{'Gold clusters that don\'t exist anymore'             ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = true   ,~exists(new_sources))))}
     ,{'Existing clusters switched from Gold to Non-gold'    ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = true   ,isgold_new = false   , exists(new_sources)) ))   }
+                                          
+  ] ,lay_child_stats);
+
+  ds_notgold_stats := dataset([
+     {'-----------Overall stats------------------','---------------'}
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = false) )) }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_append_gold_field_old(isgold = false) )) }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = false) ) - count(ds_append_gold_field_old(isgold = false) )) }
+    ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = false   ,isgold_old = true )))  }
+    ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = false   ,isgold_new = true )))  }
+    ,{'Total Non-Gold Clusters in common'                                     ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = false   ,isgold_old = false)))  }
+                                          
+    ,{'------Gained Stats breakdown-------------','---------------'}
+    ,{'Brand new Non-gold clusters'                                   ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = false   ,exists(new_sources)  ,~exists(old_sources)) )) }
+    ,{'Existing clusters switched from Gold to Non-Gold'              ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = false   ,isgold_old = true   ,exists(old_sources),exists(new_sources)) )) }
+                                          
+    ,{'--------Lost Stats breakdown-------------','---------------'}
+    ,{'Non-Gold clusters that don\'t exist anymore'                   ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = false   ,exists(old_sources) ,~exists(new_sources))))}
+    ,{'Existing clusters switched from Non-Gold to Gold'              ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = false   ,isgold_new = true   ,exists(old_sources), exists(new_sources)) ))   }
                                           
   ] ,lay_child_stats);
 
@@ -429,6 +489,11 @@ functionmacro
       ,ds_gold_stats   
       ,top10_contributory_sources_gold                                                              
     }
+
+   ,{  'Non-Gold'                                                                                                                                                                                                                 
+      ,ds_notgold_stats                                                                                                       
+      ,top10_contributory_sources_Notgold                                                                                                          
+    }                                                                                                                                             
 
    ,{  'Active'                                                                                                                                                                                                                 
       ,ds_active_stats                                                                                                       

@@ -19,7 +19,8 @@ module
 	 
 	shared lgid3_ih					:= dataset([],BIPV2_LGID3.layout_LGID3);
 	
-	shared lgid3_prop_file	:= dataset([], recordof(BIPV2_LGID3.match_candidates(lgid3_ih).candidates)); // Use propogated file
+	//shared lgid3_prop_file	:= dataset([], recordof(BIPV2_LGID3.match_candidates(lgid3_ih).candidates)); // Use propogated file
+	shared lgid3_prop_file	:= dataset([], Layouts.candidate); 
  
   EXPORT lgid3_MatchesKeyName            := '~'+'prte::key::BIPV2_LGID3::LGID3::Debug::attribute_matches';	
 

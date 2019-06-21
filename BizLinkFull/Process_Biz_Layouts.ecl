@@ -1314,21 +1314,47 @@ EXPORT CombineAllScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_bGetAllSc
   OutputLayout_Batch Create_Output(LayoutScoredFetch le, DATASET(LayoutScoredFetch) ri) := TRANSFORM
     SELF.Results := ri;
     SELF.Reference := le.Reference;
-    SELF.Results_seleid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results,-seleid),LEFT.seleid=RIGHT.seleid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(proxid=SELF.Results[1].proxid),-proxid));
-    SELF.Results_orgid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results_seleid,-orgid),LEFT.orgid=RIGHT.orgid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(seleid=SELF.Results[1].seleid),-seleid));
-    SELF.Results_ultid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results_orgid,-ultid),LEFT.ultid=RIGHT.ultid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(orgid=SELF.Results[1].orgid),-orgid));
-    SELF.Results_powid := IF(In_bGetAllScores, SORT( ROLLUP( SORT( SELF.Results,-powid),LEFT.powid=RIGHT.powid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(proxid=SELF.Results[1].proxid),-proxid));
+    SELF := [];
+  END;
+  OutputLayout_Batch Create_Output1(OutputLayout_Batch L) := TRANSFORM
+    SELF.Results_seleid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( L.Results,-seleid),LEFT.seleid=RIGHT.seleid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(proxid=L.Results[1].proxid),-proxid));
+    SELF := L;
+  END;
+  OutputLayout_Batch Create_Output2(OutputLayout_Batch L) := TRANSFORM
+    SELF.Results_orgid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( L.Results_seleid,-orgid),LEFT.orgid=RIGHT.orgid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(seleid=L.Results[1].seleid),-seleid));
+    SELF := L;
+  END;
+  OutputLayout_Batch Create_Output3(OutputLayout_Batch L) := TRANSFORM
+    SELF.Results_ultid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( L.Results_orgid,-ultid),LEFT.ultid=RIGHT.ultid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(orgid=L.Results[1].orgid),-orgid));
+    SELF := L;
+  END;
+  OutputLayout_Batch Create_Output4(OutputLayout_Batch L) := TRANSFORM
+    SELF.Results_powid := IF(In_bGetAllScores, SORT( ROLLUP( SORT( L.Results,-powid),LEFT.powid=RIGHT.powid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(proxid=L.Results[1].proxid),-proxid));
+    SELF := L;
+  END;
+  OutputLayout_Batch Create_Output5(OutputLayout_Batch L) := TRANSFORM
+    SELF.Results := L.Results;
+    SELF.Reference := L.Reference;
+    SELF.Results_seleid := L.Results_seleid;
+    SELF.Results_orgid := L.Results_orgid;
+    SELF.Results_ultid := L.Results_ultid;
+    SELF.Results_powid := L.Results_powid;
     MAC_Add_ResolutionFlags()
   END;
   r0 := ROLLUP( SORT( GROUP( SORT ( DISTRIBUTE(In_Data,HASH(Reference)),Reference, LOCAL ), Reference, LOCAL),proxid),LEFT.proxid=RIGHT.proxid,Combine_Scores(LEFT,RIGHT,In_disableForce))(SALT311.DebugMode OR ~ForceFailed);
   r1 := AdjustScoresForNonExactMatches(UNGROUP(r0));
-  R2 := ROLLUP( TOPN(r1,100,-Weight),GROUP, Create_Output(LEFT,ROWS(LEFT)) );
-  SALT311.MAC_External_AddPcnt(R2,LayoutScoredFetch,Results,OutputLayout_Batch,27,R3);
-  SALT311.MAC_External_AddPcnt(R3,LayoutScoredFetch,Results_seleid,OutputLayout_Batch,27,R4);
-  SALT311.MAC_External_AddPcnt(R4,LayoutScoredFetch,Results_orgid,OutputLayout_Batch,27,R5);
-  SALT311.MAC_External_AddPcnt(R5,LayoutScoredFetch,Results_ultid,OutputLayout_Batch,27,R6);
-  SALT311.MAC_External_AddPcnt(R6,LayoutScoredFetch,Results_powid,OutputLayout_Batch,27,R7);
-  RETURN r7;
+  R2 := ROLLUP( TOPN(r1,100,-Weight),GROUP, Create_Output(LEFT,ROWS(LEFT)) ) : GLOBAL;
+  R3 := PROJECT(R2, Create_Output1(LEFT)) : GLOBAL;
+  R4 := PROJECT(R3, Create_Output2(LEFT)) : GLOBAL;
+  R5 := PROJECT(R4, Create_Output3(LEFT)) : GLOBAL;
+  R6 := PROJECT(R5, Create_Output4(LEFT)) : GLOBAL;
+  R7 := PROJECT(R6, Create_Output5(LEFT)) : GLOBAL;
+  SALT311.MAC_External_AddPcnt(R7,LayoutScoredFetch,Results,OutputLayout_Batch,27,R8);
+  SALT311.MAC_External_AddPcnt(R8,LayoutScoredFetch,Results_seleid,OutputLayout_Batch,27,R9);
+  SALT311.MAC_External_AddPcnt(R9,LayoutScoredFetch,Results_orgid,OutputLayout_Batch,27,R10);
+  SALT311.MAC_External_AddPcnt(R10,LayoutScoredFetch,Results_ultid,OutputLayout_Batch,27,R11);
+  SALT311.MAC_External_AddPcnt(R11,LayoutScoredFetch,Results_powid,OutputLayout_Batch,27,R12);
+  RETURN r12;
 END;
 EXPORT CombineLinkpathScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_disableForce = TRUE) := FUNCTION
 // Note - results are returned distributed by HASH(reference) - this is part of the specification

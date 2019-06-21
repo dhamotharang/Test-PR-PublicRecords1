@@ -52,6 +52,8 @@
   string1 chk_digit;
   string4 err_stat;
 	//CCPA-283 Adding CCPA new fields
+	unsigned6	did;
+	unsigned3 did_score;
 	UNSIGNED4 global_sid;
 	UNSIGNED8 record_sid;
  END;

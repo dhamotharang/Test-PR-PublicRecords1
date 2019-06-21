@@ -113,6 +113,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'EXTERNALFILE:Ext_Data:NAMED(File_Ext_Data):DIVE(NEVER):SEARCH:IGNORE(sele_flag,org_flag,ult_flag):CLEAN\n'
     + '\n'
     + 'HACK:IMPROVE_EF_WEIGHTS\n'
+    + 'HACK:SPLIT_COMBINEALLSCORES\n'
     + '\n'
     + 'LINKPATH:L_CNPNAME_ZIP:cnp_name:zip:?:prim_name:st(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_CNPNAME_ST:cnp_name:st:?:prim_name:zip(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CNPNAME_ZIP)\n'

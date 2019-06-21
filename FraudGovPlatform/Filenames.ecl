@@ -45,6 +45,11 @@ module
 		export _InquiryLogsRejected := FileSprayed+'::Rejected::InquiryLogs';
 		export _InquiryLogsDelete := FileSprayed+'::Delete::InquiryLogs';
 		export InquiryLogs := _InquiryLogsPassed;		
+
+		export _RDPPassed := FileSprayed+'::Passed::RDP';  
+		export _RDPRejected := FileSprayed+'::Rejected::RDP';
+		export _RDPDelete := FileSprayed+'::Delete::RDP';
+		export RDP := _RDPPassed;		
 		
 	end;
 	
