@@ -58,10 +58,11 @@
   <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
 </message>
 */
-IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie;
+
 
 EXPORT PhoneFinderReportService() :=
 MACRO	
+IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, AutoheaderV2, Autokey_batch;
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// parse ESDL input
   dIn       := DATASET([], iesp.phonefinder.t_PhoneFinderSearchRequest) : STORED('PhoneFinderSearchRequest',FEW);

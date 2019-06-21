@@ -45,12 +45,9 @@ Indicator ID	Risk Alert
 42  High Count of Devices Associated to Phone Number in Past Month.
 43  High Count of Email Addresses Associated to Phone Number in Past Month.
 44  Phone Seen in High Number of Countries in Past Month.
-<<<<<<< HEAD
 45  Phone Number is Associated to more than [Threshold] Identities
 46  Surname of Phone's Listing Name Does Not Match Identity Found
-=======
 47  Phone returned more than X times in past Y days.
->>>>>>> 0f52f29534cf67a4f3465856552215003b2a6f02
 */
 
 IMPORT $, iesp, STD, ut;
@@ -133,6 +130,7 @@ FUNCTION
                                 43 => EXISTS((pInput.TmxVariables(Name = 'countemailsseenwithphone_month' AND (INTEGER)Value >= le.Threshold))),
                                 44 => EXISTS((pInput.TmxVariables(Name = 'phoneseenmultiplecountry_month' AND (INTEGER)Value >= le.Threshold))),
                                 45 => pInput.identity_count > le.Threshold,
+                                46 => inMod.isPrimarySearchPII AND ~pInput.isLNameMatch,
                                 47 => pInput.phone_inresponse_count > le.Threshold,
                                 FALSE);
 
