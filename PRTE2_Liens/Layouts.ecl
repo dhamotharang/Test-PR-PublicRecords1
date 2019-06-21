@@ -160,15 +160,79 @@ EXPORT LinkIDSKey:= RECORD
 	string10	orig_rmsid;
  END;
 
+
+
 //Due to the Prod Layout changes
-EXPORT alpha_main_in := RECORD
-	main_base_ext and not [global_sid,
-												 record_sid,
-												 orig_rmsid,
-												 AgencyID,
-												 AgencyID_src
-												 ];
-	end;
+layout_filing_status := RECORD,maxlength(10000)
+   string filing_status;
+   string filing_status_desc;
+  END;
+
+
+EXPORT alpha_main_in := RECORD,maxlength(32766)
+  string50 tmsid;
+  string50 rmsid;
+  string process_date;
+  string record_code;
+  string date_vendor_removed;
+  string filing_jurisdiction;
+  string filing_state;
+  string20 orig_filing_number;
+  string orig_filing_type;
+  string orig_filing_date;
+  string orig_filing_time;
+  string case_number;
+  string20 filing_number;
+  string filing_type_desc;
+  string filing_date;
+  string filing_time;
+  string vendor_entry_date;
+  string judge;
+  string case_title;
+  string filing_book;
+  string filing_page;
+  string release_date;
+  string amount;
+  string eviction;
+  string satisifaction_type;
+  string judg_satisfied_date;
+  string judg_vacated_date;
+  string tax_code;
+  string irs_serial_number;
+  string effective_date;
+  string lapse_date;
+  string accident_date;
+  string sherrif_indc;
+  string expiration_date;
+  string agency;
+  string agency_city;
+  string agency_state;
+  string agency_county;
+  string legal_lot;
+  string legal_block;
+  string legal_borough;
+  string certificate_number;
+  boolean bcbflag;
+  unsigned8 persistent_record_id;
+  DATASET(layout_filing_status) filing_status;
+  string2 filing_type_id;
+  string8 collection_date;
+  string45 caselinkid;
+  string50 tmsid_old;
+  string50 rmsid_old;
+  boolean caselinkid_prop_flag;
+  string20 cust_name;
+  string10 bug_num;
+  string7 courtid;
+  string2 filing_typ_code;
+ END;
+
+	// LiensV2.layout_liens_main_module.layout_liens_main and not [global_sid,record_sid,orig_rmsid,AgencyID, AgencyID_src];
+	// string20	cust_name;
+	// string10	bug_num;	
+	// string7		courtid;
+	// string2		filing_typ_code;											 
+	// end;
 	
 EXPORT alpha_party_in := RECORD
 	party_base_ext and not [global_sid,
