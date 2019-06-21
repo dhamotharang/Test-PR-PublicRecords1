@@ -1,27 +1,12 @@
-﻿IMPORT Citizenship, DueDiligence, Gateway, Models, Risk_Indicators;
+﻿IMPORT Business_Risk_BIP, DueDiligence, Gateway, Risk_Indicators;
 
-EXPORT getCitizenship(DATASET(DueDiligence.Layouts.Input) validInput,
-                      UNSIGNED6 inGLBA, 
-                      UNSIGNED6 inDPPA, 
-                      STRING50 inDataRestriction,
-                      STRING50 inDataPermission,
-                      STRING15 in_modelName,
-                      BOOLEAN modelValidation,
-                      BOOLEAN debug) := FUNCTION
-                      
-                      
 
-    //defaults for citizenship
-    defaultGateway := DATASET([], Gateway.Layouts.Config);
-    defaultBSVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
-    defaultBSOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
-    defaultLNBranded := FALSE;
-
-    //clean the data
-    cleanedCitizenshipData := Citizenship.Common.CleanData(validInput);
+EXPORT fn_getIndBSAndRI(DATASET(DueDiligence.Layouts.CleanedData) cleanData,
+                        Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
     
+    //for only person requests of Due Diligence and Citizenship call the BS and Indicators - use cleaned input vs the new pii/lexID just calc'd
     //convert cleaned data into a usable layout for IID
-    iid_ready := PROJECT(cleanedCitizenshipData, TRANSFORM(Risk_Indicators.layout_input,
+    iid_ready := PROJECT(cleanData, TRANSFORM(Risk_Indicators.layout_input,
                                                 SELF.seq := LEFT.cleanedInput.seq;
                                                 SELF.historydate := (UNSIGNED3)((STRING)LEFT.cleanedInput.historyDateYYYYMMDD)[..6];
                                                 SELF.DID := (UNSIGNED6)LEFT.cleanedInput.individual.lexID;
@@ -63,48 +48,56 @@ EXPORT getCitizenship(DATASET(DueDiligence.Layouts.Input) validInput,
                                                 SELF.dl_state := LEFT.cleanedInput.dlState;
                                                 
                                                 SELF := [];));
+ 
+
+
+    //defaults for citizenship and due diligence
+    defaultGateway := DATASET([], Gateway.Layouts.Config);
+    defaultBSVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
+    defaultBSOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
+    defaultLNBranded := FALSE;
     
     //call instantID
-    iid := risk_indicators.InstantID_Function(iid_ready, defaultGateway, inDPPA, inGLBA, in_ln_branded := defaultLNBranded, in_BSversion := defaultBSVersion, 
-                                              in_BSOptions := defaultBSOptions, in_DataRestriction := inDataRestriction, in_DataPermission := inDataPermission);
+    iid := Risk_Indicators.InstantID_Function(iid_ready, defaultGateway, options.DPPA_Purpose, options.GLBA_Purpose, in_ln_branded := defaultLNBranded, in_BSversion := defaultBSVersion, 
+                                              in_BSOptions := defaultBSOptions, in_DataRestriction := options.DataRestrictionMask, in_DataPermission := options.DataPermissionMask);
                     
     //call Boca Shell
-    bocaShell := risk_indicators.Boca_Shell_Function(iid, defaultGateway, inDPPA, inGLBA, BSversion := defaultBSVersion, BSOptions := defaultBSOptions,
-                                                      DataRestriction := inDataRestriction, DataPermission := inDataPermission);
+    bocaShell := Risk_Indicators.Boca_Shell_Function(iid, defaultGateway, options.DPPA_Purpose, options.GLBA_Purpose, BSversion := defaultBSVersion, BSOptions := defaultBSOptions,
+                                                      DataRestriction := options.DataRestrictionMask, DataPermission := options.DataPermissionMask);
                                                       
     ungroupBS := UNGROUP(bocaShell);
-                                                      
-                                                      
-    //retrieve the indicators
-    indicators := Citizenship.fn_indicators(cleanedCitizenshipData, ungroupBS);
 
 
-    //call model
-    modelResults := Models.cit1808_0_0(ungroupBS);    //expecting to return everything (basically running as debug TRUE, only care about seq and score
+    addBS := JOIN(cleanData, ungroupBS,
+                  LEFT.cleanedInput.seq = RIGHT.seq,
+                  TRANSFORM(DueDiligence.LayoutsInternal.SharedInput,
+                            SELF.bs := RIGHT;
+                            SELF := LEFT;
+                            SELF := [];),
+                  LEFT OUTER,
+                  ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+                                          
+                                          
     
+    //get the risk indicators used by citizenship and the due diligence identity attribute
+    riskIndicators := DueDiligence.Citizenship.getRiskIndicators(cleanData, ungroupBS);
     
-    citizenshipResults := JOIN(indicators, modelResults, 
-                                LEFT.seq = RIGHT.seq, 
-                                TRANSFORM({UNSIGNED4 seq, STRING30 acctNo, Citizenship.Layouts.LayoutScoreAndIndicators},  
-                                          SELF.citizenshipScore := RIGHT.citizenshipScore;
-                                          SELF := LEFT;
-                                          SELF := [];));
-            
-            
-            
-            
-    // IF(debug, output(iid, NAMED('iid')));
-    // IF(debug, output(bocaShell, NAMED('bocaShell')));
-    IF(modelValidation, output(Citizenship.fn_modelValidation(indicators, modelResults), NAMED('modelValidationResults')));
-    
-    
-            
-    // OUTPUT(cleanedCitizenshipData, NAMED('cit_cleanedData'));
+    addRI := JOIN(addBS, riskIndicators,
+                  LEFT.bs.seq = RIGHT.seq,
+                  TRANSFORM(DueDiligence.LayoutsInternal.SharedInput,
+                            SELF.riskIndicators := RIGHT;
+                            SELF := LEFT;),
+                  LEFT OUTER,
+                  ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+
+
+
     // OUTPUT(iid_ready, NAMED('iid_ready'));
     // OUTPUT(iid, NAMED('iid'));
     // OUTPUT(bocaShell, NAMED('bocaShell'));
-    // OUTPUT(indicators, NAMED('indicators'));
-    // OUTPUT(modelResults, NAMED('modelResults'));        
-                                          
-    RETURN citizenshipResults;
+    // OUTPUT(addBS, NAMED('addBS'));
+    // OUTPUT(riskIndicators, NAMED('riskIndicators'));
+    // OUTPUT(addRI, NAMED('addRI'));
+
+    RETURN addRI;
 END;

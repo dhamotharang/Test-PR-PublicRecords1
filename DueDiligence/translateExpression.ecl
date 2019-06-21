@@ -232,10 +232,6 @@ EXPORT translateExpression := MODULE
 		END;
     
     
-
-    EXPORT expressionTextByEnum(OffensePriority expressionReference) := expressionDCT[expressionReference].description;
-
-    
     
     EXPORT getMaxLevel(STRING charge, STRING1 offenseScore, UNSIGNED offenseCategory, STRING1 trafficFlag, UNSIGNED1 inLevel) := FUNCTION
         

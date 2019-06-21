@@ -1,21 +1,15 @@
-﻿IMPORT Citizenship, DueDiligence, iesp;
+﻿IMPORT DueDiligence, iesp;
 
 EXPORT CitizenshipServiceMain(DATASET({INTEGER4 seq, iesp.duediligenceattributes.t_DueDiligenceAttributesRequest}) rawInput,
-                              DATASET(DueDiligence.Layouts.Input) validRequest, 
-                              UNSIGNED6 inGLBA, 
-                              UNSIGNED6 inDPPA, 
-                              STRING50 inDataRestriction,
-                              STRING50 inDataPermission,
-                              STRING15 inModelName,
-                              BOOLEAN modelValidation,
-                              BOOLEAN debug) := FUNCTION
+                              DATASET(DueDiligence.LayoutsInternal.SharedInput) inData, 
+                              BOOLEAN modelValidation) := FUNCTION
                             
                             
                             
-    citizenshipInfo := Citizenship.getCitizenship(validRequest, inGLBA, inDPPA, inDataRestriction, inDataPermission, inModelName, modelValidation, debug);
+    citizenshipInfo := DueDiligence.Citizenship.getCitizenship(inData, modelValidation);
     
     
-    citizenshipIndicators := NORMALIZE(UNGROUP(citizenshipInfo), Citizenship.Constants.NUMBER_OF_INDICATORS, TRANSFORM(iesp.share.t_NameValuePair,
+    citizenshipIndicators := NORMALIZE(UNGROUP(citizenshipInfo), DueDiligence.Citizenship.Constants.NUMBER_OF_INDICATORS, TRANSFORM(iesp.share.t_NameValuePair,
 																													SELF := CASE(COUNTER,
 																																				1  => Citizenship.Common.createNVPair('LexID', LEFT.lexID),
 																																				2  => Citizenship.Common.createNVPair('LexIDScore', LEFT.lexIDScore),
