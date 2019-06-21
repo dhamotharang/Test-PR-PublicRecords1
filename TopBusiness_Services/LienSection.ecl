@@ -1,8 +1,7 @@
-/* TBD : 
-   1. Remove commented out BIP1 sample coding.
-   2. Research/resolve open issues, search on "???"
+﻿/* TBD : 
+   1. Research/resolve open issues, search on "???"
 */
-IMPORT AutoStandardI, BIPV2, iesp, LiensV2, MDR, Suppress;
+IMPORT AutoStandardI, BIPV2, iesp, LiensV2, MDR, Suppress,  liensv2_services, TopBusiness_Services;
 
 EXPORT LienSection := MODULE;
 
@@ -17,8 +16,7 @@ EXPORT LienSection := MODULE;
 
   // Strip off the input acctno from each record, will re-attach them later.
 	ds_in_ids_only := project(ds_in_ids,transform(BIPV2.IDlayouts.l_xlink_ids,
-	                                                       self := left,
-																							           self := []));
+	                                                       self := left, self := []));
 
 
   // ****** Get the needed linkids key J&Ls info for each set of input linkids
@@ -40,91 +38,99 @@ EXPORT LienSection := MODULE;
 				// "role" (i.e. D=Debtor, C=Creditor) on the filing of the company being reported on.
 				// Is this even needed???  JLs are not like UCCs where need to distinguish between
 				// "AsDebtor" and "AsSecurred"???
-        self.role_party_type := left.name_type[1],
+                   self.role_party_type := left.name_type[1],
 			  self := left, // to preserve ids & other key fields being kept
-				self := [], // to null out any unassigned fields, tot_rec_count???
+			  self := [], // to null out any unassigned fields, tot_rec_count???
 			));
 
   // Sort/dedup by linkids, tmsid & rmsid(?) to only keep 1(which one?) record per 
 	// linkids/tmsid/rmsid combo.  //Is this even a problem???
   ds_linkids_keyrecs_deduped := dedup(sort(ds_linkids_keyrecs_slimmed,
-				                                   #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+				                                   #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),																			
 																			     tmsid,rmsid),
 				                              #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
 																			tmsid,rmsid);
  
   // Next join to get the Liens "main"(filing) data needed to output on the report.
   ds_main_keyrecs := join(ds_linkids_keyrecs_deduped,
-	                        LiensV2.Key_liens_main_ID(),
-                            keyed(left.tmsid = right.tmsid and
-                                  left.rmsid  = right.rmsid
+	                                          LiensV2.Key_liens_main_ID(),
+									keyed(left.tmsid = right.tmsid and
+										       left.rmsid  = right.rmsid
 														      //^--- only get main key recs with the same rmsid as the linkids key
                                  ),
-	  transform(TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmed,
-			// assign certain fields in case they are empty
-			self.orig_filing_number := if(right.orig_filing_number !='',
-			                              right.orig_filing_number,right.filing_number);
-			self.orig_filing_date   := if(right.orig_filing_date !='',
-			                              right.orig_filing_date,right.filing_date);
-			self.orig_filing_type   := if(right.orig_filing_type !='',
-			                              right.orig_filing_type,right.filing_type_desc);
+	  transform(TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmed,		
+               self.acctno := '';																		
 			self := right, // to pull off the Liens main key fields we want
 			               // (which have the same name on the temp layout as on the main key)
-			self := left,  // to preserve ids & any other kept linkids key fields
+			self := left,  // to preserve ids & any other kept linkids key fields					
     ),
 		inner, // only key recs that match, but shouldn't there always be a match???
 		// keep all matches???  
 		limit(10000) //??? chg to TopBusiness_services.Constants.???
 	 );
+	 
+	 // call the new function to put values into these 2 fields: case_link_id and the case_link_priority 	 
+	outDStmp := liensv2_services.fn_link_liens_cases(ds_main_keyrecs,  true, acctno);
+	
+	// keep this logic in here to populate the various fields if they are not there
+	// following call to  fn_link_liens_cases function call to populate the 2 new fields.
+	outDS :=  project(outDStmp, transform(recordof(outDStmp),
+	   self.orig_filing_number := if(left.orig_filing_number !='',
+			                              left.orig_filing_number,left.filing_number);
+			self.orig_filing_date   := if(left.orig_filing_date !='',
+			                              left.orig_filing_date,left.filing_date);
+			self.orig_filing_type   := if(left.orig_filing_type !='',
+			                              left.orig_filing_type,left.filing_type_desc);
+			self := left));
 
-  // Next, sort/dedup by linkids, tmsid, rmsid, filing & orig filing info, etc.  
-	// Then only keep the record for that info with the latest(highest) process_date. ???
+  // Next, sort/dedup by linkids, case_link_id and case_link_priority,
 	//
+	// this example may not apply any more
 	// This is being done due to extra/invalid/replaced filing data on the Liens main key 
 	// for certain tmsids.   (i.e. see ult/org/sele ids=510 on the linkids key and the record with
 	// tmsid=CA00000219060681.  On the Liens main tmsid_rmsid key for that tmsid value, 
 	// it has the same orig/filing info on 2 sets of 4 recs on the Liens main key).
-  ds_main_keyrecs_deduped1 := dedup(sort(ds_main_keyrecs, 
-	                                       #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-	                                       tmsid,rmsid,filing_jurisdiction,
-																				 orig_filing_number,orig_filing_type,orig_filing_date,
-																				 filing_number,filing_type_desc,filing_date,
-																				 -process_date,record), //put most recent first
-		                                #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-	                                  tmsid,rmsid,filing_jurisdiction,
-																	  orig_filing_number,orig_filing_type,orig_filing_date,
-																		filing_number,filing_type_desc,filing_date 
-                                   );
-
-  // Now count the number of filings(tmsids) per each set of linkids
+	
+	// new logic.  Sort/dedup by case_link_id and sort by case_link_priority
+  
+  // added here to replace ds_main_keyrecs_deduped1	 
+	// and to keep the 'amount' field value and 3 other field values too since rows that have that field populated 
+	// seemed to be ranked with the higher values of case_link_priority field thus pushing them to bottom  of set during rollup so saving this
+	// 'amount' value and the 3 other fields here as rollup happens.
+  ds_main_keyrecs_deduped1 := rollup( sort(outDS,     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+							         case_link_id, case_link_priority),
+	                                                                BIPV2.IDmacros.mac_JoinTop3Linkids() AND
+	                                                                 left.case_link_id = right.case_link_id, 
+												transform(recordof(OUTDS),
+													self.amount := if (left.amount  != '', left.amount, right.amount);;
+													self.filing_type_desc := if (left.filing_type_desc  != '', left.filing_type_desc,  right.filing_type_desc); 
+													self.filing_number := if (left.filing_number != '', left.filing_number, right.filing_number); 
+													self.filing_jurisdiction := if (left.filing_jurisdiction != '', left.filing_jurisdiction,  right.filing_jurisdiction); 
+													self := left;
+													self := right));
+										
+  // Now count the number of filings(case_link_ids) per each set of linkids
   rec_layout_filings_count := record
 	    ds_main_keyrecs_deduped1.ultid;
 	    ds_main_keyrecs_deduped1.orgid;
 	    ds_main_keyrecs_deduped1.seleid;
-	    //ds_main_keyrecs.proxid;  //???
       filings_count := COUNT(GROUP);
   end;
-
-  // First sort/dedup so there is only 1 rec per tmsid per set of linkids.
-	ds_main_keyrecs_deduped2 := dedup(sort(ds_main_keyrecs_deduped1,
-																         #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-																         tmsid,
-																				 -orig_filing_date,-filing_date),
-																    #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-																    tmsid);
-
-  // Then table to count the number of filings (tmsids) per set of linkids
-	ds_ids_filings_tabled := table(ds_main_keyrecs_deduped2,
-	                               rec_layout_filings_count,
-																 #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-																 few);  //few???
-
+													
+  // Then table to count the number of filings (case_link_id) per set of linkids
+	ds_ids_filings_tabled := table(ds_main_keyrecs_deduped1,
+	                                                        rec_layout_filings_count,
+												#expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+												few);  //few???
+ 
   // Join number of filings count for the linkids back to the non-restricted recs. 
-	ds_main_keyrecs_dd2_plus_counts := join(ds_main_keyrecs_deduped2,
-	                                        ds_ids_filings_tabled,
+	ds_main_keyrecs_dd2_plus_counts := join(ds_main_keyrecs_deduped1,
+	                                                                                 ds_ids_filings_tabled,
 																          BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																		      transform(TopBusiness_Services.LienSection_Layouts. rec_ids_with_maindata_slimmed,
-																		         self.tot_rec_count := right.filings_count;
+																		      transform(TopBusiness_Services.LienSection_Layouts. rec_ids_with_maindata_slimmedExtra,																					             
+																		         self.tot_rec_count :=  right.filings_count;
+																				self.case_link_id := left.case_link_id;
+																				self.case_link_priority := left.case_link_priority;
 																			       self := left),
 																		      inner, //??? or left outer???
 																		      //keep(?????) //???
@@ -135,22 +141,21 @@ EXPORT LienSection := MODULE;
 	// keep the 100(per req 0710) most recent(?) filings/tmsids for each set of linkids.
 	// Revise to use topn(...     ---v   ???
 	ds_main_keyrecs_dd2_top100 := dedup(sort(ds_main_keyrecs_dd2_plus_counts,
-																		       #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-																				   -orig_filing_date, //check for empty first???
-																						-filing_date, //here or above orig_fd ???
+																		       #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),																					
+																					 case_link_priority,																				
 																						record),
 																      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
 																		  keep(TopBusiness_Services.Constants.liens_max_main_recs));// keep 100???
 																			// change ---^ to use iesp.constants.topbusiness_max_???
 
   // Join the top 100 ds back to the deduped ds_main_keyrecs to keep all 
+	// the case_link_id
 	// the rmsids for the tmsids being kept.
 	ds_main_keyrecs_top100_perids := join(ds_main_keyrecs_deduped1,
-	                                      ds_main_keyrecs_dd2_top100,
+	                                                                         ds_main_keyrecs_dd2_top100,
 																          BIPV2.IDmacros.mac_JoinTop3Linkids()
-																					and left.tmsid = right.tmsid  //and ???
-                                          ,
-																		      transform(TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmed,
+																					and left.case_link_id = right.case_link_id,																				
+																		      transform(TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmedExtra,																	
 																		         self.tot_rec_count := right.tot_rec_count;
 																			       self := left),
 																		      inner, //??? or left outer???
@@ -158,11 +163,16 @@ EXPORT LienSection := MODULE;
 																					limit(10000,skip) //???
 																					);
 
-  // Sort & group all the main recs (for 1 orig filing) by the linkids & tmsid
+  // Sort & group all the main recs (for 1 orig filing) by the linkids & case_linkid
+
+  //
+  // smart linx bus enhacement changes sort to sort on new field case_link_id, before rollup
+  // 
 	ds_main_keyrecs_srtd_grpd := group(sort(ds_main_keyrecs_top100_perids,
 																				  #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-																					tmsid,
-																					rmsid, // in filing(rmsid) order??? To put the
+																					case_link_id,
+																					case_link_priority  // lowest # first
+																					 // in filing(rmsid) order??? To put the
 																					       // correct orig_filing_type on the first rec
 																								 // (in case there are > 1) for a tmsid???
 																					// v--- are any of these needed? since we are just 
@@ -172,16 +182,18 @@ EXPORT LienSection := MODULE;
 																					//filing_date,   //is this needed???
 																					//filing_number, //is this needed???
 																					//record
-																					process_date // oldest first for a tmsid/rmsid???
+																					// this next line is commented out.
+																					////process_date // oldest first for a tmsid/rmsid???
 																					),
                                      #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
-																		 tmsid);
+																		 case_link_id																		
+																		 );
 
   // Then do a group rollup on all recs for a tmsid for a set of linkids to create the 
 	// main "filing_info"  and the individual "filings" child dataset.
 	TopBusiness_Services.LienSection_Layouts.rec_LiensDataParent tf_rollup_mainrecs(
-		TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmed l,
-		dataset(TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmed) allrows) := transform
+		TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmedExtra l,
+		dataset(TopBusiness_Services.LienSection_Layouts.rec_ids_with_maindata_slimmedExtra) allrows) := transform
 		  self.filing_jurisdiction  := max(allrows(filing_jurisdiction !=''),filing_jurisdiction),
 			self.orig_filing_date     := min(allrows(orig_filing_date !=''),orig_filing_date), 
 			self.orig_filing_number   := min(allrows(orig_filing_number !=''),orig_filing_number),
@@ -204,27 +216,25 @@ EXPORT LienSection := MODULE;
 																									//record, all), 
 																					 iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_FILINGS);
       self.ret_rec_count := 1; //1 rec per group/tmsid
-		  self.tot_rec_count := allrows[1].tot_rec_count; //??? 
+	 self.tot_rec_count := allrows[1].tot_rec_count; //??? 
       self := l;  //  to preserve ids & any other kept left fields
 			self := []; // to null out the 2 diff party child datasets here since they will be created below???
 	end;
 
 	ds_main_keyrecs_rolled0 := rollup(ds_main_keyrecs_srtd_grpd,
-	                                  group,
-														        tf_rollup_mainrecs(left,rows(left)));
+	                                                                group,
+												tf_rollup_mainrecs(left,rows(left)));
 
   // Filter to remove main recs without at least 1 of the 3 necessary original filing fields. ???
   ds_main_keyrecs_rolled := ds_main_keyrecs_rolled0(orig_filing_number != '' or
-	                                                  orig_filing_date   != '' or
-                                                    orig_filing_type   != '');
-
+	                                                                                              orig_filing_date   != '' or
+                                                                                                   orig_filing_type   != '');
 
   // Next join the deduped linkid keyrecs to the Liens party key to get all the Liens
 	// "party" data for the filings(tmsids) involved to output on the report.
 	//
 	// OR just use ds_main_keyrecs_rolled ---v ???
-  ds_party_keyrecs := join(ds_linkids_keyrecs_deduped,
-	                         //ds_main_keyrecs_rolled ???
+  ds_party_keyrecs := join(outDS,                        
 	                         LiensV2.key_liens_party_ID(),
                              keyed(left.tmsid = right.tmsid 
 											        // v--- to get the correct parties for the sub-filings (rmsids)
@@ -234,6 +244,8 @@ EXPORT LienSection := MODULE;
 			// Since linkids for the party were added to the party key layout, 
       // fill in the "report-by" linkids from the left dataset. 
 			// Create a new macro for this(---v)??? Something like TopBusiness_Services.IDMacros. mac_IespTransferLinkids
+      self.case_link_id := left.case_link_id;
+	 self.case_link_priority := left.case_link_priority;	
       self.ultid  := left.ultid,
       self.orgid  := left.orgid,
       self.seleid := left.seleid,
@@ -258,6 +270,7 @@ EXPORT LienSection := MODULE;
 		  self.st          := if(IsDebtor,right.st,'');
 		  self.zip         := if(IsDebtor,right.zip,'');
 		  self.zip4        := if(IsDebtor,right.zip4,'');
+		 				   
 			// v--- to pull off the rest of the Liens party key "name" related  fields we want
 			// (which have the same name on the temp layout as on the party key)
 			self :=right,
@@ -272,8 +285,13 @@ EXPORT LienSection := MODULE;
 
 	// Might have duplicate party recs across all the recs for a tmsid; 
 	// so dedup to remove any duplicates???           from bip1, is this still needed???
-	ds_party_keyrecs_deduped := dedup(ds_party_keyrecs,record, except rmsid, //orig_name, bip1???
-	                                  all);
+	//
+	// added fields to the except list here.
+	ds_party_keyrecs_deduped := dedup(ds_party_keyrecs,record, except rmsid, 
+	                                 // added here 2 new fields smart linx bus enhancements project
+							case_link_id,
+	                                 case_link_priority,
+							all);
 
   // Mask any SSNs on the party records
 	// Set the "ssn_mask_value" field that is used in Suppress.MAC_Mask
@@ -283,45 +301,18 @@ EXPORT LienSection := MODULE;
 
 	Suppress.MAC_Mask(ds_party_keyrecs_deduped, ds_party_keyrecs_masked, ssn, blank, true, false);
 
-
   // Group denormalize mainrecs rolled and deduped party recs to attach party/child recs 
 	// to their associated main/parent recs.
   TopBusiness_Services.LienSection_Layouts.rec_LiensDataParent tf_denorm_parties(
 		TopBusiness_Services.LienSection_Layouts.rec_LiensDataParent L,
 	  dataset(TopBusiness_Services.LienSection_Layouts.rec_ids_with_partydata_slimmed) R) := transform
 		  // Keep track of "Active"(cannot do in bip2???) filings where the linkids company is a "Debtor".
-      self.derog_count := if(//L.status_code     = TopBusiness_Services.Constants.ACTIVE and //bip1
-			                       L.role_party_type = TopBusiness_Services.Constants.DEBTOR,
+      self.derog_count := if(L.role_party_type = TopBusiness_Services.Constants.DEBTOR,
 														 1,0);
 			self.ret_rec_count := l.ret_rec_count;
 		  self.tot_rec_count := l.tot_rec_count;
 			// Fill in the "party" child datasets.
-    /* from bip1, not really sure why this was being done <------------------------- !!!
-			temp_debtors := project(
-				dedup(R(party_type=TopBusiness_Services.Constants.DEBTOR and bid != 0),bid,all) +
-				dedup(sort(R(party_type=TopBusiness_Services.Constants.DEBTOR and bid = 0), 
-				         if (mname <> '', 0, 1), if (name_suffix <> '', 0, 1)), except orig_name, mname, name_suffix, all),
-				LienSection_Layouts.LiensDataChild_Party) ;
-		  self.debtors      := choosen(temp_debtors, 
-				iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS);
-			self.debtoroverflow := count(temp_debtors) > iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS,
-			temp_creditors := project(
-				dedup(R(party_type=TopBusiness_Services.Constants.CREDITOR and bid != 0),bid,all) +
-					dedup(sort(R(party_type=TopBusiness_Services.Constants.CREDITOR and bid = 0), 
-					      if (mname <> '', 0, 1), if (name_suffix <> '', 0, 1)), except orig_name, mname, name_suffix, all),
-				LienSection_Layouts.LiensDataChild_Party);
-		  self.creditors    := choosen(temp_creditors, 
-				iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS);
-			self.creditoroverflow := count(temp_creditors) > iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS,
-			temp_thirdparties := project(
-				dedup(R(party_type=TopBusiness_Services.Constants.THIRDPARTY and bid != 0),bid,all) +
-				dedup(sort(R(party_type=TopBusiness_Services.Constants.THIRDPARTY and bid = 0),
-				   if (mname <> '', 0, 1), if (name_suffix <> '', 0, 1)), except orig_name, mname, name_suffix, all),
-				LienSection_Layouts.LiensDataChild_Party);
-		  self.thirdparties := choosen(temp_thirdparties, 
-				iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS);
-			self.thirdpartyoverflow := count(temp_thirdparties) > iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS,
-		*/
+    
 			temp_debtors   := project(R(name_type=TopBusiness_Services.Constants.DEBTOR),
 				                        TopBusiness_Services.LienSection_Layouts.rec_LiensDataChild_Party) ;
 		  self.debtors   := choosen(temp_debtors, 
@@ -334,20 +325,15 @@ EXPORT LienSection := MODULE;
 				                        iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS);
       // v--- Is this still needed???
 			self.creditoroverflow   := count(temp_creditors) > iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS,
-			// v--- In BIP1, but removed from BIP2???
-			//temp_thirdparties := project(R(name_type=TopBusiness_Services.Constants.THIRDPARTY),
-			//	                           LienSection_Layouts.rec_LiensDataChild_Party) ;
-		  //self.thirdparties := choosen(temp_thirdparties, 
-			//	                           iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS);
-			//self.thirdpartyoverflow := count(temp_thirdparties) > iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS,
+		
 			self              := L;
 	end;
 
-  ds_parent_child := denormalize(ds_main_keyrecs_rolled,ds_party_keyrecs_masked,
-		                               left.source_docid = right.tmsid, 
+  ds_parent_child := denormalize(ds_main_keyrecs_rolled,
+											 ds_party_keyrecs_masked,
+		                               left.source_docid = right.tmsid,   
 																 group,
 		                             tf_denorm_parties(left,rows(right)));
-
 
   // Transforms to project the parent & child recs into the BIZ report JL detail record 
 	// iesp layout fields.
@@ -355,16 +341,16 @@ EXPORT LienSection := MODULE;
   // The transform to handle the "Parties" child dataset
 	iesp.TopBusinessReport.t_TopBusinessJudgmentLienParty 
 	  tf_child_party(TopBusiness_Services.LienSection_Layouts.rec_LiensDataChild_Party l) := transform
-    self.CompanyName                 := l.cname,	
-		self.TaxId                       := l.tax_id,
-		self.SSN                         := l.ssn,
-    self.Name.Full                   := ''; 
-    self.Name.First                  := l.fname;
-	  self.Name.Middle                 := l.mname;
-	  self.Name.Last                   := l.lname;
-	  self.Name.Suffix                 := l.name_suffix;
-    self.Name.Prefix                 := l.title;
-    self.Address.StreetName          := l.prim_name,
+          self.CompanyName                 := l.cname,	
+	     self.TaxId                       := l.tax_id,
+	     self.SSN                         := l.ssn,
+          self.Name.Full                   := ''; 
+          self.Name.First                  := l.fname;
+	     self.Name.Middle                 := l.mname;
+	     self.Name.Last                   := l.lname;
+	     self.Name.Suffix                 := l.name_suffix;
+          self.Name.Prefix                 := l.title;
+          self.Address.StreetName          := l.prim_name,
 		self.Address.StreetNumber        := l.prim_range,
 		self.Address.StreetPreDirection  := l.predir,
 		self.Address.StreetPostDirection := l.postdir,
@@ -379,8 +365,9 @@ EXPORT LienSection := MODULE;
     self.Address.StreetAddress2      := '',
     self.Address.County              := '',
     self.Address.PostalCode          := '',
-    self.Address.StateCityZip        := '',
+    self.Address.StateCityZip        := ''
 	end;
+	
   // The transform to handle the "Filings" child dataset
 	iesp.TopBusinessReport.t_TopBusinessJudgmentLienFilings 	
 	  tf_child_filings(TopBusiness_Services.LienSection_Layouts.rec_LiensDataChild_Filings l) := transform
@@ -397,9 +384,13 @@ EXPORT LienSection := MODULE;
   // The transform to store data in the iesp report detail parent dataset fields
 	TopBusiness_Services.LienSection_Layouts.rec_ids_plus_JL_Detail
 	  tf_parent_detail(TopBusiness_Services.LienSection_Layouts.rec_LiensDataParent l) := transform
-    self.derogCount         := l.derog_count; 
-    self.ret_rec_count := l.ret_rec_count;
-	  self.tot_rec_count := l.tot_rec_count;
+   //  addition
+    self.case_link_id          := l.case_link_id;
+    self.case_link_priority  := l.case_link_priority;
+    //
+    self.derogCount            := l.derog_count; 
+    self.ret_rec_count        := l.ret_rec_count;
+	  self.tot_rec_count     := l.tot_rec_count;
 		//self.sort_order         := ???; 
 		// ^--- map ??? to an unsigned1(?) sort_order value for sorting the filings for each 
 		// bid and/or set a sort_date (---v) to put them in the desired order.    ???
@@ -407,17 +398,10 @@ EXPORT LienSection := MODULE;
 		//                           OR filing_date? OR latest filing_date? 
 		//                           OR earliest_filng_date? 
     self.Debtors            := sort(project(l.debtors,tf_child_party(left)),
-		                                if (Name.last <> '', 0, 1), CompanyName, Name.Last, Name.First, Name.Middle, Name.prefix, record),
-		//self.DebtorOverflow     := l.debtoroverflow,
+		                                if (Name.last <> '', 0, 1), CompanyName, Name.Last, Name.First, Name.Middle, Name.prefix, record),		
     self.Creditors          := sort(project(l.creditors,tf_child_party(left)),
-		                                if (Name.last <> '', 0, 1),CompanyName, Name.Last, Name.First, Name.Middle, Name.Prefix, record),
-		//self.CreditorOverflow   := l.creditoroverflow,
-		// v--- in bip1, but not needed in BIP2???
-    //self.ThirdParties       := sort(project(l.thirdparties,tf_child_party(left)),
-		//                                if (Name.last <> '', 0, 1),CompanyName, Name.Last, Name.First, Name.Middle, Name.prefix, record),
-		//self.ThirdPartyOverflow := l.thirdpartyoverflow,
-	  self.FilingJurisdiction := l.filing_jurisdiction,
-    //self.Amount             := (string)((real)l.amount), // from bip1, why???
+		                                if (Name.last <> '', 0, 1),CompanyName, Name.Last, Name.First, Name.Middle, Name.Prefix, record),		
+	  self.FilingJurisdiction := l.filing_jurisdiction,  
     self.Amount             := l.amount,
     self.OrigFilingNumber   := l.orig_filing_number,	
 		ReleaseDate :=          PROJECT(l.filings,
@@ -432,10 +416,7 @@ EXPORT LienSection := MODULE;
 		self.OrigFilingDate     := iesp.ECL2ESP.toDate ((integer)l.orig_filing_date),
     self.Eviction           := if(l.eviction='N','NO',
 		                              if(l.eviction='Y','YES',l.eviction));
-    self.Filings            := choosen(//dedup(sort(  //from bip1???, why?
-		                                                project(l.filings,tf_child_filings(left)), 
-		                                              //-FilingNumber,-length(trim(FilingType,left,right))),
-		                                         //record,except FilingType,all),
+    self.Filings            := choosen( project(l.filings,tf_child_filings(left)), 		                                            
 		                                   iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_FILINGS),
     // Output 1 row of dataset with source info.
 		self.SourceDocs := dataset([transform(iesp.topbusiness_share.t_TopBusinessSourceDocInfo,
@@ -446,7 +427,11 @@ EXPORT LienSection := MODULE;
 		  self.Source      := l.source,
 		  self := []) // null out other fields
 		]);
-
+		// addition for smart linx bus enhancements May 2019
+       self.PartyType :=  MAP(l.role_party_type = 'C' => 'Creditor',
+			                                 l.role_party_type = 'D' => 'Debtor',
+							              '');			 
+										
 	  self := l; //to assign all linkids
 	end;
 
@@ -462,8 +447,11 @@ EXPORT LienSection := MODULE;
 	  dataset(TopBusiness_Services.LienSection_Layouts.rec_ids_plus_JL_Detail) allrows) := transform
       self.acctno := '';  // just null out here; it will be assigned in a join below
       self.DerogSummaryCntJL   := count(allrows(derogCount!= 0)); //???
-      self.ReturnedRecordCount := sum(allrows,ret_rec_count); //???
+			
+      self.ReturnedRecordCount :=  sum(allrows,ret_rec_count);
+			                                  
 	    self.TotalRecordCount    := l.tot_rec_count; //???
+			
 			self.JudgmentsLiens := choosen(sort(project(allrows,
 		                                             transform(iesp.TopBusinessReport.t_TopBusinessJudgmentLienDetail,
                                                            self.sourceDocs := choosen(left.sourceDocs, in_souceDocMaxCount),
@@ -488,13 +476,7 @@ EXPORT LienSection := MODULE;
 
   // Sort/group all recs for a set of linkids. 
   ds_all_rptdetail_grouped := group(sort(ds_recs_rptdetail_deduped,
-		                                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids())
-																				 //,
-																				 // v--- not needed here???, 
-																				 // JLs dataset rcs will be sorted in transform above
-																				 //-OrigFilingDate.Year, -OrigFilingDate.Month, -OrigFilingDate.Day, 
-																				 //OrigFilingNumber, record 
-																			   //                  ^--- and/or sort_order ???
+		                                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids())																				
 																			  ),
                                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids())
 																   );
@@ -519,30 +501,36 @@ EXPORT LienSection := MODULE;
 			                                   self := left));
 
   // Uncomment for debugging
-  //output(ds_in_ids,                      named('ds_in_ids'));
+  // output(ds_in_ids,                      named('ds_in_ids'));
 	//output(ds_in_ids_only,                 named('ds_in_unique_ids_only'));
   //output(ds_linkids_keyrecs,             named('ds_linkids_keyrecs'));
-  //output(ds_linkids_keyrecs_slimmed,     named('ds_linkids_keyrecs_slimmed'));
-  //output(ds_linkids_keyrecs_deduped,     named('ds_linkids_keyrecs_deduped'));
+  // output(ds_linkids_keyrecs_slimmed,     named('ds_linkids_keyrecs_slimmed'));//
+  // output(ds_linkids_keyrecs_deduped,     named('ds_linkids_keyrecs_deduped'));//
 
-  // output(ds_main_keyrecs,                 named('ds_main_keyrecs'));
-  // output(ds_main_keyrecs_deduped1,        named('ds_main_keyrecs_deduped1'));
-  // output(ds_main_keyrecs_deduped2,        named('ds_main_keyrecs_deduped2'));
+   // output(ds_main_keyrecs,                 named('ds_main_keyrecs'));
+	 // output(outDStmp, named('outDStmp'));
+	 // output(outDS, named('outDS'));
+
+// output(ds_main_keyrecs_deduped1byRMSIDASWELL, named('ds_main_keyrecs_deduped1byRMSIDASWELL'));
+  // output(ds_main_keyrecs_deduped1,        named('ds_main_keyrecs_deduped1')); //
+	  // output(ds_main_keyrecs_deduped15,        named('ds_main_keyrecs_deduped15')); 
 	// output(ds_ids_filings_tabled,           named('ds_ids_filings_tabled'));
+	
 	// output(ds_main_keyrecs_dd2_plus_counts, named('ds_main_keyrecs_dd2_plus_counts'));
 	// output(ds_main_keyrecs_dd2_top100,      named('ds_main_keyrecs_dd2_top100'));
-	// output(ds_main_keyrecs_top100_perids,   named('ds_main_keyrecs_top100_perids'));
-  // output(ds_main_keyrecs_srtd_grpd,       named('ds_main_keyrecs_srtd_grpd'));
-  // output(ds_main_keyrecs_rolled0,         named('ds_main_keyrecs_rolled0'));
+	 // output(ds_main_keyrecs_top100_perids,   named('ds_main_keyrecs_top100_perids'));
+	
+  // output(ds_main_keyrecs_srtd_grpd,       named('ds_main_keyrecs_srtd_grpd')); //
+  // output(ds_main_keyrecs_rolled0,         named('ds_main_keyrecs_rolled0')); //
   // output(ds_main_keyrecs_rolled,          named('ds_main_keyrecs_rolled'));
+ // output(ds_main_keyrecs_rolled_final,          named('ds_main_keyrecs_rolled_final')); //
+  // output(ds_party_keyrecs,               named('ds_party_keyrecs')); //
+  // output(ds_party_keyrecs_deduped,       named('ds_party_keyrecs_deduped')); //
+  // output(ds_party_keyrecs_masked,        named('ds_party_keyrecs_masked'));//
 
-  // output(ds_party_keyrecs,               named('ds_party_keyrecs'));
-  // output(ds_party_keyrecs_deduped,       named('ds_party_keyrecs_deduped'));
-  // output(ds_party_keyrecs_masked,        named('ds_party_keyrecs_masked'));
-
-  // output(ds_parent_child,                named('ds_parent_child'));
+   // output(ds_parent_child,                named('ds_parent_child'));//
   // output(ds_recs_rptdetail,              named('ds_recs_rptdetail'));	
-  // output(ds_recs_rptdetail_deduped,      named('ds_all_rptdetail_deduped'));
+  // output(ds_recs_rptdetail_deduped,      named('ds_recs_rptdetail_deduped'));//
 	// output(ds_all_rptdetail_grouped,       named('ds_all_rptdetail_grouped'));
   // output(ds_all_rptdetail_rolled,        named('ds_all_rptdetail_rolled'));
   // output(ds_all_wacctno_joined,          named('ds_all_wacctno_joined'));
@@ -577,17 +565,13 @@ IMPORT AutoStandardI;
 // input dataset layout= acctno,DotID,EmpID,POWID,ProxID,OrgID,UltID  
 Liens_sec := TopBusiness_Services.LienSection.fn_FullView(
              dataset([
-						          //{'test1d', 0, 0, 0, 31, 31, 31, 31} // 1 rec, 1 tmsid
-						          //{'test2d', 0, 0, 0, 30, 30, 30, 30} // 3 recs, 3 tmsids
-					            //{'test3d', 0, 0, 0, 168, 168, 168, 168} // 6 recs, 5 tmsids (1 tmsid has 2 rmsids)
- 						          //{'test4p', 0, 0, 0, 102695539, 102695539, 102695539, 102695539} // 12 recs, 10 tmsids (2 tmsid have 2 rmsids), bug 124326
- 						          //{'test5p', 0, 0, 0, 14771, 14771, 14771, 14771} // 149? recs, bug 124078
- 						          //{'test6d', 0, 0, 0, 238, 238, 238, 238} // 2 recs, 2 tmsids
-						          //{'test7d', 0, 0, 0, 9076, 9076, 9076, 9076} // bug 120330 lien with a person with an ssn
-						          //{'test8d', 0, 0, 0, 1688005034, 1688005034, 1688005034, 1688005034} // bug 123923 2 main recs, amount dropped from 2nd
+ 						          //{'test4p', 0, 0, 0, 102695539, 102695539, 102695539, 102695539} // 9 recs, 9 tmsids (2 tmsid have 2 rmsids), bug 124326
+ 						          //{'test5p', 0, 0, 0, 14771, 14771, 14771, 14771} // 149? recs, bug 124078 ** invalid linkid currently **
+ 						          //{'test6d', 0, 0, 0, 238, 238, 238, 238} // 11 recs, 11 tmsids
+						          //{'test7d', 0, 0, 0, 9076, 9076, 9076, 9076} // bug 120330 lien with a person with an ssn *linkids changed no person with SSN*
 						          //{'test9p', 0, 0, 0, 86030884, 86030884, 86030884, 86030884} // bug 133469, 12 linkids recs, 1 seleid with 2 proxids
-					            //{'test10p1', 0, 0, 0, 0, 510, 510, 510} // bug 132084/test case 1, 18 linkids recs, duped filing info on tmsid=CA00000219060681
-					            //{'test10p2', 0, 0, 0, 0, 86192, 86192, 86192} // bug 132084/test case 2, 14 linkids recs, duped filing info on tmsid=HG08CV004103WIMILD1
+					            //{'test10p1', 0, 0, 0, 0, 510 , 510, 510} // bug 132084/test case 1, 17 linkids recs, duped filing info on tmsid=CA00000219060681
+					            //{'test10p2', 0, 0, 0, 0, 86192, 86192, 86192} // bug 132084/test case 2, 15 linkids recs, duped filing info on tmsid=HG08CV004103WIMILD1
                  ],topbusiness_services.Layouts.rec_input_ids)
 						,ds_options[1]
 					  ,tempmod
