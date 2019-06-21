@@ -1,6 +1,6 @@
 ﻿IMPORT DueDiligence, Risk_Indicators, std, Models, MDR, dx_header;
 
-EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
+EXPORT getRiskIndicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
   
   NULL       := -999999999;
@@ -15,7 +15,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
 
   indicators := JOIN(cleanedInput, clam, 
                       LEFT.inputEcho.seq = RIGHT.seq, 
-                      TRANSFORM({Citizenship.Layouts.IndicatorLayout, unsigned8 shell_dob_SAS;}, 
+                      TRANSFORM({DueDiligence.Citizenship.Layouts.IndicatorLayout, unsigned8 shell_dob_SAS;}, 
                                 SELF.seq      := LEFT.inputEcho.seq;
                                 SELF.inputSeq := IF(LEFT.inputEcho.inputSeq = DueDiligence.Constants.NUMERIC_ZERO, LEFT.inputEcho.seq, LEFT.inputEcho.inputSeq);
                                 SELF.acctNo   := LEFT.inputEcho.individual.accountNumber;
@@ -27,17 +27,17 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 verificationAge_temp := MAP(NOT RIGHT.truedid               => NEG1,
                                                             RIGHT.name_verification.age = 0 => 0,
                                                                                                RIGHT.name_verification.age); 
-                                identityAge_temp := if(verificationAge_temp > Citizenship.Constants.AGE_CAP, 
-                                                       Citizenship.Constants.AGE_CAP, 
+                                identityAge_temp := if(verificationAge_temp > DueDiligence.Citizenship.Constants.AGE_CAP, 
+                                                       DueDiligence.Citizenship.Constants.AGE_CAP, 
                                                        verificationAge_temp);
                                                        
                                 SELF.identityAge :=  IF(identityAge_temp <= 0, NEG1, identityAge_temp);                                                          
                           
                           //*** extract the dates needed from the Ver Source Sections of Boca Shell
-                                ver_sources_information   := Citizenship.Ver_source_Function(RIGHT.seq,
-                                                                                           RIGHT.header_summary.ver_sources, 
-                                                                                           RIGHT.header_summary.ver_sources_first_seen_date,
-                                                                                           RIGHT.header_summary.ver_sources_last_seen_date);
+                                ver_sources_information   := DueDiligence.Citizenship.Ver_source_Function(RIGHT.seq,
+                                                                                                           RIGHT.header_summary.ver_sources, 
+                                                                                                           RIGHT.header_summary.ver_sources_first_seen_date,
+                                                                                                           RIGHT.header_summary.ver_sources_last_seen_date);
                            //*** emergenceAgeHeader (capped at 110 years)***
                                 earliest_header_date_SAS := ver_sources_information[1..10];                                                           
                                 earliest_header_date     := (integer)earliest_header_date_SAS;  
@@ -56,8 +56,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                inferred_age = 0            => NULL,
                                                                                               inferred_age - earliest_header_yrs);
                                                                                               
-                                iv_header_emergence_age     := if(iv_header_emergence_age_temp > Citizenship.Constants.AGE_CAP, 
-                                                                     Citizenship.Constants.AGE_CAP, 
+                                iv_header_emergence_age     := if(iv_header_emergence_age_temp > DueDiligence.Citizenship.Constants.AGE_CAP, 
+                                                                     DueDiligence.Citizenship.Constants.AGE_CAP, 
                                                                      iv_header_emergence_age_temp);
                                                                      
                                 SELF.emergenceAgeHeader    := IF(iv_header_emergence_age = NULL or iv_header_emergence_age < 0, NEG1, iv_header_emergence_age);     
@@ -74,8 +74,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                    inferred_age = 0                                 => NULL,
                                                                                                                        inferred_age - earliest_bureau_yrs);
                                
-                               iv_bureau_emergence_age    := if(iv_bureau_emergence_age_temp > Citizenship.Constants.AGE_CAP, 
-                                                                     Citizenship.Constants.AGE_CAP, 
+                               iv_bureau_emergence_age    := if(iv_bureau_emergence_age_temp > DueDiligence.Citizenship.Constants.AGE_CAP, 
+                                                                     DueDiligence.Citizenship.Constants.AGE_CAP, 
                                                                      iv_bureau_emergence_age_temp);
                                                                      
                                SELF.emergenceAgeBureau    := IF(iv_bureau_emergence_age = NULL or iv_bureau_emergence_age < 0, NEG1, iv_bureau_emergence_age);  
@@ -89,19 +89,19 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 nf_age_at_ssn_issuance_temp := map(
                                                                     not(RIGHT.truedid and (ssnlength in ['4', '9'])) or 
                                                                     sysdate = NULL or ssn_years = NULL                            => NULL,
-                                                                    rc_ssnlowissue = Citizenship.Constants.RANDOMIZATION_STARTED  => NULL,
+                                                                    rc_ssnlowissue = DueDiligence.Citizenship.Constants.RANDOMIZATION_STARTED  => NULL,
                                                                     not(calc_dob = NULL)                                          => calc_dob - ssn_years,
                                                                     inferred_age = 0                                              => NULL,
                                                                                                                                      inferred_age - ssn_years);
-                               nf_age_at_ssn_issuance     := if(nf_age_at_ssn_issuance_temp > Citizenship.Constants.AGE_CAP, 
-                                                                     Citizenship.Constants.AGE_CAP, 
+                               nf_age_at_ssn_issuance     := if(nf_age_at_ssn_issuance_temp > DueDiligence.Citizenship.Constants.AGE_CAP, 
+                                                                     DueDiligence.Citizenship.Constants.AGE_CAP, 
                                                                      nf_age_at_ssn_issuance_temp);
                                                                      
                                 SELF.ssnIssuanceAge        := IF(nf_age_at_ssn_issuance = NULL or nf_age_at_ssn_issuance < 0,  NEG1, nf_age_at_ssn_issuance);
                           
                           //*** ssnIssuanceYears (capped at 110 years)
-                                ssn_years_capped          := IF(ssn_years > Citizenship.Constants.AGE_CAP,
-                                                                 Citizenship.Constants.AGE_CAP,
+                                ssn_years_capped          := IF(ssn_years > DueDiligence.Citizenship.Constants.AGE_CAP,
+                                                                 DueDiligence.Citizenship.Constants.AGE_CAP,
                                                                  ssn_years);  
                                 
                                 SELF.ssnIssuanceYears      := IF(ssn_years_capped = NULL or ssn_years_capped < 0, NEG1, ssn_years_capped);
@@ -256,7 +256,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
    Final_Indicators := JOIN(Indicators, Roll_addr_hist,      
                            LEFT.seq        = RIGHT.seq  AND
                            LEFT.lexID      = RIGHT.LexID_temp,
-                         TRANSFORM (Citizenship.Layouts.IndicatorLayout,
+                         TRANSFORM (DueDiligence.Citizenship.Layouts.IndicatorLayout,
                             SELF.seq                      := LEFT.seq;
                             SELF.lexID                    := LEFT.lexID;
                             dob_temp                      := RIGHT.dob_temp;
@@ -266,8 +266,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                             calcAgeAtThisTime_temp       := if(dob_temp = NULL or address_first_seen_SAS = NULL, NULL, 
                                                                     truncate((address_first_seen_SAS - dob_temp) / DAYSINYEAR)); 
                                                                     
-                            calcAgeAtThisTime            := if(calcAgeAtThisTime_temp > Citizenship.Constants.AGE_CAP, 
-                                                                Citizenship.Constants.AGE_CAP, 
+                            calcAgeAtThisTime            := if(calcAgeAtThisTime_temp > DueDiligence.Citizenship.Constants.AGE_CAP, 
+                                                                DueDiligence.Citizenship.Constants.AGE_CAP, 
                                                                 calcAgeAtThisTime_temp);
                        //*** addressFirstReportedAge (capped at 110 years)  
                             SELF.addressFirstReportedAge := IF(calcAgeAtThisTime = NULL or calcAgeAtThisTime < 0, NEG1, calcAgeAtThisTime);           //***this is the final answer

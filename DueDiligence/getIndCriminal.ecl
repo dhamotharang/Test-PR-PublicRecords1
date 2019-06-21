@@ -61,7 +61,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 
                                                               SELF.validate_trafficRelated := LEFT.offenseTrafficRelated;
                                                               SELF.validate_category := LEFT.temp_category;
-                                                              SELF.validate_eventType := DueDiligence.translateExpression.expressionTextByEnum(LEFT.offenseDDLegalEventTypeCode);
+                                                              SELF.validate_eventType := DueDiligence.translateExpression.dctByPriority[LEFT.offenseDDLegalEventTypeCode].description;
                                                                                                       
                                                               SELF := LEFT;                                                            
                                                               SELF := [];));

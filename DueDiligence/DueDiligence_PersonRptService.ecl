@@ -7,6 +7,10 @@ EXPORT DueDiligence_PersonRptService := MACRO
     requestLayout := iesp.duediligencepersonreport.t_DueDiligencePersonReportRequest;
 
     requestResponseLayout := iesp.duediligencepersonreport.t_DueDiligencePersonReportResponse;
+    
+    productsRequested := DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY;
+    
+    
 
     //The following macro defines the field sequence on WsECL page of query.
     WSInput.MAC_DueDiligence_Service(requestName);
@@ -22,8 +26,11 @@ EXPORT DueDiligence_PersonRptService := MACRO
 
     //********************************************************PERSON REPORT LOGIC HERE**********************************************************
     DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
+    
+    //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
+    dataToSearchBy := DueDiligence.fn_getProductInput(productsRequested, cleanData, busOptions, busLinkingOptions);
 
-    consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, DD_SSNMask, includeReport, displayAttributeText, debugIndicator, busOptions, busLinkingOptions);
+    consumerResults := DueDiligence.getIndAttributes(dataToSearchBy, DD_SSNMask, TRUE, busOptions, busLinkingOptions, debugIndicator);
 
     indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
     indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
@@ -42,14 +49,13 @@ EXPORT DueDiligence_PersonRptService := MACRO
 
 
 
-    output(final, NAMED('Results')); //This is the customer facing output    
+    OUTPUT(final, NAMED('Results')); //This is the customer facing output    
 
 
 
-    IF(debugIndicator, output(cleanData, NAMED('cleanData')));
-    IF(debugIndicator, output(wseq, NAMED('wseq')));
-    IF(intermediates, output(consumerResults, NAMED('indResults')));
-    IF(debugIndicator, output(DD_SSNMask, NAMED('DD_SSNMask'))); 
+    IF(debugIndicator, OUTPUT(cleanData, NAMED('cleanData')));
+    IF(debugIndicator, OUTPUT(wseq, NAMED('wseq')));
+    IF(intermediates, OUTPUT(consumerResults, NAMED('indResults')));
 
 	
 

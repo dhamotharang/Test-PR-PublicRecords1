@@ -282,7 +282,7 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     //BELOW ATTRIBUTES HAVE ALREADY BEEN CALC'D IN CODE (DUE TO REUSABILITY BETWEEN BUSINESS AND PERSON)
     
     //PERSON LEXID/DID
-    //is already populated in DueDiligence.getIndDID  
+    //is already populated in DueDiligence.getIndInformation (if exists)  
     SELF.PerLexID := (STRING)le.inquiredDID;
     
     SELF.PerLexIDMatch := (STRING)le.individual.score;
