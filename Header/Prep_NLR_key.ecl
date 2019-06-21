@@ -1,4 +1,4 @@
-import doxie,header,header_quick,experiancred,ut,TransunionCred,doxie_build;
+import doxie,header,dx_header,header_quick,experiancred,ut,TransunionCred,doxie_build;
 
 hdr_in	:= distribute(Header.file_headers(src in ['EQ','EN'] )
 										+ doxie_build.file_header_building(src='TN')
@@ -35,7 +35,7 @@ layout_temp := record
 	string1 tn_phone_flag	:= '';
 	string1 tn_lname_flag := '';
 
-	header.layout_header;
+	dx_header.layout_header;
 end;
 	
 layout_slim := record
@@ -312,7 +312,7 @@ r6_xx_addr:=join(ht,d
 r7 := fn_rollem(distribute(r1_did_not_in_both + project(r6_xx_addr,layout_temp),hash(did)));
 
 layout_result := record
-	header.layout_header;
+	dx_header.layout_header;
 	unsigned4 not_in_bureau := 0;
 end;
 

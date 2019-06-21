@@ -514,6 +514,7 @@ EXPORT Layouts := MODULE
 			boolean SkipInquiryLogs;
 			boolean SkipMBS;
 			boolean SkipDeltabase;
+			boolean SkipRDP;
 		END;
 
 		export SkipValidationByGCID	 := RECORD

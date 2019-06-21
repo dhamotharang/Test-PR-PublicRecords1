@@ -7,6 +7,7 @@ EXPORT segmentation_gold(
   ,string                             idName              = 'PROXID'
 	,string                             today 					    = bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate//in case you want to run as of a date in the past.  default to date of newest data.
   ,string                             outputNameModifier  = ''
+  ,string                             pLgid3KeyVersion    = 'built'
 ) := module
 	shared hrec := record
 		unsigned6 	id;
@@ -67,7 +68,7 @@ shared ds_set_status_dedup := table(ds_slim_status  ,{id,inactive},id,inactive,m
 // rename so using the original filename if exists, otherwise use the built version.
 shared lgidCandKey := BIPV2_LGID3.Keys(BIPV2_LGID3.In_LGID3).Candidates;
 shared lgidCandOpt := index(lgidCandkey, BIPV2_LGID3.Keys(BIPV2_LGID3.In_LGID3).CandidatesKeyName, opt);
-shared lgidCandBuilt := BIPV2_LGID3.keys2(BIPV2_LGID3.In_LGID3).MatchCandidates.built;
+shared lgidCandBuilt := BIPV2_LGID3.keys2(BIPV2_LGID3.In_LGID3,pLgid3KeyVersion).MatchCandidates.logical;
 shared lgidCand := if(exists(lgidCandOpt), pull(lgidCandOpt), pull(lgidCandBuilt));
 
 shared infileWithLgid3Cand :=
@@ -337,6 +338,11 @@ export ds_append_gold_field :=  project(Gold     ,transform({boolean isgold,data
                               {'isActive'                         ,~exists(left.inactives(inactive != ''))  }
                              ,{'AND isNotJustPOBox'               ,~(exists(left.prim_names(prim_name[1..6] = 'PO BOX')) and count(left.prim_names) = count(left.prim_names(prim_name[1..6] = 'PO BOX')));  }
                              ,{'AND (inHrchy OR isLgid3Linkable)' ,exists(left.has_lgids(has_lgid)) or exists(left.has_lgid3_cands(has_lgid3_cand)) }
+
+                             ,{'AND inHrchy' ,exists(left.has_lgids(has_lgid)) }
+                             ,{'AND isLgid3Linkable' ,exists(left.has_lgid3_cands(has_lgid3_cand)) }
+
+
                              ,{'AND (\n'
                               +'hasSuperCoreSrc \n'
                               +'OR \n'
@@ -347,8 +353,10 @@ export ds_append_gold_field :=  project(Gold     ,transform({boolean isgold,data
   ,self.isgold := false
   ,self.gold_calculation := dataset([
                               {'isActive'                         ,~exists(left.inactives(inactive != ''))  }
-                             ,{'AND isNotJustPOBox'               ,~exists(left.prim_names(prim_name[1..6] = 'PO BOX')) and count(left.prim_names) = count(left.prim_names(prim_name[1..6] = 'PO BOX'));  }
+                             ,{'AND isNotJustPOBox'               ,~(exists(left.prim_names(prim_name[1..6] = 'PO BOX')) and count(left.prim_names) = count(left.prim_names(prim_name[1..6] = 'PO BOX')));  }
                              ,{'AND (inHrchy OR isLgid3Linkable)' ,exists(left.has_lgids(has_lgid)) or exists(left.has_lgid3_cands(has_lgid3_cand)) }
+                             ,{'AND inHrchy'                      ,exists(left.has_lgids(has_lgid)) }
+                             ,{'AND isLgid3Linkable'              ,exists(left.has_lgid3_cands(has_lgid3_cand)) }
                              ,{'AND (\n'
                               +'hasSuperCoreSrc \n'
                               +'OR \n'

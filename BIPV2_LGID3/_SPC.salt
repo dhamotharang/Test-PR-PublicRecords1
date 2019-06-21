@@ -1,5 +1,4 @@
-﻿//SALTVERSION:311
-OPTIONS:-gh -ga -p2 -gs2
+﻿OPTIONS:-gh -ga -p2 -gs2
 MODULE:BIPV2_LGID3 
 FILENAME:LGID3
  
@@ -38,7 +37,7 @@ FIELD:OriginalSeleId:CARRY:0,0
 FIELD:OriginalOrgId:CARRY:0,0
 // Legal Name
 // FIELD:company_name:LIKE(multiword):BAGOFWORDS(MOST):EDIT1(2):PROP:FORCE(+):TYPE(string250):25,147
-FIELD:company_name:LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1(2):PROP:TYPE(string250):26,398
+FIELD:company_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1(2):PROP:TYPE(string250):26,398
 FIELD:cnp_number:PROP:FORCE(--,OR(sbfe_id)):13,2
 // NOTE: This assumes we hack the data to blank company_name except when it's a Legal Name.
 // Given field specificities and the THRESHOLD we've set above, we in-effect require
@@ -87,7 +86,6 @@ FIELD:org_proxid:CARRY:0,0
 FIELD:ultimate_proxid:CARRY:0,0
 FIELD:levels_from_top:CARRY:0,0
 FIELD:nodes_total:CARRY:0,0
-FIELD:cortera_id:CARRY:0,0
 // ------------------------------------
 //  Metadata
 // ------------------------------------
@@ -98,5 +96,4 @@ BLOCKLINK:NAMED(OverLinks):BASIS(company_name)
 
 //Underlinks
 ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):IDFIELD(LGID3):41,0
-ATTRIBUTEFILE:CorteraAccounts:NAMED(file_cortera_accounts):VALUES(account_id):IDFIELD(lgid3):SUPPORTS(company_inc_state):27,0
 

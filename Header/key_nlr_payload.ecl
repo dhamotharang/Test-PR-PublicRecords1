@@ -45,6 +45,8 @@ layout:=record
 	d.dodgy_tracking;
 	d.persistent_record_id;
 	d.not_in_bureau;
+	d.global_sid;
+	d.record_sid;
  END;
 
 export key_NLR_payload := INDEX (d, {did,rid}, layout,

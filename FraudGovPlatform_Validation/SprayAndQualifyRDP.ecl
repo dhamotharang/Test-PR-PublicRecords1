@@ -9,12 +9,14 @@ EXPORT SprayAndQualifyRDP(
 
 	billingID_list := SET(RDP_GcIds,contribution_billing_id);
 
-	rdp_file := dataset('~foreign::10.173.50.45::thor100_21::in::sba_acclogs_processed',INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])));
+	// rdp_file := dataset('~foreign::10.173.50.45::thor100_21::in::sba_acclogs_processed',INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])));
+	rdp_file := dataset('~foreign::10.173.50.45::thor100_21::in::'+DateSearch+'::sba_acclogs',INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])));
+
 
 	RDP_Logs := rdp_file(
 			 company_id in billingID_list,
-			 function_name = 'VERIFICATION',
-			 (unsigned)STD.Str.FindReplace( STD.Str.FindReplace( date_added,':',''),'-','')[1..8] = (unsigned)DateSearch
+			 function_name = 'VERIFICATION'
+			 //(unsigned)STD.Str.FindReplace( STD.Str.FindReplace( date_added,':',''),'-','')[1..8] = (unsigned)DateSearch
 		);
 			
 	fname	:= 'rdp_' + pVersion[1..8];
