@@ -1,10 +1,11 @@
-import DayBatchPCNSR,Address,DayBatchUtils,ut,NID;
+﻿import $,Address,DayBatchUtils,Doxie,NID,Suppress,Ut;
 
-export PhoneSearch_Z3L_Fuzzy(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrInput) := FUNCTION
+export PhoneSearch_Z3L_Fuzzy(GROUPED DATASET($.Layout_PCNSR_Linked) pcnsrInput,
+                              Doxie.IDataAccess mod_access) := FUNCTION
 	
-	PCNSRData := DayBatchPCNSR.Key_PCNSR_LZ3;
+	PCNSRData := $.Key_PCNSR_LZ3;
 	
-	DayBatchPCNSR.Layout_PCNSR_Linked formatOutput(pcnsrInput l,PCNSRData r,STRING m) := TRANSFORM
+	$.Layout_PCNSR_Linked formatOutput(pcnsrInput l,PCNSRData r,STRING m) := TRANSFORM
 		MAC_Link_PCNSR_To_Input(l,r,m)
 	END;
 	
@@ -19,6 +20,11 @@ export PhoneSearch_Z3L_Fuzzy(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) 
 									formatOutput(LEFT,RIGHT,'3Z'), LEFT OUTER,KEEP(50)/*,
 									ATMOST(LEFT.indata.name_last = RIGHT.lname AND LEFT.indata.z5 = RIGHT.zip,7500)*/ );
 
-	RETURN matchZ3L;
+	matchZ3L_flagged := Suppress.MAC_FlagSuppressedSource(matchZ3L, mod_access, outdata.did, outdata.global_sid);  
+  
+  matchZ3L_suppressed := PROJECT(matchZ3L_flagged, TRANSFORM($.Layout_PCNSR_Linked, SELF.outdata := IF(~LEFT.is_suppressed, lEFT.outdata), SELF := LEFT));
+  
+	RETURN matchZ3L_suppressed;
+
 
 END;
