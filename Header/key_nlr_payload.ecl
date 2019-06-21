@@ -50,4 +50,4 @@ layout:=record
  END;
 
 export key_NLR_payload := INDEX (d, {did,rid}, layout,
-		Data_Services.Data_Location.Person_header+'thor_data400::key::header_nlr::did.rid_'+doxie.version_superkey);
+		Data_Services.Data_Location.Prefix('person_header')+'thor_data400::key::header_nlr::did.rid_'+doxie.version_superkey);
