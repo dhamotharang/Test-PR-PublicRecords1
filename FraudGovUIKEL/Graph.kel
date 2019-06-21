@@ -126,7 +126,6 @@ Legal :=  ENTITY
 
 
 
-
 Employer :=  ENTITY
 (FLAT(UID(uacctno),
 	Legal rLegal=UID(seleid),
@@ -1292,17 +1291,21 @@ Legal: => BusIncorpToOldestAcctOpenSpan := MAP(OldestAcctOpenDt=-99998 OR Incorp
 //Legal Fictitious Business attributes															 
 Legal: => BusAcctPerBusLegalEntCnt := COUNT(LegalEmployer{rEmployer}); 
 
-Legal: => UnemClmAfterOldestOpenCnt30D := MAP(ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
-                                                 ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) OR OldestAcctOpenDt=-99998 => -99998,
-																								 COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 30)));
-Legal: => UnemClmAfterOldestOpenCnt60D := MAP(ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
-                                                 ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) OR OldestAcctOpenDt=-99998 => -99998,
-																								 COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 60)));
-Legal: => UnemClmAfterOldestOpenCnt90D := MAP(ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
-                                                 ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) OR OldestAcctOpenDt=-99998 => -99998,
-																								 COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 90)));
-Legal: => UnemClmAfterOldestOpenCnt120D := MAP(ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
-                                               ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) OR OldestAcctOpenDt=-99998 => -99998,
+Legal: => UnemClmAfterOldestOpenCnt30D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) => -99998,
+																							COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 30)));
+Legal: => UnemClmAfterOldestOpenCnt60D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998)=> -99998,
+																							COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 60)));
+Legal: => UnemClmAfterOldestOpenCnt90D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                              ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) => -99998,
+																						  COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 90)));
+Legal: => UnemClmAfterOldestOpenCnt120D := MAP(OldestAcctOpenDt=-99998 => -99998,
+                                               ALL(LegalClaim.rClaim, BusAgeAtClaim:Null) => 0,
+                                               ALL(LegalClaim.rClaim, BusAgeAtClaim=-99998) => -99998,
 																							 COUNT(LegalClaim.rClaim(BusAgeAtClaim >= 0 AND BusAgeAtClaim <= 120)));
 
 Legal: => EmpBeganToAcctOpenLT12MCnt := MAP(ALL(LegalEmployer,rEmployer.BusAcctEmpBeganToOpenDtSpan=-99998) => -99998,
@@ -1934,21 +1937,25 @@ Employer: => BusEmpBeganToAcctOpenGT12MCnt := MAP(BusAcctUIDEcho=-99999 OR rLega
                                                  rLegal.EmpBeganToAcctOpenGT12MCnt);
 																								 
 Employer: => BusAcctUnemClmAfterOpenCnt30D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
                                                   ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0,
-                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) OR BusAcctOpenDtEcho=-99998 => -99998,
+                                                  ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
 																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
 																									COUNT(EmployerClaim.rClaim(EmpAgeAtClaim >= 0 AND EmpAgeAtClaim <= 30)));
 Employer: => BusAcctUnemClmAfterOpenCnt60D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
                                                   ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0,
                                                   ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
 																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
 																									COUNT(EmployerClaim.rClaim(EmpAgeAtClaim >= 0 AND EmpAgeAtClaim <= 60)));
 Employer: => BusAcctUnemClmAfterOpenCnt90D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
                                                   ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0,                                                  
 																									ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
 																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
 																									COUNT(EmployerClaim.rClaim(EmpAgeAtClaim >= 0 AND EmpAgeAtClaim <= 90)));
 Employer: => BusAcctUnemClmAfterOpenCnt120D := MAP(BusAcctUIDEcho=-99999 => -99999,
+                                                  BusAcctOpenDtEcho=-99998 => -99998,
                                                   ALL(EmployerClaim.rClaim, EmpAgeAtClaim:Null) => 0, 
                                                   ALL(EmployerClaim.rClaim, EmpAgeAtClaim=-99998) => -99998,
 																									BusAcctOpenDtEcho = BusAcctNewestRecordDt => -99997,
