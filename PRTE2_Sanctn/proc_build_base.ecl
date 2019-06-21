@@ -1,4 +1,4 @@
-﻿import prte2_sanctn, prof_license_mari, prte2,std, address, PromoteSupers, ut, aid;
+﻿import prte2_sanctn, prof_license_mari, prte2,std, address, PromoteSupers, ut, aid, prte2;
 
 //uppercase and remove spaces from in files
 	PRTE2.CleanFields(files.party_in, CleanParty);
@@ -76,6 +76,8 @@ prte2_sanctn.layouts.party_ext xform_clean(dAddressCleaned l) := transform
 				SELF.err_stat	   :=	 l.clean_address.err_stat;
 				self 	:= l.clean_address;
 				self.ssn_appended := if(L.cust_name = 'LN_PR' and l.link_ssn <> '', L.link_ssn, L.ssn_appended);
+				self.global_sid		:= 22811;
+				self.record_sid		:= 0;
 				self	:= l;
 				self := [];
 	end;
@@ -99,9 +101,23 @@ layouts.party_ext		appendId(dfParty L) := transform
 END;
 
 pPartyBase	:= PROJECT(dfParty, appendId(LEFT)) + 
-								PROJECT(CleanParty(cust_name = ''), transform(Layouts.party_ext, self := left));;
+								PROJECT(CleanParty(cust_name = ''), 
+								         transform(Layouts.party_ext, 
+												           	self.global_sid		:= 22811;
+																		self.record_sid		:= 0;
+																		self := left));
 
 
+
+// Global SID
+// jParty := join(pPartyBase, prte2.Files.global_sid,
+					 // right.BuildTemplateName = 'SANCTN',
+						// transform(recordof(pPartybase), 
+											// self.global_sid := right.UniqueSourceIdentifier, self:=left),
+											// left outer,
+											// all);
+											
+											
 Layouts.Incident_ext  CleanDates(CleanIncident L) := transform
 		self.incident_date_clean	:= if(L.INCIDENT_DATE = '', '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(trim(L.INCIDENT_DATE,left,right)));
 		self.fcr_date_clean			  := if(L.FCR_DATE= '','',Prof_License_Mari.DateCleaner.ToYYYYMMDD(trim(L.FCR_DATE,left,right)));

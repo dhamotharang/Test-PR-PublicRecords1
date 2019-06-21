@@ -134,7 +134,7 @@ cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(PRTE2_liens.key_autokey_payl
 
 RETURN sequential(build_keys,
 									parallel(cnt_fcra_main_id,cnt_fcra_party_id,cnt_fcra_autokey_payload)
-									// ,PerformUpdateOrNot
+									,PerformUpdateOrNot
 									);
 
 END;
