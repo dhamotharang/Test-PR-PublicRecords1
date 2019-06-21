@@ -1,4 +1,4 @@
-﻿EXPORT Email_Report(file_name, report_tag, file_tag) := FUNCTIONMACRO
+﻿﻿EXPORT Email_Report(file_name, report_tag, file_tag) := FUNCTIONMACRO
 
 		string out_file_layout := '';
 
@@ -31,8 +31,8 @@
 		
 		// XtabOut[no_of_RECORDs];
 	
-		// send_file := fileservices.SendEmailAttachText('karthik.reddy@lexisnexis.com',
-		send_file := fileservices.SENDEmailAttachText(Kel_Shell_QA.email_distribution.Success_list,
+		send_file := fileservices.SendEmailAttachText('karthik.reddy@lexisnexis.com',
+		// send_file := fileservices.SENDEmailAttachText(Kel_Shell_QA.email_distribution.Success_list,
 							 ' '+ report_tag  +  'Test Results Direct From Thor ',
 																			 	 trim(file_tag,left,right) + ' '+ '\n Please view attachment.' ,
 																			 XtabOut[no_of_records].line ,
