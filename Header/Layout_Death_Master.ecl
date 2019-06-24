@@ -1,4 +1,7 @@
-﻿export Layout_Death_Master := record
+/*2013-04-17T01:19:20Z (Shannon Lucero)
+New fields added to death_master for the RiskView Compliance Project - #120857
+*/
+export Layout_Death_Master := record
 string8  filedate;
 string1  rec_type;
 string1  rec_type_orig;
@@ -18,7 +21,4 @@ string3	 fipscounty;
 string2  crlf;
 string1  state_death_flag := '';
 string3	 death_rec_src := '';
-//CCPA-17 
-UNSIGNED4			global_sid := 0;
-UNSIGNED8			record_sid := 0;      
 end;
