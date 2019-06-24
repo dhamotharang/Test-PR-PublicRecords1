@@ -64,7 +64,7 @@
 		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
 		EXPORT EclCompileStrategy		:= 'REMOTE';											
 		EXPORT KeepEcl							:= 'FALSE';	
-		EXPORT ForceRun							:= 'TRUE';
+		EXPORT ForceRun							:= 'FALSE';
 		EXPORT CustomerDashboard 		:= MODULE
 			EXPORT VizServiceVersion								:= '1';
 			EXPORT CompositionUuid									:= '1d19c97e-2588-4b3f-9c8f-9c42536fde5b'; 	//Customer Dashboard Composition ID
