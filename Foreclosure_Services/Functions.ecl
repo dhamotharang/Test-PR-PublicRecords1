@@ -1,4 +1,4 @@
-import ut, Census_Data, Foreclosure_services, iesp, doxie, suppress, AutoStandardI;
+﻿import ut, Census_Data, Foreclosure_services, iesp, doxie, suppress, AutoStandardI;
 
 export Functions := module
 
@@ -177,6 +177,7 @@ end;
 			self.Defendants :=choosen(project(l.defendants,iesp.foreclosure.t_ForeclosureSearchDefendant),iesp.Constants.MAX_COUNT_DEFENDANT);
 			self._penalty  := l.penalt;
 			self.AlsoFound := l.isDeepDive;			
+			self := [];
 			END;
 			
 			in_recs:=fnAddPlaintiffAndDefendantDS(in_recs_tmp,in_mod);
