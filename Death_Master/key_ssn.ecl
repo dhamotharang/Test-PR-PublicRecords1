@@ -1,10 +1,8 @@
-﻿import mdr, doxie, Data_Services;
+import mdr, doxie, Data_Services;
 
 EXPORT key_ssn(boolean isFCRA) := function
 
-	//CCPA-17 both ssn keys are not used by query. No CCPA fields are added 
-	dm_base_pre := Death_Master.File_DeathMaster_Building((LENGTH(TRIM(ssn))=9));
-	dm_base := project(dm_base_pre,{dm_base_pre}-[global_sid,record_sid]);
+	dm_base := Death_Master.File_DeathMaster_Building((LENGTH(TRIM(ssn))=9));
 
 // for reference, this is the list of the new sources being added to Death Master
 // which we want to make sure are excluded from FCRA key until shell 5.0 goes live
