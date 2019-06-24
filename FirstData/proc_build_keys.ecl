@@ -9,7 +9,7 @@ EXPORT proc_build_keys (STRING	pVersion):=function
 	
 	RoxieKeyBuild.Mac_SK_Move_to_Built_v2(dx_FirstData.names('').i_did_FCRA,name_did,ma_fcra_first_data_key);
 	
-	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::FCRA::did','Q',ma_fcra_first_data_key_to_qa,pVersion);
+	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::FirstData::FCRA::did','Q',ma_fcra_first_data_key_to_qa,pVersion,2);
 
 	// create_build := Orbit3.proc_Orbit3_CreateBuild ('First Data',filedate,'F');
 	
