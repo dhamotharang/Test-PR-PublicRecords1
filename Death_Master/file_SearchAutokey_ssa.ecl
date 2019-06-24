@@ -1,4 +1,4 @@
-﻿import header, death_master,standard, ut, doxie, address, codes; 
+import header, death_master,standard, ut, doxie, address, codes; 
 
 fdeath := distribute(Death_Master.File_DeathMaster_Building_ssa, hash(state_death_id));
 fsupp  := distribute(header.file_death_master_supplemental_ssa, hash(state_death_id));
@@ -16,10 +16,7 @@ rec := record
 	unsigned1 zero := 0;
 	string1  blank:='';
 	string2 src := '';
-	string1 glb_flag := '';
-	//CCPA-17 
-	UNSIGNED4			global_sid := 0;
-	UNSIGNED8			record_sid := 0;      
+  string1 glb_flag := '';
 end;
 
 rec tformat(fdeath l) := transform
