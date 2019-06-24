@@ -10,15 +10,14 @@ EXPORT Search_Records(
     BatchShare.MAC_CapitalizeInput(ds_search_in, ds_batch);
     
     email_params := MODULE(PROJECT(search_params, $.IParams.EmailParams)) END;
-    
     res_row := CASE(search_params.SearchType,
                  $.Constants.SearchType.EIA => $.EmailIdentityAppendSearch(ds_batch,email_params),
-                 $.Constants.SearchType.EAA => $.EmailAddressAppendSearch(ds_batch,email_params),
+                 $.Constants.SearchType.EAA => $.EmailAddressAppendSearch(ds_batch,email_params, require_full_address_check:=TRUE),
                  $.Constants.SearchType.EIC => $.EmailIdentityCheckSearch(ds_batch,email_params),
                  ROW({[],[]}, $.Layouts.email_combined_rec) 
                  );
-                 
-    _recs := res_row.Records;
+ 
+   _recs := res_row.Records;
     gw_royalties:= PROJECT(res_row.Royalties, Royalty.Layouts.Royalty);  // royalties for gateway sources are already counted
     
     inh_royalties := Royalty.RoyaltyEmail.GetRoyaltySet(_recs, email_src);

@@ -1,47 +1,59 @@
-/* *********************************************************
+﻿/* *********************************************************
 ************************************************************
 **          Constants used in Risk Reporting              **
 ************************************************************
 ********************************************************** */
 
 EXPORT Constants := MODULE
-	SHARED at := '@lexisnexis.com,';
+	SHARED at := '@lexisnexisrisk.com,';
 	
-	EXPORT Debugger := 'Brenton.Pahl' + at;
+	EXPORT Debugger := 'Andi.Koenen' + at;
 	
-	SHARED ECL_Developers := 'Brenton.Pahl' + at + 
+	SHARED ECL_Developers := //'Brenton.Pahl' + at + 
 										'David.Schlangen' + at +
 										'Todd.Steil' + at +
 										'Michele.Walklin' + at +
-										'Kevin.Huls' + at +
+										// 'Kevin.Huls' + at +
 										// 'Becki.Wilken' + at +
-										'Christopher.Albee' + at +
-										'Frank.Allen' + at +
+										// 'Christopher.Albee' + at +
+										// 'Frank.Allen' + at +
 										'Andi.Koenen' + at +
-										'Laura.Weiner' + at +
-										'Dustin.Braun' + at +
+										'Laura.Nicla' + at +
+										// 'Laure.Fischer' + at +
+										'Tabitha.Gertken' + at +
 										'';
-										
-	SHARED Product := 'Mike.Woodberry' + at +
-										'Jacquelyn.Belding' + at +
+	//Desiree only wants IID 									
+	SHARED Product2 := 'Mike.Woodberry' + at +
+										// 'Jacquelyn.Belding' + at +
 										'Greg.Bethke' + at +
-										'Deni.Hogan' + at +
+										// 'Deni.Hogan' + at +
 										'Brad.Dolesh' + at +
 										'Jeff.Butler' + at +
 										'Dawn.Hill' + at +
 										'Jennifer.Matheny' + at +
-										'Brian.Jordan' + at +
+										// 'Brian.Jordan' + at +
+										'Desiree.Delgado' + at +
 										'';
-							
+	SHARED Product := 'Mike.Woodberry' + at +
+										// 'Jacquelyn.Belding' + at +
+										'Greg.Bethke' + at +
+										// 'Deni.Hogan' + at +
+										'Brad.Dolesh' + at +
+										'Jeff.Butler' + at +
+										'Dawn.Hill' + at +
+										'Jennifer.Matheny' + at +
+										// 'Brian.Jordan' + at +
+										//'Desiree.Delgado' + at +
+										'';						
 	SHARED QA := 'Randy.Niemeyer' + at +
-				'Robert.Perez' + at +
+				// 'Robert.Perez' + at +
 				'Nathan.Koubsky' + at +
-				'Jayson.Alayay' + at +
-				'Narasimha.Peruka' + at +
-				'Sivaram.Ghatti' + at +
-				'Vikram.Pareddy' + at +
-				'Suman.Burjukindi' + at +
-				'Karthik.Reddy' + at +
+				// 'Jayson.Alayay' + at +
+				// 'Narasimha.Peruka' + at +
+				// 'Sivaram.Ghatti' + at +
+				// 'Vikram.Pareddy' + at +
+				// 'Suman.Burjukindi' + at +
+				// 'Karthik.Reddy' + at +
 				'';
 				
 	SHARED Modeling := 'Nicholas.Montpetit' + at +
@@ -56,11 +68,17 @@ EXPORT Constants := MODULE
 	EXPORT emailRiskView2ReportsTo := ECL_Developers + Product + QA + Modeling;
 	// EXPORT emailRiskView2ReportsTo := Debugger;
 	
-	EXPORT emailv2InstantIDReportsTo := ECL_Developers + Product + QA + Modeling;
+	EXPORT emailv2InstantIDReportsTo := ECL_Developers + Product2 + QA + Modeling;
 	// EXPORT emailv2InstantIDReportsTo := Debugger;
 	
 	EXPORT emailv2FraudPointReportsTo := ECL_Developers + Product + QA + Modeling;
 	// EXPORT emailv2FraudPointReportsTo := Debugger;
+
+	EXPORT emailv2ChargeBackDefenderReportsTo := ECL_Developers + Product + QA + Modeling;
+	// EXPORT emailv2ChargeBackDefenderReportsTo := Debugger;
+
+	EXPORT emailv2OrderScoreReportsTo := ECL_Developers + Product + QA + Modeling;
+	// EXPORT emailv2OrderScoreReportsTo := Debugger;
 	
 	// EXPORT emailAccountMonitoringReportsTo := ECL_Developers + Product + QA + Modeling;
 	EXPORT emailAccountMonitoringReportsTo := Debugger;
@@ -71,8 +89,9 @@ EXPORT Constants := MODULE
 	EXPORT emailPremiseAssociationReportsTo := ECL_Developers + Product + QA + Modeling;
 	// EXPORT emailPremiseAssociationReportsTo := Debugger;
 	
-	EXPORT emailSAOTHealthReportsTo := 'Brenton.Pahl' + at + 
+	EXPORT emailSAOTHealthReportsTo := //'Brenton.Pahl' + at + 
 																		 'Todd.Steil' + at +
+																		 'Margaret.Worob' + at +
 																		 'John.Freibaum' + at +
 																		 'Valerie.Minnis' + at +
 																			'';
@@ -124,6 +143,10 @@ EXPORT Constants := MODULE
 	EXPORT ThreshFraudPointScoreBuckets := 10.000;
 	EXPORT ThreshScoredBelow100 := 0.010;
 	EXPORT ThreshScoredAbove900 := 0.010;
+	
+	EXPORT ThreshChargeBackDefenderScoreBuckets := 10.000;
+	EXPORT ThreshOrderScoreScoreBuckets := 10.00;
+	
 	// CVI Thresholds
 	EXPORT ThreshPercent_CVI_00 := 1.000;
 	EXPORT ThreshPercent_CVI_10 := 2.000;
@@ -344,6 +367,22 @@ EXPORT Constants := MODULE
 	EXPORT ThreshPercent_RC_U2 := 0.250;
 	EXPORT ThreshPercent_RC_WL := 0.450;
 	EXPORT ThreshPercent_RC_ZI := 1.000;
+	//OrderScore and ChargeBackDefender new Reason codes
+	EXPORT ThreshPercent_RC_O1 := 0.030;
+	EXPORT ThreshPercent_RC_O2 := 0.030;
+	EXPORT ThreshPercent_RC_O3 := 0.030;
+	EXPORT ThreshPercent_RC_O4 := 0.030;
+	EXPORT ThreshPercent_RC_O5 := 0.030;
+	EXPORT ThreshPercent_RC_O6 := 0.030;
+	EXPORT ThreshPercent_RC_O7 := 0.030;
+	EXPORT ThreshPercent_RC_S1 := 0.030;
+	EXPORT ThreshPercent_RC_S2 := 0.030;
+	EXPORT ThreshPercent_RC_S3 := 0.030;
+	EXPORT ThreshPercent_RC_S4 := 0.030;
+	EXPORT ThreshPercent_RC_S5 := 0.030;
+	EXPORT ThreshPercent_RC_AS := 0.030;
+	EXPORT ThreshPercent_RC_EA := 0.030;
+	
 	// RiskView 2 Thresholds
 	EXPORT ThreshPercent_RC_F00 := 0.025;
 	EXPORT ThreshPercent_RC_F01 := 0.025;

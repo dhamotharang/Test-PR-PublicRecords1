@@ -1,7 +1,7 @@
-﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD, ut;
+﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD;
 EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)  dPhoneRecs,
                                  DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
-                                 PhoneFinder_Services.iParam.ReportParams         inMod,
+                                 PhoneFinder_Services.iParam.SearchParams         inMod,
                                  DATASET(Gateway.Layouts.Config) dGateways) := 
 
 MODULE
@@ -152,7 +152,7 @@ MODULE
       SELF.st       :=l.state;
       SELF.zip         :=l.zip;
       SELF.PhoneOwnershipIndicator := TRUE; // identity returned from gateway is verified
-      SELF.dt_first_seen := ut.date_math((STRING)today,-PhoneFinder_Services.Constants.ZumigoConstants.IdentityDateThreshold);
+      SELF.dt_first_seen := (STRING)today;
       SELF.dt_last_seen := (STRING)today;
       SELF.CallForwardingIndicator   := IF(Zum_inMod.CallHandlingInfo, 
                                        PhoneFinder_Services.Functions.CallForwardingDesc(l.call_forwarding),''); //get call forwarded value only when CallHandlingInfo is selected

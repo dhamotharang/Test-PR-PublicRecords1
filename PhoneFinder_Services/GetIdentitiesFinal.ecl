@@ -2,7 +2,7 @@
 
 EXPORT GetIdentitiesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                           DATASET($.Layouts.BatchInAppendDID)  dInBestInfo,
-                          $.iParam.ReportParams                inMod) :=
+                          $.iParam.SearchParams                inMod) :=
 FUNCTION
   today := (STRING)Std.Date.Today();
 

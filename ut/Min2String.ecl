@@ -1,2 +1,0 @@
-//Returns the min of two strings (unless one is empty)
-EXPORT Min2String(string l, string r) := if(l<>'' and r<>'', min(l, r), if(l<>'', l, r)):DEPRECATED('MOVED TO HomesteadExemption_Services.fn_getPropertyRecs');	

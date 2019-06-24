@@ -4,7 +4,7 @@
 EXPORT HeaderFileRollupService_Records := 
   MODULE
 
-		SHARED set_premium_phone_count(DATASET(doxie.Layout_Rollup.header_rolled) rolledRecsIn, STRING DRM) := FUNCTION
+		SHARED set_premium_phone_count(DATASET(doxie.Layout_Rollup.header_rolled) rolledRecsIn, doxie.IDataAccess mod_access) := FUNCTION
 
 			dids := DATASET([{(UNSIGNED6)rolledRecsIn[1].Results[1].did}],doxie.layout_references);
 			childAddrRecs  := NORMALIZE(rolledRecsIn[1].Results,LEFT.addrRecs,TRANSFORM(doxie.Layout_Rollup.AddrRec,SELF:=RIGHT));
@@ -12,7 +12,7 @@ EXPORT HeaderFileRollupService_Records :=
 			dedup_phones   := PROJECT(childPhoneRecs,TRANSFORM(doxie.premium_phone.phone_rec,SELF.phone:=LEFT.phone));
 
 			results := PROJECT(rolledRecsIn[1].Results,TRANSFORM(doxie.Layout_Rollup.KeyRec_Seq,
-				SELF.premium_phone_count:=doxie.premium_phone.get_count(dids,dedup_phones,DRM,TRUE);
+				SELF.premium_phone_count:=doxie.premium_phone.get_count(dids,dedup_phones,mod_access,TRUE);
 				SELF:=LEFT));
 
 			doxie.Layout_Rollup.header_rolled rolledRecsOut() := TRANSFORM
@@ -27,8 +27,8 @@ EXPORT HeaderFileRollupService_Records :=
     EXPORT fn_get_ta1_temp ( doxie.HeaderFileRollupService_IParam.ta1_iparams ta1_iparam_mod ):=
       FUNCTION
         doxie.MAC_Header_Field_Declare();
-				glbMod := AutoStandardI.GlobalModule();
-
+			
+        mod_access := $.compliance.GetGlobalDataAccessModule();
         // Choose how to search for DIDs -- by DL or in the header 
         dlSearch := ta1_iparam_mod.DLNumber <> '' AND ta1_iparam_mod.DLState <> '';
         DLkey_dids := LIMIT(DriversV2.Key_DL_Number(KEYED(s_dl=ta1_iparam_mod.DLNumber),orig_state=stringlib.StringToUpperCase(ta1_iparam_mod.DLState),did >0), ut.limits.DEFAULT,SKIP);
@@ -49,7 +49,7 @@ EXPORT HeaderFileRollupService_Records :=
 
         // Rollup header records
         tmpRecs := doxie.rollup_presentation(presRecs, ta1_iparam_mod.allow_wildcard);
-        ta1_tmp := set_premium_phone_count(tmpRecs,glbMod.dataRestrictionMask)[1];
+        ta1_tmp := set_premium_phone_count(tmpRecs,mod_access)[1];
 
       RETURN ta1_tmp;
     END; // fn_get_ta1_temp

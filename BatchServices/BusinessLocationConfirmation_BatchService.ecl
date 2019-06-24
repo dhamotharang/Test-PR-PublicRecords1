@@ -12,14 +12,19 @@
 */
 
 EXPORT BusinessLocationConfirmation_BatchService := MACRO
+
  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// Layout of input data
 	in_layout := BatchServices.BusinessLocationConfirmation_BatchService_Layouts.Input;
-	
+  
 	// Grab input data from SOAP variable
 	DATASET(in_layout) indata := DATASET([], in_layout) : STORED('batch_in', FEW);
 	
+  outData := BatchServices.BusinessLocationConfirmation_BatchService_Records(indata);
+  
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());  
+  IF (EXISTS(outData), doxie.compliance.logSoldToTransaction(mod_access)); 
 	// Retrieve and output records
-	OUTPUT(BatchServices.BusinessLocationConfirmation_BatchService_Records(indata), NAMED('Results'));
+	OUTPUT(outData, NAMED('Results'));
 	
 ENDMACRO;

@@ -1,7 +1,7 @@
 ﻿IMPORT Advo,DID_Add, Gateway, Inquiry_AccLogs,MDR,PhoneFinder_Services,PhoneFraud,PhonesInfo,Phones,Risk_Indicators, std, ut;
 
 EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs, 
-													 PhoneFinder_Services.iParam.ReportParams inMod, 
+													 PhoneFinder_Services.iParam.SearchParams inMod, 
 													 DATASET(Gateway.Layouts.Config) dGateways, 
 													 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
 													 DATASET(PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo,

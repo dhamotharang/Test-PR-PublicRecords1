@@ -1,0 +1,9 @@
+Info Log -
+
+Monitoring WU W20180904-130112(HIPIE_ALAPERIASSX-W7D_HIPIE_Plugins.ComputeSuspectProviderAddressScore.ComputeSuspectProviderAddressScore_2.0_testcmp_periassx) to completion.
+Plugin ComputeSuspectProviderAddressScore's test composition ComputeSuspectProviderAddressScore_2.0_testcmp ran on cluster http://10.241.100.159:8010/ and created workunit W20180904-130112 with status completed
+Plugin ComputeSuspectProviderAddressScore's test composition ComputeSuspectProviderAddressScore_2.0_testcmp ran and completed with state "completed"
+
+
+Err Log - 
+

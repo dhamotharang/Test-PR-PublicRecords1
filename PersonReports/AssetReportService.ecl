@@ -134,18 +134,13 @@ WSInput.MAC_PersonReports_AssetReportService();
   end;
 
   // Now define all report parameters
-  report_mod := module (options)
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
+  report_mod := module (options, mod_access)
+    EXPORT boolean ignoreFares := gm.ignoreFares;
+    EXPORT boolean ignoreFidelity := gm.ignoreFidelity;
+
     // Do all required translations here
-    export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
-    export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-		export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-		export string DataPermissionMask := gm.dataPermissionMask;
-    export string DataRestrictionMask := gm.dataRestrictionMask;
-    export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
-    export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
-    //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-		export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		export boolean Include_NonRegulated_WatercraftSources := false : stored ('IncludeNonRegulatedWatercraftSources'); 
 	end;
 
@@ -153,7 +148,7 @@ WSInput.MAC_PersonReports_AssetReportService();
   dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
 
   // main records
-  asset_mod := module (project (report_mod, PersonReports.input._assetreport, opt)) end;
+  asset_mod := module (project (report_mod, PersonReports.IParam._assetreport, opt)) end;
   recs := PersonReports.AssetReport (dids, asset_mod, FALSE).Records;
 //  output (recs);
 
@@ -167,60 +162,6 @@ WSInput.MAC_PersonReports_AssetReportService();
   IF (count (dids) > 1,
       fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria')
       output (results, named ('Results')));
-/*
-  // debug
-  print_mod := module (project (asset_mod, PersonReports.input._compoptions, opt))
-  end;
-  res := PersonReports.functions.GetCRSOptionsDataset (print_mod);
-  output (res, named ('Options'));
-*/
+
 ENDMACRO;
 //AssetReportService ();
-
-/*
-<AssetReportRequest>
-<row>
-<User>
-  <ReferenceCode>ref_code_str</ReferenceCode>
-  <BillingCode>billing_code</BillingCode>
-  <QueryId>query_id</QueryId>
-  <GLBPurpose>1</GLBPurpose>
-  <DLPurpose>1</DLPurpose>
-  <EndUser/>
-</User>
-<Options>
-	<ReturnAlsoFound></ReturnAlsoFound>
-	<IncludeRelatives></IncludeRelatives>
-	<IncludeAssociates></IncludeAssociates>
-	<IncludePhonesPlus></IncludePhonesPlus>
-	<IncludeProfessionalLicenses></IncludeProfessionalLicenses>
-	<IncludeDriversLicenses></IncludeDriversLicenses>
-</Options>
-<ReportBy>
-  <Name>
-    <Full></Full>
-    <First></First>
-    <Middle></Middle>
-    <Last></Last>
-  </Name>
-  <Address>
-    <StreetName></StreetName>
-    <StreetNumber></StreetNumber>
-    <StreetSuffix></StreetSuffix>
-    <UnitNumber></UnitNumber>
-    <State></State>
-    <City></City>
-    <Zip5></Zip5>
-  </Address>
-  <SSN></SSN>
-  <UniqueId></UniqueId>
-  <DOB>
-    <Year></Year>
-    <Month></Month>
-    <Day></Day>
-   </DOB>
-  <Phone10></Phone10>
-</ReportBy>
-</row>
-</AssetReportRequest>
-*/

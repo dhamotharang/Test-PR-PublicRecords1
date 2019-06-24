@@ -1,7 +1,7 @@
-﻿import _Control, InfutorCID, ut, riskwise, FCRA;
+﻿import _Control, InfutorCID, ut, riskwise, FCRA, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Infutor_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := FUNCTION
+export Boca_Shell_Infutor_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := FUNCTION
 
 Layout_Infutor := RECORD
 	unsigned4 seq;
@@ -12,22 +12,22 @@ END;
 
 // check corrections
 Layout_Infutor infutor_corr(ids_wide le, FCRA.Key_Override_Infutor_FFID ri) := TRANSFORM
-	firstscore := FnameScore(le.shell_input.fname, ri.fname);
-	firstmatch := iid_constants.g(firstscore);
-	lastscore := LnameScore(le.shell_input.lname, ri.lname);
-	lastmatch := iid_constants.g(lastscore);
+	firstscore := risk_indicators.FnameScore(le.shell_input.fname, ri.fname);
+	firstmatch := risk_indicators.iid_constants.g(firstscore);
+	lastscore := risk_indicators.LnameScore(le.shell_input.lname, ri.lname);
+	lastmatch := risk_indicators.iid_constants.g(lastscore);
 	zip_score := Risk_Indicators.AddrScore.zip_score(le.shell_input.in_zipcode, ri.zip);
 	cityst_score := Risk_Indicators.AddrScore.citystate_score(le.shell_input.in_city, le.shell_input.in_state, ri.p_city_name, ri.st, le.iid.cityzipflag);
-	addrmatch := iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
+	addrmatch := risk_indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						zip_score, cityst_score) );
-	phonescore := PhoneScore(le.shell_input.phone10, ri.phone);
-	phonematch := iid_constants.gn(phonescore);
+	phonescore := risk_indicators.PhoneScore(le.shell_input.phone10, ri.phone);
+	phonematch := risk_indicators.iid_constants.gn(phonescore);
 
 	self.infutor_date_first_seen := ri.dt_first_seen;
 	self.infutor_date_last_seen := ri.dt_last_seen;
 							
-	self.infutor_nap := iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
+	self.infutor_nap := risk_indicators.iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
 	
 	self := le;
 end;
@@ -46,28 +46,28 @@ infutor_correct_thor := join(ids_wide, pull(FCRA.Key_Override_Infutor_FFID),
 #END
 
 Layout_Infutor getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID_FCRA ri) := transform	
-	firstscore := FnameScore(le.shell_input.fname, ri.fname);
-	firstmatch := iid_constants.g(firstscore);
-	lastscore := LnameScore(le.shell_input.lname, ri.lname);
-	lastmatch := iid_constants.g(lastscore);
+	firstscore := risk_indicators.FnameScore(le.shell_input.fname, ri.fname);
+	firstmatch := risk_indicators.iid_constants.g(firstscore);
+	lastscore := risk_indicators.LnameScore(le.shell_input.lname, ri.lname);
+	lastmatch := risk_indicators.iid_constants.g(lastscore);
 	zip_score := Risk_Indicators.AddrScore.zip_score(le.shell_input.in_zipcode, ri.zip);
 	cityst_score := Risk_Indicators.AddrScore.citystate_score(le.shell_input.in_city, le.shell_input.in_state, ri.p_city_name, ri.st, le.iid.cityzipflag);
-	addrmatch := iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
+	addrmatch := risk_indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						zip_score, cityst_score) );
-	phonescore := PhoneScore(le.shell_input.phone10, ri.phone);
-	phonematch := iid_constants.gn(phonescore);
+	phonescore := risk_indicators.PhoneScore(le.shell_input.phone10, ri.phone);
+	phonematch := risk_indicators.iid_constants.gn(phonescore);
 
 	self.infutor_date_first_seen := ri.dt_first_seen;
 	self.infutor_date_last_seen := ri.dt_last_seen;
 							
-	self.infutor_nap := iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
+	self.infutor_nap := risk_indicators.iid_constants.comp_nap(firstmatch, lastmatch, addrmatch, phonematch);
 	self := le;
 end;
 wInfutor_roxie := join(ids_wide, InfutorCID.Key_Infutor_DID_FCRA,
 									left.did<>0 and
 									keyed(left.did=right.did) and
-									right.dt_first_seen < (unsigned)iid_constants.myGetDate(left.historydate) and 
+									right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate) and 
 									trim((string)right.did)+trim(right.phone)+trim((string)right.dt_first_seen) not in left.infutor_correct_record_id and  // old way, using concatenated keys
 									trim(right.persistent_record_id) not in	left.infutor_correct_record_id,  // new way, using persistent_record_id
 									getInfutor(left,right), left outer, atmost(riskwise.max_atmost), KEEP(100));
@@ -76,7 +76,7 @@ wInfutor_thor := join(distribute(ids_wide, hash64(did)),
 									distribute(pull(InfutorCID.Key_Infutor_DID_FCRA), hash64(did)),
 									left.did<>0 and
 									left.did=right.did and
-									right.dt_first_seen < (unsigned)iid_constants.myGetDate(left.historydate) and 
+									right.dt_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate) and 
 									trim((string)right.did)+trim(right.phone)+trim((string)right.dt_first_seen) not in left.infutor_correct_record_id and  // old way, using concatenated keys
 									trim(right.persistent_record_id) not in	left.infutor_correct_record_id,  // new way, using persistent_record_id
 									getInfutor(left,right), left outer, atmost(left.did=right.did, riskwise.max_atmost), KEEP(100), LOCAL);

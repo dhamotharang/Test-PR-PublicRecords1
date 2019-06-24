@@ -26,7 +26,7 @@ IMPORT MemberPoint, PhoneFinder_Services, Gateway;
 				SELF.did				:= LEFT.did,
 				SELF 						:= []
 			));
-			pfOptionsIn := MODULE(PROJECT(options, PhoneFinder_Services.iParam.ReportParams, OPT))
+			pfOptionsIn := MODULE(PROJECT(options, PhoneFinder_Services.iParam.SearchParams, OPT))
 				EXPORT BOOLEAN IncludeMinors					:= FALSE;
 				EXPORT STRING6 SSNMask								:= options.ssn_mask;
 				EXPORT STRING6 DOBMask								:= MemberPoint.Util.toStrMask(options.dob_mask);

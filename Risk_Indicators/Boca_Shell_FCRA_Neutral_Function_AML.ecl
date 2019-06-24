@@ -1,23 +1,23 @@
-﻿import _Control, doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile, models;
+﻿import _Control, doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile, models, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_FCRA_Neutral_Function_AML(grouped DATASET(Layout_output) iid,
+export Boca_Shell_FCRA_Neutral_Function_AML(grouped DATASET(risk_indicators.Layout_output) iid,
 								unsigned1 dppa, unsigned1 glb,
 								boolean isUtility = false,
 								boolean isLN=false,
 								boolean includeRelativeInfo = true,
 								boolean IsFCRA = FALSE,
 								unsigned1 BSversion = 1, boolean nugen = false,
-								string50 DataRestriction=iid_constants.default_DataRestriction,
+								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 								unsigned8 BSOptions
 								) := function
 
 glb_ok := glb > 0 and glb < 8 or glb=11 or glb=12;
 dppa_ok := dppa > 0 and dppa < 8;
 
-ids := GROUP(SORT(Boca_Shell_Ids_AML(iid, includeRelativeInfo, DataRestriction, BSOptions),seq),seq);
+ids := GROUP(SORT(risk_indicators.Boca_Shell_Ids_AML(iid, includeRelativeInfo, DataRestriction, BSOptions),seq),seq);
 
-relrec := layout_bocashell_neutral;
+relrec := risk_indicators.layout_bocashell_neutral;
 
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 unsigned1 IIDVersion := 0;	// version 0 will not get the new v1 reason codes
@@ -35,7 +35,7 @@ TRANSFORM
 	SELF.ADLCategory := le.ADLCategory;
 	SELF.trueDID := le.trueDID;
 
-	SELF.Shell_Input := ROW(le,TRANSFORM(Layout_Input,SELF := LEFT));
+	SELF.Shell_Input := ROW(le,TRANSFORM(risk_indicators.Layout_Input,SELF := LEFT));
 	SELF.iid.NAS_summary := le.socsverlevel;
 	SELF.iid.NAP_summary := le.phoneverlevel;
 	
@@ -62,8 +62,8 @@ TRANSFORM
 																																 0);
 	self.iid := le;
 
-	SELF.Available_Sources.DL := Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st));
-	SELF.Available_Sources.Voter := Source_Available.VoterSrcSt(le.st, bsversion, isFCRA, le.historydate);
+	SELF.Available_Sources.DL := risk_indicators.Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st));
+	SELF.Available_Sources.Voter := risk_indicators.Source_Available.VoterSrcSt(le.st, bsversion, isFCRA, le.historydate);
 
 	// Input Check
 	SELF.Input_Validation.FirstName := le.fname<>'';
@@ -537,72 +537,72 @@ wAptCount := if(BSversion>2, group(sort(join(p, if(isFCRA, If(useExperianFCRA, d
 										
 										
 // get infutor by phone for bocashell 3
-infutor_phone := if(BSversion>2, Boca_Shell_Infutor_phone(wAptCount, isFCRA, BSVersion ), wAptCount);	
+infutor_phone := if(BSversion>2, risk_indicators.Boca_Shell_Infutor_phone(wAptCount, isFCRA, BSVersion ), wAptCount);	
 												
 												
 // get accident data for boca shell 3 - not for FCRA
-acc := Boca_Shell_Accident(infutor_phone, BSversion);
+acc := risk_indicators.Boca_Shell_Accident(infutor_phone, BSversion);
 
 															
 // try getting foreclosure index - not for FCRA
-relrec getFI12(relrec le, Key_FI_Module.key_fi_geo12 ri, unsigned c) := transform
+relrec getFI12(relrec le, risk_indicators.Key_FI_Module.key_fi_geo12 ri, unsigned c) := transform
 	self.Address_Verification.Input_Address_Information.geo12_fc_index := if(c=1, ri.geo12_index, le.Address_Verification.Input_Address_Information.geo12_fc_index);
 	self.Address_Verification.Address_History_1.geo12_fc_index := if(c=4, ri.geo12_index, le.Address_Verification.Address_History_1.geo12_fc_index);
 	self.Address_Verification.Address_History_2.geo12_fc_index := if(c=7, ri.geo12_index, le.Address_Verification.Address_History_2.geo12_fc_index);
 	self := le;
 end;
-relrec getFI11(relrec le, Key_FI_Module.key_fi_geo11 ri, unsigned c) := transform
+relrec getFI11(relrec le, risk_indicators.Key_FI_Module.key_fi_geo11 ri, unsigned c) := transform
 	self.Address_Verification.Input_Address_Information.geo11_fc_index := if(c=2, ri.geo11_index, le.Address_Verification.Input_Address_Information.geo11_fc_index);
 	self.Address_Verification.Address_History_1.geo11_fc_index := if(c=5, ri.geo11_index, le.Address_Verification.Address_History_1.geo11_fc_index);
 	self.Address_Verification.Address_History_2.geo11_fc_index := if(c=8, ri.geo11_index, le.Address_Verification.Address_History_2.geo11_fc_index);
 	self := le;
 end;
-relrec getFIfips(relrec le, Key_FI_Module.key_fi_fips ri, unsigned c) := transform
+relrec getFIfips(relrec le, risk_indicators.Key_FI_Module.key_fi_fips ri, unsigned c) := transform
 	self.Address_Verification.Input_Address_Information.fips_fc_index := if(c=3, ri.fips_index, le.Address_Verification.Input_Address_Information.fips_fc_index); 
 	self.Address_Verification.Address_History_1.fips_fc_index := if(c=6, ri.fips_index, le.Address_Verification.Address_History_1.fips_fc_index); 
 	self.Address_Verification.Address_History_2.fips_fc_index := if(c=9, ri.fips_index, le.Address_Verification.Address_History_2.fips_fc_index); 
 	self := le;
 end;
 // get input address foreclosure indices
-wPropGeo12 := join(acc, Key_FI_Module.key_fi_geo12, 	
+wPropGeo12 := join(acc, risk_indicators.Key_FI_Module.key_fi_geo12, 	
 											left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and left.address_verification.input_address_information.geo_blk<>'' and
 											keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county+left.address_verification.input_address_information.geo_blk=right.geo12),
 											getFI12(left,right,1), left outer, atmost(riskwise.max_atmost), keep(1));
 
-wPropGeo11 := join(wPropGeo12, Key_FI_Module.key_fi_geo11, 
+wPropGeo11 := join(wPropGeo12, risk_indicators.Key_FI_Module.key_fi_geo11, 
 											left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and left.address_verification.input_address_information.geo_blk<>'' and
 											keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county+left.address_verification.input_address_information.geo_blk[1..6]=right.geo11),
 											getFI11(left,right,2), left outer, atmost(riskwise.max_atmost), keep(1));
 
-wPropfips := join(wPropGeo11, Key_FI_Module.key_fi_fips, 
+wPropfips := join(wPropGeo11, risk_indicators.Key_FI_Module.key_fi_fips, 
 											left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and
 											keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county=right.fips),
 											getFIfips(left,right,3), left outer, atmost(riskwise.max_atmost), keep(1));
 											
 // get address history 1 foreclosure indices										
-wPropGeo12_2 := join(wPropfips, Key_FI_Module.key_fi_geo12, 
+wPropGeo12_2 := join(wPropfips, risk_indicators.Key_FI_Module.key_fi_geo12, 
 											left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
 											keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk=right.geo12),
 											getFI12(left,right,4), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropGeo11_2 := join(wPropGeo12_2, Key_FI_Module.key_fi_geo11, 
+wPropGeo11_2 := join(wPropGeo12_2, risk_indicators.Key_FI_Module.key_fi_geo11, 
 											left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
 											keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk[1..6]=right.geo11),
 											getFI11(left,right,5), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropfips_2 := join(wPropGeo11_2, Key_FI_Module.key_fi_fips, 
+wPropfips_2 := join(wPropGeo11_2, risk_indicators.Key_FI_Module.key_fi_fips, 
 											left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and
 											keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county=right.fips),
 											getFIfips(left,right,6), left outer, atmost(riskwise.max_atmost), keep(1));
 
 // get address history 2 foreclosure indices
-wPropGeo12_3 := join(wPropfips_2, Key_FI_Module.key_fi_geo12, 
+wPropGeo12_3 := join(wPropfips_2, risk_indicators.Key_FI_Module.key_fi_geo12, 
 											left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
 											keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk=right.geo12),
 											getFI12(left,right,7), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropGeo11_3 := join(wPropGeo12_3, Key_FI_Module.key_fi_geo11, 
+wPropGeo11_3 := join(wPropGeo12_3, risk_indicators.Key_FI_Module.key_fi_geo11, 
 											left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
 											keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk[1..6]=right.geo11),
 											getFI11(left,right,8), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropfips_3 := join(wPropGeo11_3, Key_FI_Module.key_fi_fips, 
+wPropfips_3 := join(wPropGeo11_3, risk_indicators.Key_FI_Module.key_fi_fips, 
 											left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and
 											keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county=right.fips),
 											getFIfips(left,right,9), left outer, atmost(riskwise.max_atmost), keep(1));
@@ -612,7 +612,7 @@ wPropFip := if(isFCRA or BSversion<=2, infutor_phone, wPropfips_3);	// dont use 
 
 
 // add utility logic here for boca shell 3
-wUtil := if(IsFCRA or BSversion<=2, wPropFip, Boca_Shell_Utility(wPropFip, glb, isFCRA));		// don't get utility for FCRA		// don't get utility for FCRA
+wUtil := if(IsFCRA or BSversion<=2, wPropFip, risk_indicators.Boca_Shell_Utility(wPropFip, glb, isFCRA));		// don't get utility for FCRA		// don't get utility for FCRA
 
 
 					
@@ -695,7 +695,7 @@ end;
 ds_max := choosen(doxie.key_max_dt_last_seen, 1);
 hdr_max_dt_last_seen := if(isFCRA, '0', ((STRING)ds_max[1].max_date_last_seen)[1..6]+'01' );
 // this is the same as iid_constants.myGetDate with the exception of using hdr_max_dt_last_seen instead of ut.GetDate
-relative_myGetDate(unsigned3 history_date) := IF(history_date=999999,hdr_max_dt_last_seen,iid_constants.full_history_date(history_date));		
+relative_myGetDate(unsigned3 history_date) := IF(history_date=999999,hdr_max_dt_last_seen,risk_indicators.iid_constants.full_history_date(history_date));		
 																							
 relativeDaysApart(string8 full_history_date, string8 d2) := ut.DaysApart(full_history_date,d2) <= 62 OR (unsigned)d2 >= (unsigned)full_history_date;	
 relatives_slim get_relat_info(pre_relatives le, doxie.Key_Header ri) :=
@@ -722,7 +722,7 @@ END;
 			
 idheader1 :=  JOIN(pre_relatives(isrelat), doxie.Key_Header, 
 														keyed(LEFT.did=RIGHT.s_did) AND
-														right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
+														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < left.historydate AND
 														// check permissions	
 														(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
@@ -733,7 +733,7 @@ idheader1 :=  JOIN(pre_relatives(isrelat), doxie.Key_Header,
 														(~mdr.Source_is_DPPA(RIGHT.src) OR
 															(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
-														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
+														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID));
 														
 // idheader := if(isFCRA, pre_relatives(isrelat), idheader1);	// dont call the header for fcra because there will never be a relative
@@ -786,7 +786,7 @@ relatives_with_suspcious_ids := join(idroll_slim, suspicious_identities,
 															self.relative_bureau_only_count_created_6months := if(right.bureau_only_last_6months, 1, 0);	
 															self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-isFraudpoint :=  (BSOptions & iid_constants.BSOptions.IncludeFraudVelocity) > 0;
+isFraudpoint :=  (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity) > 0;
 idroll := if(isFCRA, group(idroll_slim, seq), if(isFraudpoint or bsversion>=41, group(relatives_with_suspcious_ids, seq), group(idroll_slim,seq)));
 
 relrec get_census(relatives_slim le, Census_Data.Key_Smart_Jury ri) :=
@@ -970,9 +970,9 @@ Property_with_census3b := JOIN(Property_with_census3a, Census_Data.Key_Smart_Jur
 
 With_or_without_census := IF(isFCRA, pre_relatives, Property_with_census3b);
 
-MAC_testHRIAddress (With_or_without_census, Input_Address_Information, Prop_HRI_InputAddress, IsFCRA);
-MAC_testHRIAddress (Prop_HRI_InputAddress, Address_History_1, Prop_HRI_AddressHistory_1, IsFCRA);
-MAC_testHRIAddress (Prop_HRI_AddressHistory_1, Address_History_2, Prop_HRI_AddressHistory_2, IsFCRA);
+risk_indicators.MAC_testHRIAddress (With_or_without_census, Input_Address_Information, Prop_HRI_InputAddress, IsFCRA);
+risk_indicators.MAC_testHRIAddress (Prop_HRI_InputAddress, Address_History_1, Prop_HRI_AddressHistory_1, IsFCRA);
+risk_indicators.MAC_testHRIAddress (Prop_HRI_AddressHistory_1, Address_History_2, Prop_HRI_AddressHistory_2, IsFCRA);
 
 
 return Prop_HRI_AddressHistory_2;

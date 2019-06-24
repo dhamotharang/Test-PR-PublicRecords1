@@ -1,7 +1,7 @@
-﻿import _Control, advo, riskwise, ut, fcra;
+﻿import _Control, advo, riskwise, ut, fcra, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Advo(GROUPED DATASET(layout_bocashell_neutral) clam_pre_ADVO, 
+export Boca_Shell_Advo(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_ADVO, 
 											boolean isFCRA, string50 DataRestrictionMask, boolean isPreScreen,
 											integer bsVersion) := FUNCTION
 
@@ -307,7 +307,7 @@ with_advo1_fcra_roxie := join(clam_pre_ADVO, advo_fcra_data_rolled,
 					left.Address_Verification.Input_Address_Information.predir = right.predir and
 					left.Address_Verification.Input_Address_Information.postdir = right.postdir and
 					left.Address_Verification.Input_Address_Information.sec_range = right.sec_range and
-					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+					(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 					(trim(left.Address_Verification.Input_Address_Information.zip5) + trim(left.Address_Verification.Input_Address_Information.prim_range) + 
 					trim(left.Address_Verification.Input_Address_Information.prim_name) + trim(left.Address_Verification.Input_Address_Information.sec_range) 
 					not in left.ADVO_correct_record_id),
@@ -326,7 +326,7 @@ with_advo1_fcra_thor := join(distribute(clam_pre_ADVO, hash64(Address_Verificati
 					left.Address_Verification.Input_Address_Information.predir = right.predir and
 					left.Address_Verification.Input_Address_Information.postdir = right.postdir and
 					left.Address_Verification.Input_Address_Information.sec_range = right.sec_range and
-					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
+					(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
 					(trim(left.Address_Verification.Input_Address_Information.zip5) + trim(left.Address_Verification.Input_Address_Information.prim_range) + 
 					trim(left.Address_Verification.Input_Address_Information.prim_name) + trim(left.Address_Verification.Input_Address_Information.sec_range) 
 					not in left.ADVO_correct_record_id),
@@ -364,7 +364,7 @@ with_advo2_fcra_roxie := join(with_advo1_fcra, advo_fcra_data_rolled,
 					left.Address_Verification.Address_History_1.postdir = right.postdir and
 					left.Address_Verification.Address_History_1.sec_range = right.sec_range and
 					// ((unsigned)RIGHT.date_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) and
-					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
+					(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
 					getAdvo2FCRA(LEFT,RIGHT), left outer, keep(1));					
 
 // Must be exact match on all parts -- including sec range being blank.
@@ -382,7 +382,7 @@ with_advo2_fcra_thor := join(distribute(with_advo1_fcra, hash64(Address_Verifica
 					left.Address_Verification.Address_History_1.postdir = right.postdir and
 					left.Address_Verification.Address_History_1.sec_range = right.sec_range and
 					// ((unsigned)RIGHT.date_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) and
-					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
+					(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
 					getAdvo2FCRA(LEFT,RIGHT), left outer, keep(1), LOCAL);				
 
 #IF(onThor)
@@ -417,7 +417,7 @@ with_advo3_fcra_roxie := join(with_advo2_fcra, advo_fcra_data_rolled,
 					left.Address_Verification.Address_History_2.postdir = right.postdir and
 					left.Address_Verification.Address_History_2.sec_range = right.sec_range and
 					// ((unsigned)RIGHT.date_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) and
-					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
+					(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
 					getAdvo3FCRA(LEFT,RIGHT), left outer, keep(1));	
 
 // Must be exact match on all parts -- including sec range being blank.
@@ -435,7 +435,7 @@ with_advo3_fcra_thor := join(distribute(with_advo2_fcra, hash64(Address_Verifica
 					left.Address_Verification.Address_History_2.postdir = right.postdir and
 					left.Address_Verification.Address_History_2.sec_range = right.sec_range and
 					// ((unsigned)RIGHT.date_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) and
-					(ut.daysapart(RIGHT.date_last_seen, iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
+					(ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)),
 					getAdvo3FCRA(LEFT,RIGHT), left outer, keep(1), LOCAL);	
 	
 #IF(onThor)
@@ -449,7 +449,7 @@ with_advo_fcra := if(bsversion>=50, with_advo3_fcra,with_advo2_fcra);
 
 with_advo := if(isFCRA, group(sort(with_advo_fcra, seq), seq), with_advo3_nonfcra_slim);
 
-advo_permitted := datarestrictionmask[iid_constants.posADVORestriction]<>'1' and isPrescreen=false;
+advo_permitted := datarestrictionmask[risk_indicators.iid_constants.posADVORestriction]<>'1' and isPrescreen=false;
 
 
 with_advo_final := if(advo_permitted, with_advo, project(clam_pre_ADVO, transform(risk_indicators.Layout_Boca_Shell, self := left)));

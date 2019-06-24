@@ -1,7 +1,8 @@
-IMPORT iesp, doxie, prof_LicenseV2_Services;
+IMPORT AutoStandardI, iesp, doxie, prof_LicenseV2_Services;
+IMPORT $;
 
 iesp.proflicense.t_PL2Action SetAction (
-  string _type, string violation_description, string8 violation_date, string8 effective_date, 
+  string _type, string violation_description, string8 violation_date, string8 effective_date,
   string description, string status, string8 posting_date) := FUNCTION
 
   iesp.proflicense.t_PL2Action xform () := transform
@@ -15,7 +16,7 @@ iesp.proflicense.t_PL2Action SetAction (
 		Self := [];
   end;
   return Row (xform ());
-END;  
+END;
 
 iesp.proflicense.t_PL2Education SetEducation (string school, string degree, string curriculum, string dates) := FUNCTION
   iesp.proflicense.t_PL2Education xform () := transform
@@ -25,15 +26,19 @@ iesp.proflicense.t_PL2Education SetEducation (string school, string degree, stri
     Self.DatesAttended := dates;
   end;
   return Row (xform ());
-END;  
+END;
 
 EXPORT proflic_records (
   dataset (doxie.layout_references) dids,
-  input.proflic in_params = module (input.proflic) end,
+  $.input.proflic in_params = module ($.input.proflic) end,
   boolean IsFCRA = false
 ) := MODULE
 
-  ds_raw := prof_LicenseV2_Services.Prof_Lic_Raw.source_view.by_did (dids);
+  mod_access := MODULE(doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+    EXPORT log_record_source := ~isFCRA;
+  END;
+
+  ds_raw := prof_LicenseV2_Services.Prof_Lic_Raw.source_view.by_did(dids, mod_access := mod_access, isFCRA := isFCRA);
 
   iesp.proflicense.t_ProfessionalLicenseRecord FormatReport (prof_LicenseV2_Services.Assorted_Layouts.Layout_report L) := transform
     self.LicenseType := L.license_type;

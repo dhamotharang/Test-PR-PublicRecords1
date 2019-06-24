@@ -207,5 +207,5 @@ EXPORT ReportService() := MACRO
 		),
 		FAIL(303,doxie.ErrorCodes(303)));
 	
-	IF(~Options.IsOnline,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
+	IF(~Options.IsOnline AND ~Options.Blind, output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 ENDMACRO;

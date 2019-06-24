@@ -1,4 +1,4 @@
-import header, ut, doxie, mdr;
+﻿import header, ut, doxie, mdr, risk_indicators;
 
 
 // hf is a dataset of header, filtered by the correct sources before this function is called
@@ -92,7 +92,7 @@ ssn_stats := record
 	did := fixed4unique.did;
 	ssn_ct := count(group);
 	ssn_ct_c6 := count(group, ut.DaysApart(sysdate, ((string)fixed4unique.dt_first_seen)[1..6]+'31') < 183);
-	ssn_ct_s18 := count(group, ut.DaysApart( sysdate, ((string)fixed4unique.dt_last_seen)[1..6]+'31') < iid_constants.eighteenmonths);
+	ssn_ct_s18 := count(group, ut.DaysApart( sysdate, ((string)fixed4unique.dt_last_seen)[1..6]+'31') < risk_indicators.iid_constants.eighteenmonths);
 end;
 ssn_counts := table(fixed4unique, ssn_stats, did, local);
 
@@ -304,11 +304,11 @@ lname_stats := record
 	lname_ct :=    count(group);
 	lname_ct30 :=  count(group, ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);	// same or greater dt first seen than build date
 	lname_ct90 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < 60 ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
-	lname_ct180 := count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < iid_constants.fiveMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
-	lname_ct12 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < iid_constants.elevenMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
-	lname_ct24 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < iid_constants.twentythreeMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
-	lname_ct36 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < iid_constants.thirtyfiveMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);	
-	lname_ct60 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < iid_constants.fiftynineMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
+	lname_ct180 := count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.fiveMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
+	lname_ct12 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.elevenMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
+	lname_ct24 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.twentythreeMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
+	lname_ct36 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.thirtyfiveMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);	
+	lname_ct60 :=  count(group, ( ut.DaysApart(hdrBuildDate01, ((string)d_last.dt_first_seen)[1..6]+'31') < risk_indicators.iid_constants.fiftynineMonths ) or ((string)d_last.dt_first_seen)[1..6]+'31' >= hdrBuildDate01 and d_last.dt_first_seen<>999999);
 END;
 lname_counts := table(d_last, lname_stats, did, local);
 

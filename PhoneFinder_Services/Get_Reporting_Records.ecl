@@ -1,7 +1,7 @@
 ﻿﻿﻿IMPORT iesp, Std;
 
 EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord) pF_Records,
-								     PhoneFinder_Services.iParam.ReportParams    inMod,
+								     PhoneFinder_Services.iParam.SearchParams    inMod,
 									 iesp.phonefinder.t_PhoneFinderSearchBy      pSearchBy
 									 ) := FUNCTION
 																 

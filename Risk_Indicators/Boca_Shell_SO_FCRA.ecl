@@ -5,7 +5,7 @@ EXPORT Boca_Shell_SO_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_BankLiesCrim) := function
 
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
-	insurance_fcra_filter := (BSOptions & iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_fcra_filter := (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
 
 	// sex offender records aren't in the doxie_files.Key_BocaShell_Crim_FCRA key, need to add them here
 	fcra_sex_offender_did_key := SexOffender.Key_SexOffender_DID(true);

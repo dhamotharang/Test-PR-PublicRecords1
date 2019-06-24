@@ -1,7 +1,7 @@
-﻿import _Control, Prof_License_Mari, riskwise;
+﻿import _Control, Prof_License_Mari, riskwise, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
-EXPORT Boca_Shell_Mari(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, 
+EXPORT Boca_Shell_Mari(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
 											boolean isFCRA, boolean isPreScreen) := FUNCTION
 
 key_main := Prof_License_Mari.key_did(isFCRA) ;

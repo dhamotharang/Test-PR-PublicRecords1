@@ -17,7 +17,14 @@ EXPORT Functions := MODULE
 																							,TRUE
 																							,TRUE)
 											(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC); //restricting ER and Q3 experian sources
-		                                        			 
+        EXPORT BIpv2bestKeyResults := BIPv2_best.Key_LinkIds.kfetch(Project(BIPlinkids, transform(BIPV2.IDlayouts.l_xlink_ids,SELF := LEFT))
+				                                                                                      ,FETCHLEVEL
+																				,
+																				,
+																				,false
+																				,FETCHLIMIT
+																				)(proxid = 0);
+				                                                                                              		                                        			 
 	     EXPORT   BusCreditHeaderRecs :=  Business_Credit.Key_LinkIds().kfetch2(BIpLinkids
 			                                                                                                                              ,FETCHLEVEL
 																				                                    ,
@@ -154,6 +161,28 @@ EXPORT Functions := MODULE
 		integer BuzCreditIndicator := MAP(exists_BipHeader and ~exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
 																			~exists_BipHeader and exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY,
 																			exists_BipHeader and exists_BuzCreditHeader	 => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
+																			0); 
+		
+		RETURN BuzCreditIndicator;
+	END;	// END of function fn_BuzCreditIndicator
+	
+	EXPORT fn_BuzCreditIndicator2 (UNSIGNED6 UltID, UNSIGNED6 OrgID, UNSIGNED6 SeleID , STRING in_dataPermissionMask, BOOLEAN buzCreditAccess = FALSE) := FUNCTION
+
+		BIPV2.IDlayouts.l_xlink_ids2 initialize() := TRANSFORM
+			SELF.SeleID := SeleID;
+			SELF.OrgID  := OrgID;
+			SELF.UltID  := UltID;
+			SELF				:= [];
+		END;
+
+		BusinessIds := DATASET([initialize()]);
+		
+		BOOLEAN exists_BipHeader 			:= true; // always going to be in bip v2 header since results are from this key:  BIPV2.Key_BH_Relationship_SELEID.kFetch
+		BOOLEAN exists_BuzCreditHeader:= IF(buzCreditAccess, EXISTS(Business_Credit.Key_LinkIds().Kfetch2(BusinessIds,,,in_dataPermissionMask,BusinessCredit_Services.Constants.JOIN_LIMIT)(record_type = Business_Credit.Constants().AccountBase)), FALSE);
+
+		integer BuzCreditIndicator := MAP(exists_BipHeader and ~exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.HEADER_FILE_ONLY,
+													//~exists_BipHeader and exists_BuzCreditHeader => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BUSINESS_CREDIT_ONLY, // will never exist at this point
+														exists_BipHeader and exists_BuzCreditHeader	 => BusinessCredit_Services.Constants.BUSINESS_CREDIT_INDICATOR.BOTH,
 																			0); 
 		
 		RETURN BuzCreditIndicator;
@@ -556,7 +585,10 @@ EXPORT Functions := MODULE
 						// Company Phone (use only the Business Phone).		
 						PhonePopulated := le.Phone10 != '' AND ri.Company_Phone != '';
 						PhoneScore     := Risk_Indicators.PhoneScore( ri.Company_Phone, le.Phone10 );
-						PhoneMatched   := PhonePopulated AND (le.Phone10[1] = ri.Company_Phone[1] OR le.Phone10[4] = ri.Company_Phone[4] OR le.Phone10[4] = ri.Company_Phone[1]) AND Risk_Indicators.iid_constants.gn( PhoneScore );
+						PhoneMatched   := PhonePopulated AND (le.Phone10[1] = ri.Company_Phone[1] OR
+						                                                                            le.Phone10[4] = ri.Company_Phone[4] OR 
+																				 le.Phone10[4] = ri.Company_Phone[1]) AND Risk_Indicators.iid_constants.gn( PhoneScore );
+																				
 						
 						// Begin transform...:
 						SELF.Seq               := le.Seq;

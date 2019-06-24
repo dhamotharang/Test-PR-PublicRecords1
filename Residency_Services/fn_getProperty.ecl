@@ -3,13 +3,13 @@
 	//    BatchDatasets.fetch_Property_recs, to get homestead_exemption information.
 	// 2. Check 3 fields for homestead information and set as needed.
 	// 3. Attach homestead info to appropriate input acctno/address record(s).
-IMPORT Address,BatchDatasets,BatchServices,HomesteadExemption_Services,LN_PropertyV2,
+IMPORT BatchDatasets,BatchServices,HomesteadExemption_Services,
        Residency_Services,Suppress,ut;
 
 EXPORT fn_getProperty(DATASET(Residency_Services.Layouts.IntermediateData) ds_input) := FUNCTION
 
 	// Fetch property records for the SSNs/names from the batch input
-	// NOTE: This is similar to coding in part of/step 1 of HomesteadExemption_Services.fn_getPropertyRecs
+	// NOTE: This is similar to coding in part of/step 1 of HomesteadExemption_Services/fn_getPropertyRecs
   //
   // Project certain input fields onto appropriate layout
   ds_in_prop_fetch_projtd := PROJECT(ds_input, TRANSFORM(BatchDatasets.Layouts.batch_in,
@@ -36,7 +36,7 @@ EXPORT fn_getProperty(DATASET(Residency_Services.Layouts.IntermediateData) ds_in
 	ds_in_prop_fetch_pdd := DEDUP(SORT(ds_in_prop_fetch_projtd(ssn <>''), acctno, ssn), acctno, ssn);	
 
   // Call an existing function to actually fetch the property records. 
-	// NOTE: 3 of next 4 steps similar to HomesteadExemption_Services.fn_getPropertyBatch, but could
+	// NOTE: 3 of next 4 steps similar to HomesteadExemption_Services/fn_getPropertyBatch, but could
 	//       not use that since other "tweaks" were needed here.
 	ds_prop_recs_fetched := BatchDatasets.fetch_Property_recs(
 												     ds_in_prop_fetch_pdd,

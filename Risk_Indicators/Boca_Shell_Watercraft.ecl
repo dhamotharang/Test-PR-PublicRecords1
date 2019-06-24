@@ -1,6 +1,6 @@
-import watercraft, riskwise, ut;
+﻿import watercraft, riskwise, ut, risk_indicators;
 
-export Boca_Shell_Watercraft(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsVersion ) := FUNCTION
+export Boca_Shell_Watercraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsVersion ) := FUNCTION
 
 string8 watercraft_build_date := Risk_Indicators.get_Build_date('watercraft_build_version');
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;

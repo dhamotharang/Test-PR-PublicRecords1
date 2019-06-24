@@ -1,4 +1,4 @@
-﻿EXPORT Email_Report(file_name, report_tag, file_tag) := FUNCTIONMACRO
+﻿﻿EXPORT Email_Report(file_name, report_tag, file_tag) := FUNCTIONMACRO
 
 		string out_file_layout := '';
 

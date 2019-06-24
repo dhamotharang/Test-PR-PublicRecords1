@@ -627,7 +627,10 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 
 	SELF.ValidElementSummaryAddressPOBox := if(Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass),'1','0');
 	SELF.ValidElementSummaryAddressCMRA := if(le.hrisksic in ['2310','2300','2220','2280','2320'], '1','0');		// should this also include le.ADVODropIndicator='C' 
-	SELF.ValidElementSummarySSNFoundForLexID := if(actualIIDVersion=1,if(le.bestssn<>'', '1', '0'),'');	
+	SELF.ValidElementSummarySSNFoundForLexID :=  Map (actualIIDVersion <> 1 => '',
+                                                    le.socsverlevel in [4,6,7,9,10,11,12] and actualIIDVersion=1 => '1',
+                                                    le.header_summary.ssns_on_file <>'' and actualIIDVersion=1 => '1',
+                                                      '0');
 	
 	SELF.cviCustomScore := '';	// new field for future use
 	

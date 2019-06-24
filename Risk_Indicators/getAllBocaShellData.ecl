@@ -1,4 +1,4 @@
-﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO;
+﻿IMPORT _Control, Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellData (
@@ -11,7 +11,7 @@ EXPORT getAllBocaShellData (
   boolean includeRelativeInfo=true, boolean includeDLInfo=true,
   boolean includeVehInfo=true, boolean includeDerogInfo=true, 
   unsigned1 BSversion=1, boolean isPreScreen=false, boolean doScore=false, boolean filter_out_fares=false,
-	string50 DataRestriction=iid_constants.default_DataRestriction,
+	string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 	unsigned8 BSOptions = 0,  UNSIGNED1 glb=0,
 	dataset(Gateway.Layouts.Config) gateways,
 	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
@@ -32,7 +32,7 @@ EXPORT getAllBocaShellData (
   IsAML  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsAML) > 0;
 
   // =============== Get Property Info ===============
-  layout_PropertyRecord get_addresses(p le, integer c) := TRANSFORM
+  risk_indicators.layout_PropertyRecord get_addresses(p le, integer c) := TRANSFORM
     SELF.fname := le.Shell_Input.fname;
     SELF.lname := le.Shell_Input.lname;
 
@@ -79,20 +79,20 @@ EXPORT getAllBocaShellData (
   END;
   p_address := NORMALIZE(p,3,get_addresses (LEFT,COUNTER))(prim_name != '', zip5 != '');
 
-  ids_full := project (ids_wide, transform (Layout_BocaShell_neutral_ids, self := left));
+  ids_full := project (ids_wide, transform (risk_indicators.Layout_BocaShell_neutral_ids, self := left));
 	pre_ids_only := dedup(sort(ids_wide, seq, did), seq, did);
-  ids_only := project(pre_ids_only, transform(layout_boca_shell_ids, self := left));
+  ids_only := project(pre_ids_only, transform(risk_indicators.layout_boca_shell_ids, self := left));
 	
 	// filter bankruptcy data differently for state of Arizona when query is in InsuranceMode
 	boolean InsuranceMode := (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceMode) > 0;
 	ids_only_derogs := project(pre_ids_only, 
-						transform(layouts.layout_derogs_input, 
+						transform(risk_indicators.layouts.layout_derogs_input, 
 						self.insurance_bk_filter := insuranceMode and 
 								(left.shell_input.st='AZ' or stringlib.stringtouppercase(left.shell_input.in_state)='AZ');
 						self := left));
 
 	// try to get multiple records per did to pass into derogs
-	layouts.layout_derogs_input get_dids(pre_ids_only le, integer c) := TRANSFORM
+	risk_indicators.layouts.layout_derogs_input get_dids(pre_ids_only le, integer c) := TRANSFORM
 		self.did := CHOOSE(c,	le.shell_input.did,
 													le.iid.did2,
 													le.iid.did3);
@@ -276,7 +276,7 @@ END;
 
 single_property_relat := ROLLUP(SORT(Prop_ownership_len,seq,did,property_status_family), roll_ownership(LEFT,RIGHT), seq, did);
 															
-layout_bocashell_neutral addRelatInfo(ids_wide le, single_property_relat ri) := TRANSFORM
+risk_indicators.layout_bocashell_neutral addRelatInfo(ids_wide le, single_property_relat ri) := TRANSFORM
   SELF.seq := le.seq;
 	self.did := le.did;
 	self.relativepropertycount := ri.RelativePropertyCount;
@@ -627,7 +627,7 @@ ExactMatchLevel:=risk_indicators.iid_constants.default_ExactMatchLevel;
 withSSNFlags := Risk_Indicators.iid_getSSNFlags(ssnFlagsPrep, dppa, glb, isFCRA, false/*runSSNCodes*/, ExactMatchLevel, DataRestriction, BSversion, BSOptions, DataPermission );	
 
 //todo withSSNFlags need again for relatives 
-layout_bocashell_neutral add_ssnFlags(	withSSNFlags le, pre_ids_only ri) := TRANSFORM
+risk_indicators.layout_bocashell_neutral add_ssnFlags(	withSSNFlags le, pre_ids_only ri) := TRANSFORM
   self.AMLParentNonUsSSN := if(Risk_Indicators.rcSet.isCode85(le.ssn, le.socllowissue) and stringlib.stringtolowercase(ri.relation) in ['father','mother'], 1, 0);
 	self.AMLSocsRCISflag := le.socsRCISflag;
 	self.AMLSocllowissue := le.socllowissue;
@@ -704,7 +704,7 @@ relatParentPubRec := AML.AMLRelativesAssocs(group(RelatInfo, seq), dppa, glb, is
 
 
   // =============== Relative Aggregates ===============
-  relrec := layout_bocashell_neutral_ids;
+  relrec :=risk_indicators.layout_bocashell_neutral_ids;
 
   cntrelrec := TABLE(ids_only(isrelat), {seq, cnt := COUNT(GROUP)}, seq);
 
@@ -793,7 +793,7 @@ dl_added_back := History_2_Property_Added;
 
 risk_indicators.Layout_Boca_Shell add_back_vehicles(risk_indicators.Layout_Boca_Shell le, vehicles_rolled ri) :=
 TRANSFORM
-	SELF.Vehicles := PROJECT(ri,TRANSFORM(Layout_Vehicles.Vehicle_Set,SELF := LEFT));
+	SELF.Vehicles := PROJECT(ri,TRANSFORM(risk_indicators.Layout_Vehicles.Vehicle_Set,SELF := LEFT));
 	
 	SELF.relatives.relative_vehicle_owned_count := ri.relative_owned_count;	// this field needs both relatives and derogs turned on
 	
@@ -826,7 +826,7 @@ END;
 derogs_w_rel_crims := dedup(JOIN(doc_rolled, ids_full(isrelat), 
 	left.did=right.did, add_crim_rels(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL), did);
 
-bsplus add_back_derogs(Layout_Boca_Shell le, derogs_w_rel_crims ri) := TRANSFORM
+bsplus add_back_derogs(risk_indicators.Layout_Boca_Shell le, derogs_w_rel_crims ri) := TRANSFORM
 	crim_dist := if(le.shell_input.z5<>'' and ri.zip5<>'', ut.zip_Dist(le.shell_input.z5,ri.zip5), 9999);//default to 9999 for at least 1 blank zip
 	self.Relatives.criminal_relative_within25miles := (INTEGER)(crim_dist < 25 and ri.BJL.criminal_count>0 and ri.isrelat);
   SELF.Relatives.criminal_relative_within100miles := (INTEGER)(crim_dist BETWEEN 25 AND 100 AND crim_dist<>100 and ri.BJL.criminal_count>0 and ri.isrelat);
@@ -1366,7 +1366,7 @@ wealth := Models.WIN704_0_0(impulse_added_back, if(isFCRA, dataset([],Easi.layou
 
 withWealth := join(impulse_added_back, wealth,
 				left.seq=right.seq,
-				transform(Layout_Boca_Shell, self.wealth_indicator := (string)right.wealth_indicator, self := left),
+				transform(risk_indicators.Layout_Boca_Shell, self.wealth_indicator := (string)right.wealth_indicator, self := left),
 				left outer, many lookup);
 				
 //aml income  Models.IEN1006_0_1(withWealth, easi_census)),
@@ -1475,14 +1475,14 @@ with_address_risk := if(isFCRA, with_bus_header_summary, risk_indicators.Boca_Sh
 												
 
 indBSvalues := join(relatAddDerog(~isrelat), with_address_risk, right.seq=left.seq and right.did=left.did,
-               transform(layout_bocashell_neutral, self := right; self := left));
+               transform(risk_indicators.layout_bocashell_neutral, self := right; self := left));
 
 
 AMLIndv := indBSvalues + relatAddDerog(isrelat);
 	
 // AMLIndexOut := if(~isFCRA and isAML, AML.AMLRollAttributes(group(sort(AMLIndv, seq,did), seq)),
 									// Dataset([],layout_bocashell_neutral));
-AMLIndexOut := Dataset([],layout_bocashell_neutral);
+AMLIndexOut := Dataset([],risk_indicators.layout_bocashell_neutral);
 
 risk_indicators.Layout_Boca_Shell AddAMLIndex(with_address_risk le, AMLIndexOut ri) := TRANSFORM
 
@@ -1543,7 +1543,7 @@ bsdata_pre_optout := map(bsversion > 3 and ~isFCRA => with_hotlist,
 		best_reported_age := risk_indicators.years_apart((unsigned)myGetDate, le.reported_dob);
 		prescreen_minor := isPreScreen and best_reported_age between 1 and 20;
 		opted_out := ri.opt_out_hit or prescreen_minor;				
-		flagBit := risk_indicators.iid_constants.SetFlag( iid_constants.IIDFlag.IsPreScreen, opted_out );
+		flagBit := risk_indicators.iid_constants.SetFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, opted_out );
 		self.iid.iid_flags := le.iid.iid_flags | flagBit;
 		self := le;
 	END;
@@ -1553,7 +1553,7 @@ bsdata_pre_optout := map(bsversion > 3 and ~isFCRA => with_hotlist,
 // per Chris Brodeur, DNM is non-FCRA only
 	risk_indicators.Layout_Boca_Shell setDNMFlag( risk_indicators.Layout_Boca_Shell le, dma.key_DNM_Name_Address ri ) := TRANSFORM
 		is_hit := ri.l_zip != '';
-		flagBit := risk_indicators.iid_constants.SetFlag( iid_constants.IIDFlag.IsDoNotMail, is_hit );
+		flagBit := risk_indicators.iid_constants.SetFlag( risk_indicators.iid_constants.IIDFlag.IsDoNotMail, is_hit );
 		self.iid.iid_flags := le.iid.iid_flags | flagBit;
 		self := le;
 	END;

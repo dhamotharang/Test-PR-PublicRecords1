@@ -34,7 +34,7 @@ EXPORT CanadianPhoneSearch := MACRO
 #stored('PenaltThreshold',20);
 
 #constant ('AddressOrigin', Address.Components.Country.CA);  // set Canada address mode
-
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 f_ready := CAN_PH.CanadianPhoneSearch_records;
 
 unsigned8	MaxResults_val					:= 2000		: stored('MaxResults');
@@ -42,6 +42,7 @@ unsigned8	MaxResultsThisTime_val	:= 2000		: stored('MaxResultsThisTime');
 unsigned8	SkipRecords_val					:= 0			: stored('SkipRecords');
 
 doxie.MAC_Marshall_Results(f_ready, f_out);
+IF(EXISTS(f_out), doxie.compliance.logSoldToTransaction(mod_access));
 OUTPUT (f_out, NAMED ('Results'));
 
 ENDMACRO;

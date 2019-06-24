@@ -1,4 +1,4 @@
-﻿import _Control, gong, riskwise, address, ut, FCRA,gateway;
+﻿import _Control, gong, riskwise, address, ut, FCRA,gateway, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 // this function will be used on Neutral roxie only
@@ -20,7 +20,7 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 																		boolean include_additional_watchlists = false,
 																		real watchlist_threshold = 0.84,
 																		integer2 dob_radius = -1,
-																		string50 DataRestriction=iid_constants.default_DataRestriction,
+																		string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 																		unsigned8 BSOptions=0,
 																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
                                     string100 IntendedPurpose=''
@@ -304,7 +304,7 @@ gong_key := if(isFCRA, gong.Key_FCRA_History_did, gong.Key_History_did);
 with_gong_did1_roxie := join(best_of_header, gong_key, 
 									left.did!=0 and keyed(right.l_did=left.did) and 
 									// check date first seen before history date.  per Brent, don't need to check if phone was current at the time
-									((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) and
+									((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) and
 									trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id	// old way - prior to 11/13/2012
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(riskwise.max_atmost), keep(100));
@@ -314,7 +314,7 @@ with_gong_did1_thor := join(distribute(best_of_header, hash64(did)),
 									distribute(pull(gong_key), hash64(did)), 
 									left.did!=0 and (right.l_did=left.did) and 
 									// check date first seen before history date.  per Brent, don't need to check if phone was current at the time
-									((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) and
+									((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) and
 									trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id	// old way - prior to 11/13/2012
 									and trim((string)right.persistent_record_id) not in left.gong_correct_record_id, // new way - using persistent_record_id
 									add_gong(left, right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost), keep(100), LOCAL);
