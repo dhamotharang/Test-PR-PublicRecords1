@@ -477,7 +477,7 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 	export unsigned8 AppendFlags (IIDFlag leftFlags, IIDFlag rightFlags) := (leftFlags) + (rightFlags);
 
 	// options to turn on/off in the boca shell
-	export BSOptions := enum(
+	export BSOptions := enum(UNSIGNED8,
 		IncludePreScreen = 1 << 0,
 		IncludeDoNotmail = 1 << 1,
 		IsCapOneBatch    = 1 << 2,
@@ -509,7 +509,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		SSNLienFtlr = 1									<< 28,
 		BCBLienFtlr = 1									<< 29,
 		InsuranceFCRABankruptcyException = 1 << 30,
-		InsuranceFCRABankruptcyAllow10Yr = 1 << 31
+		InsuranceFCRABankruptcyAllow10Yr = 1 << 31,
+		FilterVoter = 1									<< 32
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);

@@ -46,7 +46,7 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 // step 2.  append most recent address and when available, populate blank ssn and dob																								
 // ====================================================================
 
-	with_header := risk_indicators.iid_getHeader(with_DID, DPPA_Purpose, GLB_Purpose, isFCRA, ln_branded, bsversion := BSversion, dataRestriction:=DataRestriction);
+	with_header := risk_indicators.iid_getHeader(with_DID, DPPA_Purpose, GLB_Purpose, isFCRA, ln_branded, bsversion := BSversion, dataRestriction:=DataRestriction, BSOptions:=BSOptions);
 	// output(with_header, named('with_header'));
 
 	DoAddressAppend := Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeAddressAppend, BSOptions);
