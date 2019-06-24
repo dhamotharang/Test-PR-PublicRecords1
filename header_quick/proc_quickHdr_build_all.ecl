@@ -4,10 +4,10 @@ EXPORT proc_quickHdr_build_all (
 	STRING sourceIP = _control.IPAddress.bctlpedata10,
 	STRING sourcePathWeekly  = '/data/Builds/builds/quick_header/data/',
 	STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
-	STRING destinationGroup  = STD.System.Thorlib.Group();
+	STRING destinationGroup  = STD.System.Thorlib.Group()
 ) := FUNCTION
 
-	SHARED filedate := _config(sourceIP, sourcePathWeekly).get_v_eq_as_of_date;
+	SHARED filedate := header_quick._config(sourceIP, sourcePathWeekly).get_v_eq_as_of_date;
 	EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
 		FileName:= STD.File.GetSuperFileSubName(superfile,1);
 		v_strt  := stringlib.stringfind(FileName,'20',1);
@@ -97,8 +97,8 @@ EXPORT proc_quickHdr_build_all (
 		doWeekly,
 		doMonthly,
 		notify('Build_Header_Ingest', '*'),
-		Inputs_Clear,
-		Inputs_Set(filedate),
+		header_quick.Inputs_Clear,
+		header_quick.Inputs_Set(filedate),
 		buildAll,
 		QA_sample /*,Source_Check_rep*/
 	);
