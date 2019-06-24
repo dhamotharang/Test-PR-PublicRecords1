@@ -1,4 +1,4 @@
-﻿import doxie, autokey, ut, header, Doxie_Raw, gong_Services, header_quick, AutoStandardI, infutor, Std;
+import doxie, autokey, ut, header, Doxie_Raw, gong_Services, header_quick, AutoStandardI, infutor, Std;
 
 Did_Type_Mask_value:= AutoStandardI.InterfaceTranslator.Did_Type_mask_val.val(project(AutoStandardI.GlobalModule(),
                                                         AutoStandardI.InterfaceTranslator.Did_Type_mask_val.params));
@@ -172,6 +172,10 @@ MODULE
                               ), 
                        transform(doxie.layout_header_records, 
                                  self.includedByHHID := left.includedByHHID,
+                                 // Added default value to global_sid, record_sid to resolve syntax errors
+                                 // Please remove default values while suppressing records.
+                                 SELF.global_sid:= 0,
+                                 SELF.record_sid:= 0,
                                  self := right,
                                  self.penalt := 0,
                                  self.num_compares := 0),
