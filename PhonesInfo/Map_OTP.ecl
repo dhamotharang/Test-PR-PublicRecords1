@@ -53,6 +53,7 @@ EXPORT Map_OTP 	:= FUNCTION
 		self.spid												:= '';
 		self.carrier_name								:= '';
 		self.phone_swap									:= '';
+		self.ocn												:= '';
 		self.global_sid									:= 0;
 		self.record_sid									:= 0;
 		self 														:= l;
@@ -114,11 +115,7 @@ EXPORT Map_OTP 	:= FUNCTION
 	//Add Record SID/////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(ddAddCount l):= transform
-		self.record_sid 								:= hash64(Mdr.SourceTools.Src_PhoneFraud_OTP + 
-																							l.phone + 
-																							l.transaction_code + 
-																							l.transaction_start_dt + 
-																							l.transaction_start_time) + (integer)l.phone;	
+		self.record_sid 								:= hash64(Mdr.SourceTools.Src_PhoneFraud_OTP + l.phone + l.transaction_code + l.transaction_start_dt + l.transaction_start_time) + (integer)l.phone;	
 		self 														:= l;
 	end;
 	

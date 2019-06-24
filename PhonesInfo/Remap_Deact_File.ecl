@@ -22,7 +22,7 @@
 		self.timestamp									:= stringlib.stringfilter(l.timestamp, '0123456789');
 		self.phone											:= l.msisdn[2..];
 		self.phone_swap									:= l.msisdnnew[2..];
-		self.changeid										:= l.changeid;
+		self.changeid										:= stringlib.stringfilter(l.changeid, '0123456789'); //Remove "-"; Creates sorting issues.
 		self.operatorid									:= l.operatorid;
 		self.filename										:= '';
 	end;
@@ -102,8 +102,8 @@
 	end;
 
 	inFile			:= project(concatAll, fixF(left, counter));
-	notSA				:= inFile(action_code<>'SA');
-	allSA				:= inFile(action_code='SA');
+	notSA				:= inFile(action_code<>PhonesInfo.TransactionCode.SwapAdd);
+	allSA				:= inFile(action_code=PhonesInfo.TransactionCode.SwapAdd);
 	
 //////////////////////////////////////////////////////////////	
 //Populate Transaction Dates//////////////////////////////////
@@ -190,6 +190,7 @@
 		self.routing_code								:= '';
 		self.dial_type									:= '';
 		self.spid												:= '';
+		self.ocn												:= '';
 		self.global_sid									:= 0;
 		self.record_sid									:= 0;
 		self 														:= l;
@@ -198,15 +199,59 @@
 	transLayout := project(concatTag, fixTr(left));
 	
 //////////////////////////////////////////////////////////////	
+//Append Carrier Related Info - Ocn/Spid//////////////////////
+//////////////////////////////////////////////////////////////
+		
+	//DF-25238: Append Ocn Field to Transaction Key Layout
+	
+	//Standardize Carrier Names from Phone Type File
+	pType				:= PhonesInfo.File_Phones_Type.Main(source in [mdr.sourceTools.src_Phones_Lerg6, mdr.sourceTools.src_Phones_LIDB]);
+			
+	tempLayout := record
+		pType;
+		string temp_carrier;
+	end;
+			
+	tempLayout addCr(pType l):= transform
+		fixCarrier := PhonesInfo._Functions.fn_standardName(l.carrier_name);
+				
+		self.temp_carrier								:= trim(stringlib.stringtouppercase(map(regexfind('ATT', fixCarrier, 0)<>'' 			=> 'ATT',
+																																						regexfind('SPRINT', fixCarrier, 0)<>'' 		=> 'SPRINT',
+																																						regexfind('TMOBILE', fixCarrier, 0)<>'' 	=> 'TMOBILE',
+																																						regexfind('VERIZON', fixCarrier, 0)<>'' 	=> 'VERIZON',
+																																						fixCarrier)), left, right);
+		self														:= l;
+	end;
+			
+	fixPTyCarr:= project(pType, addCr(left));	
+			
+	//Append Carrier Related Info	to Transaction File
+	srtTrans		:= sort(distribute(transLayout, hash(phone)), phone, -vendor_last_reported_dt, carrier_name, local);	
+	srtPType		:= sort(distribute(fixPTyCarr, hash(phone)), phone, -vendor_last_reported_dt, temp_carrier, local);
+	
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main addOTr(srtTrans l, srtPType r):= transform
+		self.ocn												:= r.account_owner;	
+		self.spid												:= r.spid;
+		self 														:= l;
+	end;
+	
+	addOcn			:= join(srtTrans, srtPType,
+											trim(left.phone, left, right) = trim(right.phone, left, right) and
+											trim(left.carrier_name, left, right) = trim(right.temp_carrier, left, right),
+											addOTr(left, right), left outer, local, keep(1));
+	
+	ddAddOcn		:= dedup(sort(distribute(addOcn, hash(phone)), record, local), record, local);
+	
+//////////////////////////////////////////////////////////////	
 //Add Record_Sid//////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 
-	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(transLayout l):= transform
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(ddAddOcn l):= transform
 		self.record_sid 								:= hash64(Mdr.SourceTools.src_Phones_Disconnect + l.phone_swap + l.source + l.carrier_name + l.transaction_code + l.transaction_start_dt + l.transaction_end_dt + l.vendor_first_reported_dt) + (integer)l.phone;
 		self 														:= l;
 	end;
 	
-	addID 			:= project(transLayout, trID(left))(transaction_code<>'' and phone<>'');
+	addID 			:= project(ddAddOcn, trID(left))(transaction_code<>'' and phone<>'');
 	
 //////////////////////////////////////////////////////////////	
 //Dedup Results///////////////////////////////////////////////
