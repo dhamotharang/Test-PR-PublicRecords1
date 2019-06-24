@@ -365,4 +365,46 @@ EXPORT Transforms := MODULE
     SELF.SubjectLexid  := lexid;
   END;
   
+  EXPORT $.Layouts.batch_final_rec xfBatchOut($.Layouts.email_final_rec le)
+    := TRANSFORM
+                              SELF.acctno          := le.acctno,
+                              SELF.orig_first_name := le.original.first_name;
+                              SELF.orig_last_name  := le.original.last_name;
+                              SELF.orig_address    := le.original.address;
+                              SELF.orig_city       := le.original.city;
+                              SELF.orig_state      := le.original.state;
+                              SELF.orig_zip        := le.original.zip;
+                              SELF.orig_zip4       := le.original.zip4;
+                              SELF.orig_email      := le.original.email;
+                              SELF.orig_ip         := le.original.ip;
+                              SELF.orig_login_date := le.original.login_date;
+                              SELF.orig_site       := le.original.site;
+                              SELF.orig_company_name := le.orig_CompanyName;
+                              SELF.cln_company_name := le.cln_CompanyName;
+                              SELF.company_title := le.CompanyTitle;
+                              SELF.src := le.email_src;
+                              SELF.best_title := le.bestinfo.title;
+                              SELF.best_fname := le.bestinfo.fname;
+                              SELF.best_mname := le.bestinfo.mname;
+                              SELF.best_lname := le.bestinfo.lname;
+                              SELF.best_name_suffix := le.bestinfo.name_suffix;
+                              SELF.best_prim_range := le.bestinfo.prim_range;
+                              SELF.best_predir := le.bestinfo.predir;
+                              SELF.best_prim_name := le.bestinfo.prim_name;
+                              SELF.best_addr_suffix := le.bestinfo.suffix;
+                              SELF.best_postdir := le.bestinfo.postdir;
+                              SELF.best_unit_desig := le.bestinfo.unit_desig;
+                              SELF.best_sec_range := le.bestinfo.sec_range;
+                              SELF.best_city_name := le.bestinfo.city_name;
+                              SELF.best_st := le.bestinfo.st;
+                              SELF.best_zip := le.bestinfo.zip;
+                              SELF.best_zip4 := le.bestinfo.zip4;
+                              SELF.best_ssn := le.bestinfo.ssn;
+                              SELF.best_dob := le.bestinfo.dob;
+                              SELF.clean_email := le.cleaned.clean_email;
+                              SELF := le.cleaned.Name;
+                              SELF := le.cleaned.Address;
+                              SELF := le;
+  END;
+
 END;

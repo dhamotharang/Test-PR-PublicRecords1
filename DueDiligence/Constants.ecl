@@ -1,7 +1,9 @@
-﻿IMPORT MDR, risk_indicators;
+﻿IMPORT iesp, MDR, risk_indicators;
 
 
 EXPORT Constants := MODULE
+
+EXPORT ATTRIBUTE_RESPONSE_LAYOUT := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
 
 EXPORT VERSION_0 := 0;
 EXPORT VERSION_3 := 3;

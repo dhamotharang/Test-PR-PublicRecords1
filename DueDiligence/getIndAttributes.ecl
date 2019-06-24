@@ -1,36 +1,75 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD, ut;
 
 
-EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
-                        UNSIGNED1 dppa,
-                        UNSIGNED1 glba,
-                        STRING dataRestrictionMask,
+EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
                         STRING6 ssnMask,
                         BOOLEAN includeReport,
-                        BOOLEAN displayAttributeText,
-                        BOOLEAN debugMode,
                         Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                        BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+                        BIPV2.mod_sources.iParams linkingOptions,
+                        BOOLEAN debugMode = FALSE) := FUNCTION
 
 																						 
 
     INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
     UNSIGNED8 bsOptions := DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS;
     BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
+    
+    UNSIGNED1 dppa := options.DPPA_Purpose;
+    UNSIGNED1 glba := options.GLBA_Purpose;
+    STRING dataRestrictionMask := options.DataRestrictionMask;
 
 
 
-    //get the DID of the inquired individual
-    inquiredInd := DueDiligence.getIndDID(cleanedInput, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, includeReport);
+
+    //convert the incoming data to the DueDiligence.Layouts.Indv_Internal used
+    //for processing an individual
+    inquiredInd := PROJECT(inData, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+    
+                                              historyDate := IF(LEFT.cleanedinput.historyDateYYYYMMDD = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.cleanedinput.historyDateYYYYMMDD);
+                                              
+                                              SELF.seq := LEFT.cleanedInput.seq;
+                                              SELF.indvRawInput := LEFT.inputEcho.individual;
+                                              SELF.indvCleanInput := LEFT.cleanedInput.individual;
+                                              SELF.historyDateRaw := LEFT.cleanedinput.historyDateYYYYMMDD;
+                                              SELF.historyDate := historyDate;
+                                              SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL;
+                                              
+                                              SELF.inquiredDID := LEFT.dataToUse.did;
+                                              SELF.individual.did := LEFT.dataToUse.did;
+                                              SELF.individual.score := LEFT.dataToUse.lexIDScore;
+                                              SELF.individual.ssn := LEFT.dataToUse.ssn;
+                                              SELF.individual.dob := (UNSIGNED4)LEFT.dataToUse.dob;
+                                              SELF.individual.phone := LEFT.dataToUse.phone;
+                                              
+                                              SELF.individual := LEFT.dataToUse.name;
+                                              SELF.individual := LEFT.dataToUse.address;
+                                              
+                                              SELF.inputaddressprovided := LEFT.cleanedInput.addressProvided;
+                                              SELF.fullinputaddressprovided := LEFT.cleanedInput.fullCleanAddressExists;
+                                              
+                                              SELF.bestSSN := LEFT.dataToUse.ssn;
+                                              SELF.bestPhone := LEFT.dataToUse.phone;
+                                              SELF.bestDOB := (UNSIGNED4)LEFT.dataToUse.dob;
+                                              
+                                              SELF.bestName := LEFT.dataToUse.name;
+                                              SELF.bestAddress := LEFT.dataToUse.bestAddress;
+                                              
+                                              
+                                              validDOB := DueDiligence.Common.IsValidDOB((UNSIGNED4)LEFT.dataToUse.dob);
+                                              validHistDate := STD.Date.IsValidDate(historyDate);
+                                              
+                                              SELF.estimatedAge := IF(validDOB AND validHistDate, ut.Age((UNSIGNED4)LEFT.dataToUse.dob, historyDate), 0);
+
+                                              SELF := [];));
+
+
 
     didFound := inquiredInd(inquiredDID <> 0);
     noDIDFound := inquiredInd(inquiredDID = 0);
 
-    //get the best data for the individual if do not have it
-    indBest := DueDiligence.getIndBestData(didFound, dppa, glba, includeReport);
 
     //get estimated income
-    indEstIncome := DueDiligence.getIndEstimatedIncome(indBest);
+    indEstIncome := DueDiligence.getIndEstimatedIncome(didFound);
 
     //get geographic risk of the inquired individual's address  
     indGeoRisk := DueDiligence.getIndGeographicRisk(indEstIncome, dppa, glba, includeReport);
@@ -39,7 +78,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
     indProfLic := DueDiligence.getIndProfessionalData(indGeoRisk);
 
     //get relatives of the inquired individual  
-    indRelatives := DueDiligence.getIndRelatives(indProfLic, dppa, glba, includeReport);
+    indRelatives := DueDiligence.getIndRelatives(indProfLic, options);
 
     //get header information
     indHeader := DueDiligence.getIndHeader(indRelatives, dataRestrictionMask, dppa, glba, isFCRA, includeReport);
@@ -75,11 +114,9 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
     
 
     //debugging section
-    IF(debugMode, OUTPUT(cleanedInput, NAMED('cleanedInput')));
     IF(debugMode, OUTPUT(inquiredInd, NAMED('inquiredInd')));
     IF(debugMode, OUTPUT(didFound, NAMED('didFound')));
     IF(debugMode, OUTPUT(noDIDFound, NAMED('noDIDFound')));
-    IF(debugMode, OUTPUT(indBest, NAMED('indBest')));
     IF(debugMode, OUTPUT(indEstIncome, NAMED('indEstIncome')));
     IF(debugMode, OUTPUT(indGeoRisk, NAMED('indGeoRisk')));
     IF(debugMode, OUTPUT(indProfLic, NAMED('indProfLic')));
@@ -98,5 +135,4 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 
 
     RETURN indKRI;
-
 END;

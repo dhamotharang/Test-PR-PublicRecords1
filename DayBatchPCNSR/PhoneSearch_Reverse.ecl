@@ -1,10 +1,11 @@
-import DayBatchPCNSR;
+﻿import $, doxie, Suppress;
 
-export PhoneSearch_Reverse(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrInput) := FUNCTION
+export PhoneSearch_Reverse(GROUPED DATASET($.Layout_PCNSR_Linked) pcnsrInput,
+                           doxie.IDataAccess mod_access) := FUNCTION
 
-	K := DayBatchPCNSR.Key_PCNSR_Phone;
+	K := $.Key_PCNSR_Phone;
 	
-	DayBatchPCNSR.Layout_PCNSR_Linked formatOutput(pcnsrInput l,K r,STRING m) := TRANSFORM
+	$.Layout_PCNSR_Linked formatOutput(pcnsrInput l,K r,STRING m) := TRANSFORM
 		MAC_Link_PCNSR_To_Input(l,r,m)
 	END;
 	
@@ -15,7 +16,13 @@ export PhoneSearch_Reverse(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pc
 											KEYED(LEFT.indata.phoneno[4..10] = RIGHT.phone_number),
 											formatOutput(LEFT,RIGHT,'P'),LEFT OUTER, ATMOST(7500)
 											);
-	ungrp := UNGROUP(match_Phone);
+   
+  match_flagged := Suppress.MAC_FlagSuppressedSource(match_Phone, mod_access, outdata.did, outdata.global_sid);  
+  
+  match_suppressed := PROJECT(match_flagged, TRANSFORM($.Layout_PCNSR_Linked, 
+                                             SELF.outdata := IF(~LEFT.is_suppressed, lEFT.outdata), 
+                                             SELF := LEFT));
+	ungrp := UNGROUP(match_suppressed);
 	srted := GROUP(SORT(ungrp,indata.acctno,-outdata.refresh_date),indata.acctno);
 	RETURN srted;
 END;

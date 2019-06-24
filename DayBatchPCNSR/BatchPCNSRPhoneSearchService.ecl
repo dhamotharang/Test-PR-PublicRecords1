@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="DayBatchPCNSR">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="search" type="xsd:string"/>
@@ -22,19 +22,24 @@
 	<B>NOTE:</B>		This service expects clean inputs<BR>
 */
 
-export BatchPCNSRPhoneSearchService := MACRO
+EXPORT BatchPCNSRPhoneSearchService := MACRO
+
+IMPORT AutoStandardI, doxie;
+
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+  
 	STRING20 searchType := '' : STORED('search');
 
 	in_format := DayBatchPCNSR.Layout_clean_in;
 
-	cleanInput := dataset([],in_format) : stored('batch_in',few);
-	
+	cleanInput := DATASET([],in_format) : STORED('batch_in',FEW);
+	 
 	//See Comment in DayBatchUtils.MAC_RemoveUncleanCityZip
 	DayBatchUtils.MAC_RemoveUncleanCityZip(cleanInput,reallyCleanInput);
 	
-	FinalOutput := DayBatchPCNSR.Fetch_Batch_PCNSR_Full(reallyCleanInput,searchType);
-	
-	
+  FinalOutput := DayBatchPCNSR.Fetch_Batch_PCNSR_Full(reallyCleanInput, searchType, mod_access); 
+  
+		
 	OUTPUT(FinalOutput, NAMED('Dataset'));
 	
 ENDMACRO;

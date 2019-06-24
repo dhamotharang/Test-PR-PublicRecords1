@@ -1,43 +1,24 @@
-﻿EXPORT DueDiligenceBatchMain(input, inGLBA, inDPPA) := FUNCTIONMACRO
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
-  //FBOP (Federal Bureau Of Prison) specific field
-  //FBOP Date Tolerance
-  UNSIGNED1 FBOP_DateTolerance := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DateTolerance');
-  UNSIGNED1 FBOP_DateToleranceYearsPrior := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DateToleranceYearsPrior');
-  
-  //FBOP Name Tolerance
-  BOOLEAN FBOP_includeRequiredExactInputLastName := FALSE : STORED('FBOP_IncludeExactInputLastName');
-  BOOLEAN FBOP_includeNicknames := FALSE : STORED('FBOP_IncludeNicknames');
-  UNSIGNED1 FBOP_nameOrderSearched := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_NameOrderSearched');
-  
-  //FBOP Age Tolerance
-  BOOLEAN FBOP_includeLexIDPrimaryDOBYear := FALSE : STORED('FBOP_IncludeLexIDPrimaryDOBYear');
-  BOOLEAN FBOP_includeDOBYearRadius := FALSE : STORED('FBOP_IncludeDOBYearRadius');
-  UNSIGNED1 FBOP_DOBNumberOfYearsRadius := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DOBNumberOfYearsRadius');
-  
-  //validate the requests
-	validatedRequests := DueDiligence.CommonQuery.ValidateRequest(input, inGLBA, inDPPA, DueDiligence.Constants.ATTRIBUTES);
-  
-  //clean data
-  cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequests(validRequest));
+EXPORT DueDiligenceBatchMain(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
+                             Business_Risk_BIP.LIB_Business_Shell_LIBIN busOptions, 
+                             BIPV2.mod_sources.iParams busLinkingOptions) := FUNCTION
 
-
-	//Keep track of individual vs business requests
-	indRecs :=  cleanData(inputEcho.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS);
-  busRecs :=  cleanData(inputEcho.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS);
   
-  DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(inDPPA, inGLBA, dataRestriction, dataPermission, Business_Risk_BIP.Constants.Default_IndustryClass);
+  //Keep track of individual vs business requests
+  indRecs :=  inData(cleanedInput.containsPersonReq);
+  busRecs :=  inData(cleanedInput.containsPersonReq = FALSE);
+  
 
-
-	//********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
-	consumerResults := DueDiligence.getIndAttributes(indRecs, inDPPA, inGLBA, dataRestriction, DueDiligence.Constants.EMPTY, FALSE, FALSE, FALSE, busOptions, busLinkingOptions);
-																				 
+  //********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
+  consumerResults := DueDiligence.getIndAttributes(indRecs, DueDiligence.Constants.EMPTY, FALSE, busOptions, busLinkingOptions);
+                                         
   indIndex := JOIN(indRecs, consumerResults, 
-										LEFT.inputEcho.seq = RIGHT.seq, 
-										TRANSFORM(DueDiligence.Layouts.BatchOut,
-                              SELF.seq := LEFT.inputEcho.seq;
+                    LEFT.cleanedInput.seq = RIGHT.seq, 
+                    TRANSFORM(DueDiligence.Layouts.BatchOut,
+                              SELF.seq := LEFT.cleanedInput.seq;
                               SELF.acctNo := LEFT.inputEcho.individual.accountNumber;
-                              
+
                               SELF.PerLexID := RIGHT.PerLexID;
                               SELF.PerLexIDMatch := RIGHT.PerLexIDMatch;
                               SELF.PerAssetOwnProperty := RIGHT.PerAssetOwnProperty;
@@ -82,22 +63,21 @@
                               SELF.PerBusAssociations_Flag := RIGHT.PerBusAssociations_Flag;
                               SELF.PerEmploymentIndustry := RIGHT.PerEmploymentIndustry;
                               SELF.PerEmploymentIndustry_Flag := RIGHT.PerEmploymentIndustry_Flag;
-                              
+
                               SELF := [];), 
                     LEFT OUTER);  	  
 
 
 
-//********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
- 
-	businessResults := DueDiligence.getBusAttributes(busRecs, busOptions, busLinkingOptions);
-														 
+  //********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
+  businessResults := DueDiligence.getBusAttributes(busRecs, DueDiligence.Constants.EMPTY, FALSE, busOptions, busLinkingOptions);
+                             
   busIndex := JOIN(busRecs, businessResults,
-										LEFT.inputEcho.seq = RIGHT.seq, 
-										TRANSFORM(DueDiligence.Layouts.BatchOut,
-                              SELF.seq := RIGHT.seq;
-                              SELF.acctNo := RIGHT.busn_input.accountNumber;
-                              
+                    LEFT.cleanedInput.seq = RIGHT.seq, 
+                    TRANSFORM(DueDiligence.Layouts.BatchOut,
+                              SELF.seq := LEFT.cleanedInput.seq;
+                              SELF.acctNo := LEFT.inputEcho.business.accountNumber;
+
                               SELF.BusLexID := RIGHT.BusLexID;
                               SELF.BusLexIDMatch := RIGHT.BusLexIDMatch;
                               SELF.BusAssetOwnProperty := RIGHT.BusAssetOwnProperty;
@@ -148,14 +128,13 @@
                               SELF.BusBEOAccessToFundsProperty_Flag := RIGHT.BusBEOAccessToFundsProperty_Flag;
                               SELF.BusLinkedBusinesses := RIGHT.BusLinkedBusinesses;
                               SELF.BusLinkedBusinesses_Flag := RIGHT.BusLinkedBusinesses_Flag;
-                              
+
                               SELF := [];), 
                     LEFT OUTER); 
 							
 
-	final :=  UNGROUP(indIndex) + UNGROUP(busIndex);
+  final :=  UNGROUP(indIndex) + UNGROUP(busIndex);
   
 
   RETURN final;
-  
-ENDMACRO;
+END;

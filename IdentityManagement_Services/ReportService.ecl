@@ -212,7 +212,7 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
                  if(idm_mod.include_realtimevehicle, royalties_rtv) +
                  if(idm_mod.include_InsuranceDL,royalties_insuraceDL);
 
-
+   IF (exists(results), doxie.compliance.logSoldToTransaction(mod_access));
 		IF (count (dids) > 1,
 			fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria')
 			// comment the "fail" above and uncomment the "output" below for debugging

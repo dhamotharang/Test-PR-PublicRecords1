@@ -1,21 +1,20 @@
-IMPORT  RoxieKeyBuild,ut,autokey,doxie, header_services,business_header,mdr;
+﻿IMPORT  RoxieKeyBuild,ut,autokey,doxie, header_services,business_header,mdr, aid;
 
 export File_keybuild(
 
-	dataset(paw.layout.Employment_Out	) pPawBase	= paw.File_Base
+	dataset(paw.layout.Employment_Out	) pPawBase	= paw.File_base_cleanAddr_keybuild
 
 ) :=
 function
 
 	dBase 	  	  := pPawBase;
-	//===================================================================
-
+	
 	Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
 	
   header_services.Supplemental_Data.mac_verify(	'employment_sup.txt',
 																								Suppression_Layout, 
-																								emp_ONLY_supp_ds_func	);
+																								emp_ONLY_supp_ds_func	); 
 	 
 	Emp_ONLY_Suppression_In := emp_ONLY_supp_ds_func();
 
@@ -30,11 +29,11 @@ function
 	end;
 
 	EmpFullOut_HashBDID EmpHashBDID(Layout.Employment_Out l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,12,1));
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,15,1));
 	 self := l;
 	end;
 
-	EmpONLYHeader_withMD5 := project(dBase, EmpHashBDID(left));
+	EmpONLYHeader_withMD5 := project(pPawBase, EmpHashBDID(left));
 
 	Layout.Employment_Out EmpONLYSuppress(EmpONLYHeader_withMD5 l) := transform
 	 self := l;
@@ -186,11 +185,42 @@ function
 																								attr );
 	Base_File_In := attr();
 	
-	UNSIGNED6 endMax := MAX(dBase, contact_id);
+	// UNSIGNED6 endMax := MAX(paw.File_Base, contact_id);
 	
 	paw.Layout.Employment_Out reformated_header(Base_File_In L, INTEGER c) := 
 	transform
-			self.contact_id 		:= endMax + c;
+			self.contact_id 		:= hash64(l.did,
+																		l.bdid,
+																		l.ssn,
+																		l.company_name,
+																		l.company_prim_range,
+																		l.company_predir,
+																		l.company_prim_name,
+																		l.company_addr_suffix,
+																		l.company_unit_desig,
+																		l.company_sec_range,
+																		l.company_city,
+																		l.company_state,
+																		l.company_zip,
+																		l.company_title,
+																		l.company_phone,
+																		l.company_fein,
+																		l.fname,
+																		l.mname,
+																		l.lname,
+																		l.name_suffix,
+																		l.prim_range,
+																		l.predir,
+																		l.prim_name,
+																		l.addr_suffix,
+																		l.unit_desig,
+																		l.sec_range,
+																		l.city,
+																		l.state,
+																		l.zip,
+																		l.phone,
+																		l.email_address,
+																		l.source);
 			self.bdid 					:= (unsigned6)l.bdid;
 			self.did  					:= (unsigned6)l.did;
 			self.old_score			:= L.score;
@@ -210,16 +240,11 @@ function
 	// -----------------------------------------
 	dTooldlayout := project(File_To_Process_To_Key
 		,transform(
-			 paw.Layout.Employment_Out_old
-			,self.source	:= if(left.from_hdr = 'N' and not Flags.ShouldUseNewCodes
-												,MDR.Align_SourceTools.fBackward(left.source,left.vendor_id)
-												,left.source
-											);
-			 self					:= left;
+			 paw.Layout.Employment_Out
+			,self					:= left;
 		)
 	);
 
 	return dTooldlayout;
 
 end;
-	

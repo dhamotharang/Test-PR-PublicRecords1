@@ -1,0 +1,33 @@
+EXPORT MAC_EmailSearchV2_BatchService := MACRO
+
+#WEBSERVICE(FIELDS('DPPAPurpose', 
+                     'GLBPurpose', 
+                     'DataPermissionMask',
+                     'DataRestrictionMask',
+                     'ApplicationType', 
+                     'IndustryClass' , 
+                     'DOBMask',
+                     'SSNMask',  
+                     'ResellerType',  
+                     'IntendedUse',  
+                     'batch_in', 
+                     'MaxResults', 
+                     'Max_Results_Per_Acct', 
+                     'ReturnDetailedRoyalties', 
+                     'PenaltThreshold',
+                     'DIDScoreThreshold',
+                     'Run_Deep_Dive',
+                     'IncludeNoLexidMatch',
+                     'IncludeHistoricData', 
+                     'EmailQualityRulesMask', 
+                     'SearchType',
+                     'SearchTier',
+                     'CheckEmailDeliverable',
+                     'KeepUndeliverableEmail',
+                     'MaxEmailsForDeliveryCheck',
+                     'BVAPIkey',
+                     'SkipTMXcheck',
+                     'MaxEmailsForTMXcheck',
+                     'Gateways'
+                     ));
+ENDMACRO;

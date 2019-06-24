@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut;
+import _control, versioncontrol,Data_Services;
 
 export _Dataset(
 
@@ -10,8 +10,8 @@ module
 	export IsDataland 					:= VersionControl._Flags.IsDataland;
 	
 	export foreign_environment := if(VersionControl._Flags.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,Data_Services.foreign_prod
+																	,Data_Services.foreign_dataland
 																);
 												
 	export Name										:= 'POE'		;

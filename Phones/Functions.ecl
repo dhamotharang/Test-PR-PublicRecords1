@@ -163,7 +163,7 @@ MODULE
 			l_BatchIn batch_in;
 			STRING120 listed_name;
 			BOOLEAN   isDeepDive := FALSE;
-      UNSIGNED8 global_sid := 0;
+      UNSIGNED4 global_sid := 0;
 	    UNSIGNED8 record_sid := 0;
 		END;
     

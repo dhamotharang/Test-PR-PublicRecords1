@@ -258,8 +258,9 @@ MODULE
 			STRING100                                             verification_desc;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
-      UNSIGNED2                                             identity_count := 0;
+			UNSIGNED2                                             identity_count := 0;
 			INTEGER                                               phone_inresponse_count;
+			BOOLEAN                                               isLNameMatch;
 		END;
 		
 		EXPORT ExcludePhones :=

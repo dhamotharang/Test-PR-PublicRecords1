@@ -10,7 +10,7 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   clnd_input_pii := PROJECT(marked_input_recs(~is_rejected_rec),$.Layouts.batch_in_rec);
   
   // attach resolved LexId as subject_lexId
-  clnd_input_with_lexids := $.Functions.AppendSubjectLexid(clnd_input_pii);
+  clnd_input_with_lexids := $.Functions.AppendSubjectLexid(clnd_input_pii, in_mod.DIDScoreThreshold);
   
   ds_rejected_input := PROJECT(marked_input_recs(is_rejected_rec), 
                                   TRANSFORM($.Layouts.email_final_rec, 

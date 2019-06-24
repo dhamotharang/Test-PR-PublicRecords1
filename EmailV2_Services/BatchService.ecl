@@ -33,33 +33,9 @@ EXPORT BatchService(useCannedRecs = 'false') := MACRO
 IMPORT AutoheaderV2, AutoKeyI, BatchShare, EmailV2_Services, Royalty;
 
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-  #WEBSERVICE(FIELDS('DPPAPurpose', 
-                     'GLBPurpose', 
-                     'DataPermissionMask',
-                     'DataRestrictionMask',
-                     'ApplicationType', 
-                     'IndustryClass' , 
-                     'DOBMask',
-                     'SSNMask',  
-                     'ResellerType',  
-                     'IntendedUse',  
-                     'batch_in', 
-                     'MaxResults', 
-                     'Max_Results_Per_Acct', 
-                     'ReturnDetailedRoyalties', 
-                     'PenaltThreshold',
-                     'Run_Deep_Dive',
-                     'RequireLexidMatch',
-                     'IncludeHistoricData', 
-                     'EmailQualityRulesMask', 
-                     'SearchType',
-                     'CheckEmailDeliverable',
-                     'KeepUndeliverableEmail',
-                     'MaxEmailsForDeliveryCheck',
-                     'BVAPIkey',
-                     'Gateways'
-                     ));
-  
+
+  WSInput.MAC_EmailSearchV2_BatchService(); 
+    
   ds_xml_in := DATASET([], EmailV2_Services.Layouts.batch_email_input) : STORED('batch_in', FEW);
   batch_params := EmailV2_Services.IParams.getBatchParams();
   

@@ -1,11 +1,12 @@
-﻿IMPORT DueDiligence, Header, Relationship, RelationshipIdentifier_Services, RiskWise;
+﻿IMPORT Business_Risk_BIP, DueDiligence, Header, Relationship, RelationshipIdentifier_Services, RiskWise;
 
 EXPORT getIndRelatives(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
-                       UNSIGNED1 dppa,
-                       UNSIGNED1 glba,
-                       BOOLEAN includeReport = FALSE) := FUNCTION
+                       Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
 												
-												
+		
+    
+    UNSIGNED1 dppa := options.DPPA_Purpose;
+    UNSIGNED1 glba := options.GLBA_Purpose;										
 
 	
     getRelations(DATASET(Relationship.Layout_GetRelationship.DIDs_layout) listOfDIDs) := FUNCTION
@@ -64,12 +65,13 @@ EXPORT getIndRelatives(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                       LEFT.inquiredDID = RIGHT.did1,
                       TRANSFORM(DueDiligence.Layouts.Indv_Internal,
                                 SELF.seq := LEFT.seq;
+                                SELF.historyDate := LEFT.historyDate;
                                 SELF.inquiredDID := LEFT.inquiredDID;
                                 SELF.individual.did := RIGHT.did2;
                                 SELF.indvType := IF(RIGHT.title IN Header.relative_titles.set_Spouse, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);
                                 SELF := [];));
 
-    bestRelativeData := DueDiligence.getIndBestData(relatives, dppa, glba, FALSE);
+    bestRelativeData := DueDiligence.getIndInformation(options).GetIndividualBestDataWithLexID(relatives);
 
 
     slimmedRolledSpouseData := getListOfRelations(bestRelativeData, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
