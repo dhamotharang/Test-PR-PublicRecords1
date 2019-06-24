@@ -45,7 +45,7 @@ module
 		export _InquiryLogsRejected := FileSprayed+'::Rejected::InquiryLogs';
 		export _InquiryLogsDelete := FileSprayed+'::Delete::InquiryLogs';
 		export InquiryLogs := _InquiryLogsPassed;		
-
+		
 		export _RDPPassed := FileSprayed+'::Passed::RDP';  
 		export _RDPRejected := FileSprayed+'::Rejected::RDP';
 		export _RDPDelete := FileSprayed+'::Delete::RDP';
@@ -67,9 +67,6 @@ module
 		export ByPassed_IdentityData						:= tools.mod_FilenamesInput(Template('ByPassed_IdentityData'),pversion);
 		export ByPassed_KnownFraud							:= tools.mod_FilenamesInput(Template('ByPassed_KnownFraud'),pversion);
 		export ByPassed_Deltabase							:= tools.mod_FilenamesInput(Template('ByPassed_Deltabase'),pversion);
-		export AddressCache_IDDT								:= tools.mod_FilenamesInput(Template('AddressCache_IDDT'),pversion);
-		export AddressCache_KNFD								:= tools.mod_FilenamesInput(Template('AddressCache_KNFD'),pversion);
-		export AddressCache_Deltabase							:= tools.mod_FilenamesInput(Template('AddressCache_Deltabase'),pversion);
 		
 		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
 		export MBSInclusionDemoData					:= tools.mod_FilenamesInput(Template('MBSInclusionDemoData'),pversion);
@@ -84,10 +81,7 @@ module
 			Deltabase.dAll_filenames +
 			ByPassed_IdentityData.dAll_filenames +
 			ByPassed_KnownFraud.dAll_filenames + 
-			ByPassed_Deltabase.dAll_filenames + 
-			AddressCache_IDDT.dAll_filenames + 
-			AddressCache_KNFD.dAll_filenames + 
-			AddressCache_Deltabase.dAll_filenames;
+			ByPassed_Deltabase.dAll_filenames;
 			
 	end;
 
@@ -120,9 +114,6 @@ module
 	
 		shared Template(string tag) := _Dataset(pUseOtherEnvironment).FileTemplate + tag;
 		//Otto Files
-		export IdentityData := tools.mod_FilenamesBuild(Template('IdentityData'),pversion);
-		export KnownFraud 	:= tools.mod_FilenamesBuild(Template('KnownFraud'),pversion);
-		export Deltabase 	:= tools.mod_FilenamesBuild(Template('Deltabase'),pversion);
 		export AddressCache	:= tools.mod_FilenamesBuild(Template('AddressCache'),pversion);
 		export Pii					:= tools.mod_FilenamesBuild(Template('Pii'),pversion);
 		export CIID					:= tools.mod_FilenamesBuild(Template('CIID'),pversion);
@@ -192,9 +183,6 @@ module
 		Export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
 			
 		export dAll_filenames :=
-			IdentityData.dAll_filenames +
-			KnownFraud.dAll_filenames +
-			Deltabase.dAll_filenames +
 			AddressCache.dAll_filenames +
 			Pii.dAll_filenames +
 			CIID.dAll_filenames +
