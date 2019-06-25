@@ -10,7 +10,7 @@ death_record := record
 end;
 
 //Remove TS and EN src from FCRA keys
-// death_ready := table(Death_Master.File_DeathMaster_Building((unsigned6)did != 0  and glb_flag != 'Y' and (src in mdr.sourceTools.set_scoring_FCRA) and (src not in mdr.sourceTools.set_scoring_FCRA_retro_test)), death_record /*and not [state_death_flag, death_rec_src]*/);
+death_ready := project(Death_Master.File_DeathMaster_Building((unsigned6)did != 0  and glb_flag != 'Y' and (src in mdr.sourceTools.set_scoring_FCRA) and (src not in mdr.sourceTools.set_scoring_FCRA_retro_test)), death_record /*and not [state_death_flag, death_rec_src]*/);
 //get county name
 // census_data.MAC_Fips2County(death_ready,state,fipscounty,county_name,dead_with_county);
 
