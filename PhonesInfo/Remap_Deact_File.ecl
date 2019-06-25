@@ -215,11 +215,11 @@
 	tempLayout addCr(pType l):= transform
 		fixCarrier := PhonesInfo._Functions.fn_standardName(l.carrier_name);
 				
-		self.temp_carrier								:= trim(stringlib.stringtouppercase(map(regexfind('ATT', fixCarrier, 0)<>'' 			=> 'ATT',
-																																						regexfind('SPRINT', fixCarrier, 0)<>'' 		=> 'SPRINT',
-																																						regexfind('TMOBILE', fixCarrier, 0)<>'' 	=> 'TMOBILE',
-																																						regexfind('VERIZON', fixCarrier, 0)<>'' 	=> 'VERIZON',
-																																						fixCarrier)), left, right);
+		self.temp_carrier								:= map(regexfind('ATT', fixCarrier, 0)<>'' 			=> 'ATT',
+																						regexfind('SPRINT', fixCarrier, 0)<>'' 		=> 'SPRINT',
+																						regexfind('TMOBILE', fixCarrier, 0)<>'' 	=> 'TMOBILE',
+																						regexfind('VERIZON', fixCarrier, 0)<>'' 	=> 'VERIZON',
+																						fixCarrier);
 		self														:= l;
 	end;
 			
