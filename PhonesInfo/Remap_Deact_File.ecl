@@ -3,6 +3,7 @@
 	//DF-24397: Create Dx-Prefixed Keys
 	//DF-24599: Add Transaction_Count, Transaction_End_Dt & Transaction_End_Time Fields to Transaction File
 	//DF-25056: Update Phone Transaction Logic - Account for Deact Swap Changes
+	//DF-25238: Add "ocn" Field and Append Carrier Info to Deact Records
 
 //Pull Records from Deact History File
 	deactHist 	:= PhonesInfo.File_Deact.History2;
