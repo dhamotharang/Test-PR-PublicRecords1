@@ -48,7 +48,7 @@ ekey_dids_roxie := join(clam_pre_email_in, dx_email.Key_Did(isFCRA),
                     left.shell_input.did=right.did,
                     transform(recordof(dx_Email.Key_Did), self := right), atmost(riskwise.max_atmost));
                     
-ekey_roxie := join(ekey_dids_roxie, dx_Email.Key_email_payload(),
+ekey_roxie := join(ekey_dids_roxie, dx_Email.Key_email_payload(isFCRA),
 (keyed(left.email_rec_key=right.email_rec_key)));
 
 ekey_dids_thor := join(distribute(clam_pre_email_in, hash(shell_input.did)), 
@@ -57,7 +57,7 @@ ekey_dids_thor := join(distribute(clam_pre_email_in, hash(shell_input.did)),
                 transform(recordof(dx_Email.Key_Did), self := right), atmost(riskwise.max_atmost), LOCAL);
                 
 ekey_thor :=  join(distribute(ekey_dids_thor, hash(email_rec_key)), 
-               distribute(pull(dx_Email.Key_email_payload()), hash(email_rec_key)),
+               distribute(pull(dx_Email.Key_email_payload(isFCRA)), hash(email_rec_key)),
                left.email_rec_key=right.email_rec_key, LOCAL);      
                
 #IF(onThor)        
@@ -73,7 +73,7 @@ email_keysv2_roxie := join(clam_pre_email_in, dx_Email.Key_Email_Address(),
                 left.shell_input.email_address=right.clean_email,
                 transform(recordof(dx_Email.Key_Email_Address), self := right), atmost(riskwise.max_atmost));
                 
-email_join_roxie :=  join(email_keysv2_roxie, dx_Email.Key_email_payload(),
+email_join_roxie :=  join(email_keysv2_roxie, dx_Email.Key_email_payload(isFCRA),
   (keyed(left.email_rec_key=right.email_rec_key)));
                 
 email_keysv2_thor := join(distribute(clam_pre_email_in, hash(shell_input.email_address)), 
@@ -82,7 +82,7 @@ email_keysv2_thor := join(distribute(clam_pre_email_in, hash(shell_input.email_a
                 transform(recordof(dx_Email.Key_Email_Address), self := right), atmost(riskwise.max_atmost), LOCAL);
                 
 email_join_thor :=  join(distribute(email_keysv2_thor, hash(email_rec_key)), 
-               distribute(pull(dx_Email.Key_email_payload()), hash(email_rec_key)),
+               distribute(pull(dx_Email.Key_email_payload(isFCRA)), hash(email_rec_key)),
                left.email_rec_key=right.email_rec_key, LOCAL);         
 
 #IF(onThor)        
@@ -260,26 +260,69 @@ email_recs_nonfcra_thor := join(distribute(clam_pre_email, hash64(did)),
                 email_recs_non_fcra := ungroup(email_recs_nonfcra_roxie);
 #END
 
-emailfile_raw_fcra_roxie := join(clam_pre_email, ekey,
+emailrec add_email_raw_fcra(clam_pre_email le, email_data.Key_Did_FCRA rt) := transform
+                self.seq := le.seq;
+                
+                domain_type := TRIM(rt.append_domain_type);
+                self.email_ct := if(TRIM(rt.clean_email)<>'', 1, 0);
+                self.email_domain_Free_ct := if(domain_type = 'FREE', 1, 0);
+                self.email_domain_ISP_ct := if(domain_type = 'ISP', 1, 0);
+                self.email_domain_EDU_ct := if(domain_type = 'EDU', 1, 0);
+                self.email_domain_Corp_ct := if(domain_type = 'CORP', 1, 0);
+                
+                email_src := trim(rt.email_src);
+                self.email_source_list := email_src;
+                self.email_source_ct := if(email_src <> '', '1', '');
+                self.email_source_first_seen := rt.date_first_seen;
+                self.email_source_last_seen := rt.date_last_seen;
+                
+                // new logic for shell 5.0
+                ecompare := risk_indicators.EmailCompare(le.shell_input.email_address, rt.clean_email, le.shell_input.fname, le.shell_input.lname);
+                emailmatch_score := ecompare.EmailScore; 
+                emailmatch := risk_indicators.iid_constants.g(emailmatch_score);
+                
+                Email_First_level := ecompare.Email_First_Level;
+                Email_Last_level := ecompare.Email_Last_Level;
+                
+// -1 Email address not provided on input
+// 0-       Email address does not match email addresses on file for the identity
+// 1-       Email address does not match email addresses on file for the identity but first name is found in the email address string
+// 2-       Email address does not match email addresses on file for the identity but last name is found in the email address string
+// 3-       Email address does not match email addresses on file for the identity but first name and last name is found in the email address string
+// 4-       Email address matches email addresses on file but it is not the most currently reported email address
+// 5-       Email address matches email addresses on file    and is the most currently reported email address
+                self.Identity_Email_Verification_Level := map(
+                                trim(le.shell_input.email_address)='' => '-1',
+                                // emailmatch => '5',  // won't know till the rollup if we have the most recent or not, so default to a 4 if email_match for now
+                                emailmatch => '4',  
+                                email_first_level='1' and email_last_level='1' => '3', 
+                                email_last_level='1' => '2',
+                                email_first_level='1' => '1',
+                                '0');                                                        
+                                                
+                self := rt;
+end;
+
+emailfile_raw_fcra_roxie := join(clam_pre_email, email_data.Key_Did_FCRA,
                                                                                                 left.did<>0 and 
                                                                                                 keyed(left.did=right.did) and
                                                                                   right.email_src IN setsources   
                                                                                                 and (unsigned)right.date_first_seen[1..6] < left.historydate and
                                                                                                 (ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
                                                                                                 (string100)right.email_rec_key not in left.email_data_correct_record_id,  // don't include records in the raw which have been corrected
-                                                                                                add_email_raw(left, right),
+                                                                                                add_email_raw_fcra(left, right),
                                                                                                 left outer,
                                                                                                 atmost(riskwise.max_atmost), keep(1000));
 
 emailfile_raw_fcra_thor := join(distribute(clam_pre_email, hash64(did)), 
-                                                                                                distribute(pull(ekey), hash64(did)),
+                                                                                                distribute(pull(email_data.Key_Did_FCRA), hash64(did)),
                                                                                                 left.did<>0 and 
                                                                                                 left.did=right.did and
                                                                                   right.email_src IN setsources   
                                                                                                 and (unsigned)right.date_first_seen[1..6] < left.historydate and
                                                                                                 (ut.daysapart(RIGHT.date_last_seen, risk_indicators.iid_constants.mygetdate(left.historydate)) < ut.DaysInNYears(7)) and
                                                                                                 (string100)right.email_rec_key not in left.email_data_correct_record_id,  // don't include records in the raw which have been corrected
-                                                                                                add_email_raw(left, right),
+                                                                                                add_email_raw_fcra(left, right),
                                                                                                 left outer,
                                                                                                 atmost(left.did=right.did, riskwise.max_atmost), keep(1000), LOCAL);
 
