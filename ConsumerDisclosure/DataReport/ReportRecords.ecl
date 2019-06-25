@@ -83,7 +83,7 @@ FUNCTION
     SELF.PeopleAtWork := PROJECT(paw_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServicePAWData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.Pilot := PROJECT(pilot_recs, $.Transforms.xformPilotData(LEFT));
     SELF.ProfessionalLicense := PROJECT(proflic_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
-    //SELF.ProfLicenseMari := PROJECT(proflic_mari_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseMariData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
+    SELF.ProfLicenseMari := PROJECT(proflic_mari_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseMariData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
     SELF.PropertyAssessment := PROJECT(SORT(property_by_owner_recs(EXISTS(Assessment)),-assessed_value_year), $.Transforms.xformPropertyAssessmentData(LEFT));
     SELF.PropertyDeed := PROJECT(SORT(property_by_owner_recs(EXISTS(Deed)),-contract_date), $.Transforms.xformPropertyDeedData(LEFT));
     SELF.AssessmentByResidence := PROJECT(SORT(property_by_residence_recs(EXISTS(Assessment)),-assessed_value_year), $.Transforms.xformPropertyAssessmentData(LEFT));
