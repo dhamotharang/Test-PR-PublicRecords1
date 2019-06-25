@@ -1032,11 +1032,13 @@ USE KELOtto.fraudgovshared(FLAT,
 
   BankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_1) != ''),
     RoutingNumber = bank_routing_number_1,
+    AccountNumber = bank_account_number_1,
     OttoBankAccountId = OttoBankAccountId
 		),
 
   BankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_2) != ''),
     RoutingNumber = bank_routing_number_2,
+    AccountNumber = bank_account_number_2,
     OttoBankAccountId = OttoBankAccountId2
 		),
 
@@ -1207,7 +1209,7 @@ Event: => HriPoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'|PO|'))) > 0 => 1, 0);
 Event: => HriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'|VA|'))) > 0 => 1, 0);
 
 Event: => IdNas9OnlyFlag := MAP(nas_summary = '9' => 1, 0); // Address not associated with identity per public records
-Event: => IdNas9Flag := MAP(nas_summary = '9' AND relativeaddressmatch = 0 => 1, 0); // Address not associated with identity per public records and not relative address
+Event: => IdNas9Flag := MAP(nas_summary = '9' /*AND relativeaddressmatch = 0 */=> 1, 0); // Address not associated with identity per public records and not relative address
 Event: => IdNap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
 
 Event: => KrDl200Flag := MAP(COUNT(EventTypes(EventType IN ['200']))>0 => 1, 0);
