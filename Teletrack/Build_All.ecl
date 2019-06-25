@@ -1,4 +1,4 @@
-import versioncontrol, _control;
+﻿import versioncontrol, _control, Orbit3;
 
 export Build_All(
 
@@ -24,6 +24,8 @@ module
 
 	));
 	
+	updateorbit := Orbit3.proc_Orbit3_CreateBuild('Teletrack',(pversion),'N');
+	
 	export full_build := sequential(
 		 create_supers
 		,spray_files
@@ -32,6 +34,7 @@ module
 		,Promote(pversion).buildfiles.Built2QA
 		,Strata_Population_Stats(pversion).all
 		,QA_Records
+		,updateorbit
 	) : success(Send_Email(pversion,, not pIsTesting).BuildSuccess), failure(send_email(pversion,, not pIsTesting).buildfailure);
 	
 	export All :=
