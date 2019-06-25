@@ -20,16 +20,10 @@ EXPORT Get_ids
 	end;
 	ids := autokeyi.AutoKeyStandardFetch(tempmod).ids;
 
-  // create layout for autokeys
-  layout_autokey_app := RECORD (SANCTN.layout_autokeys)
-    integer zero := 0;
-    string0 blk  := '';
-//    unsigned6 fdid := 0;
-  END;
-  ds := DATASET ([], layout_autokey_app);
+  ds := DATASET ([], RECORDOF(SANCTN.Key_SANCTN_autokey_payload));
 
   // Get IDs from autokeys 
-  AutokeyB2.mac_get_payload (ids, ak_keyname, ds, outPLfat, 0, 0, ak_typeStr);
+  AutokeyB2.mac_get_payload (ids, ak_keyname, ds, outPLfat, 0, 0, ak_typeStr,fakeid);
 
 	by_autokey := project (outPLfat, outrec);
 /*

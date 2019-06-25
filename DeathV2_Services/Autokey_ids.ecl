@@ -8,7 +8,7 @@ con := death_master.Constants('');
 outrec := DeathV2_Services.layouts.search_ID;
 
 //****** SEARCH THE AUTOKEYS
-ds := Death_Master.file_searchautokey;
+ds := Death_Master.file_searchautokey_ssa;
 tempmod := module(project(AutoStandardI.GlobalModule(),AutoKeyI.AutoKeyStandardFetchArgumentInterface,opt))
 	export string autokey_keyname_root := con.autokey_keyname_ssa;
 	export string typestr := 'AK';
