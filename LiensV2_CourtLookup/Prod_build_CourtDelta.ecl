@@ -2,12 +2,11 @@
 
 STRING8 GetDate := (STRING8)Std.Date.Today();																																					
 CourtIn_Proj				:= Project(LiensV2_CourtLookup.Files().CourtIn,                 
-                                                          transform(Layouts.rBaseCourtLookup,self.Date_first_seen := GetDate;
-																																								self.Date_last_seen  := GetDate;
-																																								self.Current_rec     := 'Y';
-																																								self.county          := ''; //once OKC provides county remove this.
-																																								self := left;
-																																								));
+                               transform(Layouts.rBaseCourtLookup,self.Date_first_seen := GetDate;
+																										            	self.Date_last_seen  := GetDate;
+																											            self.Current_rec     := 'Y';																											     
+																											            self := left;
+																											           ));
 
 old_ds             := distribute(LiensV2_CourtLookup.Files().CourtBase,HASH(LNCourtCode)); 
 new_ds             := dedup(sort(distribute(CourtIn_Proj,HASH(LNCourtCode)),record,local),record,local); 
@@ -30,6 +29,7 @@ END;
 
 rollupCourt           := ROLLUP(combined_ds,  
                                 trim(left.LNCourtCode)  = trim(right.LNCourtCode)  and
+																trim(left.County)       = trim(right.County)       and
 																trim(left.CourtName)    = trim(right.CourtName)    and 
 																trim(left.RMSCourtCode) = trim(right.RMSCourtCode) and
 		                            trim(left.CourtName)    = trim(right.CourtName)    and

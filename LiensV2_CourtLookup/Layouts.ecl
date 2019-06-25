@@ -2,6 +2,7 @@
 
 	EXPORT	rCourtlookupIn	:=	RECORD
 		STRING		LNCourtCode; 
+		STRING    County;
 		STRING		RMSCourtCode;
 		STRING		CourtName;
 		STRING		Address1;
@@ -13,7 +14,8 @@
 	END;
 	
 	EXPORT	rBaseCourtLookup	:=	RECORD
-		STRING		LNCourtCode; 
+		STRING		LNCourtCode;
+		STRING    County;
 		STRING		RMSCourtCode;
 		STRING		CourtName;
 		STRING		Address1;
@@ -22,7 +24,6 @@
 		STRING		State;
 		STRING		ZipCode;
 		STRING10	Phone;
-		STRING    County;
 		STRING10  Date_first_seen;
 		STRING10  Date_last_seen;
 		STRING1   Current_rec;

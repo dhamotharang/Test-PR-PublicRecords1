@@ -3,4 +3,4 @@
 // export	file_lookup_in := project(ds,transform(recordof(ds),self.desc := regexreplace('\"',left.desc,''),self := left));
 
 
-export	file_lookup_in :=LiensV2_CourtLookup.Files().CourtBase ; //DF-24988
+export	file_lookup_in :=LiensV2_CourtLookup.Files().CourtBase(Current_rec ='Y') ; //DF-24988
