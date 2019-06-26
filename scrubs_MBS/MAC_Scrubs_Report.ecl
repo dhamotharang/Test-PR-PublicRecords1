@@ -105,8 +105,8 @@
 	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
 	//Submits Profile's stats to Orbit
 	
-	SuperFile :=FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::' + scopename;
-	Super_Log_File := SuperFile + '::' + scopename + '_' + BuildDate;
+	SuperFile :=FraudGovPlatform.Filenames().OutputF.Scrubs_MBS + '::log';
+	Super_Log_File := SuperFile + '::scrubs_mbs';
 	SuperFile_Entries := dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
 	
 	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull')),

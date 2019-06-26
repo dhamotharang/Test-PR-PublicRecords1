@@ -20,8 +20,8 @@ SHARED  h00 := Watchdog_best.Specificities(ih).input_file;
        AND LEFT.prim_name = RIGHT.prim_name AND LEFT.suffix = RIGHT.suffix AND LEFT.postdir = RIGHT.postdir AND LEFT.unit_desig = RIGHT.unit_desig AND LEFT.sec_range = RIGHT.sec_range
        AND LEFT.city_name = RIGHT.city_name AND LEFT.st = RIGHT.st AND LEFT.zip = RIGHT.zip AND LEFT.zip4 = RIGHT.zip4 AND LEFT.tnt = RIGHT.tnt
        AND LEFT.valid_ssn = RIGHT.valid_ssn AND LEFT.jflag1 = RIGHT.jflag1 AND LEFT.jflag2 = RIGHT.jflag2 AND LEFT.jflag3 = RIGHT.jflag3 AND LEFT.rawaid = RIGHT.rawaid
-       AND LEFT.dodgy_tracking = RIGHT.dodgy_tracking AND LEFT.address_ind = RIGHT.address_ind AND LEFT.name_ind = RIGHT.name_ind AND LEFT.persistent_record_id = RIGHT.persistent_record_id AND LEFT.ssnum = RIGHT.ssnum
-       AND LEFT.address = RIGHT.address AND LEFT.did < RIGHT.did,TRANSFORM(Rec,SELF.did2 := LEFT.did,SELF.did1 := RIGHT.did), HASH);
+       AND LEFT.dodgy_tracking = RIGHT.dodgy_tracking AND LEFT.address_ind = RIGHT.address_ind AND LEFT.name_ind = RIGHT.name_ind AND LEFT.persistent_record_id = RIGHT.persistent_record_id AND LEFT.lastname = RIGHT.lastname
+       AND LEFT.ssnum = RIGHT.ssnum AND LEFT.address = RIGHT.address AND LEFT.did < RIGHT.did,TRANSFORM(Rec,SELF.did2 := LEFT.did,SELF.did1 := RIGHT.did), HASH);
 SHARED PickOne := DEDUP( SORT( DISTRIBUTE( Match,HASH(did1) ), did1, did2, LOCAL), did1, LOCAL); // Lowest collector ID for each singleton
 EXPORT patch_file := PickOne;
   SALT311.utMAC_Patch_Id(h00,did,PickOne,did1,did2,o1); // Patch the input file

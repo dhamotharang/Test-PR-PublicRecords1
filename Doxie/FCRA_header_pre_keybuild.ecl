@@ -1,11 +1,11 @@
-﻿import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, PRTE2_Header;
+﻿import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, PRTE2_Header,dx_header;
 
 head := doxie_build.file_fcra_header_built; 
 
 /* **************** get County Name from Count Code ****************** */
 xHead_Layout :=
 RECORD
-	head;
+	dx_header.layout_header;
 	string1 valid_dob := '';
 	unsigned6 hhid := 0;
 	STRING18 county_name := '';

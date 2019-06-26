@@ -2,7 +2,6 @@
 EXPORT Config := MODULE,VIRTUAL
 EXPORT DoSliceouts := TRUE; // If set to false slice-outs do not occur (saves time)
 EXPORT SliceDistance := 10;
-EXPORT FastSlice := TRUE; // Set to false for a more aggressive mode of slicing
 EXPORT CorrelateSampleSize := 100000000; // Size of sample used in hygiene.corelations
 EXPORT ByPassCleave := FALSE; // If set to true Cleave process will not run in the next internal linking iteration.
 EXPORT PersistExpire := 30; // PERSIST file expiration time in days.
@@ -17,5 +16,5 @@ EXPORT MatchThreshold := 41;
 EXPORT BasicMatchThreshold := MatchThreshold; // Possibly reduce by a little to give yourself wriggle room in the rather less precise basic match
 EXPORT JoinLimit := 10000;
 // Configuration of individual fields
-EXPORT src_Permit_Number := 1; // The number of permit bits for record access control; This number needs to be in sync with fn_sources!
+EXPORT src_Permit_Number := 1; // The number of permit bits for record access control; This number needs to be in sync with Watchdog_Best.fn_sources!
 END;

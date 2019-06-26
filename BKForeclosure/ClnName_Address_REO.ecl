@@ -6,7 +6,7 @@
 //Clean Names for REO	
 EXPORT ClnName_Address_REO(DATASET(RECORDOF(Layout_BK.CleanFields_REO)) dNormFile) := FUNCTION
 NID.Mac_CleanFullNames(dNormFile,FileClnName,name_full
-												,includeInRepository:=false, normalizeDualNames:=true, useV2 := true);
+												,includeInRepository:=true, normalizeDualNames:=true, useV2 := true);
 												
 //Name flags
 	person_flags := ['P', 'D'];
@@ -25,8 +25,8 @@ ClnName_reo      := PROJECT(FileClnName,TRANSFORM(Layout_BK.CleanFields_REO,
 																									SELF.cln_mname2				:=	IF(IsName, LEFT.cln_mname2, '');
 																									SELF.cln_lname2				:=	IF(IsName, LEFT.cln_lname2, '');
 																									SELF.cln_suffix2			:=	IF(IsName, LEFT.cln_suffix2, '');
-																									SELF.cname						:=  IF(LEFT.nametype IN business_flags AND trim(LEFT.cln_fname) = '',
-																																								LEFT.name_full,'');
+																									SELF.cname						:=  IF(LEFT.nametype IN business_flags AND trim(LEFT.cln_fname) = '',LEFT.name_full,
+																																							IF(TRIM(SELF.cln_fname) = '' AND TRIM(SELF.cln_lname) = '',LEFT.name_full,''));
 																									SELF := LEFT));
 
 //Clean address for REO 

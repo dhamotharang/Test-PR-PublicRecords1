@@ -1,14 +1,15 @@
 ﻿IMPORT STD,_control;
 
-//Files for S0376 are Located  //
-EXPORT Spray_refreshFile(STRING filedate, STRING	pServerIP	= IF(_control.thisenvironment.name = 'Dataland',
-																																	_control.IPAddress.bctlpedata12,
-																																	_control.IPAddress.bctlpedata11)) := MODULE
+//Raw file location
+EXPORT Spray_refreshFile(STRING filedate, STRING	pServerIP	= _control.IPAddress.bctlpedata12) := MODULE
+// pServerIP	= IF(_control.thisenvironment.name = 'Dataland',
+																																	// _control.IPAddress.bctlpedata12,
+																																	// _control.IPAddress.bctlpedata11)) := MODULE
 
 #workunit('name','Spray Foreclosure Refresh');
-
-SHARED filepath_nod       := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Refresh/NOD/';
-SHARED filepath_reo       := '/data/data_build_2/property/ln/epic/bk/in/test/foreclosure/' +filedate +'/Managed_Refresh/REO/';
+SHARED version := STD.Date.AdjustDate((integer)filedate,,,-1); //Folder date is a day after version date
+SHARED filepath_nod       := '/data/data_build_2/property/ln/epic/bk/foreclosure/data/' +(string)filedate+'/Managed_Refresh/NOD'+(string)version+'/';
+SHARED filepath_reo       := '/data/data_build_2/property/ln/epic/bk/foreclosure/data/' +(string)filedate+'/Managed_Refresh/REO'+(string)version+'/';
 SHARED group_name	        := STD.System.Thorlib.Group ( );
 SHARED fn_nod_Orph        := '*_NOD_Orphan_Refresh_*.txt';
 SHARED fn_nod_Ref         := '*_NOD_Refresh_*.txt';
@@ -17,16 +18,16 @@ SHARED fn_reo_Ref         := '*_REO_Refresh_*.txt';
 SHARED maxRecordSize	    := 8192;
 
 //Sprayed input files
-SHARED dst_nod_orph_raw   := '~thor_data400::in::BKForeclosure::refresh_nod_orphan::' + filedate + '::raw';
-SHARED dst_nod_ref_raw    := '~thor_data400::in::BKForeclosure::refresh_nod::' + filedate + '::raw';
-SHARED dst_reo_orph_raw   := '~thor_data400::in::BKForeclosure::refresh_reo_orphan::' + filedate + '::raw';
-SHARED dst_reo_ref_raw    := '~thor_data400::in::BKForeclosure::refresh_reo::' + filedate + '::raw';
+SHARED dst_nod_orph_raw   := '~thor_data400::in::BKForeclosure::refresh_nod_orphan::' +(string)version+ '::raw';
+SHARED dst_nod_ref_raw    := '~thor_data400::in::BKForeclosure::refresh_nod::' +(string)version+ '::raw';
+SHARED dst_reo_orph_raw   := '~thor_data400::in::BKForeclosure::refresh_reo_orphan::' +(string)version+ '::raw';
+SHARED dst_reo_ref_raw    := '~thor_data400::in::BKForeclosure::refresh_reo::' +(string)version+ '::raw';
 
 //Input files with filedate and file_type added
-SHARED dst_nod_orph       := '~thor_data400::in::BKForeclosure::refresh_nod_orphan::' + filedate;
-SHARED dst_nod_ref        := '~thor_data400::in::BKForeclosure::refresh_nod::' + filedate;
-SHARED dst_reo_orph       := '~thor_data400::in::BKForeclosure::refresh_reo_orphan::' + filedate;
-SHARED dst_reo_ref        := '~thor_data400::in::BKForeclosure::refresh_reo::' + filedate;
+SHARED dst_nod_orph       := '~thor_data400::in::BKForeclosure::refresh_nod_orphan::' +(string)version;
+SHARED dst_nod_ref        := '~thor_data400::in::BKForeclosure::refresh_nod::' +(string)version;
+SHARED dst_reo_orph       := '~thor_data400::in::BKForeclosure::refresh_reo_orphan::' +(string)version;
+SHARED dst_reo_ref        := '~thor_data400::in::BKForeclosure::refresh_reo::' +(string)version;
 
 //Final input superfiles used for build
 SHARED sprf_nod_orph     := '~thor_data400::in::BKForeclosure::refresh_nod_orphan';
@@ -49,28 +50,30 @@ SHARED sprf_reo_ref      := '~thor_data400::in::BKForeclosure::refresh_reo';
   TransformFile_Nod_Orphan := FUNCTION
 	  dsraw := DATASET(dst_nod_Orph_raw,
 										          BKForeclosure.Layout_BK.Nod_raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'NOD_ORPHAN';SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := (string)version; SELF.bk_infile_type := 'NOD_ORPHAN'; SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
   TransformFile_Nod_refresh := FUNCTION
 	  dsraw := DATASET(dst_nod_ref_raw,
 										          BKForeclosure.Layout_BK.Nod_raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'NOD_REFRESH'; SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.Nod_in,SELF.ln_filedate := (string)version; SELF.bk_infile_type := 'NOD_REFRESH'; SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
   TransformFile_Reo_Orphan := FUNCTION
 	  dsraw := DATASET(dst_reo_orph_raw,
 										          BKForeclosure.Layout_BK.REO_Raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_ORPHAN';SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := (string)version; SELF.bk_infile_type := 'REO_ORPHAN';
+																			SELF.APN := REGEXREPLACE('^([~]+)|([+])',LEFT.APN,'');SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;
 	
   TransformFile_Reo_refresh := FUNCTION
 	  dsraw := DATASET(dst_reo_ref_raw,
 										          BKForeclosure.Layout_BK.Reo_Raw,CSV(SEPARATOR('\t'),QUOTE(''),TERMINATOR(['\n','\r','\r\n'])));
-		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := filedate; SELF.bk_infile_type := 'REO_REFRESH';SELF := LEFT; SELF :=[]));
+		ds    := PROJECT(dsraw,TRANSFORM(BKForeclosure.Layout_BK.REO_in,SELF.ln_filedate := (string)version; SELF.bk_infile_type := 'REO_REFRESH';
+																		SELF.APN := REGEXREPLACE('^([~]+)|([+])',LEFT.APN,'');SELF := LEFT; SELF :=[]));
 	RETURN ds;
 	END;	
 	
@@ -119,13 +122,9 @@ super_all
 	:=	
 	SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod_orphan', TRUE),
 		AddToSuperfile_Nod_Orph,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod', TRUE),
 		AddToSuperfile_Nod_Ref,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo_orphan', TRUE),
 		AddToSuperfile_Reo_Orph,
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo', TRUE),
 		AddToSuperfile_Reo_Ref,
 		STD.File.FinishSuperFileTransaction()
 	);	

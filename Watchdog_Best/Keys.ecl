@@ -29,13 +29,8 @@ EXPORT CandidatesKeyName := '~'+'key::Watchdog_best::did::Debug::match_candidate
 prop_file := match_candidates(ih).candidates; // Use propogated file
 
 EXPORT Candidates := INDEX(prop_file,{did},{prop_file},CandidatesKeyName);
-
-EXPORT CandidatesForSliceKeyName := '~'+'key::Watchdog_best::did::Debug::match_candidatesforslice_debug';
-prop_file_forslice := match_candidates(ih).candidates_ForSlice; // Use propogated file
-
-EXPORT CandidatesForSlice := INDEX(prop_file_forslice,{did},{prop_file_forslice},CandidatesForSliceKeyName);
 // Build enough to support the debug services such as the compare service
-EXPORT BuildDebug := PARALLEL(Build_Specificities_Key, PARALLEL(BUILDINDEX(Candidates, OVERWRITE),BUILDINDEX(CandidatesForSlice, OVERWRITE)));
+EXPORT BuildDebug := PARALLEL(Build_Specificities_Key, BUILDINDEX(Candidates, OVERWRITE));
 // Build Everything
 EXPORT BuildAll := PARALLEL(BuildDebug, PARALLEL(BUILDINDEX(MatchSample, OVERWRITE),BUILDINDEX(PatchedCandidates, OVERWRITE)),Build_InData,MatchHistory.BuildAll);
 END;

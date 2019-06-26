@@ -1,5 +1,5 @@
 ﻿
-EXPORT MAC_PopulationStatistics(infile,Ref='',src='',Input_pflag1 = '',Input_pflag2 = '',Input_pflag3 = '',Input_src = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_last_reported = '',Input_dt_vendor_first_reported = '',Input_dt_nonglb_last_seen = '',Input_rec_type = '',Input_phone = '',Input_ssn = '',Input_dob = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_city_name = '',Input_st = '',Input_zip = '',Input_zip4 = '',Input_tnt = '',Input_valid_ssn = '',Input_jflag1 = '',Input_jflag2 = '',Input_jflag3 = '',Input_rawaid = '',Input_dodgy_tracking = '',Input_address_ind = '',Input_name_ind = '',Input_persistent_record_id = '',Input_ssnum = '',Input_address = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',src='',Input_pflag1 = '',Input_pflag2 = '',Input_pflag3 = '',Input_src = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_last_reported = '',Input_dt_vendor_first_reported = '',Input_dt_nonglb_last_seen = '',Input_rec_type = '',Input_phone = '',Input_ssn = '',Input_dob = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_city_name = '',Input_st = '',Input_zip = '',Input_zip4 = '',Input_tnt = '',Input_valid_ssn = '',Input_jflag1 = '',Input_jflag2 = '',Input_jflag3 = '',Input_rawaid = '',Input_dodgy_tracking = '',Input_address_ind = '',Input_name_ind = '',Input_persistent_record_id = '',Input_lastname = '',Input_ssnum = '',Input_address = '',OutFile) := MACRO
   IMPORT SALT311,Watchdog_best;
   #uniquename(of)
   %of% := RECORD
@@ -243,6 +243,12 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',src='',Input_pflag1 = '',Input_pfl
       '' 
     #ELSE
         IF( le.Input_persistent_record_id = (TYPEOF(le.Input_persistent_record_id))'','',':persistent_record_id')
+    #END
+
++    #IF( #TEXT(Input_lastname)='' )
+      '' 
+    #ELSE
+        IF( le.Input_lastname = (TYPEOF(le.Input_lastname))'','',':lastname')
     #END
 
 +    #IF( #TEXT(Input_ssnum)='' )

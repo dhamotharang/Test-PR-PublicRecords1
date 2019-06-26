@@ -5,18 +5,12 @@
 EXPORT MEOW_LocationID(DATASET(Process_LocationID_Layouts.InputLayout) in, BOOLEAN MultiRec = FALSE,SET OF SALT37.UIDType ButNot=[]) := MODULE
 Process_LocationID_Layouts.OutputLayout GetResults(Process_LocationID_Layouts.InputLayout le) := TRANSFORM
 // Need to calculate lengths for EDIT fields
-  UNSIGNED1 predir_len := LENGTH(TRIM(le.predir));
-  UNSIGNED1 prim_name_len := LENGTH(TRIM(le.prim_name));
-  UNSIGNED1 addr_suffix_len := LENGTH(TRIM(le.addr_suffix));
-  UNSIGNED1 postdir_len := LENGTH(TRIM(le.postdir));
-  UNSIGNED1 unit_desig_len := LENGTH(TRIM(le.unit_desig));
-  UNSIGNED1 v_city_name_len := LENGTH(TRIM(le.v_city_name));
   SELF.keys_tried := IF (Key_LocationId_STATECITY.CanSearch(le),1 << 1,0) + IF (Key_LocationId_ZIP.CanSearch(le),1 << 2,0);
   fetchResults := TOPN(ROLLUP(IF ( Process_LocationID_Layouts.HardKeyMatch(le) ,
     MERGE(
-    SORTED(Key_LocationId_STATECITY.ScoredLocIdFetch(param_v_city_name := le.v_city_name,param_v_city_name_len := v_city_name_len,param_st := le.st,param_prim_range := le.prim_range,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_sec_range := le.sec_range,param_unit_desig := le.unit_desig,param_unit_desig_len := unit_desig_len,param_postdir := le.postdir,param_postdir_len := postdir_len,param_addr_suffix := le.addr_suffix,param_addr_suffix_len := addr_suffix_len,param_predir := le.predir,param_predir_len := predir_len),LocId)
-    ,SORTED(Key_LocationId_ZIP.ScoredLocIdFetch(param_zip5 := le.zip5,param_prim_range := le.prim_range,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_sec_range := le.sec_range,param_unit_desig := le.unit_desig,param_unit_desig_len := unit_desig_len,param_postdir := le.postdir,param_postdir_len := postdir_len,param_addr_suffix := le.addr_suffix,param_addr_suffix_len := addr_suffix_len,param_predir := le.predir,param_predir_len := predir_len),LocId),SORTED(LocId)) /* Merged */
-    ,SORTED(Key_LocationId_.ScoredLocIdFetch(param_prim_range := le.prim_range,param_predir := le.predir,param_predir_len := predir_len,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_addr_suffix := le.addr_suffix,param_addr_suffix_len := addr_suffix_len,param_postdir := le.postdir,param_postdir_len := postdir_len,param_unit_desig := le.unit_desig,param_unit_desig_len := unit_desig_len,param_sec_range := le.sec_range,param_v_city_name := le.v_city_name,param_v_city_name_len := v_city_name_len,param_st := le.st,param_zip5 := le.zip5),LocId)) /* IF */ 
+    SORTED(Key_LocationId_STATECITY.ScoredLocIdFetch(param_v_city_name := le.v_city_name,param_st := le.st,param_prim_range := le.prim_range,param_prim_name_derived := le.prim_name_derived,param_sec_range := le.sec_range,param_predir := le.predir,param_postdir := le.postdir,param_addr_suffix_derived := le.addr_suffix_derived,param_unit_desig := le.unit_desig,param_err_stat := le.err_stat),LocId)
+    ,SORTED(Key_LocationId_ZIP.ScoredLocIdFetch(param_zip5 := le.zip5,param_prim_range := le.prim_range,param_prim_name_derived := le.prim_name_derived,param_sec_range := le.sec_range,param_predir := le.predir,param_postdir := le.postdir,param_addr_suffix_derived := le.addr_suffix_derived,param_unit_desig := le.unit_desig,param_err_stat := le.err_stat),LocId),SORTED(LocId)) /* Merged */
+    ,SORTED(Key_LocationId_.ScoredLocIdFetch(param_prim_range := le.prim_range,param_predir := le.predir,param_prim_name_derived := le.prim_name_derived,param_addr_suffix_derived := le.addr_suffix_derived,param_postdir := le.postdir,param_err_stat := le.err_stat,param_unit_desig := le.unit_desig,param_sec_range := le.sec_range,param_v_city_name := le.v_city_name,param_st := le.st,param_zip5 := le.zip5),LocId)) /* IF */ 
  
     , RIGHT.LocId > 0 AND LEFT.LocId = RIGHT.LocId, Process_LocationID_Layouts.Combine_Scores(LEFT,RIGHT))(LocId NOT IN ButNot),le.MaxIDs + 1,-Weight)(SALT37.DebugMode OR ~ForceFailed OR ButNot<>[]); // Warning - is a fetch to keys etc
   SELF.Results := CHOOSEN(fetchResults, le.MaxIDs);
@@ -79,9 +73,10 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR4);
       INTEGER2 Record_Score; // Score for this particular record
       INTEGER2 Match_prim_range;
       INTEGER2 Match_predir;
-      INTEGER2 Match_prim_name;
-      INTEGER2 Match_addr_suffix;
+      INTEGER2 Match_prim_name_derived;
+      INTEGER2 Match_addr_suffix_derived;
       INTEGER2 Match_postdir;
+      INTEGER2 Match_err_stat;
       INTEGER2 Match_unit_desig;
       INTEGER2 Match_sec_range;
       INTEGER2 Match_v_city_name;
@@ -91,23 +86,24 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR4);
     IMPORT SALT37;
     Layout_Matched_Data score_fields(RD le,Inv ri) := TRANSFORM
     SELF.Match_prim_range := MAP ( ri.prim_range = (TYPEOF(ri.prim_range))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.prim_range = (TYPEOF(ri.prim_range))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.prim_range = le.prim_range => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
-    SELF.Match_predir := MAP ( ri.predir = (TYPEOF(ri.predir))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.predir = (TYPEOF(ri.predir))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.predir = le.predir => SALT37.HeaderSearchMatchCode.Match,_CFG.WithinEditN(le.predir,0,ri.predir,0,1, 0) => SALT37.HeaderSearchMatchCode.FuzzyMatch,SALT37.HeaderSearchMatchCode.NoMatch);
-    SELF.Match_prim_name := MAP ( ri.prim_name = (TYPEOF(ri.prim_name))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.prim_name = (TYPEOF(ri.prim_name))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.prim_name = le.prim_name => SALT37.HeaderSearchMatchCode.Match,_CFG.WithinEditN(le.prim_name,0,ri.prim_name,0,1, 0) => SALT37.HeaderSearchMatchCode.FuzzyMatch,SALT37.HeaderSearchMatchCode.NoMatch);
-    SELF.Match_addr_suffix := MAP ( ri.addr_suffix = (TYPEOF(ri.addr_suffix))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.addr_suffix = (TYPEOF(ri.addr_suffix))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.addr_suffix = le.addr_suffix => SALT37.HeaderSearchMatchCode.Match,_CFG.WithinEditN(le.addr_suffix,0,ri.addr_suffix,0,1, 0) => SALT37.HeaderSearchMatchCode.FuzzyMatch,SALT37.HeaderSearchMatchCode.NoMatch);
-    SELF.Match_postdir := MAP ( ri.postdir = (TYPEOF(ri.postdir))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.postdir = (TYPEOF(ri.postdir))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.postdir = le.postdir => SALT37.HeaderSearchMatchCode.Match,_CFG.WithinEditN(le.postdir,0,ri.postdir,0,1, 0) => SALT37.HeaderSearchMatchCode.FuzzyMatch,SALT37.HeaderSearchMatchCode.NoMatch);
-    SELF.Match_unit_desig := MAP ( ri.unit_desig = (TYPEOF(ri.unit_desig))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.unit_desig = (TYPEOF(ri.unit_desig))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.unit_desig = le.unit_desig => SALT37.HeaderSearchMatchCode.Match,_CFG.WithinEditN(le.unit_desig,0,ri.unit_desig,0,1, 0) => SALT37.HeaderSearchMatchCode.FuzzyMatch,SALT37.HeaderSearchMatchCode.NoMatch);
+    SELF.Match_predir := MAP ( ri.predir = (TYPEOF(ri.predir))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.predir = (TYPEOF(ri.predir))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.predir = le.predir => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
+    SELF.Match_prim_name_derived := MAP ( ri.prim_name_derived = (TYPEOF(ri.prim_name_derived))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.prim_name_derived = (TYPEOF(ri.prim_name_derived))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.prim_name_derived = le.prim_name_derived => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
+    SELF.Match_addr_suffix_derived := MAP ( ri.addr_suffix_derived = (TYPEOF(ri.addr_suffix_derived))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.addr_suffix_derived = (TYPEOF(ri.addr_suffix_derived))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.addr_suffix_derived = le.addr_suffix_derived => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
+    SELF.Match_postdir := MAP ( ri.postdir = (TYPEOF(ri.postdir))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.postdir = (TYPEOF(ri.postdir))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.postdir = le.postdir => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
+    SELF.Match_err_stat := MAP ( ri.err_stat = (TYPEOF(ri.err_stat))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.err_stat = (TYPEOF(ri.err_stat))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.err_stat = le.err_stat => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
+    SELF.Match_unit_desig := MAP ( ri.unit_desig = (TYPEOF(ri.unit_desig))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.unit_desig = (TYPEOF(ri.unit_desig))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.unit_desig = le.unit_desig => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
     SELF.Match_sec_range := MAP ( ri.sec_range = (TYPEOF(ri.sec_range))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.sec_range = (TYPEOF(ri.sec_range))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.sec_range = le.sec_range => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
-    SELF.Match_v_city_name := MAP ( ri.v_city_name = (TYPEOF(ri.v_city_name))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.v_city_name = (TYPEOF(ri.v_city_name))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.v_city_name = le.v_city_name => SALT37.HeaderSearchMatchCode.Match,_CFG.WithinEditN(le.v_city_name,0,ri.v_city_name,0,1, 0) => SALT37.HeaderSearchMatchCode.FuzzyMatch,SALT37.HeaderSearchMatchCode.NoMatch);
+    SELF.Match_v_city_name := MAP ( ri.v_city_name = (TYPEOF(ri.v_city_name))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.v_city_name = (TYPEOF(ri.v_city_name))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.v_city_name = le.v_city_name => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
     SELF.Match_st := MAP ( ri.st = (TYPEOF(ri.st))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.st = (TYPEOF(ri.st))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.st = le.st => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
     SELF.Match_zip5 := MAP ( ri.zip5 = (TYPEOF(ri.zip5))'' => SALT37.HeaderSearchMatchCode.NoSearchCriteria, le.zip5 = (TYPEOF(ri.zip5))'' => SALT37.HeaderSearchMatchCode.BlankField, ri.zip5 = le.zip5 => SALT37.HeaderSearchMatchCode.Match,SALT37.HeaderSearchMatchCode.NoMatch);
-      SELF.Record_Score := SELF.Match_prim_range + SELF.Match_predir + SELF.Match_prim_name + SELF.Match_addr_suffix + SELF.Match_postdir + SELF.Match_unit_desig + SELF.Match_sec_range + SELF.Match_v_city_name + SELF.Match_st + SELF.Match_zip5;
-      SELF.Is_FullMatch := SELF.Match_prim_range>=0 AND SELF.Match_predir>=0 AND SELF.Match_prim_name>=0 AND SELF.Match_addr_suffix>=0 AND SELF.Match_postdir>=0 AND SELF.Match_unit_desig>=0 AND SELF.Match_sec_range>=0 AND SELF.Match_v_city_name>=0 AND SELF.Match_st>=0 AND SELF.Match_zip5>=0;
+      SELF.Record_Score := SELF.Match_prim_range + SELF.Match_predir + SELF.Match_prim_name_derived + SELF.Match_addr_suffix_derived + SELF.Match_postdir + SELF.Match_err_stat + SELF.Match_unit_desig + SELF.Match_sec_range + SELF.Match_v_city_name + SELF.Match_st + SELF.Match_zip5;
+      SELF.Is_FullMatch := SELF.Match_prim_range>=0 AND SELF.Match_predir>=0 AND SELF.Match_prim_name_derived>=0 AND SELF.Match_addr_suffix_derived>=0 AND SELF.Match_postdir>=0 AND SELF.Match_err_stat>=0 AND SELF.Match_unit_desig>=0 AND SELF.Match_sec_range>=0 AND SELF.Match_v_city_name>=0 AND SELF.Match_st>=0 AND SELF.Match_zip5>=0;
       SELF.Has_FullMatch := SELF.Is_FullMatch; // Filled in later using iterate
       SELF.FullMatch_Required := ri.FullMatch;
       SELF.RecordsOnly := ri.MatchRecords;
       SELF := le;
     END;
-    ScoredData := JOIN(RD,Inv,LEFT.UniqueId=RIGHT.UniqueId,score_fields(LEFT,RIGHT));
+    ScoredData := JOIN(RD,Inv,LEFT.UniqueId=RIGHT.UniqueId,score_fields(LEFT,RIGHT),ALL);
     Layout_Matched_Data prop_full(ScoredData le,ScoredData ri) := TRANSFORM
   	  SELF.Has_FullMatch := ri.Has_FullMatch OR le.Has_FullMatch AND le.LocId=ri.LocId AND le.UniqueId=ri.UniqueId;
       SELF := ri;
@@ -135,19 +131,13 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR4);
   EXPORT DataToSearch := DEDUP(ds,WHOLE RECORD,ALL);
 Process_LocationID_Layouts.OutputLayout GetResultsSpecific(Process_LocationID_Layouts.InputLayout le,STRING LinkPathName) := TRANSFORM
 // Need to calculate lengths for EDIT fields
-  UNSIGNED1 predir_len := LENGTH(TRIM(le.predir));
-  UNSIGNED1 prim_name_len := LENGTH(TRIM(le.prim_name));
-  UNSIGNED1 addr_suffix_len := LENGTH(TRIM(le.addr_suffix));
-  UNSIGNED1 postdir_len := LENGTH(TRIM(le.postdir));
-  UNSIGNED1 unit_desig_len := LENGTH(TRIM(le.unit_desig));
-  UNSIGNED1 v_city_name_len := LENGTH(TRIM(le.v_city_name));
   SELF.keys_tried := MAP(
         LinkPathName = 'STATECITY' =>  + IF (Key_LocationId_STATECITY.CanSearch(le),1 << 1,0),
         LinkPathName = 'ZIP' =>  + IF (Key_LocationId_ZIP.CanSearch(le),1 << 2,0),0);
   fetchResults := MAP(
-        LinkPathName = 'STATECITY' => IF(Key_LocationId_STATECITY.CanSearch(le),SORTED(Key_LocationId_STATECITY.ScoredLocIdFetch(param_v_city_name := le.v_city_name,param_v_city_name_len := v_city_name_len,param_st := le.st,param_prim_range := le.prim_range,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_sec_range := le.sec_range,param_unit_desig := le.unit_desig,param_unit_desig_len := unit_desig_len,param_postdir := le.postdir,param_postdir_len := postdir_len,param_addr_suffix := le.addr_suffix,param_addr_suffix_len := addr_suffix_len,param_predir := le.predir,param_predir_len := predir_len),LocId),DATASET([],Process_LocationID_Layouts.LayoutScoredFetch)),
-        LinkPathName = 'ZIP' => IF(Key_LocationId_ZIP.CanSearch(le),SORTED(Key_LocationId_ZIP.ScoredLocIdFetch(param_zip5 := le.zip5,param_prim_range := le.prim_range,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_sec_range := le.sec_range,param_unit_desig := le.unit_desig,param_unit_desig_len := unit_desig_len,param_postdir := le.postdir,param_postdir_len := postdir_len,param_addr_suffix := le.addr_suffix,param_addr_suffix_len := addr_suffix_len,param_predir := le.predir,param_predir_len := predir_len),LocId),DATASET([],Process_LocationID_Layouts.LayoutScoredFetch)),
-    SORTED(Key_LocationId_.ScoredLocIdFetch(param_prim_range := le.prim_range,param_predir := le.predir,param_predir_len := predir_len,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_addr_suffix := le.addr_suffix,param_addr_suffix_len := addr_suffix_len,param_postdir := le.postdir,param_postdir_len := postdir_len,param_unit_desig := le.unit_desig,param_unit_desig_len := unit_desig_len,param_sec_range := le.sec_range,param_v_city_name := le.v_city_name,param_v_city_name_len := v_city_name_len,param_st := le.st,param_zip5 := le.zip5),LocId));
+        LinkPathName = 'STATECITY' => IF(Key_LocationId_STATECITY.CanSearch(le),SORTED(Key_LocationId_STATECITY.ScoredLocIdFetch(param_v_city_name := le.v_city_name,param_st := le.st,param_prim_range := le.prim_range,param_prim_name_derived := le.prim_name_derived,param_sec_range := le.sec_range,param_predir := le.predir,param_postdir := le.postdir,param_addr_suffix_derived := le.addr_suffix_derived,param_unit_desig := le.unit_desig,param_err_stat := le.err_stat),LocId),DATASET([],Process_LocationID_Layouts.LayoutScoredFetch)),
+        LinkPathName = 'ZIP' => IF(Key_LocationId_ZIP.CanSearch(le),SORTED(Key_LocationId_ZIP.ScoredLocIdFetch(param_zip5 := le.zip5,param_prim_range := le.prim_range,param_prim_name_derived := le.prim_name_derived,param_sec_range := le.sec_range,param_predir := le.predir,param_postdir := le.postdir,param_addr_suffix_derived := le.addr_suffix_derived,param_unit_desig := le.unit_desig,param_err_stat := le.err_stat),LocId),DATASET([],Process_LocationID_Layouts.LayoutScoredFetch)),
+    SORTED(Key_LocationId_.ScoredLocIdFetch(param_prim_range := le.prim_range,param_predir := le.predir,param_prim_name_derived := le.prim_name_derived,param_addr_suffix_derived := le.addr_suffix_derived,param_postdir := le.postdir,param_err_stat := le.err_stat,param_unit_desig := le.unit_desig,param_sec_range := le.sec_range,param_v_city_name := le.v_city_name,param_st := le.st,param_zip5 := le.zip5),LocId));
   SELF.Results := CHOOSEN(fetchResults, le.MaxIDs);
   SELF.IsTruncated := COUNT(fetchResults) > le.MaxIDs;
   Process_LocationID_Layouts.MAC_Add_ResolutionFlags()

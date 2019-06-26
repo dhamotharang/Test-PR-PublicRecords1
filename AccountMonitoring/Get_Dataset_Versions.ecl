@@ -1,4 +1,4 @@
-// This output for this function is the product, subfile name and the version number 
+﻿// This output for this function is the product, subfile name and the version number 
 // It also always returns the three (header, quick header & Daily utility) key versions 
 // The output can be limited to a particular product or products by passing a product mask in.
 // Only when valid despray information passed into the funtion, will files be written, otherwise the
@@ -527,7 +527,7 @@ EXPORT Get_Dataset_Versions(
 					LEFT.name,1,NOCASE)));
 		
 		// SBFE
-		Sbfe_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.sbfe.sbfeLinkid_superkeyname),
+		Sbfe_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.sbfe.r_sbfeLinkid_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'SBFE',
 				SELF.subfile := 'LINKID',
@@ -535,7 +535,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::sbfe::(.*)::linkids',
 					LEFT.name,1,NOCASE)));
 					
-		Sbfe_Trade := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.sbfe.sbfeTrade_superkeyname),
+		Sbfe_Trade := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.sbfe.r_sbfeTrade_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'SBFE',
 				SELF.subfile := 'TRADE',
@@ -543,7 +543,7 @@ EXPORT Get_Dataset_Versions(
 					'thor_data400::key::sbfe::(.*)::tradeline',
 					LEFT.name,1,NOCASE)));
 		
-		Sbfe_Score := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.sbfe.sbfeScore_superkeyname),
+		Sbfe_Score := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.sbfe.r_sbfeScore_superkeyname),
 			TRANSFORM(Final_Layout,
 				SELF.product := 'SBFE',
 				SELF.subfile := 'SCORE',

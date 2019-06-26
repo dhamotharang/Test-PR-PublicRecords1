@@ -547,7 +547,14 @@ EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) i
 
   r1 := JOIN(j1,in_data,LEFT.Proxid2 = RIGHT.Proxid,transform({unsigned6 proxid1,unsigned6 proxid2,recordof(left) leftrec,recordof(right) rightrec},self.leftrec := left,self.rightrec := right,self := left),HASH);  //new hack
   
-  r := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,if(right.proxid1 != 0,right.rule,left.leftrec.rule),,right.support_cnp_name),HASH,left outer);
+  r2 := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,transform({recordof(left),unsigned rule,unsigned support_cnp_name}
+    ,self.rule              := if(right.proxid1 != 0,right.rule,left.leftrec.rule)
+    ,self.support_cnp_name  := right.support_cnp_name
+    ,self                   := left
+  ),HASH,left outer);
+    
+  r := project(distribute(r2),sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,left.rule,,left.support_cnp_name));
+  // r := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,if(right.proxid1 != 0,right.rule,left.leftrec.rule),,right.support_cnp_name),HASH,left outer);
   // r := JOIN(r1,ia,LEFT.Proxid1 = RIGHT.Proxid1 and left.proxid2 = right.proxid2,sample_match_join( PROJECT(LEFT.leftrec,strim(LEFT)),left.rightrec,left.leftrec.rule,,right.support_cnp_name),HASH,left outer);
   // d := DEDUP( SORT( r, Proxid1, Proxid2, -Conf, LOCAL ), Proxid1, Proxid2, LOCAL ); // Proxid2 distributed by join
   d := DEDUP( SORT( r, Proxid1, Proxid2, -map(Conf between 30 and 7000 => conf ,conf > 7000  => 29 ,conf - 1), LOCAL ), Proxid1, Proxid2, LOCAL ); // Proxid2 distributed by join

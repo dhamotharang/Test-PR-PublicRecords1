@@ -1,4 +1,4 @@
-import bipv2_proxid,tools;
+﻿import bipv2_proxid,tools;
 EXPORT Agg_Slim(
     pDataset
    ,pID                         = 'proxid'
@@ -52,7 +52,7 @@ functionmacro
     self.a_duns     := left.active_duns_number;
     self.a_entnum   := left.active_enterprise_number;
     self.a_corpkey  := left.active_domestic_corp_key;
-    self.address    := stringlib.stringcleanspaces(trim(left.prim_range,left,right) + ' ' + trim(left.prim_name,left,right) + ' ' + trim(left.sec_range,left,right) + ' ' + trim(left.v_city_name,left,right) + ' ' + trim(left.st,left,right) + ' ' + trim(left.zip));
+    self.address    := stringlib.stringcleanspaces(trim(left.prim_range_derived,left,right) + ' ' + trim(left.prim_name_derived,left,right) + ' ' + trim(left.sec_range,left,right) + ' ' + trim(left.v_city_name,left,right) + ' ' + trim(left.st,left,right) + ' ' + trim(left.zip));
 
     self          := left;  
   ));

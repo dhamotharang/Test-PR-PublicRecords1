@@ -1,4 +1,5 @@
-﻿IMPORT AID, ut, NID, codes, Address, _validate, std;
+﻿
+IMPORT AID, ut, NID, codes, Address, _validate, std;
 
 EXPORT Standardize_NameAddr := MODULE	
 
@@ -9,8 +10,7 @@ EXPORT Standardize_NameAddr := MODULE
 	EXPORT fStandardizeNamesPhone(DATASET(Equifax_Business_Data.Layouts.Base) pPreProcessInput) :=	FUNCTION
 			
 		// -- Mapping Clean company name and clean phone numbers
-		Equifax_Business_Data.Layouts.Base tMapCleanCompanyName(pPreProcessInput L) := TRANSFORM   
-		  SElF.record_sid := L.rcid;
+		Equifax_Business_Data.Layouts.Base tMapCleanCompanyName(pPreProcessInput L) := TRANSFORM 
 			SELF.clean_company_name := L.normCompany_Name;
 			SELF.clean_phone := ut.CleanPhone(L.EFX_PHONE); 
 			SELF.clean_secondary_phone := ut.CleanPhone(L.EFX_FAXPHONE);
@@ -58,12 +58,19 @@ EXPORT Standardize_NameAddr := MODULE
 																		              0);
 			SELF.clean_certexp10_date := IF(_validate.date.fIsValid(ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.AT_CERTEXP10)),
 			                                            (UNSIGNED4)ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.AT_CERTEXP10),
-																		              0);			
-			SELF.EFX_COUNTYNM := IF(STD.STR.FilterOut(L.EFX_COUNTYNM, '0123456789') = '',
-			                        EFX_COUNTYNUM_TABLE.COUNTYNUM(ut.CleanSpacesAndUpper(L.EFX_COUNTYNM), ut.CleanSpacesAndUpper(L.EFX_STATE)),L.EFX_COUNTYNM);
-			SELF.EFX_COUNTY := IF(
-			                      STD.STR.FilterOut(L.EFX_COUNTYNM, '0123456789') = '',L.EFX_COUNTYNM
-														,EFX_COUNTYNAME_TABLE.COUNTYNAME(ut.CleanSpacesAndUpper(L.EFX_STATE), ut.CleanSpacesAndUpper(L.EFX_COUNTYNM), ut.CleanSpacesAndUpper(L.EFX_COUNTY)));	
+																		              0);	
+			SELF.EFX_COUNTYNM :=
+			MAP(
+			 STD.STR.FilterOut(TRIM(L.EFX_COUNTYNM), '0123456789') != '' AND LENGTH(TRIM(L.EFX_COUNTYNM)) > 3                          => L.EFX_COUNTYNM,
+			 STD.STR.FilterOut(TRIM(L.EFX_COUNTYNM), '0123456789') = '' AND LENGTH(TRIM(L.EFX_COUNTYNM)) = 3                           => EFX_COUNTYNUM_TABLE.COUNTYNUM(ut.CleanSpacesAndUpper(L.EFX_COUNTYNM), ut.CleanSpacesAndUpper(L.EFX_STATE)),
+			 ut.CleanSpacesAndUpper(L.EFX_COUNTYNM) = '' AND LENGTH(TRIM(L.EFX_COUNTY)) = 3 AND STD.STR.FilterOut(TRIM(L.EFX_COUNTY), '0123456789') = '' => EFX_COUNTYNUM_TABLE.COUNTYNUM(ut.CleanSpacesAndUpper(L.EFX_COUNTY), ut.CleanSpacesAndUpper(L.EFX_STATE)),
+			 L.EFX_COUNTYNM);	
+			SELF.EFX_COUNTY :=
+			MAP(
+			 STD.STR.FilterOut(TRIM(L.EFX_COUNTY), '0123456789') = '' AND LENGTH(TRIM(L.EFX_COUNTY)) = 3 => L.EFX_COUNTY,
+			 STD.STR.FilterOut(TRIM(L.EFX_COUNTYNM), '0123456789') = '' AND LENGTH(TRIM(L.EFX_COUNTYNM)) = 3        => L.EFX_COUNTYNM,
+			 STD.STR.FilterOut(TRIM(L.EFX_COUNTYNM), '0123456789') != '' AND LENGTH(TRIM(L.EFX_COUNTYNM)) > 3       => EFX_COUNTYNAME_TABLE.COUNTYNAME(ut.CleanSpacesAndUpper(L.EFX_STATE), ut.CleanSpacesAndUpper(L.EFX_COUNTYNM), ut.CleanSpacesAndUpper(L.EFX_COUNTY)),
+			 L.EFX_COUNTY);	
 			date_first_seen := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.Record_Update_Refresh_Date);
  		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
 			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);

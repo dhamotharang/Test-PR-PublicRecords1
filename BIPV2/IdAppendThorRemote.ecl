@@ -11,6 +11,7 @@ EXPORT IdAppendThorRemote(
 		,boolean reAppend = true
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
 		                            // on thor appends so should not be used for production.
+		,string svcAppendUrl = ''
 	) := module
 
 	shared serviceName := 'BizLinkFull.svcappend';
@@ -30,11 +31,11 @@ EXPORT IdAppendThorRemote(
 		+ if(val, 'true', 'false')
 		+ '</' + element + '>';
 
-	
-	isProd := _control.ThisEnvironment.Name = 'Prod';
-	certUrl := _control.RoxieEnv.boca_certvip;
-	prodUrl := _control.RoxieEnv.boca_prodvip;
-	shared urlBipAppend := if(isProd, prodUrl, certUrl);
+
+	prodUrl := IdConstants.URL_ROXIE_PROD;
+	inputUrl := if(svcAppendUrl[1..7] = 'http://', svcAppendUrl[8..], svcAppendUrl);
+	shared urlBipAppend := if(svcAppendUrl = '', prodUrl, inputUrl);
+
 
 	shared pipeParms := xmlUnsigned('score_threshold', scoreThreshold)
 		+ xmlUnsigned('weight_threshold', weightThreshold)
@@ -50,7 +51,7 @@ EXPORT IdAppendThorRemote(
 		pipeOutput := PIPE(inputDs,
 			'roxiepipe -iw ' + SIZEOF(BIPV2.IdAppendLayouts.AppendInput)+' -t 1 -ow '
 			+ SIZEOF(BIPV2.IdAppendLayouts.svcAppendOut)
-			+ ' -b 1000 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Results' + ' -q "<' + serviceName + ' format=\'raw\'>'
+			+ ' -b 50 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Results' + ' -q "<' + serviceName + ' format=\'raw\'>'
 			+ pipeParms
 			+ xmlBool('include_best', includeBest)
 			+ xmlString('fetch_level', fetchLevel)
@@ -71,7 +72,7 @@ EXPORT IdAppendThorRemote(
 		pipeOutput := PIPE(inputDs,
 			'roxiepipe -iw ' + SIZEOF(BIPV2.IdAppendLayouts.AppendInput)+' -t 1 -ow '
 			+ SIZEOF(BIPV2.IdAppendLayouts.svcAppendRecsOut)
-			+ ' -b 1000 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Header' + ' -q "<' + serviceName + ' format=\'raw\'>'
+			+ ' -b 50 -mr 2 -h '+ urlBipAppend + ' -vip -r ' + 'Header' + ' -q "<' + serviceName + ' format=\'raw\'>'
 			+ pipeParms
 			+ xmlBool('include_best', false)
 			+ xmlBool('include_records', true)

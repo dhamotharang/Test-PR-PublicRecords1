@@ -227,54 +227,16 @@ SHARED udops(string3 skipPackage='000') := sequential(
                        ))
 );
 
-SHARED tokenval := orbit3.GetToken();
-SHARED rec_rep := {STRING  Name, STRING  Status, STRING  Message};
-    
-SHARED  update_entry(string buildname, string Buildvs, string Envmt) := FUNCTION
-             
-    submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
-                                                            Orbit3.Constants(Envmt).platform_upd).retcode ;
-    
-    return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-                project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-                );
-END;
+SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := function
 
-SHARED update_bentry(string buildname, string Buildvs, string Envmt) := FUNCTION
-            
-    status := Orbit3.Constants(Envmt).platform_upd(PlatformName='Boolean Roxie Production');
-    submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
-                                                            status).retcode ;
-    
-    return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-                project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-                );
-END;
+    skipcreatebuild := if(isCreate, false, true);
+    skipupdatebuild := if(isCreate, true, false);
 
-SHARED create_entry(string buildname, string Buildvs) := FUNCTION
-    
-    submit_change1 := Orbit3.CreateBuild        (buildname, Buildvs, tokenval).retcode;
-    submit_change2 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval).retcode;
-    return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-               project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))+
-               project(submit_change2, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-              );
-END;
-
-SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := function
-
-    RETURN if (createORupdate='create',
-                sequential(
-                        if(skipPackage[1]='0',output(create_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor))),
-                        if(skipPackage[2]='0',output(create_entry('FCRA_Header'    ,lastestFCRAversionOnThor))),
-                        if(skipPackage[3]='0',output(create_entry('Header_IKB'     ,lastestWklyversionOnThor)))
-                ),
-                sequential(
-                        if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor,'N'))),
-                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'F'))),
-                        if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
-                )
-       );
+    RETURN sequential(
+                        if(skipPackage[1]='0',Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
+                        if(skipPackage[2]='0',Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
+                        if(skipPackage[3]='0',Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
+                      );
 
 END;
 
@@ -328,8 +290,8 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
     +'gabriel.marcan@lexisnexisrisk.com\n'
     +'\nThank you,'),          
     
-    orbit_update_entries('create',skipPackage),
-    orbit_update_entries('update',skipPackage),
+    orbit_update_entries(true,skipPackage),   //Create
+    orbit_update_entries(false,skipPackage),  //Update
     udops(skipPackage)
 );
 END;

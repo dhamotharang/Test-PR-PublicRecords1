@@ -1223,6 +1223,20 @@
 				trim(kword, left, right) = 'DKDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKDPA,
 				trim(kword, left, right) = 'NLDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLDPA,
 				trim(kword, left, right) = 'NODPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NODPA,
+				trim(kword, left, right) = 'CZDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_CZDPA,
+				trim(kword, left, right) = 'HUDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_HUDPA,
+				trim(kword, left, right) = 'ICDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_ICDPA,
+				trim(kword, left, right) = 'MDBP-W' =>SubGroup_Constants.numKeywordsID.KEYWORD_MDBP_W,
+				trim(kword, left, right) = 'NLACM' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLACM,
+				trim(kword, left, right) = 'NONBIM' =>SubGroup_Constants.numKeywordsID.KEYWORD_NONBIM,
+				trim(kword, left, right) = 'SLGAZ-PO' =>SubGroup_Constants.numKeywordsID.KEYWORD_SLGAZ_PO,
+				trim(kword, left, right) = 'NIB' =>SubGroup_Constants.numKeywordsID.KEYWORD_NIB,
+				trim(kword, left, right) = 'BRIBAMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRIBAMA,
+				trim(kword, left, right) = 'CARBQ' =>SubGroup_Constants.numKeywordsID.KEYWORD_CARBQ,
+				trim(kword, left, right) = 'AZFMS-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_AZFMS_NAT,
+				trim(kword, left, right) = 'BECA' =>SubGroup_Constants.numKeywordsID.KEYWORD_BECA,
+				trim(kword, left, right) = 'OFAC-NICHRAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_NICHRAA,
+				trim(kword, left, right) = 'CANSEMNIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMNIC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

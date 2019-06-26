@@ -1,4 +1,5 @@
 ﻿import header,ut,dops;
+
 #WORKUNIT('protect',true);
 #WORKUNIT('priority','high');
 #WORKUNIT('priority',11);
@@ -15,9 +16,10 @@
 build_version:= header.version_build;
 dops_datasetname:='PersonHeaderKeys';
 build_component:='BASE BUILD:XADL';
-dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
 
-sequential(dlog,Header.proc_postHeaderBuilds.XADLkeys);
+dlog:=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,build_component);
+sequential(dlog,Header.proc_postHeaderBuilds().XADLkeys);
+
 // builds a) XADL2 keys b)re-ADL external sources c)XADL1 base files.
 // a and b must have completed successfuly before
 // relatives may start.
@@ -25,6 +27,10 @@ sequential(dlog,Header.proc_postHeaderBuilds.XADLkeys);
 // External re-ADL 4-6hrs
 // XADL1 base files 48-72hrs
 
+//20190324 W20190414-185935
+//20190225 W20190315-092116
+//20181224 W20190212-104608
+//20181023 W20181115-075003
 //20180821 W20180910-164805
 //20180724 W20180710-092919
 //20180626 W20180710-092919

@@ -2,8 +2,15 @@
 EXPORT Fields := MODULE
  
 // Processing for each FieldType
-EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'zip5','alpha_st','DFLT');
-EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'zip5' => 1,'alpha_st' => 2,'DFLT' => 3,0);
+EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'sec_range','zip5','alpha_st','DFLT');
+EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'sec_range' => 1,'zip5' => 2,'alpha_st' => 3,'DFLT' => 4,0);
+ 
+EXPORT MakeFT_sec_range(SALT37.StrType s0) := FUNCTION
+  s1 := SALT37.stringfilter(s0,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_sec_range(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
+EXPORT InValidMessageFT_sec_range(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_zip5(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -27,8 +34,8 @@ END;
 EXPORT InValidFT_DFLT(SALT37.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0);
 EXPORT InValidMessageFT_DFLT(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotLeft,SALT37.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','v_city_name','st','zip5');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'prim_range' => 0,'predir' => 1,'prim_name' => 2,'addr_suffix' => 3,'postdir' => 4,'unit_desig' => 5,'sec_range' => 6,'v_city_name' => 7,'st' => 8,'zip5' => 9,0);
+EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'prim_range','predir','prim_name_derived','addr_suffix_derived','postdir','err_stat','unit_desig','sec_range','v_city_name','st','zip5');
+EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'prim_range' => 0,'predir' => 1,'prim_name_derived' => 2,'addr_suffix_derived' => 3,'postdir' => 4,'err_stat' => 5,'unit_desig' => 6,'sec_range' => 7,'v_city_name' => 8,'st' => 9,'zip5' => 10,0);
  
 //Individual field level validation
  
@@ -40,25 +47,29 @@ EXPORT Make_predir(SALT37.StrType s0) := s0;
 EXPORT InValid_predir(SALT37.StrType s) := 0;
 EXPORT InValidMessage_predir(UNSIGNED1 wh) := '';
  
-EXPORT Make_prim_name(SALT37.StrType s0) := MakeFT_DFLT(s0);
-EXPORT InValid_prim_name(SALT37.StrType s) := InValidFT_DFLT(s);
-EXPORT InValidMessage_prim_name(UNSIGNED1 wh) := InValidMessageFT_DFLT(wh);
+EXPORT Make_prim_name_derived(SALT37.StrType s0) := s0;
+EXPORT InValid_prim_name_derived(SALT37.StrType s) := 0;
+EXPORT InValidMessage_prim_name_derived(UNSIGNED1 wh) := '';
  
-EXPORT Make_addr_suffix(SALT37.StrType s0) := s0;
-EXPORT InValid_addr_suffix(SALT37.StrType s) := 0;
-EXPORT InValidMessage_addr_suffix(UNSIGNED1 wh) := '';
+EXPORT Make_addr_suffix_derived(SALT37.StrType s0) := s0;
+EXPORT InValid_addr_suffix_derived(SALT37.StrType s) := 0;
+EXPORT InValidMessage_addr_suffix_derived(UNSIGNED1 wh) := '';
  
 EXPORT Make_postdir(SALT37.StrType s0) := s0;
 EXPORT InValid_postdir(SALT37.StrType s) := 0;
 EXPORT InValidMessage_postdir(UNSIGNED1 wh) := '';
  
+EXPORT Make_err_stat(SALT37.StrType s0) := s0;
+EXPORT InValid_err_stat(SALT37.StrType s) := 0;
+EXPORT InValidMessage_err_stat(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_unit_desig(SALT37.StrType s0) := s0;
 EXPORT InValid_unit_desig(SALT37.StrType s) := 0;
 EXPORT InValidMessage_unit_desig(UNSIGNED1 wh) := '';
  
-EXPORT Make_sec_range(SALT37.StrType s0) := s0;
-EXPORT InValid_sec_range(SALT37.StrType s) := 0;
-EXPORT InValidMessage_sec_range(UNSIGNED1 wh) := '';
+EXPORT Make_sec_range(SALT37.StrType s0) := MakeFT_sec_range(s0);
+EXPORT InValid_sec_range(SALT37.StrType s) := InValidFT_sec_range(s);
+EXPORT InValidMessage_sec_range(UNSIGNED1 wh) := InValidMessageFT_sec_range(wh);
  
 EXPORT Make_v_city_name(SALT37.StrType s0) := s0;
 EXPORT InValid_v_city_name(SALT37.StrType s) := 0;
@@ -95,9 +106,10 @@ Bad_Pivots := %t2%(Cnt>100);
   %dl% := RECORD
     BOOLEAN Diff_prim_range;
     BOOLEAN Diff_predir;
-    BOOLEAN Diff_prim_name;
-    BOOLEAN Diff_addr_suffix;
+    BOOLEAN Diff_prim_name_derived;
+    BOOLEAN Diff_addr_suffix_derived;
     BOOLEAN Diff_postdir;
+    BOOLEAN Diff_err_stat;
     BOOLEAN Diff_unit_desig;
     BOOLEAN Diff_sec_range;
     BOOLEAN Diff_v_city_name;
@@ -110,16 +122,17 @@ Bad_Pivots := %t2%(Cnt>100);
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
     SELF.Diff_prim_range := le.prim_range <> ri.prim_range;
     SELF.Diff_predir := le.predir <> ri.predir;
-    SELF.Diff_prim_name := le.prim_name <> ri.prim_name;
-    SELF.Diff_addr_suffix := le.addr_suffix <> ri.addr_suffix;
+    SELF.Diff_prim_name_derived := le.prim_name_derived <> ri.prim_name_derived;
+    SELF.Diff_addr_suffix_derived := le.addr_suffix_derived <> ri.addr_suffix_derived;
     SELF.Diff_postdir := le.postdir <> ri.postdir;
+    SELF.Diff_err_stat := le.err_stat <> ri.err_stat;
     SELF.Diff_unit_desig := le.unit_desig <> ri.unit_desig;
     SELF.Diff_sec_range := le.sec_range <> ri.sec_range;
     SELF.Diff_v_city_name := le.v_city_name <> ri.v_city_name;
     SELF.Diff_st := le.st <> ri.st;
     SELF.Diff_zip5 := le.zip5 <> ri.zip5;
     SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip5,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name_derived,1,0)+ IF( SELF.Diff_addr_suffix_derived,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_err_stat,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_st,1,0)+ IF( SELF.Diff_zip5,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -134,9 +147,10 @@ Bad_Pivots := %t2%(Cnt>100);
   %AggRec% := RECORD
     Count_Diff_prim_range := COUNT(GROUP,%Closest%.Diff_prim_range);
     Count_Diff_predir := COUNT(GROUP,%Closest%.Diff_predir);
-    Count_Diff_prim_name := COUNT(GROUP,%Closest%.Diff_prim_name);
-    Count_Diff_addr_suffix := COUNT(GROUP,%Closest%.Diff_addr_suffix);
+    Count_Diff_prim_name_derived := COUNT(GROUP,%Closest%.Diff_prim_name_derived);
+    Count_Diff_addr_suffix_derived := COUNT(GROUP,%Closest%.Diff_addr_suffix_derived);
     Count_Diff_postdir := COUNT(GROUP,%Closest%.Diff_postdir);
+    Count_Diff_err_stat := COUNT(GROUP,%Closest%.Diff_err_stat);
     Count_Diff_unit_desig := COUNT(GROUP,%Closest%.Diff_unit_desig);
     Count_Diff_sec_range := COUNT(GROUP,%Closest%.Diff_sec_range);
     Count_Diff_v_city_name := COUNT(GROUP,%Closest%.Diff_v_city_name);

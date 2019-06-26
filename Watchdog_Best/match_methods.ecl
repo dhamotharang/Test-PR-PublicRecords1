@@ -82,11 +82,10 @@ EXPORT match_fname(TYPEOF(h.fname) L, TYPEOF(h.fname) R, UNSIGNED1 LL = 0, UNSIG
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
-EXPORT match_mname(TYPEOF(h.mname) L, TYPEOF(h.mname) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_mname(TYPEOF(h.mname) L, TYPEOF(h.mname) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT311.MatchCode.ExactMatch,
 	LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT311.MatchCode.InitialLMatch,
 	LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT311.MatchCode.InitialRMatch,
-	Config.WithinEditN(L,LL,R,RL,1,0)=> SALT311.MatchCode.EditDistanceMatch,
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
@@ -205,6 +204,11 @@ EXPORT match_persistent_record_id(TYPEOF(h.persistent_record_id) L, TYPEOF(h.per
    MAP(L = R => SALT311.MatchCode.ExactMatch,
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
+);
+EXPORT match_lastname(TYPEOF(h.lastname) L,TYPEOF(h.lastname) R, BOOLEAN RequiredField = FALSE) :=  IF(~RequiredField,
+    MAP(L = R => SALT311.MatchCode.ExactMatch,
+      SALT311.MatchCode.NoMatch),
+        MAP(L = R => SALT311.MatchCode.ExactMatch,SALT311.MatchCode.NoMatch)
 );
 EXPORT match_ssnum(TYPEOF(h.ssnum) L,TYPEOF(h.ssnum) R, BOOLEAN RequiredField = FALSE) :=  IF(~RequiredField,
     MAP(L = R => SALT311.MatchCode.ExactMatch,
