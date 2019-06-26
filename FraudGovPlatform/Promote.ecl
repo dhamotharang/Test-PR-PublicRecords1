@@ -6,7 +6,7 @@ export Promote(
 
 	 string pversion = ''
 	,string pFilter = ''
-	,boolean pDelete = false
+	,boolean pDelete = true
 	,boolean pIsTesting = false
 	,dataset(lay_inputs) pInputFilenames = 	Filenames(pversion).Input.dAll_filenames
 	,dataset(lay_builds) pBuildFilenames = 	Filenames(pversion).dAll_filenames
@@ -47,6 +47,7 @@ module
 	end;
 	export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
 	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
+	export rollbackinput := tools.mod_RollbackInput(pInputFilenames,pFilter,pDelete,pIsTesting);
 
 
 	export promote_sprayed_files := sequential(
@@ -65,7 +66,7 @@ module
 
 	export promote_keys := sequential(
 			// Promote Shared Files
-			  FraudShared.Promote().buildfiles.Built2QA			
+			  FraudShared.Promote(pDelete := pDelete).buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			, FraudShared.Promote().buildfiles.cleanup	
 			//Remove the Demo file from father sf, which was moved from qa as a promote routeine

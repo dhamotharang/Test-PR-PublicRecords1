@@ -25,7 +25,7 @@
 
   
   //exclude high frequence clusters.
-  tempFullCluster := JOIN(OttoFullGraph, HighFrequencyExclusionList, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, LEFT ONLY, LOOKUP);
+  SHARED tempFullCluster := JOIN(OttoFullGraph, HighFrequencyExclusionList, LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, LEFT ONLY, LOOKUP);
   
   //KELOtto.KelFiles.FullCluster
   topstuff := tempFullCluster((cl_high_risk_pattern1_flag_ = 1 OR cl_high_risk_pattern2_flag_ = 1 OR cl_high_risk_pattern3_flag_ = 1 OR cl_high_risk_pattern4_flag_ = 1 OR cl_high_risk_pattern5_flag_ = 1) AND cl_identity_count_ < 51 AND tree_uid_=entity_context_uid_);
@@ -46,24 +46,34 @@
   ts4 := topn(GROUP(SORT(topstuff((cl_high_risk_pattern3_flag_ = 0 AND (cl_high_risk_pattern1_flag_ = 1 OR cl_high_risk_pattern2_flag_ = 1) )), customer_id_, industry_type_, SKEW(1)), customer_id_, industry_type_, SKEW(1)), 5000, -cl_impact_weight_, SKEW(1));
   //count(ts4);
 
-  MainClustersPrep1 := DEDUP(SORT(topnormalstuff + ts1 + ts2 + ts3 + ts4, customer_id_, industry_type_, entity_context_uid_), customer_id_, industry_type_, entity_context_uid_);
+  EXPORT MainClustersPrep1 := DEDUP(SORT(topnormalstuff + ts1 + ts2 + ts3 + ts4, customer_id_, industry_type_, entity_context_uid_), customer_id_, industry_type_, entity_context_uid_);
   //count(MainClustersPrep1);
 
-  MainClustersPrep2 := JOIN(MainClustersPrep1, tempFullCluster, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_ and LEFT.entity_context_uid_ != RIGHT.entity_context_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.entity_context_uid_, SELF := LEFT), HASH);
-  MainClustersPrep3 := JOIN(MainClustersPrep2, topstuff, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.RelatedEntityContextUid = RIGHT.entity_context_uid_, TRANSFORM({RECORDOF(LEFT), INTEGER1 AssociatedClusterScore, INTEGER IsHigher}, 
+  EXPORT MainClustersPrep2_1 := JOIN(MainClustersPrep1, tempFullCluster, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.tree_uid_ and LEFT.entity_context_uid_ != RIGHT.entity_context_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.entity_context_uid_, SELF := LEFT), HASH);
+
+  EXPORT MainClustersPrep2_2 := JOIN(MainClustersPrep1, tempFullCluster, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_ = RIGHT.entity_context_uid_ and LEFT.entity_context_uid_ != RIGHT.tree_uid_, TRANSFORM({RECORDOF(LEFT), STRING RelatedEntityContextUid}, SELF.RelatedEntityContextUid := RIGHT.tree_uid_, SELF := LEFT), KEEP(1), HASH);
+
+  EXPORT MainClustersPrep2 := MainClustersPrep2_1 + MainClustersPrep2_2;
+	
+	EXPORT MainClustersPrep3 := JOIN(MainClustersPrep2, MainClustersPrep1, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.RelatedEntityContextUid = RIGHT.entity_context_uid_, TRANSFORM({RECORDOF(LEFT), INTEGER1 AssociatedClusterScore, INTEGER IsHigher}, 
                             SELF.IsHigher := MAP(LEFT.cluster_score_ > RIGHT.cluster_score_ OR (left.cluster_score_ = RIGHT.cluster_score_ AND LEFT.entity_context_uid_ > RIGHT.entity_context_uid_) OR RIGHT.entity_context_uid_ = '' => 1, 0),
                             SELF.AssociatedClusterScore := RIGHT.cluster_score_, SELF := LEFT), HASH);
 
-  MainClustersPrep4 := TABLE(MainClustersPrep3, {customer_id_, industry_type_, entity_context_uid_, cluster_score_, HigherPercent := AVE(GROUP, IsHigher)}, customer_id_, industry_type_, entity_context_uid_, cluster_score_, MERGE);
-  MainClusters := JOIN(MainClustersPrep1, MainClustersPrep4(HigherPercent=1), LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_, 
+  EXPORT MainClustersPrep4 := TABLE(MainClustersPrep3, {customer_id_, industry_type_, entity_context_uid_, cluster_score_, HigherPercent := AVE(GROUP, IsHigher)}, customer_id_, industry_type_, entity_context_uid_, cluster_score_, MERGE);
+	// exclude any clusters that are not the higher, leaving clusters that don't have any connected clusters there too.
+  EXPORT MainClusters := JOIN(MainClustersPrep1, MainClustersPrep4(HigherPercent<1), LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_, 
 	                           TRANSFORM(RECORDOF(LEFT), 
 														 SELF.kr_high_risk_flag_ := 3, // THIS IS A TEMPORARY HACK TO FLAG HIGH RISK CLUSTERS ONLY.
-														 SELF := LEFT), LOOKUP);
+														 SELF := LEFT), LEFT ONLY, LOOKUP);
+
 
   // Top Identities
-  
+
   TopIdentitiesPrep1 := tempFullCluster(tree_uid_=entity_context_uid_ AND entity_type_ = 1 AND score_ > 60  /*cl_event_count_percentile_ > 85*/ AND cl_identity_count_ < 50);
-  TopIdentitiesPrep2 := topn(GROUP(SORT(TopIdentitiesPrep1, customer_id_, industry_type_, skew(1)), customer_id_, industry_type_, SKEW(1)), 1000, customer_id_, industry_type_, -cl_impact_weight_, SKEW(1));
+  // FILTER OUT MINORS
+	TopIdentitiesPrep1_1 := JOIN(TopIdentitiesPrep1, KELOtto.Q__show_Customer_Person.Res0(Age_ < 20), LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_=RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, SMART);
+  
+  EXPORT TopIdentitiesPrep2 := topn(GROUP(SORT(TopIdentitiesPrep1_1, customer_id_, industry_type_, skew(1)), customer_id_, industry_type_, SKEW(1)), 1000, customer_id_, industry_type_, -cl_impact_weight_, SKEW(1));
 
 
   //count(TopIdentitiesPrep2);

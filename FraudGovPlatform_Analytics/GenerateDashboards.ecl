@@ -36,5 +36,11 @@ EXPORT GenerateDashboards(
 	dRunClusDetailsDashboard	:= FraudGovPlatform_Analytics.fnRunClusterDetailsDashboard(runProd, useProdData, newVersion);
 	RunCustDashboard 					:= OUTPUT(dRunCustDashboard);
 	RunClusDetailsDashboard 	:= OUTPUT(dRunClusDetailsDashboard);
-	RETURN SEQUENTIAL(RunCustDashboard, RunClusDetailsDashboard);
+	
+	//QA Dashboards - ONLY run when runProd is set to FALSE
+	dRunPersonStatsDeltaDashboard		:= FraudGovPlatform_Analytics.fnRunPersonStatsDeltaDashboard();
+	dRunNewClusterRecordsDashboard	:= FraudGovPlatform_Analytics.fnRunNewClusterRecordsDashboard();
+	RunPersonStatsDeltaDashboard		:= OUTPUT(dRunPersonStatsDeltaDashboard);
+	RunNewClusterRecordsDashboard 	:= OUTPUT(dRunNewClusterRecordsDashboard);
+	RETURN PARALLEL(SEQUENTIAL(RunCustDashboard, RunClusDetailsDashboard), IF(~runProd, SEQUENTIAL(RunPersonStatsDeltaDashboard, RunNewClusterRecordsDashboard)));
 END;

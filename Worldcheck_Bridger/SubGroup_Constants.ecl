@@ -1128,6 +1128,13 @@
 		export string KEYWORD_NLACM									:= '814';
 		export string KEYWORD_NONBIM								:= '815';
 		export string KEYWORD_SLGAZ_PO							:= '816';
+		export string KEYWORD_NIB										:= '817';
+		export string KEYWORD_BRIBAMA								:= '818';
+		export string KEYWORD_CARBQ									:= '819';
+		export string KEYWORD_AZFMS_NAT							:= '820';
+		export string KEYWORD_BECA									:= '821';
+		export string KEYWORD_OFAC_NICHRAA					:= '822';
+		export string KEYWORD_CANSEMNIC							:= '823';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

@@ -49,6 +49,13 @@ Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_InquiryLogsInputPrepSchedule:=if(d=0,Go,noGo);
 
 //10AM
+wuname:='FraudGov RDP Input Prep Schedule';
+d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
+ECL:='FraudGovPlatform_Validation._CRON_RDPInputPrepSchedule;';
+Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
+EXPORT CRON_RDPInputPrepSchedule:=if(d=0,Go,noGo);
+
+//10AM
 wuname:='FraudGov NAC Input Prep Schedule';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
 ECL:='FraudGovPlatform_Validation._CRON_NACInputPrepSchedule;';
@@ -66,6 +73,7 @@ Go:=sequential(
 						 CRON_DeltabaseInputPrepSchedule
 						,CRON_InputPrepSchedule
 						,CRON_InquiryLogsInputPrepSchedule
+						,CRON_RDPInputPrepSchedule
 						,CRON_MBSInputPrepSchedule
 						,CRON_NACInputPrepSchedule
 						,CRON_Base_Schedule

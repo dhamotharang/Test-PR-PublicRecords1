@@ -1,5 +1,4 @@
-﻿//Prte2.layouts.DEFLT_CPA will probably not be needed in this BWR. Awaiting production update of PhoneMart.layouts.base.
-
+﻿
 import PhoneMart, STD,PRTE2, _control, PRTE;  
 
 skipDOPS:=false;
@@ -18,6 +17,8 @@ dPhoneMart_base_slim := PROJECT(dPhoneMart_base,layout_key_base);
 
 didKey := INDEX(dPhoneMart_base_slim,{unsigned6 l_did := did},{dPhoneMart_base_slim},prte2.constants.prefix + 'key::phonemart::' + pversion + '::did'); 
 
+phoneKey := INDEX(dPhoneMart_base_slim,{phone},{dPhoneMart_base_slim},prte2.constants.prefix + 'key::phonemart::' + pversion + '::phone'); 
+
 //---------- making DOPS optional -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it'); 
@@ -26,6 +27,8 @@ didKey := INDEX(dPhoneMart_base_slim,{unsigned6 l_did := did},{dPhoneMart_base_s
 	PerformUpdateOrNot	:= IF(not skipDops,updatedops,NoUpdate);
 
 BUILD(didKey);
+BUILD(phoneKey);
+
 PerformUpdateOrNot;
 
 output ('successful');

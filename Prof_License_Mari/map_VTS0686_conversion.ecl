@@ -1,4 +1,4 @@
-/* Converting Vermont Dept of Banking Insurance Securities Professional License File to MARI common layout
+﻿/* Converting Vermont Dept of Banking Insurance Securities Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 
@@ -53,7 +53,7 @@ Prof_License_Mari.layouts_reference.MARIBASE	xformToCommon(Prof_License_Mari.lay
 		self.STD_SOURCE_DESC  := '';
 		self.TYPE_CD					:= 'GR';
 		
-		TrimNAME_ORG := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.COMP_NAME);
+		TrimNAME_ORG := ut.CleanSpacesAndUpper(pInput.COMP_NAME);
 		StdNAME_ORG	 := Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_ORG);
 		CleanNAME_ORG	:= MAP(StringLib.stringfind(StdNAME_ORG,'.COM',1) > 0 => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_ORG),
 								   REGEXFIND('^([A-Za-z ]*)(CORP)[ ](INC)',TRIM(StdNAME_ORG,left,right))
@@ -68,7 +68,7 @@ Prof_License_Mari.layouts_reference.MARIBASE	xformToCommon(Prof_License_Mari.lay
 		self.NAME_ORG_SUFX	  := Prof_License_Mari.mod_clean_name_addr.strippunctName(
 																	Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_ORG));
 	  
-		TrimNAME_DBA	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.TRADE_NAME);
+		TrimNAME_DBA	:= ut.CleanSpacesAndUpper(pInput.TRADE_NAME);
 		StdNAME_DBA		:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_DBA);
 		CleanNAME_DBA	:= MAP( StringLib.stringfind(StdNAME_DBA,'.COM',1) > 0 => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_DBA),
 													REGEXFIND('^([A-Za-z ]*)(CORP)[ ](INC)',TRIM(StdNAME_DBA,left,right))
@@ -94,8 +94,8 @@ Prof_License_Mari.layouts_reference.MARIBASE	xformToCommon(Prof_License_Mari.lay
 	// License Information
 		self.LICENSE_NBR	    := pInput.LIC_NUMR;
 		self.LICENSE_STATE	  := 'VT';
-		self.RAW_LICENSE_TYPE	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CODE1);
-		self.STD_LICENSE_TYPE := CASE(Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC),
+		self.RAW_LICENSE_TYPE	:= ut.CleanSpacesAndUpper(pInput.CODE1);
+		self.STD_LICENSE_TYPE := CASE(ut.CleanSpacesAndUpper(pInput.LIC),
 																	// 'CHECK CASHER '  => 'CC',
 																	// 'DEBT ADJUSTER'  => 'DA',
 																	// 'MONEY TRANSMITTER' => 'MT',
@@ -127,8 +127,8 @@ Prof_License_Mari.layouts_reference.MARIBASE	xformToCommon(Prof_License_Mari.lay
 		self.NAME_MARI_DBA	  := StdNAME_DBA;
 
 	//Prepping Address field 
-		TrimAddress1 := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1);
-		TrimAddress2 := Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS2);
+		TrimAddress1 := ut.CleanSpacesAndUpper(pInput.ADDRESS1);
+		TrimAddress2 := ut.CleanSpacesAndUpper(pInput.ADDRESS2);
 		
 		self.ADDR_BUS_IND			:= IF(TRIM(TrimAddress1 + pInput.CITY + pInput.ZIP) != '','B','');
 		self.ADDR_ADDR1_1		:= MAP(	StringLib.stringfind(TrimAddress1,',',2)> 0 and REGEXFIND('^([R][Ff]?[Dd]?[Rr]?[\\#]?[0-9]+),',TrimAddress1) =>
@@ -158,9 +158,9 @@ Prof_License_Mari.layouts_reference.MARIBASE	xformToCommon(Prof_License_Mari.lay
 																											   
 		
 		
-		TrimCity	:=  Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY);
+		TrimCity	:=  ut.CleanSpacesAndUpper(pInput.CITY);
 		self.ADDR_CITY_1		:= TrimCity;
-		self.ADDR_STATE_1		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE);
+		self.ADDR_STATE_1		:= ut.CleanSpacesAndUpper(pInput.STATE);
 		ParsedZIP           := IF(LENGTH(pInput.ZIP) = 4, '0' + pInput.ZIP,
 															IF(REGEXFIND('[0-9]{5}(-[0-9]{4})?',pInput.ZIP),pInput.ZIP,
 																	pInput.ZIP)
@@ -181,9 +181,9 @@ Prof_License_Mari.layouts_reference.MARIBASE	xformToCommon(Prof_License_Mari.lay
 																			+trim(self.std_license_type,left,right)
 																			+trim(self.std_source_upd,left,right)
 																			+trim(self.NAME_ORG,left,right)
-																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1)
-																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY)
-																			+Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP));
+																			+ut.CleanSpacesAndUpper(pInput.ADDRESS1)
+																			+ut.CleanSpacesAndUpper(pInput.CITY)
+																			+ut.CleanSpacesAndUpper(pInput.ZIP));
 																								   
 																							  
 		self.PCMC_SLPK		:= 0;

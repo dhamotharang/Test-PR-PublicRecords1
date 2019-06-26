@@ -2,6 +2,8 @@
 
 	//DF-24397: Create Dx-Prefixed Keys
 	//DF-24599: Add Transaction_Count, Transaction_End_Dt & Transaction_End_Time Fields to Transaction File
+	//DF-25056: Update Phone Transaction Logic - Account for Deact Swap Changes
+	//DF-25238: Add "ocn" Field and Append Carrier Info to Deact Records
 
 //Pull Records from Deact History File
 	deactHist 	:= PhonesInfo.File_Deact.History2;
@@ -21,7 +23,7 @@
 		self.timestamp									:= stringlib.stringfilter(l.timestamp, '0123456789');
 		self.phone											:= l.msisdn[2..];
 		self.phone_swap									:= l.msisdnnew[2..];
-		self.changeid										:= l.changeid;
+		self.changeid										:= stringlib.stringfilter(l.changeid, '0123456789'); //Remove "-"; Creates sorting issues.
 		self.operatorid									:= l.operatorid;
 		self.filename										:= '';
 	end;
@@ -74,7 +76,7 @@
 	
 	//Concat All Records
 	concatAll 	:= nonSWRec + concatSW;
-
+	
 //////////////////////////////////////////////////////////////	
 //Map Records to Common Deact Layout//////////////////////////
 //////////////////////////////////////////////////////////////
@@ -101,82 +103,86 @@
 	end;
 
 	inFile			:= project(concatAll, fixF(left, counter));
-
+	notSA				:= inFile(action_code<>PhonesInfo.TransactionCode.SwapAdd);
+	allSA				:= inFile(action_code=PhonesInfo.TransactionCode.SwapAdd);
+	
 //////////////////////////////////////////////////////////////	
 //Populate Transaction Dates//////////////////////////////////
 //////////////////////////////////////////////////////////////
 
-	fixFields_d := distribute(inFile, hash(phone));
+	fixFields_d := distribute(notSA, hash(phone));
 	fixFields_s := sort(fixFields_d, phone, -(integer)changeid, carrier_name, -if(action_code in [PhonesInfo.TransactionCode.Deact, PhonesInfo.TransactionCode.Suspend], 1, 2), local);
 	fixFields_g := group(fixFields_s, phone);
-	
+	  
 	PhonesInfo.Layout_Deact.Temp2 iter1(fixFields_g l, fixFields_g r) := transform
 	//conditions to determine when to rollup into one record
-	sameCarrierDate	:= l.carrier_name = r.carrier_name 		and l.timestamp[1..8] = r.timestamp[1..8];
+	  sameCarrierDate			:= l.carrier_name = r.carrier_name 		and l.timestamp[1..8] = r.timestamp[1..8];
 		consecDESU 					:= r.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 	and l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend];
 		REafterDESU 				:= r.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 	and l.action_code in [PhonesInfo.TransactionCode.React];
-		SWafterDESU					:= r.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 	and l.action_code in [PhonesInfo.TransactionCode.SwapAdd,PhonesInfo.TransactionCode.SwapDelete];
+		SDafterDESU					:= r.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 	and l.action_code in [PhonesInfo.TransactionCode.SwapDelete];
 			
-		consecRE 						:= r.action_code in [PhonesInfo.TransactionCode.React] 																					and l.action_code in [PhonesInfo.TransactionCode.React];
+		consecRE 						:= r.action_code in [PhonesInfo.TransactionCode.React] 				and l.action_code in [PhonesInfo.TransactionCode.React];
 		
-		DESUafterRE 				:= r.action_code in [PhonesInfo.TransactionCode.React] 																					and l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend];
-		SWafterRE						:= r.action_code in [PhonesInfo.TransactionCode.React] 																					and l.action_code in [PhonesInfo.TransactionCode.SwapAdd,PhonesInfo.TransactionCode.SwapDelete];
+		DESUafterRE 				:= r.action_code in [PhonesInfo.TransactionCode.React] 				and l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend];
+		SDafterRE						:= r.action_code in [PhonesInfo.TransactionCode.React] 				and l.action_code in [PhonesInfo.TransactionCode.SwapDelete];
 
-		consecSA 						:= r.action_code in [PhonesInfo.TransactionCode.SwapAdd] 																				and l.action_code in [PhonesInfo.TransactionCode.SwapAdd];
-		consecSD 						:= r.action_code in [PhonesInfo.TransactionCode.SwapDelete] 																		and l.action_code in [PhonesInfo.TransactionCode.SwapDelete];
-		DESUafterSW					:= r.action_code in [PhonesInfo.TransactionCode.SwapAdd,PhonesInfo.TransactionCode.SwapDelete] 	and l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend];
-		REafterSW						:= r.action_code in [PhonesInfo.TransactionCode.SwapAdd,PhonesInfo.TransactionCode.SwapDelete] 	and l.action_code in [PhonesInfo.TransactionCode.React];
+		consecSD 						:= r.action_code in [PhonesInfo.TransactionCode.SwapDelete] 	and l.action_code in [PhonesInfo.TransactionCode.SwapDelete];
+		
+		DESUafterSD					:= r.action_code in [PhonesInfo.TransactionCode.SwapDelete] 	and l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend];
+		REafterSD						:= r.action_code in [PhonesInfo.TransactionCode.SwapDelete] 	and l.action_code in [PhonesInfo.TransactionCode.React];
 
 		isLastDESU 					:= l.phone <> r.phone and r.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend];
 		isLastRE 						:= l.phone <> r.phone and r.action_code in [PhonesInfo.TransactionCode.React];
-		isLastSW 						:= l.phone <> r.phone and r.action_code in [PhonesInfo.TransactionCode.SwapAdd,PhonesInfo.TransactionCode.SwapDelete];
+		isLastSD 						:= l.phone <> r.phone and r.action_code in [PhonesInfo.TransactionCode.SwapDelete];
 			
 	//Transactions to be rolled up into one record have the same groupid		
-		self.groupid 										:= if(((consecDESU or consecRE or SWafterDESU or SWafterRE) and sameCarrierDate) or
-																					((consecSA or consecSD) and sameCarrierDate and l.phone_swap = r.phone_swap) or
-																					(REafterDESU and l.carrier_name = r.carrier_name), l.groupid, 
+		self.groupid 										:= if(((consecDESU or consecRE or SDafterDESU or SDafterRE) and sameCarrierDate) or
+																					((consecSD and sameCarrierDate and l.phone_swap = r.phone_swap) or
+																					(REafterDESU and l.carrier_name = r.carrier_name)), l.groupid, 
 																					r.groupid); 
 		self.deact_code									:= r.deact_code;		
 		self.deact_end_dt 							:= if(isLastDESU, 0, 
 																				if(consecDESU and ~sameCarrierDate, l.deact_start_dt, 
 																				if(REafterDESU and ~sameCarrierDate, l.react_start_dt,
-																				if(SWafterDESU and ~sameCarrierDate, l.swap_start_dt,
+																				if(SDafterDESU and ~sameCarrierDate, l.swap_start_dt,
 																				r.deact_end_dt))));	
 		self.react_end_dt 							:= if(isLastRE, 0, 
 																				if(consecRE and ~sameCarrierDate, l.react_start_dt, 
 																				if(DESUafterRE and ~sameCarrierDate, l.deact_start_dt,
-																				if(SWafterRE and ~sameCarrierDate, l.swap_start_dt,
+																				if(SDafterRE and ~sameCarrierDate, l.swap_start_dt,
 																				r.react_start_dt))));	
-		self.swap_end_dt 								:= if(isLastSW, 0, 
-																				if((consecSA or consecSD) and ~sameCarrierDate, l.swap_start_dt,
-																				if(DESUafterSW and ~sameCarrierDate, l.deact_start_dt,
-																				if(REafterSW and ~sameCarrierDate, l.react_start_dt,
+		self.swap_end_dt 								:= if(isLastSD, 0, 
+																				if(consecSD and ~sameCarrierDate, l.swap_start_dt,
+																				if(DESUafterSD and ~sameCarrierDate, l.deact_start_dt,
+																				if(REafterSD and ~sameCarrierDate, l.react_start_dt,
 																				r.swap_end_dt))));
-		self.is_deact										:= if(isLastDESU or isLastSW, 'Y', 'N');
+		self.is_deact										:= if(isLastDESU or isLastSD, 'Y', 'N');
 		self.is_react										:= if(isLastRE, 'Y', 'N');
 		self 														:= r;
 	end;		
 			
 	tagGroups 	:= iterate(fixFields_g, iter1(left,right));
 	tagGroups_ug:= ungroup(tagGroups);
+	concatTag		:= tagGroups_ug + allSA;
 	
 //////////////////////////////////////////////////////////////	
 //Transform File to Transaction Base Layout///////////////////
 //////////////////////////////////////////////////////////////
 
-	dx_PhonesInfo.Layouts.Phones_Transaction_Main fixTr(tagGroups_ug l):= transform
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main fixTr(concatTag l):= transform
 		self.source											:= Mdr.SourceTools.src_Phones_Disconnect; //PX	
 		self.transaction_code						:= l.action_code;
 		self.vendor_first_reported_time	:= '';
 		self.vendor_last_reported_time 	:= '';
-		self.transaction_start_dt				:= map(l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 			=> l.deact_start_dt,
+		self.transaction_start_dt				:= map(l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 		=> l.deact_start_dt,
 																					l.action_code in [PhonesInfo.TransactionCode.React]  																				=> l.react_start_dt, 
 																					l.action_code in [PhonesInfo.TransactionCode.SwapAdd,PhonesInfo.TransactionCode.SwapDelete]	=> l.swap_start_dt,
 																						0);
 		self.transaction_start_time			:= '';
-		self.transaction_end_dt					:= map(l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 			=> l.deact_end_dt,
+		self.transaction_end_dt					:= map(l.action_code in [PhonesInfo.TransactionCode.Deact,PhonesInfo.TransactionCode.Suspend] 		=> l.deact_end_dt,
 																					l.action_code in [PhonesInfo.TransactionCode.React]  																				=> l.react_end_dt, 
-																					l.action_code in [PhonesInfo.TransactionCode.SwapAdd,PhonesInfo.TransactionCode.SwapDelete]	=> l.swap_end_dt,
+																					l.action_code in [PhonesInfo.TransactionCode.SwapDelete]																		=> l.swap_end_dt,
+																					l.action_code in [PhonesInfo.TransactionCode.SwapAdd]																				=> l.swap_start_dt,
 																					0);
 		self.transaction_end_time				:= '';
 		self.transaction_count					:= 0;
@@ -185,30 +191,68 @@
 		self.routing_code								:= '';
 		self.dial_type									:= '';
 		self.spid												:= '';
+		self.ocn												:= '';
 		self.global_sid									:= 0;
 		self.record_sid									:= 0;
 		self 														:= l;
 	end;
 	
-	transLayout := project(tagGroups_ug, fixTr(left));
-
+	transLayout := project(concatTag, fixTr(left));
+	
+//////////////////////////////////////////////////////////////	
+//Append Carrier Related Info - Ocn/Spid//////////////////////
+//////////////////////////////////////////////////////////////
+		
+	//DF-25238: Append Ocn Field to Transaction Key Layout
+	
+	//Standardize Carrier Names from Phone Type File
+	pType				:= PhonesInfo.File_Phones_Type.Main(source in [mdr.sourceTools.src_Phones_Lerg6, mdr.sourceTools.src_Phones_LIDB]);
+			
+	tempLayout := record
+		pType;
+		string temp_carrier;
+	end;
+			
+	tempLayout addCr(pType l):= transform
+		fixCarrier := PhonesInfo._Functions.fn_standardName(l.carrier_name);
+				
+		self.temp_carrier								:= map(regexfind('ATT', fixCarrier, 0)<>'' 			=> 'ATT',
+																						regexfind('SPRINT', fixCarrier, 0)<>'' 		=> 'SPRINT',
+																						regexfind('TMOBILE', fixCarrier, 0)<>'' 	=> 'TMOBILE',
+																						regexfind('VERIZON', fixCarrier, 0)<>'' 	=> 'VERIZON',
+																						fixCarrier);
+		self														:= l;
+	end;
+			
+	fixPTyCarr:= project(pType, addCr(left));	
+			
+	//Append Carrier Related Info	to Transaction File
+	srtTrans		:= sort(distribute(transLayout, hash(phone)), phone, -vendor_last_reported_dt, carrier_name, local);	
+	srtPType		:= sort(distribute(fixPTyCarr, hash(phone)), phone, -vendor_last_reported_dt, temp_carrier, local);
+	
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main addOTr(srtTrans l, srtPType r):= transform
+		self.ocn												:= r.account_owner;	
+		self.spid												:= r.spid;
+		self 														:= l;
+	end;
+	
+	addOcn			:= join(srtTrans, srtPType,
+											trim(left.phone, left, right) = trim(right.phone, left, right) and
+											trim(left.carrier_name, left, right) = trim(right.temp_carrier, left, right),
+											addOTr(left, right), left outer, local, keep(1));
+	
+	ddAddOcn		:= dedup(sort(distribute(addOcn, hash(phone)), record, local), record, local);
+	
 //////////////////////////////////////////////////////////////	
 //Add Record_Sid//////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 
-	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(transLayout l):= transform
-		self.record_sid 								:= hash64(Mdr.SourceTools.src_Phones_Disconnect + 
-																							l.phone_swap + 
-																							l.source + 
-																							l.carrier_name + 
-																							l.transaction_code + 
-																							l.transaction_start_dt + 
-																							l.transaction_end_dt + 
-																							l.vendor_first_reported_dt) + (integer)l.phone;
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(ddAddOcn l):= transform
+		self.record_sid 								:= hash64(Mdr.SourceTools.src_Phones_Disconnect + l.phone_swap + l.source + l.carrier_name + l.transaction_code + l.transaction_start_dt + l.transaction_end_dt + l.vendor_first_reported_dt) + (integer)l.phone;
 		self 														:= l;
 	end;
 	
-	addID 			:= project(transLayout, trID(left))(transaction_code<>'' and phone<>'');
+	addID 			:= project(ddAddOcn, trID(left))(transaction_code<>'' and phone<>'');
 	
 //////////////////////////////////////////////////////////////	
 //Dedup Results///////////////////////////////////////////////

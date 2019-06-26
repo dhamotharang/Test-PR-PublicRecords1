@@ -118,7 +118,7 @@ END;
 basestrata_Reo := SORT(TABLE(basefile_Reo,rPopulationStats_Reo,fips_cd[1..2],few),fips_cd);
 
 STRATA.createXMLStats(basestrata_Reo,
-                      'BKForeclosure_Reo Stats',
+                      'BKForeclosure_Reo',
 					            'data',
 					            filedate,
 					            BKForeclosure.Roxie_Email_List,

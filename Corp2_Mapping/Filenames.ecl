@@ -300,11 +300,14 @@ module
 
 	export id_raw :=
 	module
-
-		export vendorRaw                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendorRaw::id',landing_zone,,,547,,pGroupname,,,'FIXED',,,,,);
-
+		export Filing 						       := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::id',landing_zone,,,,,pGroupname,,,'VARIABLE');
+		export FilingName 					     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filingname::id',landing_zone,,,,,pGroupname,,,'VARIABLE');
+		export Party 						         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::party::id',landing_zone,,,,,pGroupname,,,'VARIABLE');
+		
 		export dAll_filenames :=
-			  vendorRaw.dAll_filenames
+			  Filing.dAll_filenames
+			+ FilingName.dAll_filenames
+			+ Party.dAll_filenames
 			;
 
 	end;
