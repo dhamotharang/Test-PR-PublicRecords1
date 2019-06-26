@@ -1,4 +1,4 @@
-// Parameters
+﻿// Parameters
 
 // datasetname - same as dataset name in the package
 // buildversion - version used to build the roxie keys
@@ -9,8 +9,9 @@
 // Function - to check if the keys are built on thor
 import dops,_Control;
 EXPORT isRoxieKeysBuilt(string datasetname,string buildversion, string location,string eflag,string bool = 'N', string daliip = ''
-													,string dopsenv = dops.constants.dopsenvironment) := function
-	keysds := dops.GetRoxieKeys(datasetname,location,eflag,bool,'Y',dopsenv);
+													,string dopsenv = dops.constants.dopsenvironment
+													,string l_testenv = 'NA') := function
+	keysds := dops.GetRoxieKeys(datasetname,location,eflag,bool,'Y',dopsenv,l_testenv := l_testenv);
 	
 	recwithflag := record
 		string dsname;

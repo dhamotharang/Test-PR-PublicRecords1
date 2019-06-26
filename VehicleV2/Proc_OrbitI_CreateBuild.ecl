@@ -1,24 +1,12 @@
-import orbit,_Control;
+﻿import orbit,_Control,Orbit3Insurance;
 export Proc_OrbitI_CreateBuild(string pdate,string envment = 'nonfcra') := function
 
-	tokenval := orbit.GetToken();
+string pEnv := if ( envment = 'nonfcra' , 'N','F' );
 
-	createbuild := orbit.CreateBuild(orbitIConstants(envment).buildname,
-									orbitIConstants(envment).masterbuildname,
-									pdate,
-									orbitIConstants(envment).platform,
-									tokenval,
-									);
 
-					
-	return if(_Control.ThisEnvironment.Name = 'Prod_Thor', if( createbuild[1].retcode = 'Success',
-									output('OrbitI Create build success'),
-									fileservices.sendemail(
-												OrbitIConstants(envment).emaillist,
-												'Vehicle OrbitI Create Build:'+pdate+':FAILED',
-												'OrbitI Create build failed. Reason: ' + createbuild[1].retdesc)
-									),
-									output('Not a prod environment')
-									);
+
+create_build :=  Orbit3Insurance.Proc_Orbit3I_CreateBuild (VehicleV2.orbitIConstants(envment).masterbuildname, pdate,pEnv,'Charles.Pettola@lexisnexisrisk.com' ) ;
+
+return create_build;
 
 end;

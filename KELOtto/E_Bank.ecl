@@ -38,7 +38,7 @@ EXPORT E_Bank := MODULE
   EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Bank::UidLookup',EXPIRE(30));
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Bank::UidLookup',EXPIRE(7));
   EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::KELOtto::Bank');
   EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::KELOtto::Bank');
   EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
@@ -107,7 +107,7 @@ EXPORT E_Bank := MODULE
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Bank_Group,COUNT(ROWS(LEFT))=1),GROUP,Bank__Single_Rollup(LEFT)) + ROLLUP(HAVING(Bank_Group,COUNT(ROWS(LEFT))>1),GROUP,Bank__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::KELOtto::Bank::Result',EXPIRE(30));
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::KELOtto::Bank::Result',EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT _r_Customer__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_r_Customer_);
   EXPORT Routing_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Routing_Number_);

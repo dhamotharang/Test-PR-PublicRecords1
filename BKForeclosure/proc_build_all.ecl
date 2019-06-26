@@ -13,7 +13,7 @@ EXPORT proc_build_all (STRING filedate)	:= FUNCTION
 													,build_nod_base
 													,OUTPUT(COUNT(BKForeclosure.File_BK_Foreclosure.fNod(Delete_Flag = 'DELETE')),NAMED('TotalDel_NOD_out'))//True Deletes
 													,OUTPUT(COUNT(BKForeclosure.File_BK_Foreclosure.fNod(Delete_Flag <> 'DELETE')),NAMED('Total_NOD_out'))
-													//,NodPopulationStats
+													,NodPopulationStats
 													);
 													
 	//Build REO
@@ -28,11 +28,11 @@ EXPORT proc_build_all (STRING filedate)	:= FUNCTION
 													,build_reo_base
 													,OUTPUT(COUNT(BKForeclosure.File_BK_Foreclosure.fReo(Delete_Flag = 'DELETE')),NAMED('TotalDel_REO_out'))//True Deletes
 													,OUTPUT(COUNT(BKForeclosure.File_BK_Foreclosure.fReo(Delete_Flag <> 'DELETE')),NAMED('Total_REO_out'))
-													//,NodPopulationStats
+													,ReoPopulationStats
 													);												
 
-	// orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('BKForeclosure NOD',(string)version,'N')
-														// ,Orbit3.proc_Orbit3_CreateBuild_AddItem ('BKForeclosure REO',(string)version,'N')
+	// orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('BKForeclosure NOD',filedate,'N')
+														// ,Orbit3.proc_Orbit3_CreateBuild_AddItem ('BKForeclosure REO',filedate,'N')
 														// );
 	
 	BuildAll	:= SEQUENTIAL(Nodbuilt, Reobuilt/*, orbit_update*/);

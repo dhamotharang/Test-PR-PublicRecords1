@@ -6,13 +6,13 @@ EXPORT UpdateBase (STRING filedate, BOOLEAN pUseProd = FALSE) := MODULE
 	
    CleanBankFile	          := Vendor_Src.StandardizeInputFile(filedate, pUseProd).Bank;
 	 CleanLienFile	          := Vendor_Src.StandardizeInputFile(filedate, pUseProd).Lien;
-	 FixedRiskViewFile        := Vendor_Src.StandardizeInputFile(filedate, pUseProd).RiskviewFFD;
+	 OrbitFile                := Vendor_Src.StandardizeInputFile(filedate, pUseProd).OrbitFFD;
 	 CleanCourtLocatorFile	  := Vendor_Src.StandardizeInputFile(filedate, pUseProd).CourtLocator;
 	 CollegeLocator          	:= Vendor_Src.StandardizeInputFile(filedate, pUseProd).CollegeLocator;	
 	 MasterList      		      := Vendor_Src.StandardizeInputFile(filedate, pUseProd).MasterList;
 	 
  	 
-NewBaseData	:= CleanBankFile + CleanLienFile + FixedRiskViewFile + CleanCourtLocatorFile + MasterList + CollegeLocator; //+ Files().base.qa;
+NewBaseData	:= CleanBankFile + CleanLienFile + OrbitFile + CleanCourtLocatorFile + MasterList + CollegeLocator + Files().base.qa;
                                                                                                                               
 				
 DistNewBaseFile := DISTRIBUTE(NewBaseData, HASH(input_file_id, source_code));

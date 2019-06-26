@@ -9,6 +9,7 @@ export IdAppendThor(
 		,boolean allowInvalidResults = false
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
 		                            // on thor appends so should not be used for production.
+		,string svcAppendUrl = ''
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -47,7 +48,8 @@ export IdAppendThor(
 			,weightThreshold := weightThreshold
 			,disableSaltForce := not primForce
 			,reAppend := reAppend
-			,mimicRoxie := mimicRoxie);
+			,mimicRoxie := mimicRoxie
+			,svcAppendUrl := svcAppendUrl);
 
 	export IdsOnly() := function
 		resRemote := project(remoteAppend.IdsOnly(), BIPV2.IdAppendLayouts.IdsOnlyOutput);

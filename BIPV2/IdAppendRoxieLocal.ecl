@@ -3,7 +3,7 @@ import BIPV2;
 import BIPV2_Company_Names;
 import BIPV2_Suppression;
 import BizLinkFull;
-import SALT37;
+import SALT311;
 import Std.Str;
 
 // Should we disable fallback? Can we disable fallback?
@@ -63,29 +63,29 @@ template := bizlinkfull.process_biz_layouts.inputlayout;
 SALTInput := project(inputDsCnp, transform({BizLinkFull.Process_Biz_Layouts.InputLayout},
   self.UniqueID       := (typeof(Template.UniqueID))left.request_id;
 	// company name prefix is an option
-	namePrefix := BizLinkFull.Fields.Make_company_name_prefix((SALT37.StrType) BizLinkFull.fn_company_name_prefix(left.cnp_name));
+	namePrefix := BizLinkFull.Fields.Make_company_name_prefix((SALT311.StrType) BizLinkFull.fn_company_name_prefix(left.cnp_name));
   self.company_name_prefix := if(not useFuzzy, '',
 	                               (typeof(Template.company_name_prefix)) namePrefix);
   self.cnp_number     := (typeof(Template.cnp_number))left.cnp_number;
   self.cnp_btype      := (typeof(Template.cnp_btype))left.cnp_btype;
   self.cnp_lowv       := (typeof(Template.cnp_lowv))left.cnp_lowv;
-  self.cnp_name       := (typeof(Template.cnp_name))BizLinkFull.Fields.Make_cnp_name((SALT37.StrType)LEFT.cnp_name);
+  self.cnp_name       := (typeof(Template.cnp_name))BizLinkFull.Fields.Make_cnp_name((SALT311.StrType)LEFT.cnp_name);
   self.prim_range     := (typeof(Template.prim_range))left.prim_range;
-  self.prim_name      := (typeof(Template.prim_name))BizLinkFull.Fields.Make_prim_name((SALT37.StrType)LEFT.prim_name);
-  self.sec_range      := (typeof(Template.sec_range))BizLinkFull.Fields.Make_sec_range((SALT37.StrType)LEFT.sec_range);   
-  self.city           := (typeof(Template.city))BizLinkFull.Fields.Make_city((SALT37.StrType)LEFT.city);
-  self.st             := (typeof(Template.st))BizLinkFull.Fields.Make_st((SALT37.StrType)LEFT.state);
+  self.prim_name      := (typeof(Template.prim_name))BizLinkFull.Fields.Make_prim_name((SALT311.StrType)LEFT.prim_name);
+  self.sec_range      := (typeof(Template.sec_range))BizLinkFull.Fields.Make_sec_range((SALT311.StrType)LEFT.sec_range);   
+  self.city           := (typeof(Template.city))BizLinkFull.Fields.Make_city((SALT311.StrType)LEFT.city);
+  self.st             := (typeof(Template.st))BizLinkFull.Fields.Make_st((SALT311.StrType)LEFT.state);
   self.zip_cases      := LEFT.zip_cases;
   self.company_phone  := (typeof(Template.company_phone))left.phone10;
   self.company_phone_3 := (typeof(Template.company_phone_3))left.company_phone_3;
   self.company_phone_3_ex:= '';
   self.company_phone_7 := (typeof(Template.company_phone_7))left.company_phone_7;
   self.company_fein   := (typeof(Template.company_fein))LEFT.fein;
-  self.company_url    := (typeof(Template.company_url))BizLinkFull.Fields.Make_company_url((SALT37.StrType)LEFT.url);
-  self.company_sic_code1 :=(typeof(Template.company_sic_code1))BizLinkFull.Fields.Make_company_sic_code1((SALT37.StrType)LEFT.sic_code);
-  self.fname          := (typeof(Template.fname))BizLinkFull.Fields.Make_fname((SALT37.StrType)left.contact_fname);
-  self.mname          := (typeof(Template.mname))BizLinkFull.Fields.Make_mname((SALT37.StrType)left.contact_mname);
-  self.lname          := (typeof(Template.lname))BizLinkFull.Fields.Make_lname((SALT37.StrType)left.contact_lname);
+  self.company_url    := (typeof(Template.company_url))BizLinkFull.Fields.Make_company_url((SALT311.StrType)LEFT.url);
+  self.company_sic_code1 :=(typeof(Template.company_sic_code1))BizLinkFull.Fields.Make_company_sic_code1((SALT311.StrType)LEFT.sic_code);
+  self.fname          := (typeof(Template.fname))BizLinkFull.Fields.Make_fname((SALT311.StrType)left.contact_fname);
+  self.mname          := (typeof(Template.mname))BizLinkFull.Fields.Make_mname((SALT311.StrType)left.contact_mname);
+  self.lname          := (typeof(Template.lname))BizLinkFull.Fields.Make_lname((SALT311.StrType)left.contact_lname);
   self.fname_preferred := (typeof(Template.fname_preferred))left.fname_preferred;
   self.contact_email  := (typeof(Template.contact_email))left.Email;
   self.contact_ssn    := (typeof(Template.contact_ssn))left.contact_ssn;
@@ -111,7 +111,7 @@ topScores :=
 		// If doing address matching and prim name/range post-force, check for no mismatch
 		// topProx := if('A' not in matchSet or not primForcePost, topProx0,
 		topProx := if(not primForcePost, topProx0,
-		              topProx0((left.prim_range != '' and prim_range_match_code = SALT37.MatchCode.ExactMatch)
+		              topProx0((left.prim_range != '' and prim_range_match_code = SALT311.MatchCode.ExactMatch)
 		                         or (not (left.prim_range != '' and prim_rangeWeight <= 0)
 		                               and not (left.prim_name != '' and prim_nameWeight <= 0)
 		                       )));

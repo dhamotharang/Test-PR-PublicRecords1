@@ -15,7 +15,7 @@ BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(ClnRawReoIn L, seqNum) := TRAN
 	SELF.PROCESS_DATE						 := thorlib.wuid()[2..9];
 	SELF.src  									 := mdr.sourceTools.src_BKFS_Reo;
 	ClnAPN											 := IF(LENGTH(TRIM(L.APN)) = 1 and STD.Str.Find(L.APN,'+',1) = 1, STD.Str.FindReplace(L.APN,'+',''),
-																			STD.Str.FindReplace(L.APN,'~',''));
+																			REGEXREPLACE('(\\+|`|~)',L.APN,''));
 	SELF.foreclosure_id					 :=	IF(L.APN <> '',
 																		 STD.Str.FindReplace(TRIM(ClnAPN,LEFT,RIGHT) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', ''),
 																		 STD.Str.FindReplace('FC' + INTFORMAT(seqNum, 8, 1) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', '')																
@@ -40,7 +40,7 @@ BKForeclosure.Layout_BK.base_reo_ext CleanTrimReo(ClnRawReoIn L, seqNum) := TRAN
 	SELF.recording_page_num      := L.recording_page_num;
 	SELF.recording_doc_num       := L.recording_doc_num;
 	SELF.doc_type_cd             := L.doc_type_cd;
-	SELF.APN                     := STD.Str.FindReplace(L.APN,'~','');
+	SELF.APN                     := ClnAPN;
 	SELF.multi_APN               := L.multi_APN;
 	SELF.partial_interest_trans  := L.partial_interest_trans;
 	SELF.seller1_fname           := ut.CleanSpacesAndUpper(L.seller1_fname);

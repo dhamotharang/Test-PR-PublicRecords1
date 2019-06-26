@@ -20,9 +20,9 @@ EXPORT Append_NOD(DATASET(RECORDOF(Layout_BK.CleanFields_NOD)) dClnFile) := FUNC
 			'N' = Allow match on company name only.
 	*/
 	
-BIP_Matchset := ['A','P'];
+BIP_Matchset := ['A'];
 	
-Business_Header_SS.MAC_Add_BDID_Flex(	prepBDID_nod	// Input Dataset
+Business_Header_SS.MAC_Match_Flex(	prepBDID_nod	// Input Dataset
 																			 ,BIP_Matchset     														 // BDID Matchset what fields to match on
 																			 ,cname									     				          // company_name
 																			 ,prim_range       													 // prim_range
@@ -37,13 +37,21 @@ Business_Header_SS.MAC_Add_BDID_Flex(	prepBDID_nod	// Input Dataset
 																			 ,FALSE              								// output layout has bdid score field?
 																			 ,bdid_score				       				 // bdid_score
 																			 ,dbase_temp_nod  								// Output Dataset
-																			 ,															 // default threshold
-																			 ,													 		// use prod version of superfiles
-																			 ,														 // default is to hit prod from dataland, and on prod hit prod.		
-																			 ,[BIPV2.IDconstants.xlink_version_BIP]	// Create BIP Keys only
+																			 ,															 // keep count
+																			 ,															// default threshold
+																			 ,														 // use prod version of superfiles
+																			 ,														// default is to hit prod from dataland, and on prod hit prod.
+																			 ,BIPV2.xlink_version_set	 		// Create BIP Keys only
 																			 ,           		             // Url
 																			 ,													// Email
 																			 ,p_city_name							 // City
+																			 ,												// fname
+																			 ,						 					 // mname
+																			 ,											// lname
+																			 ,										 // contact ssn
+																			 ,src									// source
+																			 ,									 // source_record_id
+																			 ,false						  // if mac_Source_Match appears exists before flex macro
 																			 );	
 	
 	dBase_BIP_nod := dbase_temp_nod;	
@@ -83,7 +91,9 @@ did_add.MAC_Match_Flex
  nod_IDs := did_out_nod + bip_out_nod;
  // ds_nod  := PROJECT(nod_IDs, TRANSFORM(layout_BK.did_nod_plus,
                            // SELF:=LEFT)):persist('~thor_data400::BKForeclosure_Append_ID_NOD');
-dedNOD_IDs	:= DEDUP(nod_IDs,ALL,RECORD);													 
+ DID_Add.MAC_Add_SSN_By_DID(nod_IDs,did,ssn,appendSSN);
+
+ dedNOD_IDs	:= DEDUP(appendSSN,ALL,RECORD);													 
 
 RETURN dedNOD_IDs;
 END;
@@ -108,7 +118,7 @@ EXPORT Append_REO(DATASET(RECORDOF(Layout_BK.CleanFields_REO)) dClnFile) := FUNC
 	*/
 	
 	BIP_Matchset := ['A'];
-	Business_Header_SS.MAC_Add_BDID_Flex(	prepBDID_reo	// Input Dataset
+	Business_Header_SS.MAC_Match_Flex(	prepBDID_reo	// Input Dataset
 																			 ,BIP_Matchset     														 // BDID Matchset what fields to match on
 																			 ,cname									     				          // company_name
 																			 ,prim_range       													 // prim_range
@@ -123,14 +133,22 @@ EXPORT Append_REO(DATASET(RECORDOF(Layout_BK.CleanFields_REO)) dClnFile) := FUNC
 																			 ,FALSE              								// output layout has bdid score field?
 																			 ,bdid_score				       				 // bdid_score
 																			 ,dbase_temp_reo  								// Output Dataset
-																			 ,															 // default threshold
-																			 ,													 		// use prod version of superfiles
-																			 ,														 // default is to hit prod from dataland, and on prod hit prod.		
-																			 ,[BIPV2.IDconstants.xlink_version_BIP]	// Create BIP Keys only
+																			 ,															 // keep count
+																			 ,															// default threshold
+																			 ,														 // use prod version of superfiles
+																			 ,														// default is to hit prod from dataland, and on prod hit prod.
+																			 ,BIPV2.xlink_version_set	 		// Create BIP Keys only
 																			 ,           		             // Url
 																			 ,													// Email
 																			 ,p_city_name							 // City
-																			 );
+																			 ,												// fname
+																			 ,						 					 // mname
+																			 ,											// lname
+																			 ,										 // contact ssn
+																			 ,src									// source
+																			 ,									 // source_record_id
+																			 ,false						  // if mac_Source_Match appears exists before flex macro
+																			 );	
 	
 	dBase_BIP_reo := dbase_temp_reo;			
 
@@ -170,8 +188,12 @@ did_add.MAC_Match_Flex
 //BUILD 
 //-----------------------------------------------------------------
  reo_IDs := did_out_reo + bip_out_reo;
+ 
+ DID_Add.MAC_Add_SSN_By_DID(reo_IDs,did,ssn,appendSSN);
+ 
+ dedReo_IDs	:= DEDUP(appendSSN,ALL,RECORD);
 
-RETURN reo_IDs;													 
+RETURN dedReo_IDs;													 
 END;
 
 

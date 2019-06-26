@@ -1,4 +1,4 @@
-import standard, ut, doxie; 
+﻿import standard, ut, doxie; 
 
 export file_SearchAutokey(
 	
@@ -18,11 +18,14 @@ export file_SearchAutokey(
 		Standard.L_Address.base Bus_addr   	;
 		Standard.L_Address.base person_addr	;
 		standard.name person_name			;
-			unsigned1 zero 					:= 0;
+		unsigned1 zero 					:= 0;
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) project enhancements - JIRA# CCPA-111
+		unsigned4 global_sid := 0;
+		unsigned8 record_sid := 0;
 	end;
 
 
-	Rec tranBC(Layout.Employment_Out_old  pInput) 
+	Rec tranBC(Layout.Employment_Out  pInput) 
 	 := transform
 		self.DID 						:= pInput.DID;
 		self.BDID 						:= pInput.BDID;

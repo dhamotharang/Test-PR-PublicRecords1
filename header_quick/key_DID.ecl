@@ -1,4 +1,4 @@
-import header,doxie;
+import doxie,dx_header,data_services;
 export key_DID := 
-	header_quick.FN_key_DID(dataset([], header.Layout_Header), 
-	'~thor_data400::key::' + header_quick.str_SegmentName + 'DID_' + Doxie.Version_SuperKey);
+	header_quick.FN_key_DID(dataset([], dx_header.Layout_Header), 
+	data_services.Data_location.Prefix('Header_Quick') + 'thor_data400::key::' + header_quick.str_SegmentName + 'DID_' + Doxie.Version_SuperKey);

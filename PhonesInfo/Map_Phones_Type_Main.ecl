@@ -5,8 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Map Phone Base Files to Phone Type Layout - Append Serv/Line/Carrier Names from Carrier Reference Table///////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	dsICPort		:= PhonesInfo.File_iConectiv.Main;																																																										//Source = PK; iConectiv Ported Phone Base File
+	dsICPort		:= PhonesInfo.File_iConectiv.Main(transaction_code<>'PD');																																										//Source = PK; iConectiv Ported Phone Base File
 	dsLIDB 			:= PhonesInfo.File_LIDB.Response_Processed;																																																						//Source = PB; LIDB - AT&T Gateway Base File
 	dsLIDBDelt	:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); 	//Source = PB; Deltabase Gateway File (LIDB) - Pull Only Good Records
 	dsL6Phones	:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), dx_PhonesInfo.Layouts.Phones_Type_Main);	
@@ -20,7 +19,15 @@
 	sortiCon					:= sort(distribute(dsICPort, hash(spid)), spid, local);
 	sortSPID					:= sort(distribute(dsCarrRef, hash(spid)), spid, serv, line, carrier_name, local);//Lookup Supplied Internally	
 	
-	dx_PhonesInfo.Layouts.Phones_Type_Main addiConSL(sortiCon l, sortSPID r):= transform
+	tempLayout := record
+		dx_PhonesInfo.Layouts.Phones_Type_Main;
+		string temp_vfreported;
+		string temp_vlreported;
+	end;	
+	
+	tempLayout addiConSL(sortiCon l, sortSPID r):= transform
+		self.temp_vfreported						:= ((string)l.vendor_first_reported_dt) + l.vendor_first_reported_time;
+		self.temp_vlreported						:= ((string)l.vendor_last_reported_dt) + l.vendor_last_reported_time;
 		self.reference_id								:= '';
 		self.reply_code									:= '';
 		self.local_routing_number				:= '';
@@ -47,7 +54,7 @@
 	srtAddiCOFN				:= sort(distribute(addiConON, hash(spid)), spid, operator_fullname, local);
 	srtRefOFN_match		:= sort(distribute(dsCarrRef(carrier_name=operator_full_name), hash(spid)), spid, carrier_name, local);
 		
-	dx_PhonesInfo.Layouts.Phones_Type_Main addiCOFNTr(srtAddiCOFN l, srtRefOFN_match r):= transform
+	tempLayout addiCOFNTr(srtAddiCOFN l, srtRefOFN_match r):= transform
 		self.account_owner							:= r.ocn;
 		self.carrier_name								:= PhonesInfo._Functions.fn_CarrierName(r.carrier_name);
 		self 														:= l;
@@ -62,7 +69,7 @@
 	srtAddiCRem				:= sort(distribute(addiOCN_match(account_owner=''), hash(spid)), spid, operator_fullname, local);
 	srtRefRem					:= sort(distribute(dsCarrRef(carrier_name<>operator_full_name), hash(spid)), spid, operator_full_name, carrier_name, local);
 	
-	dx_PhonesInfo.Layouts.Phones_Type_Main addiRemTr(srtAddiCRem l, srtRefRem r):= transform
+	tempLayout addiRemTr(srtAddiCRem l, srtRefRem r):= transform
 		self.account_owner							:= r.ocn;
 		self.carrier_name								:= PhonesInfo._Functions.fn_CarrierName(r.carrier_name);
 		self 														:= l;
@@ -74,7 +81,43 @@
 	
 	//Concat Appended OCN/Carrier Name Results
 	ddiConAddFields 	:= dedup(sort(distribute(addiOCN_match(account_owner<>'')+addiCRem, hash(phone)), record, local), record, local);
+
+	//Rollup Same Port Phone Type Records
+	srtDdiConAddFields:= sort(distribute(ddiConAddFields, hash(phone)), phone, carrier_name, account_owner, serv, line, high_risk_indicator, prepaid, -vendor_last_reported_dt, local);
+
+	tempLayout rollupiConDate(srtDdiConAddFields l, srtDdiConAddFields r) := transform
+			
+		minDate		:= lib_date.earliestdate((integer)l.temp_vfreported, (integer)r.temp_vfreported);
+		maxDate		:= lib_date.latestdate((integer)l.temp_vlreported, (integer)r.temp_vlreported);
+		
+		self.temp_vfreported						:= (string)minDate;
+		self.temp_vlreported						:= (string)maxDate;
+		self.global_sid									:= 0;	//CCPA Requirement
+		self.record_sid									:= 0;	//CCPA Requirement
+		self 														:= l;
+	end;
+
+	rollupiConDates	:= rollup(srtDdiConAddFields, 
+																	left.phone = right.phone and
+																	left.carrier_name = right.carrier_name and
+																	left.account_owner = right.account_owner and
+																	left.serv = right.serv and
+																	left.line = right.line and
+																	left.high_risk_indicator = right.high_risk_indicator and
+																	left.prepaid = right.prepaid,
+																	rollupiConDate(left, right), local);
 	
+	//Fix Vendor First/Last Reported Date/Time
+	dx_PhonesInfo.Layouts.Phones_Type_Main dtTr(rollupiConDates l):= transform
+		self.vendor_first_reported_dt		:= (integer)(l.temp_vfreported[1..8]);
+		self.vendor_first_reported_time := l.temp_vfreported[9..];
+		self.vendor_last_reported_dt 		:= (integer)(l.temp_vlreported[1..8]);
+		self.vendor_last_reported_time	:= l.temp_vlreported[9..];
+		self														:= l;
+	end;
+	
+	applyiConDates 				:= project(rollupiConDates, dtTr(left));
+																	
 	/////////////////////////////////////////////////////////	
 	//LIDB File - Join by Account Owner & Carrier Name///////
 	/////////////////////////////////////////////////////////
@@ -121,7 +164,7 @@
 	
 	dedupFields				:= dedup(sort(distribute(joinFields, hash(carrier_name)), record, local), record, local);
 	
-	srt_concatFiles		:= sort(distribute(dedupFields, hash(phone)), phone, reference_id, name, account_owner, serv, line, -vendor_last_reported_dt, local);
+	srt_concatFiles		:= sort(distribute(dedupFields, hash(phone)), phone, reference_id, name, account_owner, serv, line, high_risk_indicator, prepaid, -vendor_last_reported_dt, local);
 
 	nameLayout rollupDate(srt_concatFiles l, srt_concatFiles r) := transform
 			
@@ -141,7 +184,9 @@
 															left.name = right.name and
 															left.account_owner = right.account_owner and
 															left.serv = right.serv and
-															left.line = right.line,
+															left.line = right.line and
+															left.high_risk_indicator = right.high_risk_indicator and
+															left.prepaid = right.prepaid,
 															rollupDate(left, right), local);	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////	
@@ -201,16 +246,17 @@
 	srcLidbDelt				:= dedup(sort(distribute(joinLidbDeltFields, hash(carrier_name)), record, local), record, local);	
 	
 	//Concat LIDB Records
+	
 	concatLIDB				:= project(applyDates, dx_PhonesInfo.Layouts.Phones_Type_Main) + srcLidbDelt;	
 
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	//Concat All Records//////////////////////////////////////////////////////////////////////	
 	//////////////////////////////////////////////////////////////////////////////////////////
-	allFiles					:= ddiConAddFields + concatLIDB 	+ dsL6Phones;	
-	                   //Ported 				 + LIDB Records + L6 Phones
+	
+	allFiles					:= applyiConDates + concatLIDB 	 + dsL6Phones;	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////	
-	//Append Record_SID//////////////////////////////////////////////////////////////////////	
+	//Append Record_SID///////////////////////////////////////////////////////////////////////	
 	//////////////////////////////////////////////////////////////////////////////////////////	
 	
 	//Add Record_SID to All Records

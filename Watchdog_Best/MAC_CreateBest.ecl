@@ -168,7 +168,7 @@ M := MODULE
     SELF.Orig_Row_Cnt := le.Row_Cnt;
     SELF := le;
   END;
-  Supports := JOIN(BestMiddleName_tab_mname,BestMiddleName_tab_mname, LEFT.did = RIGHT.did  AND ( (LEFT.mname[1..LENGTH(TRIM(RIGHT.mname))] = RIGHT.mname OR RIGHT.mname[1..LENGTH(TRIM(LEFT.mname))] = LEFT.mname ) OR Watchdog_best.Config.WithinEditN(LEFT.mname,0,RIGHT.mname,0,1, 0)  ),NoteSupport(LEFT,RIGHT),LOCAL);
+  Supports := JOIN(BestMiddleName_tab_mname,BestMiddleName_tab_mname, LEFT.did = RIGHT.did  AND ( (LEFT.mname[1..LENGTH(TRIM(RIGHT.mname))] = RIGHT.mname OR RIGHT.mname[1..LENGTH(TRIM(LEFT.mname))] = LEFT.mname ) ),NoteSupport(LEFT,RIGHT),LOCAL);
   Supports TR(Supports le, Supports ri) := TRANSFORM
     SELF.data_permits := le.data_permits|ri.data_permits;
     SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
@@ -177,7 +177,10 @@ M := MODULE
   EXPORT BestMiddleName_fuzz_mname := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
 
   // Now actually find the best value
-  EXPORT BestMiddleName_method_mname := DEDUP( SORT( BestMiddleName_fuzz_mname,did,-LENGTH(TRIM((SALT311.StrType)mname)),-Row_Cnt,LOCAL),did,LOCAL);
+  grp := GROUP( BestMiddleName_fuzz_mname,did,ALL,LOCAL);
+  srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
+  cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
+  EXPORT BestMiddleName_method_mname := cmn;
 
 
 
@@ -206,7 +209,7 @@ M := MODULE
     SELF.Orig_Row_Cnt := le.Row_Cnt;
     SELF := le;
   END;
-  Supports := JOIN(CommonMiddleName_tab_mname,CommonMiddleName_tab_mname, LEFT.did = RIGHT.did  AND ( (LEFT.mname[1..LENGTH(TRIM(RIGHT.mname))] = RIGHT.mname OR RIGHT.mname[1..LENGTH(TRIM(LEFT.mname))] = LEFT.mname ) OR Watchdog_best.Config.WithinEditN(LEFT.mname,0,RIGHT.mname,0,1, 0)  ),NoteSupport(LEFT,RIGHT),LOCAL);
+  Supports := JOIN(CommonMiddleName_tab_mname,CommonMiddleName_tab_mname, LEFT.did = RIGHT.did  AND ( (LEFT.mname[1..LENGTH(TRIM(RIGHT.mname))] = RIGHT.mname OR RIGHT.mname[1..LENGTH(TRIM(LEFT.mname))] = LEFT.mname ) ),NoteSupport(LEFT,RIGHT),LOCAL);
   Supports TR(Supports le, Supports ri) := TRANSFORM
     SELF.data_permits := le.data_permits|ri.data_permits;
     SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;

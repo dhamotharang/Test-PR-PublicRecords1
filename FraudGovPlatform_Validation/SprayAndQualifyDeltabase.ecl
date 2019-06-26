@@ -6,7 +6,6 @@ EXPORT SprayAndQualifyDeltabase(
 	STRING pDeltabaseRootDir = IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.DeltaLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.DeltaLandingZonePathBase_prod)
 ) := FUNCTION
 
-// DateSearch := ut.date_math(pVersion[1..8], -1);
 DateSearch := pVersion[1..8];
 
 dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pDeltabaseRootDir + DateSearch, 'delta_identity.txt')):INDEPENDENT;

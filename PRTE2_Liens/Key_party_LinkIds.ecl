@@ -1,8 +1,14 @@
-Import Data_Services, PRTE2_Liens, liensv2, BIPV2, Doxie, ut;
+﻿Import Data_Services, PRTE2_Liens, liensv2, BIPV2, Doxie, ut;
 
 EXPORT Key_party_LinkIDs := MODULE
 
-		shared  base_recs := project(PRTE2_Liens.Files.Party_out,transform(PRTE2_Liens.Layouts.LinkIDSKey,self:=left)); //for future use. Key is currently blank in PRTE
+		dsFile 	:= project(PRTE2_Liens.Files.Party_out,transform(PRTE2_Liens.Layouts.LinkIDSKey,self:=left)); //for future use. Key is currently blank in PRTE
+		
+		dist_id := distribute(dsFile, hash(TMSID,RMSID, lname, fname, cname,prim_range,prim_name,addr_suffix,sec_range,zip));
+		sort_id := sort(dist_id, TMSID, RMSID, lname, fname, cname,prim_range,prim_name,addr_suffix,sec_range,zip, local);
+		
+		shared  base_recs := sort_id;
+		
 		export  out_SuperKeyName  := Constants.KEY_PREFIX + doxie.Version_SuperKey + '::party::linkids';
 
 		BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_SuperKeyName);

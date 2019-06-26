@@ -33,8 +33,7 @@ tools.mac_WriteFile(Filenames(pversion).Base.Death_Orig.New,Death_Orig,Build_dea
 												
 Export All := 	Sequential
 											(
-											 Append_SoapDemoData.Base_Clear
-											,Build_pii_Base
+											 Build_pii_Base
 											,Promote(pversion).buildfiles.New2Built
  											,Build_ciid_Orig
 											,Build_crim_Orig
@@ -47,7 +46,6 @@ Export All := 	Sequential
 											,Build_IPMetaData_Base
 											,Promote(pversion).buildfiles.New2Built
 											,Promote(pversion).buildfiles.Built2QA
-											,if(_Flags.UseDemoData, Append_SoapDemoData.Base_Set)
-											):Failure(if(_Flags.UseDemoData, Append_SoapDemoData.Base_Set))
+											)
 								;
 END;
