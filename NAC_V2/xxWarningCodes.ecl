@@ -1,4 +1,4 @@
-	EXPORT	warningcodes := ENUM(
+﻿	EXPORT	xxwarningcodes := ENUM(
 		W101 = 0x000001,				// Invalid/Missing Race Value, Set to "U"
 		W102 = 0x000002,				// Invalid/Missing Gender Value, Set to "U"
 		W103 = 0x000004,				// Invalid/Missing Ethnicity Value, Set to "U"
