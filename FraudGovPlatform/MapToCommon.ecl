@@ -74,10 +74,6 @@ module
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;
 		self.classification_Activity.Confidence_that_activity_was_deceitful_id	:= (unsigned2)left.deceitful_confidence;
-		self.dt_first_seen	:= left.Process_Date; 
-		self.dt_last_seen		:= left.Process_Date;
-		self.dt_vendor_last_reported	:= left.FileDate; 
-		self.dt_vendor_first_reported	:= left.FileDate; 	
 		self:= left; 
 		self:= [];
 	)); 
