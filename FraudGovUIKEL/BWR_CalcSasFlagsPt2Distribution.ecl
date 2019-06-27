@@ -12,8 +12,6 @@ EXPORT BWR_CalcSasFlagsPt2Distribution := MODULE
 		ENDMACRO;
 
 		// Nate Attributes 
-		// Claim attributes
-		// Business Account attributes
 		shared ds_BusAcctOpenDtMsince := fn_macro(ds, 'BusAcctOpenDtMsince', Bus_Acct_Open_Dt_Msince_);
 		shared ds_BusOldestAcctOpenDtMsince	:= fn_macro(ds, 'BusOldestAcctOpenDtMsince', Bus_Oldest_Acct_Open_Dt_Msince_);					
 		shared ds_BusAcctLiabStartToOpenGT5MFlag := fn_macro(ds, 'BusAcctLiabStartToOpenGT5MFlag', Bus_Acct_Liab_Start_To_Open_G_T5_M_Flag_);
@@ -42,9 +40,9 @@ EXPORT BWR_CalcSasFlagsPt2Distribution := MODULE
 		shared ds_BusAcctAddressPOBoxFlag := fn_macro(ds, 'BusAcctAddressPOBoxFlag', Bus_Acct_Address_P_O_Box_Flag_);
 		shared ds_BusAcctPerBusAddressPOBoxCnt := fn_macro(ds, 'BusAcctPerBusAddressPOBoxCnt', Bus_Acct_Per_Bus_Address_P_O_Box_Cnt_);																						
 		shared ds_BusAcctPerBusAddressPOBoxFlag := fn_macro(ds, 'BusAcctPerBusAddressPOBoxFlag', Bus_Acct_Per_Bus_Address_P_O_Box_Flag_);
-		// shared ds_VelBusAcctPerAddrInProgCnt := fn_macro(ds, 'VelBusAcctPerAddrInProgCnt', Vel_Bus_Acct_Per_Addr_In_Prog_Cnt_);
+		shared ds_VelBusAcctPerAddrInProgCnt := fn_macro(ds, 'VelBusAcctPerAddrInProgCnt', Vel_Bus_Acct_Per_Addr_In_Prog_Cnt_);
 
-		// shared ds_VelBusAcctPerAddrInBusLegEntCnt := fn_macro(ds, 'VelBusAcctPerAddrInBusLegEntCnt', Vel_Bus_Acct_Per_Addr_In_Bus_Leg_Ent_Cnt_);
+		shared ds_VelBusAcctPerAddrInBusLegEntCnt := fn_macro(ds, 'VelBusAcctPerAddrInBusLegEntCnt', Vel_Bus_Acct_Per_Addr_In_Bus_Leg_Ent_Cnt_);
 		shared ds_BusAcctLegalActionTypeEcho := fn_macro(ds, 'BusAcctLegalActionTypeEcho', Bus_Acct_Legal_Action_Type_Echo_);
 		shared ds_BusAcctLegalActionFlag := fn_macro(ds, 'BusAcctLegalActionFlag', Bus_Acct_Legal_Action_Flag_);
 		shared ds_BusAcctPerBusLegActLienCnt := fn_macro(ds, 'BusAcctPerBusLegActLienCnt', Bus_Acct_Per_Bus_Leg_Act_Lien_Cnt_);
@@ -67,14 +65,12 @@ EXPORT BWR_CalcSasFlagsPt2Distribution := MODULE
 		shared ds_BusAcctPerBusTaxLiabBlceOthCnt := fn_macro(ds, 'BusAcctPerBusTaxLiabBlceOthCnt', Bus_Acct_Per_Bus_Tax_Liab_Blce_Oth_Cnt_);
 		shared ds_BusTaxLiabBlceDebitFlag := fn_macro(ds, 'BusTaxLiabBlceDebitFlag', Bus_Tax_Liab_Blce_Debit_Flag_);
 			
-
-
 		SHARED ds_All := 	ds_BusAcctOpenDtMsince + ds_BusOldestAcctOpenDtMsince	+ ds_BusAcctLiabStartToOpenGT5MFlag + ds_BusOldestLiabStartToOpenGT5MFlag +ds_BusAcctOwnerCntEcho + 
 											ds_BusAcctOwnerName1Pop + ds_BusAcctOwnerSSN1Pop + ds_BusAcctOwnerName2Pop + ds_BusAcctOwnerSSN2Pop + ds_BusAcctOwnerName3Pop + 
 											ds_BusAcctOwnerSSN3Pop + ds_BusAcctOwnerNotPopFlag + ds_BusAcctPerBusOwnerNotPopCnt + ds_BusOwnerNotPopFlag + ds_BusAcctFullAddressCleanPop + 
 											ds_BusAcctStateClean + ds_ProgramStateEcho + ds_BusAcctStateNotInProgAreaFlag + ds_BusAcctPerBusNotInProgAreaCnt + ds_BusAcctPerBusNotInProgAreaFlag + 
 											ds_BusAcctAddressTypeClean + ds_BusAcctAddressPOBoxFlag + ds_BusAcctPerBusAddressPOBoxCnt + ds_BusAcctPerBusAddressPOBoxFlag + 
-											// ds_VelBusAcctPerAddrInProgCnt + ds_VelBusAcctPerAddrInBusLegEntCnt + 
+											ds_VelBusAcctPerAddrInProgCnt + ds_VelBusAcctPerAddrInBusLegEntCnt + 
 											ds_BusAcctLegalActionTypeEcho + ds_BusAcctLegalActionFlag + ds_BusAcctPerBusLegActLienCnt + ds_BusAcctPerBusLegalActOtherCnt + 
 											ds_BusAcctPerBusLegalActPaymCnt + ds_BusLegalActionFlag + ds_BusAcctWarrantIssuedCntEcho + ds_BusAcctWarrantIssuedDtEcho + ds_BusAcctWarrantIssuedFlag + 
 											ds_BusWarrantIssuedSum + ds_BusAcctPerBusWithWarrantCnt + ds_BusWarrantIssuedFlag + ds_BusAcctTaxLiabBlceStatusEcho + ds_BusAcctTaxLiabBlceDebitFlag + 
@@ -95,12 +91,6 @@ EXPORT BWR_CalcSasFlagsPt2Distribution := MODULE
 				RETURN ROW({attr_str, pass_cnt, COUNT(xt2)-pass_cnt}, {STRING30 attribute_name, INTEGER npass, INTEGER nfail});	
 		ENDMACRO;
 		
-		
-		shared dsSeleBusUnemClmAcctCurActiveCnt := fn_seleCheck(ds, 'BusUnemClmAcctCurActiveCnt', Bus_Unem_Clm_Acct_Cur_Active_Cnt_);
-		
-		
-
-
 		shared ds_SeleBusOldestAcctOpenDtMsince	:= fn_seleCheck(ds, 'BusOldestAcctOpenDtMsince', Bus_Oldest_Acct_Open_Dt_Msince_);					
 		shared ds_SeleBusOldestLiabStartToOpenGT5MFlag := fn_seleCheck(ds, 'BusOldestLiabStartToOpenGT5MFlag', Bus_Oldest_Liab_Start_To_Open_G_T5_M_Flag_);
 		shared ds_SeleBusAcctPerBusOwnerNotPopCnt := fn_seleCheck(ds, 'BusAcctPerBusOwnerNotPopCnt', Bus_Acct_Per_Bus_Owner_Not_Pop_Cnt_);

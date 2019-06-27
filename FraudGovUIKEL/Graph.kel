@@ -198,7 +198,8 @@ Employer :=  ENTITY
   INTEGER score,
   INTEGER weight,
 	
-  STRING physicaladdresscleanedaddress,
+	CleanAddress rCleanAddr=UID(physicaladdresscleanedaddress),
+	// STRING physicaladdresscleanedaddress,
   STRING physicaladdressstate,
   STRING physicaladdressrecordtype
 	
@@ -866,7 +867,7 @@ Employer :=  ENTITY
    */
 		),
 	MODEL(
-UID,rLegal,dummycode,uacctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno,ultid,orgid,seleid,proxid,powid,dotid,empid,score,weight,physicaladdresscleanedaddress,physicaladdressstate,physicaladdressrecordtype));
+UID,rLegal,dummycode,uacctno,checkdigit,fedno,cocd,areacd,status,liabcd,datefirstemp,dateliabest,compyr,timelapsecd,ownershipcd,reinstatedate,unitaddeddate,liabtermdate,dateacquired,bkstopcode,bankruptcydate,legalactioncd,letofassessment,statusreceiptdate,acquiredbyacctno,unpaidbalcd,warrantsissued,datewarrantissued,auditdate,fieldrepcd,datepurged,numownssn,ownername1,ownerssn1,ownername2,ownerssn2,ownername3,ownerssn3,reconamt,unpdbalamt,prevchrgamt,ownername,phones{phonenumber},mno,mnosic6,mnoavgwages,flempname,slempname,fltradename,sltradename,flstreetaddr,slstreetaddr,attnof,citystate,zip,altzipcode,country,leaseclientind,aggregateleasingno,ultid,orgid,seleid,proxid,powid,dotid,empid,score,weight,rCleanAddr,physicaladdressstate,physicaladdressrecordtype));
 
   
 Claim :=  ENTITY
@@ -1166,6 +1167,11 @@ Claimant :=  ENTITY
 	INTEGER claimantlexid),
 	MODEL(UID, claimant_ssn, claimantlexid));
 
+CleanAddress := ENTITY
+(FLAT(UID(physicaladdresscleanedaddress),
+	STRING addr=physicaladdresscleanedaddress),
+	MODEL(UID, addr));
+	
 /*
 	Define associations between entities
 */
@@ -1190,12 +1196,26 @@ LegalClaim :=  ASSOCIATION
 		Claim rClaim=UID(bizrecid)
     //DATE claim_submit_ccyymmdd
    ));
-	 
 
+EmployerAddr := ASSOCIATION
+	(FLAT(
+		CleanAddress rAddr=UID(physicaladdresscleanedaddress),
+    Employer rEmployer=UID(uacctno)
+	));
+	
+LegalAddr := ASSOCIATION
+	(FLAT(
+		CleanAddress rAddr=UID(physicaladdresscleanedaddress),
+    Legal rLegal=UID(seleid)
+	));
+	 
 USE FRAUDGovUIKEL.Files.Employer(FLAT,
     Employer(FILTER((UNSIGNED)uacctno != 0)),
 	  Legal(FILTER((UNSIGNED)uacctno != 0)),
-		LegalEmployer(FILTER((UNSIGNED)uacctno != 0))
+		LegalEmployer(FILTER((UNSIGNED)uacctno != 0)),
+		LegalAddr(FILTER((UNSIGNED)uacctno != 0)),
+		CleanAddress(FILTER((UNSIGNED)uacctno != 0)),
+		EmployerAddr(FILTER((UNSIGNED)uacctno != 0))
 	);
 USE FraudGovUIKEL.Files.Claims(FLAT, 
   Claim(FILTER((UNSIGNED)claim_sep_emp_no != 0)),
@@ -1206,6 +1226,10 @@ USE FraudGovUIKEL.Files.Claims(FLAT,
 USE FraudGovUIKEL.Files.Claimant(FLAT,
   Claimant(FILTER((UNSIGNED)application_id != 0)));                        
 
+
+// Address Fields
+CleanAddress: => VelBusAcctPerAddrInProgCnt := MAP(COUNT(EmployerAddr.rEmployer(BusAcctUIDEcho>0)) = 0 => -99998, // No Employers using this address with a BusAcctUIDEcho
+																									 MIN(COUNT(EmployerAddr.rEmployer(BusAcctUIDEcho>0)), 9999));
 
 /*
 	Define attributes for the Legal entity
@@ -1399,7 +1423,10 @@ Legal: => BusAcctPerBusTaxLiabBlceOthCnt := MAP(ALL(LegalEmployer.rEmployer, Bus
 Legal: => BusTaxLiabBlceDebitFlag := MAP(BusAcctPerBusTaxLiabBlceDebCnt=-99998 => -99998,
 																				 BusAcctPerBusTaxLiabBlceDebCnt=0 => 0,
 																				 BusAcctPerBusTaxLiabBlceDebCnt > 0 => 1);
-																				 
+Legal: => dsVelBusAcctPerAddrInBusLegEnt := LegalEmployer.rEmployer(BusAcctUIDEcho > 0);  
+
+
+																		
 																				 
 // Claim Attributes
 Claim: => ClaimAge := MAP(claim_submit_ccyymmdd:Null OR (NOT ISVALIDDATE(claim_submit_ccyymmdd)) => -99998,
@@ -1621,16 +1648,16 @@ Employer: => BusAcctOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					 BusAcctOwnerCntEcho > 0 OR (BusAcctOwnerName1Pop=1 AND BusAcctOwnerSSN1Pop=1) OR 
 																							(BusAcctOwnerName2Pop=1 AND BusAcctOwnerSSN2Pop=1) OR 
 																							(BusAcctOwnerName3Pop=1 AND BusAcctOwnerSSN3Pop=1) => 0,
-																					 BusAcctOwnerCntEcho = 0 AND (BusAcctOwnerName1Pop=1 OR BusAcctOwnerSSN1Pop=1) AND 
-																							(BusAcctOwnerName2Pop=1 OR BusAcctOwnerSSN2Pop=1) AND 
-																							(BusAcctOwnerName3Pop=1 OR BusAcctOwnerSSN3Pop=1) => 1,
+																					 BusAcctOwnerCntEcho = 0 AND (BusAcctOwnerName1Pop=0 OR BusAcctOwnerSSN1Pop=0) AND 
+																							(BusAcctOwnerName2Pop=0 OR BusAcctOwnerSSN2Pop=0) AND 
+																							(BusAcctOwnerName3Pop=0 OR BusAcctOwnerSSN3Pop=0) => 1,
 																					 -99997);
 Employer: => BusAcctPerBusOwnerNotPopCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																								rLegal.BusAcctPerBusOwnerNotPopCnt);
 Employer: => BusOwnerNotPopFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																			 rLegal.BusOwnerNotPopFlag);
 Employer: => BusAcctFullAddressCleanPop := MAP((flstreetaddr:Null OR citystate:Null OR zip:Null) => -99999, // (Street+City+State) OR(Street+Zip) not met. Demorgan'd out 														,							 
-																							physicaladdresscleanedaddress:Null OR physicaladdresscleanedaddress='' => 0,
+																							rCleanAddr:Null OR rCleanAddr.addr='' => 0,
 																							1); //populated
 Employer: => BusAcctStateClean := MAP(BusAcctFullAddressCleanPop=-99999 OR BusAcctFullAddressCleanPop=0 => -99999,
 																			physicaladdressstate:Null OR physicaladdressstate='' => -99998,
@@ -1656,19 +1683,14 @@ Employer: => BusAcctPerBusAddressPOBoxCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcc
 
 Employer: => BusAcctPerBusAddressPOBoxFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																									rLegal.BusAcctPerBusAddressPOBoxFlag);
-// Employer: => VelBusAcctPerAddrInProgCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - Need to use latest master record for each business when coded
-																							 // COUNT(Employer(BusAcctUIDEcho != -99999)) = 0 => -99998);
-																							 // COUNT(Employer(BusAcctUIDEcho != -99999){progState := ProgramStateEcho, 
-																																												// addr := physicaladdresscleanedaddress, 
-																																												// uidCnt := BusAcctUIDEcho$GROUP{ProgramStateEcho,physicaladdresscleanedaddress}:Count}
-																																												// (progState=ProgramStateEcho AND addr=physicaladdresscleanedaddress)) = 0 => -99998, // Filter out no valid acct ids, 
-																							 // MAX(MIN(COUNT(Employer(BusAcctUIDEcho != -99999){progState := ProgramStateEcho, 
-																																																// addr := physicaladdresscleanedaddress, 
-																																																// uidCnt := BusAcctUIDEcho$GROUP{ProgramStateEcho,physicaladdresscleanedaddress}:Count}
-																																																// (progState=ProgramStateEcho AND addr=physicaladdresscleanedaddress)), 9999), 0));
-
-// Employer: => VelBusAcctPerAddrInBusLegEntCnt := MAP
-
+Employer: => VelBusAcctPerAddrInProgCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - Need to use latest master record for each business when coded
+																							 rCleanAddr.VelBusAcctPerAddrInProgCnt);
+																							
+Employer: => VelBusAcctPerAddrInBusLegEntCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - need to use latest master record
+																										BusAcctSeleIDAppend=-99998 => -99998,
+																										MIN(COUNT(rLegal.dsVelBusAcctPerAddrInBusLegEnt(
+																																		rCleanAddr=Employer.rCleanAddr)), 9999));
+																										
 Employer: => BusAcctLegalActionTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							legalactioncd:Null OR legalactioncd='' => -99998,
 																							UPCASE(legalactioncd) = 'A' => 1,
@@ -1896,5 +1918,6 @@ QUERY: showEmployers <= Employer;
 QUERY: showLegal <= Legal;
 QUERY: showClaims <= Claim;
 QUERY: showEmployerClaims <= EmployerClaim;
+QUERY: showEmployerAddr <= EmployerAddr;
 QUERY: showLegalClaimsClaim <= LegalClaim.rClaim;
 QUERY: showClaimant <= Claimant;
