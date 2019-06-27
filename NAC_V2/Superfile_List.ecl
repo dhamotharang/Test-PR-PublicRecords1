@@ -1,5 +1,5 @@
-import data_services;
-EXPORT Superfile_List(string st='') := module
+﻿import data_services;
+EXPORT Superfile_List := module
 
 	export in_old    := '~nac::in::consortium_old_layout';
 	export in        := '~nac::in::consortium';
@@ -8,8 +8,8 @@ EXPORT Superfile_List(string st='') := module
 	export Base_prev := '~nac::base::consortium_father';
 	export Collisions  := data_services.foreign_prod + 'nac::out::collisions';
 	//export Collisions  := '~nac::poc::collisions';
-	export temp      := '~nac::in::'+st+'::temp';
-	export rejected  := '~nac::in::'+st+'::rejected';
+	//export temp      := '~nac::in::'+st+'::temp';
+	export rejectedFiles  := '~nac::in::rejected';
 	export Flag      := '~thor_data400::out::NAC_NewHeader_flag';
 	
 	// for NCF2
@@ -23,7 +23,17 @@ EXPORT Superfile_List(string st='') := module
 	export sfPayload := '~nac::out::payload';
 	export sfBase2 := '~nac::out::base2';
 	export sfBase1 := '~nac::in::base1';
+	export sfNCF2Base := '~nac::out::ncf2base';
 	export sfCollisions := '~nac::out::collisions2';
 	export sfNewCollisions := '~nac::out::newcollisions2';
+	
+/*
+		new base file sequence: ready, processing, processed, father, delete
+*/
+	export sfReady := '~nac::out::ready';			// New Base2 file prepped for ingest
+	export sfProcessing := '~nac::out::processing';			// New Base2 file being processed for ingest
+	export sfProcesed := '~nac::out::processed';			// New Base2 file archived after ingest
+	
+	//export 
 	
 end;
