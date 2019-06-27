@@ -4,7 +4,7 @@ IMPORT Watchdog_Best; // Import modules for  attribute definitions
 EXPORT match_candidates(DATASET(layout_Hdr) ih) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
   h00 := Watchdog_best.BasicMatch(ih).input_file;
-SHARED thin_table := DISTRIBUTE(TABLE(h00,{rid,pflag1,pflag2,pflag3,src,dt_first_seen,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported,dt_nonglb_last_seen,rec_type,phone,phone_len,ssn,dob,title,fname,fname_len,mname,mname_len,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4,tnt,valid_ssn,jflag1,jflag2,jflag3,rawaid,dodgy_tracking,address_ind,name_ind,persistent_record_id,lastname,ssnum,address,did}),HASH(did));
+SHARED thin_table := DISTRIBUTE(TABLE(h00,{rid,pflag1,pflag2,pflag3,src,dt_first_seen,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported,dt_nonglb_last_seen,rec_type,phone,phone_len,ssn,dob,title,fname,fname_len,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,city_name,st,zip,zip4,tnt,valid_ssn,jflag1,jflag2,jflag3,rawaid,dodgy_tracking,address_ind,name_ind,persistent_record_id,lastname,ssnum,address,did}),HASH(did));
 SHARED BestM := MAC_CreateBest(ih, , );
 
 
@@ -73,8 +73,6 @@ EXPORT Layout_Candidates := RECORD // A record to hold weights of each field val
   INTEGER2 mname_weight100 := 0; // Contains 100x the specificity
   INTEGER2 mname_initial_char_weight100 := 0; // Contains 100x the specificity
   BOOLEAN mname_isnull := (h0.mname  IN SET(s.nulls_mname,mname) OR h0.mname = (TYPEOF(h0.mname))''); // Simplify later processing 
-  UNSIGNED mname_cnt := 0; // Number of instances with this particular field value
-  UNSIGNED mname_e1_cnt := 0; // Number of names instances matching this one by edit distance
   INTEGER2 lname_weight100 := 0; // Contains 100x the specificity
   BOOLEAN lname_isnull := (h0.lname  IN SET(s.nulls_lname,lname) OR h0.lname = (TYPEOF(h0.lname))''); // Simplify later processing 
   INTEGER2 name_suffix_weight100 := 0; // Contains 100x the specificity
@@ -159,8 +157,6 @@ layout_candidates add_lname(layout_candidates le,Specificities(ih).lname_values_
 END;
 j37 := JOIN(j38,PULL(Specificities(ih).lname_values_persisted),LEFT.lname=RIGHT.lname,add_lname(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 layout_candidates add_mname(layout_candidates le,Specificities(ih).mname_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.mname_cnt := ri.cnt;
-  SELF.mname_e1_cnt := ri.e1_cnt;
   SELF.mname_weight100 := MAP (le.mname_isnull => 0, patch_default and ri.field_specificity=0 => s.mname_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.mname_initial_char_weight100 := MAP (le.mname_isnull => 0, ri.InitialChar_specificity) * 100;
   SELF := le;
