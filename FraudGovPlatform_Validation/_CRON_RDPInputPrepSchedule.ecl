@@ -35,4 +35,4 @@ lECL1 :=
 SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipRDP;
 Run_ECL := if(SkipJob=false,lECL1, 'output(\'Spray RDP Skipped\');\n' );
 
-_Control.fSubmitNewWorkunit(Run_ECL, ThorName ) : WHEN(CRON(EVERY_DAY_AT_10AM));
+_Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_10AM));

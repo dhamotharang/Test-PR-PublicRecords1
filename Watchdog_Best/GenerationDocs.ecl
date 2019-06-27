@@ -30,7 +30,7 @@ BESTTYPE:BestFirstName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_f
 BESTTYPE:CommonFirstName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_fname)
 BESTTYPE:AnyFirstName:BASIS(did):COMMONEST
 // middle name
-BESTTYPE:BestMiddleName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname_strict)
+BESTTYPE:BestMiddleName:BASIS(did):LONGEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname_strict)
 BESTTYPE:CommonMiddleName:BASIS(did):COMMONEST:FUZZY:VALID(Watchdog_Best.fn_valid_mname)
 BESTTYPE:AnyMiddleName:BASIS(did):COMMONEST
 // last name
@@ -81,7 +81,7 @@ FIELD:ssn:TYPE(QSTRING7):17,1
 FIELD:dob:TYPE(INTEGER4):PrefferedDOB:BestDOB:NoDayDOB:NoMonthDOB:13,1
 FIELD:title:TYPE(QSTRING4):BestTitle:1,0
 FIELD:fname:TYPE(QSTRING15):EDIT1:INITIAL:BestFirstName:CommonFirstName:AnyFirstName:1,1
-FIELD:mname:TYPE(QSTRING15):INITIAL:BestMiddleName:CommonMiddleName:AnyMiddleName:1,1
+FIELD:mname:TYPE(QSTRING15):EDIT1:INITIAL:BestMiddleName:CommonMiddleName:AnyMiddleName:1,1
 FIELD:lname:TYPE(QSTRING15):HYPHEN1:1,1
 FIELD:name_suffix:TYPE(QSTRING4):NULLS(REPLACE,):BestSuffix:70,1
 FIELD:prim_range:TYPE(QSTRING8):115,3
@@ -257,6 +257,7 @@ mname Scoring:
 Two mname fields will be considered to match if:
   - they are identical
   - one is the leading part of the other
+  - one can be turned into the other with 1 edit (see Glossary)
 The exact number of points allocated to a match will depend upon the global scarcity of the mname
 and the degree of fuzziness required but should average 1 points with a failed match subtracting 0 points.
 (This subtraction estimate is based upon 0% of clusters with 2 or more records have 2 or more values for mname.)

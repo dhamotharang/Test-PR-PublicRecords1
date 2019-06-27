@@ -37,14 +37,14 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 	addAddr_bdid			:= addAddr(hhid=0 and did=0 and bdid<>0) + addAddr(hhid<>0 and did=0 and bdid<>0);
 	
 	//Pull Current Records First
-	dhhid							:= dedup(sort(distribute(addAddr_hhid(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, hhid, -current_record_flag,  dt_first_seen, -dt_last_seen, local), p3+phone7, hhid, local);
-	ddid							:= dedup(sort(distribute(addAddr_did(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, did, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, did, local);
-	dbdid							:= dedup(sort(distribute(addAddr_bdid(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, bdid, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, bdid, local);	
+	dhhid							:= dedup(sort(distribute(addAddr_hhid(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, hhid, -current_record_flag,  dt_first_seen, -dt_last_seen, local), p3+phone7, hhid, current_record_flag, local);
+	ddid							:= dedup(sort(distribute(addAddr_did(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, did, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, did, current_record_flag, local);
+	dbdid							:= dedup(sort(distribute(addAddr_bdid(dt_first_seen not in ['','0']), hash(p3+phone7)), p3+phone7, bdid, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, bdid, current_record_flag, local);	
 
 	allRec						:= dhhid + ddid + dbdid;
 
 	//Dedup By Address1; Sort Current Records First
-	ddRec 						:= dedup(sort(distribute(allRec, hash(p3+phone7)), p3+phone7, address1, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, address1, local);
+	ddRec 						:= dedup(sort(distribute(allRec, hash(p3+phone7)), p3+phone7, address1, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, address1, current_record_flag, local);
 
 	tempLayout := record
 		dx_PhonesInfo.Layouts.Phones_Transaction_Main;
@@ -91,7 +91,6 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 		self.bdid 											:= l.bdid;
 		self.addID											:= hash(l.p3+l.phone7+l.did+l.hhid+l.bdid);
 		self.groupid										:= c;
-		self.ocn												:= '';
 		self.global_sid									:= 0;
 		self.record_sid									:= 0;
 		self.is_deact										:= 'N';
@@ -101,8 +100,8 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 
 	inF								:= project(ddRec, fixF(left, counter));
 	
-	inRE 							:= inF(transaction_code=PhonesInfo.TransactionCode.React);
-	inDE							:= inF(transaction_code=PhonesInfo.TransactionCode.Deact);
+	inRE 							:= inF(transaction_code='RE');
+	inDE							:= inF(transaction_code='DE');
 
 	//Keep Earliest React 
 	inFRE 						:= dedup(sort(distribute(inRE, hash(phone)), phone, react_start_dt, local), phone, local);
@@ -177,29 +176,17 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 	
 	fixForm						:= project(aggrTrans_r, fixTr(left));
 	
-	//Append Carrier Related Info	to Transaction File 
-	srtFixForm				:= sort(distribute(fixForm, hash(phone)), phone, -vendor_last_reported_dt, local);
-	srtPType					:= sort(distribute(PhonesInfo.File_Phones_Type.Main(source in [mdr.sourceTools.src_Phones_Lerg6, mdr.sourceTools.src_Phones_LIDB]), hash(phone)), phone, -vendor_last_reported_dt, local);
-	
-	dx_PhonesInfo.Layouts.Phones_Transaction_Main addOTr(srtFixForm l, srtPType r):= transform
-		self.ocn												:= r.account_owner;	
-		self.spid												:= r.spid;
-		self 														:= l;
-	end;
-	
-	addOcn						:= join(srtFixForm, srtPType,
-														trim(left.phone, left, right) = trim(right.phone, left, right),
-														addOTr(left, right), left outer, local, keep(1));
-	
-	ddAddOcn					:= dedup(sort(distribute(addOcn, hash(phone)), record, local), record, local);
-	
 	//Add Record SID
-	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(ddAddOcn l):= transform
-		self.record_sid 								:= hash64(Mdr.SourceTools.Src_Phones_Gong_History_Disconnect + l.transaction_code + l.transaction_start_dt + l.transaction_end_dt + l.vendor_first_reported_dt) + (integer)l.phone;
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(fixForm l):= transform
+		self.record_sid 								:= hash64(Mdr.SourceTools.Src_Phones_Gong_History_Disconnect + 
+																							l.transaction_code + 
+																							l.transaction_start_dt + 
+																							l.transaction_end_dt + 
+																							l.vendor_first_reported_dt) + (integer)l.phone;
 		self 														:= l;
 	end;
 	
-	addID							:= project(ddAddOcn, trID(left))(length(trim(phone, left, right))=10); //Pull Complete Phones
+	addID							:= project(fixForm, trID(left))(length(trim(phone, left, right))=10); //Pull Complete Phones
 		
 	//DEDUP RESULTS
 	ddRecords					:= dedup(sort(distribute(addID, hash(phone)), record, local), record, local);

@@ -3,22 +3,25 @@
 EXPORT SprayAndQualifyRDP(
 	string pversion )
 := FUNCTION
-	DateSearch := pVersion[1..8];
+	DateSearch := ut.date_math(pVersion[1..8], -1);
 
-	Customer_Settings := FraudGovPlatform.MBS_Mappings(contribution_source = 'RDP' and contribution_gc_id != '');
+	RDP_GcIds := FraudGovPlatform.MBS_Mappings(contribution_source = 'RDP' and contribution_gc_id != '');
 
-	billingID_list := SET(Customer_Settings,contribution_billing_id);
+	billingID_list := SET(RDP_GcIds,contribution_billing_id);
 
+	// rdp_file := dataset('~foreign::10.173.50.45::thor100_21::in::sba_acclogs_processed',INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])));
 	rdp_file := dataset('~foreign::10.173.50.45::thor100_21::in::'+DateSearch+'::sba_acclogs',INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])));
+
 
 	RDP_Logs := rdp_file(
 			 company_id in billingID_list,
 			 function_name = 'VERIFICATION'
+			 //(unsigned)STD.Str.FindReplace( STD.Str.FindReplace( date_added,':',''),'-','')[1..8] = (unsigned)DateSearch
 		);
-
-	FileSprayed := (string)(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ Customer_Settings[1].Customer_Account_Number + '_' + Customer_Settings[1].Customer_State + '_' + Customer_Settings[1].Customer_Agency_Vertical_Type + '_' + Customer_Settings[1].Customer_Program + '_' + Customer_Settings[1].Contribution_Source + '_' + DateSearch + '_' + Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S')):independent ;
-	
-	RDP_Sprayed := FraudGovPlatform.Filenames().Sprayed.RDP;
+			
+	fname	:= 'rdp_' + pVersion[1..8];
+	FileSprayed := FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
+	InquiryLogs_Sprayed := FraudGovPlatform.Filenames().Sprayed.RDP;
 	
 	tools.mac_WriteFile(FileSprayed,
 									RDP_Logs,
@@ -33,7 +36,7 @@ EXPORT SprayAndQualifyRDP(
 
 	outputwork  := sequential(
 								  Build_Input_File
-								, nothor(fileservices.AddSuperfile(RDP_Sprayed,FileSprayed))
+								, fileservices.AddSuperfile(InquiryLogs_Sprayed,FileSprayed)
 							);
 	
 	RETURN outputwork;							

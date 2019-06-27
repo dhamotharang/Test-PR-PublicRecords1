@@ -23,9 +23,9 @@ new_records_sample_for_qa	:= BankruptcyV2.New_records_sample        : success(fi
 scrubs_step2 := bankruptcyV2.proc_build_scrubs_step2(filedate);
 Stats_For_DR := bankruptcyv2.BK_Stats_Metadata;
 orbit_report.Bankruptcy_Stats(orbitreport);
-build_relationships := BankruptcyV2.Proc_Create_Relationships(filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net');
-dops_update := Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y',,,'Y');
-BIP_dops_update := RoxieKeyBuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com',,'BN');
+build_relationships := BankruptcyV2.Proc_Create_Relationships(filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net');
+dops_update := Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y',,,'Y');
+BIP_dops_update := RoxieKeyBuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com',,'BN');
 send_package := if(_Control.ThisEnvironment.Name = 'Dataland',output('Package Sent'),
 			fileservices.sendemail('Roxiedeployment@seisint.com,QualityAssurance@seisint.com',
 			'Roxie Prod NonFCRA BK Package Files ' + ut.GetDate,

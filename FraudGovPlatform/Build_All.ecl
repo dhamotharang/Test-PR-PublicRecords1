@@ -43,6 +43,7 @@ BuildStatusReport :=
 	export build_all := sequential(
 		FraudGovPlatform.Build_Input(version).ALL,
 		FraudGovPlatform.Build_Base(version).ALL,
+		FraudGovPlatform.Build_Main(version).ALL,
 		if ( FraudGovPlatform.Mac_TestRecordID(version) = 'Passed' and FraudGovPlatform.Mac_TestRinID(version) = 'Passed', 
 				sequential(
 					FraudGovPlatform.Promote(version).promote_base,

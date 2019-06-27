@@ -15,7 +15,8 @@ FUNCTION
 
 		SELF.Customer_Job_ID	:= '1'; 
 		SELF.Batch_Record_ID	:= '1'; 
-		SELF.Reason_Description	:= 'Applicant Activity via LexisNexis'; 
+		SELF.Transaction_ID_Number :=	L.transaction_id;
+		SELF.Reason_for_Transaction_Activity	:= 'Applicant Activity via LexisNexis'; 
 		SELF.Date_of_Transaction	:= STD.Str.FindReplace( STD.Str.FindReplace( L.date_added,':',''),'-','')[1..8] ;
 		SELF.DOB := L.dob[5..8] + L.dob[1..2] + L.dob[3..4];
 		SELF.raw_First_name	:= L.first_name;
@@ -26,9 +27,9 @@ FUNCTION
 		SELF.phone_number	:= L.phone;
 		SELF.Cell_Phone	:= L.work_phone;
 		SELF.Drivers_License_State:= 	L.dl;
-		SELF.Drivers_License:= 	L.dl_state;
+		SELF.Drivers_License_Number:= 	L.dl_state;
 		SELF.SSN:= 	L.ssn;
-		SELF.rawlinkid	:= L.response_lexid;
+		SELF.LexID	:= L.response_lexid;
 		SELF.IP_Address	:= L.ipaddr;
 		SELF := L;
 		SELF := [];

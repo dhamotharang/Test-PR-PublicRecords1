@@ -186,6 +186,7 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.mname = ri.mname  => le.mname_weight100,
                         LENGTH(TRIM(le.mname))>0 and le.mname = ri.mname[1..LENGTH(TRIM(le.mname))] => le.mname_weight100, // An initial match - take initial specificity
                         LENGTH(TRIM(ri.mname))>0 and ri.mname = le.mname[1..LENGTH(TRIM(ri.mname))] => ri.mname_weight100, // An initial match - take initial specificity
+                        Config.WithinEditN(le.mname,le.mname_len,ri.mname,ri.mname_len,1,0) =>  SALT311.fn_fuzzy_specificity(le.mname_weight100,le.mname_cnt, le.mname_e1_cnt,ri.mname_weight100,ri.mname_cnt,ri.mname_e1_cnt),
                         SALT311.Fn_Fail_Scale(AVE(le.mname_weight100,ri.mname_weight100),s.mname_switch));
   INTEGER2 address_ind_score := MAP(
                         le.address_ind_isnull OR ri.address_ind_isnull => 0,

@@ -553,12 +553,13 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.right_mname := ri.mname;
   SELF.mname_match_code := MAP(
                         le.mname_isnull OR ri.mname_isnull => SALT311.MatchCode.OneSideNull,
-                        match_methods(ih).match_mname(le.mname,ri.mname));
+                        match_methods(ih).match_mname(le.mname,ri.mname, le.mname_len, ri.mname_len));
   SELF.mname_score := MAP(
                         le.mname_isnull OR ri.mname_isnull => 0,
                         le.mname = ri.mname  => le.mname_weight100,
                         LENGTH(TRIM(le.mname))>0 and le.mname = ri.mname[1..LENGTH(TRIM(le.mname))] => le.mname_weight100, // An initial match - take initial specificity
                         LENGTH(TRIM(ri.mname))>0 and ri.mname = le.mname[1..LENGTH(TRIM(ri.mname))] => ri.mname_weight100, // An initial match - take initial specificity
+                        Config.WithinEditN(le.mname,le.mname_len,ri.mname,ri.mname_len,1,0) =>  SALT311.fn_fuzzy_specificity(le.mname_weight100,le.mname_cnt, le.mname_e1_cnt,ri.mname_weight100,ri.mname_cnt,ri.mname_e1_cnt),
                         SALT311.Fn_Fail_Scale(AVE(le.mname_weight100,ri.mname_weight100),s.mname_switch));
   SELF.left_address_ind := le.address_ind;
   SELF.right_address_ind := ri.address_ind;
