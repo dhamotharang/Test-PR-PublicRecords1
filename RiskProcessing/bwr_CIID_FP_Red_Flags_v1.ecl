@@ -28,7 +28,8 @@ prii_layout := RECORD
 	string historydate;
 END;
 
-f := DATASET('~jpyon::in::citi_1295_3220_in_in',prii_layout,csv(quote('"')));
+// f := DATASET('~jpyon::in::citi_1295_3220_in_in',prii_layout,csv(quote('"')));
+f := DATASET('~tfuerstenberg::out::members_8976_all_ciid',prii_layout,csv(quote('"')));
 // f := choosen(DATASET(ut.foreign_prod+'jpyon::in::citi_1295_3220_in_in',prii_layout,csv(quote('"'))),100);
 output(f);
 
