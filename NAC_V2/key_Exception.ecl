@@ -1,4 +1,4 @@
-import doxie,data_services;
+﻿import doxie,data_services;
 
 rExceptionKey := RECORD
   string2 	sourceprogramstate;
@@ -14,7 +14,7 @@ rExceptionKey := RECORD
  END;
 
 
-d1 := PROJECT(Files('').dsExceptionRecords(replaced=0), TRANSFORM(rExceptionKey,
+d1 := PROJECT(Files2.dsExceptionRecords(replaced=0), TRANSFORM(rExceptionKey,
 																							//self.sourcegroupid := left.groupid;
 																							// temporary:
 																							self.sourcegroupid := left.sourceprogramstate + '01';

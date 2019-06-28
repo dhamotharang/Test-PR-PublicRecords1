@@ -231,7 +231,7 @@ EXPORT proc_build_quick_hdr(
 	);
 
 	RETURN SEQUENTIAL(
-		/*weekly_handling,*/
+		weekly_handling,
 		roxie_keys,
 		Proc_Accept_SRC_toQA(filedate),
 		proc_build_ssn_suppression(filedate),

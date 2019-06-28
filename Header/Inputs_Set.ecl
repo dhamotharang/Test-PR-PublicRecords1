@@ -36,11 +36,13 @@ output('Nothing added to base::LiensHeader_Building'),
 fileservices.addsuperfile('~thor_data400::base::LiensHeader_Building','~thor_data400::base::liens',,true));
 
 
+File_liens_party_headerIngest := PROJECT(LiensV2.File_Liens_Party_BIPV2_with_Linkflags_build,LiensV2.Layout_Liens_party_HeaderIngest);
+
 liensv2_file := if(fileservices.getsuperfilesubcount('~thor_data400::base::LiensV2_mainHeader_Building')>0,
 output('Nothing added to base::LiensV2Header_Building'),
 sequential(
-output(liensv2.file_liens_main,,'~thor_data400::base::liens::main', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files main
-output(liensv2.File_liens_party_headerIngest,,'~thor_data400::base::liens::party', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files party
+output(liensv2.file_liens_main_build,,'~thor_data400::base::liens::main', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files main
+output(File_liens_party_headerIngest,,'~thor_data400::base::liens::party', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files party
 fileservices.addsuperfile('~thor_data400::base::LiensV2_mainHeader_Building','~thor_data400::base::liens::main'),
 fileservices.addsuperfile('~thor_data400::base::LiensV2_partyHeader_Building','~thor_data400::base::liens::party')
 ));
