@@ -1077,6 +1077,8 @@ module
 				or  (trim(pInput.vendor_id) = '12-221573' and trim(pInput.lname) = 'HUBBARD' and trim(pInput.fname) = 'MARY' and trim(pInput.company_prim_name) = 'CENTRAL' and pInput.company_zip = 33713)
 				// -- JIRA - DF-24522 - Consumer Dispute - Unlink to PAW - zoom record
 				or  (trim(pInput.vendor_id) = '185398039' and trim(pInput.lname) = 'ROLSETH' and pInput.company_phone = 6516313237 and regexfind('YADA SYSTEMS',pInput.company_name, nocase))
+				// -- JIRA - DF-25118 - Father's PAW records associated to son
+				or  (trim(pInput.vendor_id) = ['12-N02262','12-767331'] and trim(pInput.lname) = 'RAY' and trim(pInput.fname) = 'GRANDSTAFF')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
