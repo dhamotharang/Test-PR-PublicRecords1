@@ -23,7 +23,7 @@ EXPORT ProcessContributoryFile(string ip, string rootDir, string lfn, string mai
 						output('Spraying: '+ ip + ready + lfn + ' -> ' + '~nac::uber::in::'+lfn)
 						,nothor(STD.File.SprayVariable(
 							 IP
-							,ready + lfn
+							,spraying + lfn
 							,,,,
 							,if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01','thor400_36_02')
 							,ilfn
