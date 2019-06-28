@@ -1,4 +1,4 @@
-﻿IMPORT versioncontrol, _control, ut, tools,HMS_CSR;
+﻿IMPORT versioncontrol, _control, ut, tools,HMS_CSR, Orbit3;
 EXPORT Build_all(string pversion, boolean pUseProd = false) := FUNCTION
 
 	spray_  		 := VersionControl.fSprayInputFiles(HMS_CSR.fSpray(pversion,pUseProd));
@@ -14,6 +14,9 @@ EXPORT Build_all(string pversion, boolean pUseProd = false) := FUNCTION
 
 	if(not superFile,FileServices.CreateSuperFile('~thor400_data::base::hms_csr::hms_csrcredential',,1));
 	
+	
+
+	
 	built := sequential(
 						spray_
 						// ,checkspray_ 
@@ -27,7 +30,10 @@ EXPORT Build_all(string pversion, boolean pUseProd = false) := FUNCTION
 					
 														
 						//Archive
-						,FileServices.StartSuperFileTransaction(),
+						,FileServices.StartSuperFileTransaction()
+						
+						//update ORBIT 
+						,Orbit3.Proc_Orbit3_CreateBuild_npf ('HMS_CSR',pVersion),
 						
 						//Clean Up Base Files
 						FileServices.RemoveOwnedSubFiles('~thor400_data::base::hms_csr::hms_csrcredential',true),

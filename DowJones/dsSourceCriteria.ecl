@@ -1773,6 +1773,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'US Department of State - Public Designation under Section 7031(c) of Foreign Operations and Related Programs Act','1760'},
 {'French Economy Ministry - EU and UN Asset Freezing Measures','1761'},
 {'French Economy Ministry - National Asset Freezing Measures','1762'},
-{'Quebec’s Most Wanted Criminals List','1763'}
+{U'Quebec’s Most Wanted Criminals List','1763'},
+{'DFATD (Canada) Special Economic Measures (Nicaragua) Regulations','1764'},
+{'European Bank for Reconstruction and Development Third Party Findings List','1765'},
+{'OFAC - Nicaragua Human Rights and Anticorruption Act of 2018','1766'}
 ],r);
 

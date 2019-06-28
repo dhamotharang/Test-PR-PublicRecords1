@@ -14,9 +14,10 @@ EXPORT keys := MODULE
 				           constants.KeyName_death_master + 'did_death_masterv2_'+doxie.Version_SuperKey);
 	
 	EXPORT key_ssn(boolean isFCRA) := function
-		fcra_base := Files.File_DeathMaster_Building((LENGTH(TRIM(ssn))=9) and trim(src) = mdr.sourceTools.src_Death_Master and glb_flag != 'Y');
-
-		base := if(isFCRA, fcra_base, files.File_DeathMaster_Building((LENGTH(TRIM(ssn))=9)));
+		fcra_base := Files.File_DeathMaster_Building_2((LENGTH(TRIM(ssn))=9) and trim(src) = mdr.sourceTools.src_Death_Master and glb_flag != 'Y');
+  	//base := if(isFCRA, fcra_base, files.File_DeathMaster_Building((LENGTH(TRIM(ssn))=9)));
+		base:=fcra_base;
+		
 
 		key_name := if(isFCRA, 
 			constants.KeyName_death_master + 'fcra::death_master::ssn_'+ doxie.Version_SuperKey,
@@ -33,8 +34,8 @@ EXPORT keys := MODULE
 			   constants.KeyName_death_master + 'fcra::did_death_masterv2_'+doxie.Version_SuperKey);
 
 
-	EXPORT key_death_masterv2_ssa_did_fcra := Index(Files.Bldg_Dead_With_County_FCRA(TRUE),
-		{unsigned6 l_did := (integer)did},{Files.Bldg_Dead_With_County_FCRA(TRUE)},
+	EXPORT key_death_masterv2_ssa_did_fcra := Index(Files.Bldg_Dead_With_County_FCRA_SSA(TRUE),
+		{unsigned6 l_did := (integer)did},{Files.Bldg_Dead_With_County_FCRA_SSA(TRUE)},
 		constants.KeyName_death_master + 'fcra::did_death_masterv2_ssa_'+doxie.Version_SuperKey);
 
 	EXPORT key_dod_ssa := index(

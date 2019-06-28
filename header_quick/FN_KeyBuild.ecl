@@ -1,45 +1,57 @@
-﻿import header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr,aid,PromoteSupers;
+﻿IMPORT header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr,aid,PromoteSupers;
 
-export FN_KeyBuild(dataset(header.Layout_Header) header_in0, string filedate) := 
-FUNCTION
+EXPORT FN_KeyBuild(
+	DATASET(header.Layout_Header) header_in0, 
+	STRING filedate
+) := FUNCTION
 
-//***//***//***//*** SUPPRESSION CODE - CNG 20070417 - W20070417-161923 & W20070417-164348 ***//***//***//***//
+	//***//***//***//*** SUPPRESSION CODE - CNG 20070417 - W20070417-161923 & W20070417-164348 ***//***//***//***//
 
-recordof(header_in0) t_set_src(recordof(header_in0) le) := transform
- self.src := if(le.src='WH','WH', if(le.src= 'EQ', 'QH', le.src));
- self     := le;
-end;
+	RECORDOF(header_in0) t_set_src(recordof(header_in0) le) := TRANSFORM
+ 		self.src := if(le.src='WH','WH', if(le.src= 'EQ', 'QH', le.src));
+ 		self     := le;
+	END;
 
-header_in := project(header_in0,t_set_src(left));
+	header_in := PROJECT(header_in0,t_set_src(left));
 
-Suppression_Layout := header_services.Supplemental_Data.layout_in;
+	Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
-header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func); 
+	header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func); 
  
-Suppression_In := supp_ds_func();
+	Suppression_In := supp_ds_func();
 
-dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+	dSuppressedIn := PROJECT(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
 
-rHashDIDAddress := header_services.Supplemental_Data.layout_out;
+	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 
-rFullOut_HashDIDAddress := record
- header.Layout_Header;
- rHashDIDAddress;
-end;
+	rFullOut_HashDIDAddress := RECORD
+		header.Layout_Header;
+		rHashDIDAddress;
+	END;
 
-//***//***// TEST CODE FOR SUPPRESSION - 20070605
+	//***//***// TEST CODE FOR SUPPRESSION - 20070605
 
-rFullOut_HashDIDAddress tHashDIDAddress(header_in l) := transform                            
- self.hval :=  hashmd5(intformat(l.did,15,1),(string)l.st,(string)l.zip,(string)l.city_name,
-									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
- self := l;
-end;
+	rFullOut_HashDIDAddress tHashDIDAddress(header_in l) := TRANSFORM                            
+		self.hval :=  hashmd5(
+			intformat(l.did,15,1),
+			(STRING)l.st,
+			(STRING)l.zip,
+			(STRING)l.city_name,
+			(STRING)l.prim_name,
+			(STRING)l.prim_range,
+			(STRING)l.predir,
+			(STRING)l.suffix,
+			(STRING)l.postdir,
+			(STRING)l.sec_range
+		);
+		self := l;
+	END;
 
-dHeader_withMD5 := project(header_in, tHashDIDAddress(left));
+dHeader_withMD5 := PROJECT(header_in, tHashDIDAddress(left));
 
-header.Layout_Header tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
- self := l;
-end;
+header.Layout_Header tSuppress(dHeader_withMD5 l, dSuppressedIn r) := TRANSFORM
+	self := l;
+END;
 
 full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
                           left.hval=right.hval,
@@ -230,21 +242,21 @@ PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick_SSN_validity',    
 PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::header_nlr::did.rid',            'Q',MQ4);
 Roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::headerquick::fraud_flag::@version@::eq','Q',MQ5,filedate);
 
-return sequential(
-									build_source_key(filedate)
-									,build_qh_base
-									,header_quick.proc_build_fraud_flag_eq(filedate)
-									,notify('QuickHeader BaseFile Complete','*')
-									,build_rid_srid_keys(filedate)
-									,parallel(
-														autoKeys
-														,sequential(B1,M1,MQ1)
-														,sequential(B2,M2,MQ2)
-														,sequential(B3,M3,MQ3)
-														,sequential(B4,M4,MQ4)
-														,sequential(B5,M5,MQ5)
-														)
-									,build_source_key_prep(filedate)
-								);
+RETURN SEQUENTIAL(
+		build_source_key(filedate),
+		build_qh_base,
+		header_quick.proc_build_fraud_flag_eq(filedate),
+		notify('QuickHeader BaseFile Complete','*'),
+		build_rid_srid_keys(filedate),
+		PARALLEL(
+			autoKeys,
+			SEQUENTIAL(B1,M1,MQ1),
+			SEQUENTIAL(B2,M2,MQ2),
+			SEQUENTIAL(B3,M3,MQ3),
+			SEQUENTIAL(B4,M4,MQ4),
+			SEQUENTIAL(B5,M5,MQ5)
+		)
+		,build_source_key_prep(filedate)
+	);
 
 END;
