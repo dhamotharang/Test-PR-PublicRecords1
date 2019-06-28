@@ -30,9 +30,14 @@ EXPORT GetReports(string lfn) := function
 										self := LEFT.ExceptionRec;
 										));
 										
+		badRecords := PROJECT(nac2(RecordCode NOT IN Nac_V2.Layouts2.validRecordCodes), TRANSFORM(Nac_V2.Layouts2.rBadRecordEx,
+										self.RecordCode := left.RecordCode;
+										self := LEFT.BadRec;
+										));
+										
 		exceptionArchive := PROJECT(exceptions, $.Layouts2.rExceptionRecord);
 
-		errs := DISTRIBUTE((+)(addresses.dsErrs,clients.dsErrs,cases.dsErrs,contacts.dsErrs,exceptions.dsErrs), RANDOM());
+		errs := DISTRIBUTE((+)(addresses.dsErrs,clients.dsErrs,cases.dsErrs,contacts.dsErrs,exceptions.dsErrs,badRecords.dsErrs), RANDOM());
 
 		total := COUNT(nac2);
 		nErrors := COUNT(errs(Severity='E'));
@@ -50,7 +55,7 @@ EXPORT GetReports(string lfn) := function
 
 		ncd := nac_v2.Print.NCD2_Report(fn, errs, total, nErrors, nWarnings, nWarned, nRejected, 'XX', ExcessiveInvalidRecordsFound);
 
-		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions); 
+		ncx := Nac_v2.Print.NCX2_Report(cases, clients, addresses, contacts, exceptions, badRecords); 
 
 		return MODULE
 			EXPORT	DATASET($.ValidationCodes.rError) dsErrs := errs;
