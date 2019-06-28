@@ -5,9 +5,9 @@ EXPORT SprayAndQualifyInquiryLogs(
 := FUNCTION
 	DateSearch := ut.date_math(pVersion[1..8], -1);
 
-	RDP_GcIds := FraudGovPlatform.MBS_Mappings(contribution_source = 'RDP' and contribution_gc_id != '');
+	Customer_Settings := FraudGovPlatform.MBS_Mappings(contribution_source = 'RDP' and contribution_gc_id != '');
 
-	gcid_list := SET(RDP_GcIds,contribution_gc_id);
+	gcid_list := SET(Customer_Settings,contribution_gc_id);
 
 
 	inquiry_logs:=	inql_v2.Files().Inql_base.qa;
@@ -15,7 +15,6 @@ EXPORT SprayAndQualifyInquiryLogs(
 	IDM_Logs := inquiry_logs(
 			 mbs.global_company_id in gcid_list 
 			, search_info.function_description<>'' 
-			// , Search_info.datetime[1..8] = ut.date_math(ut.GetDate,-2)	
 			, Search_info.datetime[1..8] = DateSearch
 			, regexfind('gov',bus_intel.vertical,nocase)
 			,~regexfind('test',search_info.transaction_type,nocase)

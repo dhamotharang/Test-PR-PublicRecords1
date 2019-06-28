@@ -94,6 +94,7 @@
 		self.transaction_count					:= 0;
 		self.carrier_name								:= '';
 		self.phone_swap									:= '';
+		self.ocn												:= '';
 		self.global_sid									:= 0;
 		self.record_sid									:= 0;
 		self 														:= l;
