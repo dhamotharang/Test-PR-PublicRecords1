@@ -17,7 +17,8 @@ module
 	export Coverage					:= Corp2.Stats_Coverage(pversion);
 	export Cleanup					:= Promote(pDelete := true).buildfiles.cleanup;
 	export dops							:= RoxieKeyBuild.updateversion('Corp2Keys', pversion, _control.MyInfo.EmailAddressNotify,,'N|B');
-
+  export DOPSGrowthCheck  := fDOPSGrowthCheck(pversion).GrowthCheck;
+	
 	orbit_report.Corp_Stats(getretval);
 	export corp_orbit_report := getretval;
 	export corp2keys := 	
@@ -27,7 +28,8 @@ module
 							,promote2QA
 							,stratapop
 							,build_boolean
-							,corp_orbit_report		
+							,corp_orbit_report
+							,DOPSGrowthCheck	
 						) : success(Send_Email(pversion).Roxie), failure(Send_Email(pversion).BuildFailure);
 						
 	export All :=
