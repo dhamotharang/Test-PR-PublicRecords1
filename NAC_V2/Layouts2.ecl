@@ -241,7 +241,7 @@ EXPORT rExceptionRecord := RECORD
 		unsigned4 created;
 		unsigned4 updated;
 		unsigned4 replaced;
-		unsigned8 errors;
+		unsigned4 errors;
 		unsigned4 warnings;
 END;		
 
