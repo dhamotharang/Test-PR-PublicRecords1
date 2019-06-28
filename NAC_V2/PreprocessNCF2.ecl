@@ -33,7 +33,7 @@ EXPORT PreprocessNCF2(string ilfn) := function
 				self.AddressRec := IF(rc='AD01', TRANSFER(text, Nac_V2.Layouts2.rAddress - RecordCode));
 				self.StateContactRec := IF(rc='SC01', TRANSFER(text, Nac_V2.Layouts2.rStateContact - RecordCode));
 				self.ExceptionRec := IF(rc='EX01', TRANSFER(text, Nac_V2.Layouts2.rException - RecordCode));
-				self.BadRecord := IF(rc NOT IN Nac_V2.Layouts2.validRecordCodes, left.text, '');
+				self.BadRec := IF(rc NOT IN Nac_V2.Layouts2.validRecordCodes, TRANSFER(text, Nac_V2.Layouts2.rBadRecord - RecordCode));
 				self.RecordCode := rc;
 				));
 				
@@ -105,6 +105,13 @@ EXPORT PreprocessNCF2(string ilfn) := function
 	clients := nac_v2.mod_Validation.VerifyRelatedClients(cases, clients1);
 	addresses := nac_v2.mod_Validation.VerifyRelatedAddresses(cases, clients, addresses1);
 	
+		bad :=		Nac_V2.mod_Validation.ValidateRecordCode(
+								PROJECT(nacin(RecordCode NOT IN Nac_V2.Layouts2.validRecordCodes), TRANSFORM(Nac_V2.Layouts2.rBadRecord,
+										self := LEFT.BadRec;
+										self.RecordCode := left.RecordCode;
+							)));
+
+	
   recombined := PROJECT(cases, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.CaseRec := left;
 								self.RecordCode := left.RecordCode;
@@ -127,6 +134,11 @@ EXPORT PreprocessNCF2(string ilfn) := function
 							) &
 							PROJECT(exceptions, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
 								self.ExceptionRec := left;
+								self.RecordCode := left.RecordCode;
+								self := []) 
+							) &
+							PROJECT(bad, TRANSFORM(nac_v2.Layouts2.rNac2Ex,
+								self.BadRec := left;
 								self.RecordCode := left.RecordCode;
 								self := []) 
 							)
