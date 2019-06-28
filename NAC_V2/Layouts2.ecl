@@ -99,6 +99,11 @@ export rException := RECORD
 	string50		Comments;
 END;
 
+export rBadRecord := RECORD
+	string4			RecordCode;
+	string64		text;
+END;
+
 EXPORT validRecordCodes := ['CA01','CL01','AD01','SC01','EX01'];
 
 EXPORT rNac2 := RECORD
@@ -119,7 +124,7 @@ EXPORT rNac2 := RECORD
 	  rException - RecordCode		ExceptionRec;
 	END;
 	IFBLOCK(self.RecordCode NOT IN ['CA01','CL01','AD01','SC01','EX01'])
-		string		BadRecord {maxlength(256)};
+		rBadRecord - RecordCode		BadRec;
 	END;
 	string1	eol := '\n';
 END;
@@ -214,6 +219,11 @@ END;
 		rCommonEx;
 	END;
 	
+	export rBadRecordEx := RECORD
+		rBadRecord;
+		rCommonEx;
+	END;
+	
 EXPORT rNac2Ex := RECORD
 	string4			RecordCode;
 	IFBLOCK(self.RecordCode = 'CA01')
@@ -232,7 +242,7 @@ EXPORT rNac2Ex := RECORD
 	  rExceptionEx - RecordCode		ExceptionRec;
 	END;
 	IFBLOCK(self.RecordCode NOT IN ['CA01','CL01','AD01','SC01','EX01'])
-		string		BadRecord {maxlength(256)};
+		rBadRecordEx - RecordCode		BadRec;
 	END;
 END;	
 
