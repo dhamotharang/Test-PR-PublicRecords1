@@ -150,6 +150,7 @@ EXPORT Layouts := MODULE
 			unsigned1 isDeleted{xpath('is_deleted')};
 			string12 officerID{xpath('officer_id')};
 			string10 date_report_submitted {xpath('date_report_submitted')};
+			string releasable{xpath('releasable')};
 		END;
 
 		EXPORT DeltaPersonRecord := RECORD
