@@ -3,7 +3,7 @@
 	in_srt := sort(inputs, customer_id,transaction_id,Date_of_Transaction,Household_ID,Customer_Person_ID,Customer_Program,Reason_for_Transaction_Activity,inquiry_source,customer_county,customer_state,customer_agency_vertical_type,ssn,dob,Rawlinkid,raw_full_name,raw_title,raw_first_name,raw_middle_name,raw_last_name,raw_Orig_Suffix,full_address,street_1,city,state,zip,county,mailing_street_1,mailing_city,mailing_state,mailing_zip,mailing_county,phone_number,ultid,orgid,seleid,tin,Email_Address,appended_provider_id,lnpid,npi,ip_address,device_id,professional_id,bank_routing_number_1,bank_account_number_1,Drivers_License_State,Drivers_License,geo_lat,geo_long,file_type,deceitful_confidence,reason_description,event_type_1,event_entity_1, reported_by, reported_date);
 
 	new_rec := record
-		HIROSHI_Input;
+		inputs;
 		unsigned4 dt_first_seen;
 		unsigned4 dt_last_seen; 
 		unsigned4 dt_vendor_last_reported; 
