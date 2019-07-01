@@ -325,8 +325,8 @@ EXPORT mod_Validation := MODULE
 	
 	END;
 	
-	EXPORT ValidRecordCode(Dataset(Layouts2.rNac2) ds) := 
-				PROJECT(ds, TRANSFORM(Layouts2.rCommonEx, SKIP(left.RecordCode in Layouts2.ValidRecordCodes),
+	EXPORT ValidateRecordCode(Dataset(Layouts2.rBadRecord) ds) := 
+				PROJECT(ds, TRANSFORM(Layouts2.rBadRecordEx, SKIP(left.RecordCode in Layouts2.ValidRecordCodes),
 					self.dsErrs := IF(left.RecordCode not in Layouts2.ValidRecordCodes, 
 											DATASET([{errCodes.E101, 'E', 'R', FieldCode('E', errCodes.E101), left.RecordCode, 'XX', left.RecordCode}], rErr));							
 					self.errors := COUNT(self.dsErrs(severity='E'));

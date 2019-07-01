@@ -19,7 +19,7 @@ doit := SEQUENTIAL(
 	OUTPUT(IF(version=version1, 'Versions Match', 'Outdated Base1: ' + version1)),
 	OUTPUT(b2,,lfn_base, COMPRESSED),
 	nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
-	nac_v2.BuildPayload(b2, version),
+	nac_V2.BuildPayload(b2, version),
 	nac_v2.Build_keys(version),
 	OUTPUT(collisions,,lfn_collisions,COMPRESSED,OVERWRITE),
 	nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfCollisions, lfn_collisions),

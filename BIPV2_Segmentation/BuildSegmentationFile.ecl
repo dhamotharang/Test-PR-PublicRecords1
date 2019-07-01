@@ -12,7 +12,7 @@ export BuildSegmentationFile(
                                string   pVersion                 = BIPV2.KeySuffix_mod2.MostRecentWithIngestVersionDate
 				        ) := function
 
-     outputFileName := BIPV2_Segmentation.Files(trim(pVersion),false).FILE_LOGICAL;
+     outputFileName := BIPV2_Segmentation.Files(trim(pVersion)).FILE_LOGICAL;
 		
      //Current Build Version of Contacts Key
 	contactKeyDs   := distribute(pull(BIPV2_Build.key_contact_linkids.keybuilt), hash32(seleid));
@@ -51,7 +51,7 @@ export BuildSegmentationFile(
                                self.category := right.category;
                                self.subcategory := right.subCategory;
                                self:=left;
-                               self:=[]), left outer, keep(1), local);
+                               self:=[]), left outer, keep(1), hash);
 
      withBest := join(withSeg, bestRecs(proxid=0), 
                       left.seleid = right.seleid, 
@@ -79,7 +79,7 @@ export BuildSegmentationFile(
                                      self.company_incorporation_date := right.company_incorporation_date[1].company_incorporation_date;
                                      self.company_sic_code1          := right.sic_code[1].company_sic_code1;
                                      self.company_naics_code1        := right.naics_code[1].company_naics_code1;               
-                                     self:=left), left outer, keep(1), local);           
+                                     self:=left), left outer, keep(1), hash);           
                                      
      contactInfo := ExtractContacts.extractContactInfo(contactKeyDs, seg_key);
 
@@ -87,8 +87,8 @@ export BuildSegmentationFile(
 	                     left.seleid = right.seleid, 
                           transform(Layouts.SegmentationLayout,
                                     self.contacts := right.contacts;
-                                    self:=left), keep(1), left outer, local);
-                                                                                                                                                                               
+                                    self:=left), keep(1), left outer, hash);
+
      go := sequential(
 	     output(withContacts,,outputFileName,overwrite,compressed) 
 	    ,evaluate(BIPV2_Segmentation.Files(trim(pVersion),false).updateSuperFiles(outputFileName))
