@@ -229,7 +229,9 @@ EXPORT Print := MODULE
 												,DATASET(nac_v2.Layouts2.rClientEx) clients
 												,DATASET(nac_v2.Layouts2.rAddressEx) addresses
 												,DATASET(nac_v2.Layouts2.rStateContactEx) contacts
-												,DATASET(nac_v2.Layouts2.rExceptionEx) exceptions) := FUNCTION
+												,DATASET(nac_v2.Layouts2.rExceptionEx) exceptions
+												,DATASET(nac_v2.Layouts2.rBadRecordEx) badRecords
+												) := FUNCTION
 
 		rr_cases := NORMALIZE(cases(errors>0 OR warnings>0), left.dsErrs, toNcx2(RIGHT,
 														'CA01',
@@ -256,7 +258,12 @@ EXPORT Print := MODULE
 													left.SourceProgramState, left.SourceProgramCode, '', left.SourceClientId
 													));
 
-		records := rr_cases + rr_clients + rr_addresses + rr_contacts + rr_exceptions;
+		rr_badRecords := NORMALIZE(badRecords(errors>0 OR warnings>0), LEFT.dsErrs, toNcx2(RIGHT,
+													'XXXX',
+													'', '', '', ''
+													));
+
+		records := rr_cases + rr_clients + rr_addresses + rr_contacts + rr_exceptions + rr_badRecords;
 	
 		return SORT(CHOOSEN(records, 1000),errorcode);		// HHSCO-35
 			

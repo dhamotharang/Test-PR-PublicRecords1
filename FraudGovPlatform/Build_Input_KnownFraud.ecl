@@ -79,7 +79,6 @@ module
 			{inputs} RollupUpdate({inputs} l, {inputs} r) := 
 			transform
 					SELF.source_rec_id := if(l.source_rec_id < r.source_rec_id,l.source_rec_id, r.source_rec_id); // leave always previous Unique_Id 
-					SELF.process_date := if(l.source_rec_id < r.source_rec_id,l.process_date, r.process_date); // leave always previous Process_Date
 					self := l;
 			end;
 
