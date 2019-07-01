@@ -1,3 +1,4 @@
+﻿import ut;
 EXPORT Mod_Sets := Module
 
 EXPORT threshld:=0.05;
@@ -149,65 +150,7 @@ EXPORT Exception_Reasons
 			,'B'		// LexID Overlinking
 ];
 
-EXPORT	States
-		:=
-			[
-			 'AK' 
-			 ,'AL' 
-			 ,'AR' 
-			 ,'AZ' 
-			 ,'CA' 
-			 ,'CO' 
-			 ,'CT' 
-			 ,'DC' 
-			 ,'DE' 
-			 ,'FL' 
-			 ,'GA'
-			 ,'GU'
-			 ,'HI' 
-			 ,'IA' 
-			 ,'ID' 
-			 ,'IL' 
-			 ,'IN' 
-			 ,'KS' 
-			 ,'KY' 
-			 ,'LA' 
-			 ,'MA' 
-			 ,'MD' 
-			 ,'ME' 
-			 ,'MI' 
-			 ,'MN' 
-			 ,'MO' 
-			 ,'MS' 
-			 ,'MT' 
-			 ,'NC' 
-			 ,'ND' 
-			 ,'NE' 
-			 ,'NH' 
-			 ,'NJ' 
-			 ,'NM' 
-			 ,'NV' 
-			 ,'NY' 
-			 ,'OH' 
-			 ,'OK' 
-			 ,'OR' 
-			 ,'PA'
-			 ,'PR'
-			 ,'RI' 
-			 ,'SC' 
-			 ,'SD' 
-			 ,'TN' 
-			 ,'TX' 
-			 ,'UT' 
-			 ,'VA'
-			 ,'VI'
-			 ,'VT' 
-			 ,'WA' 
-			 ,'WI' 
-			 ,'WV' 
-			 ,'WY' 
-			]
-	;
+EXPORT	States := ut.Set_State_Abbrev;
 
 EXPORT RegexBadAddress
 		:=

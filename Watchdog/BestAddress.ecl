@@ -7,7 +7,7 @@ If multiple then pick the one with a gong record
 If multiple (or none) then pick the one with the most recent first reported
 */
 
-import header,mdr, ut, utilfile,address,header_quick, AID;
+import header,mdr, ut, utilfile,address,header_quick, AID,STD;
 
 export bestaddress(string build_type = '') := function
 
@@ -53,8 +53,8 @@ flag_rec assignedDates(en Le) := transform
 
 //assess a penalty to the vendor date so it doesn't have equal weight to the seen date
 //results in approx 700k address changes W20080328-102320
-
-self.dt_last_seen := ((integer)(ut.GetDate[1..6])-if(le.dt_last_seen=0,le.dt_vendor_last_reported-2,le.dt_last_seen))/3;
+GetDate:=(STRING8)Std.Date.Today();
+self.dt_last_seen := ((integer)(GetDate[1..6])-if(le.dt_last_seen=0,le.dt_vendor_last_reported-2,le.dt_last_seen))/3;
 self.dt_first_seen := if(le.dt_first_seen=0,le.dt_vendor_first_reported-2,le.dt_first_seen);
 self.unit_desig := if(le.sec_range='','',le.unit_desig);
 self.addr_dt_last_seen := (unsigned3)le.dt_last_seen;
