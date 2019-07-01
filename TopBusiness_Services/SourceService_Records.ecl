@@ -1,15 +1,15 @@
 ﻿//NOTE: The coding in this attribute needs to be kept in sync with the datasets in
 //      iesp.topbusinesssourcedoc.t_TopBusinessSourceDocRecord
 
-import BIPV2,iesp, doxie;
+import BIPV2, iesp, doxie;
 
 export SourceService_Records(
 	dataset(TopBusiness_Services.SourceService_Layouts.InputLayout) indata,
 	doxie.IDataAccess mod_access,
 	TopBusiness_Services.SourceService_Layouts.OptionsLayout inoptions) := function
-	
+
 	FETCH_LEVEL := inoptions.fetch_Level;
-	
+
 	//Transform to non iesp record structure
 	indataRecs := PROJECT(indata,TRANSFORM(TopBusiness_Services.Layouts.rec_input_ids_wSrc,
 																				SELF.DotID 	:= LEFT.BusinessIds.DotID,
@@ -25,14 +25,14 @@ export SourceService_Records(
 																				// precedence, so in these cases the section is blaked out.
 																				SELF.Section := IF(LEFT.Source = '',LEFT.Section,''),
 																				SELF := LEFT));
-	
- 
+
+
 	// First, dedup the input requests by linkids, idvalues, section and source
 	deduped_sources := dedup(indataRecs,
 														#expand(BIPV2.IDmacros.mac_ListAllLinkids()),
 														IdValue,IdType,Section,Source,all);
 
-	// ******************************* 
+	// *******************************
 	// Get each type of SOURCE documents using the values in the linkids or idvalue
 
 	// Default/Other Directories. This is the default scenario for all sources that do not have their own
@@ -44,7 +44,7 @@ export SourceService_Records(
 	ds_linkids_only := PROJECT(other_source_docids,TRANSFORM(BIPV2.IDlayouts.l_xlink_ids,
 																		SELF := LEFT,
 																		SELF := []));
-	bhRecs := IF (EXISTS(ds_linkids_only), 
+	bhRecs := IF (EXISTS(ds_linkids_only),
 	             BIPV2.Key_BH_Linking_Ids.kfetch(ds_linkids_only,FETCH_LEVEL,
 	                      ,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit,TRUE)
 								,ds_empty_bhKfetchCall);
@@ -53,34 +53,34 @@ export SourceService_Records(
   other_prepared := PROJECT(other_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-	
-	// AIRCRAFT 
+																						self := []));
+
+	// AIRCRAFT
 	aircraft_source_docids := deduped_sources(SourceServiceInfo.IncludeRptAircraft(source,section));
 	aircraft_docs := CHOOSEN(TopBusiness_Services.AircraftSource_Records(aircraft_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_FAA_RECORD);
 	aircraft_prepared := PROJECT(aircraft_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.Aircrafts := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-	
-	// Amidir License 
+																						self := []));
+
+	// Amidir License
 	amidir_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptAmidir(source,section));
 	amidir_docs := CHOOSEN(TopBusiness_Services.AmidirSource_Records(amidir_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_AMSLIC_RECORD);
 	amidir_prepared := PROJECT(amidir_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-	// AMS License 
+																						self := []));
+	// AMS License
 	ams_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptAMS(source,section));
 	ams_docs := CHOOSEN(TopBusiness_Services.AMSSource_Records(ams_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_AMSLIC_RECORD);
 	ams_prepared := PROJECT(ams_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.AMSLicenses := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-																						
+																						self := []));
+
 	// ATF, Alcohol, Tobacco and Firearms
 	atf_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptATF(source,section));
 	atf_docs := CHOOSEN(TopBusiness_Services.ATFSource_Records(atf_source_docids,inoptions,false)
@@ -98,7 +98,7 @@ export SourceService_Records(
 																						self.BankruptcyReportRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-	
+
 	// BBB Member
 	bbbMember_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptBBBMember(source,section));
 	bbbMember_docs := CHOOSEN(TopBusiness_Services.BBBSource_Records(bbbMember_source_docids,inoptions,false)
@@ -107,7 +107,7 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-	
+
 	// BBB Non Member
 	bbbNonMember_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptBBBNonMember(source,section));
 	bbbNonMember_docs := CHOOSEN(TopBusiness_Services.BBBNonMemSource_Records(bbbNonMember_source_docids,inoptions,false)
@@ -116,7 +116,7 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																						
+
  	// Business Registrations
 	busreg_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptBusReg(source,section));
 	busreg_docs := CHOOSEN(TopBusiness_Services.BusinessRegSource_Records(busreg_source_docids,inoptions,false)
@@ -125,7 +125,7 @@ export SourceService_Records(
 																						self.BusinessRegistrationRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-	// Calbus 
+	// Calbus
 	calbus_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCalbus(source,section));
 	calbus_docs     := CHOOSEN(TopBusiness_Services.CalbusSource_Records(calbus_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_CALBUS_RECORD);
@@ -134,7 +134,7 @@ export SourceService_Records(
 																						self.acctno := 'SINGLE',
 																						self := []));
 
-	// CA Sales Tax 
+	// CA Sales Tax
 	catax_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCASalesTax(source,section));
 	catax_docs     := CHOOSEN(TopBusiness_Services.CASalesTaxSource_Records(catax_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_CATAX_RECORD);
@@ -142,8 +142,8 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																						
-	// CNLD Facilities 
+
+	// CNLD Facilities
 	cnld_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCNLDFacility(source,section));
 	cnld_docs     := CHOOSEN(TopBusiness_Services.CNLDFacilitySource_Records(cnld_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_CNLD_RECORD);
@@ -151,7 +151,7 @@ export SourceService_Records(
 																						self.CNLDFacilities := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-	
+
 	// CORPORATIONS - source= multiple "C*" codes, source_docid = corp_key+'//'+ corp_process_date
 	corp_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCorp(source,section));
 	corp_docs     := CHOOSEN(TopBusiness_Services.CorporationSource_Records(corp_source_docids,inoptions,false)
@@ -160,7 +160,7 @@ export SourceService_Records(
 																						self.CorporateFilings := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-  
+
   // CORTERA - source= 'RR' source_docid=link_id
 	cortera_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCortera(source,section));
 	cortera_docs     := CHOOSEN(TopBusiness_Services.CorteraSource_Records(cortera_source_docids,inoptions,false)
@@ -168,8 +168,8 @@ export SourceService_Records(
 	cortera_prepared := PROJECT(cortera_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.CorteraRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));																						
-	
+																						self := []));
+
 	// Crash Carrier
 	crash_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCrash(source,section));
 	crash_docs     := CHOOSEN(TopBusiness_Services.CrashCarrierSource_Records(crash_source_docids,inoptions,false)
@@ -179,14 +179,14 @@ export SourceService_Records(
 																						self.acctno := 'SINGLE',
 																						self := []));
 
-  // DCA (AKA LNCA) 
+  // DCA (AKA LNCA)
 	dca_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptDCA(source,section));
 	dca_docs     := CHOOSEN(TopBusiness_Services.dcaSource_Records(dca_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_DCA_RECORD);
 	dca_prepared := PROJECT(dca_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.DcaRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
+																						self := []));
 
   // DEA (Drug Engforcement Administration) - source=DA, source_docid=dea_registration_number
 	dea_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptDEA(source,section));
@@ -195,7 +195,7 @@ export SourceService_Records(
 	dea_prepared := PROJECT(dea_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.DeaRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
+																						self := []));
 
 	// Diversity certification
 	div_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptDiversityCert(source,section));
@@ -204,8 +204,8 @@ export SourceService_Records(
 	div_prepared := PROJECT(div_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.DiversityCertRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-																						
+																						self := []));
+
   // DUN & BRADSTREET FEIN - source='DN',  source_docid=tmsid
 	dnbfein_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptDNBFein(source,section));
 	dnbfein_docs     := CHOOSEN(TopBusiness_Services.dnbfeinSource_Records(dnbfein_source_docids,inoptions,false)
@@ -213,7 +213,7 @@ export SourceService_Records(
 	dnbfein_prepared := PROJECT(dnbfein_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.FeinRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
+																						self := []));
 
 	// EXPERIAN BUSINESS REPORTS (EBR) - source='ER',  source_docid=file_number+'//'+process_date,
 	ebr_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptEBR(source,section));
@@ -222,8 +222,8 @@ export SourceService_Records(
 	ebr_prepared := PROJECT(ebr_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.EbrRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));		
-	
+																						self := []));
+
 	// EXPERIAN CRDB
 	expcrdb_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptEXPCrdb(source,section));
 	expcrdb_docs     := CHOOSEN(TopBusiness_Services.ExperianCRDBSource_Records(expcrdb_source_docids,inoptions,false)
@@ -231,8 +231,8 @@ export SourceService_Records(
 	expcrdb_prepared := PROJECT(expcrdb_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.ExpCRDBRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));		
-																						
+																						self := []));
+
 	// EXPERIAN FEIN - source='E5','E6'
 	expfein_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptEXPFein(source,section));
 	expfein_docs     := CHOOSEN(TopBusiness_Services.ExperianFeinSource_Records(expfein_source_docids,inoptions,false)
@@ -240,18 +240,18 @@ export SourceService_Records(
 	expfein_prepared := PROJECT(expfein_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.ExpFeinRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));		
+																						self := []));
 
 	// EQUIFAX Bus data Records- source= 'Z1' source_docid=effx_1
 	equifax_bus_data_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptEquifaxBusData(source,section));
-	
+
 	equifax_bus_data_docs     := CHOOSEN(TopBusiness_Services.EquifaxBusinessDataSource_Records(equifax_bus_data_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_EQUIFAXBUSDATA_RECORD);
 	equifax_bus_data_prepared := PROJECT(equifax_bus_data_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.EquifaxBusinessDataRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));			
-																						
+																						self := []));
+
      // FICTITIOUS BUSINESS NAMES (FBNs) - source_docid = tmsid(38?)+ '//' + rmsid(35?)
 	fbn_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptFBN(source,section));
 	fbn_docs     := CHOOSEN(TopBusiness_Services.FBNSource_Records(fbn_source_docids,inoptions,false)
@@ -259,7 +259,7 @@ export SourceService_Records(
 	fbn_prepared := PROJECT(fbn_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.FbnRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));		
+																						self := []));
 
   // FCC Licenses
 	fcc_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptFCC(source,section));
@@ -268,7 +268,7 @@ export SourceService_Records(
 	fcc_prepared := PROJECT(fcc_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.FccRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
+																						self := []));
 
 	// FDIC
 	fdic_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptFDIC(source,section));
@@ -277,8 +277,8 @@ export SourceService_Records(
 	fdic_prepared := PROJECT(fdic_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-																																										
+																						self := []));
+
 	// FORECLOSURE
 	forec_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptForeclosure(source,section));
 	forec_docs := CHOOSEN(TopBusiness_Services.ForeclosureNODSource_Records(forec_source_docids,inoptions,false,false)
@@ -286,8 +286,8 @@ export SourceService_Records(
 	forec_prepared := PROJECT(forec_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.Foreclosures := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-																						
+																						self := []));
+
 	// Franchise
 	frandx_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptFrandx(source,section));
 	frandx_docs := CHOOSEN(TopBusiness_Services.FranchiseSource_Records(frandx_source_docids,inoptions,false)
@@ -296,7 +296,7 @@ export SourceService_Records(
 																						self.FranchiseRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																			
+
 	// Gong - Phone
 	gong_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptGong(source,section));
 	gong_docs := CHOOSEN(TopBusiness_Services.GongSource_Records(gong_source_docids,inoptions,false)
@@ -305,7 +305,7 @@ export SourceService_Records(
 																						self.GongRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																					
+
 	// GSA
 	gsa_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptGSA(source,section));
 	gsa_docs := CHOOSEN(TopBusiness_Services.GSASource_Records(gsa_source_docids,inoptions,false)
@@ -313,8 +313,8 @@ export SourceService_Records(
   gsa_prepared := PROJECT(gsa_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));																					
-																					
+																						self := []));
+
   //IA State Tax
 	iatax_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptIASalesTax(source,section));
 	iatax_docs     := CHOOSEN(TopBusiness_Services.IASalesTaxSource_Records(iatax_source_docids,inoptions,false)
@@ -323,7 +323,7 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																					
+
 	// InfoUSA_ABIUS
 	infoUSA_abius_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptInfoUSA_ABIUS(source,section));
 	infoUSA_abius_docs := CHOOSEN(TopBusiness_Services.InfoUSA_ABIUSSource_Records(infoUSA_abius_source_docids,inoptions,false)
@@ -332,7 +332,7 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																						
+
 	// InfoUSA_Deadco
 	infoUSA_deadco_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptInfoUSA_deadco(source,section));
 	infoUSA_deadco_docs := CHOOSEN(TopBusiness_Services.InfoUSA_DeadcoSource_Records(infoUSA_deadco_source_docids,inoptions,false)
@@ -341,7 +341,7 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																						
+
    // infutorNarb Records- source= 'Z2' source_docid=record_id (vl_id in bip header is composed of both 'pid' and 'record_id' fields)
 	infutor_narb_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptInfutorNarb(source,section));
 	infutor_narb_docs     := CHOOSEN(TopBusiness_Services.InfutorNARBSource_Records(infutor_narb_source_docids,inoptions,false)
@@ -349,8 +349,8 @@ export SourceService_Records(
 	infutorNarb_prepared := PROJECT(infutor_narb_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.InfutorNarbRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));																									
-																						
+																						self := []));
+
 		// Insurance Certification
 	insCert_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptInsuranceCert(source,section));
 	insCert_docs := CHOOSEN(TopBusiness_Services.InsuranceCertSource_Records(insCert_source_docids,inoptions,false)
@@ -359,7 +359,7 @@ export SourceService_Records(
 																						self.InsuranceCertRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																						
+
 	// IRS 5500
 	irs5500_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptIRS5500(source,section));
 	irs5500_docs := CHOOSEN(TopBusiness_Services.IRS5500Source_Records(irs5500_source_docids,inoptions,false)
@@ -368,7 +368,7 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-	
+
 	// IRS 990 - Non Profit
 	irs990_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptIRS990(source,section));
 	irs990_docs := CHOOSEN(TopBusiness_Services.IRS990Source_Records(irs990_source_docids,inoptions,false)
@@ -377,7 +377,7 @@ export SourceService_Records(
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																						
+
 	// LABOR ACTIONS WHD
 	labor_actions_whd_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptLaborActionsWHD(source,section));
 	labor_actions_whd_docs := CHOOSEN(TopBusiness_Services.LaborActionsWHDSource_Records(labor_actions_whd_source_docids,inoptions,false)
@@ -385,8 +385,8 @@ export SourceService_Records(
 	labor_actions_whd_prepared := PROJECT(labor_actions_whd_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));			
-	
+																						self := []));
+
 	// LIENS & JUDGMENTS source=xx(multiple), source_docid=tmsid
 	lien_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptLiens(source,section));
 	lien_docs := CHOOSEN(TopBusiness_Services.LienSource_Records(lien_source_docids,inoptions,false)
@@ -394,16 +394,16 @@ export SourceService_Records(
 	lien_prepared := PROJECT(lien_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.liensjudgments := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));		
-																						
+																						self := []));
+
 	// Mississippi Workers Compensation
 	MSWorkersComp_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptMSWorkersComp(source,section));
 	MSWorkersComp_docs := CHOOSEN(TopBusiness_Services.MSWorkSource_Records(MSWorkersComp_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_MSWORK_RECORD);
 	MSWorkersComp_prepared := PROJECT(MSWorkersComp_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
-																						self.OtherSourceRecords := dataset(left), 
+																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));																								
+																						self := []));
 
 	// MOTOR VEHICLE REGISTRATIONS (MVRs) - source=multiple values
 	mvr_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptMVR(source,section));
@@ -413,7 +413,7 @@ export SourceService_Records(
 																						self.MotorVehicles := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
-																						
+
 	// Natural Disaster Readiness
 	ndr_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptNaturalDisaster_Readiness(source,section));
 	ndr_docs := CHOOSEN(TopBusiness_Services.NDRSource_Records(ndr_source_docids,inoptions,false)
@@ -421,8 +421,8 @@ export SourceService_Records(
 	ndr_prepared := PROJECT(ndr_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));																							
-																						
+																						self := []));
+
 	// NCPDP (National Council for prescription Drug Program)
 	ncpdp_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptNCPDP(source,section));
 	ncpdp_docs := CHOOSEN(TopBusiness_Services.NcpdpSource_Records(ncpdp_source_docids,inoptions,false)
@@ -430,59 +430,59 @@ export SourceService_Records(
 	ncpdp_prepared := PROJECT(ncpdp_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-	// NOTICE OF DEFAULT(NOD) 
+																						self := []));
+	// NOTICE OF DEFAULT(NOD)
 	nod_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptNod(source,section));
 	nod_docs := CHOOSEN(TopBusiness_Services.ForeclosureNODSource_Records(nod_source_docids,inoptions,false,true)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_FOREC_RECORD);
 	nod_prepared := PROJECT(nod_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.NoticeOfDefaults := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
+																						self := []));
 
 	// Oregon Workers Compensation
 	ORWorkersComp_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptORWorkersComp(source,section));
 	ORWorkersComp_docs := CHOOSEN(TopBusiness_Services.ORWorkSource_Records(ORWorkersComp_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_WORKERSCOMP_RECORD);
 	ORWorkersComp_prepared := PROJECT(ORWorkersComp_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
-																						self.OtherSourceRecords := dataset(left), 
+																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));				
-	// OIG 
+																						self := []));
+	// OIG
 	oig_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptOIG(source,section));
 	oig_docs := CHOOSEN(TopBusiness_Services.OIGSource_Records(oig_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_OIG_RECORD);
 	oig_prepared := PROJECT(oig_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(LEFT),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-	// Oshair 
+																						self := []));
+	// Oshair
 	oshair_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptOshair(source,section));
 	oshair_docs := CHOOSEN(TopBusiness_Services.OshairSource_Records(oshair_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_OSHAIR_RECORD);
 	oshair_prepared := PROJECT(oshair_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OSHAReportRecords := dataset(LEFT),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-																						
+																						self := []));
+
 	// PROFESSIONAL LICENSES -
 	prolic_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptProlic(source,section));
-	prolic_docs := CHOOSEN(TopBusiness_Services.ProfLicenseSource_Records(prolic_source_docids,inoptions,false)
+	prolic_docs := CHOOSEN(TopBusiness_Services.ProfLicenseSource_Records(prolic_source_docids, inoptions, mod_access, false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_PROFLIC_RECORD);
 	prolic_prepared := PROJECT(prolic_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.ProlicRecords := dataset(LEFT),
 																						self.acctno := 'SINGLE',
-																						self := []));			
-							
-	// REAL PROPERTY (includes Assessments, Deeds & Mortgages); 
+																						self := []));
+
+	// REAL PROPERTY (includes Assessments, Deeds & Mortgages);
 	property_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptProperty(source,section));
 	property_docs := CHOOSEN(TopBusiness_Services.PropertySource_Records(property_source_docids,inoptions,,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_PROP_RECORD);
 	property_prepared := PROJECT(property_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.PropertyReportRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));		
-																						
+																						self := []));
+
 	// SEC Broker/Dealer
 	secbd_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptSEC_Broker_Dealer(source,section));
 	secbd_docs := CHOOSEN(TopBusiness_Services.SEC_BDSource_Records(secbd_source_docids,inoptions,false)
@@ -490,34 +490,34 @@ export SourceService_Records(
 	secbd_prepared := PROJECT(secbd_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));																							
-																						
-	// SHEILA GRECO 
+																						self := []));
+
+	// SHEILA GRECO
 	sgreco_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptSheilaGreco(source,section));
 	sgreco_docs := CHOOSEN(TopBusiness_Services.SheilaGrecoSource_Records(sgreco_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_SHEILA_RECORD);
 	sgreco_prepared := PROJECT(sgreco_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.SheilaGrecoRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-																						
-	// SPOKE 
-	spoke_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptSpoke(source,section));	
+																						self := []));
+
+	// SPOKE
+	spoke_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptSpoke(source,section));
 	spoke_docs := CHOOSEN(TopBusiness_Services.SpokeSource_Records(spoke_source_docids,inoptions, mod_access,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_SPOKE_RECORD);
 	spoke_prepared := PROJECT(spoke_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));		
-																						
-	// TXBUS 
-	txbus_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptTxbus(source,section));	
+																						self := []));
+
+	// TXBUS
+	txbus_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptTxbus(source,section));
 	txbus_docs := CHOOSEN(TopBusiness_Services.TXBUSSource_Records(txbus_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_TXBUS_RECORD);
 	txbus_prepared := PROJECT(txbus_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));									
+																						self := []));
 
 	// UCC - source=multiple values, source_docid== trim(tmsid,left,right)
 	ucc_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptUCCs(source,section));
@@ -526,7 +526,7 @@ export SourceService_Records(
 	ucc_prepared := PROJECT(ucc_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.UCCFilings := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
+																						self := []));
 
 	// WATERCRAFT - source=multiple values, source_docid = watercraft_key(30)+ '//' + sequence_key(30)
 	watercraft_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptWatercraft(source,section));
@@ -535,18 +535,18 @@ export SourceService_Records(
 	watercraft_prepared := PROJECT(watercraft_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.Watercrafts := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-																						
+																						self := []));
+
 	// Workers Compensation
 	workersCompensation_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptWorkersCompensation(source,section));
 	workersCompensation_docs     := CHOOSEN(TopBusiness_Services.WorkersCompensationSource_Records(workersCompensation_source_docids,inoptions,false)
 																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_WORKERSCOMP_RECORD);
 	workersCompensation_prepared := PROJECT(workersCompensation_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
-																						self.WorkCompInsuranceCertRecords := dataset(left), 
+																						self.WorkCompInsuranceCertRecords := dataset(left),
 																						// self.OtherSourceRecords := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));				
- 
+																						self := []));
+
  	// YellowPages
 	yellowpage_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptYellowPages(source,section));
 	yellowpage_docs := CHOOSEN(TopBusiness_Services.YellowPagesSource_Records(yellowpage_source_docids,inoptions,false)
@@ -554,18 +554,18 @@ export SourceService_Records(
 	yellowpage_prepared := PROJECT(yellowpage_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
 																						self.YellowPages := dataset(left),
 																						self.acctno := 'SINGLE',
-																						self := []));	
-	
-	// As of now, many sources are placed into the othersourceRecords in the ouput dataset, combine and limit 
+																						self := []));
+
+	// As of now, many sources are placed into the othersourceRecords in the ouput dataset, combine and limit
 	// the total amount to not exceed the dataset max limit.
 	allOther_prepared := CHOOSEN(other_prepared
-																+ amidir_prepared 
+																+ amidir_prepared
 																+ bbbMember_prepared
 																+ bbbNonMember_prepared
 																+ calbus_prepared
 																+ catax_prepared
-																+ fdic_prepared															
-																+ gsa_prepared																
+																+ fdic_prepared
+																+ gsa_prepared
 																+ iatax_prepared
 																+ infoUSA_abius_prepared
 																+	infoUSA_deadco_prepared
@@ -586,18 +586,18 @@ export SourceService_Records(
  all_prepared := aircraft_prepared
 		+ allOther_prepared
   	+ ams_prepared
-		+ atf_prepared      
+		+ atf_prepared
 		+ bankruptcy_prepared
 		+ busreg_prepared
 		+ cnld_prepared
-		+ corp_prepared    
+		+ corp_prepared
 		+ cortera_prepared
     + crash_prepared
-    + dca_prepared         
-    + dea_prepared  
+    + dca_prepared
+    + dea_prepared
 		+ div_prepared
-		+ dnbfein_prepared     
-		+ ebr_prepared  
+		+ dnbfein_prepared
+		+ ebr_prepared
 		+ expcrdb_prepared
 		+ expfein_prepared
 		  + equifax_bus_data_prepared
@@ -608,15 +608,15 @@ export SourceService_Records(
 		+ gong_prepared
 		+ infutorNarb_prepared
 		+ insCert_prepared
-		+ lien_prepared        
-		+ mvr_prepared         
+		+ lien_prepared
+		+ mvr_prepared
 		+ nod_prepared
 		+ oshair_prepared
-    + prolic_prepared     
-		+ property_prepared    	
-		+ sgreco_prepared   
-		+ ucc_prepared        
-		+ watercraft_prepared  
+    + prolic_prepared
+		+ property_prepared
+		+ sgreco_prepared
+		+ ucc_prepared
+		+ watercraft_prepared
 		+ workersCompensation_prepared
 		+ yellowpage_prepared
 		;
@@ -629,7 +629,7 @@ export SourceService_Records(
 			self.AtfRecords := left.AtfRecords + right.AtfRecords,
 			self.BankruptcyReportRecords := left.BankruptcyReportRecords + right.BankruptcyReportRecords,
 			self.BusinessRegistrationRecords := left.BusinessRegistrationRecords + right.BusinessRegistrationRecords,
-			self.CNLDFacilities := left.CNLDFacilities + right.CNLDFacilities,	
+			self.CNLDFacilities := left.CNLDFacilities + right.CNLDFacilities,
 			self.CorporateFilings := left.CorporateFilings + right.CorporateFilings,
 			self.CorteraRecords := left.CorteraRecords + right.CorteraRecords;
 			self.CrashCarriers := left.CrashCarriers + right.CrashCarriers,
@@ -720,7 +720,7 @@ export SourceService_Records(
 	// output(dnbfein_prepared,               named('dnbfein_prepared'));
   // output(ebr_source_docids,              named('ebr_source_docids'));
 	// output(ebr_docs,                       named('ebr_docs'));
-	// output(ebr_prepared,                   named('ebr_prepared'));	
+	// output(ebr_prepared,                   named('ebr_prepared'));
 	// output(expcrdb_source_docids,          named('expcrdb_source_docids'));
 	// output(expcrdb_docs,                   named('expcrdb_docs'));
 	// output(expcrdb_prepared,               named('expcrdb_prepared'));
@@ -735,7 +735,7 @@ export SourceService_Records(
 	// output(fcc_prepared,                  	named('fcc_prepared'));
 	// output(fdic_source_docids,            	named('fdic_source_docids'));
 	// output(fdic_docs,                     	named('fdic_docs'));
-	// output(fdic_prepared,                 	named('fdic_prepared'));	
+	// output(fdic_prepared,                 	named('fdic_prepared'));
 	// output(forec_source_docids,            named('forec_source_docids'));
 	// output(forec_docs,                     named('forec_docs'));
 	// output(forec_prepared,                 named('forec_prepared'));
@@ -747,10 +747,10 @@ export SourceService_Records(
 	// output(gong_prepared,                	named('gong_prepared'));
 	// output(gsa_source_docids,           		named('gsa_source_docids'));
 	// output(gsa_docs,                    		named('gsa_docs'));
-	// output(gsa_prepared,                		named('gsa_prepared'));	
+	// output(gsa_prepared,                		named('gsa_prepared'));
 	// output(iatax_source_docids,            named('iatax_source_docids'));
 	// output(iatax_docs,                     named('iatax_docs'));
-	// output(iatax_prepared,                 named('iatax_prepared'));	
+	// output(iatax_prepared,                 named('iatax_prepared'));
   // OUTPUT(infoUSA_deadco_source_docids,   NAMED('infoUSA_deadco_source_docids'));
   // OUTPUT(infoUSA_deadco_docs,            NAMED('infoUSA_deadco_docs'));
   // OUTPUT(infoUSA_deadco_prepared,        NAMED('infoUSA_deadco_prepared'));
@@ -768,22 +768,22 @@ export SourceService_Records(
 	// output(lien_prepared,                  named('lien_prepared'));
 	// output(MSWorkersComp_source_docids, 		named('MSWorkersComp_source_docids'));
 	// output(MSWorkersComp_docs,          		named('MSWorkersComp_docs'));
-	// output(MSWorkersComp_prepared,      		named('MSWorkersComp_prepared'));		
+	// output(MSWorkersComp_prepared,      		named('MSWorkersComp_prepared'));
 	// output(mvr_source_docids,              named('mvr_source_docids'));
 	// output(choosen(mvr_docs,500),          named('mvr_docs'));
 	// output(mvr_prepared,                   named('mvr_prepared'));
 	// output(ncpdp_source_docids, 						named('ncpdp_source_docids'));
 	// output(ncpdp_docs,          						named('ncpdp_docs'));
-	// output(ncpdp_prepared,      						named('ncpdp_prepared'));	
+	// output(ncpdp_prepared,      						named('ncpdp_prepared'));
 	// output(ndr_source_docids, 							named('ndr_source_docids'));
 	// output(ndr_docs,          							named('ndr_docs'));
-	// output(ndr_prepared,      							named('ndr_prepared'));	
+	// output(ndr_prepared,      							named('ndr_prepared'));
 	// output(nod_source_docids,            	named('nod_source_docids'));
 	// output(nod_docs,                       named('nod_docs'));
 	// output(nod_prepared,                 	named('nod_prepared'));
 	// output(ORWorkersComp_source_docids, 		named('ORWorkersComp_source_docids'));
 	// output(ORWorkersComp_docs,          		named('ORWorkersComp_docs'));
-	// output(ORWorkersComp_prepared,      		named('ORWorkersComp_prepared'));	
+	// output(ORWorkersComp_prepared,      		named('ORWorkersComp_prepared'));
 	// output(oshair_source_docids,						named('oshair_source_docids'));
 	// output(oshair_docs,										named('oshair_docs'));
 	// output(oshair_prepared,								named('oshair_prepared'));
@@ -798,7 +798,7 @@ export SourceService_Records(
 	// output(property_prepared,              named('property_prepared'));
 	// output(secbd_source_docids,            named('secbd_source_docids'));
 	// output(secbd_docs,                     named('secbd_docs'));
-	// output(secbd_prepared,                 named('secbd_prepared'));	
+	// output(secbd_prepared,                 named('secbd_prepared'));
 	// output(sgreco_source_docids,           named('sgreco_source_docids'));
 	// output(sgreco_docs,                    named('sgreco_docs'));
 	// output(sgreco_prepared,                named('sgreco_prepared'));
@@ -825,5 +825,5 @@ export SourceService_Records(
 	// output(rollup_acctno,                  named('rollup_acctno'));
 
 	return rollup_acctno;
-	
+
 end;
