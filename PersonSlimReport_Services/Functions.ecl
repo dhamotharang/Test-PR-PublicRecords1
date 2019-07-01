@@ -1,5 +1,5 @@
 ﻿IMPORT American_Student_Services, ATF_Services, DidVille, doxie, doxie_crs, Gateway, iesp,
-       PersonReports, PersonSlimReport_Services, SmartRollup, STD, suppress, ut;
+       PersonReports, PersonSlimReport_Services, SmartRollup, STD, ut;
 
 EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
@@ -135,7 +135,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
 	
 	EXPORT profLicRecsByDid(Ioptions in_mod):= FUNCTION
-      pl_mod  := module (project (in_mod, PersonReports.input.proflic, opt)) end;
+      pl_mod  := module (PersonReports.IParam.proflic)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      end;
       pl_raw  := PersonReports.proflic_records(in_did,pl_mod).proflicenses_v2;	 
       pl_clean := project(pl_raw,
                     TRANSFORM(iesp.proflicense.t_ProfessionalLicenseRecord,
@@ -149,8 +151,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
  //this function also adds did's to the RTV records to be used in alerting platform
   SHARED getRealTimeVehicles(Ioptions in_mod, DATASET(doxie.layout_best) bestRecs = DATASET([],doxie.layout_best)) := FUNCTION
-  
-      mod_access:= PersonSlimReport_Services.IParams.convertToDataAccess(in_mod);
+      mod_access:= MODULE (doxie.IDataAccess)
+        //this brings some extras (like, include_BlankDOD), but there's no harm in it
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      END;
   
       rec_reg_seq := record(iesp.motorvehicle.t_MotorVehicleReportRegistrant)
         unsigned4 seq := 0;

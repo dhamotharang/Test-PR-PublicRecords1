@@ -157,9 +157,6 @@ EXPORT input := MODULE
   export phonesplus := INTERFACE (phones, _report)
   end;
 
-  export proflic := INTERFACE (_didsearch)
-  end;
-
   export property := INTERFACE (_report)
     export boolean use_nonsubjectproperty     := false; // former "include_priorproperties"
     export boolean use_currentlyownedproperty := false; //meaning, current ONLY!

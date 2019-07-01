@@ -172,7 +172,7 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagemen
 // =======================================================================
 // ====================  Professional License Data	======================
 // =======================================================================
-			profmod	:=  personReports.proflic_records(dids);
+			profmod	:=  personReports.proflic_records(dids, PROJECT (in_params, PersonReports.IParam.proflic));
 			esp_proflicense :=	PROJECT(profmod.proflicenses_v2, iesp.identitymanagementreport.t_IdmProfessionalLicense)(LicenseNumber <> '');
 			filtered_proflicense := DEDUP(SORT(esp_proflicense,LicenseNumber,ProfessionOrBoard,-DateLastSeen),LicenseNumber,ProfessionOrBoard);
 														
