@@ -9,7 +9,7 @@ EXPORT proc_segmentation(
   ,string                            pGoldOutputModifier  = ''
   ,boolean                           pPopulateStatus      = false
   ,boolean                           pUseClean2           = false //for testing so that persists will not have to be rebuilt each time(the regulatory suppression causes that to happen)
-  
+  ,string                            pLgid3KeyVersion     = 'built'  
 ) := 
 module
     shared ds_Input_clean := if(pUseClean2 = false
@@ -146,8 +146,8 @@ module
     //Generate Segmentation File
     export build_seg_file           := BIPV2_Segmentation.BuildSegmentationFile;
     // Gold Segmentation
-    export modgoldSELEV2_test       := BIPV2_PostProcess.segmentation_gold(SeleFree_test,   'SELEID',pToday, 'V2'          + pGoldOutputModifier);
-    export modgoldSELEV2P_test      := BIPV2_PostProcess.segmentation_gold(SeleProb_test,   'SELEID',pToday, 'V2Probation' + pGoldOutputModifier);    
+    export modgoldSELEV2_test       := BIPV2_PostProcess.segmentation_gold(SeleFree_test,   'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion);
+    export modgoldSELEV2P_test      := BIPV2_PostProcess.segmentation_gold(SeleProb_test,   'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion);    
     
     // Segmentation Stats
     export modProxV2_test           := BIPv2_PostProcess.segmentation(ProxFree_test, 'PROXID',pToday);
@@ -215,8 +215,10 @@ module
     BIPV2_PostProcess.macPartition(pInput, Empid,  EmpFree,  EmpProb)
     
     // Gold Segmentation
-    export modgoldSELEV2      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier);
-    export modgoldSELEV2P     := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2Probation' + pGoldOutputModifier);    
+    export modgoldSELEV2      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier,pLgid3KeyVersion);
+    export modgoldSELEV2P     := BIPV2_PostProcess.segmentation_gold(SeleProb,  'SELEID',pToday, 'V2Probation' + pGoldOutputModifier,pLgid3KeyVersion);    
+
+    export modgoldSELEV2_all  := BIPV2_PostProcess.segmentation_gold(pInput  ,  'SELEID',pToday, 'V2_all'      + pGoldOutputModifier,pLgid3KeyVersion);
     
     export goldSELEV2         := modgoldSELEV2.out;
     export goldSELEV2P        := modgoldSELEV2P.out;
