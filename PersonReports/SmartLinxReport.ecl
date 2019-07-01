@@ -145,7 +145,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   p_voters := choosen (if (param.Smart_Rollup, s_voters, voters), iesp.Constants.SMART.MaxVoter);
 
 	//combine proflic,  medprov, medsanc
-  profmod   := personReports.proflic_records (dids, module (project (old_param, $.input.proflic, opt)) end, IsFCRA);
+  profmod   := personReports.proflic_records (dids, PROJECT(mod_smartlinx, $.IParam.proflic), IsFCRA);
 	prof      := IF (param.include_proflicenses and count(profmod.proflicenses_v2) <= iesp.constants.SMART.MaxUnRolledRecords, profmod.proflicenses_v2,dataset([],iesp.proflicense.t_ProfessionalLicenseRecord));
   sanc	    := IF (param.include_proflicenses, personReports.sanctions_records (dids, module (project (old_param, $.input.sanctions, opt)) end, IsFCRA),dataset([],iesp.proflicense.t_SanctionRecord));
 	prov_recs := IF (param.include_proflicenses, personReports.providers_records (dids, module (project (old_param, $.input.providers)) end, IsFCRA));
@@ -326,7 +326,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   //INDIVIDUALS  relatives, neighbors are assigned above  
 
   //BUSINESS
-     pawRaw     := IF (param.include_peopleatwork, PersonReports.peopleatwork_records (dids,module (project (mod_smartlinx, $.IParam.peopleatwork, opt))end, IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
+     pawRaw     := IF (param.include_peopleatwork, PersonReports.peopleatwork_records (dids, PROJECT (mod_smartlinx, $.IParam.peopleatwork), IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
 		 pawMod     := SmartRollup.smart_paw(pawRaw);
 		 pawNonExec := SmartRollup.fn_smart_rollup_paw(pawMod.paw_nonExec);  //non-executives ONLY rolled up
 		 pawNonExec_count := count(pawNonExec);
