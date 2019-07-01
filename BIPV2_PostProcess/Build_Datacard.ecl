@@ -1,13 +1,16 @@
-﻿import ut,bipv2,wk_ut,BIPV2_Findlinks,BIPV2_Postprocess,std;
+﻿import ut,bipv2,wk_ut,BIPV2_Findlinks,BIPV2_Postprocess,std,BIPV2_Strata;
 thecurrentdate  := (STRING8)Std.Date.Today();         
 highwuid        := 'W' + thecurrentdate + '-999999';
 
 EXPORT Build_Datacard(
-   string   pversion  = bipv2.KeySuffix
-  ,string20 TheSprint = 'Sprint ' + BIPV2.KeySuffix_mod2.SprintNumber(pversion) //'Sprint 26'
-  ,string   the_WU    = trim(sort(wk_ut.get_Running_Workunits('W' + trim(STD.Str.Filter(pversion,'0123456789')) + '-000001',highwuid,'completed')(job = 'BIPV2_PostProcess.proc_segmentation ' + pversion),-wuid)[1].wuid)//'W20150217-055342'
+   string   pversion        = bipv2.KeySuffix
+  ,string20 TheSprint       = 'Sprint ' + BIPV2.KeySuffix_mod2.SprintNumber(pversion) //'Sprint 26'
+  ,string   the_WU          = trim(sort(wk_ut.get_Running_Workunits('W' + trim(STD.Str.Filter(pversion,'0123456789')) + '-000001',highwuid,'completed')(job = 'BIPV2_PostProcess.proc_segmentation ' + pversion),-wuid)[1].wuid)//'W20150217-055342'
+  ,string   the_StrataWU    = trim(sort(wk_ut.get_Running_Workunits('W' + trim(STD.Str.Filter(pversion,'0123456789')) + '-000001',highwuid,'completed')(job = 'BIPV2_Strata.proc_build_all '         + pversion),-wuid)[1].wuid)//'W20150217-055342'
 
 ) := Module
+
+	 Shared Seleid_Cluster_Stats:=Dataset(WorkUnit(the_StrataWU,'Overall_Seleid_Cluster_Stats'),BIPV2_Strata.layouts.lay_cluster_stats);
 
 	//------------------------ID_Segmentation---------------------------------------------
 	 Shared ProxSegmentationStatsV2_rec :={string20 segType, string20 segSubType, unsigned4 total};
@@ -255,7 +258,7 @@ EXPORT Build_Datacard(
 
 		Shared Data_Fill_Rates :=dataset([
  {'Current Build Fill Rates','','','','','','','','','','','','','','','','','','','',''}
-,{BIPV2_PostProcess.FormatDate(pVersion),'PROXID','','SELEID','','','ORGID','','POWID','','',                                         '','PROXID','','SELEID','','','ORGID','','POWID',''},
+,{BIPV2_PostProcess.FormatDate(pVersion),'PROXID','','SELEID','','','ORGID','','POWID','','',                                         '','PROXID','','SELEID','','','ORGID','','POWID',''}
 ,{'','Active','Inactive','Active','Inactive','Act Gold','Active','Inactive','Active','Inactive','',      '','Active','Inactive','Active','Inactive','Act Gold','Active','Inactive','Active','Inactive'}
 ,{'Address','','','','','','','','','','','Address','','','','','','','','',''}
 ,{'Street'         ,PA.prim_name/PAT           ,PI.prim_name/PIT           ,SA.prim_name/SAT           ,SI.prim_name/SIT           ,SG.prim_name/SGT           ,OA.prim_name/OAT           ,OI.prim_name/OIT           ,WA.prim_name/WAT           ,WI.prim_name/WIT           ,'' ,'Street'         ,PA.prim_name           ,PI.prim_name           ,SA.prim_name           ,SI.prim_name           ,SG.prim_name           ,OA.prim_name           ,OI.prim_name           ,WA.prim_name           ,WI.prim_name           }
@@ -264,14 +267,14 @@ EXPORT Build_Datacard(
 ,{'ZIP'            ,PA.zip/PAT                 ,PI.zip/PIT                 ,SA.zip/SAT                 ,SI.zip/SIT                 ,SG.zip/SGT                 ,OA.zip/OAT                 ,OI.zip/OIT                 ,WA.zip/WAT                 ,WI.zip/WIT                 ,'' ,'ZIP'            ,PA.zip                 ,PI.zip                 ,SA.zip                 ,SI.zip                 ,SG.zip                 ,OA.zip                 ,OI.zip                 ,WA.zip                 ,WI.zip                 }
 ,{'Phone'          ,PA.company_phone/PAT       ,PI.company_phone/PIT       ,SA.company_phone/SAT       ,SI.company_phone/SIT       ,SG.company_phone/SGT       ,OA.company_phone/OAT       ,OI.company_phone/OIT       ,WA.company_phone/WAT       ,WI.company_phone/WIT       ,'' ,'Phone'          ,PA.company_phone       ,PI.company_phone       ,SA.company_phone       ,SI.company_phone       ,SG.company_phone       ,OA.company_phone       ,OI.company_phone       ,WA.company_phone       ,WI.company_phone       }
 ,{'DBA'            ,PA.dba_name/PAT            ,PI.dba_name/PIT            ,SA.dba_name/SAT            ,SI.dba_name/SIT            ,SG.dba_name/SGT            ,OA.dba_name/OAT            ,OI.dba_name/OIT            ,WA.dba_name/WAT            ,WI.dba_name/WIT            ,'' ,'DBA'            ,PA.dba_name            ,PI.dba_name            ,SA.dba_name            ,SI.dba_name            ,SG.dba_name            ,OA.dba_name            ,OI.dba_name            ,WA.dba_name            ,WI.dba_name            }
-,{'Industry'       ,'','','','','','','','','','','Industry','','','','','','','','',''},
+,{'Industry'       ,'','','','','','','','','','','Industry','','','','','','','','',''}
 ,{'SIC Primary'    ,PA.company_sic_code1/PAT   ,PI.company_sic_code1/PIT   ,SA.company_sic_code1/SAT   ,SI.company_sic_code1/SIT   ,SG.company_sic_code1/SGT   ,OA.company_sic_code1/OAT   ,OI.company_sic_code1/OIT   ,WA.company_sic_code1/WAT   ,WI.company_sic_code1/WIT   ,'' ,'SIC Primary'    ,PA.company_sic_code1   ,PI.company_sic_code1   ,SA.company_sic_code1   ,SI.company_sic_code1   ,SG.company_sic_code1   ,OA.company_sic_code1   ,OI.company_sic_code1   ,WA.company_sic_code1   ,WI.company_sic_code1   }
 ,{'NAICS Primary'  ,PA.company_naics_code1/PAT ,PI.company_naics_code1/PIT ,SA.company_naics_code1/SAT ,SI.company_naics_code1/SIT ,SG.company_naics_code1/SGT ,OA.company_naics_code1/OAT ,OI.company_naics_code1/OIT ,WA.company_naics_code1/WAT ,WI.company_naics_code1/WIT ,'' ,'NAICS Primary'  ,PA.company_naics_code1 ,PI.company_naics_code1 ,SA.company_naics_code1 ,SI.company_naics_code1 ,SG.company_naics_code1 ,OA.company_naics_code1 ,OI.company_naics_code1 ,WA.company_naics_code1 ,WI.company_naics_code1 }
-,{'Contact'        ,'','','','','','','','','','','Contact','','','','','','','','',''},
+,{'Contact'        ,'','','','','','','','','','','Contact','','','','','','','','',''}
 ,{'Name'           ,PA.lname/PAT               ,PI.lname/PIT               ,SA.lname/SAT               ,SI.lname/SIT               ,SG.lname/SGT               ,OA.lname/OAT               ,OI.lname/OIT               ,WA.lname/WAT               ,WI.lname/WIT               ,'' ,'Name'           ,PA.lname               ,PI.lname               ,SA.lname               ,SI.lname               ,SG.lname               ,OA.lname               ,OI.lname               ,WA.lname               ,WI.lname               }
 ,{'Email'          ,PA.contact_email/PAT       ,PI.contact_email/PIT       ,SA.contact_email/SAT       ,SI.contact_email/SIT       ,SG.contact_email/SGT       ,OA.contact_email/OAT       ,OI.contact_email/OIT       ,WA.contact_email/WAT       ,WI.contact_email/WIT       ,'' ,'Email'          ,PA.contact_email       ,PI.contact_email       ,SA.contact_email       ,SI.contact_email       ,SG.contact_email       ,OA.contact_email       ,OI.contact_email       ,WA.contact_email       ,WI.contact_email       }
 ,{'Phone'          ,PA.contact_phone/PAT       ,PI.contact_phone/PIT       ,SA.contact_phone/SAT       ,SI.contact_phone/SIT       ,SG.contact_phone/SGT       ,OA.contact_phone/OAT       ,OI.contact_phone/OIT       ,WA.contact_phone/WAT       ,WI.contact_phone/WIT       ,'' ,'Phone'          ,PA.contact_phone       ,PI.contact_phone       ,SA.contact_phone       ,SI.contact_phone       ,SG.contact_phone       ,OA.contact_phone       ,OI.contact_phone       ,WA.contact_phone       ,WI.contact_phone       }
-,{'Other Content'  ,'','','','','','','','','','',                                                              'Other Content','','','','','','','','',''},                         
+,{'Other Content'  ,'','','','','','','','','','',                                                              'Other Content','','','','','','','','',''}                         
 ,{'FEIN'           ,PA.company_fein/PAT        ,PI.company_fein/PIT        ,SA.company_fein/SAT        ,SI.company_fein/SIT        ,SG.company_fein/SGT        ,OA.company_fein/OAT        ,OI.company_fein/OIT        ,WA.company_fein/WAT        ,WI.company_fein/WIT        ,'' ,'FEIN'           ,PA.company_fein        ,PI.company_fein        ,SA.company_fein        ,SI.company_fein        ,SG.company_fein        ,OA.company_fein        ,OI.company_fein        ,WA.company_fein        ,WI.company_fein        }
 ,{'Ticker'         ,PA.company_ticker/PAT      ,PI.company_ticker/PIT      ,SA.company_ticker/SAT      ,SI.company_ticker/SIT      ,SG.company_ticker/SGT      ,OA.company_ticker/OAT      ,OI.company_ticker/OIT      ,WA.company_ticker/WAT      ,WI.company_ticker/WIT      ,'' ,'Ticker'         ,PA.company_ticker      ,PI.company_ticker      ,SA.company_ticker      ,SI.company_ticker      ,SG.company_ticker      ,OA.company_ticker      ,OI.company_ticker      ,WA.company_ticker      ,WI.company_ticker      }
 ,{'URL'            ,PA.company_url/PAT         ,PI.company_url/PIT         ,SA.company_url/SAT         ,SI.company_url/SIT         ,SG.company_url/SGT         ,OA.company_url/OAT         ,OI.company_url/OIT         ,WA.company_url/WAT         ,WI.company_url/WIT         ,'' ,'URL'            ,PA.company_url         ,PI.company_url         ,SA.company_url         ,SI.company_url         ,SG.company_url         ,OA.company_url         ,OI.company_url         ,WA.company_url         ,WI.company_url         }
@@ -489,21 +492,23 @@ EXPORT Build_Datacard(
 	 shared rr :=wk_ut.Restore_Workunit(wu);
 
   shared Prox:=BIPV2_postProcess.Data_GetProxConfStat(pVersion);
-	 shared Lgid:=BIPV2_postProcess.Data_GetLgidConfStat(pVersion);
+	shared Lgid:=BIPV2_postProcess.Data_GetLgidConfStat(pVersion);
 
   export run :=sequential(
-													output(the_WU ,named('the_WU')),
-													output(rr),
-													output(Prox,named('ProxConf')),
-													output(Lgid,named('LgidConf')),		
-													BIPV2_Findlinks.DS_Version_IterNumber.UpdateProxVersionIterNumber(),
-													BIPV2_Findlinks.DS_Version_IterNumber.UpdateLgid3VersionIterNumber(), 												
-													output(Data_Fill_Rates, named('Data_Fill_Rates'));
-													output(Marketing_Data_Fill_Rates, named('Marketing_Data_Fill_Rates'));
-													output(Segmentation_ds, named('ID_Segmentation'));
-													output(SegmentationdsProb, named('ID_Probation'));
-													output(GOLD_ds, named('GOLD')),
-												);
+     output(the_WU                    ,named('the_WU'                     ))
+    ,output(the_StrataWU              ,named('the_StrataWU'               ))
+    ,output(rr                                                             )
+    ,output(Prox                      ,named('ProxConf'                   ))
+    ,output(Lgid                      ,named('LgidConf'                   ))		
+    ,BIPV2_Findlinks.DS_Version_IterNumber.UpdateProxVersionIterNumber ()
+    ,BIPV2_Findlinks.DS_Version_IterNumber.UpdateLgid3VersionIterNumber()												
+    ,output(Data_Fill_Rates           ,named('Data_Fill_Rates'            ))
+    ,output(Marketing_Data_Fill_Rates ,named('Marketing_Data_Fill_Rates'  ))
+    ,output(Segmentation_ds           ,named('ID_Segmentation'            ))
+    ,output(SegmentationdsProb        ,named('ID_Probation'               ))
+    ,output(GOLD_ds                   ,named('GOLD'                       ))
+    ,output(Seleid_Cluster_Stats      ,named('Status_Changes_Explanation' ))
+  );
 end;
 
 								
