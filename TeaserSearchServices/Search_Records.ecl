@@ -1,5 +1,5 @@
 ﻿
-import AutoStandardI,iesp, ut, doxie,  Header, NID, Suppress, RiskWise, STD;
+import AutoStandardI,iesp, ut, doxie,  Header, NID, Suppress, RiskWise, STD, Suppress;
 
 export Search_Records := module
 	export params := interface(
@@ -36,7 +36,9 @@ export Search_Records := module
 	end;
 	
 	export val(params in_mod) := function
-	
+    global_mod := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+    
 		lname_value := AutoStandardI.InterfaceTranslator.lname_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.lname_value.params));
 		lname_set_value := AutoStandardI.InterfaceTranslator.lname_set_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.lname_set_value.params));
 		fname_value := AutoStandardI.InterfaceTranslator.fname_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.fname_value.params));
@@ -181,12 +183,14 @@ export Search_Records := module
 		// 1. need to postfilter any wildly dissimilar last names when phonetics is enabled
 		// 2. need to make sure that middle initial matches don't have different mnames
 		// 3. need to see if a full dob provided that it doesn't mismatch
-		recs_clean := recs_ddp((~phonetics or datalib.namesimilar(lname,lname_value,1) <= 6) and
+		recs_clean_pre := recs_ddp((~phonetics or datalib.namesimilar(lname,lname_value,1) <= 6) and
 													 (in_mod.RelaxedMiddleNameMatch or 
 													 mname_value = '' or mname = mname_value or 
 													  mname[1] = mname_value or mname = mname_value[1]) and
 														(in_mob = 0 or (dob div 100) % 100 = in_mob) and
 														(in_day = 0 or (dob % 100) = in_day));
+                            
+    recs_clean := Suppress.MAC_SuppressSource(recs_clean_pre,mod_access);                       
 		RETURN recs_clean;										
 	end;		
 	
@@ -233,7 +237,7 @@ export Search_Records := module
 		recs_ref := project(recs_top, transform(doxie.layout_references, 
 								 													  self.did := (unsigned6) left.uniqueid));
 											 
-		recs_history := Functions.historicalNamesAddrs(recs_ref, in_mod.IncludeAllAddresses);
+		recs_history := Functions.historicalNamesAddrs(recs_ref, in_mod.IncludeAllAddresses,mod_access);
 		recs_history_use := IF(in_mod.IncludeFullHistory, recs_history, recs_top);
 		
 		// add phone indicator if requested

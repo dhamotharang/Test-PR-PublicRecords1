@@ -1,4 +1,4 @@
-//Get characteristics/attributes about a subject from Watchdog.Key_Supplemental
+﻿//Get characteristics/attributes about a subject from Watchdog.Key_Supplemental
 //NOTE: DL sourced characteristics are selected before other sources with the exception of RACE. 
 //  Height is greatest found and latest date
 //  Race is most reported value and lastest date
@@ -49,6 +49,8 @@ EXPORT fn_getAttributes(integer subjectDid,
 	 string prim_name := '';            //only here because of preglb header that is hardcoded into restrictions macro
 	 string dppa_purpose := '';         //only here because of preglb header that is hardcoded into restrictions macro
 	 unsigned rid := 0;
+   unsigned4 global_sid := 0;
+   unsigned8 record_sid := 0;         // only to run it thru the macro
 	end;
 	tmpRecord := record
    tmpFiller;
