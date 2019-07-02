@@ -242,6 +242,9 @@ EXPORT IParam := MODULE
   EXPORT _sources := INTERFACE (include, versions)
   END;
 
+  EXPORT _compoptions := INTERFACE (_report, personal, property, dl, include, versions, providers)
+  END;
+
   //IParam._report isn't compatible with input._report, projecting from new to old will not work.
   //To facilitate converting the modules until we make all PersonReports components
   //compatible with IDataAccess, I will define a set of "old_report" interfaces
@@ -272,6 +275,23 @@ EXPORT IParam := MODULE
 
   //Same as $.input._finderreport, minus _report part
   EXPORT old_finderreport := INTERFACE (personal, include, vehicles, dl)
+    EXPORT boolean use_verified_address_ra := TRUE;
+    EXPORT boolean use_verified_address_nb := TRUE;
+    EXPORT boolean nbrs_with_phones := TRUE;
+    EXPORT boolean rels_with_phones := TRUE;
+
+    EXPORT boolean include_akas        := TRUE;
+    EXPORT boolean include_associates  := TRUE;
+    EXPORT boolean include_bankruptcy  := TRUE;
+    EXPORT boolean include_bpsaddress  := TRUE;
+    EXPORT boolean include_corpaffiliations := TRUE;
+    EXPORT boolean include_imposters   := TRUE;
+    EXPORT boolean include_neighbors   := TRUE;
+    EXPORT boolean include_oldphones   := TRUE;
+    EXPORT boolean include_relatives   := TRUE;
+    EXPORT boolean include_relativeaddresses := TRUE;
+    EXPORT boolean use_NonDMVSources       := TRUE;
+
     //these are not used by Finder; will be removed eventually.
     EXPORT boolean ignoreFares := FALSE;
     EXPORT boolean ignoreFidelity := FALSE;
