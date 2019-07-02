@@ -29,6 +29,8 @@ dops_update  := sequential(RoxieKeybuild.updateversion('ThriveKeys',pversion,'an
 built := sequential(
 					spray_lt
 					,spray_pd
+					,fn_RunScrubsOnInput('LT',pversion)	
+					,fn_RunScrubsOnInput('PD',pversion)
 					,Build_Base(pversion,pUseProd).all
 					,Build_Keys(pversion,pUseProd).all
 					,Promote(pversion,pUseProd).buildfiles.Built2QA
