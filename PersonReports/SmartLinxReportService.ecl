@@ -126,192 +126,6 @@
 to be relatively harmless anyway). <br /> 
 */
 
-/*--HELP-- 
-<pre>
-&lt;SmartlinxReportRequest&gt;
-  &lt;Row&gt;
-    &lt;User&gt;
-      &lt;ReferenceCode&gt;&lt;/ReferenceCode&gt;
-      &lt;BillingCode&gt;&lt;/BillingCode&gt;
-      &lt;QueryId&gt;&lt;/QueryId&gt;
-      &lt;CompanyId&gt;&lt;/CompanyId&gt;
-      &lt;GLBPurpose&gt;&lt;/GLBPurpose&gt;
-      &lt;DLPurpose&gt;&lt;/DLPurpose&gt;
-      &lt;LoginHistoryId&gt;&lt;/LoginHistoryId&gt;
-      &lt;DebitUnits&gt;&lt;/DebitUnits&gt;
-      &lt;IP&gt;&lt;/IP&gt;
-      &lt;IndustryClass&gt;&lt;/IndustryClass&gt;
-      &lt;ResultFormat&gt;&lt;/ResultFormat&gt;
-      &lt;LogAsFunction&gt;&lt;/LogAsFunction&gt;
-      &lt;SSNMask&gt;&lt;/SSNMask&gt;
-      &lt;DOBMask&gt;&lt;/DOBMask&gt;
-      &lt;DLMask&gt;&lt;/DLMask&gt;
-      &lt;DataRestrictionMask&gt;&lt;/DataRestrictionMask&gt;
-      &lt;DataPermissionMask&gt;&lt;/DataPermissionMask&gt;
-      &lt;ApplicationType&gt;&lt;/ApplicationType&gt;
-      &lt;SSNMaskingOn&gt;&lt;/SSNMaskingOn&gt;
-      &lt;DLMaskingOn&gt;&lt;/DLMaskingOn&gt;
-      &lt;EndUser&gt;
-        &lt;CompanyName&gt;&lt;/CompanyName&gt;
-        &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-        &lt;City&gt;&lt;/City&gt;
-        &lt;State&gt;&lt;/State&gt;
-        &lt;Zip5&gt;&lt;/Zip5&gt;
-      &lt;/EndUser&gt;
-      &lt;MaxWaitSeconds&gt;&lt;/MaxWaitSeconds&gt;
-      &lt;RelatedTransactionId&gt;&lt;/RelatedTransactionId&gt;
-      &lt;AccountNumber&gt;&lt;/AccountNumber&gt;
-      &lt;TestDataEnabled&gt;&lt;/TestDataEnabled&gt;
-      &lt;TestDataTableName&gt;&lt;/TestDataTableName&gt;
-    &lt;/User&gt;
-    &lt;RemoteLocations&gt;
-      &lt;Item/&gt;
-    &lt;/RemoteLocations&gt;
-    &lt;ServiceLocations&gt;
-      &lt;ServiceLocation&gt;
-        &lt;LocationId&gt;&lt;/LocationId&gt;
-        &lt;ServiceName&gt;&lt;/ServiceName&gt;
-        &lt;Parameters&gt;
-          &lt;Parameter&gt;
-            &lt;Name&gt;&lt;/Name&gt;
-            &lt;Value&gt;&lt;/Value&gt;
-          &lt;/Parameter&gt;
-        &lt;/Parameters&gt;
-      &lt;/ServiceLocation&gt;
-    &lt;/ServiceLocations&gt;
-    &lt;Options&gt;
-      &lt;Blind&gt;&lt;/Blind&gt;
-      &lt;Encrypt&gt;&lt;/Encrypt&gt;
-      &lt;ReturnTokens&gt;&lt;/ReturnTokens&gt;
-      &lt;IncludeAKAs&gt;&lt;/IncludeAKAs&gt;
-      &lt;IncludeImposters&gt;&lt;/IncludeImposters&gt;
-      &lt;IncludeOldPhones&gt;&lt;/IncludeOldPhones&gt;
-      &lt;IncludeAssociates&gt;&lt;/IncludeAssociates&gt;
-      &lt;IncludeProperties&gt;&lt;/IncludeProperties&gt;
-      &lt;IncludePriorProperties&gt;&lt;/IncludePriorProperties&gt;
-      &lt;IncludeCurrentProperties&gt;&lt;/IncludeCurrentProperties&gt;
-      &lt;IncludeDriversLicenses&gt;&lt;/IncludeDriversLicenses&gt;
-      &lt;IncludeMotorVehicles&gt;&lt;/IncludeMotorVehicles&gt;
-      &lt;IncludeBankruptcies&gt;&lt;/IncludeBankruptcies&gt;
-      &lt;IncludeLiensJudgments&gt;&lt;/IncludeLiensJudgments&gt;
-      &lt;IncludeCorporateAffiliations&gt;&lt;/IncludeCorporateAffiliations&gt;
-      &lt;IncludeMerchantVessels&gt;&lt;/IncludeMerchantVessels&gt;
-      &lt;IncludeUCCFilings&gt;&lt;/IncludeUCCFilings&gt;
-      &lt;IncludeInternetDomains&gt;&lt;/IncludeInternetDomains&gt;
-      &lt;IncludeFAACertificates&gt;&lt;/IncludeFAACertificates&gt;
-      &lt;IncludeCriminalRecords&gt;&lt;/IncludeCriminalRecords&gt;
-      &lt;IncludeCensusData&gt;&lt;/IncludeCensusData&gt;
-      &lt;IncludeAccidents&gt;&lt;/IncludeAccidents&gt;
-      &lt;IncludeWaterCrafts&gt;&lt;/IncludeWaterCrafts&gt;
-      &lt;IncludeProfessionalLicenses&gt;&lt;/IncludeProfessionalLicenses&gt;
-      &lt;IncludeHealthCareSanctions&gt;&lt;/IncludeHealthCareSanctions&gt;
-      &lt;IncludeDEAControlledSubstance&gt;&lt;/IncludeDEAControlledSubstance&gt;
-      &lt;IncludeVoterRegistrations&gt;&lt;/IncludeVoterRegistrations&gt;
-      &lt;IncludeHuntingFishingLicenses&gt;&lt;/IncludeHuntingFishingLicenses&gt;
-      &lt;IncludeFirearmExplosives&gt;&lt;/IncludeFirearmExplosives&gt;
-      &lt;IncludeWeaponPermits&gt;&lt;/IncludeWeaponPermits&gt;
-      &lt;IncludeCriminalIndicators&gt;&lt;/IncludeCriminalIndicators&gt;
-      &lt;IncludeSexualOffenses&gt;&lt;/IncludeSexualOffenses&gt;
-      &lt;IncludeCivilCourts&gt;&lt;/IncludeCivilCourts&gt;
-      &lt;IncludeFAAAircrafts&gt;&lt;/IncludeFAAAircrafts&gt;
-      &lt;IncludePeopleAtWork&gt;&lt;/IncludePeopleAtWork&gt;
-      &lt;IncludeHighRiskIndicators&gt;&lt;/IncludeHighRiskIndicators&gt;
-      &lt;IncludeForeclosures&gt;&lt;/IncludeForeclosures&gt;
-      &lt;IncludePhonesPlus&gt;&lt;/IncludePhonesPlus&gt;
-      &lt;DoPhoneReport&gt;&lt;/DoPhoneReport&gt;
-      &lt;IncludeMatrixCriminalHistory&gt;&lt;/IncludeMatrixCriminalHistory&gt;
-      &lt;Relatives&gt;
-        &lt;IncludeRelatives&gt;&lt;/IncludeRelatives&gt;
-        &lt;MaxRelatives&gt;&lt;/MaxRelatives&gt;
-        &lt;RelativeDepth&gt;&lt;/RelativeDepth&gt;
-        &lt;IncludeRelativeAddresses&gt;&lt;/IncludeRelativeAddresses&gt;
-        &lt;MaxRelativeAddresses&gt;&lt;/MaxRelativeAddresses&gt;
-      &lt;/Relatives&gt;
-      &lt;Neighbors&gt;
-        &lt;IncludeNeighbors&gt;&lt;/IncludeNeighbors&gt;
-        &lt;IncludeHistoricalNeighbors&gt;&lt;/IncludeHistoricalNeighbors&gt;
-        &lt;NeighborhoodCount&gt;&lt;/NeighborhoodCount&gt;
-        &lt;NeighborCount&gt;&lt;/NeighborCount&gt;
-        &lt;HistoricalNeighborhoodCount&gt;&lt;/HistoricalNeighborhoodCount&gt;
-        &lt;HistoricalNeighborCount&gt;&lt;/HistoricalNeighborCount&gt;
-      &lt;/Neighbors&gt;
-      &lt;LawEnforcement&gt;&lt;/LawEnforcement&gt;
-      &lt;PruneAgedSSNs&gt;&lt;/PruneAgedSSNs&gt;
-      &lt;MaxAddresses&gt;&lt;/MaxAddresses&gt;
-      &lt;MaxSubjectAddresses&gt;&lt;/MaxSubjectAddresses&gt;
-      &lt;LegacyVerified&gt;&lt;/LegacyVerified&gt;
-      &lt;IncludeSourceDocs&gt;&lt;/IncludeSourceDocs&gt;
-      &lt;IncludeBestInfo&gt;&lt;/IncludeBestInfo&gt;
-      &lt;IncludePhonesFeedback&gt;&lt;/IncludePhonesFeedback&gt;
-      &lt;IncludeDriversAtAddress&gt;&lt;/IncludeDriversAtAddress&gt;
-      &lt;IncludeGlobalWatchLists&gt;&lt;/IncludeGlobalWatchLists&gt;
-      &lt;IncludeRealTimeVehicles&gt;&lt;/IncludeRealTimeVehicles&gt;
-      &lt;RealTimePermissibleUse&gt;&lt;/RealTimePermissibleUse&gt;
-      &lt;IncludeFictitiousBusinesses&gt;&lt;/IncludeFictitiousBusinesses&gt;
-      &lt;IncludeNoticeOfDefaults&gt;&lt;/IncludeNoticeOfDefaults&gt;
-      &lt;IncludeGSAVerification&gt;&lt;/IncludeGSAVerification&gt;
-      &lt;DateRange&gt;&lt;/DateRange&gt;
-      &lt;EnableNationalAccidents&gt;&lt;/EnableNationalAccidents&gt;
-      &lt;AcceptedNonSolicitationTerms&gt;&lt;/AcceptedNonSolicitationTerms&gt;
-      &lt;IncludeEmailAddresses&gt;&lt;/IncludeEmailAddresses&gt;
-      &lt;IncludeHealthCareProviders&gt;&lt;/IncludeHealthCareProviders&gt;
-      &lt;HealthCareProviders&gt;
-        &lt;IncludeHealthCareProviders&gt;&lt;/IncludeHealthCareProviders&gt;
-        &lt;IncludeGroupAffiliations&gt;&lt;/IncludeGroupAffiliations&gt;
-        &lt;IncludeHospitalAffiliations&gt;&lt;/IncludeHospitalAffiliations&gt;
-        &lt;IncludeEducation&gt;&lt;/IncludeEducation&gt;
-        &lt;IncludeBusinessAddress&gt;&lt;/IncludeBusinessAddress&gt;
-      &lt;/HealthCareProviders&gt;
-      &lt;IncludeVerification&gt;&lt;/IncludeVerification&gt;
-      &lt;IncludePhoneSummary&gt;&lt;/IncludePhoneSummary&gt;
-      &lt;IncludeStudentInformation&gt;&lt;/IncludeStudentInformation&gt;
-    &lt;/Options&gt;
-    &lt;ReportBy&gt;
-      &lt;Name&gt;
-        &lt;Full&gt;&lt;/Full&gt;
-        &lt;First&gt;&lt;/First&gt;
-        &lt;Middle&gt;&lt;/Middle&gt;
-        &lt;Last&gt;&lt;/Last&gt;
-        &lt;Suffix&gt;&lt;/Suffix&gt;
-        &lt;Prefix&gt;&lt;/Prefix&gt;
-      &lt;/Name&gt;
-      &lt;Address&gt;
-        &lt;StreetNumber&gt;&lt;/StreetNumber&gt;
-        &lt;StreetPreDirection&gt;&lt;/StreetPreDirection&gt;
-        &lt;StreetName&gt;&lt;/StreetName&gt;
-        &lt;StreetSuffix&gt;&lt;/StreetSuffix&gt;
-        &lt;StreetPostDirection&gt;&lt;/StreetPostDirection&gt;
-        &lt;UnitDesignation&gt;&lt;/UnitDesignation&gt;
-        &lt;UnitNumber&gt;&lt;/UnitNumber&gt;
-        &lt;StreetAddress1&gt;&lt;/StreetAddress1&gt;
-        &lt;StreetAddress2&gt;&lt;/StreetAddress2&gt;
-        &lt;City&gt;&lt;/City&gt;
-        &lt;State&gt;&lt;/State&gt;
-        &lt;Zip5&gt;&lt;/Zip5&gt;
-        &lt;Zip4&gt;&lt;/Zip4&gt;
-        &lt;County&gt;&lt;/County&gt;
-        &lt;PostalCode&gt;&lt;/PostalCode&gt;
-        &lt;StateCityZip&gt;&lt;/StateCityZip&gt;
-      &lt;/Address&gt;
-      &lt;SSN&gt;&lt;/SSN&gt;
-      &lt;SSNLast4&gt;&lt;/SSNLast4&gt;
-      &lt;SSNFirst5&gt;&lt;/SSNFirst5&gt;
-      &lt;UniqueId&gt;&lt;/UniqueId&gt;
-      &lt;DOB&gt;
-        &lt;Year&gt;&lt;/Year&gt;
-        &lt;Month&gt;&lt;/Month&gt;
-        &lt;Day&gt;&lt;/Day&gt;
-      &lt;/DOB&gt;
-      &lt;Phone10&gt;&lt;/Phone10&gt;
-      &lt;CompanyName&gt;&lt;/CompanyName&gt;
-      &lt;BusinessPhone&gt;&lt;/BusinessPhone&gt;
-    &lt;/ReportBy&gt;
-  &lt;/Row&gt;
-&lt;/SmartlinxReportRequest&gt;
-</pre>
-*/
-/*--USES-- ut.input_xslt */
-
 IMPORT iesp, doxie, AutoStandardI, Royalty;
 
 EXPORT SmartLinxReportService () := MACRO
@@ -380,7 +194,9 @@ EXPORT SmartLinxReportService () := MACRO
   #stored ('UsingKeepSSNs', first_row.options.PruneAgedSSNs);
   #stored ('KeepOldSsns', ~first_row.options.PruneAgedSSNs);
 	  // set up defaults: comp report options are the most detailed, so they can be used here
-  options_esdl := module (project (options_in, PersonReports.input._compreport, opt))
+  options_esdl := module (project (options_in, PersonReports.IParam._compoptions, OPT))
+    export boolean include_bpsaddress := TRUE;
+    export unsigned1 max_relatives := 11;
   end;
 
   // store XML options for subsequent legacy-style reading
@@ -401,7 +217,7 @@ EXPORT SmartLinxReportService () := MACRO
   // get search parameters from global #stored variables;
   globals := AutoStandardI.GlobalModule(); //PersonReports.input.include
   // parameters needed for search only (perhaps, there should be a separate function for reading them)
-  search_mod := module (project (globals, PersonReports.input._didsearch, opt))
+  search_mod := module (project (globals, PersonReports.IParam._didsearch, opt))
   end;
 
   // Now define all report parameters
@@ -489,37 +305,3 @@ EXPORT SmartLinxReportService () := MACRO
 // return 0;
 // end;
 ENDMACRO;
-//SmartLinxReportService ();
-/*
-<SmartLinxReportRequest>
-<row>
-<User>
-  <ReferenceCode>ref_code_str</ReferenceCode>
-  <BillingCode>billing_code</BillingCode>
-  <QueryId>query_id</QueryId>
-  <GLBPurpose>1</GLBPurpose>
-  <DLPurpose>1</DLPurpose>
-  <EndUser/>
-</User>
-<Options>
-  <IncludeAKAs>true</IncludeAKAs>
-  <IncludeBpsAddress>true</IncludeBpsAddress>
-  <IncludeEmailAddresses>true</IncludeEmailAddresses>
-  <IncludeSourceDocs>true</IncludeSourceDocs>
-  <IncludeBestInfo>true</IncludeBestInfo>
-</Options>
-<ReportBy>
-  <SSN></SSN>
-  <UniqueId></UniqueId>
-  <DOB>
-    <Year></Year>
-    <Month></Month>
-    <Day></Day>
-   </DOB>
-  <Phone10></Phone10>
-</ReportBy>
-</row>
-</SmartLinxReportRequest>
-*/
-
-// BpsDenormalizer::doIndividual
