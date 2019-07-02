@@ -1,3 +1,8 @@
-﻿import Watchdog,doxie,Data_Services;
-export Key_Watchdog_glb := INDEX(Watchdog.file_best,Watchdog.Layout_Key,
-Data_Services.Data_location.Prefix('Watchdog_Best')+ 'thor_data400::key::watchdog_best.did_'+doxie.Version_SuperKey);
+﻿import Watchdog_V2,doxie,Data_Services;
+
+Parms := Module(Watchdog_V2.UniversalKeyInterface)
+EXPORT Permissions := Watchdog_V2.fn_UniversalKeySearch.PermissionsType.glb;
+END;
+
+export Key_Watchdog_glb :=Watchdog_V2.fn_UniversalKeySearch.FetchRecords(Parms);
+

@@ -1,49 +1,64 @@
-import header, ut, doxie, data_services;
+﻿import header, ut, doxie, data_services,Watchdog_V2;
 
-wdog := pull(Watchdog.key_watchdog_nonglb_nonblank);
-
-// should only contain alphas and allowable name punctuation, and optionally be tested for non-blank
-isValidStr(string str, boolean emptyOK = false) := (emptyOK or length(trim(str)) > 0) 
-																								and str = stringlib.stringfilter(str, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -');
-
-// need to allow for empty state values that come from death records,
-// but require populated name fields 
-wdog_clean := wdog(isValidStr(st, true) and isValidStr(lname) and isValidStr(fname));
-
-// pull all of the DIDs/SSNs that cannot be returned to the customer
-wdog_pull_ssn := join(wdog_clean(ssn<>''), doxie.File_pullSSN,  
-											(string60)left.ssn = right.ssn, 
-											transform(left), left only, lookup);
-
-wdog_pull_ssn_all := wdog_pull_ssn + wdog_clean(ssn='');
-
-wdog_pull_did := join(wdog_pull_ssn_all, doxie.File_pullSSN,  
-											intformat((unsigned6)left.did,12,1) = right.ssn, 
-											transform(left), left only, lookup);
-												 
-wdog_dist := distribute(wdog_pull_did, hash(did));
-
-// need to filter out any ambiguous DIDs that get filtered from the header search keys
-hdr := distribute(dataset(data_services.Data_Location.Watchdog_Best +
-																'thor400_84::out::watchdog_filtered_header_nonglb',header.layout_header,flat),hash(did));
-			
-hdr_ambig := hdr(jflag2 in ['A','B','D','E']);
-
-newrec := RECORD
-	wdog;
-	string20 pfname := '';
+TeaserLayout := RECORD
+  qstring20 lname;
+  string2 st;
+  string20 pfname :='';
+  qstring20 fname;
+  qstring5 zip;
+  unsigned6 did;
+  qstring10 phone;
+  qstring9 ssn;
+  integer4 dob;
+  qstring5 title;
+  qstring20 mname;
+  qstring5 name_suffix;
+  qstring10 prim_range;
+  string2 predir;
+  qstring28 prim_name;
+  qstring4 suffix;
+  string2 postdir;
+  qstring10 unit_desig;
+  qstring8 sec_range;
+  qstring25 city_name;
+  qstring4 zip4;
+  unsigned3 addr_dt_last_seen;
+  qstring8 dod;
+  qstring17 prpty_deed_id;
+  qstring22 vehicle_vehnum;
+  qstring22 bkrupt_crtcode_caseno;
+  integer4 main_count;
+  integer4 search_count;
+  qstring15 dl_number;
+  qstring12 bdid;
+  integer4 run_date;
+  integer4 total_records;
+  unsigned8 rawaid;
+  unsigned3 addr_dt_first_seen;
+  string10 adl_ind;
+  string1 valid_ssn;
+  string1 glb_name;
+  string1 glb_address;
+  string1 glb_dob;
+  string1 glb_ssn;
+  string1 glb_phone;
+  unsigned8 filepos;
+ END;
+ 
+Parms := Module(Watchdog_V2.UniversalKeyInterface)
+EXPORT Permissions := Watchdog_V2.fn_UniversalKeySearch.PermissionsType.nonglb_teaser;
 END;
 
 
-newrec xform(wdog_dist l, hdr_ambig r) := TRANSFORM
-	// remove minors
-	self.did := IF(l.dob = 0 or ut.GetAgeI(l.dob) >= 18, l.did, SKIP);
-	self.pfname := datalib.preferredFirstNew(l.fname, true);
-	self := l;
-END;
+EXPORT FilteredDS := Watchdog_V2.fn_UniversalKeySearch.FetchRecords(Parms);
 
-wdog_filt := join(wdog_dist, hdr_ambig, left.did = right.did,
-									xform(left, right), left only, local);
+SortNonglb_teaser := SORT (FilteredDS, lname,SKEW(1.0));
 
-export key_watchdog_teaser := index(wdog_filt, {lname, st, pfname, fname, zip}, {wdog_filt},
-																		'~thor_data400::key::watchdog_nonglb.teaser_' + doxie.Version_SuperKey);
+Nonglb_teaser := PROJECT(SortNonglb_teaser,TRANSFORM(TeaserLayout,self.pfname := datalib.preferredFirstNew(left.fname, true),SELF :=LEFT));
+
+EXPORT key_watchdog_teaser := Nonglb_teaser;
+ 
+
+
+
+
