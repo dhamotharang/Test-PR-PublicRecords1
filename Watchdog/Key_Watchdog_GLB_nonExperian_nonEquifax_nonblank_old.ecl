@@ -1,9 +1,13 @@
-﻿import lib_fileservices, ut, header_services, doxie,_Control,header, Data_Services;
+﻿import ut,doxie,watchdog,header,mdr,header_services,_Control,data_services;
 
 string_rec := record
 	watchdog.Layout_Best;
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
+
+//************************************************************************
+//ADD INFORMATION - CNG 20070426 - W20070426-115123
+//************************************************************************
 
 Drop_Header_Layout := 
 record
@@ -76,20 +80,78 @@ string_rec reformat_layout(Base_File_Append_In L) :=
     self := L;
  end;
 
-Base_File_Append_out := project(Base_File_Append_In, reformat_layout(left)); 
+Base_File_Append_out := project(Base_File_Append_In, reformat_layout(left));
 
 //append ADL indicator
 watchdog.mac_append_ADL_ind(Base_File_Append_out, Base_File_Append);
 
-main_dataset := dataset(Data_Services.foreign_prod+'thor_data400::base::watchdog_best_nonen_noneq',string_rec,flat) + Base_File_Append;
- 
-t0 := join(main_dataset,
+//***********END*************************************************************
+
+wdog0 := dataset( '~thor_data400::BASE::Watchdog_best_nonen_noneq',string_rec,flat);
+
+t0 := join(wdog0,
 					Base_File_Append,
           left.did = right.did,
 					left only,
 					lookup);
 
-_t1 := t0 + Base_File_Append;
-ut.mac_suppress_by_phonetype(_t1,phone,st,t1,true,did);
+wdog := t0 + Base_File_Append;
 
-export Key_Watchdog_GLB_nonExperian_nonEquifax := INDEX(t1,{t1},Data_Services.Data_location.Prefix('Watchdog_Best')+'thor_data400::key::watchdog_best_nonen_noneq.did_'+doxie.Version_SuperKey);
+candidates := distribute(wdog(trim(fname)='' or trim(lname)=''),hash(did));
+not_candidates := wdog(~(trim(fname)='' or trim(lname)=''));
+glb_pst        := distribute(dataset('~thor400_84::out::watchdog_filtered_header_nonen_noneq',header.layout_header,flat),hash(did));;
+
+header.layout_header t1(glb_pst le, candidates ri) := transform
+ self := le;
+end;
+
+j1 := join(glb_pst,candidates
+			,left.did=right.did
+			,t1(left,right)
+			,local);
+
+//only fix those that need fixing
+bestFirstLast	:=	fn_BestFirstLastName(j1);
+
+string_rec tr(candidates l,bestFirstLast r) := transform
+	self.fname	:=	if(l.fname='',r.fname,l.fname);
+	self.lname	:=	if(l.lname='',r.lname,l.lname);
+	self        := l;
+end;
+
+fb0:=join(candidates,bestFirstLast
+			,left.did=right.did
+			,tr(left,right)
+			,left outer
+			,local);
+
+concat := fb0+not_candidates;
+
+candidates1 := distribute(concat(trim(ssn)=''),hash(did));
+not_candidates1 := concat(~(trim(ssn)=''));
+
+j2 := join(glb_pst,candidates1
+			,left.did=right.did
+			,t1(left,right)
+			,local);
+
+_bestSSN	:=	watchdog.fn_best_ssn(j2).concat_them;
+
+string_rec tr0(candidates1 l,_bestSSN r) := transform
+	self.ssn	:=	if(l.ssn='',r.ssn,l.ssn);
+	self        :=	l;
+end;
+
+fb00:=join(candidates1,_bestSSN
+			,left.did=right.did
+			,tr0(left,right)
+			,left outer
+			,local);
+
+concat1 := fb00+not_candidates1;
+
+_fb := project(concat1,watchdog.layout_key);
+ut.mac_suppress_by_phonetype(_fb,phone,st,fb,true,did);
+
+export Key_Watchdog_GLB_nonExperian_nonEquifax_nonblank_old := INDEX(fb,{fb},
+ Data_Services.Data_location.Prefix('Watchdog_Best')+'thor_data400::key::watchdog_best_nonen_noneq.did_nonblank_'+doxie.Version_SuperKey);

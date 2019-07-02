@@ -1,6 +1,6 @@
 ﻿import doxie,data_services; 
 //See key_Prep_Watchdog...
-export Key_Watchdog_marketing_V2 :=	INDEX(file_best_marketing
+export Key_Watchdog_marketing_V2_old :=	INDEX(file_best_marketing
 
 		,watchdog.Layout_best_flags
 		,Data_services.Data_location.Prefix('Watchdog_Best')
