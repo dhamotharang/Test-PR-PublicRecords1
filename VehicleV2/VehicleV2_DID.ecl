@@ -1,4 +1,4 @@
-import BIPV2, vehicleV2,did_add,ut,header_slimsort,didville,business_header,business_header_ss,address,doxie_files,watchdog,mdr,header;
+﻿import BIPV2, vehicleV2,did_add,ut,header_slimsort,didville,business_header,business_header_ss,address,doxie_files,watchdog,mdr,header;
 
 party_in			:=	VehicleV2.Map_Experian_Party	     +	
                   VehicleV2.Mapping_NC_party	       +	
@@ -13,7 +13,7 @@ party_in_dist	:=	distribute(party_in,hash(vehicle_key,iteration_key,sequence_key
 src_rec	:=
 record
 	header_slimsort.Layout_Source;
-	VehicleV2.Layout_Base.Party_Bip
+	VehicleV2.Layout_Base.Party_Bip;
 end;
 
 party_in_proj		:=	project(party_in_dist,transform(src_rec,self := left,self := []));
@@ -166,7 +166,7 @@ business_header_ss.MAC_Match_Flex(
 			,true
 		);																																								
 
-VehicleV2.Layout_Base.Party_Bip	x2PartyBIP(mac_src_match_rec l) := transform
+VehicleV2.Layout_Base.Party_Bip x2PartyBIP(mac_src_match_rec l) := transform
 	self.append_bdid := l.bdid;
 	self := l;
 end;

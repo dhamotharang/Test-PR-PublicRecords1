@@ -1,4 +1,4 @@
-import ut,VehicleV2,VehicleCodes,CODES,vehlic;
+﻿import ut,VehicleV2,VehicleCodes,CODES,vehlic;
 
 //---------------------------------------------------------------------------
 //-------MAP to BASE MAIN FORMAT LAYOUT
@@ -10,7 +10,10 @@ dOHTempMain	:=	VehicleV2.Mapping_OH_Temp_Main;
 // dOHTempMain	:=	dataset('~thor_data400::persist::vehicleV2::oh_temp_main',VehicleV2.Layout_OH.OH_as_VehicleV2,thor);
 
 // Map to the base vehiclev2 main layout
-VehicleV2.Layout_Base_Main	tReformat2Main(dOHTempMain	pInput)	:=
+// Added for CCPA-103
+Layout_Temp_SID_Removal := VehicleV2.Layout_Base_Main - [global_sid,record_sid];
+//VehicleV2.Layout_Base_Main	
+Layout_Temp_SID_Removal 	tReformat2Main(dOHTempMain	pInput)	:=
 transform
 	string3 v_major 								:=	VehicleCodes.StateColorToNCICColor(pInput.STATE_origin,pInput.MAJOR_COLOR_CODE);
 	string3 v_minor 								:=	VehicleCodes.StateColorToNCICColor(pInput.STATE_origin,pInput.MINOR_COLOR_CODE);

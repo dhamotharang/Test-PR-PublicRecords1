@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+﻿//---------------------------------------------------------------------------
 //-------MAP to BASE MAIN FORMAT LAYOUT
 //---------------------------------------------------------------------------
 
@@ -9,7 +9,10 @@ dNCTempMain	:=	VehicleV2.Mapping_NC_Temp_Main;
 
 // dNCTempMain	:=	dataset('~thor_data400::persist::vehicleV2::nc_temp_main',VehicleV2.Layout_NC.NC_as_VehicleV2_Layout,thor);
 
-VehicleV2.Layout_Base_Main	tNCMain(dNCTempMain	pInput)	:=
+// Added for CCPA-103
+Layout_Temp_SID_Removal := VehicleV2.Layout_Base_Main - [global_sid,record_sid];
+//VehicleV2.Layout_Base_Main	
+Layout_Temp_SID_Removal 	tNCMain(dNCTempMain	pInput)	:=
 transform
 	string3 v_major 								:=	VehicleCodes.StateColorToNCICColor(pInput.STATE_origin,pInput.MAJOR_COLOR_CODE);
 	string3 v_minor 								:=	VehicleCodes.StateColorToNCICColor(pInput.STATE_origin,pInput.MINOR_COLOR_CODE);

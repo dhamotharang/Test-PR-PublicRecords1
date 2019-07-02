@@ -1,4 +1,4 @@
-import VehicleV2, Doxie, ut, data_services,BIPV2;
+﻿import VehicleV2, Doxie, ut, data_services,BIPV2;
 
 get_recs	:= VehicleV2.file_VehicleV2_Party_Clean_Sequence_Key;
 
@@ -25,6 +25,9 @@ layout_Key_Vehicle_Party_Key	tAddStdLienholder(get_recs pLeft, layout_std_lienho
 	:=
 		TRANSFORM
 			self.std_lienholder_name	:=	pLkp.std_lienholder_name;
+			//Added for CCPA-103
+			self.global_sid           :=  0;
+			self.record_sid           :=  0;
 			self											:=	pLeft;
 		END
 	;

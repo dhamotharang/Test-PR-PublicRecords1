@@ -1,4 +1,4 @@
-import ut,VehicleV2,VehicleCodes;
+﻿import ut,VehicleV2,VehicleCodes;
 
 //---------------------------------------------------------------------------
 //-------MAP to BASE MAIN FORMAT LAYOUT
@@ -7,7 +7,10 @@ import ut,VehicleV2,VehicleCodes;
 dInfutorMotorcycleTempMain	:=	VehicleV2.Mapping_Infutor_Motorcycle_Temp_Main;
 
 // Map to the base vehiclev2 main layout
-VehicleV2.Layout_Base_Main	tReformat2Main(dInfutorMotorcycleTempMain	pInput)	:=
+// Added for CCPA-103
+Layout_Temp_SID_Removal := VehicleV2.Layout_Base_Main - [global_sid,record_sid];
+//VehicleV2.Layout_Base_Main	
+Layout_Temp_SID_Removal 	tReformat2Main(dInfutorMotorcycleTempMain	pInput)	:=
 transform
 	
 	self.State_BitMAP_Flag 					:=	0; //update later

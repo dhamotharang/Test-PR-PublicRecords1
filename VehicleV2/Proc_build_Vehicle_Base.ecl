@@ -1,4 +1,4 @@
-import	vehicleV2,PromoteSupers;
+﻿import	vehicleV2,PromoteSupers;
 															
 //build vehicle main & party base file
 
@@ -21,4 +21,16 @@ PromoteSupers.MAC_SF_BuildProcess(	VehicleV2.VehicleV2_DID	+	VehicleV2.irs_dummy
 																	);
 
 
-export	Proc_build_Vehicle_Base	:=	sequential(bld_vehicleV2_main,bld_vehicleV2_party);
+export	Proc_build_Vehicle_Base	:=	sequential(project(bld_vehicleV2_main,transform(VehicleV2.Layout_Base_Main,
+                                                                                     self.global_sid := 0;             //Added for CCPA-103
+																																										 self.record_sid := 0;             //Added for CCPA-103
+																																										 self            := left
+                                                                                    )
+																												),
+                                                project(bld_vehicleV2_party,trnasform(VehicleV2.Layout_Base.Party_CCPA, //Added for CCPA-103
+																								                                      self.global_sid := 0;             //Added for CCPA-103
+																																											self.record_sid := 0;             //Added for CCPA-103
+																																											self            := left
+																																										 )
+																											 )
+																						   );
