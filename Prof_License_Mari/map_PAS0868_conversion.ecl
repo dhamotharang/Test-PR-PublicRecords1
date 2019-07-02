@@ -5,7 +5,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, standard,STD;
 
 EXPORT map_PAS0868_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Prof License MARI- PAS0868')
 	code 										:= 'PAS0868';
 	src_cd									:= code[3..7];
 	src_st									:= code[1..2];	//License state
@@ -81,7 +81,7 @@ END;
 	oFile										:= OUTPUT(SAMPLE(GoodNameRec, 4000,1));
 	
 	//Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(GoodNameRec pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(GoodNameRec pInput) := TRANSFORM
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];		//yyyymmdd
 		SELF.LAST_UPD_DTE			:= pVersion;							//it was set to process_date before
@@ -391,7 +391,7 @@ END;
 	inFileLic	:= PROJECT(GoodNameRec,xformToCommon(left));
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(inFileLic L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(inFileLic L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -401,7 +401,7 @@ END;
 																	trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 	// Populate STD_STATUS_CD field via translation on statu field
-	Prof_License_Mari.layouts.base 	trans_lic_status(ds_map_prof_cd L, Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in 	trans_lic_status(ds_map_prof_cd L, Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS :=  StringLib.stringtouppercase(TRIM(R.DM_VALUE1,LEFT,RIGHT));
 																
 		SELF := L;
@@ -415,7 +415,7 @@ END;
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_lic_trans(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_lic_trans L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;

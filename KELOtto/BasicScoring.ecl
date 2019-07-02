@@ -58,7 +58,7 @@
   EXPORT BankAccountStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Bank_Account.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_,' +
+												'high_risk_routing_,cl_active30_identity_count_,cl_active7_identity_count_,' +
                         'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_,safe_flag_,contributor_safe_flag_'                        
 												) : PERSIST('~temp::deleteme50');
 
@@ -145,7 +145,7 @@
                             SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => RIGHT.UiDescription, LEFT.Label);
                             SELF.field := LEFT.field +
                                           MAP(TRIM(RIGHT.Value) != '' =>  '_' + RIGHT.Value, MAP(RIGHT.Low > 0 => '_' + (STRING)RIGHT.Low, '') + MAP(RIGHT.High > 0 => '_' + (STRING)RIGHT.High, ''));
-                            SELF := LEFT), LOOKUP, LEFT OUTER) : PERSIST('~temp::deleteme92');
+                            SELF := LEFT), LOOKUP, LEFT OUTER) : PERSIST('~temp::deleteme92', EXPIRE(7));
                          
   EXPORT ScoreBreakdownAggregate := TABLE(WeightedResult(customer_id_>0), 
                         {customer_id_, industry_type_, entity_context_uid_, INTEGER entity_type_ := (INTEGER)entity_context_uid_[2..3], indicatortype, indicatordescription, 
@@ -158,7 +158,7 @@
             KELOtto.Functions.CalculatePercentile(ScoreBreakdownAggregate, 'customer_id_, industry_type_, indicatortype, entity_type_, indicatordescription', ValueCurved, 'CustomerPercentile', 'CustomerQuartileRank'), 
             TRANSFORM(RECORDOF(LEFT) AND NOT [hashid], 
             self.RiskLevel := LEFT.CustomerPercentile, // Only set the RiskLevel 
-            SELF := LEFT)) : PERSIST('~temp::deleteme43', EXPIRE(7));
+            SELF := LEFT)): PERSIST('~temp::deleteme43', EXPIRE(7));
 
 
 
@@ -176,7 +176,7 @@
 													   SELF.RiskLevel := Right.RiskLevel, SELF.populationtype := RIGHT.populationtype, SELf.Value := RIGHT.Value, SELF := LEFT),
 													 LEFT OUTER, LOOKUP);
 													   
-  EXPORT FullScoredBreakdown := TempAverages + ScoreBreakdown : PERSIST('~temp::deleteme62');
+  EXPORT FullScoredBreakdown := TempAverages + ScoreBreakdown: PERSIST('~temp::deleteme62');
 
   // The cluster score is the percentile of the "cluster" indicator type..
   
@@ -186,8 +186,12 @@
     
   SHARED ScoresPrep1 := TABLE(ScoreBreakdown,
                {customer_id_, industry_type_, entity_context_uid_, 
-                Score := SUM(GROUP, CustomerPercentile), 
-                CurveScore := (SUM(GROUP, CustomerPercentile)*1000000) + HASH32(entity_context_uid_) % 1000000,
+                Score := SUM(GROUP, CustomerPercentile * 
+								                       MAP(indicatortype='KR' => 8, MAP(indicatortype='VL' => 0.5, MAP(indicatortype='CL' => 0.5, 0.5)))
+								                     ), 
+                CurveScore := SUM(GROUP, CustomerPercentile * 
+								                       MAP(indicatortype='KR' => 8, MAP(indicatortype='VL' => 0.5, MAP(indicatortype='CL' => 0.5, 0.5)))
+								                     ) + HASH32(entity_context_uid_) % 1000000,
                 TotalWeightValue := SUM(GROUP, Value) // This is the raw value, if none of the indicators have values and this is 0 then we should 0 the score.                
                }, customer_id_, industry_type_, entity_context_uid_, MERGE);
                
@@ -241,11 +245,6 @@
                                                       {'safe_flag_', (STRING)LEFT.safe_flag_},
                                                       {'identity_count_', (STRING)LEFT.identity_count_}
 																											], FlagsRec)(Value <> '');
-															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
+															 SELF := LEFT)) : PERSIST('~temp::deleteme65');
 				
-
-                         
-//EXPORT MacEntityWeighting := 'todo';
-
-
 END;

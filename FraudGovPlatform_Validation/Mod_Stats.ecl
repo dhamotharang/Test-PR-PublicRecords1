@@ -1,4 +1,4 @@
-﻿IMPORT STD,ut,FraudGovPlatform,FraudShared;
+﻿IMPORT STD,ut,FraudGovPlatform,FraudShared,_validate;
 EXPORT Mod_stats := MODULE
 
 	EXPORT ValidateDelimiter(string fname, string pSeparator, string pTerminator):= module
@@ -191,8 +191,8 @@ END;
 			r tr0(r l):=transform
 				self.FileName   :=trim(fname);
 				self.FileState  :='NA';
-				self.FileDate   :=trim(regexfind('([0-9])+_([0-9])\\w+',fname, 0)[1..8]);
-				self.FileTime   :=trim(regexfind('([0-9])+_([0-9])\\w+',fname, 0)[10..15]);
+				self.FileDate   := if (regexfind( 'Delta', fname, nocase ), trim(regexfind('([0-9])\\w+',fname, 0)[1..8]), trim(regexfind('([0-9])+_([0-9])\\w+',fname, 0)[1..8]));
+				self.FileTime   := if (regexfind( 'Delta', fname, nocase ), '', trim(regexfind('([0-9])+_([0-9])\\w+',fname, 0)[10..15]));
 				self.RecordsTotal :=mx;
 				self:=l;
 			end;
@@ -202,113 +202,51 @@ END;
 			r tr1(withRC l, integer c):=transform
 
 				self.field:=choose(c
-					,'reported_date'
-					,'lexid'
-					,'raw_full_name'
-					,'raw_First_name'
-					,'raw_Last_Name'
-					,'SSN'
-					,'full_address'
-					,'street_1'
-					,'City'
-					,'State'
-					,'Zip'
-					,'Drivers_License_Number'
-					,'Drivers_License_State'
+					,'field1'
+					,'field2'
+					,'field3'
+					,'field4'
+					,'field5'
 					);
 
 				self.value:=choose(c
-					,l.reported_date
-					,l.lexid
-					,l.raw_full_name
-					,l.raw_First_name
-					,l.raw_Last_Name
-					,l.SSN
-					,l.full_address
-					,l.street_1
-					,l.City
-					,l.State
-					,l.Zip
-					,l.Drivers_License_Number
-					,l.Drivers_License_State
+					,l.field1
+					,l.field2
+					,l.field3
+					,l.field4
+					,l.field5
 					);
 
 				err_IdentityData:=choose(c
-					,if(length(trim(l.reported_date,left,right))=8,'','E002')
-					,'' //lexid
-					,''	//fullname
-					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_First_name <>'' or l.raw_full_name <>''),'','E001')	
-					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_Last_Name <>'' or l.raw_full_name <>''),'','E001')
-					,''
-					,''	//full_address (Deltabase)
-					,''	//physical_address (Deltabase)
-					,''	//street_1
-					,''	//City
-					,if(l.street_1 <>'' and 
-								if(l.city <>''
-									,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) or
-											length(trim(l.Zip,left,right)) in [9,5] )
-									,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) and
-											length(trim(l.Zip,left,right)) in [9,5] )),'','W002')
-					,''	//zip
-					,'' //Drivers_License_Number
-					,'' //Drivers_License_State
+					,if(l.field1<>'','','E001') //Customer_Job_ID
+					,if(l.field2<>'','','E001') //Batch_Record_ID
+					,if(l.field3<>'','','E001') //Transaction_ID_Number
+					,if(l.field4<>'','','E001') //Reason_for_Transaction_Activity
+					,if (_Validate.Date.fIsValid(l.field5) and (unsigned)l.field5 <= (unsigned)(STRING8)Std.Date.Today(),'','E002') //Date_of_Transaction
 					);
 
 				err_KnownFraud:=choose(c
-					,if(length(trim(l.reported_date,left,right))=8,'','E002')
-					,''	//lexid
-					,''	//fullname
-					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_First_name <>'' or l.raw_full_name <>''),'','E001')	
-					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_Last_Name <>'' or l.raw_full_name <>''),'','E001')
-					,''
-					,''	//full_address (Deltabase)
-					,''	//physical_address (Deltabase)
-					,''	//street_1
-					,''	//City
-					,if(l.street_1 <>'' and 
-								if(l.city <>''
-									,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) or
-											length(trim(l.Zip,left,right)) in [9,5] )
-									,((STD.Str.ToUpperCase(l.State) <> '' and l.State in Mod_Sets.States) and
-											length(trim(l.Zip,left,right)) in [9,5] )),'','W002')
-					,''	//zip
-					,'' //Drivers_License_Number
-					,'' //Drivers_License_State
+					,if(l.field1<>'','','E001') //customer_event_id
+					,if(_Validate.Date.fIsValid(l.field2) and (unsigned)l.field2 <= (unsigned)(STRING8)Std.Date.Today(),'','E002') //reported_date
+					,if(l.field3<>'','','E001') //reported_time
+					,if(l.field4<>'','','E001') //reported_by
+					,'' //field5
 					);			
 
 				err_Safelist:=choose(c
-					,if(length(trim(l.reported_date,left,right))=8,'','E002')
-					,''	//lexid
-					,''	//fullname
-					,''	//raw_First_name	
-					,''	//raw_Last_Name
-					,''	//id
-					,''	//full_address (Deltabase)
-					,''	//physical_address (Deltabase)
-					,''	//street_1
-					,''	//City
-					,''	//Address
-					,''	//zip
-					,''	//Drivers_License_Number
-					,''	//Drivers_License_State
+					,if(l.field1<>'','','E001') //customer_event_id
+					,if(_Validate.Date.fIsValid(l.field2) and (unsigned)l.field2 <= (unsigned)(STRING8)Std.Date.Today(),'','E002') //reported_date
+					,if(l.field3<>'','','E001') //reported_time
+					,if(l.field4<>'','','E001') //reported_by
+					,'' //field5
 					);		
 
 				err_Deltabase:=choose(c
-					,if(length(trim(l.reported_date,left,right))>=8,'','E002')
-					,''	//lexid
-					,''	//fullname
-					,''	//raw_First_name	
-					,''	//raw_Last_Name
-					,''	//id
-					,''	//full_address (Deltabase)
-					,''	//physical_address (Deltabase)
-					,''	//street_1
-					,''	//City
-					,''	//Address
-					,''	//zip
-					,''	//Drivers_License_Number
-					,''	//Drivers_License_State
+					,if(l.field1<>'0','','E001') //InqLog_ID
+					,if(_Validate.Date.fIsValid(STD.Str.FindReplace( STD.Str.FindReplace( l.field2,':',''),'-','')[1..8]) and (unsigned)STD.Str.FindReplace( STD.Str.FindReplace( l.field2,':',''),'-','')[1..8] <= (unsigned)(STRING8)Std.Date.Today(),'','E002') //reported_date
+					,if(l.field3<>'','','E001') //user_added
+					,'' //field4
+					,'' //field5
 					);											
 										
 				self.err :=	MAP (
@@ -321,9 +259,15 @@ END;
 				self:=l;
 				end;
 
-			Shared err1:=normalize(withRC,19,tr1(left,counter));
+				norm :=	MAP (
+					 STD.Str.Contains( fname, 'Identity'		,	true )	=> 5
+					,STD.Str.Contains( fname, 'KnownRisk'		,	true )	=> 4
+					,STD.Str.Contains( fname, 'Safelist'		,	true )	=> 4
+					,STD.Str.Contains( fname, 'Delta'			,	true )	=> 3
+					,0	);
 
-			//output(err1);
+			Shared err1:=normalize(withRC,norm,tr1(left,counter));
+
 			
 			EXPORT ValidationResults := err1;
 
@@ -349,24 +293,48 @@ END;
 												{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.Deltabase},
 												CSV(separator([pSeparator]),quote(''),terminator(pTerminator)));
 
-				Validate_IdentityData := ValidateInputs(	fname, 
-					project(DS_IdentityData, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.reported_date := left.Date_of_Transaction; self.lexid := (string20)Left.lexid; SELF := LEFT;SELF := []))).ValidationResults;
+				EXPORT Validate_IdentityData := ValidateInputs(	fname, 
+					project(DS_IdentityData, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record, 
+					SELF.field1 := LEFT.Customer_Job_ID;
+					SELF.field2 := LEFT.Batch_Record_ID;
+					SELF.field3 := LEFT.Transaction_ID;
+					SELF.field4 := LEFT.Reason_Description;
+					SELF.field5 := LEFT.Date_of_Transaction;
+					SELF := LEFT;SELF := []))).ValidationResults;
 																			
-				Validate_KnownFraud := ValidateInputs(	fname, 
-					project(DS_KnownFraud, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
+				EXPORT Validate_KnownFraud := ValidateInputs(	fname, 
+					project(DS_KnownFraud, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,
+					SELF.field1 := LEFT.customer_event_id;
+					SELF.field2 := LEFT.reported_date;
+					SELF.field3 := LEFT.reported_time;
+					SELF.field4 := LEFT.reported_by;
+					SELF.field5 := '';
+					SELF := LEFT;SELF := []))).ValidationResults;	
 
-				Validate_SafeList := ValidateInputs(	fname, 
-					project(DS_SafeList, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
+				EXPORT Validate_SafeList := ValidateInputs(	fname, 
+					project(DS_SafeList, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record, 
+					SELF.field1 := LEFT.customer_event_id;
+					SELF.field2 := LEFT.reported_date;
+					SELF.field3 := LEFT.reported_time;
+					SELF.field4 := LEFT.reported_by;
+					SELF.field5 := '';
+					SELF := LEFT;SELF := []))).ValidationResults;	
 
-				Validate_Deltabase 	:= 	ValidateInputs(	fname, 
-					project(DS_DeltaBase, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
+				EXPORT Validate_Deltabase 	:= ValidateInputs( fname, 
+					project(DS_DeltaBase, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record, 
+					SELF.field1 := (STRING)LEFT.InqLog_ID;
+					SELF.field2 := LEFT.reported_date;
+					SELF.field3 := LEFT.reported_by;
+					SELF.field4 := '';
+					SELF.field5 := '';
+					SELF := LEFT;SELF := []))).ValidationResults;	
 
 				SHARED ErrorsFound	
 					:=	MAP (
 							 STD.Str.Contains( fname, 'Identity'		,	true )	=> Validate_IdentityData
 							,STD.Str.Contains( fname, 'KnownRisk'		,	true )	=> Validate_KnownFraud
 							,STD.Str.Contains( fname, 'SafeList'		,	true )	=> Validate_SafeList
-							,STD.Str.Contains( fname, 'Delta'		,	true )	=> Validate_Deltabase);
+							,STD.Str.Contains( fname, 'Delta'				,	true )	=> Validate_Deltabase);
 									
 				comb:=
 							sort(table(ErrorsFound(err<>''),{
@@ -416,10 +384,9 @@ END;
 		shared DeltabaseMbs 
 			:= join(	p1,
 						MBS(Deltabase = 1),
-						left.Customer_Account_Number =(string)right.gc_id
+						left.Customer_Id =(string)right.gc_id
 						and left.Deltabase = right.Deltabase
-						,transform({string20 Customer_Account_Number,unsigned4 seq}
-						,self.Customer_Account_Number:=left.Customer_Account_Number,
+						,transform({string20 Customer_Id,unsigned4 seq}
 						,self.seq := counter
 						,self:=left),left only);
 	
@@ -456,7 +423,7 @@ END;
 			self.ErrorCount :=mx;
 			self.RecordsRejected :=mx;
 			self.field :='Customer_Account_Number';
-			self.value :=trim(l.Customer_Account_Number,left,right);
+			self.value :=trim(l.Customer_Id,left,right);
 			self:=l;
 		end;
 
@@ -468,7 +435,7 @@ END;
 				,min_seq:=min(group,seq)
 				,err_cnt:=count(group)
 				,withRC
-			},filedate,filetime,field,Customer_Account_Number,few),filedate,filetime,-err_cnt):ONWARNING(2168,ignore);
+			},filedate,filetime,field,Customer_Id,few),filedate,filetime,-err_cnt):ONWARNING(2168,ignore);
 
 		comb tr5(comb l) := transform
 			treshld_ :=	Mod_Sets.threshld;

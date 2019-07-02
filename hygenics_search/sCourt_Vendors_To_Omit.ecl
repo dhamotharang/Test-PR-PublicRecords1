@@ -80,6 +80,7 @@
 '8A', // NEVADA_CLARK_COUNTY_DISTRICT_COURTS                                                                 
 '8D', // OHIO_SHELBY_COUNTY_COMMON_PLEAS_COURT                                                               
 '8M', // OHIO_FAYETTE_COUNTY_COMMON_PLEAS_COURT                                                              
+'8O', // OHIO_LUCAS_COUNTY_COMMON_PLEAS_COURT                                                                
 '8P', // OHIO_CUYAHOGA_COUNTY_CLEVELAND_MUNICIPAL_COURT                                                      
 '8Q', // OHIO_CUYAHOGA_COUNTY_CLEVELANDHEIGHTS_MUNICIPAL_COURT                                               
 '8V', // OHIO_COLUMBIANA_COUNTY_EASTLIVERPOOL_MUNICIPAL_COURT                                                
@@ -132,10 +133,12 @@
 'DB', // ARKANSAS_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DD', // ARIZONA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DJ', // GEORGIA_DEPARTMENT_OF_CORRECTIONS                                                                   
+'DK', // GEORGIA_PAROLE                                                                                      
 'DL', // HAWAII_DEPARTMENT_OF_CORRECTIONS                                                                    
 'DP', // IOWA_DEPARTMENT_OF_CORRECTIONS_PROBATION                                                            
 'DR', // KENTUCKY_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DT', // MAINE_DEPARTMENT_OF_CORRECTIONS                                                                     
+'DU', // MARYLAND_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
@@ -146,7 +149,6 @@
 'EN', // VIRGINIA_DEPARTMENT_OF_CORRECTIONS                                                                  
 'EP', // WASHINGTON_DEPARTMENT_OF_CORRECTIONS                                                                
 'EQ', // WASHINGTON_DC_DEPARTMENT_OF_CORRECTIONS                                                             
-'ER', // WISCONSIN_DEPARTMENT_OF_CORRECTIONS                                                                 
 'ES', // WEST_VIRGINIA_DEPARTMENT_OF_CORRECTIONS                                                             
 'EZ', // OHIO_SUMMIT_COUNTY_BARBERTON_MUNICIPAL_COURT                                                        
 'FB', // FLORIDA_SARASOTA_COUNTY                                                                             
@@ -205,9 +207,11 @@
 'HX', // MASSACHUSETTS_WRENTHAM_POLICE_ARRESTS                                                               
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
+'I0031', // SC JASPER SUMMARY COURT_IE                                                                          
 'I0032', // TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE                                                      
 'I0048', // TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE                                                            
 'I0049', // TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE                                                         
+'I0055', // SD PENNINGTON ARREST_IE                                                                             
 'IC', // IOWA_ADMINISTRATOR_OF_THE_COURTS                                                                    
 'IE', // MINNESOTA_DAKOTA_COUNTY_ARRESTS                                                                     
 'IF', // MINNESOTA_HENNEPIN_COUNTY_ARRESTS                                                                   
@@ -450,6 +454,7 @@
 'ZY', // SOUTH_CAROLINA_DARLINGTON_COUNTY_CIRCUIT_COURTS                                                     
 'ZZ', // SOUTH_CAROLINA_DARLINGTON_COUNTY_SUMMARY_COURTS                                                     
 
+
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
 'W0002', // MINNESOTA_ADMINISTRATOR_OF_THE_COURTS_CW                                                            
@@ -680,7 +685,6 @@
 'W0330', // MASSACHUSETTS_IPSWICH_POLICE_DEPARTMENT_CW                                                          
 'W0332', // MASSACHUSETTS_SANDWICH_POLICE_DEPARTMENT_CW                                                         
 'W0334', // MASSACHUSETTS_WHITMAN_CW                                                                            
-'W0339', // OREGON_CLACKAMAS_COUNTY_SHERIFF_CW                                                                  
 'W0341', // TEXAS_KNOX_COUNTY_SHERIFF_CW                                                                        
 
 ////////////////////////////////////////////////////////

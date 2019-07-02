@@ -36,11 +36,11 @@ EXPORT As_Business_Linking (
 				                                         'P' => 'PARENT COMPANY',
 																								 'T' => 'TRADENAME',
 																								 '');
-				self.company_sic_code1           := l.sic1;
-				self.company_sic_code2           := l.sic2;
-				self.company_sic_code3           := l.sic3;
-				self.company_sic_code4           := l.sic4;
-				self.company_sic_code5           := l.sic5;
+				self.company_sic_code1           := l.sic1[1..4];
+				self.company_sic_code2           := l.sic2[1..4];
+				self.company_sic_code3           := l.sic3[1..4];
+				self.company_sic_code4           := l.sic4[1..4];
+				self.company_sic_code5           := l.sic5[1..4];
 				self.company_org_structure_raw   := map(l.government = 'Y' and l.small = 'Y' => 'GOVERNMENT-SMALL_BUSINESS',
 																							  l.government = 'Y'   								 => 'GOVERNMENT',
 																								l.small = 'Y' 											 => 'SMALL_BUSINESS',

@@ -6,7 +6,7 @@ EXPORT Spray_Lerg_In(string version, const varstring eclsourceip, string thor_fi
 
 	//Linux Directories
 	srcdir 	:= '/data/Builds/builds/';
-		dir1		:= 'lerg_mon/bin';
+		dir1		:= 'lerg_mon/data';
 	//srcdir 	:= '/data/data_999/phones/';
 	//dir1		:= 'lerg_mon/build';
 	

@@ -15,31 +15,30 @@ EXPORT Deltabase_numberOfColumns	:=56;
 EXPORT VelocityRules_numberOfColumns	:=15;
 
 EXPORT CriticalFieldError_IdentityData	:= [
-		 'Customer_Job_ID'
-		,'Batch_Record_ID'
-		,'Reason_for_Transaction_Activity'
-		,'Date_of_Transaction'
-		,'First_name'
-		,'Last_Name'
+		 'field1'
+		,'field2'
+		,'field3'
+		,'field4'
+		,'field5'
 	];
 EXPORT CriticalFieldError_KnownFraud	:= [
-		 'Customer_Job_ID'
-		,'customer_event_id'
-		,'reported_date'
-		,'reported_time'
-		,'reported_by'
+		 'field1'
+		,'field2'
+		,'field3'
+		,'field4'
 	];	
 
 EXPORT CriticalFieldError_Deltabase	:= [
-		 'Customer_Account_Number'
-		,'Customer_program'
-		,'reported_date'
+		 'field1'
+		,'field2'
+		,'field3'
 	];			
 
 EXPORT CriticalFieldError_SafeList := [
-		 'Customer_Account_Number'
-		,'Customer_program'
-		,'reported_date'
+		 'field1'
+		,'field2'
+		,'field3'
+		,'field4'
 	];			
 EXPORT Agency_Vertical_Type 
 		:= 

@@ -6,6 +6,7 @@ ThorName:=IF(_control.ThisEnvironment.Name<>'Prod_Thor',Constants.ThorName_Dev,C
 
 lECL1 :=
  'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
++'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov NAC Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
@@ -26,7 +27,7 @@ lECL1 :=
 +'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyNAC(version)\n'
 +'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'NAC\', Scrubs_FraudGov.NAC_In_NAC, FraudGovPlatform_Validation.Mailing_List().Alert)\n'
 +'		)\n'
-+'	);\n'
++'	):failure(email(\'FraudGov NAC Input Prep Failed\'));\n'
 ;
 
 #WORKUNIT('protect',true);

@@ -26,7 +26,7 @@ lECL1 :=
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
 +'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInquiryLogs(version)\n'
 +'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'InquiryLogs\', Scrubs_FraudGov.InquiryLogs_In_InquiryLogs, FraudGovPlatform_Validation.Mailing_List().Alert))\n'
-+'	);\n'
++'	):failure(email(\'FraudGov InquiryLogs Input Prep Failed\'));\n'
 ;
 
 #WORKUNIT('protect',true);
@@ -35,4 +35,4 @@ lECL1 :=
 SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipInquiryLogs;
 Run_ECL := if(SkipJob=false,lECL1, 'output(\'Spray InquiryLogs Skipped\');\n' );
 
-_Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_10AM));
+_Control.fSubmitNewWorkunit(Run_ECL, ThorName ) : WHEN(CRON(EVERY_DAY_AT_10AM));

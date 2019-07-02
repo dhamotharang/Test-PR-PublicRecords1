@@ -1,4 +1,4 @@
-IMPORT corp2_raw_ID, tools;
+﻿IMPORT corp2_raw_ID, tools;
 
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -6,18 +6,11 @@ EXPORT Filenames(STRING  pversion = '',
 	EXPORT Input := MODULE
 	
 		SHARED Template(STRING tag) := Corp2_Raw_ID._Dataset(pUseOtherEnvironment).InputTemplate + tag;		
-		EXPORT vendorRaw 						:= tools.mod_FilenamesInput(Template('vendorRaw::id'), pversion);
+		
+		EXPORT Filing 						  := tools.mod_FilenamesInput(Template('filing::id'), pversion);
+		EXPORT FilingName 					:= tools.mod_FilenamesInput(Template('filingname::id'), pversion);
+		EXPORT Party 						    := tools.mod_FilenamesInput(Template('party::id'), pversion);
 		
 	END;
-
-	EXPORT Base := MODULE
-	
-		SHARED Template(STRING tag) := Corp2_Raw_ID._Dataset(pUseOtherEnvironment).FileTemplate + tag;		
-		EXPORT vendorRaw 						:= tools.mod_FilenamesBuild(Template('vendorRaw::id'), pversion);
-		EXPORT dAll_vendorRaw		    := vendorRaw.dAll_filenames;
-		
-	END;
-	
-	EXPORT dAll_filenames 				:= Base.dAll_vendorRaw;
-	  
+ 
 END;

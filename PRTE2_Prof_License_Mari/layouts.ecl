@@ -1,4 +1,4 @@
-﻿import Prof_License_Mari;
+﻿import Prof_License_Mari,PRTE2;
 
 export layouts := MODULE
 	
@@ -11,8 +11,14 @@ export layouts := MODULE
       string10 cust_name;
       string10 bug_num;
       string20 req;
+			
 
-	END;  		
+	END;  
+	// Export Search2:=RECORD
+	// search;
+	// PRTE2.Layouts.DEFLT_CPA;
+	// end;
+	
 
 	export disp_action := RECORD
 			Prof_License_Mari.Layouts.Disciplinary_Action;
