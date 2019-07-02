@@ -50,6 +50,7 @@
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_,' +
                         'ip_not_us_,ip_vpn_,ip_high_risk_city_,ip_hosted_,ip_tor_,' +
+												'_iprngbeg_,_iprngend_,_edgecountry_,_edgeregion_,_edgecity_,_edgeconnspeed_,_edgemetrocode_,_edgelatitude_,_edgelongitude_,_edgepostalcode_,_edgecountrycode_,_edgeregioncode_,_edgecitycode_,_edgecontinentcode_,_edgetwolettercountry_,_edgeinternalcode_,_edgeareacodes_,_edgecountryconf_,_edgeregionconf_,_edgecitycong_,_edgepostalconf_,_edgegmtoffset_,_edgeindst_,_siccode_,_domainname_,_ispname_,_homebiztype_,_asn_,_asnname_,_primarylang_,_secondarylang_,_proxytype_,_proxydescription_,_isanisp_,_companyname_,_organizationname_,' +
                         'kr_ip600_flag_,kr_ip601_flag_,kr_ip602_flag_,kr_ip603_flag_,kr_ip604_flag_,kr_ip605_flag_,kr_ip1000_flag_,kr_ip1001_flag_,' +
                         'cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_'
 												) : PERSIST('~temp::deleteme48');
@@ -59,6 +60,7 @@
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'high_risk_routing_,cl_active30_identity_count_,cl_active7_identity_count_,' +
+												'full_bankname_,' +
                         'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_,safe_flag_,contributor_safe_flag_'                        
 												) : PERSIST('~temp::deleteme50');
 
@@ -81,7 +83,6 @@
                         'addr_hri11_flag_,addr_hri12_flag_,addr_hri14_flag_,addr_hri25_flag_,addr_hri30_flag_,addr_hri50_flag_,addr_hri_co_flag_,addr_hri_mo_flag_,addr_hri_pa_flag_,addr_hri_po_flag_,addr_hri_va_flag_,' + 
                         'ph_hri07_flag_,ph_hri08_flag_,ph_hri15_flag_,ph_hri27_flag_,ph_hri31_flag_,' + 
                         'ssn_hri06_flag_,ssn_hri26_flag_,ssn_hri29_flag_,ssn_hri38_flag_,ssn_hri71_flag_,ssn_hri_it_flag_,ssn_hri_mi_flag_,safe_flag_,contributor_safe_flag_'     
-                        
 												) : PERSIST('~temp::deleteme49');
                            
   // Original Entity Stats
