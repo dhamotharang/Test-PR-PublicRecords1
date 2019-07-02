@@ -10,7 +10,7 @@
    Output: iesp.retrievedocument.t_ECrashRetrieveDocumentResponseEx (xml)
 */
 
-IMPORT AutoStandardI, Iesp, FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, Ut, Gateway, Doxie;
+IMPORT AutoStandardI, iesp, FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, ut, Gateway;
 
 EXPORT DocumentRetrievalService() := FUNCTION
    GatewaysIn := dataset([], Risk_Indicators.Layout_Gateways_In) : stored ('Gateways', FEW);
@@ -45,10 +45,11 @@ EXPORT DocumentRetrievalService() := FUNCTION
 	ColoredImage := Request[1].Options.ColoredImage;
 	Redact       := Request[1].Options.Redact;
 	
-	ErrorCodeImageOverflow      := 404;
-	ErrorCodeImageNonReleasable := 406;
+	ErrorCodeImageOverflow := 404;
 	
-	FilteredDupedDocuments := RawDocumentIn.GetReportDocuments(RequestReportId, DocumentType);
+ FilteredDupedDocuments := RawDocumentIn.GetReportDocuments(RequestReportId, DocumentType);
+	
+	//OUTPUT(FilteredDupedDocuments,named('FilteredDupedDocuments'));
 	
 	ImageHashes := PROJECT(
 		FilteredDupedDocuments,
@@ -59,7 +60,7 @@ EXPORT DocumentRetrievalService() := FUNCTION
 		)
 	);
 	
-	ImageRetrievalResponse := ImageService.GetImages(ImageService.GetDocumentImageRequest(ImageHashes, RequestReportId, ColoredImage, Redact));
+	ImageRetrievalResponse := ImageService.GetImages(ImageService.GetDocumentImageRequest(ImageHashes,RequestReportId, ColoredImage, Redact));
 	
 	EmptyHeader := ROW(
 		TRANSFORM(
@@ -68,7 +69,6 @@ EXPORT DocumentRetrievalService() := FUNCTION
 		)
 	);
 	
-	// The response for image too large.
 	iesp.retrievedocument.t_ECrashRetrieveDocumentResponse._Header ExceptionImageOverflowLayout := TRANSFORM
 		SELF.Status := ErrorCodeImageOverflow;
 		SELF.Exceptions := DATASET([
@@ -80,49 +80,24 @@ EXPORT DocumentRetrievalService() := FUNCTION
 		], iesp.share.t_WsException);
 		SELF := [];
 	END;
-
+	
 	HeaderImageOverflow := ROW(ExceptionImageOverflowLayout);
-	
-	SuperReportIdToReportId := CHOOSEN(FLAccidents_Ecrash.Key_eCrashV2_ReportId(KEYED(report_id = RequestReportId)), 1);
-	
-	ReportHashKeysFromKey := JOIN(
-		SuperReportIdToReportId,
-		FLAccidents_Ecrash.Key_eCrashv2_Supplemental,
-		KEYED(LEFT.super_report_id = RIGHT.super_report_id),
-		TRANSFORM(RIGHT),
-		LIMIT(eCrash_Services.constants.MAX_REPORT_NUMBER, FAIL(203, doxie.ErrorCodes(203))));
-	
-	ReportsDeltabaseResult := IF(
-		ReportHashKeysFromKey[1].Vendor_Code IN eCrash_Services.Constants.VENDOR_CODES_BYPASS_DELTABASE, 
-		eCrash_Services.Functions.getSupplementalsBypassDeltabase(ReportHashKeysFromKey),
-		eCrash_Services.Functions.getSupplementalsDeltabase(
-			RequestReportId,
-			ReportHashKeysFromKey,
-			InModuleDeltaBase));
-		
-	SuperReportRow := ReportsDeltabaseResult.superReportRow;
-	
-	ReportsAll := IF(
-		ReportHashKeysFromKey[1].Vendor_Code IN eCrash_Services.Constants.VENDOR_CODES_BYPASS_DELTABASE, 
-		SuperReportRow,
-		ReportsDeltabaseResult.deltabaseReportsAll);
-	
-	IF(ReportsAll[1].Releasable != '1', FAIL(ErrorCodeImageNonReleasable, 'Image is non-releasable'));	
-	
-	// Compose our reponse.
-	IsImageTooLarge := LENGTH(ImageRetrievalResponse[1].response.ImageData) = iesp.Constants.Retrieve_Document.MaxDocumentSize;
-
-	ResponseHeader := MAP(IsImageTooLarge => HeaderImageOverflow,
-		                    EmptyHeader);
+	ResponseHeader := IF(
+		LENGTH(ImageRetrievalResponse[1].response.ImageData) = iesp.Constants.Retrieve_Document.MaxDocumentSize,
+		HeaderImageOverflow,
+		EmptyHeader
+	);
 	
 	iesp.retrievedocument.t_ECrashRetrieveDocumentResponse GenerateResponse(
 		iesp.accident_image.t_AccidentImageResponseEx L,
-		iesp.retrievedocument.t_ECrashRetrieveDocumentResponse._Header H) := TRANSFORM
+		iesp.retrievedocument.t_ECrashRetrieveDocumentResponse._Header H
+	) := TRANSFORM
 		SELF._Header := H;
 		SELF.DocumentData := IF(
-			H.Exceptions[1].Code IN [ErrorCodeImageOverflow, ErrorCodeImageNonReleasable],
+			H.Exceptions[1].Code = ErrorCodeImageOverflow,
 			'',
-			L.response.ImageData);
+			L.response.ImageData
+		);
 	END;
 	
 	Images := PROJECT(ImageRetrievalResponse, GenerateResponse(LEFT, ResponseHeader));
