@@ -10,7 +10,7 @@ dOHTempMain	:=	VehicleV2.Mapping_OH_Temp_Main;
 // dOHTempMain	:=	dataset('~thor_data400::persist::vehicleV2::oh_temp_main',VehicleV2.Layout_OH.OH_as_VehicleV2,thor);
 
 // Map to the base vehiclev2 main layout
-// Added for CCPA-103
+// Added for CCPA-103 
 Layout_Temp_SID_Removal := VehicleV2.Layout_Base_Main - [global_sid,record_sid];
 //VehicleV2.Layout_Base_Main	
 Layout_Temp_SID_Removal 	tReformat2Main(dOHTempMain	pInput)	:=

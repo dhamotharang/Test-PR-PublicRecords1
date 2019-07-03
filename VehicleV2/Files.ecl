@@ -62,6 +62,7 @@ module
 		export	Infutor_Motorcycle	:=	dataset('~thor_data400::base::vehicleV2::inf_nondppa_motorcycle',VehicleV2.Layout_Infutor_Motorcycle.Infutor_Motorcycle_as_VehicleV2,thor);
 		export	MA									:=	dataset('~thor_data400::base::vehicleV2::direct::ma',VehicleV2.Layout_MA.MA_as_VehicleV2,thor);
 		// export	Main					      :=	dataset('~thor_data400::base::vehicleV2::main',VehicleV2.Layout_Base.Main,thor);
+		// Modified for CCPA-103
 		export  Main								:=  project(VehicleV2.Prep_Build.Main_Base('~thor_data400::base::vehicleV2::main'), transform(VehicleV2.Layout_Base.Main, 
 		                                                                                                                          self.global_sid := 0; //Added for CCPA-103
 																																																															self.record_sid := 0; //Added for CCPA-103

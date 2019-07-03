@@ -4,7 +4,7 @@ dVehicleTempMain	:=	VehicleV2.Mapping_TEMP_main;
 
 // dVehicleTempMain	:=	dataset('~thor_data400::persist::vehicleV2::vehicleV1_temp_main',VehicleV2.Layout_temp_module.Layout_temp_main,flat);
 
-// Added for CCPA-103
+// Added for CCPA-103 
 Layout_Temp_SID_Removal := VehicleV2.Layout_Base_Main - [global_sid,record_sid];
 //VehicleV2.Layout_Base_Main	
 Layout_Temp_SID_Removal 	tMappingMain(VehicleV2.Layout_temp_module.Layout_temp_main	L)	:=
