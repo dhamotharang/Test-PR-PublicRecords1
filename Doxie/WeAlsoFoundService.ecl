@@ -35,7 +35,8 @@
 /*--INFO-- This service searches the dids from header file.*/
 
 EXPORT WeAlsoFoundService := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #stored('useOnlyBestDID',true);
   import doxie;
 
   dids := doxie.Get_Dids ();
