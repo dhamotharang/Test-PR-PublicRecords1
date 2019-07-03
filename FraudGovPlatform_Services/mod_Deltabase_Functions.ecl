@@ -36,6 +36,9 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		SHARED GetRecentTimelineDetails(DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_delta_records) := FUNCTION
 
 			iesp.fraudgovreport.t_FraudGovTimelineDetails xForm_getTimeLineDetails( FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
+			
+				reported_dt := iesp.ECL2ESP.toTimeStamp(L.Reported_Date[1..8] +  ' ' + L.Reported_Time[1..6]);
+				event_dt := iesp.ECL2ESP.toDatestring8(L.Event_Date);
 				
 				SELF.IsRecentActivity := TRUE;
 				SELF.FileType := L.classification_Permissible_use_access.file_type;
@@ -45,15 +48,15 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.HouseHoldId := L.Investigation_Referral_Case_ID;
 				SELF.CustomerPersonId := (STRING)L.uid;
 				SELF.EventType1 := L.Event_Type_1;
-				SELF.EventDate.Year := (INTEGER)(L.Event_Date[1..4]);
-				SELF.EventDate.Month := (INTEGER)(L.Event_Date[5..6]);
-				SELF.EventDate.Day := (INTEGER)(L.Event_Date[7..8]);
-				SELF.ReportedDateTime.Year := (INTEGER)(L.Reported_Date[1..4]);
-				SELF.ReportedDateTime.Month := (INTEGER)(L.Reported_Date[5..6]);
-				SELF.ReportedDateTime.Day := (INTEGER)(L.Reported_Date[7..8]);
-				SELF.ReportedDateTime.Hour24 := (INTEGER)(L.Reported_Time[1..2]);
-				SELF.ReportedDateTime.Minute := (INTEGER)(L.Reported_Time[3..4]);
-				SELF.ReportedDateTime.Second := (INTEGER)(L.Reported_Time[5..6]);
+				SELF.EventDate.Year := event_dt.Year;
+				SELF.EventDate.Month := event_dt.Month;
+				SELF.EventDate.Day := event_dt.Day;
+				SELF.ReportedDateTime.Year := reported_dt.Year;
+				SELF.ReportedDateTime.Month := reported_dt.Month;
+				SELF.ReportedDateTime.Day := reported_dt.Day;
+				SELF.ReportedDateTime.Hour24 := reported_dt.Hour24;
+				SELF.ReportedDateTime.Minute := reported_dt.Minute;
+				SELF.ReportedDateTime.Second := reported_dt.Second;
 				SELF.IndustryTypeDescription := L.classification_source.Industry_segment;
 				SELF.ReportedBy := L.classification_Permissible_use_access.user_added;
 				SELF.ActivityReason := L.reason_description;
