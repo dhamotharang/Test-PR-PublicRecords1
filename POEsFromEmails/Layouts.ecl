@@ -1,4 +1,4 @@
-import address;
+﻿import address, BIPV2;
 
 export Layouts := module
 	
@@ -46,9 +46,9 @@ export Layouts := module
 	
 	export AllDataForAllBdidsRec := RECORD
 			unsigned8 								bh_rec_key 					:= 0;
-			unsigned8									bdid			 					:= 0;
-			unsigned8 								group_id 	 					:= 0;
-			unsigned8 								agrp_bdid								;
+			unsigned6									bdid			 					:= 0;
+			unsigned6 								group_id 	 					:= 0;
+			unsigned6 								agrp_bdid								;
 			string120  								bh_company_name					;
 			unsigned6 								bh_phone								;
 			Address.Layout_clean_slim	bh_Company_addr					;
@@ -57,6 +57,13 @@ export Layouts := module
 			unsigned8 								bh_rawaid								;
 	END;
 
+	export rollupgroupids := 
+	record
+
+			unsigned6 								group_id 	 					:= 0;
+			dataset({unsigned6 did})	dids										;
+	
+	end;
 	
 	////////////////////////////////////////////////////////////////////////
 	// -- Common Layouts for processing
@@ -86,16 +93,46 @@ export Layouts := module
 			unsigned8 								bh_rawaid								;
 	end;
 	
+	export temp := 
+	record, maxlength(1000000)
+		AllDataForAllBdidsRec;
+		dataset({unsigned6 did})	dids		;
+	end;
 	
+	export temp2 := 
+	record 
+		AllDataForAllBdidsRec;
+		unsigned6 did		;
+	end;
+
 	////////////////////////////////////////////////////////////////////////
 	// -- Base Layout
 	////////////////////////////////////////////////////////////////////////
 	export Base := record 
-		unsigned6						Did				:= 0;
-		unsigned6						Bdid			:= 0;
-		unsigned6 					group_id			;
-		unsigned6 					agrp_bdid			;
+	  BIPV2.IDlayouts.l_xlink_ids       ;	//Added for BIP project
+		unsigned6				Did						:= 0;
+		unsigned6				Bdid					:= 0;
+		unsigned6 			group_id					;
+		unsigned6 			agrp_bdid					;
 		Common														;
+		// Jira# CCPA-, The below layout with 2 new fields are added for CCPA (California Consumer Protection Act) project.
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		unsigned4 			global_sid 		:= 0;
+		unsigned8 			record_sid 		:= 0;
+	end;
+	
+	export temp_base := record
+    string10        prim_range		;
+	  string28        prim_name			;
+	  string8         sec_range			;
+	  string25        city_name			;
+	  string2         st						;
+	  string5         zip						;	 
+	  string20        fname					;
+	  string20        mname					;
+	  string20        lname					;    
+		string10	    	phone					;
+		Base                          ;    
 	end;
 	
 	////////////////////////////////////////////////////////////////////////
@@ -104,6 +141,16 @@ export Layouts := module
 	export Keybuild :=
 	record
 		Base;
+	end;
+	
+	export aid_prep :=
+	record
+		unsigned8 unique_id;
+		string person_addr1;
+		string person_addr2;
+		string company_addr1;
+		string company_addr2;
+		base;
 	end;
 
 end;
