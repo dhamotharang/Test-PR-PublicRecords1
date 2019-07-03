@@ -12,10 +12,10 @@ EXPORT compliance := MODULE
   END;
 
   // from doxie.mac_header_field_declare() -- i.e. translated
-  EXPORT GetGlobalDataAccessModule (isFCRA = false) := FUNCTIONMACRO
+  EXPORT GetGlobalDataAccessModule () := FUNCTIONMACRO
     IMPORT STD;
     // a hack: DPM and DRM are not provided
-    local gm := AutoStandardI.GlobalModule(isFCRA);
+    local gm := AutoStandardI.GlobalModule();
     local access := MODULE (doxie.IDataAccess)
       EXPORT unsigned1 unrestricted := 0 | IF (gm.AllowGLB, doxie.compliance.ALLOW.GLB, 0)
                                          | IF (gm.AllowDPPA, doxie.compliance.ALLOW.DPPA, 0)
@@ -31,9 +31,9 @@ EXPORT compliance := MODULE
       EXPORT boolean no_scrub := ^.no_scrub;
       EXPORT unsigned3 date_threshold := dateVal;
       EXPORT boolean suppress_dmv := suppressDMVInfo_value;
-      EXPORT boolean lexid_source_optout := gm.LexIdSourceOptout;
+      EXPORT unsigned1 lexid_source_optout := gm.LexIdSourceOptout;
       // "unsigned", so that we could accommodate different log levels, if needed
-      EXPORT boolean log_record_source := ~gm.isFCRAval AND gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
+      EXPORT boolean log_record_source := gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
       EXPORT boolean show_minors := gm.IncludeMinors OR (GLB_Purpose = 2);
       EXPORT string ssn_mask := ssn_mask_value;
       EXPORT unsigned1 dl_mask :=  dl_mask_val;
@@ -65,9 +65,9 @@ EXPORT compliance := MODULE
       EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gm,AutoStandardI.InterfaceTranslator.no_scrub.params));
       EXPORT unsigned3 date_threshold := AutoStandardI.InterfaceTranslator.dateVal.val(project(gm,AutoStandardI.InterfaceTranslator.dateVal.params));
       EXPORT boolean suppress_dmv := gm.SuppressDMVInfo;
-      EXPORT boolean lexid_source_optout := gm.LexIdSourceOptout;
+      EXPORT unsigned1 lexid_source_optout := gm.LexIdSourceOptout;
       // "unsigned", so that we could accommodate different log levels, if needed
-      EXPORT boolean log_record_source := ~gm.isFCRAVal AND gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0); 
+      EXPORT boolean log_record_source := gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0); 
       EXPORT boolean show_minors := gm.IncludeMinors OR (glb_auto = 2);
       EXPORT string ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
       EXPORT unsigned1 dl_mask :=  AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.dl_mask_val.params));
