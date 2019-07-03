@@ -1,13 +1,15 @@
-import DayBatchPCNSR;
+﻿import $, Doxie, Suppress;
 /*
 This Attribute gets upto 10 records that have the same last name as the last name in the
 input data. I successively searches last name records by removing the last character in the
 zip till the 10 records are found.
 */
 
-export PhoneSearch_Surnames(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrInput, UNSIGNED max_Count) := FUNCTION
+EXPORT PhoneSearch_Surnames(GROUPED DATASET($.Layout_PCNSR_Linked) pcnsrInput, 
+                            UNSIGNED max_Count,
+                            Doxie.IDataAccess mod_access) := FUNCTION
 	
-	K_LZ3 := DayBatchPCNSR.Key_PCNSR_Surnames;
+	K_LZ3 := $.Key_PCNSR_Surnames;
 	
 	Layout_rolled_matches := RECORD
 		pcnsrInput;
@@ -121,14 +123,16 @@ export PhoneSearch_Surnames(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) p
 							matchZL3(matchCode <> '') + matchZL2(matchCode <> '') + 
 							matchZL1(matchCode <> '') + matchL(matchCode <> '') + matchL(cnt = 1);
 
-//allMatch := matchZL4;
+  allMatch_flagged := Suppress.MAC_FlagSuppressedSource(allMatch, mod_access, outdata.did, outdata.global_sid);  
+  
+  allMatch_suppressed := PROJECT(allMatch_flagged, TRANSFORM($.Layout_PCNSR_Linked, SELF.outdata := IF(~LEFT.is_suppressed, lEFT.outdata), SELF := LEFT));
 
-	ungroupedMatch := UNGROUP(allMatch);
+	ungroupedMatch := UNGROUP(allMatch_suppressed);
 	
 	grpMatch := GROUP(SORT(ungroupedMatch,indata.acctno),indata.acctno);
 	
 	out := TOPN(grpMatch,max_count,indata.acctno,ABS( (INTEGER)(indata.z5[1..5]) - (INTEGER)(outdata.zip[1..5]) ));
 
 	
-	RETURN PROJECT(out,TRANSFORM(DayBatchPCNSR.Layout_PCNSR_Linked,SELF := LEFT));
+	RETURN PROJECT(out,TRANSFORM($.Layout_PCNSR_Linked,SELF := LEFT));
 END;

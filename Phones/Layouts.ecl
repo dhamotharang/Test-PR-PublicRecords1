@@ -292,7 +292,7 @@ MODULE
 			BatchShare.Layouts.ShareAcct;
 			portedMetadata_Main;
 			BatchOut;
-		 Carrier_Reference;//Added for Phone Finder inhousemetadata
+		 Carrier_Reference;
 		END;
 
 	END;

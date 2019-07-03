@@ -1,4 +1,4 @@
-﻿import iesp, AutoStandardI, ut, doxie, suppress, American_student_list, American_student_services, standard, risk_indicators, std;
+﻿import iesp, AutoStandardI, ut, doxie, data_services, suppress, American_student_list, American_student_services, standard, risk_indicators, std;
 
 export Functions := MODULE
 
@@ -125,7 +125,7 @@ export Functions := MODULE
 	END;
 	
 	
-	export GetCollegeIndicators(dataset (doxie.layout_references) dids, boolean isFCRA = false,unsigned3 history_date = 999999) := FUNCTION;
+	shared GetCollegeIndicators(dataset (doxie.layout_references) dids, doxie.IDataAccess mod_access, boolean isFCRA = false, unsigned3 history_date = 999999) := FUNCTION;
 	full_history_date := risk_indicators.iid_constants.full_history_date(history_date);
 	sLayout	:= record
 		american_student_list.key_DID;
@@ -151,7 +151,11 @@ export Functions := MODULE
 												left.did!=0 and keyed(left.did=right.l_did),
 												studentFCRA(left,right), left outer, atmost(keyed(left.did=right.l_did), 100), 
 												keep(American_Student_Services.Constants.max_college_to_use));
-	studentRecs := if (isFCRA, sfile_FCRA, sfile_nonFCRA);									
+	studentRecs_pre := if (isFCRA, sfile_FCRA, sfile_nonFCRA);
+  dataEnvironment := if(isFCRA,data_services.data_env.iFCRA,data_services.data_env.iNonFCRA);
+  studentRecs := Suppress.MAC_SuppressSource(studentRecs_pre, mod_access,did,,dataEnvironment);
+  doxie.compliance.logSoldToSources(studentRecs,mod_access,did);
+
 	studentRecsH := studentRecs((unsigned)date_first_seen < (unsigned)full_history_date);
 
 	outlayout  := record
@@ -354,9 +358,10 @@ export Functions := MODULE
 											,xform_roll(left,right));
 			return ds_rollup;
   END;
-EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRecs) studentrecs, dataset(American_Student_Services.layouts.deepDids) all_dids) := FUNCTION			
+EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRecs) studentrecs, dataset(American_Student_Services.layouts.deepDids) all_dids,
+                              doxie.IDataAccess mod_access ) := FUNCTION			
  	
-	  college_indicators := GetCollegeIndicators(project(all_dids,doxie.layout_references), false);
+	  college_indicators := GetCollegeIndicators(project(all_dids,doxie.layout_references),mod_access,false);
 	
 	  Layouts.full_output  xform_collegeIndicators(studentrecs R, American_Student_Services.layouts.college_data L) := Transform
 					self := L;
@@ -386,20 +391,21 @@ EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 	
 	END;	
 	EXPORT	get_report_recs(dataset(doxie.layout_references) dids, 
-	                        American_Student_Services.IParam.reportParams aInputData, boolean onlyCurrent = true) := FUNCTION		
+	                        American_Student_Services.IParam.reportParams aInputData, 
+                          boolean onlyCurrent = true) := FUNCTION		
 
     student_rec:= record
       iesp.student.t_StudentRecord;
       string2 src;
     end;
-		
+		mod_access :=project(aInputData,doxie.IDataAccess); 
     all_dids := project(dids,transform(American_student_services.layouts.deepDids, self.isDeepDive := false, self := left));													
-	  recs_by_dids := American_student_services.Raw.getPayloadByDIDS(all_dids);
+	  recs_by_dids := American_student_services.Raw.getPayloadByDIDS(all_dids, mod_access);
 	  sup_recs_by_dids := American_student_services.Raw.getSupplementalStudentInfobyDIDs(all_dids);
 	  all_recs := recs_by_dids + sup_recs_by_dids;
 		//ds_rollup := rollup_recs(all_recs);
 	  studentrecs := apply_restrictions(all_recs, aInputData);		
-    student_w_indicators := add_college_indicators(studentrecs, all_dids);
+    student_w_indicators := add_college_indicators(studentrecs, all_dids, mod_access);
 		student_rec iesp_format(student_w_indicators l) := transform
 			self._Penalty := 0;//l.record_penalty;  //no penalty for report records.
 			self.AlsoFound := l.isDeepDive;

@@ -1,4 +1,4 @@
-﻿import Autokey_batch,AutoStandardI,BatchServices,doxie,iesp,MDR,POE,PSS,risk_indicators,suppress,ut,CriminalRecords_Services;
+﻿import Autokey_batch,AutoStandardI,BatchServices,doxie,iesp,MDR,POE,PSS,risk_indicators,suppress,ut,CriminalRecords_Services, STD;
 
 export Search_Records := module
 	export params := interface(
@@ -85,11 +85,13 @@ export Search_Records := module
 	end;
 	
 	export val(params in_mod) := function
-
+	
     // ***** Main processing
-		in_appType     := AutoStandardI.InterfaceTranslator.application_type_val.val(in_mod);
-		glb_purpose		 := AutoStandardI.InterfaceTranslator.glb_purpose.val(in_mod);
-		in_ssn         := AutoStandardI.InterfaceTranslator.ssn_value.val(in_mod);
+	mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+      EXPORT string32 application_type := in_mod.applicationType;
+	  EXPORT unsigned1 glb_purpose := in_mod.glbPurpose;
+    END;
+	in_ssn := AutoStandardI.InterfaceTranslator.ssn_value.val(in_mod);
 		
     IncludeSpouse       := in_mod.include_spouse;
     in_excluded_sources := in_mod.excluded_sources;
@@ -105,7 +107,7 @@ export Search_Records := module
     ds_excluded_sources := 
 	     if(in_excluded_sources_edited = '',
 	        dataset([], layout_source),
-			    dataset(ut.Stringsplit(in_excluded_sources_edited, ','), layout_source));
+			    dataset(Std.Str.SplitWords(in_excluded_sources_edited, ','), layout_source));
 					
 					
 		//  3. Convert input soap/xml fields into a single record batch and get the did for 
@@ -122,7 +124,7 @@ export Search_Records := module
 		ds_combined_dids_sorted := dedup(sort(ds_subject_dids + ds_spouse_dids,lookupdid),lookupdid);
 		
 	  //  5. Get all the POE and PSS recs for the subject & spouse dids
-    ds_poe_recs_slimmed := WorkPlace_Services.Functions.getPoeRecs(ds_combined_dids_sorted);
+    ds_poe_recs_slimmed := WorkPlace_Services.Functions.getPoeRecs(ds_combined_dids_sorted, mod_access);
 
 		ds_pss_recs_slimmed	:=	WorkPlace_Services.Functions.getPSSRecs(ds_combined_dids_sorted);
 
@@ -144,12 +146,12 @@ export Search_Records := module
 	       // Include the record if the source is not restricted.
 			   // NOTE1: As of 01/14/2011, Teletrack is the only source that might be 
 			   //                          restricted via the DataRestrictionMask.
-		     (MDR.sourceTools.SourceIsTeletrack(source) and ~doxie.DataRestriction.TT) OR
+		     (MDR.sourceTools.SourceIsTeletrack(source) and ~doxie.compliance.isTTRestricted (mod_access.DataRestrictionMask)) OR
          // OR include the record if the source is not Teletrack.
 			   ~MDR.sourceTools.SourceIsTeletrack(source));
 
 		// 7.2.1 Applying GLB restrictions to utility records.
-		ds_all_recs_glb_ok := ds_all_recs_not_restricted(ut.PermissionTools.glb.SrcOk(in_mod.GLBPurpose, source, dt_first_seen, 0));
+		ds_all_recs_glb_ok := ds_all_recs_not_restricted(doxie.compliance.source_ok(mod_access.glb_purpose, mod_access.DataRestrictionMask, source, dt_first_seen, 0));
 
     // 7.3 Next do a "left only" join to the excluded_sources dataset to pass through         ??? 
     //     all sources that are not excluded.
@@ -160,14 +162,12 @@ export Search_Records := module
 															  );
 
     // 8. pull recs by ssn & did and then mask ssns if needed.
-		Suppress.MAC_Suppress(ds_all_recs_included,ds_dids_pulled,in_appType,Suppress.Constants.LinkTypes.DID,did);
-		Suppress.MAC_Suppress(ds_dids_pulled,ds_ssns_pulled,in_appType,Suppress.Constants.LinkTypes.SSN,subject_ssn);
+		Suppress.MAC_Suppress(ds_all_recs_included,ds_dids_pulled,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_dids_pulled,ds_ssns_pulled,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,subject_ssn);
 	  doxie.MAC_PruneOldSSNs(ds_ssns_pulled, ds_all_recs_pulled, subject_ssn, did);
 
 		// set the ssn_mask_value that is used in Suppress.MAC_Mask
-		string6 ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(
-		                            in_mod,
-                                AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
+		string6 ssn_mask_value := mod_access.ssn_mask;
 
 		suppress.MAC_Mask(ds_all_recs_pulled, ds_all_recs_masked, subject_ssn, blank, true, false);
 

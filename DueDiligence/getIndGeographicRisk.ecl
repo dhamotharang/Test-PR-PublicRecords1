@@ -6,12 +6,11 @@ EXPORT getIndGeographicRisk(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 												   BOOLEAN includeReport = FALSE) := FUNCTION
 	
  
-  // ------                                                                                    ------
-	// ------ Start by calling the Geographic Risk Function                                      ------  
-	// ------    The individual address IS the cleaned input  and geo blk came from the          ------
-  // ------    address cleaner.  we also rely on getIndBestData to populate the address        ------
-	// ------                                                                                    ------
- ListOfAddresses  :=  PROJECT(inData,  
+
+	//Start by calling the Geographic Risk Function                                  
+	//The individual address IS the cleaned input  and geo blk came from the 
+  //address cleaner.         
+  ListOfAddresses  :=  PROJECT(inData,  
 			TRANSFORM(DueDiligence.layoutsInternal.GeographicLayout,
 			 /* populate the Geographic internal record with address data from the left  */ 
 						   SELF.seq    := LEFT.seq; 

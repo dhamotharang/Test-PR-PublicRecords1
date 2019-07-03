@@ -152,6 +152,7 @@ export ConsumerAttributes_Service := MACRO
 		self.bsversion := CASE( attr,
 															'bocashellattrv3' => 3,
 															'bocashellattrv4' => 4,
+															'bocashellattrv4novoter' => 4,
 															'riskviewattrv3'  => 3,
 															'riskviewattrv4'  => 4,
 													 0);
@@ -160,6 +161,7 @@ export ConsumerAttributes_Service := MACRO
 	attributesIn := project(optionsIn.RequestedAttributeGroups, getVersions(left));
 
 	isLeadIntegrity := exists(attributesIn(attr[1..9]='leadinteg'));
+	isFilterVoter   := exists(attributesIn(attr='bocashellattrv4novoter'));
 	
 	DPPA := map(  isLeadIntegrity => 0,
 								userIn.DLPurpose='' => 0,
@@ -167,8 +169,9 @@ export ConsumerAttributes_Service := MACRO
 	GLBA := map(	isLeadIntegrity => 5,
 								userIn.GLBPurpose='' 	=> 8, 
 								(unsigned1)userIn.GLBPurpose);
-								
+	
 	RemoveFares	:= if(isLeadIntegrity, true, optionsIn.RemoveFares);
+	FilterVoter := if(isFilterVoter, true, false);
 			
 	temp := record
 		dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
@@ -300,7 +303,7 @@ export ConsumerAttributes_Service := MACRO
 	unsigned2 EverOccupant_PastMonths := 0;
 	unsigned4 EverOccupant_StartDate  := 99999999;
 	unsigned1 AppendBest 					:= 1;	// search the best file
-	unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly;
+	unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly + if(FilterVoter, risk_indicators.iid_constants.BSOptions.FilterVoter, 0 );
 
 IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
@@ -359,6 +362,7 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 															nugen, 
 															RemoveFares, 
 															DataRestrictionMask,
+															BSOptions,
 															DataPermission:=DataPermission);
 																
 	adlBasedClam(unsigned1 bsversion) := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
@@ -387,7 +391,8 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 															doScore, 
 															nugen,
 															DataRestriction:=DataRestrictionMask,
-															DataPermission:=DataPermission);
+															DataPermission:=DataPermission,
+															BSOptions:=BSOptions);
 																	
 
 	finalClam(unsigned1 bsversion) := if(ADLBasedShell, adlBasedClam(bsversion), clam(bsversion));
@@ -414,7 +419,8 @@ IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, v
 			self.Name := le.attr;
 			self.Attributes := CASE( le.attr,
 																'bocashellattrv3' => bocaV3, // this isn't active yet, but serves as a placeholder.
-																'bocashellattrv4' => bocaV4
+																'bocashellattrv4' => bocaV4,
+																'bocashellattrv4novoter' => bocaV4
 					);
 	end;
 	

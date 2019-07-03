@@ -121,7 +121,7 @@ export Functions := module
 
   // This function combines subject and optional spouse dids, sorts & dedups them, 
 	// then "looks" them up on the POE did key file.
-	export getPoeRecs(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_subject_dids):= function
+	export getPoeRecs(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_subject_dids, doxie.IDataAccess mod_access):= function
  
     // 1. Combine the subject dids and spouse dids into 1 dataset and then sort and 
 	  //     dedup by lookup did in case 1 subject did is another subject's spouse did.
@@ -182,8 +182,8 @@ export Functions := module
 																	SELF :=[]),
 												        inner, // use all recs from right that match left
 												        LIMIT(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
-
-    return ds_poe_recs_slimmed;
+		ds_poe_recs_suppressed := Suppress.MAC_SuppressSource(ds_poe_recs_slimmed, mod_access);
+    return ds_poe_recs_suppressed;
 
   end; // end of getPoeRecs function
 
@@ -600,7 +600,8 @@ export Functions := module
 		RETURN  isNonPersonalEmail;
 	END;	// end of checkNonPersonalEmail function 
 	
-	EXPORT	getDetailedWithEmail(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus)	ds_recs_in, doxie.IDataAccess mod_access)	:= FUNCTION
+	EXPORT	getDetailedWithEmail(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus)	
+                               ds_recs_in, doxie.IDataAccess mod_access)	:= FUNCTION
 		
 		ds_recs_spoke     	:= ds_recs_in(MDR.sourceTools.SourceIsSpoke(source));
 		ds_recs_zoom    	  := ds_recs_in(MDR.sourceTools.SourceIsZoom(source));
@@ -786,21 +787,28 @@ export Functions := module
 															));													 
 
 	// Get the detailed data from the Thrive key did file.
-	ds_detail_thrive := JOIN(ds_recs_thrive,thrive.keys().did.qa,
-                           KEYED(LEFT.did = RIGHT.did) AND 
-												   // match on additional field in case multiple recs for the did
-												   LEFT.dt_last_seen = RIGHT.dt_last_seen,
-	                       TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
-														// fields from RIGHT thrive did key file, see thrive.layouts.base
-														
-														temp_email1 				:= IF(checkNonPersonalEmail(RIGHT.Email),RIGHT.Email,'');
-											 		  SELF.email1 				:= temp_email1,
-													  SELF.email_src1     := IF(temp_email1 <>'',RIGHT.src,''),										
-                            SELF                := LEFT), 
-													LEFT OUTER,
-													KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
-													LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
+	ds_detail_thrive_org := JOIN(ds_recs_thrive,thrive.keys().did.qa,
+                               KEYED(LEFT.did = RIGHT.did) AND 
+                               // match on additional field in case multiple recs for the did
+                               LEFT.dt_last_seen = RIGHT.dt_last_seen,
+                             TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+                                // fields from RIGHT thrive did key file, see thrive.layouts.base
+                                
+                                temp_email1 				:= IF(checkNonPersonalEmail(RIGHT.Email),RIGHT.Email,'');
+                                SELF.email1 				:= temp_email1,
+                                SELF.email_src1     := IF(temp_email1 <>'',RIGHT.src,''),										
+                                SELF                := LEFT), 
+                              LEFT OUTER,
+                              KEEP(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
+                              LIMIT(BatchServices.WorkPlace_Constants.Limits.KEYED_JOIN_UNLIMITED));
 
+   ds_detail_thrive_flagged := Suppress.MAC_FlagSuppressedSource(ds_detail_thrive_org, mod_access);
+   
+   ds_detail_thrive := PROJECT(ds_detail_thrive_flagged,
+                         TRANSFORM(WorkPlace_Services.Layouts.poe_didkey_plus,
+                                   SELF.email1 := IF(LEFT.is_suppressed, '', LEFT.email1);
+                                   SELF.email_src1 := IF(LEFT.is_suppressed, '', LEFT.email_src1);										
+                                   SELF := LEFT));
 
   // Project all the others that don't need additional source specIFic data
 	// to put all recs into the same layout AND convert 3 fields.
@@ -919,6 +927,7 @@ export Functions := module
     doxie.compliance.logSoldToSources (ds_detail_oneclick_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_detail_saleschannel_flagged(~is_suppressed), mod_access);
     doxie.compliance.logSoldToSources (ds_email_data_suppressed, mod_access);
+    doxie.compliance.logSoldToSources (ds_detail_thrive_flagged(~is_suppressed), mod_access);
 	  RETURN ds_detail_wemail;
   END; // end of getDetailedWithEmail function 
 	

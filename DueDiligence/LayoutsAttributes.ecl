@@ -176,7 +176,7 @@
     UNSIGNED2 	VehicleCount;                                   //populated in DueDiligence.getIndVehicle
     UNSIGNED6  	VehicleBaseValue;
     //PerAgeRange
-    INTEGER1    estimatedAge;
+    UNSIGNED2    estimatedAge;
   END;
 
 END;

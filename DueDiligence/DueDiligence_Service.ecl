@@ -1,10 +1,10 @@
-﻿IMPORT AutoStandardI, Citizenship, DueDiligence, iesp, STD, WSInput;
+﻿IMPORT DueDiligence, iesp, STD, WSInput;
 
 EXPORT DueDiligence_Service := MACRO
 
       SHARED getComboValidRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbaPurpose, UNSIGNED1 dppaPurpose, STRING15 modelName, STRING ddAttrsRequested) := FUNCTION
           
-          validateCit := Citizenship.Common.ValidateInput(input, glbaPurpose, dppaPurpose, modelName);
+          validateCit := DueDiligence.Citizenship.Common.ValidateInput(input, glbaPurpose, dppaPurpose, modelName);
           validateDD := DueDiligence.CommonQuery.ValidateRequest(input, glbaPurpose, dppaPurpose, DueDiligence.Constants.ATTRIBUTES);
           
           citizenshipError := TRIM(validateCit[1].errorMessage);
@@ -37,11 +37,12 @@ EXPORT DueDiligence_Service := MACRO
       requestName := 'DueDiligenceAttributesRequest';
       requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesRequest;
 
-      requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
+      requestResponseLayout := DueDiligence.Constants.ATTRIBUTE_RESPONSE_LAYOUT;
 
       //The following macro defines the field sequence on WsECL page of query.
       WSInput.MAC_DueDiligence_Service(requestName);
 
+      //get the input used for Citizenship and Due Diligence from the request (DueDiligence.Layouts.Input)
       DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, FALSE, DueDiligence.Constants.ATTRIBUTES);
 
       //determine which product(s) are being requested
@@ -51,30 +52,40 @@ EXPORT DueDiligence_Service := MACRO
       IF(selectedProduct = DueDiligence.Constants.EMPTY OR selectedProduct NOT IN DueDiligence.CitDDShared.VALID_REQUESTED_PRODUCTS , FAIL(DueDiligence.CitDDShared.VALIDATION_INVALID_PRODUCT_REQUEST_TYPE));
 
 
-      reqProduct := MAP(selectedProduct = 'attributesandcitizenship' => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH,
-                        selectedProduct = 'citizenshiponly' => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY,
-                        DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY);
+      reqProduct := DueDiligence.CitDDShared.getProductEnum(selectedProduct);
                                 
                                 
       validatedRequest := CASE(reqProduct,
                                 DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH => getComboValidRequest(input, glba, dppa, modelName, requestedVersion),
-                                DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY => Citizenship.Common.ValidateInput(input, glba, dppa, modelName),
+                                DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY => DueDiligence.Citizenship.Common.ValidateInput(input, glba, dppa, modelName),
                                 DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.ATTRIBUTES));
                               
                               
       DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
 
       validRequest := validatedRequest(validRequest);
+      
+      //clean the input of the valid requests for requested products Citizenship and Due Diligence (DueDiligence.Layouts.CleanedData)
+      cleanData := DueDiligence.CitDDShared.GetCleanData(validRequest);
+      
+      //retrieve options - used primarily in business calls
+      DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
+      
+      //retrieve the data based on input to be used in searches (PII vs LexID vs Combo of PII and LexID)
+      dataToSearchBy := DueDiligence.fn_getProductInput(reqProduct, cleanData, busOptions, busLinkingOptions);
+      
+      
+      
 
 
-
+      //call the respective prodcuts - Citizenship and Due Diligences based on request
       citResults := IF(reqProduct IN DueDiligence.CitDDShared.CITIZENSHIP_PRODUCTS, 
-                            Citizenship.CitizenshipServiceMain(wseq, validRequest, glba, dppa, drm, dpm, modelName, intermediates, debugIndicator),
-                            DATASET([], requestResponseLayout));
+                       DueDiligence.Citizenship.CitizenshipServiceMain(wseq, dataToSearchBy, intermediates),
+                       DATASET([], requestResponseLayout));
                             
       ddResults := IF(reqProduct IN DueDiligence.CitDDShared.DUEDILIGENCE_PRODUCTS, 
-                            DueDiligence.DueDiligenceServiceMain(wseq, validRequest), 
-                            DATASET([], requestResponseLayout));
+                      DueDiligence.DueDiligenceServiceMain(dataToSearchBy, requestedVersion, DD_SSNMask, busOptions, busLinkingOptions, optionsIn.AdditionalInput, wseq, intermediates, debugIndicator), 
+                      DATASET([], requestResponseLayout));
 
 
 
@@ -106,7 +117,7 @@ EXPORT DueDiligence_Service := MACRO
       
       testSeedFunction := DueDiligence.TestSeeds.TestSeedFunction(input, testSeedTableName, optionsIn.AdditionalInput);
       final_testSeeds := CASE(reqProduct,
-                              DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY => IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
+                              DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY => IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
                                                                                                       testSeedFunction.GetPersonAttributeSeeds,
                                                                                                       testSeedFunction.GetBusinessAttributeSeeds));
 
@@ -116,18 +127,18 @@ EXPORT DueDiligence_Service := MACRO
 
 
 
-      final := MAP(executeTestSeeds AND reqProduct = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY => final_testSeeds,
+      final := MAP(executeTestSeeds AND reqProduct = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY => final_testSeeds,
                     final_actual);
 
 
 
+      IF(intermediates, OUTPUT(citResults, NAMED('citResults')));
+      IF(intermediates, OUTPUT(ddResults, NAMED('ddResults')));
 
-      IF(intermediates, output(citResults, NAMED('citResults')));
-      IF(intermediates, output(ddResults, NAMED('ddResults')));
+      
+      OUTPUT(final, NAMED('Results')); //This is the customer facing output   
+      
 
-
-
-      OUTPUT(final, NAMED('Results')); //This is the customer facing output    
       
 ENDMACRO;
 

@@ -194,6 +194,91 @@ EXPORT Layouts := MODULE
     BOOLEAN    accept_all;
   END;
 
+  EXPORT batch_final_rec := RECORD
+    STRING20  acctno := '';
+    //riginal fields:
+    STRING orig_first_name;
+    STRING orig_last_name;
+    STRING orig_address;
+    STRING orig_city;
+    STRING orig_state;
+    STRING orig_zip;
+    STRING orig_zip4;
+    STRING orig_email;
+    STRING orig_ip;
+    STRING orig_login_date;
+    STRING orig_site;
+    STRING company_title;
+    STRING orig_company_name;
+    // cleaned fields:
+    STRING cln_company_name;
+    STRING5  title;
+    STRING20 fname;
+    STRING20 mname;
+    STRING20 lname;
+    STRING5  name_suffix;
+    STRING10 prim_range;
+    STRING2  predir;
+    STRING28 prim_name;
+    STRING4  addr_suffix;
+    STRING2  postdir;
+    STRING10 unit_desig;
+    STRING8  sec_range;
+    STRING25 p_city_name;
+    STRING25 v_city_name;
+    STRING2  st;
+    STRING5  zip;
+    STRING4  zip4;
+    STRING200 clean_email;
+    //best fields:
+    QSTRING5  best_title := '';
+    QSTRING20 best_fname := '';
+    QSTRING20 best_mname := '';
+    QSTRING20 best_lname := '';
+    QSTRING5  best_name_suffix := '';
+    QSTRING10 best_prim_range := '';
+    STRING2   best_predir := '';
+    QSTRING28 best_prim_name := '';
+    QSTRING4  best_addr_suffix := '';
+    STRING2   best_postdir := '';
+    QSTRING10 best_unit_desig := '';
+    QSTRING8  best_sec_range := '';
+    QSTRING25 best_city_name := '';
+    STRING2   best_st := '';
+    QSTRING5  best_zip := '';
+    QSTRING4  best_zip4 := '';
+    QSTRING9  best_ssn := '';
+    INTEGER4  best_dob := 0;
+    // other fields:
+    STRING8   process_date;
+    STRING8   date_first_seen;
+    STRING8   date_last_seen;
+    STRING8   date_vendor_first_reported;
+    STRING8   date_vendor_last_reported;
+    UNSIGNED6 DID;
+    UNSIGNED6 DotID;
+    UNSIGNED6 EmpID;
+    UNSIGNED6 POWID;
+    UNSIGNED6 ProxID;
+    UNSIGNED6 SELEID;
+    UNSIGNED6 OrgID;
+    UNSIGNED6 UltID;
+    UNSIGNED2 num_email_per_did := 0;
+    UNSIGNED2 num_did_per_email := 0;
+    STRING    email_status := '';
+    STRING    email_status_reason := '';
+    STRING    additional_status_info := '';
+    STRING    relationship  := '';
+    STRING    src;
+    STRING    record_err_msg  := '';
+    UNSIGNED2 record_err_code := 0;
+  END;
+
+  EXPORT batch_combined_rec := RECORD
+    DATASET(batch_final_rec) Records;
+    DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
+  END;
+  
   EXPORT Gateway_Data := MODULE
     EXPORT batch_in_bv_rec := RECORD
       STRING   email := '';

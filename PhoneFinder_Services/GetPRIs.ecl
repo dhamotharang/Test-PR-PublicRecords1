@@ -121,6 +121,7 @@ FUNCTION
                                         SELF.listing_type_bus  := IF(STD.Str.Find(RIGHT.ListingType, 'BUSINESS') > 0, 'B', ''),
                                         SELF.listing_type_gov  := IF(STD.Str.Find(RIGHT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
                                         SELF.RealTimePhone_Ext := RIGHT,
+                                        SELF.isLNameMatch      := STD.Str.findword(TRIM(IF(RIGHT.ListingName != '', RIGHT.ListingName, LEFT.listed_name)),TRIM(LEFT.lname), TRUE),
                                         SELF := RIGHT, SELF := LEFT),
                               LEFT OUTER,
                               LIMIT(0), KEEP(1));
@@ -164,6 +165,7 @@ FUNCTION
                                             SELF.listing_type_bus  := IF(STD.Str.Find(LEFT.ListingType, 'BUSINESS') > 0, 'B', ''),
                                             SELF.listing_type_gov  := IF(STD.Str.Find(LEFT.ListingType, 'GOVERNMENT') > 0, 'G', ''),
                                             SELF.RealTimePhone_Ext := LEFT,
+                                            SELF.isLNameMatch      := STD.Str.findword(TRIM(LEFT.ListingName),TRIM(RIGHT.lname), TRUE),                                          
                                             SELF := LEFT, SELF := []),
                                     LIMIT(0), KEEP(1));
   

@@ -315,7 +315,7 @@ to be relatively harmless anyway). <br />
 IMPORT iesp, doxie, AutoStandardI, Royalty;
 
 EXPORT SmartLinxReportService () := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   #onwarning(4207, ignore);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonReports_SmartLinxReportService();
@@ -473,6 +473,7 @@ EXPORT SmartLinxReportService () := MACRO
 	Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);	
  	royalties := if (not ut.IndustryClass.is_knowx, royalties_fares) + royalties_email;
 
+  IF (exists(results), doxie.compliance.logSoldToTransaction(mod_access));
 	output (results, named ('Results'));
   output (royalties, named ('RoyaltySet'));
 

@@ -1,4 +1,4 @@
-﻿IMPORT Address, Business_Header, Business_Risk_BIP, Citizenship, DueDiligence, iesp, Risk_Indicators, STD, ut;
+﻿IMPORT Business_Risk_BIP, DueDiligence, iesp, Risk_Indicators, STD;
 
 
 EXPORT CommonQuery := MODULE
@@ -162,6 +162,8 @@ EXPORT CommonQuery := MODULE
                                             SELF.email := reportBy.person.citizenship.email;
                                             
                                             SELF.productRequested := search.ProductRequestType;
+                                          #ELSE
+                                            SELF.productRequested := DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_ONLY; //reports do not have the option of citizenship - so can only request Due Diligence
                                           #END
                                           
                                           SELF := [];));
@@ -207,110 +209,12 @@ EXPORT CommonQuery := MODULE
 			
 			
     EXPORT GetCleanData(DATASET(DueDiligence.Layouts.Input) input) := FUNCTION
-			
-        cleanData := PROJECT(input, TRANSFORM(DueDiligence.Layouts.CleanedData,
-                                              //Clean Address
-                                              addressToClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.address, LEFT.business.address);
-                                              addressClean := DueDiligence.CitDDShared.cleanAddress(addressToClean);
-
-                                              addrProvided := addressToClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressToClean.streetAddress2 <> DueDiligence.Constants.EMPTY OR addressToClean.prim_range <> DueDiligence.Constants.EMPTY OR addressToClean.predir <> DueDiligence.Constants.EMPTY OR 
-                                                              addressToClean.prim_name <> DueDiligence.Constants.EMPTY OR addressToClean.addr_suffix <> DueDiligence.Constants.EMPTY OR addressToClean.postdir <> DueDiligence.Constants.EMPTY OR addressToClean.unit_desig <> DueDiligence.Constants.EMPTY OR 
-                                                              addressToClean.sec_range <> DueDiligence.Constants.EMPTY OR addressToClean.city <> DueDiligence.Constants.EMPTY OR addressToClean.state <> DueDiligence.Constants.EMPTY OR addressToClean.zip5 <> DueDiligence.Constants.EMPTY;	
-                                                              
-                                              fullAddrProvided := (addressClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressClean.prim_name <> DueDiligence.Constants.EMPTY) AND addressClean.city <> DueDiligence.Constants.EMPTY AND addressClean.state <> DueDiligence.Constants.EMPTY AND addressClean.zip5 <> DueDiligence.Constants.EMPTY;
-
-                                              //Clean Company Name
-                                              busName := LEFT.business.companyName;
-                                              altBusName := LEFT.business.altCompanyName;
-
-
-                                              companyName := IF(busName = DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName), ut.CleanCompany(busName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
-                                              altCompanyName := IF(busName = DueDiligence.Constants.EMPTY, DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName)); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
-
-                                              //Clean Phone Number
-                                              phoneNumber := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.phone, LEFT.business.phone);
-                                              phoneToClean := DueDiligence.CitDDShared.stripNonNumericValues(phoneNumber);
-
-                                              //Remove any non-numeric fiends from taxID and lexID fields
-                                              taxID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.ssn, LEFT.business.fein);
-                                              taxIDToClean := DueDiligence.CitDDShared.stripNonNumericValues(taxID);
-                                              validTaxID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
-                                                                IF(Business_Header.IsValidSsn((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY), 
-                                                                IF(Business_Header.ValidFEIN((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY ));
-
-                                              lexID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.lexID, LEFT.business.lexID);
-                                              validLexID := DueDiligence.CitDDShared.stripNonNumericValues(lexID);
-
-                                              //Valid history date passed - if invalid should return 99999999 for current mode
-                                              validDate := DueDiligence.Common.checkInvalidDate((STRING)LEFT.historyDateYYYYMMDD, (STRING)DueDiligence.Constants.date8Nines);
-
-                                              //Populate appropriate cleaned data	
-                                              busClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS, 
-                                                                              DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
-                                                                                                  SELF.lexID := validLexID;
-                                                                                                  SELF.companyName := companyName;
-                                                                                                  SELF.altCompanyName := altCompanyName;
-                                                                                                  SELF.address := addressClean;
-                                                                                                  SELF.phone := IF(Business_Risk_BIP.Common.validPhone(phoneToClean), phoneToClean, DueDiligence.Constants.EMPTY);
-                                                                                                  SELF.fein := validTaxID;
-                                                                                                  SELF.BIP_IDs.SeleID.LinkID := (UNSIGNED6)validLexID;
-                                                                                                  SELF := LEFT.business;
-                                                                                                  SELF := [];)]),
-                                                                              DATASET([], DueDiligence.Layouts.Busn_Input));
-
-                                              indClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS,
-                                                                              DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
-                                                                                                  SELF.lexID := validLexID;
-                                                                                                  SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
-                                                                                                                                  unparsedName := STD.Str.ToUpperCase(LEFT.individual.name.fullName);
-                                                                                                                                  fName := STD.Str.ToUpperCase(LEFT.individual.name.firstName);
-                                                                                                                                  mName := STD.Str.ToUpperCase(LEFT.individual.name.middleName);
-                                                                                                                                  lName := STD.Str.ToUpperCase(LEFT.individual.name.lastName);
-                                                                                                                                  sName := STD.Str.ToUpperCase(LEFT.individual.name.suffix);
-                                                                                                                                  
-                                                                                                                                  
-                                                                                                                                  cleanedName := MAP(STD.Str.ToUpperCase(LEFT.individual.nameInputOrder) = 'FML' => Address.CleanPersonFML73(unparsedName),
-                                                                                                                                                     STD.Str.ToUpperCase(LEFT.individual.nameInputOrder) = 'LFM' => Address.CleanPersonLFM73(unparsedName),
-                                                                                                                                                     Address.CleanPerson73(unparsedName));	
-                                                            
-                                                                                                                                  cleanedFirst := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[6..25]), DueDiligence.Constants.EMPTY);
-                                                                                                                                  cleanedMiddle := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[26..45]), DueDiligence.Constants.EMPTY);
-                                                                                                                                  cleanedLast := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[46..65]), DueDiligence.Constants.EMPTY);
-                                                                                                                                  cleanedSuffix := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[66..70]), DueDiligence.Constants.EMPTY);
-                                                                                                                  
-                                                                                                                                  SELF.fullName := unparsedName;
-                                                                                                                                  SELF.firstName := IF(fName = DueDiligence.Constants.EMPTY, cleanedFirst, fName);
-                                                                                                                                  SELF.middleName := IF(mName = DueDiligence.Constants.EMPTY, cleanedMiddle, mName);
-                                                                                                                                  SELF.lastName := IF(lName = DueDiligence.Constants.EMPTY, cleanedLast, lName);
-                                                                                                                                  SELF.suffix := IF(sName = DueDiligence.Constants.EMPTY, cleanedSuffix, sName);																															
-                                                                                                                                  SELF := [];)])[1];
-                                                                                                  SELF.address := addressClean;
-                                                                                                  SELF.phone := phoneToClean;
-                                                                                                  SELF.ssn := validTaxID;
-                                                                                                  SELF := LEFT.individual;
-                                                                                                  SELF := [];)]),
-                                                                              DATASET([], DueDiligence.Layouts.Indv_Input));
-
-                                              inputClean := DATASET([TRANSFORM(DueDiligence.Layouts.Input,
-                                                                                SELF.business := busClean[1];
-                                                                                SELF.individual := indClean[1];
-                                                                                SELF.historyDateYYYYMMDD := (UNSIGNED)validDate;
-                                                                                SELF.addressProvided := addrProvided;
-                                                                                SELF.fullAddressProvided := fullAddrProvided;
-                                                                                SELF := LEFT;
-                                                                                SELF := [];)])[1];
-
-
-                                              SELF.cleanedInput := inputClean;
-                                              SELF.inputEcho := LEFT;
-                                              SELF := []));
-			
-				
-        RETURN cleanData;
+        RETURN DueDiligence.CitDDShared.GetCleanData(input);
     END;
 		
 		
     EXPORT mac_GetBusinessOptionSettings(dppaIn, glbaIn, drmIn, dpmIn, industryIn) := MACRO
+        IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
     
         industry := IF(TRIM(industryIn) = DueDiligence.Constants.EMPTY, Business_Risk_BIP.Constants.Default_IndustryClass, industryIn);
 
