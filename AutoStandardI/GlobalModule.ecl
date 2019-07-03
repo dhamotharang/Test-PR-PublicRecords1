@@ -348,7 +348,7 @@ export GlobalModule(boolean isFCRA = false) := module
 	export unsigned1 ResellerType := 0 : stored('ResellerType');
 	export unsigned1 IntendedUse := 0 : stored('IntendedUse');
 	export boolean LogRecordSource := TRUE : STORED ('LogRecordSource');
-	export boolean LexIdSourceOptout := TRUE : STORED ('LexIdSourceOptout');
+	export unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
 	export string TransactionID := '' : stored ('_TransactionId');
 	export string BatchUID := '' : stored('_BatchUID');
 	export unsigned6 GlobalCompanyId := 0 : stored('_GCID');
