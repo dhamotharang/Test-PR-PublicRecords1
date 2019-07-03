@@ -1,16 +1,13 @@
-﻿IMPORT Doxie, Gateway, Iesp, Phones, PhonesInfo, STD, UT, dx_PhonesInfo;
+﻿IMPORT Doxie, Phones, PhonesInfo, STD, UT, dx_PhonesInfo;
 
 EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
 	Phones.IParam.BatchParams in_mod) := FUNCTION
 
-	Layout_BatchOut := Phones.Layouts.PhoneAttributes.BatchOut;
 	Layout_BatchRaw	:= Phones.Layouts.PhoneAttributes.Raw;
 	today := STD.Date.Today();
 	earliestAllowedDate := (UNSIGNED)ut.date_math((STRING)today, -in_mod.max_age_days);
 
 	//Get phone data from Roxie
-
-phoneInfo := DEDUP(SORT(PROJECT(dBatchPhonesIn, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.phoneno)), phone), phone);
 
 dPortedMetadataPhones := JOIN(dBatchPhonesIn,PhonesInfo.Key_Phones.Ported_Metadata, 
 													LEFT.phoneno = RIGHT.phone,
@@ -23,12 +20,12 @@ dPortedMetadataPhones := JOIN(dBatchPhonesIn,PhonesInfo.Key_Phones.Ported_Metada
 
 dPhone_wCurrentCarrierInfo := dPortedMetadataPhones(is_ported OR source = Phones.Constants.Sources.Lerg6);
 
-dPhone_wOldCarrierInfo := JOIN(dPortedMetadataPhones, dPhone_wCurrentCarrierInfo,
+dPhone_wOldCarrierInfo := DEDUP(SORT(JOIN(dPortedMetadataPhones, dPhone_wCurrentCarrierInfo,
 														LEFT.phoneno = RIGHT.phone,
 														TRANSFORM(Layout_BatchRaw,
 														SELF.acctno := LEFT.acctno,
 														SELF := LEFT),
-														LEFT ONLY);		//Should look up Lerg6 index only if that data is not available in ported_metadata index														 
+														LEFT ONLY), acctno, phone), acctno, phone);		//Should look up Lerg6 index only if that data is not available in ported_metadata index														 
 
 Layout_BatchRaw transformLerg6(Layout_BatchRaw l, recordof(dx_PhonesInfo.Key_Phones_Lerg6) r) := TRANSFORM
 		is_block := (r.block_id = Phones.Constants.PhoneAttributes.DEFAULT_BLOCK_ID);
@@ -49,13 +46,11 @@ dLerg6Phones := JOIN(dPhone_wOldCarrierInfo, dx_PhonesInfo.Key_Phones_Lerg6, (LE
 																	   and RIGHT.is_current = TRUE),
 		                  transformLerg6(LEFT, RIGHT),LEFT OUTER, LIMIT(0),KEEP(Phones.Constants.PhoneAttributes.MaxRecsPerPhone));
 
-filteredLerg6Phones := DEDUP(SORT(dLerg6Phones,acctno,phone,-dt_last_reported), acctno,phone);
+filteredLerg6Phones := SORT(dLerg6Phones,acctno,phone,-dt_last_reported);
 
    
 
-dPortedPhones_with_LERG6 := dPortedMetadataPhones + filteredLerg6Phones;
-dPortedPhones_without_LERG6 := dPortedMetadataPhones;
-dPortedPhones := IF(EXISTS(dPhone_wCurrentCarrierInfo), dPortedPhones_without_LERG6, dPortedPhones_with_LERG6);
+dPortedPhones := dPortedMetadataPhones + filteredLerg6Phones;
 
 	//Add additional carrier info to Lerg6 records. They don't contain this information.
 	//However records retrieved from the metadata file should be left alone.

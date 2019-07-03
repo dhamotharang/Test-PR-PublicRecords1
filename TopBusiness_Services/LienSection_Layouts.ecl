@@ -1,4 +1,4 @@
-import BIPV2, iesp, LiensV2;
+﻿import BIPV2, iesp, LiensV2;
 
 export LienSection_Layouts := module;
 
@@ -21,6 +21,9 @@ export LienSection_Layouts := module;
 
   // A slimmed layout with lien main key (tmsid/rmsid)/report output lien main fields only
   export rec_ids_with_maindata_slimmed := record
+	     string30 acctno;
+		// string case_link_id;
+		// unsigned case_link_priority;
 		BIPV2.IDlayouts.l_header_ids;
 		// For BIP2, use this---^ OR this ---v ???
 	  // iesp.share.t_BusinessIdentity; //BIP2, version 2
@@ -37,13 +40,13 @@ export LienSection_Layouts := module;
 		Liensv2.layout_liens_main_module.layout_liens_main.orig_filing_type;	
 		Liensv2.layout_liens_main_module.layout_liens_main.orig_filing_date;	
 		Liensv2.layout_liens_main_module.layout_liens_main.filing_number;
-    Liensv2.layout_liens_main_module.layout_liens_main.filing_type_desc;
+		Liensv2.layout_liens_main_module.layout_liens_main.filing_type_desc;
 		Liensv2.layout_liens_main_module.layout_liens_main.filing_date;	
 		Liensv2.layout_liens_main_module.layout_liens_main.filing_status;
 		Liensv2.layout_liens_main_module.layout_liens_main.amount;
 		// new field
 		Liensv2.layout_liens_main_module.layout_liens_main.release_date;
-    Liensv2.layout_liens_main_module.layout_liens_main.eviction; 
+          Liensv2.layout_liens_main_module.layout_liens_main.eviction; 
 		Liensv2.layout_liens_main_module.layout_liens_main.agency;
 		Liensv2.layout_liens_main_module.layout_liens_main.agency_state;
 		Liensv2.layout_liens_main_module.layout_liens_main.agency_county; 
@@ -53,10 +56,26 @@ export LienSection_Layouts := module;
     // v--- derived/internal fields		???
 		rec_ids_with_linkidsdata_slimmed.role_party_type; //the "role"/name_type of the reported on company on the filing
 		unsigned2 tot_rec_count; // on this level and below???
+		// bus smart linx additions for SMLINX-3
+		Liensv2.layout_liens_main_module.layout_liens_main.irs_serial_number;
+		Liensv2.layout_liens_main_module.layout_liens_main.case_number;
+		Liensv2.layout_liens_main_module.layout_liens_main.filing_page;
+		Liensv2.layout_liens_main_module.layout_liens_main.filing_book;	
+		Liensv2.layout_liens_main_module.layout_liens_main.certificate_number;		
 	end;
+	
+export rec_ids_with_maindata_slimmedExtra := record
+                              rec_ids_with_maindata_slimmed;
+				         unsigned case_link_id;
+					    unsigned case_link_priority;
+		end;
 
   // A slimmed layout with lien party key (tmsid/rmsid)/report output lien party fields only
   export rec_ids_with_partydata_slimmed := record
+	     // bus smart linx additions additions
+           unsigned case_link_id;
+		unsigned case_link_priority;
+		//
 		BIPV2.IDlayouts.l_header_ids;
 		// For BIP2, use this---^ OR this ---v ???
 	  // iesp.share.t_BusinessIdentity; //BIP2, version 2
@@ -66,14 +85,14 @@ export LienSection_Layouts := module;
 		    // but some of those fields are way too long ???
 		LiensV2.layout_liens_party.tmsid; //needed for linking to the main key
 		LiensV2.layout_liens_party.rmsid; //needed for linking to the main key???
-    LiensV2.layout_liens_party.tax_id;  //fein when party is a company???
+		LiensV2.layout_liens_party.tax_id;  //fein when party is a company???
 		LiensV2.layout_liens_party.ssn;     // only when a party is a person
 		LiensV2.layout_liens_party.title;
 		LiensV2.layout_liens_party.fname;
 		LiensV2.layout_liens_party.mname;
 		LiensV2.layout_liens_party.lname;
 		LiensV2.layout_liens_party.name_suffix;
-    LiensV2.layout_liens_party.cname;      // company name
+		LiensV2.layout_liens_party.cname;      // company name
 		LiensV2.layout_liens_party.prim_range;
 		LiensV2.layout_liens_party.predir;
 		LiensV2.layout_liens_party.prim_name;
@@ -88,7 +107,7 @@ export LienSection_Layouts := module;
 		LiensV2.layout_liens_party.zip4;
 		LiensV2.layout_liens_party.name_type;  
 		// ^--- Existing field (note string2, not 1) on liens party file which contains: 
-		    // A(Attorney), AD(Attorney for Debtor), C(Creditor), D(Debtor), T(Third Party)
+		    // A(Attorney), AD(Attorney for Debtor), C(Creditor), D(Debtor), T(Third Party)				
   end;
 
   export rec_LiensDataChild_Party := record
@@ -98,7 +117,7 @@ export LienSection_Layouts := module;
   export rec_LiensDataChild_Filings := record
 		rec_ids_with_maindata_slimmed.filing_date;	
 		rec_ids_with_maindata_slimmed.filing_number;
-    rec_ids_with_maindata_slimmed.filing_type_desc;
+           rec_ids_with_maindata_slimmed.filing_type_desc;
 		rec_ids_with_maindata_slimmed.filing_status;
 		rec_ids_with_maindata_slimmed.agency;
 		rec_ids_with_maindata_slimmed.agency_state;
@@ -107,6 +126,10 @@ export LienSection_Layouts := module;
 	end;
 
   export rec_LiensDataParent := record
+	     //  bus smart linx  additions
+		unsigned case_link_id;
+		unsigned case_link_priority;
+		//
 		BIPV2.IDlayouts.l_header_ids;
 		// For BIP2, use this---^ OR this ---v ???
 	  // iesp.share.t_BusinessIdentity; //BIP2, version 2
@@ -125,18 +148,20 @@ export LienSection_Layouts := module;
     rec_ids_with_maindata_slimmed.eviction; 
 		boolean debtoroverflow; //???
 		boolean creditoroverflow; //???
-		// boolean thirdpartyoverflow; ???
+		
     dataset(rec_LiensDataChild_Party) debtors
 		  {maxcount(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS)}; 
     dataset(rec_LiensDataChild_Party) creditors
-		  {maxcount(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS)}; 
-    // dataset(rec_LiensDataChild_Party) thirdparties   ???
- 		 // {maxcount(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS)}; 
+		  {maxcount(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_PARTYS)};    
     dataset(rec_LiensDataChild_Filings) filings
 		  {maxcount(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_LIENS_FILINGS)}; 
   end;
 
 	export rec_ids_plus_JL_Detail := record
+		// bus smart linx addition
+		unsigned case_link_id;
+		unsigned case_link_priority;
+		//
 		BIPV2.IDlayouts.l_header_ids;
 		// For BIP2, use this---^ OR this ---v ???
 	  // iesp.share.t_BusinessIdentity; //BIP2, version 2
@@ -148,7 +173,7 @@ export LienSection_Layouts := module;
 	end;		
 
 	export rec_ids_plus_JL_Rec := record
-		TopBusiness_Services.Layouts.rec_input_ids.acctno;
+		TopBusiness_Services.Layouts.rec_input_ids.acctno;		
 	  BIPV2.IDlayouts.l_header_ids;
 		iesp.topbusinessReport.t_TopBusinessLienSection;
 	end;

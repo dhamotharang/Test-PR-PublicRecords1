@@ -997,6 +997,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 								self.Address.County                 := rt.JudgLien_Debt_County              ;
 								self.Address.PostalCode             := rt.JudgLien_Debt_PostalCode          ;
 								self.Address.StateCityZip           := rt.JudgLien_Debt_StateCityZip        ;
+							
 						));
 						self.Creditors :=
 							project(Risk_Indicators.iid_constants.ds_Record, transform(iesp.TopBusinessReport.t_TopBusinessJudgmentLienParty,
@@ -1025,6 +1026,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 								self.Address.County               := rt.JudgLien_Cred_County              ;
 								self.Address.PostalCode           := rt.JudgLien_Cred_PostalCode          ;
 								self.Address.StateCityZip         := rt.JudgLien_Cred_StateCityZip        ;
+								
 						));
 						self.Filings :=
 							project(Risk_Indicators.iid_constants.ds_Record, transform(iesp.TopBusinessReport.t_TopBusinessJudgmentLienFilings,
@@ -1089,6 +1091,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 								self.Name.Prefix                 := rt.JudgLien_Docs_Prefix              ;
 								self.Name.CompanyName            := rt.JudgLien_Docs_CompanyName         ;
 						));
+				 self := [];
 				));
 				self.SourceDocs :=
 					project(Risk_Indicators.iid_constants.ds_Record, transform(iesp.topbusiness_share.t_TopBusinessSourceDocInfo,

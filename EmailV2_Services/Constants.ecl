@@ -31,6 +31,8 @@ EXPORT Constants := MODULE
   EXPORT STRING EMAIL_SOURCES := 'EMAIL_SOURCES';
   EXPORT STRING STR_TRUE := 'true';
   EXPORT STRING STR_FALSE := 'false';
+  EXPORT STRING Basic := 'basic';
+  EXPORT STRING Premium := 'premium';
   
   STRING StatusInvalid := 'invalid';
   EXPORT BOOLEAN isUndeliverableEmail(STRING _status) := STD.Str.ToLowerCase(_status) = StatusInvalid;

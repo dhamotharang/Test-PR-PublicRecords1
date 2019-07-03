@@ -26,14 +26,14 @@ export ADL_Based_Modeling_Function(DATASET (risk_indicators.layout_input) indata
 																		boolean nugen = false,
 																		string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
-                                    string100 IntendedPurpose=''
+																		string100 IntendedPurpose='',
+																		unsigned8 BSOptions = 0
 																		) := function										
 										
 
 // ====================================================================
 // step 1.  call the adl based IID
 // ====================================================================
-unsigned8 BSOptions:=0;
 iid_results_with_flags := risk_indicators.ADL_Based_Modeling_IID_function(indata,
 																		gateways, 
 																		dppa_purpose, 
@@ -82,6 +82,7 @@ bs_ret := risk_indicators.Boca_Shell_Function(iid_results,
 																						doScore, 
 																						nugen,
 																						datarestriction:=datarestriction,
+																						BSOptions:=BSOptions,
 																						datapermission:=datapermission);
 
 // ====================================================================

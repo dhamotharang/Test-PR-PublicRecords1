@@ -60,6 +60,9 @@ EXPORT Layouts := MODULE
 		string50 college_major_exploded := '';
 		string1 public_private_code := '';
 		STRING2 src :='';
+   American_student_list.layout_american_student_base_v2.global_sid;
+   American_student_list.layout_american_student_base_v2.record_sid;
+
 	END;
 	
 	EXPORT college_data := record

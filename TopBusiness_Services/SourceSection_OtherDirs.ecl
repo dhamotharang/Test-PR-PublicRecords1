@@ -1,8 +1,8 @@
-﻿/* Status as of 10/20/2015, coding is DONE to count source docs for these sources: 
+﻿/* Status as of 6/18/2019, coding is DONE to count source docs for these sources: 
       12. Other Directories - ABIUS(aka UsaBiz from InfoUSA), ACF(American Corporate Finance), 
                               AMIDIR, AMS, BBB(mbr&nonmbr),
                               BusRegs, CNLD_Facilites, Cortera, Credit Unions, DEADCO(from InfoUSA), 
-                              Diversity Cert, DnB_Fein, FBN, LaborActions_WHD,    
+                              Diversity Cert, DnB_Fein, dx_Equifax_business_data, FBN, dx_Infutor_narb, LaborActions_WHD,    
                               Martindale-Hubell, NCPDP, Redbooks, SDA, SDAA, Sheila Greco, 
                               SKA, Spoke & Utilities
 
@@ -37,7 +37,7 @@ EXPORT SourceSection_OtherDirs := MODULE
    ):= function 
  
   FETCH_LEVEL := rs_options.fetch_level;
-
+  
   // ***** Get ABIUS (aka InfoUSA USABiz) counts
   TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
 	   tf_abius_count(Layouts.rec_input_ids_wSrc l) :=transform
@@ -319,6 +319,38 @@ EXPORT SourceSection_OtherDirs := MODULE
 		 end;
 
   ds_dnbfein_counts := project(ds_dnbfein_keyrecs_dd_tabled,tf_dnbfein_count(left));
+	
+	 // ****  Get Equifax business Data counts.
+	ds_equifax_bus_data_keyrecs := TopBusiness_Services.Key_Fetches(ds_in_ids_woacctno, // input ids to join key with
+										                                     FETCH_LEVEL,// level of ids to join with										          
+																	TopBusiness_Services.Constants.SlimKeepLimit
+										                                    ). ds_equifax_bus_data_linkidskey_recs ;
+
+  ds_equifax_bus_data_keyrecs_slim := dedup(sort(ds_equifax_bus_data_keyrecs,
+		     			                        #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+																	    efx_id),
+	     			                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+															   efx_id);
+
+  // table to count # of recs (efx_id) per group (set of linkids)
+	ds_equifax_bus_data_keyrecs_tabled := table(ds_equifax_bus_data_keyrecs_slim,
+	                                   // v--- Create table layout on the fly
+                                     {#expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+											                recs_count := count(group)
+																		 },
+																     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
+
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+	   tf_equifax_bus_data_count(recordof(ds_equifax_bus_data_keyrecs_tabled) l) :=transform
+        self.category_desc     := TopBusiness_Services.Constants.OtherDirCategoryName,
+	      self.category_doccount := l.recs_count;
+				self.Section           := ''; //section name not needed
+				self.Source            := MDR.sourceTools.src_Equifax_Business_Data; // but need source code
+				self                   := l;  // to assign top3 linkids
+			  self                   := []; // to null unused linkids
+		 end;
+
+  ds_equifax_bus_data_counts := project(ds_equifax_bus_data_keyrecs_tabled,tf_equifax_bus_data_count(left));
 
 	// ***** Get FBN (Fictitious Business Names aka Doing Business As) counts
   // *** Key fetch to get linkids key data.
@@ -353,6 +385,38 @@ EXPORT SourceSection_OtherDirs := MODULE
 		 end;
 
   ds_fbn_counts := project(ds_fbn_keyrecs_dd_tabled,tf_fbn_count(left));
+	
+	 // ***** Get Infutor NARB counts
+	ds_Infutor_NARB_keyrecs := TopBusiness_Services.Key_Fetches(ds_in_ids_woacctno, // input ids to join key with
+										                                     FETCH_LEVEL,// level of ids to join with										          
+																	TopBusiness_Services.Constants.SlimKeepLimit
+										                                    ). ds_infutor_narb_linkidskey_recs;
+
+  ds_Infutor_NARB_keyrecs_slim := dedup(sort(ds_Infutor_NARB_keyrecs,
+		     			                        #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+																	    pid+record_id),
+	     			                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+															    pid+record_id);
+
+  // table to count # of recs (pid+record_id) per group (set of linkids)
+	ds_infutor_NARB_keyrecs_tabled := table(ds_infutor_NARB_keyrecs_slim,
+	                                   // v--- Create table layout on the fly
+                                     {#expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+											                recs_count := count(group)
+																		 },
+																     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
+
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+	   tf_Infutor_NARB_count(recordof(ds_infutor_NARB_keyrecs_tabled) l) :=transform
+        self.category_desc     := TopBusiness_Services.Constants.OtherDirCategoryName,
+	      self.category_doccount := l.recs_count;
+				self.Section           := ''; //section name not needed
+				self.Source            := MDR.sourceTools.src_Infutor_NARB; // but need source code
+				self                   := l;  // to assign top3 linkids
+			  self                   := []; // to null unused linkids
+		 end;
+
+  ds_infutor_NARB_counts := project(ds_infutor_NARB_keyrecs_tabled,tf_infutor_NARB_count(left));
 
 	// ***** Get LaborActions WHD counts
   TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
@@ -563,7 +627,9 @@ EXPORT SourceSection_OtherDirs := MODULE
 										 //ds_debtset_counts + // debtset = debt settlement      
   								   ds_dnbfein_counts + 
 										 ds_divcert_counts + // divcert = diversity certification
+										  ds_equifax_bus_data_counts + 
 									   ds_fbn_counts     + 
+										 ds_infutor_NARB_counts + 
                      ds_lawhd_counts   + // lawhd = LaborActions WHD
 										 ds_mdhbl_counts   + // mdhbl = martindale-hubbell
 									   // ds_ncpdp_counts   + 
@@ -742,7 +808,8 @@ source_sec := TopBusiness_Services.SourceSection.fn_FullView(
                       // {'testRB233_3', 0, 0, 0, 0, 78706613, 233, 233} // 1 record
                       // {'testRB3859', 0, 0, 0, 0, 3859, 3859, 3859} // 1 record
                       // {'testRB3376', 0, 0, 0, 0, 3376, 3376, 3376} // 1 record
-                      
+                      // {'testZ1_539544',0,0,0,0,233,233,5395444) // recs for equifax bus data
+                     //  {'testZ2_539544',0,0,0,0,233,233,5395444) // recs for infutorNarb data
                   ],topbusiness_services.Layouts.rec_input_ids)
 						,ds_options[1]
 					  ,tempmod

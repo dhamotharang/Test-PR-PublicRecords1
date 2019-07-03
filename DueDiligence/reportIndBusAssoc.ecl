@@ -33,7 +33,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     layoutForBusInfo := PROJECT(uniqueBusinessID, TRANSFORM(DueDiligence.Layouts.CleanedData, SELF := LEFT));																													
 
     //retrieve the best info for a business
-    busInfo := DueDiligence.getBusInfo(layoutForBusInfo, options, linkingOptions);			
+    busInfo := DueDiligence.getBusInformation(options, linkingOptions).GetBusinessBestDataWithPII(layoutForBusInfo);
 
     populateBusiness := JOIN(busInfo, uniqueBusinessID,
                               LEFT.seq = RIGHT.inputEcho.seq,
@@ -139,7 +139,7 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                   SELF.clean.cleanedInput.business.BIP_IDs.SeleID.LinkID := DueDiligence.Constants.NUMERIC_ZERO;
                                   
                                   
-                                  SELF.clean.cleanedInput.fullAddressProvided := TRUE;
+                                  SELF.clean.cleanedInput.fullCleanAddressExists := TRUE;
                                   SELF.clean.cleanedInput.individual.name := IF(agentsAreBusiness = FALSE, RIGHT);
                                   SELF.clean.cleanedInput.individual.address := IF(agentsAreBusiness = FALSE, RIGHT);
                                   
@@ -167,9 +167,8 @@ EXPORT reportIndBusAssoc(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     busAgents := uniqueAgentID(agentIsBus);
     indAgents := uniqueAgentID(agentIsBus = FALSE);
 
-    busLexIDs := DueDiligence.getBusInfo(busAgents.clean, options, linkingOptions);
-    indLexIDs := DueDiligence.getIndDID(indAgents.clean, options.DataRestrictionMask, options.DPPA_Purpose, options.GLBA_Purpose,
-                                        DueDiligence.CitDDShared.DEFAULT_BS_VERSION, DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS);
+    busLexIDs := DueDiligence.getBusInformation(options, linkingOptions).GetBusinessBestDataWithPII(busAgents.clean);
+    indLexIDs := DueDiligence.getIndInformation(options).GetIndividualBestDataWithPII(indAgents.clean);
                                         
                                         
                                         

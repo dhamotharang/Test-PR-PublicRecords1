@@ -1,6 +1,7 @@
-import DayBatchPCNSR,Address,DayBatchUtils,ut;
+﻿import $,Address,DayBatchUtils,Doxie,Suppress,ut;
 
-export PhoneSearch_13Z_Fuzzy(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrInput) := FUNCTION
+export PhoneSearch_13Z_Fuzzy(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) pcnsrInput,
+                              Doxie.IDataAccess mod_access) := FUNCTION
 	
 	PCNSRData := DayBatchPCNSR.Key_PCNSR_Z317LF;
 
@@ -18,6 +19,10 @@ export PhoneSearch_13Z_Fuzzy(GROUPED DATASET(DayBatchPCNSR.Layout_PCNSR_Linked) 
 									ut.StringSimilar(LEFT.indata.prim_name,RIGHT.prim_name) <= 3,
 									formatOutput(LEFT,RIGHT,'13Z'), LEFT OUTER );
 	
-	RETURN match13Z;
+	match13Z_flagged := Suppress.MAC_FlagSuppressedSource(match13Z, mod_access, outdata.did, outdata.global_sid);  
+  
+  match13Z_suppressed := PROJECT(match137Z_flagged, TRANSFORM($.Layout_PCNSR_Linked, SELF.outdata := IF(~LEFT.is_suppressed, lEFT.outdata), SELF := LEFT));
+  
+	RETURN match13Z_suppressed;
 
 END;

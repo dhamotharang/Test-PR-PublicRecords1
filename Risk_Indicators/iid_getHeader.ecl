@@ -33,6 +33,7 @@ dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
 EnableEmergingID := (BSOptions & risk_indicators.iid_constants.BSOptions.EnableEmergingID) > 0;
 FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
+FilterVoter := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterVoter) > 0;
 
 // only use this variable in realtime mode to simulate the header build date rather than todays date
 dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
@@ -168,6 +169,7 @@ j_pre_roxie := join (g_inrec, header_key,
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
 														(right.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(right.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
+                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and 
 													 right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 													 RIGHT.dt_first_seen < left.historydate and // check dates
                            right.dt_vendor_first_reported < left.historydate and // check dates
@@ -199,6 +201,7 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
 														(right.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(right.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
+                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
 													 right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
 													 RIGHT.dt_first_seen < left.historydate and // check dates
                            right.dt_vendor_first_reported < left.historydate and // check dates
@@ -249,6 +252,7 @@ j_quickpre_roxie := join (g_inrec, header_quick_key,
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
+                           ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
 													 RIGHT.dt_first_seen < left.historydate and // check dates
                            right.dt_vendor_first_reported < left.historydate and // check dates
 													 (
@@ -280,6 +284,7 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
 														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
 													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
+                           ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
 													 RIGHT.dt_first_seen < left.historydate and // check dates
                            right.dt_vendor_first_reported < left.historydate and // check dates
 													 (
