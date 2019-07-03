@@ -130,7 +130,7 @@ self.ActiveFlag := if(R.phoneno != '','Y','');
 self.InitScore		:= if(L.InitScoreType = '',5,L.InitScore);
 self.InitScoreType	:= if(L.InitScoreType = '','QSENT OTHER',L.InitScoreType);
 self.ConfidenceScore:= L.InitScore + L.TDSMatch;
-self.global_sid := 0;
+self.global_sid := 22671;
 self.record_sid := 0;
 self := L;
 end;					
