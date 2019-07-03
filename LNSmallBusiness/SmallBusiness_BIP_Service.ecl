@@ -209,8 +209,7 @@ SmallBusinessAnalyticsRequest XML:
 &lt;/Watchlists_Requested&gt;
 &lt;/lnsmallbusiness.smallbusiness_bip_serviceRequest&gt;
 </pre>
-*/
-//#option ('optimizelevel', 0); // do not release this option to prod !!!! it is usefull during deployment 
+*/ 
 #option('expandSelectCreateRow', true);
 #option('embeddedWarningsAsErrors', 0);
 IMPORT Address, Business_Risk_BIP, Cortera, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Reporting, 
@@ -586,8 +585,8 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	
 	#if(Models.LIB_BusinessRisk_Models().TurnOnValidation) // If TRUE, output the model results directly
 		
-	RETURN OUTPUT(SBA_Results_Temp, NAMED('Results'));
-	// RETURN OUTPUT(SBA_Results_Temp_with_PhoneSources, NAMED('Results')); //used for model validation 
+	  RETURN OUTPUT(SBA_Results_Temp, NAMED('Results'));
+	//RETURN OUTPUT(SBA_Results_Temp_with_PhoneSources, NAMED('Results')); //used for model validation 
 		
 	 #else	
 	 SBA_Results := IF(TestDataEnabled = FALSE, SBA_Results_Temp,
