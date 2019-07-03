@@ -1,4 +1,4 @@
-import doxie, VersionControl;
+import doxie, VersionControl, BIPV2;
 
 export Keys(
 
@@ -8,7 +8,7 @@ export Keys(
 ) :=
 module
 
-	shared Base					:= project(Files(pversion).Base.Built, transform(layouts.keybuild, self := left));
+	shared Base					:= project(Files(pversion).Base.Built, transform(layouts.keybuild -BIPV2.IDlayouts.l_xlink_ids, self := left));
 
 	shared FilterBdids	:= Base(bdid	!= 0);
 	shared FilterDids		:= Base(did		!= 0);
