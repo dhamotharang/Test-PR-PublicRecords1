@@ -137,7 +137,7 @@ dwr := record
 	standard.Name person_name;
 	dParty.Orig_Name_Type;
 	dParty.history;
-	//Added for CCPA-103
+	//Added for CCPA-103 
 	d2.global_sid;
 	d2.record_sid;
 	unsigned4 Reg_Latest_Effective_Date;

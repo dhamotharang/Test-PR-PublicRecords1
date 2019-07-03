@@ -11,6 +11,7 @@ layout_std_lienholder_lkp := RECORD
 END;
 
 file_std_lienholder_lkp := DATASET('~thor_data400::lookup::vehiclesv2::std_lienholder', layout_std_lienholder_lkp, CSV(SEPARATOR('|')));
+// file_std_lienholder_lkp := DATASET(data_services.foreign_prod + 'thor_data400::lookup::vehiclesv2::std_lienholder', layout_std_lienholder_lkp, CSV(SEPARATOR('|')));
 
 layout_Key_Vehicle_Party_Key
 	:=
@@ -25,9 +26,9 @@ layout_Key_Vehicle_Party_Key	tAddStdLienholder(get_recs pLeft, layout_std_lienho
 	:=
 		TRANSFORM
 			self.std_lienholder_name	:=	pLkp.std_lienholder_name;
-			//Added for CCPA-103
-			self.global_sid           :=  0;
-			self.record_sid           :=  0;
+			//Added for CCPA-103 layout changes
+			self.global_sid           :=  pLeft.global_sid;
+			self.record_sid           :=  pLeft.record_sid;
 			self											:=	pLeft;
 		END
 	;

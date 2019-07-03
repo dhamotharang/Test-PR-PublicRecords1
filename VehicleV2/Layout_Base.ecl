@@ -256,6 +256,7 @@ export	Party_Bip	:=record
 		unsigned8				source_rec_id := 0;	 	//Added for BIP project
    end;
 	 
+//New layout added for CCPA-103	 
 export	Party_CCPA	:=record
 		Party_Bip;
 		//Added for CCPA-103

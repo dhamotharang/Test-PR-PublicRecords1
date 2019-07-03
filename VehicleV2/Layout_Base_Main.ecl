@@ -104,7 +104,7 @@
   string50 AIRBAG_FRONT_PASS	;
   string50 AIRBAG_FRONT_PASS_SIDE	;
   string50 AIRBAGS	;
-	//Added for CCPA-103
+	//Added for CCPA-103 
 	unsigned4 global_sid;
 	unsigned8 record_sid;
   end
