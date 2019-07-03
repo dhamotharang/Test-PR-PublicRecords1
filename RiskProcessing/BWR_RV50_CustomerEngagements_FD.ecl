@@ -137,4 +137,5 @@ OUTPUT(Count(GetFDdata), NAMED('RecCountAfterFDdataAppend'));
 
 OUTPUT(Count(GetFDdata(Dl_number <> '')), NAMED('CountRecsWithDLAfterFDappend'));
 
-// output(GetFDdata,, FDOutFileName + thorlib.wuid(),CSV(QUOTE('"'),heading(single))); 
+//Output file with results to send to First Data
+output(GetFDdata,, FDOutFileName + thorlib.wuid(),CSV(QUOTE('"'),heading(single))); 
