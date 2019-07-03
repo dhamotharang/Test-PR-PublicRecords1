@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2;
 
 EXPORT Key_LinkIds := MODULE
 
@@ -19,7 +19,8 @@ EXPORT Key_LinkIds := MODULE
 		unsigned2 ScoreThreshold = 0								//Applied at lowest leve of ID
 		) := FUNCTION
 
-		BIPV2.IDmacros.mac_IndexFetch(inputs, Key, out, Level)
+		BIPV2.IDmacros.mac_IndexFetch(inputs, Key, fetched, Level)
+		Experian_CRDB.mac_check_access(fetched, out, mod_access);
 		return out;																					
 
 	END;
