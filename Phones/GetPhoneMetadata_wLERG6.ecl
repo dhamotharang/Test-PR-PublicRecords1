@@ -1,4 +1,4 @@
-﻿IMPORT Doxie, Phones, PhonesInfo, STD, UT, dx_PhonesInfo;
+IMPORT Doxie, Phones, PhonesInfo, STD, UT, dx_PhonesInfo;
 
 EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
 	Phones.IParam.BatchParams in_mod) := FUNCTION
@@ -168,10 +168,58 @@ Layout_BatchRaw  ProcessRecs(Layout_BatchRaw L) := TRANSFORM
 		//These values are assigned below when all the most recent data is combined so they match what is being displayed.
 		SELF.phone_line_type_desc := '';
 		SELF.phone_serv_type_desc := '';
+
 		SELF := L;
 	END;
 	dPhones_w_Metadata := PROJECT(dPortedPhonesSorted, ProcessRecs(LEFT));
+
 	
+	Layout_BatchRaw ProcessStatus(Layout_BatchRaw L, DATASET(Layout_BatchRaw) allrows) :=  TRANSFORM
+		 today :=  STD.Date.Today();
+		 max_deact_start_dt := MAX(allrows, deact_start_dt);
+		 max_port_start_dt	:= MAX(allrows, porting_dt);
+		 max_react_start_dt	:= MAX(allrows, react_start_dt);
+		 max_swap_start_dt := MAX(allrows, swap_start_dt);
+		 daysbetween_deact_port := STD.Date.DaysBetween(max_deact_start_dt, max_port_start_dt);
+		 daysbetween_deact_react  := STD.Date.DaysBetween(max_deact_start_dt, max_react_start_dt);
+		 daysbetween_deact_today  := STD.Date.DaysBetween(max_deact_start_dt , today);
+		 daysbetween_swap_today := STD.Date.DaysBetween(max_swap_start_dt, today);
+         
+		 Is_recent_swap := (max_swap_start_dt <= max_port_start_dt OR max_swap_start_dt <= max_react_start_dt);
+		 Isport_react_event := (max_port_start_dt != 0 OR max_react_start_dt !=0);
+         IsDeactInactiveStatus := (Isport_react_event 
+                            AND daysbetween_deact_port > Phones.Constants.PhoneStatus.LastActivityThreshold);
+         IsSwapInactiveStatus := (Isport_react_event
+                            AND daysbetween_deact_port < Phones.Constants.PhoneStatus.LastActivityThreshold
+                            AND ~Is_recent_swap);
+                 
+		SELF.phone_status := MAP(IsDeactInactiveStatus AND daysbetween_deact_today < Phones.Constants.PhoneStatus.ActLowerTh => Phones.Constants.PhoneStatus.Inactive,
+                                IsDeactInactiveStatus  AND daysbetween_deact_today < Phones.Constants.PhoneStatus.ActUpperTh => Phones.Constants.PhoneStatus.NotAvailable,
+                                IsDeactInactiveStatus AND daysbetween_deact_today >= Phones.Constants.PhoneStatus.ActUpperTh => Phones.Constants.PhoneStatus.PresumedActive,
+                                IsSwapInactiveStatus AND daysbetween_swap_today < Phones.Constants.PhoneStatus.ActLowerTh => Phones.Constants.PhoneStatus.Inactive,
+                                IsSwapInactiveStatus AND daysbetween_swap_today < Phones.Constants.PhoneStatus.ActUpperTh => Phones.Constants.PhoneStatus.NotAvailable,
+                                IsSwapInactiveStatus AND daysbetween_swap_today >= Phones.Constants.PhoneStatus.ActUpperTh => Phones.Constants.PhoneStatus.PresumedActive,
+                                Isport_react_event AND Is_recent_swap => Phones.Constants.PhoneStatus.Active,
+                                
+                                ~Isport_react_event AND (max_deact_start_dt != 0) AND daysbetween_deact_today < Phones.Constants.PhoneStatus.ActLowerTh =>  Phones.Constants.PhoneStatus.Inactive,
+                                ~Isport_react_event AND daysbetween_deact_today < Phones.Constants.PhoneStatus.ActUpperTh => Phones.Constants.PhoneStatus.NotAvailable,
+                                daysbetween_deact_today >= Phones.Constants.PhoneStatus.ActUpperTh => Phones.Constants.PhoneStatus.PresumedActive,
+                                (L.line = Phones.Constants.PhoneServiceType.line_landline) => Phones.Constants.PhoneStatus.NotAvailable,
+                                (L.line != Phones.Constants.PhoneServiceType.line_landline) => Phones.Constants.PhoneStatus.PresumedActive,
+                                Phones.Constants.PhoneStatus.NotAvailable);
+	
+		SELF := L;
+		
+	END;
+
+	dPhoneStaus_grp := GROUP(SORT(dPhones_w_Metadata, phone), phone);
+
+	dphone_status_roll :=  ROLLUP(dPhoneStaus_grp, GROUP, ProcessStatus(LEFT, ROWS(LEFT)));		
+    dPhonesMetadata_w_status := JOIN(dPhones_w_Metadata, dphone_status_roll,
+                                        LEFT.phone = RIGHT.phone,
+                                        TRANSFORM(Layout_BatchRaw, SELF.phone_status := RIGHT.phone_status, SELF := LEFT),
+                                        LEFT OUTER, LIMIT(0), KEEP(1));
+
  	#IF(Phones.Constants.Debug.PhoneMetadata_wLIDB)
         OUTPUT(dBatchPhonesIn,NAMED('dBatchPhonesIn'), EXTEND);
         OUTPUT(dPortedMetadataPhones,NAMED('dPortedMetadataPhones'), EXTEND);
@@ -193,5 +241,5 @@ Layout_BatchRaw  ProcessRecs(Layout_BatchRaw L) := TRANSFORM
 								OUTPUT(filteredLerg6Phones,NAMED('filteredLerg6Phones'), EXTEND);
 	#END
 
-RETURN dPhones_w_Metadata;
+RETURN dPhonesMetadata_w_status;
 END;
