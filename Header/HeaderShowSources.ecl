@@ -320,7 +320,13 @@ qhdr_rid := join(left_over,key_qhdr_rid,
 
 hdr_rid_all := hdr_rid + qhdr_rid;
 
-doxie_raw.layout_header_raw getHeadAll(doxie.Key_Header L) := transform
+Layout_header_raw_CCPA:= RECORD
+      doxie_raw.layout_header_raw;
+      unsigned4 global_sid;
+      unsigned8 record_sid; 
+END;
+
+Layout_header_raw_CCPA getHeadAll(doxie.Key_Header L) := transform
  self.did := l.s_did ;  // 138824 : make sure to get the DID
  self := l;
 end;
