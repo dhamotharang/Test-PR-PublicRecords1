@@ -99,16 +99,23 @@ dear  := if(~IsFCRA,JOIN (dids_owners, doxie.key_death_masterV2_ssa_DID,
                GetDeadRecords (Left, Right),
                left outer, limit (ut.limits.HEADER_PER_DID), keep (ut.limits.DEATH_PER_DID)));
 
+
 							 
 // dear := doxie.deathfile_records (in_params.include_BlankDOD or (unsigned)dod8 != 0);
+Death_source_sort := SORT(dear, did, dod8);
 
-
+Death_source_grp:= Sort(group(Death_source_sort,did,dod8), did, dod8, if(IsLimitedAccessDMF, 1,0));
+Death_source_info := UNGROUP(iterate(Death_source_grp, TRANSFORM(doxie_crs.layout_deathfile_records, 
+									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod8 != 0 AND RIGHT.IsLimitedAccessDMF),
+	                                LEFT.IsLimitedAccessDMF ) ,
+									SELF :=right))); 
 //============================  
 
 // for the purpose of deceased indicator we need only one record per person, preferrably with a county
 
-shared src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);	  
- 
+shared src_deceased := dedup (sort (Death_source_info, did, -dod8, trim (county_name) = ''), did, dod8);	  
+
+
 besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dids, transform (doxie.layout_best , 
                                                                             Self.did := Left.did, Self := [])));
 
