@@ -1,4 +1,4 @@
-import Ut, address, lib_stringlib, _Control, idl_header,STD;
+﻿import Ut, address, lib_stringlib, _Control, idl_header,STD;
 
 export Standardize_InputXML := module
 
@@ -67,7 +67,7 @@ export Standardize_InputXML := module
 			self.clean_ref_last_date                := if(length(trim(l.reference_lastdate,left,right)) >= 10, StringLib.StringFilter(l.reference_lastdate[1..10],'0123456789'), '');
 			self.clean_ref_valid_date               := if(length(trim(l.reference_validdate,left,right)) >= 10, StringLib.StringFilter(l.reference_validdate[1..10],'0123456789'), '');
 			self.clean_valid_date                   := vdate;
-
+			self.global_sid													:= 23231;
 			self.rawfields													:= l					              ;
 		end;
 		

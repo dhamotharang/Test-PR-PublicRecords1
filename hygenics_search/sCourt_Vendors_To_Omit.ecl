@@ -94,6 +94,7 @@
 '9U', // OHIO_UNION_COUNTY_COMMON_PLEAS_COURT                                                                
 '9V', // OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT                                                              
 '9W', // TEXAS_KAUFMAN_COUNTY                                                                                
+'9Z', // FLORIDA_MANATEE_COUNTY                                                                              
 'BA', // ALABAMA_BALDWIN_COUNTY_ARRESTS                                                                      
 'BB', // ALABAMA_CALHOUN_COUNTY_ARRESTS                                                                      
 'BC', // ALABAMA_HOUSTON_COUNTY_ARRESTS                                                                      
@@ -129,7 +130,6 @@
 'CX', // FLORIDA_BROWARD_COUNTY_ARRESTS                                                                      
 'CY', // FLORIDA_CHARLOTTE_COUNTY_ARRESTS                                                                    
 'CZ', // FLORIDA_CITRUS_COUNTY_ARRESTS                                                                       
-'DA', // ALABAMA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DB', // ARKANSAS_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DD', // ARIZONA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DJ', // GEORGIA_DEPARTMENT_OF_CORRECTIONS                                                                   
@@ -207,7 +207,7 @@
 'HX', // MASSACHUSETTS_WRENTHAM_POLICE_ARRESTS                                                               
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
-'I0031', // SC JASPER SUMMARY COURT_IE                                                                          
+'I0024', // OH PORTAGE RAVENNA MUNICIPAL COURT_IE                                                               
 'I0032', // TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE                                                      
 'I0048', // TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE                                                            
 'I0049', // TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE                                                         
@@ -418,6 +418,7 @@
 'WZ', // OHIO_JEFFERSON_COUNTY_WINTERSVILLE                                                                  
 'XX', // OHIO_KNOX_COUNTY_COMMON_PLEAS_COURT                                                                 
 'XY', // OHIO_KNOX_COUNTY_MOUNT_VERNON_MUNICIPAL_COURT                                                       
+'YB', // OHIO_LORAIN_COUNTY_ELYRIA_MUNICIPAL_COURT                                                           
 'YD', // OHIO_LORAIN_COUNTY_OBERLIN_MUNICIPAL_COURT                                                          
 'YE', // OHIO_LUCAS_COUNTY_MAUMEE_MUNICIPAL_COURT                                                            
 'YG', // SOUTH_CAROLINA_NEWBERRY_COUNTY_CIRCUIT_COURTS                                                       
@@ -466,7 +467,6 @@
 'W0010', // CALIFORNIA_KERN_COUNTY_CW                                                                           
 'W0011', // CALIFORNIA_LAKE_COUNTY_CW                                                                           
 'W0014', // CALIFORNIA_MADERA_COUNTY_CW                                                                         
-'W0015', // CALIFORNIA_MARIN_COUNTY_WEBSITE_CW                                                                  
 'W0016', // CALIFORNIA_MENDOCINO_COUNTY_CW                                                                      
 'W0017', // CALIFORNIA_MONTEREY_COUNTY_CW                                                                       
 'W0018', // CALIFORNIA_NAPA_COUNTY_CW                                                                           

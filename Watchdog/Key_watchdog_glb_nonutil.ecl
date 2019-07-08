@@ -1,4 +1,4 @@
-IMPORT doxie,ut,_Control,Watchdog,Data_Services;
+﻿IMPORT doxie,ut,_Control,Watchdog,Data_Services;
 
 EXPORT Key_watchdog_glb_nonutil := INDEX(	watchdog.File_Best_nonutility,
 																					Watchdog.Layout_Key,
