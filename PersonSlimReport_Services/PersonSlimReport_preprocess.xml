@@ -1743,9 +1743,9 @@
              name="PersonSlimReportDeath">
   <DiffMatchs>
    <diff_match name="daymonthyear">
-    <part ftype="string" name="Year"/>
-    <part ftype="string" name="Day"/>
-    <part ftype="string" name="Month"/>
+    <part ftype="number" name="Year"/>
+    <part ftype="number" name="Day"/>
+    <part ftype="number" name="Month"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -1756,9 +1756,9 @@
              name="PersonSlimReportDOB">
   <DiffMatchs>
    <diff_match name="daymonthyear">
-    <part ftype="string" name="Year"/>
-    <part ftype="string" name="Day"/>
-    <part ftype="string" name="Month"/>
+    <part ftype="number" name="Year"/>
+    <part ftype="number" name="Day"/>
+    <part ftype="number" name="Month"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -9987,16 +9987,10 @@
     </entry>
    </diff_selectors>
   </EsdlElement>
-  <EsdlElement _nomon="1"
+  <EsdlElement _mon="1"
                max_len="1"
                name="EntityTypeCode"
-               type="string">
-   <diff_selectors>
-    <entry path="Properties/Property/Entities/Entity/EntityTypeCode">
-     <category>false</category>
-    </entry>
-   </diff_selectors>
-  </EsdlElement>
+               type="string"/>
   <EsdlElement _nomon="1"
                max_len="8"
                name="EntityType"
@@ -10051,13 +10045,14 @@
    </diff_selectors>
   </EsdlElement>
   <DiffMatchs>
-   <diff_match name="address.cityaddress.stateaddress.streetnameaddress.streetnumberaddress.unitnumberaddress.zip5">
+   <diff_match name="address.cityaddress.stateaddress.streetnameaddress.streetnumberaddress.unitnumberaddress.zip5entitytypecode">
     <part ftype="string" name="Address.UnitNumber"/>
     <part ftype="string" name="Address.StreetNumber"/>
     <part ftype="string" name="Address.Zip5"/>
     <part ftype="string" name="Address.StreetName"/>
     <part ftype="string" name="Address.City"/>
     <part ftype="string" name="Address.State"/>
+    <part ftype="string" name="EntityTypeCode"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -10170,13 +10165,14 @@
              name="Entities"
              type="Property2Entity">
    <DiffMatchs>
-    <diff_match name="address.cityaddress.stateaddress.streetnameaddress.streetnumberaddress.unitnumberaddress.zip5">
+    <diff_match name="address.cityaddress.stateaddress.streetnameaddress.streetnumberaddress.unitnumberaddress.zip5entitytypecode">
      <part ftype="string" name="Address.UnitNumber"/>
      <part ftype="string" name="Address.StreetNumber"/>
      <part ftype="string" name="Address.Zip5"/>
      <part ftype="string" name="Address.StreetName"/>
      <part ftype="string" name="Address.City"/>
      <part ftype="string" name="Address.State"/>
+     <part ftype="string" name="EntityTypeCode"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -11459,9 +11455,9 @@
    </diff_selectors>
    <DiffMatchs>
     <diff_match name="daymonthyear">
-     <part ftype="string" name="Year"/>
-     <part ftype="string" name="Day"/>
-     <part ftype="string" name="Month"/>
+     <part ftype="number" name="Year"/>
+     <part ftype="number" name="Day"/>
+     <part ftype="number" name="Month"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -11478,9 +11474,9 @@
    </diff_selectors>
    <DiffMatchs>
     <diff_match name="daymonthyear">
-     <part ftype="string" name="Year"/>
-     <part ftype="string" name="Day"/>
-     <part ftype="string" name="Month"/>
+     <part ftype="number" name="Year"/>
+     <part ftype="number" name="Day"/>
+     <part ftype="number" name="Month"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -16554,7 +16550,7 @@
        <EquityFlagDesc/>
       </DeedSourcePropertyRecord>
      </Deed>
-     <Entities diff_match="Address.StreetNumber+Address.StreetName+Address.UnitNumber+Address.City+Address.State+Address.Zip5">
+     <Entities diff_match="Address.StreetNumber+Address.StreetName+Address.UnitNumber+Address.City+Address.State+Address.Zip5+EntityTypeCode">
       <Entity>
        <Names diff_match="UniqueId">
         <Name>
@@ -16624,7 +16620,7 @@
         <TimeZone/>
         <ListingTimeZone/>
        </Phone>
-       <EntityTypeCode diff_monitor=""/>
+       <EntityTypeCode/>
        <EntityType diff_monitor=""/>
        <OriginalAddress diff_monitor="">
         <StreetNumber/>
