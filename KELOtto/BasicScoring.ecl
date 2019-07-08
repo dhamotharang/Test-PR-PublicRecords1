@@ -1,5 +1,6 @@
 ﻿EXPORT BasicScoring := MODULE
-  IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services;
+
+  IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services, Std;
 
 	EXPORT WeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 	
@@ -143,7 +144,7 @@
                          ), TRANSFORM({RECORDOF(LEFT), RIGHT.Weight}, 
                             SELF.Weight := RIGHT.Weight, 
                             SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, -1), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
-                            SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => RIGHT.UiDescription, LEFT.Label);
+                            SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), LEFT.Label);
                             SELF.field := LEFT.field +
                                           MAP(TRIM(RIGHT.Value) != '' =>  '_' + RIGHT.Value, MAP(RIGHT.Low > 0 => '_' + (STRING)RIGHT.Low, '') + MAP(RIGHT.High > 0 => '_' + (STRING)RIGHT.High, ''));
                             SELF := LEFT), LOOKUP, LEFT OUTER) : PERSIST('~temp::deleteme92', EXPIRE(7));
