@@ -127,13 +127,21 @@ MODULE
 		EXPORT Wireless := 'WIRELESS';
 		EXPORT VoIP     := 'VOIP';
 		EXPORT Other    := 'UNKNOWN';
+		EXPORT line_landline := '0';
 	END;
 
 	EXPORT PhoneStatus :=
 	MODULE
-		EXPORT ACTIVE 		:= 'active';
-		EXPORT CANCELLED 	:= 'cancelled';
-		EXPORT SUSPENDED    := 'suspended';
+		EXPORT Active 		:= 'ACTIVE';
+		EXPORT Cancelled 	:= 'CANCELLED';
+		EXPORT Suspended    := 'SUSPENDED';
+		EXPORT Inactive 	:= 'INACTIVE';
+    	EXPORT NotAvailable 	:= 'NOT AVAILABLE';
+		EXPORT PresumedActive 	:= 'PRESUMED ACTIVE';
+		EXPORT ActLowerTh		:= 180;
+		EXPORT ActUpperTh		:= 365;
+		EXPORT LastActivityThreshold:= 30;
+
 	END;	
 
 	EXPORT GatewayValues :=
@@ -218,5 +226,6 @@ MODULE
 		EXPORT VERFICATION	        := 'V';
 		EXPORT DEFAULT_BLOCK_ID:= 'A';
 		EXPORT PORTED := 'P';  //phone number is ported
+
 	END;
 END;
