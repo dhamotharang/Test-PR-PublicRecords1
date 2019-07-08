@@ -1,7 +1,7 @@
 This document explains the steps in generating the necessary alerting queries via the ESP monitoring platform
 
 
-1) first you will need to get the latest version of a 7.0+ client tools which includes the latest monitoring command line tools used below.
+1) first you will need to get the latest version of a 7.2.22+ client tools which includes the latest monitoring command line tools used below.
 
 2) add the cassandra plugin to your plugin folder in the client tools - https://github.com/hpcc-systems/HPCC-Platform/blob/master/plugins/cassandra/cassandra.ecllib
 
@@ -52,7 +52,7 @@ esdl     monitor       ws_accurint.ecm       WsAccurint        PersonSlimReport 
 -I cmd\scapps\esp\services\ws_distrix\scm\
 
 -----
-C:\Users\abitda01\Desktop\repository\alerts\run>"C:\Program Files\HPCCSystems\7.2.14\clienttools\bin\esdl.exe" monitor ws_accurint.ecm WsAccurint PersonSlimReport ..\gen_ecl\monitor_template_PersonSlimReport.xml -I cmd\scapps\esp\scm -I cmd\scapps\esp\services\ws_gateway\scm -I cmd\scapps\esp\services\ws_gatewayEx\scm -I cmd\scapps\esp\services\ws_distrix\scm
+C:\Users\abitda01\Desktop\repository\alerts\run>"C:\Program Files\HPCCSystems\7.2.22\clienttools\bin\esdl.exe" monitor ws_accurint.ecm WsAccurint PersonSlimReport ..\gen_ecl\monitor_template_PersonSlimReport.xml -I cmd\scapps\esp\scm -I cmd\scapps\esp\services\ws_gateway\scm -I cmd\scapps\esp\services\ws_gatewayEx\scm -I cmd\scapps\esp\services\ws_distrix\scm
 
 Loading XML ESDL definition: ws_accurint.ecm
 Time taken for adding XML ESDL definition: 248479425 cycles (248M) = 82 msec
