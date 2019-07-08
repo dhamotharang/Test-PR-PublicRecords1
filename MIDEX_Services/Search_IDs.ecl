@@ -1,15 +1,17 @@
-IMPORT Prof_License_Mari, SANCTN, SANCTN_Mari, ut;
+﻿IMPORT MIDEX_Services,SANCTN,SANCTN_Mari,STD,ut;
 
 EXPORT Search_IDs := MODULE
 
-	EXPORT Mari_NonPublic_Sanct_val(Iparam.searchrecords in_mod) := 
+	EXPORT Mari_NonPublic_Sanct_val(MIDEX_Services.Iparam.searchrecords in_mod) := 
     FUNCTION
 		
-      autoKey_Hits := Raw_Nonpublic.fn_get_nonPublicAutokeyData();
+      autoKey_Hits := MIDEX_Services.Raw_Nonpublic.fn_get_nonPublicAutokeyData();
                 
+      // CCPA - Suppression will take place with the payload join in the service funtion calls  
+      //        We are only keeping the midex report number components from the key here
       autoKey_Pay := JOIN(autoKey_Hits,SANCTN_Mari.key_autokey_payload,
                           KEYED(LEFT.id = RIGHT.fakeid),
-                          TRANSFORM(Layouts.rec_midex_payloadKeyField,
+                          TRANSFORM(MIDEX_Services.Layouts.rec_midex_payloadKeyField,
                                     SELF.BATCH := RIGHT.batch;
                                     SELF.INCIDENT_NUM := RIGHT.incident_num;
                                     SELF.PARTY_NUM := RIGHT.party_num;
@@ -20,7 +22,9 @@ EXPORT Search_IDs := MODULE
 
       MIDEX_Services.Macros.MAC_midexPayloadKeyField(autoKey_Pay, ds_nonPub_autoKey, BATCH, INCIDENT_NUM, PARTY_NUM, MIDEX_RPT_NBR );
       
-      ds_nonPub_did     := IF(in_mod.DID != '', 
+      // CCPA - Suppression will take place with the payload join in the service funtion calls
+      //        there is no personal info in this key
+			ds_nonPub_did     := IF(in_mod.DID != '', 
                               MIDEX_Services.Raw_Nonpublic.fn_get_nonPublicDidData ( (UNSIGNED6)in_mod.DID ), 
                               DATASET( [], MIDEX_Services.Layouts.rec_midex_payloadKeyField )
                              );
@@ -45,7 +49,7 @@ EXPORT Search_IDs := MODULE
                                  
       // if the user enters the MIDEX Report Number, pull the three pieces out for the payload key
       ds_nonPub_midexRptNumRaw :=  IF(in_mod.midex_rpt_num != '', 
-                                      DATASET( [{TRIM(StringLib.StringToUpperCase(in_mod.midex_rpt_num), LEFT, RIGHT), '' ,'', '' } ], MIDEX_Services.Layouts.rec_midex_payloadKeyField ),
+                                      DATASET( [{TRIM(STD.STR.ToUpperCase(in_mod.midex_rpt_num), LEFT, RIGHT), '' ,'', '' } ], MIDEX_Services.Layouts.rec_midex_payloadKeyField ),
                                       DATASET( [], MIDEX_Services.Layouts.rec_midex_payloadKeyField )
                                      );
       MIDEX_Services.Macros.MAC_getIncidentNumFromMidexReportNum ( ds_nonPub_midexRptNumRaw, ds_nonPub_midexRptNum );
@@ -62,10 +66,12 @@ EXPORT Search_IDs := MODULE
       RETURN(ds_all_nonpub_midexRptNums);
     END;  // Mari_NonPublic_Sanct_val
 	
-	EXPORT Mari_Public_Sanct_val(Iparam.searchrecords in_mod) := 
+	EXPORT Mari_Public_Sanct_val(MIDEX_Services.Iparam.searchrecords in_mod) := 
     FUNCTION
 		
         ds_pubSanctn_autokey_hits := MIDEX_Services.Raw_Public.fn_get_PublicSanctnAutokeyData();
+        // CCPA - Suppression will take place with the payload join in the service funtion calls  
+        //        We are only keeping the midex report number components from the key here
         ds_pubSanctnAutokey_pay := 
           JOIN( ds_pubSanctn_autokey_hits,
                 SANCTN.Key_SANCTN_autokey_payload,
@@ -78,10 +84,12 @@ EXPORT Search_IDs := MODULE
                          ),
                 INNER,
 								LIMIT(ut.limits.default,SKIP));
-                
+
         MIDEX_Services.Macros.MAC_midexPayloadKeyField(ds_pubSanctnAutokey_pay, ds_PubSanctn_autoKey, BATCH, INCIDENT_NUM, PARTY_NUM, MIDEX_RPT_NBR );
 		                 
-        ds_PubSanctn_did := IF(in_mod.DID != '',      
+        // CCPA - Suppression will take place with the payload join in the service funtion calls
+        //        there is no personal info in this key
+			  ds_PubSanctn_did := IF(in_mod.DID != '',      
                                MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData( (UNSIGNED6)in_mod.DID ),
                                DATASET( [], MIDEX_Services.Layouts.rec_midex_payloadKeyField )
                               );
@@ -117,7 +125,7 @@ EXPORT Search_IDs := MODULE
     RETURN(ds_PubSanctn_midexRptNums);
 	END;  // Mari_Public_Sanct_val
 	
-	EXPORT Mari_ProfLic_val(Iparam.searchrecords in_mod) := 
+	EXPORT Mari_ProfLic_val(MIDEX_Services.Iparam.searchrecords in_mod) := 
     FUNCTION
 	  
                                                                              

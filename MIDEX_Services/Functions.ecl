@@ -1,8 +1,7 @@
-﻿IMPORT AutoKeyI, AutoStandardI, census_data, iesp,
-       lib_stringlib, liensv2_services, LN_PropertyV2_Services, 
-       Midex_Services, Prof_License_Mari, SANCTN, SANCTN_Mari, 
-       Suppress, ut;
+﻿IMPORT AutoStandardI, census_data, iesp,liensv2_services, LN_PropertyV2_Services, 
+       Midex_Services, Prof_License_Mari, SANCTN, SANCTN_Mari, STD, Suppress, ut;
 
+       
 EXPORT Functions := 
   MODULE
   
@@ -42,7 +41,7 @@ EXPORT Functions :=
         addrSearched        := (UNSIGNED)addrSearchedCalc;
         compNameSearched    := IF(AutoStandardI.InterfaceTranslator.company_name_value.val(in_mod) != '',1,0);
         didSearched         := IF(in_mod.did != '',1,0);
-        licSeached          := IF(TRIM(StringLib.StringToUpperCase(in_mod.license_number)) != '',1,0);
+        licSeached          := IF(TRIM(STD.STR.ToUpperCase(in_mod.license_number)) != '',1,0);
         MidexRptNbrSearched := IF(in_mod.midex_rpt_num != '',1,0);
         nameSearched        := (UNSIGNED)nameSearchedCalc;
         nmlsIdSearched      := IF(in_mod.nmls_id != '',1,0);
@@ -166,13 +165,12 @@ EXPORT Functions :=
       END;			
       
 	         
-    EXPORT fn_dobMask ( STRING8 dob, STRING dobMask) := 
+    EXPORT fn_dobMask ( STRING8 dob, UNSIGNED1 dobMask) := 
       FUNCTION
-        UNSIGNED1 dobMaskUnsigned := suppress.date_mask_math.MaskIndicator(dobMask);
         dob_in_tDateFormat := iesp.ECL2ESP.toDatestring8(dob);
         masked             := IF( dob = '',
                                   dob_in_tDateFormat,
-                                  iesp.ECL2ESP.ApplyDateMask(dob_in_tDateFormat, dobMaskUnsigned)
+                                  iesp.ECL2ESP.ApplyDateMask(dob_in_tDateFormat, dobMask)
                                 );
        
         RETURN masked;
@@ -183,7 +181,7 @@ EXPORT Functions :=
      FUNCTION
        ssnRaw     := IF( ssn_appended != '', 
 										 		 ssn_appended, 
-											   lib_stringlib.stringlib.StringFilterOut( SSNUMBER, '-') 
+											   STD.STR.FilterOut( SSNUMBER, '-') 
                        );
        ssnMasked  := Suppress.ssn_Mask( ssnRaw, ssnMask);
       
@@ -299,8 +297,8 @@ EXPORT Functions :=
 		SHARED iesp.midexlicensereport.t_MIDEXRegulator Format_RegulatorRec_iesp(Layouts.Regulator_Layout L) := TRANSFORM
 				SELF.Regulator 					:= L.regulator_name;
 				SELF.RegistrationName 	:= L.registration_name;
-				SELF.Authorized					:= IF(Stringlib.StringContains(L.authorized,'YES',true),'Y',
-																				IF(Stringlib.StringContains(L.authorized,'NO',true),'N','U'));
+				SELF.Authorized					:= IF(STD.STR.Contains(L.authorized,'YES',true),'Y',
+																				IF(STD.STR.Contains(L.authorized,'NO',true),'N','U'));
 																				
 				SELF.Registrations			:= PROJECT(CHOOSEN(L.Registrations,iesp.Constants.MIDEX.MAX_COUNT_REGISTRATIONS),Format_RegistraionRec_iesp(LEFT));
 		END;
@@ -337,7 +335,7 @@ EXPORT Functions :=
                                                  L.company_st, L.company_zip5, '', L.company_county);
 				SELF.Licenses := PROJECT(CHOOSEN(SORT(L.Licenses,-isCurrent, -lic_issue_date),iesp.Constants.MIDEX.MAX_COUNT_REPORT_LICENSES),Format_licenseRec_iesp(LEFT));
 				SELF.OfficeLocations := PROJECT(CHOOSEN(L.Locations,iesp.Constants.MIDEX.MAX_COUNT_OFFICE_LOCATIONS),Format_LocationRec_iesp(LEFT));
-				SELF.AuthRepresents := PROJECT(CHOOSEN(L.Represents(stringlib.StringToUpperCase(authorized)='YES'),iesp.Constants.MIDEX.MAX_COUNT_REPRESENT),Format_RepresentRec_iesp(LEFT));
+				SELF.AuthRepresents := PROJECT(CHOOSEN(L.Represents(STD.STR.ToUpperCase(authorized)='YES'),iesp.Constants.MIDEX.MAX_COUNT_REPRESENT),Format_RepresentRec_iesp(LEFT));
 				SELF.PrevAuthRepresents := PROJECT(CHOOSEN(L.Represents(authorized!='YES'),iesp.Constants.MIDEX.MAX_COUNT_REPRESENT),Format_RepresentRec_iesp(LEFT));
 				SELF.Regulators := PROJECT(CHOOSEN(L.Regulators,iesp.Constants.MIDEX.MAX_COUNT_REGULATORS),Format_RegulatorRec_iesp(LEFT));
 				SELF.DisciplinaryActions := PROJECT(CHOOSEN(L.Disc_Actions,iesp.Constants.MIDEX.MAX_COUNT_REG_ACTIONS),Format_actionRec_iesp(LEFT));
@@ -456,7 +454,7 @@ EXPORT Functions :=
       // in the field and that was failing to put the '$#xd;' in the t_stringArrayItem dataset.
       EXPORT fn_setStringArray ( STRING inText ) :=
         FUNCTION
-          inTextTrim := StringLib.StringFilterOut(TRIM(inText, ALL),'\r');
+          inTextTrim := STD.STR.FilterOut(TRIM(inText, ALL),'\r');
           isBlankLine := LENGTH(inTextTrim) = 0;
           stringValue := IF(isBlankLine,
                             DATASET([{'&#xd;'}],iesp.share.t_StringArrayItem),
@@ -738,7 +736,7 @@ EXPORT Functions :=
        RETURN ROW(xfm_setSmartLinxPersonFormat ());
     END;
 
-    EXPORT fn_SubjectReported  ( MIDEX_Services.Layouts.CompReport_TempLayout ds_midexRptNumberPayloadRecs, STRING dobMask ) := 
+    EXPORT fn_SubjectReported  ( MIDEX_Services.Layouts.CompReport_TempLayout ds_midexRptNumberPayloadRecs, UNSIGNED1 dobMask ) := 
       FUNCTION
         iesp.midexcompreport.t_MIDEXCompSubject xfm_SubjectReported () :=
           TRANSFORM

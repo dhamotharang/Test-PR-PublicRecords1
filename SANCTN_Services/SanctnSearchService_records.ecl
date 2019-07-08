@@ -1,4 +1,7 @@
-IMPORT doxie, business_header,ut;
+﻿IMPORT business_header,doxie,Sanctn_services,STD,ut;
+
+EXPORT SanctnSearchService_records (doxie.IDataAccess mod_access) := 
+  FUNCTION
 
   unsigned2 pt := 10 : stored('PenaltThreshold');
 
@@ -9,15 +12,15 @@ IMPORT doxie, business_header,ut;
   // workHard = true, noFail = false, IncludeDeepDives = false, is_CompSearchL = false
   ids := Sanctn_services.Get_ids (true, , false, is_CompSearchL); //this is layout [layouts.id]
 
-  ds_recs := Sanctn_services.raw.SEARCH_VIEW.by_id (ids, ssn_mask_val, application_type_value);
+  ds_recs := Sanctn_services.raw.SEARCH_VIEW.by_id (ids, mod_access);
 
   // additional filtering, in case we have incident date in input
   string8 inc_date_val       := '' : STORED ('IncidentDate');
  	string8 IncidentStartDate  := '' : STORED('IncidentStartDate');
 	string8 IncidentEndDate    := '' : STORED('IncidentEndDate');
 
-  is_valid_dateinput := (IncidentStartDate = '' or ut.ValidDate(IncidentStartDate)) 
-		                       and (IncidentEndDate = '' or ut.ValidDate(IncidentEndDate));
+  is_valid_dateinput := (IncidentStartDate = '' or STD.DATE.IsValidDate((UNSIGNED4)IncidentStartDate)) 
+		                       and (IncidentEndDate = '' or STD.DATE.IsValidDate((UNSIGNED4)IncidentEndDate));
 		
 	IF(~is_valid_dateinput, FAIL('An error occurred while running SANCTN_Services.SanctnSearchService: invalid input dates.') );
 	
@@ -33,4 +36,5 @@ IMPORT doxie, business_header,ut;
 
   doxie.MAC_Marshall_Results (rsrt, rmar);
 
-EXPORT SanctnSearchService_records := rmar;
+  RETURN rmar;
+  END;

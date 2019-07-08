@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, AutoStandardI, census_data, iesp, Prof_License_Mari, ut, BIPV2;
+﻿IMPORT AutoKeyI, AutoStandardI, BIPV2, census_data, iesp, Prof_License_Mari, STD, ut;
 
 // ==============================================================================================================	
 //  MARI MIDEX "LICENSE" DATA (Prof_License_Mari) related functions
@@ -158,7 +158,7 @@ EXPORT Raw_ProfessionalLicenses :=
                                                   SELF.did := (UNSIGNED6)RIGHT.did,
 																									SELF.bdid := (UNSIGNED6)RIGHT.bdid,
 																									// If phone1 is all zeroes or blank use contact phone
-																									SELF.phone := IF(stringlib.stringfilterOut(RIGHT.phn_phone_1,'0') != '',RIGHT.phn_phone_1,RIGHT.phn_contact);
+																									SELF.phone := IF(STD.STR.filterOut(RIGHT.phn_phone_1,'0') != '',RIGHT.phn_phone_1,RIGHT.phn_contact);
 																									SELF.report_number := (STRING) RIGHT.mari_rid,
 																									SELF.nmls_id := RIGHT.nmls_id,
 																									SELF := RIGHT,
@@ -230,7 +230,7 @@ EXPORT Raw_ProfessionalLicenses :=
                                                     SELF.dob := RIGHT.birth_dte,
                                                     SELF.did := (UNSIGNED6)RIGHT.did,
                                                     // If phone1 is all zeroes or blank use contact phone
-                                                    SELF.phone := IF(stringlib.stringfilterOut(RIGHT.phn_phone_1,'0') != '',RIGHT.phn_phone_1,RIGHT.phn_contact);
+                                                    SELF.phone := IF(STD.STR.filterOut(RIGHT.phn_phone_1,'0') != '',RIGHT.phn_phone_1,RIGHT.phn_contact);
                                                     SELF.data_source := RIGHT.std_source_desc,
                                                     SELF.isCurrent := (RIGHT.result_cd_1 = Midex_Services.Constants.RECORD_STATUS.LatestRecordUpdatingSource),
                                                     SELF := RIGHT,

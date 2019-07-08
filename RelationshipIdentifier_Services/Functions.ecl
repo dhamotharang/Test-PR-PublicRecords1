@@ -1,4 +1,4 @@
-import didville, iesp,relationshipIdentifier_services, doxie, MIDEX_Services, bipv2, gong, STD;
+﻿import bipv2,didville,doxie,gong,iesp,MIDEX_Services,relationshipIdentifier_services,STD;
 EXPORT Functions := MODULE
 
   // this function calls the person search to find possible DID's.
@@ -110,7 +110,7 @@ EXPORT Functions := MODULE
 	 
 	 EXPORT getMidexLicenseType(unsigned6 midexDID, 
 	                          dataset(BIPV2.IDlayouts.l_xlink_ids) midexlinkids,
-	                          string dataPermissionMask) := FUNCTION
+	                          doxie.IDataAccess mod_access ) := FUNCTION
     // this function just inputs a DID or BIP linkids and looks for existence of a midex license type
 		// that is classified as a 'real estate' license.  If a did is associated with a person that has a real
 		// estate license or linkid for a business then that licese type(s) (1 or more) are returned and on the GUI side a link
@@ -151,7 +151,7 @@ EXPORT Functions := MODULE
 		sancData_did := MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData(midexDID);
 		sancData_bus := MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData(midexlinkids, FETCHLEVEL);
 		sancdata := if (midexDID <> 0, sancData_did, sancData_bus);
-		SancDataPayload := MIDEX_Services.Raw_Public.license.report_view.by_midex_rpt_num(sancData);
+		SancDataPayload := MIDEX_Services.Raw_Public.license.report_view.by_midex_rpt_num(sancData,mod_access);
 		
 		licenseListSanc := Project(SancDataPayload,TRANSFORM(MIDEX_Services.Layouts.LicenseReport_Layout,
                               self.licenses := left.licenses;
@@ -159,7 +159,7 @@ EXPORT Functions := MODULE
 															
    // ** nonpublic:  did = 969216909 this one has PL as well.
 	 // dataPermissionMask is needed for getting particular non pub licenses.
-	  setNonpubAccess := MIDEX_Services.Functions.fn_GetNonPubDataSources(dataPermissionMask);
+	  setNonpubAccess := MIDEX_Services.Functions.fn_GetNonPubDataSources(mod_access.dataPermissionMask);
 	 	nonPubData_did := MIDEX_Services.Raw_NonPublic.fn_get_nonPublicDidData(midexDID);
 		nonPubData_bus := MIDEX_Services.Raw_NonPublic.fn_get_nonPublicLinkIdData(midexlinkids, FETCHLEVEL); 
 		nonPubData := if (midexDID <> 0, nonPubData_did, nonPubData_bus);
