@@ -4,12 +4,12 @@
 EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData,
                         STRING6 ssnMask,
                         BOOLEAN includeReport,
-                        Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-                        BIPV2.mod_sources.iParams linkingOptions,
+												Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+												BIPV2.mod_sources.iParams linkingOptions,
                         BOOLEAN debugMode = FALSE) := FUNCTION
 
   
-
+	
     BOOLEAN includeAllBusinessData := TRUE;
 
 
@@ -17,13 +17,13 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     //for processing a business
     inquiredBus := PROJECT(inData, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                               SELF.seq := LEFT.cleanedInput.seq;
-                              
+
                                               SELF.busn_info.BIP_IDs.UltID.LinkID := LEFT.dataToUse.UltID;
                                               SELF.busn_info.BIP_IDs.OrgID.LinkID := LEFT.dataToUse.OrgID;
                                               SELF.busn_info.BIP_IDs.SeleID.LinkID := LEFT.dataToUse.SeleID;
                                               SELF.busn_info.BIP_IDs.ProxID.LinkID := LEFT.dataToUse.ProxID;
                                               SELF.busn_info.BIP_IDs.PowID.LinkID := LEFT.dataToUse.PowID;
-                                              
+
                                               SELF.busn_info.lexID := (STRING)LEFT.dataToUse.SeleID;
                                               SELF.busn_info.companyName := LEFT.dataToUse.companyName; 
                                               SELF.busn_info.altCompanyName := LEFT.dataToUse.altCompanyName;
@@ -31,24 +31,24 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
                                               SELF.busn_info.phone := LEFT.dataToUse.phone;
                                               SELF.busn_info.address := LEFT.dataToUse.address;
                                               SELF.busn_info.accountNumber := LEFT.cleanedInput.business.accountNumber;
-                                              
+
                                               SELF.score := LEFT.dataToUse.lexIDScore;
-                                              
+
                                               SELF.historyDate := LEFT.cleanedInput.historyDateYYYYMMDD;
-                                              
+
                                               addressProvided := LEFT.cleanedInput.addressProvided;
                                               fullAddressProvided := LEFT.cleanedInput.fullCleanAddressExists;
                                               cleanBusInput := LEFT.cleanedInput.business;
-                                              
+
                                               SELF.inputaddressprovided := addressProvided;
                                               SELF.fullinputaddressprovided := fullAddressProvided;
                                               SELF.relatedDegree := DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE;                                           
-                                              
+
                                               SELF.bestBusInfo.companyName := LEFT.dataToUse.companyName;
                                               SELF.bestBusInfo.address := LEFT.dataToUse.bestAddress;
                                               SELF.bestBusInfo.phone := LEFT.dataToUse.phone;
                                               SELF.bestBusInfo.fein := LEFT.dataToUse.fein;
-                                              
+
                                               SELF.busn_input := LEFT.inputEcho.business;
                                               SELF := [];));
 
@@ -72,9 +72,9 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
 
 
     //get attribute data for the inquired business
-    busProperty := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions);
+    busProperty    := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions);
 
-    busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions);
+    busWatercraft  := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions);
 
     busAircraft := DueDiligence.getBusAircraft(busWatercraft, options);
 
@@ -82,7 +82,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
 
     busReg := DueDiligence.getBusRegistration(busVehicle, options, includeAllBusinessData);
 
-    busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
+    busGeoRisk := DueDiligence.getBusGeographicRisk(busReg);   
 
     busSales := DueDiligence.getBusSales(busGeoRisk, options, linkingOptions);
 
@@ -100,7 +100,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions, includeReport);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
 
 
-    addCounts := PROJECT(busSicNaic, TRANSFORM(RECORDOF(LEFT),
+    addCounts := PROJECT(busSicNaic, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                                 SELF.numOfRegAgents := COUNT(LEFT.registeredAgents);
                                                 SELF.numOfSicNaic := COUNT(LEFT.sicNaicSources);
                                                 SELF.execCount := COUNT(LEFT.execs);
