@@ -1,4 +1,4 @@
-import TopBusiness, iesp, AutoStandardI, BIPv2, Property, LN_propertyv2, Census_Data, MDR;
+﻿import TopBusiness, iesp, BIPv2, Property, Census_Data, MDR;
 
 export foreclosureNODSection := module
 
@@ -35,7 +35,7 @@ export Fn_fullView(
 													 
 		  
      foreclosure_linkids_payload := join(foreclosure_linkids_rawSlim,Property.Key_Foreclosures_FID,		                                        
-		                      keyed(left.foreclosure_id = right.fid),																										
+		                      keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures,																										
 													transform({iesp.share.t_businessIdentity;recordof(right);},
 													         self.ultid := left.ultid;
 																	 self.orgid := left.orgid;
@@ -49,7 +49,7 @@ export Fn_fullView(
 													limit(0),keep(iesp.constants.TOPBUSINESS.MAX_COUNT_BIZRPT_FORECLOSURE_NODS));
 													
     nod_linkids_payload := join(nod_linkids_rawSlim, Property.Key_NOD_FID,
-		                        keyed(left.foreclosure_id = right.fid),
+		                        keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures,
 															transform({iesp.share.t_businessIdentity;recordof(right);},
 													         self.ultid := left.ultid;
 																	 self.orgid := left.orgid;

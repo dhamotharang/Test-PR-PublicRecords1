@@ -1,4 +1,4 @@
-﻿import ut, Census_Data, Foreclosure_services, iesp, doxie, suppress, AutoStandardI;
+﻿import ut, Census_Data, Foreclosure_services, iesp, suppress, AutoStandardI, MDR;
 
 export Functions := module
 
@@ -164,6 +164,9 @@ end;
 
 		iesp.foreclosure.t_ForeclosureSearchRecord xform(Foreclosure_Services.Layouts.rawrec_plaintiffs_defendants l) := TRANSFORM
 			self.ForeclosureId:= l.foreclosure_id;
+			//Setting VendorSource to 'A' if source of records is FARES and 'B' for BlackKnight, per requirement, to distinguish between Fares and Blackknight data 
+			self.VendorSource:=if(l.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
+																																																Foreclosure_services.Constants('').src_BlackKnight);
 			self.RecordingDate :=iesp.ECL2ESP.toDatestring8(l.recording_date);
 			self.SiteAddress :=setAddressFields(l.situs1_prim_name, l.situs1_prim_range, l.situs1_predir, l.situs1_postdir, l.situs1_addr_suffix,
 			                              l.situs1_unit_desig,l.situs1_sec_range, l.situs1_p_city_name,l.situs1_v_city_name, '',
@@ -196,6 +199,7 @@ export fnforeclosureReportval(dataset(foreclosure_services.Layouts.rawrec) in_re
   iesp.foreclosure.t_ForeclosureReportRecord xform(Foreclosure_Services.Layouts.rawrec_plaintiffs_defendants l) := TRANSFORM																								 
 	
 	self.ForeclosureId:= l.foreclosure_id;
+	self.VendorSource:= if(l.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, Foreclosure_services.Constants('').src_BlackKnight);
 	self.CaseNumber :=l.court_case_nbr;
 	self.DeedType :=l.deed_desc;
 	self.SiteAddress :=setAddressFields(l.situs1_prim_name, l.situs1_prim_range, l.situs1_predir, l.situs1_postdir, l.situs1_addr_suffix,

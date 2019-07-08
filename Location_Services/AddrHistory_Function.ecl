@@ -1,5 +1,5 @@
 ﻿import location_services, address, ut, risk_indicators, property, dx_BestRecords, doxie, doxie_raw, doxie_ln,
-       AutoStandardI, DeathV2_Services, LN_PropertyV2_Services, LN_PropertyV2, STD;
+       AutoStandardI, DeathV2_Services, LN_PropertyV2_Services, LN_PropertyV2, STD, MDR;
 
 todays_date := (string) STD.Date.Today();
 
@@ -405,7 +405,8 @@ end;
 
 frecs := join(fids,
               property.Key_Foreclosures_FID,
-              keyed(left.fid = right.fid),
+              keyed(left.fid = right.fid) AND 
+													 RIGHT.source=MDR.sourceTools.src_Foreclosures,
               get_foreclosures(LEFT,RIGHT),
               limit(ut.limits.Foreclosure_MAX, skip));
 

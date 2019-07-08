@@ -1,4 +1,4 @@
-﻿import AutoStandardI,Foreclosure_Services,doxie,Property,iesp,ut, BIPV2;
+﻿import AutoStandardI,Foreclosure_Services,doxie,iesp;
 
 export Records := module
 	export params := interface(
@@ -9,11 +9,11 @@ export Records := module
 		AutoStandardI.InterfaceTranslator.penalt_threshold_value.params)
 		export string6 ssnmask;
 	end;
-	export val(params in_mod, boolean isNodSearch=false) := function
+	export val(params in_mod, boolean isNodSearch=false, boolean includeBlackKnight=false) := function
 		// Get the IDs, pull the payload records and add Foreclosure_id.
 		ids := Foreclosure_services.SearchService_IDs.val(in_mod,isNodSearch);
 																 
-		recs:=Foreclosure_Services.Raw.GetRawRecs(ids,isNodSearch, in_mod.IndustryClass);
+		recs:=Foreclosure_Services.Raw.GetRawRecs(ids, isNodSearch, in_mod.IndustryClass, includeBlackKnight);
 		// Calculate the penalty on the records
 
 		recs_plus_pen := project(recs,transform(Foreclosure_Services.Layouts.rawrec,
@@ -242,7 +242,7 @@ export Records := module
 		// output(recs_plus_pen,named('SSREcs_recs_plus_pen'));
 		// output(recs_sort,named('SSREcs_recs_sort'));
 		
-		return if(not doxie.DataRestriction.Fares,tempresults_slim,dataset([],iesp.foreclosure.t_ForeclosureSearchRecord));
+		return if(not doxie.DataRestriction.Fares,tempresults_slim,tempresults_slim(VendorSource!=Foreclosure_services.Constants('').src_Fares));
 		
 		end;
 		

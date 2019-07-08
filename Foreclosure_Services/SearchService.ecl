@@ -53,7 +53,7 @@
 */
 /*--USES-- ut.input_xslt */
 
-IMPORT iesp, AutoStandardI, doxie;
+IMPORT iesp, AutoStandardI;
 
 EXPORT SearchService := MACRO
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -83,8 +83,8 @@ EXPORT SearchService := MACRO
 
   boolean ExcludeForeclosures := false : STORED ('ExcludeForeclosures');
   boolean IncludeNoticeOfDefaults := false : STORED ('IncludeNoticeOfDefaults');
-  for := if(~ExcludeForeclosures,Foreclosure_Services.Records.val(tempmod,false));
-  nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.Records.val(tempmod,true));
+  for := if(~ExcludeForeclosures,Foreclosure_Services.Records.val(tempmod,false, true));
+  nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.Records.val(tempmod,true, true));
   tmp := sort(for+nod,if(AlsoFound,1,0),_penalty,-recordingdate,record);
 
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results (tmp, results, iesp.foreclosure.t_ForeclosureSearchResponse);
