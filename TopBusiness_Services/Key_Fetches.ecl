@@ -108,7 +108,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 	                                                                                  FETCH_LEVEL, ,FETCH_LIMIT);
 
   // *** Key fetch to get Experian CRDB linkids key records
-  EXPORT ds_expcrdb_linkidskey_recs := Experian_CRDB.Key_LinkIDs.kFetch(ds_in_linkids,FETCH_LEVEL);
+  EXPORT ds_expcrdb_linkidskey_recs := Experian_CRDB.Key_LinkIDs.kFetch(ds_in_linkids,mod_access,FETCH_LEVEL);
 
   // *** Key fetch to get Experian Fein linkids key records
   EXPORT ds_expfein_linkidskey_recs := Experian_FEIN.Key_LinkIDs.kFetch(ds_in_linkids,FETCH_LEVEL);
