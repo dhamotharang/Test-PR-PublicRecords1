@@ -4,8 +4,8 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
                              doxie.IDataAccess mod_access ) := 
   FUNCTION
 
+    BOOLEAN   enableAlert            := in_mod.EnableAlert;    
     BOOLEAN   include_SourceDocs     := in_mod.includeSourceDocs;
-    BOOLEAN   enableAlert            := in_mod.EnableAlert;
     DATASET   ds_midexReportNumberIn := in_mod.MidexReportNumbers;
     
     in_did  		:= (UNSIGNED6)in_mod.did;
@@ -111,7 +111,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
     // --------------------------------------------------------------------------------------------------------------
     //              TopBusiness Data
     // --------------------------------------------------------------------------------------------------------------
-		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, in_mod.BusinessIDFetchLevel, mod_access)); 
+		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, mod_access, in_mod.BusinessIDFetchLevel)); 
     rec_topBusinessRecs 				:= PROJECT(rec_topBusinessRecs_bip_raw, iesp.midexcompreport.t_MIDEXCompTopBusinessRecord)[1];
 
     // --------------------------------------------------------------------------------------------------------------
