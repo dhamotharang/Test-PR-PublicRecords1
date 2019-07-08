@@ -155,20 +155,15 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     perAccessToFundsIncome_Flag4 := IF(le.estimatedIncome BETWEEN 60000 AND 79999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
     perAccessToFundsIncome_Flag3 := IF(le.estimatedIncome BETWEEN 40000 AND 59999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
     perAccessToFundsIncome_Flag2 := IF(le.estimatedIncome BETWEEN 20000 AND 39999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-    perAccessToFundsIncome_Flag1 := IF(le.estimatedIncome BETWEEN 0 AND 19999, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag1 := IF(le.estimatedIncome BETWEEN 0 AND 19999 AND le.incomeRecordExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAccessToFundsIncome_Flag0 := IF(le.incomeRecordExists = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR); 
     
-    perAccessToFundsIncome_Flag_final := DueDiligence.Common.calcFinalFlagField(perAccessToFundsIncome_Flag9,
-                                                                                perAccessToFundsIncome_Flag8,
-                                                                                perAccessToFundsIncome_Flag7,
-                                                                                perAccessToFundsIncome_Flag6,
-                                                                                perAccessToFundsIncome_Flag5,
-                                                                                perAccessToFundsIncome_Flag4,
-                                                                                perAccessToFundsIncome_Flag3,
-                                                                                perAccessToFundsIncome_Flag2,
-                                                                                perAccessToFundsIncome_Flag1);
+    perAccessToFundsIncome_Flag_final := perAccessToFundsIncome_Flag9 + perAccessToFundsIncome_Flag8 + perAccessToFundsIncome_Flag7 + perAccessToFundsIncome_Flag6 +
+                                         perAccessToFundsIncome_Flag5 + perAccessToFundsIncome_Flag4 + perAccessToFundsIncome_Flag3 + perAccessToFundsIncome_Flag2 +
+                                         perAccessToFundsIncome_Flag1 + perAccessToFundsIncome_Flag0;
     
     SELF.PerAccessToFundsIncome_Flag := perAccessToFundsIncome_Flag_final;
-		SELF.PerAccessToFundsIncome := (STRING)(10 - STD.Str.Find(perAccessToFundsIncome_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
+    SELF.PerAccessToFundsIncome := (STRING)(10 - STD.Str.Find(perAccessToFundsIncome_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
     //PERSON AGE RANGE
@@ -198,18 +193,18 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
     
 
     //INDIVIDUAL GEOGRAPHIC RISK
-		perGeoRisk_Flag9 := IF(le.CountyHasHighCrimeIndex AND le.CountyBordersForgeinJur AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                            	
-		perGeoRisk_Flag8 := IF(le.CityBorderStation OR le.CityFerryCrossing OR le.CityRailStation, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                           											
-		perGeoRisk_Flag7 := IF(le.CountyBordersForgeinJur, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);  
-		perGeoRisk_Flag6 := IF(~le.CountyBordersForgeinJur AND le.CountyBorderOceanForgJur, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                           			
-		perGeoRisk_Flag5 := IF(le.CountyHasHighCrimeIndex AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                           											
-		perGeoRisk_Flag4 := IF(le.CountyHasHighCrimeIndex, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                                                                                   
-		perGeoRisk_Flag3 := IF(le.HIFCA, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                                               
-		perGeoRisk_Flag2 := IF(le.HIDTA, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                                               
-		perGeoRisk_Flag1 := IF(~le.CountyHasHighCrimeIndex, DueDiligence.Constants.T_INDICATOR,DueDiligence.Constants.F_INDICATOR);                             
-	
+    perGeoRisk_Flag9 := IF(le.CountyHasHighCrimeIndex AND le.CountyBordersForgeinJur AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);										
+    perGeoRisk_Flag8 := IF(le.CityBorderStation OR le.CityFerryCrossing OR le.CityRailStation, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     												
+    perGeoRisk_Flag7 := IF(le.CountyBordersForgeinJur, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);       		
+    perGeoRisk_Flag6 := IF((~le.CountyBordersForgeinJur AND le.validFIPSCode) AND le.CountyBorderOceanForgJur, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);												
+    perGeoRisk_Flag5 := IF(le.CountyHasHighCrimeIndex AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                             												
+    perGeoRisk_Flag4 := IF(le.CountyHasHighCrimeIndex, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                    		                                                                 
+    perGeoRisk_Flag3 := IF(le.HIFCA, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  		
+    perGeoRisk_Flag2 := IF(le.HIDTA, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                           
+    perGeoRisk_Flag1 := IF(~le.CountyHasHighCrimeIndex AND le.censusRecordExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+   
 
-		perGeoRisk_Flag_final := DueDiligence.Common.calcFinalFlagField(perGeoRisk_Flag9,
+    perGeoRisk_Flag_final := DueDiligence.Common.calcFinalFlagField(perGeoRisk_Flag9,
                                                                     perGeoRisk_Flag8, 
                                                                     perGeoRisk_Flag7, 
                                                                     perGeoRisk_Flag6, 
@@ -218,6 +213,7 @@ EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
                                                                     perGeoRisk_Flag3, 
                                                                     perGeoRisk_Flag2, 
                                                                     perGeoRisk_Flag1); 
+    
 		
 		SELF.perGeographic_Flag := perGeoRisk_Flag_final;                                             
 		SELF.perGeographic := (STRING)(10-STD.Str.Find(perGeoRisk_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));          

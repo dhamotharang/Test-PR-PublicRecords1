@@ -63,7 +63,7 @@ EXPORT getIndInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := 
                                                                                 SELF.zip4 := RIGHT.zip4;
                                                                                 SELF := [];));
                                                                                                           
-                                      cleanedAddress := DueDiligence.CitDDShared.cleanAddress(tempAddress);
+                                      cleanedAddress := DueDiligence.CommonAddress.GetCleanAddress(tempAddress);
                                                                             
                                       SELF.address := cleanedAddress;
                                       SELF.ssn := RIGHT.ssn;

@@ -6,7 +6,7 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                          
     //mask best ssn for the report    
     Suppress.MAC_Mask(inData, maskedBestData, bestSSN, '', TRUE, FALSE,,,, ssnMask);
-    
+                                                                                        
 		fnGetKeyAddr1History(leftDS, fieldName) := FUNCTIONMACRO
 			addKeyAddr1History := JOIN(leftDS, Advo.Key_Addr1_history,  
                           LEFT.#EXPAND(fieldName).zip5 != '' AND 

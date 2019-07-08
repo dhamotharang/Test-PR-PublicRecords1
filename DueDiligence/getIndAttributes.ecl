@@ -72,7 +72,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
     indEstIncome := DueDiligence.getIndEstimatedIncome(didFound);
 
     //get geographic risk of the inquired individual's address  
-    indGeoRisk := DueDiligence.getIndGeographicRisk(indEstIncome, dppa, glba, includeReport);
+    indGeoRisk := DueDiligence.getIndGeographicRisk(indEstIncome);
 
     //get proffessional license
     indProfLic := DueDiligence.getIndProfessionalData(indGeoRisk);
