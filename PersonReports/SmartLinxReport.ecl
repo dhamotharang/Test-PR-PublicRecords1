@@ -191,8 +191,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
     boolean IsSubjectOwned;
     unsigned4 srt_date;
   end;
-  msearch := module (project (old_param, $.input.dummy_search, opt)) end; // msearch will fill in all the defaults (mainly, search), which I don't ever have when running a report
-  added_in_mod   := project(msearch, foreclosure_services.raw.params);
+  added_in_mod := project (mod_smartlinx, Foreclosure_Services.Raw.params);
 	nod            := Foreclosure_Services.Raw.REPORT_VIEW.by_did(dids,added_in_mod,true);
 	s_nod          := if (param.include_properties and not doxie.DataRestriction.Fares,nod,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
 	p_nod          := CHOOSEN (s_nod, iesp.constants.SMART.MaxNOD);

@@ -1,12 +1,13 @@
-﻿import doxie,doxie_cbrs,Foreclosure_services,Property, iesp, UT,AutoStandardI, BIPV2, MDR;
+import doxie, doxie_cbrs, Foreclosure_services, Property, UT, BIPV2, Suppress, MDR;
 	
 export Raw := module
 	 
-		export params := interface(AutoStandardI.InterfaceTranslator.application_type_val.params)
-			export string6 ssnmask;
-			export string5 IndustryClass;
-		end;
-		
+    EXPORT params := INTERFACE
+      EXPORT string5 industry_class := '';
+      EXPORT string32 application_type := Suppress.Constants.ApplicationTypes.DEFAULT;
+      EXPORT string ssn_mask := suppress.constants.ssn_mask_type.ALL;
+    END;
+
 		export Layouts.FIDNumberPlus byDIDs(dataset(doxie.layout_references) in_dids, boolean isNodSearch=false) := function		
 			deduped := dedup(sort(in_dids,did),did);
 			keyDID := if(isNodSearch,Property.Key_NOD_DID,Property.Key_Foreclosure_DID);
@@ -98,13 +99,13 @@ export Raw := module
        end;
 
 		export by_did (dataset(doxie.layout_references) in_dids, params in_mod, boolean isNodSearch=false) := function
-			recs:= GetRawRecs(byDIDs(in_dids,isNodSearch),isNodSearch, in_mod.IndustryClass);
+			recs:= GetRawRecs(byDIDs(in_dids,isNodSearch),isNodSearch, in_mod.industry_class);
 			rpt:=format_rpt(recs,in_mod);
 			return rpt;
 		end;
 
   export by_bdid (dataset(doxie_cbrs.layout_references) in_bdids, params in_mod, boolean isNodSearch=false) := function
-   recs:= GetRawRecs(byBDIDs(in_bdids,isNodSearch),isNodSearch, in_mod.IndustryClass);
+   recs:= GetRawRecs(byBDIDs(in_bdids,isNodSearch),isNodSearch, in_mod.industry_class);
 			rpt:=format_rpt(recs,in_mod);
 			return rpt;
   end;

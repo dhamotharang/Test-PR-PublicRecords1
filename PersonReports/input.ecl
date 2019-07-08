@@ -119,18 +119,12 @@ EXPORT input := MODULE
   export firearms := INTERFACE (ATF_Services.IParam.search_params)
   end;
 
-  export foreclosures := INTERFACE (Foreclosure_Services.ReportService_Records.params)
-  end;
-
   export huntingfishing := INTERFACE (Hunting_Fishing_Services.Search_Records.params)
   end;
 
   export liens := INTERFACE (_report)
     export string1 liens_party_type := '';
     export string50 tmsid_value := ''; // reserved for future needs if any
-  end;
-
-  export nod := INTERFACE (Foreclosure_Services.Records.params)
   end;
 
   export internetdomains := INTERFACE (InternetDomain_Services.SearchService_Records.params)

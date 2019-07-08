@@ -1,10 +1,14 @@
-﻿import ut, Census_Data, Foreclosure_services, iesp, suppress, AutoStandardI, MDR;
+import ut, Census_Data, Foreclosure_services, iesp, suppress, AutoStandardI, MDR;
 
 export Functions := module
 
-		export params := interface(AutoStandardI.InterfaceTranslator.application_type_val.params)
-			export string6 ssnmask;
-		end;
+//same as raw.params
+EXPORT params := INTERFACE
+  EXPORT string5 industry_class := '';
+  EXPORT string32 application_type := Suppress.Constants.ApplicationTypes.DEFAULT;
+  EXPORT string ssn_mask := suppress.constants.ssn_mask_type.ALL;
+END;
+
 EXPORT SetAddressFields(string primname, string primrange, string predir, string postdir,
 	                        string addrsuff, string unitdesig, string secrange, string pcityname,
 													string vcityname, string paramcity, string st, string zip, string zip4,
@@ -96,9 +100,9 @@ out_names_srt := dedup(sort(out_names_fltd,rec_seq,companyname, name.first, name
 out_names_dep_tmp:=project(sort(out_names_srt,rec_order),out_name_seq_rec);
 
 // suppression and masking: [defendants] only; [plaintiffs] is a free-flow text.
-Suppress.MAC_Suppress(out_names_dep_tmp,suppress_did,in_mod.applicationType,Suppress.Constants.LinkTypes.DID,uniqueid);
-Suppress.MAC_Suppress(suppress_did,suppress_ssn,in_mod.applicationType,Suppress.Constants.LinkTypes.SSN,ssn);
-suppress.MAC_Mask(suppress_ssn, out_names_dep, ssn, blank, true, false,,,,in_mod.ssnmask);
+Suppress.MAC_Suppress(out_names_dep_tmp,suppress_did,in_mod.application_type,Suppress.Constants.LinkTypes.DID,uniqueid);
+Suppress.MAC_Suppress(suppress_did,suppress_ssn,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+suppress.MAC_Mask(suppress_ssn, out_names_dep, ssn, blank, true, false,,,,in_mod.ssn_mask);
 	
 out_slim_seq_rec get_plaintiffs(out_slim_seq_w_tzone l, out_plaintiffs_dep r) := transform
 	self.plaintiffs := l.plaintiffs + dataset([{r.value}],
