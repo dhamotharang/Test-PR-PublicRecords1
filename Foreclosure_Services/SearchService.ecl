@@ -51,7 +51,6 @@
 <tr><td>true</td><td>false</td><td>zip, zilch, zero, zippo, zot, ...</td></tr>
 </table>
 */
-/*--USES-- ut.input_xslt */
 
 IMPORT iesp, AutoStandardI;
 
@@ -76,112 +75,18 @@ EXPORT SearchService := MACRO
   #stored ('IncludeNoticeOfDefaults',first_row.options.IncludeNoticeOfDefaults);
 
   input_params := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 	tempmod := module(project(input_params,Foreclosure_Services.Records.params,opt))  
     export string70 foreclosure_id := '' : stored ('ForeclosureId');
-		Export string32 applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
   end;
 
   boolean ExcludeForeclosures := false : STORED ('ExcludeForeclosures');
   boolean IncludeNoticeOfDefaults := false : STORED ('IncludeNoticeOfDefaults');
-  for := if(~ExcludeForeclosures,Foreclosure_Services.Records.val(tempmod,false, true));
-  nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.Records.val(tempmod,true, true));
+  for := if(~ExcludeForeclosures,Foreclosure_Services.Records.val(tempmod,mod_access,false));
+  nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.Records.val(tempmod,mod_access,true));
   tmp := sort(for+nod,if(AlsoFound,1,0),_penalty,-recordingdate,record);
 
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results (tmp, results, iesp.foreclosure.t_ForeclosureSearchResponse);
   output (results, named('Results'));
 ENDMACRO;
 // SearchService ();
-
-/*
-<!-- ForeclosureSearchRequest -->
-<dataset>
-  <row>
-    <remotelocations>
-      <value></value>
-    </remotelocations>
-    <servicelocations>
-      <locationid></locationid>
-      <servicename></servicename>
-      <parameters>
-        <name></name>
-        <value></value>
-      </parameters>
-    </servicelocations>
-    <user>
-      <referencecode></referencecode>
-      <billingcode></billingcode>
-      <queryid></queryid>
-      <companyid></companyid>
-      <glbpurpose></glbpurpose>
-      <dlpurpose></dlpurpose>
-      <loginhistoryid></loginhistoryid>
-      <debitunits></debitunits>
-      <ip></ip>
-      <industryclass></industryclass>
-      <resultformat></resultformat>
-      <logasfunction></logasfunction>
-      <ssnmask></ssnmask>
-      <dobmask></dobmask>
-      <dlmask></dlmask>
-      <datarestrictionmask></datarestrictionmask>
-      <datapermissionmask></datapermissionmask>
-      <ssnmaskingon></ssnmaskingon>
-      <dlmaskingon></dlmaskingon>
-      <enduser>
-        <companyname></companyname>
-        <streetaddress1></streetaddress1>
-        <city></city>
-        <state></state>
-        <zip5></zip5>
-      </enduser>
-      <maxwaitseconds></maxwaitseconds>
-      <relatedtransactionid></relatedtransactionid>
-      <accountnumber></accountnumber>
-    </user>
-    <searchby>
-      <name>
-        <full></full>
-        <first></first>
-        <middle></middle>
-        <last></last>
-        <suffix></suffix>
-        <prefix></prefix>
-      </name>
-      <address>
-        <streetname></streetname>
-        <streetnumber></streetnumber>
-        <streetpredirection></streetpredirection>
-        <streetpostdirection></streetpostdirection>
-        <streetsuffix></streetsuffix>
-        <unitdesignation></unitdesignation>
-        <unitnumber></unitnumber>
-        <streetaddress1></streetaddress1>
-        <streetaddress2></streetaddress2>
-        <state></state>
-        <city></city>
-        <zip5></zip5>
-        <zip4></zip4>
-        <county></county>
-        <postalcode></postalcode>
-        <statecityzip></statecityzip>
-      </address>
-      <ssn></ssn>
-      <companyname></companyname>
-    </searchby>
-    <options>
-      <blind></blind>
-      <encrypt></encrypt>
-      <strictmatch></strictmatch>
-      <maxresults></maxresults>
-      <usenicknames></usenicknames>
-      <includealsofound></includealsofound>
-      <usephonetics></usephonetics>
-      <penaltythreshold></penaltythreshold>
-      <returncount></returncount>
-      <startingrecord></startingrecord>
-      <ExcludeForeclosures></ExcludeForeclosures>
-      <IncludeNoticeOfDefaults></IncludeNoticeOfDefaults>
-    </options>
-  </row>
-</dataset>
-*/

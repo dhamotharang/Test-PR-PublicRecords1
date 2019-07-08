@@ -95,6 +95,8 @@ EXPORT Records := MODULE
 	END;
 
 	EXPORT PersonSummary(PublicProfileServices.IParam.searchParams rptByMod_new) := FUNCTION
+		mod_access := PROJECT (rptByMod_new, doxie.IDataAccess);
+
 		//create a module compatible with the old person-report
 		rptByMod := MODULE (PersonReports.input._report)
 			PersonReports.input.mac_copy_report_fields(rptByMod_new);
@@ -151,7 +153,8 @@ EXPORT Records := MODULE
 			veh_mod := VehicleV2_Services.IParam.GetReportModule ();
 			SELF.Vehicles := CHOOSEN(GLOBAL(iesp.transform_vehiclesV2(VehicleV2_Services.raw.get_vehicle_crs_report(veh_mod, dids))),iesp.Constants.BR.MaxVehicles);
 			SELF.FictitiousBusinesses := CHOOSEN(GLOBAL(doxie.Comp_FBN2Search(dids)),iesp.Constants.BR.MaxFictitiousBusinesses);
-			SELF.NoticesOfDefaults := CHOOSEN(GLOBAL(Foreclosure_Services.Records.val(nodMod,TRUE)),IESP.CONSTANTS.PUBLICPROFILE.MAX_NOTICE_OF_DEFAULTS);
+			SELF.NoticesOfDefaults := CHOOSEN(GLOBAL(Foreclosure_Services.Records.val(nodMod,mod_access,TRUE)),IESP.CONSTANTS.PUBLICPROFILE.MAX_NOTICE_OF_DEFAULTS);
+			SELF.Foreclosures := CHOOSEN(GLOBAL(Foreclosure_Services.ReportService_Records.val(forMod,mod_access)),IESP.CONSTANTS.PUBLICPROFILE.MAX_FORECLOSURES);
 			ucc_mode := module (project(rptByMod, PersonReports.input.ucc, opt)) 
 				export string1 ucc_party_type := 'D';
 			end;
@@ -194,7 +197,6 @@ EXPORT Records := MODULE
 			SELF.FirearmExplosives := CHOOSEN(GLOBAL(ATF_Services.SearchService_Records.report(atfMod)),iesp.Constants.BR.MaxFirearmsExplosives);
 			watercrafts_mod := module (project(rptByMod, PersonReports.input.watercrafts, opt)) end;
 			SELF.WaterCrafts := CHOOSEN(GLOBAL(PersonReports.Watercraft_Records(dids, watercrafts_mod).watercrafts_v2),iesp.Constants.BR.MaxWatercrafts);
-			SELF.Foreclosures := CHOOSEN(GLOBAL(Foreclosure_Services.ReportService_Records.val(forMod)),IESP.CONSTANTS.PUBLICPROFILE.MAX_FORECLOSURES);
 			pp_mod := module (project(rptByMod, PersonReports.input.phonesplus, opt)) end;
 			SELF.PhonesPluses := CHOOSEN(GLOBAL(PersonReports.phonesplus_records(dids, pp_mod).phonesplus_v2),iesp.Constants.BR.MaxPhonesPlus);
 			SELF.EmailAddresses := CHOOSEN(GLOBAL(PersonReports.email_records(dids,PROJECT(rptByMod,PersonReports.input.emails))),iesp.Constants.BR.MaxEmails);
