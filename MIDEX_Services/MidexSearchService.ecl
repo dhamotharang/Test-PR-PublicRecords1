@@ -48,7 +48,7 @@
 /*--INFO-- Search and return Midex information.*/
 // <message name="Midex DataPermissionMask: Position 8=1: Nonpublic included, 9=1: Freddie Mac included">
   
-IMPORT AutoStandardI, iesp;
+IMPORT AutoStandardI,doxie,iesp,MIDEX_Services;
 
 EXPORT MidexSearchService := 
   MACRO
@@ -118,9 +118,10 @@ EXPORT MidexSearchService :=
                                                       Midex_Services.Constants.AlertVersion.None);
 			EXPORT BOOLEAN   ReturnAllRecords        := alert_Input.ReturnAllRecords	: STORED('ReturnAllRecords');
     END;
-
-    ds_results := Midex_Services.MidexSearch_Records(tempmod);
-
+    
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
+    ds_results := Midex_Services.MidexSearch_Records(tempmod, mod_access);
+    
     OUTPUT(ds_results, NAMED('Results'));
 
   ENDMACRO;

@@ -1,11 +1,9 @@
-﻿IMPORT AutoStandardI, iesp, ut;
+﻿IMPORT doxie,iesp,MIDEX_Services,ut;
 
-EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) := 
+EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod,
+                              doxie.IDataAccess mod_access) := 
   FUNCTION
 	
-		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
-		application_type_value := AutoStandardI.InterfaceTranslator.application_type_val.val(project(in_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
-		
 		// Two possible report Ids can be passed, midex_rpt_num is for sanct(public and nonpublic) and 
 		// mari_rid is for professional license. 
 		
@@ -44,17 +42,20 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
 		ds_Sanctreport_ids := in_mod.MidexReportNumbers;
     
     // Get Non Public Sanction report(s)
-		nonPubAccess   := MIDEX_Services.Functions.fn_GetNonPubDataSources(in_mod.DataPermissionMask);
+		nonPubAccess   := MIDEX_Services.Functions.fn_GetNonPubDataSources(mod_access.DataPermissionMask);
     sanctNP_report := MIDEX_Services.Raw_NonPublic.License.Report_View.by_midex_rpt_num(ds_Sanctreport_ids,in_mod.AlertVersion,in_mod.SearchType,,,nonPubAccess);
 		
 		// Get Public sanction report(s)
-    sanctPub_report := MIDEX_Services.Raw_Public.License.Report_View.by_midex_rpt_num(ds_Sanctreport_ids,in_mod.AlertVersion,in_mod.SearchType,in_mod.ssnmask,in_mod.applicationType);
+    sanctPub_report := MIDEX_Services.Raw_Public.License.Report_View.by_midex_rpt_num(ds_Sanctreport_ids,
+                                                                                      mod_access,
+                                                                                      in_mod.AlertVersion,
+                                                                                      in_mod.SearchType);
 		
 		// Get Profesional License Mari report(s)
 		profLic_report := MIDEX_Services.Raw_ProfessionalLicenses.License.Report_View.by_mari_num(ds_Profreport_ids, 
                                                                                               in_mod.AlertVersion, 
-                                                                                              in_mod.ssnmask, 
-                                                                                              in_mod.applicationType, 
+                                                                                              mod_access.ssn_mask,         // \
+                                                                                              mod_access.application_Type, // / will delete these when doing the professional license code
                                                                                               IF(in_mod.isLicenseOnlyReport,MIDEX_Services.Constants.ALL_LICENSES_SEARCH,in_mod.searchType));
 																																															
           // removed (Dedup, DS, all ) so as not to resort the data set that is returned from the 3 DS's being added together.
