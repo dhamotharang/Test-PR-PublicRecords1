@@ -82,8 +82,8 @@ EXPORT SearchService := MACRO
 
   boolean ExcludeForeclosures := false : STORED ('ExcludeForeclosures');
   boolean IncludeNoticeOfDefaults := false : STORED ('IncludeNoticeOfDefaults');
-  for := if(~ExcludeForeclosures,Foreclosure_Services.Records.val(tempmod,mod_access,false));
-  nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.Records.val(tempmod,mod_access,true));
+  for := if(~ExcludeForeclosures,Foreclosure_Services.Records.val(tempmod,mod_access,false,true));
+  nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.Records.val(tempmod,mod_access,true,true));
   tmp := sort(for+nod,if(AlsoFound,1,0),_penalty,-recordingdate,record);
 
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results (tmp, results, iesp.foreclosure.t_ForeclosureSearchResponse);
