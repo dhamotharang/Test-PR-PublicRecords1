@@ -123,6 +123,8 @@ daily_ssns := join(keep_trecs, jdirty, left.did=right.did and left.ssn = right.s
 									 transform(ssn_people_plus, 
 														 self.date_ob := left.dob, 
 														 self.dead := left.tnt = 'D',
+														 self.global_sid:= right.global_sid,
+														 self.record_sid:= right.record_sid,
 														 self := left), 
 									 left only);
 combined := jdirty+daily_ssns;
