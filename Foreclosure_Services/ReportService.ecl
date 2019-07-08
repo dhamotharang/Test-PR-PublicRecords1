@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService">
 	<part name="ExcludeForeclosures"     type="xsd:boolean"/>
 	<part name="IncludeNoticeOfDefaults" type="xsd:boolean"/>
@@ -66,8 +66,8 @@ export ReportService := macro
 	
 	boolean ExcludeForeclosures := false : stored('ExcludeForeclosures');
 	boolean IncludeNoticeOfDefaults := false : stored('IncludeNoticeOfDefaults');
-	for := if(~ExcludeForeclosures,Foreclosure_Services.ReportService_Records.val(tempmod,false));
-	nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.ReportService_Records.val(tempmod,true));
+	for := if(~ExcludeForeclosures,Foreclosure_Services.ReportService_Records.val(tempmod,false, true));
+	nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.ReportService_Records.val(tempmod,true, true));
 	raw_records := sort(for+nod,-recordingdate,record);
 
   // attach standard ESP header

@@ -1,4 +1,4 @@
-﻿import doxie,doxie_cbrs,Foreclosure_services,Property, iesp, Census_Data, Codes,UT,AutoStandardI, BIPV2;
+﻿import doxie,doxie_cbrs,Foreclosure_services,Property, iesp, UT,AutoStandardI, BIPV2, MDR;
 	
 export Raw := module
 	 
@@ -48,12 +48,16 @@ export Raw := module
 		
 
 	export Layouts.Rawrec GetRawRecs(dataset(Layouts.FIDNumberPlus) ids, boolean isNodSearch=false,
-																																		string5 IndustryClass = '') :=function
+																																		string5 IndustryClass = '', boolean includeBlackKnight=false) :=function
 																																		
 			isCNSMR := IndustryClass = ut.IndustryClass.Knowx_IC;
 			keyFID := if(isNodSearch,Property.Key_NOD_FID,Property.Key_Foreclosures_FID);
+			
+			isBkAllowed := (includeBlackKnight and (not doxie.DataRestriction.BlackKnight));
+			
 			recs_info := join(ids,keyFID,
-		             keyed(left.fid =  right.fid),
+		             keyed(left.fid =  right.fid) AND
+								 if (isBkAllowed, true, right.source=MDR.sourceTools.src_Foreclosures),
 											transform(Foreclosure_Services.Layouts.Rawrec,	
 													 self.foreclosure_id :=left.fid,
 																self:=right,  // set for use later.
@@ -63,16 +67,16 @@ export Raw := module
 	return recs;
 	end;
 	
-		export Layouts.FIDNumberPlus byforeclosureid(dataset(Layouts.FIDNumberPlus) in_foreclosure_id, boolean isNodSearch=false) := function
-			deduped := dedup(sort(in_foreclosure_id,fid),fid);
-			joinup := project(GetRawRecs(deduped,isNodSearch),transform(Layouts.FIDNumberPlus,														 
-															 self.fid  := left.foreclosure_id,
-															 self.bdid := 0,
-															 self.did := 0));
-													
-			return joinup;
-		end;
-
+ export Layouts.FIDNumberPlus byforeclosureid(dataset(Layouts.FIDNumberPlus) in_foreclosure_id, boolean isNodSearch=false, boolean includeBlackKnight=false) := function
+   			deduped := dedup(sort(in_foreclosure_id,fid),fid);
+   			joinup := project(GetRawRecs(deduped,isNodSearch,,includeBlackKnight),transform(Layouts.FIDNumberPlus,														 
+   															 self.fid  := left.foreclosure_id,
+   															 self.bdid := 0,
+   															 self.did := 0));
+   													
+   			return joinup;
+   		end;
+		
 	// ================================================================
   // Returns data in the IESP format for report view 
   // ================================================================
@@ -85,12 +89,14 @@ export Raw := module
 			return rpt_fmt;
 		end;
 		
-		export by_fid (dataset(Layouts.layout_fid) in_fids, params in_mod, boolean isNodSearch=false) := function
-   fids_tmp:=project(in_fids,transform(Layouts.FIDNumberPlus,self:=left,self.did:=0,self.bdid:=0));
-			recs:= GetRawRecs(byforeclosureid(fids_tmp,isNodSearch),isNodSearch);
-			rpt:=format_rpt(recs,in_mod);
-			return rpt;
-    end;
+ 		export by_fid (dataset(Layouts.layout_fid) in_fids, params in_mod, boolean isNodSearch=false,
+   																			 boolean includeBlackKnight=false) := function
+      fids_tmp:=project(in_fids,transform(Layouts.FIDNumberPlus,self:=left,self.did:=0,self.bdid:=0));
+   			recs:= GetRawRecs(byforeclosureid(fids_tmp,isNodSearch,includeBlackKnight),isNodSearch,,includeBlackKnight);
+   			rpt:=format_rpt(recs,in_mod);
+   			return rpt;
+       end;
+
 		export by_did (dataset(doxie.layout_references) in_dids, params in_mod, boolean isNodSearch=false) := function
 			recs:= GetRawRecs(byDIDs(in_dids,isNodSearch),isNodSearch, in_mod.IndustryClass);
 			rpt:=format_rpt(recs,in_mod);

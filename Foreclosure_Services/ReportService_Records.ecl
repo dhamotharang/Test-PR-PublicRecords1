@@ -1,4 +1,4 @@
-import AutoStandardI,Foreclosure_Services,ut,doxie,property,iesp,suppress;
+﻿import AutoStandardI,Foreclosure_Services,doxie,iesp,suppress;
 
 export ReportService_Records := module
 	export params := interface(
@@ -8,7 +8,7 @@ export ReportService_Records := module
 		AutoStandardI.InterfaceTranslator.dppa_purpose.params)
 		EXPORT string6 ssnmask;
 	end;
-	export val(params in_mod, boolean isNodSearch=false) := function
+	export val(params in_mod, boolean isNodSearch=false, boolean includeBlackKnight=false) := function
 		
 
 		ids := Foreclosure_services.ReportService_IDs.val(in_mod,isNodSearch);
@@ -17,10 +17,12 @@ export ReportService_Records := module
 		
 		recs:= project(ids_tmp,Layouts.layout_fid);
 		added_in_mod := project(in_mod, raw.params);
-		recs_fmt := Foreclosure_Services.Raw.REPORT_VIEW.by_fid(recs,added_in_mod,isNodSearch);
-		
+        recs_fmt := Foreclosure_Services.Raw.REPORT_VIEW.by_fid(recs,added_in_mod,isNodSearch,includeBlackKnight);
+
 		recs_sort := sort(recs_fmt, -recordingdate.year, -recordingdate.month, -recordingdate.day,record);
-    tempresults_slim := project(recs_sort, iesp.foreclosure.t_ForeclosureReportRecord); 
-		return if(not doxie.DataRestriction.Fares,tempresults_slim,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
+  		tempresults_slim := project(recs_sort, iesp.foreclosure.t_ForeclosureReportRecord); 
+	 
+		return if(not doxie.DataRestriction.Fares,tempresults_slim,tempresults_slim(VendorSource!=Foreclosure_services.Constants('').src_Fares));
+		
 		end;
 end;
