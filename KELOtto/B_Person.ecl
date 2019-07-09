@@ -709,7 +709,7 @@ EXPORT B_Person := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE633448 := JOIN(__EE615049,__EE633441,__JC633447(LEFT,RIGHT),__JT633447(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE633448 := JOIN(__EE615049,__EE633441,__JC633447(LEFT,RIGHT),__JT633447(LEFT,RIGHT),LEFT OUTER,SMART);
   SHARED __EE632921 := __EE625570;
   SHARED __EE632894 := __EE520399;
   SHARED __EE633606 := __EE632894(__EE632894.Ip_Tor_ = 1);
@@ -7885,7 +7885,7 @@ EXPORT B_Person := MODULE
     SELF.Cl_High_Kr_Identity_Top10_ := MAP(__T(__OP2(__CN(__PP655158.Cl_High_Kr_Identity_Percent_),>,__PP655158.P_E_R_C_E_N_T_I_L_E___Cl_High_Kr_Identity_Percent_))=>1,0);
     SELF.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Top10_ := MAP(__T(__OP2(__CN(__PP655158.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Percent_),>,__PP655158.P_E_R_C_E_N_T_I_L_E___Cl_High_Risk_Death_Prior_To_All_Events_Identity_Percent_))=>1,0);
     SELF.Cl_High_Risk_Pattern1_Flag_ := MAP(__PP655158.Cl_Identity_Count_ > 9=>1,0);
-    SELF.Cl_High_Risk_Pattern2_Flag_ := MAP(__PP655158.Cl_Nas9_Identity_Count_ > 3 AND __PP655158.Cl_Nap3_Identity_Count_ > 0=>1,0);
+    SELF.Cl_High_Risk_Pattern2_Flag_ := MAP(__PP655158.Cl_Nas9_Identity_Count_ > 10 AND __PP655158.Cl_Nap3_Identity_Count_ > 0=>1,0);
     SELF.Cl_High_Risk_Pattern3_Flag_ := MAP(__PP655158.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Count_ > 0=>1,0);
     SELF.Cl_High_Risk_Pattern4_Flag_ := MAP(__PP655158.Cl_Ip_High_Risk_Identity_Count_ > 4=>1,0);
     SELF.Cl_High_Risk_Pattern5_Flag_ := MAP(__PP655158.Cl_High_Kr_Identity_Count_ > 4=>1,0);
