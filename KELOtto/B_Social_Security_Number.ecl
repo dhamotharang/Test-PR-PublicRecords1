@@ -791,7 +791,7 @@ EXPORT B_Social_Security_Number := MODULE
     SELF.Cluster_Score_ := 0;
     SELF.Contributor_Safe_Flag_ := MAP(__PP688013.C_O_U_N_T___Exp1_ <> 0=>1,0);
     SELF.Customer_Id_ := __PP688013.Customer_Id__1_;
-    SELF.Entity_Context_Uid_ := __OP2(__CN('_15'),+,__PP688013.Ssn_);
+    SELF.Entity_Context_Uid_ := __OP2(__CN('_15'),+,__PP688013.Otto_S_S_N_Id_);
     SELF.Entity_Type_ := 15;
     SELF.Event_Count_ := __PP688013.C_O_U_N_T___Ssn_Event_;
     SELF.Hri06_Flag_ := MAP(__PP688013.C_O_U_N_T___Exp1__1_ <> 0=>1,0);
