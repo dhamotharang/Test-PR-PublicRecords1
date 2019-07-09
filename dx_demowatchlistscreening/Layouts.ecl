@@ -1,8 +1,6 @@
-﻿import dx_demowatchlistscreening;
-
-EXPORT Layouts := module
+﻿EXPORT layouts := module
 	
-export matches_entity_name := record
+export matches_entity_name_layout := record
 	String50	Block_ID;
 	String50	Error_Message;
 	String50	Warning_Message;
@@ -376,7 +374,6 @@ export matches_entity_name := record
 	String50	Matches_Descriptions_Type_5;
 	String50	Matches_Descriptions_Value_5;
 	String100	Matches_Descriptions_Notes_5;
-
-	end;
+end;
 
 end;
