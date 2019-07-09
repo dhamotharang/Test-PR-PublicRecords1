@@ -5,6 +5,8 @@ EXPORT Get_ids
   (boolean workHard = true, boolean noFail = false, boolean IncludeDeepDives = false, 
    boolean is_CompSearchL = false) := FUNCTION
 
+  outrec := Sanctn_Services.layouts.search_ids;
+
   // by autokey
 	ak_keyname := SANCTN_Services.Constants.ak_keyname;
 	ak_typeStr := SANCTN_Services.Constants.ak_typeStr;
@@ -19,23 +21,12 @@ EXPORT Get_ids
 	end;
 	ids := autokeyi.AutoKeyStandardFetch(tempmod).ids;
 
-  // create layout for autokeys
-  layout_autokey_app := RECORD (SANCTN.layout_autokeys)
-    integer zero := 0;
-    string0 blk  := '';
-//    unsigned6 fdid := 0;
-  END;
-  ds := DATASET ([], layout_autokey_app);
+  ds := DATASET ([], RECORDOF(SANCTN.Key_SANCTN_autokey_payload));
 
   // Get IDs from autokeys 
-  AutokeyB2.mac_get_payload (ids, ak_keyname, ds, outPLfat, 0, 0, ak_typeStr);
-  
-  // CCPA - because there is company and individual info in a single record,
-  //        suppression of fields needs to be done at the payload transform 
-  //        Here, only IDs are being returned.
-  by_autokey := 
-    PROJECT(outPLfat, Sanctn_Services.layouts.search_ids);
+  AutokeyB2.mac_get_payload (ids, ak_keyname, ds, outPLfat, 0, 0, ak_typeStr,fakeid);
 
+	by_autokey := project (outPLfat, outrec);
 /*
   outpl := project (outPLfat, {outPLfat.id, outPLfat.did, outPLfat.bdidL, outPLfat.batch_number, outPLfat.incident_number});
 	by_auto := project(outpl, outrec);
