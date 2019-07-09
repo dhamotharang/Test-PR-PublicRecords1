@@ -73,7 +73,11 @@ module
 
 		{inputs} RollupUpdate({inputs} l, {inputs} r) := 
 		transform
+<<<<<<< HEAD
 			SELF.Unique_Id := if(l.Unique_Id < r.Unique_Id,l.Unique_Id, r.Unique_Id); // leave always previous Unique_Id 
+=======
+			SELF.source_rec_id := if(l.source_rec_id < r.source_rec_id,l.source_rec_id, r.source_rec_id); // leave always previous source_rec_id 
+>>>>>>> ThorProd
 			self := l;
 		end;
 

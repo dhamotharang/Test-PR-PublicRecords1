@@ -18,5 +18,8 @@
     nonglb_noneq_nonblank    = 10000000000000b,
     marketing                = 100000000000000b, 
     marketing_preglb         = 1000000000000000b, 
-    infutor                  = 10000000000000000b);
+    infutor                  = 10000000000000000b,
+		nonglb_teaser            = 100000000000000000b,
+		nonglb_noneq_teaser      = 1000000000000000000b);
 end;
+

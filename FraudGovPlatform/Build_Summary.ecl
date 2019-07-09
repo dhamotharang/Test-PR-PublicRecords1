@@ -90,7 +90,7 @@ EXPORT Build_Summary(string pversion) := MODULE
 
 	Source_Comparison := join (Source_Loaded_before, Source_Loaded_after,
 		left.Customer_ID = right.Customer_ID and left.source = right.source,
-		 transform({ string Customer_ID, string source, unsigned6 cnt_before, unsigned6 cnt_after, unsigned6 new_records}, 
+		 transform({ string Customer_ID, string source, unsigned6 cnt_before, unsigned6 cnt_after, integer new_records}, 
 		self.Customer_ID := right.Customer_ID;
 		self.source := right.source;
 		self.cnt_before := left.cnt_before;

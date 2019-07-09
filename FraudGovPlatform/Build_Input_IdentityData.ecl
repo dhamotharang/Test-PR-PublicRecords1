@@ -119,6 +119,25 @@ module
 			or (_Validate.Date.fIsValid(Date_of_Transaction) = false  or (unsigned)Date_of_Transaction > (unsigned)(STRING8)Std.Date.Today())
 		);
 
+<<<<<<< HEAD
+=======
+		shared fn_dedup(inputs):=FUNCTIONMACRO
+			in_dst := inputs;
+			in_srt := sort(in_dst , Customer_Job_ID,Batch_Record_ID,transaction_id,Reason_Description,Date_of_Transaction,Rawlinkid,raw_Full_Name,raw_Title,raw_First_name,raw_Middle_Name,raw_Last_Name,raw_Orig_Suffix,SSN,SSN4,Address_Type,Street_1,Street_2,City,State,Zip,Mailing_Street_1,Mailing_Street_2,Mailing_City,Mailing_State,Mailing_Zip,County,Contact_Type,phone_number,Cell_Phone,dob,Email_Address,Drivers_License_State,Drivers_License,Bank_Routing_Number_1,Bank_Account_Number_1,Bank_Routing_Number_2,Bank_Account_Number_2,Ethnicity,Race,Household_ID,Customer_Person_ID,Head_of_Household_indicator,Relationship_Indicator,IP_Address,Device_ID,Unique_number,MAC_Address,Serial_Number,Device_Type,Device_identification_Provider, geo_lat,geo_long,filename);
+			{inputs} RollupUpdate({inputs} l, {inputs} r) := 
+			transform
+					SELF.source_rec_id := if(l.source_rec_id < r.source_rec_id,l.source_rec_id, r.source_rec_id); // leave always previous Unique_Id 
+					self := l;
+			end;
+
+			in_ddp := rollup( in_srt
+					,RollupUpdate(left, right)
+					,Customer_Job_ID,Batch_Record_ID,transaction_id,Reason_Description,Date_of_Transaction,Rawlinkid,raw_Full_Name,raw_Title,raw_First_name,raw_Middle_Name,raw_Last_Name,raw_Orig_Suffix,SSN,SSN4,Address_Type,Street_1,Street_2,City,State,Zip,Mailing_Street_1,Mailing_Street_2,Mailing_City,Mailing_State,Mailing_Zip,County,Contact_Type,phone_number,Cell_Phone,dob,Email_Address,Drivers_License_State,Drivers_License,Bank_Routing_Number_1,Bank_Account_Number_1,Bank_Routing_Number_2,Bank_Account_Number_2,Ethnicity,Race,Household_ID,Customer_Person_ID,Head_of_Household_indicator,Relationship_Indicator,IP_Address,Device_ID,Unique_number,MAC_Address,Serial_Number,Device_Type,Device_identification_Provider, geo_lat,geo_long,filename
+					,local
+			);
+			return in_ddp;
+	ENDMACRO;	
+>>>>>>> ThorProd
 	//Exclude Errors
 	shared f1_bypass_dedup:= fn_dedup(ByPassed_IdentityData_Sprayed + PROJECT(NotInMbs + f1_errors,FraudGovPlatform.Layouts.Input.IdentityData));
 	

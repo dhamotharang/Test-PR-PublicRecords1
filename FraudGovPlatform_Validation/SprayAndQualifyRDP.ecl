@@ -18,10 +18,17 @@ EXPORT SprayAndQualifyRDP(
 			 function_name = 'VERIFICATION'
 			 //(unsigned)STD.Str.FindReplace( STD.Str.FindReplace( date_added,':',''),'-','')[1..8] = (unsigned)DateSearch
 		);
+<<<<<<< HEAD
 			
 	fname	:= 'rdp_' + pVersion[1..8];
 	FileSprayed := FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
 	InquiryLogs_Sprayed := FraudGovPlatform.Filenames().Sprayed.RDP;
+=======
+
+	FileSprayed := (string)(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ Customer_Settings[1].Customer_Account_Number + '_' + Customer_Settings[1].Customer_State + '_' + Customer_Settings[1].Customer_Agency_Vertical_Type + '_' + Customer_Settings[1].Customer_Program + '_' + trim(Customer_Settings[1].Contribution_Source) + '_' + DateSearch + '_' + Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S')):independent ;
+	
+	RDP_Sprayed := FraudGovPlatform.Filenames().Sprayed.RDP;
+>>>>>>> ThorProd
 	
 	tools.mac_WriteFile(FileSprayed,
 									RDP_Logs,

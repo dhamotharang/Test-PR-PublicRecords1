@@ -104,6 +104,7 @@ module
 		self.additional_address.Zip := left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
 		self.additional_address.address_1 := left.mailing_address_1;
+<<<<<<< HEAD
 		self.additional_address.address_2 := left.mailing_address_2;		
 		self.Household_ID := left.Case_ID;
 		self.Customer_Person_ID := (string)left.Client_uid;
@@ -112,6 +113,10 @@ module
 		self.classification_Permissible_use_access.file_type := left.file_type;
 		self.classification_source.Source_type_id := left.file_type;
 		self.classification_source.Source_type := FraudShared.MBS_CVD(column_name = 'FILE_TYPE' and status = 1 and desc_value = (unsigned2)left.file_type )[1].description;;
+=======
+		self.additional_address.address_2 := left.mailing_address_2;
+		self.classification_Activity.Confidence_that_activity_was_deceitful_id	:= (unsigned2)left.deceitful_confidence;
+>>>>>>> ThorProd
 		self:= left; 
 		self:= [];
 	)); 

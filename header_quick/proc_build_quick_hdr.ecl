@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck;
 
 export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',string leMailTargetScoring='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com') := function
@@ -12,6 +13,27 @@ export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lex
 										 
 	            		
 //	RoxieKeyBuild.Mac_Daily_Email_Local('QUICK HEADER','SUCC',filedate,send_succ_msg,leMailTarget);
+=======
+﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck,dx_header;
+
+EXPORT proc_build_quick_hdr(
+	STRING filedate, 
+	STRING leMailTarget='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',
+	STRING leMailTargetScoring='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com'
+) := FUNCTION
+
+	versionCheck := IF(
+		filedate[1..6] = ut.GetDate[1..6] AND (header.Sourcedata_month.v_version[1..6] = filedate[1..6] OR header.Sourcedata_month.v_eq_as_of_date[1..6] = filedate[1..6]),
+		OUTPUT('The version dates are good'),
+		FAIL('Either the filedate or the header.Sourcedata_month date or both are not good')
+	);
+
+	SuccessBody := IF(
+		VersionControl.IsValidVersion(filedate),
+		'Quick Header ' + filedate + ' is ready for CERT deployment, please respond immediately if we can send to cert',''
+	);
+
+>>>>>>> ThorProd
 	RoxieKeyBuild.Mac_Daily_Email_Local('QUICK HEADER','FAIL see workunit:'+workunit,filedate,send_fail_msg,leMailTarget);
 	
 	dops_FCRA_QH	:= roxiekeybuild.updateversion('FCRA_QuickHeaderKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'F');
@@ -157,6 +179,7 @@ rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 	//***//***//***//*** END SUPPRESSION TEXT ***//***//***//***//
 
 	fSendMail(string pSubject, string pBody) := fileservices.sendemail(leMailTarget,pSubject,pBody);
+<<<<<<< HEAD
 	
   weekly_handling := sequential(output(header.file_header_in_weekly.File,,'~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date',__compressed__),
 																fileservices.addsuperfile('~thor400_84::in::eq_weekly_with_as_of_date2','~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date'),
@@ -189,3 +212,82 @@ DeltaCommands:= sequential(
 										,DeltaCommands
 										);										 
 end;
+=======
+
+	weekly_handling := SEQUENTIAL(
+		OUTPUT(header.file_header_in_weekly.File,,'~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date',__compressed__),
+		fileservices.addsuperfile('~thor400_84::in::eq_weekly_with_as_of_date2','~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date'),
+		fileservices.addsuperfile('~thor400_84::in::eq_weekly_history','~thor400_84::in::eq_weekly',,true),
+		fileservices.clearsuperfile('~thor400_84::in::eq_weekly')
+	);
+
+	//Persistence and Growth Checks
+	GetDops:=dops.GetDeployedDatasets('P','B','F');
+	OnlyQuickHeader:=GetDops(datasetname='FCRA_QuickHeaderKeys ');
+	father_filedate := OnlyQuickHeader[1].buildversion;
+	SET OF STRING Key_QuickHeader_InputSet:=['fname','lname','name_suffix','prim_range','prim_name','sec_range','city_name','st','zip','dob','ssn','mname','phone','src'];
+	header_quick_index := header_quick.FN_key_DID(DATASET([],dx_header.Layout_Header), '~thor_data400::key::headerquick::fcra::'+filedate+'::did');
+	DeltaCommands:= SEQUENTIAL(
+		DOPSGrowthCheck.CalculateStats(
+			'FCRA_QuickHeaderKeys ',
+			'header_quick_index',
+			'Key_QuickHeader',
+			'~thor_data400::key::headerquick::fcra::'+filedate+'::did',
+			'did',
+			'persistent_record_ID','','','','',
+			filedate,father_filedate,
+			true,
+			true
+		),
+		DOPSGrowthCheck.DeltaCommand(
+			'~thor_data400::key::headerquick::fcra::'+filedate+'::did',
+			'~thor_data400::key::headerquick::fcra::'+father_filedate+'::did',
+			'FCRA_QuickHeaderKeys ',
+			'Key_QuickHeader',
+			'header_quick_index',
+			'persistent_record_ID',
+			filedate,
+			father_filedate,
+			Key_QuickHeader_InputSet,
+			true,
+			true
+		),
+		DOPSGrowthCheck.ChangesByField(
+			'~thor_data400::key::headerquick::fcra::'+filedate+'::did',
+			'~thor_data400::key::headerquick::fcra::'+father_filedate+'::did',
+			'FCRA_QuickHeaderKeys ',
+			'Key_QuickHeader',
+			'header_quick_index',
+			'persistent_record_ID','',
+			filedate,father_filedate,
+			true,
+			true
+		),
+		DopsGrowthCheck.PersistenceCheck(
+			'~thor_data400::key::headerquick::fcra::'+filedate+'::did',
+			'~thor_data400::key::headerquick::fcra::'+father_filedate+'::did',
+			'FCRA_QuickHeaderKeys ',
+			'Key_QuickHeader',
+			'header_quick_index',
+			'persistent_record_ID',
+			Key_QuickHeader_InputSet,
+			Key_QuickHeader_InputSet,
+			filedate,
+			father_filedate,
+			true,
+			true
+		)
+	);
+
+	RETURN SEQUENTIAL(
+		weekly_handling,
+		roxie_keys,
+		Proc_Accept_SRC_toQA(filedate),
+		proc_build_ssn_suppression(filedate),
+		proc_build_current_wa_residents_file,
+		SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs),
+		//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
+		DeltaCommands
+	);
+END;
+>>>>>>> ThorProd
