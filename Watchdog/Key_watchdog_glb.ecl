@@ -1,8 +1,18 @@
-﻿import Watchdog_V2,doxie,Data_Services;
+﻿import Watchdog_V2,doxie,Data_Services,dx_BestRecords;
+
+
+EXPORT GlbLayout := RECORD
+Watchdog.Layout_Key-[__filepos];
+unsigned8 filepos;
+END;
+
+
 
 Parms := Module(Watchdog_V2.UniversalKeyInterface)
 EXPORT Permissions := Watchdog_V2.fn_UniversalKeySearch.PermissionsType.glb;
 END;
 
-export Key_Watchdog_glb :=Watchdog_V2.fn_UniversalKeySearch.FetchRecords(Parms);
+FilterDS :=Watchdog_V2.fn_UniversalKeySearch.FetchRecords(Parms);
+
+EXPORT Key_Watchdog_glb := PROJECT(FilterDS,TRANSFORM(GlbLayout,SELF :=LEFT));
 
