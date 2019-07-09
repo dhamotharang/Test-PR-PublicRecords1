@@ -1,6 +1,6 @@
 ﻿import lib_fileservices, ut, header_services, doxie,_Control,header, Data_Services,Watchdog_V2;
 
-EXPORT GlbnonExperiannonEquifaxLayout := RECORD
+GlbnonExperiannonEquifaxLayout := RECORD
 Watchdog.Layout_Key-[__filepos];
 unsigned8 filepos;
 END;

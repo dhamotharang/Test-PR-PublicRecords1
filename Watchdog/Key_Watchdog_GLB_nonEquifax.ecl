@@ -1,7 +1,7 @@
 ﻿import lib_fileservices, ut, header_services, doxie,_Control,header,Data_Services,Watchdog_V2;
 
 
-EXPORT GlbNoneqLayout := RECORD
+GlbNoneqLayout := RECORD
 Watchdog.Layout_Key-[__filepos];
 unsigned8 filepos;
 END;

@@ -1,6 +1,6 @@
 ﻿IMPORT doxie,data_services,Watchdog_V2;
 
-EXPORT GlbnonutilnonblankLayout := RECORD
+GlbnonutilnonblankLayout := RECORD
 Watchdog.Layout_Key-[__filepos];
 unsigned8 filepos;
 END;

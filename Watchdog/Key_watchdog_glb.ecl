@@ -1,7 +1,7 @@
 ﻿import Watchdog_V2,doxie,Data_Services,dx_BestRecords;
 
 
-EXPORT GlbLayout := RECORD
+GlbLayout := RECORD
 Watchdog.Layout_Key-[__filepos];
 unsigned8 filepos;
 END;
