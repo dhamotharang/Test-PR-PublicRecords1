@@ -1,4 +1,4 @@
-IMPORT bipv2,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS, Prof_License_Mari,std;
+﻿IMPORT bipv2,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS, Prof_License_Mari,std;
 #OPTION('multiplePersistInstances',FALSE);
 
 export party_did(dataset(recordof(layout_SANCTN_party_clean)) j_party_toclean ) := function
@@ -119,12 +119,10 @@ Business_Header_SS.MAC_Match_Flex(
 																	,FALSE
 																	);
 
-out4 := PROJECT(bdid_out, SANCTN.layout_SANCTN_did);
+out4 := PROJECT(bdid_out, transform(SANCTN.layout_SANCTN_did, self.global_sid := 22811; self := left));
 
 dsSanctn_did := out4  : PERSIST(SANCTN.cluster +'persist::SANCTN::party_did_new2');
 
 return dsSanctn_did;
 
 end;
-
-
