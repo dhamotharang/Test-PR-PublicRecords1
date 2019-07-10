@@ -1236,18 +1236,22 @@ CleanAddress: => VelBusAcctPerAddrInProgCnt := MAP(COUNT(EmployerAddr.rEmployer(
 */
 Legal: => AccountNumberCount := COUNT(AccountNumbers);
 Legal: => ClaimCount := COUNT(LegalClaim);
-Legal: => BusNewestRecordDt := 20190213; // fixme. Need updated when new iterations of data come in
+Legal: => BusNewestRecordDt := 20190701; // fixme. Need updated when new iterations of data come in
 Legal: => NewestUnemClmDt := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, // No valid claim dates
 																 INTEGER(MAX(LegalClaim.rClaim, claim_submit_ccyymmdd)));
 Legal: => OldestUnemClmDt := MAP(ALL(LegalClaim.rClaim, ClaimAge=-99998) => -99997, // No valid claim dates
 																 INTEGER(MIN(LegalClaim.rClaim, claim_submit_ccyymmdd)));
-Legal: => NewestTaxLiabEndDt := MAP(ALL(LegalEmployer.rEmployer, liabtermdate:Null OR (NOT ISVALIDDATE(liabtermdate))) => -99998, // No valid liabtermdate
-																 INTEGER(MAX(LegalEmployer.rEmployer, liabtermdate)));
-Legal: => OldestTaxLiabEndDt := MAP(ALL(LegalEmployer.rEmployer, liabtermdate:Null OR (NOT ISVALIDDATE(liabtermdate))) => -99998, // No valid liabtermdate
-																 INTEGER(MIN(LegalEmployer.rEmployer, liabtermdate)));				
-Legal: => NewestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null OR (NOT ISVALIDDATE(dateliabest))) => -99998, // No valid dateliabest
-																 INTEGER(MAX(LegalEmployer.rEmployer, dateliabest)));
-Legal: => OldestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null OR (NOT ISVALIDDATE(dateliabest))) => -99998, // No valid dateliabest
+Legal: => NewestTaxLiabEndDt := MAP(ALL(LegalEmployer.rEmployer, liabtermdate:Null) => -99998,
+                                    ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(liabtermdate)) => -99998, // No valid liabtermdate
+																    INTEGER(MAX(LegalEmployer.rEmployer, liabtermdate)));
+Legal: => OldestTaxLiabEndDt := MAP(ALL(LegalEmployer.rEmployer, liabtermdate:Null) => -99998,
+                                    ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(liabtermdate)) => -99998, // No valid liabtermdate
+																    INTEGER(MIN(LegalEmployer.rEmployer, liabtermdate)));				
+Legal: => NewestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null) => -99998,
+                                      ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(dateliabest)) => -99998, // No valid dateliabest
+																      INTEGER(MAX(LegalEmployer.rEmployer, dateliabest)));
+Legal: => OldestTaxLiabStartDt := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null) => -99998,
+                                      ALL(LegalEmployer.rEmployer, NOT ISVALIDDATE(dateliabest)) => -99998, // No valid dateliabest
 																 INTEGER(MIN(LegalEmployer.rEmployer, dateliabest)));			
 Legal: => TaxLiabOngoingFlag := MAP(ALL(LegalEmployer.rEmployer, dateliabest:Null OR (NOT ISVALIDDATE(dateliabest))) => -99998, // No valid dateliabest
 																				 ALL(LegalEmployer.rEmployer, NOT liabtermdate:Null) OR (NewestTaxLiabStartDt < NewestTaxLiabEndDt) => 0,
@@ -1486,8 +1490,8 @@ Employer: => BusAcctOrgIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 																				orgid:Null => -99998,
 																				orgid);
 Employer: => BusAcctSeleIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
-																			 seleid:Null => -99998,
-																			 seleid);
+																			  seleid:Null => -99998,
+																			  seleid);
 Employer: => BusAcctProxIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999, 
 																			 proxid:Null => -99998,
 																			 proxid);
@@ -1502,7 +1506,7 @@ Employer: => BusAcctPowIDAppend := MAP(BusAcctUIDEcho=-99999 => -99999,
 
 */
 Employer: => BusAcctNewestUpdateMasterDt := MAP(BusAcctUIDEcho=-99999 => -99999,
-																								20190213); // fixme. Need to put in an "lastupdated" date into the entities. Do we keep multiple versions?
+																								20190701); // fixme. Need to put in an "lastupdated" date into the entities. Do we keep multiple versions?
 Employer: => BusNewestRecordDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																			rLegal.BusNewestRecordDt); // fixme
 Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
@@ -1511,9 +1515,9 @@ Employer: => BusAcctDtEmployerBeganEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 Employer: => BusAcctTaxLiabEndDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							 ISVALIDDATE(liabtermdate) => INTEGER(liabtermdate), // In YYYYMMDD format
 																							 -99998);																							 
-Employer: => BusNewestTaxLiabStartDt := MAP(rLegal:Null => -99999,
+Employer: => BusNewestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																					  rLegal.NewestTaxLiabStartDt); // possible fixme?
-Employer: => BusNewestTaxLiabEndDt := MAP(rLegal:Null => -99999,
+Employer: => BusNewestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																					rLegal.NewestTaxLiabEndDt);// possible fixme?
 Employer: => BusAcctTaxLiabStartMsince := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							BusAcctTaxLiabStartDtEcho=-99998 => -99998,
@@ -1613,31 +1617,31 @@ Employer: => BusAcctLexIDMultiUnemClmCnt30D := MAP(BusAcctUIDEcho=-99999 => -999
 
 
 // The same attributes as before, just on the legal business entitiy instead of the actual business.			
-Employer: => BusUnemClmAcctCurActiveCnt := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmAcctCurActiveCnt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 rLegal.BusUnemClmAcctCurActiveCnt);	
 
 // Count the number of unique claimant ids for claims in a specified time period prior to BusAcctNewestRecordDt
-Employer: => BusUnemClmAcctFiledCntEv := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmAcctFiledCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																						 rLegal.BusUnemClmAcctFiledCntEv);																						 
-Employer: => BusUnemClmAcctFiledCnt1Y := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmAcctFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																						 rLegal.BusUnemClmAcctFiledCnt1Y);																						 
-Employer: => BusUnemClmAcctFiledCnt120D := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmAcctFiledCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 rLegal.BusUnemClmAcctFiledCnt120D);																							 
-Employer: => BusUnemClmAcctFiledCnt90D := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmAcctFiledCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							rLegal.BusUnemClmAcctFiledCnt90D);	
-Employer: => BusUnemClmAcctFiledCnt30D := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmAcctFiledCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							rLegal.BusUnemClmAcctFiledCnt30D);	
 
 // Count the number of unique claimant LexIDs for claims in a specified time period prior to BusAcctNewestRecordDt
-Employer: => BusUnemClmLexIDFiledCntEv := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmLexIDFiledCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							rLegal.BusUnemClmLexIDFiledCntEv);																							
-Employer: => BusUnemClmLexIDFiledCnt1Y := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmLexIDFiledCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							rLegal.BusUnemClmLexIDFiledCnt1Y);																							
-Employer: => BusUnemClmLexIDFiledCnt120D := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmLexIDFiledCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								rLegal.BusUnemClmLexIDFiledCnt120D); 
-Employer: => BusUnemClmLexIDFiledCnt90D := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmLexIDFiledCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 rLegal.BusUnemClmLexIDFiledCnt90D); 
-Employer: => BusUnemClmLexIDFiledCnt30D := MAP(rLegal:Null => -99999,
+Employer: => BusUnemClmLexIDFiledCnt30D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 rLegal.BusUnemClmLexIDFiledCnt30D);
 																			
 // Count the number of unique claimant LexIDs with 2 or more claims in a specified time period prior to BusAcctNewestRecordDt																		
@@ -1645,7 +1649,7 @@ Employer: => BusLexIDMultiUnemClmCntEv := MAP(BusAcctUIDEcho=-99999 OR rLegal:Nu
 																									rLegal.BusLexIDMultiUnemClmCntEv);
 Employer: => BusLexIDMultiUnemClmCnt1Y := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
 																									rLegal.BusLexIDMultiUnemClmCnt1Y);
-Employer: => BusLexIDMultiUnemClmCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
+Employer: => BusLexIDMultiUnemClmCnt120D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999, 
 																										rLegal.BusLexIDMultiUnemClmCnt120D);
 Employer: => BusLexIDMultiUnemClmCnt90D := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null=> -99999,
 																									 rLegal.BusLexIDMultiUnemClmCnt90D);
@@ -1720,8 +1724,8 @@ Employer: => BusAcctPerBusAddressPOBoxCnt := MAP(BusAcctUIDEcho=-99999 OR BusAcc
 Employer: => BusAcctPerBusAddressPOBoxFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSeleIDAppend=-99998 => -99999,
 																									rLegal.BusAcctPerBusAddressPOBoxFlag);
 Employer: => VelBusAcctPerAddrInProgCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - Need to use latest master record for each business when coded
-																							 rCleanAddr.VelBusAcctPerAddrInProgCnt);
-																							
+																							 rCleanAddr.VelBusAcctPerAddrInProgCnt);	
+																					
 Employer: => VelBusAcctPerAddrInBusLegEntCnt := MAP(BusAcctFullAddressCleanPop IN [-99999, 0] => -99999, // fixme - need to use latest master record
 																										BusAcctSeleIDAppend=-99998 => -99998,
 																										MIN(COUNT(rLegal.dsVelBusAcctPerAddrInBusLegEnt(
@@ -1790,16 +1794,16 @@ Employer: => BusTaxLiabBlceDebitFlag := MAP(BusAcctUIDEcho=-99999 OR BusAcctSele
 
 */								
 Employer: => BusAcctNewestRecordDt := MAP(BusAcctUIDEcho=-99999 => -99999,
-																					20190213);
+																					20190701);
 Employer: => BusAcctStatusTypeEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																					status:Null OR status='' => -99998,
 																					status); // fixme. Need status from most recent master record																																			
 Employer: => BusAcctTaxLiabStartDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																							ISVALIDDATE(dateliabest) => INTEGER(dateliabest),
 																							-99998);
-Employer: => BusOldestTaxLiabStartDt := MAP(rLegal:Null => -99999,
+Employer: => BusOldestTaxLiabStartDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																					  rLegal.OldestTaxLiabStartDt);																					
-Employer: => BusOldestTaxLiabEndDt := MAP(rLegal:Null => -99999,
+Employer: => BusOldestTaxLiabEndDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																					rLegal.OldestTaxLiabEndDt);
 Employer: => BusTaxLiabOngoingFlag := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																					rLegal.TaxLiabOngoingFlag);

@@ -828,7 +828,8 @@ EXPORT files := MODULE
   integer8 proxgsaflag;
  END;
  
- EmployerPrep := DATASET('~fraudgov::tndata::ts999_output', TrumpRec, THOR);
+ // EmployerPrep := DATASET('~fraudgov::tndata::ts999_output', TrumpRec, THOR); // Old File
+ EmployerPrep := DATASET('~fraudgov::tndata::20190701::ts999_output', TrumpRec, THOR);
  EXPORT Employer := PROJECT(EmployerPrep, 
                       TRANSFORM({RECORDOF(LEFT), UNSIGNED uacctno}, 
 											// Acctno has some garbage data in it. Some of these are incorrectly getting cast to account numbers. Fix that
@@ -1124,7 +1125,8 @@ EXPORT files := MODULE
   integer8 proxgsaflag;
  END;
  
- ClaimsBase := DATASET('~fraudgov::tndata::claims_output', ClaimsRec, THOR);
+ // ClaimsBase := DATASET('~fraudgov::tndata::claims_output', ClaimsRec, THOR); // Old File
+ ClaimsBase := DATASET('~fraudgov::tndata::20190701::claims_output ', ClaimsRec, THOR);
  EXPORT Claims := PROJECT(ClaimsBase, TRANSFORM({RECORDOF(LEFT), UNSIGNED uacctno}, SELF.uacctno := (UNSIGNED)std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF.claim_sep_emp_no := std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF := LEFT)); 
  
  ClaimantsRec := RECORD
@@ -1192,44 +1194,45 @@ EXPORT files := MODULE
   string claimant_xlink_keys_desc;
   string60 claimant_xlink_matches;
   string claimant_xlink_matches_desc;
-  unsigned8 payment_bye_ccyymmdd;
-  unsigned8 payment_nbr;
-  unsigned8 payment_date;
-  unsigned8 payment_cert_date;
-  unsigned8 payment_canc_date;
-  unsigned8 payment_wed;
-  string12 payment_prog;
-  decimal6_2 payment_net_amt;
-  decimal5_2 payment_wba;
-  decimal5_2 payment_child_support;
-  decimal5_2 payment_wh_tax_amt;
-  decimal5_2 payment_earnings_reported;
-  decimal5_2 payment_offset;
-  decimal5_2 payment_retirement;
-  string75 claimstatus;
-  string50 col_pr_direct_deposit_number;
-  string75 col_desc;
-  decimal19_2 col_pr_payment_amount;
-  string1 col_pr_payment_cleared;
-  unsigned8 col_pr_unreceived_date;
-  unsigned8 col_pr_unreceived_reason;
-  unsigned8 col_pr_reissue_date;
-  unsigned8 col_banking_error_code;
-  unsigned8 col_banking_trace_nbr;
-  string1 col_bank_status_flag;
-  string50 col_pr_direct_deposit_routing_number;
-  unsigned8 col_pr_direct_deposit_account_type;
-  unsigned8 col_banking_batch_nbr;
-  unsigned8 col_pr_check_seq_payment_id;
-  unsigned8 col_pr_id_parent;
-  unsigned8 col_pr_payment_status;
-  unsigned8 col_paymentcancelledsource;
-  unsigned8 col_istransferweek;
-  string claimantentitycontextuid;
-  unsigned6 claimantrecid;
+  // unsigned8 payment_bye_ccyymmdd;
+  // unsigned8 payment_nbr;
+  // unsigned8 payment_date;
+  // unsigned8 payment_cert_date;
+  // unsigned8 payment_canc_date;
+  // unsigned8 payment_wed;
+  // string12 payment_prog;
+  // decimal6_2 payment_net_amt;
+  // decimal5_2 payment_wba;
+  // decimal5_2 payment_child_support;
+  // decimal5_2 payment_wh_tax_amt;
+  // decimal5_2 payment_earnings_reported;
+  // decimal5_2 payment_offset;
+  // decimal5_2 payment_retirement;
+  // string75 claimstatus;
+  // string50 col_pr_direct_deposit_number;
+  // string75 col_desc;
+  // decimal19_2 col_pr_payment_amount;
+  // string1 col_pr_payment_cleared;
+  // unsigned8 col_pr_unreceived_date;
+  // unsigned8 col_pr_unreceived_reason;
+  // unsigned8 col_pr_reissue_date;
+  // unsigned8 col_banking_error_code;
+  // unsigned8 col_banking_trace_nbr;
+  // string1 col_bank_status_flag;
+  // string50 col_pr_direct_deposit_routing_number;
+  // unsigned8 col_pr_direct_deposit_account_type;
+  // unsigned8 col_banking_batch_nbr;
+  // unsigned8 col_pr_check_seq_payment_id;
+  // unsigned8 col_pr_id_parent;
+  // unsigned8 col_pr_payment_status;
+  // unsigned8 col_paymentcancelledsource;
+  // unsigned8 col_istransferweek;
+  // string claimantentitycontextuid;
+  // unsigned6 claimantrecid;
  END;
 
  
-EXPORT Claimant := DATASET('~fraudgov::tndata::claimants_output', ClaimantsRec, THOR);
+// EXPORT Claimant := DATASET('~fraudgov::tndata::claimants_output', ClaimantsRec, THOR); //Old File
+EXPORT Claimant := DATASET('~fraudgov::tndata::20190701::claimants_output', ClaimantsRec, THOR);
 
 END;

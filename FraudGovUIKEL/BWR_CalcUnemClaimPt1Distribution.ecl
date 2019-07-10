@@ -148,15 +148,15 @@ EXPORT BWR_CalcUnemClaimPt1Distribution := MODULE
 			daliserver := std.system.Thorlib.DaliServer();
 			cpos := std.Str.Find(daliserver, ':', 1)-1;
 			lzip := daliserver[1..cpos];
-			lz_dir := '/var/lib/HPCCSystems/mydropzone/fraudgov/kelattributes/';
-			file_path := '~nnavarro::fraudgov::kelattributes::';
+			lz_dir := '/var/lib/HPCCSystems/mydropzone/fraudgov/kelattributes/20190701/';
+			file_path := '~nnavarro::fraudgov::kelattributes::20190701::';
 			thor_file := file_path + reportName;
 			lz_path := lz_dir + reportName + '.csv';
 			thor_out := OUTPUT(dsMac,, thor_file, CSV(HEADING(SINGLE),SEPARATOR(','),QUOTE('"')), OVERWRITE);
 			RETURN SEQUENTIAL(std.file.CreateExternalDirectory(lzip, lz_dir), thor_out, std.file.Despray(thor_file, lzip,lz_path,,,,true));
 		ENDMACRO;
 
-		// EXPORT main := OUTPUT(dsSeleChecks, NAMED('dsSeleChecks'));
+
 		EXPORT main := SEQUENTIAL(writeFile(ds_All, 'UnemClaimPt1_AttributesDistribution'),
 															writeFile(dsSeleChecks, 'UnemClaimPt1_SelePassFailTests'),
 															writeFile(dsSpanChecks, 'UnemClaimPt1_SpanPassFailTests'),
