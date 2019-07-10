@@ -5,7 +5,7 @@ return( map(
 
 
     (((integer8) score_in   < 500  or (integer8) score_in   > 900 ) and (integer8) score_in not in [100,101,102,103,104,200,222] and stringlib.stringfind(lay, 'RiskView', 1) > 0 )   and score_in<>'' =>  'UNDEFINED',	
-																	
+																	  
 																		( ((integer8) score_in   < 300 or (integer8) score_in   > 999 ) and stringlib.stringfind(lay, 'fraudpoint', 1) > 0 )   and score_in<>''   =>  'UNDEFINED',
 																		
 																		( ((integer8) score_in   < 300 or (integer8) score_in   > 999 )and stringlib.stringfind(lay, 'BNK4', 1) > 0 )   and score_in<>''   =>  'UNDEFINED',	
