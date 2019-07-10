@@ -83,6 +83,7 @@ xpnd_sanctn	 xpand_sanctn_aka(ds_CleanParsedAKA	 L) :=  TRANSFORM
 self.cname						:= IF(L.NAME_TYPE = 'D',L.AKA_DBA_TEXT,'');
 self.did							:= 0;
 self.bdid							:= 0;
+self.global_sid				:= 22811;
 self 	:= L; 
 self	:= [];
 END;
