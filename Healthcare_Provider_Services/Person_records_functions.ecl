@@ -481,8 +481,10 @@ EXPORT Person_records_functions := Module
 			string1	   valid_SSN;
 			string1	   jflag1;  
 			string1      jflag2;
-		string1	   jflag3;
-			unsigned6 rid;
+      string1	   jflag3;
+      unsigned6 rid;
+      unsigned4 global_sid;
+      unsigned8 record_sid;
 		end;
 
 		ssn_people_plus get_people(doxie.Key_Header le) := transform
@@ -505,6 +507,8 @@ EXPORT Person_records_functions := Module
 											 transform(ssn_people_plus, 
 																 self.date_ob := left.dob, 
 																 self.dead := left.tnt = 'D',
+																 self.global_sid:= right.global_sid,
+														 		 self.record_sid:= right.record_sid,
 																 self := left), 
 											 left only);
 		combined := jdirty+daily_ssns;

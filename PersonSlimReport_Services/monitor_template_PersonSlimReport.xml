@@ -4504,7 +4504,7 @@
             <EquityFlagDesc/>
           </DeedSourcePropertyRecord>
         </Deed>
-        <Entities diff_match="Address.StreetNumber+Address.StreetName+Address.UnitNumber+Address.City+Address.State+Address.Zip5">
+        <Entities diff_match="Address.StreetNumber+Address.StreetName+Address.UnitNumber+Address.City+Address.State+Address.Zip5+EntityTypeCode">
           <Entity>
             <Names diff_match="UniqueId">
               <Name>
@@ -4574,7 +4574,7 @@
               <TimeZone/>
               <ListingTimeZone/>
             </Phone>
-            <EntityTypeCode diff_monitor=""/>
+            <EntityTypeCode/>
             <EntityType diff_monitor=""/>
             <OriginalAddress diff_monitor="">
               <StreetNumber/>

@@ -6,6 +6,7 @@ EXPORT data_env := MODULE
   EXPORT UNSIGNED1 iFCRA := 1;
   EXPORT UNSIGNED1 iPRCT := 2;
   EXPORT UNSIGNED1 iHIPAA := 4;
+  EXPORT BOOLEAN isFCRA(UNSIGNED __env) := __env = iFCRA;
 
   EXPORT STRING GetString(UNSIGNED __env) := TRIM(CASE(__env,
                                                   iFCRA    => 'fcra',

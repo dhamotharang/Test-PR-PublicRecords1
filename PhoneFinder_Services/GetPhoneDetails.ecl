@@ -65,6 +65,8 @@ FUNCTION
     SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxNpa      := le.Contact_Fax[1..3];
     SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxNXX      := le.Contact_Fax[4..6];
     SELF.RealTimePhone_Ext.operatingCompany.PhoneInfo.FaxLine     := le.Contact_Fax[7..10];
+    SELF.PhoneStatus                                              := IF(le.phone_status = Phones.Constants.PhoneStatus.PresumedActive, PhoneFinder_Services.Constants.PhoneStatus.Active,
+                                                                      le.phone_status);
     SELF                                                          := [];                                                      
   END;
   

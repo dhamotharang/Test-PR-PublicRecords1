@@ -37,7 +37,7 @@ EXPORT getBusInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                                                                                                             SELF.zip4 := LEFT.zip4;
                                                                                                             SELF := [];));
                                                                                                           
-                                                                    cleanedAddress := DueDiligence.CitDDShared.cleanAddress(tempAddress);
+                                                                    cleanedAddress := DueDiligence.CommonAddress.GetCleanAddress(tempAddress);
 
                                                                     SELF.addressFound := cleanedAddress.streetAddress1 <> DueDiligence.Constants.EMPTY AND
                                                                                          cleanedAddress.city <> DueDiligence.Constants.EMPTY AND
@@ -91,7 +91,7 @@ EXPORT getBusInformation(Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
                                                                             SELF.zip4 := RIGHT.input_echo.zip4;
                                                                             SELF := [];));
                                                        
-                                    clean2 := DueDiligence.CitDDShared.cleanAddress(tempAddress);
+                                    clean2 := DueDiligence.CommonAddress.GetCleanAddress(tempAddress);
                                     clean1 := LEFT.cleanedAddress;
                                     
                                     SELF.seq := LEFT.request_id;

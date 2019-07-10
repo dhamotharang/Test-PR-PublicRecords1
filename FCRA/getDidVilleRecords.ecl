@@ -13,14 +13,14 @@ EXPORT getDidVilleRecords(iesp.person_picklist.t_PersonPickListRequest srchReq,
 	// multiple dids and one above threshold: Status=0   Return did with highest score
 
 	// fetch DidVille params set values from picklist user request
-	dv_mod:=MODULE(PROJECT(Gateway.IParam.getDidVilleParams(),Gateway.IParam.DidVilleParams,OPT))
-		EXPORT STRING32 ApplicationType := srchReq.User.ApplicationType;
+	dv_mod:=MODULE(Gateway.IParam.getDidVilleParams())
+		EXPORT STRING32 application_type := srchReq.User.ApplicationType;
 		EXPORT STRING DataPermissionMask := srchReq.User.DataPermissionMask;
 		EXPORT STRING DataRestrictionMask := srchReq.User.DataRestrictionMask;
-		EXPORT UNSIGNED1 DPPAPurpose := (UNSIGNED)srchReq.User.DLPurpose;
-		EXPORT UNSIGNED1 GLBPurpose := (UNSIGNED)srchReq.User.GLBPurpose;
-		EXPORT STRING5 IndustryClass := srchReq.User.IndustryClass;
-		EXPORT STRING6 SSN_Mask := srchReq.User.SSNMask;
+		EXPORT UNSIGNED1 dppa := (UNSIGNED)srchReq.User.DLPurpose;
+		EXPORT UNSIGNED1 glb := (UNSIGNED)srchReq.User.GLBPurpose;
+		EXPORT STRING5 industry_class := srchReq.User.IndustryClass;
+		EXPORT STRING ssn_mask := srchReq.User.SSNMask;
 		EXPORT DATASET(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
 	END;
 
@@ -74,7 +74,7 @@ EXPORT getDidVilleRecords(iesp.person_picklist.t_PersonPickListRequest srchReq,
 	srchResp:=PROJECT(ds_didville_out,TRANSFORM(iesp.person_picklist.t_PersonPickListResponse,
 		didScoreRec:={UNSIGNED score,UNSIGNED did};
 		ds_did_score:=PROJECT(LEFT.result,TRANSFORM(didScoreRec,SELF.score:=(UNSIGNED)LEFT.score,SELF.did:=(UNSIGNED)LEFT.did));
-		Suppress.MAC_Suppress(ds_did_score,ds_recs,dv_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_did_score,ds_recs,dv_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
 		rec:=SORT(ds_recs,-score,did)[1];
 		DID_NOT_FOUND:=rec.did=0;
 		DIDS_BELOW_THRESHOLD:=COUNT(ds_recs)>1 AND rec.score<did_score_threshold;

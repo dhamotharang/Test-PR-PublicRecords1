@@ -1,10 +1,10 @@
-/*
+﻿/*
  * Searches the foreclosure key by Zip, Street Number, Street Name, Street Suffix
  * and Street Pre Direction.  Eventually this key should be updated to use Address
  * ID (AID).
  */
 
-IMPORT ut, Property;
+IMPORT ut, Property, MDR;
 
 EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(Address_Shell.layoutPropertyCharacteristics) working, UNSIGNED1 attributesVersion = 1) := FUNCTION
 /* ************************************************************
@@ -24,7 +24,8 @@ EXPORT Address_Shell.layoutPropertyCharacteristics searchForeclosures (DATASET(A
 																																AND TRIM(LEFT.Input.StreetSuffix) <> '' AND TRIM(LEFT.Input.StreetPreDirection) <> '')
 																																AND KEYED(LEFT.Input.Zip5 = RIGHT.situs1_zip AND LEFT.Input.StreetNumber = RIGHT.situs1_prim_range
 																																AND LEFT.Input.StreetName = RIGHT.situs1_prim_name AND LEFT.Input.StreetSuffix = RIGHT.situs1_addr_suffix
-																																AND LEFT.Input.StreetPreDirection = RIGHT.situs1_predir), 
+																																AND LEFT.Input.StreetPreDirection = RIGHT.situs1_predir)
+																																AND RIGHT.source=MDR.sourceTools.src_Foreclosures, 
 																getForeclosuresV1(LEFT, RIGHT), LEFT OUTER, KEEP(200), ATMOST(1000));
 
 	version1Dedup := DEDUP(SORT(version1Temp, Input.seq, PropertyAttributes.Version1.Foreclosure_Recording_Date), Input.seq, PropertyAttributes.Version1.Foreclosure_Recording_Date);

@@ -54,23 +54,6 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN IncludeImposters            := FALSE;
 		EXPORT BOOLEAN IncludeUtility              := FALSE;
 	END;
-	
-	//convert current parameters' module into IDataAccess - 
-	//temporarily until Vlad completes the IDataAccess work and updates the whole mod
-  EXPORT convertToDataAccess (PersonSlimReportOptions mod) := FUNCTION
-    //note: using (most restrictive) defaults for fields not defined in the current module
-    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated(AutostandardI.GlobalModule()))
-      EXPORT unsigned1 glb := mod.GLBPurpose;
-      EXPORT unsigned1 dppa := mod.DPPAPurpose;
-      EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
-      EXPORT string5 industry_class := mod.industry_class;
-      EXPORT string32 application_type := mod.ApplicationType;
-      EXPORT boolean show_minors := mod.IncludeMinors OR (mod.GLBPurpose = 2);
-      EXPORT string ssn_mask := mod.ssn_mask;
-      EXPORT unsigned1 dl_mask := IF (mod.mask_dl, 1, 0);
-    END;
-    RETURN PROJECT (mod_access, doxie.IDataAccess);
-  END;
 
 	EXPORT getOptions(iesp.personslimreport.t_PersonSlimReportRequest inIesp) := FUNCTION
 		in_mod := MODULE(PersonSlimReportOptions)
@@ -151,4 +134,17 @@ EXPORT IParams := MODULE
 		RETURN OUTPUT (dataset ([],{integer x}), named('__internal__'), extend);
 	END;
 
+  //Copies values available in PersonSlimReportOptions to PersonReports.IParam._report (compatible with IDataAccess)
+	//temporarily until Vlad completes the IDataAccess work and updates the whole mod
+  EXPORT MAC_copy_old_report_fields (in_mod) := MACRO
+    EXPORT unsigned1 glb := in_mod.GLBPurpose;
+    EXPORT unsigned1 dppa := in_mod.DPPAPurpose;
+    EXPORT string DataRestrictionMask := in_mod.DataRestrictionMask;
+    EXPORT string5 industry_class :=  in_mod.industry_class;
+    EXPORT string32 application_type :=  in_mod.ApplicationType;
+    EXPORT boolean show_minors := in_mod.IncludeMinors OR (in_mod.GLBPurpose = 2);;
+    EXPORT string ssn_mask := in_mod.ssn_mask;
+    EXPORT unsigned1 dl_mask := IF (in_mod.mask_dl, 1, 0);
+    EXPORT boolean include_BlankDOD := in_mod.IncludeBlankDOD;
+  ENDMACRO;    
 END;

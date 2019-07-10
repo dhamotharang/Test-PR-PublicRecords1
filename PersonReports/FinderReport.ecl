@@ -1,4 +1,4 @@
-﻿IMPORT doxie, iesp, D2C;
+﻿IMPORT doxie, iesp;
 
 out_rec := iesp.peoplereport.t_PeopleReportIndividual;
 
@@ -37,7 +37,8 @@ EXPORT out_rec FinderReport (
   // "single source" person's data
   vehs := if(~isCNSMR, vehicle_records (dids, module (project (param, input.vehicles)) end, IsFCRA).vehicles);
   p_vehicles   := choosen (vehs, iesp.Constants.BR.MaxVehicles);
-  proflic := proflic_records (dids, module (project (param, input.proflic, opt)) end, IsFCRA);
+  proflic := PersonReports.proflic_records (dids, PROJECT (mod_finder, $.IParam.proflic), IsFCRA);
+
   p_proflic    := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
   bankrpt := bankruptcy_records (dids, module (project (param, input.bankruptcy, opt)) end, IsFCRA);
   p_bankruptcy := choosen (bankrpt.bankruptcy, iesp.Constants.BR.MaxBankruptcies);

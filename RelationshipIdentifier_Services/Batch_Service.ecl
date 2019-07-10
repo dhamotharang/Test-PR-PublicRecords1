@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchService">
 	<part name="batch_in"                     type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="Include_Neighbors" 	          type="xsd:boolean"/>
@@ -13,7 +13,7 @@
 // 4. Then call the report recs which goes through each and every entity entered (up to max of 8) per acctno
 //     and ultimately calls the function to return relationships between 2 entities.
 
-IMPORT autostandardi, RelationshipIdentifier_Services;
+IMPORT autostandardi,BatchShare,doxie,RelationshipIdentifier_Services;
 EXPORT Batch_Service() :=
 MACRO
 		
@@ -56,20 +56,10 @@ MACRO
 																						
 	empty_ds_options := DATASET([],RelationshipIdentifier_Services.Layouts.OptionsLayout)[1];
 		
-	tempmod := MODULE(AutoStandardI.DataRestrictionI.params)
-			EXPORT BOOLEAN AllowAll := False;
-			EXPORT BOOLEAN AllowDPPA := False;
-			EXPORT BOOLEAN AllowGLB := False;		  
-			EXPORT STRING DataRestrictionMask := batchParams.DataRestrictionMask;
-			EXPORT UNSIGNED1 DPPAPurpose := batchParams.dppaPurpose;
-			EXPORT UNSIGNED1 GLBPurpose := batchParams.GLBPurpose;
-			EXPORT BOOLEAN ignoreFares := False;
-			EXPORT BOOLEAN ignoreFidelity := False;
-			EXPORT BOOLEAN includeMinors := False;
-	End;		
-													 
-	ds_batchSearchResults := RelationshipIdentifier_Services.Search_Records( empty_ds,  
-																																					 tempMod,
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	
+  ds_batchSearchResults := RelationshipIdentifier_Services.Search_Records( empty_ds,
+                                                                           mod_access,  
 																																					 empty_ds_options,		
 																																					 ds_batchInProcessed,
 																																					 batchParams).ds_results_batch;
@@ -138,9 +128,9 @@ MACRO
 																				SELF.Error_Code := RelationshipIdentifier_Services.Constants.SECOND_ENTITY_MISSING;
 															          SELF := LEFT;
 																				SELF := [] ));
-																				
-		results := SORT(batch_results + batchRecs_MissingSecEntity, record);	
-
+		
+    results := SORT(batch_results + batchRecs_MissingSecEntity, record);	
+  	
   // =============================   DEBUG  =============================		
 	// output(ds_batchInReq, named('ds_batchInReq'));
 	// output(ds_batchInTmp, named('ds_batchInTmp'));

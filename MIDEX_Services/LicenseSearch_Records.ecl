@@ -1,6 +1,7 @@
-﻿import AutoStandardI, iesp, doxie;
+﻿IMPORT doxie,MIDEX_Services;
 
-EXPORT LicenseSearch_Records (MIDEX_Services.IParam.searchrecords in_mod) := 
+EXPORT LicenseSearch_Records (MIDEX_Services.IParam.searchrecords in_mod,
+                              doxie.IDataAccess mod_access) := 
   FUNCTION
 		
 		nonPubAccess := MIDEX_Services.Functions.fn_GetNonPubDataSources(in_mod.DataPermissionMask);
@@ -13,7 +14,7 @@ EXPORT LicenseSearch_Records (MIDEX_Services.IParam.searchrecords in_mod) :=
 		
 		// Get public sanction data
 		pub_sanct_ids := MIDEX_Services.Search_IDs.Mari_Public_Sanct_val(in_mod);
-		Pub_src_recs := MIDEX_Services.Raw_Public.License.Search_View.by_midex_rpt_num(pub_sanct_ids,alertVersion);
+		Pub_src_recs := MIDEX_Services.Raw_Public.License.Search_View.by_midex_rpt_num(pub_sanct_ids,mod_access,alertVersion);
 		
 		// Get professional license data
 		prof_ids := MIDEX_Services.Search_IDs.Mari_ProfLic_val(in_mod);

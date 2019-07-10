@@ -1,4 +1,5 @@
-﻿IMPORT AutoStandardI, doxie, iesp, Prof_License_Mari, SANCTN, SANCTN_Mari, SANCTN_Services, Standard, BIPV2;
+﻿IMPORT AutoStandardI,BIPV2,doxie,iesp,AutoStandardI,Prof_License_Mari,SANCTN,
+       SANCTN_Mari,SANCTN_Services,Standard;
 
 EXPORT Layouts := MODULE
   
@@ -149,6 +150,8 @@ EXPORT Layouts := MODULE
       BOOLEAN   isLicenseCurrent := FALSE;
 			UNSIGNED8 nmls_id       := 0;
       BOOLEAN  exactMatch := FALSE;
+      UNSIGNED4 global_sid;
+	    UNSIGNED8 record_sid;
       hash_layout;
     END;
 		
@@ -213,6 +216,8 @@ EXPORT Layouts := MODULE
 				UNSIGNED penalt := 99;
 				BOOLEAN  exactMatch := FALSE;
         STRING8 dob;
+	      UNSIGNED4 global_sid;
+	      UNSIGNED8 record_sid;
 				hash_layout;
 		END;
     
@@ -314,6 +319,9 @@ EXPORT Layouts := MODULE
 				STRING10  taxid;
         STRING10  phone;
 				STRING26  report_number;
+        //CCPA-9 Add CCPA fields
+	      UNSIGNED4 global_sid;
+	      UNSIGNED8 record_sid;
 				hash_layout;
 		END;
 
@@ -442,6 +450,9 @@ EXPORT Layouts := MODULE
 				iesp.share.t_BusinessIdentity businessIds;
         DATASET (iesp.share.t_Name) AKANames;                    
         DATASET (iesp.midexcompreport.t_MIDEXDBAName) DBANames;  
+	      UNSIGNED6 DID;
+        UNSIGNED4 global_sid;
+	      UNSIGNED8 record_sid;
       END;
 
       
@@ -523,6 +534,8 @@ EXPORT Layouts := MODULE
         STRING10   Phone                := '';
         DATASET    (iesp.share.t_Name) AKANames;                    
         DATASET    (iesp.midexcompreport.t_MIDEXDBAName) DBANames;  
+	      UNSIGNED4 global_sid;
+	      UNSIGNED8 record_sid;
         hash_layout;
       END;  // Record CompReport_TempLayout 
 

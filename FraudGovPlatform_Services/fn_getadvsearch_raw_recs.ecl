@@ -1,4 +1,4 @@
-﻿IMPORT doxie, FraudShared_Services, iesp, STD;
+﻿IMPORT doxie, FraudShared_Services, STD;
 
 EXPORT fn_getadvsearch_raw_recs (
 	DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
@@ -116,7 +116,7 @@ EXPORT fn_getadvsearch_raw_recs (
 								dataset([], FraudShared_Services.Layouts.Recid_rec));
 
 	initial_rec := RECORD
-		unsigned1 cnt;
+		unsigned2 cnt;
 		string100 key_identifier;
 		dataset(FraudShared_Services.Layouts.Recid_rec) Recid_rec;
 	END;

@@ -1,7 +1,7 @@
-export MAC_GlbClean_Header(infile,outfile, batch = false, IsFCRA = false, modAccess) := macro
+﻿export MAC_GlbClean_Header(infile,outfile, batch = false, IsFCRA = false, modAccess) := macro
 
 //TODO: check if glb_ok nad dppa_ok can be moved here
-import mdr, ut, doxie, suppress, header, codes;
+import mdr, ut, doxie, suppress, header, codes, data_services;
 
 #uniquename(isUtility)
 %isUtility% := modAccess.isUtility();
@@ -114,6 +114,7 @@ END;
 
 #uniquename(Fetch3a)
 #uniquename(Fetch3b)
+
 Suppress.MAC_Suppress(%Fetch3%,%Fetch3a%,%appType%,Suppress.Constants.LinkTypes.SSN,ssn,,,batch);
 Suppress.MAC_Suppress(%Fetch3a%,%Fetch3b%,%appType%,Suppress.Constants.LinkTypes.DID,did,,,batch);
 
@@ -131,7 +132,13 @@ Suppress.MAC_Suppress(%Fetch3a%,%Fetch3b%,%appType%,Suppress.Constants.LinkTypes
 #uniquename(Fetch3e)
 %Fetch3e0% := Header.FilterDMVInfo(%Fetch3d%);
 %Fetch3e% := if(%suppressDMVInfo% and ~modAccess.isConsumer () and ~isFCRA, %Fetch3e0%, %Fetch3d%);
+#uniquename(Fetch3f)
+%Fetch3f% := %Fetch3e%(glb_ok or ~glb);
 
-outfile := %Fetch3e%(glb_ok or ~glb);
+#uniquename(environment)
+%environment% := if(IsFCRA,data_services.data_env.iFCRA,data_services.data_env.iNonFCRA);
+outfile := Suppress.MAC_SuppressSource(%Fetch3f%,modAccess,,,%environment%);
+
+
 
 endmacro;

@@ -136,7 +136,10 @@ export DataRestrictionI := module
 
 		// BriteVerify gateway for Emails 
 		export boolean BriteVerifyData := ~allow and (fixed_DRM[46] not in ['0','']);
-
+		
+		// BlackKnight for Foreclosures 
+		export BLACKKNIGHT := (~allow and fixed_DRM[47]<>'0'); 
+				
   end;
 
 end;

@@ -13,8 +13,10 @@ EXPORT TuFraudAlert_Transforms := MODULE
     SELF.DataRestrictionMask := in_mod.DataRestrictionMask;
     SELF.DataPermissionMask := in_mod.DataPermissionMask;
     SELF.ApplicationType := in_mod.ApplicationType;
+    SELF.IndustryClass := in_mod.IndustryClass;
     SELF := [];
   END;
+
   //This transform sets default values for the request for easier testing on the roxie layer.
   EXPORT iesp.tu_fraud_alert.t_TuFraudAlertRequest set_request_defaults(iesp.tu_fraud_alert.t_TuFraudAlertRequest L) := TRANSFORM
     SELF.SearchBy.TransactionControl.RecordCode := 'TU4I';

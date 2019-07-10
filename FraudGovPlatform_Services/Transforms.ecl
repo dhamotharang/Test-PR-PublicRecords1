@@ -10,7 +10,7 @@ EXPORT Transforms := MODULE
 		SELF.SSN := l.ssn;
 		SELF.Name := iesp.ECL2ESP.SetName(l.fname, l.mname, l.lname, l.name_suffix,'');
 		SELF.Address := iesp.ECL2ESP.SetAddress('','','','','','','', l.p_city_name,l.st, l.zip, l.zip4,'','', 
-																						'', '', stringlib.stringcleanspaces(l.p_city_name + ' ' + 
+																						'', '', STD.Str.CleanSpaces(l.p_city_name + ' ' + 
 																						l.st + ' '+ l.zip + l.zip4));
 		SELF.DOB := iesp.ECL2ESP.toDatestring8(l.dob8);
 		SELF.DOD := iesp.ECL2ESP.toDatestring8(l.dod8);
@@ -48,7 +48,7 @@ EXPORT Transforms := MODULE
 		SELF.DOB := iesp.ECL2ESP.toDateString8(l.dob);																		
 		SELF.Address := iesp.ECL2ESP.setAddress(l.prim_range, l.prim_name, l.addr_suffix, '','','','', l.p_city_name, 
 																					  l.st, l.zip5,  '','','', '', '',
-																						stringlib.stringcleanspaces(l.p_city_name + ' ' + l.st + ' '+ l.zip5));
+																						STD.Str.CleanSpaces(l.p_city_name + ' ' + l.st + ' '+ l.zip5));
 		SELF.DataSource := l.datasource;
 		
 		//****************************************************************
@@ -312,7 +312,7 @@ EXPORT Transforms := MODULE
 																										L.clean_address.addr_suffix, L.clean_address.unit_desig, L.clean_address.sec_range, 
 																										L.clean_address.p_city_name, L.clean_address.st, L.clean_address.zip, L.clean_address.zip4, 
 																										'', '', STD.Str.CleanSpaces(L.Street_1 + ' ' + L.Street_2), 
-																										STD.Str.CleanSpaces(Address.Addr2FromComponents(TRIM(L.City), TRIM(L.State), L.Zip)),'');
+																										STD.Str.CleanSpaces(Address.Addr2FromComponents(L.City, L.State, L.Zip)),'');
 		SELF.MailingAddress := iesp.ECL2ESP.SetAddress(L.additional_address.clean_address.prim_name, L.additional_address.clean_address.prim_range, L.additional_address.clean_address.predir, L.additional_address.clean_address.postdir, 
 																										L.additional_address.clean_address.addr_suffix, L.additional_address.clean_address.unit_desig, L.additional_address.clean_address.sec_range, 
 																										L.additional_address.clean_address.p_city_name, L.additional_address.clean_address.st, L.additional_address.clean_address.zip, L.additional_address.clean_address.zip4, 

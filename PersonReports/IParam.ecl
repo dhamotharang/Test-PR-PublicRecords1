@@ -3,7 +3,7 @@
 
 // Currently almost all of these are "fake": just synonyms of a superset input
 
-IMPORT AutoHeaderI, doxie, suppress, relationship, FCRA, PAW_Services, AutoStandardI;
+IMPORT AutoHeaderI, doxie, suppress, relationship, FCRA, AutoStandardI;
 
 EXPORT IParam := MODULE
 
@@ -52,9 +52,11 @@ EXPORT IParam := MODULE
     EXPORT string50 tmsid_value := ''; // reserved for future needs if any
   END;
 
-  EXPORT peopleatwork := INTERFACE (_report) // changed to just include _report for ssn_mask information
+  EXPORT peopleatwork := INTERFACE (_report)
   END;
 
+  EXPORT proflic := INTERFACE (_report)
+  END;
 
   // general (vs. productwise) phones options
   EXPORT phones := INTERFACE
@@ -240,6 +242,9 @@ EXPORT IParam := MODULE
   EXPORT _sources := INTERFACE (include, versions)
   END;
 
+  EXPORT _compoptions := INTERFACE (_report, personal, property, dl, include, versions, providers)
+  END;
+
   //IParam._report isn't compatible with input._report, projecting from new to old will not work.
   //To facilitate converting the modules until we make all PersonReports components
   //compatible with IDataAccess, I will define a set of "old_report" interfaces
@@ -270,6 +275,23 @@ EXPORT IParam := MODULE
 
   //Same as $.input._finderreport, minus _report part
   EXPORT old_finderreport := INTERFACE (personal, include, vehicles, dl)
+    EXPORT boolean use_verified_address_ra := TRUE;
+    EXPORT boolean use_verified_address_nb := TRUE;
+    EXPORT boolean nbrs_with_phones := TRUE;
+    EXPORT boolean rels_with_phones := TRUE;
+
+    EXPORT boolean include_akas        := TRUE;
+    EXPORT boolean include_associates  := TRUE;
+    EXPORT boolean include_bankruptcy  := TRUE;
+    EXPORT boolean include_bpsaddress  := TRUE;
+    EXPORT boolean include_corpaffiliations := TRUE;
+    EXPORT boolean include_imposters   := TRUE;
+    EXPORT boolean include_neighbors   := TRUE;
+    EXPORT boolean include_oldphones   := TRUE;
+    EXPORT boolean include_relatives   := TRUE;
+    EXPORT boolean include_relativeaddresses := TRUE;
+    EXPORT boolean use_NonDMVSources       := TRUE;
+
     //these are not used by Finder; will be removed eventually.
     EXPORT boolean ignoreFares := FALSE;
     EXPORT boolean ignoreFidelity := FALSE;
@@ -390,45 +412,5 @@ EXPORT IParam := MODULE
 
     RETURN mod_res;
   END;  
-
-  // Creates a module in a new _report format -- compatible with IDataAccess -- from a module implementing old _report interface
-  EXPORT MAC_CreateIDataAccessReportModule (old_style) := FUNCTIONMACRO
-    local report := MODULE (PersonReports.IParam._report)
-      // IDataAccessPart
-      EXPORT unsigned1 glb := old_style.GLBPurpose;
-      EXPORT unsigned1 dppa := old_style.DPPAPurpose;
-      EXPORT string DataPermissionMask := old_style.DataPermissionMask;
-      EXPORT string DataRestrictionMask := old_style.DataRestrictionMask;
-      EXPORT boolean ln_branded :=  old_style.ln_branded;
-      // EXPORT boolean probation_override := FALSE;
-      EXPORT string5 industry_class :=  old_style.industryclass;
-      EXPORT string32 application_type :=  old_style.applicationtype;
-      // EXPORT boolean no_scrub := FALSE;
-      EXPORT unsigned3 date_threshold := old_style.dateval;
-      // EXPORT boolean suppress_dmv := TRUE;
-      // EXPORT unsigned1 reseller_type := 0;
-      // EXPORT unsigned1 intended_use := 0;
-      // EXPORT boolean log_record_source := TRUE;
-      // EXPORT boolean lexid_source_optout := TRUE;
-      EXPORT boolean show_minors := old_style.IncludeMinors;
-      //masking
-      EXPORT string ssn_mask := old_style.ssn_mask;
-      EXPORT unsigned1 dl_mask := IF (old_style.mask_dl, 1, 0);
-      EXPORT unsigned1 dob_mask := old_style.dob_mask;
-      // EXPORT string transaction_id := '';
-      // EXPORT unsigned6 global_company_id := 0;
-      // ----------------------------------------------------
-
-      EXPORT boolean include_hri := old_style.include_hri;
-      EXPORT boolean legacy_verified := old_style.legacy_verified;
-      EXPORT unsigned1 score_threshold := old_style.score_threshold;
-      EXPORT unsigned2 penalty_threshold := old_style.penalty_threshold;
-      EXPORT unsigned1 max_hri := old_style.max_hri;
-      EXPORT boolean include_BlankDOD := old_style.include_BlankDOD;
-      EXPORT boolean smart_rollup := old_style.smart_rollup;
-      EXPORT integer1 non_subject_suppression := old_style.non_subject_suppression;
-    END;
-    RETURN report;  
-  ENDMACRO;    
 
 END;

@@ -132,13 +132,10 @@ FUNCTION
     SELF.NoContractCarrier  := IF(inMod.ReturnPortingInfo, r.NoContractCarrier, l.NoContractCarrier);
     SELF.Prepaid				 := IF(inMod.ReturnPortingInfo, r.Prepaid, l.Prepaid);
     deact_thresholdcheck := Std.Date.IsValidDate(r.DisconnectDate) AND (ut.DaysApart((STRING)r.DisconnectDate, currentDate) <= PhoneFinder_Services.Constants.PortingStatus.DisconnectedPhoneThreshold);
-    Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react AND deact_thresholdcheck => PhoneFinder_Services.Constants.PhoneStatus.Inactive, 
-                                ~r.is_deact AND r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Active, 
-                                PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
-    Phone_Status         := IF(inMod.UseInHousePhoneMetadata, Phone_Status_Inhouse, l.PhoneStatus); // flag to use inhouse phone metatdata instead of Qsent PVS
-    SELF.PhoneStatus     :=  Phone_Status;
-    SELF.ActivationDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, r.ActivationDate, 0);
-    SELF.DisconnectDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, r.DisconnectDate, 0);
+    
+    SELF.PhoneStatus     :=  l.PhoneStatus;
+    SELF.ActivationDate  := IF(l.PhoneStatus = PhoneFinder_Services.Constants.PhoneStatus.Active, r.ActivationDate, 0);
+    SELF.DisconnectDate  := IF(l.PhoneStatus = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, r.DisconnectDate, 0);
     // Override TU data to use LIBD and Port data when available
     SELF.serviceType  	 := r.serviceType;
     SELF.RealTimePhone_Ext.ServiceClass := IF(hasMetadata, (STRING)r.serviceType, l.RealTimePhone_Ext.ServiceClass);
