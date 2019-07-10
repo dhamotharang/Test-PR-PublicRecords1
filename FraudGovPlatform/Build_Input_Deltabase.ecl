@@ -20,10 +20,6 @@ module
 		self.Process_Date := (unsigned)pversion;
 		self.FileDate := (unsigned)l.fn[sub..sub+7];
 		self.FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
-		self.address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1));
-		self.address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
-		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1));
-		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));		
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		self.file_type := 3 ;
 		self:=l;
