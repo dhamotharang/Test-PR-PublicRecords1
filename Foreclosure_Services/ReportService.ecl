@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService">
 	<part name="ExcludeForeclosures"     type="xsd:boolean"/>
 	<part name="IncludeNoticeOfDefaults" type="xsd:boolean"/>
@@ -38,7 +38,6 @@
 <tr><td>true</td><td>false</td><td>nil, nada, null, naught, nothing, ...</td></tr>
 </table>
 */
-/*--USES-- ut.input_xslt */
 
 import Foreclosure_services, iesp, AutoStandardI;
 export ReportService := macro
@@ -59,15 +58,15 @@ export ReportService := macro
 		#stored ('IncludeNoticeOfDefaults',first_row.options.IncludeNoticeOfDefaults);
 	
   input_params := AutoStandardI.GlobalModule();
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 	tempmod := module(project(input_params,Foreclosure_services.ReportService_Records.params,opt))
 			EXPORT string70 ForeclosureId := '' :stored ('ForeclosureId');
-			Export string32 applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
 	end;
-	
+
 	boolean ExcludeForeclosures := false : stored('ExcludeForeclosures');
 	boolean IncludeNoticeOfDefaults := false : stored('IncludeNoticeOfDefaults');
-	for := if(~ExcludeForeclosures,Foreclosure_Services.ReportService_Records.val(tempmod,false));
-	nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.ReportService_Records.val(tempmod,true));
+	for := if(~ExcludeForeclosures,Foreclosure_Services.ReportService_Records.val(tempmod,mod_access,false,true));
+	nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.ReportService_Records.val(tempmod,mod_access,true,true));
 	raw_records := sort(for+nod,-recordingdate,record);
 
   // attach standard ESP header
@@ -81,63 +80,3 @@ export ReportService := macro
 endmacro;
 
 //ReportService ();
-/*
-<!-- ForeclosureReportRequest -->
-<dataset>
-  <row>
-    <remotelocations>
-      <value></value>
-    </remotelocations>
-    <servicelocations>
-      <locationid></locationid>
-      <servicename></servicename>
-      <parameters>
-        <name></name>
-        <value></value>
-      </parameters>
-    </servicelocations>
-    <user>
-      <referencecode></referencecode>
-      <billingcode></billingcode>
-      <queryid></queryid>
-      <companyid></companyid>
-      <glbpurpose></glbpurpose>
-      <dlpurpose></dlpurpose>
-      <loginhistoryid></loginhistoryid>
-      <debitunits></debitunits>
-      <ip></ip>
-      <industryclass></industryclass>
-      <resultformat></resultformat>
-      <logasfunction></logasfunction>
-      <ssnmask></ssnmask>
-      <dobmask></dobmask>
-      <dlmask></dlmask>
-      <datarestrictionmask></datarestrictionmask>
-      <datapermissionmask></datapermissionmask>
-      <ssnmaskingon></ssnmaskingon>
-      <dlmaskingon></dlmaskingon>
-      <enduser>
-        <companyname></companyname>
-        <streetaddress1></streetaddress1>
-        <city></city>
-        <state></state>
-        <zip5></zip5>
-      </enduser>
-      <maxwaitseconds></maxwaitseconds>
-      <relatedtransactionid></relatedtransactionid>
-      <accountnumber></accountnumber>
-    </user>
-    <reportby>
-      <foreclosureid></foreclosureid>
-      <ssn></ssn>
-      <uniqueid></uniqueid>
-    </reportby>
-    <options>
-      <blind></blind>
-      <encrypt></encrypt>
-      <ExcludeForeclosures></ExcludeForeclosures>
-      <IncludeNoticeOfDefaults></IncludeNoticeOfDefaults>
-    </options>
-  </row>
-</dataset>
-*/

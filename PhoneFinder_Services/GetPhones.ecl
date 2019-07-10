@@ -137,7 +137,8 @@ FUNCTION
 	
 	dPhoneRecs := PROJECT(dPhonesCombined,
                         TRANSFORM(lFinal, 
-                                  SELF.phonestatus := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode), 
+                                  SELF.phonestatus := IF(inMod.UseInHousePhoneMetadata, LEFT.phonestatus,
+								  						PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode)), 
                                   SELF             := LEFT));
 		
 	// Debug
@@ -161,6 +162,6 @@ FUNCTION
 			OUTPUT(dQSentCombined, NAMED('dQSentCombined'), EXTEND);
 		#END
 	#END
-	
+
 	RETURN dPhoneRecs;
 END;

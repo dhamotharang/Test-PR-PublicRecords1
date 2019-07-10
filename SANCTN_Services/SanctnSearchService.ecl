@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SanctnSearchService" wuTimeout="300000">
   <part name="BatchNumber"    type="xsd:string"/>
   <part name="IncidentNumber" type="xsd:string"/>
@@ -44,13 +44,15 @@
 </message>
 */
 /*--INFO-- SANCTIONs combined search / report.*/
+IMPORT doxie, Sanctn_Services, Text_Search;
 
 EXPORT SanctnSearchService := MACRO
 
-#constant('SearchIgnoresAddressOnly',true)
-#stored('PenaltThreshold',10)
+#constant('SearchIgnoresAddressOnly',true);
+#stored('PenaltThreshold',10);
 
-rpen := Sanctn_Services.SanctnSearchService_records;
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+rpen := Sanctn_Services.SanctnSearchService_records(mod_access);
 Text_Search.MAC_Append_ExternalKey(rpen, rpen2, l.BATCH_NUMBER+l.INCIDENT_NUMBER);
 output(rpen2, named('Results'));
 

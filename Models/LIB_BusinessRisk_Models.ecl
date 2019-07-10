@@ -2,19 +2,27 @@
 // This MODULE EXPORTs all of our BusinessRisk model calls.  By doing this, each library 
 // can request a specific module and thus only those models are compiled.
 
-IMPORT Business_Risk_BIP, Models, Risk_Indicators, RiskView,UT ;
+IMPORT Business_Risk_BIP, Models, Risk_Indicators, RiskView,UT,RiskWise ;
 
 // Including these blank defaults for retrieving the sets of Valid Models without having 
 // to pass in Business Shell or Arguments. This way when creating a new model we only need 
 // to update one section of the code to plug the model in (Models.LIB_BusinessRisk_Models)
-blankBusShell     := GROUP(DATASET([], Business_Risk_BIP.Layouts.Shell), Seq);
+blankBusShell  := GROUP(DATASET([], Business_Risk_BIP.Layouts.Shell), Seq);
 blankArguments := MODULE(Models.BR_LIBIN) END;
 blankBocaShell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
+blankiid       := GROUP(DATASET([],Risk_Indicators.Layout_Output), Seq);
+blankips       := DATASET([],riskwise.Layout_IP2O);
+
 
 EXPORT LIB_BusinessRisk_Models(
-											GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell = blankBusShell,
+											GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell = blankBusShell,		
 											Models.BR_LIBIN arguments = blankArguments,
-											GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) bocaShell = blankBocaShell
+											GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) bocaShell = blankBocaShell,
+                      GROUPED DATASET(Risk_Indicators.Layout_Output) iid = blankiid,
+                      DATASET(riskwise.Layout_IP2O) ips = blankips,
+                      unsigned1 DPPA=0, unsigned1 GLB=0,
+                      string DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+                      string DataPermission=risk_indicators.iid_constants.default_DataPermission
 																							) := INLINE MODULE
 
 	SHARED modelName				:= StringLib.StringToUpperCase(arguments.modelName);
@@ -26,7 +34,7 @@ EXPORT LIB_BusinessRisk_Models(
 
 	
 	
-	 EXPORT ValidatingModel := Models.BOFM1812_1_0(busShell); // Change this to the model you are trying to validate	
+	 EXPORT ValidatingModel := Models.BBFM1811_1_0(bocaShell,iid,'',ips,false,DPPA,GLB,DataRestriction,DataPermission,'',busShell,54); // Change this to the model you are trying to validate	
 
 	// The calcIndex function returns the 'billing_index' given the report_option
 	// value. billing_index is needed by batch.  it is passed to the ESP logging
@@ -56,8 +64,9 @@ EXPORT LIB_BusinessRisk_Models(
 									{'SLBB1809_0_0', 'SLBB1809_0_0', 7, '0-999'}, //blended
 									{'SLBO1809_0_0', 'SLBO1809_0_0', 8, '0-999'}, //not blended
                   //V101 attributes is 9
-                  {'BBFM1808_1_0', 'BBFM1808_1_0', 10, '0-999'}, //blended , based 
-                  {'BOFM1812_1_0', 'BOFM1812_1_0', 11, '0-999'}, //not blended 
+                  {'BBFM1808_1_0', 'BBFM1808_1_0', 10, '0-999'}, //blended 
+                  {'BOFM1812_1_0', 'BOFM1812_1_0', 11, '0-999'}, //not blended, business only
+                  {'BBFM1811_1_0', 'BBFM1811_1_0', 12, '0-999'}, //blended  
 								// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 									{'SBBM9999_9'  , 'SBBM9999_9'  , 0             , '0-999'},
 									{'SBOM9999_9'  , 'SBOM9999_9'  , 0             , '0-999'}
@@ -78,6 +87,7 @@ EXPORT LIB_BusinessRisk_Models(
 											'SLBO1702_0_2' => UNGROUP(Models.SLBO1702_0_2(busShell)),
 											'SLBO1809_0_0' => UNGROUP(Models.SLBO1809_0_0(busShell)),
                       'BOFM1812_1_0' => UNGROUP(Models.BOFM1812_1_0(busShell)),
+                      'BBFM1811_1_0' => UNGROUP(Models.BBFM1811_1_0(bocaShell,iid,'',ips,false,DPPA,GLB,DataRestriction,DataPermission,'',busShell,54)),
 											// ----------------------------------------------------------------------------------
 											// --------------------------------- CUSTOM MODELS ----------------------------------
 

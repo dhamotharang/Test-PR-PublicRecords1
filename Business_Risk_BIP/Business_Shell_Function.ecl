@@ -1,27 +1,35 @@
-﻿IMPORT Address, BIPV2, BizLinkFull, Business_Header, Business_Risk_BIP, Cortera, Gateway, MDR, NID, RiskWise, Risk_Indicators, UT, std;
+﻿IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Header,
+  Business_Risk_BIP, Cortera, Doxie, Gateway, MDR, NID, RiskWise, Risk_Indicators, UT, std;
 
-EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig, 
+EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig,
 															 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 															 DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw) ) := FUNCTION
 
+  mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()));
+    EXPORT dppa := Options.DPPA_Purpose;
+    EXPORT glb := Options.GLBA_Purpose;
+    EXPORT DataRestrictionMask := Options.DataRestrictionMask;
+    EXPORT DataPermissionMask := Options.DataPermissionMask;
+    EXPORT industry_class := Options.IndustryClass;
+  END;
 
 	RESTRICTED_SET := ['0', ''];
 
 	// Restrict SBFE data here in Business_Shell_Function to return blank fields in the SBFE datarow.
 	restrict_sbfe   := Options.DataPermissionMask[12] IN RESTRICTED_SET;
-	
+
 	// Instantiate a helper module, which will provide functionality to process AltCompanyNames.
 	modInp := Business_Risk_BIP.mod_InputDataset(InputOrig, Options);
 
 	// Make sure that something is populated, even if we don't get a hit on the key, and verify that the attribute is included in the version we are running
 	checkBlank(STRING field, STRING default_val, UNSIGNED minVersion=2) := MAP(Options.BusShellVersion < minVersion => '',
-																																						 field = '' 												  => default_val, 
+																																						 field = '' 												  => default_val,
 																																																								     field);
 	// Function to blank out attributes that are not to be returned in the requested business shell version.
 	checkVersion(STRING field, UNSIGNED minVersion=2) := IF(Options.BusShellVersion < minVersion, '', field);
-	
+
 	calculateValueFor := Business_Risk_BIP.mod_BusinessShellVersionLogic(Options);
- 
+
 	// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
 	linkingOptions := MODULE(BIPV2.mod_sources.iParams)
 		EXPORT STRING DataRestrictionMask		:= Options.DataRestrictionMask; // Note: Must unfortunately leave as undefined STRING length to match the module definition
@@ -35,26 +43,26 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		EXPORT BOOLEAN IncludeMinors				:= TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
 		EXPORT BOOLEAN LNBranded						:= TRUE; // Not entirely certain what effect this has
 	END;
-	
-	// For the AllowedSourcesSet, only include the Dunn Bradstreet source if that source is explicitly 
-	// allowed and drop any unallowed Marketing sources when Marketing Mode is turned on. Also, filter 
-	// out Experian data for those Scoring products intended primarily for the purpose of commercial 
+
+	// For the AllowedSourcesSet, only include the Dunn Bradstreet source if that source is explicitly
+	// allowed and drop any unallowed Marketing sources when Marketing Mode is turned on. Also, filter
+	// out Experian data for those Scoring products intended primarily for the purpose of commercial
 	// credit origination. E.g.:
 	//   o   Small Business Attributes
 	//   o   Small Business Attributes with SBFE Data
 	//   o   Small Business Credit Score with SBFE Data
 	//   o   Small Business Blended Credit Score with SBFE Data
 	//   o   Small Business Risk Score
-	AllowedSourcesSet := 
+	AllowedSourcesSet :=
 			SET(
 				CHOOSEN(
 					Business_Risk_BIP.Constants.AllowedSources(
 							(
-								Source <> MDR.SourceTools.src_Dunn_Bradstreet OR 
+								Source <> MDR.SourceTools.src_Dunn_Bradstreet OR
 								StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
 							) AND
 							(
-								Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR 
+								Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR
 								Source NOT IN SET(Business_Risk_BIP.Constants.MarketingRestrictedSources, Source)
 							) AND
 							(
@@ -62,39 +70,39 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 								Source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source)
 							) AND
 							(
-							
+
 								Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 OR
 								Source <> MDR.SourceTools.Src_Cortera
 							)	 AND
 							(
-							
+
 								Options.DataRestrictionMask[42] IN ['', '0'] OR
 								Source <> MDR.SourceTools.Src_Cortera
-							)	
-					), 
+							)
+					),
 					300
-				), 
+				),
 				Source );
-	
+
 	// Add new records to the Input_orig dataset for each record having an AltCompanyName.
 	Input := IF(Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v22, InputOrig, modInp.InputOrigPlusAltCompanyNames);
-	
+
 	// Clean up the input - parse the name, address, clean SSN, clean Phone, etc.
 	Business_Risk_BIP.Layouts.Shell cleanInput(Business_Risk_BIP.Layouts.Input le, UNSIGNED2 seqCounter) := TRANSFORM
 		SELF.Seq := seqCounter; // Uniquely Sequence our input
 		SELF.Clean_Input.Seq := seqCounter;
-		
+
 		SELF.Input_Echo := le; // Keep our original input
-		
+
 		// Company Name Fields
 		CompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.CompanyName), BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
 		SELF.Clean_Input.CompanyName := CompanyName;
 		SELF.Clean_Input.AltCompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
 		// Company Address Fields
 		companyAddress := Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1 + ' ' + le.StreetAddress2, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range);
-		companyCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.City, le.State, le.Zip);											
+		companyCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.City, le.State, le.Zip);
 		cleanedCompanyAddress := Address.CleanFields(companyCleanAddr);
-		SELF.Clean_Input.StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Predir, cleanedCompanyAddress.Prim_Name, 
+		SELF.Clean_Input.StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Predir, cleanedCompanyAddress.Prim_Name,
 																											cleanedCompanyAddress.Addr_Suffix, cleanedCompanyAddress.Postdir, cleanedCompanyAddress.Unit_Desig, cleanedCompanyAddress.Sec_Range);
 		SELF.Clean_Input.StreetAddress2 := TRIM(StringLib.StringToUppercase(le.StreetAddress2));
 		SELF.Clean_Input.Prim_Range := cleanedCompanyAddress.Prim_Range;
@@ -141,9 +149,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative Address Fields
 		repAddress := Risk_Indicators.MOD_AddressClean.street_address(le.Rep_StreetAddress1 + ' ' + le.Rep_StreetAddress2, le.Rep_Prim_Range, le.Rep_Predir, le.Rep_Prim_Name, le.Rep_Addr_Suffix, le.Rep_Postdir, le.Rep_Unit_Desig, le.Rep_Sec_Range);
-		repCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(repAddress, le.Rep_City, le.Rep_State, le.Rep_Zip);											
+		repCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(repAddress, le.Rep_City, le.Rep_State, le.Rep_Zip);
 		cleanedRepAddress := Address.CleanFields(repCleanAddr);
-		SELF.Clean_Input.Rep_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRepAddress.Prim_Range, cleanedRepAddress.Predir, cleanedRepAddress.Prim_Name, 
+		SELF.Clean_Input.Rep_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRepAddress.Prim_Range, cleanedRepAddress.Predir, cleanedRepAddress.Prim_Name,
 																											cleanedRepAddress.Addr_Suffix, cleanedRepAddress.Postdir, cleanedRepAddress.Unit_Desig, cleanedRepAddress.Sec_Range);
 		SELF.Clean_Input.Rep_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep_StreetAddress2));
 		SELF.Clean_Input.Rep_Prim_Range := cleanedRepAddress.Prim_Range;
@@ -193,9 +201,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep2_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep2_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 2 Address Fields
 		rep2Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep2_StreetAddress1 + ' ' + le.Rep2_StreetAddress2, le.Rep2_Prim_Range, le.Rep2_Predir, le.Rep2_Prim_Name, le.Rep2_Addr_Suffix, le.Rep2_Postdir, le.Rep2_Unit_Desig, le.Rep2_Sec_Range);
-		Rep2CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep2Address, le.Rep2_City, le.Rep2_State, le.Rep2_Zip);											
+		Rep2CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep2Address, le.Rep2_City, le.Rep2_State, le.Rep2_Zip);
 		cleanedRep2Address := Address.CleanFields(Rep2CleanAddr);
-		SELF.Clean_Input.Rep2_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep2Address.Prim_Range, cleanedRep2Address.Predir, cleanedRep2Address.Prim_Name, 
+		SELF.Clean_Input.Rep2_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep2Address.Prim_Range, cleanedRep2Address.Predir, cleanedRep2Address.Prim_Name,
 																											cleanedRep2Address.Addr_Suffix, cleanedRep2Address.Postdir, cleanedRep2Address.Unit_Desig, cleanedRep2Address.Sec_Range);
 		SELF.Clean_Input.Rep2_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep2_StreetAddress2));
 		SELF.Clean_Input.Rep2_Prim_Range := cleanedRep2Address.Prim_Range;
@@ -245,9 +253,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep3_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep3_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 3 Address Fields
 		Rep3Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep3_StreetAddress1 + ' ' + le.Rep3_StreetAddress2, le.Rep3_Prim_Range, le.Rep3_Predir, le.Rep3_Prim_Name, le.Rep3_Addr_Suffix, le.Rep3_Postdir, le.Rep3_Unit_Desig, le.Rep3_Sec_Range);
-		Rep3CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(Rep3Address, le.Rep3_City, le.Rep3_State, le.Rep3_Zip);											
+		Rep3CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(Rep3Address, le.Rep3_City, le.Rep3_State, le.Rep3_Zip);
 		cleanedRep3Address := Address.CleanFields(Rep3CleanAddr);
-		SELF.Clean_Input.Rep3_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep3Address.Prim_Range, cleanedRep3Address.Predir, cleanedRep3Address.Prim_Name, 
+		SELF.Clean_Input.Rep3_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep3Address.Prim_Range, cleanedRep3Address.Predir, cleanedRep3Address.Prim_Name,
 																											cleanedRep3Address.Addr_Suffix, cleanedRep3Address.Postdir, cleanedRep3Address.Unit_Desig, cleanedRep3Address.Sec_Range);
 		SELF.Clean_Input.Rep3_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep3_StreetAddress2));
 		SELF.Clean_Input.Rep3_Prim_Range := cleanedRep3Address.Prim_Range;
@@ -298,9 +306,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep4_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep4_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 4 Address Fields
 		rep4Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep4_StreetAddress1 + ' ' + le.Rep4_StreetAddress2, le.Rep4_Prim_Range, le.Rep4_Predir, le.Rep4_Prim_Name, le.Rep4_Addr_Suffix, le.Rep4_Postdir, le.Rep4_Unit_Desig, le.Rep4_Sec_Range);
-		Rep4CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep4Address, le.Rep4_City, le.Rep4_State, le.Rep4_Zip);											
+		Rep4CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep4Address, le.Rep4_City, le.Rep4_State, le.Rep4_Zip);
 		cleanedRep4Address := Address.CleanFields(Rep4CleanAddr);
-		SELF.Clean_Input.Rep4_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep4Address.Prim_Range, cleanedRep4Address.Predir, cleanedRep4Address.Prim_Name, 
+		SELF.Clean_Input.Rep4_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep4Address.Prim_Range, cleanedRep4Address.Predir, cleanedRep4Address.Prim_Name,
 																											cleanedRep4Address.Addr_Suffix, cleanedRep4Address.Postdir, cleanedRep4Address.Unit_Desig, cleanedRep4Address.Sec_Range);
 		SELF.Clean_Input.Rep4_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep4_StreetAddress2));
 		SELF.Clean_Input.Rep4_Prim_Range := cleanedRep4Address.Prim_Range;
@@ -350,9 +358,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Clean_Input.Rep5_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep5_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative 5 Address Fields
 		rep5Address := Risk_Indicators.MOD_AddressClean.street_address(le.Rep5_StreetAddress1 + ' ' + le.Rep5_StreetAddress2, le.Rep5_Prim_Range, le.Rep5_Predir, le.Rep5_Prim_Name, le.Rep5_Addr_Suffix, le.Rep5_Postdir, le.Rep5_Unit_Desig, le.Rep5_Sec_Range);
-		Rep5CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep5Address, le.Rep5_City, le.Rep5_State, le.Rep5_Zip);											
+		Rep5CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(rep5Address, le.Rep5_City, le.Rep5_State, le.Rep5_Zip);
 		cleanedRep5Address := Address.CleanFields(Rep5CleanAddr);
-		SELF.Clean_Input.Rep5_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep5Address.Prim_Range, cleanedRep5Address.Predir, cleanedRep5Address.Prim_Name, 
+		SELF.Clean_Input.Rep5_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRep5Address.Prim_Range, cleanedRep5Address.Predir, cleanedRep5Address.Prim_Name,
 																											cleanedRep5Address.Addr_Suffix, cleanedRep5Address.Postdir, cleanedRep5Address.Unit_Desig, cleanedRep5Address.Sec_Range);
 		SELF.Clean_Input.Rep5_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep5_StreetAddress2));
 		SELF.Clean_Input.Rep5_Prim_Range := cleanedRep5Address.Prim_Range;
@@ -388,9 +396,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 		SELF.Clean_Input.HistoryDate := IF(le.HistoryDate <= 0, (INTEGER)Business_Risk_BIP.Constants.NinesDate, le.HistoryDate); // If HistoryDate not populated run in "realtime" mode
 		SELF.Clean_Input.HistoryDateTime := IF(le.HistoryDateTime <= 0, (INTEGER)Business_Risk_BIP.Constants.NinesDateTime, le.HistoryDateTime); // If HistoryDateTime not populated run in "realtime" mode
-		
+
 		SELF.Clean_Input := le; // Fill out the remaining fields with what was passed in
-		
+
 		// Calculate all of the input populated attributes
 		BusNameCheck := Business_Risk_BIP.Common.SetBoolean(TRIM(le.CompanyName) <> '');
 		SELF.Input.InputCheckBusName := BusNameCheck;
@@ -404,14 +412,14 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		BusAddrZipCheck := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Zip) <> '');
 		SELF.Input.InputCheckBusZip := BusAddrZipCheck;
     InputCheckBusAddrZip := checkVersion(Business_Risk_BIP.Common.SetBoolean(
-                                         BusAddrLine1Check = '1' AND (BusAddrZipCheck = '1' OR (BusAddrCityCheck = '1' AND BusAddrStateCheck = '1'))), 
+                                         BusAddrLine1Check = '1' AND (BusAddrZipCheck = '1' OR (BusAddrCityCheck = '1' AND BusAddrStateCheck = '1'))),
                                          Business_Risk_BIP.Constants.BusShellVersion_v30);
     SELF.Input.InputCheckBusAddrZip := InputCheckBusAddrZip;
-    
+
 		AddrPOBox := MAP(BusAddrLine1Check = '0' OR InputCheckBusAddrZip = '0'                     => '-1',
 																			 Address.isPOBox(cleanedCompanyAddress.Prim_Name) = TRUE => '1',
 																																																  '0');
-		SELF.Verification.AddrPOBox	:= checkBlank(AddrPOBox, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);																																											
+		SELF.Verification.AddrPOBox	:= checkBlank(AddrPOBox, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Input.InputCheckBusFEIN := Business_Risk_BIP.Common.SetBoolean(TRIM(le.FEIN) <> '');
 		BusPhoneCheck := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Phone10) <> '');
 		SELF.Input.InputCheckBusPhone := BusPhoneCheck;
@@ -424,7 +432,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Input.InputCheckBusStartDate   := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Bus_Start_Date) <> '');
 		SELF.Input.InputCheckBusAnnualRevenue   := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Yearly_Revenue)	  <> '');
 		BusFax := RiskWise.CleanPhone(le.Fax_Number);
-		SELF.Input.InputCheckBusFax  := Business_Risk_BIP.Common.SetBoolean(TRIM(BusFax)  <> '');		
+		SELF.Input.InputCheckBusFax  := Business_Risk_BIP.Common.SetBoolean(TRIM(BusFax)  <> '');
 
 		AuthRepFirstNameCheck := Business_Risk_BIP.Common.SetBoolean((TRIM(le.Rep_FullName) <> '' AND cleanedName[6..25] <> '') OR TRIM(le.Rep_FirstName) <> ''); // If the rep full name was passed in see if it cleaned to a first name
 		SELF.Input.InputCheckAuthRepFirstName := AuthRepFirstNameCheck;
@@ -500,8 +508,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Input.InputCheckAuthRep3DLState := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Rep3_DLState) <> '');
 		// SELF.Input.InputAuthRep3FormerLastNameCheck := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Rep3_FormerLastName) <> '');
 		SELF.Input.InputCheckAuthRep3Title := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Rep3_BusinessTitle) <> '');
-		
-		
+
+
 		// Authorized Rep 4 Checks
 		AuthRep4FirstNameCheck := Business_Risk_BIP.Common.SetBoolean((TRIM(le.Rep4_FullName) <> '' AND cleanedNameRep4[6..25] <> '') OR TRIM(le.Rep4_FirstName) <> ''); // If the Rep2 full name was passed in see if it cleaned to a first name
 		SELF.Input.InputCheckAuthRep4FirstName := AuthRep4FirstNameCheck;
@@ -559,7 +567,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Input.InputCheckAuthRep5DLState := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Rep5_DLState) <> '');
 		//SELF.Input.InputAuthRep5FormerLastNameCheck := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Rep5_FormerLastName) <> '');
 		SELF.Input.InputCheckAuthRep5Title := Business_Risk_BIP.Common.SetBoolean(TRIM(le.Rep5_BusinessTitle) <> '');
-		
+
 		// Calculate attributes based purely on input
 		// Check to see if the Authorized Rep Name is part of the Company Name
 		BusNameAuthRepFirst := Business_Risk_BIP.Common.SetBoolean(calculateValueFor._BusNameAuthRepMatch(CompanyName, RepFirstName));
@@ -586,9 +594,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		BusNameAuthRep5PreferredFirst := Business_Risk_BIP.Common.SetBoolean(TRIM(Rep5PreferredFirstName) <> '' AND calculateValueFor._BusNameAuthRepMatch(CompanyName, Rep5PreferredFirstName));
 		BusNameAuthRep5Last := Business_Risk_BIP.Common.SetBoolean(calculateValueFor._BusNameAuthRepMatch(CompanyName, Rep5LastName));
 		BusNameAuthRep5Full := Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep5First = '1' AND BusNameAuthRep5Last = '1') OR (BusNameAuthRep5PreferredFirst = '1' AND BusNameAuthRep5Last = '1'));
-		
+
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirstInput := IF(BusNameCheck = '0' OR AuthRepFirstNameCheck = '0', '-1', BusNameAuthRepFirst);
-		
+
 		// We can't have a preferred first name populated unless the regular first name is populated - keep this as the AuthRepFirstNameCheck like we have in the line above
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstInput := IF(BusNameCheck = '0' OR AuthRepFirstNameCheck = '0', '-1', BusNameAuthRepPreferredFirst);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLastInput := IF(BusNameCheck = '0' OR AuthRepLastNameCheck = '0', '-1', BusNameAuthRepLast);
@@ -601,13 +609,13 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		ZIPScore						:= Risk_Indicators.AddrScore.ZIP_Score(cleanedCompanyAddress.Zip, cleanedRepAddress.Zip);
 		CityStateScore			:= Risk_Indicators.AddrScore.CityState_Score(cleanedCompanyAddress.V_City_Name, cleanedCompanyAddress.St, cleanedRepAddress.V_City_Name, cleanedRepAddress.St, '');
 		CityStateZipMatched	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
-		AddressMatched			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range, 
+		AddressMatched			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range,
 																						cleanedRepAddress.Prim_Range, cleanedRepAddress.Prim_Name, cleanedRepAddress.Sec_Range,
 																						ZIPScore, CityStateScore));
 		AddressNotPopulated := BusAddrLine1Check = '0' OR BusAddrCityCheck = '0' OR BusAddrStateCheck = '0' OR BusAddrZipCheck = '0' OR
 													 AuthRepAddrLine1Check = '0' OR AuthRepAddrCityCheck = '0' OR AuthRepAddrStateCheck = '0' OR AuthRepAddrZipCheck = '0';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepAddrBusAddrInput := IF(AddressNotPopulated, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched));
-		
+
 		//REP 2
     SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2FirstInput := IF(BusNameCheck = '0' OR AuthRep2FirstNameCheck = '0', '-1', BusNameAuthRep2First);
 		// We can't have a preferred first name populated unless the regular first name is populated - keep this as the AuthRepFirstNameCheck like we have in the line above
@@ -617,12 +625,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		ZIPScore2						:= Risk_Indicators.AddrScore.ZIP_Score(cleanedCompanyAddress.Zip, cleanedRep2Address.Zip);
 		CityStateScore2			:= Risk_Indicators.AddrScore.CityState_Score(cleanedCompanyAddress.V_City_Name, cleanedCompanyAddress.St, cleanedRep2Address.V_City_Name, cleanedRep2Address.St, '');
 		CityStateZipMatched2	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
-		AddressMatched2			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range, 
+		AddressMatched2			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range,
 																						cleanedRep2Address.Prim_Range, cleanedRep2Address.Prim_Name, cleanedRep2Address.Sec_Range,
 																						ZIPScore2, CityStateScore2));
 		AddressNotPopulated2 := BusAddrLine1Check = '0' OR BusAddrCityCheck = '0' OR BusAddrStateCheck = '0' OR BusAddrZipCheck = '0' OR
 													 AuthRep2AddrLine1Check = '0' OR AuthRep2AddrCityCheck = '0' OR AuthRep2AddrStateCheck = '0' OR AuthRep2AddrZipCheck = '0';
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddrInput := IF(AddressNotPopulated2, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched2));		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddrInput := IF(AddressNotPopulated2, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched2));
 		// rep 3
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3FirstInput := IF(BusNameCheck = '0' OR AuthRep3FirstNameCheck = '0', '-1', BusNameAuthRep3First);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3PrefFirstInput := IF(BusNameCheck = '0' OR AuthRep3FirstNameCheck = '0', '-1', BusNameAuthRep3PreferredFirst);
@@ -631,13 +639,13 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		ZIPScore3						:= Risk_Indicators.AddrScore.ZIP_Score(cleanedCompanyAddress.Zip, cleanedRep3Address.Zip);
 		CityStateScore3			:= Risk_Indicators.AddrScore.CityState_Score(cleanedCompanyAddress.V_City_Name, cleanedCompanyAddress.St, cleanedRep3Address.V_City_Name, cleanedRep3Address.St, '');
 		CityStateZipMatched3	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
-		AddressMatched3			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range, 
+		AddressMatched3			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range,
 																						cleanedRep3Address.Prim_Range, cleanedRep3Address.Prim_Name, cleanedRep3Address.Sec_Range,
 																						ZIPScore3, CityStateScore3));
 		AddressNotPopulated3 := BusAddrLine1Check = '0' OR BusAddrCityCheck = '0' OR BusAddrStateCheck = '0' OR BusAddrZipCheck = '0' OR
 													 AuthRep3AddrLine1Check = '0' OR AuthRep3AddrCityCheck = '0' OR AuthRep3AddrStateCheck = '0' OR AuthRep3AddrZipCheck = '0';
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddrInput := IF(AddressNotPopulated3, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched3));	
-		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddrInput := IF(AddressNotPopulated3, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched3));
+
 		// rep 4
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4FirstInput := IF(BusNameCheck = '0' OR AuthRep4FirstNameCheck = '0', '-1', BusNameAuthRep4First);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstInput := IF(BusNameCheck = '0' OR AuthRep4FirstNameCheck = '0', '-1', BusNameAuthRep4PreferredFirst);
@@ -646,12 +654,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		ZIPScore4						:= Risk_Indicators.AddrScore.ZIP_Score(cleanedCompanyAddress.Zip, cleanedRep4Address.Zip);
 		CityStateScore4			:= Risk_Indicators.AddrScore.CityState_Score(cleanedCompanyAddress.V_City_Name, cleanedCompanyAddress.St, cleanedRep4Address.V_City_Name, cleanedRep4Address.St, '');
 		CityStateZipMatched4	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
-		AddressMatched4			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range, 
+		AddressMatched4			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range,
 																						cleanedRep4Address.Prim_Range, cleanedRep4Address.Prim_Name, cleanedRep4Address.Sec_Range,
 																						ZIPScore4, CityStateScore4));
 		AddressNotPopulated4 := BusAddrLine1Check = '0' OR BusAddrCityCheck = '0' OR BusAddrStateCheck = '0' OR BusAddrZipCheck = '0' OR
 													 AuthRep4AddrLine1Check = '0' OR AuthRep4AddrCityCheck = '0' OR AuthRep4AddrStateCheck = '0' OR AuthRep4AddrZipCheck = '0';
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddrInput := IF(AddressNotPopulated4, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched4));	
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddrInput := IF(AddressNotPopulated4, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched4));
 
 		//REP 5
     SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5FirstInput := IF(BusNameCheck = '0' OR AuthRep5FirstNameCheck = '0', '-1', BusNameAuthRep5First);
@@ -662,34 +670,34 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		ZIPScore5						:= Risk_Indicators.AddrScore.ZIP_Score(cleanedCompanyAddress.Zip, cleanedRep5Address.Zip);
 		CityStateScore5			:= Risk_Indicators.AddrScore.CityState_Score(cleanedCompanyAddress.V_City_Name, cleanedCompanyAddress.St, cleanedRep5Address.V_City_Name, cleanedRep5Address.St, '');
 		CityStateZipMatched5	:= Risk_Indicators.iid_constants.ga(ZIPScore) AND Risk_Indicators.iid_constants.ga(CityStateScore);
-		AddressMatched5			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range, 
+		AddressMatched5			:= Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Prim_Name, cleanedCompanyAddress.Sec_Range,
 																						cleanedRep5Address.Prim_Range, cleanedRep5Address.Prim_Name, cleanedRep5Address.Sec_Range,
 																						ZIPScore5, CityStateScore5));
 		AddressNotPopulated5 := BusAddrLine1Check = '0' OR BusAddrCityCheck = '0' OR BusAddrStateCheck = '0' OR BusAddrZipCheck = '0' OR
 													 AuthRep5AddrLine1Check = '0' OR AuthRep5AddrCityCheck = '0' OR AuthRep5AddrStateCheck = '0' OR AuthRep5AddrZipCheck = '0';
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddrInput := IF(AddressNotPopulated5, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched5));	
-	
-		
-		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddrInput := IF(AddressNotPopulated5, '-1', Business_Risk_BIP.Common.SetBoolean(AddressMatched5));
+
+
+
 		InputAddrValid := MAP(TRIM(companyAddress) = '' OR InputCheckBusAddrZip = '0' => '-1', // No Company Address Input
 													cleanedCompanyAddress.Err_Stat[1] = 'E'                 => '0',  // Error cleaning Address - Invalid
                                                                                      '1'); // Company Address Input and it passed the address cleaner
 		SELF.Verification.InputAddrValid := InputAddrValid;										                 // This will get set to -1 below if no BIP IDs assigned
     SELF.Verification.InputAddrValidNoID := calculateValueFor._InputAddrValidNoID(InputAddrValid);
-															
-		InputPhoneValid := IF(TRIM(le.Phone10) = '', '-1', Business_Risk_BIP.Common.SetBoolean(Business_Risk_BIP.Common.validPhone(le.Phone10)));													
+
+		InputPhoneValid := IF(TRIM(le.Phone10) = '', '-1', Business_Risk_BIP.Common.SetBoolean(Business_Risk_BIP.Common.validPhone(le.Phone10)));
 		SELF.Verification.InputPhoneValid := InputPhoneValid; 		// This will get set to -1 below if no BIP IDs assigned
-		
+
     SELF.Verification.InputPhoneValidNoID := calculateValueFor._InputPhoneValidNoID(InputPhoneValid);
-		
+
 		InputFEINValid := IF(TRIM(filteredFEIN) = '', '-1', Business_Risk_BIP.Common.SetBoolean(Business_Header.ValidFEIN((INTEGER)filteredFEIN)));
 		SELF.Verification.InputFEINValid := InputFEINValid;				// This will get set to -1 below if no BIP IDs assigned
     SELF.Verification.InputFEINValidNoID := calculateValueFor._InputFEINValidNoID(InputFEINValid);
-		
+
 		SELF := []; // None of the remaining attributes have been populated yet
 	END;
 	cleanedInput := PROJECT(Input, cleanInput(LEFT, COUNTER));
-		
+
 	Risk_Indicators.Layout_Input prepForDIDAppend(Business_Risk_BIP.Layouts.Shell le) := TRANSFORM
 		SELF.Seq := le.Clean_Input.Seq;
 		SELF.HistoryDate := le.Clean_Input.HistoryDate;
@@ -726,11 +734,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.DL_State := le.Clean_Input.Rep_DLState;
 		SELF.Email_Address := le.Clean_Input.Rep_Email;
 		SELF.Phone10 := le.Clean_Input.Rep_Phone10;
-		
+
 		SELF := [];
 	END;
 	prepDIDAppend := PROJECT(cleanedInput, prepForDIDAppend(LEFT));
-	
+
 	DIDAppend := Risk_Indicators.iid_getDID_prepOutput(prepDIDAppend,
 																										Options.DPPA_Purpose,
 																										Options.GLBA_Purpose,
@@ -740,11 +748,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																										0, /*Append_Best*/
 																										DATASET([], Gateway.Layouts.Config), /*Gateways*/
 																										0 /*BSOptions*/);
-																										
+
 	// Pick the DID with the highest score, in the event that multiple have the same score, choose the lowest value DID to make this deterministic
 	DIDKept := ROLLUP(SORT(DIDAppend, Seq, -Score, DID), LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT));
-	
-	withDID := JOIN(cleanedInput, DIDKept, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell, 
+
+	withDID := JOIN(cleanedInput, DIDKept, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Clean_Input.Rep_LexID := RIGHT.DID;
 																								SELF.Clean_Input.Rep_LexIDScore := RIGHT.Score;
 																								SELF := LEFT),
@@ -752,9 +760,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	// Grab just the clean input to pass to the BIP Linking Process
 	prepBIPAppend := PROJECT(withDID, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
-	
+
 	BIPAppend := Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend, , Options.DoNotUseAuthRepInBIPAppend);
-	
+
 	withBIP := JOIN(withDID, BIPAppend, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.BIP_IDs := RIGHT;
 																								SELF.Verification.InputIDMatchConfidence := checkBlank((STRING)RIGHT.Weight, '0');
@@ -765,31 +773,31 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Verification.InputIDMatchUltID		:= (STRING)RIGHT.UltID.LinkID;
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-	
+
 	// Search by FEIN before we take out inputs with no BIP IDs assigned.
 	WatchListHit := Business_Risk_BIP.getWatchlists(withBIP, Options, linkingOptions, AllowedSourcesSet);
-		
-	Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet);
-	
-	InputBasedSources := Business_Risk_BIP.getInputBasedSources(withBIP, Options, linkingOptions, AllowedSourcesSet); 
-	
-	BusinessByFEIN := Business_Risk_BIP.getBusinessByFEIN(withBIP, Options, linkingOptions, AllowedSourcesSet); 
-	
-	BusinessByPhone := Business_Risk_BIP.getBusinessByPhone(withBIP, Options, linkingOptions, AllowedSourcesSet); 
-	
-	BusinessByAddress := Business_Risk_BIP.getBusinessByAddress(withBIP, Options, linkingOptions, AllowedSourcesSet); 
-  
-  InquiriesByInputs := Business_Risk_BIP.getInquiriesByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet); 
 
-  PropertyByInputs := Business_Risk_BIP.getPropertyByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet); 
-  
+	Phone := Business_Risk_BIP.getPhones(withBIP, Options, linkingOptions, AllowedSourcesSet);
+
+	InputBasedSources := Business_Risk_BIP.getInputBasedSources(withBIP, Options, linkingOptions, AllowedSourcesSet);
+
+	BusinessByFEIN := Business_Risk_BIP.getBusinessByFEIN(withBIP, Options, linkingOptions, AllowedSourcesSet);
+
+	BusinessByPhone := Business_Risk_BIP.getBusinessByPhone(withBIP, Options, linkingOptions, AllowedSourcesSet);
+
+	BusinessByAddress := Business_Risk_BIP.getBusinessByAddress(withBIP, Options, linkingOptions, AllowedSourcesSet);
+
+  InquiriesByInputs := Business_Risk_BIP.getInquiriesByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet);
+
+  PropertyByInputs := Business_Risk_BIP.getPropertyByInputs(withBIP, Options, linkingOptions, AllowedSourcesSet);
+
 	withWatchlists := JOIN(withBIP, WatchlistHit, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.WatchlistHits := RIGHT.WatchlistHits;
 																								VerWatchlistNameMatch := IF(TRIM(LEFT.Clean_Input.CompanyName)='' AND TRIM(LEFT.Clean_Input.AltCompanyName)='', '-1', RIGHT.Verification.VerWatchlistNameMatch);
 																								SELF.Verification.VerWatchlistNameMatch := checkBlank(VerWatchlistNameMatch, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-	
+
 	 withPhone := JOIN(withWatchlists, Phone, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Input_Characteristics.InputPhoneProblems  :=  RIGHT.Input_Characteristics.InputPhoneProblems,
 																								SELF.Input_Characteristics.InputPhoneEntityCount := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, RIGHT.Input_Characteristics.InputPhoneEntityCount, LEFT.Input_Characteristics.InputPhoneEntityCount),
@@ -798,7 +806,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Verification.PhoneDisconnected := checkBlank(RIGHT.Verification.PhoneDisconnected, '2'); // A 2 indicates "Unknown"
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																								
+
 	withInputBasedSources := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, withPhone, // unless running version 2.2 or higher we don't need any of the 'input based' attributes
 																					JOIN(withPhone, InputBasedSources, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 
@@ -808,7 +816,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Verification.InputAddrVacancyNoID := checkBlank( calculateValueFor._InputAddrVacancyNoID(RIGHT.Verification.InputAddrVacancyNoID), '0', Business_Risk_BIP.Constants.BusShellVersion_v22 ),
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
-																																				
+
 	withBusinessByFEIN := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, withInputBasedSources, // unless running version 2.2 or higher we don't need any of the 'input based' attributes
 																					JOIN(withInputBasedSources, BusinessByFEIN, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Verification.FEINOnFile := checkBlank(RIGHT.Verification.FEINOnFile, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
@@ -822,7 +830,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Input_Characteristics.InputTINEntityCount01Mos := checkBlank(RIGHT.Input_Characteristics.InputTINEntityCount01Mos, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
-																						
+
 	withBusinessByPhone := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, withBusinessByFEIN, // unless running version 3.0 or higher we don't need any of the 'input based' attributes
 																					JOIN(withBusinessByFEIN, BusinessByPhone, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
                                                 SELF.Input_Characteristics.InputPhoneEntityCount := checkBlank(RIGHT.Input_Characteristics.InputPhoneEntityCount, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -833,7 +841,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Input_Characteristics.InputPhoneEntityCount01Mos := checkBlank(RIGHT.Input_Characteristics.InputPhoneEntityCount01Mos, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
-																						
+
 	withBusinessByAddress := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, withBusinessByPhone, // unless running version 3.0 or higher we don't need any of the 'input based' attributes
 																					JOIN(withBusinessByPhone, BusinessByAddress, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Input_Characteristics.InputAddrTINCount := checkBlank(RIGHT.Input_Characteristics.InputAddrTINCount, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -853,8 +861,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Organizational_Structure.OrgAddrLegalEntityCountInactive := checkBlank(RIGHT.Organizational_Structure.OrgAddrLegalEntityCountInactive, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Organizational_Structure.OrgAddrLegalEntityCountDefunct := checkBlank(RIGHT.Organizational_Structure.OrgAddrLegalEntityCountDefunct, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																							SELF := LEFT),
-																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));		
-  
+																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
+
   withInquiriesByInputs := JOIN(withBusinessByAddress, InquiriesByInputs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Inquiry.InquiryBusAddress := checkBlank(RIGHT.Inquiry.InquiryBusAddress, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Inquiry.InquiryBusAddress01Mos := checkBlank(RIGHT.Inquiry.InquiryBusAddress01Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -895,29 +903,29 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Inquiry.InquiryConsumerSSN06Mos := checkBlank(RIGHT.Inquiry.InquiryConsumerSSN06Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Inquiry.InquiryConsumerSSN12Mos := checkBlank(RIGHT.Inquiry.InquiryConsumerSSN12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF := LEFT),
-																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW); 
+																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
   withPropertyByInputs := JOIN(withInquiriesByInputs, PropertyByInputs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Input_Characteristics.InputAddrLotSize := checkBlank(RIGHT.Input_Characteristics.InputAddrLotSize, '0');
 																								SELF.Input_Characteristics.InputAddrAssessedTotal := checkBlank(RIGHT.Input_Characteristics.InputAddrAssessedTotal, '0');
 																								SELF.Input_Characteristics.InputAddrSqFootage := checkBlank(RIGHT.Input_Characteristics.InputAddrSqFootage, '0');
 																								SELF := LEFT),
-																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW); 
-                                                
+																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+
   withAuthRepLexIDs := Business_Risk_BIP.getAuthRepLexIDs(withPropertyByInputs, Options);
-  
+
 	// Don't bother running a bunch of searches on Seq's that didn't find any ID's, just add them back at the end
 	NoLinkIDsFound := withAuthRepLexIDs (BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
 	// Only run the searches with Seq's that found BIP Link ID's that we can search with
 	LinkIDsFoundTemp := withAuthRepLexIDs (BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
 	// Append "Best" Company information if only BIP ID's were passed in and it was requested in the Options that we perform the BIPBestAppend process, otherwise this function just returns what was sent to it
 	LinkIDsFound := Business_Risk_BIP.BIP_Best_Append(LinkIDsFoundTemp, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	// Go out and grab the various data/attributes
 
 	BestBusinessInfo := Business_Risk_BIP.getBestBusinessInfo(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
-	withBestBusinessInfo :=  IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, LinkIDsFound, 
+	withBestBusinessInfo :=  IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, LinkIDsFound,
 																						JOIN(LinkIDsFound, BestBusinessInfo, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Best_Info.BestCompanyName := RIGHT.Best_Info.BestCompanyName;
 																								SELF.Best_Info.BestCompanyAddress1 := RIGHT.Best_Info.BestCompanyAddress1;
@@ -942,11 +950,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Best_Info.BestTypeOther := checkBlank(RIGHT.Best_Info.BestTypeOther, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Verification.AddrIsBest := RIGHT.Verification.AddrIsBest;
 																								SELF := LEFT),
-																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));	
+																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
 
-	
+
 	businessHeader := Business_Risk_BIP.getBusinessHeader(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	consumerHeader_all := Business_Risk_BIP.getConsumerHeader(businessHeader + NoLinkIDsFound, Options, linkingOptions, AllowedSourcesSet); // Pass in Business Header results for companies with BIP IDs assigned. Also pass in records with no BIP IDs assigned.
 
 	consumerHeader := consumerHeader_all(BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
@@ -956,59 +964,59 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	associates := Business_Risk_BIP.getAssociateSources(businessHeader, Options, linkingOptions, AllowedSourcesSet); // Need to pass Business Header in because that contains the set of Contact DIDs
 
 	OSHA := Business_Risk_BIP.getOSHA(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	Bankruptcy := Business_Risk_BIP.getBankruptcy(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	Property := Business_Risk_BIP.getProperty(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
 
 	EDA := Business_Risk_BIP.getEDA(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	EBR := Business_Risk_BIP.getEBR(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	Tradelines := Business_Risk_BIP.getTradelines(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	AddrAndPropertyData := Business_Risk_BIP.getAddrAndPropertyData(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	employeeSources := Business_Risk_BIP.getEmployeeSources(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	UCC := Business_Risk_BIP.getUCC(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	Liens := Business_Risk_BIP.getLiens(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	Inquiries := Business_Risk_BIP.getInquiries(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	otherSources := Business_Risk_BIP.getOtherSources(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	CorporateFilings := Business_Risk_BIP.getCorporateFilings(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	AirWatercraft := Business_Risk_BIP.getAirWatercraft(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	MotorVehicleData := Business_Risk_BIP.getMotorVehicles(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
 	GovernmentDebarred := Business_Risk_BIP.getGovernmentDebarred(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-		
+
 	PhoneAddrDistances := Business_Risk_BIP.getPhoneAddrDistances(businessHeader, Options, linkingOptions, AllowedSourcesSet);
-	
-	ProfLic := Business_Risk_BIP.getProfLicenses(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
-		
+
+	ProfLic := Business_Risk_BIP.getProfLicenses(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet, mod_access);
+
 	Cortera := Business_Risk_BIP.getCortera(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet, ds_CorteraRetrotestRecsRaw);
-	 
+
 	SBFE := Business_Risk_BIP.getSBFE(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
 
-	
+
 	mergeBNAP(STRING leftBNAP, STRING rightBNAP) := FUNCTION
 		maxBNAP := MAX((INTEGER)leftBNAP, (INTEGER)rightBNAP);
 		minBNAP := MIN((INTEGER)leftBNAP, (INTEGER)rightBNAP);
-		
+
 		mergedBNAP := MAP(maxBNAP IN [5, 6, 7] AND minBNAP = 4	=> 8,
 											maxBNAP IN [6, 7] AND minBNAP = 5			=> 8,
 																															 maxBNAP);
 		RETURN((STRING)mergedBNAP);
 	END;
-	
+
 	// All data has been gathered, now join everything back together - utilize PARALLEL to minimize latency of the Shell
-																						
+
 	withBusinessHeader := JOIN(withBestBusinessInfo, businessHeader, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF.Verification.NameMatch := (STRING)MAX((INTEGER)LEFT.Verification.NameMatch, (INTEGER)RIGHT.Verification.NameMatch);
@@ -1073,7 +1081,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRepSSNBusFEIN  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepSSNBusFEIN, '0');
-		
+
 																								//rep2
 																								SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstFile := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First, '0');
@@ -1099,7 +1107,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile, '0');
-																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep3SSNBusFein  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3SSNBusFein, '0');	
+																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep3SSNBusFein  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3SSNBusFein, '0');
 																								//rep4
 																								SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstFile := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4First := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4First, '0');
@@ -1112,7 +1120,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
                                                 SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep4SSNOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4SSNOnFile, '0');
-																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep4SSNBusFEIN  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4SSNBusFEIN, '0');																
+																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep4SSNBusFEIN  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4SSNBusFEIN, '0');
 																								//rep5
 																								SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstFile := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5First := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5First, '0');
@@ -1126,7 +1134,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep5SSNOnFile  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5SSNOnFile, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFEIN  := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFEIN, '0');
-																							
+
 																								SELF.Associates.AssociateCount := checkBlank(RIGHT.Associates.AssociateCount, '0');
 																								SELF.Associates.AssociateCurrentCount := checkBlank(RIGHT.Associates.AssociateCurrentCount, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Associates.AssociateCurrentSOSCount := checkBlank(RIGHT.Associates.AssociateCurrentSOSCount, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -1151,7 +1159,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Build_Dates.BusinessHeaderBuildDate := RIGHT.Data_Build_Dates.BusinessHeaderBuildDate;
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withConsumerHeader := JOIN(withBusinessHeader, consumerHeader, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Verification.BusAddrConsumerFirstName := checkBlank(RIGHT.Verification.BusAddrConsumerFirstName, '0');
 																								SELF.Verification.BusAddrConsumerLastName := checkBlank(RIGHT.Verification.BusAddrConsumerLastName, '0');
@@ -1162,46 +1170,46 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Business_To_Person_Link.BusAddrPersonNameOverlap := checkBlank(RIGHT.Business_To_Person_Link.BusAddrPersonNameOverlap, '0');
 																								SELF.Business_To_Executive_Link.AR2BRep1NameBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep1NameBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep2NameBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep2NameBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep3NameBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3NameBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);			
+																								SELF.Business_To_Executive_Link.AR2BRep3NameBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3NameBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep4NameBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep4NameBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep5NameBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5NameBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								
+
 																								SELF.Business_To_Executive_Link.AR2BRep1AddrBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep1AddrBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep2AddrBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep2AddrBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep3AddrBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3AddrBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);																								
+																								SELF.Business_To_Executive_Link.AR2BRep3AddrBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3AddrBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep4AddrBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep4AddrBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep5AddrBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5AddrBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);																								
-																								
+																								SELF.Business_To_Executive_Link.AR2BRep5AddrBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5AddrBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
+
 																								SELF.Business_To_Executive_Link.AR2BRep1PhoneBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep1PhoneBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep2PhoneBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep2PhoneBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep3PhoneBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3PhoneBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);					
+																								SELF.Business_To_Executive_Link.AR2BRep3PhoneBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3PhoneBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																                SELF.Business_To_Executive_Link.AR2BRep4PhoneBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep4PhoneBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep5PhoneBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5PhoneBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);							
-																								
+																								SELF.Business_To_Executive_Link.AR2BRep5PhoneBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5PhoneBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
+
 																								SELF.Business_To_Executive_Link.AR2BRep1SSNBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep1SSNBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep2SSNBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep2SSNBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep3SSNBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3SSNBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);					
+																								SELF.Business_To_Executive_Link.AR2BRep3SSNBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3SSNBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep4SSNBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep4SSNBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep5SSNBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5SSNBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);																								
-																								
+																								SELF.Business_To_Executive_Link.AR2BRep5SSNBusHeaderLexID := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5SSNBusHeaderLexID, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
+
 																								SELF.Business_To_Executive_Link.AR2BRep1AddrAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep1AddrAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep2AddrAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep2AddrAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep3AddrAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3AddrAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep4AddrAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep4AddrAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep5AddrAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5AddrAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);																								
-																								
+																								SELF.Business_To_Executive_Link.AR2BRep5AddrAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5AddrAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
+
 																								SELF.Business_To_Executive_Link.AR2BRep1PhoneAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep1PhoneAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep2PhoneAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep2PhoneAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep3PhoneAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3PhoneAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep4PhoneAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep4PhoneAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								SELF.Business_To_Executive_Link.AR2BRep5PhoneAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5PhoneAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);																								
-																								
+																								SELF.Business_To_Executive_Link.AR2BRep5PhoneAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5PhoneAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
+
 																								SELF.Business_To_Executive_Link.AR2BRep1SSNAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep1SSNAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep2SSNAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep2SSNAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep3SSNAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep3SSNAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep4SSNAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep4SSNAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BRep5SSNAssociateCHeader := checkBlank(RIGHT.Business_To_Executive_Link.AR2BRep5SSNAssociateCHeader, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								
+
 																								SELF.Verification.FEINPersonNameMatch := checkBlank(RIGHT.Verification.FEINPersonNameMatch, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Verification.FEINPersonAddrMatch := checkBlank(RIGHT.Verification.FEINPersonAddrMatch, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Verification.FEINAssociateSSNMatch := checkBlank(RIGHT.Verification.FEINAssociateSSNMatch, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
@@ -1229,7 +1237,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Input_Characteristics.InputAddrConsumerCount := checkBlank(RIGHT.Input_Characteristics.InputAddrConsumerCount, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withAssociates := JOIN(withConsumerHeader, associates, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Associates.AssociateHighCrimeAddrCount := checkBlank(RIGHT.Associates.AssociateHighCrimeAddrCount, '0');
 																								SELF.Associates.AssociateFelonyCount := checkBlank(RIGHT.Associates.AssociateFelonyCount, '0');
@@ -1256,9 +1264,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Associates.AssociateCurrentPAWCount := checkBlank(RIGHT.Associates.AssociateCurrentPAWCount, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-															
+
  withAuthRepTitles := Business_Risk_BIP.getAuthRepTitles(withAssociates, Options, linkingOptions, AllowedSourcesSet);
- 
+
 	withOSHA := JOIN(withAuthRepTitles, OSHA, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Firmographic.OwnershipType := checkBlank(RIGHT.Firmographic.OwnershipType, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
@@ -1266,7 +1274,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeOSHA := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeOSHA, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withBankruptcy := JOIN(withOSHA, Bankruptcy, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF.Bankruptcy.BankruptcyCount03Month := checkBlank(RIGHT.Bankruptcy.BankruptcyCount03Month, '0');
@@ -1291,7 +1299,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Build_Dates.BankruptcyBuildDate := RIGHT.Data_Build_Dates.BankruptcyBuildDate;
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withProperty := JOIN(withBankruptcy, Property, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount, '0');
@@ -1299,18 +1307,18 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount3 := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount3, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount4 := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount4, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount5 := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount5, '0');
-																								
+
 																								SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRepOwned := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusAddrAuthRepOwned, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep2Owned := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep2Owned, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep3Owned := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep3Owned, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep4Owned := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep4Owned, '0');
 																								SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep5Owned := checkBlank(RIGHT.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep5Owned, '0');
-																								
+
 																								SELF.Best_Info.BestOwnership := checkBlank(RIGHT.Best_Info.BestOwnership, '0', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Data_Fetch_Indicators.FetchCodeProperty := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeProperty, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withEDA := JOIN(withProperty, EDA, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								VerificationBusInputPhoneAddr := MAX((INTEGER)LEFT.Verification.VerificationBusInputPhoneAddr, (INTEGER)RIGHT.Verification.VerificationBusInputPhoneAddr);
 																								SELF.Verification.VerificationBusInputPhoneAddr := IF(VerificationBusInputPhoneAddr = -2, '-1', (STRING)VerificationBusInputPhoneAddr);
@@ -1328,7 +1336,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.BestAddrPhones := LEFT.BestAddrPhones + RIGHT.BestAddrPhones;
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withEBR := JOIN(withEDA, EBR, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Firmographic.FirmAgeEstablished := checkBlank(RIGHT.Firmographic.FirmAgeEstablished, '-1');
 																								SELF.Firmographic.FirmReportedSales := checkBlank(RIGHT.Firmographic.FirmReportedSales, '-1');
@@ -1337,7 +1345,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withTradelines := JOIN(withEBR, Tradelines, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Tradeline.TradeBalanceCurrent := checkBlank(RIGHT.Tradeline.TradeBalanceCurrent, '-1');
 																								SELF.Tradeline.Trade06MonthHighBalance := checkBlank(RIGHT.Tradeline.Trade06MonthHighBalance, '-1');
@@ -1385,7 +1393,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeTradelines := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeTradelines, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withAddrAndPropertyData := JOIN(withTradelines, AddrAndPropertyData, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF.Verification.AddrIsBest                       := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, RIGHT.Verification.AddrIsBest, LEFT.Verification.AddrIsBest);
@@ -1405,7 +1413,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Asset_Information.AssetCurrentPropertySqFootageTotal := checkBlank(RIGHT.Asset_Information.AssetCurrentPropertySqFootageTotal, '-1');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withEmployee := JOIN(withAddrAndPropertyData, employeeSources, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																			     SELF.PhoneSources := LEFT.PhoneSources + RIGHT.PhoneSources;
@@ -1425,7 +1433,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeABIUS := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeABIUS, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withUCC := JOIN(withEmployee, UCC, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF.Public_Record.UCCCount := checkBlank(RIGHT.Public_Record.UCCCount, '0');
@@ -1446,7 +1454,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeUCC := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeUCC, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withLiens := JOIN(withUCC, Liens, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Lien_And_Judgment.LienFilingDateList   := RIGHT.Lien_And_Judgment.LienFilingDateList;
 																								SELF.Lien_And_Judgment.LienTimeNewest := RIGHT.Lien_And_Judgment.LienTimeNewest;
@@ -1599,7 +1607,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeLien 					 := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeLien, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withInquiries := JOIN(withLiens, Inquiries, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Inquiry.InquiryIndustryDescriptionList := RIGHT.Inquiry.InquiryIndustryDescriptionList;
 																								SELF.Inquiry.InquiryDateList := RIGHT.Inquiry.InquiryDateList;
@@ -1634,8 +1642,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeInquiries := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeInquiries, '0');
 																								SELF.Data_Fetch_Indicators.FetchCodeInquiriesUpdate := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeInquiriesUpdate, '0');
 																								SELF := LEFT),
-																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW); 
-																						
+																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+
 	withOther := JOIN(withInquiries, otherSources, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
@@ -1661,7 +1669,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Business_To_Executive_Link.AR2BBusPAWRep3 := checkBlank(RIGHT.Business_To_Executive_Link.AR2BBusPAWRep3, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BBusPAWRep4 := checkBlank(RIGHT.Business_To_Executive_Link.AR2BBusPAWRep4, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.Business_To_Executive_Link.AR2BBusPAWRep5 := checkBlank(RIGHT.Business_To_Executive_Link.AR2BBusPAWRep5, '0', Business_Risk_BIP.Constants.BusShellVersion_v22);
-																								
+
 																								SELF.Data_Fetch_Indicators.FetchCodeBBBMember := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeBBBMember, '0');
 																								SELF.Data_Fetch_Indicators.FetchCodeBBBNonMember := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeBBBNonMember, '0');
 																								SELF.Data_Fetch_Indicators.FetchCodeFBN := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeFBN, '0');
@@ -1672,7 +1680,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeYellowPages := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeYellowPages, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withCorporateFilings := JOIN(withOther, CorporateFilings, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.SOS.SOSDateOfIncorporationList     := RIGHT.SOS.SOSDateOfIncorporationList;
 																								SELF.SOS.SOSStanding										:= checkBlank(RIGHT.SOS.SOSStanding, '-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
@@ -1700,7 +1708,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SOS.SOSForeignDateLastSeen         := checkBlank(RIGHT.SOS.SOSForeignDateLastSeen, '0');
 																								SELF.SOS.SOSForeignMosSinceFirstSeen    := checkBlank(RIGHT.SOS.SOSForeignMosSinceFirstSeen, '0');
 																								SELF.SOS.SOSStandingBest                := checkBlank(RIGHT.SOS.SOSStandingBest, '0');
-																								SELF.SOS.SOSStandingWorst               := checkBlank(RIGHT.SOS.SOSStandingWorst, '0');                                                
+																								SELF.SOS.SOSStandingWorst               := checkBlank(RIGHT.SOS.SOSStandingWorst, '0');
 																								SELF.SOS.SOSCodeList                    := RIGHT.SOS.SOSCodeList;
 																								SELF.SOS.SOSFilingCodeList              := RIGHT.SOS.SOSFilingCodeList;
 																								SELF.SOS.SOSForeignStateList            := RIGHT.SOS.SOSForeignStateList;
@@ -1725,7 +1733,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Fetch_Indicators.FetchCodeCorporateFilings := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeCorporateFilings, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	withAirWatercraft := JOIN(withCorporateFilings, AirWatercraft, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF.Asset_Information.AssetAircraftCount := checkBlank(RIGHT.Asset_Information.AssetAircraftCount, '0'),
@@ -1736,7 +1744,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Data_Build_Dates.WatercraftBuildDate := RIGHT.Data_Build_Dates.WatercraftBuildDate;
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
  withMotorVehicles := JOIN(withAirWatercraft, MotorVehicleData, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Asset_Information.AssetVehicleCount := checkBlank(RIGHT.Asset_Information.AssetVehicleCount, '-1'),
 																								SELF.Asset_Information.AssetPersonalVehicleCount := checkBlank(RIGHT.Asset_Information.AssetPersonalVehicleCount, '-1'),
@@ -1745,13 +1753,13 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Asset_Information.AssetTotalVehicleValue := checkBlank(RIGHT.Asset_Information.AssetTotalVehicleValue, '-1'),
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
- 
+
 	withGovernmentDebarred := JOIN(withMotorVehicles, GovernmentDebarred, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Public_Record.GovernmentDebarred := checkBlank(RIGHT.Public_Record.GovernmentDebarred, '0'),
 																								SELF.Data_Fetch_Indicators.FetchCodeGovernmentDebarred := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeGovernmentDebarred, '0');
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
- 
+
 	withPhoneAddrDistance := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, withGovernmentDebarred, //PhoneAddrDistance attributes only needed for v2.2 and above.
 																						JOIN(withGovernmentDebarred, PhoneAddrDistances, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Verification.PhoneDistance := checkBlank(RIGHT.Verification.PhoneDistance, '-1'),
@@ -1776,9 +1784,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Sources := LEFT.Sources + RIGHT.Sources;
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-                                           
-	
-	withCortera := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, withProfLic, 
+
+
+	withCortera := IF(Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, withProfLic,
 																						JOIN(withProfLic, Cortera, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.B2B.UltimateIDCount := checkBlank(RIGHT.B2B.UltimateIDCount, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
                                                 SELF.B2B.UltimateIDCountActive := checkBlank(RIGHT.B2B.UltimateIDCountActive, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -1791,18 +1799,18 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.B2B.VendorScorePaymentBehaviorMin := checkBlank(RIGHT.B2B.VendorScorePaymentBehaviorMin, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.AvgProviderCount12Mos := checkBlank(RIGHT.B2B.AvgProviderCount12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.ProviderTrajectory12Mos := checkBlank(RIGHT.B2B.ProviderTrajectory12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
-																								SELF.B2B.ProviderTrajectory24Mos := checkBlank(RIGHT.B2B.ProviderTrajectory24Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);	
+																								SELF.B2B.ProviderTrajectory24Mos := checkBlank(RIGHT.B2B.ProviderTrajectory24Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.NumSpendCategories12Mos := checkBlank(RIGHT.B2B.NumSpendCategories12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.TotalSpend12Mos := checkBlank(RIGHT.B2B.TotalSpend12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.SpendTrajectory12Mos := checkBlank(RIGHT.B2B.SpendTrajectory12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
-																								SELF.B2B.SpendTrajectory24Mos := checkBlank(RIGHT.B2B.SpendTrajectory24Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);	
+																								SELF.B2B.SpendTrajectory24Mos := checkBlank(RIGHT.B2B.SpendTrajectory24Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.AveDaysBeyondTerms := checkBlank(RIGHT.B2B.AveDaysBeyondTerms, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.AvgPctTradelinesGT30DPD12Mos := checkBlank(RIGHT.B2B.AvgPctTradelinesGT30DPD12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.AvgPctTradelinesGT30DPDIndex12Mos := checkBlank(RIGHT.B2B.AvgPctTradelinesGT30DPDIndex12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.AvgPctTradelinesGT60DPD12Mos := checkBlank(RIGHT.B2B.AvgPctTradelinesGT60DPD12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.AvgPctTradelinesGT60DPDIndex12Mos := checkBlank(RIGHT.B2B.AvgPctTradelinesGT60DPDIndex12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.AvgPctTradelinesGT90DPD12Mos := checkBlank(RIGHT.B2B.AvgPctTradelinesGT90DPD12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
-																								SELF.B2B.AvgPctTradelinesGT90DPDIndex12Mos := checkBlank(RIGHT.B2B.AvgPctTradelinesGT90DPDIndex12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);	
+																								SELF.B2B.AvgPctTradelinesGT90DPDIndex12Mos := checkBlank(RIGHT.B2B.AvgPctTradelinesGT90DPDIndex12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.DaysBeyondTerms30Trajectory12Mos := checkBlank(RIGHT.B2B.DaysBeyondTerms30Trajectory12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.DaysBeyondTerms30Trajectory24Mos := checkBlank(RIGHT.B2B.DaysBeyondTerms30Trajectory24Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.B2B.DaysBeyondTerms60Trajectory12Mos := checkBlank(RIGHT.B2B.DaysBeyondTerms60Trajectory12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -1819,8 +1827,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.EmployeeSources := LEFT.EmployeeSources + RIGHT.EmployeeSources;
 																								SELF.SICNAICSources := LEFT.SICNAICSources + RIGHT.SICNAICSources;
 																								SELF := LEFT),
-																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));	
-	
+																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
+
 	withSBFE := JOIN(withCortera, SBFE, LEFT.Seq = Right.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								LNIDHit := LEFT.Verification.InputIDMatchCategory NOT IN [Business_Risk_BIP.Constants.Category_None, ''];
 																								SELF.Verification.InputIDMatchStatus := checkBlank(IF(LNIDHit, LEFT.Verification.InputIDMatchStatus, RIGHT.Verification.InputIDMatchStatus), 'UNKNOWN', Business_Risk_BIP.Constants.BusShellVersion_v22);
@@ -1845,8 +1853,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SBFE.SBFEAddrMatchMonthsLastSeen := checkBlank(SBFEAddrMatchMonthsLastSeen, '-99', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SELF.SBFE.SBFEVerBusInputPhone := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99',checkBlank(RIGHT.SBFE.SBFEVerBusInputPhone, '-99'));
 																								SBFEPhoneMatchDateFirstSeen := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', RIGHT.SBFE.SBFEPhoneMatchDateFirstSeen);
-																								SELF.SBFE.SBFEPhoneMatchDateFirstSeen := checkBlank(SBFEPhoneMatchDateFirstSeen, '-99', Business_Risk_BIP.Constants.BusShellVersion_v22); 
-																								SBFEPhoneMatchMonthsFirstSeen := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', RIGHT.SBFE.SBFEPhoneMatchMonthsFirstSeen); 
+																								SELF.SBFE.SBFEPhoneMatchDateFirstSeen := checkBlank(SBFEPhoneMatchDateFirstSeen, '-99', Business_Risk_BIP.Constants.BusShellVersion_v22);
+																								SBFEPhoneMatchMonthsFirstSeen := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', RIGHT.SBFE.SBFEPhoneMatchMonthsFirstSeen);
 																						 		SELF.SBFE.SBFEPhoneMatchMonthsFirstSeen := checkBlank(SBFEPhoneMatchMonthsFirstSeen, '-99', Business_Risk_BIP.Constants.BusShellVersion_v22);
 																								SBFEPhoneMatchDateLastSeen := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', RIGHT.SBFE.SBFEPhoneMatchDateLastSeen);
 																								SELF.SBFE.SBFEPhoneMatchDateLastSeen := checkBlank(SBFEPhoneMatchDateLastSeen, '-99', Business_Risk_BIP.Constants.BusShellVersion_v22);
@@ -1874,7 +1882,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SBFE.SBFEBusExecLinkRep3NameonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep3NameonFile, '-99'));
 																								SELF.SBFE.SBFEBusExecLinkRep3AddronFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep3AddronFile, '-99'));
 																								SELF.SBFE.SBFEBusExecLinkRep3PhoneonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep3PhoneonFile, '-99'));
-																								SELF.SBFE.SBFEBusExecLinkRep3SSNonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep3SSNonFile, '-99'));	
+																								SELF.SBFE.SBFEBusExecLinkRep3SSNonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep3SSNonFile, '-99'));
 																								SELF.SBFE.SBFEBusExecLinkRep4NameonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep4NameonFile, '-99'));
 																								SELF.SBFE.SBFEBusExecLinkRep4AddronFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep4AddronFile, '-99'));
 																								SELF.SBFE.SBFEBusExecLinkRep4PhoneonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep4PhoneonFile, '-99'));
@@ -1883,11 +1891,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SBFE.SBFEBusExecLinkRep5AddronFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep5AddronFile, '-99'));
 																								SELF.SBFE.SBFEBusExecLinkRep5PhoneonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep5PhoneonFile, '-99'));
 																								SELF.SBFE.SBFEBusExecLinkRep5SSNonFile := IF((INTEGER)RIGHT.SBFE.SBFEAccountCount <= 0, '-99', checkBlank(RIGHT.SBFE.SBFEBusExecLinkRep5SSNonFile, '-99'));
-																								
+
 																								SELF.SBFE.SBFEDateFirstCycleAll := checkBlank(RIGHT.SBFE.SBFEDateFirstCycleAll, '-99');
 																								SELF.SBFE.SBFETimeOldestCycle := checkBlank(RIGHT.SBFE.SBFETimeOldestCycle,'-99');
 																								SELF.SBFE.SBFEDateLastCycleAll := checkBlank(RIGHT.SBFE.SBFEDateLastCycleAll, '-99');
-																								SELF.SBFE.SBFETimeNewestCycle := checkBlank(RIGHT.SBFE.SBFETimeNewestCycle,'-99');	
+																								SELF.SBFE.SBFETimeNewestCycle := checkBlank(RIGHT.SBFE.SBFETimeNewestCycle,'-99');
 																								SELF.SBFE.SBFEAccountCount := checkBlank(RIGHT.SBFE.SBFEAccountCount, '-99');
 																								SELF.SBFE.SBFEAccountCount12M := checkBlank(RIGHT.SBFE.SBFEAccountCount12M, '-99');
 																								SELF.SBFE.SBFEOpenCount03M := checkBlank(RIGHT.SBFE.SBFEOpenCount03M, '-99');
@@ -3739,20 +3747,20 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.SBFE.SBFEGuarantorMaxCount := checkBlank(RIGHT.SBFE.SBFEGuarantorMaxCount, '-99');
 																								SELF.SBFE.SBFEPrincipalAccountCount := checkBlank(RIGHT.SBFE.SBFEPrincipalAccountCount, '-99');
 																								SELF.SBFE.SBFEPrincipalMinCount := checkBlank(RIGHT.SBFE.SBFEPrincipalMinCount, '-99');
-																								SELF.SBFE.SBFEPrincipalMaxCount := checkBlank(RIGHT.SBFE.SBFEPrincipalMaxCount, '-99');							
+																								SELF.SBFE.SBFEPrincipalMaxCount := checkBlank(RIGHT.SBFE.SBFEPrincipalMaxCount, '-99');
 																								SELF.SBFE.SBFEINTERNALObservedPerf06 := checkBlank(RIGHT.SBFE.SBFEINTERNALObservedPerf06, '-99');
 																								SELF.SBFE.SBFEINTERNALObservedPerf12 := checkBlank(RIGHT.SBFE.SBFEINTERNALObservedPerf12, '-99');
 																								SELF.SBFE.SBFEINTERNALObservedPerf18 := checkBlank(RIGHT.SBFE.SBFEINTERNALObservedPerf18, '-99');
 																								SELF.SBFE.SBFEINTERNALObservedPerf24 := checkBlank(RIGHT.SBFE.SBFEINTERNALObservedPerf24, '-99');
 																								SELF.SBFE.SBFEINTERNALObservedPerf36 := checkBlank(RIGHT.SBFE.SBFEINTERNALObservedPerf36, '-99');
 																								SELF.Data_Fetch_Indicators.FetchCodeSBFE := checkBlank(RIGHT.Data_Fetch_Indicators.FetchCodeSBFE, '0');
-																								
+
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
- 
+
 	// Call Targus Gateway for each input record that has a legit Business Phone, no records
 	// found among our inhouse phone sources, and no Targus restriction for the customer.
-	targusGatewayPrep_pre_pre := 
+	targusGatewayPrep_pre_pre :=
 		JOIN(
 			LinkIDsFound, withSBFE,
 			LEFT.seq = RIGHT.seq AND
@@ -3760,17 +3768,17 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 			TRANSFORM( Business_Risk_BIP.Layouts.Shell, SELF := LEFT, SELF := [] ),
 			LEFT ONLY
 		);
-		
+
 	targusGatewayPrep_pre := IF( Options.RunTargusGatewayAnywayForTesting, LinkIDsFound, targusGatewayPrep_pre_pre );
 
 	targusGatewayPrep := targusGatewayPrep_pre(Input.InputCheckBusPhone = '1');
-	
+
 	targusGateway := Business_Risk_BIP.getTargusGateway(targusGatewayPrep, Options, linkingOptions, AllowedSourcesSet);
 
 	withTargusGateway := JOIN(withSBFE, targusGateway, LEFT.Seq = Right.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Input_Characteristics.InputPhoneEntityCount := (STRING)MAX((INTEGER)LEFT.Input_Characteristics.InputPhoneEntityCount, (INTEGER)RIGHT.InputPhoneEntityCount),
 																								SELF.Input_Characteristics.InputPhoneMobile := (STRING)MAX((INTEGER)LEFT.Input_Characteristics.InputPhoneMobile, (INTEGER)RIGHT.InputPhoneMobile),
-																								SELF.Verification.PhoneDisconnected := 
+																								SELF.Verification.PhoneDisconnected :=
 																										IF(
 																												LEFT.seq = RIGHT.seq,
 																												(STRING)MIN((INTEGER)LEFT.Verification.PhoneDisconnected, (INTEGER)RIGHT.PhoneDisconnected),
@@ -3782,35 +3790,35 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.PhoneSources := LEFT.PhoneSources + RIGHT.PhoneSources,
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
-																						
+
 	 BestAddrPhones := Business_Risk_BIP.getBestAddrPhones(withTargusGateway, Options, linkingOptions, AllowedSourcesSet);
 
 	 withBestAddrPhones := JOIN(withTargusGateway, BestAddrPhones, LEFT.Seq = Right.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Best_Info.BestPhoneService := checkBlank(RIGHT.Best_Info.BestPhoneService, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF := LEFT),
-																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);	
-																						
-	// Now that everything is back together, combine the sources into their delimited list fields, and calculate source based attributes	
+																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+
+	// Now that everything is back together, combine the sources into their delimited list fields, and calculate source based attributes
 	Business_Risk_BIP.Layouts.LayoutSources rollSource(Business_Risk_BIP.Layouts.LayoutSources le, Business_Risk_BIP.Layouts.LayoutSources ri) := TRANSFORM
 		SELF.Source := IF(StringLib.StringFind(le.Source, ',', 1) > 0, '\'' + le.Source + '\'', le.Source); // Because this is a comma delimited list - if a source contains a comma, put quotes around it
 		MinDate := MAP((INTEGER)le.DateFirstSeen > 0 AND (INTEGER)ri.DateFirstSeen > 0		=> MIN((INTEGER)le.DateFirstSeen, (INTEGER)ri.DateFirstSeen),
 									 (INTEGER)le.DateFirstSeen <= 0 AND (INTEGER)ri.DateFirstSeen > 0	=> (INTEGER)ri.DateFirstSeen,
 																																														 (INTEGER)le.DateFirstSeen);
 		SELF.DateFirstSeen := IF(MinDate <= 0, Business_Risk_BIP.Constants.MissingDate, (STRING)MinDate);
-		
+
 		MinVendorDate := MAP((INTEGER)le.DateVendorFirstSeen > 0 AND (INTEGER)ri.DateVendorFirstSeen > 0		=> MIN((INTEGER)le.DateVendorFirstSeen, (INTEGER)ri.DateVendorFirstSeen),
 									 (INTEGER)le.DateVendorFirstSeen <= 0 AND (INTEGER)ri.DateVendorFirstSeen > 0	=> (INTEGER)ri.DateVendorFirstSeen,
 																																														 (INTEGER)le.DateVendorFirstSeen);
-		SELF.DateVendorFirstSeen := IF(MinVendorDate <= 0, Business_Risk_BIP.Constants.MissingDate, (STRING)MinVendorDate);				
-		
+		SELF.DateVendorFirstSeen := IF(MinVendorDate <= 0, Business_Risk_BIP.Constants.MissingDate, (STRING)MinVendorDate);
+
 		MaxDate := MAX((INTEGER)le.DateLastSeen, (INTEGER)ri.DateLastSeen);
 		SELF.DateLastSeen := IF(MaxDate <= 0, Business_Risk_BIP.Constants.MissingDate, (STRING)MaxDate);
-		
+
 		MaxVendorDate := MAX((INTEGER)le.DateVendorLastSeen, (INTEGER)ri.DateVendorLastSeen);
 		SELF.DateVendorLastSeen := IF(MaxVendorDate <= 0, Business_Risk_BIP.Constants.MissingDate, (STRING)MaxVendorDate);
-		
+
 		SELF.RecordCount := le.RecordCount + ri.RecordCount;
-		
+
 		SELF := le;
 	END;
 	Business_Risk_BIP.Layouts.LayoutSICNAIC rollSICNAICSource(Business_Risk_BIP.Layouts.LayoutSICNAIC le, Business_Risk_BIP.Layouts.LayoutSICNAIC ri) := TRANSFORM
@@ -3822,16 +3830,16 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		MaxDate := MAX((INTEGER)le.DateLastSeen, (INTEGER)ri.DateLastSeen);
 		SELF.DateLastSeen := IF(MaxDate <= 0, Business_Risk_BIP.Constants.MissingDate, (STRING)MaxDate);
 		SELF.RecordCount := le.RecordCount + ri.RecordCount;
-		
+
 		SELF := le;
 	END;
-	
+
 	Business_Risk_BIP.Layouts.Shell finalizeDelimitedFields(Business_Risk_BIP.Layouts.Shell le) := TRANSFORM
 		// Get the header build date as a reference point for any date calculations
 		BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 		TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, le.Clean_Input.HistoryDate);
 
-		
+
 		// Group sources based on what the modelers would like to see
 		GroupedSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.Sources);
 		GroupedNameSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.NameSources);
@@ -3839,12 +3847,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		GroupedAddressSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.AddressSources);
 		GroupedBestAddressSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.BestAddressSources);
     // Starting in v30, phone sources should be a subset of phoneID sources, so add in the Gong results (PhoneIDSources) when found searching by BIP ID  in v30 and up.
-		GroupedPhoneSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.PhoneSources + 
+		GroupedPhoneSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.PhoneSources +
                                             IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, le.PhoneIDSources));
 		GroupedFEINSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.FEINSources);
 		GroupedEmployeeSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, le.EmployeeSources);
 		GroupedSICNAICSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSICNAIC, le.SICNAICSources);
-		
+
 		// Get this Seq's unique Sources/Dates
 		UniqueSources := ROLLUP(SORT(GroupedSources, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');
 		UniqueNameSources := ROLLUP(SORT(GroupedNameSources, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');
@@ -3854,7 +3862,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		UniquePhoneSources := ROLLUP(SORT(GroupedPhoneSources, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');
 		UniqueFEINSources := ROLLUP(SORT(GroupedFEINSources, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');
 		UniqueEmployeeSources := ROLLUP(SORT(GroupedEmployeeSources, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');
-		
+
 		// Now sort the sources by the order we want them to appear in our delimited fields, most recent to oldest
 		SeqSources := SORT(UniqueSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount);
 		SeqNameSources := SORT(UniqueNameSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount);
@@ -3864,37 +3872,37 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SeqPhoneSources := SORT(UniquePhoneSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount);
 		SeqFEINSources := SORT(UniqueFEINSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount);
     // Filter out sources that didn't have Employee count available. In verison 3.0, we differentiate between none available (-1) and 0, but in earlier versions these are all 0s.
-		SeqEmployeeSources := SORT(UniqueEmployeeSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount) (IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, RecordCount > -1, RecordCount > 0)); 
+		SeqEmployeeSources := SORT(UniqueEmployeeSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount) (IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, RecordCount > -1, RecordCount > 0));
 
 		gong_src := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22, MDR.sourceTools.set_Gong_History, MDR.sourceTools.set_Gong_Business);
-		
+
 		sourcesFiltered := le.Sources(source NOT IN [gong_src, MDR.sourceTools.set_Phones_Plus]);
 		LinkIdSources := sourcesFiltered + le.LinkIdSources;
 		GroupedSourcesLinkIds := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, LinkIdSources);
 		UniqueSourcesLinkIds := ROLLUP(SORT(GroupedSourcesLinkIds, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');
 		SeqSourcesLinkIds := SORT(UniqueSourcesLinkIds, -DateLastSeen, -DateFirstSeen, Source, -RecordCount);
-		
+
 		// SELF.Verification.VerInputIDTruebiz := checkVersion(IF(COUNT(SeqSourcesLinkIds) > 0, '1', '0'), Business_Risk_BIP.Constants.BusShellVersion_v22);
 		VerInputIDTruebiz := calculateValueFor._VerInputIDTruebiz(SeqSourcesLinkIds);
 		SELF.Verification.VerInputIDTruebiz := VerInputIDTruebiz;
-		
+
 		SICSources := ROLLUP(SORT((GroupedSICNAICSources ((INTEGER)SICCode > 0 AND Source <> '')), Source, ((INTEGER)SICCode), -IsPrimary, -DateLastSeen, -DateFirstSeen, -RecordCount), LEFT.Source = RIGHT.Source AND LEFT.SICCode = RIGHT.SICCode, rollSICNAICSource(LEFT, RIGHT));
 		NAICSources := ROLLUP(SORT((GroupedSICNAICSources ((INTEGER)NAICCode > 0 AND Source <> '')), Source, ((INTEGER)NAICCode), -IsPrimary, -DateLastSeen, -DateFirstSeen, -RecordCount), LEFT.Source = RIGHT.Source AND LEFT.SICCode = RIGHT.SICCode, rollSICNAICSource(LEFT, RIGHT));
 
 		DerogSourceRecords := SeqSources (Source IN Business_Risk_BIP.Constants.Set_Derog);
 		NonDerogSourceRecords := SeqSources (Source IN Business_Risk_BIP.Constants.Set_NonDerog);
-		
+
 		DerogSourceRecords12Month := DerogSourceRecords ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= Business_Risk_BIP.Constants.OneYear);
 		DerogSourceRecords06Month := DerogSourceRecords12Month ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= Business_Risk_BIP.Constants.SixMonths);
 		DerogSourceRecords03Month := DerogSourceRecords06Month ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths);
-		
+
 		NonDerogSourceRecords60Month := NonDerogSourceRecords ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(5));
 		NonDerogSourceRecords36Month := NonDerogSourceRecords60Month ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(3));
 		NonDerogSourceRecords24Month := NonDerogSourceRecords36Month ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(2));
 		NonDerogSourceRecords12Month := NonDerogSourceRecords24Month ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(1));
 		NonDerogSourceRecords06Month := NonDerogSourceRecords12Month ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= Business_Risk_BIP.Constants.SixMonths);
 		NonDerogSourceRecords03Month := NonDerogSourceRecords06Month ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths);
-		
+
 		SELF.Sources := SeqSources;
 		// Convert to a delimited list
 		SELF.Verification.SourceList := Business_Risk_BIP.Common.convertDelimited(SeqSources, Source, Business_Risk_BIP.Constants.FieldDelimiter);
@@ -3911,21 +3919,21 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.NameMatchSourceLSList := calculateValueFor._NameMatchSourceLSList(SeqNameSources);
 
 		SELF.Verification.NameMatchSourceCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqNameSources), -1, 99);
-                          
+
     cantVerifyAddress := FALSE;  // don't check the individual parts anymore, part of RQ-14786
-                          
+
 		SELF.Verification.AddrVerificationSourceList := IF(cantVerifyAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqAddressVerSources, Source, Business_Risk_BIP.Constants.FieldDelimiter));
 		SELF.Verification.AddrVerificationSourceCount := IF(cantVerifyAddress, '-1', (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqAddressVerSources), -1, 99));
 		SELF.Verification.AddrVerificationDateFirstSeenList := IF(cantVerifyAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqAddressVerSources, DateFirstSeen, Business_Risk_BIP.Constants.FieldDelimiter));
 		SELF.Input_Characteristics.InputAddrConsumerCount := IF(le.Input.InputCheckBusAddrZip = '0' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, '-1', le.Input_Characteristics.InputAddrConsumerCount);
-		
+
 		SELF.Verification.AddrMatchSourceFSList := calculateValueFor._AddrMatchSourceFSList(cantVerifyAddress, SeqAddressVerSources);
 		SELF.Verification.AddrVerificationDateLastSeenList := IF(cantVerifyAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqAddressVerSources, DateLastSeen, Business_Risk_BIP.Constants.FieldDelimiter));
 		SELF.Verification.AddrMatchSourceLSList := calculateValueFor._AddrMatchSourceLSList(cantVerifyAddress, SeqAddressVerSources);
 
 		newestAddrDate := calculateValueFor._newestAddrDate(SeqAddressVerSources, le.Clean_Input.HistoryDate);
 		oldestAddrDate := calculateValueFor._oldestAddrDate(SeqAddressVerSources, le.Clean_Input.HistoryDate);
-		
+
 		InputAddrLengthOfResidence := IF(NOT cantVerifyAddress AND newestAddrDate <> Business_Risk_BIP.Constants.MissingDate AND oldestAddrDate <> Business_Risk_BIP.Constants.MissingDate, (STRING)Business_Risk_BIP.Common.CapNum(ut.MonthsApart(newestAddrDate, oldestAddrDate), -1, 99999), '-1');
 		SELF.Verification.InputAddrLengthOfResidence := calculateValueFor.checkTrueBiz(InputAddrLengthOfResidence, VerInputIDTruebiz);
 
@@ -3940,7 +3948,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.PhoneMatchDateLastSeen := Business_Risk_BIP.Common.checkInvalidDate(TOPN(SeqPhoneSources, 1, -DateLastSeen)[1].DateLastSeen, Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate);
 		SELF.Verification.PhoneMatchSourceCount := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND le.Input.InputCheckBusPhone = '0', '-1',
                                                   (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqPhoneSources), -1, 99));
-		
+
     SELF.Verification.FEINMatchSourceList := Business_Risk_BIP.Common.convertDelimited(SeqFEINSources, Source, Business_Risk_BIP.Constants.FieldDelimiter);
 		SELF.Verification.FEINMatchDateFirstSeenList := Business_Risk_BIP.Common.convertDelimited(SeqFEINSources, DateFirstSeen, Business_Risk_BIP.Constants.FieldDelimiter);
 		SELF.Verification.FEINMatchSourceDateFSList := calculateValueFor._FEINMatchSourceDateFSList(SeqFEINSources);
@@ -3952,10 +3960,10 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		NoBestAddress := IF(TRIM(le.Best_Info.BestPrimRange) = '' OR // If best address wasn't populated we can't verify it
 												TRIM(le.Best_Info.BestCompanyZip) = '',
 													TRUE, FALSE);
-													
+
 		BestSourceCount := IF(NoBestAddress, '-1', (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqBestAddressSources), -1, 99));
 		BestSourceCount_TrueBiz := calculateValueFor.checkTrueBiz(BestSourceCount, VerInputIDTruebiz);
-		SELF.Best_Info.BestSourceCount := BestSourceCount_TrueBiz;		
+		SELF.Best_Info.BestSourceCount := BestSourceCount_TrueBiz;
     SELF.Best_Info.BestSourceList := IF(NoBestAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqBestAddressSources, Source, Business_Risk_BIP.Constants.FieldDelimiter));
 		SELF.Best_Info.BestSourceFirstSeenList := IF(NoBestAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqBestAddressSources, DateFirstSeen, Business_Risk_BIP.Constants.FieldDelimiter));
 		SELF.Best_Info.BestSourceLastSeenList := IF(NoBestAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqBestAddressSources, DateLastSeen, Business_Risk_BIP.Constants.FieldDelimiter));
@@ -4000,7 +4008,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		MonthsMostRecentOnFile := (STRING)IF((INTEGER)MaxDateLastSeen > 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart((STRING)MaxDateLastSeen, (STRING)TodaysDate), 1, 99999), -1);
 		SELF.Verification.SourceMostRecentTimeonFile := MonthsMostRecentOnFile;
 		SELF.Business_Activity.BusinessRecordUpdated12Month := IF((INTEGER)MaxDateLastSeen > 0, Business_Risk_BIP.Common.SetBoolean((INTEGER)MonthsMostRecentOnFile BETWEEN 1 AND 12), '-1');
-		
+
 		BureauMinDateFirstSeen := (STRING)MIN(PROJECT(SeqSources (Source IN Business_Risk_BIP.Constants.Set_Bureau), TRANSFORM(RECORDOF(LEFT), SELF.DateFirstSeen := IF((INTEGER)LEFT.DateFirstSeen <= 0, Business_Risk_BIP.Constants.NinesDate, LEFT.DateFirstSeen))), (INTEGER)DateFirstSeen);
 		BureauDateFirstSeen := IF(BureauMinDateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_Bip.Constants.MissingDate, BureauMinDateFirstSeen);
 		BureauMaxDateLastSeen := (STRING)MAX(SeqSources (Source IN Business_Risk_BIP.Constants.Set_Bureau), (INTEGER)DateLastSeen);
@@ -4032,7 +4040,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		correctedVerificationBusInputPhoneAddr := IF(correctedAddrVerification = '-1' AND le.Input.InputCheckBusPhone = '1', '-1', le.Verification.VerificationBusInputPhoneAddr); // If we override the AddrVerification to a -1 above check if we need to override VerificationBusInputPhoneAddr check as well
 		VerificationBusInputPhoneAddr := IF(le.Input.InputCheckBusPhone = '0', '-1', correctedVerificationBusInputPhoneAddr);
 		SELF.Verification.VerificationBusInputPhoneAddr := calculateValueFor.checkTrueBiz(VerificationBusInputPhoneAddr, VerInputIDTruebiz);
-    
+
 		// Ensure we don't have any weird corner cases
 		SELF.Verification.NameMatch := IF(ut.Exists2(SeqNameSources), le.Verification.NameMatch, Business_Risk_BIP.Common.SetBoolean(FALSE)); // Only return a name match if we kept a source confirming name match
 		SELF.Verification.NameMatchCount := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(SeqNameSources), -1, 99999);
@@ -4050,42 +4058,42 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		WatchlistHitFound := ut.Exists2(le.WatchlistHits); // We have a hit on the watchlist(s)
 		DeceasedFEINAsSSN := le.DeceasedFEIN_As_SSN;
 		// Requires that all elements verify within the same header record
-		SELF.Verification.BVIIndicator := Business_Risk_BIP.calculateBVI_V1(BNAT_Indicator, BNAP_Indicator, BNAS_Indicator, 
-																													MultiSrcAddr, MultiSrcAddrCurr, MultiSrcCmpy, MultiSrcCmpyCurr, 
+		SELF.Verification.BVIIndicator := Business_Risk_BIP.calculateBVI_V1(BNAT_Indicator, BNAP_Indicator, BNAS_Indicator,
+																													MultiSrcAddr, MultiSrcAddrCurr, MultiSrcCmpy, MultiSrcCmpyCurr,
 																													WatchlistHitFound, DeceasedFEINAsSSN);
-		
+
 		// Looks at all header records to verify elements in cases where individual header records have partial information
 		BNAT2_Indicator := le.Verification.BNAT2;
 		BNAP2_Indicator := le.Verification.BNAP2;
 		BNAS2_Indicator := le.Verification.BNAS2;
-		SELF.Verification.BVIIndicator2 := Business_Risk_BIP.calculateBVI_V1(BNAT2_Indicator, BNAP2_Indicator, BNAS2_Indicator, 
-																													MultiSrcAddr, MultiSrcAddrCurr, MultiSrcCmpy, MultiSrcCmpyCurr, 
+		SELF.Verification.BVIIndicator2 := Business_Risk_BIP.calculateBVI_V1(BNAT2_Indicator, BNAP2_Indicator, BNAS2_Indicator,
+																													MultiSrcAddr, MultiSrcAddrCurr, MultiSrcCmpy, MultiSrcCmpyCurr,
 																													WatchlistHitFound, DeceasedFEINAsSSN);
 
 		// --------------------- End BVI Calculation ------------------------
-		
-		SELF.Verification.VerificationBusInputPhone := MAP(le.Input.InputCheckBusPhone = '0' 																													 => '-1', 
+
+		SELF.Verification.VerificationBusInputPhone := MAP(le.Input.InputCheckBusPhone = '0' 																													 => '-1',
 																											 BNAP2_Indicator IN ['7', '8'] AND COUNT(SeqPhoneSources) > 0																 => '2',
 																											 COUNT(SeqPhoneSources) > 0																																	 => '1',
 																																																																											'0');
-																																							
+
 		SELF.Verification.VerificationBusInputAddr := MAP(cantVerifyAddress																										=> '-1',
 																											BNAT2_Indicator IN ['4', '6', '7', '8']															=> '2',
 																											COUNT(SeqAddressVerSources) > 0 OR correctedAddrVerification = '1'	=> '1',
 																																																														 '0');
-		
+
 		SELF.Verification.VerificationBusInputName := MAP(le.Input.InputCheckBusName = '0'																										=> '-1',
 																											BNAT2_Indicator IN ['5', '6', '7', '8'] OR BNAP2_Indicator IN ['5', '6', '7', '8']	=> '1',
 																																																																						 '0');
-																																																																						 
+
 		FEINVerificationNotPopulatedCorrection := IF(le.Input.InputCheckBusFEIN = '0', '-1', le.Verification.FEINVerification);
 		VerificationBusInputFEIN := MAP(le.Input.InputCheckBusFEIN = '0'											=> '-1',
 																		FEINVerificationNotPopulatedCorrection IN ['3', '4']	=> '2',
 																		FEINVerificationNotPopulatedCorrection IN ['1', '2']	=> '1',
-																																															'0');																				 
+																																															'0');
 		SELF.Verification.VerificationBusInputFEIN := VerificationBusInputFEIN;
 		SELF.Verification.FEINVerification := IF(VerificationBusInputFEIN <> '0', FEINVerificationNotPopulatedCorrection, '0'); // Return a 0 if we calculated a VerificationBusInputFEIN of 0
-		
+
 		// Since the BIP link IDs are populated in this transform, make sure the counts are at least 1 in case we didn't get a hit on the Business Header
 		SELF.Organizational_Structure.UltIDOrgIDTreeCount := (STRING)MAX(1, (INTEGER)le.Organizational_Structure.UltIDOrgIDTreeCount);
 		SELF.Organizational_Structure.OrgLegalEntityCount := (STRING)MAX(1, (INTEGER)le.Organizational_Structure.OrgLegalEntityCount);
@@ -4098,7 +4106,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Organizational_Structure.OrgLocationCount := (STRING)MAX(1, (INTEGER)le.Organizational_Structure.OrgLocationCount);
 		SELF.Organizational_Structure.SeleIDPowIDTreeCount := (STRING)MAX(1, (INTEGER)le.Organizational_Structure.SeleIDPowIDTreeCount);
 		SELF.Organizational_Structure.ProxIDPowIDTreeCount := (STRING)MAX(1, (INTEGER)le.Organizational_Structure.ProxIDPowIDTreeCount);
-		
+
 		FirmEmployeeCount_v22 := IF(ut.Exists2(SeqEmployeeSources), le.Firmographic.FirmEmployeeCount, '-1');
 		FirmEmployeeCount_v30 := IF(ut.Exists2(SeqEmployeeSources), (STRING)Business_Risk_BIP.Common.capNum(SORT(SeqEmployeeSources (RecordCount > -1), -(Source = 'DF'), -(Source = 'RR'), -(Source = 'BR'), -(Source = 'IA'), -(Source = 'IC'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1].RecordCount, -1, 999999), '-1');
 		SELF.Firmographic.FirmEmployeeCount := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, FirmEmployeeCount_v30, FirmEmployeeCount_v22);
@@ -4113,11 +4121,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Firmographic.FirmEmployeeCountMostRecent := FirmEmployeeCountMostRecent;
 		SELF.Firmographic.FirmEmployeeRangeCountMostRecent := checkVersion((STRING)Business_Risk_BIP.Common.getEmployeeRangeIndex((INTEGER)FirmEmployeeCountMostRecent), Business_Risk_BIP.Constants.BusShellVersion_v30);
 
-		SELF.Firmographic.BusObservedAge := IF(DateFirstSeen = Business_Risk_BIP.Constants.MissingDate, 
-		     '-1', 
+		SELF.Firmographic.BusObservedAge := IF(DateFirstSeen = Business_Risk_BIP.Constants.MissingDate,
+		     '-1',
 		     (STRING)Business_Risk_BIP.Common.capNum(ROUNDUP(ut.DaysApart(DateFirstSeen, Business_Risk_BIP.Common.todaysDate((STRING8)Std.Date.Today(), le.Clean_Input.HistoryDate)) / 365.25), -1, 110)
 		);
-		
+
 		// To choose the best SIC/NAIC we are going with a waterfall source selection - the first source in this list is the SIC/NAIC we choose.  Adding dates/record counts to ensure we don't have some sort of magical indeterminate code..
 		// DCA (DF), Experian EBR (ER), YellowPages (Y), OSHAIR (OS), BusReg (BR), FBN (FH), CalBus (C#), DNBDMI (DN)
 		BestSIC := SORT((SICSources (IsPrimary = TRUE)), -(Source = 'DF'), -(Source = 'ER'), -(Source = 'Y'), -(Source = 'OS'), -(Source = 'BR'), -(Source = 'FH'), -(Source = 'C#'), -(Source = 'DN'), -DateLastSeen, -DateFirstSeen, -RecordCount)[1];
@@ -4136,7 +4144,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																						(inputSICPopulated = TRUE AND Business_Risk_BIP.Common.industryGroup(le.Clean_Input.SIC, Business_Risk_BIP.Constants.SIC) IN SICIndustrySet) OR						 // SIC Populated and the industry group matches
 																						(inputNAICPopulated = TRUE AND Business_Risk_BIP.Common.industryGroup(le.Clean_Input.NAIC, Business_Risk_BIP.Constants.NAIC) IN NAICIndustrySet)	=> '1',	 // NAIC populated and the industry group matches
 																																																																																			 '0'); // Neither SIC or NAIC matched what we found, or we found nothing
-																						
+
 		// Make sure these return values can't contradict each other due to flaws in the data
 		BankruptcyCount := IF((INTEGER)le.Bankruptcy.BankruptcyChapter > 0, (STRING)MAX((INTEGER)le.Bankruptcy.BankruptcyCount, 1), le.Bankruptcy.BankruptcyCount); // If we have a bankruptcy chapter, make sure the bankruptcy count is at least 1
 		SELF.Bankruptcy.BankruptcyCount := calculateValueFor.checkTrueBiz(le.Bankruptcy.BankruptcyCount, VerInputIDTruebiz);
@@ -4167,10 +4175,10 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
     SELF.Asset_Information.AssetCommercialVehicleCount := calculateValueFor.checkTrueBiz(le.Asset_Information.AssetCommercialVehicleCount, VerInputIDTruebiz);
     SELF.Asset_Information.AssetOtherVehicleCount := calculateValueFor.checkTrueBiz(le.Asset_Information.AssetOtherVehicleCount, VerInputIDTruebiz);
     SELF.Asset_Information.AssetTotalVehicleValue := calculateValueFor.checkTrueBiz(le.Asset_Information.AssetTotalVehicleValue, VerInputIDTruebiz);
-    
+
 		// Make sure we can't have more property overlap than properties owned
 		BusExecLinkPropertyOverlapCount := IF(le.Input.InputCheckAuthRepFirstName = '0' OR le.Input.InputCheckAuthRepLastName = '0', '-1', (STRING)MIN((INTEGER)le.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount, (INTEGER)le.Asset_Information.AssetPropertyCount));
-		SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount := calculateValueFor.checkTrueBiz(BusExecLinkPropertyOverlapCount, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount := calculateValueFor.checkTrueBiz(BusExecLinkPropertyOverlapCount, VerInputIDTruebiz);
 		BusExecLinkPropertyOverlapCount2 := IF(le.Input.InputCheckAuthRep2FirstName = '0' OR le.Input.InputCheckAuthRep2LastName = '0', '-1', (STRING)MIN((INTEGER)le.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount2, (INTEGER)le.Asset_Information.AssetPropertyCount));
 		SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount2 := calculateValueFor.checkTrueBiz(BusExecLinkPropertyOverlapCount2, VerInputIDTruebiz);
 		BusExecLinkPropertyOverlapCount3 := IF(le.Input.InputCheckAuthRep3FirstName = '0' OR le.Input.InputCheckAuthRep3LastName = '0', '-1', (STRING)MIN((INTEGER)le.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount3, (INTEGER)le.Asset_Information.AssetPropertyCount));
@@ -4182,18 +4190,18 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 		//rep1
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile := IF(le.Input.InputCheckAuthRepFirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile);
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRepFirst := IF(le.Input.InputCheckAuthRepFirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRepFirst, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRepLast := IF(le.Input.InputCheckAuthRepLastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLast);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLast := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRepLast, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRepFull := IF(le.Input.InputCheckAuthRepFirstName = '0' OR le.Input.InputCheckAuthRepLastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFull);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFull := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRepFull, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFull := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRepFull, VerInputIDTruebiz);
 		BusExecLinkAuthRepPhoneBusPhone := IF(le.Input.InputCheckAuthRepPhone = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRepPhoneBusPhone);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepPhoneBusPhone := calculateValueFor.checkTrueBiz(BusExecLinkAuthRepPhoneBusPhone, VerInputIDTruebiz);
 		BusExecLinkAuthRepAddrBusAddr := IF(le.Input.InputCheckAuthRepAddr = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRepAddrBusAddr);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepAddrBusAddr := calculateValueFor.checkTrueBiz(BusExecLinkAuthRepAddrBusAddr, VerInputIDTruebiz);
-		
+
 		BusExecLinkAuthRepNameOnFile  := IF(le.Input.InputCheckAuthRepFirstName = '0' AND le.Input.InputCheckAuthRepLastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile := calculateValueFor.checkTrueBiz(BusExecLinkAuthRepNameOnFile, VerInputIDTruebiz);
 		BusExecLinkAuthRepAddrOnFile := IF(le.Input.InputCheckAuthRepAddr = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile);
@@ -4220,19 +4228,19 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Business_To_Executive_Link.BusExecLinkBusAddrAuthRepOwned := calculateValueFor.checkTrueBiz(BusExecLinkBusAddrAuthRepOwned, VerInputIDTruebiz);
 		BusExecLinkUtilityOverlapCount := IF(le.Input.InputCheckAuthRepFirstName = '0' OR le.Input.InputCheckAuthRepLastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount);
 		SELF.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount := calculateValueFor.checkTrueBiz(BusExecLinkUtilityOverlapCount, VerInputIDTruebiz);
-		BusExecLinkInquiryOverlapCount := IF(le.Input.InputCheckAuthRepFirstName = '0' OR le.Input.InputCheckAuthRepLastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount);		
+		BusExecLinkInquiryOverlapCount := IF(le.Input.InputCheckAuthRepFirstName = '0' OR le.Input.InputCheckAuthRepLastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount);
 		SELF.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount := calculateValueFor.checkTrueBiz(BusExecLinkInquiryOverlapCount, VerInputIDTruebiz);
     SELF.Business_To_Executive_Link.AR2BBusRep1AddrDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep1AddrDistance, VerInputIDTruebiz);
     SELF.Business_To_Executive_Link.AR2BBusRep1PhoneDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep1PhoneDistance, VerInputIDTruebiz);
 		//rep2
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile, VerInputIDTruebiz);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstFile := IF(le.Input.InputCheckAuthRep2FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstFile);
 		BusExecLinkBusNameAuthRep2First := IF(le.Input.InputCheckAuthRep2FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep2First, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep2First, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep2Last := IF(le.Input.InputCheckAuthRep2LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Last);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Last := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep2Last, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Last := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep2Last, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep2Full := IF(le.Input.InputCheckAuthRep2FirstName = '0' OR le.Input.InputCheckAuthRep2LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep2Full, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep2Full, VerInputIDTruebiz);
 		BusExecLinkAuthRep2PhoneBusPhone := IF(le.Input.InputCheckAuthRep2Phone = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneBusPhone);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneBusPhone := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep2PhoneBusPhone, VerInputIDTruebiz);
 		BusExecLinkAuthRep2AddrBusAddr := IF(le.Input.InputCheckAuthRep2Addr = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddr);
@@ -4246,7 +4254,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		BusExecLinkAuthRep2SSNOnFile  := IF(le.Input.InputCheckAuthRep2SSN = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep2SSNOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2SSNOnFile := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep2SSNOnFile, VerInputIDTruebiz);
 		BusExecLinkAuthRep2SSNBusFEIN  := IF(le.Input.InputCheckAuthRep2SSN = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep2SSNBusFEIN);
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2SSNBusFEIN := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep2SSNBusFEIN, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2SSNBusFEIN := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep2SSNBusFEIN, VerInputIDTruebiz);
 		SELF.Business_To_Executive_Link.AR2BRep2NameBusHeaderLexID := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BRep2NameBusHeaderLexID, VerInputIDTruebiz);
 		SELF.Business_To_Executive_Link.AR2BRep2AddrBusHeaderLexID := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BRep2AddrBusHeaderLexID, VerInputIDTruebiz);
 		SELF.Business_To_Executive_Link.AR2BRep2PhoneBusHeaderLexID := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BRep2PhoneBusHeaderLexID, VerInputIDTruebiz);
@@ -4266,14 +4274,14 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
     SELF.Business_To_Executive_Link.AR2BBusRep2AddrDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep2AddrDistance, VerInputIDTruebiz);
     SELF.Business_To_Executive_Link.AR2BBusRep2PhoneDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep2PhoneDistance, VerInputIDTruebiz);
 		//rep3
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile, VerInputIDTruebiz);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3PrefFirstFile := IF(le.Input.InputCheckAuthRep3FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3PrefFirstFile);
 		BusExecLinkBusNameAuthRep3First := IF(le.Input.InputCheckAuthRep3FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3First);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3First := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep3First, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep3Last := IF(le.Input.InputCheckAuthRep3LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Last);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Last := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep3Last, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep3Full := IF(le.Input.InputCheckAuthRep3FirstName = '0' OR le.Input.InputCheckAuthRep3LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Full);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep3Full, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep3Full, VerInputIDTruebiz);
 		BusExecLinkAuthRep3PhoneBusPhone := IF(le.Input.InputCheckAuthRep3Phone = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep3PhoneBusPhone, VerInputIDTruebiz);
 		BusExecLinkAuthRep3AddrBusAddr := IF(le.Input.InputCheckAuthRep3Addr = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr);
@@ -4307,18 +4315,18 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
     SELF.Business_To_Executive_Link.AR2BBusRep3AddrDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep3AddrDistance, VerInputIDTruebiz);
     SELF.Business_To_Executive_Link.AR2BBusRep3PhoneDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep3PhoneDistance, VerInputIDTruebiz);
 		//rep4
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile, VerInputIDTruebiz);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstFile := IF(le.Input.InputCheckAuthRep4FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstFile);
 		BusExecLinkBusNameAuthRep4First := IF(le.Input.InputCheckAuthRep4FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4First);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4First := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep4First, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep4Last := IF(le.Input.InputCheckAuthRep4LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4Last);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4Last := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep4Last, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep4Full := IF(le.Input.InputCheckAuthRep4FirstName = '0' OR le.Input.InputCheckAuthRep4LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep4Full, VerInputIDTruebiz);				
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep4Full, VerInputIDTruebiz);
 		BusExecLinkAuthRep4PhoneBusPhone := IF(le.Input.InputCheckAuthRep4Phone = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone);
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep4PhoneBusPhone, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep4PhoneBusPhone, VerInputIDTruebiz);
 		BusExecLinkAuthRep4AddrBusAddr := IF(le.Input.InputCheckAuthRep4Addr = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr);
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep4AddrBusAddr, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep4AddrBusAddr, VerInputIDTruebiz);
 		BusExecLinkAuthRep4NameOnFile  := IF(le.Input.InputCheckAuthRep4FirstName = '0' AND le.Input.InputCheckAuthRep4LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep4NameOnFile, VerInputIDTruebiz);
 		BusExecLinkAuthRep4AddrOnFile := IF(le.Input.InputCheckAuthRep4Addr = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile);
@@ -4347,16 +4355,16 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
     SELF.Business_To_Executive_Link.AR2BBusRep4AddrDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep4AddrDistance, VerInputIDTruebiz);
     SELF.Business_To_Executive_Link.AR2BBusRep4PhoneDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep4PhoneDistance, VerInputIDTruebiz);
 		//rep5
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile, VerInputIDTruebiz);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstFile := IF(le.Input.InputCheckAuthRep5FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstFile);
 		BusExecLinkBusNameAuthRep5First := IF(le.Input.InputCheckAuthRep5FirstName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5First);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5First := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep5First, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5First := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep5First, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep5Last := IF(le.Input.InputCheckAuthRep5LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Last);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Last := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep5Last, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Last := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep5Last, VerInputIDTruebiz);
 		BusExecLinkBusNameAuthRep5Full := IF(le.Input.InputCheckAuthRep5FirstName = '0' OR le.Input.InputCheckAuthRep5LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Full);
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep5Full, VerInputIDTruebiz);				
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Full := calculateValueFor.checkTrueBiz(BusExecLinkBusNameAuthRep5Full, VerInputIDTruebiz);
 		BusExecLinkAuthRep5PhoneBusPhone := IF(le.Input.InputCheckAuthRep5Phone = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone);
-		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep5PhoneBusPhone, VerInputIDTruebiz);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep5PhoneBusPhone, VerInputIDTruebiz);
 		BusExecLinkAuthRep5AddrBusAddr := IF(le.Input.InputCheckAuthRep5Addr = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddr);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddr := calculateValueFor.checkTrueBiz(BusExecLinkAuthRep5AddrBusAddr, VerInputIDTruebiz);
 		BusExecLinkAuthRep5NameOnFile  := IF(le.Input.InputCheckAuthRep5FirstName = '0' AND le.Input.InputCheckAuthRep5LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile);
@@ -4386,7 +4394,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount5 := IF(le.Input.InputCheckAuthRep5FirstName = '0' OR le.Input.InputCheckAuthRep5LastName = '0', '-1', le.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount5);
     SELF.Business_To_Executive_Link.AR2BBusRep5AddrDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep5AddrDistance, VerInputIDTruebiz);
     SELF.Business_To_Executive_Link.AR2BBusRep5PhoneDistance := calculateValueFor.checkTrueBiz(le.Business_To_Executive_Link.AR2BBusRep5PhoneDistance, VerInputIDTruebiz);
-		
+
 		SELF.Inquiry.InquiryConsumerAddress := IF(le.Input.InputCheckBusAddr = '0', '-1', le.Inquiry.InquiryConsumerAddress);
 		SELF.Inquiry.InquiryConsumerPhone := IF(le.Input.InputCheckBusPhone = '0', '-1', le.Inquiry.InquiryConsumerPhone);
 		SELF.Inquiry.InquiryConsumerAddressSSN := IF(le.Input.InputCheckBusAddr = '0', '-1', le.Inquiry.InquiryConsumerAddressSSN);
@@ -4403,12 +4411,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 		BusinessAddrCount := (STRING)MAX((INTEGER)le.Business_Characteristics.BusinessAddrCount, 0); // We have BIP ID's, make sure the count is at least 0
 		SELF.Business_Characteristics.BusinessAddrCount := calculateValueFor.checkTrueBiz(BusinessAddrCount, VerInputIDTruebiz);
-		BusinessActivity36Month := 											MAP((INTEGER)MaxDateLastSeen <= 0 															=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyTimeNewest	BETWEEN 1 AND 36 OR 
+		BusinessActivity36Month := 											MAP((INTEGER)MaxDateLastSeen <= 0 															=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyTimeNewest	BETWEEN 1 AND 36 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount36 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount36 > 0			=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 36 OR
-																												COUNT(NonDerogSourceRecords36Month) = 0 AND	
+																												COUNT(NonDerogSourceRecords36Month) = 0 AND
 																												(INTEGER)MaxDateLastSeen > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords36Month) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords36Month) = 2											=> '3',
@@ -4416,12 +4424,12 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																												COUNT(NonDerogSourceRecords36Month) >= 4										=> '5',
 																																																											 '-1');
 		SELF.Business_Activity.BusinessActivity36Month := checkBlank(BusinessActivity36Month, '-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
-		BusinessActivity24Month := 											MAP((INTEGER)MaxDateLastSeen <= 0																=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyCount24Month > 0 OR 
+		BusinessActivity24Month := 											MAP((INTEGER)MaxDateLastSeen <= 0																=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyCount24Month > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount24 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount24 > 0			=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 24 OR
-																												COUNT(NonDerogSourceRecords24Month) = 0 AND	
+																												COUNT(NonDerogSourceRecords24Month) = 0 AND
 																												(INTEGER)MaxDateLastSeen > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords24Month) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords24Month) = 2											=> '3',
@@ -4429,44 +4437,44 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																												COUNT(NonDerogSourceRecords24Month) >= 4										=> '5',
 																																																											 '-1');
 		SELF.Business_Activity.BusinessActivity24Month := checkBlank(BusinessActivity24Month, '-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
-		
-		SELF.Business_Activity.BusinessActivity12Month := MAP((INTEGER)MaxDateLastSeen <= 0 														=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyCount12Month > 0 OR 
+
+		SELF.Business_Activity.BusinessActivity12Month := MAP((INTEGER)MaxDateLastSeen <= 0 														=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyCount12Month > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount12 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount12 > 0			=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 12 OR
-																												COUNT(NonDerogSourceRecords12Month) = 0 AND	
+																												COUNT(NonDerogSourceRecords12Month) = 0 AND
 																												(INTEGER)MaxDateLastSeen > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords12Month) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords12Month) = 2											=> '3',
 																												COUNT(NonDerogSourceRecords12Month) = 3											=> '4',
 																												COUNT(NonDerogSourceRecords12Month) >= 4										=> '5',
 																																																											 '-1');
-		SELF.Business_Activity.BusinessActivity06Month := MAP((INTEGER)MaxDateLastSeen <= 0 														=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyCount06Month > 0 OR 
+		SELF.Business_Activity.BusinessActivity06Month := MAP((INTEGER)MaxDateLastSeen <= 0 														=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyCount06Month > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount06 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount06 > 0			=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 6 OR
-																												COUNT(NonDerogSourceRecords06Month) = 0 AND	
+																												COUNT(NonDerogSourceRecords06Month) = 0 AND
 																												(INTEGER)MaxDateLastSeen > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords06Month) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords06Month) = 2											=> '3',
 																												COUNT(NonDerogSourceRecords06Month) = 3											=> '4',
 																												COUNT(NonDerogSourceRecords06Month) >= 4										=> '5',
 																																																											 '-1');
-		SELF.Business_Activity.BusinessActivity03Month := MAP((INTEGER)MaxDateLastSeen <= 0 														=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyCount03Month > 0 OR 
+		SELF.Business_Activity.BusinessActivity03Month := MAP((INTEGER)MaxDateLastSeen <= 0 														=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyCount03Month > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount03 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount03 > 0			=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 3 OR
-																												COUNT(NonDerogSourceRecords03Month) = 0 AND	
+																												COUNT(NonDerogSourceRecords03Month) = 0 AND
 																												(INTEGER)MaxDateLastSeen > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords03Month) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords03Month) = 2											=> '3',
 																												COUNT(NonDerogSourceRecords03Month) = 3											=> '4',
 																												COUNT(NonDerogSourceRecords03Month) >= 4										=> '5',
 																																																											 '-1');
-	
+
 		BankruptcyTimeNewest := IF((INTEGER)le.Bankruptcy.BankruptcyCount > 0, le.Bankruptcy.BankruptcyTimeNewest, '-1');
 		SELF.Bankruptcy.BankruptcyTimeNewest := calculateValueFor.checkTrueBiz(BankruptcyTimeNewest, VerInputIDTruebiz);
 		SELF.Bankruptcy.BankruptcyCount12Month := calculateValueFor.checkTrueBiz(le.Bankruptcy.BankruptcyCount12Month, VerInputIDTruebiz);
@@ -4474,7 +4482,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Bankruptcy.BankruptcyCount84Month := calculateValueFor.checkTrueBiz(le.Bankruptcy.BankruptcyCount84Month, VerInputIDTruebiz);
 		SELF.Bankruptcy.BankruptcyChapter := calculateValueFor.checkTrueBiz(le.Bankruptcy.BankruptcyChapter, VerInputIDTruebiz);
 		SELF.Bankruptcy.bankruptrecentdate := calculateValueFor.checkTrueBiz(le.Bankruptcy.bankruptrecentdate, VerInputIDTruebiz);
-		
+
 		SELF.Verification.SourceNonDerogCount := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords), -1, 99999);
 		SELF.Verification.SourceNonDerogCount03 := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords03Month), -1, 99999);
 		SELF.Verification.SourceNonDerogCount06 := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords06Month), -1, 99999);
@@ -4482,14 +4490,14 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.SourceNonDerogCount24 := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords24Month), -1, 99999);
 		SELF.Verification.SourceNonDerogCount36 := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords36Month), -1, 99999);
 		SELF.Verification.SourceNonDerogCount60 := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords60Month), -1, 99999);
-		
+
 		// Not coded yet, set to default values
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation2 := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation3 := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation4 := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation5 := '-1';
-		
+
 		SELF.Verification.BusFEINOnFileCount := '-1';
 		SELF.Verification.FEINMiskeyFlag := Business_Risk_BIP.Common.SetBoolean(FALSE);
 		SELF.Verification.PhoneMisKey := Business_Risk_BIP.Common.SetBoolean(FALSE);
@@ -4497,16 +4505,16 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	//	SELF.Verification.AddrMiskey := Business_Risk_BIP.Common.SetBoolean(FALSE);
 		SELF.Verification.AddrEverReported := '-1';
 		SELF.Verification.NameMiskey := Business_Risk_BIP.Common.SetBoolean(FALSE);
-		
+
 		SBFEExists := (INTEGER)le.SBFE.SBFEAccountCount > 0;
 		SELF.SBFE.SBFESourceIndex := MAP(COUNT(SeqSources) > 0 AND NOT SBFEExists => '1',  //LN only
 																		 COUNT(SeqSources) = 0 AND SBFEExists 		=> '2',  //SBFE only
 																		 COUNT(SeqSources) > 0 AND SBFEExists 		=> '3',  //LN and SBFE
 																																								 '0'); // Else there are no sources as of the archive date
-		
+
 		LNExists := COUNT(SeqSourcesLinkIds) > 0;
 		CorteraExists := le.Verification.SourceIndex = '2';
-		
+
 		SELF.Verification.SourceIndex := MAP(NOT LNExists AND NOT CorteraExists AND NOT SBFEExists 	=> '-1',
 																				 LNExists AND NOT CorteraExists AND NOT SBFEExists 		 	=> '1',
 																				 NOT LNExists AND CorteraExists AND NOT SBFEExists 		  => '2',
@@ -4516,11 +4524,11 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																				 NOT LNExists AND CorteraExists AND SBFEExists 					=> '6',
 																				 LNExists AND CorteraExists AND SBFEExists 							=> '7',
 																																																	 '-1');
-																				 
-																		
-																				 
+
+
+
 		SELF.BillingHit := IF( (COUNT(SeqSources) > 0 AND NOT SBFEExists) OR SBFEExists, '1', '0' );
-		
+
 		MinDateFirstSeenID := (STRING)MIN(PROJECT(SeqSourcesLinkIds, TRANSFORM(RECORDOF(LEFT), SELF.DateFirstSeen := IF((INTEGER)LEFT.DateFirstSeen <= 0, Business_Risk_BIP.Constants.NinesDate, LEFT.DateFirstSeen))), (INTEGER)DateFirstSeen);
 		SourceFirstSeenID := IF(MinDateFirstSeenID = Business_Risk_BIP.Constants.NinesDate, Business_Risk_Bip.Constants.MissingDate, MinDateFirstSeenID);
 		SELF.Verification.SourceFirstSeenID := SourceFirstSeenID;
@@ -4531,19 +4539,19 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Business_Activity.SourceBusinessRecordTimeNewestID := IF((INTEGER)BRTimeNewestID > 0 AND (INTEGER)BRTimeOldestID > 0, (STRING)MIN((INTEGER)BRTimeNewestID, (INTEGER)BRTimeOldestID), BRTimeNewestID);
 		SELF.Business_Activity.SourceBusinessRecordTimeOldestID := (STRING)MAX((INTEGER)BRTimeNewestID, (INTEGER)BRTimeOldestID);
 		MonthsMostRecentOnFileID := (STRING)IF((INTEGER)MaxDateLastSeenID > 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart((STRING)MaxDateLastSeenID, (STRING)TodaysDate), 1, 99999), -1);
-		SELF.Business_Activity.SourceBusinessRecordUpdated12MonthID := IF((INTEGER)MaxDateLastSeenID > 0, Business_Risk_BIP.Common.SetBoolean((INTEGER)MonthsMostRecentOnFileID BETWEEN 1 AND 12), '-1');		
-		
+		SELF.Business_Activity.SourceBusinessRecordUpdated12MonthID := IF((INTEGER)MaxDateLastSeenID > 0, Business_Risk_BIP.Common.SetBoolean((INTEGER)MonthsMostRecentOnFileID BETWEEN 1 AND 12), '-1');
+
 		SourceCountID := (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqSourcesLinkIds), -1, 99);
 		SELF.Verification.SourceCountID := calculateValueFor.checkTrueBiz(SourceCountID, VerInputIDTruebiz);
-		
+
 		NonDerogSourceRecordsID := SeqSourcesLinkIds (Source IN Business_Risk_BIP.Constants.Set_NonDerog);
-		NonDerogSourceRecords60MonthID := NonDerogSourceRecordsID ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(5)); 
+		NonDerogSourceRecords60MonthID := NonDerogSourceRecordsID ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(5));
 		NonDerogSourceRecords36MonthID := NonDerogSourceRecords60MonthID ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(3));
 		NonDerogSourceRecords24MonthID := NonDerogSourceRecords36MonthID ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(2));
 		NonDerogSourceRecords12MonthID := NonDerogSourceRecords24MonthID ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= ut.DaysInNYears(1));
 		NonDerogSourceRecords06MonthID := NonDerogSourceRecords12MonthID ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= Business_Risk_BIP.Constants.SixMonths);
 		NonDerogSourceRecords03MonthID := NonDerogSourceRecords06MonthID ((INTEGER)DateLastSeen > 0 AND ut.DaysApart(DateLastSeen, TodaysDate) <= Business_Risk_BIP.Constants.ThreeMonths);
-		
+
 		SourceNonDerogCountID := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecordsID), -1, 99999);
 		SourceNonDerogCount03MonthID := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords03MonthID), -1, 99999);
 		SourceNonDerogCount06MonthID := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(NonDerogSourceRecords06MonthID), -1, 99999);
@@ -4560,37 +4568,37 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.SourceNonDerogCount24MonthID := calculateValueFor.checkTrueBiz(SourceNonDerogCount24MonthID, VerInputIDTruebiz);
 		SELF.Verification.SourceNonDerogCount36MonthID := calculateValueFor.checkTrueBiz(SourceNonDerogCount36MonthID, VerInputIDTruebiz);
 		SELF.Verification.SourceNonDerogCount60MonthID := calculateValueFor.checkTrueBiz(SourceNonDerogCount60MonthID, VerInputIDTruebiz);
-		
-		SELF.Business_Activity.BusinessActivity03MonthID := 	MAP((INTEGER)MaxDateLastSeenID <= 0 														=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyCount03Month > 0 OR 
+
+		SELF.Business_Activity.BusinessActivity03MonthID := 	MAP((INTEGER)MaxDateLastSeenID <= 0 														=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyCount03Month > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount03 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount03 > 0							=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 3 OR
-																												COUNT(NonDerogSourceRecords03MonthID) = 0 AND	
+																												COUNT(NonDerogSourceRecords03MonthID) = 0 AND
 																												(INTEGER)MaxDateLastSeenID > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords03MonthID) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords03MonthID) = 2											=> '3',
 																												COUNT(NonDerogSourceRecords03MonthID) = 3											=> '4',
 																												COUNT(NonDerogSourceRecords03MonthID) >= 4											=> '5',
 																																																															'-1');
-		SELF.Business_Activity.BusinessActivity06MonthID := MAP((INTEGER)MaxDateLastSeenID <= 0 															=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyCount06Month > 0 OR 
+		SELF.Business_Activity.BusinessActivity06MonthID := MAP((INTEGER)MaxDateLastSeenID <= 0 															=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyCount06Month > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount06 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount06 > 0							=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 6 OR
-																												COUNT(NonDerogSourceRecords06MonthID) = 0 AND	
+																												COUNT(NonDerogSourceRecords06MonthID) = 0 AND
 																												(INTEGER)MaxDateLastSeenID > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords06MonthID) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords06MonthID) = 2											=> '3',
 																												COUNT(NonDerogSourceRecords06MonthID) = 3											=> '4',
 																												COUNT(NonDerogSourceRecords06MonthID) >= 4											=> '5',
 																																																															'-1');
-		SELF.Business_Activity.BusinessActivity12MonthID := MAP((INTEGER)MaxDateLastSeenID <= 0 														=> '-1', 
-																												(INTEGER)le.Bankruptcy.BankruptcyCount12Month > 0 OR 
+		SELF.Business_Activity.BusinessActivity12MonthID := MAP((INTEGER)MaxDateLastSeenID <= 0 														=> '-1',
+																												(INTEGER)le.Bankruptcy.BankruptcyCount12Month > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.LienFiledCount12 > 0 OR
 																												(INTEGER)le.Lien_And_Judgment.JudgmentFiledCount12 > 0			=> '0',
 																												(INTEGER)le.SOS.SOSTimeAgentChange BETWEEN 1 AND 12 OR
-																												COUNT(NonDerogSourceRecords12MonthID) = 0 AND	
+																												COUNT(NonDerogSourceRecords12MonthID) = 0 AND
 																												(INTEGER)MaxDateLastSeenID > 0 																=> '1',
 																												COUNT(NonDerogSourceRecords12MonthID) = 1											=> '2',
 																												COUNT(NonDerogSourceRecords12MonthID) = 2											=> '3',
@@ -4603,17 +4611,17 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.sourcedatelastseenlistID := Business_Risk_BIP.Common.convertDelimited(SeqSourcesLinkIds, DateLastSeen, Business_Risk_BIP.Constants.FieldDelimiter);
 		SELF.Verification.SourceIDDateLastSeenList := calculateValueFor._SourceIDDateLastSeenList(SeqSourcesLinkIds);
 
-		SELF.Firmographic.busobservedageID := IF(SourceFirstSeenID = Business_Risk_BIP.Constants.MissingDate, 
-		     '-1', 
+		SELF.Firmographic.busobservedageID := IF(SourceFirstSeenID = Business_Risk_BIP.Constants.MissingDate,
+		     '-1',
          (STRING)Business_Risk_BIP.Common.capNum(ROUNDUP(ut.DaysApart(SourceFirstSeenID, Business_Risk_BIP.Common.todaysDate((STRING8)Std.Date.Today(), le.Clean_Input.HistoryDate)) / 365.25), -1, 110)
     );
-		                                         
+
 		PhoneIDSources := le.PhoneSources(source NOT IN [gong_src, MDR.sourceTools.set_Phones_Plus]) + le.PhoneIDSources;
 		GroupedPhoneIDSources := Business_Risk_BIP.Common.groupSources(Business_Risk_BIP.Layouts.LayoutSources, PhoneIDSources);
 		UniquePhoneIDSources := ROLLUP(SORT(GroupedPhoneIDSources, Source), LEFT.Source = RIGHT.Source, rollSource(LEFT, RIGHT)) (Source <> '');
-		SeqPhoneIDSources := SORT(UniquePhoneIDSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount);		
-		
-		
+		SeqPhoneIDSources := SORT(UniquePhoneIDSources, -DateLastSeen, -DateFirstSeen, Source, -RecordCount);
+
+
 		SELF.Verification.PhoneMatchDateFirstSeenID := Business_Risk_BIP.Common.checkInvalidDate(TOPN(SeqPhoneIDSources, 1, DateFirstSeen)[1].DateFirstSeen, Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate);
 		SELF.Verification.PhoneMatchDateLastSeenID := Business_Risk_BIP.Common.checkInvalidDate(TOPN(SeqPhoneIDSources, 1, -DateLastSeen)[1].DateLastSeen, Business_Risk_BIP.Constants.MissingDate, le.Clean_Input.HistoryDate);
 		SELF.Verification.PhoneMatchSourceCountID :=  IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND le.Input.InputCheckBusPhone = '0', '-1',
@@ -4624,9 +4632,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.PhoneMatchIDSourceDateFSList := calculateValueFor._PhoneMatchIDSourceDateFSList(SeqPhoneIDSources);
 		SELF.Verification.PhoneDateLastSeenListID := Business_Risk_BIP.Common.convertDelimited(SeqPhoneIDSources, DateLastSeen, Business_Risk_BIP.Constants.FieldDelimiter);
 		SELF.Verification.PhoneMatchIDSourceDateLSList := calculateValueFor._PhoneMatchIDSourceDateLSList(SeqPhoneIDSources);
-		
+
 		// If the Business Header JOIN() LIMIT was reached, manually assign the match category and match status attriutes now, since that data couldn't be pulled out of the business header data earlier.
-		IsLargeBusinessCategory := le.Data_Fetch_Indicators.FetchCodeBusinessHeader = Business_Risk_BIP.Constants.LimitExceededErrorCode;						
+		IsLargeBusinessCategory := le.Data_Fetch_Indicators.FetchCodeBusinessHeader = Business_Risk_BIP.Constants.LimitExceededErrorCode;
 		SELF.Verification.InputIDMatchCategory := calculateValueFor._InputIDMatchCategory(IsLargeBusinessCategory, le.Verification.InputIDMatchCategory);
 		SELF.Verification.InputIDMatchStatus := calculateValueFor._InputIDMatchStatus(IsLargeBusinessCategory, le.Verification.InputIDMatchStatus);
 
@@ -4690,7 +4698,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Associates.AssociateCurrentBusinessCount := calculateValueFor.checkTrueBiz(le.Associates.AssociateCurrentBusinessCount, VerInputIDTruebiz);
 		SELF.Associates.AssociateCurrentPAWCount := calculateValueFor.checkTrueBiz(le.Associates.AssociateCurrentPAWCount, VerInputIDTruebiz);
 		SELF.Associates.AssociateCurrentSOSCount := calculateValueFor.checkTrueBiz(le.Associates.AssociateCurrentSOSCount, VerInputIDTruebiz);
-		
+
 		SELF.Lien_And_Judgment.LienCount := calculateValueFor.checkTrueBiz(le.Lien_And_Judgment.LienCount, VerInputIDTruebiz);
 		SELF.Lien_And_Judgment.LienReleasedCount := calculateValueFor.checkTrueBiz(le.Lien_And_Judgment.LienReleasedCount, VerInputIDTruebiz);
 		SELF.Lien_And_Judgment.LienStateCount := calculateValueFor.checkTrueBiz(le.Lien_And_Judgment.LienStateCount, VerInputIDTruebiz);
@@ -4815,7 +4823,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Lien_And_Judgment.JudgmentReleasedODateFirstSeen := calculateValueFor.checkTrueBiz(le.Lien_And_Judgment.JudgmentReleasedODateFirstSeen, VerInputIDTruebiz);
 		SELF.Lien_And_Judgment.JudgmentReleasedODateLastSeen := calculateValueFor.checkTrueBiz(le.Lien_And_Judgment.JudgmentReleasedODateLastSeen, VerInputIDTruebiz);
 		SELF.Lien_And_Judgment.JudgmentReleasedOTotalAmount := calculateValueFor.checkTrueBiz(le.Lien_And_Judgment.JudgmentReleasedOTotalAmount, VerInputIDTruebiz);
-		
+
 		SELF.Inquiry.InquiryDateFirstSeen := calculateValueFor.checkTrueBiz(le.Inquiry.InquiryDateFirstSeen, VerInputIDTruebiz);
 		SELF.Inquiry.InquiryDateLastSeen := calculateValueFor.checkTrueBiz(le.Inquiry.InquiryDateLastSeen, VerInputIDTruebiz);
 		SELF.Inquiry.InquiryCount := calculateValueFor.checkTrueBiz(le.Inquiry.InquiryCount, VerInputIDTruebiz);
@@ -4853,7 +4861,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Public_Record.GovernmentDebarred := calculateValueFor.checkTrueBiz(le.Public_Record.GovernmentDebarred, VerInputIDTruebiz);
 
 		// If BestSourceCount_TrueBiz <= 0, then we can't verify the best address existed as of the archive date, so we set
-		// the fields based on best address to -1. 
+		// the fields based on best address to -1.
 		SELF.Best_Info.BestTypeAdvo := calculateValueFor.checkBestAddr(le.Best_Info.BestTypeAdvo, BestSourceCount_TrueBiz);
 		SELF.Best_Info.BestZipcodeType := calculateValueFor.checkBestAddr(le.Best_Info.BestZipcodeType, BestSourceCount_TrueBiz);
 		SELF.Best_Info.BestVacancy := calculateValueFor.checkBestAddr(le.Best_Info.BestVacancy, BestSourceCount_TrueBiz);
@@ -4896,7 +4904,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 				le.Data_Fetch_Indicators.FetchCodeWatercraft = Business_Risk_BIP.Constants.LimitExceededErrorCode OR
 				le.Data_Fetch_Indicators.FetchCodeYellowPages = Business_Risk_BIP.Constants.LimitExceededErrorCode,
 			'1', '0');
-		
+
 		SELF := le;
 	END;
 
@@ -4904,7 +4912,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
  // Add Verified input elements.
  withVerifiedInputElements := Business_Risk_BIP.getVerifiedElements(withFinalDelimitedFields, Options, linkingOptions, AllowedSourcesSet);
-	
+
  // Add Scores and other Verification Indicators.
  TempShell := Business_Risk_BIP.getScoresAndIndicators( withVerifiedInputElements, Options );
 
@@ -4929,28 +4937,28 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Verification.VerifiedConsumerZip := RIGHT.Verification.VerifiedConsumerZip;
 																								SELF.Verification.VerifiedConsumerFEIN := RIGHT.Verification.VerifiedConsumerFEIN;
 																								SELF.Verification.VerifiedConsumerPhone := RIGHT.Verification.VerifiedConsumerPhone;
-                                                SELF.Input_Characteristics.InputAddrConsumerCount := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, 
+                                                SELF.Input_Characteristics.InputAddrConsumerCount := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30,
                                                                                             checkBlank(RIGHT.Input_Characteristics.InputAddrConsumerCount, '0'), '-1');
                                                 SELF := LEFT),
 																					LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
 
 	TempBlankShell := PROJECT(withConsumerHeader_noIds, Business_Risk_BIP.xfm_finalizeBlankShellFields(LEFT,Options.BusShellVersion));
-	
+
 	// Combine what we found in the shell with the inputs that we couldn't find a BIP Link ID for
 	FinalShell_pre := SORT(TempShell + TempBlankShell, Seq);
-	
+
 	// Last, render blank the SBFE datarow if the DataPermissionMask restricts SBFE data.
-	FinalShell_restricted := 
+	FinalShell_restricted :=
 		PROJECT( FinalShell_pre, TRANSFORM( Business_Risk_BIP.Layouts.Shell, SELF.SBFE := [], SELF := LEFT ) );
-		
+
 	FinalShell_v20 := PROJECT(FinalShell_pre, Business_Risk_BIP.xfm_blankOutSBFEEnhancementAttrs(LEFT));
 
 	FinalShell := MAP( restrict_sbfe 								 																							=> FinalShell_restricted, // If SBFE data not allowed, blank all SBFE fields
 										 Options.BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v20 => FinalShell_v20,				// If Business shell v2 is requested, blank out SBFE enhancement (v2.1) attributes
 																																																	 FinalShell_pre );
-																																																	 
-	FinalShell_rolled := IF(Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v22, FinalShell, modInp.fn_PopulateAltCompanyNameFields(FinalShell));																																																 
-	
+
+	FinalShell_rolled := IF(Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v22, FinalShell, modInp.fn_PopulateAltCompanyNameFields(FinalShell));
+
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
@@ -4974,16 +4982,16 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 	// OUTPUT(CHOOSEN(withOther, 100), NAMED('Sample_withOther'));
 	// OUTPUT(CHOOSEN(withCorporateFilings, 100), NAMED('Sample_withCorporateFilings'));
 	// OUTPUT(CHOOSEN(TempShell, 100), NAMED('Sample_TempShell'));
-	
+
 	/* The  following Debugs are useful for evaluating the AltCompanyName changes (RR-10930). */
 	// OUTPUT( CHOOSEN(modInp.InputOrigResequencedPlusOrigSeq, 100), NAMED('InputOrigResequencedPlusOrigSeq') );
-	
+
 	// TempShell_pre_slim := PROJECT( CHOOSEN(TempShell_pre, 100), modInp.xfm_slimShellResults(LEFT) );
 	// OUTPUT( TempShell_pre_slim, NAMED('before_rollup') );
-	
+
 	// TempShell_slim := PROJECT( CHOOSEN(TempShell, 100), modInp.xfm_slimShellResults(LEFT) );
 	// OUTPUT( TempShell_slim, NAMED('after_rollup') );
-	
+
 
 	RETURN FinalShell_rolled;
 END;

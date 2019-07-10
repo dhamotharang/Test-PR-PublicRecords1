@@ -1,9 +1,9 @@
-IMPORT Foreclosure_Vacancy, Property, ut, std;
+﻿IMPORT Foreclosure_Vacancy, Property, ut, std;
 
-EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in) ds_xml_in = DATASET([],Foreclosure_Services.Layouts.layout_batch_in)) := 
+EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in) ds_xml_in = DATASET([],Foreclosure_Services.Layouts.layout_batch_in), boolean includeBlackKnight=false) := 
 	FUNCTION
 		
-		UCase := StringLib.StringToUpperCase;
+		UCase := STD.Str.ToUpperCase;
 
 		//move AcctNo into UniqueID_in field
 		Foreclosure_Services.Layouts.layout_batch_in addAcctNo(ds_xml_in l) := transform
@@ -44,7 +44,7 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 			);
 			
 		//Get data
-		response := Foreclosure_Vacancy.getData(isRenewal := true).fn_Find_Foreclosure_By_Addr(input_cleaned, Property.Key_Foreclosures_Addr);
+		response := Foreclosure_Vacancy.getData(isRenewal := true).fn_Find_Foreclosure_By_Addr(input_cleaned, Property.Key_Foreclosures_Addr, includeBlackKnight);
 		
 		//Add Acct No back on linked via uniqueID
 		Foreclosure_Services.Layouts.Final_Batch addAcctNoBack(input_cleaned l, response r) := transform
@@ -88,6 +88,7 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 			Foreclosure_Services.Layouts.Final_Batch;
 			STRING1  foreclosure_type_flag;
 			STRING70 deed_document_type_desc;
+			STRING1 vendor_source;
 			STRING8  date_file_processed; // 'Today'
 			STRING8  deed_recording_date;
 			STRING12 foreclosure_type_age_flag;
@@ -137,6 +138,7 @@ EXPORT BatchService_Records(DATASET(Foreclosure_Services.Layouts.layout_batch_in
 					layout_final_batch_plus,		
 					SELF.foreclosure_type_flag     := fn_get_foreclosure_type_flag(LEFT),
 					SELF.deed_document_type_desc   := LEFT.doc_type_desc,
+					SELF.vendor_source             := LEFT.source;
 					SELF.date_file_processed       := TODAY,
 					SELF.foreclosure_type_age_flag := fn_get_foreclosure_type_age_flag(LEFT),
 					SELF.deed_recording_date       := LEFT.cp_recording_dt,

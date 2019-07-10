@@ -166,13 +166,15 @@ export Functions := MODULE
 		return with_ind;
 	end;
 
-	export historicalNamesAddrs(dataset(doxie.layout_references) dids, boolean IncludeAllAddresses) := function
+	export historicalNamesAddrs(dataset(doxie.layout_references) dids, boolean IncludeAllAddresses,
+                              doxie.IDataAccess mod_access) := function
 
 		uniq_dids := dedup(sort(dids, did), did);
 		
-		hist_recs := join(uniq_dids, Header.Key_Teaser_cnsmr_did, keyed(left.did = right.did), 
+		hist_recs_pre := join(uniq_dids, Header.Key_Teaser_cnsmr_did, keyed(left.did = right.did), 
 											transform(Header.layout_teaser, self := right), 
 											limit(ut.limits.FETCH_KEYED, SKIP));
+    hist_recs := Suppress.MAC_SuppressSource(hist_recs_pre,mod_access);                  
 		recs_grp := group(sort(hist_recs, did, -isCurrent), did);
 		recs_history := rollup(recs_grp, GROUP, combine(LEFT,ROWS(LEFT), IncludeAllAddresses));
 		return recs_history;
@@ -611,7 +613,7 @@ export Functions := MODULE
 		// output(addressesTmp, named('AddressesTmp'));	 			 
 		 // output(sort_recs_WithEmail, named('sort_recs_WithEmail'));
    
-    doxie.compliance.logSoldToSources(if(IncludeEducationInformation,student_data_suppressed),mod_access,did);  
+    
 		RETURN sort_recs_WithEmail;
 	end;
 	export getCounts(dataset(iesp.thinrolluppersonextendedsearch.t_ThinRollupPersonExtendedSearchRecord) inrecs,

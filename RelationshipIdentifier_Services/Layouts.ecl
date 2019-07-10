@@ -1,4 +1,4 @@
-IMPORT BatchShare, relationship, topbusiness_services, bipv2,iesp, risk_indicators;
+﻿IMPORT BatchShare, relationship, topbusiness_services, bipv2,iesp, risk_indicators;
 EXPORT Layouts := MODULE
 
 export Local_tRelationshipIdentifierSearch := record
@@ -10,10 +10,6 @@ end;
 		BOOLEAN lnbranded;		
 		BOOLEAN IncludeNeighbors;		
 		STRING8 AsOfDate;
-		STRING6  SSNMaskVal;
-		string32 application_type;		
-		string datarestrictionmask;
-		string dataPermissionMask;
 		//boolean PDF;
  END;
 

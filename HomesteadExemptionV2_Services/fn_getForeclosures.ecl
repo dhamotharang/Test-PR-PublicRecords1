@@ -1,4 +1,4 @@
-﻿IMPORT doxie, Property, ut;
+﻿IMPORT doxie, Property, ut, MDR;
 
 EXPORT fn_getForeclosures(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) ds_srch_recs) := FUNCTION
 
@@ -13,7 +13,8 @@ EXPORT fn_getForeclosures(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRe
 		KEYED(LEFT.prim_name=RIGHT.situs1_prim_name) AND
 		KEYED(LEFT.addr_suffix=RIGHT.situs1_addr_suffix) AND
 		KEYED(LEFT.predir=RIGHT.situs1_predir) AND
-		LEFT.sec_range=RIGHT.situs1_sec_range AND RIGHT.deed_category='U',
+		LEFT.sec_range=RIGHT.situs1_sec_range AND RIGHT.deed_category='U'	AND 
+		RIGHT.source=MDR.sourceTools.src_Foreclosures,
 		TRANSFORM(workRec,SELF:=LEFT,SELF:=RIGHT),
 		LEFT OUTER,LIMIT(ut.limits.Foreclosure_MAX,SKIP));
 

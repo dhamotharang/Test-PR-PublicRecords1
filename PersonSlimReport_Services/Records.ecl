@@ -7,7 +7,10 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
  globalMod := AutoStandardI.GlobalModule();
  
  //filter out minors and suppress DID(s) before attempting to fetch any data....
-  mod_access    := PersonSlimReport_Services.IParams.convertToDataAccess(in_mod);
+  mod_access  := MODULE(doxie.IDataAccess)
+    //this brings some extras (like, include_BlankDOD), but there's no harm in it
+    $.IParams.MAC_copy_old_report_fields(in_mod);
+  END;
   did_minorSafe := doxie.compliance.MAC_FilterOutMinors(in_did, , , mod_access.show_minors);
   Suppress.MAC_Suppress(did_minorSafe,did_safe,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
  

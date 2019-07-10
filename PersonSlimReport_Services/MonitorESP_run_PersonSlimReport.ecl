@@ -8247,8 +8247,10 @@ END;
 EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_Property2Entity L, layouts._lt_Property2Entity R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_EntityTypeCode := (L.EntityTypeCode != R.EntityTypeCode);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_EntityTypeCode;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -8257,7 +8259,7 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_EntityTypeCode, DATASET ([{'EntityTypeCode', R.EntityTypeCode}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -8342,26 +8344,26 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R) := FUNCTION
-    boolean IsInner :=  (L.Address.UnitNumber = R.Address.UnitNumber AND L.Address.StreetNumber = R.Address.StreetNumber AND L.Address.Zip5 = R.Address.Zip5 AND L.Address.StreetName = R.Address.StreetName AND L.Address.City = R.Address.City AND L.Address.State = R.Address.State);
+  EXPORT  integer1 CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R) := FUNCTION
+    boolean IsInner :=  (L.Address.UnitNumber = R.Address.UnitNumber AND L.Address.StreetNumber = R.Address.StreetNumber AND L.Address.Zip5 = R.Address.Zip5 AND L.Address.StreetName = R.Address.StreetName AND L.Address.City = R.Address.City AND L.Address.State = R.Address.State AND L.EntityTypeCode = R.EntityTypeCode);
 
-    boolean IsOuterRight :=   (L.Address.UnitNumber = '' AND L.Address.StreetNumber = '' AND L.Address.Zip5 = '' AND L.Address.StreetName = '' AND L.Address.City = '' AND L.Address.State = '');
+    boolean IsOuterRight :=   (L.Address.UnitNumber = '' AND L.Address.StreetNumber = '' AND L.Address.Zip5 = '' AND L.Address.StreetName = '' AND L.Address.City = '' AND L.Address.State = '' AND L.EntityTypeCode = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5 (dataset(layouts._lt_Property2Entity) _n, dataset(layouts._lt_Property2Entity) _o) := FUNCTION
+  EXPORT  AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode (dataset(layouts._lt_Property2Entity) _n, dataset(layouts._lt_Property2Entity) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State,
+                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State AND LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(LEFT, RIGHT)),
+                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State,
+                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State AND LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(LEFT, RIGHT)),
+                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Property2Entity);
@@ -8401,7 +8403,7 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
       SELF.Assessment  := L.Assessment;
       SELF.Deed  := L.Deed;
 
-      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(L.Entities, R.Entities);
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(L.Entities, R.Entities);
       checked_Entities := MAP (is_deleted => R.Entities,
                               is_added => L.Entities,
                               updated_Entities);
@@ -8424,7 +8426,7 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
       SELF.Assessment  := L.Assessment;
       SELF.Deed  := L.Deed;
 
-      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5(L.Entities, R.Entities);
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(L.Entities, R.Entities);
       checked_Entities := MAP (is_deleted => R.Entities,
                               is_added => L.Entities,
                               updated_Entities);
@@ -9149,11 +9151,11 @@ END;
 // we start to throttle, and maxRetries controls how many times inserts that fail because Cassandra is too busy
 // will be retried.
 
-monitorStoreRec getStoredMonitor(string id) := EMBED(cassandra : server(csndServer), user(csndUser), password(csndPassword), keyspace(csndKeySpaceFrom))
+monitorStoreRec getStoredMonitor(string id) := EMBED(cassandra : server(csndServer), user(csndUser), password(csndPassword), keyspace(csndKeySpaceFrom), consistency('LOCAL_QUORUM'))
   SELECT monitorId, result from monitor WHERE monitorId=? LIMIT 1;
 ENDEMBED;
 
-updateMonitor(dataset(monitorStoreRec) values) := EMBED(cassandra : server(csndServer), user(csndUser), password(csndPassword), keyspace(csndKeySpaceTo), maxFutures(100), maxRetries(10))
+updateMonitor(dataset(monitorStoreRec) values) := EMBED(cassandra : server(csndServer), user(csndUser), password(csndPassword), keyspace(csndKeySpaceTo), maxFutures(100), maxRetries(10), consistency('LOCAL_QUORUM'))
   INSERT INTO monitor (monitorId, result) values (?,?);
 ENDEMBED;
 

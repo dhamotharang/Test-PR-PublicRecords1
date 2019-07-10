@@ -143,7 +143,8 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 													SELF.entity_value := LEFT.entity_value,
 													SELF.tree_uid := LEFT.tree_uid_,
 													SELF.entity_context_uid := LEFT.entity_context_uid_,
-													SELF := []));
+													SELF.acctno := '',
+													SELF.record_id := 0));
 																										
 		ds_cluster_details := FraudGovPlatform_Services.Functions.getClusterDetails(ds_cluster_proj, batch_params, TRUE);
 		
@@ -254,7 +255,9 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																																							SELF.DescriptionCode := LEFT.field,
 																																							SELF.Description := LEFT.label,
 																																							SELF.DescriptionValue := LEFT.value,
-																																							SELF := []));
+																																							SELF.EventDate.Year := 0,
+																																							SELF.EventDate.Month := 0,
+																																							SELF.EventDate.Day := 0));
 		
 		/* Returning the Score Breakdown for Online Report */
 		ds_score_breakdown := FraudGovPlatform_Services.Functions.GetScoreBreakDown(ds_entityNameUID, batch_params);

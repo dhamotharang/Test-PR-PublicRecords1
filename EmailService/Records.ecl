@@ -16,16 +16,21 @@ EXPORT Records := MODULE
 			TRANSFORM(Email_Data.Layout_Email.Base,SELF:=RIGHT,SELF:=[]),
 			KEEP(FCRA.compliance.MAX_OVERRIDE_LIMIT),LIMIT(0));
 
-		// get email records less overwritten records
+		// get email records
 		ds_email_recs:=JOIN(ds_dids,Email_Data.Key_Did_FCRA,
-			KEYED(LEFT.did=RIGHT.did)
-			AND RIGHT.email_rec_key!=0 AND TRIM((STRING)RIGHT.email_rec_key) NOT IN SET(ds_FlagFile((UNSIGNED)did=LEFT.did),TRIM(record_id)),
+			KEYED(LEFT.did=RIGHT.did) AND RIGHT.email_rec_key!=0,
 			TRANSFORM(Email_Data.Layout_Email.Base,SELF:=RIGHT),
 			KEEP(EmailService.Constants.FCRA.MaxEmailPerDID),
 			LIMIT(EmailService.Constants.FCRA.MaxEmailRecords,SKIP));
 
+		// less overwritten records
+		ds_email_less_overwritten:=JOIN(ds_email_recs,ds_FlagFile,
+			LEFT.did=(UNSIGNED)RIGHT.did
+			AND (STRING)LEFT.email_rec_key=TRIM(RIGHT.record_id),
+			TRANSFORM(Email_Data.Layout_Email.Base,SELF:=LEFT),LEFT ONLY);
+
 		// dedup results by email address push non-Royalty sources to the bottom
-		ds_email_raw:=DEDUP(SORT(ds_email_recs+ds_override_recs,did,clean_email,
+		ds_email_raw:=DEDUP(SORT(ds_email_less_overwritten+ds_override_recs,did,clean_email,
 			IF(email_src IN Royalty.Constants.EMAIL_ROYALTY_SET(TRUE),0,1),
 			-date_last_seen,-date_first_seen),did,clean_email);
 
@@ -106,6 +111,7 @@ EXPORT Records := MODULE
 		// OUTPUT(ds_FlagFile,NAMED('ds_FlagFile'));
 		// OUTPUT(SORT(ds_override_recs,did,-date_first_seen,-date_last_seen),NAMED('ds_override_recs'));
 		// OUTPUT(SORT(ds_email_recs,did,-date_first_seen,-date_last_seen),NAMED('ds_email_recs'));
+		// OUTPUT(SORT(ds_email_less_overwritten,did,-date_first_seen,-date_last_seen),NAMED('ds_email_less_overwritten'));
 		// OUTPUT(SORT(ds_email_raw,did,-date_first_seen,-date_last_seen),NAMED('ds_email_raw'));
 		// OUTPUT(SORT(ds_email_disclose,(UNSIGNED)acctno,-date_first_seen,-date_last_seen),NAMED('ds_email_disclose'));
 		// OUTPUT(SORT(ds_email_dispute,(UNSIGNED)acctno,-date_first_seen,-date_last_seen),NAMED('ds_email_dispute'));

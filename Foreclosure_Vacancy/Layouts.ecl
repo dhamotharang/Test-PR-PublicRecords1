@@ -354,6 +354,7 @@ EXPORT Layouts := MODULE
 		STRING250	LEGAL_DESC_2; 	 					//legal_2
 		STRING250	LEGAL_DESC_3; 	 					//legal_3
 		STRING50	LEGAL_DESC_4; 	 					//legal_4
+		STRING1 SOURCE;        //vendor_source
 	end;
 //Output Layouts
 

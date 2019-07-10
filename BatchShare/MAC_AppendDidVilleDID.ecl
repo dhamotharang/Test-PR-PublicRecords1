@@ -25,13 +25,7 @@ IMPORT Address, AutoKeyI, BatchShare, DidVille, Gateway, Standard, Suppress;
 
 	// fetch BatchShare params set values from input mod
 	#UNIQUENAME(dv_mod);
-
-	#UNIQUENAME(in_mod_legacy);
-  %in_mod_legacy% := BatchShare.IParam.ConvertToLegacy(in_mod);
-
-	%dv_mod%:=MODULE(PROJECT(%in_mod_legacy%,Gateway.IParam.DidVilleParams,OPT))
-		EXPORT DATASET(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
-	END;
+  %dv_mod% := PROJECT(in_mod, Gateway.IParam.DidVilleParams, OPT);
 
 	#UNIQUENAME(batchInRec);
 	%batchInRec%:=RECORDOF(batch_in);
@@ -98,7 +92,7 @@ IMPORT Address, AutoKeyI, BatchShare, DidVille, Gateway, Standard, Suppress;
 	%denormRec% %denormRecs%({UNSIGNED acctno} L,DATASET({UNSIGNED err_search,%resultRec%}) R) := TRANSFORM
 		didScoreRec:={UNSIGNED err_search,UNSIGNED score,UNSIGNED did};
 		ds_did_score:=PROJECT(R,TRANSFORM(didScoreRec,SELF.score:=(UNSIGNED)LEFT.score,SELF.did:=(UNSIGNED)LEFT.did,SELF.err_search:=LEFT.err_search));
-		Suppress.MAC_Suppress(ds_did_score,ds_recs,%dv_mod%.applicationtype,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_did_score,ds_recs,%dv_mod%.application_type,Suppress.Constants.LinkTypes.DID,did);
 		rec:=SORT(ds_recs,-score,did)[1];
 		DID_PROVIDED:=rec.err_search>0;
 		DID_NOT_FOUND:=rec.did=0;

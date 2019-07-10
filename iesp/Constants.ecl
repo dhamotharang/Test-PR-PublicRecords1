@@ -2152,5 +2152,10 @@ EXPORT Constants := MODULE
     export UNSIGNED2 MaxImposters    := 50;
     export UNSIGNED2 MaxUtilities    := 100;
   end;
+  
+  export CollectionReport := module
+    export unsigned2 MaxCollections := 100;
+    export unsigned2 MaxCollectionRecords := 2000;
+  end;
 	
 END;

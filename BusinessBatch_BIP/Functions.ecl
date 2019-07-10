@@ -1325,8 +1325,8 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
     dDCAInfoRaw := DCAV2.Key_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);
     RawRecordType := RECORDOF(dDCAInfoRaw);
 
-    // currently, all DCA records are marketing restricted
-    dDCAInfoMark := DATASET([], RawRecordType);
+    // currently, all DCA records are marketing-allowed for the BRM rollup service
+    dDCAInfoMark := dDCAInfoRaw;
 
     dDCAInfo := IF (inMod.ExcludeMarketing, dDCAInfoMark, dDCAInfoRaw);
     

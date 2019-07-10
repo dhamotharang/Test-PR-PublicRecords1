@@ -153,6 +153,7 @@ export RiskViewReport_Service := MACRO
 		reportOut := if(users.TestDataEnabled,
 										Risk_Indicators.RVR_TestSeed_Function(requestIn),
 										Models.RiskViewReport_RptFunction(BocaShell_returned, BocaShellVersion, DataRestriction, option.IntendedPurpose));
+        
 
 		// ----------------------------------------
 		// Model transforms
@@ -199,7 +200,8 @@ export RiskViewReport_Service := MACRO
 		// Starts with 'LOG_' (Upper case is important!!)
 		// Middle part is the database name, in this case: 'log__mbs__fcra'
 		// Must end with '_intermediate__log'
-IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log')) );
+    IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log')) );
+
 
 		
 		//Log to Deltabase
@@ -224,6 +226,7 @@ IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, N
 																						 self.data_restriction_mask := DataRestriction,
 																						 self.data_permission_mask := DataPermission,
 																						 self.industry := Industry_Search[1].Industry,
+																						
 																						 // self.i_attributes_name := attributesIn[1].name,
 																						 self.i_ssn := inSSN,
                                              self.i_dob := Search.dob.year +
@@ -242,17 +245,18 @@ IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, N
                                              self.i_home_phone := search.HomePhone,
                                              self.i_work_phone := search.WorkPhone,
 																						 // Check to see if there were models requested
-																						 // model_count := count(option.IncludeModels.ModelRequests);
-																						 self.i_model_name_1 := model_name1,
+																						 //model_count := count(option.IncludeModels.ModelRequests);
+																						 model_count := scores_count;
+																						 self.i_model_name_1 := if(model_count >=1, model_name1, ''),
 																						 extra_score := scores_count > 1;
-																						 self.i_model_name_2 := model_name2,
+																						 self.i_model_name_2 := if(extra_score, model_name2, ''),
 																						 self.o_score_1    := IF(model_name1 != '', left.Models[1].Scores[1].i, ''),
-																						 self.o_reason_1_1 := left.Models[1].Scores[1].reason_codes[1].reason_code,
-																						 self.o_reason_1_2 := left.Models[1].Scores[1].reason_codes[2].reason_code,
-																						 self.o_reason_1_3 := left.Models[1].Scores[1].reason_codes[3].reason_code,
-																						 self.o_reason_1_4 := left.Models[1].Scores[1].reason_codes[4].reason_code,
-																						 self.o_reason_1_5 := left.Models[1].Scores[1].reason_codes[5].reason_code,
-																						 self.o_reason_1_6 := left.Models[1].Scores[1].reason_codes[6].reason_code,
+																						 self.o_reason_1_1 := IF(model_count != 0, left.Models[1].Scores[1].reason_codes[1].reason_code, ''),
+																						 self.o_reason_1_2 := IF(model_count != 0, left.Models[1].Scores[1].reason_codes[2].reason_code, ''),
+																						 self.o_reason_1_3 := IF(model_count != 0, left.Models[1].Scores[1].reason_codes[3].reason_code, ''),
+																						 self.o_reason_1_4 := IF(model_count != 0, left.Models[1].Scores[1].reason_codes[4].reason_code, ''),
+																						 self.o_reason_1_5 := IF(model_count != 0, left.Models[1].Scores[1].reason_codes[5].reason_code, ''),
+																						 self.o_reason_1_6 := IF(model_count != 0, left.Models[1].Scores[1].reason_codes[6].reason_code, ''),
 																						 self.o_score_2    := IF(extra_score, left.Models[2].Scores[1].i, ''),
 																						 self.o_reason_2_1 := IF(extra_score, left.Models[2].Scores[1].reason_codes[1].reason_code, ''),
 																						 self.o_reason_2_2 := IF(extra_score, left.Models[2].Scores[1].reason_codes[2].reason_code, ''),

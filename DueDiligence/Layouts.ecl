@@ -3,96 +3,96 @@
 EXPORT Layouts := MODULE
 
   EXPORT LinkIDs := RECORD
-		SALT28.UIDType	LinkID := 0;
-		INTEGER2				Weight := 0;                    // Specificity attached to this match
-		UNSIGNED2				Score := 0;                     // Chances of being correct as a percentage
-		UNSIGNED4				LinkCount := 0;                 // Number of times that particular LinkID is returned from the BIP Append Process
-	END;
-	
-	EXPORT DD_CompanyNames := RECORD
-		STRING120 Name := '';
-		UNSIGNED4	LinkCount := 0;                       // Number of times that particular Name is returned from the BIP Append Process
-	END;
-	 
-	EXPORT LinkID_Results := RECORD
-		UNSIGNED6 Seq       := 0;
-		BOOLEAN BIPIDSourceInput;                       // Indicates if the BIP IDs were returned from the append process or input
-		LinkIDs PowID;
-		LinkIDs ProxID;
-		LinkIDs SeleID;
-		LinkIDs OrgID;
-		LinkIDs UltID;
-	END;
-  
+    SALT28.UIDType	LinkID := 0;
+    INTEGER2				Weight := 0;                    // Specificity attached to this match
+    UNSIGNED2				Score := 0;                     // Chances of being correct as a percentage
+    UNSIGNED4				LinkCount := 0;                 // Number of times that particular LinkID is returned from the BIP Append Process
+  END;
+
+  EXPORT DD_CompanyNames := RECORD
+    STRING120 Name := '';
+    UNSIGNED4	LinkCount := 0;                       // Number of times that particular Name is returned from the BIP Append Process
+  END;
+
+  EXPORT LinkID_Results := RECORD
+    UNSIGNED6 Seq       := 0;
+    BOOLEAN BIPIDSourceInput;                       // Indicates if the BIP IDs were returned from the append process or input
+    LinkIDs PowID;
+    LinkIDs ProxID;
+    LinkIDs SeleID;
+    LinkIDs OrgID;
+    LinkIDs UltID;
+  END;
+
   EXPORT AddressSlimDetail := RECORD
     STRING10 prim_range;
-		STRING2  predir;
-		STRING28 prim_name;
-		STRING4  addr_suffix;
-		STRING2  postdir;
-		STRING10 unit_desig;
-		STRING8  sec_range;
-		STRING25 city;
-		STRING2  state;
-		STRING5  zip5;
-		STRING4  zip4;
+    STRING2  predir;
+    STRING28 prim_name;
+    STRING4  addr_suffix;
+    STRING2  postdir;
+    STRING10 unit_desig;
+    STRING8  sec_range;
+    STRING25 city;
+    STRING2  state;
+    STRING5  zip5;
+    STRING4  zip4;
     STRING3  county;                               //Due Diligence is capturing the last 3 digits of the full 5 digit FIPS code. It uses the 3 digit code to access the Census Keys and the will build the 5 digit FIPS to determine HIFCA and HIDTA  
     STRING7  geo_blk;
   END;
 
-	EXPORT Address := RECORD
-		STRING120   streetAddress1;
-		STRING120   streetAddress2;
-		AddressSlimDetail;
-		STRING4  cart;	
-		STRING1  cr_sort_sz;
-		STRING4  lot;	
-		STRING1  lot_order;
-		STRING2  dbpc; 	
-		STRING1  chk_digit; 
-		STRING2  rec_type;
-		STRING10 geo_lat;
-		STRING11 geo_long;
-		STRING4  msa; 
-		STRING1  geo_match;
-		STRING4  err_stat;	
-		UNSIGNED4 dateLastSeen;
-	END;
+  EXPORT Address := RECORD
+    STRING120   streetAddress1;
+    STRING120   streetAddress2;
+    AddressSlimDetail;
+    STRING4  cart;	
+    STRING1  cr_sort_sz;
+    STRING4  lot;	
+    STRING1  lot_order;
+    STRING2  dbpc; 	
+    STRING1  chk_digit; 
+    STRING2  rec_type;
+    STRING10 geo_lat;
+    STRING11 geo_long;
+    STRING4  msa; 
+    STRING1  geo_match;
+    STRING4  err_stat;	
+    UNSIGNED4 dateLastSeen;
+  END;
 
-	EXPORT Name := RECORD
-		STRING120 fullName;
-		STRING20 firstName;
-		STRING20 middleName;
-		STRING20 lastName;
-		STRING5 suffix;	
-	END;
-  
+  EXPORT Name := RECORD
+    STRING120 fullName;
+    STRING20 firstName;
+    STRING20 middleName;
+    STRING20 lastName;
+    STRING5 suffix;	
+  END;
+
   SHARED Shared_Input := RECORD
     STRING15 lexID;
-		STRING30 accountNumber;
+    STRING30 accountNumber;
     Address address;
     STRING14 phone;  //to account if input comes in (xxx) xxx-xxxx
     UNSIGNED6 inputSeq;
   END;
 
-	EXPORT Busn_Input := RECORD
-		LinkID_Results BIP_IDs;
-		Shared_Input;
-		STRING120 companyName;
-		STRING120 altCompanyName;
-		STRING11 fein;
-	END;
+  EXPORT Busn_Input := RECORD
+    LinkID_Results BIP_IDs;
+    Shared_Input;
+    STRING120 companyName;
+    STRING120 altCompanyName;
+    STRING11 fein;
+  END;
 
-	EXPORT Indv_Input := RECORD
-		Shared_Input;
-		STRING3 nameInputOrder;
-		Name name;		
-		STRING11 ssn; //to account if input comes in xxx-xx-xxxx
-		STRING8 dob;
-	END;
+  EXPORT Indv_Input := RECORD
+    Shared_Input;
+    STRING3 nameInputOrder;
+    Name name;		
+    STRING11 ssn; //to account if input comes in xxx-xx-xxxx
+    STRING8 dob;
+  END;
 
 
-	EXPORT Input := RECORD
+  EXPORT Input := RECORD
     BOOLEAN validRequest;
     STRING200 errorMessage;
     BOOLEAN containsCitizenshipReq;
@@ -109,15 +109,15 @@ EXPORT Layouts := MODULE
     DueDiligence.Citizenship.Layouts.Input;
     Busn_Input business;
     Indv_Input individual;
-	END;
+  END;
 
-	EXPORT CleanedData := RECORD
+  EXPORT CleanedData := RECORD
     Input inputEcho;
     Input cleanedInput;
-	END;
+  END;
 
   //ALSO USED BY BATCH - changing name will impact batch
-	EXPORT PerAttributes := RECORD
+  EXPORT PerAttributes := RECORD
     STRING15 PerLexID;
     STRING3 PerLexIDMatch;
     STRING2 PerAssetOwnProperty;
@@ -162,10 +162,10 @@ EXPORT Layouts := MODULE
     STRING10 PerProfLicense_Flag;
     STRING2 PerBusAssociations;
     STRING10 PerBusAssociations_Flag;
-	END;
+  END;
 
   //ALSO USED BY BATCH - changing name will impact batch
-	EXPORT BusAttributes := RECORD
+  EXPORT BusAttributes := RECORD
     STRING15 BusLexID;
     STRING3 BusLexIDMatch;
     STRING2 BusAssetOwnProperty;
@@ -216,8 +216,8 @@ EXPORT Layouts := MODULE
     STRING10 BusBEOAccessToFundsProperty_Flag;
     STRING2 BusLinkedBusinesses;
     STRING10 BusLinkedBusinesses_Flag;
-	END;
-  
+  END;
+
   SHARED BatchFILayout := RECORD
     STRING8 FIAcctOpenDate;
     STRING100 FICRR;
@@ -279,8 +279,8 @@ EXPORT Layouts := MODULE
     BusAttributes;
     DueDiligence.Citizenship.Layouts.LayoutScoreAndIndicators;
   END;
-  
-	
+
+
   EXPORT LayoutSICNAIC := RECORD
     UNSIGNED4 DateFirstSeen;
     UNSIGNED4 DateLastSeen;
@@ -293,14 +293,14 @@ EXPORT Layouts := MODULE
     BOOLEAN IsPrimary;
     STRING3 source;
   END;
-	
+
   EXPORT SICNAICRating := RECORD
     STRING8 code;
     STRING highestIndustryOrRiskLevel;
     STRING1 sicNAICSIndicator;
     STRING2 industryCategory;
   END;
-	
+
   EXPORT SicNaicRiskLayout := RECORD
     SICNAICRating bestSIC;
     SICNAICRating bestNAICS;
@@ -319,8 +319,8 @@ EXPORT Layouts := MODULE
     STRING800 naicCodes;
   END;
 
-  
-	
+
+
   EXPORT CivilOffensesCounts := RECORD                               
     /* LIENS and JUDGMENTS and EVICTIONS */  
     UNSIGNED2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
@@ -333,13 +333,14 @@ EXPORT Layouts := MODULE
     UNSIGNED2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
     UNSIGNED2   evictionsCnt;                                       //*** evictions EVER
   END;  
-		
-	
+
+
   EXPORT GeographicRiskLayout := RECORD 
     STRING12    buildgeolink;
     STRING3	    EasiTotCrime;
     STRING28    CityState;
-    STRING5     FipsCode;  
+    STRING5     FipsCode; 
+    BOOLEAN     validFIPSCode;                          //populated in DueDiligence.Common.getGeographicRisk
     STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk 
     BOOLEAN     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
     BOOLEAN     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
@@ -349,11 +350,12 @@ EXPORT Layouts := MODULE
     BOOLEAN     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
     BOOLEAN     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
     BOOLEAN     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
+    BOOLEAN     censusRecordExists;                     //populated in DueDiligence.Common.getGeographicRisk
   END;  	
-	
- 
-	
-	
+
+
+
+
   EXPORT BusSourceLayout := RECORD
     STRING source;
     STRING sourceName;
@@ -736,7 +738,7 @@ EXPORT Layouts := MODULE
     STRING2			residentialAddr;												            //populated in DueDiligence.getBusAsInd
     UNSIGNED1		personNameSSN;													            //populated in DueDiligence.getBusAsInd
     UNSIGNED1		personAddrSSN;													            //populated in DueDiligence.getBusAsInd
-    /*BusIndustryRisk*/
+    //BusIndustryRisk
     SicNaicRiskLayout sicNaicRisk;											            //populated in DueDiligence.getBusSicNaic -- ATTRIBUTE AND OTHER LAYOUTS??
     UNSIGNED3		numOfSicNaic;
     DATASET(LayoutSICNAIC) sicNaicSources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};		//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
@@ -747,10 +749,10 @@ EXPORT Layouts := MODULE
     UNSIGNED4	  BusnHdrDtLastSeen;										        	    //populated in DueDiligence.getBusHeader		
     STRING5     FIPsCode;
 
-    /*BusGeographicRisk*/
+    //BusGeographicRisk
     GeographicRiskLayout;   
 
-    /* Civil Offenses   */   
+    //Civil Offenses  
     CivilOffensesCounts  Business;
 
     BusAttributes;

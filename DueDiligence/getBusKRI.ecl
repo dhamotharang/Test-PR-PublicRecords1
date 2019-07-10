@@ -375,13 +375,13 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
     BusGeoRisk_Flag9 := IF(le.CountyHasHighCrimeIndex AND le.CountyBordersForgeinJur AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);										
     BusGeoRisk_Flag8 := IF(le.CityBorderStation OR le.CityFerryCrossing OR le.CityRailStation, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                     												
     BusGeoRisk_Flag7 := IF(le.CountyBordersForgeinJur, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);       		
-    BusGeoRisk_Flag6 := IF(~le.CountyBordersForgeinJur AND le.CountyBorderOceanForgJur, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);												
+    BusGeoRisk_Flag6 := IF((~le.CountyBordersForgeinJur AND le.validFIPSCode) AND le.CountyBorderOceanForgJur, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);												
     BusGeoRisk_Flag5 := IF(le.CountyHasHighCrimeIndex AND (le.HIDTA OR le.HIFCA), DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                             												
     BusGeoRisk_Flag4 := IF(le.CountyHasHighCrimeIndex, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                    		                                                                 
     BusGeoRisk_Flag3 := IF(le.HIFCA, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                                  		
     BusGeoRisk_Flag2 := IF(le.HIDTA, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);                                           
-    BusGeoRisk_Flag1 := IF(~le.CountyHasHighCrimeIndex, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-
+    BusGeoRisk_Flag1 := IF(~le.CountyHasHighCrimeIndex AND le.censusRecordExists, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+   
     BusGeoRisk_Flag_final := DueDiligence.Common.calcFinalFlagField(BusGeoRisk_Flag9,
                                                                     BusGeoRisk_Flag8,
                                                                     BusGeoRisk_Flag7,
