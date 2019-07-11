@@ -66,10 +66,12 @@ esdl     monitor       ws_accurint.ecm       WsAccurint        PersonSlimReport 
 -I C:\Users\abitda01\Desktop\repository\alerts\run\cmd\scapps\esp\services\ws_distrix\scm\
 //output directory 
 --outdir=C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services
+// cassandra DB config value purposely left blank after =
+--cassandra-consistency=
 
 -----
 C:\Users\abitda01>
-"C:\Program Files\HPCCSystems\7.2.22\clienttools\bin\esdl.exe" monitor ws_accurint.ecm WsAccurint PersonSlimReport C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services\monitor_template_PersonSlimReport.xml -I C:\Users\abitda01\Desktop\repository\scapps\esp\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gateway\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gatewayEx\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_distrix\scm --outdir=C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services
+"C:\Program Files\HPCCSystems\7.2.22\clienttools\bin\esdl.exe" monitor ws_accurint.ecm WsAccurint PersonSlimReport C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services\monitor_template_PersonSlimReport.xml -I C:\Users\abitda01\Desktop\repository\scapps\esp\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gateway\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gatewayEx\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_distrix\scm --outdir=C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services --cassandra-consistency=
 
 Loading XML ESDL definition: ws_accurint.ecm
 Time taken for adding XML ESDL definition: 224771849 cycles (224M) = 74 msec
