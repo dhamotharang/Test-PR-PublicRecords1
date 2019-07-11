@@ -25,7 +25,7 @@ return( map(
 																		
 						(((integer8) score_in   < -1  or (integer8) score_in   > 999 ) and stringlib.stringfind(lay, 'paro', 1) > -1 )  =>  '-1',
 																			
-																
+		        (((integer8) score_in   >=0  and (integer8) score_in   <= 100 ) and stringlib.stringfind(lay, 'socioeconomic_v5_batch', 1) > 0 ) and score_in<>''  => score_in,	
 																		
 																
 
