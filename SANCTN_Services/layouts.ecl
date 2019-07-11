@@ -47,12 +47,8 @@ EXPORT layouts := module
     standard.Name name;
     string45 cname := '';
     AddressTranslated address;
-  end;
-  
-  EXPORT rec_party_plusIsSupp := RECORD
-    rec_party;
     BOOLEAN is_suppressed;
-  END;
+  end;
   
   // this may be redundant, but I want the output to be same as before
   EXPORT Party := RECORD
@@ -82,13 +78,9 @@ EXPORT layouts := module
     STRING1  OK_FOR_FCR;
   	string8 incident_date_clean := '';
     string8 fcr_date_clean := '';
-  END;
-
-  EXPORT IncidentPlusIsSupp := RECORD
-    Incident;
     BOOLEAN is_suppressed;
   END;
-  
+
   // Complete stand-alone SOURCE/REPORT service
   EXPORT SourceOutput := RECORD
     unsigned1 penalt := 0;
