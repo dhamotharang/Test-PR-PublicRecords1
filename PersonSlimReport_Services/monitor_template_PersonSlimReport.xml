@@ -758,6 +758,68 @@
             </Addresses>
           </Debtor>
         </Debtors>
+        <Debtors2 diff_match="OriginName">
+          <Debtor>
+            <OriginName/>
+            <ParsedParties diff_match="UniqueId">
+              <Party>
+                <BusinessIds diff_monitor="">
+                  <DotID/>
+                  <EmpID/>
+                  <POWID/>
+                  <ProxID/>
+                  <SeleID/>
+                  <OrgID/>
+                  <UltID/>
+                </BusinessIds>
+                <IdValue diff_monitor=""/>
+                <BusinessId diff_monitor=""/>
+                <UniqueId/>
+                <Name>
+                  <Full diff_monitor=""/>
+                  <First/>
+                  <Middle diff_monitor=""/>
+                  <Last/>
+                  <Suffix diff_monitor=""/>
+                  <Prefix diff_monitor=""/>
+                </Name>
+                <CompanyName diff_monitor=""/>
+                <SSN diff_monitor=""/>
+                <FEIN diff_monitor=""/>
+                <IncorporatedState diff_monitor=""/>
+                <CorporateNumber diff_monitor=""/>
+                <CorporateType diff_monitor=""/>
+              </Party>
+            </ParsedParties>
+            <Addresses diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </Addresses>
+          </Debtor>
+        </Debtors2>
         <Creditors diff_match="OriginName">
           <Creditor>
             <OriginName/>
@@ -968,13 +1030,223 @@
             <NewUsed/>
           </Collateral>
         </Collaterals>
+        <Creditors2 diff_match="OriginName">
+          <Creditor>
+            <OriginName/>
+            <ParsedParties diff_match="UniqueId">
+              <Party>
+                <BusinessIds diff_monitor="">
+                  <DotID/>
+                  <EmpID/>
+                  <POWID/>
+                  <ProxID/>
+                  <SeleID/>
+                  <OrgID/>
+                  <UltID/>
+                </BusinessIds>
+                <IdValue diff_monitor=""/>
+                <BusinessId diff_monitor=""/>
+                <UniqueId/>
+                <Name>
+                  <Full diff_monitor=""/>
+                  <First/>
+                  <Middle diff_monitor=""/>
+                  <Last/>
+                  <Suffix diff_monitor=""/>
+                  <Prefix diff_monitor=""/>
+                </Name>
+                <CompanyName diff_monitor=""/>
+                <SSN diff_monitor=""/>
+                <FEIN diff_monitor=""/>
+                <IncorporatedState diff_monitor=""/>
+                <CorporateNumber diff_monitor=""/>
+                <CorporateType diff_monitor=""/>
+              </Party>
+            </ParsedParties>
+            <Addresses diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </Addresses>
+          </Creditor>
+        </Creditors2>
+        <Secureds2 diff_match="OriginName">
+          <Secured>
+            <OriginName/>
+            <ParsedParties diff_match="UniqueId">
+              <Party>
+                <BusinessIds diff_monitor="">
+                  <DotID/>
+                  <EmpID/>
+                  <POWID/>
+                  <ProxID/>
+                  <SeleID/>
+                  <OrgID/>
+                  <UltID/>
+                </BusinessIds>
+                <IdValue diff_monitor=""/>
+                <BusinessId diff_monitor=""/>
+                <UniqueId/>
+                <Name>
+                  <Full diff_monitor=""/>
+                  <First/>
+                  <Middle diff_monitor=""/>
+                  <Last/>
+                  <Suffix diff_monitor=""/>
+                  <Prefix diff_monitor=""/>
+                </Name>
+                <CompanyName diff_monitor=""/>
+                <SSN diff_monitor=""/>
+                <FEIN diff_monitor=""/>
+                <IncorporatedState diff_monitor=""/>
+                <CorporateNumber diff_monitor=""/>
+                <CorporateType diff_monitor=""/>
+              </Party>
+            </ParsedParties>
+            <Addresses diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </Addresses>
+          </Secured>
+        </Secureds2>
+        <Assignees2 diff_match="OriginName">
+          <Assignee>
+            <OriginName/>
+            <ParsedParties diff_match="UniqueId">
+              <Party>
+                <BusinessIds diff_monitor="">
+                  <DotID/>
+                  <EmpID/>
+                  <POWID/>
+                  <ProxID/>
+                  <SeleID/>
+                  <OrgID/>
+                  <UltID/>
+                </BusinessIds>
+                <IdValue diff_monitor=""/>
+                <BusinessId diff_monitor=""/>
+                <UniqueId/>
+                <Name>
+                  <Full diff_monitor=""/>
+                  <First/>
+                  <Middle diff_monitor=""/>
+                  <Last/>
+                  <Suffix diff_monitor=""/>
+                  <Prefix diff_monitor=""/>
+                </Name>
+                <CompanyName diff_monitor=""/>
+                <SSN diff_monitor=""/>
+                <FEIN diff_monitor=""/>
+                <IncorporatedState diff_monitor=""/>
+                <CorporateNumber diff_monitor=""/>
+                <CorporateType diff_monitor=""/>
+              </Party>
+            </ParsedParties>
+            <Addresses diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </Addresses>
+          </Assignee>
+        </Assignees2>
+        <Collaterals2 diff_match="" diff_monitor="">
+          <Collateral>
+            <Description/>
+            <Count/>
+            <PropertyDescription/>
+            <Address/>
+            <SerialNumber/>
+            <PrimaryMachine/>
+            <SecondMachine/>
+            <ManufacturerCode/>
+            <Manufacturer/>
+            <ModelYear/>
+            <Model/>
+            <ModelDesc/>
+            <ManufacturedYear/>
+            <Borough/>
+            <Block/>
+            <Lot/>
+            <AirRights/>
+            <SubterraneanRights/>
+            <Easement/>
+            <NewUsed/>
+          </Collateral>
+        </Collaterals2>
         <Signers diff_match="" diff_monitor="">
           <Signer>
             <Name/>
             <Title/>
           </Signer>
         </Signers>
-        <Filings diff_match="" diff_monitor="">
+        <Filings2 diff_match="" diff_monitor="">
           <Filing>
             <FilingStatus/>
             <Number/>
@@ -1014,7 +1286,7 @@
             <StatementsFiled/>
             <MicrofilmNumber/>
           </Filing>
-        </Filings>
+        </Filings2>
         <FilingOffices diff_match="" diff_monitor="">
           <Office>
             <FilingAgency/>
