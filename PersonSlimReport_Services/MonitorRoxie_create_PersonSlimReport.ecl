@@ -87,7 +87,8 @@ request := MODULE
     boolean TestDataEnabled {xpath('TestDataEnabled')};//hidden[ecl_only]
     string32 TestDataTableName {xpath('TestDataTableName')};//hidden[ecl_only]
     boolean OutcomeTrackingOptOut {xpath('OutcomeTrackingOptOut')};//hidden[internal]
-    integer NonSubjectSuppression {xpath('NonSubjectSuppression')};//hidden[internal]
+    integer NonSubjectSuppression {xpath('NonSubjectSuppression')};//hidden[ecl_only]
+    integer NonSubjectSuppression2 {xpath('NonSubjectSuppression2')};//hidden[internal]
     string ProductType {xpath('ProductType')};//hidden[internal]
     string11 BatchJobId {xpath('BatchJobId')};//hidden[internal]
     string11 BatchSequenceNumber {xpath('BatchSequenceNumber')};//hidden[internal]
@@ -96,6 +97,8 @@ request := MODULE
     string ProductCode {xpath('ProductCode')};//hidden[internal]
     boolean AllowRoamingBypass {xpath('AllowRoamingBypass')};//hidden[internal]
     string DataSource {xpath('DataSource')};//hidden[internal]
+    string2 ResellerType {xpath('ResellerType')};//hidden[internal]
+    unsigned6 GCID {xpath('GCID')};//hidden[internal] // Xsd type: unsigned
     string OutputType {xpath('OutputType')}; 
   END;
 
@@ -112,6 +115,7 @@ request := MODULE
 
   EXPORT _lt_BaseOption := RECORD
     boolean Blind {xpath('Blind')};//hidden[internal]
+    string2 IntendedUse {xpath('IntendedUse')};//hidden[internal]
   END;
 
   EXPORT _lt_BaseReportOption := RECORD (_lt_BaseOption)
@@ -346,7 +350,7 @@ layouts := MODULE
     string100 IdValue {xpath('IdValue')};
     string60 LicenseType {xpath('LicenseType')};
     string20 LicenseNumber {xpath('LicenseNumber')};
-    integer ProviderNumber {xpath('ProviderNumber')};
+    string ProviderNumber {xpath('ProviderNumber')};
     string9 SSN {xpath('SSN')};
     _lt_Date DateLastSeen {xpath('DateLastSeen')};
     string60 ProfessionOrBoard {xpath('ProfessionOrBoard')};
@@ -645,6 +649,10 @@ layouts := MODULE
     string OrigStreetAddress2 {xpath('OrigStreetAddress2'), maxlength(128)};
   END;
 
+  EXPORT _lt_row_UniversalAndRawAddress := RECORD  (_lt_UniversalAndRawAddress)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_UCCPerson := RECORD
     string120 OriginName {xpath('OriginName')};
     string IsDisputed {xpath('IsDisputed')};
@@ -670,7 +678,7 @@ layouts := MODULE
     integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
-  EXPORT _lt_UCCCollateral := RECORD
+  EXPORT _lt_UCCCollateral := RECORD (DiffMetaRec)
     string512 Description {xpath('Description')};
     string5 Count {xpath('Count')};
     string50 PropertyDescription {xpath('PropertyDescription')};
@@ -696,12 +704,16 @@ layouts := MODULE
     string1 NewUsed {xpath('NewUsed')};
   END;
 
+  EXPORT _lt_row_UCCReport2Collateral := RECORD  (_lt_UCCReport2Collateral)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
+  END;
+
   EXPORT _lt_UCCSigner := RECORD
     string75 Name {xpath('Name')};
     string60 Title {xpath('Title')};
   END;
 
-  EXPORT _lt_UCCFiling := RECORD
+  EXPORT _lt_UCCFiling := RECORD (DiffMetaRec)
     string8 FilingStatus {xpath('FilingStatus')};
     string14 Number {xpath('Number')};
     string40 _Type {xpath('Type')};
@@ -722,6 +734,10 @@ layouts := MODULE
     string8 ContinuousExpiration {xpath('ContinuousExpiration')};
     string3 StatementsFiled {xpath('StatementsFiled')};
     string17 MicrofilmNumber {xpath('MicrofilmNumber')};
+  END;
+
+  EXPORT _lt_row_UCCReport2Filing := RECORD  (_lt_UCCReport2Filing)
+    integer _diff_ord {xpath('@diff_ord')} := 0;
   END;
 
   EXPORT _lt_UCCFilingOffice := RECORD
@@ -979,6 +995,7 @@ layouts := MODULE
     string99 CaseTypeDescription {xpath('CaseTypeDescription')};
     string99 Count {xpath('Count')};
     string30 County {xpath('County')};
+    string OffenseTown {xpath('OffenseTown')};
     string99 Description {xpath('Description')};
     string35 MaximumTerm {xpath('MaximumTerm')};
     string35 MinimumTerm {xpath('MinimumTerm')};
@@ -1435,6 +1452,7 @@ layouts := MODULE
     string70 BusinessName {xpath('BusinessName')};
     string12 BusinessId {xpath('BusinessId')};
     string30 NameSource {xpath('NameSource')};
+    string30 ReportedName {xpath('ReportedName')};
   END;
 
   EXPORT _lt_MotorVehicleReportRegistrationInfo := RECORD (DiffMetaRec)
@@ -1459,6 +1477,7 @@ layouts := MODULE
     _lt_MotorVehicleReportPersonOrBusiness RegistrantInfo {xpath('RegistrantInfo')};
     _lt_MotorVehicleReportRegistrationInfo RegistrationInfo {xpath('RegistrationInfo')};
     _lt_Date TitleIssueDate {xpath('TitleIssueDate')};
+    string17 TitleNumber {xpath('TitleNumber')};
   END;
 
   EXPORT _lt_row_MotorVehicleReportRegistrant := RECORD  (_lt_MotorVehicleReportRegistrant)
@@ -2689,6 +2708,7 @@ layouts := MODULE
     string18 DeathCounty {xpath('DeathCounty')};
     string2 DeathState {xpath('DeathState')};
     string1 DeathVerificationCode {xpath('DeathVerificationCode')};
+    boolean IsLimitedAccessDMF {xpath('IsLimitedAccessDMF')};//hidden[internal]
     string1 Deceased {xpath('Deceased')}; 
   END;
 
@@ -3115,19 +3135,55 @@ END;
 
   EXPORT DiffScalars (layouts._lt_Address L, layouts._lt_Address R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
+    StreetPreDirection_active := CASE(path + '/StreetPreDirection', '/Addresses/Address/StreetPreDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPreDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPreDirection' => (false), '/FAACertifications/Certification/Address/StreetPreDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPreDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPreDirection' => (false), '/Criminals/Criminal/Address/StreetPreDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPreDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPreDirection' => (false), '/Drivers/Driver/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPreDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPreDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPreDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPreDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPreDirection' => (false), is_active);
+    shared boolean updated_StreetPreDirection := StreetPreDirection_active AND (L.StreetPreDirection != R.StreetPreDirection);
     shared boolean updated_StreetName := (L.StreetName != R.StreetName);
+    StreetSuffix_active := CASE(path + '/StreetSuffix', '/Addresses/Address/StreetSuffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetSuffix' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetSuffix' => (false), '/FAACertifications/Certification/Address/StreetSuffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetSuffix' => (false), '/SexualOffenses/SexualOffense/Address/StreetSuffix' => (false), '/Criminals/Criminal/Address/StreetSuffix' => (false), '/WeaponPermits/WeaponPermit/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetSuffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetSuffix' => (false), '/Drivers/Driver/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetSuffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetSuffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/Properties/Property/Entities/Entity/Address/StreetSuffix' => (false), '/Educations/Education/AddressAtCollege/StreetSuffix' => (false), '/Utilities/Utility/Addresses/Address/StreetSuffix' => (false), is_active);
+    shared boolean updated_StreetSuffix := StreetSuffix_active AND (L.StreetSuffix != R.StreetSuffix);
+    StreetPostDirection_active := CASE(path + '/StreetPostDirection', '/Addresses/Address/StreetPostDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPostDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPostDirection' => (false), '/FAACertifications/Certification/Address/StreetPostDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPostDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPostDirection' => (false), '/Criminals/Criminal/Address/StreetPostDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPostDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPostDirection' => (false), '/Drivers/Driver/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPostDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPostDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPostDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPostDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPostDirection' => (false), is_active);
+    shared boolean updated_StreetPostDirection := StreetPostDirection_active AND (L.StreetPostDirection != R.StreetPostDirection);
+    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/UnitDesignation' => (false), '/PeopleAtWorks/PeopleAtWork/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/UnitDesignation' => (false), '/SexualOffenses/SexualOffense/Address/UnitDesignation' => (false), '/Criminals/Criminal/Address/UnitDesignation' => (false), '/WeaponPermits/WeaponPermit/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/UnitDesignation' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/Properties/Property/Entities/Entity/Address/UnitDesignation' => (false), '/Educations/Education/AddressAtCollege/UnitDesignation' => (false), '/Utilities/Utility/Addresses/Address/UnitDesignation' => (false), is_active);
+    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
     shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
+    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress1' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress1' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress1' => (false), '/Criminals/Criminal/Address/StreetAddress1' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress1' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress1' => (false), '/Educations/Education/AddressAtCollege/StreetAddress1' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress1' => (false), is_active);
+    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
+    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress2' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress2' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress2' => (false), '/Criminals/Criminal/Address/StreetAddress2' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress2' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress2' => (false), '/Educations/Education/AddressAtCollege/StreetAddress2' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress2' => (false), is_active);
+    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
     shared boolean updated_City := (L.City != R.City);
     shared boolean updated_State := (L.State != R.State);
     shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
+    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Zip4' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Zip4' => (false), '/SexualOffenses/SexualOffense/Address/Zip4' => (false), '/Criminals/Criminal/Address/Zip4' => (false), '/WeaponPermits/WeaponPermit/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Zip4' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/Properties/Property/Entities/Entity/Address/Zip4' => (false), '/Educations/Education/AddressAtCollege/Zip4' => (false), '/Utilities/Utility/Addresses/Address/Zip4' => (false), is_active);
+    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
+    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/County' => (false), '/PeopleAtWorks/PeopleAtWork/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/County' => (false), '/SexualOffenses/SexualOffense/Address/County' => (false), '/Criminals/Criminal/Address/County' => (false), '/WeaponPermits/WeaponPermit/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/County' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/County' => (false), '/Properties/Property/Entities/Entity/Address/County' => (false), '/Educations/Education/AddressAtCollege/County' => (false), '/Utilities/Utility/Addresses/Address/County' => (false), is_active);
+    shared boolean updated_County := County_active AND (L.County != R.County);
+    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/PostalCode' => (false), '/PeopleAtWorks/PeopleAtWork/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/PostalCode' => (false), '/SexualOffenses/SexualOffense/Address/PostalCode' => (false), '/Criminals/Criminal/Address/PostalCode' => (false), '/WeaponPermits/WeaponPermit/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/PostalCode' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/Properties/Property/Entities/Entity/Address/PostalCode' => (false), '/Educations/Education/AddressAtCollege/PostalCode' => (false), '/Utilities/Utility/Addresses/Address/PostalCode' => (false), is_active);
+    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
+    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StateCityZip' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StateCityZip' => (false), '/SexualOffenses/SexualOffense/Address/StateCityZip' => (false), '/Criminals/Criminal/Address/StateCityZip' => (false), '/WeaponPermits/WeaponPermit/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StateCityZip' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/Properties/Property/Entities/Entity/Address/StateCityZip' => (false), '/Educations/Education/AddressAtCollege/StateCityZip' => (false), '/Utilities/Utility/Addresses/Address/StateCityZip' => (false), is_active);
+    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
+    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Latitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Latitude' => (false), '/SexualOffenses/SexualOffense/Address/Latitude' => (false), '/Criminals/Criminal/Address/Latitude' => (false), '/WeaponPermits/WeaponPermit/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Latitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/Properties/Property/Entities/Entity/Address/Latitude' => (false), '/Educations/Education/AddressAtCollege/Latitude' => (false), '/Utilities/Utility/Addresses/Address/Latitude' => (false), is_active);
+    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
+    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Longitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Longitude' => (false), '/SexualOffenses/SexualOffense/Address/Longitude' => (false), '/Criminals/Criminal/Address/Longitude' => (false), '/WeaponPermits/WeaponPermit/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Longitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/Properties/Property/Entities/Entity/Address/Longitude' => (false), '/Educations/Education/AddressAtCollege/Longitude' => (false), '/Utilities/Utility/Addresses/Address/Longitude' => (false), is_active);
+    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
 
     shared is_updated := false
       OR updated_StreetNumber
+      OR updated_StreetPreDirection
       OR updated_StreetName
+      OR updated_StreetSuffix
+      OR updated_StreetPostDirection
+      OR updated_UnitDesignation
       OR updated_UnitNumber
+      OR updated_StreetAddress1
+      OR updated_StreetAddress2
       OR updated_City
       OR updated_State
-      OR updated_Zip5;
+      OR updated_Zip5
+      OR updated_Zip4
+      OR updated_County
+      OR updated_PostalCode
+      OR updated_StateCityZip
+      OR updated_Latitude
+      OR updated_Longitude;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3137,11 +3193,23 @@ END;
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
          +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
+         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
+         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
          +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
          +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
          +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
-         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow));
+         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
+         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
+         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
+         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
+         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
+         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
+         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3207,19 +3275,55 @@ EXPORT _df_PersonSlimReportAddress(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_PersonSlimReportAddress L, layouts._lt_PersonSlimReportAddress R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
+    StreetPreDirection_active := CASE(path + '/StreetPreDirection', '/Addresses/Address/StreetPreDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPreDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPreDirection' => (false), '/FAACertifications/Certification/Address/StreetPreDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPreDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPreDirection' => (false), '/Criminals/Criminal/Address/StreetPreDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPreDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPreDirection' => (false), '/Drivers/Driver/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPreDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPreDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPreDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPreDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPreDirection' => (false), is_active);
+    shared boolean updated_StreetPreDirection := StreetPreDirection_active AND (L.StreetPreDirection != R.StreetPreDirection);
     shared boolean updated_StreetName := (L.StreetName != R.StreetName);
+    StreetSuffix_active := CASE(path + '/StreetSuffix', '/Addresses/Address/StreetSuffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetSuffix' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetSuffix' => (false), '/FAACertifications/Certification/Address/StreetSuffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetSuffix' => (false), '/SexualOffenses/SexualOffense/Address/StreetSuffix' => (false), '/Criminals/Criminal/Address/StreetSuffix' => (false), '/WeaponPermits/WeaponPermit/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetSuffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetSuffix' => (false), '/Drivers/Driver/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetSuffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetSuffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/Properties/Property/Entities/Entity/Address/StreetSuffix' => (false), '/Educations/Education/AddressAtCollege/StreetSuffix' => (false), '/Utilities/Utility/Addresses/Address/StreetSuffix' => (false), is_active);
+    shared boolean updated_StreetSuffix := StreetSuffix_active AND (L.StreetSuffix != R.StreetSuffix);
+    StreetPostDirection_active := CASE(path + '/StreetPostDirection', '/Addresses/Address/StreetPostDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPostDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPostDirection' => (false), '/FAACertifications/Certification/Address/StreetPostDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPostDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPostDirection' => (false), '/Criminals/Criminal/Address/StreetPostDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPostDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPostDirection' => (false), '/Drivers/Driver/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPostDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPostDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPostDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPostDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPostDirection' => (false), is_active);
+    shared boolean updated_StreetPostDirection := StreetPostDirection_active AND (L.StreetPostDirection != R.StreetPostDirection);
+    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/UnitDesignation' => (false), '/PeopleAtWorks/PeopleAtWork/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/UnitDesignation' => (false), '/SexualOffenses/SexualOffense/Address/UnitDesignation' => (false), '/Criminals/Criminal/Address/UnitDesignation' => (false), '/WeaponPermits/WeaponPermit/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/UnitDesignation' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/Properties/Property/Entities/Entity/Address/UnitDesignation' => (false), '/Educations/Education/AddressAtCollege/UnitDesignation' => (false), '/Utilities/Utility/Addresses/Address/UnitDesignation' => (false), is_active);
+    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
     shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
+    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress1' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress1' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress1' => (false), '/Criminals/Criminal/Address/StreetAddress1' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress1' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress1' => (false), '/Educations/Education/AddressAtCollege/StreetAddress1' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress1' => (false), is_active);
+    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
+    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress2' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress2' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress2' => (false), '/Criminals/Criminal/Address/StreetAddress2' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress2' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress2' => (false), '/Educations/Education/AddressAtCollege/StreetAddress2' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress2' => (false), is_active);
+    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
     shared boolean updated_City := (L.City != R.City);
     shared boolean updated_State := (L.State != R.State);
     shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
+    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Zip4' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Zip4' => (false), '/SexualOffenses/SexualOffense/Address/Zip4' => (false), '/Criminals/Criminal/Address/Zip4' => (false), '/WeaponPermits/WeaponPermit/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Zip4' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/Properties/Property/Entities/Entity/Address/Zip4' => (false), '/Educations/Education/AddressAtCollege/Zip4' => (false), '/Utilities/Utility/Addresses/Address/Zip4' => (false), is_active);
+    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
+    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/County' => (false), '/PeopleAtWorks/PeopleAtWork/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/County' => (false), '/SexualOffenses/SexualOffense/Address/County' => (false), '/Criminals/Criminal/Address/County' => (false), '/WeaponPermits/WeaponPermit/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/County' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/County' => (false), '/Properties/Property/Entities/Entity/Address/County' => (false), '/Educations/Education/AddressAtCollege/County' => (false), '/Utilities/Utility/Addresses/Address/County' => (false), is_active);
+    shared boolean updated_County := County_active AND (L.County != R.County);
+    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/PostalCode' => (false), '/PeopleAtWorks/PeopleAtWork/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/PostalCode' => (false), '/SexualOffenses/SexualOffense/Address/PostalCode' => (false), '/Criminals/Criminal/Address/PostalCode' => (false), '/WeaponPermits/WeaponPermit/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/PostalCode' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/Properties/Property/Entities/Entity/Address/PostalCode' => (false), '/Educations/Education/AddressAtCollege/PostalCode' => (false), '/Utilities/Utility/Addresses/Address/PostalCode' => (false), is_active);
+    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
+    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StateCityZip' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StateCityZip' => (false), '/SexualOffenses/SexualOffense/Address/StateCityZip' => (false), '/Criminals/Criminal/Address/StateCityZip' => (false), '/WeaponPermits/WeaponPermit/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StateCityZip' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/Properties/Property/Entities/Entity/Address/StateCityZip' => (false), '/Educations/Education/AddressAtCollege/StateCityZip' => (false), '/Utilities/Utility/Addresses/Address/StateCityZip' => (false), is_active);
+    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
+    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Latitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Latitude' => (false), '/SexualOffenses/SexualOffense/Address/Latitude' => (false), '/Criminals/Criminal/Address/Latitude' => (false), '/WeaponPermits/WeaponPermit/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Latitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/Properties/Property/Entities/Entity/Address/Latitude' => (false), '/Educations/Education/AddressAtCollege/Latitude' => (false), '/Utilities/Utility/Addresses/Address/Latitude' => (false), is_active);
+    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
+    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Longitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Longitude' => (false), '/SexualOffenses/SexualOffense/Address/Longitude' => (false), '/Criminals/Criminal/Address/Longitude' => (false), '/WeaponPermits/WeaponPermit/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Longitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/Properties/Property/Entities/Entity/Address/Longitude' => (false), '/Educations/Education/AddressAtCollege/Longitude' => (false), '/Utilities/Utility/Addresses/Address/Longitude' => (false), is_active);
+    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
 
     shared is_updated := false
       OR updated_StreetNumber
+      OR updated_StreetPreDirection
       OR updated_StreetName
+      OR updated_StreetSuffix
+      OR updated_StreetPostDirection
+      OR updated_UnitDesignation
       OR updated_UnitNumber
+      OR updated_StreetAddress1
+      OR updated_StreetAddress2
       OR updated_City
       OR updated_State
-      OR updated_Zip5;
+      OR updated_Zip5
+      OR updated_Zip4
+      OR updated_County
+      OR updated_PostalCode
+      OR updated_StateCityZip
+      OR updated_Latitude
+      OR updated_Longitude;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3229,11 +3333,23 @@ EXPORT _df_PersonSlimReportAddress(boolean is_active, string path) := MODULE
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
          +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
+         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
+         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
          +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
          +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
          +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
-         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow));
+         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
+         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
+         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
+         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
+         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
+         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
+         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3298,12 +3414,24 @@ END;
 EXPORT _df_Name(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_Name L, layouts._lt_Name R, boolean is_deleted, boolean is_added) := MODULE
+    Full_active := CASE(path + '/Full', '/Names/Name/Full' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Full' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Full' => (false), '/Aircrafts/Aircraft/Registrant/Name/Full' => (false), '/FAACertifications/Certification/Name/Full' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Full' => (false), '/SexualOffenses/SexualOffense/Name/Full' => (false), '/Criminals/Criminal/Name/Full' => (false), '/WeaponPermits/WeaponPermit/Name/Full' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Full' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Full' => (false), '/VoterRegistrations/VoterRegistration/Name/Full' => (false), '/Drivers/Driver/Name/Full' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Full' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Full' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Full' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Full' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Full' => (false), '/Properties/Property/Entities/Entity/Names/Name/Full' => (false), '/Educations/Education/Name/Full' => (false), '/AKAs/AKA/Name/Full' => (false), '/Imposters/Imposter/Name/Full' => (false), '/Utilities/Utility/Name/Full' => (false), is_active);
+    shared boolean updated_Full := Full_active AND (L.Full != R.Full);
     shared boolean updated_First := (L.First != R.First);
+    Middle_active := CASE(path + '/Middle', '/Names/Name/Middle' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Middle' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Middle' => (false), '/Aircrafts/Aircraft/Registrant/Name/Middle' => (false), '/FAACertifications/Certification/Name/Middle' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Middle' => (false), '/SexualOffenses/SexualOffense/Name/Middle' => (false), '/Criminals/Criminal/Name/Middle' => (false), '/WeaponPermits/WeaponPermit/Name/Middle' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Middle' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Middle' => (false), '/VoterRegistrations/VoterRegistration/Name/Middle' => (false), '/Drivers/Driver/Name/Middle' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Middle' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Middle' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Middle' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Middle' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Middle' => (false), '/Properties/Property/Entities/Entity/Names/Name/Middle' => (false), '/Educations/Education/Name/Middle' => (false), '/AKAs/AKA/Name/Middle' => (false), '/Imposters/Imposter/Name/Middle' => (false), '/Utilities/Utility/Name/Middle' => (false), is_active);
+    shared boolean updated_Middle := Middle_active AND (L.Middle != R.Middle);
     shared boolean updated_Last := (L.Last != R.Last);
+    Suffix_active := CASE(path + '/Suffix', '/Names/Name/Suffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Suffix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Suffix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Suffix' => (false), '/FAACertifications/Certification/Name/Suffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Suffix' => (false), '/SexualOffenses/SexualOffense/Name/Suffix' => (false), '/Criminals/Criminal/Name/Suffix' => (false), '/WeaponPermits/WeaponPermit/Name/Suffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Suffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Suffix' => (false), '/VoterRegistrations/VoterRegistration/Name/Suffix' => (false), '/Drivers/Driver/Name/Suffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Suffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Suffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Suffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Suffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Suffix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Suffix' => (false), '/Educations/Education/Name/Suffix' => (false), '/AKAs/AKA/Name/Suffix' => (false), '/Imposters/Imposter/Name/Suffix' => (false), '/Utilities/Utility/Name/Suffix' => (false), is_active);
+    shared boolean updated_Suffix := Suffix_active AND (L.Suffix != R.Suffix);
+    Prefix_active := CASE(path + '/Prefix', '/Names/Name/Prefix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Prefix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Prefix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Prefix' => (false), '/FAACertifications/Certification/Name/Prefix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Prefix' => (false), '/SexualOffenses/SexualOffense/Name/Prefix' => (false), '/Criminals/Criminal/Name/Prefix' => (false), '/WeaponPermits/WeaponPermit/Name/Prefix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Prefix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Prefix' => (false), '/VoterRegistrations/VoterRegistration/Name/Prefix' => (false), '/Drivers/Driver/Name/Prefix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Prefix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Prefix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Prefix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Prefix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Prefix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Prefix' => (false), '/Educations/Education/Name/Prefix' => (false), '/AKAs/AKA/Name/Prefix' => (false), '/Imposters/Imposter/Name/Prefix' => (false), '/Utilities/Utility/Name/Prefix' => (false), is_active);
+    shared boolean updated_Prefix := Prefix_active AND (L.Prefix != R.Prefix);
 
     shared is_updated := false
+      OR updated_Full
       OR updated_First
-      OR updated_Last;
+      OR updated_Middle
+      OR updated_Last
+      OR updated_Suffix
+      OR updated_Prefix;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3312,8 +3440,12 @@ EXPORT _df_Name(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
-         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_Full, DATASET ([{'Full', R.Full}], layouts.DiffMetaRow))
+         +  IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
+         +  IF (updated_Middle, DATASET ([{'Middle', R.Middle}], layouts.DiffMetaRow))
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))
+         +  IF (updated_Suffix, DATASET ([{'Suffix', R.Suffix}], layouts.DiffMetaRow))
+         +  IF (updated_Prefix, DATASET ([{'Prefix', R.Prefix}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3348,17 +3480,54 @@ EXPORT _df_Name(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
+  EXPORT  integer1 CheckOuter_firstlast(layouts._lt_Name L, layouts._lt_Name R) := FUNCTION
+    boolean IsInner :=  (L.Last = R.Last AND L.First = R.First);
+
+    boolean IsOuterRight :=   (L.Last = '' AND L.First = '');
+    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+  END;
+  EXPORT  AsDataset_firstlast (dataset(layouts._lt_Name) _n, dataset(layouts._lt_Name) _o) := FUNCTION
+
+    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Name, SELF._diff_ord := COUNTER, SELF := LEFT));
+    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Name, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
+    ActiveJoin := JOIN (_new, _old,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_firstlast(LEFT, RIGHT)),
+                  FULL OUTER,
+                  LIMIT (0));
+    PassiveJoin := JOIN (_new, _old,
+                  LEFT.Last = RIGHT.Last AND LEFT.First = RIGHT.First,
+                  ProcessTxRow (LEFT, RIGHT,
+                  CheckOuter_firstlast(LEFT, RIGHT)),
+                  LEFT OUTER,
+                  LIMIT (0));
+    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Name);
+  END;
+  
 END;
 
 EXPORT _df_PersonSlimReportName(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_PersonSlimReportName L, layouts._lt_PersonSlimReportName R, boolean is_deleted, boolean is_added) := MODULE
+    Full_active := CASE(path + '/Full', '/Names/Name/Full' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Full' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Full' => (false), '/Aircrafts/Aircraft/Registrant/Name/Full' => (false), '/FAACertifications/Certification/Name/Full' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Full' => (false), '/SexualOffenses/SexualOffense/Name/Full' => (false), '/Criminals/Criminal/Name/Full' => (false), '/WeaponPermits/WeaponPermit/Name/Full' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Full' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Full' => (false), '/VoterRegistrations/VoterRegistration/Name/Full' => (false), '/Drivers/Driver/Name/Full' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Full' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Full' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Full' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Full' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Full' => (false), '/Properties/Property/Entities/Entity/Names/Name/Full' => (false), '/Educations/Education/Name/Full' => (false), '/AKAs/AKA/Name/Full' => (false), '/Imposters/Imposter/Name/Full' => (false), '/Utilities/Utility/Name/Full' => (false), is_active);
+    shared boolean updated_Full := Full_active AND (L.Full != R.Full);
     shared boolean updated_First := (L.First != R.First);
+    Middle_active := CASE(path + '/Middle', '/Names/Name/Middle' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Middle' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Middle' => (false), '/Aircrafts/Aircraft/Registrant/Name/Middle' => (false), '/FAACertifications/Certification/Name/Middle' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Middle' => (false), '/SexualOffenses/SexualOffense/Name/Middle' => (false), '/Criminals/Criminal/Name/Middle' => (false), '/WeaponPermits/WeaponPermit/Name/Middle' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Middle' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Middle' => (false), '/VoterRegistrations/VoterRegistration/Name/Middle' => (false), '/Drivers/Driver/Name/Middle' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Middle' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Middle' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Middle' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Middle' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Middle' => (false), '/Properties/Property/Entities/Entity/Names/Name/Middle' => (false), '/Educations/Education/Name/Middle' => (false), '/AKAs/AKA/Name/Middle' => (false), '/Imposters/Imposter/Name/Middle' => (false), '/Utilities/Utility/Name/Middle' => (false), is_active);
+    shared boolean updated_Middle := Middle_active AND (L.Middle != R.Middle);
     shared boolean updated_Last := (L.Last != R.Last);
+    Suffix_active := CASE(path + '/Suffix', '/Names/Name/Suffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Suffix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Suffix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Suffix' => (false), '/FAACertifications/Certification/Name/Suffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Suffix' => (false), '/SexualOffenses/SexualOffense/Name/Suffix' => (false), '/Criminals/Criminal/Name/Suffix' => (false), '/WeaponPermits/WeaponPermit/Name/Suffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Suffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Suffix' => (false), '/VoterRegistrations/VoterRegistration/Name/Suffix' => (false), '/Drivers/Driver/Name/Suffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Suffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Suffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Suffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Suffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Suffix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Suffix' => (false), '/Educations/Education/Name/Suffix' => (false), '/AKAs/AKA/Name/Suffix' => (false), '/Imposters/Imposter/Name/Suffix' => (false), '/Utilities/Utility/Name/Suffix' => (false), is_active);
+    shared boolean updated_Suffix := Suffix_active AND (L.Suffix != R.Suffix);
+    Prefix_active := CASE(path + '/Prefix', '/Names/Name/Prefix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Prefix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Prefix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Prefix' => (false), '/FAACertifications/Certification/Name/Prefix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Prefix' => (false), '/SexualOffenses/SexualOffense/Name/Prefix' => (false), '/Criminals/Criminal/Name/Prefix' => (false), '/WeaponPermits/WeaponPermit/Name/Prefix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Prefix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Prefix' => (false), '/VoterRegistrations/VoterRegistration/Name/Prefix' => (false), '/Drivers/Driver/Name/Prefix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Prefix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Prefix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Prefix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Prefix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Prefix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Prefix' => (false), '/Educations/Education/Name/Prefix' => (false), '/AKAs/AKA/Name/Prefix' => (false), '/Imposters/Imposter/Name/Prefix' => (false), '/Utilities/Utility/Name/Prefix' => (false), is_active);
+    shared boolean updated_Prefix := Prefix_active AND (L.Prefix != R.Prefix);
 
     shared is_updated := false
+      OR updated_Full
       OR updated_First
-      OR updated_Last;
+      OR updated_Middle
+      OR updated_Last
+      OR updated_Suffix
+      OR updated_Prefix;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -3367,8 +3536,12 @@ EXPORT _df_PersonSlimReportName(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
-         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_Full, DATASET ([{'Full', R.Full}], layouts.DiffMetaRow))
+         +  IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
+         +  IF (updated_Middle, DATASET ([{'Middle', R.Middle}], layouts.DiffMetaRow))
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))
+         +  IF (updated_Suffix, DATASET ([{'Suffix', R.Suffix}], layouts.DiffMetaRow))
+         +  IF (updated_Prefix, DATASET ([{'Prefix', R.Prefix}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -3817,11 +3990,23 @@ END;
 EXPORT _df_BusinessIdentity(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_BusinessIdentity L, layouts._lt_BusinessIdentity R, boolean is_deleted, boolean is_added) := MODULE
+    DotID_active := CASE(path + '/DotID', '/PeopleAtWorks/PeopleAtWork/BusinessIds/DotID' => (false), is_active);
+    shared boolean updated_DotID := DotID_active AND (L.DotID != R.DotID);
+    EmpID_active := CASE(path + '/EmpID', '/PeopleAtWorks/PeopleAtWork/BusinessIds/EmpID' => (false), is_active);
+    shared boolean updated_EmpID := EmpID_active AND (L.EmpID != R.EmpID);
+    POWID_active := CASE(path + '/POWID', '/PeopleAtWorks/PeopleAtWork/BusinessIds/POWID' => (false), is_active);
+    shared boolean updated_POWID := POWID_active AND (L.POWID != R.POWID);
+    ProxID_active := CASE(path + '/ProxID', '/PeopleAtWorks/PeopleAtWork/BusinessIds/ProxID' => (false), is_active);
+    shared boolean updated_ProxID := ProxID_active AND (L.ProxID != R.ProxID);
     shared boolean updated_SeleID := (L.SeleID != R.SeleID);
     shared boolean updated_OrgID := (L.OrgID != R.OrgID);
     shared boolean updated_UltID := (L.UltID != R.UltID);
 
     shared is_updated := false
+      OR updated_DotID
+      OR updated_EmpID
+      OR updated_POWID
+      OR updated_ProxID
       OR updated_SeleID
       OR updated_OrgID
       OR updated_UltID;
@@ -3833,7 +4018,11 @@ EXPORT _df_BusinessIdentity(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_SeleID, DATASET ([{'SeleID', R.SeleID}], layouts.DiffMetaRow))
+      _meta :=   IF (updated_DotID, DATASET ([{'DotID', R.DotID}], layouts.DiffMetaRow))
+         +  IF (updated_EmpID, DATASET ([{'EmpID', R.EmpID}], layouts.DiffMetaRow))
+         +  IF (updated_POWID, DATASET ([{'POWID', R.POWID}], layouts.DiffMetaRow))
+         +  IF (updated_ProxID, DATASET ([{'ProxID', R.ProxID}], layouts.DiffMetaRow))
+         +  IF (updated_SeleID, DATASET ([{'SeleID', R.SeleID}], layouts.DiffMetaRow))
          +  IF (updated_OrgID, DATASET ([{'OrgID', R.OrgID}], layouts.DiffMetaRow))
          +  IF (updated_UltID, DATASET ([{'UltID', R.UltID}], layouts.DiffMetaRow));
 
@@ -4646,10 +4835,26 @@ END;
 EXPORT _df_UCCParsedParty(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_UCCParsedParty L, layouts._lt_UCCParsedParty R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_IdValue := (L.IdValue != R.IdValue);
+    shared boolean updated_BusinessId := (L.BusinessId != R.BusinessId);
     shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
+    shared boolean updated_CompanyName := (L.CompanyName != R.CompanyName);
+    shared boolean updated_SSN := (L.SSN != R.SSN);
+    shared boolean updated_FEIN := (L.FEIN != R.FEIN);
+    shared boolean updated_IncorporatedState := (L.IncorporatedState != R.IncorporatedState);
+    shared boolean updated_CorporateNumber := (L.CorporateNumber != R.CorporateNumber);
+    shared boolean updated_CorporateType := (L.CorporateType != R.CorporateType);
 
     shared is_updated := false
-      OR updated_UniqueId;
+      OR updated_IdValue
+      OR updated_BusinessId
+      OR updated_UniqueId
+      OR updated_CompanyName
+      OR updated_SSN
+      OR updated_FEIN
+      OR updated_IncorporatedState
+      OR updated_CorporateNumber
+      OR updated_CorporateType;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -4658,7 +4863,15 @@ EXPORT _df_UCCParsedParty(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_IdValue, DATASET ([{'IdValue', R.IdValue}], layouts.DiffMetaRow))
+         +  IF (updated_BusinessId, DATASET ([{'BusinessId', R.BusinessId}], layouts.DiffMetaRow))
+         +  IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
+         +  IF (updated_CompanyName, DATASET ([{'CompanyName', R.CompanyName}], layouts.DiffMetaRow))
+         +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow))
+         +  IF (updated_FEIN, DATASET ([{'FEIN', R.FEIN}], layouts.DiffMetaRow))
+         +  IF (updated_IncorporatedState, DATASET ([{'IncorporatedState', R.IncorporatedState}], layouts.DiffMetaRow))
+         +  IF (updated_CorporateNumber, DATASET ([{'CorporateNumber', R.CorporateNumber}], layouts.DiffMetaRow))
+         +  IF (updated_CorporateType, DATASET ([{'CorporateType', R.CorporateType}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -4668,7 +4881,15 @@ EXPORT _df_UCCParsedParty(boolean is_active, string path) := MODULE
 
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
-        SELF.BusinessIds  := L.BusinessIds;
+  
+      path_BusinessIds := path + '/BusinessIds';
+    
+      updated_BusinessIds := _df_BusinessIdentity(is_active, path_BusinessIds).AsRecord(L.BusinessIds, R.BusinessIds);
+        
+      checked_BusinessIds := MAP (is_deleted => R.BusinessIds,
+                              is_added => L.BusinessIds,
+                              updated_BusinessIds);
+      SELF.BusinessIds := checked_BusinessIds;
 
       path_Name := path + '/Name';
     
@@ -4692,7 +4913,15 @@ EXPORT _df_UCCParsedParty(boolean is_active, string path) := MODULE
 
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
-         SELF.BusinessIds  := L.BusinessIds;
+   
+      path_BusinessIds := path + '/BusinessIds';
+    
+      updated_BusinessIds := _df_BusinessIdentity(is_active, path_BusinessIds).AsRecord(L.BusinessIds, R.BusinessIds);
+        
+      checked_BusinessIds := MAP (is_deleted => R.BusinessIds,
+                              is_added => L.BusinessIds,
+                              updated_BusinessIds);
+      SELF.BusinessIds := checked_BusinessIds;
 
       path_Name := path + '/Name';
     
@@ -4713,50 +4942,71 @@ EXPORT _df_UCCParsedParty(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_uniqueid(layouts._lt_UCCParsedParty L, layouts._lt_UCCParsedParty R) := FUNCTION
-    boolean IsInner :=  (L.UniqueId = R.UniqueId);
-
-    boolean IsOuterRight :=   (L.UniqueId = '');
-    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
-  END;
-  EXPORT  AsDataset_uniqueid (dataset(layouts._lt_UCCParsedParty) _n, dataset(layouts._lt_UCCParsedParty) _o) := FUNCTION
-
-    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_UCCParsedParty, SELF._diff_ord := COUNTER, SELF := LEFT));
-    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_UCCParsedParty, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
-    ActiveJoin := JOIN (_new, _old,
-                  LEFT.UniqueId = RIGHT.UniqueId,
-                  ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_uniqueid(LEFT, RIGHT)),
-                  FULL OUTER,
-                  LIMIT (0));
-    PassiveJoin := JOIN (_new, _old,
-                  LEFT.UniqueId = RIGHT.UniqueId,
-                  ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_uniqueid(LEFT, RIGHT)),
-                  LEFT OUTER,
-                  LIMIT (0));
-    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_UCCParsedParty);
-  END;
-  
 END;
 
-EXPORT _df_UniversalAddress(boolean is_active, string path) := MODULE
+EXPORT _df_UniversalAndRawAddress(boolean is_active, string path) := MODULE
 
-  EXPORT DiffScalars (layouts._lt_UniversalAddress L, layouts._lt_UniversalAddress R, boolean is_deleted, boolean is_added) := MODULE
+  EXPORT DiffScalars (layouts._lt_UniversalAndRawAddress L, layouts._lt_UniversalAndRawAddress R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
+    StreetPreDirection_active := CASE(path + '/StreetPreDirection', '/Addresses/Address/StreetPreDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPreDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPreDirection' => (false), '/FAACertifications/Certification/Address/StreetPreDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPreDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPreDirection' => (false), '/Criminals/Criminal/Address/StreetPreDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPreDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPreDirection' => (false), '/Drivers/Driver/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPreDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPreDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPreDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPreDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPreDirection' => (false), is_active);
+    shared boolean updated_StreetPreDirection := StreetPreDirection_active AND (L.StreetPreDirection != R.StreetPreDirection);
     shared boolean updated_StreetName := (L.StreetName != R.StreetName);
+    StreetSuffix_active := CASE(path + '/StreetSuffix', '/Addresses/Address/StreetSuffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetSuffix' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetSuffix' => (false), '/FAACertifications/Certification/Address/StreetSuffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetSuffix' => (false), '/SexualOffenses/SexualOffense/Address/StreetSuffix' => (false), '/Criminals/Criminal/Address/StreetSuffix' => (false), '/WeaponPermits/WeaponPermit/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetSuffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetSuffix' => (false), '/Drivers/Driver/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetSuffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetSuffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/Properties/Property/Entities/Entity/Address/StreetSuffix' => (false), '/Educations/Education/AddressAtCollege/StreetSuffix' => (false), '/Utilities/Utility/Addresses/Address/StreetSuffix' => (false), is_active);
+    shared boolean updated_StreetSuffix := StreetSuffix_active AND (L.StreetSuffix != R.StreetSuffix);
+    StreetPostDirection_active := CASE(path + '/StreetPostDirection', '/Addresses/Address/StreetPostDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPostDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPostDirection' => (false), '/FAACertifications/Certification/Address/StreetPostDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPostDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPostDirection' => (false), '/Criminals/Criminal/Address/StreetPostDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPostDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPostDirection' => (false), '/Drivers/Driver/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPostDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPostDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPostDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPostDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPostDirection' => (false), is_active);
+    shared boolean updated_StreetPostDirection := StreetPostDirection_active AND (L.StreetPostDirection != R.StreetPostDirection);
+    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/UnitDesignation' => (false), '/PeopleAtWorks/PeopleAtWork/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/UnitDesignation' => (false), '/SexualOffenses/SexualOffense/Address/UnitDesignation' => (false), '/Criminals/Criminal/Address/UnitDesignation' => (false), '/WeaponPermits/WeaponPermit/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/UnitDesignation' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/Properties/Property/Entities/Entity/Address/UnitDesignation' => (false), '/Educations/Education/AddressAtCollege/UnitDesignation' => (false), '/Utilities/Utility/Addresses/Address/UnitDesignation' => (false), is_active);
+    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
     shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
+    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress1' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress1' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress1' => (false), '/Criminals/Criminal/Address/StreetAddress1' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress1' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress1' => (false), '/Educations/Education/AddressAtCollege/StreetAddress1' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress1' => (false), is_active);
+    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
+    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress2' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress2' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress2' => (false), '/Criminals/Criminal/Address/StreetAddress2' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress2' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress2' => (false), '/Educations/Education/AddressAtCollege/StreetAddress2' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress2' => (false), is_active);
+    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
     shared boolean updated_City := (L.City != R.City);
     shared boolean updated_State := (L.State != R.State);
     shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
+    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Zip4' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Zip4' => (false), '/SexualOffenses/SexualOffense/Address/Zip4' => (false), '/Criminals/Criminal/Address/Zip4' => (false), '/WeaponPermits/WeaponPermit/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Zip4' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/Properties/Property/Entities/Entity/Address/Zip4' => (false), '/Educations/Education/AddressAtCollege/Zip4' => (false), '/Utilities/Utility/Addresses/Address/Zip4' => (false), is_active);
+    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
+    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/County' => (false), '/PeopleAtWorks/PeopleAtWork/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/County' => (false), '/SexualOffenses/SexualOffense/Address/County' => (false), '/Criminals/Criminal/Address/County' => (false), '/WeaponPermits/WeaponPermit/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/County' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/County' => (false), '/Properties/Property/Entities/Entity/Address/County' => (false), '/Educations/Education/AddressAtCollege/County' => (false), '/Utilities/Utility/Addresses/Address/County' => (false), is_active);
+    shared boolean updated_County := County_active AND (L.County != R.County);
+    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/PostalCode' => (false), '/PeopleAtWorks/PeopleAtWork/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/PostalCode' => (false), '/SexualOffenses/SexualOffense/Address/PostalCode' => (false), '/Criminals/Criminal/Address/PostalCode' => (false), '/WeaponPermits/WeaponPermit/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/PostalCode' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/Properties/Property/Entities/Entity/Address/PostalCode' => (false), '/Educations/Education/AddressAtCollege/PostalCode' => (false), '/Utilities/Utility/Addresses/Address/PostalCode' => (false), is_active);
+    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
+    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StateCityZip' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StateCityZip' => (false), '/SexualOffenses/SexualOffense/Address/StateCityZip' => (false), '/Criminals/Criminal/Address/StateCityZip' => (false), '/WeaponPermits/WeaponPermit/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StateCityZip' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/Properties/Property/Entities/Entity/Address/StateCityZip' => (false), '/Educations/Education/AddressAtCollege/StateCityZip' => (false), '/Utilities/Utility/Addresses/Address/StateCityZip' => (false), is_active);
+    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
+    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Latitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Latitude' => (false), '/SexualOffenses/SexualOffense/Address/Latitude' => (false), '/Criminals/Criminal/Address/Latitude' => (false), '/WeaponPermits/WeaponPermit/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Latitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/Properties/Property/Entities/Entity/Address/Latitude' => (false), '/Educations/Education/AddressAtCollege/Latitude' => (false), '/Utilities/Utility/Addresses/Address/Latitude' => (false), is_active);
+    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
+    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Longitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Longitude' => (false), '/SexualOffenses/SexualOffense/Address/Longitude' => (false), '/Criminals/Criminal/Address/Longitude' => (false), '/WeaponPermits/WeaponPermit/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Longitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/Properties/Property/Entities/Entity/Address/Longitude' => (false), '/Educations/Education/AddressAtCollege/Longitude' => (false), '/Utilities/Utility/Addresses/Address/Longitude' => (false), is_active);
+    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
+    shared boolean updated_Country := (L.Country != R.Country);
+    shared boolean updated_Province := (L.Province != R.Province);
+    shared boolean updated_IsForeign := (L.IsForeign != R.IsForeign);
+    shared boolean updated_OrigStreetAddress1 := (L.OrigStreetAddress1 != R.OrigStreetAddress1);
+    shared boolean updated_OrigStreetAddress2 := (L.OrigStreetAddress2 != R.OrigStreetAddress2);
 
     shared is_updated := false
       OR updated_StreetNumber
+      OR updated_StreetPreDirection
       OR updated_StreetName
+      OR updated_StreetSuffix
+      OR updated_StreetPostDirection
+      OR updated_UnitDesignation
       OR updated_UnitNumber
+      OR updated_StreetAddress1
+      OR updated_StreetAddress2
       OR updated_City
       OR updated_State
-      OR updated_Zip5;
+      OR updated_Zip5
+      OR updated_Zip4
+      OR updated_County
+      OR updated_PostalCode
+      OR updated_StateCityZip
+      OR updated_Latitude
+      OR updated_Longitude
+      OR updated_Country
+      OR updated_Province
+      OR updated_IsForeign
+      OR updated_OrigStreetAddress1
+      OR updated_OrigStreetAddress2;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -4766,11 +5016,142 @@ EXPORT _df_UniversalAddress(boolean is_active, string path) := MODULE
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
          +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
+         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
+         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
          +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
          +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
          +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
-         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow));
+         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
+         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
+         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
+         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
+         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
+         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
+         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow))+ IF (updated_Country, DATASET ([{'Country', R.Country}], layouts.DiffMetaRow))
+         +  IF (updated_Province, DATASET ([{'Province', R.Province}], layouts.DiffMetaRow))
+         +  IF (updated_IsForeign, DATASET ([{'IsForeign', IF(R.IsForeign = true, 'true', 'false')}], layouts.DiffMetaRow))
+         +  IF (updated_OrigStreetAddress1, DATASET ([{'OrigStreetAddress1', R.OrigStreetAddress1}], layouts.DiffMetaRow))
+         +  IF (updated_OrigStreetAddress2, DATASET ([{'OrigStreetAddress2', R.OrigStreetAddress2}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_UniversalAndRawAddress ProcessTx(layouts._lt_UniversalAndRawAddress L, layouts._lt_UniversalAndRawAddress R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_UniversalAndRawAddress ProcessTxRow(layouts._lt_row_UniversalAndRawAddress L, layouts._lt_row_UniversalAndRawAddress R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_UniversalAndRawAddress _new, layouts._lt_UniversalAndRawAddress _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_UniversalAddress(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_UniversalAddress L, layouts._lt_UniversalAddress R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_StreetNumber := (L.StreetNumber != R.StreetNumber);
+    StreetPreDirection_active := CASE(path + '/StreetPreDirection', '/Addresses/Address/StreetPreDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPreDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPreDirection' => (false), '/FAACertifications/Certification/Address/StreetPreDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPreDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPreDirection' => (false), '/Criminals/Criminal/Address/StreetPreDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPreDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPreDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPreDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPreDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPreDirection' => (false), '/Drivers/Driver/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPreDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPreDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPreDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPreDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPreDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPreDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPreDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPreDirection' => (false), is_active);
+    shared boolean updated_StreetPreDirection := StreetPreDirection_active AND (L.StreetPreDirection != R.StreetPreDirection);
+    shared boolean updated_StreetName := (L.StreetName != R.StreetName);
+    StreetSuffix_active := CASE(path + '/StreetSuffix', '/Addresses/Address/StreetSuffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetSuffix' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetSuffix' => (false), '/FAACertifications/Certification/Address/StreetSuffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetSuffix' => (false), '/SexualOffenses/SexualOffense/Address/StreetSuffix' => (false), '/Criminals/Criminal/Address/StreetSuffix' => (false), '/WeaponPermits/WeaponPermit/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetSuffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetSuffix' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetSuffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetSuffix' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetSuffix' => (false), '/Drivers/Driver/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetSuffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetSuffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetSuffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetSuffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetSuffix' => (false), '/Properties/Property/Entities/Entity/Address/StreetSuffix' => (false), '/Educations/Education/AddressAtCollege/StreetSuffix' => (false), '/Utilities/Utility/Addresses/Address/StreetSuffix' => (false), is_active);
+    shared boolean updated_StreetSuffix := StreetSuffix_active AND (L.StreetSuffix != R.StreetSuffix);
+    StreetPostDirection_active := CASE(path + '/StreetPostDirection', '/Addresses/Address/StreetPostDirection' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetPostDirection' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetPostDirection' => (false), '/FAACertifications/Certification/Address/StreetPostDirection' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetPostDirection' => (false), '/SexualOffenses/SexualOffense/Address/StreetPostDirection' => (false), '/Criminals/Criminal/Address/StreetPostDirection' => (false), '/WeaponPermits/WeaponPermit/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetPostDirection' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetPostDirection' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetPostDirection' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetPostDirection' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetPostDirection' => (false), '/Drivers/Driver/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetPostDirection' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetPostDirection' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetPostDirection' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetPostDirection' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetPostDirection' => (false), '/Properties/Property/Entities/Entity/Address/StreetPostDirection' => (false), '/Educations/Education/AddressAtCollege/StreetPostDirection' => (false), '/Utilities/Utility/Addresses/Address/StreetPostDirection' => (false), is_active);
+    shared boolean updated_StreetPostDirection := StreetPostDirection_active AND (L.StreetPostDirection != R.StreetPostDirection);
+    UnitDesignation_active := CASE(path + '/UnitDesignation', '/Addresses/Address/UnitDesignation' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/UnitDesignation' => (false), '/PeopleAtWorks/PeopleAtWork/Address/UnitDesignation' => (false), '/FAACertifications/Certification/Address/UnitDesignation' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/UnitDesignation' => (false), '/SexualOffenses/SexualOffense/Address/UnitDesignation' => (false), '/Criminals/Criminal/Address/UnitDesignation' => (false), '/WeaponPermits/WeaponPermit/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/UnitDesignation' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/UnitDesignation' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/UnitDesignation' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/UnitDesignation' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/UnitDesignation' => (false), '/Drivers/Driver/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/UnitDesignation' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/UnitDesignation' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/UnitDesignation' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/UnitDesignation' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/UnitDesignation' => (false), '/Properties/Property/Entities/Entity/Address/UnitDesignation' => (false), '/Educations/Education/AddressAtCollege/UnitDesignation' => (false), '/Utilities/Utility/Addresses/Address/UnitDesignation' => (false), is_active);
+    shared boolean updated_UnitDesignation := UnitDesignation_active AND (L.UnitDesignation != R.UnitDesignation);
+    shared boolean updated_UnitNumber := (L.UnitNumber != R.UnitNumber);
+    StreetAddress1_active := CASE(path + '/StreetAddress1', '/Addresses/Address/StreetAddress1' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress1' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress1' => (false), '/FAACertifications/Certification/Address/StreetAddress1' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress1' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress1' => (false), '/Criminals/Criminal/Address/StreetAddress1' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress1' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress1' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress1' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress1' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress1' => (false), '/Drivers/Driver/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress1' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress1' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress1' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress1' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress1' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress1' => (false), '/Educations/Education/AddressAtCollege/StreetAddress1' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress1' => (false), is_active);
+    shared boolean updated_StreetAddress1 := StreetAddress1_active AND (L.StreetAddress1 != R.StreetAddress1);
+    StreetAddress2_active := CASE(path + '/StreetAddress2', '/Addresses/Address/StreetAddress2' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StreetAddress2' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StreetAddress2' => (false), '/FAACertifications/Certification/Address/StreetAddress2' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StreetAddress2' => (false), '/SexualOffenses/SexualOffense/Address/StreetAddress2' => (false), '/Criminals/Criminal/Address/StreetAddress2' => (false), '/WeaponPermits/WeaponPermit/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StreetAddress2' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StreetAddress2' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StreetAddress2' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StreetAddress2' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StreetAddress2' => (false), '/Drivers/Driver/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StreetAddress2' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StreetAddress2' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StreetAddress2' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StreetAddress2' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StreetAddress2' => (false), '/Properties/Property/Entities/Entity/Address/StreetAddress2' => (false), '/Educations/Education/AddressAtCollege/StreetAddress2' => (false), '/Utilities/Utility/Addresses/Address/StreetAddress2' => (false), is_active);
+    shared boolean updated_StreetAddress2 := StreetAddress2_active AND (L.StreetAddress2 != R.StreetAddress2);
+    shared boolean updated_City := (L.City != R.City);
+    shared boolean updated_State := (L.State != R.State);
+    shared boolean updated_Zip5 := (L.Zip5 != R.Zip5);
+    Zip4_active := CASE(path + '/Zip4', '/Addresses/Address/Zip4' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Zip4' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Zip4' => (false), '/FAACertifications/Certification/Address/Zip4' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Zip4' => (false), '/SexualOffenses/SexualOffense/Address/Zip4' => (false), '/Criminals/Criminal/Address/Zip4' => (false), '/WeaponPermits/WeaponPermit/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Zip4' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Zip4' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Zip4' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Zip4' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Zip4' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Zip4' => (false), '/Drivers/Driver/Address/Zip4' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Zip4' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Zip4' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Zip4' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Zip4' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Zip4' => (false), '/Properties/Property/Entities/Entity/Address/Zip4' => (false), '/Educations/Education/AddressAtCollege/Zip4' => (false), '/Utilities/Utility/Addresses/Address/Zip4' => (false), is_active);
+    shared boolean updated_Zip4 := Zip4_active AND (L.Zip4 != R.Zip4);
+    County_active := CASE(path + '/County', '/Addresses/Address/County' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/County' => (false), '/PeopleAtWorks/PeopleAtWork/Address/County' => (false), '/FAACertifications/Certification/Address/County' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/County' => (false), '/SexualOffenses/SexualOffense/Address/County' => (false), '/Criminals/Criminal/Address/County' => (false), '/WeaponPermits/WeaponPermit/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/County' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/County' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/County' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/County' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/County' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/County' => (false), '/Drivers/Driver/Address/County' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/County' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/County' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/County' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/County' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/County' => (false), '/Properties/Property/Entities/Entity/Address/County' => (false), '/Educations/Education/AddressAtCollege/County' => (false), '/Utilities/Utility/Addresses/Address/County' => (false), is_active);
+    shared boolean updated_County := County_active AND (L.County != R.County);
+    PostalCode_active := CASE(path + '/PostalCode', '/Addresses/Address/PostalCode' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/PostalCode' => (false), '/PeopleAtWorks/PeopleAtWork/Address/PostalCode' => (false), '/FAACertifications/Certification/Address/PostalCode' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/PostalCode' => (false), '/SexualOffenses/SexualOffense/Address/PostalCode' => (false), '/Criminals/Criminal/Address/PostalCode' => (false), '/WeaponPermits/WeaponPermit/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/PostalCode' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/PostalCode' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/PostalCode' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/PostalCode' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/PostalCode' => (false), '/Drivers/Driver/Address/PostalCode' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/PostalCode' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/PostalCode' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/PostalCode' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/PostalCode' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/PostalCode' => (false), '/Properties/Property/Entities/Entity/Address/PostalCode' => (false), '/Educations/Education/AddressAtCollege/PostalCode' => (false), '/Utilities/Utility/Addresses/Address/PostalCode' => (false), is_active);
+    shared boolean updated_PostalCode := PostalCode_active AND (L.PostalCode != R.PostalCode);
+    StateCityZip_active := CASE(path + '/StateCityZip', '/Addresses/Address/StateCityZip' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/StateCityZip' => (false), '/PeopleAtWorks/PeopleAtWork/Address/StateCityZip' => (false), '/FAACertifications/Certification/Address/StateCityZip' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/StateCityZip' => (false), '/SexualOffenses/SexualOffense/Address/StateCityZip' => (false), '/Criminals/Criminal/Address/StateCityZip' => (false), '/WeaponPermits/WeaponPermit/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/StateCityZip' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/StateCityZip' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/StateCityZip' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/StateCityZip' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/StateCityZip' => (false), '/Drivers/Driver/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/StateCityZip' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/StateCityZip' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/StateCityZip' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/StateCityZip' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/StateCityZip' => (false), '/Properties/Property/Entities/Entity/Address/StateCityZip' => (false), '/Educations/Education/AddressAtCollege/StateCityZip' => (false), '/Utilities/Utility/Addresses/Address/StateCityZip' => (false), is_active);
+    shared boolean updated_StateCityZip := StateCityZip_active AND (L.StateCityZip != R.StateCityZip);
+    Latitude_active := CASE(path + '/Latitude', '/Addresses/Address/Latitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Latitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Latitude' => (false), '/FAACertifications/Certification/Address/Latitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Latitude' => (false), '/SexualOffenses/SexualOffense/Address/Latitude' => (false), '/Criminals/Criminal/Address/Latitude' => (false), '/WeaponPermits/WeaponPermit/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Latitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Latitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Latitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Latitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Latitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Latitude' => (false), '/Drivers/Driver/Address/Latitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Latitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Latitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Latitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Latitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Latitude' => (false), '/Properties/Property/Entities/Entity/Address/Latitude' => (false), '/Educations/Education/AddressAtCollege/Latitude' => (false), '/Utilities/Utility/Addresses/Address/Latitude' => (false), is_active);
+    shared boolean updated_Latitude := Latitude_active AND (L.Latitude != R.Latitude);
+    Longitude_active := CASE(path + '/Longitude', '/Addresses/Address/Longitude' => (false), '/ProfessionalLicenses/ProfessionalLicense/Address/Longitude' => (false), '/PeopleAtWorks/PeopleAtWork/Address/Longitude' => (false), '/FAACertifications/Certification/Address/Longitude' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Address/Longitude' => (false), '/SexualOffenses/SexualOffense/Address/Longitude' => (false), '/Criminals/Criminal/Address/Longitude' => (false), '/WeaponPermits/WeaponPermit/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Address/Longitude' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/MailAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/MailingAddress/Longitude' => (false), '/FirearmExplosives/FirearmExplosive/PremiseAddress/Longitude' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Address/Longitude' => (false), '/VoterRegistrations/VoterRegistration/ResidentAddress/Longitude' => (false), '/VoterRegistrations/VoterRegistration/MailingAddress/Longitude' => (false), '/Drivers/Driver/Address/Longitude' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Address/Longitude' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Address/Longitude' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Address/Longitude' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Address/Longitude' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/Addresses/Address/Longitude' => (false), '/Properties/Property/Entities/Entity/Address/Longitude' => (false), '/Educations/Education/AddressAtCollege/Longitude' => (false), '/Utilities/Utility/Addresses/Address/Longitude' => (false), is_active);
+    shared boolean updated_Longitude := Longitude_active AND (L.Longitude != R.Longitude);
+
+    shared is_updated := false
+      OR updated_StreetNumber
+      OR updated_StreetPreDirection
+      OR updated_StreetName
+      OR updated_StreetSuffix
+      OR updated_StreetPostDirection
+      OR updated_UnitDesignation
+      OR updated_UnitNumber
+      OR updated_StreetAddress1
+      OR updated_StreetAddress2
+      OR updated_City
+      OR updated_State
+      OR updated_Zip5
+      OR updated_Zip4
+      OR updated_County
+      OR updated_PostalCode
+      OR updated_StateCityZip
+      OR updated_Latitude
+      OR updated_Longitude;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_StreetNumber, DATASET ([{'StreetNumber', R.StreetNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPreDirection, DATASET ([{'StreetPreDirection', R.StreetPreDirection}], layouts.DiffMetaRow))
+         +  IF (updated_StreetName, DATASET ([{'StreetName', R.StreetName}], layouts.DiffMetaRow))
+         +  IF (updated_StreetSuffix, DATASET ([{'StreetSuffix', R.StreetSuffix}], layouts.DiffMetaRow))
+         +  IF (updated_StreetPostDirection, DATASET ([{'StreetPostDirection', R.StreetPostDirection}], layouts.DiffMetaRow))
+         +  IF (updated_UnitDesignation, DATASET ([{'UnitDesignation', R.UnitDesignation}], layouts.DiffMetaRow))
+         +  IF (updated_UnitNumber, DATASET ([{'UnitNumber', R.UnitNumber}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress1, DATASET ([{'StreetAddress1', R.StreetAddress1}], layouts.DiffMetaRow))
+         +  IF (updated_StreetAddress2, DATASET ([{'StreetAddress2', R.StreetAddress2}], layouts.DiffMetaRow))
+         +  IF (updated_City, DATASET ([{'City', R.City}], layouts.DiffMetaRow))
+         +  IF (updated_State, DATASET ([{'State', R.State}], layouts.DiffMetaRow))
+         +  IF (updated_Zip5, DATASET ([{'Zip5', R.Zip5}], layouts.DiffMetaRow))
+         +  IF (updated_Zip4, DATASET ([{'Zip4', R.Zip4}], layouts.DiffMetaRow))
+         +  IF (updated_County, DATASET ([{'County', R.County}], layouts.DiffMetaRow))
+         +  IF (updated_PostalCode, DATASET ([{'PostalCode', R.PostalCode}], layouts.DiffMetaRow))
+         +  IF (updated_StateCityZip, DATASET ([{'StateCityZip', R.StateCityZip}], layouts.DiffMetaRow))
+         +  IF (updated_Latitude, DATASET ([{'Latitude', R.Latitude}], layouts.DiffMetaRow))
+         +  IF (updated_Longitude, DATASET ([{'Longitude', R.Longitude}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -4818,12 +5199,7 @@ EXPORT _df_UCCReport2Person(boolean is_active, string path) := MODULE
 
       SELF._diff := IF(is_active, m._diff, '');
       SELF._diffmeta := IF(is_active, m._diffmeta);
-  
-      updated_ParsedParties := _df_UCCParsedParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
-      checked_ParsedParties := MAP (is_deleted => R.ParsedParties,
-                              is_added => L.ParsedParties,
-                              updated_ParsedParties);
-      SELF.ParsedParties  := checked_ParsedParties;
+        SELF.ParsedParties  := L.ParsedParties;
       SELF.Addresses  := L.Addresses;
 
 
@@ -4839,12 +5215,7 @@ EXPORT _df_UCCReport2Person(boolean is_active, string path) := MODULE
 
     SELF._diff := IF(is_active, m._diff, '');
     SELF._diffmeta := IF(is_active, m._diffmeta);
-   
-      updated_ParsedParties := _df_UCCParsedParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
-      checked_ParsedParties := MAP (is_deleted => R.ParsedParties,
-                              is_added => L.ParsedParties,
-                              updated_ParsedParties);
-      SELF.ParsedParties  := checked_ParsedParties;
+         SELF.ParsedParties  := L.ParsedParties;
       SELF.Addresses  := L.Addresses;
 
     SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
@@ -4857,29 +5228,286 @@ EXPORT _df_UCCReport2Person(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_originname(layouts._lt_UCCReport2Person L, layouts._lt_UCCReport2Person R) := FUNCTION
-    boolean IsInner :=  (L.OriginName = R.OriginName);
+END;
 
-    boolean IsOuterRight :=   (L.OriginName = '');
-    return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
+EXPORT _df_UCCReport2Collateral(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_UCCReport2Collateral L, layouts._lt_UCCReport2Collateral R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_Description := (L.Description != R.Description);
+    shared boolean updated_Count := (L.Count != R.Count);
+    shared boolean updated_PropertyDescription := (L.PropertyDescription != R.PropertyDescription);
+    shared boolean updated_Address := (L.Address != R.Address);
+    shared boolean updated_SerialNumber := (L.SerialNumber != R.SerialNumber);
+    shared boolean updated_PrimaryMachine := (L.PrimaryMachine != R.PrimaryMachine);
+    shared boolean updated_SecondMachine := (L.SecondMachine != R.SecondMachine);
+    shared boolean updated_ManufacturerCode := (L.ManufacturerCode != R.ManufacturerCode);
+    shared boolean updated_Manufacturer := (L.Manufacturer != R.Manufacturer);
+    shared boolean updated_ModelYear := (L.ModelYear != R.ModelYear);
+    shared boolean updated_Model := (L.Model != R.Model);
+    shared boolean updated_ModelDesc := (L.ModelDesc != R.ModelDesc);
+    shared boolean updated_ManufacturedYear := (L.ManufacturedYear != R.ManufacturedYear);
+    shared boolean updated_Borough := (L.Borough != R.Borough);
+    shared boolean updated_Block := (L.Block != R.Block);
+    shared boolean updated_Lot := (L.Lot != R.Lot);
+    shared boolean updated_AirRights := (L.AirRights != R.AirRights);
+    shared boolean updated_SubterraneanRights := (L.SubterraneanRights != R.SubterraneanRights);
+    shared boolean updated_Easement := (L.Easement != R.Easement);
+    shared boolean updated_NewUsed := (L.NewUsed != R.NewUsed);
+
+    shared is_updated := false
+      OR updated_Description
+      OR updated_Count
+      OR updated_PropertyDescription
+      OR updated_Address
+      OR updated_SerialNumber
+      OR updated_PrimaryMachine
+      OR updated_SecondMachine
+      OR updated_ManufacturerCode
+      OR updated_Manufacturer
+      OR updated_ModelYear
+      OR updated_Model
+      OR updated_ModelDesc
+      OR updated_ManufacturedYear
+      OR updated_Borough
+      OR updated_Block
+      OR updated_Lot
+      OR updated_AirRights
+      OR updated_SubterraneanRights
+      OR updated_Easement
+      OR updated_NewUsed;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_Description, DATASET ([{'Description', R.Description}], layouts.DiffMetaRow))
+         +  IF (updated_Count, DATASET ([{'Count', R.Count}], layouts.DiffMetaRow))
+         +  IF (updated_PropertyDescription, DATASET ([{'PropertyDescription', R.PropertyDescription}], layouts.DiffMetaRow))
+         +  IF (updated_Address, DATASET ([{'Address', R.Address}], layouts.DiffMetaRow))
+         +  IF (updated_SerialNumber, DATASET ([{'SerialNumber', R.SerialNumber}], layouts.DiffMetaRow))+ IF (updated_PrimaryMachine, DATASET ([{'PrimaryMachine', R.PrimaryMachine}], layouts.DiffMetaRow))
+         +  IF (updated_SecondMachine, DATASET ([{'SecondMachine', R.SecondMachine}], layouts.DiffMetaRow))
+         +  IF (updated_ManufacturerCode, DATASET ([{'ManufacturerCode', R.ManufacturerCode}], layouts.DiffMetaRow))
+         +  IF (updated_Manufacturer, DATASET ([{'Manufacturer', R.Manufacturer}], layouts.DiffMetaRow))
+         +  IF (updated_ModelYear, DATASET ([{'ModelYear', R.ModelYear}], layouts.DiffMetaRow))
+         +  IF (updated_Model, DATASET ([{'Model', R.Model}], layouts.DiffMetaRow))
+         +  IF (updated_ModelDesc, DATASET ([{'ModelDesc', R.ModelDesc}], layouts.DiffMetaRow))
+         +  IF (updated_ManufacturedYear, DATASET ([{'ManufacturedYear', R.ManufacturedYear}], layouts.DiffMetaRow))
+         +  IF (updated_Borough, DATASET ([{'Borough', R.Borough}], layouts.DiffMetaRow))
+         +  IF (updated_Block, DATASET ([{'Block', R.Block}], layouts.DiffMetaRow))
+         +  IF (updated_Lot, DATASET ([{'Lot', R.Lot}], layouts.DiffMetaRow))
+         +  IF (updated_AirRights, DATASET ([{'AirRights', R.AirRights}], layouts.DiffMetaRow))
+         +  IF (updated_SubterraneanRights, DATASET ([{'SubterraneanRights', R.SubterraneanRights}], layouts.DiffMetaRow))
+         +  IF (updated_Easement, DATASET ([{'Easement', R.Easement}], layouts.DiffMetaRow))
+         +  IF (updated_NewUsed, DATASET ([{'NewUsed', R.NewUsed}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
-  EXPORT  AsDataset_originname (dataset(layouts._lt_UCCReport2Person) _n, dataset(layouts._lt_UCCReport2Person) _o) := FUNCTION
 
-    _new := PROJECT (_n, TRANSFORM (layouts._lt_row_UCCReport2Person, SELF._diff_ord := COUNTER, SELF := LEFT));
-    _old := PROJECT (_o, TRANSFORM (layouts._lt_row_UCCReport2Person, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
-    ActiveJoin := JOIN (_new, _old,
-                  LEFT.OriginName = RIGHT.OriginName,
-                  ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_originname(LEFT, RIGHT)),
-                  FULL OUTER,
-                  LIMIT (0));
-    PassiveJoin := JOIN (_new, _old,
-                  LEFT.OriginName = RIGHT.OriginName,
-                  ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_originname(LEFT, RIGHT)),
-                  LEFT OUTER,
-                  LIMIT (0));
-    RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_UCCReport2Person);
+  EXPORT layouts._lt_UCCReport2Collateral ProcessTx(layouts._lt_UCCReport2Collateral L, layouts._lt_UCCReport2Collateral R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_UCCReport2Collateral ProcessTxRow(layouts._lt_row_UCCReport2Collateral L, layouts._lt_row_UCCReport2Collateral R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_UCCReport2Collateral _new, layouts._lt_UCCReport2Collateral _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
+  END;
+  
+END;
+
+EXPORT _df_UCCReport2Filing(boolean is_active, string path) := MODULE
+
+  EXPORT DiffScalars (layouts._lt_UCCReport2Filing L, layouts._lt_UCCReport2Filing R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_FilingStatus := (L.FilingStatus != R.FilingStatus);
+    shared boolean updated_Number := (L.Number != R.Number);
+    shared boolean updated__Type := (L._Type != R._Type);
+    shared boolean updated_Time := (L.Time != R.Time);
+    shared boolean updated_Pages := (L.Pages != R.Pages);
+    shared boolean updated_Amount := (L.Amount != R.Amount);
+    shared boolean updated_ContractType := (L.ContractType != R.ContractType);
+    shared boolean updated_SerialNumber := (L.SerialNumber != R.SerialNumber);
+    shared boolean updated_FilingNumberIndicator := (L.FilingNumberIndicator != R.FilingNumberIndicator);
+    shared boolean updated_ContinuousExpiration := (L.ContinuousExpiration != R.ContinuousExpiration);
+    shared boolean updated_StatementsFiled := (L.StatementsFiled != R.StatementsFiled);
+    shared boolean updated_MicrofilmNumber := (L.MicrofilmNumber != R.MicrofilmNumber);
+
+    shared is_updated := false
+      OR updated_FilingStatus
+      OR updated_Number
+      OR updated__Type
+      OR updated_Time
+      OR updated_Pages
+      OR updated_Amount
+      OR updated_ContractType
+      OR updated_SerialNumber
+      OR updated_FilingNumberIndicator
+      OR updated_ContinuousExpiration
+      OR updated_StatementsFiled
+      OR updated_MicrofilmNumber;
+
+    shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
+                      is_added    => DiffStatus.State.ADDED,
+                      is_updated  => DiffStatus.State.UPDATED,
+                      DiffStatus.State.UNCHANGED);
+
+    EXPORT _diff := DiffStatus.Convert (_change);
+    // Get update information for all scalars
+      _meta :=   IF (updated_FilingStatus, DATASET ([{'FilingStatus', R.FilingStatus}], layouts.DiffMetaRow))
+         +  IF (updated_Number, DATASET ([{'Number', R.Number}], layouts.DiffMetaRow))
+         +  IF (updated__Type, DATASET ([{'_Type', R._Type}], layouts.DiffMetaRow))
+         +  IF (updated_Time, DATASET ([{'Time', R.Time}], layouts.DiffMetaRow))
+         +  IF (updated_Pages, DATASET ([{'Pages', R.Pages}], layouts.DiffMetaRow))
+         +  IF (updated_Amount, DATASET ([{'Amount', R.Amount}], layouts.DiffMetaRow))
+         +  IF (updated_ContractType, DATASET ([{'ContractType', R.ContractType}], layouts.DiffMetaRow))
+         +  IF (updated_SerialNumber, DATASET ([{'SerialNumber', R.SerialNumber}], layouts.DiffMetaRow))+ IF (updated_FilingNumberIndicator, DATASET ([{'FilingNumberIndicator', R.FilingNumberIndicator}], layouts.DiffMetaRow))
+         +  IF (updated_ContinuousExpiration, DATASET ([{'ContinuousExpiration', R.ContinuousExpiration}], layouts.DiffMetaRow))
+         +  IF (updated_StatementsFiled, DATASET ([{'StatementsFiled', R.StatementsFiled}], layouts.DiffMetaRow))
+         +  IF (updated_MicrofilmNumber, DATASET ([{'MicrofilmNumber', R.MicrofilmNumber}], layouts.DiffMetaRow));
+
+    EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
+  END;
+
+  EXPORT layouts._lt_UCCReport2Filing ProcessTx(layouts._lt_UCCReport2Filing L, layouts._lt_UCCReport2Filing R, boolean is_deleted, boolean is_added) :=TRANSFORM
+      m := DiffScalars(L, R, is_deleted, is_added);
+
+      SELF._diff := IF(is_active, m._diff, '');
+      SELF._diffmeta := IF(is_active, m._diffmeta);
+  
+      path_Date := path + '/Date';
+    
+      updated_Date := _df_Date(is_active, path_Date).AsRecord(L.Date, R.Date);
+        
+      checked_Date := MAP (is_deleted => R.Date,
+                              is_added => L.Date,
+                              updated_Date);
+      SELF.Date := checked_Date;
+
+      path_ExpirationDate := path + '/ExpirationDate';
+    
+      updated_ExpirationDate := _df_Date(is_active, path_ExpirationDate).AsRecord(L.ExpirationDate, R.ExpirationDate);
+        
+      checked_ExpirationDate := MAP (is_deleted => R.ExpirationDate,
+                              is_added => L.ExpirationDate,
+                              updated_ExpirationDate);
+      SELF.ExpirationDate := checked_ExpirationDate;
+
+      path_EffectiveDate := path + '/EffectiveDate';
+    
+      updated_EffectiveDate := _df_Date(is_active, path_EffectiveDate).AsRecord(L.EffectiveDate, R.EffectiveDate);
+        
+      checked_EffectiveDate := MAP (is_deleted => R.EffectiveDate,
+                              is_added => L.EffectiveDate,
+                              updated_EffectiveDate);
+      SELF.EffectiveDate := checked_EffectiveDate;
+
+      path_VendorEntryDate := path + '/VendorEntryDate';
+    
+      updated_VendorEntryDate := _df_Date(is_active, path_VendorEntryDate).AsRecord(L.VendorEntryDate, R.VendorEntryDate);
+        
+      checked_VendorEntryDate := MAP (is_deleted => R.VendorEntryDate,
+                              is_added => L.VendorEntryDate,
+                              updated_VendorEntryDate);
+      SELF.VendorEntryDate := checked_VendorEntryDate;
+
+      path_VendorUpdateDate := path + '/VendorUpdateDate';
+    
+      updated_VendorUpdateDate := _df_Date(is_active, path_VendorUpdateDate).AsRecord(L.VendorUpdateDate, R.VendorUpdateDate);
+        
+      checked_VendorUpdateDate := MAP (is_deleted => R.VendorUpdateDate,
+                              is_added => L.VendorUpdateDate,
+                              updated_VendorUpdateDate);
+      SELF.VendorUpdateDate := checked_VendorUpdateDate;
+
+
+      SELF := IF (is_deleted, R, L);
+
+    END;
+
+
+  EXPORT layouts._lt_row_UCCReport2Filing ProcessTxRow(layouts._lt_row_UCCReport2Filing L, layouts._lt_row_UCCReport2Filing R, integer1 joinRowType) :=TRANSFORM
+    boolean is_deleted := joinRowType = DiffStatus.JoinRowType.OuterRight;
+    boolean is_added := joinRowType = DiffStatus.JoinRowType.OuterLeft;
+    m := DiffScalars(L, R, is_deleted, is_added);
+
+    SELF._diff := IF(is_active, m._diff, '');
+    SELF._diffmeta := IF(is_active, m._diffmeta);
+   
+      path_Date := path + '/Date';
+    
+      updated_Date := _df_Date(is_active, path_Date).AsRecord(L.Date, R.Date);
+        
+      checked_Date := MAP (is_deleted => R.Date,
+                              is_added => L.Date,
+                              updated_Date);
+      SELF.Date := checked_Date;
+
+      path_ExpirationDate := path + '/ExpirationDate';
+    
+      updated_ExpirationDate := _df_Date(is_active, path_ExpirationDate).AsRecord(L.ExpirationDate, R.ExpirationDate);
+        
+      checked_ExpirationDate := MAP (is_deleted => R.ExpirationDate,
+                              is_added => L.ExpirationDate,
+                              updated_ExpirationDate);
+      SELF.ExpirationDate := checked_ExpirationDate;
+
+      path_EffectiveDate := path + '/EffectiveDate';
+    
+      updated_EffectiveDate := _df_Date(is_active, path_EffectiveDate).AsRecord(L.EffectiveDate, R.EffectiveDate);
+        
+      checked_EffectiveDate := MAP (is_deleted => R.EffectiveDate,
+                              is_added => L.EffectiveDate,
+                              updated_EffectiveDate);
+      SELF.EffectiveDate := checked_EffectiveDate;
+
+      path_VendorEntryDate := path + '/VendorEntryDate';
+    
+      updated_VendorEntryDate := _df_Date(is_active, path_VendorEntryDate).AsRecord(L.VendorEntryDate, R.VendorEntryDate);
+        
+      checked_VendorEntryDate := MAP (is_deleted => R.VendorEntryDate,
+                              is_added => L.VendorEntryDate,
+                              updated_VendorEntryDate);
+      SELF.VendorEntryDate := checked_VendorEntryDate;
+
+      path_VendorUpdateDate := path + '/VendorUpdateDate';
+    
+      updated_VendorUpdateDate := _df_Date(is_active, path_VendorUpdateDate).AsRecord(L.VendorUpdateDate, R.VendorUpdateDate);
+        
+      checked_VendorUpdateDate := MAP (is_deleted => R.VendorUpdateDate,
+                              is_added => L.VendorUpdateDate,
+                              updated_VendorUpdateDate);
+      SELF.VendorUpdateDate := checked_VendorUpdateDate;
+
+    SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
+    SELF := IF (is_deleted, R, L);
+
+  END;
+
+
+  EXPORT AsRecord (layouts._lt_UCCReport2Filing _new, layouts._lt_UCCReport2Filing _old) := FUNCTION
+    RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
 END;
@@ -4915,30 +5543,10 @@ EXPORT _df_UCCReport2Record(boolean is_active, string path) := MODULE
         SELF.BusinessIds  := L.BusinessIds;
       SELF.OriginFilingDate  := L.OriginFilingDate;
       SELF.CommentEffectiveDate  := L.CommentEffectiveDate;
-
-      updated_Debtors2 := _df_UCCReport2Person(is_active, path + '/Debtors2/Debtor').AsDataset_originname(L.Debtors2, R.Debtors2);
-      checked_Debtors2 := MAP (is_deleted => R.Debtors2,
-                              is_added => L.Debtors2,
-                              updated_Debtors2);
-      SELF.Debtors2  := checked_Debtors2;
-
-      updated_Creditors2 := _df_UCCReport2Person(is_active, path + '/Creditors2/Creditor').AsDataset_originname(L.Creditors2, R.Creditors2);
-      checked_Creditors2 := MAP (is_deleted => R.Creditors2,
-                              is_added => L.Creditors2,
-                              updated_Creditors2);
-      SELF.Creditors2  := checked_Creditors2;
-
-      updated_Secureds2 := _df_UCCReport2Person(is_active, path + '/Secureds2/Secured').AsDataset_originname(L.Secureds2, R.Secureds2);
-      checked_Secureds2 := MAP (is_deleted => R.Secureds2,
-                              is_added => L.Secureds2,
-                              updated_Secureds2);
-      SELF.Secureds2  := checked_Secureds2;
-
-      updated_Assignees2 := _df_UCCReport2Person(is_active, path + '/Assignees2/Assignee').AsDataset_originname(L.Assignees2, R.Assignees2);
-      checked_Assignees2 := MAP (is_deleted => R.Assignees2,
-                              is_added => L.Assignees2,
-                              updated_Assignees2);
-      SELF.Assignees2  := checked_Assignees2;
+      SELF.Debtors2  := L.Debtors2;
+      SELF.Creditors2  := L.Creditors2;
+      SELF.Secureds2  := L.Secureds2;
+      SELF.Assignees2  := L.Assignees2;
       SELF.Collaterals2  := L.Collaterals2;
       SELF.Signers  := L.Signers;
       SELF.Filings2  := L.Filings2;
@@ -4960,30 +5568,10 @@ EXPORT _df_UCCReport2Record(boolean is_active, string path) := MODULE
          SELF.BusinessIds  := L.BusinessIds;
       SELF.OriginFilingDate  := L.OriginFilingDate;
       SELF.CommentEffectiveDate  := L.CommentEffectiveDate;
-
-      updated_Debtors2 := _df_UCCReport2Person(is_active, path + '/Debtors2/Debtor').AsDataset_originname(L.Debtors2, R.Debtors2);
-      checked_Debtors2 := MAP (is_deleted => R.Debtors2,
-                              is_added => L.Debtors2,
-                              updated_Debtors2);
-      SELF.Debtors2  := checked_Debtors2;
-
-      updated_Creditors2 := _df_UCCReport2Person(is_active, path + '/Creditors2/Creditor').AsDataset_originname(L.Creditors2, R.Creditors2);
-      checked_Creditors2 := MAP (is_deleted => R.Creditors2,
-                              is_added => L.Creditors2,
-                              updated_Creditors2);
-      SELF.Creditors2  := checked_Creditors2;
-
-      updated_Secureds2 := _df_UCCReport2Person(is_active, path + '/Secureds2/Secured').AsDataset_originname(L.Secureds2, R.Secureds2);
-      checked_Secureds2 := MAP (is_deleted => R.Secureds2,
-                              is_added => L.Secureds2,
-                              updated_Secureds2);
-      SELF.Secureds2  := checked_Secureds2;
-
-      updated_Assignees2 := _df_UCCReport2Person(is_active, path + '/Assignees2/Assignee').AsDataset_originname(L.Assignees2, R.Assignees2);
-      checked_Assignees2 := MAP (is_deleted => R.Assignees2,
-                              is_added => L.Assignees2,
-                              updated_Assignees2);
-      SELF.Assignees2  := checked_Assignees2;
+      SELF.Debtors2  := L.Debtors2;
+      SELF.Creditors2  := L.Creditors2;
+      SELF.Secureds2  := L.Secureds2;
+      SELF.Assignees2  := L.Assignees2;
       SELF.Collaterals2  := L.Collaterals2;
       SELF.Signers  := L.Signers;
       SELF.Filings2  := L.Filings2;
@@ -5745,7 +6333,12 @@ EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
                               is_added => L.PremiseAddress,
                               updated_PremiseAddress);
       SELF.PremiseAddress := checked_PremiseAddress;
-      SELF.LicenseNames  := L.LicenseNames;
+
+      updated_LicenseNames := _df_Name(is_active, path + '/LicenseNames/Name').AsDataset_firstlast(L.LicenseNames, R.LicenseNames);
+      checked_LicenseNames := MAP (is_deleted => R.LicenseNames,
+                              is_added => L.LicenseNames,
+                              updated_LicenseNames);
+      SELF.LicenseNames  := checked_LicenseNames;
 
 
       SELF := IF (is_deleted, R, L);
@@ -5789,7 +6382,12 @@ EXPORT _df_FirearmRecord(boolean is_active, string path) := MODULE
                               is_added => L.PremiseAddress,
                               updated_PremiseAddress);
       SELF.PremiseAddress := checked_PremiseAddress;
-      SELF.LicenseNames  := L.LicenseNames;
+
+      updated_LicenseNames := _df_Name(is_active, path + '/LicenseNames/Name').AsDataset_firstlast(L.LicenseNames, R.LicenseNames);
+      checked_LicenseNames := MAP (is_deleted => R.LicenseNames,
+                              is_added => L.LicenseNames,
+                              updated_LicenseNames);
+      SELF.LicenseNames  := checked_LicenseNames;
 
     SELF._diff_ord := IF (is_deleted, R._diff_ord, L._diff_ord);
     SELF := IF (is_deleted, R, L);
@@ -6420,11 +7018,13 @@ EXPORT _df_MotorVehicleReportPersonOrBusiness(boolean is_active, string path) :=
     shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
     shared boolean updated_SSN := (L.SSN != R.SSN);
     shared boolean updated_DriverLicenseNumber := (L.DriverLicenseNumber != R.DriverLicenseNumber);
+    shared boolean updated_ReportedName := (L.ReportedName != R.ReportedName);
 
     shared is_updated := false
       OR updated_UniqueId
       OR updated_SSN
-      OR updated_DriverLicenseNumber;
+      OR updated_DriverLicenseNumber
+      OR updated_ReportedName;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -6435,7 +7035,8 @@ EXPORT _df_MotorVehicleReportPersonOrBusiness(boolean is_active, string path) :=
     // Get update information for all scalars
       _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
          +  IF (updated_SSN, DATASET ([{'SSN', R.SSN}], layouts.DiffMetaRow))
-         +  IF (updated_DriverLicenseNumber, DATASET ([{'DriverLicenseNumber', R.DriverLicenseNumber}], layouts.DiffMetaRow));
+         +  IF (updated_DriverLicenseNumber, DATASET ([{'DriverLicenseNumber', R.DriverLicenseNumber}], layouts.DiffMetaRow))
+         +  IF (updated_ReportedName, DATASET ([{'ReportedName', R.ReportedName}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -6534,8 +7135,10 @@ END;
 EXPORT _df_MotorVehicleReportRegistrant(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_MotorVehicleReportRegistrant L, layouts._lt_MotorVehicleReportRegistrant R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_TitleNumber := (L.TitleNumber != R.TitleNumber);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_TitleNumber;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -6544,7 +7147,7 @@ EXPORT _df_MotorVehicleReportRegistrant(boolean is_active, string path) := MODUL
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_TitleNumber, DATASET ([{'TitleNumber', R.TitleNumber}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -7326,12 +7929,24 @@ END;
 EXPORT _df_NameAndCompany(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_NameAndCompany L, layouts._lt_NameAndCompany R, boolean is_deleted, boolean is_added) := MODULE
+    Full_active := CASE(path + '/Full', '/Names/Name/Full' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Full' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Full' => (false), '/Aircrafts/Aircraft/Registrant/Name/Full' => (false), '/FAACertifications/Certification/Name/Full' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Full' => (false), '/SexualOffenses/SexualOffense/Name/Full' => (false), '/Criminals/Criminal/Name/Full' => (false), '/WeaponPermits/WeaponPermit/Name/Full' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Full' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Full' => (false), '/VoterRegistrations/VoterRegistration/Name/Full' => (false), '/Drivers/Driver/Name/Full' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Full' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Full' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Full' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Full' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Full' => (false), '/Properties/Property/Entities/Entity/Names/Name/Full' => (false), '/Educations/Education/Name/Full' => (false), '/AKAs/AKA/Name/Full' => (false), '/Imposters/Imposter/Name/Full' => (false), '/Utilities/Utility/Name/Full' => (false), is_active);
+    shared boolean updated_Full := Full_active AND (L.Full != R.Full);
     shared boolean updated_First := (L.First != R.First);
+    Middle_active := CASE(path + '/Middle', '/Names/Name/Middle' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Middle' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Middle' => (false), '/Aircrafts/Aircraft/Registrant/Name/Middle' => (false), '/FAACertifications/Certification/Name/Middle' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Middle' => (false), '/SexualOffenses/SexualOffense/Name/Middle' => (false), '/Criminals/Criminal/Name/Middle' => (false), '/WeaponPermits/WeaponPermit/Name/Middle' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Middle' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Middle' => (false), '/VoterRegistrations/VoterRegistration/Name/Middle' => (false), '/Drivers/Driver/Name/Middle' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Middle' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Middle' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Middle' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Middle' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Middle' => (false), '/Properties/Property/Entities/Entity/Names/Name/Middle' => (false), '/Educations/Education/Name/Middle' => (false), '/AKAs/AKA/Name/Middle' => (false), '/Imposters/Imposter/Name/Middle' => (false), '/Utilities/Utility/Name/Middle' => (false), is_active);
+    shared boolean updated_Middle := Middle_active AND (L.Middle != R.Middle);
     shared boolean updated_Last := (L.Last != R.Last);
+    Suffix_active := CASE(path + '/Suffix', '/Names/Name/Suffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Suffix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Suffix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Suffix' => (false), '/FAACertifications/Certification/Name/Suffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Suffix' => (false), '/SexualOffenses/SexualOffense/Name/Suffix' => (false), '/Criminals/Criminal/Name/Suffix' => (false), '/WeaponPermits/WeaponPermit/Name/Suffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Suffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Suffix' => (false), '/VoterRegistrations/VoterRegistration/Name/Suffix' => (false), '/Drivers/Driver/Name/Suffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Suffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Suffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Suffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Suffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Suffix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Suffix' => (false), '/Educations/Education/Name/Suffix' => (false), '/AKAs/AKA/Name/Suffix' => (false), '/Imposters/Imposter/Name/Suffix' => (false), '/Utilities/Utility/Name/Suffix' => (false), is_active);
+    shared boolean updated_Suffix := Suffix_active AND (L.Suffix != R.Suffix);
+    Prefix_active := CASE(path + '/Prefix', '/Names/Name/Prefix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Prefix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Prefix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Prefix' => (false), '/FAACertifications/Certification/Name/Prefix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Prefix' => (false), '/SexualOffenses/SexualOffense/Name/Prefix' => (false), '/Criminals/Criminal/Name/Prefix' => (false), '/WeaponPermits/WeaponPermit/Name/Prefix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Prefix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Prefix' => (false), '/VoterRegistrations/VoterRegistration/Name/Prefix' => (false), '/Drivers/Driver/Name/Prefix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Prefix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Prefix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Prefix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Prefix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Prefix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Prefix' => (false), '/Educations/Education/Name/Prefix' => (false), '/AKAs/AKA/Name/Prefix' => (false), '/Imposters/Imposter/Name/Prefix' => (false), '/Utilities/Utility/Name/Prefix' => (false), is_active);
+    shared boolean updated_Prefix := Prefix_active AND (L.Prefix != R.Prefix);
 
     shared is_updated := false
+      OR updated_Full
       OR updated_First
-      OR updated_Last;
+      OR updated_Middle
+      OR updated_Last
+      OR updated_Suffix
+      OR updated_Prefix;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -7340,8 +7955,12 @@ EXPORT _df_NameAndCompany(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
-         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_Full, DATASET ([{'Full', R.Full}], layouts.DiffMetaRow))
+         +  IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
+         +  IF (updated_Middle, DATASET ([{'Middle', R.Middle}], layouts.DiffMetaRow))
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))
+         +  IF (updated_Suffix, DATASET ([{'Suffix', R.Suffix}], layouts.DiffMetaRow))
+         +  IF (updated_Prefix, DATASET ([{'Prefix', R.Prefix}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -7367,12 +7986,24 @@ END;
 EXPORT _df_BankruptcySearch2Name(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_BankruptcySearch2Name L, layouts._lt_BankruptcySearch2Name R, boolean is_deleted, boolean is_added) := MODULE
+    Full_active := CASE(path + '/Full', '/Names/Name/Full' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Full' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Full' => (false), '/Aircrafts/Aircraft/Registrant/Name/Full' => (false), '/FAACertifications/Certification/Name/Full' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Full' => (false), '/SexualOffenses/SexualOffense/Name/Full' => (false), '/Criminals/Criminal/Name/Full' => (false), '/WeaponPermits/WeaponPermit/Name/Full' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Full' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Full' => (false), '/VoterRegistrations/VoterRegistration/Name/Full' => (false), '/Drivers/Driver/Name/Full' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Full' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Full' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Full' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Full' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Full' => (false), '/Properties/Property/Entities/Entity/Names/Name/Full' => (false), '/Educations/Education/Name/Full' => (false), '/AKAs/AKA/Name/Full' => (false), '/Imposters/Imposter/Name/Full' => (false), '/Utilities/Utility/Name/Full' => (false), is_active);
+    shared boolean updated_Full := Full_active AND (L.Full != R.Full);
     shared boolean updated_First := (L.First != R.First);
+    Middle_active := CASE(path + '/Middle', '/Names/Name/Middle' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Middle' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Middle' => (false), '/Aircrafts/Aircraft/Registrant/Name/Middle' => (false), '/FAACertifications/Certification/Name/Middle' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Middle' => (false), '/SexualOffenses/SexualOffense/Name/Middle' => (false), '/Criminals/Criminal/Name/Middle' => (false), '/WeaponPermits/WeaponPermit/Name/Middle' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Middle' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Middle' => (false), '/VoterRegistrations/VoterRegistration/Name/Middle' => (false), '/Drivers/Driver/Name/Middle' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Middle' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Middle' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Middle' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Middle' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Middle' => (false), '/Properties/Property/Entities/Entity/Names/Name/Middle' => (false), '/Educations/Education/Name/Middle' => (false), '/AKAs/AKA/Name/Middle' => (false), '/Imposters/Imposter/Name/Middle' => (false), '/Utilities/Utility/Name/Middle' => (false), is_active);
+    shared boolean updated_Middle := Middle_active AND (L.Middle != R.Middle);
     shared boolean updated_Last := (L.Last != R.Last);
+    Suffix_active := CASE(path + '/Suffix', '/Names/Name/Suffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Suffix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Suffix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Suffix' => (false), '/FAACertifications/Certification/Name/Suffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Suffix' => (false), '/SexualOffenses/SexualOffense/Name/Suffix' => (false), '/Criminals/Criminal/Name/Suffix' => (false), '/WeaponPermits/WeaponPermit/Name/Suffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Suffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Suffix' => (false), '/VoterRegistrations/VoterRegistration/Name/Suffix' => (false), '/Drivers/Driver/Name/Suffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Suffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Suffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Suffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Suffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Suffix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Suffix' => (false), '/Educations/Education/Name/Suffix' => (false), '/AKAs/AKA/Name/Suffix' => (false), '/Imposters/Imposter/Name/Suffix' => (false), '/Utilities/Utility/Name/Suffix' => (false), is_active);
+    shared boolean updated_Suffix := Suffix_active AND (L.Suffix != R.Suffix);
+    Prefix_active := CASE(path + '/Prefix', '/Names/Name/Prefix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Prefix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Prefix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Prefix' => (false), '/FAACertifications/Certification/Name/Prefix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Prefix' => (false), '/SexualOffenses/SexualOffense/Name/Prefix' => (false), '/Criminals/Criminal/Name/Prefix' => (false), '/WeaponPermits/WeaponPermit/Name/Prefix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Prefix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Prefix' => (false), '/VoterRegistrations/VoterRegistration/Name/Prefix' => (false), '/Drivers/Driver/Name/Prefix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Prefix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Prefix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Prefix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Prefix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Prefix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Prefix' => (false), '/Educations/Education/Name/Prefix' => (false), '/AKAs/AKA/Name/Prefix' => (false), '/Imposters/Imposter/Name/Prefix' => (false), '/Utilities/Utility/Name/Prefix' => (false), is_active);
+    shared boolean updated_Prefix := Prefix_active AND (L.Prefix != R.Prefix);
 
     shared is_updated := false
+      OR updated_Full
       OR updated_First
-      OR updated_Last;
+      OR updated_Middle
+      OR updated_Last
+      OR updated_Suffix
+      OR updated_Prefix;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -7381,8 +8012,12 @@ EXPORT _df_BankruptcySearch2Name(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
-         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow));
+      _meta :=   IF (updated_Full, DATASET ([{'Full', R.Full}], layouts.DiffMetaRow))
+         +  IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
+         +  IF (updated_Middle, DATASET ([{'Middle', R.Middle}], layouts.DiffMetaRow))
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))
+         +  IF (updated_Suffix, DATASET ([{'Suffix', R.Suffix}], layouts.DiffMetaRow))
+         +  IF (updated_Prefix, DATASET ([{'Prefix', R.Prefix}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -7957,7 +8592,12 @@ EXPORT _df_LienJudgmentDebtor(boolean is_active, string path) := MODULE
                               is_added => L.Address,
                               updated_Address);
       SELF.Address := checked_Address;
-      SELF.Addresses  := L.Addresses;
+
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
       SELF.Phones  := L.Phones;
 
       updated_ParsedParties := _df_LienJudgmentParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
@@ -7988,7 +8628,12 @@ EXPORT _df_LienJudgmentDebtor(boolean is_active, string path) := MODULE
                               is_added => L.Address,
                               updated_Address);
       SELF.Address := checked_Address;
-      SELF.Addresses  := L.Addresses;
+
+      updated_Addresses := _df_Address(is_active, path + '/Addresses/Address').AsDataset_citystatestreetnamestreetnumberunitnumberzip5(L.Addresses, R.Addresses);
+      checked_Addresses := MAP (is_deleted => R.Addresses,
+                              is_added => L.Addresses,
+                              updated_Addresses);
+      SELF.Addresses  := checked_Addresses;
       SELF.Phones  := L.Phones;
 
       updated_ParsedParties := _df_LienJudgmentParty(is_active, path + '/ParsedParties/Party').AsDataset_uniqueid(L.ParsedParties, R.ParsedParties);
@@ -8151,8 +8796,16 @@ END;
 EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_Property2Name L, layouts._lt_Property2Name R, boolean is_deleted, boolean is_added) := MODULE
+    Full_active := CASE(path + '/Full', '/Names/Name/Full' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Full' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Full' => (false), '/Aircrafts/Aircraft/Registrant/Name/Full' => (false), '/FAACertifications/Certification/Name/Full' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Full' => (false), '/SexualOffenses/SexualOffense/Name/Full' => (false), '/Criminals/Criminal/Name/Full' => (false), '/WeaponPermits/WeaponPermit/Name/Full' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Full' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Full' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Full' => (false), '/VoterRegistrations/VoterRegistration/Name/Full' => (false), '/Drivers/Driver/Name/Full' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Full' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Full' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Full' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Full' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Full' => (false), '/Properties/Property/Entities/Entity/Names/Name/Full' => (false), '/Educations/Education/Name/Full' => (false), '/AKAs/AKA/Name/Full' => (false), '/Imposters/Imposter/Name/Full' => (false), '/Utilities/Utility/Name/Full' => (false), is_active);
+    shared boolean updated_Full := Full_active AND (L.Full != R.Full);
     shared boolean updated_First := (L.First != R.First);
+    Middle_active := CASE(path + '/Middle', '/Names/Name/Middle' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Middle' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Middle' => (false), '/Aircrafts/Aircraft/Registrant/Name/Middle' => (false), '/FAACertifications/Certification/Name/Middle' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Middle' => (false), '/SexualOffenses/SexualOffense/Name/Middle' => (false), '/Criminals/Criminal/Name/Middle' => (false), '/WeaponPermits/WeaponPermit/Name/Middle' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Middle' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Middle' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Middle' => (false), '/VoterRegistrations/VoterRegistration/Name/Middle' => (false), '/Drivers/Driver/Name/Middle' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Middle' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Middle' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Middle' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Middle' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Middle' => (false), '/Properties/Property/Entities/Entity/Names/Name/Middle' => (false), '/Educations/Education/Name/Middle' => (false), '/AKAs/AKA/Name/Middle' => (false), '/Imposters/Imposter/Name/Middle' => (false), '/Utilities/Utility/Name/Middle' => (false), is_active);
+    shared boolean updated_Middle := Middle_active AND (L.Middle != R.Middle);
     shared boolean updated_Last := (L.Last != R.Last);
+    Suffix_active := CASE(path + '/Suffix', '/Names/Name/Suffix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Suffix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Suffix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Suffix' => (false), '/FAACertifications/Certification/Name/Suffix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Suffix' => (false), '/SexualOffenses/SexualOffense/Name/Suffix' => (false), '/Criminals/Criminal/Name/Suffix' => (false), '/WeaponPermits/WeaponPermit/Name/Suffix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Suffix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Suffix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Suffix' => (false), '/VoterRegistrations/VoterRegistration/Name/Suffix' => (false), '/Drivers/Driver/Name/Suffix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Suffix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Suffix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Suffix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Suffix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Suffix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Suffix' => (false), '/Educations/Education/Name/Suffix' => (false), '/AKAs/AKA/Name/Suffix' => (false), '/Imposters/Imposter/Name/Suffix' => (false), '/Utilities/Utility/Name/Suffix' => (false), is_active);
+    shared boolean updated_Suffix := Suffix_active AND (L.Suffix != R.Suffix);
+    Prefix_active := CASE(path + '/Prefix', '/Names/Name/Prefix' => (false), '/ProfessionalLicenses/ProfessionalLicense/Name/Prefix' => (false), '/PeopleAtWorks/PeopleAtWork/Name/Prefix' => (false), '/Aircrafts/Aircraft/Registrant/Name/Prefix' => (false), '/FAACertifications/Certification/Name/Prefix' => (false), '/WaterCrafts/WaterCraft/Owners/Owner/Name/Prefix' => (false), '/SexualOffenses/SexualOffense/Name/Prefix' => (false), '/Criminals/Criminal/Name/Prefix' => (false), '/WeaponPermits/WeaponPermit/Name/Prefix' => (false), '/HuntingFishingLicenses/HuntingFishingLicense/Name/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseName/Prefix' => (false), '/FirearmExplosives/FirearmExplosive/LicenseNames/Name/Prefix' => (false), '/ControlledSubstances/ControlledSubstance/ControlledSubstancesInfo/ControlledSubstanceInfo/Name/Prefix' => (false), '/VoterRegistrations/VoterRegistration/Name/Prefix' => (false), '/Drivers/Driver/Name/Prefix' => (false), '/Vehicles/Vehicle/Registrants/Registrant/RegistrantInfo/Name/Prefix' => (false), '/Vehicles/Vehicle/Owners/Owner/OwnerInfo/Name/Prefix' => (false), '/Accidents/Accident/Vehicles/Item/Driver/Individual/Name/Prefix' => (false), '/Bankruptcies/Bankruptcy/Debtors/Debtor/Names/Name/Prefix' => (false), '/LiensJudgments/LienJudgment/Debtors/Debtor/ParsedParties/Party/Name/Prefix' => (false), '/Properties/Property/Entities/Entity/Names/Name/Prefix' => (false), '/Educations/Education/Name/Prefix' => (false), '/AKAs/AKA/Name/Prefix' => (false), '/Imposters/Imposter/Name/Prefix' => (false), '/Utilities/Utility/Name/Prefix' => (false), is_active);
+    shared boolean updated_Prefix := Prefix_active AND (L.Prefix != R.Prefix);
     shared boolean updated_IdValue := (L.IdValue != R.IdValue);
     shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
     shared boolean updated_BusinessId := (L.BusinessId != R.BusinessId);
@@ -8160,8 +8813,12 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
     shared boolean updated_LinkingWeight := (L.LinkingWeight != R.LinkingWeight);
 
     shared is_updated := false
+      OR updated_Full
       OR updated_First
+      OR updated_Middle
       OR updated_Last
+      OR updated_Suffix
+      OR updated_Prefix
       OR updated_IdValue
       OR updated_UniqueId
       OR updated_BusinessId
@@ -8175,8 +8832,12 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
-         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))+ IF (updated_IdValue, DATASET ([{'IdValue', R.IdValue}], layouts.DiffMetaRow))
+      _meta :=   IF (updated_Full, DATASET ([{'Full', R.Full}], layouts.DiffMetaRow))
+         +  IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
+         +  IF (updated_Middle, DATASET ([{'Middle', R.Middle}], layouts.DiffMetaRow))
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))
+         +  IF (updated_Suffix, DATASET ([{'Suffix', R.Suffix}], layouts.DiffMetaRow))
+         +  IF (updated_Prefix, DATASET ([{'Prefix', R.Prefix}], layouts.DiffMetaRow))+ IF (updated_IdValue, DATASET ([{'IdValue', R.IdValue}], layouts.DiffMetaRow))
          +  IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
          +  IF (updated_BusinessId, DATASET ([{'BusinessId', R.BusinessId}], layouts.DiffMetaRow))
          +  IF (updated_AppendedSSN, DATASET ([{'AppendedSSN', R.AppendedSSN}], layouts.DiffMetaRow))
@@ -8344,26 +9005,26 @@ EXPORT _df_Property2Entity(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R) := FUNCTION
-    boolean IsInner :=  (L.Address.UnitNumber = R.Address.UnitNumber AND L.Address.StreetNumber = R.Address.StreetNumber AND L.Address.Zip5 = R.Address.Zip5 AND L.Address.StreetName = R.Address.StreetName AND L.Address.City = R.Address.City AND L.Address.State = R.Address.State AND L.EntityTypeCode = R.EntityTypeCode);
+  EXPORT  integer1 CheckOuter_entitytypecode(layouts._lt_Property2Entity L, layouts._lt_Property2Entity R) := FUNCTION
+    boolean IsInner :=  (L.EntityTypeCode = R.EntityTypeCode);
 
-    boolean IsOuterRight :=   (L.Address.UnitNumber = '' AND L.Address.StreetNumber = '' AND L.Address.Zip5 = '' AND L.Address.StreetName = '' AND L.Address.City = '' AND L.Address.State = '' AND L.EntityTypeCode = '');
+    boolean IsOuterRight :=   (L.EntityTypeCode = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode (dataset(layouts._lt_Property2Entity) _n, dataset(layouts._lt_Property2Entity) _o) := FUNCTION
+  EXPORT  AsDataset_entitytypecode (dataset(layouts._lt_Property2Entity) _n, dataset(layouts._lt_Property2Entity) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_Property2Entity, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State AND LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
+                  LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(LEFT, RIGHT)),
+                  CheckOuter_entitytypecode(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.Address.UnitNumber = RIGHT.Address.UnitNumber AND LEFT.Address.StreetNumber = RIGHT.Address.StreetNumber AND LEFT.Address.Zip5 = RIGHT.Address.Zip5 AND LEFT.Address.StreetName = RIGHT.Address.StreetName AND LEFT.Address.City = RIGHT.Address.City AND LEFT.Address.State = RIGHT.Address.State AND LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
+                  LEFT.EntityTypeCode = RIGHT.EntityTypeCode,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(LEFT, RIGHT)),
+                  CheckOuter_entitytypecode(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_Property2Entity);
@@ -8403,7 +9064,7 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
       SELF.Assessment  := L.Assessment;
       SELF.Deed  := L.Deed;
 
-      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(L.Entities, R.Entities);
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_entitytypecode(L.Entities, R.Entities);
       checked_Entities := MAP (is_deleted => R.Entities,
                               is_added => L.Entities,
                               updated_Entities);
@@ -8426,7 +9087,7 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
       SELF.Assessment  := L.Assessment;
       SELF.Deed  := L.Deed;
 
-      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_address_cityaddress_stateaddress_streetnameaddress_streetnumberaddress_unitnumberaddress_zip5entitytypecode(L.Entities, R.Entities);
+      updated_Entities := _df_Property2Entity(is_active, path + '/Entities/Entity').AsDataset_entitytypecode(L.Entities, R.Entities);
       checked_Entities := MAP (is_deleted => R.Entities,
                               is_added => L.Entities,
                               updated_Entities);
@@ -8743,8 +9404,10 @@ END;
 EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_BpsReportIdentity L, layouts._lt_BpsReportIdentity R, boolean is_deleted, boolean is_added) := MODULE
+    shared boolean updated_IsLimitedAccessDMF := (L.IsLimitedAccessDMF != R.IsLimitedAccessDMF);
 
-    shared is_updated := false;
+    shared is_updated := false
+      OR updated_IsLimitedAccessDMF;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -8753,7 +9416,7 @@ EXPORT _df_BpsReportIdentity(boolean is_active, string path) := MODULE
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=  DATASET ([], layouts.DiffMetaRow);
+      _meta :=   IF (updated_IsLimitedAccessDMF, DATASET ([{'IsLimitedAccessDMF', IF(R.IsLimitedAccessDMF = true, 'true', 'false')}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
