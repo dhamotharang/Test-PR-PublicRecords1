@@ -18,19 +18,20 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
 
   // get collections for all in-scope datasets
   recs := 
-    $.MAC(in_mod).GetCollection(dids, 'AmericanstudentKeys', American_student_list.key_DID, l_did, date_last_seen)
-  + $.MAC(in_mod).GetCollectionFromRaw(email_recs, 'EmailV2Keys', dx_Email.Key_email_payload(), did, date_last_seen)
-  + $.MAC(in_mod).GetCollection(dids, 'OneClickDataKeys', one_click_data.keys().did.qa, did, dt_last_seen)
-  + $.MAC(in_mod).GetCollectionFromRaw(paw_recs, 'PAWV2Keys', paw.Key_contactID, did, dt_last_seen)
-  + $.MAC(in_mod).GetCollection(dids, 'PCNSRKeys', DayBatchPCNSR.Key_PCNSR_DID, did, date_vendor_last_reported)    
-  + $.MAC(in_mod).GetCollection(dids, 'PhonemartKeys', PhoneMart.key_phonemart_did, l_did, dt_vendor_last_reported)  
-  + $.MAC(in_mod).GetCollection(dids, 'ProfLicenseKeys', prof_licensev2.Key_Proflic_Did(), did, date_last_seen) 
-  + $.MAC(in_mod).GetCollection(dids, 'QSentKeys', Phonesplus.key_qsent_did, l_did, DateLastSeen)
-  + $.MAC(in_mod).GetCollection(dids, 'SalesChannelKeys', saleschannel.keys().did.qa, did, date_last_seen)
-  + $.MAC(in_mod).GetCollection(dids, 'SpokeKeys', spoke.keys().did.qa, did, dt_last_seen)
-  + $.MAC(in_mod).GetCollection(dids, 'ThriveKeys', thrive.keys().did.qa, did, dt_last_seen)
-  + $.MAC(in_mod).GetCollection(dids, 'ZoomKeys', zoom.keys().did.qa, did, dt_vendor_last_reported);
-  
+    $.MAC.GetCollection(dids, in_mod, 'AmericanstudentKeys', American_student_list.key_DID, l_did, date_last_seen)
+    + $.MAC.GetCollectionFromRaw(email_recs, in_mod, 'EmailV2Keys', dx_Email.Key_email_payload(), did, date_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'OneClickDataKeys', one_click_data.keys().did.qa, did, dt_last_seen)
+    + $.MAC.GetCollectionFromRaw(paw_recs, in_mod, 'PAWV2Keys', paw.Key_contactID, did, dt_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'PCNSRKeys', DayBatchPCNSR.Key_PCNSR_DID, did, date_vendor_last_reported)    
+    + $.MAC.GetCollection(dids, in_mod, 'PhonemartKeys', PhoneMart.key_phonemart_did, l_did, dt_vendor_last_reported)  
+    + $.MAC.GetCollection(dids, in_mod, 'ProfLicenseKeys', prof_licensev2.Key_Proflic_Did(), did, date_last_seen) 
+    + $.MAC.GetCollection(dids, in_mod, 'QSentKeys', Phonesplus.key_qsent_did, l_did, DateLastSeen)
+    + $.MAC.GetCollection(dids, in_mod, 'SalesChannelKeys', saleschannel.keys().did.qa, did, date_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'SpokeKeys', spoke.keys().did.qa, did, dt_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'ThriveKeys', thrive.keys().did.qa, did, dt_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'ZoomKeys', zoom.keys().did.qa, did, dt_vendor_last_reported)
+  ;
+
   RETURN recs;
 
 END;

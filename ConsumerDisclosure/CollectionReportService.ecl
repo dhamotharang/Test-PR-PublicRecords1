@@ -5,10 +5,6 @@ export CollectionReportService() := macro
   first_row := in_req[1] : INDEPENDENT;
   report_options := GLOBAL(first_row.Options);
   reportby := GLOBAL(first_row.ReportBy);
-
-  iesp.ECL2ESP.SetInputBaseRequest(first_row);
-  iesp.ECL2ESP.SetInputReportBy(ROW(reportby, transform(iesp.bpsreport.t_BpsReportBy, self := left, self := [])));
-  iesp.ECL2ESP.SetInputUser (first_row.User);
   
   unsigned6 lexID := (unsigned6) reportby.LexID;
   in_mod := ConsumerDisclosure.CollectionReport.IParam.GetParams(reportby, report_options);
@@ -22,6 +18,7 @@ export CollectionReportService() := macro
     self._Header.Message := '';
     self._Header.Exceptions := dataset([], iesp.share.t_WsException);
     self.Result.InputEcho := reportby;
+    self.Result.LexID := (STRING) lexID;
     self.Result.LNPID := ''; //??
     self.Result.RoxieCluster := STD.System.Thorlib.Cluster();
     self.Result.Collections :=  col_recs;   
