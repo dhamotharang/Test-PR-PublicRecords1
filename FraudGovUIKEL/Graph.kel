@@ -1305,17 +1305,11 @@ Legal: => OldestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp
 Legal: => NewestEmployerBeganDt := MAP(ALL(LegalEmployer.rEmployer, datefirstemp:Null OR (NOT ISVALIDDATE(datefirstemp))) => -99998, // No valid datefirstemp
 																 INTEGER(MAX(LegalEmployer.rEmployer, datefirstemp)));
 Legal: => BusOldestEmpBegantoAcctOpenSpan := MAP(OldestEmployerBeganDt=-99998 OR OldestAcctOpenDt=-99998 => -99998,
-																								    MONTHSBETWEEN(DATE(OldestEmployerBeganDt),DATE(OldestAcctOpenDt))>999 => 999,
-																								    MONTHSBETWEEN(DATE(OldestEmployerBeganDt),DATE(OldestAcctOpenDt))<-999 => -999,
-																								    MONTHSBETWEEN(DATE(OldestEmployerBeganDt),DATE(OldestAcctOpenDt)));																										
+																								    MAX(MIN(MONTHSBETWEEN(DATE(OldestEmployerBeganDt),DATE(OldestAcctOpenDt)), 999), -999));
 Legal: => BusOldestLiabStartToAcctOpenSpan := MAP(OldestTaxLiabStartDt=-99998 OR OldestAcctOpenDt=-99998 => -99998,
-																								     MONTHSBETWEEN(DATE(OldestTaxLiabStartDt),DATE(OldestAcctOpenDt))>999 => 999,
-																								     MONTHSBETWEEN(DATE(OldestTaxLiabStartDt),DATE(OldestAcctOpenDt))<-999 => -999,
-																								     MONTHSBETWEEN(DATE(OldestTaxLiabStartDt),DATE(OldestAcctOpenDt)));
+																								    MAX(MIN(MONTHSBETWEEN(DATE(OldestTaxLiabStartDt),DATE(OldestAcctOpenDt)), 999), -999));
 Legal: => BusIncorpToOldestAcctOpenSpan := MAP(OldestAcctOpenDt=-99998 OR IncorpDt =-99998 => -99998,
-																								  MONTHSBETWEEN(DATE(IncorpDt),DATE(OldestAcctOpenDt))>999 => 999,
-																								  MONTHSBETWEEN(DATE(IncorpDt),DATE(OldestAcctOpenDt))<-999 => -999,
-																								  MONTHSBETWEEN(DATE(IncorpDt),DATE(OldestAcctOpenDt)));
+																								  MAX(MIN(MONTHSBETWEEN(DATE(IncorpDt),DATE(OldestAcctOpenDt)), 999), -999));
 //Legal Fictitious Business attributes															 
 Legal: => BusAcctPerBusLegalEntCnt := COUNT(LegalEmployer{rEmployer}); 
 
@@ -1833,7 +1827,7 @@ Employer: => BusIncorpStatusType := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => 
 Employer: => BusAcctLiabToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									 BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctOldestUnemClmDt=-99998 => -99998,
 																									 BusAcctTaxLiabStartDtEcho=-99997 OR BusAcctOldestUnemClmDt=-99997 => -99997,
-																									MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOldestUnemClmDt)));
+																									 MAX(MIN(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOldestUnemClmDt)), 999), -999));
 Employer: => BusAcctLiabToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									 BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctNewestUnemClmDt=-99998 => -99998,
 																									 BusAcctTaxLiabStartDtEcho=-99997 OR BusAcctNewestUnemClmDt=-99997 => -99997,
@@ -1845,19 +1839,19 @@ Employer: => BusIncorpToLiabSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => 
 Employer: => BusIncorpToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								 BusIncorpDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
 																								 BusIncorpDt=-99997 OR BusOldestUnemClmDt=-99997 => -99997,
-																								 MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt)),999));
+																								 MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusOldestUnemClmDt)), 999), -999));
 Employer: => BusIncorpToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																								 BusIncorpDt=-99998 OR BusNewestUnemClmDt=-99998 => -99998,
 																								 BusIncorpDt=-99997 OR BusNewestUnemClmDt=-99997 => -99997,
-																								 MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt)),999));
+																								 MAX(MIN(MONTHSBETWEEN(DATE(BusIncorpDt),DATE(BusNewestUnemClmDt)), 999), -999));
 Employer: => BusLiabToOldestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 BusOldestTaxLiabStartDt=-99998 OR BusOldestUnemClmDt=-99998 => -99998,
 																							 BusOldestTaxLiabStartDt=-99997 OR BusOldestUnemClmDt=-99997 => -99997,
-																							 MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusOldestUnemClmDt)));
+																							 MAX(MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusOldestUnemClmDt)), 999), -999));
 Employer: => BusLiabToNewestUnemClmSpan := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
 																							 BusOldestTaxLiabStartDt=-99998 OR BusNewestUnemClmDt=-99998 => -99998,
 																							 BusOldestTaxLiabStartDt=-99997 OR BusNewestUnemClmDt=-99997 => -99997,
-																							 MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusNewestUnemClmDt)));					 
+																							 MAX(MIN(MONTHSBETWEEN(DATE(BusOldestTaxLiabStartDt),DATE(BusNewestUnemClmDt)), 999), -999));					 
 Employer: => BusAcctUnemClaimCurrActiveCnt := MAP(BusAcctUIDEcho=-99999 => -99999,
 																									ClaimCount=0 => -99998,
 																									ALL(EmployerClaim.rClaim, claim_status:Null ) => -99997,
@@ -1932,14 +1926,10 @@ Employer: => BusAcctOpenDtEcho := MAP(BusAcctUIDEcho=-99999 => -99999,
 																		  INTEGER(statusreceiptdate));
 Employer: => BusAcctEmpBeganToOpenDtSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
                                                 BusAcctDtEmployerBeganEcho=-99998 OR BusAcctOpenDtEcho=-99998 => -99998,
-																								MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho))>999 => 999,
-																								MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho))<-999 => -999,
-																								MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho)));
+																								MIN(MAX(MONTHSBETWEEN(DATE(BusAcctDtEmployerBeganEcho),DATE(BusAcctOpenDtEcho)),999),-999));
 Employer: => BusAcctLiabStartToOpenDtSpan := MAP(BusAcctUIDEcho=-99999 => -99999,
                                                 BusAcctTaxLiabStartDtEcho=-99998 OR BusAcctOpenDtEcho=-99998 => -99998,
-																								MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho))>999 => 999,
-																								MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho))<-999 => -999,
-																								MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho)));
+																								MIN(MAX(MONTHSBETWEEN(DATE(BusAcctTaxLiabStartDtEcho),DATE(BusAcctOpenDtEcho)),999),-999));
 Employer: => BusOldestAcctOpenDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
                                            rLegal.OldestAcctOpenDt);
 Employer: => BusNewestAcctOpenDt := MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
