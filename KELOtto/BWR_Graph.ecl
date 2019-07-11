@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 #OPTION('expandSelectCreateRow',true);
 IMPORT KEL011 AS KEL;
 IMPORT * FROM KEL011.Null;

@@ -1092,7 +1092,7 @@ Export CIID := RECORD
   unsigned1 customerquartilerank;
  END;
  
- Export	entitystats	:=	RECORD
+ Export	entitystats	:= RECORD
   integer1 entitytype;
   string entityhash;
   string field;
@@ -1109,7 +1109,7 @@ Export CIID := RECORD
   integer8 weight;
  END;
  
- Export	fullgraph	:= RECORD
+EXPORT fullgraph	:= RECORD
   unsigned8 source_customer_;
   unsigned1 __source_customer__flags;
   integer8 customer_id_;
@@ -1123,6 +1123,7 @@ Export CIID := RECORD
   unsigned2 date_first_seen_;
   unsigned2 date_last_seen_;
   integer8 __recordcount;
+  boolean hf;
   integer8 entity_type_;
   string label_;
   unsigned1 __label__flags;
@@ -1158,9 +1159,17 @@ Export CIID := RECORD
   integer8 death_prior_to_all_events_;
   integer8 nas9_flag_;
   integer8 nap3_flag_;
+  unsigned4 dt_first_seen_;
+  unsigned1 __dt_first_seen__flags;
+  unsigned4 dt_last_seen_;
+  unsigned1 __dt_last_seen__flags;
   DATASET(RECORD
    string entity_context_uid_;
    unsigned1 __entity_context_uid__flags;
+   unsigned4 dt_first_seen_;
+   unsigned1 __dt_first_seen__flags;
+   unsigned4 dt_last_seen_;
+   unsigned1 __dt_last_seen__flags;
    unsigned2 date_first_seen_;
    unsigned2 date_last_seen_;
    integer8 __recordcount;
@@ -1178,6 +1187,8 @@ Export CIID := RECORD
   unsigned1 __state__flags;
   string zip_;
   unsigned1 __zip__flags;
+  integer8 cluster_score__1_;
+  unsigned1 __cluster_score__1__flags;
   integer8 person_count_;
   integer8 high_frequency_flag_;
   integer8 high_risk_death_prior_to_all_events_percent_flag_;
@@ -1191,10 +1202,15 @@ Export CIID := RECORD
   unsigned1 __abbreviated_bankname__flags;
   string license_state_;
   unsigned1 __license_state__flags;
+  integer8 in_customer_population__1_;
+  integer8 contributor_safe_flag__1_;
+  integer8 safe_flag__1_;
   unsigned8 event_count_;
   unsigned8 identity_count_;
+  unsigned1 cl_adjacent_safe_flag_;
   DATASET(flagsrec) flags;
  END;
+
  
  Export	personassociationsdetails	:=	RECORD
   unsigned8 associatedcustomerfileinfo;

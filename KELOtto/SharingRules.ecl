@@ -9,6 +9,9 @@ OttoRules := Fraudshared.Files('').input.mbsfdnmasteridindtypeinclusion.sprayed(
 // Customer_id / ind_type for fdn_file_info_id from base data (it doesn't exist in the sharing rules).
 CustomerIds := TABLE(KELOtto.fraudgov, {classification_Permissible_use_access.fdn_file_info_id, inclusion_id := (INTEGER)customer_id, classification_Permissible_use_access.ind_type, SourceCustomerHash := HASH32(TRIM(customer_id) + '|' + TRIM((STRING)classification_Permissible_use_access.ind_type))}, classification_Permissible_use_access.fdn_file_info_id, customer_id, classification_Permissible_use_access.ind_type, FEW);
 
+CustomerIdStatePrep := TABLE(KELOtto.fraudgov(clean_address.st != ''), {SourceCustomerHash := HASH32(TRIM(customer_id) + '|' + TRIM((STRING)classification_Permissible_use_access.ind_type)), STRING State := clean_address.st, StateCount := COUNT(GROUP)}, classification_Permissible_use_access.fdn_file_info_id, customer_id, classification_Permissible_use_access.ind_type, clean_address.st, MERGE);
+CustomerIdState := DEDUP(SORT(CustomerIdStatePrep, SourceCustomerHash, -StateCount), SourceCustomerHash);
+
 OttoSharingFinal := OttoRules;
 
 OttoSharingUsingInclusionId1 := PROJECT(OttoSharingFinal(inclusion_id > 0), 
@@ -19,7 +22,12 @@ OttoSharingUsingInclusionId2 := JOIN(OttoSharingUsingInclusionId1, CustomerIds,
                                 LEFT.fdn_file_info_id=RIGHT.fdn_file_info_id,
                                 TRANSFORM({RECORDOF(LEFT), INTEGER SourceCustomerHash}, 
                                   SELF.SourceCustomerHash := RIGHT.SourceCustomerHash, SELF := LEFT), KEEP(1));
+																	
+// Putting this in specifically to implement customer state\jurisdiction, which should be replaced by customer state from MBS.
 
-EXPORT SharingRules := DEDUP(SORT(OttoSharingUsingInclusionId2, fdn_file_info_id, SourceCustomerHash, TargetCustomerHash), fdn_file_info_id, SourceCustomerHash, TargetCustomerHash); 
+OttoSharingUsingInclusionIdWithState := JOIN(OttoSharingUsingInclusionId2, CustomerIdState, 
+                                LEFT.SourceCustomerHash=RIGHT.SourceCustomerHash, LEFT OUTER, LOOKUP);
+
+EXPORT SharingRules := OttoSharingUsingInclusionIdWithState;//CustomerIdState;//DEDUP(SORT(OttoSharingUsingInclusionId2, fdn_file_info_id, SourceCustomerHash, TargetCustomerHash), fdn_file_info_id, SourceCustomerHash, TargetCustomerHash); 
 
 
