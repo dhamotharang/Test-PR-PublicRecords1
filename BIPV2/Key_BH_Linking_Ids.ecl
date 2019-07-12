@@ -90,7 +90,7 @@ MODULE
 		,boolean                                dnbFullRemove               = false // optionally clobber all DNB data; by default we apply masking
 		,boolean                                bypassContactSuppression    = false // Optionally skip BIPV2_Suppression.mac_contacts - only use this if you are 100% certain you aren't using contact information
 		,unsigned1                              JoinType                    = BIPV2.IDconstants.JoinTypes.KeepJoin
-    // ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
+    ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
   ) :=
   function   
 		BIPV2.IDmacros.mac_IndexFetch2     (inputs, Key, ds_fetched , Level, JoinLimit, JoinType);
@@ -116,8 +116,8 @@ MODULE
 		allowCodeBmap       := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 		marketingSuppressed := kFetched(BIPV2.mod_sources.src2bmap(source) & allowCodeBmap <> 0);    
     
-    return  kFetched;						
-    // return  if(pApplyMarketingSuppression = true  ,marketingSuppressed  ,kFetched);						
+    // return  kFetched;						
+    return  if(pApplyMarketingSuppression = true  ,marketingSuppressed  ,kFetched);						
   end;
 
 	//DEPRECATED VERSION OF THE ABOVE KFETCH2
@@ -150,8 +150,9 @@ MODULE
      BIPV2.mod_sources.iParams  in_mod                      = PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
     ,boolean                    dnbFullRemove               = false // optionally clobber all DNB data; by default we apply masking
     ,boolean                    bypassContactSuppression    = false // Optionally skip BIPV2_Suppression.mac_contacts - only use this if you are 100% certain you aren't using contact information
-    ,boolean                    pApplyMarketingSuppression  = false
-    ,string                     pKeyversion                 = 'qa'  //which version of the key to pull?  makes it easy to test other key versions without sandboxing
+    ,boolean                    pApplyMarketingSuppression  = false // Apply Marketing suppression to the key
+    ,boolean                    pReturnFullKey              = false // Return the Full Key unrestricted.  Overrides all other suppression parameters
+    ,string                     pKeyversion                 = 'qa'  // which version of the key to pull?  makes it easy to test other key versions without sandboxing
   ) :=
   function
     
@@ -172,7 +173,13 @@ MODULE
 		allowCodeBmap       := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 		marketingSuppressed := kFetched(BIPV2.mod_sources.src2bmap(source) & allowCodeBmap <> 0);    
     
-    return  if(pApplyMarketingSuppression = true  ,marketingSuppressed  ,kFetched);						
+    ds_fetched_out := project(ds_fetched  ,transform(recordof(kFetched),self := left,self := []));
+    
+    
+    return  map(   pReturnFullKey             = true  =>  ds_fetched_out           
+                  ,pApplyMarketingSuppression = true  =>  marketingSuppressed  
+                  ,                                       kFetched
+            );						
 
   end;
 

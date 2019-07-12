@@ -88,7 +88,7 @@ END;
 ////** get all dids for latest hhid_relat
 didRec joinByHHid(inRec L, key_hhid R) := TRANSFORM
 	 SELF.i_uniqueid := L.i_uniqueid;
-	 SELF.did := IF(R.did = L.did,SKIP,R.did);
+	 SELF.did := IF(R.did = L.i_lexid,SKIP,R.did);
  END;
 
 
