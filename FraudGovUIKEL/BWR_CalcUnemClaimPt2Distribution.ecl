@@ -15,7 +15,7 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
 		// Nate Attributes 
 		// Claim attributes
 		// Business Account attributes
-		shared ds_BusAcctUnemClmAcctCurActiveCnt := fn_macro(ds, 'BusAcctUnemClmAcctCurActiveCnt', Bus_Acct_Unem_Clm_Acct_Cur_Active_Cnt_);
+		shared ds_BusAcctUnemClmAcctCurrActiveCnt := fn_macro(ds, 'BusAcctUnemClmAcctCurrActiveCnt', Bus_Acct_Unem_Clm_Acct_Cur_Active_Cnt_);
 		
 		shared ds_BusAcctUnemClmAcctFiledCntEv := fn_macro(ds, 'BusAcctUnemClmAcctFiledCntEv', Bus_Acct_Unem_Clm_Acct_Filed_Cnt_Ev_);
 		shared ds_BusAcctUnemClmAcctFiledCnt1Y := fn_macro(ds, 'BusAcctUnemClmAcctFiledCnt1Y', Bus_Acct_Unem_Clm_Acct_Filed_Cnt1_Y_);
@@ -36,7 +36,7 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
 		shared ds_BusAcctLexIDMultiUnemClmCnt30D := fn_macro(ds, 'BusAcctLexIDMultiUnemClmCnt30D', Bus_Acct_Lex_I_D_Multi_Unem_Clm_Cnt30_D_);
 		
 		// Legal business attributes
-		shared ds_BusUnemClmAcctCurActiveCnt := fn_macro(ds, 'BusUnemClmAcctCurActiveCnt', Bus_Unem_Clm_Acct_Cur_Active_Cnt_);
+		shared ds_BusUnemClmAcctCurrActiveCnt := fn_macro(ds, 'BusUnemClmAcctCurrActiveCnt', Bus_Unem_Clm_Acct_Cur_Active_Cnt_);
 		shared ds_BusUnemClmAcctFiledCntEv := fn_macro(ds, 'BusUnemClmAcctFiledCntEv', Bus_Unem_Clm_Acct_Filed_Cnt_Ev_);
 		shared ds_BusUnemClmAcctFiledCnt1Y := fn_macro(ds, 'BusUnemClmAcctFiledCnt1Y', Bus_Unem_Clm_Acct_Filed_Cnt1_Y_);
 		shared ds_BusUnemClmAcctFiledCnt120D := fn_macro(ds, 'BusUnemClmAcctFiledCnt120D', Bus_Unem_Clm_Acct_Filed_Cnt120_D_);
@@ -56,11 +56,11 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
 		shared ds_BusLexIDMultiUnemClmCnt30D := fn_macro(ds, 'BusLexIDMultiUnemClmCnt30D', Bus_Lex_I_D_Multi_Unem_Clm_Cnt30_D_);
 
 
-		SHARED ds_All := 	ds_BusAcctUnemClmAcctCurActiveCnt + 
+		SHARED ds_All := 	ds_BusAcctUnemClmAcctCurrActiveCnt + 
 											ds_BusAcctUnemClmAcctFiledCntEv + ds_BusAcctUnemClmAcctFiledCnt1Y + ds_BusAcctUnemClmAcctFiledCnt120D + ds_BusAcctUnemClmAcctFiledCnt90D + ds_BusAcctUnemClmAcctFiledCnt30D + 
 											ds_BusAcctUnemClmLexIDFiledCntEv + ds_BusAcctUnemClmLexIDFiledCnt1Y + ds_BusAcctUnemClmLexIDFiledCnt120D + ds_BusAcctUnemClmLexIDFiledCnt90D + ds_BusAcctUnemClmLexIDFiledCnt30D + 
 											ds_BusAcctLexIDMultiUnemClmCntEv + ds_BusAcctLexIDMultiUnemClmCnt1Y + ds_BusAcctLexIDMultiUnemClmCnt120D + ds_BusAcctLexIDMultiUnemClmCnt90D + ds_BusAcctLexIDMultiUnemClmCnt30D + 
-											ds_BusUnemClmAcctCurActiveCnt + ds_BusUnemClmAcctFiledCntEv + ds_BusUnemClmAcctFiledCnt1Y + ds_BusUnemClmAcctFiledCnt120D + ds_BusUnemClmAcctFiledCnt90D + ds_BusUnemClmAcctFiledCnt30D + 
+											ds_BusUnemClmAcctCurrActiveCnt + ds_BusUnemClmAcctFiledCntEv + ds_BusUnemClmAcctFiledCnt1Y + ds_BusUnemClmAcctFiledCnt120D + ds_BusUnemClmAcctFiledCnt90D + ds_BusUnemClmAcctFiledCnt30D + 
 											ds_BusUnemClmLexIDFiledCntEv + ds_BusUnemClmLexIDFiledCnt1Y + ds_BusUnemClmLexIDFiledCnt120D + ds_BusUnemClmLexIDFiledCnt90D + ds_BusUnemClmLexIDFiledCnt30D + 
 											ds_BusLexIDMultiUnemClmCntEv + ds_BusLexIDMultiUnemClmCnt1Y + ds_BusLexIDMultiUnemClmCnt120D + ds_BusLexIDMultiUnemClmCnt90D + ds_BusLexIDMultiUnemClmCnt30D;
 
@@ -81,7 +81,7 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
 		ENDMACRO;
 		
 		
-		shared dsSeleBusUnemClmAcctCurActiveCnt := fn_seleCheck(ds, 'BusUnemClmAcctCurActiveCnt', Bus_Unem_Clm_Acct_Cur_Active_Cnt_);
+		shared dsSeleBusUnemClmAcctCurrActiveCnt := fn_seleCheck(ds, 'BusUnemClmAcctCurrActiveCnt', Bus_Unem_Clm_Acct_Cur_Active_Cnt_);
 		shared dsSeleBusUnemClmAcctFiledCntEv := fn_seleCheck(ds, 'BusUnemClmAcctFiledCntEv', Bus_Unem_Clm_Acct_Filed_Cnt_Ev_);
 		shared dsSeleBusUnemClmAcctFiledCnt1Y := fn_seleCheck(ds, 'BusUnemClmAcctFiledCnt1Y', Bus_Unem_Clm_Acct_Filed_Cnt1_Y_);
 		shared dsSeleBusUnemClmAcctFiledCnt120D := fn_seleCheck(ds, 'BusUnemClmAcctFiledCnt120D', Bus_Unem_Clm_Acct_Filed_Cnt120_D_);
@@ -101,7 +101,7 @@ EXPORT BWR_CalcUnemClaimPt2Distribution := MODULE
 		shared dsSeleBusLexIDMultiUnemClmCnt30D := fn_seleCheck(ds, 'BusLexIDMultiUnemClmCnt30D', Bus_Lex_I_D_Multi_Unem_Clm_Cnt30_D_);
 		
 		
-		SHARED dsSeleChecks := dsSeleBusUnemClmAcctCurActiveCnt + dsSeleBusUnemClmAcctFiledCntEv + dsSeleBusUnemClmAcctFiledCnt1Y + dsSeleBusUnemClmAcctFiledCnt120D + dsSeleBusUnemClmAcctFiledCnt90D + dsSeleBusUnemClmAcctFiledCnt30D + 
+		SHARED dsSeleChecks := dsSeleBusUnemClmAcctCurrActiveCnt + dsSeleBusUnemClmAcctFiledCntEv + dsSeleBusUnemClmAcctFiledCnt1Y + dsSeleBusUnemClmAcctFiledCnt120D + dsSeleBusUnemClmAcctFiledCnt90D + dsSeleBusUnemClmAcctFiledCnt30D + 
 													 dsSeleBusUnemClmLexIDFiledCntEv + dsSeleBusUnemClmLexIDFiledCnt1Y + dsSeleBusUnemClmLexIDFiledCnt120D + dsSeleBusUnemClmLexIDFiledCnt90D + dsSeleBusUnemClmLexIDFiledCnt30D + 
 													 dsSeleBusLexIDMultiUnemClmCntEv + dsSeleBusLexIDMultiUnemClmCnt1Y + dsSeleBusLexIDMultiUnemClmCnt120D + dsSeleBusLexIDMultiUnemClmCnt90D + dsSeleBusLexIDMultiUnemClmCnt30D;
 		
