@@ -33,6 +33,7 @@ end;
 export t_CollectionMetadata := record
   string Name {xpath('Name')};
   integer RecordCount {xpath('RecordCount')};
+  string KeyAttribute {xpath('KeyAtribute')};
   string DateField {xpath('DateField')};
   t_EclLayout EclLayout {xpath('EclLayout')};
 end;
@@ -44,6 +45,7 @@ end;
     
 export t_CollectionReportResult := record
   t_CollectionReportBy InputEcho {xpath('InputEcho')};
+  string LexId {xpath('LexId')};
   string LNPID {xpath('LNPID')};
   string RoxieCluster {xpath('RoxieCluster')};
   dataset(t_Collection) Collections {xpath('Collections/Collection'), MAXCOUNT(iesp.Constants.CollectionReport.MaxCollections)};
