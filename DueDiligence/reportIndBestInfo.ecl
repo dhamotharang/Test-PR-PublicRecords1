@@ -24,7 +24,7 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
 																			'SELF.Residential_OR_Business_Ind_Best := RIGHT.Residential_OR_Business_Ind;'));
                                       SELF := LEFT,
                                       SELF := []), LEFT outer, 
-                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+                          KEEP(DueDiligence.Constants.MAX_ATMOST_1));
 			return addKeyAddr1History;
 		ENDMACRO;
 		//get Residential_OR_Business_Ind for Advo.Lookup_Descriptions.fn_resbus
