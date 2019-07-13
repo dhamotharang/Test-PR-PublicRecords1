@@ -1,16 +1,9 @@
-﻿IMPORT      data_services,doxie;
+﻿IMPORT      data_services,dx_Header;
 
-EXPORT      Key_Addr_Unique_Expanded(boolean isFCRA=false) := FUNCTION
+EXPORT      Key_Addr_Unique_Expanded(boolean isFCRA=false) := 
 
-            location        := data_services.Data_location.prefix('person_header');
-            keynameNfcra    := 'thor_data400::key::header::qa::addr_unique_expanded';	
-            keyname_fcra    := 'thor_data400::key::fcra::header::qa::addr_unique_expanded';
-            keyname         := if(isFCRA,keyname_fcra,keynameNfcra);
-            ds              := dataset(location+keyname,Header.Layout_addr_ind_full,thor);
+            if(isFCRA,
+                        dx_Header.Key_Addr_Unique_Expanded(data_services.data_env.iFCRA),
+                        dx_Header.Key_Addr_Unique_Expanded()
 
-            layout_key      := {ds.did};
-            layout_payload  := {ds};
-
-            RETURN      INDEX(ds, layout_key, layout_payload,	location+keyname);
-            
-END;
+            ):DEPRECATED('Use dx_Header.Key_Addr_Unique_Expanded');

@@ -1,4 +1,4 @@
-import data_services,doxie;
+import data_services,doxie,header;
 
 export key_addr_hist(boolean isFCRA=false) := function
 
@@ -13,4 +13,4 @@ address_ind :=index(ds,{ds.s_did},{ds}
 
 return address_ind;
 
-end;
+end:DEPRECATED('Please MIGRATE usage to dx_Header.Key_Addr_Unique_Expanded');
