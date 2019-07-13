@@ -1,9 +1,9 @@
 ﻿import lib_fileservices, ut, header_services, doxie,_Control,header, Data_Services,Watchdog_V2;
 
-GlbnonExperiannonEquifaxLayout := RECORD
-Watchdog.Layout_Key-[__filepos];
-unsigned8 filepos;
-END;
+GlbnonExperiannonEquifaxLayout := record
+	watchdog.Layout_Best;
+    unsigned integer8 __filepos { virtual(fileposition)};
+end;
 
 
 Parms := Module(Watchdog_V2.UniversalKeyInterface)

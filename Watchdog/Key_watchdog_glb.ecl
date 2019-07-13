@@ -1,10 +1,9 @@
 ﻿import Watchdog_V2,doxie,Data_Services,dx_BestRecords;
 
-
-GlbLayout := RECORD
-Watchdog.Layout_Key-[__filepos];
-unsigned8 filepos;
-END;
+GlbLayout := record
+	watchdog.Layout_Best;
+    unsigned integer8 __filepos { virtual(fileposition)};
+end;
 
 
 

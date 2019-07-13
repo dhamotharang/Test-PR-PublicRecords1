@@ -1,9 +1,9 @@
 ﻿import ut,doxie,watchdog_V2,header,mdr,header_services,_Control, Data_Services;
 
-GlbnonEquifaxnonblankLayout := RECORD
-Watchdog.Layout_Key-[__filepos];
-unsigned8 filepos;
-END;
+GlbnonEquifaxnonblankLayout := record
+	watchdog.Layout_Best;
+    unsigned integer8 __filepos { virtual(fileposition)};
+end;
 
  
 Parms := Module(Watchdog_V2.UniversalKeyInterface)

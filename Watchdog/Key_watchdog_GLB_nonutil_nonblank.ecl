@@ -1,9 +1,9 @@
 ﻿IMPORT doxie,data_services,Watchdog_V2;
 
-GlbnonutilnonblankLayout := RECORD
-Watchdog.Layout_Key-[__filepos];
-unsigned8 filepos;
-END;
+GlbnonutilnonblankLayout := record
+	watchdog.Layout_Best;
+    unsigned integer8 __filepos { virtual(fileposition)};
+end;
 
 
 Parms := Module(Watchdog_V2.UniversalKeyInterface)
