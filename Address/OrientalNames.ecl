@@ -1,4 +1,4 @@
-export OrientalNames := MODULE
+﻿export OrientalNames := MODULE
 /*
 	includes Chinese Mandarin and Cantonese names
 	plus related languages including Korean and Vietnamese
@@ -437,67 +437,67 @@ shared VietnameseNames := DATASET([
 ],	{string20 name, string1 gender}) : GLOBAL(FEW);
 
 shared set of string20 VietnameseSurnames := [
-'AI-TAN-GIAC-LA',			//	Ãi-tÃ¢n-giÃ¡c-la
+'AI-TAN-GIAC-LA',			//	Ái-tân-giác-la
 'A-SU-NA',						//	A-s?-na
-'BACH LY',						//	BÃ¡ch LÃ½
-'BOT NHI CHI CAN',		//	B?t Nhi Ch? CÃ¢n
+'BACH LY',						//	Bách Lý
+'BOT NHI CHI CAN',		//	B?t Nhi Ch? Cân
 'THUAN-VU',						//	Thu?n-vu
 'DE-NGU',							//	??-ng?
-'DONG-PHUONG',				//	?Ã´ng-ph??ng
-'DONG-CAC',						//	?Ã´ng-cÃ¡c
-'DONG-QUACH',					//	?Ã´ng-quÃ¡ch
-'DONG-MON',						//	?Ã´ng-mÃ´n
+'DONG-PHUONG',				//	?ông-ph??ng
+'DONG-CAC',						//	?ông-các
+'DONG-QUACH',					//	?ông-quách
+'DONG-MON',						//	?ông-môn
 'DOAN-MOC',						//	?oan-m?c
-'DOC-CO',							//	??c-cÃ´
-'CONG-TON',						//	CÃ´ng-tÃ´n
-'CONG-DUONG',					//	CÃ´ng-d??ng
-'CONG-DA',						//	CÃ´ng-dÃ£
-'CONG-TAY',						//	CÃ´ng-tÃ¢y
-'QUAN-KHAU',					//	QuÃ¡n-khÃ¢u
+'DOC-CO',							//	??c-cô
+'CONG-TON',						//	Công-tôn
+'CONG-DUONG',					//	Công-d??ng
+'CONG-DA',						//	Công-dã
+'CONG-TAY',						//	Công-tây
+'QUAN-KHAU',					//	Quán-khâu
 'COC-LUONG',					//	C?c-l??ng
 'HA-LAN',							//	H?-lan
-'HACH-LIEN',					//	HÃ¡ch-liÃªn
-'HACH-XA-LY',					//	HÃ¡ch-xÃ¡-lÃ½
+'HACH-LIEN',					//	Hách-liên
+'HACH-XA-LY',					//	Hách-xá-lý
 'HA-NHUOC',						//	H?-nh??c
-'HOANG-PHU',					//	HoÃ ng-ph?
-'HO-DIEN',						//	HÃ´-diÃªn
+'HOANG-PHU',					//	Hoàng-ph?
+'HO-DIEN',						//	Hô-diên
 'LENH-HO',						//	L?nh-h?
-'LO-LY',							//	L?-lÃ½
-'LU-KHAU',						//	L?-khÃ¢u
+'LO-LY',							//	L?-lý
+'LU-KHAU',						//	L?-khâu
 'MAC-KY',							//	M?c-k?
 'MO-DUNG',						//	M?-dung
 'NAP-LAN',						//	N?p-lan
 'NAM-CUNG',						//	Nam-cung
-'AU-DUONG',						//	Ã‚u-d??ng
+'AU-DUONG',						//	Âu-d??ng
 'SA-TRA',							//	Sa-tra
 'THUONG-QUAN',				//	Th??ng-quan
-'THAN-DO',						//	ThÃ¢n-??
-'TU-MA',							//	T?-mÃ£
+'THAN-DO',						//	Thân-??
+'TU-MA',							//	T?-mã
 'TU-DO',							//	T?-??
-'TU-KHONG',						//	T?-khÃ´ng
+'TU-KHONG',						//	T?-không
 'TU-KHAU',						//	T?-kh?u
-'THAI-SU',						//	ThÃ¡i-s?
-'DAM-THAI',						//	?Ã m-thÃ¡i
-'THAC-BAT',						//	ThÃ¡c-b?t
-'HOAN-NHAN',					//	HoÃ n-nhan
-'VAN-NHAN',						//	V?n-nhÃ¢n
-'NGO-MA',							//	Ng?-mÃ£
+'THAI-SU',						//	Thái-s?
+'DAM-THAI',						//	?àm-thái
+'THAC-BAT',						//	Thác-b?t
+'HOAN-NHAN',					//	Hoàn-nhan
+'VAN-NHAN',						//	V?n-nhân
+'NGO-MA',							//	Ng?-mã
 'HA-HAU',							//	H?-h?u
-'TIEN-VU',						//	TiÃªn-vu
-'TAY-MON',						//	TÃ¢y-mÃ´n
-'HIEN-VIEN',					//	HiÃªn-viÃªn
+'TIEN-VU',						//	Tiên-vu
+'TAY-MON',						//	Tây-môn
+'HIEN-VIEN',					//	Hiên-viên
 'DUONG-TU',						//	D??ng-t?
 'GIA-LUAT',						//	Gia-lu?t
-'NHAC-CHINH',					//	Nh?c-chÃ­nh
-'UY-TRI',							//	Ãšy-trÃ¬
+'NHAC-CHINH',					//	Nh?c-chính
+'UY-TRI',							//	Úy-trì
 'VU-VAN',							//	V?-v?n
-'TRUONG-TON',					//	Tr??ng-tÃ´n
+'TRUONG-TON',					//	Tr??ng-tôn
 'CHUNG-LY',						//	Chung-ly
-'CHU-CAT',						//	Ch?-cÃ¡t (Gia-cÃ¡t)
+'CHU-CAT',						//	Ch?-cát (Gia-cát)
 'GIA-CAT',
-'CHUC-DUNG',					//	ChÃºc-dung
+'CHUC-DUNG',					//	Chúc-dung
 'TU-CU',							//	T?-c?
-'TA-NHAN'							//	T?-nhÃ¢n
+'TA-NHAN'							//	T?-nhân
 ];
 
 shared ThaiNames := DATASET([
@@ -1506,7 +1506,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'TRAU',
 'CHU',
 'SU',
-'SHÃ',
+'SHÍ',
 'SHIH',
 'SEK',
 'SHEK',
@@ -1761,7 +1761,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'REI',
 'RYEO',
 'FU',
-'XÃNG',
+'XÍNG',
 'HSING',
 'JING',
 'YING',
@@ -1816,7 +1816,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'LINGHU',
 'LULI',
 'LUQIU',
-'MOQÃ',
+'MOQÍ',
 'MURONG',
 'NALAN',
 'NANGONG',
@@ -1841,7 +1841,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'XUANYUAN',
 'YANGZI',
 'YELU',
-'YUEZHÃˆNG',
+'YUEZHENG',
 'YUCHI',
 'YUWEN',
 'ZHANGSUN',
@@ -1864,16 +1864,6 @@ shared SET of STRING20 ChineseFirstnames := SET(SORT(ChineseNames,name,gender), 
 shared SET of STRING20 ThaiFirstnames := SET(SORT(ThaiNames,name,gender), name);
 shared SET of STRING20 KoreanFirstnames := SET(SORT(KoreanNames,name,gender), name);
 shared SET of STRING20 VietnameseFirstnames := SET(SORT(VietnameseNames,name,gender), name);
-
-
-shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(OrientalBoys);
-shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(OrientalGirls);	
-shared SET OF STRING32 FirstNames := Address.TokenManagement.SortAndTerminateSet(OrientalFirstnames);	
-shared SET OF STRING32 surnameTokens := Address.TokenManagement.SortAndTerminateSet(OrientalSurnames);	
-shared SET OF STRING32 ChineseSurnameTokens := Address.TokenManagement.SortAndTerminateSet(ChineseSurnames);	
-shared SET OF STRING32 ChineseNameTokens := Address.TokenManagement.SortAndTerminateSet(ChineseFirstnames);	
-
-
 
 export dsAsianSurnames := SORT(DATASET(OrientalSurnames, {string20 name}),name);
 export dsAsianGivennames := SORT(PROJECT(OrientalNames, {string20 name}),name);

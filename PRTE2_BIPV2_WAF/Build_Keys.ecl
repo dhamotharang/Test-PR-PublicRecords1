@@ -1,7 +1,8 @@
-﻿import doxie, tools, BIPV2, VersionControl, Roxiekeybuild, wk_ut;
+﻿import _control, doxie, tools, BIPV2, VersionControl, PRTE, Roxiekeybuild, wk_ut;
 
 export Build_Keys (string 		pversion
-									 ,boolean 	pIsTesting = false
+									 ,boolean 	pIsTesting 				= false
+									 ,boolean		pShouldUpdateDOPS	= true
 									) :=
 module
 
@@ -17,9 +18,23 @@ module
 						 //,Promote(pversion).BuildKeyFiles.Built2QA
 						): success(output('PRTE2_BIPV2_WAF Build completed successfully')), failure(output('PRTE2_BIPV2_WAF Build failed'));
 		
+	export update_dops_WAFKeys :=	iff(pShouldUpdateDOPS, 
+																		PRTE.UpdateVersion(
+																			'BIPV2WAFKeys'											//	Package name
+																			,pversion														//	Package version
+																			,_control.MyInfo.EmailAddressNormal	//	Who to email with specifics
+																			,'B'																//  inloc - 'B' - Boca, 'A' - Alpharetta
+																			,'N'																//	N = Non-FCRA, F = FCRA
+																			,'N'                                //	N = Do not also include boolean, Y = Include boolean, too
+																		)
+																 );
+	
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
-		,full_build
+		,sequential(
+				 full_build
+				,update_dops_WAFKeys
+		 )
 		,output('No Valid version parameter passed, skipping PRTE2_BIPV2_WAF.Build_Keys atribute')
 	);
 

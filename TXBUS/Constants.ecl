@@ -1,6 +1,11 @@
+﻿
 export Constants := module
 
-   export Cluster := '~thor_data400::';
+   export Cluster := '~thor_data400::';   
+	 
+	 export cleaned_name := '~thor_data400::in::txbus::qa::Clean_updates::Superfile';
+	 
+	 export base_name := '~thor_data400::base::txbus::basefile';
    
    export autokey_logical(string filedate) := '~thor_data400::key::txbus::'+ filedate + '::autokey::';
    

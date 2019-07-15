@@ -1,11 +1,11 @@
-import BIPV2, doxie,ut;
+﻿import BIPV2, doxie,ut;
 
 export Key_Calbus_LinkIDS := MODULE
 
   // DEFINE THE INDEX
 	shared superfile_name		:= CALBUS.Constants.key_qa_name + 'linkids';
 
-	shared Base							:= CALBUS.File_Calbus_Base;
+	shared Base							:= PROJECT(Calbus.File_Calbus_Base, transform(Calbus.Layouts_Calbus.Layout_Base-sub_account_number-account_type, self:=left));
 
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	export Key := k;

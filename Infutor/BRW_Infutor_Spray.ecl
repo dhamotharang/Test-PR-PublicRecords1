@@ -1,12 +1,15 @@
-import infutor, _Control;
+﻿import infutor,_Control;
 
-STRING filedate := infutor.version_dev;
-#workunit('name','Infutor Spray - '+infutor.version_dev);
-#OPTION('AllowedClusters','hthor');
+EXPORT BRW_Infutor_Spray(STRING9 filedate) := FUNCTION
 
-#OPTION('multiplePersistInstances',FALSE);
-                                                       
- SEQUENTIAL(
+#Workunit('name','Yogurt:Trackerplus'+filedate);
+#Workunit('priority','high');
+#Workunit('priority',10);
+#Workunit('protect',TRUE);
+#option('multiplePersistInstances',FALSE);
+
+                                                      
+ return SEQUENTIAL(
                                              
 infutor.fSprayInputFiles(_Control.IPAddress.bctlpedata11,'/data/data_lib_2_hus2/infutor/in/CRD_AK.txt','~thor_dell400::in::infutor::' + filedate + '::AK') 
 ,infutor.fSprayInputFiles(_Control.IPAddress.bctlpedata11,'/data/data_lib_2_hus2/infutor/in/CRD_AL.txt','~thor_dell400::in::infutor::' + filedate + '::AL') 
@@ -61,3 +64,5 @@ infutor.fSprayInputFiles(_Control.IPAddress.bctlpedata11,'/data/data_lib_2_hus2/
  ,infutor.fSprayInputFiles(_Control.IPAddress.bctlpedata11,'/data/data_lib_2_hus2/infutor/in/CRD_WV.txt','~thor_dell400::in::infutor::' + filedate + '::WV')
  ,infutor.fSprayInputFiles(_Control.IPAddress.bctlpedata11,'/data/data_lib_2_hus2/infutor/in/CRD_WY.txt','~thor_dell400::in::infutor::' + filedate + '::WY')
 );
+  
+END;

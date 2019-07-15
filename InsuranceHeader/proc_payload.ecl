@@ -5,7 +5,7 @@ IMPORT HEADER,doxie_build,ut,header_services,YellowPages,PromoteSupers,RoxieKeyB
 
 EXPORT proc_payload(STRING8 filedate)  := FUNCTION
 
-  Header_base := DISTRIBUTE(HEADER.Last_Rollup,HASH(did)):PERSIST('thor_data::header::base_insuranceheader'); 
+  Header_base := DISTRIBUTE(HEADER.Last_Rollup(filedate),HASH(did)):PERSIST('thor_data::header::base_insuranceheader'); 
   //Header_base := DISTRIBUTE(dataset('~thor400_44::persist::last_rollup__p4148703418', header.layout_header, flat),HASH(did)); 
   ut.mac_suppress_by_phonetype(Header_base,phone,st,phone_suppression,true,did);
 

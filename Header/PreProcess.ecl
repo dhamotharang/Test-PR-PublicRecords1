@@ -1,4 +1,4 @@
-import header, address, ut, doxie, header_quick, AID, idl_header, Nid;
+﻿import header, address, ut, doxie, header_quick, AID, idl_header, Nid;
 export preprocess(boolean pFastHeader=false) := function
 
 monthly_data := Files_SeqdSrc(pFastHeader).EQ;
@@ -329,7 +329,8 @@ map_to_new_rec_layout := project(deduped_hdrs,t_map_to_new_rec_layout(left));
 
 did_monthly0 := header_quick.FN_DID(map_to_new_rec_layout);
 
-did_monthly:=fn_Not_Primary_EQ(did_monthly0) : persist('~thor_data400::persist::header_preprocess_did');
+did_monthly:=fn_Not_Primary_EQ(did_monthly0) : persist('~thor_data400::persist::header_preprocess_did'+
+													if(pFastHeader,'','_header'));
 
 return did_monthly;
 end;

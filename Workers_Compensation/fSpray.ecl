@@ -9,7 +9,7 @@ export fSpray(string filedate)	:=	function
 								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/','*.csv')(size>0)) >0,
 								FileServices.SprayVariable(_control.IPAddress.bctlpedata11,
 								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/'+'*.csv',
-								,'\t',,,'thor400_66',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,true));
+								,'\t',,,'thor400_36',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,true));
 																			
 	addSuper :=	if (COUNT(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata11,
 								'/data/hds_180/SIM/Workers_Compensation/'+filedate+'/','*.csv')(size>0)) >0,

@@ -1,5 +1,5 @@
-// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
-#workunit('name','map_MNS0869_conversion'); 
+﻿// MNS0869 / Minnesotas Bookstore /	Real Estate // raw data to common layout for MARI and PL use
+#workunit('name','Yogurt: map_MNS0869_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
@@ -42,7 +42,7 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 	ut.CleanFields(ValidFile,clnValidFile);
 	
 	maribase_plus_dbas := RECORD,MAXLENGTH(5200)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba;
 		STRING60 dba1;
 		STRING60 dba2;
@@ -623,7 +623,7 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 			SELF.NAME_ORG_SUFX	:= StringLib.StringFilterOut(L.NAME_ORG_SUFX, '.');
 			TrimDBASufx			:= MAP(REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => StringLib.StringFindReplace(L.TMP_DBA,'CO',''),
 												 NOT REGEXFIND('([Cc][Oo][\\.]?)$',L.TMP_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanFName(L.TMP_DBA), 
@@ -644,7 +644,7 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 	oLookup := OUTPUT(SORT(company_only_lookup,license_nbr));
 	
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;
@@ -654,7 +654,7 @@ EXPORT map_MNS0869_conversion(STRING pVersion) := FUNCTION
 										AND LEFT.AFFIL_TYPE_CD IN ['IN', 'BR'],
 										 assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);																		
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'THIS IS NOT A MAIN OFFICE.  IT IS A BRANCH OFFICE WITHOUT AN ASSOCIATED MAIN OFFICE FROM THIS SOURCE.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

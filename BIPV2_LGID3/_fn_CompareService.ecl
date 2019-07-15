@@ -1,37 +1,28 @@
-import BIPV2_LGID3,tools;
-
+﻿import BIPV2_LGID3,tools;
 EXPORT _fn_CompareService(
-
    unsigned6  pLgid31
   ,unsigned6  pLgid32
   ,string     pversion = 'qa'
   
 ) :=
 function
-
 //  version               := pversion;
   unsigned8 Lgid3one   := IF( pLgid31>pLgid32, pLgid31, pLgid32 );
   unsigned8 Lgid3two   := IF( pLgid31>pLgid32, pLgid32, pLgid31 );
-
   BFile := BIPV2_LGID3.In_LGID3;
   kFile := BIPV2_LGID3.Keys2(BFile,pversion);
-
   odl   := PROJECT(CHOOSEN(KFile.Candidates(Lgid3=Lgid3one),100000),BIPV2_LGID3.match_candidates(BFile).layout_candidates);
   odr   := PROJECT(CHOOSEN(KFile.Candidates(Lgid3=Lgid3Two),100000),BIPV2_LGID3.match_candidates(BFile).layout_candidates);
   k     := KFile.Specificities_Key;
   s     := GLOBAL(PROJECT(k,BIPV2_LGID3.Layout_Specificities.R)[1]);
   odlv  := BIPV2_LGID3.Debug(BFile,s).RolledEntities(odl);
   odrv  := BIPV2_LGID3.Debug(BFile,s).RolledEntities(odr);
-
-  mtch := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,LGID3one,LGID3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches));
-
-  // BIPV2_LGID3.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
-    // SELF := le;
-  // END;
-
-  // am    := PROJECT(KFile.Attribute_Matches(Lgid31=Lgid3one,Lgid32=Lgid3two)+KFile.Attribute_Matches(Lgid31=Lgid3two,Lgid32=Lgid3one),ainto(LEFT));
-  // mtch  := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Lgid3one,Lgid3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches),am);
-
+  // mtch := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,LGID3one,LGID3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches));
+  BIPV2_LGID3.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
+    SELF := le;
+  END;
+  am    := PROJECT(KFile.Attribute_Matches(Lgid31=Lgid3one,Lgid32=Lgid3two)+KFile.Attribute_Matches(Lgid31=Lgid3two,Lgid32=Lgid3one),ainto(LEFT));
+  mtch  := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Lgid3one,Lgid3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches),am);
   // get layout with the scores only for easier reading
   dnorm_specs_filt2 := BIPV2_LGID3._fn_normscores(mtch);
  
@@ -45,13 +36,11 @@ function
     ,self.rid					:= counter
   ));
   dnorm_specs_filt := sort(dnorm_specs((unsigned)fieldvalue != 0),rid);
-
   ///////////
   //--norm all fields, trying to group them better into child datasets per field so easier to see
   ///////////
   layouttools2 := tools.macf_LayoutTools(recordof(mtch),false,'',true);
   mtch_score2  := project(mtch,layouttools2.layout_record);
-
   // layspecs := {unsigned rid,string fieldname,string fieldvalue};
   dnorm_specs2 := normalize(mtch,count(layouttools2.setAllFields),transform({unsigned rollupid,layspecs}
     ,self.fieldname 	:= layouttools2.fGetFieldName(counter);
@@ -59,7 +48,6 @@ function
     ,self.rid					:= counter
     ,self.rollupid    := 0;
   ));
-
   diterate          := iterate(sort(group(dnorm_specs2),rid),transform(recordof(left),self.rollupid := if(regexfind('^left_|^support_',right.fieldname,nocase) and not regexfind('^support_',left.fieldname,nocase),right.rid  ,left.rollupid ) ,self := right ));
   dproj             := project(diterate,transform({unsigned rid,unsigned rollupid,dataset(layspecs - rid) child},self := left,self.child := dataset([{left.fieldname,left.fieldvalue}],layspecs - rid)));
   drollup           := rollup(sort(dproj,rid),left.rollupid = right.rollupid,transform(recordof(left),self.child := left.child + right.child,self := left));
@@ -78,7 +66,6 @@ function
 // 24 24 right_hist_enterprise_number  
 // 24 23 hist_enterprise_number_score 0 
 // 23 22 left_hist_enterprise_number 
-
   return 
   parallel(
      // output( Lgid3one              ,named('Lgid3one'                    ))
@@ -93,7 +80,6 @@ function
 //    ,OUTPUT( odl + odr              ,NAMED('Lgid3BothRecords'         ))
     ,OUTPUT( odl                    ,NAMED('Lgid3OneRecords'          ))
     ,OUTPUT( odr                    ,NAMED('Lgid3TwoRecords'          ))
-
     // ,OUTPUT( dnorm_specs2           ,NAMED('RecordMatchesNormScores2'   ),all)
     // ,OUTPUT( diterate               ,NAMED('RecordMatchesIterate'       ),all)
     // ,OUTPUT( dproj                  ,NAMED('RecordMatchesIProj'         ),all)
@@ -103,5 +89,4 @@ function
     // ,OUTPUT( dproj2                 ,NAMED('RecordMatchesProj2'         ),all)
     // ,OUTPUT( dproj3                 ,NAMED('RecordMatchesProj3'         ),all)
   );
-
 end;

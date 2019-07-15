@@ -1,4 +1,4 @@
-export fn_sprayInputfiles(sourceIP,sourcefile,filedate,st,cty,oftype,group_name='\'thor400_60\'',email_target='\' \'') := 
+﻿export fn_sprayInputfiles(sourceIP,sourcefile,filedate,st,cty,oftype,group_name='\'thor400_44\'',email_target='\' \'') := 
 macro
 #uniquename(spray_of)
 #uniquename(superfile_transaction)

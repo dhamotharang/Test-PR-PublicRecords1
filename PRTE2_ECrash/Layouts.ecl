@@ -1551,6 +1551,10 @@ EXPORT ecrashv2_accnbrv1 := RECORD
 	
 	//Appriss Integration
 	STRING1 Releasable;
+	
+	//Added 7/12/18 Jira DF-22370
+	STRING10 date_report_submitted;
+ 
   unsigned8 __internal_fpos__;
  END;
  

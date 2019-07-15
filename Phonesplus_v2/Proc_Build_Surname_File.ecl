@@ -1,5 +1,6 @@
-import Nid, Address, Gong, ut, Gong_Neustar;
+﻿import Nid, Address, Gong, ut, Gong_Neustar;
 
+export Proc_build_Surname_file (string pversion):= function
 boolean isGoodName(string lname) := LENGTH(TRIM(lname)) > 0 AND TRIM(stringlib.stringfilter(lname,'@.0123456789()"')) = '';
 f := Phonesplus_v2.File_Phonesplus_Base(current_rec and in_flag and glb_dppa_flag = '' and glb_dppa_all = '' and isGoodName(lname));
 
@@ -36,9 +37,13 @@ Gong.layout_historyaid map_common_layout(f_clean l) := transform
 f_Surname := project(f_clean(nametype='P',OrigName not in overrides,NOT REGEXFIND('\\b(FOR|UNLISTED|UNPUBLISHED|BLOCKED)\\b',OrigName)),map_common_layout(left));
 f_Surname_d := dedup(sort(f_Surname, record), all);
 
-ut.MAC_SF_BuildProcess(f_Surname_d,'~thor_data400::base::phonesplusv2_surname',surname_base,2,,true, Phonesplus_v2.version);
+ut.MAC_SF_BuildProcess(f_Surname_d,'~thor_data400::base::phonesplusv2_surname',surname_base,2,,true, pversion);
 
-export Proc_build_Surname_file := sequential(surname_base);
+
+
+return sequential(surname_base);
+
+end;
 
 
 

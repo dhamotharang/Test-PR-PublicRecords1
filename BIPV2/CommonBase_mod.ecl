@@ -1,4 +1,4 @@
-// This module is all about the BIP2 header layout.  It's meant to be referenced by
+﻿// This module is all about the BIP2 header layout.  It's meant to be referenced by
 // BIPV2.CommonBase and nothing else, but we don't really have a way to enforce that.
 IMPORT BIPV2, BIPV2_Company_Names, AID;
 EXPORT CommonBase_mod := MODULE
@@ -1612,5 +1612,13 @@ EXPORT CommonBase_mod := MODULE
   string1 address_type_derived;
   boolean is_vanity_name_derived;
  END;
+
 	EXPORT Layout_Static := Layout_S40;
+
+	EXPORT Layout := #IF(BIPV2._Config.BASE_LAYOUT_DYNAMIC)
+		Layout_Derived;
+	#ELSE
+		Layout_Static;
+	#END
+
 END;

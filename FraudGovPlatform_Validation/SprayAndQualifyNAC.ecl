@@ -1,62 +1,22 @@
-﻿IMPORT _Control,tools,STD,NAC,FraudGovPlatform;
+﻿IMPORT FraudGovPlatform,ut, lib_fileservices,Std;
+EXPORT SprayAndQualifyNAC( string pversion ) := FUNCTION
 
-EXPORT SprayAndQualifyNAC(
-	string pversion,
-	string ip = NAC.Constants.LandingZoneServer,
-	string rootDir = NAC.Constants.LandingZonePathBase + '/msh/done/', 
-	string destinationGroup = if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_30'))
-:= FUNCTION	
-	dsFileList:=nothor(FileServices.RemoteDirectory(ip, rootDir, 'FL_MSH_' + pversion[1..8] + '*.dat')):independent;
+	DateSearch := pVersion[1..8];
 
-	dsFileListSorted := sort(dsFileList,modified);
-	FileFound:=exists(dsFileListSorted);
+	sf := FraudGovPlatform.Filenames().Sprayed.NAC;
+	
+	FS:=fileservices;
+	
+	d := nothor(FS.LogicalFileList( 'nac::for_msh::fl_msh_'+DateSearch+'*.dat', TRUE, FALSE));
+	fn := d[1].name;
+	Customer_Settings := FraudGovPlatform.mbs_mappings(contribution_source = 'NAC');
 
-	UpSt := '';
-	UpType := 'NAC';
-
-	ReportFileFound:=if(FileFound
-						,output('Found File To Spray',named('Found_File_To_Spray'))
-						,output('No File To Spray',named('No_File_To_Spray'))
-						);
-						
-						
-	fname	:=dsFileListSorted[1].Name:independent;
-	FileSprayed := FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
-	NAC_Sprayed := FraudGovPlatform.Filenames().Sprayed.NAC;
-
-	IsEmptyFile:=dsFileListSorted[1].size = 0;
-
-	SprayIt:= sequential(
-							output('Spraying: '+ ip + rootDir + fname + ' -> ' + FileSprayed) ,
-							FileServices.SprayFixed(	
-							sourceIP								:=	ip,
-							sourcePath							:= rootDir + fname,
-							recordSize							:=	sizeof(NAC.Layouts.MSH),
-							destinationGroup					:=	destinationGroup,
-							destinationLogicalName			:=	FileSprayed,
-							compress								:=	true,
-							allowoverwrite						:=true),
-							fileservices.AddSuperfile(NAC_Sprayed,FileSprayed));	
-
-	ReportEmptyFile := 
-			SEQUENTIAL (	OUTPUT('File '+ip+rootDir + pversion +'/'+ fname+' empty',NAMED('File_empty')),
-								Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert);
-							
-	outputwork
-			:=
-				if(fname=''
-						,output('No new NAC file to process')
-						,sequential(
-											ReportFileFound
-											,if(FileFound,
-														if (IsEmptyFile,
-																	 ReportEmptyFile
-																	,SprayIt		 
-														)
-														,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileErrorAlert
-											)
-						)
-				):failure(Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FraudGov_Input_Prep_failure);
-
-	RETURN outputwork;							
+	copy := (string)(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ Customer_Settings[1].Customer_Account_Number + '_' + Customer_Settings[1].Customer_State + '_' + Customer_Settings[1].Customer_Agency_Vertical_Type + '_' + Customer_Settings[1].Customer_Program + '_' + trim(Customer_Settings[1].Contribution_Source) + '_' + DateSearch + '_' + Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S')):independent ;
+	outputwork  := sequential(
+		FS.StartSuperFileTransaction(),
+		nothor(FS.Copy('~'+fn,'thor400_44',copy, allowoverwrite := true)),
+		nothor(FS.AddSuperFile(sf, copy)),
+		FS.FinishSuperFileTransaction());
+	
+	RETURN outputwork;
 END;

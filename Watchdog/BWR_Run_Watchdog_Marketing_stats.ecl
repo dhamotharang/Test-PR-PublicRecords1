@@ -1,4 +1,4 @@
-//export BWR_Run_Watchdog_Marketing_stats := 'todo';
+﻿//export BWR_Run_Watchdog_Marketing_stats := 'todo';
 // Do not use this, un BRW_Watchdog_marketing_cron
 
 import watchdog;
@@ -12,9 +12,9 @@ string_rec := record
 end;
 */
 
-#workunit('name','Watchdog-marketing stats');
+#workunit('name','Yogurt:Watchdog-marketing stats');
 #workunit('priority','high');
-#workunit('priority','11');
+#workunit('priority',13);
 
 #stored ('watchtype', 'marketing'); 
 

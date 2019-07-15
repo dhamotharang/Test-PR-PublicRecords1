@@ -1,8 +1,8 @@
-IMPORT SALT37,std;
-EXPORT Key_InsuranceHeader_DLN(BOOLEAN incremental=FALSE) := MODULE
+﻿IMPORT SALT37,std;
+EXPORT Key_InsuranceHeader_DLN(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit= Config.DLN_MAXBLOCKLIMIT) := MODULE/*HACK25*/
  
 //DL_NBR:DL_STATE:?:MAINNAME:+:SSN5:SSN4:DERIVED_GENDER:SNAME:DOB
-EXPORT KeyName := KeyNames().DLN_super; /*HACK*/
+EXPORT KeyName := KeyNames().DLN_super; /*HACK10*/
  
 EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::DLN';
  
@@ -31,6 +31,7 @@ layout := RECORD // project out required fields
   h.DOB_day;
   h.DT_EFFECTIVE_FIRST;
   h.DT_EFFECTIVE_LAST;
+  h.DL_NBR_len;
   h.FNAME_len;
   h.MNAME_len;
   h.LNAME_len;
@@ -38,6 +39,7 @@ layout := RECORD // project out required fields
   h.SSN4_len;
 //Scores for various field components
   h.DL_NBR_weight100 ; // Contains 100x the specificity
+  INTEGER2 DL_NBR_e1_Weight100 := SALT37.Min0(h.DL_NBR_weight100 + 100*log(h.DL_NBR_cnt/h.DL_NBR_e1_cnt)/log(2)); // Precompute edit-distance specificity
   h.DL_STATE_weight100 ; // Contains 100x the specificity
   h.FNAME_weight100 ; // Contains 100x the specificity
   h.FNAME_MAINNAME_weight100 ; // Contains 100x the specificity
@@ -101,29 +103,31 @@ EXPORT MergeKeyFiles(STRING superFileIn, STRING outfileName, UNSIGNED4 minDate =
   fieldListPayload := 'IsIncremental';
   RETURN Process_xIDL_Layouts().MAC_GenerateMergedKey(superFileIn, outfileName, minDate, replaceExisting, fieldListIndex, fieldListPayload, 'Key');
 END;
+EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.DLN_MAXBLOCKLIMIT, aBlockLimit);/*HACK24a*/
 EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.DL_NBR <> (TYPEOF(le.DL_NBR))'' AND Fields.InValid_DL_NBR((SALT37.StrType)le.DL_NBR)=0 AND le.DL_STATE <> (TYPEOF(le.DL_STATE))'' AND Fields.InValid_DL_STATE((SALT37.StrType)le.DL_STATE)=0;
 KeyRec := RECORDOF(Key);
  
-EXPORT RawFetch(TYPEOF(h.DL_NBR) param_DL_NBR = (TYPEOF(h.DL_NBR))'',TYPEOF(h.DL_STATE) param_DL_STATE = (TYPEOF(h.DL_STATE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'') := 
+EXPORT RawFetch(TYPEOF(h.DL_NBR) param_DL_NBR = (TYPEOF(h.DL_NBR))'',TYPEOF(h.DL_NBR_len) param_DL_NBR_len = (TYPEOF(h.DL_NBR_len))'',TYPEOF(h.DL_STATE) param_DL_STATE = (TYPEOF(h.DL_STATE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'') := 
     STEPPED( LIMIT( Key(
           KEYED(( DL_NBR = param_DL_NBR AND param_DL_NBR <> (TYPEOF(DL_NBR))''))
       AND KEYED(( DL_STATE = param_DL_STATE AND param_DL_STATE <> (TYPEOF(DL_STATE))''))
-      AND (( (FNAME[1..LENGTH(TRIM(param_FNAME))] = param_FNAME OR param_FNAME[1..LENGTH(TRIM(FNAME))] = FNAME)  OR FNAME_PreferredName = fn_PreferredName(param_FNAME) OR metaphonelib.DMetaPhone1(FNAME)=metaphonelib.DMetaPhone1(param_FNAME) OR Config.WithinEditN(FNAME,FNAME_len,param_FNAME,param_FNAME_len,1,Config.FNAME_LENGTH_EDIT2) /*HACK*/ OR Config.WildMatch(FNAME,param_FNAME,FALSE) )
+      AND (( (FNAME[1..LENGTH(TRIM(param_FNAME))] = param_FNAME OR param_FNAME[1..LENGTH(TRIM(FNAME))] = FNAME)  OR FNAME_PreferredName = fn_PreferredName(param_FNAME) OR metaphonelib.DMetaPhone1(FNAME)=metaphonelib.DMetaPhone1(param_FNAME) OR Config.WithinEditN(FNAME,FNAME_len,param_FNAME,param_FNAME_len,1,Config.FNAME_LENGTH_EDIT2) /*HACK02*/ OR Config.WildMatch(FNAME,param_FNAME,FALSE) )
         AND ( (MNAME[1..LENGTH(TRIM(param_MNAME))] = param_MNAME OR param_MNAME[1..LENGTH(TRIM(MNAME))] = MNAME) OR Config.WithinEditN(MNAME,MNAME_len,param_MNAME,param_MNAME_len,2, 0) )
-        AND ( LNAME = (TYPEOF(LNAME))'' OR param_LNAME = (TYPEOF(LNAME))'' OR metaphonelib.DMetaPhone1(LNAME)=metaphonelib.DMetaPhone1(param_LNAME) OR Config.WithinEditN(LNAME,LNAME_len,param_LNAME,param_LNAME_len,1,Config.LNAME_LENGTH_EDIT2) /*HACK*/ OR SALT37.HyphenMatch(LNAME,param_LNAME,1)<=2 OR Config.WildMatch(LNAME,param_LNAME,FALSE) )
-        OR SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)FNAME,FNAME_MAINNAME_weight100,true,0,false,FNAME_initial_char_weight100/*HACK*/,1,0,FNAME_len,FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)MNAME,MNAME_MAINNAME_weight100,true,0,true,MNAME_initial_char_weight100,2,0,MNAME_len,MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LNAME,LNAME_MAINNAME_weight100,true,0,false,0,1,0,LNAME_len,LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)param_FNAME,param_FNAME_len,(SALT37.StrType)param_MNAME,param_MNAME_len,(SALT37.StrType)param_LNAME,param_LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0)),Config.DLN_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
+        AND ( LNAME = (TYPEOF(LNAME))'' OR param_LNAME = (TYPEOF(LNAME))'' OR metaphonelib.DMetaPhone1(LNAME)=metaphonelib.DMetaPhone1(param_LNAME) OR Config.WithinEditN(LNAME,LNAME_len,param_LNAME,param_LNAME_len,1,Config.LNAME_LENGTH_EDIT2) /*HACK06*/ OR SALT37.HyphenMatch(LNAME,param_LNAME,1)<=2 OR Config.WildMatch(LNAME,param_LNAME,FALSE) )
+        OR (SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)FNAME,FNAME_MAINNAME_weight100,true,0,false,FNAME_initial_char_weight100/*HACK11*/,1,0,FNAME_len,FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)MNAME,MNAME_MAINNAME_weight100,true,0,true,MNAME_initial_char_weight100,2,0,MNAME_len,MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LNAME,LNAME_MAINNAME_weight100,true,0,false,0,1,0,LNAME_len,LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)param_FNAME,param_FNAME_len,(SALT37.StrType)param_MNAME,param_MNAME_len,(SALT37.StrType)param_LNAME,param_LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0
+OR FNAME = param_FNAME))),MAX_BLOCKLIMIT/*HACK24b*/ /*HACK14c*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
  
  
-EXPORT ScoredDIDFetch(TYPEOF(h.DL_NBR) param_DL_NBR = (TYPEOF(h.DL_NBR))'',TYPEOF(h.DL_STATE) param_DL_STATE = (TYPEOF(h.DL_STATE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.SSN5) param_SSN5 = (TYPEOF(h.SSN5))'',TYPEOF(h.SSN5_len) param_SSN5_len = (TYPEOF(h.SSN5_len))'',TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len) param_SSN4_len = (TYPEOF(h.SSN4_len))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',UNSIGNED4 param_DOB,BOOLEAN param_disableForce = FALSE) := FUNCTION
-  RawData := RawFetch(param_DL_NBR,param_DL_STATE,param_FNAME,param_MNAME,param_LNAME,param_FNAME_len,param_MNAME_len,param_LNAME_len);
+EXPORT ScoredDIDFetch(TYPEOF(h.DL_NBR) param_DL_NBR = (TYPEOF(h.DL_NBR))'',TYPEOF(h.DL_NBR_len) param_DL_NBR_len = (TYPEOF(h.DL_NBR_len))'',TYPEOF(h.DL_STATE) param_DL_STATE = (TYPEOF(h.DL_STATE))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.MNAME) param_MNAME = (TYPEOF(h.MNAME))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.MNAME_len) param_MNAME_len = (TYPEOF(h.MNAME_len))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',TYPEOF(h.SSN5) param_SSN5 = (TYPEOF(h.SSN5))'',TYPEOF(h.SSN5_len) param_SSN5_len = (TYPEOF(h.SSN5_len))'',TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len) param_SSN4_len = (TYPEOF(h.SSN4_len))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',UNSIGNED4 param_DOB,BOOLEAN param_disableForce = FALSE) := FUNCTION
+  RawData := RawFetch(param_DL_NBR,param_DL_NBR_len,param_DL_STATE,param_FNAME,param_MNAME,param_LNAME,param_FNAME_len,param_MNAME_len,param_LNAME_len);
  
   Process_xIDL_Layouts().LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 8; // Set bitmap for keys used
+    SELF.keys_used := 1 << 9; // Set bitmap for keys used
     SELF.keys_poisoned := IF(le.DT_EFFECTIVE_LAST <> 0 AND le.IsIncremental, SELF.keys_used, 0);
-    SELF.keys_failed := IF(le.DID = 0, 1 << 8, 0); // Set bitmap for key failed
+    SELF.keys_failed := IF(le.DID = 0, 1 << 9, 0); // Set bitmap for key failed
     SELF.DL_NBR_match_code := MAP(
            le.DL_STATE = (TYPEOF(le.DL_STATE))'' OR param_DL_STATE = (TYPEOF(param_DL_STATE))'' OR le.DL_STATE <> param_DL_STATE => 0, // Only valid if the context variable is equal
-           match_methods(File_InsuranceHeader).match_DL_NBR(le.DL_NBR,param_DL_NBR,TRUE));
+           match_methods(File_InsuranceHeader).match_DL_NBR(le.DL_NBR,param_DL_NBR,le.DL_NBR_len,param_DL_NBR_len,TRUE));
     SELF.DL_NBRWeight := (50+MAP (
            le.DL_STATE = (TYPEOF(le.DL_STATE))'' OR param_DL_STATE = (TYPEOF(param_DL_STATE))'' OR le.DL_STATE <> param_DL_STATE => 0, // Only valid if the context variable is equal
            le.DL_NBR = param_DL_NBR  => le.DL_NBR_weight100,
@@ -142,7 +146,7 @@ EXPORT ScoredDIDFetch(TYPEOF(h.DL_NBR) param_DL_NBR = (TYPEOF(h.DL_NBR))'',TYPEO
            le.FNAME = param_FNAME  => le.FNAME_weight100,
            le.FNAME = param_FNAME[1..LENGTH(TRIM(le.FNAME))]   =>le.FNAME_weight100,
            le.FNAME[1..LENGTH(TRIM(param_FNAME))] = param_FNAME => SALT37.Fn_Interpolate_Initial(le.FNAME,param_FNAME,le.FNAME_weight100,le.FNAME_initial_char_weight100),
-           Config.WithinEditN(le.FNAME,le.FNAME_len,param_FNAME,param_FNAME_len,1,Config.FNAME_LENGTH_EDIT2) /*HACK*/  =>IF( metaphonelib.DMetaPhone1(le.FNAME)=metaphonelib.DMetaPhone1(param_FNAME),le.FNAME_e1p_weight100,le.FNAME_e1_weight100),
+           Config.WithinEditN(le.FNAME,le.FNAME_len,param_FNAME,param_FNAME_len,1,Config.FNAME_LENGTH_EDIT2) /*HACK03*/  =>IF( metaphonelib.DMetaPhone1(le.FNAME)=metaphonelib.DMetaPhone1(param_FNAME),le.FNAME_e1p_weight100,le.FNAME_e1_weight100),
            metaphonelib.DMetaPhone1(le.FNAME)=metaphonelib.DMetaPhone1(param_FNAME)  =>le.FNAME_p_weight100,
            Config.WildMatch(le.FNAME,param_FNAME,false)  =>le.FNAME_weight100 / Config.WildPenalty,
            le.FNAME_PreferredName = fn_PreferredName(param_FNAME) => le.FNAME_PreferredName_weight100,
@@ -164,13 +168,13 @@ EXPORT ScoredDIDFetch(TYPEOF(h.DL_NBR) param_DL_NBR = (TYPEOF(h.DL_NBR))'',TYPEO
            le.LNAME = (TYPEOF(le.LNAME))'' OR param_LNAME = (TYPEOF(param_LNAME))'' => 0,
            le.LNAME = param_LNAME  => le.LNAME_weight100,
            SALT37.HyphenMatch(le.LNAME,param_LNAME,1)<=2  =>le.LNAME_weight100*MIN(1,LENGTH(TRIM(param_LNAME))/LENGTH(TRIM(le.LNAME))),
-           Config.WithinEditN(le.LNAME,le.LNAME_len,param_LNAME,param_LNAME_len,1,Config.LNAME_LENGTH_EDIT2) /*HACK*/  =>IF( metaphonelib.DMetaPhone1(le.LNAME)=metaphonelib.DMetaPhone1(param_LNAME),le.LNAME_e1p_weight100,le.LNAME_e1_weight100),
+           Config.WithinEditN(le.LNAME,le.LNAME_len,param_LNAME,param_LNAME_len,1,Config.LNAME_LENGTH_EDIT2) /*HACK07*/  =>IF( metaphonelib.DMetaPhone1(le.LNAME)=metaphonelib.DMetaPhone1(param_LNAME),le.LNAME_e1p_weight100,le.LNAME_e1_weight100),
            metaphonelib.DMetaPhone1(le.LNAME)=metaphonelib.DMetaPhone1(param_LNAME)  =>le.LNAME_p_weight100,
            Config.WildMatch(le.LNAME,param_LNAME,false)  =>le.LNAME_weight100 / Config.WildPenalty,
            -0.617*le.LNAME_weight100))/100*0.80; 
     SELF.MAINNAME_match_code := match_methods(File_InsuranceHeader).match_MAINNAME(HASH32((SALT37.StrType) le.FNAME,(SALT37.StrType) le.MNAME,(SALT37.StrType) le.LNAME),HASH32((SALT37.StrType) param_FNAME,(SALT37.StrType) param_MNAME,(SALT37.StrType) param_LNAME),(SALT37.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,true,0,true,le.FNAME_initial_char_weight100,1,0,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,true,0,true,le.MNAME_initial_char_weight100,2,0,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,true,0,false,0,1,0,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)param_FNAME,0,param_FNAME_len,0,(SALT37.StrType)param_MNAME,0,param_MNAME_len,0,(SALT37.StrType)param_LNAME,0,param_LNAME_len,0,FALSE);
     SELF.MAINNAMEWeight := (50+MAP(HASH32((SALT37.StrType) le.FNAME,(SALT37.StrType) le.MNAME,(SALT37.StrType) le.LNAME) = HASH32((SALT37.StrType) param_FNAME,(SALT37.StrType) param_MNAME,(SALT37.StrType) param_LNAME) => le.FNAME_weight100+le.MNAME_weight100+le.LNAME_weight100,
-                SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,true,0,FALSE /*HACK*/,le.FNAME_initial_char_weight100,1,0,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,true,0,true,le.MNAME_initial_char_weight100,2,0,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,true,0,false,0,1,0,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)param_FNAME,param_FNAME_len,(SALT37.StrType)param_MNAME,param_MNAME_len,(SALT37.StrType)param_LNAME,param_LNAME_len,InsuranceHeader_xLink.Config.WithinEditN)))/100; //Concept could score even if fields do not
+                SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,true,0,FALSE /*HACK12*/,le.FNAME_initial_char_weight100,1,0,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,true,0,true,le.MNAME_initial_char_weight100,2,0,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,true,0,false,0,1,0,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)param_FNAME,param_FNAME_len,(SALT37.StrType)param_MNAME,param_MNAME_len,(SALT37.StrType)param_LNAME,param_LNAME_len,InsuranceHeader_xLink.Config.WithinEditN)))/100; //Concept could score even if fields do not
     SELF.SSN5_match_code := MAP(
            le.SSN5 = (TYPEOF(le.SSN5))'' OR param_SSN5 = (TYPEOF(param_SSN5))'' => SALT37.MatchCode.OneSideNull,
            match_methods(File_InsuranceHeader).match_SSN5(le.SSN5,param_SSN5,le.SSN5_len,param_SSN5_len,FALSE));
@@ -247,6 +251,7 @@ END;
 EXPORT InputLayout_Batch := RECORD
   SALT37.UIDType Reference;//How to recognize this record in the subsequent
   TYPEOF(h.DL_NBR) DL_NBR := (TYPEOF(h.DL_NBR))'';
+  TYPEOF(h.DL_NBR_len) DL_NBR_len := (TYPEOF(h.DL_NBR_len))'';
   TYPEOF(h.DL_STATE) DL_STATE := (TYPEOF(h.DL_STATE))'';
   SALT37.StrType MAINNAME := (SALT37.StrType)'';
   TYPEOF(h.FNAME) FNAME := (TYPEOF(h.FNAME))'';
@@ -267,12 +272,12 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
  
   Process_xIDL_Layouts().LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 8; // Set bitmap for keys used
+    SELF.keys_used := 1 << 9; // Set bitmap for keys used
     SELF.keys_poisoned := IF(le.DT_EFFECTIVE_LAST <> 0 AND le.IsIncremental, SELF.keys_used, 0);
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.DL_NBR_match_code := MAP(
            le.DL_STATE = (TYPEOF(le.DL_STATE))'' OR ri.DL_STATE = (TYPEOF(ri.DL_STATE))'' OR le.DL_STATE <> ri.DL_STATE => 0, // Only valid if the context variable is equal
-           match_methods(File_InsuranceHeader).match_DL_NBR(le.DL_NBR,ri.DL_NBR,TRUE));
+           match_methods(File_InsuranceHeader).match_DL_NBR(le.DL_NBR,ri.DL_NBR,le.DL_NBR_len,ri.DL_NBR_len,TRUE));
     SELF.DL_NBRWeight := (50+MAP (
            le.DL_STATE = (TYPEOF(le.DL_STATE))'' OR ri.DL_STATE = (TYPEOF(ri.DL_STATE))'' OR le.DL_STATE <> ri.DL_STATE => 0, // Only valid if the context variable is equal
            le.DL_NBR = ri.DL_NBR  => le.DL_NBR_weight100,
@@ -291,7 +296,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
            le.FNAME = ri.FNAME  => le.FNAME_weight100,
            le.FNAME = ri.FNAME[1..LENGTH(TRIM(le.FNAME))]   =>le.FNAME_weight100,
            le.FNAME[1..LENGTH(TRIM(ri.FNAME))] = ri.FNAME => SALT37.Fn_Interpolate_Initial(le.FNAME,ri.FNAME,le.FNAME_weight100,le.FNAME_initial_char_weight100),
-           Config.WithinEditN(le.FNAME,le.FNAME_len,ri.FNAME,ri.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK*/  =>IF( metaphonelib.DMetaPhone1(le.FNAME)=metaphonelib.DMetaPhone1(ri.FNAME),le.FNAME_e1p_weight100,le.FNAME_e1_weight100),
+           Config.WithinEditN(le.FNAME,le.FNAME_len,ri.FNAME,ri.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK04*/  =>IF( metaphonelib.DMetaPhone1(le.FNAME)=metaphonelib.DMetaPhone1(ri.FNAME),le.FNAME_e1p_weight100,le.FNAME_e1_weight100),
            metaphonelib.DMetaPhone1(le.FNAME)=metaphonelib.DMetaPhone1(ri.FNAME)  =>le.FNAME_p_weight100,
            Config.WildMatch(le.FNAME,ri.FNAME,false)  =>le.FNAME_weight100 / Config.WildPenalty,
            le.FNAME_PreferredName = fn_PreferredName(ri.FNAME) => le.FNAME_PreferredName_weight100,
@@ -313,13 +318,13 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
            le.LNAME = (TYPEOF(le.LNAME))'' OR ri.LNAME = (TYPEOF(ri.LNAME))'' => 0,
            le.LNAME = ri.LNAME  => le.LNAME_weight100,
            SALT37.HyphenMatch(le.LNAME,ri.LNAME,1)<=2  =>le.LNAME_weight100*MIN(1,LENGTH(TRIM(ri.LNAME))/LENGTH(TRIM(le.LNAME))),
-           Config.WithinEditN(le.LNAME,le.LNAME_len,ri.LNAME,ri.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK*/  =>IF( metaphonelib.DMetaPhone1(le.LNAME)=metaphonelib.DMetaPhone1(ri.LNAME),le.LNAME_e1p_weight100,le.LNAME_e1_weight100),
+           Config.WithinEditN(le.LNAME,le.LNAME_len,ri.LNAME,ri.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK08*/  =>IF( metaphonelib.DMetaPhone1(le.LNAME)=metaphonelib.DMetaPhone1(ri.LNAME),le.LNAME_e1p_weight100,le.LNAME_e1_weight100),
            metaphonelib.DMetaPhone1(le.LNAME)=metaphonelib.DMetaPhone1(ri.LNAME)  =>le.LNAME_p_weight100,
            Config.WildMatch(le.LNAME,ri.LNAME,false)  =>le.LNAME_weight100 / Config.WildPenalty,
            -0.617*le.LNAME_weight100))/100*0.80; 
     SELF.MAINNAME_match_code := match_methods(File_InsuranceHeader).match_MAINNAME(HASH32((SALT37.StrType) le.FNAME,(SALT37.StrType) le.MNAME,(SALT37.StrType) le.LNAME),HASH32((SALT37.StrType) ri.FNAME,(SALT37.StrType) ri.MNAME,(SALT37.StrType) ri.LNAME),(SALT37.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,true,0,true,le.FNAME_initial_char_weight100,1,0,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,true,0,true,le.MNAME_initial_char_weight100,2,0,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,true,0,false,0,1,0,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)ri.FNAME,0,ri.FNAME_len,0,(SALT37.StrType)ri.MNAME,0,ri.MNAME_len,0,(SALT37.StrType)ri.LNAME,0,ri.LNAME_len,0,FALSE);
     SELF.MAINNAMEWeight := (50+MAP(HASH32((SALT37.StrType) le.FNAME,(SALT37.StrType) le.MNAME,(SALT37.StrType) le.LNAME) = HASH32((SALT37.StrType) ri.FNAME,(SALT37.StrType) ri.MNAME,(SALT37.StrType) ri.LNAME) => le.FNAME_weight100+le.MNAME_weight100+le.LNAME_weight100,
-                SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,true,0,FALSE /*HACK*/,le.FNAME_initial_char_weight100,1,0,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,true,0,true,le.MNAME_initial_char_weight100,2,0,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,true,0,false,0,1,0,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)ri.FNAME,ri.FNAME_len,(SALT37.StrType)ri.MNAME,ri.MNAME_len,(SALT37.StrType)ri.LNAME,ri.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN)))/100; //Concept could score even if fields do not
+                SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,true,0,FALSE /*HACK12*/,le.FNAME_initial_char_weight100,1,0,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,true,0,true,le.MNAME_initial_char_weight100,2,0,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,true,0,false,0,1,0,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)ri.FNAME,ri.FNAME_len,(SALT37.StrType)ri.MNAME,ri.MNAME_len,(SALT37.StrType)ri.LNAME,ri.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN)))/100; //Concept could score even if fields do not
     SELF.SSN5_match_code := MAP(
            le.SSN5 = (TYPEOF(le.SSN5))'' OR ri.SSN5 = (TYPEOF(ri.SSN5))'' => SALT37.MatchCode.OneSideNull,
            match_methods(File_InsuranceHeader).match_SSN5(le.SSN5,ri.SSN5,le.SSN5_len,ri.SSN5_len,FALSE));
@@ -389,15 +394,17 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
   J0 := JOIN(Recs1,Key,LEFT.DL_NBR = RIGHT.DL_NBR
      AND LEFT.DL_STATE = RIGHT.DL_STATE
      AND (( ( 
-        ((LEFT.FNAME[1..LENGTH(TRIM(RIGHT.FNAME))] = RIGHT.FNAME OR RIGHT.FNAME[1..LENGTH(TRIM(LEFT.FNAME))] = LEFT.FNAME ) OR metaphonelib.DMetaPhone1(LEFT.FNAME)=metaphonelib.DMetaPhone1(RIGHT.FNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.FNAME,LEFT.FNAME_len,RIGHT.FNAME,RIGHT.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK*/  OR RIGHT.FNAME_PreferredName = fn_PreferredName(LEFT.FNAME) ) AND ((LEFT.MNAME[1..LENGTH(TRIM(RIGHT.MNAME))] = RIGHT.MNAME OR RIGHT.MNAME[1..LENGTH(TRIM(LEFT.MNAME))] = LEFT.MNAME )OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.MNAME,LEFT.MNAME_len,RIGHT.MNAME,RIGHT.MNAME_len,2, 0) ) AND (LEFT.LNAME = (TYPEOF(LEFT.LNAME))'' OR RIGHT.LNAME = (TYPEOF(RIGHT.LNAME))''  OR metaphonelib.DMetaPhone1(LEFT.LNAME)=metaphonelib.DMetaPhone1(RIGHT.LNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.LNAME,LEFT.LNAME_len,RIGHT.LNAME,RIGHT.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK*/ OR SALT37.HyphenMatch(LEFT.LNAME,RIGHT.LNAME,1)<=2 )
-          OR SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)RIGHT.FNAME,RIGHT.FNAME_MAINNAME_weight100,true,0,false/*HACK*/,RIGHT.FNAME_initial_char_weight100,1,0,RIGHT.FNAME_len,RIGHT.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.MNAME,RIGHT.MNAME_MAINNAME_weight100,true,0,true,RIGHT.MNAME_initial_char_weight100,2,0,RIGHT.MNAME_len,RIGHT.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.LNAME,RIGHT.LNAME_MAINNAME_weight100,true,0,false,0,1,0,RIGHT.LNAME_len,RIGHT.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LEFT.FNAME,LEFT.FNAME_len,(SALT37.StrType)LEFT.MNAME,LEFT.MNAME_len,(SALT37.StrType)LEFT.LNAME,LEFT.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0) )),Score_Batch(RIGHT,LEFT),
+        ((LEFT.FNAME[1..LENGTH(TRIM(RIGHT.FNAME))] = RIGHT.FNAME OR RIGHT.FNAME[1..LENGTH(TRIM(LEFT.FNAME))] = LEFT.FNAME ) OR metaphonelib.DMetaPhone1(LEFT.FNAME)=metaphonelib.DMetaPhone1(RIGHT.FNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.FNAME,LEFT.FNAME_len,RIGHT.FNAME,RIGHT.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK05*/  OR RIGHT.FNAME_PreferredName = fn_PreferredName(LEFT.FNAME) ) AND ((LEFT.MNAME[1..LENGTH(TRIM(RIGHT.MNAME))] = RIGHT.MNAME OR RIGHT.MNAME[1..LENGTH(TRIM(LEFT.MNAME))] = LEFT.MNAME )OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.MNAME,LEFT.MNAME_len,RIGHT.MNAME,RIGHT.MNAME_len,2, 0) ) AND (LEFT.LNAME = (TYPEOF(LEFT.LNAME))'' OR RIGHT.LNAME = (TYPEOF(RIGHT.LNAME))''  OR metaphonelib.DMetaPhone1(LEFT.LNAME)=metaphonelib.DMetaPhone1(RIGHT.LNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.LNAME,LEFT.LNAME_len,RIGHT.LNAME,RIGHT.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK09*/ OR SALT37.HyphenMatch(LEFT.LNAME,RIGHT.LNAME,1)<=2 )
+          OR (SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)RIGHT.FNAME,RIGHT.FNAME_MAINNAME_weight100,true,0,false/*HACK13*/,RIGHT.FNAME_initial_char_weight100,1,0,RIGHT.FNAME_len,RIGHT.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.MNAME,RIGHT.MNAME_MAINNAME_weight100,true,0,true,RIGHT.MNAME_initial_char_weight100,2,0,RIGHT.MNAME_len,RIGHT.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.LNAME,RIGHT.LNAME_MAINNAME_weight100,true,0,false,0,1,0,RIGHT.LNAME_len,RIGHT.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LEFT.FNAME,LEFT.FNAME_len,(SALT37.StrType)LEFT.MNAME,LEFT.MNAME_len,(SALT37.StrType)LEFT.LNAME,LEFT.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0
+ OR LEFT.FNAME = RIGHT.FNAME)) )),/*HACK14d*/Score_Batch(RIGHT,LEFT),
     ATMOST(LEFT.DL_NBR = RIGHT.DL_NBR
      AND LEFT.DL_STATE = RIGHT.DL_STATE,Config.DLN_MAXBLOCKSIZE)); // Use indexed join (used for smaller batches
   J1 := JOIN(Recs1,PULL(Key),LEFT.DL_NBR = RIGHT.DL_NBR
      AND LEFT.DL_STATE = RIGHT.DL_STATE
      AND (( ( 
-        ((LEFT.FNAME[1..LENGTH(TRIM(RIGHT.FNAME))] = RIGHT.FNAME OR RIGHT.FNAME[1..LENGTH(TRIM(LEFT.FNAME))] = LEFT.FNAME ) OR metaphonelib.DMetaPhone1(LEFT.FNAME)=metaphonelib.DMetaPhone1(RIGHT.FNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.FNAME,LEFT.FNAME_len,RIGHT.FNAME,RIGHT.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK*/  OR RIGHT.FNAME_PreferredName = fn_PreferredName(LEFT.FNAME) ) AND ((LEFT.MNAME[1..LENGTH(TRIM(RIGHT.MNAME))] = RIGHT.MNAME OR RIGHT.MNAME[1..LENGTH(TRIM(LEFT.MNAME))] = LEFT.MNAME )OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.MNAME,LEFT.MNAME_len,RIGHT.MNAME,RIGHT.MNAME_len,2, 0) ) AND (LEFT.LNAME = (TYPEOF(LEFT.LNAME))'' OR RIGHT.LNAME = (TYPEOF(RIGHT.LNAME))''  OR metaphonelib.DMetaPhone1(LEFT.LNAME)=metaphonelib.DMetaPhone1(RIGHT.LNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.LNAME,LEFT.LNAME_len,RIGHT.LNAME,RIGHT.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK*/ OR SALT37.HyphenMatch(LEFT.LNAME,RIGHT.LNAME,1)<=2 )
-          OR SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)RIGHT.FNAME,RIGHT.FNAME_MAINNAME_weight100,true,0,false/*HACK*/,RIGHT.FNAME_initial_char_weight100,1,0,RIGHT.FNAME_len,RIGHT.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.MNAME,RIGHT.MNAME_MAINNAME_weight100,true,0,true,RIGHT.MNAME_initial_char_weight100,2,0,RIGHT.MNAME_len,RIGHT.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.LNAME,RIGHT.LNAME_MAINNAME_weight100,true,0,false,0,1,0,RIGHT.LNAME_len,RIGHT.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LEFT.FNAME,LEFT.FNAME_len,(SALT37.StrType)LEFT.MNAME,LEFT.MNAME_len,(SALT37.StrType)LEFT.LNAME,LEFT.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0) )),Score_Batch(RIGHT,LEFT),
+        ((LEFT.FNAME[1..LENGTH(TRIM(RIGHT.FNAME))] = RIGHT.FNAME OR RIGHT.FNAME[1..LENGTH(TRIM(LEFT.FNAME))] = LEFT.FNAME ) OR metaphonelib.DMetaPhone1(LEFT.FNAME)=metaphonelib.DMetaPhone1(RIGHT.FNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.FNAME,LEFT.FNAME_len,RIGHT.FNAME,RIGHT.FNAME_len,1, Config.FNAME_LENGTH_EDIT2) /*HACK05*/  OR RIGHT.FNAME_PreferredName = fn_PreferredName(LEFT.FNAME) ) AND ((LEFT.MNAME[1..LENGTH(TRIM(RIGHT.MNAME))] = RIGHT.MNAME OR RIGHT.MNAME[1..LENGTH(TRIM(LEFT.MNAME))] = LEFT.MNAME )OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.MNAME,LEFT.MNAME_len,RIGHT.MNAME,RIGHT.MNAME_len,2, 0) ) AND (LEFT.LNAME = (TYPEOF(LEFT.LNAME))'' OR RIGHT.LNAME = (TYPEOF(RIGHT.LNAME))''  OR metaphonelib.DMetaPhone1(LEFT.LNAME)=metaphonelib.DMetaPhone1(RIGHT.LNAME) OR InsuranceHeader_xLink.Config.WithinEditN(LEFT.LNAME,LEFT.LNAME_len,RIGHT.LNAME,RIGHT.LNAME_len,1, Config.LNAME_LENGTH_EDIT2) /*HACK09*/ OR SALT37.HyphenMatch(LEFT.LNAME,RIGHT.LNAME,1)<=2 )
+          OR (SALT37.fn_concept_wordbag_EditN_EL.Match3((SALT37.StrType)RIGHT.FNAME,RIGHT.FNAME_MAINNAME_weight100,true,0,false/*HACK13*/,RIGHT.FNAME_initial_char_weight100,1,0,RIGHT.FNAME_len,RIGHT.FNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.MNAME,RIGHT.MNAME_MAINNAME_weight100,true,0,true,RIGHT.MNAME_initial_char_weight100,2,0,RIGHT.MNAME_len,RIGHT.MNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)RIGHT.LNAME,RIGHT.LNAME_MAINNAME_weight100,true,0,false,0,1,0,RIGHT.LNAME_len,RIGHT.LNAME_MAINNAME_fuzzy_weight100,(SALT37.StrType)LEFT.FNAME,LEFT.FNAME_len,(SALT37.StrType)LEFT.MNAME,LEFT.MNAME_len,(SALT37.StrType)LEFT.LNAME,LEFT.LNAME_len,InsuranceHeader_xLink.Config.WithinEditN) > 0
+ OR LEFT.FNAME = RIGHT.FNAME)) )),/*HACK14d*/Score_Batch(RIGHT,LEFT),
     ATMOST(LEFT.DL_NBR = RIGHT.DL_NBR
      AND LEFT.DL_STATE = RIGHT.DL_STATE,Config.DLN_MAXBLOCKSIZE),HASH,UNORDERED); // PULL used to cause non-indexed join
   J2 := IF(AsIndex,J0,J1);
@@ -416,6 +423,7 @@ IMPORT SALT37,InsuranceHeader_xLink;
   InsuranceHeader_xLink.Key_InsuranceHeader_DLN().InputLayout_Batch %trans%(InFile le) := TRANSFORM
     SELF.Reference := le.Input_Ref;
     SELF.DL_NBR := (TYPEOF(SELF.DL_NBR))le.Input_DL_NBR;
+    SELF.DL_NBR_len := LENGTH(TRIM((TYPEOF(SELF.DL_NBR))le.Input_DL_NBR));
     SELF.DL_STATE := (TYPEOF(SELF.DL_STATE))le.Input_DL_STATE;
     #IF ( #TEXT(Input_FNAME) <> '' )
       SELF.FNAME := (TYPEOF(SELF.FNAME))le.Input_FNAME;

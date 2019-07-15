@@ -1,4 +1,4 @@
-output('Diff Name BagOfWordsResults');
+﻿output('Diff Name BagOfWordsResults');
 output((integer2)SALT27.MatchBagOfWords('1640 SUPERCENTER 15 WALMART 14','1720 REGIS 15',0,0,0,0)  ,named('Many'));
 output((integer2)SALT27.MatchBagOfWords('1640 SUPERCENTER 15 WALMART 14','1720 REGIS 15',0,1,0,0)  ,named('Most'));
 output((integer2)SALT27.MatchBagOfWords('1640 SUPERCENTER 15 WALMART 14','1720 REGIS 15',0,2,0,0)  ,named('All'));

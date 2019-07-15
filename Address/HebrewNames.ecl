@@ -1,4 +1,4 @@
-export HebrewNames := MODULE
+﻿export HebrewNames := MODULE
 
 export SET of STRING20 HebrewBoys := [
 'ABDOWN',
@@ -227,7 +227,7 @@ export SET of STRING20 HebrewBoys := [
 'DANIYYEL', // : Variant spelling of Hebrew Daniyel, meaning "God is my judge." 
 'DAR', //  (????): Hebrew name meaning both "mother-of-pearl" and "marble." 
 'DARA', //  (??????): Hebrew name meaning "the arm." In the bible, this is the name of a son of Zerah. Compare with other forms of Dara. 
-'DARYAVESH','DAR\'YAVESH', //  (???????????): Hebrew form of Persian DÃ¢rayavahush (Latin Darius), meaning "possesses a lot, wealthy." In the bible, this is the name of several characters including Darius the Mede, son of Ahasuerus, king of the Chaldeans. 
+'DARYAVESH','DAR\'YAVESH', //  (???????????): Hebrew form of Persian Dârayavahush (Latin Darius), meaning "possesses a lot, wealthy." In the bible, this is the name of several characters including Darius the Mede, son of Ahasuerus, king of the Chaldeans. 
 'DATAN', // : Variant spelling of Hebrew Dathan, meaning "belonging to a fountain." 
 'DA\'THAN', //  (??????): Variant spelling of Hebrew Dathan, meaning "belonging to a fountain." 
 'DATHAN', //  (??????): Hebrew name meaning "belonging to a fountain." In the bible, this is the name of a son of Eliab who, with his brother Abiram, joined Korah in his rebellion against Moses. 
@@ -407,7 +407,7 @@ export SET of STRING20 HebrewBoys := [
 'KENANYAH', //  (??????????): Hebrew name meaning "Jehovah establishes" or "whom Jehovah defends." In the bible, this is the name of a Levite who was the chief of the Temple singers who conducted the music when the Ark of the Covenant was moved from the house of Obed-edom to Jerusalem. 
 'KESED', //  (???????): Hebrew name meaning "increase." In the bible, this is the name of the 4th son of Nahor. Chesed is the Anglicized form. 
 'KORACH', //  (?????): Variant spelling of Hebrew Qorach, meaning "bald" or "ice." In the bible, this is the name of a Levite who led a rebellion against Moses and Aaron.  
-'KOWRESH', //  (???????): Hebrew form of Persian KÃ»rush, meaning "like the sun." In the bible, this is the name of the king of Persia, Cyrus the Great, conqueror of Babylon, who freed the captive Jews.  
+'KOWRESH', //  (???????): Hebrew form of Persian Kûrush, meaning "like the sun." In the bible, this is the name of the king of Persia, Cyrus the Great, conqueror of Babylon, who freed the captive Jews.  
 'KUSH', // : Variant spelling of Hebrew Kuwsh, meaning "black," i.e. "Ethiopian."  
 'KUWSH', //  (?????): Hebrew name meaning "black," i.e. "Ethiopian." In the bible, this is the name of a land and its people. It is also the name of a Benjamite and the son of Ham and grandson of Noah. The Anglicized form is Cush. 
 'LABAN', // (?????): Hebrew name meaning "white." In the bible, this is the name of the father of Rachel and Leah. 
@@ -1058,7 +1058,7 @@ export SET of STRING20 HebrewGirls := [
 'GALA', //  (??????): Feminine variant spelling of Hebrew unisex Gal, meaning "mound, wave." Compare with another form of Gala. 
 'GALIA', // : Variant spelling of Hebrew Galya, meaning "hill of God." 
 'GALILA', //  (?????????): Feminine form of Hebrew Galil, meaning "cylinder" or "boundary." Compare with another form of Galila. 
-'GALINA', //  (?????????): Hebrew form of Greek HelÃ©n?, possibly meaning "torch." Compare with another form of Galina. 
+'GALINA', //  (?????????): Hebrew form of Greek Helén?, possibly meaning "torch." Compare with another form of Galina. 
 'GALIT', //  (???????): Variant form of Hebrew Gal, meaning "mound, wave." 
 'GALYA', //  (????????): Hebrew name meaning "hill of God." Compare with another form of Galya. 
 'GAVRIELA', //  (??????????): Feminine form of Hebrew Gavriel, meaning "man of God" or "warrior of God." 

@@ -7,14 +7,20 @@
 // stay merged going forward.
 EXPORT MAC_Split_Parents(infile,patchfile,did_name,pid_name,o) := MACRO
 	#uniquename(pids)
+	#uniquename(infile_null)
+	#uniquename(infile_nonnull)
+
+	%infile_null%    := infile(pid_name=0);
+	%infile_nonnull% := infile(pid_name<>0);
+
 	%pids% := JOIN(
-		infile, patchfile,
+		%infile_nonnull%, patchfile,
 		LEFT.did_name=RIGHT.did_name AND LEFT.pid_name<>0,
 		TRANSFORM({LEFT.pid_name},SELF:=LEFT),
 		KEEP(1));
-	o := JOIN(
-		infile, %pids%,
+	o := %infile_null% + JOIN(
+		%infile_nonnull%, %pids%,
 		LEFT.pid_name=RIGHT.pid_name,
-		TRANSFORM(RECORDOF(LEFT),SELF.pid_name:=LEFT.did_name,SELF:=LEFT),
-		LEFT OUTER, KEEP(1));
+		TRANSFORM(RECORDOF(LEFT),SELF.pid_name:=if(RIGHT.pid_name!=0,LEFT.did_name,LEFT.pid_name),SELF:=LEFT),
+		LEFT OUTER, KEEP(1), HASH);
 ENDMACRO;

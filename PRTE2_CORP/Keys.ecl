@@ -1,4 +1,4 @@
-﻿IMPORT  doxie,mdr, Corp2,BIPV2;
+﻿IMPORT  doxie,mdr, Corp2,BIPV2, corp2_mapping;
 
 EXPORT keys := MODULE
 
@@ -49,7 +49,7 @@ EXPORT key_corp_ar := INDEX(FILES.DS_AR_key, {corp_key,record_type},
 
 //Cleanup Corp base file	
   CorpBase TFixCorpBase(CorpBase L) := TRANSFORM
-		SELF.corp_legal_name := Corp2.fCleanupTextInput(L.corp_legal_name,'corp_legal_name');
+		SELF.corp_legal_name 			:= Corp2_Mapping.fn_RemoveSpecialChars(L.corp_legal_name);
 		SELF.corp_sos_charter_nbr := StringLib.StringToUpperCase(L.corp_sos_charter_nbr);
     SELF := L;
   END;

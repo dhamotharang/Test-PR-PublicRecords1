@@ -1,4 +1,4 @@
-import tools,FraudShared;
+﻿import tools,FraudShared;
 
 export Build_Base(
 
@@ -11,6 +11,7 @@ export Build_Base(
 	,boolean                                      pSkipOIGBase                      = false
 	,boolean                                      pSkipAInspection                  = false
 	,boolean                                      pSkipErieBase                     = false
+	,boolean                                      pSkipErieWatchListBase            = false
 	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainFile										  =	FraudShared.Files().Base.Main.QA
 
   ,dataset(Layouts.Base.SuspectIP)						  pBaseSuspectIPFile							  =	Files().Base.SuspectIP.QA
@@ -42,6 +43,10 @@ export Build_Base(
 	,dataset(Layouts.Base.Erie)						        pBaseErieFile						         	=	Files().Base.Erie.QA
 	,dataset(Layouts.Input.Erie)	                pUpdateErieFile	                  =	Files().Input.Erie.Sprayed
 	,boolean                                      pUpdateErieflag                   = _Flags.Update.Erie
+  
+	,dataset(Layouts.Base.ErieWatchList)          pBaseErieWatchListFile             =	Files().Base.ErieWatchList.QA
+	,dataset(Layouts.Input.ErieWatchList)	         pUpdateErieWatchListFile           =	Files().Input.ErieWatchList.Sprayed
+	,boolean                                      pUpdateErieWatchListflag            = _Flags.Update.ErieWatchList
 
 ) :=
 module
@@ -105,6 +110,13 @@ module
 					,pBaseErieFile
 					,pUpdateErieFile
 					,pUpdateErieflag
+					).All)
+				,if(pSkipErieBase , output('ErieWatchList base skipped')
+				,Build_Base_ErieWatchList(
+				  pversion
+					,pBaseErieWatchListFile
+					,pUpdateErieWatchListFile
+					,pUpdateErieWatchListflag
 					).All)
 			 )
 			 ,MapToCommon(

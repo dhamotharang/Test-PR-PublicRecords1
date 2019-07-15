@@ -3,7 +3,7 @@
 
 export spray_data_new  := MODULE 
 
-	export srcIP       		  := 'bctlpedata11.risk.regn.net';
+	export srcIP       		  := _control.IPAddress.bctlpedata11;
 	export targetGrp   		  := 'thor400_44';
 	export src_root   := '/data/stub_cleaning/court/hygenics/criminal/';
 	

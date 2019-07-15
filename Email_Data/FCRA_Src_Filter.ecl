@@ -1,1 +1,1 @@
-﻿EXPORT FCRA_Src_Filter := ['!I','IM','W@','AN','RS','DG'];
+﻿EXPORT FCRA_Src_Filter := ['!I','IM','W@','DG','AN','RS','AP'];

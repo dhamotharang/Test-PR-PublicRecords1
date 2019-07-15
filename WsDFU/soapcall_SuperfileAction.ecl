@@ -1,7 +1,7 @@
-/*
+﻿/*
   SuperfileAction can add to superfile, etc.
 */
-import _control,ut,wk_ut;
+import _control,ut;
 // #option('maxLength', 131072); // have to increase for the remote directory child datasets
 //////////////////////////////////////////////////////////////////////////////////////////////
 export soapcall_SuperfileAction(
@@ -11,7 +11,7 @@ export soapcall_SuperfileAction(
   ,string                pbefore              = ''    //add the subfile before this file in the superfile
   ,boolean               pdelete              = false //true = remove it from superfile and delete it. false = remove it from superfile
   ,boolean               premoveSuperfile     = false //true = delete superfile, false=keep superfile
-  ,string                pesp                 = wk_ut._constants.LocalEsp
+  ,string                pesp                 = _Config.LocalEsp
 ) :=                           
 function
 
@@ -25,7 +25,7 @@ function
 	  dataset(item_record)  subfiles             {xpath('subfiles'         )} := dataset([{psubfile}],item_record)  ;
     string                before               {xpath('before'           )} := pbefore                            ;
     boolean               delete               {xpath('delete'           )} := pdelete                            ; //not sure what this is yet
-    boolean               removeSuperfile      {xpath('removeSuperfile'  )} := premoveSuperfile                   ;
+    boolean               removeSuperfile_     {xpath('removeSuperfile'  )} := premoveSuperfile                   ;
 
   end;
        
@@ -41,6 +41,9 @@ function
     
 	end;
   
+  import ut,Workman;
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
 
   esp				:= pesp + ':8010';
   dsoap_results := SOAPCALL(
@@ -52,6 +55,18 @@ function
     ,timeout(1200)  //max 20 minutes
   );
   
-  return dsoap_results  ;
+  dsoap_results_remote := SOAPCALL(
+    'http://' + esp + '/WsDfu?ver_=1.31'
+    ,'SuperfileAction'
+    ,SuperfileActionRequest_Record
+    ,dataset(SuperfileActionResponse_Record)
+    ,xpath('SuperfileActionResponse')
+    ,timeout(1200)  //max 20 minutes
+    %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,dsoap_results  ,dsoap_results_remote);
+
+  return returnresult  ;
 
 end;

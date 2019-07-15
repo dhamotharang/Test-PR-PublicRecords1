@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT BaseFile_MAC_PopulationStatistics(infile,Ref='',Input_reference_id = '',Input_source = '',Input_dt_first_reported = '',Input_dt_last_reported = '',Input_phone = '',Input_phonetype = '',Input_reply_code = '',Input_local_routing_number = '',Input_account_owner = '',Input_carrier_name = '',Input_carrier_category = '',Input_local_area_transport_area = '',Input_point_code = '',Input_country_code = '',Input_dial_type = '',Input_routing_code = '',Input_porting_dt = '',Input_porting_time = '',Input_country_abbr = '',Input_vendor_first_reported_dt = '',Input_vendor_first_reported_time = '',Input_vendor_last_reported_dt = '',Input_vendor_last_reported_time = '',Input_port_start_dt = '',Input_port_start_time = '',Input_port_end_dt = '',Input_port_end_time = '',Input_remove_port_dt = '',Input_is_ported = '',Input_serv = '',Input_line = '',Input_spid = '',Input_operator_fullname = '',Input_number_in_service = '',Input_high_risk_indicator = '',Input_prepaid = '',Input_phone_swap = '',Input_swap_start_dt = '',Input_swap_start_time = '',Input_swap_end_dt = '',Input_swap_end_time = '',Input_deact_code = '',Input_deact_start_dt = '',Input_deact_start_time = '',Input_deact_end_dt = '',Input_deact_end_time = '',Input_react_start_dt = '',Input_react_start_time = '',Input_react_end_dt = '',Input_react_end_time = '',Input_is_deact = '',Input_is_react = '',Input_call_forward_dt = '',Input_caller_id = '',OutFile) := MACRO
-  IMPORT SALT39,Scrubs_PhonesInfo;
+  IMPORT SALT311,Scrubs_PhonesInfo;
   #uniquename(of)
   %of% := RECORD
-    SALT39.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

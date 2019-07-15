@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 export FAA_Keyfilenames(
 
@@ -198,4 +198,4 @@ module
 																			 + FAA_Keys_FCRA.aircraft_reg_did.dAll_filenames														
 																			 ;
 
-end;
+end: DEPRECATED('Use PRTE2_FAA.Constants instead.');

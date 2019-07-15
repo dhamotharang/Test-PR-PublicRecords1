@@ -1,4 +1,4 @@
-﻿IMPORT SALT39,STD;
+﻿IMPORT SALT311,STD;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT BaseFile_Scrubs := MODULE
  
@@ -66,56 +66,56 @@ EXPORT BaseFile_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(BaseFile_Layout_PhonesInfo) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.source_Invalid := BaseFile_Fields.InValid_source((SALT39.StrType)le.source);
-    SELF.dt_first_reported_Invalid := BaseFile_Fields.InValid_dt_first_reported((SALT39.StrType)le.dt_first_reported);
-    SELF.dt_last_reported_Invalid := BaseFile_Fields.InValid_dt_last_reported((SALT39.StrType)le.dt_last_reported);
-    SELF.phone_Invalid := BaseFile_Fields.InValid_phone((SALT39.StrType)le.phone);
-    SELF.phonetype_Invalid := BaseFile_Fields.InValid_phonetype((SALT39.StrType)le.phonetype);
-    SELF.reply_code_Invalid := BaseFile_Fields.InValid_reply_code((SALT39.StrType)le.reply_code);
-    SELF.local_routing_number_Invalid := BaseFile_Fields.InValid_local_routing_number((SALT39.StrType)le.local_routing_number);
-    SELF.account_owner_Invalid := BaseFile_Fields.InValid_account_owner((SALT39.StrType)le.account_owner);
-    SELF.carrier_category_Invalid := BaseFile_Fields.InValid_carrier_category((SALT39.StrType)le.carrier_category);
-    SELF.local_area_transport_area_Invalid := BaseFile_Fields.InValid_local_area_transport_area((SALT39.StrType)le.local_area_transport_area);
-    SELF.country_code_Invalid := BaseFile_Fields.InValid_country_code((SALT39.StrType)le.country_code);
-    SELF.dial_type_Invalid := BaseFile_Fields.InValid_dial_type((SALT39.StrType)le.dial_type);
-    SELF.routing_code_Invalid := BaseFile_Fields.InValid_routing_code((SALT39.StrType)le.routing_code);
-    SELF.porting_dt_Invalid := BaseFile_Fields.InValid_porting_dt((SALT39.StrType)le.porting_dt);
-    SELF.porting_time_Invalid := BaseFile_Fields.InValid_porting_time((SALT39.StrType)le.porting_time);
-    SELF.country_abbr_Invalid := BaseFile_Fields.InValid_country_abbr((SALT39.StrType)le.country_abbr);
-    SELF.vendor_first_reported_dt_Invalid := BaseFile_Fields.InValid_vendor_first_reported_dt((SALT39.StrType)le.vendor_first_reported_dt);
-    SELF.vendor_first_reported_time_Invalid := BaseFile_Fields.InValid_vendor_first_reported_time((SALT39.StrType)le.vendor_first_reported_time);
-    SELF.vendor_last_reported_dt_Invalid := BaseFile_Fields.InValid_vendor_last_reported_dt((SALT39.StrType)le.vendor_last_reported_dt);
-    SELF.vendor_last_reported_time_Invalid := BaseFile_Fields.InValid_vendor_last_reported_time((SALT39.StrType)le.vendor_last_reported_time);
-    SELF.port_start_dt_Invalid := BaseFile_Fields.InValid_port_start_dt((SALT39.StrType)le.port_start_dt);
-    SELF.port_start_time_Invalid := BaseFile_Fields.InValid_port_start_time((SALT39.StrType)le.port_start_time);
-    SELF.port_end_dt_Invalid := BaseFile_Fields.InValid_port_end_dt((SALT39.StrType)le.port_end_dt);
-    SELF.port_end_time_Invalid := BaseFile_Fields.InValid_port_end_time((SALT39.StrType)le.port_end_time);
-    SELF.remove_port_dt_Invalid := BaseFile_Fields.InValid_remove_port_dt((SALT39.StrType)le.remove_port_dt);
-    SELF.serv_Invalid := BaseFile_Fields.InValid_serv((SALT39.StrType)le.serv);
-    SELF.line_Invalid := BaseFile_Fields.InValid_line((SALT39.StrType)le.line);
-    SELF.spid_Invalid := BaseFile_Fields.InValid_spid((SALT39.StrType)le.spid);
-    SELF.operator_fullname_Invalid := BaseFile_Fields.InValid_operator_fullname((SALT39.StrType)le.operator_fullname);
-    SELF.number_in_service_Invalid := BaseFile_Fields.InValid_number_in_service((SALT39.StrType)le.number_in_service);
-    SELF.high_risk_indicator_Invalid := BaseFile_Fields.InValid_high_risk_indicator((SALT39.StrType)le.high_risk_indicator);
-    SELF.prepaid_Invalid := BaseFile_Fields.InValid_prepaid((SALT39.StrType)le.prepaid);
-    SELF.phone_swap_Invalid := BaseFile_Fields.InValid_phone_swap((SALT39.StrType)le.phone_swap);
-    SELF.swap_start_dt_Invalid := BaseFile_Fields.InValid_swap_start_dt((SALT39.StrType)le.swap_start_dt);
-    SELF.swap_start_time_Invalid := BaseFile_Fields.InValid_swap_start_time((SALT39.StrType)le.swap_start_time);
-    SELF.swap_end_dt_Invalid := BaseFile_Fields.InValid_swap_end_dt((SALT39.StrType)le.swap_end_dt);
-    SELF.swap_end_time_Invalid := BaseFile_Fields.InValid_swap_end_time((SALT39.StrType)le.swap_end_time);
-    SELF.deact_code_Invalid := BaseFile_Fields.InValid_deact_code((SALT39.StrType)le.deact_code);
-    SELF.deact_start_dt_Invalid := BaseFile_Fields.InValid_deact_start_dt((SALT39.StrType)le.deact_start_dt);
-    SELF.deact_start_time_Invalid := BaseFile_Fields.InValid_deact_start_time((SALT39.StrType)le.deact_start_time);
-    SELF.deact_end_dt_Invalid := BaseFile_Fields.InValid_deact_end_dt((SALT39.StrType)le.deact_end_dt);
-    SELF.deact_end_time_Invalid := BaseFile_Fields.InValid_deact_end_time((SALT39.StrType)le.deact_end_time);
-    SELF.react_start_dt_Invalid := BaseFile_Fields.InValid_react_start_dt((SALT39.StrType)le.react_start_dt);
-    SELF.react_start_time_Invalid := BaseFile_Fields.InValid_react_start_time((SALT39.StrType)le.react_start_time);
-    SELF.react_end_dt_Invalid := BaseFile_Fields.InValid_react_end_dt((SALT39.StrType)le.react_end_dt);
-    SELF.react_end_time_Invalid := BaseFile_Fields.InValid_react_end_time((SALT39.StrType)le.react_end_time);
-    SELF.is_deact_Invalid := BaseFile_Fields.InValid_is_deact((SALT39.StrType)le.is_deact);
-    SELF.is_react_Invalid := BaseFile_Fields.InValid_is_react((SALT39.StrType)le.is_react);
-    SELF.call_forward_dt_Invalid := BaseFile_Fields.InValid_call_forward_dt((SALT39.StrType)le.call_forward_dt);
-    SELF.caller_id_Invalid := BaseFile_Fields.InValid_caller_id((SALT39.StrType)le.caller_id);
+    SELF.source_Invalid := BaseFile_Fields.InValid_source((SALT311.StrType)le.source);
+    SELF.dt_first_reported_Invalid := BaseFile_Fields.InValid_dt_first_reported((SALT311.StrType)le.dt_first_reported);
+    SELF.dt_last_reported_Invalid := BaseFile_Fields.InValid_dt_last_reported((SALT311.StrType)le.dt_last_reported);
+    SELF.phone_Invalid := BaseFile_Fields.InValid_phone((SALT311.StrType)le.phone);
+    SELF.phonetype_Invalid := BaseFile_Fields.InValid_phonetype((SALT311.StrType)le.phonetype);
+    SELF.reply_code_Invalid := BaseFile_Fields.InValid_reply_code((SALT311.StrType)le.reply_code);
+    SELF.local_routing_number_Invalid := BaseFile_Fields.InValid_local_routing_number((SALT311.StrType)le.local_routing_number);
+    SELF.account_owner_Invalid := BaseFile_Fields.InValid_account_owner((SALT311.StrType)le.account_owner);
+    SELF.carrier_category_Invalid := BaseFile_Fields.InValid_carrier_category((SALT311.StrType)le.carrier_category);
+    SELF.local_area_transport_area_Invalid := BaseFile_Fields.InValid_local_area_transport_area((SALT311.StrType)le.local_area_transport_area);
+    SELF.country_code_Invalid := BaseFile_Fields.InValid_country_code((SALT311.StrType)le.country_code);
+    SELF.dial_type_Invalid := BaseFile_Fields.InValid_dial_type((SALT311.StrType)le.dial_type);
+    SELF.routing_code_Invalid := BaseFile_Fields.InValid_routing_code((SALT311.StrType)le.routing_code);
+    SELF.porting_dt_Invalid := BaseFile_Fields.InValid_porting_dt((SALT311.StrType)le.porting_dt);
+    SELF.porting_time_Invalid := BaseFile_Fields.InValid_porting_time((SALT311.StrType)le.porting_time);
+    SELF.country_abbr_Invalid := BaseFile_Fields.InValid_country_abbr((SALT311.StrType)le.country_abbr);
+    SELF.vendor_first_reported_dt_Invalid := BaseFile_Fields.InValid_vendor_first_reported_dt((SALT311.StrType)le.vendor_first_reported_dt);
+    SELF.vendor_first_reported_time_Invalid := BaseFile_Fields.InValid_vendor_first_reported_time((SALT311.StrType)le.vendor_first_reported_time);
+    SELF.vendor_last_reported_dt_Invalid := BaseFile_Fields.InValid_vendor_last_reported_dt((SALT311.StrType)le.vendor_last_reported_dt);
+    SELF.vendor_last_reported_time_Invalid := BaseFile_Fields.InValid_vendor_last_reported_time((SALT311.StrType)le.vendor_last_reported_time);
+    SELF.port_start_dt_Invalid := BaseFile_Fields.InValid_port_start_dt((SALT311.StrType)le.port_start_dt);
+    SELF.port_start_time_Invalid := BaseFile_Fields.InValid_port_start_time((SALT311.StrType)le.port_start_time);
+    SELF.port_end_dt_Invalid := BaseFile_Fields.InValid_port_end_dt((SALT311.StrType)le.port_end_dt);
+    SELF.port_end_time_Invalid := BaseFile_Fields.InValid_port_end_time((SALT311.StrType)le.port_end_time);
+    SELF.remove_port_dt_Invalid := BaseFile_Fields.InValid_remove_port_dt((SALT311.StrType)le.remove_port_dt);
+    SELF.serv_Invalid := BaseFile_Fields.InValid_serv((SALT311.StrType)le.serv);
+    SELF.line_Invalid := BaseFile_Fields.InValid_line((SALT311.StrType)le.line);
+    SELF.spid_Invalid := BaseFile_Fields.InValid_spid((SALT311.StrType)le.spid);
+    SELF.operator_fullname_Invalid := BaseFile_Fields.InValid_operator_fullname((SALT311.StrType)le.operator_fullname);
+    SELF.number_in_service_Invalid := BaseFile_Fields.InValid_number_in_service((SALT311.StrType)le.number_in_service);
+    SELF.high_risk_indicator_Invalid := BaseFile_Fields.InValid_high_risk_indicator((SALT311.StrType)le.high_risk_indicator);
+    SELF.prepaid_Invalid := BaseFile_Fields.InValid_prepaid((SALT311.StrType)le.prepaid);
+    SELF.phone_swap_Invalid := BaseFile_Fields.InValid_phone_swap((SALT311.StrType)le.phone_swap);
+    SELF.swap_start_dt_Invalid := BaseFile_Fields.InValid_swap_start_dt((SALT311.StrType)le.swap_start_dt);
+    SELF.swap_start_time_Invalid := BaseFile_Fields.InValid_swap_start_time((SALT311.StrType)le.swap_start_time);
+    SELF.swap_end_dt_Invalid := BaseFile_Fields.InValid_swap_end_dt((SALT311.StrType)le.swap_end_dt);
+    SELF.swap_end_time_Invalid := BaseFile_Fields.InValid_swap_end_time((SALT311.StrType)le.swap_end_time);
+    SELF.deact_code_Invalid := BaseFile_Fields.InValid_deact_code((SALT311.StrType)le.deact_code);
+    SELF.deact_start_dt_Invalid := BaseFile_Fields.InValid_deact_start_dt((SALT311.StrType)le.deact_start_dt);
+    SELF.deact_start_time_Invalid := BaseFile_Fields.InValid_deact_start_time((SALT311.StrType)le.deact_start_time);
+    SELF.deact_end_dt_Invalid := BaseFile_Fields.InValid_deact_end_dt((SALT311.StrType)le.deact_end_dt);
+    SELF.deact_end_time_Invalid := BaseFile_Fields.InValid_deact_end_time((SALT311.StrType)le.deact_end_time);
+    SELF.react_start_dt_Invalid := BaseFile_Fields.InValid_react_start_dt((SALT311.StrType)le.react_start_dt);
+    SELF.react_start_time_Invalid := BaseFile_Fields.InValid_react_start_time((SALT311.StrType)le.react_start_time);
+    SELF.react_end_dt_Invalid := BaseFile_Fields.InValid_react_end_dt((SALT311.StrType)le.react_end_dt);
+    SELF.react_end_time_Invalid := BaseFile_Fields.InValid_react_end_time((SALT311.StrType)le.react_end_time);
+    SELF.is_deact_Invalid := BaseFile_Fields.InValid_is_deact((SALT311.StrType)le.is_deact);
+    SELF.is_react_Invalid := BaseFile_Fields.InValid_is_react((SALT311.StrType)le.is_react);
+    SELF.call_forward_dt_Invalid := BaseFile_Fields.InValid_call_forward_dt((SALT311.StrType)le.call_forward_dt);
+    SELF.caller_id_Invalid := BaseFile_Fields.InValid_caller_id((SALT311.StrType)le.caller_id);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -260,8 +260,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT39.StrType ErrorMessage;
-    SALT39.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -320,7 +320,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.caller_id_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'source','dt_first_reported','dt_last_reported','phone','phonetype','reply_code','local_routing_number','account_owner','carrier_category','local_area_transport_area','country_code','dial_type','routing_code','porting_dt','porting_time','country_abbr','vendor_first_reported_dt','vendor_first_reported_time','vendor_last_reported_dt','vendor_last_reported_time','port_start_dt','port_start_time','port_end_dt','port_end_time','remove_port_dt','serv','line','spid','operator_fullname','number_in_service','high_risk_indicator','prepaid','phone_swap','swap_start_dt','swap_start_time','swap_end_dt','swap_end_time','deact_code','deact_start_dt','deact_start_time','deact_end_dt','deact_end_time','react_start_dt','react_start_time','react_end_dt','react_end_time','is_deact','is_react','call_forward_dt','caller_id','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'Invalid_Source','Invalid_Date','Invalid_Date','Invalid_Phone','Invalid_Phone_Type','Invalid_Num','Invalid_Num','Invalid_Char','Invalid_Char','Invalid_Num','Invalid_Num','Invalid_Dial_Type','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_ISO2','Invalid_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Future_Date','Invalid_Zero_Three','Invalid_Zero_Three','Invalid_Num','Invalid_Char','Invalid_Num_In_Service','Invalid_YN','Invalid_YN','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Deact','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_Date','Invalid_Num','Invalid_Future_Date','Invalid_Num','Invalid_YN','Invalid_YN','Invalid_Date','Invalid_Char','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT39.StrType)le.source,(SALT39.StrType)le.dt_first_reported,(SALT39.StrType)le.dt_last_reported,(SALT39.StrType)le.phone,(SALT39.StrType)le.phonetype,(SALT39.StrType)le.reply_code,(SALT39.StrType)le.local_routing_number,(SALT39.StrType)le.account_owner,(SALT39.StrType)le.carrier_category,(SALT39.StrType)le.local_area_transport_area,(SALT39.StrType)le.country_code,(SALT39.StrType)le.dial_type,(SALT39.StrType)le.routing_code,(SALT39.StrType)le.porting_dt,(SALT39.StrType)le.porting_time,(SALT39.StrType)le.country_abbr,(SALT39.StrType)le.vendor_first_reported_dt,(SALT39.StrType)le.vendor_first_reported_time,(SALT39.StrType)le.vendor_last_reported_dt,(SALT39.StrType)le.vendor_last_reported_time,(SALT39.StrType)le.port_start_dt,(SALT39.StrType)le.port_start_time,(SALT39.StrType)le.port_end_dt,(SALT39.StrType)le.port_end_time,(SALT39.StrType)le.remove_port_dt,(SALT39.StrType)le.serv,(SALT39.StrType)le.line,(SALT39.StrType)le.spid,(SALT39.StrType)le.operator_fullname,(SALT39.StrType)le.number_in_service,(SALT39.StrType)le.high_risk_indicator,(SALT39.StrType)le.prepaid,(SALT39.StrType)le.phone_swap,(SALT39.StrType)le.swap_start_dt,(SALT39.StrType)le.swap_start_time,(SALT39.StrType)le.swap_end_dt,(SALT39.StrType)le.swap_end_time,(SALT39.StrType)le.deact_code,(SALT39.StrType)le.deact_start_dt,(SALT39.StrType)le.deact_start_time,(SALT39.StrType)le.deact_end_dt,(SALT39.StrType)le.deact_end_time,(SALT39.StrType)le.react_start_dt,(SALT39.StrType)le.react_start_time,(SALT39.StrType)le.react_end_dt,(SALT39.StrType)le.react_end_time,(SALT39.StrType)le.is_deact,(SALT39.StrType)le.is_react,(SALT39.StrType)le.call_forward_dt,(SALT39.StrType)le.caller_id,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.source,(SALT311.StrType)le.dt_first_reported,(SALT311.StrType)le.dt_last_reported,(SALT311.StrType)le.phone,(SALT311.StrType)le.phonetype,(SALT311.StrType)le.reply_code,(SALT311.StrType)le.local_routing_number,(SALT311.StrType)le.account_owner,(SALT311.StrType)le.carrier_category,(SALT311.StrType)le.local_area_transport_area,(SALT311.StrType)le.country_code,(SALT311.StrType)le.dial_type,(SALT311.StrType)le.routing_code,(SALT311.StrType)le.porting_dt,(SALT311.StrType)le.porting_time,(SALT311.StrType)le.country_abbr,(SALT311.StrType)le.vendor_first_reported_dt,(SALT311.StrType)le.vendor_first_reported_time,(SALT311.StrType)le.vendor_last_reported_dt,(SALT311.StrType)le.vendor_last_reported_time,(SALT311.StrType)le.port_start_dt,(SALT311.StrType)le.port_start_time,(SALT311.StrType)le.port_end_dt,(SALT311.StrType)le.port_end_time,(SALT311.StrType)le.remove_port_dt,(SALT311.StrType)le.serv,(SALT311.StrType)le.line,(SALT311.StrType)le.spid,(SALT311.StrType)le.operator_fullname,(SALT311.StrType)le.number_in_service,(SALT311.StrType)le.high_risk_indicator,(SALT311.StrType)le.prepaid,(SALT311.StrType)le.phone_swap,(SALT311.StrType)le.swap_start_dt,(SALT311.StrType)le.swap_start_time,(SALT311.StrType)le.swap_end_dt,(SALT311.StrType)le.swap_end_time,(SALT311.StrType)le.deact_code,(SALT311.StrType)le.deact_start_dt,(SALT311.StrType)le.deact_start_time,(SALT311.StrType)le.deact_end_dt,(SALT311.StrType)le.deact_end_time,(SALT311.StrType)le.react_start_dt,(SALT311.StrType)le.react_start_time,(SALT311.StrType)le.react_end_dt,(SALT311.StrType)le.react_end_time,(SALT311.StrType)le.is_deact,(SALT311.StrType)le.is_react,(SALT311.StrType)le.call_forward_dt,(SALT311.StrType)le.caller_id,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,50,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -328,7 +328,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(BaseFile_Layout_PhonesInfo) prevDS = DATASET([], BaseFile_Layout_PhonesInfo), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT39.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -556,7 +556,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.is_deact_ALLOW_ErrorCount
           ,le.is_react_ALLOW_ErrorCount
           ,le.call_forward_dt_CUSTOM_ErrorCount
-          ,le.caller_id_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.caller_id_ALLOW_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -570,12 +570,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT39.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT39.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -590,7 +590,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT39.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -764,7 +764,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,54,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT39.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -789,12 +789,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(BaseFile_Layout_PhonesInfo) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT39.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, BaseFile_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_PhonesInfo, BaseFile_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -805,10 +805,10 @@ EXPORT StandardStats(DATASET(BaseFile_Layout_PhonesInfo) inFile, BOOLEAN doError
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT39.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT39.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;

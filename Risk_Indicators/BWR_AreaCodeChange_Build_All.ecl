@@ -1,4 +1,4 @@
-import Risk_Indicators, ut, _Control, std;
+﻿import Risk_Indicators, ut, _Control, std;
 
 //READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME////READ ME//
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +30,7 @@ vsDate	:= ut.GetDate;
 RETURN sequential(Risk_Indicators.spray_AreaCode_split(filedate)
 									,Risk_Indicators.Process_AreaCode_Change(filedate)
 									,Risk_Indicators.proc_build_AreaCodeChange_keys(vsDate)
+									,Risk_Indicators.proc_build_AreaCodeChange_FCRAkeys(vsDate)
 									,Risk_Indicators.sample_AreaCode_Change
 									);
 END;

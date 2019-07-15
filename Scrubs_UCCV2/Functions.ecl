@@ -82,11 +82,26 @@ EXPORT Functions := MODULE
   END;
 
   //****************************************************************************
+	 //fn_verify_zip5_country:  returns true or false based upon whether or not 
+  //                          there is a 5-digit value for USA location.
+	 //****************************************************************************
+	 EXPORT fn_verify_zip5_country(STRING zip5, STRING country) := function    
+      is_US := CASE(Stringlib.StringFilterOut(TRIM(country,ALL), '.'),
+                    'US'                     => TRUE,
+                    'USA'                    => TRUE,
+                    'UNITEDSTATES'           => TRUE,
+                    'UNITEDSTATESOFAMERICA'  => TRUE,
+                    ''                       => TRUE,
+                    FALSE);
+      RETURN IF((LENGTH(zip5) = 5 AND Stringlib.StringFilterOut(zip5, '0123456789') = '') OR NOT is_US, 1, 0);
+  END;
+
+  //****************************************************************************
 	 //fn_verify_zip4:  returns true or false based upon whether or not there is
   //                 a 4-digit value.
 	 //****************************************************************************
 	 EXPORT fn_verify_zip4(STRING zip4) := function    
-		  RETURN IF(LENGTH(zip4) = 4 AND Stringlib.StringFilterOut(zip4, '0123456789') = '', 1, 0);
+		  RETURN IF(LENGTH(zip4) IN [0,4] AND Stringlib.StringFilterOut(zip4, '0123456789') = '', 1, 0);
   END;
 
   //****************************************************************************
@@ -95,8 +110,8 @@ EXPORT Functions := MODULE
 	 //****************************************************************************
 	 EXPORT fn_verify_cart(STRING cart) := function    
 		  RETURN IF(LENGTH(cart) = 4 AND 
-              Stringlib.StringFilterOut(cart[1], 'BCHR') = '' AND
-              Stringlib.StringFilterOut(cart[2..], '0123456789') = '', 1, 0);
+                Stringlib.StringFilterOut(cart[1], 'BCHR') = '' AND
+                Stringlib.StringFilterOut(cart[2..], '0123456789') = '', 1, 0);
   END;
 
   //****************************************************************************

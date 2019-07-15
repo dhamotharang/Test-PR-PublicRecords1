@@ -1,29 +1,31 @@
-﻿import _Control,STD;
+﻿import FraudGovPlatform,_Control,STD;
 
-every_10_min := '*/10 0-23 * * *';
-IP:= FraudGovPlatform_Validation.Constants.LandingZoneServer;
-RootDir := FraudGovPlatform_Validation.Constants.LandingZonePathBase;
+every_hour := '0 * * * *';
+
+IP:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',Constants.LandingZoneServer_dev,Constants.LandingZoneServer_prod);
+RootDir:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',Constants.LandingZonePathBase_dev,Constants.LandingZonePathBase_prod);
+ThorName:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',Constants.ThorName_Dev,Constants.ThorName_Prod);
+
 LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev02','thor400_30');
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)):global(few);
 dsFileListSorted := sort(dsFileList,modified);
 pfile:=STD.STR.SplitWords(dsFileListSorted[1].Name,'/');
 FileDir:=RootDir + pfile[1] +'/';
 
-ECL :=
+lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov Contributory Input Prep\';\n'
++'wuname := \'FraudGov Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   \'sesha.nookala@lexisnexis.com\'\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'valid_state := [\'submitted\', \'compiling\',\'blocked\',\'running\',\'wait\'];\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n'
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'
@@ -33,12 +35,17 @@ ECL :=
 +'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyInput(version,\''+IP+'\',\''+FileDir+'\'))\n'
 +'	);\n'
 ;
-
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov Input Prep Schedule');
 
-if(count(nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)))>0,_Control.fSubmitNewWorkunit(ECL,ThorName),'NO FILES TO SPRAY') :WHEN(CRON(every_10_min))
+SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipContributions;
+Run_ECL := if(SkipJob=false,lECL1, 'output(\'Spray Contributions Skipped\');\n' );
+
+if(count(nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)))>0,
+	_Control.fSubmitNewWorkunit(Run_ECL,ThorName),
+	'NO FILES TO SPRAY') 
+:WHEN(CRON(every_hour))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Input Prep SCHEDULE failure'
-																			,FraudGovPlatform_Validation.Constants.NOC_MSG
-																			));
+			,'FraudGov Input Prep Schedule failure'
+			,FraudGovPlatform_Validation.Constants.NOC_MSG
+			));

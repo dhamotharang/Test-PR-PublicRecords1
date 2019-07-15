@@ -1,19 +1,19 @@
-import tools;
+﻿import tools;
 EXPORT Ingest(
 
-	 dataset(Layouts.Base			)	pInputFile							
-	,dataset(Layouts.Base			)	pBaseFile			= Files().base.qa									
+	 dataset(Layouts.Base_new			)	pInputFile							
+	,dataset(Layouts.Base_new			)	pBaseFile			= Files().base.qa									
 	,string											pPersistname	= persistnames().IngestIt
 	
 ) :=
 MODULE
   shared base := pBaseFile; // Change IN_File_Base to change input to ingest process
-  SHARED NullFile := DATASET([],Layouts.Base); // Use to replace files you wish to remove
+  SHARED NullFile := DATASET([],Layouts.Base_new); // Use to replace files you wish to remove
 // First collect together all sources
   shared infile := pInputFile;
 //infile := NullFile; // Can be uncommented to remove temporarily
   shared FilesToIngest1 := infile;
-  Layouts.Base Into(FilesToIngest1 le) := TRANSFORM
+  Layouts.Base_new Into(FilesToIngest1 le) := TRANSFORM
     self := le;
   end;
    shared  FilesToIngest := PROJECT(FilesToIngest1,Into(left)); // In case local header decl and _as_ attributes differ
@@ -21,10 +21,10 @@ MODULE
 // Now need to discover which records are old / new / updated
   SHARED RecordType := utilities.recordtype;
   SHARED RTToText(unsigned1 c) := utilities.rttotext(c);
-  shared WithRT := RECORD(Layouts.Base)
+  shared WithRT := RECORD(Layouts.Base_new)
     __Tpe := RecordType.Unknown;
   END;
-  shared  WithRT AddFlag(Layouts.base le,UNSIGNED1 c) := TRANSFORM
+  shared  WithRT AddFlag(Layouts.base_new le,UNSIGNED1 c) := TRANSFORM
     SELF.__Tpe := c;
     SELF := le;
   END;
@@ -163,7 +163,7 @@ MODULE
     UNSIGNED Cnt := COUNT(GROUP);
   END;
   EXPORT UpdateStats := TABLE(AllRecs,StatsRec,__Tpe,FEW);
-  SHARED Layouts.Base DeTag(AllRecs le) := TRANSFORM
+  SHARED Layouts.base_new DeTag(AllRecs le) := TRANSFORM
 	  self.record_type := le.__Tpe;
     SELF := le;
   END;

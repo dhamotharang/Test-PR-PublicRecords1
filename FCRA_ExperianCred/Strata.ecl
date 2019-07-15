@@ -1,6 +1,5 @@
-import STRATA;
+﻿import STRATA;
 pFCRA_ExperianCred_EN_base:=Files.Base;
-pVersion:=Version;
 
 rPopulationStats_FCRA_ExperianCred_EN_base
  :=
@@ -83,11 +82,15 @@ dPopulationStats_FCRA_ExperianCred_EN_base := table(pFCRA_ExperianCred_EN_base
 							  	    ,rPopulationStats_FCRA_ExperianCred_EN_base
 									,st
 									,few);
-STRATA.createXMLStats(dPopulationStats_FCRA_ExperianCred_EN_base
+
+CreateXMLStats(string ver) :=  function									
+	STRATA.createXMLStats(dPopulationStats_FCRA_ExperianCred_EN_base
 					 ,'EN'
 					 ,'FCRA_ExperianCred'
-					 ,pVersion
+					 ,ver
 					 ,'jose.bello@lexisnexis.com'
 					 ,zFCRA_ExperianCred_EN_base);
+	return zFCRA_ExperianCred_EN_base;
+END;
 
-EXPORT Strata := zFCRA_ExperianCred_EN_base;
+EXPORT Strata(string ver) := CreateXMLStats(ver);

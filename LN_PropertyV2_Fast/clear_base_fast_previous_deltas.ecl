@@ -1,4 +1,4 @@
-// This function attribute is called by the full build (proc0_build_all) to clear delta base files added to the full - Jira DF-11862
+﻿// This function attribute is called by the full build (proc0_build_all) to clear delta base files added to the full - Jira DF-11862
 
 import ut,LN_PropertyV2,ln_propertyv2_fast,std;
 EXPORT clear_base_fast_previous_deltas(string pdate) := function
@@ -43,46 +43,35 @@ EXPORT clear_base_fast_previous_deltas(string pdate) := function
 											 );
 	END;
 	
-	mostcurrentlog		:= sort(LN_PropertyV2_Fast.BuildLogger.file,-version)[1] : INDEPENDENT;
 	todays_date				:= (STRING8)Std.Date.Today() : INDEPENDENT;
-	new_delta_version	:= if(mostcurrentlog.version<todays_date,todays_date,error('PROBLEM, New delta less or equal latest build')) : INDEPENDENT;
-
-	updatelognewdelta	:= sequential(LN_PropertyV2_Fast.BuildLogger.update(new_delta_version,'update_type','DELTA'),
-																	LN_PropertyV2_Fast.BuildLogger.update(new_delta_version,'prep_start_date',mostcurrentlog.prep_start_date),
-																	LN_PropertyV2_Fast.BuildLogger.update(new_delta_version,'prep_end_date',mostcurrentlog.prep_end_date),
-																	LN_PropertyV2_Fast.BuildLogger.update(new_delta_version,'base_build_start_date',(STRING8)Std.Date.Today()));
-
-	buildnewdeltakeys	:= sequential(LN_PropertyV2_Fast.proc4channeldelta(new_delta_version,true),LN_PropertyV2_Fast.verify_compare_latest_keys(true)); //Jira DF-18162
-	
-	updatedopsnewdelta:= LN_PropertyV2_Fast.build_information(true).set_qa_version(new_delta_version);
-	
-	return sequential( 
-										updatelognewdelta,
-										parallel(
-														 sequential(output(select_assessment,,prefix_basef+'assessment_'+new_delta_version,overwrite,compressed), 
-																				Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.assessment),
-																				addToSuperFile(LN_PropertyV2_Fast.FileNames.base.assessment,prefix_basef+'assessment_'+new_delta_version)),
-														 sequential(output(select_deed_mortg,,prefix_basef+'deed_mortgage_'+new_delta_version,overwrite,compressed), 
-																				Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.deed_mortg),
-																				addToSuperFile(LN_PropertyV2_Fast.FileNames.base.deed_mortg,prefix_basef+'deed_mortgage_'+new_delta_version)),
-														 sequential(output(select_addl_names,,prefix_basef+'addl::ln_names_'+new_delta_version,overwrite,compressed), 
-																				Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_names),
-																				addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_names,prefix_basef+'addl::ln_names_'+new_delta_version)),
-														 sequential(output(select_addl_legal,,prefix_basef+'addl::legal_'+new_delta_version,overwrite,compressed), 
-																				Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_legal),
-																				addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_legal,prefix_basef+'addl::legal_'+new_delta_version)),
-														 sequential(output(select_addl_frs_a,,prefix_basef+'addl_frs_assessment_'+new_delta_version,overwrite,compressed), 
-																				Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_frs_a),
-																				addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_frs_a,prefix_basef+'addl_frs_assessment_'+new_delta_version)),
-														 sequential(output(select_addl_frs_d,,prefix_basef+'addl_frs_deed_mortgage_'+new_delta_version,overwrite,compressed), 
-																				Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_frs_d),
-																				addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_frs_d,prefix_basef+'addl_frs_deed_mortgage_'+new_delta_version)),
-														 sequential(output(select_search_prp,,prefix_basef+'search_'+new_delta_version,overwrite,compressed), 
-																				Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.search_prp),
-																				addToSuperFile(LN_PropertyV2_Fast.FileNames.base.search_prp,prefix_basef+'search_'+new_delta_version)),
-															),
-										LN_PropertyV2_Fast.BuildLogger.update(new_delta_version,'base_build_end_date',(STRING8)Std.Date.Today()),
-										buildnewdeltakeys,
-										updatedopsnewdelta
+	return 	parallel(
+										 sequential(output(select_assessment,,prefix_basef+'assessment_'+todays_date,overwrite,compressed), 
+																Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.assessment),
+																addToSuperFile(LN_PropertyV2_Fast.FileNames.base.assessment,prefix_basef+'assessment_'+todays_date)
+																),
+										 sequential(output(select_deed_mortg,,prefix_basef+'deed_mortgage_'+todays_date,overwrite,compressed), 
+																Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.deed_mortg),
+																addToSuperFile(LN_PropertyV2_Fast.FileNames.base.deed_mortg,prefix_basef+'deed_mortgage_'+todays_date)
+																),
+										 sequential(output(select_addl_names,,prefix_basef+'addl::ln_names_'+todays_date,overwrite,compressed), 
+																Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_names),
+																addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_names,prefix_basef+'addl::ln_names_'+todays_date)
+															  ),
+										 sequential(output(select_addl_legal,,prefix_basef+'addl::legal_'+todays_date,overwrite,compressed), 
+																Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_legal),
+																addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_legal,prefix_basef+'addl::legal_'+todays_date)
+																),
+ 									   sequential(output(select_addl_frs_a,,prefix_basef+'addl_frs_assessment_'+todays_date,overwrite,compressed), 
+																Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_frs_a),
+																addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_frs_a,prefix_basef+'addl_frs_assessment_'+todays_date)
+																),
+										 sequential(output(select_addl_frs_d,,prefix_basef+'addl_frs_deed_mortgage_'+todays_date,overwrite,compressed), 
+																Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.addl_frs_d),
+																addToSuperFile(LN_PropertyV2_Fast.FileNames.base.addl_frs_d,prefix_basef+'addl_frs_deed_mortgage_'+todays_date)
+																),
+										 sequential(output(select_search_prp,,prefix_basef+'search_'+todays_date,overwrite,compressed), 
+																Cleansuperfile(LN_PropertyV2_Fast.FileNames.base.search_prp),
+																addToSuperFile(LN_PropertyV2_Fast.FileNames.base.search_prp,prefix_basef+'search_'+todays_date)
+																),
 										);
 END;

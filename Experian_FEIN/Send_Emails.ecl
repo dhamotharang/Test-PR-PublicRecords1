@@ -1,15 +1,27 @@
-import VersionControl,tools;
+IMPORT STD, VersionControl, tools, _Control;
 
-export Send_Emails(string pversion) := module
+EXPORT Send_Emails(STRING pAddresses, STRING pVersion, STRING pMessage = '') := MODULE
+	SHARED addresses := STD.Str.SplitWords(pAddresses, ','); 
 
-	export BuildSuccess	:= tools.fun_SendEmail(
-													 Email_Notification_Lists().BuildSuccess
-													,_Dataset().Name + ' Build Succeeded ' + pversion
-													,workunit);
+	EXPORT Get_Primary_Addresses := IF( _Control.MyInfo.EmailAddressNotify = addresses[1], addresses[1],  _Control.MyInfo.EmailAddressNotify + ';' + addresses[1] + ';');
 
-	export BuildFailure	:= tools.fun_SendEmail(
-													Email_Notification_Lists().BuildFailure
-												 ,_Dataset().Name + ' Build ' + pversion + ' Failed',
-													workunit + '\n' + failmessage);
-		
-end;
+	EXPORT Call_Email_Notification := tools.mod_Email_Notification_Lists(
+            Get_Primary_Addresses,
+			Get_Primary_Addresses + ';' + addresses[2] + ';',
+            Get_Primary_Addresses + ';' + addresses[2] + ';',
+            Get_Primary_Addresses,,
+            Get_Primary_Addresses + ';' + addresses[2] + ';'+ addresses[3] + ';'
+    );
+ 
+	EXPORT BuildSuccess := tools.fun_SendEmail(
+		Call_Email_Notification.BuildSuccess,
+		_Dataset().Name + ' Build Succeeded ' + pVersion,
+		workunit
+	);
+
+	EXPORT BuildFailure := tools.fun_SendEmail(
+		Call_Email_Notification.BuildFailure,
+		_Dataset().Name + ' Build ' + pVersion + ' Failed',
+		workunit + '\n' + failmessage
+	);
+END;

@@ -1,10 +1,8 @@
-IMPORT  address, ut, header_slimsort, did_add, didville,AID,_validate,NID;
+﻿IMPORT  address, ut, header_slimsort, did_add, didville,AID,_validate,NID;
 
-#IF (IsFullUpdate = true)
-	Exprn_credit := Files.load_in;
-#ELSE
-	Exprn_credit := Files.update_in;
-#END
+export Build_base(string ver, boolean IsFullUpdate = false) := module
+
+Exprn_credit := if(IsFullUpdate, Files.load_in, Files.update_in);
 // Prepped_rec_type[1]:
 // 0=current name
 // 1=former name1
@@ -188,8 +186,8 @@ Layouts.base t_prep (Layouts.load L, INTEGER C):= TRANSFORM
 
 	self.dt_first_seen            := (unsigned)_validate.date.fCorrectedDateString(self.orig_crdt_ccyymmdd,false);
 	self.dt_last_seen             := (unsigned)_validate.date.fCorrectedDateString(self.orig_updt_ccyymmdd,false);
-	self.dt_vendor_first_reported := (unsigned)version;
-	self.dt_vendor_last_reported  := (unsigned)version;
+	self.dt_vendor_first_reported := (unsigned)ver;
+	self.dt_vendor_last_reported  := (unsigned)ver;
 
 	SELF.fname                    := self.orig_fname;
 	SELF.mname                    := self.orig_mname;
@@ -244,44 +242,40 @@ preprocess2 := distribute(preprocess1,hash(EXPERIAN_ENCRYPTED_PIN));
 preprocess  := dedup(preprocess2,record,except prepped_rec_type,all,local):persist('~thor_data400::persist::FCRA_ExperianCred_clean');
 
 
-#IF (IsFullUpdate = true)
+base_and_update_full := preprocess;
 
-	base_and_update := preprocess;
+cur_base_d   := distribute(project(Files.Base, transform(Layouts.base, self.did := 0, self := left)), hash(EXPERIAN_ENCRYPTED_PIN));
+cur_update_d := dedup(distribute(preprocess, hash(EXPERIAN_ENCRYPTED_PIN)),record,all,local);
+cur_deletes_d := dedup(distribute(Files.Deletes_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
+cur_deceased_d := dedup(distribute(Files.Deceased_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
 
-#ELSE
+apply_updates := join(cur_base_d, dedup(cur_update_d,EXPERIAN_ENCRYPTED_PIN,all,local)
+                                    ,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
+                                    ,left only
+                                    ,local)
+                                    +
+                                    cur_update_d
+                                    ;
 
-	cur_base_d   := distribute(project(Files.Base, transform(Layouts.base, self.did := 0, self := left)), hash(EXPERIAN_ENCRYPTED_PIN));
-	cur_update_d := dedup(distribute(preprocess, hash(EXPERIAN_ENCRYPTED_PIN)),record,all,local);
-	cur_deletes_d := dedup(distribute(Files.Deletes_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
-	cur_deceased_d := dedup(distribute(Files.Deceased_in, hash(EXPERIAN_ENCRYPTED_PIN)),EXPERIAN_ENCRYPTED_PIN,all,local);
+apply_deletes := join(distribute(apply_updates,hash(EXPERIAN_ENCRYPTED_PIN)), cur_deletes_d
+                                ,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
+                        ,transform(Layouts.base
+                            ,self.IsDelete := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN,true,left.IsDelete)
+                            ,self:= left)
+                        ,left outer
+                        ,local);
 
-	apply_updates := join(cur_base_d, dedup(cur_update_d,EXPERIAN_ENCRYPTED_PIN,all,local)
-										,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
-										,left only
-										,local)
-										+
-										cur_update_d
-										;
+apply_deceased := join(apply_deletes, cur_deceased_d
+                                ,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
+                        ,transform(Layouts.base
+                            ,self.IsDeceased := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN and left.Prepped_rec_type<>'400',true,left.IsDeceased)
+                            ,self:= left)
+                        ,left outer
+                        ,local);
 
-	apply_deletes := join(distribute(apply_updates,hash(EXPERIAN_ENCRYPTED_PIN)), cur_deletes_d
-									,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
-							,transform(Layouts.base
-								,self.IsDelete := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN,true,left.IsDelete)
-								,self:= left)
-							,left outer
-							,local);
+base_and_update_delta := apply_deceased;
 
-	apply_deceased := join(apply_deletes, cur_deceased_d
-									,left.EXPERIAN_ENCRYPTED_PIN = right.EXPERIAN_ENCRYPTED_PIN
-							,transform(Layouts.base
-								,self.IsDeceased := if(left.EXPERIAN_ENCRYPTED_PIN=right.EXPERIAN_ENCRYPTED_PIN and left.Prepped_rec_type<>'400',true,left.IsDeceased)
-								,self:= left)
-							,left outer
-							,local);
-
-	base_and_update := apply_deceased;
-
-#END
+base_and_update := if(IsFullUpdate, base_and_update_full, base_and_update_delta);
 
 EN_ready := base_and_update;
 //-----------------------------------------------------------------
@@ -371,9 +365,11 @@ candidates		:=d_did_0(IsDelete=false and IsUpdating=true and IsDeceased=false an
 not_candidates:=d_did_0(IsDelete=true  or  IsUpdating=false or IsDeceased=true  or  IsCurrent=false);
 d_did:=project(candidates
 									,transform(layouts.base
-											,self.dt_last_seen:=if((unsigned)version > left.dt_first_seen, (unsigned)version, left.dt_last_seen)
+											,self.dt_last_seen:=if((unsigned)ver > left.dt_first_seen, (unsigned)ver, left.dt_last_seen)
 											,self:=left
 											))
 											+ not_candidates;
 
-export Build_base := d_did;
+export ALL := d_did;
+
+END;

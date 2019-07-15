@@ -1,8 +1,14 @@
+﻿//
+// hygenics_search.Key_BocaShell_Crim_FCRA
+//
+
 Import Data_Services, doxie, ut, crimsrch, hygenics_crim,doxie_build,corrections;
 
+file_offenses_ds := dataset('~thor_data400::base::corrections_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_Offenses_with_OffenseCategory,flat)(length(trim(offender_key, left, right))>2);
+file_offenses_keybuilding := hygenics_crim.Prep_Build.PB_File_Offenses(file_offenses_ds);
 
-file_offenses_keybuilding := dataset('~thor_data400::base::corrections_offenses_' + doxie_build.buildstate,hygenics_crim.Layout_Base_Offenses_with_OffenseCategory,flat)(length(trim(offender_key, left, right))>2);
-file_courtoffenses_keybuilding := dataset('~thor_Data400::base::corrections_court_offenses_' + doxie_build.buildstate, hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory,flat)(length(offender_key)>2);
+file_courtoffenses_ds := dataset('~thor_Data400::base::corrections_court_offenses_' + doxie_build.buildstate, hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory,flat)(length(offender_key)>2);
+file_courtoffenses_keybuilding  := hygenics_crim.Prep_Build.PB_File_CourtOffenses(file_courtoffenses_ds);
 
 f := hygenics_search.file_fcra_offenders_keybuilding (Vendor not in hygenics_search.sCourt_Vendors_To_Omit);
 o := file_courtoffenses_keybuilding (Vendor not in hygenics_search.sCourt_Vendors_To_Omit and (stringlib.stringfind(court_disp_desc_1, 'DISMISSED', 1) > 0 or stringlib.stringfind(court_disp_desc_2, 'DISMISSED', 1) > 0));

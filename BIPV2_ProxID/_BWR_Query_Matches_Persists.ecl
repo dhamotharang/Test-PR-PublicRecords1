@@ -1,9 +1,9 @@
-ih      := BIPV2_ProxID_dev.In_DOT_Base;
-laymtch := BIPV2_ProxID_dev.match_candidates(ih).layout_matches;
+﻿ih      := BIPV2_ProxID.In_DOT_Base;
+laymtch := BIPV2_ProxID.match_candidates(ih).layout_matches;
 
-All_Matches   := dataset('~temp::BIPV2_ProxID_dev_Proxid_DOT_Base_all_m',laymtch,flat); // all matches before processing
-remove_trans  := dataset('~temp::BIPV2_ProxID_dev_Proxid_DOT_Base_mt'   ,laymtch,flat); // remove transitives
-BestPerRecord := dataset('~temp::BIPV2_ProxID_dev_Proxid_DOT_Base_mr'   ,laymtch,flat); // best per record
+All_Matches   := dataset('~temp::BIPV2_ProxID_Proxid_DOT_Base_all_m',laymtch,flat); // all matches before processing
+remove_trans  := dataset('~temp::BIPV2_ProxID_Proxid_DOT_Base_mt'   ,laymtch,flat); // remove transitives
+BestPerRecord := dataset('~temp::BIPV2_ProxID_Proxid_DOT_Base_mr'   ,laymtch,flat); // best per record
 
 lproxid := 7842;
 

@@ -479,7 +479,7 @@ export buildprep := Sequential(dout,
 								        if ( FileServices.FileExists( '~thor_data400::in::prolic_mn_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_mn_old')),
                         FileServices.RenameLogicalfile( '~thor_data400::in::prolic_mn','~thor_data400::in::prolic_mn_old'),   
                         
-											output( outfile,,'~thor_data400::in::prolic_mn',overwrite),
+											output( outfile,,'~thor_data400::in::prolic_mn',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
 								
 												 

@@ -1,4 +1,4 @@
-import ut,RoxieKeyBuild,PRTE2_DEATH_MASTER,AutoKeyB2, promotesupers;
+﻿import ut,RoxieKeyBuild,PRTE2_DEATH_MASTER,AutoKeyB2, promotesupers, strata,PRTE2_Common, _control,PRTE;
  
 EXPORT Proc_Build_Keys(string filedate) := FUNCTION
 
@@ -82,6 +82,10 @@ proc_deathmaster_buildkey_ssa(string filedate) := function
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(keys.key_death_masterV2_ssa_DID_fcra, 
 											constants.KeyName_death_master + 'fcra::did_death_masterV2_ssa',
 											constants.KeyName_death_master + 'fcra::death_masterV2_ssa::'+%version_date%+'::did',a9);
+											
+	// RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(keys.key_death_masterV2_ssa_DID_fcra_SSA, 
+											// constants.KeyName_death_master + 'fcra::did_death_masterV2_ssa',
+											// constants.KeyName_death_master + 'fcra::death_masterV2_ssa::'+%version_date%+'::did',a9);
 
 
 
@@ -177,8 +181,23 @@ out_auto := sequential(outaction, mymove);
 return out_auto;
 END;
 
+//DF-22303: FCRA Consumer Data Field Depreciation:FCRA_DeathMasterSSAKeys
+cnt_fcra_ssa_ssn := OUTPUT(strata.macf_pops(keys.key_ssn_ssa(TRUE),,,,,,FALSE,
+															 ['st_country_code','zip_lastpayment']), named('cnt_fcra_ssa_ssn'));
+															 
 
+// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
+is_running_in_prod 			:= PRTE2_Common.Constants.is_running_in_prod;
+DOPS_Comment		 				:= OUTPUT('Skipping DOPS process');
+updatedops							:= PRTE.UpdateVersion('DeathMasterKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+updatedops_ssa					:= PRTE.UpdateVersion('DeathMasterSSAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+updatedops_fcra					:= PRTE.UpdateVersion('FCRA_DeathMasterKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+updatedops_ssa_fcra			:= PRTE.UpdateVersion('FCRA_DeathMasterSSAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+															 
 
-RETURN PARALLEL(proc_deathmaster_buildkey(filedate),proc_deathmaster_buildkey_ssa(filedate),
-				 proc_autokeybuild_ssa(filedate));
+RETURN SEQUENTIAL(PARALLEL(proc_deathmaster_buildkey(filedate),proc_deathmaster_buildkey_ssa(filedate),
+									proc_autokeybuild_ssa(filedate),
+									cnt_fcra_ssa_ssn,
+									IF(not is_running_in_prod, DOPS_Comment, parallel(updatedops,updatedops_ssa,updatedops_fcra,updatedops_ssa_fcra))  
+									));
 end;

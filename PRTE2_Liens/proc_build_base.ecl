@@ -10,11 +10,16 @@ Base_Main_in		:= PRTE2_Liens.files.MainStatus(TMSID <> ''); //Spreadsheet passed
 Base_Party_in 	:= PRTE2_Liens.files.SprayParty(TMSID <> ''); //Spreadsheet passed blank records
 
 //Insurance data - Already processed using PRTE2_Liens_Ins.BWR_Spray_Both_Files
-Base_Main_Ins 	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Main, PRTE2_Liens.Layouts.main_base, THOR);
-Base_Party_Ins	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Party, PRTE2_Liens.Layouts.party_base, THOR);
+Base_Main_Ins 	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Main, PRTE2_Liens.Layouts.alpha_main_in, THOR);
+Base_Party_Ins	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Party, PRTE2_Liens.Layouts.alpha_party_in, THOR);
 
 //Create TMSID/RMSID, Persist ID
 PRTE2_Liens.Layouts.main_base_ext PopulateID(Base_Main_in L) := TRANSFORM
+// CCPA fields
+		self.global_sid 		:= 0;
+		self.orig_rmsid			:= '';
+		self.agencyid				:= '';
+		self.agencyid_src 	:= '';
 		self.persistent_record_id := 	HASH64(trim(L.tmsid,left,right)+ ','+
 																					trim(L.rmsid,left,right)+  ','+
 																					trim(L.filing_jurisdiction,left,right)+  ','+
@@ -50,12 +55,13 @@ PRTE2_Liens.Layouts.main_base_ext PopulateID(Base_Main_in L) := TRANSFORM
 																					trim(L.certificate_number ,left,right)+ ','+
 																					trim(L.filing_status[1].filing_status ,left,right)+trim(L.filing_status[1].filing_status_desc,left,right));
 	
+	self.record_sid			:= SELF.persistent_record_id;
 	self := L;
 END;
 pCreateMainIDs := DEDUP(PROJECT(Base_Main_in, PopulateID(left)),ALL);
 
 //Clean address - new records only
-fPrevParty	:= PROJECT(Base_Party_in(trim(DID) != '' OR trim(BDID) != ''),PRTE2_Liens.Layouts.party_base_ext); 
+fPrevParty	:= PROJECT(Base_Party_in(trim(DID) != '' OR trim(BDID) != ''),transform(PRTE2_Liens.Layouts.party_base_ext, self := left,self := [])); 
 fNewParty		:= Base_Party_in(trim(cust_name) != '' AND (trim(DID) = '' or trim(BDID) = ''));
 
 lCleanAddr	:= RECORD
@@ -139,6 +145,9 @@ pCleanNameAddr := PROJECT(addr_clean, xfmNamesAddr(left));
 fPartyAll := pCleanNameAddr + fPrevParty;
 
 PRTE2_Liens.Layouts.party_base_ext AddPersist(fPartyAll L) := TRANSFORM
+// CCPA fields
+  self.global_sid := 0;
+	self.orig_rmsid := '';
 	self.persistent_record_id := hash64(trim(l.tmsid,left,right)+','+
 																		trim(l.rmsid,left,right)+','+
 																		trim(l.orig_full_debtorname,left,right)+','+
@@ -161,16 +170,26 @@ PRTE2_Liens.Layouts.party_base_ext AddPersist(fPartyAll L) := TRANSFORM
 																		trim(l.phone ,left,right)+ ','+
 																		trim(l.name_type ,left,right) +','+ trim(l.bdid,left,right) +','+trim(l.did,left,right)+','+trim(l.zip,left,right)
 																		+trim(l.fname,left,right)+','+trim(l.lname,left,right)+','+trim(l.mname,left,right)+','+trim(l.name_suffix,left,right) +','+ trim(l.zip4,left,right)); // orig name has multiple names 
-
+  self.record_sid	:= self.persistent_record_id;
 	self	:= L;
 	self	:= [];
 END;
 
 pAppendPersist	:= PROJECT(fPartyAll, AddPersist(LEFT));
 
-//combine Boca & Insurance data
-concatMain := pCreateMainIDs + PROJECT(Base_Main_Ins, TRANSFORM(PRTE2_Liens.Layouts.main_base_ext, SELF := LEFT; SELF := []));
-concatParty := pAppendPersist + PROJECT(Base_Party_Ins, TRANSFORM(PRTE2_Liens.Layouts.party_base_ext, SELF := LEFT; SELF := []));
+//combine Boca & Insurance data - insurance data s/b in the *_ext layouts anyway but project just to be sure.
+concatMain := pCreateMainIDs + PROJECT(Base_Main_Ins, TRANSFORM(PRTE2_Liens.Layouts.main_base_ext, 
+																																self.global_sid 		:= 0;
+																																self.orig_rmsid			:= '';
+																																self.agencyid				:= '';
+																																self.agencyid_src 	:= '';
+																																self.record_sid			:= left.persistent_record_id;
+																																SELF := LEFT; SELF := []));
+concatParty := pAppendPersist + PROJECT(Base_Party_Ins, TRANSFORM(PRTE2_Liens.Layouts.party_base_ext, 
+																																	self.global_sid := 0;
+																																	self.orig_rmsid := '';
+																																	self.record_sid			:= left.persistent_record_id;
+																																	SELF := LEFT; SELF := []));
 
 PromoteSupers.Mac_SF_BuildProcess(concatMain, Constants.BASE_PREFIX +'main', build_main_base);
 PromoteSupers.Mac_SF_BuildProcess(concatParty, Constants.BASE_PREFIX +'party', build_party_base);

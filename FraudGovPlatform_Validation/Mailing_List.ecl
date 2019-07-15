@@ -1,71 +1,49 @@
-﻿EXPORT Mailing_List(string st, string ut) := module
+﻿import _control;
+EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') := module
 
-	shared Dev_list := 'oscar.barrientos@lexisnexis.com'
-										// +',Srinivas.Bhimineni@lexisnexisrisk.com'
-										// +',oscar.barrientos@lexisnexis.com'
-										// +',Jose.Bello@lexisnexis.com'
-										;
-	shared DOPS_list := 'oscar.barrientos@lexisnexis.com'
-										// +',Srinivas.Bhimineni@lexisnexisrisk.com'
-										// +',Jose.Bello@lexisnexis.com'
+	shared Dev_list :=	'Oscar.Barrientos@lexisnexisrisk.com'
+										+	';Sesha.Nookala@lexisnexisrisk.com'
 										;
 
-	shared FL_IDENTITYDATA_list := Dev_list
-										// +',oscar.barrientos@lexisnexis.com'
-										// +',Srinivas.Bhimineni@lexisnexisrisk.com'
-										// +',Jose.Bello@lexisnexis.com'
+	shared Data_QA_list := 'Prasanna.Kolli@lexisnexisrisk.com'
 										;
-	shared D1_IDENTITYDATA_list := Dev_list
-										// +',oscar.barrientos@lexisnexis.com'
-										// +',Srinivas.Bhimineni@lexisnexisrisk.com'
-										// +',Jose.Bello@lexisnexis.com'
+
+	shared Batch_list	:=	Dev_list
+										+	';roberto.perez@lexisnexisrisk.com'
+										;
+
+	shared Roxie_list :=	'Vishesh.Ved@lexisnexisrisk.com'
+										+	';'+Data_QA_list
+										+	';'+Dev_list
+										;
+	shared RinNetwork_list := 'riskintelligencenetwork.support@lexisnexisrisk.com'
+										;										
+	shared Boca_Ops	:= 	'SupercomputerOps@lexisnexisrisk.com'
+										+	';'+Dev_list										
 										;
 										
-	shared FL_KNOWNFRAUD_list := Dev_list
-										// +',oscar.barrientos@lexisnexis.com'
-										// +',Srinivas.Bhimineni@lexisnexisrisk.com'
-										// +',Jose.Bello@lexisnexis.com'
-										;
-
-	shared D1_KNOWNFRAUD_list := Dev_list
-										// +',oscar.barrientos@lexisnexis.com'
-										// +',Srinivas.Bhimineni@lexisnexisrisk.com'
-										// +',Jose.Bello@lexisnexis.com'
-										;
-										
-	shared NA_INQUIRYLOGS_list := Dev_list
-											// +',oscar.barrientos@lexisnexis.com'
-											// +',Srinivas.Bhimineni@lexisnexisrisk.com'
-											// +',Jose.Bello@lexisnexis.com'
+	shared Analytics_list	:= 	'Julie.Carmigniani@lexisnexisrisk.com'
+											+	';'+Dev_list										
 											;
-										
+
+
 	shared fn_mail_recipiant(string recipiant) := function
 		return		map(
-									recipiant='Validation' =>
-										map (
-													 st = 'FL' and ut = 'IDENTITYDATA'	=> Dev_list
-													,st = 'D1' and ut = 'IDENTITYDATA'	=> Dev_list
-													,st = 'FL' and ut = 'KNOWNFRAUD'		=> Dev_list
-													,st = 'D1' and ut = 'KNOWNFRAUD'		=> Dev_list
-													,ut = 'INQUIRYLOGS'									=> Dev_list
-													,Dev_list
-													)
-									,recipiant='Alert' =>
-											map (
-													 st = 'FL' and ut = 'IDENTITYDATA' 	=> FL_IDENTITYDATA_list
-													,st = 'D1' and ut = 'IDENTITYDATA' 	=> D1_IDENTITYDATA_list 
-													,st = 'FL' and ut = 'KNOWNFRAUD' 		=> FL_KNOWNFRAUD_list
-													,st = 'D1' and ut = 'KNOWNFRAUD' 		=> D1_KNOWNFRAUD_list
-													,ut = 'INQUIRYLOGS'									=> NA_INQUIRYLOGS_list
-													,DOPS_list
-													)
-									,DOPS_list
-									)
-									;
+									 recipiant='Validation' => if(_control.ThisEnvironment.Name = 'Prod_Thor',Dev_list,Dev_list)
+									,recipiant='Alert'			=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Dev_list,Dev_list)
+									,recipiant='Roxie' 			=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Roxie_list,Dev_list)
+									,recipiant='RinNetwork'	=> if(_control.ThisEnvironment.Name = 'Prod_Thor',RinNetwork_list,Dev_list)
+									,recipiant='BocaOps'		=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Boca_Ops,Dev_list)
+									,recipiant='Analytics'	=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Analytics_list,Dev_list)
+									,Dev_list
+								);
 	end;
 
-	export Validation := fn_mail_recipiant('Validation');
-	export Alert      := fn_mail_recipiant('Alert');
-	export BocaOps    := fn_mail_recipiant('BocaOps');
+	export Validation		:= fn_mail_recipiant('Validation');
+	export Roxie				:= fn_mail_recipiant('Roxie');
+	export Alert				:= fn_mail_recipiant('Alert');
+	export BocaOps			:= fn_mail_recipiant('BocaOps');
+	export Analytics		:= fn_mail_recipiant('Analytics');
+	export RinNetwork		:= fn_mail_recipiant('RinNetwork');
 
 end;

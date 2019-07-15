@@ -1,4 +1,4 @@
-IMPORT _Control, Data_Services;
+﻿IMPORT _Control, Data_Services, faa;
 
 EXPORT Constants := MODULE
 
@@ -42,4 +42,9 @@ EXPORT Constants := MODULE
 		EXPORT TYPE_STR := 'BC';
 		EXPORT USE_ALL_LOOKUPS := TRUE;
 
+
+//DF-21803:FCRA Consumer Data Fields Depreciation
+		EXPORT key_airmen_cert_set := faa.Constants.fields_to_clear_pilot_certificate;
+		EXPORT key_airmen_did_set  := faa.Constants.fields_to_clear_pilot_registration;
+		EXPORT key_aircraft_id_set	:= faa.Constants.fields_to_clear_aircraft_registration;
 END;	

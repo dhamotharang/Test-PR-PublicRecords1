@@ -1,8 +1,9 @@
-Import Email_Data;
+﻿Import Email_Data;
 
 EXPORT File_Email_Base_Scrubs(string version) := FUNCTION
 
-File_Base := Build_base((integer)version).rollup_with_history_misc;
+// File_Base := Build_base((integer)version).rollup_with_history_misc;  //removed 8-3 bjd
+File_Base := Build_base((integer)version).rollup_with_history;
 
 Email_Data.Layout_Email.Scrubs_Layout xform(file_base l) := transform
 	 self.title := l.clean_name.title;

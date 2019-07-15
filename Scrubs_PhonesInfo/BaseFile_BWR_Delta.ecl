@@ -1,7 +1,7 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_PhonesInfo.BaseFile_BWR_Delta - Finding the Delta of Two Files - SALT V3.9.0');
-IMPORT Scrubs_PhonesInfo,SALT39;
+#workunit('name','Scrubs_PhonesInfo.BaseFile_BWR_Delta - Finding the Delta of Two Files - SALT V3.11.4');
+IMPORT Scrubs_PhonesInfo,SALT311;
 FilePrev := DATASET([], BaseFile_Layout_PhonesInfo);
 FileNew := DATASET([], BaseFile_Layout_PhonesInfo);
 d := Scrubs_PhonesInfo.BaseFile_Delta(FilePrev, FileNew); // Instantiate delta module

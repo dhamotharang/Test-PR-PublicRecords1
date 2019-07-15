@@ -37,6 +37,9 @@
 	,yellowpages
 	,zoom
 	,cortera
+	,infutor_narb
+	,Equifax_Business_Data
+	,DataBridge
 	;
 
 Business_Sources1 :=
@@ -80,6 +83,9 @@ Business_Sources1 :=
   + YellowPages.As_Business_Linking()
   // + Zoom.Zoom_As_Business_Linking          //on blacklist of ingest sources, filtered out completely
 	+ Cortera.Files.Bus_linking
+	+ Infutor_NARB.As_Business_Linking()
+	+ Equifax_Business_Data.As_Business_Linking()
+	+ DataBridge.As_Business_Linking()
   ;
 
  // -- remove these re-corp states because we are not ready to ingest them yet.

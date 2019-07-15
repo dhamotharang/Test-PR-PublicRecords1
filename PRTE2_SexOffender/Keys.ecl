@@ -72,11 +72,15 @@ EXPORT Keys := MODULE
 
 		pGetCategory	:= PROJECT(Files.SexOffense_base, TRANSFORM(Layouts.lOffenseKey, self.sspk := left.seisint_primary_key; self.offense_category := GetOffenseCategory (left.offense_category[1..3]) +
 																												GetOffenseCategory (left.offense_category[5..7]); self := left;));
-																												
-		add_all			:= pGetCategory;
-																												
-	RETURN IF(IsFCRA, INDEX(add_all,{sspk},{pGetCategory},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::offenses_public'),
-										INDEX(add_all,{sspk},{pGetCategory},PRTE2_SexOffender.Constants.KEY_PREFIX +  doxie.Version_SuperKey + '::offenses_public'));
+
+// DF-21920 Blank out specified fields in prte::key::sexoffender::fcra::offenses_public_qa
+	ut.MAC_CLEAR_FIELDS(pGetCategory, pGetCategory_cleared, constants.fields_to_clear_offenses_public);
+										
+	add_all		:= if(isFCRA, pGetCategory_cleared, pGetCategory);
+
+	RETURN INDEX(add_all, {sspk},{add_all},
+								if(isFCRA, PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::', 
+											     PRTE2_SexOffender.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::offenses_public');
 	END;
 	
 	
@@ -91,13 +95,20 @@ EXPORT Keys := MODULE
 											self.lat := (real)left.geo_lat;
 											self.long	:= (real)left.geo_long;
                       self := left));
-											
-		Ofdr_all		:= Ofdr_exp;
 
-											
-	RETURN IF(IsFCRA, INDEX(Ofdr_all,{string60 sspk := Ofdr_exp.seisint_primary_key},{Ofdr_all},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::spkpublic'),
-										INDEX(Ofdr_all,{string60 sspk := Ofdr_exp.seisint_primary_key},{Ofdr_all},PRTE2_SexOffender.Constants.KEY_PREFIX +  doxie.Version_SuperKey + '::spkpublic'));
+   ofdr_prj := Ofdr_exp;
+	// DF-21920 Blank out specified fields in prte::key::sexoffender::fcra::spkpublic_qa
+	ut.MAC_CLEAR_FIELDS(ofdr_prj, ofdr_prj_cleared, constants.fields_to_clear_spkpublic);
+										
+	Ofdr_all		:= if(isFCRA, ofdr_prj_cleared, ofdr_prj);
+
+	RETURN INDEX(Ofdr_all, 
+							{string60 sspk := Ofdr_all.seisint_primary_key},
+							{Ofdr_all},
+							if(isFCRA, PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::', 
+											   PRTE2_SexOffender.Constants.KEY_PREFIX) + doxie.Version_SuperKey + '::spkpublic');
 	END;
+	
 	
 	//ENH key
 	r := RECORD

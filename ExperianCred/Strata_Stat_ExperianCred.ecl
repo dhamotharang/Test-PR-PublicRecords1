@@ -1,6 +1,5 @@
-import STRATA;
+﻿import STRATA;
 pExperian_base:=Files.Base_File_Out;
-pVersion:=Version;
 
 rPopulationStats_Experian_base
  :=
@@ -85,11 +84,15 @@ rPopulationStats_Experian_base
 dPopulationStats_Experian_base := table(pExperian_base
 							  	    ,rPopulationStats_Experian_base
 									,few);
-STRATA.createXMLStats(dPopulationStats_Experian_base
+
+CreateXMLStats(string ver) := function 
+	STRATA.createXMLStats(dPopulationStats_Experian_base
 					 ,'ENv3'
 					 ,'ExperianCred'
-					 ,pVersion
+					 ,ver
 					 ,'Angela.Herzberg@lexisnexis.com; Michael.Gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com'
 					 ,zExperian_base);
+	return zExperian_base;
+END;
 
-EXPORT Strata_Stat_ExperianCred := zExperian_base;
+EXPORT Strata_Stat_ExperianCred(string ver) := CreateXMLStats(ver);

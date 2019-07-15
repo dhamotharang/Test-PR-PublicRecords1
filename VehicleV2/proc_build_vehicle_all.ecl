@@ -1,4 +1,4 @@
-﻿import Orbit_Report,RoxieKeyBuild, dops;
+﻿import Orbit_Report,RoxieKeyBuild, dops, Scrubs_VehicleV2;
 
 //export proc_build_vehicle_all(process_date)	:=
 export proc_build_vehicle_all(process_date, file_date='')	:=
@@ -9,7 +9,7 @@ export proc_build_vehicle_all(process_date, file_date='')	:=
 
 	import vehicleV2;
 	
-  Email_Recipients := 'kgummadi@seisint.com,wma@seisint.com,cathy.tio@lexisnexis.com';
+  Email_Recipients := 'cathy.tio@lexisnexis.com,charles.pettola@lexisnexisrisk.com';
 	
   VehicleV2.proc_build_stats(process_date,zDoStatsReference)			// now a macro
   
@@ -21,10 +21,13 @@ export proc_build_vehicle_all(process_date, file_date='')	:=
 	VINA_Info										:= VehicleV2.Populate_VINA_Info													: success(output('Poulation of VINA information succeeded'));
 
 	//BUG 168876 - Scrub input files
-	Scrub_Experian_Files				:= Scrubs_VehicleV2_Experian.proc_submit_stats(process_date)					  : success(output('Scrub Experian input file completed.'));
-	Scrub_Infutor_Motorcycle_Files:= Scrubs_VehicleV2_Infutor_Motorcycle.proc_submit_stats(process_date): success(output('Scrub Infutor Motorcycle input file completed.'));
-	Scrub_Infutor_VIN_Files			:= Scrubs_VehicleV2_Infutor_Vin.proc_submit_stats(process_date)					: success(output('Scrub Infutor Vin input file completed.'));
-	Scrub_OH_Direct_Files				:= Scrubs_VehicleV2_OH_Direct.proc_submit_stats(process_date)						: success(output('Scrub OH Direct input file completed.'));
+	// Scrub_Experian_Files				:= Scrubs_VehicleV2_Experian.proc_submit_stats(process_date)					  : success(output('Scrub Experian input file completed.'));
+	// Scrub_Infutor_Motorcycle_Files:= Scrubs_VehicleV2_Infutor_Motorcycle.proc_submit_stats(process_date): success(output('Scrub Infutor Motorcycle input file completed.'));
+	// Scrub_Infutor_VIN_Files			:= Scrubs_VehicleV2_Infutor_Vin.proc_submit_stats(process_date)					: success(output('Scrub Infutor Vin input file completed.'));
+	// Scrub_OH_Direct_Files				:= Scrubs_VehicleV2_OH_Direct.proc_submit_stats(process_date)						: success(output('Scrub OH Direct input file completed.'));
+	
+	//DF-23405 - Scrubs_VehicleV2 - use new scrubs attribute and modified some field type 
+	Scrubs_Input_Files				:= Scrubs_VehicleV2.fn_RunScrubs(process_date,Email_Recipients);
 	
 	Build_Experian_Base									:=	VehicleV2.Experian_as_Base													:	success(output('Build Experian Base successfully completed.'));
 	Build_NC_Base															:=	VehicleV2.NC_as_Base																:	success(output('Build NC Base successfully completed.'));
@@ -64,10 +67,11 @@ export proc_build_vehicle_all(process_date, file_date='')	:=
 							Spray_Infutor_VIN_Files,
 							Spray_Infutor_Motorcycle_Files,
 							VINA_Info,
-							Scrub_Experian_Files,
-							Scrub_Infutor_Motorcycle_Files,
-							Scrub_Infutor_VIN_Files,
-							Scrub_OH_Direct_Files,
+							// Scrub_Experian_Files,
+							// Scrub_Infutor_Motorcycle_Files,
+							// Scrub_Infutor_VIN_Files,
+							// Scrub_OH_Direct_Files,
+							Scrubs_Input_Files,
 							Build_Experian_Base,
 							Build_NC_Base,
 							Build_OH_Base,

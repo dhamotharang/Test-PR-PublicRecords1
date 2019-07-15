@@ -48,7 +48,7 @@ OutDS := join(inDS, %SuppressionDS%,
 										%eq%(left.name_first, right.name_first) and
 										%eq%(left.name_suffix, right.name_suffix) and
 								/* MATCH BY ADDRESS OR */		
-										((left.inphone = '' and 
+										((	//left.inphone = '' and 
 																					%eq%(left.prim_name, right.prim_name) and 
 																					%eq%(left.prim_range, right.prim_range) and 
 																					%eq%(left.sec_range, right.sec_range) and 

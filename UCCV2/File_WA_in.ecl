@@ -1,11 +1,15 @@
+﻿import STD;
+
 lines := record
 	string line  {maxlength(115000)};
 	end;
 	
 dsCSV := dataset('~thor_data400::in::uccv2::wa',lines,csv(separator('~^~^~'),terminator('</Document>'),quote(''),maxlength(115000)));
 
+NonPrintable := '\000\001\002\003\004\005\006\007\010\011\012\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037'; 
+
 dsChecked1 := project(dsCSV,transform({dsCSV},					
-					line0 := left.line;
+					line0 := STD.Str.FilterOut(left.line, NonPrintable);
 					line1 := if(regexfind('[^\\s]*&(?!.*;)[^\\s]*',line0),
 									stringlib.StringFindReplace(line0,regexfind('[^\\s]*&(?!.*;)[^\\s]*',line0,0),
 									stringlib.stringfilterout(regexfind('[^\\s]*&(?!.*;)[^\\s]*',line0,0),'&')),

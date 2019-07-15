@@ -1,4 +1,4 @@
-import versioncontrol;
+﻿import versioncontrol,_Control;
 
 export Stats_Coverage(
 
@@ -7,6 +7,7 @@ export Stats_Coverage(
 	,string																			pDesprayDirectory = '/data/data_build_4/corporate_filings/logs/base_file_coverages'
 	,boolean																		pOverwrite				= false
 	,boolean																		pIsTesting				= false
+	,string																			landing_zone			= _Control.IPAddress.bctlpedata10
 
 ) :=
 function
@@ -70,7 +71,7 @@ function
 	
 	myfilestodespray := dataset([
 		
-		 {	 filenames(pversion).stats.coverage.new	,'bctlpedata10.risk.regn.net',pDesprayDirectory + '/corpv2_base_file_coverage_stats_' + pversion + '.dict' }
+		 {	 filenames(pversion).stats.coverage.new	,landing_zone,pDesprayDirectory + '/corpv2_base_file_coverage_stats_' + pversion + '.dict' }
                                                                                                                            
 	], versioncontrol.Layout_DKCs.Input);
 

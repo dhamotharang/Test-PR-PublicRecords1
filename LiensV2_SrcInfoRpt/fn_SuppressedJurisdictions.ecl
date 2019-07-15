@@ -53,7 +53,7 @@ EXPORT	fn_SuppressedJurisdictions(STRING	filename)	:=	FUNCTION
 
 	//	Remove Juristdictions based on information within the record
 	dSuppressedJurisdictions	:=	dActionGroupFilter(
-																	VisitInterval	IN	['OVER 90','OVER 120','OVER 180']	AND
+																	VisitInterval	IN	['OVER 90','OVER 120','OVER 180', '> 90','> 120','> 180']	AND
 																	VisitWithin90	IN	['NO']
 																);
 																

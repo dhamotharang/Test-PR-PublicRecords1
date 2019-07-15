@@ -1,8 +1,8 @@
-import	header,ln_property,ln_mortgage,ut,_control,mdr,data_services,Std;
+﻿import	header,ln_property,ln_mortgage,ut,_control,mdr,data_services,Std;
 
-EXPORT	ln_propertyv2_as_source(boolean pFastHeader = false,boolean pForWatchdog = false)	:=	module
+EXPORT	ln_propertyv2_as_source(boolean pFastHeader = false,boolean pForWatchdog = false, string filedate = '')	:=	module
 						
-//same filter used in v1						
+//same filter used in v1
 SHARED dLNPropertySearch		:=	if(pFastHeader
 												,dataset('~thor_data400::base::ln_propv2srchQuickHeader_building',ln_propertyv2.Layout_DID_Out,flat)
 														(ut.DaysApart((STRING8)Std.Date.Today(), ((string)dt_vendor_last_reported)[..6] + '01') <= 60+Header.Sourcedata_month.v_fheader_days_to_keep)
@@ -105,8 +105,8 @@ r1	:=	record
 	string1   dummy_seg;
 end;
 
-p1	:=	project(if(pForWatchdog,ln_propertyv2_deed_as_source,header.Files_SeqdSrc(pFastHeader).FAD),r1);
-p2	:=	project(if(pForWatchdog,ln_propertyv2_tax_as_source,header.Files_SeqdSrc(pFastHeader).FAT),r1);
+p1	:=	project(if(pForWatchdog,ln_propertyv2_deed_as_source,header.Files_SeqdSrc(pFastHeader, filedate).FAD),r1);
+p2	:=	project(if(pForWatchdog,ln_propertyv2_tax_as_source,header.Files_SeqdSrc(pFastHeader, filedate).FAT),r1);
 
 concat     	:=	p1+p2;
 concat_dist	:=	distribute(concat,hash(ln_fares_id));
@@ -185,6 +185,9 @@ r_layout_new_records_strings	:=	record
 	string1   jflag1   	:=	'';
 	string1   jflag2   	:=	'';
 	string1   jflag3   	:=	'';
+	p3_filt.ln_fares_id;
+	p3_filt.conjunctive_name_seq;
+	p3_filt.nameasis;
 end;
 
 r_layout_new_records_strings t4(p3_filt le)	:=	transform
@@ -238,7 +241,7 @@ r_layout_new_records_strings t_rollup(p4_sort le, p4_dist ri)	:=	transform
  self                         	:=	le;
 end;
 
-SHARED p_rollup	:=	rollup(	p4_sort,
+EXPORT p_rollup	:=	rollup(	p4_sort,
 														left.src         = right.src         and 
 														left.vendor_id   = right.vendor_id   and
 														left.fname       = right.fname       and 

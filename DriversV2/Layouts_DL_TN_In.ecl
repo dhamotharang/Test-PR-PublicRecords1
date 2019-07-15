@@ -1,4 +1,4 @@
-export Layouts_DL_TN_In := module
+﻿export Layouts_DL_TN_In := module
   
 	export Layout_TN_Raw := record
 	  string line;
@@ -111,94 +111,56 @@ export Layouts_DL_TN_In := module
 		string1   geo_match;
 		string4   err_stat;
 	end;
+	
+	/*  As Per Michael Gould's Email Note: The TN Convictions and Withdrawal files lengths are inconsistent from month to month from vendor, 
+			even though they are supposed to be 69 (68+terminator) or 63 (62+terminator), But for some reason vendor has been inconsistent 
+			with the file lengths,Michael is planning on converting the files by padding the extra spaces towards the end of the records using DOS to Unix script. 
+			As he requested, extending the record lengths to 200 bytes by adding a filler fields, so the file lengths be consistent from update to update.  
+  */
   
 	// **********TN DL CONVICTIONS record layout
   export Layout_TN_CP := record
-	  string20 last_name;
-		string12 first_name;
-		string12 middle_name;
-		string3  suffix_name;
-		string25 street1;
-		string20 street2;
-		string29 city;
-		string2 ST;
-		string5 zip5;
-		string8 birthdate;
-		string6 race;
-		string1 gender;
-		string1 height_ft;
-		string2 height_in;
-		string3 weight;
-		string2 eye_color;
-		string2 hair_color;
-		string9 dl_number;
-		string8 dl_issue_date;
-		string8 exp_date;
-		string1 lkup_consent_flag;
-		string1 rls_consent_flag;
-		string2 county_code;
-		string8 event_date;
-		string8 post_date;
-		string3 crlf;
+	  string9    dl_number;
+		string8    birthdate;
+		string3    action_code;
+		string8    event_date;
+		string8    post_date;	
+		string29   last_name;
+		string2    county_code;
+		string131  filler:=''; //Padded values as per above comments
+		string2    crlf;
   end;
 	
 	export Layout_TN_CP_With_ProcessDte := record
 	  string8 process_date;
-		Layout_TN_CP -crlf;
+	  Layout_TN_CP -crlf;
 	end;
  
 	export Layout_TN_CP_All_Cleaned := record
 		Layout_TN_CP_With_ProcessDte;
-		string5	 clean_name_prefix;
-   	string20 clean_name_first;
-   	string20 clean_name_middle;
-   	string20 clean_name_last;
-   	string5	 clean_name_suffix;
-		string3  cleaning_score := '';
-	end;
+  end;
 	
-	//   *************TN DL WITHDRAWALS/SUSPENSIONS record layout
+	// *************TN DL WITHDRAWALS/SUSPENSIONS record layout
 	export Layout_TN_WDL := record
-	  string20 last_name;
-		string12 first_name;
-		string12 middle_name;
-		string3 suffix_name;
-		string25 street1;
-		string20 street2;
-		string29 city;
-		string2 st;
-		string5 zip5;
-		string8 birthdate;
-		string6 race;
-		string1 gender;
-		string1 height_ft;
-		string2 height_in;
-		string3 weight;
-		string2 eye_color;
-		string2 hair_color;
-		string9 dl_number;
-		string8 dl_issue_date;
-		string8 exp_date;
-		string1 lkup_consent_flag;
-		string1 rls_consent_flag;
-		string2 county_code;
-		string8 event_date;
-		string8 post_date;
-		string3 crlf;
+		string9    dl_number;
+		string3    action_code;
+		string8    event_date;
+		string20   last_name;	
+		string8    birthdate;	
+		string8    post_date;	
+		string2    county_code;
+		string3	   action_type;	
+		string137  filler:=''; //Padded values as per above comments
+		string2    crlf;
 	end;
 	
 	export Layout_TN_WDL_With_ProcessDte := record
-	  string8 process_date;
+		string8 process_date;
 		Layout_TN_WDL -crlf;
 	end;
 	
-	export Layout_TN_WDL_All_Cleaned := record
+  export Layout_TN_WDL_All_Cleaned := record
 		Layout_TN_WDL_With_ProcessDte;
-		string5	 clean_name_prefix;
-   	string20 clean_name_first;
-   	string20 clean_name_middle;
-   	string20 clean_name_last;
-   	string5	 clean_name_suffix;
-		string3  cleaning_score;
-	end;
+  end;
+	 
 end;

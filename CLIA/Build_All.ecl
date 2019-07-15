@@ -1,4 +1,4 @@
-IMPORT _Control, CLIA._Flags, RoxieKeyBuild, tools;
+﻿IMPORT _Control, CLIA._Flags, RoxieKeyBuild, tools, Orbit3;
 
 EXPORT Build_All(
   STRING								pversion,
@@ -34,6 +34,8 @@ EXPORT Build_All(
 	
 	EXPORT dops_update := RoxieKeyBuild.updateversion('CLIAKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 
+EXPORT orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('CLIA',pversion,'N'); 
+
 	EXPORT full_build :=
 	   SEQUENTIAL(Create_Supers,
 		            spray_files,
@@ -51,7 +53,8 @@ EXPORT Build_All(
 																		    pIsTesting,
 																		    pOverwrite,
 																		    pBaseBuilt).All,
-								dops_update
+								dops_update,
+								orbit_update
 	             ) : SUCCESS(Send_Emails(pversion, , FALSE).Roxie), FAILURE(Send_Emails(pversion, , FALSE).BuildFailure);
 	
 	EXPORT All := IF(tools.fun_IsValidVersion(pversion),

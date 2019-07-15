@@ -1,4 +1,4 @@
-import fcra, ut, data_services;
+﻿import fcra, ut, data_services, AlloyMedia_student_list;
 
 EXPORT key_Override_Alloy_FFID := FUNCTION
 
@@ -20,8 +20,9 @@ EXPORT key_Override_Alloy_FFID := FUNCTION
 	dailyds := project(dailyds_old, TRANSFORM(fcra.layout_override_alloy,SELF.tier2:=' ',SELF:=LEFT));
   kf := dedup (sort (ds_base, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf, dailyds, DID, replaceds);
-	alloy_ffid := index(replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'ffid', OPT);
-	
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::alloy::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, AlloyMedia_student_list.Constants.fields_to_clear_alloy);
+	alloy_ffid := index(replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'ffid', OPT);	
 	RETURN alloy_ffid;
 	
 END;

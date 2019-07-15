@@ -1,4 +1,4 @@
-IMPORT BIPV2, BIPV2_Best, Business_Header, IESP, DemoSearchTool, 
+﻿IMPORT BIPV2, BIPV2_Best, Business_Header, IESP, DemoSearchTool, 
        Infutor, Watchdog;
 
 EXPORT Raw := 
@@ -104,7 +104,7 @@ EXPORT Raw :=
       FUNCTION
         
         ds_PerRecs := 
-          JOIN(ds_persIds, Watchdog.Key_Prep_Watchdog_GLB,
+          JOIN(ds_persIds, Watchdog.Key_Prep_Watchdog_GLB(),
                KEYED(LEFT.DID = RIGHT.DID),
                TRANSFORM(DemoSearchTool.Layouts.finalPlusSorting_rec,
                          SELF.PersonInformation := PROJECT(RIGHT, DemoSearchTool.Transforms.xfm_intoPersonLayout(LEFT) ),  
@@ -128,7 +128,7 @@ EXPORT Raw :=
       FUNCTION
         
         ds_PerRecs := 
-          JOIN(ds_combinedIds, Watchdog.Key_Prep_Watchdog_GLB,
+          JOIN(ds_combinedIds, Watchdog.Key_Prep_Watchdog_GLB(),
             KEYED(LEFT.DID = RIGHT.DID),     
             TRANSFORM(DemoSearchTool.Layouts.SearchToolSrcRecPlusBdidForCombOutput_rec,
                       SELF.PersonInformation := PROJECT(RIGHT, DemoSearchTool.Transforms.xfm_intoPersonLayout(LEFT) ),  
@@ -166,7 +166,7 @@ EXPORT Raw :=
       FUNCTION
         
         ds_PerRecs := 
-          JOIN(ds_combinedIds, Watchdog.Key_Prep_Watchdog_GLB,
+          JOIN(ds_combinedIds, Watchdog.Key_Prep_Watchdog_GLB(),
             KEYED(LEFT.DID = RIGHT.DID),
             TRANSFORM(DemoSearchTool.Layouts.SearchToolSrcRecPlusBipidsForCombOutput_rec,
                       SELF.PersonInformation := PROJECT(RIGHT, DemoSearchTool.Transforms.xfm_intoPersonLayout(LEFT) ),  

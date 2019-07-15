@@ -1,5 +1,4 @@
-
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Profile Booster">
 	<part name="ProfileBoosterRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
@@ -40,7 +39,7 @@ EXPORT Search_Service := MACRO
 		BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 
 		//Look up the industry by the company ID.
-		Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.ProfileBooster__Search_Service);
+		Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.ProfileBooster__Search_Service);
 	/* ************* End Scout Fields **************/
 	
 	string6  outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
@@ -151,7 +150,11 @@ EXPORT Search_Service := MACRO
 	searchResults := IF(TestDataEnabled, 
 											ProfileBooster.TestSeed_Function(packagedTestseedInput, TestDataTableName), // TestSeed Values
 											ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion) // Realtime Values
-										 );
+										 );	
+										 
+										 // temporary for testing on dev roxie when new key isn't available
+// searchResults := ProfileBooster.Search_Function(PB_Input, DataRestriction, DataPermission, AttributesVersion); // Realtime Values
+										
 
 iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 			
@@ -336,6 +339,13 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 					c = 175	=> 'RaAOccProfLicMmbrCnt',
 					c = 176	=> 'RaAOccBusinessAssocMmbrCnt',
 					c = 177	=> 'RaAInterestSportPersonMmbrCnt',
+					
+					c = 178	=> 'PPCurrOwnedAutoVIN',
+					c = 179	=> 'PPCurrOwnedAutoYear',
+					c = 180	=> 'PPCurrOwnedAutoMake',
+					c = 181	=> 'PPCurrOwnedAutoModel',
+					c = 182	=> 'PPCurrOwnedAutoSeries',
+					c = 183	=> 'PPCurrOwnedAutoType',		
 										 'Invalid');
 			
 			
@@ -518,11 +528,19 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 					c = 175	=> le.attributes.version1.RaAOccProfLicMmbrCnt,
 					c = 176	=> le.attributes.version1.RaAOccBusinessAssocMmbrCnt,
 					c = 177	=> le.attributes.version1.RaAInterestSportPersonMmbrCnt,
+					
+					c = 178	=> le.attributes.version1.PPCurrOwnedAutoVIN,
+					c = 179	=> le.attributes.version1.PPCurrOwnedAutoYear,
+					c = 180	=> le.attributes.version1.PPCurrOwnedAutoMake,
+					c = 181	=> le.attributes.version1.PPCurrOwnedAutoModel,
+					c = 182	=> le.attributes.version1.PPCurrOwnedAutoSeries,
+					c = 183	=> le.attributes.version1.PPCurrOwnedAutoType,		
+					
 										 'Invalid');
 		
 	END;
  	
-	IndIndex := normalize(ungroup(searchResults), 177, createrec(LEFT,COUNTER ));
+	IndIndex := normalize(ungroup(searchResults), 183, createrec(LEFT,COUNTER ));
 	
 	iesp.ProfileBoosterAttributes.t_ProfileBoosterResponse IntoResults(wseq le, searchResults ri ) := Transform
     	self.InputEcho := le.SearchBy;	

@@ -1,4 +1,4 @@
-import codes, ut, idl_header;
+﻿import codes, ut, idl_header;
 
 in_file := Calbus.Cleaned_Calbus_Addr;
 
@@ -6,7 +6,7 @@ Layout_Out := Calbus.Layouts_Calbus.Layout_AID_Common;
 
 Dist_Cleaned_Calbus := distribute(in_file, hash64(Account_Number));
 
-Srt_Dist_Cleaned_Calbus := sort(Dist_Cleaned_Calbus, Account_Number, Owner_Name, firm_name, Business_prim_range, Business_prim_name,
+Srt_Dist_Cleaned_Calbus := sort(Dist_Cleaned_Calbus, Account_Number, Sub_account_number, Account_type, Owner_Name, firm_name, Business_prim_range, Business_prim_name,
                                 Business_predir, Business_addr_suffix, Business_postdir, Business_unit_desig, Business_sec_range, 
 							    Business_p_city_name, Business_st, Business_zip5, Mailing_prim_range, Mailing_prim_name,
 							    Mailing_predir, Mailing_addr_suffix, Mailing_postdir, Mailing_unit_desig, Mailing_sec_range,
@@ -22,7 +22,7 @@ Layout_Out  rollupXform(Layout_Out l, Layout_Out r) := transform
 	self                := l;
 end;
 
-rolledup_file := rollup(Srt_Dist_Cleaned_Calbus, rollupXform(LEFT,RIGHT), Account_Number, Owner_Name, firm_name, 
+rolledup_file := rollup(Srt_Dist_Cleaned_Calbus, rollupXform(LEFT,RIGHT), Account_Number, Sub_account_number, Account_type, Owner_Name, firm_name, 
                         Business_prim_range, Business_prim_name, Business_predir, Business_addr_suffix, Business_postdir,
 						Business_unit_desig, Business_sec_range, Business_p_city_name, Business_st, Business_zip5, 
 						Mailing_prim_range, Mailing_prim_name, Mailing_predir, Mailing_addr_suffix, Mailing_postdir,

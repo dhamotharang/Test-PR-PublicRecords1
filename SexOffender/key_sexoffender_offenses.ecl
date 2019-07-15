@@ -1,4 +1,4 @@
-import doxie, doxie_build, ut, hygenics_search;
+﻿import doxie, doxie_build, ut, hygenics_search;
 
 export key_sexoffender_offenses (boolean IsFCRA = false) := function
 
@@ -73,6 +73,9 @@ addField 		:= project(df, addFieldTran(left)); //(~IsFCRA); // disable fcra for 
 add_filter 	:= addField(seisint_primary_key[1..4] not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key);
 add_all			:= addField;
 
+// DF-21836 Blank out specified fields in thor_data400::key::sexoffender::fcra::offenses_public_qa
+ut.MAC_CLEAR_FIELDS(add_filter, add_filter_cleared, SexOffender.Constants.fields_to_clear_offenses_public);
+
 //TODO: apply source, date, etc. fcra-filtering
 	
 //TODO: change names according to a standard
@@ -81,6 +84,6 @@ string file_name := if (IsFCRA,
 					 Constants.Cluster+'::key::sexoffender_offenses_' + doxie_build.buildstate+'_' + doxie.Version_SuperKey);
 
 return if (IsFCRA, 
-           index (add_filter, {string60 sspk := add_filter.seisint_primary_key}, {add_filter}, file_name, OPT),
+           index (add_filter_cleared, {string60 sspk := add_filter_cleared.seisint_primary_key}, {add_filter_cleared}, file_name, OPT),
            index (add_all, {string60 sspk := add_all.seisint_primary_key}, {add_all}, file_name));
 end;

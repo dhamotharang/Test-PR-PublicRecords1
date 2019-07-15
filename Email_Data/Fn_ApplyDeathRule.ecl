@@ -1,5 +1,5 @@
 ﻿IMPORT Email_Data, STD, Header;
-#option('multiplePersistInstances',true);
+
 
 EXPORT Fn_ApplyDeathRule(dataset(recordof(Layout_email.temp_Validate)) email_in) := FUNCTION
 		fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa;

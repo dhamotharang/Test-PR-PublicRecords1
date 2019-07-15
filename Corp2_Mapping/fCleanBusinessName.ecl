@@ -1,4 +1,4 @@
-import corp2_mapping,ut,corp2;
+﻿import corp2_mapping,ut,corp2;
 export fCleanBusinessName(string pStateOrigin,string pStateOriginDesc,string pBName='') := module
 	//********************************************************************
 	//fCleanBusinessName: takes a business and tries to determine if it is
@@ -7,9 +7,9 @@ export fCleanBusinessName(string pStateOrigin,string pStateOriginDesc,string pBN
 	//1) Only special characters exists in the field	
 	//*******************************************************************
 
-		shared UC_StateOrigin				:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
-		shared UC_StateOriginDesc		:= ut.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));
-		shared UC_BName 						:= ut.fn_RemoveSpecialChars(corp2.t2u(pBName));
+		shared UC_StateOrigin				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
+		shared UC_StateOriginDesc		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));
+		shared UC_BName 						:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pBName));
 		shared UC_CleanedName				:= corp2.t2u(stringlib.stringfilterout(UC_BName,'`'));
 		shared PatternInvalidNames	:= '^TEST(ING)* RECORD|^TEST(ING)* NAME|^TEST ASSUMED NAME$|NOT PROVIDED|^NONE,$|^NONE$';
 		shared Test4Unknown					:= if(regexfind('UNKNOWN',corp2.t2u(UC_CleanedName),0)<>'', //Found a company of "UOWN" so checking first for "UNKNOWN"

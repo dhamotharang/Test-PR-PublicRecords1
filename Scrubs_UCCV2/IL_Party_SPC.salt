@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_UCCV2
 FILENAME:UCCV2
 NAMESCOPE:IL_Party
@@ -32,7 +32,7 @@ FIELDTYPE:invalid_orig_lname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>
 FIELDTYPE:invalid_orig_fname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,orig_name,orig_lname)
 FIELDTYPE:invalid_orig_address1:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,orig_city,orig_state)
 FIELDTYPE:invalid_orig_state:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_state>0)
-FIELDTYPE:invalid_orig_zip5:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_zip5>0)
+FIELDTYPE:invalid_orig_zip5:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_zip5_country>0,orig_country)
 FIELDTYPE:invalid_party_type:ENUM(D|S)
 FIELDTYPE:invalid_fname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,mname,lname,company_name)
 FIELDTYPE:invalid_mname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,fname,lname,company_name)

@@ -14,6 +14,8 @@ export AlloyMedia_src := Map_AlloyMedia_as_Email(version);
 export SalesChannel_src	:= Map_SalesChannel_As_Email(version);
 export Datagence_src	:= Map_Datagence_As_Email(version);
 export InfutorNARE_src	:= Map_InfutorNARE_As_Email(version);
+export	Anchor_src	:= Map_Anchor_As_Email(version);
+export RealSource_src	:= Map_RealSource_As_Email(version);
 
 export email_sources := entiera_src +
 				 Impulse_src +
@@ -26,7 +28,9 @@ export email_sources := entiera_src +
 				 AlloyMedia_src +
 				 SalesChannel_src +
 				 Datagence_src +
-				 InfutorNARE_src;	
+				 InfutorNARE_src +
+				 Anchor_src	+
+				 RealSource_src;
 
 //-------Append data from Watchdog
 export append_best_data    := Fn_Append_Best (email_sources);
@@ -43,6 +47,6 @@ export propagate_did   		:= Fn_Propagate_Did(propagate_src_email);
 //-----Concatenate current base and previous base to create a final base with histor
 export rollup_with_history := Fn_Rollup_Base_History(propagate_did);
 //-----Concatenate current base and previoubase to create a final base with histor and misc emails
-export rollup_with_history_misc := Fn_Append_Misc(rollup_with_history) ;  
+// export rollup_with_history_misc := Fn_Append_Misc(rollup_with_history) ; // removed 8-3 bjd 
 
 end;

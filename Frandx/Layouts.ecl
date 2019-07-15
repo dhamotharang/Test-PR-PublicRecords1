@@ -1,4 +1,4 @@
-import Address, BIPV2;
+﻿import Address, BIPV2;
 
 export Layouts := module
 
@@ -25,8 +25,8 @@ export Layouts := module
 			
 			export Sprayed := record
 				string Franchisee_Id;
-				string Brand_Name;
 				string Fruns;
+				string Brand_Name;
 				string Company_Name;
 				string Exec_Full_Name;
 				string Address1;
@@ -109,7 +109,31 @@ export Layouts := module
 		unsigned4 											dt_vendor_last_reported			:= 0;
 		string1													record_type									:='';
 					
-		Input.Sprayed																										;
+		string													Franchisee_Id;
+		string													Brand_Name;
+		string													Fruns;
+		string													Company_Name;
+		string													Exec_Full_Name;
+		string													Address1;
+		string													Address2;
+		string													City;
+		string													State;
+		string													Zip_Code;
+		string													Zip_Code4;
+		string													Phone;
+		string													Phone_Extension;
+		string													Secondary_Phone;
+		string													Unit_Flag;
+		string													Relationship_Code;
+		string													F_Units;
+		string													Website_Url;
+		string													Email;
+		string													Industry;
+		string													Sector;
+		string													Industry_Type;
+		string													Sic_Code;
+		string													Frn_Start_Date;
+		string													Record_Id;
 		string20												Unit_Flag_Exp					 			:='';
 		string20												Relationship_Code_Exp				:='';
 		string10												clean_phone									:='';

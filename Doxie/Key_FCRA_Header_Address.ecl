@@ -1,6 +1,6 @@
-import header, doxie_build,ut,mdr;
+﻿import header, doxie_build,ut,mdr;
 
-f := doxie_build.file_fcra_header_building(trim(prim_name)<>'', trim(zip)<>'');
+f := doxie_build.file_fcra_header_built(trim(prim_name)<>'', trim(zip)<>'');
 
 slim_f := table(f, {did,
 src,

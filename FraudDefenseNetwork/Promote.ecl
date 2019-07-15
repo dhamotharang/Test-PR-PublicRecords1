@@ -1,4 +1,4 @@
-import ut,tools;
+﻿import ut,tools;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
@@ -24,9 +24,11 @@ module
                        //  fileservices.addsuperfile('~thor_data400::in::fdn::glb5'      ,ut.foreign_logs+'thor_data400::in::fdn::sprayed::glb5',addcontents := true);
                          fileservices.addsuperfile('~thor_data400::in::fdn::SuspectIP'  ,'~thor_data400::in::fdn::used::SuspectIP',addcontents := true),
                          fileservices.addsuperfile('~thor_data400::in::fdn::Erie'  ,'~thor_data400::in::fdn::used::Erie',addcontents := true),
+                         fileservices.addsuperfile('~thor_data400::in::fdn::ErieWatchList'  ,'~thor_data400::in::fdn::used::ErieWatchList',addcontents := true),
 												 FraudDefenseNetwork.fn_promote_GLB5,
 												 fileservices.clearsuperfile('~thor_data400::in::fdn::used::SuspectIP'),
-												 fileservices.clearsuperfile('~thor_data400::in::fdn::used::Erie')
+												 fileservices.clearsuperfile('~thor_data400::in::fdn::used::Erie'),
+												 fileservices.clearsuperfile('~thor_data400::in::fdn::used::ErieWatchList')
 												 );
 
 end;

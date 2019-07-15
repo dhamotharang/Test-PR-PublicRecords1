@@ -1,5 +1,5 @@
-import ut,mdr,PromoteSupers;
-export build_header_raw(string filedate = Header.version_build,boolean incremental = FALSE) := function
+﻿import ut,mdr,PromoteSupers;
+export build_header_raw(string filedate,boolean incremental = FALSE) := function
 
 h:=distribute(header.Header_Joined(filedate).final,hash(did));
 

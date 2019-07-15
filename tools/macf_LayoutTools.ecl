@@ -1,4 +1,4 @@
-/*
+﻿/*
 	-- macf_LayoutTools macro
 	Gives you the following in a module in the pOutput parameter
 	pOutput.layout_record		-- the layout of the passed record.  Useful if record is spread out over multiple attributes, this puts it in one.  
@@ -41,6 +41,7 @@ functionmacro
 	#uniquename(moutput						)
 	#uniquename(loutput						)
 	#uniquename(layout_record						)
+	#uniquename(string_layout_record						)
 	#uniquename(layout_record_xpath						)
 	#uniquename(lsize							)
 	#uniquename(loutSetFields			)
@@ -59,7 +60,8 @@ functionmacro
 //	#SET(moutput				,							%'mymodule'% +  ' :=\nmodule\n')
 
 	#SET(layout_record					,'\texport layout_record :=\n\trecord\n')
-	#SET(layout_record_xpath					,'\texport layout_record_xpath :=\n\trecord\n')
+	#SET(string_layout_record   ,'\texport string_layout_record := \'{\\n\'\n')
+	#SET(layout_record_xpath	  ,'\texport layout_record_xpath :=\n\trecord\n')
 	#SET(loutSetFields					,'\texport setAllFields :=\n\t[\n')
 	#SET(lfGetField							,'\texport fGetFieldValue(unsigned2 pfield,' + trim(#TEXT(pRecord),all) + ' pRow) :=\n\tmap(\n') 
 	#SET(lfGetFieldName					,'\texport fGetFieldName(unsigned2 pfield) := setAllFields[pfield];\n') 
@@ -101,6 +103,7 @@ functionmacro
             
 						#APPEND(layout_record	      ,'\t\t' + %'@type'% + %'lsize'% + %'fillertype'% + %'name'% + %'fillername'% + ';\n')
 						#APPEND(layout_record_xpath	,'\t\t' + %'@type'% + %'lsize'% + %'fillertype'% + %'name'% + %'fillername'% + '{xpath(\'' + %'name_lowercase'% + '\')};\n')
+						#APPEND(string_layout_record,'+ \'\t\t' + %'@type'% + %'lsize'% + %'fillertype'% + %'name'% + %'fillername'% + ';\\n\'\n')
 
 						#SET(lnumFields	,%lnumFields% + 1)
 						#IF(%lnumFields% = 1) #SET(lcomma,'\t\t ') #ELSE #SET(lcomma,'\n\t\t,') #END
@@ -123,6 +126,7 @@ functionmacro
 	#END
 	
 	#APPEND(layout_record									, '\tend;\n')
+	#APPEND(string_layout_record          , '+ \'\t}\';\n')
 	#APPEND(layout_record_xpath									, '\tend;\n')
 	#APPEND(loutSetFields						, '\n\t];\n')
 	#IF((%'lType'% = 'unsigned' or %'lType'% = 'integer' or %'lType'% = 'real' or %'lType'% = 'decimal') and pConvertAllFields2String = false)
@@ -131,7 +135,7 @@ functionmacro
 		#APPEND(lfGetField						, '\n\t\t,\'\'\n\t);\n')
 	#END
 	
-	#APPEND(moutput	,%'layout_record'% + %'layout_record_xpath'% + %'loutSetFields'% + %'lfGetField'% + %'lfGetFieldName'% + '\nend;')
+	#APPEND(moutput	,%'layout_record'% + %'layout_record_xpath'% + %'string_layout_record'% + %'loutSetFields'% + %'lfGetField'% + %'lfGetFieldName'% + '\nend;')
 //	#SET(loutput  ,%'moutput'% + ' return ' + %'mymodule'% + ';\n'))
 	#SET(loutput  ,%'moutput'% )
   

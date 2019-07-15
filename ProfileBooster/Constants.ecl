@@ -1,4 +1,6 @@
-EXPORT Constants := MODULE
+﻿EXPORT Constants := MODULE
+
+
 //these are states allowed
 EXPORT setWatercraftStates := [
 													'AL','AR','AZ','CO','CT','GA','IA','ME',

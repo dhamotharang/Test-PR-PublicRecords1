@@ -1,4 +1,4 @@
-IMPORT CanadianPhones,Address,VersionControl, ut;
+﻿IMPORT CanadianPhones,Address,VersionControl, ut;
 
 EXPORT map_axciomCanBus(string8 abusFileDate) := FUNCTION
 
@@ -59,6 +59,7 @@ EXPORT map_axciomCanBus(string8 abusFileDate) := FUNCTION
 		SELF.rec_type   						:= CleanAddress[101..102];
 		SELF.language 							:= CleanAddress[103];
 		SELF.errstat 								:= CleanAddress[104..109];
+		SELF.global_sid							:= 26071; //DF-25404
 
 		SELF												:= input; 
 		SELF			   								 :=[];

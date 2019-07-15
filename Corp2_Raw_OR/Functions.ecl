@@ -1,4 +1,4 @@
-IMPORT corp2_mapping, corp2, ut;
+﻿IMPORT corp2_mapping, corp2, ut;
 
 EXPORT Functions := MODULE
 
@@ -33,7 +33,8 @@ EXPORT Functions := MODULE
 					 uc_s := corp2.t2u(s);
 					 return map(uc_s in ['APPLICANT','AUTHORIZED REPRESENTATIVE'] => uc_s,
 										  uc_s in ['CORRESPONDENT'] 												=> uc_s,				
-										  uc_s in ['GENERAL PARTNER'] 											=> uc_s,				
+										  uc_s in ['GENERAL PARTNER'] 											=> uc_s,	
+										  uc_s in ['INDIVIDUAL WITH DIRECT KNOWLEDGE'] 			=> uc_s,
 										  uc_s in ['MANAGER','MANAGING PARTNER','MEMBER'] 	=> uc_s,				
 										  uc_s in ['NONFILEABLE CORRESPONDENT']							=> uc_s,				
 										  uc_s in ['PARTNER','PRESIDENT'] 									=> uc_s,				

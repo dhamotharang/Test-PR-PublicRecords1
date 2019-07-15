@@ -16,6 +16,10 @@
 <part name="CITY" type="xsd:string"/>
 <part name="ST" type="xsd:string"/>
 <part name="ZIP" type="xsd:string"/>
+<part name="DL_STATE" type="xsd:string"/>
+<part name="DL_NBR" type="xsd:string"/>
+<part name="fname2" type="xsd:string"/>
+<part name="lname2" type="xsd:string"/>
 <part name="WEIGHT" type="xsd:string" default="30"/>
 <part name="DISTANCE" type="xsd:string" default="3"/>
 <part name="SEGMENTATION" type="xsd:boolean" default="true"/>
@@ -28,7 +32,7 @@ EXPORT MEOW_xlinking_Service := MACRO
  	#WEBSERVICE(FIELDS(
 	'SNAME', 'FNAME', 'MNAME', 'LNAME', 'NAME', 
 	'ADDRESS1', 'ADDRESS2', 'PRIM_RANGE', 'PRIM_NAME', 'SEC_RANGE', 'CITY',
-	'ST', 'ZIP', 'SSN', 'DOB', 'PHONE', 'fname2', 'lname2', 
+	'ST', 'ZIP', 'SSN', 'DOB', 'PHONE', 'DL_STATE', 'DL_NBR', 'fname2', 'lname2', 
 	'disableForce', 'Weight', 'Distance', 'Segmentation', 'Debug', 'UniqueID'
 	),
 	DESCRIPTION('SALT V3.7 <p/> Attempt to resolve or find DIDs. <p>The more data input the better' + 

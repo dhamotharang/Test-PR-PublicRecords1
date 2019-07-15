@@ -1,8 +1,8 @@
-envVars :=
+﻿envVars :=
  '#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
-+'#OPTION(\'AllowedClusters\',\'thor400_44_sla,thor400_44\');\n'
++'#OPTION(\'AllowedClusters\',\'thor400_44_sla_eclcc,thor400_44_eclcc\');\n'
 +'#OPTION(\'AllowAutoQueueSwitch\',\'1\');\n'
 +'#STORED (\'_Validate_Year_Range_Low\', \'1800\');\n'
 +'#STORED (\'_Validate_Year_Range_high\', ut.GetDate[1..4]);\n'

@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	BIPV2_Best_SBFE,	BIPV2_Best,	BIPV2_Best_Proxid,	BIPV2,	
+﻿IMPORT	Business_Credit,	BIPV2_Best_SBFE,	BIPV2_Best,	BIPV2_Best_Proxid,	BIPV2,	
 				VersionControl,	ut, STD;
 EXPORT	proc_build_base(STRING	pVersion	,
 												Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	MODULE
@@ -32,7 +32,7 @@ EXPORT	proc_build_base(STRING	pVersion	,
 	VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.memberSpecific.new		,dMemberSpecific		,Build_MemberSpecific_File		,TRUE);
   VersionControl.macBuildNewLogicalFile(Filenames(pVersion).out.releasedate.new				,dReleaseDate				,Build_ReleaseDate_File				,TRUE);
 	
-	//	SBFE Best Key Base Files
+		// SBFE Best Key Base Files
 	SHARED	dHrchyBase		:=	PROJECT(BIPV2_Best_SBFE.CommonBase.DS_SBFE_CLEAN,BIPV2.CommonBase.Layout);
 	SHARED	pInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Proxid;
 	SHARED	sInBase				:=	BIPV2_Best.In_Base(dHrchyBase).For_Seleid;
@@ -41,7 +41,8 @@ EXPORT	proc_build_base(STRING	pVersion	,
                                                                                       
 	EXPORT	full_build	:=
 				SEQUENTIAL(
-					IF(NOTHOR(STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Sprayed))>0,
+					IF(NOTHOR( STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Sprayed)
+              +	STD.File.GetSuperFileSubCount(Filenames(pVersion).Input.Using))>0,
 						SEQUENTIAL(
 							Promote(pversion).inputfiles.Sprayed2Using
 							,Build_Denormalized_File
@@ -68,7 +69,7 @@ EXPORT	proc_build_base(STRING	pVersion	,
 					,Build_ReleaseDate_File
 					,Promote(pversion, 'out').buildfiles.New2Built
 					,Promote(pversion, 'out').buildfiles.Built2QA
-					//	Build SBFE Best Key Base Files.  Only build the base files during a Full Build.
+						// Build SBFE Best Key Base Files.  Only build the base files during a Full Build.
 					,IF(pBuildType	<>	Constants().buildType.Daily,
 						SEQUENTIAL(
 							Build_SBFEBest_File

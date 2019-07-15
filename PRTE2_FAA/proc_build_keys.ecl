@@ -1,4 +1,4 @@
-import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, PRTE;
+﻿import RoxieKeyBuild,PRTE, _control, STD,prte2,tools, PRTE2_Common, PRTE, strata;
 
 export proc_build_keys(string filedate) := FUNCTION
 
@@ -15,6 +15,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_aircraft_reg_nnum,		Constant
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_aircraft_linkids.Key,	Constants.KEY_PREFIX+'aircraft_linkids',	Constants.KEY_PREFIX+filedate+'::aircraft_linkids',	k9);
 
 //Copying Reference Keys
+// DF-21779: Copying Prod Keys which should be depreciated.
 key_aircraft_info	:= 	STD.File.copy(Constants.thor_cluster_Files+	'key::faa_aircraft_info_qa',tools.fun_Clustername_DFU(), Constants.KEY_PREFIX+filedate+'::aircraft_info',,,,,true,,,true);
 key_engine_info  	:= 	STD.File.copy(Constants.thor_cluster_Files+	'key::faa_engine_info_qa',tools.fun_Clustername_DFU('02'), Constants.KEY_PREFIX+filedate+'::engine_info',,,,,true,,,true);
 
@@ -101,6 +102,16 @@ To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa
 									 fcra_mv1_qa, fcra_mv2_qa, fcra_mv3_qa, fcra_mv4_qa, fcra_mv5_qa, fcra_mv6_qa, fcra_mv7_qa, fcra_mv8_qa);
 
 
+//DF-21803:FCRA Consumer Data Fields Depreciation
+cnt_faa_airmen_cert_fcra := OUTPUT(strata.macf_pops(Keys.key_Certifications(true),,,,,,FALSE,['ratings']), named('cnt_faa_airmen_cert_fcra'));
+cnt_faa_airmen_did_fcra 	:= OUTPUT(strata.macf_pops(Keys.key_airmen_did(true),,,,,,FALSE,['ace_fips_st','country','region','title']), named('cnt_faa_airmen_did_fcra'));
+cnt_faa_aircraft_id_fcra := OUTPUT(strata.macf_pops(Keys.key_aircraft_id(true),,,,,,FALSE,
+																																		['ace_fips_st','certification','compname','country','fract_owner',
+																																		'last_action_date','lf','orig_county','region','status_code','title',
+																																		'type_registrant']),named('cnt_faa_aircraft_id_fcra'));
+																																		
+
+
 // -- Build Autokeys
 build_autokeys_common := Keys.autokeys(filedate);
 build_autokeys_airmen	:= Keys.autokeys_airmen(filedate);
@@ -108,9 +119,9 @@ build_autokeys_airmen	:= Keys.autokeys_airmen(filedate);
 
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
 is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
-DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
-updatedops   		 := PRTE.UpdateVersion('FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-updatedops_fcra  := PRTE.UpdateVersion('FCRA_FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+DOPS_Comment		 					:= OUTPUT('Skipping DOPS process');
+updatedops   		 				:= PRTE.UpdateVersion('FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+updatedops_fcra  			:= PRTE.UpdateVersion('FCRA_FAAKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
 
 
 
@@ -122,6 +133,7 @@ buildKey	:=	sequential(
 												,build_autokeys_common
 												,build_autokeys_airmen
 												,if(is_running_in_prod, parallel(updatedops,updatedops_fcra),DOPS_Comment) 
+												,parallel(cnt_faa_airmen_cert_fcra,cnt_faa_airmen_did_fcra,cnt_faa_aircraft_id_fcra)
 												);	
 
 return	buildKey;

@@ -1,55 +1,47 @@
-import lib_fileservices,tools, std;
+﻿IMPORT lib_fileservices,tools, std;
 
 EXPORT SprayFiles := module;
 
-export Clear_Input_Superfiles(string pLogicalname, string pdataset_name) :=	function	
-		/* 
-			Removes the filename from all the superfiles the file is attached to.
-		*/
+	EXPORT Clear_Input_Superfiles(string pLogicalname, string pdataset_name) := function
 		all_subfilenames := DATASET([{prte2._Dataset().thor_cluster_files + 'in::' + pdataset_name + '::@version@' + '::' + pLogicalname}], Tools.Layout_Names);
-		;
-		
-		return nothor(Tools.fun_ClearfilesFromSupers(all_subfilenames, false));
-	end; //end clear-input_superfiles
 
+		RETURN NOTHOR(Tools.fun_ClearfilesFromSupers(all_subfilenames, false));
+	END;
 
-export Spray_Raw_Data(  
-											 string		pFilename			= '' //group's file name on linux box
-											,string		pLogicalname	= '' //group's file name on thor
-											,string   pDataset_name = ''
-											,boolean	pShouldSprayMultipleFilesAs1	= false
-											,string		pServerIP			= prte2._Constants().sServerIP
-											,string		pDirectory		= prte2._Constants().sDirectory
-											,string		pFiletype			= '.txt'
-											,string		pGroupName		= tools.fun_Clustername_DFU()		
-											,boolean	pIsTesting		= false
-											,boolean	pOverwrite		= false		
-										) := function		
-												
-		sFileMask					:= '*'+pFilename+'*':STORED(pFilename + '-Filename');
-    
-		
-		dFilesToProcess		:= FileServices.RemoteDirectory(prte2._Constants().sServerIP,prte2._Constants().sDirectory,sFileMask);
-    output(dFilesToProcess);
+	EXPORT Spray_Raw_Data( 
+		STRING pFilename = '',
+		STRING pLogicalname = '',
+		STRING pDataset_name = '',
+		BOOLEAN pShouldSprayMultipleFilesAs1 = false,
+		STRING pServerIP = prte2._Constants().sServerIP,
+		STRING pDirectory = prte2._Constants().sDirectory,
+		STRING pFiletype = '.txt',
+		//STRING pGroupName = tools.fun_Clustername_DFU(),
+		STRING pGroupName = thorlib.group(),
+		BOOLEAN pIsTesting = false,
+		BOOLEAN pOverwrite = false
+	) := FUNCTION
 
-		pversion := IF(regexfind('[[:digit:]]{8}',dFilesToProcess[1].name),regexfind('[[:digit:]]{8}',dFilesToProcess[1].name,0),(STRING)Std.Date.Today());
-		
-		sLogicalFilename	:= prte2.Filenames(pLogicalname,pversion, pdataset_name).input.logical;
-		output(sLogicalFilename);
-    		
-		bAlreadySprayed		:= if(FileServices.FileExists(sLogicalFilename),true,false):STORED(pFilename +'-CK if AlreadySprayed');
-    output(bAlreadySprayed);
-		
-    // clear_superfile := Clear_Input_Superfiles(pLogicalname, pdataset_name);
-   
-		if( not bAlreadySprayed,
-				prte2.Spray(pversion,sFileMask,pLogicalname,pdataset_name,pShouldSprayMultipleFilesAs1,pServerIP,pDirectory,pFiletype,pGroupName,pIsTesting,pOverwrite,bAlreadySprayed),
-					output('File: '+sLogicalFilename+' already exists on THOR; File: '+sLogicalFilename+' not re-sprayed.')
-			);
+		sFileMask := IF(REGEXFIND('prte__\\w+__\\w+_(_\\d{1,}__)?\\d{8}(\\w{1})?\\.txt',pFilename),pFilename,'*'+pFilename+'*'):STORED(pFilename + '-Filename');
+		//sFileMask := IF(REGEXFIND('prte__\\w+__\\w+__\\d{1,}__\\d{8}\\.txt',pFilename),pFilename,'prte__'+pFilename+'__*__[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].txt'):STORED(pFilename + '-Filename');
+		dFilesToProcess := STD.File.RemoteDirectory(pServerIP,pDirectory,sFileMask);
+		OUTPUT(dFilesToProcess);
 
-		return if(nothor(FileServices.FileExists(sLogicalFilename)),sLogicalFilename,'');	
-		
-	end; //end Spray_Raw_Data
-	
-end;	
-	
+		pversion := IF(REGEXFIND('\\d{8}',dFilesToProcess[1].name),regexfind('\\d{8}',dFilesToProcess[1].name,0),(STRING)Std.Date.Today());
+
+		sLogicalFilename := prte2.Filenames(pLogicalname,pversion, pdataset_name).input.logical;
+		OUTPUT(sLogicalFilename);
+
+		bAlreadySprayed	:= if(FileServices.FileExists(sLogicalFilename),true,false):STORED(pFilename +'-CK if AlreadySprayed');
+		OUTPUT(bAlreadySprayed);
+
+		IF( NOT bAlreadySprayed,
+			prte2.Spray(pversion,sFileMask,pLogicalname,pdataset_name,pShouldSprayMultipleFilesAs1,pServerIP,pDirectory,pFiletype,pGroupName,pIsTesting,pOverwrite,bAlreadySprayed),
+			OUTPUT('File: '+sLogicalFilename+' already exists on THOR; File: '+sLogicalFilename+' not re-sprayed.')
+		);
+
+		RETURN IF(NOTHOR(FileServices.FileExists(sLogicalFilename)),sLogicalFilename,'');
+
+	END;
+
+END;

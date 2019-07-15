@@ -1,20 +1,17 @@
-import STD;
-EXPORT fn_ProcessContactRecord(DATASET(Layouts2.rStateContact) inrec) := FUNCTION
+﻿import STD;
+sfList := [$.Superfile_List.sfContactRecords,
+						$.Superfile_List.sfContactRecords + '_father',
+						$.Superfile_List.sfContactRecords + '_grandfather',
+						$.Superfile_List.sfContactRecords + '_delete'
+					];
+lfn := $.Superfile_List.sfContactRecords + '_' + WORKUNIT;
+EXPORT fn_ProcessContactRecord(DATASET($.Layouts2.rStateContactEx) inrec) := FUNCTION
 
-	contacts := DISTRIBUTE(Files('').StateContacts,HASH64(ProgramCode, ProgramState)); 
+	contacts := $.Process_ContactRecords(inrec); 
 
-	deletions := inrec(UpdateType='D');
-	
-	c1 := contacts - deletions;
-	// TO DO: Override records
-	
-	c2 := c1 + inrec(UpdateType='U');
-	
-	c3 := DEDUP(c2, all);
-	
-	
-	//Std.file.fPromoteSuperFileList([Files('').StateContacts], c3, deltail := true)
-	
-	return c3;
+	return ORDERED(
+			OUTPUT(contacts,,lfn, COMPRESSED),
+			Std.file.fPromoteSuperFileList(sfList, lfn, deltail := true)
+	);
 
 END;

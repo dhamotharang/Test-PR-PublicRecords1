@@ -1,4 +1,4 @@
-import business_header_ss, business_risk, EDA_VIA_XML, Risk_Indicators, govdata, Marketing_Best,_control,Business_HeaderV2, versioncontrol,Business_Header_BDL2,paw;
+﻿import business_header_ss, business_risk, EDA_VIA_XML, Risk_Indicators, govdata, Marketing_Best,_control,Business_HeaderV2, versioncontrol,Business_Header_BDL2,paw;
 /*
 	Check the following:
 	
@@ -13,7 +13,7 @@ pShouldPromote2QA 			:= true													;
 pShouldRollbackSources	:= true													;
 pShouldSendToStrata			:= true													;
 
-#workunit ('name', 'Build Business Header ' + pversion);
+#workunit ('name', 'Yogurt:Build Business Header ' + pversion);
 #workunit ('protect', true);
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -67,6 +67,7 @@ sequential(
 	,proc_Build_Bases
 	,proc_Build_Other
 	,if(pShouldRollbackSources,proc_cleanup)
+	,notify('BUSINESS HEADER KEY BUILD COMPLETE','*')
 ) : success(business_header.Send_Email(pversion).BuildSuccess)
 	, failure(business_header.Send_Email(pversion).BuildFailure)
 	;

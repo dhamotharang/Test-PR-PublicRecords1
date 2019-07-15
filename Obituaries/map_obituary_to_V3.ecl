@@ -1,4 +1,4 @@
-import	Obituaries,Header,ut,address,DID_Add, lib_ziplib, RoxieKeyBuild;
+﻿import	Obituaries,Header,ut,address,DID_Add, lib_ziplib, RoxieKeyBuild,	STD;
 #stored('did_add_force','thor');
 
 EXPORT map_obituary_to_V3(string filedate) := FUNCTION
@@ -14,7 +14,7 @@ Header.Layout_Did_Death_MasterV3 TributesCln(Obituaries.layouts.layout_reor_trib
 	tempdod										:=	l.death_year + l.death_month + l.death_day;
 	tempdob1									:=	l.birth_year + l.birth_month + l.birth_day;
 	tempdob										:=	IF((l.birth_year='') and (l.age<>'')
-																	, ((integer)ut.getdate[1..4] - (integer)trim(l.age,left,right))+'0000'
+																	, (Std.Date.Today() DIV 10000 - (integer)trim(l.age,left,right))+'0000'
 																	, tempdob1
 																);
 	self.dob8									:=	tempdob;
@@ -125,7 +125,7 @@ END;
 obits_with_dids_DIST	:=	SORT(DISTRIBUTE(obits_with_dids),RECORD,LOCAL):PERSIST('~thor_data400::persist::death_master::obit_did');
 ds_obituary_dmasterv3	:=	DEDUP(PROJECT(obits_with_dids_DIST,map_to_dmastv3(LEFT),LOCAL));
 
-RoxieKeyBuild.Mac_SF_BuildProcess(ds_obituary_dmasterv3,'~thor_data400::base::did_death_masterv3_obituary','~thor_data400::base::did_death_masterv3_obituary_'+filedate, build_obit_d_mastv3,3);
+RoxieKeyBuild.Mac_SF_BuildProcess(ds_obituary_dmasterv3,'~thor_data400::base::did_death_masterv3_obituary','~thor_data400::base::did_death_masterv3_obituary_'+filedate, build_obit_d_mastv3,3,,TRUE);
 
 return sequential(build_obit_d_mastv3);
 

@@ -13,7 +13,7 @@ EXPORT GenerationMod := MODULE
     + '//Uncomment Process if doing external adl\n'
     + '//PROCESS:<ProcessName>\n'
     + '//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields\n'
-    + 'FIELDTYPE:invalid_addr_type:ALLOW(#BCHLPUXY)\n'
+    + 'FIELDTYPE:invalid_addr_type:ALLOW(#BCDHLPUXY)\n'
     + 'FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)\n'
     + 'FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)\n'
     + 'FIELDTYPE:invalid_alphanumericpound:ALLOW(#ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)\n'

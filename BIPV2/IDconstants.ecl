@@ -1,3 +1,5 @@
+﻿import _control;
+
 EXPORT IDconstants := 
 MODULE
 
@@ -38,5 +40,11 @@ export Set_Fetch_Level_Above_PowID     				:= [Fetch_Level_ProxID,Fetch_Level_SE
 export Set_Fetch_Level_Above_ProxID    				:= [Fetch_Level_SELEID,Fetch_Level_OrgID,Fetch_Level_UltID];
 export Set_Fetch_Level_Above_SELEID    				:= [Fetch_Level_OrgID,Fetch_Level_UltID];
 export Set_Fetch_Level_Above_OrgID		       	:= [Fetch_Level_UltID];
+
+export USE_LOCAL_KEYS := true;
+export APPEND_WEIGHT_THRESHOLD_ROXIE := 44;
+export URL_ROXIE_DEV := 'dev155vip.hpcc.risk.regn.net:9876'; // useful for testing and devlopment
+export URL_ROXIE_CERT := _control.RoxieEnv.boca_certvip; // useful for testing and development
+export URL_ROXIE_PROD := _control.RoxieEnv.boca_prodvip;
 
 END;

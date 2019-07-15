@@ -1,4 +1,4 @@
-EXPORT mac_avoid_transitives_scalene(ifile,did1,did2,conf,dover,rule_num,thresh,bucketsize = 3) := 
+﻿EXPORT mac_avoid_transitives_scalene(ifile,did1,did2,conf,dover,rule_num,thresh,bucketsize = 3) := 
 FUNCTIONMACRO
 import BIPV2_Tools;
 //first, put the scores into buckets

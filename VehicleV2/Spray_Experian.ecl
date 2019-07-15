@@ -2,7 +2,7 @@
 
 export Spray_Experian(	string	pFileDate,
 												string	pProcessDate,
-												string	pGroupName	=	'thor400_66',
+												string	pGroupName	=	'thor400_36',
 												boolean	pOverwrite	=	false
 											)	:=
 function

@@ -1,8 +1,9 @@
-/* Converting Nebraska Appraiser Professional License File to MARI common layout
+﻿/* Converting Nebraska Appraiser Professional License File to MARI common layout
 */
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib,std;
 
 EXPORT map_NES0859_conversion(string pVersion) := FUNCTION
+#workunit('name','Yogurt: map_NES0859_conversion');
 	code 								:= 'NES0859';
 	src_cd							:= code[3..7];
 	src_st							:= code[1..2];	//License state
@@ -21,7 +22,7 @@ EXPORT map_NES0859_conversion(string pVersion) := FUNCTION
 	Sufx_Pattern := '(,SR\\.|,SR| SR\\.| SR|, JR|, JR\\.| JR\\.| JR| III| II| IV| VII)';	
 	
 	//Map Real Estate License to common MARIBASE layout
-	Prof_License_Mari.layouts.base xformToCommon(Prof_License_Mari.layout_NES0859.src pInput) := TRANSFORM
+	Prof_License_Mari.layout_base_in xformToCommon(Prof_License_Mari.layout_NES0859.src pInput) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= pVersion;			//yyyymmdd
@@ -37,15 +38,15 @@ EXPORT map_NES0859_conversion(string pVersion) := FUNCTION
 		SELF.STD_SOURCE_UPD		:= src_cd;
 		SELF.LICENSE_STATE	  := src_st;
 
-		trim_lic_type					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.LIC_TYPE);
-		trim_full_name				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ORG_NAME);
-		trim_office_name			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.OFFICENAME);
-		trim_address					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ADDRESS1_1);
-		trim_city							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.CITY_1);
-		trim_state						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.STATE_1);
-		trim_zip							:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.ZIP);
-		trim_telephone				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.TELE_1);
-		trim_email						:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.EMAIL_1);
+		trim_lic_type					:= ut.CleanSpacesAndUpper(pInput.LIC_TYPE);
+		trim_full_name				:= ut.CleanSpacesAndUpper(pInput.ORG_NAME);
+		trim_office_name			:= ut.CleanSpacesAndUpper(pInput.OFFICENAME);
+		trim_address					:= ut.CleanSpacesAndUpper(pInput.ADDRESS1_1);
+		trim_city							:= ut.CleanSpacesAndUpper(pInput.CITY_1);
+		trim_state						:= ut.CleanSpacesAndUpper(pInput.STATE_1);
+		trim_zip							:= ut.CleanSpacesAndUpper(pInput.ZIP);
+		trim_telephone				:= ut.CleanSpacesAndUpper(pInput.TELE_1);
+		trim_email						:= ut.CleanSpacesAndUpper(pInput.EMAIL_1);
 			
 	
 		// Populate name fields. Reformat the full name into FML format because the name parser for FML works better.
@@ -182,7 +183,7 @@ EXPORT map_NES0859_conversion(string pVersion) := FUNCTION
 	inFileLic := PROJECT(ValidRecs, xformToCommon(left));	
 
 	// Translating Raw codes to standardized status/license codes
-	Prof_License_Mari.layouts.base	doTypeJoin(inFileLic L, SrcCmvTrans R) := TRANSFORM
+	Prof_License_Mari.layout_base_in	doTypeJoin(inFileLic L, SrcCmvTrans R) := TRANSFORM
 		SELF.STD_PROF_CD	:= R.DM_VALUE1;
 		SELF := L;
 	END;

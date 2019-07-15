@@ -1,6 +1,22 @@
-import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master, promotesupers;
+﻿import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master, promotesupers, dops, DOPSGrowthCheck, strata;
 
 export proc_deathmaster_buildkey_ssa(string filedate) := function
+	//Add persistence and growth checks.  Placed at top of code to avoid variable scope issue with variables declared in macros.
+	GetDops:=dops.GetDeployedDatasets('P','B','F');
+	OnlyDeathMaster:=GetDops(datasetname='FCRA_DeathMasterKeys');
+	father_filedate := OnlyDeathMaster[1].buildversion;
+	filename := '~thor_data400::key::fcra::death_masterv2::'+filedate+'::did';
+	father_filename := '~thor_data400::key::fcra::death_masterv2::'+father_filedate+'::did';
+	set of string key_DeathMaster_InputSet:=['l_did','did','did_score','filedate','rec_type','rec_type_orig','ssn','lname','name_suffix','fname','mname','vorp_code','dod8','dob8','st_country_code','zip_lastres','zip_lastpayment','state','fipscounty','state_death_flag','death_rec_src','src','glb_flag','county_name'];
+
+	DeltaCommands:=sequential(
+	DOPSGrowthCheck.CalculateStats('FCRA_DeathMasterKeys','doxie.key_death_masterv2_did_fcra','key_death_master',filename,'l_did','state_death_id','','','','',filedate,father_filedate),
+	DOPSGrowthCheck.DeltaCommand(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id',filedate,father_filedate,key_DeathMaster_InputSet),
+	DOPSGrowthCheck.ChangesByField(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id','',filedate,father_filedate),
+	DopsGrowthCheck.PersistenceCheck(filename,father_filename,'FCRA_DeathMasterKeys','key_death_master','doxie.key_death_masterv2_did_fcra','state_death_id',key_DeathMaster_InputSet,key_DeathMaster_InputSet,filedate,father_filedate),
+	);
+
+	
 	#uniquename(version_date)
 	%version_date% := filedate;
 
@@ -89,11 +105,16 @@ export proc_deathmaster_buildkey_ssa(string filedate) := function
 	///////////////////////// Move FCRA KEYS /////////////////////////
 	RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::fcra::did_death_masterV2_ssa', 'Q', move9, 2);
 
-	move_qa	:=	parallel(move1,move2,move3,move4,move5,move6,move7,move8,move9);
+	// DF-21696 Show counts of blanked out fields in thor_data400::key::fcra::did_death_masterv2_ssa_qa
+	cnt_death_masterv2_ssa_did_key_fcra := OUTPUT(strata.macf_pops(Doxie.key_death_masterv2_ssa_did_fcra,,,,,,FALSE,['st_country_code','zip_lastpayment']));
+	cnt_death_master_ssa_ssn_key_fcra := OUTPUT(strata.macf_pops(Death_Master.key_ssn_ssa(isFCRA := true),,,,,,FALSE,['st_country_code','zip_lastpayment']));
 
+	move_qa	:=	parallel(move1,move2,move3,move4,move5,move6,move7,move8,move9);
+	
 	// Move building to built
 	post1 := promotesupers.SF_MaintBuilding('~thor_data400::base::did_death_master_ssa');  
 	post2 := promotesupers.SF_MaintBuilding('~thor_data400::base::did_death_masterV2_ssa');
+	
 
-	return sequential(pre1,pre2,full1,move_qa,post1,post2);
+	return sequential(pre1,pre2,full1,move_qa,post1,post2,DeltaCommands,cnt_death_masterv2_ssa_did_key_fcra,cnt_death_master_ssa_ssn_key_fcra);
 end;

@@ -1,4 +1,4 @@
-import address,corp2,corp2_raw_il,scrubs,scrubs_corp2_mapping_il_llc_ar,scrubs_corp2_mapping_il_llc_main,std,tools,ut,versioncontrol;
+﻿import address,corp2,corp2_raw_il,scrubs,scrubs_corp2_mapping_il_llc_ar,scrubs_corp2_mapping_il_llc_main,std,tools,ut,versioncontrol;
 
 export IL_LLC := module 
 
@@ -325,15 +325,13 @@ export IL_LLC := module
 
 		AR_ScrubsAlert				 := AR_ScrubsWithExamples(RejectWarning = 'Y');
 		AR_ScrubsAttachment	   := Scrubs.fn_email_attachment(AR_ScrubsAlert);
-		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.spray
+		AR_MailFile					   := FileServices.SendEmailAttachData(corp2.Email_Notification_Lists.AttachedList
 																															,'Scrubs CorpAR_LLC_IL Report' //subject
 																															,'Scrubs CorpAR_LLC_IL Report' //body
 																															,(data)AR_ScrubsAttachment
 																															,'text/csv'
 																															,'CorpLLCILARScrubsReport.csv'																															
-																															,
-																															,
-																															,corp2.Email_Notification_Lists.spray);
+																															);
 
 		AR_BadRecords				 := AR_N.ExpandedInFile(	
 																								corp_key_Invalid							  			<> 0 or
@@ -421,9 +419,7 @@ export IL_LLC := module
 																																 ,(data)Main_ScrubsAttachment
 																																 ,'text/csv'
 																																 ,'CorpLLCILMainScrubsReport.csv'
-																																 ,
-																																 ,
-																																 ,corp2.Email_Notification_Lists.spray);
+																																 );
 																																 
 		Main_BadRecords						:= Main_N.ExpandedInFile(	
 																											 dt_vendor_first_reported_Invalid 			<> 0 or

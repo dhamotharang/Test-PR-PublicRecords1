@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_DL_WY_MEDCERT.BWR_PopulationStatistics - Population Statistics - SALT V3.8.0');
+IMPORT Scrubs_DL_WY_MEDCERT,SALT38;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_DL_WY_MEDCERT.MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* append_process_date_field */,/* orig_first_name_field */,/* orig_middle_name_field */,/* orig_last_name_field */,/* mailing_street_addr_1_field */,/* mailing_city_1_field */,/* mailing_state_1_field */,/* mailing_zip_code_1_field */,/* phys_street_addr_2_field */,/* phys_city_2_field */,/* phys_state_2_field */,/* phys_zip_code_2_field */,/* orig_dl_number_field */,/* orig_dob_field */,/* orig_code_1_field */,/* orig_code_2_field */,/* orig_code_3_field */,/* orig_code_4_field */,/* orig_code_5_field */,/* orig_code_6_field */,/* orig_code_7_field */,/* orig_code_8_field */,/* orig_issue_date_field */,/* orig_expire_date_field */,/* med_cert_status_field */,/* med_cert_type_field */,/* med_cert_expire_date_field */,/* name_suffix_field */,/* clean_name_prefix_field */,/* clean_name_first_field */,/* clean_name_middle_field */,/* clean_name_last_field */,/* clean_name_suffix_field */,/* clean_name_score_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

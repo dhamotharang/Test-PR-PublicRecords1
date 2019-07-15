@@ -1,10 +1,12 @@
-IMPORT ut,SALT34;
-IMPORT Scrubs,Scrubs_Corp2_Mapping_MI_AR; // Import modules for FieldTypes attribute definitions
+﻿IMPORT SALT34;
+IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
+EXPORT NumFields := 36;
+ 
 // Processing for each FieldType
-EXPORT SALT34.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_mandatory','invalid_date','invalid_future_date','invalid_charter_nbr','invalid_numeric','invalid_extension','invalid_frame','invalid_roll');
-EXPORT FieldTypeNum(SALT34.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_mandatory' => 4,'invalid_date' => 5,'invalid_future_date' => 6,'invalid_charter_nbr' => 7,'invalid_numeric' => 8,'invalid_extension' => 9,'invalid_frame' => 10,'invalid_roll' => 11,0);
+EXPORT SALT34.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_mandatory','invalid_date','invalid_future_date','invalid_charter_nbr','invalid_numeric');
+EXPORT FieldTypeNum(SALT34.StrType fn) := CASE(fn,'invalid_corp_key' => 1,'invalid_corp_vendor' => 2,'invalid_state_origin' => 3,'invalid_mandatory' => 4,'invalid_date' => 5,'invalid_future_date' => 6,'invalid_charter_nbr' => 7,'invalid_numeric' => 8,0);
  
 EXPORT MakeFT_invalid_corp_key(SALT34.StrType s0) := FUNCTION
   s1 := SALT34.stringfilter(s0,'-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
@@ -59,26 +61,11 @@ END;
 EXPORT InValidFT_invalid_numeric(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,'0123456789 '))));
 EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('0123456789 '),SALT34.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_extension(SALT34.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_extension(SALT34.StrType s) := WHICH(~Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_extension(s)>0);
-EXPORT InValidMessageFT_invalid_extension(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_extension'),SALT34.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_frame(SALT34.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_frame(SALT34.StrType s) := WHICH(~Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_frame(s)>0);
-EXPORT InValidMessageFT_invalid_frame(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_frame'),SALT34.HygieneErrors.Good);
- 
-EXPORT MakeFT_invalid_roll(SALT34.StrType s0) := FUNCTION
-  RETURN  s0;
-END;
-EXPORT InValidFT_invalid_roll(SALT34.StrType s) := WHICH(~Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_roll(s)>0);
-EXPORT InValidMessageFT_invalid_roll(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_roll'),SALT34.HygieneErrors.Good);
- 
 EXPORT SALT34.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','ar_year','ar_mailed_dt','ar_due_dt','ar_filed_dt','ar_report_dt','ar_report_nbr','ar_franchise_tax_paid_dt','ar_delinquent_dt','ar_tax_factor','ar_tax_amount_paid','ar_annual_report_cap','ar_illinois_capital','ar_roll','ar_frame','ar_extension','ar_microfilm_nbr','ar_comment','ar_type','ar_exempt','ar_license_tax_amount','ar_status','ar_paid_date','ar_prev_paid_date','ar_prev_tax_factor','ar_extension_date','ar_report_mail_date','ar_deliquent_report_mail_date','ar_report_filed_date','ar_year_and_month_due');
+EXPORT SALT34.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','ar_year','ar_mailed_dt','ar_due_dt','ar_filed_dt','ar_report_dt','ar_report_nbr','ar_franchise_tax_paid_dt','ar_delinquent_dt','ar_tax_factor','ar_tax_amount_paid','ar_annual_report_cap','ar_illinois_capital','ar_roll','ar_frame','ar_extension','ar_microfilm_nbr','ar_comment','ar_type','ar_exempt','ar_license_tax_amount','ar_status','ar_paid_date','ar_prev_paid_date','ar_prev_tax_factor','ar_extension_date','ar_report_mail_date','ar_deliquent_report_mail_date','ar_report_filed_date','ar_year_and_month_due');
 EXPORT FieldNum(SALT34.StrType fn) := CASE(fn,'corp_key' => 0,'corp_vendor' => 1,'corp_vendor_county' => 2,'corp_vendor_subcode' => 3,'corp_state_origin' => 4,'corp_process_date' => 5,'corp_sos_charter_nbr' => 6,'ar_year' => 7,'ar_mailed_dt' => 8,'ar_due_dt' => 9,'ar_filed_dt' => 10,'ar_report_dt' => 11,'ar_report_nbr' => 12,'ar_franchise_tax_paid_dt' => 13,'ar_delinquent_dt' => 14,'ar_tax_factor' => 15,'ar_tax_amount_paid' => 16,'ar_annual_report_cap' => 17,'ar_illinois_capital' => 18,'ar_roll' => 19,'ar_frame' => 20,'ar_extension' => 21,'ar_microfilm_nbr' => 22,'ar_comment' => 23,'ar_type' => 24,'ar_exempt' => 25,'ar_license_tax_amount' => 26,'ar_status' => 27,'ar_paid_date' => 28,'ar_prev_paid_date' => 29,'ar_prev_tax_factor' => 30,'ar_extension_date' => 31,'ar_report_mail_date' => 32,'ar_deliquent_report_mail_date' => 33,'ar_report_filed_date' => 34,'ar_year_and_month_due' => 35,0);
+EXPORT SET OF SALT34.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','LENGTHS'],['ENUM'],[],[],['ENUM'],['ALLOW','CUSTOM'],['ALLOW','LENGTHS'],['ALLOW'],[],[],['ALLOW','CUSTOM'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -91,11 +78,11 @@ EXPORT InValid_corp_vendor(SALT34.StrType s) := InValidFT_invalid_corp_vendor(s)
 EXPORT InValidMessage_corp_vendor(UNSIGNED1 wh) := InValidMessageFT_invalid_corp_vendor(wh);
  
 EXPORT Make_corp_vendor_county(SALT34.StrType s0) := s0;
-EXPORT InValid_corp_vendor_county(SALT34.StrType s) := FALSE;
+EXPORT InValid_corp_vendor_county(SALT34.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_county(UNSIGNED1 wh) := '';
  
 EXPORT Make_corp_vendor_subcode(SALT34.StrType s0) := s0;
-EXPORT InValid_corp_vendor_subcode(SALT34.StrType s) := FALSE;
+EXPORT InValid_corp_vendor_subcode(SALT34.StrType s) := 0;
 EXPORT InValidMessage_corp_vendor_subcode(UNSIGNED1 wh) := '';
  
 EXPORT Make_corp_state_origin(SALT34.StrType s0) := MakeFT_invalid_state_origin(s0);
@@ -115,115 +102,115 @@ EXPORT InValid_ar_year(SALT34.StrType s) := InValidFT_invalid_numeric(s);
 EXPORT InValidMessage_ar_year(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric(wh);
  
 EXPORT Make_ar_mailed_dt(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_mailed_dt(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_mailed_dt(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_mailed_dt(UNSIGNED1 wh) := '';
  
-EXPORT Make_ar_due_dt(SALT34.StrType s0) := MakeFT_invalid_future_date(s0);
-EXPORT InValid_ar_due_dt(SALT34.StrType s) := InValidFT_invalid_future_date(s);
-EXPORT InValidMessage_ar_due_dt(UNSIGNED1 wh) := InValidMessageFT_invalid_future_date(wh);
+EXPORT Make_ar_due_dt(SALT34.StrType s0) := s0;
+EXPORT InValid_ar_due_dt(SALT34.StrType s) := 0;
+EXPORT InValidMessage_ar_due_dt(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_filed_dt(SALT34.StrType s0) := MakeFT_invalid_date(s0);
 EXPORT InValid_ar_filed_dt(SALT34.StrType s) := InValidFT_invalid_date(s);
 EXPORT InValidMessage_ar_filed_dt(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
  
 EXPORT Make_ar_report_dt(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_report_dt(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_report_dt(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_report_dt(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_report_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_report_nbr(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_report_nbr(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_report_nbr(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_franchise_tax_paid_dt(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_franchise_tax_paid_dt(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_franchise_tax_paid_dt(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_franchise_tax_paid_dt(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_delinquent_dt(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_delinquent_dt(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_delinquent_dt(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_delinquent_dt(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_tax_factor(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_tax_factor(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_tax_factor(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_tax_factor(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_tax_amount_paid(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_tax_amount_paid(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_tax_amount_paid(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_tax_amount_paid(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_annual_report_cap(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_annual_report_cap(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_annual_report_cap(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_annual_report_cap(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_illinois_capital(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_illinois_capital(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_illinois_capital(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_illinois_capital(UNSIGNED1 wh) := '';
  
-EXPORT Make_ar_roll(SALT34.StrType s0) := MakeFT_invalid_roll(s0);
-EXPORT InValid_ar_roll(SALT34.StrType s) := InValidFT_invalid_roll(s);
-EXPORT InValidMessage_ar_roll(UNSIGNED1 wh) := InValidMessageFT_invalid_roll(wh);
+EXPORT Make_ar_roll(SALT34.StrType s0) := s0;
+EXPORT InValid_ar_roll(SALT34.StrType s) := 0;
+EXPORT InValidMessage_ar_roll(UNSIGNED1 wh) := '';
  
-EXPORT Make_ar_frame(SALT34.StrType s0) := MakeFT_invalid_frame(s0);
-EXPORT InValid_ar_frame(SALT34.StrType s) := InValidFT_invalid_frame(s);
-EXPORT InValidMessage_ar_frame(UNSIGNED1 wh) := InValidMessageFT_invalid_frame(wh);
+EXPORT Make_ar_frame(SALT34.StrType s0) := s0;
+EXPORT InValid_ar_frame(SALT34.StrType s) := 0;
+EXPORT InValidMessage_ar_frame(UNSIGNED1 wh) := '';
  
-EXPORT Make_ar_extension(SALT34.StrType s0) := MakeFT_invalid_extension(s0);
-EXPORT InValid_ar_extension(SALT34.StrType s) := InValidFT_invalid_extension(s);
-EXPORT InValidMessage_ar_extension(UNSIGNED1 wh) := InValidMessageFT_invalid_extension(wh);
+EXPORT Make_ar_extension(SALT34.StrType s0) := s0;
+EXPORT InValid_ar_extension(SALT34.StrType s) := 0;
+EXPORT InValidMessage_ar_extension(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_microfilm_nbr(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_microfilm_nbr(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_microfilm_nbr(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_microfilm_nbr(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_comment(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_comment(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_comment(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_comment(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_type(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_type(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_type(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_type(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_exempt(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_exempt(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_exempt(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_exempt(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_license_tax_amount(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_license_tax_amount(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_license_tax_amount(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_license_tax_amount(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_status(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_status(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_status(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_status(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_paid_date(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_paid_date(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_paid_date(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_paid_date(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_prev_paid_date(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_prev_paid_date(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_prev_paid_date(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_prev_paid_date(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_prev_tax_factor(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_prev_tax_factor(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_prev_tax_factor(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_prev_tax_factor(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_extension_date(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_extension_date(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_extension_date(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_extension_date(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_report_mail_date(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_report_mail_date(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_report_mail_date(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_report_mail_date(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_deliquent_report_mail_date(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_deliquent_report_mail_date(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_deliquent_report_mail_date(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_deliquent_report_mail_date(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_report_filed_date(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_report_filed_date(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_report_filed_date(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_report_filed_date(UNSIGNED1 wh) := '';
  
 EXPORT Make_ar_year_and_month_due(SALT34.StrType s0) := s0;
-EXPORT InValid_ar_year_and_month_due(SALT34.StrType s) := FALSE;
+EXPORT InValid_ar_year_and_month_due(SALT34.StrType s) := 0;
 EXPORT InValidMessage_ar_year_and_month_due(UNSIGNED1 wh) := '';
  
 // This macro will compute and count field level differences based upon a pivot expression

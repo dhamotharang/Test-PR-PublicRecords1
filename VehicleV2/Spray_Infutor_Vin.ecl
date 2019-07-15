@@ -3,7 +3,7 @@
 //location. The input files are with txt extention and delimited by tab.
 EXPORT Spray_Infutor_Vin(string	pProcessDate,
 	                       string	pFileDate     ='',
-												 string	pGroupName	  =	'thor400_66',
+												 string	pGroupName	  =	'thor400_36',
 												 boolean	pOverwrite	=	true
 											)	:=
 FUNCTION

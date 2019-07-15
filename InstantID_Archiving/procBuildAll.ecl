@@ -1,4 +1,4 @@
-IMPORT ut, roxiekeybuild, Orbit3;
+﻿IMPORT ut, roxiekeybuild, Orbit3;
 
 EXPORT procBuildAll(STRING pFileDate = ut.GetDate) := FUNCTION
 
@@ -38,6 +38,7 @@ RETURN SEQUENTIAL(
 						InstantID_Archiving.fnSprayFilesBatch();
 						BuildKeyFile;
 						InstantID_Archiving.Build_Base_Files;
+						InstantID_Archiving.Build_Batch_Base_Files(filedate);
 						InstantID_Archiving.procBuildKeys(filedate); 
 						InstantID_Archiving.procBuildAutoKeys(filedate);
 						//Samples;

@@ -33,5 +33,4 @@ dJoinedRollup	:=	rollup(SrtBase,
 
 //Layout expected by the keys 
 export File_Base_Search_Dev := project(dJoinedRollup, Watercraft.Layout_Watercraft_Search_Base);
-
  

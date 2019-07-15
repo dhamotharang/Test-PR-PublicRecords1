@@ -1,4 +1,4 @@
-#stored('did_add_force','thor');
+﻿#stored('did_add_force','thor');
 import address, 
 	   business_header_ss, 
 	   business_header, 
@@ -147,7 +147,7 @@ nppes.Layouts.base   buildBase(outfile15 L) := transform, skip (length(trim(rege
 															'5' => 'OTHER NAME',									
 															'');
 		self.mailing_country_desc					:= ut.Country_ISO2_To_Name(l.provider_business_mailing_address_country_code);
-		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.provider_business_practice_location_address_city_name);
+		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.Provider_Business_Practice_Location_Address_Country_Code);
 		self.other_pid_issuer_desc_1                := getIssuerDesc(l.other_provider_identifier_type_code_1);
 		self.other_pid_issuer_desc_2                := getIssuerDesc(l.other_provider_identifier_type_code_2);
 		self.other_pid_issuer_desc_3                := getIssuerDesc(l.other_provider_identifier_type_code_3);
@@ -286,6 +286,8 @@ end;
 													 clean_name_provider.name_score, clean_name_provider_other.name_score,
 													 clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
 													 RawAID_Location, AceAID_Location,
+													 xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc,  //HC-1224	
+													 xadl2_matches, xadl2_matches_desc,
 												LOCAL);
 
 	nppes.Layouts.base rollupBase(nppes.Layouts.base L, nppes.Layouts.base R) := TRANSFORM
@@ -311,6 +313,8 @@ end;
 																		clean_name_provider.name_score, clean_name_provider_other.name_score,
 																		clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
 																		RawAID_Location, AceAID_Location, source_rec_id, lnpid,
+																		xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, 
+																		xadl2_matches, xadl2_matches_desc,																		
 																 LOCAL);
 
   nppes.Layouts.base doiterate(nppes.Layouts.base L, nppes.Layouts.base R) := TRANSFORM

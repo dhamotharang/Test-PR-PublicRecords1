@@ -44,13 +44,13 @@ EXPORT Constants := module
 	
 	export deletethresholdsize := 100000000000;
 
-	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, tamika.edman@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
+	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
 
 	export allowedclusters(string environment) := module
 		export clusterset := if (dops.constants.ThorEnvironment = 'prod'
 														,map(
 															environment = 'yogurt-thor' => ['thor40_31_yogurt'],
-															environment = 'boca-prod-thor' => ['thor400_30','thor400_20','thor400_60','thor400_44','thor400_66'],
+															environment = 'boca-prod-thor' => ['thor400_30','thor400_20','thor400_60','thor400_44','thor400_66','thor400_36'],
 															['NA'])
 														,map(
 															environment = 'boca-dev-thor' => ['thor400_dev','thor400_sta','thor50_dev','thor50_dev02'],

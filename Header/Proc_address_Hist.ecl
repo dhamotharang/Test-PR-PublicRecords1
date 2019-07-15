@@ -1,4 +1,4 @@
-import ut,mdr,doxie_build;
+﻿import ut,mdr,doxie_build;
 
 export proc_address_hist (boolean isFCRA) := FUNCTION
 
@@ -140,7 +140,7 @@ layout_address_only := record
 
 END;
 
-building  := distribute(if(isFCRA, doxie_build.File_FCRA_header_building, doxie_build.file_header_building),
+building  := distribute(if(isFCRA, doxie_build.File_FCRA_header_built, doxie_build.file_header_building),
 							hash32(prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,zip));
 
 b_thin    := dedup(sort(project(building(RawAID<>0),transform(layout_address_only,self:=LEFT)),

@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 EXPORT _filenames(
    string   pversion              = ''
 	,boolean	pUseOtherEnvironment	= false

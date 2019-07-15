@@ -104,9 +104,14 @@
 		STRING20 home_phone;
 		STRING50 Policy_num;
 		STRING8 Policy_Expiration_Date;
-		STRING25  v_city_name;
+		STRING25 v_city_name;
     //BuyCrash project KY Integration
-		STRING3  contrib_source;
+		STRING3 contrib_source;
+		//Buycrash Release6
+		STRING10 date_report_submitted;
+		//CrashLogic Release4
+    STRING1 releasable;
+    BOOLEAN flag_for_delete;
 		UNSIGNED8 	__internal_fpos__;
 	END;
 

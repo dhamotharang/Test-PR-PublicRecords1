@@ -34,7 +34,8 @@ fAddToSuper(string pSubName) :=
 						
 SprayFiles := 
 SEQUENTIAL(
-			IF(EXISTS(list(size=0)) OR COUNT(list) < 10,
+			//The vendor sends us either 9 or 10 files on a monthly basis.
+			IF(EXISTS(list(size=0)) OR COUNT(list) < 9,
 			FAIL('Empty or missing file detected'),
 			NOTHOR(APPLY(List2, SprayFile( name)))));
 			

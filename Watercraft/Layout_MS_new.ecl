@@ -1,4 +1,4 @@
-EXPORT Layout_MS_new := 
+﻿EXPORT Layout_MS_new := 
 record
 string3		STATEABREV;
 string22	REG_NUM;
@@ -24,7 +24,8 @@ string50	COUNTY;
 string5		FIPS;
 string8		TRANSACTION_DATE;
 string8		EXPIRATION_DATE;
-string18	BOAT_TYPE_CODE;
-string6		STATUS;
+// string18	BOAT_TYPE_CODE;						//DF-19984 - Layout change, deleted
+// string6		STATUS;											//DF-19984 - Layout change, deleted
+string6		SUFFIX;													//DF-19984 - Layout change, new field
 string2		lf;
 end;

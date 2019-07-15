@@ -148,8 +148,10 @@ function
 	
 	AID.MacAppendFromRaw_2Line(dBC_with_addr, prep_address_first, prep_address_last, RawAID, dWithAID, lFlags);
 	
+	dBC_WithAID:= dWithAID : independent;
+	
 	//*** Appending cleaned contact address fields in this join
-	Layouts.Out.Layout_BC_out MapClnContAddr(dBC_w_Uniq_id l, dWithAID r) := transform
+	Layouts.Out.Layout_BC_out MapClnContAddr(dBC_w_Uniq_id l, dBC_WithAID r) := transform
 		self.contact_rawaid              				:= r.AIDWork_RawAID;
 		self.contact_aceaid              				:= r.AIDWork_ACECache.aid;
 		self.contact_clean_addr.prim_range     	:= r.AIDWork_ACECache.prim_range;
@@ -183,12 +185,12 @@ function
 	end;
 
 	jBC_CleanContAddr	:= JOIN(dBC_w_Uniq_id,
-														dWithAID(addr_type = 'C'),
+														dBC_WithAID(addr_type = 'C'),
 														left.uniq_id = right.uniq_id,
 														MapClnContAddr(left,right),left outer);
 												
 	//*** Appending cleaned business address fields in this join
-	Layouts.Out.Layout_BC_out MapClnBusAddr(dBC_w_Uniq_id l, dWithAID r) := transform
+	Layouts.Out.Layout_BC_out MapClnBusAddr(dBC_w_Uniq_id l, dBC_WithAID r) := transform
 		self.company_rawaid              				:= r.AIDWork_RawAID;
 		self.company_clean_addr.prim_range     	:= r.AIDWork_ACECache.prim_range;
 		self.company_clean_addr.predir         	:= r.AIDWork_ACECache.predir;
@@ -221,7 +223,7 @@ function
 	end;
 
 	jBC_CleanBusAddr	:= JOIN(jBC_CleanContAddr,
-														dWithAID(addr_type = 'B'),
+														dBC_WithAID(addr_type = 'B'),
 														left.uniq_id = right.uniq_id,
 														MapClnBusAddr(left,right),left outer): persist('~prte::persist::PRTE2_Business_Header::BC_Init');
 												

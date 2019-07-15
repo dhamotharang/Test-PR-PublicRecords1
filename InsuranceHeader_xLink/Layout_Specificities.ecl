@@ -1,4 +1,4 @@
-IMPORT SALT37;
+﻿IMPORT SALT37;
 EXPORT Layout_Specificities := MODULE
 SHARED L := Layout_InsuranceHeader;
 EXPORT SNAME_ChildRec := RECORD
@@ -205,7 +205,7 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   REAL4 SSN5_specificity;
   REAL4 SSN5_switch;
   REAL4 SSN5_maximum;
-  DATASET(SSN5_ChildRec) nulls_SSN5 {MAXCOUNT(150)};
+  DATASET(SSN5_ChildRec) nulls_SSN5 {MAXCOUNT(150)}; /*LHACK*/
   REAL4 SSN4_specificity;
   REAL4 SSN4_switch;
   REAL4 SSN4_maximum;

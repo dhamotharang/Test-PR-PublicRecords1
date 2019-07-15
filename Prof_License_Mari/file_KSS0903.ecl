@@ -1,4 +1,4 @@
-//Raw professional license files from the Kansas Real Estate Agents, Brokers, & Firms
+﻿//Raw professional license files from the Kansas Real Estate Agents, Brokers, & Firms
 IMPORT ut,_control, Prof_License_Mari, Lib_FileServices;
 
 EXPORT file_KSS0903 := MODULE
@@ -8,5 +8,5 @@ EXPORT file_KSS0903 := MODULE
 
 	EXPORT rle		 := dataset(Common_Prof_Lic_Mari.SourcesFolder + code + '::' + 'using' + '::' + file_name, 
 														Prof_License_Mari.layout_KSS0903.common,
-														csv(heading(1),SEPARATOR([',']),QUOTE('"')));
+														csv(SEPARATOR([',']),QUOTE('"')));
 END;

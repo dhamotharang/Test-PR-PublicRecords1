@@ -11,6 +11,7 @@ FILENAME:ALC_PROFESSIONALS
 //PROCESS:<ProcessName>
 //FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
 FIELDTYPE:invalid_slashspace_date:ALLOW(/ 0123456789)
+FIELDTYPE:invalid_slashOspace_date:ALLOW(/ O0123456789)
 FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
 FIELDTYPE:invalid_alphapound:ALLOW(#ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
 FIELDTYPE:invalid_alphaspace:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
@@ -19,7 +20,7 @@ FIELDTYPE:invalid_numeric:ALLOW(0123456789)
 FIELDTYPE:invalid_numericpound:ALLOW(#0123456789)
 FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
 FIELDTYPE:invalid_gender:ENUM(M|F|B|I|U| )
-FIELDTYPE:invalid_addr_type:ALLOW(#BCHLPUXY)
+FIELDTYPE:invalid_addr_type:ALLOW(#BCDHLPUXY)
 FIELDTYPE:invalid_license_number:ALLOW( .-#*;/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):CUSTOM(ALC.Custom_Scrubs.fn_valid_mt_prof_license_no<1,license_state)
 //BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
 //FUZZY can be used to create new types of FUZZY linking
@@ -54,8 +55,8 @@ FIELD:keycode:TYPE(STRING35):0,0
 FIELD:custno:TYPE(STRING16):LIKE(invalid_alphanumeric):0,0
 FIELD:license_no:TYPE(STRING20):LIKE(invalid_license_number):0,0
 FIELD:dob:TYPE(STRING20):LIKE(invalid_slashspace_date):0,0
-FIELD:orig_date:TYPE(STRING20):LIKE(invalid_slashspace_date):0,0
-FIELD:exp_date:TYPE(STRING20):LIKE(invalid_slashspace_date):0,0
+FIELD:orig_date:TYPE(STRING20):LIKE(invalid_slashOspace_date):0,0
+FIELD:exp_date:TYPE(STRING20):LIKE(invalid_slashOspace_date):0,0
 FIELD:degree:TYPE(STRING20):0,0
 FIELD:specialty:TYPE(STRING20):0,0
 //CONCEPT statements should be used to group together interellated fields; such as address

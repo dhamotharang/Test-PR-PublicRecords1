@@ -1,4 +1,4 @@
-import ut,_control,misc,vehlic,header_slimsort;
+﻿import ut,_control,misc,vehlic,header_slimsort;
 
 // build base for header hash and vinashrunk : check vina is needed? 
 
@@ -18,8 +18,8 @@ DestinationIP_PA       := '10.173.84.223'; // PA_DISTRIX_LZ - /d$/import/distrix
 // C:\dropzone\Distrix
 Basefile      		:= '~thor_data400::base::headers_hashes_';
 Basefilev         := '~thor_data400::out::vinashrunk';
-punixPA           := '/c$/distrix/';
-punixOH           := '/c$/distrix/';
+punixPA           := '/mnt/disk1/distrix/';
+
 
 layout_header_hash := record
 unsigned8	hash_val;
@@ -54,20 +54,19 @@ f9b  := despray(Basefile + 'p9', DestinationIP_PA,punixPA+'headers_hashes_p9.d00
 fvb  := despray(Basefilev      , DestinationIP_PA,punixPA+'vinashrunk.d00'); 
 
 send_email:= fileservices.SendEmail(
-																		'jose.bello@lexisnexis.com'
-																			+',Brian.knowles@lexisnexis.com'
-																			+',Roger.Smith@lexisnexis.com'
-																			+',Christopher.Brodeur@lexisnexis.com'
-																			+',gabriel.marcan@lexisnexis.com'
+																		'jose.bello@lexisnexisrisk.com'
+																			+',Brian.knowles@lexisnexisrisk.com'
+																			+',Christopher.Brodeur@lexisnexisrisk.com'
+                                                                            +',Andrew.Frederickson@lexisnexisrisk.com'
+																			+',gabriel.marcan@lexisnexisrisk.com'
 																		,'Header hash and vina files available'
 																		,'Header hash and vina files available at:\n'
-																			+'10.173.84.222 - OH_DISTRIX_LZ - /c$/distrix/\n'
 																			+'10.173.84.223 - PA_DISTRIX_LZ - /c$/distrix/\n'
 																		);
 
-send_bad_email := FileServices.sendemail('jose.bello@lexisnexis.com', 'Header hashes build failed', failmessage,'');
+send_bad_email := FileServices.sendemail('gabriel.marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com', 'Header hashes build failed', failmessage,'');
 
 export header_hash_split := sequential(
-																			build_base,header_split
-																			,parallel(f0b,f1b,f2b,f3b,f4b,f5b,f6b,f7b,f8b,f9b,fvb)
+																			build_base,header_split,
+																			parallel(f0b,f1b,f2b,f3b,f4b,f5b,f6b,f7b,f8b,f9b,fvb)
 																			) :success(send_email), failure(send_bad_email);

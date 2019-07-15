@@ -1,4 +1,4 @@
-import ut, CanadianPhones, PromoteSupers;
+﻿import ut, CanadianPhones, PromoteSupers;
 
 CanadianPhones_V2.layoutCanadianWhitepagesBase fnRollupNewUpdates(CanadianPhones_V2.layoutCanadianWhitepagesBase L, CanadianPhones_V2.layoutCanadianWhitepagesBase R) := TRANSFORM
 
@@ -25,7 +25,16 @@ EXPORT proc_build_base := FUNCTION
 	base := CanadianPhones_V2.file_CanadianWhitePagesBase;
 	
 	//Mark all records in existing records  to be historical
-	base_hist := PROJECT(base, TRANSFORM({base}, SELF.history_flag:=IF(LEFT.history_flag='U','U','H');SELF:=LEFT;));
+	base_hist := PROJECT(base, TRANSFORM({base}, 
+	                                     SELF.history_flag :=IF(LEFT.history_flag='U','U','H');
+       																 //Added for CCPA-90 / DF-25404
+																		  self.global_sid := map(LEFT.source_file = 'AXCIOM_CANADIAN_RESI' => 26061,
+																														 LEFT.source_file = 'AXCIOM_CANADIAN_BUSI' => 26071,
+																														 LEFT.source_file = 'INFOUSA_WHITEPAGES' 	=> 26041,
+																														 LEFT.source_file = 'INFOUSA_YELLOWPAGES'  => 26051,
+																														 0);
+																		   SELF.record_sid   := 0;
+																			 SELF:=LEFT;));
 
 	//Combine updates with existing base
   canadianwp := axciom_res + axciom_bus + base;

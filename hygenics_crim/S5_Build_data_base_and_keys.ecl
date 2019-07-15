@@ -1,4 +1,4 @@
-
+﻿
 import crim_common, CrimSrch, Lib_FileServices, doxie_build, hygenics_search,hygenics_images,Lib_date,scrubs,scrubs_crim;
       #OPTION('multiplePersistInstances',FALSE);
 			#workunit('name','Accurint-Securint Criminal Build ' + CrimSrch.Version.Development);
@@ -46,6 +46,7 @@ import crim_common, CrimSrch, Lib_FileServices, doxie_build, hygenics_search,hyg
 																	),
 													
 													Hygenics_crim.proc_AcceptSK_DOC_To_QA,
+													hygenics_crim.Proc_FCRA_Field_Deprecation_Stats,				//DF-21868
 													
 													DoTheStats,
 													zRunStrataPopulationStats,

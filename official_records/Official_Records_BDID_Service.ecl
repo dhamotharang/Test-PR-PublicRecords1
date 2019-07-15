@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name = 'OfficialRecsBDIDService'>
 	<part name = 'BDID' type = 'xsd:string'/>
 </message>

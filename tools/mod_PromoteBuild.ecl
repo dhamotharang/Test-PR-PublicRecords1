@@ -35,5 +35,5 @@ module
 	export LockSuper(string		pToVersion
 									,string		pFromVersion
 													)		:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fSuper2SuperLock		(templatename	,pToVersion	,pFromVersion											))),output(lnames(filter),all));
-  export Cleanup              := if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote._fVersionIntegrityCheck	(templatename,pDelete	,pIncludeBuiltDelete,pCleanupFilter))),output(lnames(filter),all));
+  export Cleanup              := if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote._fVersionIntegrityCheck	(templatename,pDelete	,pIncludeBuiltDelete,pCleanupFilter,pForceGenPromotion))),output(lnames(filter),all));
 end;

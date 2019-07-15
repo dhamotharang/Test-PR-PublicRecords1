@@ -1,4 +1,4 @@
-export MAC_Build_qsent (indataset,infname,inmname,inlname,
+﻿export MAC_Build_qsent (indataset, pversion, infname,inmname,inlname,
 						inssn,
 						indob,
 						phone,
@@ -52,19 +52,19 @@ AutoKey.Keys  (indataset,infname,inmname,inlname,
 					%Address_Key%,%CityStName_Key%,%Name_Key%,%Phone_Key%,%Phone_Key2%,%SSN_Key%,%SSN_Key2%,%StName_Key%,%Zip_Key%,%ZipPRLname_Key%
 					,4,true,0,Phonesplus_v2)
 
-Cellphone.MAC_SK_BuildProcess_v2(%Address_Key%, '~thor_data400::key::qsent::' + Phonesplus.version + '::address',
+Cellphone.MAC_SK_BuildProcess_v2(%Address_Key%, '~thor_data400::key::qsent::' + pversion + '::address',
 						  '~thor_data400::key::qsent_address', %do_one%, ,diffing)
-Cellphone.MAC_SK_BuildProcess_v2(%CityStName_Key%, '~thor_data400::key::qsent::' + Phonesplus.version + '::citystname',
+Cellphone.MAC_SK_BuildProcess_v2(%CityStName_Key%, '~thor_data400::key::qsent::' + pversion + '::citystname',
 						  '~thor_data400::key::qsent_citystname', %do_two%, ,diffing)
-Cellphone.MAC_SK_BuildProcess_v2(%Name_Key%, '~thor_data400::key::qsent::' + Phonesplus.version + '::name',
+Cellphone.MAC_SK_BuildProcess_v2(%Name_Key%, '~thor_data400::key::qsent::' + pversion + '::name',
 						  '~thor_data400::key::qsent_name', %do_three%, ,diffing)
-Cellphone.MAC_SK_BuildProcess_v2(%Phone_Key%, '~thor_data400::key::qsent::' + Phonesplus.version + '::phone',
+Cellphone.MAC_SK_BuildProcess_v2(%Phone_Key%, '~thor_data400::key::qsent::' + pversion + '::phone',
 						  '~thor_data400::key::qsent_phone', %do_four%, ,diffing)
-Cellphone.MAC_SK_BuildProcess_v2(%SSN_Key%, '~thor_data400::key::qsent::' + Phonesplus.version + '::ssn',
+Cellphone.MAC_SK_BuildProcess_v2(%SSN_Key%, '~thor_data400::key::qsent::' + pversion + '::ssn',
 						  '~thor_data400::key::qsent_ssn', %do_five%, ,diffing)
-Cellphone.MAC_SK_BuildProcess_v2(%StName_Key%,'~thor_data400::key::qsent::' + Phonesplus.version + '::stname',
+Cellphone.MAC_SK_BuildProcess_v2(%StName_Key%,'~thor_data400::key::qsent::' + pversion + '::stname',
 						  '~thor_data400::key::qsent_stname', %do_six%, ,diffing)
-Cellphone.MAC_SK_BuildProcess_v2(%Zip_Key%,'~thor_data400::key::qsent::' + Phonesplus.version + '::zip',
+Cellphone.MAC_SK_BuildProcess_v2(%Zip_Key%,'~thor_data400::key::qsent::' + pversion + '::zip',
 						  '~thor_data400::key::qsent_zip', %do_seven%, ,diffing)
 
 outaction := PARALLEL(%do_one%,

@@ -1,4 +1,4 @@
-import mdr, ut, Strata, header;
+﻿import mdr, ut, Strata, header;
 
 //****** Check that all the sourcing is properly done
 hsc := output(header.Source_Check, all,NAMED('Source_Check'));
@@ -51,8 +51,7 @@ ut.fn_AddStat(mdr.fn_max_rid(h_new(not header.isDemoData())), 'Build Stats: MaxR
 );
 
 export Proc_BuildStats := parallel(
-									header.Proc_Regression_Test
-									,hsc
+									hsc
 									,did_stats
 									,integration_stats
 									,statsout
@@ -62,4 +61,5 @@ export Proc_BuildStats := parallel(
 									,header.fn_new_dids_by_src(h_new,h_old)
 									,output(Header.fn_ADLSegmentation_v2(h_new).tab,named('SegmentationStats'))
 									,header.fn_adl_segmentStats_across_builds(h_new,h_old)
+									,header.stats.GenerateLinkingStats
 									);

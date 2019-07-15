@@ -1,25 +1,17 @@
-/*
-
+﻿/*
 	Shamelessly pilfered from Vern's tools.mac_GetSALTReviewSamples (due to some hardcoded proxid references)
-
-
   gets samples to review for people in the set
   should output the rolled up views for all samples first, then later output details if needed to look at 
   this should allow much faster review times
-
 iter := '25';
 #workunit('name','BIPV2_LGID3 Iter ' + iter + ' review samples');
 psetReviewers           := ['CM','LB','TL','JL','FN','DW'];
 pNumSamplesPerReviewer  := 15;
-
 kmtch      := index(BIPV2_LGID3.Keys(BIPV2_LGID3.In_LGID3).MatchSample ,BIPV2_LGID3.keynames('20130330' + iter).match_sample_debug.logical);
-
 tools.mac_GetReviewSamples(kmtch,lgid3,'21',pNumSamplesPerReviewer,psetReviewers,true);
 */
 import tools;
-
 EXPORT mac_GetSALTReviewSamples(
-
    pMatchSampleKey                    //Match sample debug index
   ,pMatchCandidatesKey                //Match Candidates key
   ,pInFile                            //Infile for matching(BIPV2_LGID3.In_LGID3)
@@ -28,10 +20,8 @@ EXPORT mac_GetSALTReviewSamples(
   ,pNumSamplesPerReviewer             //how many samples for each reviewer
   ,psetReviewers          = '[]'      //names of reviewers
 	,pOutputEcl			        = 'false'		//Should output the ecl as a string(for testing) or actually run the ecl
-
 ) :=
 functionmacro
-
 	import std, tools;
 		
   #UNIQUENAME(ECL)
@@ -78,20 +68,16 @@ functionmacro
   #SET   (ECL    ,'kmatchsample    := ' + %'lMatchSampleKey'% + ';\n')
   #APPEND(ECL    ,'kmatchsample_eq := pull(kmatchsample)(conf = ' + pThreshold + ');\n')
   #APPEND(ECL    ,'kmatchsample_gt := pull(kmatchsample)(conf > ' + pThreshold + ');\n')
-
   #APPEND(ECL    ,'//do 2/3 recs at threshold, 1/3 above threshold\n')
   #APPEND(ECL    ,'countReviewers := ' + count(psetReviewers) + ';\n')
   #APPEND(ECL    ,'totalSamples := ' + pNumSamplesPerReviewer + ' * countReviewers;\n')
   
   #APPEND(ECL    ,'countkmatchsample_eq  := count(kmatchsample_eq);\n')
   #APPEND(ECL    ,'countkmatchsample_gt  := count(kmatchsample_gt);\n')
-
   #APPEND(ECL    ,'samplesatthreshold          := if((unsigned)(totalsamples * 2/3)      >= countkmatchsample_eq  ,countkmatchsample_eq   ,(unsigned)(totalsamples * 2/3)      );\n')
   #APPEND(ECL    ,'samplesabovethreshold       := if((totalSamples - samplesatthreshold) >  countkmatchsample_gt  ,countkmatchsample_gt   ,(totalSamples - samplesatthreshold) );\n')
-
   #SET(cnteqSamples    ,(unsigned)(pNumSamplesPerReviewer * 2/3))
   #SET(cntgtSamples    ,(unsigned)(pNumSamplesPerReviewer * 1/3))
-
   #APPEND(ECL    ,'samplerecseq      := enth (kmatchsample_eq,samplesatthreshold     ) : independent;\n')
   #APPEND(ECL    ,'samplerecsgt      := enth (kmatchsample_gt,samplesabovethreshold  ) : independent;\n\n')
 ////
@@ -108,12 +94,9 @@ functionmacro
   #APPEND(ECL    ,'s := dataset([],' + %'lModule'% + '.Layout_Specificities.R);\n')
   #APPEND(ECL    ,'alllgid3srolled := ' + %'lModule'% + '.Debug(' + %'lInfile'% + ',s).RolledEntities(alllgid3cands);\n')
   #APPEND(ECL    ,'layrolled := recordof(alllgid3srolled);\n\n')
-
   #APPEND(ECL    ,'mapremainder(unsigned previewer) := \n')
   #APPEND(ECL    ,'map(\n')
   #APPEND(ECL    ,'   samplesremainder  = 0 => 0         \n')
-
-
   #SET(layscore  , tools.mac_FilterLayout(recordof(pMatchSampleKey),true,'^(?!.*?(left|right|skipped).*).*$'    ,true))
   #SET(layfields , tools.mac_FilterLayout(recordof(pMatchSampleKey),true,'^(?=.*?(left|right|skipped).*).*$'    ,true)) 
   
@@ -122,7 +105,6 @@ functionmacro
   #SET(NormSamples  ,'')
   #SET(RollSamples  ,'')
   #SET(SepOutput    ,'____')
-
   #SET(outputNormSamples  ,'\t,output(\'-----------------------------------\' ,named(\'__\' ))\n')
   #SET(outputRollSamples  ,'\t,output(\'-----------------------------------\' ,named(\'_\'))\n')
   #APPEND(outputRollSamples  ,'\t,output(\'2 recs per Matching Pair, + 1 blank rec for separation\' ,named(\'RolledUpViewsOfSamplesFollows\'))\n')
@@ -145,24 +127,19 @@ functionmacro
   #APPEND(Outputs ,'\t output(count(kmatchsample   ) ,named(\'TotalMatchSamples\'   ))\n')
   #APPEND(Outputs ,'\t,output(count(kmatchsample_eq) ,named(\'TotalMatchSamplesEqualToThreshold\'))\n')
   #APPEND(Outputs ,'\t,output(count(kmatchsample_gt) ,named(\'TotalMatchSamplesGreaterThanThreshold\'))\n')
-
   #SET(CNTR ,1)
-
   #LOOP
     #IF(%CNTR% > count(psetReviewers))
       #BREAK
     #END
     #SET(multipier  ,%CNTR% - 1)
-
     #IF(%CNTR% > 1)
       #APPEND(startrec     ,'startrec' + %'CNTR'% + '   := startrec' + %'multipier'% + ' + samplesperreviewer + mapremainder(' + %'multipier'% + ');\n')
     #END
     #APPEND(mapRemainders     ,'  ,previewer         = ' + %'CNTR'% + ' and samplesremainder >= ' + %'CNTR'% + '  => 1\n')
-
     #APPEND(Samples     ,psetReviewers[%CNTR%] + ' := choosen(allsamplerecs,samplesperreviewer + mapremainder(' + %'CNTR'% + '),startrec' + %'CNTR'% + ' );\n')
     #APPEND(SlimSamples ,psetReviewers[%CNTR%] + '_Score  := project(' + psetReviewers[%CNTR%] + ',' + %'layscore'%  + ' );\n')
     #APPEND(SlimSamples ,psetReviewers[%CNTR%] + '_Fields := project(' + psetReviewers[%CNTR%] + ',' + %'layfields'% + ' );\n')
-
     #APPEND(NormSamples ,psetReviewers[%CNTR%] + '_norm := project(normalize(' + psetReviewers[%CNTR%] + ',3,transform({integer2 conf,unsigned6 lgid3},self.lgid3 := choose(counter  ,left.lgid31,left.lgid32,0),self.conf := left.conf)) ,transform({unsigned cnt,recordof(left)},self.cnt := counter + ((startrec' + %'CNTR'% + ' - 1) * 3),self := left));\n')
     #APPEND(RollSamples ,psetReviewers[%CNTR%] + '_rolled := sort(join(' + psetReviewers[%CNTR%] + '_norm ,alllgid3srolled ,left.lgid3 = right.lgid3 ,transform({unsigned cnt,integer2 conf,recordof(right)},self.cnt := left.cnt,self.conf := if(right.lgid3 != 0  ,left.conf,0),self := right),left outer,lookup),cnt);\n')
  
@@ -177,7 +154,6 @@ functionmacro
     #END
     #APPEND(outputNormSamples ,'\t,output(' + psetReviewers[%CNTR%] + '_norm         ,named(\'' + psetReviewers[%CNTR%] + '_norm\'       ),all)\n')
     #APPEND(outputRollSamples ,'\t,output(' + psetReviewers[%CNTR%] + '_rolled       ,named(\'' + psetReviewers[%CNTR%] + '\'     ),all)\n')
-
     #APPEND(BigOutputs ,'\t,output(\'-----------------------------------\' ,named(\'' + %'SepOutput'% + '\'))\n')
     #APPEND(BigOutputs ,'\t,output(' + psetReviewers[%CNTR%] + '         ,named(\'' + psetReviewers[%CNTR%] + '_cands\'       ),all)\n')
     #APPEND(BigOutputs ,'\t,output(' + psetReviewers[%CNTR%] + '_score   ,named(\'' + psetReviewers[%CNTR%] + '_scores\'),all)\n')
@@ -206,11 +182,9 @@ functionmacro
   #APPEND(ECL ,'return PARALLEL(\n' + %'Outputs'% + %'outputRollSamples'% /*+ %'outputNormSamples'%*/ + %'BigOutputs'% + ');\n'   )
   
   #SET(ECL  ,'' + %'ECL'%)
-
 	#if(pOutputEcl = true)
 		return output(%'ECL'%);
 	#ELSE
 		%ECL%
 	#END
-
 endmacro;

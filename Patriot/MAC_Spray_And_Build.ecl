@@ -2,7 +2,6 @@
 
 export MAC_Spray_And_Build(filedate,recsize = '4235',doscore = 'false', group_name='\'thor400_44\'') := macro
 
-#workunit('name','Patriot Spray And Build');
 #uniquename(pre)
 #uniquename(serverIP)
 // %serverIP% := map(

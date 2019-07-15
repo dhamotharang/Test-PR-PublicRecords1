@@ -1,4 +1,5 @@
-﻿EXPORT MAC_RangeFieldYYYYMMDD_By_UID_optimized := MACRO
+﻿EXPORT MAC_RangeFieldYYYYMMDD_By_UID_optimized(infile,ufield,infield,low_infield,high_infield,null_field,outfile) := MACRO
+
 /* The File_Sample data has imperfect dates (some MM , DD parts are 0, or not realistic).
 I used the following function (appplied on (UNSIGNED6)low/high_infield) in the %infile_parse%
 Need to use this function in this macro - atleast for using on File_Sample data. If I dont use this function, 
@@ -33,7 +34,7 @@ END;
 #uniquename(idata_parsed)
 // Presently we do not handle open ended ranges (well)
 // We also need to make sure that all dates are in 8 digits (YYYYMMDD)
-%idata_parsed% := TABLE(infile((UNSIGNED6)low_infield<>null_field,(UNSIGNED6)high_infield<>null_field,(UNSIGNED6)low_infield>10000000,(UNSIGNED6)high_infield>10000000), %infile_parse%);
+%idata_parsed% := TABLE(infile((UNSIGNED6)low_infield<>null_field,(UNSIGNED6)high_infield<>null_field,(UNSIGNED6)low_infield>10000000,(UNSIGNED6)high_infield>10000000, low_infield <= high_infield), %infile_parse%);
 
 /* Function: end_of_month_day - computes the last date of a given YYYYMM
 	@param: month - MM part 
@@ -177,7 +178,7 @@ END;
 	SELF.cnt := le.cnt;
 END;
 #uniquename(outfile_year_infield)
-%outfile_year_infield% := NORMALIZE(%outfile_year%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYY% (LEFT,COUNTER-1+LEFT.infield_beg));
+%outfile_year_infield% := SORT(NORMALIZE(%outfile_year%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYY% (LEFT,COUNTER-1+LEFT.infield_beg)), infield, ufield);
 
 #uniquename(expand_YYYYMM_dfs)
 %infield_ent_cnt_rec% %expand_YYYYMM_dfs%(%outfile_month_dfs% le, INTEGER c) := TRANSFORM
@@ -186,7 +187,7 @@ END;
 	SELF.cnt := le.cnt;
 END;
 #uniquename(outfile_month_dfs_infield)
-%outfile_month_dfs_infield% := NORMALIZE(%outfile_month_dfs%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYYMM_dfs% (LEFT,COUNTER-1+LEFT.infield_beg));
+%outfile_month_dfs_infield% := SORT(NORMALIZE(%outfile_month_dfs%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYYMM_dfs% (LEFT,COUNTER-1+LEFT.infield_beg)), infield, ufield);
 
 #uniquename(expand_YYYYMM_dls)
 %infield_ent_cnt_rec% %expand_YYYYMM_dls%(%outfile_month_dls% le, INTEGER c) := TRANSFORM
@@ -195,17 +196,16 @@ END;
 	SELF.cnt := le.cnt;
 END;
 #uniquename(outfile_month_dls_infield)
-%outfile_month_dls_infield% := NORMALIZE(%outfile_month_dls%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYYMM_dls% (LEFT,COUNTER-1+LEFT.infield_beg));
+%outfile_month_dls_infield% := SORT(NORMALIZE(%outfile_month_dls%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYYMM_dls% (LEFT,COUNTER-1+LEFT.infield_beg)), infield, ufield);
 
 // Combine all outfiles and dedup by infield,did, Cnt := COUNT(GROUP)
-#uniquename(outfile_raw)
-%outfile_raw% := SORT((%outfile_year_infield% + %outfile_month_dfs_infield% + %outfile_month_dls_infield% + %outfile_dfs% + %outfile_dls%),infield,ufield);
+#uniquename(outfile_set)
+%outfile_set% := [SORTED(%outfile_year_infield%) ,SORTED(%outfile_month_dfs_infield%), SORTED(%outfile_month_dls_infield%), SORTED(%outfile_dfs%), SORTED(%outfile_dls%)];
 #uniquename(tr_roll)
 %infield_ent_cnt_rec% %tr_roll%(%infield_ent_cnt_rec% le, %infield_ent_cnt_rec% ri):= TRANSFORM
 	SELF.infield := le.infield;
 	SELF.ufield := le.ufield;
 	SELF.cnt := le.cnt + ri.cnt;
 END;
-outfile := ROLLUP(%outfile_raw%,LEFT.infield = RIGHT.infield AND LEFT.ufield = RIGHT.ufield, %tr_roll%(LEFT,RIGHT));
-
- ENDMACRO;
+outfile := ROLLUP(MERGE(%outfile_set%,infield,ufield,SORTED(infield,ufield)),LEFT.infield = RIGHT.infield AND LEFT.ufield = RIGHT.ufield, %tr_roll%(LEFT,RIGHT));
+  ENDMACRO;

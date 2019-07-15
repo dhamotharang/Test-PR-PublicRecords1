@@ -1,6 +1,8 @@
 import mdr, ut, header_slimsort, did_add, didville, _control, Transunion_PTrak, TransunionCred, address,idl_header,header,Data_Services,PromoteSupers;
 import NID as nNID;
 
+EXPORT build_tucs_did(string filedate) := FUNCTION
+
 trans_recs := dataset(Data_Services.Data_location.Prefix('person_header')
 											+'thor_data400::base::tucsheader_building',Transunion_PTrak.Layout_Transunion_Out.LayoutTransunionBaseOut,flat);
 
@@ -208,7 +210,7 @@ j1 := join(distribute(NoTtee,hash(did)),hdr_val_ssn
 						 ,left outer
 						 ,local)(fname <> '' and lname <>'');
 
-fixed_dates := header.fn_fix_dates(j1);
+fixed_dates := header.fn_fix_dates(j1,,filedate);
 
 DoBuild := distribute(fixed_dates,hash(did));
 
@@ -219,8 +221,8 @@ pre2 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::TransunionCre
     output('Nothing added to Base::TransunionCred_did_BUILDING'),
 		fileservices.addsuperfile('~thor_data400::Base::TransunionCred_did_BUILDING','~thor_data400::base::transunioncredheader_building',,true));
 
-PromoteSupers.MAC_SF_BuildProcess(DoBuild(src='TS' and ( ~((did=118120464 and fname='STEPHEN' and lname='KLINE') or (did=1067439253 and fname='STEPHEN' and lname in ['KLINE','BAKER'])))),'~thor_data400::BASE::tucs_did',bld_TS,2,,true,pVersion:=Header.version_build);
-PromoteSupers.MAC_SF_BuildProcess(transunionCred.fn_dedup(DoBuild(src='TN')),'~thor_data400::BASE::TransunionCred_did',bld_TN,2,,true,pVersion:=Header.version_build);
+PromoteSupers.MAC_SF_BuildProcess(DoBuild(src='TS' and ( ~((did=118120464 and fname='STEPHEN' and lname='KLINE') or (did=1067439253 and fname='STEPHEN' and lname in ['KLINE','BAKER'])))),'~thor_data400::BASE::tucs_did',bld_TS,2,,true,pVersion:=filedate);
+PromoteSupers.MAC_SF_BuildProcess(transunionCred.fn_dedup(DoBuild(src='TN')),'~thor_data400::BASE::TransunionCred_did',bld_TN,2,,true,pVersion:=filedate);
 
 post1 := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::tucs_did_BUILT'),
@@ -233,4 +235,5 @@ post2 := sequential(
 
 full1 := sequential(pre1, pre2, bld_TS, bld_TN, post1, post2);
 
-export build_tucs_did := full1;
+RETURN full1;
+END;

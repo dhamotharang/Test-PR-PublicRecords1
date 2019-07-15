@@ -1,4 +1,4 @@
-//I used prim_range_derived_weight100 instead of prim_range_weight100 here... ????? don't know whether it is OK and the reason
+﻿//I used prim_range_derived_weight100 instead of prim_range_weight100 here... ????? don't know whether it is OK and the reason
 EXPORT _mj_extra(
    pH
   ,pMatchJoin

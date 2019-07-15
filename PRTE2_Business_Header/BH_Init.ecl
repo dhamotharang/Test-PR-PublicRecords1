@@ -80,8 +80,10 @@ function
 	
 	AID.MacAppendFromRaw_2Line(dBH_with_addr, prep_address_first, prep_address_last, RawAID, dWithAID, lFlags);
 
+	dBH_WithAID:= dWithAID :independent;
+	
 	//Append cleaned address fields
-	Layouts.Out.Layout_BH_Out tMapClnAddr(dBH_Addr_For_AID l, dWithAID r) := transform
+	Layouts.Out.Layout_BH_Out tMapClnAddr(dBH_Addr_For_AID l, dBH_WithAID r) := transform
 			self.RawAID					:= r.aidwork_rawaid;
 			self.AceAID					:= r.AIDWork_ACECache.aid;
 			self.prim_range     := r.AIDWork_ACECache.prim_range;
@@ -116,7 +118,7 @@ function
 	end;
 
 	jBH_CleanAddr	:= JOIN(dBH_Addr_For_AID,
-												dWithAID,
+												dBH_WithAID,
 												left.uniq_id = right.uniq_id,
 												tMapClnAddr(left,right),left outer);
 	

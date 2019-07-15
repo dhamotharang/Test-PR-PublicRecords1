@@ -1,8 +1,8 @@
-import tools,strata;
+﻿import tools,strata;
 export Build_Strata(
 	 string															pversion
 	,boolean														pOverwrite				= false
-	,dataset(Layouts.Base							)	pBaseFile   			= Files().Base.built		
+	,dataset(Layouts.Base_new						)	pBaseFile   			= Files().Base.built		
 	,string															pfileversion			= 'using'
 	,boolean														pUseOtherEnviron	= _Constants().isdataland
 	,dataset(Layouts.Input.Sprayed		)	pSprayedFile			= Files(pfileversion,pUseOtherEnviron).Input.logical

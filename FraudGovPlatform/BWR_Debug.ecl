@@ -31,8 +31,9 @@ pVersion := '20180306';
 
 // Build Base
 		build_bases := sequential (
-			  FraudGovPlatform.Build_Base_KnownFraud( pVersion , FraudGovPlatform.Files().Base.KnownFraud.Built , FraudGovPlatform.Files().Input.KnownFraud.Sprayed , FraudGovPlatform._Flags.Update.KnownFraud ).all
-			, FraudGovPlatform.Build_Base_IdentityData( pVersion , FraudGovPlatform.Files().Base.IdentityData.Built , FraudGovPlatform.Files().Input.IdentityData.Sprayed , FraudGovPlatform._Flags.Update.IdentityData ).all
+			  FraudGovPlatform.Build_Base_KnownFraud(pVersion).all
+			, FraudGovPlatform.Build_Base_IdentityData(pVersion).all
+			, FraudGovPlatform.Build_Base_AddressCache(pVersion).all
 			, FraudGovPlatform.Promote().buildfiles.Built2QA
 		);
 
@@ -51,7 +52,7 @@ pVersion := '20180306';
 		
 // Build All
 		
-		build_all := sequential(
+		build_fraudgov := sequential(
 					  #workunit('name','FRAUDGOV DATA BUILD ' + pVersion)
 					, FraudGovPlatform.Create_Supers
 					, create_build
@@ -63,5 +64,5 @@ pVersion := '20180306';
 					, build_keys			
 		);		
 		
-		build_all;
+		build_fraudgov;
 			

@@ -1,10 +1,10 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT39;
-EXPORT BaseFile_GenerationMod := MODULE(SALT39.iGenerationMod)
+IMPORT SALT311;
+EXPORT BaseFile_GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.9.0';
-  EXPORT salt_MODULE := 'SALT39'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
@@ -38,13 +38,13 @@ EXPORT BaseFile_GenerationMod := MODULE(SALT39.iGenerationMod)
  
   // The entire spec file
   EXPORT spcString :=
-    'options:-gh \n'
+    'OPTIONS:-gh \n'
     + 'MODULE:Scrubs_PhonesInfo\n'
     + 'FILENAME:PhonesInfo\n'
     + 'NAMESCOPE:BaseFile \n'
     + '\n'
     + 'FIELDTYPE:Invalid_Phone:ALLOW(0123456789)\n'
-    + 'FIELDTYPE:Invalid_Source:ENUM(PX|PK|PJ|PO|PB):LENGTHS(1..)\n'
+    + 'FIELDTYPE:Invalid_Source:ENUM(PX|PK|PJ|PG|PB):LENGTHS(1..)\n'
     + 'FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)\n'
     + 'FIELDTYPE:Invalid_Future_Date:CUSTOM(Scrubs.fn_valid_date>0,\'future\')\n'
     + 'FIELDTYPE:Invalid_Phone_Type:ENUM(LC|CL| )\n'
@@ -111,7 +111,7 @@ EXPORT BaseFile_GenerationMod := MODULE(SALT39.iGenerationMod)
     + 'FIELD:react_end_dt:LIKE(Invalid_Future_Date):TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:react_end_time:LIKE(Invalid_Num):TYPE(STRING6):0,0\n'
     + 'FIELD:is_deact:LIKE(Invalid_YN):TYPE(STRING2):0,0\n'
-    + 'FIELD:is_react:Like(Invalid_YN):TYPE(STRING2):0,0\n'
+    + 'FIELD:is_react:LIKE(Invalid_YN):TYPE(STRING2):0,0\n'
     + 'FIELD:call_forward_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:caller_id:LIKE(Invalid_Char):TYPE(STRING15):0,0\n'
     ;

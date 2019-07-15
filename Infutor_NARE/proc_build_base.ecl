@@ -1,4 +1,4 @@
-#workunit('name', 'Infutor Email Base Build');
+﻿#workunit('name', 'Infutor Email Base Build');
 #OPTION('multiplePersistInstances', FALSE);
 
 IMPORT	Infutor_NARE
@@ -56,7 +56,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	//Clean input name	
 	NID.Mac_CleanParsedNames(f_blank, FileClnName, 
 													firstname:=FirstName, lastname:=LastName, middlename := MiddleName, namesuffix := Suffix
-													,includeInRepository:=true, normalizeDualNames:=false);
+													,includeInRepository:=true, normalizeDualNames:=false, useV2 := true);
 	
 //Project to base layout, prep for Clean Address, add date fields 
 	month_pattern := '(^JAN |FEB |MAR |APR |MAY |JUN |JUL |AUG |SEP |SEPT |OCT |NOV |DEC |MON |TUE |WED |THU |FRI )';

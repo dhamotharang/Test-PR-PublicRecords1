@@ -1,4 +1,4 @@
-import Models, Risk_Indicators, RiskView, Seed_Files, iesp;
+﻿import Models, Risk_Indicators, RiskView, Seed_Files, iesp;
 
 export TestSeed_Function(DATASET(Risk_Indicators.Layout_Input) inData, 
 												STRING32 TestDataTableName_in, 
@@ -7,6 +7,7 @@ export TestSeed_Function(DATASET(Risk_Indicators.Layout_Input) inData,
 												STRING Bankcard_Model_Name,
 												STRING Short_Term_Lending_Model_Name,
 												STRING Telecommunications_Model_Name,
+												STRING Crossindustry_Model_Name,
 												STRING Custom_Model_Name,
 												STRING Custom2_Model_Name,
 												STRING Custom3_Model_Name,
@@ -78,6 +79,18 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		SELF.Telecommunications_reason3 := if(valid_Telecommunications AND NOT isPreScreenPurpose AND ri.telecommunications_reason3 <> '00', ri.telecommunications_reason3, '');
 		SELF.Telecommunications_reason4 := if(valid_Telecommunications AND NOT isPreScreenPurpose AND ri.telecommunications_reason4 <> '00', ri.telecommunications_reason4, '');
 		SELF.Telecommunications_reason5 := if(valid_Telecommunications AND NOT isPreScreenPurpose AND ri.telecommunications_reason5 <> '00', ri.telecommunications_reason5, '');
+
+  Crossindustry_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Crossindustry_Model_Name, LEFT, RIGHT)))[1];
+		valid_Crossindustry := Crossindustry_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Crossindustry_Model_Name, LEFT, RIGHT)) IN valid_model_names;
+		SELF.Crossindustry_Index := if(valid_Crossindustry, (STRING)Crossindustry_info.Billing_Index, '');
+		SELF.Crossindustry_Score_Name := if(valid_Crossindustry, Crossindustry_info.Output_Model_Name, '');
+		SELF.Crossindustry_Type := if(valid_Crossindustry, Crossindustry_info.Model_Type, '');
+		SELF.Crossindustry_score := if(valid_Crossindustry, ri.Crossindustry_score, '');
+		SELF.Crossindustry_reason1 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND ri.Crossindustry_reason1 <> '00', ri.Crossindustry_reason1, '');
+		SELF.Crossindustry_reason2 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND ri.Crossindustry_reason2 <> '00', ri.Crossindustry_reason2, '');
+		SELF.Crossindustry_reason3 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND ri.Crossindustry_reason3 <> '00', ri.Crossindustry_reason3, '');
+		SELF.Crossindustry_reason4 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND ri.Crossindustry_reason4 <> '00', ri.Crossindustry_reason4, '');
+		SELF.Crossindustry_reason5 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND ri.Crossindustry_reason5 <> '00', ri.Crossindustry_reason5, '');
 
 		Custom_info := model_info(Model_Name = StringLib.StringToUpperCase(TRIM(Custom_Model_Name, LEFT, RIGHT)))[1];
 		valid_Custom := Custom_Model_Name <> '' AND StringLib.StringToUpperCase(TRIM(Custom_Model_Name, LEFT, RIGHT)) IN valid_model_names;
@@ -380,8 +393,9 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	
 		 A:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Liens,
-		self.seq 													:= ri.liens1_seq;
-	  self.DateFiled      							:= ri.liens1_DateFiled;
+		self.seq 												     	:= ri.liens1_seq;
+	 self.DateFiled      							:= ri.liens1_DateFiled;
+  self.LienTypeID            := ri.Liens1_LienTypeID;
 		self.LienType       							:= ri.Liens1_LienType;
 		self.Amount         							:= ri.Liens1_Amount;
 		self.ReleaseDate    							:= ri.Liens1_ReleaseDate;
@@ -389,16 +403,19 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.FilingNumber   							:= ri.Liens1_FilingNumber;
 		self.FilingBook     							:= ri.Liens1_FilingBook;
 		self.FilingPage     							:= ri.Liens1_FilingPage;
+		self.AgencyID       							:= ri.Liens1_AgencyID;
 		self.Agency         							:= ri.Liens1_Agency;
 		self.AgencyCounty   							:= ri.Liens1_AgencyCounty;
 		self.AgencyState	   							:= ri.Liens1_AgencyState;
+  self.ConsumerStatementID   := ri.Liens1_ConsumerStatementID;
 		SELF := [];
 	)]);
 	
 	B:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Liens,
-		self.seq 												:= ri.liens2_seq;
+		self.seq 										     		:= ri.liens2_seq;
 		self.DateFiled      						:= ri.Liens2_DateFiled;
+  self.LienTypeID           := ri.Liens2_LienTypeID;
 		self.LienType      							:= ri.Liens2_LienType;
 		self.Amount        							:= ri.Liens2_Amount;
 		self.ReleaseDate    						:= ri.Liens2_ReleaseDate;
@@ -406,9 +423,11 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.FilingNumber   						:= ri.Liens2_FilingNumber;
 		self.FilingBook     						:= ri.Liens2_FilingBook;
 		self.FilingPage     						:= ri.Liens2_FilingPage;
+		self.AgencyID        						:= ri.Liens2_AgencyID;
 		self.Agency         						:= ri.Liens2_Agency;
 		self.AgencyCounty   						:= ri.Liens2_AgencyCounty;
 		self.AgencyState	   						:= ri.Liens2_AgencyState;
+  self.ConsumerStatementID  := ri.Liens2_ConsumerStatementID;
 		SELF := [];
 		)]);
 	
@@ -418,44 +437,50 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// Judgments 1&2
 	C:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Judgments,
-		self.seq 												:= ri.Jgmts1_seq;
+		self.seq 							     					:= ri.Jgmts1_seq;
 		self.DateFiled      						:= ri.Jgmts1_DateFiled;
-		self.JudgmentType      					:= ri.Jgmts1_JudgmentType;
+  self.JudgmentTypeID       := ri.Jgmts1_JudgmentTypeID;
+		self.JudgmentType      			:= ri.Jgmts1_JudgmentType;
 		self.Amount        							:= ri.Jgmts1_Amount;
 		self.ReleaseDate    						:= ri.Jgmts1_ReleaseDate;
-		self.FilingDescription    			:= ri.Jgmts1_FilingDescription;
+		self.FilingDescription    := ri.Jgmts1_FilingDescription;
 		self.DateLastSeen   						:= ri.Jgmts1_DateLastSeen;
-		self.Defendant   			        	:= ri.Jgmts1_Defendant;
-		self.Plaintiff    			        := ri.Jgmts1_Plaintiff ;
+		self.Defendant   			      := ri.Jgmts1_Defendant;
+		self.Plaintiff    			     := ri.Jgmts1_Plaintiff ;
 		self.FilingNumber   						:= ri.Jgmts1_FilingNumber;
 		self.FilingBook     						:= ri.Jgmts1_FilingBook;
 		self.FilingPage     						:= ri.Jgmts1_FilingPage;
-		self.Eviction                   := ri.Jgmts1_Eviction;
+		self.Eviction             := ri.Jgmts1_Eviction;
+		self.AgencyID        						:= ri.Jgmts1_AgencyID;
 		self.Agency         						:= ri.Jgmts1_Agency;
 		self.AgencyCounty   						:= ri.Jgmts1_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts1_AgencyState;
+  self.ConsumerStatementID  := ri.Jgmts1_ConsumerStatementID;
 		SELF := [];
 		)]);
 		
 		
 	D:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Judgments,
-		self.seq 												:= ri.Jgmts2_seq;
+		self.seq 											     	:= ri.Jgmts2_seq;
 		self.DateFiled      						:= ri.Jgmts2_DateFiled;
-		self.JudgmentType       				:= ri.Jgmts2_JudgmentType;
+  self.JudgmentTypeID       := ri.Jgmts2_JudgmentTypeID;
+		self.JudgmentType       		:= ri.Jgmts2_JudgmentType;
 		self.Amount        							:= ri.Jgmts2_Amount;
 		self.ReleaseDate    						:= ri.Jgmts2_ReleaseDate;
-		self.FilingDescription    			:= ri.Jgmts2_FilingDescription;
+		self.FilingDescription    := ri.Jgmts2_FilingDescription;
 		self.DateLastSeen   						:= ri.Jgmts2_DateLastSeen;
-		self.Defendant   			        	:= ri.Jgmts2_Defendant;
-		self.Plaintiff    			        := ri.Jgmts2_Plaintiff ;
+		self.Defendant   			      := ri.Jgmts2_Defendant;
+		self.Plaintiff    			     := ri.Jgmts2_Plaintiff ;
 		self.FilingNumber   						:= ri.Jgmts2_FilingNumber;
 		self.FilingBook     						:= ri.Jgmts2_FilingBook;
 		self.FilingPage     						:= ri.Jgmts2_FilingPage;
-		self.Eviction                   := ri.Jgmts2_Eviction;
+		self.Eviction             := ri.Jgmts2_Eviction;
+		self.AgencyID        						:= ri.Jgmts2_AgencyID;
 		self.Agency         						:= ri.Jgmts2_Agency;
 		self.AgencyCounty   						:= ri.Jgmts2_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts2_AgencyState;
+  self.ConsumerStatementID  := ri.Jgmts2_ConsumerStatementID;
 		SELF := [];
 		)]);	
 		
@@ -519,6 +544,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	
 
 	// ------------------ DEBUGGING SECTION --------------------
+	// OUTPUT(SeedKey, NAMED('TS_SeedKey'));
 	// OUTPUT(inData, NAMED('TS_inData'));
 	// OUTPUT(Seed_Files.Hash_InstantID(StringLib.StringToUpperCase(TRIM(inData[1].FName, LEFT, RIGHT)), StringLib.StringToUpperCase(TRIM(inData[1].LName, LEFT, RIGHT)), TRIM(inData[1].SSN, LEFT, RIGHT), Risk_Indicators.nullstring, TRIM(inData[1].in_Zipcode[1..5], LEFT, RIGHT), TRIM(inData[1].Phone10, LEFT, RIGHT), Risk_Indicators.nullstring), NAMED('TS_Hashdata'));
 	// OUTPUT(TestDataTableName_in, NAMED('TS_TestDataTableName'));
@@ -527,6 +553,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// OUTPUT(Bankcard_Model_Name, NAMED('TS_Bankcard_Model_Name'));
 	// OUTPUT(Short_Term_Lending_Model_Name, NAMED('TS_Short_Term_Lending_Model_Name'));
 	// OUTPUT(Telecommunications_Model_Name, NAMED('TS_Telecommunications_Model_Name'));
+	// OUTPUT(Crossindustry_Model_Name, NAMED('TS_Crossindustry_Model_Name'));
 	// OUTPUT(Custom_Model_Name, NAMED('TS_Custom_Model_Name'));
 	// OUTPUT(seedResults, NAMED('seedResults'));
 	// ---------------------------------------------------------

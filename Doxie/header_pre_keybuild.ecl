@@ -1,4 +1,4 @@
-import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build,mdr,PRTE2_Header;
+import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build,mdr,PRTE2_Header,dx_header;
 
 head0 := doxie_build.file_header_building; 
 head:=project(head0,transform({head0}
@@ -10,7 +10,7 @@ head:=project(head0,transform({head0}
 /* **************** get County Name from Count Code ****************** */
 xHead_Layout :=
 RECORD
-	head;
+	dx_header.layout_header;
 	string1 valid_dob := '';
 	unsigned6 hhid := 0;
 	STRING18 county_name := '';
@@ -171,7 +171,7 @@ END;
 with_segmented := JOIN(with_appends,segmented_h,left.did=right.did,get_lookups(LEFT,RIGHT), LOCAL): PERSIST('persist::header_pre_keybuild');
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
-export header_pre_keybuild := project(prte2_header.files.header_pre_keybuild,{xHead_Layout});
+export header_pre_keybuild := project(prte2_header.pre_keys.header_pre_keybuild,{xHead_Layout});
 #ELSE
 export header_pre_keybuild := with_segmented;
 #END;

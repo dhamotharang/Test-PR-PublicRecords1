@@ -22,7 +22,11 @@ header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_in
 
 gong_append_in := attr();
 
-gong_in := PROJECT (gong_append_in, transform(gong_Neustar.Layout_history, self := left; self := [];)) ;
+gong_in1 := PROJECT (gong_append_in, transform(gong_Neustar.Layout_history, self := left; self := [];)) ;
+
+gong_in := PROJECT(gong_in1, Transform(gong_Neustar.Layout_history,
+				self.Persistent_Record_id := (unsigned8)0x7FFFFFFFFFFFFFFF - COUNTER;
+				self := left;));
 
 trSwapCityNamesFiltWithGong0 := trSwapCityNames;
 

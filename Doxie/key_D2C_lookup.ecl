@@ -2,4 +2,5 @@
 
 d:=dataset([], doxie_build.Layout_D2C_Lookup);
 
-EXPORT key_D2C_lookup(string v='qa') := index(d,{did},{d},Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::D2C_lookups_' + v);
+EXPORT key_D2C_lookup(unsigned1 data_env = data_services.data_env.iNonFCRA) := 
+         index(d,{did},{d},data_services.data_location.Prefix()+'thor_data400::key::D2C_lookups_' + doxie.Version_SuperKey);

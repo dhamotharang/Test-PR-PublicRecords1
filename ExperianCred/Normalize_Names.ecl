@@ -1,5 +1,8 @@
-import ut;
-input_files := Correct_Misparsed_Names;
+﻿import ut;
+
+EXPORT Normalize_Names(string ver) := module
+
+input_files := Correct_Misparsed_Names(ver).all;
 //----Assign a record sequence number;
 Layout_Temp_Sequence := record
 	unsigned Seq_Rec_Id :=0;
@@ -76,4 +79,6 @@ norm_names_filtered := norm_names(length(trim(Orig_lname,all)) > 1 AND
 							      trim(Orig_lname + Orig_mname + Orig_fname,all) <> ',' AND
 								  trim(Orig_fname,all) <> '');
 
-EXPORT Normalize_Names := norm_names_filtered:persist('~thor_data400::persist::experiancred::Normalize_Names');
+export ALL := norm_names_filtered:persist('~thor_data400::persist::experiancred::Normalize_Names');
+
+END;

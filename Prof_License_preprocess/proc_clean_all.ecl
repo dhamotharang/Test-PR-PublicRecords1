@@ -1,4 +1,4 @@
-import Prof_License,Address,ut,NID,lib_Stringlib,_Validate;
+﻿import Prof_License,Address,ut,NID,lib_Stringlib,_Validate;
 
 EXPORT proc_clean_all( dataset(recordof(Prof_License.Layout_proLic_in))infile,string state ) := module
 
@@ -232,6 +232,9 @@ end;
 
 dWithCleanfields := project( dWithCleanAddr, tcleanfill(left));
 
+ Prof_License_preprocess.IsValidLayout ( 	dWithCleanfields ).out_all  : PERSIST( '~thor_data400::persist::prolic_validate_'+state);										
+
+
 string prev_fname := map ( 
                       state in ['wy','in'] => 'thor_data400::in::prolic_'+state+'_new',
 											'~thor_data400::in::prolic_'+state+'_old'
@@ -275,6 +278,7 @@ Prof_License.Layout_proLic_in trollup ( concat_all l ,concat_all r) := transform
 												LEFT.sec_range = RIGHT.sec_range and
 												LEFT.zip = RIGHT.zip, trollup(left,right),local);
 												
+
 												
 export cleanout := sort( dUnique , profession_or_board, date_first_seen, date_last_seen, license_number, company_name, orig_name,local );
 

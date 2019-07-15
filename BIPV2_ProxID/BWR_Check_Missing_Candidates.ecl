@@ -1,4 +1,4 @@
-EXPORT BWR_Check_Missing_Candidates := 'todo';output(BIPV2_ProxID.Files().outfile.qa(dotid in [1786858,4063037]));
+﻿EXPORT BWR_Check_Missing_Candidates := 'todo';output(BIPV2_ProxID.Files().outfile.qa(dotid in [1786858,4063037]));
 UNSIGNED8 Proxidone := 1786858;
 UNSIGNED8 Proxidtwo := 4063037;
 BFile := BIPV2_ProxID.In_DOT_Base;

@@ -6,7 +6,7 @@ IMPORT _control,Address;
 export Spray_NC_Update(string	process_date) :=
 function
 	srcIP											:=	_control.IPAddress.bctlpedata11;
-	targetGrp									:=	'thor400_66';
+	targetGrp									:=	'thor400_36';
 	superfile_raw							:=	'~thor_data400::in::vehiclev2::di::nc_raw';
 	superfile									:=	'~thor_data400::in::vehiclev2::di::nc';
 	superfile_archive					:=	'~thor_data400::in::vehiclev2::di::nc_father';

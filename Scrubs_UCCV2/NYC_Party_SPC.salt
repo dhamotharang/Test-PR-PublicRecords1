@@ -32,7 +32,7 @@ FIELDTYPE:invalid_orig_name:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0
 FIELDTYPE:invalid_orig_lname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,orig_name,orig_fname)
 FIELDTYPE:invalid_orig_fname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,orig_name,orig_lname)
 FIELDTYPE:invalid_state:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_state>0)
-FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_zip5>0)
+FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_UCCV2.Functions.fn_verify_zip5_country>0,orig_country)
 FIELDTYPE:invalid_orig_country:CUSTOM(Scrubs_UCCV2.Functions.fn_country2>0)
 FIELDTYPE:invalid_party_type:ENUM(D|S|A|N)
 FIELDTYPE:invalid_fname:CUSTOM(Scrubs_UCCV2.Functions.fn_populated_strings>0,mname,lname,company_name)

@@ -1,10 +1,10 @@
-// spray AZS0813 Professional Licenses Files for MARI	
+﻿// spray AZS0813 Professional Licenses Files for MARI	
 //Unzip files before running spray   
 import ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib;
 	   
 EXPORT spray_AZS0813 := MODULE
 
-	#workunit('name','Spray AZS0813');
+	#workunit('name','Yogurt:Spray AZS0813');
 	SHARED code						:= 'AZS0813';
 
 	//  Spray All Files

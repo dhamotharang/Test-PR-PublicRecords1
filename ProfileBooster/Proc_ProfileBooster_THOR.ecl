@@ -1,4 +1,4 @@
-// *****************************************************************************************************************
+﻿// *****************************************************************************************************************
 // RUN THIS SCRIPT ON 400 WAY THOR TO OPTIMIZE PERFORMANCE
 //
 // IF YOU'RE RUNNING A FILE LESS THAN 1 MILLION RECORDS, JUST RUN THE BATCH SERVICE INSTEAD OF THIS THOR JOB
@@ -283,6 +283,14 @@ ds_in := dataset (test_file_name, layout_file_input, csv(heading(single), quote(
 		self.v1_RaAOccProfLicMmbrCnt									:= le.attributes.version1.RaAOccProfLicMmbrCnt;
 		self.v1_RaAOccBusinessAssocMmbrCnt						:= le.attributes.version1.RaAOccBusinessAssocMmbrCnt;
 		self.v1_RaAInterestSportPersonMmbrCnt					:= le.attributes.version1.RaAInterestSportPersonMmbrCnt;
+		
+		self.v1_PPCurrOwnedAutoVIN				:= le.attributes.version1.PPCurrOwnedAutoVIN;
+		self.v1_PPCurrOwnedAutoYear			:= le.attributes.version1.PPCurrOwnedAutoYear;
+		self.v1_PPCurrOwnedAutoMake				:= le.attributes.version1.PPCurrOwnedAutoMake;
+		self.v1_PPCurrOwnedAutoModel				:= le.attributes.version1.PPCurrOwnedAutoModel;
+		self.v1_PPCurrOwnedAutoSeries				:= le.attributes.version1.PPCurrOwnedAutoSeries;
+		self.v1_PPCurrOwnedAutoType				:= le.attributes.version1.PPCurrOwnedAutoType;
+		
 	end;	
 			 
 	search_function_with_acctno := join(attributes, PB_wSeq, 

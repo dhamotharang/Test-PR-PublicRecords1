@@ -18,7 +18,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	
 	export maxWU := if (last_wuid <> '', last_wuid, if(count(ReadFileList) > 0, max(ReadFileList,wuid), thorbackup.Constants.Yogurt().startwudaysbehind));
 
-	export getMaxWU := if (maxWU < thorbackup.Constants.Yogurt().startwudaysbehind, maxWU, thorbackup.Constants.Yogurt().startwudaysbehind);
+	export getMaxWU := if (maxWU > thorbackup.Constants.Yogurt().startwudaysbehind, maxWU, thorbackup.Constants.Yogurt().startwudaysbehind);
 
 	export GetFilesInWorkunit(string wid) := function
 		InRecord := record
@@ -74,7 +74,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('hpccinternal',files,nocase)
 																				or regexfind('spill',files,nocase)
 																				or regexfind('persist',files,nocase)
-																				or regexfind('::key::',files,nocase)
+																				//or regexfind('::key::',files,nocase)
 																				or regexfind('yogurt',files,nocase)
 																				// or regexfind('foreign',files,nocase)
 																				or regexfind(':: ',files,nocase)
@@ -85,6 +85,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('[/~()]', files,nocase)
 																				or regexfind('10.173.231.12',files,nocase)
 																				or regexfind('10.241.20.205',files,nocase)
+																				or regexfind('10.241.50.45',files,nocase)
 																				or regexfind('thor_data400::in::seq',files,nocase)
 																				or regexfind('^file::.*$',files,nocase)
 																				)) ,files),record);

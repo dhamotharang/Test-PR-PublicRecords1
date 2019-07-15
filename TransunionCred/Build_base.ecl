@@ -1,10 +1,9 @@
-IMPORT  address, ut, header_slimsort, did_add, didville,AID,std;
+﻿IMPORT  address, ut, header_slimsort, did_add, didville,AID,std;
 
-#IF (IsFullUpdate = false)
-	TrnUn_credit := Files.update_in;
-#ELSE
-	TrnUn_credit := Files.load_in;
-#END
+export Build_base(string ver, boolean IsFullUpdate = false) := module 
+
+TrnUn_credit := if(IsFullUpdate,Files.load_in,  project(Files.update_in, transform(TransunionCred.Layouts.load, self.cr := '';, self := left;)));
+
 setValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
 string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
 																							,SuffixIn in ['2','ND'] => 'II'
@@ -39,9 +38,9 @@ Layouts.base t_norm_name (TrnUn_credit L, INTEGER C):= TRANSFORM
 																),left,right);
 
 	self.dt_first_seen            := CHOOSE(C,(unsigned)l.date_address_reported,0,0,0);
-	self.dt_last_seen             := if(self.Prepped_rec_type='A1',(unsigned)version,0);
-	self.dt_vendor_first_reported := (unsigned)version;
-	self.dt_vendor_last_reported  := (unsigned)version;
+	self.dt_last_seen             := if(self.Prepped_rec_type='A1',(unsigned)ver,0);
+	self.dt_vendor_first_reported := (unsigned)ver;
+	self.dt_vendor_last_reported  := (unsigned)ver;
 	valid_dob                     := if((unsigned)l.Date_of_Birth between 18000101 and (unsigned)(STRING8)Std.Date.Today()
 																				,(unsigned)l.Date_of_Birth
 																				,0);
@@ -111,31 +110,30 @@ preprocess := project(norm_names,tr_addr(left)):persist('~thor_data400::persist:
 
 cur_base_d := distribute(project(Files.Base, transform(recordof(Files.Base), self.did := 0, self := left)), hash(Party_ID));
 
-#IF (IsFullUpdate = false)
-	cur_update_d := dedup(distribute(preprocess, hash(Party_ID)),Party_ID,all,local);
+cur_update_d := dedup(distribute(preprocess, hash(Party_ID)),Party_ID,all,local);
 
-	apply_updates := join(cur_base_d, cur_update_d
-									,left.Party_ID = right.Party_ID
-							,transform(Layouts.base
-								,self.IsCurrent	:= if(left.Party_ID=right.Party_ID and left.Prepped_rec_type='A1',false,left.IsCurrent)
-								,self           := left)
-							,left outer
-							,local);
+apply_updates := join(cur_base_d, cur_update_d
+                                ,left.Party_ID = right.Party_ID
+                        ,transform(Layouts.base
+                            ,self.IsCurrent	:= if(left.Party_ID=right.Party_ID and left.Prepped_rec_type='A1',false,left.IsCurrent)
+                            ,self           := left)
+                        ,left outer
+                        ,local);
 
-	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
-												,preprocess
-												,preprocess + apply_updates);
+base_and_update_delta := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
+                                            ,preprocess
+                                            ,preprocess + apply_updates);
 
-#ELSE
-	reset_cur_base := project(cur_base_d, transform(Layouts.base
-											,self.IsCurrent  := false
-											,self.IsUpdating := false
-											,self := left));
+reset_cur_base := project(cur_base_d, transform(Layouts.base
+                                        ,self.IsCurrent  := false
+                                        ,self.IsUpdating := false
+                                        ,self := left));
 
-	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
-											 ,preprocess
-											 ,preprocess + reset_cur_base);
-#END
+base_and_update_full := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
+                                         ,preprocess
+                                         ,preprocess + reset_cur_base);
+                                             
+base_and_update := if(IsFullUpdate, base_and_update_full, base_and_update_delta); 
 
 TN_ready := base_and_update;
 //-----------------------------------------------------------------
@@ -258,9 +256,11 @@ candidates		:=base_and_delete(IsDelete=false and IsUpdating=true and Deceased_In
 not_candidates:=base_and_delete(IsDelete=true  or  IsUpdating=false or Deceased_Indicator_Flag =  'Y' or  IsCurrent=false);
 TransunionCred_out:=project(candidates
 															,transform(layouts.base
-																	,self.dt_last_seen:=if((unsigned)version > left.dt_first_seen, (unsigned)version, left.dt_last_seen)
+																	,self.dt_last_seen:=if((unsigned)ver > left.dt_first_seen, (unsigned)ver, left.dt_last_seen)
 																	,self:=left
 																	))
 																	+ not_candidates;
 
-export Build_base := TransunionCred_out;
+export All := TransunionCred_out;
+
+end;

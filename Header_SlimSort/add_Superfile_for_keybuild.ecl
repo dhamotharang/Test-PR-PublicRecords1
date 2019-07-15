@@ -1,7 +1,7 @@
 
 import ut, header,header_slimsort;
 
-src_cluster := header_slimsort.cluster.cluster_60;
+src_cluster := header_slimsort.cluster.cluster_66;
 src_cluster_name := '~' + src_cluster + '::';
 
 	c1 := fileservices.clearsuperfile('~thor_Data400::base::hss_name_address');

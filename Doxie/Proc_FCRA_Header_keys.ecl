@@ -4,8 +4,8 @@ export Proc_FCRA_Header_keys(string filedate) := function
 
 //Build keys
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.key_FCRA_header,'~thor_data400::key::fcra::header','~thor_data400::key::fcra::header::'+filedate+'::data',fcra_head_data);
-RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.Key_FCRA_AptBuildings, '~thor_data400::key::fcra::hdr_apt_bldgs','~thor_data400::key::fcra::header::'+filedate+'::apt_bldgs',fcra_apt_blg);
-RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.Key_FCRA_EN_AptBuildings, '~thor_data400::key::fcra::en_hdr_apt_bldgs','~thor_data400::key::fcra::header::'+filedate+'::en_apt_bldgs',fcra_en_apt_blg);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.Key_FCRA_AptBuildings_pre(filedate), '~thor_data400::key::fcra::hdr_apt_bldgs','~thor_data400::key::fcra::header::'+filedate+'::apt_bldgs',fcra_apt_blg);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.Key_FCRA_EN_AptBuildings_pre(filedate), '~thor_data400::key::fcra::en_hdr_apt_bldgs','~thor_data400::key::fcra::header::'+filedate+'::en_apt_bldgs',fcra_en_apt_blg);
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.Key_FCRA_Header_Address ,'~thor_data400::key::fcra::header_address','~thor_data400::key::fcra::header::'+filedate+'::address',fcra_address_payload);
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.key_FCRA_max_dt_last_seen,'~thor_data400::key::fcra::max_dt_last_seen','~thor_data400::key::fcra::header::'+filedate+'::max_dt_last_seen',fcra_max_dt_last_seen);
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.Key_FCRA_legacy_ssn,'~thor_data400::key::fcra::header.legacy_ssn','~thor_data400::key::fcra::header::'+filedate+'::legacy_ssn',fcra_legacy_ssn);

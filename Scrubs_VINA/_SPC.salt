@@ -1,0 +1,234 @@
+﻿MODULE:Scrubs_VINA
+FILENAME:VINA
+NAMESCOPE:BaseFile
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+//FUZZY can be used to create new types of FUZZY linking
+FIELDTYPE:Invalid_engine_information_cylinders:ALLOW(0123456789U)
+FIELDTYPE:Invalid_Nums:ALLOW(0123456789)
+FIELDTYPE:Invalid_Num_Axles:ALLOW(FTUYZ0123456789)
+FIELDTYPE:Invalid_Tire_Size:ALLOW(0123456789.-ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:Invalid_Decimal:ALLOW(0123456789.)
+FIELDTYPE:Invalid_Nums_Blank:ALLOW(0123456789 )
+FIELDTYPE:Invalid_Nums_Rotary:ALLOW(R0123456789 U)
+FIELDTYPE:Invalid_Vehicle_Type:ALLOW(PTMC)
+FIELDTYPE:Invalid_Abbreviation:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz )
+FIELDTYPE:Invalid_Vin:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*)
+FIELDTYPE:Invalid_Body_Type:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"'`()/+!,)
+FIELDTYPE:Invalid_Char_No_Spec:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .-:*&"'`()/+!,)
+FIELDTYPE:Invalid_Fuel:ALLOW(BCEFGHMNPDU)
+FIELDTYPE:Invalid_HPC:ALLOW(ACDHJLMN03 )
+FIELDTYPE:Invalid_Wheel:ALLOW(F4A )
+FIELDTYPE:Invalid_Ton:ALLOW(ABCDJKLMNOPQRFGHI)
+FIELDTYPE:Invalid_Location:ALLOW(CPM )
+FIELDTYPE:Invalid_Option_SOUNA:ALLOW(SOUNA )
+FIELDTYPE:Invalid_Option_SOUN:ALLOW(SOUN A)
+FIELDTYPE:Invalid_Radio:ALLOW(123456789A)
+FIELDTYPE:Invalid_Roof:ALLOW(1234567)
+FIELDTYPE:Invalid_ALB:ALLOW(12345678U)
+FIELDTYPE:Invalid_Transmission:ALLOW(ABCDEFGHIJKLMNOPQRST)
+FIELDTYPE:Invalid_Security:ALLOW(ESKABCDFGHJONUZPITUN)
+FIELDTYPE:Invalid_Visrap:ALLOW(ABCDEFGHIJKLMPRSTUVWXY347)
+FIELDTYPE:Invalid_Cab:ALLOW(ABCDEFGHIJKLMNOU)
+FIELDTYPE:Invalid_FAC:ALLOW(ABCU)
+FIELDTYPE:Invalid_RAC:ALLOW(STU)
+FIELDTYPE:Invalid_Brakes:ALLOW(ABCDEFU)
+FIELDTYPE:Invalid_Engine_Type:ALLOW(HLMU)
+FIELDTYPE:Invalid_Trailer_Body:ENUM(407|412|AUT|BEV|CCH|CHP|CUR|DMP|DOL|ENB|ENT|ENU|FBD|FDD|GRN|HPR|LBD|LDD|LGO|LIV|LOG|ROL|SPE|TAG|TNK|TPN|TRN|T06|T07|T12|T13|T19|T20|T21|T22|T23|T24|T25|T26|T27|T28|T29|T31|T53|T54|T55|T56|T57|T58|T69|T75|UNK|UOC|UTL|VAN|VDR|VOT|VRF| |U|N)
+FIELDTYPE:Invalid_Trailer_length:ALLOW(0123456789XUNKLG)
+FIELDTYPE:Invalid_Proactive_VIN_Ind:ALLOW(YNU)
+FIELDTYPE:Invalid_VIN_Pattern:ALLOW(ABCDEGHIKMNOPRSTVWXYZU)
+FIELDTYPE:Invalid_Segmentation_Codes:ALLOW(AB0DEFGHIJKLMNOPQRSTUVWCYZ123456789)
+FIELDTYPE:Invalid_Country:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
+FIELDTYPE:Invalid_Liter:ALLOW(0123456789L.)
+FIELDTYPE:Invalid_Block_Type:ALLOW(VILHWRU)
+FIELDTYPE:Invalid_Carburetion:ENUM(1BL|2BL|3BL|4BL|CPI|DIR|FI|HSC|IDI|MPI|PFI|SFI|TBI|TPI| )
+FIELDTYPE:Invalid_Carburetion_Num:ALLOW(0123456789CFLTUVYZ)
+FIELDTYPE:Invalid_Head_Configuration:ENUM(SOHC|DOHC|OHV| |U)
+FIELDTYPE:Invalid_Valves:ALLOW(0123456789V)
+FIELDTYPE:Invalid_Aspiration_Code:ALLOW(EHNUYI)
+FIELDTYPE:Invalid_Carburetion_Code:ALLOW(01234BCDFHIMPSTUX)
+FIELDTYPE:Invalid_VPC:ALLOW(12345 )
+FIELDTYPE:Invalid_Transmission_Speed:ALLOW(0123456789SPDCVT )
+FIELDTYPE:Invalid_Transmission_Type:ENUM(MANUAL|AUTO| )
+FIELDTYPE:Invalid_Transmission_Code:ALLOW(AM )
+FIELDTYPE:Invalid_Transmission_Speed_Code:ALLOW(0123456789)
+FIELDTYPE:Invalid_Y_or_N:ALLOW(YN)
+FIELDTYPE:Invalid_Y_or_N_orBlank:ALLOW(YN )
+FIELDTYPE:Invalid_Battery_Type:ENUM(NIMH|PBA|HYB|LIPO|LTHI| )
+FIELDTYPE:Invalid_Battery_KW:ALLOW(0123456789KW)
+FIELDTYPE:Invalid_Battery_Volts:ALLOW(0123456789V)
+FIELDTYPE:Invalid_Engine_Brand:ALLOW(HV )
+FIELDTYPE:Invalid_Supercharged:ALLOW(YNIU )
+FIELDTYPE:Invalid_Turbocharged:ALLOW(YNIU )
+FIELD:match_make:LIKE(Invalid_Char):TYPE(STRING3):0,0
+FIELD:match_year:LIKE(Invalid_Nums):TYPE(STRING4):0,0
+FIELD:match_vin:LIKE(Invalid_Vin):TYPE(STRING17):0,0
+FIELD:make_abbreviation:LIKE(Invalid_Abbreviation):TYPE(STRING4):0,0
+FIELD:model_year:LIKE(Invalid_Nums):TYPE(STRING4):0,0
+FIELD:vehicle_type:LIKE(Invalid_Vehicle_Type):TYPE(STRING1):0,0
+FIELD:make_name:LIKE(Invalid_Char):TYPE(STRING35):0,0
+FIELD:series_name:LIKE(Invalid_Char):TYPE(STRING25):0,0
+FIELD:body_type:LIKE(Invalid_Body_Type):TYPE(STRING2):0,0
+FIELD:wheels:LIKE(Invalid_Nums):TYPE(STRING2):0,0
+FIELD:displacement:LIKE(Invalid_Nums_Blank):TYPE(STRING4):0,0
+FIELD:cylinders:LIKE(Invalid_Nums_Rotary):TYPE(STRING2):0,0
+FIELD:fuel:LIKE(Invalid_Fuel):TYPE(STRING1):0,0
+FIELD:carburetion:LIKE(Invalid_Carburetion_Num):TYPE(STRING1):0,0
+FIELD:gvw:LIKE(Invalid_Nums_Rotary):TYPE(STRING1):0,0
+FIELD:wheel_base:LIKE(Invalid_Decimal):TYPE(STRING8):0,0
+FIELD:tire_size:LIKE(Invalid_Tire_Size):TYPE(STRING6):0,0
+FIELD:ton_rating:LIKE(Invalid_Char_No_Spec):TYPE(STRING2):0,0
+FIELD:base_shipping_weight:LIKE(Invalid_Decimal):TYPE(STRING4):0,0
+FIELD:variance_weight:LIKE(Invalid_Nums):TYPE(STRING2):0,0
+FIELD:base_list_price:LIKE(Invalid_Char):TYPE(STRING5):0,0
+FIELD:price_variance:LIKE(Invalid_Nums):TYPE(STRING2):0,0
+FIELD:high_performance_code:LIKE(Invalid_HPC):TYPE(STRING1):0,0
+FIELD:driving_wheels:LIKE(Invalid_Wheel):TYPE(STRING1):0,0
+FIELD:iso_physical_damage:TYPE(STRING12):0,0
+FIELD:location_indicator:LIKE(Invalid_Location):TYPE(STRING1):0,0
+FIELD:air_conditioning:LIKE(Invalid_Option_SOUN):TYPE(STRING1):0,0
+FIELD:power_steering:LIKE(Invalid_Option_SOUN):TYPE(STRING1):0,0
+FIELD:power_brakes:LIKE(Invalid_Option_SOUN):TYPE(STRING1):0,0
+FIELD:power_windows:LIKE(Invalid_Option_SOUN):TYPE(STRING1):0,0
+FIELD:tilt_wheel:LIKE(Invalid_Option_SOUN):TYPE(STRING1):0,0
+FIELD:roof:LIKE(Invalid_Roof):TYPE(STRING1):0,0
+FIELD:optional_roof1:LIKE(Invalid_Roof):TYPE(STRING1):0,0
+FIELD:optional_roof2:LIKE(Invalid_Roof):TYPE(STRING1):0,0
+FIELD:radio:LIKE(Invalid_Radio):TYPE(STRING1):0,0
+FIELD:optional_radio1:LIKE(Invalid_Radio):TYPE(STRING1):0,0
+FIELD:optional_radio2:LIKE(Invalid_Radio):TYPE(STRING1):0,0
+FIELD:transmission:LIKE(Invalid_Transmission):TYPE(STRING1):0,0
+FIELD:optional_transmission1:LIKE(Invalid_Transmission):TYPE(STRING1):0,0
+FIELD:optional_transmission2:LIKE(Invalid_Transmission):TYPE(STRING1):0,0
+FIELD:anti_lock_brakes:LIKE(Invalid_ALB):TYPE(STRING1):0,0
+FIELD:security_system:LIKE(Invalid_Security):TYPE(STRING1):0,0
+FIELD:daytime_running_lights:LIKE(Invalid_Option_SOUN):TYPE(STRING1):0,0
+FIELD:visrap:LIKE(Invalid_Visrap):TYPE(STRING1):0,0
+FIELD:cab_configuration:LIKE(Invalid_Cab):TYPE(STRING1):0,0
+FIELD:front_axle_code:LIKE(Invalid_FAC):TYPE(STRING1):0,0
+FIELD:rear_axle_code:LIKE(Invalid_RAC):TYPE(STRING1):0,0
+FIELD:brakes_code:LIKE(Invalid_Brakes):TYPE(STRING1):0,0
+FIELD:engine_manufacturer:LIKE(Invalid_Char):TYPE(STRING15):0,0
+FIELD:engine_model:LIKE(Invalid_Char):TYPE(STRING15):0,0
+FIELD:engine_type_code:LIKE(Invalid_Engine_Type):TYPE(STRING1):0,0
+FIELD:trailer_body_style:LIKE(Invalid_Trailer_Body):TYPE(STRING3):0,0
+FIELD:trailer_number_of_axles:LIKE(Invalid_Num_Axles):TYPE(STRING1):0,0
+FIELD:trailer_length:LIKE(Invalid_Trailer_length):TYPE(STRING3):0,0
+FIELD:proactive_vin:LIKE(Invalid_Proactive_VIN_Ind):TYPE(STRING1):0,0
+FIELD:ma_state_exceptions:TYPE(STRING6):0,0
+FIELD:filler_1:TYPE(STRING6):0,0
+FIELD:series_abbreviation:TYPE(STRING6):0,0
+FIELD:vin_pattern:LIKE(Invalid_VIN_Pattern):TYPE(STRING17):0,0
+FIELD:ncic_data:LIKE(Invalid_Char):TYPE(STRING7):0,0
+FIELD:full_body_style_name:LIKE(Invalid_Char):TYPE(STRING20):0,0
+FIELD:nvpp_make_code:TYPE(STRING2):0,0
+FIELD:nvpp_make_abbreviation:TYPE(STRING3):0,0
+FIELD:nvpp_series_model:TYPE(STRING4):0,0
+FIELD:nvpp_series_name:TYPE(STRING30):0,0
+FIELD:segmentation_code:LIKE(Invalid_Segmentation_Codes):TYPE(STRING1):0,0
+FIELD:country_of_origin:LIKE(Invalid_Char):TYPE(STRING20):0,0
+FIELD:engine_liter_information:LIKE(Invalid_Liter):TYPE(STRING5):0,0
+FIELD:engine_information_filler1:TYPE(STRING1):0,0
+FIELD:engine_information_block_type:LIKE(Invalid_Block_Type):TYPE(STRING1):0,0
+FIELD:engine_information_cylinders:LIKE(Invalid_engine_information_cylinders):TYPE(STRING2):0,0
+FIELD:engine_information_filler2:TYPE(STRING1):0,0
+FIELD:engine_information_carburetion:LIKE(Invalid_Carburetion):TYPE(STRING3):0,0
+FIELD:engine_information_filler3:TYPE(STRING1):0,0
+FIELD:engine_information_head_configuration:LIKE(Invalid_Head_Configuration):TYPE(STRING4):0,0
+FIELD:engine_information_filler4:TYPE(STRING1):0,0
+FIELD:engine_information_total_valves:LIKE(Invalid_Valves):TYPE(STRING3):0,0
+FIELD:engine_information_filler5:TYPE(STRING1):0,0
+FIELD:engine_information_aspiration_code:LIKE(Invalid_Aspiration_Code):TYPE(STRING1):0,0
+FIELD:engine_information_carburetion_code:LIKE(Invalid_Carburetion_Code):TYPE(STRING1):0,0
+FIELD:engine_information_valves_per_cylinder:LIKE(Invalid_VPC):TYPE(STRING1):0,0
+FIELD:transmission_speed:LIKE(Invalid_Transmission_Speed):TYPE(STRING5):0,0
+FIELD:transmission_filler1:TYPE(STRING1):0,0
+FIELD:transmission_type:LIKE(Invalid_Transmission_Type):TYPE(STRING7):0,0
+FIELD:transmission_filler2:TYPE(STRING1):0,0
+FIELD:transmission_code:LIKE(Invalid_Transmission_Code):TYPE(STRING1):0,0
+FIELD:transmission_filler3:TYPE(STRING1):0,0
+FIELD:transmission_speed_code:LIKE(Invalid_Transmission_Speed_Code):TYPE(STRING1):0,0
+FIELD:base_model:LIKE(Invalid_Char):TYPE(STRING17):0,0
+FIELD:complete_prefix_file_id:LIKE(Invalid_Nums):TYPE(STRING7):0,0
+FIELD:series_name_full_spelling:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:vis_theft_code:LIKE(Invalid_Y_or_N):TYPE(STRING1):0,0
+FIELD:base_list_price_expanded:LIKE(Invalid_Char):TYPE(STRING7):0,0
+FIELD:default_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:default_nada_model:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:default_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:default_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:default_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:default_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_1_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:alt_1_nada_model:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_1_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_1_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_1_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_1_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_2_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:alt_2_nada_model:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_2_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_2_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_2_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_2_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_3_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:alt_3_nada_model:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_3_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_3_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_3_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_3_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_4_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:alt_4_nada_model:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_4_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_4_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_4_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_4_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_5_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:alt_5_nada_model:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_5_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_5_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_5_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_5_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_6_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:alt_6_nada_model:TYPE(STRING30):0,0
+FIELD:alt_6_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_6_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_6_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_6_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_7_nada_vehicle_id:LIKE(Invalid_Char):TYPE(STRING8):0,0
+FIELD:alt_7_nada_model:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_7_nada_body_style:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:alt_7_nada_msrp:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_7_nada_gvwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:alt_7_nada_gcwr:LIKE(Invalid_Char):TYPE(STRING6):0,0
+FIELD:aaia_codes:LIKE(Invalid_Char):TYPE(STRING49):0,0
+FIELD:incomplete_vehicle_flag:LIKE(Invalid_Y_or_N):TYPE(STRING1):0,0
+FIELD:filler2:TYPE(STRING1):0,0
+FIELD:electric_battery_info_type:LIKE(Invalid_Battery_Type):TYPE(STRING4):0,0
+FIELD:filler3:TYPE(STRING1):0,0
+FIELD:electric_battery_kilowatts:LIKE(Invalid_Battery_KW):TYPE(STRING4):0,0
+FIELD:filler4:TYPE(STRING1):0,0
+FIELD:electric_battery_volts:LIKE(Invalid_Battery_Volts):TYPE(STRING4):0,0
+FIELD:filler5:TYPE(STRING1):0,0
+FIELD:engine_info_proprietary_engine_brand:LIKE(Invalid_Engine_Brand):TYPE(STRING1):0,0
+FIELD:filler6:TYPE(STRING1):0,0
+FIELD:engine_info_high_output_engine:LIKE(Invalid_Y_or_N):TYPE(STRING1):0,0
+FIELD:engine_info_supercharged:LIKE(Invalid_Supercharged):TYPE(STRING1):0,0
+FIELD:engine_info_turbocharged:LIKE(Invalid_Turbocharged):TYPE(STRING1):0,0
+FIELD:engine_info_vvtl:LIKE(Invalid_Y_or_N_orBlank):TYPE(STRING1):0,0
+FIELD:iso_liability:LIKE(Invalid_Char):TYPE(STRING7):0,0
+FIELD:series_name_condensed:LIKE(Invalid_Char):TYPE(STRING20):0,0
+FIELD:aces_data:LIKE(Invalid_Char):TYPE(STRING97):0,0
+FIELD:base_shipping_weight_expanded:LIKE(Invalid_Decimal):TYPE(STRING5):0,0
+FIELD:filler7:TYPE(STRING169):0,0
+FIELD:customer_defined_data:LIKE(Invalid_Char):TYPE(STRING25):0,0

@@ -1,6 +1,5 @@
-import STRATA;
+﻿import STRATA;
 pTransunion_TN_base:=Files.Base;
-pVersion:=Version;
 
 rPopulationStats_Transunion_TN_base
  :=
@@ -102,11 +101,17 @@ dPopulationStats_Transunion_TN_base := table(pTransunion_TN_base
 							  	    ,rPopulationStats_Transunion_TN_base
 									,state
 									,few);
-STRATA.createXMLStats(dPopulationStats_Transunion_TN_base
-					 ,'TN'
-					 ,'TransunionCred'
-					 ,pVersion
-					 ,'jose.bello@lexisnexis.com,michael.gould@lexisnexis.com'
-					 ,zTransunion_TN_base);
 
-EXPORT Strata := zTransunion_TN_base;
+CreateXMLstatus(string ver) := function
+						
+	STRATA.createXMLStats(dPopulationStats_Transunion_TN_base
+						 ,'TN'
+						 ,'TransunionCred'
+						 ,ver
+						 ,'jose.bello@lexisnexis.com,michael.gould@lexisnexis.com'
+						 ,zTransunion_TN_base);
+	return zTransunion_TN_base;
+
+end;
+
+EXPORT Strata(string ver) := CreateXMLstatus(ver);

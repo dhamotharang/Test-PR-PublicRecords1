@@ -6,7 +6,7 @@ EXPORT fSprayDd(
 	STRING		pVersion              = '',
 	STRING    pHxOrMx               = 'hx',
 	BOOLEAN   pUseProd              = FALSE,
-	STRING		pServerIP							= _control.IPAddress.bctlpedata12,
+	STRING		pServerIP							= _control.IPAddress.bctlpedata10,
 	STRING		pRawfile							= '*.txt',
 	STRING		pDirectory						= '/data/run_enclarity/hxmx/input/',
 	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),
@@ -24,7 +24,7 @@ EXPORT fSprayDd(
 	thorFolder := MAP(lowerX = 'hx' => hxmx.Filenames(pVersion,pUseProd).hx_lInputTemplate, 
 										hxmx.Filenames(pVersion,pUseProd).mx_lInputTemplate);
 
-	fileList := NOTHOR(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata12, pDirectory + remoteDateFolder + '/', '*' + upperX + pRawfile)):INDEPENDENT;
+	fileList := NOTHOR(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata10, pDirectory + remoteDateFolder + '/', '*' + upperX + pRawfile)):INDEPENDENT;
 			// (name[30..31] IN ['29','30','31'])
 
 	filesSorted := SORT(fileList,name);

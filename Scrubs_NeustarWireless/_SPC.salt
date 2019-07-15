@@ -1,0 +1,69 @@
+﻿//SALT:  _SPC;
+OPTIONS:-gh
+MODULE:Scrubs_NeustarWireless
+FILENAME:NeustarWireless
+
+FIELDTYPE:invalid_phone:SPACES( ):ALLOW(0123456789):LENGTHS(10)
+FIELDTYPE:invalid_fname:SPACES( ):LENGTHS(0..15)
+FIELDTYPE:invalid_mname:SPACES( ):LENGTHS(0,1)
+FIELDTYPE:invalid_lname:SPACES( ):LENGTHS(0..20)
+FIELDTYPE:invalid_gender:SPACES( ):ENUM(F|M|)
+FIELDTYPE:invalid_dob:SPACES( ):ALLOW(0123456789):LENGTHS(0,8)
+FIELDTYPE:invalid_predir_postdir:SPACES( ):ALLOW(ENSW)
+FIELDTYPE:invalid_street_type:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_apt_type:SPACES( ):ALLOW(#ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_zip:SPACES( ):ALLOW(0123456789):LENGTHS(5,0)
+FIELDTYPE:invalid_plus4:SPACES( ):ALLOW(0123456789):LENGTHS(4,0)
+FIELDTYPE:invalid_dpc:SPACES( ):ALLOW(0123456789)
+FIELDTYPE:invalid_z4_type:SPACES( ):ALLOW(FGHPRS)
+FIELDTYPE:invalid_city:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_state:ENUM(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|AA|AP|AE|AS|GU|MP|PR|VI|PW|)
+FIELDTYPE:invalid_fips_state:SPACES( ):ALLOW(0123456789):LENGTHS(2,0)
+FIELDTYPE:invalid_fips_county:SPACES( ):ALLOW(0123456789):LENGTHS(3,0)
+FIELDTYPE:invalid_cbsa:SPACES( ):ALLOW(0123456789)
+FIELDTYPE:invalid_lat_long:SPACES( ):ALLOW(-.0123456789)
+FIELDTYPE:invalid_email:ALLOW(@.ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_verified:ALLOW(ABCDE)
+FIELDTYPE:invalid_activity_status:SPACES( ):ENUM(A1|A2|A3|A4|A5|A6|A7|I1|I2|I3|I4|I5|I6|I7|U)
+FIELDTYPE:invalid_Y_N:ENUM(Y|N)
+
+FIELD:phone:LIKE(invalid_phone):TYPE(STRING):0,0
+FIELD:fname:TYPE(STRING):0,0
+FIELD:mname:TYPE(STRING):0,0
+FIELD:lname:TYPE(STRING):0,0
+FIELD:salutation:TYPE(STRING):0,0
+FIELD:suffix:TYPE(STRING):0,0
+FIELD:gender:LIKE(invalid_gender):TYPE(STRING):0,0
+FIELD:dob:LIKE(invalid_dob):TYPE(STRING):0,0
+FIELD:house:TYPE(STRING):0,0
+FIELD:pre_dir:LIKE(invalid_predir_postdir):TYPE(STRING):0,0
+FIELD:street:TYPE(STRING):0,0
+FIELD:street_type:LIKE(invalid_street_type):TYPE(STRING):0,0
+FIELD:post_dir:LIKE(invalid_predir_postdir):TYPE(STRING):0,0
+FIELD:apt_type:LIKE(invalid_apt_type):TYPE(STRING):0,0
+FIELD:apt_nbr:TYPE(STRING):0,0
+FIELD:zip:LIKE(invalid_zip):TYPE(STRING):0,0
+FIELD:plus4:LIKE(invalid_plus4):TYPE(STRING):0,0
+FIELD:dpc:LIKE(invalid_dpc):TYPE(STRING):0,0
+FIELD:z4_type:LIKE(invalid_z4_type):TYPE(STRING):0,0
+FIELD:crte:TYPE(STRING):0,0
+FIELD:city:LIKE(invalid_city):TYPE(STRING):0,0
+FIELD:state:LIKE(invalid_state):TYPE(STRING):0,0
+FIELD:dpvcmra:TYPE(STRING):0,0
+FIELD:dpvconf:TYPE(STRING):0,0
+FIELD:fips_state:LIKE(invalid_fips_state):TYPE(STRING):0,0
+FIELD:fips_county:LIKE(invalid_fips_county):TYPE(STRING):0,0
+FIELD:census_tract:TYPE(STRING):0,0
+FIELD:census_block_group:TYPE(STRING):0,0
+FIELD:cbsa:LIKE(invalid_cbsa):TYPE(STRING):0,0
+FIELD:match_code:TYPE(STRING):0,0
+FIELD:latitude:LIKE(invalid_lat_long):TYPE(STRING):0,0
+FIELD:longitude:LIKE(invalid_lat_long):TYPE(STRING):0,0
+FIELD:email:LIKE(invalid_email):TYPE(STRING):0,0
+FIELD:filler1:TYPE(STRING):0,0
+FIELD:filler2:TYPE(STRING):0,0
+FIELD:verified:LIKE(invalid_verified):TYPE(STRING):0,0
+FIELD:activity_status:LIKE(invalid_activity_status):TYPE(STRING):0,0
+FIELD:prepaid:LIKE(invalid_Y_N):TYPE(STRING):0,0
+FIELD:cord_cutter:LIKE(invalid_Y_N):TYPE(STRING):0,0
+

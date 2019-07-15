@@ -1,4 +1,4 @@
-//------------------------------------
+﻿//------------------------------------
 import	NAC, Std, lib_fileservices;
 #workunit('priority', 'high');
 #workunit('priority', 11);
@@ -9,7 +9,7 @@ unsigned2	gFilenameDatesToKeep	:=	40;
 unsigned2	gNCFFileListLimit			:=	200;
 string		gEmailTarget					:=	'tony.kirk@lexisnexis.com,nacprojectsupport@lnssi.com,jennifer.paganacci@lexisnexis.com,'
 																+		'Tim.Meeks@mdhs.ms.gov,Reshma.Khatkhate@mdhs.ms.gov,'
-																+		'Ann.York@dhr.alabama.gov,Patricia.Roberts@dhr.alabama.gov,OACIS_HELPDESK@dhr.alabama.gov,MELISSA.BAKER@DHR.ALABAMA.GOV,'
+																+		'Patricia.Roberts@dhr.alabama.gov,OACIS_HELPDESK@dhr.alabama.gov,MELISSA.BAKER@DHR.ALABAMA.GOV,'
 																+		'Lynn_Rossow@dcf.state.fl.us,Karen_Hawkins@dcf.state.fl.us,'
 																+		'Kimberlin.Donald@dhs.ga.gov,Latonya.James@dhs.ga.gov,sonya.ward@dhs.ga.gov,wewebb@dhr.state.ga.us,cmjohnson2@dhr.state.ga.us,Jean.Cliche@dhs.ga.gov,'
 																+		'Michael.A.Morris@la.gov,Michael.Dronet@la.gov,Kevin.Bourgeois.DCFS@la.gov,J.Funderburk.DCFS@la.gov'

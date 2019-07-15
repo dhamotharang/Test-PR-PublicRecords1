@@ -26,8 +26,8 @@ After the current process has determined what is above and below the line, match
 -	For the records that were below the line and moved above, propagate above the line to other records for the same phone and household.
 ===============================================================================================================
 */
-import Experian_Phones, ut, PhoneMart,_Control;
-EXPORT Fn_Phone_Verification(dataset(recordof(Layout_Phonesplus_Base)) phplus_in) := function
+import Experian_Phones, ut, PhoneMart,_control;
+EXPORT Fn_Phone_Verification(dataset(recordof(Layout_Phonesplus_Base)) phplus_in, string pversion) := function
 
 // remote insurance verification file
 iver_rec := RECORD
@@ -41,7 +41,7 @@ iver_rec := RECORD
 //ins prod
 
 
-ins := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor400_64::persist::for_phone_verification', iver_rec , thor);
+ins := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor_data400::base::insuranceheader::for_phone_verification', iver_rec , thor);
 //ins dataland
 //ins := dataset('~foreign::10.194.10.1::thor400_72::persist::for_phone_verification', iver_rec , thor);
 
@@ -51,7 +51,7 @@ file1_ := pull(PhoneMart.key_phonemart_did);
 								is_current and
 								//only use cellphones and non-cellphones when the date_last_seen is within 1 year
 								(phone_type = 'C' or
-								(phone_type = 'N' and date_last_seen > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00)) )));*/
+								(phone_type = 'N' and date_last_seen > (unsigned) ut.date_math (pversion, -((1 * 365.00) + 2.00)) )));*/
 								
 								
 file1 := file1_(did > 0);
@@ -60,7 +60,7 @@ Layout_Phonesplus_Base t_ins_match (phplus_in le, ins ri) := transform
 is_match := le.cellphone = ri.phone and le.did = ri.did and 
 						//only use cellphones and non-cellphones when the date_last_seen is within 3 years
 						(le.append_phone_type in Phonesplus_v2.Translation_Codes.cellphone_types or
-						(ri.dt_last_seen  > (unsigned)ut.date_math (version, -((3 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));
+						(ri.dt_last_seen  > (unsigned)ut.date_math (pversion, -((3 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));
 
 
 Ins_Verified_Above_rule := if(is_match and le.in_flag, true, false);
@@ -94,12 +94,12 @@ Layout_Phonesplus_Base t_file1_match (ins_match le, file1 ri) := transform
 /*is_match := le.cellphone = ri.phone and le.did = ri.did and
 						//only use cellphones and non-cellphones when the date_last_seen is within 1 year
 						(le.append_phone_type in Phonesplus_v2.Translation_Codes.cellphone_types or
-						(ri.date_last_seen  > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));*/
+						(ri.date_last_seen  > (unsigned) ut.date_math (pversion, -((1 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));*/
 						
 is_match := le.cellphone = ri.phone and le.did = ri.did and
 						//only use cellphones and non-cellphones when the date_last_seen is within 1 year
 						(le.append_phone_type in Phonesplus_v2.Translation_Codes.cellphone_types or
-						(ri.dt_last_seen  > (unsigned) ut.date_math (version, -((1 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));
+						(ri.dt_last_seen  > (unsigned) ut.date_math (pversion, -((1 * 365.00) + 2.00))  and le.append_phone_type not in Phonesplus_v2.Translation_Codes.cellphone_types));
 
 FileOne_Verified_Above_rule := if(is_match and le.in_flag, true, false);
 FileOne_Verified_Below_rule := if(is_match and ~le.in_flag, true, false);

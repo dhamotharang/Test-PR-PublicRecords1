@@ -1,4 +1,4 @@
-/* ----------------- Quick Simple Sanity Check of BIP IDs only(using Strata) ------------------- */
+﻿/* ----------------- Quick Simple Sanity Check of BIP IDs only(using Strata) ------------------- */
 // ['rcid:Dotid','Dotid:proxid:empid','proxid:powid:seleid','lgid3:seleid','empid:orgid','powid:orgid','seleid:orgid','orgid:ultid','ultid']
 import strata,bipv2_build,BIPV2_Files,bipv2,tools;
 export mac_BIP_ID_Check(
@@ -66,7 +66,7 @@ functionmacro
     //#IF('ultid'  not in %SET_IDS_DO_NOT_EXIST% and 'ultimate_proxid'  not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check(ds_slim,rcid,ultid ,false ,ultimate_proxid       ) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
     //#IF('ultimate_proxid'  not in %SET_IDS_DO_NOT_EXIST% and 'ultid'  not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check(ds_slim,rcid,ultimate_proxid ,false ,ultid       ) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
     
-    ;
+    : independent;  // add independent to prevent this from being evaluated twice in Strata.macf_CreateXMLStats
   // ds_Uniques      := Strata.macf_Uniques        (ds_slim );
   ID_Check_Strata	:= Strata.macf_CreateXMLStats (return_dataset ,pBuild,pBuild_Step  ,pversion	,pEmail_List	,pStatType ,pBuild_SubStep	,pIsTesting,pOverwrite);
   return ID_Check_Strata;

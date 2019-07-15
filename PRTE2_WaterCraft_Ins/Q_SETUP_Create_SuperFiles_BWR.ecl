@@ -3,6 +3,7 @@
 IMPORT promotesupers;
 // IMPORT promotesupers, PRTE2_WaterCraft_Ins;
 // Main_IN_Name		:= PRTE2_WaterCraft_Ins.Files.SuperFile.Internal_All_Slim_Name;
+// IE (for PROD before the code):
 Main_IN_Name		:= '~prte::internal::prte2::WaterCraft::AllDataSlim_ALPHA';
 
 OUTPUT(Main_IN_Name);

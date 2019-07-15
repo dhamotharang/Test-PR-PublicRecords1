@@ -1,4 +1,4 @@
-EXPORT _Constants(BOOLEAN	pUseOtherEnvironment = FALSE) := MODULE
+﻿EXPORT _Constants(BOOLEAN	pUseOtherEnvironment = FALSE) := MODULE
 
 	EXPORT autokey_buildskipset := ['P', 'Q', 'F'];
 	/*
@@ -31,12 +31,5 @@ EXPORT _Constants(BOOLEAN	pUseOtherEnvironment = FALSE) := MODULE
 
   EXPORT mi_cust_id := 1535116; // A hard-coded number that signifies a MI record
 	EXPORT il_cust_id := 1594356; // A hard-coded number that signifies an IL record
-
-  // For IL data, valid license numbers start with only these 3-digit combinations.
-  EXPORT valid_license_numbers := ['000', '001', '002', '003', '005', '007', '008', '016', '019',
-	                                    '021', '036', '037', '038', '041', '046', '051', '054',
-																			'055', '056', '058', '059', '064', '070', '071', '085',
-																			'093', '146', '147', '149', '150', '166', '178', '180',
-																			'203'];
 
 END;

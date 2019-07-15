@@ -10,7 +10,7 @@ FILENAME:ALC_LAWYERS
 //Uncomment Process if doing external adl
 //PROCESS:<ProcessName>
 //FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
-FIELDTYPE:invalid_addr_type:ALLOW(#BCHLPUXY)
+FIELDTYPE:invalid_addr_type:ALLOW(#BCDHLPUXY)
 FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
 FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
 FIELDTYPE:invalid_alphanumericpound:ALLOW(#ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)

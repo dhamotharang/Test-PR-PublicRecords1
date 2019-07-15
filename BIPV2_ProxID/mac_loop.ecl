@@ -1,4 +1,4 @@
-import BIPV2_ProxID;
+﻿import BIPV2_ProxID;
 export mac_loop(pversion,ih = 'BIPV2_ProxID.In_DOT_Base',offset = '0',mt = 'BIPV2_ProxID._Proc_Iterate_Experimental().lMT',finalloop = 'true',pIsTesting = 'false') := 
 functionmacro
 import BIPV2_ProxID;

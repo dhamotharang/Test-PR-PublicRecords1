@@ -8,17 +8,17 @@ IMPORT RealSource, AID, address, bipv2;
 		string  Suffix;
 		string  Address;
 		string  City;
-		string2  State;
-		string5  ZipCode;
-		string4  ZipPlus4;
+		string2 State;
+		string	ZipCode; //changed to string vs string5 to catch invalid ziplength
+		string  ZipPlus4;
 		string10 Phone;
-		string8  DOB;
+		string8 DOB;
 		string  Email;
 		string  IPAddr;
 		string10  Datestamp;
 		string  URL;
 	END;
-	
+
 	EXPORT Base	:= RECORD
 		unsigned6 rcid;
 		Raw;
@@ -57,8 +57,6 @@ IMPORT RealSource, AID, address, bipv2;
 		//Not currently utilized but BIP fields will be a future project
 	EXPORT Base_w_bip	:= RECORD
 		Base;
-		unsigned8 BDID;
-		unsigned8 BDID_Score;
 		bipv2.IDlayouts.l_xlink_ids;
 	END;
 

@@ -1,4 +1,4 @@
-IMPORT lib_fileservices, _control, lib_STRINGlib, _Validate, did_add, ut, business_header_ss, business_header,
+﻿IMPORT lib_fileservices, _control, lib_STRINGlib, _Validate, did_add, ut, business_header_ss, business_header,
 Health_Facility_Services, HealthCareFacility, Enclarity_Facility_Sanctions ;
 
 // #STORED('did_add_force','thor'); // remove or set to 'roxi' to put recs through roxi
@@ -118,7 +118,7 @@ EXPORT Proc_Get_Company_IDs 	:= MODULE
 			,//Input_SOURCE_RID = ''
 			,result
 			,FALSE
-			,30); 
+			,32);//30); 20180726 per Senthil - change to 32
 											         
 		final_file	:= PROJECT(result, transform(Enclarity_facility_sanctions.layouts.base.facility_sanctions,
 													self.lnfid := left.lnpid, self := left));

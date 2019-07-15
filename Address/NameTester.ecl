@@ -1,4 +1,4 @@
-import lib_stringlib, _Control, Data_Services, lib_DataLib, STD; //, LIB_Word; //IDL_Header,
+﻿import lib_stringlib, _Control, Data_Services, lib_DataLib, STD, nid; //, LIB_Word; //IDL_Header,
 /*************
 This module is used by the name repository to look up likely first and last names
 *************/
@@ -76,8 +76,8 @@ shared uncluster :=
 				_Control.ThisEnvironment.name = 'Prod_Thor' => '~thor_data400::',
         '~thor::');
 
-export filename_fnames		:= uncluster + 'base::nid::firstnames';
-export filename_lnames		:= uncluster + 'base::nid::lastnames';
+//export filename_fnames		:= uncluster + 'base::nid::firstnames';
+//export filename_lnames		:= uncluster + 'base::nid::lastnames';
 
 shared layout_name_count := record
 		string20 name;
@@ -90,29 +90,42 @@ shared layout_name_count := record
 		integer8 gender_cnt := 0;
 		integer8 placement_cnt := 0;
 end;
+shared rName := record
+		string20	name;
+end;
+
 shared filter := ['AA','NONAME','AND','OK','OR','II','III','JR','SR','NONEOFYOURBU',
 			'NFM','NMN','COMPANY','COMPUTER'];
-export file_all_lnames := DATASET(filename_lnames,layout_name_count, FLAT)
-							(LENGTH(TRIM(name)) > 1, name NOT IN filter, ~IsBusinessWord(name));	// : GLOBAL(FEW);
-export file_lnames := file_all_lnames(pct_lname > 0.25);
-shared notfirst := ['LUCKNER'];			// names that slipped through the cracks
+notfirst := ['LUCKNER'];			// names that slipped through the cracks
+
 //export file_fnames := DEDUP(SORT(DISTRIBUTE(
-export file_all_fnames := DATASET(filename_fnames,layout_name_count, FLAT)
+export file_all_fnames := //DATASET(filename_fnames,layout_name_count, FLAT)
+							Nid.FirstNameStats
+							(LENGTH(TRIM(name)) > 1, name NOT IN filter+notfirst, ~IsBusinessWord(name));	// : GLOBAL(FEW);
+export file_all_lnames := //DATASET(filename_lnames,layout_name_count, FLAT)
+							PROJECT(Nid.LastNameStats, recordof(file_all_fnames))
 							(LENGTH(TRIM(name)) > 1, name NOT IN filter, ~IsBusinessWord(name));	// : GLOBAL(FEW);
+							
 export file_fnames := DEDUP(
-						DATASET(filename_fnames, layout_name_count, FLAT)
-						(name NOT IN filter+notfirst,pct_fname > 0.15, ~IsBusinessWord(name))
+						//DATASET(filename_fnames, layout_name_count, FLAT)
+						file_all_fnames(pct_fname > 0.15)
+						//(name NOT IN filter+notfirst,pct_fname > 0.15, ~IsBusinessWord(name))
 							//+ FirstNames.xtranames
-							+ file_all_lnames(pct_fname > 0.25),
+							+file_all_lnames(pct_fname > 0.25),
+							//+ PROJECT(file_all_lnames(pct_fname > 0.25),recordof(zz_csalvo.FirstNameStats)),
 							//HASH(name)), name, LOCAL),
 							name, ALL);	// : GLOBAL(FEW);
 //export file_hifnames := DEDUP(SORT(DISTRIBUTE(			// high percentage first names
 export file_hifnames := DEDUP(				// high percentage first names
-						DATASET(filename_fnames, layout_name_count, FLAT)
-						(name NOT IN filter+notfirst,pct_fname > 0.5, ~IsBusinessWord(name)),
+						//DATASET(filename_fnames, layout_name_count, FLAT)
+						file_all_fnames(pct_fname > 0.5),
+						//(name NOT IN filter+notfirst,pct_fname > 0.5, ~IsBusinessWord(name)),
 							//HASH(name)), name, LOCAL),
 							name, ALL);	// : GLOBAL(FEW);
-					
+
+export file_lnames := file_all_lnames(pct_lname > 0.25);
+
+				
 //shared dsFirstNames := Firstnames + FirstNames2;
 /*export dsFirstNames := DATASET(
 				MAP(
@@ -189,20 +202,27 @@ shared CommonFirstNames := ['ANDREA','AL','AMANDA','ANDREA','ANN','CHERYL','CHRI
 			'MARIE','MARIA','MARIO','MARY','MARILYN','NORMA','PEGGY',
 			'SANDRA','SHEILA','SUE','SUSAN','TAMMY','WILLIAM'];
 
-n1 := DATASET(filename_fnames, layout_name_count, THOR)(LENGTH(TRIM(name)) > 1,name NOT IN filter,~IsBusinessWord(name));
-shared idlnames := DEDUP(SORT(DISTRIBUTE(n1+file_all_lnames,hash(name)),name,LOCAL),name,LOCAL);
+//n1 := PROJECT(file_all_fnames, rName);
+//n1 := file_all_fnames + file_all_lnames;
+			//DATASET(filename_fnames, layout_name_count, THOR)
+			//zz_csalvo.FirstNameStats(LENGTH(TRIM(name)) > 1,name NOT IN filter,~IsBusinessWord(name));
+//export idlnames := DEDUP(SORT(DISTRIBUTE(n1(pct_lname > 0.15), hash(name)),name,FEW,LOCAL),name,LOCAL);
+//n1 := DATASET(filename_fnames, layout_name_count, THOR)(LENGTH(TRIM(name)) > 1,name NOT IN filter,~IsBusinessWord(name));
+n1 := file_all_fnames;
+export idlnames := DEDUP(SORT(DISTRIBUTE(n1+file_all_lnames,hash(name)),name,LOCAL),name,LOCAL);
 
-shared census := DISTRIBUTE(Address.CensusSurnames(name NOT IN filter, ~IsBusinessWord(name)),hash(name));
+//export census := DISTRIBUTE(Address.CensusSurnames(name NOT IN filter, ~IsBusinessWord(name)),hash(name));
+export census := DISTRIBUTE(Nid.CensusSurnames(name NOT IN filter, ~IsBusinessWord(name)),hash(name));
 export newnames := JOIN(census, idlnames, LEFT.name=RIGHT.name, 
 			TRANSFORM(layout_name_count,
 				SELF.name := LEFT.name;
 				SELF := LEFT;),
-			LEFT ONLY, LOCAL);
+			LEFT ONLY, FEW, LOCAL);
 export common := JOIN(idlnames, census, LEFT.name=RIGHT.name, 
 			TRANSFORM(layout_name_count,
 				SELF.name := LEFT.name;
 				SELF := LEFT;),
-			INNER, LOCAL)(pct_lname > 0.15);	// : GLOBAL(FEW);
+			INNER, FEW, LOCAL)(pct_lname > 0.15);	// : GLOBAL(FEW);
 			
 
 
@@ -384,7 +404,7 @@ boolean NoVowels(string s) :=
 boolean EmbeddedWords(string s) := 
 	REGEXFIND('[A-Z]+(AAA|AUTO|CENTER|COMP|CRAFT|CRYO|DESIGN|EASY|ECONO|EURO|FIRE|FLEX|HOUSE|INFO|INTER|MASTER|MECH|METRO|MULTI|OMNI|PHARM|PLEX|POLY|POWER|PSYCH|SCAPE|SCOPY|SERVICE|SHOP|TECH|TELE|TIONAL|TOWN|TRANS|TRONIC|ULTRA|WARE|WEAR|WORK)[A-Z]+',s);
 boolean EndPhrase(string s) := 
-	REGEXFIND('[A-Z]{3,}(ANCE|EX|INC|LLC|LLP|ABLE|LAND|MENT|SHIP|CARE|SION|TION|TIONAL|TIONS|TRONIC|TRONICS|CORP|COMPANY|INCORPO|ISTS|ISTIC|FOUNDATION|LAKE|UNITED|SERVICES|SVCS|SCIENCE|SMITHING|MART|MARTS|SIDE|TIC|TICS|VILLE|WORLD|WORK|WORKS)\\b',s);
+	REGEXFIND('[A-Z]{3,}(ANCE|EX|INC|LLC|LLP|ABLE|LAND|MENT|SHIP|CARE|SION|TION|TIONAL|TIONS|TRONIC|TRONICS|CORP|COMPANY|INCORPO|ISTS|ISTIC|FOUNDATION|LAKE|UNITED|SERVICE|SERVICES|SVCS|SCIENCE|SMITHING|MART|MARTS|SIDE|TIC|TICS|VILLE|WORLD|WORK|WORKS)\\b',s);
 boolean PrePhrase(string s) := 
 	REGEXFIND(
 	'\\b(ACCU|AERO|AMERI|ADVANCED|ARCH|AUDIO|AUTO|BANC|BANK|CHEM|COMPU|DATA|ELECTRO|FIRST|HEALTH|INFO|INFRA|INSUR|NEW|NUTRI|OMNI)[A-Z]{2,}'
@@ -402,33 +422,4 @@ string RemoveInvisible(string s) := STD.Str.FilterOut(s,'\000\032');
 export string RemoveNonPrintingChars(string s) := REGEXREPLACE('([^ -~]+)', 
 												RemoveDiacritics(RemoveInvisible(s)),' ');
 
-/*
-export integer InvalidNameFormatDebug(string name) := MAP(
-	REGEXFIND('^[A-Z]+ +(JR|SR|NMN|NMI|II|III|IV)$', name) => 1,	// NAME JR
-	REGEXFIND('^[A-Z] +[A-Z] +(JR|SR|I|II|III|IV|V)$', name) => 2,	// A B JR
-	REGEXFIND('^(JR|SR|MC|ST|NMN|NMI|ATTN) +[A-Z]+$', name)	=> 3,	// JR NAME
-	REGEXFIND('\\b(JR|SR|II|III|IV) +(JR|SR|II|III|IV)$', name)	=> 4,	// JR JR
-	REGEXFIND('\\b[B-DF-HJ-NP-TVWXZ]+Q\\b', name) => 5,
-	REGEXFIND(rgxLastReversed, name) => 6,
-	REGEXFIND('^[A-Z]+ +[A-Z]* *[A-Z]+[0-9][A-Z]+$',name) => 7,	// embedded numeral
-	REGEXFIND('^[A-Z] +[A-Z]$', name) => 8,	// A B
-	REGEXFIND('^[A-Z] +[A-Z] +[A-Z]$', name) => 9,	// A B C
-	REGEXFIND('\\b([B-HJ-Z])\\1{2,}', name) => 10,	// XXX (except AAA and III)
-	REGEXFIND('\\b([AI])\\1{4,}', name) => 11,	// XXX (except AAA and III)
-	REGEXFIND('^([A-Z]+) \\1$', name) => 12,	// DURAN DURAN
-	REGEXFIND('^[A-Z]-[A-Z]\\b', name) => 13,	// ^A-B
-	REGEXFIND('\\b[A-Z]-[A-Z]$', name) => 14,	// A-B$
-	NameHyphenInitial(name) => 15,
-	REGEXFIND('\\b(AND|OR)$', name)	=> 15,	// ends with "AND"
-	REGEXFIND('^(AND|OR)\\b', name)	=> 16,	// begins with "OR"
-	REGEXFIND('\\b(ERROR|ISSUED)\\b', name)	=> 17,	// 
-	REGEXFIND('^COOKIE +[A-Z]* +MONSTER$', name) => 18, 
-	REGEXFIND('^I LIKE +[A-Z]*\\b', name) => 19,	// 
-	REGEXFIND('\\b(LT|FT|DL|JT|HW)\\b',name) => 20,  // unprocessed abbreviations
-	REGEXFIND('^[A-Z][A-Z] [A-Z][A-Z]$',name) => 21,
-	REGEXFIND('^[A-Z]+ [A-Z] (ST|MC)$',name) => 22,
-	REGEXFIND('\\b[0-9]+ [A-Z]+ (ST|STREET|RD|DR|DRIVE)\\b',name) => 23,
-	InvalidConsonantString(name) => 24,
-	0);
-*/
 END;

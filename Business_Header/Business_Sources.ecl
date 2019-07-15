@@ -1,4 +1,4 @@
-IMPORT  
+﻿IMPORT  
 	 acf
 	,ak_busreg
 	,amidir
@@ -100,7 +100,7 @@ module
 		+ Liquor_Licenses.As_Business_Header.PA
 		+ Liquor_Licenses.As_Business_Header.TX
 		+ ln_propertyv2.LN_Propertyv2_as_Business_Header()
-		+ lobbyists.Cleaned_Lobbyists_As_Business_Header
+		//+ lobbyists.Cleaned_Lobbyists_As_Business_Header		//Not being updated, and the base file is missing. So, removing the code since the data already exists in the Business header file.
 		+ martindale_hubbell.As_Business_Header().Organizations
 		+ OSHAIR.OSHAIR_Inspection_As_Business_Header
 		+ Prof_License.Prof_License_As_Business_Header()
@@ -161,7 +161,7 @@ module
 		+ Liquor_Licenses.As_Business_Contact.PA
 		+ Liquor_Licenses.As_Business_Contact.TX
 		+ ln_propertyv2.LN_Propertyv2_as_Business_Contact()
-		+ lobbyists.Cleaned_Lobbyists_As_Business_Contact
+		//+ lobbyists.Cleaned_Lobbyists_As_Business_Contact    //Not being updated, and the base file is missing. So, removing the code since the data already exists in the Business header file.
 		+ Martindale_Hubbell.As_Business_Contact().Individuals
 		+ Prof_License.Prof_License_As_Business_Contact()
 		+ RedBooks.As_Business_Contact()

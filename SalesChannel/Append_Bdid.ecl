@@ -1,4 +1,4 @@
-//Assigns DIDs, BDIDs, and LinkIDs on the passed records
+﻿//Assigns DIDs, BDIDs, and LinkIDs on the passed records
 import Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,watchdog,Business_HeaderV2,mdr;
 //////////////////////////////////////////////////////////////////////////////////////
@@ -7,7 +7,7 @@ Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS,watchdog,Busin
 //////////////////////////////////////////////////////////////////////////////////////
 export Append_Bdid(
 
-	 dataset(Layouts.Base)	pDataset
+	 dataset(Layouts.Base_new)	pDataset
 	,string									pPersistname	= persistnames().appendBdid
 
 ) :=
@@ -16,7 +16,7 @@ function
 	//////////////////////////////////////////////////////////////////////////////////////
 	// -- Slim record for Bdiding
 	//////////////////////////////////////////////////////////////////////////////////////
-	Layouts.Temporary.BdidSlim tSlimForBdiding(Layouts.Base l) :=
+	Layouts.Temporary.BdidSlim tSlimForBdiding(Layouts.Base_new l) :=
 	transform
 
 		self.unique_id		:= l.rid																;
@@ -108,7 +108,7 @@ function
 	pDataset_dist 		:= distribute	(pDataset					,rid										);
 
 		 
-	Layouts.Base tAssignBdids(Layouts.Base l, Layouts.Temporary.BdidSlim r) :=
+	Layouts.Base_new tAssignBdids(Layouts.Base_new l, Layouts.Temporary.BdidSlim r) :=
 	transform
 
 		self.bdid				:= if(r.bdid 				<> 0, r.bdid				, 0);

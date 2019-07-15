@@ -1,6 +1,7 @@
-// spray ARS0835 Professional Licenses Files for MARI	   
+﻿// spray ARS0835 Professional Licenses Files for MARI	   
 IMPORT ut, _control, Prof_License_Mari, Lib_FileServices, lib_stringlib,Lib_date;  EXPORT spray_ARS0835(STRING filedate) := MODULE
 
+ #workunit('name','Yogurt:Spray ARS0835');
 	SHARED code 									:= 'ARS0835';
 	SHARED destination 						:= Common_Prof_Lic_Mari.SourcesFolder + code + '::';
   SHARED superfile_active 			:= destination + 'sprayed::' + 'active';

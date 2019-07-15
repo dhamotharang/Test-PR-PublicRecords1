@@ -1,11 +1,12 @@
+﻿
 EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_sbfe_id = '',Input_nodes_below_st = '',Input_Lgid3IfHrchy = '',Input_OriginalSeleId = '',Input_OriginalOrgId = '',Input_company_name = '',Input_cnp_number = '',Input_active_duns_number = '',Input_duns_number = '',Input_duns_number_concept = '',Input_company_fein = '',Input_company_inc_state = '',Input_company_charter_number = '',Input_cnp_btype = '',Input_company_name_type_derived = '',Input_hist_duns_number = '',Input_active_domestic_corp_key = '',Input_hist_domestic_corp_key = '',Input_foreign_corp_key = '',Input_unk_corp_key = '',Input_cnp_name = '',Input_cnp_hasNumber = '',Input_cnp_lowv = '',Input_cnp_translated = '',Input_cnp_classid = '',Input_prim_range = '',Input_prim_name = '',Input_sec_range = '',Input_v_city_name = '',Input_st = '',Input_zip = '',Input_has_lgid = '',Input_is_sele_level = '',Input_is_org_level = '',Input_is_ult_level = '',Input_parent_proxid = '',Input_sele_proxid = '',Input_org_proxid = '',Input_ultimate_proxid = '',Input_levels_from_top = '',Input_nodes_total = '',Input_dt_first_seen = '',Input_dt_last_seen = '',OutFile) := MACRO
-  IMPORT SALT30,BIPV2_LGID3;
+  IMPORT SALT311,BIPV2_LGID3;
   #uniquename(of)
   %of% := RECORD
     #IF (#TEXT(source)<>'')
-    SALT30.StrType source;
+    SALT311.StrType source;
     #END
-    SALT30.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM

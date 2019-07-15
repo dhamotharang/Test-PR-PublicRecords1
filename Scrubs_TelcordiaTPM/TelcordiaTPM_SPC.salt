@@ -1,0 +1,27 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_TelcordiaTPM
+FILENAME:TelcordiaTPM
+
+FIELDTYPE:Invalid_Num:ALLOW(0123456789)
+FIELDTYPE:Invalid_TB:ALLOW(0123456789A)
+FIELDTYPE:Invalid_CompanyType:ENUM(0|7|5|1|8|4|6|9|3)
+FIELDTYPE:Invalid_dialind:ENUM(1|0)
+FIELDTYPE:Invalid_PointID:ENUM(0|2|4|6|3|C)
+
+
+FIELD:npa:LIKE(Invalid_Num):TYPE(STRING3):0,0
+FIELD:nxx:LIKE(Invalid_Num):TYPE(STRING3):0,0
+FIELD:tb:LIKE(Invalid_TB):TYPE(STRING1):0,0
+FIELD:city:TYPE(STRING50):0,0
+FIELD:st:TYPE(STRING2):0,0
+FIELD:ocn:TYPE(STRING30):0,0
+FIELD:company_type:LIKE(Invalid_CompanyType):TYPE(STRING1):0,0
+FIELD:nxx_type:LIKE(Invalid_Num):TYPE(STRING2):0,0
+FIELD:dial_ind:LIKE(Invalid_dialind):TYPE(STRING1):0,0
+FIELD:point_id:LIKE(Invalid_PointID):TYPE(STRING1):0,0
+FIELD:lf:TYPE(STRING1):0,0
+FIELD:zip:LIKE(Invalid_Num):TYPE(STRING5):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

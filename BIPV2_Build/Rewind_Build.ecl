@@ -1,4 +1,4 @@
-import tools,wk_ut,std,ut,WsDFU;
+﻿import tools,wk_ut,std,ut,WsDFU;
 
 EXPORT Rewind_Build(
 
@@ -71,7 +71,7 @@ function
     // ,iff(pDeleteFiles  = true ,nothor(apply(files2delete, tools.Delete_File(/*'~' + */name,rid,total_cnt,esp))))//no worky
     // ,iff(pDeleteFiles  = true ,nothor(global(apply(files2delete, tools.Delete_File(/*'~' + */name,rid,total_cnt,esp)))))//no worky
     ,iff(pDeleteFiles  = true ,       apply(global(files2delete(isLocal = false),few), sequential(
-       output(WsDFU.Delete_File(name,true,,esp),named('Remote_Files_Deleted'),extend)
+       output(WsDFU.DeleteLogicalFile(name,true,,esp),named('Remote_Files_Deleted'),extend)
       ,output(rid,named('Number_Files_Deleted'),overwrite)
       ,STD.System.Log.addWorkunitInformation ('Number of files deleted so far: ' + (string)rid + ' out of a total of ' + total_cnt + ' files.')
     )))

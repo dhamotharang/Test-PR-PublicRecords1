@@ -1,4 +1,4 @@
-import business_header_ss, business_risk, EDA_VIA_XML, Risk_Indicators, govdata, Marketing_Best,_control,Business_HeaderV2, versioncontrol,Business_Header_BDL2,paw;
+﻿import business_header_ss, business_risk, EDA_VIA_XML, Risk_Indicators, govdata, Marketing_Best,_control,Business_HeaderV2, versioncontrol,Business_Header_BDL2,paw;
 
 // Check Business_Header.Filters
 
@@ -62,6 +62,7 @@ module
 		,proc_Build_Bases
 		,proc_Build_Other
 		,if(pShouldRollbackSources,proc_cleanup)
+		,notify('BUSINESS HEADER KEY BUILD COMPLETE','*')
 	) : success(Send_Email(pversion).BuildSuccess)
 		, failure(Send_Email(pversion).BuildFailure)
 		;

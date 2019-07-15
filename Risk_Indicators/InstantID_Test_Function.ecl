@@ -1,12 +1,11 @@
-import Seed_Files, Models;
+﻿import Seed_Files, Models;
 
 export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,string30 lname_val,string9 ssn_value,
 				string5 zip_value,string10 phone_value,string30 Account_Value, unsigned1 NumReturnCodes) := 
 				FUNCTION
 	
 	
-	risk_indicators.Layout_InstandID_NuGen Make_InstantID_rec(Seed_files.Key_InstantID Le)
-		:=Transform
+	risk_indicators.Layout_InstandID_NuGen Make_InstantID_rec(Seed_files.Key_InstantID Le) := Transform
 		
 		_ri := dataset([{le.outhri_1,le.outhri_desc_1},{le.outhri_2,le.outhri_desc_2},{le.outhri_3,le.outhri_desc_3},
 			{le.outhri_4,le.outhri_desc_4},{le.outhri_5,le.outhri_desc_5},{le.outhri_6,le.outhri_desc_6},{le.outhri_7,le.outhri_desc_7},
@@ -198,7 +197,8 @@ export InstantID_Test_Function(string20 TestDataTableName,string30 fname_val,str
 		self.addressCMRA := (BOOLEAN)le.addressCMRA;	
 	
 		self.SSNFoundForLexID := (BOOLEAN)le.SSNFoundForLexID;
-		self.cviCustomScore := le.cviCustomScore;		
+		self.cviCustomScore := le.cviCustomScore;
+    self.AddressSecondaryRangeMismatch := le.AddressSecondaryRangeMismatch;
 		
 		self := le;
 		self := [];  // blank out sections which have now been broken out into their own testseed files, like red flags and models for example

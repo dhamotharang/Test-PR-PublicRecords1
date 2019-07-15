@@ -1,7 +1,9 @@
-//-----------------------------------------------------------------
+﻿//-----------------------------------------------------------------
 //NORMALIZE Addresses
 //-----------------------------------------------------------------
-norm_names := ExperianCred.Normalize_Names;
+EXPORT Normalize_Address(string ver) := module
+
+norm_names := ExperianCred.Normalize_Names(ver).all;
 
 Layouts.Layout_Norm_Address t_norm_addr (Layouts.Layout_Norm_Name le, INTEGER C) := TRANSFORM
 	SELF.Orig_Prim_Range	:=choose(C, le.Street_Address, le.Street_Address_Previous1, le.Street_Address_Previous2, le.Street_Address_Previous3, le.Street_Address_Previous4, le.Street_Address_Previous5, le.Street_Address_Previous6, le.Street_Address_Previous7);
@@ -34,4 +36,6 @@ norm_addr_filtered := norm_address(trim(Orig_Prim_Range + Orig_Predir + Orig_Pri
 									AddressSeq = 1))
 								   );
 
-EXPORT Normalize_Address := norm_addr_filtered:persist('~thor_data400::persist::experiancred::Normalize_Address');
+EXPORT ALL := norm_addr_filtered:persist('~thor_data400::persist::experiancred::Normalize_Address');
+
+END;

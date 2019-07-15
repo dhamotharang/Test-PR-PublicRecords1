@@ -1,4 +1,4 @@
-IMPORT SALT32,Scrubs,Data_Services,zz_gmarcan;
+IMPORT SALT32,Scrubs,Data_Services;
 IMPORT Scrubs_Equifax_Monthly as S;
 F := S.In_File: independent;		  // input file
 o := 'Scrubs_Equifax_Monthly';		// orbit profile name

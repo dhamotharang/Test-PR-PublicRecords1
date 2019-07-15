@@ -1,4 +1,4 @@
-IMPORT versioncontrol, _control, ut, Orbit3;
+﻿IMPORT versioncontrol, _control, ut, Orbit3;
 
 EXPORT Build_All(STRING	pversion) := MODULE
 		EXPORT spray_files	:= fSpray(pversion);
@@ -32,13 +32,22 @@ EXPORT Build_All(STRING	pversion) := MODULE
 																						,NewBase
 																						,Build_Base_File );	
 																						
-	Copy2Alpha := sequential(output('Copying WorkerComp keybuild_full file to 10.194.12.2'),
-							fileservices.Copy(filenames(pversion).keybuild_full.logical,'thor400_198_a',filenames(pversion).keybuild_full.logical,_control.IPAddress.prod_thor_dali,
-												,'http://10.194.12.2:8010/FileSpray',,true,true,,true));
-												
+    Copy2Alpha := sequential(output('Copying WorkerComp keybuild_full file to 10.194.112.105')
+		                                ,fileservices.Copy(filenames(pversion).keybuild_full.logical
+																		,'thor400_112'
+																		,filenames(pversion).keybuild_full.logical
+																		,_control.IPAddress.prod_thor_dali
+																		,
+																		,'http://alpha_prod_thor_esp.risk.regn.net:8010/FileSpray'
+																		,
+																		,true
+																		,true
+																		,
+																		,true));
+										
 		create_orbit := Orbit3.proc_Orbit3_CreateBuild ( 'Workers Compensation',pversion);
 				
-		full_build 	:= SEQUENTIAL( 
+		full_build 	:= SEQUENTIAL(
 				 				   nothor(APPLY(filenames().Base.dAll_filenames, APPLY(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
 					    		,nothor(APPLY(filenames().Input.dAll_superfilenames, versioncontrol.mUtilities.createsuper(name)))
 				    	    ,spray_files

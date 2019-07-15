@@ -1,4 +1,4 @@
-// adapted from InsuranceHeader_PreProcess.mod_clean_suffix in Alpha
+﻿// adapted from InsuranceHeader_PreProcess.mod_clean_suffix in Alpha
 export string5 fn_normSuffix(string5 sname) := function
 	
 	snameSet		:= ['SR', 'JR', '1', '2', '3', '4', '5', '6', '7', '8'];

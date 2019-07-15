@@ -1,9 +1,10 @@
-
+﻿
 //************************************************************************************************************* */	
 //  The purpose of this development is take MO Mortgage License raw file and convert it to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, STD;
+#workunit('name','Yogurt: map_MOS0634_conversion');
 
 EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 
@@ -34,7 +35,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 	O_ValidMOFile	:= OUTPUT(ValidMOFile);																
 
 	maribase_plus_dbas := RECORD,MAXLENGTH(6800)
-		Prof_License_Mari.layouts.base;
+		Prof_License_Mari.layout_base_in;
 		STRING60 dba1;
 		STRING60 dba2;
 		STRING60 dba3;
@@ -43,6 +44,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		STRING60 dba6;
 		STRING60 dba7;
 		STRING60 dba8;
+		STRING60 dba9;
 	END;
 
 	//MO Real Estate/Appraisers layout to Common
@@ -211,7 +213,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_ORG					:= IF(SELF.TYPE_CD = 'GR',
 		                            StringLib.StringCleanSpaces(StripOrgName),
 																TRIM(SELF.NAME_LAST) + ' ' + TRIM(SELF.NAME_FIRST));
-		SELF.NAME_ORG_SUFX 		:= IF(SELF.TYPE_CD = 'GR',Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, '')),'');
+		SELF.NAME_ORG_SUFX 		:= IF(SELF.TYPE_CD = 'GR',ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, '')),'');
 
 		//Mari name fields
 		SELF.NAME_ORG_ORIG		:= IF(SELF.NAME_ORG<>'',TrimNameOrg,'');
@@ -320,10 +322,12 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		prepDBA1							:= IF(REGEXFIND('[ ]*/[ ]*/[ ]*',prepDBA),REGEXREPLACE('[ ]*/[ ]*/[ ]*',prepDBA,' / '),prepDBA);
 		ClnSpaceDBA						:= StringLib.StringCleanSpaces(prepDBA1);
 		
-	//Parse DBA fields 
-    SELF.DBA1     := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',TrimDBA,'');	
+	//Parse DBA fields  
+    SELF.DBA1     := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',REGEXREPLACE('DBA ',REGEXFIND('(.*) DBA (.*)',TrimDBA,1),''),'');	
+ 	  
+ 	  SELF.DBA2     := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',REGEXFIND('(.*) DBA (.*)',TrimDBA,2),'');	
 	
-		SELF.DBA2			:=  MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,',',1) > 0 => REGEXFIND('^([\\/]?)([A-Za-z ][^\\/]+)',ClnSpaceDBA,2),
+		SELF.DBA3			:=  MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,',',1) > 0 => REGEXFIND('^([\\/]?)([A-Za-z ][^\\/]+)',ClnSpaceDBA,2),
 												  StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 												  REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,1),
 												  StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
@@ -331,7 +335,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 												  StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 => REGEXFIND('^([^\\/]+)[\\/][ ]([^\\/]+)',ClnSpaceDBA,1),
 												  StringLib.stringfind(ClnSpaceDBA,';',1) > 0 => REGEXFIND('^([A-Za-z ][^\\;]+)[\\;][ ]([A-Za-z ][^\\;]+)[ ]',ClnSpaceDBA,1),ClnSpaceDBA);
 				
-		SELF.dba3			:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
+		SELF.dba4			:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 												 REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,2),
 											   StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
 											   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,2),
@@ -339,7 +343,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 											   StringLib.stringfind(ClnSpaceDBA,';',1) > 0 => REGEXFIND('^([A-Za-z ][^\\;]+)[\\;][ ]([A-Za-z ][^\\;]+)[ ]',ClnSpaceDBA,2),
 																								 ' ');
 							
-		SELF.dba4 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
+		SELF.dba5 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 											   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,3),
 											   StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
 										 	   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,3),
@@ -347,7 +351,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 											   REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)',ClnSpaceDBA,3),
 																									'');
 				
-		SELF.dba5 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
+		SELF.dba6 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 												 REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,4),
 											   StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
 											   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,4),
@@ -355,12 +359,12 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 											   REGEXFIND('([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,4), 
 																									 '');
 				
-		SELF.dba6 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
+		SELF.dba7 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
 											    REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,5),'');
 
-		SELF.dba7 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',5) > 0,
+		SELF.dba8 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',5) > 0,
 													REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,6),'');
-		SELF.dba8 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
+		SELF.dba9 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
 													REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,7),'');
     SELF.NAME_DBA_ORIG := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',TrimDBA,'');		
 																
@@ -393,7 +397,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 														+TrimLicType
 														+TRIM(src_cd,LEFT,RIGHT)
 														+TrimNameOrg
-														+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StdNAME_DBA)
+														+ut.CleanSpacesAndUpper(StdNAME_DBA)
 														+TrimAddress1
 														+TrimCity
 														+TrimState
@@ -433,20 +437,20 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 
 	maribase_dbas	NormIT(ds_map L, INTEGER C) := TRANSFORM
 		SELF := L;
-		SELF.TMP_DBA := CHOOSE(C, L.DBA1, L.DBA2, L.DBA3, L.DBA4, L.DBA5, L.DBA6, L.DBA7, L.DBA8);
+		SELF.TMP_DBA := CHOOSE(C, L.DBA1, L.DBA2, L.DBA3, L.DBA4, L.DBA5, L.DBA6, L.DBA7, L.DBA8, L.DBA9);
 	END;
 
 	NormDBAs 	:= DEDUP(NORMALIZE(ds_map,8,NormIT(LEFT,COUNTER)),ALL,RECORD);
 
 	NoDBARecs	:= NormDBAs(TMP_DBA = '' AND DBA1 = '' 
-					AND DBA2 = '' AND DBA3 = '' AND DBA4 = '' AND DBA5 = '' AND DBA6 = '' AND DBA7 = '' AND DBA8 ='');
+					AND DBA2 = '' AND DBA3 = '' AND DBA4 = '' AND DBA5 = '' AND DBA6 = '' AND DBA7 = '' AND DBA8 ='' AND DBA9 ='');
 	DBARecs 	:= NormDBAs(TMP_DBA != '');
 
 	FilteredRecs  := DBARecs + NoDBARecs;
 
 	// Transform expanded dataset to MARIBASE layout
 	// Apply DBA Business Rules
-	Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
 		//Fix some irregular syntax
 		tmpDBA							:= TRIM(REGEXREPLACE('AND D B A',L.TMP_DBA,''),LEFT,RIGHT);
 		tmpDBA1							:= REGEXREPLACE(' AND$',tmpDBA,'');
@@ -458,7 +462,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_DBA);
 		SELF.NAME_DBA				:= IF(TRIM(ClnDBA) != TRIM(L.NAME_ORG), ClnDBA,'');
 		SELF.DBA_FLAG       := IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',1,0); // 1: true  0: false
-		SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
+		SELF.NAME_DBA_SUFX	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')),''); 
 		SELF.NAME_MARI_DBA	:= IF(TRIM(SELF.name_dba,LEFT,RIGHT) != '',TRIM(StdNAME_DBA,LEFT,RIGHT),'');  
 		SELF := L;
 	END;
@@ -469,7 +473,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 	//Perform lookup to assign pcmcslpk of child to cmcslpk of parent
 	company_only_lookup := ds_map_base(affil_type_cd='CO');
 
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_base L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := R.cmc_slpk;
 		SELF := L;
 	END;

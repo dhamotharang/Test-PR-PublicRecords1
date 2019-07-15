@@ -1,4 +1,4 @@
-import PRTE_CSV, RoxieKeyBuild, UT;
+﻿import PRTE_CSV, RoxieKeyBuild, UT;
 
 export FAA_Promote_Keys	(string pVersion
 												,boolean pUseOtherEnvironment = false
@@ -104,4 +104,5 @@ export FAA_Promote_Keys	(string pVersion
 																															,promote_fcra_keys_to_qa
 																															)
 																										);
-end;
+end: DEPRECATED('Use PRTE2_FAA.Proc_Build_keys instead.');
+;

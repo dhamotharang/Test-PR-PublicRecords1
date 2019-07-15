@@ -1,4 +1,4 @@
-IMPORT corp2, ut;
+﻿IMPORT corp2, ut;
 
 EXPORT Functions := MODULE
   
@@ -39,8 +39,11 @@ EXPORT Functions := MODULE
 			'11' => '11',
 			'12' => '12',
 			'13' => '9' ,
+			'14' => '14',
+			'15' => '15',
 			'16' => '16',
 			'17' => 'B' ,
+			'18' => '18',
 			'19' => '19',
 			'20' => '20',
 			''   => 'B' ,
@@ -61,8 +64,11 @@ EXPORT Functions := MODULE
 			'11' => 'PREVIOUS APPLICANT',		// 11 - PREVIOUS APPLICANT
 			'12' => corp2.t2u(desc),				// 12 - PREVIOUS PRINCIPAL PLACE OF BUSINESS
 			'13' => 'PREVIOUS PRINICIPAL',	// 9  - PREVIOUS PRINICIPAL
+			'14' => 'PREVIOUS REGISTERED MAILING',
+			'15' => 'PREVIOUS REGISTERED OFFICE',
 			'16' => corp2.t2u(desc),				// 16 - PREVIOUS UCC ADDRESS
 			'17' => 'BUSINESS',							// B  - BUSINESS
+			'18' => corp2.t2u(desc),        // 18 - REGISTERED OFFICE
 			'19' => corp2.t2u(desc),				// 19 - UCC ADDRESS
 			'20' => corp2.t2u(desc),			  // 20 - WITHDRAWAL ADDRESS
 			''   => 'BUSINESS',							// B  - BUSINESS
@@ -216,11 +222,15 @@ EXPORT Functions := MODULE
 			'CT'=>'CONNECTICUT',
 			'DE'=>'DELAWARE',
 			'DC'=>'DISTRICT OF COLUMBIA',
+			'ET'=>'ETHIOPIA',
 			'FM'=>'FEDERATED STATES OF MICRONESIA',
 			'FL'=>'FLORIDA',
 			'GA'=>'GEORGIA',
+			'GR'=>'GREAT BRITAIN', //'GERMANY' 'GREECE',
 			'GU'=>'GUAM',
 			'HI'=>'HAWAII',
+			'HO'=>'HOLLAND',
+			'IC'=>'ICELAND',  
 			'ID'=>'IDAHO',
 			'IL'=>'ILLINOIS',
 			'IN'=>'INDIANA',
@@ -228,6 +238,7 @@ EXPORT Functions := MODULE
 			'KS'=>'KANSAS',
 			'KY'=>'KENTUCKY',
 			'LA'=>'LOUISIANA',
+			'LU'=>'LUXEMBOURG',
 			'ME'=>'MAINE',
 			'MH'=>'MARSHALL ISLANDS',
 			'MD'=>'MARYLAND',

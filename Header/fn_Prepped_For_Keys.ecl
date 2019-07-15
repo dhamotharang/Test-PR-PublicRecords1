@@ -1,9 +1,9 @@
-import address, doxie, doxie_build, ut, watchdog;
+﻿import address, doxie, doxie_build, ut, watchdog;
 
 export fn_Prepped_For_Keys (boolean isFCRA=false) := function
 //h := dataset('~thor_data400::Base::HeaderKey_Building',header.Layout_Header,flat);
 //  Bug 12065, use blocked data filter on header instead of raw data
-h := if(isFCRA,doxie_build.file_fcra_header_building,doxie_build.file_header_building);
+h := if(isFCRA,doxie_build.file_fcra_header_built,doxie_build.file_header_building);
 
 
 t1 := table(h,fn_layout_prep_for_keys(isFCRA));

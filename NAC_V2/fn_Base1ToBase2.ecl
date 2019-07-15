@@ -1,4 +1,4 @@
-import STD, address;
+﻿import STD, address;
 
 reclean(DATASET(Nac_v2.Layouts.baseHistorical) filein) := FUNCTION
 	
@@ -103,9 +103,16 @@ END;
 EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 		b1_flat := nac_v2.fn_flatten(b);			// first, roll up all the records to make a date range;
 		
-		b1_sameaddr := b1_flat((Phys_addr1=Mail_addr1 AND Phys_addr2=Mail_addr2) OR Phys_addr1='' OR Mail_addr1='');	// physical = mailing
+		b1_sameaddr := PROJECT(b1_flat((Phys_addr1=Mail_addr1 AND Phys_addr2=Mail_addr2) OR Phys_addr1='' OR Mail_addr1=''),	// physical = mailing
+											TRANSFORM({b1_flat},
+												self.AddressType := MAP(
+														left.Phys_addr1 = left.Mail_addr1 AND left.Phys_addr2 = left.Mail_addr2 => 'B',
+														left.Phys_addr1 = '' => 'M',
+														'P');
+												self := left;));
 		b1_diffaddr := NORMALIZE(b1_flat(Phys_addr1<>Mail_addr1 OR Phys_addr2<>Mail_addr2,Phys_addr1<>'', Mail_addr1<>''), 2, 
 											TRANSFORM({b1_flat},
+												self.AddressType := CHOOSE(COUNTER, 'P', 'M');
 												self.Prepped_addr1 := CHOOSE(COUNTER, left.Phys_addr1, left.Mail_addr1);
 												self.Prepped_addr2 := CHOOSE(COUNTER, left.Phys_addr2, left.Mail_addr2);
 												self := LEFT;));
@@ -119,6 +126,7 @@ EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 						self.ProgramState := left.Case_State_Abbreviation;
 						self.ProgramCode := IF(left.Case_Benefit_Type='R','S',left.Case_Benefit_Type);
 						self.GroupId := left.Case_State_Abbreviation + '01';	// default group for v1
+						self.OrigGroupId := left.Case_State_Abbreviation + '01';	// default group for v1
 						self.CaseID := left.Case_Identifier;
 						self.ClientID := left.Client_Identifier;
 						self.MonthlyAllotment := '0';	// whole dollar
@@ -201,6 +209,8 @@ EXPORT fn_Base1ToBase2(DATASET(NAC_V2.Layouts.base) b) := FUNCTION
 						SELF.fips_state 			:= left.fips_county;
 						SELF.fips_county 			:= left.county;
 
+						self.created := Std.Date.Today();
+						self.updated := Std.Date.Today();
 						self := left;
 						//self := [];
 				));

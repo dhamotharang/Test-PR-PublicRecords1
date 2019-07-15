@@ -1,4 +1,4 @@
-/* Oct.2016 - IPAddress length expanded to 45 characters in queries, related fields have comment: //IP-update related */
+﻿/* Oct.2016 - IPAddress length expanded to 45 characters in queries, related fields have comment: //IP-update related */
 export Layout_InstantID := record
 string20 dataset_name;
 string30 acctNo;
@@ -360,5 +360,6 @@ string12 outverDPBC;
 string12 outChron_DPBC_1;
 string12 outChron_DPBC_2;
 string12 outChron_DPBC_3;
+string1 AddressSecondaryRangeMismatch;
 
 end;

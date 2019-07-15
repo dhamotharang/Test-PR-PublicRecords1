@@ -1,4 +1,4 @@
-export FAA_Key_Layouts := module
+﻿export FAA_Key_Layouts := module
 
 	export rthor_data400__key__faa__autokey__address	:=
 	record
@@ -1060,4 +1060,4 @@ RECORD
   integer1 fp;
  end;
 
-end;
+end: DEPRECATED('Use PRTE2_FAA.Layouts instead.');

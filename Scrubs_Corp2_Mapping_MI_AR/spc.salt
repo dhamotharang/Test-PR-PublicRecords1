@@ -1,4 +1,4 @@
-OPTIONS:-gh 
+﻿OPTIONS:-gh 
 MODULE:Scrubs_Corp2_Mapping_MI_AR
 FILENAME:In_MI
 //Uncomment up to NINES for internal or external adl
@@ -22,9 +22,7 @@ FIELDTYPE:invalid_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_pastdate>0)
 FIELDTYPE:invalid_future_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_generaldate>0)
 FIELDTYPE:invalid_charter_nbr:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(1..)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789 )
-FIELDTYPE:invalid_extension:CUSTOM(Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_extension>0)
-FIELDTYPE:invalid_frame:CUSTOM(Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_frame>0)
-FIELDTYPE:invalid_roll:CUSTOM(Scrubs_Corp2_Mapping_MI_AR.Functions.invalid_ar_roll>0)
+
 
 //FIELD DEFINITIONS
 FIELD:corp_key:TYPE(STRING30):LIKE(invalid_corp_key):0,0
@@ -36,7 +34,7 @@ FIELD:corp_process_date:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:corp_sos_charter_nbr:TYPE(STRING32):LIKE(invalid_charter_nbr):0,0
 FIELD:ar_year:TYPE(STRING4):LIKE(invalid_numeric):0,0
 FIELD:ar_mailed_dt:TYPE(STRING8):0,0
-FIELD:ar_due_dt:TYPE(STRING8):LIKE(invalid_future_date):0,0
+FIELD:ar_due_dt:TYPE(STRING8):0,0
 FIELD:ar_filed_dt:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:ar_report_dt:TYPE(STRING8):0,0
 FIELD:ar_report_nbr:TYPE(STRING30):0,0
@@ -46,9 +44,9 @@ FIELD:ar_tax_factor:TYPE(STRING10):0,0
 FIELD:ar_tax_amount_paid:TYPE(STRING10):0,0
 FIELD:ar_annual_report_cap:TYPE(STRING10):0,0
 FIELD:ar_illinois_capital:TYPE(STRING10):0,0
-FIELD:ar_roll:TYPE(STRING10):LIKE(invalid_roll):0,0
-FIELD:ar_frame:TYPE(STRING10):LIKE(invalid_frame):0,0
-FIELD:ar_extension:TYPE(STRING10):LIKE(invalid_extension):0,0
+FIELD:ar_roll:TYPE(STRING10):0,0
+FIELD:ar_frame:TYPE(STRING10):0,0
+FIELD:ar_extension:TYPE(STRING10):0,0
 FIELD:ar_microfilm_nbr:TYPE(STRING10):0,0
 FIELD:ar_comment:TYPE(STRING350):0,0
 FIELD:ar_type:TYPE(STRING60):0,0

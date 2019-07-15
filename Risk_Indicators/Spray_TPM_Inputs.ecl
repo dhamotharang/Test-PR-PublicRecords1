@@ -1,12 +1,15 @@
-import lib_fileservices,roxiekeybuild,ut,strata,_Control,Risk_Indicators;
+﻿import lib_fileservices,roxiekeybuild,ut,strata,_Control,Risk_Indicators;
 
 export Spray_TPM_Inputs(string filedate) :=
 
 function
+
+string ipaddr := if ( _Control.ThisEnvironment.Name = 'Dataland', _Control.IPAddress.bctlpedata12,_Control.IPAddress.bctlpedata11 );
+string groupname := thorlib.group();
   
-spray_tpm 			:= Fileservices.SprayFixed(_Control.IPAddress.edata12, '/thor_back5/local_data/tpmdata/sources/' + filedate + '/TPM.DAT', 111, 'thor400_20', '~thor_data400::in::tpm_'+filedate, , , ,true);
-spray_ocn 			:= Fileservices.SprayFixed(_Control.IPAddress.edata12, '/thor_back5/local_data/tpmdata/sources/' + filedate + '/OCN.DAT', 43, 'thor400_20', '~thor_data400::in::tpm_ocn_'+filedate, , , , true);
-spray_plname 	  := Fileservices.SprayFixed(_Control.IPAddress.edata12, '/thor_back5/local_data/tpmdata/sources/' + filedate + '/PLNAME.DAT', 65, 'thor400_20', '~thor_data400::in::tpm_plname_'+filedate, , , ,true);
+spray_tpm 			:= Fileservices.SprayFixed(ipaddr, '/data/thor_back5/local_data/tpmdata/sources/' + filedate + '/TPM.DAT', 111, groupname, '~thor_data400::in::tpm_'+filedate, , , ,true);
+spray_ocn 			:= Fileservices.SprayFixed(ipaddr, '/data/thor_back5/local_data/tpmdata/sources/' + filedate + '/OCN.DAT', 43, groupname, '~thor_data400::in::tpm_ocn_'+filedate, , , , true);
+spray_plname 	  := Fileservices.SprayFixed(ipaddr, '/data/thor_back5/local_data/tpmdata/sources/' + filedate + '/PLNAME.DAT', 65, groupname, '~thor_data400::in::tpm_plname_'+filedate, , , ,true);
 
 move_tpm 			:= sequential(FileServices.StartSuperFileTransaction(),
 				FileServices.AddSuperFile		('~thor_data400::in::tpm_delete','~thor_data400::in::tpm_grandfather',, true),

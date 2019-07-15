@@ -20,7 +20,7 @@ export destpath			:= '/data/data_build_5_2/MARI/extract/';
 export MariDestpath		:=  '~thor_data400::in::proflic_mari::';	
 export referpath		:= '/data/data_build_5_2/MARI/reference/';
 // export group_name	:=	'thor40_241';
-export group_name	:=	'thor400_66';
+export group_name	:=	'thor400_36';
 export group_name_2	:=	'thor5_241_10a';
 
 END;

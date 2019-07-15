@@ -3,15 +3,15 @@ IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
 // Processing for each FieldType
-EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_slash_date','invalid_date','invalid_alpha','invalid_alphapound','invalid_alphaspace','invalid_alphaspacequote','invalid_numeric','invalid_numericpound','invalid_alphanumeric','invalid_gender','invalid_addr_type','invalid_license_number');
-EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'invalid_slash_date' => 1,'invalid_date' => 2,'invalid_alpha' => 3,'invalid_alphapound' => 4,'invalid_alphaspace' => 5,'invalid_alphaspacequote' => 6,'invalid_numeric' => 7,'invalid_numericpound' => 8,'invalid_alphanumeric' => 9,'invalid_gender' => 10,'invalid_addr_type' => 11,'invalid_license_number' => 12,0);
+EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_slashO_date','invalid_date','invalid_alpha','invalid_alphapound','invalid_alphaspace','invalid_alphaspacequote','invalid_numeric','invalid_numericpound','invalid_alphanumeric','invalid_gender','invalid_addr_type','invalid_license_number');
+EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'invalid_slashO_date' => 1,'invalid_date' => 2,'invalid_alpha' => 3,'invalid_alphapound' => 4,'invalid_alphaspace' => 5,'invalid_alphaspacequote' => 6,'invalid_numeric' => 7,'invalid_numericpound' => 8,'invalid_alphanumeric' => 9,'invalid_gender' => 10,'invalid_addr_type' => 11,'invalid_license_number' => 12,0);
  
-EXPORT MakeFT_invalid_slash_date(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,'/0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_slashO_date(SALT37.StrType s0) := FUNCTION
+  s1 := SALT37.stringfilter(s0,'/O0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_slash_date(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'/0123456789'))));
-EXPORT InValidMessageFT_invalid_slash_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('/0123456789'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_slashO_date(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'/O0123456789'))));
+EXPORT InValidMessageFT_invalid_slashO_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('/O0123456789'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_date(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -76,11 +76,11 @@ EXPORT InValidFT_invalid_gender(SALT37.StrType s) := WHICH(((SALT37.StrType) s) 
 EXPORT InValidMessageFT_invalid_gender(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('M|F|B|I|U| '),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_addr_type(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,'#BCHLPUXY'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,'#BCDHLPUXY'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_addr_type(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'#BCHLPUXY'))));
-EXPORT InValidMessageFT_invalid_addr_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('#BCHLPUXY'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_addr_type(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'#BCDHLPUXY'))));
+EXPORT InValidMessageFT_invalid_addr_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('#BCDHLPUXY'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_license_number(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,' .-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols
@@ -170,13 +170,13 @@ EXPORT Make_county_cd(SALT37.StrType s0) := MakeFT_invalid_alphanumeric(s0);
 EXPORT InValid_county_cd(SALT37.StrType s) := InValidFT_invalid_alphanumeric(s);
 EXPORT InValidMessage_county_cd(UNSIGNED1 wh) := InValidMessageFT_invalid_alphanumeric(wh);
  
-EXPORT Make_orig_date(SALT37.StrType s0) := MakeFT_invalid_slash_date(s0);
-EXPORT InValid_orig_date(SALT37.StrType s) := InValidFT_invalid_slash_date(s);
-EXPORT InValidMessage_orig_date(UNSIGNED1 wh) := InValidMessageFT_invalid_slash_date(wh);
+EXPORT Make_orig_date(SALT37.StrType s0) := MakeFT_invalid_slashO_date(s0);
+EXPORT InValid_orig_date(SALT37.StrType s) := InValidFT_invalid_slashO_date(s);
+EXPORT InValidMessage_orig_date(UNSIGNED1 wh) := InValidMessageFT_invalid_slashO_date(wh);
  
-EXPORT Make_exp_date(SALT37.StrType s0) := MakeFT_invalid_slash_date(s0);
-EXPORT InValid_exp_date(SALT37.StrType s) := InValidFT_invalid_slash_date(s);
-EXPORT InValidMessage_exp_date(UNSIGNED1 wh) := InValidMessageFT_invalid_slash_date(wh);
+EXPORT Make_exp_date(SALT37.StrType s0) := MakeFT_invalid_slashO_date(s0);
+EXPORT InValid_exp_date(SALT37.StrType s) := InValidFT_invalid_slashO_date(s);
+EXPORT InValidMessage_exp_date(UNSIGNED1 wh) := InValidMessageFT_invalid_slashO_date(wh);
  
 EXPORT Make_license_state(SALT37.StrType s0) := MakeFT_invalid_alpha(s0);
 EXPORT InValid_license_state(SALT37.StrType s) := InValidFT_invalid_alpha(s);

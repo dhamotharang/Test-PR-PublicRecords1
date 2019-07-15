@@ -20,7 +20,7 @@ MACRO
 %suppreRecSize% := 100;			//FileServices.SprayFixed 
 
 // %spray_suppre% := FileServices.SprayVariable(Source_IP,source_path + file_name,%suppreRecSize%,%suppreCsvSeparater%,%suppreCsvTeminater%,,group_name,American_student_list.thor_cluster + 'in::american_student_list_suppression_'+ filedate,-1,,,true,true,true);
-%spray_suppre% := FileServices.SprayFixed(Source_IP,source_path+filedate+'/'+file_name,%suppreRecSize%,group_name,American_student_list.thor_cluster + 'in::american_student_list_suppression_'+ filedate,-1,,,,true,true);
+%spray_suppre% := FileServices.SprayFixed(Source_IP,source_path+filedate+'/'+file_name,%suppreRecSize%,group_name,American_student_list.thor_cluster + 'in::american_student_list_suppression_'+ filedate,-1,,,true,true,true);
 
 %Create_Suppre_Superfiles% := sequential(FileServices.CreateSuperFile(American_student_list.thor_cluster + 'in::american_student_list_suppression::Superfile',false),
 									FileServices.CreateSuperFile('~thor_data400::in::american_student_list_suppression::Delete',false),

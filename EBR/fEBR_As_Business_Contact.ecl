@@ -5,12 +5,8 @@ function
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// -- Input Files to process
 	//////////////////////////////////////////////////////////////////////////////////////////////
-	//*** Filtering the EBR quarterly "20171205" extract records (with process_date of 20171206) getting ingested into legacy business header.
-	//*** Filtering the EBR quarterly "20180307" extract records (with process_date of 20180308) getting ingested into legacy business header.
-	demo_base 		:= pInputDemoBase(~(process_date = '20171206' and process_date_first_seen = 20171206 and process_date_last_seen = 20171206) and
-																  ~(process_date = '20180308' and process_date_first_seen = 20180308 and process_date_last_seen = 20180308) and
-																	~(process_date = '20180308' and process_date_first_seen = 20171206 and process_date_last_seen = 20180308)
-																 );
+	//*** Removed the filters that had in place to filert out the quartely unload records - as per Jira DF-23116.
+	demo_base 		:= pInputDemoBase;
 
 	layout_BH_contact 	:= Business_Header.Layout_Business_Contact_Full_New;
 

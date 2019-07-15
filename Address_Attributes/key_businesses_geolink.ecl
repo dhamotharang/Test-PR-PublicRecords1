@@ -1,9 +1,7 @@
-Import Data_Services, Business_Header, doxie, risk_indicators, std;
+﻿Import Data_Services, Business_Header, doxie, risk_indicators, std;
 
 //constants
-string 	today := (STRING8)Std.Date.Today();
-string	two_years := (string)((integer)today[1..4] - 1);
-integer	year_filter := (integer)(two_years + '0000');
+integer	year_filter := Std.Date.AdjustDate(Std.Date.Today(),-2,0,0);  // DF-23935 Correct Two Year Filter
 
 //layouts
 layout_Business_geolink := record

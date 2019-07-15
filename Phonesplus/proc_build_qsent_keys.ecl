@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus_v2,NID;
+﻿import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus_v2,NID;
 
 export proc_build_qsent_keys(string filedate) := 
 function
@@ -10,7 +10,7 @@ sfShuffle := sequential(
 	//fileservices.clearsuperfile('~thor_data400::base::qsent_father'),
 	//fileservices.addsuperfile('~thor_data400::base::qsent_father','~thor_data400::base::qsent',0,true),
 	fileservices.clearsuperfile('~thor_data400::base::qsent', true),
-	fileservices.addsuperfile('~thor_data400::base::qsent','~thor_data400::out::qsent_did_' + Phonesplus.version),
+	fileservices.addsuperfile('~thor_data400::base::qsent','~thor_data400::out::qsent_did_' + filedate),
 	fileservices.finishsuperfiletransaction()
 	);
 	
@@ -31,7 +31,7 @@ RoxieKeyBuild.Mac_SK_Move_To_Built_V2('~thor_data400::key::qsent_companyname'
 /* ***********************start cellphones autokeys ****************************** */
 dist_DSqsent := Phonesplus.File_qsent_fdid;
 
-Phonesplus.MAC_Build_qsent(dist_DSqsent,fname,mname,lname,
+Phonesplus.MAC_Build_qsent(dist_DSqsent, filedate, fname,mname,lname,
 				 blk,
 				 Dob,
 				 CellPhone,
@@ -47,7 +47,8 @@ Phonesplus.MAC_Build_qsent(dist_DSqsent,fname,mname,lname,
 						
 DS_qsent_rec := record
 	unsigned6 fdid;
-	Phonesplus.layoutCommonKeys;
+	// CCPA-5 Add CCPA fields
+	Phonesplus.layoutCommonKeys_CCPA;
 end;
 
 DS_qsent_rec slim_it(dist_DSqsent  l) := transform

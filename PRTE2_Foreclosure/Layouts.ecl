@@ -1,4 +1,4 @@
-﻿IMPORT Property, PRTE_CSV, autokey, BIPV2, AID;
+﻿IMPORT Property, PRTE_CSV, autokey, BIPV2, AID, PRTE2;
 
 EXPORT Layouts := MODULE
 
@@ -737,7 +737,7 @@ EXPORT Layouts := MODULE
 			string3  	deed_category;
 			string55 	deed_desc;
 			string3  	document_type;
-			string40 	document_desc;
+			string55 	document_desc;
 			string8  	recording_date;
 			string4  	document_year;
 			string12 	document_nbr;
@@ -899,6 +899,15 @@ EXPORT Layouts := MODULE
 			string1  	situs1_geo_match;
 			string4  	situs1_err_stat;
 			string8 	process_date;
+			// New Fields
+			string1 		lender_type;
+			string55 	lender_type_desc;
+			string10 	loan_amount;
+			string1 		loan_type;
+			string60 	loan_type_desc;
+			string2 	source;
+		 // CCPA Project
+		 prte2.Layouts.DEFLT_CPA;
 		end;
 	
 		export key_geo := record
@@ -948,6 +957,7 @@ EXPORT Layouts := MODULE
 			string1		blank :='';
 			BIPV2.IDlayouts.l_xlink_ids;	//Added for BIP project
 			unsigned8 source_rec_id :=0; //Added for BIP project
+			string2 source;
 end;
 
 
@@ -1078,6 +1088,7 @@ end;
 				string2			site_st;
 				string5			site_zip;
 				string4			site_zip4;
+				string2			source;
 				unsigned 		zero :=0;
 				string1			blank :='';
 		END;

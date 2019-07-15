@@ -1,4 +1,4 @@
-// Function to update data operations database with a new build version for a specific
+﻿// Function to update data operations database with a new build version for a specific
 // dataset
 
 // Parameters
@@ -28,7 +28,8 @@ string auto_pkg = 'N',string inenvment = '',string isboolready = 'Y',
 string isprodready = 'N',string inloc = 'B',string indaliip = '',string includeboolean = 'Y', 
 string updateflag = 'F',
 string tagdelta = '',
-string dopsenv = dops.constants.dopsenvironment) := dops.updateversion(
+string dopsenv = dops.constants.dopsenvironment,
+boolean overrideupdateflag = false) := dops.updateversion(
 												datasetname
 												,uversion
 												,email_t
@@ -41,6 +42,7 @@ string dopsenv = dops.constants.dopsenvironment) := dops.updateversion(
 												,includeboolean
 												,updateflag
 												,tagdelta
-												,dopsenv) : DEPRECATED('Use dops.updateversion() Instead');
+												,dopsenv
+												,overrideupdateflag) : DEPRECATED('Use dops.updateversion() Instead');
 
 	

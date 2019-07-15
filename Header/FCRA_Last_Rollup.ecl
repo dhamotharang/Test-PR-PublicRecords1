@@ -1,6 +1,8 @@
 import ut,did_add,mdr,idl_header;
 
-inf := distribute(header.fn_with_tnt(true),hash(did));
+export FCRA_Last_Rollup(string filedate):= FUNCTION
+
+inf := distribute(header.fn_with_tnt(true,filedate),hash(did));
 
 //-- Slim record to ease the join burdone
 sm_rec := record
@@ -167,11 +169,13 @@ sj := sort(distribute(j,old_rid),old_rid,new_rid,local);
 
 rolled_rids := dedup(sj,old_rid,local);
 
-ut.MAC_Patch_Id(inf, rid, rolled_rids, old_rid, new_rid, old_and_new);
+inf_seqd:=project(inf,transform({inf},self.persistent_record_ID:=left.rid,self:=left));
+
+ut.MAC_Patch_Id(inf_seqd, rid, rolled_rids, old_rid, new_rid, old_and_new);
 
 dinfile := distribute(old_and_new,hash(rid));
 
-BR_s := sort(dinfile, rid,dt_vendor_last_reported,dt_vendor_first_reported,dt_last_seen,local);
+BR_s := sort(dinfile, rid,dt_vendor_last_reported,dt_vendor_first_reported,dt_last_seen,persistent_record_ID,local);
 
 hddpd := rollup(BR_s,left.rid=right.rid,header.tra_merge_headers(left,right),local);
 
@@ -265,8 +269,10 @@ dSetJFlagForPropertyFragments := join(merged_dist,did_counts,
 									  left outer, local
 									 );
 									 
-fix_dates  := header.fn_fix_dates(dSetJFlagForPropertyFragments);
+fix_dates  := header.fn_fix_dates(dSetJFlagForPropertyFragments,,filedate);
 set_titles := header.fn_apply_title(fix_dates);
 append_PID := header.fn_persistent_record_ID(set_titles);
  
-export FCRA_Last_Rollup := (append_PID + Dummy_records.FCRAseed) : persist('persist::fcra_last_rollup');
+_FCRA_Last_Rollup := (append_PID + Dummy_records.FCRAseed) : persist('persist::fcra_last_rollup');
+return _FCRA_Last_Rollup;
+end;

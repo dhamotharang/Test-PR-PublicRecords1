@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 
 EXPORT Functions := MODULE
 
@@ -75,6 +75,278 @@ EXPORT Functions := MODULE
 											'**|'+uc_s
 										 );
 		END;
+    
+		//****************************************************************************
+		//Country_Description: returns the corp_country_of_formation.
+		//****************************************************************************
+		EXPORT Country_Description(string s) := FUNCTION
+
+					 uc_s := corp2.t2u(s);
+					 
+	         RETURN map(uc_s = ''    => '',
+		        		      uc_s = 'AFG' => 'AFGHANISTAN',
+											uc_s = 'ALA' => 'ÅLAND ISLANDS',
+											uc_s = 'ALB' => 'ALBANIA',
+											uc_s = 'DZA' => 'ALGERIA',
+											uc_s = 'ASM' => 'AMERICAN SAMOA',
+											uc_s = 'AND' => 'ANDORRA',
+											uc_s = 'AGO' => 'ANGOLA',
+											uc_s = 'AIA' => 'ANGUILLA',
+											uc_s = 'ATA' => 'ANTARCTICA',
+											uc_s = 'ATG' => 'ANTIGUA AND BARBUDA',
+											uc_s = 'ARG' => 'ARGENTINA',
+											uc_s = 'ARM' => 'ARMENIA',
+											uc_s = 'ABW' => 'ARUBA',
+											uc_s = 'AUS' => 'AUSTRALIA',
+											uc_s = 'AUT' => 'AUSTRIA',
+											uc_s = 'AZE' => 'AZERBAIJAN',
+											uc_s = 'BHS' => 'BAHAMAS',
+											uc_s = 'BHR' => 'BAHRAIN',
+											uc_s = 'BGD' => 'BANGLADESH',
+											uc_s = 'BRB' => 'BARBADOS',
+											uc_s = 'BLR' => 'BELARUS',
+											uc_s = 'BEL' => 'BELGIUM',
+											uc_s = 'BLZ' => 'BELIZE',
+											uc_s = 'BEN' => 'BENIN',
+											uc_s = 'BMU' => 'BERMUDA',
+											uc_s = 'BTN' => 'BHUTAN',
+											uc_s = 'BOL' => 'BOLIVIA',
+											uc_s = 'BES' => 'BONAIRE, SINT EUSTATIUS AND SABA',
+											uc_s = 'BIH' => 'BOSNIA AND HERZEGOVINA',
+											uc_s = 'BWA' => 'BOTSWANA',
+											uc_s = 'BVT' => 'BOUVET ISLAND',
+											uc_s = 'BRA' => 'BRAZIL',
+											uc_s = 'IOT' => 'BRITISH INDIAN OCEAN TERRITORY',
+											uc_s = 'BRN' => 'BRUNEI DARUSSALAM',
+											uc_s = 'BGR' => 'BULGARIA',
+											uc_s = 'BFA' => 'BURKINA FASO',
+											uc_s = 'BDI' => 'BURUNDI',
+											uc_s = 'CPV' => 'CABO VERDE',
+											uc_s = 'KHM' => 'CAMBODIA',
+											uc_s = 'CMR' => 'CAMEROON',
+											uc_s = 'CAN' => 'CANADA',
+											uc_s = 'CYM' => 'CAYMAN ISLANDS',
+											uc_s = 'CAF' => 'CENTRAL AFRICAN REPUBLIC',
+											uc_s = 'TCD' => 'CHAD',
+											uc_s = 'CHL' => 'CHILE',
+											uc_s = 'CHN' => 'CHINA',
+											uc_s = 'CXR' => 'CHRISTMAS ISLAND',
+											uc_s = 'CCK' => 'COCOS (KEELING) ISLANDS',
+											uc_s = 'COL' => 'COLOMBIA',
+											uc_s = 'COM' => 'COMOROS',
+											uc_s = 'COD' => 'CONGO',
+											uc_s = 'COG' => 'CONGO',
+											uc_s = 'COK' => 'COOK ISLANDS',
+											uc_s = 'CRI' => 'COSTA RICA',
+											uc_s = 'CIV' => 'COTE D\'IVOIRE',
+											uc_s = 'HRV' => 'CROATIA',
+											uc_s = 'CUB' => 'CUBA',
+											uc_s = 'CUW' => 'CURAÇAO',
+											uc_s = 'CYP' => 'CYPRUS',
+											uc_s = 'CZE' => 'CZECHIA',
+											uc_s = 'DNK' => 'DENMARK',
+											uc_s = 'DJI' => 'DJIBOUTI',
+											uc_s = 'DMA' => 'DOMINICA',
+											uc_s = 'DOM' => 'DOMINICAN REPUBLIC',
+											uc_s = 'ECU' => 'ECUADOR',
+											uc_s = 'EGY' => 'EGYPT',
+											uc_s = 'SLV' => 'EL SALVADOR',
+											uc_s = 'GNQ' => 'EQUATORIAL GUINEA',
+											uc_s = 'ERI' => 'ERITREA',
+											uc_s = 'EST' => 'ESTONIA',
+											uc_s = 'ETH' => 'ETHIOPIA',
+											uc_s = 'FLK' => 'FALKLAND ISLANDS',
+											uc_s = 'FRO' => 'FAROE ISLANDS',
+											uc_s = 'FJI' => 'FIJI',
+											uc_s = 'FIN' => 'FINLAND',
+											uc_s = 'FRA' => 'FRANCE',
+											uc_s = 'GUF' => 'FRENCH GUIANA',
+											uc_s = 'PYF' => 'FRENCH POLYNESIA',
+											uc_s = 'ATF' => 'FRENCH SOUTHERN TERRITORIES',
+											uc_s = 'GAB' => 'GABON',
+											uc_s = 'GMB' => 'GAMBIA',
+											uc_s = 'GEO' => 'GEORGIA',
+											uc_s = 'DEU' => 'GERMANY',
+											uc_s = 'GHA' => 'GHANA',
+											uc_s = 'GIB' => 'GIBRALTAR',
+											uc_s = 'GRC' => 'GREECE',
+											uc_s = 'GRL' => 'GREENLAND',
+											uc_s = 'GRD' => 'GRENADA',
+											uc_s = 'GLP' => 'GUADELOUPE',
+											uc_s = 'GUM' => 'GUAM',
+											uc_s = 'GTM' => 'GUATEMALA',
+											uc_s = 'GGY' => 'GUERNSEY',
+											uc_s = 'GIN' => 'GUINEA',
+											uc_s = 'GNB' => 'GUINEA-BISSAU',
+											uc_s = 'GUY' => 'GUYANA',
+											uc_s = 'HTI' => 'HAITI',
+											uc_s = 'HMD' => 'HEARD ISLAND AND MCDONALD ISLANDS',
+											uc_s = 'VAT' => 'HOLY SEE',
+											uc_s = 'HND' => 'HONDURAS',
+											uc_s = 'HKG' => 'HONG KONG',
+											uc_s = 'HUN' => 'HUNGARY',
+											uc_s = 'ISL' => 'ICELAND',
+											uc_s = 'IND' => 'INDIA',
+											uc_s = 'IDN' => 'INDONESIA',
+											uc_s = 'IRN' => 'IRAN',
+											uc_s = 'IRQ' => 'IRAQ',
+											uc_s = 'IRL' => 'IRELAND',
+											uc_s = 'IMN' => 'ISLE OF MAN',
+											uc_s = 'ISR' => 'ISRAEL',
+											uc_s = 'ITA' => 'ITALY',
+											uc_s = 'JAM' => 'JAMAICA',
+											uc_s = 'JPN' => 'JAPAN',
+											uc_s = 'JEY' => 'JERSEY',
+											uc_s = 'JOR' => 'JORDAN',
+											uc_s = 'KAZ' => 'KAZAKHSTAN',
+											uc_s = 'KEN' => 'KENYA',
+											uc_s = 'KIR' => 'KIRIBATI',
+											uc_s = 'PRK' => 'KOREA',
+											uc_s = 'KOR' => 'KOREA',
+											uc_s = 'KWT' => 'KUWAIT',
+											uc_s = 'KGZ' => 'KYRGYZSTAN',
+											uc_s = 'LAO' => 'LAO PEOPLE\'S DEMOCRATIC REPUBLIC',
+											uc_s = 'LVA' => 'LATVIA',
+											uc_s = 'LBN' => 'LEBANON',
+											uc_s = 'LSO' => 'LESOTHO',
+											uc_s = 'LBR' => 'LIBERIA',
+											uc_s = 'LBY' => 'LIBYA',
+											uc_s = 'LIE' => 'LIECHTENSTEIN',
+											uc_s = 'LTU' => 'LITHUANIA',
+											uc_s = 'LUX' => 'LUXEMBOURG',
+											uc_s = 'MAC' => 'MACAO',
+											uc_s = 'MKD' => 'MACEDONIA',
+											uc_s = 'MDG' => 'MADAGASCAR',
+											uc_s = 'MWI' => 'MALAWI',
+											uc_s = 'MYS' => 'MALAYSIA',
+											uc_s = 'MDV' => 'MALDIVES',
+											uc_s = 'MLI' => 'MALI',
+											uc_s = 'MLT' => 'MALTA',
+											uc_s = 'MHL' => 'MARSHALL ISLANDS',
+											uc_s = 'MTQ' => 'MARTINIQUE',
+											uc_s = 'MRT' => 'MAURITANIA',
+											uc_s = 'MUS' => 'MAURITIUS',
+											uc_s = 'MYT' => 'MAYOTTE',
+											uc_s = 'MEX' => 'MEXICO',
+											uc_s = 'FSM' => 'MICRONESIA',
+											uc_s = 'MDA' => 'MOLDOVA',
+											uc_s = 'MCO' => 'MONACO',
+											uc_s = 'MNG' => 'MONGOLIA',
+											uc_s = 'MNE' => 'MONTENEGRO',
+											uc_s = 'MSR' => 'MONTSERRAT',
+											uc_s = 'MAR' => 'MOROCCO',
+											uc_s = 'MOZ' => 'MOZAMBIQUE',
+											uc_s = 'MMR' => 'MYANMAR',
+											uc_s = 'NAM' => 'NAMIBIA',
+											uc_s = 'NRU' => 'NAURU',
+											uc_s = 'NPL' => 'NEPAL',
+											uc_s = 'NLD' => 'NETHERLANDS',
+											uc_s = 'NCL' => 'NEW CALEDONIA',
+											uc_s = 'NZL' => 'NEW ZEALAND',
+											uc_s = 'NIC' => 'NICARAGUA',
+											uc_s = 'NER' => 'NIGER',
+											uc_s = 'NGA' => 'NIGERIA',
+											uc_s = 'NIU' => 'NIUE',
+											uc_s = 'NFK' => 'NORFOLK ISLAND',
+											uc_s = 'MNP' => 'NORTHERN MARIANA ISLANDS',
+											uc_s = 'NOR' => 'NORWAY',
+											uc_s = 'OMN' => 'OMAN',
+											uc_s = 'PAK' => 'PAKISTAN',
+											uc_s = 'PLW' => 'PALAU',
+											uc_s = 'PSE' => 'PALESTINE, STATE OF',
+											uc_s = 'PAN' => 'PANAMA',
+											uc_s = 'PNG' => 'PAPUA NEW GUINEA',
+											uc_s = 'PRY' => 'PARAGUAY',
+											uc_s = 'PER' => 'PERU',
+											uc_s = 'PHL' => 'PHILIPPINES',
+											uc_s = 'PCN' => 'PITCAIRN',
+											uc_s = 'POL' => 'POLAND',
+											uc_s = 'PRT' => 'PORTUGAL',
+											uc_s = 'PRI' => 'PUERTO RICO',
+											uc_s = 'QAT' => 'QATAR',
+											uc_s = 'REU' => 'RÉUNION',
+											uc_s = 'ROU' => 'ROMANIA',
+											uc_s = 'RUS' => 'RUSSIAN FEDERATION',
+											uc_s = 'RWA' => 'RWANDA',
+											uc_s = 'BLM' => 'SAINT BARTHELEMY',
+											uc_s = 'SHN' => 'SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA',
+											uc_s = 'KNA' => 'SAINT KITTS AND NEVIS',
+											uc_s = 'LCA' => 'SAINT LUCIA',
+											uc_s = 'MAF' => 'SAINT MARTIN',
+											uc_s = 'SPM' => 'SAINT PIERRE AND MIQUELON',
+											uc_s = 'VCT' => 'SAINT VINCENT AND THE GRENADINES',
+											uc_s = 'WSM' => 'SAMOA',
+											uc_s = 'SMR' => 'SAN MARINO',
+											uc_s = 'STP' => 'SAO TOME AND PRINCIPE',
+											uc_s = 'SAU' => 'SAUDI ARABIA',
+											uc_s = 'SEN' => 'SENEGAL',
+											uc_s = 'SRB' => 'SERBIA',
+											uc_s = 'SYC' => 'SEYCHELLES',
+											uc_s = 'SLE' => 'SIERRA LEONE',
+											uc_s = 'SGP' => 'SINGAPORE',
+											uc_s = 'SXM' => 'SINT MAARTEN',
+											uc_s = 'SVK' => 'SLOVAKIA',
+											uc_s = 'SVN' => 'SLOVENIA',
+											uc_s = 'SLB' => 'SOLOMON ISLANDS',
+											uc_s = 'SOM' => 'SOMALIA',
+											uc_s = 'ZAF' => 'SOUTH AFRICA',
+											uc_s = 'SGS' => 'SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS',
+											uc_s = 'SSD' => 'SOUTH SUDAN',
+											uc_s = 'ESP' => 'SPAIN',
+											uc_s = 'LKA' => 'SRI LANKA',
+											uc_s = 'SDN' => 'SUDAN',
+											uc_s = 'SUR' => 'SURINAME',
+											uc_s = 'SJM' => 'SVALBARD AND JAN MAYEN',
+											uc_s = 'SWZ' => 'SWAZILAND',
+											uc_s = 'SWE' => 'SWEDEN',
+											uc_s = 'CHE' => 'SWITZERLAND',
+											uc_s = 'SYR' => 'SYRIAN ARAB REPUBLIC',
+											uc_s = 'TWN' => 'TAIWAN',
+											uc_s = 'TJK' => 'TAJIKISTAN',
+											uc_s = 'TZA' => 'TANZANIA, UNITED REPUBLIC OF',
+											uc_s = 'THA' => 'THAILAND',
+											uc_s = 'TLS' => 'TIMOR-LESTE',
+											uc_s = 'TGO' => 'TOGO',
+											uc_s = 'TKL' => 'TOKELAU',
+											uc_s = 'TON' => 'TONGA',
+											uc_s = 'TTO' => 'TRINIDAD AND TOBAGO',
+											uc_s = 'TUN' => 'TUNISIA',
+											uc_s = 'TUR' => 'TURKEY',
+											uc_s = 'TKM' => 'TURKMENISTAN',
+											uc_s = 'TCA' => 'TURKS AND CAICOS ISLANDS',
+											uc_s = 'TUV' => 'TUVALU',
+											uc_s = 'UGA' => 'UGANDA',
+											uc_s = 'UKR' => 'UKRAINE',
+											uc_s = 'ARE' => 'UNITED ARAB EMIRATES',
+											uc_s = 'GBR' => 'UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND',
+											uc_s = 'UMI' => 'UNITED STATES MINOR OUTLYING ISLANDS',
+											uc_s = 'USA' => 'UNITED STATES OF AMERICA',
+											uc_s = 'URY' => 'URUGUAY',
+											uc_s = 'UZB' => 'UZBEKISTAN',
+											uc_s = 'VUT' => 'VANUATU',
+											uc_s = 'VEN' => 'VENEZUELA',
+											uc_s = 'VNM' => 'VIET NAM',
+											uc_s = 'VGB' => 'VIRGIN ISLANDS',
+											uc_s = 'VIR' => 'VIRGIN ISLANDS',
+											uc_s = 'WLF' => 'WALLIS AND FUTUNA',
+											uc_s = 'ESH' => 'WESTERN SAHARA',
+											uc_s = 'YEM' => 'YEMEN',
+											uc_s = 'ZMB' => 'ZAMBIA',
+											uc_s = 'ZWE' => 'ZIMBABWE',
+											uc_s = 'XFH' => 'CONFEDERATED SALISH AND KOOTENAI TRIBES',
+											uc_s = 'XFN' => 'SAC AND FOX NATION',
+											uc_s = 'XGT' => 'GTB OTTAWA AND CHIPPEWA',
+											uc_s = 'XHB' => 'NOTTAWASEPPI BAND OF HURON POTAWATOMI',
+											uc_s = 'XKB' => 'KEWEENAW BAY INDIAN COMMUNITY',
+											uc_s = 'XMJ' => 'MESA GRANDE BAND OF DIEGUENO MISSION INDIANS OF THE MESA GRANDE RESERVATION',
+											uc_s = 'XMP' => 'MATCH-E-BE-NASH-SHE-WISH BAND OF POTTAWATOMI INDIANS OF MICHIGAN',
+											uc_s = 'XPB' => 'POKAGON BAND OF POTAWATOMI INDIANS',
+											uc_s = 'XRR' => 'LITTLE RIVER BAND OF OTTAWA INDIANS',
+											uc_s = 'XTI' => 'LITTLE TRAVERSE BAY BANDS OF ODAWA INDIANS',
+											uc_s = 'XYN' => 'CONFEDERATED TRIBES AND BANDS OF THE YAKAMA NATION',
+											 '**|'+uc_s
+							 );
+		END;
 
 		//****************************************************************************
 		//Foreign_Description: returns the country description.
@@ -148,6 +420,7 @@ EXPORT Functions := MODULE
 											 'PM'	 => 'PANAMA',										//FROM SOS WEBSITE
 											 'PO'  => 'POLAND ',									//FROM SOS WEBSITE
 											 'PQ'  => 'QUEBEC',										//CANADIAN PROVINCE
+											 'QC'  => 'QUEBEC',										//CANADIAN PROVINCE
 											 'RC'  => 'PEOPLES REPUBLIC OF CHINA',//FROM SOS WEBSITE
 											 'RM'  => 'REPUBLIC OF MAURITIUS',		//FROM SOS WEBSITE
 											 'RS'  => 'REP OF MARSHALL ISLANDS',	//FROM SOS WEBSITE
@@ -208,53 +481,23 @@ EXPORT Functions := MODULE
 										 );
 		END;
 
-		//****************************************************************************
-		//CorpActs: returns the overloaded field "corp_acts" that needs to retain
-		//					c_act2_1a and c_act2_1a as part of "corp_acts" until the fields 
-		//     			corp_acts2 and corp_acts3 are customer facing.
-		//****************************************************************************
-		export CorpActs(string act1, string act2, string act3) := function
-		
-			uc_act1 := corp2.t2u(act1);
-			uc_act2 := corp2.t2u(act2);
-			uc_act3 := corp2.t2u(act3);
-			
-			return if(uc_act1='','',uc_act1+if(uc_act2='','','; '+uc_act2+if(uc_act3='','','; '+uc_act3)));
-
-		end;
-		
-		//****************************************************************************
-		//MailingAddr: returns a standardized PO Box verbage and removes email 
-		//						 addresses.
-		//****************************************************************************
-		export MailingAddr(string s) := function
-					 uc_s := corp2.t2u(s);
-					 return map(regexfind('^PO BOX:',   uc_s,0) <> '' => uc_s, 																			//correct format, return input
-											regexfind('^P.O. BOX:', uc_s,0) <> '' => regexreplace('^P.O. BOX:',uc_s,'PO BOX:'), //standardize format
-											regexfind('^P.O. BOX',  uc_s,0) <> '' => regexreplace('^P.O. BOX', uc_s,'PO BOX:'), //standardize format
-											regexfind('^P O BOX:',  uc_s,0) <> '' => regexreplace('^P O BOX:', uc_s,'PO BOX:'), //standardize format
-											regexfind('^P O BOX',   uc_s,0) <> '' => regexreplace('^P O BOX',  uc_s,'PO BOX:'), //standardize format
-											regexfind('^PO BOX',    uc_s,0) <> '' => regexreplace('^PO BOX',   uc_s,'PO BOX:'), //standardize format
-											regexfind('@',uc_s,0)<>'' and regexfind(' ',uc_s,0)='' => '', 											//An email address
-											uc_s																																								//not a po box, return input
-										 );
-		end;
-		 
+			 
 		//****************************************************************************
     //CorpAgentCounty: returns the "Corp Agent County".
     //****************************************************************************
     export CorpAgentCounty(string s) := function
-			 uc_s := corp2.t2u(s);
-			 return map(uc_s = '00'  				=> '',
-									uc_s = '1' 					=> 'ALCONA',
-								  uc_s = '2' 					=> 'ALGER',
-								  uc_s = '3' 					=> 'ALLEGAN',
-								  uc_s = '4' 					=> 'ALPENA',
-								  uc_s = '5' 					=> 'ANTRIM',
-								  uc_s = '6' 					=> 'ARENAC',
-								  uc_s = '7' 					=> 'BARAGA',
-								  uc_s = '8' 					=> 'BARRY',
-								  uc_s = '9' 					=> 'BAY',
+		   
+		   uc_s := corp2.t2u(s);
+			 return map(uc_s in ['0','00']  => '',
+									uc_s in ['1','01']	=> 'ALCONA',
+								  uc_s in ['2','02']	=> 'ALGER',
+								  uc_s in ['3','03']	=> 'ALLEGAN',
+								  uc_s in ['4','04']	=> 'ALPENA',
+								  uc_s in ['5','05'] 	=> 'ANTRIM',
+								  uc_s in ['6','06'] 	=> 'ARENAC',
+								  uc_s in ['7','07'] 	=> 'BARAGA',
+								  uc_s in ['8','08']  => 'BARRY',
+								  uc_s in ['9','09'] 	=> 'BAY',
 								  uc_s = '10' 				=> 'BENZIE',
 								  uc_s = '11' 				=> 'BERRIEN',
 								  uc_s = '12' 				=> 'BRANCH',
@@ -290,13 +533,13 @@ EXPORT Functions := MODULE
 								  uc_s = '42' 				=> 'KEWEENAW',
 								  uc_s = '43' 				=> 'LAKE',
 								  uc_s = '44' 				=> 'LAPEER',
-								  uc_s = '45' 				=> 'LEEINAU',
+								  uc_s = '45' 				=> 'LEELNAU',
 								  uc_s = '46' 				=> 'LENAWEE',
 								  uc_s = '47' 				=> 'LIVINGSTON',
 								  uc_s = '48' 				=> 'LUCE',
 								  uc_s = '49' 				=> 'MACKINAC',
 								  uc_s = '50' 				=> 'MACOMB',
-								  uc_s = '51' 				=> 'MAINSTEE',
+								  uc_s = '51' 				=> 'MANISTEE',
 								  uc_s = '52' 				=> 'MARQUETTE',
 								  uc_s = '53' 				=> 'MASON',
 								  uc_s = '54' 				=> 'MECOSTA',
@@ -334,165 +577,103 @@ EXPORT Functions := MODULE
     end;
 										 	
 		//****************************************************************************
-    //CorpPurpose: returns the "corp_purpose".
+    //CorpAgentCountyStr: returns the "Corp Agent County" string.
     //****************************************************************************
-    export CorpPurpose(string s) := function
+    export CorpAgentCountyStr(string s1, string s2, string s3) := function
+		   
+			 //This function uses the CorpAgentCounty to get the full county name
+		   County1 := CorpAgentCounty(s1);
+			 County2 := CorpAgentCounty(s2);
+   		 County3 := CorpAgentCounty(s3);
+			 
+			 return if(County1 = '','',corp2.t2u(County1) + if(County2 = '','','; ' + corp2.t2u(County2) + if(County3 = '','','; ' + corp2.t2u(County3))));
+    end;									
+		
+		
+		//****************************************************************************
+    //CorpOrigOrgStructureCD: returns the "corp_orig_org_structure_desc".
+    //****************************************************************************
+    export CorpOrigOrgStructureCD(String s) := function
 			 uc_s := corp2.t2u(s);
-			 return map(uc_s = 'APC' 			=> 'ALL PURPOSE CLAUSE',
-								  uc_s = 'ECC' 			=> 'ECCLESIASTICAL CORPORATION',
-								  uc_s = 'GENBKLAW' => 'GENERAL BANKING LAW',																												 
-								  uc_s = 'HMO' 			=> 'HEALTH MAINTENANCE ORGANIZATION',
-								  uc_s = 'PSA' 			=> 'PUBLIC SCHOOL ACADEMY',
-								  uc_s = 'TPA' 			=> 'THIRD PARTY ADMINISTRATOR',
-								  uc_s
+			 return map(uc_s in ['200','0200'] => 'DOMESTIC PROFIT CORPORATION',
+								  uc_s in ['201','0201'] => 'PARTNERSHIP ASSOCIATIONS LIMITED',
+								  uc_s in ['300','0300'] => 'DOMESTIC NONPROFIT CORPORATION',
+								  uc_s in ['400','0400'] => 'DOMESTIC PROFESSIONAL CORPORATION',
+								  uc_s in ['402','0402'] => 'DOMESTIC PROFESSIONAL LIMITED LIABILITY COMPANY',
+								  uc_s in ['500','0500'] => 'FOREIGN PROFIT CORPORATION',
+								  uc_s in ['502','0502'] => 'FOREIGN NONPROFIT CORPORATION',
+								  uc_s in ['503','0503'] => 'FOREIGN PROFESSIONAL CORPORATION',
+								  uc_s in ['504','0504'] => 'FOREIGN LIMITED LIABILITY COMPANY',
+								  uc_s in ['505','0505'] => 'FOREIGN PROFESSIONAL LIMITED LIABILITY COMPANY',
+								  uc_s in ['506','0506'] => 'FOREIGN TRUST',
+								  uc_s in ['601','0601'] => 'DOMESTIC LIMITED PARTNERSHIP',
+								  uc_s in ['602','0602'] => 'FOREIGN LIMITED PARTNERSHIP',
+									uc_s in ['801','0801'] => 'DOMESTIC LIMITED LIABILITY COMPANY',
+								  ''
 								 );
-    end;	
+	  end;
 		
 		//****************************************************************************
     //CorpStatusComment: returns the "corp_status_cmt" (comment).
 		//****************************************************************************
 		export CorpStatusComment(string s) := function
 			 uc_s := corp2.t2u(s);
-			 return map(uc_s = ''					  => '',
-									uc_s = '00'					=> '',
-									uc_s = '10' 				=> 'COUNTER FILINGS - DETROIT',
-									uc_s = '11' 				=> 'COUNTER FILINGS - LANSING',
-									uc_s = '20' 				=> 'HELD 30 DAY FOLLOW-UP LETTER SENT',
-									uc_s = '21' 				=> 'HELD FOR MONEY',
-									uc_s = '22' 				=> 'HELD FOR ANNUAL REPORT REINSTATEMENT',
-									uc_s = '23' 				=> 'HELD PENDING DISSOLUTION',
-									uc_s = '24' 				=> 'HELD FOR GOOD STANDING',
-									uc_s = '25' 				=> 'HELD FOR TAX CLEARANCE',
-									uc_s = '26' 				=> 'HELD FOR ATTORNEY GENERAL CONSENT',
-									uc_s = '27' 				=> 'HELD AND HAVE DONE TAX CLEARANCE FOLLOW UP LETTER',
-									uc_s = '28' 				=> 'HELD FOR DEPARTMENT OF EDUCATION APPROVAL',
-									uc_s = '29' 				=> 'HELD FOR INSURANCE BUREAU APPROVAL',
-									uc_s = '30' 				=> 'HELD - RESPONSE RECEIVED; NEED MORE INFORMATION',
-									uc_s = '31' 				=> 'PRECLEARANCE',
-									uc_s = '40' 				=> 'RETURNED FOR ANNUAL REPORT REINSTATEMENT',
-									uc_s = '41' 				=> 'RETURNED FOR SIGNATURE',
-									uc_s = '42' 				=> 'RETURNED DOCUMENT, HELD GOOD-STANDING',
-									uc_s = '43' 				=> 'RETURNED FOR NAME CORRECTION',
-									uc_s = '44' 				=> 'RETURNED FOR RESIDENT AGENT CORRECTION',
-									uc_s = '45' 				=> 'RETURNED FOR REGISTERED OFFICE CORRECTION',
-									uc_s = '46' 				=> 'RETURNED FOR ITEM 5B CORRECTION',
-									uc_s = '47' 				=> 'RETURNED FOR STOCK CORRECTION',
-									uc_s = '48' 				=> 'RETURNED WITH 30 DAY FOLLOW-UP LETTER',
-									uc_s = '49' 				=> 'RETURNED - INCORRECT FORM USED',
-									uc_s = '50' 				=> 'RETURNED FOR REDRAFTING - FORM ILLEGIBLE',
-									uc_s = '51' 				=> 'RETURNED AMENDMENT NEED RESTATED CERTIFICATE (L-P)',
-									uc_s = '52' 				=> 'RETURNED - NEED CONTRIBUTION ON SUPPLEMENT L (L-P)',
-									uc_s = '53' 				=> 'RETURNED - NEED ITEM 4 ON SUPPLEMENT L COMPLETED (L-P)',
-									uc_s = '54' 				=> 'RETURNED - NEED ITEM 5 ON SUPPLEMENT L COMPLETED (L-P)',
-									uc_s = '55' 				=> 'RETURNED PURPOSES QUESTIONED',
-									uc_s = '56' 				=> 'RETURNED FOR DIRECTOR LIABILITY PROVISIONS',
-									uc_s = '60' 				=> 'DENIED - 15 DAYS TO RESPOND (MARKS)',
-									uc_s = '61' 				=> 'HELD FOR SAMPLES (MARKS)',
-									uc_s = '62' 				=> 'RETURNED DOCUMENT, HELD SAMPLES (MARKS)',
-									uc_s = '70' 				=> 'OTHER',
-									uc_s = '71' 				=> '30 DAY FOLLOW-UP COMPLETED',
-									uc_s = '72' 				=> 'REINSTATEMENT PENDING',
-									uc_s = 'AD' 				=> 'AUTOMATIC DISSOLUTION',
-									uc_s = 'AR' 				=> 'ARTICLES OF ORGANIZATION RESCINDED BY FILING CERTIFICATE OF CORRECTION',
-									uc_s = 'AW' 				=> 'AUTOMATIC WITHDRAWAL',
-									uc_s = 'CC' 				=> 'CERTIFICATE OF CANCELLATION',
-									uc_s = 'CD' 				=> 'CERTIFICATE OF DISSOLUTION',
-									uc_s = 'CM' 				=> 'CONSENT OF MEMBERS',
-									uc_s = 'CN' 				=> 'CONSOLIDATION',
-									uc_s = 'CO' 				=> 'COURT ORDER',
-									uc_s = 'CV' 				=> 'CERTIFICATE OF CONVERSION',
-									uc_s = 'CW' 				=> 'CERTIFICATE OF WITHDRAWAL',
-									uc_s = 'DC' 				=> 'DISHONORED CHECK',
-									uc_s = 'FC' 				=> 'FAILURE TO COMPLY',
-									uc_s = 'FN' 				=> 'FOREIGN LIMITED PARTNERSHIP THAT DID NOT REGISTER UNDER ACT 213 OF 1982',
-									uc_s = 'FR' 				=> 'FOREIGN RAILROAD NOT QUALIFIED',
-									uc_s = 'ME' 				=> 'MERGER',
-									uc_s = 'N1' 				=> 'FOREIGN NONPROFIT CORPORATION - FAILURE TO MAINTAIN RESIDENT AGENT',
-									uc_s = 'N2' 				=> 'FOREIGN NONPROFIT CORPORATION - FAILURE TO FILE CHANGE OF RESIDENT AGENT OR REGISTERED OFFICE',
-									uc_s = 'N3' 				=> 'FOREIGN NONPROFIT CORPORATION - FAILURE TO FILE COPY OF AMENDMENT',
-									uc_s = 'N4' 				=> 'FOREIGN NONPROFIT CORPORATION - FAILURE TO FILE CERTIFICATE ATTESTING TO MERGER',
-									uc_s = 'N5' 				=> 'FOREIGN NONPROFIT CORPORATION - FAILURE TO FILE ANNUAL REPORT OR FAILURE TO PAY ANNUAL FILING FEE',
-									uc_s = 'N6' 				=> 'NONPROFIT DOCUMENT RESCINDED BY FILING CERTIFICATE OF CORRECTION',
-									uc_s = 'OT' 				=> 'OTHER TYPE OF DISSOLUTION/CANCELLATION',
-									uc_s = 'P1' 				=> 'FOREIGN PROFIT CORPORATION - FAILURE TO MAINTAIN RESIDENT AGENT',
-									uc_s = 'P2' 				=> 'FOREIGN PROFIT CORPORATION - FAILURE TO FILE CHANGE OF RESIDENT AGENT OR REGISTERED OFFICE',
-									uc_s = 'P3' 				=> 'FOREIGN PROFIT CORPORATION - FAILURE TO AMEND APPLICATION AS REQUIRED',
-									uc_s = 'P4' 				=> 'FOREIGN PROFIT CORPORATION - FAILURE TO FILE CERTIFICATE ATTESTING TO MERGER',
-									uc_s = 'P5' 				=> 'FOREIGN PROFIT CORPORATION - FAILURE TO FILE SUPPLEMENTAL STATEMENT',
-									uc_s = 'P6' 				=> 'FOREIGN PROFIT CORPORATION - FAILURE TO FILE ANNUAL REPORT OR FAILURE TO PAY ANNUAL FILING FEE',
-									uc_s = 'P7' 				=> 'PROFIT DOCUMENT RESCINDED BY FILING CERTIFICATE OF CORRECTION',
-									uc_s = 'R' 					=> 'FAILURE TO COMPLY',
-									uc_s = 'RE' 				=> 'RESCINDED',
-									uc_s = 'SE' 				=> 'SPECIFIED EVENT',
-									uc_s = 'TE' 				=> 'TERM EXPIRATION',
-									uc_s = 'TM' 				=> 'TERMINATION OF MEMBERSHIP',
+			 return map(uc_s = ''		  => '',
+			            uc_s = 'CN'   => 'CONVERTED',
+									uc_s = 'CRCC'	=> 'CANCELLED:  CERTIFICATE OF CANCELLATION',
+									uc_s = 'CRCO'	=> 'CANCELLED:  COURT ORDER',
+									uc_s = 'CRTE'	=> 'CANCELLED:  TERM EXPIRED',
+									uc_s = 'DSCD'	=> 'DISSOLVED:  CERTIFICATE OF DISSOLUTION',
+									uc_s = 'DSCO'	=> 'DISSOLVED:  COURT ORDER',
+									uc_s = 'DSOL'	=> 'DISSOLVED:  OPERATION OF LAW',
+									uc_s = 'DSTE'	=> 'DISSOLVED:  TERM EXPIRED',
+									uc_s = 'ECCN'	=> 'EXISTENCE CEASED:  CONSOLIDATION',
+									uc_s = 'ECMR'	=> 'EXISTENCE CEASED:  MERGED',
+									uc_s = 'EX'	  => 'EXPIRED',
+									uc_s = 'NGS'	=> 'IN EXISTENCE BUT NOT IN GOOD STANDING',
+									uc_s = 'NR'	  => 'NOT REGISTERED',
+									uc_s = 'OT'	  => 'OTHER',
+									uc_s = 'RS'	  => 'RESCINDED',
+									uc_s = 'RVFC'	=> 'REVOKED:  FAILURE TO COMPLY',
+									uc_s = 'RVOL'	=> 'REVOKED:  OPERATION OF LAW',
+									uc_s = 'WDCC'	=> 'WITHDRAWN:  CERTIFICATE OF CORRECTION',
+									uc_s = 'WDCO'	=> 'WITHDRAWN: COURT ORDER',
+									uc_s = 'WDCW'	=> 'WITHDRAWN:  CERTIFICATE OF WITHDRAWAL',
+									uc_s = 'XC'	  => 'CONVERSION',
 									'**|'+uc_s
 								 );
     end;
 
 		//****************************************************************************
-		//EventFilingDesc: returns the "ar_comment" and "event_filing_desc".
+		//FilingDesc: returns the "event_filing_desc" and "stock_addl_info"
 		//****************************************************************************
-		export EventFilingDesc(String s) := function
+		export FilingDesc(String s) := function
 			 uc_s := corp2.t2u(s);
-			 return map(uc_s = '01' => 'SPECIAL ENTRIES',
-								  uc_s = '02' => 'IDENTIFICATION NUMBER CHANGES',
-								  uc_s = '03' => 'NAME CHANGES',
-								  uc_s = '04' => 'HISTORY TRUE NAME',
-								  uc_s = '05' => 'CHANGE OF AGENT AND/OR OFFICE',
-								  uc_s = '06' => 'CHANGE OF AGENT AND/OR OFFICE',
-								  uc_s = '09' => 'ADDITIONAL STOCK AND SPECIAL NOTES RELATED TO CURRENT STOCK',
-								  uc_s = '14' => 'MERGERS',
-								  uc_s = '17' => 'REVOCATION - FOREIGN CORPORATION',
-								  uc_s = '18' => 'ANNUAL REPORT FILED',
-									uc_s = '23' => 'STOCK HISTORY',
-								  uc_s = '27' => 'CONSOLIDATION',
-								  uc_s = '31' => 'ALERT MESSAGE',
-								  uc_s = '37' => 'RAILROAD RECORDS TRANSFERRED PER ACT 354 OF 1993',
-								  uc_s = '40' => 'MULTIPLE FILING HISTORY',
-								  uc_s = '41' => 'CHANGE OF LIMITED PARTNERSHIP',
-									uc_s = '82' => 'ANNUAL REPORT - REPORT RETURNED',
-									uc_s = '85' => 'ANNUAL REPORT - NO FEE RECEIVED OR FEE RECEIVED, NO REPORT',
-								  ''
+			 return map(uc_s in ['2','02'] => 'IDENTIFICATION NUMBER CHANGES',
+								  uc_s in ['3','03'] => 'NAME CHANGES',
+								  uc_s in ['4','04'] => 'HISTORY TRUE NAME',
+								  uc_s in ['5','05'] => 'CHANGE OF AGENT AND/OR OFFICE',
+								  uc_s in ['9','09'] => 'ADDITIONAL STOCK AND SPECIAL NOTES RELATED TO CURRENT STOCK',
+								  uc_s =  '14'       => 'MERGERS',
+								  uc_s =  '23'       => 'STOCK HISTORY',
+								  uc_s =  '27'       => 'CONSOLIDATION',
+								  uc_s =  '41'       => 'CHANGE OF LIMITED PARTNERSHIP',
+								  uc_s =  ''         => '',
+									'**|'+uc_s
 								 );
     end;
 
-
 		//****************************************************************************
-		//InfoString: returns the "event_desc" and "stock_addl_info".
-		//****************************************************************************
-		export InfoString(string s1, string s2, string s3, string s4, string s5, string s6, string s7) := function
-			 uc_s1 := corp2.t2u(s1); //info_70
-			 uc_s2 := if(stringlib.stringfilterout(s2,'0123456789 ')<>'',corp2.t2u(s2),''); //roll_70
-			 uc_s3 := if(stringlib.stringfilterout(s3,'0123456789 ')<>'',corp2.t2u(s3),''); //frame_70
-			 uc_s4 := corp2.t2u(s4); //info2_70
-			 uc_s5 := corp2.t2u(s5); //info3_70
-			 uc_s6 := corp2.t2u(s6); //info4_70
-			 uc_s7 := corp2.t2u(s7); //info5_70
-						
-			 return corp2.t2u(uc_s1+' '+uc_s2+' '+uc_s3+' '+uc_s4+' '+uc_s5+' '+uc_s6+' '+uc_s7);
-	  end;
-		
-		//****************************************************************************
-    //LLCForeignDomesticInd: returns the "corp_foreign_domestic_ind".
+    //ForeignDomesticInd: returns the "corp_foreign_domestic_ind".
     //****************************************************************************
-    export LLCForeignDomesticInd(String s) := function
+    export ForeignDomesticInd(String s) := function
 			 uc_s := corp2.t2u(s);
-			 return map(uc_s between 'D00001' and 'D8999Z' => 'D',
-								  uc_s between 'E00001' and 'E8999Z' => 'D',
-								  uc_s between 'F00001' and 'F8999Z' => 'D',
-								  uc_s between 'G00001' and 'G8999Z' => 'D',
-								  uc_s between 'H00001' and 'H8999Z' => 'D',
-								  uc_s between 'LC0000' and 'LC899Z' => 'D',
-								  uc_s between 'B90000' and 'B9499Z' => 'F',
-								  uc_s between 'D90000' and 'D9499Z' => 'F',
-								  uc_s between 'E90000' and 'E9499Z' => 'F',
-								  uc_s between 'F90000' and 'F9499Z' => 'F',
-								  uc_s between 'G90000' and 'G9499Z' => 'F',
-								  uc_s between 'H90000' and 'H9499Z' => 'F',
-								  uc_s between 'LC9000' and 'LC949Z' => 'F',
+			 return map(uc_s in ['DOMESTIC PROFIT CORPORATION','PARTNERSHIP ASSOCIATIONS LIMITED','DOMESTIC NONPROFIT CORPORATION','DOMESTIC PROFESSIONAL CORPORATION',
+			                     'DOMESTIC PROFESSIONAL LIMITED LIABILITY COMPANY','DOMESTIC LIMITED PARTNERSHIP','DOMESTIC LIMITED LIABILITY COMPANY']                    => 'D',
+								  uc_s in ['FOREIGN PROFIT CORPORATION','FOREIGN NONPROFIT CORPORATION','FOREIGN PROFESSIONAL CORPORATION','FOREIGN LIMITED LIABILITY COMPANY',
+									         'FOREIGN PROFESSIONAL LIMITED LIABILITY COMPANY','FOREIGN TRUST','FOREIGN LIMITED PARTNERSHIP']                                           => 'F',
 								  ''
 								 );
 	  end;
-
+		
 END;

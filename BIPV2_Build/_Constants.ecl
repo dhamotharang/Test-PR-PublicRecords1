@@ -8,7 +8,7 @@ export _Constants(
 	tools.Constants(
 		 pDatasetName					:= pDatasetname
 		,pUseOtherEnvironment	:= pUseOtherEnvironment
-		,pGroupname						:= '66' //use thor400_60 by default for the BIP build
+		,pGroupname						:= '36' //use thor400_36 by default for the BIP build
 		,pMaxRecordSize				:= 4096
 		,pIsTesting						:= Tools._Constants.IsDataland
     ,pAdd_Eclcc           := true

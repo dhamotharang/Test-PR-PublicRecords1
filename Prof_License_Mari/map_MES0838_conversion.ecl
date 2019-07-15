@@ -36,7 +36,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 	ValidMEFile					:= ds_ME_Appraiser(TRIM(FULLNAME,LEFT,RIGHT) <> ' ' AND TRIM(LIC_TYPE) NOT IN DEL_Lic_types AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(FULLNAME)));
 
 	//ME Real Estate Company Personnel layout to Common
-	Prof_License_Mari.layouts.base	transformToCommon(ValidMEFile L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(ValidMEFile L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -66,7 +66,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_DBA_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameDBA); //split corporation prefix from name
 		SELF.NAME_DBA					:= IF(REGEXFIND(IPpattern,tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')),
 															Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')));
-		SELF.NAME_DBA_SUFX		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		SELF.NAME_DBA_SUFX		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		SELF.DBA_FLAG					:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0);
 	
 		//Parse name
@@ -91,7 +91,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 																 NOT REGEXFIND(ADDRESS_PATTERN,L.ADDRESS4_1)=> L.ADDRESS4_1,
 																 '');
 																	 
-		temp_OfficeName				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(getOfficeName);											 
+		temp_OfficeName				:= ut.CleanSpacesAndUpper(getOfficeName);											 
 		stdOfficeName					:= TRIM(Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(temp_OfficeName),LEFT,RIGHT);
 		clnOfficeName					:= TRIM(StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(stdOfficeName)),LEFT,RIGHT);
 		replOfficeSlash				:= StringLib.StringCleanSpaces(REGEXREPLACE('C/O',clnOfficeName,''));
@@ -103,7 +103,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 																		  SELF.BRKR_LICENSE_NBR<>'' AND TRIM(L.RILICENSEP)='IB' => 'INACTIVE BROKER',
 																			'');		
 
-		tempLicNum           	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.SLNUM);
+		tempLicNum           	:= ut.CleanSpacesAndUpper(L.SLNUM);
 		SELF.LICENSE_NBR	   	:= IF(tempLicNum<>'',ut.CleanSpacesAndUpper(L.LIC_TYPE) + tempLicNum,'');	
 		SELF.OFF_LICENSE_NBR	:= IF(L.OFF_SLNUM<>'',ut.CleanSpacesAndUpper(L.EMPLICTYPE) + ut.CleanSpacesAndUpper(L.OFF_SLNUM),'');
 		SELF.OFF_LICENSE_NBR_TYPE := MAP(SELF.OFF_LICENSE_NBR<>'' AND TRIM(L.EMPLICTYPE)='DB' => 'DESIGNATED BROKER',
@@ -129,7 +129,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 																Prof_License_Mari.DateCleaner.ToYYYYMMDD(StringLib.StringToUpperCase(L.EXPDT)));
 
 		SELF.ADDR_BUS_IND			:= IF(TRIM(L.ADDRESS1_1) != ' ','B',' ');
-		SELF.NAME_ORG_ORIG		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.FULLNAME);
+		SELF.NAME_ORG_ORIG		:= ut.CleanSpacesAndUpper(L.FULLNAME);
 		SELF.NAME_FORMAT			:= 'F';
 
 		SELF.NAME_MARI_ORG		:= IF(TRIM(replOfficeSlash)!=' ',TRIM(replOfficeSlash,LEFT,RIGHT),' ');	
@@ -145,8 +145,8 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		SELF.PHN_PHONE_1			:= ut.CleanPhone(TrimPhone);
 		SELF.PHN_FAX_1				:= ut.CleanPhone(TrimFax);
 		
-		TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.CITY_1);
-		TrimState							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.STATE_1);
+		TrimCity							:= ut.CleanSpacesAndUpper(L.CITY_1);
+		TrimState							:= ut.CleanSpacesAndUpper(L.STATE_1);
 		TrimZip								:= TRIM(L.ZIP_1);
 
 		RemovePattern	  := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
@@ -158,10 +158,10 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 					 '^SACKS$|^.* AT GLACIER$|^.* RENTALS$|^.* BY WYNDHAM$|^.* OFFICE$|GENERAL DELIVERY| VISTA VILLAGE$|' +
 					 '^LANDVEST$|^LANDVEST |^LAND VEST|^LAND AMERICA|^ADAM LEMIEUX|^.* VALUATION COUNSELORS' +
 					 ')';
-    trimAddress1        	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS1_1);
-    trimAddress2        	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS2_1);
-    trimAddress3        	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS3_1);
-    trimAddress4        	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS4_1);
+    trimAddress1        	:= ut.CleanSpacesAndUpper(L.ADDRESS1_1);
+    trimAddress2        	:= ut.CleanSpacesAndUpper(L.ADDRESS2_1);
+    trimAddress3        	:= ut.CleanSpacesAndUpper(L.ADDRESS3_1);
+    trimAddress4        	:= ut.CleanSpacesAndUpper(L.ADDRESS4_1);
 		clnAddress1						:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(trimAddress1, RemovePattern);
 		clnAddress2						:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(trimAddress2, RemovePattern);
 		clnAddress3						:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(trimAddress3, RemovePattern);
@@ -206,13 +206,13 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 
 		CO_PATTERN_ADDR2			:= '(C/O |ATTENTION |ATTN | LLC$| INC$| COMPANY$|& COMPANY|APPRAISAL INC|CO INC| GROUP$)';
 		SELF.ADDR_MAIL_IND		:= IF(TRIM(L.HMADDRESS1) != ' ','M',' ');
-		TrimHmCity						:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.HMCITY);
-		TrimHmState						:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.HMSTATE);
+		TrimHmCity						:= ut.CleanSpacesAndUpper(L.HMCITY);
+		TrimHmState						:= ut.CleanSpacesAndUpper(L.HMSTATE);
 		TrimHmZip							:= TRIM(L.HMZIP);
-    HmAddress1        		:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.HMADDRESS1);
-    HmAddress2    	    	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.HMADDRESS2);
-    HmAddress3  	      	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.HMADDRESS3);
-    HmAddress4	        	:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.HMADDRESS4);
+    HmAddress1        		:= ut.CleanSpacesAndUpper(L.HMADDRESS1);
+    HmAddress2    	    	:= ut.CleanSpacesAndUpper(L.HMADDRESS2);
+    HmAddress3  	      	:= ut.CleanSpacesAndUpper(L.HMADDRESS3);
+    HmAddress4	        	:= ut.CleanSpacesAndUpper(L.HMADDRESS4);
 		clnHmAddress1					:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(HmAddress1, RemovePattern);
 		clnHmAddress2					:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(HmAddress2, RemovePattern);
 		clnHmAddress3					:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(HmAddress3, RemovePattern);
@@ -299,8 +299,8 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		SELF.REGULATOR      := ut.CleanSpacesAndUpper(L.BOARDNAME);
 
 		SELF.EMAIL						:= StringLib.StringToUpperCase(TRIM(L.EMAIL_1,LEFT,RIGHT));
-		SELF.DISPLINARY_ACTION:= MAP(TRIM(L.FLAG15)<>'' => Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.FLAG15),
-		                             TRIM(L.FLAG13)<>'' => Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.FLAG13),
+		SELF.DISPLINARY_ACTION:= MAP(TRIM(L.FLAG15)<>'' => ut.CleanSpacesAndUpper(L.FLAG15),
+		                             TRIM(L.FLAG13)<>'' => ut.CleanSpacesAndUpper(L.FLAG13),
 																 '');
 
   TrimCEUREQUIRED          := REGEXREPLACE('\\.00',L.CEUREQUIRED,'');
@@ -330,7 +330,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		 // address_1
 		 // dba
 	
-		SELF.STD_LICENSE_DESC :=  Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.STATUS_DES);
+		SELF.STD_LICENSE_DESC :=  ut.CleanSpacesAndUpper(L.STATUS_DES);
 		
 		SELF.mltreckey 		:= 0; //This file doesn't have multiple DBA's
 		
@@ -358,7 +358,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ValidMEFile, transformToCommon(left));
 
   // populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -367,7 +367,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 																LEFT.STD_SOURCE_UPD=RIGHT.source_upd AND RIGHT.fld_name='LIC_TYPE' AND StringLib.StringToUpperCase(TRIM(LEFT.RAW_LICENSE_TYPE,LEFT,RIGHT))=TRIM(RIGHT.fld_value,LEFT,RIGHT),
 																			trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -377,7 +377,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 																			trans_status_trans(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 	//Use the office license nbr to set the contact info
-	Prof_License_Mari.layouts.base assign_contact(ds_map_status_trans L, ds_map_status_trans R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_contact(ds_map_status_trans L, ds_map_status_trans R) := TRANSFORM
 		 SELF.NAME_CONTACT_PREFX := R.NAME_PREFX;
 		 SELF.NAME_CONTACT_FIRST := R.NAME_FIRST;
 		 SELF.NAME_CONTACT_MID   := R.NAME_MID;

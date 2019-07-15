@@ -1,4 +1,4 @@
-export Layout_In_Party
+﻿export Layout_In_Party
  :=
   record
 	string8		process_date;

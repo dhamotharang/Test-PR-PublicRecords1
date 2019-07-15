@@ -1,11 +1,11 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take AK Professional License raw files AND convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI, SCANK, AND PL_BASE development.
 //************************************************************************************************************* */	
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_AKS0376_conversion(STRING pVersion) := FUNCTION
-#workunit('name','Prof License MARI- AKS0376 ' + pVersion);
+#workunit('name','Yogurt:Prof License MARI- AKS0376 ' + pVersion);
 
 src_cd	:= 'S0376';
 bus_name_pattern := '( INC$| INC\\.$| INC\\.;$|,INC$|,INC\\.$|,INC\\.;$| INC\\.,$| INC\\. | INC,|' +
@@ -141,7 +141,7 @@ ds_AKocc_ProfDesc	:= JOIN(ds_AKocc_LicDesc, ds_Prof_Desc,
 													jAKocc_ProfCd(LEFT,RIGHT),LEFT OUTER, LOOKUP);
 
 maribase_plus_dbas := RECORD, maxsize(5000)
-  Prof_License_Mari.layouts.base;	
+  Prof_License_Mari.layout_base_in;	
 	STRING60 dba1;
 	STRING60 dba2;
 	STRING60 dba3;
@@ -220,7 +220,7 @@ maribase_plus_dbas	TransformOccToCommon(layout_AKocc_ProfCd L) := TRANSFORM
 	
   TrimDBA			  := ut.CleanSpacesAndUpper(L.DBA);	
   clnNameDBA    := StringLib.StringFindReplace(TrimDBA,'.','');
-  tmpDBA        := stringLib.StringFindReplace(clnNameDBA,' DBA ',' / '); // This will replace all DBA(s) w/ â€˜/â€™
+  tmpDBA        := stringLib.StringFindReplace(clnNameDBA,' DBA ',' / '); // This will replace all DBA(s) w/ Ã¢â‚¬Ëœ/Ã¢â‚¬â„¢
 
   SELF.dba1 := IF(REGEXFIND('^(.*) /(.*)',tmpDBA),REGEXFIND('^(.*) /(.*)',tmpDBA,1),clnNameDBA);         
   SELF.dba2 := REGEXFIND('^(.*) /(.*)',tmpDBA,2);
@@ -382,7 +382,7 @@ FilteredRecs  := DBARecs + NoDBARecs;
 
 
 // Transform expanded dataset to MARIBASE layout
-Prof_License_Mari.layouts.base	 xTransToBase(FilteredRecs L) := TRANSFORM		
+Prof_License_Mari.layout_base_in	 xTransToBase(FilteredRecs L) := TRANSFORM		
 	matchDBA_ORG                    := IF(TRIM(L.TMP_DBA) = TRIM(L.NAME_ORG_ORIG),'', L.TMP_DBA); //Remove any dba name that matches NAME_ORG_Orig name
   StdNAME_DBA                     := Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(matchDBA_ORG);
 	tmpDBASufx := Prof_License_Mari.mod_clean_name_addr.strippunctName(Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_DBA));

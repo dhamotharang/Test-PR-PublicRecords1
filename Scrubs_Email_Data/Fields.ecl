@@ -84,8 +84,8 @@ EXPORT InValidMessageFT_invalid_activecode(UNSIGNED1 wh) := CHOOSE(wh,SALT30.Hyg
 EXPORT MakeFT_invalid_source(SALT30.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_source(SALT30.StrType s) := WHICH(((SALT30.StrType) s) NOT IN ['T$','TM','SC','IB','M1','IM','!I','DG','W@','AW','AO','ET']);
-EXPORT InValidMessageFT_invalid_source(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInEnum('T$|TM|SC|IB|M1|IM|!I|DG|W@|AW|AO|ET|AN|RS'),SALT30.HygieneErrors.Good);
+EXPORT InValidFT_invalid_source(SALT30.StrType s) := WHICH(((SALT30.StrType) s) NOT IN ['T$','TM','SC','IB','M1','IM','!I','DG','W@','AW','AO','ET','AN','RS','AP']);
+EXPORT InValidMessageFT_invalid_source(UNSIGNED1 wh) := CHOOSE(wh,SALT30.HygieneErrors.NotInEnum('T$|TM|SC|IB|M1|IM|!I|DG|W@|AW|AO|ET|AN|RS|AP'),SALT30.HygieneErrors.Good);
 EXPORT MakeFT_invalid_email(SALT30.StrType s0) := FUNCTION
   s1 := SALT30.stringfilter(s0,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -@&._!?/'); // Only allow valid symbols
   s2 := SALT30.stringcleanspaces( SALT30.stringsubstituteout(s1,' -@&._!?/',' ') ); // Insert spaces but avoid doubles

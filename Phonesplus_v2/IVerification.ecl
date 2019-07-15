@@ -23,7 +23,7 @@ Implementation:
 4- Keep history of the data that has been verified
 */
 
-import gong_v2, doxie, ut,didville;
+import Gong_Neustar, doxie, ut,didville,_Control;
 shared reformat(ds, ds_source, record_type, did_field, orig_did_field, phone_field) := functionmacro
 #uniquename(t_reformat)
 File_Iverification.layout t_reformat(ds le) := transform
@@ -59,7 +59,8 @@ end;
 endmacro;
 
 // --------------------gather did - phone combinations from gong and phonesplus
-gong := gong_v2.key_did(did >0 and phone10 <> '');
+gong := Gong_Neustar.Key_History_did(did >0 and phone10 <> '' and current_flag =true); // VC - Using newer file DF-23004
+        //gong_v2.key_did(did >0 and phone10 <> '');
 pplus:= phonesplus_V2.Key_Phonesplus_Did(did >0 and cellphone <> '' and current_rec);
 
 gong_r := sort(distribute(reformat(gong, 1, 0, did, did, phone10), hash(phone)), phone, did, local);																											
@@ -159,7 +160,7 @@ iver_rec := RECORD
   boolean is_latest;
  END;
 
-remote_ds := dataset('~foreign::alpha_prod_thor_dali.risk.regn.net::thor400_64::persist::for_phone_verification', iver_rec , thor);
+remote_ds := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor_data400::base::insuranceheader::for_phone_verification', iver_rec , thor);
 
 remote_ds_t := project(remote_ds, {iver_rec, unsigned hhid := 0});
 

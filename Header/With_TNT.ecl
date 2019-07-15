@@ -1,7 +1,7 @@
 import header;
 
 //workaround
-h_new_wo := sort(Apt_Patch,did);
+h_new_wo := sort(header.Apt_Patch,did);
 
 h_new := distribute(h_new_wo,hash(rid));
 

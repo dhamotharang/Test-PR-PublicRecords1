@@ -1,4 +1,4 @@
-//I have a strong suspecious that this call can only complete in hthor. 
+﻿//I have a strong suspecious that this call can only complete in hthor. 
 //using wk_ut.get_DS_Result instead of Dataset(WorkUnit(wuid,'ConfidenceLevels')... OK
 import STD,BIPV2_Build,bipv2,wk_ut;
 EXPORT DataCollector(string   version_in  = bipv2.KeySuffix) := Module
@@ -70,12 +70,12 @@ shared lay_conf := {UNSIGNED2 Conf,UNSIGNED MatchesFound};
 export ProxLgidConf :=function
 	xx:= 	apply(global(ds_prox,few), sequential(
 			//output(Dataset(WorkUnit(wuid,'ConfidenceLevels'),{UNSIGNED2 Conf,UNSIGNED MatchesFound}),named('ConfidenceLevels_prox'),extend)
-			output(wk_ut.get_DS_Result(wuid,'ConfidenceLevels',lay_conf,,true),named('ConfidenceLevels_prox'),extend)
+			output(wk_ut.get_DS_Result(wuid,'ConfidenceLevels',lay_conf,,,true),named('ConfidenceLevels_prox'),extend)
 		 ));
 
   xx1:= apply(global(ds_LGID3,few), sequential(
 			//output(Dataset(WorkUnit(wuid,'ConfidenceLevels'),{UNSIGNED2 Conf,UNSIGNED MatchesFound}),named('ConfidenceLevels_lgid'),extend)
-			output(wk_ut.get_DS_Result(wuid,'ConfidenceLevels',lay_conf,,true),named('ConfidenceLevels_lgid'),extend)
+			output(wk_ut.get_DS_Result(wuid,'ConfidenceLevels',lay_conf,,,true),named('ConfidenceLevels_lgid'),extend)
 		 ));
 		 
 		 return sequential(xx,xx1);
@@ -87,7 +87,10 @@ EXPORT addCandidates := FUNCTION
 		a0:=ProxLgidConf;
 		a := createLogicalFile(dsAdd);
 		b := updateSuperFile(logicalFilename_version_wuid);
-		c := sequential(aaa,a0,a,b);
+		c := sequential(
+      output(ds_prox  ,named('ds_prox'))
+     ,output(ds_LGID3  ,named('ds_LGID3'))
+    ,aaa,a0,a,b);
 		
 		return c;
 END;

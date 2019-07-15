@@ -1,4 +1,4 @@
-import Risk_Indicators, Models, iesp, doxie, ut;
+﻿import Risk_Indicators, Models, iesp, doxie, ut;
 
 EXPORT getAttributes(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell, 
 										 string50 DataPermissionMask = risk_indicators.iid_constants.default_DataPermission) := FUNCTION
@@ -243,6 +243,15 @@ ProfileBooster.Layouts.Layout_PB_BatchOut getAttr(PBShell le) := transform
 	self.attributes.version1.RaAOccProfLicMmbrCnt						:= if(noDid, '-1', (string)min(le.RaAOccProfLicMmbrCnt,maxcnt));
 	self.attributes.version1.RaAOccBusinessAssocMmbrCnt			:= if(noDid, '-1', (string)min(le.RaAOccBusinessAssocMmbrCnt,maxcnt));
 	self.attributes.version1.RaAInterestSportPersonMmbrCnt	:= if(noDid, '-1', (string)min(le.RaAInterestSportPersonMmbrCnt,maxcnt));
+	
+	// new attributes for RQ-13721
+	self.attributes.version1.PPCurrOwnedAutoVIN	:= if(noDid, '-1', le.PPCurrOwnedAutoVIN);
+	self.attributes.version1.PPCurrOwnedAutoYear	:= if(noDid, '-1', le.PPCurrOwnedAutoYear);
+	self.attributes.version1.PPCurrOwnedAutoMake	:= if(noDid, '-1', le.PPCurrOwnedAutoMake);
+	self.attributes.version1.PPCurrOwnedAutoModel	:= if(noDid, '-1', le.PPCurrOwnedAutoModel);
+	self.attributes.version1.PPCurrOwnedAutoSeries	:= if(noDid, '-1', le.PPCurrOwnedAutoSeries);
+	self.attributes.version1.PPCurrOwnedAutoType	:= if(noDid, '-1', le.PPCurrOwnedAutoType);
+			
 	self	:= le;
 	self	:= [];
 end;

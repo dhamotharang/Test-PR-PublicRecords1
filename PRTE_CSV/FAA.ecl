@@ -1,4 +1,4 @@
-import faa, prte_bip, ut,mdr;
+﻿import faa, prte_bip, ut,mdr;
 
 export FAA	(string pversion = '') := module
 
@@ -149,4 +149,4 @@ export FAA	(string pversion = '') := module
 																																														self 												:= left;
 																																														)
 																															);
-end;
+end: DEPRECATED('Use PRTE2_FAA.Files instead.');

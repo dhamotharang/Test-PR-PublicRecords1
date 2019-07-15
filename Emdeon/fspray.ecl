@@ -1,9 +1,9 @@
-import lib_fileservices,_control,lib_stringlib,Versioncontrol,emdeon, ut, tools;
+﻿import lib_fileservices,_control,lib_stringlib,Versioncontrol,emdeon, ut, tools;
 
 EXPORT fSpray(
 	STRING		pVersion              = '',
 	BOOLEAN   pUseProd              = false,
-	STRING		pServerIP							= _control.IPAddress.bctlpedata12,
+	STRING		pServerIP							= _control.IPAddress.bctlpedata10,
 	STRING		pRawfile							= '*Claims_US_CF_D_deid.dat',
 	STRING		pDirectory						= '/data/enclarity/claims/',// + pVersion,
 	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),//was thor400_30

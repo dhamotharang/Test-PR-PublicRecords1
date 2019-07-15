@@ -1,0 +1,1 @@
+﻿EXPORT File_DL_CP_As_DR_Info := dataset(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_DR_Info', DriversV2.Layouts_DL_Conv_Points_Common.Layout_Driver_Record_Info, thor);

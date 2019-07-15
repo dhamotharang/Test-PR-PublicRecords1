@@ -1,4 +1,4 @@
-import entiera, emailservice, mdr, _validate;
+﻿import entiera, emailservice, mdr, _validate;
 export Map_Entiera_As_Email(version) := function
 with_email := entiera.File_Entiera_Base(length(trim(orig_email,left, right)) > 4 and StringLib.StringFindCount(orig_email,  '@') > 0);
 

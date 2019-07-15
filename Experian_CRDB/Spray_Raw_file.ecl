@@ -2,7 +2,7 @@
 EXPORT Spray_Raw_file(string version) := module
 
 export Input := DATASET([
- 	{'_Control.IPAddress.bctlpedata11' //'edata12-bld.br.seisint.com'										
+ 	{'uspr-edata11.risk.regn.net' //'edata12-bld.br.seisint.com'										
  	,'/data/hds_180/experian_CRDB/data/' + version                      
  	,'*.TXT'                           
  	,'4777'                                                             

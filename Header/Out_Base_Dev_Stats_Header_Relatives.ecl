@@ -1,12 +1,12 @@
 import ut,strata;
 
-export out_base_dev_stats_header_relatives(string filedate) := function
+export out_base_dev_stats_header_relatives(string filedate,string emailListStrataBuilders) := MODULE
 
-ds_hdr_in    := header.File_Header_In().eq_uid_monthly;
-ds_hdr       := header.file_headers;
-ds_relatives := header.File_Relatives;
+SHARED ds_hdr_in    := header.File_Header_In().eq_uid_monthly;
+SHARED ds_hdr       := header.file_headers;
+SHARED ds_relatives := header.File_Relatives_v3;
 
-rPopulationStats_file_header_in
+SHARED rPopulationStats_file_header_in
  :=
   record
     string3  grouping                                         := 'ALL';
@@ -49,7 +49,7 @@ rPopulationStats_file_header_in
     //blank3_CountNonBlank                                      := sum(group,if(ds_hdr_in.blank3<>'',1,0));
 end;
 
-rPopulationStats_file_headers
+SHARED rPopulationStats_file_headers
  :=
   record
     CountGroup := count(group);
@@ -96,7 +96,7 @@ rPopulationStats_file_headers
     jflag3_CountNonBlank                                 := sum(group,if(ds_hdr.jflag3<>'',1,0));
 end;
 
-rPopulationStats_ds_relatives
+SHARED rPopulationStats_ds_relatives
  :=
   record
     string3  grouping                           := 'ALL';
@@ -110,24 +110,27 @@ rPopulationStats_ds_relatives
     number_cohabits_CountNonZero                := sum(group,if(ds_relatives.number_cohabits<>0,1,0));
 end;
 
-tStats_hdr_in    := table(ds_hdr_in,   rPopulationStats_file_header_in,  few);
-tStats_hdr       := table(ds_hdr,      rPopulationStats_file_headers,src,few);
-tStats_relatives := table(ds_relatives,rPopulationStats_ds_relatives,    few);
+SHARED tStats_hdr_in    := table(ds_hdr_in,   rPopulationStats_file_header_in,  few);
+SHARED tStats_hdr       := table(ds_hdr,      rPopulationStats_file_headers,src,few);
+SHARED tStats_relatives := table(ds_relatives,rPopulationStats_ds_relatives,    few);
 
-zOrig_Stats_hdr_in    := output(choosen(tStats_hdr_in,   all));
-zOrig_Stats_hdr       := output(choosen(tStats_hdr,      all));
-zOrig_Stats_relatives := output(choosen(tStats_relatives,all));
+SHARED zOrig_Stats_hdr_in    := output(choosen(tStats_hdr_in,   all));
+SHARED zOrig_Stats_hdr       := output(choosen(tStats_hdr,      all));
+SHARED zOrig_Stats_relatives := output(choosen(tStats_relatives,all));
 
-STRATA.createXMLStats(tStats_hdr_in,   'Credit Header','Data',filedate,'ayeesha.kayttala@lexisnexis.com;jose.bello@lexisnexis.com',zPopulation_Stats_hdr_in,   'View','Population')
-STRATA.createXMLStats(tStats_hdr,      'Header',       'Data',filedate,'ayeesha.kayttala@lexisnexis.com;jose.bello@lexisnexis.com',zPopulation_Stats_hdr,      'View','Population')
-STRATA.createXMLStats(tStats_relatives,'Relatives',    'Data',filedate,'ayeesha.kayttala@lexisnexis.com;jose.bello@lexisnexis.com',zPopulation_Stats_relatives,'View','Population')
+STRATA.createXMLStats(tStats_hdr_in,   'Credit Header','Data',filedate,emailListStrataBuilders,zPopulation_Stats_hdr_in,   'View','Population')
 
-return parallel(zOrig_Stats_hdr_in
-                ,zOrig_Stats_hdr
-				,zOrig_Stats_relatives
-				,zPopulation_Stats_hdr_in
-				,zPopulation_Stats_hdr
-				,zPopulation_Stats_relatives
-				 );
+EXPORT ingest_report := parallel(zOrig_Stats_hdr_in,
+                                  zPopulation_Stats_hdr_in
+                                 );
+
+STRATA.createXMLStats(tStats_hdr,      'Header',       'Data',filedate,emailListStrataBuilders,zPopulation_Stats_hdr,      'View','Population')
+STRATA.createXMLStats(tStats_relatives,'Relatives',    'Data',filedate,emailListStrataBuilders,zPopulation_Stats_relatives,'View','Population')
+
+EXPORT hdr_reports := parallel(zOrig_Stats_hdr,
+                               zOrig_Stats_relatives,
+                               zPopulation_Stats_hdr,
+                               zPopulation_Stats_relatives,
+                               );
 
 end;									  

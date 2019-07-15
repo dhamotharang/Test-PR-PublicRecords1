@@ -164,6 +164,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string20 FilingNumber       ;    
 		string10 FilingBook         ;    
 		string10 FilingPage         ;    
+		string7 AgencyID						;    
 		string60 Agency             ;    
 		string35 AgencyCounty       ;    
 		string2 AgencyState         ; 
@@ -198,7 +199,8 @@ EXPORT Layouts_Derog_Info := MODULE
 		string8 DateLastSeen   ;    
 		string20 FilingNumber       ;    
 		string10 FilingBook         ;    
-		string10 FilingPage         ;    
+		string10 FilingPage         ; 
+		string7	 AgencyID           ;    
 		string60 Agency             ;    
 		string35 AgencyCounty       ;    
 		string2 AgencyState         ;  
@@ -225,7 +227,8 @@ EXPORT Layouts_Derog_Info := MODULE
 		string20 FilingNumber ;                
 		string10 FilingBook   ;                
 		string10 FilingPage   ;                
-		string1 Eviction      ;                
+		string1 Eviction      ;  
+		string7 AgencyID      ;                
 		string60 Agency       ;                
 		string35 AgencyCounty ;                
 		string2 AgencyState    ;
