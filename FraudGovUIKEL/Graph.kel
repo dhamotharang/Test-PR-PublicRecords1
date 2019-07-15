@@ -2009,7 +2009,7 @@ Employer: => BusUnemClmLT60DAfterOpenFlag :=  MAP(BusAcctUIDEcho=-99999 OR rLega
 Employer: => BusUnemClm60To120DAfterOpenFlag :=  MAP(BusAcctUIDEcho=-99999 OR rLegal:Null => -99999,
                                                   BusUnemClmAfterOldestOpenCnt60D=-99998 OR BusOldestAcctOpenDt=-99998 => -99998,
 																									BusOldestAcctOpenDt = BusAcctNewestRecordDt => -99997,
-																									IF(BusUnemClmAfterOldestOpenCnt60D - BusUnemClmAfterOldestOpenCnt60D > 0,1,0));
+																									IF(BusUnemClmAfterOldestOpenCnt120D - BusUnemClmAfterOldestOpenCnt60D > 0,1,0));
 
 // Claim: => EmployerClaimCount := rEmployer.ClaimCount;
 QUERY: showEmployers <= Employer;
