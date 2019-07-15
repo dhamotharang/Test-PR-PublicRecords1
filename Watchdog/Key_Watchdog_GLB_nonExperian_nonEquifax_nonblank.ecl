@@ -2,7 +2,7 @@
 
 GlbnonExperiannonEquifaxnonblankLayout := record
 	watchdog.Layout_Best;
-    unsigned integer8 __filepos { virtual(fileposition)};
+    unsigned integer8 __filepos { virtual(fileposition)}:=0;
 end;
 
 Parms := Module(Watchdog_V2.UniversalKeyInterface)

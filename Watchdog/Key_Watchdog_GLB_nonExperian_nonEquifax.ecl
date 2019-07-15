@@ -2,7 +2,7 @@
 
 GlbnonExperiannonEquifaxLayout := record
 	watchdog.Layout_Best;
-    unsigned integer8 __filepos { virtual(fileposition)};
+    unsigned integer8 __filepos { virtual(fileposition)}:=0;
 end;
 
 
