@@ -9,15 +9,15 @@ module
 
 	export	string		LandingZoneFilePathRgx			:=	'^[0-9]+/ready';
 	
-	export	string		DeltaLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/deltabase/dev/';
+	export	string		DeltaLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/deltabase/prod/';
 	export	string		DeltaLandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/deltabase/prod/';
 
 	export	string		VRulesLandingZonePathBase	:=	'/data/otto/velocityrules/';
 	
-	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dev';
-	export	string 		MBSLandingZonePathBase_prod	:='/data/super_credit/fraudgov/in/mbs/prod';
+	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
+	export	string 		MBSLandingZonePathBase_prod	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';
 	
-	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in/mbs/dev';
+	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in/mbs/prod';
 	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in/mbs/prod';
 
 	export string		ThorName_Dev					:= 'thor400_dev_eclcc';
@@ -33,7 +33,7 @@ module
 		:=
 		'** NOC **\n\n'
 
-		+'http://prod_esp:8010/?legacy&inner=../WsWorkunits/WUInfo%3FWuid%3D'+workunit+'\n\n'
+		+'http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid='+workunit+'#/stub/Summary\n\n'
 
 		+'Please investigate cause of failure of workunit '+workunit+' linked\n'
 		+'above in Boca Prod.  Then please resubmit it to ensure FraudGov ingest process\n'
@@ -48,6 +48,6 @@ module
 		+'but please do not forget.\n\n'
 
 		+'If issues persist/repeat outside the Sunday maintenance window,\n'
-		+'please contact Oscar.Barrientos@lexisnexis.com and Jose.Bello@lexisnexis.com for assistance.\n'
+		+'please contact Oscar.Barrientos@lexisnexisrisk.com (+13058126820) or Sesha.Nookala@lexisnexisrisk.com for assistance.\n'
 		;
 end;

@@ -1,4 +1,4 @@
-EXPORT Layout_Override_Liens_Party_In := record
+﻿EXPORT Layout_Override_Liens_Party_In := record
 string50 tmsid;
 string50 rmsid;
 string250 orig_full_debtorname;
@@ -59,5 +59,9 @@ string8 date_last_seen;
 string8 date_vendor_first_reported;
 string8 date_vendor_last_reported;
 unsigned8 persistent_record_id := 0 ; 
+// DF-24061 VC
+string10  orig_rmsid;
+unsigned4 global_sid;
+unsigned8 record_sid;
 string20 flag_file_id;
 end;

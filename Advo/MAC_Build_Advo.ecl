@@ -1,4 +1,4 @@
-﻿import advo,uspis_hotlist,_Control, Orbit3, dops;
+﻿import advo,uspis_hotlist,_Control, Orbit3, dops,Orbit3Insurance;
 
 export MAC_Build_Advo (
 
@@ -25,8 +25,11 @@ export MAC_Build_Advo (
                 dops.updateversion('FCRA_CDSKeys',pversion,'michael.gould@lexisnexisrisk.com',,'F'));
 	buildOrbit := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('CDS',pversion,'N'),
 	                         Orbit3.proc_Orbit3_CreateBuild ('FCRA CDS',pversion,'F'),
-													 
+																	 
 							  );
+								
+								  //Orbiti Update
+     buildOrbiti :=    Orbit3Insurance.Proc_Orbit3I_CreateBuild ('CDS', pversion,'N','Sudhir.Kasavajjala@lexisnexisrisk.com' ) ;
 
 	sequential(
 				DoBuild
@@ -34,6 +37,7 @@ export MAC_Build_Advo (
 				,idops
 				,ldops
 				,buildOrbit
+				,buildOrbiti
 				,movetoResearch
 				)
 				: success(Advo.Send_Email(pversion).Build_Success)

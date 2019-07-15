@@ -1,10 +1,12 @@
-﻿import _Control, NAC;
+﻿import FraudGovPlatform,_Control, NAC;
 
-EVERY_DAY_AT_6AM := '0 11 * * *';
-ThorName	:=		IF(_control.ThisEnvironment.Name		<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
+EVERY_DAY_AT_10AM := '0 14 * * *';
+
+ThorName:=IF(_control.ThisEnvironment.Name<>'Prod_Thor',Constants.ThorName_Dev,Constants.ThorName_Prod);
 
 lECL1 :=
- 'import ut;\n'
+ 'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
++'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov NAC Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
@@ -22,11 +24,14 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,FraudGovPlatform.Build_All(version).Run_NAC\n'
-+'	);\n'
++'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyNAC(version)\n'
++'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'NAC\', Scrubs_FraudGov.NAC_In_NAC, FraudGovPlatform_Validation.Mailing_List().Alert)\n'
++'		)\n'
++'	):failure(email(\'FraudGov NAC Input Prep Failed\'));\n'
 ;
 
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov NAC Input Prep Schedule');
-
-_Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_6AM));
+SkipJob := FraudGovPlatform.Files().Flags.SkipModules[1].SkipNAC;
+Run_ECL := if(SkipJob=false,lECL1, 'output(\'Spray NAC Skipped\');\n' );
+_Control.fSubmitNewWorkunit(Run_ECL, ThorName ) : WHEN(CRON(EVERY_DAY_AT_10AM));

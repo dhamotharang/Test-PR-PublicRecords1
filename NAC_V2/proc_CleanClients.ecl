@@ -1,4 +1,8 @@
-import	STD, Address, Nid, ut, _validate, header, did_add;
+﻿import	STD, Address, Nid, ut, _validate, header, did_add;
+
+		integer YYYYMMDDToDays(string pInput) := 
+									 (((integer)(pInput[1..4])*365) + ((integer)(pInput[5..6])*30)+ ((integer)(pInput[7..8])));
+
 
 EXPORT proc_CleanClients(dataset(layouts2.rClientEx) basein) := FUNCTION
 
@@ -15,9 +19,7 @@ EXPORT proc_CleanClients(dataset(layouts2.rClientEx) basein) := FUNCTION
 																								,(unsigned)_validate.date.fCorrectedDateString(left.DOB,false)
 																								,0);
 
-									integer YYYYMMDDToDays(string pInput) := 
-									 (((integer)(pInput[1..4])*365) + ((integer)(pInput[5..6])*30)+ ((integer)(pInput[7..8])));
-									today := YYYYMMDDToDays(ut.GetDate);
+									today := YYYYMMDDToDays((string8)STD.Date.Today());
 
 									SELF.age:=if(SELF.clean_dob>0,(integer)((today - YYYYMMDDToDays((string)SELF.clean_dob)) / 365),-999);
 

@@ -1,39 +1,22 @@
 ﻿import FraudGovPlatform,PromoteSupers;
 EXPORT fn_Skip_Modules (
-	boolean SkipBaseBuild = false,
-	boolean SkipBaseRollback = true,
-	boolean SkipKeysBuild = true,
-	boolean SkipNACBuild = false,
-	boolean SkipInquiryLogsBuild = true,
-	boolean SkipPiiBuild = true,
-	boolean SkipKelBuild = true,
-	boolean SkipOrbitBuild = true,
-	boolean SkipDashboardsBuild = true,
+	boolean SkipBuild = false,
+	boolean SkipContributions = false,
+	boolean SkipNAC = false,
+	boolean SkipInquiryLogs = false,
 	boolean SkipMBS = false,
 	boolean SkipDeltabase = false,
-	boolean SkipContributory = true,
-	boolean SkipScrubs = true,
-	boolean SkipRefreshHeader = true,
-	boolean SkipRefreshAddresses = true,
-	boolean SkipGarbageCollector = true
+	boolean SkipRDP = false
 ) := FUNCTION 
 
-	d:=dataset([{	SkipBaseBuild,
-				SkipBaseRollback, 
-				SkipKeysBuild, 
-				SkipNACBuild,
-				SkipInquiryLogsBuild, 
-				SkipPiiBuild,
-				SkipKelBuild, 
-				SkipOrbitBuild,
-				SkipDashboardsBuild,
-				SkipMBS,
+	d:=dataset([{
+				SkipBuild,
+				SkipContributions,
+				SkipNAC,
+				SkipInquiryLogs, 
+				SkipMBS, 
 				SkipDeltabase,
-				SkipContributory,
-				SkipScrubs,
-				SkipRefreshHeader,
-				SkipRefreshAddresses,
-				SkipGarbageCollector			
+				SkipRDP
 				}],
 			FraudGovPlatform.Layouts.Flags.SkipModules);
 

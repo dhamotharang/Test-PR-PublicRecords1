@@ -1,4 +1,4 @@
-import AutoKeyB2,Address,autokey,AutoKeyI, ut, codes;
+﻿import AutoKeyB2,Address,autokey,AutoKeyI, ut, codes;
 
 export proc_build_autokeys(string filedate) := function
 
@@ -17,6 +17,10 @@ xpnd_sanctn := RECORD
 SANCTN.layout_autokeys;
   INTEGER8 zero := 0;
 	blk  := '';
+	//CCPA-283 Adding CCPA new fields
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid:=0;
+
 END;
 
 xpnd_sanctn xpand_sanctn(pty L, inc R) :=  TRANSFORM
@@ -79,6 +83,7 @@ xpnd_sanctn	 xpand_sanctn_aka(ds_CleanParsedAKA	 L) :=  TRANSFORM
 self.cname						:= IF(L.NAME_TYPE = 'D',L.AKA_DBA_TEXT,'');
 self.did							:= 0;
 self.bdid							:= 0;
+self.global_sid				:= 22811;
 self 	:= L; 
 self	:= [];
 END;

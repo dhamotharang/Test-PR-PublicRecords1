@@ -2,9 +2,11 @@
 
 #option('multiplePersistInstances', false);
 #option('defaultSkewError', 1);
+//#option('freezepersists', true);
 
-output(KELOtto.KelFiles.CustomerAddress,, '~gov::otto::customeraddress', overwrite);
-output(KELOtto.KelFiles.PersonStats,, '~gov::otto::personstats', overwrite);
+//output(KELOtto.KelFiles.CustomerAddress,, '~gov::otto::customeraddress', overwrite);
+//output(KELOtto.KelFiles.PersonStats,, '~gov::otto::personstats', overwrite);
+
 output(KELOtto.KelFiles.PersonEvents,, '~gov::otto::personevents', overwrite);
 output(KELOtto.KelFiles.CustomerStats,, '~gov::otto::customerstats', overwrite);
 output(KELOtto.KelFiles.CustomerStatsPivot,, '~gov::otto::customerstats_pivot', overwrite);
@@ -22,5 +24,6 @@ output(KELOtto.KelFiles.PersonAssociationsDetails,, '~gov::otto::person_associat
 output(KELOtto.KelFiles.ScoreBreakdown,,'~gov::otto::entity_scorebreakdown', overwrite);
 
 // Optimized Customer Dashboard Content.
+
 output(KELOtto.CustomerDash.TopEntityStats,, '~gov::otto::customerdashtopentitystats', overwrite);
 output(KELOtto.CustomerDash.TopClustersAndElements,, '~gov::otto::customerdashtopclusters', overwrite);

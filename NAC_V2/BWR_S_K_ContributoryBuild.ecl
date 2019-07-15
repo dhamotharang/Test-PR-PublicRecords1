@@ -31,7 +31,7 @@ envVars
 ;
 
 import _Control;
-ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241','thor400_30_sla');
+ThorName := 'thor400_44_sla_eclcc';
 
 // NOTE: Ssystem time is standard time + 5; therefore, Sunday at 10 PM is actually Monday 3 AM
 #WORKUNIT('name', 'S-K NAC Contributory Build');

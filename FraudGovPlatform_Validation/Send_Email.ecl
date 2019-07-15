@@ -6,7 +6,7 @@
 
 	export build_success
 						:= fileservices.sendemail(
-								Mailing_List(UpSt,UpType,ce).BocaOps
+								Mailing_List(UpSt,UpType,ce).Roxie
 								,'FraudGov Build Succeeded ' + filedate
 								,'Sample records are in WUID:' + workunit
 								,
@@ -26,9 +26,9 @@
 
 	export build_rollback
 						:= fileservices.sendemail(
-								Mailing_List(UpSt,UpType,ce).BocaOps
+								Mailing_List(UpSt,UpType,ce).Alert
 								,'FraudGov '+filedate+' Build ROLLBACK'
-								,workunit+ ' ' + FAILMESSAGE + '\n'
+								,'WUID: ' + workunit +'\n\n'
 								+'Build failed due one of the following reasons:\n\n'
 								+'Validate Build: ' + build_status + '\n'
 								+'Validate RIDs: ' + rid_status + '\n'
@@ -84,7 +84,7 @@
 
 	export FileErrorAlert
 						:= fileservices.sendemail(
-								Mailing_List(UpSt,UpType,ce).BocaOps
+								Mailing_List(UpSt,UpType,ce).Alert
 								,'*** ALERT **** FraudGov Contributory File Validation FAILURE'
 								,'File not found -> '+fn
 								,

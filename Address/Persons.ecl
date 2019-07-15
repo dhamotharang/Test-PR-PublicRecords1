@@ -805,7 +805,7 @@ export IsSureGen(string name) :=
 	TRIM(name,LEFT,RIGHT) IN ['JR','SR','II','III','IV','VI','VII','VIII','IX'];
 
 // determine if name may be multi-part last name
-shared boolean IsLastNameOnly(string name) := RegexFind('^' + rgxLastStrong + '$', name);
+export boolean IsLastNameOnly(string name) := RegexFind('^' + rgxLast + '$', name);
 export boolean IsJustLastName(string name) := 
 	IF(RegexFind('^' + rgxLastStrong + '$', name),
 		NOT NameTester.IsFirstName(RegexFind('^([A-Z]+) +', name, 1)) and NOT NameTester.IsLoPctFirstName(RegexFind('^([A-Z]+) +', name, 1)),

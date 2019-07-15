@@ -1,4 +1,4 @@
-// MES0691 / Louisiana Real Estate Commission / Real Estate raw data to common layout for MARI and PL use
+﻿// MES0691 / Louisiana Real Estate Commission / Real Estate raw data to common layout for MARI and PL use
 
 
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
@@ -16,7 +16,7 @@ mtg_all       := Prof_License_Mari.files_MES0691;
 ValidFile	:= mtg_all(TRIM(name_1,left,right)+trim(name_1,left,right) != ' ' 
 								 AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(name_1))
                  AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(name_1))
-								 AND Prof_License_Mari.mod_clean_name_addr.trimUpper(slnum) != 'LICENSENUMBER');
+								 AND ut.CleanSpacesAndUpper(slnum) != 'LICENSENUMBER');
 
 //Dataset reference files for lookup joins
 License_Desc	  := Prof_License_Mari.files_References.MARIcmvLicType(SRC_UPD = 'S0691');
@@ -52,13 +52,13 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			self.LAST_UPD_DTE    := process_date;
 			self.STAMP_DTE       := process_date;
 			self.STD_SOURCE_UPD	 := src_cd;
-		  tempLicNum           := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.slnum);
+		  tempLicNum           := ut.CleanSpacesAndUpper(pInput.slnum);
 			self.LICENSE_NBR	   := tempLicNum;
 			self.LICENSE_STATE	 := src_st;
 			
 
 			// initialize raw_license_type from raw data
-			tempRawType  := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.lic_type);
+			tempRawType  := ut.CleanSpacesAndUpper(pInput.lic_type);
 												 
 			self.RAW_LICENSE_TYPE := tempRawType;
 																	 													          
@@ -70,15 +70,15 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
         
 			
 			// assigning dates per business rules
-			trimExpDt            := Prof_License_Mari.mod_clean_name_addr.trimUpper(pInput.expdt);
+			trimExpDt            := ut.CleanSpacesAndUpper(pInput.expdt);
 			tempExpDt            := if(length(trimExpDt)<9,'0'+trimExpDt,trimExpdt);
 			tempExpDt2           := (string)Prof_License_Mari.DateCleaner.FromDDMMMYY(tempExpDt);
 		  self.EXPIRE_DTE		   := tempExpDt2;
-			trimIssueDt          := Prof_License_Mari.mod_clean_name_addr.trimUpper(pInput.issuedt);
+			trimIssueDt          := ut.CleanSpacesAndUpper(pInput.issuedt);
 			tempIssueDate        := if(length(trimIssueDt)<9,'0'+trimIssueDt,trimIssueDt);
 			tempIssueDate2       := (string)Prof_License_Mari.DateCleaner.FromDDMMMYY(tempIssueDate);
 			self.ORIG_ISSUE_DTE  := tempIssueDate2;
-			trimCurIssueDt       := Prof_License_Mari.mod_clean_name_addr.trimUpper(pInput.curissuedt);
+			trimCurIssueDt       := ut.CleanSpacesAndUpper(pInput.curissuedt);
 			tempCurIssueDt       := if(length(trimCurIssueDt)<9,'0'+trimCurIssueDt,trimCurIssueDt);
 			tempCurIssueDt2      := (string)Prof_License_Mari.DateCleaner.FromDDMMMYY(tempCurIssueDt);
 			self.CURR_ISSUE_DTE  := tempCurIssueDt2;
@@ -93,7 +93,7 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			self.PHN_MARI_1  := tempPhone5;
 			
 			// email
-			tempEmail  := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.email_1);
+			tempEmail  := ut.CleanSpacesAndUpper(pInput.email_1);
 			self.EMAIL := tempEmail;
 			
 			// fax
@@ -106,7 +106,7 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			self.PHN_MARI_FAX_1  := tempFax5;
 				
 			//initialize raw_license_status from raw data
-			tempRawStatus := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.licstat);
+			tempRawStatus := ut.CleanSpacesAndUpper(pInput.licstat);
 			
 			self.RAW_LICENSE_STATUS := tempRawStatus;
 			
@@ -121,8 +121,8 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 		// 1.) Replacing D/B/A with  '|' to separate ORG_NAME & DBA
 		// 2.) Handle AKA Names to First, Middle Last Format
 		// 3.) Standardized corporation suffixes
-		  trimName1        := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.name_1);
-			trimName2        := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.name_2);
+		  trimName1        := ut.CleanSpacesAndUpper(pInput.name_1);
+			trimName2        := ut.CleanSpacesAndUpper(pInput.name_2);
 		  tempTrimName     := map(trimName2 != '' => trimName2,
 			                        trimName2 = '' and trimName1 != '' => trimName1, 
 			                       '');
@@ -213,9 +213,9 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 
 		   	 
       // office address fields
-			tempAdd1_1_1            := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS1_1);
-			tempAdd2_1_1            := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS2_1);
-      tempAdd3_1_1            := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS3_1);
+			tempAdd1_1_1            := ut.CleanSpacesAndUpper(pInput.ADDRESS1_1);
+			tempAdd2_1_1            := ut.CleanSpacesAndUpper(pInput.ADDRESS2_1);
+      tempAdd3_1_1            := ut.CleanSpacesAndUpper(pInput.ADDRESS3_1);
 			
 			tempAdd1_1_2            := if(Prof_License_Mari.func_is_address(tempAdd1_1_1) = false,tempAdd2_1_1,tempAdd1_1_1);
 			tempAdd1_1_3            := map(tempAdd1_1_2 = '' and tempAdd2_1_1 = '' => tempAdd3_1_1,
@@ -232,11 +232,11 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			self.ADDR_ADDR2_1   := tempAdd2_1_3;
 			self.ADDR_ADDR3_1   := tempAdd3_1_2;
 			
-			self.ADDR_CITY_1		:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.CITY_1);
-			tempState           := if(Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STATE_1)='NULL','',
-			                          Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STATE_1));
+			self.ADDR_CITY_1		:= ut.CleanSpacesAndUpper(pInput.CITY_1);
+			tempState           := if(ut.CleanSpacesAndUpper(pInput.STATE_1)='NULL','',
+			                          ut.CleanSpacesAndUpper(pInput.STATE_1));
 			self.ADDR_STATE_1	  := tempState;
-			tempZip3             := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(stringlib.stringfindreplace(pInput.ZIP_1,'-',''));
+			tempZip3             := ut.CleanSpacesAndUpper(stringlib.stringfindreplace(pInput.ZIP_1,'-',''));
 			tempZip4            := stringlib.stringfindreplace(tempZip3,' ','');
 			tempZip44           := if(length(tempZip4)=4, '0'+tempZip4, tempZip4);
 			self.ADDR_ZIP5_1		:= tempZip44[1..5];
@@ -245,9 +245,9 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			
 			// second set of address fields
 			
-			tempAdd1_2_1            := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS1_2);
-			tempAdd2_2_1            := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS2_2);
-      tempAdd3_2_1            := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS3_2);
+			tempAdd1_2_1            := ut.CleanSpacesAndUpper(pInput.ADDRESS1_2);
+			tempAdd2_2_1            := ut.CleanSpacesAndUpper(pInput.ADDRESS2_2);
+      tempAdd3_2_1            := ut.CleanSpacesAndUpper(pInput.ADDRESS3_2);
 			
 			tempAdd1_2_2            := if(Prof_License_Mari.func_is_address(tempAdd1_2_1) = false,tempAdd2_2_1,tempAdd1_2_1);
 			tempAdd1_2_3            := map(tempAdd1_2_2 = '' and tempAdd2_2_1 = '' => tempAdd3_2_1,
@@ -264,11 +264,11 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			self.ADDR_ADDR2_2   := tempAdd2_2_3;
 			self.ADDR_ADDR3_2   := tempAdd3_2_2;
 			
-			self.ADDR_CITY_2		:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.CITY_2);
-			tempState2           := if(Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STATE_2)='NULL','',
-			                          Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.STATE_2));
+			self.ADDR_CITY_2		:= ut.CleanSpacesAndUpper(pInput.CITY_2);
+			tempState2           := if(ut.CleanSpacesAndUpper(pInput.STATE_2)='NULL','',
+			                          ut.CleanSpacesAndUpper(pInput.STATE_2));
 			self.ADDR_STATE_2	  := tempState2;
-			tempZip5             := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(stringlib.stringfindreplace(pInput.ZIP_2,'-',''));
+			tempZip5             := ut.CleanSpacesAndUpper(stringlib.stringfindreplace(pInput.ZIP_2,'-',''));
 			tempZip6            := stringlib.stringfindreplace(tempZip5,' ','');
 			tempZip66           := if(length(tempZip6)=4, '0'+tempZip6, tempZip6);
 			self.ADDR_ZIP5_2		:= tempZip66[1..5];
@@ -280,9 +280,9 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			
 			
 			//assign officename
-			// tempNameOff          := if(tempTypeCd = 'MD',Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.contact),'');
+			// tempNameOff          := if(tempTypeCd = 'MD',ut.CleanSpacesAndUpper(pInput.contact),'');
 			// /*tempNameOff2         := if(tempTypeCd = 'MD' and prof_license_mari.func_is_address(pInput.address1_1)='false' and tempNameOff='',
-			                           // Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.address1_1),
+			                           // ut.CleanSpacesAndUpper(pInput.address1_1),
 																 // tempNameOff);*/
 															 																 
 			// trimNAME_OFFICE     := tempNameOff;
@@ -302,8 +302,8 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			
 			
 			// Business rules to parse contacts
-			trimDept        := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.dept);
-			trimCont        := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.contact);
+			trimDept        := ut.CleanSpacesAndUpper(pInput.dept);
+			trimCont        := ut.CleanSpacesAndUpper(pInput.contact);
 			
 			tempContact     := map(trimDept != '' and Prof_License_Mari.func_is_company(trimDept) = false => trimDept,
 			                       trimCont != '' and Prof_License_Mari.func_is_company(trimCont) = false => trimCont,
@@ -345,7 +345,7 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 
 		  // Populate if DBA exist in ORG_NAME field
 			tempDBA       := if(trimName2 != '' and trimName1 != '', trimName1, '');
-			trimDBA       := Prof_License_Mari.mod_clean_name_addr.trimUpper(tempDBA);
+			trimDBA       := ut.CleanSpacesAndUpper(tempDBA);
 			trimDBA2      := if(trimDBA = tempTrimName,'',trimDBA);
 			trimFix       := stringlib.stringfindreplace(trimDBA2,'RE/MAX','REMAX');
 			//trimDBA2      := if(tempTypeCd = 'GR' and Prof_License_Mari.func_is_address(tempAdd1)= false and trimDBA = '',tempAdd1, trimDBA);
@@ -422,10 +422,10 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			mltreckeyHash := hash32(trim(tempLicNum,left,right) 
 		                           +trim(tempStdLicType,left,right)
 										           +trim(src_cd,left,right)
-				                       +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StdName_Org)
-										           +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS1_1)
-															 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StripDBA)
-															 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS2_1)
+				                       +ut.CleanSpacesAndUpper(StdName_Org)
+										           +ut.CleanSpacesAndUpper(pInput.ADDRESS1_1)
+															 +ut.CleanSpacesAndUpper(StripDBA)
+															 +ut.CleanSpacesAndUpper(pInput.ADDRESS2_1)
 															 +tempContact); 
 			
 			self.mltrec_key := if(temp_dba1 != ' ',mltreckeyHash, 0);
@@ -441,9 +441,9 @@ maribase_plus_dbas	transformToCommon(Prof_License_Mari.Layout_MES0691 pInput) :=
 			self.cmc_slpk         := hash32(trim(tempLicNum,left,right) 
 		                           +trim(tempStdLicType,left,right)
 										           +trim(src_cd,left,right)
-				                       +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StdName_Org)
-										           +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS1_1)
-															 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(pInput.ADDRESS2_1)
+				                       +ut.CleanSpacesAndUpper(StdName_Org)
+										           +ut.CleanSpacesAndUpper(pInput.ADDRESS1_1)
+															 +ut.CleanSpacesAndUpper(pInput.ADDRESS2_1)
 															 +tempContact);
 										 
 

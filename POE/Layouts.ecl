@@ -1,6 +1,14 @@
-import address;
+﻿import address;
 export Layouts :=
 module
+
+	// Jira# CCPA-102, The below layout with 2 new fields are added for CCPA (California Consumer Protection Act) project.
+	// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+	export CCPA_fields := 
+	record
+		unsigned4 													global_sid 		:= 0;
+		unsigned8 													record_sid 		:= 0;
+	end;
 
 	export Base :=
 	record
@@ -29,6 +37,7 @@ module
 		unsigned4  									company_fein							;
 		unsigned8										company_rawaid				:= 0;
 		unsigned8										company_aceaid				:= 0;
+		CCPA_fields																						; // Added new CCPA fields as per Jira# CCPA-102
 
 	end;                                                		
 	
@@ -59,6 +68,7 @@ module
 		unsigned4  									company_fein							;
 		unsigned8										company_rawaid				:= 0;
 		unsigned8										company_aceaid				:= 0;
+		CCPA_fields																						; // Added new CCPA fields as per Jira# CCPA-102
 
 	end;                                                		
 

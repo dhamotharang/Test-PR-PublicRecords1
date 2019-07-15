@@ -146,14 +146,14 @@ roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::banko::fcra::@version@::courtc
 updatedops :=  
 							if( dops.GetBuildVersion('BankruptcyV2Keys','B','N','T')[1..8] <> filedate[1..8] and dops.GetBuildVersion('FCRA_BankruptcyKeys','B','F','T')[1..8] <> filedate[1..8],
 							sequential(
-									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'N',,'Y'),
-									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'F',,'Y'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'N',,'Y'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'F',,'Y'),
 									Banko.Manage_Input_Files(true)
 										),
 							if (~(ut.Weekday((integer)filedate[1..8]) = 'SATURDAY' or ut.Weekday((integer)filedate[1..8]) = 'SUNDAY'),
 								sequential(
-									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
-									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
 									Banko.Manage_Input_Files(true)
 										)
 										
@@ -163,13 +163,16 @@ updatedops :=
 create_build := sequential(Orbit3.proc_Orbit3_CreateBuild('Bankruptcy Additional Events',filedate,'N'),
                 Orbit3.proc_Orbit3_CreateBuild('FCRA Bankruptcy Additional Events',filedate,'F'));
 
+df:=dataset('~thor::banko::filter::qa::additionalevents',Banko.BankoJoinRecord,thor);
+samples:= output(choosen(df(entereddate [1..8] = todaysdate),100),named('BK_Events_Samples'));
+
 retval := sequential(//if(newCatEvent,Banko.Spray_CatEventLookupTable('edata12','/hds_2/bkevents/archive/process/*CATEVENTDESC',filedate),output('No New CatEvent File')), //If no new cateven file, no spray
 						sequential(
 							parallel(output_nonfcra,output_fcra),
 							parallel(nonfcrabase,fcrabase),Banko.fCheckNewCatEventClasses(filedate)),
 					 parallel(FilterBase,FilterFcraBase),notify('BK EVENT FILTER BASE COMPLETE','*'),
 					 parallel(nonfcrakey,fcrakey,nonfcrafullkey,fcrafullkey),updatedops,
-					 mvnonfcra,mvfcra,mvnonfcrafull,mvfcrafull,
+					 mvnonfcra,mvfcra,mvnonfcrafull,mvfcrafull,samples,
 					 if(ut.Weekday((integer)filedate[1..8]) <> 'SATURDAY' and ut.Weekday((integer)filedate[1..8]) <> 'SUNDAY',
 					 create_build,
 					 output('No Orbit Entries Needed for weekend builds'))
@@ -187,7 +190,7 @@ We send of an email once the job is completed, with any courtID misses.
 file_in := Banko.Banko_FileDataset;	
 counted := (string)count(file_in(_CourtID = ''));
 
-leMailTarget := 'john.freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, christopher.brodeur@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com';
+leMailTarget := 'kevin.reeder@lexisnexisrisk.com, christopher.brodeur@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com';
 //,Joseph.Lezcano@lexisnexisrisk.com';
 
 fSendMail(string pSubject,string pBody)

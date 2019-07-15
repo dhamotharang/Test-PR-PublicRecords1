@@ -1,4 +1,4 @@
-import RoxieKeyBuild, ut;
+﻿import RoxieKeyBuild, ut, Orbit3;
 export proc_build_sna_keys(string filedate) := function
 
 RoxieKeyBuild.Mac_SK_BuildProcess_Local(SNA.Key_Person_Cluster
@@ -51,6 +51,8 @@ move_qa_keys := parallel(moveq10
 							
 updatedops := Roxiekeybuild.updateversion('SNAKeys',filedate,'skasavajjala@seisint.com ; Melanie.Jackson@lexisnexis.com',,'N');
 
+// Updates Orbit 
+updateorbit := Orbit3.proc_Orbit3_CreateBuild('SNA',filedate,'N');
 
 do_all:= sequential(
 					
@@ -59,6 +61,7 @@ do_all:= sequential(
 					,move_qa_keys
 					,updatedops
 					,Sample_QA.out
+					,updateorbit
 					); 
 					//: success(send_succ_msg),failure(send_fail_msg);
 return do_all;

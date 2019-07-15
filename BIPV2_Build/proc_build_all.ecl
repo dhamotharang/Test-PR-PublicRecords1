@@ -56,6 +56,7 @@ export proc_build_all(
   ,pSkipProx              = 'false'
   ,pSkipProxMj6           = 'false'
   ,pSkipProxPost          = 'false'
+  ,pSkipProxidUnderlinks  = 'false'
   ,pSkipHierarchy         = 'false'
   ,pSkipLgid3             = 'false'
   ,pSkipPowDown           = 'false'
@@ -79,6 +80,7 @@ export proc_build_all(
   ,pSkipCDWBuild          = 'false'
   ,pSkipXAppend           = 'false'
   ,pSkipDataCard          = 'false'
+  ,pSkipEntityReport      = 'false'
   ,pSkipDashboard         = 'false'
   ,pSkipCopyOtherKeys     = 'false'
   ,pSkipRenameKeys        = 'false'
@@ -147,22 +149,23 @@ functionmacro
        output(pversion, named('Build_Date'))
       // ,BIPV2_Build.proc_Watch_This_Workunit (pversion,workunit) //watch this workunit, in case it fails in some weird way it will still email me.
       ,output(BIPV2_Build.files().workunit_history.qa(regexfind(pversion,version,nocase)),named('Workunits'),overwrite)
-      ,if(pSkipSpaceUsage    = false ,BIPV2_Build.proc_Space_Usage          (pversion,pType := 1))
-      ,if(pSkipCleanup       = false ,BIPV2_Build.proc_cleanup              (pversion)           )
-      ,if(pSkipSourceIngest  = false ,BIPV2_Build.proc_Source_Ingest        (pversion)           )
-      ,if(pSkipPrepIngest    = false ,BIPV2_Build.proc_ingest               ().prepIngest(pversion)           )
-      ,if(pSkipRunIngest     = false ,BIPV2_Build.proc_ingest               ().runIngest(pversion,pOmitDisposition)           )
-      ,if(pSkipDOT           = false ,BIPV2_Build.proc_dotid                ().MultIter_run (pDotStartIteration     ,pDotNumIterations      ,pdoDotidInit ,pdoDotidSpecs  ,pdoDotidIters  ,pdoDotidPost                                                                    ,,,,,,pCompileTest ))
-      ,if(pSkipProx          = false ,BIPV2_Build.proc_proxid                               (pProxStartIteration    ,pProxNumIterations     ,pversion     ,                                     ,,pDotFilenameForProx       ,,pdoProxidSpecs                               ,,,,,,pCompileTest ))
-      ,if(pSkipProxMj6       = false ,BIPV2_Build.proc_proxid_mj6                           ( '' ,pProxMj6NumIterations  ,pversion     ,pdoProxidMj6Preprocess,pdoProxidMj6Specs, pdoProxidMj6Iters,pdoProxidMj6PostProcess,,,pInputFilenameForProxMj6     ,,,pCompileTest ))            
-      ,if(pSkipProxPost      = false ,BIPV2_Build.proc_proxid                               ( '' ,pProxPostNumIterations ,pversion     ,'bipv2_proxid_mj6._files().out.built',,pInputFilenameForProxPost ,,false             ,,,'ProxidPost'               ,,,pCompileTest ))
-      ,if(pSkipHierarchy     = false ,BIPV2_Build.proc_hrchy                (pversion                                                                                                                   ))
-      ,if(pSkipLgid3         = false ,BIPV2_Build.proc_lgid3                ().MultIter_run (pLgid3StartIteration   ,pLgid3NumIterations  ,pdoLgid3Init  ,pdoLgid3Specs   ,pdoLgid3Iters  ,pdoLgid3Post ,pversion     ,,pCompileTest  ))
-      ,if(pSkipPowDown       = false ,BIPV2_Build.proc_powid_down           ().MultIter_run (pPowDownStartIteration ,pPowDownNumIterations,pdoPowDownInit,pdoPowDownSpecs                                         ,,,,,,pCompileTest  )) 
-      ,if(pSkipPow           = false ,BIPV2_Build.proc_powid                ().MultIter_run (pPowStartIteration     ,pPowNumIterations    ,pdoPowInit    ,pdoPowSpecs     ,pdoPowIters    ,pdoPowPost              ,,,,,pCompileTest  ))
-      ,if(pSkipEmpDown       = false ,BIPV2_Build.proc_empid_down           ().MultIter_run (pEmpDownStartIteration ,pEmpDownNumIterations,pdoEmpDownInit                                                       ,,,,,,,,pCompileTest  ))
-      ,if(pSkipEmp           = false ,BIPV2_Build.proc_empid                ().MultIter_run (pEmpStartIteration     ,pEmpNumIterations    ,pdoEmpInit    ,pdoEmpSpecs     ,pdoEmpIters    ,pdoEmpPost              ,,,,,pCompileTest  ))
-      ,if(pSkipCommonBase    = false ,BIPV2_Build.proc_CommonBase           ()                                                                                                                           )
+      ,if(pSkipSpaceUsage       = false ,BIPV2_Build.proc_Space_Usage          (pversion,pType := 1))
+      ,if(pSkipCleanup          = false ,BIPV2_Build.proc_cleanup              (pversion)           )
+      ,if(pSkipSourceIngest     = false ,BIPV2_Build.proc_Source_Ingest        (pversion)           )
+      ,if(pSkipPrepIngest       = false ,BIPV2_Build.proc_ingest               ().prepIngest(pversion)           )
+      ,if(pSkipRunIngest        = false ,BIPV2_Build.proc_ingest               ().runIngest(pversion,pOmitDisposition)           )
+      ,if(pSkipDOT              = false ,BIPV2_Build.proc_dotid                ().MultIter_run (pDotStartIteration     ,pDotNumIterations      ,pdoDotidInit ,pdoDotidSpecs  ,pdoDotidIters  ,pdoDotidPost                                                                    ,,,,,,pCompileTest ))
+      ,if(pSkipProx             = false ,BIPV2_Build.proc_proxid                               (pProxStartIteration    ,pProxNumIterations     ,pversion     ,                                     ,,pDotFilenameForProx       ,,pdoProxidSpecs                               ,,,,,,pCompileTest ))
+      ,if(pSkipProxMj6          = false ,BIPV2_Build.proc_proxid_mj6                           ( '' ,pProxMj6NumIterations  ,pversion     ,pdoProxidMj6Preprocess,pdoProxidMj6Specs, pdoProxidMj6Iters,pdoProxidMj6PostProcess,,,pInputFilenameForProxMj6     ,,,pCompileTest ))            
+      ,if(pSkipProxPost         = false ,BIPV2_Build.proc_proxid                               ( '' ,pProxPostNumIterations ,pversion     ,'bipv2_proxid_mj6._files().out.built',,pInputFilenameForProxPost ,,false             ,,,'ProxidPost'               ,,,pCompileTest ))
+      ,if(pSkipProxidUnderlinks = false ,BIPV2_Build.proc_proxid_underlinks    (pversion                                                                                                                                ,,,pCompileTest  ))
+      ,if(pSkipHierarchy        = false ,BIPV2_Build.proc_hrchy                (pversion                                                                                                                                                 ))
+      ,if(pSkipLgid3            = false ,BIPV2_Build.proc_lgid3                ().MultIter_run (pLgid3StartIteration   ,pLgid3NumIterations  ,pdoLgid3Init  ,pdoLgid3Specs   ,pdoLgid3Iters  ,pdoLgid3Post ,pversion     ,,pCompileTest  ))
+      ,if(pSkipPowDown          = false ,BIPV2_Build.proc_powid_down           ().MultIter_run (pPowDownStartIteration ,pPowDownNumIterations,pdoPowDownInit,pdoPowDownSpecs                                         ,,,,,,pCompileTest  )) 
+      ,if(pSkipPow              = false ,BIPV2_Build.proc_powid                ().MultIter_run (pPowStartIteration     ,pPowNumIterations    ,pdoPowInit    ,pdoPowSpecs     ,pdoPowIters    ,pdoPowPost              ,,,,,pCompileTest  ))
+      ,if(pSkipEmpDown          = false ,BIPV2_Build.proc_empid_down           ().MultIter_run (pEmpDownStartIteration ,pEmpDownNumIterations,pdoEmpDownInit                                                       ,,,,,,,,pCompileTest  ))
+      ,if(pSkipEmp              = false ,BIPV2_Build.proc_empid                ().MultIter_run (pEmpStartIteration     ,pEmpNumIterations    ,pdoEmpInit    ,pdoEmpSpecs     ,pdoEmpIters    ,pdoEmpPost              ,,,,,pCompileTest  ))
+      ,if(pSkipCommonBase       = false ,BIPV2_Build.proc_CommonBase           ()                                                                                                                           )
       
       ,Wait4Threads
       
@@ -172,6 +175,7 @@ functionmacro
       ,if(pSkipCDWBuild      = false ,BIPV2_Build.proc_CDW_Files              (pversion                                                                                                     )) // do Build CDW
       // ,if(pSkipXAppend       = false ,BIPV2_Build.proc_External_Append_Testing(pversion                                                                                                     )) // do external append testing
       ,if(pSkipDataCard      = false ,BIPV2_Build.proc_DataCard               (pversion                                                                                                     )) // do datacard
+      ,if(pSkipEntityReport  = false ,BIPV2_Build.proc_EntityReport           (pversion                                                                                                     )) // do entity report
       ,if(pSkipDashboard     = false ,BIPV2_Build.proc_Dashboard              (pversion                                                                                                     )) // do dashboard
       ,if(pSkipRenameKeys    = false ,BIPV2_Build.proc_rename_BIPV2FullKeys   (pversion,pRenameKeysFilter,false,,'built')                                                                    ) //only rename bipv2_proxid,strnbrname & bipv2_relative, rest should be correct
       ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',true                                                                   )) // Copy the rest of the BIPV2FullKeys package to dataland

@@ -16,7 +16,7 @@ module
 											
 	export allScrubs := 'julianne.franzer@lexisnexis.com' 		
 											+ emailaddressep +  'kevin.reeder@lexisnexisrisk.com'
-											+ emailaddressep +	'Gregory.Rose@lexisnexisrisk.com'
+											+ emailaddressep +	'gregory.rose@lexisnexisrisk.com'
 											+ emailaddressep +	'julie.ellison@lexisnexisrisk.com' 		
 											+ emailaddressep +	'rosemary.murphy@lexisnexisrisk.com' 
 											+ emailaddressep +	_control.MyInfo.EmailAddressNotify
@@ -24,8 +24,12 @@ module
 											
 											
 	export all_Sprays :=  'kevin.reeder@lexisnexisrisk.com'
-											+ emailaddressep + 'Gregory.Rose@lexisnexisrisk.com'
+											+ emailaddressep + 'gregory.rose@lexisnexisrisk.com'
 											+ emailaddressep + _control.MyInfo.EmailAddressNotify; 
+											
+  export all_SpraysC :=  'kevin.reeder@lexisnexisrisk.com'
+											+ ',' + 'gregory.rose@lexisnexisrisk.com'
+											+ ',' + _control.MyInfo.EmailAddressNotify; 
 							
 											
 	export BuildSuccess := 
@@ -50,6 +54,13 @@ module
 		if(Flags.IsTesting
 			,_control.MyInfo.EmailAddressNotify
 			,all_Sprays
+		);
+		
+		
+		export AttachedList := 
+		if(Flags.IsTesting
+			,_control.MyInfo.EmailAddressNotify
+			,all_SpraysC
 		);
 	
 	export Roxie := 

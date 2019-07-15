@@ -20,15 +20,13 @@ MODULE
 	IdentityData MapIDDT(Sprayed_NAC L) := TRANSFORM 
 
 			filename := ut.CleanSpacesAndUpper(l.fn);
-			fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
-			FileDate := fn[6];
 
-			SELF.Customer_Job_ID := '0';
-			SELF.Batch_Record_ID := '0';
-			SELF.Transaction_ID_Number := L.ESPTransactionId;
-			SELF.Reason_for_Transaction_Activity:= 'Search in National Accuracy Clearinghouse';
+			SELF.Customer_Job_ID := '1';
+			SELF.Batch_Record_ID := '1';
+			SELF.Transaction_ID := L.ESPTransactionId;
+			SELF.Reason_Description:= 'Search in National Accuracy Clearinghouse';
 
-			SELF.Date_of_Transaction := FileDate;
+			SELF.Date_of_Transaction := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]);
 
 			SELF.raw_Full_Name := l.SearchFullName;
 			SELF.raw_First_name := l.SearchFirstName;
@@ -56,10 +54,8 @@ MODULE
 			SELF.Ethnicity := l.ClientEthnicity;
 			SELF.Race := l.ClientRace;
 
-			SELF.Case_ID := l.SearchCaseId;
-			SELF.Client_ID := l.SearchClientId;
-
-			SELF.source_input := 'NAC_MSH';
+			SELF.Household_ID := l.SearchCaseId;
+			SELF.Customer_Person_ID := l.SearchClientId;
 			SELF := L;
 			SELF := [];
 	END;
@@ -75,12 +71,9 @@ MODULE
 	KnownFraud MapKNFD(Sprayed_NAC L) := TRANSFORM 
 
 			filename := ut.CleanSpacesAndUpper(l.fn);
-			fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
-			FileDate := fn[6];
-			FileTime := fn[7];
 
-			SELF.reported_date := FileDate;
-			SELF.reported_time := FileTime;
+			SELF.reported_date := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]);
+			SELF.reported_time := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]);
 			SELF.reported_by   := 'NAC-MSH';
 			SELF.customer_event_id := L.SequenceNumber + '_' + L.activitysource ;
 
@@ -116,24 +109,20 @@ MODULE
 											L.matchcodes in Level_2 => 'Identity associated to NAC level 2 collision',
 											'');
 
-			SELF.case_id	:= L.CaseID;
-			SELF.client_id	:= L.ClientID;
-
-			SELF.source_input := 'NAC_MSH';
+			SELF.Household_id	:= L.CaseID;
+			SELF.Customer_Person_ID	:= L.ClientID;
 			SELF := L;
 			SELF := [];
 	END;
 
 	KnownFraud JoinNACBase(Sprayed_NAC L, Nac_BASE R) := TRANSFORM 
 
-			searchpattern := '([0-9])\\w+';
-			sw := STD.Str.SplitWords( regexfind(searchpattern, L.fn,0), '_');
-			vDate := sw[1];
-			vTime := sw[2];
 
-			SELF.reported_date := vDate;
-			SELF.reported_time := vTime;
+			filename := ut.CleanSpacesAndUpper(l.fn);
 
+			SELF.reported_date := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]);
+			SELF.reported_time := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[10..15]);
+			SELF.reported_by   := 'NAC-MSH';
 			SELF.customer_event_id := L.SequenceNumber + '_' + L.activitysource ;
 
 			SELF.event_type_1 := map(	L.matchcodes in Level_1 => '14000',
@@ -168,16 +157,14 @@ MODULE
 											L.matchcodes in Level_2 => 'Identity associated to NAC level 2 collision',
 											'');
 
-			SELF.case_id	:= R.Case_Identifier;
-			SELF.client_id	:= R.Client_Identifier;
-
-			SELF.source_input := 'NAC_MSH';
+			SELF.Household_id	:= R.Case_Identifier;
+			SELF.Customer_Person_ID	:= R.Client_Identifier;
 			SELF := L;
 			SELF := [];
 	END;
 
 	bucket_4 := distribute(Sprayed_NAC(ActivityType ='4'), hash(drupaluserstate, SearchCaseId, SearchClientId, SearchBenefitType, SearchBenefitMonth));
-	dbucket_4 := dedup(bucket_4,all);
+	dbucket_4 := dedup(bucket_4,all,local);
 
 	J_NACBase := Join(bucket_4(DrupalUserState='FL') , NAC_Base(Case_State_Abbreviation='FL')
 													,		trim(left.drupaluserstate)		=		trim(right.Case_State_Abbreviation)

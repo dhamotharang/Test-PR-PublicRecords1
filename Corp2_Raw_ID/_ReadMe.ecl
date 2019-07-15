@@ -1,20 +1,22 @@
-/* Source(s)								:Idaho Secretary of State		  
+﻿/* Source(s)								: Idaho Secretary of State		  
    		
-   Update Frequency					:Monthly			
+   Update Frequency					: Monthly			
    			
    Update Type							:	Full Load		
    		
    Expected Volume of Data	:		
    											
-   Data Description					:The Idaho Secretary of State provides one record layout containing the following "filing types": 
-														 C = Corporation; D = Assumed Business Name;
-														 G = Name Registration; J = Limited Liability Partnership (LLP); 
-														 K = Partnership Authority (GP); L = Limited Partnership; 	 
+   Data Description					: The Idaho Secretary of State provides 3 data files:  Filing, Party and Filing Name.													
+															
+															The primary key is the CONTROL_NO.
+															
+															Each entity contains a CONTROL_NO that serves as a key to the 
+															Filing, Party and Filing Name.
+ 	 
    	
-   Source Structure					:	
+   Source Structure					:	The 3 vendor files are variable length and tab-delimited.
    							
-	 Source Notes							: The vendor data consists of 1 record layout 
-															with an unique index comprised of the FILE-TYPE, FILE-NUMBER, and DUP-NUMBER-INDICATOR fields  
+	 Source Notes							: The vendor data consists of 3 record layouts 
 																	
    Loading Notes					  :		
 */

@@ -87,8 +87,11 @@
 		string10 	phone;
 		string5		source;
 		string2		transaction_code;
-		unsigned8	transaction_dt;
-		string6		transaction_time;
+		unsigned8	transaction_start_dt;
+		string6		transaction_start_time;
+		unsigned8	transaction_end_dt;
+		string6		transaction_end_time;
+		unsigned8 transaction_count;
 		unsigned8	vendor_first_reported_dt;
 		string6		vendor_first_reported_time;
 		unsigned8	vendor_last_reported_dt;
@@ -100,6 +103,7 @@
 		string10 	spid;
 		string60 	carrier_name;
 		string10 	phone_swap;
+		string6		ocn;
 		unsigned4 global_sid;		//CCPA Requirement
 		unsigned8 record_sid;		//CCPA Requirement
 	END;

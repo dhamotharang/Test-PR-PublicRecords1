@@ -1,8 +1,10 @@
-//****************Function to append flags/indicators when matching to Gong***************
-import Gong_v2, ut;
+﻿//****************Function to append flags/indicators when matching to Gong***************
+import Gong_Neustar, ut;
 export Fn_Append_Gong(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
 
-gong	 	:=	gong_v2.file_gongmaster(current_record_flag = 'Y');
+// VC - Using newer file DF-23004. As per Charles file_gongmaster should not be used for anything
+// gong	 	:=	gong_v2.file_gongmaster(current_record_flag = 'Y');
+gong	 	:=	Gong_Neustar.File_History(current_record_flag = 'Y'); 
 
 phonesplus_v2.Mac_Filter_Bad_Phones (gong,phone10,,,gong_phones)
 

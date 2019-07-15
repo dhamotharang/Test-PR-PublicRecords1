@@ -1,6 +1,6 @@
 ﻿import ut,lib_keylib,lib_fileservices,RoxieKeybuild,Orbit3,Suppress,_control,header,Watchdog_V2;
 
-leMailTarget := 'dataops@seisint.com;michael.gould@lexisnexisrisk.com';
+leMailTarget := 'Sudhir.Kasavajjala@lexisnexisrisk.com';
 
 // Get filedate from the watchdog check file
 
@@ -125,7 +125,7 @@ file_remove := sequential(
 
 
 email_success := fileservices.sendemail(
-										'roxiebuilds@seisint.com;sudhir.kasavajjala@lexisnexis.com;michael.gould@lexisnexis.com',
+										'Sudhir.Kasavajjala@lexisnexisrisk.com',
 										'Watchdog Weekly Build Succeeded - ' + filedate,
 										'Keys:\n' +
 										
@@ -149,24 +149,24 @@ email_success := fileservices.sendemail(
 										);
 
 email_failure := fileservices.sendemail(
-										'roxiebuilds@seisint.com;sudhir.kasavajjala@lexisnexis.com;michael.gould@lexisnexisrisk.com',
+										'Sudhir.Kasavajjala@lexisnexisrisk.com',
 										'Watchdog Weekly Roxie Build Failed - ' + filedate,
 										failmessage
 										);
 										
-update_version := RoxieKeyBuild.updateversion('WatchdogKeys',filedate,'michael.gould.lexisnexisrisk.com@seisint.com',,'N|B');
+update_version := RoxieKeyBuild.updateversion('WatchdogKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N|B');
 create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate,'N|B');
 										
 export Proc_build_Keys := sequential(wchk,build_keys,move_to_built,move_keys
 			,parallel(eighth_key,eighthDotOne_key),mv8,mv8_1,move8,move8_1 // builds off seventh key and uses MOXIE out file that will be deleted
 		  /*k9,k10,mv9,mv10,move9,move10*/
 			// build universal key after all the other keys are built
-			,Watchdog_V2.Proc_Build_Merged_Key(filedate),
+			//,Watchdog_V2.Proc_Build_Merged_Key(filedate),
 			// then update DOPS
-			update_version,
-			create_build,
+			//update_version,
+			//create_build,
 			/*,create_build,update_idops,*/
-			temp_file,
+			,temp_file,
 			/*,fSendMail('WATCHDOG_KEYS_COMPLETE','Watchdog keys complete on prod400'),*/
 		  /*file_despray,*/file_remove
 			) : 
