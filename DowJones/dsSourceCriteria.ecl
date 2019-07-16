@@ -1776,6 +1776,8 @@ EXPORT dsSourceCriteria := DATASET([
 {U'Quebec’s Most Wanted Criminals List','1763'},
 {'DFATD (Canada) Special Economic Measures (Nicaragua) Regulations','1764'},
 {'European Bank for Reconstruction and Development Third Party Findings List','1765'},
-{'OFAC - Nicaragua Human Rights and Anticorruption Act of 2018','1766'}
+{'OFAC - Nicaragua Human Rights and Anticorruption Act of 2018','1766'},
+{'US Executive Order 13876','1767'},
+{'MOJ (Taiwan) Banned Entry Vessels List','1768'}
 ],r);
 

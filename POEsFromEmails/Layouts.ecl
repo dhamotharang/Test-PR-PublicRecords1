@@ -1,4 +1,4 @@
-import address, BIPV2;
+﻿import address, BIPV2;
 
 export Layouts := module
 	
@@ -110,11 +110,15 @@ export Layouts := module
 	////////////////////////////////////////////////////////////////////////
 	export Base := record 
 	  BIPV2.IDlayouts.l_xlink_ids       ;	//Added for BIP project
-		unsigned6						Did				:= 0;
-		unsigned6						Bdid			:= 0;
-		unsigned6 					group_id			;
-		unsigned6 					agrp_bdid			;
+		unsigned6				Did						:= 0;
+		unsigned6				Bdid					:= 0;
+		unsigned6 			group_id					;
+		unsigned6 			agrp_bdid					;
 		Common														;
+		// Jira# CCPA-, The below layout with 2 new fields are added for CCPA (California Consumer Protection Act) project.
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		unsigned4 			global_sid 		:= 0;
+		unsigned8 			record_sid 		:= 0;
 	end;
 	
 	export temp_base := record

@@ -61,5 +61,16 @@ MODULE
     string Pct_Gold_Seleids_with_same_orgid	 ;
     string Pct_Gold_Seleids_with_same_ultid	 ;
   end;
+
+  export lay_contributory_sources := {string Source           ,string Count_Seleids       };
+  export lay_child_stats          := {string Stat_Description ,string Count_Seleids := '' };
+
+  export lay_cluster_stats := 
+  {
+     string                             Status  
+    ,dataset(lay_child_stats          ) Comparison_Stats
+    ,dataset(lay_contributory_sources ) Top_10_Sources_of_Gained_Seleids
+
+  };
   
 END;

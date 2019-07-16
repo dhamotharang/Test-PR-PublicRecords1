@@ -514,8 +514,10 @@ MODULE
 	export src_ZOOM                      := 'ZM';
 	export src_BKFS_Nod                  := 'B7';  //Black Knight Foreclosure Nod info
 	export src_BKFS_Reo                  := 'I5';  //Black Knight Foreclosure Deed(Reo) info
-	export src_BKFS_Assignment           := 'B1';  //Black Knight Assignment of Mortgage info
-	export src_BKFS_Release		           := 'B2';  //Black Knight Release of Mortgage info
+	export src_BKFS_Assignment_Refresh   := 'B1';  //Black Knight Assignment of Mortgage info
+	export src_BKFS_Release_Refresh	     := 'B2';  //Black Knight Release of Mortgage info
+	export src_BKFS_Assignment_Update	   := 'B3';  //Black Knight Assignment of Mortgage info
+	export src_BKFS_Release_Update	     := 'B4';  //Black Knight Release of Mortgage info
 	export WH_src                        := 'WH';  // WH=Weekly Equifax Header. Also see src_Equifax_Weekly
 	
 
@@ -1108,7 +1110,7 @@ export set_Marketing_Sources           := [
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
 		,src_Vickers									 ,src_ZOOM											,src_Cortera										
 		,set_Marketing_Corp					   ,set_Marketing_Death					  ,set_Marketing_FBN						 ,set_Marketing_Liquor_Licenses
-		,set_Marketing_WC
+		,set_Marketing_WC              ,src_Infutor_NARB              ,src_Equifax_Business_Data     ,src_DataBridge  
 	]; 
 	
 export set_Marketing_Restricted := [
@@ -2041,8 +2043,10 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Zumigo_GetLineId  				 := [src_Zumigo_GetLineId 				 ];
 	export set_BKFS_Nod                  := [src_BKFS_Nod                  ];
 	export set_BKFS_Reo                  := [src_BKFS_Reo                  ];
-	export set_BKFS_Assignment           := [src_BKFS_Assignment           ];
-	export set_BKFS_Release		           := [src_BKFS_Release		           ];
+	export set_BKFS_Assignment_Refresh   := [src_BKFS_Assignment_Refresh   ];
+	export set_BKFS_Release_Refresh      := [src_BKFS_Release_Refresh      ];
+	export set_BKFS_Assignment_Update	   := [src_BKFS_Assignment_Update    ];
+	export set_BKFS_Release_Update	     := [src_BKFS_Release_Update       ];
 	export set_credit_header_bureau      := set_Transunion + set_Experian_Credit_Header +
 	                                        set_Equifax_Direct + set_Equifax_Quick + set_Equifax_Weekly;
 
@@ -2592,8 +2596,10 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsZOOM                       (string  sr) := sr               in set_ZOOM                       ;
 	export SourceIsBKFS_Nod                   (string  sr) := sr               in set_BKFS_Nod                   ;
 	export SourceIsBKFS_Reo                   (string  sr) := sr               in set_BKFS_Reo                   ;
-	export SourceIsBKFS_Assignment            (string  sr) := sr               in set_BKFS_Assignment            ;
-	export SourceIsBKFS_Release               (string  sr) := sr               in set_BKFS_Release               ;
+	export SourceIsBKFS_Assignment_Refresh    (string  sr) := sr               in set_BKFS_Assignment_Refresh    ;
+	export SourceIsBKFS_Release_Refresh       (string  sr) := sr               in set_BKFS_Release_Refresh       ;
+	export SourceIsBKFS_Assignment_Update     (string  sr) := sr               in set_BKFS_Assignment_Update     ;
+	export SourceIsBKFS_Release_Update        (string  sr) := sr               in set_BKFS_Release_Update        ;
 	export SourceNot4Despray                  (string2 sr) := SourceGroup(sr)  in ['none']                       ;
 
 
@@ -3101,8 +3107,10 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_ZOOM                      ,'ZOOM'                                                      }
 		,{src_BKFS_Nod                  ,'Black Knight Foreclosure Nod'                              }
 		,{src_BKFS_Reo                  ,'Black Knight Foreclosure Reo'                              }
-		,{src_BKFS_Assignment           ,'Black Knight Mortgage Assignment'                          }
-		,{src_BKFS_Release	            ,'Black Knight Mortgage Release' 		                         }
+		,{src_BKFS_Assignment_Refresh   ,'Black Knight Mortgage Assignment Refresh'                  }
+		,{src_BKFS_Release_Refresh      ,'Black Knight Mortgage Release Refresh'                     }
+		,{src_BKFS_Assignment_Update    ,'Black Knight Mortgage Assignment Update'                   }
+		,{src_BKFS_Release_Update       ,'Black Knight Mortgage Release Update'                      }
 	], layout_description);            
 
                                      
@@ -3619,8 +3627,10 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_ZOOM                      => 'ZOOM' 
 		,src_BKFS_Nod                  => 'Black Knight Foreclosure Nod' 
 		,src_BKFS_Reo                  => 'Black Knight Foreclosure Reo'
-		,src_BKFS_Assignment           => 'Black Knight Mortgage Assignment'
-		,src_BKFS_Release		           => 'Black Knight Mortgage Release'
+		,src_BKFS_Assignment_Refresh   => 'Black Knight Mortgage Assignment Refresh'
+		,src_BKFS_Release_Refresh		   => 'Black Knight Mortgage Release Refresh'
+		,src_BKFS_Assignment_Update    => 'Black Knight Mortgage Assignment Update'
+		,src_BKFS_Release_Update       => 'Black Knight Mortgage Release Update'
 		,'?' + pSource
 	);
 
