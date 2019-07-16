@@ -44,11 +44,11 @@ EXPORT Append_CleanAddress (
 			SELF.clean_address.geo_match				:= if(FOUND, R.geo_match,			L.clean_address.geo_match);
 			SELF.clean_address.err_stat					:= if(FOUND, R.err_stat,			L.clean_address.err_stat);
 			SELF.address_1											:= if(FOUND, 
-				tools.AID_Helpers.fRawFixLine1( trim(R.prim_range) + ' ' +  trim(R.prim_name) +' '+ trim(R.sec_range)),
-				tools.AID_Helpers.fRawFixLine1( trim(L.clean_address.prim_range) + ' ' +  trim(L.clean_address.prim_name) +' '+ trim(L.clean_address.sec_range)));
+				tools.AID_Helpers.fRawFixLine1( trim(R.prim_range) + ' ' +  trim(R.predir) + ' ' + trim(R.prim_name) +' '+ trim(R.addr_suffix) +' '+ trim(R.postdir) +' '+ trim(R.unit_desig) +' '+ trim(R.sec_range)),
+				tools.AID_Helpers.fRawFixLine1( trim(L.clean_address.prim_range) + ' ' +  trim(L.clean_address.predir) + ' ' + trim(L.clean_address.prim_name) +' '+ trim(L.clean_address.addr_suffix) +' '+ trim(L.clean_address.postdir) +' '+ trim(L.clean_address.unit_desig) +' '+trim(L.clean_address.sec_range)));
 			SELF.address_2											:= if(FOUND, 
-				tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(R.v_city_name) + if(R.st != '', ', ', ' ') + trim(R.st) + ' ' + trim(R.zip))),
-				tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(L.clean_address.v_city_name) + if(L.clean_address.st != '', ', ', ' ') + trim(L.clean_address.st) + ' ' + trim(L.clean_address.zip))));
+				tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(R.v_city_name) + if( R.v_city_name !='' and( R.st != '' or R.zip !=''), ', ', '') + trim(R.st) +' '+ trim(R.zip))),
+				tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(L.clean_address.v_city_name) + if(L.clean_address.v_city_name != '' and (L.clean_address.st !='' or L.clean_address.zip !=''), ', ', '') + trim(L.clean_address.st) + ' ' + trim(L.clean_address.zip))));
 			SELF := L;
 	END;
 	
@@ -102,8 +102,8 @@ EXPORT Append_CleanAddress (
 				SELF.clean_address.geo_blk				:= Clean_Address_182[171..177]	; //geo_blk
 				SELF.clean_address.geo_match			:= Clean_Address_182[178]			; //geo_match
 				SELF.clean_address.err_stat				:= Clean_Address_182[179..182]	; //err_stat		
-				SELF.address_1										:= tools.AID_Helpers.fRawFixLine1( trim(Clean_Address_182[1..10]) + ' ' +  trim(Clean_Address_182[13..40]) +' '+ trim(Clean_Address_182[57..64]));
-				SELF.address_2										:= tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(Clean_Address_182[90..114]) + if(Clean_Address_182[115..116] != '', ', ', ' ') + trim(Clean_Address_182[115..116]) + ' ' + trim(Clean_Address_182[117..121])));
+				SELF.address_1										:= tools.AID_Helpers.fRawFixLine1( trim(Clean_Address_182[1..10]) + ' ' +  trim(Clean_Address_182[11..12]) + ' ' +  trim(Clean_Address_182[13..40]) +' '+ trim(Clean_Address_182[41..44]) +' '+ trim(Clean_Address_182[45..46]) +' '+ trim(Clean_Address_182[47..56]) +' '+ trim(Clean_Address_182[57..64]));
+				SELF.address_2										:= tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(Clean_Address_182[90..114]) + if(Clean_Address_182[90..114] !='' and (Clean_Address_182[115..116] != '' or Clean_Address_182[117..121] !=''), ', ', '') + trim(Clean_Address_182[115..116]) + ' ' + trim(Clean_Address_182[117..121])));
 				SELF															:= L;
 		END;
 	
