@@ -1,7 +1,7 @@
 ﻿import ut,mdr,PromoteSupers;
 export build_header_raw(string filedate,boolean incremental = FALSE) := function
 
-h:=distribute(header.Header_Joined(filedate).final,hash(did));
+h:=distribute(header.Header_Joined(filedate).final,hash(did))(src not in ['B7', 'I5']);  //temporarily skipping BKFS sources
 
 basename:='~thor_data400::base::header_raw';
 basenamei:='~thor_data400::base::header_raw_incremental';
@@ -81,6 +81,7 @@ updateLatest := sequential(
                                             if(incremental,basenamei, basename)+'_'+filedate));
                                             
 return sequential( Header.fn_blanked_pii(filedate)
+                  ,fileservices.sendemail('debendra.kumar@lexisnexisrisk.com;gabriel.marcan@lexisnexisrisk.com','Header Ingest - Sources Skipped','Temporarily Skipping Black Knight Foreclosure src(B7, I5)\n\rSee '+workunit)
 				  ,if(incremental,incremental_,full_)
 				  ,updateLatest);
 
