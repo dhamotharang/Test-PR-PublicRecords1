@@ -1,4 +1,4 @@
-import bipv2_build,topbusiness_bipv2,bipv2,AutoStandardI,tools;
+﻿import bipv2_build,topbusiness_bipv2,bipv2,AutoStandardI,tools;
 
 export key_directories_linkids :=
 module
@@ -36,7 +36,7 @@ module
 
   end;
  
-  shared concat_them       := fmakecommon(ds_contacts      ,ds_industry      );
+  export concat_them       := fmakecommon(ds_contacts      ,ds_industry      );
   shared concat_thembuilt  := fmakecommon(ds_contactsbuilt ,ds_industrybuilt );
   
   shared superfile_name := keynames().directories_linkids.QA;//vern can you create so that it's consistent with other business header keys?
@@ -48,10 +48,10 @@ module
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(concat_thembuilt, kb, superfile_name)  //for use inside BIP build since keys haven't been promoted to qa yet.
   export kbuilt := kb;
   
-  export keyvs := tools.macf_FilesIndex('Key' ,keynames().directories_linkids);
-  export keybuilt := keyvs.built;
-  export keyfather := keyvs.father;
-  export keygrandfather := keyvs.grandfather;
+  export keyvs(string pversion = '',boolean penvironment = tools._Constants.IsDataland) := tools.macf_FilesIndex('Key' ,keynames(pversion,penvironment).directories_linkids);
+  export keybuilt := keyvs().built;
+  export keyfather := keyvs().father;
+  export keygrandfather := keyvs().grandfather;
 
   //DEFINE THE INDEX ACCESS
   export kFetch(
