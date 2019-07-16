@@ -37,7 +37,7 @@ super_keybuilding :=
 	sequential(
 		accurint_acclogs.Proc_BuildKeys,
 		Accurint_AccLogs.Proc_AutokeyBuild,
-		RoxieKeybuild.updateversion('CaseConnectKeys',trim(version, all),'john.freibaum@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N'));
+		RoxieKeybuild.updateversion('CaseConnectKeys',trim(version, all),'jason.allerdings@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N'));
 
 //// Clear Supers
 
@@ -49,7 +49,7 @@ processed_filenames := nothor(table(WorkunitServices.WorkunitFilesRead(workunit)
 
 //// Send Email
 
-sendEmail := fileservices.sendemail('john.freibaum@lexisnexis.com', 'Case Connect: Accurint Acc Logs Complete', workunit);
+sendEmail := fileservices.sendemail('jason.allerdings@lexisnexis.com', 'Case Connect: Accurint Acc Logs Complete', workunit);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
