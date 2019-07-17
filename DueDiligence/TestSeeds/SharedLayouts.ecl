@@ -126,6 +126,9 @@
     STRING3 weight;
     CriminalSourceDetail sourceDetail1;
     CriminalSourceDetail sourceDetail2;
+    UNSIGNED2 offenseID;
+    UNSIGNED2 offensePriorityOrder;
+    UNSIGNED1 offenseLevel;
   END;
   
   
