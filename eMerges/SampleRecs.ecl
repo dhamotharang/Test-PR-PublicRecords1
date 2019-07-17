@@ -1,4 +1,4 @@
-import eMerges;
+﻿import eMerges;
 
 export SampleRecs(string version) := function
 
@@ -36,7 +36,7 @@ CcwSampleRec := join(ccw, ccw_father,
                                 
 sampleout:=  sequential(
                          output(choosen(HuntSampleRec, 1000), named('HuntingFishingSampleRecords'))
-												,output(choosen(CcwSampleRec, 1000), named('CCWSampleRecords'))
+							//					,output(choosen(CcwSampleRec, 1000), named('CCWSampleRecords'))
                       );
 
 return sampleout;

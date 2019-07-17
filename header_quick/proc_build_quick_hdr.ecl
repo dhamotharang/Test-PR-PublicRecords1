@@ -1,4 +1,4 @@
-﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck;
+﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck,dx_header;
 
 EXPORT proc_build_quick_hdr(
 	STRING filedate, 
@@ -177,7 +177,7 @@ EXPORT proc_build_quick_hdr(
 	OnlyQuickHeader:=GetDops(datasetname='FCRA_QuickHeaderKeys ');
 	father_filedate := OnlyQuickHeader[1].buildversion;
 	SET OF STRING Key_QuickHeader_InputSet:=['fname','lname','name_suffix','prim_range','prim_name','sec_range','city_name','st','zip','dob','ssn','mname','phone','src'];
-	header_quick_index := header_quick.FN_key_DID(DATASET([],header.Layout_Header), '~thor_data400::key::headerquick::fcra::'+filedate+'::did');
+	header_quick_index := header_quick.FN_key_DID(DATASET([],dx_header.Layout_Header), '~thor_data400::key::headerquick::fcra::'+filedate+'::did');
 	DeltaCommands:= SEQUENTIAL(
 		DOPSGrowthCheck.CalculateStats(
 			'FCRA_QuickHeaderKeys ',

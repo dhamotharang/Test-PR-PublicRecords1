@@ -402,12 +402,12 @@ functionmacro
 
   ds_notgold_stats := dataset([
      {'-----------Overall stats------------------','---------------'}
-    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = false) )) }
-    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_append_gold_field_old(isgold = false) )) }  
-    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_append_gold_field_new(isgold = false) ) - count(ds_append_gold_field_old(isgold = false) )) }
-    ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = false   ,isgold_old = true )))  }
-    ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_old = false   ,isgold_new = true )))  }
-    ,{'Total Non-Gold Clusters in common'                                     ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = false   ,isgold_old = false)))  }
+    ,{'New file (Sprint ' + trim(new_sprint) + ', ' + trim(new_version) + ')' ,ut.fIntWithCommas(count(ds_find_gold_diffs_all((isgold_new = false and exists(new_sources)) ))) }
+    ,{'Old file (Sprint ' + trim(old_sprint) + ', ' + trim(old_version) + ')' ,ut.fIntWithCommas(count(ds_find_gold_diffs_all((isgold_old = false and exists(old_sources)) ))) }  
+    ,{'Overall difference(+/-)'                                               ,ut.fIntWithCommas(count(ds_find_gold_diffs_all((isgold_new = false and exists(new_sources)) )) - count(ds_find_gold_diffs_all((isgold_old = false and exists(old_sources)) ))) }
+    ,{'Total Clusters gained'                                                 ,ut.fIntWithCommas(count(ds_find_gold_diffs_all((isgold_new = false and exists(new_sources))  ,(isgold_old = true  or ~exists(old_sources)) )))  }
+    ,{'Total clusters lost'                                                   ,ut.fIntWithCommas(count(ds_find_gold_diffs_all((isgold_old = false and exists(old_sources))  ,(isgold_new = true  or ~exists(new_sources)) )))  }
+    ,{'Total Non-Gold Clusters in common'                                     ,ut.fIntWithCommas(count(ds_find_gold_diffs_all((isgold_new = false and exists(new_sources))  ,(isgold_old = false and exists(old_sources)) )))  }
                                           
     ,{'------Gained Stats breakdown-------------','---------------'}
     ,{'Brand new Non-gold clusters'                                   ,ut.fIntWithCommas(count(ds_find_gold_diffs_all(isgold_new = false   ,exists(new_sources)  ,~exists(old_sources)) )) }
