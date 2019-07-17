@@ -1,0 +1,4 @@
+﻿EXPORT UniversalKeyInterface := INTERFACE
+	EXPORT UNSIGNED6 Did :=0;
+	EXPORT UNSIGNED6 Permissions:=0;
+END;

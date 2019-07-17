@@ -1,0 +1,2 @@
+﻿import Data_Services, doxie,ut,_Control;
+export Key_Watchdog_marketing_old := INDEX(file_best_marketing,watchdog.Layout_best_flags,Data_services.Data_location.Prefix('Watchdog_Best')+'thor_data400::key::watchdog_marketing.did_'+doxie.Version_SuperKey);
