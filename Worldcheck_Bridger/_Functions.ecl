@@ -1239,6 +1239,7 @@
 				trim(kword, left, right) = 'CANSEMNIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMNIC,
 				trim(kword, left, right) = 'GHSEC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GHSEC,
 				trim(kword, left, right) = 'NABON' =>SubGroup_Constants.numKeywordsID.KEYWORD_NABON,
+				trim(kword, left, right) = 'USCME' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCME,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
