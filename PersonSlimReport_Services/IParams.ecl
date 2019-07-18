@@ -1,4 +1,4 @@
-﻿IMPORT PersonSlimReport_Services, BatchShare, ut, iesp, doxie;
+﻿IMPORT PersonSlimReport_Services, BatchShare, ut, iesp, doxie, suppress;
 EXPORT IParams := MODULE
 
 	EXPORT PersonSlimReportOptions := INTERFACE
@@ -10,6 +10,8 @@ EXPORT IParams := MODULE
 		EXPORT STRING6   ssn_mask                := BatchShare.Constants.Defaults.SSNMask; //'NONE'
 		EXPORT BOOLEAN   IncludeMinors           := FALSE;
 		EXPORT BOOLEAN   mask_dl                 := FALSE; //for accidents
+		EXPORT unsigned1 dob_mask                := suppress.constants.dateMask.ALL;
+
 		EXPORT STRING    RealTimePermissibleUse  := '';
 		EXPORT BOOLEAN   IncludeNonRegulatedVehicleSources      := FALSE;
 		EXPORT BOOLEAN   IncludeNonRegulatedDMVSources          := FALSE;
@@ -64,6 +66,7 @@ EXPORT IParams := MODULE
 			EXPORT STRING5   industry_class            := inIesp.user.industryclass;
 			EXPORT STRING6   ssn_mask                  := inIesp.user.ssnmask;
 			EXPORT BOOLEAN   mask_dl                   := inIesp.user.dlmask;
+			EXPORT unsigned1 dob_mask                  := suppress.date_mask_math.MaskIndicator (inIesp.user.dobmask);
 
 			EXPORT BOOLEAN IncludeAddresses            := inIesp.Options.IncludeAddresses;
 			EXPORT BOOLEAN IncludePhones               := inIesp.Options.IncludePhones;
@@ -145,6 +148,7 @@ EXPORT IParams := MODULE
     EXPORT boolean show_minors := in_mod.IncludeMinors OR (in_mod.GLBPurpose = 2);;
     EXPORT string ssn_mask := in_mod.ssn_mask;
     EXPORT unsigned1 dl_mask := IF (in_mod.mask_dl, 1, 0);
+    EXPORT unsigned1 dob_mask := in_mod.dob_mask;
     EXPORT boolean include_BlankDOD := in_mod.IncludeBlankDOD;
   ENDMACRO;    
 END;
