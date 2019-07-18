@@ -1,5 +1,5 @@
 ﻿
-IMPORT AutoKeyI, AutoStandardI, census_data, iesp, lib_stringlib, SANCTN, Suppress, ut,BIPV2,MIDEX_Services;
+IMPORT AutoKeyI,AutoStandardI,BIPV2,census_data,doxie,iesp,MIDEX_Services,SANCTN,STD,Suppress;
 
 // ==============================================================================================================	
 //  MARI MIDEX "PUBLIC" DATA (SANCTN) related functions
@@ -22,7 +22,9 @@ EXPORT Raw_Public :=
 							EXPORT BOOLEAN useAllLookups       := SANCTN.Constants.USE_ALL_LOOKUPS;
 						END;
 
-					ds_PublicSanctnAutokeyIds := AutoKeyI.AutoKeyStandardFetch(tempmod_PublicSanctn).ids;
+					// CCPA - Suppression will take place with the payload join in the funtions below 
+					//        We are only keeping the midex report number and it's components from the key
+          ds_PublicSanctnAutokeyIds := AutoKeyI.AutoKeyStandardFetch(tempmod_PublicSanctn).ids;
 					ds_pubSanctnAutokeyIdsSorted := DEDUP( SORT( ds_PublicSanctnAutokeyIds, id), id);            
 					RETURN ds_PubSanctnAutokeyIdsSorted;
 				END; // get_PublicSanctnAutokeyData
@@ -40,16 +42,19 @@ EXPORT Raw_Public :=
 				
 				EXPORT fn_get_PublicSanctnLinkIdData ( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, STRING1 FetchLevel ):=
 					FUNCTION
-						ds_SANCTN_linkid_recs := CHOOSEN(SANCTN.Key_SANCTN_LinkIds.kFetch(in_linkid, FetchLevel),MIDEX_Services.Constants.JOIN_LIMIT);
+						// CCPA - Suppression takes place with the payload join in the funtions below 
+						//        We are only keeping the midex report number and it's components from the key
+            ds_SANCTN_linkid_recs := CHOOSEN(SANCTN.Key_SANCTN_LinkIds.kFetch(in_linkid, FetchLevel),MIDEX_Services.Constants.JOIN_LIMIT);
 						
-						MIDEX_Services.Macros.MAC_midexPayloadKeyField(ds_SANCTN_linkid_recs, ds_outDataSet, BATCH_NUMBER, INCIDENT_NUMBER, PARTY_NUMBER, MIDEX_PRT_NBR );
+            MIDEX_Services.Macros.MAC_midexPayloadKeyField(ds_SANCTN_linkid_recs, ds_outDataSet, BATCH_NUMBER, INCIDENT_NUMBER, PARTY_NUMBER, MIDEX_PRT_NBR );
 						
 						RETURN ds_outDataSet;
 					END; // get_PublicLinkIdData
 					
 				EXPORT fn_get_PublicSanctnDidData ( UNSIGNED6 in_did ):=
 					FUNCTION
-						ds_SANCTN_did_recs := CHOOSEN(SANCTN.Key_SANCTN_DID( KEYED( DID = in_did ) AND in_did != 0),MIDEX_Services.Constants.JOIN_LIMIT);
+						// CCPA - No personal info in key - suppression takes place with the payload join
+            ds_SANCTN_did_recs := CHOOSEN(SANCTN.Key_SANCTN_DID( KEYED( DID = in_did ) AND in_did != 0),MIDEX_Services.Constants.JOIN_LIMIT);
 						
 						MIDEX_Services.Macros.MAC_midexPayloadKeyField(ds_SANCTN_did_recs, ds_outDataSet, BATCH_NUMBER, INCIDENT_NUMBER, PARTY_NUMBER, MIDEX_PRT_NBR );
 						
@@ -70,8 +75,8 @@ EXPORT Raw_Public :=
 				EXPORT fn_get_PublicLicNbrData( STRING50 in_licNbr, STRING30 in_licState) :=
 					FUNCTION
           
-           upperCaseLicense  := TRIM(StringLib.StringToUpperCase(in_licNbr));
-           upperCaseLicState := TRIM(StringLib.StringToUpperCase(in_licState));
+            upperCaseLicense  := TRIM(STD.STR.ToUpperCase(in_licNbr));
+            upperCaseLicState := TRIM(STD.STR.ToUpperCase(in_licState));
         
             ds_SANCTN_lic_recs := CHOOSEN(SANCTN.Key_License_NBR( KEYED( cln_license_number = upperCaseLicense AND
 																																				 (upperCaseLicState = '' OR license_state = upperCaseLicState) ) AND 
@@ -92,17 +97,6 @@ EXPORT Raw_Public :=
 						RETURN ds_outDataSet;
 				END; // get_PublicNMLSData
 				
-				EXPORT fn_get_PublicSanctnPayload ( DATASET( MIDEX_Services.Layouts.rec_midex_payloadKeyField ) ds_mari ) :=
-					FUNCTION
-						ds_payload_sorted := DEDUP( SORT( ds_mari, midex_rpt_nbr ), midex_rpt_nbr );
-						ds_mari_recs :=
-							JOIN( ds_payload_sorted,
-										SANCTN.key_MIDEX_RPT_NBR,
-										KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
-										TRANSFORM(RIGHT),
-										LIMIT(MIDEX_Services.Constants.JOIN_LIMIT,SKIP));
-						RETURN ds_mari_recs;
-				 END;
 
 			//==============================================
 			// MODULE: Public License Search and report view 
@@ -111,10 +105,11 @@ EXPORT Raw_Public :=
 			
 				 EXPORT REPORT_VIEW := MODULE
 							EXPORT by_midex_rpt_num(DATASET (MIDEX_Services.layouts.rec_midex_payloadKeyField) in_ids,
+                                      doxie.IDataAccess mod_access, 
                                       UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None,
-                                      STRING in_search_type = 'I', STRING in_ssn_mask_type = '', STRING32 in_app_type = '') := FUNCTION
+                                      STRING in_search_type = 'I') := FUNCTION
 
-									sanct_recsRaw := JOIN( in_ids,SANCTN.key_MIDEX_RPT_NBR,
+							  sanct_recsRaw := JOIN( in_ids,SANCTN.key_MIDEX_RPT_NBR,
 																			KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
 																			TRANSFORM(MIDEX_Services.Layouts.LicenseReport_Layout,
 																								SELF.data_source := MIDEX_Services.Constants.DATASOURCE_PUBLIC,
@@ -125,7 +120,7 @@ EXPORT Raw_Public :=
 																								SELF.LastName := RIGHT.lname,
 																								SELF.SuffixName := RIGHT.name_suffix,
 																								SELF.companyName := RIGHT.cname,
-																								SELF.ssn := lib_stringlib.stringlib.StringFilterOut( RIGHT.ssnumber, '-');,
+																								SELF.ssn := STD.STR.FilterOut( RIGHT.ssnumber, '-');,
 																								SELF.did := (UNSIGNED6)RIGHT.did,
 																								SELF.bdid := (UNSIGNED6)RIGHT.bdid,
 																								SELF.phone := '';
@@ -135,10 +130,11 @@ EXPORT Raw_Public :=
 																								SELF := []),
 																				KEEP(1),
 																				LIMIT(0));
-                
-                census_data.MAC_Fips2County_Keyed(sanct_recsRaw,st,fips_county,county,sanct_recs);								
+                                        
+                ds_sanct_suppressed := Suppress.MAC_SuppressSource(sanct_recsRaw, mod_access); 
+                census_data.MAC_Fips2County_Keyed(ds_sanct_suppressed,st,fips_county,county,sanct_recs);								
 
-								// Get license info via midex rpt number									
+								// Get license info via midex rpt number	
 								sanct_recs_wlicInfo := JOIN(sanct_recs,SANCTN.key_license_midex,
                                             KEYED(LEFT.report_number = RIGHT.midex_rpt_nbr),
                                             TRANSFORM(MIDEX_Services.Layouts.LicenseReport_Layout,
@@ -157,9 +153,9 @@ EXPORT Raw_Public :=
 								nmls_type := Functions.set_nmlsLicenseType(in_search_type);
 								
 								// Add the nmlsID to recordset if one exists.
-								sanct_recs_nmlsID := JOIN (sanct_recs_wlicInfo,SANCTN.key_nmls_midex,
+                sanct_recs_nmlsID := JOIN (sanct_recs_wlicInfo,SANCTN.key_nmls_midex,
 																					 KEYED(LEFT.report_number = RIGHT.midex_rpt_nbr) AND
-																					 nmls_type = Stringlib.StringToUpperCase(RIGHT.license_type),
+																					 nmls_type = STD.STR.ToUpperCase(RIGHT.license_type),
 																					 TRANSFORM(MIDEX_Services.Layouts.LicenseReport_Layout,
 																											SELF.nmls_id :=(INTEGER) RIGHT.nmls_id,
 																											SELF := LEFT),
@@ -176,15 +172,16 @@ EXPORT Raw_Public :=
 								
 								sanct_rolled := ROLLUP(sanct_group,GROUP,licenseRollup(LEFT,ROWS(LEFT)));
 								sanct_recsHash := PROJECT(sanct_rolled,MIDEX_Services.alert_calcs.calcLicenseReptHashes(LEFT,alertVersion));
-								RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,sanct_recsHash,sanct_rolled));
+                              
+                RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,sanct_recsHash,sanct_rolled));
 							END; // end by midex report number funtion
 				 END; // license report view module
 								 
 				 EXPORT SEARCH_VIEW := MODULE
 												
 							EXPORT by_midex_rpt_num(DATASET (MIDEX_Services.layouts.rec_midex_payloadKeyField) in_ids,
-                                      UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None,
-                                      STRING in_ssn_mask_type = '', string32 in_app_type = '') := FUNCTION
+                                      doxie.IDataAccess mod_access,
+                                      UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None) := FUNCTION
 															
 									sanct_recsRaw := JOIN(in_ids,SANCTN.key_MIDEX_RPT_NBR,
 																			KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
@@ -193,16 +190,17 @@ EXPORT Raw_Public :=
 																								SELF.licensee_MidName := RIGHT.mname,
 																								SELF.licensee_LastName := RIGHT.lname,
 																								SELF.licensee_companyName := RIGHT.cname,
-																								SELF.ssn := lib_stringlib.stringlib.StringFilterOut( RIGHT.ssnumber, '-');,
+																								SELF.ssn := STD.STR.FilterOut( RIGHT.ssnumber, '-');,
 																								SELF.data_source := MIDEX_Services.Constants.DATASOURCE_PUBLIC,
 																								SELF.city := RIGHT.v_city_name,
 																								SELF := RIGHT,
 																								SELF := []),
 																				LIMIT(iesp.Constants.MIDEX.MAX_COUNT_SEARCH_RESPONSE_RECORDS,SKIP));
 									
-                  census_data.MAC_Fips2County_Keyed(sanct_recsRaw,st,fips_county,county,sanct_recs);								
+                  ds_sanct_suppressed := Suppress.MAC_SuppressSource(sanct_recsRaw, mod_access); 
+                  census_data.MAC_Fips2County_Keyed(ds_sanct_suppressed,st,fips_county,county,sanct_recs);								
 
-									// Get license info via midex rpt number									
+									// Get license info via midex rpt number
 									sanct_recs_wlicInfo := JOIN(sanct_recs,SANCTN.key_license_midex,
 																								KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
 																								TRANSFORM(MIDEX_Services.Layouts.license_srch_layout,
@@ -218,7 +216,7 @@ EXPORT Raw_Public :=
 									sanct_recs_wlicInfo_Dedup := DEDUP(sanct_recs_wlicInfo,ALL);
 									
 									// Attach nmls info
-									sanct_recs_wNmlsID := JOIN(sanct_recs_wlicInfo_Dedup,SANCTN.key_nmls_midex,
+                  sanct_recs_wNmlsID := JOIN(sanct_recs_wlicInfo_Dedup,SANCTN.key_nmls_midex,
 																								KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
 																								TRANSFORM(MIDEX_Services.Layouts.license_srch_layout,
 																													SELF.nmls_info := ROW ({RIGHT.license_type,RIGHT.nmls_id}, Layouts.rec_nmlsInfo),
@@ -234,7 +232,7 @@ EXPORT Raw_Public :=
 												SELF := l;
 									END;
 									sanct_recs_wNmlsID_rolled := ROLLUP(sanct_recs_wNmlsID_group,GROUP,Roll_NMLSInfo(LEFT,ROWS(LEFT)));
-									
+                  
 									sanct_recsHash := PROJECT(sanct_recs_wNmlsID_rolled,MIDEX_Services.alert_calcs.calcLicenseSrchHashes(LEFT));
 									
 									RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,sanct_recsHash,sanct_recs_wNmlsID_rolled));
@@ -256,7 +254,9 @@ EXPORT Raw_Public :=
           // same parts (ie: name, license number, nmls ID, etc.  Therefore, the code joins many  
           // of the same keys and it does appear that there is duplication. Hence the request for 
           // comments for each section/join.
-					EXPORT fn_pub_RptView_by_midex_rpt_num(DATASET (MIDEX_Services.layouts.rec_midex_payloadKeyField) in_midex_rpt_nbrs, BOOLEAN alert = FALSE, STRING ssnMask, STRING dobMask, STRING8 StartLoadDate = '') := 
+					EXPORT fn_pub_RptView_by_midex_rpt_num(DATASET(MIDEX_Services.layouts.rec_midex_payloadKeyField) in_midex_rpt_nbrs, 
+                                                 doxie.IDataAccess mod_access, 
+                                                 BOOLEAN alert = FALSE, STRING8 StartLoadDate = '') := 
 
 						FUNCTION
 								 
@@ -291,7 +291,7 @@ EXPORT Raw_Public :=
                       LIMIT(MIDEX_Services.Constants.JOIN_LIMIT),
                       KEEP(1));
               
-							// find associated parties. This joins gets the list of associated parties for the 
+              // find associated parties. This joins gets the list of associated parties for the 
               // midex report numbers.  The professions are listed in separtate rows and will be 
               // rolled up into a child dataset.
               // LEFT.party_num != RIGHT.party_number => removes the subject from the parties list
@@ -308,20 +308,21 @@ EXPORT Raw_Public :=
 																 SELF.incidentNumber     := RIGHT.incident_number,
 																 SELF.partyNumber        := RIGHT.party_number,     
 																 SELF.Name               := iesp.ECL2ESP.setName( RIGHT.fname, RIGHT.mname, RIGHT.lname, RIGHT.name_suffix, RIGHT.title),
-																 SELF.ssn                := MIDEX_Services.Functions.fn_pubSanctSsnMask(RIGHT.ssNumber, '', ssnMask),
+																 SELF.ssn                := MIDEX_Services.Functions.fn_pubSanctSsnMask(RIGHT.ssNumber, '', mod_access.ssn_mask),
 																 SELF.Professions        := DATASET([{RIGHT.party_vocation}], iesp.share.t_StringArrayItem),  /* vocation is string45 */
 																 SELF.partyPosition      := RIGHT.party_position,
 																 SELF.partyFirm          := RIGHT.party_firm,
 																 SELF.midex_rpt_nbr      := TRIM(RIGHT.batch_number, RIGHT, LEFT) + '-' + (STRING)incidentNum + '-' + (STRING)partyNum,
-																 SELF                    := RIGHT;
+                                 SELF                    := RIGHT;
                                  SELF                    := [];
 															 ),
 											INNER,
                       LIMIT(MIDEX_Services.Constants.JOIN_LIMIT_FOR_CHOOSEN, SKIP));
 							
-							census_data.MAC_Fips2County_Keyed(ds_partiesRaw,st,fips_county,county,ds_parties); 
-              
-              ds_partiesSorted := SORT( ds_parties, midex_rpt_nbr);
+              ds_parties_suppressed := Suppress.MAC_SuppressSource(ds_partiesRaw, mod_access); 
+							
+              census_data.MAC_Fips2County_Keyed(ds_parties_suppressed,st,fips_county,county,ds_parties); 
+              ds_partiesSorted := SORT(ds_parties, midex_rpt_nbr);
 							
               // rollup professions in associated parties
 							ds_partiesProfessionsRolled :=
@@ -374,7 +375,7 @@ EXPORT Raw_Public :=
 																 ));
               
               // Add licenses	to the parties payload with professions and then rollup the licenses.							 
-							ds_partiesLicense :=
+              ds_partiesLicense :=
 								JOIN( ds_associatedParties,
 											SANCTN.key_license_midex,
 											KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
@@ -400,7 +401,7 @@ EXPORT Raw_Public :=
 							// Per Rodney, there will never be more than one NMLS ID associated with a public midex report number
 							// so there is no need to rollup/select the appropriate nmls ID as with the nonpublic data.
 							// parties, professions, licenses & nmls 									 
-							ds_partiesWithNmls :=
+              ds_partiesWithNmls :=
 								JOIN( ds_partiesLicenseRolled, 
 											SANCTN.key_nmls_midex,
 											KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
@@ -433,7 +434,7 @@ EXPORT Raw_Public :=
 																		SELF.Professions                := CHOOSEN( DEDUP( SORT( LEFT.Professions, value), value), iesp.Constants.MIDEX.MAX_COUNT_REPORT_PROFESSIONS);
 																		SELF.Licenses                   := LEFT.LicensesSlimmed;
 																		SELF.NMLSInfo                   := ROW({LEFT.nmlsId, LEFT.nmlsType}, iesp.midex_share.t_NMLSInfo);
-																		SELF.OtherIdentifyingReferences := []; 
+																		SELF.OtherIdentifyingReferences := []; // this data is only in nonpublic keys
 																		SELF.batch                      := LEFT.batchNumber;
 																		SELF.incident_num               := LEFT.incidentNumber;
 																		SELF.party_num                  := LEFT.partyNumber;
@@ -470,7 +471,7 @@ EXPORT Raw_Public :=
               //----------------------------------------------------------------------------------------------------
               
               // collect records for the response/rebuttal text child dataset
-							ds_responseRecords :=
+              ds_responseRecords :=
 								JOIN(in_PubMidexRptNbrsFiltered, 
 										 SANCTN.key_rebuttal_text, 
 										 KEYED(LEFT.batch = RIGHT.batch_number AND
@@ -497,7 +498,7 @@ EXPORT Raw_Public :=
 																	 SELF      := LEFT;
 																 ));
 							// collect records for the incident text and roll for child dataset 
-							ds_incidentRecsAll := 
+              ds_incidentRecsAll := 
 								JOIN( in_PubMidexRptNbrsFiltered,
 											SANCTN.key_incident_midex,
 											KEYED(LEFT.batch = RIGHT.batch_number AND
@@ -586,7 +587,7 @@ EXPORT Raw_Public :=
               //----------------------------------------------------------------------------------------------------------
               // Get payload data for midex report numbers and roll public actions and professions
               // into child datasets
-              ds_payloadRecsRaw := 
+              ds_payloadRecsRawAll := 
 								 JOIN( in_PubMidexRptNbrsFiltered,
 											 SANCTN.key_MIDEX_RPT_NBR,
 											 KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
@@ -596,7 +597,7 @@ EXPORT Raw_Public :=
 																	SELF.lastname          := RIGHT.lname;
 																	SELF.suffixname        := RIGHT.name_suffix;
 																	SELF.Prefixname        := RIGHT.title;
-																	SELF.ssn               := MIDEX_Services.Functions.fn_pubSanctSsnMask(RIGHT.ssNumber, RIGHT.ssn_appended, ssnMask),
+																	SELF.ssn               := MIDEX_Services.Functions.fn_pubSanctSsnMask(RIGHT.ssNumber, RIGHT.ssn_appended, mod_access.ssn_mask),
 																	SELF.CompanyName       := RIGHT.cname;
 																	SELF.companyAka        := RIGHT.dba_name;
 																	SELF.UniqueId          := (STRING)RIGHT.DID;
@@ -608,7 +609,7 @@ EXPORT Raw_Public :=
 																	SELF.party_num         := RIGHT.PARTY_NUMBER;
 																	SELF.JobTitle          := RIGHT.party_position;
 																	SELF.Professions       := DATASET([{RIGHT.party_vocation}],iesp.share.t_StringArrayItem);
-																	SELF.PublicActions     := DATASET([{RIGHT.party_text}], iesp.share.t_StringArrayItem);
+	 																SELF.PublicActions     := DATASET([{RIGHT.party_text}], iesp.share.t_StringArrayItem);
 																	SELF.MIDEXFileNumber   := RIGHT.midex_rpt_nbr;
 																	SELF.midex_rpt_nbr     := LEFT.midex_rpt_nbr;
 																	SELF                   := RIGHT; 
@@ -617,7 +618,8 @@ EXPORT Raw_Public :=
 											 INNER,
                        LIMIT(MIDEX_Services.Constants.JOIN_LIMIT_FOR_CHOOSEN, SKIP));  
 							
-              census_data.MAC_Fips2County_Keyed(ds_payloadRecsRaw,st,fips_county,county,ds_payloadRecs); 
+              ds_payloadRecsRawSuppressed := Suppress.MAC_SuppressSource(ds_payloadRecsRawAll, mod_access); 
+              census_data.MAC_Fips2County_Keyed(ds_payloadRecsRawSuppressed,st,fips_county,county,ds_payloadRecs); 
                 
               ds_payloadRecsSorted := SORT(ds_payloadRecs, midex_rpt_nbr, order_number);
 							
@@ -708,7 +710,7 @@ EXPORT Raw_Public :=
 	 
 						 // add license data to the payload, incident text, response text, 
              // party, public actions and professions dataset and then rollup licenses
-						 ds_payloadWithLicenseRecs :=
+             ds_payloadWithLicenseRecs :=
 								JOIN( ds_payloadWithPartyRecs,
 											SANCTN.key_license_midex,
 											KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
@@ -749,11 +751,12 @@ EXPORT Raw_Public :=
 							 
 						 ds_reportRecs_recsHash := 
 								PROJECT(ds_reportRecs, MIDEX_Services.alert_calcs.xfm_calcMidexIncidentHashes(LEFT));
+
    
-						RETURN (IF(alert,ds_reportRecs_recsHash,ds_reportRecs));
+            RETURN (IF(alert,ds_reportRecs_recsHash,ds_reportRecs));
 					END;
 			 
-				 EXPORT fn_PublicLayoutRecords(DATASET (MIDEX_Services.Layouts.CompReport_TempLayout) ds_payloadRecs, STRING dobMask) := 
+				 EXPORT fn_PublicLayoutRecords(DATASET (MIDEX_Services.Layouts.CompReport_TempLayout) ds_payloadRecs, UNSIGNED1 dobMask) := 
 					FUNCTION
 						ds_publicRecsRaw := 
 							 PROJECT( ds_payloadRecs, 
@@ -777,6 +780,7 @@ EXPORT Raw_Public :=
 
                 
 								ds_publicRecsSorted := SORT(ds_publicRecsRaw, MIDEXFileNumber);
+                
 						 RETURN ds_publicRecsSorted;
 					 END; 
 				 END;  // END REPORT_VIEW MODULE
@@ -784,9 +788,10 @@ EXPORT Raw_Public :=
 				 
 				 EXPORT SEARCH_VIEW := MODULE
 												
-							EXPORT fn_by_midex_rpt_nums(DATASET (MIDEX_Services.layouts.rec_midex_payloadKeyField) in_midex_rpt_nbrs,
-                                          STRING ssnMask, UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None,
-                                          STRING8 StartLoadDate = '' ) := 
+							EXPORT fn_by_midex_rpt_nums(DATASET (MIDEX_Services.layouts.rec_midex_payloadKeyField) in_midex_rpt_nbrs, 
+                                          doxie.IDataAccess mod_access,
+                                          UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None,
+                                          STRING8 StartLoadDate = '') := 
 								FUNCTION
 									in_midexRptNbrsPub := 
 										PROJECT( in_midex_rpt_nbrs, 
@@ -819,7 +824,7 @@ EXPORT Raw_Public :=
 									// for this join, there can be multiple rows, but everything is duplicated except for the 
                   // party text field and that is not used. We only need to keep one record per midex
                   // report number.
-									ds_payloadRecsRaw := 
+									ds_payloadRecs := 
 										 JOIN( in_PubMidexRptNbrsFiltered,
 													 SANCTN.key_MIDEX_RPT_NBR,
 													 KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
@@ -830,7 +835,7 @@ EXPORT Raw_Public :=
 																			SELF.lastname          := RIGHT.lname;
 																			SELF.suffixname        := RIGHT.name_suffix,
 																			SELF.Prefixname        := RIGHT.title,
-																			SELF.ssn               := MIDEX_Services.Functions.fn_pubSanctSsnMask(RIGHT.ssNumber, RIGHT.ssn_appended, ssnMask),
+																			SELF.ssn               := MIDEX_Services.Functions.fn_pubSanctSsnMask(RIGHT.ssNumber, RIGHT.ssn_appended, mod_access.ssn_mask),
 																			SELF.CompanyName       := RIGHT.cname,
 																			SELF.UniqueId          := IF( RIGHT.DID = 0,
                                                                     (STRING)RIGHT.DID,
@@ -852,10 +857,11 @@ EXPORT Raw_Public :=
 													 KEEP(1),
 													 LIMIT(0));  
 									
-                  census_data.MAC_Fips2County_Keyed(ds_payloadRecsRaw,st,fips_county,county,ds_payloadRecs); 
-                
+                   ds_payloadRecsRawSuppressed := Suppress.MAC_SuppressSource(ds_payloadRecs, mod_access); 
+                   census_data.MAC_Fips2County_Keyed(ds_payloadRecsRawSuppressed,st,fips_county,county,ds_payloadRecsFips); 
+                   
 									ds_payloadWithLic := 
-										 JOIN( ds_payloadRecs,
+										 JOIN( ds_payloadRecsFips,
 													 SANCTN.key_license_midex,
 													 KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr),
 													 TRANSFORM( MIDEX_Services.Layouts.rec_temp_layout,
@@ -894,8 +900,7 @@ EXPORT Raw_Public :=
 																		 ) ); 
 									
 									recsHash := PROJECT(ds_SearchRecs,MIDEX_Services.alert_calcs.calcMidexSrchHashes(LEFT));
-			
-									RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,recsHash,ds_SearchRecs));
+                  RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,recsHash,ds_SearchRecs));
 									
 							END; // function fn_by_midex_rpt_num
 				END; // End Search View

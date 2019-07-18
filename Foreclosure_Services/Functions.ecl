@@ -1,10 +1,14 @@
-﻿import ut, Census_Data, Foreclosure_services, iesp, doxie, suppress, AutoStandardI;
+import ut, Census_Data, Foreclosure_services, iesp, suppress, AutoStandardI, MDR;
 
 export Functions := module
 
-		export params := interface(AutoStandardI.InterfaceTranslator.application_type_val.params)
-			export string6 ssnmask;
-		end;
+//same as raw.params
+EXPORT params := INTERFACE
+  EXPORT string5 industry_class := '';
+  EXPORT string32 application_type := Suppress.Constants.ApplicationTypes.DEFAULT;
+  EXPORT string ssn_mask := suppress.constants.ssn_mask_type.ALL;
+END;
+
 EXPORT SetAddressFields(string primname, string primrange, string predir, string postdir,
 	                        string addrsuff, string unitdesig, string secrange, string pcityname,
 													string vcityname, string paramcity, string st, string zip, string zip4,
@@ -96,9 +100,9 @@ out_names_srt := dedup(sort(out_names_fltd,rec_seq,companyname, name.first, name
 out_names_dep_tmp:=project(sort(out_names_srt,rec_order),out_name_seq_rec);
 
 // suppression and masking: [defendants] only; [plaintiffs] is a free-flow text.
-Suppress.MAC_Suppress(out_names_dep_tmp,suppress_did,in_mod.applicationType,Suppress.Constants.LinkTypes.DID,uniqueid);
-Suppress.MAC_Suppress(suppress_did,suppress_ssn,in_mod.applicationType,Suppress.Constants.LinkTypes.SSN,ssn);
-suppress.MAC_Mask(suppress_ssn, out_names_dep, ssn, blank, true, false,,,,in_mod.ssnmask);
+Suppress.MAC_Suppress(out_names_dep_tmp,suppress_did,in_mod.application_type,Suppress.Constants.LinkTypes.DID,uniqueid);
+Suppress.MAC_Suppress(suppress_did,suppress_ssn,in_mod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
+suppress.MAC_Mask(suppress_ssn, out_names_dep, ssn, blank, true, false,,,,in_mod.ssn_mask);
 	
 out_slim_seq_rec get_plaintiffs(out_slim_seq_w_tzone l, out_plaintiffs_dep r) := transform
 	self.plaintiffs := l.plaintiffs + dataset([{r.value}],
@@ -164,6 +168,9 @@ end;
 
 		iesp.foreclosure.t_ForeclosureSearchRecord xform(Foreclosure_Services.Layouts.rawrec_plaintiffs_defendants l) := TRANSFORM
 			self.ForeclosureId:= l.foreclosure_id;
+			//Setting VendorSource to 'A' if source of records is FARES and 'B' for BlackKnight, per requirement, to distinguish between Fares and Blackknight data 
+			self.VendorSource:=if(l.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
+																																																Foreclosure_services.Constants('').src_BlackKnight);
 			self.RecordingDate :=iesp.ECL2ESP.toDatestring8(l.recording_date);
 			self.SiteAddress :=setAddressFields(l.situs1_prim_name, l.situs1_prim_range, l.situs1_predir, l.situs1_postdir, l.situs1_addr_suffix,
 			                              l.situs1_unit_desig,l.situs1_sec_range, l.situs1_p_city_name,l.situs1_v_city_name, '',
@@ -196,6 +203,7 @@ export fnforeclosureReportval(dataset(foreclosure_services.Layouts.rawrec) in_re
   iesp.foreclosure.t_ForeclosureReportRecord xform(Foreclosure_Services.Layouts.rawrec_plaintiffs_defendants l) := TRANSFORM																								 
 	
 	self.ForeclosureId:= l.foreclosure_id;
+	self.VendorSource:= if(l.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, Foreclosure_services.Constants('').src_BlackKnight);
 	self.CaseNumber :=l.court_case_nbr;
 	self.DeedType :=l.deed_desc;
 	self.SiteAddress :=setAddressFields(l.situs1_prim_name, l.situs1_prim_range, l.situs1_predir, l.situs1_postdir, l.situs1_addr_suffix,

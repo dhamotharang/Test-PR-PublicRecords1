@@ -1,4 +1,4 @@
-﻿IMPORT Address_Attributes, BIPv2, Business_Header, codes, Business_Risk, Risk_indicators, RiskWise, Address, Business_Risk_BIP, DueDiligence, STD;
+﻿IMPORT Address_Attributes, BIPv2, Risk_indicators, Business_Risk_BIP, DueDiligence;
 
 /*
 	Following Keys being used:
@@ -134,16 +134,16 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																			SELF := LEFT;),
 														LEFT OUTER);
 
+	addIncorpLooseLaws := DueDiligence.CommonBusiness.getIncoprorationWithLooseLawsAddr(addAddrStructure, filteredInquiredBus, 'state_of_incorporation_abbr');
 									
 	//determine if business is operating from a private post, mail drop, remailer, storage facility or undeliverable secondary range										
-	operatingMailingAddr := PROJECT(filteredInquiredBus + filteredOperatingLocations, TRANSFORM({BOOLEAN privatePost, BOOLEAN mailDrop, BOOLEAN remailer, BOOLEAN storageFacility, BOOLEAN undelSecRange, BOOLEAN isVacant, BOOLEAN incLooseState, RECORDOF(LEFT)},
+	operatingMailingAddr := PROJECT(filteredInquiredBus + filteredOperatingLocations, TRANSFORM({BOOLEAN privatePost, BOOLEAN mailDrop, BOOLEAN remailer, BOOLEAN storageFacility, BOOLEAN undelSecRange, BOOLEAN isVacant, RECORDOF(LEFT)},
                                                                                               SELF.privatePost := LEFT.priv_post > 0;
                                                                                               SELF.mailDrop := LEFT.drop > 0;
                                                                                               SELF.remailer := LEFT.potential_remail;
                                                                                               SELF.storageFacility := LEFT.storage > 0;
                                                                                               SELF.undelSecRange := LEFT.undel_sec > 0;
                                                                                               SELF.isVacant := LEFT.vacant_cnt > 0;
-                                                                                              SELF.incLooseState := LEFT.inc_st_loose_cnt > 0;
                                                                                               SELF := LEFT;));
 																															
 	sortOperatingMailingAddr := SORT(operatingMailingAddr, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), partyIndicator);
@@ -158,10 +158,9 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																								SELF.storageFacility := LEFT.storageFacility OR RIGHT.storageFacility;
 																								SELF.undelSecRange := LEFT.undelSecRange OR RIGHT.undelSecRange;
 																								SELF.isVacant := LEFT.isVacant OR RIGHT.isVacant;
-																								SELF.incLooseState := LEFT.incLooseState OR RIGHT.incLooseState;
 																								SELF := LEFT;));
 
-	addOperatingMailingAddr := JOIN(addAddrStructure, rollOperatingMailingAddr(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
+	addOperatingMailingAddr := JOIN(addIncorpLooseLaws, rollOperatingMailingAddr(partyIndicator = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE),
 																	#EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
 																	TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																						SELF.privatePostExists := RIGHT.privatePost;
@@ -170,7 +169,6 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 																						SELF.storageFacilityExists := RIGHT.storageFacility;
 																						SELF.undeliverableSecRangeExists := RIGHT.undelSecRange;
 																						SELF.vacant := RIGHT.isVacant;
-																						SELF.incorpWithLooseLaws := LEFT.incorpWithLooseLaws OR RIGHT.incLooseState;
 																						SELF := LEFT;),
 																	LEFT OUTER);
                                   

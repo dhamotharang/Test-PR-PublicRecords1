@@ -13,7 +13,7 @@ EXPORT functions := MODULE
   // TODO: worth creating constant literals for SOAP names?
   // TODO: this code must be executed only in ESDL mode! So far I can't accomplish this
   // NB: careful: some ESDL-standard options (glb, dppa, etc.) are stored through iesp@ECL2EP
-  EXPORT SetInputSearchOptions (PersonReports.input._compoptions m_esdl) := FUNCTION
+  EXPORT SetInputSearchOptions (PersonReports.IParam._compoptions m_esdl) := FUNCTION
     // this is to zero down as much as possible from SOAP header options
     #stored ('SelectIndividually', true);
 
@@ -226,11 +226,11 @@ EXPORT functions := MODULE
   END;
 
   //debug
-  EXPORT GetCRSOptionsDataset (PersonReports.input._compoptions options) := dataset ([
+  EXPORT GetCRSOptionsDataset (PersonReports.IParam._compoptions options) := dataset ([
     {'select_individually', options.select_individually},
     {'REPORT', ''},
-    {'    GLBPurpose', options.GLBPurpose},
-    {'    DPPAPurpose', options.DPPAPurpose},
+    {'    GLBPurpose', options.glb},
+    {'    DPPAPurpose', options.dppa},
     {'    ssn_mask', options.ssn_mask},
     {'    legacy_verified', options.legacy_verified},
     {'    ln_branded', options.ln_branded},

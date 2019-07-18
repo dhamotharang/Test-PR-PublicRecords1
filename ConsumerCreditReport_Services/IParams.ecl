@@ -26,7 +26,6 @@ EXPORT IParams := MODULE
 			EXPORT STRING50 BillingCode := '' : STORED('BillingCode');
 			EXPORT STRING20 CompanyId := '' : STORED('CompanyId');
 			EXPORT STRING120 EndUserCompanyName := '' : STORED('EndUserCompanyName');
-			EXPORT STRING6 DOBMask := Suppress.Constants.DATE_MASK_TYPE.NONE : STORED('DOBMask');
 			EXPORT STRING PermissiblePurpose := '' : STORED('PermissiblePurpose');
 			EXPORT INTEGER8 FFDOptionsMask := FFD.FFDMask.Get(); 
 			EXPORT BOOLEAN FetchLiensJudgments := IncludeLiensJudgments AND NOT isRestricted;

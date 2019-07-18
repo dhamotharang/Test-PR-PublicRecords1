@@ -1,4 +1,4 @@
-import doxie,doxie_cbrs,doxie_raw, Foreclosure_services, BIPV2, Property, TopBusiness_Services;
+﻿import doxie,doxie_cbrs,doxie_raw, Foreclosure_services, TopBusiness_Services;
 
 export SearchService_IDs := module
 	export params := interface(AutoKey_IDs.params, TopBusiness_Services.iParam.BIDParams)
@@ -27,7 +27,7 @@ export SearchService_IDs := module
 		
 		foreclosure_id := dataset([{in_mod.foreclosure_id,0,0, false}],Layouts.FIDNumberPlus);
 		
-		by_ForeclosureId := if(in_mod.foreclosure_id != '',Foreclosure_services.Raw.byforeclosureid(foreclosure_id,isNodSearch));
+		by_ForeclosureId := if(in_mod.foreclosure_id != '',Foreclosure_services.Raw.byforeclosureid(foreclosure_id,isNodSearch,true));
 		
 		// lookup by DID
 		dids := dataset([{(unsigned)in_mod.DID}],doxie.layout_references);

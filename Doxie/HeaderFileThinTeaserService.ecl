@@ -89,7 +89,7 @@
 IMPORT ut, watchdog, NID, suppress, standard, doxie;
 			 
 EXPORT HeaderFileThinTeaserService := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #Constant('applicationType',suppress.Constants.ApplicationTypes.Consumer);
 
 	boolean  includeRelatives := false : stored('IncludeRelativeNames');

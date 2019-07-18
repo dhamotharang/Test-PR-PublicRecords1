@@ -1,7 +1,7 @@
-/*2010-09-09T20:45:34Z (Adam Shirey)
+﻿/*2010-09-09T20:45:34Z (Adam Shirey)
 Returning iesp.intermediate_log.t_IntermediateLogRecord for customer support tool
 */
-import address, ut, Risk_Indicators, LN_PropertyV2, ADVO, AddrFraud, Property, iesp, models, std;
+import address, ut, Risk_Indicators, ADVO, AddrFraud, Property, iesp, models, std, MDR, Foreclosure_Services;
  
 //Data sources
 export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],Foreclosure_Vacancy.Layouts.in_data), boolean isRenewal = FALSE) := MODULE
@@ -92,6 +92,8 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		//Calculate fields per depricated ChoicePoint FC process see Mark McLean for details
 		self.CP_DATA_DATE            := tmp_data_date;//Derived newest of filing_date and record_date 
 		self.fc_unique_ID            := l.UniqueID_in;
+		self.source           							:= if(r.source=MDR.sourceTools.src_Foreclosures, Foreclosure_services.Constants('').src_Fares, 
+																																																																																					Foreclosure_services.Constants('').src_BlackKnight);																																																																																	 
 		self.DEED_EVENT_TYPE_CD      := r.deed_category;
 		self.DEED_EVENT_TYPE_DESC    := r.deed_desc;
 		self.DOC_TYPE_CD             := if( isRenewal, r.document_type, '' );
@@ -154,7 +156,7 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 		self := [];
 	end;
 
-	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(layouts.in_clean) clnd, DATASET(RECORDOF(Property.Key_Foreclosures_Addr)) keyfile) :=
+	EXPORT fn_Find_Foreclosure_By_Addr(DATASET(layouts.in_clean) clnd, DATASET(RECORDOF(Property.Key_Foreclosures_Addr)) keyfile, boolean includeBlackKnight=false) :=
 		FUNCTION
 			clnd_filtered := clnd(zip != '' and prim_range != '' and prim_name != '');
 			foreclosure_recs := 
@@ -163,7 +165,8 @@ export getData(DATASET(Foreclosure_Vacancy.Layouts.in_data) indata = DATASET([],
 					keyed(left.prim_range = right.situs1_prim_range) and
 					keyed(left.prim_name = right.situs1_prim_name) and
 					keyed(left.suffix = right.situs1_addr_suffix) and
-					left.sec_range = right.situs1_sec_range,
+					left.sec_range = right.situs1_sec_range and
+					if (includeBlackKnight, true, right.source=MDR.sourceTools.src_Foreclosures),
 					addAddrOnlyForeclosures(left, right),Left Outer,atmost(100), keep(50));	
 					
 			RETURN foreclosure_recs;

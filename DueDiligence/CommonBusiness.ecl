@@ -788,6 +788,56 @@ EXPORT CommonBusiness := MODULE
     riskySicNaic := DEDUP(prepRiskySicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
     
     RETURN riskySicNaic;
-  ENDMACRO; 
+  ENDMACRO;
 	
+	EXPORT getIncoprorationWithLooseLaws(inBusiness, filteredData, filteredCompanyIncState) := FUNCTIONMACRO
+			  projectLooseLaws := PROJECT(filteredData, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState, STRING2 CompanyIncorpSt}, 
+					SELF.looseLawState    := LEFT.#EXPAND(filteredCompanyIncState) IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS;
+					SELF.CompanyIncorpSt  := LEFT.#EXPAND(filteredCompanyIncState);
+					SELF := LEFT;
+				));
+				
+        addIncLooseLaws := DueDiligence.CommonBusiness.getIncoprorationWithLooseLawsShared(inBusiness, projectLooseLaws);
+                    
+        RETURN addIncLooseLaws;
+	ENDMACRO;
+	
+	EXPORT getIncoprorationWithLooseLawsAddr(inBusiness, filteredData, filteredCompanyIncState) := FUNCTIONMACRO
+			  projectLooseLaws := PROJECT(filteredData, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState, STRING2 CompanyIncorpSt}, 
+					SELF.looseLawState    := LEFT.inc_st_loose_cnt > 0;
+					SELF.CompanyIncorpSt  := LEFT.#EXPAND(filteredCompanyIncState);
+					SELF := LEFT;
+				));
+				      
+        addIncLooseLaws := DueDiligence.CommonBusiness.getIncoprorationWithLooseLawsShared(inBusiness, projectLooseLaws);
+                    
+        RETURN addIncLooseLaws;
+	ENDMACRO;
+	
+	EXPORT getIncoprorationWithLooseLawsShared(inBusiness, projectLooseLaws) := FUNCTIONMACRO
+				sortLooseLaws := SORT(projectLooseLaws, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -looseLawState, -(CompanyIncorpSt='DE'), -(CompanyIncorpSt='NV'), -(CompanyIncorpSt='WY'));
+        
+        dedupLooseLaws := DEDUP(sortLooseLaws, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+                                            
+        addIncLooseLaws := JOIN(inBusiness, dedupLooseLaws,
+                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
+                                TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                      looseIndicator := LEFT.incorpWithLooseLaws OR RIGHT.looseLawState;
+																			SELF.incorpWithLooseLaws := looseIndicator;
+																			//***To be printed on the shell shelf char section of report  
+                                      SELF.CompanyIncorpState  := MAP(
+																																			LEFT.incorpWithLooseLaws																																			 => LEFT.CompanyIncorpState,
+																																			RIGHT.looseLawState 
+																																				AND RIGHT.CompanyIncorpSt IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS 		 => RIGHT.CompanyIncorpSt,
+																																			RIGHT.looseLawState 
+																																				AND RIGHT.CompanyIncorpSt NOT IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS
+																																				AND LEFT.CompanyIncorpState NOT IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS	=> '',
+																																			NOT RIGHT.looseLawState	AND LEFT.CompanyIncorpState =''																	       => RIGHT.CompanyIncorpSt,
+																																																																																				LEFT.CompanyIncorpState);
+																			SELF := LEFT;),
+                                LEFT OUTER,
+                                ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+				RETURN addIncLooseLaws;
+	ENDMACRO;
+
 END;

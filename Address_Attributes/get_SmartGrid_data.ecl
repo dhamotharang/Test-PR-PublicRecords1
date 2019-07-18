@@ -1,4 +1,4 @@
-import address_attributes, advo, AVM_V2, doxie, EASI, header, LN_PropertyV2, property, Risk_Indicators, ut;
+﻿import address_attributes, advo, AVM_V2, EASI, LN_PropertyV2, property, Risk_Indicators, MDR;
 
 export get_SmartGrid_Data(DATASET(Address_Attributes.Layouts.SmartGrid_in) indata = DATASET([],Address_Attributes.Layouts.SmartGrid_in)) := FUNCTION
 
@@ -345,7 +345,8 @@ export get_SmartGrid_Data(DATASET(Address_Attributes.Layouts.SmartGrid_in) indat
 			keyed(left.prim_range = right.situs1_prim_range) and
 			keyed(left.prim_name = right.situs1_prim_name) and
 			keyed(left.suffix = right.situs1_addr_suffix) and 
-			keyed(left.predir = right.situs1_predir or left.predir = ''),
+			keyed(left.predir = right.situs1_predir or left.predir = '') and
+			right.source=MDR.sourceTools.src_Foreclosures,
 			addAddrOnlyForeclosures(left, right),Left Outer);
 
 		Foreclosures := sort(Find_Foreclosure_By_Addr, -data_date);

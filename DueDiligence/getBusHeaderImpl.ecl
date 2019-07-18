@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
 /*
 	Following Keys being used: 
@@ -268,35 +268,6 @@ EXPORT getBusHeaderImpl := MODULE
                           ATMOST(1));
                 
         RETURN addNoFein;
-    ENDMACRO;
-    
-    
-    
-    EXPORT getIncoprorationWithLooseLaws(inBusiness, filteredData) := FUNCTIONMACRO
-        projectLooseLaws := PROJECT(filteredData, TRANSFORM({RECORDOF(LEFT), BOOLEAN looseLawState, STRING2 CompanyIncorpSt}, 
-                                    SELF.looseLawState    := LEFT.company_inc_state IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS;
-                                    SELF.CompanyIncorpSt  := LEFT.company_inc_state;  
-                                    SELF := LEFT;));
-      
-        sortLooseLaws := SORT(projectLooseLaws, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
-        
-        rollLooseLaws := ROLLUP(sortLooseLaws,
-                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-                                TRANSFORM({RECORDOF(LEFT)},
-                                            SELF.looseLawState := LEFT.looseLawState OR RIGHT.looseLawState;
-                                            SELF.CompanyIncorpSt := IF(LEFT.CompanyIncorpSt != '', LEFT.CompanyIncorpSt, RIGHT.CompanyIncorpSt); 
-                                            SELF := LEFT;));
-                                            
-        addIncLooseLaws := JOIN(inBusiness, rollLooseLaws,
-                                #EXPAND(DueDiligence.Constants.mac_JOINLinkids_BusInternal()),
-                                TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-                                      SELF.incorpWithLooseLaws := LEFT.incorpWithLooseLaws OR RIGHT.looseLawState;
-                                      SELF.CompanyIncorpState  := RIGHT.CompanyIncorpSt;                         //***To be printed on the shell shelf char section of report  
-                                      SELF := LEFT;),
-                                LEFT OUTER,
-                                ATMOST(1));
-                    
-        RETURN addIncLooseLaws;
     ENDMACRO;
     
     

@@ -96,7 +96,7 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   end;
 
   // stores XML options, which are not BpsReport "compatible", for subsequent reading
-  SetInputLocalOptions (PersonReports.input._finderreport options_esdl) := FUNCTION
+  SetInputLocalOptions (PersonReports.IParam._finderreport options_esdl) := FUNCTION
     #stored ('ReturnAlsoFound', options_esdl.include_alsofound);
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   end;
@@ -113,11 +113,11 @@ unsigned1 n_phones := 40 : stored('_n_phones');
   options_in := GetInputOptions (global (first_row.Options));
 
   // set up default options -- those, which must be always chosen in ESDL mode
-  options_esdl := module (project (options_in, PersonReports.input.default_options_finder, opt))
+  options_esdl := module (project (options_in, PersonReports.IParam._finderreport, opt))
   end;
 
   // store ESDL options for subsequent legacy-style reading
-  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.input._compoptions, opt)) end);
+  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.IParam._compoptions, opt)) end);
   SetInputLocalOptions (options_esdl);
 
   // Read from stored and set parameters from SOAP (rather debug purpose). 
@@ -145,7 +145,7 @@ unsigned1 n_phones := 40 : stored('_n_phones');
 	gm := AutoStandardI.GlobalModule();
 
   // define search parameters; in "pure" ESDL mode this must be replaced with a module created from XML input
-  search_mod := module (project (gm, PersonReports.input._didsearch, opt))
+  search_mod := module (project (gm, PersonReports.IParam._didsearch, opt))
   end;
 
   // Now define all report parameters

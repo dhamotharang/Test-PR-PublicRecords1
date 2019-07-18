@@ -1,17 +1,18 @@
-IMPORT AutoStandardI, doxie, iesp;
+﻿IMPORT doxie,iesp,MIDEX_Services;
 
-EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) := 
+EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod,
+                             doxie.IDataAccess mod_access ) := 
   FUNCTION
 
+    BOOLEAN   enableAlert            := in_mod.EnableAlert;    
     BOOLEAN   include_SourceDocs     := in_mod.includeSourceDocs;
-    BOOLEAN   enableAlert            := in_mod.EnableAlert;
     DATASET   ds_midexReportNumberIn := in_mod.MidexReportNumbers;
     
     in_did  		:= (UNSIGNED6)in_mod.did;
     in_bdid 		:= (UNSIGNED6)in_mod.bdid;
 		in_linkids	:= in_mod.linkids;
 		fetchLevel	:= in_mod.BusinessIDFetchLevel;
-    setNonpubAccess := MIDEX_Services.Functions.fn_GetNonPubDataSources( in_mod.DataPermissionMask );                
+    setNonpubAccess := MIDEX_Services.Functions.fn_GetNonPubDataSources( mod_access.DataPermissionMask );                
             
     // Search Type requested
     isLinkIdsSearch := EXISTS(in_linkids(ProxID != 0 OR SeleID != 0 OR OrgID != 0 OR UltID != 0));
@@ -34,13 +35,13 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
     // Calling macro to get all components for the nonpublic data so that midex report numbers that come from the did/bdid keys can be parsed as well.
     MIDEX_Services.Macros.MAC_getIncidentNumFromMidexReportNum( ds_nonPubMidexReportNumbersAll, ds_nonPubMidexReportNumbers );  
     
-    ds_nonPubMidexPayloadRecs_all := MIDEX_Services.Raw_Nonpublic.MIDEX.REPORT_VIEW.fn_nonPub_by_midexReportNumbers( ds_nonPubMidexReportNumbers, setNonpubAccess, in_mod.EnableAlert, in_mod.searchType, in_mod.SSNMask, in_mod.dobMask, in_mod.StartLoadDate ); //DATASET([], MIDEX_Services.Layouts.CompReport_TempLayout); 
+    ds_nonPubMidexPayloadRecs_all := MIDEX_Services.Raw_Nonpublic.MIDEX.REPORT_VIEW.fn_nonPub_by_midexReportNumbers( ds_nonPubMidexReportNumbers, setNonpubAccess, in_mod.EnableAlert, in_mod.searchType, mod_access.SSN_Mask, mod_access.dob_Mask, in_mod.StartLoadDate ); //DATASET([], MIDEX_Services.Layouts.CompReport_TempLayout); 
     
     // --------------------------------------------------------------------------------------------------------------
     //              MIDEX Non-Public Freddie Mac Sanctions Data
     // --------------------------------------------------------------------------------------------------------------
     ds_MidexFreddieMacPayloadRecs := ds_nonPubMidexPayloadRecs_all(dataSource = MIDEX_Services.Constants.DATASOURCE_FREDDIE );
-    ds_MidexFreddieMacResults_all := MIDEX_Services.Raw_Nonpublic.MIDEX.REPORT_VIEW.fn_freddieMacLayoutRecords( ds_MidexFreddieMacPayloadRecs, setNonpubAccess, in_mod.dobMask );
+    ds_MidexFreddieMacResults_all := MIDEX_Services.Raw_Nonpublic.MIDEX.REPORT_VIEW.fn_freddieMacLayoutRecords( ds_MidexFreddieMacPayloadRecs, setNonpubAccess, mod_access.dob_Mask );
     ds_MidexFreddieMacResults     := IF( MIDEX_Services.Constants.DATASOURCE_CODE_FREDDIE IN setNonpubAccess,
                                          CHOOSEN(ds_MidexFreddieMacResults_all, iesp.Constants.MIDEX.MAX_COUNT_REPORT_RESPONSE_FMRECS),
                                          DATASET([], iesp.midexcompreport.t_MIDEXCompNonPublicExRecord));
@@ -49,7 +50,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
     //              MIDEX Non-Public Sanctions Data
     // --------------------------------------------------------------------------------------------------------------
     ds_MidexNonpublicPayloadRecs   := ds_nonPubMidexPayloadRecs_all(dataSource = MIDEX_Services.Constants.DATASOURCE_NON_PUB);
-    ds_nonPubSanctnMariResults_all := MIDEX_Services.Raw_Nonpublic.MIDEX.REPORT_VIEW.fn_nonpublicLayoutRecs( ds_MidexNonpublicPayloadRecs, in_mod.dobMask );
+    ds_nonPubSanctnMariResults_all := MIDEX_Services.Raw_Nonpublic.MIDEX.REPORT_VIEW.fn_nonpublicLayoutRecs( ds_MidexNonpublicPayloadRecs, mod_access.dob_mask );
     ds_MidexNonpublicResults       := IF( MIDEX_Services.Constants.DATASOURCE_CODE_NONPUB IN setNonpubAccess, 
                                           CHOOSEN(ds_nonPubSanctnMariResults_all, iesp.Constants.MIDEX.MAX_COUNT_REPORT_RESPONSE_NPRECS),
                                           DATASET( [], iesp.midexcompreport.t_MIDEXCompNonPublicRecord ));
@@ -59,13 +60,13 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
     // --------------------------------------------------------------------------------------------------------------
     ds_pubDidRecs  			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnDidData( in_did );
     ds_pubBdidRecs 			:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnBdidData( in_bdid );
-    ds_pubLinkIdRecs 		:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData( in_linkids, FetchLevel );
+    ds_pubLinkIdRecs 		:= MIDEX_Services.Raw_Public.fn_get_PublicSanctnLinkIdData( in_linkids,FetchLevel);
 		ds_pubBusinessRecs	:= if(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, ds_pubLinkIdRecs, ds_pubBdidRecs);
 		
     ds_PubMidexReportNumbers := ds_PubDidRecs + ds_pubBusinessRecs + ds_midexReportNumberIn;
     
-    ds_MidexPublicResults_temp := MIDEX_Services.Raw_Public.MIDEX.REPORT_VIEW.fn_pub_RptView_by_midex_rpt_num(ds_pubMidexReportNumbers, in_mod.EnableAlert, in_mod.SSNMask, in_mod.dobMask, in_mod.StartLoadDate ); 
-    ds_MidexPublicResults_all  := MIDEX_Services.Raw_Public.MIDEX.REPORT_VIEW.fn_PublicLayoutRecords(ds_MidexPublicResults_temp, in_mod.dobMask );
+    ds_MidexPublicResults_temp := MIDEX_Services.Raw_Public.MIDEX.REPORT_VIEW.fn_pub_RptView_by_midex_rpt_num(ds_pubMidexReportNumbers, mod_access, in_mod.EnableAlert, in_mod.StartLoadDate); 
+    ds_MidexPublicResults_all  := MIDEX_Services.Raw_Public.MIDEX.REPORT_VIEW.fn_PublicLayoutRecords(ds_MidexPublicResults_temp, mod_access.dob_Mask );
     ds_MidexPublicResults := CHOOSEN(ds_MidexPublicResults_all, iesp.Constants.MIDEX.MAX_COUNT_REPORT_RESPONSE_PUBRECS);
                                
     // --------------------------------------------------------------------------------------------------------------
@@ -90,7 +91,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
       EXPORT BOOLEAN TrackCriminal        := FALSE;
     END;
 
-    ds_MidexLicenseRecordsOut := MIDEX_Services.LicenseReport_Records(licenseMod);
+    ds_MidexLicenseRecordsOut := MIDEX_Services.LicenseReport_Records(licenseMod,mod_access);
     
     // Format to the license iesp response output - not to deviate too much from the existing code to account for alerts
     ds_MidexLicenseRecordsOutIesp := MIDEX_Services.Functions.Format_licenseReport_iespResponse(ds_MidexLicenseRecordsOut);
@@ -104,13 +105,13 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
     // --------------------------------------------------------------------------------------------------------------
     //              Business SmartLinx Data
     // --------------------------------------------------------------------------------------------------------------
-    rec_smartLinxBusinessRecs_raw	:= IF(MidexReportSearchType = MIDEX_SERVICES.Constants.BUSINESS_REPORT, MIDEX_Services.SmartLinx_Business_Sections(in_mod.bdid, include_SourceDocs, in_mod.SSNMask)); 
+    rec_smartLinxBusinessRecs_raw	:= IF(MidexReportSearchType = MIDEX_SERVICES.Constants.BUSINESS_REPORT, MIDEX_Services.SmartLinx_Business_Sections(in_mod.bdid, include_SourceDocs, mod_access.SSN_Mask)); 
     rec_smartLinxBusinessRecs			:= PROJECT( rec_smartLinxBusinessRecs_raw, MIDEX_Services.Functions.xfm_setSmartLinxBusinessFormat( LEFT ));
 
     // --------------------------------------------------------------------------------------------------------------
     //              TopBusiness Data
     // --------------------------------------------------------------------------------------------------------------
-		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, in_mod)); 
+		rec_topBusinessRecs_bip_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT, MIDEX_Services.TopBusiness_Sections(in_linkids, mod_access, in_mod.BusinessIDFetchLevel)); 
     rec_topBusinessRecs 				:= PROJECT(rec_topBusinessRecs_bip_raw, iesp.midexcompreport.t_MIDEXCompTopBusinessRecord)[1];
 
     // --------------------------------------------------------------------------------------------------------------
@@ -121,9 +122,9 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
 		rec_smartLinxPersonRecs_raw := IF(MidexReportSearchType = MIDEX_SERVICES.Constants.PERSON_REPORT, 
                                       PROJECT(MIDEX_Services.SmartLinx_Person_Sections(in_mod.did, include_SourceDocs, smartLinx_pers_options), 
                                               MIDEX_Services.Layouts.rec_SmartLinxPersonWithSources ));
-		
+
     // since this is a single record coming back, but send only first row to function for layout transform
-		rec_smartLinxPersonRecs := MIDEX_Services.Functions.fn_setSmartLinxPersonFormat ( rec_smartLinxPersonRecs_raw[1], in_mod.dobMask, smartLinx_pers_options); 
+		rec_smartLinxPersonRecs := MIDEX_Services.Functions.fn_setSmartLinxPersonFormat ( rec_smartLinxPersonRecs_raw[1], mod_access.dob_mask, smartLinx_pers_options); 
     // in the function call, not sure why we have to send the first row because it's a record, not a 
     // dataset, but sending the first row clears the error.
     
@@ -151,7 +152,6 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
                   TRANSFORM(Midex_Services.Layouts.hash_layout,
                             SELF := LEFT));
 
-                        
     // Here it's preferred to combine the hash values in a rollup instead of the sum as above because there are several hash values being calculated.           
     ds_licenseHashRollup := 
       ROLLUP( ds_licenseProject, 
@@ -182,8 +182,6 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
                         SELF                            := [],
                        ));
 
-
-
     // --------------------------------------------------------------------------------------------------------------
     //              Smartlinx Alert Calculations
     // --------------------------------------------------------------------------------------------------------------
@@ -193,7 +191,6 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
                                MidexReportSearchType = MIDEX_SERVICES.Constants.PERSON_REPORT   		=> PROJECT(rec_smartLinxPersonRecs, MIDEX_Services.alert_calcs.xfm_calcMidexSmartlinxPersonHashes(LEFT)),
                                                                              		 ROW([],MIDEX_Services.Layouts.hash_layout)
                              );
-    
 
     // --------------------------------------------------------------------------------------------------------------
     //            Combine Sections in Final Layout Output  
@@ -217,11 +214,10 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
 																							rec_smartLinxPersonRecs ); 
 				SELF.TopBusinessRecord 				:= IF(MidexReportSearchType = MIDEX_SERVICES.Constants.NEW_BUSINESS_REPORT,
 																							rec_topBusinessRecs);
-				self := [];
+				SELF := [];
       END;
 
     ds_MIDEXCompReportRecordLayout := DATASET([xfm_formatInto_t_MIDEXCompReportRecordLayout()]) ;
-
 
     // --------------------------------------------------------------------------------------------------------------
     //              Combine Alert Calculations
@@ -375,7 +371,7 @@ EXPORT MidexReport_Records ( MIDEX_Services.Iparam.reportrecords in_mod ) :=
                                   in_mod.EnableAlert AND NOT sanctionsExist => ds_deletedHash,
                                   ds_blankHash
                                );                                                                                                                                                                                                            
-  
+
     // If an alert report request is made and the document/report isn't found anymore, then return
     // a record with the record deleted flag set to true.
     alertVersion := IF(in_mod.enableAlert,Midex_Services.Constants.AlertVersion.Current,Midex_Services.Constants.AlertVersion.None);

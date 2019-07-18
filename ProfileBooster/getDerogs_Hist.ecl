@@ -1,4 +1,4 @@
-﻿import _Control, doxie_files,ut,doxie, liensv2, riskwise, property, bankruptcyv3, ProfileBooster, Risk_Indicators;
+﻿import _Control, doxie_files,ut,doxie, liensv2, riskwise, property, bankruptcyv3, ProfileBooster, Risk_Indicators, MDR;
 onThor := _Control.Environment.OnThor;
 
 //Note - this function mimics Bocashell derogs function with mods made specific to Profile Booster. 
@@ -761,7 +761,7 @@ end;
 all_foreclosures_roxie := join(wFID, kforf,
 						left.fid!='' and 
 						keyed(left.fid=right.fid) and
-						(unsigned3)(right.recording_date[1..6]) < left.historydate,
+						(unsigned3)(right.recording_date[1..6]) < left.historydate AND right.source=MDR.sourceTools.src_Foreclosures,
 						add_foreclosure_flag(left, right),
 						left outer, atmost(keyed(left.fid=right.fid), riskwise.max_atmost), keep(50));
 
@@ -769,7 +769,7 @@ all_foreclosures_thor1 := join(
 	distribute(wFID(fid<>''), hash64(fid)), 
 	distribute(pull(kforf), hash64(fid)),
 						left.fid=right.fid and
-						(unsigned3)(right.recording_date[1..6]) < left.historydate,
+						(unsigned3)(right.recording_date[1..6]) < left.historydate AND right.source=MDR.sourceTools.src_Foreclosures,
 						add_foreclosure_flag(left, right),
 						left outer, atmost(left.fid=right.fid, riskwise.max_atmost), keep(50),
 	local);

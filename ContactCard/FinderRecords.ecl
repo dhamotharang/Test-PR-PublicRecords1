@@ -110,8 +110,14 @@ END;
 
 
 
-export SubjectDeathRecords :=  project(SubjectDeathRecords_info, transform(dodpadlock_rec, self.IsLimitedAccessDMF := (left.src = MDR.sourceTools.src_Death_Restricted);
-																																																																																											self := left));
+Death_source_info :=  SORT(project(SubjectDeathRecords_info, transform(dodpadlock_rec, self.IsLimitedAccessDMF := (left.src = MDR.sourceTools.src_Death_Restricted);
+																					   self := left)),  did, dod8);
+Death_source_grp:= Sort(group(Death_source_info,did,dod8), did,dod8, if(IsLimitedAccessDMF, 1,0));
+
+export SubjectDeathRecords := UNGROUP(iterate(Death_source_grp, TRANSFORM(dodpadlock_rec, 
+									SELF.IsLimitedAccessDMF :=if(COUNTER = 1 , ((INTEGER)RIGHT.dod8 != 0 AND RIGHT.IsLimitedAccessDMF),
+	                                            LEFT.IsLimitedAccessDMF ) ,
+									SELF :=right)));
 
 //***** PREPARE HEADER FOR GONG APPEND
 shared head_slim := sort(join(head, 

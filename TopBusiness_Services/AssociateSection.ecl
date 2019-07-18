@@ -887,7 +887,7 @@ EXPORT AssociateSection := MODULE;
   ds_fc_linkids_keyrecs_plusparty := 
 	                         join(ds_fc_linkids_keyrecs_deduped,
 	                              Property.Key_Foreclosures_FID_Linkids,
-                                   keyed(left.foreclosure_id = right.fid)
+                                   keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures
 																	 // vers1, just get all recs because they will have to be normalized first due to multiple names???
 
 														       // vers1b can't do here??? 
@@ -1169,7 +1169,7 @@ EXPORT AssociateSection := MODULE;
   ds_nod_linkids_keyrecs_plusparty := 
 	                         join(ds_nod_linkids_keyrecs_deduped,
 	                              Property.Key_NOD_FID_Linkids,
-                                   keyed(left.foreclosure_id = right.fid)
+                                   keyed(left.foreclosure_id = right.fid) AND RIGHT.source=MDR.sourceTools.src_Foreclosures
 																	 // vers1, just get all recs because they will have to be normalized first due to multiple names???
 
 														       // vers1b can't do here??? 

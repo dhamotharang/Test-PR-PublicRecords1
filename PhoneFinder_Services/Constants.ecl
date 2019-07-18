@@ -65,6 +65,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,Equifa
     EXPORT Inactive := 'INACTIVE';
     EXPORT Active 	:= 'ACTIVE';
     EXPORT NotAvailable 	:= 'NOT AVAILABLE';
+
   END;
 	
 	// Listing types

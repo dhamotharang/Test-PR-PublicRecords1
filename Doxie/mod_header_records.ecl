@@ -154,7 +154,7 @@ MODULE
   //output(dailies_uncleaned);
   //output(dailies);
   
-  export Records := dailies;
+  export Records := project(dailies, doxie.layout_presentation);
 END;
 
 //***** FETCH AND CHECK PERMISSIONS FOR AND EXPORT THE HEADER RECORDS

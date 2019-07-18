@@ -1,4 +1,4 @@
-﻿import doxie_files, property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators;
+﻿import doxie_files, property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators, MDR;
 
 export Boca_Shell_Derogs (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, unsigned1 BSversion=1) := function
 
@@ -582,7 +582,8 @@ wFID := join(w_crim, property.key_foreclosure_did,
 
 all_foreclosures := join(wFID, property.key_foreclosures_fid,
 						left.fid!='' and 
-						keyed(left.fid=right.fid),
+						keyed(left.fid=right.fid) and
+						right.source=MDR.sourceTools.src_Foreclosures,
 						transform(layout_derog_process, 
 								self.BJL.last_foreclosure_date := right.recording_date,
 								self.BJL.foreclosure_flag := right.fid!='',

@@ -172,6 +172,7 @@
     BOOLEAN			atleastOneInactiveBlastPilot;				            //populated in DueDiligence.getIndProfessionalData
     //PerAccessToFundsIncome
     UNSIGNED3   estimatedIncome;                                //populated in DueDiligence.getIndEstimatedIncome
+    BOOLEAN     incomeRecordExists;                             //populated in DueDiligence.getIndEstimatedIncome
     //PerAssetOwnVehicle
     UNSIGNED2 	VehicleCount;                                   //populated in DueDiligence.getIndVehicle
     UNSIGNED6  	VehicleBaseValue;

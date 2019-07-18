@@ -117,8 +117,8 @@ export SearchService() := macro
   input_params := AutoStandardI.GlobalModule();
 	tempmod := module(project(input_params,Foreclosure_Services.Records.params,opt))  
     export string70 foreclosure_id  := '';
-		Export string32 applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
   end;
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 
 	// Unlike in Foreclosure_Services.SearchService, including Forclosures must be set to FALSE by default.
   boolean IncludeForeclosures      := false : STORED ('IncludeForeclosures');
@@ -126,8 +126,8 @@ export SearchService() := macro
 
 	// Foreclosure_Services.Records will return either Foeclosures or Notices of Default, but not both. 
 	// So, two calls to the same function, each with a different parameter value.	
-  for := if( IncludeForeclosures, Foreclosure_Services.Records.val(tempmod,false));
-  nod := if( IncludeNoticesOfDefault, Foreclosure_Services.Records.val(tempmod,true));
+  for := if( IncludeForeclosures, Foreclosure_Services.Records.val(tempmod,mod_access,false));
+  nod := if( IncludeNoticesOfDefault, Foreclosure_Services.Records.val(tempmod,mod_access,true));
   tmp := sort( for + nod , if(AlsoFound,1,0), _penalty, -recordingdate, record );
 
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results (tmp, foreclosureResults, iesp.foreclosure.t_ForeclosureSearchResponse);

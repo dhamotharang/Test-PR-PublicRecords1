@@ -40,8 +40,13 @@ EXPORT ForeclosureNODSource_Records(
 	
 	fid_keys_dedup := dedup(sort(fid_keys,fid), fid);
 	
-	in_mod := module(project(AutoStandardI.GlobalModule(),Foreclosure_Services.Raw.params,opt)) end;
-	
+	gmod := AutoStandardI.GlobalModule();
+	in_mod := MODULE(Foreclosure_Services.Raw.params);
+		EXPORT string5 industry_class := gmod.IndustryClass;
+		EXPORT string32 application_type := gmod.ApplicationType;
+		EXPORT string ssn_mask := gmod.ssnmask;
+	END;
+
 	// Get the foreclosure or Nod raw data from the appropriate view.
 	Foreclosure_sourceview := Foreclosure_Services.raw.REPORT_VIEW.by_fid (fid_keys_dedup, in_mod, IsNod);
 
@@ -82,4 +87,3 @@ EXPORT ForeclosureNODSource_Records(
   EXPORT SourceView_RecCount := COUNT(foreclosure_sourceview_wLinkIds);
 	
 END;
-

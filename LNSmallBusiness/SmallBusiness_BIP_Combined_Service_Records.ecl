@@ -2,26 +2,26 @@
 
 EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams SmallBizCombined_inmod ) := 
   FUNCTION
-    SHARED set_modelsRequested := SET(SmallBizCombined_inmod.ModelsRequested, ModelName); 
+    set_modelsRequested := SET(SmallBizCombined_inmod.ModelsRequested, ModelName); 
     
- 		SHARED isBIPIDSearch := SmallBizCombined_inmod.ds_SBA_Input[1].UltID != 0 OR SmallBizCombined_inmod.ds_SBA_Input[1].OrgID != 0 OR SmallBizCombined_inmod.ds_SBA_Input[1].SeleID != 0;
+ 		 isBIPIDSearch := SmallBizCombined_inmod.ds_SBA_Input[1].UltID != 0 OR SmallBizCombined_inmod.ds_SBA_Input[1].OrgID != 0 OR SmallBizCombined_inmod.ds_SBA_Input[1].SeleID != 0;
    /* ************************************************************************
 	  *         Get the Small Business Attributes and Scores Results           *
 	  ************************************************************************ */
     
-    SHARED ds_inCreditScoreRequested  := SmallBizCombined_inmod.ModelsRequested(ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO,BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL]);
-		SHARED ds_inBlendedScoreRequested := SmallBizCombined_inmod.ModelsRequested(ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB,BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL]);
+     ds_inCreditScoreRequested  := SmallBizCombined_inmod.ModelsRequested(ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO,BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL]);
+		 ds_inBlendedScoreRequested := SmallBizCombined_inmod.ModelsRequested(ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB,BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR]);
 
     // See if the LN Small Business Scores have been requested.
     // If not requested, substitue with the Credit Report scores request.
-    SHARED LNSmallBizModelsType := 
+     LNSmallBizModelsType := 
       MAP( EXISTS(ds_inCreditScoreRequested) AND 
              EXISTS(ds_inBlendedScoreRequested)   => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT_BLENDED,
            EXISTS(ds_inCreditScoreRequested)      => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
            EXISTS(ds_inBlendedScoreRequested)     => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
                                                      BusinessCredit_Services.Constants.SCORE_TYPE.NONE );
  
-    SHARED CreditReportModelsType := 
+     CreditReportModelsType := 
       MAP( SmallBizCombined_inmod.IncludeCreditReport AND
           (SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID != 0 OR SmallBizCombined_inmod.MinInputMetForAuthRepPopulated)
              => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT_BLENDED, 
@@ -39,6 +39,7 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
     BLENDED_SCORE_MODEL		                SBBM1601_0_0
     CREDIT_SCORE_SLBO		                  SLBO1702_0_2
     BLENDED_SCORE_SLBB		                SLBB1702_0_2
+    BLENDED_SCORE_BBFM_SBFEATTR           BBFM1811_1_0
 
     Lewis expressed to me a couple of things:
       •	These should be seen as pairs of models, and it is expected that the customer would request either SBOM1601 and SBBM1601; or 
@@ -120,6 +121,24 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 										 BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL IN set_modelsRequested)
                  => LNSmallBusiness.Constants.DATASET_MODELS.CREDIT_SLBONFEL,	
                  
+                // //SBOM and BBFM
+                 
+                 	(LNSmallBizModelsType   = BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT_BLENDED and
+                 (SmallBizCombined_inmod.ModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL] or
+                  SmallBizCombined_inmod.ModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL] or
+                  SmallBizCombined_inmod.ModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL] or
+                  SmallBizCombined_inmod.ModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL] or   
+                  SmallBizCombined_inmod.ModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL]) and
+                 (SmallBizCombined_inmod.ModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR] or
+                  SmallBizCombined_inmod.ModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR] or
+                  SmallBizCombined_inmod.ModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR] or
+                  SmallBizCombined_inmod.ModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR] or     
+                  SmallBizCombined_inmod.ModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR])) 
+              => LNSmallBusiness.Constants.DATASET_MODELS.CREDIT_BLENDED_BBFM_SBFEATTR,
+
+
+																		 
+                 
                     // We're not testing for the SLBBNFEL model only, since the rules listed above indicate that the system must not run a BB model by itself.
                  
 									//Old flagships - SBBM and SBOM
@@ -194,7 +213,10 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE)+
               	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)),
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SCORE_SLBBNFEL, 
-							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE);  
+							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE)+  
+              	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR)),
+							BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_BBFM_SBFEATTR, 
+							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE); 
 	
     ds_Final_SmallBizAnaResults := 
       LNSmallBusiness.SmallBusiness_intoIESP_layouts.fn_SmallBiz_intoESDL(SBA_Results,

@@ -75,14 +75,6 @@ EXPORT input := MODULE
     export string30 _lname := '';
   end;
 
-  export _person := INTERFACE (_name)
-    // cannot name it "ssn" because of conflicts of types with interfaces in InterfaceTranslator (string11)
-    // (IMHO, string11 must have been called something like "ssn_in")
-    export string9 _ssn := ''; // needed, if comp report (and alike) are provided with input SSN
-    export unsigned8 _dob := 0;
-  end;
-
-
   /////////////// STAND ALONE (SINGLE SOURCE)  ///////////////
   export accidents := INTERFACE (Accident_Services.IParam.searchRecords)
   end;
@@ -94,10 +86,6 @@ EXPORT input := MODULE
     export string1 bk_party_type := 'D'; //enforces to return records with subject as Debtor only
     export boolean bk_include_dockets := false;
     export boolean bk_suppress_withdrawn := false;
-  end;
-
-  // business IID
-  export business_iid := INTERFACE (_person)
   end;
 
   export ccw := INTERFACE (_report)
@@ -131,18 +119,12 @@ EXPORT input := MODULE
   export firearms := INTERFACE (ATF_Services.IParam.search_params)
   end;
 
-  export foreclosures := INTERFACE (Foreclosure_Services.ReportService_Records.params)
-  end;
-
   export huntingfishing := INTERFACE (Hunting_Fishing_Services.Search_Records.params)
   end;
 
   export liens := INTERFACE (_report)
     export string1 liens_party_type := '';
     export string50 tmsid_value := ''; // reserved for future needs if any
-  end;
-
-  export nod := INTERFACE (Foreclosure_Services.Records.params)
   end;
 
   export internetdomains := INTERFACE (InternetDomain_Services.SearchService_Records.params)
@@ -155,9 +137,6 @@ EXPORT input := MODULE
   end;
 
   export phonesplus := INTERFACE (phones, _report)
-  end;
-
-  export proflic := INTERFACE (_didsearch)
   end;
 
   export property := INTERFACE (_report)
@@ -325,75 +304,6 @@ EXPORT input := MODULE
 		
   end;
 
-  // TODO: Check Mark's suggestion to define all required for the service through "override_includes"
-  export _assetreport := INTERFACE (_report, address, bankruptcy, property, vehicles, watercrafts, imposters, relatives, include, dl, ucc)
-    export boolean use_bestaka_ra := false;
-    export boolean use_NonDMVSources := true;
-    export boolean include_relativeaddresses := true; // if include relatives, then addresses must be included
-
-    export boolean include_faaaircrafts := true;
-    export boolean include_motorvehicles := true;
-    export boolean include_uccfilings := true;
-    export boolean include_imposters := true;
-    export boolean include_akas := true;
-    export boolean include_bpsaddress := true;
-    export boolean include_faacertificates := true;
-    export boolean include_watercrafts := true;
-    export boolean include_properties := true;
-    export boolean include_peopleatwork := true;
-  end;
-
-  export _finderreport := INTERFACE (personal, include, vehicles, dl)
-  end;
-
-  // default options for finder; only those absolutely NOT provided by ESP must be defined here.
-  export default_options_finder := module (_finderreport)
-    export boolean use_verified_address_ra := true;
-    export boolean use_verified_address_nb := true;
-    export boolean nbrs_with_phones := true;
-    export boolean rels_with_phones := true;
-
-    export boolean include_akas        := true;
-    export boolean include_associates  := true;
-    export boolean include_bankruptcy  := true;
-    export boolean include_bpsaddress  := true;
-    export boolean include_corpaffiliations := true;
-    export boolean include_imposters   := true;
-    export boolean include_neighbors   := true;
-    export boolean include_oldphones   := true;
-    export boolean include_relatives   := true;
-    export boolean include_relativeaddresses := true;
-    export boolean use_NonDMVSources       := true;
-  end;
-
-  export _prelitreport := INTERFACE (_report, address, include, property, vehicles, imposters, relatives, dl, bankruptcy, watercrafts)
-    export boolean use_NonDMVSources       := true;
-    export boolean include_relativeaddresses := true; // if include relatives, then addresses must be included
-
-    export boolean include_motorvehicles   := true;
-    export boolean include_uccfilings      := true;
-    export boolean include_imposters       := true;
-    export boolean include_akas            := true;
-    export boolean include_bpsaddress      := true;
-    export boolean include_censusdata      := false;
-    export boolean include_watercrafts     := true;
-    export boolean include_properties      := true;
-    export boolean include_bankruptcy      := true;
-    export boolean include_proflicenses    := true;
-    export boolean include_corpaffiliations := true;
-    export boolean include_peopleatwork    := true;
-    export boolean include_liensjudgments  := true;
-    // some data are available in new presentation (default should be minimal version):
-    export unsigned1 bankruptcy_version := 1;
-    export unsigned1 liensjudgments_version := 1;
-  end;
-
-  export _rnareport := INTERFACE (_report, AutoStandardI.InterfaceTranslator.clean_address.params, include, personal)
-    export boolean use_verified_address_nb := true;
-    export boolean nbrs_with_phones := true;
-    export unsigned1 neighbors_per_address := 6;
-  end;
-
   export mardiv := INTERFACE (_didsearch) end;
 
   // =========================================================================
@@ -420,19 +330,6 @@ EXPORT input := MODULE
     export unsigned1 ucc_version := 0;
     export unsigned1 vehicles_version := 0;
     export unsigned1 voters_version := 0;
-  end;
-
-  // TODO: do I really need to keep both?
-  export _compoptions := INTERFACE (_main, include, versions, providers)
-    export boolean LNVersion := false; // TODO: perhaps, outdated: required in call to central records
-  end;
-  export _compreport := INTERFACE (_compoptions, _person, AutoStandardI.InterfaceTranslator.adl_service_ip.params)
-    // define defaults for those just declared
-    export string100 seisintadlservice := '';
-
-    export boolean include_bpsaddress        := true;
-    export boolean include_merchantvessels := false;
-    export unsigned1 max_relatives := 11;
   end;
 
   export _sources := INTERFACE (_report, include, versions)

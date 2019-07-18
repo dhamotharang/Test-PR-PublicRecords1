@@ -1,4 +1,4 @@
-// Report Records attribute for the Relationship Identifier Report Service.
+﻿// Report Records attribute for the Relationship Identifier Report Service.
 
 // It takes input of DID or linkids set (bipdata) and then
 // returns a list of up to 8 entity's with each different relationship type between each of the entities
@@ -14,20 +14,12 @@ EXPORT Report_Records := MODULE
 EXPORT  GetReport( 
                 dataset(iesp.RelationshipIdentifierReport.t_RelationshipIdentifierReportBy) DS_dataInReportBy,								
 								boolean inc_neighbor,		
-								unsigned1 dppapurpose,
-								unsigned1 glbpurpose,
-								string DataRestrictionMask,
-								string DataPermissionMask,
-								string6 ssnMaskVal,
-								string32 application_type_value,
-								unsigned1 DOBMaskValue,
-								unsigned4 EndDate
+								unsigned4 EndDate,
+                doxie.IDataAccess mod_access
 							) :=
 FUNCTION
 
- dppa_ok := ut.dppa_ok(dppaPurpose);
-  glb_ok := ut.glb_ok(glbPurpose);
-		boolean do_mask_dob := DOBMaskValue != suppress.Constants.DateMask.NONE;
+boolean do_mask_dob := mod_access.DOB_Mask != suppress.Constants.DateMask.NONE;
 
 ds_input_withSeqNum := PROJECT(DS_dataInReportBy,
                              TRANSFORM( {unsigned2 seqNum; string50 role; Relationship.layout_GetRelationship.DIDs_Layout;
@@ -200,10 +192,10 @@ NamesAdded := PROJECT(DS_relationships,
 	// so accumulate results in this project via the child ds
 	nbr_res := project(ds_did_in, TRANSFORM(layout_neighbor,
 		self.neighborRecs := doxie_crs.NeighborRecords(dataset([left.did],doxie.layout_references),
-	                                             dppapurpose,
-								                               glbpurpose,
-																							 DataRestrictionMask, 
-								                               ssnMaskVal)(mode = 'C' and dt_last_seen >= NumMonthsBack);		
+	                                             mod_access.dppa,
+								                               mod_access.glb,
+																							 mod_access.DataRestrictionMask, 
+								                               mod_access.ssn_mask)(mode = 'C' and dt_last_seen >= NumMonthsBack);		
 																						//	 ^^^ only use current neighbors 
 																			 )
 	);																							 
@@ -254,7 +246,7 @@ NamesAdded := PROJECT(DS_relationships,
 					 END;
 		  DS_InputDID := dataset([DIDXform()]);
 			doxie.mac_best_records(ds_input_withSeqNum, did,	                      
-												  ds_input_withSeqNumOut,dppa_ok,glb_ok,,DataRestrictionMask);
+												  ds_input_withSeqNumOut,mod_access.isValidDppa(),mod_access.isValidGlb(),,mod_access.DataRestrictionMask);
 		
 		 personInfo := JOIN(DS_inputDID,ds_input_withSeqNumOut,
 		                    LEFT.DID = RIGHT.DID,TRANSFORM(RIGHT));
@@ -332,7 +324,7 @@ NamesAdded := PROJECT(DS_relationships,
 																										 
 																										   Self.DOB  := if (do_mask_dob, 
 																							iesp.ECL2ESP.ApplyDateMask (IESP.ecl2esp.toDate(personInfo[1].dob),
-																				                           DOBMaskValue),
+																				                           mod_access.DOB_Mask),
 																													IESP.ecl2esp.toDate(personInfo[1].dob)); 
 								
 																										 SELF.DOD := iesp.ECL2ESP.ToDate((UNSIGNED4)personInfo[1].dod);																										
@@ -403,7 +395,7 @@ NamesAdded := PROJECT(DS_relationships,
 														// which is a flag for GUI side to insert link to midex login screen.
 														PossibleMidexreportStructures := 
 														    RelationshipIdentifier_Services.Functions.getMidexLicenseType(
-														                   inputDID,l_xlink_ids, DataPermissionMask);
+														                   inputDID,l_xlink_ids, mod_access);
                            														                           
 														SELF.Primaryentity.MidexlicenseTypes := choosen(Dedup(PROJECT(PossibleMidexreportStructures,														                      
 																									 TRANSFORM(IESP.share.t_stringarrayItem,																									   
@@ -670,12 +662,12 @@ result := PROJECT(Ds_relationship_tmp,
 				  tmpSecondaryEntitys := project(LEFT.secondaryEntities,					                      
 					                     TRANSFORM(iesp.relationshipidentifierreport.t_relationshipIdentifierReportSecondaryEntity,
 															 SELF := LEFT));           
-						Suppress.MAC_Mask(tmpSecondaryEntitys, tmpSecondaryEntitysMasked, identity.ssnInfo.SSN, null, true, false, maskVal:=ssnMaskVal);
-						Suppress.MAC_Mask(tmpSecondaryEntitysMasked, tmpSecondaryEntitysMasked2, identity.ssnInfoEx.SSN, null, true, false, maskVal:=ssnMaskVal);
+						Suppress.MAC_Mask(tmpSecondaryEntitys, tmpSecondaryEntitysMasked, identity.ssnInfo.SSN, null, true, false, maskVal:=mod_access.ssn_mask);
+						Suppress.MAC_Mask(tmpSecondaryEntitysMasked, tmpSecondaryEntitysMasked2, identity.ssnInfoEx.SSN, null, true, false, maskVal:=mod_access.ssn_mask);
 						self.SecondaryEntities := PROJECT(tmpSecondaryEntitysMasked2, TRANSFORM(LEFT));						                           
 				  SELF := LEFT));
-  Suppress.MAC_Mask(result, resultMasked, PrimaryEntity.identity.ssnInfo.SSN, null, true, false, maskVal:=ssnMaskVal); 
-	Suppress.Mac_mask(resultMasked, resultMasked2, primaryEntity.Identity.ssnInfoEx.SSN, null, True, false, maskVal:=ssnMaskVal); 
+  Suppress.MAC_Mask(result, resultMasked, PrimaryEntity.identity.ssnInfo.SSN, null, true, false, maskVal:=mod_access.ssn_mask); 
+	Suppress.Mac_mask(resultMasked, resultMasked2, primaryEntity.Identity.ssnInfoEx.SSN, null, True, false, maskVal:=mod_access.ssn_mask); 
  
  return(resultMasked2);
 END; // function
