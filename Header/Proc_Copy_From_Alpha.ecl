@@ -62,7 +62,10 @@ SHARED copy_files(string nm, string src_name, string dest_clstr,string src_alpha
 
 end;
 // ************************************************************************************************************************************
-
+inspr(string spr, string newLogical):=FUNCTION
+    spr_cntns:=STD.File.SuperFileContents(spr);
+    RETURN (newLogical in set(spr_cntns,name));
+END;
 SHARED update_supers(string spr0, string newLogical) := function
 
     spr:='~'+ case( spr0, 'thor_data400::key::header::qa::relatives_v3'=>
@@ -76,14 +79,14 @@ SHARED update_supers(string spr0, string newLogical) := function
                          'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
                          'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
                   ,spr0);
-    return sequential(
-        output(dataset([{spr,'~'+newLogical}],{string super, string new_logical}),named('cp_built_update'),extend)
+    return if(~inspr(spr,newLogical),sequential(
+        output(dataset([{spr,'~'+newLogical,'Updating'}],{string super, string new_logical,string comment}),named('cp_built_update'),extend)
         ,std.file.RemoveOwnedSubFiles(spr,TRUE)
         ,std.file.clearsuperfile     (spr)
         ,if(std.file.SuperFileExists('~'+newLogical)
              ,std.file.addsuperfile       (spr   , '~'+newLogical ,,true)
              ,std.file.addsuperfile       (spr   , '~'+newLogical       ));
-    );
+    ),output(dataset([{spr,'~'+newLogical,'Already up-to-date'}],{string super, string new_logical, string comment}),named('cp_built_update'),extend));
 end;
 // ************************************************************************************************************************************
 
