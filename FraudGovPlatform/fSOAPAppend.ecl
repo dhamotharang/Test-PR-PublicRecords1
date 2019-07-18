@@ -14,7 +14,7 @@ shared pii_previous := Files().base.pii.qa;			//pii previous build
 
 shared pii_updates := Join(pii_current,pii_previous,left=right,left only); //pii updates
 
-Shared pii_input	:= if(UpdatePii,pii_updates,pii_current); 
+Shared pii_input	:= if(UpdatePii,pii_updates,pii_current):independent; 
 
 //Add record_id to the pii soap input
 
@@ -36,7 +36,7 @@ shared pii_base	:= rollup(pii_srt,Roll_Recid(left,right),record,except record_id
 // normalized record_ids dataset for soap append outputs.
 
 shared Pii_Base_norm := normalize(pii_base,left.Record_ids,transform({recordof(left),unsigned8 record_id_new}
-															,self.record_id_new := right.record_id,self:=left));		
+															,self.record_id_new := right.record_id,self:=left)):independent;		
 
 //PII Input Process End
 
@@ -97,7 +97,7 @@ EXPORT CIID		:= MODULE
 service_name	:= 'risk_indicators.InstantID_batch';
 serviceURL		:= riskwise.shortcuts.prod_batch_analytics_roxie;
 
-string DataRestriction := '00000000000000'; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
+string DataRestriction := risk_indicators.iid_constants.default_DataRestriction; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
 																						// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 string pModel := 'FP1109_0' ;
 
@@ -124,7 +124,7 @@ end;
 layoutSoap := record
 		dataset(in_format) batch_in;
 		unsigned1 DPPAPurpose := 1;   //CHANGE ACCORDINGLY
-		unsigned1 GLBPurpose := 1;    //CHANGE ACCORDINGLY
+		unsigned1 GLBPurpose := 5;    //CHANGE ACCORDINGLY
 		STRING5 IndustryClass := '';
 		boolean LnBranded  := false;
 		boolean OfacOnly := false ;
@@ -250,7 +250,7 @@ shared ciid_reladdr := AppendRelativesAddressMatch.macAppendRelativesAddressMatc
 
 //Assign fdn_file_info_ids
 shared ciid_base_map	:= Join(pii_input ,ciid_reladdr, left.record_id=right.record_id,Transform(Layouts.Ciid
-																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
+																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right)):independent;
 
 //Anonymize if needed for a specific source
 
@@ -353,7 +353,7 @@ shared Crim_base_map	:= Join(pii_input , Crim_recid_map, left.record_id=right.re
 																	,self.lname_orig	:= left.lname
 																	,self.ssn_orig		:= left.ssn
 																	,self.dob_orig		:= left.dob
-																	,self:=right));
+																	,self:=right)):independent;
 
 shared Crim_anon	:= Anonymize.Crim(Crim_base_map).all;
 
@@ -374,7 +374,7 @@ layout_out  := DeathV2_Services.Layouts.BatchOut;
 layoutSoap := record
 	dataset(layout_in) batch_in;
 	unsigned1 DPPAPurpose := 1;//Needs to be changed accordingly. 
-	unsigned1 GLBPurpose := 1;//Needs to be changed accordingly. 
+	unsigned1 GLBPurpose := 5;//Needs to be changed accordingly. 
 end;
 
 layout_in make_batch_in(pii_base L) := TRANSFORM
@@ -432,7 +432,7 @@ shared Death_recid_map	:= Join(Pii_Base_norm, P, left.record_id = right.record_i
 //Assign fdn_file_info_ids
 
 shared death_base_map	:= Join(pii_input ,Death_recid_map, left.record_id=right.record_id,Transform(Layouts.Death
-																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
+																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right)):independent;
 
 //Anonymize if needed for a specific source
 shared Death_anon	:= Anonymize.Death(death_base_map).all;
@@ -448,7 +448,7 @@ EXPORT FraudPoint	:= MODULE
 service_name	:= 'Models.FraudAdvisor_Batch_Service';
 serviceURL		:= riskwise.shortcuts.prod_batch_analytics_roxie;
 
-string DataRestriction := '00000000000000'; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
+string DataRestriction := risk_indicators.iid_constants.default_DataRestriction; // byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
 									// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 string pModel := 'FP31505_0' ;
 
@@ -503,7 +503,7 @@ layout_soap_input make_fp_in(pii_base le, integer c) := TRANSFORM
 	SELF.ModelName := pModel;
 	SELF.DataRestrictionMask := DataRestriction; 
 	SELF.DPPAPurpose := 1;
-	SELF.GLBPURPOSE := 1;
+	SELF.GLBPURPOSE := 5;
 	SELF.IncludeVersion1 := includeV1;   
 	SELF.IncludeVersion2 := includeV2;		
 	SELF.RedFlag_version := redflags;			
@@ -543,7 +543,7 @@ shared Fp_recid_map	:= Join(Pii_Base_norm, fP, left.record_id = right.record_id,
 //Assign fdn_file_info_ids
 
 shared Fp_base_map	:= Join(pii_input ,Fp_recid_map, left.record_id=right.record_id,Transform(Layouts.FraudPoint,
-																	self.did:=left.did,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
+																	self.did:=left.did,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right)):independent;
 																	
 
 Fp_combine	:= dedup((Fp_base_map + fraudpoint_base),all);
