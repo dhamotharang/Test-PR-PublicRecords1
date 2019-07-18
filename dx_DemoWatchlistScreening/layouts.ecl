@@ -1,6 +1,6 @@
 ﻿EXPORT layouts := module
 	
-export matches_entity_name := record
+export matches_entity_name_layout := record
 	String50	Block_ID;
 	String50	Error_Message;
 	String50	Warning_Message;

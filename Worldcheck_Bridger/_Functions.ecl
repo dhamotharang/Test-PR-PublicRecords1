@@ -1235,6 +1235,14 @@
 				trim(kword, left, right) = 'CARBQ' =>SubGroup_Constants.numKeywordsID.KEYWORD_CARBQ,
 				trim(kword, left, right) = 'AZFMS-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_AZFMS_NAT,
 				trim(kword, left, right) = 'BECA' =>SubGroup_Constants.numKeywordsID.KEYWORD_BECA,
+<<<<<<< HEAD
+=======
+				trim(kword, left, right) = 'OFAC-NICHRAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_NICHRAA,
+				trim(kword, left, right) = 'CANSEMNIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMNIC,
+				trim(kword, left, right) = 'GHSEC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GHSEC,
+				trim(kword, left, right) = 'NABON' =>SubGroup_Constants.numKeywordsID.KEYWORD_NABON,
+				trim(kword, left, right) = 'USCME' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCME,
+>>>>>>> ThorProd
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

@@ -54,6 +54,7 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 																							(data)TRIM(SELF.orig_teramedia_id, LEFT, RIGHT) +
 																							(data)TRIM(SELF.email_src, LEFT, RIGHT));
 	SELF.rules											:= 0;
+	SELF.global_sid                 := 25321;
 	SELF := input;
 	SELF := [];
 END;

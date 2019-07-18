@@ -116,7 +116,6 @@ slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM
 	self.firstname	 	:= le.fname;
 	self.middlename		:= le.mname;
 	self.lastname		:= le.lname;
-	SELF.global_sid   := 0;
 	SELF.record_sid   := 0;
 	SELF := le; 
 END;

@@ -1,7 +1,7 @@
 ﻿IMPORT $;
 
-inFile := $.Layouts.matches_entity_name; 
+inFile := $.Layouts.matches_entity_name_layout; 
 
 
 EXPORT key_matches_entity_name := 
-         INDEX ({inFile}, {inFile.matches_entity_name}, $.names().i_match_name, OPT);
+         INDEX ({inFile.matches_entity_name}, inFile, $.names().i_match_name, OPT);
