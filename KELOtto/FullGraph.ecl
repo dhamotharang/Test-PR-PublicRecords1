@@ -73,7 +73,7 @@ EntityToTree := DISTRIBUTE(
                   SELF.tree_uid_ := MAP(LEFT.tree_uid_[2..3] != '01' => LEFT.entity_context_uid_, LEFT.tree_uid_),
                   SELF.entity_context_uid_ := MAP(LEFT.tree_uid_[2..3] != '01' => LEFT.tree_uid_, LEFT.entity_context_uid_),
                   SELF := LEFT))
-                 , HASH32(source_customer_, tree_uid_));  
+                 , HASH32(source_customer_, tree_uid_))(entity_context_uid_ != ''); // blank entity context uids are coming from somewhere incorrectly. 
 
 FullPersonTreeEntities1 := JOIN(TreeToEntity, EntityToTree,
                             LEFT.source_customer_=RIGHT.source_customer_ AND LEFT.entity_context_uid_=RIGHT.tree_uid_,
