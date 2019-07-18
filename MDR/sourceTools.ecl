@@ -1110,7 +1110,7 @@ export set_Marketing_Sources           := [
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
 		,src_Vickers									 ,src_ZOOM											,src_Cortera										
 		,set_Marketing_Corp					   ,set_Marketing_Death					  ,set_Marketing_FBN						 ,set_Marketing_Liquor_Licenses
-		,set_Marketing_WC
+		,set_Marketing_WC              ,src_Infutor_NARB              ,src_Equifax_Business_Data     ,src_DataBridge  
 	]; 
 	
 export set_Marketing_Restricted := [
