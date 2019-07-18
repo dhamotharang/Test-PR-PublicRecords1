@@ -80,7 +80,7 @@ EXPORT Layouts := MODULE
 	END;
 	
 	EXPORT full_output := RECORD
-		finalRecs;
+		finalRecs - [global_sid, record_sid];
 		college_data - DID;
 	END;
 

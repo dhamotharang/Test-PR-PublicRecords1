@@ -1,4 +1,4 @@
-﻿IMPORT doxie, iesp,fcra, FFD, Gateway, PersonReports;
+﻿IMPORT doxie, iesp, FFD, Gateway, PersonReports;
 
 out_rec := personreports.layouts.CommonAssetReportIndividual;
 
@@ -51,7 +51,7 @@ EXPORT AssetReport (
   pplus := PersonReports.phonesplus_records (dids, module (project (param, PersonReports.input.phonesplus, opt)) end, IsFCRA);
   p_phonesplus  := choosen (pplus.phonesplus,  iesp.constants.BR.MaxPhonesPlus);
 
-  proflic := PersonReports.proflic_records (dids, module (project (param, PersonReports.input.proflic, opt)) end, IsFCRA);
+  proflic := PersonReports.proflic_records (dids, PROJECT (mod_asset, $.IParam.proflic), IsFCRA);
   p_proflic     := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
   
   pilots := PersonReports.faacert_records (dids, module (project (param, PersonReports.input.faacerts)) end, IsFCRA, ds_flags, 

@@ -11,7 +11,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
 	 END;
        
 	 CurrentDate := (STRING)Std.Date.Today();
-	 Timestamp := (STRING)STD.Date.CurrentTime();
+	 Timestamp := (STRING)STD.Date.CurrentTime(TRUE);
 	 Date := STD.date.ConvertDateFormat(CurrentDate, '%Y%m%d','%Y-%m-%d');
 	 Time :=STD.date.ConvertTimeFormat(Timestamp, '%H%M%S', '%H:%M:%S');
 	 TransactionType := inMod.TransactionType;

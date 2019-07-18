@@ -1,4 +1,4 @@
-IMPORT Foreclosure_Vacancy, Property, iesp;
+﻿IMPORT Foreclosure_Vacancy, Property, iesp;
 
 export Layouts := MODULE;
 	export Layout_Foreclosure_out :=record(Property.Layout_Fares_Foreclosure)
@@ -53,5 +53,6 @@ export Layouts := MODULE;
 		Foreclosure_Vacancy.Layouts.Final_Renewal;
 		string45 parcel_number_parcel_id;
 		string45 parcel_number_unmatched_id;
+		String1 source;
 	end;
 END;

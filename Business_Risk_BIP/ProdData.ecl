@@ -1,6 +1,6 @@
 ﻿/*--SOAP--
 <message name="ProdData" wuTimeout="300000">
-	<!-- Company SearchBy Fields --> 
+	<!-- Company SearchBy Fields -->
 	<part name="CompanyName" type="xsd:string"/>
 	<part name="AltCompanyName" type="xsd:string"/>
 	<part name="StreetAddress1" type="xsd:string"/>
@@ -19,7 +19,7 @@
 	<part name="Zip4" type="xsd:string"/>
 	<part name="Lat" type="xsd:string"/>
 	<part name="Long" type="xsd:string"/>
-	<part name="Addr_Type" type="xsd:string"/> 
+	<part name="Addr_Type" type="xsd:string"/>
 	<part name="Addr_Status" type="xsd:string"/>
 	<part name="County" type="xsd:string"/>
 	<part name="Geo_Block" type="xsd:string"/>
@@ -32,7 +32,7 @@
 	<part name="SeleID" type="xsd:integer"/>
 	<part name="OrgID" type="xsd:integer"/>
 	<part name="UltID" type="xsd:integer"/>
-	<!-- Authorized Representative SearchBy Fields --> 
+	<!-- Authorized Representative SearchBy Fields -->
 	<part name="Rep_FullName" type="xsd:string"/>
 	<part name="Rep_NameTitle" type="xsd:string"/>
 	<part name="Rep_FirstName" type="xsd:string"/>
@@ -68,7 +68,7 @@
 	<part name="Rep_DLState" type="xsd:string"/>
 	<part name="Rep_Email" type="xsd:string"/>
 	<part name="Rep_LexID" type="xsd:integer"/>
-	<!-- Option Fields --> 
+	<!-- Option Fields -->
 	<part name="DPPA_Purpose" type="xsd:integer"/>
 	<part name="GLBA_Purpose" type="xsd:integer"/>
 	<part name="Data_Restriction_Mask" type="xsd:string"/>
@@ -82,7 +82,7 @@
   <part name="OFAC_Version" type="xsd:integer"/>
   <part name="Global_Watchlist_Threshold" type="xsd:real"/>
   <part name="Watchlists_Requested" type="tns:XmlDataSet" cols="90" rows="10"/>
-	<!-- Output Options --> 
+	<!-- Output Options -->
 	<part name="OutputRecordCount" type="xsd:integer"/>
 	<part name="IncludeAll" type="xsd:boolean"/>
 	<part name="IncludeLinkingResults" type="xsd:boolean"/>
@@ -118,7 +118,8 @@
 /*--INFO-- Prod Data Service - This is the XML Service utilizing BIP linking*/
 
 #option('expandSelectCreateRow', true);
-IMPORT Address, BBB2, BIPV2, BizLinkFull, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, Corp2, DCAV2, DNB_DMI, EBR, EBR_Services, FBNv2, Gateway, GovData, iesp, InfoUSA, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, NID, OSHAIR, Risk_Indicators, RiskWise, UCCV2, UCCv2_Services, UT, UtilFile;
+IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, EBR, EBR_Services, Gateway,
+  iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT;
 
 EXPORT ProdData() := FUNCTION
 	/* ************************************************************************
@@ -201,7 +202,7 @@ EXPORT ProdData() := FUNCTION
 	'OverrideExperianRestriction',
   'gateways'
 	));
-	
+
 	/* ************************************************************************
 	 *                          Grab service inputs                           *
 	 ************************************************************************ */
@@ -294,7 +295,7 @@ layout_watchlists_temp := record
 
   watchlist_options := dataset([],layout_watchlists_temp) : stored('Watchlists_Requested', few);
   Watchlists_Requested_In := watchlist_options[1].WatchList;
-	
+
   // Output Options
 	UNSIGNED4 OutputRecordCount_In := 100 : STORED('OutputRecordCount');
 	BOOLEAN IncludeAll_In							:= FALSE : STORED('IncludeAll');
@@ -328,12 +329,20 @@ layout_watchlists_temp := record
 
   gateways_in := Gateway.Configuration.Get();
 
+  mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()));
+    EXPORT dppa := DPPA_Purpose_In;
+    EXPORT glb := GLBA_Purpose_In;
+    EXPORT industry_class := IndustryClass_In;
+    EXPORT DataRestrictionMask := DataRestrictionMask_In;
+    EXPORT DataPermissionMask := DataPermissionMask_In;
+  END;
+
 	/* ************************************************************************
 	 *              Create the Appropriate Library Interface                  *
 	 ************************************************************************ */
 	// NOTE: If you change this you MUST redeploy the Library as the interface has changed.
 	emptyRecord := dataset([{1}], {unsigned a});
-	
+
 	Business_Risk_BIP.Layouts.Input grabInput(emptyRecord le, UNSIGNED1 c) := TRANSFORM
 		SELF.Seq := c;
 		SELF.AcctNo := (STRING)c;
@@ -355,7 +364,7 @@ layout_watchlists_temp := record
 		SELF.Zip4 := Zip4;
 		SELF.Lat := Lat;
 		SELF.Long := Long;
-		SELF.Addr_Type := Addr_Type; 
+		SELF.Addr_Type := Addr_Type;
 		SELF.Addr_Status := Addr_Status;
 		SELF.County := County;
 		SELF.Geo_Block := Geo_Block;
@@ -403,27 +412,27 @@ layout_watchlists_temp := record
 		SELF.Rep_DLState := Rep_DLState;
 		SELF.Rep_Email := Rep_Email;
 		SELF.Rep_LexID := Rep_LexID;
-		
+
 		SELF.HistoryDate := (UNSIGNED3)(((STRING12)HistoryDate)[1..6]);
 		SELF.HistoryDateTime := HistoryDate;
 		SELF := [];
 	END;
-	
+
 	Input := PROJECT(dataset([{1}], {unsigned a}), grabInput(LEFT, COUNTER));
-	
+
 	options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 		// Clean up the Options and make sure that defaults are enforced
 		EXPORT UNSIGNED1	DPPA_Purpose 				:= DPPA_Purpose_In;
 		EXPORT UNSIGNED1	GLBA_Purpose 				:= GLBA_Purpose_In;
-		EXPORT STRING50		DataRestrictionMask	:= IF(DataRestrictionMask_In = '', 
-																							Business_Risk_BIP.Constants.Default_DataRestrictionMask, 
+		EXPORT STRING50		DataRestrictionMask	:= IF(DataRestrictionMask_In = '',
+																							Business_Risk_BIP.Constants.Default_DataRestrictionMask,
 																							DataRestrictionMask_In);
-		EXPORT STRING50		DataPermissionMask	:= IF(DataPermissionMask_In = '', 
-																							Business_Risk_BIP.Constants.Default_DataPermissionMask, 
+		EXPORT STRING50		DataPermissionMask	:= IF(DataPermissionMask_In = '',
+																							Business_Risk_BIP.Constants.Default_DataPermissionMask,
 																							DataPermissionMask_In);
 		EXPORT STRING10		IndustryClass				:= IndustryClass_In;
-		EXPORT UNSIGNED1	LinkSearchLevel			:= IF(LinkSearchLevel_In BETWEEN Business_Risk_BIP.Constants.LinkSearch.Default AND Business_Risk_BIP.Constants.LinkSearch.UltID, 
-																							LinkSearchLevel_In, 
+		EXPORT UNSIGNED1	LinkSearchLevel			:= IF(LinkSearchLevel_In BETWEEN Business_Risk_BIP.Constants.LinkSearch.Default AND Business_Risk_BIP.Constants.LinkSearch.UltID,
+																							LinkSearchLevel_In,
 																							Business_Risk_BIP.Constants.LinkSearch.Default);
 		EXPORT UNSIGNED1	BusShellVersion			:= Business_Risk_BIP.Constants.Default_BusShellVersion;
 		EXPORT UNSIGNED1	MarketingMode				:= MAX(MIN(MarketingMode_In, 1), 0);
@@ -437,7 +446,7 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN		OverrideExperianRestriction := OverrideExperianRestriction_In;
     EXPORT BOOLEAN 		Include_OFAC 																		:= if(OFAC_Version = 1, false, true);
 	END;
-	
+
 	// Define the default interface for output options
 	OutputInterface := INTERFACE
 		EXPORT UNSIGNED4	OutputRecordCount		:= 100;
@@ -498,7 +507,7 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN IncludeProfLic := IncludeProfLic_In;
 		EXPORT BOOLEAN IncludeSBFE := IncludeSBFE_In;
 	END;
-	
+
 	// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
 	linkingOptions := MODULE(BIPV2.mod_sources.iParams)
 		EXPORT STRING DataRestrictionMask		:= Options.DataRestrictionMask; // Note: Must unfortunately leave as undefined STRING length to match the module definition
@@ -512,23 +521,23 @@ layout_watchlists_temp := record
 		EXPORT BOOLEAN IncludeMinors				:= TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
 		EXPORT BOOLEAN LNBranded						:= TRUE; // Not entirely certain what effect this has
 	END;
-	
+
 	// Clean up the input - parse the name, address, clean SSN, clean Phone, etc.
 	Business_Risk_BIP.Layouts.Shell cleanInput(Business_Risk_BIP.Layouts.Input le, UNSIGNED2 seqCounter) := TRANSFORM
 		SELF.Seq := seqCounter; // Uniquely Sequence our input
 		SELF.Clean_Input.Seq := seqCounter;
-		
+
 		SELF.Input_Echo := le; // Keep our original input
-		
+
 		// Company Name Fields
 		CompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.CompanyName), BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
 		SELF.Clean_Input.CompanyName := CompanyName;
 		SELF.Clean_Input.AltCompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
 		// Company Address Fields
 		companyAddress := Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1 + ' ' + le.StreetAddress2, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range);
-		companyCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.City, le.State, le.Zip);											
+		companyCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.City, le.State, le.Zip);
 		cleanedCompanyAddress := Address.CleanFields(companyCleanAddr);
-		SELF.Clean_Input.StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Predir, cleanedCompanyAddress.Prim_Name, 
+		SELF.Clean_Input.StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Predir, cleanedCompanyAddress.Prim_Name,
 																											cleanedCompanyAddress.Addr_Suffix, cleanedCompanyAddress.Postdir, cleanedCompanyAddress.Unit_Desig, cleanedCompanyAddress.Sec_Range);
 		SELF.Clean_Input.StreetAddress2 := TRIM(StringLib.StringToUppercase(le.StreetAddress2));
 		SELF.Clean_Input.Prim_Range := cleanedCompanyAddress.Prim_Range;
@@ -573,9 +582,9 @@ layout_watchlists_temp := record
 		SELF.Clean_Input.Rep_FormerLastName := TRIM(StringLib.StringToUppercase(le.Rep_FormerLastName), LEFT, RIGHT);
 		// Authorized Representative Address Fields
 		repAddress := Risk_Indicators.MOD_AddressClean.street_address(le.Rep_StreetAddress1 + ' ' + le.Rep_StreetAddress2, le.Rep_Prim_Range, le.Rep_Predir, le.Rep_Prim_Name, le.Rep_Addr_Suffix, le.Rep_Postdir, le.Rep_Unit_Desig, le.Rep_Sec_Range);
-		repCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.Rep_City, le.Rep_State, le.Rep_Zip);											
+		repCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.Rep_City, le.Rep_State, le.Rep_Zip);
 		cleanedRepAddress := Address.CleanFields(repCleanAddr);
-		SELF.Clean_Input.Rep_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRepAddress.Prim_Range, cleanedRepAddress.Predir, cleanedRepAddress.Prim_Name, 
+		SELF.Clean_Input.Rep_StreetAddress1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedRepAddress.Prim_Range, cleanedRepAddress.Predir, cleanedRepAddress.Prim_Name,
 																											cleanedRepAddress.Addr_Suffix, cleanedRepAddress.Postdir, cleanedRepAddress.Unit_Desig, cleanedRepAddress.Sec_Range);
 		SELF.Clean_Input.Rep_StreetAddress2 := TRIM(StringLib.StringToUppercase(le.Rep_StreetAddress2));
 		SELF.Clean_Input.Rep_Prim_Range := cleanedRepAddress.Prim_Range;
@@ -606,45 +615,45 @@ layout_watchlists_temp := record
 		SELF.Clean_Input.Rep_DLNumber := RiskWise.CleanDL_Num(le.Rep_DLNumber);
 		SELF.Clean_Input.Rep_DLState := StringLib.StringToUpperCase(TRIM(le.Rep_DLState, LEFT, RIGHT));
 		SELF.Clean_Input.Rep_Email := StringLib.StringToUpperCase(TRIM(le.Rep_Email, LEFT, RIGHT));
-		
+
 		SELF.Clean_Input.HistoryDate := IF(le.HistoryDate <= 0, (INTEGER)Business_Risk_BIP.Constants.NinesDate, le.HistoryDate); // If HistoryDate no populated run in "realtime" mode
-		
+
 		SELF.Clean_Input := le; // Fill out the remaining fields with what was passed in
-		
+
 		SELF := []; // None of the remaining attributes have been populated yet
 	END;
 	cleanedInput := PROJECT(Input, cleanInput(LEFT, COUNTER));
-	
-	// For the AllowedSourcesSet, only include the Dunn Bradstreet source if that source is explicitly 
-	// allowed and drop any unallowed Marketing sources when Marketing Mode is turned on. Also, filter 
-	// out Experian data for those Scoring products intended primarily for the purpose of commercial 
+
+	// For the AllowedSourcesSet, only include the Dunn Bradstreet source if that source is explicitly
+	// allowed and drop any unallowed Marketing sources when Marketing Mode is turned on. Also, filter
+	// out Experian data for those Scoring products intended primarily for the purpose of commercial
 	// credit origination. E.g.:
 	//   o   Small Business Attributes
 	//   o   Small Business Attributes with SBFE Data
 	//   o   Small Business Credit Score with SBFE Data
 	//   o   Small Business Blended Credit Score with SBFE Data
 	//   o   Small Business Risk Score
-	AllowedSourcesSet := 
+	AllowedSourcesSet :=
 			SET(
 				CHOOSEN(
 					Business_Risk_BIP.Constants.AllowedSources(
 							(
-								Source <> MDR.SourceTools.src_Dunn_Bradstreet OR 
+								Source <> MDR.SourceTools.src_Dunn_Bradstreet OR
 								StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
 							) AND
 							(
-								Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR 
+								Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR
 								Source NOT IN SET(Business_Risk_BIP.Constants.MarketingRestrictedSources, Source)
 							) AND
 							(
 								Options.OverrideExperianRestriction = True OR
 								Source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source)
 							)
-					), 
+					),
 					300
-				), 
+				),
 				Source ) + [MDR.SourceTools.src_Cortera_Tradeline];
-	
+
 	Risk_Indicators.Layout_Input prepForDIDAppend(Business_Risk_BIP.Layouts.Shell le) := TRANSFORM
 		SELF.Seq := le.Clean_Input.Seq;
 		SELF.HistoryDate := le.Clean_Input.HistoryDate;
@@ -681,11 +690,11 @@ layout_watchlists_temp := record
 		SELF.DL_State := le.Clean_Input.Rep_DLState;
 		SELF.Email_Address := le.Clean_Input.Rep_Email;
 		SELF.Phone10 := le.Clean_Input.Rep_Phone10;
-		
+
 		SELF := [];
 	END;
 	prepDIDAppend := PROJECT(cleanedInput, prepForDIDAppend(LEFT));
-	
+
 	DIDAppend := Risk_Indicators.iid_getDID_prepOutput(prepDIDAppend,
 																										Options.DPPA_Purpose,
 																										Options.GLBA_Purpose,
@@ -695,21 +704,21 @@ layout_watchlists_temp := record
 																										0, /*Append_Best*/
 																										DATASET([], Gateway.Layouts.Config), /*Gateways*/
 																										0 /*BSOptions*/);
-                                                    
+
    if(options.OFAC_Version = 4 and not exists(options.Gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
-																										
+
 	// Pick the DID with the highest score, in the event that multiple have the same score, choose the lowest value DID to make this deterministic
 	DIDKept := ROLLUP(SORT(DIDAppend, Seq, -Score, DID), LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT));
-	
-	withDID := JOIN(cleanedInput, DIDKept, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell, 
+
+	withDID := JOIN(cleanedInput, DIDKept, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																																				SELF.Clean_Input.Rep_LexID := RIGHT.DID;
 																																				SELF.Clean_Input.Rep_LexIDScore := RIGHT.Score;
 																																				SELF := LEFT),
 																					LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
+
 	// Grab just the clean input to pass to the BIP Linking Process
 	prepBIPAppend := PROJECT(withDID, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
-	
+
 	// Prepare the BIP Append input - These should be clean coming in
 	BIPV2.IDFunctions.rec_SearchInput prepBIPInput(Business_Risk_BIP.Layouts.Input le, BOOLEAN useAlt) := TRANSFORM
 		SELF.company_name := IF(useAlt = FALSE, le.CompanyName, le.AltCompanyName);
@@ -741,17 +750,17 @@ layout_watchlists_temp := record
 	AlsoSearchFor := prepBIPAppend (AltCompanyName NOT IN ['', CompanyName]);
 
 	BIPSearchInputMain := PROJECT(prepBIPAppend, prepBIPInput(LEFT, FALSE));
-	
+
 	BIPSearchInputAlt := PROJECT(AlsoSearchFor, prepBIPInput(LEFT, TRUE));
-	
+
 	BIPSearchInput := BIPSearchInputMain + BIPSearchInputAlt;
 
 	// Fetch all Link IDs.  This is a non-restricted source search.
 	// LinkIDsRaw := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(BIPSearchInput).Data2_;
 	LinkIDsRaw := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(BIPSearchInput).UnsuppressedData2_;
-	
+
 	BIPAppend := Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend);
-	
+
 	withBIP := JOIN(withDID, BIPAppend, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																																				SELF.BIP_IDs := RIGHT;
 																																				SELF.Verification.InputIDMatchPowID		:= (STRING)RIGHT.PowID.LinkID;
@@ -761,49 +770,49 @@ layout_watchlists_temp := record
 																																				SELF.Verification.InputIDMatchUltID		:= (STRING)RIGHT.UltID.LinkID;
 																																				SELF := LEFT),
 																					LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
+
 	// Don't bother running a bunch of searches on Seq's that didn't find any ID's, just add them back at the end
 	NoLinkIDsFound := withBIP (BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
 	// Only run the searches with Seq's that found BIP Link ID's that we can search with
 	LinkIDsFoundTemp := withBIP (BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
 	// Append "Best" Company information if only BIP ID's were passed in and it was requested in the Options that we perform the BIPBestAppend process, otherwise this function just returns what was sent to it
 	LinkIDsFound := Business_Risk_BIP.BIP_Best_Append(LinkIDsFoundTemp, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	cleanedInputSet := PROJECT(LinkIDsFound, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
-	
-	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeCortera, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, outputs.OFAC_Version, outputs.IncludeWatchlist, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}], 
+
+	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeCortera, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, outputs.OFAC_Version, outputs.IncludeWatchlist, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}],
 													 {UNSIGNED4 OutputRecordCount, BOOLEAN IncludeAll, BOOLEAN IncludeABIUS, BOOLEAN IncludeBankruptcy, BOOLEAN IncludeBBB, BOOLEAN IncludeBusinessHeader, BOOLEAN IncludeBusReg, BOOLEAN IncludeCorpFilings, BOOLEAN IncludeCortera, BOOLEAN IncludeDCA, BOOLEAN IncludeDEADCO, BOOLEAN IncludeDNBDMI, BOOLEAN IncludeEBR, BOOLEAN IncludeFBN, BOOLEAN IncludeInquiriesBus, BOOLEAN IncludeIRS990, BOOLEAN IncludeLiensJudgments, BOOLEAN IncludeLinkingResults, BOOLEAN IncludeOSHA, BOOLEAN IncludePropertyAssessments, BOOLEAN IncludePropertyDeeds, BOOLEAN IncludeSBFE, BOOLEAN IncludeTradelines, BOOLEAN IncludeUCC, BOOLEAN IncludeUtility, Unsigned1 OFAC_Version, BOOLEAN IncludeWatchlist, STRING DataRestrictionMask, BOOLEAN ignoreFares, BOOLEAN ignoreFidelity, BOOLEAN AllowAll, BOOLEAN AllowGLB, BOOLEAN AllowDPPA, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, BOOLEAN IncludeMinors, BOOLEAN LNBranded});
-	
+
 	kFetchLinkIDs := Business_Risk_BIP.Common.GetLinkIDs(LinkIDsFound);
 	kFetchLinkSearchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel);
 	// --------------- LexisNexis Business Header ----------------
 	BHBuildDate := Risk_Indicators.get_Build_date('bip_build_version');
 
 	BusinessHeader := Business_Risk_BIP.PD_Business_Header(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ---------------- EBR - Experian Business Records ------------------
 	EBR5600 := Business_Risk_BIP.PD_EBR5600(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ---------------- DNB DMI - Dunn Bradstreet DMI ------------------
 	DNBDMI := Business_Risk_BIP.PD_DNBDMI(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-		
+
 	// ---------------- BusReg - Business Registration ------------------
 	BusReg := Business_Risk_BIP.PD_BusReg(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 		// ---------------- DCA - Directory of Corporate Affiliations AKA LNCA ------------------
 	DCA := Business_Risk_BIP.PD_DCA(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ---------------- DEADCO ------------------
 	DEADCO := Business_Risk_BIP.PD_DEADCO(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ---------------- ABIUS ------------------
 	ABIUS := Business_Risk_BIP.PD_ABIUS(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ---------------- Business Inquiries - Only Allowed in Non-Marketing Mode ------------------
 	InqBuildDate := Risk_Indicators.get_Build_date('inquiry_update_build_version');
 
 	InquiriesAll := Business_Risk_BIP.PD_Inquiries(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// --------------- Judgments and Liens ----------------
 	// Get the TMSID/RMSID results for Liens and Judgments data
 	LiensJudgmentsTMSIDRaw := LiensV2.Key_LinkIds.kFetch2(kFetchLinkIDs,
@@ -813,32 +822,32 @@ layout_watchlists_temp := record
 																							Options.KeepLargeBusinesses);
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(LiensJudgmentsTMSIDRaw, LinkIDsFound, LiensJudgmentsTMSIDSeq);
-	
+
 	// Filter out records after our history date
 	LiensJudgmentsTMSID := Business_Risk_BIP.Common.FilterRecords(LiensJudgmentsTMSIDSeq, date_first_seen, date_vendor_first_reported, MDR.SourceTools.src_UCCV2, AllowedSourcesSet);
-	
+
 	liens_judgments_main :=	JOIN(LiensJudgmentsTMSID, LiensV2.key_liens_main_ID, KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.rmsid = RIGHT.rmsid), TRANSFORM(RIGHT), ATMOST(1000));
-	
-	
+
+
 	// ---------------- OSHA - Occupational Safety and Health Administration ------------------
 	OSHA := Business_Risk_BIP.PD_OSHA(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
-	
+
+
 	// ---------------- Better Business Bureau ------------------
 	BBBMember := Business_Risk_BIP.PD_BBB_Member(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	BBBNonMember := Business_Risk_BIP.PD_BBB_NonMember(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
-	
+
+
 	// ---------------- Ficticious Business Name ---------------------
 	FBN := Business_Risk_BIP.PD_FBN(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ---------------- IRS 990/IRS Non-Profit ------------------------
 	IRS990 := Business_Risk_BIP.PD_IRS990(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ---------------- Utility Data ---------------------
 	Util := Business_Risk_BIP.PD_Utility(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// --------------- Property Data - Using Business IDs ----------------
 	PropertyRaw := LN_PropertyV2.Key_LinkIds.kFetch2(kFetchLinkIDs,
 																							kFetchLinkSearchLevel,
@@ -849,19 +858,19 @@ layout_watchlists_temp := record
 																					 );
 	// Add back our Seq numbers
 	Business_Risk_BIP.Common.AppendSeq2(PropertyRaw, LinkIDsFound, PropertySeq);
-	
+
 	// Filter out records after our history date
 	Property := Business_Risk_BIP.Common.FilterRecords(PropertySeq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_LnPropV2_Fares_Asrs, AllowedSourcesSet);
-	
+
 	PropertyAssessments := JOIN(Property, LN_PropertyV2.key_assessor_fid(FALSE /*isFCRA*/), KEYED(LEFT.LN_Fares_ID = RIGHT.LN_Fares_ID),
 															TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq}, SELF.Seq := LEFT.Seq; SELF := RIGHT),
 															ATMOST(Business_Risk_BIP.Constants.Limit_Assessments));
-	
+
 	PropertyDeeds := JOIN(Property, LN_PropertyV2.key_deed_fid(FALSE /*isFCRA*/), KEYED(LEFT.LN_Fares_ID = RIGHT.LN_Fares_ID),
 															TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq}, SELF.Seq := LEFT.Seq; SELF := RIGHT),
 															ATMOST(Business_Risk_BIP.Constants.Limit_Deeds));
-															
-	
+
+
 	// --------------- EBR Data ----------------
 	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(kFetchLinkIDs,
 																						 kFetchLinkSearchLevel,
@@ -869,35 +878,35 @@ layout_watchlists_temp := record
 																							linkingOptions,
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses
-																							);																	
+																							);
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(EBRRaw, LinkIDsFound, EBRSeq);
-	
+
 	// Filter out records after our history date.
 	EBR_recs := Business_Risk_BIP.Common.FilterRecords(EBRSeq, date_first_seen, process_date_first_seen, MDR.SourceTools.src_EBR, AllowedSourcesSet);
-	
-	// Get EBR filing numbers from linkids.		
+
+	// Get EBR filing numbers from linkids.
 	ebr_filing_numbers_plus_seq := PROJECT( EBR_recs(file_number != ''), {UNSIGNED4 seq, EBR_Services.layout_file_number} );
-  
+
 	ebr_filing_numbers_plus_seq_ddpd := DEDUP(ebr_filing_numbers_plus_seq, ALL, HASH);
 
 	header_recs_pre :=	JOIN(ebr_filing_numbers_plus_seq_ddpd, EBR.Key_0010_Header_FILE_NUMBER, KEYED(LEFT.file_number = RIGHT.file_number), TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq}, SELF.Seq := LEFT.Seq, SELF := RIGHT), ATMOST(EBR_Services.constants.maxcounts.default));
-	
+
 	// Mimicking what is done in other business queries, we will keep 1 file_number per sequence.  To do this we will keep the most recently processed record, following by most recently last seen, and then lastly the smallest file_number to make it determinate
 	header_recs := GROUP(DEDUP(SORT(header_recs_pre, seq, -process_date_last_seen, -date_last_seen, file_number), Seq), seq);
-		
-	executive_recs_added :=	JOIN(header_recs, ebr.Key_1000_Executive_Summary_FILE_NUMBER,	KEYED(LEFT.file_number = RIGHT.file_number), TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq}, 
+
+	executive_recs_added :=	JOIN(header_recs, ebr.Key_1000_Executive_Summary_FILE_NUMBER,	KEYED(LEFT.file_number = RIGHT.file_number), TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq},
 				SELF.seq                        := LEFT.seq,
 				SELF.process_date               := LEFT.process_date,
 				SELF.FILE_NUMBER                := LEFT.file_number,
 				SELF := RIGHT), ATMOST(EBR_Services.constants.maxcounts.default));
-	
+
 	trade_payment_total_recs_added :=	JOIN(executive_recs_added, ebr.Key_2015_Trade_Payment_Totals_FILE_NUMBER,	KEYED(LEFT.file_number = RIGHT.file_number), TRANSFORM(RIGHT), ATMOST(EBR_Services.constants.maxcounts.default));
-			
+
 
 	// --------------- UCC - Uniform Commercial Code ----------------
 	UCCDataSeq := Business_Risk_BIP.PD_UCC(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// ------------- Corp2 - Corporate Filings ------------
 	CorpFilings_raw := Corp2.Key_LinkIDs.Corp.kfetch2(kFetchLinkIDs,
 	                                         kFetchLinkSearchLevel,
@@ -908,9 +917,9 @@ layout_watchlists_temp := record
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(CorpFilings_raw, LinkIDsFound, CorpFilings_seq);
 
- // Calculate the source code by state to restrict records for Marketing properly. We'll 
+ // Calculate the source code by state to restrict records for Marketing properly. We'll
  // borrow corp_src_type for the state source code.
- CorpFilings_withSrcCode := 
+ CorpFilings_withSrcCode :=
   PROJECT(
     CorpFilings_seq,
     TRANSFORM( RECORDOF(CorpFilings_seq),
@@ -920,23 +929,23 @@ layout_watchlists_temp := record
 
 	// Filter out records after our history date.
 	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_withSrcCode, dt_last_seen, dt_vendor_first_reported, corp_src_type, AllowedSourcesSet);
-	
-	
+
+
 	// ------------ Bankruptcy Build Date -------------
 	BkBuildDate := Risk_Indicators.get_Build_date('Bankruptcy_daily');
-	
+
 	// --------------- Bankruptcy Data ----------------
 	Bankruptcy := Business_Risk_BIP.PD_Bankruptcy(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
-	
+
 	// Only turn on watchlist searching if explicitly specified, unlike the others where we include them with the "ALL" results
 	WatchlistResults := Business_Risk_BIP.getWatchlists(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
-	
+
 	// --------------- Professional License data ----------------
-	ProfLic := Business_Risk_BIP.PD_ProfLic(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet);
-                  
+	ProfLic := Business_Risk_BIP.PD_ProfLic(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, AllowedSourcesSet, mod_access);
+
 	// --------------- SBFE data ----------------
 	SBFE := Business_Risk_BIP.PD_SBFE(LinkIDsFound, options, linkingOptions, AllowedSourcesSet).SBFE_data_raw;
-	
+
   // --------------- Cortera data ----------------
   Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
   CorteraRecs := Cortera.CorteraRecs;
@@ -947,15 +956,15 @@ layout_watchlists_temp := record
 	OUTPUT(Input, NAMED('Raw_Input'));
 	OUTPUT(CHOOSEN(cleanedInput, outputs.OutputRecordCount), NAMED('Cleaned_Input'));
 	OUTPUT(optionsDataset, NAMED('ProdData_Options'));
-	
+
 	// Linking Results
 	IF((outputs.IncludeLinkingResults OR outputs.IncludeAll), OUTPUT(CHOOSEN(PROJECT((LinkIDsFound + NoLinkIDsFound), TRANSFORM(Business_Risk_BIP.Layouts.LinkID_Results, SELF := LEFT.BIP_IDs)), outputs.OutputRecordCount), NAMED('Linking_Results')));
 	IF((outputs.IncludeLinkingResults OR outputs.IncludeAll), OUTPUT(CHOOSEN(LinkIDsRaw, outputs.OutputRecordCount), NAMED('Raw_BIPV2_Linking_Results__BIPV2_IDfunctions_fun_IndexedSearchForXLinkIDs_Data2')));
-	
+
 	// Business Header
 	IF((outputs.IncludeBusinessHeader OR outputs.IncludeAll), OUTPUT((BHBuildDate), NAMED('Business_Header_Build_Date')));
 	IF((outputs.IncludeBusinessHeader OR outputs.IncludeAll), OUTPUT(CHOOSEN((BusinessHeader), outputs.OutputRecordCount), NAMED('Business_Header')));
-	
+
 	// The remainder of the datasets output alphabetically
 	IF((outputs.IncludeABIUS OR outputs.IncludeAll), OUTPUT(CHOOSEN((ABIUS), outputs.OutputRecordCount), NAMED('ABIUS')));
 	IF((outputs.IncludeBankruptcy OR outputs.IncludeAll), OUTPUT((BkBuildDate), NAMED('Bankruptcy_Build_Date')));
@@ -990,6 +999,6 @@ layout_watchlists_temp := record
 	IF(outputs.IncludeWatchlist, OUTPUT(WatchlistResults[1].WatchlistHits, NAMED('Watchlist_Hits')));
 	IF(outputs.IncludeProfLic OR outputs.IncludeAll, OUTPUT(CHOOSEN((ProfLic), outputs.OutputRecordCount), NAMED('ProfessionalLicense')));
 	IF((outputs.IncludeSBFE OR outputs.IncludeAll), OUTPUT(CHOOSEN((SBFE), outputs.OutputRecordCount), NAMED('SBFE')));
-		
+
 	RETURN(TRUE);
 END;

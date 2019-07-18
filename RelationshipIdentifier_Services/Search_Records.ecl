@@ -1,12 +1,12 @@
-IMPORT AutoStandardI,BIPV2, didville, RelationshipIdentifier_Services,
-         iesp, Suppress, doxie, MDR, TopBusiness_Services, STD,  Address;
+﻿IMPORT Address,AutoStandardI,BIPV2,didville,doxie,iesp,MDR,RelationshipIdentifier_Services,
+         TopBusiness_Services,STD,Suppress;
 
 EXPORT  Search_Records(                 
 								RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch ds_dataInSearch
-								,AutoStandardI.PermissionI_Tools.params tempMod
-								,RelationshipIdentifier_Services.Layouts.OptionsLayout options
+								,doxie.IDataAccess mod_access
+                ,RelationshipIdentifier_Services.Layouts.OptionsLayout options
                 ,DATASET(RelationshipIdentifier_Services.Layouts.Batch.Input_Processed) tmpds_BatchIn
-                ,RelationshipIdentifier_Services.iParam.BatchParams               inMod
+                ,RelationshipIdentifier_Services.iParam.BatchParams               inMod               
 							) :=
  // FUNCTION  //leaving this function ecl cmd in here in case debugging is needed. 	
  MODULE
@@ -44,13 +44,14 @@ EXPORT  Search_Records(
 	SHARED unsigned4 endDate := if (endDateTmp = 0, (unsigned4) curDate, endDateTmp);
   SHARED unsigned4 endDatetmpBatch := (unsigned4) inmod.endDate;
 	SHARED unsigned4 enddatebatch := if (endDateTmpBatch = 0, (unsigned4) curDate, endDateTmpBatch);
-  SHARED ssnMaskVal := options.ssnMaskVal;
-	SHARED application_type_value := options.Application_type;
+  SHARED ssnMaskVal := mod_access.ssn_mask;
+	SHARED application_type_value := mod_access.Application_type;
 	
-	SHARED dppa_ok := AutoStandardI.PermissionI_Tools.val(tempmod).DPPA.ok(tempmod.DPPAPurpose);
-	SHARED glb_ok :=  AutoStandardI.PermissionI_Tools.val(tempmod).GLB.ok(tempmod.GLBPurpose);
-	SHARED DRM := options.dataRestrictionMask;
-	SHARED DPM := options.DataPermissionMask;
+	SHARED DRM := mod_access.dataRestrictionMask;
+	SHARED DPM := mod_access.DataPermissionMask;
+  SHARED dppa_ok := mod_access.isValidDppa();
+  SHARED glb_ok := mod_access.isValidGlb();
+  
 	// will contain both person and business INPUT stuff
 	//
 	// seqence the recs and then need to join back to 
@@ -467,7 +468,7 @@ EXPORT  Search_Records(
 																		inputDID := (UNSIGNED6) RIGHT.DID;																													 
 																	PossibleMidexSearchStructures := 
 																			RelationshipIdentifier_Services.Functions.getMidexLicenseType(
-														                   inputDID,l_xlink_ids, DPM);
+														                   inputDID,l_xlink_ids,mod_access);
                            														                           
 														      SELF.MidexlicenseTypes :=  choosen(dedup(PROJECT(PossibleMidexSearchStructures,													                      
 																									 TRANSFORM(IESP.share.t_stringarrayItem,																									   

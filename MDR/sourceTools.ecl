@@ -129,6 +129,7 @@ MODULE
 	export src_Cortera_Tradeline         := '7K';
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
 	export src_Credit_Unions             := 'CU';
+	export src_DataBridge								 := 'RQ';
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
 	export src_DEA                       := 'DA';  // US Drug Enforcement Administration
@@ -1084,7 +1085,7 @@ MODULE
 		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
-// Marketing approved sources as of 3/2019.
+// Marketing approved sources as of 6/2019.
 export set_Marketing_Sources           := [
 		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
 		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
@@ -1103,8 +1104,8 @@ export set_Marketing_Sources           := [
 		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
 		,src_Vickers									 ,src_ZOOM											,src_Cortera									 ,src_Equifax_Business_Data		
-    ,src_FBNV2_Hist_Choicepoint
-    /*updated set_Marketing_Corp*/		
+		,src_FBNV2_Hist_Choicepoint		 ,src_DCA												,src_Infutor_NARB							 ,src_DataBridge
+		/*updated set_Marketing_Corp*/		
     ,src_AK_Corporations					 ,src_AL_Corporations						,src_AZ_Corporations					 ,src_AR_Corporations 
 		,src_CA_Corporations					 ,src_CO_Corporations						,src_CT_Corporations					 ,src_DC_Corporations
 		,src_FL_Corporations					 ,src_GA_Corporations						,src_HI_Corporations					 ,src_IA_Corporations 
@@ -1676,6 +1677,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_WY_Corporations           := [src_WY_Corporations           ];
 	export set_CrashCarrier              := [src_CrashCarrier              ];	
 	export set_Credit_Unions             := [src_Credit_Unions             ];
+	export set_DataBridge                := [src_DataBridge                ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
 	export set_Death_Michigan            := [src_Death_Michigan            ];
@@ -2191,6 +2193,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCrashCarrier               (string  sr) := sr               in set_CrashCarrier               ;	
 	export SourceIsCredit_Unions              (string  sr) := sr               in set_Credit_Unions              ;		
 	export SourceIsCriminal_History           (string  sr) := sr               in set_Criminal_History           ;
+	export SourceIsDataBridge                 (string  sr) := sr               in set_DataBridge                 ;
 	export SourceDatagence                    (string  sr) := sr               in set_Datagence;
 	export SourceIsDCA                        (string  sr) := sr               in set_DCA                        ;
 	export SourceIsDea                        (string  sr) := sr               in set_Dea                        ;

@@ -1,4 +1,4 @@
-﻿import doxie_files, ut, liensv2, riskwise, property, bankruptcyv3, risk_indicators;
+﻿import doxie_files, ut, liensv2, riskwise, property, bankruptcyv3, risk_indicators, MDR;
 
 export Boca_Shell_Derogs_Hist (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, integer bsversion) := FUNCTION
 															 
@@ -676,6 +676,7 @@ wFID := join(crim_rolled, kford,
 all_foreclosures := join(wFID, kforf,
 						left.fid!='' and 
 						keyed(left.fid=right.fid) and
+						right.source=MDR.sourceTools.src_Foreclosures and
 						(unsigned3)(right.recording_date[1..6]) < left.historydate,
 						transform(layout_extended, 
 								self.BJL.last_foreclosure_date := right.recording_date,

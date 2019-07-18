@@ -42,7 +42,7 @@
 </message>
 */
 /*--INFO-- Search and return Midex License information.*/
-import AutoStandardI, iesp;
+import AutoStandardI,doxie,iesp,MIDEX_Services;
 
 export LicenseSearchService := macro
 	
@@ -108,8 +108,9 @@ export LicenseSearchService := macro
                                             Midex_Services.Constants.AlertVersion.None);
 	end;
 
-	ds_results := Midex_Services.LicenseSearch_Records(tempmod);
-
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
+  ds_results := Midex_Services.LicenseSearch_Records(tempmod, mod_access);
+  
   // Output the search results
   output(ds_results, named('Results'));
 	

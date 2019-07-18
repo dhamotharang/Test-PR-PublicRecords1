@@ -161,7 +161,7 @@ EXPORT Header_xlinking_Service := MACRO
  
  pm := InsuranceHeader_xLink.MEOW_xIDL(Input_Data); // This module performs regular xDID functions
 	ds1 := pm.Raw_Results; 
-	KeyLayout := recordof(InsuranceHeader_xLink.Key_InsuranceHeader_DID);
+	KeyLayout := recordof(InsuranceHeader_xLink.Key_InsuranceHeader_DID) - [global_sid, record_sid];
 	resultsLayout := InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch;
 	segKey := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
 	resTrimLayout := record

@@ -61,7 +61,7 @@ EXPORT PrelitReport (
   pplus := PersonReports.phonesplus_records(dids, module (project(param, PersonReports.input.phonesplus, opt)) end, IsFCRA);
   p_phonesplus  := choosen (pplus.phonesplus,  iesp.constants.BR.MaxPhonesPlus);
 
-  proflic := PersonReports.proflic_records(dids, module (project(param, PersonReports.input.proflic, opt)) end, IsFCRA);
+  proflic := PersonReports.proflic_records(dids, PROJECT(mod_prelit, $.IParam.proflic), IsFCRA);
   p_proflic     := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
 
   bankrpt := PersonReports.bankruptcy_records(dids, 

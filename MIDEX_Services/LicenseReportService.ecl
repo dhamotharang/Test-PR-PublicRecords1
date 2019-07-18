@@ -26,7 +26,7 @@
 
 export LicenseReportService := macro
 
-	import AutoStandardI, iesp;
+	import AutoStandardI,doxie,iesp,MIDEX_Services;
   // Get XML input 
   rec_in := iesp.midexlicensereport.t_MIDEXLicenseReportRequest;
   ds_in := DATASET ([], rec_in) : STORED ('MIDEXLicenseReportRequest', FEW);
@@ -100,9 +100,10 @@ export LicenseReportService := macro
     export boolean   includeLicRptsFromNMLS := FALSE;  // Only return License report requested
 	end;
 
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
   // No MAC_marshal is used, since the alert values are set at the repsone record level, the .val
 	// returns the results already "Marshalled".
-	ds_results := Midex_Services.LicenseReport_Records(tempmod);
+	ds_results := Midex_Services.LicenseReport_Records(tempmod, mod_access);
 	finalresults := MIDEX_Services.Functions.Format_licenseReport_iespResponse(ds_results);
   
   // Output the search results

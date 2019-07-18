@@ -1,4 +1,4 @@
-import ut, header;
+﻿import ut, header;
 
 export ssn_persons ( boolean checkRNA = false ) := function
 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
@@ -99,6 +99,8 @@ ssn_people_plus := record //some extra fields to allow us to use mac_glbclean an
 	string1	   jflag3;
 	string1 valid_dob := '';
 	unsigned6    rid;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
 end;
 
 ssn_people_plus get_people(doxie.Key_Header le) := transform
@@ -121,6 +123,8 @@ daily_ssns := join(keep_trecs, jdirty, left.did=right.did and left.ssn = right.s
 									 transform(ssn_people_plus, 
 														 self.date_ob := left.dob, 
 														 self.dead := left.tnt = 'D',
+														 self.global_sid:= right.global_sid,
+														 self.record_sid:= right.record_sid,
 														 self := left), 
 									 left only);
 combined := jdirty+daily_ssns;

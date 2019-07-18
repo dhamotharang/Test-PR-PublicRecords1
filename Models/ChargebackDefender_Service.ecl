@@ -169,6 +169,7 @@ export ChargebackDefender_Service := MACRO
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
+  
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__ChargebackDefender_Service);
 /* ************* End Scout Fields **************/
  
@@ -720,7 +721,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	seed_final := project( ret_test_seed, transform( Models.Layout_Chargeback_Out, self := left ) );
 
 	cbd_model := if( Test_Data_Enabled, seed_final, ret );
-	// cbd_model := ret;
+	//cbd_model := ret;
 	
 	
 	// ****get attributes
@@ -728,7 +729,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	attributes := Models.getCBDAttributes(clam, account_value, indata, attrversion);	
 	attr_test_seed := Models.CBDAttributes_TestSeed_FN(testPrep, account_value, Test_Data_Table_Name);  //Deactivate test seed keys - Comment out this line
 	
-	attrs := map(	test_data_enabled => attr_test_seed, //Deactivate test seed keys - comment out the remainder of the top line, starting after the map definition.
+	attrs := map(	
+  test_data_enabled => attr_test_seed, //Deactivate test seed keys - comment out the remainder of the top line, starting after the map definition.
 								~goodAttributeRequest => fail(Models.Layout_CBDAttributes, 'Invalid attribute request'),
 								attributes);	// choose either real results or test results
 	
@@ -819,19 +821,19 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 																								 self.i_model_name_1 := genericModelName,
 																								 self.i_model_name_2 := '',
 																								 self.o_score_1    := IF(genericModelName != '', left.Models[1].Scores[1].i, ''),
-																								 self.o_reason_1_1 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[1].Reason_Code,
-																								 self.o_reason_1_2 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[2].Reason_Code,
-																								 self.o_reason_1_3 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[3].Reason_Code,
-																								 self.o_reason_1_4 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[4].Reason_Code,
-																								 self.o_reason_1_5 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[5].Reason_Code,
-																								 self.o_reason_1_6 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[6].Reason_Code,
+																								 self.o_reason_1_1 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[1].Reason_Code, ''),
+																								 self.o_reason_1_2 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[2].Reason_Code, ''),
+																								 self.o_reason_1_3 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[3].Reason_Code, ''),
+																								 self.o_reason_1_4 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[4].Reason_Code, ''),
+																								 self.o_reason_1_5 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[5].Reason_Code, ''),
+																								 self.o_reason_1_6 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[6].Reason_Code, ''),
 																								 // self.o_score_2    := '',
-																								 self.o_reason_2_1 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[1].Reason_Code,
-																								 self.o_reason_2_2 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[2].Reason_Code,
-																								 self.o_reason_2_3 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[3].Reason_Code,
-																								 self.o_reason_2_4 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[4].Reason_Code,
-																								 self.o_reason_2_5 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[5].Reason_Code,
-																								 self.o_reason_2_6 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[6].Reason_Code,
+																								 self.o_reason_2_1 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[1].Reason_Code, ''),
+																								 self.o_reason_2_2 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[2].Reason_Code, ''),
+																								 self.o_reason_2_3 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[3].Reason_Code, ''),
+																								 self.o_reason_2_4 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[4].Reason_Code, ''),
+																								 self.o_reason_2_5 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[5].Reason_Code, ''),
+																								 self.o_reason_2_6 := IF(genericModelName != '', left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[6].Reason_Code, ''),
                                                  self.o_lexid := clam[1].Bill_To_Out.DID,
 																								 self := left,
 																								 self := [] ));

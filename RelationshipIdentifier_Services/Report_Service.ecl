@@ -1,4 +1,4 @@
-// input:  iesp.RelationshipIdentifierReport.t_RelationshipIdentifierReportRequest
+﻿// input:  iesp.RelationshipIdentifierReport.t_RelationshipIdentifierReportRequest
 
 // output:  iesp.RelationshipIdentifierReport.t_RelationshipIdentifierReportResponseEx
 // sample XML inputs are listed below The options IncludeNeighbor and AsOfDate are 
@@ -12,7 +12,7 @@ export Report_Service() := macro
 	ds_in := dataset([],rec_in) : stored('RelationshipIdentifierReportRequest',few);
 	first_row := ds_in[1] : independent;
 	
-	ds_reportOptions := PROJECT(first_row.Options, TRANSFORM(
+  ds_reportOptions := PROJECT(first_row.Options, TRANSFORM(
 	         iesp.RelationshipIdentifierReport.t_RelationshipIdentifierReportOption,
 					 SELF := LEFT;
 					 self := [];
@@ -29,43 +29,14 @@ export Report_Service() := macro
 	 #stored('Max_Neighborhoods',8); // default for this in comp report is 4
 	 
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	
-	string in_dlpurposeLocal := global(First_row.User).DLPurpose;
-	string in_GLBpurposeLocal := global(First_row.User).GLBPurpose;
-	// Set DPPA, GLBA, DRM, etc.
-	iesp.ECL2ESP.SetInputUser (first_row.User);
-	
-	unsigned1 stored_DPPAPurpose := 0 : stored('DPPAPurpose');
-	unsigned1 stored_GLBPurpose  := 0 : stored('GLBPurpose');
-	
-	string    DRM         := '': stored('DataRestrictionMask');
-	string    DPM         := '': stored('DataPermissionMask');
-	string6   SSnMask     := '': stored('SSNMask');
-	string    DOBMask     := '': stored('DOBMask'); // NONE
-  string32  application_type_value := '' : stored('ApplicationType');
-	
-   tempmod := module(AutoStandardI.PermissionI_Tools.params)
-	        export boolean AllowAll := false;
-					export boolean AllowGLB := false;
-					export boolean AllowDPPA := false;
-					export unsigned1 DPPAPurpose := stored_DPPAPurpose;
-					export unsigned1 GLBPurpose := stored_GLBPurpose;
-					export boolean IncludeMinors := false;
-					export boolean restrictPreGLB := false;
-		END;
-		
-		dppa_ok := AutoStandardI.PermissionI_Tools.val(tempmod).DPPA.ok(tempmod.DPPAPurpose);
-	  glb_ok :=  AutoStandardI.PermissionI_Tools.val(tempmod).GLB.ok(tempmod.GLBPurpose);
+	dppa_ok := mod_access.isValidDppa();
+  glb_ok  := mod_access.isValidGlb();
 			
-		dppa_valid := dppa_ok OR ((unsigned1) (in_dlpurposeLocal) = 0);
-	  glb_valid := glb_ok OR ((unsigned1) (in_GLBpurposeLocal) = 0);
- 
-  
 	// coded per requirement 3.30 #3 Relationship identifier Project.
-  PermissionsFlagdppa := in_dlpurposeLocal = '';
-	PermissionsFlagGLB  := in_glbPurposeLocal = '';
-	// dppa_valid := dppa_ok OR ((unsigned1) (in_dlpurposeLocal) = 0);
-	// glb_valid := glb_ok OR ((unsigned1) (in_GLBpurposeLocal) = 0);
+  PermissionsFlagdppa := mod_access.dppa = 0;
+	PermissionsFlagGLB  := mod_access.glb = 0;
 	
 	// END OF requirement 3.30 #3
 	
@@ -73,11 +44,10 @@ export Report_Service() := macro
 	                    iesp.RelationshipIdentifierReport.t_relationshipIdentifierReportBy,																							  
 												SELF := LEFT;									
 												));		  
- 	unsigned1 dobMaskValue := suppress.date_mask_math.MaskIndicator(dobMask);
-	num_rows := COUNT(ds_reportBy);
+ 	num_rows := COUNT(ds_reportBy);
 	
 	reportResults := RelationshipIdentifier_Services.Report_Records.getReport(ds_reportBy,inc_neighbors,
-	           stored_DPPAPurpose,stored_GLBPurpose,DRM,DPM,ssnMask,application_type_value,DOBMaskValue,endDate);
+	                                                                          endDate,mod_access);
 	
 	iesp.RelationshipIdentifierReport.t_RelationshipIdentifierReportResponse
 		 Format_out() := TRANSFORM
@@ -87,13 +57,13 @@ export Report_Service() := macro
 			 
 			Results := dataset( [format_out()]);	
 
-	Map(
+	  Map(
 	     num_rows <= 1 OR num_rows >= iesp.constants.RelationshipIdentifier.MAX_COUNT_SEARCH_MATCH_RECORDS +1
 																	=> FAIL(203,doxie.ErrorCodes(301)),
 							PermissionsFlagDPPA => FAIL(100, 'DPPA permissible purpose is required'),
 							PermissionsFlagGlb  => FAIL(100, 'GLB permissible purpose is required.'),
-							(~(dppa_valid))        => FAIL(2, 'Invalid DPPA permissible purpose'),
-							 (~(glb_valid))         => FAIL(2, 'Invalid GLB permissible purpose'),
+							(~(dppa_ok))        => FAIL(2, 'Invalid DPPA permissible purpose'),
+							 (~(glb_ok))         => FAIL(2, 'Invalid GLB permissible purpose'),
 							output(Results, named('Results'))
 	   );
 	ENDMACRO;

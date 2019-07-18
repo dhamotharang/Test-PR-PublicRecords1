@@ -1,9 +1,8 @@
-﻿IMPORT AutoStandardI, BIPV2, iesp, MIDEX_Services, TopBusiness_Services;
-EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, 
-											MIDEX_Services.Iparam.reportrecords in_mod ) :=
+﻿IMPORT AutoStandardI, BIPV2, doxie, MIDEX_Services, TopBusiness_Services;
+EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
+                             doxie.IDataAccess mod_access, 
+                             STRING1  BusinessIDFetchLevel) :=
 	FUNCTION
-	// set the FETCH LEVEL for join to main bus header key 
-	FETCH_LEVEL := in_mod.BusinessIDFetchLevel;
 	
 	in_topbusiness_ds := PROJECT(in_linkid, 
 			TRANSFORM(TopBusiness_Services.Layouts.rec_input_ids,
@@ -11,25 +10,36 @@ EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
 				SELF 				:= LEFT));
 				
 	TopBusiness_Services.BusinessReportComprehensive_Layouts xform_topbusiness_options() := TRANSFORM
-		SELF.IncludeAssociatedBusinesses	:= TRUE;
-		SELF.IncludeBankruptcies  				:= TRUE;
-		SELF.IncludeContacts 							:= TRUE; //executives (current and prior), individuals (current and prior), etc.
-		SELF.IncludeLiensJudgments				:= TRUE;
-		SELF.IncludeProperties  					:= TRUE;
-		SELF.IncludeNameVariations 				:= TRUE;
-		SELF.IncludeParents 							:= TRUE;
-		SELF.IncludeOpsSites 							:= TRUE;
-		SELF.IncludeIncorporation					:= TRUE;
-		SELF.IncludeConnectedBusinesses		:= TRUE;
-		SELF.IncludeRegisteredAgents			:= TRUE;
-		SELF.BusinessReportFetchLevel 		:= in_mod.BusinessIDFetchLevel;
-		SELF.ApplicationType							:= in_mod.ApplicationType;
-		SELF 															:= [];
-	END;
+    SELF.IncludeAssociatedBusinesses	:= TRUE;
+    SELF.IncludeBankruptcies  				:= TRUE;
+    SELF.IncludeContacts 							:= TRUE; //executives (current and prior), individuals (current and prior), etc.
+    SELF.IncludeLiensJudgments				:= TRUE;
+    SELF.IncludeProperties  					:= TRUE;
+    SELF.IncludeNameVariations 				:= TRUE;
+    SELF.IncludeParents 							:= TRUE;
+    SELF.IncludeOpsSites 							:= TRUE;
+    SELF.IncludeIncorporation					:= TRUE;
+    SELF.IncludeConnectedBusinesses		:= TRUE;
+    SELF.IncludeRegisteredAgents			:= TRUE;
+    SELF.BusinessReportFetchLevel 		:= BusinessIDFetchLevel;
+    SELF.ApplicationType							:= mod_access.Application_Type;
+    SELF 															:= [];
+  END;
 	in_topbusiness_options 	:= row(xform_topbusiness_options());
 	
-	in_topbusiness_mod			:= module (project(in_mod, AutoStandardI.DataRestrictionI.params, opt)) end;
-	
+  in_topbusiness_mod := MODULE (AutoStandardI.DataRestrictionI.params)
+    EXPORT BOOLEAN AllowAll := mod_access.unrestricted = doxie.compliance.ALLOW.ALL;
+    EXPORT BOOLEAN AllowGLB := mod_access.unrestricted & doxie.compliance.ALLOW.GLB > 0;
+    EXPORT BOOLEAN AllowDPPA := mod_access.unrestricted & doxie.compliance.ALLOW.DPPA >0;
+    EXPORT UNSIGNED1 DPPAPurpose := mod_access.dppa;
+    EXPORT UNSIGNED1 GLBPurpose := mod_access.glb;
+    EXPORT BOOLEAN IncludeMinors := mod_access.show_minors;
+    EXPORT BOOLEAN restrictPreGLB := mod_access.isPreGlbRestricted();
+    EXPORT string DataRestrictionMask := mod_access.DataRestrictionMask;
+    EXPORT BOOLEAN ignoreFares := FALSE;
+    EXPORT BOOLEAN ignoreFidelity := FALSE;
+  END;
+
 	// Per Don L., don't call Guts directly but rather call the TopBusiness_Services sections as needed in a similar fashion as Guts
 	
 	// set the dotid/empid/powid values to 0 regardless of what is in input	
@@ -64,7 +74,7 @@ EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
 			self := left, 														
 			));
 														 
-	ds_busHeaderRecs := BIPV2.Key_BH_Linking_Ids.kfetch(ds_in_unique_ids_only,FETCH_LEVEL,
+	ds_busHeaderRecs := BIPV2.Key_BH_Linking_Ids.kfetch(ds_in_unique_ids_only,BusinessIDFetchLevel,
 	                             ,,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit,TRUE);
 			
 	seed_results := project(ds_input_data,

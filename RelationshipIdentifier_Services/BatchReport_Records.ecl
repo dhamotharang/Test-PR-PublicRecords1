@@ -1,15 +1,15 @@
-import RelationshipIdentifier_Services,  doxie_crs, doxie_raw,
+﻿import RelationshipIdentifier_Services,  doxie_crs, doxie_raw,
 doxie, Batchshare, ut, iesp, bipv2, TopBusiness_Services, 
 Relationship, header, BIPV2_Best, Suppress, STD;
 EXPORT BatchReport_Records(  
 	dataset( RelationshipIdentifier_Services.Layouts.Batch.intermediateLayoutExt) ds_batchReportInRecs,
-	RelationshipIdentifier_Services.iParam.BatchParams inMod	
+	RelationshipIdentifier_Services.iParam.BatchParams inMod
 	) := FUNCTION
 	
+	DRM := InMod.DataRestrictionMask;
 	dppa_ok := ut.dppa_ok(inMod.dppaPurpose); 
   glb_ok := ut.glb_ok(InMod.glbPurpose);
-	DRM := InMod.DataRestrictionMask;
-		
+  
 	integer CurDate := STD.Date.today();
 	unsigned4 endDateTmp := (unsigned4) inMod.EndDate;	
 	unsigned4 endDate := if (endDateTmp = 0, (unsigned4) curDate, endDateTmp);

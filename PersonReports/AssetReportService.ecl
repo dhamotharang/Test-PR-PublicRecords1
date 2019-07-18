@@ -92,7 +92,7 @@ WSInput.MAC_PersonReports_AssetReportService();
   end;
 
   // stores XML options, which are not BpsReport "compatible", for subsequent reading
-  SetInputLocalOptions (PersonReports.input._assetreport options_esdl) := FUNCTION
+  SetInputLocalOptions (PersonReports.IParam._assetreport options_esdl) := FUNCTION
     #stored ('ReturnAlsoFound', options_esdl.include_alsofound);
     return output (dataset ([],{integer x}), named('__internal__'), extend);
   end;
@@ -109,11 +109,11 @@ WSInput.MAC_PersonReports_AssetReportService();
   options_in := GetInputOptions (global (first_row.Options));
 
   // set up default options -- those, which must be always chosen in ESDL mode
-  options_esdl := module (project (options_in, PersonReports.input._assetreport, opt))
+  options_esdl := module (project (options_in, PersonReports.IParam._assetreport, OPT))
   end;
 
   // store XML options for subsequent legacy-style reading
-  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.input._compoptions, opt)) end);
+  PersonReports.functions.SetInputSearchOptions (module (project (options_esdl, PersonReports.IParam._compoptions, OPT)) end);
   SetInputLocalOptions (options_esdl);
 
   // Read from stored and set parameters from SOAP (rather debug purpose). 
@@ -130,7 +130,7 @@ WSInput.MAC_PersonReports_AssetReportService();
 	gm := AutoStandardI.GlobalModule();
 
   // define search parameters; in "pure" ESDL mode this must be replaced with a module created from XML input
-  search_mod := module (project (gm, PersonReports.input._didsearch, opt))
+  search_mod := module (project (gm, PersonReports.IParam._didsearch, opt))
   end;
 
   // Now define all report parameters
