@@ -22,10 +22,11 @@ SOCIO_Attributes_Report_run         := Scoring_Project_Macros.SOCIO_Attributes_R
 
 
 SEQUENTIAL(SOCIO_Monitoring_v5_new,SOCIO_runbins,SOCIO_ks_Test,SOCIO_Attributes_Report_run)
+//SEQUENTIAL(SOCIO_Monitoring_v5_new)
 //SEQUENTIAL(SOCIO_ks_Test,SOCIO_Attributes_Report_run)
 //SEQUENTIAL(SOCIO_Monitoring_v5_new)
 //:WHEN(CRON('0 5 * * *')), //runs everday at 1am EST
 //:WHEN(CRON('0 7 * * *')), //runs everday at 3am EST
 //:WHEN(CRON('0 18 * * *')),//runs everday at 2pm EST
-SUCCESS(FileServices.SendEmail('Daniel.Harkins@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com','SOCIO_v5_Daily_Monitoring_Completed','The Completed workunit is:' + workunit)),
+:SUCCESS(FileServices.SendEmail('Daniel.Harkins@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com','SOCIO_v5_Daily_Monitoring_Completed','The Completed workunit is:' + workunit)),
 FAILURE(FileServices.SendEmail('Daniel.Harkins@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com','SOCIO_v5_Daily_Monitoring job failed','The Failed workunit is:'   + workunit + FailMessage));

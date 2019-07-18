@@ -25,7 +25,9 @@
      min_value := min(group, (integer8) %table_in2%.score );
                 
    end;
-                
+    
+
+			
    #UNIQUENAME(stat_data)
    %stat_data%   := table ( %table_in2%( (integer8) score > 0 )  , %stat_group% );
    

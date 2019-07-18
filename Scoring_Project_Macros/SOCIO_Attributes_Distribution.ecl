@@ -46,23 +46,23 @@ ip:='~';
 		
 		// rpt10:=Scoring_QA.NONFCRA_leadintegrity_xml_generic_attributes_v3(ip,n10,a1,b1);
 		
-		rpt11:=Scoring_QA_New_Bins.test_LIv4_attr_report_Batch(ip,a1,b1);
+//		rpt11:=Scoring_QA_New_Bins.test_LIv4_attr_report_Batch(ip,a1,b1);
 		
-		rpt12:=Scoring_QA_New_Bins.test_LIv4_attr_report(ip,a1,b1);
+	//	rpt12:=Scoring_QA_New_Bins.test_LIv4_attr_report(ip,a1,b1);
 		
 		// rpt13:=Scoring_QA.NONFCRA_Fraudpoint_batch_generic_attributes_v2(ip,a1,b1);
 		
 		// rpt14:=Scoring_QA.NONFCRA_Fraudpoint_xml_generic_attributes_v2(ip,a1,b1);
 		
-		rpt15:=Scoring_QA.NONFCRA_PIO2_batch_chase(ip,a1,b1);
+	//	rpt15:=Scoring_QA.NONFCRA_PIO2_batch_chase(ip,a1,b1);
 		
-		rpt16:=Scoring_QA.NONFCRA_PIO2_xml_chase(ip,a1,b1);
+		//rpt16:=Scoring_QA.NONFCRA_PIO2_xml_chase(ip,a1,b1);
 		
-		rpt17:=Scoring_QA.NONFCRA_BNK4_batch_chase(ip,a1,b1);
+		//rpt17:=Scoring_QA.NONFCRA_BNK4_batch_chase(ip,a1,b1);
 		
-		rpt18:=Scoring_QA.NONFCRA_BNK4_xml_chase(ip,a1,b1);
+	//	rpt18:=Scoring_QA.NONFCRA_BNK4_xml_chase(ip,a1,b1);
 
-    rpt19:=Scoring_QA.NONFCRA_CBBL_xml_chase(ip,a1,b1);
+    //rpt19:=Scoring_QA.NONFCRA_CBBL_xml_chase(ip,a1,b1);
 		
 		// rpt20:=Scoring_QA.NONFCRA_IT60_batch_paro(ip,a1,b1);
 		
@@ -76,13 +76,13 @@ ip:='~';
 		
 		// rpt25:=Scoring_QA.FCRA_RiskView_xml_Experian_attributes_v3(ip,a1,b1);
 				
-		rpt26:=Scoring_QA_New_Bins.Test_fpv201_attr_report(ip,a1,b1);
+	//	rpt26:=Scoring_QA_New_Bins.Test_fpv201_attr_report(ip,a1,b1);
 
 		// rpt27:=Scoring_QA.FCRA_RiskView_xml_generic_attributes_v5(ip,a1,b1);
 		
 		// rpt28:=Scoring_QA.FCRA_RiskView_batch_capitalone_attributes_v5(ip,a1,b1);
 		
-		rpt29:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,a1,b1);
+	//	rpt29:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,a1,b1);
 
 /*for biid2		rpt30:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,a1,b1); ////////change inside: stats, average & dids delete "1"
 */
@@ -97,7 +97,7 @@ ip:='~';
     // rpt4_1:=Scoring_QA.FCRA_RiskView_batch_generic_attributes_v4(ip,b1,a1);
 		
 		// rpt5_1:=Scoring_QA.NONFCRA_ITA_capitalone_batch_v3(ip,b1,a1);
-		rpt5_1:=Scoring_QA_New_Bins.test_ita_attribute_report(ip,b1,a1);
+	//	rpt5_1:=Scoring_QA_New_Bins.test_ita_attribute_report(ip,b1,a1);
 		
 		// rpt6_1:=Scoring_QA.FCRA_RiskView_batch_capitalone_attributes_v3(ip,b1,a1);
 		
@@ -109,23 +109,23 @@ ip:='~';
 		
 		// rpt10_1:=Scoring_QA.NONFCRA_leadintegrity_xml_generic_attributes_v3(ip,n10,b1,a1);
 		
-		rpt11_1:=Scoring_QA_New_Bins.test_LIv4_attr_report_Batch(ip,b1,a1);
+	//	rpt11_1:=Scoring_QA_New_Bins.test_LIv4_attr_report_Batch(ip,b1,a1);
 		
-		rpt12_1:=Scoring_QA_New_Bins.test_LIv4_attr_report(ip,b1,a1);
+		//rpt12_1:=Scoring_QA_New_Bins.test_LIv4_attr_report(ip,b1,a1);
 		
 		// rpt13_1:=Scoring_QA.NONFCRA_Fraudpoint_batch_generic_attributes_v2(ip,b1,a1);
 		
 		// rpt14_1:=Scoring_QA.NONFCRA_Fraudpoint_xml_generic_attributes_v2(ip,b1,a1);
 			
-		rpt15_1:=Scoring_QA.NONFCRA_PIO2_batch_chase(ip,b1,a1);
+		//rpt15_1:=Scoring_QA.NONFCRA_PIO2_batch_chase(ip,b1,a1);
 		
-		rpt16_1:=Scoring_QA.NONFCRA_PIO2_xml_chase(ip,b1,a1);
+	//	rpt16_1:=Scoring_QA.NONFCRA_PIO2_xml_chase(ip,b1,a1);
 		
-		rpt17_1:=Scoring_QA.NONFCRA_BNK4_batch_chase(ip,b1,a1);
+		//rpt17_1:=Scoring_QA.NONFCRA_BNK4_batch_chase(ip,b1,a1);
 		
-		rpt18_1:=Scoring_QA.NONFCRA_BNK4_xml_chase(ip,b1,a1);
+		//rpt18_1:=Scoring_QA.NONFCRA_BNK4_xml_chase(ip,b1,a1);
 
-    rpt19_1:=Scoring_QA.NONFCRA_CBBL_xml_chase(ip,b1,a1);
+  //  rpt19_1:=Scoring_QA.NONFCRA_CBBL_xml_chase(ip,b1,a1);
 		
 		// rpt20_1:=Scoring_QA.NONFCRA_IT60_batch_paro(ip,b1,a1);
 		
@@ -139,13 +139,13 @@ ip:='~';
 		
 		// rpt25_1:=Scoring_QA.FCRA_RiskView_xml_Experian_attributes_v3(ip,b1,a1);
 		
-		rpt26_1:=Scoring_QA_New_Bins.Test_fpv201_attr_report(ip,b1,a1);
+//		rpt26_1:=Scoring_QA_New_Bins.Test_fpv201_attr_report(ip,b1,a1);
 			
 		// rpt27_1:=Scoring_QA.FCRA_RiskView_xml_generic_attributes_v5(ip,b1,a1);
 		
 		// rpt28_1:=Scoring_QA.FCRA_RiskView_batch_capitalone_attributes_v5(ip,b1,a1);
 
-		rpt29_1:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,b1,a1);
+		//rpt29_1:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,b1,a1);
 
 /*for biid2				rpt30_1:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,b1,a1); ////////change inside: stats, average & dids delete "1"
 */
@@ -159,7 +159,7 @@ ip:='~';
 			decimal20_4 Count1;
       decimal20_4 file_count;
       decimal20_4 ds_count;
-     						
+     					 
     END;
 		
 		
@@ -488,7 +488,7 @@ ip:='~';
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ a1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + a1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + a1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt5,rpt11,rpt12,rpt15,rpt16,rpt17,rpt18,rpt19,rpt26,rpt29
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt5
 /*fpr biid2		,rpt30	*/					
 						) );
                 																		 
@@ -496,7 +496,7 @@ ip:='~';
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ b1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + b1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + b1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt5_1,rpt11_1,rpt12_1,rpt15_1,rpt16_1,rpt17_1,rpt18_1,rpt19_1,rpt26_1,rpt29_1
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt5_1
 /*fpr biid2		,rpt30_1	*/					
 						) );
 
