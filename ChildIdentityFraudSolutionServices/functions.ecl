@@ -6,9 +6,7 @@
 export Functions := module
 
 //These are the common batch parameters that may be used to call other batch services. 
-BatchParams := BatchShare.IParam.getBatchParams();				 										 
-// temporarily: until we move all batches to BatchShare.IParam.BatchParamsV2
-shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
+shared mod_batchV2 := BatchShare.IParam.getBatchParamsV2();
 //---------------------------------------------------------------------------------------------------------//	
 	export getBest(dataset(Layouts.BatchIn) BatchIn)  := function
 	
