@@ -24,7 +24,7 @@ EXPORT SearchRecords(American_Student_Services.IParam.searchParams aInputData, u
 			
 	//get payload data by dids
 	recs_by_dids := American_Student_Services.Raw.getPayloadByDIDS(all_dids, mod_access);
-	sup_recs_by_dids := American_Student_Services.Raw.getSupplementalStudentInfobyDIDs(all_dids);
+	sup_recs_by_dids := American_Student_Services.Raw.getSupplementalStudentInfobyDIDs(all_dids,mod_access);
 	
 	all_recs := map(ds_exclusion=1 => recs_by_ids + recs_by_dids, 			// DatasourceExclusion=1, no Alloy, keep ASL
 									ds_exclusion=2 => sup_recs_by_dids,					 				// DatasourceExclusion=2, no ASL, keep Alloy

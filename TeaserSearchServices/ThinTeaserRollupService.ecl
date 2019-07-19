@@ -175,7 +175,6 @@ export ThinTeaserRollupService := MACRO
 	// output(w_addition_data_counts, named('w_addition_data_counts'));
 	//output(dtcCounts, named('dtcCounts'));
 	output(results, named('Results'));
-	IF (exists(results), doxie.compliance.logSoldToTransaction(mod_access));
 	// Generate Royalty Billing information if this is ForceLogging event
 	Royalty.MAC_RoyaltyTeaser(getExtendedFakeAddress, royalties, lastID);
 	if(forceLogging, output(royalties, named('RoyaltySet')));

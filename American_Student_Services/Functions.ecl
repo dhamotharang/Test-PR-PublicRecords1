@@ -154,7 +154,6 @@ export Functions := MODULE
 	studentRecs_pre := if (isFCRA, sfile_FCRA, sfile_nonFCRA);
   dataEnvironment := if(isFCRA,data_services.data_env.iFCRA,data_services.data_env.iNonFCRA);
   studentRecs := Suppress.MAC_SuppressSource(studentRecs_pre, mod_access,did,,dataEnvironment);
-  doxie.compliance.logSoldToSources(studentRecs,mod_access,did);
 
 	studentRecsH := studentRecs((unsigned)date_first_seen < (unsigned)full_history_date);
 
@@ -216,7 +215,7 @@ export Functions := MODULE
 
 	 
 	 best1 := sort(ds_all,did,class_score, record);
-	 best2 := dedup(best1,did,keep(Constants.max_college));
+	 best2 := dedup(best1,did,keep(American_student_services.Constants.max_college));
 
 		highSchool_info xform_indicators(best2 L, dataset(highSchool_info) R) := TRANSFORM
 			
@@ -363,7 +362,7 @@ EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
  	
 	  college_indicators := GetCollegeIndicators(project(all_dids,doxie.layout_references),mod_access,false);
 	
-	  Layouts.full_output  xform_collegeIndicators(studentrecs R, American_Student_Services.layouts.college_data L) := Transform
+	  American_student_services.Layouts.full_output  xform_collegeIndicators(studentrecs R, American_Student_Services.layouts.college_data L) := Transform
 					self := L;
 					self := R;
 				END;
@@ -401,7 +400,7 @@ EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 		mod_access :=project(aInputData,doxie.IDataAccess); 
     all_dids := project(dids,transform(American_student_services.layouts.deepDids, self.isDeepDive := false, self := left));													
 	  recs_by_dids := American_student_services.Raw.getPayloadByDIDS(all_dids, mod_access);
-	  sup_recs_by_dids := American_student_services.Raw.getSupplementalStudentInfobyDIDs(all_dids);
+	  sup_recs_by_dids := American_student_services.Raw.getSupplementalStudentInfobyDIDs(all_dids,mod_access);
 	  all_recs := recs_by_dids + sup_recs_by_dids;
 		//ds_rollup := rollup_recs(all_recs);
 	  studentrecs := apply_restrictions(all_recs, aInputData);		
