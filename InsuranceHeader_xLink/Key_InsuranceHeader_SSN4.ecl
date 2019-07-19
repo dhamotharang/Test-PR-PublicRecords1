@@ -1,4 +1,4 @@
-﻿IMPORT SALT37,std;
+﻿IMPORT SALT37,std, vault, _control;
 EXPORT Key_InsuranceHeader_SSN4(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit= Config.SSN4_MAXBLOCKLIMIT) := MODULE/*HACK25*/
  
 //SSN4:FNAME:LNAME(NOFUZZY):+:DOB:SSN5:DERIVED_GENDER:SNAME
@@ -63,8 +63,12 @@ s := Specificities(File_InsuranceHeader).Specificities[1];
  
 DataForKey0 := DEDUP(SORT(TABLE(h((SSN4 NOT IN SET(s.nulls_SSN4,SSN4) AND SSN4 <> (TYPEOF(SSN4))''),(FNAME NOT IN SET(s.nulls_FNAME,FNAME) AND FNAME <> (TYPEOF(FNAME))''),(LNAME NOT IN SET(s.nulls_LNAME,LNAME) AND LNAME <> (TYPEOF(LNAME))'')),layout),WHOLE RECORD,LOCAL),WHOLE RECORD,LOCAL); // Project out the fields in match candidates required for this Name()
 SHARED DataForKey := DataForKey0;
- 
+
+#IF(_Control.Environment.onVault) 
+EXPORT key := vault.InsuranceHeader_xLink.Key_InsuranceHeader_SSN4().key;
+#ELSE
 EXPORT Key := INDEX(DataForKey,{DataForKey},{BOOLEAN IsIncremental := incremental},KeyName);
+#END;
  
 EXPORT BuildAll := BUILDINDEX(Key, OVERWRITE);
 // Compute shrinkage stats; the amount we could shrink the key for each extra credit removal

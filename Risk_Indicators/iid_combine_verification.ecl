@@ -1170,8 +1170,10 @@ END;
 with_advo_rolled := rollup(with_advo_temp, left.seq = right.seq, rollWithAdvo(left,right));
 //don't append ADVO data if it's restricted in the DRM	
 with_advo := if(isFCRA or datarestriction[iid_constants.posADVORestriction] = '1', flagrecs, project(with_advo_rolled, Risk_Indicators.Layout_Output));					
+
+did_deceased_key := if(isfcra, doxie.key_death_masterV2_ssa_DID_fcra, doxie.key_death_masterV2_ssa_DID);
 		
-Risk_Indicators.Layout_Output getDIDdeceased(with_advo le, 	doxie.key_death_masterV2_ssa_DID ri) := TRANSFORM
+Risk_Indicators.Layout_Output getDIDdeceased(with_advo le, 	did_deceased_key ri) := TRANSFORM
 																	SELF.DIDdeceased := ri.l_did<>0;
 																	SELF.DIDdeceasedDate := (UNSIGNED)ri.dod8;
 																	SELF.DIDdeceasedDOB := (UNSIGNED)ri.dob8;
@@ -1180,7 +1182,7 @@ Risk_Indicators.Layout_Output getDIDdeceased(with_advo le, 	doxie.key_death_mast
 																	SELF := le;
 END;
 	
-withDIDdeceased_nonfcra_roxie := JOIN(with_advo, doxie.key_death_masterV2_ssa_DID, 
+withDIDdeceased_nonfcra_roxie := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
@@ -1188,7 +1190,7 @@ withDIDdeceased_nonfcra_roxie := JOIN(with_advo, doxie.key_death_masterV2_ssa_DI
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 
 withDIDdeceased_nonfcra_thor := JOIN(distribute(with_advo, hash64(did)), 
-												distribute(pull(doxie.key_death_masterV2_ssa_DID), hash64(l_did)), 
+												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
@@ -1201,7 +1203,7 @@ withDIDdeceased_nonfcra_thor := JOIN(distribute(with_advo, hash64(did)),
 	withDIDdeceased_nonfcra := withDIDdeceased_nonfcra_roxie;
 #END
 
-withDIDdeceased_FCRA_roxie := JOIN(with_advo, doxie.key_death_masterV2_ssa_DID_fcra, 
+withDIDdeceased_FCRA_roxie := JOIN(with_advo, did_deceased_key, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
@@ -1209,7 +1211,7 @@ withDIDdeceased_FCRA_roxie := JOIN(with_advo, doxie.key_death_masterV2_ssa_DID_f
 												LEFT OUTER, ATMOST(riskwise.max_atmost), KEEP(100));
 
 withDIDdeceased_FCRA_thor := JOIN(distribute(with_advo, hash64(did)), 
-												distribute(pull(doxie.key_death_masterV2_ssa_DID_fcra), hash64(l_did)), 
+												distribute(pull(did_deceased_key), hash64(l_did)), 
 												LEFT.did<>0 AND (LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
 												(right.src <> MDR.sourceTools.src_Death_Restricted or Risk_Indicators.iid_constants.deathSSA_ok(DataPermission)), 
@@ -1231,7 +1233,9 @@ END;
 
 rolledDeceased := ROLLUP(SORT(withDIDdeceased, -DIDdeceasedfirst,-DIDdeceasedlast,-DIDdeceasedDate,-DIDdeceasedDOB), TRUE, rollDeceased(LEFT,RIGHT));	
 
-combinedFinal := if((BSOptions & iid_constants.BSOptions.IsInstantIDv1) > 0 or bsVersion >= 50, rolledDeceased, with_advo);	// only do the deceased by DID for CIID/FLEXID											
+combinedFinal := if((BSOptions & iid_constants.BSOptions.IsInstantIDv1) > 0 or bsVersion >= 50, 
+group(rolledDeceased, seq), 
+group(with_advo, seq));	// only do the deceased by DID for CIID/FLEXID											
 //combinedFinal := project(combinedFinal_tmp, Risk_Indicators.Layout_Output);
 
  //output(ssnrecs, named('ssnrecs'));

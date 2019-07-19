@@ -1,4 +1,4 @@
-import ut, doxie, risk_indicators, Data_Services;
+﻿import ut, doxie, risk_indicators, Data_Services, vault, _control;
 
 unsigned2 MAX_FARES := 100;
 
@@ -477,5 +477,15 @@ END;
 
 Prop := project(wDistressed, to_relat_prop(LEFT));
 
+
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export Key_Prop_Ownership_FCRA_V4 := vault.LN_PropertyV2.Key_Prop_Ownership_FCRA_V4;
+
+#ELSE
 export Key_Prop_Ownership_FCRA_V4 := index (Prop, {did}, {Prop},
 																	Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyv2::fcra::'+doxie.Version_SuperKey+'::did.ownership_v4');
+
+
+#END;
+

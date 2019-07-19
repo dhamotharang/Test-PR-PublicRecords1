@@ -1,4 +1,10 @@
-Import Data_Services, doxie, ln_property, ut, fcra;
+﻿Import Data_Services, doxie, ln_property, ut, fcra, vault, _control;
+
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export key_addr_fid(boolean IsFCRA = false) := vault.LN_PropertyV2.key_addr_fid(isFCRA);
+
+#ELSE
 
 export key_addr_fid(boolean IsFCRA = false) := function
 
@@ -18,4 +24,5 @@ return_file		:= INDEX(base_file,{prim_name,prim_range,zip,predir,postdir,suffix,
 return(return_file); 		
 
 END;																	
-													
+		
+#END;
