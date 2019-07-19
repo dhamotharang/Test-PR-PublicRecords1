@@ -1,4 +1,4 @@
-Import Data_Services, gong, mdr, doxie, ut, Data_Services; 
+﻿Import Data_Services, gong, mdr, doxie, ut, Data_Services, vault, _control; 
 
 hist_in := Gong.File_History_Full_Prepped_for_FCRA_Keys(trim(phone10)<>'');
 
@@ -38,9 +38,17 @@ end;
 
 seven_three_file := project(valid_history_full, split_ten(left));
 
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export key_fcra_history_phone := vault.Gong.Key_FCRA_History_Phone;
+#ELSE
 export key_fcra_history_phone := index(seven_three_file,
                                   {p7 := phone7,p3 := area_code,st,
 					    boolean current_flag := if(current_record_flag='Y',true,false),
 					    boolean business_flag := if(listing_type_bus='B',true,false)},
 					    {seven_three_file},
 					  Data_Services.Data_location.Prefix('Gong_History') + 'thor_data400::key::gong_history::fcra::'+doxie.Version_SuperKey + '::phone');
+
+#END;
+
+
