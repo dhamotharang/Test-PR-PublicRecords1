@@ -356,9 +356,10 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	//    since it contains more than just "ported" phones) 
 	// and keep the matching key records to be used for mutiple places below.
 	
-
-	ds_ppmd_key_recs := join(ds_cmp_res_out_dd, PhonesInfo.Key_Phones.Ported_Metadata,
-															keyed(left.phone = right.phone)
+	phoneInfo := DEDUP(SORT(PROJECT(ds_cmp_res_out_dd, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.Phone)), phone), phone);
+	ds_ported_metadata := Phones.GetPhoneMetaData.CombineRawPhoneData(phoneInfo);
+	ds_ppmd_key_recs := join(ds_cmp_res_out_dd, ds_ported_metadata,
+															(left.phone = right.phone)
 															and (~IsCNSMR or right.source not in D2C.Constants.PhonemetadataRestrictedSources),
 													 transform(right),
 													 inner, limit(doxie.phone_noreconn_constants.MaxPortedMatches,skip));							 
