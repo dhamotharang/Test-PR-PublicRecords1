@@ -4,12 +4,26 @@ import AutoStandardI, doxie, doxie_raw, FCRA, iesp, moxie_phonesplus_server, paw
 EXPORT search_functions := MODULE
 
   //This function must exist outside the transform in order for the logging macro to work.
-  get_prof_lic(doxie.layout_references indata, doxie.IDataAccess mod_access) := FUNCTION
+  shared get_prof_lic(doxie.layout_references indata, doxie.IDataAccess mod_access) := FUNCTION
     prof_lic_raw :=  CHOOSEN(Prof_LicenseV2.Key_Proflic_Did()(did = indata.did), 255);
     prof_lic_suppressed := Suppress.MAC_SuppressSource(prof_lic_raw, mod_access);
     Doxie.compliance.logSoldToSources(prof_lic_suppressed, mod_access);
     RETURN prof_lic_suppressed;
   END;
+
+  shared get_motorvehicles (unsigned6 did) := FUNCTION
+    vehicles_raw := LIMIT(VehicleV2.Key_Vehicle_DID(keyed(append_did=did)),UT.Limits.DEFAULT,SKIP);
+    vehicles_grp := GROUP (DEDUP (SORT (PROJECT (vehicles_raw, TRANSFORM(VehicleV2_services.Layout_Vehicle_Key,SELF := LEFT)),
+                                        Vehicle_Key, Iteration_Key, sequence_key),
+                                  vehicle_key,iteration_key,sequence_key),
+                           Vehicle_key, Iteration_key);
+
+		vehicle_mod := VehicleV2_Services.IParam.getSearchModule();
+    // if desired the limit might be increased to 20000 which will cover all dids except 118 records
+    vehicles_res := VehicleV2_Services.raw.get_vehicle_search(vehicle_mod, vehicles_grp);
+    RETURN vehicles_res(is_current);
+  END;  
+
 
   //Do not comment out this function or change to Doxie version
   //this version has special data filtering for sex offenders
@@ -21,16 +35,7 @@ EXPORT search_functions := MODULE
         END;
         did_rec := DATASET ([prep_did()]);
         RelativesAndAssociates := CHOOSEN(Relationship.proc_GetRelationship(did_rec,TRUE,TRUE,FALSE,FALSE,ut.limits.DEFAULT,,TRUE).result,500);
-        self.MotorVehicle := Count(VehicleV2_Services.Vehicle_raw.get_vehicle_search(
-                        group(
-                          dedup(
-                            sort( project(
-                                  LIMIT(VehicleV2.Key_Vehicle_DID(keyed(append_did=l.did)),UT.Limits.DEFAULT,SKIP), // if desired the limit might be increased to 20000 which will cover all dids except 118 records
-                                      TRANSFORM(VehicleV2_services.Layout_Vehicle_Key,SELF := LEFT)),
-                              Vehicle_Key, Iteration_Key, sequence_key),
-                            vehicle_key,iteration_key,sequence_key),
-                          Vehicle_key, Iteration_key)
-                        )(is_current));
+        self.MotorVehicle := Count(get_motorvehicles(l.did));
         self.DriversLicense := Count((Doxie_Raw.DLV2_Raw_Legacy(dataset([{l.did}],doxie.layout_references),'')((expiration_date >= (UNSIGNED)Std.Date.Today()-10000 and history = '') or expiration_date=0)));
         self.PossibleRelatives := count(RelativesAndAssociates(isRelative));
         self.PossibleAssociates := count(RelativesAndAssociates(~isRelative));

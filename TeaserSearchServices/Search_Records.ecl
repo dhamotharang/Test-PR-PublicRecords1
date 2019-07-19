@@ -1,5 +1,5 @@
 ﻿
-import AutoStandardI,iesp, ut, doxie,  Header, NID, Suppress, RiskWise, STD, Suppress;
+import AutoStandardI,iesp, ut, doxie,  Header, NID, Suppress, RiskWise, STD, TeaserSearchServices;
 
 export Search_Records := module
 	export params := interface(
@@ -33,12 +33,13 @@ export Search_Records := module
 		export WidenSearchResults := false; 
 		export string12 PreferredUniqueId := '';
 		export string32 applicationType	:= suppress.Constants.ApplicationTypes.Consumer;
+		export SortAgeRange  := false;
 	end;
 	
 	export val(params in_mod) := function
-    global_mod := AutoStandardI.GlobalModule();
-    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
-    
+	      global_mod := AutoStandardI.GlobalModule();
+		mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
+
 		lname_value := AutoStandardI.InterfaceTranslator.lname_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.lname_value.params));
 		lname_set_value := AutoStandardI.InterfaceTranslator.lname_set_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.lname_set_value.params));
 		fname_value := AutoStandardI.InterfaceTranslator.fname_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.fname_value.params));
@@ -50,8 +51,8 @@ export Search_Records := module
 		pname_value := AutoStandardI.InterfaceTranslator.pname_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.pname_value.params));
 		zipradius_value := AutoStandardI.InterfaceTranslator.zipradius_value.val(project(in_mod,AutoStandardI.InterfaceTranslator.zipradius_value.params));
 		dob_val := AutoStandardI.InterfaceTranslator.dob_val.val(project(in_mod,AutoStandardI.InterfaceTranslator.dob_val.params));
-		agelow_val := AutoStandardI.InterfaceTranslator.agelow_val.val(project(in_mod,AutoStandardI.InterfaceTranslator.agelow_val.params));
-		agehigh_val := AutoStandardI.InterfaceTranslator.agehigh_val.val(project(in_mod,AutoStandardI.InterfaceTranslator.agehigh_val.params));
+		TmpAgelow_val := AutoStandardI.InterfaceTranslator.agelow_val.val(project(in_mod,AutoStandardI.InterfaceTranslator.agelow_val.params));
+		TmpAgehigh_val := AutoStandardI.InterfaceTranslator.agehigh_val.val(project(in_mod,AutoStandardI.InterfaceTranslator.agehigh_val.params));
 		phonetics := AutoStandardI.InterfaceTranslator.phonetics.val(project(in_mod,AutoStandardI.InterfaceTranslator.phonetics.params));
 		nicknames := AutoStandardI.InterfaceTranslator.nicknames.val(project(in_mod,AutoStandardI.InterfaceTranslator.nicknames.params));
 		// added line
@@ -60,17 +61,46 @@ export Search_Records := module
 		in_yob := dob_val div 10000; 
 		in_mob := (dob_val div 100) % 100;
 		in_day := dob_val % 100;
-
-		//unsigned8 todays_date := (unsigned8)Stringlib.getDateYYYYMMDD();
+		
 		unsigned8 todays_date := (unsigned8) STD.Date.today();
-		unsigned8 yob_val_low := map(
+			
+			unsigned8 tmpYob_val_low := map(
 			dob_val != 0 => dob_val div 10000,
-			agehigh_val = 0 => 1900,
-			(todays_date div 10000 - agehigh_val - 1));
-		unsigned8 yob_val_high := map(
+			tmpAgehigh_val = 0 => 1900,   // line changed
+			(todays_date div 10000 - tmpAgehigh_val - 1));
+			
+			unsigned8 tmpYob_val_high :=   map(
 			dob_val != 0 => dob_val div 10000, 
-			agelow_val = 0 => todays_date div 10000,
-			(todays_date div 10000 - agelow_val));
+			tmpAgelow_val = 0 => todays_date div 10000,  // line changed
+			(todays_date div 10000 - tmpAgelow_val));
+			
+			unsigned8 ageRangeYob_val_low :=     map(
+			dob_val != 0 => dob_val div 10000, 
+			TmpAgehigh_val = 0 => 1900,  // line changed
+			(todays_date div 10000 - TmpAgehigh_val - 1));
+			 
+			unsigned8 ageRangeYob_val_high :=  map(
+			dob_val != 0 => dob_val div 10000, 
+			TmpAgelow_val = 0 => todays_date div 10000, // line changed
+			(todays_date div 10000 - TmpAgelow_val));
+			
+			agelow_val :=   if (in_mod.SortAgeRange and tmpAgelow_val > 0 and  TmpAgehigh_val > 0,
+			                             0,
+								TmpAgelow_val);								 
+			
+			agehigh_val :=  if (in_mod.SortAgeRange and TmpAgelow_val > 0 and  TmpAgehigh_val > 0,
+			                              0 ,
+								   TmpAgeHigh_val);
+			// reset values to what they were orginally 
+			yob_val_low := if (in_mod.SortAgeRange and agelow_val > 0 and  agehigh_val > 0,
+			                            ageRangeYob_val_low,
+                                             tmpYob_val_low);																	
+																
+			// reset values to what they were orginally 
+			yob_val_high :=   if  (in_mod.SortAgeRange and agelow_val > 0 and  agehigh_val > 0,
+			                            ageRangeYob_val_high,
+								 tmpYob_val_high);
+	    
 
 		// ensure no overflow
 		maxReturnCount := ut.Min2(iesp.ECL2ESP.Marshall.return_count, iesp.Constants.ThinRps.MaxCountResponseRecords);
@@ -96,7 +126,7 @@ export Search_Records := module
 				keyed(lname IN lname_set_value) and
 				keyed(in_mod.IncludeFullHistory or isCurrent) and 
 				keyed(st in state_set) and
-				keyed(fname_value = '' or Functions.PrefFirstMatch2(pfname, fname_value)) and
+				keyed(fname_value = '' or TeaserSearchServices.Functions.PrefFirstMatch2(pfname, fname_value)) and
 				keyed(fname_value = '' or fname = fname_value) and
 				keyed(widen or ((zip_val = '' or zip = zip_val) and 
 				(city_value = '' or zip in zips_within_city_strs))) and
@@ -109,7 +139,7 @@ export Search_Records := module
 			keyed(phonetics or lname IN lname_set_value) and
 			keyed(in_mod.IncludeFullHistory or isCurrent) and
 			keyed(st in state_set) and
-			keyed(fname_value = '' or Functions.PrefFirstMatch2(pfname, fname_value)) and
+			keyed(fname_value = '' or TeaserSearchServices.Functions.PrefFirstMatch2(pfname, fname_value)) and
 			keyed(nicknames or fname_value = '' or fname = fname_value) and
 			keyed(fuz_widen or ((zipradius_value = 0 or zip_value = [] or zip in zip_value_strs) and
 				(zipradius_value <> 0 or zip_val = '' or zip = zip_val) and
@@ -190,7 +220,7 @@ export Search_Records := module
 														(in_mob = 0 or (dob div 100) % 100 = in_mob) and
 														(in_day = 0 or (dob % 100) = in_day));
                             
-    recs_clean := Suppress.MAC_SuppressSource(recs_clean_pre,mod_access);                       
+		recs_clean := Suppress.MAC_SuppressSource(recs_clean_pre,mod_access);                      
 		RETURN recs_clean;										
 	end;		
 	
@@ -222,7 +252,7 @@ export Search_Records := module
 		Suppress.MAC_Suppress(recs_clean_tsrWithDID,recs_pull_tsr,in_mod.applicationType,Suppress.Constants.LinkTypes.DID,did);
 		
 		recs_grp := group(sort(recs_pull_tsr, did, -isCurrent), did);
-		recs := rollup(recs_grp, GROUP, Functions.combine(LEFT,ROWS(LEFT), in_mod.IncludeAllAddresses));
+		recs := rollup(recs_grp, GROUP, TeaserSearchServices.Functions.combine(LEFT,ROWS(LEFT), in_mod.IncludeAllAddresses));
 		
 		// filter out minors from the final result 
 		recs_nominors := Doxie.compliance.MAC_FilterOutMinors(recs,uniqueid,dob_val,False);
@@ -237,26 +267,68 @@ export Search_Records := module
 		recs_ref := project(recs_top, transform(doxie.layout_references, 
 								 													  self.did := (unsigned6) left.uniqueid));
 											 
-		recs_history := Functions.historicalNamesAddrs(recs_ref, in_mod.IncludeAllAddresses,mod_access);
+		recs_history := TeaserSearchServices.Functions.historicalNamesAddrs(recs_ref, in_mod.IncludeAllAddresses,mod_access);
 		recs_history_use := IF(in_mod.IncludeFullHistory, recs_history, recs_top);
 		
 		// add phone indicator if requested
-		recs_phone := Functions.AddPhoneIndicator(recs_history_use, in_mod.IncludePhones);
+		recs_phone := TeaserSearchServices.Functions.AddPhoneIndicator(recs_history_use, in_mod.IncludePhones);
 		recs_phone_use := if(in_mod.IncludePhoneIndicator or in_mod.IncludePhones,recs_phone, recs_history_use);
 
 		// add relative names if requested
-		with_rels := Functions.AddRelativeNames(recs_phone_use,in_mod.applicationType);
+		with_rels := TeaserSearchServices.Functions.AddRelativeNames(recs_phone_use,in_mod.applicationType);
 		Final_res := IF(in_mod.IncludeRelativeNames, with_rels, recs_phone_use);
   
+	     // now set a sequence # into sort for use later.
+	     filtered_final_res := project(final_res, transform({recordof(LEFT); integer age; integer seq;},
+			                                          dateofBirthDS := project(LEFT.DOBs, transform(iesp.thinrolluppersonsearch.t_ThinRpsDOB, SELF := LEFT));
+										      age :=  dateOfBirthDS[1].age;										
+											self.age := age;
+											self.seq := if ( age >= TmpAgelow_val and age <= TmpAgehigh_val and age <> 0, counter,0);			
+											                                // ^^^^ use orginal values here ^^^^^^^^^^^^^^
+											self := LEFT));       											
+					 
+		// now sort on the existence of seq value being > 0 which pushes the seq =0 below the other recs.
+		tmpFinal_sortedAgeRange :=  SORT(filtered_final_res, if (seq <> 0, 0, 1), 		                                   
+												if((integer)UniqueId = (integer)in_mod.PreferredUniqueId, 0, 1), penalt, -Addresses[1].DateLastSeen.Year,
+						-Addresses[1].DateLastSeen.Month,-Addresses[1].DateLastSeen.Day, -totalRecords, record);	                          
+             // now take out the SEQ/AGE fields to return to originalLayout						
+              final_res_ageRange := project(tmpFinal_sortedAgeRange, transform(TeaserSearchServices.Layouts.records_plus,
+					                                    self := LEFT));						               //   ^^^^^ this is layout returned from historicalNamesAddrs function call
+																							         // which is the 'combine' transform
+			                                              
 		//return standard output when no PreferredUniqueId entered, otherwise, return data with the PreferredUniqueId matching what the user entered a lexid
-		final_sorted := SORT(final_res, 		                    
+		tmpFinal_sorted := SORT(final_res, 		                    
 												  if((integer)UniqueId = (integer)in_mod.PreferredUniqueId, 0, 1), penalt, -Addresses[1].DateLastSeen.Year,
 						-Addresses[1].DateLastSeen.Month,-Addresses[1].DateLastSeen.Day, -totalRecords, record);		
-		
- 		
-		final_out := PROJECT(final_sorted, Layouts.records);
+						
+		// and finally use the new sort order if the boolean and the 2 age range filters are set to true are > 0 respectvely.			
+          final_sorted := if (in_mod.SortAgeRange and tmpAgelow_val > 0 and  tmpAgeHigh_val > 0, 
+					                   final_res_ageRange,
+								tmpFinal_sorted);
+		 		
+		final_out := PROJECT(final_sorted, TeaserSearchServices.Layouts.records);
 	  //output(recs_clean_tsr, named('recs_clean_tsr'));
 		//output(did_value, named('did_value'));
+		// output(cleaned_recs, named('cleaned_recs'));
+		// output(cleaned_recs_retried, named('cleaned_recs_retried'));
+		//output(todays_date, named('todays_date'));
+		// output(tmpYob_val_low, named('tmpYob_val_low'));
+		// output(tmpYob_val_high, named('tmpYob_val_high'));
+		// output(ageRangeYob_val_low, named('ageRangeYob_val_low'));
+		// output(ageRangeYob_val_high, named('ageRangeYob_val_high'));
+		
+		// output(cleaned_recs, named('cleaned_recs'));
+		// output(cleaned_recs_retried, named('cleaned_recs_retried'));
+		
+		// output(recs_nominors, named('recs_nominors'));
+		// output(recs_agechecked, named('recs_agechecked'));
+		// output(yob_val_low, named('yob_val_low'));
+		// output(yob_val_high, named('yob_val_high'));
+		
+		// output(final_res, named('final_res'));
+		// output(filtered_final_res, named('filtered_final_res'));
+
+		// output(tmpfinal_sorted, named('tmpFinal_sorted'));
 		return final_out;
 	end;
 end;

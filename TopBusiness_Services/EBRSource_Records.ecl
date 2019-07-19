@@ -1,16 +1,16 @@
 ﻿// ================================================================================
 // ======   RETURNS EBR DATA FOR A GIVEN FILE_NUMBER IN ESP-COMPLIANT WAY    ======
 // ================================================================================
-IMPORT EBR, EBR_Services, BIPV2, iesp, std, ut; 
+IMPORT EBR, EBR_Services, BIPV2, iesp, TopBusiness_Services, std, ut; 
 
 EXPORT EBRSource_Records(
-  dataset(Layouts.rec_input_ids_wSrc) in_docids,
-  SourceService_Layouts.OptionsLayout inoptions, 
+  dataset(TopBusiness_Services.Layouts.rec_input_ids_wSrc) in_docids,
+  TopBusiness_Services.SourceService_Layouts.OptionsLayout inoptions, 
 	boolean IsFCRA = false) 
  := MODULE
 	
 	SHARED ebr_layout_wLinkIds := RECORD
-		Layouts.rec_input_ids_wSrc;
+		TopBusiness_Services.Layouts.rec_input_ids_wSrc;
 		ebr_services.Layout_EBR_Source;
 	END;
 
@@ -21,7 +21,7 @@ EXPORT EBRSource_Records(
 	
 	// *** Key fetch to get ebr filing numbers from linkids
   ds_ebrkeys := PROJECT(EBR.Key_0010_Header_linkids.kFetch(in_docs_linkonly,inoptions.fetch_level),
-																TRANSFORM(Layouts.rec_input_ids_wSrc,
+																TRANSFORM(TopBusiness_Services.Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.file_number,
 																					SELF := LEFT,
 																					SELF := []));
@@ -515,7 +515,7 @@ EXPORT EBRSource_Records(
 	
   // main iesp.bizcredit report record transform
   SHARED iesp.bizcredit.t_BizCreditReportRecord toOut (ebr_layout_wLinkIds L) := transform
-		IDmacros.mac_IespTransferLinkids()  //sets all 7 ids and also includes IdValue
+		TopBusiness_Services.IDmacros.mac_IespTransferLinkids()  //sets all 7 ids and also includes IdValue
 	  self.FileNumber                         := L.file_number;
 	  self.BusinessHeader.BusinessId          := (string) L.curr_header_rec.bdid; //old bdid, is this still needed in the output???
 	  self.BusinessHeader.DateFirstSeen       := iesp.ECL2ESP.toDate ((integer4) L.curr_header_rec.date_first_seen);
@@ -603,7 +603,7 @@ EXPORT EBRSource_Records(
 		self := []; 
   end;
 	
-	SHARED SourceCount_Layouts.SourceDetailsLayout xform_Details(ebr_layout_wLinkIds L) := TRANSFORM
+	SHARED TopBusiness_Services.SourceCount_Layouts.SourceDetailsLayout xform_Details(ebr_layout_wLinkIds L) := TRANSFORM
 			self.src			:= 'EBR';
 			self.src_desc := 'Experian Business Data';
 			self.hasName 	:= L.curr_header_rec.company_name<>'';

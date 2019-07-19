@@ -6,8 +6,10 @@ EXPORT  vehicle_records (
   boolean IsFCRA = false
 ) := MODULE
 
-  shared vehi := VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report (dids, in_params.ssn_mask) 
+  report_mod := VehicleV2_Services.IParam.getReportModule();
+  shared vehi := VehicleV2_Services.raw.get_vehicle_crs_report (report_mod, dids, in_params.ssn_mask) 
   (~in_params.Use_CurrentlyOwnedVehicles or is_current); 
+
 
   // iesp.motorvehicle.t_MVReportRecord
   export vehicles := if (~IsFCRA, iesp.transform_vehicles (vehi));

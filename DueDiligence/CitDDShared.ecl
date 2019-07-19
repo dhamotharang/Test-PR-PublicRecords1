@@ -7,6 +7,10 @@ EXPORT CitDDShared := MODULE
   EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
   EXPORT VALIDATION_INVALID_DD_ATTRIBUTE_REQUEST_WITH_CITIZENSHIP := 'Business attributes are not valid with a citizenship request';
   EXPORT VALIDATION_INVALID_PRODUCT_REQUEST_TYPE := 'Product Request Type is required or invalid. Product Request Type = AttributesOnly, CitizenshipOnly or AttributesAndCitizenship';
+  EXPORT VALIDATION_INVALID_DD_VERSION := 'Please enter a valid attributes version';
+  EXPORT VALIDATION_INVALID_MODEL_NAME := 'Model is currently not supported.';
+  EXPORT VALIDATION_INVALID_DD_CITIZENSHIP_COMBO := 'Attributes version is invalid and model is not supported.';
+  EXPORT VALIDATION_INVALID_REQUEST := 'Invalid request. Could not determine which products were requested';
 
   EXPORT VALID_PRODUCT_DUE_DILIGENCE_ONLY := 'attributesonly';
   EXPORT VALID_PRODUCT_CITIZENSHIP_ONLY := 'citizenshiponly';

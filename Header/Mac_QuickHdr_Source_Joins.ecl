@@ -104,7 +104,6 @@ FUNCTIONMACRO
     #ELSEIF(srcAllVeh IN pSources)
       SELF.veh_child    := doxie_raw.veh_legacy_raw(PROJECT(ri.veh_child, vehiclev2_services.layout_vehicle_key),mod_access.date_threshold,mod_access.dppa,mod_access.glb,IncludeNonRegulatedVehicleSources);
       SELF.veh_v2_child := doxie_raw.VehV2_raw( doxie_raw.ds_EmptyDIDs,
-                                                doxie_raw.ds_EmptyBDIDs,
                                                 PROJECT(ri.veh_child,vehiclev2_services.layout_vehicle_key));
     
     // Transunion credit header
