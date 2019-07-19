@@ -291,7 +291,7 @@ EXPORT Transforms := MODULE
 		SELF.CustomerPersonId := L.customer_person_id;
 		SELF.CustomerEventId := L.customer_event_id;
 		SELF.ReportedDateTime :=  iesp.ECL2ESP.toTimeStamp(reported_date_time);
-		SELF.ReportedBy := L.reported_by;
+		SELF.ReportedBy := IF(L.reported_by = '', 'File', L.reported_by);
 		SELF.EventDate := iesp.ECL2ESP.toDatestring8(L.event_date);
 		SELF.EventEndDate := iesp.ECL2ESP.toDatestring8(L.event_end_date);
 		SELF.EventLocation := L.event_location;
@@ -346,6 +346,16 @@ EXPORT Transforms := MODULE
 		SELF.DeviceRiskCode := L.device_risk_code;
 		SELF.GeoLocation.Latitude := L.clean_address.geo_lat;
 		SELF.GeoLocation.Longitude := L.clean_address.geo_long;
+		SELF.FEIN := L.fein;
+		SELF.InvestigatorId := L.investigator_id;
+		SELF.InvestigationReferralCaseId := L.investigation_referral_case_id;
+		SELF.ReferralReason := L.referral_reason;
+		SELF.Disposition := L.disposition;
+		SELF.BusinessName := L.clean_business_name;
+		SELF.BusinessRiskCode := L.business_risk_code;
+		SELF.ReportingAgencyState := L.classification_source.customer_state;
+		SELF.ClearedFraud := ''; //Not in payload yet, will be updated once the data team makes the change to include this field
+		SELF.ReasonClearedCode := ''; //Not in payload yet, will be updated once the data team makes the change to include this field
 	END;
 
 	EXPORT FraudGovPlatform_Services.Layouts.entity_information_recs xform_elements_Information(FraudGovPlatform_Services.Layouts.fragment_w_value_recs L,

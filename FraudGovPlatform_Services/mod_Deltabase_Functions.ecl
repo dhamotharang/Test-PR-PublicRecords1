@@ -95,6 +95,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				//stores the geo lat long information in one field with "," as the separator
 				SELF.GeoLocation.Latitude := regexfind('(.*),(.*)$',L.GPS_coordinates,1);
 				SELF.GeoLocation.Longitude := regexfind('(.*),(.*)$',L.GPS_coordinates,2);
+				SELF.ReportingAgencyState := L.classification_source.customer_state;
 				SELF := [];
 			END;
 
@@ -165,6 +166,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.classification_Entity.entity_type := L.event_entity_1;
 				SELF.classification_Activity.Confidence_that_activity_was_deceitful_id := (INTEGER)L.deceitful_confidence;
 				SELF.classification_source.Industry_segment := L.program_name;
+				SELF.classification_source.customer_state := L.customer_state;
 
 				SELF := [];
 			END;
