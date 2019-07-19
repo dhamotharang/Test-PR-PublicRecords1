@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, AutoStandardI, BIPV2, census_data, iesp, Prof_License_Mari, STD, ut;
+﻿IMPORT AutoKeyI, AutoStandardI, BIPV2, census_data, doxie, iesp, Prof_License_Mari, STD, Suppress, ut;
 
 // ==============================================================================================================	
 //  MARI MIDEX "LICENSE" DATA (Prof_License_Mari) related functions
@@ -7,9 +7,10 @@
 EXPORT Raw_ProfessionalLicenses := 
   MODULE
   
-        //===========================================
+        //========================================================
         // Functions
-        //===========================================
+        //   NOTE:  CCPA - suppression done at payload retrieval
+        //========================================================
         EXPORT fn_get_ProfLicMari_AutokeyData ():=
           FUNCTION
        
@@ -101,15 +102,16 @@ EXPORT Raw_ProfessionalLicenses :=
                 // searchType in the function call. 
                 // Use: MIDEX_Services.Constants.INDIV_SEARCH OR MIDEX_Services.Constants.COMP_SEARCH
 								EXPORT by_mari_num( DATASET (MIDEX_Services.layouts.rec_profLicMari_payloadKeyField) in_ids,
+                                    doxie.IDataAccess mod_access, 
                                     UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None,
-                                    STRING in_ssn_mask_type = '', STRING32 in_app_type = '', STRING1 searchType ) := FUNCTION
+                                    STRING1 searchType ) := FUNCTION
 										
 										prof_recsRaw := JOIN(in_ids,Prof_License_Mari.key_mari_payload,
 																				KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
                                         // Bug# 182946 - Filter out records which have been superceded							   
                                         RIGHT.result_cd_1 NOT IN [Midex_Services.Constants.RECORD_STATUS.SupercededMariRidUpdatingSource,
                                                                   Midex_Services.Constants.RECORD_STATUS.SupercededMariRidNonUpdatingSource]												
-													AND
+													              AND
 																				CASE(searchType,
                                              MIDEX_Services.Constants.COMP_SEARCH => 
                                                RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.COMPANY OR
@@ -169,14 +171,14 @@ EXPORT Raw_ProfessionalLicenses :=
 									// number and keep the most recent license.								
 									
 									// sort  by -last_upd_date around dedup/sort added here to bubble the most recent to top before returning results
-									profs_recsRaw_dedup := SORT(DEDUP(SORT(prof_recsRaw,mari_rid,Licenses[1].lic_number,-last_upd_date),mari_rid,Licenses[1].lic_number), -last_upd_date);
+									profs_recsRaw_dedup_all := SORT(DEDUP(SORT(prof_recsRaw,mari_rid,Licenses[1].lic_number,-last_upd_date),mari_rid,Licenses[1].lic_number), -last_upd_date);
 									
-									census_data.MAC_Fips2County_Keyed(profs_recsRaw_dedup,company_st,company_county_fips,company_county,prof_recs);
+									profs_recsRaw_dedup := Suppress.MAC_SuppressSource(profs_recsRaw_dedup_all, mod_access); 
+                  census_data.MAC_Fips2County_Keyed(profs_recsRaw_dedup,company_st,company_county_fips,company_county,prof_recs);
                                         
 									// get nmls info if it exists
 									prof_nmls_recs := MIDEX_Services.Functions.add_nmls_info(prof_recs);
 									prof_recsHash := PROJECT(prof_nmls_recs,MIDEX_Services.alert_calcs.calcLicenseReptHashes(LEFT,alertVersion));
-									
 									RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,prof_recsHash,prof_nmls_recs));
 								END;
 					 END;
@@ -185,10 +187,10 @@ EXPORT Raw_ProfessionalLicenses :=
            EXPORT SEARCH_VIEW := MODULE
 													
 								EXPORT by_mari_num( DATASET (MIDEX_Services.Layouts.rec_profLicMari_payloadKeyField) in_ids,
-                                    UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None,
-                                    STRING in_ssn_mask_type = '', STRING32 in_app_type = '') := FUNCTION
+                                    doxie.IDataAccess mod_access, 
+                                    UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None) := FUNCTION
 										
-										prof_recsRaw := JOIN(in_ids,Prof_License_Mari.key_mari_payload,
+										prof_recsAll := JOIN(in_ids,Prof_License_Mari.key_mari_payload,
                                           KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
                                           // Bug# 182946 - Filter out records which have been superceded
                                           RIGHT.result_cd_1 NOT IN [Midex_Services.Constants.RECORD_STATUS.SupercededMariRidUpdatingSource,
@@ -237,6 +239,7 @@ EXPORT Raw_ProfessionalLicenses :=
                                                     SELF := []),
                                           LIMIT(iesp.Constants.MIDEX.MAX_COUNT_SEARCH_RESPONSE_RECORDS,SKIP));
                   
+                  prof_recsRaw := Suppress.MAC_SuppressSource(prof_recsAll, mod_access); 
                   census_data.MAC_Fips2County_Keyed(prof_recsRaw,st,fips_county,county,prof_recs);
                                        
 									prof_recsHash := PROJECT(prof_recs,MIDEX_Services.alert_calcs.calcLicenseSrchHashes(LEFT));
