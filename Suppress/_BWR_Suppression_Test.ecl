@@ -30,13 +30,13 @@ output(d_clean_flagged, named('suppress_flagged'));
 
 l_suppressed := record
 	d_in;
-	boolean suppress_flag := false;
+	boolean is_suppressed := false;
 end;
 
 d_in_wsup := project(d_in, transform(l_suppressed, self := left;));
 
 // or call macro to flag suppressed (2)
-d_clean_flagged_wsupp := Suppress.MAC_FlagSuppressedSource(d_in_wsup, mod_access, did, global_sid, suppress_flag);
+d_clean_flagged_wsupp := Suppress.MAC_FlagSuppressedSource(d_in_wsup, mod_access, did, global_sid);
 output(d_clean_flagged_wsupp, named('d_clean_flagged_wsupp'));
 
 // -----------------------------------------------------------------
