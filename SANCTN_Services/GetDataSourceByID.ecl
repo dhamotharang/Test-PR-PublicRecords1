@@ -71,7 +71,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
 		limit(Constants.PARTY_PER_INCIDENT,skip)
 	);   
 
-  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access, did, global_sid, is_suppressed); 
+  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access, did, global_sid); 
 
   // ---------------------------------------------------------------------
   // First roll each party's texts

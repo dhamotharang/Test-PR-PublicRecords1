@@ -38,6 +38,7 @@ EXPORT translateExpression := MODULE
                                   //Level 2 order
                                   ORDINANCES_AND_INFRACTIONS, COURT_CHARGES, LIVESTOCK_DOMESTIC_ANIMALS, HUNT_FISH_GAME_OFFENSES,
                                   ALCOHOL_RELATED, TRAFFIC_OFFENSES, ZONING, DUI, CHILD_SUPPORT,
+                                  // ALCOHOL_RELATED, ZONING, DUI, CHILD_SUPPORT,
                                   ALIEN_AND_IMMIGRATION, DISORDERLY_CONDUCT, TRESPASSING, SHOPLIFTING, 
 
                                   //Level 3 order
@@ -72,6 +73,7 @@ EXPORT translateExpression := MODULE
                                   STRUCTURING, MONEY_TRANSMITTER, CRIMINAL_PROCEEDS, CORRUPTION_OR_BRIBERY, POLITICAL_CORRUPTION, ELECTION_CORRUPTION, 
                                   OBSTRUCTION_OF_JUSTICE, ORGANIZED_CRIME, EXTORTION_AND_BLACKMAIL, RACKETEERING, SECURITIES_AND_COMMODITIES, 
                                   ANTITRUST_VIOLATIONS, TAX_EVASION, MONEY_LAUNDERING, CRIMINAL_SYNDICALISM, TREASON_ESPIONAGE, TERRORISM);
+                                  // ANTITRUST_VIOLATIONS, TAX_EVASION, MONEY_LAUNDERING, CRIMINAL_SYNDICALISM, TREASON_ESPIONAGE, TERRORISM, TRAFFIC_OFFENSES);
     
 
                                   
@@ -213,20 +215,49 @@ EXPORT translateExpression := MODULE
     SHARED expressionDCT := DICTIONARY(expressionDS, {id => expressionDS}); 
     EXPORT dctByPriority := DICTIONARY(expressionDS, {priorityOrder => expressionDS}); 
   
+
     
+    SHARED additionalChecksToExpression(UNSIGNED expressionID, UNSIGNED expressionPriority, STRING1 offenseLevel, STRING1 trafficFlag, UNSIGNED offenseCategory, BOOLEAN foundUsingExpression) := FUNCTION
+        
+        isTrafficking := foundUsingExpression AND offenseLevel <> DueDiligence.Constants.TRAFFIC AND trafficFlag <> DueDiligence.Constants.YES;
+        
+        //check based on the expression we are currently evaluating
+        additionalCheck := CASE(expressionID,
+                                    //check that trafficking is not traffic related
+                                    OffenseID.HUMAN_TRAFFICKING => IF(isTrafficking, expressionPriority, OffensePriority.UNCATEGORIZED),
+                                    OffenseID.DRUG_TRAFFICKING => IF(isTrafficking, expressionPriority, OffensePriority.UNCATEGORIZED),
+                                    OffenseID.ARMS_TRAFFICKING => IF(isTrafficking, expressionPriority, OffensePriority.UNCATEGORIZED),
+                                    OffenseID.OTHER_TRAFFICKING => IF(isTrafficking, expressionPriority, OffensePriority.UNCATEGORIZED),
+                                    
+                                    //check for traffic offense
+                                    OffenseID.TRAFFIC => IF(foundUsingExpression OR
+                                                            offenseLevel = DueDiligence.Constants.TRAFFIC OR
+                                                            trafficFlag = DueDiligence.Constants.YES OR
+                                                            offenseCategory = 1073741824, expressionPriority, OffensePriority.UNCATEGORIZED),
+                                                            
+                                    expressionPriority);
+                                    
+        RETURN additionalCheck;
+    END;
     
     //Common routine to determine if the text contains the definition of the expression
-		SHARED getOffensePriorityByLevel(UNSIGNED4 enumReferenceByID, STRING textToSearch) := FUNCTION
+		SHARED getOffensePriorityByLevel(UNSIGNED4 enumReferenceByID, STRING textToSearch, STRING1 offenseLevel, STRING1 trafficFlag, UNSIGNED offenseCategory) := FUNCTION
+    
+    
+        additionalChecksRequired := [OffenseID.HUMAN_TRAFFICKING, OffenseID.DRUG_TRAFFICKING, OffenseID.ARMS_TRAFFICKING, OffenseID.OTHER_TRAFFICKING, OffenseID.TRAFFIC];
+        
+        notProvidedSpecified := ['NOT SPECIFIED', 'NOT PROVIDED BY SOURCE'];
     
         trimTextToSearch := TRIM(textToSearch, LEFT, RIGHT);
-        
         expressionDetails := expressionDCT[enumReferenceByID];
+        expressionFound := REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE);
         
-        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => IF(expressionDetails.level = LEVEL_2, OffensePriority.NO_OFFENSE_PROVIDED, OffensePriority.UNCATEGORIZED),
-                                 STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => IF(expressionDetails.level = LEVEL_2, OffensePriority.NO_OFFENSE_PROVIDED, OffensePriority.UNCATEGORIZED),
+        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => IF(expressionDetails.level = LEVEL_2 AND expressionDetails.id = OffenseID.NO_OFFENSE_PROVIDED, OffensePriority.NO_OFFENSE_PROVIDED, OffensePriority.UNCATEGORIZED),
+                                 STD.str.ToUpperCase(trimTextToSearch) IN notProvidedSpecified => IF(expressionDetails.level = LEVEL_2 AND expressionDetails.id = OffenseID.NO_OFFENSE_PROVIDED, OffensePriority.NO_OFFENSE_PROVIDED, OffensePriority.UNCATEGORIZED),
                                  expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => OffensePriority.UNCATEGORIZED,
-                                 IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.priorityOrder, OffensePriority.UNCATEGORIZED));                        
-                               
+                                 expressionDetails.id IN additionalChecksRequired => additionalChecksToExpression(expressionDetails.id, expressionDetails.priorityOrder, offenseLevel, trafficFlag, offenseCategory, expressionFound),
+                                 IF(expressionFound, expressionDetails.priorityOrder, OffensePriority.UNCATEGORIZED));      
+                                                               
        
         RETURN expressionResults;
 		END;
@@ -237,12 +268,12 @@ EXPORT translateExpression := MODULE
         
         allInLevel := expressionDS(level = inLevel);
         
-        determineMaxLevel := PROJECT(allInLevel, TRANSFORM({RECORDOF(LEFT), UNSIGNED levelResult},
-																														resultedWeight := getOffensePriorityByLevel(LEFT.id, charge);
-																														SELF.levelResult := resultedWeight;
-																														SELF := LEFT;));
+        determineMaxPriorityForLevel := PROJECT(allInLevel, TRANSFORM({RECORDOF(LEFT) -expressionToUse, UNSIGNED levelResult},
+                                                                      SELF.levelResult := getOffensePriorityByLevel(LEFT.id, charge, offenseScore, trafficFlag, offenseCategory);
+                                                                      SELF := LEFT;));
         
-        getMaxLevelByLevel := DEDUP(SORT(determineMaxLevel, -levelResult, -priorityOrder), level);
+        
+        getMaxLevelByLevel := DEDUP(SORT(determineMaxPriorityForLevel, -levelResult, -priorityOrder), level);
 
         RETURN getMaxLevelByLevel[1].levelResult;
     END;
