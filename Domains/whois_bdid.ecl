@@ -3,7 +3,7 @@
 Layout_Whois_Temp := record
 		string46 company_name;
 		string34 source_group;
-		Layout_Whois_Base_BIP - [global_sid,record_sid];  //Added field exclusion for CCPA-357
+		Layout_Whois_Base_BIP - [global_sid,record_sid]; //Added for CCPA-357
 		string2 source;
 end;
 

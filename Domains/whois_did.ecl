@@ -5,7 +5,7 @@ record
 
 	unsigned6 uid := 0;
 	unsigned1 did_score := 0;
-	Layout_Whois_Base_BIP - [global_sid,record_sid]; //Added field exclusion here for CCPA-357
+	Layout_Whois_Base_BIP; 
 	string5  clean_admin_name_title				;
 	string20 clean_admin_name_fname				;
 	string20 clean_admin_name_mname				;
@@ -88,8 +88,8 @@ self.lname 				:= if(l.name_type = 'R', l.lname 			, l.clean_admin_name_lname 		
 self.name_suffix 	:= if(l.name_type = 'R', l.name_suffix	, l.clean_admin_name_name_suffix);
 self.name_score 	:= if(l.name_type = 'R', l.name_score 	, l.clean_admin_name_name_score );
 //Added for CCPA-357
-self.global_sid   := 0;
-self.record_sid   := 0;
+self.global_sid   := l.global_sid;
+self.record_sid   := l.record_sid;
                                                                                 
 self := l;
 
