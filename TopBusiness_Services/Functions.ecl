@@ -1,4 +1,4 @@
-﻿import AutoStandardI, MDR, BIPV2;
+﻿import AutoStandardI, BIPV2, MDR, TopBusiness_Services;
 
 export Functions := module
 
@@ -179,8 +179,7 @@ ENDMACRO;
        //v--- per the product requirements document, "... data is in hundreds(?) of thousands",
 			 //     but on 09/21/12 Debra Winkleman in Risk Data Receiving contacted the data  
 			 //     supplier and their contact person says it is in thousands.
-			 // RQ-14844 - Sales is now in 100s;	
-	     annual_sales_amount:= temp_sales2 * 100;	
+			 annual_sales_amount:= temp_sales2 * TopBusiness_Services.Constants.EbrAnnSalesMultiplier;	
 	
 		return annual_sales_amount;
 	END;
