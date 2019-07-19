@@ -152,18 +152,6 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.OrigClientSequenceNumber := (unsigned)fn_right((string)l.PrepRecSeq,(string)r.PrepRecSeq);
 			self.ClientNCFFileDate := (unsigned)fn_right((string)l.NCF_FileDate,(string)r.NCF_FileDate);
 			self.ClientProcessDate := (unsigned)fn_right((string)l.ProcessDate,(string)r.ProcessDate);
-			/*
-			self.SearchCleanSSN := fn_left(l.Clean_ssn,r.Clean_ssn);
-			self.ClientCleanSSN := fn_right(l.Clean_ssn,r.Clean_ssn);
-			self.SearchCleanDOB := fn_left((string)l.Clean_Dob,(string)r.Clean_Dob);
-			self.ClientCleanDOB := fn_right((string)l.Clean_Dob,(string)r.Clean_Dob);
-			//
-			self.SearchFName := fn_left(l.fname,r.fname);
-			self.ClientFName := fn_right(l.fname,r.fname);
-			self.SearchPrefName := fn_left(l.prefname,r.prefname);
-			self.ClientPrefName := fn_right(l.prefname,r.prefname);
-			self.SearchNameSuffix := fn_left(l.name_suffix,r.name_suffix);
-			self.ClientNameSuffix := fn_right(l.name_suffix,r.name_suffix);
-			*/
 			self:=l;
+			self := []
 	end;
