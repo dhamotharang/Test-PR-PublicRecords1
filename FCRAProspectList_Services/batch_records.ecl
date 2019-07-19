@@ -1,4 +1,5 @@
-import address,FCRA_LIST,fcra_opt_out,FCRAProspectList_Services, Suppress;
+import address, FCRA_LIST, fcra_opt_out, FCRAProspectList_Services, Suppress;
+
 EXPORT batch_records ( DATASET(FCRAProspectList_Services.Layouts.Input_Processed) ds_BatchIn,
                                FCRAProspectList_Services.iParam.BatchParams inMod
 							       ) := FUNCTION 
@@ -37,11 +38,11 @@ EXPORT batch_records ( DATASET(FCRAProspectList_Services.Layouts.Input_Processed
 																	
     // remove recs that have 'SSN' values that are in the suppression list	(over and above FCRA opt out)												 													
     Suppress.MAC_Suppress(ds_resultsRawOptOut, 
-			  ds_resultsRaw_SSNpulled,inMod.applicationType,Suppress.Constants.LinkTypes.SSN,ssn);
+			  ds_resultsRaw_SSNpulled,inMod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
 		
 		// remove recs that have the particular lexid (did) values that are in the suppression list (over and above FCRA opt out)
 		Suppress.MAC_Suppress(ds_resultsRaw_SSNpulled,
-		    ds_resultsRawDIDPulled,inMod.applicationType,Suppress.Constants.LinkTypes.DID,LexID);
+		    ds_resultsRawDIDPulled,inMod.application_type,Suppress.Constants.LinkTypes.DID,LexID);
 		
 		// Mask SSN values if so desired from the results.
 	  Suppress.MAC_Mask(ds_resultsRawDIDPulled,

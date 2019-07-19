@@ -19,7 +19,7 @@ EXPORT IParams := MODULE
 			EXPORT BOOLEAN   Display_HRI        := FALSE : STORED('Display_HRI');
 			EXPORT UNSIGNED3 DIDScoreThreshold  := SSNBest_Services.Constants.DIDScoreThreshold : STORED('DIDScoreThreshold'); //internal
 			EXPORT BOOLEAN   IsGlbRequired      := FALSE : STORED('IsGlbRequired');
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.IncludeMinors) IncludeMinors:= FALSE : STORED('IncludeMinors'); 
+			EXPORT BOOLEAN IncludeMinors:= FALSE : STORED('IncludeMinors'); 
 		END;
 		RETURN in_mod;
 	END;
