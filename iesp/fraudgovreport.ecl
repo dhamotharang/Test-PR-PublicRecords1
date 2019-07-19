@@ -189,6 +189,16 @@ export t_FraudGovTimelineDetails := record
 	string30 IPAddressFraudCode {xpath('IPAddressFraudCode')};
 	string30 DeviceRiskCode {xpath('DeviceRiskCode')};
 	iesp.share.t_GeoLocation GeoLocation {xpath('GeoLocation')};
+	string10 FEIN {xpath('FEIN')};
+	string10 InvestigatorId {xpath('InvestigatorId')};
+	string25 InvestigationReferralCaseId {xpath('InvestigationReferralCaseId')};
+	string50 ReferralReason {xpath('ReferralReason')};
+	string25 Disposition {xpath('Disposition')};
+	string100 BusinessName {xpath('BusinessName')};
+	string60 BusinessRiskCode {xpath('BusinessRiskCode')};
+	string2 ReportingAgencyState {xpath('ReportingAgencyState')};
+	string3 ClearedFraud {xpath('ClearedFraud')};
+	string250 ReasonClearedCode {xpath('ReasonClearedCode')};
 end;
 		
 export t_FraudGovDeceased := record
