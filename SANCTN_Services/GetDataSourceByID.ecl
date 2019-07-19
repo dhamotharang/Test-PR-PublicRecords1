@@ -63,8 +63,6 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
   END;
   inc_compact := ROLLUP (inc_grp, GROUP, RollIncidentInfo (Left, ROWS (Left)));
 
-
-
 	// retrieve parties: each party may have multiple entries here, depending on the number of parts in party info
 	party_subset_all := join(
 		inc_compact, SANCTN.Key_SANCTN_party,
@@ -73,14 +71,14 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
 		limit(Constants.PARTY_PER_INCIDENT,skip)
 	);   
 
-  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access); 
+  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access, did, global_sid, is_suppressed); 
 
   // ---------------------------------------------------------------------
   // First roll each party's texts
   party_srt := SORT (party_subset, batch_number, incident_number, party_number);
   party_grp := GROUP (party_srt, batch_number, incident_number, party_number);
 
-  Sanctn_Services.layouts.rec_party RollPartyInfo (SANCTN_Services.layouts.layoutSanctnCleanPlusIsSupp L, DATASET (SANCTN_Services.layouts.layoutSanctnCleanPlusIsSupp) all_recs) := transform
+  Sanctn_Services.layouts.rec_party RollPartyInfo (SANCTN_Services.layouts.layoutSanctnClean L, DATASET (SANCTN_Services.layouts.layoutSanctnClean) all_recs) := transform
     SELF.name := L;
 
     // set state
@@ -147,7 +145,7 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
   // add party info
   OUT_REC AppendParty (Sanctn_Services.layouts.Incident L, rec_parties_rolled R) := TRANSFORM
     // NB: sort uses "uncleaned" party name, since it has both people and companies
-    SELF.is_suppressed := IF(R.is_suppressed, SKIP, L.is_suppressed);
+    SELF.incident_number := IF(R.is_suppressed, SKIP, L.incident_number);
     SELF.parties := SORT (R.parties, party_name);
     SELF.penalt := R.penalt;
     SELF := L;
