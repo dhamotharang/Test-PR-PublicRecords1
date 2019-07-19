@@ -1,4 +1,4 @@
-﻿import gong, riskwise, address, ut, Gateway;
+﻿import Gateway, risk_indicators;
 
 export ADL_Based_Modeling_Function(DATASET (risk_indicators.layout_input) indata,
 																		DATASET (Gateway.Layouts.Config) gateways,
@@ -27,7 +27,11 @@ export ADL_Based_Modeling_Function(DATASET (risk_indicators.layout_input) indata
 																		string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 																		string100 IntendedPurpose='',
-																		unsigned8 BSOptions = 0
+																		unsigned8 BSOptions = 0,
+                                                                        unsigned1 LexIdSourceOptout = 1,
+                                                                        string TransactionID = '',
+                                                                        string BatchUID = '',
+                                                                        unsigned6 GlobalCompanyId = 0
 																		) := function										
 										
 

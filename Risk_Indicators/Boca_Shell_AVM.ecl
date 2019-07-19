@@ -1,7 +1,9 @@
-﻿import _Control, avm_V2, riskwise, ut;
+﻿import _Control, avm_V2, riskwise, ut, risk_indicators, doxie;
+// doxie, Suppress; for later use in CCPA, will be cleaned up when CCPA changes are made
+
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_AVM(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := FUNCTION
+export Boca_Shell_AVM(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access) := FUNCTION
 
 Layout_AVM := RECORD
 	unsigned4 seq;
