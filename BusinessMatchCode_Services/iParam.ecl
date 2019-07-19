@@ -5,7 +5,7 @@ MODULE
 
   // JIRA RR-10621 Exclude Experian records (default = FALSE)
   EXPORT BatchParams :=
-  INTERFACE(BatchShare.IParam.BatchParams)
+  INTERFACE(BatchShare.IParam.BatchParamsV2)
 		
       EXPORT  BOOLEAN ExcludeExperian;
 		  EXPORT  UNSIGNED2 InMatchCode_score;
@@ -32,7 +32,7 @@ MODULE
   // Function to initalize the params
 	EXPORT getBatchParams() :=
 	FUNCTION
-			BaseBatchParams := BatchShare.IParam.getBatchParams();
+			BaseBatchParams := BatchShare.IParam.getBatchParamsV2();
 			
 			inMod := MODULE(PROJECT(BaseBatchParams,BatchParams,OPT))				
 			   EXPORT UNSIGNED8 MaxResultsPerAcct := BusinessMatchCode_services.Constants.Defaults.MaxResultsPerAcctno : STORED('Max_Results_Per_Acct');

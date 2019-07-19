@@ -67,7 +67,7 @@ EXPORT IParam := MODULE
 	END;
 	
 	EXPORT BatchParams :=
-			INTERFACE(BatchShare.IParam.BatchParams);
+			INTERFACE(BatchShare.IParam.BatchParamsV2);
 			EXPORT STRING1 BIPFetchLevel;
 			EXPORT UNSIGNED8 MaxSearchResultsPerAcct;
 			EXPORT BOOLEAN IncludeBusHeader;
@@ -75,7 +75,7 @@ EXPORT IParam := MODULE
 
   // Function to initalize the batch params
 	EXPORT getBatchParams() :=	FUNCTION
-			BaseBatchParams := BatchShare.IParam.getBatchParams();
+			BaseBatchParams := BatchShare.IParam.getBatchParamsV2();
 			
 			inMod := MODULE(PROJECT(BaseBatchParams,BatchParams,OPT))
 				EXPORT UNSIGNED8 MaxSearchResultsPerAcct := BusinessCredit_Services.Constants.MaxSearchResultsPerAcct : STORED('Max_Search_Results_Per_Acct');
