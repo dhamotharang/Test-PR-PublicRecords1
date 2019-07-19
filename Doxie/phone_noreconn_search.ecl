@@ -54,6 +54,7 @@
    <part name="SuppressPortedTestDate" type="xsd:string"/>
    <part name="excludeLandlines" type="xsd:boolean"/>
    <part name="SuppressBlankNameAddress" type="xsd:boolean"/>
+   <part name="GetSSNBest" type="xsd:boolean" default="false"/>
 </message>
 */
 
@@ -67,7 +68,7 @@ if the permission is set. Try Qsent data if nothing found above.
 <message name="phone_noreconn_search" wuTimeout="300000">
 */
 
-IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, PhonesInfo, Royalty, STD, Suppress, ut, WSInput, D2C;
+IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, PhonesInfo, Royalty, STD, Suppress, ut, WSInput, D2C,SSNBest_Services;
 
 EXPORT phone_noreconn_search := MACRO 
 	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -81,7 +82,8 @@ EXPORT phone_noreconn_search := MACRO
 	boolean excludeBusiness := false : stored('ExcludeBusiness');
 	boolean excludeLandlines := false : stored('ExcludeLandlines');	
 	boolean SuppressNewPorting := excludeLandlines : stored('SuppressNewPorting');
- boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
+    boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
+	boolean GetSSNBest := false : stored('GetSSNBest');
 
 	doxie.MAC_Header_Field_Declare();
 	globalmod := AutoStandardI.GlobalModule();
@@ -341,8 +343,24 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 
 	resultsFilterRes := if(excludeResidence,resultsToMask(listing_type_bus <> '' or listing_type_res = ''), resultsToMask);
 	resultsFilterBus := if(excludeBusiness, resultsFilterRes(listing_type_res <> '' or listing_type_bus = ''), resultsFilterRes);
+	
+	// Append Gov SSN if requested
+	ssnBestParams := PROJECT (mod_access, SSNBest_Services.IParams.BatchParams, OPT);
+		
+	RecprepGovSSN := record
+		recordof(resultsFilterBus) - did ;
+		unsigned8 did ;
+	end;
+	
+	prepGovSSN := project(resultsFilterBus,Transform(RecprepGovSSN,self.did := (unsigned)left.did, self:=left));
+	
+	_withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(prepGovSSN, ssnBestParams, ssn, did, false); 
+	
+	withGovBestSSN  := PROJECT(_withGovBestSSN,TRANSFORM(recordof(resultsFilterBus),self.did := (string)left.did, self:=left));
 
-	Suppress.MAC_Mask(resultsFilterBus, cmp_res_out, ssn, blank, true, false,,,,SSN_mask_value);		
+	resultsGovSSN := if(GetSSNBest,withGovBestSSN,resultsFilterBus);
+
+	Suppress.MAC_Mask(resultsGovSSN, cmp_res_out, ssn, blank, true, false,,,,SSN_mask_value);		
 
 	// **************************************************************************************
 	// Start of June 2016 corrections to the 04/19/16 "RTP Synchrony Port Update" changes.
@@ -594,4 +612,4 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 		 if(use_tg or use_qt or call_PVS or use_LR, parallel(disp_cnt, out_royal, out_rslt), parallel(disp_cnt, out_rslt)),out_rslt);
 
 ENDMACRO;
-// doxie.phone_noreconn_search();
+// doxie.phone_noreconn_search(); 

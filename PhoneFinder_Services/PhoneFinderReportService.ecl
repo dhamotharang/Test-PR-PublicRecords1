@@ -46,6 +46,7 @@
   <part name="UseDeltabase" type="xsd:boolean" default="false"/>
   <part name="IncludePhoneMetadata" type="xsd:boolean" default="true"/>
   <part name="SubjectMetadataOnly" type="xsd:boolean" default="false"/>
+  <part name="SuppressBlankNameAddress" type="xsd:boolean" default="false"/>
   <separator />
 	<part name="Gateways" type="tns:XmlDataSet" cols="80" rows="15" />
 	<part name="PhoneFinderSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -171,8 +172,12 @@ iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
       			SELF.InputEcho := pfSearchBy;
  END;
       		
- results := DATASET([tFormat2IespResponse()]);
-   
+ dPhoneFinder := DATASET([tFormat2IespResponse()]);
+ 
+ // return blank  dataset when identities child dataset is blank
+ results := if(~reportMod.SuppressBlankNameAddress or (reportMod.SuppressBlankNameAddress and exists(dPhoneFinder.records.identities)),
+                       dPhoneFinder);
+											     
  royalties	:= modRecords.dRoyalties;
    	
  Zumigo_Log := modRecords.Zumigo_History_Recs; 

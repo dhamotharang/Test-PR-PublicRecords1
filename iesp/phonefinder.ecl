@@ -88,6 +88,7 @@ export t_PhoneFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean IsRDPRequest {xpath('IsRDPRequest')};//hidden[internal]
 	string PrimarySearchCriteria {xpath('PrimarySearchCriteria')}; //values['Phone','PII','']
 	t_PhoneFinderSwitchModeOptions RDPSwitchModeOptions {xpath('RDPSwitchModeOptions')};//hidden[internal]
+  boolean SuppressBlankNameAddress {xpath('SuppressBlankNameAddress')};//hidden[internal]
 end;
 		
 export t_SpoofCommon := record
@@ -198,6 +199,7 @@ export t_PhoneIdentityInfo := record
 	string PrimaryAddressType {xpath('PrimaryAddressType')};
 	string1 RecordType {xpath('RecordType')};
 	boolean PhoneOwnershipIndicator {xpath('PhoneOwnershipIndicator')};
+	string SSN {xpath('SSN')};//hidden[internal]
 end;
 		
 export t_PhoneFinderHistory := record
