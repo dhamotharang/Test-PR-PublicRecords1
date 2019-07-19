@@ -2,32 +2,6 @@
 
 EXPORT Common := MODULE
 
-  EXPORT ValidateInput(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING15 modelName):= FUNCTION
-
-      BOOLEAN ValidGLB := DueDiligence.CitDDShared.isValidGLBA(glbPurpose);
-      BOOLEAN ValidDPPA := DueDiligence.CitDDShared.isValidDPPA(dppaPurpose);
-
-      BOOLEAN validModel := STD.Str.ToUpperCase(modelName) IN Citizenship.Constants.VALID_MODEL_NAMES;
-
-      validatedRequests := PROJECT(input, TRANSFORM(DueDiligence.Layouts.Input,
-                                                    //Validate the request
-                                                    STRING OhNoMessage := MAP(validModel = FALSE => Citizenship.Constants.VALIDATION_INVALID_MODEL_NAME,
-                                                                              ValidGLB = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_GLB,
-                                                                              ValidDPPA = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_DPPA,
-                                                                              DueDiligence.Constants.EMPTY);
-
-
-
-
-                                                    SELF.validRequest := OhNoMessage = DueDiligence.Constants.EMPTY;
-                                                    SELF.errorMessage := OhNoMessage;
-
-                                                    SELF := LEFT;));
-                                                    
-      RETURN validatedRequests;
-  END;
-  
-
   EXPORT createNVPair(STRING name, INTEGER val) := FUNCTION
       
       iesp.share.t_NameValuePair createPair(STRING n, INTEGER v) := TRANSFORM

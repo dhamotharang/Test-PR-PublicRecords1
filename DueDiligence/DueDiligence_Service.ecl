@@ -2,38 +2,6 @@
 
 EXPORT DueDiligence_Service := MACRO
 
-      SHARED getComboValidRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbaPurpose, UNSIGNED1 dppaPurpose, STRING15 modelName, STRING ddAttrsRequested) := FUNCTION
-          
-          validateCit := DueDiligence.Citizenship.Common.ValidateInput(input, glbaPurpose, dppaPurpose, modelName);
-          validateDD := DueDiligence.CommonQuery.ValidateRequest(input, glbaPurpose, dppaPurpose, DueDiligence.Constants.ATTRIBUTES);
-          
-          citizenshipError := TRIM(validateCit[1].errorMessage);
-          dueDiligenceError := TRIM(validateDD[1].errorMessage);
-          
-          newErrorMessage := MAP(ddAttrsRequested IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS => DueDiligence.CitDDShared.VALIDATION_INVALID_DD_ATTRIBUTE_REQUEST_WITH_CITIZENSHIP,
-                                 citizenshipError <> DueDiligence.Constants.EMPTY AND 
-                                    dueDiligenceError <> DueDiligence.Constants.EMPTY => citizenshipError + ' \n ' + dueDiligenceError,
-                                 citizenshipError + ' ' + dueDiligenceError);
-                                    
-          trimErrorMessage := TRIM(newErrorMessage, LEFT, RIGHT);                          
-          
-          //both products will be in the same input layout, so only need to return 1 back to pass back to each product and update error message of 1 request
-          validatedRequest := PROJECT(input, TRANSFORM(RECORDOF(LEFT),
-                                                        SELF.errorMessage := trimErrorMessage;
-                                                        SELF.validRequest := trimErrorMessage = DueDiligence.Constants.EMPTY;
-                                                        SELF := LEFT;));
-          
-          RETURN validatedRequest;          
-      END;
-
-
-
-
-
-
-
-
-
       requestName := 'DueDiligenceAttributesRequest';
       requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesRequest;
 
@@ -55,11 +23,7 @@ EXPORT DueDiligence_Service := MACRO
       reqProduct := DueDiligence.CitDDShared.getProductEnum(selectedProduct);
                                 
                                 
-      validatedRequest := CASE(reqProduct,
-                                DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH => getComboValidRequest(input, glba, dppa, modelName, requestedVersion),
-                                DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY => DueDiligence.Citizenship.Common.ValidateInput(input, glba, dppa, modelName),
-                                DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.ATTRIBUTES));
-                              
+      validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.ATTRIBUTES, modelName);                              
                               
       DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
 
