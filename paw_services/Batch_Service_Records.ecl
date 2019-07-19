@@ -178,9 +178,9 @@ EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) d
 		to_suppress := all_recs + too_many_w_error_code;
 				
 		//Suppress by SSN and DID.
-		base_params := BatchShare.IParam.getBatchParams();
-		Suppress.MAC_Suppress(to_suppress, ssn_suppressed, base_params.applicationType, Suppress.Constants.LinkTypes.SSN, ssn);
-		Suppress.MAC_Suppress(ssn_suppressed, did_suppressed, base_params.applicationType, Suppress.Constants.LinkTypes.DID, did);
+		base_params := BatchShare.IParam.getBatchParamsV2();
+		Suppress.MAC_Suppress(to_suppress, ssn_suppressed, base_params.application_type, Suppress.Constants.LinkTypes.SSN, ssn);
+		Suppress.MAC_Suppress(ssn_suppressed, did_suppressed, base_params.application_type, Suppress.Constants.LinkTypes.DID, did);
 			
   all_recsTmp := DEDUP(GROUP(did_suppressed, acctno, did), true, keep(5));
 		all_recs_rolled := ROLLUP(all_recsTmp, GROUP, paw_services.Functions.Batch_view.format_batch_out(LEFT,rows(LEFT)));
@@ -228,4 +228,5 @@ EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) d
 		//
 		RETURN results;
 		
-	END;	
+	END;
+  
