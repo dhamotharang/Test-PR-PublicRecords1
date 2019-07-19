@@ -447,6 +447,8 @@ Key_SearchResponse :=
 join(requestIn, dx_demowatchlistscreening.key_matches_entity_name, KEYED(STD.Uni.ToUpperCase(left.Input.EntityRecords[1].Name.Full) = right.matches_entity_name)  and right.matches_file_name IN SET(left.Config.DataFiles, Name),
 WatchlistTransform(left,right));
 
+//Testing response name for functionability
+
 output( Key_SearchResponse, named('Key_SearchResponse'));
 
 ENDMACRO;
