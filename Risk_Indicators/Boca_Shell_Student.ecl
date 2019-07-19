@@ -1,7 +1,7 @@
 ﻿
-import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators;
+import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing) := FUNCTION
+export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing, doxie.IDataAccess mod_access) := FUNCTION
 		
 	Layout_AS_Plus := RECORD
 		Riskwise.Layouts.Layout_American_Student student;
@@ -10,8 +10,13 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		unsigned3 historydate;
 		string1 src; // used to identify source ('A'=alloy vs 'C' or 'H' = american student) so we can tiebreak on rollup
 	end;
+  
+  	Layout_AS_Plus_CCPA := RECORD
+        unsigned4 global_sid; // CCPA changes
+		Layout_AS_Plus;
+	end;
 	 
-	Layout_AS_Plus student(ids_only le, american_student_list.key_DID ri) := TRANSFORM
+	Layout_AS_Plus_CCPA student(ids_only le, american_student_list.key_DID ri) := TRANSFORM
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
@@ -20,6 +25,7 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		self.student := ri;
 		self.student.college_tier := if(bsversion>=50, ri.tier2, ri.tier);
 		self.src := ri.historical_flag; // ASL records will be indicated by a historical (H) or current (C) indicator
+        self.global_sid := ri.global_sid;
 	end;
 	student_file := join(ids_only, american_student_list.key_DID, 
 		left.did!=0 
@@ -30,7 +36,7 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
 	);
 
-	Layout_AS_Plus roll( Layout_AS_Plus le, Layout_AS_Plus ri ) := TRANSFORM
+	Layout_AS_Plus_CCPA roll( Layout_AS_Plus_CCPA le, Layout_AS_Plus_CCPA ri ) := TRANSFORM
 		self := map(
 
 			// Use any other record over File Type 'M' 
@@ -60,7 +66,7 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 
 
 	// alloy
-	Layout_AS_Plus alloy_main(ids_only le, AlloyMedia_student_list.Key_DID ri) := TRANSFORM
+	Layout_AS_Plus_CCPA alloy_main(ids_only le, AlloyMedia_student_list.Key_DID ri) := TRANSFORM
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
@@ -151,6 +157,8 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 			alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
 
 
-	student_all := group(rollup(sort(ungroup(student_file + alloy_file),seq,record /* use record to avoid indeterminate code */), roll(left,right), seq),seq);
+	student_all_suppressed := Suppress.Mac_SuppressSource(group(rollup(sort(ungroup(student_file + alloy_file),seq,record /* use record to avoid indeterminate code */), roll(left,right), seq),seq),mod_access);
+    student_all := PROJECT(student_all_suppressed, TRANSFORM(Layout_AS_Plus,
+                                                  SELF := LEFT));
 	return student_all;
 end;

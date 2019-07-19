@@ -18,10 +18,19 @@ EXPORT getAllBocaShellData (
 	boolean isDirectToConsumerPurpose = false,
 	boolean IncludeLnJ = false,
  integer2 ReportingPeriod = 84,
-  boolean adl_based_shell= false
- 
+  boolean adl_based_shell= false,
+  unsigned1 LexIdSourceOptout = 1,
+  string TransactionID = '',
+  string BatchUID = '',
+  unsigned6 GlobalCompanyId = 0 
   ) := FUNCTION
-	
+  
+   mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
+
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
 	// if the record is default_history_date or same month as today's date, run production_realtime_mode
 	production_realtime_mode := iid[1].historydate=risk_indicators.iid_constants.default_history_date
@@ -497,10 +506,10 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Watercraft ===============
 	watercraft := IF (IsFCRA,
 											Risk_Indicators.Boca_Shell_Watercraft_FCRA (ids_only(~isrelat), isPreScreen, bsversion), 
-											Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/));
+											Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
 	watercraft_hist := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
-													Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/));
+													Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
 	watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
   
 	watercraft_relat := watercraft_rolled(isrelat);
@@ -510,26 +519,34 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Professional Licenses ===============
 	proflic := IF (IsFCRA,
 											Risk_Indicators.Boca_Shell_Proflic_FCRA (ids_only(~isrelat), bsversion, isPrescreen, isDirectToConsumerPurpose),
-											Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion));
+											Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion, 
+                                                                              LexIdSourceOptout,
+                                                                              TransactionID,
+                                                                              BatchUID,
+                                                                              GlobalCompanyId));
 	proflic_hist := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Proflic_Hist_FCRA (ids_only(~isrelat), bsversion, isPrescreen, isDirectToConsumerPurpose),
-													Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion));
+												    Risk_Indicators.Boca_Shell_Proflic      (ids_only(~isrelat), bsversion, 
+                                                                              LexIdSourceOptout,
+                                                                              TransactionID,
+                                                                              BatchUID,
+                                                                              GlobalCompanyId));
 	proflic_rolled := if (production_realtime_mode, proflic, proflic_hist);
 	
 
 	// =============== Student File ===============
 	student_rolled := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Student_FCRA (ids_only(~isrelat), bsversion),
-													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares));  
+													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares, mod_access));  
 													// filter_out_fares is our option that tells us we are running this for leadIntegrity.
 													// Use that same option here as our marketing flag within student function
 
 
 // =============== Aircraft ===============
 	aircraft := IF (IsFCRA,		Risk_Indicators.Boca_Shell_aircraft_FCRA (ids_only(~isrelat)),
-						                Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/));
+						                Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/, mod_access));
 	aircraft_hist := IF (IsFCRA, Risk_Indicators.Boca_Shell_aircraft_Hist_FCRA (ids_only(~isrelat)),
-					              Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/) );
+					              Risk_Indicators.Boca_Shell_aircraft      (ids_only/*(~isrelat)*/, mod_access));
 	aircraft_rolled := if (production_realtime_mode, aircraft, aircraft_hist);
 
   aircraft_rolled_indv := aircraft_rolled(~isrelat);
@@ -539,25 +556,25 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== AVM ===============
 	avm_rolled := IF (IsFCRA,
 												Risk_Indicators.Boca_Shell_AVM_FCRA (ids_wide(~isrelat)),
-												Risk_Indicators.Boca_Shell_AVM      (ids_wide(~isrelat)));
+												Risk_Indicators.Boca_Shell_AVM      (ids_wide(~isrelat), mod_access));
 								
 								
 	//=========== Gong ============
 	gong_rolled := IF (IsFCRA,
 												Risk_Indicators.Boca_Shell_Gong_FCRA (ids_wide(~isrelat)),
-												Risk_Indicators.Boca_Shell_Gong			 (ids_wide(~isrelat)));
+												Risk_Indicators.Boca_Shell_Gong			 (ids_wide(~isrelat), mod_access));
 												
 												
 	// ============ Infutor =============
 	infutor_rolled := IF(IsFCRA,
 													Risk_Indicators.Boca_Shell_Infutor_FCRA (ids_wide(~isrelat)),
-													Risk_Indicators.Boca_Shell_Infutor      (ids_wide(~isrelat)));
+													Risk_Indicators.Boca_Shell_Infutor      (ids_wide(~isrelat), mod_access));
 													
 													
 	// =========== Impulse ==============
 	impulse_rolled := IF(IsFCRA,
 													Risk_Indicators.Boca_Shell_Impulse_FCRA (ids_wide(~isrelat), bsversion, isDirectToConsumerPurpose),
-													Risk_indicators.Boca_Shell_Impulse      (ids_wide(~isrelat), bsversion));
+													Risk_indicators.Boca_Shell_Impulse      (ids_wide(~isrelat), bsversion, mod_access));
 																						
 
 
@@ -1397,7 +1414,7 @@ shell3_bsdata := if(bsversion >= 2, shell3_bsdata_newIncomeLevelCode, shell3_bsd
 
 // new sections of data for shell 4.0 content
 advo_rolled := risk_indicators.boca_shell_advo(ids_wide(~isrelat), isFCRA, datarestriction, isPreScreen, bsversion);  // change to neutral layout
-employment_rolled := risk_indicators.boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion);	
+employment_rolled := risk_indicators.boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion, mod_access);	
 
 // need to populate the phones_on_file from the gong search.  inquiries search expects that to be populated
 inquiries_input_roxie := join(ids_wide(~isrelat), gong_added_back, left.seq=right.seq,
@@ -1647,7 +1664,7 @@ bsdata41 := if(isFCRA, rhode_island_patch, with_DNM_PreScreen);
 
 // nonfcra 5.0 data only
 insurance_phones_rolled := Risk_Indicators.Boca_Shell_Insurance_Phones(ids_wide(~isrelat));
-bureau_phones_rolled := Risk_Indicators.Boca_Shell_Bureau_Phones(ids_wide(~isrelat));
+bureau_phones_rolled := Risk_Indicators.Boca_Shell_Bureau_Phones(ids_wide(~isrelat), mod_access);
 
 with_insurance_phones := join(bsdata41, insurance_phones_rolled, left.seq=right.seq,
 	transform(risk_indicators.Layout_Boca_Shell, 
@@ -1665,7 +1682,7 @@ with_bureau_phone_verification := join(with_insurance_phones, bureau_phones_roll
 // everything in shell 5.0 up to this point is non-fcra only.  if isFCRA, start with bsdata41
 shell50_branch1 := if(isFCRA, group(bsdata41, seq), group(with_bureau_phone_verification, seq));
 
-with_college_attendance := risk_indicators.boca_shell_college_attendance(shell50_branch1, isFCRA);		
+with_college_attendance := risk_indicators.boca_shell_college_attendance(shell50_branch1, isFCRA, mod_access);		
 with_source_profile := risk_indicators.getSourceProfile(with_college_attendance, isFCRA);		
 with_economic_trajectory := risk_indicators.getEconomicTrajectory(with_source_profile);		
 with_address_occupancy := Risk_Indicators.Boca_Shell_Address_Occupancy(with_economic_trajectory, isFCRA);		
