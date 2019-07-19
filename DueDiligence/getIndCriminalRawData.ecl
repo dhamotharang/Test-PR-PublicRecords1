@@ -192,9 +192,7 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                       SELF.offenseCharge := IF(RIGHT.data_type = DATA_TYPE_ARREST_LOG, RIGHT.arr_off_desc_1, RIGHT.court_off_desc_1);
                                       SELF.offenseChargeLevelReported := IF(RIGHT.data_type = DATA_TYPE_CRIMINAL, RIGHT.court_off_lev_mapped, RIGHT.arr_off_lev_mapped);
                                       SELF.offenseDDLastReportedActivity := MAX((UNSIGNED)RIGHT.off_date, (UNSIGNED)RIGHT.arr_date, 
-                                                                                (UNSIGNED)RIGHT.court_disp_date, (UNSIGNED)RIGHT.sent_date);     
-                                      SELF.offenseDDLastCourtDispDate := (UNSIGNED)RIGHT.court_disp_date;
-                                     
+                                                                                (UNSIGNED)RIGHT.court_disp_date, (UNSIGNED)RIGHT.sent_date);                                       
                                      
                                       
                                       //additional data
@@ -350,62 +348,20 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
 
     
     addLegalEventType := PROJECT(dedupAllOffenseData, TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFlat,
-    
-                                                                      //calculate the offense score for each offense
-                                                                      calcdOffenseScore := DueDiligence.Common.LookAtOther(LEFT.temp_offenseScore,
-                                                                                                                            LEFT.temp_courtOffLevel,                 
-                                                                                                                            LEFT.offenseCharge,
-                                                                                                                            LEFT.courtDisposition1,
-                                                                                                                            LEFT.courtDisposition2,
-                                                                                                                            LEFT.offenseChargeLevelReported,
-                                                                                                                            LEFT.offenseTrafficRelated);
-                                                                       
-                                                                                               
-                                                                      
-                                                                      //calculate the event type levels for each offense
-                                                                      charge := LEFT.offenseCharge;
-                                                                      offenseLevel := calcdOffenseScore;
-                                                                      category := LEFT.temp_category;
-                                                                      traffic := LEFT.offenseTrafficRelated;
-                                                                 
-                                                                    
-                                                                      typeLevel_9 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_9);
-                                                                      typeLevel_8 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_8);                                                                                                                                
-                                                                      typeLevel_7 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_7);                                                                                                                                
-                                                                      typeLevel_6 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_6);                                                                                                                                
-                                                                      typeLevel_5 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_5);                                                                                                                                
-                                                                      typeLevel_4 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_4);                                                                                                                                
-                                                                      typeLevel_3 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_3);                                                                                                                                
-                                                                      typeLevel_2 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_2);
-                                                                      
-                                                                      legalSubCategory := MAX(typeLevel_9, typeLevel_8, typeLevel_7, typeLevel_6,
-                                                                                              typeLevel_5, typeLevel_4, typeLevel_3, typeLevel_2);
-                                                                                                            
-                                                                      
-                                                                      SELF.attr_legalEventCat9 := typeLevel_9 > 0;
-                                                                      SELF.attr_legalEventCat8 := typeLevel_8 > 0;
-                                                                      SELF.attr_legalEventCat7 := typeLevel_7 > 0;
-                                                                      SELF.attr_legalEventCat6 := typeLevel_6 > 0;
-                                                                      SELF.attr_legalEventCat5 := typeLevel_5 > 0;
-                                                                      SELF.attr_legalEventCat4 := typeLevel_4 > 0;
-                                                                      SELF.attr_legalEventCat3 := typeLevel_3 > 0;
-                                                                      SELF.attr_legalEventCat2 := typeLevel_2 > 0;
-                                                                                                            
-                                                                      SELF.offenseDDLegalEventTypeCode := legalSubCategory;
-                                                                                                            
-                                                                      SELF.sort_eventTypeCodeFull := MAP(legalSubCategory > 0 => (STRING)legalSubCategory,
-                                                                                                         LEFT.temp_category = 1099511627776 => LEFT.offenseCharge,
-                                                                                                         (STRING)LEFT.temp_category);
-                                                                            
-                                                                      firstReportedActivityString := IF(LEFT.temp_date = DueDiligence.Constants.EMPTY, (STRING)LEFT.temp_calcdFirstSeenDate, LEFT.temp_date);     
-                                                                      
-                                                                      SELF.offenseDDFirstReportedActivity := firstReportedActivityString;
-                                                                      SELF.temp_firstReportedActivity := firstReportedActivityString;
-                                                                      
-                                                                      SELF.offenseDDChargeLevelCalculated := calcdOffenseScore; 
-                                                                      SELF.offenseChargeLevelCalculated := calcdOffenseScore;
- 
-                                                                      SELF := LEFT;));
+                                                                firstReportedActivityString := IF(LEFT.temp_date = DueDiligence.Constants.EMPTY, (STRING)LEFT.temp_calcdFirstSeenDate, LEFT.temp_date);     
+                                                                
+                                                                SELF.offenseDDFirstReportedActivity := firstReportedActivityString;
+                                                                SELF.temp_firstReportedActivity := firstReportedActivityString; //only used for filtering
+                                                                
+                                                                SELF.offenseChargeLevelCalculated := DueDiligence.Common.LookAtOther(LEFT.temp_offenseScore,
+                                                                                                                      LEFT.temp_courtOffLevel,                 
+                                                                                                                      LEFT.offenseCharge,
+                                                                                                                      LEFT.courtDisposition1,
+                                                                                                                      LEFT.courtDisposition2,
+                                                                                                                      LEFT.offenseChargeLevelReported,
+                                                                                                                      LEFT.offenseTrafficRelated);
+
+                                                                SELF := LEFT;));
     
     
 
