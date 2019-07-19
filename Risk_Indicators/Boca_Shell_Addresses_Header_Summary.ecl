@@ -1,4 +1,4 @@
-﻿import Inquiry_AccLogs, risk_indicators;
+﻿import risk_indicators;
 
 EXPORT Boca_Shell_Addresses_Header_Summary( grouped dataset(risk_indicators.iid_constants.layout_outx) all_header, grouped dataset(risk_indicators.Layout_Output) rolled_header ) := function
 
@@ -40,7 +40,7 @@ tf_source_stats := project(address_source_stats,
 							self.prim_name := left._prim_name;
 							self := left));
 							
-grp_source_stats := group(sort(tf_source_stats, seq, z5, prim_name, prim_range, addr_sources_first_seen_date, addr_sources), seq, z5, prim_name, prim_range);		
+grp_source_stats := group(sort(tf_source_stats, seq, z5, prim_name, prim_range, addr_sources, -addr_sources_first_seen_date), seq, z5, prim_name, prim_range);		
 							
 temp_rec roll_addr_source_stats(temp_rec le, temp_rec rt) := transform
 	self.addr_sources := trim(le.addr_sources) + rt.addr_sources +',';
@@ -51,7 +51,7 @@ temp_rec roll_addr_source_stats(temp_rec le, temp_rec rt) := transform
 	self := rt;
 end;
 					
-rolled_addr_source_stats := rollup(tf_source_stats, 
+rolled_addr_source_stats := rollup(grp_source_stats, 
 	left.seq=right.seq and left.z5=right.z5 and left.prim_name=right.prim_name and left.prim_range=right.prim_range, 
 	roll_addr_source_stats(left,right));
 
