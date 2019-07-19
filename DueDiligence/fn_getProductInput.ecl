@@ -62,6 +62,7 @@ EXPORT fn_getProductInput(UNSIGNED1 productRequested,
                       TRANSFORM(DueDiligence.LayoutsInternal.SharedInput,
                                   SELF.dataToUse.lexIDInput := LEFT.cleanedInput.lexIDPopulated;
                                   SELF.dataToUse.piiInput := LEFT.cleanedInput.piiPopulated;
+                                  SELF.dataToUse.seq := LEFT.cleanedInput.seq;
                                   SELF.dataToUse := RIGHT;
                                   SELF := LEFT;
                                   SELF := [];),

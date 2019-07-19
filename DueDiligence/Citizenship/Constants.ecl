@@ -11,9 +11,6 @@ EXPORT Constants := MODULE
   
   EXPORT RANDOMIZATION_STARTED  := 20110625;      //date ssn randomization started - June 25th, 2011
   EXPORT AGE_CAP                := 110;           //This is the highest value we will allow in this product.
-  
-  //Validation error messages
-  EXPORT VALIDATION_INVALID_MODEL_NAME := 'Model is currently not supported.';
     
  
   EXPORT P_SOURCE  := 'P ';
