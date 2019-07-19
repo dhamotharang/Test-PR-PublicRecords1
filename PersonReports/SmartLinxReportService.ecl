@@ -289,8 +289,7 @@ EXPORT SmartLinxReportService () := MACRO
 	Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);	
  	royalties := if (not ut.IndustryClass.is_knowx, royalties_fares) + royalties_email;
 
-  IF (exists(results), doxie.compliance.logSoldToTransaction(mod_access));
-	output (results, named ('Results'));
+  output (results, named ('Results'));
   output (royalties, named ('RoyaltySet'));
 
 /*

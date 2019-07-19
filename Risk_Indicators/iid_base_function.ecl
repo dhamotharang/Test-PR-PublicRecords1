@@ -1,4 +1,4 @@
-﻿import _Control, doxie, ut, DID_Add, address, UtilFile, riskwise, Gong, iesp, fcra, gateway;
+﻿import _Control, iesp, fcra, gateway, risk_indicators;
 onThor := _Control.Environment.OnThor;
 
 export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(Gateway.Layouts.Config) gateways,
@@ -108,7 +108,17 @@ risk_indicators.layout_output add_flags(risk_indicators.Layout_output le) := TRA
 	
 	SELF := le;
 END;
-with_overrides := if( isFCRA, PROJECT(with_did, add_flags(LEFT)), with_did);
+
+
+
+
+#IF(_Control.Environment.onVault)
+	with_overrides := with_did;  // when on Vault, we don't need to do corrections
+#ELSE
+	with_overrides := if( isFCRA, PROJECT(with_did, add_flags(LEFT)), with_did);
+#END
+
+
 
 with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, BSversion, IntendedPurpose), with_did);
 

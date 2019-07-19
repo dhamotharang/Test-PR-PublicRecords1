@@ -25,12 +25,10 @@ export AutoKeyIds(IParam.searchParams in_mod) := function
 		reportMod := MODULE(PROJECT(in_mod, IParam.reportParams,opt)) END;
 	
 		//** search by did for deepdives
-		//newbydid := VehicleV2_Services.Vehicle_raw.get_vehicle_keys_from_dids(newdids);
-		newbydid := Raw.get_vehicle_keys_from_dids(reportMod, newdids);
+		newbydid := VehicleV2_Services.Raw.get_vehicle_keys_from_dids(reportMod, newdids);
 
 		//** search by bdid for deepdives
-		//newbybdid := VehicleV2_Services.Vehicle_raw.get_vehicle_keys_from_bdids(newbdids);
-		newbybdid := Raw.get_vehicle_keys_from_bdids(reportMod, newbdids);
+		newbybdid := VehicleV2_Services.Raw.get_vehicle_keys_from_bdids(reportMod, newbdids);
 
 		//***** FOR DEEP DIVES
 		DeepDives    := project(newbydid + newbybdid, transform(outrec, self.is_deep_dive := true, self := left));
@@ -44,4 +42,5 @@ export AutoKeyIds(IParam.searchParams in_mod) := function
 		rets := byak +  
 				if(includeDeepDive, deepDives);
 		return(rets);
-	END;	
+	END;
+  

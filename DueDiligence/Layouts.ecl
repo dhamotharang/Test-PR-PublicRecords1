@@ -487,11 +487,6 @@ EXPORT Layouts := MODULE
     STRING50 DOCCurrentKnownInmateStatus;
     STRING25 DOCCurrentLocationSecurity;
     DATASET({STRING120 name}) partyNames;
-
-    //used for file validation
-    STRING1 validate_trafficRelated;
-    UNSIGNED8 validate_category;
-    STRING100 validate_eventType;
   END;
 
   EXPORT CriminalOffenses := RECORD

@@ -2,7 +2,7 @@
 // NOTE if timeouts reoccur place to look for improved join limits may be within 
 // BIPV2.mac_AddStatus
 // ******************
-import BIPV2, iesp, BIPV2_Best, autostandardi, ut, BusinessCredit_Services, MDR;
+import BIPV2, iesp, BIPV2_Best, autostandardi, MDR;
 export ConnectedBusinessSection := module
 
  //per Franz/DAB email 3/28 11:09 AM : Basically SKIP any records with same SELEID 

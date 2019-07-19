@@ -13,10 +13,10 @@
 */
 EXPORT MAC_FlagSuppressedSource (ds_in, mod_access, did_field = 'did', gsid_field = 'global_sid', data_env = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
 
-  LOCAL l_out := RECORD
-   ds_in;
-   BOOLEAN is_suppressed := false;
+  LOCAL rec_suppressed := RECORD
+    BOOLEAN is_suppressed := false;
   END;
+  LOCAL l_out := RECORDOF(ds_in) OR rec_suppressed;
   
   LOCAL suppressed_recs := JOIN(ds_in, suppress.key_OptOutSrc(data_env), 
     KEYED((UNSIGNED6) LEFT.did_field = RIGHT.lexid) AND

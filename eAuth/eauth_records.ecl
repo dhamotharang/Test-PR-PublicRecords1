@@ -186,7 +186,8 @@ EXPORT out_rec eauth_records (
 
 
   // vehicle
-  p_vehicles := choosen(VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report (dids), iesp.Constants.BR.MaxVehicles)
+  report_mod := VehicleV2_Services.IParam.getReportModule();  
+  p_vehicles := choosen(VehicleV2_Services.raw.get_vehicle_crs_report (report_mod, dids), iesp.Constants.BR.MaxVehicles)
   : GLOBAL;  
 //TODO: check use current only HistoryFlag = 'CURRENT'
 

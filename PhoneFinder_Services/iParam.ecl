@@ -41,7 +41,8 @@ MODULE
     EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE;
 		EXPORT BOOLEAN   UseDeltabase 			 := FALSE;
     EXPORT BOOLEAN   SubjectMetadataOnly := FALSE;	
-		EXPORT BOOLEAN 	 DetailedRoyalties 	 := FALSE;	
+		EXPORT BOOLEAN 	 DetailedRoyalties 	 := FALSE;
+    EXPORT BOOLEAN   SuppressBlankNameAddress := FALSE;	
 		// Options for phone verification
 		EXPORT BOOLEAN   VerifyPhoneName      	:= FALSE;
 		EXPORT BOOLEAN	 VerifyPhoneNameAddress	:= FALSE;
@@ -119,6 +120,7 @@ MODULE
     EXPORT BOOLEAN UseThreatMetrixRules               := FALSE;
     EXPORT BOOLEAN hasActiveIdentitycountRules        := FALSE;
     EXPORT BOOLEAN hasActivePhoneTransactionCountRule := FALSE;
+    EXPORT BOOLEAN IsGovSearch := FALSE;
   END;
     
   EXPORT PhoneVerificationParams := 
@@ -169,6 +171,7 @@ MODULE
       EXPORT BOOLEAN   IncludePhoneMetadata := pfOptions.IncludePhoneMetadata;				 				 																			 
       BOOLEAN          SubjectMetadata      := pfOptions.SubjectMetadataOnly;
       EXPORT BOOLEAN   SubjectMetadataOnly  := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
+      EXPORT BOOLEAN   SuppressBlankNameAddress := pfOptions.SuppressBlankNameAddress;
     
       // Options for phone verification	  
       EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName;
@@ -292,6 +295,7 @@ MODULE
 
       EXPORT BOOLEAN hasActiveIdentityCountRules        := IncludeRiskIndicators AND EXISTS(RiskIndicators((RiskId = $.Constants.RiskRules.IdentityCount AND Active)));
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
+      EXPORT BOOLEAN IsGovsearch := ApplicationType in [AutoStandardI.Constants.APPLICATION_TYPE_LE,AutoStandardI.Constants.APPLICATION_TYPE_GOV];
     END;
 			
     RETURN in_params;
@@ -340,6 +344,7 @@ MODULE
                                                                   $.Constants.TransType.PHONERISKASSESSMENT]; // accudata_ocn gateway call
              BOOLEAN   SubjectMetadata 		 := FALSE : STORED('SubjectMetadataOnly');
       EXPORT BOOLEAN   SubjectMetadataOnly := IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
+      EXPORT BOOLEAN   SuppressBlankNameAddress := FALSE : STORED('SuppressBlankNameAddress');
                     
       EXPORT BOOLEAN 	 DetailedRoyalties 	            := FALSE : STORED('ReturnDetailedRoyalties');
       EXPORT UNSIGNED1 LineIdentityConsentLevel       := 0 : STORED('LineIdentityConsentLevel');	
@@ -404,7 +409,8 @@ MODULE
       EXPORT BOOLEAN IncludeZumigoOptions         :=  IncludeNameAddressValidation OR IncludeNameAddressInfo OR
                                                       IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
                                                       IncludeDeviceInfo OR IncludeDeviceHistory;
-      EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;                                                        
+      EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;
+      EXPORT BOOLEAN IsGovsearch := ApplicationType in [AutoStandardI.Constants.APPLICATION_TYPE_LE,AutoStandardI.Constants.APPLICATION_TYPE_GOV];                                                        
     END; 
     
     RETURN input_Mod;

@@ -77,9 +77,10 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                                       attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
                                                       DueDiligence.Constants.INVALID);
                                                       
-                                      productsRequested := MAP(modelName != DueDiligence.Constants.EMPTY AND version IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS => DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP,
-                                                                modelName != DueDiligence.Constants.EMPTY => DueDiligence.CitDDShared.VALID_PRODUCT_CITIZENSHIP_ONLY,
-                                                                DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_ONLY);
+                                      productsRequested := MAP(requestedProducts = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH => DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP,
+                                                               requestedProducts = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY => DueDiligence.CitDDShared.VALID_PRODUCT_CITIZENSHIP_ONLY,
+                                                               requestedProducts = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY => DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_ONLY,
+                                                               DueDiligence.Constants.INVALID);
                                     
                                     
                                       address_in := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
@@ -147,7 +148,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                       
                                       
   //validate the requests
-  validatedRequests := DueDiligence.CommonQuery.ValidateRequest(wseq, glba, dppa, DueDiligence.Constants.ATTRIBUTES);
+  validatedRequests := DueDiligence.CommonQuery.ValidateRequest(wseq, glba, dppa, DueDiligence.Constants.ATTRIBUTES, modelName);
   
   //clean data
   cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequests(validRequest));
@@ -335,6 +336,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                             SELF := LEFT;));
 
   
+  IF(debugIndicator, output(validatedRequests, NAMED('validatedRequests')));
   IF(debugIndicator, output(cleanData, NAMED('cleanData')));
   IF(debugIndicator, output(dataToSearchBy, NAMED('dataToSearchBy')));
   IF(debugIndicator, output(citResults, NAMED('citizenshipResults')));

@@ -1,10 +1,10 @@
-
 // -----------------------------------------------------------------
 // -- CCPA: MAC suppress source (CCPA) test
 // -----------------------------------------------------------------
 
 #STORED('GLBPurpose', 3)
 #STORED('DPPAPurpose', 1)
+#STORED('LexIdSourceOptout', 2) // <- to enable test suppression
 
 import AutoStandardI, doxie;
 
@@ -27,6 +27,17 @@ output(d_clean, named('suppressed'));
 // or call macro to flag suppressed
 d_clean_flagged := Suppress.MAC_FlagSuppressedSource(d_in, mod_access);
 output(d_clean_flagged, named('suppress_flagged'));
+
+l_suppressed := record
+	d_in;
+	boolean is_suppressed := false;
+end;
+
+d_in_wsup := project(d_in, transform(l_suppressed, self := left;));
+
+// or call macro to flag suppressed (2)
+d_clean_flagged_wsupp := Suppress.MAC_FlagSuppressedSource(d_in_wsup, mod_access, did, global_sid);
+output(d_clean_flagged_wsupp, named('d_clean_flagged_wsupp'));
 
 // -----------------------------------------------------------------
 // -- CCPA: Exemption bit test

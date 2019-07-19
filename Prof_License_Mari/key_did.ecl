@@ -1,5 +1,9 @@
-import doxie, ut, Data_Services, Prof_License_Mari, fcra;
+﻿import doxie, ut, Data_Services, Prof_License_Mari, fcra, vault, _control;
 
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export key_did(boolean IsFCRA = false) := vault.Prof_License_Mari.key_did(isFCRA);
+
+#ELSE
 
 export key_did(boolean IsFCRA = false) := function
 
@@ -20,4 +24,5 @@ return(return_file);
 end;
 
 
+#END;
 		   

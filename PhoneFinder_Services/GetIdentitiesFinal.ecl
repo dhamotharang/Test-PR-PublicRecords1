@@ -1,4 +1,4 @@
-﻿IMPORT $, iesp, Phones, STD, ut;
+﻿IMPORT $, iesp, Phones, STD, ut,SSNBest_Services;
 
 EXPORT GetIdentitiesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                           DATASET($.Layouts.BatchInAppendDID)  dInBestInfo,
@@ -109,7 +109,22 @@ FUNCTION
                             LIMIT(0), KEEP(1));
 
   dIdentitiesFinal := IF(~inMod.IsPrimarySearchPII, dIdentitiesInfo, dIdentityBestInfo);
+	
+	//Append gov best SSN, SSN (Gov best) is returned only for Gov searches. If any other verticals need SSN we need to start using'getSSNBest' flag 
+	
+	ssnBestParams := MODULE (PROJECT (inmod, SSNBest_Services.IParams.BatchParams, OPT))
+									EXPORT STRING ssn_mask := inmod.ssnmask; // These  assignmnets will not be needed once IDataAccess changes are made in PhoneFinder
+									EXPORT unsigned1 glb := inmod.GLBPurpose; 
+									EXPORT unsigned1 dppa := inmod.DPPAPurpose;
+									EXPORT string32 application_type := inmod.ApplicationType;
+									EXPORT string5 industry_class := inmod.IndustryClass; 
+		END;
+	
+	withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(dIdentitiesFinal, ssnBestParams, ssn, did, false); 
+	
+	dIdentitiesWssn := IF(inmod.IsGovsearch, withGovBestSSN, dIdentitiesFinal);
 
+	
   #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitySlim, NAMED('dIdentitySlim'));
     OUTPUT(dIdentitySlimFiltered, NAMED('dIdentitySlimFiltered'));
@@ -121,5 +136,5 @@ FUNCTION
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'));
   #END		
   
-  RETURN dIdentitiesFinal;
+  RETURN dIdentitiesWssn;
 END;

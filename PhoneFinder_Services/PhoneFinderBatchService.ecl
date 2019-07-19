@@ -25,6 +25,7 @@
   <part name="UseInHousePhoneMetadata" type="xsd:boolean" default="false"/>
   <part name="VerifyPhoneName" type="xsd:boolean" default="false"/>
   <part name="VerifyPhoneNameAddress" type="xsd:boolean" default="false"/>
+  <part name="SuppressBlankNameAddress" type="xsd:boolean" default="false"/>
 	<separator/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 	<separator/>
@@ -53,8 +54,13 @@ MACRO
    																																											dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways));
    	
     royalties	 := modBatchRecords.dRoyalties;
-   	results   	:= modBatchRecords.dBatchOut;
+   	dPhones   	:= modBatchRecords.dBatchOut;
    	Zumigo_Log	:= modBatchRecords.Zumigo_History_Recs;
+		
+		dNonblankNameAddr := dPhones(identity1_full != '' OR (identity1_first != '' AND identity1_last!= '') 
+													OR (identity1_streetname != '' AND ((identity1_city != '' AND identity1_state != '' ) OR identity1_zip5 != '')));
+		
+		results := if(reportMod.SuppressBlankNameAddress,dNonblankNameAddr,dPhones);
     
      mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
      IF (EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access)); 

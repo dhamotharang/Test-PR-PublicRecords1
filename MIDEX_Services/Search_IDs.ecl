@@ -128,7 +128,8 @@ EXPORT Search_IDs := MODULE
 	EXPORT Mari_ProfLic_val(MIDEX_Services.Iparam.searchrecords in_mod) := 
     FUNCTION
 	  
-                                                                             
+        // CCPA - Suppression will take place with the payload join in the service funtion calls  
+        //        We are only keeping the midex report number components from the key here
         ds_autokey_ProfLicMari_mari_rids  := MIDEX_Services.Raw_ProfessionalLicenses.fn_get_ProfLicMari_AutokeyData();
         
         

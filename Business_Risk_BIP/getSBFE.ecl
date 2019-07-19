@@ -58,7 +58,7 @@ EXPORT getSBFE(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 	
   linkid_recs_loaddate := JOIN(SBFESeq, Business_Credit.Key_ReleaseDates(), LEFT.original_version=RIGHT.version, getacctno_loaddate(LEFT,RIGHT), LEFT OUTER);
 	
-	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, -load_date), seq, acct_no);
+	linkid_recs_loaddate_dedup := DEDUP(SORT(linkid_recs_loaddate, seq, acct_no, original_version, -load_date), seq, acct_no);
 
   linkid_recs := Business_Risk_BIP.Common.FilterRecords2(linkid_recs_loaddate_dedup, load_date, MDR.SourceTools.src_Business_Credit, AllowedSourcesSet);
 	

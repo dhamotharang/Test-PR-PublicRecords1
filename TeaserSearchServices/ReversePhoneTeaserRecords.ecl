@@ -1,4 +1,4 @@
-﻿import AutostandardI, iesp, doxie, dx_header, gateway, Gong, Risk_Indicators, PhonesInfo, Suppress, ut, bipv2,
+﻿import AutostandardI, iesp, doxie, dx_header, gateway, Gong, Risk_Indicators, Phones, Suppress, ut, bipv2,
   MDR;
 
 EXPORT ReversePhoneTeaserRecords := Module
@@ -109,9 +109,10 @@ EXPORT Records(AutoStandardI.DataRestrictionI.params tempMod,
 												    AddrInfoFromPhoneInputOut,dppa_ok,glb_ok,,DRM);	
   
 	//bestInfo := if (NOT(exists(addrInfoFromPhoneInputOut), seleBest, AddrInfoFromPhoneInputOut);
-																							
-	PortedMetadatapayload := SORT(JOIN(phone_recs , PhonesInfo.Key_Phones.Ported_Metadata,
-																		 keyed(LEFT.PhoneVal = RIGHT.phone),
+	phoneInfo := DEDUP(SORT(PROJECT(phone_recs, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.PhoneVal)), phone), phone);	
+	dported_metadata := Phones.GetPhoneMetaData.CombineRawPhoneData(phoneInfo);																					
+	PortedMetadatapayload := SORT(JOIN(phone_recs , dported_metadata,
+																		 (LEFT.PhoneVal = RIGHT.phone),
 																		 TRANSFORM(RIGHT), limit(0), keep(10000)),
 																		 -vendor_last_reported_dt);
    PortedMetadatapayloadSlim := PortedMetadatapayload(((source = mdr.sourcetools.src_PhonesPorted_iConectiv 
