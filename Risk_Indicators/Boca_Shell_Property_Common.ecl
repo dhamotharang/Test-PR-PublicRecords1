@@ -589,7 +589,9 @@ end;
 			(UNSIGNED3)(RIGHT.sortby_date[1..6]) >= LEFT.p_address_dt_first_seen and 
 			((UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.p_address_dt_last_seen or LEFT.p_address_dt_last_seen=0) and
 			// remove records that are after the history date
-			(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate,
+			(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate and
+			(unsigned3)RIGHT.assessment.tax_year <= If(is_FCRA ,(((unsigned)((string)LEFT.historydate)[1..4])+1), 9999) and
+				(unsigned3)RIGHT.assessment.assessed_value_year <= If(is_FCRA ,(((unsigned)((string)LEFT.historydate)[1..4])+1), 9999 ), 
 			TRANSFORM( layout_full_plus_ids,
 				self.seq := left.seq,  // just for personal sanity sake, map the seq number from the left dataset
 				SELF := RIGHT, 
@@ -609,7 +611,9 @@ end;
 				(UNSIGNED3)(RIGHT.sortby_date[1..6]) >= LEFT.p_address_dt_first_seen and 
 				((UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.p_address_dt_last_seen or LEFT.p_address_dt_last_seen=0) and
 				// remove records that are after the history date
-				(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate,
+				(UNSIGNED3)(RIGHT.sortby_date[1..6]) <= LEFT.historydate and
+				(unsigned3)RIGHT.assessment.tax_year <= If(is_FCRA ,(((unsigned)(string)LEFT.historydate[1..4])+1), 9999) and
+				(unsigned3)RIGHT.assessment.assessed_value_year <= If(is_FCRA ,(((unsigned)(string)LEFT.historydate[1..4])+1), 9999 ), 
 				TRANSFORM( layout_full_plus_ids,
 					self.seq := left.seq,  // just for personal sanity sake, map the seq number from the left dataset
 					SELF := RIGHT, 
@@ -1177,14 +1181,10 @@ end;
 	// output(onThor, named('onThor'));
 	
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did, NAMED('ids_plus_fares_by_did') ) );
-	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did_ddpd, NAMED('ids_plus_fares_by_did_ddpd') ) );
-	// IF( ViewDebugs, OUTPUT( p_address_filt_a, NAMED('p_address_filt_a') ) );
-	// IF( ViewDebugs, OUTPUT( p_address_filt_b, NAMED('p_address_filt_b') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_did, NAMED('ids_plus_fares_by_did') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares_by_address, NAMED('ids_plus_fares_by_address') ) );
 	// IF( ViewDebugs, OUTPUT( ids_plus_fares, NAMED('ids_plus_fares') ) );
 // OUTPUT( ids_plus_fares_temp, NAMED('ids_plus_fares_temp') );
-// OUTPUT( ids_plus_fares, NAMED('ids_plus_fares') );
 	
 	// IF( ViewDebugs, OUTPUT( ds_property_recs_raw_with_uniqueid, NAMED('property_recs_all') ) );
 	// IF( ViewDebugs, OUTPUT( ds_property_recs_filt_a, NAMED('property_recs_filt_a') ) );
@@ -1197,19 +1197,20 @@ end;
 	
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FARES, NAMED('assess_recs_FARES') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FIDELITY, NAMED('assess_recs_FIDELITY') ) );
+	// IF( ViewDebugs, OUTPUT( ds_property_recs_filt_a_roxie, NAMED('ds_property_recs_filt_a_roxie') ) );	
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_FIDELITY_rolled, NAMED('assess_recs_FIDELITY_rolled') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assess_recs_most_recent, NAMED('assess_recs_most_recent') ) );
 	
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs, NAMED('deed_recs') ) );
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs_filt_b, NAMED('deed_recs_filt') ) );
 	// IF( ViewDebugs, OUTPUT( ds_deed_recs_most_recent, NAMED('deed_recs_most_recent') ) );
+	// IF( ViewDebugs, OUTPUT( ds_final_not_found, NAMED('final_not_found') ) );	
 	
 	// IF( ViewDebugs, OUTPUT( ds_assessments_and_deeds_most_recent, NAMED('all_recs_most_recent') ) );
 	// IF( ViewDebugs, OUTPUT( ds_assessments_and_deeds_best_vendor_source, NAMED('best_vendor_source') ) );
 	// IF( ViewDebugs, OUTPUT( ds_best_vendor_source_rolled, NAMED('best_vendor_source_rolled') ) );
-	// IF( ViewDebugs, OUTPUT( ds_final_found, NAMED('ds_final_found') ) );
+	// IF( ViewDebugs, OUTPUT( ds_final, NAMED('ds_final_found') ) );
 	// IF( ViewDebugs, OUTPUT( ds_final_pre, NAMED('final_pre') ) );
-	// IF( ViewDebugs, OUTPUT( ds_final_not_found, NAMED('final_not_found') ) );	
 	
 	// output(ids_only, named('ids_only'));
 	// output(p_address, named('p_address'));
@@ -1222,9 +1223,16 @@ end;
 	// output(property_records_full, named('property_records_full'));
 	// output(ds_property_recs_raw_with_uniqueid, named('ds_property_recs_raw_with_uniqueid'));
 	// output(ds_property_recs_filt_d2, named('ds_property_recs_filt_d2'));
+	// output(ds_property_recs_filt_a, NAMED('property_recs_filt_a'));
+	// output(ds_property_recs_filt_a);
+	// output(ds_property_recs_filt_b, NAMED('property_recs_filt_b'));
+	// output(ds_property_recs_filt_c, NAMED('property_recs_filt_c'));
+	// output(ds_property_recs_filt_d, NAMED('property_recs_filt_d'));
 	// output(ds_property_recs_filt_e, named('ds_property_recs_filt_e'));
 	// output(ds_assess_recs_FARES, named('ds_assess_recs_FARES'));
 	// output(ds_assess_recs_FIDELITY, named('ds_assess_recs_FIDELITY'));
+	// output(ids_plus_fares_roxie, NAMED('ids_plus_fares_roxie'));
+	// output(ds_property_recs_filt_a_roxie, NAMED('ds_property_recs_filt_a_roxie'));
 	// output(ds_assess_recs_FIDELITY_rolled, named('ds_assess_recs_FIDELITY_rolled'));
 	// output(ds_assess_recs_most_recent_pre, named('ds_assess_recs_most_recent_pre'));
 	// output(ds_assess_recs_most_recent, named('ds_assess_recs_most_recent'));
