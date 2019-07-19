@@ -1,4 +1,4 @@
-﻿﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA, personcontext;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Models, iesp, personcontext;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
@@ -64,7 +64,7 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 
 	self.ssn := ssn_val;
 	self.dob := dob_val;
-	self.age := if ((integer)le.age = 0 and (integer)le.dob != 0, (string3)ut.GetAgeI((integer)le.dob), (le.age));
+	self.age := if ((integer)le.age = 0 and (integer)le.dob != 0, (string3)ut.Age((integer)le.dob), (le.age));
 	
 	self.phone10 := hphone_val;
 	self.wphone10 := wphone_val;
@@ -643,12 +643,16 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	boolean hasLegalHold :=  rt.consumerflags.legal_hold_alert;  
 	boolean hasIdentityFraudAlert := rt.consumerflags.id_theft_flag  ;
 	  
-	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Crossindustry_score = score OR le.Custom_score = score;
+
+	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Crossindustry_score = score OR le.Custom_score = score OR le.Custom2_score = score or le.Custom3_score = score or le.Custom4_score = score or le.Custom5_score = score;
 	
 	// instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
 	attr := models.Attributes_Master(rt, true);
-	boolean Alerts200 := if(le.SubjectDeceased='1' or attr.SubjectDeceased = '1', true, false) ;
-	boolean has200Score := hasScore('200') or Alerts200 ;
+boolean Alerts200 := (le.SubjectDeceased='1' or attr.SubjectDeceased = '1') or (le.SSNDeceased='1' or attr.SSNDeceased='1') or hasScore('200');//checking iid.decsflag (ssa ssn), iid.diddeceased (ssa lexid) and header source DE and Score of 200
+	models_temp := model_info(Model_Name = 'RVC1602_1')[1];
+	temp2 := (string)models_temp.Output_Model_Name;
+	deceased_exception_models := [temp2]; //models that are not to have the new deceased logic per seth							
+	boolean has200Score := Alerts200 or hasScore('200') ;  //Alerts still need to be set for exception models
 	boolean has222Score := hasScore('222');
 	
   boolean chapter7bankruptcy := '7' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
@@ -760,164 +764,199 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	prescreen_score_scenario_custom5 := prescreen_score_pass_custom5 OR prescreen_score_fail_custom5;
 
   //Auto model overrides
-	SELF.Auto_score := MAP(le.Auto_score <> '' AND score_override_alert_returned	=> '100',
+	 
+	auto_deceased := has200Score and le.auto_score_name not in deceased_exception_models;
+	// to prevent a 200 score with a 222A alert (happens when ssn is deceased but unable to find lexid), overwrite all scores to 222 if 222A alert is returned.  Models prioritize 200 over 222.
+	no_truedid := UT.Exists2(ds_alerts (alert_code = '222A'));
+  SELF.Auto_score := MAP(le.Auto_score <> '' AND score_override_alert_returned	=> '100',
 												 le.Auto_score <> '' AND prescreen_score_pass_auto			=> '1',
 												 le.Auto_score <> '' AND prescreen_score_fail_auto			=> '0',
-																																									 le.Auto_score);
-	SELF.Auto_Type := IF(prescreen_score_scenario_auto, '0-1', le.Auto_Type);
-	SELF.Auto_reason1 := MAP(prescreen_score_scenario_auto OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+												 le.Auto_score <> '' AND no_truedid 										=> '222',
+												 le.Auto_score <> '' AND auto_deceased 									=> '200',
+																																								le.Auto_score);
+  SELF.Auto_Type := IF(prescreen_score_scenario_auto, '0-1', le.Auto_Type);	
+	SELF.Auto_reason1 := MAP(prescreen_score_scenario_auto OR  (score_override_alert_returned AND ~exception_score_reason) or auto_deceased or no_truedid=> '', 
                            SELF.Auto_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                            SELF.Auto_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                            SELF.Auto_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                           le.Auto_reason1);
-	SELF.Auto_reason2 := IF(prescreen_score_scenario_auto OR score_override_alert_returned, '', le.Auto_reason2);
-	SELF.Auto_reason3 := IF(prescreen_score_scenario_auto OR score_override_alert_returned, '', le.Auto_reason3);
-	SELF.Auto_reason4 := IF(prescreen_score_scenario_auto OR score_override_alert_returned, '', le.Auto_reason4);
-	SELF.Auto_reason5 := IF(prescreen_score_scenario_auto OR score_override_alert_returned, '', le.Auto_reason5);
+                                                                                                                               le.Auto_reason1);
+		SELF.Auto_reason2 := IF(prescreen_score_scenario_auto OR score_override_alert_returned or auto_deceased or no_truedid, '', le.Auto_reason2);
+		SELF.Auto_reason3 := IF(prescreen_score_scenario_auto OR score_override_alert_returned or auto_deceased or no_truedid, '', le.Auto_reason3);
+		SELF.Auto_reason4 := IF(prescreen_score_scenario_auto OR score_override_alert_returned or auto_deceased or no_truedid, '', le.Auto_reason4);
+		SELF.Auto_reason5 := IF(prescreen_score_scenario_auto OR score_override_alert_returned or auto_deceased or no_truedid, '', le.Auto_reason5);
 
   //Bankcard model overrides
+  bank_deceased := has200Score and le.bankcard_score_name not in deceased_exception_models;
 	SELF.Bankcard_score := MAP(le.Bankcard_score <> '' AND score_override_alert_returned 	=> '100',
 														 le.Bankcard_score <> '' AND prescreen_score_pass_bankcard	=> '1',
 														 le.Bankcard_score <> '' AND prescreen_score_fail_bankcard	=> '0',
-																																													 le.Bankcard_score);
+														 le.Bankcard_score <> '' AND no_truedid											=> '222',
+														 le.Bankcard_score <> '' AND bank_deceased 									=> '200',
+																																													le.Bankcard_score);
 	SELF.Bankcard_Type := IF(prescreen_score_scenario_bankcard, '0-1', le.Bankcard_Type);
-	SELF.Bankcard_reason1 := MAP(prescreen_score_scenario_bankcard OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+	SELF.Bankcard_reason1 := MAP(prescreen_score_scenario_bankcard OR (score_override_alert_returned AND ~exception_score_reason) or bank_deceased or no_truedid=> '', 
                                SELF.Bankcard_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                                SELF.Bankcard_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                                SELF.Bankcard_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                   le.Bankcard_reason1);
-	SELF.Bankcard_reason2 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned, '', le.Bankcard_reason2);
-	SELF.Bankcard_reason3 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned, '', le.Bankcard_reason3);
-	SELF.Bankcard_reason4 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned, '', le.Bankcard_reason4);
-	SELF.Bankcard_reason5 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned, '', le.Bankcard_reason5);
+                                                                                                                                     le.Bankcard_reason1);
+	SELF.Bankcard_reason2 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned or bank_deceased or no_truedid, '', le.Bankcard_reason2);
+	SELF.Bankcard_reason3 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned or bank_deceased or no_truedid, '', le.Bankcard_reason3);
+	SELF.Bankcard_reason4 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned or bank_deceased or no_truedid, '', le.Bankcard_reason4);
+	SELF.Bankcard_reason5 := IF(prescreen_score_scenario_bankcard OR score_override_alert_returned or bank_deceased or no_truedid, '', le.Bankcard_reason5);
 
   //Short term lending model overrides
+  STL_deceased := has200Score and le.short_term_lending_score_name not in deceased_exception_models;
 	SELF.Short_term_lending_score := MAP(le.Short_term_lending_score <> '' AND score_override_alert_returned 	=> '100',
 																			 le.Short_term_lending_score <> '' AND prescreen_score_pass_stl				=> '1',
 																			 le.Short_term_lending_score <> '' AND prescreen_score_fail_stl				=> '0',
-																																																							 le.Short_term_lending_score);
+                                       le.Short_term_lending_score <> '' AND no_truedid											=> '222',
+                                       le.Short_term_lending_score <> '' AND STL_deceased										=> '200',
+																																																							le.Short_term_lending_score);
 	SELF.Short_term_lending_Type := IF(prescreen_score_scenario_stl, '0-1', le.Short_term_lending_Type);
-	SELF.Short_term_lending_reason1 := MAP(prescreen_score_scenario_stl OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+  SELF.Short_term_lending_reason1 := MAP(prescreen_score_scenario_stl OR  (score_override_alert_returned AND ~exception_score_reason) or STL_deceased or no_truedid=> '', 
                                          SELF.Short_term_lending_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose => 'Z97',
                                          SELF.Short_term_lending_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose => 'Z98',
                                          SELF.Short_term_lending_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose => 'Z99',
-                                                                                                                                        le.Short_term_lending_reason1);
-	SELF.Short_term_lending_reason2 := IF(prescreen_score_scenario_stl OR score_override_alert_returned, '', le.Short_term_lending_reason2);
-	SELF.Short_term_lending_reason3 := IF(prescreen_score_scenario_stl OR score_override_alert_returned, '', le.Short_term_lending_reason3);
-	SELF.Short_term_lending_reason4 := IF(prescreen_score_scenario_stl OR score_override_alert_returned, '', le.Short_term_lending_reason4);
-	SELF.Short_term_lending_reason5 := IF(prescreen_score_scenario_stl OR score_override_alert_returned, '', le.Short_term_lending_reason5);
+                                                                                                                                           le.Short_term_lending_reason1);
+		SELF.Short_term_lending_reason2 := IF(prescreen_score_scenario_stl OR score_override_alert_returned or STL_deceased or no_truedid, '', le.Short_term_lending_reason2);
+		SELF.Short_term_lending_reason3 := IF(prescreen_score_scenario_stl OR score_override_alert_returned or STL_deceased or no_truedid, '', le.Short_term_lending_reason3);
+		SELF.Short_term_lending_reason4 := IF(prescreen_score_scenario_stl OR score_override_alert_returned or STL_deceased or no_truedid, '', le.Short_term_lending_reason4);
+		SELF.Short_term_lending_reason5 := IF(prescreen_score_scenario_stl OR score_override_alert_returned or STL_deceased or no_truedid, '', le.Short_term_lending_reason5);
 
   //Telecom model overrides
+  Tele_deceased := has200Score and le.telecommunications_score_name not in deceased_exception_models;
 	SELF.Telecommunications_score := MAP(le.Telecommunications_score <> '' AND score_override_alert_returned 	=> '100',
 																			 le.Telecommunications_score <> '' AND prescreen_score_pass_teleco		=> '1',
 																			 le.Telecommunications_score <> '' AND prescreen_score_fail_teleco		=> '0',
-																																																							 le.Telecommunications_score);
+                                       le.Telecommunications_score <> '' AND no_truedid											=> '222',
+																			 le.Telecommunications_score <> '' AND Tele_deceased 									=> '200',
+																																																							le.Telecommunications_score);
 	SELF.Telecommunications_Type := IF(prescreen_score_scenario_teleco, '0-1', le.Telecommunications_Type);
-	SELF.Telecommunications_reason1 := MAP(prescreen_score_scenario_teleco OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+	SELF.Telecommunications_reason1 := MAP(prescreen_score_scenario_teleco OR (score_override_alert_returned AND ~exception_score_reason) or Tele_deceased or no_truedid=> '', 
                                          SELF.Telecommunications_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose    => 'Z97',
                                          SELF.Telecommunications_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose    => 'Z98',
                                          SELF.Telecommunications_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose    => 'Z99',
-                                                                                                                                           le.Telecommunications_reason1);
-	SELF.Telecommunications_reason2 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason2);
-	SELF.Telecommunications_reason3 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason3);
-	SELF.Telecommunications_reason4 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason4);
-	SELF.Telecommunications_reason5 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason5);
+                                                                                                                                               le.Telecommunications_reason1);
+		SELF.Telecommunications_reason2 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned or Tele_deceased or no_truedid, '', le.Telecommunications_reason2);
+		SELF.Telecommunications_reason3 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned or Tele_deceased or no_truedid, '', le.Telecommunications_reason3);
+		SELF.Telecommunications_reason4 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned or Tele_deceased or no_truedid, '', le.Telecommunications_reason4);
+		SELF.Telecommunications_reason5 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned or Tele_deceased or no_truedid, '', le.Telecommunications_reason5);
 
   //Cross Industry model overrides
-	SELF.Crossindustry_score := MAP(le.Crossindustry_score <> '' AND score_override_alert_returned 	=> '100',
+    CI_deceased := has200Score and le.crossindustry_score_name not in deceased_exception_models;
+		SELF.Crossindustry_score := MAP(le.Crossindustry_score <> '' AND score_override_alert_returned 						=> '100',	
 																			 le.Crossindustry_score <> '' AND prescreen_score_pass_Crossindustry		=> '1',
 																			 le.Crossindustry_score <> '' AND prescreen_score_fail_Crossindustry		=> '0',
-																																																							 le.Crossindustry_score);
+                                       le.Crossindustry_score <> '' AND no_truedid														=> '222',
+																			 le.Crossindustry_score <> '' AND CI_deceased 													=> '200',
+																																																								le.Crossindustry_score);
 	SELF.Crossindustry_Type := IF(prescreen_score_scenario_Crossindustry, '0-1', le.Crossindustry_Type);
-	SELF.Crossindustry_reason1 := MAP(prescreen_score_scenario_Crossindustry OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+	SELF.Crossindustry_reason1 := MAP(prescreen_score_scenario_Crossindustry OR  (score_override_alert_returned AND ~exception_score_reason) or CI_deceased or no_truedid=> '', 
                                     SELF.Crossindustry_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                                     SELF.Crossindustry_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                                     SELF.Crossindustry_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
                                                                                                                                              le.Crossindustry_reason1);
-	SELF.Crossindustry_reason2 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason2);
-	SELF.Crossindustry_reason3 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason3);
-	SELF.Crossindustry_reason4 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason4);
-	SELF.Crossindustry_reason5 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason5);
+	SELF.Crossindustry_reason2 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned or CI_deceased or no_truedid, '', le.Crossindustry_reason2);
+	SELF.Crossindustry_reason3 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned or CI_deceased or no_truedid, '', le.Crossindustry_reason3);
+	SELF.Crossindustry_reason4 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned or CI_deceased or no_truedid, '', le.Crossindustry_reason4);
+	SELF.Crossindustry_reason5 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned or CI_deceased or no_truedid, '', le.Crossindustry_reason5);
 
   //Custom model overrides
+	C1_deceased := has200Score and le.custom_score_name not in deceased_exception_models;
 	SELF.Custom_score := MAP(le.Custom_score <> '' AND score_override_alert_returned 	=> '100',
 													 le.Custom_score <> '' AND prescreen_score_pass_custom		=> '1',
 													 le.Custom_score <> '' AND prescreen_score_fail_custom		=> '0',
-																																											 le.Custom_score);
+													 le.Custom_score <> '' AND no_truedid											=> '222',
+													 le.Custom_score <> '' AND C1_deceased 										=> '200',
+																																											le.Custom_score);
 	SELF.Custom_Type := IF(prescreen_score_scenario_custom, '0-1', le.Custom_Type);
-	SELF.Custom_reason1 := MAP(prescreen_score_scenario_custom OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+
+	SELF.Custom_reason1 := MAP(prescreen_score_scenario_custom OR (score_override_alert_returned AND ~exception_score_reason) or C1_deceased or no_truedid=> '',  
                              SELF.Custom_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                              SELF.Custom_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                              SELF.Custom_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                               le.Custom_reason1);
-	SELF.Custom_reason2 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason2);
-	SELF.Custom_reason3 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason3);
-	SELF.Custom_reason4 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason4);
-	SELF.Custom_reason5 := IF(prescreen_score_scenario_custom OR score_override_alert_returned, '', le.Custom_reason5);
+                                                                                                                                 le.Custom_reason1);
+		SELF.Custom_reason2 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason2);
+		SELF.Custom_reason3 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason3);
+		SELF.Custom_reason4 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason4);
+		SELF.Custom_reason5 := IF(prescreen_score_scenario_custom OR score_override_alert_returned or C1_deceased or no_truedid, '', le.Custom_reason5);
 
   //Custom2 model overrides
+  C2_deceased := has200Score and le.custom2_score_name not in deceased_exception_models;
 	SELF.Custom2_score := MAP(le.Custom2_score <> '' AND score_override_alert_returned 	=> '100',
-													 le.Custom2_score <> '' AND prescreen_score_pass_custom2		=> '1',
-													 le.Custom2_score <> '' AND prescreen_score_fail_custom2		=> '0',
-																																											 le.Custom2_score);
+														le.Custom2_score <> '' AND prescreen_score_pass_custom2		=> '1',
+														le.Custom2_score <> '' AND prescreen_score_fail_custom2		=> '0',
+														le.Custom2_score <> '' AND no_truedid											=> '222',
+														le.Custom2_score <> '' AND C2_deceased 										=> '200',
+																																												le.Custom2_score);
 	SELF.Custom2_Type := IF(prescreen_score_scenario_custom2, '0-1', le.Custom2_Type);
-	SELF.Custom2_reason1 := MAP(prescreen_score_scenario_custom2 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+	SELF.Custom2_reason1 := MAP(prescreen_score_scenario_custom2 OR (score_override_alert_returned AND ~exception_score_reason) or C2_deceased or no_truedid=> '', 
                               SELF.Custom2_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                               SELF.Custom2_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                               SELF.Custom2_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                 le.Custom2_reason1);
-	SELF.Custom2_reason2 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned, '', le.Custom2_reason2);
-	SELF.Custom2_reason3 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned, '', le.Custom2_reason3);
-	SELF.Custom2_reason4 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned, '', le.Custom2_reason4);
-	SELF.Custom2_reason5 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned, '', le.Custom2_reason5);
+                                                                                                                                   le.Custom2_reason1);	
+		SELF.Custom2_reason2 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason2);
+		SELF.Custom2_reason3 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason3);
+		SELF.Custom2_reason4 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason4);
+		SELF.Custom2_reason5 := IF(prescreen_score_scenario_custom2 OR score_override_alert_returned or C2_deceased or no_truedid, '', le.Custom2_reason5);
 
-  //Custom3 model overrides
+  //Custom3 model overrides 
+	C3_deceased := has200Score and le.custom3_score_name not in deceased_exception_models;
 	SELF.Custom3_score := MAP(le.Custom3_score <> '' AND score_override_alert_returned 	=> '100',
-													 le.Custom3_score <> '' AND prescreen_score_pass_custom3		=> '1',
-													 le.Custom3_score <> '' AND prescreen_score_fail_custom3		=> '0',
-																																											 le.Custom3_score);
+														le.Custom3_score <> '' AND prescreen_score_pass_custom3		=> '1',
+														le.Custom3_score <> '' AND prescreen_score_fail_custom3		=> '0',
+														le.Custom3_score <> '' AND no_truedid											=> '222',
+														le.Custom3_score <> '' AND C3_deceased 										=> '200',
+																																												le.Custom3_score);
 	SELF.Custom3_Type := IF(prescreen_score_scenario_custom3, '0-1', le.Custom3_Type);
-	SELF.Custom3_reason1 := MAP(prescreen_score_scenario_custom3 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+	SELF.Custom3_reason1 := MAP(prescreen_score_scenario_custom3 OR (score_override_alert_returned AND ~exception_score_reason) or C3_deceased or no_truedid=> '',  
                               SELF.Custom3_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                               SELF.Custom3_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                               SELF.Custom3_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                 le.Custom3_reason1);
-	SELF.Custom3_reason2 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned, '', le.Custom3_reason2);
-	SELF.Custom3_reason3 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned, '', le.Custom3_reason3);
-	SELF.Custom3_reason4 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned, '', le.Custom3_reason4);
-	SELF.Custom3_reason5 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned, '', le.Custom3_reason5);
+                                                                                                                                   le.Custom3_reason1);
+		SELF.Custom3_reason2 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason2);
+		SELF.Custom3_reason3 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason3);
+		SELF.Custom3_reason4 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason4);
+		SELF.Custom3_reason5 := IF(prescreen_score_scenario_custom3 OR score_override_alert_returned or C3_deceased or no_truedid, '', le.Custom3_reason5);
 
   //Custom4 model overrides
+	C4_deceased := has200Score and le.custom4_score_name not in deceased_exception_models;
 	SELF.Custom4_score := MAP(le.Custom4_score <> '' AND score_override_alert_returned 	=> '100',
-													 le.Custom4_score <> '' AND prescreen_score_pass_custom4		=> '1',
-													 le.Custom4_score <> '' AND prescreen_score_fail_custom4		=> '0',
-																																											 le.Custom4_score);
+													  le.Custom4_score <> '' AND prescreen_score_pass_custom4		=> '1',
+													  le.Custom4_score <> '' AND prescreen_score_fail_custom4		=> '0',
+													  le.Custom4_score <> '' AND no_truedid											=> '222',
+													  le.Custom4_score <> '' AND C4_deceased 										=> '200',
+																																											le.Custom4_score);
+
 	SELF.Custom4_Type := IF(prescreen_score_scenario_custom4, '0-1', le.Custom4_Type);
-	SELF.Custom4_reason1 := MAP(prescreen_score_scenario_custom4 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+	SELF.Custom4_reason1 := MAP(prescreen_score_scenario_custom4 OR (score_override_alert_returned AND ~exception_score_reason) or C4_deceased or no_truedid=> '', 
                               SELF.Custom4_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                               SELF.Custom4_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                               SELF.Custom4_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                 le.Custom4_reason1);
-	SELF.Custom4_reason2 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned, '', le.Custom4_reason2);
-	SELF.Custom4_reason3 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned, '', le.Custom4_reason3);
-	SELF.Custom4_reason4 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned, '', le.Custom4_reason4);
-	SELF.Custom4_reason5 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned, '', le.Custom4_reason5);
+                                                                                                                                   le.Custom4_reason1);
+		SELF.Custom4_reason2 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason2);
+		SELF.Custom4_reason3 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason3);
+		SELF.Custom4_reason4 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason4);
+		SELF.Custom4_reason5 := IF(prescreen_score_scenario_custom4 OR score_override_alert_returned or C4_deceased or no_truedid, '', le.Custom4_reason5);
 
   //Custom5 model overrides
+  C5_deceased := has200Score and le.custom5_score_name not in deceased_exception_models;
 	SELF.Custom5_score := MAP(le.Custom5_score <> '' AND score_override_alert_returned 	=> '100',
-													 le.Custom5_score <> '' AND prescreen_score_pass_custom5		=> '1',
-													 le.Custom5_score <> '' AND prescreen_score_fail_custom5		=> '0',
-																																											 le.Custom5_score);
+														le.Custom5_score <> '' AND prescreen_score_pass_custom5		=> '1',
+														le.Custom5_score <> '' AND prescreen_score_fail_custom5		=> '0',
+														le.Custom5_score <> '' AND no_truedid											=> '222',
+														le.Custom5_score <> '' AND C5_deceased 										=> '200',
+																																												le.Custom5_score);
 	SELF.Custom5_Type := IF(prescreen_score_scenario_custom5, '0-1', le.Custom5_Type);
-	SELF.Custom5_reason1 := MAP(prescreen_score_scenario_custom5 OR (score_override_alert_returned AND ~exception_score_reason) => '', 
+	SELF.Custom5_reason1 := MAP(prescreen_score_scenario_custom5 OR (score_override_alert_returned AND ~exception_score_reason) or C5_deceased or no_truedid=> '', 
                               SELF.Custom5_score = '222' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z97',
                               SELF.Custom5_score = '200' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z98',
                               SELF.Custom5_score = '100' AND exception_score_reason AND NOT isPreScreenPurpose                => 'Z99',
-                                                                                                                                 le.Custom5_reason1);
-	SELF.Custom5_reason2 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason2);
-	SELF.Custom5_reason3 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason3);
-	SELF.Custom5_reason4 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason4);
-	SELF.Custom5_reason5 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason5);
+                                                                                                                                   le.Custom5_reason1);
+		SELF.Custom5_reason2 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason2);
+		SELF.Custom5_reason3 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason3);
+		SELF.Custom5_reason4 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason4);
+		SELF.Custom5_reason5 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned or C5_deceased or no_truedid, '', le.Custom5_reason5);
   
 	AlertRegulatoryCondition := map(
 		(hasSecurityFreeze and ~isCollectionsPurpose) or isStateException or tooYoungForPrescreen or PrescreenOptOut OR 
@@ -1232,7 +1271,7 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // 					for debugging
 // ===================================
 
-// output(riskview5_search_results, named('riskview5_final_results'));
+// output(riskview5_score_search_results, named('riskview5_score_search_results'));
 // OUTPUT(auto_model, NAMED('auto_model'));
 // OUTPUT(bankcard_model, NAMED('bankcard_model'));
 // OUTPUT(short_term_lending_model, NAMED('short_term_lending_model'));
