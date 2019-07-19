@@ -1,5 +1,5 @@
 ﻿
-IMPORT Address, AutoStandardI, BatchShare, Doxie, Gateway, Models, Risk_Indicators, Riskwise, ut, VehicleV2, 
+IMPORT Address, AutoStandardI, BatchShare, Gateway, Models, Risk_Indicators, Riskwise, ut, VehicleV2, 
 VehicleV2_Services, std;
 
 EXPORT BeneficiaryRiskScore_Functions := MODULE
@@ -101,14 +101,14 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 	EXPORT get_restriction_params() := 
 		FUNCTION
 			
-			base_params := BatchShare.IParam.getBatchParams();
+			base_params := BatchShare.IParam.getBatchParamsV2();
 			
 			// Project the base params to read shared parameters from stored(). If necessary, you may 
 			// redefine default values for common parameters and/or define default values for domain-
 			// specific parameters.
 			modInputRestrictions := 
 				MODULE(PROJECT(base_params, Models.BeneficiaryRiskScore_Interfaces.IRestrictionParams, opt))
-					EXPORT BOOLEAN dppa_ok     := DPPAPurpose BETWEEN 1 AND 7;
+					EXPORT BOOLEAN dppa_ok     := dppa BETWEEN 1 AND 7;
 					EXPORT BOOLEAN ViewDebugs  := FALSE : STORED('ViewDebugs');
 				END;
 			
