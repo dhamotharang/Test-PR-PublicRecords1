@@ -8,7 +8,7 @@ export PAC_Indicator_BatchService_Records (
 	indata_clean := BatchServices.PAC_Indicator_BatchService_Functions.clean_batch(indata);
 
 	ak_keyname := '~thor_data400::key::Debt_Settlement::qa::autokey::';
-	ak_dataset := dataset([], Debt_Settlement.Layouts.Base);
+	ak_dataset := dataset([], Debt_Settlement.Layouts.Keybuild);
  
 	batch_layout  := Autokey_batch.Layouts.rec_inBatchMaster;
 	joined_layout := BatchServices.PAC_Indicator_BatchService_Layouts.joined_layout; 
