@@ -1,4 +1,4 @@
-﻿import _Control, Gateway, PersonContext, risk_indicators, iesp, ut, FFD;
+﻿import _Control, Gateway, PersonContext, risk_indicators, iesp, FFD;
 onThor := _Control.Environment.OnThor;
 
 // this function will be used by every FCRA transaction coming in from a scoring product.  
@@ -33,9 +33,13 @@ dsResponseRecords_roxie := dedup(
 	dsResponse[1].records.LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS));
 
 // When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
-dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, 
-if(recordtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs], 2, 1),  // condider alerts to be higher priority than consumer statements, https://jira.rsi.lexisnexis.com/browse/DEMPSEY-273
--(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
+// dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, 
+// if(recordtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs], 2, 1),  // condider alerts to be higher priority than consumer statements, https://jira.rsi.lexisnexis.com/browse/DEMPSEY-273
+// -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
+
+// when running on Vault, the graph is getting hung up in PersonContext.Functions.PerformCombineDatasets, going to work around that issue for now
+dsResponseRecords_thor := dataset([], PersonContext.Layouts.Layout_PCResponseRec);
+
 
 #IF(onThor)
 	dsResponseRecords := dsResponseRecords_thor;
@@ -286,6 +290,8 @@ with_personContext := join(input_with_DID, rolled_personContext, left.did=right.
 // output(PersonContext_transformed, named('PersonContext_transformed'));	
 // output(rolled_personContext, named('rolled_personContext'));			
 // output(with_personContext, named('with_personcontext'));			
+
+// output(PCKeys,,'~dvstemp::in::getpersoncontext_thor_debugging', __compressed__);
 
 return group(with_personContext,seq);
 
