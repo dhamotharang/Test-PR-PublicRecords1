@@ -178,9 +178,9 @@ EXPORT MoveToQA :=sequential(
     ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor_data400'  ), ver(nm,filedate,'thor_data400')) ))
     ,nothor(apply(reltv_n_othr, update_supers(  ver(nm,'qa'    ,'thor_data400'), ver(nm,filedate,'thor_data400')) ))
     // This keey is built in Doxie.Proc_Header_Keys (not copied like the rest)
-    ,                           update_supers(  ver(ld,'qa'    ,'thor_data400'), ver(ld,filedate,'thor_data400'))
-    ,                           update_supers(  ver(ld,'qa'    ,'thor400_44'  ), ver(ld,filedate,'thor_data400'))
-    ,                           update_supers(  ver(ld,'qa'    ,'thor400_36'  ), ver(ld,filedate,'thor_data400'))
+    ,nothor(                    update_supers(  ver(ld,'qa'    ,'thor_data400'), ver(ld,filedate,'thor_data400')))
+    ,nothor(                    update_supers(  ver(ld,'qa'    ,'thor400_44'  ), ver(ld,filedate,'thor_data400')))
+    ,nothor(                    update_supers(  ver(ld,'qa'    ,'thor400_36'  ), ver(ld,filedate,'thor_data400')))
     ,nothor(Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true,ikb_ver)) // Restore the incremental keys into the qa superfiles
     ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta_eclcc','Dataland') // Copy and update new full keys in dataland
 );
