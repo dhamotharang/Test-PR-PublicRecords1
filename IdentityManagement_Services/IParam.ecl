@@ -1,7 +1,7 @@
 /***
  ** Module to define parameter interface for selection of desired reports. Each defaults to 'false' unless requested.
 ***/
-import PersonReports;
+import PersonReports, doxie;
 
 export IParam := module
   export _include := INTERFACE
@@ -30,7 +30,7 @@ export IParam := module
 		export unsigned2 LinkingWeightThreshold := 0;
   end;
 
-	export _report := INTERFACE (PersonReports.IParam._report, PersonReports.IParam.relatives,
+	export _report := INTERFACE (doxie.IDataAccess, PersonReports.IParam._report, PersonReports.IParam.relatives,
 															 PersonReports.IParam.neighbors, _include)
 		export boolean SuppressCompromisedDLs := false;
 

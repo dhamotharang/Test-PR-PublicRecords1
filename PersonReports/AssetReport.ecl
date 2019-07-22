@@ -1,4 +1,4 @@
-﻿IMPORT doxie, iesp, FFD, Gateway, PersonReports;
+﻿IMPORT $, doxie, iesp, FFD, Gateway, PersonReports;
 
 out_rec := personreports.layouts.CommonAssetReportIndividual;
 
@@ -9,7 +9,7 @@ EXPORT AssetReport (
   boolean IsFCRA = false) := FUNCTION
 
   //Convert to the old _report style module: $.input._assetreport
-  //mod_access := PROJECT (mod_asset, doxie.IDataAccess);
+  mod_access := PROJECT (mod_asset, doxie.IDataAccess);
   param := MODULE (PROJECT (mod_asset, $.IParam.old_assetreport))
     $.input.mac_copy_report_fields(mod_asset);
   END;
@@ -69,11 +69,11 @@ EXPORT AssetReport (
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Watercraft)
                                      ).wtr_recs, iesp.Constants.BR.MaxWatercrafts);
                                      
-  p_assessments := choosen (PersonReports.property_records(dids, module (project (param, PersonReports.input.property)) end, IsFCRA, ds_flags, 
+  p_assessments := choosen (PersonReports.property_records(dids, mod_access, PROJECT (mod_asset, $.IParam.property), IsFCRA, ds_flags, 
                           slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.ASSESSMENT,
                                                    FFD.Constants.DataGroups.PROPERTY_SEARCH]
                                      )).prop_assessments, iesp.Constants.BR.MaxAssessments);
-  p_deeds       := choosen (PersonReports.property_records(dids, module (project (param, PersonReports.input.property)) end, IsFCRA, ds_flags, 
+  p_deeds       := choosen (PersonReports.property_records(dids, mod_access, PROJECT (mod_asset, $.IParam.property), IsFCRA, ds_flags, 
                           slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.DEED,
                                                    FFD.Constants.DataGroups.PROPERTY_SEARCH]
                                      )).prop_deeds_all, iesp.Constants.BR.MaxDeeds);
@@ -83,7 +83,7 @@ EXPORT AssetReport (
                                      )), iesp.Constants.BR.MaxAircrafts);
 
   
-  p_paw         := choosen (PersonReports.peopleatwork_records(dids, Module(PROJECT (mod_asset,PersonReports.IParam.peopleatwork, OPT))end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  p_paw         := choosen (PersonReports.peopleatwork_records(dids, PROJECT (mod_asset,PersonReports.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
   
  
   // -----------------------------------------------------------------------
@@ -94,11 +94,11 @@ EXPORT AssetReport (
   // this service must not know anything about underlying data.
   // -----------------------------------------------------------------------
 
-  bankrpt := PersonReports.bankruptcy_records (dids, module (project (param, PersonReports.input.bankruptcy, opt)) end, 
+  bankrpt := PersonReports.bankruptcy_records (dids, mod_access, PROJECT (mod_asset, $.IParam.bankruptcy), 
                                               IsFCRA, ds_flags, param.non_subject_suppression, 
                                               slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Bankruptcy));
   
-  cnt := PersonReports.Counts(dids, project (param, PersonReports.input.count_param), IsFCRA);
+  cnt := PersonReports.Counts(dids, mod_access, PROJECT (mod_asset, $.IParam.count_param), IsFCRA);
   
   // special patch for DL:
   p_dlsr := choosen (pers.dlsr, 1);
