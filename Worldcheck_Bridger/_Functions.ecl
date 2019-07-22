@@ -1241,6 +1241,7 @@
 				trim(kword, left, right) = 'NABON' =>SubGroup_Constants.numKeywordsID.KEYWORD_NABON,
 				trim(kword, left, right) = 'USCME' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCME,
 				trim(kword, left, right) = 'INMSJE-NGO' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMSJE_NGO,
+				trim(kword, left, right) = 'GIBNATSANC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GIBNATSANC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
