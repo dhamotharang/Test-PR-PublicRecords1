@@ -1,8 +1,4 @@
-﻿import mdr, doxie, Data_Services, vault, _control;
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-EXPORT key_ssn_ssa(boolean isFCRA) := vault.Death_Master.key_ssn_ssa(isFCRA);
-#ELSE
+import mdr, doxie, Data_Services;
 
 EXPORT key_ssn_ssa(boolean isFCRA) := function
 
@@ -39,5 +35,4 @@ key_name := if(isFCRA,
 	return index(base,{ssn},{base},key_name);
 	
 end;
-#END;
 

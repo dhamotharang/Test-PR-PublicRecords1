@@ -1,4 +1,4 @@
-﻿Import Data_Services, American_student_list, Doxie, vault, _control;
+Import Data_Services, American_student_list, Doxie;
 
 file_in := American_student_list.File_american_student_DID_PH_Suppressed_v2;
 
@@ -9,16 +9,9 @@ American_student_DID_base	:=	PROJECT(file_in((unsigned8)did<>0), transform(Ameri
 	self.new_income_level_code := '',
 	self := left));
 
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export key_DID_FCRA := vault.american_student_list.key_DID_FCRA;
-#ELSE
 export key_DID_FCRA := index(American_student_DID_base, 
                             {unsigned6 l_did := (unsigned)did},{American_student_DID_base},
 				            Data_Services.Data_location.Prefix('american_student')+'thor_data400::key::fcra::American_Student::' + Doxie.Version_SuperKey+'::DID2');
-#END;
- 
-
 										
 										
 								

@@ -1,4 +1,4 @@
-﻿import doxie, ut, ln_propertyv2, data_services	, vault, _control;
+import doxie, ut, ln_propertyv2, data_services;
 
 EXPORT Key_Override_Property := MODULE
 
@@ -19,14 +19,8 @@ EXPORT Key_Override_Property := MODULE
 	dailyds_assessment := dataset (daily_prefix + 'assessment', assessment_override_layout, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_assessment, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_assessment,ln_fares_id,replaceds);
+  export assessment := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'property_assessment::qa::ffid', OPT);
 
-#IF(_Control.Environment.onVault) 
-export assessment := vault.FCRA.Key_Override_Property.assessment;
-#ELSE
-export assessment := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'property_assessment::qa::ffid', OPT);
-#END;
-	
-  
 
 // Deed Record
 	shared deed_override_layout := record
@@ -38,13 +32,8 @@ export assessment := index (replaceds, {flag_file_id}, {replaceds}, keyname_pref
 	dailyds_deed := dataset (daily_prefix + 'deed', deed_override_layout, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_deed, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_deed,ln_fares_id,replaceds);
-
-#IF(_Control.Environment.onVault) 
-	export deed := vault.FCRA.Key_Override_Property.deed;
-#ELSE
   export deed := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'property_deed::qa::ffid', OPT);
-#END;
-  
+
 
 
 //Search Record
@@ -57,13 +46,7 @@ export assessment := index (replaceds, {flag_file_id}, {replaceds}, keyname_pref
 	dailyds_search := dataset (daily_prefix + 'property_search', search_override_layout, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_search, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_search,persistent_record_id,replaceds);
-
-#IF(_Control.Environment.onVault) 
-  export search := vault.FCRA.Key_Override_Property.search;
-#ELSE
   export search := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'property_search::qa::ffid', OPT);
-#END;
-
 
 
 // Ownership: this is a derivative override based on the main overrides (search, A & D) 
@@ -72,14 +55,7 @@ export assessment := index (replaceds, {flag_file_id}, {replaceds}, keyname_pref
                     project (ds_assessment, ln_propertyv2.layout_property_common_model_base),
                     project (ds_deed,ln_propertyv2.layout_deed_mortgage_common_model_base));
 
-#IF(_Control.Environment.onVault) 
-  export ownership := vault.FCRA.Key_Override_Property.ownership;
-#ELSE
   export ownership := index (ds_ownership, {did}, {ds_ownership}, keyname_prefix +'property_ownership::qa::did');
-#END;
-
-
-
 
 
 END;

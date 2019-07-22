@@ -1,9 +1,4 @@
-﻿Import ut, doxie, Data_Services, vault, _control;
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export Key_Voters_States(boolean IsFCRA = false) := vault.VotersV2.Key_Voters_States(isFCRA);
-
-#ELSE
+Import ut, doxie, Data_Services;
 
 export Key_Voters_States(boolean IsFCRA = false) := function
 VoterFile := VotersV2.File_Voters_Building(ut.valid_st(source_state));
@@ -32,5 +27,3 @@ filename := if (IsFCRA,
 return index(VoterAvailSt, {state}, {VoterAvailSt}, filename);								
 								
 end;
-
-#END;

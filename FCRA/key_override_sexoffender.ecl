@@ -1,4 +1,4 @@
-﻿IMPORT Data_Services, sexoffender, vault, _control;
+IMPORT Data_Services, sexoffender;
 
 EXPORT key_override_sexoffender := module
 	shared fname_prefix := data_services.data_location.prefix('fcra_overrides') + 'thor_data400::base::override::fcra::qa::';
@@ -11,14 +11,7 @@ EXPORT key_override_sexoffender := module
 
   ds_SOff := dataset (fname_prefix + 'so_main', SOff_rec, flat, OPT);
   kf_SOff := dedup (sort (ds_SOff, -flag_file_id), except flag_file_id);
-
-#IF(_Control.Environment.onVault) 
-  export so_main := vault.FCRA.key_override_sexoffender.so_main;
-#ELSE
   export so_main := index (kf_SOff, {flag_file_id}, {kf_SOff}, keyname_prefix + 'so_main::qa::ffid', OPT);
-#END;	
-
-
 		
 	//TODO: this should be in a defined layout...
 	offense_rec := record

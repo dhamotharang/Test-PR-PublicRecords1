@@ -1,8 +1,4 @@
-﻿import fcra, data_services, vault, _control;
-
-#IF(_Control.Environment.onVault) 
-EXPORT key_Override_Alloy_FFID := vault.FCRA.Key_Override_Alloy_FFID;
-#ELSE
+import fcra, data_services;
 
 EXPORT key_Override_Alloy_FFID := FUNCTION
 
@@ -29,5 +25,8 @@ EXPORT key_Override_Alloy_FFID := FUNCTION
 	
 END;
 
-#END;
+// ds_override := dataset('~thor_data400::base::override::fcra::qa::alloy', fcra.layout_override_alloy, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+// ds := dedup(sort(ds_override,-flag_file_id),except flag_file_id,keep(1));
 
+// export Key_Override_Alloy_FFID := index(ds, {flag_file_id}, {ds}, 
+// data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::alloy::qa::ffid');

@@ -9,7 +9,7 @@ infile %tester% (infile le, Risk_Indicators.Key_HRI_Address_To_Sic ri) := TRANSF
 END;
 
 #uniquename(tester_fcra)
-infile %tester_FCRA% (infile le, risk_indicators.Key_HRI_Address_To_Sic_filtered_FCRA ri) := TRANSFORM
+infile %tester_FCRA% (infile le, Risk_Indicators.Key_HRI_Address_To_Sic_filtered ri) := TRANSFORM
 	SELF.Address_Verification.addr_field.HR_Address := ri.sic_code<>'';
 	SELF := le;
 END;

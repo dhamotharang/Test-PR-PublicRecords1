@@ -1,12 +1,11 @@
-﻿import liensv2, Doxie, ut,data_services;
+import liensv2, Doxie, ut,data_services;
 
 get_recs := LiensV2.fnOverrideFilingStatus(LiensV2.file_liens_main);
 get_recs_newLayout	:=	PROJECT(get_recs,
 													TRANSFORM(
 														RECORDOF(LiensV2.key_liens_main_ID_FCRA),
 														SELF.bCBFLag	:=	FALSE;
-														SELF:=LEFT;
-														self := [];  // to account for vault file not containing _internal_fpos_, work around that syntax error
+														SELF:=LEFT
 													)
 												);
 dist_id := distribute(get_recs_newLayout, hash(TMSID,RMSID));

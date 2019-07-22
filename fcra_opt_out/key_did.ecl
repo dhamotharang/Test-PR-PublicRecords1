@@ -1,4 +1,4 @@
-﻿import doxie, data_services, vault, _control;
+import doxie, data_services;
 
 f_optout := fcra_opt_out.file_infile_appended;
 
@@ -23,13 +23,9 @@ end;
 tbl_did := table(f_optout,slim_optout,did,ssn,source_flag,julian_date,inname_first,inname_last,address,
 			city,state,zip5,did_score,ssn_append,permanent_flag,opt_back_in,date_YYYYMMDD,few);
 
+			
 
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export key_did := vault.fcra_opt_out.key_did;
-#ELSE
 export key_did := index(tbl_did((unsigned)DID<>0),
               {unsigned6 l_DID := (unsigned)did},{ssn,source_flag,julian_date,inname_first,inname_last,address,
 							city,state,zip5,did_score,ssn_append,permanent_flag,opt_back_in,date_YYYYMMDD},
               data_services.data_location.prefix() + 'thor_data400::key::fcra::optout::did_'+doxie.Version_SuperKey);
-#END;
-

@@ -602,9 +602,8 @@ isFraudpoint :=  not isFCRA and (BSOptions & iid_constants.BSOptions.IncludeFrau
 ssn_table_results := if(isFraudpoint or (bsversion>=41 and ~isFCRA), group(ssn_table_results2, seq), group(ssn_table_results1, seq));
 // ssn_table_results := if(isFraudpoint or (bsversion>=41 and ~isFCRA), group(ssn_table_results2, seq), group(ssn_table_results1, seq));
 
-SSNMapKey := if(isFCRA, doxie.Key_SSN_FCRA_Map, doxie.Key_SSN_Map);
     									
-risk_indicators.layout_output get_ssnMap (risk_indicators.layout_output le, SSNMapKey ri, INTEGER i) := transform
+risk_indicators.layout_output get_ssnMap (risk_indicators.layout_output le, doxie.Key_SSN_Map ri, INTEGER i) := transform
 	hasCorrection := le.ssn_correct_ffid <> [];
 	
   // new ssn-issue data have '20990101' for the current date intervals
@@ -648,7 +647,7 @@ risk_indicators.layout_output get_ssnMap (risk_indicators.layout_output le, SSNM
 	SELF := le;
 END;
 
-
+SSNMapKey := if(isFCRA, doxie.Key_SSN_FCRA_Map, doxie.Key_SSN_Map);
 
 got_SSNMap_roxie := join(ssn_table_results, SSNMapKey,
 												(left.ssn!='' AND LENGTH(StringLib.StringFilter(LEFT.ssn, '0123456789')) = 9 AND LENGTH(TRIM(LEFT.ssn)) = 9) and 
@@ -681,6 +680,7 @@ got_SSNMap_thor := got_SSNMap_thor_pre +
 got_SSNMapDL_roxie := join(got_SSNMap, SSNMapKey,
 																(left.dl_number!='') and
 																keyed(left.dl_number[1..5]=right.ssn5) AND
+																//TODO: not clear if check for start/end_serial for DL
 																// check date
 																((unsigned3)(RIGHT.start_date[1..6]) < left.historydate),
 																get_ssnMap(left,right, 2),
@@ -689,6 +689,7 @@ got_SSNMapDL_roxie := join(got_SSNMap, SSNMapKey,
 got_SSNMapDL_thor_pre := join(distribute(got_SSNMap(dl_number<>''), hash64(dl_number[1..5])), 
 																distribute(pull(SSNMapKey), hash64(ssn5)),
 																(left.dl_number[1..5]=right.ssn5) AND
+																//TODO: not clear if check for start/end_serial for DL
 																// check date
 																((unsigned3)(RIGHT.start_date[1..6]) < left.historydate),
 																get_ssnMap(left,right, 2),

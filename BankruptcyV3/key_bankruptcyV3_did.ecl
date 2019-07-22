@@ -1,9 +1,4 @@
-﻿import BankruptcyV2, fcra, Doxie, ut, std, vault, _control;
-
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export key_bankruptcyV3_did(boolean isFCRA = false) := vault.BankruptcyV3.key_bankruptcyV3_did(isFCRA);
-#ELSE
+import BankruptcyV2, fcra, Doxie, ut, std;
 
 export key_bankruptcyV3_did(boolean isFCRA = false) := function
   todaysdate := (STRING8)Std.Date.Today();
@@ -36,5 +31,3 @@ export key_bankruptcyV3_did(boolean isFCRA = false) := function
 
 	return index(slim_dedup,{unsigned6 did := (unsigned6)did},{TMSID,court_code,case_number},key_name);
 end;
-
-#END;

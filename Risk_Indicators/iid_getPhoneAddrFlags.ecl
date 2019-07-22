@@ -303,9 +303,8 @@ jphonerecs2_thor := jphonerecs2_thor_pre + jphonerecs2_thor_nowphone;
 // rollup again here before searching telcordia
 jphonerecs2rolled := rollup(jphonerecs2,true,flagroll(LEFT,RIGHT));
 
-telecordia_key := if(isFCRA, risk_indicators.Key_FCRA_Telcordia_tpm_slim, risk_indicators.Key_Telcordia_tpm_slim);
 
-risk_indicators.layout_output teltrans(risk_indicators.layout_output le, telecordia_key ri, INTEGER i) := transform
+risk_indicators.layout_output teltrans(risk_indicators.layout_output le, risk_indicators.Key_Telcordia_tpm_slim ri, INTEGER i) := transform
 	self.nxx_type := IF(i=1,IF(le.nxx_type='',ri.nxx_type,le.nxx_type), le.nxx_type);
 	self.phonetype := IF(i=1,risk_indicators.PRIIPhoneRiskFlag('').telcordiaPhoneType(ri.dial_ind, ri.point_id),le.phonetype);
 	self.hriskphoneflag := IF(i=1,IF(le.nxx_type='',risk_indicators.PRIIPhoneRiskFlag(le.phone10).phoneRiskFlag(ri.nxx_type, le.phonedissflag, ''),le.hriskphoneflag), le.hriskphoneflag);
@@ -344,6 +343,7 @@ risk_indicators.layout_output teltrans(risk_indicators.layout_output le, telecor
 	self := le;
 END;
 
+telecordia_key := if(isFCRA, risk_indicators.Key_FCRA_Telcordia_tpm_slim, risk_indicators.Key_Telcordia_tpm_slim);
 
 telphonerecs0_roxie := group(join(jphonerecs2rolled, telecordia_key,
 												LEFT.phone10!='' AND
