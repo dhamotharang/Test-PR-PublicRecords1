@@ -1139,6 +1139,7 @@
 		export string KEYWORD_NABON									:= '825';
 		export string KEYWORD_USCME									:= '826';
 		export string KEYWORD_INMSJE_NGO						:= '827';
+		export string KEYWORD_GIBNATSANC						:= '828';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
