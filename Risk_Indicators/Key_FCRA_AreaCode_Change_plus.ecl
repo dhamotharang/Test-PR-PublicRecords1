@@ -1,4 +1,4 @@
-import doxie,data_services;
+﻿import doxie,data_services, vault, _control;
 raw := file_areacode_change;
 
 
@@ -31,5 +31,12 @@ end;
 
 final := base + project(base, swap(left));
 
+
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export Key_FCRA_AreaCode_Change_plus := vault.risk_indicators.Key_FCRA_AreaCode_Change_plus;
+#ELSE
 export Key_FCRA_AreaCode_Change_plus := index(final,{old_NPA,old_NXX},{final},data_services.data_location.prefix() + 'thor_data400::key::fcra::areacode_change_plus_' + doxie.Version_SuperKey);
+#END;
+
+
 

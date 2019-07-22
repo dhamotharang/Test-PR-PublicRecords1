@@ -119,7 +119,7 @@ layout_headerOverridePlusSeq get_header_corr(g_inrec le, fcra.Key_Override_Heade
 	self := ri;
 END; 
 
-header_corr_roxie := if(isFCRA, JOIN(g_inrec, fcra.Key_Override_Header_DID,	// quick header is included
+header_corr_roxie := if(isFCRA, group(JOIN(g_inrec, fcra.Key_Override_Header_DID,	// quick header is included
 																left.did<>0 and keyed (Left.did = Right.did) and
 																// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
 																(right.head.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
@@ -129,7 +129,7 @@ header_corr_roxie := if(isFCRA, JOIN(g_inrec, fcra.Key_Override_Header_DID,	// q
 																	trim((string)right.did) + trim((string)right.head.rid) not in left.header_correct_record_id	// old way - exclude corrected records from prior to 11/13/2012
 																	and trim( (string)right.head.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id		
 																get_header_corr(LEFT, RIGHT),																
-																atmost(ut.limits.HEADER_PER_DID)),
+																atmost(ut.limits.HEADER_PER_DID)), seq),
 													group(dataset([], layout_headerOverridePlusSeq),seq));
 
 header_corr_thor := if(isFCRA,group( JOIN(distribute(g_inrec(did<>0), hash64(did)),

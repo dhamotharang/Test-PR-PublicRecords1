@@ -364,7 +364,7 @@ end;
 
 		JOIN( 
 			unique_dids, 
-			distribute(pull(temp_key_property_did(source_code_2 = PROPERTY)), s_did), // LN_PropertyV2.key_Property_did(is_FCRA),
+			distribute(pull(temp_key_property_did)(source_code_2 = PROPERTY), s_did), // LN_PropertyV2.key_Property_did(is_FCRA),
 			LEFT.did = RIGHT.s_did,
 			append_fares_id_by_DID(left, right),
 			KEEP(100), 
@@ -441,7 +441,7 @@ end;
 		ids_plus_fares_by_address_thor := 
 		JOIN(
 			distribute(p_addr(prim_name<>''), hash64(prim_name, prim_range, zip5, sec_range)), 
-			distribute(pull(kaf(source_code_2 = PROPERTY)), hash64(prim_name, prim_range, zip, sec_range)),
+			distribute(pull(kaf)(source_code_2 = PROPERTY), hash64(prim_name, prim_range, zip, sec_range)),
 			LEFT.prim_name = RIGHT.prim_name AND
 			LEFT.prim_range = RIGHT.prim_range AND
 			LEFT.zip5 = RIGHT.zip AND
