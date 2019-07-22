@@ -6,7 +6,7 @@ EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := m
 	 contactKey := project(pull(BIPV2_Build.key_contact_linkids.keyvs(,false).built), recordof(key_contact_linkids.dkeybuild));
 	 
   build_date := (unsigned) STD.Str.Filter(pversion,'0123456789');
-		shared contactTitles := BestContactTitle(contactKey, build_date).contact_title;
+	shared contactTitles := project(BestContactTitle(contactKey, build_date).contact_title  ,transform({BestContactTitle(contactKey, build_date).layout,unsigned4 global_sid,unsigned8 record_sid},self := left,self := []));
 
   shared contact_title_bipd_pst          :=   contactTitles : persist('~persist::BIPV2_Build::key_contact_title_linkids.ds_prep');
   export contact_title_bipd_dst          :=   dataset('~persist::BIPV2_Build::key_contact_title_linkids.ds_prep',{contactTitles},flat);
