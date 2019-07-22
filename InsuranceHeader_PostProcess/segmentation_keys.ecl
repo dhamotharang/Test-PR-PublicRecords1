@@ -1,4 +1,4 @@
-﻿import Data_Services, doxie, vault, _control;	
+import Data_Services, doxie;	
 export segmentation_keys := module
 
 	coreCheckLayout := RECORD
@@ -13,12 +13,5 @@ export segmentation_keys := module
 	segmentation := dataset([],coreCheckLayout) ;
 	
 	sfile_key_did_ind := Data_Services.Data_Location.Prefix('SEGMENTATION') + 'thor_data400::key::insuranceheader_segmentation::did_ind_' + doxie.Version_SuperKey;
-
-#IF(_Control.Environment.onVault) 
-	// export key_did_ind := vault.InsuranceHeader.segmentation_keys.key_did_ind;  // flat version
-	export key_did_ind := vault.InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;  // key version
-#ELSE
 	export key_did_ind := INDEX(segmentation, {did}, {segmentation}, sfile_key_did_ind	);	
-#END;
-
 end;

@@ -1,4 +1,4 @@
-﻿Import Data_Services, liensv2, Doxie, ut, BIPV2, _Control, vault;
+﻿Import Data_Services, liensv2, Doxie, ut, BIPV2;
 
 get_recs := LiensV2.file_liens_party_keybuild_fcra;
 
@@ -26,9 +26,5 @@ sort_id := sort(dist_id, TMSID, RMSID,local);
 //DF-22188 - Deprecate speicified in thor_data400::key::liensv2::fcra::party::tmsid.rmsid_qa
 ut.MAC_CLEAR_FIELDS(sort_id, sort_id_cleared, LiensV2.Constants.fields_to_clear_party_id_fcra);
 
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export 	key_liens_party_id_FCRA := vault.LiensV2.key_liens_party_id_FCRA;
-#ELSE
 export 	key_liens_party_id_FCRA := index(sort_id_cleared,{tmsid,RMSID},{sort_id_cleared},
 Data_Services.Data_location.Prefix('Liensv2')+'thor_data400::key::liensv2::fcra::party::TMSID.RMSID_' + doxie.Version_SuperKey);
-#END;

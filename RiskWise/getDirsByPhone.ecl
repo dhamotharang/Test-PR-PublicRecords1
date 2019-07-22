@@ -27,19 +27,17 @@ gong_correct_thor := join(input(gong_correct_ffid<>[]), pull(FCRA.Key_Override_G
 	gong_correct := gong_correct_roxie;
 #END
 
-gong_key_history_phone := if(isFCRA, gong.Key_FCRA_History_Phone, gong.key_history_phone);
-
-Layout_Dirs_Phone add_gong(input le, gong_key_history_phone rt) := transform
+Layout_Dirs_Phone add_gong(input le, gong.key_history_phone rt) := transform
 	self.src := 'GH';
 	self := rt;
 end;
 // get gong history using the input phone
-g_history_non_fcra_roxie := join(input, gong_key_history_phone,
+g_history_non_fcra_roxie := join(input, gong.Key_History_phone,
 										trim(left.phone10)!= '' and keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),									 
 									add_gong(left,right), ATMOST(keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100));
 
 g_history_non_fcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(phone10)), 
-										 distribute(pull(gong_key_history_phone), hash64(p3+p7)),
+										 distribute(pull(gong.Key_History_phone), hash64(p3+p7)),
 										 (right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),									 
 									add_gong(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
 
@@ -49,13 +47,13 @@ g_history_non_fcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(pho
 	g_history_non_fcra := g_history_non_fcra_roxie;
 #END
 
-g_history_fcra_roxie := join(input, gong_key_history_phone,
+g_history_fcra_roxie := join(input, gong.Key_FCRA_History_Phone,
 										trim(left.phone10)!= '' and keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]) and
 									  trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id,
 									add_gong(left,right), ATMOST(keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100));
 
 g_history_fcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(phone10)), 
-										distribute(pull(gong_key_history_phone), hash64(p3+p7)),
+										distribute(pull(gong.Key_FCRA_History_Phone), hash64(p3+p7)),
 										(right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]) and
 									  trim((string12)right.did+(string10)right.phone10+(string8)right.dt_first_seen) not in left.gong_correct_record_id,
 									add_gong(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
@@ -75,9 +73,9 @@ combo := if(isFCRA, /*group( sort (*/ combined/*, seq), seq)*/, g_history);
 // no longer use today's date for the calculation, use the build date							
 cdate := Risk_Indicators.get_Build_date('targus_build_version');
 
-targus_phone_key := if(isFCRA, targus.Key_Targus_FCRA_Phone, targus.Key_Targus_Phone);
+
 						
-Layout_Dirs_Phone add_targus(input le, targus_phone_key rt) := transform
+Layout_Dirs_Phone add_targus(input le, targus.Key_Targus_Phone rt) := transform
 	self.src := 'WP';
 	self.phone10 := rt.phone_number;
 	self.area_code := rt.phone_number[1..3];
@@ -106,12 +104,12 @@ end;
 // JRP 02/01/2008 - EOM
 
 // get targus white pages info using the input phone
-targus_wp_nonfcra_roxie := join(input, targus_phone_key,
+targus_wp_nonfcra_roxie := join(input, targus.Key_Targus_Phone,
 														trim(left.phone10)!= '' and keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),
 													add_targus(left,right), ATMOST(keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100));
 
 targus_wp_nonfcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(phone10)), 
-														 distribute(pull(targus_phone_key), hash64(p3+p7)),
+														 distribute(pull(targus.Key_Targus_Phone), hash64(p3+p7)),
 														 (right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),
 													add_targus(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
 
@@ -121,12 +119,12 @@ targus_wp_nonfcra_thor := join(distribute(input(trim(phone10)!= ''), hash64(phon
 	targus_wp_nonfcra := targus_wp_nonfcra_roxie;
 #END
 
-targus_wp_fcra_roxie := join(input, targus_phone_key,
+targus_wp_fcra_roxie := join(input, targus.Key_Targus_FCRA_Phone,
 												trim(left.phone10)!= '' and keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),
 											add_targus(left,right), ATMOST(keyed(right.p3=left.phone10[1..3]) and keyed(right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100));
 											
 targus_wp_fcra_thor := join(distribute(input(trim(phone10)!=''), hash64(phone10)), 
-											 distribute(pull(targus_phone_key), hash64(p3+p7)),
+											 distribute(pull(targus.Key_Targus_FCRA_Phone), hash64(p3+p7)),
 											(right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),
 											add_targus(left,right), ATMOST((right.p3=left.phone10[1..3]) and (right.p7=left.phone10[4..10]),RiskWise.max_atmost),keep(100), LOCAL);
 

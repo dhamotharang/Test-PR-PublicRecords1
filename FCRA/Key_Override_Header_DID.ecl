@@ -1,4 +1,4 @@
-﻿import fcra, ut, data_services, vault, _control;
+import fcra, ut, data_services;
 
 kf := File_Header_Correct ((unsigned)head.did<>0);
 
@@ -75,12 +75,7 @@ end;
 
 withoutcd := project(rolledupdata,proj_recs(left));
 
-
-#IF(_Control.Environment.onVault) 
-export Key_Override_Header_DID := vault.FCRA.Key_Override_Header_DID;
-#ELSE
 export Key_Override_Header_DID := 
 index(withoutcd,
 			{unsigned6 did := (unsigned)head.did}, {withoutcd}, 
  data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::header::qa::did');
-#END;

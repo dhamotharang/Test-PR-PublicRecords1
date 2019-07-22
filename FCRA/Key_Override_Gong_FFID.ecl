@@ -1,4 +1,4 @@
-﻿import data_services, vault, _control;
+import data_services;
 
 string_rec := record
 string20 flag_file_id;
@@ -76,10 +76,5 @@ end;
 
 kf := project(ds,proj_recs(left));
 
-#IF(_Control.Environment.onVault) 
-export Key_Override_Gong_FFID := vault.FCRA.Key_Override_Gong_FFID;
-#ELSE
 export Key_Override_Gong_FFID := index(kf,{flag_file_id}, {kf},
 data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::gong::qa::ffid');
-#END;
-

@@ -1,4 +1,4 @@
-﻿import ut, doxie, data_services, vault, _control;
+﻿import ut, doxie, data_services;
 
 baseCID := InfutorCID.File_InfutorCID_Base((unsigned)phone<>0);
 
@@ -47,11 +47,4 @@ slim_layout into_slim(baseCID le) := transform
 end;
 p := project(baseCID, into_slim(left));
 
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export Key_Infutor_Phone_FCRA := vault.InfutorCID.Key_Infutor_Phone_FCRA;
-#ELSE
 export Key_Infutor_Phone_FCRA := index(p,{phone},{p},data_services.data_location.prefix() + 'thor_data400::key::infutorcid::fcra::phone_' + doxie.Version_SuperKey);
-#END;
-
-

@@ -1,4 +1,4 @@
-﻿import doxie, Data_Services, vault, _control;
+import doxie, Data_Services;
 j := Telcordia_tpm_base;
 
 slimrec := record	, MAXLENGTH(9999)
@@ -28,11 +28,5 @@ j3 := denormalize(j2,j, left.npa= right.npa and left.nxx = right.nxx and
 			   denorm_j(LEFT,RIGHT));
 
 
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export Key_FCRA_Telcordia_tpm_slim := vault.Risk_Indicators.Key_FCRA_Telcordia_tpm_Slim;
-#ELSE
 export Key_FCRA_Telcordia_tpm_slim := INDEX(j3,{npa,nxx,tb},{j3},Data_Services.Data_Location.Prefix('Telcordia')+'thor_data400::key::fcra::telcordia_tpm_slim_'+doxie.Version_SuperKey,OPT);
-#END;
-
 

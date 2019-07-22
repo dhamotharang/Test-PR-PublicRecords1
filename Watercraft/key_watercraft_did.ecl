@@ -1,10 +1,5 @@
-﻿import watercraft, doxie, ut, fcra,data_services, vault, _control;
+import watercraft, doxie, ut, fcra,data_services;
 
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export key_watercraft_did (boolean isFCRA = false) := vault.watercraft.key_watercraft_did(isFCRA);
-
-#ELSE
 export key_watercraft_did (boolean isFCRA = false) := function
 
   base_file := watercraft.file_base_search_dev((unsigned6)did<>0);
@@ -25,6 +20,3 @@ export key_watercraft_did (boolean isFCRA = false) := function
   return index (base_dep, {l_did := (unsigned6) did}, {state_origin, watercraft_key,sequence_key},
                 file_prefix + doxie.Version_SuperKey);
 end;
-
-#END;
-

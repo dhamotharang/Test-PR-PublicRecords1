@@ -186,15 +186,13 @@ EXPORT getAllBocaShellData (
 												 left.seq = right.seq,
 												 tf_pre_ADVO(left, right), left outer), seq);
 
-	advo_key := if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history);
-
-	Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd getAdvo1(pre_ADVO le, advo_key ri) := TRANSFORM
+	Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd getAdvo1(pre_ADVO le, Advo.Key_Addr1_history ri) := TRANSFORM
 		self.Residential_or_Business_Ind	:= ri.Residential_or_Business_Ind;
 		self 															:= le;
 	END;
 
 	//do search of ADVO by property to pick up address type - we are specifically looking for business addresses
-	prop_with_advo_roxie := join(pre_ADVO, advo_key,  //join to appropriate FCRA/nonFCRA key
+	prop_with_advo_roxie := join(pre_ADVO, if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history),  //join to appropriate FCRA/nonFCRA key
 					left.zip5 != '' and 
 					left.prim_range != '' and
 					keyed(left.zip5 = right.zip) and
@@ -212,7 +210,7 @@ EXPORT getAllBocaShellData (
 	prop_with_advo_thor := join(distribute(pre_ADVO, hash64(zip5,
 																												 prim_range,
 																												 prim_name)), 
-					distribute(pull(advo_key), hash64(zip, prim_range, prim_name)),  //join to appropriate FCRA/nonFCRA key
+					distribute(pull(if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history)), hash64(zip, prim_range, prim_name)),  //join to appropriate FCRA/nonFCRA key
 					left.zip5 != '' and 
 					left.prim_range != '' and
 					left.zip5 = right.zip and
@@ -1422,26 +1420,12 @@ advo_rolled := risk_indicators.boca_shell_advo(ids_wide(~isrelat), isFCRA, datar
 employment_rolled := risk_indicators.boca_shell_employment(ids_wide(~isrelat), isFCRA, isPreScreen, bsversion, mod_access);	
 
 // need to populate the phones_on_file from the gong search.  inquiries search expects that to be populated
-inquiries_input_roxie := join(ids_wide(~isrelat), gong_added_back, left.seq=right.seq,
+inquiries_input := group(join(ids_wide(~isrelat), gong_added_back, left.seq=right.seq,
 		transform(risk_indicators.Layout_BocaShell_Neutral, 
 						self.header_summary.phones_on_file := right.header_summary.phones_on_file,
 						self.header_summary.phones_on_file_created12months := right.header_summary.phones_on_file_created12months,
-						self := left));
+						self := left)), seq);
 						
-inquiries_input_thor := join(
-												distribute(ids_wide(~isrelat), seq), 
-												distribute(gong_added_back, seq), left.seq=right.seq,
-		transform(risk_indicators.Layout_BocaShell_Neutral, 
-						self.header_summary.phones_on_file := right.header_summary.phones_on_file,
-						self.header_summary.phones_on_file_created12months := right.header_summary.phones_on_file_created12months,
-						self := left), left outer, local);
-
-#IF(onThor)
-	inquiries_input := group(inquiries_input_thor, seq);
-#ELSE
-	inquiries_input := group(inquiries_input_roxie, seq);
-#END
- 						
 inquiries_rolled := if(isFCRA, 
 										risk_indicators.boca_shell_inquiries_FCRA(inquiries_input, BSOptions, bsversion, gateways),
 										risk_indicators.boca_shell_inquiries(inquiries_input, BSOptions, bsversion, gateways, DataPermission));

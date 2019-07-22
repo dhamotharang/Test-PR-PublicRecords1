@@ -1,10 +1,5 @@
-﻿import doxie, FCRA, Data_Services, vault, _control;
+import doxie, FCRA, Data_Services;
 
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export key_proflic_did (boolean IsFCRA = false) := vault.prof_licenseV2.Key_Proflic_Did (isFCRA);
-
-#ELSE
 export key_proflic_did (boolean IsFCRA = false) := function
   df := Prof_LicenseV2.File_Proflic_Base_Keybuild((unsigned)did != 0 and vendor<>'INFUTOR');
 
@@ -27,8 +22,3 @@ export key_proflic_did (boolean IsFCRA = false) := function
 
   return index (out_df, {did}, {out_df}, file_name);
 end;
-
-
-#END;
-
-

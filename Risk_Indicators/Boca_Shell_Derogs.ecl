@@ -139,7 +139,7 @@ bankrupt_rolled_disp := JOIN(bankrupt_rolled_tmp, bankrupt_disp,
 		SELF.BJL.bk_chapter := RIGHT.BJL.bk_chapter;
 		SELF := LEFT),
 	LEFT OUTER);
-bankrupt_rolled := if(bsVersion < 50, group(bankrupt_rolled_tmp, seq), group(bankrupt_rolled_disp, seq));
+bankrupt_rolled := if(bsVersion < 50, bankrupt_rolled_tmp, group(bankrupt_rolled_disp, seq));
 	
 kld			:= liensv2.key_liens_DID;
 klr_nonFCRA	:= liensv2.key_liens_party_id;

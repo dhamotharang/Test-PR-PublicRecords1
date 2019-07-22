@@ -1,4 +1,4 @@
-﻿import watercraft, data_services, vault, _control;
+import watercraft, data_services;
 
 export key_override_watercraft := MODULE
 
@@ -18,13 +18,7 @@ export key_override_watercraft := MODULE
   //TODO: why dedup? shouldn't it be done in the input dataset?
   kf := dedup (sort (ds_sid, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_sid,persistent_record_id,replaceds);
-
-#IF(_Control.Environment.onVault) 
-  export sid := vault.FCRA.key_override_watercraft.sid;
-#ELSE
   export sid := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'watercraft_sid');
-#END;	
-
 
   // CID (coast guard)
   cid_rec := record

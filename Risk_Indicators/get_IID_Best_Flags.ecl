@@ -294,8 +294,7 @@ layout_output_tmp flagroll(layout_output_tmp l, layout_output_tmp r) := transfor
 		r, l);	
 END;
 
-hri_key := if(isFCRA, risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA, risk_indicators.key_HRI_Address_To_SIC); 
-layout_output_tmp bestaddr_highrisk_transform(risk_indicators.layout_output l,hri_key r) := transform
+layout_output_tmp bestaddr_highrisk_transform(risk_indicators.layout_output l,risk_indicators.key_HRI_Address_To_SIC r) := transform
 	// override the address type to a P if the high risk database finds a match to 'UNITED STATES POSTAL SERVICE'													
 	addr_type := if(trim(r.sic_code)='2265', 'P', l.addr_type);	
 	self.hriskaddrflag := MAP(trim(l.zipclass) = 'P' => '1',
@@ -313,7 +312,7 @@ layout_output_tmp bestaddr_highrisk_transform(risk_indicators.layout_output l,hr
 END;
 
 with_bestaddr_hriskaddrflag_tmp_roxie := if (isFCRA,
-			join(bestaddr_zipclass,hri_key,
+			join(bestaddr_zipclass,risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA,
 				left.z5!='' and left.prim_name != '' and
 				keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and 
 				keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and 
@@ -323,7 +322,7 @@ with_bestaddr_hriskaddrflag_tmp_roxie := if (isFCRA,
 				ATMOST(keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and
 					  keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and
 						keyed(ut.NNEQ(left.sec_range, right.sec_range)), RiskWise.max_atmost), keep(100)),
-			join(bestaddr_zipclass,hri_key,
+			join(bestaddr_zipclass,risk_indicators.key_HRI_Address_To_SIC,
 				left.z5!='' and left.prim_name != '' and
 				keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and 
 				keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and 
@@ -336,7 +335,7 @@ with_bestaddr_hriskaddrflag_tmp_roxie := if (isFCRA,
 
 with_bestaddr_hriskaddrflag_tmp_thor := if (isFCRA,
 			join(distribute(bestaddr_zipclass, hash64(z5, prim_name, addr_suffix, predir, postdir, prim_range)),
-				distribute(pull(hri_key), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
+				distribute(pull(risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
 				left.z5!='' and left.prim_name != '' and
 				(left.z5=right.z5) and (left.prim_name=right.prim_name) and (left.addr_suffix=right.suffix) and 
 				(left.predir=right.predir) and (left.postdir=right.postdir) and (left.prim_range=right.prim_range) and 
@@ -346,7 +345,7 @@ with_bestaddr_hriskaddrflag_tmp_thor := if (isFCRA,
 				ATMOST(left.z5=right.z5 and left.prim_name=right.prim_name and left.addr_suffix=right.suffix and
 					  left.predir=right.predir and left.postdir=right.postdir and left.prim_range=right.prim_range, RiskWise.max_atmost), keep(100), LOCAL),
 			join(distribute(bestaddr_zipclass, hash64(z5, prim_name, addr_suffix, predir, postdir, prim_range)),
-				distribute(pull(hri_key), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
+				distribute(pull(risk_indicators.key_HRI_Address_To_SIC), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
 				left.z5!='' and left.prim_name != '' and
 				(left.z5=right.z5) and (left.prim_name=right.prim_name) and (left.addr_suffix=right.suffix) and 
 				(left.predir=right.predir) and (left.postdir=right.postdir) and (left.prim_range=right.prim_range) and 

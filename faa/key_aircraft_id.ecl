@@ -1,8 +1,4 @@
-﻿Import Data_Services, doxie,ut, vault, _control;
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export key_aircraft_id(boolean isFCRA = false) := vault.faa.key_aircraft_id(isFCRA);
-#ELSE
+Import Data_Services, doxie,ut;
 export key_aircraft_id(boolean isFCRA = false) := function
 
 df := faa.searchFile_Linkids;
@@ -13,10 +9,6 @@ df := faa.searchFile_Linkids;
 										 
   return index(df,{aircraft_id},{df},
                 file_prefix + doxie.Version_SuperKey);
-end;
-#END;
-
-
- 	
+end; 	
 
 

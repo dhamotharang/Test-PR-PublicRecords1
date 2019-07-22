@@ -1,10 +1,5 @@
-﻿Import Data_Services, census_data, ln_property, doxie, ut, fcra, vault, _control;
+Import Data_Services, census_data, ln_property, doxie, ut, fcra;
 
-
-#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export Key_Assessor_FID(boolean IsFCRA = false) := vault.LN_PropertyV2.key_assessor_fid(isFCRA);
-
-#ELSE
 
 export Key_Assessor_FID(boolean IsFCRA = false) := function
 
@@ -25,6 +20,4 @@ return_file		:= INDEX(base_file,
 													
 return(return_file);		
 
-END;	
-
-#END;			   
+END;				   

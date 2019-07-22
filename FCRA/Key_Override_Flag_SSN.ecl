@@ -1,4 +1,7 @@
-﻿import fcra, ut, data_services, vault, _control;
+/*2012-03-21T20:12:03Z (Dave Schlangen_Prod)
+added prefix to point at dataland for override keys to test on 1 way roxie
+*/
+import fcra, ut, data_services;
 
 ds := FCRA.File_flag;
 
@@ -16,10 +19,5 @@ sortkf1 := sort(kf1,did,record_id,file_id,-flag_file_id,local);
 
 kf := dedup(sortkf1,did,record_id,file_id,local);
 
-
-#IF(_Control.Environment.onVault) 
-export key_override_flag_ssn := vault.FCRA.Key_Override_Flag_SSN;
-#ELSE
 export key_override_flag_ssn := index(kf,{l_ssn := ssn}, {kf},
 data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::flag::qa::ssn');
-#END;
