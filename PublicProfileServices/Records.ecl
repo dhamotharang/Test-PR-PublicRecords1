@@ -98,7 +98,6 @@ EXPORT Records := MODULE
 		mod_access := PROJECT (rptByMod_new, doxie.IDataAccess);
 
 		//create a module compatible with the old person-report
-    mod_access := PROJECT(rptByMod_new, doxie.IDataAccess);
 		rptByMod := MODULE (PersonReports.input._report)
 			PersonReports.input.mac_copy_report_fields(rptByMod_new);
 		END;
