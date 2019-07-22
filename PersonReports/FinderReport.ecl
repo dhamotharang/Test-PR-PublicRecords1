@@ -1,4 +1,4 @@
-﻿IMPORT doxie, iesp;
+﻿IMPORT $, doxie, iesp;
 
 out_rec := iesp.peoplereport.t_PeopleReportIndividual;
 
@@ -40,9 +40,9 @@ EXPORT out_rec FinderReport (
   proflic := PersonReports.proflic_records (dids, PROJECT (mod_finder, $.IParam.proflic), IsFCRA);
 
   p_proflic    := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
-  bankrpt := bankruptcy_records (dids, module (project (param, input.bankruptcy, opt)) end, IsFCRA);
+  bankrpt := $.bankruptcy_records (dids, mod_access, PROJECT (mod_finder, $.IParam.bankruptcy, OPT), IsFCRA);
   p_bankruptcy := choosen (bankrpt.bankruptcy, iesp.Constants.BR.MaxBankruptcies);
-  p_at_work    := choosen (peopleatwork_records    (dids, module (project (mod_finder, $.IParam.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  p_at_work    := choosen ($.peopleatwork_records (dids, PROJECT (mod_finder, $.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
   p_corp_aff   := choosen (corpaffiliation_records (dids, module (project (param, input.corpaffil)) end, IsFCRA), iesp.Constants.BR.MaxCorpAffiliations);
 
   p_dlsr := choosen (pers.dlsr, 1);
@@ -55,7 +55,7 @@ EXPORT out_rec FinderReport (
   // TODO: All "counts" logic must be eventually moved to corresponding data attribute(s),
   // this service must not know anything about underlying data.
   // -----------------------------------------------------------------------
-  cnt := counts (dids, project (param, $.input.count_param, OPT), IsFCRA);
+  cnt := $.counts (dids, mod_access, PROJECT (mod_finder, $.IParam.count_param, OPT), IsFCRA);
 
   // Combine all them together
   out_rec Format () := TRANSFORM
