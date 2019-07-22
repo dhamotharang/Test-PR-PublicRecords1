@@ -239,11 +239,11 @@ ForceclosureBaseV2 := PROJECT(foreclosureBase,TRANSFORM(Property.Layout_Fares_Fo
 																												SELF.SOURCE := MDR.sourceTools.src_Foreclosures;
 																												SELF := LEFT; SELF := [])); //To combine BK and CL
 
-BKforeclosureBase	:= BKForeclosure.Fn_Map_BK2Foreclosure;
+// BKforeclosureBase	:= BKForeclosure.Fn_Map_BK2Foreclosure;
 
-CombineAll	:= ForceclosureBaseV2 + BKforeclosureBase;
+// CombineAll	:= ForceclosureBaseV2 + BKforeclosureBase;
 
-ut.mac_suppress_by_phonetype(CombineAll,		attorney_phone_nbr,state,                   phone_out1);
+ut.mac_suppress_by_phonetype(ForceclosureBaseV2,		attorney_phone_nbr,state,                   phone_out1);
 ut.mac_suppress_by_phonetype(phone_out1,     lender_phone,      lender_beneficiary_state,phone_out2);
 ut.mac_suppress_by_phonetype(phone_out2,     trustee_phone,     trustee_state,           phone_out3);
 
