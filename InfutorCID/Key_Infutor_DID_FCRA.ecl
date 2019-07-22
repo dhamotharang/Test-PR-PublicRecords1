@@ -1,4 +1,4 @@
-﻿import ut, doxie, data_services;
+﻿import ut, doxie, data_services, vault, _control;
 
 baseCID := distribute(InfutorCID.File_InfutorCID_Base(did > 0 or did_instantID > 0), hash(did));
 
@@ -48,4 +48,12 @@ slim_layout into_slim(baseCID le) := transform
 end;
 p := dedup(sort(project(baseCID, into_slim(left)), record, except persistent_record_id, local), record, except persistent_record_id, local);
 
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export Key_Infutor_DID_FCRA := vault.InfutorCID.Key_Infutor_DID_FCRA;
+#ELSE
 export Key_Infutor_DID_FCRA := index(p,{did},{p},data_services.data_location.prefix() + 'thor_data400::key::infutorcid::fcra::did_' + doxie.Version_SuperKey);
+
+
+#END;
+
+
