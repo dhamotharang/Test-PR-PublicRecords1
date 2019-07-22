@@ -195,7 +195,7 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := fu
     );
 END;
 
-EXPORT update_inc_idl(boolean skipIncSFupdate=false, string filedt) := updateSupers('::header',skipIncSFupdate,'::idl', filedt);
+EXPORT update_inc_idl(boolean skipIncSFupdate=false, string filedt) := nothor(updateSupers('::header',skipIncSFupdate,'::idl', filedt));
 
 SHARED elist:= Header.email_list.BocaDevelopers;
 

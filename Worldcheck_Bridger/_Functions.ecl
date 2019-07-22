@@ -1237,6 +1237,10 @@
 				trim(kword, left, right) = 'BECA' =>SubGroup_Constants.numKeywordsID.KEYWORD_BECA,
 				trim(kword, left, right) = 'OFAC-NICHRAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_NICHRAA,
 				trim(kword, left, right) = 'CANSEMNIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMNIC,
+				trim(kword, left, right) = 'GHSEC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GHSEC,
+				trim(kword, left, right) = 'NABON' =>SubGroup_Constants.numKeywordsID.KEYWORD_NABON,
+				trim(kword, left, right) = 'USCME' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCME,
+				trim(kword, left, right) = 'INMSJE-NGO' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMSJE_NGO,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
