@@ -3,7 +3,7 @@
 
 onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_AVM(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access) := FUNCTION
+export Boca_Shell_AVM(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = doxie.IDataAccess) := FUNCTION
 
 Layout_AVM := RECORD
 	unsigned4 seq;
