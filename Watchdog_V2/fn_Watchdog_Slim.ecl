@@ -2,12 +2,16 @@
 
 EXPORT fn_Watchdog_Slim(STRING pversion) := MODULE
 
-NewDistributedFile := DISTRIBUTE(Watchdog_V2.fn_build_merged, HASH(did));
+slim:=table(Watchdog_v2.IDX_UniversalKey_File.IndexFile,{did,cnt:=sum(group,permissions)},did,merge);
 
-Slim := PROJECT(NewDistributedFile, TRANSFORM(Watchdog_V2.Layout_Universal_Slim,SELF:=LEFT));
+RolledBase := ROLLUP(Slim,
+                     LEFT.did = RIGHT.did,
+										 TRANSFORM(LEFT));
+										 
+SortedDS := SORT(RolledBase, did);			
 
-EXPORT Watchdog_Slim_Sorted := SORT(Slim, did);
-
+EXPORT Watchdog_Slim_Sorted := PROJECT(SortedDS,TRANSFORM(Watchdog_V2.Layout_Universal_Slim,SELF.Permissions:= LEFT.cnt,SELF :=LEFT));
+																													
 PromoteSupers.MAC_SF_BuildProcess(Watchdog_Slim_Sorted,'~thor_data400::base::watchdog_universal_slim',seq_name,2,,true,pVersion);
 
 EXPORT full_build	:= 
@@ -17,3 +21,5 @@ EXPORT full_build	:=
 	               );
 
 END;
+
+
