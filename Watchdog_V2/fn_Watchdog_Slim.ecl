@@ -3,12 +3,8 @@
 EXPORT fn_Watchdog_Slim(STRING pversion) := MODULE
 
 slim:=table(Watchdog_v2.IDX_UniversalKey_File.IndexFile,{did,cnt:=sum(group,permissions)},did,merge);
-
-RolledBase := ROLLUP(Slim,
-                     LEFT.did = RIGHT.did,
-										 TRANSFORM(LEFT));
 										 
-SortedDS := SORT(RolledBase, did);			
+SortedDS := SORT(slim, did);			
 
 EXPORT Watchdog_Slim_Sorted := PROJECT(SortedDS,TRANSFORM(Watchdog_V2.Layout_Universal_Slim,SELF.Permissions:= LEFT.cnt,SELF :=LEFT));
 																													
