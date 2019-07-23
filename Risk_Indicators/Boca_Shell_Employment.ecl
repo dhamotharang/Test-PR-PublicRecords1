@@ -5,7 +5,7 @@ export Boca_Shell_Employment(GROUPED DATASET(risk_indicators.layout_bocashell_ne
 															boolean isFCRA, 
 															boolean isPreScreen, 
 															integer bsVersion,
-															doxie.IDataAccess mod_access  = doxie.IDataAccess) := FUNCTION
+															doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 patw := record
 	clam_pre_employment.seq;

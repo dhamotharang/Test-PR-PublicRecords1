@@ -1,7 +1,7 @@
 ﻿import riskwise, ut, gong, risk_indicators, doxie;
 // doxie, Suppress; for later use in CCPA, will be cleaned up when CCPA changes are made
 
-export Boca_Shell_Gong(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = doxie.IDataAccess) := FUNCTION
+export Boca_Shell_Gong(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 Layout_Gong := RECORD
 	unsigned4 seq;
