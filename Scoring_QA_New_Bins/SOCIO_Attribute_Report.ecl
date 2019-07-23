@@ -46,6 +46,7 @@ ppd:=if(pfc!= 0 and cfc=0,1,(cf/cfc)*100);
 Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeRs_Score',dist1);
 Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeMA_Score',dist2);
 Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeMo_Score',dist3);
+Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'Score'     ,dist4);
 
 /*Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'bus_ri_1',dist4);
 Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'bus_ri_2',dist5);
@@ -73,7 +74,7 @@ Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_z5',dist21
 Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_ssn',dist22);
 Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_phone10',dist23);
 */
-				dis := dist1+dist2+dist3;
+				dis := dist1+dist2+dist3+dist4;
 				
 							 Scoring_QA.range_function_module.Distinct_function7(DS2,'acctno',did1);
 	 
@@ -98,8 +99,9 @@ Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Average_func(DS2,'rep1_nap_summary',ave
 Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'SeRs_Score',ave1);
 Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'SeMA_Score',ave2);
 Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'SeMo_Score',ave3);
+Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'Score'     ,ave4);
       	
-      	   avearage:= ave1+ave2+ave3;
+      	   avearage:= ave1+ave2+ave3+ave4;
 	
    result4_stats:=avearage   ;
 

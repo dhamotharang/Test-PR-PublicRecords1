@@ -7,7 +7,10 @@ EXPORT IParam := MODULE
     EXPORT UNSIGNED request_date;
     EXPORT STRING state_act;
     EXPORT BOOLEAN ReturnEclLayoutText;
-    EXPORT isDateOK(unsigned rec_date) := request_date = 0 OR (rec_date = 0) OR (rec_date >= request_date); // including all recs with no date
+    EXPORT isDateOK(unsigned rec_date, unsigned1 dt_format) := FUNCTION 
+      dt_YYYYMMDD := IF(dt_format = $.Constants.DateFormat.YYYYMM, rec_date*100, rec_date); // make sure format is YYYYMMDD
+      RETURN request_date = 0 OR (rec_date = 0) OR (dt_YYYYMMDD >= request_date); // including all recs with no date
+    END;
   END;
 
   EXPORT GetParams(

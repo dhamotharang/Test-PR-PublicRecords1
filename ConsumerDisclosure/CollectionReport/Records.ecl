@@ -1,5 +1,6 @@
-IMPORT $, american_student_list, daybatchpcnsr, doxie, dx_email, iesp, one_click_data, 
-  paw, phonemart, phonesplus, prof_licensev2, saleschannel, spoke, thrive, zoom;
+IMPORT $, alloymedia_student_list, american_student_list, daybatchpcnsr, doxie, dx_email, dx_header, header, header_quick, 
+  iesp, infutor, one_click_data, paw, phonemart, phonesplus, prof_licensev2, prof_license_mari, 
+  saleschannel, spoke, thrive, zoom;
 
 EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
 
@@ -18,14 +19,21 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
 
   // get collections for all in-scope datasets
   recs := 
-    $.MAC.GetCollection(dids, in_mod, 'AmericanstudentKeys', American_student_list.key_DID, l_did, date_last_seen)
+      $.MAC.GetCollection(dids, in_mod, 'AlloyKeys', AlloyMedia_student_list.Key_DID, did, date_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'AmericanstudentKeys', American_student_list.key_DID, l_did, date_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'DeathMasterSsaKeys', doxie.key_death_masterV2_ssa_DID, l_did, filedate)
     + $.MAC.GetCollectionFromRaw(email_recs, in_mod, 'EmailV2Keys', dx_Email.Key_email_payload(), did, date_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, 'InfutorKeys', infutor.Key_Header_Infutor_Knowx, s_did, dt_last_seen, $.Constants.DateFormat.YYYYMM)
+    + $.MAC.GetCollection(dids, in_mod, 'MariKeys', Prof_License_Mari.key_did(), s_did, date_last_seen)
     + $.MAC.GetCollection(dids, in_mod, 'OneClickDataKeys', one_click_data.keys().did.qa, did, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(paw_recs, in_mod, 'PAWV2Keys', paw.Key_contactID, did, dt_last_seen)
     + $.MAC.GetCollection(dids, in_mod, 'PCNSRKeys', DayBatchPCNSR.Key_PCNSR_DID, did, date_vendor_last_reported)    
-    + $.MAC.GetCollection(dids, in_mod, 'PhonemartKeys', PhoneMart.key_phonemart_did, l_did, dt_vendor_last_reported)  
+    + $.MAC.GetCollection(dids, in_mod, 'PersonHeaderKeys', dx_header.key_header(), s_did, dt_last_seen, $.Constants.DateFormat.YYYYMM)    
+    // phonemart rule out of scope as of 07/19/2019 
+    // + $.MAC.GetCollection(dids, in_mod, 'PhonemartKeys', PhoneMart.key_phonemart_did, l_did, dt_vendor_last_reported)  
     + $.MAC.GetCollection(dids, in_mod, 'ProfLicenseKeys', prof_licensev2.Key_Proflic_Did(), did, date_last_seen) 
     + $.MAC.GetCollection(dids, in_mod, 'QSentKeys', Phonesplus.key_qsent_did, l_did, DateLastSeen)
+    + $.MAC.GetCollection(dids, in_mod, 'QuickHeaderKeys', header_quick.key_DID, did, dt_last_seen, $.Constants.DateFormat.YYYYMM)
     + $.MAC.GetCollection(dids, in_mod, 'SalesChannelKeys', saleschannel.keys().did.qa, did, date_last_seen)
     + $.MAC.GetCollection(dids, in_mod, 'SpokeKeys', spoke.keys().did.qa, did, dt_last_seen)
     + $.MAC.GetCollection(dids, in_mod, 'ThriveKeys', thrive.keys().did.qa, did, dt_last_seen)

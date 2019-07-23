@@ -1,10 +1,11 @@
-﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators;
+﻿import _Control, paw, riskwise, ut, mdr, fcra, risk_indicators, doxie, Suppress;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Employment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_employment, 
 															boolean isFCRA, 
 															boolean isPreScreen, 
-															integer bsVersion) := FUNCTION
+															integer bsVersion,
+															doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 patw := record
 	clam_pre_employment.seq;
@@ -27,7 +28,12 @@ patw := record
 	
 end;
 
-patw getPawDid(clam_pre_employment le, paw.Key_Did ri) := TRANSFORM
+patw_CCPA := record
+    unsigned4 global_sid; // CCPA changes
+	patw;
+end;
+
+patw_CCPA getPawDid(clam_pre_employment le, paw.Key_Did ri) := TRANSFORM
 	self.seq := le.seq;
 	self.did := le.did;
 	self.historydate := le.historydate;
@@ -54,7 +60,7 @@ with_paw_did_thor := join(distribute(clam_pre_employment, hash64(did)),
 	with_paw_did := with_paw_did_roxie;
 #END
 
-patw getPawFull(with_paw_did le, paw.Key_contactID ri) := TRANSFORM
+patw_CCPA getPawFull(with_paw_did le, paw.Key_contactID ri) := TRANSFORM
 	self.seq := le.seq;
 	self.did := le.did;
 	self.historydate := le.historydate;								
@@ -74,6 +80,7 @@ patw getPawFull(with_paw_did le, paw.Key_contactID ri) := TRANSFORM
 	self.Source_ct	:= if(ri.contact_id<>0, 1, 0);  // number of different PAW sources appeared on
 	self.sources := '';
 	self.active_phones := '';
+	self.global_sid := ri.global_sid;
 END;
 
 pawfile_full_nonfcra_roxie := join(with_paw_did, paw.Key_contactid,
@@ -92,11 +99,19 @@ pawfile_full_nonfcra_thor := join(distribute(with_paw_did, hash64(contact_id)),
 						getPawFull(LEFT,RIGHT),
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
-
+	
+pawfile_suppress_roxie := Suppress.MAC_SuppressSource(pawfile_full_nonfcra_roxie, mod_access);
+pawfile_full_formatted_roxie := PROJECT(pawfile_suppress_roxie, TRANSFORM(patw,
+                                                  SELF := LEFT));
+																									
+pawfile_suppress_thor := Suppress.MAC_SuppressSource(pawfile_full_nonfcra_thor, mod_access);
+pawfile_full_formatted_thor := PROJECT(pawfile_suppress_thor, TRANSFORM(patw,
+                                                  SELF := LEFT));
+																									
 #IF(onThor)
-	pawfile_full_nonfcra := group(sort(pawfile_full_nonfcra_thor,seq),seq);
+	pawfile_full_nonfcra := group(sort(pawfile_full_formatted_thor,seq),seq);
 #ELSE
-	pawfile_full_nonfcra := pawfile_full_nonfcra_roxie;
+	pawfile_full_nonfcra := pawfile_full_formatted_roxie;
 #END
 
 // can not use these sources if running in prescreen mode

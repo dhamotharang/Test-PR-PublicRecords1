@@ -1,8 +1,8 @@
-﻿import _Control, Prof_License_Mari, riskwise, risk_indicators;
+﻿import _Control, Prof_License_Mari, riskwise, risk_indicators, doxie, Suppress;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Mari(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
-											boolean isFCRA, boolean isPreScreen) := FUNCTION
+											boolean isFCRA, boolean isPreScreen, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 key_main := Prof_License_Mari.key_did(isFCRA) ;
 rec_main := recordof (key_main);
@@ -15,7 +15,12 @@ layout_mari_temp := record
 	string license_st := '';
 end;
 
-layout_mari_temp append_mari(ids_only le, key_main rt) := transform
+layout_mari_temp_CCPA := record
+    unsigned4 global_sid; // CCPA changes
+	layout_mari_temp;
+end;
+
+layout_mari_temp_CCPA append_mari(ids_only le, key_main rt) := transform
 		Self.number_of_licenses := if(rt.license_nbr<>'', 1, 0);
 		self.license_nbr := rt.license_nbr;
 		self.date_first_seen := (unsigned)rt.date_first_seen;
@@ -24,6 +29,7 @@ layout_mari_temp append_mari(ids_only le, key_main rt) := transform
 		self.issue_date := (unsigned)rt.curr_issue_dte;
 		self.expiration_date := (unsigned)rt.expire_dte;
 		self.license_st := rt.license_state;
+        self.global_sid := rt.global_sid;
 		self := le;
 end;
 
@@ -56,7 +62,7 @@ distribute(pull(key_main(std_source_upd not in risk_indicators.iid_constants.res
 sorted_mari := sort(raw_data, seq, -issue_date, -expiration_date, -license_nbr, license_st);
 
 rolled_mari_summary := rollup(sorted_mari, left.seq=right.seq, 
-	transform(layout_mari_temp,
+	transform(layout_mari_temp_CCPA,
 	self.date_first_seen := if(left.date_first_seen < right.date_first_seen, left.date_first_seen, right.date_first_seen);
 	self.date_last_seen := if(left.date_last_seen > right.date_last_seen, left.date_last_seen, right.date_last_seen);
 	self.number_of_licenses := if(left.license_nbr=right.license_nbr, left.number_of_licenses, left.number_of_licenses + right.number_of_licenses);
@@ -67,9 +73,11 @@ rolled_mari_summary := rollup(sorted_mari, left.seq=right.seq,
 	self.license_st := right.license_st;
 	self := left));
 
+                                                  
+Mari_Suppressed := Suppress.MAC_SuppressSource(if(isprescreen, dataset([], layout_mari_temp_CCPA), ungroup(rolled_mari_summary) ), mod_access);
 
-mari_final := if(isprescreen, dataset([], layout_mari_temp), ungroup(rolled_mari_summary) );
-
+mari_final := PROJECT(Mari_Suppressed, TRANSFORM(layout_mari_temp,
+                                                  SELF := LEFT));
 // output(sorted_mari, named('sorted_mari'));
 // output(rolled_mari_summary, named('rolled_mari_summary'));
 // output(raw_data, named('raw_data'));	

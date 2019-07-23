@@ -23,10 +23,12 @@ SOCIO_Attributes_Distribution_run   := Scoring_QA_New_Bins.SOCIO_Attributes;
 
 SEQUENTIAL(SOCIO_Monitoring_v5_new,SOCIO_runbins,SOCIO_ks_Test,SOCIO_Attributes_Tracking_run,SOCIO_Attributes_Distribution_run)
 //SEQUENTIAL(SOCIO_Monitoring_v5_new)
+//SEQUENTIAL(SOCIO_ks_Test,SOCIO_Attributes_Tracking_run,SOCIO_Attributes_Distribution_run)
+//SEQUENTIAL(SOCIO_Monitoring_v5_new)
 //SEQUENTIAL(SOCIO_ks_Test,SOCIO_Attributes_Report_run)
 //SEQUENTIAL(SOCIO_Monitoring_v5_new)
 //:WHEN(CRON('0 5 * * *')), //runs everday at 1am EST
 //:WHEN(CRON('0 7 * * *')), //runs everday at 3am EST
 //:WHEN(CRON('0 18 * * *')),//runs everday at 2pm EST
-:SUCCESS(FileServices.SendEmail('Daniel.Harkins@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com','SOCIO_v5_Daily_Monitoring_Completed','The Completed workunit is:' + workunit)),
-FAILURE(FileServices.SendEmail('Daniel.Harkins@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com','SOCIO_v5_Daily_Monitoring job failed','The Failed workunit is:'   + workunit + FailMessage));
+:SUCCESS(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,'SOCIO_v5_Daily_Monitoring_Completed','The Completed workunit is:' + workunit)),
+FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,'SOCIO_v5_Daily_Monitoring job failed','The Failed workunit is:'   + workunit + FailMessage));

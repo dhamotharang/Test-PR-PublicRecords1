@@ -119,7 +119,7 @@
 
 #option('expandSelectCreateRow', true);
 IMPORT Address, AutoStandardI, BIPV2, BizLinkFull, Business_Risk_BIP, Corp2, Doxie, EBR, EBR_Services, Gateway,
-  iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT;
+ iesp, LiensV2, LN_PropertyV2, MDR, NID, Risk_Indicators, RiskWise, UT;
 
 EXPORT ProdData() := FUNCTION
 	/* ************************************************************************
@@ -811,7 +811,8 @@ layout_watchlists_temp := record
 	// ---------------- Business Inquiries - Only Allowed in Non-Marketing Mode ------------------
 	InqBuildDate := Risk_Indicators.get_Build_date('inquiry_update_build_version');
 
-	InquiriesAll := Business_Risk_BIP.PD_Inquiries(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
+	InquiriesAll := Business_Risk_BIP.PD_Inquiries(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel,
+     options, AllowedSourcesSet, mod_access);
 
 	// --------------- Judgments and Liens ----------------
 	// Get the TMSID/RMSID results for Liens and Judgments data

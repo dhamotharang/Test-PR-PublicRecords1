@@ -155,8 +155,8 @@ unsigned1 n_phones := 40 : stored('_n_phones');
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
 		EXPORT UNSIGNED1 neighborhoods := 10;
     // these are not used in Finder, will be removed when all components are switched to IDataAccess.
-    EXPORT boolean ignoreFares := FALSE;
-    EXPORT boolean ignoreFidelity := FALSE;
+    // EXPORT boolean ignoreFares := FALSE;
+    // EXPORT boolean ignoreFidelity := FALSE;
   end;
 
   // execute search
