@@ -4,12 +4,6 @@ onThor := _Control.Environment.OnThor;
 export Boca_Shell_Proflic_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, 
 				boolean isPrescreen, boolean isDirectToConsumerPurpose = false) := FUNCTION
         
-   mod_access := MODULE(Doxie.IDataAccess)
-      EXPORT unsigned1 lexid_source_optout := 0;
-      EXPORT string transaction_id := ''; // esp transaction id or batch uid
-      EXPORT unsigned6 global_company_id := 0; // mbs gcid
-    END;
-
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 myGetDate := proflic_build_date;
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
@@ -151,7 +145,7 @@ license_recs1_thor := license_recs1_thor_did + PL_correct(did=0);
 
 isFCRA := true;
 
-mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen, mod_access);
+mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen);
 
 // initially not so sure we trust the dates on the MARI file to be accurate.  
 // ie, date_first_seen is newer than the expire date

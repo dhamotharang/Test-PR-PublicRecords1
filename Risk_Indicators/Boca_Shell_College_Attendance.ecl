@@ -1,16 +1,10 @@
 ﻿
-import Inquiry_AccLogs, risk_indicators, doxie, Suppress, riskwise;
+import Inquiry_AccLogs, risk_indicators, doxie, riskwise;
 
-EXPORT Boca_Shell_College_Attendance( grouped dataset(risk_indicators.layout_boca_shell) input_clam, boolean isFCRA, doxie.IDataAccess mod_access  = doxie.IDataAccess) := function
-
-layout_temp_CCPA := RECORD
-	integer8 did; // CCPA changes
-    unsigned4 global_sid; // CCPA changes
-	risk_indicators.layout_boca_shell;
-END;
+EXPORT Boca_Shell_College_Attendance( grouped dataset(risk_indicators.layout_boca_shell) input_clam, boolean isFCRA, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 with_college_attendance := project(input_clam,
-	transform(layout_temp_CCPA,
+	transform(risk_indicators.layout_boca_shell,
 		college_land_use_codes := [ '1111', '9103', '9204', '0118', '0656', '0680', '0119', '9203'];
 		addr_history_college_evidence := left.address_history_summary.address_history_advo_college_hit or 
 																		 left.address_verification.input_address_information.Standardized_land_use_code in college_land_use_codes or
@@ -38,26 +32,8 @@ with_college_attendance := project(input_clam,
 													addr_history_college_evidence => true,		
 													student_loan_inquiry => true,
 													false);
-		self.did := left.did;
-        self.global_sid := 0;
 		self := left));	
-    
-layout_temp_CCPA College_Attendance_CCPA(with_college_attendance le, Inquiry_AccLogs.Key_Inquiry_DID ri) := transform
-                self.global_sid := ri.ccpa.global_sid;
-				self := le;
-end;
 
-college_attendance_join :=  join(with_college_attendance, Inquiry_AccLogs.Key_Inquiry_DID,
-												 keyed(right.s_did=left.did),
-												 College_Attendance_CCPA(left,right), 
-                                                 left outer,
-												 atmost(right.s_did=left.did, riskwise.max_atmost));
-
-suppressed_college_attendance := Suppress.MAC_SuppressSource(college_attendance_join, mod_access);
-
-formatted_college_attendance := PROJECT(suppressed_college_attendance, TRANSFORM(risk_indicators.layout_boca_shell,
-                                                  SELF := LEFT));
-																								
-return formatted_college_attendance;
+return with_college_attendance;
 
 end;

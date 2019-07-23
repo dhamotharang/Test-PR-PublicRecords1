@@ -2,7 +2,7 @@
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Mari(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
-											boolean isFCRA, boolean isPreScreen, doxie.IDataAccess mod_access = doxie.IDataAccess) := FUNCTION
+											boolean isFCRA, boolean isPreScreen, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 key_main := Prof_License_Mari.key_did(isFCRA) ;
 rec_main := recordof (key_main);

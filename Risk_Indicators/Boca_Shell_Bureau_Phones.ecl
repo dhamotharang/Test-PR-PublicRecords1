@@ -2,7 +2,7 @@
 //grabs the verified phone info from Equifax - which we call bureau in case we change sources later on
 import PhoneMart, riskwise, risk_indicators, doxie, Suppress;
 
-EXPORT Boca_Shell_Bureau_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = doxie.IDataAccess) := function
+EXPORT Boca_Shell_Bureau_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 temp_layout := record
 	unsigned seq;

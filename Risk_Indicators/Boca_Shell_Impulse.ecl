@@ -1,6 +1,6 @@
 ﻿Import Impulse_Email, ut, thrive, riskwise, mdr, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_Impulse(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, integer bsversion, doxie.IDataAccess mod_access  = doxie.IDataAccess) := FUNCTION
+export Boca_Shell_Impulse(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, integer bsversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 Layout_Impulse := RECORD
 	unsigned4 seq;
