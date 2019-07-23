@@ -65,6 +65,7 @@ res := PROJECT (ds, TRANSFORM({  STRING80 product,STRING80 version, STRING80 pro
 																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_SeRs_Score' 	 => 'test1' ,
 																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_SeMA_Score'  	 => 'test2' ,
 																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_SeMo_Score'  	 => 'test3' ,
+																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_Score'  	     => 'test4' , //'Score' = total cost risk score 2.0
 																	LEFT.flagship );				
 														
 														SELF.version := 
@@ -83,6 +84,7 @@ res := PROJECT (ds, TRANSFORM({  STRING80 product,STRING80 version, STRING80 pro
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeRs_Score'	 => 'Generic' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMA_Score'	 => 'Generic' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMo_Score'	 => 'Generic' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'Score'	       => 'Generic' ,
 														  '');
 														
                             SELF.model1 := 
@@ -90,6 +92,7 @@ res := PROJECT (ds, TRANSFORM({  STRING80 product,STRING80 version, STRING80 pro
 			                      LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeRs_Score'	 => 'SeRs_Score' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMA_Score'	 => 'SeMA_Score' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMo_Score'	 => 'SeMo_Score' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'Score'	       => 'Score' ,
 															 '');
 														
 														SELF := LEFT ));
@@ -116,11 +119,12 @@ score_data1_project:=score_data1_project_1(score<>'');
    END;
    											 
     	test:=  TABLE(score_data1_project,test_rec,product,version,process1,customer,model1);
-   	//output(test,named('Line_122'));
+   	output(test,named('Line_122'));
 
 score_data2_project_1 := scores_project(score_data2,data_rec);
 score_data2_project   := score_data2_project_1( score<>'' );
-
+output(score_data2_project_1,named('line_124'));
+output(score_data2_project,named('line_125'));
 
 score_name_1_layout := record			
   string30 acctno; 
@@ -222,13 +226,13 @@ end;
 
 // score_data1_project;
                                           
-score_data1_project_SOCIO:=score_data1_project (product='socioeconomic_v5_batch' and (decimal10_4)score  >=0 and (decimal10_4)score  <=100);
+score_data1_project_SOCIO:=score_data1_project (product='socioeconomic_v5_batch' and (decimal10_4)score  >=0 and (decimal10_4)score  <=2500);
                                                               
 //output(score_data1_project_SOCIO,named('Line_229'));																		
 																
 																															
 																														
-score_data2_project_SOCIO:=score_data2_project(product='socioeconomic_v5_batch'and (decimal10_4)score  >=0 and (decimal10_4)score  <=100);	
+score_data2_project_SOCIO:=score_data2_project(product='socioeconomic_v5_batch'and (decimal10_4)score  >=0 and (decimal10_4)score  <=2500);	
                                                               
 //output(score_data2_project_SOCIO,named('Line_233'));																													
 																															
@@ -1353,7 +1357,8 @@ SocioEconomic_V5_infile_cnt:=COUNT(DATASET(SOCIO_Monitoring_v5_infile,SOCIO_layo
   input_file_count_ds:=DATASET([         
 																	{'socioeconomic_v5_batch','Generic','Batch','SeRs_Score','0',50000},
 																	{'socioeconomic_v5_batch','Generic','Batch','SeMA_Score','0',50000},
-																	{'socioeconomic_v5_batch','Generic','Batch','SeMo_Score','0',50000}
+																	{'socioeconomic_v5_batch','Generic','Batch','SeMo_Score','0',50000},
+																	{'socioeconomic_v5_batch','Generic','Batch','Score','0',50000}
                                ],input_file_count_ds_rec);
 
        
@@ -1498,7 +1503,7 @@ SocioEconomic_V5_infile_cnt:=COUNT(DATASET(SOCIO_Monitoring_v5_infile,SOCIO_layo
 							
  			  fcra_alert_msg:=	if(count(FCRA_result)<28,'\n ALERT: This FCRA report did not run properly for all products or versions','');
    			
-   			nonfcra_alert_msg:=	if(count(NON_FCRA_result)<3,'\n ALERT: This NON-FCRA report did not run properly for all products or versions','');
+   			nonfcra_alert_msg:=	if(count(NON_FCRA_result)<4,'\n ALERT: This NON-FCRA report did not run properly for all products or versions','');
    																									 
    				 // result;
    
@@ -1591,23 +1596,27 @@ SocioEconomic_V5_infile_cnt:=COUNT(DATASET(SOCIO_Monitoring_v5_infile,SOCIO_layo
       			END;
             
       			XtabOut1 := ITERATE(outputs1,Xform1(LEFT,RIGHT));
-      			//OUTPUT(XtabOut1);
+      
 						
  
             //XtabOut[no_of_records];
       
       			
-      					// send_file1 := fileservices.SendEmailAttachText('daniel.harkins@lexisnexisrisk.com',
-      			send_file1 := fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,
+      					 send_file1 := fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,
+      			//send_file1 := fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,
       			      			 'SOCIO_v5_KS(NON_FCRA)'  +  'test results Direct from Thor ',
       																				 prev_date + ' vs ' + curr_date + '\nPlease view attachment.' + nonfcra_alert_msg,
       																				 XtabOut1[no_of_records1].line ,
       																				 'text/plain; charset=ISO-8859-3', 
       																				 'SOCIO_v5_KS_NON_FCRA' +  prev_date + '_VS_' + curr_date + '.csv',
+																							 
+																							 
+																							
       																				  );	
 																							 
 					   					 
-					   send_file2 :=FileServices.SendEmail('Daniel.Harkins@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com', 'SOCIO KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
+					   //send_file2 :=FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List, 'SOCIO KS Report Exceptions ' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
+					   send_file2 :=FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List, 'SOCIO KS Report Exceptions' , alert_msg_file[COUNT(alert_msg_file)].line);																		 
 					  																		 
       																				 
       																			 

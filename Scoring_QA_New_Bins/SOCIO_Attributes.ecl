@@ -11,11 +11,11 @@ return res[1..8];
 end;
 
 b:=fn_LastTwoMonths(a,1);
-	a1:= a +'_1';
-	// a1:= '20190107_1';
 
-b1:=b +'_1';
-// b1:='20190226_1';
+a1 := a +'_1';
+
+b1 := b +'_1';
+
 
 ip:='~';
 
@@ -283,15 +283,14 @@ ip:='~';
    					FileServices.CreateSuperFile('~scoringqa::bss::dids1::' + b1),rpt31_1) );
 
 	 send_file:=	
-fileservices.SendEmailAttachText('daniel.harkins@lexisnexisrisk.com,matthew.ludewig@lexisnexisrisk.com',					
+fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,					
 					'SOCIO_v5 Attribute Distribution Report',
 																				'BUSINESS SERVICES SCORING(BSS)NonFCRA Attribute Distribution Report '+ a1 + ' vs ' + b1 + '\n Please view attachment.',
 																				 XtabOut[no_of_records].line ,
 																				 'text/plain; charset=ISO-8859-3', 
 																				'SOCIO_AttributeDistributionShifts_' + a1 + '_vs_' + b1 + '.csv',
-																				 ,
-																				 ,
-																				 'daniel.harkins@lexisnexisrisk.com,matthew.ludewig@lexisnexisrisk.com') ;  	
+																				
+																				) ;  	
 	          
 		   sequential (new_bins_remove_superfile,old_bins_remove_superfile,new_bins,old_bins, out_file, send_file );	//new_bins_remove_superfile,old_bins_remove_superfile,
 
