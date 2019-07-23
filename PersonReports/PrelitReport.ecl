@@ -1,4 +1,4 @@
-﻿IMPORT doxie, iesp, FCRA, FFD, Gateway, PersonReports;
+﻿IMPORT $, doxie, iesp, FCRA, FFD, Gateway, PersonReports;
 
 // returns extended structure to allow for different versions of data.
 out_rec := personreports.layouts.CommonPreLitigationReportIndividual;
@@ -10,7 +10,7 @@ EXPORT PrelitReport (
   boolean IsFCRA = false) := FUNCTION
 
   //Convert to the old _report style module: $.input._prelitreport
-  //mod_access := PROJECT (mod_prelit, doxie.IDataAccess);
+  mod_access := PROJECT (mod_prelit, doxie.IDataAccess);
   param := MODULE (PROJECT (mod_prelit, $.IParam.old_prelitreport))
     $.input.mac_copy_report_fields(mod_prelit);
   END;
@@ -64,8 +64,9 @@ EXPORT PrelitReport (
   proflic := PersonReports.proflic_records(dids, PROJECT(mod_prelit, $.IParam.proflic), IsFCRA);
   p_proflic     := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
 
-  bankrpt := PersonReports.bankruptcy_records(dids, 
-                                              module (project(param, PersonReports.input.bankruptcy, opt)) end,
+  bankrpt := PersonReports.bankruptcy_records(dids,
+                                              mod_access, 
+                                              PROJECT(mod_prelit, $.IParam.bankruptcy),
                                               IsFCRA, 
                                               ds_flags, 
                                               param.non_subject_suppression, 
@@ -84,15 +85,17 @@ EXPORT PrelitReport (
   p_liens_v2    := if (param.liensjudgments_version = 2, choosen (p_liens.liensjudgment_v2, iesp.Constants.BR.MaxLiensJudgments));
 
   // asset data
-  p_assessments := choosen(PersonReports.property_records(dids, 
-                                                          module (project (param, PersonReports.input.property)) end, 
+  p_assessments := choosen(PersonReports.property_records(dids,
+                                                          mod_access ,
+                                                          PROJECT(mod_prelit, $.IParam.property), 
                                                           IsFCRA, ds_flags, 
                                                           slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.ASSESSMENT,
                                                                         FFD.Constants.DataGroups.PROPERTY_SEARCH]
                             )).prop_assessments, iesp.Constants.BR.MaxAssessments);
                             
   p_deeds := choosen(PersonReports.property_records(dids, 
-                                                    module (project (param, PersonReports.input.property)) end, 
+                                                    mod_access ,
+                                                    PROJECT(mod_prelit, $.IParam.property), 
                                                     IsFCRA, 
                                                     ds_flags, 
                                                     slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.DEED,
@@ -113,7 +116,7 @@ EXPORT PrelitReport (
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Watercraft
                           )).wtr_recs, iesp.Constants.BR.MaxWatercrafts);
 
-  p_at_work     := choosen (PersonReports.peopleatwork_records (dids, module (project (mod_prelit, $.IParam.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
+  p_at_work     := choosen (PersonReports.peopleatwork_records (dids, PROJECT (mod_prelit, $.IParam.peopleatwork, OPT), IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
 
   // -----------------------------------------------------------------------
   // COUNTS (cannot use doxie.key_did_lookups_v2 -- not always in sync);
@@ -122,7 +125,7 @@ EXPORT PrelitReport (
   // TODO: All "counts" logic must be eventually moved to corresponding data attribute(s),
   // this service must not know anything about underlying data.
   // -----------------------------------------------------------------------
-  cnt := PersonReports.counts (dids, project (param, PersonReports.input.count_param), IsFCRA, ds_flags);
+  cnt := PersonReports.counts (dids, mod_access, PROJECT(mod_prelit, $.IParam.count_param), IsFCRA, ds_flags);
   // special patch for DL:
   p_dlsr := choosen (pers.dlsr, 1);
 

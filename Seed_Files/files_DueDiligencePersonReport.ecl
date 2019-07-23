@@ -26,7 +26,7 @@ EXPORT files_DueDiligencePersonReport  := MODULE
 									'EconomicAircraft'      => filePrefix + '::base::' + middleName + 'economicAircraft',
 									'ProfessionalNetwork'		=> filePrefix + '::base::' + middleName + 'professionalNetwork',
 									'BusinessAssociations'  => filePrefix + '::base::' + middleName + 'businessAssociation',
-									'ItentityAge'           => filePrefix + '::base::' + middleName + 'identityAge',
+									'IdentityAge'           => filePrefix + '::base::' + middleName + 'identityAge',
 									'');
                   
 		IF(fn = '', FAIL('Unknown Section'));
@@ -119,7 +119,7 @@ EXPORT files_DueDiligencePersonReport  := MODULE
   //==========================================================
   // Identity Section - Age
   //==========================================================	
-	EXPORT Section_IdentityAge := DATASET(GetFileName('BusinessAssociations'), DueDiligence.TestSeeds.PersonLayouts.IdentityAgeSection, 
+	EXPORT Section_IdentityAge := DATASET(GetFileName('IdentityAge'), DueDiligence.TestSeeds.PersonLayouts.IdentityAgeSection, 
                                              CSV(HEADING(1), SEPARATOR(','), QUOTE('"'), MAXLENGTH(max10k)));
 
 END;

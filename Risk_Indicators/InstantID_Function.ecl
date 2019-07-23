@@ -28,7 +28,11 @@ export InstantID_Function(DATASET(risk_indicators.layout_input) indata1, dataset
 													string20 in_CompanyID = '',
 													string50 in_DataPermission=risk_indicators.iid_constants.default_DataPermission,
 													boolean in_IncludeNAPData = false,
-                          string100 in_IntendedPurpose = ''
+                                                    string100 in_IntendedPurpose = '',
+                                                    unsigned1 LexIdSourceOptout = 1,
+                                                    string TransactionID = '',
+                                                    string BatchUID = '',
+                                                    unsigned6 GlobalCompanyId = 0
 													) :=
 FUNCTION
 
