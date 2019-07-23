@@ -1,7 +1,7 @@
 ﻿
 import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing, doxie.IDataAccess mod_access = doxie.IDataAccess) := FUNCTION
+export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 		
 	Layout_AS_Plus := RECORD
 		Riskwise.Layouts.Layout_American_Student student;

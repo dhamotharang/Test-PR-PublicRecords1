@@ -1,6 +1,6 @@
 ﻿import InfutorCID, ut, riskwise, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_Infutor(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access  = doxie.IDataAccess) := FUNCTION
+export Boca_Shell_Infutor(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 Layout_Infutor := RECORD
 	unsigned4 seq;
