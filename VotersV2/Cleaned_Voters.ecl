@@ -6,7 +6,6 @@ import _Validate, ut, lib_stringlib;
 export Cleaned_Voters(string filedate) := function
 
 //Barb O'Neill changed for DOPS-461
-//Modifed Build to use AID and NID rather than Address for name and address cleaning
 	In_Voters_File  := VotersV2.File_Voters_In();
 
 	In_Voter_Layout := VotersV2.Layout_Voters_In;

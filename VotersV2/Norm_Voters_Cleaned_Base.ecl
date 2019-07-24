@@ -1,5 +1,5 @@
 ﻿import VotersV2, NID, Address;
-//Added AID and NID processing
+//NID processing
 
 in_file := VotersV2.Cleaned_Addr_Cache_Base;
 
