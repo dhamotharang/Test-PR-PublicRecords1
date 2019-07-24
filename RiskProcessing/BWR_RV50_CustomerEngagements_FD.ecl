@@ -58,8 +58,8 @@ RVOutFile := '~tfuerstenberg::out::safco_8815_ttdapps_061919_cox_rv50_w20190621-
 FDOutFileName := '~mwalklin::out::CustomerEngagement_FD_out_';
 							
 
-RVPIIFile := DATASET(RVInputFile_temp, prii_layout, CSV(QUOTE('"'),heading(single)));
-output(RVPIIFile, named('RV50ResultFile'));
+RVPIIFile := DATASET(RVInputFile_temp, prii_layout, CSV(QUOTE('"')));
+output(RVPIIFile, named('RV50PII_File'));
 							
 RVFile := IF(recordsToRun > 0, CHOOSEN(DATASET(RVOutFile, RV50output_layout, CSV(QUOTE('"'),heading(single))),recordsToRun,1000),
               DATASET(RVOutFile, RV50output_layout, CSV(QUOTE('"'),heading(single))));
@@ -68,12 +68,12 @@ Output(Count(RVFile), named('CountRV50ResultRecords'));
 
 RVdids := project(RVFile, transform(FDFinalLayout, 
                                     self.account_number := left.acctno, 
-                                    self.LexID := (INTEGER)left.LexID,
+                                    self.LexID := (Unsigned6)left.LexID,
                                     self := []));
 																		
 //Adding Consumer Data from Input PII file                                    
 AppendPII := join(RVdids, RVPIIFile, left.Account_number = right.Account,
-                    transform(FDFinalLayout,  self.archive_date := right.historydate,
+                    transform(FDFinalLayout,  self.archive_date := If(length(right.historydate) = 6, right.historydate + '01', right.historydate),
                                               self.ssn := right.SSN,
 																							self.DL_Number := right.DLNumber,
 																							self.DL_state := right.DLState,
@@ -98,7 +98,8 @@ output(COUNT(bestSSN(ssn <> '')), NAMED('CountSSNsAppended'));
 bestSSNappended := join(distribute(AppendPII, hash64(LexID)), 
 													distribute(bestSSN, hash64(did)),  
 													left.LexID=right.did,
-												  TRANSFORM(FDFinalLayout, 
+												  TRANSFORM(FDFinalLayout,
+																	self.lexid := left.lexid,
 																	SELF.ssn := If(left.ssn <> '', left.ssn, right.ssn),
 																	SELF := left), left outer, LOCAL);
                                   
@@ -125,7 +126,7 @@ END;
 output(Count(bestSSNappended(dl_number = '')),named('CountRecsWnoDL'));
 
 // The LexID is a string value on the FD key, INTFORMAT used to match Input LexID to key.
-GetFDdata := join(bestSSNappended, FDKey, (string15)INTFORMAT(left.lexid,12,1) = right.lex_id ,
+GetFDdata := join(bestSSNappended, FDKey, left.lexid = right.lex_id ,
 																					//  Date logic incase it is decided to use it
 																					// and 
 																					// left.archive_date >= If(right.FIRST_SEEN_DATE_TRUE = '', '19010101', right.FIRST_SEEN_DATE_TRUE),
