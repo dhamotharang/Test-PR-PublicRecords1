@@ -17,8 +17,8 @@ EXPORT prep_business_ingest := FUNCTION
 		SELF.clean_title := '';
 		ClnFname				 := STD.Str.CleanSpaces(L.FIRSTNAME);
 		ClnLname				 := STD.Str.CleanSpaces(L.LASTNAME);
-    SELF.firstname   := IF(L.FIRSTNAME = 'NULL','',L.FIRSTNAME);
-    SELF.lastname    := IF(L.LASTNAME = 'NULL','',L.LASTNAME);
+    SELF.firstname   := IF(L.FIRSTNAME = 'NULL','',ClnFname);
+    SELF.lastname    := IF(L.LASTNAME = 'NULL','',ClnLname);
 		SELF.date_vendor_first_reported := version;
     SELF.date_vendor_last_reported  := version;
 		SELF.current_rec 	:= TRUE;

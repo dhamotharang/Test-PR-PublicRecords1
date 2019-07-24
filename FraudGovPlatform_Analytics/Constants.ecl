@@ -55,10 +55,11 @@
 		EXPORT fatherFileScope			:= 'fraudgov::base::father::kel::';
 		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrZWUyMDE5IQ==';
 		EXPORT reqSource						:= 'batch';		
-		EXPORT DspProd							:= 'dsp';
+		// EXPORT DspProd							:= 'dsp';
+		EXPORT DspProd							:= 'dsp-cert';
 		EXPORT DspQa								:= 'dsp-qa';
-		// EXPORT HpccConnectionProd		:= 'ramps_fraudgov';
-		EXPORT HpccConnectionProd		:= 'ramps';
+		EXPORT HpccConnectionProd		:= 'ramps_fraudgov';
+		// EXPORT HpccConnectionProd		:= 'ramps';
 		EXPORT HpccConnectionProdQa	:= 'ramps_prodthor_certroxie';
 		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
 		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
