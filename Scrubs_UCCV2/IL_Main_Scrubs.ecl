@@ -1,4 +1,4 @@
-﻿IMPORT SALT38,STD;
+﻿IMPORT SALT311,STD;
 IMPORT Scrubs,Scrubs_UCCV2; // Import modules for FieldTypes attribute definitions
 EXPORT IL_Main_Scrubs := MODULE
  
@@ -72,62 +72,62 @@ EXPORT IL_Main_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(IL_Main_Layout_UCCV2) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.tmsid_Invalid := IL_Main_Fields.InValid_tmsid((SALT38.StrType)le.tmsid);
-    SELF.rmsid_Invalid := IL_Main_Fields.InValid_rmsid((SALT38.StrType)le.rmsid);
-    SELF.process_date_Invalid := IL_Main_Fields.InValid_process_date((SALT38.StrType)le.process_date);
-    SELF.filing_jurisdiction_Invalid := IL_Main_Fields.InValid_filing_jurisdiction((SALT38.StrType)le.filing_jurisdiction);
-    SELF.orig_filing_number_Invalid := IL_Main_Fields.InValid_orig_filing_number((SALT38.StrType)le.orig_filing_number);
-    SELF.orig_filing_type_Invalid := IL_Main_Fields.InValid_orig_filing_type((SALT38.StrType)le.orig_filing_type);
-    SELF.orig_filing_date_Invalid := IL_Main_Fields.InValid_orig_filing_date((SALT38.StrType)le.orig_filing_date);
-    SELF.orig_filing_time_Invalid := IL_Main_Fields.InValid_orig_filing_time((SALT38.StrType)le.orig_filing_time);
-    SELF.filing_number_Invalid := IL_Main_Fields.InValid_filing_number((SALT38.StrType)le.filing_number);
-    SELF.filing_type_Invalid := IL_Main_Fields.InValid_filing_type((SALT38.StrType)le.filing_type);
-    SELF.filing_date_Invalid := IL_Main_Fields.InValid_filing_date((SALT38.StrType)le.filing_date);
-    SELF.filing_time_Invalid := IL_Main_Fields.InValid_filing_time((SALT38.StrType)le.filing_time);
-    SELF.filing_status_Invalid := IL_Main_Fields.InValid_filing_status((SALT38.StrType)le.filing_status);
-    SELF.status_type_Invalid := IL_Main_Fields.InValid_status_type((SALT38.StrType)le.status_type);
-    SELF.page_Invalid := IL_Main_Fields.InValid_page((SALT38.StrType)le.page);
-    SELF.expiration_date_Invalid := IL_Main_Fields.InValid_expiration_date((SALT38.StrType)le.expiration_date);
-    SELF.contract_type_Invalid := IL_Main_Fields.InValid_contract_type((SALT38.StrType)le.contract_type);
-    SELF.vendor_entry_date_Invalid := IL_Main_Fields.InValid_vendor_entry_date((SALT38.StrType)le.vendor_entry_date);
-    SELF.vendor_upd_date_Invalid := IL_Main_Fields.InValid_vendor_upd_date((SALT38.StrType)le.vendor_upd_date);
-    SELF.statements_filed_Invalid := IL_Main_Fields.InValid_statements_filed((SALT38.StrType)le.statements_filed);
-    SELF.continuious_expiration_Invalid := IL_Main_Fields.InValid_continuious_expiration((SALT38.StrType)le.continuious_expiration);
-    SELF.microfilm_number_Invalid := IL_Main_Fields.InValid_microfilm_number((SALT38.StrType)le.microfilm_number);
-    SELF.amount_Invalid := IL_Main_Fields.InValid_amount((SALT38.StrType)le.amount);
-    SELF.irs_serial_number_Invalid := IL_Main_Fields.InValid_irs_serial_number((SALT38.StrType)le.irs_serial_number);
-    SELF.effective_date_Invalid := IL_Main_Fields.InValid_effective_date((SALT38.StrType)le.effective_date);
-    SELF.signer_name_Invalid := IL_Main_Fields.InValid_signer_name((SALT38.StrType)le.signer_name);
-    SELF.title_Invalid := IL_Main_Fields.InValid_title((SALT38.StrType)le.title);
-    SELF.filing_agency_Invalid := IL_Main_Fields.InValid_filing_agency((SALT38.StrType)le.filing_agency);
-    SELF.address_Invalid := IL_Main_Fields.InValid_address((SALT38.StrType)le.address);
-    SELF.city_Invalid := IL_Main_Fields.InValid_city((SALT38.StrType)le.city);
-    SELF.state_Invalid := IL_Main_Fields.InValid_state((SALT38.StrType)le.state);
-    SELF.county_Invalid := IL_Main_Fields.InValid_county((SALT38.StrType)le.county);
-    SELF.zip_Invalid := IL_Main_Fields.InValid_zip((SALT38.StrType)le.zip);
-    SELF.duns_number_Invalid := IL_Main_Fields.InValid_duns_number((SALT38.StrType)le.duns_number);
-    SELF.cmnt_effective_date_Invalid := IL_Main_Fields.InValid_cmnt_effective_date((SALT38.StrType)le.cmnt_effective_date);
-    SELF.description_Invalid := IL_Main_Fields.InValid_description((SALT38.StrType)le.description);
-    SELF.prim_machine_Invalid := IL_Main_Fields.InValid_prim_machine((SALT38.StrType)le.prim_machine);
-    SELF.sec_machine_Invalid := IL_Main_Fields.InValid_sec_machine((SALT38.StrType)le.sec_machine);
-    SELF.manufacturer_code_Invalid := IL_Main_Fields.InValid_manufacturer_code((SALT38.StrType)le.manufacturer_code);
-    SELF.manufacturer_name_Invalid := IL_Main_Fields.InValid_manufacturer_name((SALT38.StrType)le.manufacturer_name);
-    SELF.model_Invalid := IL_Main_Fields.InValid_model((SALT38.StrType)le.model);
-    SELF.model_year_Invalid := IL_Main_Fields.InValid_model_year((SALT38.StrType)le.model_year);
-    SELF.model_desc_Invalid := IL_Main_Fields.InValid_model_desc((SALT38.StrType)le.model_desc);
-    SELF.collateral_count_Invalid := IL_Main_Fields.InValid_collateral_count((SALT38.StrType)le.collateral_count);
-    SELF.manufactured_year_Invalid := IL_Main_Fields.InValid_manufactured_year((SALT38.StrType)le.manufactured_year);
-    SELF.new_used_Invalid := IL_Main_Fields.InValid_new_used((SALT38.StrType)le.new_used);
-    SELF.serial_number_Invalid := IL_Main_Fields.InValid_serial_number((SALT38.StrType)le.serial_number);
-    SELF.property_desc_Invalid := IL_Main_Fields.InValid_property_desc((SALT38.StrType)le.property_desc);
-    SELF.borough_Invalid := IL_Main_Fields.InValid_borough((SALT38.StrType)le.borough);
-    SELF.block_Invalid := IL_Main_Fields.InValid_block((SALT38.StrType)le.block);
-    SELF.collateral_address_Invalid := IL_Main_Fields.InValid_collateral_address((SALT38.StrType)le.collateral_address);
-    SELF.air_rights_indc_Invalid := IL_Main_Fields.InValid_air_rights_indc((SALT38.StrType)le.air_rights_indc);
-    SELF.subterranean_rights_indc_Invalid := IL_Main_Fields.InValid_subterranean_rights_indc((SALT38.StrType)le.subterranean_rights_indc);
-    SELF.easment_indc_Invalid := IL_Main_Fields.InValid_easment_indc((SALT38.StrType)le.easment_indc);
-    SELF.volume_Invalid := IL_Main_Fields.InValid_volume((SALT38.StrType)le.volume);
-    SELF.persistent_record_id_Invalid := IL_Main_Fields.InValid_persistent_record_id((SALT38.StrType)le.persistent_record_id);
+    SELF.tmsid_Invalid := IL_Main_Fields.InValid_tmsid((SALT311.StrType)le.tmsid);
+    SELF.rmsid_Invalid := IL_Main_Fields.InValid_rmsid((SALT311.StrType)le.rmsid);
+    SELF.process_date_Invalid := IL_Main_Fields.InValid_process_date((SALT311.StrType)le.process_date);
+    SELF.filing_jurisdiction_Invalid := IL_Main_Fields.InValid_filing_jurisdiction((SALT311.StrType)le.filing_jurisdiction);
+    SELF.orig_filing_number_Invalid := IL_Main_Fields.InValid_orig_filing_number((SALT311.StrType)le.orig_filing_number);
+    SELF.orig_filing_type_Invalid := IL_Main_Fields.InValid_orig_filing_type((SALT311.StrType)le.orig_filing_type);
+    SELF.orig_filing_date_Invalid := IL_Main_Fields.InValid_orig_filing_date((SALT311.StrType)le.orig_filing_date);
+    SELF.orig_filing_time_Invalid := IL_Main_Fields.InValid_orig_filing_time((SALT311.StrType)le.orig_filing_time);
+    SELF.filing_number_Invalid := IL_Main_Fields.InValid_filing_number((SALT311.StrType)le.filing_number);
+    SELF.filing_type_Invalid := IL_Main_Fields.InValid_filing_type((SALT311.StrType)le.filing_type);
+    SELF.filing_date_Invalid := IL_Main_Fields.InValid_filing_date((SALT311.StrType)le.filing_date);
+    SELF.filing_time_Invalid := IL_Main_Fields.InValid_filing_time((SALT311.StrType)le.filing_time);
+    SELF.filing_status_Invalid := IL_Main_Fields.InValid_filing_status((SALT311.StrType)le.filing_status);
+    SELF.status_type_Invalid := IL_Main_Fields.InValid_status_type((SALT311.StrType)le.status_type);
+    SELF.page_Invalid := IL_Main_Fields.InValid_page((SALT311.StrType)le.page);
+    SELF.expiration_date_Invalid := IL_Main_Fields.InValid_expiration_date((SALT311.StrType)le.expiration_date);
+    SELF.contract_type_Invalid := IL_Main_Fields.InValid_contract_type((SALT311.StrType)le.contract_type);
+    SELF.vendor_entry_date_Invalid := IL_Main_Fields.InValid_vendor_entry_date((SALT311.StrType)le.vendor_entry_date);
+    SELF.vendor_upd_date_Invalid := IL_Main_Fields.InValid_vendor_upd_date((SALT311.StrType)le.vendor_upd_date);
+    SELF.statements_filed_Invalid := IL_Main_Fields.InValid_statements_filed((SALT311.StrType)le.statements_filed);
+    SELF.continuious_expiration_Invalid := IL_Main_Fields.InValid_continuious_expiration((SALT311.StrType)le.continuious_expiration);
+    SELF.microfilm_number_Invalid := IL_Main_Fields.InValid_microfilm_number((SALT311.StrType)le.microfilm_number);
+    SELF.amount_Invalid := IL_Main_Fields.InValid_amount((SALT311.StrType)le.amount);
+    SELF.irs_serial_number_Invalid := IL_Main_Fields.InValid_irs_serial_number((SALT311.StrType)le.irs_serial_number);
+    SELF.effective_date_Invalid := IL_Main_Fields.InValid_effective_date((SALT311.StrType)le.effective_date);
+    SELF.signer_name_Invalid := IL_Main_Fields.InValid_signer_name((SALT311.StrType)le.signer_name);
+    SELF.title_Invalid := IL_Main_Fields.InValid_title((SALT311.StrType)le.title);
+    SELF.filing_agency_Invalid := IL_Main_Fields.InValid_filing_agency((SALT311.StrType)le.filing_agency);
+    SELF.address_Invalid := IL_Main_Fields.InValid_address((SALT311.StrType)le.address);
+    SELF.city_Invalid := IL_Main_Fields.InValid_city((SALT311.StrType)le.city);
+    SELF.state_Invalid := IL_Main_Fields.InValid_state((SALT311.StrType)le.state);
+    SELF.county_Invalid := IL_Main_Fields.InValid_county((SALT311.StrType)le.county);
+    SELF.zip_Invalid := IL_Main_Fields.InValid_zip((SALT311.StrType)le.zip);
+    SELF.duns_number_Invalid := IL_Main_Fields.InValid_duns_number((SALT311.StrType)le.duns_number);
+    SELF.cmnt_effective_date_Invalid := IL_Main_Fields.InValid_cmnt_effective_date((SALT311.StrType)le.cmnt_effective_date);
+    SELF.description_Invalid := IL_Main_Fields.InValid_description((SALT311.StrType)le.description);
+    SELF.prim_machine_Invalid := IL_Main_Fields.InValid_prim_machine((SALT311.StrType)le.prim_machine);
+    SELF.sec_machine_Invalid := IL_Main_Fields.InValid_sec_machine((SALT311.StrType)le.sec_machine);
+    SELF.manufacturer_code_Invalid := IL_Main_Fields.InValid_manufacturer_code((SALT311.StrType)le.manufacturer_code);
+    SELF.manufacturer_name_Invalid := IL_Main_Fields.InValid_manufacturer_name((SALT311.StrType)le.manufacturer_name);
+    SELF.model_Invalid := IL_Main_Fields.InValid_model((SALT311.StrType)le.model);
+    SELF.model_year_Invalid := IL_Main_Fields.InValid_model_year((SALT311.StrType)le.model_year);
+    SELF.model_desc_Invalid := IL_Main_Fields.InValid_model_desc((SALT311.StrType)le.model_desc);
+    SELF.collateral_count_Invalid := IL_Main_Fields.InValid_collateral_count((SALT311.StrType)le.collateral_count);
+    SELF.manufactured_year_Invalid := IL_Main_Fields.InValid_manufactured_year((SALT311.StrType)le.manufactured_year);
+    SELF.new_used_Invalid := IL_Main_Fields.InValid_new_used((SALT311.StrType)le.new_used);
+    SELF.serial_number_Invalid := IL_Main_Fields.InValid_serial_number((SALT311.StrType)le.serial_number);
+    SELF.property_desc_Invalid := IL_Main_Fields.InValid_property_desc((SALT311.StrType)le.property_desc);
+    SELF.borough_Invalid := IL_Main_Fields.InValid_borough((SALT311.StrType)le.borough);
+    SELF.block_Invalid := IL_Main_Fields.InValid_block((SALT311.StrType)le.block);
+    SELF.collateral_address_Invalid := IL_Main_Fields.InValid_collateral_address((SALT311.StrType)le.collateral_address);
+    SELF.air_rights_indc_Invalid := IL_Main_Fields.InValid_air_rights_indc((SALT311.StrType)le.air_rights_indc);
+    SELF.subterranean_rights_indc_Invalid := IL_Main_Fields.InValid_subterranean_rights_indc((SALT311.StrType)le.subterranean_rights_indc);
+    SELF.easment_indc_Invalid := IL_Main_Fields.InValid_easment_indc((SALT311.StrType)le.easment_indc);
+    SELF.volume_Invalid := IL_Main_Fields.InValid_volume((SALT311.StrType)le.volume);
+    SELF.persistent_record_id_Invalid := IL_Main_Fields.InValid_persistent_record_id((SALT311.StrType)le.persistent_record_id);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -209,61 +209,61 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     tmsid_CUSTOM_ErrorCount := COUNT(GROUP,h.tmsid_Invalid=1);
     rmsid_CUSTOM_ErrorCount := COUNT(GROUP,h.rmsid_Invalid=1);
     process_date_CUSTOM_ErrorCount := COUNT(GROUP,h.process_date_Invalid=1);
-    process_date_LENGTH_ErrorCount := COUNT(GROUP,h.process_date_Invalid=2);
+    process_date_LENGTHS_ErrorCount := COUNT(GROUP,h.process_date_Invalid=2);
     process_date_Total_ErrorCount := COUNT(GROUP,h.process_date_Invalid>0);
     filing_jurisdiction_ENUM_ErrorCount := COUNT(GROUP,h.filing_jurisdiction_Invalid=1);
     orig_filing_number_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_filing_number_Invalid=1);
     orig_filing_type_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_filing_type_Invalid=1);
     orig_filing_date_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_filing_date_Invalid=1);
     orig_filing_time_CUSTOM_ErrorCount := COUNT(GROUP,h.orig_filing_time_Invalid=1);
-    filing_number_LENGTH_ErrorCount := COUNT(GROUP,h.filing_number_Invalid=1);
+    filing_number_CUSTOM_ErrorCount := COUNT(GROUP,h.filing_number_Invalid=1);
     filing_type_CUSTOM_ErrorCount := COUNT(GROUP,h.filing_type_Invalid=1);
     filing_date_CUSTOM_ErrorCount := COUNT(GROUP,h.filing_date_Invalid=1);
     filing_time_CUSTOM_ErrorCount := COUNT(GROUP,h.filing_time_Invalid=1);
-    filing_status_LENGTH_ErrorCount := COUNT(GROUP,h.filing_status_Invalid=1);
-    status_type_LENGTH_ErrorCount := COUNT(GROUP,h.status_type_Invalid=1);
+    filing_status_LENGTHS_ErrorCount := COUNT(GROUP,h.filing_status_Invalid=1);
+    status_type_LENGTHS_ErrorCount := COUNT(GROUP,h.status_type_Invalid=1);
     page_ALLOW_ErrorCount := COUNT(GROUP,h.page_Invalid=1);
     expiration_date_CUSTOM_ErrorCount := COUNT(GROUP,h.expiration_date_Invalid=1);
-    contract_type_LENGTH_ErrorCount := COUNT(GROUP,h.contract_type_Invalid=1);
-    vendor_entry_date_LENGTH_ErrorCount := COUNT(GROUP,h.vendor_entry_date_Invalid=1);
-    vendor_upd_date_LENGTH_ErrorCount := COUNT(GROUP,h.vendor_upd_date_Invalid=1);
+    contract_type_LENGTHS_ErrorCount := COUNT(GROUP,h.contract_type_Invalid=1);
+    vendor_entry_date_LENGTHS_ErrorCount := COUNT(GROUP,h.vendor_entry_date_Invalid=1);
+    vendor_upd_date_LENGTHS_ErrorCount := COUNT(GROUP,h.vendor_upd_date_Invalid=1);
     statements_filed_ALLOW_ErrorCount := COUNT(GROUP,h.statements_filed_Invalid=1);
     continuious_expiration_ENUM_ErrorCount := COUNT(GROUP,h.continuious_expiration_Invalid=1);
-    microfilm_number_LENGTH_ErrorCount := COUNT(GROUP,h.microfilm_number_Invalid=1);
-    amount_LENGTH_ErrorCount := COUNT(GROUP,h.amount_Invalid=1);
-    irs_serial_number_LENGTH_ErrorCount := COUNT(GROUP,h.irs_serial_number_Invalid=1);
-    effective_date_LENGTH_ErrorCount := COUNT(GROUP,h.effective_date_Invalid=1);
-    signer_name_LENGTH_ErrorCount := COUNT(GROUP,h.signer_name_Invalid=1);
-    title_LENGTH_ErrorCount := COUNT(GROUP,h.title_Invalid=1);
-    filing_agency_LENGTH_ErrorCount := COUNT(GROUP,h.filing_agency_Invalid=1);
-    address_LENGTH_ErrorCount := COUNT(GROUP,h.address_Invalid=1);
-    city_LENGTH_ErrorCount := COUNT(GROUP,h.city_Invalid=1);
-    state_LENGTH_ErrorCount := COUNT(GROUP,h.state_Invalid=1);
-    county_LENGTH_ErrorCount := COUNT(GROUP,h.county_Invalid=1);
-    zip_LENGTH_ErrorCount := COUNT(GROUP,h.zip_Invalid=1);
-    duns_number_LENGTH_ErrorCount := COUNT(GROUP,h.duns_number_Invalid=1);
-    cmnt_effective_date_LENGTH_ErrorCount := COUNT(GROUP,h.cmnt_effective_date_Invalid=1);
-    description_LENGTH_ErrorCount := COUNT(GROUP,h.description_Invalid=1);
-    prim_machine_LENGTH_ErrorCount := COUNT(GROUP,h.prim_machine_Invalid=1);
-    sec_machine_LENGTH_ErrorCount := COUNT(GROUP,h.sec_machine_Invalid=1);
-    manufacturer_code_LENGTH_ErrorCount := COUNT(GROUP,h.manufacturer_code_Invalid=1);
-    manufacturer_name_LENGTH_ErrorCount := COUNT(GROUP,h.manufacturer_name_Invalid=1);
-    model_LENGTH_ErrorCount := COUNT(GROUP,h.model_Invalid=1);
-    model_year_LENGTH_ErrorCount := COUNT(GROUP,h.model_year_Invalid=1);
-    model_desc_LENGTH_ErrorCount := COUNT(GROUP,h.model_desc_Invalid=1);
-    collateral_count_LENGTH_ErrorCount := COUNT(GROUP,h.collateral_count_Invalid=1);
-    manufactured_year_LENGTH_ErrorCount := COUNT(GROUP,h.manufactured_year_Invalid=1);
-    new_used_LENGTH_ErrorCount := COUNT(GROUP,h.new_used_Invalid=1);
-    serial_number_LENGTH_ErrorCount := COUNT(GROUP,h.serial_number_Invalid=1);
-    property_desc_LENGTH_ErrorCount := COUNT(GROUP,h.property_desc_Invalid=1);
-    borough_LENGTH_ErrorCount := COUNT(GROUP,h.borough_Invalid=1);
-    block_LENGTH_ErrorCount := COUNT(GROUP,h.block_Invalid=1);
-    collateral_address_LENGTH_ErrorCount := COUNT(GROUP,h.collateral_address_Invalid=1);
-    air_rights_indc_LENGTH_ErrorCount := COUNT(GROUP,h.air_rights_indc_Invalid=1);
-    subterranean_rights_indc_LENGTH_ErrorCount := COUNT(GROUP,h.subterranean_rights_indc_Invalid=1);
-    easment_indc_LENGTH_ErrorCount := COUNT(GROUP,h.easment_indc_Invalid=1);
-    volume_LENGTH_ErrorCount := COUNT(GROUP,h.volume_Invalid=1);
-    persistent_record_id_LENGTH_ErrorCount := COUNT(GROUP,h.persistent_record_id_Invalid=1);
+    microfilm_number_LENGTHS_ErrorCount := COUNT(GROUP,h.microfilm_number_Invalid=1);
+    amount_LENGTHS_ErrorCount := COUNT(GROUP,h.amount_Invalid=1);
+    irs_serial_number_LENGTHS_ErrorCount := COUNT(GROUP,h.irs_serial_number_Invalid=1);
+    effective_date_LENGTHS_ErrorCount := COUNT(GROUP,h.effective_date_Invalid=1);
+    signer_name_LENGTHS_ErrorCount := COUNT(GROUP,h.signer_name_Invalid=1);
+    title_LENGTHS_ErrorCount := COUNT(GROUP,h.title_Invalid=1);
+    filing_agency_LENGTHS_ErrorCount := COUNT(GROUP,h.filing_agency_Invalid=1);
+    address_LENGTHS_ErrorCount := COUNT(GROUP,h.address_Invalid=1);
+    city_LENGTHS_ErrorCount := COUNT(GROUP,h.city_Invalid=1);
+    state_LENGTHS_ErrorCount := COUNT(GROUP,h.state_Invalid=1);
+    county_LENGTHS_ErrorCount := COUNT(GROUP,h.county_Invalid=1);
+    zip_LENGTHS_ErrorCount := COUNT(GROUP,h.zip_Invalid=1);
+    duns_number_LENGTHS_ErrorCount := COUNT(GROUP,h.duns_number_Invalid=1);
+    cmnt_effective_date_LENGTHS_ErrorCount := COUNT(GROUP,h.cmnt_effective_date_Invalid=1);
+    description_LENGTHS_ErrorCount := COUNT(GROUP,h.description_Invalid=1);
+    prim_machine_LENGTHS_ErrorCount := COUNT(GROUP,h.prim_machine_Invalid=1);
+    sec_machine_LENGTHS_ErrorCount := COUNT(GROUP,h.sec_machine_Invalid=1);
+    manufacturer_code_LENGTHS_ErrorCount := COUNT(GROUP,h.manufacturer_code_Invalid=1);
+    manufacturer_name_LENGTHS_ErrorCount := COUNT(GROUP,h.manufacturer_name_Invalid=1);
+    model_LENGTHS_ErrorCount := COUNT(GROUP,h.model_Invalid=1);
+    model_year_LENGTHS_ErrorCount := COUNT(GROUP,h.model_year_Invalid=1);
+    model_desc_LENGTHS_ErrorCount := COUNT(GROUP,h.model_desc_Invalid=1);
+    collateral_count_LENGTHS_ErrorCount := COUNT(GROUP,h.collateral_count_Invalid=1);
+    manufactured_year_LENGTHS_ErrorCount := COUNT(GROUP,h.manufactured_year_Invalid=1);
+    new_used_LENGTHS_ErrorCount := COUNT(GROUP,h.new_used_Invalid=1);
+    serial_number_LENGTHS_ErrorCount := COUNT(GROUP,h.serial_number_Invalid=1);
+    property_desc_LENGTHS_ErrorCount := COUNT(GROUP,h.property_desc_Invalid=1);
+    borough_LENGTHS_ErrorCount := COUNT(GROUP,h.borough_Invalid=1);
+    block_LENGTHS_ErrorCount := COUNT(GROUP,h.block_Invalid=1);
+    collateral_address_LENGTHS_ErrorCount := COUNT(GROUP,h.collateral_address_Invalid=1);
+    air_rights_indc_LENGTHS_ErrorCount := COUNT(GROUP,h.air_rights_indc_Invalid=1);
+    subterranean_rights_indc_LENGTHS_ErrorCount := COUNT(GROUP,h.subterranean_rights_indc_Invalid=1);
+    easment_indc_LENGTHS_ErrorCount := COUNT(GROUP,h.easment_indc_Invalid=1);
+    volume_LENGTHS_ErrorCount := COUNT(GROUP,h.volume_Invalid=1);
+    persistent_record_id_LENGTHS_ErrorCount := COUNT(GROUP,h.persistent_record_id_Invalid=1);
     AnyRule_WithErrorsCount := COUNT(GROUP, h.tmsid_Invalid > 0 OR h.rmsid_Invalid > 0 OR h.process_date_Invalid > 0 OR h.filing_jurisdiction_Invalid > 0 OR h.orig_filing_number_Invalid > 0 OR h.orig_filing_type_Invalid > 0 OR h.orig_filing_date_Invalid > 0 OR h.orig_filing_time_Invalid > 0 OR h.filing_number_Invalid > 0 OR h.filing_type_Invalid > 0 OR h.filing_date_Invalid > 0 OR h.filing_time_Invalid > 0 OR h.filing_status_Invalid > 0 OR h.status_type_Invalid > 0 OR h.page_Invalid > 0 OR h.expiration_date_Invalid > 0 OR h.contract_type_Invalid > 0 OR h.vendor_entry_date_Invalid > 0 OR h.vendor_upd_date_Invalid > 0 OR h.statements_filed_Invalid > 0 OR h.continuious_expiration_Invalid > 0 OR h.microfilm_number_Invalid > 0 OR h.amount_Invalid > 0 OR h.irs_serial_number_Invalid > 0 OR h.effective_date_Invalid > 0 OR h.signer_name_Invalid > 0 OR h.title_Invalid > 0 OR h.filing_agency_Invalid > 0 OR h.address_Invalid > 0 OR h.city_Invalid > 0 OR h.state_Invalid > 0 OR h.county_Invalid > 0 OR h.zip_Invalid > 0 OR h.duns_number_Invalid > 0 OR h.cmnt_effective_date_Invalid > 0 OR h.description_Invalid > 0 OR h.prim_machine_Invalid > 0 OR h.sec_machine_Invalid > 0 OR h.manufacturer_code_Invalid > 0 OR h.manufacturer_name_Invalid > 0 OR h.model_Invalid > 0 OR h.model_year_Invalid > 0 OR h.model_desc_Invalid > 0 OR h.collateral_count_Invalid > 0 OR h.manufactured_year_Invalid > 0 OR h.new_used_Invalid > 0 OR h.serial_number_Invalid > 0 OR h.property_desc_Invalid > 0 OR h.borough_Invalid > 0 OR h.block_Invalid > 0 OR h.collateral_address_Invalid > 0 OR h.air_rights_indc_Invalid > 0 OR h.subterranean_rights_indc_Invalid > 0 OR h.easment_indc_Invalid > 0 OR h.volume_Invalid > 0 OR h.persistent_record_id_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
@@ -272,9 +272,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.tmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_Total_ErrorCount > 0, 1, 0) + IF(le.filing_jurisdiction_ENUM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_status_LENGTH_ErrorCount > 0, 1, 0) + IF(le.status_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.page_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expiration_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contract_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.vendor_entry_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.vendor_upd_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.statements_filed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.continuious_expiration_ENUM_ErrorCount > 0, 1, 0) + IF(le.microfilm_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.amount_LENGTH_ErrorCount > 0, 1, 0) + IF(le.irs_serial_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.effective_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.signer_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.title_LENGTH_ErrorCount > 0, 1, 0) + IF(le.filing_agency_LENGTH_ErrorCount > 0, 1, 0) + IF(le.address_LENGTH_ErrorCount > 0, 1, 0) + IF(le.city_LENGTH_ErrorCount > 0, 1, 0) + IF(le.state_LENGTH_ErrorCount > 0, 1, 0) + IF(le.county_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTH_ErrorCount > 0, 1, 0) + IF(le.duns_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.cmnt_effective_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.description_LENGTH_ErrorCount > 0, 1, 0) + IF(le.prim_machine_LENGTH_ErrorCount > 0, 1, 0) + IF(le.sec_machine_LENGTH_ErrorCount > 0, 1, 0) + IF(le.manufacturer_code_LENGTH_ErrorCount > 0, 1, 0) + IF(le.manufacturer_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.model_LENGTH_ErrorCount > 0, 1, 0) + IF(le.model_year_LENGTH_ErrorCount > 0, 1, 0) + IF(le.model_desc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.collateral_count_LENGTH_ErrorCount > 0, 1, 0) + IF(le.manufactured_year_LENGTH_ErrorCount > 0, 1, 0) + IF(le.new_used_LENGTH_ErrorCount > 0, 1, 0) + IF(le.serial_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.property_desc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.borough_LENGTH_ErrorCount > 0, 1, 0) + IF(le.block_LENGTH_ErrorCount > 0, 1, 0) + IF(le.collateral_address_LENGTH_ErrorCount > 0, 1, 0) + IF(le.air_rights_indc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.subterranean_rights_indc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.easment_indc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.volume_LENGTH_ErrorCount > 0, 1, 0) + IF(le.persistent_record_id_LENGTH_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.tmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_Total_ErrorCount > 0, 1, 0) + IF(le.filing_jurisdiction_ENUM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_status_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.status_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.page_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expiration_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contract_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.vendor_entry_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.vendor_upd_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.statements_filed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.continuious_expiration_ENUM_ErrorCount > 0, 1, 0) + IF(le.microfilm_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.irs_serial_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.effective_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.signer_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.title_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.filing_agency_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.address_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.city_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.county_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.duns_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.cmnt_effective_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.description_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_machine_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.sec_machine_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.manufacturer_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.manufacturer_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.model_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.model_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.model_desc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.collateral_count_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.manufactured_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.new_used_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.serial_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.property_desc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.borough_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.block_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.collateral_address_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.air_rights_indc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.subterranean_rights_indc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.easment_indc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.volume_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.persistent_record_id_LENGTHS_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.tmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.filing_jurisdiction_ENUM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_status_LENGTH_ErrorCount > 0, 1, 0) + IF(le.status_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.page_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expiration_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contract_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.vendor_entry_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.vendor_upd_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.statements_filed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.continuious_expiration_ENUM_ErrorCount > 0, 1, 0) + IF(le.microfilm_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.amount_LENGTH_ErrorCount > 0, 1, 0) + IF(le.irs_serial_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.effective_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.signer_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.title_LENGTH_ErrorCount > 0, 1, 0) + IF(le.filing_agency_LENGTH_ErrorCount > 0, 1, 0) + IF(le.address_LENGTH_ErrorCount > 0, 1, 0) + IF(le.city_LENGTH_ErrorCount > 0, 1, 0) + IF(le.state_LENGTH_ErrorCount > 0, 1, 0) + IF(le.county_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTH_ErrorCount > 0, 1, 0) + IF(le.duns_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.cmnt_effective_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.description_LENGTH_ErrorCount > 0, 1, 0) + IF(le.prim_machine_LENGTH_ErrorCount > 0, 1, 0) + IF(le.sec_machine_LENGTH_ErrorCount > 0, 1, 0) + IF(le.manufacturer_code_LENGTH_ErrorCount > 0, 1, 0) + IF(le.manufacturer_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.model_LENGTH_ErrorCount > 0, 1, 0) + IF(le.model_year_LENGTH_ErrorCount > 0, 1, 0) + IF(le.model_desc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.collateral_count_LENGTH_ErrorCount > 0, 1, 0) + IF(le.manufactured_year_LENGTH_ErrorCount > 0, 1, 0) + IF(le.new_used_LENGTH_ErrorCount > 0, 1, 0) + IF(le.serial_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.property_desc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.borough_LENGTH_ErrorCount > 0, 1, 0) + IF(le.block_LENGTH_ErrorCount > 0, 1, 0) + IF(le.collateral_address_LENGTH_ErrorCount > 0, 1, 0) + IF(le.air_rights_indc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.subterranean_rights_indc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.easment_indc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.volume_LENGTH_ErrorCount > 0, 1, 0) + IF(le.persistent_record_id_LENGTH_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.tmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.filing_jurisdiction_ENUM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_time_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.filing_status_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.status_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.page_ALLOW_ErrorCount > 0, 1, 0) + IF(le.expiration_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.contract_type_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.vendor_entry_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.vendor_upd_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.statements_filed_ALLOW_ErrorCount > 0, 1, 0) + IF(le.continuious_expiration_ENUM_ErrorCount > 0, 1, 0) + IF(le.microfilm_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.amount_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.irs_serial_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.effective_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.signer_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.title_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.filing_agency_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.address_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.city_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.state_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.county_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.duns_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.cmnt_effective_date_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.description_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.prim_machine_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.sec_machine_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.manufacturer_code_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.manufacturer_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.model_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.model_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.model_desc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.collateral_count_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.manufactured_year_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.new_used_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.serial_number_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.property_desc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.borough_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.block_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.collateral_address_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.air_rights_indc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.subterranean_rights_indc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.easment_indc_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.volume_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.persistent_record_id_LENGTHS_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -284,8 +284,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT38.StrType ErrorMessage;
-    SALT38.StrType FieldContents;
+    SALT311.StrType ErrorMessage;
+    SALT311.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -294,63 +294,63 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.tmsid_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.rmsid_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.process_date_Invalid,'CUSTOM','LENGTH','UNKNOWN')
+          ,CHOOSE(le.process_date_Invalid,'CUSTOM','LENGTHS','UNKNOWN')
           ,CHOOSE(le.filing_jurisdiction_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.orig_filing_number_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.orig_filing_type_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.orig_filing_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.orig_filing_time_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.filing_number_Invalid,'LENGTH','UNKNOWN')
+          ,CHOOSE(le.filing_number_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.filing_type_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.filing_date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.filing_time_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.filing_status_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.status_type_Invalid,'LENGTH','UNKNOWN')
+          ,CHOOSE(le.filing_status_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.status_type_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.page_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.expiration_date_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.contract_type_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.vendor_entry_date_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.vendor_upd_date_Invalid,'LENGTH','UNKNOWN')
+          ,CHOOSE(le.contract_type_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.vendor_entry_date_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.vendor_upd_date_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.statements_filed_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.continuious_expiration_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.microfilm_number_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.amount_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.irs_serial_number_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.effective_date_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.signer_name_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.title_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.filing_agency_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.address_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.city_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.state_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.county_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.zip_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.duns_number_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.cmnt_effective_date_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.description_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.prim_machine_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.sec_machine_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.manufacturer_code_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.manufacturer_name_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.model_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.model_year_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.model_desc_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.collateral_count_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.manufactured_year_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.new_used_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.serial_number_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.property_desc_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.borough_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.block_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.collateral_address_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.air_rights_indc_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.subterranean_rights_indc_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.easment_indc_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.volume_Invalid,'LENGTH','UNKNOWN')
-          ,CHOOSE(le.persistent_record_id_Invalid,'LENGTH','UNKNOWN'),'UNKNOWN'));
+          ,CHOOSE(le.microfilm_number_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.amount_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.irs_serial_number_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.effective_date_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.signer_name_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.title_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.filing_agency_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.address_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.city_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.state_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.county_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.zip_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.duns_number_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.cmnt_effective_date_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.description_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.prim_machine_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.sec_machine_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.manufacturer_code_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.manufacturer_name_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.model_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.model_year_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.model_desc_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.collateral_count_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.manufactured_year_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.new_used_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.serial_number_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.property_desc_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.borough_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.block_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.collateral_address_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.air_rights_indc_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.subterranean_rights_indc_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.easment_indc_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.volume_Invalid,'LENGTHS','UNKNOWN')
+          ,CHOOSE(le.persistent_record_id_Invalid,'LENGTHS','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'tmsid','rmsid','process_date','filing_jurisdiction','orig_filing_number','orig_filing_type','orig_filing_date','orig_filing_time','filing_number','filing_type','filing_date','filing_time','filing_status','status_type','page','expiration_date','contract_type','vendor_entry_date','vendor_upd_date','statements_filed','continuious_expiration','microfilm_number','amount','irs_serial_number','effective_date','signer_name','title','filing_agency','address','city','state','county','zip','duns_number','cmnt_effective_date','description','prim_machine','sec_machine','manufacturer_code','manufacturer_name','model','model_year','model_desc','collateral_count','manufactured_year','new_used','serial_number','property_desc','borough','block','collateral_address','air_rights_indc','subterranean_rights_indc','easment_indc','volume','persistent_record_id','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_tmsid','invalid_rmsid','invalid_8pastdate','invalid_filing_jurisdiction','invalid_orig_filing_number','invalid_orig_filing_type','invalid_orig_filing_date','invalid_orig_filing_time','invalid_mandatory','invalid_filing_type','invalid_filing_date','invalid_filing_time','invalid_empty','invalid_empty','invalid_numeric_blank','invalid_expiration_date','invalid_empty','invalid_empty','invalid_empty','invalid_numeric_blank','invalid_boolean_yn_blank','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_mandatory','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.tmsid,(SALT38.StrType)le.rmsid,(SALT38.StrType)le.process_date,(SALT38.StrType)le.filing_jurisdiction,(SALT38.StrType)le.orig_filing_number,(SALT38.StrType)le.orig_filing_type,(SALT38.StrType)le.orig_filing_date,(SALT38.StrType)le.orig_filing_time,(SALT38.StrType)le.filing_number,(SALT38.StrType)le.filing_type,(SALT38.StrType)le.filing_date,(SALT38.StrType)le.filing_time,(SALT38.StrType)le.filing_status,(SALT38.StrType)le.status_type,(SALT38.StrType)le.page,(SALT38.StrType)le.expiration_date,(SALT38.StrType)le.contract_type,(SALT38.StrType)le.vendor_entry_date,(SALT38.StrType)le.vendor_upd_date,(SALT38.StrType)le.statements_filed,(SALT38.StrType)le.continuious_expiration,(SALT38.StrType)le.microfilm_number,(SALT38.StrType)le.amount,(SALT38.StrType)le.irs_serial_number,(SALT38.StrType)le.effective_date,(SALT38.StrType)le.signer_name,(SALT38.StrType)le.title,(SALT38.StrType)le.filing_agency,(SALT38.StrType)le.address,(SALT38.StrType)le.city,(SALT38.StrType)le.state,(SALT38.StrType)le.county,(SALT38.StrType)le.zip,(SALT38.StrType)le.duns_number,(SALT38.StrType)le.cmnt_effective_date,(SALT38.StrType)le.description,(SALT38.StrType)le.prim_machine,(SALT38.StrType)le.sec_machine,(SALT38.StrType)le.manufacturer_code,(SALT38.StrType)le.manufacturer_name,(SALT38.StrType)le.model,(SALT38.StrType)le.model_year,(SALT38.StrType)le.model_desc,(SALT38.StrType)le.collateral_count,(SALT38.StrType)le.manufactured_year,(SALT38.StrType)le.new_used,(SALT38.StrType)le.serial_number,(SALT38.StrType)le.property_desc,(SALT38.StrType)le.borough,(SALT38.StrType)le.block,(SALT38.StrType)le.collateral_address,(SALT38.StrType)le.air_rights_indc,(SALT38.StrType)le.subterranean_rights_indc,(SALT38.StrType)le.easment_indc,(SALT38.StrType)le.volume,(SALT38.StrType)le.persistent_record_id,'***SALTBUG***');
+    SELF.FieldType := CHOOSE(c,'invalid_tmsid','invalid_rmsid','invalid_8pastdate','invalid_filing_jurisdiction','invalid_orig_filing_number','invalid_orig_filing_type','invalid_orig_filing_date','invalid_orig_filing_time','invalid_filing_number','invalid_filing_type','invalid_filing_date','invalid_filing_time','invalid_empty','invalid_empty','invalid_numeric_blank','invalid_expiration_date','invalid_empty','invalid_empty','invalid_empty','invalid_numeric_blank','invalid_boolean_yn_blank','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_mandatory','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.tmsid,(SALT311.StrType)le.rmsid,(SALT311.StrType)le.process_date,(SALT311.StrType)le.filing_jurisdiction,(SALT311.StrType)le.orig_filing_number,(SALT311.StrType)le.orig_filing_type,(SALT311.StrType)le.orig_filing_date,(SALT311.StrType)le.orig_filing_time,(SALT311.StrType)le.filing_number,(SALT311.StrType)le.filing_type,(SALT311.StrType)le.filing_date,(SALT311.StrType)le.filing_time,(SALT311.StrType)le.filing_status,(SALT311.StrType)le.status_type,(SALT311.StrType)le.page,(SALT311.StrType)le.expiration_date,(SALT311.StrType)le.contract_type,(SALT311.StrType)le.vendor_entry_date,(SALT311.StrType)le.vendor_upd_date,(SALT311.StrType)le.statements_filed,(SALT311.StrType)le.continuious_expiration,(SALT311.StrType)le.microfilm_number,(SALT311.StrType)le.amount,(SALT311.StrType)le.irs_serial_number,(SALT311.StrType)le.effective_date,(SALT311.StrType)le.signer_name,(SALT311.StrType)le.title,(SALT311.StrType)le.filing_agency,(SALT311.StrType)le.address,(SALT311.StrType)le.city,(SALT311.StrType)le.state,(SALT311.StrType)le.county,(SALT311.StrType)le.zip,(SALT311.StrType)le.duns_number,(SALT311.StrType)le.cmnt_effective_date,(SALT311.StrType)le.description,(SALT311.StrType)le.prim_machine,(SALT311.StrType)le.sec_machine,(SALT311.StrType)le.manufacturer_code,(SALT311.StrType)le.manufacturer_name,(SALT311.StrType)le.model,(SALT311.StrType)le.model_year,(SALT311.StrType)le.model_desc,(SALT311.StrType)le.collateral_count,(SALT311.StrType)le.manufactured_year,(SALT311.StrType)le.new_used,(SALT311.StrType)le.serial_number,(SALT311.StrType)le.property_desc,(SALT311.StrType)le.borough,(SALT311.StrType)le.block,(SALT311.StrType)le.collateral_address,(SALT311.StrType)le.air_rights_indc,(SALT311.StrType)le.subterranean_rights_indc,(SALT311.StrType)le.easment_indc,(SALT311.StrType)le.volume,(SALT311.StrType)le.persistent_record_id,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,56,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
@@ -358,67 +358,67 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(IL_Main_Layout_UCCV2) prevDS = DATASET([], IL_Main_Layout_UCCV2), STRING10 Src='UNK'):= FUNCTION
   // field error stats
-    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT311.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
       SELF.ruledesc := CHOOSE(c
           ,'tmsid:invalid_tmsid:CUSTOM'
           ,'rmsid:invalid_rmsid:CUSTOM'
-          ,'process_date:invalid_8pastdate:CUSTOM','process_date:invalid_8pastdate:LENGTH'
+          ,'process_date:invalid_8pastdate:CUSTOM','process_date:invalid_8pastdate:LENGTHS'
           ,'filing_jurisdiction:invalid_filing_jurisdiction:ENUM'
           ,'orig_filing_number:invalid_orig_filing_number:CUSTOM'
           ,'orig_filing_type:invalid_orig_filing_type:CUSTOM'
           ,'orig_filing_date:invalid_orig_filing_date:CUSTOM'
           ,'orig_filing_time:invalid_orig_filing_time:CUSTOM'
-          ,'filing_number:invalid_mandatory:LENGTH'
+          ,'filing_number:invalid_filing_number:CUSTOM'
           ,'filing_type:invalid_filing_type:CUSTOM'
           ,'filing_date:invalid_filing_date:CUSTOM'
           ,'filing_time:invalid_filing_time:CUSTOM'
-          ,'filing_status:invalid_empty:LENGTH'
-          ,'status_type:invalid_empty:LENGTH'
+          ,'filing_status:invalid_empty:LENGTHS'
+          ,'status_type:invalid_empty:LENGTHS'
           ,'page:invalid_numeric_blank:ALLOW'
           ,'expiration_date:invalid_expiration_date:CUSTOM'
-          ,'contract_type:invalid_empty:LENGTH'
-          ,'vendor_entry_date:invalid_empty:LENGTH'
-          ,'vendor_upd_date:invalid_empty:LENGTH'
+          ,'contract_type:invalid_empty:LENGTHS'
+          ,'vendor_entry_date:invalid_empty:LENGTHS'
+          ,'vendor_upd_date:invalid_empty:LENGTHS'
           ,'statements_filed:invalid_numeric_blank:ALLOW'
           ,'continuious_expiration:invalid_boolean_yn_blank:ENUM'
-          ,'microfilm_number:invalid_empty:LENGTH'
-          ,'amount:invalid_empty:LENGTH'
-          ,'irs_serial_number:invalid_empty:LENGTH'
-          ,'effective_date:invalid_empty:LENGTH'
-          ,'signer_name:invalid_empty:LENGTH'
-          ,'title:invalid_empty:LENGTH'
-          ,'filing_agency:invalid_empty:LENGTH'
-          ,'address:invalid_empty:LENGTH'
-          ,'city:invalid_empty:LENGTH'
-          ,'state:invalid_empty:LENGTH'
-          ,'county:invalid_empty:LENGTH'
-          ,'zip:invalid_empty:LENGTH'
-          ,'duns_number:invalid_empty:LENGTH'
-          ,'cmnt_effective_date:invalid_empty:LENGTH'
-          ,'description:invalid_empty:LENGTH'
-          ,'prim_machine:invalid_empty:LENGTH'
-          ,'sec_machine:invalid_empty:LENGTH'
-          ,'manufacturer_code:invalid_empty:LENGTH'
-          ,'manufacturer_name:invalid_empty:LENGTH'
-          ,'model:invalid_empty:LENGTH'
-          ,'model_year:invalid_empty:LENGTH'
-          ,'model_desc:invalid_empty:LENGTH'
-          ,'collateral_count:invalid_empty:LENGTH'
-          ,'manufactured_year:invalid_empty:LENGTH'
-          ,'new_used:invalid_empty:LENGTH'
-          ,'serial_number:invalid_empty:LENGTH'
-          ,'property_desc:invalid_empty:LENGTH'
-          ,'borough:invalid_empty:LENGTH'
-          ,'block:invalid_empty:LENGTH'
-          ,'collateral_address:invalid_empty:LENGTH'
-          ,'air_rights_indc:invalid_empty:LENGTH'
-          ,'subterranean_rights_indc:invalid_empty:LENGTH'
-          ,'easment_indc:invalid_empty:LENGTH'
-          ,'volume:invalid_empty:LENGTH'
-          ,'persistent_record_id:invalid_mandatory:LENGTH'
+          ,'microfilm_number:invalid_empty:LENGTHS'
+          ,'amount:invalid_empty:LENGTHS'
+          ,'irs_serial_number:invalid_empty:LENGTHS'
+          ,'effective_date:invalid_empty:LENGTHS'
+          ,'signer_name:invalid_empty:LENGTHS'
+          ,'title:invalid_empty:LENGTHS'
+          ,'filing_agency:invalid_empty:LENGTHS'
+          ,'address:invalid_empty:LENGTHS'
+          ,'city:invalid_empty:LENGTHS'
+          ,'state:invalid_empty:LENGTHS'
+          ,'county:invalid_empty:LENGTHS'
+          ,'zip:invalid_empty:LENGTHS'
+          ,'duns_number:invalid_empty:LENGTHS'
+          ,'cmnt_effective_date:invalid_empty:LENGTHS'
+          ,'description:invalid_empty:LENGTHS'
+          ,'prim_machine:invalid_empty:LENGTHS'
+          ,'sec_machine:invalid_empty:LENGTHS'
+          ,'manufacturer_code:invalid_empty:LENGTHS'
+          ,'manufacturer_name:invalid_empty:LENGTHS'
+          ,'model:invalid_empty:LENGTHS'
+          ,'model_year:invalid_empty:LENGTHS'
+          ,'model_desc:invalid_empty:LENGTHS'
+          ,'collateral_count:invalid_empty:LENGTHS'
+          ,'manufactured_year:invalid_empty:LENGTHS'
+          ,'new_used:invalid_empty:LENGTHS'
+          ,'serial_number:invalid_empty:LENGTHS'
+          ,'property_desc:invalid_empty:LENGTHS'
+          ,'borough:invalid_empty:LENGTHS'
+          ,'block:invalid_empty:LENGTHS'
+          ,'collateral_address:invalid_empty:LENGTHS'
+          ,'air_rights_indc:invalid_empty:LENGTHS'
+          ,'subterranean_rights_indc:invalid_empty:LENGTHS'
+          ,'easment_indc:invalid_empty:LENGTHS'
+          ,'volume:invalid_empty:LENGTHS'
+          ,'persistent_record_id:invalid_mandatory:LENGTHS'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -493,60 +493,60 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulecnt := CHOOSE(c
           ,le.tmsid_CUSTOM_ErrorCount
           ,le.rmsid_CUSTOM_ErrorCount
-          ,le.process_date_CUSTOM_ErrorCount,le.process_date_LENGTH_ErrorCount
+          ,le.process_date_CUSTOM_ErrorCount,le.process_date_LENGTHS_ErrorCount
           ,le.filing_jurisdiction_ENUM_ErrorCount
           ,le.orig_filing_number_CUSTOM_ErrorCount
           ,le.orig_filing_type_CUSTOM_ErrorCount
           ,le.orig_filing_date_CUSTOM_ErrorCount
           ,le.orig_filing_time_CUSTOM_ErrorCount
-          ,le.filing_number_LENGTH_ErrorCount
+          ,le.filing_number_CUSTOM_ErrorCount
           ,le.filing_type_CUSTOM_ErrorCount
           ,le.filing_date_CUSTOM_ErrorCount
           ,le.filing_time_CUSTOM_ErrorCount
-          ,le.filing_status_LENGTH_ErrorCount
-          ,le.status_type_LENGTH_ErrorCount
+          ,le.filing_status_LENGTHS_ErrorCount
+          ,le.status_type_LENGTHS_ErrorCount
           ,le.page_ALLOW_ErrorCount
           ,le.expiration_date_CUSTOM_ErrorCount
-          ,le.contract_type_LENGTH_ErrorCount
-          ,le.vendor_entry_date_LENGTH_ErrorCount
-          ,le.vendor_upd_date_LENGTH_ErrorCount
+          ,le.contract_type_LENGTHS_ErrorCount
+          ,le.vendor_entry_date_LENGTHS_ErrorCount
+          ,le.vendor_upd_date_LENGTHS_ErrorCount
           ,le.statements_filed_ALLOW_ErrorCount
           ,le.continuious_expiration_ENUM_ErrorCount
-          ,le.microfilm_number_LENGTH_ErrorCount
-          ,le.amount_LENGTH_ErrorCount
-          ,le.irs_serial_number_LENGTH_ErrorCount
-          ,le.effective_date_LENGTH_ErrorCount
-          ,le.signer_name_LENGTH_ErrorCount
-          ,le.title_LENGTH_ErrorCount
-          ,le.filing_agency_LENGTH_ErrorCount
-          ,le.address_LENGTH_ErrorCount
-          ,le.city_LENGTH_ErrorCount
-          ,le.state_LENGTH_ErrorCount
-          ,le.county_LENGTH_ErrorCount
-          ,le.zip_LENGTH_ErrorCount
-          ,le.duns_number_LENGTH_ErrorCount
-          ,le.cmnt_effective_date_LENGTH_ErrorCount
-          ,le.description_LENGTH_ErrorCount
-          ,le.prim_machine_LENGTH_ErrorCount
-          ,le.sec_machine_LENGTH_ErrorCount
-          ,le.manufacturer_code_LENGTH_ErrorCount
-          ,le.manufacturer_name_LENGTH_ErrorCount
-          ,le.model_LENGTH_ErrorCount
-          ,le.model_year_LENGTH_ErrorCount
-          ,le.model_desc_LENGTH_ErrorCount
-          ,le.collateral_count_LENGTH_ErrorCount
-          ,le.manufactured_year_LENGTH_ErrorCount
-          ,le.new_used_LENGTH_ErrorCount
-          ,le.serial_number_LENGTH_ErrorCount
-          ,le.property_desc_LENGTH_ErrorCount
-          ,le.borough_LENGTH_ErrorCount
-          ,le.block_LENGTH_ErrorCount
-          ,le.collateral_address_LENGTH_ErrorCount
-          ,le.air_rights_indc_LENGTH_ErrorCount
-          ,le.subterranean_rights_indc_LENGTH_ErrorCount
-          ,le.easment_indc_LENGTH_ErrorCount
-          ,le.volume_LENGTH_ErrorCount
-          ,le.persistent_record_id_LENGTH_ErrorCount
+          ,le.microfilm_number_LENGTHS_ErrorCount
+          ,le.amount_LENGTHS_ErrorCount
+          ,le.irs_serial_number_LENGTHS_ErrorCount
+          ,le.effective_date_LENGTHS_ErrorCount
+          ,le.signer_name_LENGTHS_ErrorCount
+          ,le.title_LENGTHS_ErrorCount
+          ,le.filing_agency_LENGTHS_ErrorCount
+          ,le.address_LENGTHS_ErrorCount
+          ,le.city_LENGTHS_ErrorCount
+          ,le.state_LENGTHS_ErrorCount
+          ,le.county_LENGTHS_ErrorCount
+          ,le.zip_LENGTHS_ErrorCount
+          ,le.duns_number_LENGTHS_ErrorCount
+          ,le.cmnt_effective_date_LENGTHS_ErrorCount
+          ,le.description_LENGTHS_ErrorCount
+          ,le.prim_machine_LENGTHS_ErrorCount
+          ,le.sec_machine_LENGTHS_ErrorCount
+          ,le.manufacturer_code_LENGTHS_ErrorCount
+          ,le.manufacturer_name_LENGTHS_ErrorCount
+          ,le.model_LENGTHS_ErrorCount
+          ,le.model_year_LENGTHS_ErrorCount
+          ,le.model_desc_LENGTHS_ErrorCount
+          ,le.collateral_count_LENGTHS_ErrorCount
+          ,le.manufactured_year_LENGTHS_ErrorCount
+          ,le.new_used_LENGTHS_ErrorCount
+          ,le.serial_number_LENGTHS_ErrorCount
+          ,le.property_desc_LENGTHS_ErrorCount
+          ,le.borough_LENGTHS_ErrorCount
+          ,le.block_LENGTHS_ErrorCount
+          ,le.collateral_address_LENGTHS_ErrorCount
+          ,le.air_rights_indc_LENGTHS_ErrorCount
+          ,le.subterranean_rights_indc_LENGTHS_ErrorCount
+          ,le.easment_indc_LENGTHS_ErrorCount
+          ,le.volume_LENGTHS_ErrorCount
+          ,le.persistent_record_id_LENGTHS_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -557,60 +557,60 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.tmsid_CUSTOM_ErrorCount
           ,le.rmsid_CUSTOM_ErrorCount
-          ,le.process_date_CUSTOM_ErrorCount,le.process_date_LENGTH_ErrorCount
+          ,le.process_date_CUSTOM_ErrorCount,le.process_date_LENGTHS_ErrorCount
           ,le.filing_jurisdiction_ENUM_ErrorCount
           ,le.orig_filing_number_CUSTOM_ErrorCount
           ,le.orig_filing_type_CUSTOM_ErrorCount
           ,le.orig_filing_date_CUSTOM_ErrorCount
           ,le.orig_filing_time_CUSTOM_ErrorCount
-          ,le.filing_number_LENGTH_ErrorCount
+          ,le.filing_number_CUSTOM_ErrorCount
           ,le.filing_type_CUSTOM_ErrorCount
           ,le.filing_date_CUSTOM_ErrorCount
           ,le.filing_time_CUSTOM_ErrorCount
-          ,le.filing_status_LENGTH_ErrorCount
-          ,le.status_type_LENGTH_ErrorCount
+          ,le.filing_status_LENGTHS_ErrorCount
+          ,le.status_type_LENGTHS_ErrorCount
           ,le.page_ALLOW_ErrorCount
           ,le.expiration_date_CUSTOM_ErrorCount
-          ,le.contract_type_LENGTH_ErrorCount
-          ,le.vendor_entry_date_LENGTH_ErrorCount
-          ,le.vendor_upd_date_LENGTH_ErrorCount
+          ,le.contract_type_LENGTHS_ErrorCount
+          ,le.vendor_entry_date_LENGTHS_ErrorCount
+          ,le.vendor_upd_date_LENGTHS_ErrorCount
           ,le.statements_filed_ALLOW_ErrorCount
           ,le.continuious_expiration_ENUM_ErrorCount
-          ,le.microfilm_number_LENGTH_ErrorCount
-          ,le.amount_LENGTH_ErrorCount
-          ,le.irs_serial_number_LENGTH_ErrorCount
-          ,le.effective_date_LENGTH_ErrorCount
-          ,le.signer_name_LENGTH_ErrorCount
-          ,le.title_LENGTH_ErrorCount
-          ,le.filing_agency_LENGTH_ErrorCount
-          ,le.address_LENGTH_ErrorCount
-          ,le.city_LENGTH_ErrorCount
-          ,le.state_LENGTH_ErrorCount
-          ,le.county_LENGTH_ErrorCount
-          ,le.zip_LENGTH_ErrorCount
-          ,le.duns_number_LENGTH_ErrorCount
-          ,le.cmnt_effective_date_LENGTH_ErrorCount
-          ,le.description_LENGTH_ErrorCount
-          ,le.prim_machine_LENGTH_ErrorCount
-          ,le.sec_machine_LENGTH_ErrorCount
-          ,le.manufacturer_code_LENGTH_ErrorCount
-          ,le.manufacturer_name_LENGTH_ErrorCount
-          ,le.model_LENGTH_ErrorCount
-          ,le.model_year_LENGTH_ErrorCount
-          ,le.model_desc_LENGTH_ErrorCount
-          ,le.collateral_count_LENGTH_ErrorCount
-          ,le.manufactured_year_LENGTH_ErrorCount
-          ,le.new_used_LENGTH_ErrorCount
-          ,le.serial_number_LENGTH_ErrorCount
-          ,le.property_desc_LENGTH_ErrorCount
-          ,le.borough_LENGTH_ErrorCount
-          ,le.block_LENGTH_ErrorCount
-          ,le.collateral_address_LENGTH_ErrorCount
-          ,le.air_rights_indc_LENGTH_ErrorCount
-          ,le.subterranean_rights_indc_LENGTH_ErrorCount
-          ,le.easment_indc_LENGTH_ErrorCount
-          ,le.volume_LENGTH_ErrorCount
-          ,le.persistent_record_id_LENGTH_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,le.microfilm_number_LENGTHS_ErrorCount
+          ,le.amount_LENGTHS_ErrorCount
+          ,le.irs_serial_number_LENGTHS_ErrorCount
+          ,le.effective_date_LENGTHS_ErrorCount
+          ,le.signer_name_LENGTHS_ErrorCount
+          ,le.title_LENGTHS_ErrorCount
+          ,le.filing_agency_LENGTHS_ErrorCount
+          ,le.address_LENGTHS_ErrorCount
+          ,le.city_LENGTHS_ErrorCount
+          ,le.state_LENGTHS_ErrorCount
+          ,le.county_LENGTHS_ErrorCount
+          ,le.zip_LENGTHS_ErrorCount
+          ,le.duns_number_LENGTHS_ErrorCount
+          ,le.cmnt_effective_date_LENGTHS_ErrorCount
+          ,le.description_LENGTHS_ErrorCount
+          ,le.prim_machine_LENGTHS_ErrorCount
+          ,le.sec_machine_LENGTHS_ErrorCount
+          ,le.manufacturer_code_LENGTHS_ErrorCount
+          ,le.manufacturer_name_LENGTHS_ErrorCount
+          ,le.model_LENGTHS_ErrorCount
+          ,le.model_year_LENGTHS_ErrorCount
+          ,le.model_desc_LENGTHS_ErrorCount
+          ,le.collateral_count_LENGTHS_ErrorCount
+          ,le.manufactured_year_LENGTHS_ErrorCount
+          ,le.new_used_LENGTHS_ErrorCount
+          ,le.serial_number_LENGTHS_ErrorCount
+          ,le.property_desc_LENGTHS_ErrorCount
+          ,le.borough_LENGTHS_ErrorCount
+          ,le.block_LENGTHS_ErrorCount
+          ,le.collateral_address_LENGTHS_ErrorCount
+          ,le.air_rights_indc_LENGTHS_ErrorCount
+          ,le.subterranean_rights_indc_LENGTHS_ErrorCount
+          ,le.easment_indc_LENGTHS_ErrorCount
+          ,le.volume_LENGTHS_ErrorCount
+          ,le.persistent_record_id_LENGTHS_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
@@ -624,12 +624,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT311.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT311.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
@@ -644,7 +644,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       isNumField := (STRING)((TYPEOF(infield))'') = '0';
       RETURN IF(isNumField, 'nonzero', 'nonblank');
     ENDMACRO;
-    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -842,7 +842,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     FieldPopStats := NORMALIZE(hygiene_summaryStats,62,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
-    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+    SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
       SELF.recordstotal := le.NumberOfRecords;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -867,12 +867,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
 END;
  
 EXPORT StandardStats(DATASET(IL_Main_Layout_UCCV2) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
-  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
   expandedFile := FromNone(inFile).ExpandedInfile;
   mod_fromexpandedOverall := FromExpanded(expandedFile);
   scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
  
-  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_UCCV2, IL_Main_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  SALT311.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_UCCV2, IL_Main_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
   scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
  
   allErrsOverall := mod_fromexpandedOverall.AllErrors;
@@ -883,10 +883,10 @@ EXPORT StandardStats(DATASET(IL_Main_Layout_UCCV2) inFile, BOOLEAN doErrorOveral
   	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
   	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
   	                                                       TRANSFORM(RECORDOF(LEFT),
-  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT311.Layout_Stats_Standard.Examples);
   	                                                       SELF := LEFT),
   	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
-  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT311.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
  
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
