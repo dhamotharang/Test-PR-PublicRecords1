@@ -1,11 +1,8 @@
-import doxie, doxie_build, ut, hygenics_search, data_services;
+﻿import doxie, doxie_build, ut, hygenics_search, data_services, vault, _control;
 
-/*
-df := file_offenses;
-
-export Key_Offenses := index(df,{ok := df.offender_key},{df},Data_Services.Data_location.Prefix('Criminal')+'thor_Data400::key::corrections_offenses_' + doxie_build.buildstate + '_' + doxie.Version_SuperKey);
-*/
-
+#IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
+export key_offenses(boolean IsFCRA = false) := vault.doxie_files.Key_Offenses(isFCRA);
+#ELSE
 export key_offenses(boolean IsFCRA = false) := function
 
 df2 := file_offenses(Vendor not in hygenics_search.sCourt_Vendors_To_Omit);
@@ -20,3 +17,4 @@ return if (IsFCRA,
            index(df,{ok := df.offender_key},{df}, file_name));
 
 end;
+#END;

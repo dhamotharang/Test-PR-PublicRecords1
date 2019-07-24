@@ -58,28 +58,27 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
       self.incident_text := L.incident_text;
     end; 
     SELF.info := PROJECT (info_rolled, AssignSequence (Left, COUNTER));
+    SELF.is_suppressed := [];
     SELF := L;
   END;
-  inc_compact_all := ROLLUP (inc_grp, GROUP, RollIncidentInfo (Left, ROWS (Left)));
-
-
+  inc_compact := ROLLUP (inc_grp, GROUP, RollIncidentInfo (Left, ROWS (Left)));
 
 	// retrieve parties: each party may have multiple entries here, depending on the number of parts in party info
 	party_subset_all := join(
-		inc_compact_all, SANCTN.Key_SANCTN_party,
+		inc_compact, SANCTN.Key_SANCTN_party,
 		keyed(left.batch_number=right.batch_number) and keyed(left.incident_number=right.incident_number),
 		transform(SANCTN_Services.layouts.layoutSanctnClean, self:=right),
 		limit(Constants.PARTY_PER_INCIDENT,skip)
 	);   
 
-  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access); 
+  party_subset := Suppress.MAC_FlagSuppressedSource(party_subset_all, mod_access, did, global_sid); 
 
   // ---------------------------------------------------------------------
   // First roll each party's texts
   party_srt := SORT (party_subset, batch_number, incident_number, party_number);
   party_grp := GROUP (party_srt, batch_number, incident_number, party_number);
 
-  Sanctn_Services.layouts.rec_party_plusIsSupp RollPartyInfo (SANCTN_Services.layouts.layoutSanctnCleanPlusIsSupp L, DATASET (SANCTN_Services.layouts.layoutSanctnCleanPlusIsSupp) all_recs) := transform
+  Sanctn_Services.layouts.rec_party RollPartyInfo (SANCTN_Services.layouts.layoutSanctnClean L, DATASET (SANCTN_Services.layouts.layoutSanctnClean) all_recs) := transform
     SELF.name := L;
 
     // set state
@@ -135,35 +134,24 @@ EXPORT out_rec GetDataSourceByID (GROUPED DATASET (Sanctn_Services.layouts.id) i
   END; 
 
   rec_parties_rolled RollParties (prt_grp L, DATASET (recordof (prt_grp)) all_recs) := transform
-    sortBySuppress := SORT(all_recs, -is_suppressed); // bring any "TRUE" is_suppressed recs to top
     Self.parties := project (all_recs, Sanctn_Services.layouts.Party);
     // minimal penalty among all party entities (people/companies)
     Self.penalt := MIN (all_recs, penalt);
-    Self.is_suppressed := sortBySuppress[1].is_suppressed;
+    Self.is_suppressed := EXISTS(all_recs(is_suppressed));
     Self := L;
   end;
   party_ready := rollup (prt_grp, GROUP, RollParties (Left, ROWS (Left)));
 
-
   // add party info
-  OUT_REC AppendParty (Sanctn_Services.layouts.IncidentPlusIsSupp L, rec_parties_rolled R) := TRANSFORM
-
+  OUT_REC AppendParty (Sanctn_Services.layouts.Incident L, rec_parties_rolled R) := TRANSFORM
     // NB: sort uses "uncleaned" party name, since it has both people and companies
+    SELF.incident_number := IF(R.is_suppressed, SKIP, L.incident_number);
     SELF.parties := SORT (R.parties, party_name);
     SELF.penalt := R.penalt;
     SELF := L;
   END;
 
-  inc_compact := JOIN(inc_compact_all, party_ready,
-                      Left.batch_number=Right.batch_number and 
-                      Left.incident_number = Right.incident_number,
-                      TRANSFORM(SANCTN_Services.layouts.IncidentPlusIsSupp,
-                        self.is_suppressed := RIGHT.is_suppressed,
-                        self := LEFT),
-                      LEFT OUTER, keep(1), limit (0));
-                        
-  // ds_party := PROJECT (inc_compact, GetPartyInfo (Left));
-  ds_res := JOIN (inc_compact(~is_suppressed), party_ready,
+  ds_res := JOIN (inc_compact, party_ready,
                   Left.batch_number=Right.batch_number and 
                   Left.incident_number = Right.incident_number,
                   AppendParty (Left, Right),

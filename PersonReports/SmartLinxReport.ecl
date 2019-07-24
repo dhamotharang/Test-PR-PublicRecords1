@@ -14,6 +14,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   //this will be gone after all interfaces extend IDataAccess
   old_param := $.IParam.ConvertToOldSmartLinx(param);
   mod_smartlinx := param;
+  mod_access := PROJECT (mod_smartlinx, doxie.IDataAccess);
 
   globals := AutoStandardI.GlobalModule();
   subject_did := dids[1].did; // DID should be atmost one (do we keep layout_references for legacy reasons?)
@@ -199,7 +200,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_fore         := if (param.include_properties and not doxie.DataRestriction.Fares,fore,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
 	s_fore_count   := count(s_fore);
 	p_fore         := CHOOSEN (s_fore, iesp.constants.SMART.MaxForeclosures);
-	propMod        := PersonReports.property_records (dids, module (project (old_param, $.input.property)) end, IsFCRA, ds_flags);  //should set flag for Current or Prior owner
+	propMod        := PersonReports.property_records (dids, mod_access, module (project (param, $.IParam.property)) end, IsFCRA, ds_flags);  //should set flag for Current or Prior owner
 	propUnderLimit := (not excessive_property) and (count(propMod.property_v2) <= iesp.constants.SMART.MaxUnRolledRecords);
 	allPropV2      := if (param.include_properties and propUnderLimit, project(propMod.property_v2,iesp.property.t_PropertyReport2Record),dataset([],iesp.property.t_PropertyReport2Record)); //used for other business assoc
 	alldeed        := if (param.include_properties and propUnderLimit, project(propMod.prop_deeds_all,iesp.propdeed.t_DeedReportRecord),dataset([],iesp.propdeed.t_DeedReportRecord));
@@ -265,7 +266,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 														iesp.Constants.SMART.MaxAircrafts);		
 									
 // Bankruptcy, LiensJudgements, UCC
-  bankruptcyMod := PersonReports.bankruptcy_records(dids, module (project (old_param, $.input.bankruptcy)) end, IsFCRA);
+  bankruptcyMod := PersonReports.bankruptcy_records(dids, mod_access, module (project (param, $.IParam.bankruptcy)) end, IsFCRA);
 	bankruptcy    := IF (param.include_bankruptcy,  bankruptcyMod.bankruptcy_v2, dataset([],iesp.bankruptcy.t_BankruptcyReport2Record));
   s_bankruptcy  := SmartRollup.fn_smart_rollup_bankruptcy(bankruptcy);  
 	s_bankruptcy_active := s_bankruptcy(ActiveClosed=iesp.Constants.SMART.ACTIVE);

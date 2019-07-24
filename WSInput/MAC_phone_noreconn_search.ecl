@@ -43,6 +43,7 @@
 											'StrictMatch',
 											'SuppressNewPorting',
 											'SuppressPortedTestDate',
+											'GetSSNBest',
 											'SuppressBlankNameAddress',											
 											'TUGatewayPhoneticMatch',
 											'UseDateSort',

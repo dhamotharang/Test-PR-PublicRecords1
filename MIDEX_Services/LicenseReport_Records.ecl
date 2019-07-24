@@ -53,9 +53,8 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod,
 		
 		// Get Profesional License Mari report(s)
 		profLic_report := MIDEX_Services.Raw_ProfessionalLicenses.License.Report_View.by_mari_num(ds_Profreport_ids, 
+                                                                                              mod_access,
                                                                                               in_mod.AlertVersion, 
-                                                                                              mod_access.ssn_mask,         // \
-                                                                                              mod_access.application_Type, // / will delete these when doing the professional license code
                                                                                               IF(in_mod.isLicenseOnlyReport,MIDEX_Services.Constants.ALL_LICENSES_SEARCH,in_mod.searchType));
 																																															
           // removed (Dedup, DS, all ) so as not to resort the data set that is returned from the 3 DS's being added together.

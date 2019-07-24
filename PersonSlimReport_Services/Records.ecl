@@ -126,9 +126,11 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
                         iesp.Constants.PersonSlim.MaxAccidents));
 												
  //***BANKRUPTCY RECS***\\ // DATASET([],iesp.bankruptcy.t_BankruptcyReport2Record);
- bk_mod      := module (project(in_mod, PersonReports.input.bankruptcy, opt)) end;
+ bk_mod      := module (PersonReports.IParam.bankruptcy)
+                  $.IParams.MAC_copy_old_report_fields(in_mod);
+                end;
  bankruptcies:= if(in_mod.IncludeBankruptcies,
-                  CHOOSEN(SmartRollup.fn_smart_rollup_bankruptcy(PersonReports.bankruptcy_records(did_safe, bk_mod).bankruptcy_v2),
+                  CHOOSEN(SmartRollup.fn_smart_rollup_bankruptcy(PersonReports.bankruptcy_records(did_safe, mod_access, bk_mod).bankruptcy_v2),
                           iesp.Constants.PersonSlim.MaxBankruptcies));
  	
  //***LIEN RECS***\\ // DATASET([],iesp.lienjudgement.t_LienJudgmentReportRecord);
@@ -141,7 +143,7 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
 												 
   //***PROPERTY RECS***\\ // DATASET([],iesp.property.t_PropertyReport2Record);
  properties := if(in_mod.IncludeProperties,
-                  CHOOSEN(PersonSlimReport_Services.Functions(did_safe).propertyRecsByDid(in_mod),
+                  CHOOSEN(PersonSlimReport_Services.Functions(did_safe).propertyRecsByDid(in_mod, mod_access),
                          iesp.Constants.PersonSlim.MaxProperties));
 												 
  //***MARRIAGE & DIVORCE RECS***\\ // DATASET([],iesp.marriagedivorce.t_MarriageSearch2Record);

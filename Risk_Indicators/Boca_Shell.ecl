@@ -1,4 +1,4 @@
-﻿import ut, riskwise, risk_indicators, AutoStandardI;
+﻿import ut, riskwise, risk_indicators, AutoStandardI, doxie, PublicRecords_KEL, Gateway;
 
 export Boca_Shell := MACRO
 
@@ -44,7 +44,11 @@ export Boca_Shell := MACRO
 	'IncludeOfac',
 	'IncludeAdditionalWatchLists',
 	'GlobalWatchlistThreshold',
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string30 account_value := '' 		: stored('AccountNumber');
 string30 fname_val := ''     		: stored('FirstName');
@@ -99,6 +103,12 @@ real watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
 boolean   include_ofac       := false    : stored('IncludeOfac');
 boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 rec := record
   unsigned4 seq;
@@ -243,10 +253,18 @@ prep := risk_indicators.InstantID_Function(iid_prep,
 																						in_append_best := append_best,
 																						in_BSOptions := bsOptions,
 																						in_LastSeenThreshold := LastSeenThreshold,
-																						in_dataPermission:=DataPermission);
+																						in_dataPermission:=DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID
+                                                                                        );
 													
 ret := risk_indicators.Boca_Shell_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value),false, ~no_rel, true, true, true, bsversion, doScore, 
-										nugen := nugen, filter_out_fares := RemoveFares, DataRestriction:=DataRestriction,BSOptions := BSOptions, DataPermission:=DataPermission);
+										nugen := nugen, filter_out_fares := RemoveFares, DataRestriction:=DataRestriction,BSOptions := BSOptions, DataPermission:=DataPermission, 
+                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
+
+
 
 adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 																		gateways, 
@@ -274,7 +292,12 @@ adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 																		doScore, 
 																		nugen,
 																		DataRestriction:=DataRestriction, 
-																		DataPermission:=DataPermission);
+																		DataPermission:=DataPermission,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID
+                                                                        );
 
 final_temp := if(ADL_Based_Shell, adl_based_ret, ret);																		
 

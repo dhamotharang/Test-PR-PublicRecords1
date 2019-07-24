@@ -152,7 +152,7 @@ MODULE
       SELF.st       :=l.state;
       SELF.zip         :=l.zip;
       SELF.PhoneOwnershipIndicator := TRUE; // identity returned from gateway is verified
-      SELF.dt_first_seen := (STRING)today;
+      SELF.dt_first_seen := ''; // Assigning blank date for zumigo records RQ-16263
       SELF.dt_last_seen := (STRING)today;
       SELF.CallForwardingIndicator   := IF(Zum_inMod.CallHandlingInfo, 
                                        PhoneFinder_Services.Functions.CallForwardingDesc(l.call_forwarding),''); //get call forwarded value only when CallHandlingInfo is selected

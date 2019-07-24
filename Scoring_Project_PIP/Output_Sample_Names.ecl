@@ -119,6 +119,8 @@ EXPORT AddressShell_Attributes_V1_BATCH_Generic_outfile := '~ScoringQA::out::NON
 
 EXPORT BusinessShell_Attributes_V2_XML_Generic_outfile := '~ScoringQA::out::NONFCRA::BusinessShell_xml_generic_attributes_v2_';
 
+EXPORT SOCIO_Attributes_V5_outfile := '~ScoringQA::Out::Socioeconomic_v5_Batch_';
+
 //************ LeadIntegrity PROD file names ******************************
 
 EXPORT PROD_LI_Attributes_V4_BATCH_Generic_msn1106_0_outfile := '~ScoringQA::out::NONFCRA::PROD_leadintegrity_batch_generic_attributes_v4_';

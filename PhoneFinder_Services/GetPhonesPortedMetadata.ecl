@@ -1,4 +1,4 @@
-﻿IMPORT  Gateway, MDR, PhoneFinder_Services, PhonesInfo, STD, ut;
+﻿IMPORT  Gateway, MDR, PhoneFinder_Services, Phones, STD, ut;
 
 EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs0,
 													     PhoneFinder_Services.iParam.SearchParams inMod,
@@ -10,8 +10,10 @@ FUNCTION
   currentDate := (STRING)STD.Date.Today();		
                           
   //Based on subject info get ALL ports and CURRENT deact records
-  dPorted	:= JOIN(subjectInfo, PhonesInfo.Key_Phones.Ported_Metadata,
-                  KEYED(LEFT.phone = RIGHT.phone) AND
+  phoneInfo := DEDUP(SORT(PROJECT(subjectInfo, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.phone)), phone), phone);
+  dported_metadata := Phones.GetPhoneMetaData.CombineRawPhoneData(phoneInfo);
+  dPorted	:= JOIN(subjectInfo, dported_metadata,
+                  (LEFT.phone = RIGHT.phone) AND
                   ((LEFT.FirstSeenDate <= RIGHT.port_start_dt) OR 	
                     (LEFT.FirstSeenDate <= RIGHT.dt_last_reported) OR 	
                     (RIGHT.deact_code=PhoneFinder_Services.Constants.PortingStatus.Disconnected AND RIGHT.is_deact='Y')),
@@ -38,7 +40,7 @@ FUNCTION
                               acctno, phone, MAX(-dt_last_reported, -port_start_dt)), acctno, phone),
                         PhoneFinder_Services.Constants.MaxPortedMatches, acctno, phone, MAX(-dt_last_reported, -port_start_dt)); 
                                 
-  // There are 4 sources in PhonesInfo.Key_Phones.Ported_Metadata - PK, PJ, PB, PX. 
+  // There are 4 sources in Ported_Metadata - PK, PJ, PB, PX. 
   // PB records will NOT have a port_start_dt and are base records created for gong and phonesplus records without any ports.
   // PX records will NOT have a port_start_dt and represents disconnect activities.
   // Both PB and PX will be ordered by dt_last_reported.

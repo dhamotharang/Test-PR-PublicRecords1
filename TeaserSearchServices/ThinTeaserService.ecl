@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ThinTeaserService">	
   <part name="FirstName" type="xsd:string"/>
   <part name="AllowNickNames" type="xsd:boolean"/>
@@ -28,6 +28,7 @@
 	<part name="IncludePhoneIndicator" type="xsd:boolean"/>
 	<part name="IncludePhones" type="xsd:boolean"/>
 	<part name="ForceLogging" type="xsd:boolean"/>  
+     <part name="SortAgeRange" type="xsd:boolean"/>
 	<part name="ApplicationType"     	type="xsd:string"/>
   <separator />
 	<part name="ThinRollupPersonSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -35,7 +36,8 @@
 */
 /*--INFO-- Special Thin teaser search (originally developed for PSM).
 */
-IMPORT PhonesFeedback_Services,PhonesFeedback,Gong_Services,Risk_Indicators,Advo,ut,Watchdog,standard, AutoStandardI, iesp, Royalty;
+
+IMPORT AutoStandardI, iesp, Royalty, TeaserSearchServices;
 export ThinTeaserService := MACRO
 
   rec_in := iesp.thinrolluppersonsearch.t_ThinRollupPersonSearchRequest;
@@ -83,6 +85,9 @@ export ThinTeaserService := MACRO
   boolean in_IncludePhoneIndicator := false : stored('IncludePhoneIndicator');	
   #stored ('IncludePhones', search_options.IncludePhones);
   boolean in_IncludePhones := false : stored('IncludePhones');	
+	
+	 #stored ('SortAgeRange', search_options.SortAgeRange);
+  boolean in_SortAgeRange := false : stored('SortAgeRange');
 
 	#stored ('ForceLogging', search_options.ForceLogging);
   boolean in_ForceLogging := false : stored('ForceLogging');	
@@ -101,6 +106,7 @@ export ThinTeaserService := MACRO
 		export AlwaysReturnRecords := in_AlwaysReturnRecords;
 		export applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		export PreferredUniqueId := in_PreferredUniqueId;
+		export SortAgeRange :=  in_SortAgeRange;
 	end;
 
 	tempresults := TeaserSearchServices.Search_Records.val(tempmod);
@@ -201,6 +207,7 @@ ENDMACRO;
   <IncludeFullHistory>1</IncludeFullHistory>
   <IncludeRelativeNames>1</IncludeRelativeNames>
   <AlwaysReturnRecords>0</AlwaysReturnRecords>
+<SortAgeRange>0</SortAgeRange>
 </Options>
 </row>
 </ThinRollupPersonSearchRequest>

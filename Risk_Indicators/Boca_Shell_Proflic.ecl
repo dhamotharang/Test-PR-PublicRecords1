@@ -1,6 +1,17 @@
-﻿import prof_licenseV2, riskwise, ut, Prof_License_Mari, risk_indicators;
+﻿import prof_licenseV2, riskwise, ut, Prof_License_Mari, risk_indicators, doxie, Suppress;
 
-export Boca_Shell_Proflic(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsVersion) := FUNCTION
+export Boca_Shell_Proflic(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
+integer bsVersion, 
+unsigned1 LexIdSourceOptout = 1,
+string TransactionID = '',
+string BatchUID = '',
+unsigned6 GlobalCompanyId = 0 ) := FUNCTION
+
+   mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
 
 string8 proflic_build_date := Risk_Indicators.get_Build_date('proflic_build_version');
 
@@ -12,11 +23,17 @@ PL_Plus_temp := record
 	unsigned tmp_MostRecent; //as need to perserve the date in the data for output
 end;
 
+PL_Plus_temp_CCPA := record
+    integer8 did; // CCPA changes
+    unsigned4 global_sid; // CCPA changes
+	PL_Plus_temp;
+end;
+
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 
 key_did := prof_licenseV2.Key_Proflic_Did ();
 
-PL_Plus_temp PL_nonFCRA(ids_only le, key_did rt) := transform
+PL_Plus_temp_CCPA PL_nonFCRA(ids_only le, key_did rt) := transform
 	hit := trim(rt.prolic_key)!='';	// check to see that we have a good record
 	earliest_date := min(proflic_build_date, risk_indicators.iid_constants.full_history_date(le.historydate));
 	myGetDate := if(le.historydate=999999, proflic_build_date, earliest_date);
@@ -54,18 +71,24 @@ PL_Plus_temp PL_nonFCRA(ids_only le, key_did rt) := transform
 	self.PLcategory := if(hit, risk_indicators.getPLinfo(rt.license_type).PLcategory, '');
 	self.license_number_cleaned := if(hit, Risk_Indicators.iid_constants.stripLeadingZeros(rt.license_number), '');	
   self.tmp_MostRecent := self.date_most_recent;
+    self.global_sid := rt.global_sid;
 	self := le;
 	self := [];  // setting sanctions to blank
 end;
-license_recs_original_pre := join(ids_only, key_did,
+license_recs_original_join := join(ids_only, key_did,
 											left.did!=0 and keyed(right.did = left.did) and
 											(unsigned)right.date_first_seen[1..6] < left.historydate,
 											PL_nonFCRA(left,right), atmost(right.did = left.did, riskwise.max_atmost));
+                      
+license_recs_original_suppressed := Suppress.MAC_SuppressSource(license_recs_original_join, mod_access);
+
+license_recs_original_pre := PROJECT(license_recs_original_suppressed, TRANSFORM(PL_Plus_temp,
+                                                  SELF := LEFT));
 											
 isFCRA := false;
 isPrescreen := false;
 
-mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen);
+mari_data := risk_indicators.Boca_Shell_Mari(ids_only, isFCRA, isPreScreen, mod_access);
 ingenix_data := risk_indicators.Boca_Shell_Ingenix(ids_only);
 
 // initially not so sure we trust the dates on the MARI file to be accurate.  
@@ -114,7 +137,7 @@ ingenix_recs := join (ids_only, ingenix_data,
 			self.source_st := if(hit, right.license_st, '');
 			self.license_number := if(hit, right.licensenumber, ''); 	
 			self.license_number_cleaned := if(hit, Risk_Indicators.iid_constants.stripLeadingZeros(right.licensenumber), '');	
-			self.tmp_MostRecent := (unsigned) self.date_most_recent;		
+			self.tmp_MostRecent := (unsigned) self.date_most_recent;
 			self := left),
     atmost(riskwise.max_atmost),
 		keep(100)
@@ -179,6 +202,7 @@ license_recs_dates:= project(license_recs(professional_license_flag = true), tra
 	
 sorted_licenses := group(sort(license_recs_dates, seq, did, -license_number_cleaned, source_st,
 	-tmp_MostRecent, -proflic_count,-PLcategory, record), seq);
+
 rolled_licenses := rollup(sorted_licenses, true, roll_licenses(left,right));	
 
 rolled_licenses_final := project(rolled_licenses, transform(RiskWise.Layouts.Layout_Professional_License_Plus, self := left));

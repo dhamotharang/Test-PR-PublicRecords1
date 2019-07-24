@@ -57,11 +57,14 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                                                                           DueDiligence.Constants.TRAFFIC => 3,
                                                                                                           DueDiligence.Constants.INFRACTION => 4,
                                                                                                           5);
+                                                              
+                                                              SELF.offenseDDChargeLevelCalculated := LEFT.offenseChargeLevelCalculated;
+                                                              SELF.offenseDDLastCourtDispDate := LEFT.offenseCourtDispDate;
                                                                                                           
-
-                                                              SELF.validate_trafficRelated := LEFT.offenseTrafficRelated;
-                                                              SELF.validate_category := LEFT.temp_category;
-                                                              SELF.validate_eventType := DueDiligence.translateExpression.dctByPriority[LEFT.offenseDDLegalEventTypeCode].description;
+                                                              SELF.offenseTrafficRelated := MAP(LEFT.offenseTrafficRelated = DueDiligence.Constants.YES OR
+                                                                                                LEFT.offenseChargeLevelReported IN [DueDiligence.Constants.TRAFFIC, 'TRAFFIC'] OR
+                                                                                                LEFT.offensechargelevelcalculated = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.YES,
+                                                                                                LEFT.offenseTrafficRelated);
                                                                                                       
                                                               SELF := LEFT;                                                            
                                                               SELF := [];));
@@ -75,11 +78,11 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
                                                             SELF := LEFT;));
 																														
 		//get unique party names for a given offense
-		sortUniquePartyNames := SORT(transformPartyNames, seq, did, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sort_key, -offenseDDFirstReportedActivity, offenseDDLegalEventTypeCode, dedupName);
-		dedupUniquePartyNames := DEDUP(sortUniquePartyNames, seq, did, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sort_key, offenseDDFirstReportedActivity, offenseDDLegalEventTypeCode, dedupName);
+		sortUniquePartyNames := SORT(transformPartyNames, seq, did, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sort_key, -offenseDDFirstReportedActivity, offenseCharge, dedupName);
+		dedupUniquePartyNames := DEDUP(sortUniquePartyNames, seq, did, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sort_key, offenseDDFirstReportedActivity, offenseCharge, dedupName);
 
     //sort and roll parties by offense
-    sortPartyNames := SORT(dedupUniquePartyNames, seq, did, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sort_key, -offenseDDFirstReportedActivity, offenseDDLegalEventTypeCode, temp_chargeLevelCalcWeight, -offenseDDLastReportedActivity, offenseCharge);
+    sortPartyNames := SORT(dedupUniquePartyNames, seq, did, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sort_key, -offenseDDFirstReportedActivity, offenseCharge, temp_chargeLevelCalcWeight, -offenseDDLastReportedActivity);
    
 	  //get unique party names for an offense
     uniquePartyNames := ROLLUP(sortPartyNames,
@@ -91,7 +94,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 															LEFT.source = RIGHT.source AND
 															LEFT.sort_key = RIGHT.sort_key AND
 															LEFT.offenseDDFirstReportedActivity = RIGHT.offenseDDFirstReportedActivity AND
-															LEFT.offenseDDLegalEventTypeCode = RIGHT.offenseDDLegalEventTypeCode,
+															LEFT.offenseCharge = RIGHT.offenseCharge,
                               TRANSFORM(RECORDOF(LEFT),
                                         SELF.partyNames := LEFT.partyNames + RIGHT.partyNames;
                                         SELF := LEFT;));
@@ -106,7 +109,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 									LEFT.source = RIGHT.source AND
 									LEFT.sort_key = RIGHT.sort_key AND
 									LEFT.offenseDDFirstReportedActivity = RIGHT.offenseDDFirstReportedActivity AND
-									LEFT.offenseDDLegalEventTypeCode = RIGHT.offenseDDLegalEventTypeCode,
+									LEFT.offenseCharge = RIGHT.offenseCharge,
 									TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFinal,
 														SELF.sources := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalSources, 
 																											SELF.partyNames := RIGHT.partyNames;
@@ -114,7 +117,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 														SELF := LEFT;));
 
                                                             
-    sortSources := SORT(transformSources, seq, did, ultID, orgID, seleID, source, sort_key, -offenseDDFirstReportedActivity, offenseDDLegalEventTypeCode, temp_chargeLevelCalcWeight, -offenseDDLastReportedActivity, offenseCharge);
+    sortSources := SORT(transformSources, seq, did, ultID, orgID, seleID, source, sort_key, -offenseDDFirstReportedActivity, offenseCharge, temp_chargeLevelCalcWeight, -offenseDDLastReportedActivity);
     
     rollSources := ROLLUP(sortSources,
 													LEFT.seq = RIGHT.seq AND
@@ -125,7 +128,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 													LEFT.source = RIGHT.source AND
 													LEFT.sort_key = RIGHT.sort_key AND
 													LEFT.offenseDDFirstReportedActivity = RIGHT.offenseDDFirstReportedActivity AND
-													LEFT.offenseDDLegalEventTypeCode = RIGHT.offenseDDLegalEventTypeCode,
+													LEFT.offenseCharge = RIGHT.offenseCharge,
 													TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFinal,
 																		// grab top level - first populated value or greatest value
 																		SELF.state := DueDiligence.Common.firstPopulatedString(state);
@@ -134,17 +137,14 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 																		SELF.offenseStatute := DueDiligence.Common.firstPopulatedString(offenseStatute);
 																		SELF.offenseDDLastReportedActivity := MAX(LEFT.offenseDDLastReportedActivity, RIGHT.offenseDDLastReportedActivity);
 																		SELF.offenseDDLastCourtDispDate := MAX(LEFT.offenseDDLastCourtDispDate, RIGHT.offenseDDLastCourtDispDate);
-																		SELF.offenseDDLegalEventTypeCode := MAX(LEFT.offenseDDLegalEventTypeCode, RIGHT.offenseDDLegalEventTypeCode);
 																		SELF.offenseCharge := IF(STD.Str.ToUpperCase(TRIM(LEFT.offenseCharge)) IN ['', 'NOT SPECIFIED', 'OTHER'], RIGHT.offenseCharge, LEFT.offenseCharge);
 																		
-																		tempCalcdLevel := MAP(LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY => DueDiligence.Constants.FELONY,
-																													 LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.MISDEMEANOR OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.MISDEMEANOR => DueDiligence.Constants.MISDEMEANOR,
-																													 LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.TRAFFIC OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.TRAFFIC,
-																													 LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.INFRACTION OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.INFRACTION => DueDiligence.Constants.INFRACTION,
-																													 LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.UNKNOWN OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.UNKNOWN => DueDiligence.Constants.UNKNOWN,
-																													 DueDiligence.Constants.EMPTY);
-																		
-																		SELF.offenseDDChargeLevelCalculated := tempCalcdLevel;
+																		SELF.offenseDDChargeLevelCalculated := MAP(LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.FELONY => DueDiligence.Constants.FELONY,
+                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.MISDEMEANOR OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.MISDEMEANOR => DueDiligence.Constants.MISDEMEANOR,
+                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.TRAFFIC OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.TRAFFIC,
+                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.INFRACTION OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.INFRACTION => DueDiligence.Constants.INFRACTION,
+                                                                               LEFT.offenseDDChargeLevelCalculated = DueDiligence.Constants.UNKNOWN OR RIGHT.offenseDDChargeLevelCalculated = DueDiligence.Constants.UNKNOWN => DueDiligence.Constants.UNKNOWN,
+                                                                               DueDiligence.Constants.EMPTY);
 																		
 																		SELF.offenseIncarcerationProbationParole := MAP(LEFT.offenseIncarcerationProbationParole = DueDiligence.Constants.INCARCERATION_TEXT OR RIGHT.offenseIncarcerationProbationParole = DueDiligence.Constants.INCARCERATION_TEXT => DueDiligence.Constants.INCARCERATION_TEXT,
 																																										LEFT.offenseIncarcerationProbationParole = DueDiligence.Constants.PAROLE_TEXT OR RIGHT.offenseIncarcerationProbationParole = DueDiligence.Constants.PAROLE_TEXT => DueDiligence.Constants.PAROLE_TEXT,
@@ -156,10 +156,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 																																																											 
 																		SELF.offenseChargeLevelReported := DueDiligence.Common.firstPopulatedString(offenseChargeLevelReported);
 																		SELF.offenseConviction := IF(LEFT.offenseConviction = DueDiligence.Constants.Yes, LEFT.offenseConviction, RIGHT.offenseConviction);
-																		SELF.offenseTrafficRelated := MAP((LEFT.offenseTrafficRelated = DueDiligence.Constants.YES OR RIGHT.offenseTrafficRelated = DueDiligence.Constants.YES) OR
-																																			(LEFT.offenseChargeLevelReported IN [DueDiligence.Constants.TRAFFIC, 'TRAFFIC'] OR RIGHT.offenseChargeLevelReported IN [DueDiligence.Constants.TRAFFIC, 'TRAFFIC']) OR
-																																			(LEFT.offenseDDLegalEventTypeCode = DueDiligence.translateExpression.OffensePriority.TRAFFIC_OFFENSES OR RIGHT.offenseDDLegalEventTypeCode = DueDiligence.translateExpression.OffensePriority.TRAFFIC_OFFENSES) OR
-																																			tempCalcdLevel = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.YES,
+																		SELF.offenseTrafficRelated := MAP(LEFT.offenseTrafficRelated = DueDiligence.Constants.YES OR RIGHT.offenseTrafficRelated = DueDiligence.Constants.YES => DueDiligence.Constants.YES,
 																																			LEFT.offenseTrafficRelated = DueDiligence.Constants.EMPTY => RIGHT.offenseTrafficRelated,
 																																			LEFT.offenseTrafficRelated);
 																	 
@@ -190,33 +187,62 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 																		
 																		SELF.attr_misdemeanorConvictionPast3Yrs := LEFT.attr_misdemeanorConvictionPast3Yrs OR RIGHT.attr_misdemeanorConvictionPast3Yrs;
 																		SELF.attr_misdemeanorConvictionOver3Yrs := LEFT.attr_misdemeanorConvictionOver3Yrs OR RIGHT.attr_misdemeanorConvictionOver3Yrs;
-																		
-																		SELF.attr_legalEventCat9 := LEFT.attr_legalEventCat9 OR RIGHT.attr_legalEventCat9;
-																		SELF.attr_legalEventCat8 := LEFT.attr_legalEventCat8 OR RIGHT.attr_legalEventCat8;
-																		SELF.attr_legalEventCat7 := LEFT.attr_legalEventCat7 OR RIGHT.attr_legalEventCat7;
-																		SELF.attr_legalEventCat6 := LEFT.attr_legalEventCat6 OR RIGHT.attr_legalEventCat6;
-																		SELF.attr_legalEventCat5 := LEFT.attr_legalEventCat5 OR RIGHT.attr_legalEventCat5;
-																		SELF.attr_legalEventCat4 := LEFT.attr_legalEventCat4 OR RIGHT.attr_legalEventCat4;
-																		SELF.attr_legalEventCat3 := LEFT.attr_legalEventCat3 OR RIGHT.attr_legalEventCat3;
-																		SELF.attr_legalEventCat2 := LEFT.attr_legalEventCat2 OR RIGHT.attr_legalEventCat2;
 													
 																		SELF.sources := LEFT.sources + RIGHT.sources;
 																		SELF := LEFT;));
+                                    
+                                    
+    //calc offense type based on top level data
+    updateWithOffenseType := PROJECT(rollSources, TRANSFORM(DueDiligence.LayoutsInternal.IndCrimLayoutFinal,
+    
+                                                            charge := LEFT.offenseCharge;
+                                                            offenseLevel := LEFT.offenseDDChargeLevelCalculated;
+                                                            category := LEFT.temp_category;
+                                                            traffic := LEFT.offenseTrafficRelated;
+        
+        
+                                                            typeLevel_9 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_9);
+                                                            typeLevel_8 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_8);                                                                                                                                
+                                                            typeLevel_7 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_7);                                                                                                                                
+                                                            typeLevel_6 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_6);                                                                                                                                
+                                                            typeLevel_5 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_5);                                                                                                                                
+                                                            typeLevel_4 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_4);                                                                                                                                
+                                                            typeLevel_3 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_3);                                                                                                                                
+                                                            typeLevel_2 := DueDiligence.translateExpression.getMaxLevel(charge, offenseLevel, category, traffic, DueDiligence.translateExpression.LEVEL_2);
+                                                            
+                                                            maxPriority := MAX(typeLevel_9, typeLevel_8, typeLevel_7, typeLevel_6,
+                                                                               typeLevel_5, typeLevel_4, typeLevel_3, typeLevel_2);
+                                                            
+                                                            SELF.attr_legalEventCat9 := typeLevel_9 > 0;
+                                                            SELF.attr_legalEventCat8 := typeLevel_8 > 0;
+                                                            SELF.attr_legalEventCat7 := typeLevel_7 > 0;
+                                                            SELF.attr_legalEventCat6 := typeLevel_6 > 0;
+                                                            SELF.attr_legalEventCat5 := typeLevel_5 > 0;
+                                                            SELF.attr_legalEventCat4 := typeLevel_4 > 0;
+                                                            SELF.attr_legalEventCat3 := typeLevel_3 > 0;
+                                                            SELF.attr_legalEventCat2 := typeLevel_2 > 0;
+                                                                                                  
+                                                            SELF.offenseDDLegalEventTypeCode := maxPriority;                                                        
+                                                            
+                                                            SELF.offenseTrafficRelated := IF(traffic = DueDiligence.Constants.YES OR maxPriority = DueDiligence.translateExpression.OffensePriority.TRAFFIC_OFFENSES,
+                                                                                              DueDiligence.Constants.YES,
+                                                                                              traffic);
+                                                            SELF := LEFT;));
 
 
     //roll up all offenses now by person
-    formatCrimData := PROJECT(rollSources, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout,  BOOLEAN attr_currentlyIncarceratedOrParoled,
-                                                                          BOOLEAN attr_felonyPast3Yrs, BOOLEAN attr_felonyOver3Yrs, BOOLEAN attr_previouslyIncarcerated,
-                                                                          BOOLEAN attr_uncategorizedConvictionPast3Yrs, BOOLEAN attr_uncategorizedConvictionOver3Yrs,
-                                                                          BOOLEAN attr_misdemeanorConvictionPast3Yrs, BOOLEAN attr_misdemeanorConvictionOver3Yrs, 
-                                                                          BOOLEAN attr_legalEventCat9, BOOLEAN attr_legalEventCat8, BOOLEAN attr_legalEventCat7;
-                                                                          BOOLEAN attr_legalEventCat6, BOOLEAN attr_legalEventCat5, BOOLEAN attr_legalEventCat4;
-                                                                          BOOLEAN attr_legalEventCat3, BOOLEAN attr_legalEventCat2;
-                                                                          DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
-                                                      
-                                                      SELF.indCrimOffenses := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalOffenses, SELF := LEFT;)]);
-                                                      SELF := LEFT;
-                                                      SELF := [];));
+    formatCrimData := PROJECT(updateWithOffenseType, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout,  BOOLEAN attr_currentlyIncarceratedOrParoled,
+                                                                                    BOOLEAN attr_felonyPast3Yrs, BOOLEAN attr_felonyOver3Yrs, BOOLEAN attr_previouslyIncarcerated,
+                                                                                    BOOLEAN attr_uncategorizedConvictionPast3Yrs, BOOLEAN attr_uncategorizedConvictionOver3Yrs,
+                                                                                    BOOLEAN attr_misdemeanorConvictionPast3Yrs, BOOLEAN attr_misdemeanorConvictionOver3Yrs, 
+                                                                                    BOOLEAN attr_legalEventCat9, BOOLEAN attr_legalEventCat8, BOOLEAN attr_legalEventCat7;
+                                                                                    BOOLEAN attr_legalEventCat6, BOOLEAN attr_legalEventCat5, BOOLEAN attr_legalEventCat4;
+                                                                                    BOOLEAN attr_legalEventCat3, BOOLEAN attr_legalEventCat2;
+                                                                                    DATASET(DueDiligence.Layouts.CriminalOffenses) indCrimOffenses},
+                                                                
+                                                                SELF.indCrimOffenses := DATASET([TRANSFORM(DueDiligence.Layouts.CriminalOffenses, SELF := LEFT;)]);
+                                                                SELF := LEFT;
+                                                                SELF := [];));
                                                       
 
     sortformatCrimData := SORT(formatCrimData, seq, did, ultID, orgID, seleID);  
@@ -306,6 +332,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
    
    
     
+		// OUTPUT(rawCriminalData, NAMED('rawCriminalData'));																		
 		// OUTPUT(transformPartyNames, NAMED('transformPartyNames'));																		
 		// OUTPUT(sortUniquePartyNames, NAMED('sortUniquePartyNames'));																		
 		// OUTPUT(dedupUniquePartyNames, NAMED('dedupUniquePartyNames'));																		
@@ -314,6 +341,7 @@ EXPORT getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) individ
 		// OUTPUT(transformSources, NAMED('transformSources'));																		
 		// OUTPUT(sortSources, NAMED('sortSources'));																		
 		// OUTPUT(rollSources, NAMED('rollSources'));	
+		// OUTPUT(updateWithOffenseType, NAMED('updateWithOffenseType'));	
     
     // OUTPUT(formatCrimData, NAMED('formatCrimData'));
     // OUTPUT(rollCrimToDID, NAMED('rollCrimToDID'));

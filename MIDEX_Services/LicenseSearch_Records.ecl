@@ -18,7 +18,7 @@ EXPORT LicenseSearch_Records (MIDEX_Services.IParam.searchrecords in_mod,
 		
 		// Get professional license data
 		prof_ids := MIDEX_Services.Search_IDs.Mari_ProfLic_val(in_mod);
-		Prof_src_recs := MIDEX_Services.Raw_ProfessionalLicenses.License.Search_View.by_mari_num(prof_ids,alertVersion);
+		Prof_src_recs := MIDEX_Services.Raw_ProfessionalLicenses.License.Search_View.by_mari_num(prof_ids,mod_access,alertVersion);
 		
 		// Combine and penalize
 		all_recs_dedup := DEDUP(nonPub_src_recs+Pub_src_recs+Prof_src_recs,ALL);	

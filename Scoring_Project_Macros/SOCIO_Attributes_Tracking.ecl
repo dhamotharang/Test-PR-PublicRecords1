@@ -15,7 +15,9 @@ END;
 b  := fn_LastTwoMonths(a,1); //yesterdays date
 
 a1 := a +'_1';
+
 b1 := b +'_1'; 
+
 
 
 //reading in dataset dph SOCIO
@@ -603,70 +605,62 @@ line_heading_avg := ('Field' + filler)[1..42] + ('Previous Avg' + filler)[1..15]
 j_base_matched := JOIN(ds_base, ds_test, LEFT.acctno = RIGHT.acctno, TRANSFORM(input_layout, SELF := LEFT));								
 j_test_matched := JOIN(ds_base, ds_test, LEFT.acctno = RIGHT.acctno, TRANSFORM(input_layout, SELF := RIGHT));	
 
-//Remove UNmatched once daily collection file is stable
-Prev_Avg_SeRs_Score_Unmatched := ave(ds_base, (INTEGER)SeRs_Score); //overall average of entire sample regardless of how many records were returned (ex: 10000 records returned yesterday vs 25000 returned today)
-Curr_Avg_SeRs_Score_Unmatched := ave(ds_test, (INTEGER)SeRs_Score);
-Diff_Avg_SeRs_Score_Unmatched := Curr_Avg_SeRs_Score_Unmatched - Prev_Avg_SeRs_Score_Unmatched;
+//Remove Unmatched once daily collection file is stable
+Prev_Avg_SeRs_Score_Unmatched    := ave(ds_base,(REAL)SeRs_Score); //overall average of entire sample regardless of how many records were returned (ex: 10000 records returned yesterday vs 25000 returned today)
+Curr_Avg_SeRs_Score_Unmatched    := ave(ds_test,(REAL)SeRs_Score);
+Diff_Avg_SeRs_Score_Unmatched    := Curr_Avg_SeRs_Score_Unmatched - Prev_Avg_SeRs_Score_Unmatched;
 DiffPct_Avg_SeRs_Score_Unmatched := (Curr_Avg_SeRs_Score_Unmatched - Prev_Avg_SeRs_Score_Unmatched)/Prev_Avg_SeRs_Score_Unmatched*100;
 
 
 //Matched is used for most of our reports
-Prev_Avg_SeRs_Matched := ave(j_base_matched, (INTEGER)SeRs_Score);
-Curr_Avg_SeRs_Matched := ave(j_test_matched, (INTEGER)SeRs_Score);
-Diff_Avg_SeRs_Matched := Curr_Avg_SeRs_matched - Prev_Avg_SeRs_matched;
-DiffPct_Avg_SeRs_Matched := (Diff_Avg_SeRs_matched) / Prev_Avg_SeRs_matched * 100;
-
+Prev_Avg_SeRs_Matched    := ave(j_base_matched,(REAL)SeRs_Score);
+Curr_Avg_SeRs_Matched    := ave(j_test_matched,(REAL)SeRs_Score);
+Diff_Avg_SeRs_Matched    := (Curr_Avg_SeRs_matched - Prev_Avg_SeRs_matched);
+DiffPct_Avg_SeRs_Matched := (Diff_Avg_SeRs_matched / Prev_Avg_SeRs_matched) * 100;
 
 
 //Medication adherence score calculations(unmatched and matched)
-Prev_Avg_SeMa_Score_Unmatched := ave(ds_base, (INTEGER)SeMa_Score);
-Curr_Avg_SeMa_Score_Unmatched := ave(ds_test, (INTEGER)SeMa_Score);
-Diff_Avg_SeMa_Score_Unmatched := Curr_Avg_SeMa_Score_Unmatched - Prev_Avg_SeMa_Score_Unmatched;
+Prev_Avg_SeMa_Score_Unmatched    := ave(ds_base, (REAL)SeMa_Score);
+Curr_Avg_SeMa_Score_Unmatched    := ave(ds_test, (REAL)SeMa_Score);
+Diff_Avg_SeMa_Score_Unmatched    := Curr_Avg_SeMa_Score_Unmatched - Prev_Avg_SeMa_Score_Unmatched;
 DiffPct_Avg_SeMa_Score_Unmatched := (Curr_Avg_SeMa_Score_Unmatched - Prev_Avg_SeMa_Score_Unmatched)/Prev_Avg_SeMa_Score_Unmatched*100;
 
-Prev_Avg_SeMa_Matched := ave(j_base_matched, (INTEGER)SeMa_Score);
-Curr_Avg_SeMa_Matched := ave(j_test_matched, (INTEGER)SeMa_Score);
-Diff_Avg_SeMa_Matched := Curr_Avg_SeMa_matched - Prev_Avg_SeMa_matched;
-DiffPct_Avg_SeMa_Matched := (Diff_Avg_SeMa_matched)/Prev_Avg_SeMa_matched*100;
+Prev_Avg_SeMa_Matched    := ave(j_base_matched,(REAL)SeMa_Score);
+Curr_Avg_SeMa_Matched    := ave(j_test_matched,(REAL)SeMa_Score);
+Diff_Avg_SeMa_Matched    := (Curr_Avg_SeMa_matched - Prev_Avg_SeMa_matched);
+DiffPct_Avg_SeMa_Matched := (Diff_Avg_SeMa_matched / Prev_Avg_SeMa_matched) * 100;
 
-
-
-///////////////////////////testing scores/////////////////////////////////
-/*OUTPUT(Prev_Avg_SeMa_Score_Unmatched,NAMED('Prev_Avg_SeMa_Score_Unmatched'));  //use this to troubleshoot individual scores
-OUTPUT(Curr_Avg_SeMa_Score_Unmatched,NAMED('Curr_Avg_SeMa_Score_Unmatched'));  //use this to troubleshoot individual scores
-OUTPUT(Diff_Avg_SeMa_Score_Unmatched,NAMED('Diff_Avg_SeMa_Score_Unmatched'));  //use this to troubleshoot individual scores
-OUTPUT(DiffPct_Avg_SeMa_Score_Unmatched,NAMED('DiffPct_Avg_SeMa_Score_Unmatched'));  //use this to troubleshoot individual scores
-OUTPUT(Prev_Avg_SeMa_Matched,NAMED('Prev_Avg_SeMa_Matched'));  //use this to troubleshoot individual scores
-OUTPUT(Curr_Avg_SeMa_Matched,NAMED('Curr_Avg_SeMa_Matched'));  //use this to troubleshoot individual scores
-OUTPUT(Diff_Avg_SeMa_Matched,NAMED('Diff_Avg_SeMa_Matched'));  //use this to troubleshoot individual scores
-OUTPUT(DiffPct_Avg_SeMa_Matched,NAMED('DiffPct_Avg_SeMa_Matched'));  //use this to troubleshoot individual scores
-*/
 
 //Motivation score calculations(unmatched and matched)
-Prev_Avg_SeMo_Score_Unmatched := ave(ds_base, (INTEGER)SeMo_Score);
-Curr_Avg_SeMo_Score_Unmatched := ave(ds_test, (INTEGER)SeMo_Score);
-Diff_Avg_SeMo_Score_Unmatched := Curr_Avg_SeMo_Score_Unmatched - Prev_Avg_SeMo_Score_Unmatched;
+Prev_Avg_SeMo_Score_Unmatched    := ave(ds_base, (REAL)SeMo_Score);
+Curr_Avg_SeMo_Score_Unmatched    := ave(ds_test, (REAL)SeMo_Score);
+Diff_Avg_SeMo_Score_Unmatched    := Curr_Avg_SeMo_Score_Unmatched - Prev_Avg_SeMo_Score_Unmatched;
 DiffPct_Avg_SeMo_Score_Unmatched := (Curr_Avg_SeMo_Score_Unmatched - Prev_Avg_SeMo_Score_Unmatched)/Prev_Avg_SeMo_Score_Unmatched*100;
 
-Prev_Avg_SeMo_Matched    := ave(j_base_matched, (INTEGER)SeMo_Score);
-Curr_Avg_SeMo_Matched    := ave(j_test_matched, (INTEGER)SeMo_Score);
+Prev_Avg_SeMo_Matched    := ave(j_base_matched, (REAL)SeMo_Score);
+Curr_Avg_SeMo_Matched    := ave(j_test_matched, (REAL)SeMo_Score);
 Diff_Avg_SeMo_Matched    := Curr_Avg_SeMo_Matched - Prev_Avg_SeMo_Matched;
-DiffPct_Avg_SeMo_Matched := (Diff_Avg_SeMo_Matched) / Prev_Avg_SeMo_Matched * 100;
+DiffPct_Avg_SeMo_Matched := (Diff_Avg_SeMo_Matched / Prev_Avg_SeMo_Matched) * 100;
 
 
-//OUTPUT(Prev_Avg_SeMo_Score_Unmatched,NAMED('Prev_Avg_SeMo_Score_Unmatched'));
-//OUTPUT(Curr_Avg_SeMo_Score_Unmatched,NAMED('Curr_Avg_SeMo_Score_Unmatched'));
+//Total Cost Risk Score 2.0 Matched//
+Prev_Avg_Score_Matched    := ave(j_base_matched,(REAL)Score);
+Curr_Avg_Score_Matched    := ave(j_test_matched,(REAL)Score);
+Diff_Avg_Score_Matched    := (Curr_Avg_Score_matched - Prev_Avg_Score_matched);
+DiffPct_Avg_Score_Matched := (Diff_Avg_Score_matched / Prev_Avg_Score_matched) * 100;
+
 
 //Scores from above formatted for output in email
 	head_cert_realtime_avg := DATASET([{1,    
 												line_heading_avg + '\n'
 												+ '------------------------------------------------------------------------------------------------' + '\n'
-												+('SeRs_Score(unmatched)' + filler)[1..45] + ((string)Round(Prev_Avg_SeRs_Score_Unmatched, 2) + filler)[1..14] + ((string)Round(Curr_Avg_SeRs_Score_Unmatched, 2) + filler)[1..14]+ ((string)Round(Diff_Avg_SeRs_Score_Unmatched, 2) + filler)[1..14]+ (string)Round(DiffPct_Avg_SeRs_Score_Unmatched,1) + '\n'
-												+('SeMa_Score(unmatched)' + filler)[1..45] + ((string)Round(Prev_Avg_SeMa_Score_Unmatched, 2) + filler)[1..14] + ((string)Round(Curr_Avg_SeMa_Score_Unmatched, 2) + filler)[1..14]+ ((string)Round(Diff_Avg_SeMa_Score_Unmatched, 2) + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMa_Score_Unmatched,1) + '\n'
-												+('SeMo_Score(unmatched)' + filler)[1..45] + ((string)Round(Prev_Avg_SeMo_Score_Unmatched, 2) + filler)[1..14] + ((string)Round(Curr_Avg_SeMo_Score_Unmatched, 2) + filler)[1..14]+ ((string)Round(Diff_Avg_SeMo_Score_Unmatched, 2) + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMo_Score_Unmatched,1) + '\n'
-												+('SeRs_Score(matched)'   + filler)[1..45] + ((string)Round(Prev_Avg_SeRs_Matched, 2)         + filler)[1..14] + ((string)Round(Curr_Avg_SeRs_Matched, 2)         + filler)[1..14]+ ((string)Round(Diff_Avg_SeRs_Matched, 2)         + filler)[1..14]+ (string)Round(DiffPct_Avg_SeRs_Matched,1)         + '\n'
-												+('SeMa_Score(matched)'   + filler)[1..45] + ((string)Round(Prev_Avg_SeMa_Matched, 2)         + filler)[1..14] + ((string)Round(Curr_Avg_SeMa_Matched, 2)         + filler)[1..14]+ ((string)Round(Diff_Avg_SeMa_Matched, 2)         + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMa_Matched,1)         + '\n'
-												+('SeMo_Score(matched)'   + filler)[1..45] + ((string)Round(Prev_Avg_SeMo_Matched, 2)         + filler)[1..14] + ((string)Round(Curr_Avg_SeMo_Matched, 2)         + filler)[1..14]+ ((string)Round(Diff_Avg_SeMo_Matched, 2)         + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMo_Matched,1)
+											//	+('SeRs_Score(unmatched)' + filler)[1..45] + ((string)Round(Prev_Avg_SeRs_Score_Unmatched, 2) + filler)[1..14] + ((string)Round(Curr_Avg_SeRs_Score_Unmatched, 2) + filler)[1..14]+ ((string)Round(Diff_Avg_SeRs_Score_Unmatched, 2) + filler)[1..14]+ (string)Round(DiffPct_Avg_SeRs_Score_Unmatched,1) + '\n'
+											//	+('SeMa_Score(unmatched)' + filler)[1..45] + ((string)Round(Prev_Avg_SeMa_Score_Unmatched, 2) + filler)[1..14] + ((string)Round(Curr_Avg_SeMa_Score_Unmatched, 2) + filler)[1..14]+ ((string)Round(Diff_Avg_SeMa_Score_Unmatched, 2) + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMa_Score_Unmatched,1) + '\n'
+											//	+('SeMo_Score(unmatched)' + filler)[1..45] + ((string)Round(Prev_Avg_SeMo_Score_Unmatched, 2) + filler)[1..14] + ((string)Round(Curr_Avg_SeMo_Score_Unmatched, 2) + filler)[1..14]+ ((string)Round(Diff_Avg_SeMo_Score_Unmatched, 2) + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMo_Score_Unmatched,1) + '\n'
+												+('SeRs_Score(matched)'   + filler)[1..45] + ((STRING)(DECIMAL10_2)ROUND(Prev_Avg_SeRs_Matched, 2)          + filler)[1..14] + ((string)(DECIMAL10_2)Round(Curr_Avg_SeRs_Matched, 2)         + filler)[1..14]+ ((string)Round(Diff_Avg_SeRs_Matched, 2)         + filler)[1..14]+ (string)Round(DiffPct_Avg_SeRs_Matched,1)         + '\n'
+												+('SeMa_Score(matched)'   + filler)[1..45] + ((STRING)(DECIMAL10_2)ROUND(Prev_Avg_SeMa_Matched, 2)          + filler)[1..14] + ((string)(DECIMAL10_2)Round(Curr_Avg_SeMa_Matched, 2)         + filler)[1..14]+ ((string)Round(Diff_Avg_SeMa_Matched, 2)         + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMa_Matched,1)         + '\n'
+												+('SeMo_Score(matched)'   + filler)[1..45] + ((STRING)(DECIMAL10_2)ROUND(Prev_Avg_SeMo_Matched, 2)          + filler)[1..14] + ((string)(DECIMAL10_2)Round(Curr_Avg_SeMo_Matched, 2)         + filler)[1..14]+ ((string)Round(Diff_Avg_SeMo_Matched, 2)         + filler)[1..14]+ (string)Round(DiffPct_Avg_SeMo_Matched,1)         + '\n'
+												+('Total_Cost_Risk_Score_2.0(matched)'   + filler)[1..45] + ((STRING)(DECIMAL10_2)ROUND(Prev_Avg_Score_Matched, 2)          + filler)[1..14] + ((string)(DECIMAL10_2)Round(Curr_Avg_Score_Matched, 2)         + filler)[1..14]+ ((string)Round(Diff_Avg_Score_Matched, 2)         + filler)[1..14]+ (string)Round(DiffPct_Avg_Score_Matched,1)
 												}], MyRec); 	
 	
 	
@@ -702,7 +696,7 @@ DiffPct_Avg_SeMo_Matched := (Diff_Avg_SeMo_Matched) / Prev_Avg_SeMo_Matched * 10
 
 	XtabOut := ITERATE(output_full, Xform(LEFT, RIGHT));
 
-final := FileServices.SendEmail('Daniel.Harkins@lexisnexisrisk.com, Matthew.Ludewig@lexisnexisrisk.com', 'SOCIO_v5_Daily_Monitoring: MaxDiff' + max_diff, XtabOut[COUNT(XtabOut)].line);
+final := FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List, 'SOCIO_v5_Daily_Monitoring: MaxDiff' + max_diff, XtabOut[COUNT(XtabOut)].line);
 //final;
 
 
@@ -715,11 +709,11 @@ rar_hi_3     := table(ds_base, {rar_driver_hi3; RAR_High_3_Count := count(group)
 //mo_hi    := table(ds_base, {mo_driver_hi1;  namedcount := count(group)}, mo_driver_hi1);//high table today
 //mo_lo    := table(ds_base, {mo_driver_lo1;  namedcount := count(group)}, mo_driver_lo1);//low table today
 
-output(rar_hi_1,NAMED('rar_hi_1'));
-output(rar_hi_2,NAMED('rar_hi_2'));
-output(rar_hi_3,NAMED('rar_hi_3'));
+//output(rar_hi_1,NAMED('rar_hi_1'));
+//output(rar_hi_2,NAMED('rar_hi_2'));
+//output(rar_hi_3,NAMED('rar_hi_3'));
 
 SEQUENTIAL(final);
 //final;
 
-EXPORT SOCIO_Attributes_Report := 'todo';
+EXPORT SOCIO_Attributes_Tracking := 'todo';

@@ -514,13 +514,12 @@ EXPORT Functions :=
         RETURN results;
       END;
 
-   EXPORT iesp.midexcompreport.t_MidexCompPersonSmartlinxRecord fn_setSmartLinxPersonFormat ( MIDEX_Services.Layouts.rec_SmartLinxPersonWithSources ds_Person_in, STRING dobMask, MIDEX_Services.Iparam.smartLinxPersonIncludeOptions options ) :=
+   EXPORT iesp.midexcompreport.t_MidexCompPersonSmartlinxRecord fn_setSmartLinxPersonFormat ( MIDEX_Services.Layouts.rec_SmartLinxPersonWithSources ds_Person_in, UNSIGNED1 dobMaskUnsigned, MIDEX_Services.Iparam.smartLinxPersonIncludeOptions options ) :=
       FUNCTION 
         // The smartlinx report does not mask the dob (2/12/2014). DOB masking is needed for 
         // the Midex XML users. Per Krishna T. we are masking the smartlinx sections here in the 
         // midex code and a new project will be created to mask the DOB in each of the smarlinx 
         // sections at some point in the future.
-        UNSIGNED1 dobMaskUnsigned := suppress.date_mask_math.MaskIndicator(dobMask);
                           
         bestInfoDobMask := 
           ROW( TRANSFORM( iesp.smartlinxreport.t_SLRBestInfo, 

@@ -176,7 +176,11 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	//Vehicles - Residents and Neighbors and Report Address
 	//
 	//Get Vehicle info based on DIDs (residents) as well as based on Address the report is on.
-	veh_ids_for_curdids := VehicleV2_Services.Vehicle_raw.get_vehicle_keys_from_dids(cur_dids);
+	report_mod := VehicleV2_Services.IParam.getReportModule();
+	in_mod := module (report_mod)
+		export boolean excludeLessors := FALSE;
+	end;
+	veh_ids_for_curdids := VehicleV2_Services.Raw.get_Vehicle_keys_from_dids(in_mod, cur_dids);
 
   // Sort/dedup the current resident dids & report addresss vehicle ids to remove exact duplicates.
 	veh_ids_for_resaddr_dd := dedup(sort(veh_ids_for_curdids + veh_ids_for_addr,
@@ -242,7 +246,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																	    );
 
  	//Get report formatted rec out of vehicle_raw for the neighbor DIDs.
-	veh_ids_for_nbrdids     := VehicleV2_Services.Vehicle_raw.get_vehicle_keys_from_dids(nbr_dids);
+	veh_ids_for_nbrdids     := VehicleV2_Services.raw.get_vehicle_keys_from_dids(in_mod, nbr_dids);
+
   vehicle_recs_nbr_vehraw := if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(
 																								veh_ids_for_nbrdids)
 																								(is_current)); //filter for only "current" ones

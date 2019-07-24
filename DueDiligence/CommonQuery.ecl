@@ -166,31 +166,41 @@ EXPORT CommonQuery := MODULE
                                             SELF.productRequested := DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_ONLY; //reports do not have the option of citizenship - so can only request Due Diligence
                                           #END
                                           
-                                          SELF := [];));
+                                          SELF := [];));                                                                           
     ENDMACRO;
 		
 		
-    EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING11 requestedService):= FUNCTION
+    EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING11 requestedService, STRING15 modelName = DueDiligence.Constants.EMPTY):= FUNCTION
         
         BOOLEAN ValidGLB := DueDiligence.CitDDShared.isValidGLBA(glbPurpose);
         BOOLEAN ValidDPPA := DueDiligence.CitDDShared.isValidDPPA(dppaPurpose);
+        BOOLEAN validModel := STD.Str.ToUpperCase(modelName) IN DueDiligence.Citizenship.Constants.VALID_MODEL_NAMES;
                                                       
         validatedRequests := PROJECT(input, TRANSFORM(DueDiligence.Layouts.Input,
                                                       //Validate the request
-                                                      BOOLEAN ValidIndVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
-                                                      BOOLEAN ValidBusVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
-
-                                                      STRING OhNoMessage := MAP(ValidIndVersion = FALSE AND ValidBusVersion = FALSE => DueDiligence.Constants.VALIDATION_INVALID_VERSION,
+                                                      BOOLEAN validIndVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
+                                                      BOOLEAN validBusVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
+                                                      
+                                                      requestedProducts := STD.Str.ToLowerCase(TRIM(LEFT.productRequested));
+                                                      
+                                                      STRING OhNoMessage := MAP((requestedProducts = DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP OR requestedProducts = DueDiligence.CitDDShared.VALID_PRODUCT_CITIZENSHIP_ONLY) AND validBusVersion = TRUE => DueDiligence.CitDDShared.VALIDATION_INVALID_DD_ATTRIBUTE_REQUEST_WITH_CITIZENSHIP,
+                                                                                requestedProducts = DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP AND validIndVersion = FALSE AND validModel = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_DD_CITIZENSHIP_COMBO,
+                                                                                requestedProducts = DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP AND validIndVersion = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_DD_VERSION,
+                                                                                requestedProducts = DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_AND_CITIZENSHIP AND validModel = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_MODEL_NAME,
+                                                                                requestedProducts = DueDiligence.CitDDShared.VALID_PRODUCT_CITIZENSHIP_ONLY AND validModel = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_MODEL_NAME,
+                                                                                requestedProducts = DueDiligence.CitDDShared.VALID_PRODUCT_DUE_DILIGENCE_ONLY AND validIndVersion = FALSE AND validBusVersion = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_DD_VERSION,
                                                                                 ValidGLB = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_GLB,
                                                                                 ValidDPPA = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_DPPA,
+                                                                                requestedProducts = STD.Str.ToLowerCase(DueDiligence.Constants.INVALID) => DueDiligence.CitDDShared.VALIDATION_INVALID_REQUEST,
                                                                                 DueDiligence.Constants.EMPTY);
                                                                                 
-                                                      validVersions := MAP(TRIM(requestedService) = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
-                                                                           TRIM(requestedService) = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
-                                                                           DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3 + ' OR ' + DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3);
+                                                      validDDVersions := MAP(TRIM(requestedService) = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
+                                                                             TRIM(requestedService) = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
+                                                                             DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3 + ' OR ' + DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3);
                                                             
-                                                      versionReq := ': ' + validVersions;
-                                                      updatedOhNoMessage := IF(OhNoMessage = DueDiligence.Constants.VALIDATION_INVALID_VERSION, TRIM(OhNoMessage) + versionReq, OhNoMessage);
+                                                      updatedOhNoMessage := MAP(OhNoMessage = DueDiligence.CitDDShared.VALIDATION_INVALID_DD_VERSION => TRIM(OhNoMessage) + ': ' + validDDVersions, 
+                                                                                OhNoMessage = DueDiligence.CitDDShared.VALIDATION_INVALID_MODEL_NAME => TRIM(OhNoMessage) + ' Supported models include: CIT1808_0_0',
+                                                                                OhNoMessage);
 
                                                       trimOhNo := TRIM(updatedOhNoMessage);
 

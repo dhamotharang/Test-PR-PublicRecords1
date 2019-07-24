@@ -540,6 +540,7 @@ export Functions := MODULE
 					self.DateReportSubmitted.Year := (integer)l.Date_Report_submitted[1..4];
 					self.DateReportSubmitted.Month := (integer)l.Date_Report_submitted[6..7];
 					self.DateReportSubmitted.Day := (integer)l.Date_Report_submitted[9..10];
+					self.IsReleasable := l.Releasable = '1';
 					self:=[]
 					END;
 					

@@ -61,7 +61,9 @@ j := project(s.ExtKeyAnswers, TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key,
 dup_vehs := dedup(sort(j,vehicle_key,iteration_key,sequence_key),vehicle_key,iteration_key,sequence_key);
 grp_vehs := group(dup_vehs,vehicle_key,iteration_key);
 
-rpen :=VehicleV2_services.Vehicle_raw.get_vehicle_search(grp_vehs);
+vehicle_mod := VehicleV2_services.IParam.getSearchModule();
+
+rpen :=VehicleV2_services.raw.get_vehicle_search(vehicle_mod, grp_vehs);
 
 Text_Search.MAC_Append_ExternalKey(rpen, rpen2, l.Vehicle_Key+l.Iteration_Key+l.Sequence_Key);
 

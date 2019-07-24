@@ -1,4 +1,4 @@
-﻿IMPORT Address, Autokey_batch, Doxie, iesp, MDR, NID, Phones, PhoneFinder_Services, std, ut;
+﻿IMPORT Address, Autokey_batch, Doxie, iesp, MDR, NID, Phones, PhoneFinder_Services, std, ut, SSNBest_Services;
 
 pfLayouts     := PhoneFinder_Services.Layouts;
 lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -665,7 +665,7 @@ MODULE
 	ENDMACRO;
 	
 	// Identity info
-	EXPORT GetIdentityInfo(DATASET(lFinal) dIn,BOOLEAN isPhoneSearch) :=
+	EXPORT GetIdentityInfo(DATASET(lFinal) dIn,PhoneFinder_Services.iParam.SearchParams inMod,BOOLEAN isPhoneSearch,BOOLEAN isPhoneHistory) :=
 	FUNCTION
 		today:= Std.Date.Today();
 		dIdentitySlim := PROJECT(dIn((lname != '' or listed_name != '') and typeflag != Phones.Constants.TypeFlag.DataSource_PV),
@@ -701,6 +701,20 @@ MODULE
 		vMaxCount := IF(isPhoneSearch,iesp.Constants.Phone_Finder.MaxIdentities,iesp.Constants.Phone_Finder.MaxPhoneHistory);
 		
 		dIdentityTopn := DEDUP(SORT(dIdentityCombined,acctno,did=0,penalt,IF(PhoneOwnershipIndicator,0,1),-dt_last_seen,dt_first_seen,phone_source),acctno,KEEP(vMaxCount));
+
+		//Append gov best SSN, SSN (Gov best) is returned only for Gov searches. If any other verticals need SSN we need to start using'getSSNBest' flag 
+			
+		ssnBestParams := MODULE (PROJECT (inMod, SSNBest_Services.IParams.BatchParams, OPT))
+						EXPORT STRING ssn_mask := inmod.ssnmask; // These assignments will not be needed once IDataAccess changes are made in PhoneFinder
+						EXPORT unsigned1 glb := inmod.GLBPurpose;
+						EXPORT unsigned1 dppa := inmod.DPPAPurpose;
+						EXPORT string32 application_type := inmod.ApplicationType;
+						EXPORT string5 industry_class := inmod.IndustryClass;
+		END;
+	
+		withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(dIdentityTopn, ssnBestParams, ssn, did, false); 
+	
+		IdentityWssn := IF(inmod.IsGovsearch and ~isPhoneHistory, withGovBestSSN, dIdentityTopn);
 		
 		// Format to iesp
 		lIdentityIesp tFormat2IespIdentity(lIdentitySlim pInput) :=
@@ -742,7 +756,7 @@ MODULE
 			SELF																	 := [];
 		END;
 		
-		dIdentityIesp := PROJECT(dIdentityTopn,tFormat2IespIdentity(LEFT));
+		dIdentityIesp := PROJECT(IdentityWssn,tFormat2IespIdentity(LEFT));
 
 	 #IF(PhoneFinder_Services.Constants.Debug.Intermediate)
 			OUTPUT(dIdentitySlim,NAMED('dIdentitySlim'),EXTEND);
@@ -989,7 +1003,7 @@ MODULE
 		#IF(isPhoneSearch)
 			dSearchResultsPrimaryPhone := dSearchResults;
 			
-			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dSearchResultsPrimaryPhone,isPhoneSearch);
+			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dSearchResultsPrimaryPhone,inMod,isPhoneSearch,false);
 			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dSearchResultsUnfiltered,inMod);
 		#ELSE
 			dSearchResultsPrimaryPhoneUnfiltered := dSearchResultsUnfiltered(isPrimaryPhone);
@@ -1000,7 +1014,7 @@ MODULE
 			dPrimaryPhoneRecs := dSearchResultsPrimaryPhoneUnfiltered(phone_source in [PhoneFinder_Services.Constants.PhoneSource.Waterfall,
 																																				PhoneFinder_Services.Constants.PhoneSource.QSentGateway]);
 			
-			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,isPhoneSearch);
+			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,inMod,isPhoneSearch,true);
 			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs,inMod);
 			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones,inMod);
 		#END
@@ -1062,7 +1076,7 @@ MODULE
 																		ri.RecentAddress.County,ri.RecentAddress.PostalCode,ri.RecentAddress.StateCityZip},
 																	{ri.FirstSeenWithPrimaryPhone.Year,ri.FirstSeenWithPrimaryPhone.Month,ri.FirstSeenWithPrimaryPhone.Day},
 																	{ri.LastSeenWithPrimaryPhone.Year,ri.LastSeenWithPrimaryPhone.Month,ri.LastSeenWithPrimaryPhone.Day},
-																	ri.TimeWithPrimaryPhone,ri.TimeSinceLastSeenWithPrimaryPhone,ri.PrimaryAddressType,ri.RecordType,ri.phoneownershipindicator},
+																	ri.TimeWithPrimaryPhone,ri.TimeSinceLastSeenWithPrimaryPhone,ri.PrimaryAddressType,ri.RecordType,ri.phoneownershipindicator,ri.SSN},
 																iesp.phonefinder.t_PhoneIdentityInfo);
 			SELF               := le;
 			SELF               := [];
@@ -1160,6 +1174,7 @@ MODULE
 				SELF.primary_identity.TimeWithPrimaryPhone              := ri.TimeWithPrimaryPhone;
 				SELF.primary_identity.TimeSinceLastSeenWithPrimaryPhone := ri.TimeSinceLastSeenWithPrimaryPhone;
 				SELF.primary_identity.PhoneOwnershipIndicator           := ri.PhoneOwnershipIndicator;
+				SELF.primary_identity.ssn                               := ri.ssn;
 				SELF                                                    := [];
 			END;
 			
@@ -1226,6 +1241,7 @@ MODULE
 					#APPEND(IdentityInfo,'SELF.Identity' + %'i'% + '_Middle := pInput.identity_info[' + %'i'% + '].Name.Middle;\n')
 					#APPEND(IdentityInfo,'SELF.Identity' + %'i'% + '_Last := pInput.identity_info[' + %'i'% + '].Name.Last;\n')
 					#APPEND(IdentityInfo,'SELF.Identity' + %'i'% + '_Suffix := pInput.identity_info[' + %'i'% + '].Name.Suffix;\n')
+					#APPEND(IdentityInfo,'SELF.Identity' + %'i'% + '_SSN:= pInput.identity_info[' + %'i'% + '].SSN;\n')
 					#APPEND(IdentityInfo,'SELF.Identity' + %'i'% + '_Deceased := pInput.identity_info[' + %'i'% + '].Deceased;\n')
 					#APPEND(IdentityInfo,'SELF.Identity' + %'i'% + '_StreetNumber := pInput.identity_info[' + %'i'% + '].RecentAddress.StreetNumber;\n')
 					#APPEND(IdentityInfo,'SELF.Identity' + %'i'% + '_StreetPreDirection := pInput.identity_info[' + %'i'% + '].RecentAddress.StreetPreDirection;\n')
@@ -1389,6 +1405,7 @@ MODULE
 				SELF.Identity1_Middle                            := pInput.primary_identity.Name.Middle;
 				SELF.Identity1_Last                              := pInput.primary_identity.Name.Last;
 				SELF.Identity1_Suffix                            := pInput.primary_identity.Name.Suffix;
+				SELF.Identity1_SSN                               := pInput.primary_identity.SSN;
 				SELF.Identity1_Deceased                          := pInput.primary_identity.Deceased;
 				SELF.Identity1_StreetNumber                      := pInput.primary_identity.RecentAddress.StreetNumber;
 				SELF.Identity1_StreetPreDirection                := pInput.primary_identity.RecentAddress.StreetPreDirection;
@@ -1476,7 +1493,7 @@ MODULE
 		END;
 		
 		dFormat2BatchOut := PROJECT(dFormat2BatchReady,tFormat2Batch(LEFT));
-// OUTPUT(dFormat2BatchReady);		
+		
 		//Debug
 		#IF(PhoneFinder_Services.Constants.Debug.Main)
 			#IF(isPhoneSearch)
@@ -1498,7 +1515,7 @@ MODULE
    				OUTPUT(dPrimaryIdentityIesp,NAMED('dPrimaryIdentityIesp'));
    				OUTPUT(dPrimaryIdentity,NAMED('dPrimaryIdentity'));
    				OUTPUT(dFormat2BatchReady,NAMED('dFormat2BatchReady'));
-   				OUTPUT(dFormat2BatchOut,NAMED('dFormat2BatchOut'));
+  				OUTPUT(dFormat2BatchOut,NAMED('dFormat2BatchOut'));
 
 			#END
 		#END

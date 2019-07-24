@@ -1,5 +1,5 @@
 ﻿
-IMPORT Address, Gateway, Risk_Indicators, RiskProcessing, RiskWise, ut, doxie, gateway;
+IMPORT Gateway, Risk_Indicators, RiskProcessing, ut;
                                      
 EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts.SearchSubject) ds_input,
 																		 DATASET(Gateway.Layouts.Config) gateways,
@@ -32,8 +32,8 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 		// NOTE: the following code is copied from Risk_Indicators.Boca_Shell and modified slightly.
 		SHARED prep := risk_indicators.InstantID_Function(iid_prep, 
 																				gateways, 
-																				restrictions.DPPAPurpose, 
-																				restrictions.GLBPurpose, 
+																				restrictions.dppa, 
+																				restrictions.glb, 
 																				iidConfig.isUtility, 
 																				iidConfig.ln_branded, 
 																				iidConfig.ofac_only,
@@ -91,8 +91,8 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 		SHARED iid := GROUP(iid_deduped, seq);
 
 		SHARED ids_wide := Risk_Indicators.boca_shell_FCRA_Neutral_Function(iid, 
-																				restrictions.DPPAPurpose, 
-																				restrictions.GLBPurpose,  
+																				restrictions.dppa, 
+																				restrictions.glb,  
 																				iidConfig.isUtility, 
 																				iidConfig.ln_branded, 
 																				iidConfig.includeRelativeInfo, 
@@ -109,7 +109,7 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 																				p,
 																				FALSE, 
 																				iidConfig.ln_branded, 
-																				restrictions.DPPAPurpose, 
+																				restrictions.dppa, 
 																				restrictions.dppa_ok, 
 																				iidConfig.includeRelativeInfo, 
 																				iidConfig.includeDLInfo, 
@@ -121,7 +121,7 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 																				bsSvcOptions.Remove_Fares, 
 																				restrictions.DataRestrictionMask, 
 																				bsSvcOptions.bsOptions, 
-																				restrictions.GLBPurpose, 
+																				restrictions.glb, 
 																				gateways,
 																				restrictions.DataPermissionMask);
 		
@@ -144,8 +144,8 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 
 		SHARED adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
 																				gateways, 
-																				restrictions.DPPAPurpose, 
-																				restrictions.GLBPurpose, 
+																				restrictions.dppa, 
+																				restrictions.glb, 
 																				iidConfig.isFCRA,
 																				bsSvcOptions.bsversion, 
 																				iidConfig.isUtility,
@@ -199,8 +199,8 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 																				pbf_prep, 
 																				iid_prep, 
 																				gateways,
-																				restrictions.GLBPurpose, 
-																				restrictions.DPPAPurpose, 
+																				restrictions.glb, 
+																				restrictions.dppa, 
 																				pbfSvcOptions.Date_Cutoff,
 																				pbfSvcOptions.Current_Only,
 																				pbfSvcOptions.RelativeDepthLevel,
@@ -370,3 +370,4 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 		EXPORT final_results                := final_results_BSv50_and_PBF;
 
 	END;
+  

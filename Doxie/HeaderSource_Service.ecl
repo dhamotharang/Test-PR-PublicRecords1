@@ -280,7 +280,6 @@ Royalty.RoyaltyFares.MAC_SetA(property_table, foreclosure_table, royalties);
 ds_occur := Doxie_Raw.Occurrence.fromHSS(Sections_ddpd);
 
 // =-=-=-=-=-=-=-=-=-=-=-=-= Outputs =-=-=-=-=-=-=-=-=-=-=-=-=
-IF (exists(Sections_ddpd) or exists(ds_occur), doxie.compliance.logSoldToTransaction(mod_access));
 parallel(
 	if(includeSources,			output(Sections_ddpd,	named('Sources'))),
 	if(includeSources,			output(royalties,			named('RoyaltySet'))),

@@ -54,14 +54,16 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                                       
                                           SELF.historyDate := LEFT.historyDateYYYYMMDD;
                                           SELF.result.AdditionalInput := additionalInfo;
-                                           
+                                          
+                                                                                              
+                                          
                                           //populate input echo for a person
                                           #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
                                                       'SELF.result.inputEcho.person.lexID := LEFT.individual.lexID;' + 
                                                       'SELF.result.inputEcho.person.phone := LEFT.individual.phone;' +
                                                       'SELF.result.inputEcho.person.ssn := LEFT.individual.ssn;' +
                                                       'SELF.result.inputEcho.person.dob := iesp.ECL2ESP.toDatestring8(LEFT.individual.dob);' +
-                                                      
+                                             
                                                       'SELF.result.inputEcho.person.address := iesp.ECL2ESP.SetAddress(LEFT.individual.address.prim_name,' +
                                                                                                                        'LEFT.individual.address.prim_range,' + 
                                                                                                                        'LEFT.individual.address.predir,' + 
@@ -155,7 +157,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                     
                                     SELF := LEFT;),
                           LEFT OUTER,
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
 
         inputInfo := JOIN(bestInfo, Seed_Files.keys_DueDiligencePersonReport.PersonInformationSection,
@@ -209,7 +211,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                     
                                     SELF := LEFT;),
                           LEFT OUTER, 
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                             
         //================================
         // Legal Section
@@ -244,7 +246,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                                                                                                                     SELF.criminals := badBoys;)]);
                                     SELF := LEFT;),
                           LEFT OUTER, 
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Economic Section - Income
@@ -256,7 +258,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                           SELF.result.personReport.personAttributeDetails.economic.estimatedIncome := RIGHT.estimatedIncome;
                                           SELF := LEFT;),
                                 LEFT OUTER, 
-                                ATMOST(1));
+                                ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Economic Section - property
@@ -277,7 +279,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                     SELF.result.personReport.personAttributeDetails.economic.property := props;
                                     SELF := LEFT;),
                           LEFT OUTER, 
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Economic Section - vehicle
@@ -289,7 +291,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                   SELF.result.personReport.personAttributeDetails.economic.vehicle.motorVehicles := DueDiligence.TestSeeds.TestSeedFunctionHelperPerson.GetVehiclesDS(RIGHT);
                                   SELF := LEFT;),
                         LEFT OUTER, 
-                        ATMOST(1));
+                        ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Economic Section - watercraft
@@ -301,7 +303,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                       SELF.result.personReport.personAttributeDetails.economic.watercraft.watercrafts := DueDiligence.TestSeeds.TestSeedFunctionHelperPerson.GetWatercraftDS(RIGHT);
                                       SELF := LEFT;),
                             LEFT OUTER, 
-                            ATMOST(1));
+                            ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Economic Section - aircraft
@@ -313,7 +315,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                     SELF.result.personReport.personAttributeDetails.economic.aircraft.aircrafts := DueDiligence.TestSeeds.TestSeedFunctionHelperPerson.GetAircraftDS(RIGHT);
                                     SELF := LEFT;),
                           LEFT OUTER, 
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Professional Network Section
@@ -325,7 +327,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                     SELF.result.personReport.personAttributeDetails.professionalNetwork.professionalLicenses := DueDiligence.TestSeeds.TestSeedFunctionHelperPerson.GetProfLicensesDS(RIGHT);
                                     SELF := LEFT;),
                           LEFT OUTER,
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Business Associations Section
@@ -337,7 +339,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                     SELF.result.personReport.personAttributeDetails.businessAssocation.associations := DueDiligence.TestSeeds.TestSeedFunctionHelperPerson.GetBusAssociationsDS(RIGHT);
                                     SELF := LEFT;),
                           LEFT OUTER, 
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Identity Section - Age
@@ -350,12 +352,12 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                         SELF.result.personReport.personAttributeDetails.identitiy.estimatedAge := RIGHT.estimatedAge;
                                         SELF := LEFT;),
                               LEFT OUTER, 
-                              ATMOST(1));
+                              ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                           
         //================================
         // Attributes Section
         //================================
-        attributes := JOIN(busAssoc, Seed_Files.keys_DueDiligencePersonReport.AttributesSection,
+        attributes := JOIN(estimatedAge, Seed_Files.keys_DueDiligencePersonReport.AttributesSection,
                               KEYED(RIGHT.inDatasetName = LEFT.datasetName) AND
                               KEYED(RIGHT.hashValue = LEFT.hashkey),
                               TRANSFORM(RECORDOF(LEFT),
@@ -366,7 +368,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                         SELF.result.UniqueID := (STRING)RIGHT.perLexID;
                                         SELF := LEFT;),
                               LEFT OUTER, 
-                              ATMOST(1));
+                              ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                         
         RETURN PROJECT(attributes, TRANSFORM(personResponseLayout, SELF := LEFT;));
     END;
@@ -415,7 +417,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                     
                                     SELF := LEFT;),
                           LEFT OUTER, 
-                          ATMOST(1));
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
         
         //================================
         // Attributes Section
@@ -431,7 +433,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                         SELF.result.UniqueID := (STRING)RIGHT.perLexID;
                                         SELF := LEFT;),
                               LEFT OUTER, 
-                              ATMOST(1));
+                              ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                         
         RETURN PROJECT(attributes, TRANSFORM(attributeResponseLayout, SELF := LEFT;));
     END;
@@ -439,7 +441,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
     
     EXPORT GetBusinessAttributeSeeds := FUNCTION
         inRecs := getKeys(attributeResponseLayout, DueDiligence.Constants.BUSINESS);
-        
+                
         //================================
         // Input Echo Section
         //================================
@@ -473,7 +475,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                       SELF.result.inputEcho.business.fein := IF(seedFound, RIGHT.fein, LEFT.result.inputEcho.business.fein);
                                       SELF := LEFT;),
                             LEFT OUTER, 
-                            ATMOST(1));
+                            ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
         
         //================================
         // Attributes Section
@@ -489,9 +491,83 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                         SELF.result.BusinessID := RIGHT.busLexID;
                                         SELF := LEFT;),
                               LEFT OUTER, 
-                              ATMOST(1));
+                              ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
                         
         RETURN PROJECT(attributes, TRANSFORM(attributeResponseLayout, SELF := LEFT;));
+    END;
+    
+    
+    EXPORT GetCitizenshipSeeds := FUNCTION
+        
+        inRecs := getKeys(attributeResponseLayout, DueDiligence.Constants.INDIVIDUAL);
+        
+        inputInfo := JOIN(inRecs, Seed_Files.keys_Citizenship.InputEchoSection,
+                          KEYED(LEFT.datasetName = RIGHT.inDatasetName) AND
+                          KEYED(LEFT.hashkey = RIGHT.hashValue),
+                          TRANSFORM(RECORDOF(LEFT),
+                                    
+                                    seedExists := RIGHT.hashValue = LEFT.hashkey;
+                                    
+                                    name := iesp.ECL2ESP.SetName(RIGHT.firstName,
+                                                                  RIGHT.middleName,
+                                                                  RIGHT.lastName,
+                                                                  RIGHT.suffix,
+                                                                  DueDiligence.Constants.EMPTY,
+                                                                  RIGHT.fullName);
+                                                                  
+                                    address := iesp.ECL2ESP.SetAddress(RIGHT.streetName,
+                                                                       RIGHT.streetNumber, 
+                                                                       RIGHT.streetPreDirection,
+                                                                       RIGHT.streetPostDirection,
+                                                                       RIGHT.streetSuffix,
+                                                                       RIGHT.unitDesignation,
+                                                                       RIGHT.unitNumber,
+                                                                       RIGHT.city,
+                                                                       RIGHT.state,
+                                                                       RIGHT.zip5,
+                                                                       RIGHT.zip4,
+                                                                       DueDiligence.Constants.EMPTY,
+                                                                       DueDiligence.Constants.EMPTY,
+                                                                       RIGHT.streetAddress1,
+                                                                       RIGHT.streetAddress2);
+                                                                       
+                                    
+                                    SELF.result.inputEcho.person.lexID := IF(seedExists, (STRING)RIGHT.lexID, LEFT.result.inputEcho.person.lexID);
+                                    SELF.result.inputEcho.person.phone := IF(seedExists, RIGHT.phone, LEFT.result.inputEcho.person.phone);
+                                    SELF.result.inputEcho.person.ssn := IF(seedExists, RIGHT.ssn, LEFT.result.inputEcho.person.ssn);
+                                    SELF.result.inputEcho.person.dob := IF(seedExists, iesp.ECL2ESP.toDate(RIGHT.dob), LEFT.result.inputEcho.person.dob);
+                                    SELF.result.inputEcho.person.address := IF(seedExists, address, LEFT.result.inputEcho.person.address);                                             
+                                    SELF.result.inputEcho.person.name := IF(seedExists, name, LEFT.result.inputEcho.person.name);
+                                    SELF.result.inputEcho.person.citizenship.citizenshipModelName := IF(seedExists, RIGHT.modelName, inData[1].modelName);
+                                    SELF.result.inputEcho.person.citizenship.phone2 := IF(seedExists, RIGHT.phone2, inData[1].phone2);
+                                    SELF.result.inputEcho.person.citizenship.dlNumber := IF(seedExists, RIGHT.dlNumber, inData[1].dlNumber);
+                                    SELF.result.inputEcho.person.citizenship.dlState := IF(seedExists, RIGHT.dlState, inData[1].dlState);
+                                    SELF.result.inputEcho.person.citizenship.email := IF(seedExists, RIGHT.emailAddress, inData[1].email);
+                                    
+                                    SELF.result.inputEcho.productRequestType := inData[1].productRequested;
+                                    
+                                    SELF := LEFT;),
+                          LEFT OUTER, 
+                          ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+                          
+                          
+        // ================================
+        // Risk Indicators Section
+        // ================================
+        indicators := JOIN(inputInfo, Seed_Files.keys_Citizenship.RiskIndicatorsSection,
+                              KEYED(RIGHT.inDatasetName = LEFT.datasetName) AND
+                              KEYED(RIGHT.hashValue = LEFT.hashkey),
+                              TRANSFORM(RECORDOF(LEFT),
+                                        SELF.result.CitizenshipResults := IF((INTEGER)RIGHT.citizenshipScore > 0, 
+                                                                              DueDiligence.TestSeeds.TestSeedFunctionHelperCitizenship.GetRiskIndicators(RIGHT),
+                                                                              DueDiligence.TestSeeds.TestSeedFunctionHelperCitizenship.GetRiskIndicatorsNotFound);
+                                        SELF.result.UniqueID := RIGHT.lexID;
+                                        SELF := LEFT;),
+                              LEFT OUTER, 
+                              ATMOST(DueDiligence.Constants.MAX_ATMOST_1));
+        
+
+        RETURN PROJECT(indicators, TRANSFORM(attributeResponseLayout, SELF := LEFT;));
     END;
 
 END;
