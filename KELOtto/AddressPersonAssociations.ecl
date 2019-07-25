@@ -59,7 +59,7 @@ EXPORT AddressPersonAssociations := MODULE
 
 	EXPORT AddressMatchPrep := JOIN(DistributedAddressEvents, DistributedAddressEvents, 
 										LEFT.did != RIGHT.did AND LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.AddressHash = RIGHT.AddressHash AND 
-										ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < DateOverLapThreshold,
+										ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < MAP(LEFT.AssociatedCustomerFileInfo = 2481802344 => 180, DateOverLapThreshold),
 										TRANSFORM({
 											LEFT.AssociatedCustomerFileInfo,
 											LEFT.customer_id_,
@@ -101,7 +101,7 @@ EXPORT AddressPersonAssociations := MODULE
 											// maybe need to strip and clean this first.
 											SELF.PhoneNumberMatch := MAP((LEFT.phone_number != '' AND LEFT.phone_number = RIGHT.phone_number) OR (LEFT.phone_number != '' AND LEFT.phone_number=RIGHT.cell_phone) OR (LEFT.cell_phone != '' AND LEFT.cell_phone = RIGHT.phone_number)=>1, 0),
 											SELF := LEFT
-										), LOCAL) : PERSIST('~temp::deleteme30');
+										), LOCAL);// : PERSIST('~temp::deleteme30');
 
 // Reduce to 1 row per did per customer, day with the flags aggregated.
 EXPORT AddressMatch := TABLE(AddressMatchPrep, 
@@ -182,7 +182,7 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 																			SELF := LEFT, SELF := []));
 
 
-	SHARED PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31');
+	SHARED PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2;// : PERSIST('~temp::deleteme31');
 										
   SHARED PersonAddressMatchStatsPrep4 := PersonAddressMatchStatsPrep3(
 			// Rules for a valid association
@@ -190,7 +190,7 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 			sameaddressemailmatch = 1 OR 
 			sameaddressssnmatch = 1 OR 
 			sameaddressphonenumbermatch = 1 OR
-			NonHighFrequencyAddressCount > 2 OR 
+			NonHighFrequencyAddressCount > 2 OR (AssociatedCustomerFileInfo = 2481802344 AND NonHighFrequencyAddressCount > 0) OR
 			NonHighFrequencySameAddressSameDayCount > 0 OR
 			HighFrequencySameAddressSameDayCount > 5
 			 );          
