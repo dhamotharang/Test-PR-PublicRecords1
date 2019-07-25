@@ -29,6 +29,8 @@ rec := record
 	//Added for CCPA-103
 	dParty.global_sid;
 	dParty.record_sid;
+	//Added for DF-25578
+	dParty.raw_name;
 end;
 
 //make orig_ssn and append_ssn searchable

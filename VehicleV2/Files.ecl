@@ -73,6 +73,8 @@ module
 		export  party_bip						:=  project(VehicleV2.Prep_Build.Party_Base_bip('~thor_data400::base::vehicleV2::party'), transform(VehicleV2.Layout_Base.Party_CCPA,
 		                                                                                                                                self.global_sid := 0; //Added for CCPA-103
 																																																																		self.record_sid := 0; //Added for CCPA-103
+																																																																		//Added for DF-25578
+																																																																		self.raw_name   := '';
 																																																																		self:=left));
 		export	Party			          :=	project(Party_bip,transform(VehicleV2.Layout_Base.Party,self:=left));
 		export  Picker              :=  dataset('~thor_data400::out::vehicle_valid_make_model', {string MakeID,string MakeCode,string MakeDescription,	string ModelDescription}, csv(separator('|')));

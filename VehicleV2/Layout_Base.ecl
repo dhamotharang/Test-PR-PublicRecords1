@@ -262,6 +262,8 @@ export	Party_CCPA	:=record
 		//Added for CCPA-103
 		unsigned4 global_sid;
 		unsigned8 record_sid;
+		//Added for DF-25578
+		string30 raw_name;
    end;
 	 
 	export	Party_AID	:=

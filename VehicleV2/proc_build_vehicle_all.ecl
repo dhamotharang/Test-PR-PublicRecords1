@@ -9,7 +9,7 @@ export proc_build_vehicle_all(process_date, file_date='')	:=
 
 	import vehicleV2;
 	
-  Email_Recipients := 'cathy.tio@lexisnexis.com,charles.pettola@lexisnexisrisk.com';
+  Email_Recipients := 'cathy.tio@lexisnexis.com,charles.pettola@lexisnexisrisk.com,dave.beining@lexisnexisrisk.com';
 	
   VehicleV2.proc_build_stats(process_date,zDoStatsReference)			// now a macro
   
