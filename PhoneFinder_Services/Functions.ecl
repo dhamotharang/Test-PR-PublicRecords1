@@ -665,7 +665,7 @@ MODULE
 	ENDMACRO;
 	
 	// Identity info
-	EXPORT GetIdentityInfo(DATASET(lFinal) dIn,PhoneFinder_Services.iParam.SearchParams inMod,BOOLEAN isPhoneSearch,BOOLEAN isPhoneHistory) :=
+	EXPORT GetIdentityInfo(DATASET(lFinal) dIn,PhoneFinder_Services.iParam.SearchParams inMod,BOOLEAN isPhoneSearch) :=
 	FUNCTION
 		today:= Std.Date.Today();
 		dIdentitySlim := PROJECT(dIn((lname != '' or listed_name != '') and typeflag != Phones.Constants.TypeFlag.DataSource_PV),
@@ -714,7 +714,7 @@ MODULE
 	
 		withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(dIdentityTopn, ssnBestParams, ssn, did, false); 
 	
-		IdentityWssn := IF(inmod.IsGovsearch and ~isPhoneHistory, withGovBestSSN, dIdentityTopn);
+		IdentityWssn := IF(inmod.IsGovsearch, withGovBestSSN, dIdentityTopn);
 		
 		// Format to iesp
 		lIdentityIesp tFormat2IespIdentity(lIdentitySlim pInput) :=
@@ -1003,7 +1003,7 @@ MODULE
 		#IF(isPhoneSearch)
 			dSearchResultsPrimaryPhone := dSearchResults;
 			
-			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dSearchResultsPrimaryPhone,inMod,isPhoneSearch,false);
+			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dSearchResultsPrimaryPhone,inMod,isPhoneSearch);
 			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dSearchResultsUnfiltered,inMod);
 		#ELSE
 			dSearchResultsPrimaryPhoneUnfiltered := dSearchResultsUnfiltered(isPrimaryPhone);
@@ -1014,7 +1014,7 @@ MODULE
 			dPrimaryPhoneRecs := dSearchResultsPrimaryPhoneUnfiltered(phone_source in [PhoneFinder_Services.Constants.PhoneSource.Waterfall,
 																																				PhoneFinder_Services.Constants.PhoneSource.QSentGateway]);
 			
-			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,inMod,isPhoneSearch,true);
+			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,inMod,isPhoneSearch);
 			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs,inMod);
 			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones,inMod);
 		#END
