@@ -30,6 +30,7 @@ export	Proc_build_Vehicle_Base	:=	sequential(project(bld_vehicleV2_main,transfor
                                                 project(bld_vehicleV2_party,trnasform(VehicleV2.Layout_Base.Party_CCPA, //Added for CCPA-103
 																								                                      self.global_sid := 0;             //Added for CCPA-103
 																																											self.record_sid := 0;             //Added for CCPA-103
+																																											self.raw_name   := '';            //Added for DF-25578
 																																											self            := left
 																																										 )
 																											 )
