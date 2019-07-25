@@ -1,9 +1,10 @@
-IMPORT	Header, Address, ut, NID;
+﻿IMPORT	Header, Address, ut, NID,Std;
 EXPORT	fn_setRecordStatus(	STRING	pVersion,
 														Constants().buildType	pBuildType	= Constants().buildType.Daily)	:=	FUNCTION
 
 	dDenormed									:=	Business_Credit.Files().Denormalized;
-	
+		//	006 Suppress Associated Accounts
+	File_Correction_IndicatorSuppressCode:=['006'];
 		// 003 = Delete All Account History
 		// 080 = Delete Due to Legal Issue (Member Reported)
 		// 090 = Delete Due to Fraud (Member Reported)
@@ -45,11 +46,51 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 	dDenormedSorted	:=	SORT(DISTRIBUTE(dSlimDenormed(active),
 												HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported)),
 															Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,LOCAL);
+															
+	dMassSuppress:=dDenormedSorted(File_Correction_Indicator in File_Correction_IndicatorSuppressCode);
+	
+	dSetMassSuppress:=JOIN(
+												dDenormedSorted(File_Correction_Indicator not in File_Correction_IndicatorSuppressCode),
+												dMassSuppress,
+													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
+													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
+													LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
+													LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
+													LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
+													LEFT.process_date											=	RIGHT.process_date,
+												TRANSFORM(RECORDOF(LEFT),
+													SELF.active						:=	FALSE;
+													SELF.correction_type	:=	'A';
+													SELF.correction_date	:=	(STRING8)Std.Date.Today();
+													SELF				:=	LEFT),
+												LEFT OUTER,
+												LOCAL
+											);
+											
+	dMassUnSuppress:=dDenormedSorted(File_Type_Indicator = '005');
+	
+	dSetMassUnSuppress:=JOIN(
+												dDenormedSorted(File_Type_Indicator<>'005'),
+												dMassSuppress,
+													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
+													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
+													LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
+													LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
+													LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
+													LEFT.process_date											=	RIGHT.process_date,
+												TRANSFORM(RECORDOF(LEFT),
+													SELF.active						:=	TRUE;
+													SELF.correction_type	:=	'A';
+													SELF.correction_date	:=	(STRING8)Std.Date.Today();
+													SELF				:=	LEFT),
+												LEFT OUTER,
+												LOCAL
+											);
 																	
-	dMassReplace	:=	dDenormedSorted(File_Type_Indicator='002');
+	dMassReplace	:=	dSetMassUnSuppress(File_Type_Indicator='002');
 	
 	dSetMassDelete	:=	JOIN(
-												dDenormedSorted(File_Type_Indicator<>'002'),
+												dSetMassUnSuppress(File_Type_Indicator<>'002'),
 												dMassReplace,
 													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
 													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
