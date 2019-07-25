@@ -68,7 +68,7 @@ if the permission is set. Try Qsent data if nothing found above.
 <message name="phone_noreconn_search" wuTimeout="300000">
 */
 
-IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, PhonesInfo, Royalty, STD, Suppress, ut, WSInput, D2C,SSNBest_Services;
+IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, Royalty, STD, Suppress, ut, WSInput, D2C,SSNBest_Services, Phones;
 
 EXPORT phone_noreconn_search := MACRO 
 	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -370,12 +370,16 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	// First sort/dedup to only keep unique phone#s to reduce the ported phones key join matches
 	ds_cmp_res_out_dd := dedup(sort(cmp_res_out,phone),phone);
 
-	// Then do a a one-time join to the "phones_ported_metadata" key (NOTE:key name is miss-leading
-	//    since it contains more than just "ported" phones) 
+	// Pull metadata records from phones_type and phones_transactions keys 
 	// and keep the matching key records to be used for mutiple places below.
 	
-	phoneInfo := DEDUP(SORT(PROJECT(ds_cmp_res_out_dd, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.Phone)), phone), phone);
-	ds_ported_metadata := Phones.GetPhoneMetaData.CombineRawPhoneData(phoneInfo);
+
+  phoneInfo := DEDUP(SORT(PROJECT(ds_cmp_res_out_dd, TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn, SELF.phoneno := LEFT.Phone, SELF := [])), phoneno), phoneno);	
+	  in_mod := MODULE(Phones.IParam.BatchParams)
+		EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+	END; 
+	ds_ported_metadata := Phones.GetPhoneMetadata_wLERG6(phoneInfo,in_mod);
+
 	ds_ppmd_key_recs := join(ds_cmp_res_out_dd, ds_ported_metadata,
 															(left.phone = right.phone)
 															and (~IsCNSMR or right.source not in D2C.Constants.PhonemetadataRestrictedSources),
@@ -386,8 +390,8 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	// left date_first/last_seen (+/-5 days) vs right port_start/end dates to save the port dates.
 	out_layout_plus_portinfo := record
 		out_layout;
-		PhonesInfo.Layout_common.portedMetadata_Main.port_start_dt;
-		PhonesInfo.Layout_common.portedMetadata_Main.port_end_dt;
+		Phones.Layouts.portedMetadata_Main.port_start_dt;
+		Phones.Layouts.portedMetadata_Main.port_end_dt;
 	end;
 
 	ds_ported_dt_match := join(cmp_res_out, ds_ppmd_key_recs,

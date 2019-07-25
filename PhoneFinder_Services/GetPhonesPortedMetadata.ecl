@@ -1,4 +1,4 @@
-﻿IMPORT  Gateway, MDR, PhoneFinder_Services, Phones, STD, ut;
+﻿IMPORT  Gateway, MDR, PhoneFinder_Services, STD, ut, PhonesInfo;
 
 EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs0,
 													     PhoneFinder_Services.iParam.SearchParams inMod,
@@ -10,10 +10,9 @@ FUNCTION
   currentDate := (STRING)STD.Date.Today();		
                           
   //Based on subject info get ALL ports and CURRENT deact records
-  phoneInfo := DEDUP(SORT(PROJECT(subjectInfo, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.phone)), phone), phone);
-  dported_metadata := Phones.GetPhoneMetaData.CombineRawPhoneData(phoneInfo);
-  dPorted	:= JOIN(subjectInfo, dported_metadata,
-                  (LEFT.phone = RIGHT.phone) AND
+
+  dPorted	:= JOIN(subjectInfo, PhonesInfo.Key_Phones.Ported_Metadata,
+                  KEYED(LEFT.phone = RIGHT.phone) AND
                   ((LEFT.FirstSeenDate <= RIGHT.port_start_dt) OR 	
                     (LEFT.FirstSeenDate <= RIGHT.dt_last_reported) OR 	
                     (RIGHT.deact_code=PhoneFinder_Services.Constants.PortingStatus.Disconnected AND RIGHT.is_deact='Y')),
