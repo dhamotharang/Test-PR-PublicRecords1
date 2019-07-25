@@ -510,7 +510,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		BCBLienFtlr = 1									<< 29,
 		InsuranceFCRABankruptcyException = 1 << 30,
 		InsuranceFCRABankruptcyAllow10Yr = 1 << 31,
-		FilterVoter = 1									<< 32
+		FilterVoter = 1									<< 32,
+    InsuranceFCRASODataFilter       = 1 << 33
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
