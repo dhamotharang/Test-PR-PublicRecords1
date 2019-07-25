@@ -1141,6 +1141,7 @@
 		export string KEYWORD_INMSJE_NGO						:= '827';
 		export string KEYWORD_GIBNATSANC						:= '828';
 		export string KEYWORD_OFAC_EO13846					:= '829';
+		export string KEYWORD_TWMPB_DV							:= '830';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
