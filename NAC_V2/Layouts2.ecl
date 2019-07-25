@@ -247,12 +247,20 @@ EXPORT rNac2Ex := RECORD
 END;	
 
 EXPORT rExceptionRecord := RECORD
-		rException - RecordCode;
+	string1			UpdateType;			// U = Add/Update, D = Delete
+	string2			SourceProgramState;
+	string1			SourceProgramCode;
+	string20		SourceClientId;
+	string4			SourceGroupId;
+	string2			MatchedState;
+	string1			MatchedProgramCode;
+	string20		MatchedClientId;
+	string4			MatchedGroupId;
+	string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
+	string50		Comments;
 		unsigned4 created;
 		unsigned4 updated;
 		unsigned4 replaced;
-		unsigned4 errors;
-		unsigned4 warnings;
 END;		
 
 END;

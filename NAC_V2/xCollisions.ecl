@@ -86,6 +86,11 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.SearchMiddleName := fn_left(l.MiddleName,r.MiddleName);
 			self.SearchSSN := fn_left(l.SSN,r.SSN);
 			self.SearchDOB := fn_left(l.DOB,r.DOB);
+			
+			self.SearchRangeType := fn_left(l.PeriodType, r.PeriodType);
+			self.CaseMonthlyAllotment := fn_left(l.MonthlyAllotment, r.MonthlyAllotment);
+			self.RegionCode := fn_left(l.RegionCode, r.RegionCode);
+			
 			self.SearchEligibilityDate := fn_left(l.eligibility_status_date,r.eligibility_status_date);
 			self.SearchEligibilityStatus := fn_left(l.eligibility_status_indicator,r.eligibility_status_indicator);
 			self.SearchAddress1StreetAddress1 := fn_left(l.Physical_Street1,r.Physical_Street1);
