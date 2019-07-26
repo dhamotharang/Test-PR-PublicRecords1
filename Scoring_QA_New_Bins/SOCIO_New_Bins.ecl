@@ -1,5 +1,232 @@
 ﻿EXPORT SOCIO_New_Bins := module
 
+
+
+EXPORT range_function_socio(DS,f1,Result) := MACRO//SeMA_Score, SeMo_Score, SeRs_Score 
+
+#uniquename(tble)
+%tble% := table(ds);
+#uniquename(cnt)
+%cnt% := count(%tble%);
+#uniquename(rc)
+%rc% := record
+string field_name;
+string distribution_type ;
+STRING50 attribute_value ;
+end;
+                                                                                                                
+#uniquename(Bks_project)
+%Bks_project% := PROJECT(%tble%, TRANSFORM(%rc%,
+                                                self.field_name:=f1;
+                                                self.distribution_type := 'range';
+                                                self.attribute_value := IF(regexfind('[0-9]',left.#expand(f1)) or length(trim(left.#expand(f1),left,right))= 0,
+                                                    MAP(
+                                                                length(trim(left.#expand(f1),left,right)) = 0 => 'Blank', 
+
+(real)left.#expand(f1) < 0                                        => 'Negative_Score',
+(real)left.#expand(f1) >= 0     AND (real)left.#expand(f1) <= 10  => '0 - 10',
+(real)left.#expand(f1) >= 10.01 AND (real)left.#expand(f1) <= 20  => '10.01 - 20',
+(real)left.#expand(f1) >= 20.01 AND (real)left.#expand(f1) <= 30  => '20.01 - 30',
+(real)left.#expand(f1) >= 30.01 AND (real)left.#expand(f1) <= 40  => '30.01 - 40',
+(real)left.#expand(f1) >= 40.01 AND (real)left.#expand(f1) <= 50  => '40.01 - 50',
+(real)left.#expand(f1) >= 50.01 AND (real)left.#expand(f1) <= 60  => '50.01 - 60',
+(real)left.#expand(f1) >= 60.01 AND (real)left.#expand(f1) <= 70  => '60.01 - 70',
+(real)left.#expand(f1) >= 70.01 AND (real)left.#expand(f1) <= 80  => '70.01 - 80',
+(real)left.#expand(f1) >= 80.01 AND (real)left.#expand(f1) <= 90  => '80.01 - 90',
+(real)left.#expand(f1) >= 90.01 AND (real)left.#expand(f1) <= 100 => '90.01 - 100',
+(real)left.#expand(f1) >  100 => '>100',
+
+                                                                'UNDEFINED'),
+                                                                    'UNDEFINED'
+                                                                        );     
+                                                                                ));
+
+#uniquename(rc_tab)
+%rc_tab% := record
+%Bks_project%.field_name;
+%Bks_project%.distribution_type;
+%Bks_project%.attribute_value ;
+decimal20_4 Count1 := count(group);
+end;
+
+result := table(%Bks_project%,%rc_tab%,field_name,distribution_type,attribute_value);
+
+endmacro;
+
+
+//============================================================================
+
+
+
+EXPORT range_function_socio_2(DS,f1,Result) := MACRO//Score (Total_Cost_Risk_Score_2.0)
+
+#uniquename(tble)
+%tble% := table(ds);
+#uniquename(cnt)
+%cnt% := count(%tble%);
+#uniquename(rc)
+%rc% := record
+string field_name;
+string distribution_type ;
+STRING50 attribute_value ;
+end;
+                                                                                                                
+#uniquename(Bks_project)
+%Bks_project% := PROJECT(%tble%, TRANSFORM(%rc%,
+                                                self.field_name:=f1;
+                                                self.distribution_type := 'range';
+                                                self.attribute_value := IF(regexfind('[0-9]',left.#expand(f1)) or length(trim(left.#expand(f1),left,right))= 0,
+                                                    MAP(
+                                                                length(trim(left.#expand(f1),left,right)) = 0 => 'Blank', 
+
+(real)left.#expand(f1) < 0                                             => 'Negative_Score',
+(real)left.#expand(f1) >= 0        AND (real)left.#expand(f1) <= 100   => '0 - 100',
+(real)left.#expand(f1) >= 100.01   AND (real)left.#expand(f1) <= 200   => '100.01 - 200',
+(real)left.#expand(f1) >= 200.01   AND (real)left.#expand(f1) <= 300   => '200.01 - 300',
+(real)left.#expand(f1) >= 300.01   AND (real)left.#expand(f1) <= 400   => '300.01 - 400',
+(real)left.#expand(f1) >= 400.01   AND (real)left.#expand(f1) <= 500   => '400.01 - 500',
+(real)left.#expand(f1) >= 500.01   AND (real)left.#expand(f1) <= 600   => '500.01 - 600',
+(real)left.#expand(f1) >= 600.01   AND (real)left.#expand(f1) <= 700   => '600.01 - 700',
+(real)left.#expand(f1) >= 700.01   AND (real)left.#expand(f1) <= 800   => '700.01 - 800',
+(real)left.#expand(f1) >= 800.01   AND (real)left.#expand(f1) <= 900   => '800.01 - 900',
+(real)left.#expand(f1) >= 900.01   AND (real)left.#expand(f1) <= 1000  => '900.01 - 1000',
+(real)left.#expand(f1) >= 1000.01  AND (real)left.#expand(f1) <= 1100  => '1000.01 - 1100',
+(real)left.#expand(f1) >= 1100.01  AND (real)left.#expand(f1) <= 1200  => '1100.01 - 1200',
+(real)left.#expand(f1) >= 1200.01  AND (real)left.#expand(f1) <= 1300  => '1200.01 - 1300',
+(real)left.#expand(f1) >= 1300.01  AND (real)left.#expand(f1) <= 1400  => '1300.01 - 1400',
+(real)left.#expand(f1) >= 1400.01  AND (real)left.#expand(f1) <= 1500  => '1400.01 - 1500',
+(real)left.#expand(f1) >= 1500.01  AND (real)left.#expand(f1) <= 1600  => '1500.01 - 1600',
+(real)left.#expand(f1) >= 1600.01  AND (real)left.#expand(f1) <= 1700  => '1600.01 - 1700',
+(real)left.#expand(f1) >= 1700.01  AND (real)left.#expand(f1) <= 1800  => '1700.01 - 1800',
+(real)left.#expand(f1) >= 1800.01  AND (real)left.#expand(f1) <= 1900  => '1800.01 - 1900',
+(real)left.#expand(f1) >= 1900.01  AND (real)left.#expand(f1) <= 2000  => '1900.01 - 2000',
+(real)left.#expand(f1) >  2000.01 => '>2000',
+
+                                                                'UNDEFINED'),
+                                                                    'UNDEFINED'
+                                                                        );     
+                                                                                ));
+
+#uniquename(rc_tab)
+%rc_tab% := record
+%Bks_project%.field_name;
+%Bks_project%.distribution_type;
+%Bks_project%.attribute_value ;
+decimal20_4 Count1 := count(group);
+end;
+
+result := table(%Bks_project%,%rc_tab%,field_name,distribution_type,attribute_value);
+
+endmacro;
+
+
+
+
+//========================================================================================
+EXPORT range_function_socio_3(DS,f1,Result) := MACRO//age_in_years
+
+#uniquename(tble)
+%tble% := table(ds);
+#uniquename(cnt)
+%cnt% := count(%tble%);
+#uniquename(rc)
+%rc% := record
+string field_name;
+string distribution_type ;
+STRING50 attribute_value ;
+end;
+                                                                                                                
+#uniquename(Bks_project)
+%Bks_project% := PROJECT(%tble%, TRANSFORM(%rc%,
+                                                self.field_name:=f1;
+                                                self.distribution_type := 'range';
+                                                self.attribute_value := IF(regexfind('[0-9]',left.#expand(f1)) or length(trim(left.#expand(f1),left,right))= 0,
+                                                    MAP(
+                                                                length(trim(left.#expand(f1),left,right)) = 0 => 'Blank', 
+
+(real)left.#expand(f1) < 0                                        => 'Negative_Age_Error',
+(real)left.#expand(f1) >= 0     AND (real)left.#expand(f1) <= 10  => '0 - 10',
+(real)left.#expand(f1) >= 10.01 AND (real)left.#expand(f1) <= 20  => '10.01 - 20',
+(real)left.#expand(f1) >= 20.01 AND (real)left.#expand(f1) <= 30  => '20.01 - 30',
+(real)left.#expand(f1) >= 30.01 AND (real)left.#expand(f1) <= 40  => '30.01 - 40',
+(real)left.#expand(f1) >= 40.01 AND (real)left.#expand(f1) <= 50  => '40.01 - 50',
+(real)left.#expand(f1) >= 50.01 AND (real)left.#expand(f1) <= 60  => '50.01 - 60',
+(real)left.#expand(f1) >= 60.01 AND (real)left.#expand(f1) <= 70  => '60.01 - 70',
+(real)left.#expand(f1) >= 70.01 AND (real)left.#expand(f1) <= 80  => '70.01 - 80',
+(real)left.#expand(f1) >= 80.01 AND (real)left.#expand(f1) <= 90  => '80.01 - 90',
+(real)left.#expand(f1) >= 90.01 AND (real)left.#expand(f1) <= 100 => '90.01 - 100',
+(real)left.#expand(f1) >= 100.01 AND (real)left.#expand(f1) <= 110 => '100.01 - 110',
+(real)left.#expand(f1) >= 110.01 AND (real)left.#expand(f1) <= 120 => '110.01 - 120',
+(real)left.#expand(f1) >= 120.01 AND (real)left.#expand(f1) <= 130 => '120.01 - 130',
+(real)left.#expand(f1) >  130 => '>130',
+
+                                                                'UNDEFINED'),
+                                                                    'UNDEFINED'
+                                                                        );     
+                                                                                ));
+
+#uniquename(rc_tab)
+%rc_tab% := record
+%Bks_project%.field_name;
+%Bks_project%.distribution_type;
+%Bks_project%.attribute_value ;
+decimal20_4 Count1 := count(group);
+end;
+
+result := table(%Bks_project%,%rc_tab%,field_name,distribution_type,attribute_value);
+
+endmacro;
+
+//=========================================================================
+EXPORT range_function_socio_4(DS,f1,Result) := MACRO//readmissionscore_category/medicationadherencescore_category/motivationscore_category
+
+#uniquename(tble)
+%tble% := table(ds);
+#uniquename(cnt)
+%cnt% := count(%tble%);
+#uniquename(rc)
+%rc% := record
+string field_name;
+string distribution_type ;
+STRING50 attribute_value ;
+end;
+                                                                                                                
+#uniquename(Bks_project)
+%Bks_project% := PROJECT(%tble%, TRANSFORM(%rc%,
+                                                self.field_name:=f1;
+                                                self.distribution_type := 'range';
+                                                self.attribute_value := IF(regexfind('[0-9]',left.#expand(f1)) or length(trim(left.#expand(f1),left,right))= 0,
+                                                    MAP(
+                                                                length(trim(left.#expand(f1),left,right)) = 0 => 'Blank', 
+
+(real)left.#expand(f1) <= 0 => 'Error',
+(real)left.#expand(f1) = 1  => '1',
+(real)left.#expand(f1) = 2  => '2',
+(real)left.#expand(f1) = 3  => '3',
+(real)left.#expand(f1) = 4  => '4',
+(real)left.#expand(f1) = 5  => '5',
+(real)left.#expand(f1) > 5  => 'Error',
+
+                                       'UNDEFINED'),
+                                             'UNDEFINED'
+                                                  );     
+                                                          ));
+
+#uniquename(rc_tab)
+%rc_tab% := record
+%Bks_project%.field_name;
+%Bks_project%.distribution_type;
+%Bks_project%.attribute_value ;
+decimal20_4 Count1 := count(group);
+end;
+
+result := table(%Bks_project%,%rc_tab%,field_name,distribution_type,attribute_value);
+
+endmacro;
+
+//========================================================================================
+
+
 EXPORT range_function_1(DS,f1,Result) := MACRO//addrchangecrimediff
 
 #uniquename(tble)

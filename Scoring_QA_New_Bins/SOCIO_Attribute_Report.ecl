@@ -36,74 +36,55 @@ ppd:=if(pfc!= 0 and cfc=0,1,(cf/cfc)*100);
 // Scoring_QA_New_Bins.Test_FPv201_new_bins.range_function_3(DS2,'addrchangeecontrajectoryindex',range3);
 
       	// ran:= range1+range2+range3+range4+range5;
-      	
-// Scoring_QA_New_Bins.Test_FPv201_new_bins.Distinct_function(DS2,'inputphonetype',dist5);
+    
+  	
+		
+//SOCIO Range Functions
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio(DS2,'SeRs_Score',range1);
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio(DS2,'SeMA_Score',range2);
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio(DS2,'SeMo_Score',range3);
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio_2(DS2,'Score',range4);
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio_3(DS2,'age_in_years',range5);
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio_4(DS2,'readmissionscore_category',range6);
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio_4(DS2,'medicationadherencescore_category',range7);
+Scoring_QA_New_Bins.SOCIO_New_Bins.range_function_socio_4(DS2,'motivationscore_category',range8);
 
-// Scoring_QA_New_Bins.Test_FPv201_new_bins.Distinct_function(DS2,'prevaddrdwelltype',dist6);
 
-// Scoring_QA_New_Bins.Test_FPv201_new_bins.Distinct_function(DS2,'prevaddrstatus',dist7);
+ran:= range1+range2+range3+range4+range5+range6+range7+range8;
 
-Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeRs_Score',dist1);
-Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeMA_Score',dist2);
-Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeMo_Score',dist3);
-Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'Score'     ,dist4);
 
-/*Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'bus_ri_1',dist4);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'bus_ri_2',dist5);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'bus_ri_3',dist6);
+//SOCIO Distinct Functions
+//Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeRs_Score',dist1);
+//Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeMA_Score',dist2);
+//Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'SeMo_Score',dist3);
+//Scoring_QA_New_Bins.SOCIO_New_Bins.Distinct_function(DS2,'Score',dist4);
 
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'rep1_nas_summary',dist7);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'rep1_nap_summary',dist8);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'rep1_hri_1',dist9);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'rep1_hri_2',dist10);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function(DS2,'rep1_hri_3',dist11);
 
-	// Scoring_QA_New_Bins.Test_FPv201_new_bins.Distinct_function2(DS2,'addrchangeecontrajectory',dist1);
-
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'bus_company_name',dist12);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'bus_addr1',dist13);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'bus_z5',dist14);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'bus_city_name',dist15);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'bus_st',dist16);
-
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_firstname',dist17);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_lastname',dist18);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_addr1',dist19);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_st',dist20);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_z5',dist21);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_ssn',dist22);
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Distinct_function2(DS2,'rep1_phone10',dist23);
-*/
-				dis := dist1+dist2+dist3+dist4;
+	//			dis := dist1+dist2+dist3+dist4;
 				
 							 Scoring_QA.range_function_module.Distinct_function7(DS2,'acctno',did1);
 	 
 	 did_stats:=did1;
 			
-			result2_stats:= dis+ did_stats ; //ran + 
+			//result2_stats:= dis+ did_stats ; //ran + 
+			result2_stats:= ran + did_stats ; //ran + 
         
-/*Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Average_func(DS2,'bvi',ave1);
-				
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Average_func(DS2,'rep1_cvi',ave2);
 
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Average_func(DS2,'bus2exec_index_rep1',ave3);
 
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Average_func(DS2,'rep1_nas_summary',ave4);
-
-Scoring_QA_New_Bins.Test_BIIDV2_new_bins.Average_func(DS2,'rep1_nap_summary',ave5);
-
-// Scoring_QA_New_Bins.Test_FPv201_new_bins.Average_func(DS2,'addrchangeecontrajectoryindex',ave4);
-
-// Scoring_QA_New_Bins.Test_FPv201_new_bins.Average_func(DS2,'addrchangeincomediff',ave5);
-*/
 Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'SeRs_Score',ave1);
 Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'SeMA_Score',ave2);
 Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'SeMo_Score',ave3);
-Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'Score'     ,ave4);
+Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'Score',ave4);
+Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'age_in_years',ave5);
+Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'readmissionscore_category',ave6);
+Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'medicationadherencescore_category',ave7);
+Scoring_QA_New_Bins.SOCIO_New_Bins.Average_func(DS2,'motivationscore_category',ave8);
+
       	
-      	   avearage:= ave1+ave2+ave3+ave4;
+      	   avearage:= ave1+ave2+ave3+ave4+ave5+ave6+ave7+ave8;
+					
 	
-   result4_stats:=avearage   ;
+   result4_stats:=avearage;
 
 	  compare_layout_stats := RECORD
 		  string file_version;
@@ -168,7 +149,7 @@ compare_layout_stats func1(result2_stats l):=transform
 		
 		FileNameNewLogical2:='~ScoringQA::bss::dids1::'+ scoring_project_pip.Output_Sample_Names.SOCIO_Attributes_V5_outfile[2..] + current_dt;
 		
-	SaveNewFile := output(result2_stats_project,,FileNameNewLogical,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
+  	SaveNewFile := output(result2_stats_project,,FileNameNewLogical,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
 	 	 
 	 SaveNewFile1 :=output(result4_stats_project,,FileNameNewLogical1,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
 	 
