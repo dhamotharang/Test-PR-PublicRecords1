@@ -234,6 +234,27 @@ EXPORT Layouts := MODULE
 			string30	event_type_1;
 			string30	event_entity_1;
 		END;
+
+		EXPORT RDP := record
+			string75 TransactionDate;
+			string100 FirstName;
+			string100 LastName;
+			string60 MiddleName;
+			string10 Suffix;
+			string10 BirthDate;
+			string10 SSN;
+			unsigned6 Lexid_Input;
+			string100 Street1;
+			string50 Street2;
+			string50 Suite;
+			string100 City;
+			string10 State;
+			string10 Zip5;
+			string12 Phone;
+			unsigned6 Lexid_Discovered;
+			string25 RemoteIPAddress;
+			string25 ConsumerIPAddress;
+		END;
 	
 		EXPORT validate_record := record
 			string	field1	:= '';
