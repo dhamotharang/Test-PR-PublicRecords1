@@ -1,4 +1,4 @@
-export Layouts_PhonesFeedback := MODULE
+﻿export Layouts_PhonesFeedback := MODULE
 
 	export Layout_PhonesFeedback_in := record    //Len = 457                                    
 		string20 phone_feedback_id;
@@ -63,5 +63,8 @@ end;
 		string date_time_added;
 		string loginid;
 		string customerid;
+		//Added for CCPA-355
+		unsigned4 global_sid;
+		unsigned8 record_sid;
 		end;
 	end;
