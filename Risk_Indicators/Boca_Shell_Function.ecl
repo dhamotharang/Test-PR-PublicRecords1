@@ -86,7 +86,10 @@ iid := group(iid_deduped, seq);
                                    includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, BSversion,
 																	 false, doScore, filter_out_fares,
 																	 DataRestriction, BSOptions, glb, gateways, DataPermission,
-                                   LexIdSourceOptout, TransactionID, BatchUID, GlobalCompanyID);
+                                   LexIdSourceOptout := LexIdSourceOptout, 
+                                   TransactionID := TransactionID, 
+                                   BatchUID := BatchUID, 
+                                   GlobalCompanyID := GlobalCompanyID);
 
 	shell_results := per_prop;
 #end
