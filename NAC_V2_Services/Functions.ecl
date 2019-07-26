@@ -1,4 +1,4 @@
-IMPORT NAC_V2_Services,iesp,AutoStandardI,Address,NID,STD,AutoKeyI,ut;
+IMPORT NAC_V2_Services, iesp, AutoStandardI, Address, STD, AutoKeyI;
 //nacv2 interface
 nacv2I:=NAC_V2_Services.IParams.CommonParams;
 empty_mod:=module (nacv2I) end;
@@ -530,4 +530,4 @@ EXPORT Functions(nacv2I in_mod = empty_mod) := MODULE
 		RETURN ds_batch_errors;
 	ENDMACRO;
 
-END; 
+END;
