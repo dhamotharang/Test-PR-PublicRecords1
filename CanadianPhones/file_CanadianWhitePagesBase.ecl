@@ -7,7 +7,9 @@ iu_infiles := PROJECT(
 									  + dataset(CanadianPhones.thor_cluster +'base::infousaBiz',
 											CanadianPhones.layoutCanadianWhitepagesBase - [global_sid,record_sid],thor),
 											TRANSFORM(CanadianPhones.layoutCanadianWhitepagesBase,
-											          SELF.global_sid := 0;
+											          SELF.global_sid := map(left.source_file = 'INFOUSA_WHITEPAGES' 	=> 26041,
+																											 left.source_file = 'INFOUSA_YELLOWPAGES' => 26051,
+																											 0);
 																SELF.record_sid := 0;
 																SELF            := LEFT
 											         )
@@ -21,7 +23,9 @@ ax_infiles := PROJECT(
 									  + dataset(CanadianPhones.thor_cluster +'base::axciombus',
 											CanadianPhones.layoutCanadianWhitepagesBase - [global_sid,record_sid],thor),hash(phonenumber)),
 											TRANSFORM(CanadianPhones.layoutCanadianWhitepagesBase,
-											          SELF.global_sid := 0;
+											          SELF.global_sid := map(left.source_file = 'AXCIOM_CANADIAN_RESI' => 26061,
+																											 left.source_file = 'AXCIOM_CANADIAN_BUSI' => 26071,
+																											 0);
 																SELF.record_sid := 0;
 																SELF            := LEFT
 											         )

@@ -272,10 +272,6 @@ EXPORT Layouts := MODULE
 			string1			Customer_Program;
 			unsigned8		source_rec_id;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string9			clean_SSN;
 			string9			clean_Zip;
@@ -294,10 +290,6 @@ EXPORT Layouts := MODULE
 			string1			customer_program_fn; // use this one
 			unsigned8		source_rec_id ;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';   
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
@@ -312,10 +304,6 @@ EXPORT Layouts := MODULE
 			Sprayed.Deltabase;
 			unsigned8		source_rec_id ;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;

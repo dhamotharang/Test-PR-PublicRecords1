@@ -173,6 +173,7 @@
 				self.INCOME_LEVEL_CODE        			:= stringlib.StringToUpperCase(TRIM(pInput.INCOME_LEVEL_CODE,left,right));
 				self.INCOME_LEVEL        						:= stringlib.StringToUpperCase(TRIM(pInput.INCOME_LEVEL,left,right));
 				self.FILE_TYPE        							:= stringlib.StringToUpperCase(TRIM(pInput.FILE_TYPE,left,right));
+        self.global_sid                     := 23311; // DF-25320
 				self  															:= pInput;
 				self  															:= [];
 			END;

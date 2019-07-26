@@ -706,6 +706,13 @@ export layouts:= Module
 
 			BIPV2.IDlayouts.l_xlink_ids;
 	END;
+	
+	EXPORT individual_exception_base := record
+			string38        group_key;
+			License_input.lic_state	;
+			License_input.lic_num_in;
+			License_input.lic_num;
+	END;
 
 	EXPORT autokey_common	:= RECORD
 			individual_base - 

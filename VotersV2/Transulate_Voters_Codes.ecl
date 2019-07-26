@@ -56,16 +56,17 @@ end;
 Clean_file_Voter_Status_exp := join(Clean_file_PoliticalParty_exp,
 		                            codes.File_Codes_V3_In(trim(file_name, left, right) = 'EMERGES_HVC',trim(field_name, left, right) = 'VOTERSTATUS'),
 		                            trim(left.voter_status, left, right) = trim(right.code, left, right),
-		                            getVoterStatus(LEFT,RIGHT),left outer, lookup);
+		                            getVoterStatus(LEFT,RIGHT),left outer, lookup):
+                                persist('~thor_data400::perist::voters::Clean_file_Voter_Status_exp',SINGLE)
+																;
+																
 //*** End of code transulations.
 
 /* per #Bug: 174413 / Received a complaint against one female individual being reported as Male, data set will be passed 
    Below VotersV2.Filters module to handle accordingly / wrong value(s) will be blanked out  */
 
-//Barb O'Neill modified for DOPS-461
-VoteRegBase_File := VotersV2.File_Voters_Base;
-	 
-ds_Clean_file_Voter_Status_exp := VotersV2.Filters.Base(Clean_file_Voter_Status_exp + VoteRegBase_File);
+//Moved Base File to earlier in process to Add AID/NID and to refresh DIDs
+ds_Clean_file_Voter_Status_exp := VotersV2.Filters.Base(Clean_file_Voter_Status_exp);
 
 // generating a sequence number for "vtid"
 ut.MAC_Sequence_Records(ds_Clean_file_Voter_Status_exp,vtid,vtidCleanedVotersBase);
@@ -126,4 +127,4 @@ end;
 
 Clean_patched_vtid_dob_file := iterate(Srt_dist_vtidCleanedVotersBase, patchRecs(left,right),local);						  
 
-export Transulate_Voters_Codes := Clean_patched_vtid_dob_file: persist(VotersV2.Cluster+ 'persisit::Cleaned_Voter_base');
+export Transulate_Voters_Codes := Clean_patched_vtid_dob_file: persist(VotersV2.Cluster+ 'persist::Cleaned_Voter_base',SINGLE);
