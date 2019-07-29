@@ -1,8 +1,8 @@
-import STD;
+﻿import STD;
 
 irs_party	:=	dataset('~thor_data400::vehv2::irs_party_new',VehicleV2.Layout_Base_Party,flat);
 
-VehicleV2.Layout_Base.Party_Bip	reformat(VehicleV2.Layout_Base_Party	l)	:=
+VehicleV2.Layout_Base.Party_CCPA	reformat(VehicleV2.Layout_Base_Party	l)	:=
 transform
 	self.Date_Last_Seen							:=	(unsigned3)(((STRING8)Std.Date.Today())[1..6]);
 	self.Date_Vendor_Last_Reported	:=	(unsigned3)(((STRING8)Std.Date.Today())[1..6]);
@@ -121,6 +121,11 @@ transform
 																						 ,l.Ttl_Odometer_Status_Code
 																						 ,l.Ttl_Odometer_Status_Desc
 																						 ,l.Ttl_Odometer_Date);
+	//Added for CCPA-103
+	self.global_sid                   := 0;
+	self.record_sid                   := 0;
+	//Added for DF-25578
+	self.raw_name                     := '';
 	self														:=	l;
 	self														:=	[];
 end; 

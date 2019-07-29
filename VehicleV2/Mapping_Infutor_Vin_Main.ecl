@@ -26,10 +26,7 @@ string1 Infutor_Vehicle_Type_Mapping(string class_code) :=
 						 'U');
 
 // Map to the base vehiclev2 main layout
-// Added for CCPA-103 
-Layout_Temp_SID_Removal := VehicleV2.Layout_Base_Main - [global_sid,record_sid];
-//VehicleV2.Layout_Base_Main	
-Layout_Temp_SID_Removal 	tReformat2Main(dInfutorVinTempMain	pInput)	:=
+VehicleV2.Layout_Base_Main tReformat2Main(dInfutorVinTempMain	pInput)	:=
 transform
 	
 	self.State_BitMAP_Flag 					:=	0; //update later
@@ -63,6 +60,9 @@ transform
 	                                       pInput.vina_body_style_desc,
 																				 pInput.body_style_description);
 	
+	//Added for CCPA-103
+	self.global_sid                 := 0;
+	self.record_sid                 := 0;
 	self														:=	pInput;
 	self														:=	[];
 end;

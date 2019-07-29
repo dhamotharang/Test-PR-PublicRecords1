@@ -79,4 +79,11 @@ layout_old :=
 	string3			Best_Minor_Color_Code;
 	end; 
 //Modified for CCPA-103
-export irs_dummy_recs_main :=  project(dataset('~thor_data400::vehv2::irs_main',layout_old,flat),transform(VehicleV2.Layout_Base_Main - [global_sid,record_sid],self:=left,self :=[]));
+export irs_dummy_recs_main :=  project(dataset('~thor_data400::vehv2::irs_main',layout_old,flat),transform(VehicleV2.Layout_Base_Main,
+                                                                                                           //Added for CCPA-103
+                                                                                                           self.global_sid := 0, 
+																																																					 self.record_sid := 0,
+																																																					 self:=left,
+																																																					 self := []
+																																																					)
+																			);
