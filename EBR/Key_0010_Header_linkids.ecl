@@ -21,7 +21,7 @@ EXPORT Key_0010_Header_linkids := MODULE
 	FUNCTION
 
 		BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, fetched, Level, joinLimit, JoinType);
-		EBR.MAC_check_access(fetched, out, mod_access);
+		EBR.MAC_check_access(fetched, out, mod_access);							// Jira# CCPA-98, Function created for CCPA suppressions at key fetches.
 		ds_restricted := out(BIPV2.mod_sources.isPermitted(in_mod).bySource(MDR.sourceTools.src_EBR,''));
 		return ds_restricted;		
 
