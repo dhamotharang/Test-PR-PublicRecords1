@@ -7,8 +7,7 @@ rule_based_test := (REAL) 2.0;
 req_date := (INTEGER) ut.GetDate;
 
 curr_date := req_date + '_1';
-prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
-
+prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_3';
 
 //curr_date := ut.GetDate + '_1' ; //'20130908_1' ;
 //prev_date := (string) ((integer4)ut.GetDate -1)  + '_1' ;
@@ -66,6 +65,9 @@ res := PROJECT (ds, TRANSFORM({  STRING80 product,STRING80 version, STRING80 pro
 																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_SeMA_Score'  	 => 'test2' ,
 																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_SeMo_Score'  	 => 'test3' ,
 																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_Score'  	     => 'test4' , //'Score' = total cost risk score 2.0
+																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_medicationadherencescore_category'   => 'test5' , 
+																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_motivationscore_category'  	         => 'test6' , 
+																	LEFT.flagship  = 'socioeconomic_v5_batch'    AND LEFT.model = 'SocioEconomic_v5_readmissionscore_category'  	       => 'test7' , 
 																	LEFT.flagship );				
 														
 														SELF.version := 
@@ -85,6 +87,9 @@ res := PROJECT (ds, TRANSFORM({  STRING80 product,STRING80 version, STRING80 pro
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMA_Score'	 => 'Generic' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMo_Score'	 => 'Generic' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'Score'	       => 'Generic' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'medicationadherencescore_category'	   => 'Generic' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'motivationscore_category'	           => 'Generic' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'readmissionscore_category'	           => 'Generic' ,
 														  '');
 														
                             SELF.model1 := 
@@ -93,6 +98,9 @@ res := PROJECT (ds, TRANSFORM({  STRING80 product,STRING80 version, STRING80 pro
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMA_Score'	 => 'SeMA_Score' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'SeMo_Score'	 => 'SeMo_Score' ,
 														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'Score'	       => 'Score' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'medicationadherencescore_category'	   => 'medicationadherencescore_category' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'motivationscore_category'	           => 'motivationscore_category' ,
+														LEFT.flagship  = 'socioeconomic_v5_batch'  AND LEFT.model = 'readmissionscore_category'	           => 'readmissionscore_category' ,
 															 '');
 														
 														SELF := LEFT ));
@@ -1358,7 +1366,10 @@ SocioEconomic_V5_infile_cnt:=COUNT(DATASET(SOCIO_Monitoring_v5_infile,SOCIO_layo
 																	{'socioeconomic_v5_batch','Generic','Batch','SeRs_Score','0',50000},
 																	{'socioeconomic_v5_batch','Generic','Batch','SeMA_Score','0',50000},
 																	{'socioeconomic_v5_batch','Generic','Batch','SeMo_Score','0',50000},
-																	{'socioeconomic_v5_batch','Generic','Batch','Score','0',50000}
+																	{'socioeconomic_v5_batch','Generic','Batch','Score','0',50000},
+																	{'socioeconomic_v5_batch','Generic','Batch','medicationadherencescore_category','0',50000},
+																	{'socioeconomic_v5_batch','Generic','Batch','motivationscore_category','0',50000},
+																	{'socioeconomic_v5_batch','Generic','Batch','readmissionscore_category','0',50000}
                                ],input_file_count_ds_rec);
 
        
@@ -1503,7 +1514,7 @@ SocioEconomic_V5_infile_cnt:=COUNT(DATASET(SOCIO_Monitoring_v5_infile,SOCIO_layo
 							
  			  fcra_alert_msg:=	if(count(FCRA_result)<28,'\n ALERT: This FCRA report did not run properly for all products or versions','');
    			
-   			nonfcra_alert_msg:=	if(count(NON_FCRA_result)<4,'\n ALERT: This NON-FCRA report did not run properly for all products or versions','');
+   			nonfcra_alert_msg:=	if(count(NON_FCRA_result)<7,'\n ALERT: This NON-FCRA report did not run properly for all products or versions','');
    																									 
    				 // result;
    
