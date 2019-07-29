@@ -559,8 +559,7 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                               KEYED(RIGHT.hashValue = LEFT.hashkey),
                               TRANSFORM(RECORDOF(LEFT),
                                         SELF.result.CitizenshipResults := IF((INTEGER)RIGHT.citizenshipScore > 0, 
-                                                                              DueDiligence.TestSeeds.TestSeedFunctionHelperCitizenship.GetRiskIndicators(RIGHT),
-                                                                              DueDiligence.TestSeeds.TestSeedFunctionHelperCitizenship.GetRiskIndicatorsNotFound);
+                                                                              DueDiligence.TestSeeds.TestSeedFunctionHelperCitizenship.GetRiskIndicators(RIGHT));
                                         SELF.result.UniqueID := RIGHT.lexID;
                                         SELF := LEFT;),
                               LEFT OUTER, 

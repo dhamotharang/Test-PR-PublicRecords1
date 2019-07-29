@@ -92,7 +92,7 @@ EXPORT DueDiligence_Service := MACRO
 
 
 
-      final := MAP(executeTestSeeds AND reqProduct = DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY => final_testSeeds,
+      final := MAP(executeTestSeeds AND reqProduct IN [DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.DUEDILIGENCE_ONLY, DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY] => final_testSeeds,
                     final_actual);
 
 
