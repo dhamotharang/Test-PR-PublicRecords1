@@ -19,7 +19,7 @@ EXPORT Key_4510_UCC_Filings_linkids := MODULE
 	FUNCTION
 
 		BIPV2.IDmacros.mac_IndexFetch(inputs, Key, fetched, Level)
-		EBR.mac_check_access(fetched, out, mod_access);   // Jira# CCPA-98, Fucntion created for CCPA suppressions at ket fetches.
+		EBR.mac_check_access(fetched, out, mod_access);   // Jira# CCPA-98, Function created for CCPA suppressions at key fetches.
 		return out;																					
 
 	END;
