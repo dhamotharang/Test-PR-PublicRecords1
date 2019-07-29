@@ -82,7 +82,7 @@ EXPORT Build_Base_Main(STRING pversion,
 	tools.mac_WriteFile(CLIA.Filenames(pversion).Base.Main.New, baseMainPlusSourceRid, Build_Base_File);
 
 	EXPORT full_build := SEQUENTIAL(Build_Base_File,
-			                            CLIA.Promote(pversion).buildfiles.New2Built);
+			                            Promote(pversion).buildfiles.New2Built);
 		
 	EXPORT All := IF(tools.fun_IsValidVersion(pversion),
 		               full_build,
