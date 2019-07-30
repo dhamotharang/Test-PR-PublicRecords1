@@ -163,7 +163,7 @@ compare_layout_stats func1(result2_stats l):=transform
 		
 		FileNameNewLogical2:='~ScoringQA::bss::dids1::'+ scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile[2..] + current_dt;
 		
-	SaveNewFile := output(result2_stats_project,,FileNameNewLogical,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
+	 SaveNewFile := output(result2_stats_project,,FileNameNewLogical,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
 	 	 
 	 SaveNewFile1 :=output(result4_stats_project,,FileNameNewLogical1,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
 	 
