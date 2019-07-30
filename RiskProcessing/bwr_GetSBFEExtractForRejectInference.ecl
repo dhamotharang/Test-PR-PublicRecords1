@@ -39,17 +39,17 @@ IMPORT	ut, STD,	Address, Business_Credit;
 // pBuildBIIPIIFile					:=	TRUE;
 // pUseOtherEnvironment			:=	FALSE;
 /**********************************************************************************************************/
-pFilename									:=	'kgarrity::in::usbank_6988_ri_input_test_corrected';
+pFilename									:=	'jpyon::in::chase_8843_smalltest_reject.csv';
 pBIPIDLevel								:=	'SELEID'; // Possible values: ULTID, ORGID, SELEID, PROXID, POWID
 pSBFEContributorNumber		:=	'ANY';
-pAccountType							:=	'003';
+pAccountType							:=	'ANY';
 pOpenDateStart						:=	'';
 pOpenDateEnd							:=	'';
 pOpenDateDurationMonths		:=	0;
 pPerformanceWindowMonths	:=	0;
-pTradelineWindowMonthsAfter	:=	36;
-pTradelineWindowMonthsPrior	:=	6;
-pBuildBIIPIIFile					:=	TRUE;
+pTradelineWindowMonthsAfter	:=	0;
+pTradelineWindowMonthsPrior	:=	13;
+pBuildBIIPIIFile					:=	FALSE;
 pUseOtherEnvironment			:=	FALSE;
 /**********************************************************************************************************/
 
@@ -187,8 +187,7 @@ rSBFEAccounts	:=	RECORD
 END;
 
 dUniqueBIPIDandSBFEAccounts	:=	DEDUP(SORT(DISTRIBUTE(PULL(kLinkIDs)(
-																		record_type='AB'
-																		AND	account_type_reported IN sAccountType
+																		account_type_reported IN sAccountType
 																		#IF (ut.CleanSpacesAndUpper(pSBFEContributorNumber)	NOT IN	['','ANY'])
 																			AND SBFE_Contributor_Number = pSBFEContributorNumber
 																		#END
@@ -333,7 +332,7 @@ dTradelines		:=	JOIN(
 												#IF	(pTradelineWindowMonthsAfter>0)
 													AND	LEFT.Cycle_End_Date						<=	ut.Month_Math(RIGHT.historydate,pTradelineWindowMonthsAfter)
 												#ELSE
-													AND	LEFT.Cycle_End_Date						<=	RIGHT.historydate
+													AND	LEFT.Cycle_End_Date						<	RIGHT.historydate
 												#END
 											#END
 											,
