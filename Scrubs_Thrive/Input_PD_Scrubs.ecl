@@ -3,8 +3,8 @@ IMPORT Scrubs_Thrive,Scrubs; // Import modules for FieldTypes attribute definiti
 EXPORT Input_PD_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 18;
-  EXPORT NumRulesFromFieldType := 18;
+  EXPORT NumRules := 17;
+  EXPORT NumRulesFromFieldType := 17;
   EXPORT NumRulesFromRecordType := 0;
   EXPORT NumFieldsWithRules := 15;
   EXPORT NumFieldsWithPossibleEdits := 0;
@@ -74,7 +74,7 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.email_Invalid := (le.ScrubsBits1 >> 12) & 1;
     SELF.dob_Invalid := (le.ScrubsBits1 >> 13) & 1;
     SELF.employer_Invalid := (le.ScrubsBits1 >> 14) & 3;
-    SELF.dt_Invalid := (le.ScrubsBits1 >> 16) & 3;
+    SELF.dt_Invalid := (le.ScrubsBits1 >> 16) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -101,9 +101,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     employer_ALLOW_ErrorCount := COUNT(GROUP,h.employer_Invalid=1);
     employer_LENGTHS_ErrorCount := COUNT(GROUP,h.employer_Invalid=2);
     employer_Total_ErrorCount := COUNT(GROUP,h.employer_Invalid>0);
-    dt_ALLOW_ErrorCount := COUNT(GROUP,h.dt_Invalid=1);
-    dt_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_Invalid=2);
-    dt_Total_ErrorCount := COUNT(GROUP,h.dt_Invalid>0);
+    dt_CUSTOM_ErrorCount := COUNT(GROUP,h.dt_Invalid=1);
     AnyRule_WithErrorsCount := COUNT(GROUP, h.orig_fname_Invalid > 0 OR h.orig_mname_Invalid > 0 OR h.orig_lname_Invalid > 0 OR h.orig_addr_Invalid > 0 OR h.orig_city_Invalid > 0 OR h.orig_state_Invalid > 0 OR h.orig_zip5_Invalid > 0 OR h.orig_zip4_Invalid > 0 OR h.phone_home_Invalid > 0 OR h.phone_cell_Invalid > 0 OR h.phone_work_Invalid > 0 OR h.email_Invalid > 0 OR h.dob_Invalid > 0 OR h.employer_Invalid > 0 OR h.dt_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
@@ -112,9 +110,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.orig_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_addr_Total_ErrorCount > 0, 1, 0) + IF(le.orig_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_home_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_cell_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_work_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.email_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.employer_Total_ErrorCount > 0, 1, 0) + IF(le.dt_Total_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.orig_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_addr_Total_ErrorCount > 0, 1, 0) + IF(le.orig_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_home_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_cell_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_work_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.email_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.employer_Total_ErrorCount > 0, 1, 0) + IF(le.dt_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.orig_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_addr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_home_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_cell_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_work_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.email_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.employer_ALLOW_ErrorCount > 0, 1, 0) + IF(le.employer_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dt_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_CUSTOM_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.orig_fname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_mname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_lname_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_addr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_addr_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_home_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_cell_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.phone_work_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.email_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.employer_ALLOW_ErrorCount > 0, 1, 0) + IF(le.employer_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.dt_CUSTOM_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -146,7 +144,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.email_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.dob_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.employer_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.dt_Invalid,'ALLOW','CUSTOM','UNKNOWN'),'UNKNOWN'));
+          ,CHOOSE(le.dt_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'orig_fname','orig_mname','orig_lname','orig_addr','orig_city','orig_state','orig_zip5','orig_zip4','phone_home','phone_cell','phone_work','email','dob','employer','dt','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_fname','invalid_mname','invalid_lname','invalid_addr','invalid_city','invalid_state','invalid_zip5','invalid_zip4','invalid_hmphone','invalid_cellphone','invalid_wrkphone','invalid_email','invalid_dob','invalid_employer','invalid_date','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.orig_fname,(SALT311.StrType)le.orig_mname,(SALT311.StrType)le.orig_lname,(SALT311.StrType)le.orig_addr,(SALT311.StrType)le.orig_city,(SALT311.StrType)le.orig_state,(SALT311.StrType)le.orig_zip5,(SALT311.StrType)le.orig_zip4,(SALT311.StrType)le.phone_home,(SALT311.StrType)le.phone_cell,(SALT311.StrType)le.phone_work,(SALT311.StrType)le.email,(SALT311.StrType)le.dob,(SALT311.StrType)le.employer,(SALT311.StrType)le.dt,'***SALTBUG***');
@@ -176,7 +174,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'email:invalid_email:ALLOW'
           ,'dob:invalid_dob:CUSTOM'
           ,'employer:invalid_employer:ALLOW','employer:invalid_employer:LENGTHS'
-          ,'dt:invalid_date:ALLOW','dt:invalid_date:CUSTOM'
+          ,'dt:invalid_date:CUSTOM'
           ,'field:Number_Errored_Fields:SUMMARY'
           ,'field:Number_Perfect_Fields:SUMMARY'
           ,'rule:Number_Errored_Rules:SUMMARY'
@@ -199,7 +197,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Input_PD_Fields.InvalidMessage_email(1)
           ,Input_PD_Fields.InvalidMessage_dob(1)
           ,Input_PD_Fields.InvalidMessage_employer(1),Input_PD_Fields.InvalidMessage_employer(2)
-          ,Input_PD_Fields.InvalidMessage_dt(1),Input_PD_Fields.InvalidMessage_dt(2)
+          ,Input_PD_Fields.InvalidMessage_dt(1)
           ,'Fields with errors'
           ,'Fields without errors'
           ,'Rules with errors'
@@ -222,7 +220,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.email_ALLOW_ErrorCount
           ,le.dob_CUSTOM_ErrorCount
           ,le.employer_ALLOW_ErrorCount,le.employer_LENGTHS_ErrorCount
-          ,le.dt_ALLOW_ErrorCount,le.dt_CUSTOM_ErrorCount
+          ,le.dt_CUSTOM_ErrorCount
           ,le.FieldsChecked_WithErrors
           ,le.FieldsChecked_NoErrors
           ,le.Rules_WithErrors
@@ -245,7 +243,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.email_ALLOW_ErrorCount
           ,le.dob_CUSTOM_ErrorCount
           ,le.employer_ALLOW_ErrorCount,le.employer_LENGTHS_ErrorCount
-          ,le.dt_ALLOW_ErrorCount,le.dt_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
+          ,le.dt_CUSTOM_ErrorCount,0) / le.TotalCnt, CHOOSE(c - NumRules
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
           ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
           ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)

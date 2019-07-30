@@ -19,7 +19,7 @@ FIELDTYPE:invalid_wrkphone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)
 FIELDTYPE:invalid_email:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;'&)
 FIELDTYPE:invalid_dob:CUSTOM(Scrubs.Functions.fn_valid_pastDate>0)
 FIELDTYPE:invalid_employer:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-_,;'&./+()#!:%& ):LENGTHS(1..)
-FIELDTYPE:invalid_date:ALLOW(0123456789/: ):CUSTOM(Scrubs_Thrive.Functions.fn_invalid_date>0)
+FIELDTYPE:invalid_date:CUSTOM(Scrubs_Thrive.Functions.fn_invalid_date>0)
 //--------------------------------------------------------------- 
 //FIELDS TO SCRUB -- Commented out fields are not being scrubbed
 //---------------------------------------------------------------

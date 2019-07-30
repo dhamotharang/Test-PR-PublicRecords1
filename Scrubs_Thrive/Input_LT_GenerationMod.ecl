@@ -55,7 +55,7 @@ EXPORT Input_LT_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_email:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-.@_,;\'&)\n'
     + 'FIELDTYPE:invalid_phone:CUSTOM(Scrubs.Functions.fn_verify_phone>0,TRUE)\n'
     + 'FIELDTYPE:invalid_employer:ALLOW(0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-_,;\'&./+()#!:%& ):LENGTHS(1..)\n'
-    + 'FIELDTYPE:invalid_date:ALLOW(0123456789/: ):CUSTOM(Scrubs_Thrive.Functions.fn_invalid_date>0)\n'
+    + 'FIELDTYPE:invalid_date:CUSTOM(Scrubs_Thrive.Functions.fn_invalid_date>0)\n'
     + '//--------------------------------------------------------------- \n'
     + '//FIELDS TO SCRUB -- Commented out fields are not being scrubbed\n'
     + '//---------------------------------------------------------------\n'
