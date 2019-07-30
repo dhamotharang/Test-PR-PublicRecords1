@@ -1058,7 +1058,7 @@ end;
 					and left.lic_state		= right.lic_state
 					and left.lic_num_in		= right.lic_num_in
 					and left.lic_num			= right.lic_num
-			,TRANSFORM(track_ancillaries
+			,TRANSFORM(enclarity.Layouts.individual_base
 					,SELF.record_type			:= 'H'
 					,SELF									:= left)
 					,LEFT OUTER, LOOKUP);					
