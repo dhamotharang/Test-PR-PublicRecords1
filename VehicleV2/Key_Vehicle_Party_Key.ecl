@@ -25,11 +25,6 @@ layout_Key_Vehicle_Party_Key	tAddStdLienholder(get_recs pLeft, layout_std_lienho
 	:=
 		TRANSFORM
 			self.std_lienholder_name	:=	pLkp.std_lienholder_name;
-			//Added for CCPA-103 layout changes
-			self.global_sid           :=  pLeft.global_sid;
-			self.record_sid           :=  pLeft.record_sid;
-			//Added for DF-25578
-			self.raw_name             :=  pLeft.raw_name;
 			self											:=	pLeft;
 		END
 	;
