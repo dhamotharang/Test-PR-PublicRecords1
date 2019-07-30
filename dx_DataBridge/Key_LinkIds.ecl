@@ -1,5 +1,5 @@
 ﻿IMPORT $, BIPV2;
-
+ 
 EXPORT Key_LinkIds := MODULE
 
   // DEFINE THE INDEX
