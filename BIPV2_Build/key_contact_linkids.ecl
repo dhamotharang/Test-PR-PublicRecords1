@@ -58,7 +58,8 @@ module
     self := left;
 		  self:=[]));
   // Same Append as done in BIPV2_Build.proc_ingest
-  append := BIPV2_Files.tools_dotid().APPEND_DID(distribute(ds));//this can get skewed, so add distribute
+  // append := BIPV2_Files.tools_dotid().APPEND_DID(distribute(ds));//this can get skewed, so add distribute
+  append := ds;//this can get skewed, so add distribute
 
   shared contacts_sources_w_append := join(contacts_sources_with_id, append, 
     left.rcid=right.rcid, 
@@ -183,7 +184,7 @@ module
   ut.MAC_Sequence_Records(j_add_exec_ind,rid,add_rid);
  
 shared dDataset       := add_rid;
-shared layoutOrigFile	:= recordof(contacts_records) - rid;
+shared layoutOrigFile	:= {recordof(contacts_records) - rid,unsigned4 global_sid,unsigned8 record_sid};
 shared layoutSeqFile	:= recordof(dDataset);
 shared bdidSlimLayout	:=
 record
@@ -358,6 +359,8 @@ transform
 	self.dotid			   := if(r.dotid			<> 0 ,r.dotid			  ,0);
 	self.dotweight	   := if(r.dotweight	<> 0 ,r.dotweight	  ,0);
 	self.dotscore 	   := if(r.dotscore 	<> 0 ,r.dotscore 	  ,0);
+  self.global_sid    := 0;
+  self.record_sid    := 0;
 	self 						   := l;
 end;
 dAssignBdids := join(
@@ -383,6 +386,8 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
 	self.powscore 	   := 100;
 	self.orgscore 	   := 100;
 	self.ultscore 	   := 100;
+  self.global_sid    := 0;
+  self.record_sid    := 0;
   self               := left
 ));
   shared ds_concat_prep := dAssignBdids + dAssignBdids_commonbase : persist('~persist::BIPV2_Build::key_contact_linkids.ds_concat_prep');
