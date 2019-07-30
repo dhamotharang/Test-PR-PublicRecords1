@@ -121,11 +121,6 @@ transform
 																						 ,l.Ttl_Odometer_Status_Code
 																						 ,l.Ttl_Odometer_Status_Desc
 																						 ,l.Ttl_Odometer_Date);
-	//Added for CCPA-103
-	self.global_sid                   := 0;
-	self.record_sid                   := 0;
-	//Added for DF-25578
-	self.raw_name                     := '';
 	self														:=	l;
 	self														:=	[];
 end; 
