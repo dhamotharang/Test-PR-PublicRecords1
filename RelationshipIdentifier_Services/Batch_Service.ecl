@@ -13,7 +13,7 @@
 // 4. Then call the report recs which goes through each and every entity entered (up to max of 8) per acctno
 //     and ultimately calls the function to return relationships between 2 entities.
 
-IMPORT autostandardi,BatchShare,doxie,RelationshipIdentifier_Services;
+IMPORT BatchShare,RelationshipIdentifier_Services;
 EXPORT Batch_Service() :=
 MACRO
 		
@@ -56,10 +56,7 @@ MACRO
 																						
 	empty_ds_options := DATASET([],RelationshipIdentifier_Services.Layouts.OptionsLayout)[1];
 		
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
-	
   ds_batchSearchResults := RelationshipIdentifier_Services.Search_Records( empty_ds,
-                                                                           mod_access,  
 																																					 empty_ds_options,		
 																																					 ds_batchInProcessed,
 																																					 batchParams).ds_results_batch;
