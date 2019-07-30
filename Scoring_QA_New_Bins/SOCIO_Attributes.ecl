@@ -62,7 +62,7 @@ ip:='~';
 		
 		dedup_result1_stats_file_count_project:= dedup(result1_stats_file_count_project,all);
 		
-			result2_stats_file_count_project:=project(result2_stats,transform(compare_layout_stats_lay,self:=left));
+		result2_stats_file_count_project:=project(result2_stats,transform(compare_layout_stats_lay,self:=left));
 		
 		dedup_result2_stats_file_count_project:=dedup(result2_stats_file_count_project,all);
 		
@@ -118,9 +118,9 @@ ip:='~';
    																																						),full outer );
                   
                    compare_result2:= join(result3_stats,result4_stats,
-                     				                                        left.file_version = right.file_version and
+                     				                                         left.file_version = right.file_version and
 																																		 left.mode = right.mode and
-                           	                                        left.field_name = right.field_name and
+                           	                                         left.field_name = right.field_name and
                               									                      left.distribution_type = right.distribution_type and
                               																	      left.attribute_value = right.attribute_value 
                         																							,transform(	compare_layout, self.file_version:=  if(left.file_version='',right.file_version,left.file_version),
@@ -285,13 +285,15 @@ ip:='~';
 	 send_file:=	
 fileservices.SendEmailAttachText(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,					
 					'SOCIO_v5 Attribute Distribution Report',
-																				'BUSINESS SERVICES SCORING(BSS)NonFCRA Attribute Distribution Report '+ a1 + ' vs ' + b1 + '\n Please view attachment.',
+																				'BUSINESS SERVICES SCORING(BSS)SOCIO NonFCRA Attribute Distribution Report '+ a1 + ' vs ' + b1 + '\n Please view attachment.',
 																				 XtabOut[no_of_records].line ,
 																				 'text/plain; charset=ISO-8859-3', 
 																				'SOCIO_AttributeDistributionShifts_' + a1 + '_vs_' + b1 + '.csv',
 																				
 																				) ;  	
-	          
-		   sequential (new_bins_remove_superfile,old_bins_remove_superfile,new_bins,old_bins, out_file, send_file );	//new_bins_remove_superfile,old_bins_remove_superfile,
+	
+		   sequential (new_bins_remove_superfile,old_bins_remove_superfile,new_bins,old_bins, out_file, send_file);	//new_bins_remove_superfile,old_bins_remove_superfile,
+//:SUCCESS(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,'SOCIO_v5 Attribute Distribution Report Completed','The Completed workunit is:' + workunit)),
+//FAILURE(FileServices.SendEmail(Scoring_Project_DailyTracking.email_distribution.SOCIO_Daily_Monitoring_Success_List,'SOCIO_v5 Attribute Distribution Report job failed','The Failed workunit is:'   + workunit + FailMessage));
 
 EXPORT SOCIO_Attributes := 'todo';

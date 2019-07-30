@@ -23,10 +23,6 @@ SOCIO_Attributes_Distribution_run   := Scoring_QA_New_Bins.SOCIO_Attributes;
 
 SEQUENTIAL(SOCIO_Monitoring_v5_new,SOCIO_runbins,SOCIO_ks_Test,SOCIO_Attributes_Tracking_run,SOCIO_Attributes_Distribution_run)
 //SEQUENTIAL(SOCIO_Monitoring_v5_new)
-//SEQUENTIAL(SOCIO_ks_Test,SOCIO_Attributes_Tracking_run,SOCIO_Attributes_Distribution_run)
-//SEQUENTIAL(SOCIO_Monitoring_v5_new)
-//SEQUENTIAL(SOCIO_ks_Test,SOCIO_Attributes_Report_run)
-//SEQUENTIAL(SOCIO_Monitoring_v5_new)
 //:WHEN(CRON('0 5 * * *')), //runs everday at 1am EST
 //:WHEN(CRON('0 7 * * *')), //runs everday at 3am EST
 //:WHEN(CRON('0 18 * * *')),//runs everday at 2pm EST
