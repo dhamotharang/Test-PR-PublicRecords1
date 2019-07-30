@@ -65,8 +65,7 @@ EXPORT SprayAndQualifyRDP(
 		
 	MoveToPass :=
 		SEQUENTIAL(	OUTPUT('File '+fname+' content accepted',NAMED('Deltabase_File_content_accepted')),
-							fileservices.AddSuperfile(RDP_Passed,FileSprayed),
-							Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiterDeltabase, mod_sets.validTerminatorsDeltabase));
+							fileservices.AddSuperfile(RDP_Passed,FileSprayed));
 															
 	MoveToReject := 
 		SEQUENTIAL(	OUTPUT('File '+fname+' contains fatal errors.  File will be rejected',NAMED('Deltabase_File_content_rejected')),

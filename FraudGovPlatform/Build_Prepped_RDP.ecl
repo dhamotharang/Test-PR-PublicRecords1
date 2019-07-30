@@ -12,7 +12,8 @@ FUNCTION
 	END;	
 	
 	IdentityData MapIDDT(Sprayed_RDP L) := TRANSFORM 
-		DOB:=STD.STr.SplitWords(L.BirthDate,'/'); //5/1/1959  
+		DOB:=STD.STr.SplitWords(L.BirthDate,'/'); //5/1/1959 
+		SELF.Transaction_ID := L.Transaction_ID;
 		SELF.Customer_Job_ID	:= '1'; 
 		SELF.Batch_Record_ID	:= '1'; 
 		SELF.Reason_Description	:= 'Applicant Activity via LexisNexis'; 

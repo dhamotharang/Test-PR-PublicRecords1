@@ -236,6 +236,7 @@ EXPORT Layouts := MODULE
 		END;
 
 		EXPORT RDP := record
+			string Transaction_ID;
 			string75 TransactionDate;
 			string100 FirstName;
 			string100 LastName;
