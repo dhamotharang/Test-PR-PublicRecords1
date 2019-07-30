@@ -7,7 +7,7 @@ rule_based_test := (REAL) 2.0;
 req_date := (INTEGER) ut.GetDate;
 
 curr_date := req_date + '_1';
-prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_3';
+prev_date := scoring_project_ks.get_past_date(req_date, 1) + '_1';
 
 //curr_date := ut.GetDate + '_1' ; //'20130908_1' ;
 //prev_date := (string) ((integer4)ut.GetDate -1)  + '_1' ;
