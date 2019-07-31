@@ -90,6 +90,7 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF.orig_CompanyName						:= IF(TRIM(input.clean_cname) != '',ut.CleanSpacesAndUpper(input.NAME_FULL),'');
 	SELF.cln_CompanyName						:= ut.CleanSpacesAndUpper(input.clean_cname);
 	SELF.rules											:= 0;
+	SELF.global_sid                 := 27651;
 	SELF := input;
 	SELF := [];
 END;
