@@ -26,16 +26,14 @@ EXPORT Batch_Service() := MACRO
 		//  Read parameters and XML input. Fail the job at once if insufficient GLB permissions
 		//  were provided to the SOAP interface.
 		// **************************************************************************************		
-		BOOLEAN incl_PhonesFeedback := FALSE : STORED('Include_Phones_Feedback');
-		
 		gateways_in  := Gateway.Configuration.Get();
 		batch_params := Experian_Phones_Services.IParam.getBatchParams();				
 		ds_xml_in    := DATASET( [], Experian_Phones_Services.layouts.batch_in ) : STORED('batch_in', FEW);
 		
-		IF( NOT ut.glb_ok(batch_params.GLBpurpose),
+		IF( NOT batch_params.isValidGlb(),
 				FAIL('An error occurred while running Experian_Phones_Services.Batch_Service: invalid GLB purpose.') );
 
-		IF( Doxie.DataRestriction.isECHRestricted(batch_params.DataRestrictionMask), // i.e. if pos #6 = '1'
+		IF( batch_params.isECHRestricted(), // i.e. if pos #6 = '1'
 				FAIL('An error occurred while running Experian_Phones_Services.Batch_Service: invalid DataRestrictionMask value.') );
 
 		// **************************************************************************************
@@ -52,7 +50,7 @@ EXPORT Batch_Service() := MACRO
 		//    Call main attribute to fetch records. 
 		// **************************************************************************************
 		ds_batch_in := PROJECT( ds_xml_in_clean_addrs, Experian_Phones_Services.layouts.batch_in_plus );
-		m_BatchView := Experian_Phones_Services.Records.BatchView(ds_batch_in, gateways_in, incl_PhonesFeedback, batch_params);
+		m_BatchView := Experian_Phones_Services.Records.BatchView(ds_batch_in, gateways_in, batch_params);
 
 		ds_Experian_recs                     := m_BatchView.results;
 		ds_batch_in_for_suppression          := m_BatchView.batch_in_common;
@@ -61,8 +59,8 @@ EXPORT Batch_Service() := MACRO
 		//  Apply data restrictions and/or supressions. Results must always be suppressed 
 		//  by ssn or did before returning.
 		// **************************************************************************************
-		Suppress.MAC_Suppress(ds_batch_in_for_suppression, ds_batch_in_sup_1, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.DID, did);			
-		Suppress.MAC_Suppress(ds_batch_in_sup_1, ds_batch_in_sup_2, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, ssn);			
+		Suppress.MAC_Suppress(ds_batch_in_for_suppression, ds_batch_in_sup_1, batch_params.application_type,,,Suppress.Constants.LinkTypes.DID, did);			
+		Suppress.MAC_Suppress(ds_batch_in_sup_1, ds_batch_in_sup_2, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, ssn);			
 
 		ds_Experian_recs_suppressed := 
 			JOIN(

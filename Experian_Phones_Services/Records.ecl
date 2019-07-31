@@ -1,6 +1,5 @@
 
-IMPORT BatchServices, BatchShare, DidVille, Experian_Phones, Gateway, MDR, PhonesFeedback, PhonesFeedback_Services, 
-       Progressive_Phone, Risk_Indicators, Royalty, Standard, ut;
+IMPORT BatchServices, Experian_Phones, Gateway, MDR, Progressive_Phone, Royalty, Standard;
 
 EXPORT Records := MODULE
 
@@ -12,10 +11,9 @@ EXPORT Records := MODULE
 	// 
 	// END;
 	
-	EXPORT BatchView( DATASET(Experian_Phones_Services.layouts.batch_in_plus) ds_batch_in = DATASET([],Experian_Phones_Services.layouts.batch_in_plus),
-	                  DATASET(Gateway.Layouts.Config) gateways_in = Gateway.Constants.void_gateway,
-	                  BOOLEAN incl_PhonesFeedback = FALSE,
-	                  IParam.BatchParams configData ) := MODULE
+	EXPORT BatchView( DATASET(Experian_Phones_Services.layouts.batch_in_plus) ds_batch_in,
+	                  DATASET(Gateway.Layouts.Config) gateways_in,
+	                  Experian_Phones_Services.IParam.BatchParams configData ) := MODULE
 
 		SHARED err := Constants.Search_Errors;
 	
@@ -120,7 +118,7 @@ EXPORT Records := MODULE
 		//   F. Transform matching Experian gateway records to final layout.
 		// **************************************************************************************
 		SHARED ds_matching_records_pre := 
-				IF( incl_PhonesFeedback, ds_Experian_recs_having_feedback, ds_Experian_recs_having_no_feedback );
+				IF( configData.include_PhonesFeedback, ds_Experian_recs_having_feedback, ds_Experian_recs_having_no_feedback );
 	
 		SHARED ds_matching_records :=
 			JOIN(
@@ -248,4 +246,3 @@ EXPORT Records := MODULE
 	END;
 	
 END;
-

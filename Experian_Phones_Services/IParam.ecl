@@ -1,9 +1,10 @@
-import Address, BatchShare;
+import BatchShare;
 
 export IParam := module
 	
-	export BatchParams := interface (BatchShare.IParam.BatchParams)
+	export BatchParams := interface (BatchShare.IParam.BatchParamsV2)
 		export boolean AppendBest := false;
+		export boolean include_PhonesFeedback := false;
 	end;
 
 	// **************************************************************************************
@@ -13,7 +14,7 @@ export IParam := module
 	export getBatchParams() := 
 	function
 		
-		base_params := BatchShare.IParam.getBatchParams();
+		base_params := BatchShare.IParam.getBatchParamsV2();
 		
 		// project the base params to read shared parameters from store.
 		in_mod := module(project(base_params, BatchParams, opt))				
@@ -23,7 +24,8 @@ export IParam := module
 
 			// and/or define default values for domain specific parameters here.
 			export boolean		AppendBest := true;
-			
+
+			export boolean incl_PhonesFeedback := FALSE : STORED('Include_Phones_Feedback');
 		END;
 		
 		return in_mod;
