@@ -24,7 +24,7 @@ EXPORT GetAccuDataPhones := MODULE
 		portedrec := record
 		 string20 acctno;
 		 string1 typeflag;
-		 Phones.Layouts.portedMetadata_Main;	
+		 recordof(PhonesInfo.Key_Phones.Ported_Metadata);	
 		end;
 	 
 		portedrec  xporting(iesp.accudata_ocn.t_AccudataOcnResponseEx l, recordof(dx_PhonesInfo.Key_Source_Reference.ocn_name) r) :=  transform		
