@@ -25,6 +25,7 @@ module
 		filename := ut.CleanSpacesAndUpper(l.fn);
 		st := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '::', true )[3][1..2];
 		self.FileName := filename;	
+<<<<<<< HEAD
 		fn := map(	
 					regexfind('MSH',filename,nocase) => [(string)MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_Account_Number, 
 														 MBS_Mappings( contribution_source = 'NAC' and file_type = 1 and customer_state = st)[1].Customer_State, 
@@ -69,6 +70,18 @@ module
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 		self.ind_type 	:= functions.ind_type_fn(Customer_Program_fn);
+=======
+		fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
+
+		self.Customer_Id := STD.Str.FindReplace(fn[1],'FRAUDGOV::IN::','');
+		self.Customer_State := fn[2];
+		self.Customer_Agency_Vertical_Type := fn[3];
+		self.Customer_Program_fn := fn[4];
+		self.Process_Date := (unsigned)pversion;
+		self.FileDate :=(unsigned)fn[6];
+		self.FileTime :=fn[7];
+		self.ind_type 	:= functions.ind_type_fn(fn[4]);
+>>>>>>> ThorProd
 		self.file_type := 1 ;		
 		source_input := map(
 			 STD.Str.Contains( l.fn, 'KnownRisk', true) => 'KNFD'

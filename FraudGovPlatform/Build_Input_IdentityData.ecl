@@ -56,6 +56,7 @@ module
 					StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true )
 		);
 
+<<<<<<< HEAD
 		Customer_Account_Number := StringLib.StringFindReplace(fn[1],'FRAUDGOV::IN::','');
 		Customer_State := fn[2];
 		Customer_Agency_Vertical_Type := fn[3];
@@ -85,6 +86,18 @@ module
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 		self.ind_type := functions.ind_type_fn(Customer_Program);
+=======
+		fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
+
+		self.Customer_Id := StringLib.StringFindReplace(fn[1],'FRAUDGOV::IN::','');
+		self.Customer_State := fn[2];
+		self.Customer_Agency_Vertical_Type := fn[3];
+		self.Customer_Program := fn[4];
+		self.Process_Date := (unsigned)pversion;
+		self.FileDate := (unsigned)fn[6];
+		self.FileTime := fn[7];
+		self.ind_type := functions.ind_type_fn(fn[4]);
+>>>>>>> ThorProd
 		self.file_type := 3 ;
 		source_input := if (l.source_input = '', 'IDDT',l.source_input);
 		self.source_input := source_input;

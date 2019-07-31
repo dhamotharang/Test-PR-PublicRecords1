@@ -20,6 +20,7 @@ module
 		FileDate := (unsigned)l.fn[sub..sub+7];
 		FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
 		self.FileName := l.fn;
+<<<<<<< HEAD
 		self.ProcessDate := (unsigned)pversion;
 		self.FileDate := FileDate;
 		self.FileTime := FileTime;
@@ -35,6 +36,11 @@ module
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
 		self.cell_phone := '';
+=======
+		self.Process_Date := (unsigned)pversion;
+		self.FileDate := (unsigned)l.fn[sub..sub+7];
+		self.FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
+>>>>>>> ThorProd
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		source_input := if (l.inquiry_source = '', 'Deltabase','Deltabase-' + l.inquiry_source);
 		self.source_input := source_input;

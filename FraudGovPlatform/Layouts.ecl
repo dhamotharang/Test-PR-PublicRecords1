@@ -275,6 +275,7 @@ EXPORT Layouts := MODULE
 			string1			Customer_Program;
 			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
+<<<<<<< HEAD
 			unsigned8		address_id;
 			string100		address_1 := '';
 			string50		address_2 := '';
@@ -283,6 +284,8 @@ EXPORT Layouts := MODULE
 			string100		mailing_address_1 := '';
 			string50		mailing_address_2 := '';
 			Address.Layout_Clean182_fips			additional_address;	
+=======
+>>>>>>> ThorProd
 			clean_phones	clean_phones;
 			string9			clean_SSN;
 			string9			clean_Zip;
@@ -302,6 +305,7 @@ EXPORT Layouts := MODULE
 			string1			customer_program_fn; // use this one
 			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
+<<<<<<< HEAD
 			unsigned8		address_id;			
 			string100		address_1 := '';   
 			string50		address_2 := '';
@@ -310,6 +314,8 @@ EXPORT Layouts := MODULE
 			string100		mailing_address_1 := '';
 			string50		mailing_address_2 := '';
 			Address.Layout_Clean182_fips			additional_address;
+=======
+>>>>>>> ThorProd
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
@@ -325,6 +331,7 @@ EXPORT Layouts := MODULE
 			Sprayed.Deltabase;
 			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
+<<<<<<< HEAD
 			unsigned8		address_id;			
 			string100		address_1 := '';
 			string50		address_2 := '';
@@ -333,6 +340,8 @@ EXPORT Layouts := MODULE
 			string100		mailing_address_1 := '';
 			string50		mailing_address_2 := '';
 			Address.Layout_Clean182_fips			additional_address;
+=======
+>>>>>>> ThorProd
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;

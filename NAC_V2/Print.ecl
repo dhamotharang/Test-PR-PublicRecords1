@@ -38,7 +38,8 @@ LF := '\n';
 
 EXPORT Print := MODULE
 	export dRow := RECORD
-		string		text;
+		string130		text;
+		string1			eol := LF;
 	END;
 	
 	shared dNcrRow := RECORD

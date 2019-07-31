@@ -21,9 +21,10 @@ doit := SEQUENTIAL(
 	nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfBase2, lfn_base),
 	nac_V2.BuildPayload(b2, version),
 	nac_v2.Build_keys(version),
-	OUTPUT(collisions,,lfn_collisions,COMPRESSED,OVERWRITE),
+	OUTPUT(collisions,,lfn_collisions,COMPRESSED,OVERWRITE, named('collisions')),
 	nac_V2.Promote_Superfiles(Nac_V2.Superfile_List.sfCollisions, lfn_collisions),
-	OUTPUT(Nac_V2.NewCollisions(c2, c1),,'~nac::v2::newcollisions::' + version, COMPRESSED, OVERWRITE),
+	OUTPUT(Nac_V2.NewCollisions(c2, c1),,'~nac::v2::newcollisions::' + version, COMPRESSED, OVERWRITE,
+										named('new_collisions')),
 	OUTPUT(NAC_V2.GetSampleRecords(version), named('v2_samples')),
 	//RoxieKeybuild.updateversion('Nac2Keys',version,alertList,,'N'),
 	if (ut.Weekday((integer)version[1..8]) = 'SATURDAY'

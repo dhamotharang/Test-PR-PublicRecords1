@@ -57,8 +57,7 @@
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';
 		EXPORT DspQa								:= 'dsp-qa';
-		// EXPORT HpccConnectionProd		:= 'ramps_fraudgov';
-		EXPORT HpccConnectionProd		:= 'ramps';
+		EXPORT HpccConnectionProd		:= 'ramps_fraudgov';
 		EXPORT HpccConnectionProdQa	:= 'ramps_prodthor_certroxie';
 		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
 		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';

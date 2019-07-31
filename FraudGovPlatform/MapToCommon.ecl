@@ -40,10 +40,17 @@ module
 		self.additional_address.State := left.Mailing_State;
 		self.additional_address.Zip := left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
+<<<<<<< HEAD
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;
 		self.Household_ID := left.Case_ID;
 		self.Customer_Person_ID := left.Client_ID;
+=======
+		self.dt_first_seen	:= left.Process_Date;
+		self.dt_last_seen		:= left.Process_Date;
+		self.dt_vendor_last_reported	:= left.FileDate;
+		self.dt_vendor_first_reported := left.FileDate;
+>>>>>>> ThorProd
 		self:= left; 
 		self:= [];
 	)); 
@@ -65,10 +72,17 @@ module
 		self.additional_address.State := left.Mailing_State;
 		self.additional_address.Zip := left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
+<<<<<<< HEAD
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;		
 		self.Household_ID := left.Case_ID;
 		self.Customer_Person_ID := left.Client_ID;
+=======
+		self.dt_first_seen	:= left.Process_Date; 
+		self.dt_last_seen		:= left.Process_Date;
+		self.dt_vendor_last_reported	:= left.FileDate; 
+		self.dt_vendor_first_reported	:= left.FileDate; 
+>>>>>>> ThorProd
 		self:= left; 
 		self:= [];
 	)); 
@@ -103,6 +117,7 @@ module
 		self.additional_address.State := left.Mailing_State;
 		self.additional_address.Zip := left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
+<<<<<<< HEAD
 		self.additional_address.address_1 := left.mailing_address_1;
 <<<<<<< HEAD
 		self.additional_address.address_2 := left.mailing_address_2;		
@@ -115,6 +130,8 @@ module
 		self.classification_source.Source_type := FraudShared.MBS_CVD(column_name = 'FILE_TYPE' and status = 1 and desc_value = (unsigned2)left.file_type )[1].description;;
 =======
 		self.additional_address.address_2 := left.mailing_address_2;
+=======
+>>>>>>> ThorProd
 		self.classification_Activity.Confidence_that_activity_was_deceitful_id	:= (unsigned2)left.deceitful_confidence;
 >>>>>>> ThorProd
 		self:= left; 
@@ -128,8 +145,16 @@ module
 	// Filter header records
 	EXPORT NewBaseCombined := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
 
+<<<<<<< HEAD
  	// Append rid
 	EXPORT NewBaseRID := Append_RID (NewBaseCombined,pBaseMainFile); 
+=======
+	// Append Clean Additional Address
+	EXPORT Append_CleanAdditionalAddress := Append_CleanAdditionalAddress(NewBaseCleanAddress):independent;
+	
+	// Append Lexid
+	EXPORT NewBaseLexid := Append_Lexid (Append_CleanAdditionalAddress):independent;
+>>>>>>> ThorProd
 
 	// Append RinID
 	EXPORT NewBaseRinID := Append_RinID (NewBaseRID,pBaseMainFile);
