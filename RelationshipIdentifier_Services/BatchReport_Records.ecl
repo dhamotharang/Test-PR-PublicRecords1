@@ -1,14 +1,15 @@
 ﻿import RelationshipIdentifier_Services,  doxie_crs, doxie_raw,
 doxie, Batchshare, ut, iesp, bipv2, TopBusiness_Services, 
 Relationship, header, BIPV2_Best, Suppress, STD;
+
 EXPORT BatchReport_Records(  
 	dataset( RelationshipIdentifier_Services.Layouts.Batch.intermediateLayoutExt) ds_batchReportInRecs,
 	RelationshipIdentifier_Services.iParam.BatchParams inMod
 	) := FUNCTION
 	
 	DRM := InMod.DataRestrictionMask;
-	dppa_ok := ut.dppa_ok(inMod.dppaPurpose); 
-  glb_ok := ut.glb_ok(InMod.glbPurpose);
+	dppa_ok := inMod.isValidDppa();
+  glb_ok := inMod.isValidGlb();
   
 	integer CurDate := STD.Date.today();
 	unsigned4 endDateTmp := (unsigned4) inMod.EndDate;	
@@ -30,8 +31,8 @@ EXPORT BatchReport_Records(
 	     SELF.did := LEFT.DID));
 	
 	neighbor_results := doxie_crs.NeighBorRecords(neighborsbaseline,
-	                                     inMod.dppaPurpose, 
-																			 inMod.glbPurpose,
+	                                     inMod.dppa, 
+																			 inMod.glb,
 																			 inmod.DataRestrictionMask,
 																			 inMod.ssn_mask);
 		
@@ -758,7 +759,7 @@ ds_norm_final := tmpds_norm_final(PrimaryEntity < SecondaryEntity);
 ds_Results := PROJECT(ds_norm_final, TRANSFORM(Final, SELF := LEFT));
 
 ssnMaskVal := inmod.ssn_mask;
-application_type_value := inmod.applicationType;
+application_type_value := inmod.application_type;
 
 // DO suppression here
  // ********** do suppression of SSN. 
@@ -812,3 +813,4 @@ application_type_value := inmod.applicationType;
 	return(ds_ResultsFinal);
 	
 	END;
+  
