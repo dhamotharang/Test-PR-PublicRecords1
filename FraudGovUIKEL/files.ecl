@@ -828,12 +828,19 @@ EXPORT files := MODULE
   integer8 proxgsaflag;
  END;
  
- EmployerPrep := DATASET('~fraudgov::tndata::ts999_output', TrumpRec, THOR);
+ // EmployerPrep := DATASET('~fraudgov::tndata::ts999_output', TrumpRec, THOR); // Old File
+ EmployerPrep := DATASET('~fraudgov::tndata::20190701::ts999_output', TrumpRec, THOR);
  EXPORT Employer := PROJECT(EmployerPrep, 
-                      TRANSFORM(RECORDOF(LEFT), 
-											SELF.acctno := std.str.CleanSpaces(std.str.FindReplace(LEFT.acctno, '"', '\'')), 
-											SELF.statusreceiptdate := MAP((UNSIGNED)LEFT.statusreceiptdate[5..6] < 2020 => '19', '20') + LEFT.statusreceiptdate[5..6] + LEFT.statusreceiptdate[1..2] + LEFT.statusreceiptdate[3..4],
-											SELF.datefirstemp := MAP((UNSIGNED)LEFT.datefirstemp[5..6] < 2020 => '19', '20') + LEFT.datefirstemp[5..6] + LEFT.datefirstemp[1..2] + LEFT.datefirstemp[3..4],
+                      TRANSFORM({RECORDOF(LEFT), UNSIGNED uacctno}, 
+											// Acctno has some garbage data in it. Some of these are incorrectly getting cast to account numbers. Fix that
+											acctno := std.str.CleanSpaces(std.str.FindReplace(LEFT.acctno, '"', '\''));
+											SELF.acctno := IF(REGEXFIND('[a-z+ ]', acctno, NOCASE), '0', acctno);
+											SELF.uacctno := (UNSIGNED)SELF.acctno; 
+											SELF.status := IF(LEFT.status in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18'], LEFT.status, '');
+											SELF.statusreceiptdate := MAP((UNSIGNED)LEFT.statusreceiptdate[5..6] > 20 => '19', '20') + LEFT.statusreceiptdate[5..6] + LEFT.statusreceiptdate[1..2] + LEFT.statusreceiptdate[3..4],
+											SELF.datefirstemp := MAP((UNSIGNED)LEFT.datefirstemp[5..6] > 20 => '19', '20') + LEFT.datefirstemp[5..6] + LEFT.datefirstemp[1..2] + LEFT.datefirstemp[3..4],
+											SELF.dateliabest := MAP((UNSIGNED)LEFT.dateliabest[5..6] > 20 => '19', '20') + LEFT.dateliabest[5..6] + LEFT.dateliabest[1..2] + LEFT.dateliabest[3..4],
+											SELF.liabtermdate := MAP((UNSIGNED)LEFT.liabtermdate[5..6] > 20 => '19', '20') + LEFT.liabtermdate[5..6] + LEFT.liabtermdate[1..2] + LEFT.liabtermdate[3..4],											
 											SELF := LEFT)); 
  
  ClaimsRec := RECORD
@@ -1118,9 +1125,114 @@ EXPORT files := MODULE
   integer8 proxgsaflag;
  END;
  
- ClaimsBase := DATASET('~fraudgov::tndata::claims_output', ClaimsRec, THOR);
- EXPORT Claims := PROJECT(ClaimsBase, TRANSFORM({RECORDOF(LEFT), UNSIGNED acctno}, SELF.acctno := (UNSIGNED)std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF.claim_sep_emp_no := std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF := LEFT)); 
+ // ClaimsBase := DATASET('~fraudgov::tndata::claims_output', ClaimsRec, THOR); // Old File
+ ClaimsBase := DATASET('~fraudgov::tndata::20190701::claims_output ', ClaimsRec, THOR);
+ EXPORT Claims := PROJECT(ClaimsBase, TRANSFORM({RECORDOF(LEFT), UNSIGNED uacctno}, SELF.uacctno := (UNSIGNED)std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF.claim_sep_emp_no := std.str.CleanSpaces(std.str.FindReplace(LEFT.claim_sep_emp_no, '"', '\'')), SELF := LEFT)); 
  
+ ClaimantsRec := RECORD
+  string claimant_ssn;
+  string claimant_last_name;
+  string claimant_first_name;
+  string claimant_mi;
+  string claimant_address;
+  string claimant_city;
+  string claimant_state;
+  string claimant_zip;
+  integer8 claimant_dob;
+  string claimant_fips_code;
+  string claimant_fips_x;
+  string claimant_phone_nbr;
+  string claimant_addr_eff;
+  string application_id;
+  string claim_status;
+  string email;
+  string registration_ip;
+  string registration_ip_location;
+  string recent_ip;
+  string recent_ip_location;
+  string10 claimantaddressprimaryrange;
+  string2 claimantaddresspredirectional;
+  string28 claimantaddressprimaryname;
+  string4 claimantaddressaddresssuffix;
+  string2 claimantaddresspostdirectional;
+  string10 claimantaddressunitdesignation;
+  string8 claimantaddresssecondaryrange;
+  string25 claimantaddresspostalcity;
+  string25 claimantaddressvanitycity;
+  string2 claimantaddressstate;
+  string5 claimantaddresszip;
+  string4 claimantaddresszip4;
+  string2 claimantaddressdbpc;
+  string1 claimantaddresscheckdigit;
+  string2 claimantaddressrecordtype;
+  string5 claimantaddresscounty;
+  string10 claimantaddresslatitude;
+  string11 claimantaddresslongitude;
+  string4 claimantaddressmsa;
+  string7 claimantaddressgeoblock;
+  string1 claimantaddressgeomatchcode;
+  string4 claimantaddresserrorstatus;
+  boolean claimantaddresscachehit;
+  boolean claimantaddresscleanerhit;
+  string claimantaddresscleanedaddress;
+  string claimantaddressinputaddress;
+  boolean claimantaddressnoaddressinput;
+  boolean claimantaddressnoaddresscleanererror;
+  string claimantaddresserrorcodedescription;
+  unsigned6 claimantlexid;
+  unsigned2 claimant_xadl2_weight;
+  unsigned2 claimant_xadl2_score;
+  unsigned4 claimant_xadl2_keys_used;
+  unsigned2 claimant_xadl2_distance;
+  string20 claimant_xadl2_matches;
+  string claimant_xadl2_keys_desc;
+  string claimant_xadl2_matches_desc;
+  integer2 claimant_xlink_weight;
+  unsigned2 claimant_xlink_score;
+  integer1 claimant_xlink_distance;
+  unsigned4 claimant_xlink_keys;
+  string claimant_xlink_keys_desc;
+  string60 claimant_xlink_matches;
+  string claimant_xlink_matches_desc;
+  // unsigned8 payment_bye_ccyymmdd;
+  // unsigned8 payment_nbr;
+  // unsigned8 payment_date;
+  // unsigned8 payment_cert_date;
+  // unsigned8 payment_canc_date;
+  // unsigned8 payment_wed;
+  // string12 payment_prog;
+  // decimal6_2 payment_net_amt;
+  // decimal5_2 payment_wba;
+  // decimal5_2 payment_child_support;
+  // decimal5_2 payment_wh_tax_amt;
+  // decimal5_2 payment_earnings_reported;
+  // decimal5_2 payment_offset;
+  // decimal5_2 payment_retirement;
+  // string75 claimstatus;
+  // string50 col_pr_direct_deposit_number;
+  // string75 col_desc;
+  // decimal19_2 col_pr_payment_amount;
+  // string1 col_pr_payment_cleared;
+  // unsigned8 col_pr_unreceived_date;
+  // unsigned8 col_pr_unreceived_reason;
+  // unsigned8 col_pr_reissue_date;
+  // unsigned8 col_banking_error_code;
+  // unsigned8 col_banking_trace_nbr;
+  // string1 col_bank_status_flag;
+  // string50 col_pr_direct_deposit_routing_number;
+  // unsigned8 col_pr_direct_deposit_account_type;
+  // unsigned8 col_banking_batch_nbr;
+  // unsigned8 col_pr_check_seq_payment_id;
+  // unsigned8 col_pr_id_parent;
+  // unsigned8 col_pr_payment_status;
+  // unsigned8 col_paymentcancelledsource;
+  // unsigned8 col_istransferweek;
+  // string claimantentitycontextuid;
+  // unsigned6 claimantrecid;
+ END;
+
  
- 
+// EXPORT Claimant := DATASET('~fraudgov::tndata::claimants_output', ClaimantsRec, THOR); //Old File
+EXPORT Claimant := DATASET('~fraudgov::tndata::20190701::claimants_output', ClaimantsRec, THOR);
+
 END;
