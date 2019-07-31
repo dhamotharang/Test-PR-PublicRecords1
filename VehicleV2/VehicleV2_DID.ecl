@@ -1,4 +1,4 @@
-import BIPV2, vehicleV2,did_add,ut,header_slimsort,didville,business_header,business_header_ss,address,doxie_files,watchdog,mdr,header;
+﻿import BIPV2, vehicleV2,did_add,ut,header_slimsort,didville,business_header,business_header_ss,address,doxie_files,watchdog,mdr,header;
 
 party_in			:=	VehicleV2.Map_Experian_Party	     +	
                   VehicleV2.Mapping_NC_party	       +	
@@ -13,7 +13,7 @@ party_in_dist	:=	distribute(party_in,hash(vehicle_key,iteration_key,sequence_key
 src_rec	:=
 record
 	header_slimsort.Layout_Source;
-	VehicleV2.Layout_Base.Party_Bip
+	VehicleV2.Layout_Base.Party_CCPA;
 end;
 
 party_in_proj		:=	project(party_in_dist,transform(src_rec,self := left,self := []));
@@ -60,11 +60,11 @@ dVehicleBlankDID	:=	dataset(	[	{'14011729971804357981','20071017NYAE','200710172
 																	{'9780296747397872560','20100115NYAE','20060817201101R'},
 																	{'9780296747397872560','20100115NYAE','20060914201101O'}
 																],
-																{VehicleV2.Layout_Base.Party_Bip.vehicle_key,VehicleV2.Layout_Base.Party_Bip.iteration_key,VehicleV2.Layout_Base.Party_Bip.sequence_key}
+																{VehicleV2.Layout_Base.Party_CCPA.vehicle_key,VehicleV2.Layout_Base.Party_CCPA.iteration_key,VehicleV2.Layout_Base.Party_CCPA.sequence_key}
 															);
 
 // Reformat to the party layout
-VehicleV2.Layout_Base.Party_Bip	tBlankDIDs(postDID_src	le,dVehicleBlankDID	ri)	:=
+VehicleV2.Layout_Base.Party_CCPA	tBlankDIDs(postDID_src	le,dVehicleBlankDID	ri)	:=
 transform
 	self.Append_DID				:=	if(	le.vehicle_key		=	ri.vehicle_key		and
 																le.iteration_key	=	ri.iteration_key	and
@@ -97,7 +97,7 @@ preBDID_source	:=	table(preBDID,{preBDID,string source	:=	mdr.sourceTools.fVehic
 
 mac_src_match_rec	:=
 record
-	VehicleV2.Layout_Base.Party_Bip;
+	VehicleV2.Layout_Base.Party_CCPA;
 	unsigned6				BDID;
 	string 					source;
 end;
@@ -166,7 +166,7 @@ business_header_ss.MAC_Match_Flex(
 			,true
 		);																																								
 
-VehicleV2.Layout_Base.Party_Bip	x2PartyBIP(mac_src_match_rec l) := transform
+VehicleV2.Layout_Base.Party_CCPA x2PartyBIP(mac_src_match_rec l) := transform
 	self.append_bdid := l.bdid;
 	self := l;
 end;
@@ -187,7 +187,7 @@ vehicle_party_out := postFEIN + postdid_dist(TRIM(Source_Code) IN ['1V','2V']) +
                      postbdid_dist(TRIM(Source_Code) IN ['1V','2V']);
 
 //Bug 148899 - set decal number to blank if it is all zeros
-VehicleV2.Layout_Base.Party_Bip	tBlankRegDecalNumber(vehicle_party_out	le)	:=
+VehicleV2.Layout_Base.Party_CCPA	tBlankRegDecalNumber(vehicle_party_out	le)	:=
 transform
 	self.reg_decal_number	:=	if(regexfind('^0+$',trim(le.reg_decal_number)),'',le.reg_decal_number);
 	self									:=	le;
