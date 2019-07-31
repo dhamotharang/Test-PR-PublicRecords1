@@ -37,6 +37,15 @@
 EXPORT WeAlsoFoundService := MACRO
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   #stored('useOnlyBestDID',true);
+
+  #CONSTANT('TwoPartySearch', FALSE);
+
+  #CONSTANT('MatchByBuyerAddresses', FALSE);
+  #CONSTANT('MatchByMailingAddresses', FALSE);
+  #CONSTANT('MatchByOwnerAddresses', FALSE);
+  #CONSTANT('MatchByPropertyAddresses', FALSE);
+  #CONSTANT('MatchBySellerAddresses', FALSE);
+
   import doxie;
 
   dids := doxie.Get_Dids ();
