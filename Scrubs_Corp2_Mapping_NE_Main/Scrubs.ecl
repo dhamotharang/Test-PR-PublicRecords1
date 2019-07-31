@@ -3,10 +3,10 @@ IMPORT Scrubs,Scrubs_Corp2_Mapping_NE_Main; // Import modules for FieldTypes att
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT NumRules := 39;
-  EXPORT NumRulesFromFieldType := 39;
+  EXPORT NumRules := 38;
+  EXPORT NumRulesFromFieldType := 38;
   EXPORT NumRulesFromRecordType := 0;
-  EXPORT NumFieldsWithRules := 27;
+  EXPORT NumFieldsWithRules := 26;
   EXPORT NumFieldsWithPossibleEdits := 0;
   EXPORT NumRulesWithPossibleEdits := 0;
   EXPORT Expanded_Layout := RECORD(Layout_in_file)
@@ -21,7 +21,6 @@ EXPORT Scrubs := MODULE
     UNSIGNED1 corp_state_origin_Invalid;
     UNSIGNED1 corp_process_date_Invalid;
     UNSIGNED1 corp_orig_sos_charter_nbr_Invalid;
-    UNSIGNED1 corp_legal_name_Invalid;
     UNSIGNED1 corp_ln_name_type_cd_Invalid;
     UNSIGNED1 corp_filing_date_Invalid;
     UNSIGNED1 corp_status_cd_Invalid;
@@ -54,7 +53,6 @@ EXPORT FromNone(DATASET(Layout_in_file) h) := MODULE
     SELF.corp_state_origin_Invalid := Fields.InValid_corp_state_origin((SALT311.StrType)le.corp_state_origin);
     SELF.corp_process_date_Invalid := Fields.InValid_corp_process_date((SALT311.StrType)le.corp_process_date);
     SELF.corp_orig_sos_charter_nbr_Invalid := Fields.InValid_corp_orig_sos_charter_nbr((SALT311.StrType)le.corp_orig_sos_charter_nbr);
-    SELF.corp_legal_name_Invalid := Fields.InValid_corp_legal_name((SALT311.StrType)le.corp_legal_name);
     SELF.corp_ln_name_type_cd_Invalid := Fields.InValid_corp_ln_name_type_cd((SALT311.StrType)le.corp_ln_name_type_cd,(SALT311.StrType)le.recordorigin);
     SELF.corp_filing_date_Invalid := Fields.InValid_corp_filing_date((SALT311.StrType)le.corp_filing_date);
     SELF.corp_status_cd_Invalid := Fields.InValid_corp_status_cd((SALT311.StrType)le.corp_status_cd);
@@ -75,7 +73,7 @@ EXPORT FromNone(DATASET(Layout_in_file) h) := MODULE
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_in_file);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.dt_vendor_first_reported_Invalid << 0 ) + ( le.dt_vendor_last_reported_Invalid << 2 ) + ( le.dt_first_seen_Invalid << 4 ) + ( le.dt_last_seen_Invalid << 6 ) + ( le.corp_ra_dt_first_seen_Invalid << 8 ) + ( le.corp_ra_dt_last_seen_Invalid << 10 ) + ( le.corp_key_Invalid << 12 ) + ( le.corp_vendor_Invalid << 14 ) + ( le.corp_state_origin_Invalid << 15 ) + ( le.corp_process_date_Invalid << 16 ) + ( le.corp_orig_sos_charter_nbr_Invalid << 18 ) + ( le.corp_legal_name_Invalid << 20 ) + ( le.corp_ln_name_type_cd_Invalid << 21 ) + ( le.corp_filing_date_Invalid << 22 ) + ( le.corp_status_cd_Invalid << 24 ) + ( le.corp_inc_state_Invalid << 25 ) + ( le.corp_inc_date_Invalid << 26 ) + ( le.corp_term_exist_exp_Invalid << 28 ) + ( le.corp_term_exist_desc_Invalid << 29 ) + ( le.corp_foreign_domestic_ind_Invalid << 30 ) + ( le.corp_forgn_state_desc_Invalid << 31 ) + ( le.corp_forgn_date_Invalid << 32 ) + ( le.corp_orig_org_structure_cd_Invalid << 34 ) + ( le.corp_for_profit_ind_Invalid << 35 ) + ( le.corp_country_of_formation_Invalid << 36 ) + ( le.recordorigin_Invalid << 37 ) + ( le.InternalField1_Invalid << 38 );
+    SELF.ScrubsBits1 := ( le.dt_vendor_first_reported_Invalid << 0 ) + ( le.dt_vendor_last_reported_Invalid << 2 ) + ( le.dt_first_seen_Invalid << 4 ) + ( le.dt_last_seen_Invalid << 6 ) + ( le.corp_ra_dt_first_seen_Invalid << 8 ) + ( le.corp_ra_dt_last_seen_Invalid << 10 ) + ( le.corp_key_Invalid << 12 ) + ( le.corp_vendor_Invalid << 14 ) + ( le.corp_state_origin_Invalid << 15 ) + ( le.corp_process_date_Invalid << 16 ) + ( le.corp_orig_sos_charter_nbr_Invalid << 18 ) + ( le.corp_ln_name_type_cd_Invalid << 20 ) + ( le.corp_filing_date_Invalid << 21 ) + ( le.corp_status_cd_Invalid << 23 ) + ( le.corp_inc_state_Invalid << 24 ) + ( le.corp_inc_date_Invalid << 25 ) + ( le.corp_term_exist_exp_Invalid << 27 ) + ( le.corp_term_exist_desc_Invalid << 28 ) + ( le.corp_foreign_domestic_ind_Invalid << 29 ) + ( le.corp_forgn_state_desc_Invalid << 30 ) + ( le.corp_forgn_date_Invalid << 31 ) + ( le.corp_orig_org_structure_cd_Invalid << 33 ) + ( le.corp_for_profit_ind_Invalid << 34 ) + ( le.corp_country_of_formation_Invalid << 35 ) + ( le.recordorigin_Invalid << 36 ) + ( le.InternalField1_Invalid << 37 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -95,22 +93,21 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.corp_state_origin_Invalid := (le.ScrubsBits1 >> 15) & 1;
     SELF.corp_process_date_Invalid := (le.ScrubsBits1 >> 16) & 3;
     SELF.corp_orig_sos_charter_nbr_Invalid := (le.ScrubsBits1 >> 18) & 3;
-    SELF.corp_legal_name_Invalid := (le.ScrubsBits1 >> 20) & 1;
-    SELF.corp_ln_name_type_cd_Invalid := (le.ScrubsBits1 >> 21) & 1;
-    SELF.corp_filing_date_Invalid := (le.ScrubsBits1 >> 22) & 3;
-    SELF.corp_status_cd_Invalid := (le.ScrubsBits1 >> 24) & 1;
-    SELF.corp_inc_state_Invalid := (le.ScrubsBits1 >> 25) & 1;
-    SELF.corp_inc_date_Invalid := (le.ScrubsBits1 >> 26) & 3;
-    SELF.corp_term_exist_exp_Invalid := (le.ScrubsBits1 >> 28) & 1;
-    SELF.corp_term_exist_desc_Invalid := (le.ScrubsBits1 >> 29) & 1;
-    SELF.corp_foreign_domestic_ind_Invalid := (le.ScrubsBits1 >> 30) & 1;
-    SELF.corp_forgn_state_desc_Invalid := (le.ScrubsBits1 >> 31) & 1;
-    SELF.corp_forgn_date_Invalid := (le.ScrubsBits1 >> 32) & 3;
-    SELF.corp_orig_org_structure_cd_Invalid := (le.ScrubsBits1 >> 34) & 1;
-    SELF.corp_for_profit_ind_Invalid := (le.ScrubsBits1 >> 35) & 1;
-    SELF.corp_country_of_formation_Invalid := (le.ScrubsBits1 >> 36) & 1;
-    SELF.recordorigin_Invalid := (le.ScrubsBits1 >> 37) & 1;
-    SELF.InternalField1_Invalid := (le.ScrubsBits1 >> 38) & 1;
+    SELF.corp_ln_name_type_cd_Invalid := (le.ScrubsBits1 >> 20) & 1;
+    SELF.corp_filing_date_Invalid := (le.ScrubsBits1 >> 21) & 3;
+    SELF.corp_status_cd_Invalid := (le.ScrubsBits1 >> 23) & 1;
+    SELF.corp_inc_state_Invalid := (le.ScrubsBits1 >> 24) & 1;
+    SELF.corp_inc_date_Invalid := (le.ScrubsBits1 >> 25) & 3;
+    SELF.corp_term_exist_exp_Invalid := (le.ScrubsBits1 >> 27) & 1;
+    SELF.corp_term_exist_desc_Invalid := (le.ScrubsBits1 >> 28) & 1;
+    SELF.corp_foreign_domestic_ind_Invalid := (le.ScrubsBits1 >> 29) & 1;
+    SELF.corp_forgn_state_desc_Invalid := (le.ScrubsBits1 >> 30) & 1;
+    SELF.corp_forgn_date_Invalid := (le.ScrubsBits1 >> 31) & 3;
+    SELF.corp_orig_org_structure_cd_Invalid := (le.ScrubsBits1 >> 33) & 1;
+    SELF.corp_for_profit_ind_Invalid := (le.ScrubsBits1 >> 34) & 1;
+    SELF.corp_country_of_formation_Invalid := (le.ScrubsBits1 >> 35) & 1;
+    SELF.recordorigin_Invalid := (le.ScrubsBits1 >> 36) & 1;
+    SELF.InternalField1_Invalid := (le.ScrubsBits1 >> 37) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -148,7 +145,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     corp_orig_sos_charter_nbr_ALLOW_ErrorCount := COUNT(GROUP,h.corp_orig_sos_charter_nbr_Invalid=1);
     corp_orig_sos_charter_nbr_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_orig_sos_charter_nbr_Invalid=2);
     corp_orig_sos_charter_nbr_Total_ErrorCount := COUNT(GROUP,h.corp_orig_sos_charter_nbr_Invalid>0);
-    corp_legal_name_LENGTHS_ErrorCount := COUNT(GROUP,h.corp_legal_name_Invalid=1);
     corp_ln_name_type_cd_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_ln_name_type_cd_Invalid=1);
     corp_filing_date_ALLOW_ErrorCount := COUNT(GROUP,h.corp_filing_date_Invalid=1);
     corp_filing_date_CUSTOM_ErrorCount := COUNT(GROUP,h.corp_filing_date_Invalid=2);
@@ -170,7 +166,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     corp_country_of_formation_ALLOW_ErrorCount := COUNT(GROUP,h.corp_country_of_formation_Invalid=1);
     recordorigin_ENUM_ErrorCount := COUNT(GROUP,h.recordorigin_Invalid=1);
     InternalField1_ALLOW_ErrorCount := COUNT(GROUP,h.InternalField1_Invalid=1);
-    AnyRule_WithErrorsCount := COUNT(GROUP, h.dt_vendor_first_reported_Invalid > 0 OR h.dt_vendor_last_reported_Invalid > 0 OR h.dt_first_seen_Invalid > 0 OR h.dt_last_seen_Invalid > 0 OR h.corp_ra_dt_first_seen_Invalid > 0 OR h.corp_ra_dt_last_seen_Invalid > 0 OR h.corp_key_Invalid > 0 OR h.corp_vendor_Invalid > 0 OR h.corp_state_origin_Invalid > 0 OR h.corp_process_date_Invalid > 0 OR h.corp_orig_sos_charter_nbr_Invalid > 0 OR h.corp_legal_name_Invalid > 0 OR h.corp_ln_name_type_cd_Invalid > 0 OR h.corp_filing_date_Invalid > 0 OR h.corp_status_cd_Invalid > 0 OR h.corp_inc_state_Invalid > 0 OR h.corp_inc_date_Invalid > 0 OR h.corp_term_exist_exp_Invalid > 0 OR h.corp_term_exist_desc_Invalid > 0 OR h.corp_foreign_domestic_ind_Invalid > 0 OR h.corp_forgn_state_desc_Invalid > 0 OR h.corp_forgn_date_Invalid > 0 OR h.corp_orig_org_structure_cd_Invalid > 0 OR h.corp_for_profit_ind_Invalid > 0 OR h.corp_country_of_formation_Invalid > 0 OR h.recordorigin_Invalid > 0 OR h.InternalField1_Invalid > 0);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.dt_vendor_first_reported_Invalid > 0 OR h.dt_vendor_last_reported_Invalid > 0 OR h.dt_first_seen_Invalid > 0 OR h.dt_last_seen_Invalid > 0 OR h.corp_ra_dt_first_seen_Invalid > 0 OR h.corp_ra_dt_last_seen_Invalid > 0 OR h.corp_key_Invalid > 0 OR h.corp_vendor_Invalid > 0 OR h.corp_state_origin_Invalid > 0 OR h.corp_process_date_Invalid > 0 OR h.corp_orig_sos_charter_nbr_Invalid > 0 OR h.corp_ln_name_type_cd_Invalid > 0 OR h.corp_filing_date_Invalid > 0 OR h.corp_status_cd_Invalid > 0 OR h.corp_inc_state_Invalid > 0 OR h.corp_inc_date_Invalid > 0 OR h.corp_term_exist_exp_Invalid > 0 OR h.corp_term_exist_desc_Invalid > 0 OR h.corp_foreign_domestic_ind_Invalid > 0 OR h.corp_forgn_state_desc_Invalid > 0 OR h.corp_forgn_date_Invalid > 0 OR h.corp_orig_org_structure_cd_Invalid > 0 OR h.corp_for_profit_ind_Invalid > 0 OR h.corp_country_of_formation_Invalid > 0 OR h.recordorigin_Invalid > 0 OR h.InternalField1_Invalid > 0);
     FieldsChecked_WithErrors := 0;
     FieldsChecked_NoErrors := 0;
     Rules_WithErrors := 0;
@@ -178,9 +174,9 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   SummaryStats0 := TABLE(h,r);
   SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
-    SELF.FieldsChecked_WithErrors := IF(le.dt_vendor_first_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_key_Total_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_Total_ErrorCount > 0, 1, 0) + IF(le.corp_legal_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_status_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_exp_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_country_of_formation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0) + IF(le.InternalField1_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_WithErrors := IF(le.dt_vendor_first_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.corp_key_Total_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_Total_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_status_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_exp_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_Total_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_country_of_formation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0) + IF(le.InternalField1_ALLOW_ErrorCount > 0, 1, 0);
     SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
-    SELF.Rules_WithErrors := IF(le.dt_vendor_first_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_key_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_key_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_legal_name_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_status_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_exp_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_country_of_formation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0) + IF(le.InternalField1_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_WithErrors := IF(le.dt_vendor_first_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_ra_dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_key_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_key_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_vendor_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_state_origin_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_orig_sos_charter_nbr_LENGTHS_ErrorCount > 0, 1, 0) + IF(le.corp_ln_name_type_cd_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_filing_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_status_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_state_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_inc_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_exp_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_term_exist_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_foreign_domestic_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_state_desc_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.corp_forgn_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.corp_orig_org_structure_cd_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_for_profit_ind_ENUM_ErrorCount > 0, 1, 0) + IF(le.corp_country_of_formation_ALLOW_ErrorCount > 0, 1, 0) + IF(le.recordorigin_ENUM_ErrorCount > 0, 1, 0) + IF(le.InternalField1_ALLOW_ErrorCount > 0, 1, 0);
     SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
     SELF := le;
   END;
@@ -195,8 +191,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.dt_vendor_first_reported_Invalid,le.dt_vendor_last_reported_Invalid,le.dt_first_seen_Invalid,le.dt_last_seen_Invalid,le.corp_ra_dt_first_seen_Invalid,le.corp_ra_dt_last_seen_Invalid,le.corp_key_Invalid,le.corp_vendor_Invalid,le.corp_state_origin_Invalid,le.corp_process_date_Invalid,le.corp_orig_sos_charter_nbr_Invalid,le.corp_legal_name_Invalid,le.corp_ln_name_type_cd_Invalid,le.corp_filing_date_Invalid,le.corp_status_cd_Invalid,le.corp_inc_state_Invalid,le.corp_inc_date_Invalid,le.corp_term_exist_exp_Invalid,le.corp_term_exist_desc_Invalid,le.corp_foreign_domestic_ind_Invalid,le.corp_forgn_state_desc_Invalid,le.corp_forgn_date_Invalid,le.corp_orig_org_structure_cd_Invalid,le.corp_for_profit_ind_Invalid,le.corp_country_of_formation_Invalid,le.recordorigin_Invalid,le.InternalField1_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),Fields.InvalidMessage_dt_first_seen(le.dt_first_seen_Invalid),Fields.InvalidMessage_dt_last_seen(le.dt_last_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_first_seen(le.corp_ra_dt_first_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_last_seen(le.corp_ra_dt_last_seen_Invalid),Fields.InvalidMessage_corp_key(le.corp_key_Invalid),Fields.InvalidMessage_corp_vendor(le.corp_vendor_Invalid),Fields.InvalidMessage_corp_state_origin(le.corp_state_origin_Invalid),Fields.InvalidMessage_corp_process_date(le.corp_process_date_Invalid),Fields.InvalidMessage_corp_orig_sos_charter_nbr(le.corp_orig_sos_charter_nbr_Invalid),Fields.InvalidMessage_corp_legal_name(le.corp_legal_name_Invalid),Fields.InvalidMessage_corp_ln_name_type_cd(le.corp_ln_name_type_cd_Invalid),Fields.InvalidMessage_corp_filing_date(le.corp_filing_date_Invalid),Fields.InvalidMessage_corp_status_cd(le.corp_status_cd_Invalid),Fields.InvalidMessage_corp_inc_state(le.corp_inc_state_Invalid),Fields.InvalidMessage_corp_inc_date(le.corp_inc_date_Invalid),Fields.InvalidMessage_corp_term_exist_exp(le.corp_term_exist_exp_Invalid),Fields.InvalidMessage_corp_term_exist_desc(le.corp_term_exist_desc_Invalid),Fields.InvalidMessage_corp_foreign_domestic_ind(le.corp_foreign_domestic_ind_Invalid),Fields.InvalidMessage_corp_forgn_state_desc(le.corp_forgn_state_desc_Invalid),Fields.InvalidMessage_corp_forgn_date(le.corp_forgn_date_Invalid),Fields.InvalidMessage_corp_orig_org_structure_cd(le.corp_orig_org_structure_cd_Invalid),Fields.InvalidMessage_corp_for_profit_ind(le.corp_for_profit_ind_Invalid),Fields.InvalidMessage_corp_country_of_formation(le.corp_country_of_formation_Invalid),Fields.InvalidMessage_recordorigin(le.recordorigin_Invalid),Fields.InvalidMessage_InternalField1(le.InternalField1_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.dt_vendor_first_reported_Invalid,le.dt_vendor_last_reported_Invalid,le.dt_first_seen_Invalid,le.dt_last_seen_Invalid,le.corp_ra_dt_first_seen_Invalid,le.corp_ra_dt_last_seen_Invalid,le.corp_key_Invalid,le.corp_vendor_Invalid,le.corp_state_origin_Invalid,le.corp_process_date_Invalid,le.corp_orig_sos_charter_nbr_Invalid,le.corp_ln_name_type_cd_Invalid,le.corp_filing_date_Invalid,le.corp_status_cd_Invalid,le.corp_inc_state_Invalid,le.corp_inc_date_Invalid,le.corp_term_exist_exp_Invalid,le.corp_term_exist_desc_Invalid,le.corp_foreign_domestic_ind_Invalid,le.corp_forgn_state_desc_Invalid,le.corp_forgn_date_Invalid,le.corp_orig_org_structure_cd_Invalid,le.corp_for_profit_ind_Invalid,le.corp_country_of_formation_Invalid,le.recordorigin_Invalid,le.InternalField1_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),Fields.InvalidMessage_dt_first_seen(le.dt_first_seen_Invalid),Fields.InvalidMessage_dt_last_seen(le.dt_last_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_first_seen(le.corp_ra_dt_first_seen_Invalid),Fields.InvalidMessage_corp_ra_dt_last_seen(le.corp_ra_dt_last_seen_Invalid),Fields.InvalidMessage_corp_key(le.corp_key_Invalid),Fields.InvalidMessage_corp_vendor(le.corp_vendor_Invalid),Fields.InvalidMessage_corp_state_origin(le.corp_state_origin_Invalid),Fields.InvalidMessage_corp_process_date(le.corp_process_date_Invalid),Fields.InvalidMessage_corp_orig_sos_charter_nbr(le.corp_orig_sos_charter_nbr_Invalid),Fields.InvalidMessage_corp_ln_name_type_cd(le.corp_ln_name_type_cd_Invalid),Fields.InvalidMessage_corp_filing_date(le.corp_filing_date_Invalid),Fields.InvalidMessage_corp_status_cd(le.corp_status_cd_Invalid),Fields.InvalidMessage_corp_inc_state(le.corp_inc_state_Invalid),Fields.InvalidMessage_corp_inc_date(le.corp_inc_date_Invalid),Fields.InvalidMessage_corp_term_exist_exp(le.corp_term_exist_exp_Invalid),Fields.InvalidMessage_corp_term_exist_desc(le.corp_term_exist_desc_Invalid),Fields.InvalidMessage_corp_foreign_domestic_ind(le.corp_foreign_domestic_ind_Invalid),Fields.InvalidMessage_corp_forgn_state_desc(le.corp_forgn_state_desc_Invalid),Fields.InvalidMessage_corp_forgn_date(le.corp_forgn_date_Invalid),Fields.InvalidMessage_corp_orig_org_structure_cd(le.corp_orig_org_structure_cd_Invalid),Fields.InvalidMessage_corp_for_profit_ind(le.corp_for_profit_ind_Invalid),Fields.InvalidMessage_corp_country_of_formation(le.corp_country_of_formation_Invalid),Fields.InvalidMessage_recordorigin(le.recordorigin_Invalid),Fields.InvalidMessage_InternalField1(le.InternalField1_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.dt_vendor_first_reported_Invalid,'ALLOW','CUSTOM','UNKNOWN')
           ,CHOOSE(le.dt_vendor_last_reported_Invalid,'ALLOW','CUSTOM','UNKNOWN')
@@ -209,7 +205,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.corp_state_origin_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.corp_process_date_Invalid,'ALLOW','CUSTOM','UNKNOWN')
           ,CHOOSE(le.corp_orig_sos_charter_nbr_Invalid,'ALLOW','LENGTHS','UNKNOWN')
-          ,CHOOSE(le.corp_legal_name_Invalid,'LENGTHS','UNKNOWN')
           ,CHOOSE(le.corp_ln_name_type_cd_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.corp_filing_date_Invalid,'ALLOW','CUSTOM','UNKNOWN')
           ,CHOOSE(le.corp_status_cd_Invalid,'ENUM','UNKNOWN')
@@ -225,11 +220,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.corp_country_of_formation_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.recordorigin_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.InternalField1_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_filing_date','corp_status_cd','corp_inc_state','corp_inc_date','corp_term_exist_exp','corp_term_exist_desc','corp_foreign_domestic_ind','corp_forgn_state_desc','corp_forgn_date','corp_orig_org_structure_cd','corp_for_profit_ind','corp_country_of_formation','recordorigin','InternalField1','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter_nbr','invalid_mandatory','invalid_name_type_code','invalid_date','invalid_status_cd','invalid_state_origin','invalid_date','invalid_numeric','invalid_alphablank','invalid_foreign_domestic_ind','invalid_st_country','invalid_date','invalid_org_type_cd','invalid_flag_code','invalid_st_country','invalid_recordorigin','invalid_alphablank','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.corp_ra_dt_first_seen,(SALT311.StrType)le.corp_ra_dt_last_seen,(SALT311.StrType)le.corp_key,(SALT311.StrType)le.corp_vendor,(SALT311.StrType)le.corp_state_origin,(SALT311.StrType)le.corp_process_date,(SALT311.StrType)le.corp_orig_sos_charter_nbr,(SALT311.StrType)le.corp_legal_name,(SALT311.StrType)le.corp_ln_name_type_cd,(SALT311.StrType)le.corp_filing_date,(SALT311.StrType)le.corp_status_cd,(SALT311.StrType)le.corp_inc_state,(SALT311.StrType)le.corp_inc_date,(SALT311.StrType)le.corp_term_exist_exp,(SALT311.StrType)le.corp_term_exist_desc,(SALT311.StrType)le.corp_foreign_domestic_ind,(SALT311.StrType)le.corp_forgn_state_desc,(SALT311.StrType)le.corp_forgn_date,(SALT311.StrType)le.corp_orig_org_structure_cd,(SALT311.StrType)le.corp_for_profit_ind,(SALT311.StrType)le.corp_country_of_formation,(SALT311.StrType)le.recordorigin,(SALT311.StrType)le.InternalField1,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_vendor','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_ln_name_type_cd','corp_filing_date','corp_status_cd','corp_inc_state','corp_inc_date','corp_term_exist_exp','corp_term_exist_desc','corp_foreign_domestic_ind','corp_forgn_state_desc','corp_forgn_date','corp_orig_org_structure_cd','corp_for_profit_ind','corp_country_of_formation','recordorigin','InternalField1','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_corp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter_nbr','invalid_name_type_code','invalid_date','invalid_status_cd','invalid_state_origin','invalid_date','invalid_numeric','invalid_alphablank','invalid_foreign_domestic_ind','invalid_st_country','invalid_date','invalid_org_type_cd','invalid_flag_code','invalid_st_country','invalid_recordorigin','invalid_alphablank','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.corp_ra_dt_first_seen,(SALT311.StrType)le.corp_ra_dt_last_seen,(SALT311.StrType)le.corp_key,(SALT311.StrType)le.corp_vendor,(SALT311.StrType)le.corp_state_origin,(SALT311.StrType)le.corp_process_date,(SALT311.StrType)le.corp_orig_sos_charter_nbr,(SALT311.StrType)le.corp_ln_name_type_cd,(SALT311.StrType)le.corp_filing_date,(SALT311.StrType)le.corp_status_cd,(SALT311.StrType)le.corp_inc_state,(SALT311.StrType)le.corp_inc_date,(SALT311.StrType)le.corp_term_exist_exp,(SALT311.StrType)le.corp_term_exist_desc,(SALT311.StrType)le.corp_foreign_domestic_ind,(SALT311.StrType)le.corp_forgn_state_desc,(SALT311.StrType)le.corp_forgn_date,(SALT311.StrType)le.corp_orig_org_structure_cd,(SALT311.StrType)le.corp_for_profit_ind,(SALT311.StrType)le.corp_country_of_formation,(SALT311.StrType)le.recordorigin,(SALT311.StrType)le.InternalField1,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,27,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,26,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -251,7 +246,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'corp_state_origin:invalid_state_origin:ENUM'
           ,'corp_process_date:invalid_date:ALLOW','corp_process_date:invalid_date:CUSTOM'
           ,'corp_orig_sos_charter_nbr:invalid_charter_nbr:ALLOW','corp_orig_sos_charter_nbr:invalid_charter_nbr:LENGTHS'
-          ,'corp_legal_name:invalid_mandatory:LENGTHS'
           ,'corp_ln_name_type_cd:invalid_name_type_code:CUSTOM'
           ,'corp_filing_date:invalid_date:ALLOW','corp_filing_date:invalid_date:CUSTOM'
           ,'corp_status_cd:invalid_status_cd:ENUM'
@@ -286,7 +280,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Fields.InvalidMessage_corp_state_origin(1)
           ,Fields.InvalidMessage_corp_process_date(1),Fields.InvalidMessage_corp_process_date(2)
           ,Fields.InvalidMessage_corp_orig_sos_charter_nbr(1),Fields.InvalidMessage_corp_orig_sos_charter_nbr(2)
-          ,Fields.InvalidMessage_corp_legal_name(1)
           ,Fields.InvalidMessage_corp_ln_name_type_cd(1)
           ,Fields.InvalidMessage_corp_filing_date(1),Fields.InvalidMessage_corp_filing_date(2)
           ,Fields.InvalidMessage_corp_status_cd(1)
@@ -321,7 +314,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.corp_state_origin_ENUM_ErrorCount
           ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount
           ,le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount,le.corp_orig_sos_charter_nbr_LENGTHS_ErrorCount
-          ,le.corp_legal_name_LENGTHS_ErrorCount
           ,le.corp_ln_name_type_cd_CUSTOM_ErrorCount
           ,le.corp_filing_date_ALLOW_ErrorCount,le.corp_filing_date_CUSTOM_ErrorCount
           ,le.corp_status_cd_ENUM_ErrorCount
@@ -356,7 +348,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.corp_state_origin_ENUM_ErrorCount
           ,le.corp_process_date_ALLOW_ErrorCount,le.corp_process_date_CUSTOM_ErrorCount
           ,le.corp_orig_sos_charter_nbr_ALLOW_ErrorCount,le.corp_orig_sos_charter_nbr_LENGTHS_ErrorCount
-          ,le.corp_legal_name_LENGTHS_ErrorCount
           ,le.corp_ln_name_type_cd_CUSTOM_ErrorCount
           ,le.corp_filing_date_ALLOW_ErrorCount,le.corp_filing_date_CUSTOM_ErrorCount
           ,le.corp_status_cd_ENUM_ErrorCount
@@ -424,7 +415,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'corp_state_origin:' + getFieldTypeText(h.corp_state_origin) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'corp_process_date:' + getFieldTypeText(h.corp_process_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'corp_orig_sos_charter_nbr:' + getFieldTypeText(h.corp_orig_sos_charter_nbr) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
-          ,'corp_legal_name:' + getFieldTypeText(h.corp_legal_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'corp_ln_name_type_cd:' + getFieldTypeText(h.corp_ln_name_type_cd) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'corp_ln_name_type_desc:' + getFieldTypeText(h.corp_ln_name_type_desc) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
           ,'corp_supp_nbr:' + getFieldTypeText(h.corp_supp_nbr) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
@@ -714,7 +704,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_corp_state_origin_cnt
           ,le.populated_corp_process_date_cnt
           ,le.populated_corp_orig_sos_charter_nbr_cnt
-          ,le.populated_corp_legal_name_cnt
           ,le.populated_corp_ln_name_type_cd_cnt
           ,le.populated_corp_ln_name_type_desc_cnt
           ,le.populated_corp_supp_nbr_cnt
@@ -1004,7 +993,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_corp_state_origin_pcnt
           ,le.populated_corp_process_date_pcnt
           ,le.populated_corp_orig_sos_charter_nbr_pcnt
-          ,le.populated_corp_legal_name_pcnt
           ,le.populated_corp_ln_name_type_cd_pcnt
           ,le.populated_corp_ln_name_type_desc_pcnt
           ,le.populated_corp_supp_nbr_pcnt
@@ -1281,7 +1269,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.populated_InternalField1_pcnt,0);
       SELF.ErrorMessage := '';
     END;
-    FieldPopStats := NORMALIZE(hygiene_summaryStats,289,xNormHygieneStats(LEFT,COUNTER,'POP'));
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,288,xNormHygieneStats(LEFT,COUNTER,'POP'));
  
   // record count stats
     SALT311.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
@@ -1297,7 +1285,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
  
     mod_Delta := Delta(prevDS, PROJECT(h, Layout_in_file));
     deltaHygieneSummary := mod_Delta.DifferenceSummary;
-    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),289,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),288,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
     deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
                                       'Updates:count_Updates:DELTA',
                                       TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
