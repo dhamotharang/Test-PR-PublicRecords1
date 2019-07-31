@@ -3,7 +3,13 @@
 export constants:= module;
 
   EXPORT STRINGSIMILARCONSTANT := 5;
-
+  //v--- per the product requirements document, "... data is in hundreds(?) of thousands",
+  //     but on 09/21/12 Debra Winkleman in Risk Data Receiving contacted the data  
+  //     supplier and their contact person says it is in thousands.
+  // RQ-14844 - Sales is now in 100s;	
+  // RQ-16262 - Sales back to 1000s
+  EXPORT EbrAnnSalesMultiplier :=	1000;
+  
   // v--- leftover from BIP1?, no longer needed?
 	export unsigned4 section_ContactID                     :=  1 << 1;
 	//section_feinID                                       := 2;

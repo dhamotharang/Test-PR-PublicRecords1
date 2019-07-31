@@ -983,7 +983,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	Liens := Business_Risk_BIP.getLiens(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
 
-	Inquiries := Business_Risk_BIP.getInquiries(LinkIDsFound, Options, linkingOptions, AllowedSourcesSet);
+	Inquiries := Business_Risk_BIP.getInquiries(LinkIDsFound, Options, AllowedSourcesSet, mod_access);
 
 	otherSources := Business_Risk_BIP.getOtherSources(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
 

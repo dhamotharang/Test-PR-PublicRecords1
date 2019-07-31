@@ -2,7 +2,7 @@ IMPORT BatchShare, Gateway;
 
 EXPORT IParam := MODULE
 
-	// DidVille.Did_Batch_Service_Raw() params not in BatchShare.IParam.BatchParams
+	// DidVille.Did_Batch_Service_Raw() params not in BatchShare.IParam.BatchParamsV2
 	EXPORT DidVilleParams := INTERFACE(BatchShare.IParam.BatchParamsV2)
 		EXPORT STRING120 Appends := '';
 		EXPORT STRING3   AppendThreshold := '';
@@ -22,7 +22,7 @@ EXPORT IParam := MODULE
 			EXPORT BOOLEAN   IncludeRanking   := FALSE : STORED('IncludeRanking');
 			EXPORT BOOLEAN   PatriotProcess   := FALSE : STORED('PatriotProcess');
 			EXPORT STRING120 Verify           := ''    : STORED('Verify');
-			// BatchShare.IParam.getBatchParams() does not currently initialize
+			// BatchShare.IParam.getBatchParamsV2() does not currently initialize
 			EXPORT DATASET(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
 		END;
 

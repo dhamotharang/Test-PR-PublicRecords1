@@ -5,6 +5,8 @@ export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 	GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_extended) w_BankLiensCrim) := FUNCTION
 
 	insurance_fcra_filter := (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+  insurance_fcra_SODatafilter := (BSOptions & risk_indicators.iid_constants.BSOptions.InsuranceFCRASODataFilter) > 0;
+
 	//Adding Sex Offenders
 	fcra_sex_offender_did_key := SexOffender.Key_SexOffender_DID(true);
 	fcra_sex_offender_spk_key := SexOffender.Key_SexOffender_SPK(true);
@@ -98,7 +100,7 @@ export Boca_Shell_SO_FCRAHist (integer bsVersion, unsigned8 BSOptions=0,
 
 	with_sex_offenders := join(doc_rolled, sex_offenders_rolled, left.seq=right.seq,
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_extended,
-			self.BJL.criminal_count :=  if(insurance_fcra_filter, left.BJL.criminal_count,//can't return a SO count for insurance
+			self.BJL.criminal_count :=  if(insurance_fcra_filter or insurance_fcra_SODatafilter, left.BJL.criminal_count,//can't return a SO count for insurance
 				left.BJL.criminal_count + right.BJL.criminal_count);
 			self := left), left outer, keep(1));
 

@@ -73,7 +73,7 @@ EXPORT TestSeedFunctionHelperBusiness := MODULE
                                                             DueDiligence.Common.createNVPair('BusAssetOwnAircraft', INVALID_BUSINESS_SCORE) +
                                                             DueDiligence.Common.createNVPair('BusAssetOwnWatercraft', INVALID_BUSINESS_SCORE) +
                                                             DueDiligence.Common.createNVPair('BusAssetOwnVehicle', INVALID_BUSINESS_SCORE) +
-                                                            DueDiligence.Common.createNVPair('BusAccessToFundSales', NOT_CURRENTLY_IMPLEMENTED) +
+                                                            DueDiligence.Common.createNVPair('BusAccessToFundSales', INVALID_BUSINESS_SCORE) +
                                                             DueDiligence.Common.createNVPair('BusAccessToFundsProperty', INVALID_BUSINESS_SCORE) +
                                                             DueDiligence.Common.createNVPair('BusGeographic', INVALID_BUSINESS_SCORE) +
                                                             DueDiligence.Common.createNVPair('BusValidity', INVALID_BUSINESS_SCORE) +
@@ -98,7 +98,7 @@ EXPORT TestSeedFunctionHelperBusiness := MODULE
                                                                     DueDiligence.Common.createNVPair('BusAssetOwnAircraft_Flag', INVALID_BUSINESS_FLAGS) +
                                                                     DueDiligence.Common.createNVPair('BusAssetOwnWatercraft_Flag', INVALID_BUSINESS_FLAGS) +
                                                                     DueDiligence.Common.createNVPair('BusAssetOwnVehicle_Flag', INVALID_BUSINESS_FLAGS) +
-                                                                    DueDiligence.Common.createNVPair('BusAccessToFundsSales_Flag', NOT_CURRENTLY_IMPLEMENTED) +
+                                                                    DueDiligence.Common.createNVPair('BusAccessToFundsSales_Flag', INVALID_BUSINESS_FLAGS) +
                                                                     DueDiligence.Common.createNVPair('BusAccessToFundsProperty_Flag', INVALID_BUSINESS_FLAGS) +
                                                                     DueDiligence.Common.createNVPair('BusGeographic_Flag', INVALID_BUSINESS_FLAGS) +
                                                                     DueDiligence.Common.createNVPair('BusValidity_Flag', INVALID_BUSINESS_FLAGS) +

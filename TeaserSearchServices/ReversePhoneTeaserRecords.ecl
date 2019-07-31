@@ -1,4 +1,4 @@
-﻿import AutostandardI, iesp, doxie, dx_header, gateway, Gong, Risk_Indicators, PhonesInfo, Suppress, ut, bipv2,
+﻿import AutostandardI, iesp, doxie, dx_header, gateway, Gong, Risk_Indicators, Phones, dx_PhonesInfo, Suppress, ut, bipv2,
   MDR;
 
 EXPORT ReversePhoneTeaserRecords := Module
@@ -109,19 +109,13 @@ EXPORT Records(AutoStandardI.DataRestrictionI.params tempMod,
 												    AddrInfoFromPhoneInputOut,dppa_ok,glb_ok,,DRM);	
   
 	//bestInfo := if (NOT(exists(addrInfoFromPhoneInputOut), seleBest, AddrInfoFromPhoneInputOut);
-																							
-	PortedMetadatapayload := SORT(JOIN(phone_recs , PhonesInfo.Key_Phones.Ported_Metadata,
-																		 keyed(LEFT.PhoneVal = RIGHT.phone),
-																		 TRANSFORM(RIGHT), limit(0), keep(10000)),
-																		 -vendor_last_reported_dt);
-   PortedMetadatapayloadSlim := PortedMetadatapayload(((source = mdr.sourcetools.src_PhonesPorted_iConectiv 
-	                                                      OR source = mdr.sourcetools.src_PhonesPorted_TCPA) And (is_Ported))
-	                                                        OR
-																											 (source IN [mdr.sourcetools.src_Phones_LIDB, MDR.sourceTools.src_Phones_Lerg6] and (not(is_Ported)))
-                                                     );
+	//Since only serv type is needed calling only the phone_type key
+	phone_in := PROJECT(phone_recs, TRANSFORM(Phones.Layouts.rec_phoneLayout, SELF.phone := LEFT.PhoneVal));
+	PortedMetadatapayload := SORT(dx_PhonesInfo.RAW.GetPhoneType(phone_in), -vendor_last_reported_dt);																				
+
 
 	// this assumes 1 phone entry and one phone rec # returned for a given input.									 
-	String1 phoneType := IF (EXISTS(portedMetadatapayloadSlim), 
+	String1 phoneType := IF (EXISTS(PortedMetadatapayload), 
                             (STRING1) PortedMetadatapayload[1].serv, 
 														 '');																 						
 																					 

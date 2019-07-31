@@ -409,9 +409,11 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       RETURN pil_final;
 	END;
 		
-	EXPORT propertyRecsByDid(Ioptions in_mod):= FUNCTION
-      props_mod  := module (project(in_mod, PersonReports.input.property, opt)) end;
-      prop_raw   := PersonReports.Property_Records(in_did,props_mod).property_v2;
+	EXPORT propertyRecsByDid(Ioptions in_mod, doxie.IDataAccess mod_access):= FUNCTION
+      prop_mod  := module (PersonReports.IParam.property)
+        $.IParams.MAC_copy_old_report_fields(in_mod); //only report part is present in the input
+      end;  
+      prop_raw   := PersonReports.Property_Records(in_did,mod_access,prop_mod).property_v2;
       prop_clean := project(prop_raw,
                      TRANSFORM(iesp.property.t_PropertyReport2Record,
                         SELF.parcelnumber:= STD.Str.FilterOut(LEFT.parcelnumber, '- '),

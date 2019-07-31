@@ -54,6 +54,7 @@
    <part name="SuppressPortedTestDate" type="xsd:string"/>
    <part name="excludeLandlines" type="xsd:boolean"/>
    <part name="SuppressBlankNameAddress" type="xsd:boolean"/>
+   <part name="GetSSNBest" type="xsd:boolean" default="false"/>
 </message>
 */
 
@@ -67,7 +68,7 @@ if the permission is set. Try Qsent data if nothing found above.
 <message name="phone_noreconn_search" wuTimeout="300000">
 */
 
-IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, PhonesInfo, Royalty, STD, Suppress, ut, WSInput, D2C;
+IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, Royalty, STD, Suppress, ut, WSInput, D2C,SSNBest_Services, Phones;
 
 EXPORT phone_noreconn_search := MACRO 
 	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -81,7 +82,8 @@ EXPORT phone_noreconn_search := MACRO
 	boolean excludeBusiness := false : stored('ExcludeBusiness');
 	boolean excludeLandlines := false : stored('ExcludeLandlines');	
 	boolean SuppressNewPorting := excludeLandlines : stored('SuppressNewPorting');
- boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
+    boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
+	boolean GetSSNBest := false : stored('GetSSNBest');
 
 	doxie.MAC_Header_Field_Declare();
 	globalmod := AutoStandardI.GlobalModule();
@@ -341,8 +343,24 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 
 	resultsFilterRes := if(excludeResidence,resultsToMask(listing_type_bus <> '' or listing_type_res = ''), resultsToMask);
 	resultsFilterBus := if(excludeBusiness, resultsFilterRes(listing_type_res <> '' or listing_type_bus = ''), resultsFilterRes);
+	
+	// Append Gov SSN if requested
+	ssnBestParams := PROJECT (mod_access, SSNBest_Services.IParams.BatchParams, OPT);
+		
+	RecprepGovSSN := record
+		recordof(resultsFilterBus) - did ;
+		unsigned8 did ;
+	end;
+	
+	prepGovSSN := project(resultsFilterBus,Transform(RecprepGovSSN,self.did := (unsigned)left.did, self:=left));
+	
+	_withGovBestSSN := SSNBest_Services.Functions.fetchSSNs_generic(prepGovSSN, ssnBestParams, ssn, did, false); 
+	
+	withGovBestSSN  := PROJECT(_withGovBestSSN,TRANSFORM(recordof(resultsFilterBus),self.did := (string)left.did, self:=left));
 
-	Suppress.MAC_Mask(resultsFilterBus, cmp_res_out, ssn, blank, true, false,,,,SSN_mask_value);		
+	resultsGovSSN := if(GetSSNBest,withGovBestSSN,resultsFilterBus);
+
+	Suppress.MAC_Mask(resultsGovSSN, cmp_res_out, ssn, blank, true, false,,,,SSN_mask_value);		
 
 	// **************************************************************************************
 	// Start of June 2016 corrections to the 04/19/16 "RTP Synchrony Port Update" changes.
@@ -352,13 +370,18 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	// First sort/dedup to only keep unique phone#s to reduce the ported phones key join matches
 	ds_cmp_res_out_dd := dedup(sort(cmp_res_out,phone),phone);
 
-	// Then do a a one-time join to the "phones_ported_metadata" key (NOTE:key name is miss-leading
-	//    since it contains more than just "ported" phones) 
+	// Pull metadata records from phones_type and phones_transactions keys 
 	// and keep the matching key records to be used for mutiple places below.
 	
 
-	ds_ppmd_key_recs := join(ds_cmp_res_out_dd, PhonesInfo.Key_Phones.Ported_Metadata,
-															keyed(left.phone = right.phone)
+  phoneInfo := DEDUP(SORT(PROJECT(ds_cmp_res_out_dd, TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn, SELF.phoneno := LEFT.Phone, SELF := [])), phoneno), phoneno);	
+	  in_mod := MODULE(Phones.IParam.BatchParams)
+		EXPORT UNSIGNED	max_age_days := Phones.Constants.PhoneAttributes.LastActivityThreshold;
+	END; 
+	ds_ported_metadata := Phones.GetPhoneMetadata_wLERG6(phoneInfo,in_mod);
+
+	ds_ppmd_key_recs := join(ds_cmp_res_out_dd, ds_ported_metadata,
+															(left.phone = right.phone)
 															and (~IsCNSMR or right.source not in D2C.Constants.PhonemetadataRestrictedSources),
 													 transform(right),
 													 inner, limit(doxie.phone_noreconn_constants.MaxPortedMatches,skip));							 
@@ -367,8 +390,8 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	// left date_first/last_seen (+/-5 days) vs right port_start/end dates to save the port dates.
 	out_layout_plus_portinfo := record
 		out_layout;
-		PhonesInfo.Layout_common.portedMetadata_Main.port_start_dt;
-		PhonesInfo.Layout_common.portedMetadata_Main.port_end_dt;
+		Phones.Layouts.portedMetadata_Main.port_start_dt;
+		Phones.Layouts.portedMetadata_Main.port_end_dt;
 	end;
 
 	ds_ported_dt_match := join(cmp_res_out, ds_ppmd_key_recs,
@@ -593,4 +616,4 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 		 if(use_tg or use_qt or call_PVS or use_LR, parallel(disp_cnt, out_royal, out_rslt), parallel(disp_cnt, out_rslt)),out_rslt);
 
 ENDMACRO;
-// doxie.phone_noreconn_search();
+// doxie.phone_noreconn_search(); 

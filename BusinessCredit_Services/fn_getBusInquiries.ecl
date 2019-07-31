@@ -1,11 +1,22 @@
-﻿IMPORT BIPV2, BusinessCredit_Services, iesp, Inquiry_AccLogs, ut, std;
+﻿IMPORT AutoStandardI, BusinessCredit_Services, Doxie, iesp, Inquiry_AccLogs, ut, std;
 
 todays_date := (string) STD.Date.Today();
 
 EXPORT fn_getBusInquiries (BusinessCredit_Services.Iparam.reportrecords inmod) := FUNCTION
 
+  mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+    EXPORT dppa := inmod.DPPAPurpose;
+    EXPORT glb := inmod.GLBPurpose;
+    EXPORT ssnmask := inmod.ssnmask;
+    EXPORT dobmask := inmod.dobmask;
+    EXPORT ApplicationType := inmod.ApplicationType;
+    EXPORT Industry_Class := inmod.IndustryClass;
+    EXPORT DataPermissionMask := inmod.DataPermissionMask;
+    EXPORT DataRestrictionMask := inmod.DataRestrictionMask;
+  END;
+
 	InquiriesRaw			 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(inmod.BusinessIds, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
-	InquiriesUpdateRaw 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(inmod.BusinessIds, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
+	InquiriesUpdateRaw 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(inmod.BusinessIds, mod_access, inmod.FetchLevel, ,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
 	InquiriesAllTemp		:= InquiriesRaw + InquiriesUpdateRaw;
 
 	Inquiry_Slim_Rec := RECORD
@@ -41,5 +52,5 @@ EXPORT fn_getBusInquiries (BusinessCredit_Services.Iparam.reportrecords inmod) :
 
 	Inquiries_count_final := PROJECT(Inquiries_count , trans_inquiries(LEFT));
 	RETURN Inquiries_count_final;
-	
+
 END;

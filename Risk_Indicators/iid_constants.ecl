@@ -510,7 +510,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		BCBLienFtlr = 1									<< 29,
 		InsuranceFCRABankruptcyException = 1 << 30,
 		InsuranceFCRABankruptcyAllow10Yr = 1 << 31,
-		FilterVoter = 1									<< 32
+		FilterVoter = 1									<< 32,
+    InsuranceFCRASODataFilter       = 1 << 33
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
@@ -1152,6 +1153,35 @@ EXPORT FP3_FDN_Min_Input(string in_first, string in_last, string in_ssn, string 
 input_ok_fp3 := (in_first<>''and in_last<>''and in_ssn<>'') or (in_streetaddress<>'' and in_zip5<>''); 
 						
 return input_ok_fp3;						
+end;
+
+Export LexidDeceased_Lookup (boolean truedid, string ver_sources, boolean diddeceased):= function
+lexidDecFlag := Map(not truedid => '-1',
+								diddeceased => '1', //check ssa lexid key
+								STD.Str.Find(ver_sources,mdr.sourcetools.src_Death_Master, 1) > 0 => '1', //check header for DE source,  DS sources are converted to DE in iid_getheader
+								'0');	
+return lexidDecFlag;
+end;
+
+Export SSNDeceased_Lookup (boolean truedid, string In_SSN, string decsflag):= function
+
+SSNDecFlag := Map(not truedid or In_SSN='0' => '-1', 
+									decsflag='1' => '1', 
+									'0');
+
+return SSNDecFlag;
+end;
+
+Export inputssnflag_Lookup (string in_ssn, integer in_ssnpop, integer adl_ssn):= function
+
+inputssnflag := map(	
+		in_ssn in ['000000000','111111111','222222222','333333333','444444444','555555555','666666666','777777777','888888888','999999999'] => '0', // set repeating digits as not provided on input
+		in_ssnpop=0 and adl_ssn=1 => '1',
+		length(in_ssn)=4 => '2',
+		in_ssn<>'' and length(in_ssn)=9 => '3', 
+		'0');
+
+return inputssnflag;
 end;
 
 end;

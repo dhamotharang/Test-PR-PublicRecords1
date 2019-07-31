@@ -1,15 +1,20 @@
-EXPORT MacComputeImpactData (InDataset ,InProviderKey = '' , InState = '', InSanctionDate, InExpirationDate, InSuspectReason = '', InDataset2, In2ProviderKey = '', In2DateofService, In2PaidAmount) := FUNCTIONMACRO
+	EXPORT MacComputeImpactData (InDataset ,InProviderKey = '' , InState = '', InSanctionDate, InExpirationDate, InSuspectReason = '', InDataset2, In2ProviderKey = '', In2DateofService, In2PaidAmount) := FUNCTIONMACRO
 	
 	IMPORT AppendProviderAttributes;
-	FilterImpactAttrDs := InDataset ((InSuspectReason IN ['B001','C001'] AND (INTEGER) InSanctionDate > 0) OR (InSuspectReason IN ['C003'] AND (INTEGER)InExpirationDate > 0));
-
+	FilterImpactAttrDs  := InDataset ((InSuspectReason IN ['B001','C001'] AND (INTEGER) InSanctionDate > 0) OR (InSuspectReason IN ['C003'] AND (INTEGER)InExpirationDate > 0));
+	PatientImpactAttrDs := PROJECT (InDataset ((InSuspectReason IN ['G002'])), TRANSFORM(SuspectAddressVisualization.Layouts.HistoricalLayout, 
+			SELF.ProviderKey	:= 	'';
+			SELF.Reason				:= 	'';
+			SELF := LEFT;)
+	); 
+	
 	ProviderLayout := RECORD
 			STRING50  ProviderKey;
 			STRING2		State;
 			INTEGER4	SanctionDate;
 			INTEGER4	ExpirationDate;
 			STRING4	  Reason;
-			INTEGER8	PaidAmount;
+			REAL8	PaidAmount;
 			INTEGER4 	DateofService;
 	END;
 	
@@ -19,7 +24,7 @@ EXPORT MacComputeImpactData (InDataset ,InProviderKey = '' , InState = '', InSan
 			SELF.State						:=	LEFT.InState;
 			SELF.SanctionDate			:=	IF (LEFT.InSuspectReason IN ['B001','C001'], (INTEGER)LEFT.InSanctionDate,0);
 			SELF.ExpirationDate		:=	IF (LEFT.InSuspectReason IN ['C003'], (INTEGER)LEFT.InExpirationDate,0);
-			SELF.PaidAmount				:=	ROUND((REAL)RIGHT.In2PaidAmount);
+			SELF.PaidAmount				:=	(REAL)RIGHT.In2PaidAmount;
 			SELF.DateofService		:=	IF((INTEGER)RIGHT.In2DateofService > 0, (INTEGER)RIGHT.In2DateofService,0);
 			), HASH);
 
@@ -29,10 +34,14 @@ EXPORT MacComputeImpactData (InDataset ,InProviderKey = '' , InState = '', InSan
 	
 	ImpactStats := StateExclusionAmount + RevokedLicenseAmount + ExpiredLicenseAmount;
 	
-	HistoricalResults := JOIN (InDataset, ImpactStats, LEFT.InProviderKey = RIGHT.ProviderKey AND LEFT.InState = RIGHT.State AND LEFT.InSuspectReason = RIGHT.Reason AND LEFT.InSuspectReason IN ['B001', 'C001','C003'],  TRANSFORM(SuspectAddressVisualization.Layouts.HistoricalLayout, 
+	HistoricalResults := JOIN (InDataset(InSuspectReason <> 'G002'), ImpactStats, LEFT.InProviderKey = RIGHT.ProviderKey AND LEFT.InState = RIGHT.State AND LEFT.InSuspectReason = RIGHT.Reason AND LEFT.InSuspectReason IN ['B001', 'C001','C003'],  TRANSFORM(SuspectAddressVisualization.Layouts.HistoricalLayout, 
 			SELF.ProviderKey						:= 	MAP (LEFT.REASON IN ['A007'] => LEFT.ProviderKey, '');
 			SELF.Reason									:= 	'';
-			SELF.ImpactDollars := (STRING)RIGHT.ImpactAmount; SELF.ClaimCount := (STRING)RIGHT.ImpactCount; SELF := LEFT;), LEFT OUTER, HASH);
+			SELF.ImpactDollars					:=	MAP (LEFT.REASON IN ['G002','B001','C001','C003'] => (STRING)RIGHT.ImpactAmount, '');
+			SELF.ClaimCount							:=	MAP (LEFT.REASON IN ['G002','B001','C001','C003'] => (STRING)RIGHT.ImpactCount, '');
+			SELF := LEFT;), LEFT OUTER, HASH);
 	
-	RETURN HistoricalResults;
+	AddPatientResults := HistoricalResults + PatientImpactAttrDs;
+
+	RETURN AddPatientResults;
 ENDMACRO;

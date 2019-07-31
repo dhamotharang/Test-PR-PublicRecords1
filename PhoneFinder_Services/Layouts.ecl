@@ -1,4 +1,4 @@
-﻿﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhonesInfo,PhoneFraud, ThreatMetrix;
+﻿﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhoneFraud, ThreatMetrix, PhonesInfo;
 
 EXPORT Layouts :=
 MODULE
@@ -282,6 +282,7 @@ MODULE
 			UNSIGNED4 dt_last_seen;
 			STRING10  phone;
 			UNSIGNED4 dob;
+			STRING9   ssn;
 			STRING1   deceased;
 			STRING20  fname;
 			STRING20  mname;
@@ -410,6 +411,7 @@ MODULE
 								'STRING20 Identity' + %'cntIdentity'% + '_Middle;' +
 								'STRING20 Identity' + %'cntIdentity'% + '_Last;' +
 								'STRING5  Identity' + %'cntIdentity'% + '_Suffix;' +
+								'STRING9 Identity' + %'cntIdentity'% + '_SSN;' +
 								'STRING1  Identity' + %'cntIdentity'% + '_Deceased;' +
 								'STRING10 Identity' + %'cntIdentity'% + '_StreetNumber;' +
 								'STRING2  Identity' + %'cntIdentity'% + '_StreetPreDirection;' +
@@ -736,7 +738,7 @@ MODULE
 	END;	
 	
 	EXPORT PortedMetadata := RECORD
-		RECORDOF(PhonesInfo.Key_Phones.Ported_Metadata);	
+		RECORDOF(PhonesInfo.Key_Phones.Ported_Metadata);
 	END;	
 	
 	EXPORT DeltabaseResponse := RECORD                         

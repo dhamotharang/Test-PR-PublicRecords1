@@ -340,6 +340,7 @@ EXPORT LayoutsInternal := MODULE
     STRING sort_key;
     STRING sort_eventTypeCodeFull;
     UNSIGNED1 temp_chargeLevelCalcWeight;
+    UNSIGNED temp_category;
     DueDiligence.Layouts.CriminalOffenses
   END;
 
@@ -374,7 +375,7 @@ EXPORT LayoutsInternal := MODULE
     DueDiligence.Layouts.CriminalTopLevel AND NOT [source, offenseCharge, offenseChargeLevelReported, offenseConviction];
         
     //Source/Detail info
-    DueDiligence.Layouts.CriminalSources AND NOT [partyNames, validate_trafficRelated, validate_category, validate_eventType];
+    DueDiligence.Layouts.CriminalSources AND NOT [partyNames];
 
     //Party Names
     STRING120 partyName;

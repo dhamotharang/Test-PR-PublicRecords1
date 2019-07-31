@@ -103,8 +103,9 @@ combo := if(isFCRA, /*group( sort (*/ combined/*, seq), seq)*/, g_history);
 // no longer use today's date for the calculation, use the build date							
 cdate := Risk_Indicators.get_Build_date('targus_build_version');
 												
+targus_address_key := if(isFCRA, targus.Key_Targus_FCRA_Address, targus.Key_Targus_Address);
 
-Layout_Dirs_Address add_targus(input le, targus.Key_Targus_Address rt) := transform
+Layout_Dirs_Address add_targus(input le, targus_address_key rt) := transform
 	self.phone10 := if(stringlib.stringtouppercase(rt.phone_number[8..10])='XXX', rt.phone_number[1..7], rt.phone_number);
 	//self.area_code := rt.phone_number[1..3];
 	//self.phone7 := rt.phone_number[4..10];
@@ -130,7 +131,7 @@ Layout_Dirs_Address add_targus(input le, targus.Key_Targus_Address rt) := transf
 	self := [];
 end;
 // get targus white pages info using the input address
-targus_wp_nonfcra_roxie := join(input, targus.Key_Targus_Address,
+targus_wp_nonfcra_roxie := join(input, targus_address_key,
 														trim(left.prim_name)!='' and trim(left.z5)!='' and
 														(keyed(right.prim_name=left.prim_name) and keyed(right.zip=left.z5) and
 														keyed(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
@@ -143,7 +144,7 @@ targus_wp_nonfcra_roxie := join(input, targus.Key_Targus_Address,
 														keep(100));
 														
 targus_wp_nonfcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),  
-														distribute(pull(targus.Key_Targus_Address(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, zip, prim_range)),
+														distribute(pull(targus_address_key(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, zip, prim_range)),
 														((right.prim_name=left.prim_name) and (right.zip=left.z5) and
 														(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
 														add_targus(left,right),
@@ -160,7 +161,7 @@ targus_wp_nonfcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)
 	targus_wp_nonfcra := targus_wp_nonfcra_roxie;
 #END
 
-targus_wp_fcra_roxie := join(input, targus.Key_Targus_FCRA_Address,
+targus_wp_fcra_roxie := join(input, targus_address_key,
 												trim(left.prim_name)!='' and trim(left.z5)!='' and
 												(keyed(right.prim_name=left.prim_name) and keyed(right.zip=left.z5) and
 												keyed(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
@@ -172,7 +173,7 @@ targus_wp_fcra_roxie := join(input, targus.Key_Targus_FCRA_Address,
 												),
 												keep(100));
 targus_wp_fcra_thor := join(distribute(input(trim(prim_name)!='' and trim(z5)!=''), hash64(prim_name, z5, prim_range)),  
-												distribute(pull(targus.Key_Targus_FCRA_Address(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, zip, prim_range)),
+												distribute(pull(targus_address_key(trim(prim_name)!='' and trim(z5)!='')), hash64(prim_name, zip, prim_range)),
 												((right.prim_name=left.prim_name) and (right.zip=left.z5) and
 												(right.prim_range=left.prim_range) and ut.NNEQ(left.sec_range,right.sec_range)),
 												add_targus(left,right),

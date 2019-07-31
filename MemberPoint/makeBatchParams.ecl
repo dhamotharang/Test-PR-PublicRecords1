@@ -8,7 +8,6 @@ IMPORT Gateway, iesp, Std;
 		optUniqueIdScoreThreshold:=IF(inOpts.UniqueIdScoreThreshold='',MemberPoint.Constants.Defaults.UniqueIdScoreThreshold,(INTEGER)inOpts.UniqueIdScoreThreshold);
 		// optUniqueIdScoreThreshold:=IF(inOpts.UniqueIdScoreThreshold='',MemberPoint.Constants.Defaults.UniqueIdScoreThreshold,(unsigned)inOpts.UniqueIdScoreThreshold);
 
-		// base_params := BatchShare.IParam.getBatchParams();
 		base_params := MemberPoint.IParam.getBatchParams();
 		// project the base params to read shared parameters from store.
 		BatchParams := MODULE(PROJECT(base_params, MemberPoint.IParam.BatchParams, OPT))
@@ -47,4 +46,5 @@ IMPORT Gateway, iesp, Std;
 		END;
 		RETURN BatchParams;
 		
-	END;	
+	END;
+  

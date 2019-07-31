@@ -141,7 +141,7 @@ EXPORT Functions := MODULE
                             MIDEX_Services.Constants.COMP_SEARCH);
                             
 		 MidexReportDataByMariNum :=  
-		           MIDEX_Services.Raw_ProfessionalLicenses.license.report_view.by_mari_num(mari_rid,,,,MidexSearchType); 							 
+		           MIDEX_Services.Raw_ProfessionalLicenses.license.report_view.by_mari_num(mari_rid,mod_access,,MidexSearchType); 							 
 
 		 licenseListMari := Project(MidexReportDataBymariNum,TRANSFORM(MIDEX_Services.Layouts.LicenseReport_Layout,
                               self.licenses := left.licenses;

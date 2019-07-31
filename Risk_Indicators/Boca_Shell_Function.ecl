@@ -16,7 +16,11 @@ EXPORT Boca_Shell_Function (GROUPED DATASET (risk_indicators.Layout_output) iid1
 														boolean doScore=false, boolean nugen = false, boolean filter_out_fares = false,
 														string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 														unsigned8 BSOptions = 0,
-														string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) :=  
+														string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, 
+                            unsigned1 LexIdSourceOptout = 1,
+                            string TransactionID = '',
+                            string BatchUID = '',
+                            unsigned6 GlobalCompanyId = 0) :=  
 FUNCTION
 
 // for batch queries, dedup the input to reduce searching
@@ -81,7 +85,11 @@ iid := group(iid_deduped, seq);
                                    FALSE, isLN, dppa, dppa_ok,
                                    includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, BSversion,
 																	 false, doScore, filter_out_fares,
-																	 DataRestriction, BSOptions, glb, gateways, DataPermission);
+																	 DataRestriction, BSOptions, glb, gateways, DataPermission,
+                                   LexIdSourceOptout := LexIdSourceOptout, 
+                                   TransactionID := TransactionID, 
+                                   BatchUID := BatchUID, 
+                                   GlobalCompanyID := GlobalCompanyID);
 
 	shell_results := per_prop;
 #end
