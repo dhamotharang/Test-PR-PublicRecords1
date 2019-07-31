@@ -242,7 +242,7 @@ EXPORT mod_Validation := MODULE
 					self := LEFT;
 					self := []));
 							
-	EXPORT ExceptionFile(Dataset(Layouts2.rException) ds) := 
+	EXPORT ExceptionFile(Dataset(Layouts2.rExceptionEx) ds) := 
 				PROJECT(ds, TRANSFORM(Layouts2.rExceptionEx,
 					self.dsErrs := 
 							validProgramState(left.SourceProgramState, left.SourceProgramState, left.RecordCode)
