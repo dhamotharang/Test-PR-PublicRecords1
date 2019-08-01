@@ -14,7 +14,23 @@ spraying := rootDir+'spraying/';
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, ready, '*.dat')):independent;
 dsFileListSorted := sort(dsFileList,modified);
 
-fname := dsFileListSorted[1].Name:independent;
+new_rec:=record
+	dsFileListSorted;
+	string20 customer_id;
+	string20 file_type;
+end;
+Proj_dsFileListSorted := project(dsFileListSorted, transform(new_rec,
+	self.customer_id := regexfind('([0-9])\\d+',left.name,0);
+	self.file_type := regexfind('IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
+	self:=left));
+	
+J_dsFileListSorted	:= join(Proj_dsFileListSorted, FraudGovPlatform.Files().Flags.CustomerActiveSprays,
+		left.customer_id = right.customer_id and
+		left.file_type = right.file_type
+	 );
+
+
+fname := J_dsFileListSorted[1].Name:independent;
 
 // https://confluence.rsi.lexisnexis.com/display/GTG/Naming+Conventions
 fn := STD.Str.SplitWords( STD.Str.FindReplace(fname,'.dat',''), '_' );
@@ -142,7 +158,25 @@ LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;
 
 dsFileList2:= nothor(	FileServices.RemoteDirectory(ip, RootDir2,'*.dat',true))(regexfind(	LzFilePath,	name,nocase)):global(few);
 dsFileListSorted2 := sort(dsFileList2,modified);
-pfile2:=STD.STR.SplitWords(dsFileListSorted2[1].Name,'/');
+
+new_rec2:=record
+	dsFileListSorted2;
+	string20 customer_id;
+	string20 file_type;
+end;
+
+Proj_dsFileListSorted2 := project(dsFileListSorted2, transform(new_rec2,
+	self.customer_id := regexfind('([0-9])\\d+',left.name,0);
+	self.file_type := regexfind('IDENTITY|KNOWNRISK|SAFELIST',left.name,0,nocase);
+	self:=left));
+	
+J_dsFileListSorted2	:= join(Proj_dsFileListSorted2, FraudGovPlatform.Files().Flags.CustomerActiveSprays,
+		left.customer_id = right.customer_id and
+		left.file_type = right.file_type
+	 );
+
+
+pfile2:=STD.STR.SplitWords(J_dsFileListSorted2[1].Name,'/');
 FileDir2:=RootDir2 + pfile2[1] +'/';
 
 lECL1 :=
