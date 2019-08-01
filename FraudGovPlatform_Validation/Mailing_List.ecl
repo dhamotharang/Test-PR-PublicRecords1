@@ -29,10 +29,11 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 
 	shared fn_mail_recipiant(string recipiant) := function
 		return		map(
-									 recipiant='Validation' 	=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Batch_list,Dev_list)
-									,recipiant='Alert'		=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Dev_list,Dev_list)
-									,recipiant='Roxie' 		=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Roxie_list,Dev_list)
-									,recipiant='BocaOps'	=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Boca_Ops,Dev_list)
+									 recipiant='Validation' => if(_control.ThisEnvironment.Name = 'Prod_Thor',Dev_list,Dev_list)
+									,recipiant='Alert'			=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Dev_list,Dev_list)
+									,recipiant='Roxie' 			=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Roxie_list,Dev_list)
+									,recipiant='RinNetwork'	=> if(_control.ThisEnvironment.Name = 'Prod_Thor',RinNetwork_list,Dev_list)
+									,recipiant='BocaOps'		=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Boca_Ops,Dev_list)
 									,recipiant='Analytics'	=> if(_control.ThisEnvironment.Name = 'Prod_Thor',Analytics_list,Dev_list)
 									,Dev_list
 								);
