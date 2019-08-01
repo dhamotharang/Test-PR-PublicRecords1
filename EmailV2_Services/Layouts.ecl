@@ -160,10 +160,10 @@ EXPORT Layouts := MODULE
   
   EXPORT email_final_rec := RECORD(email_internal_rec)
     best_rec bestinfo;
-    STRING   email_status := '';
-    STRING   email_status_reason := '';
-    STRING   additional_status_info := '';
-    STRING   relationship  := '';
+    STRING15   email_status := '';
+    STRING50   email_status_reason := '';
+    STRING40   additional_status_info := '';
+    STRING50   relationship  := '';
     STRING   record_err_msg  := '';
     UNSIGNED2 record_err_code := 0;
     BOOLEAN  is_rejected_rec := FALSE;
@@ -265,10 +265,10 @@ EXPORT Layouts := MODULE
     UNSIGNED6 UltID;
     UNSIGNED2 num_email_per_did := 0;
     UNSIGNED2 num_did_per_email := 0;
-    STRING    email_status := '';
-    STRING    email_status_reason := '';
-    STRING    additional_status_info := '';
-    STRING    relationship  := '';
+    STRING15    email_status := '';
+    STRING50    email_status_reason := '';
+    STRING40    additional_status_info := '';
+    STRING50    relationship  := '';
     STRING    src;
     STRING    record_err_msg  := '';
     UNSIGNED2 record_err_code := 0;
