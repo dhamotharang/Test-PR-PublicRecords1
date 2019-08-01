@@ -1,4 +1,4 @@
-import AID,codes,header,ut,Vehlic,vehicleV2,VehicleCodes;
+﻿import AID,codes,header,ut,Vehlic,vehicleV2,VehicleCodes;
 
 dInfutorMotorcycleBase			:=	vehiclev2.Files.Base.Infutor_Motorcycle(append_ownername<>'');
 //dInfutorMotorcycleBase			:=	sample(vehiclev2.Files.Base.Infutor_Motorcycle(append_ownername<>''),10000,1);
@@ -75,7 +75,7 @@ dInfutorMotorcycleIterationKey			:=	join(	dInfutorMotorcycleBaseDedup,
 																		);
 
 
-VehicleV2.Layout_Base.Party_BIP	tParty(dInfutorMotorcycleIterationKey pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tParty(dInfutorMotorcycleIterationKey pInput)	:=
 transform
 	self.State_Bitmap_Flag						:=	0;
 	self.Date_First_Seen 							:=	0;  //(UNSIGNED) pInput.Dt_First_Seen;
@@ -178,7 +178,7 @@ AID.MacAppendFromRaw_2Line(	dInfutorMotorcycleAddrPopulated,
 														lAIDAppendFlags
 													);
 
-VehicleV2.Layout_Base.Party_BIP	tAceAddress(dInfutorMotorcycleAppendAID	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tAceAddress(dInfutorMotorcycleAppendAID	pInput)	:=
 transform
 	//Map_Infutor_Motorcycle_Update save the AIDWork_RawAID but nothing else. Use the clean address from this macro call.
 	self.prim_range					:=	pInput.AIDWork_AceCache.prim_range;

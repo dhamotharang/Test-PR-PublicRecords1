@@ -17,6 +17,7 @@ export proc_Build_Phase_2(
   ,pSkipStrata            = 'false'
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
+  ,pSkipCrosswalk         = 'false'
   ,pCompileTest           = 'false'
    
 ) := 
@@ -40,6 +41,7 @@ functionmacro
       ,if(pSkipBest             = false ,BIPV2_Build.proc_best                 (pversion ,false      )                                                                                        ) //when lgid3 added, run this after that
       ,if(pSkipIndustry         = false ,BIPV2_Build.proc_industry_license     (pversion             )                                                                                        )
       ,if(pSkipMisckeys         = false ,BIPV2_Build.proc_misc_keys            (pversion             )                                                                                        )
+      ,if(pSkipCrosswalk        = false ,BIPV2_Build.proc_crosswalk            (pversion             )                                                                                        )
       ,if(pSkipQASamples        = false ,BIPV2_Build.proc_BIPV2_QA_Samples     (pversion,pCompileTest)                                                                                        )
       ,if(pSkipSegStats         = false ,BIPV2_Build.proc_segmentation         (pversion             )                                                                                        )
       ,if(pSkipStrata           = false ,BIPV2_Build.proc_Strata               (pversion             )                                                                                        )

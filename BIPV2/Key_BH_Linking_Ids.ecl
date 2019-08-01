@@ -32,6 +32,8 @@ MODULE
 		BIPV2.IDlayouts.l_xlink_ids.OrgWeight;
 		BIPV2.IDlayouts.l_xlink_ids.UltScore;
 		BIPV2.IDlayouts.l_xlink_ids.UltWeight;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
 	end;
 
 	shared infile_key := project(infile, transform(layout_key,  
@@ -49,6 +51,8 @@ MODULE
 																											self.UltWeight  := 100,
 																											self.SELEscore	:= 100,
 																											self.SELEweight	:= 100,
+                                                      self.global_sid := 0  ,
+                                                      self.record_sid := 0  ,
                                                       self 						:= left,
 																											));
 
@@ -67,6 +71,8 @@ MODULE
                                                 self.UltWeight  := 100,
                                                 self.SELEscore  := 100,
                                                 self.SELEweight := 100,
+                                                self.global_sid := 0  ,
+                                                self.record_sid := 0  ,
                                                 self            := left,
                                                 ));
                                                 
@@ -77,6 +83,7 @@ MODULE
 	export Key      := k;//withOUT ParentAbovSeleField (see comment below)
 	export KeyPlus  := BIPV2.IDmacros.mac_AddParentAbovSeleField(Key); //with ParentAbovSeleField
   export keyversions(string pversion = 'qa',boolean pUseOtherEnvironment = false) := tools.macf_FilesIndex('Key',BIPV2_Build.keynames(pversion, pUseOtherEnvironment).linkids); //allow easy access to other versions(logical or super) of key
+
 
   // kfetch including optional marketing suppression
   export kFetch2(

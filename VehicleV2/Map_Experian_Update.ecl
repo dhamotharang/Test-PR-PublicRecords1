@@ -1,4 +1,4 @@
-import Address,AID,codes,Lib_StringLib,standard,ut,vehlic,vehicleCodes;
+﻿import Address,AID,codes,Lib_StringLib,standard,ut,vehlic,vehicleCodes;
 
 string1	lNameType_Owner				:=	'1';
 string1	lNameType_Lessor			:=	'2';
@@ -275,6 +275,9 @@ transform
 	self.Append_MailPrepAddr2						:=	stringlib.stringtouppercase(tmpMailPrepAddr2);
 	self.Append_PhysicalPrepAddr1				:=	stringlib.stringtouppercase(tmpPhysicalPrepAddr1);
 	self.Append_PhysicalPrepAddr2				:=	stringlib.stringtouppercase(tmpPhysicalPrepAddr2);
+	//Added for CCPA-103
+	self.global_sid                     := 0; 
+	self.record_sid                     := 0;
 	
 	self																:=	pInput;
 	self																:=	[];
