@@ -1,4 +1,4 @@
-import BIPV2_Testing,wk_ut,tools;
+﻿import BIPV2_Testing,wk_ut,tools;
 
 EXPORT proc_Kickoff_All(
    pversion               
@@ -19,6 +19,11 @@ EXPORT proc_Kickoff_All(
 ) := 
 functionmacro
 
+  // ,pSkipXlinkValidation   = 'false'
+  // ,pSkipQASamples         = 'false'
+  // ,pSkipOverlinking       = 'false'
+  // ,pSkipCrosswalk         = 'false'
+  
   ecl		  := '#workunit(\'name\',\'BIPV2_Build.proc_Build_Phase_2 @version@ ' + pUniqueOutput + '\');\n#workunit(\'priority\',\'high\');\n' + 'BIPV2_Build.proc_Build_Phase_2(\'@version@\'\n'
   + ',@pSkipXlink@\n'         
   + ',@pSkipCopyXlinkKeys@\n' 
