@@ -25,7 +25,7 @@ dl_len := LENGTH(dl_trim);
 month := dob[5..6];
 firstTwo := dl_trim[1..2];
 
-// logic added for washington
+// logic added for washington - removed use of this code Aug 2019 - left for other states
 lnlength := length(lname_trim);
 walname := if(lnlength<5,lname_trim[1..lnlength]+'*****',lname_trim);
 
@@ -236,11 +236,11 @@ ret := CASE(state,
 		'PA' =>  	MAP(dl_len=8 AND IsAllNumeric(dl_trim) =>'0',
 				    dl_len=8 => '12',
 				    '1'),
-    'RI' =>  	MAP(dl_len=7 AND dl_trim[1] ='3' AND IsAllNumeric(dl_trim)  => '0',
-                  dl_len=7 AND dl_trim[1] ='V' AND IsAllNumeric(dl_trim[2..7]) => '0',
-                  dl_len=8 AND dl_trim[1] ='4' AND IsAllNumeric(dl_trim) => '0',
-                  dl_len=7 OR dl_len=8 => '12',
-				    '1'),
+    'RI' =>  	MAP(dl_len=7 AND dl_trim[1] ='V' AND IsAllNumeric(dl_trim[2..7]) => '0',
+            dl_len=7 AND IsAllNumeric(dl_trim) => '0',
+            dl_len=8 AND dl_trim[1] ='4' AND IsAllNumeric(dl_trim) => '0',
+            dl_len=8 => '12',
+            '1'),
 		'SC' =>  	MAP(dl_len=9 AND IsAllNumeric(dl_trim) => '0',
 				    dl_len=9 => '12',
 				    '1'),
@@ -265,18 +265,13 @@ ret := CASE(state,
 									dl_len=9 AND dl_trim[1]>='A' AND dl_trim[1]<='Z' => '12',
 									dl_len=9 => '6',
 									'1'),
-		'WA' =>  	MAP(dob='' => '99',
-				    (dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND ((dl_trim[7]>='A' AND dl_trim[7]<='Z') OR
-						dl_trim[7]='*') AND (INTEGER)(dl_trim[8..9])=(100-(INTEGER)(dob[3..4])) AND (dl_trim[10]='*' OR (dl_trim[10]>='A' AND dl_trim[10]<='Z') OR
-						IsAllNumeric(dl_trim[10])) AND (((dl_trim[11]>='A' AND dl_trim[11]<='Z') OR (dl_trim[12]>='A' AND dl_trim[12]<='Z')) OR IsAllNumeric(dl_trim[11])))
-            OR (LENGTH(StringLib.StringFilter(StringLib.StringToUpperCase(dl_trim[1..12] ), 'BCDFGHJKLMNPRSTWXYZ1234567890'))=12 AND dl_trim[1..3]='WDL' AND dl_len=12) => '0',
-            dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND (dl_trim[7]>='A' AND dl_trim[7]<='Z'
-            OR
-						dl_trim[7]='*') AND (INTEGER)(dl_trim[8..9])=(100-(INTEGER)(dob[3..4])) => '12',
-				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND ((dl_trim[7]>='A' AND dl_trim[7]<='Z') OR dl_trim[7]='*') => '5',
-				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] => '10',
-				    dl_len=12 AND dl_trim[1..5]=walname[1..5] => '9',
-				    dl_len=12 => '7',
+		'WA' =>  	MAP(
+						LENGTH(StringLib.StringFilter(StringLib.StringToUpperCase(dl_trim[1..12] ), 'BCDFGHJKLMNPRSTWXYZ1234567890'))=12 
+								AND dl_trim[1..3]='WDL' 
+								AND dl_len=12 => '0',
+						dl_len=12 and LENGTH(StringLib.StringFilter(StringLib.StringToUpperCase(dl_trim[1..7] ), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))=7 
+								AND LENGTH(StringLib.StringFilter(StringLib.StringToUpperCase(dl_trim[8..12] ), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890*'))=5  => '0',
+						dl_len=12 => '7',
 				    '1'),
 		'WI' =>  	MAP(dob='' => '99',
 				    dl_trim[1..4]=lnSoundex(lname) AND IsAllNumeric(dl_trim[5..14]) AND dl_trim[8..9]=dob[3..4] => '0',
