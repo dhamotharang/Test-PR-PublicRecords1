@@ -87,8 +87,15 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
       Models.Layout_ModelOut;
       STRING ModelName := '';
     END;
-    // ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs);
-    ds_Models_temp := DATASET([], Layout_ModelOut_Plus);
+    
+   
+    
+    ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs);
+   // ds_Models_temp := DATASET([], Layout_ModelOut_Plus);
+  
+  #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
+    
+    
     iesp.smallbusinessanalytics.t_SBAScoreHRI getScoreResults(Layout_ModelOut_Plus le) := TRANSFORM
       SELF._Type := IF((INTEGER)le.Score=0,'','0-999');
       SELF.Value := (INTEGER)le.Score;
@@ -332,6 +339,14 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		// OUTPUT( ds_OutputWithAddressRisk, named('ds_OutputWithAddressRisk') );
     // OUTPUT( ds_OutputWithEcho, named('ds_OutputWithEcho') );
 		RETURN ds_Final;
+#else // Else, output the model results directly
 
-	END;
+	// return Models.LIB_BusinessRisk_Models(shell_res_grpd,,boca_shell_grouped,iid,,DPPA_Purpose,GLBA_Purpose,DataRestrictionMask_in,DataPermissionMask,appType).ValidatingModel;
+ //return Models.LIB_BusinessRisk_Models(shell_res_grpd , bocaShell := boca_shell_grouped).ValidatingModel; 
+RETURN ds_Models_temp;
+#end
+	
+  
+  
+  END;
 
