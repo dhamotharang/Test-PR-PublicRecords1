@@ -1161,6 +1161,15 @@ Claim :=  ENTITY
 		),
 	MODEL(UID, rEmployer, rClaimant, rLegal, claim_status, claim_submit_ccyymmdd, bizrecid, uacctno,claim_sep_emp_name, claim_sep_emp_no));
 
+
+Person := ENTITY
+(FLAT(UID(employeelexid),
+	STRING employeelexid,
+	STRING firstname,
+	STRING middleinit,
+	STRING lastname
+), MODEL(UID, employeelexid, firstname, middleinit, lastname));
+
 Claimant :=  ENTITY
 (FLAT(UID(application_id),
 	STRING claimant_ssn,
@@ -1208,6 +1217,34 @@ LegalAddr := ASSOCIATION
 		CleanAddress rAddr=UID(physicaladdresscleanedaddress),
     Legal rLegal=UID(seleid)
 	));
+	
+LegalPersonWages := ASSOCIATION
+	(FLAT(
+		Legal rLegal=UID(seleid),
+		INTEGER wageyearqtr,
+		REAL wageamt,
+		Person rPerson=UID(employeelexid)));
+	
+SeleSeleEmployees := ASSOCIATION
+	(FLAT(
+		Frumultid,
+		Toultid,
+		Legal rFromLegal=UID(FromSeleID),
+		Legal rToLegal=UID(ToSeleID),
+		FromEmpNum,
+		ToEmpNum,
+		fromwageyearqtr,
+		towageyearqtr,
+		Person rPerson=UID(employeelexid)
+	));
+	
+USE FraudgovUIKEL.Files.WagesAssociations(FLAT,
+		SeleSeleEmployees(FILTER((UNSIGNED)employeelexid != 0)));
+USE FraudGovUIKel.Files.Wages(FLAT,
+		Person(FILTER((UNSIGNED)employeelexid != 0)),
+		Legal,
+		LegalPersonWages(FILTER((UNSIGNED)employeelexid != 0)));
+		
 	 
 USE FRAUDGovUIKEL.Files.Employer(FLAT,
     Employer(FILTER((UNSIGNED)uacctno != 0)),
@@ -1451,6 +1488,18 @@ Legal: => BusTaxLiabBlceDebitFlag := MAP(BusAcctPerBusTaxLiabBlceDebCnt=-99998 =
 																				 BusAcctPerBusTaxLiabBlceDebCnt=0 => 0,
 																				 BusAcctPerBusTaxLiabBlceDebCnt > 0 => 1);
 Legal: => dsVelBusAcctPerAddrInBusLegEnt := LegalEmployer.rEmployer(BusAcctUIDEcho > 0);  
+
+// New legal attributes
+Legal: => TestEmployeeCount := COUNT(LegalPersonWages{rPerson});
+Legal: => FirstMoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND rFromLegal.seleid != 0)); // need to include associations where there is no prior wage reported.
+Legal: => MoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0));
+Legal: => MoveSameSeleDiffEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum));
+Legal: => MoveSameSeleDiffEmp :=SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum);
+Legal: => MoveSameUltDiffSeleEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid));
+Legal: => MoveSameUltDiffSeleEmp := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid);
+Legal: => MoveTos := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0){rFromLegal.seleid, rToLegal.seleid, rPerson.employeelexid};
+Legal: => SameUltDiffSeleEmployeeCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr = towageyearqtr AND rFromLegal != rToLegal AND  rFromLegal.ultid = rToLegal.ultid){rPerson});
+Legal: => TestWagesTotal := SUM(LegalPersonWages, wageamt);
 
 
 																		
@@ -2019,3 +2068,5 @@ QUERY: showEmployerClaims <= EmployerClaim;
 QUERY: showEmployerAddr <= EmployerAddr;
 QUERY: showLegalClaimsClaim <= LegalClaim.rClaim;
 QUERY: showClaimant <= Claimant;
+QUERY: showPerson <= Person;
+QUERY: showLegalPersonWages <= LegalPersonWages;

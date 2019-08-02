@@ -1235,4 +1235,29 @@ EXPORT files := MODULE
 // EXPORT Claimant := DATASET('~fraudgov::tndata::claimants_output', ClaimantsRec, THOR); //Old File
 EXPORT Claimant := DATASET('~fraudgov::tndata::20190701::claimants_output', ClaimantsRec, THOR);
 
+SHARED WagesAssociationsPrep := TABLE(Wages, {ultid, seleid, empnum, employeelexid, wageyearqtr}, ultid, seleid, empnum, employeelexid, wageyearqtr, MERGE);
+
+WagesSeleAssociation := RECORD
+	UNSIGNED Fromultid;
+	UNSIGNED Toultid;
+	UNSIGNED FromSeleId;
+	UNSIGNED ToSeleId;
+	STRING fromempnum;
+	STRING toempnum;
+	UNSIGNED8 employeelexid;
+	INTEGER fromwageyearqtr;
+	INTEGER towageyearqtr;
+END;
+
+EXPORT WagesAssociations := JOIN(WagesAssociationsPrep, WagesAssociationsPrep, left.employeelexid=RIGHT.employeelexid,
+	TRANSFORM(WagesSeleAssociation,
+		SELF.FromUltId := LEFT.ultid,
+		SELF.ToUltid := right.ultid,
+		SELF.FromSeleId := LEFT.seleid,
+		SELF.ToSeleID := RIGHT.seleid,
+		SELF.FromEmpnum := LEFT.empnum,
+		SELF.ToEmpnum := RIGHT.empnum,
+		SELF.fromwageyearqtr := (INTEGER)LEFT.wageyearqtr,
+		SELF.towageyearqtr := (INTEGER)RIGHT.wageyearqtr,
+		SELF := LEFT), HASH)(NOT (FromSeleID = ToSeleID AND FromEmpNum = ToEmpNum));
 END;
