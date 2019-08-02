@@ -102,8 +102,8 @@
                                                                 MultipleAddr
                                                               )),2),5,2)}
               ],rStats);
-  Stats             :=  OUTPUT(dStats,NAMED('Stats'));
-  ClusterSizeCounts :=  OUTPUT(SORT(TABLE(SORT(results,ClusterCount),{ClusterCount,cnt:=COUNT(GROUP)},ClusterCount,FEW),-ClusterCount),NAMED('ClusterSizeCounts'));
+  Stats             :=  OUTPUT(dStats,NAMED('Stats'),OVERWRITE);
+  ClusterSizeCounts :=  OUTPUT(SORT(TABLE(SORT(results,ClusterCount),{ClusterCount,cnt:=COUNT(GROUP)},ClusterCount,FEW),-ClusterCount),NAMED('ClusterSizeCounts'),OVERWRITE);
 
   dClustersWithDifferences  :=  JOIN(
                                   DISTRIBUTE(pInputFile,HASH(nomatch_id)),
@@ -127,11 +127,11 @@
                                 );
                                 
 
-  SampleClustersWithDifferences         :=  OUTPUT(CHOOSEN(dClustersWithDifferences,2000),NAMED('SampleClustersWithDifferences'));
-  SampleClustersWithLexIDDifferences    :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleLexIDs),500),NAMED('SampleClustersWithLexIDDifferences'));
-  SampleClustersWithNameDifferences     :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleNames),500),NAMED('SampleClustersWithNameDifferences'));
-  SampleClustersWithDOBDifferences      :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleDOBs),500),NAMED('SampleClustersWithDOBDifferences'));
-  SampleClustersWithAddressDifferences  :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleaddr),500),NAMED('SampleClustersWithAddressDifferences'));
+  SampleClustersWithDifferences         :=  OUTPUT(CHOOSEN(dClustersWithDifferences,2000),NAMED('SampleClustersWithDifferences'),OVERWRITE);
+  SampleClustersWithLexIDDifferences    :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleLexIDs),500),NAMED('SampleClustersWithLexIDDifferences'),OVERWRITE);
+  SampleClustersWithNameDifferences     :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleNames),500),NAMED('SampleClustersWithNameDifferences'),OVERWRITE);
+  SampleClustersWithDOBDifferences      :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleDOBs),500),NAMED('SampleClustersWithDOBDifferences'),OVERWRITE);
+  SampleClustersWithAddressDifferences  :=  OUTPUT(CHOOSEN(dClustersWithDifferences(multipleaddr),500),NAMED('SampleClustersWithAddressDifferences'),OVERWRITE);
 
   RETURN  SEQUENTIAL(
             Stats
