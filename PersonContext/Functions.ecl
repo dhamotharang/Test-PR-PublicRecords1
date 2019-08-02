@@ -1,4 +1,4 @@
-﻿IMPORT _Control, ut, iesp, Insurance_iesp, PersonContext, FCRA;
+﻿IMPORT _Control, ut, iesp, Insurance_iesp, PersonContext, FCRA, STD;
 onThor := _Control.Environment.OnThor;
 
 EXPORT FUNCTIONS := MODULE
@@ -15,14 +15,15 @@ EXPORT FUNCTIONS := MODULE
     //spin through the search key records and mark a search status error on those which fail scrutiny.
     //Also, get them out of the insurance_iesp child dataset structure and make it a simpler dataset structure that we can use outside.
     PCL.Layout_PCRequestStatus ValidateKeys(PCL.Layout_PCSearchKey L) := TRANSFORM      
-      SELF.SearchStatus      := MAP(L.LexID != '' AND (L.RecID1 != '' OR L.RecID2 != '' OR L.RecID3 != '' OR L.RecID4 != '')
-                                                                                                        => CS.LexidRecidCombinationError,
-                                   L.LexID = '' AND L.RecId1 = '' AND L.RecId2 = '' AND L.RecId3 = '' AND L.RecId4 = '' 
-                                                                                                        => CS.NoSearchRecords,
-                                   L.RecId2 != '' AND L.RecId1 = ''                                       => CS.RecIDOutOfSequence,
-                                   L.RecId3 != '' AND (L.RecId2 = '' OR L.RecId1 = '')                   => CS.RecIDOutOfSequence,
-                                   L.RecID4 != '' AND (L.RecId3 = '' OR L.RecId2 = '' OR L.RecId3 = '')   => CS.RecIDOutOfSequence,
-                                   '');
+      EmptyValues := ['0', ''];
+      SELF.SearchStatus			:= MAP(L.LexID NOT IN EmptyValues AND (L.RecID1 NOT IN EmptyValues OR L.RecID2 NOT IN EmptyValues OR L.RecID3 NOT IN EmptyValues OR L.RecID4 NOT IN EmptyValues)         						 		
+																																																												=> CS.LexidRecidCombinationError,
+			                             L.LexID IN EmptyValues AND L.RecId1 IN EmptyValues AND L.RecId2 IN EmptyValues AND L.RecId3 IN EmptyValues AND L.RecId4 IN EmptyValues  												
+																																																												=> CS.NoSearchRecords,
+			                             L.RecId2 NOT IN EmptyValues AND L.RecId1 IN EmptyValues 															=> CS.RecIDOutOfSequence,
+																	 L.RecId3 NOT IN EmptyValues AND (L.RecId2 IN EmptyValues OR L.RecId1 IN EmptyValues) => CS.RecIDOutOfSequence,
+																	 L.RecID4 NOT IN EmptyValues AND (L.RecId3 IN EmptyValues OR L.RecId2 IN EmptyValues OR L.RecId3 IN EmptyValues) 	=> CS.RecIDOutOfSequence,
+																	 '');
       SELF := L;
     END;
     
@@ -46,14 +47,15 @@ EXPORT FUNCTIONS := MODULE
     //spin through the search key records and mark a search status error on those which fail scrutiny.
     //Also, get them out of the insurance_iesp child dataset structure and make it a simpler dataset structure that we can use outside.
     PCL.Layout_PCRequestStatus ValidateKeys(PersonContext.Layouts.Layout_PCSearchKey L) := TRANSFORM      
-      SELF.SearchStatus      := MAP(L.LexID != '' AND (L.RecID1 != '' OR L.RecID2 != '' OR L.RecID3 != '' OR L.RecID4 != '')
-                                                                                                        => CS.LexidRecidCombinationError,
-                                   L.LexID = '' AND L.RecId1 = '' AND L.RecId2 = '' AND L.RecId3 = '' AND L.RecId4 = '' 
-                                                                                                        => CS.NoSearchRecords,
-                                   L.RecId2 != '' AND L.RecId1 = ''                                       => CS.RecIDOutOfSequence,
-                                   L.RecId3 != '' AND (L.RecId2 = '' OR L.RecId1 = '')                   => CS.RecIDOutOfSequence,
-                                   L.RecID4 != '' AND (L.RecId3 = '' OR L.RecId2 = '' OR L.RecId3 = '')   => CS.RecIDOutOfSequence,
-                                   '');
+      EmptyValues := ['0', ''];
+      SELF.SearchStatus			:= MAP(L.LexID NOT IN EmptyValues AND (L.RecID1 NOT IN EmptyValues OR L.RecID2 NOT IN EmptyValues OR L.RecID3 NOT IN EmptyValues OR L.RecID4 NOT IN EmptyValues)         						 		
+																																																												=> CS.LexidRecidCombinationError,
+			                             L.LexID IN EmptyValues AND L.RecId1 IN EmptyValues AND L.RecId2 IN EmptyValues AND L.RecId3 IN EmptyValues AND L.RecId4 IN EmptyValues  												
+																																																												=> CS.NoSearchRecords,
+			                             L.RecId2 NOT IN EmptyValues AND L.RecId1 IN EmptyValues 															=> CS.RecIDOutOfSequence,
+																	 L.RecId3 NOT IN EmptyValues AND (L.RecId2 IN EmptyValues OR L.RecId1 IN EmptyValues) => CS.RecIDOutOfSequence,
+																	 L.RecID4 NOT IN EmptyValues AND (L.RecId3 IN EmptyValues OR L.RecId2 IN EmptyValues OR L.RecId3 IN EmptyValues) 	=> CS.RecIDOutOfSequence,
+																	 '');
       SELF := L;
     END;
     
@@ -77,13 +79,13 @@ EXPORT FUNCTIONS := MODULE
                               STRING URL) := FUNCTION
 
     // the following transforms puts the valid search records back into the ESP interface necessary to perform soapcall to deltabase
-      PCL.Layout_PCSearchKey LoadSoapKeys(PCL.Layout_PCRequestStatus dsIn) := TRANSFORM
-        SELF.LexID  := dsIn.LexID;
-        SELF.RecID1 := dsIn.RecId1;
-        SELF.RecID2 := dsIn.RecId2;
-        SELF.RecID3 := dsIn.RecId3;
-        SELF.RecID4 := dsIn.RecID4;
-      END;
+		PCL.Layout_PCSearchKey LoadSoapKeys(PCL.Layout_PCRequestStatus dsIn) := TRANSFORM
+			SELF.LexID  := dsIn.LexID;
+			SELF.RecID1 := dsIn.RecId1;
+			SELF.RecID2 := dsIn.RecId2;
+			SELF.RecID3 := dsIn.RecId3;
+			SELF.RecID4 := dsIn.RecID4;
+		END;
     PCL.Layout_PCRequest LoadRequest() := TRANSFORM
       SELF.SearchBy.Keys := PROJECT(dsPCValidSearchRecs, LoadSoapKeys(LEFT));
       SELF.DeltabaseURL := '';
@@ -255,16 +257,17 @@ EXPORT FUNCTIONS := MODULE
     RETURN dsResultLexID;
   END;
   
-  EXPORT PerformCombineDatasets(DATASET(PCL.Layout_PCRequestStatus) SK,            //SK = Search Keys
+  EXPORT PerformCombineDatasets(DATASET(PCL.Layout_PCRequestStatus) SK,           //SK = Search Keys
                                 DATASET(PCL.Layout_PCResponseRec) DB,             //DB = Deltabase Results
-                                DATASET(PCL.Layout_PCResponseRec) RK) := MODULE    // RK= Roxie Keys Results
-
+                                DATASET(PCL.Layout_PCResponseRec) RK,							// RK= Roxie Keys Results
+																BOOLEAN isConsumerDisclosure = FALSE) := MODULE		
+																
     //Get the search key records that had some issue and put search keys records in the common internal layout. These "bad" search records
     //will be returned in the result set with their SearchStatus code.
     EXPORT SKErrors := PROJECT(SK(SearchStatus > ''), TRANSFORM(RECORDOF(DB),SELF:=LEFT,SELF:=[]));
 
     //perform a whole record dedup after combining the Deltabase (DB) results and the Roxie Key (RK) results. We may have picked up duplicates.
-    dsDedupAll := DEDUP(DB + RK,RECORD,ALL);
+    SHARED dsDedupAll := DEDUP(DB + RK,RECORD,ALL);
     
     //throw out all records which are forward dated. Forward dated records can come from deltabase in realtime so we have to deal with them at runtime.
     //future dated records don't exist in the Roxie Keys but do in the base file they are built from. Those future dated records are not built into the keys.
@@ -307,8 +310,10 @@ EXPORT FUNCTIONS := MODULE
     dsRLGrp := GROUP(dsRLSrt,LexID,RecID1,RecID2,RecID3,RecID4,DataGroup,RecordType);
     SHARED dsRLPick := TOPN(dsRLGrp,1,LexID,RecID1,RecID2,RecID3,RecID4,DataGroup,RecordType);
 
-    //combine results, transform and put a results found SearchStatus on these records.
-    SHARED dsCombine :=PROJECT(dsCLPick + dsRLPick,TRANSFORM(PCL.Layout_PCResponseRec,SELF.SearchStatus := CS.ResultsFound,SELF:=LEFT,SELF:=[]));
+		//Store future dated records for Consumer Discloure append
+		FutureRecs 				 := IF(isConsumerDisclosure, dsDedupAll(DateAdded > CN.GetDateTimeGMT));
+		//combine results, transform and put a results found SearchStatus on these records.
+    SHARED dsCombine :=PROJECT(dsCLPick + dsRLPick + FutureRecs,TRANSFORM(PCL.Layout_PCResponseRec,SELF.SearchStatus := CS.ResultsFound,SELF:=LEFT,SELF:=[]));
 
 //  records in SK were assigned a status code if they had an error. So I only want those that didn't have errors go through the following code.
 //  these records would have been eligible for a search. Now, I have to look at all those that were eligible, and are consumer level (had a
@@ -330,14 +335,38 @@ EXPORT FUNCTIONS := MODULE
     //combine the results of the previous two joins.
     SKNotFounds := SKCLNotFounds + SKRLNotFounds;                    
 
-    //Combine the SKErrors, SKNotFounds and the dsCombined results and sort the file into the proper sequence. This basically combines everything back together.                        
-    EXPORT dsResults := SORT(SKErrors + SKNotFounds + dsCombine,LexID,RecID1,RecID2,RecID3,RecID4,StatementID,-StatementSequence);
+    //Combine the SKErrors, SKNotFounds and the dsCombined results. This basically combines everything back together.                        
+    EXPORT dsResults := SKErrors + SKNotFounds + dsCombine;
 
     //set a boolean that we actually had returned results from the searches.
     EXPORT isWeFoundResults := EXISTS(dsCombine);
 
   END;//PerformCombineDatasets
 
+	//Convert all state codes to numeric codes
+  EXPORT PerformStateConversion(DATASET(PCL.Layout_PCResponseRec) Results) := MODULE
+		
+		NonSFResults := Results(recordType <> PersonContext.Constants.RecordTypes.SF);
+		SFResults 	 := Results(recordType = PersonContext.Constants.RecordTypes.SF);
+		
+		PCL.Layout_PcResponseRec convertStateCode(PCL.Layout_PCResponseRec L) := TRANSFORM
+			GetCodes 			:= PersonContext.Constants.StateCodes(state = STD.Str.ToUpperCase(TRIM(L.content, LEFT, RIGHT)))[1].codes;
+			IsNumericCode	:= regexfind('^[0-9]+$', TRIM(L.content, LEFT, RIGHT)[1]);
+			CheckCode 		:= IF(GetCodes <> '', GetCodes, SKIP); 
+			SELF.Content	:= IF(IsNumericCode OR TRIM(L.content, LEFT, RIGHT) IN ['*',''], L.content, CheckCode);
+			//store the state code into the record id 1 field
+			SELF.RecID1 := IF(~IsNumericCode AND TRIM(L.content, LEFT, RIGHT)  <> '*', L.content, L.RecID1);
+			SELF := L;
+		END;
+		//sort the file into the proper sequence
+		convertSFResults 		:= PROJECT(SFResults, convertStateCode(LEFT));
+		EXPORT dsResults		:= SORT(NonSFResults + convertSFResults,LexID,RecID1,RecID2,RecID3,RecID4,StatementID,-StatementSequence);
+		
+		//set a boolean that we actually had returned results from the searches.
+    EXPORT isWeFoundResults := EXISTS(dsResults);
+		
+	END;
+	
   EXPORT PerformCreateFinalOutput(DATASET(PCL.Layout_PCResponseRec) Results,
                                   BOOLEAN isEmptySearchDS = FALSE,
                                   BOOLEAN isNoValidSearchKeys = FALSE,

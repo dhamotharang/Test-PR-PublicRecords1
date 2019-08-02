@@ -1,6 +1,6 @@
 ﻿IMPORT PersonContext;
 
-EXPORT GetPersonContext(PersonContext.Layouts.Layout_PCRequest rowPCReq, BOOLEAN failOnSoapError = FALSE) := FUNCTION
+EXPORT GetPersonContext(PersonContext.Layouts.Layout_PCRequest rowPCReq, BOOLEAN failOnSoapError = FALSE, BOOLEAN isConsumerDisclosure = FALSE) := FUNCTION
 
   VSK              := PersonContext.Functions.ValidateSearchKeys(rowPCReq);
   dsPCDB           := PersonContext.Functions.PerformDeltabaseCall(VSK.dsPCValidSearchRecs, VSK.isEmptySearchDs, rowPCReq.DeltabaseURL);
@@ -11,9 +11,9 @@ EXPORT GetPersonContext(PersonContext.Layouts.Layout_PCRequest rowPCReq, BOOLEAN
   dsPCDB_plus_dsPCR := dsPCDB.response.Records + dsPCR_results;  
 
   dsRoxieKeyFinal := PersonContext.Functions.PerformGetRoxieKeyData(VSK.dsPCValidSearchRecs);
-  CD               := PersonContext.Functions.PerformCombineDatasets(VSK.dsPCReqValidated, dsPCDB_plus_dsPCR, dsRoxieKeyFinal);
-
-  dsFinalResponse := PersonContext.Functions.PerformCreateFinalOutput(CD.dsResults,VSK.isEmptySearchds,VSK.isNoValidSearchKeys,CD.isWeFoundResults);
+  CD 							:= PersonContext.Functions.PerformCombineDatasets(VSK.dsPCReqValidated, dsPCDB_plus_dsPCR, dsRoxieKeyFinal, isConsumerDisclosure);
+	ConvertSTCodes	:= PersonContext.Functions.PerformStateConversion(CD.dsResults);
+  dsFinalResponse := PersonContext.Functions.PerformCreateFinalOutput(ConvertSTCodes.dsResults,VSK.isEmptySearchds,VSK.isNoValidSearchKeys, CD.isWeFoundResults AND ConvertSTCodes.isWeFoundResults);
   
   PersonContext.Layouts.Layout_PCResponse onFailResponse() := TRANSFORM
       SELF._Header := dsPCDB.response._Header;
