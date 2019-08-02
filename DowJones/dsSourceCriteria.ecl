@@ -1798,7 +1798,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/1211 South Sudan List','1774'},
 {'EC (CFSP) 2019/1216 Mali List','1775'},
 {'EC 2019/1207 Democratic People\'s Republic of Korea List','1776'},
-{'EC 2019/1208 South Sudan List','1777'}
->>>>>>> ThorProd
+{'EC 2019/1208 South Sudan List','1777'},
+{'Russian Register of Entities Brought to Administrative Responsibility','1778'},
+{'US Department of State - Iran Sanctions Act','1779'}
 ],r);
 

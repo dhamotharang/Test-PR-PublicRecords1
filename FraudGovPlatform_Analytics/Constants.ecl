@@ -61,6 +61,7 @@
 		EXPORT HpccConnectionProdQa	:= 'ramps_prodthor_certroxie';
 		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
 		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
+		EXPORT HpccConnectionDev		:= 'ramps_dev_fraudgov';
 		EXPORT EclCompileStrategy		:= 'REMOTE';											
 		EXPORT KeepEcl							:= 'FALSE';	
 		EXPORT ForceRun							:= 'TRUE';
