@@ -1,4 +1,4 @@
-import AutoStandardI,PAW,ut,doxie,CriminalRecords_Services;
+﻿import AutoStandardI,PAW,ut,doxie,CriminalRecords_Services,Suppress;
 
 export PAWSearchService_Records := module
   export params := interface(
@@ -25,7 +25,8 @@ export val(dataset(layouts.search) ids, params in_mod) := function
 
   mod_access := PROJECT (in_mod, doxie.IDataAccess);
   // Get the IDs, pull the payload records and add Group ID to them.
-  recs := join(ids,paw.Key_contactID,keyed(left.contact_id=right.contact_id), atmost(ut.limits.PAW_PER_CONTACTID)); // < 25 recs per contact
+  recs_pre := join(ids,paw.Key_contactID,keyed(left.contact_id=right.contact_id), atmost(ut.limits.PAW_PER_CONTACTID)); // < 25 recs per contact
+  recs := suppress.MAC_SuppressSource(recs_pre,mod_Access);
   recs_plus_best := project(recs,transform(Layouts.Raw,self.timezone:=[],self:=left));
 
   // add timezone

@@ -267,7 +267,8 @@ export Functions := module
 		return	project(ds_PSS_Results_Dedup,WorkPlace_Services.Layouts.poe_didkey_plus);
 	end;	//	end of getPSSRecs funtion
 
-	EXPORT getPawRecs(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus) ds_poe_recs):= FUNCTION
+	EXPORT getPawRecs(DATASET(WorkPlace_Services.Layouts.poe_didkey_plus) ds_poe_recs,
+                    doxie.IDataAccess mod_access):= FUNCTION
 	      
 			dids := PROJECT(ds_poe_recs, TRANSFORM(doxie.layout_references, SELF.did:= LEFT.did));
 			contactIDs := PAW_Services.PAW_Raw.getContactIDs.byDIDs(dids);				
@@ -313,11 +314,11 @@ export Functions := module
 				SELF											:=	[];
 			END;	
 			
-			ds_PAW_Results := JOIN(contactIDs,paw.Key_contactID,
+			ds_PAW_Results_pre := JOIN(contactIDs,paw.Key_contactID,
 														 KEYED(LEFT.contact_id=RIGHT.contact_id),
 														 tPAW(LEFT, RIGHT),
 														 LIMIT(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
-														
+			ds_PAW_Results := 	suppress.MAC_SuppressSource(ds_PAW_Results_pre,mod_access);
 			ds_PAW_Results_Dedup	:=	DEDUP(SORT(ds_PAW_Results,
 																						did, company_name, -dt_last_seen),
 																			 did, company_name);
