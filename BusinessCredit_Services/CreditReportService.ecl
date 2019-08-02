@@ -49,11 +49,14 @@ EXPORT CreditReportService := MACRO
 	#STORED('UltID',ReportBy.Company.BusinessIds.UltID);
 	#STORED('DID',ReportBy.AuthorizedRep.UniqueId);
 	#STORED('IncludeBusinessCredit',Options.IncludeBusinessCredit);
+	BOOLEAN 		IncludeBusinessCreditVal 			:= 	FALSE :  STORED('IncludeBusinessCredit');
 	#STORED('LimitPaymentHistory24Months',Options.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions	
 	#STORED('ContributorIDs', Options.ContributorIDs); // bus credit report w SBFE data project additions.
-	busCreditReportTypeValue := if (Options.BusinessCreditReportType = '',BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport, 
-	                                                        Options.BusinessCreditReportType);
-	#STORED('BusinessCreditReportType', busCreditReportTypeValue); // LNOnlyCredit report option.
+	
+	
+	#STORED('BusinessCreditReportType', Options.BusinessCreditReportType); // LNOnlyCredit report option.
+
+	
 	UNSIGNED6 s_DotID  := 0 : STORED('DotID');
 	UNSIGNED6 s_EmpID  := 0 : STORED('EmpID');
 	UNSIGNED6 s_PowID  := 0 : STORED('PowID');
@@ -114,8 +117,15 @@ EXPORT CreditReportService := MACRO
 		EXPORT STRING5 		AuthRep_Zip 								:= 	ReportBy.AuthorizedRep.Address.Zip5;
 		EXPORT STRING10 	AuthRep_Phone 							:= 	ReportBy.AuthorizedRep.Phone10;
 		EXPORT UNSIGNED8 	DOB 												:= 	iesp.ECL2ESP.DateToInteger(ReportBy.AuthorizedRep.DOB);
-		EXPORT STRING11 	SSN 												:= 	ReportBy.AuthorizedRep.SSN;
-		EXPORT BOOLEAN 		Include_BusinessCredit 			:= 	FALSE :  STORED('IncludeBusinessCredit');
+		EXPORT STRING11 	SSN 												:= 	ReportBy.AuthorizedRep.SSN;		
+		
+		// use either input from ESP  the "IncludeBusinessCreditVal" or automatically default it to be true IF busCreditReportType = 1 (being the SBFEdatabusinessCreditReport)
+		// as eventually the option 'includeBusinessCredit' will be deprecated on ESP side and we wil just use the  option BusinessCreditReportType to determine if there is
+		// ability to access SBFE data or not.
+		EXPORT BOOLEAN 		Include_BusinessCredit 			:= 	Options.BusinessCreditReportType =  BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport
+		                                                                                                                        OR IncludeBusinessCreditVal;
+		                                                                                                                         
+																																																														 
 		EXPORT STRING 		DataRestrictionMask 				:= global_mod.DataRestrictionMask;
 		EXPORT STRING 		DataPermissionMask 					:= global_mod.DataPermissionMask;
 		EXPORT BOOLEAN          LimitPaymentHistory24Months                  := FALSE :  STORED('LimitPaymentHistory24Months');
