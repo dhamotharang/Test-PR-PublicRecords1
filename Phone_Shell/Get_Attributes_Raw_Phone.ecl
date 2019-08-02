@@ -1,11 +1,11 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function gathers the Raw_Phone_Characteristics.										*
  * -Switch_Type adapted from Progressive_Phone.Mac_Get_Switchtype         *
  ************************************************************************ */
 
-IMPORT AutokeyB2, Business_Header_SS, CellPhone, Phone_Shell, Risk_Indicators, RiskWise, UT, data_services;
+IMPORT AutokeyB2, Business_Header_SS, CellPhone, Phone_Shell, Risk_Indicators, RiskWise, UT, data_services, doxie;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Raw_Phone (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Raw_Phone (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	/* ************************************************************************
 	 *  Get Switch Type and Time Zone Match																		*
 	 ************************************************************************ */

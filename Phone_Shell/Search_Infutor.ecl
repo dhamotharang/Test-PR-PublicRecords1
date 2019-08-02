@@ -1,4 +1,4 @@
-/*2013-11-21T00:08:47Z (Lorraine Hill)
+﻿/*2013-11-21T00:08:47Z (Lorraine Hill)
 
 */
 /* ************************************************************************
@@ -6,10 +6,16 @@
  * - LexID (DID):: Source: INF																						*
  ************************************************************************ */
 
-IMPORT Infutor, Phone_Shell, Risk_Indicators, RiskWise, UT;
+IMPORT Infutor, Phone_Shell, RiskWise, doxie, Suppress;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Infutor (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask) := FUNCTION
-	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getInfutor(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Infutor.key_infutor_best_did ri) := TRANSFORM
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Infutor (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+
+Layout_Infutor_CCPA := RECORD
+unsigned4 global_sid;
+Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus;
+END;	
+  
+  Layout_Infutor_CCPA getInfutor(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Infutor.key_infutor_best_did ri) := TRANSFORM
 		
 		SElf.Gathered_Phone := TRIM(ri.phone);
 		
@@ -44,7 +50,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Infutor (DA
 																															);
 
 		SELF.Raw_Phone_Characteristics.Phone_Match_Code := matchcode;
-		
+		self.global_sid := ri.global_sid;
 		SELF := le;
 	END;
 	
@@ -53,5 +59,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Infutor (DA
 
 	final := DEDUP(SORT(byDID, Clean_Input.seq, Gathered_Phone, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), Clean_Input.seq, Gathered_Phone, Sources.Source_List);
 	
-	RETURN(final);
+   Infutor_Suppressed := Suppress.MAC_SuppressSource(final, mod_access);
+   Infutor_Formatted := PROJECT(Infutor_Suppressed, TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus,
+                                                  SELF := LEFT));
+	RETURN(Infutor_Formatted);
 END;

@@ -2,11 +2,11 @@
  * 			 This function gathers the Inquiries attributes.									*
  ************************************************************************ */
 
-IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, UT, STD;
+IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, STD, doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inquiries (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
-                                                                                        UNSIGNED2 PhoneShellVersion = 10 // PhoneShell V1.0 default
-                                                                                       ) := FUNCTION
+                                                                                        UNSIGNED2 PhoneShellVersion = 10, // PhoneShell V1.0 default
+                                                                                       doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	layoutInquiries := RECORD
 		Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus;
 		STRING description := '';
