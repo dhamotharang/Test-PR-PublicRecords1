@@ -205,6 +205,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.imei_changedate := t_Date2ToString(l.response.LineIdentityResponse.Device.Identifier.Imei.ChangeDate);
 		SELF.imei_change_count := l.response.LineIdentityResponse.Device.Identifier.Imei.ChangeCount;
 		SELF.imei_tracked_since := t_Date2ToString(l.response.LineIdentityResponse.Device.Identifier.Imei.TrackedSince);
+		SELF.imei_ActivationDate := t_Date2ToString(l.response.LineIdentityResponse.Device.Identifier.Imei.ActivationDate);
 		SELF.first_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].FirstNameScore;
 		SELF.last_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].LastNameScore;
 		SELF.addr_score := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].AddressScore;
@@ -255,6 +256,9 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 										l.response._header.Message <> '' => l.response._header.Message,
 										'');	
 		// SELF.date_added;
+		SELF.line_activation_date := t_Date2ToString(l.response.LineIdentityResponse.Account.LineActivationDate);
+		SELF.account_activation_date := t_Date2ToString(l.response.LineIdentityResponse.Account.AccountActivationDate);
+		SELF.acct_tenure_min := (INTEGER)l.response.LineIdentityResponse.Account.AccountTenure.min; 
 		SELF := l.response.LineIdentityResponse;
 		SELF := [];
 	
