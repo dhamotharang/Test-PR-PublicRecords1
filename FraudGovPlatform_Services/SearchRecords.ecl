@@ -1,6 +1,6 @@
-﻿IMPORT Address, BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
+﻿IMPORT Address, DidVille, FraudGovPlatform_Services, FraudShared, FraudShared_Services, IDLExternalLinking, iesp, std;
 
-EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
+EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
 										 BOOLEAN IsTestRequest = FALSE) := MODULE
 	
@@ -12,30 +12,62 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// **************************************************************************************
 	// Getting the payload records from FraudGov Payload key.
 	// **************************************************************************************
-	SHARED ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs( ds_batch_in,
+	SHARED ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs( ds_in,
 																																									batch_params,
 																																									IsOnline := batch_params.IsOnline);
+																																									
+	// Validate Input DID and check if it exists in Public Records. 
+	EXPORT BOOLEAN DidFoundInPR := ds_in[1].did <> 0 AND EXISTS(IDLExternalLinking.did_getAllRecs(ds_in[1].did)(s_did > 0));
+
+	// Validate Input DID and check if it's a RINID. 
+	SHARED BOOLEAN IsInputDidRINID := ~DidFoundInPR AND
+                                    ds_in[1].did > 900000000000 AND //This is the number RIN ID sequence starts in index.
+                                    EXISTS(FraudShared.Key_Did(_Constant.FRAUD_PLATFORM)(KEYED(did = ds_in[1].did)));
+
 
 	// **************************************************************************************
 	// Append DID for Input PII
 	// **************************************************************************************	  
-	SHARED ds_input_with_adl_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);
-	
-	EXPORT BOOLEAN adlDIDFound := EXISTS(ds_input_with_adl_did(did > 0));
 
-	EXPORT ds_adl_in := PROJECT(ds_input_with_adl_did, 
+	//prepare the layout for ADL_BEST DID call
+	SHARED ds_in_didville_layout := PROJECT(ds_in, TRANSFORM(DidVille.Layout_Did_OutBatch,
+                                                  SELF.seq		:= (UNSIGNED)LEFT.acctno;
+                                                  SELF.fname	:= LEFT.name_first;
+                                                  SELF.mname	:= LEFT.name_middle;
+                                                  SELF.lname	:= LEFT.name_last;
+                                                  SELF.suffix	:= LEFT.name_suffix;
+                                                  SELF.ssn 		:= stringlib.stringfilter(LEFT.ssn,'0123456789');
+                                                  SELF.did 		:= 0; //Purposefully sending DID = 0, so we can resolve the adl best did for Input PII. 
+                                                  SELF.phone10:= LEFT.phoneno;
+                                                  SELF				:= LEFT;
+                                                  SELF				:= []));
+	
+	EXPORT ds_in_w_adl_did_appended := DidVille.did_service_common_function( ds_in_didville_layout,
+                                                                           glb_flag := batch_params.isValidGLB(),
+                                                                           glb_purpose_value := batch_params.glb,
+                                                                           appType := batch_params.application_type,
+                                                                           include_minors := TRUE,
+                                                                           IndustryClass_val := batch_params.industry_class,
+                                                                           DRM_val := batch_params.DataRestrictionMask);
+																																			 
+	SHARED ds_in_w_adl_did_appended_ungrup := UNGROUP(ds_in_w_adl_did_appended);
+	
+	EXPORT ds_adl := JOIN(ds_in, ds_in_w_adl_did_appended_ungrup,
+												LEFT.acctno = (string)RIGHT.seq,
 												TRANSFORM(DidVille.Layout_Did_OutBatch,
-													SELF.Seq := COUNTER, 
-													SELF.did := LEFT.did, 													
+													SELF.Seq := COUNTER,
+													SELF.did := MAP(DidFoundInPR OR IsInputDidRINID => LEFT.DID,
+																					~DidFoundInPR => RIGHT.DID,
+																					0); 													
 													SELF	:= []));
 	
-	ds_contributory_in := PROJECT(ds_allPayloadRecs , 
-													TRANSFORM(DidVille.Layout_Did_OutBatch,
-														SELF.Seq := COUNTER,
-														SELF.did := LEFT.did,
-														SELF := []));
+	ds_contributory := PROJECT(ds_allPayloadRecs , 
+												TRANSFORM(DidVille.Layout_Did_OutBatch,
+													SELF.Seq := COUNTER,
+													SELF.did := LEFT.did,
+													SELF := []));
 
-	ds_contributory_in_dedup := DEDUP(SORT(ds_contributory_in(did > 0), did), did);
+	ds_contributory_dedup := DEDUP(SORT(ds_contributory(did > 0), did), did);
 	
 	/* This is best on three step process defined in GRP-724 */
 		/* 
@@ -50,17 +82,17 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		3.Bring back ELEMENT cards (ONLY MVP SUPPORTED ELEMENTs),  for each ELEMENT in the Search Criteria,   
 			when ALL ELEMENTS in the Search Criteria is found to match a single contributed row.
 		*/
-	ds_dids_to_use := IF(adlDIDFound , ds_adl_in , ds_contributory_in_dedup);
+	ds_dids_to_use := IF(DidFoundInPR , ds_adl , ds_contributory_dedup);
 	
-	//adding additional elements lexid's to ds_batch_in , so velocities can be calculated.
-	ds_elements_dids := PROJECT(ds_contributory_in_dedup, 
+	//adding additional elements lexid's to ds_in , so velocities can be calculated.
+	ds_elements_dids := PROJECT(ds_contributory_dedup, 
 												TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec, 
 													SELF.acctno := '1', //since search request is always batch of 1 record, acctno can safely be hardcoded to 1, as assigned in service layer attribute. 
 													SELF.Seq := LEFT.Seq,
 													SELF.did := LEFT.did,
 													SELF := []));
 	
-	ds_combinedfreg_recs := IF(adlDIDFound, ds_batch_in, ds_batch_in + ds_elements_dids);
+	ds_combinedfreg_recs := IF(DidFoundInPR, ds_in, ds_in + ds_elements_dids);
 
 	ds_fragment_recs_w_value := FraudGovPlatform_Services.Functions.GetFragmentRecs(ds_combinedfreg_recs, ds_allPayloadRecs, batch_params, TRUE);
 	
@@ -150,11 +182,16 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, _Constant.FRAUD_PLATFORM, batch_params);
 
 	//realtime record:
-	BOOLEAN isRealtimeRecord := adlDIDFound AND COUNT(ds_contributoryBest) = 0;
+	BOOLEAN isRealtimeRecord := DidFoundInPR AND COUNT(ds_contributoryBest) = 0;
 	
-	ds_batch_in_orig := PROJECT(ds_input_with_adl_did, FraudShared_Services.Layouts.BatchIn_rec);
+	ds_in_orig := JOIN(ds_in, ds_adl, 
+											LEFT.acctno = (string)RIGHT.seq,
+											TRANSFORM(FraudShared_Services.Layouts.BatchIn_rec, 
+												SELF.did := RIGHT.did, 
+												SELF := LEFT));
+	
 	ds_ExternalServices_recs := IF(isRealtimeRecord, 
-																	FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_batch_in_orig, batch_params),
+																	FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_in_orig, batch_params),
 																	DATASET([], FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw));
 																		
 	ds_realtimescoring_rec := FraudGovPlatform_Services.mod_RealTimeScoring(ds_ExternalServices_recs, batch_params).ds_w_realTimeScore;
@@ -216,7 +253,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),																			
 				 L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => 
 															ds_delta_recentTransactions(DriversLicense.DriversLicenseNumber = L.fragment_value AND 
-																													DriversLicense.DriversLicenseState = ds_batch_in[1].dl_state),
+																													DriversLicense.DriversLicenseState = ds_in[1].dl_state),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);
@@ -252,13 +289,16 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 														SELF.NoOfRecentTransactions := COUNT(ds_delta_recentTransactions(UniqueId = (string)LEFT.LexID)),
 														SELF := []));														
 
-	// output(ds_batch_in, named('ds_batch_in'));
+	// output(ds_in, named('ds_in'));
+	// output(batch_params.DIDScoreThreshold, named('DIDScoreThreshold'));
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
-	// output(ds_input_with_adl_did, named('ds_input_with_adl_did'));
-	// output(adlDIDFound, named('adlDIDFound'));
-	// output(ds_adl_in, named('ds_adl_in'));
-	// output(ds_contributory_in, named('ds_contributory_in'));
-	// output(ds_contributory_in_dedup, named('ds_contributory_in_dedup'));
+	// output(DidFoundInPR, named('DidFoundInPR'));
+	// output(IsInputDidRINID, named('IsInputDidRINID'));
+	// output(ds_in_didville_layout, named('ds_in_didville_layout'));
+	// output(ds_in_w_adl_did_appended, named('ds_in_w_adl_did_appended'));
+	// output(ds_adl, named('ds_adl'));
+	// output(ds_contributory, named('ds_contributory'));
+	// output(ds_contributory_dedup, named('ds_contributory_dedup'));
 	// output(ds_dids_to_use, named('ds_dids_to_use'));
 	// output(ds_elements_dids, named('ds_elements_dids'));
 	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
@@ -276,6 +316,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_GovBest, named('ds_GovBest'));
 	// output(ds_contributoryBest, named('ds_contributoryBest'));
 	// output(isRealtimeRecord, named('isRealtimeRecord'));
+	// output(ds_in_orig, named('ds_in_orig'));
 	// output(ds_ExternalServices_recs, named('ds_ExternalServices_recs'));	
 	// output(ds_realtimescoring_rec, named('ds_realtimescoring_rec'));
 	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));	
