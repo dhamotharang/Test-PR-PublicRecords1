@@ -2,7 +2,7 @@
  * This function gathers the Phonesplus_Characteristics attributes.				*
  ************************************************************************ */
 
-IMPORT AutoKey, Data_Services, Phone_Shell, Phones, Phonesplus_v2, RiskWise, UT, STD;
+IMPORT AutoKey, Data_Services, Phone_Shell, Phones, Phonesplus_v2, RiskWise, UT, STD, doxie;
 
 DEBUG_IGNORE_ALLOW_LIST := FALSE; // Set to TRUE if you do NOT want to filter by allow list
 
@@ -13,7 +13,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 			 UNSIGNED1 GLBPurpose, 
 			 UNSIGNED1 DPPAPurpose, 
 			 STRING30 IndustryClass, 
-			 STRING DataRestrictionMask
+			 STRING DataRestrictionMask,
+             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 			 ) := FUNCTION
 			 
 	/* ***********************************************************************

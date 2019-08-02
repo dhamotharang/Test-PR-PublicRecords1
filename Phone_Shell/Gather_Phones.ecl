@@ -1,4 +1,4 @@
-﻿IMPORT Gateway, Phone_Shell, RiskWise, PhoneMart;
+﻿IMPORT Gateway, Phone_Shell, RiskWise, PhoneMart, doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) Input,
 																																						 DATASET(Gateway.Layouts.Config) Gateways,
@@ -23,7 +23,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 																																						 BOOLEAN Strict_APSX = FALSE, // By default don't enforce strict Extended Skip Trace matching
 																																						 BOOLEAN BlankOutDuplicatePhones = FALSE,
 																																						 BOOLEAN UsePremiumSource_A = FALSE, 
-																																						 BOOLEAN RunRelocation = FALSE) := FUNCTION
+																																						 BOOLEAN RunRelocation = FALSE,
+                                                                                                                                                         doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	/* ******************************************************************************
    ********************************************************************************
 	 ** This function calls all of the search functions and then joins the results **
@@ -36,21 +37,21 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 	 ********************************************************************************
 	 ****************************************************************************** */	 
 	 
-	 HeaderAddresses := Phone_Shell.Search_Header_Unique_Addresses(Input, GLBPurpose, DPPAPurpose, DataRestrictionMask);
+	 HeaderAddresses := Phone_Shell.Search_Header_Unique_Addresses(Input, GLBPurpose, DPPAPurpose, DataRestrictionMask, mod_access);
 	 
 	 NonSubjectPhones := Phone_Shell.Search_Parent_Spouse_Relative_RawData(Input, GLBPurpose, DPPAPurpose, DataRestrictionMask);
 	 
 	 InputPhones := Phone_Shell.Search_Input(Input, PhoneRestrictionMask);
 
-	 Infutor := Phone_Shell.Search_Infutor(Input, PhoneRestrictionMask);
+	 Infutor := Phone_Shell.Search_Infutor(Input, PhoneRestrictionMask, mod_access);
 
-	 PeopleAtWork := Phone_Shell.Search_PeopleAtWork(Input, PhoneRestrictionMask);
+	 PeopleAtWork := Phone_Shell.Search_PeopleAtWork(Input, PhoneRestrictionMask, mod_access);
 
-	 PhonesFeedback := IF(IncludePhonesFeedback, Phone_Shell.Search_PhonesFeedback(Input, PhoneRestrictionMask));
+	 PhonesFeedback := IF(IncludePhonesFeedback, Phone_Shell.Search_PhonesFeedback(Input, PhoneRestrictionMask, mod_access));
 
 	 Relocation := IF(RunRelocation, Phone_Shell.Search_Relocation(Input, RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, PhoneRestrictionMask));
 
-	 Utility := Phone_Shell.Search_Utility(Input, GLBPurpose, PhoneRestrictionMask, IndustryClass);
+	 Utility := Phone_Shell.Search_Utility(Input, GLBPurpose, PhoneRestrictionMask, IndustryClass, mod_access);
 	 
 	 Spouse := Phone_Shell.Search_Spouse(Input, NonSubjectPhones (Subj_Phone_Type = '41'), PhoneRestrictionMask);
 
@@ -60,9 +61,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 
 	 CoResident := Phone_Shell.Search_CoResident(Input, NonSubjectPhones (Subj_Phone_Type = '44'), PhoneRestrictionMask);
 	 
-	 EDA := Phone_Shell.Search_EDA(Input, HeaderAddresses, PhoneRestrictionMask);
+	 EDA := Phone_Shell.Search_EDA(Input, HeaderAddresses, PhoneRestrictionMask, mod_access);
 	 
-	 PhonesPlus := Phone_Shell.Search_PhonesPlus(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask);
+	 PhonesPlus := Phone_Shell.Search_PhonesPlus(Input, HeaderAddresses, GLBPurpose, DPPAPurpose, IncludeLastResort, PhoneRestrictionMask, DataPermissionMask, IndustryClass, DataRestrictionMask, mod_access);
 	 
 	 SkipTrace := Phone_Shell.Search_Extended_Skip_Trace(Input, PhoneRestrictionMask, DataRestrictionMask, SX_Match_Restriction_Limit, Strict_APSX);
 	 
@@ -120,7 +121,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Phones (DAT
 											SELF.Experian_File_One_Verification.Experian_Last_Update := TRIM((string) left.Bureau_Last_Update); //for sake of existing model
 											SELF := RIGHT),
 											RIGHT OUTER);	
-	 Equifax := Phone_Shell.Search_Equifax(Input, WithPhoneMartDate, DataRestrictionMask, PhoneRestrictionMask, UsePremiumSource_A);
+	 Equifax := Phone_Shell.Search_Equifax(Input, WithPhoneMartDate, DataRestrictionMask, PhoneRestrictionMask, UsePremiumSource_A, mod_access);
 	 Combined_data := WithPhoneMartDate + Equifax (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');
 		
 	 ValidCombined := Combined_data (TRIM(Sources.Source_List) <> '' AND TRIM(Gathered_Phone) <> '');

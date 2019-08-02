@@ -1,4 +1,4 @@
-/*2013-11-21T00:09:25Z (Lorraine Hill)
+﻿/*2013-11-21T00:09:25Z (Lorraine Hill)
 
 */
 /* ************************************************************************
@@ -6,9 +6,9 @@
  * - LexID (DID):: Source: PAW																						*
  ************************************************************************ */
 
-IMPORT Phone_Shell, Risk_Indicators, RiskWise, UT, PAW;
+IMPORT Phone_Shell, RiskWise, PAW, doxie;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PeopleAtWork (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PeopleAtWork (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	 /* ***************************************************************
 		* 								Get the Contact ID by DID											*
 	  *************************************************************** */

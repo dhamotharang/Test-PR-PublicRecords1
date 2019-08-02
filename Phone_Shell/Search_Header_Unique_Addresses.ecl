@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches the Header and Fast Header to get unique				*
  * addresses seen within the last 5 years.  These results then get used		*
  * within Phone_Shell.Search_PhonesPlus and Phone_Shell.Search_EDA.				*
@@ -6,12 +6,19 @@
  * Adapted from Risk_Indicators.iid_getHeader                             *
  ************************************************************************ */
  
-IMPORT Drivers, Doxie, Header, Header_Quick, MDR, Phone_Shell, Risk_Indicators, UT, STD;
+IMPORT Drivers, Doxie, Header, Header_Quick, MDR, Phone_Shell, Risk_Indicators, UT, STD, Suppress;
 
 todays_date := (string) STD.Date.Today();
 
-EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, STRING50 DataRestrictionMask) := FUNCTION
-	fullHeader := JOIN(Input, Doxie.Key_Header,
+EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, STRING50 DataRestrictionMask, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+	
+  Layout_Unique_Addresses_CCPA := RECORD
+  unsigned4 global_sid;
+  Phone_Shell.Layouts.layoutUniqueAddresses;
+  END;
+  
+  
+  fullHeader := JOIN(Input, Doxie.Key_Header,
 													LEFT.DID <> 0 AND KEYED(LEFT.DID = RIGHT.s_DID) AND
 													// We only want unique addresses to search by within the past 6 months
 													(LEFT.Clean_Input.Prim_Range <> RIGHT.Prim_Range OR LEFT.Clean_Input.Predir <> RIGHT.Predir OR LEFT.Clean_Input.Prim_Name <> RIGHT.Prim_Name OR 
@@ -28,7 +35,7 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
 															OR
 													(Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, FALSE) AND Drivers.state_dppa_ok(Header.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))) AND
 													~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st), 
-													TRANSFORM(Phone_Shell.Layouts.layoutUniqueAddresses,	SELF.seq := LEFT.Clean_Input.seq; 
+													TRANSFORM(Layout_Unique_Addresses_CCPA,	SELF.seq := LEFT.Clean_Input.seq; 
 																														SELF.FirstName := LEFT.Clean_Input.FirstName;
 																														SELF.LastName := LEFT.Clean_Input.LastName;
 																														SELF.HomePhone := LEFT.Clean_Input.HomePhone;
@@ -44,6 +51,7 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
 																														SELF.City := RIGHT.City_Name;
 																														SELF.State := RIGHT.St;
 																														SELF.DID := RIGHT.s_DID;
+                                                                                                                        SELF.global_sid := RIGHT.global_sid;
 																														SELF.DateLastSeen := (STRING8)IF(RIGHT.dt_last_seen <> 0, RIGHT.dt_last_seen, RIGHT.dt_vendor_last_reported);
 																														SELF := RIGHT), 
 													KEEP(UT.Limits.HEADER_PER_DID), ATMOST(UT.Limits.HEADER_PER_DID));
@@ -65,7 +73,7 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
 															OR
 													(Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, FALSE) AND Drivers.state_dppa_ok(Header.translateSource(RIGHT.src), DPPAPurpose, RIGHT.src))) AND
 													~Risk_Indicators.iid_constants.filtered_source(RIGHT.src, RIGHT.st), 
-													TRANSFORM(Phone_Shell.Layouts.layoutUniqueAddresses,	SELF.seq := LEFT.Clean_Input.seq; 
+													TRANSFORM(Layout_Unique_Addresses_CCPA,	SELF.seq := LEFT.Clean_Input.seq; 
 																														SELF.FirstName := LEFT.Clean_Input.FirstName;
 																														SELF.LastName := LEFT.Clean_Input.LastName;
 																														SELF.HomePhone := LEFT.Clean_Input.HomePhone;
@@ -81,6 +89,7 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
 																														SELF.City := RIGHT.City_Name;
 																														SELF.State := RIGHT.St;
 																														SELF.DID := RIGHT.DID;
+                                                                                                                        SELF.global_sid := RIGHT.global_sid;
 																														SELF.DateLastSeen := (STRING8)IF(RIGHT.dt_last_seen <> 0, RIGHT.dt_last_seen, RIGHT.dt_vendor_last_reported);
 																														SELF := RIGHT), 
 													KEEP(UT.Limits.HEADER_PER_DID), ATMOST(UT.Limits.HEADER_PER_DID));
@@ -88,9 +97,12 @@ EXPORT Phone_Shell.Layouts.layoutUniqueAddresses Search_Header_Unique_Addresses(
 	// Don't dedup by Sec_Range, just keep the version that has Apartment number populated to avoid finding phone numbers for the entire apartment complex.
 	combinedUniqueHeaders := DEDUP(SORT(fullHeader + fastHeader, seq, DID, Prim_Range, Predir, Prim_Name, Addr_Suffix, -Sec_Range, Zip5, -((INTEGER)DateLastSeen)), seq, DID, Prim_Range, Predir, Prim_Name, Addr_Suffix, Zip5);
 	
+  combined_Unique_Headers_Suppressed := Suppress.MAC_SuppressSource(combinedUniqueHeaders, mod_access);
+  combined_Unique_Headers_Formatted := PROJECT(combined_Unique_Headers_Suppressed, TRANSFORM(  Phone_Shell.Layouts.layoutUniqueAddresses,
+                                                  SELF := LEFT));
 	// OUTPUT(fullHeader, NAMED('fullHeader'));
 	// OUTPUT(fastHeader, NAMED('fastHeader'));
 	// OUTPUT(combinedUniqueHeaders, NAMED('CombinedUniqueHeaders'));
 	
-	RETURN(combinedUniqueHeaders);
+	RETURN(combined_Unique_Headers_Formatted);
 END;

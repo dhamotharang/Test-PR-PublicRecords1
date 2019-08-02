@@ -1,15 +1,15 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches the phones feedback consortium by:					    *
  * -DID:: Source: PF                                                      *
  * -Last Name, Address:: Source: PFLA												              *
  * -First Name, Last Name, Address:: Source: PFFLA											  *
  ************************************************************************ */
 
-IMPORT Phone_Shell, PhonesFeedback, RiskWise, UT, STD;
+IMPORT Phone_Shell, PhonesFeedback, RiskWise, UT, STD, doxie;
 
 todays_date := (string) STD.Date.Today();
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesFeedback (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesFeedback (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getFeedbackPhonesAddr(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_Address ri) := TRANSFORM
 		SElf.Gathered_Phone := TRIM(ri.phone_number);
 		
