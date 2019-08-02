@@ -300,8 +300,9 @@ export FCRAConsumerAttributes_Service := MACRO
       
   unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly +
 			if(FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) + //DRM to drive Liens/Judgments
-      Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode +  // Filter SO Derog Data
-    	Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException;
+    	Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException  +
+      Risk_Indicators.iid_constants.BSOptions.InsuranceFCRASODataFilter;  // Filter SO Derog Data
+
 										
 	clam(unsigned1 bsVersion) := Risk_Indicators.Boca_Shell_Function_FCRA(
 		iid_prep, gateways, dppa, glba, isUtility, isLN,

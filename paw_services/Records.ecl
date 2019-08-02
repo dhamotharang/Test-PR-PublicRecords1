@@ -16,15 +16,20 @@ EXPORT Records := MODULE
 			TRANSFORM(Paw.Layout.Employment_Out,SELF:=RIGHT),
 			KEEP(FCRA.compliance.MAX_OVERRIDE_LIMIT),LIMIT(0));
 
-		// get paw records less overwritten records
+		// get paw records
 		ds_paw_recs:=JOIN(ds_dids,PAW.Key_DID_FCRA,
-			KEYED(LEFT.did=RIGHT.did)
-			AND RIGHT.contact_id>0 AND TRIM((STRING)RIGHT.contact_id) NOT IN SET(ds_FlagFile((UNSIGNED)did=LEFT.did),TRIM(record_id)),
+			KEYED(LEFT.did=RIGHT.did) AND RIGHT.contact_id>0,
 			TRANSFORM(Paw.Layout.Employment_Out,SELF:=RIGHT),
 			KEEP(paw_services.Constants.FCRA.MaxPawPerDID),
 			LIMIT(paw_services.Constants.FCRA.MaxPawRecords,SKIP));
 
-		ds_paw_raw:=(ds_paw_recs+ds_override_recs)(glb='N' OR in_mod.isValidGlb()); // apply GLB filter
+		// less overwritten records
+		ds_paw_less_overwritten:=JOIN(ds_paw_recs,ds_FlagFile,
+			LEFT.did=(UNSIGNED)RIGHT.did
+			AND (STRING)LEFT.contact_id=TRIM(RIGHT.record_id),
+			TRANSFORM(Paw.Layout.Employment_Out,SELF:=LEFT),LEFT ONLY);
+
+		ds_paw_raw:=(ds_paw_less_overwritten+ds_override_recs)(glb='N' OR in_mod.isValidGlb()); // apply GLB filter
 
 		// apply suppressions
 		Suppress.MAC_Suppress(ds_paw_raw,ds_dids_pulled,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);

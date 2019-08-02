@@ -7,7 +7,7 @@ import iesp;
 export emailsearchv2 := MODULE
 			
 export t_EmailSearchV2SearchBy := record
-	unsigned8 LexId {xpath('LexId')};
+	unsigned8 LexId {xpath('LexId')}; // Xsd type: string
 	string110 Email {xpath('Email')};
 	string11 SSN {xpath('SSN')};
 	string10 Phone10 {xpath('Phone10')};
@@ -27,6 +27,8 @@ export t_EmailSearchV2Option := record (iesp.share.t_BaseSearchOptionEx)
 	boolean KeepUndeliverableEmail {xpath('KeepUndeliverableEmail')};
 	unsigned2 MaxEmailsForDeliveryCheck {xpath('MaxEmailsForDeliveryCheck')};
 	string BVAPIkey {xpath('BVAPIkey')};//hidden[ecl_only]
+	boolean SkipTMX {xpath('SkipTMX')};
+	unsigned2 MaxEmailsForTMX {xpath('MaxEmailsForTMX')};
 end;
 		
 export t_EmailSearchV2OriginalData := record
@@ -41,12 +43,15 @@ export t_EmailSearchV2OriginalData := record
 	string LoginDate {xpath('LoginDate')};
 	string IPAddress {xpath('IPAddress')};
 	string Website {xpath('Website')};
+	string CompanyName {xpath('CompanyName')};
+	string CompanyTitle {xpath('CompanyTitle')};
 end;
 		
 export t_EmailSearchV2CleanData := record
 	string EmailAddress {xpath('EmailAddress')};
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
+	string CompanyName {xpath('CompanyName')};
 end;
 		
 export t_EmailSearchV2BestInfo := record
@@ -60,7 +65,7 @@ export t_EmailSearchV2Record := record
 	t_EmailSearchV2OriginalData Original {xpath('Original')};
 	t_EmailSearchV2CleanData Cleaned {xpath('Cleaned')};
 	t_EmailSearchV2BestInfo BestInfo {xpath('BestInfo')};
-	unsigned LexId {xpath('LexId')};
+	unsigned8 LexId {xpath('LexId')}; // Xsd type: string
 	iesp.share.t_Date ProcessDate {xpath('ProcessDate')};
 	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
@@ -84,7 +89,7 @@ end;
 		
 export t_EmailSearchV2InputSubject := record
 	t_EmailSearchV2SearchBy InputEcho {xpath('InputEcho')};
-	unsigned SubjectLexId {xpath('SubjectLexId')};
+	unsigned8 SubjectLexId {xpath('SubjectLexId')}; // Xsd type: string
 end;
 		
 export t_EmailSearchV2Response := record
