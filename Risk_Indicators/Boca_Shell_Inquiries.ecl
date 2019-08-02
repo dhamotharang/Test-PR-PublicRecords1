@@ -1,4 +1,4 @@
-﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, risk_indicators;
+﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, risk_indicators, doxie;
 
 isFCRA := false;
 
@@ -7,7 +7,8 @@ export Boca_Shell_Inquiries(
 	unsigned8 BSOptions,
 	integer bsVersion,
 	dataset(Gateway.Layouts.Config) gateways,
-	string DataPermission) := FUNCTION
+	string DataPermission,
+    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 // when running in FCRA historical mode, this function will call over to neutral roxie
 // to count up collection transactions that happened prior to project july moving

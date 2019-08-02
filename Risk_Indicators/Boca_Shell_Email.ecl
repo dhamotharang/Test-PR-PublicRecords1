@@ -1,11 +1,12 @@
-﻿import _Control, email_data, riskwise, ut, fcra, mdr, risk_indicators;
+﻿import _Control, email_data, riskwise, ut, fcra, mdr, risk_indicators, doxie;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Email(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) clam_pre_email_in, 
 	boolean isFCRA, 
 	integer bsversion,
 	unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
-	unsigned8 BSOptions=0
+	unsigned8 BSOptions=0,
+    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   ) := FUNCTION
 
 
