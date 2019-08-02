@@ -15,16 +15,15 @@ EXPORT FUNCTIONS := MODULE
     //spin through the search key records and mark a search status error on those which fail scrutiny.
     //Also, get them out of the insurance_iesp child dataset structure and make it a simpler dataset structure that we can use outside.
     PCL.Layout_PCRequestStatus ValidateKeys(PCL.Layout_PCSearchKey L) := TRANSFORM      
-      LexID		:= (UNSIGNED)L.LexID;
-			EmptyValues := ['0', ''];
-			
-      SELF.SearchStatus			:= MAP(LexID > 0 AND (L.RecID1 NOT IN EmptyValues OR L.RecID2 NOT IN EmptyValues OR L.RecID3 NOT IN EmptyValues OR L.RecID4 NOT IN EmptyValues)   => CS.LexidRecidCombinationError,
-			                             LexID = 0 AND L.RecId1 IN EmptyValues AND L.RecId2 IN EmptyValues AND L.RecId3 IN EmptyValues AND L.RecId4 IN EmptyValues  => CS.NoSearchRecords,
-			                             L.RecId2 NOT IN EmptyValues AND L.RecId1 IN EmptyValues																													=> CS.RecIDOutOfSequence,
-																	 L.RecId3 NOT IN EmptyValues AND (L.RecId2 IN EmptyValues OR L.RecId1 IN EmptyValues) 														=> CS.RecIDOutOfSequence,
-																	 L.RecID4 NOT IN EmptyValues AND (L.RecId3 IN EmptyValues OR L.RecId2 IN EmptyValues OR L.RecId3 IN EmptyValues)	=> CS.RecIDOutOfSequence,
+      EmptyValues := ['0', ''];
+      SELF.SearchStatus			:= MAP(L.LexID NOT IN EmptyValues AND (L.RecID1 NOT IN EmptyValues OR L.RecID2 NOT IN EmptyValues OR L.RecID3 NOT IN EmptyValues OR L.RecID4 NOT IN EmptyValues)         						 		
+																																																												=> CS.LexidRecidCombinationError,
+			                             L.LexID IN EmptyValues AND L.RecId1 IN EmptyValues AND L.RecId2 IN EmptyValues AND L.RecId3 IN EmptyValues AND L.RecId4 IN EmptyValues  												
+																																																												=> CS.NoSearchRecords,
+			                             L.RecId2 NOT IN EmptyValues AND L.RecId1 IN EmptyValues 															=> CS.RecIDOutOfSequence,
+																	 L.RecId3 NOT IN EmptyValues AND (L.RecId2 IN EmptyValues OR L.RecId1 IN EmptyValues) => CS.RecIDOutOfSequence,
+																	 L.RecID4 NOT IN EmptyValues AND (L.RecId3 IN EmptyValues OR L.RecId2 IN EmptyValues OR L.RecId3 IN EmptyValues) 	=> CS.RecIDOutOfSequence,
 																	 '');
-			SELF.LexID := (STRING)LexID;														 
       SELF := L;
     END;
     
@@ -48,16 +47,15 @@ EXPORT FUNCTIONS := MODULE
     //spin through the search key records and mark a search status error on those which fail scrutiny.
     //Also, get them out of the insurance_iesp child dataset structure and make it a simpler dataset structure that we can use outside.
     PCL.Layout_PCRequestStatus ValidateKeys(PersonContext.Layouts.Layout_PCSearchKey L) := TRANSFORM      
-      LexID		:= (UNSIGNED)L.LexID;
-			EmptyValues := ['0', ''];
-			
-      SELF.SearchStatus			:= MAP(LexID > 0 AND (L.RecID1 NOT IN EmptyValues OR L.RecID2 NOT IN EmptyValues OR L.RecID3 NOT IN EmptyValues OR L.RecID4 NOT IN EmptyValues)   => CS.LexidRecidCombinationError,
-			                             LexID = 0 AND L.RecId1 IN EmptyValues AND L.RecId2 IN EmptyValues AND L.RecId3 IN EmptyValues AND L.RecId4 IN EmptyValues  => CS.NoSearchRecords,
-			                             L.RecId2 NOT IN EmptyValues AND L.RecId1 IN EmptyValues																													=> CS.RecIDOutOfSequence,
-																	 L.RecId3 NOT IN EmptyValues AND (L.RecId2 IN EmptyValues OR L.RecId1 IN EmptyValues) 														=> CS.RecIDOutOfSequence,
-																	 L.RecID4 NOT IN EmptyValues AND (L.RecId3 IN EmptyValues OR L.RecId2 IN EmptyValues OR L.RecId3 IN EmptyValues)	=> CS.RecIDOutOfSequence,
+      EmptyValues := ['0', ''];
+      SELF.SearchStatus			:= MAP(L.LexID NOT IN EmptyValues AND (L.RecID1 NOT IN EmptyValues OR L.RecID2 NOT IN EmptyValues OR L.RecID3 NOT IN EmptyValues OR L.RecID4 NOT IN EmptyValues)         						 		
+																																																												=> CS.LexidRecidCombinationError,
+			                             L.LexID IN EmptyValues AND L.RecId1 IN EmptyValues AND L.RecId2 IN EmptyValues AND L.RecId3 IN EmptyValues AND L.RecId4 IN EmptyValues  												
+																																																												=> CS.NoSearchRecords,
+			                             L.RecId2 NOT IN EmptyValues AND L.RecId1 IN EmptyValues 															=> CS.RecIDOutOfSequence,
+																	 L.RecId3 NOT IN EmptyValues AND (L.RecId2 IN EmptyValues OR L.RecId1 IN EmptyValues) => CS.RecIDOutOfSequence,
+																	 L.RecID4 NOT IN EmptyValues AND (L.RecId3 IN EmptyValues OR L.RecId2 IN EmptyValues OR L.RecId3 IN EmptyValues) 	=> CS.RecIDOutOfSequence,
 																	 '');
-			SELF.LexID := (STRING)LexID;														 
       SELF := L;
     END;
     
@@ -261,7 +259,7 @@ EXPORT FUNCTIONS := MODULE
   
   EXPORT PerformCombineDatasets(DATASET(PCL.Layout_PCRequestStatus) SK,           //SK = Search Keys
                                 DATASET(PCL.Layout_PCResponseRec) DB,             //DB = Deltabase Results
-                                DATASET(PCL.Layout_PCResponseRec) RK,							//RK = Roxie Keys Results
+                                DATASET(PCL.Layout_PCResponseRec) RK,							// RK= Roxie Keys Results
 																BOOLEAN isConsumerDisclosure = FALSE) := MODULE		
 																
     //Get the search key records that had some issue and put search keys records in the common internal layout. These "bad" search records
