@@ -4997,7 +4997,7 @@
         </Party2>
       </MarriageDivorce>
     </MarriageDivorces>
-    <Educations diff_match="FirstReported.Year+FirstReported.Month+FirstReported.Day+AddressAtCollege.State+AddressAtCollege.Zip5" diff_monitor="Education">
+    <Educations diff_match="FirstReported.Year+FirstReported.Month+FirstReported.Day+CollegeData.Name" diff_monitor="Education">
       <Education>
         <Name>
           <Full diff_monitor=""/>

@@ -8776,26 +8776,26 @@ EXPORT _df_StudentRecord(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(layouts._lt_StudentRecord L, layouts._lt_StudentRecord R) := FUNCTION
-    boolean IsInner :=  (L.AddressAtCollege.Zip5 = R.AddressAtCollege.Zip5 AND L.AddressAtCollege.State = R.AddressAtCollege.State AND L.FirstReported.Year = R.FirstReported.Year AND L.FirstReported.Day = R.FirstReported.Day AND L.FirstReported.Month = R.FirstReported.Month);
+  EXPORT  integer1 CheckOuter_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(layouts._lt_StudentRecord L, layouts._lt_StudentRecord R) := FUNCTION
+    boolean IsInner :=  (L.FirstReported.Year = R.FirstReported.Year AND L.FirstReported.Day = R.FirstReported.Day AND L.FirstReported.Month = R.FirstReported.Month AND L.CollegeData.Name = R.CollegeData.Name);
 
-    boolean IsOuterRight :=   (L.AddressAtCollege.Zip5 = '' AND L.AddressAtCollege.State = '' AND L.FirstReported.Year = 0 AND L.FirstReported.Day = 0 AND L.FirstReported.Month = 0);
+    boolean IsOuterRight :=   (L.FirstReported.Year = 0 AND L.FirstReported.Day = 0 AND L.FirstReported.Month = 0 AND L.CollegeData.Name = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year (dataset(layouts._lt_StudentRecord) _n, dataset(layouts._lt_StudentRecord) _o) := FUNCTION
+  EXPORT  AsDataset_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year (dataset(layouts._lt_StudentRecord) _n, dataset(layouts._lt_StudentRecord) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_StudentRecord, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_StudentRecord, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.AddressAtCollege.Zip5 = RIGHT.AddressAtCollege.Zip5 AND LEFT.AddressAtCollege.State = RIGHT.AddressAtCollege.State AND LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month,
+                  LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month AND LEFT.CollegeData.Name = RIGHT.CollegeData.Name,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
+                  CheckOuter_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.AddressAtCollege.Zip5 = RIGHT.AddressAtCollege.Zip5 AND LEFT.AddressAtCollege.State = RIGHT.AddressAtCollege.State AND LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month,
+                  LEFT.FirstReported.Year = RIGHT.FirstReported.Year AND LEFT.FirstReported.Day = RIGHT.FirstReported.Day AND LEFT.FirstReported.Month = RIGHT.FirstReported.Month AND LEFT.CollegeData.Name = RIGHT.CollegeData.Name,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
+                  CheckOuter_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_StudentRecord);
@@ -9160,7 +9160,7 @@ EXPORT _df_PersonSlimReportResponse(boolean is_active, string path) := MODULE
 
       SELF.MarriageDivorces  := _df_MarriageSearch2Record(CASE(path + '/MarriageDivorces', '/MarriageDivorces' => (MonitorMarriageDivorce), is_active), path + '/MarriageDivorces/MarriageDivorce').AsDataset_filingnumberfilingtypecodestateorigin(L.MarriageDivorces, R.MarriageDivorces);
 
-      SELF.Educations  := _df_StudentRecord(CASE(path + '/Educations', '/Educations' => (MonitorEducation), is_active), path + '/Educations/Education').AsDataset_addressatcollege_stateaddressatcollege_zip5firstreported_dayfirstreported_monthfirstreported_year(L.Educations, R.Educations);
+      SELF.Educations  := _df_StudentRecord(CASE(path + '/Educations', '/Educations' => (MonitorEducation), is_active), path + '/Educations/Education').AsDataset_collegedata_namefirstreported_dayfirstreported_monthfirstreported_year(L.Educations, R.Educations);
 
       SELF.AKAs  := _df_BpsReportIdentity(CASE(path + '/AKAs', '/AKAs' => (MonitorAKA), is_active), path + '/AKAs/AKA').AsDataset_name_firstname_lastssninfoex_ssn(L.AKAs, R.AKAs);
 
