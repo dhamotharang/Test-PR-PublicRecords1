@@ -150,7 +150,7 @@ EXPORT WorkPlace_Records(doxie.IDataAccess mod_access, BOOLEAN useCannedRecs = F
 	//     choosing a candidate record below.
 	
 	//     Get PAW data only for the dids with POE data.
-	ds_paw_recs	:=	WorkPlace_Services.Functions.getPawRecs(ds_poe_recs);
+	ds_paw_recs	:=	WorkPlace_Services.Functions.getPawRecs(ds_poe_recs,mod_access);
 	
 	// Bring back to the slimmed PAW layout
 	ds_paw_recs_slimmed:= PROJECT(ds_paw_recs,BatchServices.WorkPlace_Layouts.POE_DIDKey_Slimmed);
