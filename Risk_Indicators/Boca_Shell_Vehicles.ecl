@@ -1,7 +1,7 @@
-import drivers, VehicleV2, riskwise;
+﻿import drivers, VehicleV2, riskwise, doxie;
 
 export Boca_Shell_Vehicles (GROUPED DATASET(Layout_Boca_Shell_ids) ids, unsigned1 dppa, boolean dppa_ok, boolean includeRel,
-														unsigned1 BSversion) := FUNCTION
+														unsigned1 BSversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 kv := VehicleV2.Key_BocaShell_Vehicles;
 

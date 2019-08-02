@@ -1,6 +1,6 @@
-import ut, riskwise, AddrFraud, address;
+﻿import ut, riskwise, AddrFraud, address, doxie;
 
-export Boca_Shell_Address_Risk(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, integer bsversion) := FUNCTION
+export Boca_Shell_Address_Risk(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, integer bsversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 					
 with_addrfraud_geolink := join(clam, AddrFraud.Key_AddrFraud_GeoLink,
 												left.shell_input.st<>'' and left.shell_input.county <>'' and left.shell_input.geo_blk <> '' and

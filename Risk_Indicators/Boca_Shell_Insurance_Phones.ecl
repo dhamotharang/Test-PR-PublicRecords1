@@ -10,9 +10,9 @@
 
 // Development Comments: There is a dependency on the data team building the keys as part of the Phone Shell v2.0 project prior to implementing this requirement. 
 
-import Phonesplus_v2, riskwise, risk_indicators;
+import Phonesplus_v2, riskwise, risk_indicators, doxie;
 
-EXPORT Boca_Shell_Insurance_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide) := function
+EXPORT Boca_Shell_Insurance_Phones(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 rtemp := record
 	risk_indicators.Layout_Input;
