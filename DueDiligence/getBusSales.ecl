@@ -12,7 +12,7 @@ EXPORT getBusSales(DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
 	linkIDs := DueDiligence.CommonBusiness.GetLinkIDs(busInfo);
 		
 	// ---------------- EBR - Experian Business Records ------------------
-	ebr5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(linkIDs,
+	ebr5600Raw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(linkIDs, ,
 																															 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																															 0, //ScoreThreshold --> 0 = Give me everything
 																															 linkingOptions,

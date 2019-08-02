@@ -15,7 +15,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	// NOTE: owner_type_code--One of the following descriptions will be listed: 0 = Unknown; 1 = Public; 2 = Private; 3 = Foreign; 4 = Non-Profit
 
-	EBRRaw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(LinkIDs,
+	EBRRaw := EBR.Key_5600_Demographic_Data_linkids.kFetch2(LinkIDs, ,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, // ScoreThreshold --> 0 = Give me everything
 																							linkingOptions,
