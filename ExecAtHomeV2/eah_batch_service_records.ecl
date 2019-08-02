@@ -79,7 +79,7 @@ FUNCTION
                  SELF := LEFT),
        LEFT ONLY);
   
-  dsPawLinkIdsAll := paw.Key_LinkIDs.kFetch(dsNoHitMktBest,
+  dsPawLinkIdsAll := paw.Key_LinkIDs.kFetch(dsNoHitMktBest,,
                                             BIPV2.IDconstants.Fetch_Level_SELEID);
   
   dsPawFiltered := dsPawLinkIdsAll(DID != 0 AND

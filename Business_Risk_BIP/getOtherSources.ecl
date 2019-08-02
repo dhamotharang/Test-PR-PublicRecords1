@@ -853,7 +853,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 																	
 	// ---------------- PAW ---------------------
-	PAWRaw := PAW.Key_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	PAWRaw := PAW.Key_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, 
 																							Business_Risk_BIP.Constants.Limit_Default,
