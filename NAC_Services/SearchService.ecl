@@ -5,7 +5,7 @@
 */
 IMPORT NAC_Services,NAC_V2_Services,iesp,AutoheaderV2;
 EXPORT SearchService() := FUNCTION
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 //1. Get input params and store iesp standards for penalty calculations
 	ds_in     := DATASET([], iesp.nac_search.t_NACSearchRequest) : STORED('NACSearchRequest',FEW);
 	first_row := ds_in[1] : INDEPENDENT;
