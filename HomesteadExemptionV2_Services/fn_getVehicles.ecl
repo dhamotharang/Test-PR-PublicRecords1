@@ -8,14 +8,14 @@ EXPORT fn_getVehicles(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) d
 	fetchVehicles(HomesteadExemptionV2_Services.Layouts.propIdRec L, UNSIGNED1 max_vehicles) := FUNCTION
 
 		// GET LOCAL RECORDS BY DID
-		did_mod:=MODULE(PROJECT(veh_mod,VehicleV2_Services.IParam.searchParams,OPT))
+		did_mod:=MODULE(PROJECT(veh_mod,VehicleV2_Services.IParam.searchParams))
 			EXPORT STRING14 didValue:=(STRING)L.did;
 			EXPORT STRING   DataSource:=VehicleV2_Services.Constant.LOCAL_VAL;
 			EXPORT BOOLEAN  noFail:=TRUE;
 		END;
 
 		// GET REALTIME RECORDS BY NAME AND ADDRESS
-		rtv_mod:=MODULE(PROJECT(veh_mod,VehicleV2_Services.IParam.searchParams,OPT))
+		rtv_mod:=MODULE(PROJECT(veh_mod,VehicleV2_Services.IParam.searchParams))
 			EXPORT STRING30  firstname   := L.name_first;
 			EXPORT STRING30  middlename  := L.name_middle;
 			EXPORT STRING30  lastname    := L.name_last;
