@@ -246,7 +246,16 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
         EXPORT UNSIGNED1 GLBPurpose             := SmallBizCombined_inmod.GLBAPurpose;
 		    EXPORT STRING32  ApplicationType        := SmallBizCombined_inmod.ApplicationType;
         EXPORT STRING14  DID                    := (STRING14)SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID;
-        EXPORT BOOLEAN   Include_BusinessCredit := TRUE; // Always true when called from here
+       
+				// Include_businessCredit Always true when called from here
+				// in order to keep boolean true and have backward compability this SmallBizCombined_inmod.BusinessCreditReportType needs to be set
+				// to the option of '1'  by default in the top level service ( LNSmallBusiness.SmallBusiness_BIP_Combined_Service)
+				// which is the value of BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport if nothing or '1'  is passed in.
+				// in the future when a '2' is passed for BusinessCreditReportType meaning LnOnly Credit then this will ensure that Include_businessCredit
+				// is false meaning no SBFE data in that particular version of the report.
+	   EXPORT BOOLEAN   Include_BusinessCredit :=   SmallBizCombined_inmod.BusinessCreditReportType = 
+		                                                                                         BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport; 
+																																																														 		                                                                                        		                                                                                                  		                                                                                     
 	 EXPORT BOOLEAN  LimitPaymentHistory24Months  :=  SmallBizCombined_inmod. LimitPaymentHistory24Months; // small bus Credit Report w SBFE addition
 	  EXPORT STRING     SBFEContributorIds  := SmallBizCombined_inmod.SBFEContributorIds; // small bus Credit Report w SBFE addition
 	  EXPORT STRING1 BusinessCreditReportType :=  SmallBizCombined_inmod.BusinessCreditReportType;  // use input iparam for requirement 1.3.3 
@@ -461,6 +470,7 @@ ds_newModels;
 		ds_results := IF( isGoodHit OR isBIPIDSearch OR SmallBizCombined_inmod.TestDataEnabled, ds_results_Hit, ds_results_NoHit );
 		
 		// output(isGoodHit, named('isGoodHit'));
+		//output(ds_SBA_Input_withCompPhone, named('ds_SBA_Input_withCompPhone'));
     // OUTPUT(SBA_Results_Temp_with_PhoneSources, NAMED('SBA_Results_Temp_with_PhoneSources'));
     // OUTPUT(SBA_Results, NAMED('SBA_Results'));
     // OUTPUT(ds_BizLinkIds, NAMED('ds_BizLinkIds'));
