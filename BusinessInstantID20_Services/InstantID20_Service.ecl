@@ -16,7 +16,11 @@ IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, 
 EXPORT InstantID20_Service() := MACRO
 
 		#OPTION('embeddedWarningsAsErrors',0);
-
+    
+   // #option ('optimizelevel', 0); // NEVER RELEASE THIS LINE OF CODE TO PROD
+                                    // this is for deploying to a 100-way as 
+                                    // the service is large.
+                                    // This service won't run on a 1-way.
 		/* ************************************************************************
 		 *                      Force the order on the WsECL page                 *
 		 ************************************************************************ */
@@ -148,10 +152,15 @@ EXPORT InstantID20_Service() := MACRO
 			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query. 
                                                             // Please refer to the ticket if needing further details.
 
-		// 4. Pass input to BIID 2.0 logic.
+		
+    
+    // 4. Pass input to BIID 2.0 logic.
 		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
 
-		//4.5 Call Testseeds Function
+    #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
+	
+		
+    //4.5 Call Testseeds Function
 		TestSeed_Results := BusinessInstantID20_Services.BIIDv2_TestSeed_Function(ds_Input, _TestData_TableName, , Options);
 
 		// 5. Project into IESP output.
@@ -293,5 +302,10 @@ EXPORT InstantID20_Service() := MACRO
 
 	// 7. Results!
 	OUTPUT( results_iesp, NAMED('Results') );
+#else // Else, output the model results directly
+//return ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
+OUTPUT (ds_BIID_results, NAMED('MODELRESULTS'));
 
+#end
+	
 ENDMACRO;

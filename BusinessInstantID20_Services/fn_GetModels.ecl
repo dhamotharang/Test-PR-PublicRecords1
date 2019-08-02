@@ -143,7 +143,7 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.DEFAULT_VALUE;
     // Use the SBFE restriction to return Scores or not.
     allow_SBFE_scores := Options.DataPermissionMask[12] NOT IN RESTRICTED_SET;
-    BusShellv22_scores_requested := EXISTS(Options.ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO+BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM+BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBBNFEL_SLBONFEL));
+    BusShellv22_scores_requested := EXISTS(Options.ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO+BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM+ BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BOFM + BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_SBFEATTR + BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM_NSBFEWITHEXP +BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBBNFEL_SLBONFEL));
    
     // Create a datarow to add to the intermediate log.
     Risk_Reporting.Layouts.Business_Risk_Job_Options xfm_options := TRANSFORM
@@ -209,7 +209,10 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     IncludeVeh          := TRUE;
     IncludeDerog        := TRUE;
 
-    bsversion := MAP(EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)) => 54, Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22 => 51 , 50);
+    bsversion := MAP(EXISTS(Options.ModelsRequested(ModelName IN 
+                                                    [BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP,
+                                                    BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM])) => 54, Options.BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22 => 51 , 50);
+                                                    
     //BSVersion           := if(BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22, 51, 50);
     IsFCRA              := FALSE;
     LN_Branded          := FALSE;
@@ -320,12 +323,14 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
     
     Boca_Shell_Grouped := IF(EXISTS(Options.ModelsRequested(ModelName in BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL)), Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
-    
+   
 /* **************************************************************************
 	 *                            Calculate Scores                            *
 	 * Note: The model score range is 501-900 with an exception score of 222. *
 	 ************************************************************************ */	 
     shell_res_grpd := GROUP(SORT(Shell_Results,seq),seq);
+    
+    #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
     
     Layout_ModelOut_Plus := RECORD
       Models.Layout_ModelOut;
@@ -356,12 +361,12 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
           setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, boca_shell_grouped)) ) + 
       IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)), 
           setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, boca_shell_grouped)) ) + 
+      IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP)), 
+        setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP, boca_shell_grouped)) ) +    
       IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)), 
           setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) + 		
-      
       IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)), 
           setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, boca_shell_grouped)) ) + 		
-
       IF( EXISTS(Options.ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)), 
           setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)) ) + 		
 
@@ -458,4 +463,11 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     // OUTPUT(allow_SBFE_scores,named('_allow_SBFE_scores') );
     // OUTPUT(BusShellv22_scores_requested,named('_BusShellv22_scores_requested') );
     RETURN Model_Results;
+    
+    #else // Else, output the model results directly
+
+//	return Models.LIB_BusinessRisk_Models(shell_res_grpd,,boca_shell_grouped,iid,,DPPA_Purpose,GLBA_Purpose,DataRestrictionMask_in,DataPermissionMask,appType).ValidatingModel;
+ return Models.LIB_BusinessRisk_Models(shell_res_grpd , bocaShell := boca_shell_grouped).ValidatingModel; 
+#end
+    
   END;

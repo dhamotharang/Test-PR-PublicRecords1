@@ -143,6 +143,7 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
                                  BusinessCredit_Services.Constants.CREDIT_SCORE_BOFM	 => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_SBFEATTR => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
+																 BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM_NSBFEWITHEXP => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB  => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL  => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL  => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
