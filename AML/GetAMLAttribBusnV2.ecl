@@ -7,8 +7,18 @@ EXPORT GetAMLAttribBusnV2(DATASET(Business_Risk.Layout_Input) indata,
 																	unsigned1 glba,
 																	DATASET (Gateway.Layouts.Config) gateways , 
 																	integer bsversion = 50,
+                                                                    unsigned1 LexIdSourceOptout = 1,
+                                                                    string TransactionID = '',
+                                                                    string BatchUID = '',
+                                                                    unsigned6 GlobalCompanyId = 0,
 																	string UseXG5Flag = '2',
 																	boolean IncludeNews = TRUE) := FUNCTION
+                                  
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
 
 appends := 'BEST_ALL';
 verify := 'BEST_ALL';
@@ -239,7 +249,7 @@ ExecIDSOnly := project(AddLnkBusnhdr(relatdegree in [AMLConstants.execSubjBsnDeg
 																		self.isrelat  := left.linkedbusn;
 																		self := [];));
 
-GetDegree := 	AML.AMLStudent(group(ExecIDSOnly, seq));   //RISK_INDICATORS.Layout_Boca_Shell_ids
+GetDegree := 	AML.AMLStudent(group(ExecIDSOnly, seq), mod_access);   //RISK_INDICATORS.Layout_Boca_Shell_ids
 
 
 layouts.AMLExecLayoutV2  PrepExecslayout(GetLinkedBusn le) := TRANSFORM
