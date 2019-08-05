@@ -252,6 +252,7 @@ MODULE
 			STRING                                                imei_seensince;
 			STRING8                                               imei_changedate;
 			INTEGER                                               imei_changedthis_time;
+			STRING8                                               imei_ActivationDate;
 			INTEGER                                               loststolen;
 			STRING8                                               loststolen_date;
 			BOOLEAN                                               is_verified;
@@ -361,6 +362,7 @@ MODULE
 			STRING imei_seensince;
 			STRING8 imei_changedate;
 			INTEGER imei_changedthis_time;
+			STRING8 imei_ActivationDate;
 			INTEGER loststolen;
 			STRING8 loststolen_date;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
