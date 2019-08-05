@@ -3,7 +3,6 @@ EXPORT Key_BizHead_L_CNPNAME := MODULE
  
 //cnp_name:?:prim_name:st:city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:zip
 EXPORT KeyName := BizLinkFull.Filename_keys.L_CNPNAME; /*HACK07*/
-EXPORT SlimKeyName := BizLinkFull.Filename_keys.L_CNPNAME_SLIM; /*HACK25a*/
 SHARED h := CandidatesForKey;//The input file - distributed by proxid
  
 SHARED s := Specificities(File_BizHead).Specificities[1];
@@ -79,11 +78,6 @@ DataForKey2 := DEDUP(SORT(DataForKey1,WHOLE RECORD,LOCAL),WHOLE RECORD,LOCAL); /
 SHARED DataForKey := DataForKey2;
  
 EXPORT Key := INDEX(DataForKey,{DataForKey},{},KeyName);
-
-EXPORT slimIndLay := {unsigned4 gss_hash, unsigned8 gss_bloom, h.fallback_value, h.ultid, h.orgid, h.seleid, h.proxid, unsigned2 gss_word_weight := 0}; /*HACK25b*/
-SlimKeyData := dedup(project(DataForKey, slimIndLay), record, all); /*HACK25c*/
-EXPORT SlimKey := INDEX(SlimKeyData,{SlimKeyData},{},SlimKeyName); /*HACK25d*/
-SHARED SlimKeyRec := recordof(SlimKey); /*HACK25e*/
  
 EXPORT BuildAll := BUILDINDEX(Key, OVERWRITE);
 // Compute shrinkage stats; the amount we could shrink the key for each extra credit removal
@@ -129,43 +123,12 @@ EXPORT RawFetch_server(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'
     indexOutputRecord := RECORDOF(Key);
     slimrec := { Key.gss_word_weight, Key.proxid, Key.seleid, Key.orgid, Key.ultid };
     BloomF := SALT311.Fn_Wordbag_To_Bloom(param_cnp_name); // Use for extra index filtering
-    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(LIMIT(SlimKey( KEYED(GSS_hash = search) // ADDED LIMIT
-                                                                      AND KEYED(GSS_Bloom = BloomF)
-                                                                      AND Keyed(fallback_value >= param_fallback_value)
-                                                                      
-                                                                  ),
-                                                                  250000,
-                                                                  ONFAIL(TRANSFORM(SlimKeyRec, 
-                                                                                   SELF := ROW([],SlimKeyRec))),
-                                                                  keyed),
-                                                           ultid,
-                                                           orgid,
-                                                           seleid,
-                                                           proxid,
-                                                           PRIORITY(40-spc)); /*HACK25f*/ // Filter for each row of index fetch
+    doIndexRead(UNSIGNED4 search,UNSIGNED2 spc) := STEPPED(KEY( KEYED(GSS_hash = search) AND (GSS_bloom & BloomF) = BloomF
+      AND ((param_prim_name = (TYPEOF(prim_name))'' OR prim_name = (TYPEOF(prim_name))'') OR (prim_name = param_prim_name) OR ((Config_BIP.WithinEditN(prim_name,prim_name_len,param_prim_name,param_prim_name_len,1, 0)) ))
+      AND ((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
+      AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))),ultid,orgid,seleid,proxid,PRIORITY(40-spc)); // Filter for each row of index fetch
     SALT311.MAC_collate_wordbag_matches4(wds,slimrec,doIndexRead,ultid,orgid,seleid,proxid,steppedmatches) // Perform N-way join
-    res := JOIN( steppedmatches, Key,
-                KEYED(RIGHT.GSS_Hash = wds[1].hsh) 
-                AND KEYED(RIGHT.fallback_value >= param_fallback_value) 
-                AND KEYED(LEFT.proxid = RIGHT.proxid 
-                      AND LEFT.seleid = RIGHT.seleid 
-                      AND LEFT.orgid = RIGHT.orgid 
-                      AND LEFT.ultid = RIGHT.ultid)
-                AND ((param_prim_name = (TYPEOF(RIGHT.prim_name))'' 
-                  OR RIGHT.prim_name = (TYPEOF(RIGHT.prim_name))'') 
-                  OR (RIGHT.prim_name = param_prim_name) 
-                  OR ((Config_BIP.WithinEditN(RIGHT.prim_name,RIGHT.prim_name_len,param_prim_name,param_prim_name_len,1, 0))))
-                AND ((param_st = (TYPEOF(RIGHT.st))'' 
-                  OR RIGHT.st = (TYPEOF(RIGHT.st))'') 
-                  OR (RIGHT.st = param_st))
-                AND ((param_city = (TYPEOF(RIGHT.city))'' 
-                  OR RIGHT.city = (TYPEOF(RIGHT.city))'') 
-                  OR (RIGHT.city = param_city) 
-                  OR ( (metaphonelib.DMetaPhone1(RIGHT.city)=metaphonelib.DMetaPhone1(param_city))  
-                  OR (Config_BIP.WithinEditN(RIGHT.city,RIGHT.city_len,param_city,param_city_len,2, 0)))),
-                TRANSFORM(indexOutputRecord,
-                          SELF.gss_word_weight := LEFT.gss_word_weight,
-                          SELF := RIGHT)); /*HACK25g*/
+    res := JOIN( steppedmatches, Key, KEYED(RIGHT.GSS_Hash = wds[1].hsh) AND KEYED(RIGHT.fallback_value >= param_fallback_value) AND KEYED(LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid),TRANSFORM(indexOutputRecord,SELF.gss_word_weight := LEFT.gss_word_weight,SELF := RIGHT));
     RETURN IF(SUM(wds,spec) > 19,res,IF(SUM(wds,spec) = 0,DATASET([],indexOutputRecord) ,DATASET(ROW([],indexOutputRecord)))); // Ensure at least spc of specificity in gss portion
   END;
  
@@ -174,7 +137,7 @@ EXPORT RawFetch(TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEO
   RawData0 := RawFetch_server(param_cnp_name,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,0,param_efr_bitmap);
   RawData1 := RawFetch_server(param_cnp_name,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,1,param_efr_bitmap);
   RawData2 := RawFetch_server(param_cnp_name,param_prim_name,param_prim_name_len,param_st,param_city,param_city_len,2,param_efr_bitmap);
-  Returnable(DATASET(RECORDOF(RawData0)) d) := COUNT(NOFOLD(d))>1 OR EXISTS(NOFOLD(d((TYPEOF(cnp_name))cnp_name != (TYPEOF(cnp_name))''))); /*HACK25h*/
+  Returnable(DATASET(RECORDOF(RawData0)) d) := COUNT(NOFOLD(d))<>1 OR EXISTS(NOFOLD(d((TYPEOF(cnp_name))cnp_name != (TYPEOF(cnp_name))'')));
   res := MAP (
       param_fallback_value <= 0 AND Returnable(RawData0) => RawData0,
       param_fallback_value <= 1 AND Returnable(RawData1) => RawData1,

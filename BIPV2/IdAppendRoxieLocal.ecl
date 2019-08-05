@@ -163,10 +163,10 @@ topScores :=
 		join(topScores, addHigherIds,
 			left.request_id = right.uniqueid,
 			transform(recordof(left),
-				newSele := right.seleid != 0 and left.proxid != 0;
-				newOrg := right.orgid != 0 and left.proxid != 0;
-				newUlt := right.ultid != 0 and left.proxid != 0;
-				newPow := right.powid != 0 and left.proxid != 0;
+				newSele := right.seleid != 0 and left.seleid != right.seleid;
+				newOrg := right.orgid != 0 and left.orgid != right.orgid;
+				newUlt := right.ultid != 0 and left.ultid != right.ultid;
+				newPow := right.powid != 0 and left.powid != right.powid;
 				self.seleid := if(newSele, right.seleid, left.seleid);
 				self.seleWeight := if(newSele, left.proxWeight, left.seleWeight);
 				self.seleScore := if(newSele, left.proxScore, left.seleScore);
