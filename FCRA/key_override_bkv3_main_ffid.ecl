@@ -1,7 +1,11 @@
 ﻿import bankruptcyv2, address, ut, data_services, BankruptcyV3;
 
+MainLayoutPlus := record
+	bankruptcyv2.layout_bankruptcy_main_v3.layout_bankruptcy_main_filing;
+	string20 flag_file_id;
+end;
 
-kfMain	 := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::bankrupt_main',FCRA.layout_main_ffid_v3,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt),-flag_file_id),except flag_file_id,keep(1));
+kfMain	 := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::bankrupt_main',MainLayoutPlus,xml('bk_filings/row'),opt),-flag_file_id),except flag_file_id,keep(1));
 
 
 file_in_sort := sort(distribute(kfMain,hash(tmsid)),TMSID,-(unsigned)id,-date_created, date_modified,court_code,court_name,court_location,case_number,orig_case_number,
