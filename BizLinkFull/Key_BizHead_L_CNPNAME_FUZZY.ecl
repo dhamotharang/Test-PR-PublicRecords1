@@ -1,4 +1,5 @@
-﻿IMPORT SALT311,std;EXPORT Key_BizHead_L_CNPNAME_FUZZY := MODULE
+﻿IMPORT SALT311,std;
+EXPORT Key_BizHead_L_CNPNAME_FUZZY := MODULE
  
 //company_name_prefix:?:cnp_name:zip:city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
 EXPORT KeyName := BizLinkFull.Filename_keys.L_CNPNAME_FUZZY; /*HACK07*/
@@ -9,11 +10,10 @@ SHARED s_index := Keys(File_BizHead).Specificities_Key[1]; // Index access for M
 layout := RECORD // project out required fields
 // Compulsory fields
   h.company_name_prefix;
-  h.fallback_value; // Populate the fallback field /*HACK26b*/
 // Optional fields
   h.zip;
   h.st;
-  // Moved fallback_value up in layout to decrease number of seeks against index /*HACK26a*/
+  h.fallback_value; // Populate the fallback field
   h.ultid; // Parent #3
   h.orgid; // Parent #2
   h.seleid; // Parent #1
@@ -110,12 +110,11 @@ KeyRec := RECORDOF(Key);
 EXPORT RawFetch_server(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0) := 
     STEPPED( LIMIT( Key(
           KEYED((company_name_prefix = param_company_name_prefix))
-      AND KEYED(fallback_value >= param_fallback_value) /*HACK26d*/
       AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT311.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1) > Config_BIP.cnp_name_Force * 100))
       AND KEYED((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))
       AND ((param_city = (TYPEOF(city))'' OR city = (TYPEOF(city))'') OR (city = param_city) OR ( (metaphonelib.DMetaPhone1(city)=metaphonelib.DMetaPhone1(param_city))  OR (Config_BIP.WithinEditN(city,city_len,param_city,param_city_len,2, 0)) ))
       AND KEYED((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
-      
+      AND KEYED(fallback_value >= param_fallback_value)
       AND ( param_efr_bitmap=0 OR (EFR_BMap & param_efr_bitmap)>0 )),Config_BIP.L_CNPNAME_FUZZY_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid);
  
 EXPORT RawFetch(TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0) := FUNCTION
