@@ -168,7 +168,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		// SELF.zip4;
 		// SELF.county;
 		SELF.country := l.response.LineIdentityResponse.Account.BillingAddress.Country;
-		string8 t_Date2ToString (iesp.share.t_Date2 Date) := Date.Year + Date.Month + Date.Day;
+		string8 t_Date2ToString (iesp.share.t_Date2 Date) := INTFORMAT((UNSIGNED)Date.Year,4,1) + INTFORMAT((UNSIGNED)Date.Month,2,1)+ INTFORMAT((UNSIGNED)Date.Day,2,1);
 		SELF.imsi	:= IF(l.response.LineIdentityResponse.Subscriber.IntlMobileSubscriberId='','',(STRING)HASH64(l.response.LineIdentityResponse.Subscriber.IntlMobileSubscriberId));
 		SELF.imsi_seensince := l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.SeenSince;
 		SELF.imsi_changedthis_time := (INTEGER)l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.ChangedThisTime;

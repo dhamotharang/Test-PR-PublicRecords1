@@ -72,7 +72,8 @@ FUNCTION
   TRANSFORM
     rRiskInd_Layout tCheckRIs(iesp.phonefinder.t_PhoneFinderRiskIndicator le) :=
     TRANSFORM
-      sim_change_date := (UNSIGNED)(IF(pInput.imsi_ChangeDate <> '', pInput.imsi_ChangeDate, pInput.imsi_ActivationDate));
+      sim_change_date := (UNSIGNED)(MAX(pInput.imsi_ChangeDate, pInput.imsi_ActivationDate));
+      device_change_date := (UNSIGNED)(MAX(pInput.imei_ChangeDate, pInput.imei_ActivationDate));
       dt_last_seen    := (UNSIGNED)pInput.dt_last_seen;
       dt_first_seen   := (UNSIGNED)pInput.dt_first_seen;
       currentDate     := STD.Date.Today();
@@ -108,13 +109,8 @@ FUNCTION
                                 32 => dt_first_seen = 0,
                                 33 => dt_last_seen = 0,
                                 34 => dt_first_seen = 0 AND dt_last_seen = 0,
-                                35 => STD.Date.DaysBetween(sim_change_date, currentDate) <= le.Threshold OR
-                                      (pInput.imsi_changedthis_time = 1  AND STD.Date.DaysBetween((UNSIGNED)pInput.imsi_seensince, currentDate) <= le.Threshold),
-                                36 => STD.Date.DaysBetween((UNSIGNED)pInput.imei_ChangeDate, currentDate) <= le.Threshold OR 
-                                      (pInput.loststolen = 1 AND  STD.Date.DaysBetween((UNSIGNED)pInput.loststolen_date, currentDate) <= le.Threshold) OR
-                                      (pInput.imsi_changedthis_time = 1  AND STD.Date.DaysBetween((UNSIGNED)pInput.imsi_seensince, currentDate) <= le.Threshold) OR																																																																								
-                                      (pInput.imei_changedthis_time = 1  AND STD.Date.DaysBetween((UNSIGNED)pInput.imei_seensince, currentDate) <= le.Threshold) OR																																																																								
-                                      (pInput.iccid_changedthis_time = 1 AND STD.Date.DaysBetween((UNSIGNED)pInput.iccid_seensince, currentDate) <= le.Threshold),
+                                35 => (STD.Date.DaysBetween(sim_change_date, currentDate) <= le.Threshold),
+                                36 => (STD.Date.DaysBetween(device_change_date, currentDate) <= le.Threshold),
                                 37 => MAP(le.ThresholdB = 'Day' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Day')),
                                           le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Week')),
                                           le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Month')),
