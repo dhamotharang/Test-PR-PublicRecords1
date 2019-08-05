@@ -9,6 +9,7 @@ IMPORT AppendLexidToLexidAssociation;
 EXPORT AddressPersonAssociations := MODULE
 	SHARED DateOverLapThreshold := 30; // days
 	SHARED BlankSsnSet := ['','000000000','199999999','799999999'];
+	SHARED BlankIPAddressSet := [''];
 	SHARED HighFrequencyAddressThreshold := 10;
   SHARED HighFrequencyAddressCutoff := 20;
 
@@ -22,13 +23,18 @@ EXPORT AddressPersonAssociations := MODULE
 		KELOtto.fraudgov.clean_phones.cell_phone,
 		KELOtto.fraudgov.ssn,
 		KELOtto.fraudgov.phone_number,
+		KELOtto.fraudgov.ip_address,
+		KELOtto.fraudgov.bank_routing_number_1, 
+		KELOtto.fraudgov.bank_account_number_1,
+		KELOtto.fraudgov.bank_routing_number_2, 
+		KELOtto.fraudgov.bank_account_number_2,
 		KELOtto.fraudgov.did,
 		KELOtto.fraudgov.dob,
 		KELOtto.fraudgov.event_date
 	END;
  
   // JOIN All Shared Events
-	EXPORT SharedEvents := JOIN(KELOtto.fraudgovshared(did > 0 and clean_address.prim_range != '' and clean_address.prim_name != '' and clean_address.p_city_name != ''), DEDUP(SORT(Sharing, targetcustomerhash), targetcustomerhash),
+	EXPORT SharedEvents := JOIN(KELOtto.fraudgovshared(did > 0/* and clean_address.prim_range != '' and clean_address.prim_name != '' and clean_address.p_city_name != ''*/), DEDUP(SORT(Sharing, targetcustomerhash), targetcustomerhash),
                               LEFT.associatedcustomerfileinfo = RIGHT.targetcustomerhash,
 											TRANSFORM({RECORDOF(LEFT), INTEGER customer_id_,	INTEGER industry_type_, IdentityRec, STRING CleanAddressString, UNSIGNED EventMonth}, 
 																SELF.customer_id_ := (INTEGER)RIGHT.inclusion_id,
@@ -40,7 +46,7 @@ EXPORT AddressPersonAssociations := MODULE
 																SELF := LEFT), LOOKUP);
 	
 	DistributedAddressEventsPrep1 := DISTRIBUTE(SharedEvents, AddressHash);
-  // Dedup so we have one transaction per customer per day! (previously Event\Transaction)
+  // Dedup so we have one row per transaction
 	EXPORT DistributedAddressEventsPrep := DEDUP(SORT(DistributedAddressEventsPrep1, AssociatedCustomerFileInfo, record_id, LOCAL), AssociatedCustomerFileInfo, record_id, LOCAL);
  
    
@@ -58,8 +64,16 @@ EXPORT AddressPersonAssociations := MODULE
 
 
 	EXPORT AddressMatchPrep := JOIN(DistributedAddressEvents, DistributedAddressEvents, 
-										LEFT.did != RIGHT.did AND LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND LEFT.AddressHash = RIGHT.AddressHash AND 
-										ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < MAP(LEFT.AssociatedCustomerFileInfo = 2481802344 => 180, DateOverLapThreshold),
+										LEFT.did != RIGHT.did AND LEFT.AssociatedCustomerFileInfo=RIGHT.AssociatedCustomerFileInfo AND 
+										(
+										 (LEFT.AddressHash != 14695981039346656037 AND LEFT.AddressHash = RIGHT.AddressHash AND ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)) < MAP(LEFT.AssociatedCustomerFileInfo = 2481802344 => 180, DateOverLapThreshold)) OR 
+										 (LEFT.phone_number != '' AND (LEFT.phone_number = RIGHT.phone_number OR LEFT.phone_number = RIGHT.cell_phone)) OR
+										 (LEFT.cell_phone != '' AND (LEFT.cell_phone = RIGHT.cell_phone OR LEFT.cell_phone = RIGHT.phone_number)) OR
+										 (LEFT.OttoIpAddressId != 14695981039346656037 AND LEFT.OttoIpAddressId = RIGHT.OttoIpAddressId) OR
+										 (LEFT.OttoEmailId != 14695981039346656037 AND LEFT.OttoEmailId = RIGHT.OttoEmailId) OR
+										 (LEFT.OttoBankAccountId != 12638153115695167395 AND (LEFT.OttoBankAccountId = RIGHT.OttoBankAccountId OR LEFT.OttoBankAccountId = RIGHT.OttoBankAccountId2)) OR
+										 (LEFT.OttoBankAccountId2 != 12638153115695167395 AND (LEFT.OttoBankAccountId2 = RIGHT.OttoBankAccountId OR LEFT.OttoBankAccountId2 = RIGHT.OttoBankAccountId2))
+										),  
 										TRANSFORM({
 											LEFT.AssociatedCustomerFileInfo,
 											LEFT.customer_id_,
@@ -70,9 +84,12 @@ EXPORT AddressPersonAssociations := MODULE
 											IdentityRec AssociatedPerson,
 											LEFT.HighFrequencyAddressFlag,
 											INTEGER DistanceDays,
+											INTEGER1 AddressMatch,
 											INTEGER1 EmailMatch,
 											INTEGER1 SsnMatch,
-											INTEGER1 PhoneNumberMatch
+											INTEGER1 PhoneNumberMatch,
+											INTEGER1 IPAddressMatch,
+											INTEGER1 BankAccountMatch
 															},
 											SELF.Person.AddressHash := LEFT.AddressHash,
 											SELF.Person.address_1 := LEFT.address_1,
@@ -82,6 +99,11 @@ EXPORT AddressPersonAssociations := MODULE
 											SELF.Person.cell_phone := LEFT.cell_phone,
 											SELF.Person.ssn := LEFT.ssn,
 											SELF.Person.phone_number := LEFT.phone_number,
+											SELF.Person.ip_address := LEFT.ip_address,
+											SELF.Person.bank_routing_number_1 := LEFT.bank_routing_number_1, 
+											SELF.Person.bank_account_number_1 := LEFT.bank_account_number_1,
+											SELF.Person.bank_routing_number_2 := LEFT.bank_routing_number_2, 
+											SELF.Person.bank_account_number_2 := LEFT.bank_account_number_2,
 											SELF.Person.did := LEFT.did,
 											SELF.Person.dob := LEFT.dob,
 											SELF.Person.event_date := LEFT.event_date,
@@ -92,16 +114,24 @@ EXPORT AddressPersonAssociations := MODULE
 											SELF.AssociatedPerson.cell_phone := RIGHT.cell_phone,
 											SELF.AssociatedPerson.ssn := RIGHT.ssn,
 											SELF.AssociatedPerson.phone_number := RIGHT.phone_number,
+											SELF.AssociatedPerson.ip_address := RIGHT.ip_address,
+											SELF.AssociatedPerson.bank_routing_number_1 := RIGHT.bank_routing_number_1, 
+											SELF.AssociatedPerson.bank_account_number_1 := RIGHT.bank_account_number_1,
+											SELF.AssociatedPerson.bank_routing_number_2 := RIGHT.bank_routing_number_2, 
+											SELF.AssociatedPerson.bank_account_number_2 := RIGHT.bank_account_number_2,											
 											SELF.AssociatedPerson.did := RIGHT.did,
 											SELF.AssociatedPerson.dob := RIGHT.dob,
 											SELF.AssociatedPerson.event_date := RIGHT.event_date,
 											SELF.DistanceDays  := ABS(Std.Date.ToDaysSince1900((UNSIGNED)LEFT.event_date) - Std.Date.ToDaysSince1900((UNSIGNED)RIGHT.event_date)),
+											SELF.AddressMatch := MAP(LEFT.AddressHash = RIGHT.AddressHash => 1, 0),
 											SELF.EmailMatch := MAP(LEFT.email_address != '' AND LEFT.email_address=RIGHT.email_address=>1, 0),
 											SELF.SsnMatch := MAP(LEFT.SSN != '' AND LEFT.SSN NOT IN BlankSsnSet AND LEFT.SSN=RIGHT.SSN=>1, 0),
 											// maybe need to strip and clean this first.
 											SELF.PhoneNumberMatch := MAP((LEFT.phone_number != '' AND LEFT.phone_number = RIGHT.phone_number) OR (LEFT.phone_number != '' AND LEFT.phone_number=RIGHT.cell_phone) OR (LEFT.cell_phone != '' AND LEFT.cell_phone = RIGHT.phone_number)=>1, 0),
+											SELF.IPAddressMatch := MAP(LEFT.OttoIpAddressId != 14695981039346656037 AND LEFT.OttoIpAddressId=RIGHT.OttoIpAddressId => 1, 0),
+											SELF.BankAccountMatch := MAP((LEFT.bank_account_number_1 != '' AND (LEFT.OttoBankAccountId=RIGHT.OttoBankAccountId OR LEFT.OttoBankAccountId = RIGHT.OttoBankAccountId2)) OR (LEFT.bank_account_number_2 != '' AND (LEFT.OttoBankAccountId2=RIGHT.OttoBankAccountId2 OR LEFT.OttoBankAccountId2 = RIGHT.OttoBankAccountId)) => 1, 0),
 											SELF := LEFT
-										), LOCAL);// : PERSIST('~temp::deleteme30');
+										), LOCAL) : PERSIST('~temp::deleteme30');
 
 // Reduce to 1 row per did per customer, day with the flags aggregated.
 EXPORT AddressMatch := TABLE(AddressMatchPrep, 
@@ -114,10 +144,12 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 										 AssociatedPerson,
 										 UNSIGNED1 HighFrequencyAddressFlag := MAX(GROUP, HighFrequencyAddressFlag),
 										 UNSIGNED2 DistanceDays := MAX(GROUP, DistanceDays),
+										 UNSIGNED1 AddressMatch := MAX(GROUP, AddressMatch),
 										 UNSIGNED1 EmailMatch := MAX(GROUP, EmailMatch),
 										 UNSIGNED1 SsnMatch := MAX(GROUP, SsnMatch),
-										 UNSIGNED1 PhoneNumberMatch := MAX(GROUP, PhoneNumberMatch)},
-										 
+										 UNSIGNED1 PhoneNumberMatch := MAX(GROUP, PhoneNumberMatch),
+										 UNSIGNED1 IPAddressMatch := MAX(GROUP, IPAddressMatch),
+										 UNSIGNED1 BankAccountMatch :=MAX(GROUP, BankAccountMatch)},
 										 AssociatedCustomerFileInfo,
 										 Person.did,
 										 AssociatedPerson.did,
@@ -125,7 +157,7 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 										 Person.event_date, MERGE);// : PERSIST('~temp::deleteme30');
 																
 
-	EXPORT PersonAddressMatches := TABLE(AddressMatch(DistanceDays <= DateOverLapThreshold), 
+	EXPORT PersonAddressMatches := TABLE(AddressMatch((AddressMatch=1 AND DistanceDays <= DateOverLapThreshold) OR AddressMatch=0), 
 													 {
 														AssociatedCustomerFileInfo,
 														customer_id_,
@@ -134,12 +166,17 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 														FromPersonLexId := person.did,
 														ToPersonLexId := associatedperson.did,
 														HighFrequencyAddressFlag,
-														INTEGER1 SameAddressEmailMatch := MAX(GROUP, EmailMatch),
-														INTEGER1 SameAddressSsnMatch := MAX(GROUP, SsnMatch),
-														INTEGER1 SameAddressPhoneNumberMatch := MAX(GROUP, PhoneNumberMatch),
+														INTEGER1 SameAddressEmailMatch := COUNT(GROUP, EmailMatch=1 AND AddressMatch=1),
+														INTEGER1 SameAddressSsnMatch := COUNT(GROUP, SsnMatch=1 AND AddressMatch=1),
+														INTEGER1 SameAddressPhoneNumberMatch := COUNT(GROUP, PhoneNumberMatch=1 AND AddressMatch=1),
 														INTEGER1 SameAddressMinDistanceDays := MIN(GROUP, DistanceDays),
-														INTEGER1 SameAddressSameDay := MAP(COUNT(GROUP, HighFrequencyAddressFlag = 0 AND DistanceDays = 0) > 0 => 1, 0),
-														INTEGER1 HighFrequencySameAddressSameDay := MAP(COUNT(GROUP, HighFrequencyAddressFlag = 1 AND DistanceDays = 0) > 0 => 1, 0), 
+														INTEGER1 SameAddressSameDay := MAP(COUNT(GROUP, AddressMatch=1 AND HighFrequencyAddressFlag = 0 AND DistanceDays = 0) > 0 => 1, 0),
+														INTEGER1 HighFrequencySameAddressSameDay := MAP(COUNT(GROUP, AddressMatch=1 AND HighFrequencyAddressFlag = 1 AND DistanceDays = 0) > 0 => 1, 0), 
+														INTEGER1 EmailMatch := MAX(GROUP, EmailMatch),
+														INTEGER1 SsnMatch := MAX(GROUP, SsnMatch),
+														INTEGER1 PhoneNumberMatch := MAX(GROUP, PhoneNumberMatch),
+														INTEGER1 IPAddressMatch := MAX(GROUP, IPAddressMatch),
+														INTEGER1 BankAccountMatch :=MAX(GROUP, BankAccountMatch),
 														FromPersonEntityContextUid := '_01' + (STRING)person.did,
 														ToPersonEntityContextUid := '_01' + (STRING)associatedperson.did,
                             STRING Label := TRIM(Person.address_1) + ', ' + TRIM(Person.address_2),
@@ -162,6 +199,13 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 														UNSIGNED2 NonHighFrequencyAddressCount := COUNT(GROUP, HighFrequencyAddressFlag=0),
 														UNSIGNED2 NonHighFrequencySameAddressSameDayCount := COUNT(GROUP, SameAddressSameDay=1 AND HighFrequencyAddressFlag=0),
 														UNSIGNED2 HighFrequencySameAddressSameDayCount := SUM(GROUP, HighFrequencySameAddressSameDay),
+
+														UNSIGNED2 EmailMatchCount := SUM(GROUP, EmailMatch),
+														UNSIGNED2 SsnMatchCount := SUM(GROUP, SsnMatch),
+														UNSIGNED2 PhoneNumberMatchCount := SUM(GROUP, PhoneNumberMatch),
+														UNSIGNED2 IPAddressMatchCount := SUM(GROUP, IPAddressMatch),
+														UNSIGNED2 BankAccountMatchCount := SUM(GROUP, BankAccountMatch),														
+														
 														SharedAddressCount := COUNT(GROUP),
 														FromPersonEntityContextUid,
 														ToPersonEntityContextUid
@@ -172,7 +216,8 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 	
   EXPORT CustomerDids := TABLE(KELOtto.fraudgovshared(did > 0), {AssociatedCustomerFileInfo, INTEGER customer_id_ := customer_id,	industry_type_ := classification_permissible_use_access.Ind_type, did, PersonEntityContextUid := '_01' + (STRING)did}, 
 	                           customer_id,classification_permissible_use_access.Ind_type, associatedcustomerfileinfo, did, MERGE);
-																
+										
+	// SELF associations so that cluster attributes can include themselves.									
   SHARED PersonAddressMatchStatsPrep2 := PROJECT(CustomerDids, TRANSFORM(RECORDOF(PersonAddressMatchStatsPrep1), 
 	                                    SELF.SelfMatch := 1,
                                       SELF.FromPersonLexId := LEFT.did,
@@ -182,9 +227,9 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 																			SELF := LEFT, SELF := []));
 
 
-	SHARED PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2;// : PERSIST('~temp::deleteme31');
+	SHARED PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31');
 										
-  SHARED PersonAddressMatchStatsPrep4 := PersonAddressMatchStatsPrep3(
+  EXPORT PersonAddressMatchStatsPrep4 := PersonAddressMatchStatsPrep3(
 			// Rules for a valid association
 			SelfMatch = 1 OR
 			sameaddressemailmatch = 1 OR 
@@ -192,7 +237,13 @@ EXPORT AddressMatch := TABLE(AddressMatchPrep,
 			sameaddressphonenumbermatch = 1 OR
 			NonHighFrequencyAddressCount > 2 OR (AssociatedCustomerFileInfo = 2481802344 AND NonHighFrequencyAddressCount > 0) OR
 			NonHighFrequencySameAddressSameDayCount > 0 OR
-			HighFrequencySameAddressSameDayCount > 5
+			HighFrequencySameAddressSameDayCount > 5 OR
+			EmailMatchCount > 0 OR
+			SsnMatchCount > 0 OR
+			PhoneNumberMatchCount > 0 OR
+			IPAddressMatchCount > 0 OR
+			BankAccountMatchCount > 0
+																	
 			 );          
 
 //	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep4;                	
