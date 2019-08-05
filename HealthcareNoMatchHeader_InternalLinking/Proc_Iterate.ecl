@@ -1,6 +1,6 @@
 ﻿//Executable code
 /*HACK-O-MATIC*/IMPORT SALT311,HealthcareNoMatchHeader_Ingest;
-/*HACK-O-MATIC*/EXPORT Proc_Iterate(STRING pSrc, STRING pVersion, STRING iter,DATASET(Layout_HEADER) InFile = HealthcareNoMatchHeader_Ingest.Files(pSrc).Linking().iteration,STRING OutFileNameP = HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Linking(iter).Iteration.new,UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
+/*HACK-O-MATIC*/EXPORT Proc_Iterate(STRING pSrc, STRING pVersion, STRING iter,DATASET(Layout_HEADER) InFile = HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).AllRecords,STRING OutFileNameP = HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Linking(iter).Iteration.new,UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED MM := HealthcareNoMatchHeader_InternalLinking./*HACK-O-MATIC*/matches(pSrc,pVersion,InFile,MatchThreshold); // Get the matching module
 SHARED S := /*HACK-O-MATIC*/Specificities(pSrc,pVersion,InFile).Specificities[1];
 dsOSR := CHOOSEN(MM.MatchSampleRecords,10000);
@@ -23,12 +23,12 @@ MSD :=
   ENTH(mtch(Conf<MatchThreshold,Conf>=MatchThreshold-3),500) +
   ENTH(mtch(Conf=MatchThreshold),500) +
   ENTH(mtch(Conf>MatchThreshold,Conf<=MatchThreshold+3),500);
-OMatchSamples := OUTPUT(dsOMatchSamples,NAMED('MatchSample'));
-OBSamples := OUTPUT(dsOBSamples,NAMED('BorderlineMatchSample'));
-OAS := OUTPUT(dsOAS,NAMED('AlmostMatchSample'));
-BMS := OUTPUT(CHOOSEN(BM.patch_file, 1000), NAMED('BasicMatch_Patch_File'));
-Thr := OUTPUT(ROW(dsThr),NAMED('Thresholds'));
-OMSD := OUTPUT(MSD,NAMED('MatchSampleDebug'),ALL);
+OMatchSamples := OUTPUT(dsOMatchSamples,OVERWRITE,NAMED('MatchSample'));
+OBSamples := OUTPUT(dsOBSamples,NAMED('BorderlineMatchSample'),OVERWRITE);
+OAS := OUTPUT(dsOAS,NAMED('AlmostMatchSample'),OVERWRITE);
+BMS := OUTPUT(CHOOSEN(BM.patch_file, 1000), NAMED('BasicMatch_Patch_File'),OVERWRITE);
+Thr := OUTPUT(ROW(dsThr),NAMED('Thresholds'),OVERWRITE);
+OMSD := OUTPUT(MSD,NAMED('MatchSampleDebug'),ALL,OVERWRITE);
 EXPORT OutputExtraSamples := PARALLEL(OMatchSamples, OBSamples, OAS, BMS, Thr, OMSD); // This is not called automatically - call yourself if you want them!
 dsMPSP := DATASET([{'MatchesPerformed', MM.MatchesPerformed}, {'BasicMatchesPerformed', BM.basic_match_count}, {'SlicesPerformed', MM.SlicesPerformed}], {STRING label, UNSIGNED value});
 dsPS := DATASET([{'PropagationAssisted_Pcnt', MM.MatchesPropAssisted * 100 / MM.MatchesPerformed}, {'PropagationRequired_Pcnt', MM.MatchesPropRequired * 100 / MM.MatchesPerformed}], {STRING label, UNSIGNED Pcnt});
@@ -48,7 +48,7 @@ RE := OUTPUT(dsRE,NAMED('RuleEfficacy'),OVERWRITE);
 CB := OUTPUT(dsCB,NAMED('ConfidenceLevels'),OVERWRITE);
 EXPORT ExecutionStats := PARALLEL(OS,SpcS,PRPP,PPP,PRPPS,PPPS,MPSP,RE,CB, PS,OPRP,OPP);
 dsValidityStats := DATASET([{MM.PatchingError0,MM.DuplicateRids0,COUNT(HealthcareNoMatchHeader_InternalLinking./*HACK-O-MATIC*/match_candidates(pSrc,pVersion,InFile).Unlinkables)}],{INTEGER PatchingError0, INTEGER DuplicateRids0, UNSIGNED UnlinkableRecords0});
-EXPORT ValidityStats := PARALLEL( OUTPUT(dsValidityStats,NAMED('ValidityStatisticsIterate'),OVERWRITE), OUTPUT(MM.PostIds.Advanced0,NAMED('IdConsistency0'),OVERWRITE));
+EXPORT ValidityStats := PARALLEL( OUTPUT(dsValidityStats,NAMED('ValidityStatistics'),OVERWRITE), OUTPUT(MM.PostIds.Advanced0,NAMED('IdConsistency0'),OVERWRITE));
 EXPORT InputValidityStats := OUTPUT(MM.PreIds.Advanced0,NAMED('InputIdConsistency0'),OVERWRITE);
 EXPORT DebugKeys := /*HACK-O-MATIC*/Keys(pSrc,pVersion,InFile).BuildAll;
 EXPORT OutputFileName := /*HACK-O-MATIC*/OutFileNameP;

@@ -11,7 +11,7 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
   EXPORT  cluster_name        :=  'ushc::';
 	EXPORT  prefix              :=  foreign_environment + cluster_name;
 
-	EXPORT	lInputTemplate        :=  prefix	+	'CRK::asheader::' +	pSrc  + '::';
+	EXPORT	lInputTemplate        :=  prefix	+	'CRK::temp::' + pSrc  + '::'  + pVersion  + '::';
 	EXPORT	lBaseTemplate         :=  prefix	+	'RID::HealthCareNoMatchHeader::base::' +	pSrc	+	'::@version@::';
 	EXPORT	lLinkingTemplate      :=  prefix	+	'CRK::HealthCareNoMatchHeader::linking::' +	pSrc  +	'::@version@::';
 	EXPORT	lPersistTemplate      :=  prefix  + 'persist::HealthCareNoMatchHeader::nomatch_id::'  + pSrc  + '::';
@@ -21,7 +21,8 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
 	EXPORT	IngestCache           :=  lPersistTemplate+'Ingest_Cache';
   
   EXPORT  Input  :=  MODULE
-    EXPORT  AsHeader  :=  lInputTemplate+'qa';
+    EXPORT  AsHeaderTemp  :=  lInputTemplate+'AsHeaderTemp';
+    EXPORT  BaseTemp      :=  lInputTemplate+'BaseTemp';
   END;
   
   EXPORT  Base  :=  MODULE
@@ -125,4 +126,9 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
 		Keys.dAll_filenames +
 		append.dAll_filenames
 	;
+ 
+  // workman files
+  EXPORT  WUPrefix              :=  prefix    + pSrc  + '::' + pVersion + '::';
+  EXPORT  MasterWUOutput_SF     :=  WUPrefix  + 'WUInfo';
+  EXPORT  MasterWUOutput_Inc_SF :=  WUPrefix  + 'WUInfo_Inc';
 END;
