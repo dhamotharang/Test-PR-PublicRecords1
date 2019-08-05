@@ -1,10 +1,18 @@
-﻿﻿IMPORT PhonesInfo, dx_PhonesInfo, Phones, UT;
+﻿﻿IMPORT PhonesInfo, dx_PhonesInfo, Phones, UT, STD;
 EXPORT GetPhoneMetadata := MODULE
 
 //Based on subject info get ALL ports and CURRENT deact records
 
 
 	EXPORT GetPhoneTransactions(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo) := FUNCTION
+
+	today := STD.Date.Today();
+	OTPAllowedDate_30 := (UNSIGNED)ut.date_math((STRING)today, -30);
+	OTPAllowedDate_60 := (UNSIGNED)ut.date_math((STRING)today, -60);
+	OTPAllowedDate_90 := (UNSIGNED)ut.date_math((STRING)today, -90);
+	OTPAllowedDate_180 := (UNSIGNED)ut.date_math((STRING)today, -180);
+	OTPAllowedDate_365 := (UNSIGNED)ut.date_math((STRING)today, -365);
+	OTPAllowedDate_730 := (UNSIGNED)ut.date_math((STRING)today, -730);
 
 	Phones.Layouts.portedMetadata_Main tAppendTransInfo(Phones.Layouts.rec_phoneLayout L, dx_PhonesInfo.Key_Phones_Transaction R):= TRANSFORM
 		isDESU := (R.transaction_code IN [Phones.Constants.TransactionCodes.DISCONNECTED_CODE, Phones.Constants.TransactionCodes.SUSPENDED_CODE]);
@@ -13,6 +21,7 @@ EXPORT GetPhoneMetadata := MODULE
 		isPA := R.transaction_code = Phones.Constants.TransactionCodes.PORT_ADD;
 		is_disconnected := (R.source IN [Phones.Constants.Sources.GONG_DISCONNECT_SRC, Phones.Constants.Sources.DISCONNECT_SRC] AND 
 		  					(isDESU OR isSW));
+		is_OTP := R.source = Phones.Constants.Sources.PHONEFRAUD_OTP;
 
 		SELF.swap_start_dt := IF(isSW, R.transaction_start_dt, 0);
 
@@ -50,6 +59,13 @@ EXPORT GetPhoneMetadata := MODULE
 		SELF.event_date := MAX(SELF.port_start_dt, SELF.swap_start_dt, SELF.swap_end_dt, SELF.deact_start_dt, SELF.react_start_dt);					 
 		SELF.phone := L.phone;
 		SELF.account_owner := R.ocn;
+		SELF.count_otp_30 := IF(is_OTP AND (R.transaction_end_dt >= OTPAllowedDate_30 OR R.transaction_start_dt >= OTPAllowedDate_30),R.transaction_count,0);
+		SELF.count_otp_60 := IF(is_OTP AND (R.transaction_end_dt >= OTPAllowedDate_60 OR R.transaction_start_dt >= OTPAllowedDate_60),R.transaction_count,0);
+		SELF.count_otp_90 := IF(is_OTP AND (R.transaction_end_dt >= OTPAllowedDate_90 OR R.transaction_start_dt >= OTPAllowedDate_90),R.transaction_count,0);
+		SELF.count_otp_180 := IF(is_OTP AND (R.transaction_end_dt >= OTPAllowedDate_180 OR R.transaction_start_dt >= OTPAllowedDate_180),R.transaction_count,0);
+		SELF.count_otp_365 := IF(is_OTP AND (R.transaction_end_dt >= OTPAllowedDate_365 OR R.transaction_start_dt >= OTPAllowedDate_365),R.transaction_count,0);
+		SELF.count_otp_730 := IF(is_OTP AND (R.transaction_end_dt >= OTPAllowedDate_730 OR R.transaction_start_dt >= OTPAllowedDate_730),R.transaction_count,0);
+
 		SELF := R;				 							
 	 	SELF := [];
 	END;
@@ -58,9 +74,24 @@ EXPORT GetPhoneMetadata := MODULE
 	Phones_tranpayload := JOIN(subjectInfo , Phones_transactions,
 	 								(LEFT.phone = RIGHT.phone) AND 
 									 RIGHT.transaction_code != Phones.Constants.TransactionCodes.PORT_DELETE,
-	 								tAppendTransInfo(LEFT, RIGHT), LEFT OUTER);							  
-									 
-	RETURN Phones_tranpayload;
+	 								tAppendTransInfo(LEFT, RIGHT), LEFT OUTER);	
+	
+	SortedPhones_tranpayload := SORT(Phones_tranpayload,phone,source,-vendor_last_reported_dt);
+	
+
+	Phones.Layouts.portedMetadata_Main tRollupOTP(Phones.Layouts.portedMetadata_Main L, Phones.Layouts.portedMetadata_Main R):= TRANSFORM
+			SELF.count_otp_30 := L.count_otp_30 + R.count_otp_30;
+			SELF.count_otp_60 := L.count_otp_60 + R.count_otp_60;
+			SELF.count_otp_90 := L.count_otp_90 + R.count_otp_90;
+			SELF.count_otp_180 := L.count_otp_180 + R.count_otp_180;
+			SELF.count_otp_365 := L.count_otp_365 + R.count_otp_365;
+			SELF.count_otp_730 := L.count_otp_730 + R.count_otp_730;
+			SELF := IF(R.vendor_last_reported_dt >= L.vendor_last_reported_dt, R, L);
+	END;
+
+	Phones_tranpayloadwOTP :=  ROLLUP(SortedPhones_tranpayload,LEFT.phone = RIGHT.phone AND (Left.Source = Phones.Constants.Sources.PHONEFRAUD_OTP AND Left.Source = Right.Source),tRollupOTP(LEFT,RIGHT));
+
+	RETURN Phones_tranpayloadwOTP;
 	END;	
 
     EXPORT CombineRawPhoneData(DATASET(Phones.Layouts.rec_phoneLayout) subjectInfo) := FUNCTION
