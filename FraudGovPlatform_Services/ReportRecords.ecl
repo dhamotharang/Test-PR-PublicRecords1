@@ -1,4 +1,4 @@
-﻿IMPORT DidVille, FraudShared_Services, iesp, Royalty;
+﻿IMPORT DidVille, FraudShared, FraudShared_Services, iesp, Royalty;
 
 EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
@@ -27,8 +27,17 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		
 
 		/* For A Element that's passed as input to report service. */
-		SHARED ds_payload := FraudGovPlatform_Services.Raw_Records(ds_in, batch_params);
+		ds_payload_raw := FraudGovPlatform_Services.Raw_Records(ds_in, batch_params);
 		
+		//Filter payload records which do not have same routing number as input. 
+		ds_bank_routing_number_ids := FraudShared.Key_BankRoutingNumber(batch_params.FraudPlatform)
+																		(KEYED(bank_routing_number = ds_in[1].bank_routing_number));
+		
+		SHARED ds_payload := IF(batch_params.IsOnline AND ds_in[1].bank_routing_number <> '',
+														JOIN(ds_payload_raw, ds_bank_routing_number_ids,
+															LEFT.record_id = RIGHT.record_id,
+															TRANSFORM(LEFT)),
+														ds_payload_raw);
 		
 		ds_payload_KNFD := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.KnownFraud); 
 		ds_reportKnownFrauds := FraudGovPlatform_Services.Functions.getKnownFraudRecs(ds_in, batch_params, ds_payload_KNFD);
