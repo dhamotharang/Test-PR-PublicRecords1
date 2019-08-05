@@ -1,4 +1,4 @@
-import risk_indicators, didville,doxie,FCRA,header,header_quick,header_SlimSort,watchdog,ut,DID_Add,address,
+﻿import risk_indicators, didville,doxie,FCRA,header,header_quick,header_SlimSort,watchdog,ut,DID_Add,address,
        gong,drivers,mdr,riskwise,suppress;
 
 export AMLcommonFunction(grouped DATASET(risk_indicators.Layout_Output) with_did, 
@@ -14,7 +14,11 @@ export AMLcommonFunction(grouped DATASET(risk_indicators.Layout_Output) with_did
 							unsigned4 EverOccupant_StartDate,
 							unsigned8 BSOptions,
 							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                            unsigned1 LexIdSourceOptout = 1,
+                            string TransactionID = '',
+                            string BatchUID = '',
+                            unsigned6 GlobalCompanyId = 0
 							) :=  FUNCTION
 
 

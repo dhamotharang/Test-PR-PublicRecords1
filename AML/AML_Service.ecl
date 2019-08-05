@@ -44,8 +44,19 @@ EXPORT AML_Service := MACRO
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.AML__AML_Service);
 /* ************* End Scout Fields **************/
-	
-	
+
+//CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+
+	mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
+    
 	string6 outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');
 	integer3 history_date    :=  MAP(	(integer3)(optionsIn.historyDateYYYYMM) <> 0  => (Integer3)optionsIn.historyDateYYYYMM,
 																						TRIM(outOfBandHistoryDate)  <> ''  => (integer3)outOfBandHistoryDate,
@@ -211,7 +222,11 @@ if(PermissionDPPA,FAIL('Not an allowable DPPA permissible purpose'));
 																						 DPPA,
 																						 GLBA,
 																						 gateways,
-																						 IncludeNegativeNews, bsversion, DataPermissionMask));  // will be in  final layout when returned  boca shell
+																						 IncludeNegativeNews, 
+                                                                                         bsversion, 
+                                                                                         DataPermissionMask,
+                                                                                         mod_access));  // will be in  final layout when returned  boca shell	
+
 																
   consumerAttributesV2 :=  IF(TestDataEnabled, AML.AMLRiskAttributesV2_TestSeed_Function(test_prep, TestDataTableName),
 																AML.getAMLAttributesV2(iid_prep, 
@@ -221,6 +236,7 @@ if(PermissionDPPA,FAIL('Not an allowable DPPA permissible purpose'));
 																						 gateways, 
 																						 bsversion,
 																						 DataPermissionMask,
+                                                                                         mod_access,
 																						 UseXG5,
 																						 IncludeNewsProfile));
 																						 
@@ -392,6 +408,7 @@ businessResults :=  if(TestDataEnabled, AML.AMLRiskAttributes_BusnTestSeed_Funct
 																								bsversion, 
 																								DataPermissionMask));
 
+
 businessResultsV2 :=  if(TestDataEnabled, AML.AMLRiskAttributesV2_BusnTestSeed_Function(test_Busnprep, TestDataTableName), 
 											AML.GetAMLAttribBusnV2(busInput, 
 											DataRestrictionMask,
@@ -399,6 +416,10 @@ businessResultsV2 :=  if(TestDataEnabled, AML.AMLRiskAttributesV2_BusnTestSeed_F
 											GLBA,
 											gateways,
 											bsversion,
+                                            LexIdSourceOptout,
+                                            TransactionID,
+                                            BatchUID,
+                                            GlobalCompanyId,
 											UseXG5,
 											IncludeNewsProfile));
 

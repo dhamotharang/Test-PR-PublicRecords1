@@ -1,4 +1,4 @@
-IMPORT iesp, Risk_Indicators, PersonReports, Gateway, AML;
+﻿IMPORT iesp, Risk_Indicators, PersonReports, Gateway, AML, doxie;
 
 /* Function that will retrieve and assign the Key Risk Indicator values based on the passed did and
    will set the appropriate caution indicator flags using the passed bestinfo, akas and relative records.
@@ -12,6 +12,7 @@ EXPORT fn_smart_KRIAttributes(PersonReports.IParam._smartlinxreport inParam,
 															boolean useXG5Gate = false
                               ) := FUNCTION
 		
+    
 	Risk_Indicators.Layout_Input prep_iid() := TRANSFORM
       SELF.DID 	:= subjectDID;
 			SELF.historydate := 999999;  // Set to realtime
@@ -35,8 +36,12 @@ EXPORT fn_smart_KRIAttributes(PersonReports.IParam._smartlinxreport inParam,
 	// gateway is used to calculate news profile indicators. As of now, the news profile indicators
 	// are only being calculated for when the xg5 data is used (primary individual) and not for relatives
 	// and associates.
+    mod_access := PROJECT(inParam, Doxie.IDataAccess);
 	kris := AML.getAMLattributesV2(iid,inParam.datarestrictionmask,inParam.dppa,
-																	inParam.glb,DATASET ([],Gateway.Layouts.Config),,inParam.datapermissionmask,XGParam,useXG5Gate);
+																	inParam.glb,DATASET ([],Gateway.Layouts.Config),,
+                                  inParam.datapermissionmask, 
+                                  mod_access,
+                                  XGParam,useXG5Gate);
 
 	/* Transform to iesp layout and set the caution flag */
 	outLayout xfm_keyrisk(AML.Layouts.LayoutAMLShellV2 l) := TRANSFORM
