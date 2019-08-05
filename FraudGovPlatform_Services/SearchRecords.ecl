@@ -322,5 +322,9 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));	
 	// output(ds_realtimerecord, named('ds_realtimerecord'));
 	
-	EXPORT ds_results := SORT(IF(~isRealtimeRecord, (ds_ElementsNIdentities + ds_clusters), ds_realtimerecord), ElementType, ElementValue);
+	EXPORT ds_results := SORT(IF(~isRealtimeRecord, (ds_ElementsNIdentities + ds_clusters), 
+															(ds_realtimerecord 
+																	+ ds_ElementsNIdentities(recordType <> FraudGovPlatform_Services.Constants.RecordType.IDENTITY) 
+																	+ ds_clusters(ElementType <> FraudGovPlatform_Services.Constants.RecordType.IDENTITY))), 
+														ElementType, ElementValue);
 END; 
