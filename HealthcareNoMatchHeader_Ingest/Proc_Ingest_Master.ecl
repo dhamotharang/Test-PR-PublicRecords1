@@ -31,7 +31,6 @@ EXPORT Proc_Ingest_Master(
                   ,Promote(pSrc, pVersion,,'base').buildfiles.Built2QA	
                   ,IFF(doIngestStats, runIngestStats, OUTPUT('Ingest Stats Skipped')),
                 );
-  #WORKUNIT('NAME','Healthcare NoMatch Header Ingest for SRC='+pSrc);
 
   allSteps  :=  SEQUENTIAL(
                   createsupers,

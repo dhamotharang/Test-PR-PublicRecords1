@@ -16,4 +16,6 @@ EXPORT Files( STRING	pSrc      = '',
     EXPORT  Changes           :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Linking(it).Changes.QA,HealthcareNoMatchHeader_InternalLinking.Layout_Header,THOR);
     EXPORT  Changes_Father    :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Linking(it).Changes.Father,HealthcareNoMatchHeader_InternalLinking.Layout_Header,THOR);
   END;
+	EXPORT	CRK               :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Append.CRK.QA,HealthcareNoMatchHeader_InternalLinking.Layout_Header,THOR);
+	EXPORT	CRK_Father        :=  DATASET(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion,pUseProd).Append.CRK.Father,HealthcareNoMatchHeader_InternalLinking.Layout_Header,THOR);
 END;

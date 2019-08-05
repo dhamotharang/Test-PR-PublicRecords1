@@ -132,6 +132,7 @@ MODULE
 	export src_infutor_narc3             := 'KP';  // infutor_narc3 consumer
 	export src_fed_crim                  := 'VM';  // federal Criminal
 	export src_Credit_Unions             := 'CU';
+	export src_DataBase_USA              := '9I';
 	export src_DataBridge                := 'RQ';	
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
@@ -1109,7 +1110,8 @@ export set_Marketing_Sources           := [
 		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
 		,src_Vickers									 ,src_ZOOM											,src_Cortera									 ,src_Equifax_Business_Data		
-		,src_FBNV2_Hist_Choicepoint		 ,src_DCA												,src_Infutor_NARB							 ,src_DataBridge
+		,src_FBNV2_Hist_Choicepoint		 ,src_DCA												,src_Infutor_NARB							 ,src_Database_USA
+		,src_DataBridge
 		/*updated set_Marketing_Corp*/		
     ,src_AK_Corporations					 ,src_AL_Corporations						,src_AZ_Corporations					 ,src_AR_Corporations 
 		,src_CA_Corporations					 ,src_CO_Corporations						,src_CT_Corporations					 ,src_DC_Corporations
@@ -1696,6 +1698,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_infutor_narc3             := [src_infutor_narc3             ];
 	export set_fed_crim                  := [src_fed_crim                  ];
 	export set_Credit_Unions             := [src_Credit_Unions             ];
+	export set_Database_USA              := [src_Database_USA              ];	
 	export set_DataBridge                := [src_DataBridge                ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
@@ -2220,6 +2223,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCrashCarrier               (string  sr) := sr               in set_CrashCarrier               ;	
 	export SourceIsCredit_Unions              (string  sr) := sr               in set_Credit_Unions              ;		
 	export SourceIsCriminal_History           (string  sr) := sr               in set_Criminal_History           ;
+	export SourceIsDatabase_USA               (string  sr) := sr               in set_Database_USA               ;	
 	export SourceIsDataBridge                 (string  sr) := sr               in set_DataBridge                 ;
 	export SourceDatagence                    (string  sr) := sr               in set_Datagence;
 	export SourceIsDCA                        (string  sr) := sr               in set_DCA                        ;
@@ -2764,6 +2768,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_WY_Corporations           ,'WY Corporations'                                           }
 		,{src_CrashCarrier			        ,'Crash Carrier'		                                         }		
 		,{src_Credit_Unions             ,'Credit Unions'                                             }
+		,{src_Database_USA   						,'Database_USA'                                              }		
 		,{src_DataBridge    						,'DataBridge'                                                }
 		,{src_Datagence      						,'Datagence'                                    }
 		,{src_DCA                       ,'DCA'                                                       }
@@ -3284,6 +3289,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Credit_Unions             => 'Credit Unions'                                        
 		,src_CNLD_Facilities					 => 'CNLD Facilities'
 		,src_CNLD_Practitioner				 => 'CNLD_Practitioner'
+		,src_Database_USA              => 'Database_USA'
 		,src_DataBridge                => 'DataBridge'
 		,src_Datagence      					 => 'Datagence'                               
 		,src_DCA                       => 'DCA'                                                  
