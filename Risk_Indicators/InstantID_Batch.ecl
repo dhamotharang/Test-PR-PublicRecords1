@@ -129,7 +129,7 @@
 </pre>
 */
 
-import ut, address, codes, models, riskwise, iesp, patriot, intliid, address, royalty, AutoStandardI, OFAC_XG5, STD;
+import ut, address, codes, models, riskwise, iesp, patriot, intliid, royalty, AutoStandardI, OFAC_XG5, STD, risk_indicators;
 
 export InstantID_Batch := macro
 
@@ -294,6 +294,12 @@ boolean IncludeDPBC := false 								: stored('IncludeDPBC');
 boolean EnableEmergingID := false 					: stored('EnableEmergingID');
 string3 NameInputOrder := ''								: STORED('NameInputOrder');	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
 
+// CCPA Fields
+
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 unsigned1 lowestAllowedVersion := 1;	// lowest allowed version according to product, unless the IIDVersionOveride is true
 unsigned1 maxAllowedVersion := 1;	// maximum allowed version as of 1/28/2014
@@ -524,7 +530,8 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
 									require2ele, fromBiid, isFCRA, runExcludeWatchLists ,FALSE,ofc_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,dob_radius_use,
 									bsversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, DataRestriction, CustomDataFilter, 
 									IncludeDLverification, watchlists_request, DOBMatchOptions, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold,
-									CompanyID, DataPermission);
+									CompanyID, DataPermission,
+                                    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 							
@@ -871,7 +878,8 @@ InsuranceRoyalties 	:= if(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetB
 
 // this section is all to include the fraud scores if the boolean is set to true
 	clam := risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, Doxie.Compliance.isUtilityRestricted(industry_class_value), ln_branded_value,  
-					true, false, false, true, bsversion, DataRestriction := DataRestriction, DataPermission := DataPermission);
+					true, false, false, true, bsversion, DataRestriction := DataRestriction, DataPermission := DataPermission,
+                    LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 	ip_prep := project( fs, transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
 	ip_out  := risk_indicators.getNetAcuity( ip_prep, gateways, DPPA_Purpose, GLB_Purpose);
