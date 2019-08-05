@@ -473,6 +473,7 @@ MODULE
 								'STRING OtherPhone' + %'cntPhone'% + '_CarrierCity;' +
 								'STRING OtherPhone' + %'cntPhone'% + '_CarrierState;' +
 								'STRING OtherPhone' + %'cntPhone'% + '_PhoneStatus;' +
+								'STRING OtherPhone' + %'cntPhone'% + '_Source;' +
 								'STRING OtherPhone' + %'cntPhone'% + '_PortCode;' +
 								'STRING OtherPhone' + %'cntPhone'% + '_PhoneRiskIndicator;' +
 								'BOOLEAN OtherPhone' + %'cntPhone'% + '_OTPRIFailed;' +
@@ -617,6 +618,7 @@ MODULE
 			STRING   CarrierState;
 			STRING   ListingName;
 			STRING   PhoneStatus;
+			STRING   Source;
 			STRING   ListingType;
 			STRING   PrivacyIndicator;
 			STRING   MSA;

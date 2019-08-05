@@ -45,7 +45,17 @@ EXPORT MapTransType2Code(STRING t) := TransTypeCodeDCT[ut.CleanSpacesAndUpper(t)
 EXPORT PrimarySearchCriteria := 'PII';
 
 EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,EquifaxPhones,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
-	
+
+EXPORT set of UNSIGNED1 WaterfallPhoneSources := [PhoneSource.Waterfall,PhoneSource.EquifaxPhones,PhoneSource.InHouseQSent,PhoneSource.LastResort];
+EXPORT set of UNSIGNED1 GatewaySources := [PhoneSource.QSentGateway,PhoneSource.TargusGateway,PhoneSource.EquifaxPhones,
+                                            PhoneSource.InHouseQSent,PhoneSource.LastResort];
+
+EXPORT SOURCES :=
+MODULE
+   EXPORT Gateway := 'GATEWAY';
+   EXPORT Internal := 'INTERNAL';
+END;	 
+
 	// Phone types
 	EXPORT PhoneType :=
 	MODULE
