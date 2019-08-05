@@ -304,7 +304,7 @@ EXPORT Functions := MODULE
 
 	EXPORT getMatchedEntityTypes(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
 															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
-															 Boolean skip_autokey_element_matching = FALSE) := FUNCTION	
+															 Boolean isSearchRequest = FALSE) := FUNCTION	
 
 		FraudShared_Services.Layouts.layout_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchInExtended_rec l,
 																																								FraudShared_Services.Layouts.Raw_Payload_rec r) := TRANSFORM	
@@ -319,7 +319,7 @@ EXPORT Functions := MODULE
 												
 			name :=  IF(l.name_last <> '' AND 
 									l.name_first <> '' AND
-									(skip_autokey_element_matching OR 
+									(isSearchRequest OR 
 									(stringlib.StringToUpperCase(l.name_first) = stringlib.StringToUpperCase(r.cleaned_name.fname) AND
 									stringlib.StringToUpperCase(l.name_last) = stringlib.StringToUpperCase(r.cleaned_name.lname))), 
 									DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.NAME_FRAGMENT}], 
@@ -336,7 +336,7 @@ EXPORT Functions := MODULE
 																		((l.mailing_p_city_name<>'' AND l.mailing_st<>'') OR l.mailing_z5<>'');
 										
 			physicalAddress :=  IF( isPhysicalAddress AND 
-															(skip_autokey_element_matching  OR (l.prim_range = r.clean_address.prim_range AND
+															(isSearchRequest  OR (l.prim_range = r.clean_address.prim_range AND
 															l.prim_name = r.clean_address.prim_name AND
 															l.addr_suffix = r.clean_address.addr_suffix AND
 															l.predir = r.clean_address.predir AND
@@ -369,7 +369,7 @@ EXPORT Functions := MODULE
 													{STRING fragmentType}));
 													
 			phone :=  IF(l.phoneno <> '' AND 
-									 (skip_autokey_element_matching OR 
+									 (isSearchRequest OR 
 									 (l.phoneno = r.clean_phones.phone_number OR l.phoneno = r.clean_phones.cell_phone)),  
 										DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHONE_FRAGMENT}], 
 												{STRING fragmentType}));
@@ -385,11 +385,20 @@ EXPORT Functions := MODULE
 																	l.dl_number  = r.drivers_license, 
 																	DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT}], 
 																			{STRING fragmentType}));
-
-			bankAccountNumber := IF(l.bank_account_number <> '' AND
-															(l.bank_account_number = r.bank_account_number_1 OR l.bank_account_number = r.bank_account_number_2), 
-															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT}], 
-																	{STRING fragmentType}));
+																			
+			bankAccountNumber_for_search := IF(l.bank_account_number <> '' AND 
+																					(l.bank_account_number = r.bank_account_number_1 OR l.bank_account_number = r.bank_account_number_2), 
+																				DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT}], 
+																					{STRING fragmentType}));
+													
+			bankAccountNumber_for_report := IF(l.bank_account_number <> '' AND l.bank_routing_number <> '' AND
+																					((l.bank_account_number = r.bank_account_number_1 AND l.bank_routing_number = r.bank_routing_number_1)
+																					OR 
+																					(l.bank_account_number = r.bank_account_number_2 AND l.bank_routing_number = r.bank_routing_number_2)), 
+																				DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT}], 
+																					{STRING fragmentType}));
+													
+			bankAccountNumber := IF(isSearchRequest, bankAccountNumber_for_search, bankAccountNumber_for_report);
 																																	
 			geolocation :=  IF(l.geo_lat <> '' AND l.geo_long <> '' AND 
 												 l.geo_lat = r.clean_address.geo_lat AND 
