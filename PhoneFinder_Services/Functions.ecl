@@ -564,6 +564,8 @@ MODULE
 																							+ pInput.OperatingCompany.PhoneInfo.FaxNXX
 																							+ pInput.OperatingCompany.PhoneInfo.FaxLine;																		
 			SELF.CallForwardingIndicator          := pInput.CallForwardingIndicator;
+			SELF.source := IF(pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources, PhoneFinder_Services.Constants.SOURCES.Gateway,
+				            PhoneFinder_Services.Constants.SOURCES.Internal);
 			SELF                                  := pInput;
 			SELF																	:= [];
 		END;
@@ -663,6 +665,8 @@ MODULE
 															'');
 			SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;												
 			SELF.CallForwardingIndicator          := pInput.CallForwardingIndicator;
+			SELF.source := IF(pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources, PhoneFinder_Services.Constants.SOURCES.Gateway, 
+				            PhoneFinder_Services.Constants.SOURCES.Internal);
 			SELF                                  := pInput;
 			SELF																	:= [];
 		END;
@@ -923,6 +927,9 @@ MODULE
 																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxLine;
 			SELF.VerificationStatus               := ROW({pInput.verification_desc, pInput.is_verified}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
 			SELF.PhoneAddressState                := '';
+			SELF.source := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway, 
+				               inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal, 
+				               '');
 			SELF                                  := pInput.RealTimePhone_Ext;
 			SELF																	:= pInput;
 
@@ -965,6 +972,9 @@ MODULE
 															            '');
 			SELF.PhoneOwnershipIndicator := pInput.PhoneOwnershipIndicator;												
 			SELF.CallForwardingIndicator := pInput.CallForwardingIndicator;
+			SELF.source := MAP(inmod.IsPrimarySearchPII and pinput.phone_source IN PhoneFinder_Services.Constants.GatewaySources => PhoneFinder_Services.Constants.SOURCES.Gateway, 
+				               inmod.IsPrimarySearchPII => PhoneFinder_Services.Constants.SOURCES.Internal, 
+				               '');
 			SELF                         := pInput;
 			SELF.PhoneAddressState       := '';
 
@@ -1025,7 +1035,7 @@ MODULE
 			dSearchResultsOtherPhones  := dSearchResults(~isPrimaryPhone);
 			
 			dPhoneHistRecs    := dSearchResultsPrimaryPhone;
-			dPrimaryPhoneRecs := dSearchResultsPrimaryPhoneUnfiltered(phone_source in [PhoneFinder_Services.Constants.PhoneSource.Waterfall,
+			dPrimaryPhoneRecs := dSearchResultsPrimaryPhoneUnfiltered(phone_source in [PhoneFinder_Services.Constants.WaterfallPhoneSources,
 																																				PhoneFinder_Services.Constants.PhoneSource.QSentGateway]);
 			
 			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,inMod,isPhoneSearch);
@@ -1322,6 +1332,7 @@ MODULE
 					#APPEND(OtherPhones,'SELF.OtherPhone' + %'j'% + '_CarrierCity := pInput.other_phones[' + %'j'% + '].CarrierCity;\n')
 					#APPEND(OtherPhones,'SELF.OtherPhone' + %'j'% + '_CarrierState := pInput.other_phones[' + %'j'% + '].CarrierState;\n')
 					#APPEND(OtherPhones,'SELF.OtherPhone' + %'j'% + '_PhoneStatus := pInput.other_phones[' + %'j'% + '].PhoneStatus;\n')
+					#APPEND(OtherPhones,'SELF.OtherPhone' + %'j'% + '_Source := pInput.other_phones[' + %'j'% + '].Source;\n')
 					#APPEND(OtherPhones,'SELF.OtherPhone' + %'j'% + '_PortCode := pInput.other_phones[' + %'j'% + '].PortingCode;\n')
 					#APPEND(OtherPhones,'SELF.OtherPhone' + %'j'% + '_PhoneRiskIndicator := pInput.other_phones[' + %'j'% + '].PhoneRiskIndicator;\n')
 					#APPEND(OtherPhones,'SELF.OtherPhone' + %'j'% + '_OTPRIFailed := pInput.other_phones[' + %'j'% + '].OTPRIFailed;\n')
@@ -1468,6 +1479,7 @@ MODULE
 			SELF.ContactAddress_County              := ocInfo.ContactAddress.County;
 			SELF.ContactAddress_PostalCode          := ocInfo.ContactAddress.PostalCode;
 			SELF.ContactAddress_StateCityZip        := ocInfo.ContactAddress.StateCityZip;
+			SELF.Source                             := IF(~isPhoneSearch,phoneInfo.Source,'');
 			SELF.FirstPortedDate                    := iesp.ECL2ESP.DateToInteger(phoneInfo.FirstPortedDate);
 			SELF.LastPortedDate                     := iesp.ECL2ESP.DateToInteger(phoneInfo.LastPortedDate);
 			SELF.ActivationDate                     := iesp.ECL2ESP.DateToInteger(phoneInfo.ActivationDate);
