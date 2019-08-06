@@ -2,7 +2,7 @@
 EXPORT	fn_setRecordStatus(	STRING	pVersion,
 														Constants().buildType	pBuildType	= Constants().buildType.Daily)	:=	FUNCTION
 
-	dDenormed									:=	Business_Credit.Files().Denormalized;
+	dDenormed									:=	Business_Credit.fn_ProcessSBFEFile('~thor_data400::SBFE::SuppressTest','20190802');
 		//	006 Suppress Associated Accounts
 	File_Correction_IndicatorSuppressCode:=['006'];
 		// 003 = Delete All Account History
@@ -46,51 +46,32 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 	dDenormedSorted	:=	SORT(DISTRIBUTE(dSlimDenormed(active),
 												HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported)),
 															Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,LOCAL);
-															
-	dMassSuppress:=dDenormedSorted(File_Correction_Indicator in File_Correction_IndicatorSuppressCode);
+	output(dDenormedSorted);														
 	
-	dSetMassSuppress:=JOIN(
-												dDenormedSorted(File_Correction_Indicator not in File_Correction_IndicatorSuppressCode),
-												dMassSuppress,
-													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
-													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
-													LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
-													LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
-													LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
-													LEFT.process_date											=	RIGHT.process_date,
-												TRANSFORM(RECORDOF(LEFT),
-													SELF.active						:=	FALSE;
-													SELF.correction_type	:=	'A';
-													SELF.correction_date	:=	(STRING8)Std.Date.Today();
-													SELF				:=	LEFT),
-												LEFT OUTER,
-												LOCAL
-											);
-											
-	dMassUnSuppress:=dDenormedSorted(File_Type_Indicator = '005');
+	// dMassUnSuppress:=dDenormedSorted(File_Type_Indicator = '005');
 	
-	dSetMassUnSuppress:=JOIN(
-												dDenormedSorted(File_Type_Indicator<>'005'),
-												dMassSuppress,
-													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
-													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
-													LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
-													LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
-													LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
-													LEFT.process_date											=	RIGHT.process_date,
-												TRANSFORM(RECORDOF(LEFT),
-													SELF.active						:=	TRUE;
-													SELF.correction_type	:=	'A';
-													SELF.correction_date	:=	(STRING8)Std.Date.Today();
-													SELF				:=	LEFT),
-												LEFT OUTER,
-												LOCAL
-											);
+	// dSetMassUnSuppress:=JOIN(
+												// dDenormedSorted(File_Type_Indicator<>'005'),
+												// dMassSuppress,
+													// LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
+													// LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
+													// LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
+													// LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
+													// LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
+													// LEFT.process_date											=	RIGHT.process_date,
+												// TRANSFORM(RECORDOF(LEFT),
+													// SELF.active						:=	TRUE;
+													// SELF.correction_type	:=	'A';
+													// SELF.correction_date	:=	(STRING8)Std.Date.Today();
+													// SELF				:=	LEFT),
+												// LEFT OUTER,
+												// LOCAL
+											// );
 																	
-	dMassReplace	:=	dSetMassUnSuppress(File_Type_Indicator='002');
+	dMassReplace	:=	dDenormedSorted(File_Type_Indicator='002');
 	
 	dSetMassDelete	:=	JOIN(
-												dSetMassUnSuppress(File_Type_Indicator<>'002'),
+												dDenormedSorted(File_Type_Indicator<>'002'),
 												dMassReplace,
 													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
 													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
@@ -108,6 +89,10 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 											);
 	dMassDelete		:=	dSetMassDelete(~active);
 	dStillActive	:=	dSetMassDelete(active)+dMassReplace;
+	output(dMassDelete);
+	output(dStillActive);
+	
+	
 		// Only keep the latest Account Delete
 	dDeleteRecords	:=	DEDUP(SORT(	dStillActive(Account_Update_Deletion_Indicator	IN	sDeleteAccounts),
 																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,-Extracted_Date,LOCAL),
@@ -145,20 +130,41 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 		SELF.correction_date	:=	IF(~SELF.active,R.process_date[1..8],'');
 		SELF									:=	R;
 	END;
-														
+	output(dAccountsDeleted);													
 	dDeleteMostRecent	:=	ITERATE(
 													SORT(DISTRIBUTE(dAccountsDeleted(active),
 														HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported)),
 																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,-Cycle_End_Date,-Extracted_Date,LOCAL),
 													tDeleteMostRecent(LEFT,RIGHT),LOCAL);
+output(dDeleteMostRecent);
 
+dMassSuppress:=dDeleteMostRecent(active and File_Correction_Indicator in File_Correction_IndicatorSuppressCode);
+	
+	dSetMassSuppress:=JOIN(
+												dDeleteMostRecent(active),
+												dMassSuppress,
+													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
+													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
+													LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
+													LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
+													LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
+													LEFT.process_date											<=	RIGHT.process_date,
+												TRANSFORM(RECORDOF(LEFT),
+													SELF.active						:=	if(Right.File_Correction_Indicator in File_Correction_IndicatorSuppressCode,false,true);
+													SELF.correction_type	:=	if(~Self.active,'A','');
+													SELF.correction_date	:=	if(~Self.active,(STRING8)Std.Date.Today(),'');
+													SELF				:=	LEFT),
+												LEFT OUTER,
+												LOCAL
+											);
+		output(dSetMassSuppress);
 	//	Set the original_process_date to the process_date of an earlier matching record
 	dSetOriginalProcessDate	:=	
 							JOIN(
-								SORT(DISTRIBUTE(dDeleteMostRecent(active),
+								SORT(DISTRIBUTE(dSetMassSuppress(active),
 									HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,Extracted_Date,Cycle_End_Date)),
 												Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,Extracted_Date,Cycle_End_Date,LOCAL),
-								DEDUP(SORT(DISTRIBUTE(dMassDelete+dAccountsDeleted(~active)+dDeleteMostRecent(~active)+dSlimDenormed(~active),
+								DEDUP(SORT(DISTRIBUTE(dMassDelete+dAccountsDeleted(~active)+dDeleteMostRecent(~active)+dSetMassSuppress(~active)+dSlimDenormed(~active),
 									HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,Extracted_Date,Cycle_End_Date)),
 												Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,Extracted_Date,Cycle_End_Date,process_date,LOCAL),
 												Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,Extracted_Date,Cycle_End_Date,LOCAL),
@@ -175,11 +181,11 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 								LEFT OUTER,
 								LOCAL
 							);
-
+output(dSetOriginalProcessDate);
 		// Put everything back together with the updated active indicator
 	dActive	:=	JOIN(
 								SORT(DISTRIBUTE(dDenormedWithSequenceNumber(active),HASH(sequenceNum)),sequenceNum,LOCAL),
-								SORT(DISTRIBUTE(dMassDelete+dAccountsDeleted(~active)+dDeleteMostRecent(~active)+dSetOriginalProcessDate,HASH(sequenceNum)),sequenceNum,LOCAL),
+								SORT(DISTRIBUTE(dMassDelete+dAccountsDeleted(~active)+dDeleteMostRecent(~active)+dSetMassSuppress(~active)+dSetOriginalProcessDate,HASH(sequenceNum)),sequenceNum,LOCAL),
 									LEFT.sequenceNum	=	RIGHT.sequenceNum,
 								TRANSFORM(
 									RECORDOF(dDenormed),
