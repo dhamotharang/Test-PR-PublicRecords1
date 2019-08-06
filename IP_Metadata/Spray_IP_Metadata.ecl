@@ -1,9 +1,7 @@
-IMPORT Std;
+﻿IMPORT Std;
 
-EXPORT Spray_IP_Metadata (string version, const varstring eclsourceip):= FUNCTION
+EXPORT Spray_IP_Metadata (string version, const varstring eclsourceip, string srcdir, string suffixF):= FUNCTION
 
-	srcdir 			:= '/data/data_999/phones/ip_metadata/build/';	
-	suffixF			:= 'ip_metadata_header.csv';
 	root				:= '~thor_data400::in::ip_metadata_';
 	
 	sprayFile 	:= std.File.SprayVariable(eclsourceip,

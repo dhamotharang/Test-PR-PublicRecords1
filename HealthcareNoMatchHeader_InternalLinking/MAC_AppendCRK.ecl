@@ -1,166 +1,115 @@
-﻿IMPORT  STD, HealthcareNoMatchHeader_Ingest,VersionControl;
+﻿IMPORT  STD, HealthcareNoMatchHeader_Ingest,wk_ut;
 EXPORT  MAC_AppendCRK(
-    STRING	pSrc        = ''
-    , STRING  pVersion  = (STRING)STD.Date.Today()
-    , DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) pBase = HealthcareNoMatchHeader_Ingest.Files(pSrc).AllRecords // Change IN_Base to change input to ingest process
-    , DATASET(RECORDOF(HealthCareNoMatchHeader_Ingest.In_Ingest))  pInfile = HealthcareNoMatchHeader_Ingest.Files(pSrc).AsHeaderIngest 
-)	:=	FUNCTION
-
-  //  First Build - run Ingest and Specificities
-  pIngest :=  
-    HealthcareNoMatchHeader_InternalLinking.proc_build_all(
-      pSrc
-      ,pVersion
-      ,
-      ,pBase
-      ,pInfile
-
-        // Ingest
-      ,TRUE //  doIngest
-      ,TRUE //  doIngestStats
-       
-        // Specificities
-      ,TRUE //  doSpecificities
-       
-        // Internal Linking
-      ,   //  doInternalGetBase
-      ,   //  doInternal
-
-        // Append CRK
-      ,   //  doAppendCRK
-    ).All;
+    	pSrc
+    , pVersion
+    , pBase
+    , pAsHeader
+)	:=	FUNCTIONMACRO
 
   #WORKUNIT('NAME','Healthcare NoMatch Customer Record Key for SRC='+pSrc);
 
-  //  First Iteration - Copy Ingest to Base and run
-  pIteration1 :=  
-    HealthcareNoMatchHeader_InternalLinking.proc_build_all(
-      pSrc
-      ,pVersion
-      ,'1'
-      , //  pBase
-      , //  pInfile
+  //  Set Workman Variables
+  pStartIter      :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.startIter;
+  pNumIter        :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.numIters;
+  pPrimaryQueue   :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.primaryQueue;
+  pOutECL         :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.outECL;
+  pWuPrefix       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).WUPrefix;
+  pWuSuperfile    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF;
+  pEmailTo        :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify;
+  pPollingFreq    :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.pollingFreq;
+  // pStopCondition  :=  ['MatchesPerformed','< TRIM(REALFORMAT((COUNT(pBase)+COUNT(pAsHeader))*HealthcareNoMatchHeader_InternalLinking.proc_Constants.stopThreshold,10,0),ALL)'];
+  pStopCondition  :=  ['MatchesPerformed','< 1000000'];
 
-        // Ingest
-      ,  //  doIngest
-      ,  //  doIngestStats
-       
-        // Specificities
-      ,  //  doSpecificities
-       
-        // Internal Linking
-      ,TRUE  //  doInternalGetBase
-      ,TRUE  //  doInternal
+  //  Common Workman ECL Code
+  workmanPreamble(STRING runText)  :=  FUNCTION
+    workmanPreambleECL  :=  'IMPORT HealthcareNoMatchHeader_InternalLinking,HealthcareNoMatchHeader_Ingest;' +
+                            '\npSrc := \''+pSrc+'\';' +
+                            '\npVersion  := \'@version@\';' +
+                            '\npIteration := \'@iteration@\';' +
+                            '\n#WORKUNIT(\'name\',\'HealthcareNoMatchHeader_InternalLinking '+runText+' \' + pVersion + \' Src \' + pSrc + \' iter \' + pIteration);' +
+                            // '\n#WORKUNIT(\'priority\',\'high\');' +
+                            '\n';
+    RETURN workmanPreambleECL;
+  END;
 
-        // Append CRK
-      ,   //  doAppendCRK
-    ).All;
+  // One Ingest and Specificities Iteration
+  runIngest_Text  :=  'NoMatchIngest';
+  runIngest_ECL   :=  workmanPreamble(runIngest_Text)+
+                        '\nHealthcareNoMatchHeader_InternalLinking.proc_build_all(pSrc,pVersion,pIteration'+
+                        ',doIngest:=TRUE'+
+                        ',doSpecificities:=TRUE'+
+                        ',doInternalGetBase:=TRUE'+
+                        ',doInternal:=FALSE'+
+                        ',doAppendCRK:=FALSE'+
+                        ').All;';
+  pRunIngest      :=  wk_ut.mac_ChainWuids(runIngest_ECL, 1, 1, pVersion, [], pPrimaryQueue
+                        ,pOutputEcl := pOutECL
+                        ,pUniqueOutput := runIngest_Text
+                        ,pNotifyEmails := pEmailTo
+                        ,pPollingFrequency := pPollingFreq
+                        ,pOutputFilename := pWuPrefix + '@version@' + '_@iteration@::WUInfo_' + runIngest_Text
+                        ,pOutputSuperfile := pWuSuperfile
+                      );
 
-  //  Second Iteration
-  pIteration2 :=  
-    HealthcareNoMatchHeader_InternalLinking.proc_build_all(
-      pSrc
-      ,pVersion
-      ,'2'
-      , //  pBase
-      , //  pInfile
+  // Internal Linking Iterations
+  runIteration_Text :=  'InternalLinking';
+  runIteration_ECL  :=  workmanPreamble(runIteration_Text) +
+                        '\nHealthcareNoMatchHeader_InternalLinking.proc_build_all(pSrc,pVersion,pIteration'+
+                        ',doIngest:=FALSE'+
+                        ',doSpecificities:=FALSE'+
+                        ',doInternalGetBase:=FALSE'+
+                        ',doInternal:=TRUE'+
+                        ',doAppendCRK:=FALSE'+
+                        ').All;';
+  pRunIterations    :=  wk_ut.mac_ChainWuids(runIteration_ECL, pStartIter, pNumIter, pVersion
+                          ,['PreClusterCount','PostClusterCount','MatchesPerformed'], pPrimaryQueue
+                          ,pOutputEcl := pOutECL
+                          ,pUniqueOutput := runIteration_Text
+                          ,pNotifyEmails := pEmailTo
+                          ,pPollingFrequency := pPollingFreq
+                          ,pOutputFilename := pWuPrefix + '@version@' + '_@iteration@::WUInfo_' + runIteration_Text
+                          ,pOutputSuperfile := pWuSuperfile
+                          // ,pSetStopCondition :=  pStopCondition
+                        );
 
-        // Ingest
-      ,  //  doIngest
-      ,  //  doIngestStats
-       
-        // Specificities
-      ,  //  doSpecificities
-       
-        // Internal Linking
-      ,   //  doInternalGetBase
-      ,TRUE  //  doInternal
-
-        // Append CRK
-      ,   //  doAppendCRK
-    ).All;
-
-  //  Third Iteration
-  pIteration3 :=  
-    HealthcareNoMatchHeader_InternalLinking.proc_build_all(
-      pSrc
-      ,pVersion
-      ,'3'
-      , //  pBase
-      , //  pInfile
-
-        // Ingest
-      ,  //  doIngest
-      ,  //  doIngestStats
-       
-        // Specificities
-      ,  //  doSpecificities
-       
-        // Internal Linking
-      ,   //  doInternalGetBase
-      ,TRUE  //  doInternal
-
-        // Append CRK
-      ,   //  doAppendCRK
-    ).All;
-
-  //  Fourth Iteration
-  pIteration4 :=  
-    HealthcareNoMatchHeader_InternalLinking.proc_build_all(
-      pSrc
-      ,pVersion
-      ,'4'
-      , //  pBase
-      , //  pInfile
-
-        // Ingest
-      ,  //  doIngest
-      ,  //  doIngestStats
-       
-        // Specificities
-      ,  //  doSpecificities
-       
-        // Internal Linking
-      ,   //  doInternalGetBase
-      ,TRUE  //  doInternal
-
-        // Append CRK
-      ,   //  doAppendCRK
-    ).All;
-
-  //  Append Customer Record Key
-  pAppendCRK :=  
-    HealthcareNoMatchHeader_InternalLinking.proc_build_all(
-      pSrc
-      ,pVersion
-      ,
-      , //  pBase
-      , //  pInfile
-
-        // Ingest
-      ,  //  doIngest
-      ,  //  doIngestStats
-       
-        // Specificities
-      ,  //  doSpecificities
-       
-        // Internal Linking
-      ,   //  doInternalGetBase
-      ,   //  doInternal
-
-        // Append CRK
-      ,TRUE  //  doAppendCRK
-    ).All;
-  
+  //  One Append Customer Record Key Iteration
+  runAppendCRK_Text  := 'AppendCustomerRecordKey';
+  runAppendCRK_ECL   := workmanPreamble(runAppendCRK_Text)+
+                        '\nHealthcareNoMatchHeader_InternalLinking.proc_build_all(pSrc,pVersion,pIteration'+
+                        ',doIngest:=FALSE'+
+                        ',doSpecificities:=FALSE'+
+                        ',doInternalGetBase:=FALSE'+
+                        ',doInternal:=FALSE'+
+                        ',doAppendCRK:=TRUE'+
+                        ').All;';
+  pRunAppendCRK     :=  wk_ut.mac_ChainWuids(runAppendCRK_ECL, 1, 1, pVersion, [], pPrimaryQueue
+                          ,pOutputEcl := pOutECL
+                          ,pUniqueOutput := runAppendCRK_Text
+                          ,pNotifyEmails := pEmailTo
+                          ,pPollingFrequency := pPollingFreq
+                          ,pOutputFilename := pWuPrefix + '@version@' + '_@iteration@::WUInfo_' + runAppendCRK_Text
+                          ,pOutputSuperfile := pWuSuperfile
+                        );
+                        
+    //  Build Prep
+  pCreateTempFiles  :=  SEQUENTIAL(
+                          OUTPUT(pBase,,HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.BaseTemp,COMPRESSED,OVERWRITE), // Create Temporary Base file.  This is the deafult base file for the build.
+                          OUTPUT(pAsHeader,,HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.AsHeaderTemp,COMPRESSED,OVERWRITE) // Create Temporary AsHeader file.  This is the deafult AsHeader file for the build.
+                        );
+    //  Build Cleanup
+  pDeleteTempFiles  :=  SEQUENTIAL(
+                          STD.File.DeleteLogicalFile(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.BaseTemp),
+                          STD.File.DeleteLogicalFile(HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Input.AsHeaderTemp)
+                        );
+                        
   allSteps  :=  SEQUENTIAL(
-                  pIngest       //  Ingest
-                  ,pIteration1  //  Run 4 Iterations
-                  ,pIteration2
-                  ,pIteration3
-                  ,pIteration4
-                  ,pAppendCRK   //  Append Customer Record Key
+                  pCreateTempFiles  //  Make Base and Header files available for Workman
+                  ,pRunIngest       //  Ingest
+                  ,pRunIterations   //  Linking Iterations
+                  ,pRunAppendCRK    //  Append Customer Record Key
+                  ,pDeleteTempFiles //  Cleanup
                 );
                 
   RETURN  allSteps;
-END;
+ENDMACRO;
 
