@@ -30,7 +30,7 @@ module
 											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));												
 		export RDP := dataset(Filenames().Sprayed.RDP,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.RDP},
-											CSV(heading(1),separator([',']),quote('"'),terminator('\n')));																					
+											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																					
 
 	end;
 	//////////////////////////////////////////////////////////////////
