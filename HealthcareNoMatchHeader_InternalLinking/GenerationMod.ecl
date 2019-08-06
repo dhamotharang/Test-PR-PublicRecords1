@@ -65,7 +65,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:LEXID:PROP:LIKE(NUMBER):18,0\n'
     + '// Name\n'
     + 'FIELD:SUFFIX:PROP:10,0\n'
-    + 'FIELD:FNAME:PROP:EDITX(6):INITIAL:PreferredName:FORCE(--):8,0\n'
+    + 'FIELD:FNAME:PROP:EDITX(8):INITIAL:PreferredName:FORCE(--):8,0\n'
     + 'FIELD:MNAME:PROP:INITIAL:EDITX(6):14,0\n'
     + 'FIELD:LNAME:PROP:INITIAL:HYPHEN2:EDITX(6):10,0\n'
     + 'FIELD:GENDER:1,0\n'

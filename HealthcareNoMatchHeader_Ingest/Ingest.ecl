@@ -1,10 +1,11 @@
 ﻿IMPORT STD,SALT311,HealthcareNoMatchHeader_InternalLinking;
 EXPORT Ingest( 
   STRING	pSrc      = ''
+, STRING  pVersion  = (STRING)STD.Date.Today()
 , BOOLEAN incremental=FALSE
 , DATASET(Layout_Base) Delta = DATASET([],Layout_Base)
-, DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) dsBase = HealthcareNoMatchHeader_Ingest.Files(pSrc).AllRecords // Change IN_Base to change input to ingest process
-, DATASET(RECORDOF(HealthCareNoMatchHeader_Ingest.In_Ingest))  infile = HealthcareNoMatchHeader_Ingest.Files(pSrc).AsHeaderIngest
+, DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) dsBase = HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).BaseTemp
+, DATASET(HealthcareNoMatchHeader_Ingest.Layout_Base)  infile = HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).AsHeaderTemp 
 ) := MODULE
   SHARED NullFile := DATASET([],Layout_Base); // Use to replace files you wish to remove
  
