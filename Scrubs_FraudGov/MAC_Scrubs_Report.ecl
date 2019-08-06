@@ -22,7 +22,9 @@
 
 	Orbit_stats :=	U.OrbitStats():PERSIST(persist_name);
 	OrbitReport :=	OUTPUT(Orbit_stats,ALL,NAMED(scopename+'_OrbitReport'));
-	OrbitReportSummary	:=	OUTPUT(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,ALL,NAMED(scopename+'_OrbitReportSummary'));
+	prj_Orbit_stats := project(Orbit_stats, transform(Salt35.ScrubsOrbitLayout, self:=left));
+
+	OrbitReportSummary	:=	OUTPUT(Scrubs.OrbitProfileStats(,,prj_Orbit_stats).SummaryStats,ALL,NAMED(scopename+'_OrbitReportSummary'));
 	
 	NumRules :=	Count(Orbit_stats);
 	NumFailedRules := Count(Orbit_Stats(rulecnt>0));
@@ -103,7 +105,7 @@
 		'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
 		'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
 
-	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,BuildDate,profilename).SubmitStats;
+	SubmitStats :=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',prj_Orbit_stats,BuildDate,profilename).SubmitStats;
 	//Submits Profile's stats to Orbit
 	
 	SuperFile :=FraudGovPlatform.Filenames().OutputF.Scrubs_FraudGov + '::log';
