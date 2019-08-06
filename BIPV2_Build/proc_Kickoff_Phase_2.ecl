@@ -17,6 +17,7 @@ EXPORT proc_Kickoff_Phase_2(
   ,pSkipStrata            = 'false'
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
+  ,pSkipCrosswalk         = 'false'
   ,pUniqueOutput          = '\'\''
   ,pOutputEcl             = 'false'
   ,pCompileTest           = 'false'
@@ -42,6 +43,7 @@ functionmacro
   + ',@pSkipStrata@\n'        
   + ',@pSkipOverlinking@\n'        
   + ',@pSkipSeleidRelative@\n'
+  + ',@pSkipCrosswalk@\n'
   + ',@pCompileTest@\n'
   + ');';
   
@@ -63,7 +65,8 @@ functionmacro
   ecl12   := regexreplace('@pSkipStrata@'         ,ecl11  ,fbool(pSkipStrata          ),nocase);
   ecl13   := regexreplace('@pSkipOverlinking@'    ,ecl12  ,fbool(pSkipOverlinking     ),nocase);
   ecl14   := regexreplace('@pSkipSeleidRelative@' ,ecl13  ,fbool(pSkipSeleidRelative  ),nocase);
-  ecl15   := regexreplace('@pCompileTest@'        ,ecl14  ,fbool(pCompileTest         ),nocase);
+  ecl15   := regexreplace('@pSkipCrosswalk@'      ,ecl14  ,fbool(pSkipCrosswalk       ),nocase);
+  ecl16   := regexreplace('@pCompileTest@'        ,ecl15  ,fbool(pCompileTest         ),nocase);
                                                             
   kickWuid	  := wk_ut.CreateWuid(ecl15,cluster);
 //  kickXlink	  := wk_ut.CreateWuidNWait(ecl16,'1',pversion,cluster,,_control.MyInfo.EmailAddressNotify,,pUniqueOutput,pPollingFrequency,false);
