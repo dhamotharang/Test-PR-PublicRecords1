@@ -392,7 +392,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process PRIs****************************************************
 	// ---------------------------------------------------------------------------------------------------------
-	primaryPhoneSource := [PhoneFinder_Services.Constants.PhoneSource.WaterfallPhoneSources,PhoneFinder_Services.Constants.PhoneSource.QSentGateway];
+	primaryPhoneSource := [PhoneFinder_Services.Constants.WaterfallPhoneSources,PhoneFinder_Services.Constants.PhoneSource.QSentGateway];
 	 // original approach : display RI's when IncludePhoneMetadata and transaction type = premium,ultimate and phoneriskassesment
 	 //Re-design approach: display RI's info when IncludeRiskIndicators = true
 	displayPRI := isBatch AND inMod.IncludeRiskIndicators AND EXISTS(inMod.RiskIndicators(Active));
