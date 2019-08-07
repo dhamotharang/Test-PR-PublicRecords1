@@ -1,10 +1,10 @@
-﻿IMPORT ut, AutoStandardI, AutoHeaderI, doxie, Address, Vehiclev2_services, Codes;
+IMPORT $, AutoStandardI, AutoHeaderI, doxie, Address, Vehiclev2_services, Codes;
 
 export SearchRecords := MODULE
 
-	setMatchFlags(IParam.searchParams srch, DATASET(Layout_Report) rpt, STRING addr182) := FUNCTION
+	setMatchFlags($.IParam.searchParams srch, DATASET($.Layout_Report) rpt, STRING addr182) := FUNCTION
 		clnAddr := Address.CleanFields(addr182);
-		STRING1 processType := Get_Experian_Data.get_processType(PROJECT(srch,IParam.polkParams),addr182);
+		STRING1 processType := $.Get_Experian_Data.get_processType(PROJECT(srch,IParam.polkParams),addr182);
 		BOOLEAN insuranceUsage := srch.insuranceUsage;
 		BOOLEAN includeDevelopedVehicles := srch.includeDevelopedVehicles;
 		BOOLEAN vinStandard := processType=Constant.EXP_SRCH.VIN_STANDARD;
@@ -31,7 +31,7 @@ export SearchRecords := MODULE
 			SELF := LEFT;
 		ENDMACRO;
 
-		Layout_Report setFlags(Layout_Report L) := TRANSFORM
+		Layout_Report setFlags($.Layout_Report L) := TRANSFORM
 			BOOLEAN exactVinMatch := TRIM(srch.vin_in)!='' AND TRIM(srch.vin_in)=TRIM(L.vin);
 			BOOLEAN plateMatch := TRIM(srch.licensePlateNum)!='' AND TRIM(srch.licensePlateNum) IN SET(L.registrants,TRIM(reg_true_license_plate));
 			BOOLEAN yearMatch := TRIM(srch.modelYear)!='' AND TRIM(srch.modelYear)=TRIM(L.model_year);
@@ -60,9 +60,9 @@ export SearchRecords := MODULE
 		RETURN PROJECT(rpt,setFlags(LEFT));
 	END;
 
-	shared VehicleSearch_New(IParam.searchParams aInputData, IParam.polkParams aGatewayInputData) := FUNCTION
+	shared VehicleSearch_New($.IParam.searchParams aInputData, $.IParam.polkParams aGatewayInputData) := FUNCTION
 							
-		addrInputData := MODULE(PROJECT(aInputData,IParam.searchParams,OPT))
+		addrInputData := MODULE(PROJECT(aInputData,$.IParam.searchParams))
 			EXPORT STRING vin_in := '';
 			EXPORT STRING ModelYear := '';
 			EXPORT STRING Make := '';
@@ -100,7 +100,7 @@ export SearchRecords := MODULE
 						deduped_ids(Vehicle_key = aInputData.vehicleKey or aInputData.vehicleKey =''), aInputData.ssnMask));
 
 		// for insurance usage: set current flag for both registrants and owners
-		currentVehiclesAtAddress := PROJECT(vehiclesAtAddress,TRANSFORM(Layout_Report,
+		currentVehiclesAtAddress := PROJECT(vehiclesAtAddress,TRANSFORM($.Layout_Report,
 			SELF.is_current := 'CURRENT' IN SET(LEFT.registrants,history_desc) + SET(LEFT.owners,history_desc);
 			SELF := LEFT;));
 
@@ -147,14 +147,14 @@ export SearchRecords := MODULE
 		BOOLEAN useAll := Search_Request = constant.ALL_val;
 		BOOLEAN realTime := Search_Request = constant.realtime_val;
 		BOOLEAN useExperian := ~doxie.DataPermission.use_Polk;
-		STRING2 queryState := Functions.get_state(aGatewayInputData);
+		STRING2 queryState := aInputData.state;
 
     exp_only_state := LIMIT (Codes.Key_Codes_V3 (keyed (file_name='EXPERIAN_GATEWAY'), keyed (field_name='INSURANCE_USAGE'),
                                                  wild (field_name2), keyed (code = queryState)), 1, SKIP);
     BOOLEAN gatewayONLY := useExperian AND insuranceUsage AND EXISTS (exp_only_state);
 
 
-		aPolkInputMod := MODULE(PROJECT(aGatewayInputData,IParam.polkParams,OPT))
+		aPolkInputMod := MODULE(PROJECT(aGatewayInputData,$.IParam.polkParams,OPT))
 			EXPORT BOOLEAN noFail := useAll or aGatewayInputData.noFail or useExperian;
 		END;
 		aExperianInputMod := MODULE(PROJECT(aGatewayInputData,IParam.polkParams,OPT))
@@ -206,7 +206,7 @@ export SearchRecords := MODULE
 															Vehicle_Key);
 	END;
 	
-	SHARED  getCombinedRecords(IParam.searchParams aInputData) :=FUNCTION			
+	SHARED  getCombinedRecords($.IParam.searchParams aInputData) :=FUNCTION			
 
     mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
       EXPORT unsigned1 glb := aInputData.glbpurpose;
@@ -287,14 +287,14 @@ export SearchRecords := MODULE
 		
 	END;
 	
-	EXPORT getVehicleRecords(IParam.searchParams aInputData) := FUNCTION		
+	EXPORT getVehicleRecords($.IParam.searchParams aInputData) := FUNCTION		
 		// output('Name: ' + aInputData.firstname + ' ' + aInputData.lastname + ' Address: ' + aInputData.addr + 
 		// ' City: ' + aInputDAta.city + ' State: ' + aInputData.state + ' doCombined: ' + aInputData.doCombinedSearch + ' datasource: ' + aInputData.datasource);
 		outputRecords := getCombinedRecords(aInputData);		
 		
 		// apply county post-filtering
-		tmp_state := AutoStandardI.InterfaceTranslator.state_value.val(PROJECT(aInputData,AutoStandardI.InterfaceTranslator.state_value.params));
-		tmp_county := AutoStandardI.InterfaceTranslator.county_value.val(PROJECT(aInputData,AutoStandardI.InterfaceTranslator.county_value.params));
+		tmp_state := aInputData.state;
+		tmp_county := aInputData.county;
 		do_county_filt := map(
 			tmp_county=''	=> false,
 			tmp_state=''	=> error(301, doxie.ErrorCodes(301) + ' - State required to search by County'),

@@ -67,7 +67,7 @@ outDid := Doxie_Raw.ViewSourceDid(inputi(idtype in ['DID', 'RID']), mod_access, 
 
 //=========================================================
 //For location
-outLoc := Location_Services.location_sources(inputi(idtype='LOCATION'));
+outLoc := Location_Services.location_sources(inputi(idtype='LOCATION'), mod_access);
 
 outRec := Doxie_Raw.Layout_crs_raw;
 

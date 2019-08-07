@@ -166,12 +166,20 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                                           search.AuthorizedRep3.Address.StreetAddress1);
 
     // Option Fields
-    busCreditReportTypeValue := if (Option.BusinessCreditReportType = '', LNSmallBusiness.Constants.SBFEDataBusinessCreditReport,  
+    busCreditReportTypeValue := if (Option.BusinessCreditReportType = '0' OR
+		                                                   Option.BusinessCreditReportType = '', LNSmallBusiness.Constants.SBFEDataBusinessCreditReport,  
 													Option.BusinessCreditReportType);
+													// the default for  option.businessCreditReportType now is blank  - since esp not passing that in
+													// but later  when esp does pass that in we'll have either '0' , '1', or '2' (string1 values)
+													// which are defined as
+													// '0' being default from ESP side -  we have to check for 0 here and keep it being true (default) as it was in the code previously.
+													// '1' being SBFE report
+													// '2' Ln Only credit report (no SBFE data allowed).
+    #STORED('BusinessCreditReportType',busCreditReportTypeValue); //  CreditReportOption requirement 1.3.3													
     #STORED('LimitPaymentHistory24Months',Option.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions	
     BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');
     STRING  ContributorIds := '' : STORED('SBFEContributorIds');  
-	#STORED('BusinessCreditReportType',busCreditReportTypeValue); //  CreditReportOption requirement 1.3.3
+	
     STRING1 BusinessCreditReportTypeVal :=  LNSmallBusiness.Constants.SBFEDataBusinessCreditReport : STORED('BusinessCreditReportType');
     UNSIGNED3 HistoryDateYYYYMM		    := (INTEGER)Business_Risk_BIP.Constants.NinesDate     : STORED('HistoryDateYYYYMM');
     UNSIGNED6 HistoryDate             := (INTEGER)Business_Risk_BIP.Constants.NinesDateTime : STORED('HistoryDate');
@@ -360,7 +368,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
        EXPORT STRING6   DOBMask                         := global_mod.DOBMask;
        EXPORT STRING32  ApplicationType                 := global_mod.ApplicationType;
        EXPORT STRING1   FetchLevel 					            := BIPV2.IDconstants.Fetch_Level_SELEID;
-       EXPORT BOOLEAN   IncludeCreditReport             := option.IncludeCreditReport;  
+       EXPORT BOOLEAN   IncludeCreditReport             := option.IncludeCreditReport;  	
        EXPORT BOOLEAN   LimitPaymentHistory24Months := LimitPaymentHistory24MonthsVal;
 	  EXPORT STRING       SBFEContributorIds := ContributorIds;			
 	  EXPORT STRING1   BusinessCreditReportType := BusinessCreditReportTypeVal;
@@ -437,7 +445,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                                                      self.dppa := SmallBizCombined_inmod.DPPAPurpose,
 																										 self.data_restriction_mask := users.DataRestrictionMask,
 																										 self.data_permission_mask := users.DataPermissionMask,
-																										self.industry := Industry_Search[1].Industry,
+																										 self.industry := Industry_Search[1].Industry,
 																										 self.i_attributes_name := Attributes_Requested[1].AttributeGroup,
 																										 self.i_ssn := search.AuthorizedRep1.SSN,
                                                      self.i_dob := Rep_1_DOB,

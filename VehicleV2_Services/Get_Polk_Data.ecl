@@ -4,10 +4,10 @@ export Get_Polk_Data := MODULE
 
 	shared string inquiryType (IParam.polkParams in_mod, string2 PermissibleUse) := FUNCTION
 			Boolean hasName  := in_mod.lastname<>'' or in_mod.companyname<>'';
-			Boolean hasAddr  := in_mod.Addr <>'' and (in_mod.zip<>'' or in_mod.city<>'') and Functions.get_state(in_mod)<>'';
+			Boolean hasAddr  := in_mod.Addr <>'' and (in_mod.zip<>'' or in_mod.city<>'') and in_mod.state<>'';
 			Boolean hasVin   := in_mod.vin_in<>'';
 			Boolean hasModel := in_mod.ModelYear<>'' and in_mod.Make<>'';
-			Boolean hasPlate := in_mod.LicensePlateNum<>'' and Functions.get_state(in_mod)<>'';
+			Boolean hasPlate := in_mod.LicensePlateNum<>'' and in_mod.state<>'';
 			Boolean hasNameAddr	:= hasname and hasaddr;
 
 			string typeCode := MAP(
@@ -54,7 +54,7 @@ export Get_Polk_Data := MODULE
 	export val(IParam.polkParams in_mod, boolean doCombined = FALSE) := function
 
     // a lot of things depends on an input state value; calculate it here, once.
-    state_in := Functions.get_state(in_mod);
+    state_in := in_mod.state;
 	
 		// for testing, only applies to polk gateway.
 		BOOLEAN PerformGatewayDisallowedStateChecks := FALSE : STORED('PerformGatewayDisallowedStateChecks');  

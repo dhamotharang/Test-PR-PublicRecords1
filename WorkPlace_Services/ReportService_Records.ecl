@@ -61,7 +61,7 @@ export ReportService_Records := module
 		
 		
 		//     Get PAW data only for the dids with POE data.
-		ds_paw_recs	:=	WorkPlace_Services.Functions.getPawRecs(ds_poe_recs);
+		ds_paw_recs	:=	WorkPlace_Services.Functions.getPawRecs(ds_poe_recs, mod_access);
 		
     // 5. Combine POE & PSS slimmed recs into 1 dataset here and 
 	  //    join to POE source_hierarchy key file to assign the source_order.

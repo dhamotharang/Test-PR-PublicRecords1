@@ -615,7 +615,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
   proj4 := if(reduced_data_value, proj3, proj4_orig);
 
   l_dids := get_dids(noFail := true);
-  morePhones := IF(count(l_dids)<100,doxie.Add_Phones(l_dids,doxie.relative_dids(l_dids),dial_bouncedistance_value));
+  morePhones := IF(count(l_dids)<100,doxie.Add_Phones(l_dids,doxie.relative_dids(l_dids),mod_access,dial_bouncedistance_value));
 
   ta2 addBounce(ta2 le, morePhones ri) := TRANSFORM
     SELF.WorkPhones := CHOOSEN(ri.WorkPhones, doxie.rollup_limits.phones);

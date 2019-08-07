@@ -1,11 +1,12 @@
-Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise;
+﻿Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise;
 
 
 export AMLGetHeader(GROUPED DATASET(AML.Layouts.RelativeInLayout) idsOnly,
                            unsigned1 dppa, 
 													 unsigned1 glb,
 													 boolean isFCRA = false, 
-													 string50 DataRestriction
+													 string50 DataRestriction,
+                                                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   													) := FUNCTION
 
 

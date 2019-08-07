@@ -1,11 +1,12 @@
-
-Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise,header_quick, FCRA, VotersV2;
+﻿
+Import RISK_INDICATORS, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise,header_quick, FCRA, VotersV2, Suppress;
 
 export IndGetHeader(DATASET(Layouts.RelatLayoutV2) idsIN,
                            unsigned1 dppa, 
 													 unsigned1 glb,
 													 boolean isFCRA = false, 
-													 string50 DataRestriction
+													 string50 DataRestriction,
+                                                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   													) := FUNCTION
 //version 2														
 boolean isUtility := false;
@@ -50,7 +51,12 @@ relatives_slim := record
 	integer   isNON_US_SSN;
 	Boolean   hasNON_US_SSN;
 	unsigned4   socllowissue;
-end;														
+end;					
+
+relatives_slim_CCPA := RECORD
+unsigned4 global_sid;
+relatives_slim;
+END;
 
 relatHdrTbl_slim := record
 
@@ -67,7 +73,7 @@ relatHdrTbl_slim := record
 	boolean   isITIN;
 end;
 
-relatives_slim getHeader(idsIN le, doxie.Key_Header ri) := TRANSFORM
+relatives_slim_CCPA getHeader(idsIN le, doxie.Key_Header ri) := TRANSFORM
   Self.seq := le.seq;
 	SELF.origDID := LE.origDID;
 	SELF.relatDID := LE.relatDID;
@@ -90,6 +96,7 @@ relatives_slim getHeader(idsIN le, doxie.Key_Header ri) := TRANSFORM
 	self.ssn := ri.ssn;
 	self.socllowissue := le.socllowissue;
 	self.isvoter := 0;  //remove
+    self.global_sid := ri.global_sid;
 	SELF := le;
 	SELF := ri;
 	SELF := [];
@@ -98,7 +105,7 @@ END;
 			
 IDSSortDD:= dedup(sort(idsIN(relatdegree <> 0), seq, relatdid), seq, relatdid);
 			
-Keyheader :=  JOIN(IDSSortDD, doxie.Key_Header, 
+Keyheader_Join :=  JOIN(IDSSortDD, doxie.Key_Header, 
 														keyed(LEFT.relatdid = RIGHT.s_did) 
 														AND
 														right.src not in Risk_Indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
@@ -111,10 +118,14 @@ Keyheader :=  JOIN(IDSSortDD, doxie.Key_Header,
 														AND ~Risk_Indicators.iid_constants.filtered_source(right.src, right.st)	, 
 														getHeader(LEFT,RIGHT),  LEFT OUTER, atmost(RiskWise.max_atmost), keep(150));
 
+Keyheader_Suppressed := Suppress.Mac_SuppressSource(Keyheader_Join, mod_access, relatdid);
+
+Keyheader := PROJECT(Keyheader_Suppressed, TRANSFORM(relatives_slim,
+                                                  SELF := LEFT));
 														
 // get quick header
 
-relatives_slim getQH(IDSSortDD le, header_quick.key_DID ri) := TRANSFORM
+relatives_slim_CCPA getQH(IDSSortDD le, header_quick.key_DID ri) := TRANSFORM
 
 	SELF.origDID := LE.origDID;
 	SELF.relatDID := LE.relatDID;
@@ -137,13 +148,14 @@ relatives_slim getQH(IDSSortDD le, header_quick.key_DID ri) := TRANSFORM
 	self.ssn := ri.ssn;
 	self.socllowissue := le.socllowissue;
 	self.isvoter := 0;  //remove
+    self.global_sid := ri.global_sid;
 	SELF := le;
 	SELF := ri;
 	SELF := [];
 	
 END;
 
-quickHeader := join (IDSSortDD, header_quick.key_DID,
+quickHeader_Join := join(IDSSortDD, header_quick.key_DID,
 														LEFT.relatdid<>0 AND keyed(LEFT.relatdid = RIGHT.did) AND
 														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < left.historydate 
@@ -156,6 +168,11 @@ quickHeader := join (IDSSortDD, header_quick.key_DID,
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st),
 													  getQH(left,right), 
 														atmost(ut.limits.HEADER_PER_DID), keep(100));
+                            
+quickHeader_Suppressed := Suppress.Mac_SuppressSource(quickHeader_Join, mod_access, relatdid);
+
+quickHeader := PROJECT(quickHeader_Suppressed, TRANSFORM(relatives_slim,
+                                                  SELF := LEFT));
 			   
 allheader :=  sort(ungroup(quickHeader + Keyheader), seq ,origdid, relatdid);
 

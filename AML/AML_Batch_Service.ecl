@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, gateway;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, gateway, doxie;
 
 EXPORT AML_Batch_Service() := FUNCTION
 
@@ -10,7 +10,11 @@ EXPORT AML_Batch_Service() := FUNCTION
                 'IncludeNewsProfile',
                 'DataRestrictionMask',
 								'DataPermissionMask',
-                'gateways'
+                'gateways',
+                'LexIdSourceOptout',
+                '_TransactionId',
+                '_BatchUID',
+                '_GCID'
                 ));
 
 	#STORED('GLBPurpose', 5);
@@ -25,6 +29,19 @@ EXPORT AML_Batch_Service() := FUNCTION
 	string	DataRestriction 						:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	gateways 														:= Gateway.Configuration.Get();
   string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+ 
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
+    mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
+    
 	integer bsversion := if(AttributesVersion = 1, 41, 50);
 
 	wseq := project( batch_in, transform( AML.Layouts.AMLBatchInLayout, self.seq := counter, self := left ) );
@@ -98,7 +115,8 @@ Risk_Indicators.Layout_Input into(IndRecs l) := TRANSFORM
 																						 gateways,
 																						 IncludeNegNewsCounts, 
 																						 bsversion,
-																						 DataPermission); 
+																						 DataPermission,
+                                                                                         mod_access);
 	
 																						 
 consumerAttributesV2 := AML.getAMLAttributesV2(iid_prep, 
@@ -108,6 +126,7 @@ consumerAttributesV2 := AML.getAMLAttributesV2(iid_prep,
 																						 gateways, 
 																						 bsversion,
 																						 DataPermission,
+                                                                                         mod_access,
 																						 UseXG5,
 																						 IncludeNewsProfile
 																						 );  
@@ -218,6 +237,10 @@ busInput := project(BusRecs,into_input(LEFT));
 																												GLBA,
 																												gateways,
 																												bsversion,
+                                                                                                                LexIdSourceOptout,
+                                                                                                                TransactionID,
+                                                                                                                BatchUID,
+                                                                                                                GlobalCompanyId,
 																												UseXG5,
 																												IncludeNewsProfile)); 
 														 

@@ -40,12 +40,20 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																																							 BOOLEAN Strict_APSX = FALSE, // By default don't enforce strict Extended Skip Trace matching
 																																							 BOOLEAN BlankOutDuplicatePhones = FALSE,
 																																							 BOOLEAN UsePremiumSource_A = FALSE,
-																																							 BOOLEAN RunRelocation = FALSE) := FUNCTION
+																																							 BOOLEAN RunRelocation = FALSE,
+                                                                                                                                                             doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 	/* ************************************************************************
 	 *  Clean the input and copy the input data into appropriate echo fields  *
 	 ************************************************************************ */
 	// If you are outside the PhoneRestrictionMask range, set it to the default of 0 - ALL PHONES
+  
+    // CCPA Changes
+    unsigned1 LexIdSourceOptout := mod_access.lexid_source_optout;
+    string TransactionID := mod_access.transaction_id;
+    string BatchUID := '';
+    unsigned6 GlobalCompanyId := mod_access.global_company_id;
+
 	PhoneRestrictionMask := IF(PhoneRestrictionMaskTemp > 5 OR PhoneRestrictionMaskTemp < 0, 0, PhoneRestrictionMaskTemp);
 	
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus cleanInputs(Phone_Shell.Layout_Phone_Shell.Input le, UNSIGNED4 seqCounter) := TRANSFORM
@@ -219,10 +227,20 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																						in_DataRestriction := DataRestrictionMask, in_append_best := AppendBest, 
                       in_BSOptions := BSOptions,
                       in_runDLVerification := runDLVerification,
-                      in_DataPermission := DataPermissionMask);
+                      in_DataPermission := DataPermissionMask,
+                      LexIdSourceOptout := LexIdSourceOptout,
+                      TransactionID := TransactionID,
+                      BatchUID := BatchUID,
+                      GlobalCompanyId := GlobalCompanyId);
 	
 	BocaShell := Risk_Indicators.Boca_Shell_Function(InstantID, BocaShellGateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, includeRel, includeDL, includeVeh, includeDerog, BocaShellVersion, 
-																						doScore, nugen, DataRestriction := DataRestrictionMask, DataPermission := DataPermissionMask);
+																						doScore, nugen, 
+                      DataRestriction := DataRestrictionMask, 
+                      DataPermission := DataPermissionMask,
+                      LexIdSourceOptout := LexIdSourceOptout,
+                      TransactionID := TransactionID,
+                      BatchUID := BatchUID,
+                      GlobalCompanyId := GlobalCompanyId);
 
 	/* ************************************************************************
 	 *  Merge Boca Shell Data with original input                             *
@@ -260,12 +278,12 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	withPhones := Phone_Shell.Gather_Phones(withBocaShell, Gateways, GLBPurpose, DPPAPurpose, DataRestrictionMask, DataPermissionMask, PhoneRestrictionMask, MaxPhones, InsuranceVerificationAgeLimit,
 																					SPIIAccessLevel, VerticalMarket, IndustryClass, RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, IncludeLastResort, IncludePhonesFeedback, TestAccount, Batch, SX_Match_Restriction_Limit, Strict_APSX, 
 																					BlankOutDuplicatePhones, 
-																					UsePremiumSource_A, RunRelocation);
+																					UsePremiumSource_A, RunRelocation, mod_access);
 
 	/* ************************************************************************
 	 *  Gather attributes for the discovered phones                           *
 	 ************************************************************************ */
-	withAttributes := Phone_Shell.Gather_Attributes(withPhones, GLBPurpose, DPPAPurpose, DataRestrictionMask, InsuranceVerificationAgeLimit, IndustryClass, PhoneShellVersion);
+	withAttributes := Phone_Shell.Gather_Attributes(withPhones, GLBPurpose, DPPAPurpose, DataRestrictionMask, InsuranceVerificationAgeLimit, IndustryClass, PhoneShellVersion, mod_access);
 
 	/* ************************************************************************
 	 *  Generate final output                                                 *

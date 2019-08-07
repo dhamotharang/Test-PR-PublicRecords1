@@ -10845,12 +10845,11 @@
    </diff_selectors>
   </EsdlElement>
   <DiffMatchs>
-   <diff_match name="addressatcollege.stateaddressatcollege.zip5firstreported.dayfirstreported.monthfirstreported.year">
-    <part ftype="string" name="AddressAtCollege.Zip5"/>
-    <part ftype="string" name="AddressAtCollege.State"/>
+   <diff_match name="collegedata.namefirstreported.dayfirstreported.monthfirstreported.year">
     <part ftype="number" name="FirstReported.Year"/>
     <part ftype="number" name="FirstReported.Day"/>
     <part ftype="number" name="FirstReported.Month"/>
+    <part ftype="string" name="CollegeData.Name"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -12178,12 +12177,11 @@
     </entry>
    </diff_selectors>
    <DiffMatchs>
-    <diff_match name="addressatcollege.stateaddressatcollege.zip5firstreported.dayfirstreported.monthfirstreported.year">
-     <part ftype="string" name="AddressAtCollege.Zip5"/>
-     <part ftype="string" name="AddressAtCollege.State"/>
+    <diff_match name="collegedata.namefirstreported.dayfirstreported.monthfirstreported.year">
      <part ftype="number" name="FirstReported.Year"/>
      <part ftype="number" name="FirstReported.Day"/>
      <part ftype="number" name="FirstReported.Month"/>
+     <part ftype="string" name="CollegeData.Name"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -17350,7 +17348,7 @@
      </Party2>
     </MarriageDivorce>
    </MarriageDivorces>
-   <Educations diff_match="FirstReported.Year+FirstReported.Month+FirstReported.Day+AddressAtCollege.State+AddressAtCollege.Zip5" diff_monitor="Education">
+   <Educations diff_match="FirstReported.Year+FirstReported.Month+FirstReported.Day+CollegeData.Name" diff_monitor="Education">
     <Education>
      <Name>
       <Full diff_monitor=""/>

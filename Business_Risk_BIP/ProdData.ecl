@@ -873,7 +873,7 @@ layout_watchlists_temp := record
 
 
 	// --------------- EBR Data ----------------
-	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(kFetchLinkIDs,
+	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(kFetchLinkIDs, ,
 																						 kFetchLinkSearchLevel,
 																							0, // ScoreThreshold --> 0 = Give me everything
 																							linkingOptions,

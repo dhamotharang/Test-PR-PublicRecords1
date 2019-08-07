@@ -1,4 +1,4 @@
-Import Risk_Indicators, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise, header_quick, FCRA, Address_Attributes, Easi, Census_Data, ADVO, Address;
+﻿Import Risk_Indicators, ln_propertyv2, doxie, ut, header, mdr, drivers, riskwise, header_quick, FCRA, Address_Attributes, Easi, Census_Data, ADVO, Address;
 
 
 export IndAddrAttrib( DATASET(Layouts.LayoutAMLShellV2) idsIN,
@@ -6,7 +6,8 @@ export IndAddrAttrib( DATASET(Layouts.LayoutAMLShellV2) idsIN,
 													 unsigned1 glb,
 													 boolean isFCRA = false, 
 													 string50 DataRestriction,
-													 integer bsversion = 50
+													 integer bsversion = 50,
+                                                     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   													) := FUNCTION
 														
 														

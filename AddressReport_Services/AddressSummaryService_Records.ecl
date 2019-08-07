@@ -1,6 +1,6 @@
-IMPORT AddrBest, iesp, AutoStandardI, Address;
+IMPORT AddrBest, iesp, AutoStandardI, Address, Doxie;
 
-EXPORT AddressSummaryService_Records(iesp.addresssummary.t_AddressSummaryRequest in_recs) := FUNCTION
+EXPORT AddressSummaryService_Records(iesp.addresssummary.t_AddressSummaryRequest in_recs, Doxie.IDataAccess mod_access) := FUNCTION
 	// Module Values
 	tempmod := AutoStandardI.GlobalModule();
 	// Cleaned Address
@@ -38,8 +38,8 @@ EXPORT AddressSummaryService_Records(iesp.addresssummary.t_AddressSummaryRequest
 
 	BestAddressInput := dataset([xfrm_bestaddr_in()]);
 	BestAddressCommon := AddrBest.BestAddr_common(BestAddressInput);
-	BestAddressWithSummary := AddressSummaryService_Functions.fnBestAddressWithSummary(BestAddressCommon, in_recs);
-	AddressSummaryResult := AddressSummaryService_Functions.fnAddressSummaryResult(in_recs, BestAddressWithSummary);
+	BestAddressWithSummary := AddressReport_Services.AddressSummaryService_Functions.fnBestAddressWithSummary(BestAddressCommon, in_recs, mod_access);
+	AddressSummaryResult := AddressReport_Services.AddressSummaryService_Functions.fnAddressSummaryResult(in_recs, BestAddressWithSummary);
 	
 	// TESTING - START
 	// output(in_recs, named('AddressSummaryInput'));

@@ -5,13 +5,14 @@
  * :: Source: EQP																													   *
  ************************************************************************ */
 
-IMPORT Phone_Shell, PhoneMart, RiskWise, risk_indicators;
+IMPORT Phone_Shell, PhoneMart, RiskWise, doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Equifax (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, 
 					DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) foundPhones, 
 					STRING50 DataRestrictionMask, 
 					UNSIGNED1 PhoneRestrictionMask,
-					BOOLEAN UsePremiumSource_A = FALSE) := FUNCTION
+					BOOLEAN UsePremiumSource_A = FALSE,
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	
 	EquifaxAllowed :=	UsePremiumSource_A = true and Phone_Shell.Constants.EquiaxDRMCheck(DataRestrictionMask);
 

@@ -1,4 +1,4 @@
-﻿import riskwise, gateway, BizLinkFull, Models, Risk_Indicators;
+﻿import riskwise, gateway, Risk_Indicators;
 //Old legacy RISKWISE services will not be shouldn't be sending in new score input fields...as otherwise
 //they should be updated to use our newer services.
 export BocaShell_BtSt_Function(grouped dataset(risk_indicators.layout_ciid_btst_Output) iid_btst, dataset(Gateway.Layouts.Config) gateways,
@@ -10,7 +10,11 @@ export BocaShell_BtSt_Function(grouped dataset(risk_indicators.layout_ciid_btst_
 													string50 DataPermission = risk_indicators.iid_constants.default_DataPermission,
 													dataset(Risk_Indicators.Layout_BocaShell_BtSt.input_Scores) input_Scores = dataset( [], Risk_Indicators.Layout_BocaShell_BtSt.input_Scores),
 													boolean NetAcuity_v4 = true, boolean ipid_only = false,
-													boolean skip_businessHeader = false) := FUNCTION 
+													boolean skip_businessHeader = false,
+                                                    unsigned1 LexIdSourceOptout = 1,
+                                                    string TransactionID = '',
+                                                    string BatchUID = '',
+                                                    unsigned6 GlobalCompanyId = 0) := FUNCTION 
 
 risk_indicators.Layout_Output norm(iid_btst L, integer C) := transform
 	self.seq := L.Bill_To_Output.seq + C - 1;
@@ -23,7 +27,11 @@ iid_results := normalize(iid_btst, 2, norm(LEFT,COUNTER));
 outf := risk_indicators.Boca_Shell_Function(iid_results, gateways, dppa, glb, isUtility, isLN, 
 									includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, 
 									BSversion, doScore, nugen := nugen, DataRestriction:=DataRestriction,
-									BSOptions:=inBSOptions, DataPermission:=DataPermission);
+									BSOptions:=inBSOptions, DataPermission:=DataPermission,
+                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                    TransactionID := TransactionID, 
+                                    BatchUID := BatchUID, 
+                                    GlobalCompanyID := GlobalCompanyID);
 
 outseq := record
 	unsigned4	seq;

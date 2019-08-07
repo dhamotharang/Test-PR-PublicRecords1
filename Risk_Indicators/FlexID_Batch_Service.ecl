@@ -126,7 +126,7 @@
 </pre>
 */
 
-import address, iesp, identifier2, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
+import STD, address, iesp, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
 
 export FlexID_Batch_Service := MACRO
 
@@ -235,7 +235,7 @@ unsigned1 maxAllowedVersion := 1;	// maximum allowed version as of 1/28/2014
 // to choose the version they want to use.  This version cannot be lower than the lowest allowed version unless the override tag is set to true, in which case
 // the customer can choose any version and if no version is passed in, it will be considered version 0.
 actualIIDVersion := map((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
-												IIDVersionOverride = false => ut.imin2(ut.max2((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
+												IIDVersionOverride = false => MIN(MAX((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
 												(unsigned)IIDversion); // they can override, give them whatever they asked for
 if(actualIIDVersion=99, FAIL('Not an allowable InstantIDVersion.  Currently versions 0 and 1 are supported'));
 
@@ -347,6 +347,13 @@ unsigned1 OFACVersion :=2 :stored('OFACversion');
 boolean IncludeAdditionalWatchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean IncludeOfac := FALSE: stored('IncludeOfac');
 real GlobalWatchListThreshold_temp := 0 :stored('GlobalWatchlistThreshold');
+
+// CCPA Fields
+  unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+  string TransactionID := '' : stored ('_TransactionId');
+  string BatchUID := '' : stored('_BatchUID');
+  unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+  
 			GlobalWatchListThreshold := Map( 
 																		OFACVersion >= 4	and GlobalWatchListThreshold_temp = 0	 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFACVersion < 4  and GlobalWatchListThreshold_temp = 0  => OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
@@ -357,7 +364,7 @@ unsigned1 AppendBest := 1;		// search best file
 boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND
 												actualIIDVersion=1;
 boolean AllowInsuranceDL := true;
-ModelName := StringLib.StringToLowerCase( ModelIn );
+ModelName := STD.STR.ToLowerCase( ModelIn );
 
 boolean OFAC := true;	// used in cviScore override, FlexID has been hardcoded to TRUE, so I am doing that here now
 
@@ -431,23 +438,23 @@ risk_indicators.Layout_Input into(fs le) := transform
 	self.seq := le.seq;	
 	self.ssn := le.ssn;
 	self.dob := dob_val;
-	self.age := if ((integer)le.age = 0 and (integer)dob_val != 0,(STRING3)ut.GetAgeI((integer)dob_val), (le.age));
+	self.age := if ((integer)le.age = 0 and (integer)dob_val != 0,(STRING3)ut.Age((integer)dob_val), (le.age));
 	
 	self.phone10 := le.Home_Phone;
 	self.wphone10 := le.Work_Phone;
 
-	cleaned_name := Stringlib.StringToUppercase(
-										map(trim(Stringlib.StringToUppercase(NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
-												trim(Stringlib.StringToUppercase(NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
+	cleaned_name := STD.STR.ToUpperCase(
+										map(trim(STD.STR.ToUpperCase(NameInputOrder)) = 'FML' => Address.CleanPersonFML73(le.UnParsedFullName),
+												trim(STD.STR.ToUpperCase(NameInputOrder)) = 'LFM' => Address.CleanPersonLFM73(le.UnParsedFullName),
 																																										 Address.CleanPerson73(le.UnParsedFullName)));
 	
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 	
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+	self.fname := STD.STR.ToUpperCase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+	self.lname := STD.STR.ToUpperCase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+	self.mname := STD.STR.ToUpperCase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+	self.suffix := STD.STR.ToUpperCase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+	self.title := STD.STR.ToUpperCase(if(valid_cleaned, cleaned_name[1..5],''));
 
 	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 	clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;		
@@ -475,8 +482,8 @@ risk_indicators.Layout_Input into(fs le) := transform
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 	
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.dl_state);
+	self.dl_number := STD.STR.ToUpperCase(dl_num_clean);
+	self.dl_state := STD.STR.ToUpperCase(le.dl_state);
 	
 	self.ip_address := le.ip_addr;
 	self.email_address := le.email;
@@ -511,7 +518,8 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPAPurpose, GLBPurpos
 														fromIT1O, OFACVersion, IncludeOFAC, IncludeAdditionalWatchlists, GlobalWatchListThreshold, DobRadiusUse,
 														BSVersion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones,
 														ExactMatchLevel, DataRestriction, CustomDataFilter, IncludeDLverification, watchlists_request, DOBMatchOptions,
-														EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, CompanyID, DataPermission);
+														EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSoptions, LastSeenThreshold, CompanyID, DataPermission,
+                                                        LexIdSourceOptout := LexIdSourceOptout, TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
 
@@ -603,13 +611,13 @@ LayoutFlexIDBatchOutExt format_out(ret le, fs ri) := TRANSFORM
 	SELF.VerifiedElementSummaryStreetAddress := if(IncludeSummaryFlags, 	if(addrMatch, '1', '0'), 
 																								'');
 																								
-	CityA := stringlib.stringtouppercase(trim(le.combo_city));
-	CityB := stringlib.stringtouppercase(trim(ri.p_City_name));
+	CityA := STD.STR.ToUpperCase(trim(le.combo_city));
+	CityB := STD.STR.ToUpperCase(trim(ri.p_City_name));
 	CityScore := 100 - MAX(ut.StringSimilar100(CityA, CityB), ut.StringSimilar100(CityB, CityA));
 	CityMatch := (ExactAddrMatch and CityA=CityB and CityB<>'') or (~ExactAddrMatch and CityScore between 80 and 100 and CityB<>'');
 		
 	SELF.VerifiedElementSummaryCity := if(IncludeSummaryFlags, if(CityMatch, '1', '0'), '');																							
-	SELF.VerifiedElementSummaryState := if(IncludeSummaryFlags, if(trim(le.combo_state)=trim(stringlib.stringtouppercase(ri.st)) and trim(ri.st)<>'', '1', '0'), '');
+	SELF.VerifiedElementSummaryState := if(IncludeSummaryFlags, if(trim(le.combo_state)=trim(STD.STR.ToUpperCase(ri.st)) and trim(ri.st)<>'', '1', '0'), '');
 	SELF.VerifiedElementSummaryZip := if(IncludeSummaryFlags, if(trim(le.combo_zip[1..5])=trim(ri.z5) and trim(ri.z5)<>'', '1', '0'), '');
 	SELF.VerifiedElementSummaryHomePhone := if(IncludeSummaryFlags, if(le.combo_hphonecount>0, '1', '0'), '');
 	SELF.VerifiedElementSummarySSN := if(IncludeSummaryFlags, if(le.combo_ssncount>0, '1', '0'), '');
@@ -685,7 +693,11 @@ clam :=  risk_indicators.Boca_Shell_Function(	ret,
 															FilterOutFares,
 															DataRestriction,
 															BSOptions,
-															DataPermission);
+															DataPermission,
+                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                            TransactionID := TransactionID, 
+                                                            BatchUID := BatchUID, 
+                                                            GlobalCompanyID := GlobalCompanyID);
 															
 															
 

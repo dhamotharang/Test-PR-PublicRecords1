@@ -284,8 +284,6 @@ EXPORT Raw := MODULE
 		VehicleV2_Services.IParam.reportParams in_mod,
 		DATASET(VehicleV2_Services.Layout_Vehicle_Key) in_veh_keys, string in_ssn_mask_type = '') := FUNCTION
 
-		// by_did := get_vehicle_keys_from_dids (in_dids);
-
 		SORT_keys := SORT(in_veh_keys, Vehicle_Key, -Iteration_Key);
 		group_keys := group(SORT_keys, Vehicle_key, Iteration_key);
 		DEDUP_keys := DEDUP(group_keys, Vehicle_Key, Iteration_Key,sequence_key);
@@ -332,9 +330,9 @@ EXPORT Raw := MODULE
 	end;	
 	
 	
-	  EXPORT get_vehicle_crs_report (
-			VehicleV2_Services.IParam.reportParams in_mod,
-			DATASET(doxie.layout_references) in_dids, string in_ssn_mask_type = '') := FUNCTION
+  EXPORT get_vehicle_crs_report (
+		VehicleV2_Services.IParam.reportParams in_mod,
+		DATASET(doxie.layout_references) in_dids, string in_ssn_mask_type = '') := FUNCTION
 
 		by_did := get_vehicle_keys_from_dids (in_mod, in_dids);
 		return get_vehicle_crs_report_by_Veh_key(in_mod, by_did, in_ssn_mask_type);

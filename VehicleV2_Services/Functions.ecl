@@ -1,15 +1,9 @@
 ﻿import doxie, ut, codes, iesp;
 import AutoStandardI, VehicleV2_Services, Autokey_batch, CriminalRecords_Services;
-import VehicleV2, VehicleCodes, suppress, Census_Data, doxie_raw, MDR,Driversv2;
+import VehicleV2, VehicleCodes, suppress, Census_Data, doxie_raw, MDR, Driversv2;
 
 
 export Functions := MODULE;
-
-	EXPORT get_state(VehicleV2_Services.IParam.polkParams in_mod) := FUNCTION
-		tmp_state := AutoStandardI.InterfaceTranslator.state_value.val(PROJECT(in_mod,AutoStandardI.InterfaceTranslator.state_value.params));
-		state_val := IF(in_mod.state='', tmp_state, in_mod.state);
-		RETURN TRIM(stringlib.stringtouppercase(state_val));
-	END;
 
 	EXPORT STRING getSearchDataSource(VehicleV2_Services.IParam.polkParams in_mod, BOOLEAN doCombined) := FUNCTION
 		/* doCombined = true Rules: if state with in list LOCAL_STATES_SEARCH,
@@ -17,7 +11,7 @@ export Functions := MODULE;
 			all (local and realtime) unless the datasource in in_mod has value 
 			Constant.Local_val*/
 			
-		state := get_state(in_mod);
+		state := in_mod.state;
 
 		IsLocalState := state IN Constant.LOCAL_STATES_SEARCH;	
 			

@@ -14,8 +14,7 @@ EXPORT GetPhoneTransactions (ds_in) := FUNCTIONMACRO
     IMPORT MDR;
 
     LOCAL phone_transactions := JOIN(ds_in , dx_PhonesInfo.Key_Phones_Transaction,
-									KEYED(LEFT.phone = RIGHT.phone) AND 								 
-                                    RIGHT.source != MDR.sourceTools.src_PhoneFraud_OTP,// No rules have been defined for this source
+									KEYED(LEFT.phone = RIGHT.phone),								 
 									TRANSFORM(dx_PhonesInfo.Layouts.Phones_Transaction_Main, SELF.phone := LEFT.phone; SELF:= RIGHT), 
                                     limit(10000, SKIP));
     RETURN phone_transactions;                                           

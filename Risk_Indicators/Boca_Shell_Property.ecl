@@ -1,9 +1,10 @@
-﻿import ut, ln_propertyv2, riskwise;
+﻿import ut, ln_propertyv2, riskwise, doxie;
 
 export Boca_Shell_Property (GROUPED DATASET(layout_PropertyRecord) p_address,
                             GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
                             boolean includeRelatives = true, 
-									 boolean filter_out_fares=false) := function
+							boolean filter_out_fares=false,
+                            doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 
 layout_PropertyRecordPlus := RECORD

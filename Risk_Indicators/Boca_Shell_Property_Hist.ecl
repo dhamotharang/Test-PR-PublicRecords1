@@ -1,9 +1,10 @@
-﻿import LN_PropertyV2, ut, RiskWise;
+﻿import LN_PropertyV2, ut, RiskWise, doxie;
 
 export Boca_Shell_Property_Hist (GROUPED DATASET(Layout_PropertyRecord) p_address,
                                  GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
 																 boolean includeRelatives = true,
-																 boolean filter_out_fares=false) := FUNCTION											
+																 boolean filter_out_fares=false,
+                                                                 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION											
 
 proprec := record
 	Layouts.Layout_PropertyRecordv2 - layout_overrides;

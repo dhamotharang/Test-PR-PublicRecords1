@@ -159,7 +159,7 @@ EXPORT fn_getadvsearch_raw_recs (
 	ds_payload_recs := FraudGovPlatform_Services.fn_GetPayloadRecords(ds_ids, batch_params, fraud_platform := fraud_platform);
 	
 	//Applying the all AND filters based on all the Search Fields.
-	ds_recs_filtered := ds_payload_recs(if(in_rec.did <> 0, did = in_rec.did, true) AND
+	ds_recs_filtered := ds_payload_recs(//if(in_rec.did <> 0, did = in_rec.did, true) AND
 																			if(in_rec.p_city_name <> '' AND in_rec.st <> '', 
 																					clean_address.p_city_name  = in_rec.p_city_name AND clean_address.st  = in_rec.st,
 																					true) AND

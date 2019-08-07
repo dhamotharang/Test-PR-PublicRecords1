@@ -368,6 +368,8 @@ END;
 		standard__name person_name;
 		string1 orig_name_type;
 		string1 history;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
 		unsigned integer4 reg_latest_effective_date;
 		unsigned integer4 reg_latest_expiration_date;
 		unsigned integer4 ttl_latest_issue_date;

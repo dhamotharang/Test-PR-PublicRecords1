@@ -1,6 +1,6 @@
-import paw, riskwise, ut, risk_indicators, Business_Header;
+﻿import paw, riskwise, ut, risk_indicators, Business_Header, doxie, Suppress;
 
-export AMLEmployment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) AMLEmploy) := FUNCTION
+export AMLEmployment(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) AMLEmploy, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 patw := record

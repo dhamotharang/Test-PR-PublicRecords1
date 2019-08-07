@@ -2,13 +2,13 @@
  *        This function gathers the EDA_Characteristics attributes.	      *
  ************************************************************************ */
 
-IMPORT Gong, Phone_Shell, RiskWise, UT, STD;
+IMPORT Gong, Phone_Shell, RiskWise, UT, STD, doxie;
 
 todays_date := (string) STD.Date.Today();
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
-                                                                                  UNSIGNED2 PhoneShellVersion = 10 // default to PhoneShell V1.0, use 20 (for version 2.0) and so on for other versions
-                                                                                 ) := FUNCTION
+                                                                                  UNSIGNED2 PhoneShellVersion = 10, // default to PhoneShell V1.0, use 20 (for version 2.0) and so on for other versions
+                                                                                 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	layoutEDA := RECORD
 		Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus;
 		STRING8 dt_first_seen := '';
