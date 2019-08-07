@@ -25,15 +25,15 @@ EXPORT AllInfo(DATASET($.Layout_Sanctions) infile) := FUNCTION
 		self.comments := CHOOSE(n,
 									'',
 									Std.Str.CleanSpaces(
-									IF(infile.action_date='', '', 'Action Date: ' + infile.action_date) + ' ' +
-									IF(infile.action_start='', '', 'Action Start: ' + infile.action_start) + ' ' +
-									IF(infile.fine='', '', 'Fine: ' + infile.fine)
+										IF(infile.action_date IN ['','0'], '', 'Action Date: ' + infile.action_date) + ' ' +
+										IF(infile.action_start IN ['','0'], '', 'Action Start: ' + infile.action_start) + ' ' +
+										IF(infile.fine='', '', 'Fine: ' + infile.fine)
 									),
 									'');
 		self.id := infile.key;
 END;
 
-	addlInfo := Normalize(infile, 3, xform(LEFT, COUNTER))(information<>'');
+	addlInfo := Normalize(infile(DateOfBirth<>'0' OR action<>'' OR cred<>''), 3, xform(LEFT, COUNTER))(information<>'');
 	
 	AddlSorted := SORT(DISTRIBUTE(addlInfo, id), id, Type, -parsed, information, comments, LOCAL);
 							
