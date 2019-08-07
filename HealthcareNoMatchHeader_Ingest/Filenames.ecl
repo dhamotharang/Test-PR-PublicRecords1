@@ -7,26 +7,35 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
 
   //  Prefix
 	EXPORT  IsDataland          :=  tools._Constants.IsDataland;
-	EXPORT  foreign_environment :=  '~';  //  IF(IsDataland,'~',Data_Services.foreign_prod); LET'S MAKE IT LOCAL ALWAYS
+	EXPORT  foreign_environment :=  IF(IsDataland,'~',Data_Services.foreign_prod);
   EXPORT  cluster_name        :=  'ushc::';
 	EXPORT  prefix              :=  foreign_environment + cluster_name;
 
-	EXPORT	lInputTemplate        :=  prefix	+	'CRK::asheader::' +	pSrc  + '::';
+	EXPORT	lInputTemplate        :=  prefix	+	'CRK::temp::' + pSrc  + '::'  + pVersion  + '::';
 	EXPORT	lBaseTemplate         :=  prefix	+	'RID::HealthCareNoMatchHeader::base::' +	pSrc	+	'::@version@::';
 	EXPORT	lLinkingTemplate      :=  prefix	+	'CRK::HealthCareNoMatchHeader::linking::' +	pSrc  +	'::@version@::';
-	EXPORT	lPersistTemplate      :=  prefix  + 'persist::HealthCareNoMatchHeader_Ingest::nomatch_id::'  + pSrc  + '::';
-	EXPORT	lKeyTemplate          :=  prefix  + 'key::HealthcareNoMatchHeader_InternalLinking::nomatch_id::' + pSrc	+	'::@version@::';
+	EXPORT	lPersistTemplate      :=  prefix  + 'persist::HealthCareNoMatchHeader::nomatch_id::'  + pSrc  + '::';
+	EXPORT	lKeyTemplate          :=  prefix  + 'key::HealthcareNoMatchHeader::nomatch_id::' + pSrc	+	'::@version@::';
+	EXPORT	lCRKTemplate          :=  prefix  + 'CRK::HealthcareNoMatchHeader::base::' + pSrc	+	'::@version@::';
 
 	EXPORT	IngestCache           :=  lPersistTemplate+'Ingest_Cache';
   
   EXPORT  Input  :=  MODULE
-    EXPORT  AsHeader  :=  lInputTemplate+'qa';
+    EXPORT  AsHeaderTemp  :=  lInputTemplate+'AsHeaderTemp';
+    EXPORT  BaseTemp      :=  lInputTemplate+'BaseTemp';
   END;
   
   EXPORT  Base  :=  MODULE
-    EXPORT  allRecords    :=  versioncontrol.mBuildFilenameVersions(lBaseTemplate + 'AllRecords'    , pVersion);
+    EXPORT  allRecords    :=  versioncontrol.mBuildFilenameVersions(lBaseTemplate + 'AllRecords'  , pVersion);
 		EXPORT	dAll_filenames	:=
       allRecords.dAll_filenames
+    ;
+  END;
+  
+  EXPORT  append  :=  MODULE
+    EXPORT  CRK    :=  versioncontrol.mBuildFilenameVersions(lCRKTemplate + 'CustomerRecordKey'  , pVersion);
+		EXPORT	dAll_filenames	:=
+      CRK.dAll_filenames
     ;
   END;
 
@@ -114,6 +123,12 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
 
 	EXPORT	dAll_filenames	:=
 		Base.dAll_filenames +
-		Keys.dAll_filenames
+		Keys.dAll_filenames +
+		append.dAll_filenames
 	;
+ 
+  // workman files
+  EXPORT  WUPrefix              :=  prefix    + pSrc  + '::' + pVersion + '::';
+  EXPORT  MasterWUOutput_SF     :=  WUPrefix  + 'WUInfo';
+  EXPORT  MasterWUOutput_Inc_SF :=  WUPrefix  + 'WUInfo_Inc';
 END;

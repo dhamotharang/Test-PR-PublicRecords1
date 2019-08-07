@@ -39,7 +39,8 @@ SHARED /*HACK-O-MATIC*/match_candidates(pSrc,pVersion,ih).layout_matches match_j
   INTEGER2 GENDER_score := MAP(
                         le.GENDER_isnull OR ri.GENDER_isnull => 0,
                         le.GENDER = ri.GENDER  => le.GENDER_weight100,
-                        SALT311.Fn_Fail_Scale(AVE(le.GENDER_weight100,ri.GENDER_weight100),s.GENDER_switch));
+                        /*HACK-O-MATIC*/Config.Mismatch_Score_GENDER);
+
   INTEGER2 SSN_score := MAP(
                         le.SSN_isnull OR ri.SSN_isnull => 0,
                         le.SSN = ri.SSN  => le.SSN_weight100,
@@ -85,7 +86,7 @@ SHARED /*HACK-O-MATIC*/match_candidates(pSrc,pVersion,ih).layout_matches match_j
 /*HACK-O-MATIC*/INTEGER2 MAINNAME_score_pre_v1 := MAP( (le.MAINNAME_isnull OR le.FNAME_isnull AND le.MNAME_isnull AND le.LNAME_isnull) OR (ri.MAINNAME_isnull OR ri.FNAME_isnull AND ri.MNAME_isnull AND ri.LNAME_isnull) => 0,
                         FULLNAME_score_pre > 0 => 0, // Ancestor has found solution so child keeps quiet
                         le.MAINNAME = ri.MAINNAME  => le.MAINNAME_weight100,
-                        SALT311.fn_concept_wordbag_EditN.Match3((SALT311.StrType)ri.FNAME,ri.FNAME_MAINNAME_weight100,true,Config.FNAME_Force,true,IF( LENGTH(TRIM((SALT311.StrType)ri.FNAME))<6, 1, 2),6,ri.FNAME_len,ri.FNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)ri.MNAME,ri.MNAME_MAINNAME_weight100,true,0,true,IF( LENGTH(TRIM((SALT311.StrType)ri.MNAME))<6, 1, 2),6,ri.MNAME_len,ri.MNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)ri.LNAME,ri.LNAME_MAINNAME_weight100,true,0,true,IF( LENGTH(TRIM((SALT311.StrType)ri.LNAME))<6, 1, 2),6,ri.LNAME_len,ri.LNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,/*HACK-O-MATIC*/(SALT311.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,HealthcareNoMatchHeader_InternalLinking.Config.WithinEditN)*IF(MAINNAME_score_scale=0,1,MAINNAME_score_scale))*IF(FULLNAME_score_scale=0,1,FULLNAME_score_scale);
+                        SALT311.fn_concept_wordbag_EditN.Match3((SALT311.StrType)ri.FNAME,ri.FNAME_MAINNAME_weight100,true,Config.FNAME_Force,true,IF( LENGTH(TRIM((SALT311.StrType)ri.FNAME))<8, 1, 2),8,ri.FNAME_len,ri.FNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)ri.MNAME,ri.MNAME_MAINNAME_weight100,true,0,true,IF( LENGTH(TRIM((SALT311.StrType)ri.MNAME))<6, 1, 2),6,ri.MNAME_len,ri.MNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)ri.LNAME,ri.LNAME_MAINNAME_weight100,true,0,true,IF( LENGTH(TRIM((SALT311.StrType)ri.LNAME))<6, 1, 2),6,ri.LNAME_len,ri.LNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)le.FNAME,le.FNAME_MAINNAME_weight100,le.FNAME_len,le.FNAME_MAINNAME_fuzzy_weight100,/*HACK-O-MATIC*/(SALT311.StrType)le.MNAME,le.MNAME_MAINNAME_weight100,le.MNAME_len,le.MNAME_MAINNAME_fuzzy_weight100,(SALT311.StrType)le.LNAME,le.LNAME_MAINNAME_weight100,le.LNAME_len,le.LNAME_MAINNAME_fuzzy_weight100,HealthcareNoMatchHeader_InternalLinking.Config.WithinEditN)*IF(MAINNAME_score_scale=0,1,MAINNAME_score_scale))*IF(FULLNAME_score_scale=0,1,FULLNAME_score_scale);
 
 /*HACK-O-MATIC*/INTEGER2 MAINNAME_score_pre := if (((ssn_score > Config.SSN_Score_Min_MAINNAME OR dob_score > Config.DOB_Score_Min_MAINNAME) AND MAINNAME_score_less_strict > 0)
 /*HACK-O-MATIC*/OR MAINNAME_score_strict > 0,
@@ -128,7 +129,7 @@ SHARED /*HACK-O-MATIC*/match_candidates(pSrc,pVersion,ih).layout_matches match_j
                         le.FNAME = ri.FNAME  => le.FNAME_weight100,
                         LENGTH(TRIM(le.FNAME))>0 and le.FNAME = ri.FNAME[1..LENGTH(TRIM(le.FNAME))] => le.FNAME_weight100, // An initial match - take initial specificity
                         LENGTH(TRIM(ri.FNAME))>0 and ri.FNAME = le.FNAME[1..LENGTH(TRIM(ri.FNAME))] => ri.FNAME_weight100, // An initial match - take initial specificity
-                        Config.WithinEditN(le.FNAME,le.FNAME_len,ri.FNAME,ri.FNAME_len,2,6) => MAP((6 > le.FNAME_len) OR (6 > ri.FNAME_len) => SALT311.fn_fuzzy_specificity(le.FNAME_weight100,le.FNAME_cnt, le.FNAME_e1_cnt,ri.FNAME_weight100,ri.FNAME_cnt,ri.FNAME_e1_cnt),SALT311.fn_fuzzy_specificity(le.FNAME_weight100,le.FNAME_cnt, le.FNAME_e2_cnt,ri.FNAME_weight100,ri.FNAME_cnt,ri.FNAME_e2_cnt)),
+                        Config.WithinEditN(le.FNAME,le.FNAME_len,ri.FNAME,ri.FNAME_len,2,8) => MAP((8 > le.FNAME_len) OR (8 > ri.FNAME_len) => SALT311.fn_fuzzy_specificity(le.FNAME_weight100,le.FNAME_cnt, le.FNAME_e1_cnt,ri.FNAME_weight100,ri.FNAME_cnt,ri.FNAME_e1_cnt),SALT311.fn_fuzzy_specificity(le.FNAME_weight100,le.FNAME_cnt, le.FNAME_e2_cnt,ri.FNAME_weight100,ri.FNAME_cnt,ri.FNAME_e2_cnt)),
                         le.FNAME_PreferredName = ri.FNAME_PreferredName => SALT311.fn_fuzzy_specificity(le.FNAME_weight100,le.FNAME_cnt, le.FNAME_PreferredName_cnt,ri.FNAME_weight100,ri.FNAME_cnt,ri.FNAME_PreferredName_cnt),
                         SALT311.Fn_Fail_Scale(AVE(le.FNAME_weight100,ri.FNAME_weight100),s.FNAME_switch))*IF(MAINNAME_score_scale=0,1,MAINNAME_score_scale)*IF(FULLNAME_score_scale=0,1,FULLNAME_score_scale);
   INTEGER2 SEC_RANGE_score := MAP(
@@ -238,7 +239,7 @@ mj3 := JOIN( dn3_deduped, dn3_deduped, LEFT.nomatch_id > RIGHT.nomatch_id
     ATMOST(LEFT.SUFFIX = RIGHT.SUFFIX,10000),HASH);
 mjs0_t := mj0+mj1+mj2+mj3;
 SALT311.mac_select_best_matches(mjs0_t,RID1,RID2,o0);
-mjs0 := o0 : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'mj::0',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
+mjs0 := o0 : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'mj::0',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
  
 //First 1 fields shared with following 1 joins - optimization performed
 //Fixed fields ->:LNAME(10):PRIM_NAME(10) also :LNAME(10):FNAME(8)
@@ -268,16 +269,16 @@ mj8 := JOIN( dn8_deduped, dn8_deduped, LEFT.nomatch_id > RIGHT.nomatch_id
       AND LEFT.FNAME = RIGHT.FNAME,10000),HASH);
 last_mjs_t :=mj6+mj8;
 SALT311.mac_select_best_matches(last_mjs_t,RID1,RID2,o);
-mjs1 := o : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'mj::1',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
+mjs1 := o : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'mj::1',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
  
 RETURN  mjs0+ mjs1;
 ENDMACRO;
 SHARED all_mjs := MAC_DoJoins(h,match_join);
-EXPORT All_Matches := all_mjs : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'all_m',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // To by used by RID and nomatch_id
+EXPORT All_Matches := all_mjs : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'all_m',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire)); // To by used by RID and nomatch_id
 SALT311.mac_avoid_transitives(All_Matches,nomatch_id1,nomatch_id2,Conf,DateOverlap,Rule,o);
-EXPORT PossibleMatches := o : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'mt',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
+EXPORT PossibleMatches := o : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'mt',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
 SALT311.mac_get_BestPerRecord( All_Matches,RID1,nomatch_id1,RID2,nomatch_id2,o );
-EXPORT BestPerRecord := o : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'mr',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
+EXPORT BestPerRecord := o : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'mr',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
 //Now lets see if any slice-outs are needed
 SHARED too_big := TABLE(/*HACK-O-MATIC*/match_candidates(pSrc,pVersion,ih).Candidates_ForSlice,{nomatch_id, InCluster := COUNT(GROUP)},nomatch_id,LOCAL)(InCluster>1000); // nomatch_id that are too big for sliceout
 SHARED h_ok := JOIN(/*HACK-O-MATIC*/match_candidates(pSrc,pVersion,ih).Candidates_ForSlice,too_big,LEFT.nomatch_id=RIGHT.nomatch_id,TRANSFORM(LEFT),LOCAL,LEFT ONLY);
@@ -287,7 +288,7 @@ SHARED in_matches1 := o;
 missed_linkages0 := JOIN(h_ok, in_matches1, LEFT.RID = RIGHT.RID1, TRANSFORM(RECORDOF(in_matches1), SELF.nomatch_id1 := LEFT.nomatch_id, SELF.RID1 := LEFT.RID, SELF := []), LEFT ONLY, LOCAL); // get back the records with no close matches
 missed_linkages := JOIN(missed_linkages0,/*HACK-O-MATIC*/Specificities(pSrc,pVersion,ih).ClusterSizes(InCluster>1),LEFT.nomatch_id1=RIGHT.nomatch_id,LOCAL); // remove singletons
 o1 := JOIN(in_matches1,/*HACK-O-MATIC*/Specificities(pSrc,pVersion,ih).ClusterSizes,LEFT.nomatch_id1=RIGHT.nomatch_id,LOCAL);
-EXPORT ClusterLinkages := o1 + missed_linkages : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'clu',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
+EXPORT ClusterLinkages := o1 + missed_linkages : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'clu',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
 EXPORT ClusterOutcasts := ClusterLinkages(InCluster>1,Closest<MatchThreshold);
 //Now find those outcasts that are liked elsewhere ...
 Pref_Layout := RECORD
@@ -316,11 +317,11 @@ WillJoin1 := JOIN(CurrentJumpers,All_Matches(Conf>=MatchThreshold),LEFT.nomatch_
 WillJoin2 := JOIN(WillJoin1,All_Matches(Conf>=MatchThreshold),LEFT.nomatch_id=RIGHT.nomatch_id2 AND LEFT.Pref_nomatch_id=RIGHT.nomatch_id1,TRANSFORM(LEFT),LEFT ONLY,HASH);
 WillJoin3 := JOIN(WillJoin2,/*HACK-O-MATIC*/match_candidates(pSrc,pVersion,ih).hasbuddies,LEFT.RID=RIGHT.RID,TRANSFORM(LEFT),LEFT ONLY,HASH); // Duplicated records cannot be sliced
 EXPORT BetterElsewhere := WillJoin3;
-EXPORT ToSlice := IF ( Config.DoSliceouts, DEDUP(SORT(DISTRIBUTE(BetterElsewhere(Pref_Margin>Config.SliceDistance),HASH(nomatch_id)),nomatch_id,-Pref_Margin,RID,pref_nomatch_id,pref_RID,LOCAL),nomatch_id,LOCAL)) : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'Matches::ToSlice',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
+EXPORT ToSlice := IF ( Config.DoSliceouts, DEDUP(SORT(DISTRIBUTE(BetterElsewhere(Pref_Margin>Config.SliceDistance),HASH(nomatch_id)),nomatch_id,-Pref_Margin,RID,pref_nomatch_id,pref_RID,LOCAL),nomatch_id,LOCAL)) : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'Matches::ToSlice',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
 // 1024x better in new place
   SALT311.MAC_Avoid_SliceOuts(PossibleMatches,nomatch_id1,nomatch_id2,nomatch_id,Pref_nomatch_id,ToSlice,m); // If nomatch_id is slice target - don't use in match
   m1 := IF( Config.DoSliceouts,m,PossibleMatches );
-EXPORT Matches := m1(Conf>=MatchThreshold) : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+STD.Date.Today()+'::'+'Matches::Matches',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
+EXPORT Matches := m1(Conf>=MatchThreshold) : /*HACK-O-MATIC*/PERSIST(HealthcareNoMatchHeader_Ingest.Filenames(pSrc).lPersistTemplate+pVersion+'::'+'Matches::Matches',EXPIRE(HealthcareNoMatchHeader_InternalLinking.Config.PersistExpire));
  
 //Output the attributes to use for match debugging
 EXPORT MatchSample := ENTH(Matches,1000);

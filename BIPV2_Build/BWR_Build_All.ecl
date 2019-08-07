@@ -76,7 +76,8 @@ SkipSegStats          := SkipMisckeys         ; // -- Thread 3
 SkipStrata            := SkipSegStats         ; // --
 SkipOverlinking       := SkipStrata           ; // --
 SkipSeleidRelative    := SkipOverlinking      ; // -- Thread 4
-SkipCDWBuild          := SkipSeleidRelative   ; // -- back to Master
+SkipCrosswalk         := SkipSeleidRelative   ; 
+SkipCDWBuild          := SkipCrosswalk        ; // -- back to Master
 SkipXAppend           := SkipCDWBuild         ; //
 SkipDataCard          := SkipXAppend          ;
 SkipDashboard         := SkipDataCard         ;
@@ -165,6 +166,7 @@ BIPV2_Build.proc_build_all(
   ,pSkipStrata            := SkipStrata
   ,pSkipOverlinking       := SkipOverlinking
   ,pSkipSeleidRelative    := SkipSeleidRelative
+  ,pSkipCrosswalk         := SkipCrosswalk
   ,pSkipCDWBuild          := SkipCDWBuild
   ,pSkipXAppend           := SkipXAppend
   ,pSkipDataCard          := SkipDataCard
