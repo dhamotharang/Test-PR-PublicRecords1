@@ -106,7 +106,7 @@ EXPORT files := MODULE
   unsigned6 wagesrecid;
  END;
 
- EXPORT Wages := DATASET('~fraudgov::tndata::wages_output', WagesRec, THOR);
+ EXPORT Wages := DATASET('~fraudgov::tndata::20190701::wages_output', WagesRec, THOR);
  
  TrumpRec := RECORD
   string dummycode;
@@ -1249,7 +1249,7 @@ WagesSeleAssociation := RECORD
 	INTEGER towageyearqtr;
 END;
 
-EXPORT WagesAssociations := JOIN(WagesAssociationsPrep, WagesAssociationsPrep, left.employeelexid=RIGHT.employeelexid,
+EXPORT WagesAssociations := JOIN(WagesAssociationsPrep, WagesAssociationsPrep, left.employeelexid=RIGHT.employeelexid and left.wageyearqtr <= right.wageyearqtr,
 	TRANSFORM(WagesSeleAssociation,
 		SELF.FromUltId := LEFT.ultid,
 		SELF.ToUltid := right.ultid,
