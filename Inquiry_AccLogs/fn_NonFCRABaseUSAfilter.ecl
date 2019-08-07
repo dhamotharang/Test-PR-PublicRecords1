@@ -37,13 +37,37 @@ Batch_Base_MBS		    	:= join(Batch_Base, FILE_MBS,
 														left outer, lookup);						
 
 // Full_Base_MBS   := NonBatch_Base_MBS + Batch_Base_MBS;
+// remove after 20190206a risk indicator key build 
+// daily_base_batch := dataset(Data_Services.foreign_prod + 'uspr::inql::nonfcra::base::daily::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor)
+                    // (source in ['BATCH','BATCHR3'] and version > '20190123');
+// daily_base_nobatch := dataset(Data_Services.foreign_prod + 'uspr::inql::nonfcra::base::daily::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor)
+                      // (source not in ['BATCH','BATCHR3'] );										
+// daily_base  := daily_base_batch + daily_base_nobatch;
+////////
+daily_base := dataset(Data_Services.foreign_prod + 'uspr::inql::nonfcra::base::daily::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor);
+
+///////
+weekly_base := dataset(Data_Services.foreign_logs + 'thor_data::base::inql::nonfcra::weekly::qa', INQL_v2.Layouts.Common_ThorAdditions, thor);
 
 Full_Base_MBS	:= if(base='daily'
-                   ,dataset(Data_Services.foreign_prod + 'uspr::inql::nonfcra::base::daily::qa', INQL_v2.Layouts.Common_ThorAdditions, thor)
-									 ,dataset(Data_Services.foreign_logs + 'thor_data::base::inql::nonfcra::weekly::qa', INQL_v2.Layouts.Common_ThorAdditions, thor)
+                   ,daily_base //dataset(Data_Services.foreign_prod + 'uspr::inql::nonfcra::base::daily::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor)
+									 ,weekly_base //dataset(Data_Services.foreign_logs + 'thor_data::base::inql::nonfcra::weekly::qa', INQL_v2.Layouts.Common_ThorAdditions, thor)
 									 );
    
-USA_Base_MBS       := Full_Base_MBS(country = 'UNITED STATES');
+USA_Base_MBS       := Full_Base_MBS(
+																			country = 'UNITED STATES' AND
+																		~(bus_intel.industry = 'DIRECT TO CONSUMER' and 
+																			search_info.function_description in [
+																			'ADDRBEST.BESTADDRESSBATCHSERVICE'
+																			,'BATCHSERVICES.AKABATCHSERVICE'
+																			,'BATCHSERVICES.DEATHBATCHSERVICE'
+																			,'BATCHSERVICES.EMAILBATCHSERVICE'
+																			,'BATCHSERVICES.PROPERTYBATCHSERVICE'
+																			,'DIDVILLE.DIDBATCHSERVICERAW'
+																			,'DIDVILLE.RANBESTINFOBATCHSERVICE'
+																			,'PROGRESSIVEPHONE.PROGRESSIVEPHONEWITHFEEDBACKBATCHSERVICE']
+																			)
+																		);
 
 USA_Base := project(USA_Base_MBS, Inquiry_AccLogs.Layout.Common_ThorAdditions);
 
