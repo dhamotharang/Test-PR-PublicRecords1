@@ -1053,13 +1053,10 @@ end;
 		
 		exception_lu	  := sort(Enclarity.files().exceptions.qa, group_key, lic_state, lic_num_in, local);
 		
-		get_exceptions	:= join(recombined_provs, exception_lu,
+		get_exceptions	:= join(recombined_provs, exception_lu, //currently exclusions are by group_key and license info
 							left.group_key		= right.group_key
-					and left.lic_state		= right.lic_state
-					and left.lic_num_in		= right.lic_num_in
-					and left.lic_num			= right.lic_num
-			,TRANSFORM(track_ancillaries
-					,SELF.record_type			:= 'H'
+			,TRANSFORM(enclarity.Layouts.individual_base,
+					 SELF.record_type			:= if(((left.group_key = right.group_key) and (left.lic_state = right.lic_state) and (left.lic_num_in = right.lic_num_in) and (left.lic_num = right.lic_num)), 'H', left.record_type)
 					,SELF									:= left)
 					,LEFT OUTER, LOOKUP);					
 					
