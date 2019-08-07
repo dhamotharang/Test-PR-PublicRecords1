@@ -57,9 +57,9 @@ EXPORT Build_Base_Main(STRING pversion,
 	combinedMain_sort := SORT(combinedMain_dist,
 										        CLIA_number, lab_type, facility_name, facility_name2, address1, address2,
 														   certificate_type, -expiration_date, record_type,
-															 -dt_vendor_last_reported, RECORD, skew(0.1,0.5),
+															 -dt_vendor_last_reported, RECORD, skew(1),
 				                    LOCAL);
-	
+														
 	CLIA.Layouts.Base rollupMain(CLIA.Layouts.Base L, CLIA.Layouts.Base R) := TRANSFORM
     SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
     SELF.dt_vendor_last_reported  := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
@@ -82,7 +82,7 @@ EXPORT Build_Base_Main(STRING pversion,
 	tools.mac_WriteFile(CLIA.Filenames(pversion).Base.Main.New, baseMainPlusSourceRid, Build_Base_File);
 
 	EXPORT full_build := SEQUENTIAL(Build_Base_File,
-			                            Promote(pversion).buildfiles.New2Built);
+			                            CLIA.Promote(pversion).buildfiles.New2Built);
 		
 	EXPORT All := IF(tools.fun_IsValidVersion(pversion),
 		               full_build,
