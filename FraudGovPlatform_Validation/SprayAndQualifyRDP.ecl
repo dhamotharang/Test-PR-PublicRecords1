@@ -8,7 +8,7 @@ EXPORT SprayAndQualifyRDP(
 
 	DateSearch := pVersion[1..8];
 
-	dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pRDPRootDir + DateSearch)):INDEPENDENT;
+	dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pRDPRootDir + DateSearch, '*.dat')):INDEPENDENT;
 	dsFileListSorted := SORT(dsFileList,modified);
 	fname_temp	:=dsFileListSorted[1].Name:independent;
 	fname	:= fname_temp;
