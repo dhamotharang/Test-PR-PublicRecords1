@@ -1490,16 +1490,20 @@ Legal: => BusTaxLiabBlceDebitFlag := MAP(BusAcctPerBusTaxLiabBlceDebCnt=-99998 =
 Legal: => dsVelBusAcctPerAddrInBusLegEnt := LegalEmployer.rEmployer(BusAcctUIDEcho > 0);  
 
 // New legal attributes
-Legal: => TestEmployeeCount := COUNT(LegalPersonWages{rPerson});
 Legal: => FirstMoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND rFromLegal.seleid != 0)); // need to include associations where there is no prior wage reported.
-Legal: => MoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0));
-Legal: => MoveSameSeleDiffEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum));
-Legal: => MoveSameSeleDiffEmp :=SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum);
-Legal: => MoveSameUltDiffSeleEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid));
-Legal: => MoveSameUltDiffSeleEmp := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid);
-Legal: => MoveTos := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0){rFromLegal.seleid, rToLegal.seleid, rPerson.employeelexid};
-Legal: => SameUltDiffSeleEmployeeCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr = towageyearqtr AND rFromLegal != rToLegal AND  rFromLegal.ultid = rToLegal.ultid){rPerson});
-Legal: => TestWagesTotal := SUM(LegalPersonWages, wageamt);
+Legal: => MoveToCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0)); //??? reporting 0
+Legal: => MoveSameSeleDiffEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum)); // Only 1 instance showing up
+
+//Legal: => MoveSameSeleDiffEmp :=SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal = rToLegal AND FromEmpNum != ToEmpNum);
+Legal: => MoveSameUltDiffSeleEmpCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid)); // None showing up
+
+//Legal: => MoveSameUltDiffSeleEmp := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.ultid = rToLegal.ultid);
+//Legal: => MoveTos := SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr < towageyearqtr AND rFromLegal != rToLegal AND rFromLegal.seleid != 0){rFromLegal.seleid, rToLegal.seleid, rPerson.employeelexid};
+Legal: => SameUltDiffSeleEmployeeCount := COUNT(SeleSeleEmployees(rToLegal.seleid = Legal.seleid AND fromwageyearqtr = towageyearqtr AND rFromLegal != rToLegal AND  rFromLegal.ultid = rToLegal.ultid){rPerson}); // None showing up
+
+
+// Legal: => TestWagesTotal := SUM(LegalPersonWages, wageamt);
+// Legal: => TestEmployeeCount := COUNT(LegalPersonWages{rPerson});
 
 
 																		
