@@ -963,7 +963,7 @@ Paro_final := IF(test_data_enabled, paro_test_seed, paro_model);
 Models.Layouts.Layout_Score_FP form_fp_scores(Models.layouts.Enhanced_layout_fp1109 le) :=
 TRANSFORM
 	SELF.i := le.Score;
-	SELF.description := if(Models.FP_models.Model_Check(Valid_requested_models, ['fd5609_2']), '10 to 50', '0 to 999');
+	SELF.description := if(le.model_name = 'fd5609_2', '10 to 50', '0 to 999');
 	// get the le into layout_modelout to re-use the form_rc function
 	reason_codes_temp := PROJECT(le,form_fp1109_rc(LEFT,1)) + PROJECT(le,form_fp1109_rc(LEFT,2)) + PROJECT(le,form_fp1109_rc(LEFT,3)) +
                        PROJECT(le,form_fp1109_rc(LEFT,4)) + PROJECT(le,form_fp1109_rc(LEFT,5)) + PROJECT(le,form_fp1109_rc(LEFT,6));
