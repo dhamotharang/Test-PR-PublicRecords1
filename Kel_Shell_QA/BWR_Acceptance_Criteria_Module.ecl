@@ -25,7 +25,8 @@ inut_file_records:= if(sample_size=0, choosen(input_file,all),choosen(input_file
  
  // step 2
  // run this action Attribute 
-parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Assets'),
+parallel(Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Professional License'),
+         Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Assets'),
          Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'B2B Trade'),
          Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay, 'Criminal History'),
          Kel_Shell_QA.AC_automated_file(unique_field, inut_file_records, Tag, filtered_lay,'Bankruptcy History')
