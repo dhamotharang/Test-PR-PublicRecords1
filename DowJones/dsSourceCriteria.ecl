@@ -1782,6 +1782,17 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/1171 Venezuela List','1769'},
 {'EC 2019/1169 Venezuela List','1770'},
 {'OSCE (Peru) Sanctioned Suppliers List','1771'},
-{'UN Security Council Resolution 1844 (2008) Somalia List','1772'}
+{'UN Security Council Resolution 1844 (2008) Somalia List','1772'},
+{'EC (CFSP) 2019/1210 Democratic People\'s Republic of Korea List','1773'},
+{'EC (CFSP) 2019/1211 South Sudan List','1774'},
+{'EC (CFSP) 2019/1216 Mali List','1775'},
+{'EC 2019/1207 Democratic People\'s Republic of Korea List','1776'},
+{'EC 2019/1208 South Sudan List','1777'},
+{'Russian Register of Entities Brought to Administrative Responsibility','1778'},
+{'US Department of State - Iran Sanctions Act','1779'},
+{'Canada Regulations Establishing a List of Entities','1780'},
+{'Canada Regulations Implementing the United Nations Resolutions on the Suppression of Terrorism','1781'},
+{'NDRC (China) Suspected Financial Blacklist','1782'},
+{'OFAC - Hizballah International Financing Prevention Amendments Act of 2018','1783'}
 ],r);
 

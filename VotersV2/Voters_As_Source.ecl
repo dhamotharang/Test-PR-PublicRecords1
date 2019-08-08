@@ -1,6 +1,6 @@
 import header;
 
-Layout_in := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
+Layout_in := VotersV2.Layouts_Voters.Layout_Voters_Base_new - [raw_aid,ace_aid];
 
 export Voters_As_Source(dataset(Layout_in) pVoters = dataset([],Layout_in), boolean pForHeaderBuild=false)
  :=
