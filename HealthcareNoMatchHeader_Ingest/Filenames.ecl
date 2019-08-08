@@ -129,6 +129,5 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
  
   // workman files
   EXPORT  WUPrefix              :=  prefix    + pSrc  + '::' + pVersion + '::';
-  EXPORT  MasterWUOutput_SF     :=  WUPrefix  + 'WUInfo';
-  EXPORT  MasterWUOutput_Inc_SF :=  WUPrefix  + 'WUInfo_Inc';
+  EXPORT  MasterWUOutput_SF     :=  WUPrefix  + 'HealthcareNotMatchHeader::qa::workunit_history';
 END;
