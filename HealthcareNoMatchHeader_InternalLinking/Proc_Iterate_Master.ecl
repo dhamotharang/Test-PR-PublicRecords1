@@ -12,9 +12,9 @@ EXPORT Proc_Iterate_Master(
   // internal linking iterations
   runIteration	:=	SEQUENTIAL(
     pDoAll
-    ,HealthcareNoMatchHeader_InternalLinking.Proc_Stats(pSrc,pIter,HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).Linking(pIter).Iteration)
     ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion, pIter).linkingfiles.New2Built
     ,HealthcareNoMatchHeader_Ingest.Promote(pSrc, pVersion, pIter).linkingfiles.Built2QA
+    ,HealthcareNoMatchHeader_InternalLinking.Proc_Stats(pSrc,pIter,HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).Linking(pIter).Iteration)
 	);
                 
   RETURN  runIteration;
