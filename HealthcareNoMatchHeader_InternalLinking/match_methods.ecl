@@ -50,7 +50,7 @@ EXPORT match_FNAME(TYPEOF(h.FNAME) L, TYPEOF(h.FNAME) R, UNSIGNED1 LL = 0, UNSIG
    MAP(L = R => SALT311.MatchCode.ExactMatch,
 	LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT311.MatchCode.InitialLMatch,
 	LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT311.MatchCode.InitialRMatch,
-	Config.WithinEditN(L,LL,R,RL,2,6)=> SALT311.MatchCode.EditDistanceMatch,
+	Config.WithinEditN(L,LL,R,RL,2,8)=> SALT311.MatchCode.EditDistanceMatch,
     fn_PreferredName(L) =  fn_PreferredName(R) => SALT311.MatchCode.CustomFuzzyMatch, // Compare fn_PreferredName values
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)

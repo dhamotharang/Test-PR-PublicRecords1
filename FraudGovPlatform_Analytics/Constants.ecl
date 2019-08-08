@@ -53,7 +53,7 @@
 		EXPORT fileScope						:= 'fraudgov::base::built::kel::';
 		// EXPORT fileScope						:= 'fraudgov::base::20190502::kel::';
 		EXPORT fatherFileScope			:= 'fraudgov::base::father::kel::';
-		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrZWUyMDE5IQ==';
+		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrYUlzNCE=';
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';
 		EXPORT DspQa								:= 'dsp-qa';
