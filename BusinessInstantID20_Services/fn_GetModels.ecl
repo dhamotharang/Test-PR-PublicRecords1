@@ -374,13 +374,18 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
       DATASET([], Layout_ModelOut_Plus);
 
     // If no rep info is input, but a blended model is requested, set the score to 0 and blank out the reason codes since there isn't enough info to calculate.
-    Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, SeqInput, LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
-      Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND 
-                                                            (TRIM(RIGHT.Rep_1_Full_Name) = '' AND TRIM(RIGHT.Rep_1_First_Name) = '' AND TRIM(RIGHT.Rep_1_Last_Name) = '');
-      SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
-      SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
-      SELF := LEFT), 
-      LEFT OUTER, KEEP(1));
+   
+      
+  
+      Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, ds_input, LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
+        Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND 
+                                                            (TRIM(RIGHT.AuthReps[1].FullName) = '' AND TRIM(RIGHT.AuthReps[1].FirstName) = '' AND TRIM(RIGHT.AuthReps[1].LastName) = '');
+        SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
+        SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
+        SELF := LEFT), 
+        LEFT OUTER, KEEP(1)); 
+ 
+  
       
     Model_Results_sorted := 
       SORT( 
@@ -390,6 +395,7 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
         ModelName 
       );
     
+    // Model_Results := Model_Results_sorted;
     Model_Results := IF( allow_SBFE_scores or BusShellv22_scores_requested,
                                     Model_Results_sorted, 
                                     DATASET([], Layout_ModelOut_Plus) );
@@ -455,13 +461,14 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
       
     // DEBUGs.............:  
     // OUTPUT(Options.ModelsRequested,named('_ModelsRequested') );
+   // OUTPUT(SeqInput,named('_SeqInput') );
     // OUTPUT(Shell_Results,named('_Shell_Results') );
     // OUTPUT(IID_Prep,named('_IID_Prep') );
-    // OUTPUT(Model_Results_unsorted,named('_Model_Results_unsorted') );
-    // OUTPUT(Model_Results_Good_Inputs,named('_Model_Results_Good_Inputs') );
+    //OUTPUT(Model_Results_unsorted,named('_Model_Results_unsorted') );
+    //OUTPUT(Model_Results_Good_Inputs,named('_Model_Results_Good_Inputs') );
     // OUTPUT(Model_Results_sorted,named('_Model_Results_sorted') );
     // OUTPUT(allow_SBFE_scores,named('_allow_SBFE_scores') );
-    // OUTPUT(BusShellv22_scores_requested,named('_BusShellv22_scores_requested') );
+    //OUTPUT(BusShellv22_scores_requested,named('_BusShellv22_scores_requested') );
     RETURN Model_Results;
     
     #else // Else, output the model results directly
