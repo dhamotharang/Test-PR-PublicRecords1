@@ -1247,6 +1247,8 @@
 				trim(kword, left, right) = 'ZMACC' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZMACC,
 				trim(kword, left, right) = 'OFAC-EO13876' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13876,
 				trim(kword, left, right) = 'TWTSA' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWTSA,
+				trim(kword, left, right) = 'ARMJH-REPET' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARMJH_REPET,
+				trim(kword, left, right) = 'OFAC-HIFPAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_HIFPAA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
