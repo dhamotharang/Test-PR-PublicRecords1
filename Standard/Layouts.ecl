@@ -1,0 +1,25 @@
+﻿EXPORT Layouts := MODULE
+
+  EXPORT LAYOUT_ORBIT := RECORD
+    UNSIGNED4 GLOBAL_SID;
+    UNSIGNED8 RECORD_SID;
+  END;      
+
+  EXPORT LAYOUT_AID := RECORD
+    UNSIGNED8 AID;
+    UNSIGNED2 DALI;
+    UNSIGNED6 LOCID;
+  END;      
+
+  EXPORT LAYOUT_NID := RECORD
+    UNSIGNED8 NID;
+  END;      
+
+  EXPORT LAYOUT_LINKING := RECORD
+    UNSIGNED6 DID            := 0;
+    INTEGER2  xlink_weight   := 0;
+    UNSIGNED2 xlink_score    := 0;
+    INTEGER1  xlink_distance := 0;
+  END;      
+
+END;
