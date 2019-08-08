@@ -110,4 +110,6 @@ self.DefaultValues:=(SET OF INTEGER)STD.STr.SplitWords(regexreplace(',',trim(lef
 self:=[];
 ));
 
-EXPORT Rules_file:= p(Category in ['Assets','B2B Trade','Bankruptcy History','Inquiry History',	'Criminal History',	'Business Input Clean ',	'Business Input Clean Populated',	'Business Input Echo Populated',	'Input Clean Populated',	'Input Clean',	'Input Echo Populated',	'Business Input Echo','Input Echo']);
+// EXPORT Rules_file:= p(Category in ['Assets','B2B Trade','Bankruptcy History','Inquiry History',	'Criminal History',	'Business Input Clean ',	'Business Input Clean Populated',	'Business Input Echo Populated',	'Input Clean Populated',	'Input Clean',	'Input Echo Populated',	'Business Input Echo','Input Echo']);
+
+EXPORT Rules_file:= p;
