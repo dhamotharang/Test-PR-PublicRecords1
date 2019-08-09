@@ -1,4 +1,4 @@
-﻿IMPORT data_services, _control;
+IMPORT data_services, _control;
 IMPORT $;
 #IF(_Control.Environment.onVault) IMPORT vault; #END;
 
@@ -13,6 +13,3 @@ EXPORT key_addr_hist (integer data_category = 0) :=
 #ELSE
     INDEX ({$.layouts.i_addr_hist.s_did}, {$.layouts.i_addr_hist}, fname(data_category));
 #END;
-
-
-
