@@ -1384,6 +1384,24 @@ end;
 
 export fn_shorten_sourcename(string psourcename) := function
 		result1 :=  
+		
+		      // added for IE AOC phase2
+					regexreplace('SUPREME COURT JUDICIAL BRANCH',                // added by tp
+					regexreplace('OFFENDERS',                                    // added by tp 
+					regexreplace('DEPARTMENT OF PUBLIC SAFETY',                  // added by tp 
+					regexreplace('JUSTICE',                                      // added by tp
+					regexreplace('VIOLENCE REGISTRY',                            // added by tp
+					regexreplace('JUDICIARY',                                    // added by tp
+					regexreplace('DISTRICT OF COLUMBIA',                         // added by tp
+					regexreplace('METHAMPHETAMINE',                              // added by tp 
+					regexreplace('ADMINISTRATIVE OFFICE OF COURTS',              // added by tp
+					regexreplace('ADMINISTRATOR OF COURTS',                      // added by tp  	
+					regexreplace('ADMIN OFFICE OF COURTS',                       // added by tp  	
+					regexreplace(' - FUGITIVES',                                 // added by tp  	
+					regexreplace('MAGISTRATE COURTS',                            // added by tp  		
+          regexreplace(' ADMINISTRATIVE OFFICE OF THE COURTS - ',		   // added by tp	
+		
+		
 		      regexreplace('ARRESTS',
 					regexreplace('COMMON_PLEAS',
 					regexreplace('COMMON_PLEAS_COURT|COURT OF COMMON PLEAS',
@@ -1419,7 +1437,10 @@ export fn_shorten_sourcename(string psourcename) := function
 					regexreplace('CLERK OF COURT',		
 					regexreplace('JUDICIAL SYSTEM',
 					regexreplace('_CW|_IE',psourcename,''),'JUD'),'COC'),'CCDC'),'GSC'),'DTC'),'CIL'),'SD'),'PD'),'SO'),'CTY_SO'),'CTY_PD'),'BKN')/*,'WEB')*/,'JUSTICE'),'SPC'),'JPC'),'AOC'),'SC'),
-					                                      'DOC_SUP'),'DOC_ALT'),'DOC_PAROLE'),'DOC_PROB'),'DOC_INM'),'DOC_REL'),'DOC'),'MTC'),'MC'),'TC'),'CRC'),'DC'),'CTY'),'CPC'),'CPC'),'ARR');
+					                                      'DOC_SUP'),'DOC_ALT'),'DOC_PAROLE'),'DOC_PROB'),'DOC_INM'),'DOC_REL'),'DOC'),'MTC'),'MC'),'TC'),'CRC'),'DC'),'CTY'),'CPC'),'CPC'),'ARR')
+																								
+																								// added for AOC phase2
+																							   ,'_AOC_'),'MAGC'),'_FUGTV'),'AOC'),'AOC'),'AOC'),'METH'),'DC'),'JUD'),'VIOL_REG'),'JUST'),'DPS'),'OFND'),'SUP CT JUD BRNCH');   // added by tp
 			
 					
 	space_count := 
@@ -1627,6 +1648,27 @@ export fn_shorten_sourcename(string psourcename) := function
 								 psourcename = 'NORTH_CAROLINA_RUTHERFORD_COUNTY_DETENTION_CENTER_V2_CW'                => 'NC_RUTHERFRD_CTYDCV2',
 								 psourcename = 'FLORIDA_DIXIE_COUNTY_SHERIFF_CW'                                        => 'FL_DIXIE_CTY_SO_V2',
 								 psourcename = 'TEXAS_RANDALL_COUNTY_ARRESTS_CW'                                        => 'TX_RANDALL_CTY_ARRV2',  
+
+                 // added for IE county phase2
+                 psourcename = 'OH WARREN FRANKLIN MUNICIPAL COURT_IE'                => 'OHWARRENFRANKLIN_MC',       //added by tp
+								 psourcename = 'OH SANDUSKY FREMONT MUNICIPAL COURT_IE'               => 'OHSANDUSKYFREMONT_MC',      //added by tp
+								 psourcename = 'FL PINELLAS CIRCUIT CLERK OF COURTS_IE'               => 'FL_PINELLAS_CIR_COC',       //added by tp
+								 psourcename = 'OH SUMMIT STOW MUNICIPAL COURT TRAFFIC_IE'            => 'OH_SUMMIT_STOW_MT',         //added by tp
+								 psourcename = 'FL CITRUS CLERK OF COURT DISPOSITION_IE'              => 'FLCITRS_COC_DISP',          //added by tp
+								 psourcename = 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC_IE'          => 'FLORNGE_COC_TRAF',          //added by tp
+								 psourcename = 'OH MONTGOMERY MIAMISBURG MUNICIPAL COURT_IE'          => 'OHMNTGMRYMIASBRG_MC',       //added by tp
+								 psourcename = 'OH WARREN LEBANON MUNICIPAL_IE'                       => 'OH_WARN_LEBANON_MUN',       //added by tp
+								 psourcename = 'OH WYANDOT UPPER SANDUSKY MUNICIPAL COURT_IE'         => 'OHWYANDTUPRSNDSKY_MC',      //added by tp
+								 psourcename = 'OH FRANKLIN MUNICIPAL TRAFFIC_IE'                     => 'OH_FRANKLIN_MT',            //added by tp
+								 psourcename = 'OH WARREN MORROW MAYORS COURT_IE'                     => 'OHWARNMORROW_MYRSCRT',      //added by tp
+								 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)_IE'      => 'FLMIADADE_CNTY_CRCWB',      //added by tp
+								 psourcename = 'OH CLARK MUNICIPAL TRAFFIC COURT_IE'                  => 'OH_CLARK_MT',               //added by tp
+								 psourcename = 'OH WARREN SPRINGBORO MAYORS COURT_IE'                 => 'OH_WARNSPRBORO_MYRSC',      //added by tp
+								 psourcename = 'OH MONTGOMERY DAYTON MUNICIPAL COURTS - TRAFFIC_IE'   => 'OH_MONTGOMRYDAYTN_MT',      //added by tp
+								 psourcename = 'OH MONTGOMERY MUNICIPAL COURTS EASTERN DIVISION_IE'   => 'OHMONTGOMRY_MC_EDIV',       //added by tp
+								 psourcename = 'OH MONTGOMERY MUNICIPAL COURTS WESTERN DIVISION_IE'   => 'OHMONTGOMRY_MC_WDIV',       //added by tp
+								 psourcename = 'OH WARREN WAYNESVILLE MAYORS COURT_IE'                => 'OHWARNWAYNSVIL_MYRSC',      //added by tp
+								 psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC_IE'          => 'FLMIADADE_CTY_AND_CRT',     //added by tp
 
 								 result2);
 								 
@@ -2806,6 +2848,75 @@ map(
   psourcename = 'NV CLARK ARREST_IE'                                                      => 'I0053',  
   psourcename = 'SD MINNEHAHA ARREST_IE'                                                  => 'I0054',
   psourcename = 'SD PENNINGTON ARREST_IE'                                                 => 'I0055',
+	
+//-------------------------------IE County Batch 2 20190621 ---------------------------------------------------	
+psourcename = 'AZ MARICOPA JUSTICE COURTS_IE'                      => 'I0057',  
+psourcename = 'CA LOS ANGELES SUPERIOR COURT_IE'                   => 'I0058',  
+psourcename = 'CA SANTA CRUZ SUPERIOR COURT_IE'                    => 'I0059',  
+psourcename = 'FL CITRUS CLERK OF COURT DISPOSITION_IE'            => 'I0060',  
+psourcename = 'FL CLAY COUNTY CLERK OF COURT_IE'                   => 'I0061',  
+psourcename = 'FL INDIAN RIVER CLERK OF COURT_IE'                  => 'I0062',  
+psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT COURTS(WEB)_IE'    => 'I0063',  
+psourcename = 'FL MIAMI DADE COUNTY AND CIRCUIT TRAFFIC_IE'     => 'I0064',  
+psourcename = 'FL MONROE CIRCUIT COURT_IE'                      => 'I0065',  
+psourcename = 'FL ORANGE COUNTY CLERK OF COURTS TRAFFIC_IE'     => 'I0066',  
+psourcename = 'FL PINELLAS CIRCUIT CLERK OF COURTS_IE'          => 'I0067',  
+psourcename = 'FL SAINT LUCIE CLERK OF COURTS_IE'               => 'I0068',  
+psourcename = 'KS JOHNSON DISTRICT COURT_IE'                    => 'I0069',  
+psourcename = 'OH CLARK MUNICIPAL TRAFFIC COURT_IE'             => 'I0070',  
+psourcename = 'OH DELAWARE MUNICIPAL COURT_IE'                  => 'I0071',  
+psourcename = 'OH ERIE MUNICIPAL COURT_IE'                      => 'I0072',  
+psourcename = 'OH FRANKLIN MUNICIPAL TRAFFIC_IE'                => 'I0073',  
+psourcename = 'OH LUCAS OREGON MUNICIPAL COURT_IE'              => 'I0074',  
+psourcename = 'OH LUCAS TOLEDO MUNICIPAL COURT_IE'              => 'I0075',  
+psourcename = 'OH MADISON MUNICIPAL COURT_IE'                    => 'I0076',  
+psourcename = 'OH MONTGOMERY DAYTON MUNICIPAL COURTS - TRAFFIC_IE'  => 'I0077',  
+psourcename = 'OH MONTGOMERY MIAMISBURG MUNICIPAL COURT_IE'         => 'I0078',  
+psourcename = 'OH MONTGOMERY MUNICIPAL COURTS EASTERN DIVISION_IE'  => 'I0079',  
+psourcename = 'OH MONTGOMERY MUNICIPAL COURTS WESTERN DIVISION_IE'  => 'I0080',  
+psourcename = 'OH SANDUSKY CLERK OF COURTS_IE'                      => 'I0081',  
+psourcename = 'OH SANDUSKY FREMONT MUNICIPAL COURT_IE'              => 'I0082',  
+psourcename = 'OH SUMMIT STOW MUNICIPAL COURT TRAFFIC_IE'           => 'I0083',  
+psourcename = 'OH WARREN COUNTY COURT_IE'                           => 'I0084',  
+//psourcename = 'OH WARREN COUNTY COURT_IE'                         => 
+psourcename = 'OH WARREN COURT OF COMMON PLEAS_IE'                  => 'I0085',  
+psourcename = 'OH WARREN FRANKLIN MUNICIPAL COURT_IE'               => 'I0086',  
+psourcename = 'OH WARREN LEBANON MUNICIPAL_IE'                      => 'I0087',  
+psourcename = 'OH WARREN MASON MUNICIPAL COURT_IE'                  => 'I0088',  
+psourcename = 'OH WARREN MORROW MAYORS COURT_IE'                    => 'I0089',  
+psourcename = 'OH WARREN SPRINGBORO MAYORS COURT_IE'                => 'I0090',  
+psourcename = 'OH WARREN WAYNESVILLE MAYORS COURT_IE'               => 'I0091',  
+psourcename = 'OH WYANDOT UPPER SANDUSKY MUNICIPAL COURT_IE'        => 'I0092',  
+psourcename = 'SC BEAUFORT SUMMARY COURT_IE'                        => 'I0093',  
+psourcename = 'SC SUMTER SUMMARY COURT_IE'                          => 'I0094',  
+psourcename = 'TX DENTON JUSTICE OF THE PEACE_IE'                   => 'I0095',  
+psourcename = 'TX EL PASO DISTRICT COURT_IE'                        => 'I0096',  
+
+//-------------------------------IE AOC Batch 2 20190621 ---------------------------------------------------
+
+
+psourcename = 'AZ SUPREME COURT JUDICIAL BRANCH_IE'                       => 'I0097',  
+psourcename = 'DISTRICT OF COLUMBIA SUPERIOR COURT_IE'                    => 'I0098',  
+psourcename = 'GUAM FAMILY VIOLENCE REGISTRY_IE'                          => 'I0099',  
+psourcename = 'HI STATE JUDICIARY ADMINISTRATIVE OFFICE OF COURTS_IE'     => 'I0100',  
+psourcename = 'IA ADMINISTRATIVE OFFICE OF COURTS_IE'                     => 'I0101',
+psourcename = 'ID STATE JUDICIARY_IE'                                     => 'I0102',
+psourcename = 'ID SUPREME COURT_IE'                                       => 'I0103',
+psourcename = 'IL METHAMPHETAMINE OFFENDER_IE'                            => 'I0104',
+psourcename = 'IN ADMINISTRATOR OF COURTS (WEB)_IE'                       => 'I0105',
+psourcename = 'KY COURT OF JUSTICE AOC_IE'                                => 'I0106',
+psourcename = 'MO ADMIN OFFICE OF COURTS_IE'                              => 'I0107',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - DISTRICT COURTS_IE'                => 'I0108',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MAGISTRATE COURTS_IE'              => 'I0109',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MAGISTRATE COURTS - FUGITIVES_IE'  => 'I0110',
+psourcename = 'NM ADMINISTRATIVE OFFICE OF THE COURTS - MUNICIPAL COURTS_IE'               => 'I0111',
+psourcename = 'OH DEPARTMENT OF PUBLIC SAFETY HABITUAL OFFENDERS_IE'                       => 'I0112',
+psourcename = 'OK DISTRICT COURTS (WEB)_IE'                                                => 'I0113',
+psourcename = 'OR ADMINISTRATIVE OFFICE OF COURTS (OECI)_IE'                               => 'I0114',
+psourcename = 'WI ADMIN OFFICE OF COURTS CRIMINAL_IE'                                      => 'I0115',
+psourcename = 'WI ADMIN OFFICE OF COURTS TRAFFIC_IE'                                       => 'I0116',
+	
+	
 /************************************************IE DATA END*************************************************************/
  '');                                                                            											
 
