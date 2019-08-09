@@ -72,7 +72,7 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 	
 		// Only keep the latest Account Delete
 	dDeleteRecords	:=	DEDUP(SORT(	dStillActive(Account_Update_Deletion_Indicator	IN	sDeleteAccounts),
-																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,-Extracted_Date,LOCAL),
+																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,-Extracted_Date,-process_date,LOCAL),
 																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,LOCAL);
 	
 		// Mark deleted account records as inactive
@@ -84,8 +84,8 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 	END;
 	
 	dAccountsDeleted	:=	JOIN(
-													dStillActive,
-													dDeleteRecords,
+													distribute(dStillActive,HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported)),
+													distribute(dDeleteRecords,HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported)),
 														LEFT.Sbfe_Contributor_Number					=		RIGHT.Sbfe_Contributor_Number	AND
 														LEFT.Original_Contract_Account_Number	=		RIGHT.Original_Contract_Account_Number	AND
 														LEFT.Account_Type_Reported						=		RIGHT.Account_Type_Reported		AND
@@ -110,7 +110,7 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 	dDeleteMostRecent	:=	ITERATE(
 													SORT(DISTRIBUTE(dAccountsDeleted(active),
 														HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported)),
-																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,-Cycle_End_Date,-Extracted_Date,LOCAL),
+																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,-Cycle_End_Date,-Extracted_Date,-process_date,LOCAL),
 													tDeleteMostRecent(LEFT,RIGHT),LOCAL);
 
 dMassSuppress:=dDeleteMostRecent(active and File_Correction_Indicator in File_Correction_IndicatorSuppressCode);
