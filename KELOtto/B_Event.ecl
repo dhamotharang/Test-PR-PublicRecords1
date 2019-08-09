@@ -18,7 +18,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -424,7 +424,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -760,7 +760,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -1278,7 +1278,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -1970,7 +1970,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -2545,7 +2545,7 @@ EXPORT B_Event := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE451462 := JOIN(__EE451452,__EE438665,__JC451461(LEFT,RIGHT),__JT451461(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE451462 := JOIN(__EE451452,__EE438665,__JC451461(LEFT,RIGHT),__JT451461(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __EE412316 := __ENH_Address_1;
   SHARED __EE438662 := __EE412316;
   SHARED __ST426754_Layout := RECORD
@@ -2557,7 +2557,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -3127,7 +3127,7 @@ EXPORT B_Event := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers__3_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id__1_;
+    KEL.typ.nstr Otto_Address_Id__1_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -3170,7 +3170,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Cl_Identity_Count_Percentile__2_;
     KEL.typ.int Deceased_Match_Person_Count_ := 0;
     KEL.typ.int Deceased_Person_Count__1_ := 0;
-    KEL.typ.nunk Entity_Context_Uid__2_;
+    KEL.typ.nstr Entity_Context_Uid__2_;
     KEL.typ.nstr Full_Address_;
     KEL.typ.int High_Frequency_Flag_ := 0;
     KEL.typ.int High_Risk_Death_Prior_To_All_Events_Person_Count_ := 0;
@@ -3223,7 +3223,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -3793,7 +3793,7 @@ EXPORT B_Event := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers__3_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id__1_;
+    KEL.typ.nstr Otto_Address_Id__1_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -3836,7 +3836,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Cl_Identity_Count_Percentile__2_;
     KEL.typ.int Deceased_Match_Person_Count_ := 0;
     KEL.typ.int Deceased_Person_Count__1_ := 0;
-    KEL.typ.nunk Entity_Context_Uid__2_;
+    KEL.typ.nstr Entity_Context_Uid__2_;
     KEL.typ.nstr Full_Address_;
     KEL.typ.int High_Frequency_Flag_ := 0;
     KEL.typ.int High_Risk_Death_Prior_To_All_Events_Person_Count_ := 0;
@@ -3882,7 +3882,7 @@ EXPORT B_Event := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE451482 := JOIN(__EE451472,__EE412331,__JC451481(LEFT,RIGHT),__JT451481(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE451482 := JOIN(__EE451472,__EE412331,__JC451481(LEFT,RIGHT),__JT451481(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __ST431144_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
@@ -3892,7 +3892,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -4462,7 +4462,7 @@ EXPORT B_Event := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers__3_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id__1_;
+    KEL.typ.nstr Otto_Address_Id__1_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -4505,7 +4505,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Cl_Identity_Count_Percentile__2_;
     KEL.typ.int Deceased_Match_Person_Count_ := 0;
     KEL.typ.int Deceased_Person_Count__1_ := 0;
-    KEL.typ.nunk Entity_Context_Uid__2_;
+    KEL.typ.nstr Entity_Context_Uid__2_;
     KEL.typ.nstr Full_Address_;
     KEL.typ.int High_Frequency_Flag_ := 0;
     KEL.typ.int High_Risk_Death_Prior_To_All_Events_Person_Count_ := 0;
@@ -4534,7 +4534,7 @@ EXPORT B_Event := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers__4_;
     KEL.typ.nbool _addresspobox__1_;
     KEL.typ.nbool _addresscmra__1_;
-    KEL.typ.nint Otto_Address_Id__2_;
+    KEL.typ.nstr Otto_Address_Id__2_;
     KEL.typ.nstr Primary_Range__1_;
     KEL.typ.nstr Predirectional__1_;
     KEL.typ.nstr Primary_Name__1_;
@@ -4577,7 +4577,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Cl_Identity_Count_Percentile__3_;
     KEL.typ.int Deceased_Match_Person_Count__1_ := 0;
     KEL.typ.int Deceased_Person_Count__3_ := 0;
-    KEL.typ.nunk Entity_Context_Uid__3_;
+    KEL.typ.nstr Entity_Context_Uid__3_;
     KEL.typ.nstr Full_Address__1_;
     KEL.typ.int High_Frequency_Flag__1_ := 0;
     KEL.typ.int High_Risk_Death_Prior_To_All_Events_Person_Count__1_ := 0;
@@ -4666,7 +4666,7 @@ EXPORT B_Event := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -4809,7 +4809,7 @@ EXPORT B_Event := MODULE
     KEL.typ.int Addr_Hri_Pa_Flag_ := 0;
     KEL.typ.int Addr_Hri_Po_Flag_ := 0;
     KEL.typ.int Addr_Hri_Va_Flag_ := 0;
-    KEL.typ.nunk Address_Entity_Context_Uid_;
+    KEL.typ.nstr Address_Entity_Context_Uid_;
     KEL.typ.nint Age_;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
     KEL.typ.nint Customer_Id_;
