@@ -128,6 +128,10 @@
 			string imei_changedate;
 			integer loststolen;
 			string loststolen_date;
+			string account_activation_date;
+			string line_activation_date;
+			string imei_activationdate;
+			integer acct_tenure_min;
 	end;
 	
 	export Historic_Results_Base := record
