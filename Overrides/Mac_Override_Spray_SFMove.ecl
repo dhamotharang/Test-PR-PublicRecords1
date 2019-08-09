@@ -52,7 +52,7 @@ macro
 																,%spraycsv%
 																,STD.File.AddSuperFile('~thor_data400::base::override::fcra::qa::'+datasetname+'_var'
 																											,'~thor_data400::in::override::fcra::'+filedate+'::'+datasetname+'_var')
-																,Overrides.ConvertLayouts.layouttouse(
+																,Overrides.ConvertLayouts().layouttouse(
 																								'~thor_data400::in::override::fcra::'+filedate+'::'+datasetname+'_var'
 																								,'~thor_data400::in::override::fcra::'+filedate+'::'+datasetname
 																								,headtag
