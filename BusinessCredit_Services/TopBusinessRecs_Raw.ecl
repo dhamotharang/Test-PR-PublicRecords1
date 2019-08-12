@@ -252,9 +252,9 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 
 	final_recsDefault := DATASET([transform_TopBusinessRecs()]);
 	final_recsLNOnlyCreditReport := DATASET([transform_TopBusinessRecsLNOnlyCreditReport()]);
-	final_recs := if (inmod.BusinessCreditReportType = BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport, final_recsDefault, 
-	                                   if ( (inmod.BusinessCreditReportType = BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport
-																		  and  ~(buzCreditAccess)), final_recsLNOnlyCreditReport));
+	
+	final_recs := if (inmod.BusinessCreditReportType = BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport, 
+	                                  final_recsLNOnlyCreditReport, final_recsDefault );
 
 // OUTPUT(add_parent, NAMED('add_parent_MAX_COUNT_CONNECTED_BUSINESSES'));
 // OUTPUT(add_bankruptcy[1], NAMED('add_bankruptcy'));

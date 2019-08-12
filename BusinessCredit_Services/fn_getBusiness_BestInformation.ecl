@@ -154,22 +154,21 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 																																 AuthRepBestRec[1].st, AuthRepBestRec[1].zip, AuthRepBestRec[1].zip4, '', '', street_addr, '', csz);
 			SELF.AuthRepSSN 								:= AuthRepBestRec[1].ssn;
 			SELF.AuthRepPhone 							     := AuthRepBestRec[1].phone;
-			SELF.RecentTradeDate					     	:= IF(buzCreditAccess and inMod.BusinessCreditReportType =  BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport,
-			                                                                                 iesp.ECL2ESP.toDatestring8(MAX(buzCredit_tradeline, buzCredit_tradeline.Date_Account_Opened)),
-																		  iesp.ECL2ESP.toDatestring8('')	// not using any value here will be blank									                
-																	);
+				SELF.RecentTradeDate					     	:= IF(inMod.BusinessCreditReportType =  BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport,
+																					iesp.ECL2ESP.toDatestring8(''),	// not using any value here will be blank			
+																						if (buzCreditAccess, iesp.ECL2ESP.toDatestring8(MAX(buzCredit_tradeline, buzCredit_tradeline.Date_Account_Opened))
+																				));
 			
-			SELF.EstablishedDate						:= IF(buzCreditAccess and  inMod.BusinessCreditReportType =  BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport, 
-			                                                                              iesp.ECL2ESP.toDatestring8(MIN(buzCredit_tradeline, buzCredit_tradeline.Business_Established_Date)),
-																	   iesp.ECL2ESP.toDate(dt_first_seenValue)
-																	);
+			SELF.EstablishedDate						:= IF(inMod.BusinessCreditReportType =   BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport, 
+																		iesp.ECL2ESP.toDate(dt_first_seenValue),
+			                                                                              if (buzCreditAccess, iesp.ECL2ESP.toDatestring8(MIN(buzCredit_tradeline, buzCredit_tradeline.Business_Established_Date))
+																			));			
 		
 			SELF.AnnualIncome 							:= MAP (AnnualIncome <> 0 => (STRING) AnnualIncome,
 			                                                                                 equifaxBusDataIncome <> 0 => (STRING) equifaxBusDataIncome,
 																		 (STRING) corteraAnnualIncome <> '' => (STRING) corteraAnnualIncome,
 																		  '');
-																		
-																																													
+																																																	
 			SELF.NoOfEmployees 							:=    MAP (noOfEmployees <> '' => noOfEmployees,
 			                                                                                 equifaxBusDataEmployCount <> '' => equifaxBusDataEmployCount,
 			                                                                                 corteraNumEmployees <> '' => corteraNumEmployees,
