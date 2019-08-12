@@ -1789,6 +1789,10 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2019/1207 Democratic People\'s Republic of Korea List','1776'},
 {'EC 2019/1208 South Sudan List','1777'},
 {'Russian Register of Entities Brought to Administrative Responsibility','1778'},
-{'US Department of State - Iran Sanctions Act','1779'}
+{'US Department of State - Iran Sanctions Act','1779'},
+{'Canada Regulations Establishing a List of Entities','1780'},
+{'Canada Regulations Implementing the United Nations Resolutions on the Suppression of Terrorism','1781'},
+{'NDRC (China) Suspected Financial Blacklist','1782'},
+{'OFAC - Hizballah International Financing Prevention Amendments Act of 2018','1783'}
 ],r);
 

@@ -58,8 +58,8 @@ module
     self := left;
 		  self:=[]));
   // Same Append as done in BIPV2_Build.proc_ingest
-  // append := BIPV2_Files.tools_dotid().APPEND_DID(distribute(ds));//this can get skewed, so add distribute
-  append := ds;//this can get skewed, so add distribute
+  append := BIPV2_Files.tools_dotid().APPEND_DID(distribute(ds));//this can get skewed, so add distribute
+  // append := ds;//this can get skewed, so add distribute
 
   shared contacts_sources_w_append := join(contacts_sources_with_id, append, 
     left.rcid=right.rcid, 

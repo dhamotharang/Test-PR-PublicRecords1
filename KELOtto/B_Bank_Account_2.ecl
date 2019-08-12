@@ -205,7 +205,7 @@ EXPORT B_Bank_Account_2 := MODULE
     KEL.typ.ndataset(E_Bank_Account.Source_Customers_Layout) Source_Customers_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Bank_Account.Typ) U_I_D__1_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -337,7 +337,7 @@ EXPORT B_Bank_Account_2 := MODULE
     KEL.typ.ndataset(E_Bank_Account.Source_Customers_Layout) Source_Customers_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Bank_Account.Typ) U_I_D__1_;
     KEL.typ.int S_U_M___Event_Count_ := 0;
@@ -416,7 +416,7 @@ EXPORT B_Bank_Account_2 := MODULE
     KEL.typ.ndataset(E_Bank_Account.Source_Customers_Layout) Source_Customers_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Bank_Account.Typ) U_I_D__1_;
     KEL.typ.int S_U_M___Event_Count_ := 0;
@@ -495,7 +495,7 @@ EXPORT B_Bank_Account_2 := MODULE
     KEL.typ.ndataset(E_Bank_Account.Source_Customers_Layout) Source_Customers_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Bank_Account.Typ) U_I_D__1_;
     KEL.typ.int S_U_M___Event_Count_ := 0;
@@ -523,7 +523,7 @@ EXPORT B_Bank_Account_2 := MODULE
     KEL.typ.ndataset(E_Bank_Account.Source_Customers_Layout) Source_Customers_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Bank_Account.Typ) U_I_D__1_;
     KEL.typ.int S_U_M___Event_Count_ := 0;
@@ -562,7 +562,7 @@ EXPORT B_Bank_Account_2 := MODULE
     KEL.typ.ndataset(E_Bank_Account.Source_Customers_Layout) Source_Customers_;
     KEL.typ.ntyp(E_Bank.Typ) _r_Bank_;
     KEL.typ.nstr Account_Number_;
-    KEL.typ.nint Otto_Bank_Account_Id_;
+    KEL.typ.nstr Otto_Bank_Account_Id_;
     KEL.typ.int Cl_Active30_Identity_Count_ := 0;
     KEL.typ.int Cl_Active7_Identity_Count_ := 0;
     KEL.typ.int Cl_Event_Count_ := 0;
