@@ -57,6 +57,30 @@ TRANSFORM
 	
 	SELF.source_state  			:= 	'CT';
 	SELF.decedent_race			:=	Lookup_CT.lkp_race(pInput.race);
+
+
+	// Fill Origin according to UNITED STATES CENSUS 2000 POPULATION WITH BRIDGED RACE CATEGORIES
+	// Combine all the origins
+	dHispanic_Origins		:=	DATASET([
+								{IF(pInput.HISPMEX	=	'Y','MEXICAN, MEXICAN AMERICAN,CHICANO','')},
+								{IF(pInput.HISPPR	=	'Y','PUERTO RICAN','')},
+								{IF(pInput.HISPCUB	=	'Y','CUBAN','')},
+								{IF(pInput.HISPOTH	=	'Y',pInput.HISPOTHL,'')}
+								],{STRING	origin});
+								
+	dHispanic_Origins	tCombineOrigins(dHispanic_Origins	l, dHispanic_Origins	r)	:=	TRANSFORM
+		SELF.origin	:=	IF(l.origin<>'',l.origin+'; '+r.origin,r.origin);
+	END;
+	// Remove blanks and duplicates and then concatinate
+	combined_origins	:=	ITERATE(DEDUP(SORT(dHispanic_Origins(origin NOT IN ['','-','NA','N/A']),origin),ALL),tCombineOrigins(LEFT,RIGHT));
+	
+	SELF.decedent_origin		:=	IF( combined_origins[COUNT(combined_origins)].origin	=	''	AND
+																	pInput.NONHISP	=	'N',
+																	'NOT SPANISH/HISPANIC/LATINO',
+																	combined_origins[COUNT(combined_origins)].origin);
+
+
+
 	SELF.decedent_sex				:= 	Lookup_CT.lkp_gender(pInput.sex);
 	SELF.decedent_age 			:= 	Lookup_CT.lkp_age(TRIM(pInput.AgeUnit[1],ALL),TRIM(pInput.AgeUnit_NumberOfUnits,ALL));
   SELF.education		 			:= 	Lookup_CT.lkp_gender(pInput.educ);	
