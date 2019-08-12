@@ -180,8 +180,8 @@ EXPORT FP_models := MODULE
     turn_on_IncludeHHIDSummary   := (Model_Check(ModelRequest, ['fp31604_0'])and inputok) or doAttributesVersion2 or
                                     Model_Check(ModelRequest, [Models.FraudAdvisor_Constants.ThisSet_for_BSOPTIONS,'fp1403_2','fp1510_2']);
                                     
-    turn_on_AllowInsuranceDLInfo := Model_Check(ModelRequest, Models.FraudAdvisor_Constants.ThisSet_for_BSOPTIONS) and (doAttributesVersion201 OR doAttributesVersion202);
-    turn_on_AlwaysCheckInsurance := Model_Check(ModelRequest, Models.FraudAdvisor_Constants.ThisSet_for_BSOPTIONS) and (doAttributesVersion201 OR doAttributesVersion202);
+    turn_on_AllowInsuranceDLInfo := doAttributesVersion201 OR doAttributesVersion202;
+    turn_on_AlwaysCheckInsurance := doAttributesVersion201 OR doAttributesVersion202;
     turn_on_IncludeInquiries     := Model_Check(ModelRequest, ['fp1403_2','fp1510_2']) and doInquiries;
     turn_on_IncludeInsNAP        := Model_Check(ModelRequest, ['fp1403_2','fp1510_2']);// and ~DisallowInsurancePhoneHeaderGateway;
 

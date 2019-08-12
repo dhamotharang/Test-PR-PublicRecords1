@@ -12,7 +12,7 @@ export Fetch_Gong_History_By_BusinessIds(dataset(BIPV2.IDFunctions.rec_SearchInp
 	end;
 	
 	ds_businessIds := project(ds_businessIdsInfoOutSorted, xform_businessIdsOnly(left));
-	businessIdsWithHistory := Gong.key_History_LinkIDs.kfetch(ds_businessIds, 
+	businessIdsWithHistory := Gong.key_History_LinkIDs.kfetch(ds_businessIds, ,
 																														TopBusiness_Services.Constants.sourceLinkIdLevel);
 
 	businessIdsWithHistorySorted := sort(businessIdsWithHistory, -(current_record_flag ='Y'), -dt_last_seen);
