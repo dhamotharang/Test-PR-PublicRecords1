@@ -3,7 +3,7 @@ import address, gong;
 export File_ACA_Clean(
 
 	 dataset(layout_aca_in						) pfile_aca				= file_aca
-	,dataset(gong.Layout_bscurrent_raw) pfile_gong_full	= gong.File_Gong_full
+	,dataset(RECORDOF(gong.File_Gong_full)) pfile_gong_full	= gong.File_Gong_full
 	,string															pPersistname		= '~thor_data400::persist::aca::file_aca_clean'
 	,boolean														pUseDatasets		= false
 
@@ -69,10 +69,11 @@ end;
 
 outf1 := project(df_norm,into_clean(LEFT));
 
-aca.Layout_ACA_Clean get_phones(outf1 L, gong.Layout_bscurrent_raw R) := transform
+aca.Layout_ACA_Clean get_phones(outf1 L,RECORDOF(gong.File_Gong_full) R) := transform
 	self.phone	:= R.phone10;
 	self.zip		:= L.z5;  //08-25-2009 Mapping the cleaned z5 to zip, since zip field is used in the keys.
 	self 				:= L;
+	SELF:= [];
 end;
 
 outf2 := join(distribute(outf1,hash(prim_range, prim_name, sec_range, z5)),
