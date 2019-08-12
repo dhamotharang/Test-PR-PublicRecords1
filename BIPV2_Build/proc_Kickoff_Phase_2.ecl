@@ -68,7 +68,7 @@ functionmacro
   ecl15   := regexreplace('@pSkipCrosswalk@'      ,ecl14  ,fbool(pSkipCrosswalk       ),nocase);
   ecl16   := regexreplace('@pCompileTest@'        ,ecl15  ,fbool(pCompileTest         ),nocase);
                                                             
-  kickWuid	  := wk_ut.CreateWuid(ecl15,cluster);
+  kickWuid	  := wk_ut.CreateWuid(ecl16,cluster);
 //  kickXlink	  := wk_ut.CreateWuidNWait(ecl16,'1',pversion,cluster,,_control.MyInfo.EmailAddressNotify,,pUniqueOutput,pPollingFrequency,false);
   
   return if(pOutputEcl = false  ,kickWuid  ,ecl13);
