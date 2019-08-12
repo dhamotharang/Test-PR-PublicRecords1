@@ -106,7 +106,7 @@ EXPORT files := MODULE
   unsigned6 wagesrecid;
  END;
 
- EXPORT Wages := DATASET('~fraudgov::tndata::wages_output', WagesRec, THOR);
+ EXPORT Wages := DATASET('~fraudgov::tndata::20190701::wages_output', WagesRec, THOR);
  
  TrumpRec := RECORD
   string dummycode;
@@ -1235,4 +1235,45 @@ EXPORT files := MODULE
 // EXPORT Claimant := DATASET('~fraudgov::tndata::claimants_output', ClaimantsRec, THOR); //Old File
 EXPORT Claimant := DATASET('~fraudgov::tndata::20190701::claimants_output', ClaimantsRec, THOR);
 
+SHARED WagesAssociationsPrep := TABLE(Wages(employeelexid != 0 and seleid != 0), {ultid, seleid, empnum, employeelexid, wageyearqtr}, ultid, seleid, empnum, employeelexid, wageyearqtr, MERGE);
+
+SHARED WagesSeleAssociation := RECORD
+	UNSIGNED Fromultid;
+	UNSIGNED Toultid;
+	UNSIGNED FromSeleId;
+	UNSIGNED ToSeleId;
+	STRING fromempnum;
+	STRING toempnum;
+	UNSIGNED8 employeelexid;
+	INTEGER fromwageyearqtr;
+	INTEGER towageyearqtr;
+END;
+
+
+shared fn_QtrDiff(string L, string R) := FUNCTION
+		// format 20181, 20194 etc
+		
+		// Returns true if R is same quarter as L, or one quarter past (ex. 20174 -> 20181)
+		lyr := (integer)L[..4];
+		lqtr := (integer)L[5..];
+		ryr := (integer)R[..4];
+		rqtr := (integer)R[5..];
+		
+		RETURN MAP((lyr = ryr AND lqtr = rqtr) => TRUE, // same year and quarter
+							 (lyr = ryr AND (rqtr - lqtr) = 1) => TRUE, // same year, right is one quarter ahead
+							 ((ryr - lyr) = 1 AND (rqtr = 1) AND (lqtr = 4)) => TRUE, // right is one year ahead at q1, left is q4
+							 FALSE);
+END;
+EXPORT WagesAssociations := JOIN(WagesAssociationsPrep, WagesAssociationsPrep, left.employeelexid=RIGHT.employeelexid AND
+																	left.wageyearqtr <= right.wageyearqtr AND fn_QtrDiff(left.wageyearqtr, right.wageyearqtr),
+	TRANSFORM(WagesSeleAssociation,
+		SELF.FromUltId := LEFT.ultid,
+		SELF.ToUltid := right.ultid,
+		SELF.FromSeleId := LEFT.seleid,
+		SELF.ToSeleID := RIGHT.seleid,
+		SELF.FromEmpnum := LEFT.empnum,
+		SELF.ToEmpnum := RIGHT.empnum,
+		SELF.fromwageyearqtr := (INTEGER)LEFT.wageyearqtr,
+		SELF.towageyearqtr := (INTEGER)RIGHT.wageyearqtr,
+		SELF := LEFT), HASH)(NOT (FromSeleID = ToSeleID AND FromEmpNum = ToEmpNum));// : persist('~persist::fraudgov::tndata::WagesAssociations');
 END;
