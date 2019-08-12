@@ -7,7 +7,7 @@ Layout_extra := RECORD
 	UNSIGNED8	freq;
 END;
 
-Layout_extra addWords(gong.Layout_bscurrent_raw l, integer c) := TRANSFORM
+Layout_extra addWords(RECORDOF(input_recs) l, integer c) := TRANSFORM
 	SELF.word := Stringlib.StringExtract(Stringlib.StringFindReplace(TRIM(l.listed_name),' ',','), c);
 	SELF.freq := 1;
 END;

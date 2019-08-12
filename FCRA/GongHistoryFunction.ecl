@@ -59,7 +59,8 @@ export GongHistoryFunction(dataset(Risk_Indicators.Layout_Input) bsprep, dataset
 	gong_recs := gong_deduped + PROJECT( gong_corr,
 			transform( Layout_Gong,
 				self.l_did := left.did,
-				self := LEFT
+				self := LEFT,
+				SELF := [], // flag_file_id, global_sid, record_sid
 			) );
 	//
 
