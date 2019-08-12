@@ -1,9 +1,11 @@
-import	Std;
+﻿import	Std;
 
 dVehiclePartyBase	:=	VehicleV2.Files.Base.Party_BIP;
 
 // Blank out title number for experian states ME and NE
-VehicleV2.Layout_Base.Party_bip	tBlankTitleNum(dVehiclePartyBase	pInput)	:=
+// VehicleV2.Layout_Base.Party_bip	tBlankTitleNum(dVehiclePartyBase	pInput)	:=
+//Modified for CCPA-103 layout additions
+VehicleV2.Layout_Base.Party_CCPA	tBlankTitleNum(dVehiclePartyBase	pInput)	:=
 transform
 	self.Ttl_Number	:=	if(	(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'ME')	or	pInput.state_origin	=	'NE',
 													'',
@@ -78,6 +80,11 @@ transform
 	self.UltID														:= pInput.UltID;
 	self.UltScore													:= pInput.UltScore;
 	self.UltWeight												:= pInput.UltWeight;
+	//Added for CCPA-103
+	self.global_sid                       := pInput.global_sid;
+	self.record_sid                       := pInput.record_sid;
+	//Added for DF-25578
+	self.raw_name                         := pInput.raw_name;
 	self																	:=	pInput;
 end;
 

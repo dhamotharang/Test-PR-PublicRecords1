@@ -97,9 +97,14 @@ EXPORT PreprocessNCF2(string ilfn) := function
 										)));
 									
 	 exceptions := 	Nac_V2.mod_Validation.ExceptionFile(
-										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rException,
+										PROJECT(nacin(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rExceptionEx,
 										self := LEFT.ExceptionRec;
 										self.RecordCode := left.RecordCode;
+										self.SourceGroupId := gid;
+										self.filename := fname;
+										self.Created := RightNow;
+										self.Updated := RightNow;
+										self := [];
 										)));
 										
 	clients := nac_v2.mod_Validation.VerifyRelatedClients(cases, clients1);

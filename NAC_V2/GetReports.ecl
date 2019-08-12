@@ -35,7 +35,9 @@ EXPORT GetReports(string lfn) := function
 										self := LEFT.BadRec;
 										));
 										
-		exceptionArchive := PROJECT(exceptions, $.Layouts2.rExceptionRecord);
+		exceptionArchive := PROJECT(exceptions, TRANSFORM($.Layouts2.rExceptionRecord,
+										self.SourceGroupId := left.GroupId;
+										self := left;));
 
 		errs := DISTRIBUTE((+)(addresses.dsErrs,clients.dsErrs,cases.dsErrs,contacts.dsErrs,exceptions.dsErrs,badRecords.dsErrs), RANDOM());
 

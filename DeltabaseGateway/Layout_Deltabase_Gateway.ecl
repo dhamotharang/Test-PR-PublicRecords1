@@ -128,6 +128,10 @@
 			string imei_changedate;
 			integer loststolen;
 			string loststolen_date;
+			string account_activation_date;
+			string line_activation_date;
+			string imei_activationdate;
+			integer acct_tenure_min;
 	end;
 	
 	export Historic_Results_Base := record
@@ -210,6 +214,7 @@
 			string20	imei_changedate;
 			integer5	imei_change_count;
 			string20	imei_tracked_since;
+			string20	imei_activationdate;
 			integer5	first_name_score;
 			integer5	last_name_score;
 			integer5	addr_score;
@@ -260,6 +265,9 @@
 			integer5	email_address_score;
 			integer1	loststolen;
 			string20	loststolen_date;
+			string8		account_activation_date;
+			integer5  acct_tenure_min;
+			string8   line_activation_date;
 			string8		date_added;
 			string6		time_added;
 	end;	

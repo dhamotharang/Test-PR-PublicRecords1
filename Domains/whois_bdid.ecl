@@ -1,9 +1,9 @@
-import ut, Business_Header, Business_Header_SS, did_add,mdr;
+﻿import ut, Business_Header, Business_Header_SS, did_add,mdr;
 
 Layout_Whois_Temp := record
 		string46 company_name;
 		string34 source_group;
-		Layout_Whois_Base_BIP;
+		Layout_Whois_Base_BIP - [global_sid,record_sid]; //Added for CCPA-357
 		string2 source;
 end;
 
@@ -99,7 +99,10 @@ Business_Header.MAC_Source_Match(dWithNoBdids, Domains_BDID_Rematch_0,
                                  false, fein_field);
 
 Domains.Layout_Whois_Base_BIP FormatBase(Layout_Whois_Temp  L) := transform
-self := l;
+//Added for CCPA-357
+self.global_sid := 0;
+self.record_sid := 0;
+self            := l;
 end;
 
 Domains_BDID_All := project(Domains_BDID_Rematch_0 + dWithBdids, FormatBase(left));

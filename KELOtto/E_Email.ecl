@@ -11,7 +11,7 @@ EXPORT E_Email := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
     KEL.typ.nstr Email_Address_;
     KEL.typ.nstr Type_;
-    KEL.typ.nint Otto_Email_Id_;
+    KEL.typ.nstr Otto_Email_Id_;
     KEL.typ.nkdate Created_On_;
     KEL.typ.nstr Host_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -19,7 +19,7 @@ EXPORT E_Email := MODULE
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),emailaddress(Email_Address_:\'\'),type(Type_:\'\'),ottoemailid(Otto_Email_Id_:0),createdon(Created_On_:DATE),host(Host_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),emailaddress(Email_Address_:\'\'),type(Type_:\'\'),ottoemailid(Otto_Email_Id_:\'\'),createdon(Created_On_:DATE),host(Host_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -31,7 +31,7 @@ EXPORT E_Email := MODULE
     UNSIGNED4 Cnt := COUNT(GROUP);
     KEL.typ.uid UID := 0;
   END;
-  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)0);
+  EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
   EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::KELOtto::Email::UidLookup',EXPIRE(7));
@@ -40,7 +40,7 @@ EXPORT E_Email := MODULE
   EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
   EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
   EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
-  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),email_address(Email_Address_:\'\'),email_address_type(Type_:\'\'),ottoemailid(Otto_Email_Id_:0),email_address_date(Created_On_:DATE),host(Host_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH),dt_last_seen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'UID(UID),associatedcustomerfileinfo(_r_Customer_:0),sourcecustomerfileinfo(_r_Source_Customer_:0),email_address(Email_Address_:\'\'),email_address_type(Type_:\'\'),ottoemailid(Otto_Email_Id_:\'\'),email_address_date(Created_On_:DATE),host(Host_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH),dt_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED __d0_Out := RECORD
     RECORDOF(KELOtto.fraudgovshared);
     KEL.typ.uid UID := 0;
@@ -69,7 +69,7 @@ EXPORT E_Email := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Email_Address_;
-    KEL.typ.nint Otto_Email_Id_;
+    KEL.typ.nstr Otto_Email_Id_;
     KEL.typ.ndataset(Details_Layout) Details_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;

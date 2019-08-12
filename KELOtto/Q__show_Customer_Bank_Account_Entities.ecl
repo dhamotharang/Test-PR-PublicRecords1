@@ -20,7 +20,7 @@ EXPORT Q__show_Customer_Bank_Account_Entities := MODULE
     KEL.typ.nfloat Cl_Impact_Weight_;
     KEL.typ.int Cluster_Score_ := 0;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.int Entity_Type_ := 0;
     KEL.typ.int Identity_Count_ := 0;
     KEL.typ.int In_Customer_Population_ := 0;
@@ -63,7 +63,7 @@ EXPORT Q__show_Customer_Bank_Account_Entities := MODULE
     KEL.typ.nfloat Cl_Impact_Weight_;
     KEL.typ.int Cluster_Score_ := 0;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.int Entity_Type_ := 0;
     KEL.typ.int Identity_Count_ := 0;
     KEL.typ.int In_Customer_Population_ := 0;
@@ -100,7 +100,7 @@ EXPORT Q__show_Customer_Bank_Account_Entities := MODULE
     KEL.typ.nfloat Cl_Impact_Weight_;
     KEL.typ.int Cluster_Score_ := 0;
     KEL.typ.int Contributor_Safe_Flag_ := 0;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.int Entity_Type_ := 0;
     KEL.typ.int Identity_Count_ := 0;
     KEL.typ.int In_Customer_Population_ := 0;
@@ -139,7 +139,7 @@ EXPORT Q__show_Customer_Bank_Account_Entities := MODULE
     KEL.typ.ntyp(E_Customer.Typ) Source_Customer_;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.nstr Label_;
     KEL.typ.nint Score_;
     KEL.typ.int Cluster_Score_ := 0;
