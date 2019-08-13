@@ -93,6 +93,7 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			
 			self.SearchEligibilityDate := fn_left(l.eligibility_status_date,r.eligibility_status_date);
 			self.SearchEligibilityStatus := fn_left(l.eligibility_status_indicator,r.eligibility_status_indicator);
+			
 			self.SearchAddress1StreetAddress1 := fn_left(l.Physical_Street1,r.Physical_Street1);
 			self.SearchAddress1StreetAddress2 := fn_left(l.Physical_Street2,r.Physical_Street2);
 			self.SearchAddress1City := fn_left(l.Physical_City,r.Physical_City);
@@ -122,11 +123,15 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.CasePhone1 := fn_right(l.case_Phone1,r.case_Phone1);
 			self.CasePhone2 := fn_right(l.case_Phone2,r.case_Phone2);
 			self.CaseEmail := fn_right(l.case_Email,r.case_Email);
+			
+			self.AddressPhysicalCategory := fn_right(l.Physical_AddressCategory,r.Physical_AddressCategory);	
 			self.CasePhysicalStreet1 := fn_right(l.Physical_Street1,r.Physical_Street1);
 			self.CasePhysicalStreet2 := fn_right(l.Physical_Street2,r.Physical_Street2);
 			self.CasePhysicalCity := fn_right(l.Physical_City,r.Physical_City);
 			self.CasePhysicalState := fn_right(l.Physical_State,r.Physical_State);
 			self.CasePhysicalZip := fn_right(l.Physical_Zip,r.Physical_Zip);
+			
+			self.AddressMailCategory := fn_right(l.Mailing_AddressCategory,r.Mailing_AddressCategory);	
 			self.CaseMailStreet1 := fn_right(l.Mailing_Street1,r.Mailing_Street1);
 			self.CaseMailStreet2 := fn_right(l.Mailing_Street2,r.Mailing_Street2);
 			self.CaseMailCity := fn_right(l.Mailing_City,r.Mailing_City);
@@ -134,7 +139,11 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions(NAC_v2.Layout_Bas
 			self.CaseMailZip := fn_right(l.Mailing_Zip,r.Mailing_Zip);
 			self.CaseCountyParishCode := fn_right(l.CountyCode,r.CountyCode);
 			self.CaseCountyParishName := fn_right(l.CountyName,r.CountyName);
+			
 			self.ClientID := fn_right(l.ClientId,r.ClientId);
+			self.HoHIndicator := fn_right(l.HoH_Indicator,r.HoH_Indicator);
+			self.RelationshipIndicator :=fn_right(l.Relationship,r.Relationship);
+
 			self.ClientLastName := fn_right(l.LastName,r.LastName);
 			self.ClientFirstName := fn_right(l.FirstName,r.FirstName);
 			self.ClientMiddleName := fn_right(l.MiddleName,r.MiddleName);
