@@ -779,7 +779,7 @@ Export CIID := RECORD
   unsigned1 ___addresspobox__flags;
   boolean _addresscmra_;
   unsigned1 ___addresscmra__flags;
-  integer8 otto_address_id_;
+  string otto_address_id_;
   unsigned1 __otto_address_id__flags;
   string primary_range_;
   unsigned1 __primary_range__flags;
@@ -1288,7 +1288,7 @@ Export CIID := RECORD
    integer8 __recordcount;
   END) event_types_;
   unsigned1 __event_types__flags;
-  integer8 otto_address_id_;
+  string otto_address_id_;
   unsigned1 __otto_address_id__flags;
   unsigned4 date_of_birth_;
   unsigned1 __date_of_birth__flags;
