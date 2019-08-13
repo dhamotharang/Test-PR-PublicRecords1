@@ -1,9 +1,9 @@
-import gong, doxie, data_services;
+﻿import gong, doxie, data_services;
 
 valid_gong_full := gong.File_Gong_full(trim(phone10) <> '');
 
 new_gong_record := record
-	valid_gong_full;
+	gong.Layout_bscurrent_raw;
 	string7 phone7;
 	string3 area_code;
 end;
