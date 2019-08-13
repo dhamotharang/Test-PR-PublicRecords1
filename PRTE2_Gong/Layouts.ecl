@@ -1,16 +1,20 @@
-﻿Import Gong_Neustar, Gong, WatchDog,Relocations,Gong_v2,Gong_Platinum,Business_Header;
+﻿Import Gong_Neustar, Gong, WatchDog,Relocations,Gong_v2,Gong_Platinum,Business_Header, prte2, BIPv2;
 
 EXPORT Layouts := module
 
 EXPORT Layout_bscurrent_raw := Gong_Neustar.Layout_bscurrent_raw;
-
+//CCPA layout
 EXPORT Layout_history := {Gong.Layout_history or {string100 cust_name,string20 bug_num, string address1 := '', string city := '', string state := ''
 																		, string zip := '',string link_ssn :='',string link_dob:='',string link_fein:='',string link_inc_date:=''
 																		, unsigned6 powid := 0, unsigned6 proxid := 0, unsigned6 seleid := 0, unsigned6 orgid := 0, unsigned6 ultid := 0}};
 
 EXPORT  layout_historyaid := gong.layout_historyaid;
 
-EXPORT Layout_Gong_DID := Watchdog.Layout_Gong_DID;
+//CCPA Project
+EXPORT Layout_Gong_DID := record
+Watchdog.Layout_Gong_DID;
+prte2.layouts.DEFLT_CPA;
+end;
 
 EXPORT Layout_extra := RECORD
 	STRING30	word;
@@ -89,7 +93,8 @@ EXPORT rec_address := record
   Layout_bscurrent_raw.listed_name;
   string8 date_first_seen;
   Layout_bscurrent_raw.dual_name_flag;
-end;
+END;
+
 
 
 EXPORT Layout_extra_city := RECORD
@@ -112,6 +117,7 @@ END;
 export layout_gng_hhid := RECORD
 	UNSIGNED6 hhid := 0;
 	Layout_bscurrent_raw;
+	PRTE2.Layouts.DEFLT_CPA;
 END;
 
 export Layout_HistorySurname := Gong.Layout_HistorySurname;
@@ -172,6 +178,7 @@ EXPORT Layout_Gong_Temp := RECORD
 		unsigned2         phone_sequence_score := 0;
 		boolean           ebc_flag;
 END;
+
 EXPORT Layout_gong_in := RECORD
 	string3 bell_id;
 	string11 filedate;
@@ -252,5 +259,35 @@ EXPORT Layout_gong_in := RECORD
 	string link_fein;
 	string8 link_inc_date;
 END;
+
+export layout_base := record
+Gong.Layout_history and not [global_sid, record_sid];
+unsigned8 rawaid;
+string pclean;
+string5 pdid;
+string1 nametype;
+string80 preppedname;
+unsigned8 nid;
+unsigned2 name_ind;
+unsigned8 persistent_record_id;
+BIPV2.IDlayouts.l_xlink_ids;	
+//CCPA-22 CCPA new fields
+PRTE2.Layouts.DEFLT_CPA;
+string address1 := '';
+string city := '';
+string state := ''; 
+string zip := '';
+string10 cust_name;
+string10 bug_num; 
+string link_ssn :='';
+string link_dob:='';
+string link_fein:='';
+string link_inc_date:='';
+end;
+
+EXPORT layout_historyaid_clean := record
+gong.layout_historyaid and not [global_sid, record_sid];
+PRTE2.Layouts.DEFLT_CPA;
+end;
 
 END;
