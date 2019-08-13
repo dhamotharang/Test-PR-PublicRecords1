@@ -1,4 +1,4 @@
-//****************Maps Gong history  to a common layout********************
+﻿//****************Maps Gong history  to a common layout********************
 import Gong, ut, _validate, mdr;
 phone_file := dedup(sort(distribute(Gong.File_History((unsigned)phone10 <> 0 and current_record_flag <> 'Y'), hash(phone10)), phone10, -dt_last_seen, local), phone10, local);
 
@@ -45,6 +45,7 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.mname						:= input.name_middle;
 	self.lname						:= input.name_last;
 	self.did						:= (unsigned)input.did;
+	self.pdid	:= 0; //DF-25799 Fix PhonesPlus V2 Build Error 20190813
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 
