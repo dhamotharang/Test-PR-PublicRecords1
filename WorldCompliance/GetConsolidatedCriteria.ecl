@@ -11,8 +11,20 @@
 														, LEFT OUTER),
 								id);
 												
-		return PROJECT(srcs(criteriaValue <> 0), TRANSFORM($.rSearchCriteria,
+		s2 := PROJECT(SORT(srcs(criteriaValue <> 0),id, criteriaValue, local),
+							TRANSFORM($.rSearchCriteria,
 								self.id := left.id;
-								self.criteria := U'6,' + (UNICODE)left.criteriaValue + U';';));
+								self.criteria := (unicode)left.criteriaValue;));
+								
+		s3 := ROLLUP(s2, TRANSFORM($.rSearchCriteria,
+								self.id := left.id;
+								self.criteria := left.criteria + U',' + right.criteria;),
+								id, local);
+												
+		s4 := PROJECT(s3, TRANSFORM($.rSearchCriteria,
+								self.id := left.id;
+								self.criteria := U'6,' + left.criteria + U';';));
+								
+		return s4;
 
 END;
