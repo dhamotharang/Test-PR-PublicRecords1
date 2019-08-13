@@ -44,8 +44,8 @@ Layout_In_Phonesplus.Layout_In_Common t_map_common_layout(phone_f input) := Tran
 	self.fname						:= input.name_first;
 	self.mname						:= input.name_middle;
 	self.lname						:= input.name_last;
-	self.did						:= (unsigned)input.did;
-	self.pdid	:= 0; //DF-25799 Fix PhonesPlus V2 Build Error 20190813
+	self.did						  := (unsigned)input.did;
+	self.pdid	  					:= (unsigned6)input.pdid; //DF-25799 Fix PhonesPlus V2 Build Error 20190813
 	self 							:= input; 
 	self.CellPhoneIDKey         	:= hashmd5((data)self.orig_phone [length(self.orig_phone) - 6 ..length(self.orig_phone)] + 
 											   (data)self.prim_range + 
