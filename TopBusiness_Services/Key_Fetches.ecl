@@ -96,11 +96,11 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
 
   // *** Key fetch to get EBR 0010 (header data) linkids key records
 	// NOTE: This one will need to use a passed in fetch limit
-	EXPORT ds_ebr0010_linkidskey_recs := EBR.Key_0010_Header_linkIds.kFetch(ds_in_linkids,
+	EXPORT ds_ebr0010_linkidskey_recs := EBR.Key_0010_Header_linkIds.kFetch(ds_in_linkids, ,
 	                                                                        FETCH_LEVEL,,,FETCH_LIMIT);
 
   // *** Key fetch to get EBR 5600 (Demographic data) linkids key records
-  EXPORT ds_ebr5600_linkidskey_recs := EBR.Key_5600_Demographic_Data_LinkIds.kFetch(ds_in_linkids,
+  EXPORT ds_ebr5600_linkidskey_recs := EBR.Key_5600_Demographic_Data_LinkIds.kFetch(ds_in_linkids, ,
 	                                                                                  FETCH_LEVEL,,,FETCH_LIMIT);
 
   // *** key fetch to get equifax Business Data linkids key records
@@ -128,7 +128,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
   EXPORT ds_frandx_linkidskey_recs := Frandx.Key_Linkids.kFetch(ds_in_linkids,FETCH_LEVEL);
 
   // *** Key fetch to get Gong history linkids key records
-	EXPORT ds_gong_linkidskey_recs := Gong.Key_History_LinkIDs.KFetch(ds_in_linkids, FETCH_LEVEL,,FETCH_LIMIT);
+	EXPORT ds_gong_linkidskey_recs := Gong.Key_History_LinkIDs.KFetch(ds_in_linkids, mod_access, FETCH_LEVEL,,FETCH_LIMIT);
 
 // *** key fetch to get Infutor Narb linkids key records
 

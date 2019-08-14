@@ -274,9 +274,12 @@ EXPORT Transforms := MODULE
     SELF.Original.IPAddress := le.Original.ip;
     SELF.Original.LoginDate := le.Original.login_date;
     SELF.Original.Website := le.Original.site;
+    SELF.Original.CompanyTitle := le.CompanyTitle;
+    SELF.Original.CompanyName := le.orig_CompanyName;
     SELF.Original := le.Original;
     
     SELF.Cleaned.EmailAddress := le.Cleaned.clean_email;
+    SELF.Cleaned.CompanyName := le.cln_CompanyName;
     SELF.Cleaned.Name.first := le.Cleaned.Name.fname;
     SELF.Cleaned.Name.Middle := le.Cleaned.Name.mname;
     SELF.Cleaned.Name.last := le.Cleaned.Name.lname;

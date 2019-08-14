@@ -1,6 +1,6 @@
-import prof_licenseV2, riskwise, ut, risk_indicators;
+﻿import prof_licenseV2, riskwise, ut, risk_indicators, doxie, Suppress;
 
-export AMLProflicense(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only) := FUNCTION
+export AMLProflicense(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 Layout_PL_Plus := RECORD
@@ -18,11 +18,16 @@ Layout_PL_Plus := RECORD
 	unsigned4 seq;
 END;
 
+  Layout_PL_Plus_CCPA := RECORD
+        unsigned4 global_sid; // CCPA changes
+		Layout_PL_Plus;
+	end;
+
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 
 key_did := prof_licenseV2.Key_Proflic_Did ();
 
-Layout_PL_Plus PL_nonFCRA(ids_only le, key_did rt) := transform
+Layout_PL_Plus_CCPA PL_nonFCRA(ids_only le, key_did rt) := transform
 	hit := trim(rt.prolic_key)!='';	// check to see that we have a good record
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
 	self.prolic_key := rt.prolic_key;
@@ -33,6 +38,7 @@ Layout_PL_Plus PL_nonFCRA(ids_only le, key_did rt) := transform
 	self.date_most_recent := if(hit, (unsigned)rt.date_last_seen, 0);// seems to be the issue date, should we check prolic_key<>'' here?
 	self.expiration_date := if(hit, (unsigned)rt.expiration_date, 0);//should we check prolic_key<>'' here?
 	self.HRProfLicProv := if(hit and rt.license_type in AML.AMLConstants.setHRProfLic, 1, 0);
+    self.global_sid := rt.global_sid;
 	self := le;
 end;
 license_recs := join(ids_only, key_did,
@@ -42,7 +48,7 @@ license_recs := join(ids_only, key_did,
 											atmost(right.did = left.did, riskwise.max_atmost));
 
 
-Layout_PL_Plus roll_licenses(Layout_PL_Plus le, Layout_PL_Plus rt) := transform
+Layout_PL_Plus_CCPA roll_licenses(Layout_PL_Plus_CCPA le, Layout_PL_Plus_CCPA rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;
 	self.proflic_count := le.proflic_count+IF(le.prolic_key=rt.prolic_key,0,rt.proflic_count);
 	self.date_most_recent := Max(le.date_most_recent,rt.date_most_recent);
@@ -51,9 +57,11 @@ Layout_PL_Plus roll_licenses(Layout_PL_Plus le, Layout_PL_Plus rt) := transform
 	self.HRProfLicProv := if(le.HRProfLicProv, le.HRProfLicProv, rt.HRProfLicProv);
 	self := rt;
 end;
-rolled_licenses := rollup(sort(license_recs, prolic_key,-date_most_recent), true, roll_licenses(left,right));	
 
+rolled_licenses_suppressed := Suppress.Mac_SuppressSource(rollup(sort(license_recs, prolic_key,-date_most_recent), true, roll_licenses(left,right)), mod_access);	
 
+rolled_licenses := PROJECT(rolled_licenses_suppressed, TRANSFORM(Layout_PL_Plus,
+                                                  SELF := LEFT));
 
 // output(license_recs, named('license_recs'), overwrite);					
 // output(rolled_licenses, named('rolled_licenses'), overwrite);					

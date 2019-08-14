@@ -167,6 +167,7 @@ export t_BasePhoneInfo := record
 	string ListingName {xpath('ListingName')};
 	string PhoneStatus {xpath('PhoneStatus')};
 	string2 PhoneAddressState {xpath('PhoneAddressState')};
+	string Source {xpath('Source')};
 end;
 		
 export t_PhoneFinderInfo := record (t_BasePhoneInfo)

@@ -1,4 +1,4 @@
-﻿IMPORT Phone_Shell, RiskWise, UT, STD;
+﻿IMPORT Phone_Shell, RiskWise, UT, STD, doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) Input,
 																																									UNSIGNED1 GLBPurpose,
@@ -6,8 +6,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 																																									STRING50 DataRestrictionMask,
 																																									UNSIGNED3 InsuranceVerificationAgeLimit,
 																																									STRING30 IndustryClass,
-                                         UNSIGNED2 PhoneShellVersion = 10 // default to PhoneShell V1.0, use 20 (for version 2.0) and so on for other versions
-																																								) := FUNCTION
+                                         UNSIGNED2 PhoneShellVersion = 10, // default to PhoneShell V1.0, use 20 (for version 2.0) and so on for other versions
+										 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	/* ******************************************************************************
    ********************************************************************************
 	 ** This function gathers attributes for all of the discovered phone numbers.  **
@@ -17,17 +17,17 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 	 /* ***************************************************************
 		* 			Gather all of the attributes for these phones						*
 	  *************************************************************** */
-	EDA := Phone_Shell.Get_Attributes_EDA(Input, PhoneShellVersion);
+	EDA := Phone_Shell.Get_Attributes_EDA(Input, PhoneShellVersion, mod_access);
 		
-	Inquiries := Phone_Shell.Get_Attributes_Inquiries(Input, PhoneShellVersion);
+	Inquiries := Phone_Shell.Get_Attributes_Inquiries(Input, PhoneShellVersion, mod_access);
 	
-	InternalCorroboration := Phone_Shell.Get_Attributes_Internal_Corroboration(Input, InsuranceVerificationAgeLimit);
+	InternalCorroboration := Phone_Shell.Get_Attributes_Internal_Corroboration(Input, InsuranceVerificationAgeLimit, mod_access);
 	
-	PhoneFeedback := Phone_Shell.Get_Attributes_Phone_Feedback(Input);
+	PhoneFeedback := Phone_Shell.Get_Attributes_Phone_Feedback(Input, mod_access);
 	
-	PhonesPlus := Phone_Shell.Get_Attributes_Phones_Plus(Input, GLBPurpose, DPPAPurpose, IndustryClass, DataRestrictionMask);
+	PhonesPlus := Phone_Shell.Get_Attributes_Phones_Plus(Input, GLBPurpose, DPPAPurpose, IndustryClass, DataRestrictionMask, mod_access);
 	
-	RawPhone := Phone_Shell.Get_Attributes_Raw_Phone(Input);
+	RawPhone := Phone_Shell.Get_Attributes_Raw_Phone(Input, mod_access);
 	
 	SubjectLevel := Phone_Shell.Get_Attributes_Subject_Level(Input);
 	

@@ -1,8 +1,8 @@
-IMPORT iesp,AutoStandardI,Address,doxie,Gateway,VehicleV2_Services;
+IMPORT $, iesp,AutoStandardI, Address, doxie, Gateway, VehicleV2_Services;
 
 EXPORT Get_Experian_Data := MODULE
 
-	EXPORT get_processType(IParam.polkParams in_mod, STRING addr182) := FUNCTION
+	EXPORT get_processType($.IParam.polkParams in_mod, STRING addr182) := FUNCTION
 		clnAddr := Address.CleanFields(addr182);
 		BOOLEAN hasName := TRIM(in_mod.lastname)!='' OR TRIM(in_mod.companyname)!='';
 		BOOLEAN hasPrimRange := TRIM(clnAddr.prim_range)!='';
@@ -12,7 +12,7 @@ EXPORT Get_Experian_Data := MODULE
 		BOOLEAN hasCSZ := TRIM(clnAddr.p_city_name)!='' AND TRIM(clnAddr.st)!='' AND TRIM(clnAddr.zip)!='';
 		BOOLEAN hasAddr := (hasPrimRange AND hasPrimName AND hasCSZ) OR (isRRTyp AND hasCSZ) OR	(isPoBox AND hasCSZ);
 		BOOLEAN hasNameAddr	:= hasName AND hasAddr;
-		BOOLEAN hasPlateState := TRIM(in_mod.LicensePlateNum)!='' AND TRIM(functions.get_state(in_mod))!='';
+		BOOLEAN hasPlateState := TRIM(in_mod.LicensePlateNum)!='' AND TRIM(in_mod.state)!='';
 		BOOLEAN hasVin := TRIM(in_mod.vin_in)!='';
 		STRING1 processType := 
 		MAP(hasNameAddr AND hasVin => Constant.EXP_SRCH.VIN_STANDARD,
@@ -23,7 +23,7 @@ EXPORT Get_Experian_Data := MODULE
 		RETURN processType;
 	END;
 
-	EXPORT val(IParam.polkParams in_mod, BOOLEAN doCombined=FALSE) := FUNCTION
+	EXPORT val($.IParam.polkParams in_mod, BOOLEAN doCombined=FALSE) := FUNCTION
 		// STRING serviceURL := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@10.194.9.67:8082/';
 		// STRING serviceURL := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@10.194.5.12:5004/';		
 		gateway_cfg					 := Gateway.Configuration.Get();
@@ -32,7 +32,7 @@ EXPORT Get_Experian_Data := MODULE
 		
 		dppa := Exp_Code_Translations.get_dppa(in_mod.RealTimePermissibleUse);		
 
-		STRING2 state := functions.get_state(in_mod);
+		STRING2 state := in_mod.state;
 		STRING64 cityStateZip := TRIM(in_mod.city)+' '+state+' '+TRIM(in_mod.zip);
 		addr182 := IF(in_mod.clnAddr182!='',in_mod.clnAddr182,
 			address.GetCleanAddress(TRIM(in_mod.addr),cityStateZip,address.Components.Country.US).str_addr);

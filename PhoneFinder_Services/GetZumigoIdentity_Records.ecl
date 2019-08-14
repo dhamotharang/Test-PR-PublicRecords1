@@ -181,6 +181,7 @@ MODULE
    SELF.imsi_seensince := r.imsi_seensince;
    SELF.imei_seensince := r.imei_seensince;
    SELF.imei_changedate := r.imei_changedate;
+   SELF.imei_ActivationDate := r.imei_ActivationDate;
    SELF.loststolen := r.loststolen;
    SELF.loststolen_date := r.loststolen_date;
    

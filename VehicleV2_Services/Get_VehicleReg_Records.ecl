@@ -12,12 +12,12 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
 		string30 vin_val                  := '' : STORED('VinWild');
 		string20 tag_val                  := '' : STORED('TagWild');
 						
-    string30 county_val               := aInput.County;				
+    string30 county_value             := aInput.County;				
 		STRING30 fname_val                := aInput.FirstName;
 		string30 mname_val								:= aInput.MiddleName;		
 		string30 lname_val								:= aInput.LastName;
 		string30 city_val								  := aInput.city;		
-		string2	 state_val								:= aInput.State;		 
+		string2	 state_value							:= aInput.state;		 
 		unsigned8 Maxresults_val          := if (aInput.maxresultsVal > 1000, 1000, 
 		                                         aInput.maxresultsVal); // could lower this constant if needed.		                                    		 	
 		unsigned8 maxResultsThisTime_val := if (aInput.MaxResultsVal > 1000,1000,																					
@@ -36,9 +36,7 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
 		//string TitleNumber := aInput.TitleNumber;
 		vin_value := stringlib.stringtouppercase(vin_val);		
 		tag_value := stringlib.stringtouppercase(tag_val);	
-		county_value := stringlib.stringtouppercase(county_val);		
 		city_value := stringlib.stringtouppercase(city_val);		
-		state_value := stringlib.stringtouppercase(state_val);
 		dppa_ok := dppa_purpose > 0 and dppa_purpose < 8;		
 		ssn_mask_value := StringLib.StringToUpperCase(ssn_mask_val);
 		dl_mask_value := dl_mask_val=1;
@@ -189,13 +187,13 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
 		INTEGER _ageRangeStart := 0 : STORED('Age');
 		INTEGER ageRangeStart_ := IF (LENGTH(TRIM((STRING) _ageRangeStart)) < 4, 
 								(INTEGER)_ageRangeStart,
-								(INTEGER)ut.GetAge((STRING) _ageRangeStart)
+								ut.Age(_ageRangeStart)
 								);
 
 		INTEGER _ageRangeEnd := 0 : STORED('AgeMax');
 		INTEGER ageRangeEnd_ := IF(LENGTH(TRIM((STRING) _ageRangeEnd)) < 4,
 							  if ( (INTEGER)_ageRangeEnd = 0 AND _ageRangeStart <> 0, (INTEGER)_ageRangeStart, (INTEGER)_ageRangeEnd),
-							  (INTEGER)ut.GetAge((STRING) _ageRangeEnd)
+							  ut.Age(_ageRangeEnd)
 								);
 
 		INTEGER ageRangeStart_use := IF(ageRangeStart_ < ageRangeEnd_, ageRangeStart_, ageRangeEnd_);
@@ -922,3 +920,4 @@ doxie.MAC_Marshall_Results(outfile,outf);
 	//output(wildCardRecstmp, named('wildCardRecsTmp'));
 	EXPORT RegVehRecsWildCardRegSearch := RegVehRecsWildCardRegSearchSorted;
   END;
+  

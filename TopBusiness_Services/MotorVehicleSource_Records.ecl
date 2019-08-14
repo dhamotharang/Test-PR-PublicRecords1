@@ -5,7 +5,7 @@
 //
 // This attribute was created by copying PersonReports.vehicle_records and 
 // modifying it for use by TopBusiness_Services.SourceService_Records.
-import iesp, VehicleV2, VehicleV2_Services, BIPV2,ut;
+import iesp, VehicleV2, VehicleV2_Services, BIPV2, ut;
 
 EXPORT MotorVehicleSource_Records(
 	dataset(Layouts.rec_input_ids_wSrc) in_docids,
@@ -89,7 +89,9 @@ EXPORT MotorVehicleSource_Records(
 	
 	mvr_keys_dedup := DEDUP(mvr_keys,ALL);
 	
-	mvr_sourceview := VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(mvr_keys_dedup,inoptions.ssn_mask);
+
+	mod_vehicle_report := VehicleV2_Services.IParam.getReportModule();
+	mvr_sourceview := VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(mod_vehicle_report, mvr_keys_dedup, inoptions.ssn_mask);
 
 	SHARED mvr_sourceview_wLinkIds := JOIN(mvr_sourceview,mvr_keys_comb,
 																					LEFT.Vehicle_Key = RIGHT.Vehicle_Key AND

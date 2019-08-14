@@ -20,7 +20,7 @@ EXPORT EBRSource_Records(
 																																		SELF := []));
 	
 	// *** Key fetch to get ebr filing numbers from linkids
-  ds_ebrkeys := PROJECT(EBR.Key_0010_Header_linkids.kFetch(in_docs_linkonly,inoptions.fetch_level),
+  ds_ebrkeys := PROJECT(EBR.Key_0010_Header_linkids.kFetch(in_docs_linkonly, ,inoptions.fetch_level),
 																TRANSFORM(TopBusiness_Services.Layouts.rec_input_ids_wSrc,
 																					SELF.IdValue := LEFT.file_number,
 																					SELF := LEFT,

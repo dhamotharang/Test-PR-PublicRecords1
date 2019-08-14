@@ -1,4 +1,4 @@
-/*Now (lhill)
+﻿/*Now (lhill)
 Text In Open Window
 */
 /*2013-11-21T00:11:15Z (Lorraine Hill)
@@ -9,9 +9,9 @@ Text In Open Window
  * - LexID (DID):: Source: UtilDID																				*
  ************************************************************************ */
 
-IMPORT Phone_Shell, Risk_Indicators, RiskWise, UT, Utilfile, STD, Doxie;
+IMPORT Phone_Shell, RiskWise, UT, Utilfile, STD, Doxie;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 PhoneRestrictionMask, STRING30 IndustryClass) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Utility (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 GLBPurpose, UNSIGNED1 PhoneRestrictionMask, STRING30 IndustryClass, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getUtility(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Utilfile.Key_DID ri) := TRANSFORM
 		
 		SELF.Gathered_Phone := IF((INTEGER)ri.phone <> 0, TRIM(ri.phone), TRIM(ri.work_phone));

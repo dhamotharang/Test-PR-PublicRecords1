@@ -42,7 +42,7 @@ EXPORT getTradelines(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	END;
 	
 	// --------------- EBR Data ----------------
-	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	EBRRaw := EBR.Key_0010_Header_linkids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, // ScoreThreshold --> 0 = Give me everything
 																							linkingOptions,

@@ -1,10 +1,11 @@
-import doxie, risk_indicators, doxie_raw, progressive_phone, ut, mdr, header, drivers, Riskwise, Relationship;
+﻿import doxie, risk_indicators, doxie_raw, progressive_phone, ut, mdr, header, drivers, Riskwise, Relationship, Suppress;
 
 EXPORT AMLRelativesAssocs ( Grouped DATASET(Layouts.RelativeParentLayout) iid_res,    
 													 unsigned1 dppa, 
 													 unsigned1 glb,
 													 boolean isFCRA = false, 
-													 string50 DataRestriction
+													 string50 DataRestriction,
+                                                     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 													 ) := FUNCTION;
 
 Relationship.mac_read_application_type();  
@@ -95,14 +96,22 @@ relatives_slim := record
 	unsigned1 RelatParentPubRec10yrs;
 end;
 								
-
-
+relatives_slim_CCPA := RECORD
+  unsigned4 global_sid;
+  relatives_slim;
+END;
 
 AllDIDs :=  rel_ids + SubjectDIDS ;
 
-	Doxie_Raw.Layout_HeaderRawOutput getHeaderRaw(AllDIDs le, Doxie.Key_Header ri) := TRANSFORM
+Doxie_Raw_CCPA := RECORD
+  unsigned4 global_sid;
+  Doxie_Raw.Layout_HeaderRawOutput;
+END;
+
+	Doxie_Raw_CCPA getHeaderRaw(AllDIDs le, Doxie.Key_Header ri) := TRANSFORM
 		SELF.rid := le.seq;
 		self.did := le.did;
+        self.global_sid := ri.global_sid;
 		SELF := ri;
 		SELF := [];
 	END;
@@ -138,8 +147,9 @@ JustParents := join(ParentIDs, RelidsWseq,
 												 right.didseq=left.seq ,
 									 getParentHistDt(left,right));
 
-relatives_slim getParentHeader(JustParents le, header_raw ri) := TRANSFORM
+relatives_slim_CCPA getParentHeader(JustParents le, header_raw ri) := TRANSFORM
   self.did := le.did;
+  self.global_sid := ri.global_sid;
 	SELF.relation := le.relation;
 	SELF.seq   :=  le.seq;
 	SELF.prim_range := ri.prim_range;
@@ -175,26 +185,37 @@ ParentHeader := join(JustParents, header_raw, right.dt_first_seen <> 0 and left.
 										 getParentHeader(left,right), left outer, keep(1));
 
 
-ParentHdrTenYrs := project(ParentHeader, TRANSFORM(relatives_slim, 
+ParentHdrTenYrs := project(ParentHeader, TRANSFORM(relatives_slim_CCPA, 
 																					self.RelatParentPubRec10yrs := if((ut.DaysApart((string)left.firstseendt, (string)risk_indicators.iid_constants.myGetDate(left.historydate)) >= ut.DaysInNYears(10)),1,0),
 																					self := left));
 																						
 
-relatives_slim rollrelatives(ParentHdrTenYrs le,ParentHdrTenYrs ri ) := Transform
+relatives_slim_CCPA rollrelatives(ParentHdrTenYrs le,ParentHdrTenYrs ri ) := Transform
 		self.RelatParentPubRec10yrs := if(le.RelatParentPubRec10yrs = 1, le.RelatParentPubRec10yrs, ri.RelatParentPubRec10yrs);
-		self := le;
+        self := le;
 End;
 
 rollRelatPar := rollup(ParentHdrTenYrs, left.seq=right.seq, rollrelatives(left, right));
 
-RelateParentResults := 	join(RelidsWseq, rollRelatPar,
+RelativeParentLayout_CCPA := RECORD
+unsigned4 global_sid;
+Layouts.RelativeParentLayout;
+END;
+
+
+RelateParentResultsJoined := 	join(RelidsWseq, rollRelatPar,
 												 left.didseq=right.seq ,
-												 transform(Layouts.RelativeParentLayout, 
+												 transform(RelativeParentLayout_CCPA, 
 																	 self.RelatParentPubRec10yrs := right.RelatParentPubRec10yrs,
+                                                                     self.global_sid := right.global_sid,
 																	 self := left),
 												left outer);
 							
+RelateParentResultsSuppressed := Suppress.Mac_SuppressSource(RelateParentResultsJoined, mod_access);	
 
+RelateParentResults := PROJECT(RelateParentResultsSuppressed, TRANSFORM(Layouts.RelativeParentLayout,
+                                                   SELF := LEFT));
+                                                   
 // output(iid_res, named('iid_res'));
 // output(RelidsWseq, named('RelidsWseq'));
 // output(rel_ids, named('rel_ids'), overwrite);

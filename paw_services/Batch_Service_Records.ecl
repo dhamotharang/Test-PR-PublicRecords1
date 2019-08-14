@@ -1,10 +1,10 @@
 ﻿
-IMPORT Autokey_batch, AutokeyB2, BatchServices, Doxie, PAW, paw_services, AutokeyB2_batch, NID, BatchShare, Suppress;
+IMPORT AutoStandardI,Autokey_batch, AutokeyB2, BatchServices, Doxie, PAW, paw_services, AutokeyB2_batch, NID, BatchShare, Suppress;
 
 EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) ds_batch_in = DATASET([],Autokey_batch.Layouts.rec_inBatchMaster),
-                              BOOLEAN return_current_only = FALSE ) := 
+                              Doxie.IDataAccess mod_access, BOOLEAN return_current_only = FALSE ) := 
 	FUNCTION
-	
+
 	  // constants:
 		
 		TOO_MANY_MATCHES := AutokeyB2_batch.Constants.FAILED_TOO_MANY_MATCHES;
@@ -67,12 +67,12 @@ EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) d
 		ids_acctno   := p_ids_acctno + c_ids_acctno + PROJECT(c_did(did=0), id_rec);
 		
 		// 4. Get matching PAW records.
-		recs_pre := join(ids_acctno, paw.Key_contactID,
+		recs_pre_1 := join(ids_acctno, paw.Key_contactID,
 		                 LEFT.contact_id = RIGHT.contact_id,
 								     TRANSFORM(paw_services.Layouts.batch_in, 
 															self.MATCHCODES := '', SELF.ERROR_CODE := 0, SELF := RIGHT, SELF := LEFT),
 											ATMOST(ut.limits.PAW_PER_CONTACTID)); //currently is upto 25 recs per contactId in index
-		
+		recs_pre := suppress.MAC_SuppressSource(recs_pre_1,mod_access);
 		// 5. Filter out non-current records, if selected.
 		recs_no_penalty := recs_pre((return_current_only AND record_type = PAW_Services.Constants.IS_CURRENT_RECORD) OR NOT return_current_only);
 

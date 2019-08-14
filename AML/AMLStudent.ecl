@@ -1,6 +1,6 @@
-import american_student_list, Riskwise, AlloyMedia_student_list, RISK_INDICATORS;
+﻿import american_student_list, Riskwise, AlloyMedia_student_list, RISK_INDICATORS, doxie, Suppress;
 
-export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_only) := FUNCTION
+export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_only, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 		
 	Layout_AS_Plus := RECORD
 		string8 DATE_FIRST_SEEN;
@@ -13,8 +13,13 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 		unsigned3 historydate;
 		string1 src; // used to identify source ('A'=alloy vs 'C' or 'H' = american student) so we can tiebreak on rollup
 	end;
+  
+  Layout_AS_Plus_CCPA := RECORD
+        unsigned4 global_sid; // CCPA changes
+		Layout_AS_Plus;
+	end;
 	 
-	Layout_AS_Plus student(ids_only le, american_student_list.key_DID ri) := TRANSFORM
+	Layout_AS_Plus_CCPA student(ids_only le, american_student_list.key_DID ri) := TRANSFORM
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
@@ -22,10 +27,10 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 		self.AttendCollege := ri.file_type in ['A', 'H', 'C'] or (ri.file_type = 'M' and ri.college_code <> '' and  ri.tier <> '' and ri.college_major <> '') or
 						(ri.file_type = '' and ri.college_code <> '' and  ri.tier <> '' and ri.college_major <> ' ' and  ri.class <> '' and ri.income_level_code <> '') ;
 		self.src := ri.historical_flag; // ASL records will be indicated by a historical (H) or current (C) indicator
+        self.global_sid := ri.global_sid;
 		self := [];
 	end;
 	
-// Flagged as college attendance if
 // 1.	ams_file_type in [“A”, “H”, “C”]
 // 2.	ams_file_type in[“M”] AND any of the following are populated: (ams_college_code, ams_college_tier, ams_college_major)
 // 3.	ams_file_type in[“”] AND any of the following are populated: (ams_college_code, ams_college_tier, ams_college_major, ams_class, ams_income_level_code)
@@ -38,7 +43,7 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
 	);
 
-	Layout_AS_Plus roll( Layout_AS_Plus le, Layout_AS_Plus ri ) := TRANSFORM
+	Layout_AS_Plus_CCPA roll( Layout_AS_Plus_CCPA le, Layout_AS_Plus_CCPA ri ) := TRANSFORM
 		self := map(
 			// current ASL over historical
 			le.src='C' and ri.src='H' => le,
@@ -62,7 +67,7 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 
 
 	// alloy
-	Layout_AS_Plus alloy_main(ids_only le, AlloyMedia_student_list.Key_DID ri) := TRANSFORM
+	Layout_AS_Plus_CCPA alloy_main(ids_only le, AlloyMedia_student_list.Key_DID ri) := TRANSFORM
 		self.did := le.did;
 		self.seq := le.seq;
 		self.historydate := le.historydate;
@@ -96,7 +101,8 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 		self.HRDegreeField := college_major in ['P','G','T','S'];  // accounting, law, medicine, finance
 		self.date_first_seen := ri.date_vendor_first_reported; 
 		self.date_last_seen := min( RISK_INDICATORS.iid_constants.mygetdate(le.historydate), ri.date_vendor_last_reported );
-		self := [];
+		self.global_sid := ri.global_sid;
+        self := [];
 	end;
 
 	alloy_file := join(ids_only, AlloyMedia_student_list.Key_DID, 
@@ -105,9 +111,10 @@ export AMLStudent(GROUPED DATASET(RISK_INDICATORS.Layout_Boca_Shell_ids) ids_onl
 			and right.date_vendor_first_reported < RISK_INDICATORS.iid_constants.myGetDate(left.historydate),
 			alloy_main(left, right), atmost(keyed(left.did=right.did), 100), keep(1));
 
+    student_all_suppressed := Suppress.Mac_SuppressSource(group(rollup(sort(ungroup(student_file + alloy_file),seq, did), roll(left,right), seq, did),seq, did),mod_access);
+    student_all := PROJECT(student_all_suppressed, TRANSFORM(Layout_AS_Plus,
+                                                  SELF := LEFT));
 
-	student_all := group(rollup(sort(ungroup(student_file + alloy_file),seq, did), roll(left,right), seq, did),seq, did);
-	
 	// output(student_file, named('student_file'), overwrite);
 	// output(alloy_file, named('alloy_file'), overwrite);
 	// output(student_all, named('student_all'), overwrite);

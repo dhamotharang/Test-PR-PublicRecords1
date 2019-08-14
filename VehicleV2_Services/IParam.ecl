@@ -2,7 +2,7 @@ IMPORT AutoStandardI, AutoHeaderI, AutoKeyI, iesp, VehicleV2_Services, BatchShar
 
 EXPORT IParam := MODULE
 	
-	EXPORT AutoKeyIdsParams := interface(AutoKeyI.AutoKeyStandardFetchBaseInterface)
+	SHARED AutoKeyIdsParams := interface(AutoKeyI.AutoKeyStandardFetchBaseInterface)
 		EXPORT BOOLEAN workHard := FALSE;
 		EXPORT BOOLEAN noFail := FALSE;
 		EXPORT BOOLEAN isdeepDive := FALSE;
@@ -349,8 +349,9 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 			EXPORT BOOLEAN		dl_Mask	:= AutoStandardI.InterfaceTranslator.dl_mask_value.val(project(input_params,AutoStandardI.InterfaceTranslator.dl_mask_value.params)); ;
 			EXPORT BOOLEAN 		excludeLessors := AutoStandardI.InterfaceTranslator.Exclude_Lessors.val(project(input_params,AutoStandardI.InterfaceTranslator.Exclude_Lessors.params));
 			EXPORT BOOLEAN 		displayMatchedParty := AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.val(project(input_params,AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.params));;
-      // translate 3 "standard" library fields here, since we will use them in places other than standard search
+      // translate 4 "standard" library fields here, since we will use them in places other than standard search
 			EXPORT STRING2 		state := AutoStandardI.InterfaceTranslator.state_value.val(project(input_params,AutoStandardI.InterfaceTranslator.state_value.params)); 
+			EXPORT STRING30 	county := AutoStandardI.InterfaceTranslator.county_value.val(PROJECT(input_params,AutoStandardI.InterfaceTranslator.county_value.params));
 			EXPORT STRING30 		firstname := AutoStandardI.InterfaceTranslator.fname_value.val(project(input_params,AutoStandardI.InterfaceTranslator.fname_value.params)); 
 			EXPORT STRING30			lastname := AutoStandardI.InterfaceTranslator.lname_value.val(project(input_params,AutoStandardI.InterfaceTranslator.lname_value.params)); 
 			EXPORT unsigned8 	maxresultsVal := AutoStandardI.InterfaceTranslator.MaxResults_val.val(project(input_params,AutoStandardI.InterfaceTranslator.MaxResults_val.params));

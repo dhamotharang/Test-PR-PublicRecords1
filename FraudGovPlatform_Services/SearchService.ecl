@@ -122,7 +122,7 @@ EXPORT SearchService() := MACRO
 
 		RETURN ds_batch_in;
 	END;
-
+ 
 	batch_params := FraudGovPlatform_Services.IParam.getBatchParams();
 	search_mod := GetSearchModule(first_row.SearchBy);
 
@@ -131,13 +131,9 @@ EXPORT SearchService() := MACRO
 	ds_searchrecords := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
 	
 	search_records := ds_searchrecords.ds_results;
-	adlDIDFound := ds_searchrecords.adlDIDFound;
-	ds_adl_in := ds_searchrecords.ds_adl_in;
-	
-	//Per GRP-2060, we save RINID (stored in the lexid field), when the user entered full DOB, SSN and full name
-	// as search criteria and we couldn't resolve to a lexid from publicrecords
-	// but we found a SINGLE identity record in the contributory data
-	useRINID := COUNT(search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)) = 1 AND isMinimumForRINID AND ~adlDIDFound;
+	adlDIDFound := ds_searchrecords.DidFoundInPR;
+	ds_adl := ds_searchrecords.ds_adl;
+	adl_did_input_PII := ds_searchrecords.ds_in_w_adl_did_appended;
 
 	iesp.fraudgovsearch.t_FraudGovSearchResponse final_transform_t_FraudGovSearchResponse() := TRANSFORM
 		SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
@@ -148,20 +144,43 @@ EXPORT SearchService() := MACRO
 
 	results := DATASET([final_transform_t_FraudGovSearchResponse()]);
 	
+	/*-------- Following code is to generate Deltabase Log Input ---------------------*/
+	
+	//Per GRP-2060, we save RINID (stored in the lexid field), when the user entered full DOB, SSN and full name
+	// as search criteria and we couldn't resolve to a lexid from publicrecords
+	// but we found a SINGLE identity record in the contributory data
+	useRINID := COUNT(search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)) = 1 AND isMinimumForRINID AND ~adlDIDFound AND adl_did_input_PII[1].did = 0;
+	
+	// GRP-3288
+	// Following booleans are created for the rules listed in GRP-3288. These will be used to conditionally fill Did and PII.
+	BOOLEAN isPII_Input := searchBy.Name.Last <> '' OR searchBy.SSN <> '' OR searchBy.Phone10 <> '' OR
+												 searchBy.Address.StreetAddress1 <> '' OR (searchBy.Address.StreetName <> '' AND 
+													 ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> ''));
+	//Condition 2(a)
+	BOOLEAN PIIDid_W_ValidDid_PIINoSameDid := SearchBy.UniqueId <> '' AND isPII_Input AND adlDIDFound AND (adl_did_input_PII[1].did = 0 OR (SearchBy.UniqueId  <> (string)adl_did_input_PII[1].did));
+	
 	delta_log_input := PROJECT(first_row,
 														TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRequest,
-																SELF.SearchBy.UniqueId := MAP(
-																		LEFT.SearchBy.UniqueId = '' AND ~useRINID => (STRING)ds_adl_in[1].did,
-																		LEFT.SearchBy.UniqueId = '' AND useRINID => 
-																				search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)[1].ElementValue,
-																		LEFT.SearchBy.UniqueId),
+																SELF.SearchBy.UniqueId := 
+																	IF(~useRINID ,
+																			(string) ds_adl[1].did, 
+																			search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)[1].ElementValue);
+																SELF.SearchBy.Name := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, ROW([], iesp.share.t_Name),  LEFT.SearchBy.Name);
+																SELF.SearchBy.Address := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, ROW([], iesp.share.t_Address),  LEFT.SearchBy.Address);
+																SELF.SearchBy.DOB := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, ROW([], iesp.share.t_Date),  LEFT.SearchBy.DOB);
+																SELF.SearchBy.SSN := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, '',  LEFT.SearchBy.SSN);
+																SELF.SearchBy.Phone10 := 
+																	IF(PIIDid_W_ValidDid_PIINoSameDid, '',  LEFT.SearchBy.Phone10);
 																SELF := LEFT
-																));
+														));
 
 	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
 														delta_log_input,
 														FraudGovPlatform_Services.Constants.ServiceType.SEARCH);
-														
 														
 	IF(~isValidDate, FAIL(303,doxie.ErrorCodes(303)));
 

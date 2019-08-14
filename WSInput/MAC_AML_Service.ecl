@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for AML.AML_Service
+﻿// This service created to add Web Service fields for AML.AML_Service
 
 EXPORT MAC_AML_Service := MACRO
 
@@ -17,6 +17,10 @@ EXPORT MAC_AML_Service := MACRO
 										'HistoryDateYYYYMM',
 										'AntiMoneyLaunderingRiskAttributesRequest',
 										/*---- Gateways ----*/
-										'Gateways'
+										'Gateways',
+                                        'LexIdSourceOptout',
+                                        '_TransactionId',
+                                        '_BatchUID',
+                                        '_GCID'
 									));
 ENDMACRO;	

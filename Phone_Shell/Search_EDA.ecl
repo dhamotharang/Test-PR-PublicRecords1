@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches EDA by:																					*
  * - Address, Same First Name:: Source: EDAFA															*
  * - Address, Same Last Name:: Source: EDALA															*
@@ -10,11 +10,11 @@
  *       last seen within 5 years:: Source: EDAHistory										*
  ************************************************************************ */
 
-IMPORT Gong, Phone_Shell, Risk_Indicators, RiskWise, UT, STD;
+IMPORT Gong, Phone_Shell, Risk_Indicators, RiskWise, UT, STD, doxie;
 
 todays_date := (string) STD.Date.Today();
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, DATASET(Phone_Shell.Layouts.layoutUniqueAddresses) HeaderAddresses, UNSIGNED1 PhoneRestrictionMask) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_EDA (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, DATASET(Phone_Shell.Layouts.layoutUniqueAddresses) HeaderAddresses, UNSIGNED1 PhoneRestrictionMask, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	 /* ***************************************************************
 		* 							Get the EDA (Gong) Data by DID									*
 	  *************************************************************** */

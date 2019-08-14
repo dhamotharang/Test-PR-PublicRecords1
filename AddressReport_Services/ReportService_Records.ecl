@@ -99,8 +99,13 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	cur_dids				:= project(Res_cur0, doxie.layout_references);
 	lj_IDs 					:= liensv2_services.Autokey_ids(,true,false,false, false);
 	LiensJudgments	:= LiensV2_Services.liens_raw.report_view.by_tmsid(project(lj_IDs,liensv2_services.layout_tmsid),mod_access.ssn_mask,,,,,mod_access.application_type);
+
+	in_mod := VehicleV2_Services.IParam.getReportModule();
+	mod_vehicle_report := module (in_mod)
+		export boolean excludeLessors := FALSE;
+	end;
 	veh_ids_for_addr := VehicleV2_Services.autokey_ids(false,true,true);
-	vehicles 				:= if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(veh_ids_for_addr));
+	vehicles 				:= if(~isCNSMR, VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(mod_vehicle_report, veh_ids_for_addr));
 																
 	bk_ids 					:= BankruptcyV2_Services.bankruptcy_ids(dataset([],doxie.layout_references),
 																													dataset([],doxie_cbrs.layout_references),
@@ -176,11 +181,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	//Vehicles - Residents and Neighbors and Report Address
 	//
 	//Get Vehicle info based on DIDs (residents) as well as based on Address the report is on.
-	report_mod := VehicleV2_Services.IParam.getReportModule();
-	in_mod := module (report_mod)
-		export boolean excludeLessors := FALSE;
-	end;
-	veh_ids_for_curdids := VehicleV2_Services.Raw.get_Vehicle_keys_from_dids(in_mod, cur_dids);
+	veh_ids_for_curdids := VehicleV2_Services.Raw.get_Vehicle_keys_from_dids(mod_vehicle_report, cur_dids);
 
   // Sort/dedup the current resident dids & report addresss vehicle ids to remove exact duplicates.
 	veh_ids_for_resaddr_dd := dedup(sort(veh_ids_for_curdids + veh_ids_for_addr,
@@ -234,7 +235,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
   string8 FiveYearsBack  := (string8) (current_date - 50000); // subtract 5 from yyyy portion
 		
   // Get report formatted recs for the res/addr vehicle ids to be used
-  vehicle_recs_resaddr_vehraw := if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(
+  vehicle_recs_resaddr_vehraw := if(~isCNSMR, VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(
+															    									mod_vehicle_report,
 															    									veh_ids_for_resaddr_touse));
 
   // Filter to only keep recs out of Vehicle_raw that are "current" or 
@@ -246,9 +248,10 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																	    );
 
  	//Get report formatted rec out of vehicle_raw for the neighbor DIDs.
-	veh_ids_for_nbrdids     := VehicleV2_Services.raw.get_vehicle_keys_from_dids(in_mod, nbr_dids);
+	veh_ids_for_nbrdids     := VehicleV2_Services.raw.get_vehicle_keys_from_dids(mod_vehicle_report, nbr_dids);
 
-  vehicle_recs_nbr_vehraw := if(~isCNSMR, VehicleV2_Services.Vehicle_raw.get_vehicle_crs_report_by_Veh_key(
+  vehicle_recs_nbr_vehraw := if(~isCNSMR, VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(
+																								mod_vehicle_report,
 																								veh_ids_for_nbrdids)
 																								(is_current)); //filter for only "current" ones
 
@@ -394,7 +397,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	// business_recs_all_new	:=dedup(sort(business_recs_out,bdid),bdid);
 	//no need to dedup, new business header records are already unique by BIP ids
 	gong_in := project(business_recs_out_new, BIPV2.IDlayouts.l_xlink_ids);
-	gong_out := Gong.key_History_LinkIDs.kfetch(gong_in, param.BusinessReportFetchLevel);
+	gong_out := Gong.key_History_LinkIDs.kfetch(gong_in, mod_access, param.BusinessReportFetchLevel);
 	
 	rec_bus flag_bus_new(business_recs_out_new l,gong_out r):=TRANSFORM
 		self.gong_flag	:=if(trim(r.phone10)<>'',true,false);

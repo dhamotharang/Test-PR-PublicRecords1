@@ -1,13 +1,14 @@
 import location_services, doxie, doxie_ln, doxie_raw, header, ut, Census_Data,
-       LN_PropertyV2, DeathV2_Services;
+       LN_PropertyV2, DeathV2_Services, dx_header;
 
 
-export location_report(DATASET(Doxie_Raw.Layout_address_input) addr_in, 
+export location_report(DATASET(Doxie_Raw.Layout_address_input) addr_in,
+											 doxie.IDataAccess mod_access,
 											 boolean royaltyout = FALSE, 
 											 boolean useBusinessIds = FALSE) :=  FUNCTION
 
 doxie.MAC_Selection_Declare();
-mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+
 glb_ok := mod_access.isValidGLB();
 dppa_ok := mod_access.isValidDPPA();
 
@@ -58,9 +59,9 @@ withProp := join(propAddrFids, LN_PropertyV2.key_search_fid(),
 
 withPropD := dedup(sort(withProp, did, -process_date), RECORD);
 
-addrs := join(addrDidsWithInputs,doxie.key_header,
+addrs := join(addrDidsWithInputs,dx_header.key_header(),
               LEFT.did = RIGHT.s_did,
-              transform (header.Layout_Header, Self := RIGHT),
+              transform (dx_Header.Layout_Header, Self := RIGHT),
               LIMIT (ut.limits.DID_PER_PERSON, SKIP));
 // eliminate any header records with sensitive DIDs or SSNs
 header.MAC_GlbClean_Header(addrs, addrs2, , , mod_access);
@@ -130,7 +131,7 @@ bestaddrs := JOIN(addrVars,bestrec,
 									 LEFT.st = RIGHT.st,
 									 getBestAddrs(RIGHT));
 
-headerRecs := header_records(addrDidsWithInputs);
+headerRecs := header_records(addrDidsWithInputs, mod_access);
 
 //only want a single header record for the neighbors call that matches the input
 //data

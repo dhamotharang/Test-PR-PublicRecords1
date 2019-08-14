@@ -1,4 +1,4 @@
-import ut,Insurance_iesp,iesp, InsuranceContext_iesp, iesp.Constants,
+﻿import ut,Insurance_iesp,iesp, InsuranceContext_iesp, iesp.Constants,
        PersonContext;
  
 EXPORT Layouts := MODULE
@@ -48,6 +48,12 @@ EXPORT Layouts := MODULE
     string Content { maxlength(3000)}; 
  END; 
 
+	
+	//Layouts for handling state code to numeric code conversion
+	EXPORT Layout_StateCodes := RECORD
+		STRING2 state;
+		STRING codes;
+	END;
 
 END;
 

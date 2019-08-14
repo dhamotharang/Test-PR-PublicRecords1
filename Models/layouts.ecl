@@ -1,4 +1,4 @@
-﻿import risk_indicators, iesp, BIPV2;
+﻿import risk_indicators, iesp, riskwise;
 
 export layouts := module
 
@@ -2005,6 +2005,10 @@ export layout_fp1109 := record
 	string1 SuspiciousActivityIndex;
 end;
 
+export Enhanced_layout_fp1109 := record
+  String model_name;
+  layout_fp1109;
+end;
 
 export Layout_Score_FP := record
 	STRING3 i;
@@ -2018,6 +2022,10 @@ export Layout_Score_FP := record
 	string1 FriendlyFraudIndex;
 	string1 SuspiciousActivityIndex;
 end;
+
+EXPORT Layout_Attributes_In := RECORD
+	string name;
+END;
 
 export FP_Layout_Model :=
 RECORD
@@ -2055,5 +2063,10 @@ export Layout_Model_Request_In := RECORD
 	STRING ModelName := '';
 	DATASET(Layout_Model_Options) ModelOptions;
 END;
+
+export bs_with_ip := record
+	risk_indicators.Layout_Boca_Shell bs;
+	riskwise.Layout_IP2O ip;
+end;
 
 end;

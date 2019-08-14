@@ -78,7 +78,7 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 											));
 	                                              
 	
-  BusInquiries 					:=  if (inmod.BusinessCreditReportType =  BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport,
+  BusInquiries 					:=  if (inmod.BusinessCreditReportType <> BusinessCredit_Services.Constants.LNOnlyBusinessCreditReport,
 	                      BusinessCredit_Services.fn_getBusInquiries(inmod));
 		
   buzCreditTradeLineMod	:= BusinessCredit_Services.fn_getBuzCreditTrades(inmod, buzCreditHeader_recs,IndustryCode); 
@@ -156,10 +156,8 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
    			SELF.AccountDetail			      := choosen(accountDetails, iesp.constants.BusinessCredit.MaxSection);
 			SELF.TotalAccountDetailCount   :=   accountDetailsCount;
    			SELF.CreditUtils				      := choosen(creditUtilRecs, iesp.constants.BusinessCredit.MaxSection);
-   			SELF.DBTs						      := choosen(dbtRecs, iesp.constants.BusinessCredit.MaxSection);
-				
-   			SELF.Inquiries					      := if (inmod.BusinessCreditReportType =  BusinessCredit_Services.Constants.SBFEDataBusinessCreditReport,
-				                                    choosen(BusInquiries, iesp.constants.BusinessCredit.MaxSection) );
+   			SELF.DBTs						      := choosen(dbtRecs, iesp.constants.BusinessCredit.MaxSection);				
+   			SELF.Inquiries					      := choosen(BusInquiries, iesp.constants.BusinessCredit.MaxSection);
    			SELF.Subsidiaries				:= choosen(buzCreditSubsidiaries, iesp.constants.BusinessCredit.MaxSection);
    			SELF.OwnerGuarantors		      := choosen(buzCreditOwnerGuars, iesp.constants.BusinessCredit.MaxSection);
    			SELF.TopBusinessRecord  	      := topBusinessRecs[1];

@@ -1,9 +1,10 @@
-import Census_Data,LN_PropertyV2,ut, RiskWise, Risk_Indicators;
+﻿import Census_Data,LN_PropertyV2,ut, RiskWise, Risk_Indicators, doxie;
 
 export AMLPropertyHist (GROUPED DATASET(Risk_Indicators.Layout_PropertyRecord) p_address,
                                  GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids, 
 																 boolean includeRelatives = true,
-																 boolean filter_out_fares=false) := FUNCTION											
+																 boolean filter_out_fares=false,
+                                                                 doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION											
 
 
 proprec := record

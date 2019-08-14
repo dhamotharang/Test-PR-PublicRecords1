@@ -863,7 +863,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																							SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW));
 
-  withInquiriesByInputs := JOIN(withBusinessByAddress, InquiriesByInputs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+ withInquiriesByInputs := JOIN(withBusinessByAddress, InquiriesByInputs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Inquiry.InquiryBusAddress := checkBlank(RIGHT.Inquiry.InquiryBusAddress, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Inquiry.InquiryBusAddress01Mos := checkBlank(RIGHT.Inquiry.InquiryBusAddress01Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF.Inquiry.InquiryBusAddress03Mos := checkBlank(RIGHT.Inquiry.InquiryBusAddress03Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
@@ -904,6 +904,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																								SELF.Inquiry.InquiryConsumerSSN12Mos := checkBlank(RIGHT.Inquiry.InquiryConsumerSSN12Mos, '-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+
 
   withPropertyByInputs := JOIN(withInquiriesByInputs, PropertyByInputs, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																								SELF.Input_Characteristics.InputAddrLotSize := checkBlank(RIGHT.Input_Characteristics.InputAddrLotSize, '0');
@@ -955,7 +956,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 	businessHeader := Business_Risk_BIP.getBusinessHeader(withBestBusinessInfo, Options, linkingOptions, AllowedSourcesSet);
 
-	consumerHeader_all := Business_Risk_BIP.getConsumerHeader(businessHeader + NoLinkIDsFound, Options, linkingOptions, AllowedSourcesSet); // Pass in Business Header results for companies with BIP IDs assigned. Also pass in records with no BIP IDs assigned.
+	consumerHeader_all := Business_Risk_BIP.getConsumerHeader(businessHeader + NoLinkIDsFound, Options, mod_access, AllowedSourcesSet); // Pass in Business Header results for companies with BIP IDs assigned. Also pass in records with no BIP IDs assigned.
 
 	consumerHeader := consumerHeader_all(BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
 
@@ -3757,6 +3758,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 																								SELF := LEFT),
 																						LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+
 
 	// Call Targus Gateway for each input record that has a legit Business Phone, no records
 	// found among our inhouse phone sources, and no Targus restriction for the customer.

@@ -98,7 +98,12 @@ FUNCTION
 																		// IF(ri.switch_type IN ['I','P','T','W',''],'OTHER','UNKNOWN'));
 																		PhoneFinder_Services.Constants.PhoneType.Other);
 		SELF.vendor_id         := ri.vendor;
-		SELF.phone_source      := PhoneFinder_Services.Constants.PhoneSource.Waterfall;
+		 // Distinguishing between gateway and non-gateway sourced records 
+		   PhConstants := PhoneFinder_Services.Constants.PhoneSource;
+		SELF.phone_source  := MAP(ri.subj_phone_type_new = MDR.sourceTools.src_EQUIFAX => PhConstants.EquifaxPhones,
+								  ri.vendor = MDR.sourceTools.src_wired_Assets_Royalty => PhConstants.LastResort, 
+		                          ri.vendor = MDR.sourceTools.src_Inhouse_QSent => PhConstants.InHouseQSent,
+		                          PhConstants.Waterfall);
 		SELF                   := ri;
 		SELF                   := [];
 	END;
