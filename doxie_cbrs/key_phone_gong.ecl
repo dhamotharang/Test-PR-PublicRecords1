@@ -1,6 +1,6 @@
-import gong, doxie, data_services;
+﻿import gong, doxie, data_services;
 
-f := gong.File_Gong_full(phone10 <> '' and (integer)phone10 <> 0);
+f := PROJECT(gong.File_Gong_full(phone10 <> '' and (integer)phone10 <> 0), gong.Layout_bscurrent_raw);
 
 export key_phone_gong := INDEX(f, 
 {phone10},

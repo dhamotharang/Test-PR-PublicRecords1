@@ -128,7 +128,7 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
   EXPORT ds_frandx_linkidskey_recs := Frandx.Key_Linkids.kFetch(ds_in_linkids,FETCH_LEVEL);
 
   // *** Key fetch to get Gong history linkids key records
-	EXPORT ds_gong_linkidskey_recs := Gong.Key_History_LinkIDs.KFetch(ds_in_linkids, FETCH_LEVEL,,FETCH_LIMIT);
+	EXPORT ds_gong_linkidskey_recs := Gong.Key_History_LinkIDs.KFetch(ds_in_linkids, mod_access, FETCH_LEVEL,,FETCH_LIMIT);
 
 // *** key fetch to get Infutor Narb linkids key records
 

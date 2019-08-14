@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, gong, ut, targus, FCRA, Phonesplus_v2;
+﻿﻿import _Control, risk_indicators, gong, ut, targus, FCRA, Phonesplus_v2;
 onThor := _Control.Environment.OnThor;
 
 export getDirsByAddr(dataset(Risk_Indicators.Layouts.Layout_Input_Plus_Overrides) input, boolean isFCRA=false, unsigned1 glb=0, unsigned8 BSOptions=0) := function
@@ -14,7 +14,7 @@ end;
 layout_dirs_address gong_corr(input le, FCRA.Key_Override_Gong_FFID ri) := TRANSFORM
 	self.src := 'GH';
 	self := ri;
-	// self := [];	// p3, p7, phone7, area_code
+	self := [];	// p3, p7, phone7, area_code, global_sid, record_sid
 end;
 gong_correct_roxie := join(input, FCRA.Key_Override_Gong_FFID,
 												keyed(right.flag_file_id in left.gong_correct_ffid),

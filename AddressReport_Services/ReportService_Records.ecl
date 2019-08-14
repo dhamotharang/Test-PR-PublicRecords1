@@ -397,7 +397,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	// business_recs_all_new	:=dedup(sort(business_recs_out,bdid),bdid);
 	//no need to dedup, new business header records are already unique by BIP ids
 	gong_in := project(business_recs_out_new, BIPV2.IDlayouts.l_xlink_ids);
-	gong_out := Gong.key_History_LinkIDs.kfetch(gong_in, param.BusinessReportFetchLevel);
+	gong_out := Gong.key_History_LinkIDs.kfetch(gong_in, mod_access, param.BusinessReportFetchLevel);
 	
 	rec_bus flag_bus_new(business_recs_out_new l,gong_out r):=TRANSFORM
 		self.gong_flag	:=if(trim(r.phone10)<>'',true,false);

@@ -146,7 +146,7 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	
 																	
 		// ---------------- Gong - EDA Phone Data ------------------
-	GongLinkIdRaw := Gong.key_History_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+	GongLinkIdRaw := Gong.key_History_LinkIDs.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,

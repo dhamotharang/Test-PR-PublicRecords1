@@ -8,7 +8,7 @@ Layout_extra := RECORD
 	gong.Layout_bscurrent_raw;
 END;
 
-Layout_extra addOrig(gong.Layout_bscurrent_raw l) := TRANSFORM
+Layout_extra addOrig(RECORDOF(input_recs) l) := TRANSFORM
   SELF.word := '';
 	SELF.city := l.p_city_name;
 	SELF := l;
@@ -16,7 +16,7 @@ END;
 
 orig_cities := PROJECT(input_recs, addOrig(LEFT));
 
-Layout_extra addExtra(gong.Layout_bscurrent_raw l, integer c) := TRANSFORM
+Layout_extra addExtra(RECORDOF(input_recs) l, integer c) := TRANSFORM
 	SELF.word := '';
 	SELF.city := StringLib.StringExtract(ZipLib.ZipToCities(l.z5),c+1);
 	SELF := l;
