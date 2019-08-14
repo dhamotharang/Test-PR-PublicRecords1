@@ -2,11 +2,11 @@
  * 			 This function gathers the Inquiries attributes.									*
  ************************************************************************ */
 
-IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, UT, STD;
+IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, STD, doxie;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inquiries (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
-                                                                                        UNSIGNED2 PhoneShellVersion = 10 // PhoneShell V1.0 default
-                                                                                       ) := FUNCTION
+                                                                                        UNSIGNED2 PhoneShellVersion = 10, // PhoneShell V1.0 default
+                                                                                       doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	layoutInquiries := RECORD
 		Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus;
 		STRING description := '';
@@ -51,12 +51,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		// Only count if the date is populated (inquiryMonths >= 0) and is within 6 months
 		SELF.Inquiries.Inq_Num_Addresses_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6, '1', '');
     
-  // PhoneShell V2+ implement a fix here to include sameADL for ADL-based counts  
-		SELF.Inquiries.Inq_Num_ADLs := if(PhoneShellVersion >= 20, if(sameADL, '1',''), '1');
+  // When this is rolled up in countedDID, will count 1 per unique DID in the group of inquiries for the given phone  
+		SELF.Inquiries.Inq_Num_ADLs := '1';
 		// Only count if the date is populated (inquiryMonths >= 0) and is within 6 months
-		SELF.Inquiries.Inq_Num_ADLs_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6,
-                                        if(PhoneShellVersion >= 20, if(sameADL, '1',''), '1')
-                                      , '');
+		SELF.Inquiries.Inq_Num_ADLs_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6, '1', '');
     
 		SELF.Inquiries.Inq_FirstSeen := (STRING)inquiryMonths;
 		SELF.Inquiries.Inq_LastSeen := (STRING)inquiryMonths;

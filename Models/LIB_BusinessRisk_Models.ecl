@@ -2,7 +2,7 @@
 // This MODULE EXPORTs all of our BusinessRisk model calls.  By doing this, each library 
 // can request a specific module and thus only those models are compiled.
 
-IMPORT Business_Risk_BIP, Models, Risk_Indicators, RiskView,UT,RiskWise ;
+IMPORT Business_Risk_BIP, Models, Risk_Indicators, RiskView,RiskWise ;
 
 // Including these blank defaults for retrieving the sets of Valid Models without having 
 // to pass in Business Shell or Arguments. This way when creating a new model we only need 
@@ -34,7 +34,7 @@ EXPORT LIB_BusinessRisk_Models(
 
 	
 	
-	 EXPORT ValidatingModel := Models.BBFM1811_1_0(bocaShell,iid,'',ips,false,DPPA,GLB,DataRestriction,DataPermission,'',busShell,54); // Change this to the model you are trying to validate	
+	 EXPORT ValidatingModel := Models.BBFM1903_1_0(bocaShell,busShell); // Change this to the model you are trying to validate	
 
 	// The calcIndex function returns the 'billing_index' given the report_option
 	// value. billing_index is needed by batch.  it is passed to the ESP logging
@@ -67,6 +67,7 @@ EXPORT LIB_BusinessRisk_Models(
                   {'BBFM1808_1_0', 'BBFM1808_1_0', 10, '0-999'}, //blended 
                   {'BOFM1812_1_0', 'BOFM1812_1_0', 11, '0-999'}, //not blended, business only
                   {'BBFM1811_1_0', 'BBFM1811_1_0', 12, '0-999'}, //blended  
+                  {'BBFM1903_1_0', 'BBFM1903_1_0', 13, '0-999'}, //blended  
 								// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 									{'SBBM9999_9'  , 'SBBM9999_9'  , 0             , '0-999'},
 									{'SBOM9999_9'  , 'SBOM9999_9'  , 0             , '0-999'}
@@ -84,6 +85,7 @@ EXPORT LIB_BusinessRisk_Models(
 											'SLBB1702_0_2' => UNGROUP(Models.SLBB1702_0_2(busShell, bocaShell)),
 											'SLBB1809_0_0' => UNGROUP(Models.SLBB1809_0_0(busShell, bocaShell)),
 											'BBFM1808_1_0' => UNGROUP(Models.BBFM1808_1_0(bocaShell,busShell)),
+											'BBFM1903_1_0' => UNGROUP(Models.BBFM1903_1_0(bocaShell,busShell)),
 											'SLBO1702_0_2' => UNGROUP(Models.SLBO1702_0_2(busShell)),
 											'SLBO1809_0_0' => UNGROUP(Models.SLBO1809_0_0(busShell)),
                       'BOFM1812_1_0' => UNGROUP(Models.BOFM1812_1_0(busShell)),

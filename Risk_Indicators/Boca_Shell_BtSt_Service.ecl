@@ -67,7 +67,7 @@
  </message>
 */
 
-import AutoStandardI, risk_indicators;
+import STD, AutoStandardI, risk_indicators, doxie, gateway, riskwise, royalty;
 
 export Boca_Shell_BtSt_Service := macro
 
@@ -136,7 +136,11 @@ export Boca_Shell_BtSt_Service := macro
 	'DeviceProvider2',
 	'DeviceProvider3',
 	'DeviceProvider4',
-	'TypeOfOrder'
+	'TypeOfOrder',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'
 	));
 
 string30 account_value := '' : stored('AccountNumber');
@@ -202,6 +206,11 @@ string20  DeviceProvider3_value := ''          	: stored('DeviceProvider3');
 string20 DeviceProvider4_value := ''       	: stored('DeviceProvider4');	
 string TypeOfOrder_value := risk_indicators.iid_constants.PhysicalOrder : stored('TypeOfOrder');
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 boolean   isUtility := Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(industry_class_val));
 gateways_in := Gateway.Configuration.Get();
@@ -209,7 +218,7 @@ gateways_in := Gateway.Configuration.Get();
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(Gateway.Configuration.IsNetAcuity(le.servicename) or le.servicename='veris' => le.url,
-                  version >= 50 and stringlib.StringToLowerCase(trim(le.servicename)) in [Gateway.Constants.ServiceName.DeltaInquiry] => le.url, //netacuity will be the only gateway we use in the bocashell processing, default to no gateway call
+                  version >= 50 and STD.STR.ToLowerCase(trim(le.servicename)) in [Gateway.Constants.ServiceName.DeltaInquiry] => le.url, //netacuity will be the only gateway we use in the bocashell processing, default to no gateway call
                   le.servicename = 'bridgerwlc' => le.url, // included bridger gateway to be able to hit OFAC v4
                   '');
 	self := le;
@@ -231,13 +240,13 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(d le) := transform
 	self.Bill_To_In.historydate := if(historyDateTimeStamp<>'',(unsigned)historyDateTimeStamp[1..6], history_date);
 	self.Bill_To_In.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
 	
-	self.Bill_To_In.fname := stringlib.stringtouppercase(fname_val);
-	self.Bill_To_In.mname := stringlib.stringtouppercase(mname_val);
-	self.Bill_To_In.lname := stringlib.stringtouppercase(lname_val);
-	self.Bill_To_In.suffix := stringlib.stringtouppercase(suffix_val);
-	self.Bill_To_In.in_streetAddress := stringlib.stringtouppercase(addr1_val);
-	self.Bill_To_In.in_city := stringlib.stringtouppercase(city_val);
-	self.Bill_To_In.in_state := stringlib.stringtouppercase(state_val);
+	self.Bill_To_In.fname := STD.STR.ToUpperCase(fname_val);
+	self.Bill_To_In.mname := STD.STR.ToUpperCase(mname_val);
+	self.Bill_To_In.lname := STD.STR.ToUpperCase(lname_val);
+	self.Bill_To_In.suffix := STD.STR.ToUpperCase(suffix_val);
+	self.Bill_To_In.in_streetAddress := STD.STR.ToUpperCase(addr1_val);
+	self.Bill_To_In.in_city := STD.STR.ToUpperCase(city_val);
+	self.Bill_To_In.in_state := STD.STR.ToUpperCase(state_val);
 	self.Bill_To_In.in_zipCode := zip_value;
 	self.Bill_To_In.prim_range := clean_a[1..10];
 	self.Bill_To_In.predir := clean_a[11..12];
@@ -259,18 +268,18 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(d le) := transform
 	self.Bill_To_In.ssn		:= ssn_value;
 	self.Bill_To_In.dob		:= dob_value;
 				Temp_age := if (age_value = 0 and (integer)dob_value != 0, 
-														(STRING)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)ut.Age((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
 														(STRING)age_value);
 	self.Bill_To_In.age := if((integer)temp_age > 99, '99',temp_age);
-	self.Bill_To_In.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.Bill_To_In.dl_state := stringlib.stringtouppercase(dl_state_value);
-	self.Bill_To_In.email_address	:= stringlib.stringtouppercase(email_value);
+	self.Bill_To_In.dl_number := STD.STR.ToUpperCase(dl_num_clean);
+	self.Bill_To_In.dl_state := STD.STR.ToUpperCase(dl_state_value);
+	self.Bill_To_In.email_address	:= STD.STR.ToUpperCase(email_value);
 	SELF.Bill_To_In.ip_address := ip_value;
 	self.Bill_To_In.phone10 := phone_value;
 	self.Bill_To_In.wphone10 := wphone_value;
-	self.Bill_To_In.employer_name := stringlib.stringtouppercase(employe_name_value);		
-	SELF.Bill_To_In.lname_prev := stringlib.stringtouppercase(prev_lname_value);
-	self.bill_to_in.TypeOfOrder := stringlib.stringtouppercase(TypeOfOrder_value);	
+	self.Bill_To_In.employer_name := STD.STR.ToUpperCase(employe_name_value);		
+	SELF.Bill_To_In.lname_prev := STD.STR.ToUpperCase(prev_lname_value);
+	self.bill_to_in.TypeOfOrder := STD.STR.ToUpperCase(TypeOfOrder_value);	
 
   clean_a2 := Risk_Indicators.MOD_AddressClean.clean_addr(addr1_val2, city_val2, state_val2, zip_value2);	
 	dl_num_clean2 := riskwise.cleanDL_num(dl_number_value2);
@@ -280,13 +289,13 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(d le) := transform
 	self.Ship_To_In.historydate := if(historyDateTimeStamp<>'',(unsigned)historyDateTimeStamp[1..6], history_date);
 	self.Ship_To_In.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
 	
-	self.Ship_To_In.fname := stringlib.stringtouppercase(fname_val2);
-	self.Ship_To_In.mname := stringlib.stringtouppercase(mname_val2);
-	self.Ship_To_In.lname := stringlib.stringtouppercase(lname_val2);
-	self.Ship_To_In.suffix := stringlib.stringtouppercase(suffix_val2);
-	self.Ship_To_In.in_streetAddress := stringlib.stringtouppercase(addr1_val2);
-	self.Ship_To_In.in_city := stringlib.stringtouppercase(city_val2);
-	self.Ship_To_In.in_state := stringlib.stringtouppercase(state_val2);
+	self.Ship_To_In.fname := STD.STR.ToUpperCase(fname_val2);
+	self.Ship_To_In.mname := STD.STR.ToUpperCase(mname_val2);
+	self.Ship_To_In.lname := STD.STR.ToUpperCase(lname_val2);
+	self.Ship_To_In.suffix := STD.STR.ToUpperCase(suffix_val2);
+	self.Ship_To_In.in_streetAddress := STD.STR.ToUpperCase(addr1_val2);
+	self.Ship_To_In.in_city := STD.STR.ToUpperCase(city_val2);
+	self.Ship_To_In.in_state := STD.STR.ToUpperCase(state_val2);
 	self.Ship_To_In.in_zipCode := zip_value2;
 	self.Ship_To_In.prim_range := clean_a2[1..10];
 	self.Ship_To_In.predir := clean_a2[11..12];
@@ -309,18 +318,18 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(d le) := transform
 	self.Ship_To_In.dob		:= dob_value2;
 	
 	Temp_age2 :=  if (age_value2 = 0 and (integer)dob_value2 != 0, 
-														(STRING)ut.GetAgeI_asOf((unsigned)dob_value2, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)ut.Age((unsigned)dob_value2, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
 														(STRING)age_value2);
 						
 	self.Ship_To_In.age := if((integer)temp_age2 > 99, '99',temp_age2);
-	self.Ship_To_In.dl_number := stringlib.stringtouppercase(dl_num_clean2);
-	self.Ship_To_In.dl_state := stringlib.stringtouppercase(dl_state_value2);
-	self.Ship_To_In.email_address	:= stringlib.stringtouppercase(email_value2);
+	self.Ship_To_In.dl_number := STD.STR.ToUpperCase(dl_num_clean2);
+	self.Ship_To_In.dl_state := STD.STR.ToUpperCase(dl_state_value2);
+	self.Ship_To_In.email_address	:= STD.STR.ToUpperCase(email_value2);
 	self.Ship_To_In.ip_address := ip_value2;
 	self.Ship_To_In.phone10 := phone_value2;
 	self.Ship_To_In.wphone10 := wphone_value2;
-	self.Ship_To_In.employer_name := stringlib.stringtouppercase(employe_name_value2);		
-	self.Ship_To_In.lname_prev := stringlib.stringtouppercase(prev_lname_value2);
+	self.Ship_To_In.employer_name := STD.STR.ToUpperCase(employe_name_value2);		
+	self.Ship_To_In.lname_prev := STD.STR.ToUpperCase(prev_lname_value2);
 	
 	self := [];
 end;
@@ -365,7 +374,11 @@ iid_results := risk_indicators.InstantId_BtSt_Function(prep, gateways, DPPA_Purp
 											from_BIID, isFCRA,	excludeWatchlists, from_IT1O, ofac_version, include_ofac, include_additional_watchlists, 
 											global_watchlist_threshold, dob_radius, version, DataRestriction := DataRestriction, 
                       runDLverification:=IncludeDLverification, DataPermission := DataPermission,
-                      BSOptions:=BSOptions
+                      BSOptions:=BSOptions, 
+                      LexIdSourceOptout := LexIdSourceOptout, 
+                      TransactionID := TransactionID, 
+                      BatchUID := BatchUID, 
+                      GlobalCompanyID := GlobalCompanyID
                       );
 //defaulting to emtpy on this dataset as it's only used in CBD models
 ScoresInput := project(prep, transform(Risk_Indicators.Layout_BocaShell_BtSt.input_Scores,
@@ -373,13 +386,17 @@ ScoresInput := project(prep, transform(Risk_Indicators.Layout_BocaShell_BtSt.inp
 	self.DeviceProvider2_value := DeviceProvider2_value;
 	self.DeviceProvider3_value := DeviceProvider3_value;
 	self.DeviceProvider4_value := DeviceProvider4_value;
-	self.btst_order_type := stringlib.stringtouppercase(TypeOfOrder_value);
+	self.btst_order_type := STD.STR.ToUpperCase(TypeOfOrder_value);
 	self.seq := left.bill_to_in.seq));
 
 ret := risk_indicators.BocaShell_BtSt_Function(iid_results, gateways, DPPA_Purpose, GLB_Purpose, isUtility,
 											ln_branded, includeRelativeInfo, includeDLInfo, includeVehicleInfo, includeDerogInfo, version, 
 											doScore_again, nugen := true, DataRestriction := DataRestriction, inBSOptions:=BSOptions, 
-											DataPermission := DataPermission, input_Scores := ScoresInput, NetAcuity_v4 := useNetAcuity_v4);
+											DataPermission := DataPermission, input_Scores := ScoresInput, NetAcuity_v4 := useNetAcuity_v4,
+                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                            TransactionID := TransactionID, 
+                                            BatchUID := BatchUID, 
+                                            GlobalCompanyID := GlobalCompanyID);
 											
 output(ret,NAMED('Results'));
 

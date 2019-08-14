@@ -1,10 +1,10 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * 		 This function gathers the Internal_Corroboration attributes.				*
  ************************************************************************ */
 
-IMPORT Phonesplus_v2, Phone_Shell, RiskWise, UT, STD;
+IMPORT Phonesplus_v2, Phone_Shell, RiskWise, UT, STD, doxie;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Internal_Corroboration (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED3 InsuranceVerificationAgeLimit) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Internal_Corroboration (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED3 InsuranceVerificationAgeLimit, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	internalVerificationKey := Phonesplus_v2.Keys_Iverification().did_phone.qa;
 	
 	layoutInternalCorroboration := RECORD
@@ -15,7 +15,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Int
 	layoutInternalCorroboration getInternalCorroboration(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, internalVerificationKey ri) := TRANSFORM
 		// Only populate these fields if the Insurance "Gateway" is turned on
 		InternalVerificationTurnedOn := IF(le.Clean_Input.InsuranceGatewayEnabled, TRUE, FALSE);
-		
+
 		SELF.Internal_Corroboration.Internal_Verification := IF(InternalVerificationTurnedOn, TRUE, FALSE); // We have a hit on this DID/Phone combination
 		SELF.Internal_Corroboration.Internal_Verification_First_Seen := IF(InternalVerificationTurnedOn, Phone_Shell.Common.parseDate((STRING)ri.dt_first_ver, TRUE), '');
 		SELF.Internal_Corroboration.Internal_Verification_Last_Seen := IF(InternalVerificationTurnedOn, Phone_Shell.Common.parseDate((STRING)ri.dt_last_ver, TRUE), '');

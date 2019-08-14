@@ -1,6 +1,6 @@
-﻿import doxie_files, property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators, MDR;
+﻿import doxie_files, property, riskwise, bankruptcyv3, liensv2, ut, risk_indicators, MDR, doxie;
 
-export Boca_Shell_Derogs (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, unsigned1 BSversion=1) := function
+export Boca_Shell_Derogs (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, unsigned1 BSversion=1, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := function
 
 	layout_derog_process := RECORD
 		risk_indicators.layouts.layout_derogs_input;

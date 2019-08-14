@@ -91,11 +91,11 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
                                                      self     := left));
 																										 
 	EXPORT dataset (AutoHeaderV2.layouts.search_out) all_dids := lib_dids;
-  																												
+  fetched := lib_dids(did!=0);
   // choose best DIDs, if requested
   bd := if(_options.only_best_did, 
-           lib_dids(score>=75), 
-           lib_dids);
+           fetched(score>=75),
+           fetched);
 
   boolean no_fail := search_code & AutoheaderV2.Constants.SearchCode.NOFAIL > 0;
     

@@ -1,10 +1,10 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * 			 This function gathers the Phone_Feedback attributes.							*
  ************************************************************************ */
 
-IMPORT PhonesFeedback, Phone_Shell, Risk_Indicators, RiskWise, UT;
+IMPORT PhonesFeedback, Phone_Shell, RiskWise, UT, doxie;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Phone_Feedback (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Phone_Feedback (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus getFeedback(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, PhonesFeedback.Key_PhonesFeedback_phone ri) := TRANSFORM
 		// These attributes were already calculated in Phone_Shell.Search_PhonesFeedback
 		SELF.Phone_Feedback.Phone_Feedback_Date := le.Phone_Feedback.Phone_Feedback_Date;
@@ -13,7 +13,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF.Phone_Feedback.Phone_Feedback_Middle := le.Phone_Feedback.Phone_Feedback_Middle;
 		SELF.Phone_Feedback.Phone_Feedback_Last := le.Phone_Feedback.Phone_Feedback_Last;
 		SELF.Phone_Feedback.Phone_Feedback_Last_RPC_Date := le.Phone_Feedback.Phone_Feedback_Last_RPC_Date;
-			
+
 		// Only look for the reverse phone information if the DID based Phones Feedback attributes were not found
 		reversePhoneLookup := TRIM(le.Phone_Feedback.Phone_Feedback_Date) = '' AND le.Phone_Feedback.Phone_Feedback_Result = 0 AND
 														TRIM(le.Phone_Feedback.Phone_Feedback_First) = '' AND TRIM(le.Phone_Feedback.Phone_Feedback_Middle) = '' AND

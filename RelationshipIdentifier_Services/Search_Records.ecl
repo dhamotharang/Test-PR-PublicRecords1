@@ -1,16 +1,17 @@
-﻿IMPORT Address,AutoStandardI,BIPV2,didville,doxie,iesp,MDR,RelationshipIdentifier_Services,
-         TopBusiness_Services,STD,Suppress;
+﻿IMPORT Address, BIPV2, didville, doxie, iesp, MDR, RelationshipIdentifier_Services,
+         TopBusiness_Services, STD, Suppress;
 
 EXPORT  Search_Records(                 
 								RelationshipIdentifier_Services.Layouts.Local_tRelationshipIdentifierSearch ds_dataInSearch
-								,doxie.IDataAccess mod_access
                 ,RelationshipIdentifier_Services.Layouts.OptionsLayout options
                 ,DATASET(RelationshipIdentifier_Services.Layouts.Batch.Input_Processed) tmpds_BatchIn
                 ,RelationshipIdentifier_Services.iParam.BatchParams               inMod               
 							) :=
  // FUNCTION  //leaving this function ecl cmd in here in case debugging is needed. 	
  MODULE
- 
+
+  SHARED mod_access := PROJECT (inMod, doxie.IDataAccess); // BatchParams inherits from IDataAccess
+
   // Module does 
 	//  1) Non-batch searching for the Relationship Identifier Project.
 	//  

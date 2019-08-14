@@ -2,7 +2,7 @@
 // ====== RETURNS PEOPLE@WORK RECORDS FOR A GIVEN PERSON IN ESP-COMPLIANT WAY =======
 // ==================================================================================
 
-IMPORT iesp, doxie, paw_services, paw, ut, Suppress;
+IMPORT AutoStandardI, iesp, doxie, paw_services, paw, ut, Suppress;
 
 out_rec := iesp.peopleatwork.t_PeopleAtWorkRecord;
 
@@ -10,11 +10,14 @@ EXPORT out_rec peopleatwork_records (
   dataset (doxie.layout_references) dids,
   $.IParam.peopleatwork in_params = module ($.IParam.peopleatwork) end,
   boolean IsFCRA = false) := FUNCTION
+  
+  mod_access := project(in_params,doxie.IDataAccess);
 
   // this is copy/paste from paw_services/PAWSearchService_Records; shouldn't be this way:
   // paw_services must expose raw data in some way (without "also found", penalties, etc.)
   ids := paw_services.PAW_Raw.getContactIDs.byDIDs (dids);
-  recs := join (ids, paw.Key_contactID,keyed(left.contact_id=right.contact_id), atmost(ut.limits.PAW_PER_CONTACTID)); //<25 recs per contactid
+  recs_pre := join (ids, paw.Key_contactID,keyed(left.contact_id=right.contact_id), atmost(ut.limits.PAW_PER_CONTACTID)); //<25 recs per contactid
+  recs := suppress.MAC_SuppressSource(recs_pre,mod_access);
   recs_plus := project (recs, transform(paw_services.Layouts.Raw, self.timezone:=[], self:=left));
 //l.active_phone_flag='Y' and l.company_phone <> '';
   // verify (this can be quite ineficcient, but I want to make the same call as in P@W single source):

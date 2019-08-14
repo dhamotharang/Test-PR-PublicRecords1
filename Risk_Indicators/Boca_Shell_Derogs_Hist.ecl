@@ -1,6 +1,6 @@
-﻿import doxie_files, ut, liensv2, riskwise, property, bankruptcyv3, risk_indicators, MDR;
+﻿import doxie_files, ut, liensv2, riskwise, property, bankruptcyv3, risk_indicators, MDR, doxie;
 
-export Boca_Shell_Derogs_Hist (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, integer bsversion) := FUNCTION
+export Boca_Shell_Derogs_Hist (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, integer bsversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 															 
 bans_did := BankruptcyV3.key_bankruptcyV3_did();
 bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip();

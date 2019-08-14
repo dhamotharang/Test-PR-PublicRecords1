@@ -41,7 +41,6 @@ MACRO
 									  								
 	// Set some base options
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 	user_options := global(first_row.User);
 	
@@ -60,15 +59,17 @@ MACRO
 	boolean stored_IncludeNeighbors := TRUE : stored('IncludeNeighbors');	 // default to true as per requirements
 	boolean stored_lnbranded := FALSE : stored('LnBranded');
 	string8 stored_asOfDate := '' : stored('AsOfDate');
-	
-	dppa_ok := mod_access.isValidDppa();
-	glb_ok :=  mod_access.isValidGlb();
+
+  batchParams := RelationshipIdentifier_Services.iParam.getBatchParams();
+
+	dppa_ok := batchParams.isValidDppa();
+	glb_ok :=  batchParams.isValidGlb();
 	
 	// ***************************************
 	//4 lines coded per requirement 3.30 Relationship identifier Project.
 	//
-	PermissionsFlagdppa := mod_access.dppa = 0;
-	PermissionsFlagGLB  := mod_access.glb = 0;
+	PermissionsFlagdppa := batchParams.dppa = 0;
+	PermissionsFlagGLB  := batchParams.glb = 0;
 	
   // END REl ident requirement
 	
@@ -83,9 +84,8 @@ MACRO
 										 
 // set params so that function can be called and batchParams passed along.
 	 ds_empty_batch := dataset([],RelationshipIdentifier_Services.Layouts.Batch.Input_Processed);
-	 batchParams := RelationshipIdentifier_Services.iParam.getBatchParams();
    
-	 SearchRecs := relationshipIdentifier_services.Search_Records(Search_Row,mod_access,options,
+	 SearchRecs := relationshipIdentifier_services.Search_Records(Search_Row,options,
                                                                 ds_empty_batch,batchParams).ds_results; 
    				
 	 iesp.RelationshipIdentifierSearch.t_RelationshipIdentifierSearchResponse
@@ -130,193 +130,3 @@ MACRO
 					 output(Results, named('Results'))
 			);																																																															
 ENDMACRO;
-// this below is input XML that can be pasted into roxie wsecl service 
- // once its filled out with search criteria
-// for person or for business.  Can have up to 8 <Item> XML blocks but need to have
-//  at least 2 at minimum.
-// notes : asOfDate defaults to the current date if not filled out
-// and asOfDate is doing filter on header recs based on search results in order
-// to determine ifa particular did or linkids (bip data) exists (i.e. dt_first_seen) at that point in time
-//
-/*
-<relationshipidentifier_services.search_serviceRequest>
-
- <relationshipidentifiersearchrequest>
-<row>
-<User>
-    <ReferenceCode/>
-    <BillingCode/>
-    <QueryId/>
-    <CompanyId/>
-    <GLBPurpose></GLBPurpose> // this field needs to be filled in 1-7 are valid values
-    <DLPurpose></DLPurpose>   // this field needs to be filled in 1-7 are valid values.
-    <LoginHistoryId/>
-    <DebitUnits/>
-    <IP/>
-    <IndustryClass/>
-    <ResultFormat/>
-    <LogAsFunction/>
-    <SSNMask/>
-    <DOBMask/>
-    <ExcludeDMVPII>0</ExcludeDMVPII>
-    <DLMask>0</DLMask>
-    <DataRestrictionMask>0000000000000000000</DataRestrictionMask>
-    <DataPermissionMask>000000000000</DataPermissionMask>
-    <SourceCode/>
-    <ApplicationType/>
-    <SSNMaskingOn>0</SSNMaskingOn>
-    <DLMaskingOn>0</DLMaskingOn>
-    <LnBranded>1</LnBranded>
-    <EndUser>
-     <CompanyName/>
-     <StreetAddress1/>
-     <City/>
-     <State/>
-     <Zip5/>
-     <Phone/>
-    </EndUser>
-    <MaxWaitSeconds/>
-    <RelatedTransactionId/>
-    <AccountNumber/>
-    <TestDataEnabled>0</TestDataEnabled>
-    <TestDataTableName/>
-    <OutcomeTrackingOptOut>0</OutcomeTrackingOptOut>
-    <NonSubjectSuppression/>
-   </User>   
-<Options>
-      <IncludeNeighbors>1</IncludeNeighbors>
-      <AsOfDate>
-       <Year>2016</Year>
-       <Month>02</Month>
-       <Day>20</Day>
-      </AsOfDate>
-     </Options>
-      <SearchBy>
-    <Item>
-       <UniqueId/>
-       <InSeleID/>
-       <Role>Role 1</Role> // text in this XML tag is just placeholder can be anything (string50 size).     
-       <IndividualOrBusiness>I</IndividualOrBusiness> // THIS IS single letter char EITHER A 'I' OR A 'B'
-       <Address>                                        // for business or individual (person).
-        <StreetNumber/>
-        <StreetPreDirection/>
-        <StreetName/>
-        <StreetSuffix/>
-        <StreetPostDirection/>
-        <UnitDesignation/>
-        <UnitNumber/>
-        <StreetAddress1/>
-        <StreetAddress2/>
-        <City></City>
-        <State></State>
-        <Zip5/>
-        <Zip4/>
-        <County/>
-        <PostalCode/>
-        <StateCityZip/>
-       </Address>
-       <Name>
-        <Full/>
-        <First></First>
-        <Middle/>
-        <Last></Last>
-        <Suffix/>
-        <Prefix/>
-       </Name>
-       <CompanyName/>
-       <TIN/>
-       <SSN></SSN>
-       <Phone10/>
-       <DOB>
-        <Year/>
-        <Month/>
-        <Day/>
-       </DOB>
-      </Item>
-      <Item>
-           <UniqueId/>
-           <InSeleID/>
-           <Role>Role 2</Role>      
-          <IndividualOrBusiness></IndividualOrBusiness>
-           <Address>
-            <StreetNumber></StreetNumber>
-            <StreetPreDirection/>
-            <StreetName></StreetName>
-            <StreetSuffix></StreetSuffix>
-            <StreetPostDirection/>
-            <UnitDesignation/>
-            <UnitNumber/>
-            <StreetAddress1/>
-            <StreetAddress2/>
-            <City></City>
-            <State></State>
-            <Zip5></Zip5>
-            <Zip4/>
-            <County/>
-            <PostalCode/>
-            <StateCityZip/>
-           </Address>
-           <Name>
-            <Full/>
-            <First></First>
-            <Middle/>
-            <Last/>
-            <Suffix/>
-            <Prefix/>
-           </Name>
-           <CompanyName/>
-           <TIN/>
-           <SSN/>
-           <Phone10/>
-           <DOB>
-            <Year/>
-            <Month/>
-            <Day/>
-           </DOB>
-        </Item>
-				<Item>
-           <UniqueId/>
-           <InSeleID/>
-           <Role>Role 3</Role>
-          <IndividualOrBusiness></IndividualOrBusiness>
-           <Address>
-            <StreetNumber></StreetNumber>
-            <StreetPreDirection/>
-            <StreetName></StreetName>
-            <StreetSuffix></StreetSuffix>
-            <StreetPostDirection/>
-            <UnitDesignation/>
-            <UnitNumber/>
-            <StreetAddress1/>
-            <StreetAddress2/>
-            <City></City>
-            <State></State>
-            <Zip5></Zip5>
-            <Zip4/>
-            <County/>
-            <PostalCode/>
-            <StateCityZip/>
-           </Address>
-           <Name>
-            <Full/>
-            <First></First>
-            <Middle/>
-            <Last/>
-            <Suffix/>
-            <Prefix/>
-           </Name>
-           <CompanyName/>
-           <TIN/>
-           <SSN/>
-           <Phone10/>
-           <DOB>
-            <Year/>
-            <Month/>
-            <Day/>
-           </DOB>
-           </Item>
-       </SearchBy>
-    </row>
-     </relationshipidentifiersearchrequest>
-</relationshipidentifier_services.search_serviceRequest>
-*/

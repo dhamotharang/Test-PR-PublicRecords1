@@ -95,7 +95,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 	dsPAWContact 	:= JOIN(needREA,PAW.Key_Did,
 							KEYED(LEFT.did = RIGHT.did),	
 							LIMIT(Constants.MAX_RECORDS,SKIP));	
-	dsPAW		 	:= JOIN(dsPAWContact,PAW.Key_contactID,
+	dsPAW_pre := JOIN(dsPAWContact,PAW.Key_contactID,
 							KEYED(LEFT.contact_id = right.contact_id),	
 							TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 										SELF.acctno := LEFT.acctno,
@@ -114,7 +114,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 										SELF:=LEFT,
 										SELF:=[]),										 
 							LIMIT(Constants.MAX_RECORDS,SKIP));	
-
+  dsPAW := suppress.MAC_SuppressSource(dsPAW_pre,mod_access);
 	PhoneOwnership.Layouts.Phone_Relationship rollEmployer(PhoneOwnership.Layouts.Phone_Relationship l, PhoneOwnership.Layouts.Phone_Relationship r) := TRANSFORM
 		SELF.seq := 0;
 		SELF.dt_first_seen := (STRING)ut.Min2((INTEGER)l.dt_first_seen,(INTEGER)r.dt_first_seen);

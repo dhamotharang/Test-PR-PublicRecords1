@@ -229,6 +229,12 @@ MODULE
 		unsigned8 	event_date;
 		string4 	event_type;
 		unsigned8   remove_port_dt;
+		unsigned	count_otp_30;	//add more count variables here
+		unsigned	count_otp_60;
+		unsigned	count_otp_90;
+		unsigned	count_otp_180;
+		unsigned	count_otp_365;
+		unsigned	count_otp_730;	
 	END;
 
 	EXPORT PhoneAttributes := MODULE

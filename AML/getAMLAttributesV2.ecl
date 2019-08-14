@@ -8,8 +8,14 @@ EXPORT getAMLattributesV2 (DATASET(Risk_Indicators.Layout_Input) iid_prep,
                                             DATASET (Gateway.Layouts.Config) gateways , 
 																						integer bsversion = 50,
 																						string50 DataPermission,
+                                                                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
 																						string UseXG5Flag = '2',
 																						boolean IncludeNews = TRUE) := FUNCTION
+                                            
+    unsigned1 LexIdSourceOptout := mod_access.lexid_source_optout;
+    string TransactionID := mod_access.transaction_id;
+    string BatchUID := '';
+    unsigned6 GlobalCompanyId := mod_access.global_company_id;
 																						 
 
 	boolean 	isFCRA							:= false;
@@ -174,7 +180,11 @@ END;
 																	 EverOccupant_StartDate,
 																	 BSOptions,
 																	 LastSeenThreshold,
-																	 DataPermission);
+																	 DataPermission,
+                                                                     LexIdSourceOptout, 
+                                                                     TransactionID, 
+                                                                     BatchUID, 
+                                                                     GlobalCompanyID);
 	
 	
 
@@ -182,7 +192,7 @@ NoDIDRecs := dedupALLDIDs(DID = 0);
 
 
 
-GetProperty := IndProperty(ungroup(IID(did <> 0)),DataRestrictionMask);
+GetProperty := AML.IndProperty(ungroup(IID(did <> 0)),DataRestrictionMask);
 
 
 Addproperty :=  join(IID, GetProperty,
@@ -191,12 +201,12 @@ Addproperty :=  join(IID, GetProperty,
 															self.propertyCount := right.owned.property_total;
 															self := left), left outer);
 
-GetWatercraft := IndWatercraft(Addproperty);
+GetWatercraft := AML.IndWatercraft(Addproperty);
 
-getAircraft :=   IndAircraft(GetWatercraft);
+getAircraft :=   AML.IndAircraft(GetWatercraft);
 
 
-GetAddrAttrib := 			IndAddrAttrib(getAircraft, dppa, 
+GetAddrAttrib := 			AML.IndAddrAttrib(getAircraft, dppa, 
 											GLBA,
 											isFCRA, 
 											DataRestrictionMask,
@@ -216,7 +226,7 @@ GetAddrAttrib := 			IndAddrAttrib(getAircraft, dppa,
 //  99 -  no clue who this person is or how they got in here
 
 
-GetBusnExes := IndGetBusnAssoc(ungroup(IID));
+GetBusnExes := AML.IndGetBusnAssoc(ungroup(IID));
 
 busnexec := GetBusnExes(relatdegree in[50,52]);
 
@@ -321,7 +331,7 @@ PrepIndivProfLic := project(IID,
 																			
 PrepProfLic  := 	dedup(sort(busnexec + PrepIndivProfLic, seq, assocdid), seq, assocdid);																		
 
-GetProfLic  := IndProfLic(PrepProfLic, isFCRA , DataRestrictionMask);
+GetProfLic  := AML.IndProfLic(PrepProfLic, isFCRA , DataRestrictionMask);
 
 											
 //Relatives, indiv and execs section											
@@ -360,7 +370,7 @@ ExecDerogPrep  := project(GetBusnExes(isexec and relatdegree = 52), PregexecDero
 DDExecDerogPrep := dedup(sort(ExecDerogPrep, seq, did), seq, did);
 
 //  need relatives and execs
-GetRelatAMLCrim := IndAllLegalEvents((DDRelatDerogPrep + DDExecDerogPrep),isFCRA);
+GetRelatAMLCrim := AML.IndAllLegalEvents((DDRelatDerogPrep + DDExecDerogPrep),isFCRA);
 
 
 // relatives, assoc exec, exec relatives and individual
@@ -387,7 +397,7 @@ SSNIDS := GetRelatives + ExecSSNPrep;
 // need indiv, relatives, assoc exec, execs parents to go in
 GetSSNFlags := SSNData(SSNIDS,dppa, glba,isFCRA , DataRestrictionMask,  FALSE, bsversion);  //Layouts.RelatLayoutV2 IsBusn = False
 
-GetHeader := IndGetHeader(GetSSNFlags, dppa, glba,isFCRA , DataRestrictionMask);  //Layouts.RelatLayoutV2
+GetHeader := AML.IndGetHeader(GetSSNFlags, dppa, glba,isFCRA , DataRestrictionMask);  //Layouts.RelatLayoutV2
 	
 	
 
@@ -426,7 +436,7 @@ AddRelatDerogs := join(GetRelatCitizenKRI,GetRelatAMLCrim,
 
 // AML.IndGetPersonalNetwKRI
 
-GetpersonalNtwKRI := IndGetPersonalNetwKRI(AddRelatDerogs(relatdegree between 1 and 50));
+GetpersonalNtwKRI := AML.IndGetPersonalNetwKRI(AddRelatDerogs(relatdegree between 1 and 50));
 
 GetRelatKRIs  := rollRelativesKRIs(GetpersonalNtwKRI);
 

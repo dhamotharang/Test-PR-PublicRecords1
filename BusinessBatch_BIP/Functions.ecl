@@ -167,7 +167,7 @@ END;
   EXPORT GetPhones( DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dGongPhonesRaw := Gong.key_History_LinkIDs.kFetch(dLinkIds,
+    dGongPhonesRaw := Gong.key_History_LinkIDs.kFetch(dLinkIds, ,
         BIPV2.IDconstants.Fetch_Level_SELEID)(phone10 != '');
     RawRecordType := RECORDOF(dGongPhonesRaw);
 

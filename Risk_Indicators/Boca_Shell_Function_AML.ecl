@@ -1,4 +1,4 @@
-import Gateway;
+﻿import Gateway;
 EXPORT Boca_Shell_Function_AML (GROUPED DATASET (Layout_output) iid1,
                             DATASET (Gateway.Layouts.Config) gateways,
                             unsigned1 dppa, unsigned1 glb, boolean isUtility=false, boolean isLN=false,
@@ -9,7 +9,11 @@ EXPORT Boca_Shell_Function_AML (GROUPED DATASET (Layout_output) iid1,
 														boolean doScore=false, boolean nugen = false, boolean filter_out_fares = false,
 														string50 DataRestriction=iid_constants.default_DataRestriction,
 														unsigned8 BSOptions = 0,
-														string50 DataPermission=iid_constants.default_DataPermission) :=  
+														string50 DataPermission=iid_constants.default_DataPermission,
+                                                        unsigned1 LexIdSourceOptout = 1,
+                                                        string TransactionID = '',
+                                                        string BatchUID = '',
+                                                        unsigned6 GlobalCompanyId = 0) :=  
 FUNCTION
 
 
@@ -50,7 +54,11 @@ iid := group(iid_deduped, seq);
                                    FALSE, isLN, dppa, dppa_ok,
                                    includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, BSversion,
 																	 false, doScore, filter_out_fares,
-																	 DataRestriction, BSOptions, glb, DataPermission);
+																	 DataRestriction, BSOptions, glb, DataPermission,
+                                                                     LexIdSourceOptout, 
+                                                                     TransactionID, 
+                                                                     BatchUID, 
+                                                                     GlobalCompanyID);
 
 	shell_results := per_prop;
 

@@ -1,4 +1,4 @@
-﻿import address, Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD, daybatchPCNSR;
+﻿import Easi, Risk_Indicators, Riskwise, ut, IdentityManagement_Services, STD, daybatchPCNSR, Models;
 
 export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
 	grouped DATASET(Risk_Indicators.Layout_Output) iid,
@@ -9,7 +9,8 @@ export getFDAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam,
   unsigned1 DPPA=0, unsigned1 GLB=0,
   string DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
   string DataPermission=risk_indicators.iid_constants.default_DataPermission,
-  string32 appType = ''
+  string32 appType = '',
+  DATASET(Models.Layouts.Layout_Model_Request_In) ModelRequests = DATASET([],Models.Layouts.Layout_Model_Request_In)
 	) := FUNCTION
 
 
@@ -1062,13 +1063,14 @@ DL_is_compromised := trim(compromised_DL_hash_value) <> '';
   self.version202.IdentitySynthetic := attr.synthid_trigger;
   self.version202.IdentityManipSSNRiskLevel := attr.cpnindex;
   self.version202.IdentitySSNManip := attr.cpn_trigger;
-  // VERSION 2.03
-  self.version203.IDVerSSNVerAgeOldest := attr.ver_ssn_sources_first_seen;
-  self.version203.IDVerSSNNotVerAgeOldest := attr.adls_per_ssn_and_first_seen_date;
+  // VERSION 2.03 is being deprecated
+  // self.version203.IDVerSSNVerAgeOldest := attr.ver_ssn_sources_first_seen;
+  // self.version203.IDVerSSNNotVerAgeOldest := attr.adls_per_ssn_and_first_seen_date;
   //TESTING ONLY
   // self.version203.clam := attr.attr_clam;
-
+  
   self.compromisedDL_hash := compromised_DL_hash_value;
+  
   self := [];
 END;
 
@@ -1335,6 +1337,7 @@ Models.Layout_FraudAttributes intoIDAttributes(Layout_WorkingCombo le) := TRANSF
 	SELF.IDAttributes.EmailBrowserFlag := '';
 	SELF.IDAttributes.HRiskEmailDomainFlag := '';
 	SELF.IDAttributes.DistAddrDomain := '';
+  
 	SELF := le;
 	SELF := [];
 END;
@@ -1423,5 +1426,5 @@ out_por := join( clam, out, left.seq=right.input.seq, POR_Flag(left,right), keep
 // output (ParoAttrs, named ('ParoAttrs'), overwrite);
 // output (AttrVersion, named ('AttrVersion'), overwrite);
 
-return if( model_name='fp31203_1', out_por, out );
+return if( Models.FP_models.Model_Check(ModelRequests, ['fp31203_1']), out_por, out );
 END;

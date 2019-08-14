@@ -3,7 +3,8 @@ import dx_header, property, Doxie, Doxie_Raw, Doxie_LN, doxie_cbrs,
 		LN_PropertyV2, LN_PropertyV2_Services, iesp, MDR, BIPV2, Suppress;
 
 export location_sources(DATASET(doxie_raw.Layout_input) addr_in,
-								        BOOLEAN useBusinessIds = FALSE) :=  FUNCTION
+								Doxie.IDataAccess mod_access, 
+								BOOLEAN useBusinessIds = FALSE) :=  FUNCTION
 
 doxie.MAC_Header_Field_Declare();
 
@@ -68,7 +69,7 @@ addr := PROJECT(addr_in, getAddr(LEFT));
 
 addrDidsWithInputs := getDids(addr,application_type_value);
 
-headerRecs := header_records(addrDidsWithInputs);
+headerRecs := header_records(addrDidsWithInputs, mod_access);
 
 headerSrcs := header_sources(headerRecs);
 
@@ -90,8 +91,10 @@ kh := dx_header.key_header();
 
 rec := RECORD 
 	kfs.ln_fares_id;
-	unsigned6 did := 0;
-	qstring9 ssn := '';
+	UNSIGNED6 did := 0;
+	QSTRING9 ssn := '';
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
 END;
 
 use_le:=doxie.DataPermission.use_LE;
@@ -101,9 +104,10 @@ fids := dedup(sort(PROJECT(deed_out, rec) + PROJECT(asset_out, rec), ln_fares_id
 fids_dids := join(fids, kfs, keyed(left.ln_fares_id = right.ln_fares_id), TRANSFORM(rec, SELF := RIGHT)) (did<>0);
 fids_dids_ssns0 := join(fids_dids, kh, keyed(left.did = right.s_did) and
 	(~doxie.DataRestriction.ECH or ~MDR.sourceTools.SourceIsExperian_Credit_Header(right.src)), 
-	TRANSFORM({rec, unsigned rid}, SELF.ssn := RIGHT.ssn, SELF.rid := RIGHT.rid, SELF := LEFT));
-fids_dids_ssns_filt := join(fids_dids_ssns0, dx_header.key_DMV_restricted(), keyed(left.rid = right.rid) and left.did = right.did and right.ssn = '', transform(left), left only);
-fids_dids_ssns := project(if(suppressDMVInfo_value, fids_dids_ssns_filt), rec);
+	TRANSFORM({rec, unsigned rid}, SELF.ssn := RIGHT.ssn, SELF.rid := RIGHT.rid, SELF.global_sid := RIGHT.global_sid, SELF.record_sid := RIGHT.record_sid, SELF := LEFT));
+fids_dids_source_filt := Suppress.MAC_SuppressSource(fids_dids_ssns0,mod_access);
+fids_dids_ssns_filt := join(fids_dids_source_filt, dx_header.key_DMV_restricted(), keyed(left.rid = right.rid) and left.did = right.did and right.ssn = '', transform(left), left only);
+fids_dids_ssns := project(if(mod_access.suppress_dmv, fids_dids_ssns_filt), rec);
 Suppress.MAC_Suppress(fids_dids,good_fids_did,application_type_value,Suppress.Constants.LinkTypes.DID,did);
 Suppress.MAC_Suppress(fids_dids_ssns,good_fids_ssn,application_type_value,Suppress.Constants.LinkTypes.SSN,ssn);
 

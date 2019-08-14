@@ -102,7 +102,7 @@ EXPORT Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
     PROJECT(BatchServices._Sample_inBatchMaster('BANKRUPTCY'), BatchServices.layout_BankruptcyV3_Batch_in));
 
   //Need these values to utilize picklist to try and find missing DIDs from PII.
-  batch_params := MODULE(BatchShare.IParam.getBatchParams())
+  batch_params := MODULE(BatchShare.IParam.getBatchParamsV2())
     EXPORT DATASET (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
   END;
 

@@ -327,9 +327,9 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
     EXPORT studentRecsByDid(American_Student_Services.IParam.reportParams student_mod):= FUNCTION
       student_raw := American_Student_Services.Functions.get_report_recs(in_did,
                         student_mod,PersonSlimReport_Services.Constants.onlyCurrentStudentRecs);							 
-      student_raw_sorted:= sort(student_raw, -d2i(firstreported), -iscurrent);
-      student_duped := dedup(student_raw_sorted, firstreported.year, firstreported.month, 
-                             firstreported.day, addressatcollege.state, addressatcollege.zip5);									 
+      student_raw_sorted:= sort(student_raw, CollegeData.Name, -d2i(firstreported), -iscurrent);
+      student_duped := dedup(student_raw_sorted, CollegeData.Name, firstreported.year, firstreported.month, 
+                             firstreported.day);									 
       student_duped_sorted := sort(student_duped, -d2i(lastreported ));
       RETURN student_duped_sorted;
     END;

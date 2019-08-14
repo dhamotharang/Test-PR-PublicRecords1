@@ -1,9 +1,10 @@
-﻿Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, std;
+﻿Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, std, doxie;
 
 
 
 export IndAllLegalEvents(DATASET(Layouts.AMLDerogsLayoutV2) idsIN ,
-													 boolean isFCRA = false
+													 boolean isFCRA = false,
+                                                     doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   													) := FUNCTION
 
 //version 2

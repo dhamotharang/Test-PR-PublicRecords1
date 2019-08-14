@@ -1,8 +1,9 @@
-IMPORT Risk_indicators, ut, LN_PropertyV2_Services;
+﻿IMPORT Risk_indicators, ut, LN_PropertyV2_Services, doxie;
 
 // EXPORT IndProperty(DATASET(Risk_indicators.layout_bocashell_neutral) IndivIds) := FUNCTION
 EXPORT IndProperty(DATASET(Layouts.LayoutAMLShellV2) IndivIds, 
-										string50 DataRestriction = Risk_indicators.iid_constants.default_DataRestriction) := FUNCTION
+										string50 DataRestriction = Risk_indicators.iid_constants.default_DataRestriction,
+                                        doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
 
 //version 2	
