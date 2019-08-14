@@ -161,7 +161,7 @@ EXPORT Ingest(
     SELF.pct_ingest_New := 100.0 * L.cnt_New / cnt_ingest;
     SELF := L;
   END;
-  SHARED UpdateStatsXtab := PROJECT(ROLLUP(PROJECT(SORT(UpdateStatsSrc,src),toRoll(LEFT)),doRoll(LEFT,RIGHT),src),toPct(LEFT));
+  EXPORT UpdateStatsXtab := PROJECT(ROLLUP(PROJECT(SORT(UpdateStatsSrc,src),toRoll(LEFT)),doRoll(LEFT,RIGHT),src),toPct(LEFT));
   SHARED S3 := IF(~incremental, OUTPUT(UpdateStatsXtab,ALL,NAMED('UpdateStatsXtab')));
  
   SHARED NoFlagsRec := WithRT;
