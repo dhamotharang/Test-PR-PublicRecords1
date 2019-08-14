@@ -89,13 +89,18 @@ super_all
 		FileServices.FinishSuperFileTransaction()
 	);
 
+// Remove RAW file
+   remove_raw		:=	FileServices.DeleteLogicalFile('mlo_list.raw');
+	
+
 
 //  Spray All Files
 export S0681_SprayFiles := SEQUENTIAL(
 																			clear_super
 																		  ,spray_all
 																			,xform_all
-																			,super_all);
+																			,super_all
+																			,remove_raw);
 																			
 
 END;
