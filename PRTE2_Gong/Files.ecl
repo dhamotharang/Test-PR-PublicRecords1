@@ -1,8 +1,8 @@
 ﻿Import ut, Gong, NID,didville, mdr,Gong_Neustar,Std;
 EXPORT files := module
 	
-	EXPORT file_Gong_History := DATASET('~PRTE::BASE::Gong_History', Layouts.Layout_history, FLAT );
-	EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly', Layouts.Layout_history, FLAT );
+	EXPORT file_Gong_History := DATASET('~PRTE::BASE::Gong_History', Layouts.Layout_base, FLAT );
+	EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly', Layouts.Layout_base, FLAT );
 	EXPORT DS_Gong_History_IN := DATASET('~PRTE::IN::Gong_History', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 	EXPORT DS_Gong_Weekly_IN := DATASET('~PRTE::IN::Gong_Weekly', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 	EXPORT DS_Gong_Santander_IN :=  DATASET('~PRTE::IN::Gong_Santander', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
@@ -49,8 +49,8 @@ EXPORT files := module
 	END;
 	f_cn_norm := normalize(f_cn,length(left.cn_all)/10,normCN(left,counter));
 	EXPORT f_cn_norm_dep := dedup(sort(f_cn_norm, record), record);
-	export File_History_Full_Prepped_for_Keys := Project(file_Gong_History, Layouts.layout_historyaid);
-	export File_Weekly_Full_Prepped_for_Keys := Project(file_Gong_Weekly, Layouts.layout_historyaid);
+	export File_History_Full_Prepped_for_Keys := Project(file_Gong_History, Layouts.layout_historyaid_clean);
+	export File_Weekly_Full_Prepped_for_Keys := Project(file_Gong_Weekly, Layouts.layout_historyaid_clean);
 	//DS_gong_cn_to_company
 		hist_in := File_Weekly_Full_Prepped_for_Keys((unsigned)phone10<>0, listing_type_bus<>'', listed_name<>'', current_record_flag<>'');
 		gong.mac_hist_full_slim_dep(hist_in, hist_out);
