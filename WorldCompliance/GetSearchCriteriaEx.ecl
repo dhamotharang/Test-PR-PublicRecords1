@@ -66,5 +66,5 @@ EXPORT GetSearchCriteriaEx(dataset(Layouts.rEntity) infile) :=
 		+MakeGroupHeader(CategoryCriteria(infile), 3, 'Category')
 		+MakeGroupHeader(dsDeceased, 4, 'Deceased State')
 		+MakeGroupHeader(SourceCriteria(infile), 5, 'Source')
-		+MakeGroupHeader(ConsolidatedCriteria, 6, 'Sanction')
+		+MakeGroupHeader(ConsolidatedCriteria, 6, 'Consolidated Sanction')
 		;
