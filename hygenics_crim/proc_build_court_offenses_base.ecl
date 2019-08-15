@@ -851,6 +851,18 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																			trim(l.offensedegree, left, right) in ['VI','VIOLATION'] and trim(l.offenseclass, left, right) = 'C' => 'VC',
 																																			trim(l.offensedegree, left, right) in ['VI','VIOLATION'] and trim(l.offenseclass, left, right) = 'D' => 'VD',
 																																			trim(l.offensedegree, left, right) in ['VI','VIOLATION'] and trim(l.offenseclass, left, right) = 'U' => 'VU',
+
+																																			trim(l.offensetype, left, right) = 'INFRACTION'           =>'I',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR'          =>'M',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS A'  =>'MA',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS B'  =>'MB',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'MISDEMEANOR CLASS C'  =>'MC',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY'               =>'F',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS E'       =>'FE',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS C'       =>'FC',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS B'       =>'FB',      // added by tp      
+																																			trim(l.offensetype, left, right) = 'FELONY CLASS A'       =>'FA',      // added by tp  
+																																			
 																																			'')),
 																				l.statecode in ['PA'] 	=> (map(trim(l.offensedegree, left, right)='1ST DEGREE FELONY' => 'F1',
 																																			trim(l.offensedegree, left, right)='2ND DEGREE FELONY' => 'F2',
