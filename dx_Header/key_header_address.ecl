@@ -1,5 +1,7 @@
-IMPORT data_services;
+IMPORT data_services, _Control;
 IMPORT $;
+#IF(_Control.Environment.onVault) IMPORT vault; #END;
+
 
 keyed_fields := RECORD
   $.layouts.i_header_address.prim_name;
@@ -12,5 +14,9 @@ fname (integer data_category) := IF (data_category = data_services.data_env.iFCR
                                      $.names().i_header_address_fcra,
                                      $.names().i_header_address); 
 
-EXPORT key_header_address (integer data_category = 0) := 
-         INDEX (keyed_fields, $.layouts.i_header_address, fname(data_category));
+EXPORT key_header_address (integer data_category = 0) :=
+#IF(_Control.Environment.onVault)
+    vault.dx_header.key_header_address(data_category);
+#ELSE
+    INDEX (keyed_fields, $.layouts.i_header_address, fname(data_category));
+#END;

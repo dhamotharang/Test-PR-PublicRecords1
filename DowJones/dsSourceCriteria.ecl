@@ -1793,6 +1793,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'Canada Regulations Establishing a List of Entities','1780'},
 {'Canada Regulations Implementing the United Nations Resolutions on the Suppression of Terrorism','1781'},
 {'NDRC (China) Suspected Financial Blacklist','1782'},
-{'OFAC - Hizballah International Financing Prevention Amendments Act of 2018','1783'}
+{'OFAC - Hizballah International Financing Prevention Amendments Act of 2018','1783'},
+{'EC (CFSP) 2019/1341 EU Terrorism List','1784'},
+{'EC 2019/1337 Terrorism List','1785'},
+{'US Executive Order 13884','1786'}
 ],r);
 
