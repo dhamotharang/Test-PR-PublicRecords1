@@ -65,8 +65,10 @@ export ReportService := macro
 
 	boolean ExcludeForeclosures := false : stored('ExcludeForeclosures');
 	boolean IncludeNoticeOfDefaults := false : stored('IncludeNoticeOfDefaults');
-	for := if(~ExcludeForeclosures,Foreclosure_Services.ReportService_Records.val(tempmod,mod_access,false,true));
-	nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.ReportService_Records.val(tempmod,mod_access,true,true));
+	boolean includeVendorSourceB := first_row.options.IncludeVendorSourceB;
+	 
+	for := if(~ExcludeForeclosures,Foreclosure_Services.ReportService_Records.val(tempmod,mod_access,false, includeVendorSourceB));
+	nod := if(IncludeNoticeOfDefaults,Foreclosure_Services.ReportService_Records.val(tempmod,mod_access,true, includeVendorSourceB));
 	raw_records := sort(for+nod,-recordingdate,record);
 
   // attach standard ESP header
