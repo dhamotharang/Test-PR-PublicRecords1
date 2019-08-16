@@ -174,7 +174,7 @@ EXPORT ContactPlusSearchService := MACRO
 		UNSIGNED2 MaxNumFamilyClose := 0 : STORED('MaxNumFamilyClose');
 		UNSIGNED2 MaxNumParent := 0 : STORED('MaxNumParent');
 		UNSIGNED2 MaxNumSpouse := 0 : STORED('MaxNumSpouse');
-		UNSIGNED2 MaxNumSubject := 0 : STORED('MaxNumSubject');
+		UNSIGNED2 MaxNumSubject := 50 : STORED('MaxNumSubject');
 		UNSIGNED2 MaxNumNeighbor := 0: STORED('MaxNumNeighbor');
 		
 	
