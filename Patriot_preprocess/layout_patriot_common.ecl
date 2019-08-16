@@ -83,5 +83,5 @@ STRING4 err_stat;
 //Added for CCPA-393
 UNSIGNED4 global_sid := 0;
 UNSIGNED8 record_sid := 0;
-UNSIGNED8 did        := 0;
+UNSIGNED6 did        := 0;
 END;
