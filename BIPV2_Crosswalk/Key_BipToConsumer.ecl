@@ -179,7 +179,7 @@ export Key_BipToConsumer := module
 										self            := left));
 
            adjustDates       := project(rolljobTitleLexID + rolljobTitleEmpID + changeToFinalForm(empId = 0 and contact_did=0), 
-		                              transform(Layouts.ConsumerToBipFinalRec,
+		                              transform(Layouts.BipToConsumerFinalRec,
 								          self.dt_first_seen_at_business := map(
 										                                      left.dt_first_seen_at_business > left.dt_last_seen                                          => left.dt_last_seen,
 																	   left.dt_first_seen_at_business < left.dt_first_seen and  left.dt_first_seen_at_business > 0 => left.dt_first_seen,
