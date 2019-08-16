@@ -19,7 +19,7 @@ NonFCRA_qa_ddt_ds := DS_DOPS(cluster = 'N');
 		end;
 
 	NewLay := record
-			outrec;
+			Scoring_Project_DailyTracking.Attributes.ddt_layout;
 			string newdate;
 			string newtime;
 	end;
