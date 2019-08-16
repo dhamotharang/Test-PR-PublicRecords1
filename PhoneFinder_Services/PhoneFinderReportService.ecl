@@ -62,25 +62,25 @@
 
 
 EXPORT PhoneFinderReportService() :=
-MACRO	
+MACRO
 IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, AutoheaderV2, Autokey_batch;
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// parse ESDL input
   dIn       := DATASET([], iesp.phonefinder.t_PhoneFinderSearchRequest) : STORED('PhoneFinderSearchRequest',FEW);
   pfRequest := dIn[1] : INDEPENDENT;
-	
+
 	// Searchby request
 	pfSearchBy:= GLOBAL(pfRequest.SearchBy);
-	
+
 	// User setttings
 	pfUser := GLOBAL(pfRequest.User);
-	
+
   // Report options
   pfOptions := GLOBAL(pfRequest.Options);
-	
+
 	// Gateway information
 	dGateways := Gateway.Configuration.Get();
-	
+
   // #store some standard input parameters (generally, for search purpose)
   iesp.ECL2ESP.SetInputBaseRequest(pfRequest);
   iesp.ECL2ESP.SetInputReportBy(PROJECT(pfSearchBy,
@@ -89,22 +89,22 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
 																									SELF         := LEFT,
 																									SELF         := [])));
 	iesp.ECL2ESP.SetInputSearchOptions(PROJECT(pfOptions,TRANSFORM(iesp.share.t_BaseSearchOptionEx,SELF := LEFT;SELF := [])));
-	
+
 	// Global module
 	globalMod := AutoStandardI.GlobalModule();
 	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
-  
+
 	// Search module
 	searchMod := PROJECT(globalMod,PhoneFinder_Services.iParam.DIDParams,OPT);
 	reportMod := PhoneFinder_Services.iParam.GetSearchParams(pfOptions,pfUser);
-	
+
 	// Create dataset from search request
 	Autokey_batch.Layouts.rec_inBatchMaster tFormat2Batch() :=
 	TRANSFORM
 		// Clean name and address
 		cleanName := Address.GetCleanNameAddress.fnCleanName(pfSearchBy.Name);
 		cleanAddr := Address.CleanAddressFieldsFips(AutoStandardI.InterfaceTranslator.clean_address.val(searchMod)).addressrecord;
-		
+
 		SELF.acctno      := '1';	// since there would only be one record
 		SELF.name_first  := IF( AutoStandardI.InterfaceTranslator.fname_val.val(searchMod) != '',
 														AutoStandardI.InterfaceTranslator.fname_val.val(searchMod),
@@ -123,16 +123,16 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
 		Input_PhoneNumber   := IF( AutoStandardI.InterfaceTranslator.phone_value.val(searchMod) != '',
 														AutoStandardI.InterfaceTranslator.phone_value.val(searchMod),
 														searchMod.Phone);
-		SELF.homephone  := IF(reportMod.IsPrimarySearchPII, '', Input_PhoneNumber);                                                    
+		SELF.homephone  := IF(reportMod.IsPrimarySearchPII, '', Input_PhoneNumber);
 		SELF.DID         := IF( AutoStandardI.InterfaceTranslator.did_value.val(searchMod) != '',
 														(UNSIGNED6)AutoStandardI.InterfaceTranslator.did_value.val(searchMod),
 														(UNSIGNED6)searchMod.DID);
 		SELF             := cleanAddr;
 		SELF             := [];
 	END;
-	
+
 	dReqBatch := DATASET([tFormat2Batch()]);
-	
+
 	iesp.phonefinder.t_PhoneFinderSearchBy CleanupSearch(recordof(dReqBatch) l) := TRANSFORM
 		self.Name.first := l.name_first;
 		self.Name.middle := l.name_middle;
@@ -155,13 +155,13 @@ IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut, doxie, A
 		self.UniqueId := (STRING)l.did;
 		self := l;
 		self := [];
-	
+
 	END;
 
 	cleanpSearchBy := PROJECT(dReqBatch, CleanupSearch(LEFT));
-	
+
 	formattedSearchBy := cleanpSearchBy[1];
-	
+
 	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
 															dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
  															formattedSearchBy, pfSearchBy);
@@ -171,20 +171,17 @@ iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
       			SELF.Records   := modRecords.dFormat2IESP;
       			SELF.InputEcho := pfSearchBy;
  END;
-      		
+
  dPhoneFinder := DATASET([tFormat2IespResponse()]);
- 
+
  // return blank  dataset when identities child dataset is blank
  results := if(~reportMod.SuppressBlankNameAddress or (reportMod.SuppressBlankNameAddress and exists(dPhoneFinder.records.identities)),
                        dPhoneFinder);
-											     
+
  royalties	:= modRecords.dRoyalties;
-   	
- Zumigo_Log := modRecords.Zumigo_History_Recs; 
+ Zumigo_Log := modRecords.Zumigo_History_Recs;
  PF_Reporting_Dataset := modRecords.ReportingDataset;
- 
-  IF (EXISTS(modRecords.dFormat2IESP), doxie.compliance.logSoldToTransaction(mod_access)); 
-    
+
  OUTPUT(results, named('Results'));
  OUTPUT(royalties, named('RoyaltySet'));
  OUTPUT(Zumigo_Log, named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));

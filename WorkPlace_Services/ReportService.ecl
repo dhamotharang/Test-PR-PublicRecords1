@@ -16,7 +16,7 @@
 
 	<!-- XML INPUT DATASET BOXES -->
   <part name="WorkPlaceReportRequest" type="tns:XmlDataSet" cols="80" rows="30" />
-	
+
 	<!-- RESULTS DATA EXCLUSION OPTIONS FOR INTERNAL USE-->
 	<part name="ExcludedSources"        type="xsd:string"/>
 
@@ -38,12 +38,12 @@ export ReportService := macro
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
 
 	// Store product specific report options (see iesp.workplace.t_WPReportOption)
-	report_options := global (first_row.Options); 
+	report_options := global (first_row.Options);
   #stored ('IncludeSecretaryOfStateInfo', report_options.IncludeSecretaryOfStateInfo);
   #stored ('IsSpouse', report_options.IsSpouse);
 
   // Store source exclusion option
-  #stored ('ExcludedSources', report_options.ExcludedSources); 
+  #stored ('ExcludedSources', report_options.ExcludedSources);
 
   //set main search criteria:
 	report_by := global (first_row.ReportBy);
@@ -52,17 +52,17 @@ export ReportService := macro
   // *** Start of processing
   mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	tempmod := module(project(mod_access,WorkPlace_Services.ReportService_Records.params,opt));
-	  // NOTE: UniqueID is the xml input name, but it is really a did 
-		// so it is stored into the standard global "did" name. 
+	  // NOTE: UniqueID is the xml input name, but it is really a did
+		// so it is stored into the standard global "did" name.
 	  export string12 unique_id  := ''    : stored('UniqueID');
     export boolean include_sos := false : stored('IncludeSecretaryOfStateInfo');
 		export boolean is_spouse   := false : stored('IsSpouse');	// defaults to OFF
-	  export string  excluded_sources := '' : stored('ExcludedSources'); 
+	  export string  excluded_sources := '' : stored('ExcludedSources');
 	end;
 
 	ds_temp_results  := WorkPlace_Services.ReportService_Records.val(tempmod);
 
-   // Even when no results, we still need to output the report reponse structure because 
+   // Even when no results, we still need to output the report reponse structure because
    // certain xml tags (i.e. <TransactionId> are needed by ESP.
 	 // So an empty WPReportRecord is output below when the temp_results have no records.
   iesp.workplace.t_WorkPlaceReportResponse format() := transform
@@ -72,19 +72,17 @@ export ReportService := macro
 			self.WPReportRecord  := if(temp_cnt>0,ds_temp_results[1])
    end;
   ds_results := dataset([format()]);
-									
+
 	// ds_results_slimmed := project(ds_results,
 																// transform(WorkPlace_Services.Layouts.result_sources,
 																	// self.source := left.WPReportRecord.SourceCode));
-									
-	// Royalty.MAC_RoyaltyWorkplace(ds_results_slimmed, temp_royalties);							
-	
+
+	// Royalty.MAC_RoyaltyWorkplace(ds_results_slimmed, temp_royalties);
+
 	Royalty.MAC_RoyaltyEmail(ds_results[1].WPReportRecord.EmailAddresses, email_royalties, EmailSource);
-	
+
 	// royalties:= temp_royalties + email_royalties;
-	
-  IF (exists(ds_temp_results), doxie.compliance.logSoldToTransaction(mod_access)); 
-  
+
 
   //Uncomment line below as needed to assist in debugging
   //output(ds_temp_results,  named('ds_temp_results'));
@@ -94,11 +92,11 @@ export ReportService := macro
  endmacro;
 
 /*
-For testing/debugging: 
-1. In the "WorkPlaceSearchRequest" xml text area, use the sample xml input below 
+For testing/debugging:
+1. In the "WorkPlaceSearchRequest" xml text area, use the sample xml input below
    filling in:
-   a. the appropriate input UniqueID(did) field value, 
-   b. the IncludeSecretaryofStateInfo option (if needed/desired) and 
+   a. the appropriate input UniqueID(did) field value,
+   b. the IncludeSecretaryofStateInfo option (if needed/desired) and
    c. the IsSpouse indicator if needed and
    d. If needed, set the "ExcludedSources" list of comma de-limited sources to be excluded.
 <WorkPlaceReportRequest>
