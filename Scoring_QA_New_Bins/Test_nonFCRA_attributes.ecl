@@ -84,8 +84,8 @@ ip:='~';
 		
 		rpt29:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,a1,b1);
 
-/*for biid2		rpt30:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,a1,b1); ////////change inside: stats, average & dids delete "1"
-*/
+		rpt30:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,a1,b1); ////////change inside: stats, average & dids delete "1": finished on 8/15/19
+
 
 		//*********************************************************************************************************************
 		// rpt1_1:=Scoring_QA.FCRA_RiskView_xml_generic_attributes_v3(ip,b1,a1);
@@ -147,8 +147,8 @@ ip:='~';
 
 		rpt29_1:= Scoring_QA_New_Bins.Test_ProfileBooster_attribute_report(ip,b1,a1);
 
-/*for biid2				rpt30_1:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,b1,a1); ////////change inside: stats, average & dids delete "1"
-*/
+		rpt30_1:= Scoring_QA_New_Bins.Test_BIIDv2_attribute_report(ip,b1,a1); ////////change inside: stats, average & dids delete "1": finished on 8/15/19
+
 
 			  compare_layout_stats := RECORD
 	    string file_version;
@@ -488,16 +488,14 @@ ip:='~';
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ a1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + a1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + a1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt5,rpt11,rpt12,rpt15,rpt16,rpt17,rpt18,rpt19,rpt26,rpt29
-/*fpr biid2		,rpt30	*/					
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + a1),rpt5,rpt11,rpt12,rpt15,rpt16,rpt17,rpt18,rpt19,rpt26,rpt29,rpt30					
 						) );
                 																		 
          old_bins:= if( not NOTHOR(STD.File.FileExists('~scoringqa::bss::stats::'+ b1) and STD.File.FileExists('~scoringqa::bss::averages::'+ b1)  and
    			                                                                                  STD.File.FileExists('~scoringqa::bss::dids::'+ b1)),
          	           sequential(FileServices.CreateSuperFile('~scoringqa::bss::stats::' + b1),
       							            FileServices.CreateSuperFile('~scoringqa::bss::averages::' + b1),
-   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt5_1,rpt11_1,rpt12_1,rpt15_1,rpt16_1,rpt17_1,rpt18_1,rpt19_1,rpt26_1,rpt29_1
-/*fpr biid2		,rpt30_1	*/					
+   					FileServices.CreateSuperFile('~scoringqa::bss::dids::' + b1),rpt5_1,rpt11_1,rpt12_1,rpt15_1,rpt16_1,rpt17_1,rpt18_1,rpt19_1,rpt26_1,rpt29_1,rpt30_1					
 						) );
 
          
