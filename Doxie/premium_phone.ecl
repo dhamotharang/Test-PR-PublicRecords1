@@ -9,8 +9,6 @@ EXPORT premium_phone := MODULE;
 	EXPORT premium_phone_rec := RECORD
 		moxie_phonesplus_server.Layout_batch_did.w_timezone;
 		STRING2 vendor;
-        unsigned4 global_sid := 0;
-        unsigned8 record_sid := 0;
 	END;
 
 	SHARED mac_get_records() := MACRO
@@ -19,8 +17,8 @@ EXPORT premium_phone := MODULE;
 			UNSIGNED6 did;
 			STRING10 phone;
 			STRING3 phone_digits;
-            unsigned4 global_sid := 0;
-            unsigned8 record_sid := 0;
+      UNSIGNED4 global_sid := 0;
+      UNSIGNED8 record_sid := 0;
 		END;
     
 		inputPhoneDigitRecs := DEDUP(SORT(PROJECT(phones,TRANSFORM(workPhoneRec,
@@ -34,7 +32,7 @@ EXPORT premium_phone := MODULE;
 			TRANSFORM(RECORDOF(PhoneMart.key_phonemart_did),SELF:=RIGHT),
 			LIMIT(ut.limits.PHONE_PER_PERSON,SKIP)),phone,-dt_last_seen),phone);
 
-        inhouseEquifaxRecs := Suppress.MAC_SuppressSource(inhouseEquifaxRecs_pre, mod_access);
+    inhouseEquifaxRecs := Suppress.MAC_SuppressSource(inhouseEquifaxRecs_pre, mod_access);
     
 		notInInputPhonesRecs := JOIN(inputPhoneDigitRecs,inhouseEquifaxRecs,
 			LEFT.did=RIGHT.did AND LEFT.phone=RIGHT.phone,
@@ -104,8 +102,7 @@ EXPORT premium_phone := MODULE;
 		// output(NoEquifaxRecsExist, named('NoEquifaxRecsExist'));
 		// output(gatewayResultsExperian, named('gatewayResultsExperian'));
 		// output(gatewayResults, named('gatewayResults'));
-		// output(retRes, named('retResWithMods'));
-    $.compliance.logSoldToSources(notRestrictedEquifaxRecs, mod_access);		
+		// output(retRes, named('retResWithMods'));	
     
     return(retRes);										
 	END;
