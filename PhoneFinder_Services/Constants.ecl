@@ -166,6 +166,7 @@ END;
 		EXPORT STRING5 	optInMethod := 'TCO';
 		EXPORT STRING3 	optinDuration := 'ONG';
 		EXPORT UNSIGNED1 IdentityDateThreshold := 61;
+		EXPORT UNSIGNED1 MonthlyDays := 31;
 	END;
 	
 	EXPORT ThreatMetrixConstants := MODULE
