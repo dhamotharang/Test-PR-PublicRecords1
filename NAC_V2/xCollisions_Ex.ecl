@@ -154,8 +154,14 @@ export NAC_v2.Layout_Collisions2.Layout_Collisions xCollisions_Ex(NAC_v2.Layout_
 			self.ClientSSNType := fn_right(l.ssn_Type_indicator,r.ssn_Type_indicator);
 			self.ClientDOB := fn_right(l.DOB,r.DOB);
 			self.ClientDOBType := fn_right(l.dob_Type_indicator,r.dob_Type_indicator);
+			self.ClientCertificateType := fn_right(l.Certificate_id_type, r.Certificate_id_type);
+			self.ClientMonthlyAllotment := fn_right(l.MonthlyAllotment, r.MonthlyAllotment);
 			self.ClientEligibilityStatus := fn_right(l.eligibility_status_indicator,r.eligibility_status_indicator);
 			self.ClientEligibilityDate := fn_right(l.eligibility_status_date,r.eligibility_status_date);
+			self.ClientEligibilityPeriodType := fn_right(l.PeriodType, r.PeriodType);
+			self.ClientEligibilityPeriodCount := fn_right(l.HistoricalBenefitCount, r.HistoricalBenefitCount);
+			self.ClientEligibilityStartDate := fn_right(l.StartDate_Raw, r.StartDate_Raw);
+			self.ClientEligibilityEndDate := fn_right(l.EndDate_Raw, r.EndDate_Raw);
 			self.ClientPhone := fn_right(l.client_Phone,r.client_Phone);
 			self.ClientEmail := fn_right(l.client_Email,r.client_Email);
 			self.StateContactName := fn_right(l.ContactName,r.ContactName);
