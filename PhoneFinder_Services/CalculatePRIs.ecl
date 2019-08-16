@@ -127,7 +127,7 @@ FUNCTION
                                 44 => EXISTS((pInput.TmxVariables(Name = 'phoneseenmultiplecountry_month' AND (INTEGER)Value >= le.Threshold))),
                                 45 => pInput.identity_count > le.Threshold,
                                 46 => inMod.isPrimarySearchPII AND ~pInput.isLNameMatch,
-                                47 => pInput.phone_inresponse_count > le.Threshold,
+                                47 => pInput.phone_inresponse_count > le.ThresholdA,
                                 FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);
