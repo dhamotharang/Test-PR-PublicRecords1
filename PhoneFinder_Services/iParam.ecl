@@ -289,7 +289,7 @@ MODULE
 
       EXPORT BOOLEAN IncludeZumigoOptions        := IncludeNameAddressValidation OR IncludeNameAddressInfo OR
                                                     IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
-                                                    IncludeDeviceInfo OR IncludeDeviceHistory;                                        	
+                                                    IncludeDeviceInfo OR IncludeDeviceChangeInfo;                                        	
 
       EXPORT BOOLEAN UseZumigoIdentity	         := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity; 
 
