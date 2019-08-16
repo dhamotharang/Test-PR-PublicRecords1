@@ -11,8 +11,15 @@ with_did_rawlinkid 		:= Deltabase_(DID > 0 and rawlinkid>0);
 with_did_no_rawlinkid 		:= Deltabase_(DID >0 and rawlinkid=0);
 
 FraudShared.Layouts.Base.Main T_Did_Pii_Clean(FraudShared.Layouts.Base.Main L) := TRANSFORM
-			DidMatch 																					:= if(L.Rawlinkid	= L.did, TRUE, FALSE);
+			DidMatch 																					:= MAP(L.Rawlinkid < FirstRinId and L.did < FirstRinid  and L.Rawlinkid=L.did => TRUE
+																															,L.Rawlinkid < FirstRinId and L.did < FirstRinid  and L.Rawlinkid<>L.did => FALSE
+																															,L.Rawlinkid < FirstRinId and L.did >= FirstRinid  => FALSE
+																															,L.Rawlinkid >= FirstRinId and L.did < FirstRinid  => TRUE
+																															,L.Rawlinkid >= FirstRinId and L.did >= FirstRinid AND L.Rawlinkid=L.did => TRUE
+																															,L.Rawlinkid >= FirstRinId and L.did >= FirstRinid AND L.Rawlinkid<>L.did => FALSE
+																															, TRUE);
 			SELF.Did																					:= if(DidMatch,	L.did, L.RawlinkId);
+			SELF.Did_score																		:= if(DidMatch,	L.did_score, 0);
 			SELF.ssn																					:= if(DidMatch,	L.ssn,'');
 			SELF.dob																					:= if(DidMatch,	L.dob,'');
 			SELF.clean_ssn																		:= if(DidMatch,	L.clean_ssn,'');
