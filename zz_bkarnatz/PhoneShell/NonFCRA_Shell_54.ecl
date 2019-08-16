@@ -3,6 +3,7 @@
 #workunit('name','nonfcrashell 5.4');
 IMPORT Risk_Indicators, riskprocessing, RiskWise, data_services, _control, gateway;
 
+
 unsigned record_limit :=   0;    //number of records to read from input file; 0 means ALL
 // unsigned record_limit :=   10;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 2;  //number of parallel soap calls to make [1..30]
@@ -25,14 +26,16 @@ boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
 //===================  input-output files  ======================
 
 // infile_name := '~scoringqa::phoneshell::in::jul18_pii.csv';
-infile_name := '~scoringqa::in::shell_2_0_testfile_may_july_2018_input.csv';
+// infile_name := '~scoringqa::in::shell_2_0_testfile_may_july_2018_input.csv';
+infile_name := '~scoringqa::in::phoneshell_testsample_nov18_jan19_input_3k_3of4.csv';               //Newest Sample subset From Blake/Ben W  3k
+// infile_name := '~scoringqa::in::phoneshell_testsample_nov18_jan19_input_3k_4of4.csv';               //Newest Sample subset From Blake/Ben W  3k
+
 
 // outfile_name := '~Scoring::out::phoneshell_project_bocashell_54_nonFCRA_May_July_NoRestrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();          //Run with No Restrictions
 // outfile_name := '~Scoring::out::phoneshell_project_bocashell_54_nonFCRA_May_July_Restrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();           //Run with Restrictions
 // outfile_name := '~Scoring::out::phoneshell_project_bocashell_54_nonFCRA_May_July_Restrictions' + '_PhonesPlusv2_Gong_Base_' + thorlib.wuid();           //Run with Restrictions
-outfile_name := '~ScoringQA::out::phoneshell_project_bocashell_54_nonFCRA_May_July_PSMatch_' + thorlib.wuid();           //Run with Restrictions
-// outfile_name := '~bbraaten_test_phoneshell';
-
+// outfile_name := '~ScoringQA::out::phoneshell_project_bocashell_54_nonFCRA_May_July_PSMatch_' + thorlib.wuid();           //Run with Restrictions
+outfile_name := '~ScoringQA::out::bocashell_54_nonFCRA_' + 'Timing' + '_' + 'Restrictions' + '_' + '3k_subset3_Production' + '_' + thorlib.wuid();           //Run with Restrictions
 
 //==================  input file layout  ========================
 
@@ -56,13 +59,14 @@ END;
 //=============  Service settings ====================
 //====================================================
 // Regular BocaShell service
-bs_service := 'risk_indicators.boca_shell.58';
-// bs_service := 'risk_indicators.boca_shell';
+// bs_service := 'risk_indicators.boca_shell.58';
+bs_service := 'risk_indicators.boca_shell';
 // roxieIP := RiskWise.Shortcuts.dev194;
 // roxieIP := RiskWise.Shortcuts.QA_neutral_roxieIP; 
-// roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP; 
-roxieIP := RiskWise.Shortcuts.Dev156; 
-// RoxieIP := Riskwise.shortcuts.core_97_roxieIP; // Core Roxie
+// roxieIP := RiskWise.Shortcuts.staging_neutral_roxieIP;  // Staging/Cert Roxie
+// roxieIP := RiskWise.Shortcuts.Dev156;              // Dev156 Fusion Roxie
+// RoxieIP := Riskwise.shortcuts.core_97_roxieIP;  // Core Roxie
+roxieIP := RiskWise.Shortcuts.prod_batch_analytics_roxie; // Production Roxie
 
 
 //====================================================
@@ -132,7 +136,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 END;
 p_f := PROJECT (ds_input, assignAccount (LEFT,COUNTER));
 // output(choosen(p_f,eyeball), named('BSInput'));
-OUTPUT(p_f,, outfile_name + '_BSInputSample', thor, OVERWRITE);
+// OUTPUT(p_f,, outfile_name + '_BSInputSample', thor, OVERWRITE);
 								
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
@@ -149,7 +153,7 @@ res_err := res (errorcode<>'');
 // OUTPUT (choosen(res_err, eyeball), NAMED ('res_err'));
 // output(count(res_err), named('error_count'));
 
-OUTPUT (res, , outfile_name, __compressed__);
+OUTPUT (res, , outfile_name, thor, __compressed__, overwrite);
 
 // the conversion portion-----------------------------------------------------------------------
 
@@ -158,7 +162,7 @@ f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell, thor);
 
 isFCRA := false;
 edina := Risk_Indicators.ToEdina_54(f, isFCRA, DataRestrictionMask, IntendedPurpose);
-OUTPUT(edina,, outfile_name + 'ModelingLayout'+ '_thor_copy', thor, OVERWRITE);
+// OUTPUT(edina,, outfile_name + 'ModelingLayout'+ '_thor_copy', thor, OVERWRITE);
 
 // OUTPUT(CHOOSEN(edina,eyeball), NAMED('edina'));
-OUTPUT(edina,, outfile_name+'_edina_v54',CSV(HEADING(single), QUOTE('"'))); // Write to disk.
+// OUTPUT(edina,, outfile_name+'_edina_v54',CSV(HEADING(single), QUOTE('"'))); // Write to disk.
