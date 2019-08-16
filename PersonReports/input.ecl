@@ -164,62 +164,6 @@ EXPORT input := MODULE
 		export boolean include_NonRegulated_WatercraftSources:= FALSE;
   end;
 
-  /////////////// INTERFACES REPRESENTING A PERSON ///////////////
-  export address := INTERFACE
-    export boolean include_censusdata := false;
-    export boolean exact_sec_range_match := false; //... for address-phone linking
-    export unsigned1 address_recency_days := 60; // time span address is considered to be current for certain occasions
-    export boolean include_residents := true;
-    export boolean expand_address := true;
-    // allows to include phones which were fetched without secondary range and have different from residents last names;
-    // this is probably a wrong option, but Finder report currently shows these phones.
-    export boolean include_nonresidents_phones := true;
-  end;
-
-  export neighbors := INTERFACE
-    export unsigned1 neighborhoods := 0;
-    export unsigned1 historical_neighborhoods := 0;
-    export unsigned1 neighbors_per_address := 3;
-    export unsigned1 addresses_per_neighbor := 3;
-    export unsigned1 neighbors_per_na := 6;
-    export unsigned1 neighbors_recency := 3;
-    export unsigned1 neighbors_proximity := 10;
-    // new to CRS:
-    export boolean nbrs_with_phones := false;        // meaning, ONLY neighbors with phones
-    export boolean use_verified_address_nb := false; // enforce returning of verified addresses only
-    export boolean use_bestaka_nb := true ;          // defines whether to return multiple or best AKA only
-  end;
-
-  export relatives := INTERFACE (Relationship.IParams.relationshipParams) // equally true for "associates"
-    export unsigned1 relative_depth := 1;
-    export unsigned1 max_relatives := 10;
-    export boolean include_relativeaddresses := false; //TODO: verify default; check do we need it here at all
-    export unsigned1 max_relatives_addresses  := 3;
-    // new to CRS:
-    export boolean rels_with_phones := false;        // meaning, ONLY relatives/associates with phones
-    export boolean use_verified_address_ra := false; // enforce returning of verified addresses only
-    export boolean use_bestaka_ra := true;           // defines whether to return multiple or best AKA only
-  end;
-
-  export imposters := INTERFACE
-    // An imposter may have several records on file, some of which with same as subject's SSN;
-    // This controls whether to return all imposter's records, or only ones with subject's SSN
-    // Moxie currently returns all, which may produce kind of "duplicate" output.
-    export boolean return_AllImposterRecords := false;
-		export unsigned1 max_imposter_akas := 10;
-  end;
-
-
-  /////////////// INTERFACES REPRESENTING A PERSON ///////////////
-  // Defines all "personal" data: relatives, neighbors, associates, etc. Also defines most frequent defaults
-  // (cannot use "person" -- something for Gavin to take a look at)
-  export personal := INTERFACE (_report, address, imposters, relatives, neighbors, phones)
-    // unfortunate artefact: DL should really be a stand alone data
-    export boolean include_driverslicenses := false;
-    export string9 _ssn := ''; // needed, if comp report (and alike) are provided with input SSN
-    export boolean include_criminalindicators := false;
-  end;
-
   /////////////// MAIN REPORTS' AND INCLUDE INTERFACES ///////////////
   export include := INTERFACE
     export boolean select_individually := false; //TODO: legacy; to be removed

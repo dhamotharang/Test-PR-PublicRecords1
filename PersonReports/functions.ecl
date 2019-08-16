@@ -1,4 +1,4 @@
-﻿IMPORT iesp, doxie, ut, Risk_Indicators, doxie_crs, Suppress, census_data, CriminalRecords_Services, PersonReports, std;
+﻿IMPORT $, iesp, doxie, ut, Risk_Indicators, doxie_crs, Suppress, census_data, CriminalRecords_Services, PersonReports, std;
 
 /*
   boolean IncludeMotorVehicleV1 {xpath('IncludeMotorVehicleV1')};//hidden[internal]
@@ -333,7 +333,7 @@ EXPORT functions := MODULE
     Self := [];
   end;
 
-  export Address (input.personal in_params) := MODULE
+  export Address ($.IParam.personal in_params) := MODULE
 
     export string GetLocationID (iesp.share.t_AddressEx addr) := function
       string str_addr := trim (addr.City) + ';' + trim (addr.State) + ';' + trim (addr.StreetName) + ';' + 
@@ -658,7 +658,8 @@ shared layout_names_HRI := record
   export GetPersonBase (dataset (PersonReports.layouts.comp_names) persons, 
                         dataset (doxie_crs.layout_SSN_Lookups) ssn_lookups,
                         dataset (doxie_crs.layout_deathfile_records) deathfile_records,
-                        PersonReports.input.personal in_params) := function
+                        doxie.IDataAccess mod_access,
+                        PersonReports.IParam.personal in_params) := function
 
 			//moved HRI for SSNs here to improve performance.
 			maxHriPer_Value := in_params.max_hri;
@@ -679,7 +680,7 @@ shared layout_names_HRI := record
                         Left.ssn = Right.ssn_unmasked,
                         AddIssuance (Left, Right), keep(1), left outer);
       
-			ssn_mask_value := in_params.ssn_mask;
+			ssn_mask_value := mod_access.ssn_mask;
       Suppress.MAC_Mask (issuance, issuance_msk, SSNInfoEx.ssn, null, true, false);
 
       // get deceased info
@@ -692,13 +693,10 @@ shared layout_names_HRI := record
       return IF(in_params.include_criminalindicators,pers_res,pers_deceased);
   end;
 
-  // export Residents (dataset (layouts.comp_names) residents, input.personal in_params) := MODULE
-  // END;
-
   // returnes: dataset (layouts.identity_slim)
   export GetSSNRecordsBase (dataset (doxie_crs.layout_ssn_records) ssn_main,
                             dataset (doxie_crs.layout_deathfile_records) deathfile_records,
-                            PersonReports.input.personal in_params,
+                            PersonReports.IParam.personal in_params,
 												boolean IsFCRA = false) := function
 
     all_names := dedup (sort (ssn_main, fname,lname,mname,-dob,-ssn), 
@@ -773,7 +771,7 @@ shared layout_names_HRI := record
   // returns iesp.bps_share.t_BpsReportImposter (it is based on iesp.bps_share.t_BpsReportIdentity)
   export GetImposters (dataset (PersonReports.layouts.identity_slim) all_persons,
                        dataset (doxie.layout_best) bestrecs,
-                       PersonReports.input.personal in_params) := function
+                       PersonReports.IParam.personal in_params) := function
 
     // TODO: replace join with a filter
     imposters_by_ssn := join (all_persons, bestrecs, 
@@ -810,7 +808,7 @@ shared layout_names_HRI := record
   // returnes: dataset (layouts.identity_slim)
   export GetSubjectBestAKA (dataset (doxie_crs.layout_best_information) bestrecs,
                             dataset (doxie_crs.layout_deathfile_records) deathfile_records,
-                            PersonReports.input.personal in_params,
+                            PersonReports.IParam.personal in_params,
 														boolean IsFCRA = false
 														) := function
 
@@ -902,7 +900,7 @@ shared layout_names_HRI := record
   export CreateRelativesBps (dataset (recordof (doxie.relative_summary)) rel_assoc,
                              dataset (PersonReports.layouts.identity_slim) relassoc_base, 
                              dataset (PersonReports.layouts.address_bps) addr, 
-                             PersonReports.input.personal in_params) := function
+                             PersonReports.IParam.personal in_params) := function
 
     akas_xpanded := project (relassoc_base, ExpandIdentity (Left));
     // Note: additional linking by DID (concealed weapon, sex offense indicators, etc.)
@@ -962,7 +960,7 @@ END;
   export CreateRelativesSlim (dataset (recordof (doxie.relative_summary)) rel_assoc,
                               dataset (PersonReports.layouts.identity_slim) relassoc_base, 
                               dataset (PersonReports.layouts.address_slim) addr, 
-                              PersonReports.input.personal in_params) := function
+                              PersonReports.IParam.personal in_params) := function
 
     akas_grouped := group (sort (relassoc_base, did), did); 
     akas_rolled := rollup (akas_grouped, GROUP, RollIdentitySlim (Left, rows (Left)));
@@ -1012,34 +1010,6 @@ END;
                       GetFullRelatives (left,right),left outer);
     return all_recs;
   end;
-
-  // Temporarily: only until person reports switched to use IDataAccess module.
-  // Unfortunately, I can't put this function to doxie.compliance due to some weird syntax errors
-  EXPORT GetDataAccessModulePersonReports (PersonReports.input._report in_mod) := FUNCTION
-    // in_mod is missing some of the values
-    glob := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-    mod_access := MODULE (PROJECT (glob, doxie.IDataAccess))
-      EXPORT unsigned1 glb := in_mod.GLBPurpose;
-      EXPORT unsigned1 dppa := in_mod.DPPAPurpose;
-      EXPORT string DataRestrictionMask := in_mod.DataRestrictionMask;
-      EXPORT boolean ln_branded := in_mod.ln_branded;
-      EXPORT string32 application_type := in_mod.ApplicationType;
-      EXPORT unsigned3 date_threshold := in_mod.dateval;
-      //TODO: try rid of it completely, or at least of "include" part
-      EXPORT boolean show_minors := in_mod.IncludeMinors OR (in_mod.GLBPurpose = 2);  //a.k.a. OKtoShowMinors
-      EXPORT string ssn_mask := in_mod.ssn_mask;
-      EXPORT unsigned1 dl_mask := IF (in_mod.mask_dl, 1, 0);
-      EXPORT unsigned1 dob_mask := in_mod.dob_mask;
-        // may need in the future: 
-          // export boolean AllowAll := false;
-          // export boolean AllowGLB := false;
-          // export boolean AllowDPPA := false;
-          // boolean in_mod.ignoreFares := false;
-          // boolean in_mod.ignoreFidelity:= false;
-          // restrictPreGLB
-    END;
-    RETURN mod_access;
-  END;  
 
 END;
 

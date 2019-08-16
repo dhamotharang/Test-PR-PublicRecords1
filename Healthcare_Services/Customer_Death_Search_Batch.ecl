@@ -14,7 +14,6 @@ The service requires the customer number and either a 4 digit or full SSN, or Na
 </pre>
 */
 
-import Healthcare_Provider_Services;
 EXPORT Customer_Death_Search_Batch := MACRO
 	shared myRecords := Healthcare_Services.Customer_Death_Search_Records;
 	batch_in_layout := Healthcare_Services.Customer_Death_Search_Layouts.autokeyInput;

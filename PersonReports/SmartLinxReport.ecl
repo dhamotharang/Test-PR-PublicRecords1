@@ -8,12 +8,11 @@ out_rec := record(iespOut.t_SmartlinxReportIndividual)
 end;
 // accepts atmost one DID, actually
 EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids, 
-                                PersonReports.IParam._smartlinxreport param, 
+                                PersonReports.IParam._smartlinxreport mod_smartlinx, 
                                 boolean IsFCRA = false) := FUNCTION
 
   //this will be gone after all interfaces extend IDataAccess
-  old_param := $.IParam.ConvertToOldSmartLinx(param);
-  mod_smartlinx := param;
+  old_param := $.IParam.ConvertToOldSmartLinx(mod_smartlinx);
   mod_access := PROJECT (mod_smartlinx, doxie.IDataAccess);
 
   globals := AutoStandardI.GlobalModule();
@@ -23,34 +22,34 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	ds_flags := if(isFCRA, FCRA.GetFlagFile (ds_best), fcra.compliance.blank_flagfile);
 	
 	//changes will be needed to excessive_property when this service is used for comp report to handle request for Current properties ONLY.
-	excessive_property := param.include_properties and count(choosen(LN_PropertyV2_Services.keys.search_did(isFCRA)(keyed(s_did=subject_did)),1001)) > 1000;
+	excessive_property := mod_smartlinx.include_properties and count(choosen(LN_PropertyV2_Services.keys.search_did(isFCRA)(keyed(s_did=subject_did)),1001)) > 1000;
 	messages_property_ds := if (excessive_property, dataset([{'1000','Property'}],iesp.share.t_CodeMap));
 //****************************************************************************************************
 //     PERSON RECORDS
 //****************************************************************************************************
-  persMod := module (project (old_param, personreports.input.personal)) end;
-	pers := PersonReports.Person_records (dids, persMod, IsFCRA);
+  persMod := module (project (mod_smartlinx, personreports.IParam.personal)) end;
+	pers := PersonReports.Person_records (dids, mod_access, persMod, IsFCRA);
  	best_rec_esdl :=       pers.bestrecs_esdl[1]; // best record  this is a record not a dataset???????
 	best_rec :=            pers.bestrecs[1];
 	iesp.smartlinxreport.t_SLRBestInfo  additionalBest() := transform
-	 	self.ssn := if (param.smart_rollup and best_rec.valid_ssn='G',SmartRollup.fn_smart_getSsnMetadata(best_rec.did,best_rec.ssn,best_rec.valid_ssn,globals.IncludeHRI)[1]);
+	 	self.ssn := if (mod_smartlinx.smart_rollup and best_rec.valid_ssn='G',SmartRollup.fn_smart_getSsnMetadata(best_rec.did,best_rec.ssn,best_rec.valid_ssn,mod_smartlinx.include_hri)[1]);
 		self.age := best_rec.age;
 		self.ageAtDeath := ut.Age(iesp.ECL2ESP.DateToInteger(best_rec_esdl.dob),iesp.ECL2ESP.DateToInteger(best_rec_esdl.dod));
 		self.addressCDS := SmartRollup.fn_smart_getAddrMetadata.address(best_rec,doBadSecRange)[1];  // add additional data to best section for smartlinx 
-    phones2use := choosen(SmartRollup.fn_smart_getPhonesPlusMetadata.byDid(best_rec, param),iesp.Constants.BR.MaxPhonesPlus);
+    phones2use := choosen(SmartRollup.fn_smart_getPhonesPlusMetadata.byDid(best_rec),iesp.Constants.BR.MaxPhonesPlus);
 		self.PhonesV2 := phones2use;
 		self.Phones := project(phones2use, iesp.dirassistwireless.t_DirAssistWirelessSearchRecord);
 		self := best_rec_esdl;
-		self.Attributes := SmartRollup.fn_getAttributes(subject_did, param.dppa, param.glb);
+		self.Attributes := SmartRollup.fn_getAttributes(subject_did, mod_smartlinx.dppa, mod_smartlinx.glb);
 		self := [];
 	end;
-  best_rec_smart   := if (param.include_best,  dataset([additionalBest()]),dataset([],iesp.smartlinxreport.t_SLRBestInfo)); 
-	subject_akas     := IF (param.include_akas, project(pers.Akas,iesp.bps_share.t_BpsReportIdentity), dataset([],iesp.bps_share.t_BpsReportIdentity));
+  best_rec_smart   := if (mod_smartlinx.include_best,  dataset([additionalBest()]),dataset([],iesp.smartlinxreport.t_SLRBestInfo)); 
+	subject_akas     := IF (mod_smartlinx.include_akas, project(pers.Akas,iesp.bps_share.t_BpsReportIdentity), dataset([],iesp.bps_share.t_BpsReportIdentity));
   s_akas           := SmartRollup.fn_smart_rollup_names(subject_akas);
 	p_aka_entities   := SmartRollup.fn_smart_aka_entities(s_akas, subject_akas);
 	s_akas_count     := count(s_akas);
   p_akas           := choosen (s_Akas, iesp.Constants.SMART.MaxAKA);
-  subject_addrs    := IF (param.include_bpsaddress, pers.SubjectAddresses, dataset([],iesp.bpsreport.t_BpsReportAddress) );
+  subject_addrs    := IF (mod_smartlinx.include_bpsaddress, pers.SubjectAddresses, dataset([],iesp.bpsreport.t_BpsReportAddress) );
 	//=======================================================================
 	//temporary fix to use Verified as Current indicator based on TNT value.
 	//product wanted Current to match doxie.HeaderFileRollupService for current addresses.
@@ -109,24 +108,24 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_addresses_prior := s_addresses(verified=false);
 	s_addresses_current_count := count(s_addresses_current);
 	s_addresses_prior_count := count(s_addresses_prior);
-	tmp_addresses   := choosen (SmartRollup.fn_smart_getAddrMetadata.addresses(s_addressesSequence,doBadSecRange,param),iesp.Constants.SMART.MaxAddress);
+	tmp_addresses   := choosen (SmartRollup.fn_smart_getAddrMetadata.addresses(s_addressesSequence,doBadSecRange,mod_smartlinx),iesp.Constants.SMART.MaxAddress);
 	p_addresses      := choosen (SmartRollup.fn_smart_getPhonesPlusMetadata.byPhone(tmp_addresses),iesp.Constants.SMART.MaxAddress);
 	p_addresses_current := p_addresses(verified=true);
 	p_addresses_prior   := p_addresses(verified=false);
-	subject_imposters := IF (param.include_imposters, pers.imposters,dataset([],iesp.bps_share.t_BpsReportImposter));
+	subject_imposters := IF (mod_smartlinx.include_imposters, pers.imposters,dataset([],iesp.bps_share.t_BpsReportImposter));
 	s_imposters        := SmartRollup.fn_smart_rollup_imposters(subject_imposters);
 	p_imposter_entities := choosen(SmartRollup.fn_smart_imposter_entities(subject_imposters),  iesp.Constants.SMART.MaxImposters);
 	s_imposters_count := count(s_imposters);
   p_imposters      := choosen (s_imposters,  iesp.Constants.SMART.MaxImposters);
-  s_relatives      := IF (param.include_relatives, pers.RelativesSlim, dataset([],iesp.bpsreport.t_BpsReportRelativeSlim));
+  s_relatives      := IF (mod_smartlinx.include_relatives, pers.RelativesSlim, dataset([],iesp.bpsreport.t_BpsReportRelativeSlim));
 	s_relatives_count := count(s_relatives);
 	relativesBase    := project(choosen (s_relatives,  iesp.constants.SMART.MaxRelatives),transform(iesp.smartlinxreport.t_SLRRelative, self.title := '', self.relativeofUniqueId := '', self := LEFT, self := []));;
-	relativesOf      := SmartRollup.fn_relativeOf(relativesBase,subject_did,param);
+	relativesOf      := SmartRollup.fn_relativeOf(relativesBase,subject_did,mod_smartlinx);
 	relativesTitle   := relativesOf;  // now titles are taken directly from new index doxie.Key_Relatives_V2
 	p_relatives      := relativesTitle; 
 
 	//Neighbors only want for subjects "current/newest" address,  20 addresses (10up10down), 2 Residents
-	s_neighbors      := IF (param.include_neighbors, pers.NeighborsSlim, dataset([],iesp.bpsreport.t_NeighborSlim) );
+	s_neighbors      := IF (mod_smartlinx.include_neighbors, pers.NeighborsSlim, dataset([],iesp.bpsreport.t_NeighborSlim) );
 	s_neighbors_count := count(s_neighbors.NeighborAddresses);  //count children since rows are neighborhoods.
   p_neighbors      := choosen (s_neighbors, iesp.constants.SMART.MaxNeighbors);
   p_sources        := PersonReports.SourceCounts_records (dids, module (project (old_param, $.input._sources)) end, IsFCRA);
@@ -135,54 +134,54 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 //****************************************************************************************************
   // LICENSES
 
-	dl       := IF (param.include_driversLicenses, PersonReports.DL_records(dids), DATASET([],iesp.driverlicense2.t_DLEmbeddedReport2Record));
+	dl       := IF (mod_smartlinx.include_driversLicenses, PersonReports.DL_records(dids), DATASET([],iesp.driverlicense2.t_DLEmbeddedReport2Record));
 	s_dls    := SmartRollup.fn_smart_rollup_dls(dl);
 	s_dls_count := count(s_dls);
-  p_dls    := choosen(if (param.Smart_rollup,s_dls, dl), iesp.Constants.SMART.MaxDLs);
+  p_dls    := choosen(if (mod_smartlinx.Smart_rollup,s_dls, dl), iesp.Constants.SMART.MaxDLs);
 
- 	voters   := IF (param.include_voters, $.voter_records (dids,   module(project (old_param, $.input.voters)) end, IsFCRA).voters_v2,dataset([],iesp.voter.t_VoterReport2Record));
+ 	voters   := IF (mod_smartlinx.include_voters, $.voter_records (dids,   module(project (old_param, $.input.voters)) end, IsFCRA).voters_v2,dataset([],iesp.voter.t_VoterReport2Record));
  	s_voters := SmartRollup.fn_smart_rollup_voter(voters);
 	s_voters_count := count(s_voters);
-  p_voters := choosen (if (param.Smart_Rollup, s_voters, voters), iesp.Constants.SMART.MaxVoter);
+  p_voters := choosen (if (mod_smartlinx.Smart_Rollup, s_voters, voters), iesp.Constants.SMART.MaxVoter);
 
 	//combine proflic,  medprov, medsanc
   profmod   := personReports.proflic_records (dids, PROJECT(mod_smartlinx, $.IParam.proflic), IsFCRA);
-	prof      := IF (param.include_proflicenses and count(profmod.proflicenses_v2) <= iesp.constants.SMART.MaxUnRolledRecords, profmod.proflicenses_v2,dataset([],iesp.proflicense.t_ProfessionalLicenseRecord));
-  sanc	    := IF (param.include_proflicenses, personReports.sanctions_records (dids, module (project (old_param, $.input.sanctions, opt)) end, IsFCRA),dataset([],iesp.proflicense.t_SanctionRecord));
-	prov_recs := IF (param.include_proflicenses, personReports.providers_records (dids, module (project (old_param, $.input.providers)) end, IsFCRA));
-	prov      := IF (param.include_proflicenses and count(prov_recs) <= iesp.constants.SMART.MaxUnRolledRecords, prov_recs,dataset([],iesp.proflicense.t_ProviderRecord));
+	prof      := IF (mod_smartlinx.include_proflicenses and count(profmod.proflicenses_v2) <= iesp.constants.SMART.MaxUnRolledRecords, profmod.proflicenses_v2,dataset([],iesp.proflicense.t_ProfessionalLicenseRecord));
+  sanc	    := IF (mod_smartlinx.include_proflicenses, personReports.sanctions_records (dids, module (project (old_param, $.input.sanctions, opt)) end, IsFCRA),dataset([],iesp.proflicense.t_SanctionRecord));
+	prov_recs := IF (mod_smartlinx.include_proflicenses, personReports.providers_records (dids, module (project (old_param, $.input.providers)) end, IsFCRA));
+	prov      := IF (mod_smartlinx.include_proflicenses and count(prov_recs) <= iesp.constants.SMART.MaxUnRolledRecords, prov_recs,dataset([],iesp.proflicense.t_ProviderRecord));
 	s_profSancProv := SmartRollup.fn_smart_rollup_prof_lic(prof,prov,sanc);
 	s_profSancProv_count := count(s_profSancProv);
- 	p_profSancProv := choosen (if (param.Smart_rollup, s_profSancProv, dataset([],iesp.smartlinxreport.t_SLRProfLicenseAndSanctionAndProvider)), iesp.constants.SMART.MaxProfLic);
+ 	p_profSancProv := choosen (if (mod_smartlinx.Smart_rollup, s_profSancProv, dataset([],iesp.smartlinxreport.t_SLRProfLicenseAndSanctionAndProvider)), iesp.constants.SMART.MaxProfLic);
  
 	aMod := module(project (globals,ATF_Services.IParam.search_params,opt)) 
 	  export string14 did := (string)subject_did;
   end;
-  firearms_pre:= IF (param.include_atf,ATF_Services.SearchService_Records.report(aMod, isFCRA, ds_flags));
+  firearms_pre:= IF (mod_smartlinx.include_atf,ATF_Services.SearchService_Records.report(aMod, isFCRA, ds_flags));
   firearms    := project(firearms_pre,iesp.firearm.t_FirearmRecord);
  	s_firearms  := SmartRollup.fn_smart_rollup_atf(firearms);	
 	s_firearms_count := count(s_firearms);
-  p_firearms  := choosen(if (param.Smart_rollup,s_firearms, firearms), iesp.Constants.SMART.MaxFirearms);
+  p_firearms  := choosen(if (mod_smartlinx.Smart_rollup,s_firearms, firearms), iesp.Constants.SMART.MaxFirearms);
 
-  dea         := IF (param.include_controlledsubstances, PersonReports.dea_records(dids), dataset([],iesp.deacontrolledsubstance.t_DEAControlledSubstanceSearch2Record));
+  dea         := IF (mod_smartlinx.include_controlledsubstances, PersonReports.dea_records(dids), dataset([],iesp.deacontrolledsubstance.t_DEAControlledSubstanceSearch2Record));
 	s_dea       := SmartRollup.fn_smart_rollup_dea(dea);
 	s_dea_count := count(s_dea);
-  p_dea       := choosen (if (param.Smart_Rollup, s_dea, dea),iesp.Constants.SMART.MaxDEA);
+  p_dea       := choosen (if (mod_smartlinx.Smart_Rollup, s_dea, dea),iesp.Constants.SMART.MaxDEA);
  
-	weaponsIesp_pre := IF (param.include_weaponpermits, PersonReports.ccw_records (dids, module (project (old_param, $.input.ccw)) end, isFCRA));
+	weaponsIesp_pre := IF (mod_smartlinx.include_weaponpermits, PersonReports.ccw_records (dids, module (project (old_param, $.input.ccw)) end, isFCRA));
 	weaponsIesp 	 := project(weaponsIesp_pre,iesp.concealedweapon.t_WeaponRecord);
   s_weapons      := SmartRollup.fn_smart_rollup_cweapons(weaponsIesp);
 	s_weapons_count := count(s_weapons);
-  p_weapons      := choosen (if (param.Smart_rollup, s_weapons, weaponsIesp),iesp.Constants.SMART.MaxWeapons);
+  p_weapons      := choosen (if (mod_smartlinx.Smart_rollup, s_weapons, weaponsIesp),iesp.Constants.SMART.MaxWeapons);
  
 	HF_recs 			 := doxie.hunting_records(dids, isFCRA, ds_flags(file_id = FCRA.FILE_ID.HUNTING_FISHING));
- 	hunting        := IF (param.include_huntingfishing, HF_recs, dataset([],doxie_crs.layout_hunting_records));
+ 	hunting        := IF (mod_smartlinx.include_huntingfishing, HF_recs, dataset([],doxie_crs.layout_hunting_records));
   huntfishing    := SmartRollup.fn_hunting_iesp(hunting);
 	s_hunting      := SmartRollup.fn_smart_rollup_hunting(huntfishing);
 	s_hunting_count := count(s_hunting);
-	p_hunting      := choosen (if (param.Smart_rollup, s_hunting, huntfishing),iesp.Constants.SMART.MaxHuntFish);
+	p_hunting      := choosen (if (mod_smartlinx.Smart_rollup, s_hunting, huntfishing),iesp.Constants.SMART.MaxHuntFish);
 	faacertMod     := PersonReports.faacert_records (dids, module (project (old_param, $.input.faacerts)) end, IsFCRA);
-  faa_cert       := IF (param.include_faacertificates, project(faacertMod.bps_view,iesp.bpsreport.t_BpsFAACertification),DATASET([],iesp.bpsreport.t_BpsFAACertification));
+  faa_cert       := IF (mod_smartlinx.include_faacertificates, project(faacertMod.bps_view,iesp.bpsreport.t_BpsFAACertification),DATASET([],iesp.bpsreport.t_BpsFAACertification));
   s_faa_cert     := SmartRollup.fn_smart_rollup_faa_cert(faa_cert);
 	s_faa_cert_count := count(s_faa_cert);
   p_faa_cert     := choosen (s_faa_cert, iesp.constants.SMART.MaxFaaCert);
@@ -194,89 +193,89 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   end;
   added_in_mod := project (mod_smartlinx, Foreclosure_Services.Raw.params);
 	nod            := Foreclosure_Services.Raw.REPORT_VIEW.by_did(dids,added_in_mod,true);
-	s_nod          := if (param.include_properties and not doxie.DataRestriction.Fares,nod,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
+	s_nod          := if (mod_smartlinx.include_properties and not doxie.DataRestriction.Fares,nod,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
 	p_nod          := CHOOSEN (s_nod, iesp.constants.SMART.MaxNOD);
 	fore           := Foreclosure_Services.Raw.REPORT_VIEW.by_did(dids,added_in_mod,false);
-	s_fore         := if (param.include_properties and not doxie.DataRestriction.Fares,fore,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
+	s_fore         := if (mod_smartlinx.include_properties and not doxie.DataRestriction.Fares,fore,dataset([],iesp.foreclosure.t_ForeclosureReportRecord));
 	s_fore_count   := count(s_fore);
 	p_fore         := CHOOSEN (s_fore, iesp.constants.SMART.MaxForeclosures);
-	propMod        := PersonReports.property_records (dids, mod_access, module (project (param, $.IParam.property)) end, IsFCRA, ds_flags);  //should set flag for Current or Prior owner
+	propMod        := PersonReports.property_records (dids, mod_access, module (project (mod_smartlinx, $.IParam.property)) end, IsFCRA, ds_flags);  //should set flag for Current or Prior owner
 	propUnderLimit := (not excessive_property) and (count(propMod.property_v2) <= iesp.constants.SMART.MaxUnRolledRecords);
-	allPropV2      := if (param.include_properties and propUnderLimit, project(propMod.property_v2,iesp.property.t_PropertyReport2Record),dataset([],iesp.property.t_PropertyReport2Record)); //used for other business assoc
-	alldeed        := if (param.include_properties and propUnderLimit, project(propMod.prop_deeds_all,iesp.propdeed.t_DeedReportRecord),dataset([],iesp.propdeed.t_DeedReportRecord));
-  allass         := if (param.include_properties and propUnderLimit, project(propMod.formatted_assess_all,assess_ext),dataset([],assess_ext)); //exported this dataset because I need isSubjectOwned flag
-  s_prop         := SmartRollup.fn_smart_rollup_prop(allass, alldeed, p_fore, p_nod, subject_did, param );
-  a_prop				 := SmartRollup.fn_smart_aml_properties(s_prop,param); // AML property version
-	out_prop			 := if(param.include_aml_property, a_prop, s_prop);
+	allPropV2      := if (mod_smartlinx.include_properties and propUnderLimit, project(propMod.property_v2,iesp.property.t_PropertyReport2Record),dataset([],iesp.property.t_PropertyReport2Record)); //used for other business assoc
+	alldeed        := if (mod_smartlinx.include_properties and propUnderLimit, project(propMod.prop_deeds_all,iesp.propdeed.t_DeedReportRecord),dataset([],iesp.propdeed.t_DeedReportRecord));
+  allass         := if (mod_smartlinx.include_properties and propUnderLimit, project(propMod.formatted_assess_all,assess_ext),dataset([],assess_ext)); //exported this dataset because I need isSubjectOwned flag
+  s_prop         := SmartRollup.fn_smart_rollup_prop(allass, alldeed, p_fore, p_nod, subject_did, mod_smartlinx );
+  a_prop				 := SmartRollup.fn_smart_aml_properties(s_prop,mod_smartlinx); // AML property version
+	out_prop			 := if(mod_smartlinx.include_aml_property, a_prop, s_prop);
 	s_nod_count    := count(out_prop(NoticeOfDefaultFound or ForeclosureFound));
   s_prop_current := out_prop(CurrentPrior=iesp.Constants.SMART.CURRENT);	
   s_prop_prior 	 := out_prop(CurrentPrior=iesp.Constants.SMART.PRIOR or CurrentPrior=iesp.Constants.SMART.UNKNOWN);
 	s_prop_current_count := count(s_prop_current);
 	s_prop_prior_count := count(s_prop_prior);
-	p_prop_current := choosen (if (param.Smart_rollup, s_prop_current , dataset([],iesp.smartlinxreport.t_SLRPropertyAssessmentDeedsRecord)), iesp.constants.SMART.MaxProperties);
-	p_prop_prior   := choosen (if (param.Smart_rollup, s_prop_prior   , dataset([],iesp.smartlinxreport.t_SLRPropertyAssessmentDeedsRecord)), iesp.constants.SMART.MaxProperties);
+	p_prop_current := choosen (if (mod_smartlinx.Smart_rollup, s_prop_current , dataset([],iesp.smartlinxreport.t_SLRPropertyAssessmentDeedsRecord)), iesp.constants.SMART.MaxProperties);
+	p_prop_prior   := choosen (if (mod_smartlinx.Smart_rollup, s_prop_prior   , dataset([],iesp.smartlinxreport.t_SLRPropertyAssessmentDeedsRecord)), iesp.constants.SMART.MaxProperties);
 	
 
 	// OTHER PROPERTY SECTION 
-	emails      := IF (param.include_email,  PersonReports.email_records(dids, module (project (old_param, $.input.emails)) end, IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
+	emails      := IF (mod_smartlinx.include_email,  PersonReports.email_records(dids, module (project (old_param, $.input.emails)) end, IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
 	s_emails    := SmartRollup.fn_smart_rollup_email(emails);  //count children since rows are per source
 	s_emails_count := count(s_emails);
 	p_emails      := choosen (s_emails, iesp.Constants.SMART.MaxEmails);	
 
   vehiclesMod   := PersonReports.vehicle_records (dids, module (project (old_param, $.input.vehicles, opt)) end, IsFCRA);
-	vehicles      := IF (param.include_motorvehicles and count(vehiclesMod.vehicles_v2) < iesp.constants.SMART.MaxUnRolledRecords, vehiclesMod.vehicles_v2,dataset([],iesp.motorvehicle.t_MotorVehicleReport2Record)); //using vehicles instead of vehicles_v2 because the v2 version doesn't contain historyFlag.
+	vehicles      := IF (mod_smartlinx.include_motorvehicles and count(vehiclesMod.vehicles_v2) < iesp.constants.SMART.MaxUnRolledRecords, vehiclesMod.vehicles_v2,dataset([],iesp.motorvehicle.t_MotorVehicleReport2Record)); //using vehicles instead of vehicles_v2 because the v2 version doesn't contain historyFlag.
 	s_vehicles    := SmartRollup.fn_smart_rollup_veh(vehicles, subject_did);
   s_vehicles_current := s_vehicles(CurrentPrior=iesp.Constants.SMART.CURRENT);
   s_vehicles_prior   := s_vehicles(CurrentPrior=iesp.Constants.SMART.PRIOR);
   s_vehicles_current_count := count(s_vehicles_current);
   s_vehicles_prior_count   := count(s_vehicles_prior);
-	p_vehicles_current := choosen (if (param.Smart_rollup, s_vehicles_current,
+	p_vehicles_current := choosen (if (mod_smartlinx.Smart_rollup, s_vehicles_current,
 	                              project(vehicles,transform(iesp.smartlinxreport.t_SLRVehicle, self := left, self.LengthOfOwnership := '', self.currentPrior := If (Left.isCurrent,iesp.Constants.SMART.CURRENT,iesp.Constants.SMART.PRIOR)))),
 														iesp.Constants.SMART.MaxVehicles);
-	p_vehicles_prior   := choosen (if (param.Smart_rollup, s_vehicles_prior,
+	p_vehicles_prior   := choosen (if (mod_smartlinx.Smart_rollup, s_vehicles_prior,
 	                              project(vehicles,transform(iesp.smartlinxreport.t_SLRVehicle, self := left, self.LengthOfOwnership := '', self.currentPrior := If (Left.isCurrent,iesp.Constants.SMART.CURRENT,iesp.Constants.SMART.PRIOR)))),
 														iesp.Constants.SMART.MaxVehicles);
 														
 	watercraftMod := PersonReports.watercraft_records (dids, module (project (old_param, $.input.watercrafts)) end, IsFCRA,true, ds_flags);
 	//watercrafts   := watercraftMod.wtr_recs;
-	watercrafts   := IF (param.include_watercrafts, watercraftMod.watercrafts_v2,dataset([],iesp.watercraft.t_WaterCraftReport2Record));
+	watercrafts   := IF (mod_smartlinx.include_watercrafts, watercraftMod.watercrafts_v2,dataset([],iesp.watercraft.t_WaterCraftReport2Record));
 	s_watercrafts := SmartRollup.fn_smart_rollup_watercraft(watercrafts);
 	s_watercrafts_current := s_watercrafts(CurrentPrior=iesp.Constants.SMART.CURRENT);
 	s_watercrafts_prior := s_watercrafts(CurrentPrior=iesp.Constants.SMART.PRIOR);
 	s_watercrafts_current_count := count(s_watercrafts_current);
 	s_watercrafts_prior_count := count(s_watercrafts_prior);
 	
-  p_watercrafts_current := choosen (if (param.Smart_rollup,s_watercrafts_current, 
+  p_watercrafts_current := choosen (if (mod_smartlinx.Smart_rollup,s_watercrafts_current, 
 	                             project(watercrafts, transform(iesp.smartlinxreport.t_SLRWatercraft, self.LengthOfOwnership := '', self := left, self := []))),
 													 iesp.Constants.SMART.MaxWatercrafts);
-  p_watercrafts_prior := choosen (if (param.Smart_rollup,s_watercrafts_prior, 
+  p_watercrafts_prior := choosen (if (mod_smartlinx.Smart_rollup,s_watercrafts_prior, 
 	                             project(watercrafts, transform(iesp.smartlinxreport.t_SLRWatercraft, self := left, self := []))),
 													 iesp.Constants.SMART.MaxWatercrafts);													 
-	aircrafts     := IF (param.include_faaaircrafts, project(PersonReports.aircraft_records(dids, module (project (old_param, $.input.aircrafts)) end, IsFCRA),iesp.faaaircraft.t_aircraftReportRecord),dataset([],iesp.faaaircraft.t_aircraftReportRecord));
+	aircrafts     := IF (mod_smartlinx.include_faaaircrafts, project(PersonReports.aircraft_records(dids, module (project (old_param, $.input.aircrafts)) end, IsFCRA),iesp.faaaircraft.t_aircraftReportRecord),dataset([],iesp.faaaircraft.t_aircraftReportRecord));
 	s_aircrafts   := SmartRollup.fn_smart_rollup_aircraft(aircrafts);
 	s_aircrafts_current := s_aircrafts(CurrentPrior=iesp.Constants.SMART.CURRENT);
 	s_aircrafts_prior := s_aircrafts(CurrentPrior=iesp.Constants.SMART.PRIOR);
 	s_aircrafts_current_count := count(s_aircrafts_current);
 	s_aircrafts_prior_count := count(s_aircrafts_prior);	
-	p_aircrafts_current   := choosen (if (param.Smart_rollup,s_aircrafts_current, 
+	p_aircrafts_current   := choosen (if (mod_smartlinx.Smart_rollup,s_aircrafts_current, 
                                 project(aircrafts,transform(iesp.smartlinxreport.t_SLRAircraft, self := left, self := []))),
 														iesp.Constants.SMART.MaxAircrafts);
-  p_aircrafts_prior   := choosen (if (param.Smart_rollup,s_aircrafts_prior, 
+  p_aircrafts_prior   := choosen (if (mod_smartlinx.Smart_rollup,s_aircrafts_prior, 
                                 project(aircrafts,transform(iesp.smartlinxreport.t_SLRAircraft, self := left, self := []))),
 														iesp.Constants.SMART.MaxAircrafts);		
 									
 // Bankruptcy, LiensJudgements, UCC
-  bankruptcyMod := PersonReports.bankruptcy_records(dids, mod_access, module (project (param, $.IParam.bankruptcy)) end, IsFCRA);
-	bankruptcy    := IF (param.include_bankruptcy,  bankruptcyMod.bankruptcy_v2, dataset([],iesp.bankruptcy.t_BankruptcyReport2Record));
+  bankruptcyMod := PersonReports.bankruptcy_records(dids, mod_access, module (project (mod_smartlinx, $.IParam.bankruptcy)) end, IsFCRA);
+	bankruptcy    := IF (mod_smartlinx.include_bankruptcy,  bankruptcyMod.bankruptcy_v2, dataset([],iesp.bankruptcy.t_BankruptcyReport2Record));
   s_bankruptcy  := SmartRollup.fn_smart_rollup_bankruptcy(bankruptcy);  
 	s_bankruptcy_active := s_bankruptcy(ActiveClosed=iesp.Constants.SMART.ACTIVE);
 	s_bankruptcy_closed := s_bankruptcy(ActiveClosed=iesp.Constants.SMART.CLOSED);
 	s_bankruptcy_active_count := count(s_bankruptcy_active);
 	s_bankruptcy_closed_count := count(s_bankruptcy_closed);
-	p_bankruptcy_active  := choosen (if (param.Smart_rollup, s_bankruptcy_active, 
+	p_bankruptcy_active  := choosen (if (mod_smartlinx.Smart_rollup, s_bankruptcy_active, 
 	                              project(bankruptcy,transform(iesp.smartlinxreport.t_SLRbankruptcy, self := left, self := []))),
 	                          iesp.Constants.SMART.MaxBankruptcies);
-	p_bankruptcy_closed  := choosen (if (param.Smart_rollup, s_bankruptcy_closed, 
+	p_bankruptcy_closed  := choosen (if (mod_smartlinx.Smart_rollup, s_bankruptcy_closed, 
 	                              project(bankruptcy,transform(iesp.smartlinxreport.t_SLRbankruptcy, self := left, self := []))),
 	                          iesp.Constants.SMART.MaxBankruptcies);
 
@@ -285,56 +284,56 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   // If FCRA is added to SmartLinx - the case link reduction needs to be reworked 
   //  to properly account for overrides.
   liensMod      := PersonReports.lienjudgment_records (dids,MODULE (project (old_param, $.input.liens)) END , IsFCRA, rollup_by_case_link := true);
-	liens         := IF (param.include_liensjudgments,   project(liensMod.liensjudgment_v2(),iesp.lienjudgement.t_LienJudgmentReportRecord), dataset([],iesp.lienjudgement.t_LienJudgmentReportRecord));
+	liens         := IF (mod_smartlinx.include_liensjudgments,   project(liensMod.liensjudgment_v2(),iesp.lienjudgement.t_LienJudgmentReportRecord), dataset([],iesp.lienjudgement.t_LienJudgmentReportRecord));
   s_liens       := SmartRollup.fn_smart_rollup_liens(liens);  
 	s_liens_active := s_liens(ActiveClosed=iesp.Constants.SMART.ACTIVE);
 	s_liens_terminated := s_liens(ActiveClosed=iesp.Constants.SMART.TERMINATED);
   s_liens_active_count := count(s_liens_active);
 	s_liens_terminated_count := count(s_liens_terminated);	
-  p_liens_active       := choosen (if (param.Smart_rollup,s_liens_active, 
+  p_liens_active       := choosen (if (mod_smartlinx.Smart_rollup,s_liens_active, 
 	                              project(liens,transform(iesp.smartlinxreport.t_SLRLienJudgment, self := left, self := []))),
 	                          iesp.Constants.SMART.MaxLiens);
-  p_liens_terminated       := choosen (if (param.Smart_rollup,s_liens_terminated, 
+  p_liens_terminated       := choosen (if (mod_smartlinx.Smart_rollup,s_liens_terminated, 
 	                              project(liens,transform(iesp.smartlinxreport.t_SLRLienJudgment, self := left, self := []))),
 	                          iesp.Constants.SMART.MaxLiens);
 														
 	uccsMod       := PersonReports.ucc_records (dids, module (project (old_param, $.input.ucc, opt)) end, IsFCRA);
 	uccsRecs      := uccsMod.ucc_v2;
-	uccs          := IF (param.include_uccfilings and count(uccsRecs) < iesp.constants.SMART.MaxUnRolledRecords,  uccsRecs,dataset([],iesp.ucc.t_UCCReport2Record));
+	uccs          := IF (mod_smartlinx.include_uccfilings and count(uccsRecs) < iesp.constants.SMART.MaxUnRolledRecords,  uccsRecs,dataset([],iesp.ucc.t_UCCReport2Record));
 	s_uccs        := SmartRollup.fn_smart_rollup_ucc(uccs,subject_did);
 	s_uccs_debtor := s_uccs(SubjectIs=iesp.Constants.SMART.DEBTOR);
 	s_uccs_securer := s_uccs(SubjectIs=iesp.Constants.SMART.SECURER);
 	s_uccs_debtor_count := count(s_uccs_debtor);
 	s_uccs_securer_count := count(s_uccs_securer);
-  p_uccs_debtor        := choosen (if (param.Smart_rollup,s_uccs_debtor, 
+  p_uccs_debtor        := choosen (if (mod_smartlinx.Smart_rollup,s_uccs_debtor, 
 	                              project(uccs,transform(iesp.smartlinxreport.t_SLRUcc, self := left, self := []))),
 	                          iesp.constants.SMART.MaxUCCs);	
-  p_uccs_securer  := choosen (if (param.Smart_rollup,s_uccs_securer, 
+  p_uccs_securer  := choosen (if (mod_smartlinx.Smart_rollup,s_uccs_securer, 
 	                              project(uccs,transform(iesp.smartlinxreport.t_SLRUcc, self := left, self := []))),
 	                          iesp.constants.SMART.MaxUCCs);
 
-  crim          := IF (param.include_crimrecords, PersonReports.criminal_records  (dids, module (project (old_param, PersonReports.input.criminal)) end, IsFCRA),dataset([],iesp.criminal.t_CrimReportRecord));  
+  crim          := IF (mod_smartlinx.include_crimrecords, PersonReports.criminal_records  (dids, module (project (old_param, PersonReports.input.criminal)) end, IsFCRA),dataset([],iesp.criminal.t_CrimReportRecord));  
 	p_crim        := choosen(crim,iesp.constants.SMART.MaxCrimRecords);
   p_crim_doc_count := count(p_crim(stringlib.stringToUppercase(Datasource)=iesp.Constants.SMART.DOC));
   p_crim_arrest_count := count(p_crim(stringlib.stringToUppercase(Datasource)=iesp.Constants.SMART.ARRESTLOG));
   p_crim_crim_count := count(p_crim(stringlib.stringToUppercase(Datasource)=iesp.Constants.SMART.CRIMINALCOURT));
 		 
-	sexoff        := IF (param.include_sexualoffences, PersonReports.sexoffenses_records  (dids, module (project (old_param, PersonReports.input.sexoffenses)) end, IsFCRA),dataset([],iesp.sexualoffender.t_SexOffReportRecord));	
+	sexoff        := IF (mod_smartlinx.include_sexualoffences, PersonReports.sexoffenses_records  (dids, module (project (old_param, PersonReports.input.sexoffenses)) end, IsFCRA),dataset([],iesp.sexualoffender.t_SexOffReportRecord));	
 	p_sexOff      := choosen(sexoff,iesp.constants.SMART.MaxSexualOffenses);
 	p_sexOff_count := count(p_sexOff);
 //ASSOCIATIONS
   //INDIVIDUALS  relatives, neighbors are assigned above  
 
   //BUSINESS
-     pawRaw     := IF (param.include_peopleatwork, PersonReports.peopleatwork_records (dids, PROJECT (mod_smartlinx, $.IParam.peopleatwork), IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
+     pawRaw     := IF (mod_smartlinx.include_peopleatwork, PersonReports.peopleatwork_records (dids, PROJECT (mod_smartlinx, $.IParam.peopleatwork), IsFCRA),dataset([],iesp.peopleatwork.t_PeopleAtWorkRecord));    
 		 pawMod     := SmartRollup.smart_paw(pawRaw);
 		 pawNonExec := SmartRollup.fn_smart_rollup_paw(pawMod.paw_nonExec);  //non-executives ONLY rolled up
 		 pawNonExec_count := count(pawNonExec);
 		 pawExec   := SmartRollup.fn_smart_rollup_paw(pawMod.paw_exec);  //executives ONLY rolled up
 		 p_paw     := choosen (pawNonExec, iesp.Constants.SMART.MaxPeopleAtWork);    
-     corp_aff_raw  := IF (param.include_corpaffiliations,PersonReports.corpaffiliation_records (dids, module (project (old_param, $.input.corpaffil)) end, IsFCRA),dataset([],iesp.bpsreport.t_BpsCorpAffiliation));
+     corp_aff_raw  := IF (mod_smartlinx.include_corpaffiliations,PersonReports.corpaffiliation_records (dids, module (project (old_param, $.input.corpaffil)) end, IsFCRA),dataset([],iesp.bpsreport.t_BpsCorpAffiliation));
 		 corp_aff  := SmartRollup.fn_corp_aff_titles(corp_aff_raw); //standardizes titles
-		 fbn       := IF (param.include_corpaffiliations,doxie.Comp_FBN2Search(dids),dataset([],iesp.fictitiousbusinesssearch.t_FictitiousBusinessSearchRecord)); 
+		 fbn       := IF (mod_smartlinx.include_corpaffiliations,doxie.Comp_FBN2Search(dids),dataset([],iesp.fictitiousbusinesssearch.t_FictitiousBusinessSearchRecord)); 
      s_corp_aff := SmartRollup.fn_smart_rollup_corp_aff(corp_aff, fbn, pawExec);  //fbn added to corp_aff as part of requirements bug 97177   
 		 s_corp_aff_count := count(s_corp_aff);
 		 p_corp_aff :=  choosen(s_corp_aff, iesp.Constants.SMART.MaxBusiness);
@@ -345,14 +344,14 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 		 p_other_busi_assoc := choosen(s_other_busi_assoc, iesp.constants.SMART.MaxOtherBusi);
 
 
-		 associates       := IF (param.include_associates,  pers.AssociatesSlim, dataset([],iesp.bpsreport.t_BpsReportAssociateSlim));  
-		 s_associates     := SmartRollup.fn_smart_OtherPersonAssoc(associates,subject_did,param);
+		 associates       := IF (mod_smartlinx.include_associates,  pers.AssociatesSlim, dataset([],iesp.bpsreport.t_BpsReportAssociateSlim));  
+		 s_associates     := SmartRollup.fn_smart_OtherPersonAssoc(associates,subject_did,mod_smartlinx);
 		 s_associates_count := count(s_associates);
      p_associates     := choosen (s_associates, iesp.constants.SMART.MaxAssociates);
      american_student_input := PROJECT (mod_smartlinx, American_Student_Services.IParam.reportParams);
  
 		 boolean onlyCurrent := true;  //request only current student records.
-     p_education := if(param.include_students,
+     p_education := if(mod_smartlinx.include_students,
                         choosen(American_Student_Services.Functions.get_report_recs(dids,
 												                                                            american_student_input, 
 																																										onlyCurrent),
@@ -360,11 +359,11 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
      p_education_count := count(p_education);
 	
 		 // Key risk indicator
-		 s_kris := SmartRollup.fn_smart_KRIAttributes(param,subject_did,best_rec_smart[1],p_profSancProv,p_akas,relativesOf,true);
-		 p_kris := IF(param.include_kris,PROJECT(s_kris,TRANSFORM(iesp.smartlinxreport.t_SLRKeyRiskIndInfo,SELF := LEFT)),
+		 s_kris := SmartRollup.fn_smart_KRIAttributes(mod_smartlinx,subject_did,best_rec_smart[1],p_profSancProv,p_akas,relativesOf,true);
+		 p_kris := IF(mod_smartlinx.include_kris,PROJECT(s_kris,TRANSFORM(iesp.smartlinxreport.t_SLRKeyRiskIndInfo,SELF := LEFT)),
 																			dataset([],iesp.smartlinxreport.t_SLRKeyRiskIndInfo));
 		 
-		 p_worldcompliance := IF(param.include_kris,PROJECT(s_kris.WorldCompRecs,TRANSFORM(iesp.smartlinxsearchcore.t_SLRResultMatch,SELF := LEFT)),
+		 p_worldcompliance := IF(mod_smartlinx.include_kris,PROJECT(s_kris.WorldCompRecs,TRANSFORM(iesp.smartlinxsearchcore.t_SLRResultMatch,SELF := LEFT)),
 																			dataset([],iesp.smartlinxsearchcore.t_SLRResultMatch));
 	 
 //****************************************************************************************************
