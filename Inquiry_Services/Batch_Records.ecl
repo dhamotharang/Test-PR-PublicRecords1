@@ -42,12 +42,12 @@ EXPORT Batch_Records( DATASET(Inquiry_Services.Layouts.Batch_Input_Processed) ds
 
 
 		// Kfetch to get Inquiry records by linkid.
-		ds_from_linkids := PROJECT(Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(ds_linkIds,inMod.BIPFetchLevel,,Inquiry_Services.Constants.INQUIRY_LIMIT),
+		ds_from_linkids := PROJECT(Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(ds_linkIds, mod_access, inMod.BIPFetchLevel, ,Inquiry_Services.Constants.INQUIRY_LIMIT),
 																								TRANSFORM(Inquiry_Services.Layouts.Batch_Raw_Linkid,
 																													SELF.inquiry_src := Inquiry_Services.Constants.INQ_HISTORY,
 																													SELF := LEFT));
 
-		ds_from_linkidsUpd := PROJECT(Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(ds_linkIds, mod_access, inMod.BIPFetchLevel, ,Inquiry_Services.Constants.INQUIRY_LIMIT),
+		ds_from_linkidsUpd := PROJECT(Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(ds_linkIds, mod_access, inMod.BIPFetchLevel,,Inquiry_Services.Constants.INQUIRY_LIMIT),
 																								TRANSFORM(Inquiry_Services.Layouts.Batch_Raw_Linkid,
 																													SELF.inquiry_src := Inquiry_Services.Constants.INQ_UPDATE,
 																													SELF := LEFT));

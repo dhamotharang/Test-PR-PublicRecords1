@@ -21,7 +21,8 @@ EXPORT getInquiries(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 
 	// ---------------- Business Inquiries - Only Allowed in Non-Marketing Mode ------------------
 	InquiriesRaw := IF(Options.MarketingMode = 0, Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
+                                              mod_access,
+																						  Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Inquiries,
 																							Options.KeepLargeBusinesses));

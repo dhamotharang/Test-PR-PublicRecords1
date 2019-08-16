@@ -33,8 +33,10 @@ import Foreclosure_Services;
 export BatchService := MACRO
 
 	ds_xml_in := dataset([],Foreclosure_Services.Layouts.layout_batch_in) : stored('batch_in',few);
-
-	Pre_result := Foreclosure_Services.BatchService_Records(ds_xml_in, true);
+	
+ boolean includeVendorSourceB := false : STORED ('IncludeVendorSourceB');
+	
+	Pre_result := Foreclosure_Services.BatchService_Records(ds_xml_in, includeVendorSourceB);
 	ut.mac_TrimFields(Pre_result, 'Pre_result', result);
 	OUTPUT(result, NAMED('Results'));	
 	

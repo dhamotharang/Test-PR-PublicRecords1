@@ -377,7 +377,8 @@ string6 ninesDate   := '999999';
 
 	// ---------------- Business Inquiries - Only Allowed in Non-Marketing Mode ------------------
 	InquiriesRaw := Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(UniqueRawFEINMatches,
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
+                                              mod_access,
+																						  Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.SeleID),
 																							0,
 																							Business_Risk_BIP.Constants.Limit_Inquiries,
 																							Options.KeepLargeBusinesses);
