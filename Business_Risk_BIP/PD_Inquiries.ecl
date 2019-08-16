@@ -20,7 +20,8 @@ EXPORT PD_Inquiries(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound_pre,
 
 	// --------------- Business Inquiries ----------------
 	InquiriesRaw := IF(Options.MarketingMode = 0, Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(kFetchLinkIDs,
-																						 kFetchLinkSearchLevel,
+                                              mod_access,
+																						  kFetchLinkSearchLevel,
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
 																							Options.KeepLargeBusinesses));
