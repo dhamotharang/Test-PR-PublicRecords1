@@ -9,13 +9,13 @@
   <part name="UltID" type="xsd:string"/>
 	<part name="OrgID" type="xsd:string"/>
   <part name="SeleID" type="xsd:string"/>
-	<part name="ProxID" type="xsd:string"/>  
+	<part name="ProxID" type="xsd:string"/>
 	<part name="PowID" type="xsd:string"/>
 	<part name="EmpID" type="xsd:string"/>
 	<part name="DotID" type="xsd:string"/>
 
 	<part name="IncludeAircrafts" type="xsd:boolean"/>
-	<part name="IncludeAssociatedBusinesses" type="xsd:boolean"/>	
+	<part name="IncludeAssociatedBusinesses" type="xsd:boolean"/>
 	<part name="IncludeBankruptcies" type="xsd:boolean"/>
   <part name="IncludeBusinessRegistrations" type="xsd:boolean"/>
   <part name="IncludeCompanyVerification" type="xsd:boolean"/>
@@ -23,9 +23,9 @@
 	<part name="IncludeContacts" type="xsd:boolean"/>
   <part name="IncludeDunBradStreet" type="xsd:boolean"/>
   <part name="IncludeExperianBusinessReports" type="xsd:boolean"/>
-	<part name="IncludeFinances" type="xsd:boolean"/>		
+	<part name="IncludeFinances" type="xsd:boolean"/>
   <part name="IncludeIncorporation" type="xsd:boolean"/>
-	<part name="IncludeIndustries" type="xsd:boolean"/>		
+	<part name="IncludeIndustries" type="xsd:boolean"/>
 	<part name="IncludeInternetDomains" type="xsd:boolean"/>
   <part name="IncludeIRS5500" type="xsd:boolean"/>
 	<part name="IncludeProfessionalLicenses" type="xsd:boolean"/>
@@ -36,7 +36,7 @@
 	<part name="IncludeParents" type="xsd:boolean"/>
 	<part name="IncludeProperties" type="xsd:boolean"/>
 	<part name="IncludeUCCFilings" type="xsd:boolean"/>
-	<part name="IncludeUCCFilingsSecureds" type = "xsd:boolean"/>	
+	<part name="IncludeUCCFilingsSecureds" type = "xsd:boolean"/>
 	<part name="IncludeRegisteredAgents" type="xsd:boolean"/>
   <part name="IncludeSanctions" type="xsd:boolean"/>
 	<part name="IncludeWatercrafts" type="xsd:boolean"/>
@@ -52,11 +52,11 @@
 	<part name="IncludeSourceCounts" type="xsd:boolean"/>
 	<part name="LnBranded" type="xsd:boolean"/>
 	<part name="ReportFetchLevel" type="xsd:string"/>
-	
+
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
 
 	<part name="SupplierRiskReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
-	
+
 </message>
 */
 /*--INFO-- This service produces a full business report.*/
@@ -67,13 +67,13 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	rec_in := iesp.SupplierRiskReport.t_SupplierRiskReportRequest;
 	ds_in := dataset([],rec_in) : stored('SupplierRiskReportRequest',few);
 	first_row := ds_in[1] : independent;
-	
+
 	s_gateway := dataset([],risk_indicators.Layout_Gateways_In) 	: stored('gateways');
 	// Set some base options
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
-	
+
 	report_by := global(first_row.ReportBy.BusinessId);
-	
+
 	report_options := global(first_row.Options);
 	user_options := global(first_row.User);
 
@@ -84,15 +84,15 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	#stored('ProxID',report_by.ProxID);
 	#stored('OrgID',report_by.OrgID);
 	#stored('UltID',report_by.UltID);
-	
+
 	string12 s_DotID  := '' : stored('DotID');
-	string12 s_EmpID  := '' : stored('EmpID'); 
+	string12 s_EmpID  := '' : stored('EmpID');
 	string12 s_PowID  := '' : stored('PowID');
-	string12 s_ProxID := '' : stored('ProxID');	
+	string12 s_ProxID := '' : stored('ProxID');
 	string12 s_SeleID := '' : stored('SeleID');
 	string12 s_OrgID  := '' : stored('OrgID');
 	string12 s_UltID  := '' : stored('UltID');
-	
+
   //#stored('SelectAll',report_options.SelectAll);
 	#stored('IncludeAircrafts',report_options.IncludeAircrafts);
 	#stored('IncludeAssociatedBusinesses',report_options.IncludeAssociatedBusinesses);
@@ -101,7 +101,7 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	#stored('IncludeCompanyVerification', report_options.IncludeCompanyVerification);
 	#stored('IncludeConnectedBusinesses', report_options.IncludeConnectedBusinesses);
 	#stored('IncludeContacts',report_options.IncludeContacts);
-	#stored('IncludeFinances',report_options.IncludeFinances);	
+	#stored('IncludeFinances',report_options.IncludeFinances);
 	#stored('IncludeIncorporation',report_options.IncludeIncorporation);
 	#stored('IncludeIndustries',report_options.IncludeIndustries);
 	#stored('IncludeInternetDomains',report_options.IncludeInternetDomains);
@@ -114,7 +114,7 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	#stored('IncludeParents',report_options.IncludeParents);
 	#stored('IncludeProperties',report_options.IncludeProperties);
 	#stored('IncludeUCCFilings',report_options.IncludeUCCFilings);
-	#stored('IncludeUCCFilingsSecureds',report_options.IncludeUCCFilingsSecureds);	
+	#stored('IncludeUCCFilingsSecureds',report_options.IncludeUCCFilingsSecureds);
 	#stored('IncludeRegisteredAgents',report_options.IncludeRegisteredAgents);
 	#stored('IncludeSanctions',report_options.IncludeSanctions);
 	#stored('IncludeWatercrafts',report_options.IncludeWatercrafts);
@@ -133,9 +133,9 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	#stored('LnBranded',user_options.LnBranded);
   #stored('ReportFetchLevel','S'); //report_options.ReportFetchLevel);
 
-	boolean AssociateBus := false :  stored('IncludeAssociatedBusinesses');	
-	boolean Parent := false :  stored('IncludeParents');	
-	boolean Con := false :  stored('IncludeContacts');	
+	boolean AssociateBus := false :  stored('IncludeAssociatedBusinesses');
+	boolean Parent := false :  stored('IncludeParents');
+	boolean Con := false :  stored('IncludeContacts');
 	boolean Finance := false :  stored('IncludeFinances');
 	boolean OpsSites := false :  stored('IncludeOpsSites');
 	boolean InCorp := false : stored('IncludeIncorporation');
@@ -171,32 +171,32 @@ EXPORT SupplierRiskReport_Service() := MACRO
 	boolean CustomBCIR := false : stored('IncludeCustomBCIR');
 	boolean lnbranded := false : stored('LnBranded');
 	// set DEFAULT for query level report fetches to be at the SELEID = S level.
-	string1 ReportFetchLevel := 'S' : stored('ReportFetchLevel'); 
+	string1 ReportFetchLevel := 'S' : stored('ReportFetchLevel');
 	//boolean SelectAll := false;// : stored('SelectAll');
   //boolean internal_testing := false : stored('InternalTesting');
-	
-	
-	SupplierRisk_Services.SupplierRisk_Layouts.Report_options init_options() := transform	  	 
-	  self.ApplicationType := AutoStandardI.GlobalModule().ApplicationType;		
-	  self.IncludeAssociatedBusinesses := AssociateBus; 
-		self.IncludeParents := Parent; 
-		self.IncludeContacts  :=  Con; 
-		self.IncludeFinances   := Finance; 
-		self.IncludeOpsSites := OpsSites; 
-		self.IncludeIncorporation := InCorp; 
-		self.IncludeIndustries := Indust; 
-		self.IncludeInternetDomains := URL; 
-		self.IncludeUCCFilings := UCCSect; 
-		self.IncludeUCCFilingsSecureds :=  (UCCsect and UCCSecureds); 
-		self.IncludeLiensJudgments := Liens; 
-		self.IncludeAircrafts := Aircraft; 
-		self.IncludeMotorVehicles := MVR; 
-		self.IncludeWatercrafts := Wc; 
-		self.IncludeBankruptcies := Bk; 
-		self.IncludeProperties := Prop; 
-		self.IncludeRegisteredAgents := RA; 
+
+
+	SupplierRisk_Services.SupplierRisk_Layouts.Report_options init_options() := transform
+	  self.ApplicationType := AutoStandardI.GlobalModule().ApplicationType;
+	  self.IncludeAssociatedBusinesses := AssociateBus;
+		self.IncludeParents := Parent;
+		self.IncludeContacts  :=  Con;
+		self.IncludeFinances   := Finance;
+		self.IncludeOpsSites := OpsSites;
+		self.IncludeIncorporation := InCorp;
+		self.IncludeIndustries := Indust;
+		self.IncludeInternetDomains := URL;
+		self.IncludeUCCFilings := UCCSect;
+		self.IncludeUCCFilingsSecureds :=  (UCCsect and UCCSecureds);
+		self.IncludeLiensJudgments := Liens;
+		self.IncludeAircrafts := Aircraft;
+		self.IncludeMotorVehicles := MVR;
+		self.IncludeWatercrafts := Wc;
+		self.IncludeBankruptcies := Bk;
+		self.IncludeProperties := Prop;
+		self.IncludeRegisteredAgents := RA;
 		self.IncludeConnectedBusinesses := ConnectedBusinesses;
-		self.IncludeSourceCounts := Source; 
+		self.IncludeSourceCounts := Source;
 		self.IncludeProfessionalLicenses := License;
 		self.IncludeNameVariations := namevariations;
 		self.IncludeBusinessRegistrations := businessRegistrations;
@@ -219,7 +219,7 @@ EXPORT SupplierRiskReport_Service() := MACRO
 		self.ReportFetchLevel := topbusiness_services.functions.fn_fetchLevel(trim(stringlib.stringToUpperCase(ReportFetchLevel),left,right)[1]);
 		self := [];
 	end;
-	
+
 	options := row(init_options()); // can uncomment later
 
 	// Create dataset
@@ -231,12 +231,11 @@ EXPORT SupplierRiskReport_Service() := MACRO
 		 self.ProxID := (unsigned6) s_proxid,
 		 self.SeleID := (unsigned6) s_seleid,
 		 self.OrgID  := (unsigned6) s_orgid,
-		 self.UltID  := (unsigned6) s_ultid,     
+		 self.UltID  := (unsigned6) s_ultid,
 	end;
-	
+
 	ds := dataset([initialize()]);
-	
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+
 	tempmod := module(AutoStandardI.DataRestrictionI.params)
 		export boolean AllowAll := false;
 		export boolean AllowDPPA := false;
@@ -248,15 +247,15 @@ EXPORT SupplierRiskReport_Service() := MACRO
 		export boolean ignoreFidelity := false;
 		export boolean includeMinors := false;
 	end;
-	       
+
 	// Get report
 	tmpresults := SupplierRisk_Services.SupplierRisk_records(ds,options,tempmod);
-	
-																							
-	tmp := project(tmpresults, transform(iesp.SupplierRiskReport.t_SupplierRiskReportRecord, 
-	                             self := left, self := []));	
+
+
+	tmp := project(tmpresults, transform(iesp.SupplierRiskReport.t_SupplierRiskReportRecord,
+	                             self := left, self := []));
 	validRpt := IF(tmp[1].Bestsection.CompanyName !='',true,false);
-	
+
 	iesp.SupplierRiskReport.t_SupplierRiskReportResponse format() := transform
 													self._Header         := iesp.ECL2ESP.GetHeaderRow(),
 													// Only output report if best company name exists.
@@ -265,16 +264,15 @@ EXPORT SupplierRiskReport_Service() := MACRO
 													self := []
   end;
 	results := dataset([format()]);
-	
+
 	// dataset(iesp.gateway_inviewreport.t_InviewReportResponse) rpt.EquifaxBusinessReport
-	efx_table := dataset(row(tmp[1].EQFXGatewaySection,iesp.gateway_inviewreport.t_InviewReportResponse));	
+	efx_table := dataset(row(tmp[1].EQFXGatewaySection,iesp.gateway_inviewreport.t_InviewReportResponse));
 	inv_royalties := Royalty.RoyaltyInview.GetOnlineRoyalties(efx_table,BusinessCreditRisk,BusinessFailureRiskLevel,CustomBCIR);
-	
+
 	royalties := dataset([], Royalty.Layouts.Royalty) +
 		IF(BusinessCreditRisk or BusinessFailureRiskLevel or CustomBCIR, inv_royalties);
-	
-	IF(EXISTS(Results), doxie.compliance.logSoldToTransaction(mod_access));
+
 	output(Results,named('Results'));
 	output(royalties, named('RoyaltySet'));
-	
+
 ENDMACRO;
