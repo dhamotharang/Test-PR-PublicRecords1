@@ -1,13 +1,13 @@
 import doxie, iesp, personReports, risk_indicators;
 
-export getImposters(dataset(identifier2.layout_Identifier2) indata, 
-                    boolean Include_Imposter_Data=false,
-										boolean IsFCRA = false,
-										PersonReports.input.personal personParams,
-										unsigned1 dob_mask_value) := function 
+export getImposters(dataset(identifier2.layout_Identifier2) indata,
+                    doxie.IDataAccess mod_access, 
+                    boolean Include_Imposter_Data,
+										boolean IsFCRA,
+										PersonReports.IParam.personal personParams) := function 
 
   dids := project(indata, transform(doxie.layout_references, self.did := left.did));
-  pers := PersonReports.Person_records(dids, personParams, IsFCRA);
+  pers := PersonReports.Person_records(dids, mod_access, personParams, IsFCRA);
   imposters := pers.imposters;
   found := exists(imposters);
 	ADLCount := count(dedup(sort(imposters.akas, uniqueid), uniqueid));
@@ -17,7 +17,7 @@ export getImposters(dataset(identifier2.layout_Identifier2) indata,
 	
 	iesp.bps_share.t_BpsReportDriverLicense maskDOB(iesp.bps_share.t_BpsReportDriverLicense le) := transform
 		dlDOB := intformat(le.dob.year,4,1) + intformat(le.dob.month,2,1) + intformat(le.dob.day,2,1);
-		maskedDLdob := risk_indicators.iid_constants.mask_dob(dlDOB, dob_mask_value);
+		maskedDLdob := risk_indicators.iid_constants.mask_dob(dlDOB, mod_access.dob_mask);
 		self.dob.year := (integer)maskedDLdob[1..4];
 		self.dob.month := (integer)maskedDLdob[5..6];
 		self.dob.day := (integer)maskedDLdob[7..8];
@@ -27,7 +27,7 @@ export getImposters(dataset(identifier2.layout_Identifier2) indata,
 	iesp.bps_share.t_BpsReportIdentity maskDOB2(iesp.bps_share.t_BpsReportIdentity le) := transform
 		self.driverlicenses := project(le.driverlicenses, maskDOB(left));
 		akaDOB := intformat(le.dob.year,4,1) + intformat(le.dob.month,2,1) + intformat(le.dob.day,2,1);
-		maskedAKAdob := risk_indicators.iid_constants.mask_dob(akaDOB, dob_mask_value);
+		maskedAKAdob := risk_indicators.iid_constants.mask_dob(akaDOB, mod_access.dob_mask);
 		self.dob.year := (integer)maskedAKAdob[1..4];
 		self.dob.month := (integer)maskedAKAdob[5..6];
 		self.dob.day := (integer)maskedAKAdob[7..8];

@@ -10,7 +10,7 @@ export StoredReader := MODULE
 // real translations are done in PersonReports@functions attribute
 
 
-  export relatives_options := MODULE (PersonReports.input.relatives)
+  export relatives_options := MODULE (PersonReports.IParam.relatives)
     export unsigned1 relative_depth           := min (max (^.Relative_Depth, 1), 3); //1
     export unsigned1 max_relatives            := min (^.max_relatives, iesp.Constants.BR.MaxRelatives); //100
     export boolean  include_relativeaddresses := Include_RelativeAddresses_val; //false
@@ -20,7 +20,7 @@ export StoredReader := MODULE
     export boolean use_verified_address_ra := false : stored ('UnverifiedAddresses');    // enforce returning of verified addresses only
   end;
 
-  export neighbors_options := MODULE (PersonReports.input.neighbors)
+  export neighbors_options := MODULE (PersonReports.IParam.neighbors)
     export unsigned1 neighborhoods := min (max (Max_Neighborhoods, 0), iesp.Constants.BR.MaxNeighborhood); //0
     export unsigned1 neighbors_per_address := Neighbors_PerAddress; //3
     export unsigned1 addresses_per_neighbor := Addresses_PerNeighbor; //3
@@ -31,7 +31,7 @@ export StoredReader := MODULE
     // -- generally, the radius of neighbors' units: houses, or appartments or etc.
   end;
 
-  export imposters_options := MODULE (PersonReports.input.imposters)
+  export imposters_options := MODULE (PersonReports.IParam.imposters)
     export boolean return_AllImposterRecords := false : stored('ReturnAllImposters'); //new
   end;
 

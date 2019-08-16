@@ -1,4 +1,4 @@
-import Healthcare_Provider_Services, Healthcare_Header_Services,ingenix_natlprof, doxie_files,Prof_LicenseV2_Services,codes,AutoStandardI,ut;
+import Healthcare_Provider_Services, Healthcare_Header_Services,ingenix_natlprof, doxie_files,codes,AutoStandardI,ut;
 
 export ING_sanctions_report_records(set of unsigned6 sanction_id_set, dataset(doxie.layout_references) in_dids = dataset([],doxie.layout_references)) := FUNCTION
 
@@ -21,7 +21,6 @@ ds:=project(getHdrIDs_fromSanctionID, transform(newlayout,
 												 self.ProviderID := left.sanction_id; 
 												 self.ProviderSrc := 'H';
 												 self:=[];));
-tmpMod:= MODULE(PROJECT(gm, Healthcare_Header_Services.IParams.searchParams,opt))	end;	
 Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
 	 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
 	 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);

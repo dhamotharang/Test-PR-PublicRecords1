@@ -1,7 +1,9 @@
 #option ('expandSelectCreateRow', true);
-import DOXIE,iesp,AutoheaderI,autostandardi,ut,doxie_files, Address,Prof_LicenseV2_Services, Ingenix_NatlProf, doxie_cbrs, Risk_Indicators, Models, Gateway, Healthcare_Header_Services,Healthcare_Report_Services;
+import DOXIE, iesp, ut, Address, Risk_Indicators, Models, Gateway, Healthcare_Header_Services, Healthcare_Report_Services;
 
-EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inputData, iesp.healthcareconsolidatedreport.t_HealthCareConsolidatedReportBy srcRptBy,boolean isHeaderSearch = false,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
+EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inputData,
+                             doxie.IDataAccess mod_access,
+                             iesp.healthcareconsolidatedreport.t_HealthCareConsolidatedReportBy srcRptBy,boolean isHeaderSearch = false,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 	tmpMod:= MODULE(PROJECT(inputData, Healthcare_Header_Services.IParams.searchParams,opt)) END;
 	searchByCriteria := Healthcare_Header_Services.Records.convertInputtoDataset(tmpMod);
 	provdata := Healthcare_Header_Services.Records.getReportServiceRecords(searchByCriteria,cfg)(srcid>0);
@@ -19,8 +21,10 @@ EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inp
 	gsa := Healthcare_Provider_Services.GSA_Records(inputData).dsGSA(inputData.IncludeGSASanctions);
 	clia := Healthcare_Provider_Services.CLIA_Records(inputData).dsCLIA(inputData.IncludeCLIA);
 	//Add logic to support IncludeRelativesOnlyWhenDeadOrWithSanctions for Relative and Associates
-	RelativeData := map(isIndiv=>choosen(Healthcare_Provider_Services.Person_Records(inputData,dsDids).dsRelatives(inputData.IncludeRels),iesp.Constants.BR.MaxRelatives),dataset([],iesp.bpsreport.t_BpsReportRelativeSlim));
-	AssociatesData := map(isIndiv=>choosen(Healthcare_Provider_Services.Person_Records(inputData,dsDids).dsAssociates(inputData.IncludeAssoc),iesp.Constants.BR.MaxAssociates),dataset([],iesp.bpsreport.t_BpsReportAssociate));
+
+  mod_person := Healthcare_Provider_Services.Person_Records(inputData,mod_access,dsDids); 
+	RelativeData := map(isIndiv=>choosen(mod_person.dsRelatives(inputData.IncludeRels),iesp.Constants.BR.MaxRelatives),dataset([],iesp.bpsreport.t_BpsReportRelativeSlim));
+	AssociatesData := map(isIndiv=>choosen(mod_person.dsAssociates(inputData.IncludeAssoc),iesp.Constants.BR.MaxAssociates),dataset([],iesp.bpsreport.t_BpsReportAssociate));
 	//Project the Relative data to get only the dids.
 	RelSlimData := project(relativeData, transform(doxie.layout_references, self.did:=(integer)left.UniqueId;));
 	//Call the header to get Sanctions and death
@@ -34,7 +38,7 @@ EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inp
 	RelativeDataWSanctionsFilter := Join(RelativeData,rawRecsRel,(integer)left.UniqueId=right.SrcId,transform(iesp.healthcareconsolidatedreport.t_HealthCareConsolidatedReportRelative,self.IsDeceased:=right.status='D';self.HasLEIESanctions:=right.hasOIG;self.HasEPLSSanctions:=right.hasOPM;self:=left));
 	AssociatesDataWSanctions := project(AssociatesData,transform(iesp.healthcareconsolidatedreport.t_HealthCareConsolidatedReportAssociate,self:=left;self:=[];));
 	AssociatesDataWSanctionsFilter := Join(AssociatesData,rawRecsAssoc,(integer)left.UniqueId=right.SrcId,transform(iesp.healthcareconsolidatedreport.t_HealthCareConsolidatedReportAssociate,self.IsDeceased:=right.status='D';self.HasLEIESanctions:=right.hasOIG;self.HasEPLSSanctions:=right.hasOPM;self:=left));
-	Neighbors := map(isIndiv=>choosen(Healthcare_Provider_Services.Person_Records(inputData,dsDids).dsNeighbors(inputData.IncludeNeighs),iesp.Constants.BR.MaxNeighborhood),dataset([],iesp.bpsreport.t_NeighborSlim));
+	Neighbors := map(isIndiv=>choosen(mod_person.dsNeighbors(inputData.IncludeNeighs),iesp.Constants.BR.MaxNeighborhood),dataset([],iesp.bpsreport.t_NeighborSlim));
 	Associates :=  if (inputData.IncludeRelativesOnlyWhenDeadOrWithSanctions,AssociatesDataWSanctionsFilter(HasLEIESanctions=true or HasEPLSSanctions=true or IsDeceased=true),AssociatesDataWSanctions);
 	//End logic to support IncludeRelativesOnlyWhenDeadOrWithSanctions for Relative and Associates
 	sexOff	:= map(isIndiv=>Healthcare_Provider_Services.SexualOffender_Records(inputData,dsDids).sexOffenderOffenses,
@@ -120,7 +124,7 @@ EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inp
 		self.Relatives := if (inputData.IncludeRelativesOnlyWhenDeadOrWithSanctions,RelativeDataWSanctionsFilter(HasLEIESanctions=true or HasEPLSSanctions=true or IsDeceased=true),RelativeDataWSanctions);
 		self.Neighbors := Neighbors;
 		self.Associates :=  Associates;
-		self.HistoricalNeighbors := map(isIndiv=>choosen(Healthcare_Provider_Services.Person_Records(inputData,dsDids).dsHistoricalNeighbors(inputData.IncludeHistoricalNeighbors),iesp.Constants.BR.MaxHistoricalNeighborhood),dataset ([], iesp.bpsreport.t_HistoricalNeighbor));
+		self.HistoricalNeighbors := map(isIndiv=>choosen(mod_person.dsHistoricalNeighbors(inputData.IncludeHistoricalNeighbors),iesp.Constants.BR.MaxHistoricalNeighborhood),dataset ([], iesp.bpsreport.t_HistoricalNeighbor));
 		self.DODs := iesp.ECL2ESP.toDatestring8(provRec.DateofDeath);
 		self.IsSexualOffender := exists(sexOff);
 		self.SexualOffenderId := sexOffIDs;
@@ -338,4 +342,3 @@ EXPORT ReportService_Records(Healthcare_Header_Services.IParams.ReportParams inp
 	return recs;
 	
 END;
-
