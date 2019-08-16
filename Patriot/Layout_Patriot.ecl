@@ -86,5 +86,5 @@ RECORD
 	//Added for CCPA-393
 	UNSIGNED4 global_sid;
 	UNSIGNED8 record_sid;
-	UNSIGNED8 did;
+	UNSIGNED6 did;
 END;
