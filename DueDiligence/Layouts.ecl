@@ -89,6 +89,7 @@ EXPORT Layouts := MODULE
     Name name;		
     STRING11 ssn; //to account if input comes in xxx-xx-xxxx
     STRING8 dob;
+    Address cleanAddress;
   END;
 
 
@@ -694,10 +695,9 @@ EXPORT Layouts := MODULE
     BOOLEAN inputAddressProvided;
     BOOLEAN fullInputAddressProvided;
     Indv_Input indvRawInput;
-    Indv_Input indvCleanInput;
-    GeographicRiskLayout; 
     UNSIGNED6 inquiredDID;
     RelatedParty individual;											  //populated in DueDiligence.getIndAttributes, DueDiligence.getIndInformation
+    GeographicRiskLayout; 
     UNSIGNED4 numberOfSpouses;																							
     DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
     UNSIGNED4 numberOfParents;
