@@ -105,6 +105,7 @@ MODULE
     EXPORT BOOLEAN NameAddressInfo              := FALSE;
     EXPORT BOOLEAN IncludeNameAddressInfo       := FALSE;
     EXPORT BOOLEAN AccountInfo                  := FALSE;
+    EXPORT BOOLEAN IncludeAccountInfo           := FALSE;
     EXPORT BOOLEAN CallHandlingInfo             := FALSE;
     EXPORT BOOLEAN IncludeCallHandlingInfo      := FALSE;
     EXPORT BOOLEAN DeviceInfo                   := FALSE;
@@ -266,7 +267,9 @@ MODULE
       EXPORT BOOLEAN NameAddressValidation        := pfOptions.IncludeZumigoOptions.NameAddressValidation;
       EXPORT BOOLEAN IncludeNameAddressValidation := IncludeNameAddressInfo OR (full_consent AND (TransactionType = $.Constants.TransType.Ultimate OR NameAddressValidation));   // when NameAddressInfo is requested, NameAddressValidation should also be selected
                                                           
-      EXPORT BOOLEAN AccountInfo                  := pfOptions.IncludeZumigoOptions.AccountInfo;  
+      EXPORT BOOLEAN AccountInfo                  := pfOptions.IncludeZumigoOptions.AccountInfo;
+      EXPORT BOOLEAN IncludeAccountInfo           := ValidZumigoConsents AND 
+                                                     (TransactionType = $.Constants.TransType.Ultimate OR AccountInfo); 
 
       EXPORT BOOLEAN CallHandlingInfo             := pfOptions.IncludeZumigoOptions.CallHandlingInfo;
       EXPORT BOOLEAN IncludeCallHandlingInfo           := full_consent AND
@@ -286,7 +289,7 @@ MODULE
 
       EXPORT BOOLEAN IncludeZumigoOptions        := IncludeNameAddressValidation OR IncludeNameAddressInfo OR
                                                     IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
-                                                    IncludeDeviceInfo OR IncludeDeviceHistory;                                        	
+                                                    IncludeDeviceInfo OR IncludeDeviceChangeInfo;                                        	
 
       EXPORT BOOLEAN UseZumigoIdentity	         := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity; 
 
@@ -399,6 +402,7 @@ MODULE
 
       SHARED BOOLEAN ValidDeviceConsentInquiry    := ValidZumigoConsents  AND hasActiveDeviceRules;
       EXPORT BOOLEAN IncludeNameAddressInfo       := ValidZumigoConsents AND (TransactionType = $.Constants.TransType.Ultimate);
+      EXPORT BOOLEAN IncludeAccountInfo           := ValidZumigoConsents AND (TransactionType = $.Constants.TransType.Ultimate);
       EXPORT BOOLEAN IncludeNameAddressValidation := ValidZumigoConsents AND (TransactionType = $.Constants.TransType.Ultimate);  
                                                           
       EXPORT BOOLEAN IncludeCallHandlingInfo      := full_consent AND TransactionType IN [$.Constants.TransType.Ultimate,$.Constants.TransType.PHONERISKASSESSMENT];  

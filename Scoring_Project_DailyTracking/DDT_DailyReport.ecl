@@ -1,5 +1,7 @@
 ﻿EXPORT DDT_DailyReport(string historydate = '', string email) := function
 
+		Import std;
+		
 		// environment = 'P' or 'Q'
 		// location [optional] = 'B' or 'Q' or '' or '*'
 		// cluster [optional] = 'N' or 'F' or '' or '*' or 'S' - Customer Support or 'FS' - FCRA Customer Support or 'T' - Customer Test
