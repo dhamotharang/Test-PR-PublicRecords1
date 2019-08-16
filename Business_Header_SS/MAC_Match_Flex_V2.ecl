@@ -41,13 +41,14 @@ import BIPV2;
 
 #uniquename(rec_id);
 
+#uniquename(infileWithRequestId);
 // add request_id to infile so it can be used to join later
-infileWithRequestId := project(infile, transform({recordof(left), unsigned %rec_id%}, self.%rec_id% := counter, self := left));
+%infileWithRequestId% := project(infile, transform({recordof(left), unsigned %rec_id%}, self.%rec_id% := counter, self := left));
 
-
+#uniquename(appendInput);
 // project to append input layout
-appendInput :=
-	project(infileWithRequestId,
+%appendInput% :=
+	project(%infileWithRequestId%,
 		transform(BIPV2.IdAppendLayouts.AppendInput,
 			self.request_id := left.%rec_id%;
 			self.company_name := left.company_name_field;
@@ -80,11 +81,11 @@ appendInput :=
 			#else
 				self.fein := '';
 			#end;
-			#if(#text(pUrl) != '')
-				self.url := left.pUrl;
-			#else
+			// #if(#text(pUrl) != '')
+				// self.url := left.pUrl;
+			// #else
 				self.url := '';
-			#end
+			// #end
 			#if(#text(pEmail) != '')
 				self.email := left.pEmail;
 			#else
@@ -123,19 +124,19 @@ appendInput :=
 			self := [];
 	));
 
+#uniquename(appendMod);
 // run append
-appendMod := BIPV2.IdAppendThor(appendInput,
-                                scoreThreshold := score_threshold, 
-                                weightThreshold := 0,
-                                primForce := true,
-                                reAppend := true);
-
-withAppend := appendMod.IdsOnly();
-
+%appendMod% := BIPV2.IdAppendThor(%appendInput%,
+                                  scoreThreshold := score_threshold, 
+                                  weightThreshold := 0,
+                                  primForce := true,
+                                  reAppend := true);
+#uniquename(withAppend);
+%withAppend% := %appendMod%.IdsOnly();
 
 // join with infile by append request id
 outfile2 :=
-	join(infileWithRequestId, withAppend,
+	join(%infileWithRequestId%, %withAppend%,
 		left.%rec_id% = right.request_id,
 		transform(outrec,
 			self.proxid := right.proxid;
