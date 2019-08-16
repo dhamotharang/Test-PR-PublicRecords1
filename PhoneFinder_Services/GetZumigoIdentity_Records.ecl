@@ -1,4 +1,4 @@
-﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD;
+﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD, ut;
 EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)  dPhoneRecs,
                                  DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
                                  PhoneFinder_Services.iParam.SearchParams         inMod,
@@ -106,7 +106,7 @@ MODULE
      
      EXPORT BOOLEAN NameAddressValidation := inMod.IncludeNameAddressValidation;
      EXPORT BOOLEAN NameAddressInfo       := EXISTS(PhoneSrch_wireless) AND inMod.IncludeNameAddressInfo;
-     EXPORT BOOLEAN AccountInfo           := FALSE;
+     EXPORT BOOLEAN AccountInfo           := EXISTS(PhoneSrch_wireless) AND inMod.IncludeAccountInfo;
      EXPORT BOOLEAN CallHandlingInfo      := inMod.IncludeCallHandlingInfo;
      EXPORT BOOLEAN DeviceInfo            := inMod.IncludeDeviceInfo;  
      EXPORT BOOLEAN DeviceHistory         := inMod.IncludeDeviceHistory;
@@ -134,7 +134,7 @@ MODULE
     
    
    PhoneFinder_Services.Layouts.PhoneFinder.Final  addZum(Phones.Layouts.ZumigoIdentity.zOut l) :=    TRANSFORM
-  
+      Acct_tenure := l.acct_tenure_min * $.Constants.ZumigoConstants.MonthlyDays;  
       SELF.acctno := l.acctno;
       SELF.phone := l.submitted_phonenumber;
       SELF.did := l.lexid;
@@ -152,7 +152,7 @@ MODULE
       SELF.st       :=l.state;
       SELF.zip         :=l.zip;
       SELF.PhoneOwnershipIndicator := TRUE; // identity returned from gateway is verified
-      SELF.dt_first_seen := ''; // Assigning blank date for zumigo records RQ-16263
+      SELF.dt_first_seen := ut.date_math((STRING)today, -Acct_tenure);
       SELF.dt_last_seen := (STRING)today;
       SELF.CallForwardingIndicator   := IF(Zum_inMod.CallHandlingInfo, 
                                        PhoneFinder_Services.Functions.CallForwardingDesc(l.call_forwarding),''); //get call forwarded value only when CallHandlingInfo is selected

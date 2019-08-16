@@ -80,6 +80,30 @@ EXPORT compliance := MODULE
     RETURN access;
   ENDMACRO;
 
+  //Temporary: a macro copying new-style compliance parameters to the old one;
+  //can be convenient for creating a module of AutoStandardI.PermissionI_Tools.params type from mod_access
+  EXPORT MAC_CopyComplianceValuesToLegacy (mod) := MACRO 
+    EXPORT boolean AllowAll  := mod.unrestricted = doxie.compliance.ALLOW.ALL;
+    EXPORT boolean AllowGLB  := mod.unrestricted & doxie.compliance.ALLOW.GLB > 0;
+    EXPORT boolean AllowDPPA := mod.unrestricted & doxie.compliance.ALLOW.DPPA > 0;
+    EXPORT unsigned1 GLBPurpose := mod.glb;
+    EXPORT unsigned1 DPPAPurpose := mod.dppa;
+    EXPORT string DataPermissionMask := mod.DataPermissionMask;
+    EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
+    EXPORT boolean lnbranded := mod.ln_branded;
+    EXPORT string5 IndustryClass := mod.industry_class;
+    EXPORT string32 ApplicationType := mod.application_type;
+    EXPORT unsigned3 dateval := mod.date_threshold;
+    EXPORT boolean IncludeMinors := mod.show_minors;
+    EXPORT string6 ssn_mask := mod.ssn_mask;
+    EXPORT boolean mask_dl := mod.dl_mask = 1;
+    EXPORT unsigned1 dob_mask := mod.dob_mask;
+    //... there are some others available as well: probation_override_value, no_scrub, suppress_dmv, etc.
+    //These are not defined in IDataAccess, so, if required, the must be re-defined after this macro call:
+    EXPORT boolean ignoreFares    := FALSE;
+    EXPORT boolean ignoreFidelity := FALSE;
+  ENDMACRO;
+
 
   shared restrictedSet := ['0',''];
   // ==============================================================================================
