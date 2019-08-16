@@ -6,7 +6,8 @@ export Internet_Domains_records(dataset(doxie_cbrs.layout_references) bdids) := 
 wsr := doxie_cbrs_raw.internet_domains(bdids,Include_InternetDomains_val,max_InternetDomains).records;
 
 outrec := record
-	wsr;
+    unsigned1 level; //defined Level field as it is missing in Domains.Layout_Whois_Base which is added to "WSR" in doxie_cbrs.mac_RollStart
+	Domains.Layout_Whois_Base - [global_sid, record_sid];
 	string8 update_date_decode; 
 	string8 expire_date_decode;
 	string8 create_date_decode;
