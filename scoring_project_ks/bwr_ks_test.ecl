@@ -190,10 +190,10 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														
 															// left.flagship  = 'RiskView_xml_enova_rvg1103_0_v4'  => 'RiskView' ,
 															
-	/*for biid2													left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'  	 => 'BusinessInstantIdv2' ,
+   													left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'  	 => 'BusinessInstantIdv2' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'rep1_cvi' 	 => 'BusinessInstantIdv2' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bus2exec_index_rep1'	 => 'BusinessInstantIdv2' ,
-*/
+
 														left.flagship  = 'leadintegrity_xml_generic_msn1106_0_v4' => 'LeadIntegrity'  , left.flagship );
 														
 														  self.version := 
@@ -266,8 +266,8 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														// left.flagship  = 'businessinstantid_xml_genericGeneric_'   	 => '0' ,																										
 														left.flagship  = 'RiskView_xml_enova_rvg1103_0_v4'  =>'2',	
 														
-	/*for biid2														left.flagship  = 'businessinstantidv2_xml_generic'   	 => '0' ,
-*/
+														left.flagship  = 'businessinstantidv2_xml_generic'   	 => '0' ,
+
 														left.flagship  = 'leadintegrity_xml_generic_msn1106_0_v4' => '4','');
 
 			                      
@@ -336,8 +336,8 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														left.flagship  = 'businessinstantid_batch_Chase'  	 => 'Batch' ,
 														// left.flagship  = 'businessinstantid_xml_genericGeneric_'   	 => 'XML' ,																										
 														// left.flagship  = 'RiskView_xml_enova_rvg1103_0_v4'  =>'XML',			
-	/*for biid2	    left.flagship  = 'businessinstantidv2_xml_generic'   	 => 'XML' ,														
-	*/													
+														left.flagship  = 'businessinstantidv2_xml_generic'   	 => 'XML' ,														
+													
 														left.flagship  = 'leadintegrity_xml_generic_msn1106_0_v4' => 'XML','');
 														
 														 self.customer := 
@@ -473,10 +473,10 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														
 															// left.flagship  = 'RiskView_xml_enova_rvg1103_0_v4'  => 'Enova' ,
 															
-	/*for biid2										left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'	 => 'Generic' ,
+														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'	 => 'Generic' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'rep1_cvi'	 => 'Generic' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bus2exec_index_rep1'	 => 'Generic' ,
-*/		
+		
 												
 														left.flagship  = 'leadintegrity_xml_generic_msn1106_0_v4' => 'Generic'  , '' );
 														
@@ -612,10 +612,10 @@ res:=project (ds, transform({  string80 product,string80 version, string80 proce
 														
 															// left.flagship  = 'RiskView_xml_enova_rvg1103_0_v4'  => 'rvg1103_0' ,
 															
-	/*for biid2												left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'  	 => 'bvi' ,
+														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bvi'  	 => 'bvi' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'rep1_cvi' 	 => 'rep1_cvi' ,
 														left.flagship  = 'businessinstantidv2_xml_generic'  and left.model = 'bus2exec_index_rep1'	 => 'bus2exec_index_rep1' ,
-*/
+
 														
 														left.flagship  = 'leadintegrity_xml_generic_msn1106_0_v4' => 'msn1106_0'  , '' );
 														
@@ -816,11 +816,11 @@ score_data1_project_iid1:=score_data1_project(product='InstantId' and  (model1='
 																															 
                                             );	
 																						
-/*for biid2		score_data1_project_biidv2:=score_data1_project(product='BusinessInstantIdv2' and  (model1='bvi'  or  model1='rep1_cvi' or model1='bus2exec_index_rep1')   
+score_data1_project_biidv2:=score_data1_project(product='BusinessInstantIdv2' and  (model1='bvi'  or  model1='rep1_cvi' or model1='bus2exec_index_rep1')   
                                                               and (decimal19_2)score  >=0 and  (decimal19_2)score  <=50 
 																															 
                                             );	
-*/																						
+																						
 score_data1_project_non_rv:=score_data1_project(product='IT60' or product='IT61' and (decimal19_2)score >=-1 and (decimal19_2)score  <=999);				
 																	
 
@@ -867,11 +867,11 @@ score_data2_project_iid1:=score_data2_project(product='InstantId' and  (model1='
 																															 
                                             );	
 																						
-/*for biid2		score_data2_project_biidv2:=score_data2_project(product='BusinessInstantIdv2' and  (model1='bvi'  or  model1='rep1_cvi' or model1='bus2exec_index_rep1')   
+score_data2_project_biidv2:=score_data2_project(product='BusinessInstantIdv2' and  (model1='bvi'  or  model1='rep1_cvi' or model1='bus2exec_index_rep1')   
                                                               and (decimal19_2)score  >=0 and  (decimal19_2)score  <=50 
 																															 
                                             );	
-*/
+
 score_data2_project_non_rv:=score_data2_project(product='IT60' or product='IT61' and (decimal19_2)score >=-1 and (decimal19_2)score  <=999);
 
 
@@ -898,13 +898,11 @@ score_data2_project_li_default:=score_data2_project(product='LeadIntegrity' and 
 
 		
 		dataset_prev:=score_data1_project_rv + score_data1_project_fp + score_data1_project_bnk4 + score_data1_project_pio2 + score_data1_project_cbbl + 
-		score_data1_project_li + score_data1_project_biid +score_data1_project_biid1 +  score_data1_project_iid +  score_data1_project_iid1 +  score_data1_project_non_rv; 
-/*for biid2		+ score_data1_project_biidv2;
-		*/
+		score_data1_project_li + score_data1_project_biid +score_data1_project_biid1 +  score_data1_project_iid +  score_data1_project_iid1 +  score_data1_project_non_rv + score_data1_project_biidv2;
+
 		dataset_curr:=score_data2_project_rv + score_data2_project_fp + score_data2_project_bnk4 + score_data2_project_pio2 + score_data2_project_cbbl +  score_data2_project_li + score_data2_project_biid + 			               
-		              score_data2_project_biid1 +  score_data2_project_iid +  score_data2_project_iid1 +  score_data2_project_non_rv;
-/*for biid2			+ score_data2_project_biidv2;
-		*/
+		              score_data2_project_biid1 +  score_data2_project_iid +  score_data2_project_iid1 +  score_data2_project_non_rv + score_data2_project_biidv2;
+
 
 					// test_rec := record
 
@@ -2170,8 +2168,8 @@ IID_Scores_V0_BATCH_Generic_infile :=scoring_project_pip.Input_Sample_Names.IID_
 // FP_V2_Generic_FP1109_0_infile := scoring_project_pip.Input_Sample_Names.FP_V2_Generic_FP1109_0_infile;
 FP_V3_Generic_FP31505_0_infile := scoring_project_pip.Input_Sample_Names.FP_V3_Generic_FP31505_0_infile;
 FP_V201_American_Express_FP1109_0_infile := scoring_project_pip.Input_Sample_Names.FP_V2_American_Express_FP1109_0_infile;
-/*for biid2		BIIDv2_Scores_XML_Generic_infile:= scoring_project_pip.Input_Sample_Names.BIIDv2_Scores_XML_Generic_infile;
-*/
+BIIDv2_Scores_XML_Generic_infile:= scoring_project_pip.Input_Sample_Names.BIIDv2_Scores_XML_Generic_infile;
+
 
 
 input_file_count_ds_rec:=record
@@ -2196,8 +2194,8 @@ biid_layout_input:=Record
 	BIID_Scores_XML_Generic_infile_cnt:=count(dataset(BIID_Scores_XML_Generic_infile,biid_layout_input,thor));	
 	BC10_Scores_Chase_BNK4_infile_cnt:=count(dataset(BC10_Scores_Chase_BNK4_infile,biid_layout_input,thor));		
 	CBBL_Scores_XML_Chase_infile_cnt:=count(dataset(CBBL_Scores_XML_Chase_infile,biid_layout_input,thor));								
-/*for biid2  BIIDv2_Scores_XML_Generic_infile_cnt:=count(dataset(BIIDv2_Scores_XML_Generic_infile,biid_layout_input,thor));  
-*/							
+  BIIDv2_Scores_XML_Generic_infile_cnt:=count(dataset(BIIDv2_Scores_XML_Generic_infile,biid_layout_input,thor));  
+							
 								
 bestbuy_layout_input :=RECORD
   Scoring_Project_Macros.Regression.global_layout;
@@ -2236,10 +2234,10 @@ end;
 																 {'BusinessInstantId','Generic','XML','bnat','0',BIID_Scores_XML_Generic_infile_cnt},
 																 {'BusinessInstantId','Generic','XML','bvi','0',BIID_Scores_XML_Generic_infile_cnt},
 
-/*for biid2	                               {'BusinessInstantIdv2','Generic','XML','bvi','0',50000},
+	                               {'BusinessInstantIdv2','Generic','XML','bvi','0',50000},
 	                               {'BusinessInstantIdv2','Generic','XML','rep1_cvi','0',50000},
 																 {'BusinessInstantIdv2','Generic','XML','bus2exec_index_rep1','0',50000},
-*/
+
             										 // {'FraudPoint','Generic','XML','fp1109_0','2',file_count_function(FP_V2_Generic_FP1109_0_infile)},
             										 {'FraudPoint','American_Express','XML','fp1109_0','201',file_count_function(FP_V201_American_Express_FP1109_0_infile)},
 																 

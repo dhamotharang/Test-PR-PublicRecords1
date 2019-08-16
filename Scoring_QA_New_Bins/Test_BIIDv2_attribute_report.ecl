@@ -157,11 +157,11 @@ compare_layout_stats func1(result2_stats l):=transform
 		  did_results := DATASET([{'BusinessInstantID_20','xml','did','<DID not equal>',count(file1),count(file2),count(file2)-count(file1),pfc,'<DID not equal>',pf,cf,'','','','',pd,abd,ppd,0}
 	                    ], compare_layout);
 		
-		FileNameNewLogical:='~ScoringQA::bss::stats1::'+ scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile[2..] + current_dt;
+		FileNameNewLogical:='~ScoringQA::bss::stats::'+ scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile[2..] + current_dt;
 		
-		FileNameNewLogical1:='~ScoringQA::bss::averages1::'+ scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile[2..] + current_dt;
+		FileNameNewLogical1:='~ScoringQA::bss::averages::'+ scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile[2..] + current_dt;
 		
-		FileNameNewLogical2:='~ScoringQA::bss::dids1::'+ scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile[2..] + current_dt;
+		FileNameNewLogical2:='~ScoringQA::bss::dids::'+ scoring_project_pip.Output_Sample_Names.BIIDv2_Scores_XML_Generic_outfile[2..] + current_dt;
 		
 	 SaveNewFile := output(result2_stats_project,,FileNameNewLogical,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
 	 	 
@@ -169,11 +169,11 @@ compare_layout_stats func1(result2_stats l):=transform
 	 
 	 SaveNewFile2 :=output(did_results,,FileNameNewLogical2,CSV(HEADING(single), QUOTE('"')),overwrite,EXPIRE(10));
 	 
-	 res:=FileServices.AddSuperFile( '~ScoringQA::bss::stats1::' + current_dt , FileNameNewLogical)	;					
+	 res:=FileServices.AddSuperFile( '~ScoringQA::bss::stats::' + current_dt , FileNameNewLogical)	;					
 		
-	 res1:=FileServices.AddSuperFile( '~ScoringQA::bss::averages1::' +current_dt , FileNameNewLogical1)	;		
+	 res1:=FileServices.AddSuperFile( '~ScoringQA::bss::averages::' +current_dt , FileNameNewLogical1)	;		
 	 
-	 res2:=FileServices.AddSuperFile( '~ScoringQA::bss::dids1::' +current_dt , FileNameNewLogical2)	;	
+	 res2:=FileServices.AddSuperFile( '~ScoringQA::bss::dids::' +current_dt , FileNameNewLogical2)	;	
 						
 seq:=sequential(SaveNewFile,SaveNewFile1,SaveNewFile2,res,res1,res2); //SaveNewFile2
 

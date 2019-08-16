@@ -11,6 +11,7 @@ import std, Scoring_Project, ashirey,Scoring_Project_Macros,  Scoring_Project_Da
 // ds_short := ds_type[length(ds_type)-11];
 
 dt := ut.getdate;
+	// dt1:= '20170904';
 
 fn_LastTwoMonths(string10 date_inp,integer offset) := function
 res  := GLOBAL(ut.DateFrom_DaysSince1900(ut.DaysSince1900(date_inp[1..4], date_inp[5..6], date_inp[7..8]) - offset));
@@ -18,9 +19,8 @@ return res[1..8];
 end;
 
 b:=fn_LastTwoMonths(dt,1);
-// b1:='20180621_1';
+// b:='20180621';
 	
-	// a1:= '20170904_1';
 
 // decimal19_2 thresh := 1.00;
 decimal19_2 thresh := 0;

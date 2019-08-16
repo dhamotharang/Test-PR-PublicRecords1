@@ -93,9 +93,12 @@ end;
 		#UNIQUENAME(FileName)
 		%FileName%:=	if(fileservices.fileexists('~ScoringQA::bins::ks::' + date_in + '_results')=false,
 										 FileServices.CreateSuperFile('~ScoringQA::bins::ks::' + date_in + '_results'));	
+		// %FileName%:=	if(fileservices.fileexists('~ScoringQA::bins::ks::' + date_in + '_results_1')=false,
+										 // FileServices.CreateSuperFile('~ScoringQA::bins::ks::' + date_in + '_results_1'));	
 																		 
 		#UNIQUENAME(FileNameNewLogical)
 		%FileNameNewLogical%:= '~ScoringQA::bins::ks::' + date_in + '_results' + '_' + lay + '_' + field_name  ;
+		// %FileNameNewLogical%:= '~ScoringQA::bins::ks::' + date_in + '_results_1' + '_' + lay + '_' + field_name  ;
 
 	
 		#UNIQUENAME(SaveNewFile)	
@@ -105,6 +108,7 @@ end;
 						 overwrite,EXPIRE(10));
 		#UNIQUENAME(res)					 
 		%res%:=FileServices.AddSuperFile( '~ScoringQA::bins::ks::' + date_in + '_results' , %FileNameNewLogical%)	;					
+		// %res%:=FileServices.AddSuperFile( '~ScoringQA::bins::ks::' + date_in + '_results_1' , %FileNameNewLogical%)	;					
 															
 												 
     //for raw data 
@@ -112,9 +116,12 @@ end;
 		#UNIQUENAME(FileName1)
 		%FileName1%:=	if(fileservices.fileexists('~ScoringQA::bins::ks::' + date_in + '_data')=false,
 										 FileServices.CreateSuperFile('~ScoringQA::bins::ks::' + date_in + '_data'));	
+		// %FileName1%:=	if(fileservices.fileexists('~ScoringQA::bins::ks::' + date_in + '_data_1')=false,
+										 // FileServices.CreateSuperFile('~ScoringQA::bins::ks::' + date_in + '_data_1'));	
 																		 
 		#UNIQUENAME(FileNameNewLogical1)
 		%FileNameNewLogical1%:= '~ScoringQA::bins::ks::' + date_in + '_data' + '_' + lay + '_' + field_name  ;
+		// %FileNameNewLogical1%:= '~ScoringQA::bins::ks::' + date_in + '_data_1' + '_' + lay + '_' + field_name  ;
 
 	
 		#UNIQUENAME(SaveNewFile1)	
@@ -125,6 +132,7 @@ end;
 						 
 		#UNIQUENAME(res1)					 
 		%res1%:=FileServices.AddSuperFile( '~ScoringQA::bins::ks::' + date_in + '_data' , %FileNameNewLogical1%)	;		
+		// %res1%:=FileServices.AddSuperFile( '~ScoringQA::bins::ks::' + date_in + '_data_1' , %FileNameNewLogical1%)	;		
 		
 		
 		//for #of exceptions and invalids
