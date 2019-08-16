@@ -141,7 +141,6 @@ export Key_ConsumerToBip := module
 								left.seleid   = right.seleid and
 								left.contact_did = right.contact_did, 
 								transform(Layouts.ConsumerToBipFinalRec,
-								          skip(right.job_title1 in [left.job_title1, left.job_title2, left.job_title3]),
 										self.dt_first_seen_at_business := if(right.dt_first_seen_at_business > 0 and right.dt_first_seen_at_business < left.dt_first_seen_at_business,
 										                                     right.dt_first_seen_at_business, left.dt_first_seen_at_business);
 										self.dt_last_seen_at_business  := if(right.dt_last_seen_at_business > left.dt_last_seen_at_business,
@@ -154,7 +153,21 @@ export Key_ConsumerToBip := module
 										self            := left));
 										
 
-		 return rolljobTitle;
+           adjustDates       := project(rolljobTitle, 
+		                              transform(Layouts.ConsumerToBipFinalRec,
+								          self.dt_first_seen_at_business := map(
+										                                      left.dt_first_seen_at_business > left.dt_last_seen                                          => left.dt_last_seen,
+																	   left.dt_first_seen_at_business < left.dt_first_seen and  left.dt_first_seen_at_business > 0 => left.dt_first_seen,
+																	   left.dt_first_seen_at_business
+																	   );
+								          self.dt_last_seen_at_business  := map(
+										                                      left.dt_last_seen_at_business  > left.dt_last_seen                                          => left.dt_last_seen,
+																	   left.dt_last_seen_at_business  < left.dt_first_seen and left.dt_last_seen_at_business   > 0 => left.dt_first_seen,
+																	   left.dt_last_seen_at_business
+																	   );
+						                    self := left));
+		 
+		 return adjustDates;
      end;
 	
 end;
