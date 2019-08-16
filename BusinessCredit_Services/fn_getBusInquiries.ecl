@@ -15,7 +15,7 @@ EXPORT fn_getBusInquiries (BusinessCredit_Services.Iparam.reportrecords inmod) :
     EXPORT DataRestrictionMask := inmod.DataRestrictionMask;
   END;
 
-	InquiriesRaw			 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(inmod.BusinessIds, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
+	InquiriesRaw			 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(inmod.BusinessIds, mod_access, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
 	InquiriesUpdateRaw 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(inmod.BusinessIds, mod_access, inmod.FetchLevel, ,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
 	InquiriesAllTemp		:= InquiriesRaw + InquiriesUpdateRaw;
 
