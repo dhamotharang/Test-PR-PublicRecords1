@@ -285,9 +285,6 @@ export base_sz := record
 		string8 	date_vendor_first_reported;
 		string8 	date_vendor_last_reported;
 		string1 	current_rec;
-  //CCPA-112
-  unsigned4 global_sid:=0;
-  unsigned8 record_sid:=0;
 end;
 
 //Base_sz with EOR 
