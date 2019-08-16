@@ -17,13 +17,18 @@ EXPORT MAC := MODULE
     RETURN ROW({%'l_def_str'%, %l_field_cnt%}, {string text; integer cnt;});
   ENDMACRO;
 
-  EXPORT GetCollectionFromRaw(raw_recs, in_mod, collection_name, k_name, k_did_field, k_date_field, date_format = $.Constants.DateFormat.YYYYMMDD, max_records = $.Constants.MaxCollectionRecords) 
+  EXPORT GetCollectionFromRaw(raw_recs, in_mod, collection_name, k_name, k_did_field, k_date_field = '', date_format = $.Constants.DateFormat.YYYYMMDD, max_records = $.Constants.MaxCollectionRecords) 
   := FUNCTIONMACRO
     
     IMPORT iesp, STD;
     LOCAL meta := MAC.GetLayoutMeta(k_name);
+    #IF(#TEXT(k_date_field) != '') 
+    LOCAL raw_recs_filt := SORT(raw_recs(in_mod.isDateOk((UNSIGNED) k_date_field, date_format)), k_did_field, -k_date_field, RECORD);
+    #ELSE // if dataset has no date field, just ignore it.
+    LOCAL raw_recs_filt := SORT(raw_recs, k_did_field, RECORD);
+    #END
 
-    LOCAL collection_recs := PROJECT(SORT(raw_recs(in_mod.isDateOk((UNSIGNED) k_date_field, date_format)), k_did_field, -k_date_field, RECORD), 
+    LOCAL collection_recs := PROJECT(raw_recs_filt, 
       TRANSFORM(iesp.consumer_collection_report.t_CollectionRecord,
         SELF.PrivacySourceID := (string) LEFT.record_sid;
         SELF.GlobalRecordId := (string) LEFT.global_sid;
@@ -45,14 +50,16 @@ EXPORT MAC := MODULE
 
   ENDMACRO; 
 
-  EXPORT GetCollection(in_dids, in_mod, collection_name, k_name, k_did_field, k_date_field, date_format = $.Constants.DateFormat.YYYYMMDD, max_records = $.Constants.MaxCollectionRecords) 
+  EXPORT GetCollection(in_dids, in_mod, collection_name, k_name, k_did_field, k_date_field = '', date_format = $.Constants.DateFormat.YYYYMMDD, max_records = $.Constants.MaxCollectionRecords) 
   := FUNCTIONMACRO
     
     IMPORT iesp;
     LOCAL raw_recs := JOIN(in_dids, k_name, 
       KEYED(LEFT.did = RIGHT.k_did_field), 
       TRANSFORM(RECORDOF(k_name),
+        #IF(#TEXT(k_date_field) != '')
         SELF.k_date_field := IF(in_mod.isDateOk((unsigned) RIGHT.k_date_field, date_format), RIGHT.k_date_field, skip);
+        #END
         SELF := RIGHT;
         ), KEEP(max_records), LIMIT(0)); 
 

@@ -14,7 +14,7 @@
         <Count/>
         <AllowAboveMax/>
       </TransactionCap>
-      <Exceptions diff_match="">
+      <Exceptions diff_match="" diff_monitor="">
         <Item>
           <Source/>
           <Code/>
@@ -94,6 +94,7 @@
         <IdValue diff_monitor=""/>
         <LicenseType diff_monitor=""/>
         <LicenseNumber/>
+        <ProviderNumber2 diff_monitor=""/>
         <ProviderNumber diff_monitor=""/>
         <SSN diff_monitor=""/>
         <DateLastSeen diff_monitor="">
@@ -729,6 +730,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -791,6 +819,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -853,6 +908,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -915,6 +997,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -977,6 +1086,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -1063,6 +1199,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -1125,6 +1288,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -1187,6 +1377,33 @@
                 <CorporateType diff_monitor=""/>
               </Party>
             </ParsedParties>
+            <AddressesOld diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <Country/>
+                <Province/>
+                <IsForeign/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesOld>
             <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
@@ -1246,6 +1463,47 @@
             <Title/>
           </Signer>
         </Signers>
+        <Filings diff_match="" diff_monitor="">
+          <Filing>
+            <FilingStatus/>
+            <Number/>
+            <Type/>
+            <Date>
+              <Year/>
+              <Month/>
+              <Day/>
+            </Date>
+            <Time/>
+            <Pages/>
+            <ExpirationDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </ExpirationDate>
+            <Amount/>
+            <ContractType/>
+            <EffectiveDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </EffectiveDate>
+            <SerialNumber/>
+            <FilingNumberIndicator/>
+            <VendorEntryDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </VendorEntryDate>
+            <VendorUpdateDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </VendorUpdateDate>
+            <ContinuousExpiration/>
+            <StatementsFiled/>
+            <MicrofilmNumber/>
+          </Filing>
+        </Filings>
         <Filings2 diff_match="" diff_monitor="">
           <Filing>
             <FilingStatus/>
@@ -1765,6 +2023,162 @@
             <Sentence/>
           </PrisonSentence>
         </PrisonSentences>
+        <ParoleSentencesOld diff_match="" diff_monitor="">
+          <ParoleSentence>
+            <ActualEndDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </ActualEndDate>
+            <County/>
+            <CurrentStatus/>
+            <Length/>
+            <ScheduledEndDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </ScheduledEndDate>
+            <StartDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </StartDate>
+            <DateReported>
+              <Year/>
+              <Month/>
+              <Day/>
+            </DateReported>
+            <PubicSaftyId/>
+            <InmateId/>
+            <ParoleInAbsentiaId/>
+            <Name>
+              <Full/>
+              <First/>
+              <Middle/>
+              <Last/>
+              <Suffix/>
+              <Prefix/>
+            </Name>
+            <Race/>
+            <Gender/>
+            <DOB>
+              <Year/>
+              <Month/>
+              <Day/>
+            </DOB>
+            <CountyOfBirth/>
+            <StateOfBirth/>
+            <HeightFeet/>
+            <HeightInches/>
+            <WeightInPounds/>
+            <HairColor/>
+            <SkinColor/>
+            <EyeColor/>
+            <PrisonFacilityType/>
+            <PrisonFacilityName/>
+            <AdmittedDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </AdmittedDate>
+            <PrisonStatus/>
+            <LastReceiveOrDepartCode/>
+            <LastReceiveOrDepartCDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </LastReceiveOrDepartCDate>
+            <RecordCreatedTimeStamp>
+              <Year/>
+              <Month/>
+              <Day/>
+              <Hour24/>
+              <Minute/>
+              <Second/>
+            </RecordCreatedTimeStamp>
+            <CurrentStatusFlag/>
+            <CurrentStatusEffectiveDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </CurrentStatusEffectiveDate>
+            <ParoleRegion/>
+            <SupervisingOffice/>
+            <SupervisingOfficerName/>
+            <SupervisingOfficerPhone/>
+            <LastKnownResidence>
+              <StreetNumber/>
+              <StreetPreDirection/>
+              <StreetName/>
+              <StreetSuffix/>
+              <StreetPostDirection/>
+              <UnitDesignation/>
+              <UnitNumber/>
+              <StreetAddress1/>
+              <StreetAddress2/>
+              <City/>
+              <State/>
+              <Zip5/>
+              <Zip4/>
+              <County/>
+              <PostalCode/>
+              <StateCityZip/>
+              <Latitude/>
+              <Longitude/>
+            </LastKnownResidence>
+            <ReleaseArrivalDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </ReleaseArrivalDate>
+            <ReleaseType/>
+            <ReleaseCounty/>
+            <LegalResidenceCounty/>
+            <LastParoleReviewDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </LastParoleReviewDate>
+            <OffenseCount/>
+            <Is3GOffender/>
+            <IsViolentOffender/>
+            <IsSexOffender/>
+            <IsOnViolentOffenderProgram/>
+            <LongestTimeToServe>
+              <Years/>
+              <Months/>
+              <Days/>
+            </LongestTimeToServe>
+            <LongestTimeToServeDescription/>
+            <DischargeDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </DischargeDate>
+            <ScarsMarksTattoos>
+              <SMT/>
+            </ScarsMarksTattoos>
+            <Offenses diff_match="" diff_monitor="">
+              <Offense>
+                <SentenceDate>
+                  <Year/>
+                  <Month/>
+                  <Day/>
+                </SentenceDate>
+                <Length/>
+                <OffenseCounty/>
+                <CauseNo/>
+                <NCICCode/>
+                <OffenseCount/>
+                <OffenseDate>
+                  <Year/>
+                  <Month/>
+                  <Day/>
+                </OffenseDate>
+              </Offense>
+            </Offenses>
+          </ParoleSentence>
+        </ParoleSentencesOld>
         <ParoleSentences diff_match="" diff_monitor="">
           <ParoleSentence>
             <ActualEndDate>
@@ -2242,6 +2656,11 @@
         <Occupation diff_monitor=""/>
         <Race diff_monitor=""/>
         <Gender diff_monitor=""/>
+        <RegistationDate diff_monitor="">
+          <Year/>
+          <Month/>
+          <Day/>
+        </RegistationDate>
         <RegistrationDate diff_monitor="">
           <Year/>
           <Month/>
@@ -3036,7 +3455,9 @@
           <FirstContributingCause/>
           <SecondContributingCause/>
           <FirstContributingEnvirionment/>
+          <FirstContributingEnvironment/>
           <SecondContributingEnvirionment/>
+          <SecondContributingEnvironment/>
           <FirstTrafficControl/>
           <SecondTrafficControl/>
           <TrafficwayChar/>
@@ -3531,6 +3952,133 @@
             </FilingDate>
           </Comment>
         </Comments>
+        <DebtorsOld diff_match="" diff_monitor="">
+          <Debtor>
+            <HasCriminalConviction/>
+            <IsSexualOffender/>
+            <BusinessIds>
+              <DotID/>
+              <EmpID/>
+              <POWID/>
+              <ProxID/>
+              <SeleID/>
+              <OrgID/>
+              <UltID/>
+            </BusinessIds>
+            <IdValue/>
+            <UniqueId/>
+            <BusinessId/>
+            <SSN/>
+            <AppendedSSN/>
+            <TaxId/>
+            <AppendedTaxId/>
+            <Names diff_match="" diff_monitor="">
+              <Name>
+                <Full/>
+                <First/>
+                <Middle/>
+                <Last/>
+                <Suffix/>
+                <Prefix/>
+                <CompanyName/>
+                <Type/>
+              </Name>
+            </Names>
+            <Addresses diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+              </Address>
+            </Addresses>
+            <AddressesEx diff_match="" diff_monitor="">
+              <Address>
+                <StreetNumber/>
+                <StreetPreDirection/>
+                <StreetName/>
+                <StreetSuffix/>
+                <StreetPostDirection/>
+                <UnitDesignation/>
+                <UnitNumber/>
+                <StreetAddress1/>
+                <StreetAddress2/>
+                <City/>
+                <State/>
+                <Zip5/>
+                <Zip4/>
+                <County/>
+                <PostalCode/>
+                <StateCityZip/>
+                <Latitude/>
+                <Longitude/>
+                <OrigStreetAddress1/>
+                <OrigStreetAddress2/>
+              </Address>
+            </AddressesEx>
+            <Phones>
+              <Phone10/>
+            </Phones>
+            <PhonesEx diff_match="" diff_monitor="">
+              <Phone>
+                <Phone10/>
+                <Fax/>
+                <TimeZone/>
+              </Phone>
+            </PhonesEx>
+            <Emails>
+              <Email/>
+            </Emails>
+            <CaseId/>
+            <DefendantId/>
+            <RecordId/>
+            <OriginalCounty/>
+            <SSNSource/>
+            <SSNSourceDesc/>
+            <SSNMatch/>
+            <SSNMatchDesc/>
+            <SSNMatchSource/>
+            <Screen/>
+            <ScreenDesc/>
+            <DispositionCode/>
+            <DispositionCodeDesc/>
+            <DispositionType/>
+            <DispositionTypeDesc/>
+            <DispositionReason/>
+            <StatusDate>
+              <Year/>
+              <Month/>
+              <Day/>
+            </StatusDate>
+            <HoldCase/>
+            <DateVacated>
+              <Year/>
+              <Month/>
+              <Day/>
+            </DateVacated>
+            <DateTransferred>
+              <Year/>
+              <Month/>
+              <Day/>
+            </DateTransferred>
+            <ActivityReceipt/>
+            <DefendantType unimplemented="EsdlEnum"/>
+          </Debtor>
+        </DebtorsOld>
         <Debtors diff_match="UniqueId">
           <Debtor>
             <HasCriminalConviction diff_monitor=""/>
@@ -3678,7 +4226,7 @@
             <AppendedSSN/>
             <TaxId/>
             <AppendedTaxId/>
-            <Names diff_match="">
+            <Names diff_match="" diff_monitor="">
               <Name>
                 <Full/>
                 <First/>
@@ -3690,7 +4238,7 @@
                 <Type/>
               </Name>
             </Names>
-            <Addresses diff_match="">
+            <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
                 <StreetPreDirection/>
@@ -3712,7 +4260,7 @@
                 <Longitude/>
               </Address>
             </Addresses>
-            <AddressesEx diff_match="">
+            <AddressesEx diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
                 <StreetPreDirection/>
@@ -3739,7 +4287,7 @@
             <Phones>
               <Phone10/>
             </Phones>
-            <PhonesEx diff_match="">
+            <PhonesEx diff_match="" diff_monitor="">
               <Phone>
                 <Phone10/>
                 <Fax/>
@@ -3771,7 +4319,7 @@
             <AppendedSSN/>
             <TaxId/>
             <AppendedTaxId/>
-            <Names diff_match="">
+            <Names diff_match="" diff_monitor="">
               <Name>
                 <Full/>
                 <First/>
@@ -3783,7 +4331,7 @@
                 <Type/>
               </Name>
             </Names>
-            <Addresses diff_match="">
+            <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
                 <StreetPreDirection/>
@@ -3805,7 +4353,7 @@
                 <Longitude/>
               </Address>
             </Addresses>
-            <AddressesEx diff_match="">
+            <AddressesEx diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
                 <StreetPreDirection/>
@@ -3832,7 +4380,7 @@
             <Phones>
               <Phone10/>
             </Phones>
-            <PhonesEx diff_match="">
+            <PhonesEx diff_match="" diff_monitor="">
               <Phone>
                 <Phone10/>
                 <Fax/>
@@ -4059,7 +4607,7 @@
               <Latitude/>
               <Longitude/>
             </Address>
-            <Addresses diff_match="">
+            <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
                 <StreetPreDirection/>
@@ -4081,14 +4629,14 @@
                 <Longitude/>
               </Address>
             </Addresses>
-            <Phones diff_match="">
+            <Phones diff_match="" diff_monitor="">
               <Phone>
                 <Phone10/>
                 <Fax/>
                 <TimeZone/>
               </Phone>
             </Phones>
-            <ParsedParties diff_match="">
+            <ParsedParties diff_match="" diff_monitor="">
               <Party>
                 <HasCriminalConviction/>
                 <IsSexualOffender/>
@@ -4146,7 +4694,7 @@
               <Latitude/>
               <Longitude/>
             </Address>
-            <Addresses diff_match="">
+            <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
                 <StreetPreDirection/>
@@ -4168,14 +4716,14 @@
                 <Longitude/>
               </Address>
             </Addresses>
-            <Phones diff_match="">
+            <Phones diff_match="" diff_monitor="">
               <Phone>
                 <Phone10/>
                 <Fax/>
                 <TimeZone/>
               </Phone>
             </Phones>
-            <ParsedParties diff_match="">
+            <ParsedParties diff_match="" diff_monitor="">
               <Party>
                 <HasCriminalConviction/>
                 <IsSexualOffender/>
@@ -4235,7 +4783,7 @@
             </Address>
             <Phone/>
             <TimeZone/>
-            <Addresses diff_match="">
+            <Addresses diff_match="" diff_monitor="">
               <Address>
                 <StreetNumber/>
                 <StreetPreDirection/>
@@ -4257,14 +4805,14 @@
                 <Longitude/>
               </Address>
             </Addresses>
-            <Phones diff_match="">
+            <Phones diff_match="" diff_monitor="">
               <Phone>
                 <Phone10/>
                 <Fax/>
                 <TimeZone/>
               </Phone>
             </Phones>
-            <ParsedParties diff_match="">
+            <ParsedParties diff_match="" diff_monitor="">
               <Party>
                 <HasCriminalConviction/>
                 <IsSexualOffender/>
@@ -4503,6 +5051,27 @@
           <BuildingClassCode/>
           <NeighborhoodCode/>
           <AddlLegal/>
+          <Fares>
+            <LivingSquareFeet/>
+            <IrisApn/>
+            <CalculatedLandValue/>
+            <CalculatedImprovementValue/>
+            <CalculatedTotalValue/>
+            <AdjustedGrossSquareFeet/>
+            <NoOfFullBaths/>
+            <NoOfHalfBaths/>
+            <PoolIndicator/>
+            <Frame/>
+            <FrameDesc/>
+            <ElectricEnergy/>
+            <ElectricEnergyDesc/>
+            <Sewer/>
+            <SewerDesc/>
+            <Water/>
+            <WaterDesc/>
+            <Condition/>
+            <ConditionDesc/>
+          </Fares>
           <SourcePropertyRecord>
             <LivingSquareFeet/>
             <IrisApn/>
@@ -4533,7 +5102,7 @@
           <BuildingAreas>
             <BuildingArea/>
           </BuildingAreas>
-          <BuildingAreas2 diff_match="">
+          <BuildingAreas2 diff_match="" diff_monitor="">
             <BuildingArea>
               <Area/>
               <Indicator/>
@@ -5074,7 +5643,7 @@
         <AlsoFound diff_monitor=""/>
       </Education>
     </Educations>
-    <AKAs diff_match="Name.First+Name.Last+SSNInfoEx.SSN" diff_monitor="AKA">
+    <AKAs diff_match="Name.First+Name.Last+SSNInfo.SSN" diff_monitor="AKA">
       <AKA>
         <UniqueId diff_monitor=""/>
         <Name>
@@ -5086,7 +5655,7 @@
           <Prefix diff_monitor=""/>
         </Name>
         <Gender diff_monitor=""/>
-        <SSNInfoEx>
+        <SSNInfo>
           <SSN/>
           <Valid diff_monitor=""/>
           <IssuedLocation diff_monitor=""/>
@@ -5101,6 +5670,28 @@
             <Day/>
           </IssuedEndDate>
           <FDNSsnInd diff_monitor=""/>
+          <HighRiskIndicators diff_match="" diff_monitor="">
+            <HighRiskIndicator>
+              <RiskCode/>
+              <Description/>
+            </HighRiskIndicator>
+          </HighRiskIndicators>
+        </SSNInfo>
+        <SSNInfoEx diff_monitor="">
+          <SSN/>
+          <Valid/>
+          <IssuedLocation/>
+          <IssuedStartDate>
+            <Year/>
+            <Month/>
+            <Day/>
+          </IssuedStartDate>
+          <IssuedEndDate>
+            <Year/>
+            <Month/>
+            <Day/>
+          </IssuedEndDate>
+          <FDNSsnInd/>
           <HighRiskIndicators diff_match="" diff_monitor="">
             <HighRiskIndicator>
               <RiskCode/>
@@ -5361,7 +5952,7 @@
         </DriverLicenses2>
         <CriminalHistories diff_match="" diff_monitor="">
           <CriminalHistory>
-            <Appends diff_match="">
+            <Appends diff_match="" diff_monitor="">
               <Append>
                 <ProcessDate>
                   <Year/>
@@ -5388,7 +5979,7 @@
                 <ScarMarkTattoos>
                   <ScarMarkTattoo/>
                 </ScarMarkTattoos>
-                <DOBs diff_match="">
+                <DOBs diff_match="" diff_monitor="">
                   <DOB>
                     <Year/>
                     <Month/>
@@ -5398,7 +5989,7 @@
                 <SSNs>
                   <SSN/>
                 </SSNs>
-                <AdditionalNumbers diff_match="">
+                <AdditionalNumbers diff_match="" diff_monitor="">
                   <AdditionalNumber>
                     <TypeCode/>
                     <Type/>
@@ -5409,7 +6000,7 @@
                 </AdditionalNumbers>
               </Append>
             </Appends>
-            <Identities diff_match="">
+            <Identities diff_match="" diff_monitor="">
               <Identity>
                 <StateOriginName/>
                 <StateOriginCode/>
@@ -5502,7 +6093,7 @@
                 </RawAddress>
               </Identity>
             </Identities>
-            <Arrests diff_match="">
+            <Arrests diff_match="" diff_monitor="">
               <Arrest>
                 <ProcessDate>
                   <Year/>
@@ -5522,14 +6113,14 @@
                 </ArrestDate>
                 <ArrestCount/>
                 <SequenceCode/>
-                <ArrestAgencies diff_match="">
+                <ArrestAgencies diff_match="" diff_monitor="">
                   <ArrestAgency>
                     <AgencyId/>
                     <AgencyIdCode/>
                     <AgencyCaseNumber/>
                   </ArrestAgency>
                 </ArrestAgencies>
-                <ArrestCharges diff_match="">
+                <ArrestCharges diff_match="" diff_monitor="">
                   <ArrestCharge>
                     <StateSpecificChargeFields/>
                     <ChargeNumber/>
@@ -5578,7 +6169,7 @@
                     </Dispositions>
                   </ArrestCharge>
                 </ArrestCharges>
-                <Judicials diff_match="">
+                <Judicials diff_match="" diff_monitor="">
                   <Judicial>
                     <ProcessDate>
                       <Year/>
@@ -5603,7 +6194,7 @@
                       <AgencyCaseNumber/>
                     </JudicialAgency>
                     <JudicialSequenceNumber/>
-                    <JudicialCharges diff_match="">
+                    <JudicialCharges diff_match="" diff_monitor="">
                       <JudicialCharge>
                         <ArrestChargeNumber/>
                         <ArrestChargeStatus/>
@@ -5698,7 +6289,7 @@
                     </JudicialCharges>
                   </Judicial>
                 </Judicials>
-                <Events diff_match="">
+                <Events diff_match="" diff_monitor="">
                   <Event>
                     <SortDate>
                       <Year/>
@@ -5759,7 +6350,7 @@
         <SubjectSSNIndicator diff_monitor="" unimplemented="EsdlEnum"/>
       </AKA>
     </AKAs>
-    <Imposters diff_match="Name.First+Name.Last+SSNInfoEx.SSN" diff_monitor="Imposter">
+    <Imposters diff_match="Name.First+Name.Last+SSNInfo.SSN" diff_monitor="Imposter">
       <Imposter>
         <UniqueId diff_monitor=""/>
         <Name>
@@ -5771,6 +6362,28 @@
           <Prefix diff_monitor=""/>
         </Name>
         <Gender diff_monitor=""/>
+        <SSNInfo>
+          <SSN/>
+          <Valid diff_monitor=""/>
+          <IssuedLocation diff_monitor=""/>
+          <IssuedStartDate diff_monitor="">
+            <Year/>
+            <Month/>
+            <Day/>
+          </IssuedStartDate>
+          <IssuedEndDate diff_monitor="">
+            <Year/>
+            <Month/>
+            <Day/>
+          </IssuedEndDate>
+          <FDNSsnInd diff_monitor=""/>
+          <HighRiskIndicators diff_match="" diff_monitor="">
+            <HighRiskIndicator>
+              <RiskCode/>
+              <Description/>
+            </HighRiskIndicator>
+          </HighRiskIndicators>
+        </SSNInfo>
         <SSNInfoEx diff_monitor="">
           <SSN/>
           <Valid/>
@@ -5786,7 +6399,7 @@
             <Day/>
           </IssuedEndDate>
           <FDNSsnInd/>
-          <HighRiskIndicators diff_match="">
+          <HighRiskIndicators diff_match="" diff_monitor="">
             <HighRiskIndicator>
               <RiskCode/>
               <Description/>
@@ -6046,7 +6659,7 @@
         </DriverLicenses2>
         <CriminalHistories diff_match="" diff_monitor="">
           <CriminalHistory>
-            <Appends diff_match="">
+            <Appends diff_match="" diff_monitor="">
               <Append>
                 <ProcessDate>
                   <Year/>
@@ -6073,7 +6686,7 @@
                 <ScarMarkTattoos>
                   <ScarMarkTattoo/>
                 </ScarMarkTattoos>
-                <DOBs diff_match="">
+                <DOBs diff_match="" diff_monitor="">
                   <DOB>
                     <Year/>
                     <Month/>
@@ -6083,7 +6696,7 @@
                 <SSNs>
                   <SSN/>
                 </SSNs>
-                <AdditionalNumbers diff_match="">
+                <AdditionalNumbers diff_match="" diff_monitor="">
                   <AdditionalNumber>
                     <TypeCode/>
                     <Type/>
@@ -6094,7 +6707,7 @@
                 </AdditionalNumbers>
               </Append>
             </Appends>
-            <Identities diff_match="">
+            <Identities diff_match="" diff_monitor="">
               <Identity>
                 <StateOriginName/>
                 <StateOriginCode/>
@@ -6187,7 +6800,7 @@
                 </RawAddress>
               </Identity>
             </Identities>
-            <Arrests diff_match="">
+            <Arrests diff_match="" diff_monitor="">
               <Arrest>
                 <ProcessDate>
                   <Year/>
@@ -6207,14 +6820,14 @@
                 </ArrestDate>
                 <ArrestCount/>
                 <SequenceCode/>
-                <ArrestAgencies diff_match="">
+                <ArrestAgencies diff_match="" diff_monitor="">
                   <ArrestAgency>
                     <AgencyId/>
                     <AgencyIdCode/>
                     <AgencyCaseNumber/>
                   </ArrestAgency>
                 </ArrestAgencies>
-                <ArrestCharges diff_match="">
+                <ArrestCharges diff_match="" diff_monitor="">
                   <ArrestCharge>
                     <StateSpecificChargeFields/>
                     <ChargeNumber/>
@@ -6263,7 +6876,7 @@
                     </Dispositions>
                   </ArrestCharge>
                 </ArrestCharges>
-                <Judicials diff_match="">
+                <Judicials diff_match="" diff_monitor="">
                   <Judicial>
                     <ProcessDate>
                       <Year/>
@@ -6288,7 +6901,7 @@
                       <AgencyCaseNumber/>
                     </JudicialAgency>
                     <JudicialSequenceNumber/>
-                    <JudicialCharges diff_match="">
+                    <JudicialCharges diff_match="" diff_monitor="">
                       <JudicialCharge>
                         <ArrestChargeNumber/>
                         <ArrestChargeStatus/>
@@ -6383,7 +6996,7 @@
                     </JudicialCharges>
                   </Judicial>
                 </Judicials>
-                <Events diff_match="">
+                <Events diff_match="" diff_monitor="">
                   <Event>
                     <SortDate>
                       <Year/>

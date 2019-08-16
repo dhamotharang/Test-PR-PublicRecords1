@@ -1,7 +1,7 @@
 This document explains the steps in generating the necessary alerting queries via the ESP monitoring platform
 
 
-1) first you will need to get the latest version of a 7.2.22+ client tools which includes the latest monitoring command line tools used below.
+1) first you will need to get the latest version of a 7.4.11+ client tools which includes the latest monitoring command line tools used below.
 
 2) add the cassandra plugin to your plugin folder in the client tools - https://github.com/hpcc-systems/HPCC-Platform/blob/master/plugins/cassandra/cassandra.ecllib
 
@@ -28,7 +28,7 @@ This will create iesp.personslimreport.ecl which is used in PersonSlimReport_Ser
 5) Next, generate an XML template used as the base for all monitoring queries (I added all the relevant include paths –I to avoid lacking ECM/ESDL file errors)
 
 C:\Users\abitda01>
-"C:\Program Files\HPCCSystems\7.2.22\clienttools\bin\esdl.exe" monitor-template ws_accurint.ecm WsAccurint PersonSlimReport -I C:\Users\abitda01\Desktop\repository\scapps\esp\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gateway\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gatewayEx\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_distrix\scm --outdir=C:\Users\abitda01\Desktop\repository
+"C:\Program Files (x86)\HPCCSystems\7.4.11\clienttools\bin\esdl.exe" monitor-template ws_accurint.ecm WsAccurint PersonSlimReport -I C:\Users\abitda01\Desktop\repository\scapps\esp\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gateway\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gatewayEx\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_distrix\scm --outdir=C:\Users\abitda01\Desktop\repository
 
 Loading XML ESDL definition: ws_accurint.ecm
 Time taken for adding XML ESDL definition: 230622298 cycles (230M) = 76 msec
@@ -71,7 +71,7 @@ esdl     monitor       ws_accurint.ecm       WsAccurint        PersonSlimReport 
 
 -----
 C:\Users\abitda01>
-"C:\Program Files\HPCCSystems\7.2.22\clienttools\bin\esdl.exe" monitor ws_accurint.ecm WsAccurint PersonSlimReport C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services\monitor_template_PersonSlimReport.xml -I C:\Users\abitda01\Desktop\repository\scapps\esp\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gateway\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gatewayEx\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_distrix\scm --outdir=C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services --cassandra-consistency=
+"C:\Program Files (x86)\HPCCSystems\7.4.11\clienttools\bin\esdl.exe" monitor ws_accurint.ecm WsAccurint PersonSlimReport C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services\monitor_template_PersonSlimReport.xml -I C:\Users\abitda01\Desktop\repository\scapps\esp\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gateway\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gatewayEx\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_distrix\scm --outdir=C:\Users\abitda01\Desktop\repository\PublicRecords\PersonSlimReport_Services --cassandra-consistency=
 
 Loading XML ESDL definition: ws_accurint.ecm
 Time taken for adding XML ESDL definition: 224771849 cycles (224M) = 74 msec

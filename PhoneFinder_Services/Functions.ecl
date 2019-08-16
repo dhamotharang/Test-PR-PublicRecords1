@@ -679,7 +679,7 @@ MODULE
 			OUTPUT(dPhoneIesp,NAMED('dPhoneIesp'),EXTEND);		
 		#END
 
-		RETURN UNGROUP(dPhoneIesp);
+		RETURN UNGROUP(dPhoneIesp(ListingName != ''));
 	ENDMACRO;
 	
 	// Identity info
@@ -838,7 +838,7 @@ MODULE
     dIdentities_pre := IF(inMod.isPrimarySearchPII, dIn(isPrimaryIdentity), dIn);
 
     dIdentities := SORT(dIdentities_pre, IF(did != 0, 0, 1), IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(dt_first_seen != '', dt_first_seen, '99999999'), phone_source, RECORD);
-
+		
     dIdentitiesIesp := PROJECT(dIdentities(fname != '' OR lname != '' OR listed_name != ''), tFormat2IespIdentity(LEFT));
 
     // Primary phone section
@@ -983,7 +983,7 @@ MODULE
 			SELF.ZumigoDeviceDetails     := [];
     END;
 
-    dOtherPhonesIesp := PROJECT(SORT(dIn(~isPrimaryPhone AND phone != '' AND fname = '' AND lname = ''), acctno, -phone_score), tFormat2IespOtherPhones(LEFT));
+    dOtherPhonesIesp := PROJECT(SORT(dIn(~isPrimaryPhone AND phone != '' AND fname = '' AND lname = '' AND listed_name != ''), acctno, -phone_score), tFormat2IespOtherPhones(LEFT));
 
     // Format to final iesp layout
     iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
