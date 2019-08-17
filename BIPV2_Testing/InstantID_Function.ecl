@@ -1,4 +1,4 @@
-
+﻿
 import aca, codes, watchdog, Business_Header, Business_Header_SS, BankruptcyV2, BankruptcyV3, corp2, 
 		yellowpages, Risk_Indicators, did_add, doxie, doxie_files, ut, address, gong, riskwise, suppress, liensv2, PAW, census_data, EBR, DCA, iesp, Business_Risk;
 
@@ -833,7 +833,8 @@ RiskWise.Layout_Dirs_Address Ri
 ) := transform	
 	cmpymatch_score 	:= tmax2(CnameScore(l.company_name, ri.listed_name), CnameScore(L.alt_company_name, ri.listed_name));
 	cmpymatch 		:= g(cmpymatch_score);
-	phonematchscore 	:= tscore(ut.max2(0,Risk_Indicators.PhoneScore(l.phone10, ri.phone10)));
+	//phonematchscore 	:= tscore(ut.max2(0,Risk_Indicators.PhoneScore(l.phone10, ri.phone10)));
+	phonematchscore 	:= tscore(Max(0,Risk_Indicators.PhoneScore(l.phone10, ri.phone10)));
 	phonematch 		:= gn(phonematchscore);
 	
 	zip_score := Risk_Indicators.AddrScore.zip_score(l.orig_z5, ri.z5);
@@ -849,9 +850,12 @@ RiskWise.Layout_Dirs_Address Ri
 	self.phonescore 	:= if (L.phoneMatchFlag != 'Y', if (cmpymatch and phonematch, phonematchscore, L.phonescore), L.phonescore);
 	self.phoneMatchFlag := if (L.phoneMatchFlag != 'Y', if (cmpymatch and phonematch, 'Y', 'N'), L.phoneMatchFlag);
 	self.verphone 		:= if (L.phoneMatchFlag = 'Y', L.verphone, if (self.phoneMatchFlag = 'Y' and cmpymatch, ri.phone10, L.verphone));
-	self.addrscore 	:= if (cmpymatch, ut.max2(addrmatchscore, L.addrscore), L.addrscore);
-	self.citystatescore := if (cmpymatch, ut.max2(cityst_score, L.citystatescore), L.citystatescore);
-	self.zipscore := if (cmpymatch, ut.max2(zip_score, L.zipscore), L.zipscore);
+	//self.addrscore 	:= if (cmpymatch, ut.max2(addrmatchscore, L.addrscore), L.addrscore);
+	self.addrscore 	:= if (cmpymatch, MAX(addrmatchscore, L.addrscore), L.addrscore);
+	//self.citystatescore := if (cmpymatch, ut.max2(cityst_score, L.citystatescore), L.citystatescore);
+	self.citystatescore := if (cmpymatch, MAX(cityst_score, L.citystatescore), L.citystatescore);
+	//self.zipscore := if (cmpymatch, ut.max2(zip_score, L.zipscore), L.zipscore);
+	self.zipscore := if (cmpymatch, MAX(zip_score, L.zipscore), L.zipscore);
 	self.addrMatchFlag	:= if (cmpymatch, 'Y', 'N');
 	self.verAddr		:= if (self.AddrMatchFlag = 'Y' and cmpymatch, Risk_Indicators.MOD_AddressClean.street_address('',ri.prim_range, ri.predir, ri.prim_name, ri.suffix, ri.postdir, ri.unit_desig, ri.sec_range), L.verAddr);
 	self.vercity		:= map(cmpymatch and MIN(ut.stringsimilar(ri.p_city_name,L.p_city_name),ut.stringsimilar(L.p_city_name,ri.p_city_name)) < 3 => ri.p_city_name,
@@ -916,15 +920,20 @@ with_dirs_address := join(wprison, dirs_by_addr,
 working_layout countadd(working_layout l, working_layout r) := transform
 	self.rcnt_a7 := l.rcnt_a7 or r.rcnt_a7;
 
-	self.feinscore		:= ut.max2(l.feinscore,R.feinscore);
+	//self.feinscore		:= ut.max2(l.feinscore,R.feinscore);
+	self.feinscore		:= MAX(l.feinscore,R.feinscore);
 	// self.rcntf		:= if (l.feinscore > r.feinscore or l.feinscore = r.feinscore and l.feinmatchflag = 'Y', L.rcntf, R.rcntF);
 	self.verfein 		:= IF(l.feinscore>=r.feinscore, l.verfein,r.verfein);
 	self.feinMatchFlag	:= IF(l.feinscore>R.feinscore , l.feinMatchFlag,
 							if (L.feinscore = R.feinscore and l.feinMatchFlag = 'Y', L.FeinMatchFlag,R.feinMatchFlag));
-	self.addr_compare_score := ut.max2(l.addr_compare_score, r.addr_compare_score);
-	self.addrscore		:= ut.max2(L.addrscore,r.addrscore);
-	self.citystatescore := ut.max2(L.citystatescore, r.citystatescore);
-	self.zipscore := ut.max2(l.zipscore, r.zipscore);
+	//self.addr_compare_score := ut.max2(l.addr_compare_score, r.addr_compare_score);
+	self.addr_compare_score := MAX(l.addr_compare_score, r.addr_compare_score);
+	//self.addrscore		:= ut.max2(L.addrscore,r.addrscore);
+	self.addrscore		:= MAX(L.addrscore,r.addrscore);
+	//self.citystatescore := ut.max2(L.citystatescore, r.citystatescore);
+	self.citystatescore := MAX(L.citystatescore, r.citystatescore);
+	//self.zipscore := ut.max2(l.zipscore, r.zipscore);
+	self.zipscore := MAX(l.zipscore, r.zipscore);
 	// self.rcnta		:= if (l.addrscore > r.addrscore or l.addrscore = r.addrscore and l.addrmatchflag = 'Y', l.rcnta, R.rcnta);
 	self.veraddr 		:= IF(l.addrscore>=r.addrscore,l.veraddr,r.veraddr);
 	self.addrMatchFlag	:= IF(l.addrscore>R.addrscore ,l.addrMatchFlag,
@@ -954,13 +963,15 @@ working_layout countadd(working_layout l, working_layout r) := transform
 						IF(l.addrscore>R.addrscore, L.zipmatchFlag, 
 							if (L.addrscore = R.addrscore and l.ZipMatchFlag = 'Y', L.ZipMatchFlag,R.zipMatchFlag))));
 	self.multisrcaddr	:= L.multisrcaddr or (l.src != r.src and r.src != '' and ga(self.addrscore));
-	self.cnamescore	:= ut.max2(L.cnamescore,r.cnamescore);
+	//self.cnamescore	:= ut.max2(L.cnamescore,r.cnamescore);
+	self.cnamescore	:= MAX(L.cnamescore,r.cnamescore);
 	// self.rcntc		:= if(l.cnamescore > r.cnamescore or l.cnamescore = r.cnamescore and l.cnameMatchFlag = 'Y', L.rcntc, R.rcntC);
 	self.vercmpy 		:= IF(l.cnamescore>=r.cnamescore,l.vercmpy,r.vercmpy);
 	self.cnameMatchFlag	:= IF(l.cnamescore>R.cnamescore,l.cnameMatchFlag,
 							if (L.cnamescore = R.cnamescore and l.cnameMatchFlag = 'Y', L.cnameMatchFlag,R.cnameMatchFlag));
 	self.multisrccmpy	:= L.multisrccmpy or (l.src != r.src and r.src != '' and g(self.cnamescore));
-	self.phonescore	:= ut.max2(l.phonescore,r.phonescore);
+	//self.phonescore	:= ut.max2(l.phonescore,r.phonescore);
+	self.phonescore	:= MAX(l.phonescore,r.phonescore);
 	// self.rcntP		:= if (L.phonescore > R.phonescore or L.phonescore = R.phonescore and L.phonematchflag = 'Y', L.rcntp, R.rcntP);
 	self.verPhone		:= if(L.phonescore>=R.phonescore, L.verphone, R.verphone);
 	self.PhoneMatchFlag := if(L.phonescore>R.phonescore, L.phoneMatchFlag,
@@ -977,13 +988,21 @@ working_layout countadd(working_layout l, working_layout r) := transform
 	self.csrc2		 := (L.csrc2 or R.csrc2);
 	self.psrc1		 := (l.psrc1 or R.psrc1);
 	self.psrc2		 := (L.psrc2 or R.psrc2);
-	self.phonefound	 := ut.max2(L.phonefound,R.phonefound);
-	self.addrfound		 := ut.max2(L.addrfound,R.addrfound);
-	self.cmpyfound		 := ut.max2(L.cmpyfound,R.cmpyfound);
-	self.phonecmpycount  := ut.max2(l.phonecmpycount, r.phonecmpycount);
-	self.phoneaddrcount  := ut.max2(l.phoneaddrcount, r.phoneaddrcount);
-	self.cmpyaddrcount := ut.max2(l.cmpyaddrcount, r.cmpyaddrcount);
-	self.phonecmpyaddrcount := ut.max2(l.phonecmpyaddrcount, R.phonecmpyaddrcount);
+	//self.phonefound	 := ut.max2(L.phonefound,R.phonefound);
+	self.phonefound	 := MAX(L.phonefound,R.phonefound);
+/* 	self.addrfound		 := ut.max2(L.addrfound,R.addrfound);
+   	self.cmpyfound		 := ut.max2(L.cmpyfound,R.cmpyfound);
+   	self.phonecmpycount  := ut.max2(l.phonecmpycount, r.phonecmpycount);
+   	self.phoneaddrcount  := ut.max2(l.phoneaddrcount, r.phoneaddrcount);
+   	self.cmpyaddrcount := ut.max2(l.cmpyaddrcount, r.cmpyaddrcount);
+   	self.phonecmpyaddrcount := ut.max2(l.phonecmpyaddrcount, R.phonecmpyaddrcount);
+*/
+	self.addrfound		 := MAX(L.addrfound,R.addrfound);
+	self.cmpyfound		 := MAX(L.cmpyfound,R.cmpyfound);
+	self.phonecmpycount  := MAX(l.phonecmpycount, r.phonecmpycount);
+	self.phoneaddrcount  := MAX(l.phoneaddrcount, r.phoneaddrcount);
+	self.cmpyaddrcount := MAX(l.cmpyaddrcount, r.cmpyaddrcount);
+	self.phonecmpyaddrcount := MAX(l.phonecmpyaddrcount, R.phonecmpyaddrcount);
 	self.CmpyPhoneFromAddr		 := IF(l.phonecmpycount>=r.phonecmpycount and L.cmpyphonefromaddr != '',l.CmpyPhoneFromAddr,r.CmpyPhoneFromAddr);
 	self.PhoneMatchFirst		 := IF(l.phonecmpycount>=r.phonecmpycount and L.phoneMatchFirst != '',l.PhoneMatchFirst,r.PhoneMatchFirst);
 	self.PhoneMatchLast 		 := IF(l.phonecmpycount>=r.phonecmpycount and L.phoneMatchLast != '',l.PhoneMatchLast,r.PhoneMatchLast);
@@ -1023,7 +1042,8 @@ working_layout check_gong_for_ver2(rolled_dirs_address L, RiskWise.Layout_Dirs_P
 																						zip_score, cityst_score));
 																						
 	addrmatch 		:= ga(addrmatchscore);
-	phonematchscore 	:= tscore(ut.max2(0,Risk_Indicators.PhoneScore(l.phone10, r.phone10)));
+	//phonematchscore 	:= tscore(ut.max2(0,Risk_Indicators.PhoneScore(l.phone10, r.phone10)));
+	phonematchscore 	:= tscore(MAX(0,Risk_Indicators.PhoneScore(l.phone10, r.phone10)));
 	phonematch 		:= gn(phonematchscore);
 	
 	goodHit := IF(( (INTEGER)addrmatch+(INTEGER)phonematch+(INTEGER)cmpymatch) >1,true,false);// need at least 2 elements to match to keep record
@@ -1202,13 +1222,21 @@ working_layout rolltrans(working_layout l,working_layout r) := transform
 	self.csrc2		 := (L.csrc2 or R.csrc2);
 	self.psrc1		 := (l.psrc1 or R.psrc1);
 	self.psrc2		 := (L.psrc2 or R.psrc2);
-	self.phonefound	 := ut.max2(L.phonefound,R.phonefound);
-	self.addrfound		 := ut.max2(L.addrfound,R.addrfound);
-	self.cmpyfound		 := ut.max2(L.cmpyfound,R.cmpyfound);
-	self.phonecmpycount  := ut.max2(l.phonecmpycount, r.phonecmpycount);
-	self.phoneaddrcount  := ut.max2(l.phoneaddrcount, r.phoneaddrcount);
-	self.cmpyaddrcount := ut.max2(l.cmpyaddrcount, r.cmpyaddrcount);
-	self.phonecmpyaddrcount := ut.max2(l.phonecmpyaddrcount, R.phonecmpyaddrcount);
+/* 	self.phonefound	 := ut.max2(L.phonefound,R.phonefound);
+   	self.addrfound		 := ut.max2(L.addrfound,R.addrfound);
+   	self.cmpyfound		 := ut.max2(L.cmpyfound,R.cmpyfound);
+   	self.phonecmpycount  := ut.max2(l.phonecmpycount, r.phonecmpycount);
+   	self.phoneaddrcount  := ut.max2(l.phoneaddrcount, r.phoneaddrcount);
+   	self.cmpyaddrcount := ut.max2(l.cmpyaddrcount, r.cmpyaddrcount);
+    self.phonecmpyaddrcount := ut.max2(l.phonecmpyaddrcount, R.phonecmpyaddrcount);
+*/
+	self.phonefound	 := MAX(L.phonefound,R.phonefound);
+	self.addrfound		 := MAX(L.addrfound,R.addrfound);
+	self.cmpyfound		 := MAX(L.cmpyfound,R.cmpyfound);
+	self.phonecmpycount  := MAX(l.phonecmpycount, r.phonecmpycount);
+	self.phoneaddrcount  := MAX(l.phoneaddrcount, r.phoneaddrcount);
+	self.cmpyaddrcount := MAX(l.cmpyaddrcount, r.cmpyaddrcount);
+	self.phonecmpyaddrcount := MAX(l.phonecmpyaddrcount, R.phonecmpyaddrcount);
 	self.CmpyPhoneFromAddr		 := IF(l.phonecmpycount>=r.phonecmpycount and L.cmpyphonefromaddr != '',l.CmpyPhoneFromAddr,r.CmpyPhoneFromAddr);
 	self.PhoneMatchFirst		 := IF(l.phonecmpycount>=r.phonecmpycount and L.phoneMatchFirst != '',l.PhoneMatchFirst,r.PhoneMatchFirst);
 	self.PhoneMatchLast 		 := IF(l.phonecmpycount>=r.phonecmpycount and L.phoneMatchLast != '',l.PhoneMatchLast,r.PhoneMatchLast);
@@ -1448,7 +1476,8 @@ working_layout get_BusHeader(working_layout l, Business_Header_SS.Key_BH_BDID_pl
 	myGetDate := risk_indicators.iid_constants.myGetDate(l.historydate);					
 	isrecent := recent_check(myGetDate,r.dt_last_seen[1..6]+'31');
 				   
-	cmpymatch_score 	:= ut.max2(0,tmax2(CnameScore(l.company_name, r.company_name), CnameScore(L.alt_company_name, R.company_name)));
+	//cmpymatch_score 	:= ut.max2(0,tmax2(CnameScore(l.company_name, r.company_name), CnameScore(L.alt_company_name, R.company_name)));
+	cmpymatch_score 	:= MAX(0,tmax2(CnameScore(l.company_name, r.company_name), CnameScore(L.alt_company_name, R.company_name)));
 	cmpymatch 		:= g(cmpymatch_score);
 	
 	zip_score := Risk_Indicators.AddrScore.zip_score(l.orig_z5, if(r.zip=0, '', intformat(r.zip, 5, 1)));
@@ -1456,13 +1485,16 @@ working_layout get_BusHeader(working_layout l, Business_Header_SS.Key_BH_BDID_pl
 	addr_compare_score := Risk_Indicators.AddrScore.AddressScore(l.prim_range, l.prim_name, l.sec_range, 
 																						r.prim_range, r.prim_name, r.sec_range,
 																						zip_score, cityst_score);
-	addrmatchscore 	:= ut.max2(0, addr_compare_score - if (isrecent,0,15));
+	//addrmatchscore 	:= ut.max2(0, addr_compare_score - if (isrecent,0,15));
+	addrmatchscore 	:= MAX(0, addr_compare_score - if (isrecent,0,15));
 	addrmatch 		:= ga(addrmatchscore);
 
-	phonematchscore 	:= ut.max2(0,Risk_Indicators.PhoneScore(l.phone10, (string10)if(r.phone <> 0, intformat(r.phone, 10, 1), '')) - if (isrecent,0,10));
+	//phonematchscore 	:= ut.max2(0,Risk_Indicators.PhoneScore(l.phone10, (string10)if(r.phone <> 0, intformat(r.phone, 10, 1), '')) - if (isrecent,0,10));
+	phonematchscore 	:= MAX(0,Risk_Indicators.PhoneScore(l.phone10, (string10)if(r.phone <> 0, intformat(r.phone, 10, 1), '')) - if (isrecent,0,10));
 	phonematch 		:= gn(phonematchscore);
 	
-	feinmatchscore 	:= ut.max2(0,did_add.ssn_match_score(l.fein, (string9)if(r.fein <> 0, intformat(r.fein, 9, 1), '')) - if (isrecent,0,10));
+	//feinmatchscore 	:= ut.max2(0,did_add.ssn_match_score(l.fein, (string9)if(r.fein <> 0, intformat(r.fein, 9, 1), '')) - if (isrecent,0,10));
+	feinmatchscore 	:= MAX(0,did_add.ssn_match_score(l.fein, (string9)if(r.fein <> 0, intformat(r.fein, 9, 1), '')) - if (isrecent,0,10));
 	feinmatch 		:= gn(feinmatchscore);
 	
 	self.src 			:= r.source;
