@@ -7,8 +7,8 @@ EXPORT proc_quickHdr_build_all (
 	STRING destinationGroup  = STD.System.Thorlib.Group()
 ) := FUNCTION
 
-	SHARED filedate := header_quick._config(sourceIP, sourcePathWeekly).get_v_eq_as_of_date;
-	EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
+	filedate := header_quick._config(sourceIP, sourcePathWeekly).get_v_eq_as_of_date;
+	getVname (string superfile, string v_end = ':') := FUNCTION
 		FileName:= STD.File.GetSuperFileSubName(superfile,1);
 		v_strt  := stringlib.stringfind(FileName,'20',1);
 		v_endd	:= IF(v_end='',length(FileName),stringlib.stringfind(FileName[v_strt..],v_end,1));
@@ -92,14 +92,14 @@ EXPORT proc_quickHdr_build_all (
 
 	RETURN SEQUENTIAL(
 		check_superfiles_are_in_sync,
-		header_quick._config(sourceIP, sourcePathMonthly).set_v_version,
-		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date,
-		doWeekly,
-		doMonthly,
-		notify('Build_Header_Ingest', '*'),
-		header_quick.Inputs_Clear,
-		header_quick.Inputs_Set(filedate),
-		buildAll,
-		QA_sample /*,Source_Check_rep*/
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick._config(sourceIP, sourcePathMonthly).set_v_version, 0),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date, 100),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doWeekly,200),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doMonthly,300),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, notify('Build_Header_Ingest', '*'),400),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Clear,500),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick.Inputs_Set(filedate),600),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate, buildAll, 700),
+		Header.mac_runIfNotCompleted ('QuickHeader',filedate,QA_sample, 800) /*,Source_Check_rep*/
 	);
 END;
