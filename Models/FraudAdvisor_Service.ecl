@@ -167,7 +167,11 @@ export FraudAdvisor_Service := MACRO
 		'TimeofApplication',
 		'OutcomeTrackingOptOut',
 		'SuppressCompromisedDLs',
-  'IncludeQAOutputs'
+        'IncludeQAOutputs',
+        'LexIdSourceOptout',
+        '_TransactionId',
+        '_BatchUID',
+        '_GCID'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
@@ -290,6 +294,12 @@ dobradius := if(usedobFilter,dobradius0,-1);
 ModelOptions_In := DATASET([], Models.Layouts.Layout_Model_Request_In)	: STORED('ModelRequests',few);
 attributesIn := dataset([],Models.Layouts.Layout_Attributes_In)						: stored('RequestedAttributeGroups',few);
 gateways_in := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 //IF Model field is used, then we expect only 1 model. So project it into the ModelRequests format so we can use it in the validation/execution parts.
 single_model := Dataset([Transform(Models.Layouts.Layout_Model_Request_In,
@@ -558,11 +568,19 @@ iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
 																					from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, 
 																					BSversion, in_runDLverification:=IncludeDLverification,
 																					in_DataRestriction:=DataRestriction, in_BSOptions:=BSOptions,
-																					in_LastSeenThreshold:=LastSeenThresholdIn, in_DataPermission:=DataPermission);
+																					in_LastSeenThreshold:=LastSeenThresholdIn, in_DataPermission:=DataPermission,
+                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                    TransactionID := TransactionID, 
+                                                                                    BatchUID := BatchUID, 
+                                                                                    GlobalCompanyID := GlobalCompanyID);
 
 clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn,  
 																						doRelatives, doDL, doVehicle, doDerogs, bsVersion, doScore, nugen,
-																						DataRestriction:=DataRestriction, BSOptions := BSOptions, DataPermission:=DataPermission);
+																						DataRestriction:=DataRestriction, BSOptions := BSOptions, DataPermission:=DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID);
 
 // Run Bill-to-Ship-to Shell if necessary.
 clam_BtSt := 
@@ -571,7 +589,11 @@ clam_BtSt :=
 																					ofac_only, suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists,
 																					from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius,
 																					BSversion, DataRestriction, IncludeDLverification, DataPermission,
-																					doRelatives, doDL, doVehicle, doDerogs, doScore, nugen, BSOptions)
+																					doRelatives, doDL, doVehicle, doDerogs, doScore, nugen, BSOptions,
+                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                    TransactionID := TransactionID, 
+                                                                                    BatchUID := BatchUID, 
+                                                                                    GlobalCompanyID := GlobalCompanyID)
 	);
 	
   //Added for Paro 9-2018

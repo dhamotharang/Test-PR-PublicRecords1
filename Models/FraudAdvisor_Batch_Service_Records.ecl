@@ -5,7 +5,11 @@
 EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_Interfaces.Input args ,
 																					  dataset(Models.FraudAdvisor_Batch_Service_Layouts.BatchInput) batchin ,
 																					  dataset(Gateway.Layouts.Config) gateways,
-																						dataset(riskwise.Layout_IP2O) inIPdata = dataset([], riskwise.Layout_IP2O)) :=  function
+                                                                                      dataset(riskwise.Layout_IP2O) inIPdata = dataset([], riskwise.Layout_IP2O),
+                                                                                      unsigned1 LexIdSourceOptout = 1,
+                                                                                      string TransactionID = '',
+                                                                                      string BatchUID = '',
+                                                                                      unsigned6 GlobalCompanyId = 0) :=  function
 
 Boolean VALIDATION := false; //True when validating model, false for production mode.
 
@@ -13,9 +17,9 @@ Boolean VALIDATION := false; //True when validating model, false for production 
     boolean  doVersion1               := args.doVersion1;
     boolean  doVersion2               := args.doVersion2;
     boolean  doParo                   := args.doParo_attrs;
-    string   requestedattributegroups := StringLib.StringToLowerCase(args.requestedattributegroups);
+    string   requestedattributegroups := STD.Str.ToLowerCase(args.requestedattributegroups);
 		
-		string	model_name 	:= StringLib.StringToLowerCase(args.ModelName_in);
+		string	model_name 	:= STD.Str.ToLowerCase(args.ModelName_in);
 		boolean	isUtility 	:= Doxie.Compliance.isUtilityRestricted(STD.Str.ToUpperCase(args.industry_class_val));
 
 		fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2'];
@@ -89,11 +93,11 @@ Boolean VALIDATION := false; //True when validating model, false for production 
                         );
 			boolean valid_cleaned := le.UnParsedFullName <> '';
 			
-			self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-			self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-			self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-			self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-			self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+			self.fname := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+			self.lname := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+			self.mname := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+			self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+			self.title := STD.Str.touppercase(if(valid_cleaned, cleaned_name[1..5],''));
 
 			street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
 			clean_a2 := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -123,9 +127,9 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			self.county := clean_a2[143..145];
 			self.geo_blk := clean_a2[171..177];
 			
-			self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-			self.dl_state := stringlib.stringtouppercase(le.dl_state);
-			//self.email_address := stringlib.stringtouppercase(le.email);
+			self.dl_number := STD.Str.touppercase(dl_num_clean);
+			self.dl_state := STD.Str.touppercase(le.dl_state);
+			//self.email_address := STD.Str.touppercase(le.email);
 			self.email_address := le.email;
 			
 			self.ip_address := le.ip_addr;
@@ -138,14 +142,14 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			self.seq    := le.seq;
 			
 			// Allow for one person / two addresses if second person name data is blank.
-			self.fname  := IF( le.Name_First2 != '' , stringlib.stringtouppercase(le.Name_First2) , stringlib.stringtouppercase(le.Name_First) );
-			self.mname  := IF( le.Name_Middle2 != '', stringlib.stringtouppercase(le.Name_Middle2), stringlib.stringtouppercase(le.Name_Middle) );
-			self.lname  := IF( le.Name_Last2 != ''  , stringlib.stringtouppercase(le.Name_Last2)  , stringlib.stringtouppercase(le.Name_Last) );
-			self.suffix := IF( le.Name_Suffix2 != '', stringlib.stringtouppercase(le.Name_Suffix2), stringlib.stringtouppercase(le.Name_Suffix) );
+			self.fname  := IF( le.Name_First2 != '' , STD.Str.touppercase(le.Name_First2) , STD.Str.touppercase(le.Name_First) );
+			self.mname  := IF( le.Name_Middle2 != '', STD.Str.touppercase(le.Name_Middle2), STD.Str.touppercase(le.Name_Middle) );
+			self.lname  := IF( le.Name_Last2 != ''  , STD.Str.touppercase(le.Name_Last2)  , STD.Str.touppercase(le.Name_Last) );
+			self.suffix := IF( le.Name_Suffix2 != '', STD.Str.touppercase(le.Name_Suffix2), STD.Str.touppercase(le.Name_Suffix) );
 			
-			SELF.in_streetAddress := stringlib.stringtouppercase(le.Street_Addr2);
-			SELF.in_city          := stringlib.stringtouppercase(le.p_City_name2);
-			SELF.in_state         := stringlib.stringtouppercase(le.St2);
+			SELF.in_streetAddress := STD.Str.touppercase(le.Street_Addr2);
+			SELF.in_city          := STD.Str.touppercase(le.p_City_name2);
+			SELF.in_state         := STD.Str.touppercase(le.St2);
 			SELF.in_zipCode       := le.Z52;
 			SELF.phone10          := le.Home_Phone2;	
 			SELF.historydate      := if(le.historydateyyyymm=0, 999999, le.historydateyyyymm);
@@ -181,11 +185,19 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 																							in_runDLverification:=IncludeDLverification,
 																							in_DataRestriction:=args.DataRestriction,
 																							in_BSOptions := BSOptions,
-																							in_DataPermission := args.DataPermission);
+																							in_DataPermission := args.DataPermission,
+                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID);
 
 		clam := risk_indicators.Boca_Shell_Function(iid, gateways, args.dppa, args.glb, isUtility, isLn, doRelatives, doDL, 
 																								doVehicle, doDerogs, bsVersion, doScore, nugen, DataRestriction:=args.DataRestriction,
-																								BSOptions := BSOptions, DataPermission:=args.DataPermission);
+																								BSOptions := BSOptions, DataPermission:=args.DataPermission,
+                                                                                                LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                TransactionID := TransactionID, 
+                                                                                                BatchUID := BatchUID, 
+                                                                                                GlobalCompanyID := GlobalCompanyID);
 
 		// Run Bill-to-Ship-to Shell if necessary.
 		clam_BtSt := 
@@ -194,7 +206,11 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 																							args.ofac_only, suppressNearDups, require2Ele, fromBIID, isFCRA, args.excludewatchlists,
 																							fromIT1O, args.OFACVersion, args.IncludeOfac, args.addtl_watchlists, args.gwThreshold, dobradius,
 																							bsVersion, args.DataRestriction, IncludeDLverification, args.DataPermission,
-																							doRelatives, doDL, doVehicle, doDerogs, doScore, nugen, BSOptions)
+																							doRelatives, doDL, doVehicle, doDerogs, doScore, nugen, BSOptions,
+                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID)
 			);
 	
 		ip_prep := project( batchinseq( ip_addr!='' ), transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );

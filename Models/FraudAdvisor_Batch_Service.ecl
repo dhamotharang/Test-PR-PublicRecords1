@@ -61,7 +61,7 @@
 </pre>
 */
 
-import address, risk_indicators, models, riskwise, ut, gateway, AutoStandardI;
+import risk_indicators, models, gateway, AutoStandardI, STD, Royalty;
 
 
 export FraudAdvisor_Batch_Service := MACRO
@@ -103,18 +103,27 @@ Boolean VALIDATION := False; //True for validation mode, false for production mo
 
 gateways_in := Gateway.Configuration.Get();
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
-	self.servicename := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.servicename);
+	self.servicename := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and STD.Str.ToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.servicename);
 	
-  self.url := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.url); 		
+  self.url := if(le.servicename = 'bridgerwlc' and InputArgs.OFACVersion = 4 and STD.Str.ToLowerCase(InputArgs.ModelName_in) not in Risk_Indicators.iid_constants.FABatch_WatchlistModels, '', le.url); 		
   
   self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if(InputArgs.OFACVersion = 4 and StringLib.StringToLowerCase(InputArgs.ModelName_in) in Risk_Indicators.iid_constants.FABatch_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+if(InputArgs.OFACVersion = 4 and STD.Str.ToLowerCase(InputArgs.ModelName_in) in Risk_Indicators.iid_constants.FABatch_WatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
-wModel := Models.FraudAdvisor_Batch_Service_Records(InputArgs,batchin,gateways);
+wModel := Models.FraudAdvisor_Batch_Service_Records(InputArgs,batchin,gateways, LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                            TransactionID := TransactionID, 
+                                                                                            BatchUID := BatchUID, 
+                                                                                            GlobalCompanyID := GlobalCompanyID);
 
 #IF(VALIDATION)
   output(wModel, NAMED('Results'));

@@ -28,7 +28,13 @@ string   DataRestriction := risk_indicators.iid_constants.default_DataRestrictio
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 gateways_in := Gateway.Configuration.Get();
 
-tribCode := StringLib.StringToLowerCase(tribCode_Value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
+tribCode := STD.Str.ToLowerCase(tribCode_Value);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := if(ofac_version = 4 and tribcode in ['','ex17','ex80'] and le.servicename = 'bridgerwlc', le.servicename, '');
@@ -46,9 +52,17 @@ global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 prep	:= dataset([],Risk_Indicators.Layout_CIID_BtSt_In) : stored('batch_in',few);
 
 iid_results := Risk_Indicators.InstantId_BtSt_Function(prep, gateways, dppa, glb, false, false, true, true, true, ofac_version := ofac_version, include_ofac := include_ofac, 
-                                                       global_watchlist_threshold := global_watchlist_threshold, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+                                                       global_watchlist_threshold := global_watchlist_threshold, DataRestriction:=DataRestriction, DataPermission:=DataPermission,
+                                                       LexIdSourceOptout := LexIdSourceOptout, 
+                                                      TransactionID := TransactionID, 
+                                                      BatchUID := BatchUID, 
+                                                      GlobalCompanyID := GlobalCompanyID);
 
-clamfull := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, true, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+clamfull := Risk_Indicators.BocaShell_BtSt_Function(iid_results, gateways, dppa, glb, false, false, true, false, false, true, DataRestriction:=DataRestriction, DataPermission:=DataPermission,
+                                                                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                          TransactionID := TransactionID, 
+                                                                                          BatchUID := BatchUID, 
+                                                                                          GlobalCompanyID := GlobalCompanyID);
 									
 Risk_Indicators.layout_boca_shell into_modelinput(clamfull le, integer i) := TRANSFORM
 	self := if(i=1, le.bill_to_out, le.ship_to_out);
