@@ -55,6 +55,8 @@
 		,contact_ssn // pContact_ssn = ''
 		,source // pSource = ''
 		,source_record_id // pSource_record_id = ''
+		,use_fuzzy
+		,prim_force_post
 	);
 
 	withAppend := if(from_thor, withAppendThor, withAppendRoxie);
@@ -76,16 +78,19 @@
 
 	// Catch failures so roxiepipe won't fail.
 	// Return dataset with request ids in case of failure, turning an error into a no hit.
-	catchRes := catch(res, skip);
+	catchRes := catch(res, onfail(transform(recordof(res), self.error_code := FAILCODE, self.error_msg := FAILMESSAGE, self := [])));
+	isError := exists(catchRes(error_code != 0 or error_msg != ''));
 	failResultv1 := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOut,
 	                      self.request_id := left.request_id, self := []));
 	failResult := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOutv2,
-	                      self.request_id := left.request_id, self := []));
+	                      self.request_id := left.request_id,
+	                      self.error_code := catchRes[1].error_code,
+	                      self.error_msg := catchRes[1].error_msg, self := []));
 				
 	parallel(
-		output(if(not exists(catchRes), failResult, res), named('Results_v2'));
+		output(if(isError, failResult, res), named('Results_v2'));
 		output(if(includeRecords, postHeader, emptyHeader), named('Header'));
-		output(if(not exists(catchRes), failResultv1, resv1), named('Results'));
+		output(if(isError, failResultv1, resv1), named('Results'));
 
 	);
 

@@ -41,7 +41,13 @@ ver_lab_TBD := Dops.GetBuildVersion('PersonLabKeys'//'PersonLABKeys' // DOPS pac
 ver_lab_cert_ver := dops.GetBuildVersion('PersonLabKeys','B','N','C')[1..9];
                  
 
-norun := if(filedate = lastestIkbVersionOnThor and status = 0 and ver_lab_TBD <> ver_lab_cert_ver, true, false);
+norun := if(filedate = lastestIkbVersionOnThor and status = 0
+          ,true   //norun
+          ,if(ver_lab_TBD <> ver_lab_cert_ver
+          ,true   //norun
+          ,false
+          ));
+          
 wuname1 := filedate + ' IKB - Running Right Now';
 wuname2 := filedate + ' IKB - Data Was Already Built';
 wuname3 := bldversion + if(status <> 0, ' IKB - Update Incremental linking keys RECOVER', ' IKB - Update Incremental linking keys');
