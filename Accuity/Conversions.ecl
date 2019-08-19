@@ -1,4 +1,4 @@
-export Conversions := module
+﻿export Conversions := module
 
 //////////////////////////////////////////////////////////////////////////
 export string EtypeCodetoDescr(string code) := 
@@ -170,7 +170,7 @@ case(TRIM(code,ALL),
 	'WBD1072'  =>       'OFAC Enhancements - Entities',
 	'WMD REGS1072'  =>  'OFAC Weapons of Mass Destruction Regs',
 	'WORLD BANK46'  =>  'World Bank Debarred List',   
-
+	'GWL'						=>	'Accuity Global WatchList',
 code);
 
 //////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ case(TRIM(code,ALL),
 	'CAC1146'  =>	'Organizations committing grave violations and abuses against children in situations of armed conflict',
 	'CBI1054'  =>	'Entities in the Central Bureau of Investigation Wanted List and Interpol Red Notices reposted by CBI',
   'CBI WN30'  =>      'Central Bank of Ireland Warning Notices',
-	'CEL1082'  =>	u'Entities under economic sanctions. Does not include companies, organizations, or individuals listed under UN resolutions, OSFI, or SEMA. Enhanced by AccuityÂ® with financial institutions in country and SWIFT/BICs.',
+	'CEL1082'  =>	u'Entities under economic sanctions. Does not include companies, organizations, or individuals listed under UN resolutions, OSFI, or SEMA. Enhanced by AccuityÃ‚Â® with financial institutions in country and SWIFT/BICs.',
   'CNA1044'  =>       'CHINESE MINISTRY',
 	'CSL1080'  =>	'Entities subject to Canadian Economic Sanctions implemented under the UN Act, SEMA, and FACFOA',
   'CSO1062'  =>       'CBS OFFSHORE BANKS',
@@ -202,15 +202,15 @@ case(TRIM(code,ALL),
 	'ES1014'  =>	'Entities sanctioned under EU regulations implemented by Spain\'s Ministerio de Economia',
 	'ESE1158'  =>	'Persons, groups, and entities subject to an assets freeze',
   'EU33'  =>          'European Union List',
-	'EUE1170'  =>	u'Entities AccuityÂ® considers to be sanctioned based on EU regulations, but not included in the EU List. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'EUE1170'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on EU regulations, but not included in the EU List. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'FBI35'  =>         'FBI Most Wanted',
-	'FDJ1152'  =>	u'Entities associated with jurisdictions and principal cities subject to FATF counter-measures to protect against money laundering and terrorist financing. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'FDJ1152'  =>	u'Entities associated with jurisdictions and principal cities subject to FATF counter-measures to protect against money laundering and terrorist financing. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
 	'FMU1126'  =>	'Entities related to terrorist activity or persons subject to international sanctions derived from UN',
 	'FR1010'  =>	'Entities subject to French national and EU financial sanctions as posted in the French EU Official Journal',
   'GO36'  =>          'World Government Officials List',
   'HK37'  =>          'Hong Kong Monetary Authority List',
   'HMC1178'  =>      'HMC 1178',
-	'HME1130'  =>	u'Entities AccuityÂ® considers to be sanctioned based on HM Treasury regulations, but not included in the HM Treasury List. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'HME1130'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on HM Treasury regulations, but not included in the HM Treasury List. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'IA1134'  =>        'INKSNA LIST',
 	'IND1048'  =>	'Organizations declared as terrorists under the Unlawful Activities (Prevention) Act, 1967. Recommend scanning in conjunction with UN list.',
   'INTERPOL38'  =>    'INTERPOL List',
@@ -228,10 +228,10 @@ case(TRIM(code,ALL),
 	'OCF1122'  =>	'Companies and banks reported by the OCC as involved in counterfeit or stolen instruments in connection with various scams or financial fraud',
   'OCR1186'  =>       'OCR 1186',
   'OFAC'  =>          'OFAC Enhancements',
-	'OGO1072'  =>	u'Entities AccuityÂ® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'OGO1072'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'OSFI41'  =>        'OSFI Canadian List',
 	'PRT1128'  =>	'Airports and seaports located in countries with comprehensive OFAC sanctions, including port codes when available',
-	'RBL1072'  =>	u'Entities AccuityÂ® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'RBL1072'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'REG1072'  =>       'OFAC Federal Register',
 	'RPL1176'  =>	'Organizations and individuals the Russian Federation government recognizes as involved in terrorism or related activities. Recommend scanning in conjunction with UN list.',
   'RRM1116'  =>       'RUSSIAN ROSFINMONITORING LIST',
@@ -241,20 +241,20 @@ case(TRIM(code,ALL),
   'SGP43'  =>         'Monetary Authority of Singapore List',
 	'SL1136'  =>	'Individuals and organizations listed under regulation number 397/2005 (International Sanctions Ensuring International Peace and Security)',
   'TEL1028'  =>       'Terrorist Exclusion List',
-	'TFP1072'  =>	u'Entities AccuityÂ® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'TFP1072'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'TW1016'  =>        'Taiwan',
 	'UGO1120'  =>	'Members of the US Cabinet and White House staff',
 	'UK1046'  =>	'Terrorist groups and organizations banned under UK law',
   'UN44'  =>          'United Nations Sanctions List',
-	'UNE1172'  =>	u'Entities AccuityÂ® considers to be sanctioned based on UN regulations, but not specifically include in the UN List. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'UNE1172'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on UN regulations, but not specifically include in the UN List. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
 	'UNT1064'  =>	'Individuals with travel restrictions but no asset freezing as designated by the UN Security Council Sanctions Committees',
 	'USM45'  =>		'15 Most Wanted fugitives by the US Marshals',
-	'USSD1072'  =>	u'Entities AccuityÂ® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'USSD1072'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'UST0'  =>          'OFAC US Treasury SDN List',
-	'WBD1072'  =>	u'Entities AccuityÂ® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'WBD1072'  =>	u'Entities AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
   'WMD REGS1072'  =>  'OFAC Weapons of Mass Destruction Regs',
   'WORLD BANK46'  =>  'World Bank Debarred List',   
-
+	'GWL'						=>	'Accuity Global Watchlist',
 code);
 
 //////////////////////////////////////////////////////////////////////////
@@ -326,7 +326,7 @@ code= 'UN1064'  => '10833C06-58F1-43BE-A4D8-A1EFC070F174', //UNITED NATIONS
 
 code= 'UNE1172' => 'A0B533C2-1956-46EC-9B30-AB0EF999F968', //United Nations Enhancements List
 code= 'USM45'   => '5FBFAB06-9E20-4C01-B8EC-0DF7AD62F8C6', //US Marshals
-
+code= 'GWL'			=> '4AD62758-EF7D-4E1B-B804-0873FA883214',
 '');
 
 export string GeoSourceCodetoBridgerSourceID(string code) := 
@@ -348,10 +348,10 @@ case(TRIM(code,ALL),
 
 export unicode GeoSourceCodeToDescr(string code) := 
 case(TRIM(code,ALL),
-	'CEL1082' => 	u'Countries where economic sanctions are imposed. Does not include companies, organizations, or individuals listed under UN resolutions, OSFI, or SEMA. Enhanced by AccuityÂ® with financial institutions in country and SWIFT/BICs.',
-	'FDJ1152'  =>	u'Jurisdictions and principal cities subject to FATF counter-measures to protect against money laundering and terrorist financing. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
-	'RBL1072'  =>	u'Locations AccuityÂ® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
-	'TFP1072'  =>	u'Locations AccuityÂ® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÂ® with locations and SWIFT/BICs.',
+	'CEL1082' => 	u'Countries where economic sanctions are imposed. Does not include companies, organizations, or individuals listed under UN resolutions, OSFI, or SEMA. Enhanced by AccuityÃ‚Â® with financial institutions in country and SWIFT/BICs.',
+	'FDJ1152'  =>	u'Jurisdictions and principal cities subject to FATF counter-measures to protect against money laundering and terrorist financing. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
+	'RBL1072'  =>	u'Locations AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
+	'TFP1072'  =>	u'Locations AccuityÃ‚Â® considers to be sanctioned based on OFAC regulations (subsidiaries, designated vessels, members of designated terrorist groups), but not included in OFAC\'s SDN list. Enhanced by AccuityÃ‚Â® with locations and SWIFT/BICs.',
 	code);
 
 export string ConvertRoutingCode(string code) := 

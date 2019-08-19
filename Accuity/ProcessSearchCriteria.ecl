@@ -3,7 +3,7 @@
 			self.criteria := Lft.criteria + rght.criteria;
 	END;
 	
-EXPORT ProcessSearchCriteria(DATASET($.Layouts.input.rEntity) infile) := 
+EXPORT ProcessSearchCriteria(DATASET($.Layouts.input.rEntity) infile) := FUNCTION
 
 	sources := $.GetSourceCriteria(infile);
 
@@ -13,5 +13,4 @@ EXPORT ProcessSearchCriteria(DATASET($.Layouts.input.rEntity) infile) :=
 	
 	return result;
 
-
-;
+END;

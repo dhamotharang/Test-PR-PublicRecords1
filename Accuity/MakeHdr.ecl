@@ -1,4 +1,4 @@
-import Worldcheck_Bridger;
+﻿import Worldcheck_Bridger;
 export MakeHdr := MODULE
 
 
@@ -8,7 +8,8 @@ shared hdg_Pt1:= hdg_xml+'<BuildInfo><ListInfo><Type>Entity</Type><ID>';
 shared hdg_Pt2:= '</ID>\r\n<Name>';
 shared hdg_Pt3:= '</Name>\r\n<Description>';
 shared hdg_Pt4:= '</Description><Encrypt>True</Encrypt>\r\n<Publication>';
-shared hdg_Pt5:= '</Publication></ListInfo><UserInfo><ClientID>Accuity</ClientID></UserInfo><OutputType>W32Bit</OutputType></BuildInfo>\r\n';
+shared hdg_Pt5:= '</Publication>';
+shared hdg_Pt5a := '</ListInfo><UserInfo><ClientID>Accuity</ClientID></UserInfo><OutputType>W32Bit</OutputType></BuildInfo>\r\n';
 shared hdg_Pt5b := '<Entity_List Count="';
 shared hdg_Pt6:= '">';
 
@@ -22,10 +23,10 @@ export unicode MakeGeoXMLHdr(string SourceCode, integer cnt) :=
 					+hdg_Pt4
 					//+filedate[1..4]+'-'+filedate[5..6]+'-'+filedate[7..8]+'T12:00:00.0000000Z'
 					+ GetPublicationDate(SourceCode)
-					+hdg_Pt5+'<Country_List Count="'
+					+hdg_Pt5 + hdg_Pt5a + '<Country_List Count="'
 							+(string)cnt
 						+hdg_Pt6;
-export unicode MakeXMLHdr(string SourceCode, integer cnt) := 
+export unicode MakeXMLHdr(string SourceCode, integer cnt, boolean createSearchCriteria) := 
 				hdg_Pt1 
 							+Conversions.SourceCodetoBridgerSourceID(TRIM(SourceCode,ALL))
 							+hdg_Pt2
@@ -34,19 +35,22 @@ export unicode MakeXMLHdr(string SourceCode, integer cnt) :=
 							+Conversions.SourceCodetoDescr(SourceCode)
 									+ IF(GetDisclaimer(SourceCode)='','',' '+GetDisclaimer(SourceCode))
 							+hdg_Pt4
-					//		+filedate[1..4]+'-'+filedate[5..6]+'-'+filedate[7..8]+'T12:00:00.0000000Z'
 					+ GetPublicationDate(SourceCode)
-							+hdg_Pt5+hdg_Pt5b
+							+hdg_Pt5  +
+					IF(NOT createSearchCriteria, '',
+						'<SearchCriteria>\n' + 'xxx' + '</SearchCriteria>\n')
+							+ hdg_Pt5a + hdg_Pt5b
 							+(string)cnt
 						+hdg_Pt6;
-						
+
 export 	Footer := '\r\n</Entity_List></Watchlist>\r\n';
 export 	GeoFooter := '\r\n</Country_List></Watchlist>\r\n';
 
 export CreateXMLFileHdr(string code,
-		dataset(recordof(Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.routp)) infile) := FUNCTION
+		dataset(recordof(Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.routp)) infile,
+		boolean createSearchCriteria = false) := FUNCTION
 	cnt := Accuity.Functions.getEntityCount(infile);
-	hdr := MakeXMLHdr(code, cnt);
+	hdr := MakeXMLHdr(code, cnt, createSearchCriteria);
 	return hdr;
 END;
 
@@ -59,10 +63,10 @@ END;
 
 /*Dummy Record Values:
 Set Entity Type to Individual
-Set Reason Listed to Â“Default RecordÂ”
-Set First Name to Â“ZZZZZZZÂ”
-Set Middle Name to Â“ZZZZZZZÂ”
-Set Last Name to Â“ZZZZZZZÂ”
+Set Reason Listed to Ã‚â€œDefault RecordÃ‚â€
+Set First Name to Ã‚â€œZZZZZZZÃ‚â€
+Set Middle Name to Ã‚â€œZZZZZZZÃ‚â€
+Set Last Name to Ã‚â€œZZZZZZZÃ‚â€
 */
 dummyRecord(string code) := PROJECT(
 	DATASET([
