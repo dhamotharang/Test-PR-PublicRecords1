@@ -1,4 +1,4 @@
-IMPORT GlobalWatchLists_Preprocess, std, address, ut;
+﻿IMPORT GlobalWatchLists_Preprocess, std, address, ut;
 
 EXPORT  ProcessDebarredParties := FUNCTION
 
@@ -61,7 +61,7 @@ EXPORT  ProcessDebarredParties := FUNCTION
 		self.orig_raw_name	:= ut.CleanSpacesAndUpper(L.orig_raw_name);
 	END;
 	
-	dsIntermediate := PROJECT(PROJECT(GlobalWatchLists_Preprocess.Files.dsDebarredParties, xFormAKA(left)), FormatFields(left, counter));
+	dsIntermediate := PROJECT(PROJECT(GlobalWatchLists_Preprocess.Files.dsDebarredParties(TRIM(name_info,ALL)<> ''), xFormAKA(left)), FormatFields(left, counter));
 	
 	GlobalWatchLists_Preprocess.rOutLayout Redefine1(GlobalWatchLists_Preprocess.IntermediaryLayoutDebbaredParties.tempLayout2 L) := TRANSFORM
 		self.pty_key 								:= L.ent_key;

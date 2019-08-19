@@ -132,6 +132,7 @@ MODULE
 	export src_infutor_narc3             := 'KP';  // infutor_narc3 consumer
 	export src_fed_crim                  := 'VM';  // federal Criminal
 	export src_Credit_Unions             := 'CU';
+	export src_DataBase_USA              := '9I';
 	export src_DataBridge                := 'RQ';	
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
@@ -1090,7 +1091,7 @@ MODULE
 		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
-// Marketing approved soources as of 3/2019.
+// Marketing approved sources as of 6/2019.
 export set_Marketing_Sources           := [
 		 src_AMS											 ,src_AK_Busreg                 ,src_AK_Perm_Fund						   ,src_Accurint_Trade_Show			 
 		,src_Aircrafts								 ,src_Accurint_Arrest_Log				,src_AlloyMedia_consumer       ,src_Airmen    						 		 
@@ -1108,9 +1109,34 @@ export set_Marketing_Sources           := [
 		,src_Marriage 								 ,src_MediaOne								  ,src_NaturalDisaster_Readiness ,src_NJ_Gaming_Licenses			 
 		,src_OR_Worker_Comp						 ,src_OSHAIR										,src_PBSA											 ,src_Professional_License			 
 		,src_sexoffender							 ,src_TXBUS										  /*,src_UCCV2*/  							 ,src_US_Coastguard
-		,src_Vickers									 ,src_ZOOM											,src_Cortera										
-		,set_Marketing_Corp					   ,set_Marketing_Death					  ,set_Marketing_FBN						 ,set_Marketing_Liquor_Licenses
-		,set_Marketing_WC
+		,src_Vickers									 ,src_ZOOM											,src_Cortera									 ,src_Equifax_Business_Data		
+		,src_FBNV2_Hist_Choicepoint		 ,src_DCA												,src_Infutor_NARB							 ,src_Database_USA
+		,src_DataBridge
+		/*updated set_Marketing_Corp*/		
+    ,src_AK_Corporations					 ,src_AL_Corporations						,src_AZ_Corporations					 ,src_AR_Corporations 
+		,src_CA_Corporations					 ,src_CO_Corporations						,src_CT_Corporations					 ,src_DC_Corporations
+		,src_FL_Corporations					 ,src_GA_Corporations						,src_HI_Corporations					 ,src_IA_Corporations 
+		,src_IL_Corporations					 ,src_IN_Corporations					 	,src_KY_Corporations					 ,src_LA_Corporations					 
+		,src_ME_Corporations 					 ,src_MD_Corporations					  ,src_MA_Corporations					 ,src_MI_Corporations					 
+		,src_MN_Corporations					 ,src_MS_Corporations					  ,src_MO_Corporations					 ,src_MT_Corporations					 
+		,src_NE_Corporations					 ,src_NH_Corporations						,src_NV_Corporations					 ,src_NJ_Corporations						
+		,src_NC_Corporations					 ,src_NY_Corporations					  ,src_ND_Corporations					 ,src_OH_Corporations						
+		,src_OK_Corporations					 ,src_OR_Corporations						,src_PA_Corporations					 ,src_RI_Corporations					 
+		,src_SD_Corporations					 ,src_TN_Corporations					  ,src_TX_Corporations					 ,src_UT_Corporations					 
+		,src_VT_Corporations					 ,src_VA_Corporations					  ,src_WI_Corporations					 ,src_WV_Corporations
+		,src_WY_Corporations				
+    // updated watercraft set
+    ,src_AL_Watercraft						 ,src_AR_Watercraft						  ,src_AZ_Watercraft						 ,src_CO_Watercraft 
+		,src_CT_Watercraft						 ,src_GA_Watercraft							,src_IA_Watercraft						 ,src_IL_Watercraft
+		,src_Infutor_Watercraft				 ,src_ME_Watercraft							,src_MA_Watercraft						 ,src_MN_Watercraft							
+		,src_MS_Watercraft						 ,src_NY_Watercraft						 	,src_NC_Watercraft						 ,src_NV_Watercraft
+		,src_NM_Watercraft						 ,src_OH_Watercraft						 	,src_OR_Watercraft						 ,src_TN_Watercraft
+		,src_TX_Watercraft						 ,src_WV_Watercraft							,src_WI_Watercraft						 ,src_WY_Watercraft		
+		,set_Marketing_Death					 ,set_Marketing_FBN						  ,set_Marketing_Liquor_Licenses
+    // additional items
+    ,src_Edgar                     ,src_Bankruptcy_Trustee        ,src_Infutor_Veh               ,src_MS_Worker_Comp
+    ,src_Liens_v2_Chicago_Law      ,src_Liens_v2_ILFDLN           ,src_Liens_v2_Hogan            ,src_Liens_v2_MA
+    ,src_Liens_v2_NYC              ,src_Liens_v2_NYFDLN
 	]; 
 	
 export set_Marketing_Restricted := [
@@ -1672,6 +1698,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_infutor_narc3             := [src_infutor_narc3             ];
 	export set_fed_crim                  := [src_fed_crim                  ];
 	export set_Credit_Unions             := [src_Credit_Unions             ];
+	export set_Database_USA              := [src_Database_USA              ];	
 	export set_DataBridge                := [src_DataBridge                ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
@@ -2196,6 +2223,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCrashCarrier               (string  sr) := sr               in set_CrashCarrier               ;	
 	export SourceIsCredit_Unions              (string  sr) := sr               in set_Credit_Unions              ;		
 	export SourceIsCriminal_History           (string  sr) := sr               in set_Criminal_History           ;
+	export SourceIsDatabase_USA               (string  sr) := sr               in set_Database_USA               ;	
 	export SourceIsDataBridge                 (string  sr) := sr               in set_DataBridge                 ;
 	export SourceDatagence                    (string  sr) := sr               in set_Datagence;
 	export SourceIsDCA                        (string  sr) := sr               in set_DCA                        ;
@@ -2740,6 +2768,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_WY_Corporations           ,'WY Corporations'                                           }
 		,{src_CrashCarrier			        ,'Crash Carrier'		                                         }		
 		,{src_Credit_Unions             ,'Credit Unions'                                             }
+		,{src_Database_USA   						,'Database_USA'                                              }		
 		,{src_DataBridge    						,'DataBridge'                                                }
 		,{src_Datagence      						,'Datagence'                                    }
 		,{src_DCA                       ,'DCA'                                                       }
@@ -3260,6 +3289,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Credit_Unions             => 'Credit Unions'                                        
 		,src_CNLD_Facilities					 => 'CNLD Facilities'
 		,src_CNLD_Practitioner				 => 'CNLD_Practitioner'
+		,src_Database_USA              => 'Database_USA'
 		,src_DataBridge                => 'DataBridge'
 		,src_Datagence      					 => 'Datagence'                               
 		,src_DCA                       => 'DCA'                                                  

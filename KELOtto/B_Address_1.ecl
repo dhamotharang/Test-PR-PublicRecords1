@@ -21,7 +21,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -237,7 +237,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -455,7 +455,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -527,7 +527,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -607,7 +607,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -688,7 +688,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -771,7 +771,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -856,7 +856,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -930,7 +930,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.ndataset(E_Address.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nbool _addresspobox_;
     KEL.typ.nbool _addresscmra_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
     KEL.typ.nstr Primary_Name_;
@@ -973,7 +973,7 @@ EXPORT B_Address_1 := MODULE
     KEL.typ.nint Cl_Identity_Count_Percentile_;
     KEL.typ.int Deceased_Match_Person_Count_ := 0;
     KEL.typ.int Deceased_Person_Count_ := 0;
-    KEL.typ.nunk Entity_Context_Uid_;
+    KEL.typ.nstr Entity_Context_Uid_;
     KEL.typ.nstr Full_Address_;
     KEL.typ.int High_Frequency_Flag_ := 0;
     KEL.typ.int High_Risk_Death_Prior_To_All_Events_Person_Count_ := 0;

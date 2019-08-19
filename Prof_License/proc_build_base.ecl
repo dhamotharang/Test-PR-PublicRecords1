@@ -259,9 +259,13 @@ import Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,cens
         self.score    := intformat(l.temp_DID_score, 3, 1);
         self.bdid 	  := if (L.bdid = 0, '', intformat(L.bdid,12,1));
         self.best_ssn := l.ssn;
-					//DF-24056 initialize new CCPA fields 
-					self.global_sid :=0;
-					self.record_sid := 0;				
+				//DF-24056 initialize new CCPA fields / DF-25422 populate global_sid fields
+				self.global_sid := map(l.vendor = 'ALASKA BAR ASSOCIATION' => 8271,
+															 l.vendor = 'NORTH CAROLINA UNC CECIL G. SHEPS CENTER _ PSY' => 17591,
+															 l.vendor = 'ALC' => 26541,
+															 l.vendor = 'INFOGROUP' => 26651,
+															 0);
+				self.record_sid := 0;				
         self 					:= l;
 			end;
 

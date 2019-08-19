@@ -11,7 +11,7 @@ export data_key_RID (boolean pFastHeader = false, boolean pCombo = true, dataset
 
 t  := $.Prepped_For_Keys;
 
-fqh := header_quick.file_header_quick;
+fqh := project(header_quick.file_header_quick,header.layout_header);
 
 rid_rec := record
   t.rid;
