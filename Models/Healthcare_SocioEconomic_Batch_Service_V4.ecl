@@ -1,4 +1,4 @@
-
+﻿
 import Risk_indicators, Models, Std, Profilebooster, Luci, Ut;
 
 export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
@@ -35,6 +35,12 @@ export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
 	string10 MedicationAdherenceScore_Category_2_High_In := '79.9234' : stored('MedicationAdherenceScore_Category_2_High');
 	string10 MedicationAdherenceScore_Category_1_Low_In  := '79.9235' : stored('MedicationAdherenceScore_Category_1_Low');
 	
+     //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
 	DECIMAL7_4 ReadmissionScore_Category_5_Low := (DECIMAL7_4)ReadmissionScore_Category_5_Low_In ;
 	DECIMAL7_4 ReadmissionScore_Category_4_High := (DECIMAL7_4)ReadmissionScore_Category_4_High_In ;
 	DECIMAL7_4 ReadmissionScore_Category_4_Low := (DECIMAL7_4)ReadmissionScore_Category_4_Low_In ;
@@ -67,7 +73,11 @@ export Healthcare_SocioEconomic_Batch_Service_V4 := MACRO
 		FAIL('Bad MedicationAdherenceScore_Category thresholds supplied.'));
 
 	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, 
-											trim(STD.Str.ToUpperCase(Socio_Core_Option),left,right), ofac_version_in, gateways_in_ds, coreResults);
+											trim(STD.Str.ToUpperCase(Socio_Core_Option),left,right), ofac_version_in, gateways_in_ds, coreResults,
+                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                    TransactionID := TransactionID, 
+                                                    BatchUID := BatchUID, 
+                                                    GlobalCompanyID := GlobalCompanyID);
 	
 	FinalOutput := Models.Healthcare_SocioEconomic_Transforms_Batch_Service_V4.AddScoreCategories(
 											coreResults,
