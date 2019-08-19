@@ -31,7 +31,9 @@ import didville, suppress, doxie, dx_header, DeathV2_Services, AutoStandardI, SS
 	didville.Mac_Common_Field_Declare();
 
   // need just a few things, so no reading from globals
-  mod_access := MODULE (doxie.IDataAccess)
+  // creating a unique identifier as mod_access is one of the parameter in Didville.AddressHistory_Common
+  #UNIQUENAME(mod_access)			
+  %mod_access% := MODULE (doxie.IDataAccess)
     EXPORT unsigned1 glb := glb_purpose_value;
     EXPORT unsigned1 dppa := dppa_purpose_value;
     EXPORT string DataRestrictionMask := fixed_DRM;
@@ -44,22 +46,22 @@ import didville, suppress, doxie, dx_header, DeathV2_Services, AutoStandardI, SS
 
 os(string i) := if (i='','',trim(i)+' ');
 #uniquename(deathparams)
-%deathparams% := DeathV2_Services.IParam.GetRestrictions(mod_access);
+%deathparams% := DeathV2_Services.IParam.GetRestrictions(%mod_access%);
 // Bug: 53541. For some of the services we want to use the _nonblank data (so we return the maximum 
 // number of first/last names). At the time of this change, the watchdog marketing data 
 // does not have a nonblank variant.
 
 // relevant flags for best records permissions
 #uniquename(pre_glb_flag)
-%pre_glb_flag% := mod_access.isPreGLBRestricted();
+%pre_glb_flag% := %mod_access%.isPreGLBRestricted();
 #uniquename(cnsmr_flag)
 %cnsmr_flag% := false;
 #uniquename(utility_flag)
-%utility_flag% := mod_access.isUtility();
+%utility_flag% := %mod_access%.isUtility();
 #uniquename(filter_exp)
-%filter_exp% := mod_access.isECHRestricted();
+%filter_exp% := %mod_access%.isECHRestricted();
 #uniquename(filter_eq)
-%filter_eq% := mod_access.isEQCHRestricted();
+%filter_eq% := %mod_access%.isEQCHRestricted();
 
 // get appropriate best_records permission flag
 #uniquename(perm_flag)
@@ -296,7 +298,7 @@ typeof(infile) strip_minors(infile le, index_minors_hash re) := transform
 
   outfile_ := if (stringlib.stringfind(supply,'MAX_SSN',1) = 0,outfile1,mid3);
 	
-	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(mod_access
+	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(%mod_access%
 																														 ,suppress_and_mask_:=FALSE); //since suppression and masking is done below
 																										
 	//we hit the BestSSN key to get the 'best ssn' - this will return the same SSN 'most' of the time
@@ -305,9 +307,9 @@ typeof(infile) strip_minors(infile le, index_minors_hash re) := transform
   outfile_2 := if(GetSSNBest, with_bestSSNs, outfile_);
 	
 	//**** Pull by DID and by both SSN fields
-	Suppress.MAC_Suppress(outfile_2,outfile_pulled_DID,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
-	Suppress.MAC_Suppress(outfile_pulled_DID,outfile_pulled_SSN,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn);
-	Suppress.MAC_Suppress(outfile_pulled_SSN,outfile_pulled_MAX,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,max_ssn);
+	Suppress.MAC_Suppress(outfile_2,outfile_pulled_DID,%mod_access%.application_type,Suppress.Constants.LinkTypes.DID,did);
+	Suppress.MAC_Suppress(outfile_pulled_DID,outfile_pulled_SSN,%mod_access%.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn);
+	Suppress.MAC_Suppress(outfile_pulled_SSN,outfile_pulled_MAX,%mod_access%.application_type,Suppress.Constants.LinkTypes.SSN,max_ssn);
 
 	//**** Mask
 	suppress.MAC_Mask(outfile_pulled_MAX,	outfile_masked,	best_ssn,	nodl,true,false);
