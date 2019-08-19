@@ -20,7 +20,7 @@
 /*--INFO-- This service returns dids based upon a set of personal data.*/
 export Did_Batch_Service_Raw := macro
 
-import AutoStandardI, ut;
+import AutoStandardI, STD, doxie, DidVille;
 	
 #WEBSERVICE(FIELDS('AllowAll',
 									 'Appends',
@@ -56,34 +56,23 @@ string120 fuzzy_l 								:= '' 		: stored('Fuzzies');
 boolean   dedup_results_l 				:= true 	: stored('Deduped');
 string3   thresh_val 							:= '' 		: stored('AppendThreshold');
 boolean   GLB_data 								:= false	: stored('GLBData');
-unsigned1 glb_purpose_value 			:= AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
 
 boolean   patriotproc 						:= false 	: stored('PatriotProcess');
-boolean include_minors 						:= false 	: stored('IncludeMinors');
 unsigned1 soap_xadl_version_value := 0 			: stored('xADLVersion');		
 unsigned8 MaxResultsPerAcct 			:= 1 			: stored('Max_Results_Per_Acct');	
 boolean IncludeRanking						:= false 	: stored('IncludeRanking');
 
-appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
-params_mod := module(AutoStandardI.PermissionI_Tools.params)
-	export boolean 	 AllowAll 					 := false;
-	export boolean 	 AllowGLB     			 := false;
-	export boolean 	 AllowDPPA 					 := false;
-	export unsigned1 DPPAPurpose         := 0;
-	export unsigned1 GLBPurpose 				 := glb_purpose_value;
-	export boolean   IncludeMinors       := include_minors;
-END;
-
-GLB := AutoStandardI.PermissionI_Tools.val(params_mod).glb.ok(glb_purpose_value) OR GLB_data;
+GLB_flag := mod_access.isValidGlb() OR GLB_data;
 dedup_results := dedup_results_l;// IN ['on','1'];
-appends := stringlib.stringtouppercase(append_l);
-verify := stringlib.stringtouppercase(verify_l);
+appends := STD.Str.ToUpperCase(append_l);
+verify := STD.Str.ToUpperCase(verify_l);
 thresh_num := (unsigned2)thresh_val;
-fuzzy := stringlib.stringtouppercase(fuzzy_l);
+fuzzy := STD.Str.ToUpperCase(fuzzy_l);
 
-hhidplus := stringlib.stringfind(appends,'HHID_PLUS',1)<>0;
-edabest := stringlib.stringfind(appends,'BEST_EDA',1)<>0;
+hhidplus := STD.Str.Find(appends,'HHID_PLUS',1)<>0;
+edabest := STD.Str.Find(appends,'BEST_EDA',1)<>0;
 
 in_format := DidVille.Layout_Did_InBatchRaw;
 
@@ -97,7 +86,7 @@ DidVille.Layout_Did_OutBatch into(f l) := transform
  self.lname := l.name_last;
  self.suffix := l.name_suffix;
  self.addr_suffix := l.suffix;
- self.ssn := stringlib.stringfilter(l.ssn,'0123456789');
+ self.ssn := STD.Str.Filter(l.ssn,'0123456789');
  self.did := (unsigned)l.did;
  self := l;
  end;
@@ -110,16 +99,15 @@ recs := project(f,into(left));
 UseNonBlankKey := TRUE;
 inLimit :=if(MaxResultsPerAcct > 5,5,MaxResultsPerAcct);
 
-IndustryClass := ut.IndustryClass.Get();
 ds_res_best := didville.did_service_common_function(recs, appends, verify, fuzzy, dedup_results,  
-																										thresh_num, GLB, patriotproc, false, false, 
-																										hhidplus, edabest, params_mod.GLBPurpose, 
-																										include_minors,,UseNonBlankKey,appType,
+																										thresh_num, GLB_flag, patriotproc, false, false, 
+																										hhidplus, edabest, mod_access.glb, 
+																										mod_access.show_minors,,UseNonBlankKey,mod_access.application_type,
 																										soap_xadl_version_value,inLimit,
-																										IndustryClass_val := IndustryClass); 
+																										IndustryClass_val := mod_access.industry_class); 
 				
 
-ds_res_ranked := Didville.fn_GetRankedAddress(UNGROUP(ds_res_best), params_mod);
+ds_res_ranked := Didville.fn_GetRankedAddress(UNGROUP(ds_res_best), mod_access);
 
 res := IF(IncludeRanking, GROUP(SORT(ds_res_ranked, seq, -score), seq), SORT(ds_res_best, seq, -score));
 
