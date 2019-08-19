@@ -46,7 +46,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		ds_VerificationInfo := BusinessInstantID20_Services.fn_GetVerificationInfo(ds_CleanedInput, ds_BusinessHeaderRecs, ds_Shell_Results, Options);
 		
 		// 8. Get Firmographics info.
-		ds_FirmographicsInfo := BusinessInstantID20_Services.fn_GetFirmographics(ds_CleanedInput, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet);
+		ds_FirmographicsInfo := BusinessInstantID20_Services.fn_GetFirmographics(ds_CleanedInput, ds_BIPIDsFound, Options, AllowedSourcesSet);
 		
 		// 9. Get Parent company info.
 		ds_ParentInfo := BusinessInstantID20_Services.fn_getParentInfo(ds_CleanedInput, ds_BusinessHeaderRecs, Options, linkingOptions);
