@@ -1,9 +1,9 @@
-IMPORT Address, Address_Rank, AutoStandardI, Didville, Patriot;
+IMPORT doxie, Address, Address_Rank, Didville, Patriot;
 
 EXPORT fn_GetRankedAddress(DATASET(DidVille.Layout_Did_OutBatch) batch_in,
-													 AutoStandardI.PermissionI_Tools.params in_mod) := FUNCTION
+													 doxie.IDataAccess in_mod) := FUNCTION
 
-	address_batch_params := MODULE(PROJECT(in_mod, Address_Rank.IParams.BatchParams, opt))
+	address_batch_params := MODULE(PROJECT(in_mod, Address_Rank.IParams.BatchParams, OPT))
 			EXPORT BOOLEAN IncludeShortTermRental := FALSE;
 			EXPORT BOOLEAN getDids							  := FALSE;
 	END;

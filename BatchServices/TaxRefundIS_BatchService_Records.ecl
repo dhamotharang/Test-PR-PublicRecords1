@@ -39,12 +39,7 @@ EXPORT TaxRefundIS_BatchService_Records(DATASET(in_rec) indata , BatchServices.T
 
 	/*--- Take Input through ADL_Best -> DidVille.Did_Batch_Service_Raw ---*/
 	w_bestSsn_res := BatchServices.TaxRefundIS_BatchService_Functions.getBestSSNInfo(clean_batch, 
-																																									 args.glb, 
-																																									 args.dppa, 
-																																									 args.append_l, 
-																																									 args.application_type,
-																																									 args.industry_class,
-																																									 args.verify_l);
+																																									 args);
 	         
 	/*--- Run CIID process ---*/
   w_ciid_res := BatchServices.TaxRefundIS_BatchService_Functions.getIIDRecords(clean_batch,,
