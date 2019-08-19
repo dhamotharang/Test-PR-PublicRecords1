@@ -63,8 +63,8 @@
 */
 /*--INFO-- This Service is an interface into the Business InstantID. */
 
-import address, doxie, risk_indicators, models, riskwise, Risk_Reporting, suppress, ut, iesp, AutoStandardI, OFAC_XG5,
-       Inquiry_AccLogs, Risk_Reporting;
+IMPORT risk_indicators, models, riskwise, Risk_Reporting, suppress, ut, iesp, OFAC_XG5,
+       Inquiry_AccLogs, Risk_Reporting, STD;
 
 export InstantID_Service() := macro
 
@@ -135,7 +135,11 @@ export InstantID_Service() := macro
 	'AttributesVersionRequest',
 	'WatchList',
 	'IncludeAllRiskIndicators',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -195,11 +199,11 @@ boolean	ExcludeWatchLists  := false   : stored('ExcludeWatchLists');
 set_validOFACVersions := Risk_Indicators.iid_constants.set_validOFACVersions; 
 unsigned1 OFAC_version_Null := 0 			: stored('OFACversion');
 unsigned1 OFAC_version_temp := if(OFAC_version_Null NOT IN set_validOFACVersions, 1, OFAC_version_Null);
-	OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
+	OFAC_version := if(trim(STD.Str.toLowerCase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean Include_Ofac := FALSE: stored('IncludeOfac');
 real global_watchlist_threshold_temp := 0 			: stored('GlobalWatchlistThreshold');
-	global_watchlist_threshold := Map( trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0  => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL ,
+	global_watchlist_threshold := Map( trim(STD.Str.toLowerCase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0  => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL ,
 																		OFAC_version >= 4	and global_watchlist_threshold_temp = 0																											=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
 																		OFAC_version < 4  and global_watchlist_threshold_temp = 0 																										=> OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
 																		global_watchlist_threshold_temp);
@@ -212,7 +216,7 @@ string DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 string10 exactMatchlevel := risk_indicators.iid_constants.default_ExactMatchLevel;
 STRING AttributesVersionRequest := '' : STORED('AttributesVersionRequest');
-IncludeRepAttributes := StringLib.StringToUpperCase(AttributesVersionRequest) IN ['BIIDATTRIBUTESV1'];
+IncludeRepAttributes := STD.Str.toUpperCase(AttributesVersionRequest) IN ['BIIDATTRIBUTESV1'];
 dob_radius_use := if(use_dob_filter,dob_radius,-1);
 
 gateways_in := Gateway.Configuration.Get();
@@ -232,8 +236,8 @@ boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeDLverification := false : stored('IncludeDLverification');
 unsigned1 AppendBest := 1;	// search best file
 
-in_city_name := stringlib.stringtouppercase(city);
-in_st		 := stringlib.stringtouppercase(state);
+in_city_name := STD.Str.toUpperCase(city);
+in_st		 := STD.Str.toUpperCase(state);
 in_z5		 := zip;
 
 
@@ -252,7 +256,12 @@ gateways := project(gateways_in, gw_switch(left));
 String10 ESP_version_temp := '1.000000' : STORED('_espclientinterfaceversion');
 Real ESP_version := (REAL)ESP_version_temp;
 
-
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
 OFAC_version_from_ESP :=
   MAP(
     ESP_version < 1.039 => 1, 
@@ -317,8 +326,8 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.Account := seqnum;
 	self.bdid	:= (integer)bdid;
 	self.score := 0;
-	self.company_name := stringlib.stringtouppercase(company_name);
-	self.alt_company_name := stringlib.stringtouppercase(alt_co_name);
+	self.company_name := STD.Str.toUpperCase(company_name);
+	self.alt_company_name := STD.Str.toUpperCase(alt_co_name);
 	self.prim_range := clean_bus_addr[1..10];
 	self.predir	 := clean_bus_addr[11..12];
 	self.prim_name	 := clean_bus_addr[13..40];
@@ -345,11 +354,11 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.fein		 := fein;
 	self.phone10    := busphone;
 	self.ip_addr	 := bus_ip;
-	self.rep_fname	 := stringlib.stringtouppercase(rep_fname);
-	self.rep_mname  := stringlib.stringtouppercase(rep_mname);
-	self.rep_lname  := stringlib.stringtouppercase(rep_lname);
-	self.rep_name_suffix := stringlib.stringtouppercase(rep_name_suffix);
-	self.rep_alt_Lname := stringlib.stringtouppercase(rep_alt_lname);
+	self.rep_fname	 := STD.Str.toUpperCase(rep_fname);
+	self.rep_mname  := STD.Str.toUpperCase(rep_mname);
+	self.rep_lname  := STD.Str.toUpperCase(rep_lname);
+	self.rep_name_suffix := STD.Str.toUpperCase(rep_name_suffix);
+	self.rep_alt_Lname := STD.Str.toUpperCase(rep_alt_lname);
 	self.rep_prim_range := clean_rep_addr[1..10];
 	self.rep_predir	:= clean_rep_addr[11..12];
 	self.rep_prim_name	:= clean_rep_addr[13..40];
@@ -360,8 +369,8 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.rep_p_city_name := clean_rep_addr[65..89];
 	self.rep_st		:= clean_rep_addr[115..116];
 	self.rep_z5		:= clean_rep_addr[117..121];
-	self.rep_orig_city 	:= stringlib.stringtouppercase(rep_city);
-	self.rep_orig_st	:=  stringlib.stringtouppercase(rep_state);
+	self.rep_orig_city 	:= STD.Str.toUpperCase(rep_city);
+	self.rep_orig_st	:=  STD.Str.toUpperCase(rep_state);
 	self.rep_orig_z5	:=  rep_zip;
 	self.rep_zip4		:= clean_rep_addr[122..125];
 	self.rep_lat		:= clean_rep_addr[146..155];
@@ -374,11 +383,11 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.rep_dob		:= rep_dob;
 	self.rep_phone		:= rep_phone;
 	self.rep_age 		:= (string)rep_age;
-	dl_num := stringlib.stringFilterOut(rep_dl_num,'-');
-	dl_num2 := stringlib.stringFilterOut(dl_num,' ');
-	self.rep_dl_num	:= stringlib.stringtouppercase(dl_num2);
-	self.rep_dl_state	:= stringlib.stringtouppercase(rep_dl_state);
-	self.rep_email		:= stringlib.stringtouppercase(rep_email);
+	dl_num := STD.Str.FilterOut(rep_dl_num,'-');
+	dl_num2 := STD.Str.FilterOut(dl_num,' ');
+	self.rep_dl_num	:= STD.Str.toUpperCase(dl_num2);
+	self.rep_dl_state	:= STD.Str.toUpperCase(rep_dl_state);
+	self.rep_email		:= STD.Str.toUpperCase(rep_email);
 end;
 
 df2 := project(df,into_input(LEFT));
@@ -392,7 +401,8 @@ outf := business_risk.InstantID_Function(df2, gateways, if (bdid = '', false, tr
 							ExcludeWatchLists_from_ESP,ofac_only_from_ESP,OFAC_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,Global_WatchList_Threshold,
 							dob_radius_use,IsPOBoxCompliant,bsVersion,exactMatchLevel, DataRestriction, 
 							IncludeMSoverride, IncludeDLverification, watchlists_request, AppendBest, IncludeRepAttributes, IncludeAllRC,
-							DataPermission);
+							DataPermission, LexIdSourceOptout := LexIdSourceOptout, 
+                            TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 				
 ret_btest_seed_pre := business_risk.InstantID_Test_Function(Test_Data_Table_Name,rep_fname,rep_lname,FEIN,zip,busphone,company_name, seqnum);
 
@@ -504,10 +514,10 @@ r into_final(outf L) := transform
 	self.UnreleasedLienCount := intformat(L.unreleasedLienCount,4,0);
 	self.ReleasedLienCount  := intformat(L.releasedLienCount,4, 0);
 	self.TotalBKCount	:= (string)L.bankruptcy_Count;
-	self.addr1 := addr;//address.Addr1FromComponents(L.prim_range, L.predir, L.prim_name, L.addr_suffix, L.postdir, L.unit_desig, L.sec_range);
+	self.addr1 := addr;
 	// flip around address pieces
-	self.p_city_name := stringlib.stringtouppercase(city);
-	self.st		 := stringlib.stringtouppercase(state);
+	self.p_city_name := STD.Str.toUpperCase(city);
+	self.st		 := STD.Str.toUpperCase(state);
 	self.z5		 := zip;	
 	
 	//self.p_city_name := city;
@@ -515,7 +525,7 @@ r into_final(outf L) := transform
 	//self.z5 := zip;
 	
 	self.zip4 := '';
-	self.rep_addr1 := rep_addr; //address.Addr1FromComponents(L.rep_prim_range, L.rep_predir, L.rep_prim_name, L.rep_addr_suffix, L.rep_postdir, L.rep_unit_desig, L.rep_sec_range);
+	self.rep_addr1 := rep_addr;
 	self.rep_p_city_name := rep_city;
 	self.rep_st := rep_state;
 	self.rep_z5 := rep_zip;
@@ -663,10 +673,10 @@ risk_indicators.layout_input into_rep(df l) := transform
 	self.phone10 := hphone_val;
 	self.wphone10 := wphone_val;
 	
-	self.fname := stringlib.stringtouppercase(Rep_fName);
-	self.mname := stringlib.stringtouppercase(Rep_MName);
-	self.lname := stringlib.stringtouppercase(Rep_LName);
-	self.suffix := stringlib.stringtouppercase(Rep_Name_Suffix);
+	self.fname := STD.Str.toUpperCase(Rep_fName);
+	self.mname := STD.Str.toUpperCase(Rep_MName);
+	self.lname := STD.Str.toUpperCase(Rep_LName);
+	self.suffix := STD.Str.toUpperCase(Rep_Name_Suffix);
 	
 	SELF.in_streetAddress := Rep_Addr;
 	SELF.in_city := Rep_City;
@@ -695,18 +705,18 @@ risk_indicators.layout_input into_rep(df l) := transform
 	
 	self.country := '';
 	
-	SELF.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	SELF.dl_state := stringlib.stringtouppercase(Rep_DL_State);
+	SELF.dl_number := STD.Str.toUpperCase(dl_num_clean);
+	SELF.dl_state := STD.Str.toUpperCase(Rep_DL_State);
 	
 	SELF.email_address := Rep_Email;
 	SELF.ip_address := Bus_IP;
 	
-	SELF.employer_name := stringlib.stringtouppercase(Company_Name);
-	SELF.lname_prev := stringlib.stringtouppercase(alt_Co_Name);
+	SELF.employer_name := STD.Str.toUpperCase(Company_Name);
+	SELF.lname_prev := STD.Str.toUpperCase(alt_Co_Name);
 end;
 rep_input := PROJECT(df,into_rep(LEFT));
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.toLowerCase(tribCode_value);
 
 // To avoid running risk_indicators.InstantID_Function( ) unnecessarily in business_risk.BIDO_Function
 // --which has caused performance issues--blank out the search criteria unless tribcode = '2x42'.
