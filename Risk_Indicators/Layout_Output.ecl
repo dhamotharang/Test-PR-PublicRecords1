@@ -793,6 +793,7 @@ export Layout_Output := RECORD
 	integer ssnLookupFlag := 0;
 	string120 errMsg := '';
 	risk_indicators.Layout_ConsumerFlags						ConsumerFlags;
+  risk_indicators.layouts.layout_threatmetrix_shell_internal_results ThreatMetrix;
 	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 
 END;

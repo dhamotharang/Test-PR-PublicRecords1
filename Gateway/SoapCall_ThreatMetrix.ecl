@@ -20,6 +20,9 @@ ThreatMetrix.gateway_trustdefender.t_TrustDefenderRequest into_in(inf L) := tran
 	self.Options.Policy := TRIM(L.Options.Policy);
 	self.Options.ApiType := TRIM(L.Options.ApiType);
 	self.Options.serviceType := TRIM(L.Options.serviceType);
+  self.Options.EventType := TRIM(L.Options.EventType);
+  self.Options.NoPIIPersistence := L.Options.NoPIIPersistence;
+  self.Options.DigitalIdReadOnly := L.Options.DigitalIdReadOnly;
 	self := L;
 end;
 
