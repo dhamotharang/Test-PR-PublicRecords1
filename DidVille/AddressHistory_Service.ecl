@@ -56,11 +56,11 @@ string10 prange_value := ''    : stored('primrange');
 string10 sec_range_value := '' : stored('secrange');
 string30 pname_value := ''     : stored('primname');
 string120 name_value := ''     : stored('Name');
-boolean GLB := false           : stored('UseGLBData');
-boolean DPPA := false          : stored('UseDPPAData');
+boolean GLB_Ok := false           : stored('UseGLBData');
+boolean DPPA_Ok := false          : stored('UseDPPAData');
 unsigned4 maxrecordstoreturn   := 0 : stored('MaxRecordsToReturn');
 boolean bestaddress_input := false   : stored('BestAddress');
-appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
 
 rec := record
@@ -99,7 +99,7 @@ self.zip4        := clean_a2[122..125];
 precs := project(d,into(left));
 
 //Call this common code instead of duplicating code for Service and Batch_Service
-Result := didville.AddressHistory_Common(precs, glb, dppa, maxrecordstoreturn, bestaddress_input, appType); 
+Result := didville.AddressHistory_Common(precs, mod_access, glb_Ok, dppa_Ok, maxrecordstoreturn, bestaddress_input); 
 
 output(Result, named('Result'));
 
