@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Health Care Attributes Service">
 	<part name="HealthCareAttributesRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
@@ -74,7 +74,7 @@
 </pre>
 */
 
-IMPORT Address, Risk_Indicators, Models, RiskWise, ut, dma, doxie, iesp, gateway;
+IMPORT Address, Risk_Indicators, Models, ut, iesp, gateway, STD;
 	
 EXPORT HealthCare_Attributes_Service := MACRO
 /* ***************************************
@@ -125,7 +125,7 @@ EXPORT HealthCare_Attributes_Service := MACRO
    *************************************** */
 	 
 	unsigned1 attributesVersion := map(
-		StringLib.StringToLowerCase(option.AttributesVersionRequest[1..15]) = 'healthcareattrv' => (unsigned1)option.AttributesVersionRequest[16..],
+		STD.Str.ToLowerCase(option.AttributesVersionRequest[1..15]) = 'healthcareattrv' => (unsigned1)option.AttributesVersionRequest[16..],
 		(unsigned1)option.AttributesVersionRequest
 	);
 	 
@@ -145,6 +145,12 @@ EXPORT HealthCare_Attributes_Service := MACRO
   STRING20 	AccountNumber 		:= users.AccountNumber;
 	BOOLEAN 	TestDataEnabled 	:= users.TestDataEnabled;  //*** kwh - how does these 'Testdata' fields get populated...they are not on input?
 	STRING32 	TestDataTableName := users.TestDataTableName;
+  
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 	
 	// Sequence - This is hidden from the ESP to be used by the ECL Developers for testing purposes
 	STRING30 Seq := IF((integer)AccountNumber = 0, '1', (string)(integer)AccountNumber);
@@ -158,19 +164,18 @@ EXPORT HealthCare_Attributes_Service := MACRO
 	/* ***************************************
 	 *           Package Input:            *
    *************************************** */
-	emptyRecord := ut.ds_oneRecord;
-
-	Models.layouts.Layout_HealthCare_Attributes_In intoInput(emptyRecord le) := TRANSFORM
-		SELF.Seq 						:= Seq;
-		SELF.FirstName 			:= StringLib.StringToUpperCase(NameFirst);
-		SELF.MiddleName 		:= StringLib.StringToUpperCase(NameMiddle);
-		SELF.LastName 			:= StringLib.StringToUpperCase(NameLast);
-		SELF.SuffixName 		:= StringLib.StringToUpperCase(NameSuffix);
-		SELF.streetAddr   	:= StringLib.StringToUpperCase(streetAddr);
-		SELF.City         	:= StringLib.StringToUpperCase(City);
-		SELF.State        	:= StringLib.StringToUpperCase(State);
+   
+    packagedInput := DATASET([TRANSFORM(Models.layouts.Layout_HealthCare_Attributes_In,
+        SELF.Seq 						:= Seq;
+		SELF.FirstName 			:= STD.Str.ToUpperCase(NameFirst);
+		SELF.MiddleName 		:= STD.Str.ToUpperCase(NameMiddle);
+		SELF.LastName 			:= STD.Str.ToUpperCase(NameLast);
+		SELF.SuffixName 		:= STD.Str.ToUpperCase(NameSuffix);
+		SELF.streetAddr   	:= STD.Str.ToUpperCase(streetAddr);
+		SELF.City         	:= STD.Str.ToUpperCase(City);
+		SELF.State        	:= STD.Str.ToUpperCase(State);
 		SELF.Zip          	:= Zip;
-		SELF.County        	:= StringLib.StringToUpperCase(County);
+		SELF.County        	:= STD.Str.ToUpperCase(County);
 		SELF.HomePhone 			:= HomePhone;
 		SELF.WorkPhone 			:= WorkPhone;
 		SELF.DateOfBirth 		:= DateOfBirth;
@@ -178,22 +183,16 @@ EXPORT HealthCare_Attributes_Service := MACRO
 		SELF.AccountNumber 	:= AccountNumber;
 		self.DID 						:= (unsigned)search.UniqueId;
 		SELF.HistoryDate 		:= historydate;
-		SELF 								:= [];
-	END;
-
-	packagedInput := PROJECT(emptyRecord, intoInput(LEFT));
-
-	Risk_Indicators.Layout_Input intoLayoutInput(emptyRecord le) := TRANSFORM
-		SELF.seq := (INTEGER)Seq;
-		SELF.fname := StringLib.StringToUpperCase(NameFirst);
-		SELF.lname := StringLib.StringToUpperCase(NameLast);
+		SELF 								:= [])] );
+  
+    packagedTestseedInput := DATASET([TRANSFORM(Risk_Indicators.Layout_Input,
+        SELF.seq := (INTEGER)Seq;
+		SELF.fname := STD.Str.ToUpperCase(NameFirst);
+		SELF.lname := STD.Str.ToUpperCase(NameLast);
 		SELF.ssn := SSN;
 		SELF.in_zipCode := Zip;
 		SELF.phone10 := homephone;
-		SELF := [];
-	END;
-
-	packagedTestseedInput := PROJECT(emptyRecord, intoLayoutInput(LEFT));	
+		SELF := [])] );
 	
 /* ***************************************
 	 *      Gather Attributes/Scores:      *
@@ -201,7 +200,11 @@ EXPORT HealthCare_Attributes_Service := MACRO
 	 
 	FunctionResults := IF(TestDataEnabled, 
 		Models.HealthCare_Attributes_TestSeed_Function(packagedTestseedInput, TestDataTableName),	// TestSeed Values  
-		Models.HealthCare_Attributes_Search_Function(packagedInput, GLBPurpose, DPPAPurpose, DataRestriction, DataPermission) // Realtime Values
+		Models.HealthCare_Attributes_Search_Function(packagedInput, GLBPurpose, DPPAPurpose, DataRestriction, DataPermission, 
+    LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, 
+    BatchUID := BatchUID, 
+    GlobalCompanyID := GlobalCompanyID) // Realtime Values
 	);	 
 	 
 /* ***************************************

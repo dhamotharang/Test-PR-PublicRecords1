@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProspectSurvival_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -38,7 +38,7 @@
 </pre>
 */
 
-import address, risk_indicators, models, riskwise, ut, dma, doxie, gateway;
+import address, risk_indicators, models, riskwise, ut, gateway, STD;
 
 
 export ProspectSurvival_Batch_Service := MACRO
@@ -55,7 +55,7 @@ unsigned1 dppa := 0 		: stored('DPPAPurpose');
 unsigned1 glb := RiskWise.permittedUse.GLBA : stored('GLBPurpose');
 unsigned1 version := 1      : stored('Version');
 string ModelName_in := '' : stored('ModelName');
-model_name := StringLib.StringToLowerCase( modelname_in );
+model_name := STD.Str.ToLowerCase( modelname_in );
 string5   industry_class_val := '';
 boolean   isUtility := false;
 boolean   ofac_Only := false;
@@ -78,6 +78,12 @@ batchinseq := project(batchin, into_seq(left,counter));
 
 unsigned3 history_date := 999999 		: stored('HistoryDateYYYYMM');
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+
 Risk_Indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.did 		:= le.LexId;
 	self.score := if(le.lexid<>0, 100, 0);  // hard code the DID score to 100 if DID is passed in on input
@@ -89,7 +95,7 @@ Risk_Indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.seq := le.seq;	
 	self.ssn := IF(le.ssn='000000000','',le.ssn);	// blank out social if it is all 0's
 	self.dob := dob_val;
-	self.age := if ((integer)dob_val != 0,(STRING3)ut.GetAgeI((integer)dob_val), '');
+	self.age := if ((integer)dob_val != 0,(STRING3)ut.Age((integer)dob_val), '');
 	
 	self.phone10 := le.Home_Phone;
 	self.wphone10 := le.Work_Phone;
@@ -97,11 +103,11 @@ Risk_Indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 	
-	self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-	self.lname := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-	self.mname := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-	self.suffix := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
-	self.title := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
+	self.fname := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+	self.lname := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+	self.mname := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+	self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+	self.title := STD.Str.touppercase(if(valid_cleaned, cleaned_name[1..5],''));
 
 	street_address := le.street_addr;
 	clean_addr := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
@@ -129,8 +135,8 @@ Risk_Indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.county := Address.CleanFields(clean_addr).county[3..5]; // we only want the county fips, not all 5.  first 2 are the state fips
 	self.geo_blk := Address.CleanFields(clean_addr).geo_blk;
 	
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.dl_state);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(le.dl_state);
 	
 	self.historydate := if(le.historydateyyyymm=0, history_date, le.historydateyyyymm) ;
 	self := [];
@@ -156,11 +162,19 @@ boolean 	filter_out_fares := True;
 
 iid := risk_indicators.InstantID_Function(cleanIn, gateways, dppa, glb, isUtility, isLn, ofac_only, 
 								suppressNearDups, require2Ele, fromBIID, isFCRA, excludewatchlists, fromIT1O, 
-								in_BSversion := bsVersion,in_DataRestriction:=DataRestriction,in_DataPermission:=DataPermission);
+								in_BSversion := bsVersion,in_DataRestriction:=DataRestriction,in_DataPermission:=DataPermission,
+                                LexIdSourceOptout := LexIdSourceOptout, 
+                                TransactionID := TransactionID, 
+                                BatchUID := BatchUID, 
+                                GlobalCompanyID := GlobalCompanyID);
 
 clam := risk_indicators.Boca_Shell_Function(iid, gateways, dppa, glb, isUtility, isLn, doRelatives, doDL, 
 								doVehicle, doDerogs, bsVersion, doScore, nugen, filter_out_fares,DataRestriction:=DataRestriction, BSOptions:=bsOptions, 
-								DataPermission:=DataPermission);
+								DataPermission:=DataPermission,
+                                LexIdSourceOptout := LexIdSourceOptout, 
+                                TransactionID := TransactionID, 
+                                BatchUID := BatchUID, 
+                                GlobalCompanyID := GlobalCompanyID);
 
 LeadIntegrity := Models.get_LeadIntegrity_Attributes(clam,version);
  
