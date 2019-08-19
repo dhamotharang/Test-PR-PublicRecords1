@@ -1,6 +1,7 @@
 ﻿IMPORT _control,ut,RoxieKeyBuild,header,PromoteSupers,Data_Services,STD;
 
 EXPORT proc_quickHdr_build_all (
+	STRING overwriteFileDate = '',
 	STRING sourceIP = _control.IPAddress.bctlpedata10,
 	STRING sourcePathWeekly  = '/data/Builds/builds/quick_header/data/',
 	STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
@@ -92,8 +93,8 @@ EXPORT proc_quickHdr_build_all (
 
 	RETURN SEQUENTIAL(
 		check_superfiles_are_in_sync,
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick._config(sourceIP, sourcePathMonthly).set_v_version, 0),
-		Header.mac_runIfNotCompleted ('QuickHeader',filedate, header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date, 100),
+		header_quick._config(sourceIP, sourcePathMonthly).set_v_version,
+		header_quick._config(sourceIP, sourcePathWeekly).set_v_eq_as_of_date(overwriteFileDate),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doWeekly,200),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, doMonthly,300),
 		Header.mac_runIfNotCompleted ('QuickHeader',filedate, notify('Build_Header_Ingest', '*'),400),
