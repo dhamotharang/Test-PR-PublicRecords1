@@ -8,6 +8,7 @@ export matches_entity_name_layout := record
 	String50	Write_Time;
 	String50	Entity_Records_Error_Message;
 	String50	Entity_Records_Warning_Message;
+  String50  Input_Record_ID;
 	String50	Input_Record_Screening_List_Subset_Index;
 	String50	Input_Record_EFT_Info_ID;
 	String50	Input_Record_EFT_Info_Type;
