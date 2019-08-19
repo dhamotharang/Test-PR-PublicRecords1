@@ -295,7 +295,7 @@ ModelOptions_In := DATASET([], Models.Layouts.Layout_Model_Request_In)	: STORED(
 attributesIn := dataset([],Models.Layouts.Layout_Attributes_In)						: stored('RequestedAttributeGroups',few);
 gateways_in := Gateway.Configuration.Get();
 
-//CCPA fields
+//IF Model field is used, then we expect only 1 model. So project it into the ModelRequests format so we can use it in the validation/execution parts.
 unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
 string TransactionID := '' : stored ('_TransactionId');
 string BatchUID := '' : stored('_BatchUID');
@@ -321,7 +321,7 @@ single_model := Dataset([Transform(Models.Layouts.Layout_Model_Request_In,
 //If this model request limit changes, update the model_check and custom_field_replacement functions as well
 Model_requests := choosen(ModelOptions_In, 3);
 
-Models_to_use := IF(Model != '', single_model, ModelOptions_In);
+Models_to_use := IF(Model != '', single_model, Model_requests);
 
 Valid_requested_models := project(Models_to_use, Transform(Models.Layouts.Layout_Model_Request_In,
                                        self := Models.FP_models.Valid_request(left, attributesIn, ip_value, includeriskindices, RedFlag_version, glb_ok)));
@@ -499,6 +499,7 @@ doAttributesVersion2 := Models.FP_Models.Check_Valid_Attributes(attributesIn, at
 doAttributesVersion201 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV201]) and input_ok;	  // output version201 if requested and minimum input entered
 doAttributesVersion202 := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrV202]) and input_ok;	  // output version202 if requested and minimum input entered
 doParoAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvparo]) and input_ok;	      // output Paro attrs if requested and minimum input entered
+doTMXAttributes := Models.FP_Models.Check_Valid_Attributes(attributesIn, [Models.FraudAdvisor_Constants.attrvTMX]) and input_ok;	      // output TMX attrs if requested and minimum input entered
 
 
 //Options copied over from targets np31 model to make it work the same in FraudAdvisor
@@ -561,14 +562,13 @@ bsVersion := map(
 //=========================
 BSOptions := Models.FP_Models.Set_BSOptions(Valid_requested_models, attributesIn, input_ok, doInquiries);
 
-
-
 iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn, 
 																					ofac_only, suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists, 
 																					from_IT1O, OFACVersion, IncludeOfac, addtl_watchlists, gwThreshold, dobradius, 
 																					BSversion, in_runDLverification:=IncludeDLverification,
 																					in_DataRestriction:=DataRestriction, in_BSOptions:=BSOptions,
-																					in_LastSeenThreshold:=LastSeenThresholdIn, in_DataPermission:=DataPermission,
+                                                                                    in_LastSeenThreshold:=LastSeenThresholdIn, in_CompanyID := CompanyID,
+                                                                                    in_DataPermission:=DataPermission,
                                                                                     LexIdSourceOptout := LexIdSourceOptout, 
                                                                                     TransactionID := TransactionID, 
                                                                                     BatchUID := BatchUID, 
@@ -581,6 +581,7 @@ clam := risk_indicators.Boca_Shell_Function(iid, gateways, DPPA_Purpose, GLB_Pur
                                                                                         TransactionID := TransactionID, 
                                                                                         BatchUID := BatchUID, 
                                                                                         GlobalCompanyID := GlobalCompanyID);
+
 
 // Run Bill-to-Ship-to Shell if necessary.
 clam_BtSt := 
@@ -644,7 +645,7 @@ clam_ip := join( clam, ipdata, left.seq=right.seq,
 
 #if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 	
-    /* This is for ROUND 2 Validation ONLY */
+    // This is for ROUND 2 Validation ONLY //
  	  ModelValidationResults := Models.DI31906_0_0(iid);
  	  OUTPUT(ModelValidationResults, named('Results'));
     
@@ -728,9 +729,9 @@ layout_FDAttributesOut := RECORD, maxlength(100000)
 	riskwise.layouts.red_flags_online_layout Red_Flags;
 END;
 
-
 //Centralize the logic for getting the count for the attribute normalize's
 NormalizeCount := map( doAttributesVersion1                              => 162,
+                       doTMXAttributes                                   => 538,
                        doAttributesVersion202                            => 384,
                        doAttributesVersion201 and SuppressCompromisedDLs => 226,
                        doAttributesVersion201                            => 225,
@@ -746,13 +747,14 @@ v2_name_pairs :=  normalize(pick_attr, NormalizeCount, Models.FraudAdvisor_Trans
 v2 := project(v2_name_pairs, transform(layout_attribute, self.attribute := left));
 		
 layout_AttributeGroup formAttributes(Models.Layout_FraudAttributes le) := TRANSFORM
-	self.name := map( doAttributesVersion202 => 'Version202',
+	self.name := map( doTMXAttributes        => 'Version202_DI1',
+                    doAttributesVersion202 => 'Version202',
                     doAttributesVersion201 => 'Version201',
-										doAttributesVersion2 => 'Version2',
-										'Version1'
+										doAttributesVersion2   => 'Version2',
+										                          'Version1'
 									);
-	self.index := if(doAttributesVersion1 or doAttributesVersion2, '0', '');
-	self.Attributes := if(doAttributesVersion2, ungroup(v2), ungroup(v1));
+	self.index := if(doAttributesVersion1 or doAttributesVersion2 or doTMXAttributes, '0', '');
+	self.Attributes := if(doAttributesVersion2 or doTMXAttributes, ungroup(v2), ungroup(v1));
 END;
 
 name_pairs_IDAttributes := NORMALIZE(pick_attr, NormalizeCount, Models.FraudAdvisor_Transforms(suppressCompromisedDLs).intoIDAttributes(LEFT, COUNTER));
@@ -798,10 +800,12 @@ layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := t
 	SELF.in_zipCode2       	:= zip2_value;
 	SELF.phone102          	:= hphone2_value;
 	
-	self.AttributeGroup := MAP(doAttributesVersion1 or doAttributesVersion2 => DATASET([formAttributes(le)]),
-                            doIDAttributes                                => DATASET([form_IDAttributes(le)]),
-                            doParoAttributes                              => DATASET([form_ParoAttributes(le)]),
-                                                                             DATASET([], layout_AttributeGroup)
+	self.AttributeGroup := MAP(doAttributesVersion1 or
+                             doAttributesVersion2 or
+                             doTMXAttributes          => DATASET([formAttributes(le)]),
+                             doIDAttributes           => DATASET([form_IDAttributes(le)]),
+                             doParoAttributes         => DATASET([form_ParoAttributes(le)]),
+                                                         DATASET([], layout_AttributeGroup)
                             );
   self := [];
 END;
@@ -826,6 +830,7 @@ All_models := Project(Valid_requested_models, transform(Models.layouts.Enhanced_
                                                 EXPORT Grouped Dataset(risk_indicators.Layout_Boca_Shell) _clam := clam;
                                                 EXPORT Grouped Dataset(risk_indicators.layout_bocashell_btst_out) _clam_BtSt :=  clam_BtSt;
                                                 EXPORT Dataset(models.layouts.bs_with_ip) _clam_ip :=  clam_ip;
+                                                EXPORT Grouped Dataset(Risk_Indicators.Layout_Output) IID_ret := iid;
                                                 EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions  := left.modeloptions;
                                               END;
                                               

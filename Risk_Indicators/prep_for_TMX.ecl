@@ -1,16 +1,28 @@
 ﻿import risk_indicators, PublicRecords_KEL;
 
-EXPORT prep_for_TMX(dataset(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) cleanInput, string companyID='', string companyName='') := function
+EXPORT prep_for_TMX(dataset(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) cleanInput,
+                    string20 companyID = '',
+                    string50 companyName = '',
+                    string20 _OrgId = '',
+                    string20 _ApiKey = '',
+                    string50 _Policy = '',
+                    string50 _EventType = '',
+                    boolean _NoPIIPersistence = false,
+                    boolean _DigitalIdReadOnly = false
+                    ) := function
 
 Risk_Indicators.layouts.layout_trustdefender_in prep(cleanInput le) := transform
   self.SessionId := trim('2067933A8E61C3616767047A42C727D6'),   
-  self.OrgId := trim('ymyo6b64'),
-  self.ApiKey := trim('dc1lautzmb0s44s4'),
-  self.Policy := trim('Fraudpoint_test'),
-  self.ApiType := trim('AttributeQuery'),
-  self.serviceType := trim('session-policy'),
-  self.MerchantID := companyID;
-  self.MerchantName := companyName; 
+  self.OrgId := Trim(_OrgId);   //trim('ymyo6b64'),
+  self.ApiKey := Trim(_ApiKey); //trim('dc1lautzmb0s44s4'),
+  self.Policy := Trim(_Policy); //trim('Fraudpoint_test'),
+  self.ApiType := Trim('AttributeQuery'),
+  self.serviceType := Trim('session-policy'),
+  self.Event_Type := Trim(_EventType);
+  self.NoPIIPersistence := _NoPIIPersistence;
+  self.DigitalIdReadOnly := _DigitalIdReadOnly;
+  self.MerchantID := Trim(companyID);
+  self.MerchantName := Trim(companyName); 
                         
   self.seq := le.InputUIDAppend;
 	self.historydate := (unsigned)le.inputarchivedateclean[1..6];

@@ -19,6 +19,7 @@ FUNCTION
     self.version203 := ri.version203;
 		self.IDAttributes := ri.IDAttributes;
     self.ParoAttributes := ri.ParoAttributes;
+    self.ThreatMetrix := []; // empty for now until we rebuild the testseeds
     self.compromisedDL_hash := '';  // we don't need to log this for testseed transactions
 	END;
 	FDtest := join(inData, Seed_Files.Key_FDAttributes,keyed(right.dataset_name=Test_Data_Table_Name) and 
