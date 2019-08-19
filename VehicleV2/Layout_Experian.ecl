@@ -350,9 +350,6 @@ module
     string50 AIRBAG_FRONT_PASS_SIDE	;
     string50 AIRBAGS	;
 		unsigned8				source_rec_id := 0;	 	//Added for BIP project		
-		//Added for CCPA-103
-		unsigned4 global_sid;
-		unsigned8 record_sid;
 	end;
 	
 	export Layout_temp_VehicleV2	:=
