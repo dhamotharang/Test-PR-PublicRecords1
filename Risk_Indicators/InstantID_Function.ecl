@@ -114,7 +114,7 @@ seq_map := join( indata1, indata,
 
 	// Call Library
 	iid_results := if(in_isFCRA,	library('Risk_Indicators.LIB_InstantID_Function_FCRA', Risk_Indicators.IInstantID_Function(indata, gateways, args, watchlists_requested, DOBMatchOptions)).results,
-												library('Risk_Indicators.LIB_InstantID_Function2', Risk_Indicators.IInstantID_Function(indata, gateways, args, watchlists_requested, DOBMatchOptions)).results);
+												library('Risk_Indicators.LIB_InstantID_Function', Risk_Indicators.IInstantID_Function(indata, gateways, args, watchlists_requested, DOBMatchOptions)).results);
 #else
 	base := Risk_Indicators.iid_base_function(indata, gateways, in_dppa, in_glb, in_isUtility, in_ln_branded, 
 								in_ofac_only, in_suppressNearDups, in_require2ele, in_from_biid, in_isFCRA, in_excludewatchlists, in_from_IT1O, 
