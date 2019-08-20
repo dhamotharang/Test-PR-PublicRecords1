@@ -2,29 +2,16 @@
 // to ESP output layouts as well (some sections' implementation can be found
 // in the history of PersonReports.Addrs_Imposters_Rels_Assocs)
 
-IMPORT ut, DeathV2_Services, doxie_crs, doxie, suppress, DriversV2_Services, iesp, header, CriminalRecords_Services, FCRA, FFD, MDR;
+IMPORT $, ut, DeathV2_Services, doxie_crs, doxie, suppress, DriversV2_Services, iesp, header, CriminalRecords_Services, FCRA, FFD, MDR;
 
 EXPORT Person_records (
   dataset (doxie.layout_references) dids,
-  PersonReports.input.personal in_params = module (PersonReports.input.personal) end,
+  doxie.IDataAccess mod_access,
+  PersonReports.IParam.personal in_params = module (PersonReports.IParam.personal) end,
   boolean IsFCRA = false,
 	dataset(fcra.Layout_override_flag) ds_flags = dataset([],fcra.Layout_override_flag),
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
 ) := MODULE
-
-// Get values missing from the input from global.
-// Can't project from {input} because of different type of ssn_mask (string vs. string6);
-shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
-  EXPORT unsigned1 glb := in_params.GLBPurpose;
-  EXPORT unsigned1 dppa := in_params.DPPAPurpose;
-  EXPORT string DataPermissionMask := in_params.DataPermissionMask;
-  EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
-  EXPORT boolean ln_branded := in_params.ln_branded;
-  EXPORT string5 industry_class := in_params.industryclass;
-  EXPORT string32 application_type := in_params.applicationtype;
-  EXPORT unsigned3 date_threshold := in_params.dateVal;
-  EXPORT string ssn_mask := in_params.ssn_mask;
-END;
 
 shared input_dids_set := SET (dids, did);
 
@@ -164,16 +151,16 @@ shared address_orig := doxie.Comp_Addresses; //doxie/Layout_Comp_Addresses
 
 // some name variations are missing in the source addresses; try to append from complete residents' list
 // this may improve address-phone linking, since names can be used.
-address_expanded := Functions.Address (in_params).ExpandWithResidents (address_orig, src_residents);
+address_expanded := $.Functions.Address (in_params).ExpandWithResidents (address_orig, src_residents);
 shared src_address := if (in_params.expand_address, address_expanded, address_orig);
 
 
 // This is performance fix for the cases when no other data than address itself 
 // is required (like in eAuth); can be extended with risk indicators, etc. if needed.
 PersonReports.layouts.t_AddressTimeLine GetSubjectShortAddress (doxie.Layout_Comp_Addresses L) := transform
-  	Self.StreetName          := L.prim_name;
-  	Self.StreetNumber        := L.prim_range;
-  	Self.StreetPreDirection  := L.predir;
+	Self.StreetName          := L.prim_name;
+	Self.StreetNumber        := L.prim_range;
+	Self.StreetPreDirection  := L.predir;
 	Self.StreetPostDirection := L.postdir;
 	Self.StreetSuffix        := L.suffix;
 	Self.UnitDesignation     := L.unit_desig;
@@ -210,7 +197,7 @@ phor := project (phor_pre, transform (phones_rec, Self.lname := Left.name_last, 
 
 // FinderReport style: verifies phones by last residents' names, among other things
 // Address-phone match is done at that point, so "extra" addresses appended (if any) from residents list can be removed.
-export addr_base := Functions.Address (in_params).AttachPhones (src_address, phor) 
+export addr_base := $.Functions.Address (in_params).AttachPhones (src_address, phor) 
   (address_seq_no != Constants.APPENDED_BY_RESIDENTS);
 // ---------- Now have addresses with phones ----------
 
@@ -224,13 +211,13 @@ shared ssn_lookups := doxie.SSN_Lookups; // doxie_crs/layout_SSN_Lookups
 // flat table of residents with SSN, death, etc. info;
 // contains DID and address sequence, which can be used for linking.
 // Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
-shared residents_base := Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, in_params);
+shared residents_base := $.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, mod_access, in_params);
 
 // ------------------------- expanded residents -------------------------
 // a serious of transformations to produce most complete identity
 // all DID-linking should be done before the rollup
 
-res_expanded := project (residents_base, Functions.ExpandIdentity (Left));
+res_expanded := project (residents_base, $.Functions.ExpandIdentity (Left));
 
 res_grouped := group (sort (res_expanded, address_seq_no), address_seq_no);
 
@@ -263,7 +250,7 @@ export residents_slim := if (~IsFCRA, rollup (res_slim_grouped, group, RollIdent
 // Thus, some of the addresses from address sequence table will not have residents yet (say, historical neighbors)
 
 // ------------------------- wide addresses -------------------------
-shared addr_wide := Functions.Address (in_params).AddResidents (addr_base, residents_wide);
+shared addr_wide := $.Functions.Address (in_params).AddResidents (addr_base, residents_wide);
 // NOTE: these addresses don't contain properties, census, etc. data;
 //       Since they are used in relatives and neighbors sections so far, it is not required. 
 //       But, if either is needed, it should be done here.
@@ -274,7 +261,7 @@ subj_addr := addr_wide (did IN input_dids_set);
 
 // Get Census info (only by request and only for subject's:
 subj_addr_census := if (in_params.include_censusdata,
-                               Functions.Address (in_params).AddCensus (subj_addr),
+                               $.Functions.Address (in_params).AddCensus (subj_addr),
                                subj_addr);
 
 // TODO: add properties, etc. here
@@ -283,7 +270,7 @@ EXPORT SubjectAddresses := if (~IsFCRA, project (x_SubjectAddresses, iesp.bpsrep
 
 
 // -------------------------------- slim --------------------------------
-shared addr_slim := Functions.Address (in_params).AddResidentsSlim (addr_base, residents_slim);
+shared addr_slim := $.Functions.Address (in_params).AddResidentsSlim (addr_base, residents_slim);
 EXPORT x_SubjectAddressesSlim := if (~IsFCRA, sort (addr_slim (did IN input_dids_set), -DateLastSeen, -DateFirstSeen, Address.Zip4, Address.StreetNumber));
 EXPORT SubjectAddressesSlim := if (~IsFCRA, project (x_SubjectAddressesSlim, iesp.bpsreport.t_BpsReportAddressSlim));
 
@@ -298,9 +285,9 @@ EXPORT SubjectAddressesSlim := if (~IsFCRA, project (x_SubjectAddressesSlim, ies
 
 // flat table of ssn records, containing imposters and subject's AKAs
 // contains DID, which can be used for linking 
-shared all_persons := Functions.GetSSNRecordsBase (src_ssn_main, src_deceased, in_params, IsFCRA);
+shared all_persons := $.Functions.GetSSNRecordsBase (src_ssn_main, src_deceased, in_params, IsFCRA);
 
-EXPORT Imposters := if(~IsFCRA,Functions.GetImposters (all_persons (did NOT IN input_dids_set), bestrecs, in_params));
+EXPORT Imposters := if(~IsFCRA,$.Functions.GetImposters (all_persons (did NOT IN input_dids_set), bestrecs, in_params));
 
 
 
@@ -318,7 +305,7 @@ EXPORT Imposters := if(~IsFCRA,Functions.GetImposters (all_persons (did NOT IN i
 // Eventually, doxie/ssn_records MUST be modified to return all persons, and all this code will be gone.
 //--------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------
-aka_best := Functions.GetSubjectBestAKA (bestrecs_ffd, src_deceased, in_params ,IsFCRA);
+aka_best := $.Functions.GetSubjectBestAKA (bestrecs_ffd, src_deceased, in_params ,IsFCRA);
 
 
 // append DL: only "best" record will have DLs, all other AKAs won't (ESP defect, actually)
@@ -370,8 +357,6 @@ src_names := doxie.Comp_Names; //did, name, ssn
 // Note that 'names_src' may contain more names than 'relative_src'
 
 // Choose the appropriate source for AKA: in some cases only best AKA is needed
-// rel_dids := dedup (sort (project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2)),
-                         // did), did);
 rel_dids := project (rel_assoc, transform (doxie.layout_references, Self.did := Left.person2));
 best_akas := doxie.best_records (rel_dids, IsFCRA, , , true, header.constants.checkRNA, modAccess := mod_access);
 
@@ -381,13 +366,13 @@ aka_src := if (in_params.use_bestaka_ra,
 // alternatively relative_records or relative_summary can be used, utilizing records' counts
 
 // attach SSN and death information; this is in effect AKAs
-shared relassoc_base := Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, in_params);
+shared relassoc_base := $.Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, mod_access, in_params);
 
 // ------------------------- expanded relatives/associates -------------------------
 // choose appropriate rel/assoc addresses
 relassoc_addr := addr_wide (did NOT IN input_dids_set,
                                    ~in_params.use_verified_address_ra or Verified);
-shared all_relassoc := Functions.CreateRelativesBps (rel_assoc, relassoc_base, relassoc_addr, in_params);
+shared all_relassoc := $.Functions.CreateRelativesBps (rel_assoc, relassoc_base, relassoc_addr, in_params);
 
 // TODO: verify that this sorting will work (alternatively, sort right before the output)
 
@@ -406,7 +391,7 @@ relassoc_addr_slim := addr_slim (did NOT IN input_dids_set,
 
 
 
-shared all_relassoc_slim := Functions.CreateRelativesSlim (rel_assoc, relassoc_base, relassoc_addr_slim, in_params);
+shared all_relassoc_slim := $.Functions.CreateRelativesSlim (rel_assoc, relassoc_base, relassoc_addr_slim, in_params);
 
 // TODO: verify that this sorting will work (alternatively, sort right before the output)
 EXPORT RelativesSlim := if (~IsFCRA, sort (PROJECT (all_relassoc_slim (RelativeDepth > 0), iesp.bpsreport.t_BpsReportRelativeSlim), RelativeDepth));

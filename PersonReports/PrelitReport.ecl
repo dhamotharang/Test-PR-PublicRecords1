@@ -22,14 +22,14 @@ EXPORT PrelitReport (
   ds_best := project(dids,transform(doxie.layout_best,self:=left,self:=[]));
   
   //FFD 
-  boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(param.FFDOptionsMask);
+  boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(mod_prelit.FFDOptionsMask);
   gateways := Gateway.Configuration.Get();
   
   // 1) we are using the subject DID rather than the Best DID 
   ds_dids := dataset([{FFD.Constants.SingleSearchAcctno,(unsigned)did}],FFD.Layouts.DidBatch);
   
   // 2) Call the person context    
-  pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, gateways, FFD.Constants.DataGroupSet.PrelitReport, param.FFDOptionsMask));
+  pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, gateways, FFD.Constants.DataGroupSet.PrelitReport, mod_prelit.FFDOptionsMask));
 
   // 3) Slim down the PersonContext         
   slim_pc_recs := FFD.SlimPersonContext(pc_recs);  
@@ -37,8 +37,8 @@ EXPORT PrelitReport (
   ds_flags := if (IsFCRA, FFD.GetFlagFile (ds_best, pc_recs));
 
   // person records 
-  pers := PersonReports.Person_records (dids, 
-                                        module (project (param, PersonReports.input.personal, opt)) end,
+  pers := PersonReports.Person_records (dids, mod_access,
+                                        PROJECT (mod_prelit, PersonReports.IParam.personal, OPT),
                                         IsFCRA,
                                         ds_flags, 
                                         slim_pc_recs(DataGroup = FFD.Constants.DataGroups.HDR));
@@ -69,11 +69,11 @@ EXPORT PrelitReport (
                                               PROJECT(mod_prelit, $.IParam.bankruptcy),
                                               IsFCRA, 
                                               ds_flags, 
-                                              param.non_subject_suppression, 
+                                              mod_prelit.non_subject_suppression, 
                                               slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Bankruptcy));
                                                                       
-  p_bankruptcy_v1  := if (param.bankruptcy_version = 1, choosen (bankrpt.bankruptcy, iesp.Constants.BR.MaxBankruptcies));
-  p_bankruptcy_v3  := if (param.bankruptcy_version = 3, choosen (bankrpt.bankruptcy_v3, iesp.Constants.BR.MaxBankruptcies));
+  p_bankruptcy_v1  := if (mod_prelit.bankruptcy_version = 1, choosen (bankrpt.bankruptcy, iesp.Constants.BR.MaxBankruptcies));
+  p_bankruptcy_v3  := if (mod_prelit.bankruptcy_version = 3, choosen (bankrpt.bankruptcy_v3, iesp.Constants.BR.MaxBankruptcies));
 
   p_liens := PersonReports.lienjudgment_records (dids, 
                                                 module (project (param, PersonReports.input.liens, opt)) end, 
@@ -81,8 +81,8 @@ EXPORT PrelitReport (
                                                 ds_flags, 
                                                 slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Liens));
 
-  p_liens_v1    := if (param.liensjudgments_version = 1, choosen (p_liens.liensjudgment, iesp.Constants.BR.MaxLiensJudgments));
-  p_liens_v2    := if (param.liensjudgments_version = 2, choosen (p_liens.liensjudgment_v2, iesp.Constants.BR.MaxLiensJudgments));
+  p_liens_v1    := if (mod_prelit.liensjudgments_version = 1, choosen (p_liens.liensjudgment, iesp.Constants.BR.MaxLiensJudgments));
+  p_liens_v2    := if (mod_prelit.liensjudgments_version = 2, choosen (p_liens.liensjudgment_v2, iesp.Constants.BR.MaxLiensJudgments));
 
   // asset data
   p_assessments := choosen(PersonReports.property_records(dids,
@@ -141,31 +141,31 @@ EXPORT PrelitReport (
     Self.HasCorporateAffiliation := cnt.corp.exists; 
 
     // also found
-    Self.AlsoFound := IF (param.include_alsofound, 
+    Self.AlsoFound := IF (mod_prelit.include_alsofound, 
       ROW ({exists (p_relatives), exists (p_associates), exists (p_phonesplus), exists (p_dlsr)}, iesp.prelitigationreport.t_PrelitigationReportAlsoFound));
 
-    Self.Relatives          := IF (param.include_relatives,  p_relatives);
-    Self.Associates         := IF (param.include_associates, p_associates);
-    Self.PhonesPluses       := IF (param.include_phonesplus, p_phonesplus);
+    Self.Relatives          := IF (mod_prelit.include_relatives,  p_relatives);
+    Self.Associates         := IF (mod_prelit.include_associates, p_associates);
+    Self.PhonesPluses       := IF (mod_prelit.include_phonesplus, p_phonesplus);
 
-    Self.Vehicles           := IF (param.include_motorvehicles, p_vehicles);
-    Self.UCCFilings         := IF (param.include_uccfilings, p_uccs);
-    Self.Imposters          := IF (param.include_imposters, p_imposters);
-    Self.AKAs               := IF (param.include_akas, p_akas);
-    Self.BpsReportAddresses2 := IF (param.include_bpsaddress, p_addresses);
+    Self.Vehicles           := IF (mod_prelit.include_motorvehicles, p_vehicles);
+    Self.UCCFilings         := IF (mod_prelit.include_uccfilings, p_uccs);
+    Self.Imposters          := IF (mod_prelit.include_imposters, p_imposters);
+    Self.AKAs               := IF (mod_prelit.include_akas, p_akas);
+    Self.BpsReportAddresses2 := IF (mod_prelit.include_bpsaddress, p_addresses);
 
-    Self.WaterCrafts        := IF (param.include_watercrafts, p_watercrafts);
-    Self.AssessRecords      := IF (param.include_properties, p_assessments);
-    Self.DeedRecords        := IF (param.include_properties, p_deeds);
-    Self.Bankruptcies       := IF (param.include_bankruptcy, p_bankruptcy_v1);
-    Self.Bankruptcies3      := IF (param.include_bankruptcy, p_bankruptcy_v3);
-    Self.PeopleAtWorks      := IF (param.include_peopleatwork, p_at_work);
-    Self.ProfessionalLicenses := IF (param.include_proflicenses, p_proflic);
-    Self.LiensJudgments     := IF (param.include_liensjudgments, p_liens_v1);
-    Self.LiensJudgments2    := IF (param.include_liensjudgments, p_liens_v2);
+    Self.WaterCrafts        := IF (mod_prelit.include_watercrafts, p_watercrafts);
+    Self.AssessRecords      := IF (mod_prelit.include_properties, p_assessments);
+    Self.DeedRecords        := IF (mod_prelit.include_properties, p_deeds);
+    Self.Bankruptcies       := IF (mod_prelit.include_bankruptcy, p_bankruptcy_v1);
+    Self.Bankruptcies3      := IF (mod_prelit.include_bankruptcy, p_bankruptcy_v3);
+    Self.PeopleAtWorks      := IF (mod_prelit.include_peopleatwork, p_at_work);
+    Self.ProfessionalLicenses := IF (mod_prelit.include_proflicenses, p_proflic);
+    Self.LiensJudgments     := IF (mod_prelit.include_liensjudgments, p_liens_v1);
+    Self.LiensJudgments2    := IF (mod_prelit.include_liensjudgments, p_liens_v2);
   END;
 
-  alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, param.FCRAPurpose, param.FFDOptionsMask)[1];
+  alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, mod_prelit.FCRAPurpose, mod_prelit.FFDOptionsMask)[1];
   suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 
   // is supposed to produce one row only (usebestdid = true)
@@ -173,7 +173,7 @@ EXPORT PrelitReport (
   individual := if(suppress_results_due_alerts, dataset ([], out_rec), individual_results);
 
   consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, param.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
+  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, mod_prelit.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
   FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, consumer_alerts, 
                              out_rec);
   

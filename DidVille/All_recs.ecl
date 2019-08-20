@@ -174,7 +174,7 @@ export All_recs := MODULE
 
 	tpl_raw_recs := group(sort(tpl_hdr_rl_recs + tpl_hdr_qk_recs + tpl_util_recs, rid), rid);
 
-	tpl_flt_recs := didville.fun_filter_by_best_ssn(tpl_raw_recs, f_in_triple, score_threshold_value);
+	tpl_flt_recs := didville.fun_filter_by_best_ssn(tpl_raw_recs, f_in_triple, mod_access, score_threshold_value);
 
 
 	header.MAC_GlbClean_Header(tpl_flt_recs, tpl_clean_recs, , , mod_access);
@@ -213,7 +213,7 @@ export get_dbl(dataset(didville.layout_bestInfo_batchin) f_in_double) := FUNCTIO
 
 	dbl_raw_recs := group(sort(dbl_qk_did_recs + dbl_qk_fdid_recs + dbl_util_recs, rid), rid);
 		 
-	dbl_flt_recs := didville.fun_filter_by_best_ssn(dbl_raw_recs, f_in_double, score_threshold_value);
+	dbl_flt_recs := didville.fun_filter_by_best_ssn(dbl_raw_recs, f_in_double, mod_access, score_threshold_value);
 				 
 	header.MAC_GlbClean_Header(dbl_flt_recs, dbl_clean_recs, , , mod_access);
 	dbl_best_ready := project(dbl_clean_recs, transform({dx_header.layout_header}, 
@@ -228,7 +228,7 @@ export get_sgl(dataset(didville.layout_bestInfo_batchin) f_in_single) := FUNCTIO
 
 	sgl_raw_recs := group(sort(sgl_util_recs, rid), rid);
 		 
-	sgl_flt_recs := didville.fun_filter_by_best_ssn(sgl_raw_recs, f_in_single, score_threshold_value);
+	sgl_flt_recs := didville.fun_filter_by_best_ssn(sgl_raw_recs, f_in_single, mod_access, score_threshold_value);
 
 	header.MAC_GlbClean_Header(sgl_flt_recs, sgl_clean_recs, , , mod_access);
 	sgl_ready := project(sgl_clean_recs, 

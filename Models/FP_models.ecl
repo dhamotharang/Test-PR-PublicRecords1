@@ -168,6 +168,7 @@ EXPORT FP_models := MODULE
     doAttributesVersion201 := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrV201]) and inputok;
     doAttributesVersion202 := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrV202]) and inputok;
     doParoAttributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrvparo]) and inputok;
+    doTMXAttributes := Check_Valid_Attributes(Attr_Request, [Models.FraudAdvisor_Constants.attrvTMX]) and inputok;
     
 
     turn_on_RetainInputDID       := Model_Check(ModelRequest, ['fp31604_0']) and inputok;
@@ -180,11 +181,11 @@ EXPORT FP_models := MODULE
     turn_on_IncludeHHIDSummary   := (Model_Check(ModelRequest, ['fp31604_0'])and inputok) or doAttributesVersion2 or
                                     Model_Check(ModelRequest, [Models.FraudAdvisor_Constants.ThisSet_for_BSOPTIONS,'fp1403_2','fp1510_2']);
                                     
-    turn_on_AllowInsuranceDLInfo := doAttributesVersion201 OR doAttributesVersion202;
-    turn_on_AlwaysCheckInsurance := doAttributesVersion201 OR doAttributesVersion202;
+    turn_on_AllowInsuranceDLInfo := doAttributesVersion201 OR doAttributesVersion202 OR doTMXAttributes;
+    turn_on_AlwaysCheckInsurance := doAttributesVersion201 OR doAttributesVersion202 OR doTMXAttributes;
     turn_on_IncludeInquiries     := Model_Check(ModelRequest, ['fp1403_2','fp1510_2']) and doInquiries;
     turn_on_IncludeInsNAP        := Model_Check(ModelRequest, ['fp1403_2','fp1510_2']);// and ~DisallowInsurancePhoneHeaderGateway;
-
+    turn_on_ThreatMetrix         := (Model_Check(ModelRequest, ['di31906_0']) or doTMXAttributes) and inputok;
     
     unsigned8 BSOptions := IF(turn_on_RetainInputDID, Risk_indicators.iid_constants.BSOptions.RetainInputDID, 0) +
                            IF(turn_on_IncludeDoNotMail, Risk_indicators.iid_constants.BSOptions.IncludeDoNotMail, 0) +
@@ -193,15 +194,14 @@ EXPORT FP_models := MODULE
                            IF(turn_on_AllowInsuranceDLInfo, Risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo, 0) +
                            IF(turn_on_AlwaysCheckInsurance, Risk_indicators.iid_constants.BSOptions.AlwaysCheckInsurance, 0) +
                            IF(turn_on_IncludeInquiries, Risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0) +
-                           IF(turn_on_IncludeInsNAP, Risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0);
+                           IF(turn_on_IncludeInsNAP, Risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0)+
+                           IF(turn_on_ThreatMetrix, Risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0);
     
     Return BSOptions;
   END;
 
   EXPORT Execute_model(models.FraudAdvisor_Constants.FP_model_params FP_mod) := Function
   
-  
-
     cmName      := FP_mod.ModelOptions(STD.STR.ToLowerCase(TRIM(OptionName)) = 'custom');
     model_name  := STD.STR.ToLowerCase(TRIM(cmName[1].OptionValue));
 
@@ -263,6 +263,7 @@ EXPORT FP_models := MODULE
     model_fp1710_1 := Models.FP1710_1_0( ungroup(FP_mod._clam), 6);
     model_fp1803_1 := Models.FP1803_1_0( ungroup(FP_mod._clam), 6);
     model_fp1902_1 := Models.FP1902_1_0( FP_mod._clam_ip, 6); 
+    model_di31906_0 := Models.DI31906_0_0( ungroup(FP_mod.IID_ret)); 
     
     
     //These models use the RiskIndicies from fp1109 so they are assigned to temp variables for the joins below
@@ -446,6 +447,7 @@ EXPORT FP_models := MODULE
                         'fp1803_1' => model_fp1803_1,
                         'fp1806_1' => model_fp1806_1,
                         'fp1902_1' => model_fp1902_1,
+                        'di31906_0' => model_di31906_0,
                                       DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
                        );
                      

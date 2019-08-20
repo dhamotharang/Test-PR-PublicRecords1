@@ -6,15 +6,17 @@ AddressHistory_Service and
 AddressHistory_Batch_Service
 
 */
+import address, doxie, dx_header, header, mdr, suppress, STD;
 
 export AddressHistory_Common(dataset(didville.Layout_Did_OutBatch) infile,
-                             boolean GLBin, 
-														 boolean DPPAin,
-														 unsigned4 maxrecordstoreturnIN,
-														 boolean bestaddressIN,
-														 string32 appType) := function
+									doxie.IDataAccess mod_access,
+									boolean GLB_Ok, 
+									boolean DPPA_Ok,
+									unsigned4 maxrecordstoreturnIN,
+									boolean bestaddressIN
+									) := function
 
-import AutoStandardI, address, doxie, header, mdr;
+
 
 dedup_these := false;
 appends     := 'BEST_ALL';
@@ -26,15 +28,15 @@ didville.MAC_DidAppend(infile,resu,dedup_these,fz)
 
 didville.MAC_HHid_Append(resu,appends,resu_out)
 
-resu0 := if (stringlib.stringfind(appends,'HHID_',1)=0,resu,resu_out);
+resu0 := if (STD.Str.Find(appends,'HHID_',1)=0,resu,resu_out);
 
-IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.industry_class_val.params));
+
 
 didville.MAC_BestAppend(resu0,
 											 appends,
 											 '',
 											 0,
-											 glbin,
+											 GLB_Ok,
 											 resu2,
 											 false,
 											 doxie.DataRestriction.fixed_DRM,
@@ -42,9 +44,9 @@ didville.MAC_BestAppend(resu0,
 											 ,
 											 ,
 											 ,
-											 appType,
+											 mod_access.application_type,
 											 ,
-											 IndustryClass)
+											 mod_access.industry_class);
 
 //Sort by sequence in case this is going to be the return dataset
 //resu3 := sort(resu2, seq);
@@ -73,28 +75,31 @@ AHistLayoutv2 := RECORD
 	string2     src;
 	string120   listed_name;
 	string10    listed_phone;
-	unsigned3   dt_max_seen;	
+	unsigned3   dt_max_seen;
+	unsigned4   global_sid;
+	unsigned8   record_sid;	
 END;
 
-AHistLayoutv2 AssembleHistory(res l, doxie.Key_Header r) := transform
+AHistLayoutv2 AssembleHistory(res l, dx_header.layout_key_header r) := transform
   self.addr1        := address.Addr1FromComponents(r.prim_range, r.predir, r.prim_name, r.suffix, r.postdir, r.unit_desig, r.sec_range);
-	self.dt_last_seen := MAP( ~GLBin => r.dt_nonglb_last_seen, r.dt_last_seen <> 0 => r.dt_last_seen, 0); 
+	self.dt_last_seen := MAP( ~GLB_Ok => r.dt_nonglb_last_seen, r.dt_last_seen <> 0 => r.dt_last_seen, 0); 
 	self.dt_max_seen  := 0;
 	self.seq          := l.seq;
 	self              := r;
 end; 
 
 //Retrieve History records into new new record layout
-fixed_DRM := doxie.DataRestriction.fixed_DRM;
-AHist := join(res, doxie.Key_Header, keyed(left.did = right.s_did) and
-		~Doxie.DataRestriction.isHeaderSourceRestricted(right.src,fixed_DRM),
+AHist_all := join(res, dx_header.Key_Header(), keyed(left.did = right.s_did) and
+		~doxie.compliance.isHeaderSourceRestricted(right.src, mod_access.DataRestrictionMask),
 		AssembleHistory(left, right));
+
+AHist:= Suppress.MAC_SuppressSource(AHist_all, mod_access);
 
 //output(doxie.Key_Header);
 
 //Now check for GLB and DPPA access restrictions
 AHistLayoutv2  CheckForGLB_DPPA(AHistLayoutv2 l) := transform, 
-               skip((mdr.source_is_DPPA(l.src) and DPPAin = false) or (~header.isPreGLB(l) and GLBin = false))
+               skip((mdr.source_is_DPPA(l.src) and DPPA_Ok = false) or (~header.isPreGLB(l) and GLB_Ok = false))
   self := l;  
 end;
 
@@ -164,7 +169,8 @@ AHistLayoutv2 AssembleHistory2(res l) := transform
 	self.dt_max_seen         := 0;   //Don't need max_seen for a single record
 	self.listed_name         := '';  //Ditto
 	self.listed_phone        := '';  //Ditto
-  self                     := l;	
+  	self                     := l;
+  	self:= [];	// Blanking source-related fields only
 end; 
 
 //Return Best record or multiple records

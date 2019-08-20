@@ -14,6 +14,7 @@ EXPORT attrV201 := 'fraudpointattrv201';
 EXPORT attrV202 := 'fraudpointattrv202';
 // EXPORT attrV203 := 'fraudpointattrv203';        //effectively removed, but leaving this here as a reminder
 EXPORT attrvparo := 'fraudpointattrvparo';
+EXPORT attrvTMX := 'fraudpointattrv202_diattrv1';
 
 //The ‘fraudpoint2_models’ set are models that return risk indicies and so need the expanded layout.
 EXPORT fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp1307_1', 'fp31310_2',
@@ -34,11 +35,11 @@ EXPORT Paro_models := ['msn1803_1', 'rsn804_1', 'msnrsn_1'];
 //The ‘custom_models’ set are all possible models and so add any new model name to this set.  
 //The model requested must be in this set or the query will return an “Invalid model” error. 
 EXPORT XML_custom_models := ['fp3710_0', 'fp3904_1', 'fp3905_1', 'idn6051', 'fd5609_2', 'fp3710_9', 'fp1109_0', 'fp1109_9', 'fp31203_1', 'fp31105_1',
-									'fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1', 'fp1307_2', 'fp1404_1', 'fp1407_1', 'fp1407_2', 'fp1406_1',
-									'fp1403_2',	'fp1409_2', 'fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1509_2','fp1509_1',
-									'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2',
-                  'fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1','fp1705_1','fp1801_1', 'fp1806_1',
-                             'fp1710_1', Paro_models,'fp1803_1','fp1704_1','fp1902_1'];
+                             'fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1', 'fp1307_2', 'fp1404_1', 'fp1407_1', 'fp1407_2', 'fp1406_1',
+                             'fp1403_2',	'fp1409_2', 'fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1509_2','fp1509_1',
+                             'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2',
+                             'fp1702_1','fp1706_1','fp1609_2','fp1607_1', 'fp1712_0','fp1508_1','fp1802_1','fp1705_1','fp1801_1', 'fp1806_1',
+                             'fp1710_1', Paro_models,'fp1803_1','fp1704_1','fp1902_1','di31906_0'];
 									
 									
 //Does your model have any vehicle fields (from Boca Shell).
@@ -80,12 +81,13 @@ EXPORT List_Include_RiskIndices  :=  [fraudpoint2_models, 'fp31310_2','fp1509_2'
 EXPORT List_detailed_model_description := ['ain801_1','fp31505_0','fp31505_9','fp3fdn1505_0','fp3fdn1505_9','fp1509_1','fp1510_2','fp1511_1','fp1509_2',
                                            'fp1512_1','fp31604_0','fp1610_1','fp1610_2','fp1609_1','fp1611_1','fp1606_1','fp1702_2','fp1702_1','fp1706_1',
                                            'fp1609_2','fp1607_1','fp1712_0','fp1508_1','fp1802_1','fp1705_1','fp1801_1','fp1806_1','fp1710_1','fp1803_1',
-                                           'fp1704_1','fp1902_1'];																							
+                                           'fp1704_1','fp1902_1','di31906_0'];																							
 
 EXPORT FP_model_params := INTERFACE
   EXPORT Grouped Dataset(risk_indicators.Layout_Boca_Shell) _clam := Group(Dataset([], risk_indicators.Layout_Boca_Shell), seq);
   EXPORT Grouped Dataset(risk_indicators.layout_bocashell_btst_out) _clam_BtSt :=  Group(Dataset([], risk_indicators.layout_bocashell_btst_out), bill_to_out.seq);
   EXPORT Dataset(models.layouts.bs_with_ip) _clam_ip :=  Dataset([], models.layouts.bs_with_ip);
+  EXPORT Grouped Dataset(Risk_Indicators.Layout_Output) IID_ret := Group(Dataset([], Risk_Indicators.Layout_Output), seq);
   EXPORT Dataset(Models.Layouts.Layout_Model_Options) modeloptions := Dataset([], Models.Layouts.Layout_Model_Options);
 END;
 
@@ -160,6 +162,7 @@ EXPORT getBilling_Index (STRING model_name)  := FUNCTION
               'fp1803_1'     => Risk_Indicators.BillingIndex.FP1803_1, 
               'fp1704_1'     => Risk_Indicators.BillingIndex.FP1704_1, 
               'fp1902_1'     => Risk_Indicators.BillingIndex.FP1902_1, 
+              'di31906_0'    => Risk_Indicators.BillingIndex.DI31906_0, 
 		                            ''
                );
 	    RETURN FP_BillingIndex;

@@ -1,9 +1,10 @@
 import doxie,PersonReports,AutoStandardI,iesp,ut,DeathV2_Services,doxie_crs,suppress, DriversV2_Services, header,Healthcare_Header_Services;
 
-export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData,dataset(doxie.layout_references) dsDids=dataset([],doxie.layout_references)) := MODULE
+export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData, 
+                       doxie.IDataAccess mod_access, dataset(doxie.layout_references) dsDids) := MODULE
 
   shared gmod := AutoStandardI.GlobalModule();
-	shared in_params:= MODULE(PROJECT(gmod, PersonReports.input.personal,opt)) 
+	shared in_params:= MODULE(PROJECT(gmod, PersonReports.IParam.personal, OPT)) 
 		export unsigned1 neighborhoods := inputData.NeighborhoodCount;
 		export unsigned1 historical_neighborhoods := inputData.HistoricalNeighborhoodCount;
 		export unsigned1 relative_depth := inputData.RelativeDepth;
@@ -11,22 +12,6 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 		export boolean include_relativeaddresses := inputData.IncludeRelativeAddresses;
 		export unsigned1 max_relatives_addresses  := inputData.MaxRelativeAddresses;
 		export boolean include_BlankDOD := inputData.IncludeBlankDOD; // allows to return death records with no DOD
-	END;
-
-	shared mod_access := MODULE (doxie.IDataAccess)
-    EXPORT unsigned1 glb := in_params.glbpurpose;
-    EXPORT unsigned1 dppa := in_params.dppapurpose;
-    EXPORT string DataPermissionMask := in_params.DataPermissionMask;
-    EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
-    EXPORT boolean ln_branded := in_params.ln_branded;
-    EXPORT boolean probation_override := gmod.probationoverride;
-    EXPORT string5 industry_class := in_params.industryclass;
-    EXPORT string32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(gmod,AutoStandardI.InterfaceTranslator.application_type_val.params));
-    EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gmod,AutoStandardI.InterfaceTranslator.no_scrub.params));
-		EXPORT unsigned3 date_threshold := in_params.dateVal;
-    EXPORT boolean suppress_dmv := gmod.suppressDMVInfo;
-    EXPORT string ssn_mask := in_params.ssn_mask;
-    EXPORT unsigned1 dl_mask := IF (in_params.mask_dl, 1, 0);
 	END;
 
 	//Taken from PersonReports.Person_records modified to actually work correctly
@@ -190,7 +175,7 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	// flat table of residents with SSN, death, etc. info;
 	// contains DID and address sequence, which can be used for linking.
 	// Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
-	shared residents_base := PersonReports.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, in_params);
+	shared residents_base := PersonReports.Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, mod_access, in_params);
 
 
 	// ------------------------- expanded residents -------------------------
@@ -342,7 +327,7 @@ export Person_Records (Healthcare_Header_Services.IParams.ReportParams inputData
 	// alternatively relative_records or relative_summary can be used, utilizing records' counts
 
 	// attach SSN and death information; this is in effect AKAs
-	export relassoc_base := PersonReports.Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, in_params);
+	export relassoc_base := PersonReports.Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, mod_access, in_params);
 
 
 	// ------------------------- expanded relatives/associates -------------------------

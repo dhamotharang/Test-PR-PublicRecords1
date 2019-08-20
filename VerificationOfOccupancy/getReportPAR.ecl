@@ -20,63 +20,28 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 	DPPA_OK := Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, isFCRA);
 	deathparams := MODULE(DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule()))
 		EXPORT STRING DataRestrictionMask := ^.DataRestrictionMask;  
-	END;	
+    EXPORT unsigned1 glb := GLBPurpose;
+    EXPORT unsigned1 dppa := DPPAPurpose;
+    EXPORT string ssn_mask := 'NONE'; //for use in mod_access later on.
+	END;
+  mod_access := PROJECT(deathparams, doxie.IDataAccess);
 	Experian_Permitted := DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] <> Risk_Indicators.iid_constants.sTrue;
 	TodaysDate := IF(ShellResults[1].HistoryDate = 999999, (STRING)Std.Date.Today(), ((STRING)ShellResults[1].HistoryDate)[1..6] + '01');
 									
-	// ****************************************************************
-	// *  Set SmartLinx Param Logic (PersonReports.SmartLinxReport)   *
-	// * Utilizing the default values that SmartLinx has in place.    *
-	// ****************************************************************
-	paramTemp := MODULE
-    EXPORT UNSIGNED1 glb := GLBPurpose;
-    EXPORT UNSIGNED1 dppa := DPPAPurpose;
-    EXPORT BOOLEAN ln_branded := FALSE;
-    EXPORT STRING ssn_mask := 'NONE';
-    EXPORT UNSIGNED1 score_threshold := 10;
-    EXPORT BOOLEAN legacy_verified := FALSE;
+	// **************************************************************************************
+	// * Set SmartLinx Param Logic (PersonReports.SmartLinxReport) to fetch person's data.  *
+	// * Utilizing the default values that SmartLinx and personal interfaces have in place, *
+  // * redefine only selected ones.                                                       *
+	// **************************************************************************************
+	mod_smartlinx := MODULE (PersonReports.IParam._smartlinxreport);
     EXPORT BOOLEAN include_BlankDOD := FALSE;
-		EXPORT BOOLEAN include_deceased := TRUE;
-    EXPORT BOOLEAN smart_rollup := TRUE;
-		EXPORT BOOLEAN include_sources := TRUE;
-		EXPORT UNSIGNED1 max_relatives := 100;
-    EXPORT BOOLEAN use_bestaka_ra := FALSE;
+    EXPORT BOOLEAN legacy_verified := FALSE;
 		EXPORT BOOLEAN use_bestaka_nb := FALSE;
-    EXPORT UNSIGNED1 bankruptcy_version := 2;
-		EXPORT STRING1 bk_party_type := iesp.Constants.SMART.DEBTOR;
-    EXPORT UNSIGNED1 crimrecords_version := 2;
-    EXPORT UNSIGNED1 dea_version := 2;
-    EXPORT UNSIGNED1 dl_version := 2;
-    EXPORT UNSIGNED1 liensjudgments_version := 2;
-		EXPORT STRING1 liens_party_type := iesp.Constants.SMART.DEBTOR;
-    EXPORT UNSIGNED1 phonesplus_version := 2;
-    EXPORT UNSIGNED1 proflicense_version := 2;
-    EXPORT UNSIGNED1 property_version := 2;
-    EXPORT UNSIGNED1 ucc_version := 2;
-    EXPORT UNSIGNED1 vehicles_version := 2;
-    EXPORT UNSIGNED1 voters_version := 2;
-    EXPORT BOOLEAN include_nonresidents_phones := FALSE;
-    EXPORT UNSIGNED1 neighbors_per_na := 2;
-		EXPORT BOOLEAN sort_deeds_by_ownership := TRUE;
-		EXPORT BOOLEAN AllowGraphicDescription := FALSE;
-    EXPORT BOOLEAN Include_BestAddress := FALSE;
-		EXPORT BOOLEAN IncludeAllCriminalRecords := FALSE;
-    EXPORT BOOLEAN IncludeSexualOffenses := FALSE;
 		EXPORT BOOLEAN return_AllImposterRecords := TRUE;
 		EXPORT UNSIGNED1 max_imposter_akas := 50;
-		EXPORT BOOLEAN include_proflicenses := TRUE;
-		EXPORT BOOLEAN include_providers := TRUE;  
-		EXPORT BOOLEAN include_sanctions := TRUE;
-    EXPORT BOOLEAN include_criminalindicators := FALSE;
-    EXPORT BOOLEAN include_relativeaddresses := TRUE;
-		EXPORT UNSIGNED1 neighborhoods := 1;
-    EXPORT UNSIGNED1 neighbors_per_address := 20;
-		EXPORT BOOLEAN includeHRI := TRUE; //there's no such field in the _SmartLinxReport, meant to be include_hri?
   END;
-	param := MODULE (PROJECT(paramTemp, PersonReports.IParam._SmartLinxReport, OPT)) END;
+  mod_personal := PROJECT(mod_smartlinx, PersonReports.IParam.personal);
 	
-  old_param := PersonReports.IParam.ConvertToOldSmartLinx (param);
-
 	// ****************************************************************
 	// *        Gather Best Person Data - Use SmartLinx Logic         *
 	// *             (PersonReports.SmartLinxReport)                  *
@@ -133,8 +98,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 
   //Get best rec info to pass to SSN and phones searches
   dids := project (best_rec_DOD, doxie.layout_references);
-  persMod := module (project (old_param, personreports.input.personal)) end;
-	pers := PersonReports.Person_records (dids, persMod, IsFCRA);
+	pers := PersonReports.Person_records (dids, mod_access, mod_personal, IsFCRA);
  	best_rec_esdl :=       pers.bestrecs_esdl[1]; 
 	best_rec :=            pers.bestrecs[1];
  
@@ -149,7 +113,7 @@ EXPORT getReportPAR (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Sh
 	// *         Gather SSN Metadata - Use SmartLinx Logic            *
 	// *             (PersonReports.SmartLinxReport)                  *
 	// ****************************************************************
-	ssnRawMetadata := IF(param.Smart_Rollup AND best_rec.Valid_SSN = 'G' AND isXML, SmartRollup.FN_Smart_getSSNMetadata(best_rec.DID, best_rec.SSN, best_rec.Valid_SSN, paramTemp.IncludeHRI),
+	ssnRawMetadata := IF(mod_smartlinx.Smart_Rollup AND best_rec.Valid_SSN = 'G' AND isXML, SmartRollup.FN_Smart_getSSNMetadata(best_rec.DID, best_rec.SSN, best_rec.Valid_SSN, IncludeHRI := TRUE),
 																																				DATASET([], iesp.share.t_SSNInfoEx));
 	
 	// ****************************************************************

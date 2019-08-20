@@ -22,7 +22,7 @@ export FedexNoHit := byak;
 //***** CANADA
 ck := CanadianPhones.key_fdids;
 cids := CAN_PH.Get_IDs(workhard := true, nofail := true);
-can_all := 
+export Canada := 
 	join(
 		cids,
 		ck,
@@ -33,8 +33,10 @@ can_all :=
 		),
 		keep(1)
 	);
-export Canada := Suppress.MAC_SuppressSource(can_all, mod_access, fdid);
-doxie.compliance.logSoldToSources (Canada, mod_access, fdid);
+// CanadianPhonesV1Keys and CanadianPhonesV1Keys are out of scope for CCPA phase-I, when DID field is added to these keys 
+// FDID should be changed to valid DID and Source suppression can be uncommented	
+// export Canada := Suppress.MAC_SuppressSource(can_all, mod_access, fdid);
+// doxie.compliance.logSoldToSources (Canada, mod_access, fdid);
 
 //***** GONG
 results := gong_services.Fetch_Gong_History(

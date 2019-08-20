@@ -1,10 +1,9 @@
-IMPORT BIPV2, Business_Risk_BIP, Corp2, MDR;
+﻿IMPORT BIPV2, Business_Risk_BIP, Corp2, MDR;
 
 	// The following function calculates corporate filings or Firmographics data.
 	EXPORT fn_GetFirmographics( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInput,
 	                            DATASET(BIPV2.IDlayouts.l_xlink_ids2) ds_BIPIDs,
 	                            Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
-	                            BIPV2.mod_sources.iParams linkingOptions,
 	                            SET OF STRING2 AllowedSourcesSet) := 
 		FUNCTION
 
@@ -49,12 +48,12 @@ IMPORT BIPV2, Business_Risk_BIP, Corp2, MDR;
 				SORT( 
 					ds_CorpFilings_filt,
 					seq,
-					corp_key,
-					record_type, // 'C' = Current; 'H' = Historical, so Current will be sorted to the top.
+                    -corp_key,
+                    record_type, // 'C' = Current; 'H' = Historical, so Current will be sorted to the top.
 					-(corp_ln_name_type_desc = 'LEGAL'), 
 					MIN(corp_inc_date, corp_forgn_date),
-					-corp_process_date, 
-					-dt_last_seen
+					-corp_process_date,
+                    -dt_last_seen
 				);
 
 			ds_CorpFilingsRecs := 

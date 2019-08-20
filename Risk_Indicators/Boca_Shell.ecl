@@ -226,7 +226,9 @@ unsigned8 BSOptions :=
 										 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 											0) +
 	if(RetainInputDID, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
-	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
+	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
+	if(bsVersion >= 55, risk_indicators.iid_constants.BSOptions.RunThreatMetrix, 0) ;
+
 
 
 prep := risk_indicators.InstantID_Function(iid_prep, 
@@ -299,65 +301,13 @@ adl_based_ret := risk_indicators.ADL_Based_Modeling_Function(iid_prep,
                                                                         GlobalCompanyID := GlobalCompanyID
                                                                         );
 
-final_temp := if(ADL_Based_Shell, adl_based_ret, ret);																		
-
-
-// TMX attributes are built with KEL shell 6.0 in mind, so we are going to clean the inputs the same way they are cleaning the inputs in the KEL shell prior to sending request to TMX gateway
-PublicRecords_KEL.ECL_Functions.Input_Layout_Slim into_raw_dataset(rec le) := transform  
-  SELF.InputUIDAppend := le.seq;
-	self.historydate := if(historyDateTimeStamp<>'',historyDateTimeStamp[1..6], (string)history_date);
-	self.LexID := did_value; 
-  self.account := (string)le.seq;
-	self.firstname := fname_val;
-	self.middlename := mname_val;
-	self.lastname := lname_val;
-	SELF.streetAddress := addr1_val;
-	SELF.city := city_val;
-	SELF.state := state_val;
-	SELF.zip := zip_value;
-	self.homephone := phone_value;
-	self.ssn := ssn_value;
-	self.dateofbirth := dob_value;	
-	self.WorkPhone := wphone_value;
-	SELF.dlnumber := dl_number_value;
-	SELF.dlstate := dl_state_value;
-	SELF.email := email_value;
-  self := [];
-end;
-raw_slim := PROJECT(d,into_raw_dataset(LEFT));													
-              
-// Echo input
-InputEcho := PublicRecords_KEL.ECL_Functions.Fn_InputEcho_Roxie( raw_slim );	
-
-// Clean input
-cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho );
-TMX_input := Risk_indicators.prep_for_TMX(cleanInput, 'LNRS_testMerchantName', 'LNRS_testMerchantID' ); // TODO:  when plugging TMX gateway into a product query instead of the shell, need to pass the CompanyName and CompanyID through to the gateway
-NoPIIPersistence := true;  // TODO:  when plugging TMX into a product query, set NoPIIPersistence to false.  set to TRUE in shell processing because they are not live customer transactions
-TMX_results := Risk_Indicators.getThreatMetrix(TMX_input, gateways, NoPIIPersistence);  
+final := if(ADL_Based_Shell, adl_based_ret, ret);																		
 
 // output(raw_slim, named('raw_slim'));
 // output(InputEcho, named('InputEcho'));
-// output(cleanInput, named('KEL_Shell_cleaned_input'));
 // output(iid_prep, named('iid_prep'));
-// output(TMX_input, named('TMX_input'));
-// output(TMX_results, named('TMX_results'));
 
-final55 := join(final_temp, TMX_results, left.seq=right.seq,
-  transform(risk_indicators.Layout_Boca_Shell, 
-  self.ThreatMetrix := right, 
-  // stubbing these in here.  they will need to be populated here after the TMX gateway call instead of inside getAllBocaShellModels
-  self.FD_scores.digital_insight_score := '';
-	self.FD_scores.digital_insight_reason1 := '';
-	self.FD_scores.digital_insight_reason2 := '';
-  self.FD_scores.digital_insight_reason3 := '';
-  self.FD_scores.digital_insight_reason4 := '';
-  self.FD_scores.digital_insight_reason5 := '';
-  self.FD_scores.digital_insight_reason6 := '';
-  self := left), left outer);
-  
-final := if(bsversion>=55, group(final55, seq), final_temp);   
 output(final,NAMED('Results'))
-
 
 ENDMACRO;
 

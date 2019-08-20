@@ -44,7 +44,7 @@
 */
 /*--INFO-- This Service is an interface for modelers to see all data available from BIID and Profile Risk Score. */
 
-import address, doxie, AutoStandardI;
+IMPORT RiskWise, business_risk, Risk_Indicators, STD;
 
 export Business_Shell := macro
 
@@ -93,7 +93,11 @@ export Business_Shell := macro
 	'ExcludeWatchLists',
 	'DataRestrictionMask',
 	'DataPermissionMask',
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 unsigned	seq_value		:= 0  : stored('seq');
 string30	account		:= '' : stored('AccountNumber');
@@ -135,6 +139,11 @@ string DataRestriction := risk_indicators.iid_constants.default_DataRestriction 
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 real Global_WatchList_Threshold := 0.84 			: stored('GlobalWatchlistThreshold');
 gateways := Gateway.Configuration.Get();
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 unsigned1 AppendBest := 1;	// search best file
 
 rec := record
@@ -151,8 +160,8 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.Account := account;
 	self.bdid	:= 0;
 	self.score := 0;
-	self.company_name := stringlib.stringtouppercase(company_name);
-	self.alt_company_name := stringlib.stringtouppercase(alt_co_name);
+	self.company_name := STD.Str.toUpperCase(company_name);
+	self.alt_company_name := STD.Str.toUpperCase(alt_co_name);
 	self.prim_range := clean_bus_addr[1..10];
 	self.predir	 := clean_bus_addr[11..12];
 	self.prim_name	 := clean_bus_addr[13..40];
@@ -175,11 +184,11 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.fein		 := fein;
 	self.phone10    := busphone;
 	self.ip_addr	 := bus_ip;
-	self.rep_fname	 := stringlib.stringtouppercase(rep_fname);
-	self.rep_mname  := stringlib.stringtouppercase(rep_mname);
-	self.rep_lname  := stringlib.stringtouppercase(rep_lname);
-	self.rep_name_suffix := stringlib.stringtouppercase(rep_name_suffix);
-	self.rep_alt_Lname := stringlib.stringtouppercase(rep_alt_lname);
+	self.rep_fname	 := STD.Str.toUpperCase(rep_fname);
+	self.rep_mname  := STD.Str.toUpperCase(rep_mname);
+	self.rep_lname  := STD.Str.toUpperCase(rep_lname);
+	self.rep_name_suffix := STD.Str.toUpperCase(rep_name_suffix);
+	self.rep_alt_Lname := STD.Str.toUpperCase(rep_alt_lname);
 	self.rep_prim_range := clean_rep_addr[1..10];
 	self.rep_predir	:= clean_rep_addr[11..12];
 	self.rep_prim_name	:= clean_rep_addr[13..40];
@@ -190,8 +199,8 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.rep_p_city_name := clean_rep_addr[65..89];
 	self.rep_st		:= clean_rep_addr[115..116];
 	self.rep_z5		:= clean_rep_addr[117..121];
-	self.rep_orig_city 	:= stringlib.stringtouppercase(rep_city);
-	self.rep_orig_st	:=  stringlib.stringtouppercase(rep_state);
+	self.rep_orig_city 	:= STD.Str.toUpperCase(rep_city);
+	self.rep_orig_st	:=  STD.Str.toUpperCase(rep_state);
 	self.rep_orig_z5	:=  rep_zip;
 	self.rep_zip4		:= clean_rep_addr[122..125];
 	self.rep_lat		:= clean_rep_addr[146..155];
@@ -204,11 +213,11 @@ business_risk.Layout_Input into_input(df L) := transform
 	self.rep_dob		:= rep_dob;
 	self.rep_phone		:= rep_phone;
 	self.rep_age 		:= (string)rep_age;
-	dl_num := stringlib.stringFilterOut(rep_dl_num,'-');
-	dl_num2 := stringlib.stringFilterOut(dl_num,' ');
-	self.rep_dl_num	:= stringlib.stringtouppercase(dl_num2);
-	self.rep_dl_state	:= stringlib.stringtouppercase(rep_dl_state);
-	self.rep_email		:= stringlib.stringtouppercase(rep_email);
+	dl_num := STD.Str.FilterOut(rep_dl_num,'-');
+	dl_num2 := STD.Str.FilterOut(dl_num,' ');
+	self.rep_dl_num	:= STD.Str.toUpperCase(dl_num2);
+	self.rep_dl_state	:= STD.Str.toUpperCase(rep_dl_state);
+	self.rep_email		:= STD.Str.toUpperCase(rep_email);
 	self.historydate := history_date;
 end;
 
@@ -216,7 +225,11 @@ indata := project(df,into_input(LEFT));
 
 biid := business_risk.InstantID_Function(indata, gateways, false, dppa, glb, false, false, '', 
 											ExcludeWatchLists, ofac_only,ofac_version, include_ofac, include_additional_watchlists, Global_WatchList_Threshold, IsPOBoxCompliant:=IsPOBoxCompliant, DataRestriction := DataRestriction,
-											in_append_best:=AppendBest, DataPermission := DataPermission);
+											in_append_best:=AppendBest, DataPermission := DataPermission,
+                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                            TransactionID := TransactionID, 
+                                            BatchUID := BatchUID, 
+                                            GlobalCompanyID := GlobalCompanyID);
 
 bus_shell := business_risk.Business_Shell_Function(biid, glb);
 

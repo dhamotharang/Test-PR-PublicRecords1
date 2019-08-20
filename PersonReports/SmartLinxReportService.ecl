@@ -225,6 +225,7 @@ EXPORT SmartLinxReportService () := MACRO
   report_mod := module (options, mod_access)
     // Do all required translations here
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
+    export boolean include_hri := globals.IncludeHRI;
     export boolean legacy_verified := false : stored('LegacyVerified');
     export boolean include_BlankDOD := false : stored ('IncludeBlankDOD');
 		export boolean include_deceased := true ; //need to fix PersonReports.SourceCounts_records doesn't work without it.

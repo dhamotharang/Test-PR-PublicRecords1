@@ -1,9 +1,13 @@
 ﻿/*2018-03-02T22:00:03Z (Santos, Ricardo Dos (RIS-BCT))
 RR-12118
 */
-import AutoStandardI, STD, ut;
+import doxie, AutoStandardI, STD, ut;
 
 EXPORT DID_Batch_Service_Records(dataset(DidVille.Layout_Did_InBatch) in_recs) := FUNCTION
+
+  //creating mod_access in place, since other values are also initiated here;
+  // this function is being used directly from the service layer.
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 	string120 append_l := '' 		: stored('Appends');
 	string120 verify_l := '' 		: stored('Verify');
@@ -14,11 +18,8 @@ EXPORT DID_Batch_Service_Records(dataset(DidVille.Layout_Did_InBatch) in_recs) :
 	string3   thresh_val := '' 		: stored('AppendThreshold');
 	boolean   GLB := false 			: stored('GLBData');
 	boolean   patriotproc := false 	: stored('PatriotProcess');
-	unsigned1 glb_purpose_value := 0 : stored('GLBPurpose');
-	boolean include_minors := false : stored('IncludeMinors');
 	unsigned1 soap_xadl_version_value := 0 : stored('xADLVersion');			
 	boolean usePreLab := false : stored('usePreLab');
-	appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
 	// Bug: 53541=> for this service, we are using the nonblank key to ensure the largest 
 	// majority of first and last names are populated during record retreival
@@ -37,12 +38,11 @@ EXPORT DID_Batch_Service_Records(dataset(DidVille.Layout_Did_InBatch) in_recs) :
 
 	recs := project(in_recs,into(left));
 
-	IndustryClass := ut.IndustryClass.Get();
 	res1 := didville.did_service_common_function(recs, appends, verify, fuzzy, dedup_results, 
 																							thresh_num, GLB, patriotproc, lookups, 
-																							livingSits, false, false, glb_purpose_value, 
-																							include_minors,,UseNonBlankKey, appType, soap_xadl_version_value,
-																							IndustryClass_val := IndustryClass);
+																							livingSits, false, false, mod_access.glb, 
+																							mod_access.show_minors,,UseNonBlankKey, mod_access.application_type, soap_xadl_version_value,
+																							IndustryClass_val := mod_access.industry_class);
 
 
 	Mapkey := DidVille.key_lab_did_mapping;
