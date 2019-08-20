@@ -29,7 +29,7 @@
 	<separator/>
   <part name="Gateways" type="tns:XmlDataSet" cols="70" rows="8"/>
 	<separator/>
-	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
+	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>
   <separator/>
   <part name="BatchRequest" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
@@ -46,29 +46,26 @@ MACRO
 
 	// Gateway configurations
 	dGateways := Gateway.Configuration.Get();
-	
+
  reportMod := PhoneFinder_Services.iParam.GetBatchParams();
-		
+
 	modBatchRecords := PhoneFinder_Services.PhoneFinder_BatchRecords(dBatchReq,reportMod,
    																																		IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
    																																											dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways));
-   	
+
     royalties	 := modBatchRecords.dRoyalties;
    	dPhones   	:= modBatchRecords.dBatchOut;
    	Zumigo_Log	:= modBatchRecords.Zumigo_History_Recs;
-		
-		dNonblankNameAddr := dPhones(identity1_full != '' OR (identity1_first != '' AND identity1_last!= '') 
+
+		dNonblankNameAddr := dPhones(identity1_full != '' OR (identity1_first != '' AND identity1_last!= '')
 													OR (identity1_streetname != '' AND ((identity1_city != '' AND identity1_state != '' ) OR identity1_zip5 != '')));
-		
+
 		results := if(reportMod.SuppressBlankNameAddress,dNonblankNameAddr,dPhones);
-    
-     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
-     IF (EXISTS(results), doxie.compliance.logSoldToTransaction(mod_access)); 
- 
+
    OUTPUT(results,named('Results'));
    OUTPUT(royalties,named('RoyaltySet'));
    OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
-   
+
 
 ENDMACRO;
 

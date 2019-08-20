@@ -77,8 +77,6 @@ boolean GLB := false         : stored('GLBData');
 boolean AllPos_l := false    : stored('AllPossibles');
 string3 thresh_val := ''     : stored('AppendThreshold');
 boolean patriotproc := false : stored('PatriotProcess');
-unsigned1 glb_purpose_value := 0 : stored('GLBPurpose');
-boolean include_minors := false : stored('IncludeMinors');
 boolean name_is_ordered_value := false : stored('NameIsOrdered');
 string120 email_val := '' : stored('Email');
 
@@ -89,7 +87,7 @@ unsigned2 maxScoreFromPhone := DidVille.MaxScores.MMax.maxScoreFromPhone : store
 unsigned1 soap_xadl_version_value := 0 : stored('xADLVersion');			
 boolean Limited_Output := false : stored('LimitedOutput');
 
-appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 checkInputMax(unsigned2 inp) := if (inp > 100, 100, inp);
 
@@ -185,14 +183,13 @@ precs := project(d,into(left));
 // majority of first and last names are populated during record retreival
 UseNonBlankKey := TRUE;
 
-IndustryClass := ut.IndustryClass.Get();
 res_ready := didville.did_service_common_function(precs, appends, verify, fuzzy, 
                                                   dedup_these, thresh_num, GLB, false, 
 								                                  lookups, livingsits, false, false, 
-																									glb_purpose_value, include_minors, 
-																									mod_MaxScores, UseNonBlankKey,appType,
+																									mod_access.glb, mod_access.show_minors, 
+																									mod_MaxScores, UseNonBlankKey, mod_access.application_type,
 																									soap_xadl_version_value,
-																									IndustryClass_val := IndustryClass);
+																									IndustryClass_val := mod_access.industry_class);
 																							
 patriot.MAC_AppendPatriot(res_ready,did,fname,mname,lname,res_w_pat,ptys,false)								    
 
@@ -268,4 +265,4 @@ res_final := if(Limited_Output,res_final_1,res_final_2 );
 output(res_final);
 
 ENDMACRO;
-//DidVille.Did_Service();
+// DidVille.Did_Service;

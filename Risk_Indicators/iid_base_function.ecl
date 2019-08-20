@@ -153,9 +153,15 @@ combined_verification := risk_indicators.iid_combine_verification(gotWatch, with
 dlverify := risk_indicators.iid_DL_verification(combined_verification, dppa, isfcra, ExactMatchLevel, BSOptions, DataPermission, bsversion);
 with_DL_verification := if(runDLverification, dlverify, combined_verification);
 
+runThreatMetrix := (BSOptions & risk_indicators.iid_constants.BSOptions.runThreatMetrix) > 0;
+
+with_ThreatMetrix := if(runThreatMetrix, 
+	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID), 
+	with_dl_verification);
+
 // output(with_addrs, named('with_addrs'));
 // output(with_nap, named('with_nap'));
 
-return with_DL_verification;
+return with_ThreatMetrix;
 
 end;

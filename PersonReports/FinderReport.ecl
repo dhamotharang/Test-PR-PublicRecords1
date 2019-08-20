@@ -19,7 +19,7 @@ EXPORT out_rec FinderReport (
   did := dids[1].did;
   isCNSMR := mod_access.isConsumer();
   // person records 
-  pers := Person_records (dids, module (project (param, input.personal, opt)) end, IsFCRA);
+  pers := $.person_records (dids, mod_access, PROJECT (mod_finder, $.IParam.personal), IsFCRA);
 
   p_addresses  := choosen (pers.SubjectAddressesSlim,  iesp.Constants.BR.MaxAddress);
   p_akas       := choosen (project(pers.Akas,iesp.bps_share.t_BpsReportIdentity),iesp.Constants.BR.MaxAKA);
@@ -66,26 +66,26 @@ EXPORT out_rec FinderReport (
     Self.HasCorporateAffiliation := exists (p_corp_aff);
 
     // also found
-    Self.AlsoFound := IF (param.include_alsofound, 
+    Self.AlsoFound := IF (mod_finder.include_alsofound, 
       ROW ({exists (p_at_work), exists (p_vehicles), exists (p_phonesplus_v2), exists (p_proflic), exists (p_dlsr)}, iesp.peoplereport.t_PeopleReportAlsoFound));
 
-    Self.BpsReportAddresses2 := IF (param.include_bpsaddress, GLOBAL (p_addresses));
-    Self.AKAs                := IF (param.include_akas, GLOBAL (p_akas));
-    Self.Imposters           := IF (param.include_imposters, GLOBAL (p_imposters));
-    Self.Relatives2          := IF (param.include_relatives, GLOBAL (p_relatives));
-    Self.Associates2         := IF (param.include_associates, GLOBAL (p_associates));
-    Self.Neighbors2          := IF (param.include_neighbors, GLOBAL (p_neighbors));
+    Self.BpsReportAddresses2 := IF (mod_finder.include_bpsaddress, GLOBAL (p_addresses));
+    Self.AKAs                := IF (mod_finder.include_akas, GLOBAL (p_akas));
+    Self.Imposters           := IF (mod_finder.include_imposters, GLOBAL (p_imposters));
+    Self.Relatives2          := IF (mod_finder.include_relatives, GLOBAL (p_relatives));
+    Self.Associates2         := IF (mod_finder.include_associates, GLOBAL (p_associates));
+    Self.Neighbors2          := IF (mod_finder.include_neighbors, GLOBAL (p_neighbors));
 
-    Self.PhonesPluses       := IF (param.include_phonesplus, GLOBAL (p_phonesplus_v2));
-    Self.OldPhones          := IF (param.include_oldphones, GLOBAL (p_hist));
-    Self.OldPhones2         := IF (param.include_oldphones, GLOBAL (p_hist_2));
+    Self.PhonesPluses       := IF (mod_finder.include_phonesplus, GLOBAL (p_phonesplus_v2));
+    Self.OldPhones          := IF (mod_finder.include_oldphones, GLOBAL (p_hist));
+    Self.OldPhones2         := IF (mod_finder.include_oldphones, GLOBAL (p_hist_2));
 
-    Self.Vehicles           := IF (param.include_motorvehicles, GLOBAL (p_vehicles));
-    Self.ProfessionalLicenses := IF (param.include_proflicenses, GLOBAL (p_proflic));
-    Self.Bankruptcies       := IF (param.include_bankruptcy, GLOBAL (p_bankruptcy));
-    Self.PeopleAtWorks      := IF (param.include_peopleatwork, GLOBAL (p_at_work));
-    Self.DriverLicenses     := IF (param.include_driverslicenses, GLOBAL (p_drivers));
-    Self.CorporateAffiliations := IF (param.include_corpaffiliations, GLOBAL (p_corp_aff));
+    Self.Vehicles           := IF (mod_finder.include_motorvehicles, GLOBAL (p_vehicles));
+    Self.ProfessionalLicenses := IF (mod_finder.include_proflicenses, GLOBAL (p_proflic));
+    Self.Bankruptcies       := IF (mod_finder.include_bankruptcy, GLOBAL (p_bankruptcy));
+    Self.PeopleAtWorks      := IF (mod_finder.include_peopleatwork, GLOBAL (p_at_work));
+    Self.DriverLicenses     := IF (mod_finder.include_driverslicenses, GLOBAL (p_drivers));
+    Self.CorporateAffiliations := IF (mod_finder.include_corpaffiliations, GLOBAL (p_corp_aff));
   END;
 
   // is supposed to produce one row only (usebestdid = true)

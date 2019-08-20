@@ -31,15 +31,12 @@ boolean   dedup_results := true 	: stored('Deduped');
 string3   thresh_val := '' 		    : stored('AppendThreshold');
 boolean   GLBData := false 			      : stored('GLBData');
 boolean   patriotproc := false   	: stored('PatriotProcess');
-unsigned1 glb_purpose_value  := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
-boolean   include_minors := false   : stored('IncludeMinors');
 unsigned1 soap_xadl_version_value := 0 : stored('xADLVersion');
 unsigned8 MaxResultsPerAcct 			:= 1 			: stored('Max_Results_Per_Acct');	
 boolean IncludeRanking						:= false 	: stored('IncludeRanking');			
 boolean DoPartialSuppression						:= false 	: stored('DoPartialSuppression');			
 
-string32 appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
-string6 ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(autostandardi.globalModule(), AutoStandardI.InterfaceTranslator.ssn_mask_val.params));      								
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 // Bug: 53541=> for this service, we are using the nonblank key to ensure the largest 
 // majority of first and last names are populated during record retreival
@@ -52,9 +49,10 @@ fuzzy := std.str.ToUpperCase(fuzzy_l);
 
 ds_batchIn := dataset([],BatchServices.AppendDid_BatchService_Layouts.layout_did_InbatchWithAcctnoWithDID) : stored('batch_in');
 
- BatchShare.MAC_ProcessInput(ds_batchIn,ds_batchInProcessed);
+BatchShare.MAC_ProcessInput(ds_batchIn,ds_batchInProcessed);
 
 ds_batchResults := BatchServices.AppendDID_BatchService_Records.search(ds_batchInProcessed, 
+  mod_access,
   appends,
   verify,
   fuzzy,
@@ -62,12 +60,8 @@ ds_batchResults := BatchServices.AppendDID_BatchService_Records.search(ds_batchI
 	thresh_num,
 	GLBdata,
 	patriotproc,	
-	glb_purpose_value,
-	Include_minors,
 	useNonBlankKey,
-	Apptype,
 	soap_xadl_version_value,
-	ssn_mask_value,
   MaxResultsPerAcct,
   IncludeRanking,
   DoPartialSuppression);

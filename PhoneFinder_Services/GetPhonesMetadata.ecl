@@ -154,7 +154,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
   InquiryHistorySuppressed := Suppress.MAC_SuppressSource(InquiryHistoryJoined, mod_access, person_q.appended_ADL, ccpa.global_sid);
 
 	dSearchRecswInqHistory	:= DENORMALIZE(dSearchRecswAddrType, InquiryHistorySuppressed,
-															KEYED(LEFT.phone=RIGHT.phone10) AND
+															LEFT.phone=RIGHT.phone10 AND
 															LEFT.dt_first_seen <= RIGHT.search_info.datetime[1..8],
 															GROUP,
 															getInquiries(LEFT,ROWS(RIGHT)),

@@ -1,11 +1,15 @@
-IMPORT Address, Models, ut, risk_indicators, easi, doxie, Header, dx_header, MDR, drivers, Riskwise, gateway, DeathV2_Services, AutoStandardI;
+﻿IMPORT STD, Address, Models, ut, risk_indicators, easi, doxie, Header, dx_header, MDR, drivers, Riskwise, gateway, DeathV2_Services, AutoStandardI;
 
 EXPORT HealthCare_Attributes_Search_Function(
 														DATASET(Models.layouts.Layout_HealthCare_Attributes_In) indata,
 														UNSIGNED1 GLBPurpose,
 														UNSIGNED1 DPPAPurpose,
 														STRING50 DataRestriction = risk_indicators.iid_constants.default_DataRestriction,
-														STRING50 DataPermission = risk_indicators.iid_constants.default_DataPermission
+														STRING50 DataPermission = risk_indicators.iid_constants.default_DataPermission,
+                                                        unsigned1 LexIdSourceOptout = 1,
+                                                        string TransactionID = '',
+                                                        string BatchUID = '',
+                                                        unsigned6 GlobalCompanyId = 0
 													) := FUNCTION
 
 /* ***************************************
@@ -88,10 +92,18 @@ EXPORT HealthCare_Attributes_Search_Function(
    *************************************** */
 	iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPAPurpose, GLBPurpose, isUtility, isLn, ofacOnly, 
 																					suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
-																					in_BSversion := bsVersion, in_DataRestriction := DataRestriction, in_DataPermission := DataPermission);
+																					in_BSversion := bsVersion, in_DataRestriction := DataRestriction, in_DataPermission := DataPermission,
+                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                    TransactionID := TransactionID, 
+                                                                                    BatchUID := BatchUID, 
+                                                                                    GlobalCompanyID := GlobalCompanyID);
 
 	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPAPurpose, GLBPurpose, isUtility, isLn, doRelatives, doDL, 
-																						doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction, DataPermission := DataPermission);
+																						doVehicle, doDerogs, bsVersion, doScore, nugen, filterOutFares, DataRestriction := DataRestriction, DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID);
 		
 /* ***************************************
 	 *       Gather Health Care Attributes:        *
@@ -216,7 +228,7 @@ rDemo getDemos(hdr_Rec_DID l, doxie.key_death_masterV2_ssa_DID r) := transform
 		self.did := (string)l.did;
 		self.prim_name := l.prim_name;
 		self.dod := (integer)r.dod8;
-		ages := if(l.dob > 0,(integer)ut.getdate[1..4] - (integer)l.dob[1..4],0);
+		ages := if(l.dob > 0,(INTEGER)((STRING8)Std.Date.Today())[1..4] - (integer)((STRING)l.dob)[1..4],0);
 		self.age := ages;
 		self.HHID_count := if((integer)r.dod8 = 0, 1, 0);
 		self.HHID_parent_count := if(ages >=25, 1, 0);		

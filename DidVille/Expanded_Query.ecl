@@ -1,4 +1,4 @@
-import header,doxie,ut,mdr,drivers,suppress;
+import header,doxie,ut,mdr,drivers,suppress, dx_header;
 
 unsigned8 MaxCands := 100 : stored('CandidateLimit');
 unsigned1 MaxNames := 10 : stored('MaxNames');
@@ -13,11 +13,11 @@ dppa_ok := mod_access.isValidDPPA ();
 // nofold is added as a workaround and better be removed after HPCC-13292 is fixed
 ds := group(limit(NOFOLD(doxie.Get_Dids()),MaxCands,FAIL('Too Many Candidates - Query Aborted')),did,all);
 
-header.layout_header take_right(doxie.key_header le) := transform
+header.layout_header take_right(dx_header.layout_key_header le) := transform
   self := le;
   end;
 
-t_data1 := JOIN(ds,doxie.key_header,left.did=right.s_did,take_right(right));
+t_data1 := JOIN(ds,dx_header.key_header(),left.did=right.s_did,take_right(right));
 
 header.MAC_GlbClean_Header(t_data1,t_data, , , mod_access);
 

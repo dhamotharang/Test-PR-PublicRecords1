@@ -11,7 +11,7 @@
 /*  add call to the first custom model   */  
 /*        April 2017                     */
 
-import address, Risk_Indicators, RiskWise, Suppress, Models, ut, royalty, iesp, Std, Risk_Reporting, Business_Risk_BIP;
+import address, Risk_Indicators, RiskWise, Suppress, Models, royalty, iesp, Std, Risk_Reporting, Business_Risk_BIP;
 
 export OrderScore_Service := MACRO
 
@@ -27,7 +27,11 @@ export OrderScore_Service := MACRO
 			'HistoryDateYYYYMM',
 			'HistoryDateTimeStamp',
 			'ipid_only',
-			'gateways'));
+			'gateways',
+            'LexIdSourceOptout',
+            '_TransactionId',
+            '_BatchUID',
+            '_GCID'));
 
 
 	BOOLEAN DEBUG := False;                                    //Set to TRUE for Round 1 and Round 2 validation and to FALSE when you are creating TEST SEEDS
@@ -63,6 +67,12 @@ export OrderScore_Service := MACRO
 	BOOLEAN ExcludeDMVPII           := users.ExcludeDMVPII;
 	BOOLEAN DisableOutcomeTracking  := False : STORED('OutcomeTrackingOptOut');
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__OrderScore_Service);
@@ -143,7 +153,7 @@ export OrderScore_Service := MACRO
    *************************************** */
   STRING20 account_value := users.AccountNumber;
 	BOOLEAN Test_Data_Enabled := (boolean) users.TestDataEnabled;
-	STRING32 Test_Data_Table_Name := StringLib.StringToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
+	STRING32 Test_Data_Table_Name := STD.Str.ToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
  
 	STRING outOfBandDataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
   STRING DataRestriction := IF(TRIM(users.DataRestrictionMask) <> '', users.DataRestrictionMask, outOfBandDataRestriction);
@@ -189,20 +199,20 @@ export OrderScore_Service := MACRO
 	attributesIn := project(attributesInput,  GetAttributeName(left, counter))(name != '');
 	stringified_attributesIn := Business_Risk_BIP.Common.convertDelimited(attributesIn, name, '|');
 
-	genericModelName := trim(StringLib.StringToLowerCase(option.IncludeModels.OrderScore));
+	genericModelName := trim(STD.Str.ToLowerCase(option.IncludeModels.OrderScore));
 	//reserved for future use of the model options - similar to code below...I think
-	// cmGrade           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'grade';
-	// cmGradeValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
-  // cmDeliverable           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'delivery';
-  // cmDeliverableValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
-  // cmTotal           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'total_amount';
-  // cmTotalValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+	// cmGrade           := STD.Str.ToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'grade';
+	// cmGradeValue      := STD.Str.ToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  // cmDeliverable           := STD.Str.ToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'delivery';
+  // cmDeliverableValue      := STD.Str.ToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  // cmTotal           := STD.Str.ToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'total_amount';
+  // cmTotalValue      := STD.Str.ToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
   
   
-  cmDeliverableOption           := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'delivery');
-  cmDeliverableValue      := StringLib.StringToUpperCase(TRIM(cmDeliverableOption[1].OptionValue));
-  cmTotalAmountOption           := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'total_amount' );
-  cmTotalValue      := StringLib.StringToUpperCase(TRIM(cmTotalAmountOption[1].OptionValue));
+  cmDeliverableOption           := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(TRIM(OptionName)) = 'delivery');
+  cmDeliverableValue      := STD.Str.ToUpperCase(TRIM(cmDeliverableOption[1].OptionValue));
+  cmTotalAmountOption           := option.IncludeModels.ModelOptions(STD.Str.ToLowerCase(TRIM(OptionName)) = 'total_amount' );
+  cmTotalValue      := STD.Str.ToUpperCase(TRIM(cmTotalAmountOption[1].OptionValue));
 
   /* ***************************************
 	 *           Set Users Values:           *
@@ -221,13 +231,13 @@ export OrderScore_Service := MACRO
 		                                            'osn1803_1'], 
 																								le.servicename, '');
 																								
-		netCheck := if(StringLib.StringToLowerCase(le.servicename) = 'targus' OR 
+		netCheck := if(STD.Str.ToLowerCase(le.servicename) = 'targus' OR 
 																		genericModelName NOT IN ['osn1504_0', 
 																		                         'osn1608_1', 
 																		                         'osn1803_1'], 
 																														 false, true);
 																		
-		self.url := if(netCheck or (stringlib.StringToLowerCase(trim(le.servicename)) in
+		self.url := if(netCheck or (STD.Str.ToLowerCase(trim(le.servicename)) in
 									[Gateway.Constants.ServiceName.DeltaInquiry]), 
 									le.url,  ''); //netacuity will be the only gateway we use in the bocashell processing, default to no gateway call			 
  
@@ -262,7 +272,7 @@ export OrderScore_Service := MACRO
 		string names;
 	end;
 	layout_settings checkSettings( attributesIn le, integer c ) := TRANSFORM
-		name := trim(StringLib.StringToLowercase(le.name)); 
+		name := trim(STD.Str.ToLowercase(le.name)); 
 		self.bsVersion    := map(
 			name in attributes_v4 => 51,
 			2
@@ -312,46 +322,46 @@ export OrderScore_Service := MACRO
 	cleaned_name := address.CleanPerson73(fullname_value);
 	boolean valid_cleaned := fullname_value <> '';
 		
-		self.first := stringlib.stringtouppercase(if(first_value='' AND valid_cleaned, 
+		self.first := STD.Str.touppercase(if(first_value='' AND valid_cleaned, 
 			address.cleanNameFields(cleaned_name).fname, first_value));
-		self.middle := stringlib.stringtouppercase(if(mname_val='' AND valid_cleaned, 
+		self.middle := STD.Str.touppercase(if(mname_val='' AND valid_cleaned, 
 			address.cleanNameFields(cleaned_name).mname, mname_val));
-		self.last := stringlib.stringtouppercase(if(last_value='' AND valid_cleaned, 
+		self.last := STD.Str.touppercase(if(last_value='' AND valid_cleaned, 
 			address.cleanNameFields(cleaned_name).lname, last_value));
-		self.suffix := stringlib.stringtouppercase(if(suffix_val ='' AND valid_cleaned, 
+		self.suffix := STD.Str.touppercase(if(suffix_val ='' AND valid_cleaned, 
 			address.cleanNameFields(cleaned_name).name_suffix, suffix_val));		
-		self.addr := StringLib.StringToUppercase( addr_value );
-		self.city := StringLib.StringToUppercase( city_value );
-		self.state := StringLib.StringToUppercase( state_value );
-		self.zip := StringLib.StringToUppercase( zip_value );
-		self.hphone := StringLib.StringToUppercase( hphone_value );
-		self.socs := StringLib.StringToUppercase( socs_value );
-		self.email := StringLib.StringToUppercase( email_value );
+		self.addr := STD.Str.ToUppercase( addr_value );
+		self.city := STD.Str.ToUppercase( city_value );
+		self.state := STD.Str.ToUppercase( state_value );
+		self.zip := STD.Str.ToUppercase( zip_value );
+		self.hphone := STD.Str.ToUppercase( hphone_value );
+		self.socs := STD.Str.ToUppercase( socs_value );
+		self.email := STD.Str.ToUppercase( email_value );
 		self.dob := riskwise.cleandob(dob_value);
-		self.drlc := StringLib.StringToUppercase( drlc_value );
-		self.drlcstate := StringLib.StringToUppercase( drlcstate_value );
-		self.ipaddr := StringLib.StringToUppercase( ipaddr_value );
+		self.drlc := STD.Str.ToUppercase( drlc_value );
+		self.drlcstate := STD.Str.ToUppercase( drlcstate_value );
+		self.ipaddr := STD.Str.ToUppercase( ipaddr_value );
 		//ship to
 		cleaned_name2 := address.CleanPerson73(fullname2_value);
 		boolean valid_cleaned2 := fullname2_value <> '';	
-		self.first2 := stringlib.stringtouppercase(if(first2_value='' AND valid_cleaned2, 
+		self.first2 := STD.Str.touppercase(if(first2_value='' AND valid_cleaned2, 
 			address.cleanNameFields(cleaned_name2).fname, first2_value));
-		self.middle2 := stringlib.stringtouppercase(if(mname2_val='' AND valid_cleaned2, 
+		self.middle2 := STD.Str.touppercase(if(mname2_val='' AND valid_cleaned2, 
 			address.cleanNameFields(cleaned_name2).mname, mname2_val));
-		self.last2 := stringlib.stringtouppercase(if(last2_value='' AND valid_cleaned2, 
+		self.last2 := STD.Str.touppercase(if(last2_value='' AND valid_cleaned2, 
 			address.cleanNameFields(cleaned_name2).lname, last2_value));
-		self.suffix2 := stringlib.stringtouppercase(if(suffix2_val ='' AND valid_cleaned2, 
+		self.suffix2 := STD.Str.touppercase(if(suffix2_val ='' AND valid_cleaned2, 
 			address.cleanNameFields(cleaned_name2).name_suffix, suffix2_val));		
-		self.addr2 := StringLib.StringToUppercase( addr2_value );
-		self.city2 := StringLib.StringToUppercase( city2_value );
-		self.state2 := StringLib.StringToUppercase( state2_value );
-		self.zip2 := StringLib.StringToUppercase( zip2_value );
-		self.socs2 := StringLib.StringToUppercase( socs2_value );
-		self.hphone2 := StringLib.StringToUppercase( hphone2_value );
-		self.TypeOfOrder := StringLib.StringToUppercase( TypeOfOrder_value );
-		self.drlc2 := StringLib.StringToUppercase( drlc2_value );
-		self.drlcstate2 := StringLib.StringToUppercase( drlcstate2_value );	
-		self.email2 := StringLib.StringToUppercase( email2_value );
+		self.addr2 := STD.Str.ToUppercase( addr2_value );
+		self.city2 := STD.Str.ToUppercase( city2_value );
+		self.state2 := STD.Str.ToUppercase( state2_value );
+		self.zip2 := STD.Str.ToUppercase( zip2_value );
+		self.socs2 := STD.Str.ToUppercase( socs2_value );
+		self.hphone2 := STD.Str.ToUppercase( hphone2_value );
+		self.TypeOfOrder := STD.Str.ToUppercase( TypeOfOrder_value );
+		self.drlc2 := STD.Str.ToUppercase( drlc2_value );
+		self.drlcstate2 := STD.Str.ToUppercase( drlcstate2_value );	
+		self.email2 := STD.Str.ToUppercase( email2_value );
 		self.dob2 := riskwise.cleandob(dob2_value);
 		self.DeviceProvider1_value := DeviceProvider1_value;
 		self.DeviceProvider2_value := DeviceProvider2_value;
@@ -369,7 +379,11 @@ export OrderScore_Service := MACRO
 	
 	iid_results := Models.ChargebackDefender_Function(indata, gateways_in, GLBPurpose, DPPAPurpose, ipid_only, 
 																										dataRestriction, ofac_only,
-																										suppressneardups, require2Ele, bsVersion, dataPermission, BSOptions );
+																										suppressneardups, require2Ele, bsVersion, dataPermission, BSOptions,
+                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                        TransactionID := TransactionID, 
+                                                                                                        BatchUID := BatchUID, 
+                                                                                                        GlobalCompanyID := GlobalCompanyID);
 
 	Risk_Indicators.Layout_BocaShell_BtSt.layout_OSMain_wAcct fill_output(iid_results le, indata ri) := TRANSFORM
 			self.AccountNumber := ri.account;
@@ -466,8 +480,8 @@ export OrderScore_Service := MACRO
 	ip_prep := ungroup(project(iid_results, prep_ips(left)));
 		
 	Gateway.Layouts.Config gwIPIDCheck(gateways_input le) := transform
-		self.servicename := IF(StringLib.StringToLowerCase(le.servicename) = 'netacuity' and ~ipid_only,'', le.servicename);
-		self.url := if(StringLib.StringToLowerCase(le.servicename) = 'netacuity' and ~ipid_only, '', le.url);		 
+		self.servicename := IF(STD.Str.ToLowerCase(le.servicename) = 'netacuity' and ~ipid_only,'', le.servicename);
+		self.url := if(STD.Str.ToLowerCase(le.servicename) = 'netacuity' and ~ipid_only, '', le.url);		 
 		self := le;
 	end;
 
@@ -480,13 +494,13 @@ export OrderScore_Service := MACRO
 			self.AccountNumber := le.AccountNumber;
 			self.seq := le.seq;
 			self.Result.IPAddressID.Continent := ri.continent;
-			self.Result.IPAddressID.Country := StringLib.StringToUpperCase(ri.countrycode);
-			self.Result.IPAddressID.RoutingType := if(Stringlib.StringFilterOut(ri.ipaddr[1],'0123456789') = '', ri.iproutingmethod, '');
-			self.Result.IPAddressID.State := if(StringLib.StringToUpperCase(ri.countrycode[1..2]) = 'US', StringLib.StringToUpperCase(ri.state), '');
-			self.Result.IPAddressID.Zip := if(StringLib.StringToUpperCase(ri.countrycode[1..2]) = 'US', ri.zip, '');
+			self.Result.IPAddressID.Country := STD.Str.ToUpperCase(ri.countrycode);
+			self.Result.IPAddressID.RoutingType := if(STD.Str.FilterOut(ri.ipaddr[1],'0123456789') = '', ri.iproutingmethod, '');
+			self.Result.IPAddressID.State := if(STD.Str.ToUpperCase(ri.countrycode[1..2]) = 'US', STD.Str.ToUpperCase(ri.state), '');
+			self.Result.IPAddressID.Zip := if(STD.Str.ToUpperCase(ri.countrycode[1..2]) = 'US', ri.zip, '');
 			self.Result.IPAddressID.AreaCode := if(ri.areacode <> '0', ri.areacode, '');	
-			self.Result.IPAddressID.TopLevelDomain := StringLib.StringToUpperCase(ri.topleveldomain);
-			self.Result.IPAddressID.SecondLevelDomain := StringLib.StringToUpperCase(ri.secondleveldomain);
+			self.Result.IPAddressID.TopLevelDomain := STD.Str.ToUpperCase(ri.topleveldomain);
+			self.Result.IPAddressID.SecondLevelDomain := STD.Str.ToUpperCase(ri.secondleveldomain);
 			self.Result := le.Result
 	end;
 
@@ -497,7 +511,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	self.DeviceProvider2_value := DeviceProvider2_value;
 	self.DeviceProvider3_value := DeviceProvider3_value;
 	self.DeviceProvider4_value := DeviceProvider4_value;
-	self.btst_order_type := StringLib.StringToUppercase( TypeOfOrder_value );
+	self.btst_order_type := STD.Str.ToUppercase( TypeOfOrder_value );
 	self.seq := left.seq));	
 	//self.seq := left.seq * 2)); //done in BTST function
 
@@ -523,7 +537,11 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		ScoresInput,
 		NetAcuity_v4, //true for CBD5.1 models
 		ipid_only,
-		skip_businessHeader
+		skip_businessHeader,
+        LexIdSourceOptout := LexIdSourceOptout, 
+        TransactionID := TransactionID, 
+        BatchUID := BatchUID, 
+        GlobalCompanyID := GlobalCompanyID
 	);
 
 	
@@ -531,13 +549,13 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 			self.AccountNumber := le.AccountNumber;
 			self.seq := le.seq;
 			self.Result.IPAddressID.Continent :=  ri.ip2o.continent;
-			self.Result.IPAddressID.Country := StringLib.StringToUpperCase(ri.ip2o.countrycode);
-			self.Result.IPAddressID.RoutingType := if(Stringlib.StringFilterOut(ri.ip2o.ipaddr[1],'0123456789') = '', ri.ip2o.iproutingmethod, '');
-			self.Result.IPAddressID.State := if(StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', StringLib.StringToUpperCase(ri.ip2o.state), '');
-			self.Result.IPAddressID.Zip := if(StringLib.StringToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', ri.ip2o.zip, '');
+			self.Result.IPAddressID.Country := STD.Str.ToUpperCase(ri.ip2o.countrycode);
+			self.Result.IPAddressID.RoutingType := if(STD.Str.FilterOut(ri.ip2o.ipaddr[1],'0123456789') = '', ri.ip2o.iproutingmethod, '');
+			self.Result.IPAddressID.State := if(STD.Str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', STD.Str.ToUpperCase(ri.ip2o.state), '');
+			self.Result.IPAddressID.Zip := if(STD.Str.ToUpperCase(ri.ip2o.countrycode[1..2]) = 'US', ri.ip2o.zip, '');
 			self.Result.IPAddressID.AreaCode := if(ri.ip2o.areacode <> '0', ri.ip2o.areacode, '');		
-			self.Result.IPAddressID.TopLevelDomain := StringLib.StringToUpperCase(ri.ip2o.topleveldomain);
-			self.Result.IPAddressID.SecondLevelDomain := StringLib.StringToUpperCase(ri.ip2o.secondleveldomain);
+			self.Result.IPAddressID.TopLevelDomain := STD.Str.ToUpperCase(ri.ip2o.topleveldomain);
+			self.Result.IPAddressID.SecondLevelDomain := STD.Str.ToUpperCase(ri.ip2o.secondleveldomain);
 			self.Result := le.Result
 	end;
 	
@@ -646,8 +664,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		self.seq := l.seq;
 		self.ssn := (string9)trim(socs_value);
 		self.phone10 := (string10) trim(hphone_value);
-		self.fname := (string15) trim(StringLib.StringToUppercase(first_value));
-		self.lname := (string20) trim(StringLib.StringToUppercase(last_value));
+		self.fname := (string15) trim(STD.Str.ToUppercase(first_value));
+		self.lname := (string20) trim(STD.Str.ToUppercase(last_value));
 		self.z5 := (string9) trim(zip_value);
 		self := [];
 	END;

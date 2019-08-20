@@ -1104,7 +1104,7 @@ email_main  := join(dids, email_data.Key_Did_FCRA,
 											);
 email_deduped := dedup(sort(email_main,record),all);  // dedup all just in case the data has any dups
 
-email_recs1 := email_deduped + PROJECT( email_corr, transform( Layout_Email, self := LEFT) );
+email_recs1 := email_deduped + PROJECT( email_corr, transform( Layout_Email, self := LEFT, SELF:= []) ); // Blanking out global_sid & record_sid fields
 email_recs	:= sort(email_recs1, -date_last_seen, -date_first_seen);
 
 // ==========================================================

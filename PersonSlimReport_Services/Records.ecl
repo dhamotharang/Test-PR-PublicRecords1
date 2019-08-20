@@ -158,8 +158,8 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
                         iesp.Constants.PersonSlim.MaxStudent));
  
  // this get's generic person records by DID that will be used below 
- pers_mod := module (project (in_mod, PersonReports.input.personal, opt)) end;
- pers     := PersonReports.Person_records (did_safe, pers_mod);
+ pers_mod := module (project (in_mod, PersonReports.IParam.personal, opt)) end;
+ pers     := PersonReports.Person_records (did_safe, mod_access, pers_mod);
 														 
  //***VEHICLE RECS***\\ // DATASET([],iesp.motorvehicle.t_MotorVehicleReport2Record);
  bestRecs := if(in_mod.IncludeRealTimeVehicles, pers.bestrecs, DATASET([],doxie.layout_best));

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="HealthCare_Attributes_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -34,7 +34,7 @@
 </pre>
 */
 
-import risk_indicators, models, gateway, AutoStandardI, RiskWise;
+import models, gateway, AutoStandardI, RiskWise, STD;
 
 export HealthCare_Attributes_Batch_Service := MACRO
 // Can't have duplicate definitions of Stored with different default values, 
@@ -46,10 +46,14 @@ gateways := Gateway.Constants.void_gateway;
 
 unsigned1 DPPAPurpose 					:= 0				: stored('DPPAPurpose'); // ** kwh - Should we be looking at DPPA or not?
 unsigned1 GLBPurpose := RiskWise.permittedUse.fraudGLBA: stored('GLBPurpose');
-// string50 	DataRestriction 			:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50  DataRestriction 			:= AutoStandardI.GlobalModule().DataRestrictionMask;
 string10	DataPermission 				:= AutoStandardI.GlobalModule().DataPermissionMask;
-// string10 	DataPermission 				:= Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 // add sequence to matchup later to add acctno to output
 Models.layouts.Layout_HealthCare_Attributes_Batch_In into_seq(batchin le, integer C) := TRANSFORM
@@ -65,14 +69,14 @@ Models.layouts.Layout_HealthCare_Attributes_In into_HCA_in(batchinseq le) := TRA
 	cleaned_name := address.CleanPerson73(le.UnParsedFullName);
 	boolean valid_cleaned := le.UnParsedFullName <> '';
 	
-	self.FirstName := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
-	self.LastName := stringlib.stringtouppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
-	self.MiddleName := stringlib.stringtouppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
-	self.SuffixName := stringlib.stringtouppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
+	self.FirstName := STD.Str.touppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
+	self.LastName := STD.Str.touppercase(if(le.Name_Last='' AND valid_cleaned, cleaned_name[46..65], le.Name_Last));
+	self.MiddleName := STD.Str.touppercase(if(le.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], le.Name_Middle));
+	self.SuffixName := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], le.Name_Suffix));	
 	
-	self.streetAddr := StringLib.StringToUpperCase(le.street_addr);
-	self.City := StringLib.StringToUpperCase(le.p_City_name);
-	self.State := StringLib.StringToUpperCase(le.st);
+	self.streetAddr := STD.Str.ToUpperCase(le.street_addr);
+	self.City := STD.Str.ToUpperCase(le.p_City_name);
+	self.State := STD.Str.ToUpperCase(le.st);
 	self.Zip := le.z5;
 	self.HomePhone := le.Home_Phone;
 	self.DateOfBirth := le.DOB;
@@ -87,7 +91,11 @@ HCA_in := project(batchinseq, into_HCA_in(left));
 	 *     Gather Attributes:      				 *
    *************************************** */
 	 
-FunctionResults := Models.HealthCare_Attributes_Search_Function(HCA_in, GLBPurpose, DPPAPurpose, DataRestriction, DataPermission);
+FunctionResults := Models.HealthCare_Attributes_Search_Function(HCA_in, GLBPurpose, DPPAPurpose, DataRestriction, DataPermission,
+                                                                                                                      LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                      TransactionID := TransactionID, 
+                                                                                                                      BatchUID := BatchUID, 
+                                                                                                                      GlobalCompanyID := GlobalCompanyID);
 	 
 Results := join(batchinseq, FunctionResults, left.seq=right.seq, transform(models.layouts.layout_HealthCare_Attributes_batch,
 			self.acctno := left.acctno;

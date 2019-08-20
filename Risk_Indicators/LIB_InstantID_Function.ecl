@@ -1,4 +1,4 @@
-import doxie, ut, DID_Add, address, UtilFile, riskwise, iesp, patriot, gateway;
+﻿import doxie, ut, DID_Add, address, UtilFile, riskwise, iesp, patriot, gateway;
 
 export LIB_InstantID_Function(DATASET(risk_indicators.layout_input) indata, 
 			dataset(Gateway.Layouts.Config) gateways, 
@@ -84,7 +84,12 @@ combined_verification := risk_indicators.iid_combine_verification(gotWatch, with
 dlverify := risk_indicators.iid_DL_verification(combined_verification, dppa, isfcra, ExactMatchLevel, BSOptions, DataPermission, bsversion);
 with_DL_verification := if(runDLverification, dlverify, combined_verification);
 
-export results := with_DL_verification;
+runThreatMetrix := (BSOptions & risk_indicators.iid_constants.BSOptions.runThreatMetrix) > 0;
+
+with_ThreatMetrix := if(runThreatMetrix, 
+	risk_indicators.iid_append_threatMetrix(indata, with_dl_verification, gateways, companyID), 
+	with_dl_verification);
+	
+export results := with_ThreatMetrix;
 
 END;
-

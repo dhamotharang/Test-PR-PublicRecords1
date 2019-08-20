@@ -1,7 +1,7 @@
 IMPORT data_services, STD;
 
 EXPORT log := MODULE
-  
+
   EXPORT DOMAIN := 'P'; // P-Public Records, H-Healthcare, I-Insurance
 
   EXPORT clean_query_name := FUNCTION
@@ -12,7 +12,7 @@ EXPORT log := MODULE
 
   EXPORT layout_sold_to_sources_common := RECORD
     unsigned6 did;
-    unsigned4 global_sid; 
+    unsigned4 global_sid;
     unsigned8 record_sid;
   END;
 
@@ -43,18 +43,18 @@ EXPORT log := MODULE
 
   EXPORT layout_log_record_internal := RECORD
     layout_log_sold_to_sources_rec;
-    unsigned4 global_sid; 
+    unsigned4 global_sid;
     unsigned8 record_sid;
   END;
 
   EXPORT logSoldToSources(ds_in, mod_access, did_field='did') := FUNCTIONMACRO
-   
+
     rec_log := doxie.log.layout_log_record_internal;
     rec_log toLogFormat (RECORDOF (ds_in) L) := TRANSFORM
       l_lexid :=  (unsigned6) L.did_field;
       SELF.transaction_id := mod_access.transaction_id;
       SELF.LexID := l_lexid;
-      SELF.global_sid:= L.global_sid; 
+      SELF.global_sid:= L.global_sid;
       SELF.record_sid := IF (l_lexid = 0, L.record_sid, 0); // if we have a lexid, we only need to log source ids
       SELF.source_list := IF(l_lexid = 0,
         '{'+TOJSON(ROW({L.global_sid, L.record_sid}, {unsigned4 S; unsigned8 R;}))+'}',
@@ -62,9 +62,9 @@ EXPORT log := MODULE
     END;
     ds_slim := PROJECT (ds_in, toLogFormat(LEFT));
     ds_ddp := DEDUP(SORT (ds_slim, LexID, global_sid, record_sid), LexID, global_sid, record_sid);
-         
+
     rec_log rollToLog (rec_log L, rec_log R) := TRANSFORM
-       SELF.source_list := IF (L.source_list != '', 
+       SELF.source_list := IF (L.source_list != '',
           L.source_list + IF(R.source_list != '', ','+R.source_list, ''),
           R.source_list);
       SELF := L;
@@ -77,21 +77,21 @@ EXPORT log := MODULE
         ));
     ds_log_sold_to_sources := DATASET([{ds_sold_to_sources}], doxie.log.layout_log_sold_to_sources);
 
-    // Below we should really be doing ds_in(global_sid<>0) to avoid logging "empty" records. 
+    // Below we should really be doing ds_in(global_sid<>0) to avoid logging "empty" records.
     // It would also take care of cases where we may log empty records after 'left outer' joins.
     // TODO: replace this later, once data team starts populating global_sids.
-    RETURN IF(mod_access.log_record_source AND exists(ds_in), 
-      OUTPUT(ds_log_sold_to_sources, NAMED('LOG_privacy__logs_sold__to__sources'), EXTEND));  
+    RETURN IF(mod_access.log_record_source AND exists(ds_in),
+      OUTPUT(ds_log_sold_to_sources, NAMED('FILE_privacy__logs_sold__to__sources'), EXTEND));
 
   ENDMACRO;
 
   EXPORT logSoldToTransaction(mod_access, env_flag = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
-  
+
     IMPORT doxie, data_services, STD;
 
-    // absolutely no uniquenames as this macro must always be called just once 
+    // absolutely no uniquenames as this macro must always be called just once
     doxie.log.layout_log_sold_to_transactions_rec toLogFormat() := TRANSFORM
-      SELF.transaction_id :=  mod_access.transaction_id;;
+      SELF.transaction_id :=  mod_access.transaction_id;
       SELF.domain := doxie.log.DOMAIN;
       SELF.query_name := doxie.log.clean_query_name;
       SELF.mbs_gcid := mod_access.global_company_id;
@@ -102,10 +102,10 @@ EXPORT log := MODULE
     END;
     ds_log_transaction_rec := DATASET([toLogFormat()]);
     ds_log_transaction := DATASET([{ds_log_transaction_rec}], doxie.log.layout_log_sold_to_transactions);
-    
-    RETURN IF(mod_access.log_record_source, 
-      OUTPUT(ds_log_transaction, NAMED('LOG_privacy__logs_sold__to__transactions')));
-     
+
+    RETURN IF(mod_access.log_record_source,
+      OUTPUT(ds_log_transaction, NAMED('FILE_privacy__logs_sold__to__transactions')));
+
   ENDMACRO;
 
 END;

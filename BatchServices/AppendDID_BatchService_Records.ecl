@@ -1,6 +1,8 @@
-﻿Import Batchservices, DidVille, risk_indicators, suppress, ut, AutoStandardI, STD;
+﻿Import doxie, Batchservices, DidVille, risk_indicators, suppress, AutoStandardI, STD;
+
 EXPORT APPendDID_batchService_Records := MODULE
 	EXPORT Search(DATASET (  BatchServices.AppendDid_BatchService_Layouts.layout_did_InbatchWithAcctnoWithDID) Ds_batchInProcessed,
+												 doxie.IDataAccess mod_access,  
 												 STRING120 Appends,
 												 STRING120 verify, 
 												 STRING120 fuzzy,
@@ -8,12 +10,12 @@ EXPORT APPendDID_batchService_Records := MODULE
 												 unsigned2 thresh_num,																														
 												 boolean   GLB_data,
 												 boolean 	 patriotproc,												
-												 unsigned1 glb_purpose_value,											
-												 boolean 	 Include_minors,
+												//  unsigned1 glb_purpose_value,											
+												//  boolean 	 Include_minors,
 												 boolean 	 useNonBlankKey,
-												 STRING32  appType,		
+												//  STRING32  appType,		
 												 unsigned1 soap_xadl_version_value,
-												 STRING6 	 ssnMaskVal,
+												//  STRING6 	 ssnMaskVal,
                       unsigned8 MaxResultsPerAcct,
                       boolean IncludeRanking,
                       boolean DoPartialSuppression
@@ -25,30 +27,20 @@ recs := PROJECT(Ds_batchInProcessed,
 									SELF.SSN :=  std.str.filter(LEFT.ssn,'0123456789');
 									SELF := LEFT));
 											
-IndustryClass := ut.IndustryClass.Get();
 Limit_MaxResultsPerAcct := BatchServices.Constants.Didville.Limit_MaxResultsPerAcct;
 
-params_mod := module(AutoStandardI.PermissionI_Tools.params)
-	export boolean 	 AllowAll 					 := false;
-	export boolean 	 AllowGLB     			 := false;
-	export boolean 	 AllowDPPA 					 := false;
-	export unsigned1 DPPAPurpose         := 0;
-	export unsigned1 GLBPurpose 				 := glb_purpose_value;
-	export boolean   IncludeMinors       := include_minors;
-END;
-
-GLB := AutoStandardI.PermissionI_Tools.val(params_mod).glb.ok(glb_purpose_value) OR GLB_data;
+GLB := mod_access.isValidGlb() OR GLB_data;
 hhidplus := std.str.find(appends,'HHID_PLUS',1)<>0;
 edabest := std.str.find(appends,'BEST_EDA',1)<>0;
 inLimit :=if(MaxResultsPerAcct > Limit_MaxResultsPerAcct,Limit_MaxResultsPerAcct,MaxResultsPerAcct);
 // call common did function here.
 res1TMP := didville.did_service_common_function(recs, appends, verify, fuzzy, dedup_results, 
                                             thresh_num, GLB, patriotproc, false, 
-																						false, hhidplus, edabest, glb_purpose_value, 
-																						include_minors,,UseNonBlankKey, appType, soap_xadl_version_value,
-																						inLimit,IndustryClass_val := IndustryClass
+																						false, hhidplus, edabest, mod_access.glb, 
+																						mod_access.show_minors,,UseNonBlankKey, mod_access.application_type, soap_xadl_version_value,
+																						inLimit,IndustryClass_val := mod_access.industry_class
 																						);																																												
- ResultsRanking_pre := Didville.fn_GetRankedAddress(UNGROUP(res1TMP), params_mod);
+ ResultsRanking_pre := Didville.fn_GetRankedAddress(UNGROUP(res1TMP), mod_access);
    
  ResultsRanking := IF(IncludeRanking, GROUP(SORT(ResultsRanking_pre, seq, -score), seq), 
                                         SORT(res1TMP, seq, -score));
@@ -81,7 +73,7 @@ layout_did_outBatchAdlCatWacctno_plus AddCounter(BatchServices.AppendDid_BatchSe
 ds_batchResults_with_numbers := project(UNGROUP(ds_batchResults),AddCounter(left,counter));
  
 // do suppression of DID and then masking of SSN
-Suppress.MAC_Suppress(ds_batchResults_with_numbers,ResultsSuppressedFully,appType,Suppress.Constants.LinkTypes.DID,DID,
+Suppress.MAC_Suppress(ds_batchResults_with_numbers,ResultsSuppressedFully,mod_access.application_type,Suppress.Constants.LinkTypes.DID,DID,
                        batch := true,use_acctno := true,retainField:= row_counter);
 ResultsSuppressedPartialy :=  join(ds_batchResults_with_numbers,ResultsSuppressedFully,
                                    left.row_counter = right.row_counter,
@@ -95,7 +87,7 @@ ResultsSuppressedPartialy :=  join(ds_batchResults_with_numbers,ResultsSuppresse
 ResultsSuppressed := project(if(DoPartialSuppression,ResultsSuppressedPartialy,ResultsSuppressedFully),
                               BatchServices.AppendDid_BatchService_Layouts.layout_did_outBatchAdlCatWacctno   
                              );                       
-Suppress.MAC_Mask(ResultsSuppressed,ResultsMasked, ssn, null, true, false, maskVal:=ssnMaskVal);	
+Suppress.MAC_Mask(ResultsSuppressed,ResultsMasked, ssn, null, true, false, maskVal:=mod_access.ssn_mask);	
     
  //output(ds_batchResults_with_numbers,named('ds_batchResults_with_numbers'));
  
