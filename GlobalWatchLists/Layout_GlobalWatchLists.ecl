@@ -435,4 +435,5 @@ RECORD
 		//Added for CCPA-94
 		UNSIGNED4 global_sid;
 		UNSIGNED8 record_sid;
+		UNSIGNED6 did;
 END;
