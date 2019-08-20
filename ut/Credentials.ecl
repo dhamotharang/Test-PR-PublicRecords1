@@ -21,6 +21,13 @@ EXPORT Credentials() := module
 		return dataset('~hpccinternal::'+STD.System.Job.User()+'::credentials',{string encodedcreds},thor,opt)[1].encodedcreds;
 									
 	end;
+
+  export mac_add2Soapcall() := 
+  functionmacro
+
+    return ',HTTPHEADER(\'Authorization\', \'Basic \' + ut.Credentials().fGetEncodedValues())';
+
+  endmacro;
 	
 	
 end;

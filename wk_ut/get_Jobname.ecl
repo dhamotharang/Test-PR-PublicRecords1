@@ -1,1 +1,2 @@
-EXPORT get_Jobname(string wuid,string pesp = _constants.LocalEsp) := wk_ut.get_WUInfo(wuid,pesp).JobName;
+﻿import Workman;
+EXPORT get_Jobname := Workman.get_Jobname;

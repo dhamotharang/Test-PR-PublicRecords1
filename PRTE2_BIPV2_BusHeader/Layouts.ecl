@@ -2,6 +2,91 @@
 
 export Layouts := module
 
+Export Candidate:=RECORD
+  unsigned6 lgid3;
+  unsigned6 rcid;
+  string34 sbfe_id;
+  string10 nodes_below_st;
+  string20 lgid3ifhrchy;
+  unsigned6 originalseleid;
+  unsigned6 originalorgid;
+  string30 cnp_number;
+  string9 active_duns_number;
+  string9 duns_number;
+  unsigned4 duns_number_concept;
+  string9 company_fein;
+  string2 company_inc_state;
+  string32 company_charter_number;
+  string10 cnp_btype;
+  string50 company_name_type_derived;
+  string9 hist_duns_number;
+  string30 active_domestic_corp_key;
+  string30 hist_domestic_corp_key;
+  string30 foreign_corp_key;
+  string30 unk_corp_key;
+  string250 cnp_name;
+  string1 cnp_hasnumber;
+  string20 cnp_lowv;
+  boolean cnp_translated;
+  integer4 cnp_classid;
+  string10 prim_range;
+  string28 prim_name;
+  string8 sec_range;
+  string25 v_city_name;
+  string2 st;
+  string5 zip;
+  boolean has_lgid;
+  boolean is_sele_level;
+  boolean is_org_level;
+  boolean is_ult_level;
+  unsigned6 parent_proxid;
+  unsigned6 sele_proxid;
+  unsigned6 org_proxid;
+  unsigned6 ultimate_proxid;
+  unsigned2 levels_from_top;
+  unsigned3 nodes_total;
+  unsigned4 dt_first_seen;
+  unsigned4 dt_last_seen;
+  string2 salt_partition;
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned1 lgid3ifhrchy_prop;
+  unsigned1 company_name_prop;
+  unsigned1 cnp_number_prop;
+  unsigned1 active_duns_number_prop;
+  unsigned1 duns_number_prop;
+  unsigned1 duns_number_concept_prop;
+  unsigned1 company_inc_state_prop;
+  unsigned1 company_charter_number_prop;
+  unsigned2 buddies;
+  integer2 sbfe_id_weight100;
+  boolean sbfe_id_isnull;
+  integer2 lgid3ifhrchy_weight100;
+  boolean lgid3ifhrchy_isnull;
+  string500 company_name;
+  integer2 company_name_weight100;
+  boolean company_name_isnull;
+  integer2 cnp_number_weight100;
+  boolean cnp_number_isnull;
+  integer2 active_duns_number_weight100;
+  boolean active_duns_number_isnull;
+  integer2 duns_number_weight100;
+  boolean duns_number_isnull;
+  integer2 duns_number_concept_weight100;
+  boolean duns_number_concept_isnull;
+  integer2 company_fein_weight100;
+  boolean company_fein_isnull;
+  integer2 company_inc_state_weight100;
+  boolean company_inc_state_isnull;
+  integer2 company_charter_number_weight100;
+  boolean company_charter_number_isnull;
+  integer2 cnp_btype_weight100;
+  boolean cnp_btype_isnull;
+  unsigned8 __internal_fpos__;
+ END;
+
+
 Export Layout_Matches:=RECORD,maxlength(32000)  
   unsigned6 lgid31;
   unsigned6 lgid32;
@@ -78,6 +163,9 @@ END;
 			BIPV2.Layout_Business_Linking_Full;
 			boolean executive_ind := false;
 			integer executive_ind_order:=0;
+			unsigned4 global_sid:=0;
+      unsigned8 record_sid:=0;
+
 		end;
 
 		export Layout_Best := 

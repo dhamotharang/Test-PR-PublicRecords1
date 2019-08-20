@@ -1,0 +1,45 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_FBNV2
+FILENAME:FBNV2
+NAMESCOPE:Input_CA_Orange
+//-------------------------
+//FIELDTYPE DEFINITIONS
+//-------------------------
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_phone:CUSTOM(Scrubs.Functions.fn_verify_optional_phone>0)
+FIELDTYPE:invalid_past_date:CUSTOM(Scrubs.fn_valid_pastDate > 0)
+
+//--------------------------------------------------------------- 
+//FIELDS -- Commented out fields are not being scrubbed
+//---------------------------------------------------------------
+// FIELD::process_date:TYPE(STRING):0,0	
+FIELD:REGIS_NBR:TYPE(STRING20):LIKE(invalid_mandatory):0,0
+// FIELD:BUSINESS_LETTER:TYPE(STRING):0,0	
+FIELD:BUSINESS_NAME:TYPE(STRING192):LIKE(invalid_mandatory):0,0
+// FIELD:ADDRESS:TYPE(STRING):0,0	
+// FIELD:CITY:TYPE(STRING):0,0	
+// FIELD:STATE:TYPE(STRING):0,0	
+// FIELD:ZIP_CODE:TYPE(STRING):0,0	
+FIELD:PHONE_NBR:TYPE(STRING10):LIKE(invalid_phone):0,0
+FIELD:FILE_DATE:TYPE(STRING8):LIKE(invalid_past_date):0,0
+// FIELD:DOCETYEP:TYPE(STRING):0,0	
+// FIELD:OWNER_NBR:TYPE(STRING):0,0	
+FIELD:FIRST_NAME:TYPE(STRING55):LIKE(invalid_mandatory):0,0
+FIELD:MIDDLE_NAME:TYPE(STRING55):LIKE(invalid_mandatory):0,0
+FIELD:LAST_NAME_COMPANY:TYPE(STRING55):LIKE(invalid_mandatory):0,0
+FIELD:OWNER_ADDRESS:TYPE(STRING40):LIKE(invalid_mandatory):0,0
+// FIELD:OWNER_CITY:TYPE(STRING):0,0	
+// FIELD:OWNER_STATE:TYPE(STRING):0,0	
+// FIELD:OWNER_ZIP_CODE:TYPE(STRING):0,0	
+// FIELD:BUSINESS_TYPE:TYPE(STRING):0,0
+FIELD:prep_bus_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:prep_bus_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+FIELD:prep_owner_addr_line1:TYPE(STRING100):LIKE(invalid_mandatory):0,0
+FIELD:prep_owner_addr_line_last:TYPE(STRING50):LIKE(invalid_mandatory):0,0
+// FIELD:title:TYPE(STRING):0,0
+// FIELD:fname:TYPE(STRING):0,0
+// FIELD:mname:TYPE(STRING):0,0
+// FIELD:lname:TYPE(STRING):0,0
+// FIELD:name_suffix:TYPE(STRING):0,0
+// FIELD:name_score:TYPE(STRING):0,0
+FIELD:cname:TYPE(STRING55):LIKE(invalid_mandatory):0,0

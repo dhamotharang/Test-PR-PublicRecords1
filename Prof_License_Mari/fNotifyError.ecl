@@ -1,4 +1,4 @@
-IMPORT Prof_License_Mari, Lib_FileServices, ut;
+﻿IMPORT Prof_License_Mari, Lib_FileServices, ut;
 
 EXPORT fNotifyError := MODULE
 
@@ -9,7 +9,7 @@ EXPORT fNotifyError := MODULE
 	EXPORT MissingStdLicenseStatus(string code, string src_cd, string pVersion,string email_addr) := FUNCTION
 		
 		inFileName := mari_dest + pVersion + '::' + src_cd;
-		inFile := dataset(inFileName, Prof_License_Mari.layouts.base, FLAT);
+		inFile := dataset(inFileName, Prof_License_Mari.layout_base_in, FLAT);
 		cnt := count(inFile(std_license_status=' '));
 		err_msg := 'MARI - vendor file(s) to MARI base file conversion\n\n' + 
 							 'Error Type:\t\tMissing STD_LICENSE_STATUS\n' +
@@ -31,7 +31,7 @@ EXPORT fNotifyError := MODULE
 	EXPORT MissingStdCodes(string code, string src_cd, string pVersion,string email_addr) := FUNCTION
 		
 		inFileName := mari_dest + pVersion + '::' + src_cd;
-		inFile := dataset(inFileName, Prof_License_Mari.layouts.base, FLAT);
+		inFile := dataset(inFileName, Prof_License_Mari.layout_base_in, FLAT);
 		missing_std_prof_cd_cnt := count(inFile(std_prof_cd=' '));
 		missing_std_license_status_cnt := count(inFile(std_license_status=' '));
 		missing_std_license_type_cnt := count(inFile(std_license_type=' '));
@@ -74,7 +74,7 @@ EXPORT fNotifyError := MODULE
 		//List of legit address pattern
 		PATTERN_EXCEPT_NAME := '( COMPANY ST)';
 		inFileName := mari_dest + pVersion + '::' + src_cd;
-		inFile := dataset(inFileName, Prof_License_Mari.layouts.base, FLAT);
+		inFile := dataset(inFileName, Prof_License_Mari.layout_base_in, FLAT);
 		invalid_addr1 := inFile(REGEXFIND(PATTERN_NAME,addr_addr1_1+' '+addr_addr2_1+' '+addr_addr3_1+' '+addr_addr4_1) AND
 		                        NOT REGEXFIND(PATTERN_EXCEPT_NAME,addr_addr1_1+' '+addr_addr2_1+' '+addr_addr3_1+' '+addr_addr4_1) );
 		invalid_addr1_cnt := count(invalid_addr1);	

@@ -327,7 +327,16 @@ end;
             										 ,local);
 
 	ut.MAC_Append_Rcid (sync_dates, source_rec_id, addSourceRid);
-   
-	return addSourceRid;
+	
+	// move source_rec_id to record_sid field for CCPA project
+	nppes.layouts.base addRecSid(nppes.layouts.base L) := transform
+			self.global_sid	:= 22931;
+			self.record_sid := L.source_rec_id;
+			self						:= L;
+	end;
+	
+	with_record_sid := project(addSourceRid, addRecSid (left));
+
+	return with_record_sid;
 
 end;

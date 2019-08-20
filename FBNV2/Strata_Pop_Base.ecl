@@ -1,4 +1,4 @@
-import strata, ut;
+﻿import strata, ut;
 
 export Strata_Pop_Base(string pVersion) := function
 dsBin := FBNV2.File_FBN_Business_Base_AID;

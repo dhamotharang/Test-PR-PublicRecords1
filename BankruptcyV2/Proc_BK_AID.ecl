@@ -1,4 +1,4 @@
-// Re-create AID file everytime the build is run so it refreshes the raw id.
+﻿// Re-create AID file everytime the build is run so it refreshes the raw id.
 // This AID file will maintain wht unique address fields clean and AID addresses.
 import AID,lib_stringlib,ut,_Control,address;
 export Proc_BK_AID(string filedate, boolean useaid = true) := function
@@ -441,10 +441,10 @@ clean_address.err_stat,local
 									fileservices.clearsuperfile('~thor_data400::base::bankruptcy::aid_delete',true)
 
 									); 
-	retval := sequential(outfile,superfiletransactions,GetBadCleanAddress) : success(fileservices.sendemail('Christopher.Brodeur@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net',
+	retval := sequential(outfile,superfiletransactions,GetBadCleanAddress) : success(fileservices.sendemail('Christopher.Brodeur@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net',
 			'Bankruptcy AID:SUCCESS:' + ut.GetDate,
 			'BK AID Complete')),
-			failure(fileservices.sendemail('Christopher.Brodeur@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,Michael.Gould@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net',
+			failure(fileservices.sendemail('Christopher.Brodeur@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net',
 			'Bankruptcy AID:FAILED:' + ut.GetDate,
 			'BK AID Failed. Check WU'));
 	

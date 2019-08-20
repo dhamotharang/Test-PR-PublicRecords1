@@ -538,14 +538,24 @@ Export WV 	:= Module
 		ds_stock  := project(ds_corporations, wv_stockTransform(left))(corp2.t2u(stock_authorized_nbr + stock_par_value + stock_tax_capital)<>'') ;
 		mapStock  := dedup(sort(distribute(ds_stock,hash(corp_key)),record,local),record,local) ;
 
-		mapMain		:= dedup(sort(distribute(mapDissolutions  + 
-																			 mapCont 					+ 
-																			 mapDBA 					+ 
-																			 mapSubsidiaries  + 
-																			 mapNamechanges
-																			 ,hash(corp_key)
-																			 ),
+		MapCorpRecs:= dedup(sort(distribute( mapDissolutions  + 
+																				 mapCont 					+ 
+																				 mapDBA 					+ 
+																				 mapSubsidiaries  + 
+																				 mapNamechanges
+																				 ,hash(corp_key)
+																				 ),
 												record,local),record,local): independent;
+												
+		Corp2_Mapping.LayoutsCommon.Main legalNameFix_Trans(Corp2_Mapping.LayoutsCommon.Main  l):= transform
+			
+			self.corp_legal_name :=if(Corp2_Mapping.fSpecialChars(l.corp_legal_name)='FOUND', Corp2_Raw_WV.Functions.fix_ForeignChar(l.corp_legal_name), l.corp_legal_name);
+			self								 :=l;
+			
+		end;
+		
+		legalNameFix          := project(MapCorpRecs, legalNameFix_Trans(left)) ;
+		MapMain 							:= dedup(sort(distribute(legalNameFix,hash(corp_key)),record,local),record,local) : independent;		
 																	 
 		mapEvents	:= dedup(sort(distribute(mapEvent1 + 
 																			 mapEvent2,hash(corp_key)
@@ -585,16 +595,13 @@ Export WV 	:= Module
 	
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
-		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.AttachedList
 																																	 ,'Scrubs CorpMain_WV Report' 	//subject
 																																	 ,'Scrubs CorpMain_WV Report' //body
 																																	 ,(data)Main_ScrubsAttachment
 																																	 ,'text/csv'
 																																	 ,'CorpWVMainScrubsReport.csv'
-																																	 ,
-																																	 ,
-																																	 ,corp2.Email_Notification_Lists.spray
-																																 );
+																																	);
 
 		Main_BadRecords		  := Main_N.ExpandedInFile(	dt_vendor_first_reported_Invalid 			<>0  or
 																									dt_vendor_last_reported_Invalid 			<>0  or

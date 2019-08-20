@@ -1,8 +1,11 @@
-import std;
+﻿import Workman;
 EXPORT get_FilesRead(
-   string pWorkunitID = ''
-  ,string pesp        = _constants.LocalEsp
+   pWorkunitID = '\'\''
+  ,pesp        = 'wk_ut._Constants.LocalEsp'
+  ,pUseGlobal  = 'true'
 ) :=
-  if(pesp in _constants.LocalEsps and wk_ut.Is_Valid_Wuid(pWorkunitID),wk_ut.get_WUInfo(pWorkunitID,pesp).FilesRead//STD.System.Workunit.WorkunitFilesRead(pWorkunitID)//can't trust this to flag superfiles
-                                                                      ,wk_ut.get_WUInfo(pWorkunitID,pesp).FilesRead
-  );
+functionmacro
+ import Workman;
+ return Workman.get_FilesRead(pWorkunitID,pesp,pUseGlobal);
+ 
+endmacro;

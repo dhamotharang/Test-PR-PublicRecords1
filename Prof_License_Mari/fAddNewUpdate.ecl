@@ -1,4 +1,4 @@
-IMPORT Prof_License_Mari, /*Scrubs_Prof_License_Mari,*/ ut, _Control;
+﻿IMPORT Prof_License_Mari, /*Scrubs_Prof_License_Mari,*/ ut, _Control;
 // This attribute will add the dNewData, newly processed update, to dBasefile, superfile, if following criteria is met.
 // Otherwise dNewData will be added to the layout change suspect superfile and will be examined and handled manually.
 // 1.	Count the # of records in the input file
@@ -7,7 +7,7 @@ IMPORT Prof_License_Mari, /*Scrubs_Prof_License_Mari,*/ ut, _Control;
 // 4.	Concatenate files used in 1 and 2, then dedup by all fields in the file (except the fields expected to change each build like dates) and count the number of records after the dedup
 // 5.	Compare 1 to 4  and if 4 has 20% more records than 1, then your process will return true (indicating there may be an issue) 
 
-EXPORT fAddNewUpdate(DATASET(RECORDOF(Prof_License_Mari.layouts.base)) dNewData) := FUNCTION 
+EXPORT fAddNewUpdate(DATASET(RECORDOF(Prof_License_Mari.layout_base_in)) dNewData) := FUNCTION 
 
 	//name of the super file that contains all updates that are suspect of layout changes
 	layout_change_suspect_file_name := 'layout_change_suspect';
@@ -20,7 +20,7 @@ EXPORT fAddNewUpdate(DATASET(RECORDOF(Prof_License_Mari.layouts.base)) dNewData)
 
 	// super file
 	superfile_name		:=  mari_dest + src_cd;
-	dBasefile					:=	DATASET(mari_dest+src_cd,Prof_License_Mari.layouts.base,thor);
+	dBasefile					:=	DATASET(mari_dest+src_cd,Prof_License_Mari.layout_base_in,thor);
 	latest_date				:=	MAX(dBasefile,date_vendor_last_reported);
 	dLatestUpdate			:=	dBasefile(date_vendor_last_reported=latest_date);
 

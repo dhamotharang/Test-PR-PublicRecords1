@@ -5,8 +5,10 @@ EXPORT Spray_Lerg_In(string version, const varstring eclsourceip, string thor_fi
 	//DF-24140: Lerg6 Layout Change
 
 	//Linux Directories
-	srcdir 	:= '/data/data_999/phones/';
-	dir1		:= 'lerg';
+	srcdir 	:= '/data/Builds/builds/processing/';
+		dir1		:= 'lerg_mon/data';
+	//srcdir 	:= '/data/data_999/phones/';
+	//dir1		:= 'lerg_mon/build';
 	
 	//Thor File Names
 	root		:= '~thor_data400::in::phones::';

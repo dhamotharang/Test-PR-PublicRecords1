@@ -1,4 +1,4 @@
-﻿import standard, Prof_License;
+﻿import Address, Standard, Prof_License;
 
 export Layouts_ProfLic := module
 
@@ -329,7 +329,7 @@ export Layouts_ProfLic := module
 	   string9	  best_ssn;
 	   unsigned6  bdid;
 	   string100  cname;
-	   standard.Name name;
+		 Address.Layout_Clean_Name name;
 	   standard.L_Address.base addr;
 		 string8    dob;
 	   string10   Phone;

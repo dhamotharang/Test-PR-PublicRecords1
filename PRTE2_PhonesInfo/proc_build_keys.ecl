@@ -68,7 +68,8 @@ RoxieKeyBuild.MAC_SK_Move_To_Built_V2( Constants.KeyName_phones + Constants.KeyN
 				
 				build_key_lerg6, 
 				move_built_key_lerg6, 
-				move_qa_key_lerg6, 	
+				move_qa_key_lerg6, 
+			  copy_seeds(file_date),
 			 	PerformUpdateOrNot);
 
 END;

@@ -1,4 +1,4 @@
-import tools,FraudShared;
+﻿import tools,FraudShared,_control;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 export Send_Emails(
 	
@@ -23,4 +23,4 @@ export Send_Emails(
 		,pShouldUpdateRoxiePage
 		,
 		,'N'
-	);
+);

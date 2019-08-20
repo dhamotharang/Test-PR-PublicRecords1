@@ -1,12 +1,13 @@
 ﻿Import BIPV2, tools, AutoStandardI, InsuranceHeader_PostProcess, STD;
+import BIPV2_Contacts;
 
 EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := module
 
   //Using the index instead of base file (BIPV2_Build.files().contact_linkids.built) because of Roxie compile problems 
-	 contactKey := project(pull(BIPV2_Build.key_contact_linkids.keyvs(,false).built), recordof(key_contact_linkids.dkeybuild));
+  contactKey := project(pull(BIPV2_Contacts.key_contact_linkids.keyvs(,false).built), BIPV2_Contacts.layouts.contact_linkids.layoutOrigFile);
 	 
   build_date := (unsigned) STD.Str.Filter(pversion,'0123456789');
-		shared contactTitles := BestContactTitle(contactKey, build_date).contact_title;
+	shared contactTitles := project(BestContactTitle(contactKey, build_date).contact_title  ,transform({BestContactTitle(contactKey, build_date).layout,unsigned4 global_sid,unsigned8 record_sid},self := left,self := []));
 
   shared contact_title_bipd_pst          :=   contactTitles : persist('~persist::BIPV2_Build::key_contact_title_linkids.ds_prep');
   export contact_title_bipd_dst          :=   dataset('~persist::BIPV2_Build::key_contact_title_linkids.ds_prep',{contactTitles},flat);

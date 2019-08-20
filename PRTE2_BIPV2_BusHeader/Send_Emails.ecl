@@ -6,8 +6,8 @@ export Send_Emails(
 	,boolean							pUseOtherEnvironment 		= false
 	,boolean							pShouldUpdateRoxiePage	= false
 	,dataset(lay_builds)	pBIPV2FullKeys					= keynames(pversion).dall_filenames
-	,string								pEmailList							= 'giri.rajulapalli@lexisnexisrisk.com'
-	,string								pRoxieEmailList					= 'giri.rajulapalli@lexisnexisrisk.com'
+	,string								pEmailList							= 'Edward.Blaushield@lexisnexisrisk.com'
+	,string								pRoxieEmailList					= 'Edward.Blaushield@lexisnexisrisk.com'
 	,string								pBuildName							= 'PRTE2_BIPV2_BusHeader BizlinkFull'
 	,string								pBuildMessage						= 'Base Files Finished'
 	,string							  pUseVersion							= 'qa'

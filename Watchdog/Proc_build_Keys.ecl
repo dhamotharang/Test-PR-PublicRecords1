@@ -1,6 +1,6 @@
 ﻿import ut,lib_keylib,lib_fileservices,RoxieKeybuild,Orbit3,Suppress,_control,header,Watchdog_V2;
 
-leMailTarget := 'dataops@seisint.com;michael.gould@lexisnexisrisk.com';
+leMailTarget := 'Sudhir.Kasavajjala@lexisnexisrisk.com';
 
 // Get filedate from the watchdog check file
 
@@ -32,7 +32,7 @@ RoxieKeybuild.MAC_SK_BuildProcess_Local(watchdog.Key_Prep_Watchdog_nonglb(false)
 RoxieKeybuild.MAC_SK_BuildProcess_Local(watchdog.Key_Prep_Watchdog_nonglb(true),'~thor_data400::key::watchdog::'+filedate+'::nonglb_noneq.did','~thor_data400::key::watchdog_nonglb_noneq.did',secondDotOne_key,2);
 Roxiekeybuild.MAC_SK_BuildProcess_Local(watchdog.Key_Prep_Best_SSN,'~thor_data400::key::watchdog::'+filedate+'::best.ssn','~thor_data400::key::watchdog_best.ssn',third_key,2);
 Roxiekeybuild.MAC_SK_BuildProcess_v2_Local(Suppress.Key_SSN_Bad,'~thor_data400::key::ssn_bads','~thor_data400::key::watchdog::'+filedate+'::ssn_bads',ssn_bad_key,true);
-Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.key_watchdog_glb_nonblank,'~thor_data400::key::watchdog::'+filedate+'::best.did_nonblank','~thor_data400::key::watchdog_best.did_nonblank',sixth_key,2);
+Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.key_watchdog_glb_nonblank_old,'~thor_data400::key::watchdog::'+filedate+'::best.did_nonblank','~thor_data400::key::watchdog_best.did_nonblank',sixth_key,2);
 Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.key_Prep_Watchdog_glb_nonutil_nonblank(true),'~thor_data400::key::watchdog::'+filedate+'::best_nonutil.did_nonblank','~thor_data400::key::watchdog_best_nonutil.did_nonblank',sixthDotOne_key,2);
 Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.key_Prep_Watchdog_nonglb_nonblank(false),'~thor_data400::key::watchdog::'+filedate+'::nonglb.did_nonblank','~thor_data400::key::watchdog_nonglb.did_nonblank',seventh_key,2);
 Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.key_Prep_Watchdog_nonglb_nonblank(true),'~thor_data400::key::watchdog::'+filedate+'::nonglb_noneq.did_nonblank','~thor_data400::key::watchdog_nonglb_noneq.did_nonblank',seventhDotOne_key,2);
@@ -40,12 +40,12 @@ Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Prep_Watchdog_teaser(false)
 Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Prep_Watchdog_teaser(true),'~thor_data400::key::watchdog::'+filedate+'::nonglb_noneq.teaser','~thor_data400::key::watchdog_nonglb_noneq.teaser',eighthDotOne_key,2);
 //Roxiekeybuild.MAC_SK_BuildProcess_Local(Header.Key_Teaser_search,'~thor_data400::key::watchdog::'+filedate+'::nonglb.teaser_search','~thor_data400::key::watchdog_nonglb.teaser_search',k9,2);
 //Roxiekeybuild.MAC_SK_BuildProcess_Local(Header.Key_Teaser_did,'~thor_data400::key::watchdog::'+filedate+'::nonglb.teaser_did','~thor_data400::key::watchdog_nonglb.teaser_did',k10,2);
-Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian,'~thor_data400::key::watchdog::'+filedate+'::best_nonen.did','~thor_data400::key::watchdog_best_nonen.did',ninth_key,2);
-Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian_nonblank,'~thor_data400::key::watchdog::'+filedate+'::best_nonen.did_nonblank','~thor_data400::key::watchdog_best_nonen.did_nonblank',tenth_key,2);
-Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax,'~thor_data400::key::watchdog::'+filedate+'::best_nonen_noneq.did','~thor_data400::key::watchdog_best_nonen_noneq.did',eleven_key,2);
-Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax_nonblank,'~thor_data400::key::watchdog::'+filedate+'::best_nonen_noneq.did_nonblank','~thor_data400::key::watchdog_best_nonen_noneq.did_nonblank',twleve_key,2);
-Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonEquifax,'~thor_data400::key::watchdog::'+filedate+'::best_noneq.did','~thor_data400::key::watchdog_best_noneq.did',thirteen_key,2);
-Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonEquifax_nonblank,'~thor_data400::key::watchdog::'+filedate+'::best_noneq.did_nonblank','~thor_data400::key::watchdog_best_noneq.did_nonblank',fouteen_key,2);
+Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian_old,'~thor_data400::key::watchdog::'+filedate+'::best_nonen.did','~thor_data400::key::watchdog_best_nonen.did',ninth_key,2);
+Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian_nonblank_old,'~thor_data400::key::watchdog::'+filedate+'::best_nonen.did_nonblank','~thor_data400::key::watchdog_best_nonen.did_nonblank',tenth_key,2);
+Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax_old,'~thor_data400::key::watchdog::'+filedate+'::best_nonen_noneq.did','~thor_data400::key::watchdog_best_nonen_noneq.did',eleven_key,2);
+Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax_nonblank_old,'~thor_data400::key::watchdog::'+filedate+'::best_nonen_noneq.did_nonblank','~thor_data400::key::watchdog_best_nonen_noneq.did_nonblank',twleve_key,2);
+Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonEquifax_old,'~thor_data400::key::watchdog::'+filedate+'::best_noneq.did','~thor_data400::key::watchdog_best_noneq.did',thirteen_key,2);
+Roxiekeybuild.MAC_SK_BuildProcess_Local(Watchdog.Key_Watchdog_GLB_nonEquifax_nonblank_old,'~thor_data400::key::watchdog::'+filedate+'::best_noneq.did_nonblank','~thor_data400::key::watchdog_best_noneq.did_nonblank',fouteen_key,2);
 Roxiekeybuild.MAC_SK_BuildProcess_v2_Local(header.key_ADL_segmentation,'~thor_data400::key::adl_segmentation', '~thor_data400::key::header::' + filedate + '::adl_segmentation',fifteen_key);
 Roxiekeybuild.MAC_SK_BuildProcess_v2_Local(Watchdog.Key_Best_Name_City_State,'~thor_data400::key::watchdog_best.name_city_st','~thor_data400::key::watchdog::'+filedate + '::best.name_city_st', sixteen_key);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Watchdog.Key_Supplemental,'~thor_data400::key::watchdog_best_supplemental::did','~thor_data400::key::watchdog::'+filedate+'::best_supplemental::did',seventeen_key);
@@ -125,7 +125,7 @@ file_remove := sequential(
 
 
 email_success := fileservices.sendemail(
-										'roxiebuilds@seisint.com;sudhir.kasavajjala@lexisnexis.com;michael.gould@lexisnexis.com',
+										'Sudhir.Kasavajjala@lexisnexisrisk.com',
 										'Watchdog Weekly Build Succeeded - ' + filedate,
 										'Keys:\n' +
 										
@@ -149,24 +149,24 @@ email_success := fileservices.sendemail(
 										);
 
 email_failure := fileservices.sendemail(
-										'roxiebuilds@seisint.com;sudhir.kasavajjala@lexisnexis.com;michael.gould@lexisnexisrisk.com',
+										'Sudhir.Kasavajjala@lexisnexisrisk.com',
 										'Watchdog Weekly Roxie Build Failed - ' + filedate,
 										failmessage
 										);
 										
-update_version := RoxieKeyBuild.updateversion('WatchdogKeys',filedate,'michael.gould.lexisnexisrisk.com@seisint.com',,'N|B');
+update_version := RoxieKeyBuild.updateversion('WatchdogKeys',filedate,'Sudhir.Kasavajjala@lexisnexisrisk.com',,'N|B');
 create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate,'N|B');
 										
 export Proc_build_Keys := sequential(wchk,build_keys,move_to_built,move_keys
 			,parallel(eighth_key,eighthDotOne_key),mv8,mv8_1,move8,move8_1 // builds off seventh key and uses MOXIE out file that will be deleted
 		  /*k9,k10,mv9,mv10,move9,move10*/
 			// build universal key after all the other keys are built
-			,Watchdog_V2.Proc_Build_Merged_Key(filedate),
+			//,Watchdog_V2.Proc_Build_Merged_Key(filedate),
 			// then update DOPS
-			update_version,
-			create_build,
+			//update_version,
+			//create_build,
 			/*,create_build,update_idops,*/
-			temp_file,
+			,temp_file,
 			/*,fSendMail('WATCHDOG_KEYS_COMPLETE','Watchdog keys complete on prod400'),*/
 		  /*file_despray,*/file_remove
 			) : 

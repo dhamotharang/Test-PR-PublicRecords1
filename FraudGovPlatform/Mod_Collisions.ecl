@@ -33,7 +33,7 @@ SHARED	SlimBase := project(FileBase,
 														SELF.prim_name := LEFT.clean_address.prim_name; 
 														SELF.v_city_name := LEFT.clean_address.v_city_name; 
 														SELF.st := LEFT.clean_address.st; 
-														SELF.zip := LEFT.zip; 
+														SELF.zip := LEFT.clean_address.zip; 
 														SELF := LEFT; 
 														SELF := []));
 //////////////////////////////////

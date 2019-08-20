@@ -1,4 +1,4 @@
-﻿IMPORT DCAV2, Address, Standard;
+﻿IMPORT DCAV2, Address, Standard, prte2;
 
 EXPORT Layouts := MODULE
 
@@ -57,7 +57,8 @@ EXPORT Layouts := MODULE
 		layout_clean182_fips mailing_address;
 		clean_phones clean_phones;
 		clean_dates clean_dates;
-	 END;
+		PRTE2.layouts.DEFLT_CPA;
+		 END;
 	 
 	EXPORT layout_bdid := RECORD
 		unsigned6 bdid;
@@ -303,7 +304,8 @@ EXPORT Layouts := MODULE
 		string1 geo_matcha;
 		string4 err_stata;
 		string1 lf;
-		unsigned8 __internal_fpos__;
+		PRTE2.layouts.DEFLT_CPA;
+		//	unsigned8 __internal_fpos__;
 	 END;
  
 	//layout of the infile sprayed
@@ -550,7 +552,8 @@ EXPORT Layouts := MODULE
 		unsigned6 proxid;
 		unsigned6 powid;
 		unsigned6 empid;
-		unsigned6 dotid;    
+		unsigned6 dotid; 
+		PRTE2.Layouts.DEFLT_CPA;
 		unsigned8 row_id;
 	END;
    
@@ -835,7 +838,8 @@ EXPORT Layouts := MODULE
 		string1 geo_matcha;
 		string4 err_stata;
 		string1 lf;
-		unsigned8 __internal_fpos__;
+		PRTE2.Layouts.DEFLT_CPA;
+		//	unsigned8 __internal_fpos__;
 	 END;
 	
 	EXPORT layout_autokey := 

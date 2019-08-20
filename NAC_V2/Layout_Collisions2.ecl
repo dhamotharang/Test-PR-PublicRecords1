@@ -1,4 +1,4 @@
-EXPORT Layout_Collisions2 := MODULE
+﻿EXPORT Layout_Collisions2 := MODULE
 
 	
 	export slim1 := RECORD
@@ -43,7 +43,7 @@ EXPORT Layout_Collisions := RECORD
 	,string20 SearchCaseID
 	,string20 SearchClientID
 	,string1 SearchBenefitType
-	//,string6 SearchBenefitMonth
+	,string1	SearchRangeType
 	,string8	SearchStartDate
 	,string8	SearchEndDate
 	,string30 SearchLastName
@@ -67,7 +67,6 @@ EXPORT Layout_Collisions := RECORD
 	,string2 CaseState
 	,string1 CaseBenefitType
 	,string4 CaseGroupId
-	//,string6 CaseBenefitMonth
 	,string8	CaseStartDate
 	,string8	CaseEndDate
 	,string20 CaseID
@@ -75,14 +74,18 @@ EXPORT Layout_Collisions := RECORD
 	,string25 CaseFirstName
 	,string25 CaseMiddleName
 	,string5 CaseSuffixName := ''
+	,string10	CaseMonthlyAllotment
+	,string3	RegionCode
 	,string10 CasePhone1
 	,string10 CasePhone2
 	,string256 CaseEmail
+	,string1	AddressPhysicalCategory
 	,string70 CasePhysicalStreet1
 	,string70 CasePhysicalStreet2
 	,string30 CasePhysicalCity
 	,string2 CasePhysicalState
 	,string9 CasePhysicalZip
+	,string1	AddressMailCategory
 	,string70 CaseMailStreet1
 	,string70 CaseMailStreet2
 	,string30 CaseMailCity
@@ -91,6 +94,9 @@ EXPORT Layout_Collisions := RECORD
 	,string3 CaseCountyParishCode
 	,string25 CaseCountyParishName
 	,string20 ClientID
+	,string1	HoHIndicator
+	,string1	ABAWDIndicator
+	,string1	RelationshipIndicator
 	,string30 ClientLastName
 	,string25 ClientFirstName
 	,string25 ClientMiddleName
@@ -102,8 +108,14 @@ EXPORT Layout_Collisions := RECORD
 	,string1 ClientSSNType
 	,string8 ClientDOB
 	,string1 ClientDOBType
+	,string20	ClientCertificateType
+	,string10	ClientMonthlyAllotment
 	,string1 ClientEligibilityStatus
 	,string8 ClientEligibilityDate
+	,string1	ClientEligibilityPeriodType
+	,string5	ClientEligibilityPeriodCount
+	,string8	ClientEligibilityStartDate
+	,string8	ClientEligibilityEndDate
 	,string10 ClientPhone
 	,string256 ClientEmail
 	,string50 StateContactName
@@ -115,23 +127,16 @@ EXPORT Layout_Collisions := RECORD
 	,unsigned6 OrigSearchSequenceNumber
 	,string10 SearchSequenceNumber
 	,unsigned6 OrigClientSequenceNumber
+	,string5		TotalEligiblePeriodsDays
+	,string4		TotalEligiblePeriodsMonths
+	,string3		ExceptionReasonCode
+	,string50		ExceptionComments
+	,string200	EligibilityPeriodsHistory
 	,string10 ClientSequenceNumber
 	,unsigned4 SearchNCFFileDate
 	,unsigned4 ClientNCFFileDate
 	,unsigned4 SearchProcessDate
 	,unsigned4 ClientProcessDate;
-	// For post filtering (no longer necessary)
-	/*string9		SearchCleanSSN;
-	string9		ClientCleanSSN;
-	string8		SearchCleanDOB;
-	string8		ClientCleanDOB;
-	string20	SearchFname;
-	string20	ClientFname;
-	string20	SearchPrefname;
-	string20	ClientPrefname;
-	string5		SearchNameSuffix;
-	string5		ClientNameSuffix;
-*/
 END;
 
 

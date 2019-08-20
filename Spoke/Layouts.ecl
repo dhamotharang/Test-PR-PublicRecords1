@@ -1,4 +1,4 @@
-import address, BIPV2;
+﻿import address, BIPV2;
 export Layouts :=
 module
 
@@ -89,6 +89,10 @@ module
 
 		Miscellaneous.Cleaned_Dates			clean_dates											;
 		Miscellaneous.Cleaned_Phones		clean_phones										;
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) - JIRA# CCPA-13
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		unsigned4 											global_sid 									:= 0;
+		unsigned8 											record_sid 									:= 0;
 	end;
 	
 	export Keybuild :=
@@ -111,6 +115,11 @@ module
 
 		Miscellaneous.Cleaned_Dates			clean_dates											;
 		Miscellaneous.Cleaned_Phones		clean_phones										;
+		// The below 2 fields are added for CCPA (California Consumer Protection Act) - JIRA# CCPA-13
+		// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+		unsigned4 											global_sid 									:= 0;
+		unsigned8 											record_sid 									:= 0;
+		
 	end;
 
 	export Keybuild_BIP :=

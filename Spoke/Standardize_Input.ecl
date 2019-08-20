@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header, _Validate, idl_header;
+﻿import Address, Ut, lib_stringlib, _Control, business_header, _Validate, idl_header;
 
 // -- add unique id
 // -- standardize name
@@ -190,6 +190,7 @@ module
 			self.clean_dates						:= r;
 			self.dt_first_seen					:= r.dt_first_seen;
 			self.dt_last_seen						:= r.dt_last_seen;
+			self.global_sid							:= 22911;
 			self 												:= l;
 
 		end;

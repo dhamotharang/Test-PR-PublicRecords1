@@ -63,6 +63,7 @@ EXPORT Files(STRING pversion = '', boolean pUseProd = false) := MODULE
  	 tools.mac_FilesBase(Filenames(pversion,pUseProd).prov_birthdate_Base, layouts.prov_birthdate_base, prov_birthdate_base);
  	 tools.mac_FilesBase(Filenames(pversion,pUseProd).sanction_Base, layouts.sanction_base, sanction_base);
 	 tools.mac_FilesBase(Filenames(pversion,pUseProd).gk_to_provID_Base, layouts.gk_to_provID_base, gk_to_provID_base);
+	 tools.mac_FilesBase(Filenames(pversion,pUseProd).individual_exceptions, layouts.individual_exception_base, exceptions);
 	 
    Export dea_BAcodes_base :=
 				dataset([
