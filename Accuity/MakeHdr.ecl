@@ -38,7 +38,7 @@ export unicode MakeXMLHdr(string SourceCode, integer cnt, boolean createSearchCr
 					+ GetPublicationDate(SourceCode)
 							+hdg_Pt5  +
 					IF(NOT createSearchCriteria, '',
-						'<SearchCriteria>\n' + 'xxx' + '</SearchCriteria>\n')
+						'<SearchCriteria>\n' + $.ExtractSearchCriteria + '</SearchCriteria>\n')
 							+ hdg_Pt5a + hdg_Pt5b
 							+(string)cnt
 						+hdg_Pt6;
@@ -88,13 +88,15 @@ dummyRecord(string code) := PROJECT(
 
 
 export OutputDataXMLFile(string code, string filename,
-		dataset(recordof(Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.routp)) infile) := FUNCTION
+		dataset(recordof(Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.routp)) infile,
+		boolean createSearchCriteria = false) 
+			:= FUNCTION
 
 	ds := IF(EXISTS(infile),infile,dummyRecord(code));
 	cnt := count(infile);
-	hdr := CreateXMLFileHdr(code, ds);
+	//hdr := CreateXMLFileHdr(code, ds, createSearchCriteria);
 	return OUTPUT(ds,,'~thor::accuity::'+filename,
-			xml('Entity', heading(FROMUNICODE(CreateXMLFileHdr(code, ds), 'utf8')
+			xml('Entity', heading(FROMUNICODE(CreateXMLFileHdr(code, ds, createSearchCriteria), 'utf8')
 						,Footer),trim, OPT), overwrite);
 END;
 /*
