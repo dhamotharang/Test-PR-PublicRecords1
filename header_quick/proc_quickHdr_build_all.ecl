@@ -1,11 +1,11 @@
 ﻿IMPORT _control,ut,RoxieKeyBuild,header,PromoteSupers,Data_Services,STD;
 
 EXPORT proc_quickHdr_build_all (
-	STRING overwriteFileDate = '',
 	STRING sourceIP = _control.IPAddress.bctlpedata10,
 	STRING sourcePathWeekly  = '/data/Builds/builds/quick_header/data/',
 	STRING sourcePathMonthly = '/data/Builds/builds/quick_header/data/',
-	STRING destinationGroup  = STD.System.Thorlib.Group()
+	STRING destinationGroup  = STD.System.Thorlib.Group(),
+	STRING overwriteFileDate = ''
 ) := FUNCTION
 
 	filedate := header_quick._config(sourceIP, sourcePathWeekly).get_v_eq_as_of_date;

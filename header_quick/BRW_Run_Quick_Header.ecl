@@ -8,4 +8,4 @@
 //#OPTION('AllowedClusters', 'thor400_44');
 #OPTION('AllowAutoQueueSwitch',TRUE);
 #OPTION('multiplePersistInstances',FALSE);
-header_quick.proc_quickHdr_build_all('',_control.IPAddress.bctlpedata10);
+header_quick.proc_quickHdr_build_all(_control.IPAddress.bctlpedata10);
