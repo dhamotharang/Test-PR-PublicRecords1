@@ -1,4 +1,4 @@
-import address, globalwatchlists, ut;
+﻿import address, globalwatchlists, ut;
 
 export Proc_Build_BW_Base(string pFileDate) := function
 
@@ -1043,6 +1043,9 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self.date_last_updated := '';
 		self.effective_date := '';
 		self.expiration_date := '';
+		//Added for CCPA-94
+		self.global_sid := 0;
+		self.record_sid := 0;
 		self := l;
 	end;
 	
