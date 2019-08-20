@@ -112,7 +112,7 @@
 	Super_Log_File := SuperFile + '::scrubs_fraudgov';
 	SuperFile_Entries := dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
 	
-	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull')),
+	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp_'+scopename,thor,overwrite,named(scope_datasetName+'_LogEntryFull')),
 		STD.File.StartSuperFileTransaction(),
 		STD.File.RemoveSuperFile(SuperFile,Super_Log_File,true),
 		STD.File.FinishSuperFileTransaction());
@@ -121,7 +121,7 @@
 	publish:=sequential(
 		Create_New_File,
 		nothor(global(sequential(fileservices.deleteLogicalFile(Super_Log_File),
-		fileservices.renameLogicalFile(Super_Log_File+'_temp',Super_Log_File),
+		fileservices.renameLogicalFile(Super_Log_File+'_temp_'+scopename,Super_Log_File),
 		STD.File.StartSuperFileTransaction(),
 		STD.File.AddSuperFile(SuperFile,Super_Log_File),
 		STD.File.FinishSuperFileTransaction()))));
