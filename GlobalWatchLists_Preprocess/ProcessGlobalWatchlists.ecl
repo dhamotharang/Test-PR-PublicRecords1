@@ -770,6 +770,7 @@ EXPORT ProcessGlobalWatchlists(string filedate) := FUNCTION
 		//Added for CCPA-94
 		self.global_sid :=			L.global_sid;
 		self.record_sid :=			L.record_sid;
+		self.did        :=      L.did;
 		self := L;
 		self := [];
 	END;

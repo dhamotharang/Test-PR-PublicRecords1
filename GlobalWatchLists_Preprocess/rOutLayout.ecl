@@ -376,4 +376,5 @@
 	//Added for CCPA-94
 	unsigned4 global_sid := 0;
 	unsigned8 record_sid := 0;
+	unsigned6 did        := 0;
 END;

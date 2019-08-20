@@ -1046,6 +1046,7 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		//Added for CCPA-94
 		self.global_sid := 0;
 		self.record_sid := 0;
+		self.did        := 0;
 		self := l;
 	end;
 	
