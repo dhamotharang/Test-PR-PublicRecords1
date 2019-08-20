@@ -1,4 +1,4 @@
-﻿IMPORT CCPA;
+﻿IMPORT CCPA, STD;
 
 EXPORT macGetGlobalSid(dInFile, sRoxiePackage, sFieldName='', sGlobalSid='global_sid') := FUNCTIONMACRO
 
@@ -10,7 +10,7 @@ EXPORT macGetGlobalSid(dInFile, sRoxiePackage, sFieldName='', sGlobalSid='global
 
   dDataGlobalSid := CCPA.File_Global_SID.lookupTable;
 
-  dFilterGSidFile := dDataGlobalSid(roxie_packages = sRoxiePackage);
+  dFilterGSidFile := dDataGlobalSid(STD.Str.ToUpperCase(roxie_packages) = STD.Str.ToUpperCase(sRoxiePackage));
 
   aCheckDatasetEntry := IF(EXISTS(dFilterGSidFile) = FALSE, FAIL(' DATASET ENTRY NOT FOUND '))
     : FAILURE(STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,
