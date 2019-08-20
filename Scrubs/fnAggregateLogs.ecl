@@ -16,8 +16,8 @@ newrecsStandard:=dataset('~thor_data400::Scrubs::OrbitReports::using',Scrubs.Lay
 // output(oldrecsStandard+newrecsStandard,,'~thor_data400::Scrubs::OrbitReports::full::'+workunit,thor));
 
 
-PromoteSupers.Mac_SF_BuildProcess(oldrecsPlus+newrecsPlus,'~thor_data400::ScrubsPlus::log::fullFile',build_basePlus,2,,TRUE);
-PromoteSupers.Mac_SF_BuildProcess(oldrecsStandard+newrecsStandard,'~thor_data400::Scrubs::OrbitReports::fullFile',build_baseOrbit,2,,TRUE);
+PromoteSupers.Mac_SF_BuildProcess(oldrecsPlus+newrecsPlus,'~thor_data400::ScrubsPlus::log::fullFile',build_basePlus,,,TRUE);
+PromoteSupers.Mac_SF_BuildProcess(oldrecsStandard+newrecsStandard,'~thor_data400::Scrubs::OrbitReports::fullFile',build_baseOrbit,,,TRUE);
 
 // ClearFiles:=nothor(global(sequential(
 										// STD.File.StartSuperFileTransaction(),
