@@ -9,13 +9,13 @@ IMPORT $, STD;
 
 EXPORT fn_IsEmailAddressFormatValid
 (
-	DATASET(Layouts.rlEmailValidation) dschk
+	DATASET(Layouts.rlEmailValidation) dsCheckFormat
 )
 := FUNCTION 
 	rgxEmail:='^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}+$)[A-Z0-9._%+-]{1,64}+@(?:(?=[A-Z0-9-]{1,63}+\\.)[A-Z0-9]++(?:-[A-Z0-9]++)*+\\.){1,8}+[A-Z]{2,63}+$'; 
-	dsInvalid :=  dschk(NOT REGEXFIND(rgxEmail, STD.Str.ToUpperCase(EmailAddress)));
+	dsInvalid :=  dsCheckFormat(NOT REGEXFIND(rgxEmail, STD.Str.ToUpperCase(EmailAddress)));
 	cnt := COUNT(dsInvalid); 
-	rval := IF( ( cnt > 0) , 1, 0);
+	rval := (cnt > 0);
 	IF(cnt > 0 , 
 		SEQUENTIAL(OUTPUT (dsInvalid, NAMED('invalid_format')), FAIL(1, 'Error in email format')) , 
 			OUTPUT('Email format check passed', NAMED('email_format_check'))); 
