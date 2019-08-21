@@ -172,7 +172,7 @@ END;
 				PROJECT(DISTRIBUTE(inFile(Field='')),
 					TRANSFORM(new_layout, 
 							SELF.nameid := Nid.Common.BlankNid;
-							self._name_ind := Nid.NameIndicators.Blank;
+							self._name_ind := Nid.NameIndicators.NameTypes.Blank;
 							SELF := LEFT;
 							));
 

@@ -576,6 +576,8 @@ string1 GetNameClass(string nm) :=
 string3 GetNameTypes(string s) :=
 		GetNameClass(REGEXFIND(rgxFirm, s, 1)) +
 			GetNameClass(REGEXFIND(rgxFirm, s, 2)) + GetNameClass(REGEXFIND(rgxFirm, s, 4));
+			
+NonFirmNames := ['JR','SR','II','III','MC'];
 
 boolean LikelyFirmName(string s) := FUNCTION
 	//t := GetNameTypes(s);
@@ -590,7 +592,9 @@ boolean LikelyFirmName(string s) := FUNCTION
 		REGEXFIND(rgxFirm1, s) => true,
 		REGEXFIND('^([A-Z]+) +(\\1+) *(&| AND ) *([A-Z]+)[.,/\\\']?$',s) => true,		// MORGAN MORGAN AND JONES
 		KnownFirmName(s) => true,
-		Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => false,
+		REGEXFIND(rgxFirm, s, 1) IN NonFirmNames OR REGEXFIND(rgxFirm, s, 2) IN NonFirmNames OR
+							REGEXFIND(rgxFirm, s, 4) IN NonFirmNames => false,
+		NOT Persons.TestDualName(REGEXFIND(rgxFirm, s, 1), REGEXFIND(rgxFirm, s, 2), REGEXFIND(rgxFirm, s, 4)) => true,
 		//t[2] = 'F' OR t[3] = 'F' => false,
 		//t IN ['LFF','LBF','LFB','LBB','BLF','FLF','FLB'] => false,
 		//t in ['LBL','BBL','BLL','BLB','LLL','LXL','LLX'] => true,
