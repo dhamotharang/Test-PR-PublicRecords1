@@ -1,9 +1,16 @@
-﻿import Std, _Control;
+﻿
+
+import Std, _Control;
+
+
 
 rgxEmail := '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$';
 
+
+
 EXPORT DistributionLists := MODULE
-		export lfn_internal := '~nac::internaldistribution.csv';
+
+export lfn_internal := '~nac::internaldistribution.csv';
 
 		export SprayInternal(string ip,string rootDir) := nothor(
 					Std.File.SprayVariable(ip
@@ -21,6 +28,8 @@ EXPORT DistributionLists := MODULE
 					);
 
 
+
+
 		rInternal := RECORD
 			string			list {MAXLENGTH(16)};
 			string			email {MAXLENGTH(255)};
@@ -33,9 +42,10 @@ EXPORT DistributionLists := MODULE
 																									, HEADING(1)
 																									, MAXLENGTH(1024)
 																									)
-																						)(REGEXFIND(rgxEmail,email));
+																						)(REGEXFIND(rgxEmail, email));
 																						
 		export lfn_external := '~nac::externaldistribution.csv';
+		
 		export SprayExternal(string ip,string rootDir) := nothor(
 					Std.File.SprayVariable(ip
 							,rootDir + 'enternaldistribution.csv'
@@ -50,6 +60,8 @@ EXPORT DistributionLists := MODULE
 							,true
 						)
 					);
+
+
 
 		rExternal := RECORD
 			string1			program;
@@ -66,6 +78,8 @@ EXPORT DistributionLists := MODULE
 																									)
 																						)(REGEXFIND(rgxEmail,email));
 
+
+
 		shared rEmail := RECORD
 			string	email;
 		END;
@@ -79,12 +93,34 @@ EXPORT DistributionLists := MODULE
 		END;
 
 
-	export ValidationList := extractList(PROJECT(dsInternal(list='Validation'),rEmail));
-	export AlertList := extractList(PROJECT(dsInternal(list='Alert'),rEmail));
-	export FailureList := extractList(PROJECT(dsInternal(list='Failure'),rEmail));
-	export SuccessList := extractList(PROJECT(dsInternal(list='Success'),rEmail));
+	// export ValidationList := extractList(PROJECT(dsInternal(list='Validation'),rEmail));
+	// export AlertList := extractList(PROJECT(dsInternal(list='Alert'),rEmail));
+	// export FailureList := extractList(PROJECT(dsInternal(list='Failure'),rEmail));
+	// export SuccessList := extractList(PROJECT(dsInternal(list='Success'),rEmail));
 
-	export ProgramList(string1 theProgram, string2 theState, string2 theGroupid='') :=
-	   extractList(PROJECT(dsExternal(Program=theProgram, state=theState, groupid=theGroupId),rEmail));
+
+
+	EXPORT ProgramList(string1 theProgram, string2 theState, string2 theGroupid='') :=
+	   extractList(PROJECT(dsExternal(Program=theProgram, state=theState, groupid=theGroupId), rEmail));
+											
+											
+											
+EXPORT ValidationList := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('PPA', 'Validation');
+EXPORT AlertList := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('PPA', 'Alert');
+EXPORT FailureList := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('PPA', 'Failure');
+EXPORT SuccessList := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('PPA', 'Success');										
+											
+											
+											
+											
 											
 END;
+
+
+
+
+
+
+
+
+
