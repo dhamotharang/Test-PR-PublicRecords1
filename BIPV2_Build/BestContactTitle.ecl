@@ -1,24 +1,28 @@
 ﻿Import BIPV2, tools, AutoStandardI, InsuranceHeader_PostProcess, STD;
+import BIPV2_Contacts;
 
 YEARS2 := 2*365;
 YEARS7 := 7*365;
 
-export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = dataset([],recordof(BIPV2_Build.key_contact_linkids.dkeybuild)), 
+export BestContactTitle(dataset(BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile) contactKey = dataset([], BIPV2_Contacts.Layouts.contact_linkids.layoutOrigFile), 
                         unsigned TODAYS_DATE = STD.Date.Today()) := module
+
+	contactKeyLayout := BIPV2_Contacts.key_contact_linkids.kfetch_layout;
+	
     slim_layout := {
-                    BIPV2_Build.key_contact_linkids.Key.ultid,
-                    BIPV2_Build.key_contact_linkids.Key.orgid,
-                    BIPV2_Build.key_contact_linkids.Key.seleid,
-                    BIPV2_Build.key_contact_linkids.Key.proxid,
-                    BIPV2_Build.key_contact_linkids.Key.contact_did,
+                    contactKeyLayout.ultid,
+                    contactKeyLayout.orgid,
+                    contactKeyLayout.seleid,
+                    contactKeyLayout.proxid,
+                    contactKeyLayout.contact_did,
                     string10 seg_ind;
-                    BIPV2_Build.key_contact_linkids.Key.dt_first_seen_contact,
-                    BIPV2_Build.key_contact_linkids.Key.dt_last_seen_contact,
-                    BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
-                    BIPV2_Build.key_contact_linkids.Key.executive_ind;
-                    BIPV2_Build.key_contact_linkids.Key.executive_ind_order;										  
-                    typeof(BIPV2_Build.key_contact_linkids.Key.dt_first_seen_contact) dt_first_seen_title,
-                    typeof(BIPV2_Build.key_contact_linkids.Key.dt_last_seen_contact) dt_last_seen_title,
+                    contactKeyLayout.dt_first_seen_contact,
+                    contactKeyLayout.dt_last_seen_contact,
+                    contactKeyLayout.contact_job_title_derived;
+                    contactKeyLayout.executive_ind;
+                    contactKeyLayout.executive_ind_order;										  
+                    typeof(contactKeyLayout.dt_first_seen_contact) dt_first_seen_title,
+                    typeof(contactKeyLayout.dt_last_seen_contact) dt_last_seen_title,
                     unsigned4 days_old_title;
                     unsigned4 days_old_contact;
                     unsigned data_permits;
@@ -105,7 +109,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned title_rank;
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
-        BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+        // BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+        contactKeyLayout.contact_job_title_derived;
         };
 				
     slim_child_title_layout := {
@@ -168,7 +173,8 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned contact_rank;
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
-        BIPV2_Build.key_contact_linkids.Key.contact_did,
+        // BIPV2_Build.key_contact_linkids.Key.contact_did,
+        contactKeyLayout.contact_did,
         dataset(title_layout) titles;
         };
  
@@ -211,8 +217,10 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         unsigned contact_title_rank;
         unsigned2 data_permits;
         unsigned2 accum_data_permits;
-        BIPV2_Build.key_contact_linkids.Key.contact_did,
-        BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+        // BIPV2_Build.key_contact_linkids.Key.contact_did,
+        contactKeyLayout.contact_did,
+        // BIPV2_Build.key_contact_linkids.Key.contact_job_title_derived;
+        contactKeyLayout.contact_job_title_derived;
         };
 
     contact_title_layout := {
