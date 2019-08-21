@@ -418,7 +418,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       prop_clean := project(prop_raw,
                      TRANSFORM(iesp.property.t_PropertyReport2Record,
                         SELF.parcelnumber:= STD.Str.FilterOut(LEFT.parcelnumber, '- '),
-                        SELF := LEFT,));							 
+                        SELF := LEFT,));
+			//field parcelnumber is deprecated in ESP and they use the equivalent Assessment/deed ParcelId
       prop_sorted := sort(prop_clean, recordtype, -parcelnumber,
                          -d2i(assessment.recordingdate),-d2i(deed.recordingdate));							 
       prop_duped := dedup(prop_sorted, recordtype, parcelnumber);

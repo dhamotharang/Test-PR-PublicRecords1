@@ -8284,20 +8284,12 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
   EXPORT DiffScalars (layouts._lt_Property2Name L, layouts._lt_Property2Name R, boolean is_deleted, boolean is_added) := MODULE
     shared boolean updated_First := (L.First != R.First);
     shared boolean updated_Last := (L.Last != R.Last);
-    shared boolean updated_IdValue := (L.IdValue != R.IdValue);
     shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
-    shared boolean updated_BusinessId := (L.BusinessId != R.BusinessId);
-    shared boolean updated_AppendedSSN := (L.AppendedSSN != R.AppendedSSN);
-    shared boolean updated_LinkingWeight := (L.LinkingWeight != R.LinkingWeight);
 
     shared is_updated := false
       OR updated_First
       OR updated_Last
-      OR updated_IdValue
-      OR updated_UniqueId
-      OR updated_BusinessId
-      OR updated_AppendedSSN
-      OR updated_LinkingWeight;
+      OR updated_UniqueId;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -8307,11 +8299,7 @@ EXPORT _df_Property2Name(boolean is_active, string path) := MODULE
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
       _meta :=   IF (updated_First, DATASET ([{'First', R.First}], layouts.DiffMetaRow))
-         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))+ IF (updated_IdValue, DATASET ([{'IdValue', R.IdValue}], layouts.DiffMetaRow))
-         +  IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow))
-         +  IF (updated_BusinessId, DATASET ([{'BusinessId', R.BusinessId}], layouts.DiffMetaRow))
-         +  IF (updated_AppendedSSN, DATASET ([{'AppendedSSN', R.AppendedSSN}], layouts.DiffMetaRow))
-         +  IF (updated_LinkingWeight, DATASET ([{'LinkingWeight', R.LinkingWeight}], layouts.DiffMetaRow));
+         +  IF (updated_Last, DATASET ([{'Last', R.Last}], layouts.DiffMetaRow))+ IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -8573,26 +8561,26 @@ EXPORT _df_PropertyReport2Record(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_parcelnumberrecordtype(layouts._lt_PropertyReport2Record L, layouts._lt_PropertyReport2Record R) := FUNCTION
-    boolean IsInner :=  (L.ParcelNumber = R.ParcelNumber AND L.RecordType = R.RecordType);
+  EXPORT  integer1 CheckOuter_assessment_parceliddeed_parcelidrecordtype(layouts._lt_PropertyReport2Record L, layouts._lt_PropertyReport2Record R) := FUNCTION
+    boolean IsInner :=  (L.RecordType = R.RecordType AND L.Assessment.ParcelId = R.Assessment.ParcelId AND L.Deed.ParcelId = R.Deed.ParcelId);
 
-    boolean IsOuterRight :=   (L.ParcelNumber = '' AND L.RecordType = '');
+    boolean IsOuterRight :=   (L.RecordType = '' AND L.Assessment.ParcelId = '' AND L.Deed.ParcelId = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_parcelnumberrecordtype (dataset(layouts._lt_PropertyReport2Record) _n, dataset(layouts._lt_PropertyReport2Record) _o) := FUNCTION
+  EXPORT  AsDataset_assessment_parceliddeed_parcelidrecordtype (dataset(layouts._lt_PropertyReport2Record) _n, dataset(layouts._lt_PropertyReport2Record) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_PropertyReport2Record, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_PropertyReport2Record, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.ParcelNumber = RIGHT.ParcelNumber AND LEFT.RecordType = RIGHT.RecordType,
+                  LEFT.RecordType = RIGHT.RecordType AND LEFT.Assessment.ParcelId = RIGHT.Assessment.ParcelId AND LEFT.Deed.ParcelId = RIGHT.Deed.ParcelId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_parcelnumberrecordtype(LEFT, RIGHT)),
+                  CheckOuter_assessment_parceliddeed_parcelidrecordtype(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.ParcelNumber = RIGHT.ParcelNumber AND LEFT.RecordType = RIGHT.RecordType,
+                  LEFT.RecordType = RIGHT.RecordType AND LEFT.Assessment.ParcelId = RIGHT.Assessment.ParcelId AND LEFT.Deed.ParcelId = RIGHT.Deed.ParcelId,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_parcelnumberrecordtype(LEFT, RIGHT)),
+                  CheckOuter_assessment_parceliddeed_parcelidrecordtype(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_PropertyReport2Record);
@@ -9185,7 +9173,7 @@ EXPORT _df_PersonSlimReportResponse(boolean is_active, string path) := MODULE
 
       SELF.LiensJudgments  := _df_LienJudgmentReportRecord(CASE(path + '/LiensJudgments', '/LiensJudgments' => (MonitorLienJudgment), is_active), path + '/LiensJudgments/LienJudgment').AsDataset_originfilingnumbertmsid(L.LiensJudgments, R.LiensJudgments);
 
-      SELF.Properties  := _df_PropertyReport2Record(CASE(path + '/Properties', '/Properties' => (MonitorProperty), is_active), path + '/Properties/Property').AsDataset_parcelnumberrecordtype(L.Properties, R.Properties);
+      SELF.Properties  := _df_PropertyReport2Record(CASE(path + '/Properties', '/Properties' => (MonitorProperty), is_active), path + '/Properties/Property').AsDataset_assessment_parceliddeed_parcelidrecordtype(L.Properties, R.Properties);
 
       SELF.MarriageDivorces  := _df_MarriageSearch2Record(CASE(path + '/MarriageDivorces', '/MarriageDivorces' => (MonitorMarriageDivorce), is_active), path + '/MarriageDivorces/MarriageDivorce').AsDataset_filingnumberfilingtypecodestateorigin(L.MarriageDivorces, R.MarriageDivorces);
 
