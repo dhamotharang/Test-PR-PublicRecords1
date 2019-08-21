@@ -511,18 +511,8 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 					mo_apns_w_exp	:= project(mo_apns_only, add_exp(left));
 				
 					base_w_mo_apns_exp := base_no_mo_apns + mo_apns_w_exp;
-					
-			// *************************************** Add global_sid and record_sid for CCPA ************************************
-			
-					base_w_mo_apns_exp add_sids(base_w_mo_apns_exp L) := transform
-							self.global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
-							self.record_sid					:=	L.source_rid;
-							self										:=	L;
-					end;
-					
-					with_ccpa := project(base_w_mo_apns_exp, add_sids(left));
-											
-			RETURN with_ccpa;						
+													
+			RETURN base_w_mo_apns_exp;						
 
    END;
 	 
@@ -746,18 +736,8 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 											,t_rollup(LEFT,RIGHT)
 											,LOCAL
 											);	
-											
-			// *************************************** Add global_sid and record_sid for CCPA ************************************
-			
-					stlic_base_s add_sids(stlic_base_s L) := transform
-							self.global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
-							self.record_sid					:=	L.source_rid;
-							self										:=	L;
-					end;
-					
-					base_with_ccpa := project(stlic_base_s, add_sids(left));
-																													
-				RETURN base_with_ccpa;						
+																		
+				RETURN stlic_base_s;//stlic_base;						
 
    END;
 
