@@ -123,8 +123,7 @@ export IdAppendThorLocal(
 		Input_lname := pContact_lname,
 		Input_contact_ssn := pContact_ssn,
 		Outfile := %OutFile1%,
-		// AsIndex := %useKeyedJoins%,
-		AsIndex := true, // TODO
+		AsIndex := %useKeyedJoins%,
 		In_bGetAllScores := bGetAllScores
 	);
 
