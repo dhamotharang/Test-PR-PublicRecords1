@@ -1,5 +1,5 @@
-﻿/*2019-06-05T16:30:12Z (Hennigar, Jennifer (RIS-BCT))
-CCPA-256
+﻿/*2019-07-26T19:05:37Z (Periasamy, Senthilkumar (RIS-ATL))
+
 */
 import AID, address, BIPV2;
 export Layouts := module	
@@ -541,8 +541,6 @@ export Layouts := module
 			string										xadl2_keys_desc			:= '';
 			string60									xadl2_matches				:= '';
 			string										xadl2_matches_desc	:= '';
-			unsigned4 								global_sid					:= 22931; // Source ID for NPPES - CCPA project 20190528  
-			unsigned8 								record_sid; 
 		end;				
 		
 		
