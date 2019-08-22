@@ -410,6 +410,10 @@ EXPORT Layouts := MODULE
 			string20 	Customer_Id;
 			string20	File_type;
 		end;
+		
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
+		end;
 	end;
 
 export temp := module 
@@ -1868,5 +1872,55 @@ Export CIID := RECORD
   integer8 cl_active7_identity_count_percentile_;
   real8 cl_impact_weight_;
  END;
+ 
+//KEL Dashboards Response Layout
+ rresults := RECORD
+    string name{xpath('name')};
+    string value{xpath('value')};
+    string filename{xpath('filename')};
+    string total{xpath('total')};
+   END;
+
+ rappvalues := RECORD
+    string application{xpath('application')};
+    string name{xpath('name')};
+    string value{xpath('value')};
+   END;
+
+ rworkunit := RECORD
+   string wuid{xpath('wuid')};
+   string owner{xpath('owner')};
+   string cluster{xpath('cluster')};
+   string jobname{xpath('jobname')};
+   string stateid{xpath('stateID')};
+   string state{xpath('state')};
+   string totalthortime{xpath('totalThorTime')};
+   DATASET(rresults) results{xpath('results')};
+   DATASET(rappvalues) appvalues{xpath('applicationValues')};
+   integer8 errorcount{xpath('errorCount')};
+   integer8 warningcount{xpath('warningCount')};
+   integer8 infocount{xpath('infoCount')};
+   integer8 resultcount{xpath('resultCount')};
+  END;
+
+ rresponse	:= RECORD 
+  string uuid{xpath('uuid')};
+  string username{xpath('username')};
+  string workunitid{xpath('workunitId')};
+  rworkunit workunit{xpath('workunit')};
+  string failed{xpath('failed')};
+  string running{xpath('running')};
+  string connectionurl{xpath('connectionURL')};
+  string compositionuuid{xpath('compositionUuid')};
+  string paused{xpath('paused')};
+  string complete{xpath('complete')};
+  string compositionname{xpath('compositionName')};
+ END;
+ 
+ Export DashboardResponse :={ DATASET(rresponse) response{xpath('response')} END;
+ 
+ Export ProdDashboardVersion := Record
+  string version;
+ End; 
  
 END;
