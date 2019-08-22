@@ -90,6 +90,9 @@ module
 	//////////////////////////////////////////////////////////////////
 	export CustomerSettings := FraudGov_Prefix('config') + 'CustomerSettings';
 	export CustomerMappings := FraudGov_Prefix('config') + 'CustomerMappings';
+	export CustomerDashboard := FraudGov_Prefix('config') + 'kel::customerdashboard';
+	export ClusterDetails := FraudGov_Prefix('config') + 'kel::clusterdetails';
+	export ProdDashboardVersion := FraudGov_Prefix('config') + 'kel::ProdDashboardVersion';
 
 	export Flags := module
 		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
@@ -97,6 +100,7 @@ module
 		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
 		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
 		export CustomerActiveSprays := FraudGov_Prefix('flags') + 'CustomerActiveSprays_flag';
+		export RefreshProdDashVersion := FraudGov_Prefix('flags') + 'kel::RefreshProdDashVersion';
 		
 	end;
 	//////////////////////////////////////////////////////////////////
