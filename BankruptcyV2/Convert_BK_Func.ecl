@@ -1,9 +1,19 @@
-import text_search, bankruptcyv2,codes;
+﻿import text_search, bankruptcyv2,codes;
 
 export Convert_BK_Func := function
 	
-	dmain := bankruptcyv2.file_bankruptcy_main;
-	dparty := bankruptcyv2.file_bankruptcy_search;
+	// dmain := bankruptcyv2.file_bankruptcy_main;
+	// dparty := bankruptcyv2.file_bankruptcy_search;
+	
+	dmain1    := bankruptcyv2.file_bankruptcy_main;	
+  dist_id 	:= distribute(dmain1, hash(TMSID));
+	sort_id 	:= sort(dist_id, TMSID, -process_Date, local);
+	dmain    	:= dedup(sort_id, TMSID,local);
+	
+	dparty1   := bankruptcyv2.file_bankruptcy_search;	
+	Partydist_id 	:= distribute(dparty1, hash(TMSID));
+	Partysort_id 	:= sort(Partydist_id, TMSID, -process_Date, local);
+	dparty  	    := dedup(Partysort_id, TMSID,local);	
 	
 	// Document Record Layout which has child dataset (The content is a child dataset)
 	text_bk_record := record(Text_Search.Layout_Document)
