@@ -22,17 +22,17 @@ EXPORT macGetGlobalSid(dInFile, sRoxiePackage, sFieldName='', sGlobalSid='global
   #DECLARE(sFilter);
   #SET(sFilter, '');   
   #IF(sFieldName <> '')
-    #APPEND(sFilter, '(source_codes = l.' + #TEXT(#EXPAND(sFieldName)) + ')')
+    #APPEND(sFilter, '(source_codes = (STRING)l.' + #TEXT(#EXPAND(sFieldName)) + ')')
   #END
 
   fFilterGlbSrcid (lInRec l) := FUNCTION
     sGlbSrcid := dFilterGSidFile #IF(SFieldName <> '')#EXPAND(#TEXT(%sFilter%))#END;
     tGlobalSrcID := TABLE(sGlbSrcid, {global_sid, cnt:=COUNT(GROUP)},global_sid);
 
-    aCheckDatasetDups := IF(tGlobalSrcID[1].cnt > 1 AND tGlobalSrcID[1].global_sid != '', OUTPUT('***WARNING:Duplicate GLB_SRCID for Dataset ' + sRoxiePackage,NAMED('WarningDups')));
-    aCheckGlobalSRCID := IF(tGlobalSrcID[1].global_sid = '', OUTPUT('***WARNING:GLB_SRCID IS BLANK for Dataset ' + sRoxiePackage,NAMED('WarningBlanks'))); 
+    aCheckDatasetDups := IF(tGlobalSrcID[1].cnt > 1 AND tGlobalSrcID[1].global_sid != '', STD.System.Log.addWorkunitWarning('***WARNING:Duplicate GLB_SRCID for Dataset ' + sRoxiePackage));
+    aCheckGlobalSRCID := IF(tGlobalSrcID[1].cnt = 1 AND tGlobalSrcID[1].global_sid = '', STD.System.Log.addWorkunitWarning('***WARNING:GLB_SRCID IS BLANK for Dataset ' + sRoxiePackage)); 
 
-    ORDERED(aCheckDatasetDups, aCheckGlobalSRCID);
+    ORDERED(aCheckDatasetDups,aCheckGlobalSRCID);
 
     RETURN tGlobalSrcID[1].global_sid;
   END;
