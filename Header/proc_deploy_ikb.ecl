@@ -22,12 +22,12 @@ ver_wkly_TBD := Dops.GetBuildVersion('PersonHeaderWeeklyKeys'//'PersonLABKeys' /
                     );
                     
 // Get versions for packages from DOPS
-ver_lab_cert_ver := dops.GetBuildVersion('PersonLabKeys','B','N','C')[1..8];
-ver_lab_prod_ver := dops.GetBuildVersion('PersonLabKeys','B','N','P')[1..8];
-ver_fcra_cert_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','C')[1..8];
-ver_fcra_prod_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','P')[1..8];
-ver_wkly_cert_ver := dops.GetBuildVersion('PersonHeaderWeeklyKeys','B','N','C')[1..8];
-ver_wkly_prod_ver := dops.GetBuildVersion('PersonHeaderWeeklyKeys','B','N','P')[1..8];
+ver_lab_cert_ver := dops.GetBuildVersion('PersonLabKeys','B','N','C');
+ver_lab_prod_ver := dops.GetBuildVersion('PersonLabKeys','B','N','P');
+ver_fcra_cert_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','C');
+ver_fcra_prod_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','P');
+ver_wkly_cert_ver := dops.GetBuildVersion('PersonHeaderWeeklyKeys','B','N','C');
+ver_wkly_prod_ver := dops.GetBuildVersion('PersonHeaderWeeklyKeys','B','N','P');
 
 // Gets the version from the latest QA file on Thor
 lastestIkbVersionOnThor  := header.Proc_Copy_From_Alpha_Incrementals().lastestIkbVersionOnThor;
