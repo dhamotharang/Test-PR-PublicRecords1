@@ -66,8 +66,8 @@ export constants := module
 																											,'NA'
 																											)
 																										,MAP (
-																												l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'DEV196'
-																																=> 'uspr-dopsservices.risk.regn.net/dev196'
+																												l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'DATAQA'
+																																=> 'uspr-dopsservices.risk.regn.net/dataqa'
 																												,l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'CORE'
 																																=> 'uspr-dopsservices.risk.regn.net/core'
 																												,l_loc = 'B' and STD.Str.ToUpperCase(l_testenv) = 'PRTE'
@@ -80,7 +80,10 @@ export constants := module
 																											(environment in healthcareset) and (l_loc in locationset)
 																																=> 'devdopsservices.risk.regn.net/hc'
 																											,environment not in healthcareset and l_loc = 'B'
-																																=> 'devdopsservices.risk.regn.net/pr'
+																																=> 'devdopsservices.risk.regn.net/' + 
+																																					if (l_testenv <> 'NA' and l_testenv <> ''
+																																							,l_testenv
+																																							,'pr')
 																											,environment not in healthcareset and l_loc = 'A'
 																																=> 'devdopsservices.risk.regn.net/ins'
 																											,'NA'
@@ -147,7 +150,7 @@ export constants := module
 	export vRoxieVIP(string p_cluster, string p_environment) := MAP(
 																																					p_cluster = 'fcra' and p_environment = 'cert' =>  'http://certfcraroxievip.sc.seisint.com:9876'
 																																					,p_cluster = 'fcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prod_batch_fcra
-																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://10.176.68.194:101'
+																																					,p_cluster = 'nonfcra' and p_environment = 'cert' =>  'http://roxiestaging.sc.seisint.com:9876'
 																																					,p_cluster = 'nonfcra' and p_environment = 'prod' =>  _Control.RoxieEnv.prodvip
 																																					,'NA');	
 	

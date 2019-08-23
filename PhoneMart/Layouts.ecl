@@ -60,8 +60,9 @@
 		STRING5		NAME_SUFFIX;
 		UNSIGNED8	ScrubsBits1	:=	0;
 		UNSIGNED8	ScrubsBits2	:=	0;
-		UNSIGNED4 global_sid;
-		UNSIGNED8 record_sid;
+		//CCPA-4 Add new fields for CCPA
+		unsigned4 global_sid;
+   unsigned8 record_sid;
 	END;
 
 	EXPORT	base_no_scrub	:=	base AND NOT [ScrubsBits1, ScrubsBits2];

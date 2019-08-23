@@ -1,4 +1,4 @@
-export layout_in_other := record
+﻿export layout_in_other := record
 	string40	RecordID;
 	string2		StateCode;
 	string50	Attorney;
@@ -23,5 +23,5 @@ export layout_in_other := record
 	string50	MilitaryBranch;
 	string100	EmailAddress;
 	string100	SourceName;
-	string		SourceID;
+	string100	SourceID;
 end;

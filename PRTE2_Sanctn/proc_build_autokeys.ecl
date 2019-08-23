@@ -15,11 +15,9 @@ inc := sort(table(files.base_incident
 				
 pty_aka_dba	:= files.base_party_aka_dba;
 
-xpnd_sanctn := RECORD
-	layouts.autokeys;
-  INTEGER8 zero := 0;
-	blk  := '';
-END;
+xpnd_sanctn := layouts.autokeys;
+  
+
 
 xpnd_sanctn xpand_sanctn(pty L, inc R) :=  TRANSFORM
 
@@ -38,7 +36,8 @@ self.st 					:= IF(L.st='' and length(trim(L.instate))=2 and L.incity='' and L.i
 												trim(L.instate),
 												L.st);
 				 
-self               := L; 
+self := L; 
+self := [];
 END;
 
 

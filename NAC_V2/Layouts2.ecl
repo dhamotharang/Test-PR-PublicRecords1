@@ -76,7 +76,7 @@ export rClient := RECORD
 	string10		MonthlyAllotment := '0';	// whole dollar
 	string1			Eligibility;			// E=Elibible, I=Ineligible Alien, D=Disqualified, N=Not Eligible, A=Applicant
 	string8			EffectiveDate;		// CCYYMMDD
-	string8			PeriodType;				// M=Month, D=Date
+	string1			PeriodType;				// M=Month, D=Date
 	string5			HistoricalBenefitCount;
 	string8			StartDate;
 	string8			EndDate;
@@ -94,9 +94,17 @@ export rException := RECORD
 	string2			MatchedState;
 	string1			MatchedProgramCode;
 	string20		MatchedClientId;
+	string4			MatchedGroupId;
 	string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
 	string50		Comments;
 END;
+
+export rBadRecord := RECORD
+	string4			RecordCode;
+	string64		text;
+END;
+
+EXPORT validRecordCodes := ['CA01','CL01','AD01','SC01','EX01'];
 
 EXPORT rNac2 := RECORD
 	string4			RecordCode;
@@ -116,19 +124,28 @@ EXPORT rNac2 := RECORD
 	  rException - RecordCode		ExceptionRec;
 	END;
 	IFBLOCK(self.RecordCode NOT IN ['CA01','CL01','AD01','SC01','EX01'])
-		string		BadRecord {maxlength(256)};
+		rBadRecord - RecordCode		BadRec;
 	END;
-	string	eol := '\n';
+	string1	eol := '\n';
+END;
+
+export rCommonEx := RECORD
+		string4						GroupId := '';
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		unsigned4					errors := 0;
+		unsigned4					warnings := 0;
+		DATASET($.ValidationCodes.rError)	dsErrs;
+		string4						OrigGroupId := '';
+		string32					filename := '';
 END;
 
 // extended records
 	export rAddressEx := RECORD
-		rAddress - RecordCode;
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rAddress;
+
+		rCommonEx;
 
 		String60  Prepped_addr1:='';
 		String45  Prepped_addr2:=''
@@ -164,12 +181,9 @@ END;
 	END;
 
 	export rClientEx := RECORD
-		rClient - RecordCode;
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rClient;
+
+		rCommonEx;
 
 		String75  Prepped_name:=''
 			,address.Layout_Clean_Name.title
@@ -189,30 +203,66 @@ END;
 	END;
 	
 	export rCaseEx := RECORD
-		rCase - RecordCode;
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rCase;
+
+		rCommonEx;
+
 	END;
 
 	export rStateContactEx := RECORD
-		rStateContact - RecordCode;
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rStateContact;
+		rCommonEx;
 	END;
 	
 	export rExceptionEx := RECORD
-		rException - [RecordCode];
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned8					errors := 0;
-		unsigned4					warnings := 0;
+		rException;
+		string4			SourceGroupId;
+		rCommonEx;
 	END;
+	
+	export rBadRecordEx := RECORD
+		rBadRecord;
+		rCommonEx;
+	END;
+	
+EXPORT rNac2Ex := RECORD
+	string4			RecordCode;
+	IFBLOCK(self.RecordCode = 'CA01')
+	  rCaseEx - RecordCode			CaseRec;
+	END;
+	IFBLOCK(self.RecordCode = 'CL01')
+	  rClientEx - RecordCode		ClientRec;
+	END;
+	IFBLOCK(self.RecordCode = 'AD01')
+	  rAddressEx - RecordCode		AddressRec;
+	END;
+	IFBLOCK(self.RecordCode = 'SC01')
+	  rStateContactEx - RecordCode	StateContactRec;
+	END;
+	IFBLOCK(self.RecordCode = 'EX01')
+	  rExceptionEx - RecordCode		ExceptionRec;
+	END;
+	IFBLOCK(self.RecordCode NOT IN ['CA01','CL01','AD01','SC01','EX01'])
+		rBadRecordEx - RecordCode		BadRec;
+	END;
+END;	
+
+EXPORT rExceptionRecord := RECORD
+		string1			UpdateType;			// U = Add/Update, D = Delete
+		string2			SourceProgramState;
+		string1			SourceProgramCode;
+		string20		SourceClientId;
+		string4			SourceGroupId;
+		string2			MatchedState;
+		string1			MatchedProgramCode;
+		string20		MatchedClientId;
+		string4			MatchedGroupId;
+		string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
+		string50		Comments;
+		unsigned4 	created;
+		unsigned4 	updated;
+		unsigned4 	replaced;
+		string32		filename := '';
+END;		
 
 END;

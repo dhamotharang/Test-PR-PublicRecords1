@@ -11,5 +11,9 @@ Export Linkids:=DATASET(prte2.constants.Linkids, prte2.Layouts.Norm, FLAT );
 
 Export lnpr_IN := DATASET(prte2.constants.lnpr_in, prte2.Layouts.Linkid_Rec, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
+export global_sid	:= dataset(prte2.Constants.prefix + 'in::ccpa_global', prte2.Layouts.ccpa_global_sid, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) ); 
 
+Export lnpr_DBA_IN:= DATASET(prte2.constants.lnpr_dba_in, prte2.Layouts.DBA_In_Rec, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+
+Export Linkids_DBA:=DATASET(prte2.constants.DBA_Linkids, prte2.Layouts.DBA_Norm, FLAT );
 END;

@@ -1,15 +1,17 @@
-﻿import _Control,tools,STD,FraudGovPlatform;
+﻿import _Control,tools,STD,FraudGovPlatform,ut;
 
 EXPORT SprayAndQualifyDeltabase(
-	STRING version,
+	STRING pVersion,
 	STRING ip	= IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10),
 	STRING pDeltabaseRootDir = IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.DeltaLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.DeltaLandingZonePathBase_prod)
 ) := FUNCTION
 
-dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pDeltabaseRootDir + version[1..8], 'delta_identity.txt')):INDEPENDENT;
+DateSearch := pVersion[1..8];
+
+dsFileList:=NOTHOR(FileServices.RemoteDirectory(ip, pDeltabaseRootDir + DateSearch, 'delta_identity.txt')):INDEPENDENT;
 dsFileListSorted := SORT(dsFileList,modified);
 fname_temp	:=dsFileListSorted[1].Name:independent;
-fname	:='delta_identity_'+version[1..8]+'.txt';
+fname	:='delta_'+DateSearch+'.txt';
 
 UpSt:=stringlib.stringtouppercase(fname[1..2]);
 UpType := 'Deltabase';
@@ -37,11 +39,11 @@ ClearFiles	:= SEQUENTIAL(
 
 
 SprayIt:=SEQUENTIAL(
-						OUTPUT('Spraying: '+ ip + pDeltabaseRootDir + version[1..8] + '/' + fname_temp + ' -> ' + FileSprayed) 
+						OUTPUT('Spraying: '+ ip + pDeltabaseRootDir + DateSearch + '/' + fname_temp + ' -> ' + FileSprayed) 
 						,NOTHOR(ClearFiles)
 						,NOTHOR(FileServices.SprayVariable(
 							 IP //sourceIP 
-							,pDeltabaseRootDir + version[1..8] + '/' + fname_temp //sourcepath 
+							,pDeltabaseRootDir + DateSearch + '/' + fname_temp //sourcepath 
 							,//maxrecordsize 
 							,//srcCSVseparator 
 							,'|\n,\n'//srcCSVterminator 
@@ -102,7 +104,7 @@ ReportInvalidNumberOfColumns :=
 							Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidNumberOfColumns(mod_sets.validDelimiterDeltabase, mod_sets.validTerminatorsDeltabase));
 
 ReportEmptyFile := 
-		SEQUENTIAL (	OUTPUT('File '+ip+pDeltabaseRootDir + version[1..8] +'/'+ fname_temp+' empty',NAMED('Deltabase_File_empty')),
+		SEQUENTIAL (	OUTPUT('File '+ip+pDeltabaseRootDir + DateSearch +'/'+ fname_temp+' empty',NAMED('Deltabase_File_empty')),
 							Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert);
 outputwork
 			:=

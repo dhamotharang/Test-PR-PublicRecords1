@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate,aid;
+﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate,aid;
 
 // -- prep address for cleaning
 // -- map data to the base layout
@@ -47,6 +47,7 @@ module
 		  self.prep_home_addr_line_last	   	:= ''                                       ;
 		  self.prep_work_addr_line1				 	:= ''                                       ;
 		  self.prep_work_addr_line_last	   	:= ''                                       ;
+			self.global_sid 									:= 25721;
 			SELF															:= []		  																	; 
 		end;
  		

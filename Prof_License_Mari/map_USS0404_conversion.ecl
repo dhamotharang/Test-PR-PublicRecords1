@@ -4,7 +4,7 @@
 IMPORT ut, Address, Prof_License_Mari, lib_stringlib, Lib_FileServices,STD;
 
 EXPORT map_USS0404_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Yogurt:Prof License MARI - USS0404  ' + pVersion);
 code								:= 'USS0404';
 src_st							:= code[1..2];	//License state
 src_cd							:= code[3..7];
@@ -155,7 +155,7 @@ FilterRec 	:= dsExpandFile(NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter
 ut.CleanFields(FilterRec,CleanRec);
 
 maribase_plus_dbas := RECORD,MAXLENGTH(5500)
-Prof_License_Mari.layouts.base;
+Prof_License_Mari.layout_base_in;
 STRING60 dba1;
 STRING60 dba2;
 STRING60 dba3;
@@ -326,7 +326,7 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 		SELF.NAME_ORG_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameOrg);
 		SELF.NAME_ORG					:= IF(REGEXFIND('.COM',getCorpOnly),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',tmpNameOrg,' CO')),
 																Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameOrg,' CO')));  //Without punct. and Sufx removed
-		SELF.NAME_ORG_SUFX 		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+		SELF.NAME_ORG_SUFX 		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 		SELF.STORE_NBR				:= '';
 	
 // Retrieve Contact Names
@@ -472,7 +472,7 @@ END;
 
 // Transform expanded dataset to MARIBASE layout
 // Apply DBA Business Rules
-Prof_License_Mari.layouts.base xTransToBase(FilteredRecs L) := TRANSFORM
+Prof_License_Mari.layout_base_in xTransToBase(FilteredRecs L) := TRANSFORM
   SELF.NAME_ORG 				:= IF(REGEXFIND('(%|")',L.NAME_ORG),
 															STD.Str.CleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctMisc(L.NAME_ORG)),
 																STD.Str.CleanSpaces(STD.Str.FindReplace(L.NAME_ORG,' /',' ')));

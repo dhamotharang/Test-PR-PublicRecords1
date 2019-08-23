@@ -1,8 +1,8 @@
 ﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
 Add BK daily files.
 */
-IMPORT BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
-			 Gong, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
+IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
+			 Data_Services, Gong, Gong_Neustar, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
 			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
@@ -29,6 +29,8 @@ EXPORT product_files := MODULE
 			Header.Layout_Header.dt_vendor_last_reported;
 			Header.Layout_Header.did;
 			Header.Layout_Header.src;
+      Header.Layout_Header_v2.dob;
+			Header.Layout_Header_v2.ssn;
 		END;
 
 		EXPORT layout_base_file_util_daily := RECORD
@@ -83,6 +85,7 @@ EXPORT product_files := MODULE
 			Header.Layout_Header_v2.dt_vendor_last_reported;
 			Header.Layout_Header_v2.did;
 			Header.Layout_Header_v2.src;
+      
 		END;
 		
 		EXPORT Base_Header_file_slim := 
@@ -163,7 +166,8 @@ EXPORT product_files := MODULE
 		// "INTERNAL: Expected a parent/container context.  Likely to be caused by executing something 
 		// invalid inside a NOTHOR." Use the superkey reference for now.
 		// *** adding INDEPENDENT to get_EnvVariable call to avoid referenced error above ***
-		
+
+	
 		EXPORT header_build_version         := TRIM( did_add.get_EnvVariable('header_build_version') ):INDEPENDENT;
 
 		EXPORT doxie_key_header_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::data';
@@ -185,11 +189,38 @@ EXPORT product_files := MODULE
 				PROJECT(doxie_key_header_undist, layout_base_header), 
 				HASH64(did)
 			);
-		
+      
 		EXPORT doxie_key_header_slim := DEDUP(SORT(doxie_key_header, 
 																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
 																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
 																		: INDEPENDENT; //PERSIST('acctmon::header::doxie_key_header_slim');
+
+//----------------------------------------------RoxieVersionPersonHeader-----------------------------------------------------------------
+
+		EXPORT r_doxie_key_header_superkeyname_raw := 'batchr3::monitor::personheader_' + doxie.version_superkey;
+		EXPORT r_doxie_key_header_superkeyname     :=  Data_Services.Default_Data_Location + r_doxie_key_header_superkeyname_raw; /*AccountMonitoring.constants.DATA_LOCATION*/
+
+		// Define a Duplicate Index; see the ECL Language Guide, p. 68
+		SHARED r_doxie_key_header_undist := 
+			pull(INDEX(
+				doxie.key_header,  
+				// doxie_key_header_keyname
+				r_doxie_key_header_superkeyname
+			))(did <> 0);
+			
+		SHARED r_doxie_key_header :=
+			DISTRIBUTE(
+				PROJECT(r_doxie_key_header_undist, layout_base_header), 
+				HASH64(did)
+			);
+      
+		EXPORT r_doxie_key_header_slim := DEDUP(SORT(r_doxie_key_header, 
+																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
+																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
+																		: INDEPENDENT; 
+
+//----------------------------------------------EndRoxieVersionPersonHeader------------------------------------------------------------------
+	
 		
 		// DIDUPDATE FILES
 		EXPORT doxie_key_rid_did_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::rid_did';
@@ -644,8 +675,8 @@ EXPORT product_files := MODULE
 		EXPORT gong_filename_nocluster := 'base::gong_history';
 		EXPORT gong_filename_raw := 'thor_data400::' + gong_filename_nocluster;
 		EXPORT gong_filename := AccountMonitoring.constants.DATA_LOCATION + gong_filename_raw;	
-		
-		SHARED File_Gong_History_Full := DATASET(gong_filename, Gong.layout_historyaid, THOR, __COMPRESSED__);
+		//CCPA-22 use new gong history layout defined in Gong_Neustar
+		SHARED File_Gong_History_Full := DATASET(gong_filename, Gong_Neustar.Layout_History, THOR, __COMPRESSED__);
 		//SHARED File_Gong_History_Current := File_Gong_History_Full(current_record_flag = 'Y');
 		EXPORT File_Gong_History_Current := File_Gong_History_Full(current_record_flag = 'Y');
 
@@ -1379,68 +1410,64 @@ EXPORT product_files := MODULE
 	EXPORT sbfe := MODULE
 	
 		EXPORT sbfe_build_version := TRIM(did_add.get_EnvVariable('sbfecv_build_version')):INDEPENDENT;
+  
+// Linkid key
+// Duplicate of Roxie Key 
+	
+		EXPORT r_sbfeLinkid_superkeyname_raw := 'batchr3::monitor::sbfe::linkids_' + doxie.Version_SuperKey;
+		EXPORT r_sbfeLinkid_superkeyname     := Data_Services.Default_Data_Location + r_sbfeLinkid_superkeyname_raw;
 
-		// Linkid key
-		EXPORT sbfeLinkid_keyname_raw := 'thor_data400::key::sbfe::' + sbfe_build_version + '::linkids';
-		EXPORT sbfeLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeLinkid_keyname_raw;
-		
-		EXPORT sbfeLinkid_superkeyname_raw := 'thor_data400::key::sbfe::' + doxie.Version_SuperKey + '::linkids';
-		EXPORT sbfeLinkid_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeLinkid_superkeyname_raw;
-
-		SHARED sbfeLinkid_key_undist := 
-			INDEX(
+		SHARED r_sbfeLinkid_key_undist := 
+			pull(INDEX(
 				Business_Credit.Key_LinkIds().key,  
-				sbfeLinkid_keyname
-			);
+				r_sbfeLinkid_superkeyname
+			));
 
-		EXPORT sbfeLinkid_key :=
+		EXPORT r_sbfeLinkid_key :=
 			DISTRIBUTE(
-				sbfeLinkid_key_undist, 
+				r_sbfeLinkid_key_undist, 
 				HASH64(seleid)
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_linkid');
-				
-		// Tradeline Key		
-		
-		EXPORT sbfeTrade_keyname_raw := 'thor_data400::key::sbfe::' + sbfe_build_version + '::tradeline';
-		EXPORT sbfeTrade_keyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeTrade_keyname_raw;
-		
-		EXPORT sbfeTrade_superkeyname_raw := 'thor_data400::key::sbfe::' + doxie.Version_SuperKey + '::tradeline';
-		EXPORT sbfeTrade_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeTrade_superkeyname_raw;
+   
+   
+// Tradeline Key	
+// Duplicate of Roxie Key	
+  
+		EXPORT r_sbfeTrade_superkeyname_raw := 'batchr3::monitor::sbfe::tradeline_' + doxie.Version_SuperKey;
+		EXPORT r_sbfeTrade_superkeyname     := Data_Services.Default_Data_Location + r_sbfeTrade_superkeyname_raw;
 
-		SHARED sbfeTrade_key_undist := 
-			INDEX(
+		SHARED r_sbfeTrade_key_undist := 
+			pull(INDEX(
 				Business_Credit.key_tradeline(),  
-				sbfeTrade_keyname
-			);
+				r_sbfeTrade_superkeyname
+			));
 
-		EXPORT sbfeTrade_key :=
+		EXPORT r_sbfeTrade_key :=
 			DISTRIBUTE(
-				sbfeTrade_key_undist, 
+				r_sbfeTrade_key_undist, 
 				HASH64(sbfe_contributor_number,contract_account_number)
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_tradeline');
-		
-		// Credit Score Key	
-		
-		EXPORT sbfeScore_build_version := TRIM(did_add.get_EnvVariable('sbfecvscoring_build_version')):INDEPENDENT;
-		
-		EXPORT sbfeScore_keyname_raw := 'thor_data400::key::sbfescoring::' + sbfeScore_build_version + '::scoringindex';
-		EXPORT sbfeScore_keyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeScore_keyname_raw;
-		
-		EXPORT sbfeScore_superkeyname_raw := 'thor_data400::key::sbfescoring::' + doxie.Version_SuperKey + '::scoringindex';
-		EXPORT sbfeScore_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + sbfeScore_superkeyname_raw;
 
-		SHARED sbfeScore_key_undist := 
-			INDEX(
+// Credit Score Key	
+// Duplicate of Roxie Key	
+		
+		EXPORT r_sbfeScore_superkeyname_raw := 'batchr3::monitor::sbfescoring::scoringindex_' + doxie.Version_SuperKey ;
+		EXPORT r_sbfeScore_superkeyname     := Data_Services.Default_Data_Location + r_sbfeScore_superkeyname_raw;
+
+		SHARED r_sbfeScore_key_undist := 
+			pull(INDEX(
 				Business_Credit_Scoring.Key_ScoringIndex().Key,  
-				sbfeScore_keyname
-			);
+				r_sbfeScore_superkeyname
+			));
 
-		EXPORT sbfeScore_key :=
+		EXPORT r_sbfeScore_key :=
 			DISTRIBUTE(
-				sbfeScore_key_undist,
+				r_sbfeScore_key_undist,
 				HASH64(seleid) 
 				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_scoring');
 	END;
+  
+
 		
 	EXPORT ucc := MODULE
 	

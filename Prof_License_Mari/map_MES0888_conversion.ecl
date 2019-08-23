@@ -42,7 +42,7 @@ EXPORT map_MES0888_conversion(STRING pVersion) := FUNCTION
 
 
 	//ME Real Estate Company Personnel layout to Common
-	Prof_License_Mari.layouts.base	transformToCommon(ValidMEFile L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(ValidMEFile L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -437,7 +437,7 @@ EXPORT map_MES0888_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ValidMEFile, transformToCommon(LEFT));
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -446,7 +446,7 @@ EXPORT map_MES0888_conversion(STRING pVersion) := FUNCTION
 																LEFT.STD_SOURCE_UPD=RIGHT.source_upd AND RIGHT.fld_name='LIC_TYPE' AND StringLib.StringToUpperCase(TRIM(LEFT.STD_LICENSE_TYPE,LEFT,RIGHT))=TRIM(RIGHT.fld_value,LEFT,RIGHT),
 																			trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 																			
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -459,7 +459,7 @@ EXPORT map_MES0888_conversion(STRING pVersion) := FUNCTION
 	company_only_lookup := ds_map_status_trans(affil_type_cd IN ['CO','BR']);
 
 	//Prof_License_Mari.layouts_reference.MARIBASE assign_pcmcslpk(ds_map_src_desc L, company_only_lookup R) := TRANSFORM
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_status_trans L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_status_trans L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := MAP(L.affil_type_cd = 'IN' AND R.affil_type_cd IN ['BR','CO'] => R.cmc_slpk,
 													L.affil_type_cd = 'BR' AND R.affil_type_cd='CO' => R.cmc_slpk,
 													L.pcmc_slpk);
@@ -472,7 +472,7 @@ EXPORT map_MES0888_conversion(STRING pVersion) := FUNCTION
 												assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);	
 																									
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								 TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'THIS IS NOT A MAIN OFFICE.  IT IS A BRANCH OFFICE WITHOUT AN ASSOCIATED MAIN OFFICE FROM THIS SOURCE.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 

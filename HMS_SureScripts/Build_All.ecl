@@ -1,9 +1,10 @@
-
-import versioncontrol, _control, ut, tools,HMS_SureScripts;
+﻿
+import versioncontrol, _control, ut, tools,HMS_SureScripts, Orbit3;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd));
 spray_Specialty  := VersionControl.fSprayInputFiles(fSpray_Specialty(pversion,pUseProd));
+updateorbit := Orbit3.Proc_Orbit3_CreateBuild_npf ('Sure Scripts',(pversion));
 
 built := sequential(
 					Create_SuperFiles(pversion,pUseProd).CreateSF_All
@@ -29,6 +30,7 @@ built := sequential(
 					,FileServices.ClearSuperFile(Filenames_SpecCodes(pversion,pUseProd).lSpecCodesInputTemplate)
 					
 					,FileServices.FinishSuperFileTransaction()
+					,updateorbit
 
 				): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 

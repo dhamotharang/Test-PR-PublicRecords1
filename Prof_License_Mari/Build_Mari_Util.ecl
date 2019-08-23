@@ -9,15 +9,11 @@ EXPORT Build_Mari_Util := MODULE
 		  super_mari_base		:= '~thor_data400::in::proflic_mari::'+ src_cd;
 		  mari_base					:= '~thor_data400::in::proflic_mari::'+ pVersion+'::'+src_cd;
 
-			super := IF(ut.CleanSpacesAndUpper(code)='ALL',
-			            Prof_License_Mari.file_Maribase_in,
-			            DATASET(super_mari_base,Prof_License_Mari.layouts.base,THOR));
+			super := DATASET(super_mari_base,Prof_License_Mari.layout_base_in,THOR);
 
-			after_map := map(ut.CleanSpacesAndUpper(code)='ALL' and ut.CleanSpacesAndUpper(pVersion)='ALL' 
-			                   => Prof_License_Mari.file_Maribase_in,
-											 ut.CleanSpacesAndUpper(code)<>'ALL' and ut.CleanSpacesAndUpper(pVersion)='ALL'
-											   => DATASET('~thor_data400::in::proflic_mari::'+src_cd,Prof_License_Mari.layouts.base,THOR),
-											 DATASET('~thor_data400::in::proflic_mari::'+pVersion+'::'+src_cd,Prof_License_Mari.layouts.base,THOR));
+			after_map := IF(ut.CleanSpacesAndUpper(pVersion)='ALL',
+			                 DATASET('~thor_data400::in::proflic_mari::'+src_cd,Prof_License_Mari.layout_base_in,THOR),
+											 DATASET('~thor_data400::in::proflic_mari::'+pVersion+'::'+src_cd,Prof_License_Mari.layout_base_in,THOR));
 			cmc := TABLE(after_map,{cmc_slpk,cnt:=count(group)},cmc_slpk);
 			data_table := TABLE(after_map, {std_source_upd,std_prof_cd,license_state,
 																			CREATE_DTE,LAST_UPD_DTE,STAMP_DTE,

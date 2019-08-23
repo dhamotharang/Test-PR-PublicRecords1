@@ -1,4 +1,4 @@
-import AID,codes,header,ut,Vehlic,vehicleV2,VehicleCodes;
+﻿import AID,codes,header,ut,Vehlic,vehicleV2,VehicleCodes;
 
 //---------------------------------------------------------------------------
 //-------APPEND ITERATION KEY AND NORMALIZE TWO REGISTERED OWNERS
@@ -117,7 +117,7 @@ dOHIterationKey	:=	join(	dOHBaseSort,
 //-------NORMALIZE TWO REGISTERED OWNERS
 //---------------------------------------------------------------------------
 
-VehicleV2.Layout_Base.Party_BIP	tParty(dOHIterationKey	pInput,integer	cnt)	:=
+VehicleV2.Layout_Base.Party_CCPA	tParty(dOHIterationKey	pInput,integer	cnt)	:=
 transform
 	self.State_Bitmap_Flag						:=	0;
 	self.Date_First_Seen 							:=	(UNSIGNED) pInput.Dt_First_Seen;
@@ -221,7 +221,7 @@ dFileCodesV3	:=	Codes.File_Codes_V3_In(	file_name		=	'VEHICLE_REGISTRATION'	and
 
 dRegCodesV3NoJoin	:=	dOHDeduped(REG_STATUS_CODE	=	'');
 
-VehicleV2.Layout_Base.Party_BIP	tRegStatus(dOHDeduped	L,dFileCodesV3	R)	:=
+VehicleV2.Layout_Base.Party_CCPA	tRegStatus(dOHDeduped	L,dFileCodesV3	R)	:=
 transform
 	self.Reg_Status_Desc	:=	R.long_desc;
 	self									:=	L;
@@ -254,7 +254,7 @@ AID.MacAppendFromRaw_2Line(	dOHAddrPopulated,
 														lAIDAppendFlags
 													);
 
-VehicleV2.Layout_Base.Party_BIP	tAceAddress(dOHAppendAID	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tAceAddress(dOHAppendAID	pInput)	:=
 transform
 	self.Ace_prim_range			:=	pInput.AIDWork_AceCache.prim_range;
 	self.Ace_predir					:=	pInput.AIDWork_AceCache.predir;

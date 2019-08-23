@@ -30,7 +30,7 @@ function
   dothis := sequential(
      output(pWorkunit + if(regexfind('ing',realstate,nocase) ,' is ',' has ') + getstate + ' on ' + WorkMan.getTimeDate())
     ,iff(realstate = 'completed' or realstate = 'failed' or realstate = 'aborted' or realstate = 'completed' or realstate = 'failed' or realstate = 'aborted'  
-      ,sequential(sendemail,FAIL('Watcher stopped, Notify event has been triggered because wuid ' + pWorkunit + ' has ' + realstate + ' on ' + ut.GetTimeDate() + ' with this status: ' + getstate)))
+      ,sequential(sendemail,FAIL('Watcher stopped, Notify event has been triggered because wuid ' + pWorkunit + ' has ' + realstate + ' on ' + WorkMan.getTimeDate() + ' with this status: ' + getstate)))
   );
   
   dothis : WHEN(cronFreq);

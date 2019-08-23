@@ -297,8 +297,7 @@ end;
 		SELF.dt_vendor_last_reported	:= MAX(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 		SELF.dt_vendor_first_reported	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 		SELF.process_date				      := IF(L.process_date > r.process_date, L.process_date, R.process_date);
-		SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
-		
+		SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);	
 		SELF := L;		
 	END;
 
@@ -307,6 +306,7 @@ end;
 	// have a 0 and the base record would not (if an lnpid was found).  In the future, if there's a
 	// field added that's sorted above, but not calculated/determined until later... you'll need to
 	// probably add it to the EXCEPT below to keep the records collapsing correctly.
+	
   prebase_rolledup := ROLLUP(npi_dist_sort, rollupBase(LEFT, RIGHT),
 																 EXCEPT did, did_score, bdid, bdid_score, dt_first_seen, dt_last_seen,
 																		dt_vendor_first_reported, dt_vendor_last_reported, process_date,

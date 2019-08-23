@@ -1,4 +1,4 @@
-import autokey, ut;
+﻿import autokey, ut;
 
 //populate only updating source for keys
 canadianWP := file_CanadianWhitePagesBase(vendor='AX');
@@ -106,6 +106,9 @@ slim_canadianWP := RECORD
 	string1  Transaction_Code;
     string1  listing_type;
 	unsigned6 fdid;
+	//Added for CCPA-90
+	UNSIGNED4 global_sid;
+	UNSIGNED8 record_sid;
 END;
 
 slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM 
@@ -113,6 +116,7 @@ slim_canadianWP xpand_canadianWP(canadianWP le,integer cntr) :=  TRANSFORM
 	self.firstname	 	:= le.fname;
 	self.middlename		:= le.mname;
 	self.lastname		:= le.lname;
+	SELF.record_sid   := 0;
 	SELF := le; 
 END;
 

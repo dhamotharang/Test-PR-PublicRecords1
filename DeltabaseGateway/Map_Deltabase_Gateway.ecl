@@ -100,7 +100,10 @@ inFile 				:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Raw;
 		self.imsi_changedate							:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.imsi_changedate, left, right)), '0123456789')[1..8];
 		self.imsi_activationdate					:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.imsi_activationdate, left, right)), '0123456789')[1..8];
 		self.imei_changedate							:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.imei_changedate, left, right)), '0123456789')[1..8];
+		self.imei_activationdate					:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.imei_activationdate, left, right)), '0123456789')[1..8];
 		self.loststolen_date							:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.loststolen_date, left, right)), '0123456789')[1..8];
+		self.account_activation_date			:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.account_activation_date, left, right)), '0123456789')[1..8];
+		self.line_activation_date					:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.line_activation_date, left, right)), '0123456789')[1..8];	
 		self 															:= l;
 	end;
 	

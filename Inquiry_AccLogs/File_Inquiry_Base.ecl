@@ -1,4 +1,4 @@
-import ut, did_add;
+﻿import ut, did_add;
 
 
 export File_Inquiry_Base := module
@@ -17,8 +17,11 @@ export history := project(inquiry_acclogs.File_Inquiry_BaseSourced.history, inqu
   Vk:=sc[findex..lindex];
 	
 	VP:=did_add.get_EnvVariable('inquiry_build_version','http://roxiestaging.br.seisint.com:9876')[1..8];
-  FileHistory:=if(vk=vp,dataset('~thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor),
-                        dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor));
+  father_sf_empty := count(dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor, opt)) = 0;
+
+  FileHistory:=if(vk=vp or father_sf_empty ,dataset('~thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor),
+                        dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor,opt));
+
 export fileFull:=FileHistory+inquiry_acclogs.File_Inquiry_BaseSourced.updates; 
 end; 
  

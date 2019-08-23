@@ -44,6 +44,7 @@ export unicode Common :=
      '<value id="11" name="Organized Crime Japan" />\r\n' +
      '<value id="5" name="Other Official Lists" />\r\n' +
 		 '<value id="34" name="Sanctions Control and Ownership" />\r\n' + //Bug 20372
+		 $.SearchCriteria3.Sanctions[1].criterion +
      '<value id="6" name="Sanctions Lists" />\r\n' +
 		 '<value id="13" name="Tax Crime" />\r\n' + // Bug: 156981     
 		 '<value id="7" name="Terror" />\r\n' +
@@ -55,7 +56,13 @@ export unicode Common :=
      '<value id="2" name="Alive" />\r\n' +
      '<value id="1" name="Deceased" />\r\n' + 
      '</group>\r\n' +
-			BuildSourceCriteria;
+		'<group id="3" name="Active Status">\r\n' +
+     '<value id="9" name="No Value" />\r\n' +
+		 '<value id="1" name="Active" />\r\n' + 
+     '<value id="2" name="Inactive" />\r\n' +
+     '</group>\r\n' +
+		
+		BuildSourceCriteria;
 		 
 // geographical seaches
 // Middle East me
@@ -103,7 +110,7 @@ unicode CriteriaCANADA :=
 		
 // Europe europe
 unicode CriteriaEUROPE :=	
-		U'<group id="6" name="Country"><value id="251" name="Abkhazia" /><value id="3" name="Albania" /><value id="6" name="Andorra" /><value id="13" name="Austria" /><value id="36" name="Belarus" /><value id="20" name="Belgium" /><value id="31" name="Bosnia and Herzegovina" /><value id="32" name="Bulgaria" /><value id="51" name="Croatia" /><value id="55" name="Czech Republic" /><value id="56" name="Denmark" /><value id="64" name="Estonia" /><value id="66" name="Faeroe Islands" /><value id="71" name="Finland" /><value id="73" name="France" /><value id="82" name="Georgia" /><value id="76" name="Germany" /><value id="78" name="Gibraltar" /><value id="79" name="Greece" /><value id="246" name="Guernsey" /><value id="93" name="Hungary" /><value id="94" name="Iceland" /><value id="100" name="Ireland" /><value id="248" name="Isle of Man" /><value id="102" name="Italy" /><value id="247" name="Jersey" /><value id="111" name="Kosovo" /><value id="114" name="Latvia" /><value id="119" name="Liechtenstein" /><value id="120" name="Lithuania" /><value id="121" name="Luxembourg" /><value id="134" name="Macedonia" /><value id="129" name="Malta" /><value id="137" name="Moldova" /><value id="138" name="Monaco" /><value id="136" name="Montenegro" /><value id="147" name="Netherlands" /><value id="157" name="Norway" /><value id="170" name="Poland" /><value id="171" name="Portugal" /><value id="176" name="Romania" /><value id="177" name="Russia" /><value id="191" name="San Marino" /><value id="240" name="Serbia" /><value id="189" name="Slovakia" /><value id="190" name="Slovenia" /><value id="250" name="South Ossetia" /><value id="194" name="Spain" /><value id="202" name="Svalbard and Jan Mayen Islands" /><value id="205" name="Sweden" /><value id="206" name="Switzerland" /><value id="227" name="Ukraine" /><value id="226" name="United Kingdom" /><value id="233" name="Vatican City" /></group>\r\n';
+		U'<group id="6" name="Country"><value id="251" name="Abkhazia" /><value id="3" name="Albania" /><value id="6" name="Andorra" /><value id="13" name="Austria" /><value id="36" name="Belarus" /><value id="20" name="Belgium" /><value id="31" name="Bosnia and Herzegovina" /><value id="32" name="Bulgaria" /><value id="51" name="Croatia" /><value id="55" name="Czech Republic" /><value id="56" name="Denmark" /><value id="64" name="Estonia" /><value id="66" name="Faeroe Islands" /><value id="71" name="Finland" /><value id="73" name="France" /><value id="82" name="Georgia" /><value id="76" name="Germany" /><value id="78" name="Gibraltar" /><value id="79" name="Greece" /><value id="246" name="Guernsey" /><value id="93" name="Hungary" /><value id="94" name="Iceland" /><value id="100" name="Ireland" /><value id="248" name="Isle of Man" /><value id="102" name="Italy" /><value id="247" name="Jersey" /><value id="111" name="Kosovo" /><value id="114" name="Latvia" /><value id="119" name="Liechtenstein" /><value id="120" name="Lithuania" /><value id="121" name="Luxembourg" /><value id="129" name="Malta" /><value id="137" name="Moldova" /><value id="138" name="Monaco" /><value id="136" name="Montenegro" /><value id="147" name="Netherlands" /><value id="134" name="North Macedonia" /><value id="157" name="Norway" /><value id="170" name="Poland" /><value id="171" name="Portugal" /><value id="176" name="Romania" /><value id="177" name="Russia" /><value id="191" name="San Marino" /><value id="240" name="Serbia" /><value id="189" name="Slovakia" /><value id="190" name="Slovenia" /><value id="250" name="South Ossetia" /><value id="194" name="Spain" /><value id="202" name="Svalbard and Jan Mayen Islands" /><value id="205" name="Sweden" /><value id="206" name="Switzerland" /><value id="227" name="Ukraine" /><value id="226" name="United Kingdom" /><value id="233" name="Vatican City" /></group>\r\n';
 		
 // North America na
 unicode CriteriaNA :=	

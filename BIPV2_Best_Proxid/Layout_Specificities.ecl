@@ -1,4 +1,4 @@
-IMPORT SALT30;
+﻿IMPORT SALT30;
 EXPORT Layout_Specificities := MODULE
 SHARED L := Layout_Base;
 export company_name_ChildRec := record
@@ -33,6 +33,11 @@ export company_sic_code1_ChildRec := record
 end;
 export company_naics_code1_ChildRec := record
   typeof(l.company_naics_code1) company_naics_code1;
+  unsigned8 cnt;
+  unsigned4 id;
+end;
+export dba_name_ChildRec := record
+  typeof(l.dba_name) dba_name;
   unsigned8 cnt;
   unsigned4 id;
 end;
@@ -141,6 +146,10 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   real4 company_naics_code1_switch;
   real4 company_naics_code1_max;
   dataset(company_naics_code1_ChildRec) nulls_company_naics_code1 {MAXCOUNT(100)};
+  real4 dba_name_specificity;
+  real4 dba_name_switch;
+  real4 dba_name_max;
+  dataset(dba_name_ChildRec) nulls_dba_name {MAXCOUNT(100)};
   real4 prim_range_specificity;
   real4 prim_range_switch;
   real4 prim_range_max;

@@ -1,4 +1,5 @@
 ﻿IMPORT KELOtto, FraudGovPlatform;
+RunKelDemo :=false:stored('RunKelDemo');
 
 newr := RECORD
   UNSIGNED8 did;
@@ -185,7 +186,10 @@ newr := RECORD
   integer1 relativeaddressmatch;
  END;
 
-PersonCIIDAttr := PROJECT(PULL(FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.CIID.built), 
+FileIn := If(RunKelDemo=false,FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Ciid.built
+									,FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Ciid_Demo.built); 
+									
+PersonCIIDAttr := PROJECT(FileIn, 
               TRANSFORM(newr, self.did := (UNSIGNED8)left.did, 
               // This project to simplify KEL by being able to use the CONTAINS
 							SELF.Hri := '|' + TRIM(LEFT.hri_1) + '|' + TRIM(LEFT.hri_2) + '|' + TRIM(LEFT.hri_3) + '|' + TRIM(LEFT.hri_4) + '|' + TRIM(LEFT.hri_5) + '|' + TRIM(LEFT.hri_6) + '|' + TRIM(LEFT.hri_7) + '|' + TRIM(LEFT.hri_8) + '|' + TRIM(LEFT.hri_9) + '|' + TRIM(LEFT.hri_10) + '|' + TRIM(LEFT.hri_11) + '|' + TRIM(LEFT.hri_12) + '|' + TRIM(LEFT.hri_13) + '|' + TRIM(LEFT.hri_14) + '|' + TRIM(LEFT.hri_15) + '|' + TRIM(LEFT.hri_16) + '|' + TRIM(LEFT.hri_17) + '|' + TRIM(LEFT.hri_18) + '|' + TRIM(LEFT.hri_19) + '|' + TRIM(LEFT.hri_20) + '|';

@@ -33,6 +33,7 @@ function
 		SELF.rawfields.Country					:= ut.CleanSpacesAndUpper(l.Country);
 		SELF.rawfields.Phone_Number			:= ut.CleanSpacesAndUpper(l.Phone_Number);
 		SELF.rawfields.Email						:= ut.CleanSpacesAndUpper(l.Email);
+		SELF.global_sid									:= 25681;
 		self														:= l;
 		self 														:= [];
 	end;

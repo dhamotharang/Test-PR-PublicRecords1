@@ -1,4 +1,4 @@
-import address, AID, BIPV2;
+﻿import address, AID, BIPV2;
 
 export Layouts_Files :=
 module
@@ -61,14 +61,18 @@ module
 		/////////////////////////////////////////////////////////////////////////////////////
 		shared Common := 
 		record
-			unsigned6	bdid						:= 0;
-			unsigned4	date_first_seen				:= 0;
-			unsigned4	date_last_seen				:= 0;
+			unsigned6	bdid											:= 0;
+			unsigned4	date_first_seen						:= 0;
+			unsigned4	date_last_seen						:= 0;
 			unsigned4	dt_vendor_first_reported	:= 0;
 			unsigned4	dt_vendor_last_reported		:= 0;
 			unsigned4	process_date_first_seen		:= 0;
 			unsigned4	process_date_last_seen		:= 0;
-			string1		record_type					:= '';
+			string1		record_type								:= '';
+			// The below 2 fields are added for CCPA (California Consumer Protection Act) project.
+			// The Orbit infrastructure is not available yet, so leaving unpopulated for now.
+			unsigned4 global_sid 								:= 0;
+			unsigned8 record_sid 								:= 0;
 		end;
 
 		export Layout_Addr_AID := record

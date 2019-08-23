@@ -3,7 +3,7 @@
 export fnPropagateADLs(
 			dataset(layout_history) inhistory = File_GongHistory,		// = dataset('~thor_data400::base::gong_history',layout_historyaid, flat, __compressed__), 
 			intmax_nm_match_score = 2, // higher match score allows lenient matches
-			dataset( recordof(Watchdog.Layout_Gong_DID)) gongbase = Gong_Neustar.File_Gong_DID) 
+			dataset( recordof(Gong_Neustar.Layout_Gong_DID)) gongbase = Gong_Neustar.File_Gong_DID) 
 		:= module
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

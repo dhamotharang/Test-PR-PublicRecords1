@@ -121,24 +121,28 @@ END;
 				SELF := LEFT),LOCAL),
 			__nid);
 
-		matches1 := JOIN(dsin,  Nid.Overrides(false) ,
+		LOCAL matches1 := JOIN(dsin,  Nid.Overrides(false) ,
 						LEFT.__nid = RIGHT.NID,
 						xform1(LEFT, RIGHT),
 						LOOKUP, FEW, LEFT OUTER);
-					
-		matches2 := JOIN(DISTRIBUTE(matches1(namType=''),nameid), 
-											if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
+#if(useV2)
+	  repository := Nid.NameRepository;
+#else
+	  repository := Nid.NameRepositoryV1;
+#end;					
+		LOCAL matches2 := JOIN(DISTRIBUTE(matches1(namType=''),nameid), repository(derivation=0),
+						//					if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
 						LEFT.nameid = RIGHT.NID,
 						xform(LEFT, RIGHT),
 						LOCAL, KEEP(1), LEFT OUTER);
 						
-		matches := matches1(namType<>'') + matches2 : INDEPENDENT;
+		LOCAL __matches := matches1(namType<>'') + matches2 : INDEPENDENT;
 
-  ds1 := SORT(matches(nameid=0),firstname,middlename,lastname,namesuffix, LOCAL) : INDEPENDENT;
+  ds1 := SORT(__matches(nameid=0),firstname,middlename,lastname,namesuffix, LOCAL) : INDEPENDENT;
 	nomatchdedup := DEDUP(ds1,firstname,middlename,lastname,namesuffix, LOCAL);
 	nomatchclean := PROJECT(nomatchdedup, xform2(LEFT)) : INDEPENDENT; 
 
-	nomatches := IF(EXISTS(matches(nameid=0)),
+	nomatches := IF(EXISTS(__matches(nameid=0)),
 					JOIN(ds1, nomatchclean, 
 						    LEFT.firstname=RIGHT.firstname AND LEFT.middlename=RIGHT.middlename
 						AND LEFT.lastname=RIGHT.lastname AND LEFT.namesuffix=RIGHT.namesuffix,
@@ -160,7 +164,7 @@ END;
 									SELF := LEFT;),
 								LOCAL, LEFT OUTER, KEEP(1))) : INDEPENDENT;
 								
-	tempout := IF(EXISTS(nomatches), matches(nameid<>0) + nomatches, matches) +
+	tempout := IF(EXISTS(nomatches), __matches(nameid<>0) + nomatches, __matches) +
 				PROJECT(inFile(TRIM(firstname + middlename + lastname)=''),
 					TRANSFORM(new_layout, 
 							SELF.nameid := Nid.Common.BlankNid;
@@ -221,7 +225,8 @@ Nid.MAC_IncludeInRepositoryParsed(nomatchclean,
 	_fname2,	// cleaned first name for name 2
 	_mname2,	// cleaned middle name for name 2
 	_lname2,	// cleaned last name for name 2
-	_suffix2		
+	_suffix2,
+	useV2
 	);
 
 

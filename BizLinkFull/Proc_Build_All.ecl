@@ -8,6 +8,7 @@ function
   shared specs  := specificities(File_BizHead);
   shared knames := keynames(pversion);
   
+  BuildSpec                     := specificities(File_Bizhead).Build;
   BuildSpecs                     := tools.macf_writeindex('Keys(File_BizHead).Specificities_Key',,true);
   Buildmeow                      := tools.macf_writeindex('Process_Biz_Layouts.Key         ,knames.meow                     .new'      );
   Buildsup_proxid                := tools.macf_writeindex('Process_Biz_Layouts.KeyproxidUp ,knames.sup_proxid               .new'      );
@@ -17,6 +18,7 @@ function
 //  Buildrefs                      := tools.macf_writeindex('Key_BizHead_.Key                ,knames.refs                     .new'      );  
 //  Buildwords                     := tools.macf_writeindex('Key_BizHead_.ValueKey           ,knames.words                    .new'      );
   Buildrefs_l_cnpname            := tools.macf_writeindex('Key_BizHead_L_CNPNAME.Key       ,knames.refs_l_cnpname           .new'      );
+  Buildrefs_l_cnpname_slim       := tools.macf_writeindex('Key_BizHead_L_CNPNAME.SlimKey   ,knames.refs_l_cnpname_slim      .new'      );
   Buildrefs_l_cnpname_zip        := tools.macf_writeindex('Key_BizHead_L_CNPNAME_ZIP.Key   ,knames.refs_l_cnpname_zip       .new'      );
   Buildrefs_l_cnpname_st         := tools.macf_writeindex('Key_BizHead_L_CNPNAME_ST.Key    ,knames.refs_l_cnpname_st        .new'      );
   Buildrefs_l_cnpname_fuzzy      := tools.macf_writeindex('Key_BizHead_L_CNPNAME_FUZZY.Key ,knames.refs_l_cnpname_fuzzy     .new'      );
@@ -37,11 +39,11 @@ function
   Buildwheel_city_clean          := tools.macf_writeindex('Wheel.Key_city_clean            ,knames.wheel_city_clean         .new'      );
   Buildwheel_quick_city_clean    := tools.macf_writeindex('Wheel.KeyQuick_city_clean       ,knames.wheel_quick_city_clean   .new'      );
   returnresult := sequential(
-     if(pDo_Strata = true  ,bizlinkfull._dostrata_ID_Check(File_BizHead,pversion))
-    ,BuildSpecs
+     if(pDo_Strata = true, BizLinkFull._dostrata_ID_Check(File_BizHead,pversion))
     ,if(not tools.fun_DoAllFilesExist.fNamesBuilds(knames.dall_filenames)
-      ,sequential(
-        parallel(
+      ,sequential(    
+        BuildSpec
+        ,parallel(
            BuildSpecs                   
           ,Buildmeow                    
           ,Buildsup_proxid              
@@ -51,6 +53,7 @@ function
           // ,Buildrefs                    
           // ,Buildwords                   
           ,Buildrefs_l_cnpname    
+          ,Buildrefs_l_cnpname_slim    
           ,Buildrefs_l_cnpname_zip
           ,Buildrefs_l_cnpname_st       
           ,Buildrefs_l_cnpname_fuzzy    
@@ -82,4 +85,3 @@ function
   return returnresult;
     
 end;
-

@@ -451,7 +451,13 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='623211738' and l.did='122113244666') or
 									(l.ssn='542089805' and l.did='002166694879') or
 									(l.ssn='454931305' and l.did='001035336436') or
-									(l.ssn='495742312' and l.did='001033147214'),
+									(l.ssn='495742312' and l.did='001033147214') or
+									(l.ssn='503703386' and l.did='002246670267') or
+									(l.ssn='119926570' and l.did='079982138483') or
+									(l.ssn='584621400' and l.did='002232356551') or
+									(l.ssn='401358777' and l.did='001034909614') or
+									(l.ssn='056465978' and l.did='002363964777') or
+									(l.ssn='412376589' and l.did='000329196451') ,
 							'',
 							l.ssn);
 		self.did		:= if((l.ssn='353561176' and l.did='2275932305') or 
@@ -466,7 +472,13 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='623211738' and l.did='122113244666') or
 									(l.ssn='542089805' and l.did='002166694879') or
 									(l.ssn='454931305' and l.did='001035336436') or
-									(l.ssn='495742312' and l.did='001033147214'),
+									(l.ssn='495742312' and l.did='001033147214') or
+									(l.ssn='503703386' and l.did='002246670267') or
+									(l.ssn='119926570' and l.did='079982138483') or
+									(l.ssn='584621400' and l.did='002232356551') or
+									(l.ssn='401358777' and l.did='001034909614') or
+									(l.ssn='056465978' and l.did='002363964777') or
+									(l.ssn='412376589' and l.did='000329196451') ,
 							'',
 							l.did);
 		self.did_score	:= if((l.ssn='353561176' and l.did='2275932305') or 
@@ -481,7 +493,13 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='623211738' and l.did='122113244666') or
 									(l.ssn='542089805' and l.did='002166694879') or
 									(l.ssn='454931305' and l.did='001035336436') or
-									(l.ssn='495742312' and l.did='001033147214'),
+									(l.ssn='495742312' and l.did='001033147214') or
+									(l.ssn='503703386' and l.did='002246670267') or
+									(l.ssn='119926570' and l.did='079982138483') or
+									(l.ssn='584621400' and l.did='002232356551') or
+									(l.ssn='401358777' and l.did='001034909614') or
+									(l.ssn='056465978' and l.did='002363964777') or
+									(l.ssn='412376589' and l.did='000329196451') ,
 							'',
 							l.did_score);
 		self 			:= l;
