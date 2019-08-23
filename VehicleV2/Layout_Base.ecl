@@ -110,8 +110,8 @@ module
   string50 AIRBAG_FRONT_PASS_SIDE	;
   string50 AIRBAGS	;
 	//Added for CCPA-103
-	unsigned4 global_sid;
-	unsigned8 record_sid;
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
   end;
 	
 	export	Party	:=
@@ -260,10 +260,10 @@ export	Party_Bip	:=record
 export	Party_CCPA	:=record
 		Party_Bip;
 		//Added for CCPA-103
-		unsigned4 global_sid;
-		unsigned8 record_sid;
+		unsigned4 global_sid := 0;
+		unsigned8 record_sid := 0;
 		//Added for DF-25578
-		string30 raw_name;
+		string30 raw_name := '';
    end;
 	 
 	export	Party_AID	:=

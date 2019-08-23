@@ -9,7 +9,7 @@ EXPORT Proc_Ingest_Master(
 
   ingestMod         :=  HealthCareNoMatchHeader_Ingest.Ingest(pSrc,pVersion,,,pBase,pAsHeader);
   InputSourceCounts :=  OUTPUT(ingestMod.InputSourceCounts,ALL,NAMED('InputSourceCounts'));
-  UpdateStatsXtab   :=  OUTPUT(ingestMod.InputSourceCounts,ALL,NAMED('UpdateStatsXtab'));
+  UpdateStatsXtab   :=  OUTPUT(ingestMod.UpdateStatsXtab,ALL,NAMED('UpdateStatsXtab'));
   fAllRecords       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Base.AllRecords.new;
   OutputResults     :=  OUTPUT(ingestMod.AllRecords,,fAllRecords,COMPRESSED,OVERWRITE); // Add _Notag to remove 'what happened' byte
 

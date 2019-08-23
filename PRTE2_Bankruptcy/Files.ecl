@@ -1,4 +1,4 @@
-IMPORT PRTE2_Bankruptcy, BankruptcyV2, standard, ut, doxie;
+﻿IMPORT PRTE2_Bankruptcy, BankruptcyV2, standard, ut, doxie;
 
 EXPORT Files := MODULE
 
@@ -9,11 +9,12 @@ EXPORT Files := MODULE
 	EXPORT search_in		:= DATASET(Constants.IN_PREFIX + 'search', PRTE2_Bankruptcy.Layouts.Search, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
 
 	//Base Output files
-	EXPORT Main_Base_ext			:= DATASET(Constants.BASE_PREFIX + 'main', PRTE2_Bankruptcy.Layouts.Main_BaseV3_ext, THOR); //Includes fields added by DI
-	EXPORT Main_Base	:= PROJECT(Main_Base_ext, PRTE2_Bankruptcy.Layouts.Main_BaseV3);
-	EXPORT Search_Base_ext		:= DATASET(Constants.BASE_PREFIX + 'search', PRTE2_Bankruptcy.Layouts.Search_Base_ext, THOR); //Includes fields added by DI
-	EXPORT Search_Base:= PROJECT(Search_Base_ext, PRTE2_Bankruptcy.Layouts.Search_Base);
-  EXPORT Withdrawal_Base := DATASET([],	Layouts.WithdrawnStatus_Base);
+	EXPORT Main_Base_ext		:= DATASET(Constants.BASE_PREFIX + 'main', PRTE2_Bankruptcy.Layouts.Main_BaseV3_ext, THOR); //Includes fields added by DI
+	EXPORT Main_Base				:= PROJECT(Main_Base_ext, PRTE2_Bankruptcy.Layouts.Main_BaseV3);
+	EXPORT Main_Base_supp		:= PROJECT(Main_Base_ext, PRTE2_Bankruptcy.Layouts.Main_BaseV3_supp);
+	EXPORT Search_Base_ext	:= DATASET(Constants.BASE_PREFIX + 'search', PRTE2_Bankruptcy.Layouts.Search_Base_ext, THOR); //Includes fields added by DI
+	EXPORT Search_Base			:= PROJECT(Search_Base_ext, PRTE2_Bankruptcy.Layouts.Search_Base);
+  EXPORT Withdrawal_Base 	:= DATASET([],	Layouts.WithdrawnStatus_Base);
 	
 	//Main Base in V2 Layout
 	Layouts.Main_BaseV2 xformV2(Main_Base l, Search_Base r) := transform
