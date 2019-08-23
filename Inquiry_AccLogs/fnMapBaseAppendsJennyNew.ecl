@@ -1,8 +1,8 @@
 ﻿ /*2016-04-24T19:10:38Z (jhuang_prod)
 C:\Users\huangzx\AppData\Roaming\HPCC Systems\eclide\jhuang_prod\ProdThorBoca\Inquiry_AccLogs\fnMapBaseAppendsJennyNew\2016-04-24T19_10_38Z.ecl
 */
-import ut,data_services, address, aid, lib_stringlib, address, did_add, Business_Header_SS, header_slimsort, watchdog, business_header;
-
+import ut,data_services, address, aid, lib_stringlib, address, did_add, Business_Header_SS, header_slimsort, watchdog, business_header, didville;
+import property, ut, header_slimsort, DID_Add, didville, Business_Header_SS, MDR, Business_header, Address, Header, Watchdog,PersonLinkingADL2V3,PersonLinkingADL2,_Control;
 
 /* hashes fields used to did, bdid. only outputs records that have changes (new or update) */
 export fnMapBaseAppendsJennynew(boolean isFCRA = false,

@@ -777,8 +777,6 @@ EXPORT layouts := MODULE
 			string50 	source_code;
 			string15 	taxonomy_code;
 			string 		file_date;
-			unsigned4 								global_sid					:=	26691; // Source ID for HMS State License - CCPA project 20190612 
-			unsigned8 								record_sid; 
 		END;
 		
 		EXPORT autokey_common	:= RECORD

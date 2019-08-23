@@ -81,11 +81,11 @@ import BIPV2;
 			#else
 				self.fein := '';
 			#end;
-			// #if(#text(pUrl) != '')
-				// self.url := left.pUrl;
-			// #else
+			#if(#text(pUrl) != '')
+				self.url := left.pUrl;
+			#else
 				self.url := '';
-			// #end
+			#end
 			#if(#text(pEmail) != '')
 				self.email := left.pEmail;
 			#else

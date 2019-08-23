@@ -5,8 +5,8 @@ ECL :=
 				'#WORKUNIT(\'protect\',true);\n'+
 				'#WORKUNIT(\'name\', \'Inquiry Tracking - FIDO change Report\');\n' +
 				
-				'curr:=dataset(inquiry_acclogs.foreign_fido_prod + \'thor::red::extract::inquiry_tracking_extract\', inquiry_acclogs.Layout_FIDO.extract_in, flat);\n' +
-				'prev:=dataset(inquiry_acclogs.foreign_fido_prod + \'thor::red::extract::father::inquiry_tracking_extract\', inquiry_acclogs.Layout_FIDO.extract_in, flat);\n'+
+				'curr:=dataset(inquiry_acclogs.foreign_fido_prod + \'thor::red::extract::inquiry_tracking_extract\', inql_v2.Layouts.FIDO_extract_in, flat);\n' +
+				'prev:=dataset(inquiry_acclogs.foreign_fido_prod + \'thor::red::extract::father::inquiry_tracking_extract\', inql_v2.Layouts.FIDO_extract_in, flat);\n'+
 				't := table(curr,{seq:=\'CURR\',curr}) + table(prev,{seq:=\'PREV\',prev});\n'+
 				't1:=table(t,{t,cnt:=count(group)}	,vertical_market,sub_market ,industry,use,opt_out,disable_observation,hh_id,merge,few)(cnt=1);\n' +
 
