@@ -290,4 +290,6 @@ gong.layout_historyaid and not [global_sid, record_sid];
 PRTE2.Layouts.DEFLT_CPA;
 end;
 
+// export layout_linkid := records
+
 END;
