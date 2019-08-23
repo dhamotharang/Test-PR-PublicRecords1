@@ -1147,6 +1147,7 @@
 		export string KEYWORD_TWTSA									:= '833';
 		export string KEYWORD_ARMJH_REPET						:= '834';
 		export string KEYWORD_OFAC_HIFPAA						:= '835';
+		export string KEYWORD_ILSHABAK							:= '836';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

@@ -1249,6 +1249,7 @@
 				trim(kword, left, right) = 'TWTSA' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWTSA,
 				trim(kword, left, right) = 'ARMJH-REPET' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARMJH_REPET,
 				trim(kword, left, right) = 'OFAC-HIFPAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_HIFPAA,
+				trim(kword, left, right) = 'ILSHABAK' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILSHABAK,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
