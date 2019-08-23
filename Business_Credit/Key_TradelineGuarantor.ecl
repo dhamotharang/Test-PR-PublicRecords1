@@ -1,4 +1,4 @@
-﻿IMPORT Business_Credit, BIPV2,	STD;
+﻿IMPORT _Control, Business_Credit, BIPV2, CCPA, STD;
 
 EXPORT Key_TradelineGuarantor(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
@@ -42,7 +42,10 @@ EXPORT Key_TradelineGuarantor(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																			SELF									:=	[]
 																		)
 																	);
-	SHARED	dTradelineBaseDist	:=	DEDUP(SORT(DISTRIBUTE(dTradelineBase,
+																	
+	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dTradelineBase,'SBFECV','','global_sid');
+		
+	SHARED	dTradelineBaseDist	:=	DEDUP(SORT(DISTRIBUTE(addGlobalSID,
 																		HASH(	Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID)),
 																					Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID,Original_Version,Version,LOCAL),
 																					Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID,LOCAL);

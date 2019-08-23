@@ -1,4 +1,4 @@
-﻿IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	STD;
+﻿IMPORT	_control, Business_Credit,	BIPV2,	CCPA, Address,	doxie,	lib_date,	STD;
 EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																			Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	MODULE
 
@@ -68,7 +68,10 @@ EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today()
 																	SELF.dt_datawarehouse_last_reported						:=	(UNSIGNED4)LEFT.Extracted_Date;
 																	SELF.Percent_Of_Ownership_If_Owner_Principal	:=	LEFT.Percent_Of_Ownership;
 																	SELF																					:=	LEFT));
-	SHARED	dBOInformationDist	:=	SORT(DISTRIBUTE(dBOInformation,
+																	
+	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dBOInformation,'SBFECV','','global_sid');
+	
+	SHARED	dBOInformationDist	:=	SORT(DISTRIBUTE(addGlobalSID,
 																	HASH(	record_type, Sbfe_Contributor_Number, Contract_Account_Number, Account_Type_Reported, Account_Holder_Business_Name, Clean_Account_Holder_Business_Name, 
 																				Business_Name, Clean_Business_Name, Company_Website, Guarantor_Owner_Indicator,
 																				Relationship_To_Business_Indicator, Percent_Of_Liability, Percent_Of_Ownership_If_Owner_Principal,

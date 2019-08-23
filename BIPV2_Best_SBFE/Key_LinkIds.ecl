@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2_Best_SBFE, BIPV2_Best,	BIPV2,	STD;
+﻿IMPORT _Control, BIPV2_Best_SBFE, BIPV2_Best,	BIPV2, CCPA, STD;
 EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 										Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
 
@@ -7,11 +7,15 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 															DATASET([],BIPV2_Best.Layouts.base),
 															BIPV2_Best.fn_Prep_Base_for_Key(pVersion,BIPV2_Best_SBFE.Files(pVersion).base.built)
 														);
- SHARED dSBFEBestKey := PROJECT(dSBFEBestBase, TRANSFORM(BIPV2_Best.layouts.key,SELF:=LEFT,SELF:=[]));
-  // DEFINE THE INDEX
+														
+	SHARED dSBFEBestKey := PROJECT(dSBFEBestBase, TRANSFORM(BIPV2_Best.layouts.key, SELF.global_sid := 24161, SELF:=LEFT, SELF:=[]));  //DF-25791: Populate Global_SID Field
+		
+	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dSBFEBestKey,'SBFECV','','global_sid');	
+	
+	// DEFINE THE INDEX
 	SHARED	superfile_name	:=	BIPV2_Best_SBFE.Keynames().LinkIds.QA;	
 		// If this is a daily build then only create a key with today's records
-	SHARED	Base						:=	dSBFEBestKey;
+	SHARED	Base						:=	addGlobalSID;
 	
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	EXPORT Key := k;
