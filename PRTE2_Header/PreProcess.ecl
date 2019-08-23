@@ -1,11 +1,12 @@
-// prte2_frandx.proc_build_base
+﻿// prte2_frandx.proc_build_base
 // prte2.fn_appendfakeid
 // custname='LN_PR'
 
-IMPORT header,std,Address,prte2,ut;
-EXPORT PreProcess := function
+IMPORT header,std,Address,prte2,ut, AID, AID_Support,AID_BUILD;;
+EXPORT PreProcess := module
+#option('multiplePersistInstances',FALSE);
 // header.PreProcess
-in_file := PRTE2_Header.files.personrecs;
+in_file := PRTE2_Header.file_personrecs;
 
 {in_file} tNormalizeNames (in_file L, unsigned1 pCounter):=transform
 
@@ -26,9 +27,16 @@ in_file_noemalized_names := normalize(in_file,5,tNormalizeNames(LEFT,counter))(f
 layout_normed_adderess := record
 
  {in_file_noemalized_names} AND NOT [addr1, addr2, city, st, zip];
+ // string prep_addr1;
+ // string prep_addr2;
+ // {in_file_noemalized_names} AND NOT [addr1, addr2, city, st, zip];
  string prep_addr1;
  string prep_addr2;
+ string prep_city;
+ string	prep_state;
+ string	prep_zip5;
  header.Layout_New_Records.rec_type;
+ string dummy;
  
 end;
 
@@ -56,15 +64,47 @@ layout_normed_adderess tNormalizeAddresses (in_file_noemalized_names L, unsigned
         
         self.rec_type       :=choose(pCounter, '1', '2','3','4','5','6','7','8','9','A');
         SELF := L;
+				self := [];
 
 
 end;
 
 
-in_file_noemalized_addresses := normalize(in_file_noemalized_names,10,tNormalizeAddresses(LEFT,counter))(prep_addr1<>'');
+in_file_normalized_addresse := normalize(in_file_noemalized_names,10,tNormalizeAddresses(LEFT,counter))(prep_addr1<>'');
 
-header.Layout_New_Records mapToNewRecords({in_file_noemalized_addresses} L) := transform
+in_Convert_addrsss := project(in_file_normalized_addresse, transform(layout_normed_adderess,
+															v_city 			:= trim(left.prep_addr2[1..STD.Str.Find(left.prep_addr2, ',', 1) -1], right);
+															v_statezip 	:= trim(left.prep_addr2[STD.Str.Find(left.prep_addr2, ',', 1)+1..],left,right);
+															v_state			:= trim(v_statezip[1..STD.Str.Find(v_statezip, ' ', 1) -1], right);
+															v_zip				:= trim(v_statezip[STD.Str.Find(v_statezip, ' ', 1)..],left,right);
+															self.prep_city   := v_city;
+															self.prep_state		:= v_state;
+															self.prep_zip5			:= v_zip;
+															self := left;
+															));
+																																																																					
 
+shared dAddressCleaned := PRTE2.AddressCleaner(in_Convert_addrsss,
+																							['prep_addr1'],
+																							['prep_addr2'], //blank field, not used but passed for attribute purposes
+																							['prep_city'],
+																							['prep_state'],
+																							['prep_zip5'],
+																							['clean_address'],
+																							['RawAID']);
+
+AID_BUILD.layouts.rFinal	tFinal(dAddressCleaned pInput) :=
+TRANSFORM
+	SELF.RawAID	:=	pInput.RawAID;
+	SELF				:=	pInput.clean_address;
+	SELF	:= [];
+END;
+
+export dFinal	:=	PROJECT(dAddressCleaned,tFinal(LEFT)): persist('~prte::persist::header::standardized');																				
+
+
+header.Layout_New_Records mapToNewRecords(dAddressCleaned L) := transform
+/*
     clean_address		:= Address.CleanAddress182(L.prep_addr1, L.prep_addr2);
 
     self.prim_range  	:= clean_address[1..10];
@@ -94,8 +134,24 @@ header.Layout_New_Records mapToNewRecords({in_file_noemalized_addresses} L) := t
     self.geo_blk  		:= clean_address[171..177];
  // self.geo_match  	:= clean_address[178];
  // self.err_stat  	  := clean_address[179..182];
+ */
+ 
+		self.prim_range  := L.clean_address.prim_range;
+		self.predir  		 := L.clean_address.predir;
+    self.prim_name   := L.clean_address.prim_name;
+    self.suffix      := L.clean_address.addr_suffix ;
+    self.postdir  	 := L.clean_address.postdir;
+    self.unit_desig  := L.clean_address.unit_desig;
+    self.sec_range   := L.clean_address.sec_range;
+    self.city_name   := L.clean_address.p_city_name;
+		self.st				   := L.clean_address.st;
+    self.zip  			 := L.clean_address.zip;
+    self.zip4  			 := L.clean_address.zip4;
+		self.county	     := L.clean_address.fips_county; // fips_county
+		self.geo_blk  	 := L.clean_address.geo_blk;
+		self.rawaid			 := L.rawaid;
     
-    self.dob                        := (integer)((string)L.dob);
+		self.dob                        := (integer)((string)L.dob);
     o_dt_first_seen                 := (integer)((string)L.date_first_seen)[1..6];
     self.dt_first_seen              := if(o_dt_first_seen=0,198001,o_dt_first_seen);
     today                           := (unsigned)((string)Std.Date.Today())[1..6];
@@ -122,7 +178,7 @@ header.Layout_New_Records mapToNewRecords({in_file_noemalized_addresses} L) := t
 
 end;
 
-as_header := project(in_file_noemalized_addresses,mapToNewRecords(LEFT));
+export as_header := project(dAddressCleaned,mapToNewRecords(LEFT));
 
-return as_header;
+// return as_header;
 end;

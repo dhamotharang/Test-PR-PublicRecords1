@@ -43,14 +43,15 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashv2_LicensePlateNbr,		
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashv2_OfficerBadgeNbr,						Constants.KeyName_ecrashv2+ '::@version@::officerbadgenbr', 					Constants.KeyName_ecrashv2 + '::'+ filedate + '::officerbadgenbr',						build_key_ecrashv2_officebadgenbr);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local( keys.key_ecrashv2_VinNbr,											Constants.KeyName_ecrashv2+ '::@version@::vinnbr', 										Constants.KeyName_ecrashv2 + '::'+ filedate + '::vinnbr',											build_key_ecrashv2_vinnbr);
 
-build_keys := sequential(	build_key_ecrash0, build_key_ecrash1, build_key_ecrash2v, build_key_ecrash3v, 
-													build_key_ecrash5, build_key_ecrash6, build_key_ecrash7,build_key_ecrash8,
-													build_key_ecrashv2analytics_byagencyid, build_key_ecrashv2analytics_bycollisiontype, 
-													build_key_ecrashv2analytics_bydow,build_key_ecrashv2analytics_byhod, 
-													build_key_ecrashv2analytics_byinter, build_key_ecrashv2analytics_bymoy, 
-													build_key_ecrashv2_accnbrv1, build_key_ecrashv2_accnbr, 
-													build_key_ecrashv2_agencyid_sentdate, build_key_ecrashv2_bdid, 
-													build_key_ecrashv2_did, build_key_ecrashv2_dlnbr, 
+build_keys := sequential(	
+// build_key_ecrash0, build_key_ecrash1, build_key_ecrash2v, build_key_ecrash3v, 
+													// build_key_ecrash5, build_key_ecrash6, build_key_ecrash7,build_key_ecrash8,
+													// build_key_ecrashv2analytics_byagencyid, build_key_ecrashv2analytics_bycollisiontype, 
+													// build_key_ecrashv2analytics_bydow,build_key_ecrashv2analytics_byhod, 
+													// build_key_ecrashv2analytics_byinter, build_key_ecrashv2analytics_bymoy, 
+													// build_key_ecrashv2_accnbrv1, build_key_ecrashv2_accnbr, 
+													// build_key_ecrashv2_agencyid_sentdate, build_key_ecrashv2_bdid, 
+													build_key_ecrashv2_did/*, build_key_ecrashv2_dlnbr,*/ 
 													build_key_ecrashv2_dol, build_key_ecrashv2_lastname_state, 
 													build_key_ecrashv2_photoid, build_key_ecrashv2_prefname_state, 
 													build_key_ecrashv2_reportid, build_key_ecrashv2_reportlinkid,
@@ -210,15 +211,16 @@ retval := sequential(outaction,mymove);
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION  
 is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
-updatedops   		 		:= PRTE.UpdateVersion('EcrashV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
+updatedops   		 		:= PRTE.UpdateVersion('EcrashV2Keys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N'); 
 
 RETURN 		
-			sequential(build_keys,
-									Move_Keys, 
-									To_QA, 
-									proc_build_keys_addl(filedate),
-									retval,														
-									if(not is_running_in_prod, DOPS_Comment, updatedops)
+			sequential(
+			// build_keys,
+									// Move_Keys, 
+									// To_QA, 
+									// proc_build_keys_addl(filedate),
+									// retval,														
+									// if(not is_running_in_prod, DOPS_Comment, updatedops)
 									);
 
 
