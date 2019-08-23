@@ -1,4 +1,4 @@
-IMPORT  doxie,mdr, PRTE2_Infutor, _control;
+﻿IMPORT  doxie,mdr, PRTE2_Infutor, _control;
 
 EXPORT keys := MODULE
 
@@ -24,7 +24,7 @@ EXPORT keys := MODULE
 	EXPORT key_infutorbest_did := Index(
 		Files.infutor_best_did, 
 		{did},
-		{Files.infutor_best_did }- [name_suffix],
+		{Files.infutor_best_did},
 		'~prte::key::infutor::best.did_' + doxie.Version_SuperKey);
 
 	

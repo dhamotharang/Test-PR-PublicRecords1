@@ -1,8 +1,12 @@
 ﻿Import ut, Gong, NID,didville, mdr,Gong_Neustar,Std;
 EXPORT files := module
 	
-	EXPORT file_Gong_History := DATASET('~PRTE::BASE::Gong_History', Layouts.Layout_base, FLAT );
-	EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly', Layouts.Layout_base, FLAT );
+	// EXPORT file_Gong_History := DATASET('~PRTE::BASE::Gong_History', Layouts.Layout_base, FLAT );
+	// EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly', Layouts.Layout_base, FLAT );
+	
+	EXPORT file_Gong_History := DATASET('~prte::base::gong_history_20190814', Layouts.Layout_base, FLAT );
+	EXPORT file_Gong_Weekly := DATASET('~PRTE::BASE::Gong_Weekly_20190814', Layouts.Layout_base, FLAT );
+	
 	EXPORT DS_Gong_History_IN := DATASET('~PRTE::IN::Gong_History', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 	EXPORT DS_Gong_Weekly_IN := DATASET('~PRTE::IN::Gong_Weekly', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 	EXPORT DS_Gong_Santander_IN :=  DATASET('~PRTE::IN::Gong_Santander', Layouts.Layout_gong_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );

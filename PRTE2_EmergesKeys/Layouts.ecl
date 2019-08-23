@@ -331,6 +331,8 @@ string4 mail_err_stat;
 unsigned8 persistent_record_id;
 string cust_name;
 string bug_num;
+string8 link_dob;
+string9 link_ssn;
 END;
 
 
