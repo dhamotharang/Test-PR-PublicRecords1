@@ -62,4 +62,5 @@
   UNSIGNED4 global_sid;
   UNSIGNED8 record_sid;
   STRING10  batch_jobid;
+  STRING12  batch_seq_number;
 END;

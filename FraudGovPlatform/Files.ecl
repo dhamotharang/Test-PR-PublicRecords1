@@ -1,4 +1,4 @@
-﻿import tools, FraudShared, NAC, Inquiry_AccLogs,INQL_v2;
+﻿import tools, FraudShared, NAC, Inquiry_AccLogs;
 export Files(
 
 	 string		pversion = ''
@@ -29,8 +29,8 @@ module
 											Inquiry_AccLogs.Layout.Common_ThorAdditions,
 											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));												
 		export RDP := dataset(Filenames().Sprayed.RDP,
-											INQL_v2.layouts.rSBA_In, 
-											CSV( separator('~~'), terminator(['\n', '\r\n'])));										
+											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.RDP},
+											CSV(heading(1),SEPARATOR([',','\t']),quote(['"','&quot;','\'']),TERMINATOR(['\n','\r\n','\n\r'])));																					
 
 	end;
 	//////////////////////////////////////////////////////////////////

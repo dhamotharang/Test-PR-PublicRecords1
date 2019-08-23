@@ -3,21 +3,15 @@ IMPORT HealthCareNoMatchHeader_Ingest,SALT311,STD,versioncontrol,HealthcareNoMat
 EXPORT Proc_Ingest_Master( 
     STRING	pSrc            = ''
     , STRING  pVersion      = (STRING)STD.Date.Today()
-    , DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) pBase = HealthcareNoMatchHeader_Ingest.Files(pSrc).AllRecords
-    , DATASET(RECORDOF(HealthCareNoMatchHeader_Ingest.In_Ingest))  pInfile = HealthcareNoMatchHeader_Ingest.Files(pSrc).AsHeaderIngest
-    // Ingest
-    , BOOLEAN doIngest      = FALSE // perform full ingest process (ingest source into existing base file)
-    // Ingest Stats
-    , BOOLEAN doIngestStats = FALSE // generate statistics on full ingest process
+    , DATASET(HealthcareNoMatchHeader_InternalLinking.Layout_Header) pBase = HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).BaseTemp
+    , DATASET(HealthcareNoMatchHeader_Ingest.Layout_Base)  pAsHeader = HealthcareNoMatchHeader_Ingest.Files(pSrc,pVersion).AsHeaderTemp
   ) :=  FUNCTION
 
-  ingestMod         :=  HealthCareNoMatchHeader_Ingest.Ingest(pSrc,,,pBase,pInfile);
+  ingestMod         :=  HealthCareNoMatchHeader_Ingest.Ingest(pSrc,pVersion,,,pBase,pAsHeader);
   InputSourceCounts :=  OUTPUT(ingestMod.InputSourceCounts,ALL,NAMED('InputSourceCounts'));
-  UpdateStatsXtab   :=  OUTPUT(ingestMod.InputSourceCounts,ALL,NAMED('UpdateStatsXtab'));
+  UpdateStatsXtab   :=  OUTPUT(ingestMod.UpdateStatsXtab,ALL,NAMED('UpdateStatsXtab'));
   fAllRecords       :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Base.AllRecords.new;
-  OutputResults     :=  OUTPUT(ingestMod.AllRecords,,fAllRecords,COMPRESSED,OVERWRITE); // Remove _Notag to keep 'what happened' byte
-  dAll_filenames    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).Base.dAll_filenames;
-  createsupers      :=  versioncontrol.mUtilities.createsupers(dAll_filenames);
+  OutputResults     :=  OUTPUT(ingestMod.AllRecords,,fAllRecords,COMPRESSED,OVERWRITE); // Add _Notag to remove 'what happened' byte
 
   // Ingest Stats
   runIngestStats  :=  PARALLEL(
@@ -29,13 +23,8 @@ EXPORT Proc_Ingest_Master(
                   OutputResults
                   ,Promote(pSrc, pVersion,,'base').buildfiles.New2Built
                   ,Promote(pSrc, pVersion,,'base').buildfiles.Built2QA	
-                  ,IFF(doIngestStats, runIngestStats, OUTPUT('Ingest Stats Skipped')),
-                );
-
-  allSteps  :=  SEQUENTIAL(
-                  createsupers,
-                  IFF(doIngest, runIngest, OUTPUT('Ingest Skipped')),
+                  ,runIngestStats
                 );
                 
-  RETURN  allSteps;
+  RETURN  runIngest;
 END;

@@ -83,9 +83,10 @@ build_keys := sequential(
 //---------- making DOPS optional and only in PROD build -------------------------------
 	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
-	updatedops   		 		:= PRTE.UpdateVersion('MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+	updatedops   		 		:= PRTE.UpdateVersion('MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N');
+	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_MDV2Keys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean :='N');
 	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
+
 
 RETURN sequential(build_keys
 									,build_autokeys

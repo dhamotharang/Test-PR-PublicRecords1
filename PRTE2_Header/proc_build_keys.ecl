@@ -1,4 +1,4 @@
-﻿import data_services, header,RoxieKeyBuild,doxie,doxie_build,business_risk,Address,doxie_files,InsuranceHeader_xLink,_Control,std,Relationship;
+﻿import data_services, header,RoxieKeyBuild,doxie,doxie_build,business_risk,Address,doxie_files,InsuranceHeader_xLink,_Control,std,Relationship, dx_Header, AID_Build;
 export proc_build_keys(string filedate) := MODULE
 
     SHARED kpn:=  PRTE2_Header.constants.KEY_PREFIX;       // '~prte::key::header::'
@@ -70,14 +70,17 @@ export proc_build_keys(string filedate) := MODULE
     RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.key_Header_DA                  ,kpn+'da'                                             ,kpn+filedate+'::da'                                           ,k54);
     RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie.Key_Header_DTS_FnameSmall      ,phd+'fname_small'                                    ,phd+filedate+'::fname_small'                                  ,k55);
     RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(prte2_header.key_relatives_v3        ,kpn+'relatives_v3'                                   ,kpn+filedate+'::relatives_v3'                                 ,k82);
-				RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(prte2_header.key_insuranceheader_xlink_did     ,pih+'did'                                  ,pih+filedate+'::did'                                 									,k85);
+		RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(prte2_header.key_insuranceheader_xlink_did     ,pih+'did'                                  ,pih+filedate+'::did'                                 				 ,k85);
+		RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(AID_Build.Key_AID_Base          			,kpa+'rawaid_to_acecahe'															,kpa+filedate+'::rawaid_to_acecahe'													   ,k68);
+
 
     SHARED build_keys := parallel(    k02,k03,k04,k05,k06,k07,k08,k09,k10,k11,k12,k13,k14,k15,k16,k17,k18,k19,k20,
                                   k21,k22,k23,k24,k25,k26,k27,k28,k29,k30,k31,k32,k33,k34,k35,k36,k37,k38,k39,k40,
                                   k41,k42,k43,k44,k45,k46,k47,k48,k49,k50,k51,k52,k53,k54,k55,k82,k85,
-                           
-                                  k03f,k04f,k32f );
-    
+                                  k03f,k04f,k32f,k68 );
+
+	   
+				
     /* ***********************************************  BUILD EMPTY KEYS  *********************************************/    
     ecl1 :=  '#workunit(\'name\',\'PRTE2_Header.proc_build_keys STEP2\');\n'
             +PRTE2_Header.fn_bld_blank_index('','doxie.key_header_address_research  ','thor_data400::key::address_research',           '::address_research',kpn,filedate,       '01')
@@ -85,7 +88,8 @@ export proc_build_keys(string filedate) := MODULE
             +PRTE2_Header.fn_bld_blank_index('','header.key_addr_hist(false)        ','thor_data400::key::fcra::header::address_rank', '::address_rank',kpf,filedate,           '56f')
             +PRTE2_Header.fn_bld_blank_index('','AddrFraud.Key_AddrFraud_GeoLink    ','thor_data400::key::addrrisk_geolink',           '::addrrisk_geolink',kpn,filedate,       '57')
             +PRTE2_Header.fn_bld_blank_index('','header.key_ADL_segmentation        ','thor_data400::key::adl_segmentation',           '::adl_segmentation',kpn,filedate,       '58')
-            +PRTE2_Header.fn_bld_blank_index('','Header.Key_DMV_restricted()        ','thor_data400::key::header::dmv_restricted',     '::dmv_restricted',kpn,filedate,         '59')
+            // +PRTE2_Header.fn_bld_blank_index('','Header.Key_DMV_restricted()        ','thor_data400::key::header::dmv_restricted',     '::dmv_restricted',kpn,filedate,         '59')
+						+PRTE2_Header.fn_bld_blank_index('','dx_Header.Key_DMV_restricted()        ','thor_data400::key::header::dmv_restricted',     '::dmv_restricted',kpn,filedate,         '59')
             +PRTE2_Header.fn_bld_blank_index('','doxie.Key_legacy_ssn               ','thor_data400::key::header.legacy_ssn',          '::legacy_ssn',kpn,filedate,             '60')
             +PRTE2_Header.fn_bld_blank_index('','doxie.Key_FCRA_legacy_ssn          ','thor_data400::key::fcra::header.legacy_ssn',    '::legacy_ssn',kpf,filedate,             '60f')
             +PRTE2_Header.fn_bld_blank_index('','doxie.key_max_dt_last_seen         ','thor_data400::key::max_dt_last_seen',           '::max_dt_last_seen',kpn,filedate,       '61')
@@ -96,14 +100,14 @@ export proc_build_keys(string filedate) := MODULE
             +PRTE2_Header.fn_bld_blank_index('','doxie.Key_TUCH_dob                 ','thor_data400::key::header.tuch_dob',            '::tuch_dob',kpn,filedate,               '65')
             +PRTE2_Header.fn_bld_blank_index('','idl_adl_mapping.keys.key_rid       ','thor_data400::key::lab.did_rid',                '::lab.did_rid',kpn,filedate,            '66')
             +PRTE2_Header.fn_bld_blank_index('','lssi.Key_Prep_Determiner           ','thor_data400::key::lssi.determiner',            '::determiner',kpn,filedate,             '67')
-            +PRTE2_Header.fn_bld_blank_index('','AID_Build.Key_AID_Base             ','thor_data400::key::aid::rawaid_to_acecahe',     '::rawaid_to_acecahe',kpa,filedate,      '68')
+            // +PRTE2_Header.fn_bld_blank_index('','AID_Build.Key_AID_Base             ','thor_data400::key::aid::rawaid_to_acecahe',     '::rawaid_to_acecahe',kpa,filedate,      '68')
             +PRTE2_Header.fn_bld_blank_index('','idl_adl_mapping.keys.key_rid       ','thor_data400::key::lab.did_rid',                '::did_rid',phl,filedate,                '69')
             +PRTE2_Header.fn_bld_blank_index('','Lssi.Key_Determiner                ','thor_data400::key::lssi.determiner',            '::determiner',pll,filedate,             '70')
             +PRTE2_Header.fn_bld_blank_index('','Header.Key_Addr_Unique_Expanded(false)','thor_data400::key::header',                  '::addr_unique_expanded',kpn,filedate,   '83'  ,'::qa')
             +PRTE2_Header.fn_bld_blank_index('','Header.Key_Addr_Unique_Expanded(true)','thor_data400::key::fcra::header',             '::addr_unique_expanded',kpf,filedate,   '83f' ,'::qa')
         
     +'sequential(parallel(bld01, bld56, bld56f, bld57, bld58, bld59, bld60, bld60f, bld61, bld61f, bld62, bld63, bld64, bld65,  \n'
-    +'                           bld66,         bld67, bld68, bld69, bld70, bld83, bld83f                                      )\n'
+    +'                           bld66,         bld67, bld69, bld70, bld83, bld83f                                      )\n'
     +'          ,PRTE2_Header.proc_build_keys(\''+filedate+'\').step2);';
 
     SHARED build_empty_keys := //output(ecl1); 
@@ -175,6 +179,7 @@ export proc_build_keys(string filedate) := MODULE
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::minors'                                         ,kpn+filedate+'::minors'                                       ,MB53);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::da'                                             ,kpn+filedate+'::da'                                           ,MB54);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(phd+'@version@'+'::fname_small'                                    ,phd+filedate+'::fname_small'                                  ,MB55);     
+						RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpa+'@version@'+'::rawaid_to_acecahe'                              ,kpa+filedate+'::rawaid_to_acecahe'                            ,MB68);
 
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::address_rank'                                  ,kpn+filedate+'::address_rank'                                  ,MB56);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpf+'@version@'+'::address_rank'                                  ,kpf+filedate+'::address_rank'                                  ,MB56f);
@@ -191,12 +196,12 @@ export proc_build_keys(string filedate) := MODULE
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::tuch_dob'                                      ,kpn+filedate+'::tuch_dob'                                      ,MB65);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::lab.did_rid'                                   ,kpn+filedate+'::lab.did_rid'                                   ,MB66);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::lssi.determiner'                               ,kpn+filedate+'::determiner'                                    ,MB67);
-            RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpa+'@version@'+'::rawaid_to_acecahe'                             ,kpa+filedate+'::rawaid_to_acecahe'                             ,MB68);
+            
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(phl+'@version@'+'::did_rid'                                       ,phl+filedate+'::did_rid'                                       ,MB69);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pll+'@version@'+'::determiner'                                    ,pll+filedate+'::determiner'                                    ,MB70);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::addr_unique_expanded'                          ,kpn+filedate+'::addr_unique_expanded'                          ,MB83);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpf+'@version@'+'::addr_unique_expanded'                          ,kpf+filedate+'::addr_unique_expanded'                          ,MB83f);
-												RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@'+'::did'                         																	 ,pih+filedate+'::did'                          																	,MB85);
+						RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@'+'::did'                         									,pih+filedate+'::did'                          									,MB85);
 						
                 
     SHARED move_PersonHeaderKeys_built := parallel( MB01,MB02,MB03,MB04,MB05,MB06,MB07,MB08,MB09,MB10,MB11,MB12,MB13,MB14,MB15,MB16,MB17,MB18,MB19,MB20,
@@ -209,8 +214,7 @@ export proc_build_keys(string filedate) := MODULE
                                              
                                              MB56f,MB60f,MB61f,MB83f, MB85 );
     
-    
-
+		
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@::did::refs::address'    ,pih+filedate+'::did::refs::address' ,MB69);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@::did::refs::dln'        ,pih+filedate+'::did::refs::dln'     ,MB70);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@::did::refs::dob'        ,pih+filedate+'::did::refs::dob'     ,MB71);
@@ -310,7 +314,7 @@ export proc_build_keys(string filedate) := MODULE
         RoxieKeyBuild.Mac_SK_Move_V2(pll+'@version@'+'::determiner'                                     ,'Q',MQ70,2);
         RoxieKeyBuild.Mac_SK_Move_V2(kpn+'@version@'+'::addr_unique_expanded'                           ,'Q',MQ83,2);
         RoxieKeyBuild.Mac_SK_Move_V2(kpf+'@version@'+'::addr_unique_expanded'                           ,'Q',MQ83f,2);
-								RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@'+'::did'                           																	,'Q',MQ85,2);
+				RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@'+'::did'                           									,'Q',MQ85,2);
         
         
         ;
@@ -324,7 +328,8 @@ export proc_build_keys(string filedate) := MODULE
                                                  MQ03f,MQ04f,MQ32f,
                                              
                                                  MQ56f,MQ60f,MQ61f,MQ83f,MQ85);
-    
+		
+		
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::refs::address'    ,'Q',MQ69,2);
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::refs::dln'        ,'Q',MQ70,2);
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::refs::dob'        ,'Q',MQ71,2);
@@ -339,24 +344,25 @@ export proc_build_keys(string filedate) := MODULE
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::refs::zip_pr'     ,'Q',MQ80,2);
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::idl'                   ,'Q',MQ81,2);
         RoxieKeyBuild.Mac_SK_Move_V2(kpn+'@version@::relatives_v3'          ,'Q',MQ82,2);
-								RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::sup::rid'         ,'Q',MQ84,2);
+				RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::sup::rid'         ,'Q',MQ84,2);
             
             
     
     SHARED move_PersonLABKeys_qa := parallel(MQ69,MQ70,MQ71,MQ72,MQ73,MQ74,MQ75,MQ77,MQ78,MQ79,MQ80,MQ81,MQ82,MQ84);
      
     EXPORT step1 := sequential(
-                                    build_keys
-                                    ,build_PersonLABKeys
-                                    ,build_empty_keys // This will trigger move keys in the next wuid
+                                   build_keys
+                                   ,build_PersonLABKeys
+                                   ,build_empty_keys // This will trigger move keys in the next wuid
                                     
                                    ):success(fileservices.sendemail(_control.MyInfo.EmailAddressNotify,'PRTE2_Header.proc_build_keys step1 completed',workunit)),
                                      failure(fileservices.sendemail(_control.MyInfo.EmailAddressNotify,'PRTE2_Header.proc_build_keys step1 FAILED!!!',workunit));
 
-    EXPORT step2 := SEQUENTIAL( 
+    EXPORT step2 := SEQUENTIAL(  
                                   parallel (move_PersonHeaderKeys_built,    move_PersonLABKeys_built) ,
                                   parallel (move_PersonHeaderKeys_qa,       move_PersonLABKeys_qa   ) 
                                   
                                 ):success(fileservices.sendemail(_control.MyInfo.EmailAddressNotify,'PRTE2_Header.proc_build_keys step2 completed',workunit)),
                                   failure(fileservices.sendemail(_control.MyInfo.EmailAddressNotify,'PRTE2_Header.proc_build_keys step2 FAILED!!!',workunit));
+
 END;

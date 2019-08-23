@@ -114,8 +114,15 @@ module
 
 	shared rs_unique_id := distribute(f1_unique_id,hash(unique_id));
 	
-	shared NotInMbs := join( 
-		rs_unique_id,
+	shared customer_mappings := FraudGovPlatform.MBS_Mappings; 
+
+	shared Append_Customer_Mappings := 
+		join(d_source_rec_id, customer_mappings,
+			left.customer_id = right.contribution_gc_id and right.contribution_source = 'RDP' and left.reason_description = 'APPLICANT ACTIVITY VIA LEXISNEXIS',
+			transform(Layouts.Input.IdentityData, SELF.customer_id := if(left.customer_id = right.contribution_gc_id, (string20)right.customer_id, left.customer_id); SELF:=LEFT), LEFT OUTER, lookup);
+	
+	shared append_source := join( 
+		Append_Customer_Mappings,
 		MBS_Sprayed(status = 1 and regexfind('DELTA', fdn_file_code, nocase) = false),
 		left.Customer_Account_Number =(string)right.gc_id and
 		left.customer_State = right.Customer_State and

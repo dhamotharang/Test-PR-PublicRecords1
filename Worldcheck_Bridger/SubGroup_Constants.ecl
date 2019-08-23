@@ -1149,6 +1149,11 @@
 		export string KEYWORD_TWMPB_DV							:= '830';
 		export string KEYWORD_ZMACC									:= '831';
 		export string KEYWORD_OFAC_EO13876					:= '832';
+		export string KEYWORD_TWTSA									:= '833';
+		export string KEYWORD_ARMJH_REPET						:= '834';
+		export string KEYWORD_OFAC_HIFPAA						:= '835';
+		export string KEYWORD_ILSHABAK							:= '836';
+		export string KEYWORD_FATF_SD								:= '837';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

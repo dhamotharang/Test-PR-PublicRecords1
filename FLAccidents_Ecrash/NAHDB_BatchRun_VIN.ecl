@@ -1,9 +1,10 @@
-import Address,ut,_control; 
+﻿import Address,ut,_control; 
 
 EXPORT NAHDB_BatchRun_VIN(string filedate/*, string customerName*/) := function 
 
 layoutNahdbBatchVin := Record
-string Vin
+string Vin;
+string rd_adjuster;
 
 /*string lesse, 
 string gaurentor,*/ 
@@ -145,7 +146,7 @@ return sequential(FLAccidents_Ecrash.Spray_nahdb_vin(filedate),
                  count(out); 
                  count(out(acc_dol <>'')); 
                  output(out,,'~thor_data::out::nahdb_batch_vin_'+filedate,csv(
-                 HEADING('VIN|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported  \n','',SINGLE),
+                 HEADING('VIN|rd_adjuster|acc_vin| order_id	| sequence_nbr|	 reason_id| acct_nbr	| vehicle_incident_id| vehicle_unit_number |	vendor_code| work_type_id|  orig_lname | orig_fname | orig_mname |  vehicle_owner| dob| driver_license_nbr| dlnbr_st| vehicle_year|  vehicle_make|  vehicle_model| tag_nbr| tagnbr_st| report_type_id| loss_type| acc_dol| accident_location|  acc_city|	 vehicle_incident_city| acc_st	| jurisdiction| orig_accnbr|	 accident_nbr| addl_report_number| acc_county| crash_county| cru_jurisdiction_nbr| agency_ori| carrier_name|	  Insurance_policy_num|	    Insurance_policy_Eff_Date|    Insurance_policy_Exp_Date| source_id|	 report_code|	 match_flag|	 date_vendor_last_reported  \n','',SINGLE),
                  SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE), 
 						     fileservices.despray('~thor_data::out::nahdb_batch_vin_'+filedate, _control.IPAddress.bctlpedata10, '/data/hds_180/cjr/nahdb_out_vin_'+filedate+'.csv',,,,TRUE)); 
 
