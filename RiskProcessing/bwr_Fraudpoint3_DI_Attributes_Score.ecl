@@ -1,15 +1,56 @@
-﻿//This for requesting the Fraudpoint 202 and Digital Insights attribute group
-//Returns attributes counts of 538 (v202 + DI)
-//v202 + DI - set RequestedAttributeGroups = fraudpointattrv202_diattrv1
-//v202      - set RequestedAttributeGroups = fraudpointattrv202
-//v201      - set RequestedAttributeGroups = fraudpointattrv201 (set SuppressCompromiesDLs to true to display last field (226))
-//v2        - set RequestedAttributeGroups = fraudpointattrv2
+﻿//This for requesting the Fraudpoint 202 + Digital Insights attribute group
+//Returns attributes counts of up to 538 (v202 + DI)
 
 import ut, risk_indicators, models, riskwise, iesp;
 #workunit('name','Fraudpoint 3 Score and Attributes 202 + Digital Insights');
 
-// internal fields for debugging, when set to false, QA file will not be output
-include_internal_extras := FALSE;
+//----------------
+//  ROXIE TARGET
+//----------------
+roxieIP := riskwise.shortcuts.prod_batch_analytics_roxie;
+// roxieIP := riskwise.shortcuts.staging_neutral_roxieIP;
+
+unsigned record_limit 	:= 0;   //number of records to process from input file; 0 means ALL
+unsigned eyeball        := 25;  //number of records to display in outputs
+unsigned Threads        := 30;  //number of threads to use in the soapcall
+unsigned retrys         := 5 ;  //number of retrys in the soapcall
+
+//---------------- FILE NAMES -----------------
+filename := ut.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
+outputfile := '~tfuerstenberg::out::TMX_examples_' + thorlib.wuid();
+qa_outputfile := outputfile+'_QA';
+
+
+//----------------- INPUT OPTIONS SECTION -------------------------------
+//Models to request, FP can now accept up to 3 models. Only populate the Models you need to run
+Model1 := 'di31906_0'; //Digital Insights flagship model = 'di31906_0'
+Model2 := ''; //second model if needed, Example Flagships: FP2.0 = fp1109_0 || FP3.0 = 'fp31505_0' or 'fp3fdn1505_0'
+Model3 := ''; //third model if needed
+
+RequestedAttrGroup := 'fraudpointattrv202_diattrv1'; //digital insights attr group
+// RequestedAttrGroup := 'fraudpointattrv202';  //Version 202 attr group
+// RequestedAttrGroup := 'fraudpointattrv201';  //Version 201 attr group
+// RequestedAttrGroup := 'fraudpointattrv2';    //Version 2 attr group
+
+// Change history date here to be what you need, options are listed
+historydate_to_use := 0;   //999999 will run in current mode
+                           //0 to use history date on file
+                           //any other date to use that specific date e.g.(201805)
+GLB  := 1;
+DPPA := 3;
+DataRestriction_Mask := '0000000000000000000000000';  // byte 6, if 1, restricts experian || byte 8, if 1, restricts equifax || byte 10 restricts Transunion
+DataPermission_Mask  := '0000000000100';    // to allow population of FDN Virtual Fraud, Test Fraud and Contributory Fraud, set position 11 to '1'
+                                            // to allow access to Insurance DL data, set position 13 to '1'
+_IncludeRiskIndices := FALSE; // Set to true to return riskIndicies if the requested model is able
+_OfacOnly           := FALSE;
+_ExcludeWatchLists  := FALSE;
+_OFACversion        := 1;
+_IncludeOfac        := FALSE;
+_IncludeAdditionalWatchLists := FALSE;
+_GlobalWatchlistThreshold := 0.84;
+_SuppressCompromisedDLs   := FALSE; // don’t search the eqfx compromised DL list by Last Name and SSN unless specifically requested
+_include_internal_extras  := FALSE; // internal fields for debugging, when set to false, QA file will not be output
+//-------------------------------------------------------------------------
 
 prii_layout := RECORD
      string ACCOUNT;
@@ -35,24 +76,6 @@ prii_layout := RECORD
      string HistoryDate;
 		 unsigned did := 0;
 end;
-
-
-filename := ut.foreign_prod + 'nmontpetit::out::chase_1139_apr_dev_sample_pii';
-outputfile := '~fallen::out::TMX_examples_' + thorlib.wuid();
-qa_outputfile := outputfile+'_QA';
-
-//Model and attributes to request
-Model1 := 'di31906_0'; //digital insights model
-Model2 := ''; //second model if needed
-Model3 := ''; //third model if needed
-RequestedAttrGroup := 'fraudpointattrv202_diattrv1'; //digital insights attr group
-
-//Roxie to target
-roxieIP := riskwise.shortcuts.prod_batch_analytics_roxie;
-// roxieIP := riskwise.shortcuts.staging_neutral_roxieIP;
-
-eyeball 								:= 25;	//number of records to display in outputs
-unsigned 	record_limit 	:= 0;   //number of records to process from input file; 0 means ALL
 
 f := if(record_limit = 0, //depending on the record_limit, either process the entire input file or the number of records specified
 				dataset(filename,prii_layout, csv(quote('"'))),
@@ -125,100 +148,85 @@ layout_old_acct := RECORD
 	layout_soap;
 END;
 
-SuppressCompromisedDLs := false; // don’t search the eqfx compromised DL list by Last Name and SSN unless specifically requested
-
 layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
 	self.SuppressCompromisedDLs := true; // leave this set to true for soapcall; otherwise field values will be offset
 	
 	SELF.old_account_number := le.account;
 	SELF.Accountnumber := (STRING)c;	
-	SELF.DPPAPurpose := 3;
-	SELF.GLBPurpose := 1;
+	SELF.DPPAPurpose := DPPA;
+	SELF.GLBPurpose := GLB;
+  SELF.DataRestrictionMask := DataRestriction_Mask;
+	SELF.DataPermissionMask  := DataPermission_Mask;
 
-  //**************************************************************************************** 
-  // When hard-coding archive dates, uncomment and modify one of the following sets of code 
-	//   below and comment out the existing  code for self.historydateyyyymm and self.historyDateTimeStamp 
-	//****************************************************************************************
-		// self.historydateyyyymm := 201504;  
-		// self.historyDateTimeStamp := '20150401 00000100';  
-
-		// self.historydateyyyymm := 999999;  
-		// self.historyDateTimeStamp := '';  // leave timestamp blank, query will populate it with the current date  
-
-  self.historydateyyyymm := map(
-			regexfind('^\\d{8} \\d{8}$', le.historydate) => (unsigned)le.historydate[..6],
-			regexfind('^\\d{8}$',        le.historydate) => (unsigned)le.historydate[..6],
-			                                                (unsigned)le.historydate
-	);
+  //**********************************************************************************************
+  // History date is governed by the historydate_to_use field above in the input options section
+  //**********************************************************************************************
+  self.historydateyyyymm := Map(historydate_to_use > 0 and historydate_to_use != 999999 => historydate_to_use,
+                                historydate_to_use = 999999                             => 999999,
+                                historydate_to_use = 0                  => map(
+                                                                              regexfind('^\\d{8} \\d{8}$', le.historydate) => (unsigned)le.historydate[..6],
+                                                                              regexfind('^\\d{8}$',        le.historydate) => (unsigned)le.historydate[..6],
+                                                                                                                              (unsigned)le.historydate
+                                                                              ),
+                                                                           999999 //defaults to current mode, shouldn't get here
+                                );
 	
-  self.historyDateTimeStamp := map(
-      le.historydate in ['', '999999']             => '',  // leave timestamp blank, query will populate it with the current date   	
-			regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
-			regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',
-			regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',		                                                
-			                                                le.historydate
-	);
+  self.historyDateTimeStamp := Map(historydate_to_use > 0 and historydate_to_use != 999999 => (String)historydate_to_use + '01 00000100',
+                                historydate_to_use = 999999                                => '',
+                                historydate_to_use = 0                  => map(
+                                                                              le.historydate in ['', '999999']             => '',  // leave timestamp blank, query will populate it with the current date   	
+                                                                              regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
+                                                                              regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',
+                                                                              regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',		                                                
+                                                                                                                              le.historydate
+                                                                              ),
+                                                                              '' //defaults to current mode, shouldn't get here
+                                  );
   
-	self.DataRestrictionMask := '0000000000000000000000000';  // to allow use of both Equifax and Experian, this is the default value for all legacy scoring products
-	self.DataPermissionMask  := '0000000000100';  // to allow population of FDN Virtual Fraud, Test Fraud and Contributory Fraud, set position 11 to '1'
-																								// to allow access to Insurance DL data, set position 13 to '1'
-
 	SELF.RequestedAttributeGroups := dataset([{RequestedAttrGroup}], layout_attributes_in);
   
   modelrequest1 := DATASET([TRANSFORM(Models.Layouts.Layout_Model_Request_In,
                                  SELF.ModelName := 'customfa_service',
-                                 Self.ModelOptions := Dataset([Transform(Models.Layouts.Layout_Model_Options,
-                                                                 Self.OptionName := 'custom',
-                                                                 Self.OptionValue := Model1
-                                                                )])
-                                 )]); //First model request
+                                 Self.ModelOptions := Dataset([Transform(Models.Layouts.Layout_Model_Options, Self.OptionName := 'custom', Self.OptionValue := Model1
+                           )]) )]); //First model request
 
   modelrequest2 := DATASET([TRANSFORM(Models.Layouts.Layout_Model_Request_In,
                                  SELF.ModelName := 'customfa_service',
-                                 Self.ModelOptions := Dataset([Transform(Models.Layouts.Layout_Model_Options,
-                                                                 Self.OptionName := 'custom',
-                                                                 Self.OptionValue := Model2
-                                                                )])
-                                 )]); //Second model request
+                                 Self.ModelOptions := Dataset([Transform(Models.Layouts.Layout_Model_Options, Self.OptionName := 'custom', Self.OptionValue := Model2
+                           )]) )]); //Second model request
   
   modelrequest3 := DATASET([TRANSFORM(Models.Layouts.Layout_Model_Request_In,
                                  SELF.ModelName := 'customfa_service',
-                                 Self.ModelOptions := Dataset([Transform(Models.Layouts.Layout_Model_Options,
-                                                                 Self.OptionName := 'custom',
-                                                                 Self.OptionValue := Model3
-                                                                )])
-                                 )]); //Third model request
+                                 Self.ModelOptions := Dataset([Transform(Models.Layouts.Layout_Model_Options, Self.OptionName := 'custom', Self.OptionValue := Model3
+                           )]) )]); //Third model request
   
   self.ModelRequests := IF(Model1 != '', modelrequest1) +
                         IF(Model2 != '', modelrequest2) +
                         IF(Model3 != '', modelrequest3); //Fraudpoint now accepts up to 3 models. To pass in more then 1 model use the request structures above
   
-  // self.model := Model1;
-	self.IncludeRiskIndices := false;
  	self.gateways := dataset([{'threatmetrix_test', 'http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7426/WsGatewayEx/?ver_=2.28'}], Risk_Indicators.Layout_Gateways_In)
                    /* + riskwise.shortcuts.gw_netacuityv4 */
                    /* + riskwise.shortcuts.gw_targus */;     //Can uncomment targus gateway and/or watchlists if needed
-
-	self.OfacOnly := false;
-  self.ExcludeWatchLists := false;
-	self.OFACversion := 1;
-	self.IncludeOfac := false;
-	self.IncludeAdditionalWatchLists := false;
-	self.GlobalWatchlistThreshold := 0.84;
+                   
+  self.IncludeRiskIndices := _IncludeRiskIndices;
+	self.OfacOnly := _OfacOnly;
+  self.ExcludeWatchLists := _ExcludeWatchLists;
+	self.OFACversion := _OFACversion;
+	self.IncludeOfac := _IncludeOfac;
+	self.IncludeAdditionalWatchLists := _IncludeAdditionalWatchLists;
+	self.GlobalWatchlistThreshold := _GlobalWatchlistThreshold;
   // self.watchlist := dataset([{'OFAC'}],iesp.share.t_StringArrayItem); // use this if you only need one watchlist
   // self.watchlist := dataset([{'OFAC'}],iesp.share.t_StringArrayItem) +
 									  // dataset([{'BES'}],iesp.share.t_StringArrayItem); // use this if you need more than one watchlist, follow the same formatting to add one more if needing more than two 
   
-  SELF.IncludeQAOutputs := include_internal_extras;  
+  SELF.IncludeQAOutputs := _include_internal_extras;  
 	SELF := le;
 	self := [];
 end;
 fdInput := project(f, into_fdInput(left, counter));
 output(choosen(fdInput, eyeball), named('FD_Input'));
 
-
 dist_dataset := distribute(fdInput, random());
-
 
 Layout_FA_Input := RECORD
 	Risk_Indicators.Layout_Input;
@@ -263,8 +271,8 @@ END;
 resu := soapcall(dist_dataset, roxieIP,
 				'Models.FraudAdvisor_Service', {dist_dataset}, 
 				DATASET(layout_FDAttributesOut),
-				PARALLEL(2), 
-				retry(5),
+				PARALLEL(Threads), 
+				retry(retrys),
 				onFail(myFail(LEFT)));
 				
 output(choosen(resu, eyeball), named('roxie_result'));
@@ -307,6 +315,14 @@ fd_attributes_norm := RECORD
 	string200 errorcode;
 END;
 
+Output_attr_group := CASE(RequestedAttrGroup,
+                          'fraudpointattrv202_diattrv1' => 'Version202_DI1',
+                          'fraudpointattrv202'          => 'Version202',
+                          'fraudpointattrv201'          => 'Version201',
+                          'fraudpointattrv2'            => 'Version2',
+                                                           ''
+                          );
+
 get_group(recordof(Layout_FDAttributesOut) groups, string name_i) := function
 	groupi := groups.attributegroup(name=name_i);
 	return groupi;
@@ -321,7 +337,7 @@ fd_attributes_norm normit(resu L, fdInput R) := transform
 	self.AccountNumber := r.old_account_number;
 		
 	// Digital Insights attribute output
-	v := get_group(l, 'Version202_DI1');
+	v := get_group(l, Output_attr_group);
   v1	:= get_attribute(v, 	1	);
   v2	:= get_attribute(v, 	2	);
   v3	:= get_attribute(v, 	3	);
@@ -1087,7 +1103,7 @@ self.IDVerDriversLicenseType	:= v222.attribute[1].value;
 self.IDVerSSNDriversLicense	:= v223.attribute[1].value;
 self.SourceVehicleRegistration	:= v224.attribute[1].value;
 self.SourceDriversLicense	:= v225.attribute[1].value;
-self.IdentityDriversLicenseComp	:= if(SuppressCompromisedDLs, v226.attribute[1].value, 'XX');  // only populate this field when it's requested
+self.IdentityDriversLicenseComp	:= if(_SuppressCompromisedDLs, v226.attribute[1].value, 'XX');  // only populate this field when it's requested
 //AmEx 202 attributes
 self.IDVerFNameBest := v227.attribute[1].value;
 self.IDVerLNameBest := v228.attribute[1].value;
@@ -1544,10 +1560,10 @@ without_compromised_dl := project(to_1_record, transform(fd_attributes_norm_minu
 
 // if the option is turned on to suppress compromised DLs, then output the file that has the attribute included
 // otherwise, output the file without that field in the layout
-if(SuppressCompromisedDLs,
+if(_SuppressCompromisedDLs,
 output(to_1_record,,outputfile,CSV(heading(single), quote('"')), overwrite),
 output(without_compromised_dl,,outputfile,CSV(heading(single), quote('"')), overwrite)
 );
 
-IF(Include_Internal_Extras, OUTPUT(CHOOSEN(qa_results, eyeball), NAMED('Sample_QA_Results')));
-IF(Include_Internal_Extras, OUTPUT(qa_results,,qa_outputfile, CSV(heading(single), quote('"')), overwrite));
+IF(_include_internal_extras, OUTPUT(CHOOSEN(qa_results, eyeball), NAMED('Sample_QA_Results')));
+IF(_include_internal_extras, OUTPUT(qa_results,,qa_outputfile, CSV(heading(single), quote('"')), overwrite));
