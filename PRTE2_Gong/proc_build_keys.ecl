@@ -498,7 +498,7 @@ cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true
 				build_key_gong_eda_st_city_prim_name_prim_range, 
 				build_key_gong_eda_st_lname_city, 
 				build_key_gong_eda_st_lname_fname_city, 
-				build_key_gong_hhid, 
+				// build_key_gong_hhid, 
 				build_key_gong_history_surnames, 
 				build_key_gong_history_address, 
 				build_key_gong_history_city_st_name, 
@@ -506,10 +506,10 @@ cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true
 				build_key_gong_history_companyname, 
 				build_key_gong_history_did, 
 				build_key_gong_history_hhid, 
-				build_key_gong_history_linkids, 
+				// build_key_gong_history_linkids, 
 				build_key_gong_history_name, 
 				build_key_gong_history_npa_nxx_line, 
-				build_key_gong_history_phone, 
+				// build_key_gong_history_phone, 
 				build_key_gong_history_wdtg, 
 				build_key_gong_history_wild_name_zip, 
 				build_key_gong_history_zip_name, 
@@ -522,7 +522,8 @@ cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true
 				build_key_business_headerfilteredfcra_hriphone10_v2, 
 				build_key_gong_historyfcra_address, 
 				build_key_gong_historyfcra_did, 
-				build_key_gong_historyfcra_phone, 
+				build_key_gong_historyfcra_phone 
+				/*, 
 				move_built_key_cbrs_phone10_gong, 
 				move_built_key_gong_npa, 
 				move_built_key_gong_zip, 
@@ -601,6 +602,7 @@ cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true
 				move_qa_key_gong_historyfcra_phone,
 				parallel(cnt_gong_fcra_address, cnt_gong_fcra_did, cnt_gong_fcra_phone),
 				PerformUpdateOrNot
+*/
 				);
 
 END;

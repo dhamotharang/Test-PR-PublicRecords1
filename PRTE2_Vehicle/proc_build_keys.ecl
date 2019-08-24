@@ -1,4 +1,4 @@
-import _control, AutoKeyB, AutoKeyB2, RoxieKeyBuild, PRTE, STD, prte2, tools,doxie, AutoStandardI,doxie_build, PRTE,PRTE2_Common;
+﻿import _control, AutoKeyB, AutoKeyB2, RoxieKeyBuild, PRTE, STD, prte2, tools,doxie, AutoStandardI,doxie_build, PRTE,PRTE2_Common;
 
 EXPORT proc_build_keys(string filedate) := function
 
@@ -133,7 +133,7 @@ end;
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
 is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
-updatedops					:= PRTE.UpdateVersion('VehicleV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+updatedops					:= PRTE.UpdateVersion('VehicleV2Keys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
 
 // -- Actions
 buildKey	:=	sequential( data_file
@@ -141,8 +141,9 @@ buildKey	:=	sequential( data_file
 												 ,Move_keys
 												 ,to_qa
 												 ,autokeys(filedate)
-												 ,if(not is_running_in_prod, DOPS_Comment, updatedops)												 
+												 // ,if(not is_running_in_prod, DOPS_Comment, updatedops)												 
 											);
 									
 return	buildKey;
 end;
+

@@ -34,13 +34,15 @@ end;
 	PRTE2.CleanFields(pBocaGE, CleanGEBase);
 	
 //Split into existing and new records file for name/address cleaning
-	BocaGE_prev	:= project(CleanGEBase(DID <> 0 and trim(origname) <> 'ORIGNAME'), PRTE2_PhonesPlus.Layouts.Base_ext);
+	BocaGE_prev	:= project(CleanGEBase(DID <> 0 and trim(origname) <> 'ORIGNAME' and link_ssn not in prte2_phonesplus.constants.ssn_set_exception), PRTE2_PhonesPlus.Layouts.Base_ext);
 	BocaGE_new		:= CleanGEBase(DID = 0 and trim(cust_name) <> '' and trim(origname) <> 'ORIGNAME'); //Added because somehow header records are getting into file
+	BocaGE_xmatch		:= CleanGEBase(DID <> 0 and trim(cust_name) <> '' and trim(origname) <> 'ORIGNAME' and link_ssn in prte2_phonesplus.constants.ssn_set_exception); 
 
 //Address Cleaning
- dAddressCleaned := PRTE2.AddressCleaner(BocaGE_new,
-																																								['concat_address1'],
-																																								['dummy'], //blank field, not used but passed for attribute purposes
+ combine_file := BocaGE_new + BocaGE_xmatch;
+ dAddressCleaned := PRTE2.AddressCleaner(combine_file,
+																				['concat_address1'],
+																				['dummy'], //blank field, not used but passed for attribute purposes
                                         ['OrigCity'],
                                         ['OrigState'],
                                         ['OrigZip'],
@@ -51,8 +53,8 @@ end;
 		//Map Address
 		SELF.state	:= L.clean_address.st;
 		SELF.zip5		:= L.clean_address.zip;
-		SELF							:= L.clean_address;
-		SELF							:= L;
+		SELF				:= L.clean_address;
+		SELF				:= L;
   END;
 	
 	pCleanAddr	:= PROJECT(dAddressCleaned, xFrmBase(LEFT));
@@ -81,9 +83,10 @@ end;
 	NewBocaBase		:= BocaGE_prev + pGEBase;
  	
 	PRTE2_PhonesPlus.Layouts.Base_ext AddLinkID(NewBocaBase L) := TRANSFORM
-	  SELF.did  := prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, trim(L.link_dob), L.cust_name);
+	  SELF.did  := if(L.did > 0, L.did, prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, trim(L.link_dob), L.cust_name));
     //SELF.bdid := prte2.fn_AppendFakeID.bdid(L.clean_company,	L.prim_range,	L.prim_name, L.v_city_name, L.state, L.zip5, L.cust_name);
-		SELF				:= L;
+		self.append_ocn := L.orig_carrier_name;
+		SELF			:= L;
   END;
 	
 	BocaBase := PROJECT(NewBocaBase, AddLinkID(LEFT)) + CleanHist;

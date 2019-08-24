@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_Infutor;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_Infutor;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -69,7 +69,7 @@ RETURN 		sequential(
 			move_qa_key_header_teaser_did, 
 			move_qa_key_header_teaser_search, 
 			move_qa_key_infutorbest_did 
-																							// ,parallel(updatedops,updatedops_fcra) 
+			// ,parallel(updatedops,updatedops_fcra) 
 																							);
 
 END;
