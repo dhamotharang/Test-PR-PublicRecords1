@@ -47,7 +47,7 @@ layout_j_final := record
                 //string100 SexOffenderRegistryNumber;
 
                 //from charge
-                string40   CaseID                := '';
+                string100  CaseID                := '';
                 string20   WarrantNumber         := '';
                 //string8  WarrantDate           := '';
                 string200  WarrantDesc           := '';
@@ -1379,6 +1379,8 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                                    regexfind('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus) => regexreplace('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus,'$4'),
                                    sentstat_susp_time <> '' => '',
 																	 vVendor IN ['I0022','I0020'] => l.sentenceadditionalinfo[41..],
+
+                                   vVendor IN ['I0059','I0061','I0062','I0063','I0068','I0072','I0075','I0077','I0085','I0087','I0089','I0090','I0091','I0092','I0093','I0094'] => l.sentenceadditionalinfo[41..],   // added by tp
 
                                    l.sentencestatus                                                                                                                                                                                                                                                                             
                                    );
