@@ -22,7 +22,7 @@ EXPORT Key_TradelineGuarantor(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 		UNSIGNED6	did;
 		UNSIGNED1	did_score;
 		BIPV2.IDlayouts.l_xlink_ids;	//	Added for BIP project
-    UNSIGNED4 global_sid  :=  0;
+    UNSIGNED4 global_sid;
     UNSIGNED8 record_sid  :=  0;
 		STRING2		source;
 	END;
@@ -38,6 +38,7 @@ EXPORT Key_TradelineGuarantor(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																																		LEFT.original_process_date,
 																																		LEFT.process_date);
 																			SELF.Version					:=	LEFT.process_date;
+																			SELF.global_sid				:=  0;
 																			SELF									:=	LEFT;
 																			SELF									:=	[]
 																		)

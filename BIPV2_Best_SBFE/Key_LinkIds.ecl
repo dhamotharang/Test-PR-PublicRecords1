@@ -8,7 +8,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 															BIPV2_Best.fn_Prep_Base_for_Key(pVersion,BIPV2_Best_SBFE.Files(pVersion).base.built)
 														);
 														
-	SHARED dSBFEBestKey := PROJECT(dSBFEBestBase, TRANSFORM(BIPV2_Best.layouts.key, SELF.global_sid := 24161, SELF:=LEFT, SELF:=[]));  //DF-25791: Populate Global_SID Field
+	SHARED dSBFEBestKey := PROJECT(dSBFEBestBase, TRANSFORM(BIPV2_Best.layouts.key, SELF:=LEFT, SELF:=[]));  //DF-25791: Populate Global_SID Field
 		
 	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dSBFEBestKey,'SBFECV','','global_sid');	
 	
