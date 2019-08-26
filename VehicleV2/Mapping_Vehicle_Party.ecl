@@ -129,10 +129,10 @@ transform
 	self.PREVIOUS_TITLE_STATE					:=	'';
 	self.history											:=	if(L.history = 'E','H',L.history);
 	//Added for CCPA-103
-	self.global_sid                   := 0;
-	self.record_sid                   := 0;
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
 	//Added for DF-25578
-	self.raw_name                     := '';
+	// self.raw_name                     := '';
 
 	self															:=	L;
 	self															:=	[];

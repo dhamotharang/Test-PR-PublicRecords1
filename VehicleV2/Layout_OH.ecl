@@ -1,4 +1,4 @@
-IMPORT	AID,Address;
+﻿IMPORT	AID,Address;
 
 EXPORT Layout_OH	:=
 MODULE
@@ -292,6 +292,9 @@ MODULE
 		STRING25        series_description;
 		STRING25        body_style_description;
 		UNSIGNED8				source_rec_id := 0;	 	//Added for BIP project
+		//Added for CCPA-103
+		UNSIGNED4       global_sid := 0;
+		UNSIGNED8       record_sid := 0;
   END;
 
 END;

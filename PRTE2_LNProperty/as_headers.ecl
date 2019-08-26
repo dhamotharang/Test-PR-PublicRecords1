@@ -1,4 +1,4 @@
-import header,ln_property,ln_mortgage,ut, mdr,Business_Header,lib_stringlib, LN_PropertyV2;
+﻿import header,ln_property,ln_mortgage,ut, mdr,Business_Header,lib_stringlib, LN_PropertyV2;
 
 EXPORT AS_HEADERS := MODULE
 shared pLNPropertySearch 	:= Files.file_search_building_did_out;
@@ -31,7 +31,8 @@ assessor_base := project(pLNPropertyTax, to_assessors_base(left));
 header.Mac_Set_Header_Source(assessor_base(ln_fares_id[1] ='R'),LN_Property.Layout_Property_Common_Model_BASE,header.layouts_SeqdSrc.FAT_src_rec,mdr.sourceTools.src_LnPropV2_Fares_Asrs,withUID1,1)
 header.Mac_Set_Header_Source(assessor_base(ln_fares_id[1]!='R'),LN_Property.Layout_Property_Common_Model_BASE,header.layouts_SeqdSrc.FAT_src_rec,mdr.sourceTools.src_LnPropV2_Lexis_Asrs,withUID2,1) 
 
-shared	ln_propertyv2_tax_as_source	:=	withUID1 + withUID2;
+// shared	ln_propertyv2_tax_as_source	:=	withUID1 + withUID2;
+ln_propertyv2_tax_as_source	:=	withUID1 + withUID2;
 
 LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE to_deeds_base(pLNPropertyDeed l) := transform
 	self := l;
@@ -43,7 +44,8 @@ deeds_base := project(pLNPropertyDeed, to_deeds_base(left));
 header.Mac_Set_Header_Source(deeds_base(ln_fares_id[1] ='R'),LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE,header.layouts_SeqdSrc.FAD_src_rec,mdr.sourceTools.src_LnPropV2_Fares_Deeds		 ,withUID3,1)
 header.Mac_Set_Header_Source(deeds_base(ln_fares_id[1]!='R'),LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE,header.layouts_SeqdSrc.FAD_src_rec,mdr.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs,withUID4,1)
 
-shared	ln_propertyv2_deed_as_source	:=	withUID3 + withUID4;
+// shared	ln_propertyv2_deed_as_source	:=	withUID3 + withUID4;
+ln_propertyv2_deed_as_source	:=	withUID3 + withUID4;
 
 r1	:=	record
 	unsigned6 uid;
@@ -104,7 +106,7 @@ p4	:=	project(p3_filt,t4(left));
 
 Layouts.r_layout_new_records_strings t_rollup(p4 le, p4 ri)	:=	transform
 	 self.dt_first_seen           	:=	ut.Min2(le.dt_first_seen,ri.dt_first_seen);
-	 self.dt_last_seen            	:=	ut.Max2(le.dt_first_seen,ri.dt_first_seen);
+	 self.dt_last_seen            	:=	Max(le.dt_first_seen,ri.dt_first_seen);
 	 self.dt_vendor_first_reported	:=	ut.Min2(le.dt_first_seen,ri.dt_first_seen);
 	 self.dt_vendor_last_reported 	:=	self.dt_last_seen;
 	 self.dt_nonglb_last_seen     	:=	self.dt_last_seen;

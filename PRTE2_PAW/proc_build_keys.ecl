@@ -111,11 +111,13 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 //---------- making DOPS optional and only in PROD build -------------------------------
 	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
-	updatedops   		 		:= PRTE.UpdateVersion('PAWV2Keys', filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
-	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_PAWV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+	updatedops   		 		:= PRTE.UpdateVersion('PAWV2Keys', filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N'); 
+	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_PAWV2Keys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean :='N');
 	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
 
 	// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION  
+	
+
 
 
 	RETURN 		sequential(			build_key_paw_bdid, 
