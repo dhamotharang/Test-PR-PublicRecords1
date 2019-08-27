@@ -1,4 +1,4 @@
-import Autokey_batch, VehicleV2_Services, Address, VehicleV2, BatchServices, AutokeyB2, AutoStandardI, BIPV2, STD;
+﻿import Autokey_batch, VehicleV2_Services, Address, VehicleV2, BatchServices, AutokeyB2, AutoStandardI, BIPV2, STD;
 
 export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_BatchIn) data_in,
 																 VehicleV2_Services.IParam.RTBatch_V2_params in_param) := function
@@ -537,7 +537,7 @@ export Vin_Batch_Service_records(dataset(VehicleV2_Services.Batch_Layout.Vin_Bat
 
 	// Search via BIP Linkids
 	ds_linkIds := PROJECT(data_in(ultid !=0),BIPV2.IDlayouts.l_xlink_ids2);
-	ds_from_linkids := PROJECT(VehicleV2.Key_Vehicle_linkids.kFetch(ds_linkIds,in_param.BIPFetchLevel),
+	ds_from_linkids := PROJECT(VehicleV2.Key_Vehicle_linkids.kFetch(ds_linkIds,,in_param.BIPFetchLevel),
 															 TRANSFORM(AcctRec,
 																					SELF := LEFT,
 																					SELF.vin := '',
