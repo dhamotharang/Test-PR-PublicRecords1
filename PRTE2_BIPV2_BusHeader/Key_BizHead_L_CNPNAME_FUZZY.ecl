@@ -7,10 +7,11 @@ SHARED h := CandidatesForKey;//The input file - distributed by proxid
 layout := RECORD // project out required fields
 // Compulsory fields
   h.company_name_prefix;
+	h.fallback_value; // Populate the fallback field
 // Optional fields
   h.zip;
   h.st;
-  h.fallback_value; // Populate the fallback field
+ // h.fallback_value; // Populate the fallback field
   h.ultid; // Parent #3
   h.orgid; // Parent #2
   h.seleid; // Parent #1
