@@ -7080,10 +7080,8 @@ END;
 EXPORT _df_AccidentReportIndividualInvolved(boolean is_active, string path) := MODULE
 
   EXPORT DiffScalars (layouts._lt_AccidentReportIndividualInvolved L, layouts._lt_AccidentReportIndividualInvolved R, boolean is_deleted, boolean is_added) := MODULE
-    shared boolean updated_UniqueId := (L.UniqueId != R.UniqueId);
 
-    shared is_updated := false
-      OR updated_UniqueId;
+    shared is_updated := false;
 
     shared integer _change := MAP (is_deleted  => DiffStatus.State.DELETED,
                       is_added    => DiffStatus.State.ADDED,
@@ -7092,7 +7090,7 @@ EXPORT _df_AccidentReportIndividualInvolved(boolean is_active, string path) := M
 
     EXPORT _diff := DiffStatus.Convert (_change);
     // Get update information for all scalars
-      _meta :=   IF (updated_UniqueId, DATASET ([{'UniqueId', R.UniqueId}], layouts.DiffMetaRow));
+      _meta :=  DATASET ([], layouts.DiffMetaRow);
 
     EXPORT _diffmeta := IF (~is_deleted AND ~is_added AND is_updated, _meta);
   END;
@@ -7278,26 +7276,26 @@ EXPORT _df_AccidentReportVehicle(boolean is_active, string path) := MODULE
     RETURN ROW (ProcessTx(_new, _old, false, false));
   END;
   
-  EXPORT  integer1 CheckOuter_driver_individual_uniqueid(layouts._lt_AccidentReportVehicle L, layouts._lt_AccidentReportVehicle R) := FUNCTION
-    boolean IsInner :=  (L.Driver.Individual.UniqueId = R.Driver.Individual.UniqueId);
+  EXPORT  integer1 CheckOuter_makemodeltagnumber(layouts._lt_AccidentReportVehicle L, layouts._lt_AccidentReportVehicle R) := FUNCTION
+    boolean IsInner :=  (L.TagNumber = R.TagNumber AND L.Make = R.Make AND L.Model = R.Model);
 
-    boolean IsOuterRight :=   (L.Driver.Individual.UniqueId = '');
+    boolean IsOuterRight :=   (L.TagNumber = '' AND L.Make = '' AND L.Model = '');
     return IF (IsInner, DiffStatus.JoinRowType.IsInner, IF (IsOuterRight, DiffStatus.JoinRowType.OuterRight, DiffStatus.JoinRowType.OuterLeft));
   END;
-  EXPORT  AsDataset_driver_individual_uniqueid (dataset(layouts._lt_AccidentReportVehicle) _n, dataset(layouts._lt_AccidentReportVehicle) _o) := FUNCTION
+  EXPORT  AsDataset_makemodeltagnumber (dataset(layouts._lt_AccidentReportVehicle) _n, dataset(layouts._lt_AccidentReportVehicle) _o) := FUNCTION
 
     _new := PROJECT (_n, TRANSFORM (layouts._lt_row_AccidentReportVehicle, SELF._diff_ord := COUNTER, SELF := LEFT));
     _old := PROJECT (_o, TRANSFORM (layouts._lt_row_AccidentReportVehicle, SELF._diff_ord := 10000 + COUNTER, SELF := LEFT));
     ActiveJoin := JOIN (_new, _old,
-                  LEFT.Driver.Individual.UniqueId = RIGHT.Driver.Individual.UniqueId,
+                  LEFT.TagNumber = RIGHT.TagNumber AND LEFT.Make = RIGHT.Make AND LEFT.Model = RIGHT.Model,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_driver_individual_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_makemodeltagnumber(LEFT, RIGHT)),
                   FULL OUTER,
                   LIMIT (0));
     PassiveJoin := JOIN (_new, _old,
-                  LEFT.Driver.Individual.UniqueId = RIGHT.Driver.Individual.UniqueId,
+                  LEFT.TagNumber = RIGHT.TagNumber AND LEFT.Make = RIGHT.Make AND LEFT.Model = RIGHT.Model,
                   ProcessTxRow (LEFT, RIGHT,
-                  CheckOuter_driver_individual_uniqueid(LEFT, RIGHT)),
+                  CheckOuter_makemodeltagnumber(LEFT, RIGHT)),
                   LEFT OUTER,
                   LIMIT (0));
     RETURN PROJECT(SORT(IF (is_active, ActiveJoin, PassiveJoin), _diff_ord), layouts._lt_AccidentReportVehicle);
@@ -7354,7 +7352,7 @@ EXPORT _df_AccidentReportRecord(boolean is_active, string path) := MODULE
       SELF.Investigation := checked_Investigation;
       SELF.Statistics  := L.Statistics;
 
-      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_driver_individual_uniqueid(L.Vehicles, R.Vehicles);
+      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_makemodeltagnumber(L.Vehicles, R.Vehicles);
       checked_Vehicles := MAP (is_deleted => R.Vehicles,
                               is_added => L.Vehicles,
                               updated_Vehicles);
@@ -7399,7 +7397,7 @@ EXPORT _df_AccidentReportRecord(boolean is_active, string path) := MODULE
       SELF.Investigation := checked_Investigation;
       SELF.Statistics  := L.Statistics;
 
-      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_driver_individual_uniqueid(L.Vehicles, R.Vehicles);
+      updated_Vehicles := _df_AccidentReportVehicle(is_active, path + '/Vehicles/Item').AsDataset_makemodeltagnumber(L.Vehicles, R.Vehicles);
       checked_Vehicles := MAP (is_deleted => R.Vehicles,
                               is_added => L.Vehicles,
                               updated_Vehicles);

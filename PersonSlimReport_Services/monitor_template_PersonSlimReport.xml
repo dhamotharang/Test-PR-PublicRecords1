@@ -3511,7 +3511,7 @@
           <TotalNumberOfPedestrians/>
           <TotalNumberOfPedalcyclists/>
         </Statistics>
-        <Vehicles diff_match="Driver.Individual.UniqueId">
+        <Vehicles diff_match="Item.TagNumber+Item.Make+Item.Model">
           <Item>
             <Vehicle diff_monitor=""/>
             <OwnerDriver diff_monitor=""/>
@@ -3625,7 +3625,7 @@
                 <LicenseType/>
               </DriverLicense>
               <Individual>
-                <UniqueId/>
+                <UniqueId diff_monitor=""/>
                 <Name>
                   <Full diff_monitor=""/>
                   <First/>
