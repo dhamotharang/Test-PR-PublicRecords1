@@ -11,7 +11,7 @@ lfn_collisions := Nac_V2.Superfile_List.sfCollisions + '::' + workunit;
 
 c1 := DATASET('~nac::out::collisions2::father', nac_v2.Layout_Collisions2.Layout_Collisions, thor);
 c2 := DATASET(lfn_collisions, nac_v2.Layout_Collisions2.Layout_Collisions, thor);
-alertList := NAC_v2.Mailing_List('').Dev2;
+alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
 
 version1 := NAC_V2.fn_Base1_Version;
 

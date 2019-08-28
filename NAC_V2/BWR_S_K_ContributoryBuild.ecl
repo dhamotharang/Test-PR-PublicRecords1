@@ -7,10 +7,15 @@
 +'#WORKUNIT(\'name\', wuname);\n'
 ;
 
+
+STRING ProcessRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+
+
+
 lECL1 :=
 envVars
 +'email(string msg):=fileservices.sendemail(\n'
-+'																					\'jose.bello@lexisnexis.com\'\n'
++'   \'' + ProcessRecipient +     '\'\n'
 +'																					,\'NAC Build\'\n'
 +'																					,msg\n'
 +'																					+\'Build wuid \'+workunit\n'

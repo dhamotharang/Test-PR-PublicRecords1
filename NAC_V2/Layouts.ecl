@@ -6,10 +6,11 @@ export Layouts := MODULE
 
 
 EXPORT rlInternalEmailFile := RECORD
-	STRING50   BuildName;
-	STRING50   ListName;
+	STRING100   EventType;
+	STRING50   GroupID;
 	STRING     EmailAddress;
 	STRING1    IsRecipientInactive;
+	STRING8     CreateDate
 END;
 
 

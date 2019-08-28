@@ -1,6 +1,6 @@
 ﻿import Std, RoxieKeybuild, dops;
 
-alertList := NAC_v2.Mailing_List('').Dev2;
+alertList := MOD_InternalEmailsList.fn_GetInternalRecipients('Alert','');
 
 
 EXPORT Build_Test_Data(string version = (string8)Std.Date.Today()) := function

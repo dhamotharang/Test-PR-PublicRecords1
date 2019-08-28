@@ -71,7 +71,7 @@ EXPORT fn_GetExternalRecipients
 
 	rlEmail xcat(FilteredRecordset L, FilteredRecordset R) := 
 	TRANSFORM
-		SELF.EmailAddress := TRIM(L.EmailAddress) + ' , ' + TRIM(R.EmailAddress);
+		SELF.EmailAddress := TRIM(L.EmailAddress) + ';' + TRIM(R.EmailAddress);
 	END;
 	dsList := ROLLUP(FilteredRecordset, true, xcat(LEFT, RIGHT)); 
 
