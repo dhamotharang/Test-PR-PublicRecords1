@@ -1,4 +1,4 @@
-﻿IMPORT Business_Credit, BIPV2,	STD;
+﻿IMPORT _Control, Business_Credit, BIPV2, CCPA, STD;
 
 EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 										Constants().buildType	pBuildType	=	Constants().buildType.Daily) := MODULE
@@ -22,7 +22,7 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 		UNSIGNED6	did;
 		UNSIGNED1	did_score;
 		BIPV2.IDlayouts.l_xlink_ids;	//	Added for BIP project
-    UNSIGNED4 global_sid  :=  0;
+    UNSIGNED4 global_sid;
     UNSIGNED8 record_sid  :=  0;
 		STRING2		source;
 	END;
@@ -33,10 +33,14 @@ EXPORT Key_LinkIds(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																																LEFT.original_process_date,
 																																LEFT.process_date);
 																	SELF.Version					:=	LEFT.process_date;
+																	SELF.global_sid				:=  0;
 																	SELF									:=	LEFT
 																)
 															);
-	SHARED	dLinkedBaseDist	:=	DEDUP(SORT(DISTRIBUTE(dLinkedBase,
+															
+	SHARED  addGlobalSID :=  CCPA.macGetGlobalSID(dLinkedBase,'SBFECV','','global_sid');
+	
+	SHARED	dLinkedBaseDist	:=	DEDUP(SORT(DISTRIBUTE(addGlobalSID,
 																HASH(	Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID)),
 																			Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID,Original_Version,Version,LOCAL),
 																			Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,did,DotID,EmpID,POWID,ProxID,SELEID,OrgID,UltID,LOCAL);

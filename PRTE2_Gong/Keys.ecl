@@ -217,7 +217,7 @@ EXPORT keys := MODULE
 				 
 	EXPORT key_gong_history_phone(boolean IsFCRA) := function
 	ut.MAC_CLEAR_FIELDS(file_history_phone(IsFCRA), file_history_phone_cleared,Constants.fields_to_clear);
-	keyfile := if(isFCRA, file_history_phone_cleared,file_history_phone_cleared(isFCRA));
+	keyfile := if(isFCRA, file_history_phone_cleared,file_history_phone(IsFCRA));
 	return INDEX(keyfile, 
 								{p7 := phone7,p3 := area_code,st,
 								boolean current_flag := if(current_record_flag='Y',true,false),
