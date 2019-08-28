@@ -27,6 +27,8 @@ This will create iesp.personslimreport.ecl which is used in PersonSlimReport_Ser
 
 5) Next, generate an XML template used as the base for all monitoring queries (I added all the relevant include paths –I to avoid lacking ECM/ESDL file errors)
 
+*Important note, the final comparison is done by comparing the ESP response to the cassandra response. This means that the fields selected as virtual IDs in the xml template must NOT be deprecated in ESP response.. see ECM files to make sure - https://gitlab.ins.risk.regn.net/ESPTeam/scapps/blob/17.1/esp/scm
+
 C:\Users\abitda01>
 "C:\Program Files (x86)\HPCCSystems\7.4.11\clienttools\bin\esdl.exe" monitor-template ws_accurint.ecm WsAccurint PersonSlimReport -I C:\Users\abitda01\Desktop\repository\scapps\esp\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gateway\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_gatewayEx\scm -I C:\Users\abitda01\Desktop\repository\scapps\esp\services\ws_distrix\scm --outdir=C:\Users\abitda01\Desktop\repository
 

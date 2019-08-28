@@ -18,10 +18,30 @@ EXPORT Records(DATASET(BatchServices.OptOut.Layouts.Input_Ex) recs_in,
     // input data passthrough
     self.acctno := r_in.orig_acctno;
     self.lexid := r_in.srch_did;
-    self.input_echo := r_in;
+
+    // input echo
+    self.input_did := r_in.did;
+    self.input_ssn := r_in.ssn;
+    self.input_dob := r_in.dob;
+    self.input_phone := r_in.phone;
+    self.input_title := r_in.title;
+    self.input_fname := r_in.fname;
+    self.input_mname := r_in.mname;
+    self.input_lname := r_in.lname;
+    self.input_suffix := r_in.suffix;
+    self.input_prim_range := r_in.prim_range;
+    self.input_predir := r_in.predir;
+    self.input_prim_name := r_in.prim_name;
+    self.input_addr_suffix := r_in.addr_suffix;
+    self.input_postdir := r_in.postdir;
+    self.input_unit_desig := r_in.unit_desig;
+    self.input_sec_range := r_in.sec_range;
+    self.input_city_name := r_in.city_name;
+    self.input_st := r_in.st;
+    self.input_zip := r_in.zip;
+    self.input_zip4 := r_in.zip4;
 
     // opt out data
-    self.global_sids := r_opt.global_sids;
     self.exemptions := r_opt.exemptions;
     self.act_id := r_opt.act_id;
     self.date_added := r_opt.date_added;
