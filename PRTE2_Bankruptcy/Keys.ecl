@@ -1,4 +1,4 @@
-IMPORT doxie, bipv2, ut, Data_Services, PRTE2_Bankruptcy, BankruptcyV2, PRTE, AutoKeyB2, autokey, AutoKeyI;
+﻿IMPORT doxie, bipv2, ut, Data_Services, PRTE2_Bankruptcy, BankruptcyV2, PRTE, AutoKeyB2, autokey, AutoKeyI;
 
 EXPORT Keys := MODULE
 
@@ -63,7 +63,11 @@ EXPORT Keys := MODULE
 //BankruptcyV3 keys
 	EXPORT key_bankruptcyv3_search_tmsid (BOOLEAN IsFCRA = FALSE) := FUNCTION
 		dKeybankruptcyv3_search_tmsid		:= 	PROJECT(Files.Search_Base, TRANSFORM(BankruptcyV2.layout_bankruptcy_search_v3_supp, SELF := LEFT));
-	RETURN	INDEX(dKeybankruptcyv3_search_tmsid, {tmsid}, {dKeybankruptcyv3_search_tmsid},
+		
+	ut.MAC_CLEAR_FIELDS(dKeybankruptcyv3_search_tmsid, search_tmsid_cleared, prte2_bankruptcy.constants.search_tmsid_linkids);
+	dsSearchTMSID_final := IF(isFCRA, search_tmsid_cleared, dKeybankruptcyv3_search_tmsid);
+	
+	RETURN	INDEX(dsSearchTMSID_final, {tmsid}, {dsSearchTMSID_final},
 								IF(IsFCRA,
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::fcra::'+ doxie.Version_SuperKey + '::search::tmsid',
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::'+ doxie.Version_SuperKey + '::search::tmsid'));
@@ -71,7 +75,12 @@ EXPORT Keys := MODULE
 	
 	EXPORT key_bankruptcyv3_main_tmsid (BOOLEAN IsFCRA = FALSE) := FUNCTION
 		//dKeybankruptcyv3_main_tmsid	:= PROJECT(Files.Main_Base, Layouts.Main_BaseV3);
-	RETURN	INDEX(Files.Main_Base, {tmsid}, {Files.Main_Base},
+		
+	ut.MAC_CLEAR_FIELDS(prte2_bankruptcy.Files.Main_Base, main_based_cleared, prte2_bankruptcy.Constants.main_tmsid);
+	ds_cleared_proj := project(main_based_cleared,recordof(prte2_bankruptcy.Files.Main_Base));
+	ds_final := IF(isFCRA,ds_cleared_proj,prte2_bankruptcy.Files.Main_Base);
+	
+	RETURN	INDEX(ds_final, {tmsid}, {ds_final},
 								IF(IsFCRA,
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::fcra::'+ doxie.Version_SuperKey + '::main::tmsid',
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::'+ doxie.Version_SuperKey + '::main::tmsid'));
@@ -81,7 +90,7 @@ EXPORT Keys := MODULE
 		dKeybankruptcyv3_main_supplement 	:= TABLE(Files.Main_Base, {Files.Main_Base.tmsid,
 																																Files.Main_Base.method_dismiss;
 																																Files.Main_Base.case_status});
-	RETURN	INDEX(Files.Main_Base, {tmsid}, {method_dismiss, case_status},
+	RETURN	INDEX(Files.Main_Base_supp, {tmsid}, {method_dismiss, case_status},
 								IF(IsFCRA,
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::fcra::'+ doxie.Version_SuperKey + '::main::supplemental',
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::'+ doxie.Version_SuperKey + '::main::supplemental'));
@@ -140,7 +149,10 @@ EXPORT Keys := MODULE
 		
 	EXPORT key_bankruptcyv3_search_tmsid_linkids (BOOLEAN IsFCRA = FALSE) := FUNCTION
 		//dKeybankruptcyv3_search_tmsid_linkids := project(Files.Search_Base, BankruptcyV2.layout_bankruptcy_search_v3_supp_bip);
-	RETURN INDEX(Files.Search_Base, {tmsid}, {Files.Search_Base},
+	ut.MAC_CLEAR_FIELDS(prte2_bankruptcy.Files.Search_Base, search_base_cleared, prte2_bankruptcy.constants.search_tmsid_linkids);
+	search_final := IF(isFCRA, search_base_cleared, Files.Search_Base);
+		
+	RETURN INDEX(search_final, {tmsid}, {search_final},
 							IF(IsFCRA,
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::fcra::'+ doxie.Version_SuperKey + '::search::tmsid_linkids',
 										PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::'+ doxie.Version_SuperKey + '::search::tmsid_linkids'));
@@ -185,7 +197,7 @@ EXPORT Keys := MODULE
 		dKeybankruptcyv3_ssn			:= PROJECT(Files.Search_Base, TRANSFORM(Layouts.lkey_bankruptcyv2_ssn,
 																																		SELF.ssn := if((unsigned6)LEFT.ssn <> 0,LEFT.ssn, LEFT.app_ssn); SELF:=LEFT));
 		fKeybankruptcyv3_ssn			:= dKeybankruptcyv3_ssn((unsigned6)ssn <> 0);
-	RETURN INDEX(fKeybankruptcyv3_ssn, {ssn, tmsid}, {dKeybankruptcyv3_ssn},
+	RETURN INDEX(fKeybankruptcyv3_ssn, {ssn}, {tmsid},
 																		IF(IsFCRA,
 																					PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::fcra::'+ doxie.Version_SuperKey + '::ssn',
 																					PRTE2_Bankruptcy.Constants.KEY_PREFIX + 'bankruptcyv3::'+ doxie.Version_SuperKey + '::ssn'));

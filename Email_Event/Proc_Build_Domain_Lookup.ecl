@@ -56,8 +56,8 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 										,build_table
 										,build_key
 										,zDoPopulationStats
-										// ,dops_update
-										// ,orbit_update
+										,dops_update
+										,orbit_update
 										);	
 	
 END;
