@@ -24,7 +24,7 @@ export unicode MakeXMLHdr(string version, integer cnt, dataset($.Layout_Sanction
 				hdg_Pt1 
 							+	guid		
 							+hdg_Pt2
-							+	'Medicaid Sanctions'
+							+	'State Medicaid Exclusions'
 							+hdg_Pt3
 							+ desc
 							+hdg_Pt4

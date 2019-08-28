@@ -13,7 +13,7 @@ EXPORT AllInfo(DATASET($.Layout_Sanctions) infile) := FUNCTION
 												IF(infile.type_id = 'I' AND infile.DateOfBirth<>'0',
 													'DOB',
 													SKIP),
-												IF(infile.action<>'', 'Action', SKIP),
+												IF(infile.action<>'', 'Incident', SKIP),
 												IF(infile.cred<>'', 'Occupation', SKIP),
 												SKIP);
 		self.information := TRIM(CHOOSE(n,
