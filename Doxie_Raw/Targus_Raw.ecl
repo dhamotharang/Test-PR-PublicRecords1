@@ -4,27 +4,21 @@
 // Return layout: targus.Layout_Consumer_out
 //============================================================================
 
-import Doxie, Targus, census_data, D2C;
+import Doxie, Targus, census_data, D2C, suppress;
 
 export Targus_Raw(
     dataset(Doxie.layout_references) dids,
-	   unsigned3 dateVal = 0,
-    unsigned1 dppa_purpose = 0,
-    unsigned1 glb_purpose = 0,
-		  string5 industry_class = ''
+    doxie.IDataAccess mod_access
 ) := FUNCTION
 
-isCNSMR := industry_class = D2C.Constants.CNSMR; 
-kt := Targus.Key_Targus_DID;
-
 // is pubdate the best date to use for dateVal check??? 
-out_f_info := join(dids,kt,
-    left.did=right.did and (dateVal=0 OR (unsigned3)(right.pubdate[1..6]) <= dateVal),
-    TRANSFORM(doxie_raw.Layout_Targus_raw, self := right));
-		
-out_f := if(~isCNSMR, out_f_info);
+out_info := join(dids,Targus.Key_Targus_DID,
+    left.did=right.did and (mod_access.date_threshold=0 OR (unsigned3)(right.pubdate[1..6]) <= mod_access.date_threshold),
+    TRANSFORM(right));
+out_suppressed := suppress.MAC_SuppressSource(out_info,mod_access);		
+out_filtered := if(~mod_access.isConsumer(), project(out_suppressed,doxie_raw.Layout_Targus_raw));
 
 //Populate county_name.
-census_data.MAC_Fips2County_Keyed(out_f,st,county,county_name,f2);
-return sort(f2, whole record);
+census_data.MAC_Fips2County_Keyed(out_filtered,st,county,county_name,out_final);
+return sort(out_final, whole record);
 END;
