@@ -1,11 +1,11 @@
-
+﻿
 export mac_get_blue(f_get_blue_in, 
                     f_get_blue_out, 
                     check_same_apt_lname='false', 
 				check_same_apt_diff_lname='false',
 				header_phone_use='false',
 				modAccess) := macro
-import doxie,header, header_quick, progressive_phone,utilfile, ut, mdr, STD;
+import doxie,header, header_quick, progressive_phone,utilfile, ut, mdr, STD, Suppress;
 
 #uniquename(header_key)
 %header_key% := doxie.Key_Header;
@@ -32,17 +32,21 @@ end;
 Header.MAC_GlbClean_Header(%header_recs_raw%, %header_recs_cleaned%, , , mod_access);
 %header_recs% := project(%header_recs_cleaned%, progressive_phone.layout_header_seq);
 
+
 #uniquename(by_quick_header)
 progressive_phone.layout_header_seq %by_quick_header%(f_get_blue_in l, %quick_header_key% r) := transform	
 	self.seq := l.seq;
 	self := r;
 end;
 
-#uniquename(quick_header_recs)
-%quick_header_recs% := join(f_get_blue_in, %quick_header_key%,
+#uniquename(quick_header_recs_pre)
+%quick_header_recs_pre% := join(f_get_blue_in, %quick_header_key%,
                             keyed(left.did = right.did), 
 			       	   %by_quick_header%(left, right), limit(ut.limits.HEADER_PER_DID,skip));
-
+                 
+#uniquename(quick_header_recs)
+%quick_header_recs%:= Suppress.MAC_SuppressSource(%quick_header_recs_pre% , mod_access);  
+  
 #uniquename(add4)
 unsigned3 %add4%(unsigned3 dt) := if ((dt+4) % 100 > 12, dt + 104 - 12, dt+4);
 #uniquename(todaydate)

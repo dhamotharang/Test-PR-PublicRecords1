@@ -19,6 +19,7 @@ export t_ForeclosureSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	integer StartingRecord {xpath('StartingRecord')};
 	boolean ExcludeForeclosures {xpath('ExcludeForeclosures')};
 	boolean IncludeNoticeOfDefaults {xpath('IncludeNoticeOfDefaults')};
+	boolean IncludeVendorSourceB {xpath('IncludeVendorSourceB')};//hidden[ecl_only]
 end;
 		
 export t_ForeclosureSearchDefendant := record
@@ -62,6 +63,7 @@ end;
 export t_ForeclosureReportOption := record (iesp.share.t_BaseReportOption)
 	boolean ExcludeForeclosures {xpath('ExcludeForeclosures')};
 	boolean IncludeNoticeOfDefaults {xpath('IncludeNoticeOfDefaults')};
+	boolean IncludeVendorSourceB {xpath('IncludeVendorSourceB')};//hidden[ecl_only]
 end;
 		
 export t_ForeclosureReportDefendant := record

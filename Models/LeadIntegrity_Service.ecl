@@ -71,7 +71,7 @@
 </pre>
 */
 
-IMPORT Address, Risk_Indicators, Models, RiskWise, Risk_Reporting, ut, dma, doxie, iesp, gateway, Inquiry_AccLogs, STD;
+IMPORT Address, Risk_Indicators, Models, Risk_Reporting, iesp, gateway, Inquiry_AccLogs, STD;
 	
 EXPORT LeadIntegrity_Service := MACRO
 
@@ -110,6 +110,12 @@ EXPORT LeadIntegrity_Service := MACRO
 	BOOLEAN OutofBandOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
 	DisableOutcomeTracking := OutofBandOutcomeTracking OR users.OutcomeTrackingOptOut;
 	#stored('DisableBocaShellLogging', DisableOutcomeTracking);
+  
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+string TransactionID := '' : stored ('_TransactionId');
+string BatchUID := '' : stored('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : stored('_GCID');
 
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__LeadIntegrity_Service);
@@ -153,12 +159,12 @@ EXPORT LeadIntegrity_Service := MACRO
 /* ***************************************
 	 *             Set Options:            *
    *************************************** */
-	STRING16 modelName := StringLib.StringToLowerCase(TRIM(option.IncludeModels.Integrity));
+	STRING16 modelName := STD.Str.ToLowerCase(TRIM(option.IncludeModels.Integrity));
 
 	unsigned1 attributesVersion := map(
 		modelname = 'msn1210_1' 	=> 4,  //this model creates score from V4 attributes but does not return them - so set version internally 
 		// LeadIntegrityAttrV4 (etc) is now also a valid input
-		StringLib.StringToLowerCase(option.AttributesVersionRequest[1..18]) = 'leadintegrityattrv' => (unsigned1)option.AttributesVersionRequest[19..],
+		STD.Str.ToLowerCase(option.AttributesVersionRequest[1..18]) = 'leadintegrityattrv' => (unsigned1)option.AttributesVersionRequest[19..],
 		(unsigned1)option.AttributesVersionRequest
 	);
 
@@ -215,20 +221,20 @@ if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail
    *************************************** */
 	Models.Layout_LeadIntegrity_In intoInput() := TRANSFORM
 		SELF.Seq := Seq;
-		SELF.FirstName := StringLib.StringToUpperCase(NameFirst);
-		SELF.MiddleName := StringLib.StringToUpperCase(NameMiddle);
-		SELF.LastName := StringLib.StringToUpperCase(NameLast);
-		SELF.SuffixName := StringLib.StringToUpperCase(NameSuffix);
-		SELF.streetAddr   := StringLib.StringToUpperCase(streetAddr);
-		SELF.City         := StringLib.StringToUpperCase(City);
-		SELF.State        := StringLib.StringToUpperCase(State);
+		SELF.FirstName := STD.Str.ToUpperCase(NameFirst);
+		SELF.MiddleName := STD.Str.ToUpperCase(NameMiddle);
+		SELF.LastName := STD.Str.ToUpperCase(NameLast);
+		SELF.SuffixName := STD.Str.ToUpperCase(NameSuffix);
+		SELF.streetAddr   := STD.Str.ToUpperCase(streetAddr);
+		SELF.City         := STD.Str.ToUpperCase(City);
+		SELF.State        := STD.Str.ToUpperCase(State);
 		SELF.Zip          := Zip;
 		SELF.DateOfBirth := DateOfBirth;
 		SELF.SSN := SSN;
 		SELF.HomePhone := HomePhone;
 		SELF.WorkPhone := WorkPhone;
 		SELF.DLNumber := DLNumber;
-		SELF.DLState := StringLib.StringToUpperCase(DLState);
+		SELF.DLState := STD.Str.ToUpperCase(DLState);
 		SELF.AccountNumber := AccountNumber;
 		self.DID := did_value; 		
 		SELF := [];
@@ -238,8 +244,8 @@ if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail
 	
 	Risk_Indicators.Layout_Input intoLayoutInput() := TRANSFORM
 		SELF.seq := (INTEGER)Seq;
-		SELF.fname := StringLib.StringToUpperCase(NameFirst);
-		SELF.lname := StringLib.StringToUpperCase(NameLast);
+		SELF.fname := STD.Str.ToUpperCase(NameFirst);
+		SELF.lname := STD.Str.ToUpperCase(NameLast);
 		SELF.ssn := SSN;
 		SELF.in_zipCode := Zip;
 		SELF.phone10 := HomePhone;
@@ -253,7 +259,11 @@ if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail
    *************************************** */
 	results := IF(TestDataEnabled, 
 		Models.LeadIntegrity_TestSeed_Function(packagedTestseedInput, TestDataTableName, modelname, attributesVersion),	// TestSeed Values
-		Models.LeadIntegrity_Search_Function(packagedInput, GLBPurpose, DPPAPurpose, historyDate, DataRestriction, attributesVersion, modelName, DisableDNMMask, DataPermission) // Realtime Values
+		Models.LeadIntegrity_Search_Function(packagedInput, GLBPurpose, DPPAPurpose, historyDate, DataRestriction, attributesVersion, modelName, DisableDNMMask, DataPermission,
+                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                            TransactionID := TransactionID, 
+                                                                            BatchUID := BatchUID, 
+                                                                            GlobalCompanyID := GlobalCompanyID) // Realtime Values
 	);
 
 /* ***************************************
@@ -2432,7 +2442,7 @@ if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail
 	 *    Convert Model Results to ESDL:   *
    *************************************** */
 	iesp.leadintegrity.t_ModelSequencedWarningCode intoModel(results le) := TRANSFORM
-		SELF.Name := StringLib.StringToUpperCase(modelName);
+		SELF.Name := STD.Str.ToUpperCase(modelName);
 		SELF.Scores := IF(TRIM(modelName) != '',	// Only return results if a model was requested
 									DATASET([
 														{'', le.score1, IF(TRIM(le.reason1) != '', // Make sure there is a Warning Code to return before indexing

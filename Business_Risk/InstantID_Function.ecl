@@ -1,7 +1,6 @@
-﻿
-import aca, codes, Business_Header, Business_Header_SS, BankruptcyV3, corp2, 
+﻿IMPORT aca, codes, Business_Header, Business_Header_SS, BankruptcyV3, corp2, 
 		yellowpages, Risk_Indicators, did_add, doxie, ut, riskwise, suppress, 
-		Risk_Reporting, liensv2, PAW, census_data, EBR, DCA, iesp, ut, gateway, Royalty, MDR, Business_Risk_BIP;
+		Risk_Reporting, liensv2, PAW, census_data, EBR, DCA, iesp, gateway, Royalty, Business_Risk_BIP;
 
 export InstantID_Function(DATASET(Layout_Input) indata1, dataset(Gateway.Layouts.Config) gateways, 
 					boolean hasbdids = false, unsigned1 dppa, unsigned1 glb, 
@@ -17,8 +16,11 @@ export InstantID_Function(DATASET(Layout_Input) indata1, dataset(Gateway.Layouts
 					BOOLEAN IncludeRepAttributes = FALSE,
 					BOOLEAN IncludeAllRC = FALSE,
 					string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
-					Boolean RestrictExperianData = False   //Experian data sources 'ER' and 'Q3' can't be used for commercial credit origination products (e.g. SmallBusiness_Service)
-					) :=
+					Boolean RestrictExperianData = False,  //Experian data sources 'ER' and 'Q3' can't be used for commercial credit origination products (e.g. SmallBusiness_Service)
+					unsigned1 LexIdSourceOptout = 1,
+                    string TransactionID = '',
+                    string BatchUID = '',
+                    unsigned6 GlobalCompanyId = 0) :=
 FUNCTION
 
 isFCRA := false;
@@ -109,7 +111,8 @@ ciid_results := risk_indicators.InstantID_Function(repIN, gateways, dppa, glb, i
 											include_ofac,include_additional_watchlists,Global_WatchList_Threshold,dob_radius, bsversion,
 											runSSNCodes,runBestAddrCheck,runChronoPhoneLookup,runAreaCodeSplitSearch,allowCellphones,
 											exactMatchLevel, DataRestriction, CustomDataFilter, runDLverification, watchlists_requested,
-											in_append_best:=in_append_best, in_DataPermission:=DataPermission);
+											in_append_best:=in_append_best, in_DataPermission:=DataPermission, LexIdSourceOptout := LexIdSourceOptout, 
+                                            TransactionID := TransactionID, BatchUID := BatchUID, GlobalCompanyID := GlobalCompanyID);
 
 // want is to fail immediately as we don't want customers to think there was no hit on OFAC
 
@@ -620,7 +623,11 @@ bocaShell := Risk_Indicators.Boca_Shell_Function(ciid_results, gateways, dppa, g
 																										 FALSE,//includeDLInfo
 																										 FALSE,//includeVehInfo
 																											TRUE,//includeDerogInfo
-																										IF(IncludeRepAttributes, 3, bsversion), DataRestriction := DataRestriction, DataPermission := DataPermission);
+																										IF(IncludeRepAttributes, 3, bsversion), DataRestriction := DataRestriction, DataPermission := DataPermission,
+                                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                        TransactionID := TransactionID, 
+                                                                                                        BatchUID := BatchUID, 
+                                                                                                        GlobalCompanyID := GlobalCompanyID);
 
 Rep_Attributes := RECORD
 	STRING32 Name := '';
@@ -707,8 +714,8 @@ withWatchlistsData := if(tribcode='b2bz', group(sort(b2bzWatch,seq),seq), normal
 layout_output addZipClass(withWatchlistsData le, riskwise.Key_CityStZip rt) := transform
 	self.zipclass := rt.zipclass;
 	self.zipcity := rt.prefctystname;
-	self.statezipflag := IF(rt.state <> '' and le.st <> '' and StringLib.StringToUpperCase(le.st) <> rt.state, '1', '0');
-	self.cityzipflag := IF(rt.city <> '' and le.p_city_name <> '' and (risk_indicators.LnameScore(StringLib.StringToUpperCase(le.p_city_name), rt.city) < 80), '1', '0');
+	self.statezipflag := IF(rt.state <> '' and le.st <> '' and STD.Str.toUpperCase(le.st) <> rt.state, '1', '0');
+	self.cityzipflag := IF(rt.city <> '' and le.p_city_name <> '' and (risk_indicators.LnameScore(STD.Str.toUpperCase(le.p_city_name), rt.city) < 80), '1', '0');
 	self := le;
 end;
 
@@ -1660,8 +1667,8 @@ corp_sort := dedup(sort(corprecs,seq, bdid, if (business_header.is_ActiveCorp(re
 working_layout check_standing(got_bdidTable L, corp_sort R) := transform
 	// default to good standing status on left outer part of join....
 	self.goodstanding := if (r.seq = 0, 'U', if (business_header.is_ActiveCorp(r.record_type, R.corp_status_cd, R.corp_status_desc), 'A',
-							if (stringlib.stringfind(R.corp_status_desc, 'INACTIVE', 1) != 0, 'I',
-							if (stringlib.stringfind(R.corp_status_desc, 'DISSOLVED', 1) != 0, 'D','U'))));
+							if (STD.Str.Find(R.corp_status_desc, 'INACTIVE', 1) != 0, 'I',
+							if (STD.Str.Find(R.corp_status_desc, 'DISSOLVED', 1) != 0, 'D','U'))));
 		self.SOS_filing_name := r.corp_legal_name;
 	self := l;
 end;
@@ -1824,8 +1831,8 @@ working_layout Calc_BVI(wrelatives L) := transform
 
 	// calculate the 10, 20, 30, 40 of ar2bi here, once, instead of doing it 3 times below
 	nameCompare := l.repbestfname != '' and 
-				(stringlib.stringfind(L.company_name,L.repbestfname, 1) != 0 or stringlib.stringfind(L.alt_company_name, L.repbestfname, 1) != 0 or 
-				 stringlib.stringfind(L.company_name,L.repbestLname, 1) != 0 or stringlib.stringfind(L.alt_company_name, L.repbestlname, 1) != 0);   
+				(STD.Str.Find(L.company_name,L.repbestfname, 1) != 0 or STD.Str.Find(L.alt_company_name, L.repbestfname, 1) != 0 or 
+				 STD.Str.Find(L.company_name,L.repbestLname, 1) != 0 or STD.Str.Find(L.alt_company_name, L.repbestlname, 1) != 0);   
 	
 	addcompare := ga(Risk_Indicators.AddrScore.AddressScore(L.repbestprimrange, L.repbestprimname, L.repbestsecrange,
 										    L.prim_Range, L.prim_name, L.sec_range));	

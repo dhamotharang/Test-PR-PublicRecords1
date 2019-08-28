@@ -28,8 +28,17 @@ EXPORT getIndAttributes(DATASET(DueDiligence.LayoutsInternal.SharedInput) inData
                                               historyDate := IF(LEFT.cleanedinput.historyDateYYYYMMDD = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.cleanedinput.historyDateYYYYMMDD);
                                               
                                               SELF.seq := LEFT.cleanedInput.seq;
-                                              SELF.indvRawInput := LEFT.inputEcho.individual;
-                                              SELF.indvCleanInput := LEFT.cleanedInput.individual;
+                                              SELF.indvRawInput.lexID := LEFT.inputEcho.individual.lexID;
+                                              SELF.indvRawInput.accountNumber := LEFT.inputEcho.individual.accountNumber;
+                                              SELF.indvRawInput.address := LEFT.inputEcho.individual.address;
+                                              SELF.indvRawInput.phone := LEFT.inputEcho.individual.phone;
+                                              SELF.indvRawInput.inputSeq := LEFT.inputEcho.individual.inputSeq;
+                                              SELF.indvRawInput.nameInputOrder := LEFT.inputEcho.individual.nameInputOrder;
+                                              SELF.indvRawInput.name := LEFT.inputEcho.individual.name;
+                                              SELF.indvRawInput.ssn := LEFT.inputEcho.individual.ssn;
+                                              SELF.indvRawInput.dob := LEFT.inputEcho.individual.dob;
+                                              SELF.indvRawInput.cleanAddress := LEFT.cleanedInput.individual.address;
+                                              
                                               SELF.historyDateRaw := LEFT.cleanedinput.historyDateYYYYMMDD;
                                               SELF.historyDate := historyDate;
                                               SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL;

@@ -285,7 +285,13 @@
   <EsdlArray item_tag="Item"
              max_count_var="iesp.Constants.MaxResponseExceptions"
              name="Exceptions"
-             type="WsException"/>
+             type="WsException">
+   <diff_selectors>
+    <entry path="Header/Exceptions">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _base="1"
              _used="1"
@@ -2023,6 +2029,17 @@
   <EsdlElement _nomon="1"
                ecl_tag="ProviderNumber"
                min_ver="2.300000"
+               name="ProviderNumber2"
+               type="string">
+   <diff_selectors>
+    <entry path="ProfessionalLicenses/ProfessionalLicense/ProviderNumber2">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
+  <EsdlElement _nomon="1"
+               ecl_tag="ProviderNumber"
+               min_ver="2.300000"
                name="ProviderNumber"
                type="string">
    <diff_selectors>
@@ -3413,6 +3430,49 @@
   </DiffMatchs>
  </EsdlStruct>
  <EsdlStruct _used="1"
+             _usedInArray="1"
+             base_type="Address"
+             name="AddressWithRawInfo">
+  <EsdlElement ecl_max_len="128" name="OrigStreetAddress1" type="string"/>
+  <EsdlElement ecl_max_len="128" name="OrigStreetAddress2" type="string"/>
+ </EsdlStruct>
+ <EsdlStruct _used="1"
+             _usedInArray="1"
+             base_type="Address"
+             name="UniversalAndRawAddress">
+  <EsdlElement max_len="30" name="Country" type="string"/>
+  <EsdlElement max_len="30" name="Province" type="string"/>
+  <EsdlElement name="IsForeign" type="bool"/>
+  <EsdlElement ecl_max_len="128" name="OrigStreetAddress1" type="string"/>
+  <EsdlElement ecl_max_len="128" name="OrigStreetAddress2" type="string"/>
+ </EsdlStruct>
+ <EsdlStruct name="UCCPerson">
+  <EsdlElement max_len="120" name="OriginName" type="string"/>
+  <EsdlElement min_ver="2.260000" name="IsDisputed" type="string"/>
+  <EsdlArray item_tag="Party"
+             max_count_var="iesp.Constants.UCCF.MaxPersonParsedParties"
+             name="ParsedParties"
+             type="UCCParsedParty"/>
+  <EsdlArray depr_ver="1.480000"
+             item_tag="Address"
+             max_count_var="Constants.UCCF.MaxPersonAddresses"
+             name="Addresses"
+             type="Address"/>
+  <EsdlArray depr_ver="1.650000"
+             item_tag="Address"
+             max_count_var="Constants.UCCF.MaxPersonAddresses"
+             min_ver="1.480000"
+             name="Addresses2"
+             type="AddressWithRawInfo"
+             xml_tag="Addresses"/>
+  <EsdlArray item_tag="Address"
+             max_count_var="Constants.UCCF.MaxPersonAddresses"
+             min_ver="1.650000"
+             name="Addresses3"
+             type="UniversalAndRawAddress"
+             xml_tag="Addresses"/>
+ </EsdlStruct>
+ <EsdlStruct _used="1"
              base_type="Address"
              diff_monitor="1"
              name="UniversalAddress">
@@ -3446,16 +3506,6 @@
  </EsdlStruct>
  <EsdlStruct _used="1"
              _usedInArray="1"
-             base_type="Address"
-             name="UniversalAndRawAddress">
-  <EsdlElement max_len="30" name="Country" type="string"/>
-  <EsdlElement max_len="30" name="Province" type="string"/>
-  <EsdlElement name="IsForeign" type="bool"/>
-  <EsdlElement ecl_max_len="128" name="OrigStreetAddress1" type="string"/>
-  <EsdlElement ecl_max_len="128" name="OrigStreetAddress2" type="string"/>
- </EsdlStruct>
- <EsdlStruct _used="1"
-             _usedInArray="1"
              diff_monitor="1"
              diff_ordinal="1"
              name="UCCReport2Person">
@@ -3473,6 +3523,39 @@
      <part ftype="string" name="UniqueId"/>
     </diff_match>
    </DiffMatchs>
+  </EsdlArray>
+  <EsdlArray _nomon="1"
+             item_tag="Address"
+             max_count_var="iesp.Constants.UCCF.MaxPersonAddresses"
+             min_ver="1.480000"
+             name="AddressesOld"
+             type="UniversalAndRawAddress">
+   <diff_selectors>
+    <entry path="UCCFilings/UCCFiling/Debtors/Debtor/AddressesOld">
+     <category>false</category>
+    </entry>
+    <entry path="UCCFilings/UCCFiling/Debtors2/Debtor/AddressesOld">
+     <category>false</category>
+    </entry>
+    <entry path="UCCFilings/UCCFiling/Creditors/Creditor/AddressesOld">
+     <category>false</category>
+    </entry>
+    <entry path="UCCFilings/UCCFiling/Secureds/Secured/AddressesOld">
+     <category>false</category>
+    </entry>
+    <entry path="UCCFilings/UCCFiling/Assignees/Assignee/AddressesOld">
+     <category>false</category>
+    </entry>
+    <entry path="UCCFilings/UCCFiling/Creditors2/Creditor/AddressesOld">
+     <category>false</category>
+    </entry>
+    <entry path="UCCFilings/UCCFiling/Secureds2/Secured/AddressesOld">
+     <category>false</category>
+    </entry>
+    <entry path="UCCFilings/UCCFiling/Assignees2/Assignee/AddressesOld">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
   </EsdlArray>
   <EsdlArray _nomon="1"
              item_tag="Address"
@@ -3842,6 +3925,19 @@
              type="UCCSigner">
    <diff_selectors>
     <entry path="UCCFilings/UCCFiling/Signers">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
+  <EsdlArray _nomon="1"
+             item_tag="Filing"
+             max_count_var="iesp.Constants.UCCF.MaxFilings"
+             min_ver="1.041"
+             name="Filings"
+             type="UCCReport2Filing"
+             xml_tag="Filings">
+   <diff_selectors>
+    <entry path="UCCFilings/UCCFiling/Filings">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -4658,6 +4754,9 @@
              name="Offenses"
              type="CrimReportParoleOffense">
    <diff_selectors>
+    <entry path="Criminals/Criminal/ParoleSentencesOld/ParoleSentence/Offenses">
+     <category>false</category>
+    </entry>
     <entry path="Criminals/Criminal/ParoleSentences/ParoleSentence/Offenses">
      <category>false</category>
     </entry>
@@ -4692,6 +4791,20 @@
              type="CrimReportPrison">
    <diff_selectors>
     <entry path="Criminals/Criminal/PrisonSentences">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
+  <EsdlArray _nomon="1"
+             alt_data_from="ParoleSentencesEx"
+             alt_field_first="1"
+             item_tag="ParoleSentence"
+             max_count_var="iesp.constants.CRIM.MaxParoles"
+             min_ver="1.420000"
+             name="ParoleSentencesOld"
+             type="CrimReportParoleEx">
+   <diff_selectors>
+    <entry path="Criminals/Criminal/ParoleSentencesOld">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -5398,6 +5511,16 @@
                type="string">
    <diff_selectors>
     <entry path="VoterRegistrations/VoterRegistration/Gender">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
+  <EsdlElement _nomon="1"
+               complex_type="Date"
+               min_ver="1.181"
+               name="RegistationDate">
+   <diff_selectors>
+    <entry path="VoterRegistrations/VoterRegistration/RegistationDate">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -6947,7 +7070,15 @@
                type="string"/>
   <EsdlElement depr_ver="1.650000"
                max_len="40"
+               name="FirstContributingEnvironment"
+               type="string"/>
+  <EsdlElement depr_ver="1.650000"
+               max_len="40"
                name="SecondContributingEnvirionment"
+               type="string"/>
+  <EsdlElement depr_ver="1.650000"
+               max_len="40"
+               name="SecondContributingEnvironment"
                type="string"/>
   <EsdlElement max_len="30" name="FirstTrafficControl" type="string"/>
   <EsdlElement max_len="30" name="SecondTrafficControl" type="string"/>
@@ -8124,13 +8255,6 @@
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
- <EsdlStruct _used="1"
-             _usedInArray="1"
-             base_type="Address"
-             name="AddressWithRawInfo">
-  <EsdlElement ecl_max_len="128" name="OrigStreetAddress1" type="string"/>
-  <EsdlElement ecl_max_len="128" name="OrigStreetAddress2" type="string"/>
- </EsdlStruct>
  <EsdlStruct _used="1" _usedInArray="1" name="PhoneTimeZone">
   <EsdlElement max_len="10" name="Phone10" type="string"/>
   <EsdlElement max_len="10"
@@ -8220,6 +8344,17 @@
              max_count_var="iesp.Constants.BANKRPT.MaxPersonNames"
              name="Names"
              type="BankruptcySearch2Name">
+   <diff_selectors>
+    <entry path="Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Names">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Attorneys/Attorney/Names">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Trustees/Trustee/Names">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
    <DiffMatchs>
     <diff_match name="firstlast">
      <part ftype="string" name="Last"/>
@@ -8233,6 +8368,17 @@
              max_count_var="iesp.Constants.BANKRPT.MaxPersonAddresses"
              name="Addresses"
              type="Address">
+   <diff_selectors>
+    <entry path="Bankruptcies/Bankruptcy/DebtorsOld/Debtor/Addresses">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Attorneys/Attorney/Addresses">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Trustees/Trustee/Addresses">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
    <DiffMatchs>
     <diff_match name="citystatestreetnamestreetnumberunitnumberzip5">
      <part ftype="string" name="UnitNumber"/>
@@ -8252,7 +8398,16 @@
              type="AddressWithRawInfo"
              xml_tag="Addresses">
    <diff_selectors>
+    <entry path="Bankruptcies/Bankruptcy/DebtorsOld/Debtor/AddressesEx">
+     <category>false</category>
+    </entry>
     <entry path="Bankruptcies/Bankruptcy/Debtors/Debtor/AddressesEx">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Attorneys/Attorney/AddressesEx">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Trustees/Trustee/AddressesEx">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -8277,7 +8432,16 @@
              type="PhoneTimeZone"
              xml_tag="Phones">
    <diff_selectors>
+    <entry path="Bankruptcies/Bankruptcy/DebtorsOld/Debtor/PhonesEx">
+     <category>false</category>
+    </entry>
     <entry path="Bankruptcies/Bankruptcy/Debtors/Debtor/PhonesEx">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Attorneys/Attorney/PhonesEx">
+     <category>false</category>
+    </entry>
+    <entry path="Bankruptcies/Bankruptcy/Trustees/Trustee/PhonesEx">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -8907,6 +9071,18 @@
     </entry>
    </diff_selectors>
   </EsdlArray>
+  <EsdlArray _nomon="1"
+             item_tag="Debtor"
+             max_count_var="iesp.Constants.BANKRPT.MaxDebtors"
+             min_ver="1.900000"
+             name="DebtorsOld"
+             type="BankruptcyReport2Debtor">
+   <diff_selectors>
+    <entry path="Bankruptcies/Bankruptcy/DebtorsOld">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
   <EsdlArray _mon="1"
              item_tag="Debtor"
              max_count_var="iesp.Constants.BANKRPT.MaxDebtors"
@@ -9410,12 +9586,24 @@
              max_count_var="iesp.Constants.Liens.MAX_ADDRESSES"
              min_ver="1.800000"
              name="Addresses"
-             type="Address"/>
+             type="Address">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/ThirdParties/ThirdParty/Addresses">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
   <EsdlArray item_tag="Phone"
              max_count_var="iesp.Constants.Liens.MAX_PHONES"
              min_ver="1.800000"
              name="Phones"
-             type="PhoneTimeZone"/>
+             type="PhoneTimeZone">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/ThirdParties/ThirdParty/Phones">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1"
              _usedInArray="1"
@@ -9424,7 +9612,13 @@
   <EsdlArray item_tag="Party"
              max_count_var="iesp.Constants.Liens.MAX_PARTIES"
              name="ParsedParties"
-             type="LienJudgmentParty"/>
+             type="LienJudgmentParty">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/ThirdParties/ThirdParty/ParsedParties">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _base="1" base_type="CriminalIndicators" name="BaseLienJudgmentCreditor">
   <EsdlElement max_len="120" name="Name" type="string"/>
@@ -9433,12 +9627,24 @@
              max_count_var="iesp.Constants.Liens.MAX_ADDRESSES"
              min_ver="1.800000"
              name="Addresses"
-             type="Address"/>
+             type="Address">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/Creditors/Creditor/Addresses">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
   <EsdlArray item_tag="Phone"
              max_count_var="iesp.Constants.Liens.MAX_PHONES"
              min_ver="1.800000"
              name="Phones"
-             type="PhoneTimeZone"/>
+             type="PhoneTimeZone">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/Creditors/Creditor/Phones">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1"
              _usedInArray="1"
@@ -9448,7 +9654,13 @@
              max_count_var="iesp.Constants.Liens.MAX_PARTIES"
              min_ver="1.520000"
              name="ParsedParties"
-             type="LienJudgmentParty"/>
+             type="LienJudgmentParty">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/Creditors/Creditor/ParsedParties">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _base="1" base_type="CriminalIndicators" name="BaseLienJudgmentDebtorAttorney">
   <EsdlElement max_len="120" name="Name" type="string"/>
@@ -9462,12 +9674,24 @@
              max_count_var="iesp.Constants.Liens.MAX_ADDRESSES"
              min_ver="1.800000"
              name="Addresses"
-             type="Address"/>
+             type="Address">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/DebtorAttorneys/Attorney/Addresses">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
   <EsdlArray item_tag="Phone"
              max_count_var="iesp.Constants.Liens.MAX_PHONES"
              min_ver="1.800000"
              name="Phones"
-             type="PhoneTimeZone"/>
+             type="PhoneTimeZone">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/DebtorAttorneys/Attorney/Phones">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1"
              _usedInArray="1"
@@ -9477,7 +9701,13 @@
              max_count_var="iesp.Constants.Liens.MAX_PARTIES"
              min_ver="1.670000"
              name="ParsedParties"
-             type="LienJudgmentParty"/>
+             type="LienJudgmentParty">
+   <diff_selectors>
+    <entry path="LiensJudgments/LienJudgment/DebtorAttorneys/Attorney/ParsedParties">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1" _usedInArray="1" name="LienJudgmentFiling">
   <EsdlElement max_len="20" name="Number" type="string"/>
@@ -9806,6 +10036,7 @@
   <EsdlElement max_len="3" name="BuildingClassCode" type="string"/>
   <EsdlElement max_len="9" name="NeighborhoodCode" type="string"/>
   <EsdlElement ecl_max_len="1924" name="AddlLegal" type="string"/>
+  <EsdlElement complex_type="PropertyAssessmentSrcPrptyRcd" min_ver="1.181" name="Fares"/>
   <EsdlElement complex_type="PropertyAssessmentSrcPrptyRcd" min_ver="1.181" name="SourcePropertyRecord"/>
   <EsdlArray item_tag="SchoolTaxDistrict"
              max_count_var="iesp.Constants.Prop.MaxSchoolTaxDistrict"
@@ -9825,7 +10056,13 @@
              min_ver="1.181"
              name="BuildingAreas2"
              type="BuildingAreaInfo"
-             xml_tag="BuildingAreas"/>
+             xml_tag="BuildingAreas">
+   <diff_selectors>
+    <entry path="Properties/Property/Assessment/BuildingAreas2">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
   <EsdlArray item_tag="SiteInfluence"
              max_count_var="iesp.Constants.Prop.MaxSiteInfluences"
              name="SiteInfluences"
@@ -10189,28 +10426,52 @@
     </entry>
    </diff_selectors>
   </EsdlElement>
-  <EsdlElement _mon="1"
+  <EsdlElement _nomon="1"
                max_len="100"
                min_ver="1.800000"
                name="IdValue"
-               type="string"/>
+               type="string">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/IdValue">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
   <EsdlElement _mon="1"
                max_len="12"
                name="UniqueId"
                type="string"/>
-  <EsdlElement _mon="1"
+  <EsdlElement _nomon="1"
                max_len="12"
                name="BusinessId"
-               type="string"/>
-  <EsdlElement _mon="1"
+               type="string">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/BusinessId">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
+  <EsdlElement _nomon="1"
                max_len="9"
                name="AppendedSSN"
-               type="string"/>
-  <EsdlElement _mon="1"
+               type="string">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/AppendedSSN">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
+  <EsdlElement _nomon="1"
                min_ver="1.900000"
                name="LinkingWeight"
                optional="internal"
-               type="int"/>
+               type="int">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/LinkingWeight">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
   <DiffMatchs>
    <diff_match name="uniqueid">
     <part ftype="string" name="UniqueId"/>
@@ -10475,9 +10736,10 @@
    </DiffMatchs>
   </EsdlArray>
   <DiffMatchs>
-   <diff_match name="parcelnumberrecordtype">
-    <part ftype="string" name="ParcelNumber"/>
+   <diff_match name="assessment.parceliddeed.parcelidrecordtype">
     <part ftype="string" name="RecordType"/>
+    <part ftype="string" name="Assessment.ParcelId"/>
+    <part ftype="string" name="Deed.ParcelId"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -10864,7 +11126,10 @@
                name="Valid"
                type="string">
    <diff_selectors>
-    <entry path="AKAs/AKA/SSNInfoEx/Valid">
+    <entry path="AKAs/AKA/SSNInfo/Valid">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/SSNInfo/Valid">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -10874,21 +11139,30 @@
                name="IssuedLocation"
                type="string">
    <diff_selectors>
-    <entry path="AKAs/AKA/SSNInfoEx/IssuedLocation">
+    <entry path="AKAs/AKA/SSNInfo/IssuedLocation">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/SSNInfo/IssuedLocation">
      <category>false</category>
     </entry>
    </diff_selectors>
   </EsdlElement>
   <EsdlElement _nomon="1" complex_type="Date" name="IssuedStartDate">
    <diff_selectors>
-    <entry path="AKAs/AKA/SSNInfoEx/IssuedStartDate">
+    <entry path="AKAs/AKA/SSNInfo/IssuedStartDate">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/SSNInfo/IssuedStartDate">
      <category>false</category>
     </entry>
    </diff_selectors>
   </EsdlElement>
   <EsdlElement _nomon="1" complex_type="Date" name="IssuedEndDate">
    <diff_selectors>
-    <entry path="AKAs/AKA/SSNInfoEx/IssuedEndDate">
+    <entry path="AKAs/AKA/SSNInfo/IssuedEndDate">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/SSNInfo/IssuedEndDate">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -10903,7 +11177,10 @@
                name="FDNSsnInd"
                type="int">
    <diff_selectors>
-    <entry path="AKAs/AKA/SSNInfoEx/FDNSsnInd">
+    <entry path="AKAs/AKA/SSNInfo/FDNSsnInd">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/SSNInfo/FDNSsnInd">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -10923,7 +11200,16 @@
              name="HighRiskIndicators"
              type="RiskIndicator">
    <diff_selectors>
+    <entry path="AKAs/AKA/SSNInfo/HighRiskIndicators">
+     <category>false</category>
+    </entry>
     <entry path="AKAs/AKA/SSNInfoEx/HighRiskIndicators">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/SSNInfo/HighRiskIndicators">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/SSNInfoEx/HighRiskIndicators">
      <category>false</category>
     </entry>
    </diff_selectors>
@@ -10960,12 +11246,19 @@
    </diff_selectors>
   </EsdlElement>
   <EsdlElement _mon="1"
-               _nomon="1"
+               complex_type="SSNInfoEx"
+               min_ver="1.03"
+               name="SSNInfo"
+               xml_tag="SSNInfo"/>
+  <EsdlElement _nomon="1"
                complex_type="SSNInfoEx"
                min_ver="1.03"
                name="SSNInfoEx"
                xml_tag="SSNInfo">
    <diff_selectors>
+    <entry path="AKAs/AKA/SSNInfoEx">
+     <category>false</category>
+    </entry>
     <entry path="Imposters/Imposter/SSNInfoEx">
      <category>false</category>
     </entry>
@@ -11159,9 +11452,27 @@
   <EsdlElement complex_type="PlaceOfBirth" name="PlaceOfBirth"/>
   <EsdlElement name="StateSpecificFields" type="string"/>
   <EsdlArray item_tag="ScarMarkTattoo" name="ScarMarkTattoos" type="string"/>
-  <EsdlArray item_tag="DOB" name="DOBs" type="Date"/>
+  <EsdlArray item_tag="DOB" name="DOBs" type="Date">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Appends/Append/DOBs">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Appends/Append/DOBs">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
   <EsdlArray item_tag="SSN" name="SSNs" type="string"/>
-  <EsdlArray item_tag="AdditionalNumber" name="AdditionalNumbers" type="AdditionalNumber"/>
+  <EsdlArray item_tag="AdditionalNumber" name="AdditionalNumbers" type="AdditionalNumber">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Appends/Append/AdditionalNumbers">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Appends/Append/AdditionalNumbers">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1" _usedInArray="1" name="MatrixCrimReportIdentity">
   <EsdlElement name="StateOriginName" type="string"/>
@@ -11297,7 +11608,16 @@
   <EsdlElement name="ArrestSequenceCode" type="string"/>
   <EsdlElement complex_type="MatrixCrimReportAgency" name="JudicialAgency"/>
   <EsdlElement name="JudicialSequenceNumber" type="string"/>
-  <EsdlArray item_tag="JudicialCharge" name="JudicialCharges" type="MatrixCrimReportJudicialCharge"/>
+  <EsdlArray item_tag="JudicialCharge" name="JudicialCharges" type="MatrixCrimReportJudicialCharge">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Arrests/Arrest/Judicials/Judicial/JudicialCharges">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Arrests/Arrest/Judicials/Judicial/JudicialCharges">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1" _usedInArray="1" name="MatrixCrimReportEvent">
   <EsdlElement complex_type="Date" name="SortDate"/>
@@ -11330,15 +11650,78 @@
   <EsdlElement complex_type="Date" name="ArrestDate"/>
   <EsdlElement name="ArrestCount" type="int"/>
   <EsdlElement name="SequenceCode" type="string"/>
-  <EsdlArray item_tag="ArrestAgency" name="ArrestAgencies" type="MatrixCrimReportAgency"/>
-  <EsdlArray item_tag="ArrestCharge" name="ArrestCharges" type="MatrixCrimReportCharge"/>
-  <EsdlArray item_tag="Judicial" name="Judicials" type="MatrixCrimReportJudicial"/>
-  <EsdlArray item_tag="Event" name="Events" type="MatrixCrimReportEvent"/>
+  <EsdlArray item_tag="ArrestAgency" name="ArrestAgencies" type="MatrixCrimReportAgency">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Arrests/Arrest/ArrestAgencies">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Arrests/Arrest/ArrestAgencies">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
+  <EsdlArray item_tag="ArrestCharge" name="ArrestCharges" type="MatrixCrimReportCharge">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Arrests/Arrest/ArrestCharges">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Arrests/Arrest/ArrestCharges">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
+  <EsdlArray item_tag="Judicial" name="Judicials" type="MatrixCrimReportJudicial">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Arrests/Arrest/Judicials">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Arrests/Arrest/Judicials">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
+  <EsdlArray item_tag="Event" name="Events" type="MatrixCrimReportEvent">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Arrests/Arrest/Events">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Arrests/Arrest/Events">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1" _usedInArray="1" name="MatrixCrimReportRecord">
-  <EsdlArray item_tag="Append" name="Appends" type="MatrixCrimReportAppend"/>
-  <EsdlArray item_tag="Identity" name="Identities" type="MatrixCrimReportIdentity"/>
-  <EsdlArray item_tag="Arrest" name="Arrests" type="MatrixCrimReportArrest"/>
+  <EsdlArray item_tag="Append" name="Appends" type="MatrixCrimReportAppend">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Appends">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Appends">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
+  <EsdlArray item_tag="Identity" name="Identities" type="MatrixCrimReportIdentity">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Identities">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Identities">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
+  <EsdlArray item_tag="Arrest" name="Arrests" type="MatrixCrimReportArrest">
+   <diff_selectors>
+    <entry path="AKAs/AKA/CriminalHistories/CriminalHistory/Arrests">
+     <category>false</category>
+    </entry>
+    <entry path="Imposters/Imposter/CriminalHistories/CriminalHistory/Arrests">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlArray>
  </EsdlStruct>
  <EsdlStruct _used="1"
              _usedInArray="1"
@@ -11529,10 +11912,10 @@
    </diff_selectors>
   </EsdlEnum>
   <DiffMatchs>
-   <diff_match name="name.firstname.lastssninfoex.ssn">
+   <diff_match name="name.firstname.lastssninfo.ssn">
+    <part ftype="string" name="SSNInfo.SSN"/>
     <part ftype="string" name="Name.Last"/>
     <part ftype="string" name="Name.First"/>
-    <part ftype="string" name="SSNInfoEx.SSN"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -12140,9 +12523,10 @@
     </entry>
    </diff_selectors>
    <DiffMatchs>
-    <diff_match name="parcelnumberrecordtype">
-     <part ftype="string" name="ParcelNumber"/>
+    <diff_match name="assessment.parceliddeed.parcelidrecordtype">
      <part ftype="string" name="RecordType"/>
+     <part ftype="string" name="Assessment.ParcelId"/>
+     <part ftype="string" name="Deed.ParcelId"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -12197,10 +12581,10 @@
     </entry>
    </diff_selectors>
    <DiffMatchs>
-    <diff_match name="name.firstname.lastssninfoex.ssn">
+    <diff_match name="name.firstname.lastssninfo.ssn">
+     <part ftype="string" name="SSNInfo.SSN"/>
      <part ftype="string" name="Name.Last"/>
      <part ftype="string" name="Name.First"/>
-     <part ftype="string" name="SSNInfoEx.SSN"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -12216,10 +12600,10 @@
     </entry>
    </diff_selectors>
    <DiffMatchs>
-    <diff_match name="name.firstname.lastssninfoex.ssn">
+    <diff_match name="name.firstname.lastssninfo.ssn">
+     <part ftype="string" name="SSNInfo.SSN"/>
      <part ftype="string" name="Name.Last"/>
      <part ftype="string" name="Name.First"/>
-     <part ftype="string" name="SSNInfoEx.SSN"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -12310,7 +12694,6 @@
   <Path>Accidents/Vehicles/Driver/Individual/DOB/Day</Path>
   <Path>Educations/FirstReported/Month</Path>
   <Path>Educations/FirstReported/Day</Path>
-  <Path>AKAs/SSNInfoEx</Path>
   <Path>Utilities/RecordDate/Month</Path>
   <Path>Utilities/RecordDate/Day</Path>
  </OptionalFields>
@@ -12366,7 +12749,7 @@
      <Count/>
      <AllowAboveMax/>
     </TransactionCap>
-    <Exceptions diff_match="">
+    <Exceptions diff_match="" diff_monitor="">
      <Item>
       <Source/>
       <Code/>
@@ -12446,6 +12829,7 @@
      <IdValue diff_monitor=""/>
      <LicenseType diff_monitor=""/>
      <LicenseNumber/>
+     <ProviderNumber2 diff_monitor=""/>
      <ProviderNumber diff_monitor=""/>
      <SSN diff_monitor=""/>
      <DateLastSeen diff_monitor="">
@@ -13081,6 +13465,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13143,6 +13554,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13205,6 +13643,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13267,6 +13732,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13329,6 +13821,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13415,6 +13934,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13477,6 +14023,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13539,6 +14112,33 @@
          <CorporateType diff_monitor=""/>
         </Party>
        </ParsedParties>
+       <AddressesOld diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <Country/>
+         <Province/>
+         <IsForeign/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesOld>
        <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
@@ -13598,6 +14198,47 @@
        <Title/>
       </Signer>
      </Signers>
+     <Filings diff_match="" diff_monitor="">
+      <Filing>
+       <FilingStatus/>
+       <Number/>
+       <Type/>
+       <Date>
+        <Year/>
+        <Month/>
+        <Day/>
+       </Date>
+       <Time/>
+       <Pages/>
+       <ExpirationDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </ExpirationDate>
+       <Amount/>
+       <ContractType/>
+       <EffectiveDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </EffectiveDate>
+       <SerialNumber/>
+       <FilingNumberIndicator/>
+       <VendorEntryDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </VendorEntryDate>
+       <VendorUpdateDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </VendorUpdateDate>
+       <ContinuousExpiration/>
+       <StatementsFiled/>
+       <MicrofilmNumber/>
+      </Filing>
+     </Filings>
      <Filings2 diff_match="" diff_monitor="">
       <Filing>
        <FilingStatus/>
@@ -14117,6 +14758,162 @@
        <Sentence/>
       </PrisonSentence>
      </PrisonSentences>
+     <ParoleSentencesOld diff_match="" diff_monitor="">
+      <ParoleSentence>
+       <ActualEndDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </ActualEndDate>
+       <County/>
+       <CurrentStatus/>
+       <Length/>
+       <ScheduledEndDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </ScheduledEndDate>
+       <StartDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </StartDate>
+       <DateReported>
+        <Year/>
+        <Month/>
+        <Day/>
+       </DateReported>
+       <PubicSaftyId/>
+       <InmateId/>
+       <ParoleInAbsentiaId/>
+       <Name>
+        <Full/>
+        <First/>
+        <Middle/>
+        <Last/>
+        <Suffix/>
+        <Prefix/>
+       </Name>
+       <Race/>
+       <Gender/>
+       <DOB>
+        <Year/>
+        <Month/>
+        <Day/>
+       </DOB>
+       <CountyOfBirth/>
+       <StateOfBirth/>
+       <HeightFeet/>
+       <HeightInches/>
+       <WeightInPounds/>
+       <HairColor/>
+       <SkinColor/>
+       <EyeColor/>
+       <PrisonFacilityType/>
+       <PrisonFacilityName/>
+       <AdmittedDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </AdmittedDate>
+       <PrisonStatus/>
+       <LastReceiveOrDepartCode/>
+       <LastReceiveOrDepartCDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </LastReceiveOrDepartCDate>
+       <RecordCreatedTimeStamp>
+        <Year/>
+        <Month/>
+        <Day/>
+        <Hour24/>
+        <Minute/>
+        <Second/>
+       </RecordCreatedTimeStamp>
+       <CurrentStatusFlag/>
+       <CurrentStatusEffectiveDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </CurrentStatusEffectiveDate>
+       <ParoleRegion/>
+       <SupervisingOffice/>
+       <SupervisingOfficerName/>
+       <SupervisingOfficerPhone/>
+       <LastKnownResidence>
+        <StreetNumber/>
+        <StreetPreDirection/>
+        <StreetName/>
+        <StreetSuffix/>
+        <StreetPostDirection/>
+        <UnitDesignation/>
+        <UnitNumber/>
+        <StreetAddress1/>
+        <StreetAddress2/>
+        <City/>
+        <State/>
+        <Zip5/>
+        <Zip4/>
+        <County/>
+        <PostalCode/>
+        <StateCityZip/>
+        <Latitude/>
+        <Longitude/>
+       </LastKnownResidence>
+       <ReleaseArrivalDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </ReleaseArrivalDate>
+       <ReleaseType/>
+       <ReleaseCounty/>
+       <LegalResidenceCounty/>
+       <LastParoleReviewDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </LastParoleReviewDate>
+       <OffenseCount/>
+       <Is3GOffender/>
+       <IsViolentOffender/>
+       <IsSexOffender/>
+       <IsOnViolentOffenderProgram/>
+       <LongestTimeToServe>
+        <Years/>
+        <Months/>
+        <Days/>
+       </LongestTimeToServe>
+       <LongestTimeToServeDescription/>
+       <DischargeDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </DischargeDate>
+       <ScarsMarksTattoos>
+        <SMT/>
+       </ScarsMarksTattoos>
+       <Offenses diff_match="" diff_monitor="">
+        <Offense>
+         <SentenceDate>
+          <Year/>
+          <Month/>
+          <Day/>
+         </SentenceDate>
+         <Length/>
+         <OffenseCounty/>
+         <CauseNo/>
+         <NCICCode/>
+         <OffenseCount/>
+         <OffenseDate>
+          <Year/>
+          <Month/>
+          <Day/>
+         </OffenseDate>
+        </Offense>
+       </Offenses>
+      </ParoleSentence>
+     </ParoleSentencesOld>
      <ParoleSentences diff_match="" diff_monitor="">
       <ParoleSentence>
        <ActualEndDate>
@@ -14593,6 +15390,11 @@
      <Occupation diff_monitor=""/>
      <Race diff_monitor=""/>
      <Gender diff_monitor=""/>
+     <RegistationDate diff_monitor="">
+      <Year/>
+      <Month/>
+      <Day/>
+     </RegistationDate>
      <RegistrationDate diff_monitor="">
       <Year/>
       <Month/>
@@ -15387,7 +16189,9 @@
       <FirstContributingCause/>
       <SecondContributingCause/>
       <FirstContributingEnvirionment/>
+      <FirstContributingEnvironment/>
       <SecondContributingEnvirionment/>
+      <SecondContributingEnvironment/>
       <FirstTrafficControl/>
       <SecondTrafficControl/>
       <TrafficwayChar/>
@@ -15882,6 +16686,133 @@
        </FilingDate>
       </Comment>
      </Comments>
+     <DebtorsOld diff_match="" diff_monitor="">
+      <Debtor>
+       <HasCriminalConviction/>
+       <IsSexualOffender/>
+       <BusinessIds>
+        <DotID/>
+        <EmpID/>
+        <POWID/>
+        <ProxID/>
+        <SeleID/>
+        <OrgID/>
+        <UltID/>
+       </BusinessIds>
+       <IdValue/>
+       <UniqueId/>
+       <BusinessId/>
+       <SSN/>
+       <AppendedSSN/>
+       <TaxId/>
+       <AppendedTaxId/>
+       <Names diff_match="" diff_monitor="">
+        <Name>
+         <Full/>
+         <First/>
+         <Middle/>
+         <Last/>
+         <Suffix/>
+         <Prefix/>
+         <CompanyName/>
+         <Type/>
+        </Name>
+       </Names>
+       <Addresses diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+        </Address>
+       </Addresses>
+       <AddressesEx diff_match="" diff_monitor="">
+        <Address>
+         <StreetNumber/>
+         <StreetPreDirection/>
+         <StreetName/>
+         <StreetSuffix/>
+         <StreetPostDirection/>
+         <UnitDesignation/>
+         <UnitNumber/>
+         <StreetAddress1/>
+         <StreetAddress2/>
+         <City/>
+         <State/>
+         <Zip5/>
+         <Zip4/>
+         <County/>
+         <PostalCode/>
+         <StateCityZip/>
+         <Latitude/>
+         <Longitude/>
+         <OrigStreetAddress1/>
+         <OrigStreetAddress2/>
+        </Address>
+       </AddressesEx>
+       <Phones>
+        <Phone10/>
+       </Phones>
+       <PhonesEx diff_match="" diff_monitor="">
+        <Phone>
+         <Phone10/>
+         <Fax/>
+         <TimeZone/>
+        </Phone>
+       </PhonesEx>
+       <Emails>
+        <Email/>
+       </Emails>
+       <CaseId/>
+       <DefendantId/>
+       <RecordId/>
+       <OriginalCounty/>
+       <SSNSource/>
+       <SSNSourceDesc/>
+       <SSNMatch/>
+       <SSNMatchDesc/>
+       <SSNMatchSource/>
+       <Screen/>
+       <ScreenDesc/>
+       <DispositionCode/>
+       <DispositionCodeDesc/>
+       <DispositionType/>
+       <DispositionTypeDesc/>
+       <DispositionReason/>
+       <StatusDate>
+        <Year/>
+        <Month/>
+        <Day/>
+       </StatusDate>
+       <HoldCase/>
+       <DateVacated>
+        <Year/>
+        <Month/>
+        <Day/>
+       </DateVacated>
+       <DateTransferred>
+        <Year/>
+        <Month/>
+        <Day/>
+       </DateTransferred>
+       <ActivityReceipt/>
+       <DefendantType unimplemented="EsdlEnum"/>
+      </Debtor>
+     </DebtorsOld>
      <Debtors diff_match="UniqueId">
       <Debtor>
        <HasCriminalConviction diff_monitor=""/>
@@ -16029,7 +16960,7 @@
        <AppendedSSN/>
        <TaxId/>
        <AppendedTaxId/>
-       <Names diff_match="">
+       <Names diff_match="" diff_monitor="">
         <Name>
          <Full/>
          <First/>
@@ -16041,7 +16972,7 @@
          <Type/>
         </Name>
        </Names>
-       <Addresses diff_match="">
+       <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
          <StreetPreDirection/>
@@ -16063,7 +16994,7 @@
          <Longitude/>
         </Address>
        </Addresses>
-       <AddressesEx diff_match="">
+       <AddressesEx diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
          <StreetPreDirection/>
@@ -16090,7 +17021,7 @@
        <Phones>
         <Phone10/>
        </Phones>
-       <PhonesEx diff_match="">
+       <PhonesEx diff_match="" diff_monitor="">
         <Phone>
          <Phone10/>
          <Fax/>
@@ -16122,7 +17053,7 @@
        <AppendedSSN/>
        <TaxId/>
        <AppendedTaxId/>
-       <Names diff_match="">
+       <Names diff_match="" diff_monitor="">
         <Name>
          <Full/>
          <First/>
@@ -16134,7 +17065,7 @@
          <Type/>
         </Name>
        </Names>
-       <Addresses diff_match="">
+       <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
          <StreetPreDirection/>
@@ -16156,7 +17087,7 @@
          <Longitude/>
         </Address>
        </Addresses>
-       <AddressesEx diff_match="">
+       <AddressesEx diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
          <StreetPreDirection/>
@@ -16183,7 +17114,7 @@
        <Phones>
         <Phone10/>
        </Phones>
-       <PhonesEx diff_match="">
+       <PhonesEx diff_match="" diff_monitor="">
         <Phone>
          <Phone10/>
          <Fax/>
@@ -16410,7 +17341,7 @@
         <Latitude/>
         <Longitude/>
        </Address>
-       <Addresses diff_match="">
+       <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
          <StreetPreDirection/>
@@ -16432,14 +17363,14 @@
          <Longitude/>
         </Address>
        </Addresses>
-       <Phones diff_match="">
+       <Phones diff_match="" diff_monitor="">
         <Phone>
          <Phone10/>
          <Fax/>
          <TimeZone/>
         </Phone>
        </Phones>
-       <ParsedParties diff_match="">
+       <ParsedParties diff_match="" diff_monitor="">
         <Party>
          <HasCriminalConviction/>
          <IsSexualOffender/>
@@ -16497,7 +17428,7 @@
         <Latitude/>
         <Longitude/>
        </Address>
-       <Addresses diff_match="">
+       <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
          <StreetPreDirection/>
@@ -16519,14 +17450,14 @@
          <Longitude/>
         </Address>
        </Addresses>
-       <Phones diff_match="">
+       <Phones diff_match="" diff_monitor="">
         <Phone>
          <Phone10/>
          <Fax/>
          <TimeZone/>
         </Phone>
        </Phones>
-       <ParsedParties diff_match="">
+       <ParsedParties diff_match="" diff_monitor="">
         <Party>
          <HasCriminalConviction/>
          <IsSexualOffender/>
@@ -16586,7 +17517,7 @@
        </Address>
        <Phone/>
        <TimeZone/>
-       <Addresses diff_match="">
+       <Addresses diff_match="" diff_monitor="">
         <Address>
          <StreetNumber/>
          <StreetPreDirection/>
@@ -16608,14 +17539,14 @@
          <Longitude/>
         </Address>
        </Addresses>
-       <Phones diff_match="">
+       <Phones diff_match="" diff_monitor="">
         <Phone>
          <Phone10/>
          <Fax/>
          <TimeZone/>
         </Phone>
        </Phones>
-       <ParsedParties diff_match="">
+       <ParsedParties diff_match="" diff_monitor="">
         <Party>
          <HasCriminalConviction/>
          <IsSexualOffender/>
@@ -16675,7 +17606,7 @@
      </Filings>
     </LienJudgment>
    </LiensJudgments>
-   <Properties diff_match="RecordType+ParcelNumber" diff_monitor="Property">
+   <Properties diff_match="RecordType+Assessment.ParcelId+Deed.ParcelId" diff_monitor="Property">
     <Property>
      <BusinessIds diff_monitor="">
       <DotID/>
@@ -16854,6 +17785,27 @@
       <BuildingClassCode/>
       <NeighborhoodCode/>
       <AddlLegal/>
+      <Fares>
+       <LivingSquareFeet/>
+       <IrisApn/>
+       <CalculatedLandValue/>
+       <CalculatedImprovementValue/>
+       <CalculatedTotalValue/>
+       <AdjustedGrossSquareFeet/>
+       <NoOfFullBaths/>
+       <NoOfHalfBaths/>
+       <PoolIndicator/>
+       <Frame/>
+       <FrameDesc/>
+       <ElectricEnergy/>
+       <ElectricEnergyDesc/>
+       <Sewer/>
+       <SewerDesc/>
+       <Water/>
+       <WaterDesc/>
+       <Condition/>
+       <ConditionDesc/>
+      </Fares>
       <SourcePropertyRecord>
        <LivingSquareFeet/>
        <IrisApn/>
@@ -16884,7 +17836,7 @@
       <BuildingAreas>
        <BuildingArea/>
       </BuildingAreas>
-      <BuildingAreas2 diff_match="">
+      <BuildingAreas2 diff_match="" diff_monitor="">
        <BuildingArea>
         <Area/>
         <Indicator/>
@@ -17147,11 +18099,11 @@
           <OrgID/>
           <UltID/>
          </BusinessIds>
-         <IdValue/>
+         <IdValue diff_monitor=""/>
          <UniqueId/>
-         <BusinessId/>
-         <AppendedSSN/>
-         <LinkingWeight/>
+         <BusinessId diff_monitor=""/>
+         <AppendedSSN diff_monitor=""/>
+         <LinkingWeight diff_monitor=""/>
         </Name>
        </Names>
        <OriginalNames>
@@ -17425,7 +18377,7 @@
      <AlsoFound diff_monitor=""/>
     </Education>
    </Educations>
-   <AKAs diff_match="Name.First+Name.Last+SSNInfoEx.SSN" diff_monitor="AKA">
+   <AKAs diff_match="Name.First+Name.Last+SSNInfo.SSN" diff_monitor="AKA">
     <AKA>
      <UniqueId diff_monitor=""/>
      <Name>
@@ -17437,7 +18389,7 @@
       <Prefix diff_monitor=""/>
      </Name>
      <Gender diff_monitor=""/>
-     <SSNInfoEx>
+     <SSNInfo>
       <SSN/>
       <Valid diff_monitor=""/>
       <IssuedLocation diff_monitor=""/>
@@ -17452,6 +18404,28 @@
        <Day/>
       </IssuedEndDate>
       <FDNSsnInd diff_monitor=""/>
+      <HighRiskIndicators diff_match="" diff_monitor="">
+       <HighRiskIndicator>
+        <RiskCode/>
+        <Description/>
+       </HighRiskIndicator>
+      </HighRiskIndicators>
+     </SSNInfo>
+     <SSNInfoEx diff_monitor="">
+      <SSN/>
+      <Valid/>
+      <IssuedLocation/>
+      <IssuedStartDate>
+       <Year/>
+       <Month/>
+       <Day/>
+      </IssuedStartDate>
+      <IssuedEndDate>
+       <Year/>
+       <Month/>
+       <Day/>
+      </IssuedEndDate>
+      <FDNSsnInd/>
       <HighRiskIndicators diff_match="" diff_monitor="">
        <HighRiskIndicator>
         <RiskCode/>
@@ -17712,7 +18686,7 @@
      </DriverLicenses2>
      <CriminalHistories diff_match="" diff_monitor="">
       <CriminalHistory>
-       <Appends diff_match="">
+       <Appends diff_match="" diff_monitor="">
         <Append>
          <ProcessDate>
           <Year/>
@@ -17739,7 +18713,7 @@
          <ScarMarkTattoos>
           <ScarMarkTattoo/>
          </ScarMarkTattoos>
-         <DOBs diff_match="">
+         <DOBs diff_match="" diff_monitor="">
           <DOB>
            <Year/>
            <Month/>
@@ -17749,7 +18723,7 @@
          <SSNs>
           <SSN/>
          </SSNs>
-         <AdditionalNumbers diff_match="">
+         <AdditionalNumbers diff_match="" diff_monitor="">
           <AdditionalNumber>
            <TypeCode/>
            <Type/>
@@ -17760,7 +18734,7 @@
          </AdditionalNumbers>
         </Append>
        </Appends>
-       <Identities diff_match="">
+       <Identities diff_match="" diff_monitor="">
         <Identity>
          <StateOriginName/>
          <StateOriginCode/>
@@ -17853,7 +18827,7 @@
          </RawAddress>
         </Identity>
        </Identities>
-       <Arrests diff_match="">
+       <Arrests diff_match="" diff_monitor="">
         <Arrest>
          <ProcessDate>
           <Year/>
@@ -17873,14 +18847,14 @@
          </ArrestDate>
          <ArrestCount/>
          <SequenceCode/>
-         <ArrestAgencies diff_match="">
+         <ArrestAgencies diff_match="" diff_monitor="">
           <ArrestAgency>
            <AgencyId/>
            <AgencyIdCode/>
            <AgencyCaseNumber/>
           </ArrestAgency>
          </ArrestAgencies>
-         <ArrestCharges diff_match="">
+         <ArrestCharges diff_match="" diff_monitor="">
           <ArrestCharge>
            <StateSpecificChargeFields/>
            <ChargeNumber/>
@@ -17929,7 +18903,7 @@
            </Dispositions>
           </ArrestCharge>
          </ArrestCharges>
-         <Judicials diff_match="">
+         <Judicials diff_match="" diff_monitor="">
           <Judicial>
            <ProcessDate>
             <Year/>
@@ -17954,7 +18928,7 @@
             <AgencyCaseNumber/>
            </JudicialAgency>
            <JudicialSequenceNumber/>
-           <JudicialCharges diff_match="">
+           <JudicialCharges diff_match="" diff_monitor="">
             <JudicialCharge>
              <ArrestChargeNumber/>
              <ArrestChargeStatus/>
@@ -18049,7 +19023,7 @@
            </JudicialCharges>
           </Judicial>
          </Judicials>
-         <Events diff_match="">
+         <Events diff_match="" diff_monitor="">
           <Event>
            <SortDate>
             <Year/>
@@ -18110,7 +19084,7 @@
      <SubjectSSNIndicator diff_monitor="" unimplemented="EsdlEnum"/>
     </AKA>
    </AKAs>
-   <Imposters diff_match="Name.First+Name.Last+SSNInfoEx.SSN" diff_monitor="Imposter">
+   <Imposters diff_match="Name.First+Name.Last+SSNInfo.SSN" diff_monitor="Imposter">
     <Imposter>
      <UniqueId diff_monitor=""/>
      <Name>
@@ -18122,6 +19096,28 @@
       <Prefix diff_monitor=""/>
      </Name>
      <Gender diff_monitor=""/>
+     <SSNInfo>
+      <SSN/>
+      <Valid diff_monitor=""/>
+      <IssuedLocation diff_monitor=""/>
+      <IssuedStartDate diff_monitor="">
+       <Year/>
+       <Month/>
+       <Day/>
+      </IssuedStartDate>
+      <IssuedEndDate diff_monitor="">
+       <Year/>
+       <Month/>
+       <Day/>
+      </IssuedEndDate>
+      <FDNSsnInd diff_monitor=""/>
+      <HighRiskIndicators diff_match="" diff_monitor="">
+       <HighRiskIndicator>
+        <RiskCode/>
+        <Description/>
+       </HighRiskIndicator>
+      </HighRiskIndicators>
+     </SSNInfo>
      <SSNInfoEx diff_monitor="">
       <SSN/>
       <Valid/>
@@ -18137,7 +19133,7 @@
        <Day/>
       </IssuedEndDate>
       <FDNSsnInd/>
-      <HighRiskIndicators diff_match="">
+      <HighRiskIndicators diff_match="" diff_monitor="">
        <HighRiskIndicator>
         <RiskCode/>
         <Description/>
@@ -18397,7 +19393,7 @@
      </DriverLicenses2>
      <CriminalHistories diff_match="" diff_monitor="">
       <CriminalHistory>
-       <Appends diff_match="">
+       <Appends diff_match="" diff_monitor="">
         <Append>
          <ProcessDate>
           <Year/>
@@ -18424,7 +19420,7 @@
          <ScarMarkTattoos>
           <ScarMarkTattoo/>
          </ScarMarkTattoos>
-         <DOBs diff_match="">
+         <DOBs diff_match="" diff_monitor="">
           <DOB>
            <Year/>
            <Month/>
@@ -18434,7 +19430,7 @@
          <SSNs>
           <SSN/>
          </SSNs>
-         <AdditionalNumbers diff_match="">
+         <AdditionalNumbers diff_match="" diff_monitor="">
           <AdditionalNumber>
            <TypeCode/>
            <Type/>
@@ -18445,7 +19441,7 @@
          </AdditionalNumbers>
         </Append>
        </Appends>
-       <Identities diff_match="">
+       <Identities diff_match="" diff_monitor="">
         <Identity>
          <StateOriginName/>
          <StateOriginCode/>
@@ -18538,7 +19534,7 @@
          </RawAddress>
         </Identity>
        </Identities>
-       <Arrests diff_match="">
+       <Arrests diff_match="" diff_monitor="">
         <Arrest>
          <ProcessDate>
           <Year/>
@@ -18558,14 +19554,14 @@
          </ArrestDate>
          <ArrestCount/>
          <SequenceCode/>
-         <ArrestAgencies diff_match="">
+         <ArrestAgencies diff_match="" diff_monitor="">
           <ArrestAgency>
            <AgencyId/>
            <AgencyIdCode/>
            <AgencyCaseNumber/>
           </ArrestAgency>
          </ArrestAgencies>
-         <ArrestCharges diff_match="">
+         <ArrestCharges diff_match="" diff_monitor="">
           <ArrestCharge>
            <StateSpecificChargeFields/>
            <ChargeNumber/>
@@ -18614,7 +19610,7 @@
            </Dispositions>
           </ArrestCharge>
          </ArrestCharges>
-         <Judicials diff_match="">
+         <Judicials diff_match="" diff_monitor="">
           <Judicial>
            <ProcessDate>
             <Year/>
@@ -18639,7 +19635,7 @@
             <AgencyCaseNumber/>
            </JudicialAgency>
            <JudicialSequenceNumber/>
-           <JudicialCharges diff_match="">
+           <JudicialCharges diff_match="" diff_monitor="">
             <JudicialCharge>
              <ArrestChargeNumber/>
              <ArrestChargeStatus/>
@@ -18734,7 +19730,7 @@
            </JudicialCharges>
           </Judicial>
          </Judicials>
-         <Events diff_match="">
+         <Events diff_match="" diff_monitor="">
           <Event>
            <SortDate>
             <Year/>

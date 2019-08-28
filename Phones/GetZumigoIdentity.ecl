@@ -221,6 +221,9 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		// SELF.point_code;
 		// SELF.prepaid;
 		SELF.account_status := l.response.LineIdentityResponse.Account.ServiceStatus;
+		SELF.line_activation_date := t_Date2ToString(l.response.LineIdentityResponse.Account.LineActivationDate);
+		SELF.account_activation_date := t_Date2ToString(l.response.LineIdentityResponse.Account.AccountActivationDate);
+		SELF.acct_tenure_min := (INTEGER)l.response.LineIdentityResponse.Account.AccountTenure.min;
 		// SELF.language;
 		// SELF.tele_type;
 		// SELF.bill_block;
@@ -256,9 +259,6 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 										l.response._header.Message <> '' => l.response._header.Message,
 										'');	
 		// SELF.date_added;
-		SELF.line_activation_date := t_Date2ToString(l.response.LineIdentityResponse.Account.LineActivationDate);
-		SELF.account_activation_date := t_Date2ToString(l.response.LineIdentityResponse.Account.AccountActivationDate);
-		SELF.acct_tenure_min := (INTEGER)l.response.LineIdentityResponse.Account.AccountTenure.min; 
 		SELF := l.response.LineIdentityResponse;
 		SELF := [];
 	

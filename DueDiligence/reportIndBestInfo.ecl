@@ -18,8 +18,8 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                           KEYED(LEFT.#EXPAND(fieldName).predir = RIGHT.predir) AND
                           KEYED(LEFT.#EXPAND(fieldName).postdir = RIGHT.postdir) AND
                           KEYED(LEFT.#EXPAND(fieldName).sec_range = RIGHT.sec_range), 
-                          TRANSFORM({RECORDOF(LEFT), STRING1  #EXPAND(if(fieldName='indvCleanInput.address','Residential_OR_Business_Ind_Clean','Residential_OR_Business_Ind_Best'))},
-																		  #EXPAND(if(fieldName='indvCleanInput.address',
+                          TRANSFORM({RECORDOF(LEFT), STRING1  #EXPAND(if(fieldName='indvRawInput.cleanAddress','Residential_OR_Business_Ind_Clean','Residential_OR_Business_Ind_Best'))},
+																		  #EXPAND(if(fieldName='indvRawInput.cleanAddress',
 																			'SELF.Residential_OR_Business_Ind_Clean := RIGHT.Residential_OR_Business_Ind;',
 																			'SELF.Residential_OR_Business_Ind_Best := RIGHT.Residential_OR_Business_Ind;'));
                                       SELF := LEFT,
@@ -27,8 +27,10 @@ EXPORT reportIndBestInfo(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                           KEEP(DueDiligence.Constants.MAX_ATMOST_1));
 			return addKeyAddr1History;
 		ENDMACRO;
+    
+    
 		//get Residential_OR_Business_Ind for Advo.Lookup_Descriptions.fn_resbus
-    formatCleanAddressType := fnGetKeyAddr1History(maskedBestData, 'indvCleanInput.address');
+    formatCleanAddressType := fnGetKeyAddr1History(maskedBestData, 'indvRawInput.cleanAddress');
     formatBestAddressType  := fnGetKeyAddr1History(formatCleanAddressType, 'bestaddress');
     
     //remove all duplicate values

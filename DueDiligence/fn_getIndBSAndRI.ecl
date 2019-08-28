@@ -16,10 +16,10 @@ EXPORT fn_getIndBSAndRI(DATASET(DueDiligence.Layouts.CleanedData) cleanData,
                                                 SELF.lname := LEFT.cleanedInput.individual.name.lastName;
                                                 SELF.suffix := LEFT.cleanedInput.individual.name.suffix;
                                                 
-                                                SELF.in_streetAddress := LEFT.inputEcho.individual.address.streetAddress1;
-                                                SELF.in_city := LEFT.inputEcho.individual.address.city;
-                                                SELF.in_state := LEFT.inputEcho.individual.address.state;
-                                                SELF.in_zipCode := LEFT.inputEcho.individual.address.zip5;
+                                                SELF.in_streetAddress := LEFT.cleanedInput.individual.address.streetAddress1;
+                                                SELF.in_city := LEFT.cleanedInput.individual.address.city;
+                                                SELF.in_state := LEFT.cleanedInput.individual.address.state;
+                                                SELF.in_zipCode := LEFT.cleanedInput.individual.address.zip5;
                                                 
                                                 //add the cleaned address fields
                                                 SELF.prim_range := LEFT.cleanedInput.individual.address.prim_range;

@@ -11,9 +11,8 @@ export RightAddressService := MACRO
 	#stored ('ScoreThreshold', UPS_Services.Constants.SCORE_THRESHOLD);
 	#constant('AllowWildcard',true);
 	#constant('isCP_V2',true);
-	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 	resp := UPS_Services.RightAddress().soap_response;
-  IF(EXISTS(resp), doxie.compliance.logSoldToTransaction(mod_access));
+
   output (resp, named(doxie.strResultsName));
 
 ENDMACRO;

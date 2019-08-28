@@ -1,25 +1,20 @@
-﻿/*
-This query is used only in the PRCT environment. This query substitutes for the data that would normally be received from the Bridger gateway as PRCT
-is not capable of making gateway calls. It uses a key to return a similar looking result to the query being used. This service can never be used on the 
-Boca side as it will be pointing at an empty key and no results will ever return.
-*/
+﻿/* This function is used only in the PRCT environment. This function substitutes for the data that would normally be received from the Bridger gateway as PRCT
+is not capable of making gateway calls. It uses a key to return a similar looking result to Gateway.SoapCall_BridgerSSXG5 when it is used to soapcall to Bridger. 
+This function can never be used on the Boca side as it will be pointing at an empty key and no results will ever return. */
 
-/*--SOAP--
-<message name="PRCT_BridgerRedirect">
-	<part name="WsSearchCore_SearchRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
- </message>
-*/
+import dx_demowatchlistscreening, iesp, STD;
 
-import dx_demowatchlistscreening, iesp;
-
-export PRCT_BridgerRedirect := MACRO
+export PRCT_Function (DATASET(iesp.WsSearchCore.t_SearchRequest) searchReq) := FUNCTION
                                         
-requestIn := dataset([], iesp.WsSearchCore.t_SearchRequest)  	: stored('WsSearchCore_SearchRequest', few);  
 
 iesp.WsSearchCore.t_SearchResponse WatchlistTransform (iesp.WsSearchCore.t_SearchRequest le, recordof(dx_demowatchlistscreening.key_matches_entity_name) ri):= transform
           self.SearchResult :=	project(ri, transform(iesp.WsSearchCore.t_SearchResults,
+          
+                                        self.BlockID := 1;
                                         self.EntityRecords := project(left, transform(iesp.WsSearchCore.t_ResultEntityRecord,
-
+                                                                      
+                                                                      
+                                                                      self.InputRecord.ID := le.Input.EntityRecords[1].ID;
                                                                       self.InputRecord.EntityType := ri.Input_Record_Entity_Type;
                                                                       self.InputRecord.Name.Full := ri.Input_Record_Name_Full;
                                                                       self.InputRecord.Name.Title := ri.Input_Record_Name_Title;
@@ -444,11 +439,9 @@ iesp.WsSearchCore.t_SearchResponse WatchlistTransform (iesp.WsSearchCore.t_Searc
   
 
 Key_SearchResponse :=
-join(requestIn, dx_demowatchlistscreening.key_matches_entity_name, KEYED(STD.Uni.ToUpperCase(left.Input.EntityRecords[1].Name.Full) = right.matches_entity_name)  and right.matches_file_name IN SET(left.Config.DataFiles, Name),
+join(searchReq, dx_demowatchlistscreening.key_matches_entity_name, KEYED(STD.Uni.ToUpperCase(left.Input.EntityRecords[1].Name.Full) = right.matches_entity_name or STD.Uni.ToUpperCase(left.Input.EntityRecords[1].Name.First + ' ' + if(left.Input.EntityRecords[1].Name.Middle = '', '', left.Input.EntityRecords[1].Name.Middle + ' ' )+ left.Input.EntityRecords[1].Name.Last) = right.matches_entity_name)  and right.matches_file_name IN SET(left.Config.DataFiles, Name),
 WatchlistTransform(left,right));
 
-//Testing response name for functionability
+return Key_SearchResponse;
 
-output( Key_SearchResponse, named('Key_SearchResponse'));
-
-ENDMACRO;
+END;

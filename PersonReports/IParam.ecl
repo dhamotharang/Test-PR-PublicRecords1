@@ -151,7 +151,7 @@ EXPORT IParam := MODULE
   /////////////// INTERFACES REPRESENTING A PERSON ///////////////
   // Defines all "personal" data: relatives, neighbors, associates, etc. Also defines most frequent defaults
   // (cannot use "person" -- something for Gavin to take a look at)
-  EXPORT personal := INTERFACE (address, imposters, relatives, neighbors, phones)
+  EXPORT personal := INTERFACE (_report, address, imposters, relatives, neighbors, phones)
   // //   unfortunate artefact: DL should really be a stand alone data
     EXPORT boolean include_driverslicenses := FALSE;
     EXPORT string9 _ssn := ''; // needed, if comp report (and alike) are provided with input SSN

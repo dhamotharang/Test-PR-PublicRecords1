@@ -143,15 +143,22 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		SELF := l;
 	END;
 
-	dSearchRecswInqHistory	:= DENORMALIZE(dSearchRecswAddrType,InquiryHistory,
-															KEYED(LEFT.phone=RIGHT.phone10) AND
+  //Denormalize causes issues extracting key fields needed for suppression.
+  //Instead, grab the records from the key which match the join condition
+
+  InquiryHistoryJoined := JOIN(dSearchRecswAddrType, InquiryHistory,
+    KEYED(LEFT.phone = RIGHT.phone10) AND
+    LEFT.dt_first_seen <= RIGHT.search_info.datetime[1..8],
+    TRANSFORM(RIGHT), LIMIT(PhoneFinder_Services.Constants.MetadataLimit, SKIP));
+
+  InquiryHistorySuppressed := Suppress.MAC_SuppressSource(InquiryHistoryJoined, mod_access, person_q.appended_ADL, ccpa.global_sid);
+
+	dSearchRecswInqHistory	:= DENORMALIZE(dSearchRecswAddrType, InquiryHistorySuppressed,
+															LEFT.phone=RIGHT.phone10 AND
 															LEFT.dt_first_seen <= RIGHT.search_info.datetime[1..8],
 															GROUP,
 															getInquiries(LEFT,ROWS(RIGHT)),
 															LIMIT(PhoneFinder_Services.Constants.MetadataLimit,SKIP));
-
-  //Denormalize causes some issue extracting key info needed for suppression.
-  //Instead, grab the records from the key which match the join condition
 
   InquiryDailyJoined := JOIN(dSearchRecswInqHistory, InquiryDaily,
     KEYED(LEFT.phone=RIGHT.phone10) AND LEFT.dt_first_seen <= RIGHT.search_info.datetime[1..8],

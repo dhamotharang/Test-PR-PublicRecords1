@@ -1,4 +1,4 @@
-﻿import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression;
+﻿import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression, LocationID_Ingest,LocationID_xLink;
 
 EXPORT Key_BH_Linking_Ids := 
 MODULE
@@ -36,6 +36,10 @@ MODULE
     unsigned8 record_sid;
 	end;
 
+	shared layout_key_with_locid := record(layout_key)
+        unsigned6 locid;
+     end;
+	    	
 	shared infile_key := project(infile, transform(layout_key,  
 																											self.DotScore   := 100,
 																											self.DotWeight  := 100,
@@ -55,8 +59,9 @@ MODULE
                                                       self.record_sid := 0  ,
                                                       self 						:= left,
 																											));
-
-	shared infile_hidden_key := project(infile_hidden, transform(layout_key,  
+		    
+		 
+	shared infile_hidden_key := project(infile_hidden, transform(layout_key_with_locid,  
                                                 self.DotScore   := 100,
                                                 self.DotWeight  := 100,
                                                 self.EmpScore   := 100,
@@ -73,13 +78,29 @@ MODULE
                                                 self.SELEweight := 100,
                                                 self.global_sid := 0  ,
                                                 self.record_sid := 0  ,
+                                                self.locid      := 0  ,
                                                 self            := left,
                                                 ));
-                                                
+
+
+     LocationID_xLink.Append(infile_key, 
+		                   prim_range, 
+                             predir, 
+		                   prim_name, 
+                             addr_suffix, 
+                             postdir, 
+                             sec_range, 
+                             v_city_name, 
+                             st, 
+                             zip, 
+                             out_infile_key_with_locid); 			
+	
+     shared infile_key_with_locid := project(out_infile_key_with_locid, layout_key_with_locid);
+  
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_hidden_key, k1, superfile_name_hidden);																					
   Export Key_hidden := k1;
 
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key, k, superfile_name);	
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key_with_locid, k, superfile_name);	
 	export Key      := k;//withOUT ParentAbovSeleField (see comment below)
 	export KeyPlus  := BIPV2.IDmacros.mac_AddParentAbovSeleField(Key); //with ParentAbovSeleField
   export keyversions(string pversion = 'qa',boolean pUseOtherEnvironment = false) := tools.macf_FilesIndex('Key',BIPV2_Build.keynames(pversion, pUseOtherEnvironment).linkids); //allow easy access to other versions(logical or super) of key
@@ -182,8 +203,7 @@ MODULE
     
     ds_fetched_out := project(ds_fetched  ,transform(recordof(kFetched),self := left,self := []));
     
-    
-    return  map(   pReturnFullKey             = true  =>  ds_fetched_out           
+    return  map(   pReturnFullKey             = true  =>  ds_fetched_out         
                   ,pApplyMarketingSuppression = true  =>  marketingSuppressed  
                   ,                                       kFetched
             );						

@@ -27,6 +27,12 @@ IMPORT iesp;
 	cfg_DS_SectionName := cfg_Config.Sections(STD.STR.ToUpperCase(Name)='HC_SOCIO_MAIN')[1];//Need to filter on this
 	cfg_DS_Sections := cfg_DS_SectionName.KeyValues;
 
+    //CCPA fields
+    unsigned1 LexIdSourceOptout := 1 : STORED ('LexIdSourceOptout');
+    string TransactionID := '' : stored ('_TransactionId');
+    string BatchUID := '' : stored('_BatchUID');
+    unsigned6 GlobalCompanyId := 0 : stored('_GCID');
+    
 	//Constants
 	_blank := '';
 
@@ -289,7 +295,11 @@ IMPORT iesp;
 	unsigned1 ofac_version_in := 1; //Set to default
 	gateways_in_ds := dataset([], Gateway.Layouts.Config); //Set to default
 	
-	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, ofac_version_in, gateways_in_ds, coreResults);
+	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, ofac_version_in, gateways_in_ds, coreResults,
+                                                                              LexIdSourceOptout := LexIdSourceOptout, 
+                                                                              TransactionID := TransactionID, 
+                                                                              BatchUID := BatchUID, 
+                                                                              GlobalCompanyID := GlobalCompanyID);
 	// Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, coreResults);
   	// OUTPUT(coreResults, NAMED('coreResults'));
 

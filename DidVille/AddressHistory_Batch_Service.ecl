@@ -22,13 +22,12 @@ a single 'Best' address for each individual.
 import DidVille, doxie, AutoStandardI;
 
 export AddressHistory_Batch_Service := MACRO
-boolean GLB                    := false  : stored('UseGLBData');
-boolean DPPA                   := false  : stored('UseDPPAData');
+boolean GLB_Ok                 := false  : stored('UseGLBData');
+boolean DPPA_Ok                := false  : stored('UseDPPAData');
 unsigned4 maxrecordstoreturn   := 0      : stored('MaxRecordsToReturn');
 boolean bestaddress_input      := false  : stored('BestAddress');
-appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
-
 BatchIn := dataset([], DidVille.AddressHistory_Layout_InBatch) : stored('addresshistory_batch_in', few);
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
 layout_CleanNameAddress := record
   didville.Layout_Did_OutBatch;
@@ -77,7 +76,7 @@ end;
 RemovedTempFields := project(CleanedNameAddress, RemoveTempFields(left));  
 
 //Call this common code instead of duplicating code for Service and Batch_Service
-Result := didville.AddressHistory_Common(RemovedTempFields, glb, dppa, maxrecordstoreturn, bestaddress_input, appType); 
+Result := didville.AddressHistory_Common(RemovedTempFields, mod_access, GLB_Ok, DPPA_Ok, maxrecordstoreturn, bestaddress_input); 
 
 output(Result, named('Result'));
 

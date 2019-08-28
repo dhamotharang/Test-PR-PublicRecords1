@@ -82,7 +82,8 @@ FUNCTION
       BOOLEAN isPRIFail := CASE(le.RiskId,
                                 -1 => pInput.isPrimaryPhone AND pInput.phone = '',
                                 0  => pInput.isPrimaryPhone AND (pInput.fname = '' AND pInput.lname = '' AND pInput.listed_name = '' AND pInput.prim_name = '' AND pInput.phone <> ''),
-                                1  => pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
+                                1  => IF(inmod.IsGovsearch, (pInput.fname <>'' OR pInput.lname <> '' OR pInput.listed_name <> '') AND pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive,
+																         pInput.PhoneStatus = $.Constants.PhoneStatus.Inactive),
                                 2  => STD.Date.DaysBetween(dt_first_seen, currentDate) BETWEEN le.ThresholdA AND le.Threshold,
                                 3  => dt_last_seen <> 0 AND STD.Date.DaysBetween(dt_last_seen, currentDate) > le.Threshold,
                                 5  => pInput.listing_type_bus <> '',
@@ -127,7 +128,7 @@ FUNCTION
                                 44 => EXISTS((pInput.TmxVariables(Name = 'phoneseenmultiplecountry_month' AND (INTEGER)Value >= le.Threshold))),
                                 45 => pInput.identity_count > le.Threshold,
                                 46 => inMod.isPrimarySearchPII AND ~pInput.isLNameMatch,
-                                47 => pInput.phone_inresponse_count > le.Threshold,
+                                47 => pInput.phone_inresponse_count > le.ThresholdA,
                                 FALSE);
 
       SELF.RiskId      := IF(isPRIFail, le.RiskId, SKIP);
