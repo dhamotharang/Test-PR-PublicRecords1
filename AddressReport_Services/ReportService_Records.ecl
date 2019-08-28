@@ -93,9 +93,9 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	Residents				:= Residents_Filt_did_ssn;//Residents_Filtered;
 	Residents_final	:= choosen(sort(Residents,-addr_dt_last_seen),AddressReport_Services.constants.MaxResidents);
-	Res_cur_raw			:= AddressReport_Services.split_Residents(Residents_final,res_input,param).CurrentResidents;
+	Res_cur_raw			:= AddressReport_Services.split_Residents(Residents_final,res_input,param, mod_access).CurrentResidents;
 	Res_cur0				:= Res_cur_raw.residents;
-	Res_prior				:= AddressReport_Services.split_Residents(Residents_final,res_input,param).priorResidents;
+	Res_prior				:= AddressReport_Services.split_Residents(Residents_final,res_input,param, mod_access).priorResidents;
 	cur_dids				:= project(Res_cur0, doxie.layout_references);
 	lj_IDs 					:= liensv2_services.Autokey_ids(,true,false,false, false);
 	LiensJudgments	:= LiensV2_Services.liens_raw.report_view.by_tmsid(project(lj_IDs,liensv2_services.layout_tmsid),mod_access.ssn_mask,,,,,mod_access.application_type);
