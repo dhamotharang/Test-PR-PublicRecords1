@@ -1,10 +1,12 @@
-﻿version := '20190605';
+﻿#OPTION('MultiplePersistInstances', false);
+version := '20190605';
 root := '~thor::bridger::medicaid::hc_med_sanc_extract_20190605.tab';
 
 ds1 := dataset(root, MedicaidSanctions.Layout_Sanctions, CSV);
 
-ds := ds1(last<>'');			// valid entries
-dsbad := ds1(last='');
+ds := ds1((last <> '' OR name <> ''), type_id<>'');			// valid entries
+dsbad := ds1((last='' AND name='') OR type_id='');
+
 mapped := MedicaidSanctions.MapFields(ds);
 
 SEQUENTIAL(
