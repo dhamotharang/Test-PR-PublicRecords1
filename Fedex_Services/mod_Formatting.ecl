@@ -1,4 +1,4 @@
-import doxie,ut,Address,did_add,mdr;
+import doxie,ut,Address,did_add,mdr, dx_header, Suppress;
 
 //NOTE: address_type gets set here, but then updated later by Fedex_Services.fn_CheckAddrType
 
@@ -11,26 +11,30 @@ shared outrec := Fedex_Services.Layouts.out;
 // to filter results
 shared fil(dataset(outrec) l) := 
 function
+    mod_access := Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+    temp_outrec:= RECORD
+		outrec;
+		UNSIGNED4 global_sid;
+		UNSIGNED8 record_sid;
+	END;
 
 	notpobox 		:= ~ut.isPOBox(l.prim_name);
 	deliverable := l.zip4 <> '';
 	
 	good := notpobox and deliverable;
 	
-	fixed_DRM := Doxie.DataRestriction.fixed_DRM;
-	
-	return 
-		l(good) + 
-		join(	//if the gong record is not deliverable, but the person has a header record at a very similar address that is deliverable, use that address instead
+    fixed_DRM := mod_access.DataRestrictionMask;
+    
+    header_recs_all :=  join(	//if the gong record is not deliverable, but the person has a header record at a very similar address that is deliverable, use that address instead
 			l(l.internal_src = fedex_services.Contants.internal_src_gong and l.did > 0 and not deliverable and notpobox),
-			doxie.Key_Header,
+			dx_header.Key_Header(),
 			keyed(left.did = right.s_did) and 
 			right.zip4 <> '' and	//this ensures that the address we are patching in is deliverable
 			left.prim_range = right.prim_range and  //this line was added last and prevents a slightly wrong address when i search 6624294274
 			DID_Add.Address_Match_Score(left.prim_range,left.prim_name,left.sec_range,left.zip5,right.prim_range,right.prim_name,right.sec_range,right.zip) <= 80 and
-			~Doxie.DataRestriction.isHeaderSourceRestricted(right.src, fixed_DRM),
+			~doxie.compliance.isHeaderSourceRestricted(right.src, mod_access.DataRestrictionMask),
 			transform(
-				outrec,
+				temp_outrec,
 				self.prim_range 			:= right.prim_Range;
 				self.predir 					:= right.predir;
 				self.prim_name 				:= right.prim_name;
@@ -45,11 +49,18 @@ function
 				self.zip4 						:= right.zip4;
 				self.internal_src			:= fedex_services.Contants.internal_src_gong_patched;
 				self.country				:= if (Fedex_Services.Inputs.isCanadaSearch,Fedex_Services.Contants.str_CA,Fedex_Services.Contants.str_US);
+				self.global_sid				:= right.global_sid;
+				self.record_sid				:= right.record_sid;
 				self := left
 			),
 			keep(1),
 			limit(500, skip)
 		);
+
+        header_recs := Suppress.MAC_SuppressSource(header_recs_all, mod_access);
+        recs_out := PROJECT(header_recs,outrec);
+    return l(good) + recs_out;
+		
 
 end;
 
