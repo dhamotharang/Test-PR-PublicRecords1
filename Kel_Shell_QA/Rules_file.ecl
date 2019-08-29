@@ -112,4 +112,8 @@ self:=[];
 
 // EXPORT Rules_file:= p(Category in ['Assets','B2B Trade','Bankruptcy History','Inquiry History',	'Criminal History',	'Business Input Clean ',	'Business Input Clean Populated',	'Business Input Echo Populated',	'Input Clean Populated',	'Input Clean',	'Input Echo Populated',	'Business Input Echo','Input Echo']);
 
-EXPORT Rules_file:= p;
+// manual file
+// EXPORT Rules_file:= p;
+
+// auto generation file
+EXPORT Rules_file:= Kel_Shell_QA.Automated_Rules_File;

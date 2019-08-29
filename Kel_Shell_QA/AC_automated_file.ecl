@@ -4,8 +4,8 @@
 IMPORT STD;
 
 projected_input_file:= project(inut_file_records,transform(recordof(inut_file_records),
-                       self.inputarchivedateecho:=left.inputarchivedateecho[1..8];
-											 self.InputArchiveDateClean:=left.InputArchiveDateClean[1..8];
+                       self.P_InpArchDt:=left.P_InpArchDt[1..8];
+											 self.P_InpClnArchDt:=left.P_InpClnArchDt[1..8];
                        // self.BusInputArchiveDateClean:=left.BusInputArchiveDateClean[1..8];
 											 self:=left;
                        ));
