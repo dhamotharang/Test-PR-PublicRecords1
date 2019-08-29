@@ -1,7 +1,7 @@
 ﻿every_10_min := '*/10 0-23 * * *';
 IP:='_Control.IPAddress.edata10';
 RootDir := '/data_build_4/nac/';
-
+ 
 
 STRING ProcessRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
 STRING AlertRecipient := MOD_InternalEmailsList.fn_GetInternalRecipients('Devs&NOC','');

@@ -1,5 +1,5 @@
 ﻿import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
-
+ 
 // ------------------------------------------------------------------------------------------------
 string		gLandingZoneServer		:=	'edata10.br.seisint.com';//'edata12.br.seisint.com'					:	stored('LandingZoneServer');
 string		gLandingZonePathBase	:=	'/data_build_4/nac';//'/hds_180/nac'										:	stored('LandingZonePathBase');

@@ -1,11 +1,11 @@
 ﻿#stored('did_add_force', 'thor');
-import Nac, dops, ut;
+import Nac, dops, ut; 
 export fn_Base2_from_Base1(string version) := FUNCTION
 b1 := nac.Files().Base;
 base2 := dataset($.Superfile_List.sfNCF2Base, nac_V2.layout_Base2, thor);
 b2 := nac_v2.fn_Base1ToBase2(b1) + base2 : INDEPENDENT;
 lfn_base := Nac_V2.Superfile_List.sfBase2 + '::' + workunit;
-
+ 
 collisions := NAC_V2.Mod_Collisions2(b2).AllCollisions;
 lfn_collisions := Nac_V2.Superfile_List.sfCollisions + '::' + workunit;
 

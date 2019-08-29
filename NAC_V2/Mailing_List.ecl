@@ -1,6 +1,6 @@
 ﻿EXPORT Mailing_List(string st) := module
 
- 
+  
    	shared Dev_list1a := 'Jose.Bello@lexisnexis.com'
    										+',Charles.Pettola@lexisnexis.com'
    										+',Tony.Kirk@lexisnexis.com'
