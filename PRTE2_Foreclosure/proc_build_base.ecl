@@ -34,8 +34,27 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                                 INTFORMAT((INTEGER)pInput.property_address_zip_code_2,5,1), 
                                                 pInput.property_address_zip_code_2);
 
-    //Populate Foreclosure ID when blank																												
-      SELF.foreclosure_id								:=	IF(pInput.foreclosure_id <> '', pInput.foreclosure_id,
+   //Populate Foreclosure ID when blank			
+	 
+		SELF.foreclosure_id					 :=	IF(L.APN <> '',
+																		 STD.Str.FindReplace(TRIM(ClnAPN,LEFT,RIGHT) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', ''),
+																		 STD.Str.FindReplace('FC' + INTFORMAT(seqNum, 8, 1) + TRIM(L.buyer1_lname,LEFT,RIGHT) + TRIM(L.buyer1_fname,LEFT,RIGHT), ' ', '')		 
+	 
+	 
+		SELF.foreclosure_id					 :=	MAP(pInput.foreclosure_id <> '' => pInput.foreclosure_id,
+																				pInput.parcel_number_parcel_id <> '' and pInput.source = 'B7' 
+																						and TRIM(pInput.first_defendant_borrower_owner_last_name,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_first_name,LEFT,RIGHT) <> '' =>
+																											STD.Str.FindReplace(TRIM(pInput.parcel_number_parcel_id,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_last_name,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_first_name,LEFT,RIGHT)),
+																			  
+																				pInput.parcel_number_parcel_id <> '' and pInput.source = 'B7' 
+																						and TRIM(pInput.first_defendant_borrower_owner_last_name,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_first_name,LEFT,RIGHT) = '' =>
+																										STD.Str.FindReplace(TRIM(pInput.parcel_number_parcel_id,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_company_name,LEFT,RIGHT),
+																				
+																				pInput.parcel_number_parcel_id <> '' and pInput.source = 'I5' => 	STD.Str.FindReplace('FC' + INTFORMAT(pInput.source_rec_id, 8, 1) + TRIM(pInput.first_defendant_borrower_owner_last_name,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_first_name,LEFT,RIGHT)),
+																			  
+      
+			
+			SELF.foreclosure_id								:=	
                                                 IF(pInput.parcel_number_unmatched_id <> '',
                                                   IF(TRIM(pInput.first_defendant_borrower_owner_last_name,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_first_name,LEFT,RIGHT) <> '',
                                                       StringLib.StringFindReplace(TRIM(pInput.parcel_number_unmatched_id,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_last_name,LEFT,RIGHT) + TRIM(pInput.first_defendant_borrower_owner_first_name,LEFT,RIGHT), ' ', ''),
@@ -193,7 +212,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         SELF.name5_score    :=	if(L.name5_link_dob <> '' and L.name5_link_ssn <> '',v_clean_name5.name_score,'');
         SELF.name5_company  :=	v_plaintiff_1;
 				
-								SELF.name6_prefix   :=	'';
+				SELF.name6_prefix   :=	'';
         SELF.name6_first    :=	'';
         SELF.name6_middle   :=	'';
         SELF.name6_last	    :=	'';
@@ -202,7 +221,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         SELF.name6_company  :=	'';
 				
 				  
-				    SELF.name7_prefix   :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.title,'');
+				SELF.name7_prefix   :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.title,'');
         SELF.name7_first    :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.fname,'');
         SELF.name7_middle   :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.mname,'');
         SELF.name7_last	    :=	if(L.name7_link_dob <> '' and L.name7_link_ssn <> '',v_clean_name7.lname,'');
@@ -223,10 +242,10 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         SELF.name4_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name4.fname, v_clean_name4.lname, L.name4_link_ssn, L.name4_dob, L.cust_name);
         SELF.name4_bdid  := (string) prte2.fn_AppendFakeID.bdid(L.fourth_defendant_borrower_company_name, L.situs1.prim_range, L.situs1.prim_name,L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
 
-								SELF.name5_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name5.fname, v_clean_name5.lname, L.name5_link_ssn, L.name5_link_dob, L.cust_name);
+				SELF.name5_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name5.fname, v_clean_name5.lname, L.name5_link_ssn, L.name5_link_dob, L.cust_name);
         SELF.name5_bdid  := (string) prte2.fn_AppendFakeID.bdid(v_plaintiff_1, L.situs1.prim_range, L.situs1.prim_name,L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
 				
-				    SELF.name7_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name7.fname, v_clean_name7.lname, L.name7_link_ssn, L.name7_link_dob, L.cust_name);
+				 SELF.name7_did			:= (string) prte2.fn_AppendFakeID.did(v_clean_name7.fname, v_clean_name7.lname, L.name7_link_ssn, L.name7_link_dob, L.cust_name);
         SELF.name7_bdid  := (string) prte2.fn_AppendFakeID.bdid(v_plaintiff_2, L.situs1.prim_range, L.situs1.prim_name,L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
                    
         vLinkingIds_name1 := prte2.fn_AppendFakeID.LinkIds(L.first_defendant_borrower_company_name, L.name1_fein, L.name1_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
@@ -234,10 +253,10 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         vLinkingIds_name3 := prte2.fn_AppendFakeID.LinkIds(L.third_defendant_borrower_company_name, L.name3_fein, L.name3_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
         vLinkingIds_name4 := prte2.fn_AppendFakeID.LinkIds(L.fourth_defendant_borrower_company_name, L.name4_fein, L.name4_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
           
-								vLinkingIds_name5 := prte2.fn_AppendFakeID.LinkIds(v_plaintiff_1, L.name5_link_fein, L.name5_link_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
-								vLinkingIds_name7 := prte2.fn_AppendFakeID.LinkIds(v_plaintiff_2, L.name7_link_fein, L.name7_link_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
+				vLinkingIds_name5 := prte2.fn_AppendFakeID.LinkIds(v_plaintiff_1, L.name5_link_fein, L.name5_link_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
+				vLinkingIds_name7 := prte2.fn_AppendFakeID.LinkIds(v_plaintiff_2, L.name7_link_fein, L.name7_link_inc_date, L.situs1.prim_range, L.situs1.prim_name, L.situs1.sec_range, L.situs1.v_city_name, L.situs1.st, L.situs1.zip, L.cust_name);
         
-								SELF.name1.proxid := vLinkingIds_name1.proxid;
+				SELF.name1.proxid := vLinkingIds_name1.proxid;
         SELF.name1.seleid	:= vLinkingIds_name1.seleid;
        	SELF.name1.orgid	 := vLinkingIds_name1.orgid;
         SELF.name1.ultid  := vLinkingIds_name1.ultid;
@@ -257,12 +276,12 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
         SELF.name4.orgid  := vLinkingIds_name4.orgid;
         SELF.name4.ultid  := vLinkingIds_name4.ultid;  
 				
-								SELF.name5.proxid	:= vLinkingIds_name5.proxid;
+				SELF.name5.proxid	:= vLinkingIds_name5.proxid;
         SELF.name5.seleid	:= vLinkingIds_name5.seleid;
         SELF.name5.orgid  := vLinkingIds_name5.orgid;
         SELF.name5.ultid  := vLinkingIds_name5.ultid;    
 				
-				    SELF.name7.proxid	:= vLinkingIds_name7.proxid;
+				 SELF.name7.proxid	:= vLinkingIds_name7.proxid;
         SELF.name7.seleid	:= vLinkingIds_name7.seleid;
         SELF.name7.orgid  := vLinkingIds_name7.orgid;
         SELF.name7.ultid  := vLinkingIds_name7.ultid;   
@@ -286,12 +305,12 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
       SELF.did_score        := CHOOSE(nameCounter,(INTEGER)l.name1_did_score,(INTEGER)l.name2_did_score,(INTEGER)l.name3_did_score,(INTEGER)l.name4_did_score,(INTEGER)l.name5_did_score,(INTEGER)l.name6_did_score,(INTEGER)l.name7_did_score,(INTEGER)l.name8_did_score);
       SELF.bdid             := CHOOSE(nameCounter,(INTEGER)l.name1_bdid,(INTEGER)l.name2_bdid,(INTEGER)l.name3_bdid,(INTEGER)l.name4_bdid,(INTEGER)l.name5_bdid,(INTEGER)l.name6_bdid,(INTEGER)l.name7_bdid,(INTEGER)l.name8_bdid);
       SELF.bdid_score       := CHOOSE(nameCounter,(INTEGER)l.name1_bdid_score,(INTEGER)l.name2_bdid_score,(INTEGER)l.name3_bdid_score,(INTEGER)l.name4_bdid_score,(INTEGER)l.name5_bdid_score,(INTEGER)l.name6_bdid_score,(INTEGER)l.name7_bdid_score,(INTEGER)l.name8_bdid_score);
-						SELF.ProxID										 := CHOOSE(nameCounter,l.name1.proxid,l.name2.proxid,l.name3.proxid,l.name4.proxid,l.name5.proxid,l.name6.proxid,l.name7.proxid,l.name8.proxid);
-						SELF.SELEID											:= CHOOSE(nameCounter,l.name1.seleid,l.name2.seleid,l.name3.seleid,l.name4.seleid,l.name5.seleid,l.name6.seleid,l.name7.seleid,l.name8.seleid);
-						SELF.OrgID												:= CHOOSE(nameCounter,l.name1.orgid,l.name2.orgid,l.name3.orgid,l.name4.orgid,l.name5.orgid,l.name6.orgid,l.name7.orgid,l.name8.orgid);
-						SELF.UltID												:= CHOOSE(nameCounter,l.name1.ultid,l.name2.ultid,l.name3.ultid,l.name4.ultid,l.name5.ultid,l.name6.ultid,l.name7.ultid,l.name8.ultid);
+			SELF.ProxID						:= CHOOSE(nameCounter,l.name1.proxid,l.name2.proxid,l.name3.proxid,l.name4.proxid,l.name5.proxid,l.name6.proxid,l.name7.proxid,l.name8.proxid);
+			SELF.SELEID						:= CHOOSE(nameCounter,l.name1.seleid,l.name2.seleid,l.name3.seleid,l.name4.seleid,l.name5.seleid,l.name6.seleid,l.name7.seleid,l.name8.seleid);						
+			SELF.OrgID						:= CHOOSE(nameCounter,l.name1.orgid,l.name2.orgid,l.name3.orgid,l.name4.orgid,l.name5.orgid,l.name6.orgid,l.name7.orgid,l.name8.orgid);
+			SELF.UltID			:= CHOOSE(nameCounter,l.name1.ultid,l.name2.ultid,l.name3.ultid,l.name4.ultid,l.name5.ultid,l.name6.ultid,l.name7.ultid,l.name8.ultid);
       
-						SELF.site_prim_range 	:=l.situs1_prim_range;
+			SELF.site_prim_range 	:=l.situs1_prim_range;
       SELF.site_predir      :=l.situs1_predir;
       SELF.site_prim_name   :=l.situs1_prim_name;
       SELF.site_addr_suffix	:=l.situs1_addr_suffix;

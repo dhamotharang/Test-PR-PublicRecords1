@@ -1,6 +1,6 @@
 ﻿import _control;
 
-pversion								:= ''										;
+pversion								:= '20190823'										;
 pOverwrite							:= false												;
 pShouldPromote2QA 			:= true													;
 pShouldUpdateDOPS				:= false												;

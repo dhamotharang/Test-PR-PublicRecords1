@@ -46,8 +46,8 @@ transform
 																				);
 	self.vina_body_style_desc     	:=	if(pInput.vina_body_style_desc	<>	'',pInput.vina_body_style_desc,pInput.body_style_description);
 	//Added for CCPA-103
-	self.global_sid                 := 0;
-	self.record_sid                 := 0;
+	// self.global_sid                 := 0;
+	// self.record_sid                 := 0;
 	
 	self														:=	pInput;
 	self:= [] ; //Blank all experian new fields added to main layout

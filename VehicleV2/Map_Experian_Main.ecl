@@ -49,8 +49,8 @@ transform
 																				);
 	
 	//Added for CCPA-103
-	self.global_sid                 := 0;
-	self.record_sid                 := 0;
+	// self.global_sid                 := 0;
+	// self.record_sid                 := 0;
 	self														:=	pInput;
 end;
  
