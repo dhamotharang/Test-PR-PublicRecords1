@@ -7,4 +7,4 @@ dForeclosure := property.file_Foreclosure(TRIM(foreclosure_id, left, right) NOT 
 //Filter invalid records, dedup
 dedForeclosure := DEDUP(SORT(dForeclosure,parcel_number_parcel_id,foreclosure_id),parcel_number_parcel_id,foreclosure_id);
 
-EXPORT Key_Foreclosure_ParcelNum := INDEX(dedForeclosure,{parcel_number_parcel_id},{string70 fid := foreclosure_id},'thor_data400::key::foreclosure_parcelNum_' + doxie.Version_SuperKey);
+EXPORT Key_Foreclosure_ParcelNum := INDEX(dedForeclosure,{parcel_number_parcel_id},{string70 fid := foreclosure_id},'~thor_data400::key::foreclosure_parcelNum_' + doxie.Version_SuperKey);
