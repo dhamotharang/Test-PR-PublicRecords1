@@ -1,4 +1,4 @@
-﻿IMPORT dx_PhonesInfo, Mdr, Std, Ut;
+﻿IMPORT _control, CCPA, dx_PhonesInfo, Mdr, Std, Ut;
 
 	//DF-23660: Create Lerg6 Keybuild
 	//DF-24140: Lerg6 Layout Change
@@ -377,15 +377,22 @@
 													left.eff_date = right.eff_date and
 													left.dt_start = right.dt_start, 
 													roll(left, right), local);	
+													
+	////////////////////////////////////////////////////////////////////////////////
+	//Append Global SID
+	////////////////////////////////////////////////////////////////////////////////
+	
+	addGlobal_SID	:= CCPA.macGetGlobalSID(aggrRoll, 'PhonesMetadata', 'source', 'global_sid');
 
 	////////////////////////////////////////////////////////////////////////////////
-	//Append Record ID
-	////////////////////////////////////////////////////////////////////////////////	
-	dx_PhonesInfo.Layouts.lerg6Main addRecTr(aggrRoll l):= TRANSFORM
+	//Append Record SID
+	////////////////////////////////////////////////////////////////////////////////
+	
+	dx_PhonesInfo.Layouts.lerg6Main addRecTr(addGlobal_SID l):= TRANSFORM
 		self.record_sid					:=  hash64(mdr.sourceTools.src_Phones_Lerg6 + l.ocn + l.npa + l.nxx + l.block_id + l.switch + l.aocn + l.sha_indicator + l.status + l.eff_date + l.dt_start);
 		self 	                	:= l;
 	END;
 
-	addRecID 			:= project(aggrRoll, addRecTr(left));
+	addRecID 			:= project(addGlobal_SID, addRecTr(left));
 
 EXPORT Map_Lerg6 := addRecID;
