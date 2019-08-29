@@ -1,4 +1,4 @@
-﻿IMPORT ADDRESS, BatchServices, doxie, iesp, Inquiry_AccLogs, std, Inquiry_Services, Business_Risk_BIP, ut, RiskWise;
+﻿IMPORT ADDRESS, doxie, Inquiry_AccLogs, std, Inquiry_Services, Business_Risk_BIP, ut, RiskWise;
 /*
   This service was designed to combine the results from 4 existing services and return the combined output.
   NO SOAPCALL()s are made.
@@ -8,9 +8,7 @@
 		DidVille.Did_Service
 */
 
-EXPORT Log_Records(Inquiry_Services.Log_IParam.params in_params = MODULE(Inquiry_Services.Log_IParam.params) END) := FUNCTION
-
-doxie.MAC_Header_Field_Declare();  //this was for glb and dppa..etc.
+EXPORT Log_Records(Inquiry_Services.Log_IParam.params in_params, doxie.IDataAccess mod_access) := FUNCTION
 
 //get the industry details, Inquiry_AccLogs.CompanyID_IndustryLookup_Service
 //this has to be done prior to function description lookup because productID is needed.
@@ -75,12 +73,8 @@ end;
 ds_in_cleanAddrs := project(cleaned(uid < 9), loadCleanAddr(left));
 
 // get the did, DidVille.Did_Service
-did_out := Inquiry_Services.Log_Functions.fn_getDidVille(ds_in_cleanAddrs, 
-																										     GLB_Purpose, 
-																												 DPPA_Purpose,
+did_out := Inquiry_Services.Log_Functions.fn_getDidVille(ds_in_cleanAddrs, mod_access,
 																												 ''/*append_l*/, 
-																												 application_type_value,
-																												 industry_class_val,
 																												 ''/*verify_l*/);
 did_out_sort := sort(did_out, seq);
 
