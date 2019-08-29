@@ -1,4 +1,4 @@
-﻿IMPORT  STD, HealthcareNoMatchHeader_Ingest,wk_ut;
+﻿IMPORT  STD, HealthcareNoMatchHeader_Ingest,HealthcareNoMatchHeader_InternalLinking,Workman;
 EXPORT  MAC_AppendCRK(
     	pSrc            //  Source code for Customer ex. UUID
     , pVersion        //  Build Version ex. (STRING)STD.Date.Today();
@@ -16,14 +16,6 @@ EXPORT  MAC_AppendCRK(
   pWuSuperfile    :=  HealthcareNoMatchHeader_Ingest.Filenames(pSrc,pVersion).MasterWUOutput_SF;
   pEmailTo        :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.emailNotify;
   pPollingFreq    :=  HealthcareNoMatchHeader_InternalLinking.proc_Constants.pollingFreq;
-  pSetResults     := [ 'PreClusterCount PreClusterCount.nomatch_id'        
-                      ,'PostClusterCount PostClusterCount.nomatch_id'       
-                      ,'MatchesPerformed'      
-                      ,'BasicMatchesPerformed'
-                      ,'SlicesPerformed'
-                     ];
-  pStopCondition        :=  '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
-  pSetNameCalculations  :=  ['Convergence_PCT','Convergence_Threshold'];
 
   //  Common Workman ECL Code
   workmanPreamble(STRING runText)  :=  FUNCTION
@@ -38,6 +30,19 @@ EXPORT  MAC_AppendCRK(
   END;
 
   // One Ingest and Specificities Iteration
+
+  pIngestSetResults :=  [ 'CountOld UpdateStatsXtab[1].cnt_old'
+                          ,'CountUnchanged UpdateStatsXtab[1].cnt_unchanged'
+                          ,'CountUpdated UpdateStatsXtab[1].cnt_updated'
+                          ,'CountNew UpdateStatsXtab[1].cnt_new'
+                          ,'PercentTotalOld UpdateStatsXtab[1].pct_tot_old'
+                          ,'PercentTotalUnchanged UpdateStatsXtab[1].pct_tot_unchanged'
+                          ,'PercentTotalUpdated UpdateStatsXtab[1].pct_tot_updated'
+                          ,'PercentTotalNew UpdateStatsXtab[1].pct_tot_new'
+                          ,'PercentIngestUnchanged UpdateStatsXtab[1].pct_ingest_unchanged'
+                          ,'PercentIngestUpdated UpdateStatsXtab[1].pct_ingest_updated'
+                          ,'PercentIngestNew UpdateStatsXtab[1].pct_ingest_new'
+                        ];
   runIngest_Text  :=  'NoMatchIngest';
   runIngest_ECL   :=  workmanPreamble(runIngest_Text)+
                       '\nHealthcareNoMatchHeader_InternalLinking.proc_build_all(pSrc,pVersion,pIteration'+
@@ -48,23 +53,23 @@ EXPORT  MAC_AppendCRK(
                       ',doAppendCRK:=FALSE'+
                       ').All;';
   pRunIngest      :=  Workman.mac_WorkMan(
-                        runIngest_ECL   //  pECL
-                        ,pVersion       //  pversion
-                        ,pPrimaryQueue  //  pcluster
+                        runIngest_ECL       //  pECL
+                        ,pVersion           //  pversion
+                        ,pPrimaryQueue      //  pcluster
                         , //  pStartIteration       = '1'
                         , //  pNumMaxIterations     = '1'
                         , //  pNumMinIterations     = ''
                         ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIngest_Text) //  pOutputFilename
-                        ,pWuSuperfile   //  pOutputSuperfile
-                        , //  pSetResults           = '[]'
+                        ,pWuSuperfile       //  pOutputSuperfile
+                        ,pIngestSetResults  //  pSetResults
                         , //  pStopCondition        = '\'\''
                         , //  pSetNameCalculations  = '[]'
-                        ,runIngest_Text //  pBuildName
+                        ,runIngest_Text     //  pBuildName
                         , //  pESP                  = 'WorkMan._Config.LocalEsp'
-                        ,pEmailTo       //  pNotifyEmails
+                        ,pEmailTo           //  pNotifyEmails
                         , //  pFailureEmails        = ''
                         , //  pShouldEmail          = 'true'
-                        ,pPollingFreq   //  pPollingFrequency
+                        ,pPollingFreq       //  pPollingFrequency
                         , //  pForceRun             = 'false' 
                         , //  pForceSkip            = 'false' 
                         , //  pCleanupSuper         = 'false'
@@ -75,6 +80,14 @@ EXPORT  MAC_AppendCRK(
                       );
 
   // Internal Linking Iterations
+  pIterationSetResults          :=  [ 'PreClusterCount PreClusterCount.nomatch_id'        
+                                      ,'PostClusterCount PostClusterCount.nomatch_id'       
+                                      ,'MatchesPerformed'      
+                                      ,'BasicMatchesPerformed'
+                                      ,'SlicesPerformed'
+                                    ];
+  pIterationStopCondition       :=  '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
+  pIterationSetNameCalculations :=  ['Convergence_PCT','Convergence_Threshold'];
   runIteration_Text :=  'InternalLinking';
   runIteration_ECL  :=  workmanPreamble(runIteration_Text) +
                         '\nHealthcareNoMatchHeader_InternalLinking.proc_build_all(pSrc,pVersion,pIteration'+
@@ -85,23 +98,23 @@ EXPORT  MAC_AppendCRK(
                         ',doAppendCRK:=FALSE'+
                         ').All;';
   pRunIterations    :=  Workman.mac_WorkMan(
-                        runIteration_ECL      //  pECL
-                        ,pVersion             //  pversion
-                        ,pPrimaryQueue        //  pcluster
+                        runIteration_ECL                //  pECL
+                        ,pVersion                       //  pversion
+                        ,pPrimaryQueue                  //  pcluster
                         , //  pStartIteration       = '1'
-                        ,pMaxNumIter          //  pNumMaxIterations
+                        ,pMaxNumIter                    //  pNumMaxIterations
                         , //  pNumMinIterations     = ''
                         ,pWuPrefix + 'workunit_history::HealthcareNotMatchHeader.iterations.' + trim(runIteration_Text) //  pOutputFilename  :=  
-                        ,pWuSuperfile         //  pOutputSuperfile
-                        ,pSetResults          //  pSetResults
-                        ,pStopCondition       //  pStopCondition
-                        ,pSetNameCalculations //  pSetNameCalculations
-                        ,runIteration_Text    //  pBuildName
+                        ,pWuSuperfile                   //  pOutputSuperfile
+                        ,pIterationSetResults           //  pSetResults
+                        ,pIterationStopCondition        //  pStopCondition
+                        ,pIterationSetNameCalculations  //  pSetNameCalculations
+                        ,runIteration_Text              //  pBuildName
                         , //  pESP                  = 'WorkMan._Config.LocalEsp'
-                        ,pEmailTo             //  pNotifyEmails
+                        ,pEmailTo                       //  pNotifyEmails
                         , //  pFailureEmails        = ''
                         , //  pShouldEmail          = 'true'
-                        ,pPollingFreq         //  pPollingFrequency
+                        ,pPollingFreq                   //  pPollingFrequency
                         , //  pForceRun             = 'false' 
                         , //  pForceSkip            = 'false' 
                         , //  pCleanupSuper         = 'false'
