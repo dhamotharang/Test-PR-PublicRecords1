@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, BIPV2, BIPV2_Build, BankruptcyV3, DeathV2_Services, LiensV2, 
+﻿IMPORT BIPV2, BankruptcyV3, DeathV2_Services, doxie, LiensV2, 
        iesp, LN_PropertyV2, MDR, Property, Suppress, UCCV2, UCCV2_Services, VehicleV2, Watercraft;
 
 EXPORT AssociateSection := MODULE;
@@ -7,8 +7,9 @@ EXPORT AssociateSection := MODULE;
  export fn_FullView(
    dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids_wacctno
 	 ,TopBusiness_Services.Layouts.rec_input_options in_options
-	 ,AutoStandardI.DataRestrictionI.params in_mod
+	 ,doxie.IDataAccess mod_access
                    ):= function 
+  
 
 	FETCH_LEVEL := in_options.BusinessReportFetchLevel;
 
@@ -323,7 +324,7 @@ EXPORT AssociateSection := MODULE;
 
   // Next join the vehicle linkids keyrecs to the vehicle party plus linkids key to get all 
 	// the "party" data for the vehicle_key/iteration_key(s?) involved to output on the report.
-  ds_mvr_linkids_keyrecs_plusparty :=
+  ds_mvr_linkids_keyrecs_plusparty_pre :=
 	                   join(ds_mvr_linkids_keyrecs_deduped,
 	                        VehicleV2.Key_Vehicle_Party_Key, 
 		                         keyed(left.vehicle_key   = right.vehicle_key   and
@@ -357,7 +358,7 @@ EXPORT AssociateSection := MODULE;
                              //keep(TopBusiness_Services.Constants.liens_max_party_recs)); //from bip1??? only keep 100 recs
 		                         limit(10000,skip) //chg to use constants.???
 														);
-
+  ds_mvr_linkids_keyrecs_plusparty := suppress.mac_suppressSource(ds_mvr_linkids_keyrecs_plusparty_pre,mod_access,append_did);
 	// Might have party recs with some duplicate info, so sort/dedup to remove any duplicates.
 	// Keep recs with address info as opposed to those without.???
 	ds_mvr_linkids_keyrecs_plusparty_dd := dedup(sort(ds_mvr_linkids_keyrecs_plusparty,
@@ -1618,17 +1619,12 @@ EXPORT AssociateSection := MODULE;
 	                       ds_all_common_child_top100_bp(associate_type = Constants.PERSON);
 
 
-	// Set the "ssn_mask_value" field that is used in 2(???) places.
-  string6 ssn_mask_value := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(
-                            project(AutoStandardI.GlobalModule(),
-                                    AutoStandardI.InterfaceTranslator.ssn_mask_val.params));   
-
   // Fill in is_deceased indicator here for only person associate records.
   ds_dids_deceased := DeathV2_Services.raw.get_report.FROM_DIDS(
 	                       project(ds_all_common_child_top100_per,
 			                           transform({unsigned6 did},
 																   self.did := (unsigned6) left.did)),
-											   ssn_mask_value);
+											   mod_access.ssn_mask);
 
   ds_all_common_child_top100_per_decind := join(ds_all_common_child_top100_per,
 	                                              ds_dids_deceased,
@@ -1641,7 +1637,7 @@ EXPORT AssociateSection := MODULE;
 
   // Mask any SSNs on the party records.
 	Suppress.MAC_Mask(ds_all_common_child_top100_per_decind,
-	                  ds_all_common_child_top100_per_masked, ssn, blank, true, false);
+	                  ds_all_common_child_top100_per_masked, ssn, blank, true, false, , , ,mod_access.ssn_mask);
 
 
   // Fill in has_derog indicator here for only person associate records.

@@ -1,4 +1,4 @@
-﻿IMPORT Address, AutoStandardI, TopBusiness_Services, iesp, bipv2;
+﻿IMPORT Address, AutoStandardI, doxie, TopBusiness_Services, iesp, bipv2;
 
 EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod , 
 													 DATASET(TopBusiness_Services.Layouts.rec_busHeaderLayout) ds_busheaderRecs,
@@ -19,7 +19,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 	
 	in_options 					:= ROW(xform_topbusiness_options());
 	in_topbusiness_mod	:= MODULE(PROJECT(inmod, AutoStandardI.DataRestrictionI.params, OPT)) END;	
-	
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
      
 	add_best := TopBusiness_Services.BestSection.fn_fullView(	in_topbusiness_ds, 
 																														PROJECT(DATASET(in_options),TRANSFORM(TopBusiness_Services.BestSection_Layouts.rec_OptionsLayout, self := left, self := []))[1],
@@ -108,7 +108,7 @@ EXPORT TopBusinessRecs_Raw(BusinessCredit_Services.Iparam.reportrecords inmod ,
 																																	
 	add_motorvehicle:= TopBusiness_Services.MotorVehicleSection.fn_fullView(in_topbusiness_ds,
 																																					PROJECT(DATASET(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-																																					in_topbusiness_mod,
+																																					mod_access,
                                                                           iesp.Constants.BusinessCredit.MAX_COUNT_BIZRPT_SRCDOC_RECORDS);
 		
 	add_watercraft 	:= TopBusiness_Services.WatercraftSection.fn_fullView(in_topbusiness_ds,

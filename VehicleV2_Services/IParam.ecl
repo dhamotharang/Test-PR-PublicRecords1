@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, AutoHeaderI, AutoKeyI, iesp, VehicleV2_Services, BatchShare;
+﻿IMPORT AutoStandardI, AutoHeaderI, AutoKeyI, iesp, VehicleV2_Services, BatchShare;
 
 EXPORT IParam := MODULE
 	
@@ -45,7 +45,23 @@ EXPORT IParam := MODULE
     EXPORT string5 	industryclass := mod_access.industry_class;
     EXPORT unsigned2 penalty_threshold := mod_access.penalty_threshold;
     EXPORT boolean restrictpreglb := false; //?
-  ENDMACRO;        
+  ENDMACRO;
+  
+    // Temporary, until search & record Params  interface is made compatible with doxie/IDataAccess
+  EXPORT MAC_CopyComplianceValuesFromLegacy (mod) := MACRO 
+    EXPORT unsigned1 unrestricted := 0 | IF (mod.AllowGLB, doxie.compliance.ALLOW.GLB, 0)
+                                       | IF (mod.AllowDPPA, doxie.compliance.ALLOW.DPPA, 0)
+                                       | IF (mod.AllowALL, doxie.compliance.ALLOW.ALL, 0);
+    EXPORT unsigned1 glb := mod.GLBPurpose;
+    EXPORT unsigned1 dppa := mod.DPPAPurpose;
+    EXPORT string DataPermissionMask := mod.DataPermissionMask;
+    //EXPORT boolean ln_branded := mod.lnbranded;
+    EXPORT string5 industry_class := mod.IndustryClass;
+    EXPORT string32 application_type := mod.ApplicationType;
+    EXPORT boolean show_minors := mod.IncludeMinors;
+    EXPORT unsigned1 mask_dl := IF (mod.dl_mask, 1, 0);
+  ENDMACRO;
+
 
 	SHARED baseSearchParams :=  interface(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
 							AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,AutoKeyIdsParams)					
