@@ -1,4 +1,4 @@
-IMPORT doxie, ut, iesp, Suppress, header, AutoStandardI, DeathV2_Services, dx_header, Header;
+IMPORT doxie, ut, iesp, Suppress, header, DeathV2_Services, dx_death_master, dx_header, Header;
 
 export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp, 
 	                      DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo,
@@ -107,31 +107,26 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
                            AddIssuance(left,right),
                            left outer, KEEP (1), limit (0)); //m:1 relation
 
-    AddressReport_Services.layouts.resident_layout GetDead (res_w_issuance L, doxie.key_death_masterV2_ssa_DID R):=transform
+    death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+    res_w_d_appended := dx_death_master.Append.byDid(res_w_issuance, did, death_params);
+    
+    AddressReport_Services.layouts.resident_layout GetDead (res_w_d_appended L):=transform
       // we prefer DOB from header, if valid for the purpose 
       DOB := L.Identity.DOB;
       left_dob := (string4) DOB.year + intformat (DOB.month, 2, 1) + intformat (DOB.day, 2, 1);
-      d_birth := (unsigned) if (DOB.year != 0 and DOB.month != 0, left_dob, r.dob8);
-      d_death := (unsigned) r.dod8;
-      Self.Identity.DOD := iesp.ECL2ESP.toDatestring8 (r.dod8);
-      Self.Identity.DeathVerificationCode := r.vorp_code; //death_code in header index
+      d_birth := (unsigned) if (DOB.year != 0 and DOB.month != 0, left_dob, L.death.dob8);
+      d_death := (unsigned) L.death.dod8;
+      Self.Identity.DOD := iesp.ECL2ESP.toDatestring8 (L.death.dod8);
+      Self.Identity.DeathVerificationCode := L.death.vorp_code; //death_code in header index
       Self.Identity.AgeAtDeath := if (d_death = 0 or L.Identity.age = 0, 0, ut.Age (d_birth, d_death));
-      Self.Identity.DeathCounty := R.county_name;
-      Self.Identity.DeathState := R.state;
-			self.Identity.Deceased := if (r.l_did != 0  , 'Y','N');
+      Self.Identity.DeathCounty := L.death.county_name;
+      Self.Identity.DeathState := L.death.state;
+      Self.Identity.Deceased := if (L.death.is_deceased, 'Y','N');
       Self.Identity := L.Identity;
       Self.is_best := L.is_best;
       Self := L; //all the other fields which unfortunately has defaults in the layout definition
     END;
-		
-    deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
-		
-    res_w_d_pre := JOIN (res_w_issuance, doxie.key_death_masterV2_ssa_DID, 
-                         keyed (Left.did = Right.l_did) 
-												  and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-                         GetDead (Left, Right),
-                         left outer, keep (1), limit (0));
-
+		res_w_d_pre := project(res_w_d_appended, GetDead(left));
 
     res_w_d_info_nonmasked := dedup (sort (res_w_d_pre, did, ~is_best, record, if (Identity.DeathVerificationCode<>'',0,1)),
                                     did, record, except Identity.DOD.year, Identity.DOD.month, Identity.DOD.day, Identity.DeathVerificationCode);

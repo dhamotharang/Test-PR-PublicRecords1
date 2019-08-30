@@ -1,4 +1,4 @@
-import AddrBest, Advo, USAA, DriversV2, doxie, AutoStandardI, Suppress, ut, Autokey_batch, BatchServices, 
+import AddrBest, Advo, USAA, DriversV2, doxie, dx_death_master, AutoStandardI, Suppress, ut, Autokey_batch, BatchServices, 
        DriversV2_Services, DeathV2_Services;
 
 EXPORT functions := MODULE
@@ -100,25 +100,23 @@ EXPORT functions := MODULE
     OutRecs := join(ds_in, dls_found_deduped, left.did = right.did, loadDls(left,right), LEFT OUTER, LIMIT(0), KEEP(1));
 	  RETURN OutRecs;
 	END;
-	//***************************************************************************
-	EXPORT addrBest.Layout_BestAddr.batch_Out_both_wp_did fn_addDeceased(DATASET(addrBest.Layout_BestAddr.batch_Out_both_wp_did) ds_in) := FUNCTION
-		
-		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-		
-    key_dead := doxie.key_death_masterV2_ssa_DID ;
-		ds_in  loadDead(ds_in l, key_dead r) := transform
-			self.dod := r.dod8;
-			self.deceased := if ( r.l_did != 0 ,'Y','N');
-			self := l;
-		end;
-    OutRecs := join(ds_in, key_dead, keyed(left.did=right.l_did)
-											and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, 
-											deathparams.isValidGlb(left.subj_phone_type_new in AddrBest.Constants.RNAset or left.did <> left.p_did),	//true is not the subject, false is the subject 
-											deathparams),
-											loadDead(left, right), LEFT OUTER, LIMIT(0), KEEP(1));
-    RETURN OutRecs;
-  END;
 	
+  //***************************************************************************
+  EXPORT addrBest.Layout_BestAddr.batch_Out_both_wp_did fn_addDeceased(DATASET(addrBest.Layout_BestAddr.batch_Out_both_wp_did) ds_in) := FUNCTION
+    
+    death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+    ds_in_with_death := dx_death_master.Append.byDid(ds_in, did, death_params, /*skip_glb_check=*/TRUE);
+    out_recs := project(ds_in_with_death, transform(addrBest.Layout_BestAddr.batch_Out_both_wp_did,
+      glb_ok := death_params.isValidGlb(left.subj_phone_type_new in AddrBest.Constants.RNAset 
+        or left.did <> left.p_did); // true is not the subject, false is the subject
+      is_deceased := left.death.is_deceased AND (glb_ok OR left.death.glb_flag <> 'Y');
+      self.dod := if (is_deceased, left.death.dod8, '');
+      self.deceased := if (is_deceased, 'Y', 'N');
+      self := left;
+    ));
+    return out_recs;
+  END;
+
 	/* ----------------  function for adding additional optional flags  -----------------  */
 	
 	EXPORT AddrBest.Layout_BestAddr.batch_out_final fn_add_optional_data(dataset(AddrBest.Layout_BestAddr.Batch_out_matchcodes) in_ds,

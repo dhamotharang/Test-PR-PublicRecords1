@@ -1,29 +1,27 @@
-import corp2, doxie, doxie_cbrs, doxie_raw, gong, AutoStandardI, DeathV2_Services,
+import corp2, doxie, doxie_cbrs, doxie_raw, dx_death_master, gong, AutoStandardI, DeathV2_Services,
  Address, Risk_Indicators, WorkPlace_Services, Business_Header, Header;
 
 export WorkPlace_Functions := module
 
 // using shared data-access module until it is passed in
 shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-shared deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
-shared glb_ok := deathparams.isValidGlb();
+shared death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+shared glb_ok := death_params.isValidGlb();
 
 	// This function returns the spouse did  
-	export getSpouseDID(dataset(doxie.layout_references) dids) := FUNCTION
+	shared getSpouseDID(dataset(doxie.layout_references) dids) := FUNCTION
 		
 		// get did for all possible relatives.
     // Note: now this call is using input permission values; before, defaults were used (dppa=glb=date_threshold=0, ln_branded=false)
-		relativesDid := Doxie_Raw.relative_raw(dids, mod_access);
+		relatives_did := Doxie_Raw.relative_raw(dids, mod_access);
 		
-		// this just removes the deceased
-		liveRelDids := join(relativesDid(depth=1), doxie.key_death_masterV2_ssa_DID,
-														keyed(left.person2 = right.l_did)
-														and not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-														transform({doxie.layout_references,unsigned1 titleNo}, self.did := left.person2, self.titleNo := left.TitleNo),
-														left only);
+    live_relatives_did := project(dx_death_master.Exclude(relatives_did(depth=1), person2, death_params), 
+      transform({doxie.layout_references,unsigned1 titleNo}, 
+        self.did := left.person2, self.titleNo := left.TitleNo;
+      ));
 														
-		spousesDid := liveRelDids(titleNo in Header.relative_titles.set_Spouse);		
-		RETURN spousesDid;
+		spouses_did := live_relatives_did(titleNo in Header.relative_titles.set_Spouse);		
+		RETURN spouses_did;
 	END;
 
 	// This function returns spouse did in a batch format.
