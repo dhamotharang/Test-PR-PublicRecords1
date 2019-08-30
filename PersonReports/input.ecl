@@ -52,34 +52,8 @@ EXPORT input := MODULE
     export integer1 non_subject_suppression := suppress.Constants.NonSubjectSuppression.doNothing;
 	end;
 
-  // everything required for fetching best records
-  export _best := INTERFACE
-    export unsigned1 GLBPurpose := 0;
-    export unsigned1 DPPAPurpose := 0; // not needed, actually
-    export boolean best_include_ssnissuance := false;
-    export boolean best_include_dodinfo := false; // for the future needs
-    export string6 ssn_mask := ''; // in doxie version "doSuppress" name is used for masking
-    export boolean best_append_timezone := false;
-    export boolean use_blankkey := true;
-  end;
-
-  // there's implicit inheritance of a type:
-  // export _name := INTERFACE (AutoStandardI.InterfaceTranslator.fname_val.params,
-                             // AutoStandardI.InterfaceTranslator.mname_val.params,
-                             // AutoStandardI.InterfaceTranslator.lname_val.params)
-  export _name := INTERFACE
-    // unfortunately can't use something like
-    // export typeof (AutoStandardI.InterfaceTranslator.fname_val.params.firstname) firstname;
-    export string30 _fname := '';
-    export string30 _mname := '';
-    export string30 _lname := '';
-  end;
-
   /////////////// STAND ALONE (SINGLE SOURCE)  ///////////////
   export accidents := INTERFACE (Accident_Services.IParam.searchRecords)
-  end;
-
-  export aircrafts := INTERFACE (_report)
   end;
 
   export ccw := INTERFACE (_report)
@@ -101,9 +75,6 @@ EXPORT input := MODULE
   export dl := INTERFACE
     // defines whether Certegy data will be used in addition to the Government+Experian
     export boolean use_nonDMVSources := false;
-  end;
-
-  export emails := INTERFACE (_report)
   end;
 
   export faacerts := INTERFACE (_report)
@@ -289,14 +260,5 @@ EXPORT input := MODULE
     EXPORT boolean smart_rollup := mod_new.smart_rollup;
     EXPORT integer1 non_subject_suppression := mod_new.non_subject_suppression;
   ENDMACRO;    
-
-  EXPORT getCompatibleModuleEmail (in_mod) := FUNCTIONMACRO
-    IMPORT PersonReports;
-    mod_email := MODULE (PersonReports.input.emails)
-      // email has only standard report-interface fields
-      PersonReports.input.mac_copy_report_fields (in_mod);
-    END;
-    RETURN mod_email;
-  ENDMACRO;
 
 END;

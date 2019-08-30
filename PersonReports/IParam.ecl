@@ -28,6 +28,8 @@ EXPORT IParam := MODULE
 
 
   /////////////// STAND ALONE (SINGLE SOURCE)  ///////////////
+  EXPORT aircrafts := INTERFACE (_report, doxie.IDataAccess)
+  END;
 
   EXPORT bankruptcy := INTERFACE (_report)
     EXPORT string1 bk_party_type := 'D'; //enforces to return records with subject as Debtor only
@@ -45,6 +47,9 @@ EXPORT IParam := MODULE
   EXPORT dl := INTERFACE
     // defines whether Certegy data will be used in addition to the Government+Experian
     EXPORT boolean use_nonDMVSources := FALSE;
+  END;
+
+  EXPORT emails := INTERFACE (doxie.IDataAccess)
   END;
 
   EXPORT liens := INTERFACE
