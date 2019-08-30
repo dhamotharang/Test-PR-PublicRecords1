@@ -247,7 +247,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
 	
 	EXPORT acRecsByDid(Ioptions in_mod):= FUNCTION
-      ac_mod  := module (project (in_mod, PersonReports.input.aircrafts, opt)) end;
+      ac_mod  := module (PersonReports.IParam.aircrafts)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      end;
+
       ac_raw  := PersonReports.aircraft_records(in_did,ac_mod);
       ac_sorted := sort(ac_raw, aircraftnumber, -d2i(datelastseen));
       ac_duped  := dedup(ac_sorted, aircraftnumber);

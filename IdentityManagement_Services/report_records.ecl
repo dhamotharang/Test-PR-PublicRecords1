@@ -156,8 +156,7 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagemen
 // =======================================================================
 // ========================   Emails	 ===================================
 // =======================================================================
-			tmpMod := PersonReports.input.getCompatibleModuleEmail (in_params);
-			EXPORT emails := PersonReports.email_records(dids,tmpMod);
+			EXPORT emails := PersonReports.email_records(dids, PROJECT(in_params, PersonReports.IParam.emails));
 
 // =======================================================================
 // =====================  Vehicle From Gateways	 =========================
