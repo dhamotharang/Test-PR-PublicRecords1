@@ -1,4 +1,5 @@
-﻿import _Control, risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
+﻿import _Control, risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,
+       dx_header, data_services;
 onThor := _Control.Environment.OnThor;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -12,7 +13,9 @@ export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsig
 							unsigned3 LastSeenThreshold = iid_constants.oneyear,
 							unsigned8 BSOptions=0
 	) := function
-	
+
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+
 
 ExactFirstNameRequired := ExactMatchLevel[iid_constants.posExactFirstNameMatch]=iid_constants.sTrue;
 ExactLastNameRequired := ExactMatchLevel[iid_constants.posExactLastNameMatch]=iid_constants.sTrue;
@@ -36,7 +39,7 @@ FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens)
 FilterVoter := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterVoter) > 0;
 
 // only use this variable in realtime mode to simulate the header build date rather than todays date
-dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
+dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
 max_last_seen := (string) dk[1].max_date_last_seen;
 hdrBuildDate01 := max_last_seen[1..6]+'01';
 header_build_date := (unsigned)(max_last_seen[1..6]);
@@ -152,8 +155,8 @@ header_corr_thor := if(isFCRA,group( JOIN(distribute(g_inrec(did<>0), hash64(did
 	header_corr := header_corr_roxie;
 #END
 																		
-// get full header	
-header_key := if(isFCRA, doxie.key_fcra_header, doxie.key_header);
+// get full header
+header_key := dx_header.key_header(iType);
 
 Layout_Header_Data get_j_pre(g_inrec le, header_key ri) := TRANSFORM
 	self.seq := le.seq; 
