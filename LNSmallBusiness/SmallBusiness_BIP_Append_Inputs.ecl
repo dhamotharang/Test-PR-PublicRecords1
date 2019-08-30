@@ -1,4 +1,4 @@
-﻿IMPORT Address, AutoKeyI, BIPV2, BIPV2_Best, Business_Risk_BIP, Doxie;
+﻿IMPORT Address, BIPV2, BIPV2_Best, Business_Risk_BIP, Doxie, AutoStandardI, LNSmallBusiness;
 
 // Will need to pass in some additional input params
 EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.InputWSeq) Input,
@@ -48,7 +48,11 @@ EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.Inpu
 
       ds_SBA_InputFromSeleID := JOIN(Input_with_LinkIDs, ds_best, LEFT.seq=RIGHT.uniqueid, 
           TRANSFORM( LNSmallBusiness.BIP_Layouts.Inputwseq,
-                     UseBest := LEFT.SeleID <> 0;
+                    UseBest := LEFT.SeleID <> 0 AND (LEFT.Bus_Company_Name = '' 
+																											AND LEFT.Bus_Street_Address1 = ''
+																											AND LEFT.Bus_City = ''
+																											AND LEFT.Bus_State = ''
+																											AND LEFT.Bus_Zip = '');
                      SELF.Bus_Phone10         := IF(UseBest,(STRING10)RIGHT.Company_phone[1].company_phone, LEFT.Bus_Phone10);
                      SELF.Bus_Company_Name    := IF(UseBest,RIGHT.Company_name[1].Company_Name, LEFT.Bus_Company_Name);   
                      SELF.Bus_Street_Address1 := IF(UseBest,(STRING120)Address.Addr1FromComponents(RIGHT.company_address[1].company_prim_range,
