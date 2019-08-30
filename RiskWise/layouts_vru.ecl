@@ -1,4 +1,4 @@
-import Risk_Indicators, Doxie;
+import Risk_Indicators, dx_header;
 
 EXPORT layouts_vru := MODULE
 
@@ -79,7 +79,7 @@ EXPORT layouts_vru := MODULE
 
 // if you add fields to this layout, also add the same fields to FCRA.Layout_Override_Header
 	EXPORT Layout_Header_Data := RECORD
-		recordof(doxie.Key_fcra_Header);
+		dx_header.layout_key_header;
 		Risk_Indicators.Layouts.Layout_Addr_Flags2 Addr_Flags;
 		string2 high_risk_address_source;
 		string50 high_risk_address_description; 

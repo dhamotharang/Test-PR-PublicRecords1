@@ -1,5 +1,5 @@
 ﻿import _Control, doxie, ut, mdr, header, drivers, census_data, riskwise, VotersV2, 
-	models, AID_Build, risk_indicators;
+	models, AID_Build, risk_indicators, dx_header, data_services;
 onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_FCRA_Neutral_Function(grouped DATASET(risk_indicators.Layout_output) iid,
@@ -644,15 +644,16 @@ wDwell_rawaid := project(RawAid_addrHist, getDwell(left));
 wDwell := if(BSversion>1, wDwell_rawaid, p);										
 										
 // Get apartment count for boca shell 3
-relrec addAptCount(wDwell le, header.Key_AptBuildings ri) := transform
+useExperianFCRA := isFCRA AND DataRestriction[Risk_Indicators.iid_constants.posExperianFCRARestriction]=Risk_Indicators.iid_constants.sFalse;	// if not restricted then use EN
+iType := data_services.data_env.iFCRA;
+key_apt_buildings := IF (useExperianFCRA, dx_header.key_AptBuildings_EN(), dx_header.key_AptBuildings(iType));
+
+relrec addAptCount(wDwell le, key_apt_buildings ri) := transform
 	SELF.Address_Verification.Input_Address_Information.unit_count := ri.apt_cnt;
 	SELF := le;
 end;
-useExperianFCRA := DataRestriction[Risk_Indicators.iid_constants.posExperianFCRARestriction]=Risk_Indicators.iid_constants.sFalse;	// if not restricted then use EN
 
-AptBuilding_Key := if(isFCRA, If(useExperianFCRA, doxie.Key_FCRA_EN_AptBuildings, doxie.Key_FCRA_AptBuildings), header.Key_AptBuildings);
-
-wAptCount_roxie := group(sort(join(wDwell, AptBuilding_Key,	
+wAptCount_roxie := group(sort(join(wDwell, key_apt_buildings,	
 								trim(left.shell_input.prim_name)<>'' and
 								keyed(left.shell_input.prim_range=right.prim_range) and 
 								keyed(left.shell_input.prim_name=right.prim_name) and
@@ -662,7 +663,7 @@ wAptCount_roxie := group(sort(join(wDwell, AptBuilding_Key,
 								addAptCount(left,right), left outer, atmost(riskwise.max_atmost), keep(1)),seq),seq);
 
 wAptCount_thor_addr := join(distribute(wDwell(trim(shell_input.prim_name)<>''), hash64(shell_input.prim_range, shell_input.prim_name, shell_input.z5)), 
-								distribute(pull(AptBuilding_Key), hash64(prim_range, prim_name,zip)),	
+								distribute(pull(key_apt_buildings), hash64(prim_range, prim_name,zip)),	
 								(left.shell_input.prim_range=right.prim_range) and 
 								(left.shell_input.prim_name=right.prim_name) and
 								(left.shell_input.z5=right.zip) and 
@@ -805,7 +806,7 @@ relatives_slim := record
 	unsigned1 relative_bureau_only_count_created_6months;
 end;
 																									
-ds_max := choosen(doxie.key_max_dt_last_seen, 1);
+ds_max := choosen(dx_header.key_max_dt_last_seen(), 1);
 hdr_max_dt_last_seen := if(isFCRA, '0', ((string)ds_max[1].max_date_last_seen)[1..6]+'01' );
 // this is the same as iid_constants.myGetDate with the exception of using hdr_max_dt_last_seen instead of ut.GetDate
 relative_myGetDate(unsigned3 history_date) := IF(history_date=999999,
@@ -813,7 +814,8 @@ relative_myGetDate(unsigned3 history_date) := IF(history_date=999999,
 																									min(hdr_max_dt_last_seen, risk_indicators.iid_constants.full_history_date(history_date) )
 																									);																							
 relativeDaysApart(string8 full_history_date, string8 d2) := ut.DaysApart(full_history_date,d2) <= 62 OR (unsigned)d2 >= (unsigned)full_history_date;	
-relatives_slim get_relat_info(pre_relatives le, doxie.Key_Header ri) :=
+index_header := dx_header.key_header();
+relatives_slim get_relat_info(pre_relatives le, index_header ri) :=
 TRANSFORM
 	dt := MAP(ri.dt_last_seen<>0 => ri.dt_last_seen, 
 						ri.dt_vendor_last_reported<>0 => ri.dt_vendor_last_reported,
@@ -835,7 +837,7 @@ TRANSFORM
 END;
 
 			
-idheader1_roxie :=  JOIN(pre_relatives(isrelat), doxie.Key_Header, 
+idheader1_roxie :=  JOIN(pre_relatives(isrelat), index_header, 
 														keyed(LEFT.did=RIGHT.s_did) AND
 														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < left.historydate AND
@@ -846,13 +848,13 @@ idheader1_roxie :=  JOIN(pre_relatives(isrelat), doxie.Key_Header,
 																								 RIGHT.src, 
 																								 DataRestriction) OR glb_ok) AND
 														(~mdr.Source_is_DPPA(RIGHT.src) OR
-															(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+															(dppa_ok AND drivers.state_dppa_ok(dx_header.Functions.translateSource (RIGHT.src),dppa,RIGHT.src))) AND
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
 														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID));
 
 idheader1_thor :=  group(sort(JOIN(distribute(pre_relatives(isrelat), hash64(did)), 
-														distribute(pull(doxie.Key_Header), hash64(s_did)), 
+														distribute(pull(index_header), hash64(s_did)), 
 														LEFT.did=RIGHT.s_did AND
 														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
 														RIGHT.dt_first_seen < left.historydate AND
@@ -863,7 +865,7 @@ idheader1_thor :=  group(sort(JOIN(distribute(pre_relatives(isrelat), hash64(did
 																								 RIGHT.src, 
 																								 DataRestriction) OR glb_ok) AND
 														(~mdr.Source_is_DPPA(RIGHT.src) OR
-															(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+															(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
 														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID), LOCAL),seq),seq);

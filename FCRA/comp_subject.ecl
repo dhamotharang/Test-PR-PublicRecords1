@@ -1,12 +1,15 @@
-﻿import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
+﻿import fcra, doxie, dx_header, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, 
+       NID, header, FFD, data_services;
 
 doxie.MAC_Selection_Declare() //Include_AKAs_val, Include_Imposters_val
 
 rec_header := RECORD
-	recordof(doxie.Key_fcra_Header);
-	FFD.Layouts.CommonRawRecordElements;
+  dx_header.layout_key_header;
+  FFD.Layouts.CommonRawRecordElements;
 END;
 MAX_OVERRIDE_LIMIT := 1000;		
+
+unsigned1 iType := data_services.data_env.iFCRA;
 
 // Returns a CRS-style information for the subject; FCRA-side only.
 export comp_subject(dataset(doxie.layout_references) dids,
@@ -386,7 +389,7 @@ ssn_info := doxie_crs.layout_ssn_records;
 
 // check if SSN was seen before randomization:
 // TODO: making it after validation may be more efficient
-ssn_w_legacy_info := join (find_rels, doxie.Key_FCRA_legacy_ssn,
+ssn_w_legacy_info := join (find_rels, dx_Header.key_legacy_ssn(iType),
                            keyed (Left.ssn = Right.ssn) AND
                            (Left.did = Right.did),
                            transform (p_sum, Self.legacy_ssn := Right.ssn != '', Self := Left),
@@ -584,7 +587,7 @@ end;
 
 // this is still an issue -- DID is not preserved into the lookups,
 // since the notion of 'legacy' is for the DID/SSN pair.
-ssn_w_legacy_info := join (header_ssns, doxie.Key_FCRA_legacy_ssn,
+ssn_w_legacy_info := join (header_ssns, dx_Header.key_legacy_ssn(iType),
                            keyed (Left.ssn_unmasked = Right.ssn) AND
                            (Left.did = Right.did),
                            transform (ssn_temp_rec, Self.legacy_ssn := Right.ssn != '', Self := Left),

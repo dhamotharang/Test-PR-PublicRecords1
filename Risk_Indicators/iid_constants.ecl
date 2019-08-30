@@ -1,5 +1,5 @@
 ﻿
-IMPORT ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
+IMPORT ut, risk_indicators, header, mdr, suppress, did_add, dx_header, fcra, riskwise, STD, data_services;
 
 // line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.  
 // to toggle the system date, update both of them to the date you want the system to be.
@@ -545,7 +545,8 @@ export GoodSSNLength(string9 inSSN) :=  inSSN != '' and
 	// Check to see if a particular BSOption is turned on
 	export boolean CheckBSOptionFlag (BSOptions Flag, UNSIGNED8 Options) := (Options & Flag) > 0;
 	
-	export boolean IsEligibleHeaderRec (doxie.key_fcra_header KeyHeader, boolean dppa_ok) := 
+  key_header := dx_header.key_header(data_services.data_env.iFCRA);
+	export boolean IsEligibleHeaderRec (key_header KeyHeader, boolean dppa_ok) := 
 																		~mdr.Source_is_Utility (KeyHeader.src) AND // rm Utility from NAS
 																		~mdr.Source_is_on_Probation (KeyHeader.src) AND // we won't use probation data 
 																		~(dppa_ok AND KeyHeader.src[2] IN ['E','X']) AND // we won't use experian dl's/vehicles (requires LN branding)

@@ -2,7 +2,7 @@
 // ********  IF YOU CHANGE LOGIC IN THIS FUNCTION, ALSO MODIFY THE CORRESPONDING CODE WITHIN Risk_Indicators.get_IID_Best_Flags ATTRIBUTE ****************
 // *******************************************************************************************************************************************************
 
-import _Control, risk_indicators, gong, riskwise, ut, dx_header, doxie, mdr, drivers, FCRA;
+import _Control, risk_indicators, gong, riskwise, ut, dx_header, mdr, drivers, FCRA, data_services;
 onThor := _Control.Environment.OnThor;
 
 export getPhoneADDRVelocity (GROUPED DATASET(risk_indicators.iid_constants.layout_outx) iid, boolean isUtility=false, unsigned1 dppa,
@@ -11,7 +11,9 @@ export getPhoneADDRVelocity (GROUPED DATASET(risk_indicators.iid_constants.layou
 															integer bsversion,
 															unsigned8 BSOptions) := FUNCTION
 
-dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+
+dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
 
 header_build_date := (unsigned3) ((string) dk[1].max_date_last_seen)[1..6] : global;
 
@@ -84,7 +86,7 @@ slim_addr_rec := record
 	integer adls_per_addr_created_6months;
 end;
 
-header_address_key := if(isFCRA, Doxie.Key_FCRA_Header_Address, dx_header.Key_Header_Address());
+header_address_key := dx_header.key_header_address(iType);
 
 slim_addr_rec add_header_by_address(risk_indicators.iid_constants.layout_outx le, header_address_key rt) := transform
   head_first_seen := ((string) rt.dt_first_seen)[1..6];	
