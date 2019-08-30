@@ -128,7 +128,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_neighbors      := IF (mod_smartlinx.include_neighbors, pers.NeighborsSlim, dataset([],iesp.bpsreport.t_NeighborSlim) );
 	s_neighbors_count := count(s_neighbors.NeighborAddresses);  //count children since rows are neighborhoods.
   p_neighbors      := choosen (s_neighbors, iesp.constants.SMART.MaxNeighbors);
-  p_sources        := PersonReports.SourceCounts_records (dids, module (project (old_param, $.input._sources)) end, IsFCRA);
+  p_sources        := PersonReports.SourceCounts_records (dids, mod_access, PROJECT (mod_smartlinx, $.IParam._sources), IsFCRA);
 //****************************************************************************************************
 //     SINGLE SOURCE RECORDS
 //****************************************************************************************************

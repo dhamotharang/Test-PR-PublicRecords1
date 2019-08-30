@@ -135,95 +135,12 @@ EXPORT input := MODULE
 		export boolean include_NonRegulated_WatercraftSources:= FALSE;
   end;
 
-  /////////////// MAIN REPORTS' AND INCLUDE INTERFACES ///////////////
-  export include := INTERFACE
-    export boolean select_individually := false; //TODO: legacy; to be removed
-
-    export boolean include_accidents := false;
-    export boolean include_akas := false;
-    export boolean include_alsofound := false; //was not defined in "standard" doxie-selection.
-    export boolean include_associates := false;
-    export boolean include_atf := false; // Firearms and explosives
-    export boolean include_bankruptcy := false;
-    export boolean include_best := false;
-    export boolean include_boaters := false;
-    export boolean include_bpsaddress := false; //was not defined in "standard" doxie-selection.
-    export boolean include_civilcourts := false;
-    export boolean include_controlledsubstances := false; //aka DEA
-    export boolean include_corpaffiliations := false;
-    export boolean include_crimrecords := false; //aka DOC
-    export boolean include_crimhistory := false; // aka matrix history; ESP also has IncludeMatrixRelativesCriminalHistory
-    export boolean include_deceased := false;
-    export boolean include_domains := false;
-    export boolean include_driversataddress  := false;
-    export boolean include_driverslicenses := false;
-    export boolean include_email := false;
-    export boolean include_eq := false; //Equifax?
-    export boolean include_faaaircrafts := false;
-    export boolean include_faacertificates := false;
-    export boolean include_fbn := false; // fictitious business names
-    export boolean include_flcrash := false; // aka Accidents
-    export boolean include_foreclosures := false;
-    export boolean include_huntingfishing := false;
-    export boolean include_historicalneighbors := false;
-    export boolean include_imposters := false;
-		export boolean include_kris := false;
-    export boolean include_liensjudgments := false;
-    export boolean include_merchantvessels := false; // not used in doxie-CRS
-    export boolean include_motorvehicles := false;
-    export boolean include_neighbors := false;
-    export boolean include_nod := false; // notice of default
-    export boolean include_oldphones := false;
-    export boolean include_patriot := false; // aka Global Watch List
-    export boolean include_peopleatwork := false;
-    export boolean include_phonesplus := false;
-    export boolean include_phonesummary := false;
-    export boolean include_providers := false;
-    export boolean include_proflicenses := false;
-    export boolean include_properties := false;
-    export boolean include_relatives := false;
-    export boolean include_rtvehicles := false;
-    export boolean include_sanctions := false;
-    export boolean include_sexualoffences := false;
-//    export boolean include_targus := false;
-    export boolean include_students := false;
-    export boolean include_uccfilings := false;
-    export boolean include_verification := false;
-    export boolean include_voters := false;
-    export boolean include_watercrafts := false;
-    export boolean include_weaponpermits := false; // aka CCW?
-    export boolean include_sources := false;
-    export boolean include_criminalindicators := false;
-		
-  end;
-
   export mardiv := INTERFACE (_didsearch) end;
 
   // =========================================================================
   // ================= Central Records, Comprehensive Report ================= 
   // =========================================================================
 
-  // NB: "pseudo": not for real versioning, but rather to suppress corresponding section and/or count
-  export versions := INTERFACE
-    export unsigned1 bankruptcy_version := 0;
-    export unsigned1 crimrecords_version := 0;
-    export unsigned1 dea_version := 0;
-    export unsigned1 dl_version := 0;
-    export unsigned1 en_version := 0; //pseudo. //TODO: what's that???
-    export unsigned1 email_version := 0; //pseudo
-    export unsigned1 liensjudgments_version := 0;
-    export unsigned1 phonesplus_version := 0; // pseudo
-    export unsigned1 proflicense_version := 0; // pseudo
-    export unsigned1 property_version := 0;
-    export unsigned1 statedeath_version := 0; // pseudo
-    export unsigned1 targus_version := 0; // pseudo
-    export unsigned1 ucc_version := 0;
-    export unsigned1 vehicles_version := 0;
-    export unsigned1 voters_version := 0;
-  end;
-
-  export _sources := INTERFACE (_report, include, versions)
-  end;
 
   // Until we switch all reports to the $.IParam._report interface: an utility macro to copy report's fields 
   EXPORT mac_copy_report_fields (mod_new) := MACRO
