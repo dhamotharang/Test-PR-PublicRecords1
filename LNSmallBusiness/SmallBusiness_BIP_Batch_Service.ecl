@@ -119,36 +119,36 @@
 */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Indicators, RiskWise, Royalty, Suspicious_Fraud_LN, UT, Royalty;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Royalty, Std;
 
 EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	/* ************************************************************************
 	 *                      Force the order on the WsECL page                 *
 	 ************************************************************************ */
 	#WEBSERVICE(FIELDS(
-	'Batch_In',
-	'GLBPurpose',
-	'DPPAPurpose',
-	'DataRestrictionMask',
-	'DataPermissionMask',
-	'Gateways',
-	'ReturnDetailedRoyalties',
-	'Watchlists_Requested',
-	'OFAC_Version',
-	'IndustryClass',
-	'LinkSearchLevel',
-	'MarketingMode',
-	'AllowedSources',
-	'Global_Watchlist_Threshold',
-	'AttributesVersion1',
-	'AttributesVersion2',
-	'ModelName1',
-	'ModelName2',
-	'ModelName3',
-	'ModelName4',
-	'ModelName5',
-	'IncludeTargusGateway',
-	'RunTargusGatewayAnywayForTesting'
+		'Batch_In',
+		'GLBPurpose',
+		'DPPAPurpose',
+		'DataRestrictionMask',
+		'DataPermissionMask',
+		'Gateways',
+		'ReturnDetailedRoyalties',
+		'Watchlists_Requested',
+		'OFAC_Version',
+		'IndustryClass',
+		'LinkSearchLevel',
+		'MarketingMode',
+		'AllowedSources',
+		'Global_Watchlist_Threshold',
+		'AttributesVersion1',
+		'AttributesVersion2',
+		'ModelName1',
+		'ModelName2',
+		'ModelName3',
+		'ModelName4',
+		'ModelName5',
+		'IncludeTargusGateway',
+		'RunTargusGatewayAnywayForTesting'
 	));
 
 	// Can't have duplicate definitions of Stored with different default values, 
@@ -162,7 +162,7 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	/* ************************************************************************
 	 *                          Grab service inputs                           *
 	 ************************************************************************ */
-	 	 
+	
 	DATASET(LNSmallBusiness.BIP_Layouts.Input) Input := DATASET([], LNSmallBusiness.BIP_Layouts.Input) : STORED('Batch_In');
 	// Option Fields
 	UNSIGNED1	DPPA_Purpose         := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
@@ -170,7 +170,7 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	STRING	  DataRestrictionMask  := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('DataRestrictionMask');
 	STRING	  DataPermissionMask   := Business_Risk_BIP.Constants.Default_DataPermissionMask : STORED('DataPermissionMask');
 	STRING5	IndustryClass_In		   := Business_Risk_BIP.Constants.Default_IndustryClass : STORED('IndustryClass');
-	IndustryClass                  := StringLib.StringToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
+	IndustryClass                  := Std.Str.ToUpperCase(TRIM(IndustryClass_In, LEFT, RIGHT));
 	UNSIGNED1	LinkSearchLevel      := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
 	UNSIGNED1	MarketingMode        := Business_Risk_BIP.Constants.Default_MarketingMode : STORED('MarketingMode');
 	STRING50	AllowedSources       := Business_Risk_BIP.Constants.Default_AllowedSources : STORED('AllowedSources');
@@ -195,8 +195,10 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	BOOLEAN IncludeTargusGateway := FALSE : STORED('IncludeTargusGateway');
 	BOOLEAN RunTargusGateway     := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 	
-	AttrsRequested  := DATASET([ {StringLib.StringToUpperCase(AttrsVer1_in)},{StringLib.StringToUpperCase(AttrsVer2_in)} ], LNSmallBusiness.Layouts.AttributeGroupRec);
-	ModelsRequested := DATASET([ {StringLib.StringToUpperCase(ModelName1_in)},{StringLib.StringToUpperCase(ModelName2_in)},{StringLib.StringToUpperCase(ModelName3_in)},{StringLib.StringToUpperCase(ModelName4_in)},{StringLib.StringToUpperCase(ModelName5_in)} ], LNSmallBusiness.Layouts.ModelNameRec);
+	AttrsRequested  := DATASET([ {Std.Str.ToUpperCase(AttrsVer1_in)},{Std.Str.ToUpperCase(AttrsVer2_in)} ], LNSmallBusiness.Layouts.AttributeGroupRec);
+	ModelsRequested := DATASET([ {Std.Str.ToUpperCase(ModelName1_in)},{Std.Str.ToUpperCase(ModelName2_in)},
+															 {Std.Str.ToUpperCase(ModelName3_in)},{Std.Str.ToUpperCase(ModelName4_in)},
+															 {Std.Str.ToUpperCase(ModelName5_in)} ], LNSmallBusiness.Layouts.ModelNameRec);
 	ModelOptions    := DATASET([], LNSmallBusiness.Layouts.ModelOptionsRec); // ModelOptions is never consumed in SmallBusiness_BIP_Function.
 	
 	/* ************************************************************************
@@ -221,7 +223,9 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 																														DisableIntermediateShellLogging := TRUE /* Always Turn Off Intermediate Shell Logging in Batch */,
 																														IncludeTargusGateway := IncludeTargusGateway,
 																														RunTargusGateway := RunTargusGateway, /* for testing purposes only */
-																														BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Batch_Service
+																														BIPIDWeightThreshold := LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.FOR_SmallBusiness_BIP_Batch_Service,
+																														AppendBestsFromLexIDs := TRUE   /* DCB - Added 8/7/2019 This should get the Small Buisness Attributes & Credits 
+																																															scores using the SELEID as requested in RQ-16313 */
 																														);
 
 	SBA_Results := PROJECT( SBA_Results_with_PhoneSources, LNSmallBusiness.BIP_Layouts.IntermediateLayout );
@@ -261,9 +265,9 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	 *   Restrict/allow LN Small Business Attributes and/or SBFE Attributes.  *
 	 ************************************************************************ */
 
-	allow_SBA_attrs     := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes
-	allow_SBA_attrs101  := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL)));   // i.e. "LN" Small Business Attributes no felloniew
-	allow_SBFE_attrs    := EXISTS(AttrsRequested(AttributeGroup IN [StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR_NAME),StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_V1_ATTR)])); // i.e. "SBFE" Small Business Attributes
+	allow_SBA_attrs     := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes
+	allow_SBA_attrs101  := EXISTS(AttrsRequested(AttributeGroup = Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL)));   // i.e. "LN" Small Business Attributes no felloniew
+	allow_SBFE_attrs    := EXISTS(AttrsRequested(AttributeGroup IN [Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR_NAME),Std.Str.ToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_V1_ATTR)])); // i.e. "SBFE" Small Business Attributes
 		
 	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
@@ -288,15 +292,16 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			SELF := [];
 		END;
 		
-    LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+  
+	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
 			LNSmallBusiness.Macros.mac_base_attrs()
 			LNSmallBusiness.Macros.mac_SBA_attrs101()
 			LNSmallBusiness.Macros.mac_scoring_attrs()
 			SELF := [];
 		END;
-    
-     LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		
+	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
 			LNSmallBusiness.Macros.mac_base_attrs()
 			LNSmallBusiness.Macros.mac_SBA_attrs101()
@@ -304,9 +309,7 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			LNSmallBusiness.Macros.mac_scoring_attrs()
 			SELF := [];
 		END;
-    
-    
-    
+     
 	Final_Results :=
 			MAP(
 				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101  => PROJECT( Final_Results_pre, xfm_allow_none(LEFT)),
@@ -337,7 +340,7 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 		PROJECT(
 			SBA_Results_with_PhoneSources,
 			TRANSFORM( layout_targus_temp,
-					targus_record := LEFT.PhoneSources(source = MDR.sourceTools.src_Targus_Gateway)[1];
+				targus_record 		 := LEFT.PhoneSources(source = MDR.sourceTools.src_Targus_Gateway)[1];
 				SELF.acctno        := LEFT.input_echo.acctno,
 				SELF.Source        := MDR.sourceTools.src_Targus_Gateway,
 				SELF.DateFirstSeen := targus_record.DateFirstSeen,
