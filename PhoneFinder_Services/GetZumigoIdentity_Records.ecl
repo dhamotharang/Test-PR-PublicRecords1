@@ -122,6 +122,7 @@ MODULE
    END; 
 
    Zumigo_Response := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, inMod.GLBPurpose, inMod.DPPAPurpose,,,,FALSE,FALSE);
+  
    // getting zumigo error-free response
    EXPORT Zumigo_Hist := Zumigo_Response(source = Phones.Constants.GatewayValues.ZumigoIdentity AND device_mgmt_status = ''); 
    SHARED today := STD.Date.Today();
@@ -184,6 +185,10 @@ MODULE
    SELF.imei_ActivationDate := r.imei_ActivationDate;
    SELF.loststolen := r.loststolen;
    SELF.loststolen_date := r.loststolen_date;
+   SELF.imsi_Tenure_MinDays := r.imsi_Tenure_MinDays;
+   SELF.imsi_Tenure_MaxDays := r.imsi_Tenure_MaxDays;
+   SELF.imei_Tenure_MinDays := r.imei_Tenure_MinDays;
+   SELF.imei_Tenure_MaxDays := r.imei_Tenure_MaxDays;
    
    NameAddrInfo_InputMatchedRec := Zum_inMod.NameAddressInfo AND l.did > 0 AND r.lexid > 0 AND l.did = r.lexid; // validating the record when zumigo resolved identity matched with pf resolved identity
    SELF.dt_last_seen := IF(NameAddrInfo_InputMatchedRec,(STRING)today, l.dt_last_seen);
