@@ -176,6 +176,8 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.imsi_ActivationDate := t_Date2ToString(l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.ActivationDate);
 		SELF.imsi_change_count := l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.ChangeCount;
 		SELF.imsi_trackedsince := t_Date2ToString(l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.TrackedSince);
+		SELF.imsi_Tenure_MinDays := (INTEGER)l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.Tenure.MinDays;
+		SELF.imsi_Tenure_MaxDays := (INTEGER)l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.Tenure.MaxDays;
 		SELF.iccid	:= IF(l.response.LineIdentityResponse.Subscriber.IntegratedCircuitCardId='','',(STRING)HASH64(l.response.LineIdentityResponse.Subscriber.IntegratedCircuitCardId));
 		SELF.iccid_changedthis_time := (INTEGER)l.response.LineIdentityResponse.Subscriber.Identifier.Iccid.ChangedThisTime;
 		SELF.iccid_seensince := l.response.LineIdentityResponse.Subscriber.Identifier.Iccid.SeenSince;
@@ -206,6 +208,8 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.imei_change_count := l.response.LineIdentityResponse.Device.Identifier.Imei.ChangeCount;
 		SELF.imei_tracked_since := t_Date2ToString(l.response.LineIdentityResponse.Device.Identifier.Imei.TrackedSince);
 		SELF.imei_ActivationDate := t_Date2ToString(l.response.LineIdentityResponse.Device.Identifier.Imei.ActivationDate);
+		SELF.imei_Tenure_MinDays := (INTEGER)l.response.LineIdentityResponse.Device.Identifier.Imei.Tenure.MinDays;
+		SELF.imei_Tenure_MaxDays := (INTEGER)l.response.LineIdentityResponse.Device.Identifier.Imei.Tenure.MaxDays;
 		SELF.first_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].FirstNameScore;
 		SELF.last_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].LastNameScore;
 		SELF.addr_score := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].AddressScore;

@@ -75,10 +75,16 @@ end;
 		
 export t_ZIdIccid := record (t_ZIdBaseIdentity)
 end;
-		
+
+export t_ZIdImsiTenure := record
+	integer MinDays {xpath('MinDays')};
+	integer MaxDays {xpath('MaxDays')};
+end;
+
 export t_ZIdImsi := record (t_ZIdBaseIdentity)
 	iesp.share.t_Date2 ActivationDate {xpath('ActivationDate')};
 	iesp.share.t_Date2 ChangeDate {xpath('ChangeDate')};
+	t_ZIdImsiTenure Tenure {xpath('Tenure')};
 end;
 		
 export t_ZIdSubscriberIdentifier := record

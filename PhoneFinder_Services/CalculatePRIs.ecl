@@ -72,8 +72,7 @@ FUNCTION
   TRANSFORM
     rRiskInd_Layout tCheckRIs(iesp.phonefinder.t_PhoneFinderRiskIndicator le) :=
     TRANSFORM
-      sim_change_date := (UNSIGNED)(MAX(pInput.imsi_ChangeDate, pInput.imsi_ActivationDate));
-      device_change_date := (UNSIGNED)(MAX(pInput.imei_ChangeDate, pInput.imei_ActivationDate));
+
       dt_last_seen    := (UNSIGNED)pInput.dt_last_seen;
       dt_first_seen   := (UNSIGNED)pInput.dt_first_seen;
       currentDate     := STD.Date.Today();
@@ -110,8 +109,10 @@ FUNCTION
                                 32 => dt_first_seen = 0,
                                 33 => dt_last_seen = 0,
                                 34 => dt_first_seen = 0 AND dt_last_seen = 0,
-                                35 => (STD.Date.DaysBetween(sim_change_date, currentDate) <= le.Threshold),
-                                36 => (STD.Date.DaysBetween(device_change_date, currentDate) <= le.Threshold),
+                                35 => (pInput.imsi_Tenure_MinDays != 0 AND pInput.imsi_Tenure_MinDays < le.Threshold) OR 
+                                      (pInput.imsi_Tenure_MaxDays != 0 AND pInput.imsi_Tenure_MaxDays <= le.Threshold),
+                                36 => (pInput.imei_Tenure_MinDays != 0 AND pInput.imei_Tenure_MinDays < le.Threshold) OR
+                                      (pInput.imei_Tenure_MaxDays != 0 AND pInput.imei_Tenure_MaxDays <= le.Threshold),
                                 37 => MAP(le.ThresholdB = 'Day' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Day')),
                                           le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Week')),
                                           le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Month')),
