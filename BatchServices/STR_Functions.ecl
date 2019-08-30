@@ -1,4 +1,4 @@
-﻿import Address_Rank, AutoStandardI, Autokey_Batch, BatchServices, DeathV2_services, DriversV2, DriversV2_Services, doxie, 
+﻿import Address_Rank, AutoStandardI, Autokey_Batch, BatchServices, DeathV2_services, DriversV2, DriversV2_Services, doxie, dx_death_master,
 			 Header, ut, VehicleV2_Services, VotersV2_Services;
 
 ADDRESS_LABEL 		:= PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_Addr.full, opt);
@@ -54,9 +54,9 @@ export STR_Functions := MODULE
 	                        BatchServices.Interfaces.str_config in_mod) := FUNCTION
 
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-    glb_ok :=  mod_access.isValidGLB ();
+    glb_ok := mod_access.isValidGLB ();
     dppa_ok := mod_access.isValidDPPA ();
-		
+
 		ds_best_recs_raw := doxie.best_records(dids
 																					 ,doSuppress    := false
 																					 ,include_minors:= in_mod.IncludeMinors
@@ -134,17 +134,13 @@ export STR_Functions := MODULE
 	//SkipDeceasedSubjects = TRUE IOW if we don't want to return deceased records
 	  populate_deceasedFlag:= ~in_mod.ReturnDeceased;
 		
-		// TODO: revisit str_config
-		deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
+    // TODO: revisit str_config
 		
-		ds_best_recs_with_deceased_flag := 
-			join(ds_best_recs, doxie.key_death_masterV2_ssa_DID,
-					 keyed(left.did = right.l_did) and 
-					 not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-					 transform(BatchServices.STR_Layouts.Best_Plus,
-										 self.isDeceased := right.l_did > 0,
-										 self := left),
-					 left outer, keep(1), limit(0));	
+    death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+    ds_best_recs_with_deceased_flag := project(dx_death_master.Append.byDid(ds_best_recs, did, death_params),
+      transform(BatchServices.STR_Layouts.Best_Plus,
+        self.isDeceased := left.death.is_deceased;
+        self := left)); 
 
 		return if(populate_deceasedFlag, ds_best_recs_with_deceased_flag, ds_best_recs);
 	END;

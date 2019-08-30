@@ -1,7 +1,7 @@
-﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
-       PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard, std, MDR;
+﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,dx_death_master,address,PhonesFeedback_Services,
+       PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard, STD, MDR;
 
-deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
 doxie.MAC_Header_Field_Declare(); // dial_contactprecision_value, score_threshold_value, glb_ok, dppa_ok
 mod_access := doxie.compliance.GetGlobalDataAccessModule ();
@@ -20,7 +20,7 @@ MODULE
 shared subjectDIDs 	:= 	dids;
 shared subjectDID 		:= 	max(subjectDIDs, did);
 
-shared newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(((STRING)Std.Date.Today())[1..4]);
+shared newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(((STRING)STD.Date.Today())[1..4]);
 
 //***** GET THE RELATIVES 
 //	depth is input to service and defaults to 1 by #stored('RelativeDepth',con.default_RelativeDepth) in ContactCard.ReportService,
@@ -35,12 +35,8 @@ shared allrel := Doxie_Raw.relative_raw(dids, mod_access,
 shared rel := allrel(depth=1 or newEnough((unsigned2)(((STRING)recent_cohabit)[1..4])));
 
 // this just removes the deceased
-shared relassocdids := join(rel, doxie.key_death_masterv2_ssa_did,
-														keyed(left.person2 = right.l_did)
-														and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-														transform(doxie.layout_references, self.did := left.person2),
-														left only);
-
+shared relassocdids := project(dx_death_master.Exclude(rel, person2, death_params),
+  transform(doxie.layout_references, self.did := left.person2));
 
 //***** GET ALL THE HEADER RECORDS
 
@@ -48,8 +44,6 @@ shared csa := doxie.Comp_Subject_Addresses(dids + relassocdids, , dial_contactpr
 
 shared head_nopull := csa.raw;
 
-
-	
 //***** PULL IDS
 Suppress.MAC_Suppress(head_nopull,head_pull1,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
 Suppress.MAC_Suppress(head_pull1,head_pull2,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
@@ -97,7 +91,11 @@ shared allDIDs_noNeibhors	:= 	dedup(sort(project(subjectDIDs, transform(rec.prid
 														did);
 
 //***** SEE IF DECEASED
-shared SubjectDeathRecords_info := sort(choosen(doxie.key_death_masterv2_ssa_did(keyed(l_did = subjectDID) and not DeathV2_Services.Functions.Restricted(src, glb_flag, glb_ok, deathparams)),con.max_subject),-dod8);
+subject_did := dataset([{subjectDID}], doxie.layout_references);
+subject_death_recs := choosen(dx_death_master.Get.byDid(subject_did, did, death_params),con.max_subject);
+shared SubjectDeathRecords_info := sort(
+    project(subject_death_recs, transform(dx_death_master.layout_death, SELF := LEFT.death)), 
+    -dod8); 
 
 shared boolean SubjectIsDeceased := 
 	exists(SubjectDeathRecords_info) or
@@ -279,7 +277,7 @@ phoneaddr := join(head_roll_wnei, wgong,
 									(left.sec_range = right.sec_range or
 									 (right.sec_range = '' and right.fname = '' and right.lname = '')	or //could be the building and looks like its listed to a business
 										ut.NameMatch(left.fname, left.mname, left.lname, right.fname, right.mname, right.lname) <= 2 or
-										// length(trim(left.lname)) > 1 and stringlib.stringfind(right.listing_name,left.lname,1) > 0
+										// length(trim(left.lname)) > 1 and STD.STR.Find(right.listing_name,left.lname,1) > 0
 										left.lname = right.lname
 										),//has a convincing name match
 									tra_pa(left, right),
@@ -325,7 +323,7 @@ pa_ddp := ungroup(dedup(sort(group(sort(phoneaddr_cln, contact.did, phone.phone)
 //***** KEEP storeds.PHONESPERPERSON PHONES PER PERSON	
 rank_apt(boolean aptOff,typeof(wgong.listing_name) listing_name) :=
 	map(not aptOff => 0,
-			aptOff     => map(exists(con.ds_AptWords(stringlib.StringFind(listing_name, trim(word), 1) > 0)) => 1,
+			aptOff     => map(exists(con.ds_AptWords(STD.STR.Find(listing_name, trim(word), 1) > 0)) => 1,
 												2),
 			0);
 
