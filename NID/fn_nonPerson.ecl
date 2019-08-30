@@ -1,8 +1,6 @@
 ﻿IMPORT STD, Address;
 
 
- MatchType := ENUM(integer2, NoMatch=0, Trust, Business, Person, Dual, Unclass, Inv, Blank);
-
  NameTypeToCode(string1 type) := CASE(type,
 							'B' => MatchType.Business,
 							'P' => MatchType.Person,
@@ -795,7 +793,32 @@ positions := '\\b' + positionNames+'$';
 rgxStreet := '\\b([0-9]+|[A-Z] [A-Z]|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|CENTER|NORTH|SOUTH|EAST|WEST).* (ROAD|RD|STREET|ST|AVE|AVENUE|DRIVE|CT|PLACE|PATH|LN|WAY|WY)$';		// street address only
 rgxCaseNum := '^(CASE|CIVIL ACTION|PROBATE COURT CASE|PROBATE CASE|BANKRUPTCY|COURT CASE|CIRCUIT COURT CASE) *#[A-Z0-9 ,#&/-]+$';
 
-EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
+MatchType NotAName(string name, string s, DATASET({string32 word}) words) := 
+			MAP(	
+				REGEXFIND(rgxTwoWords, name) => MatchType.Person,
+				REGEXFIND('^[A-Z]+$',name) => if(NameTester.PossibleBizWord(name),	MatchType.Business,	// single word name
+																													MatchType.Inv),
+				REGEXFIND('^[A-Z]+ [A-Z]$',name) => MatchType.Inv,	// First Mi
+				REGEXFIND('\\b((MR|DR) (&|AND)? MRS)\\b',s) => MatchType.Inv,		//MatchType.Unclass,
+				REGEXFIND(CoTrustees, s) => MatchType.Trust,		//MatchType.Unclass,
+				$.mod_NameFormat.IsDualNameFormat(name) => MatchType.Dual,
+				REGEXFIND('( AND |&| OR |&/OR )', s) => MatchType.Business,
+				REGEXFIND(' A-[A-Z]+',s) => MatchType.Business,
+				$.NameTester.LikelyBizWord(s) => MatchType.Business,
+				Address.SpecialNames.IsCityName(s) => MatchType.Business,
+				CheckBusEndings(s) => MatchType.Business,
+				REGEXFIND('^(1ST|2ND|3RD|4TH|5TH|6TH|7TH|8TH|9TH)',s) => MatchType.Business,
+				REGEXFIND(rgxFML, name) => if($.NameTester.PossibleBizWord(name),	// single word name
+																				MatchType.Business,MatchType.Inv),
+				REGEXFIND('[*%#@!?\\[]+',name) => MatchType.Inv,	// special characters
+				//preferBiz => MatchType.Business,
+				REGEXFIND('^[A-Z]{3,4}$',s) => MatchType.Business,
+				COUNT(words($.NameTester.IsAmbiguousWord(word))) > 0 => MatchType.Business,
+				MatchType.Inv		//MatchType.Hnh	//		Business
+			);
+
+
+EXPORT MatchType fn_nonPerson(string str, string s, string name, integer quality) := FUNCTION
 
 	words := Address.WordSplit(RemoveApostrophe(s));
 	digraphs := Address.WordPairs(RemoveApostrophe(s));
@@ -849,7 +872,6 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 
 		REGEXFIND('\\b(T/E|TRUST PT|A LIFE E|LIVING TST|A LIVING T|LIV TRT|REV TRUS|REV TRT|REV LT|(ROTH|SEP|TRU[, ]ST|ROLLOVER) IRA)\\b|\\bRT$', s) => MatchType.Trust,
 		// business words
-		//REGEXFIND('\\bTRUST(S)?\\b',s) => CheckTrust(s, words, digraphs, name),
 		NOT REGEXFIND(CoTrustees, s) AND REGEXFIND('\\b(TRUST|TRUS|TRU|TRST|TST|TRUSTS)\\b',s) => CheckTrust(s, words, digraphs, name),
 //		LikelyTrust(s) => MatchType.Trust,
 		REGEXFIND('\\bEXECUT(OR|RIX) +(OF|FOR)\\b', s) => MatchType.Inv,				//MatchType.Unclass,
@@ -891,7 +913,7 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 		
 		//Std.str.Contains(options,'W',true) and REGEXFIND('^[A-Z]+$',s) => MatchType.Person,
 		// abbreviation NT
-		REGEXFIND('^[0-9]+ +.+ +([A-Z]+) +NT,?$',s, 1) in geowords => MatchType.Inv,
+		//REGEXFIND('^[0-9]+ +.+ +([A-Z]+) +NT,?$',s, 1) in geowords => MatchType.Inv,
 		MatchPattern(s) => MatchType.Business,
 		
 		// junk matches 
@@ -965,7 +987,10 @@ EXPORT MatchType fn_nonPerson(string str, string s, string name) := FUNCTION
 		REGEXFIND('^[0-9]+[A-Z]+[0-9]+$', name) => MatchType.Inv,
 		REGEXFIND('^[0-9]+', s) AND CheckBusEndings(s) => MatchType.Business,
 		REGEXFIND('^[A-Z]+ +[A-Z]+ +[A-Z] [A-Z]$', s) AND CheckBusEndings(s) => MatchType.Business,
-		0);
+		
+		quality = 0 => NotAName(name, s, words),			// Persons.NameStatus.NotAName
+		quality <> 0 => $.fn_isPerson(name, quality),
+		MatchType.NoMatch);
 
 	END;
 
