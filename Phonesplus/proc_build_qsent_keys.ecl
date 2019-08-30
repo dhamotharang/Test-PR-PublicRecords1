@@ -48,7 +48,7 @@ Phonesplus.MAC_Build_qsent(dist_DSqsent, filedate, fname,mname,lname,
 DS_qsent_rec := record
 	unsigned6 fdid;
 	// CCPA-5 Add CCPA fields
-	Phonesplus.layoutCommonKeys;
+	Phonesplus.layoutCommonKeys_CCPA;
 end;
 
 DS_qsent_rec slim_it(dist_DSqsent  l) := transform
