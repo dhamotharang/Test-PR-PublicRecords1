@@ -1,4 +1,4 @@
-﻿import standard, ut, doxie; 
+﻿import _control, CCPA, standard, std, ut, doxie; 
 
 dbase := file_deadco_base;
 
@@ -27,4 +27,6 @@ rec tra(dbase l) := transform
 end;
 b:=project(dbase,tra(left));
 
-export File_Deadco_SearchAutokey := b;
+addGlobalSID := CCPA.macGetGlobalSID(b,'DEADCO','','global_sid'); //DF-25968: Add Global_SID
+
+export File_Deadco_SearchAutokey := addGlobalSID;
