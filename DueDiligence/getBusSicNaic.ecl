@@ -116,7 +116,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													
 													
 	// ---------------- Ficticious Business Name ---------------------
-	fbnRaw := FBNv2.Key_LinkIds.kFetch2(linkIDs, ,
+	fbnRaw := FBNv2.Key_LinkIds.kFetch2(linkIDs,
 																			 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																			 0, //ScoreThreshold --> 0 = Give me everything
 																			 Business_Risk_BIP.Constants.Limit_Default,

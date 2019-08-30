@@ -87,7 +87,7 @@ EXPORT getOtherSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	
 	// ---------------- Ficticious Business Name ---------------------
-	FBNRaw := FBNv2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell), ,
+	FBNRaw := FBNv2.Key_LinkIds.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
