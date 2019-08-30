@@ -103,7 +103,7 @@ EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid,
 		AssociateSection := TopBusiness_Services.AssociateSection.fn_fullView(
 			ds_input_data,
 			project(dataset(in_topbusiness_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-			in_topbusiness_mod);
+			mod_access);
 
 		ContactSection := TopBusiness_Services.ContactSection.fn_fullView(
 			project(ds_input_data, transform(TopBusiness_Services.ContactSection_Layouts.rec_Input, self := left))

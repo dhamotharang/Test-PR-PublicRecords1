@@ -73,8 +73,8 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
     EXPORT unsigned3 date_threshold := param.dateval;
     EXPORT string ssn_mask := param.ssn_mask;
   END;
+  
 	isCNSMR := mod_access.isConsumer();
-
   glb_ok :=  mod_access.isValidGLB ();
   dppa_ok := mod_access.isValidDPPA ();
 
@@ -205,14 +205,15 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 													 transform(right),
 													 inner,
 													 limit(ut.limits.DEFAULT, skip));
-
+  
   // Then sort/dedup to only keep the record with the most recent iteration_key & sequence_key
 	// values for each vehicle_key.  
-	veh_ra_pr_dd := dedup(sort(veh_ra_partyrecs,
+	veh_ra_pr_dd_pre := dedup(sort(veh_ra_partyrecs,
 	                           vehicle_key, -iteration_key, -sequence_key, 
 														 orig_name_type),  //owners before registrants and lienholders, not that it should matter
 	                      vehicle_key);
-
+  veh_ra_pr_dd := Suppress.MAC_SuppressSource(veh_ra_pr_dd_pre,mod_access,append_did);
+  
   // Join the previously deduped res & addr vehicle ids to the most recent party key info to
 	// see if the vehicle ids still belong to the resident/addr
 	// (i.e. all 3 ***_key values match the most recent ones)

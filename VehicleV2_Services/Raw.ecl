@@ -1,7 +1,7 @@
 ﻿IMPORT doxie, doxie_cbrs, VehicleV2, ut, NID, MDR, Address, STD, D2C;
 
 EXPORT Raw := MODULE
-
+    
 	EXPORT VehicleV2_Services.Layout_Vehicle_Key get_vehicle_keys_from_dids(
 							VehicleV2_Services.IParam.reportParams in_mod,
 								DATASET(doxie.layout_references) in_dids,
@@ -25,7 +25,7 @@ EXPORT Raw := MODULE
 														10000, skip ))),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_DID, skip));		
-					
+		//CCPA suppression is not required as no PII is sxtracted from the party key  			
 		vks := if(~isCNSMR, vks_vehicleV2_info);
 		ded := DEDUP(vks,all);
 		return if(in_LIMIT = 0,ded,choosen(ded,in_LIMIT));
@@ -35,12 +35,12 @@ EXPORT Raw := MODULE
       DATASET(VehicleV2_Services.Layout_Vehicle_Key) in_veh_keys,
 			UNSIGNED in_LIMIT = 0,BOOLEAN get_minors = TRUE,BOOLEAN include_non_regulated_sources = FALSE):= FUNCTION
 		
+    
 		Boolean isCNSMR := ut.IndustryClass.is_Knowx;
 		key := vehiclev2.Key_Vehicle_Main_Key;
 		key_party := Vehiclev2.Key_Vehicle_Party_Key;
 		
 		BOOLEAN include_non_regulated_data := include_non_regulated_sources and ~doxie.DataRestriction.InfutorMV;
-		
 		vks := JOIN(DEDUP(SORT(in_veh_keys,record),record), key,
 				KEYED(LEFT.vehicle_key = RIGHT.vehicle_key) AND
 				KEYED(LEFT.iteration_key = RIGHT.iteration_key or LEFT.iteration_key = '') AND
@@ -49,9 +49,10 @@ EXPORT Raw := MODULE
 				LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_KEY, skip));
 		ded := DEDUP(vks,all);
 		w_seq_info := JOIN(ded,key_party,KEYED(LEFT.vehicle_key=RIGHT.vehicle_key)
-		AND KEYED(LEFT.iteration_key=RIGHT.iteration_key) AND (get_minors or not (ut.age((integer)RIGHT.orig_dob) between 1 AND 17)),
-		TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key,self.sequence_key := RIGHT.sequence_key,self := LEFT), LIMIT(10000,skip));
-		
+		   AND KEYED(LEFT.iteration_key=RIGHT.iteration_key) AND (get_minors or not (ut.age((integer)RIGHT.orig_dob) between 1 AND 17)),
+		   TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key,self.sequence_key := RIGHT.sequence_key,self := LEFT), LIMIT(10000,skip));
+    //CCPA suppression is not required as no PII is sxtracted from the party key
+   
 		w_seq := if(~isCNSMR, w_seq_info);
 		ded_w_seq := DEDUP(w_seq,all);
 		return if(in_LIMIT=0,ded_w_seq,choosen(ded_w_seq,in_LIMIT));
@@ -62,6 +63,7 @@ EXPORT Raw := MODULE
 																DATASET(doxie_cbrs.layout_references) in_bdids,
 																UNSIGNED in_LIMIT = 0) := FUNCTION
 		
+
 		Boolean isCNSMR := in_mod.IndustryClass = D2C.Constants.CNSMR;
 		lookup_value := in_mod.lookupValue;
 	  key := VehicleV2.key_vehicle_bdid;
@@ -71,7 +73,7 @@ EXPORT Raw := MODULE
 							AND iteration_key=RIGHT.iteration_key AND sequence_key = RIGHT.sequence_key AND orig_name_type <> '2' ), 10000, skip ))),
 						TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key, self := RIGHT),
 						LIMIT(VehicleV2_Services.Constant.VEHICLE_PER_BDID,skip));
-  		
+  //CCPA suppression is not required as no PII is sxtracted from the party key	
   vks := if(~isCNSMR, vks_info);		
 		ded := DEDUP(vks,all);
 		return if(in_LIMIT = 0,ded,choosen(ded,in_LIMIT));
@@ -105,6 +107,7 @@ EXPORT Raw := MODULE
 		ded := DEDUP(vks,all);
 		w_seq := JOIN(ded,key_party,KEYED(LEFT.vehicle_key=RIGHT.vehicle_key) AND KEYED(LEFT.iteration_key=RIGHT.iteration_key) AND (in_mod.getMinors or not (ut.age((integer)RIGHT.orig_dob) between 1 AND 17)),	
 		TRANSFORM(VehicleV2_Services.Layout_Vehicle_Key,self.sequence_key := RIGHT.sequence_key,self := LEFT), LIMIT(10000,skip));
+    //CCPA suppression is not required as no PII is sxtracted from the party key
 		ded_w_seq := DEDUP(w_seq,all);
 		
 		return if(in_LIMIT = 0,ded_w_seq,choosen(ded_w_seq,in_LIMIT));

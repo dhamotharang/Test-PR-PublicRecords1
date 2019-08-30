@@ -1,7 +1,5 @@
-import AutoStandardI,Census_data,codes,doxie,DriversV2,gong,iesp,lib_date,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR,
+﻿import AutoStandardI,Census_data,codes,doxie,DriversV2,gong,iesp,lib_date,Risk_Indicators,Suppress,ut,VehicleV2,Watchdog,NID,MDR,
        dx_header;
-
-gm :=  AutoStandardI.GlobalModule();
 
 export Functions := module
 
@@ -54,6 +52,19 @@ export Functions := module
 		export string20 company_id      := '';
 		export string40000 scoring_info := '';
 	end;
+ shared MAC_CopyComplianceValuesFromLegacy (mod) := MACRO 
+    EXPORT unsigned1 unrestricted := 0 | IF (mod.AllowGLB, doxie.compliance.ALLOW.GLB, 0)
+                                       | IF (mod.AllowDPPA, doxie.compliance.ALLOW.DPPA, 0)
+                                       | IF (mod.AllowALL, doxie.compliance.ALLOW.ALL, 0);
+    EXPORT unsigned1 glb := mod.GLBPurpose;
+    EXPORT unsigned1 dppa := mod.DPPAPurpose;
+    EXPORT string DataPermissionMask := mod.DataPermissionMask;
+    //EXPORT boolean ln_branded := mod.lnbranded;
+    EXPORT string5 industry_class := mod.IndustryClass;
+    EXPORT string32 application_type := mod.ApplicationType;
+    EXPORT boolean show_minors := mod.IncludeMinors;
+    EXPORT unsigned1 mask_dl := mod.dlmask;
+  ENDMACRO;
 
 	lname_var := RECORD
 		string20	fname;
@@ -97,7 +108,14 @@ export Functions := module
 	END;
 
   export fnSearchVal(dataset(doxie.layout_presentation) in_recs,
-                     params in_mod) := function																																	
+                     params in_mod) := function	
+    
+    gm :=  AutoStandardI.GlobalModule();
+    mod_access_pre := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
+    mod_access := module(mod_access_pre)
+      MAC_CopyComplianceValuesFromLegacy(in_mod);
+    end;     
+                 
     // ----------------------------------------------------------------------------------
     // Common routine used to get the name of a county
     get_county_name(string2 st_in, string3 county_in) := 
@@ -857,13 +875,13 @@ export Functions := module
 		vehicle_party_key_rl := record(vehiclev2.Key_Vehicle_Party_Key)
     end;
 
-		vehicle_party_recs_did_all_no_dppa := join(vehicles_for_did,VehicleV2.Key_Vehicle_party_Key,
+		vehicle_party_recs_did_all_no_dppa_pre := join(vehicles_for_did,VehicleV2.Key_Vehicle_party_Key,
 																							 keyed(left.vehicle_key=right.vehicle_key) and
 																							 (in_mod.include_non_regulated_sources or right.source_code not in [MDR.sourceTools.src_infutor_veh,MDR.sourceTools.src_infutor_motorcycle_veh]),
 																							 transform(vehicle_party_key_rl,
 																												 self := right),
 																							 limit(RateEvasion_Services.Constants.MAX_RECS_ON_JOIN,skip));
-
+   vehicle_party_recs_did_all_no_dppa := suppress.MAC_SuppressSource(vehicle_party_recs_did_all_no_dppa_pre,mod_access,append_did);
 		// Apply DPPA permissions
 		vehicle_party_recs_for_did_all := vehicle_party_recs_did_all_no_dppa(ut.PermissionTools.dppa.state_ok(state_origin,in_mod.DPPAPurpose,,source_code));
 		
@@ -1002,14 +1020,14 @@ export Functions := module
 		// exist for both sources.  These will be rolled together later.
 		
 		// For the transform, use the vehicle_party_key_rl that was already defined above.
-		vin_vehicle_party_recs_no_dppa := join(vin_vehicle_key_recs_all,VehicleV2.Key_Vehicle_party_Key,
+		vin_vehicle_party_recs_no_dppa_pre := join(vin_vehicle_key_recs_all,VehicleV2.Key_Vehicle_party_Key,
 																					 keyed(left.vehicle_key=right.vehicle_key AND
 																									left.iteration_key=right.iteration_key) and
 																					 (in_mod.include_non_regulated_sources or right.source_code not in [MDR.sourceTools.src_infutor_veh,MDR.sourceTools.src_infutor_motorcycle_veh]),
 																					 transform(vehicle_party_key_rl,
 																										 self := right),
 																					 limit(RateEvasion_Services.Constants.MAX_RECS_ON_JOIN,skip));
-
+   vin_vehicle_party_recs_no_dppa := suppress.MAC_SuppressSource(vin_vehicle_party_recs_no_dppa_pre,mod_access,append_did);
 		// Apply DPPA permissions
 		vin_vehicle_party_recs_dppa := vin_vehicle_party_recs_no_dppa(ut.PermissionTools.dppa.state_ok(state_origin,in_mod.DPPAPurpose,,source_code));
 		
