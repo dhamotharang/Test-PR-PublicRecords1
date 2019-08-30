@@ -8,7 +8,7 @@ EXPORT PD_FBN(DATASET(Business_Risk_BIP.Layouts.Shell) LinkIDsFound,
 									SET OF STRING2 AllowedSourcesSet) := FUNCTION
 
 	// ---------------- Ficticious Business Name ---------------------
-	FBNRaw := FBNv2.Key_LinkIds.kFetch2(kFetchLinkIDs, ,
+	FBNRaw := FBNv2.Key_LinkIds.kFetch2(kFetchLinkIDs,
 																						 kFetchLinkSearchLevel,
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
