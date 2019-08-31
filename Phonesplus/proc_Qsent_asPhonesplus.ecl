@@ -125,7 +125,7 @@ ppmatch := join(sort(distribute(neverseen,hash(CellPhone)),CellPhone,local),
 //Mark Active Gong under different name and 
 // Mark QSENT Other	
 //CCPA-5 Add global_sid and record_sid to Qsent base file
-Phonesplus.layoutCommonOut t_mrkActive(ppmatch L ,f_currgong R) := transform
+Phonesplus.layoutCommonOut_CCPA t_mrkActive(ppmatch L ,f_currgong R) := transform
 self.ActiveFlag := if(R.phoneno != '','Y','');
 self.InitScore		:= if(L.InitScoreType = '',5,L.InitScore);
 self.InitScoreType	:= if(L.InitScoreType = '','QSENT OTHER',L.InitScoreType);
