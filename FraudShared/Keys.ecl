@@ -27,7 +27,7 @@ export Keys(
 					unsigned1	octet4;
 					end;										
 	
-	shared BaseMain           						:= Project(pFileKeybuild, Transform({Layouts_key.Main,unsigned8 __internal_fpos__:=0}
+	shared BaseMain           						:= Project(pFileKeybuild, Transform({record,maxlength(60000) Layouts_key.Main,unsigned8 __internal_fpos__:=0 end}
 																									,self.county	:=	if(left.clean_address.fips_county='' or regexfind('E',left.clean_address.fips_county,nocase),left.county,left.clean_address.fips_county)
 																									,self					:=left)
 																									);
