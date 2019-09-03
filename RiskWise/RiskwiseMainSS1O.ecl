@@ -52,7 +52,7 @@
  </message>
 */
 /*--INFO-- Migrating ss02, fds7, and fdsl to boca.  */
-import gateway;
+import gateway, Riskwise, Risk_Indicators, STD, Risk_Reporting;
 
 export RiskwiseMainSS1O := macro
 
@@ -111,7 +111,11 @@ export RiskwiseMainSS1O := macro
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -188,7 +192,13 @@ boolean suppressNearDups := true;
 boolean require2Ele := true;
 gateways_in := Gateway.Configuration.Get();
 
-tribcode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribcode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['ss02'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
@@ -207,7 +217,7 @@ d := dataset([{0}],RiskWise.Layout_SS1I);
 
 RiskWise.Layout_SS1I addseq(d l, integer C) := transform
 	self.seq := C;
-	self.tribcode := StringLib.StringToLowerCase(tribCode_value);
+	self.tribcode := STD.Str.ToLowerCase(tribCode_value);
 	self.account := account_value;
 	self.first := first_value;
 	self.last := last_value;
@@ -254,7 +264,11 @@ f := project(d, addseq(LEFT,COUNTER));
 
 ret := if(tribcode in ['ss02', 'fdsl', 'fds7'], 
 RiskWise.SS1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose,DataRestriction:=datarestriction,DataPermission:=DataPermission, ofac_version := ofac_version, include_ofac := include_ofac, 
-                       global_watchlist_threshold := global_watchlist_threshold), 
+                       global_watchlist_threshold := global_watchlist_threshold,
+                       LexIdSourceOptout := LexIdSourceOptout, 
+                       TransactionID := TransactionID, 
+                       BatchUID := BatchUID, 
+                       GlobalCompanyID := GlobalCompanyID), 
 																   dataset([{account_value}], riskwise.Layout_SS1O));
 
 //Log to Deltabase

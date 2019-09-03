@@ -1,4 +1,4 @@
-/*2015-08-07T19:21:23Z (Lorraine Hill)
+﻿/*2015-08-07T19:21:23Z (Lorraine Hill)
 #183214 restrict pre glb
 */
 /*--SOAP--
@@ -72,6 +72,7 @@
 */
 /*--INFO-- 'fds3','fd23','cap1','bnk1' */
 
+IMPORT Riskwise, Risk_Indicators, Gateway, Royalty, STD;
 export RiskWiseMainPR2O := MACRO
 
 // Can't have duplicate definitions of Stored with different default values, 
@@ -145,7 +146,11 @@ export RiskWiseMainPR2O := MACRO
 	'DataRestrictionMask',
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string4   tribCode_value := '' 			: stored('tribcode');
 string30  account_value := ''  			: stored('account');
@@ -209,12 +214,18 @@ string8   ccexpdate_value := ''    		: stored('ccedpdate');
 string53  reserved_value := ''    			: stored('reserved');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
 unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 unsigned3 history_date := 999999  			: stored('HistoryDateYYYYMM');
 boolean   runSeed_value := false 			: stored('runSeed');
 gateways_in := Gateway.Configuration.Get();
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 productSet := ['fds3','fd23','cap1','bnk1'];
 
@@ -294,7 +305,11 @@ RiskWise.Layout_SD1I addseq(d le, INTEGER C) := TRANSFORM
 END;
 f := project(d, addseq(left,counter));
 
-almost_final := RiskWise.PR2O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, DataRestriction, DataPermission);
+almost_final := RiskWise.PR2O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, DataRestriction, DataPermission,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID);
 
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),

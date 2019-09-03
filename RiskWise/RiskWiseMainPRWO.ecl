@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="St. Cloud Main Service PRWO">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -48,7 +48,7 @@
 */
 /*--INFO-- 'pw01','pw03','pw06','pw07','pw50' */
 
-import address, Risk_Indicators, Models, seed_files, gateway;
+import Risk_Indicators, Models, seed_files, gateway, Royalty, Riskwise, STD;
 
 
 export RiskWiseMainPRWO := MACRO
@@ -103,7 +103,11 @@ export RiskWiseMainPRWO := MACRO
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
 	'runSeed',
-	'gateways'));
+	'gateways',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string4  tribCode_value := '' 		: stored('tribcode');
 string30 account_value := '' 			: stored('account');
@@ -144,7 +148,7 @@ string16 ccnum_value := ''			: stored('ccnum');
 string8  ccexpdate_value := ''		: stored('ccexpdate');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 unsigned1 DPPA_Purpose := RiskWise.permittedUse.fraudDPPA 	: stored('DPPAPurpose');
 unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 
@@ -152,7 +156,11 @@ unsigned3 history_date := 999999  						: stored('HistoryDateYYYYMM');
 boolean runSeed_value := false 						: stored('runSeed');
 gateways_in := Gateway.Configuration.Get();
 
-
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
 
 productSet := ['pw01','pw03','pw06','pw07','pw50'];
 
@@ -191,8 +199,8 @@ risk_indicators.layout_input into(rec l, integer C) := TRANSFORM
 	self.phone10 := if(tribCode in ['pw01'], hphone_val, if(hphone_val = '', wphone_val, hphone_val));	// swap the wphone and homephone if homephone empty
 	self.wphone10 := if(tribCode in ['pw01'], wphone_val, if(hphone_val = '', '', wphone_val));
 	
-	self.fname := stringlib.stringtouppercase(first_value);
-	self.lname := stringlib.stringtouppercase(last_value);	
+	self.fname := STD.Str.touppercase(first_value);
+	self.lname := STD.Str.touppercase(last_value);	
 	
 	self.in_streetAddress := addr_value;
 	self.in_city := city_value;
@@ -217,20 +225,24 @@ risk_indicators.layout_input into(rec l, integer C) := TRANSFORM
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 			
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(drlcstate_value);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(drlcstate_value);
 	
 	self.email_address := email_value;
 	self.ip_address := ipaddr_value;
 	
-	self.employer_name := stringlib.stringtouppercase(cmpy_value);
+	self.employer_name := STD.Str.touppercase(cmpy_value);
 	
 	self := [];
 END;
 prep := PROJECT(d,into(left,counter));
 
 
-ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, false, false, true, true, true,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission);
+ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, false, false, true, true, true,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission,
+                                                                     LexIdSourceOptout := LexIdSourceOptout, 
+                                                                     TransactionID := TransactionID, 
+                                                                     BatchUID := BatchUID, 
+                                                                     GlobalCompanyID := GlobalCompanyID);
 
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),
@@ -381,7 +393,11 @@ finalOutput := PROJECT(ret, format_out(left));
 
 // get boca shell results for the models
 clam := if(tribCode in ['pw03','pw06','pw07','pw50'], 
-						risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, false, false, true, false, false, true,DataRestriction := DataRestriction,DataPermission := DataPermission),
+						risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, false, false, true, false, false, true,DataRestriction := DataRestriction,DataPermission := DataPermission,
+                                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                        TransactionID := TransactionID, 
+                                                                                        BatchUID := BatchUID, 
+                                                                                        GlobalCompanyID := GlobalCompanyID),
 						group(dataset([],Risk_Indicators.Layout_Boca_Shell),seq));	
 
 

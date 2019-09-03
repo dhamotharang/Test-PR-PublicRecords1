@@ -70,7 +70,7 @@
 */
 /*--INFO-- 'ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex90','ex91','ex94','ex95','sc51','2x01' */
 
-import Risk_Indicators, gateway, Inquiry_AccLogs, Risk_Reporting, STD;
+import Risk_Indicators, gateway, Inquiry_AccLogs, Risk_Reporting, STD, Royalty, Riskwise;
 
 export RiskWiseMainSC1O := MACRO
 
@@ -146,7 +146,11 @@ export RiskWiseMainSC1O := MACRO
 	'runSeed',
 	'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 	
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -238,9 +242,15 @@ boolean   runSeed_value := false 			: stored('runSeed');
 unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 productSet := ['ex01','ex04','ex05','ex11','ex12','ex39','ex40','ex90','ex91','ex94','ex95','sc51','2x01'];
 			
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['2x01', 'ex01', 'ex11', 'ex12', 'ex90', 'sc63'];
 
 targusGatewaySet := ['ex05'];
@@ -349,7 +359,11 @@ END;
 final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([], RiskWise.Layout_SC1O));
 
 almost_final := RiskWise.SC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, ofac_version, include_ofac, include_additional_watchlists, 
-                                       global_watchlist_threshold, DataRestriction,DataPermission);
+                                       global_watchlist_threshold, DataRestriction,DataPermission,
+                                       LexIdSourceOptout := LexIdSourceOptout, 
+                                       TransactionID := TransactionID, 
+                                       BatchUID := BatchUID, 
+                                       GlobalCompanyID := GlobalCompanyID);
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),
 	Royalty.RoyaltyTargus.GetOnlineRoyalties(almost_final, src, TargusType, TRUE, FALSE, FALSE, TRUE));

@@ -1,8 +1,12 @@
-﻿import ut, address, Risk_Indicators, Models, gateway;
+﻿IMPORT ut, Risk_Indicators, Models, gateway, STD;
 
 export NP2O_Function(dataset(Layout_PRII) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, string4 tribCode,
 							string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, OFACversion = 1):= FUNCTION
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, OFACversion = 1,
+                            unsigned1 LexIdSourceOptout = 1,
+                            string TransactionID = '',
+                            string BatchUID = '',
+                            unsigned6 GlobalCompanyId = 0):= FUNCTION
 
 boolean OFAC := tribCode in ['np21','np25','np27','np50','np60','np80','np81','np82','np90','np91','np92']; 
 
@@ -26,12 +30,12 @@ risk_indicators.layout_input into(indata le) := TRANSFORM
 	self.dob := dob_val;
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;
-	self.fname := stringlib.stringtouppercase(le.first);
-	self.mname := stringlib.stringtouppercase(le.middleini);
-	self.lname := stringlib.stringtouppercase(le.last);
-	self.in_streetAddress := stringlib.stringtouppercase(le.addr);
-	self.in_city := stringlib.stringtouppercase(le.city);
-	self.in_state := stringlib.stringtouppercase(le.state);
+	self.fname := STD.Str.touppercase(le.first);
+	self.mname := STD.Str.touppercase(le.middleini);
+	self.lname := STD.Str.touppercase(le.last);
+	self.in_streetAddress := STD.Str.touppercase(le.addr);
+	self.in_city := STD.Str.touppercase(le.city);
+	self.in_state := STD.Str.touppercase(le.state);
 	self.in_zipCode := le.zip;
 	self.prim_range := clean_a[1..10];
 	self.predir := clean_a[11..12];
@@ -50,12 +54,12 @@ risk_indicators.layout_input into(indata le) := TRANSFORM
 	self.addr_status := clean_a[179..182];
 	self.county := clean_a[143..145];
 	self.geo_blk := clean_a[171..177];
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.drlcstate);
-	self.age := if((integer)dob_val != 0, (string3)ut.GetAgeI((integer)dob_val), '');
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(le.drlcstate);
+	self.age := if((integer)dob_val != 0, (string3)ut.Age((integer)dob_val), '');
 	self.email_address := le.email;
-	self.employer_name := stringlib.stringtouppercase(le.cmpy);
-	self.lname_prev := stringlib.stringtouppercase(le.formerlast);
+	self.employer_name := STD.Str.touppercase(le.cmpy);
+	self.lname_prev := STD.Str.touppercase(le.formerlast);
 	self.country := le.countrycode;
 	self.in_country := le.countrycode;
 	self.historydate := le.historydate;
@@ -121,7 +125,11 @@ iid := risk_indicators.InstantID_Function(prep,
 	in_BSversion         := BSversionin,        // BSVersion
 	in_BSOptions         := BSOptionsin,        // BSOptions
 	in_DataRestriction   := DataRestriction,
-	in_DataPermission    := DataPermission
+	in_DataPermission    := DataPermission,
+    LexIdSourceOptout := LexIdSourceOptout, 
+    TransactionID := TransactionID, 
+    BatchUID := BatchUID, 
+    GlobalCompanyID := GlobalCompanyID
 );
 
 
@@ -252,7 +260,11 @@ mapped_results := join(ret, indata, left.seq = right.seq, format_out(left, right
 clam := if(tribCode in ['np25','np27','np31'], Risk_Indicators.Boca_Shell_Function(ret, gateways,dppa, glb, isUtility := false, isLN := false,
                                                includeRelativeInfo := true, includeDLInfo := false, includeVehInfo := false, includeDerogInfo := true,
 											   BSOptions := BSOptionsin, BSversion := BSversionin, DataRestriction := DataRestriction,
-											   DataPermission := DataPermission),
+											   DataPermission := DataPermission,
+                                               LexIdSourceOptout := LexIdSourceOptout, 
+                                               TransactionID := TransactionID, 
+                                               BatchUID := BatchUID, 
+                                               GlobalCompanyID := GlobalCompanyID),
 		 group(dataset([],Risk_Indicators.Layout_Boca_Shell),seq));	
 
 getScore2 := map(tribCode in ['np25'] => Models.AIN605_1_0(clam, OFAC),

@@ -39,7 +39,7 @@
 /*--INFO-- bnk4 and cbbl */
 //	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 
-IMPORT  Risk_Reporting, gateway, risk_indicators, Inquiry_AccLogs, STD;
+IMPORT  Risk_Reporting, gateway, risk_indicators, Inquiry_AccLogs, STD, Riskwise;
 export RiskwiseMainBC1O := MACRO
 #onwarning(4207, ignore);
 // Can't have duplicate definitions of Stored with different default values, 
@@ -83,7 +83,11 @@ export RiskwiseMainBC1O := MACRO
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
 	'runSeed',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 	
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -140,11 +144,18 @@ unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 boolean runSeed_value := false   : stored('runSeed');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction  : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 #stored('DisableBocaShellLogging', DisableOutcomeTracking);
 
 // gateways_in := dataset([],risk_indicators.Layout_Gateways_In) : STORED('gateways',few);
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['bnk4', 'cbbl'];
 
 // risk_indicators.Layout_Gateways_In gw_switch(gateways_in le) := transform
@@ -203,7 +214,11 @@ seed_files.Layout_BC1O format_seed(bcii_seed_output le) := transform
 end;
 final_seed := if(runSeed_value, project(bcii_seed_output, format_seed(left)), dataset([],seed_files.Layout_BC1O) );
 
-pre_ret := RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+pre_ret := RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction:=DataRestriction, DataPermission:=DataPermission,
+                                                                LexIdSourceOptout := LexIdSourceOptout, 
+                                                                TransactionID := TransactionID, 
+                                                                BatchUID := BatchUID, 
+                                                                GlobalCompanyID := GlobalCompanyID);
 
 ret := if(tribCode in ['bnk4', 'cbbl'], 
 					if(count(final_seed)>0 and runSeed_value, final_seed, 
