@@ -1,4 +1,4 @@
-﻿export layoutCommonKeys := record
+export layoutCommonKeys := record
 
   unsigned3     	DateVendorFirstReported := 0;  
   unsigned3     	DateVendorLastReported := 0;
@@ -75,7 +75,5 @@
   string3        	name_score := '';
   unsigned6 		did := 0;
   string3 			did_score := '';
-  //CCPA-718 - new fields for CCPA opt out
-  UNSIGNED4 global_sid := 0;
-  UNSIGNED8 record_sid := 0;
+
 end;
