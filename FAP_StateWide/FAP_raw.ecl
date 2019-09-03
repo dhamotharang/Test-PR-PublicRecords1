@@ -434,10 +434,10 @@ EXPORT FAP_raw := MODULE
 										in_mod_E1 := VehicleV2_Services.IParam.getSearchModule();
 										in_mod_E2 := VehicleV2_Services.IParam.getSearchModule_entity2();
 
-										E1 := MODULE(PROJECT(in_mod_E1,VehicleV2_Services.IParam.searchParams,OPT))
+										E1 := MODULE(PROJECT(in_mod_E1,VehicleV2_Services.IParam.searchParams))
 											EXPORT BOOLEAN noFail := TRUE;
 										END;
-										E2 := MODULE(PROJECT(in_mod_E2,VehicleV2_Services.IParam.searchParams,OPT))
+										E2 := MODULE(PROJECT(in_mod_E2,VehicleV2_Services.IParam.searchParams))
 											EXPORT BOOLEAN noFail := TRUE;
 										END;
 

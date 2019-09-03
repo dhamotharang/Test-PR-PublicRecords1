@@ -68,6 +68,7 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isEQCHRestricted ()        := $.compliance.isEQCHRestricted        (DataRestrictionMask);
   EXPORT boolean isTCHRestricted ()         := $.compliance.isTCHRestricted         (DataRestrictionMask);
   EXPORT boolean isTTRestricted ()          := $.compliance.isTTRestricted          (DataRestrictionMask); //TeleTrack
+  EXPORT boolean isInfutorMVRestricted ()   := $.compliance.isInfutorMVRestricted   (DataRestrictionMask); //Infutor Motorvehicles
   EXPORT boolean isPreGLBRestricted ()      := $.compliance.isPreGLBRestricted      (DataRestrictionMask);
   EXPORT boolean isFdnInquiry ()            := $.compliance.isFdnInquiry            (DataRestrictionMask);
   EXPORT boolean isJuliRestricted ()        := $.compliance.isJuliRestricted        (DataRestrictionMask);

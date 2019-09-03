@@ -88,8 +88,8 @@ export Get_Polk_Data := MODULE
 
       self.RemoteLocations:=[];
       self.ServiceLocations:=[];
-      self.user.GLBPurpose := trim((STRING) in_mod.GLBPurpose);
-      self.user.DLPurpose := trim((STRING) in_mod.DPPAPurpose);
+      self.user.GLBPurpose := (STRING) in_mod.glb;
+      self.user.DLPurpose := (STRING) in_mod.dppa;
       self.user.QueryID := trim(in_mod.QueryId);
       self.user.ReferenceCode := trim(in_mod.ReferenceCode);
       self.user.BillingCode := trim(in_mod.BillingCode);		
@@ -191,7 +191,6 @@ export Get_Polk_Data := MODULE
 	iesp.gateway_polk.t_VehicleCheckVehicleOut norm_veh(iesp.gateway_polk.t_VehicleCheckVehicleOut R) := TRANSFORM
 		SELF := R;
 	END;
-	// IF(not EXISTS(POLK_DATA) and  Search_Request = constant.report_val ,ut.outputMessage(ut.constants_MessageCodes.RTV_GATEWAY_MISSING));
 	polk_set := sort(NORMALIZE(polk_data,LEFT.response.response.vehicles,norm_veh(RIGHT)),-SeqNum,-ExpirationDate);
 
 	vina_data:=VehicleV2_Services.Get_Polk_Vina_Data(project(polk_set,transform(Layout_Vehicle_Vin,self:=left)));
@@ -358,13 +357,11 @@ rec := record
 	string200 msg;
 end;
 
-// export OutputMessages(dataset(ut.LayoutMessage) inds) := output(project(inds,rec), NAMED('MessageCodes'), extend);	
 	ds_blank:=dataset([],rec);
 	ds_msg:= dataset([{ut.constants_MessageCodes.POLK_ERROR, VehicleV2_Services.Polk_Code_Translations.ErrorCodes(Polk_Exception)}],rec);
   ds_msg_val:=if(Polk_Exception != '' and Search_Request = constant.report_val ,ds_msg,ds_blank);
 	ds_val:=if(doCombined or Search_Request = Constant.LOCAL_VAL,ds_blank,ds_msg_val);	
 	output(ds_val, NAMED('MessageCodes'), extend);
-			// ut.outputMessage(ut.constants_MessageCodes.POLK_ERROR, VehicleV2_Services.Polk_Code_Translations.ErrorCodes(Polk_Exception)));
 			// output(Polk_Exception,named('Polk_Exception'));
 			// output(polk_data,named('polk_dataresults'),extend);
 			// output(Polk_results,named('Polk_results'));
