@@ -78,25 +78,14 @@ EXPORT report_records  (DATASET(doxie.layout_references) dids, IdentityManagemen
 // =========================  Vehicles Section ===========================
 // =======================================================================
 
-      veh_lookup := '';
-      //Can't project modules, have to copy the content manually:
-      veh_mod := module (VehicleV2_Services.IParam.reportParams)
+      veh_mod := module (PROJECT (in_params, VehicleV2_Services.IParam.reportParams, OPT))
         export boolean displayMatchedParty := true; // this corresponds to #CONSTANT('DisplayMatchedParty', true); at the top level
         export boolean IncludeNonRegulatedSources := in_params.include_noregulatedvehicles;
-        export string6  ssnmask := in_params.ssn_mask;
-        export boolean	dl_Mask	:= in_params.dl_mask = 1;
-        export unsigned4 lookupValue := doxie.lookup_bit(StringLib.StringToUpperCase(veh_lookup));
+        export unsigned4 lookupValue := doxie.lookup_bit('');
             // this is to avoid a call to AutoStandardI.InterfaceTranslator.lookup_value.val(); 
-
-        VehicleV2_Services.IParam.MAC_CopyDataAccessParams(in_params);
-
-        // others of possible interest:
-     		// EXPORT STRING      DataSource := Constant.LOCAL_VAL;  
-        // EXPORT UNSIGNED2   penalty_threshold := VehicleV2_Services.Constant.VEHICLE_PENALT_THRESHOLD;
-        // EXPORT BOOLEAN    excludeLessors := false; 
       end;
 
-      vehi := VehicleV2_Services.raw.get_vehicle_crs_report (veh_mod, dids, in_params.SSN_mask);
+      vehi := VehicleV2_Services.raw.get_vehicle_crs_report (veh_mod, dids);
 
 			esp_vehicles_V2 := IdentityManagement_Services.format_vehicles(vehi);
 
