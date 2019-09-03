@@ -3,9 +3,10 @@ EXPORT Mailing_List(string st = '', string ut = '', string Customer_list = '') :
 
 	shared Dev_list :=	'Oscar.Barrientos@lexisnexisrisk.com'
 										+	';Sesha.Nookala@lexisnexisrisk.com'
+										+	';Shruthi.Parameshwar@lexisnexisrisk.com'
 										;
 
-	shared Data_QA_list := 'Prasanna.Kolli@lexisnexisrisk.com'
+	shared Data_QA_list := 'Shruthi.Parameshwar@lexisnexisrisk.com'
 										;
 
 	shared Batch_list	:=	Dev_list
