@@ -1,4 +1,4 @@
-import BIPV2, did_add, Business_Header_SS, Business_Header, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville, MDR;
+﻿import BIPV2, did_add, Business_Header_SS, Business_Header, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville, MDR;
 
 in_file := Calbus.Update_Calbus;
 
@@ -72,7 +72,7 @@ Business_Header_SS.MAC_Match_Flex(
 				 ,											// use other environment?
 				 ,BIPV2.xlink_version_set  // BIP2 ids
 				 ,											// URL
-				 ,Business_Email_Id			// email
+				 ,											// email
 				 ,Business_p_city_name	// city
 				 ,											// contact's first name
 				 ,											// contact's middle name
@@ -106,7 +106,7 @@ Business_Header_SS.MAC_Match_Flex(
 				 ,											// use other environment?
 				 ,BIPV2.xlink_version_set  // BIP2 ids
 				 ,											// URL
-				 ,Business_Email_Id			// email
+				 ,											// email
 				 ,Business_p_city_name	// city
 				 ,											// contact's first name
 				 ,											// contact's middle name

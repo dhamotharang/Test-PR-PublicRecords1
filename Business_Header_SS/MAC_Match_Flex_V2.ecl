@@ -117,7 +117,7 @@ import BIPV2;
 				self.source := '';
 			#end
 			#if(#text(pSource_record_id) != '')
-				self.source_record_id := left.pSource_record_id;
+				self.source_record_id := (typeof(self.source_record_id)) left.pSource_record_id;
 			#else
 				self.source_record_id := 0;
 			#end
