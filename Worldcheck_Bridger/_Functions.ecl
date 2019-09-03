@@ -1256,6 +1256,7 @@
 				trim(kword, left, right) = 'OFAC-HIFPAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_HIFPAA,
 				trim(kword, left, right) = 'ILSHABAK' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILSHABAK,
 				trim(kword, left, right) = 'FATF-SD' =>SubGroup_Constants.numKeywordsID.KEYWORD_FATF_SD,
+				trim(kword, left, right) = 'USCBW-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCBW_WC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

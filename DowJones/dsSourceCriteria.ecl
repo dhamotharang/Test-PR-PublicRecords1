@@ -1810,6 +1810,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'US Executive Order 13884','1786'},
 {'EC 2019/1353 ISIL (Da\'esh) and Al-Qaida List','1787'},
 {'OFAC Advisory - North Korea Sanctions Advisory','1788'},
-{'OFAC Advisory - Sanctions Risks Related to Petroleum Shipments involving Iran and Syria','1789'}
+{'OFAC Advisory - Sanctions Risks Related to Petroleum Shipments involving Iran and Syria','1789'},
+{'Ministry of Economy (Brazil) List of Employers with Slavery-like Working Conditions','1790'},
+{'US Executive Order 13883 CBW Act','1791'}
 ],r);
 

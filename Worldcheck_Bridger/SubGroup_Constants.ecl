@@ -1154,6 +1154,7 @@
 		export string KEYWORD_OFAC_HIFPAA						:= '835';
 		export string KEYWORD_ILSHABAK							:= '836';
 		export string KEYWORD_FATF_SD								:= '837';
+		export string KEYWORD_USCBW_WC							:= '838';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

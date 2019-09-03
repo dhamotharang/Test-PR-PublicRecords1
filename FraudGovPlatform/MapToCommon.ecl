@@ -54,11 +54,10 @@ module
 		self:= left; 
 		self:= [];
 	)); 
+	
+	extra_dedup_KnownFraud := fn_dedup_knownfraud(inKnownFraud); // remove duplicate records with different customer_event_id
  
-	Export KnownFraud := project (inBaseKnownFraud , transform(FraudShared.Layouts.Base.Main , 
-		self.Record_ID := 0;
-		self.customer_id := left.Customer_Account_Number;
-		self.Sub_Customer_ID := ''; 
+	Export KnownFraud := project (extra_dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
 		self.Fraud_Point_Score:= '';  
 		self.clean_business_name    := ''; 
