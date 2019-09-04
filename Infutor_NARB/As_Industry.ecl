@@ -4,6 +4,7 @@ Base := Infutor_NARB.Files().base.qa;
 
 Industry_Layout := TopBusiness_BIPV2.Layouts.rec_industry_combined_layout;
 
+//changed siccodes from 4 to 8 digits
 Industry_Layout	MapIndustry (Base L, INTEGER C)	:=	TRANSFORM,
 SKIP((C = 2 AND L.sic2[1..8] in ['',L.sic1[1..8] ])                           OR
      (C = 3 AND L.sic3[1..8] in ['',L.sic1[1..8],L.sic2[1..8] ])              OR
