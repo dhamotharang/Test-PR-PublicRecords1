@@ -71,13 +71,13 @@ import BIPV2;
 				self.state := '';
 				self.zip5 := '';
 			#end
-			#if('P' in matchset)
-				self.phone10 := left.phone_field;
+			#if('P' in matchset and #text(phone_field) != '')
+				self.phone10 := (typeof(self.phone10)) left.phone_field;
 			#else
 				self.phone10 := '';
 			#end
-			#if('F' in matchset)
-				self.fein := left.fein_field;
+			#if('F' in matchset and #text(fein_field) != '')
+				self.fein := (typeof(self.fein)) left.fein_field;
 			#else
 				self.fein := '';
 			#end;
@@ -107,7 +107,7 @@ import BIPV2;
 				self.contact_lname := '';
 			#end
 			#if(#text(pContact_ssn) != '')
-				self.contact_ssn := left.pContact_ssn;
+				self.contact_ssn := (typeof(self.contact_ssn)) left.pContact_ssn;
 			#else
 				self.contact_ssn := '';
 			#end
