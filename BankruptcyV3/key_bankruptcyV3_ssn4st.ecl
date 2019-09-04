@@ -1,13 +1,13 @@
-﻿import ut,fcra, BankruptcyV2,dops;
+﻿import ut,fcra, BankruptcyV2,dops,std;
 
 //last 4 digits of SSN, DEBTORS ONLY index
 export key_bankruptcyV3_ssn4st(boolean isFCRA = false) := function
-	todaysdate := ut.GetDate;
-	
+	// todaysdate := ut.GetDate;
+	todaysdate := (STRING8)Std.Date.Today();
 	base_recs := BankruptcyV2.file_bankruptcy_search_v3;
 	get_recs := base_recs(name_type ='D' AND 
 	                     ((integer)ssn > 0  or (integer)app_ssn > 0 or (integer)ssnmatch > 0) and 
-						 (~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,process_date)));
+						 (~IsFCRA OR fcra.bankrupt_is_ok (todaysdate,date_filed))); //DF-24582
 	FCRATest:=if(isFCRA,get_recs(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(isFCRA)),get_recs);
 	temp_rec := record
 		string4   ssnLast4;

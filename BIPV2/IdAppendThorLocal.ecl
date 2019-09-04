@@ -17,9 +17,6 @@ export IdAppendThorLocal(
 		,BDID_Score_field
 		,keep_count = '1'
 		,score_threshold = '75'
-		// ,pFileVersion = '\'prod\''
-		// ,pUseOtherEnvironment = business_header._Dataset().IsDataland
-		// ,pSetLinkingVersions = BIPV2.IDconstants.xlink_versions_default
 		,pURL = ''
 		,pEmail = ''
 		,pCity = ''
@@ -30,9 +27,11 @@ export IdAppendThorLocal(
 		,pSource = ''
 		,pSource_record_id = ''
 		,src_matching_is_priority = FALSE
-		,bGetAllScores=TRUE
+		,bGetAllScores = TRUE
 		,useFuzzy = false
 		,primForcePost = false
+		,weightThreshold = 0
+		,disableSaltForce = false
 	) := functionmacro
 
 	import BIPV2_Company_Names, BizLinkFull,ut,_Control;
@@ -125,13 +124,16 @@ export IdAppendThorLocal(
 		Outfile := %OutFile1%,
 		AsIndex := %useKeyedJoins%,
 		In_bGetAllScores := bGetAllScores
+		,In_disableForce := disableSaltForce
 	);
 
 
   #uniquename(outnorm)
   %outnorm% :=
   normalize(
-		%OutFile1%((results[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold), (results[1].proxid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
+		%OutFile1%((results[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold),
+		           results[1].weight >= weightThreshold,
+		           (results[1].proxid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
 		(integer)keep_count,
 		transform(
 		  {%OutFile1%.reference, %OutFile1%.results.proxid, %OutFile1%.results.weight, %OutFile1%.results.score, %OutFile1%.results.seleid, %OutFile1%.results.orgid, %OutFile1%.results.ultid, %OutFile1%.results.powid
@@ -142,7 +144,7 @@ export IdAppendThorLocal(
 				,%OutFile1%.results.cnp_nameweight
 				,BIPV2.IdAppendLayouts.parentIds
 		  },
-		  PG := left.results[counter].score >= (integer)score_threshold;
+		  PG := left.results[counter].score >= (integer)score_threshold and left.results[counter].weight >= weightThreshold;
 		  SG := PG or left.results_seleid[counter].score >= (integer)score_threshold;
 		  OG := SG or left.results_orgid[counter].score >= (integer)score_threshold;
 		  UG := OG or left.results_ultid[counter].score >= (integer)score_threshold;

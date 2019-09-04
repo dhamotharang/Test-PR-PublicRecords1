@@ -1,4 +1,4 @@
-import ut, Address, BIPV2, Business_Header, Business_Headerv2, Business_Header_SS, did_add,mdr, AID;
+﻿import ut, Address, BIPV2, Business_Header, Business_Headerv2, Business_Header_SS, did_add,mdr, AID;
 
 EBR_Header_In 		:= File_0010_Header_In;
 EBR_Header_Base 	:= File_0010_Header_Base_AID;
@@ -218,7 +218,7 @@ Business_Header_SS.MAC_Add_BDID_FLEX(
 			,																			// default is to hit prod from dataland, and on prod hit prod.		
 			,bipv2.xlink_version_set							// create bip keys only
 			,																			// url
-			,email_addr														// email
+			,																			// email
 			,p_city_name													// city
 			,fname																// fname
 			,mname																// mname
