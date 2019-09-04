@@ -520,7 +520,7 @@ p := group(sort(PROJECT(iid, getBocaShell(LEFT)), seq), seq);
 
 // Get apartment count for boca shell 3
 useExperianFCRA := isFCRA AND DataRestriction[Risk_Indicators.iid_constants.posExperianFCRARestriction]=Risk_Indicators.iid_constants.sFalse;	// if not restricted then use EN
-iType := data_services.data_env.iFCRA;
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 key_apt_buildings := IF(useExperianFCRA, dx_header.key_AptBuildings_EN(), dx_header.key_AptBuildings(iType));
 
 relrec addAptCount(p le, key_apt_buildings ri) := transform
