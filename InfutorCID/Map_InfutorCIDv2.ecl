@@ -370,6 +370,7 @@ jnHeader := dedup(sort(
 fixDates := project(jnHeader, transform(recordof(jnHeader),
 									self.dt_first_seen := min(left.dt_first_seen, left.dt_last_seen);
 									self.dt_last_seen := max(left.dt_first_seen, left.dt_last_seen);
+									self.global_sid := 22921; //DF-25711 - Populate Global_SID
 									self := left))(orig_phone <> '7725593733', orig_phone <> '8583422994');
 										
 										

@@ -39,19 +39,21 @@ EXPORT Layouts := MODULE
   END;
   
   EXPORT layout_in := RECORD
-    layout_key_id;
+    layout_key_id - [global_sid, record_sid];
     layout_prte_extra;
   END;
 
   EXPORT layout_base := RECORD
-    layout_in;
-    UNSIGNED6 powid;
+    // layout_in;
+		layout_key_id;
+	  UNSIGNED6 powid;
     UNSIGNED6 proxid;
     UNSIGNED6 seleid;
     UNSIGNED6 orgid;
     UNSIGNED6 ultid;
     UNSIGNED8 source_rec_id :=  0;
-  END;
+		layout_prte_extra;		
+	END;
 
   EXPORT layout_key_bdid := RECORD
     UNSIGNED6 bdid; 

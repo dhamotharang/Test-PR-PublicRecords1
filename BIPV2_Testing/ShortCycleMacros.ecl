@@ -152,6 +152,7 @@ ENDMACRO;
 
 export mac_measure(ds, act, o, answers, jfield1_answers) :=
 MACRO
+  import ut;
 	#uniquename(perecall_hits)
 	#uniquename(recall_hits)
 	#uniquename(recall_errors)
