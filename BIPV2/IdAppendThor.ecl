@@ -4,12 +4,14 @@ export IdAppendThor(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
 		,unsigned weightThreshold = 0
-		,boolean primForce = false
+		,boolean primForce = true
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
 		,boolean mimicRoxie = false // This is for ease of testing and can cause slower performance
 		                            // on thor appends so should not be used for production.
 		,string svcAppendUrl = ''
+		,boolean useFuzzy = false
+		,boolean doZipExpansion = false
 	) := module
 
 	#IF(BIPV2.IdConstants.USE_LOCAL_KEYS)
@@ -39,6 +41,9 @@ export IdAppendThor(
 		,contact_ssn // pContact_ssn = ''
 		,source // pSource = ''
 		,source_record_id // pSource_record_id = ''
+		,useFuzzy := useFuzzy
+		,weightThreshold := weightThreshold
+		,disableSaltForce := not primForce
 	);
 	#END
 
@@ -47,6 +52,8 @@ export IdAppendThor(
 			,scoreThreshold := scoreThreshold
 			,weightThreshold := weightThreshold
 			,disableSaltForce := not primForce
+			,useFuzzy := useFuzzy
+			,doZipExpansion := doZipExpansion
 			,reAppend := reAppend
 			,mimicRoxie := mimicRoxie
 			,svcAppendUrl := svcAppendUrl);
