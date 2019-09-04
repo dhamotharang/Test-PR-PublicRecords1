@@ -17,15 +17,13 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 	Cmvtranslation					:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
 	oCmvtranslation					:= OUTPUT(Cmvtranslation);
 																			
-	inFile 									:= Prof_License_Mari.file_USS0645.FOIA;
+	lender_file			:= Prof_License_Mari.file_USS0645.lender;
+	branch_file     := Prof_License_Mari.file_USS0645.branch;
+	inFile          := lender_file + branch_file;
+	// inFile       := file + branch_file;
 	ut.CleanFields(inFile, ClninFile);
-	GoodinFile              := DEDUP(clnInFile,RECORD,ALL);
-	oFile										:= OUTPUT(count(GoodinFile),NAMED('GoodinFile'));
+	oFile := output(ClninFile);
 	
-	Branch_refrnce  		:= Prof_License_Mari.files_references.USS0645_branch;
-	ut.CleanFields(Branch_refrnce, ClnBranch_refrnce);
-  O_Refrnce           := output(ClnBranch_refrnce);	
-
   fn_format_license(STRING slnum) := FUNCTION
   fmt_license 		:= CASE(LENGTH(TRIM(slnum,ALL)),
 												1	=>'000000000'+TRIM(slnum,ALL),
@@ -42,27 +40,28 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
   RETURN fmt_license;
 	END;
 	
-  ValidInFile   := PROJECT(GoodInFile, TRANSFORM(Prof_License_Mari.layout_USS0645.COMMON,
+	
+  ValidInFile   := PROJECT(inFile, TRANSFORM(Prof_License_Mari.layout_USS0645.COMMON,
 																									SELF.slnum := fn_format_license(LEFT.slnum); 
 																									SELF := LEFT;
 																									));
 	
-	Prof_License_Mari.layout_USS0645.COMMON assign_branch_flag(ValidInFile L, ClnBranch_refrnce R) := TRANSFORM
+	Prof_License_Mari.layout_USS0645.COMMON assign_branch_flag(inFile L, lender_file R) := TRANSFORM
 		SELF.BRANCH_FLAG := IF(fn_format_license(TRIM(L.SLNUM,ALL)) = fn_format_license(TRIM(R.SLNUM,ALL)) 
-		                            AND TRIM(ut.CleanSpacesAndUpper(L.LENDER_STREET_ADDR1 + L.LENDER_STREET_ADDR2),ALL)[1..15] = TRIM(ut.CleanSpacesAndUpper(R.LENDER_STREET_ADDR1+R.LENDER_STREET_ADDR2),ALL)[1..15]
-																AND TRIM(ut.CleanSpacesAndUpper(L.LENDER_CITY + L.LENDER_ZIP)) = TRIM(ut.CleanSpacesAndUpper(R.LENDER_CITY+R.LENDER_ZIP)), 'Y', 'N');
+		                            /*AND TRIM(ut.CleanSpacesAndUpper(L.STREET_ADDR1 + L.STREET_ADDR2),ALL)[1..15] = TRIM(ut.CleanSpacesAndUpper(R.STREET_ADDR1+R.STREET_ADDR2),ALL)[1..15]
+																AND TRIM(ut.CleanSpacesAndUpper(L.CITY + L.ZIP)) = TRIM(ut.CleanSpacesAndUpper(R.CITY+R.ZIP))*/, 'N', 'Y');
 		SELF := L;
 	END;
-	
-	j1_main :=  JOIN(SORT(DISTRIBUTE(ValidInFile, HASH(slnum)), slnum,LOCAL), 
-											SORT(DISTRIBUTE(ClnBranch_refrnce, HASH(slnum)), slnum,LOCAL),
+	/*
+	j1_main :=  JOIN(SORT(DISTRIBUTE(inFile, HASH(slnum)), slnum,LOCAL), 
+											SORT(DISTRIBUTE(lender_file, HASH(slnum)), slnum,LOCAL),
                           fn_format_license(TRIM(LEFT.SLNUM)) =  fn_format_license(TRIM(RIGHT.SLNUM))
-                          AND TRIM(ut.CleanSpacesAndUpper(LEFT.LENDER_STREET_ADDR1 + LEFT.LENDER_STREET_ADDR2),ALL)[1..15] = TRIM(ut.CleanSpacesAndUpper(RIGHT.LENDER_STREET_ADDR1+RIGHT.LENDER_STREET_ADDR2),ALL)[1..15]
-													AND TRIM(ut.CleanSpacesAndUpper(LEFT.LENDER_CITY + LEFT.LENDER_ZIP)) = TRIM(ut.CleanSpacesAndUpper(RIGHT.LENDER_CITY+RIGHT.LENDER_ZIP)), 
+                          AND TRIM(ut.CleanSpacesAndUpper(LEFT.STREET_ADDR1 + LEFT.STREET_ADDR2),ALL)[1..15] = TRIM(ut.CleanSpacesAndUpper(RIGHT.STREET_ADDR1+RIGHT.STREET_ADDR2),ALL)[1..15]
+													AND TRIM(ut.CleanSpacesAndUpper(LEFT.CITY + LEFT.ZIP)) = TRIM(ut.CleanSpacesAndUpper(RIGHT.CITY+RIGHT.ZIP)), 
 												  assign_branch_flag(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);	
-													
+		*/											
 	//Filtering out BAD RECORDS
-	GoodFilterRec	:= j1_main(TRIM(INSTIT_NAME) <> '' AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(INSTIT_NAME)));
+	GoodFilterRec	:= ValidInFile(TRIM(INSTIT_NAME) <> '' AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(INSTIT_NAME)));
 	
 	maribase_plus_dbas := RECORD,MAXLENGTH(7000)
 		Prof_License_Mari.layout_base_in;
@@ -92,8 +91,8 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 
 		//License number and status are not provided
 		SELF.LICENSE_NBR		:= pInput.SLNUM[1..5] + '-' + pInput.SLNUM[6..9] + '-' + pInput.SLNUM[10];
-		SELF.RAW_LICENSE_STATUS := ut.CleanSpacesAndUpper(pInput.STATUS);
-		SELF.STD_LICENSE_STATUS := IF(SELF.RAW_LICENSE_STATUS = 'ACTIVE','A','');
+		SELF.RAW_LICENSE_STATUS := 'ACTIVE';
+		SELF.STD_LICENSE_STATUS := 'A';
 
 		// SELF.PROVNOTE_3				:='{LICENSE STATUS ASSIGNED}';
 
@@ -125,10 +124,10 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 		//Get name and address
 		trimNameOrg						:= ut.CleanSpacesAndUpper(pInput.INSTIT_NAME);
 		trimNameDba						:= ut.CleanSpacesAndUpper(pInput.DBA_NAME);
-		trimAddress1					:= ut.CleanSpacesAndUpper(pInput.LENDER_STREET_ADDR1);
-		trimCity							:= ut.CleanSpacesAndUpper(pInput.LENDER_CITY);
-		trimState							:= ut.CleanSpacesAndUpper(pInput.LENDER_STATE);
-		trimZip								:= ut.CleanSpacesAndUpper(pInput.LENDER_ZIP);
+		trimAddress1					:= ut.CleanSpacesAndUpper(pInput.STREET_ADDR1);
+		trimCity							:= ut.CleanSpacesAndUpper(pInput.CITY);
+		trimState							:= ut.CleanSpacesAndUpper(pInput.STATE);
+		trimZip								:= ut.CleanSpacesAndUpper(pInput.ZIP);
 
 		//Clean corporation name
 		fixname								:= MAP(REGEXFIND('RE/MAX ',trimNameOrg) = TRUE => REGEXREPLACE('/',trimNameOrg,' '),
@@ -161,14 +160,14 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 	  SELF.ADDR_BUS_IND			:= IF(clnAddrAddr!='','B','');
 	
 		//Clean phone and remove non-numerics
-		TrimPhone							:= TRIM(StringLib.StringFilter(pInput.LENDER_PHONE_NBR,'0123456789'))[1..10];
+		TrimPhone							:= TRIM(StringLib.StringFilter(pInput.PHONE_NBR,'0123456789'))[1..10];
 		SELF.PHN_MARI_1				:= IF(TrimPhone IN ['0000000000','1111111111'],'',TrimPhone);
 		SELF.PHN_PHONE_1			:= IF(TrimPhone IN ['0000000000','1111111111'],'',TrimPhone);
-		TrimFax								:= TRIM(StringLib.StringFilter(pInput.LENDER_FAX_NBR,'0123456789'));
+		TrimFax								:= TRIM(StringLib.StringFilter(pInput.FAX_NBR,'0123456789'));
 		SELF.PHN_MARI_FAX_1		:= IF(TrimFax IN ['0000000000','1111111111'],'',TRIM(TrimFax,ALL));
 		SELF.PHN_FAX_1				:= IF(TrimFax IN ['0000000000','1111111111'],'',TrimFax);
 
-		SELF.EMAIL						:= StringLib.StringToUpperCase(TRIM(pInput.LENDER_EMAIL,LEFT,RIGHT));
+		SELF.EMAIL						:= StringLib.StringToUpperCase(TRIM(pInput.EMAIL,LEFT,RIGHT));
 	
 
 		DBAOnly								:= IF(REGEXFIND(DBApattern, fixname), REGEXFIND(DBApattern,fixname,3),'');
@@ -370,10 +369,6 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 											 AND LEFT.affil_type_cd = 'BR',
 											 assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 												
-	remove_logical 					:= SEQUENTIAL(fileservices.startsuperfiletransaction(),
-																				fileservices.RemoveSuperfile(mari_dest+src_cd,mari_dest+pVersion+'::'+src_cd),
-																				fileservices.finishsuperfiletransaction()
-																				);
 
 	// Adding to Superfile
   ds_map_deduped 			:= DEDUP(ds_map_affil,RECORD,ALL,LOCAL);
@@ -382,7 +377,8 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 	
 	add_super := Prof_License_Mari.fAddNewUpdate(ds_map_affil);
 
-	move_to_used := Prof_License_Mari.func_move_file.MyMoveFile(code, 'lenders', 'using', 'used');
+	move_to_used := parallel(Prof_License_Mari.func_move_file.MyMoveFile(code, 'lender', 'using', 'used'),
+	                         Prof_License_Mari.func_move_file.MyMoveFile(code, 'branch', 'using', 'used'));
 
 	notify_missing_codes := Prof_License_Mari.fNotifyError.MissingStdCodes(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
@@ -390,7 +386,7 @@ EXPORT map_USS0645_conversion(STRING pVersion) := FUNCTION
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
 	
-	RETURN SEQUENTIAL(oCmvtranslation,oFile,O_Refrnce,remove_logical,d_final,add_super, move_to_used, notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(oCmvtranslation,oFile, d_final,add_super, move_to_used, notify_missing_codes, notify_invalid_address);
 
 END;
 

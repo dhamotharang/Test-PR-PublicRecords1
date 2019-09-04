@@ -1,4 +1,4 @@
-IMPORT lib_fileservices, _control, lib_stringlib, _Validate, did_add, ut, business_header_ss, business_header, Health_Facility_Services, HealthCareFacility, hxmx ;
+﻿IMPORT lib_fileservices, _control, lib_stringlib, _Validate, did_add, ut, business_header_ss, business_header, Health_Facility_Services, HealthCareFacility, hxmx, BIPV2_Company_Names ;
 
 // #stored('did_add_force','thor'); // remove or set to 'roxi' to put recs through roxi
 

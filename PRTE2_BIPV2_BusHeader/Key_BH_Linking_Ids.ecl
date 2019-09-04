@@ -1,4 +1,4 @@
-﻿import BIPV2, AutoStandardI, tools, BIPV2_Suppression;
+﻿import BIPV2, AutoStandardI, tools, BIPV2_Suppression,Prte2;
 
 EXPORT Key_BH_Linking_Ids := MODULE
 
@@ -32,6 +32,10 @@ EXPORT Key_BH_Linking_Ids := MODULE
 		BIPV2.IDlayouts.l_xlink_ids.OrgWeight;
 		BIPV2.IDlayouts.l_xlink_ids.UltScore;
 		BIPV2.IDlayouts.l_xlink_ids.UltWeight;
+		Prte2.Layouts.DEFLT_CPA;
+	//	unsigned4 global_sid;
+  //  unsigned8 record_sid;
+		unsigned6 locid;
 	end;
 
 	shared infile_key := project(infile, transform(layout_key,  
@@ -49,6 +53,9 @@ EXPORT Key_BH_Linking_Ids := MODULE
 																											self.UltWeight  := 100,
 																											self.SELEscore	:= 100,
 																											self.SELEweight	:= 100,
+																											self.global_sid := 0  ,
+                                                      self.record_sid := 0  ,
+																											self.locid      :=0,
                                                       self 						:= left,
 																											));
 
@@ -67,6 +74,9 @@ EXPORT Key_BH_Linking_Ids := MODULE
                                                 self.UltWeight  := 100,
                                                 self.SELEscore  := 100,
                                                 self.SELEweight := 100,
+																								self.global_sid := 0  ,
+                                                self.record_sid := 0  ,
+																								self.locid      :=0,
                                                 self            := left,
                                                 ));
 BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_hidden_key, k1, superfile_name_hidden);																					

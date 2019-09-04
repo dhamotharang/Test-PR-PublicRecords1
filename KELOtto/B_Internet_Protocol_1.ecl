@@ -19,7 +19,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     KEL.typ.nint Record_Id_;
     KEL.typ.nkdate Event_Date_;
     KEL.typ.ndataset(E_Event.Event_Types_Layout) Event_Types_;
-    KEL.typ.nint Otto_Address_Id_;
+    KEL.typ.nstr Otto_Address_Id_;
     KEL.typ.nkdate Date_Of_Birth_;
     KEL.typ.nkdate Deceased_Date_;
     KEL.typ.nkdate Deceased_Date_Of_Birth_;
@@ -232,7 +232,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -339,7 +339,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -429,7 +429,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE291581 := JOIN(__EE291485,__EE290494,__JC291491(LEFT,RIGHT),__JT291491(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE291581 := JOIN(__EE291485,__EE290494,__JC291491(LEFT,RIGHT),__JT291491(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __EE290460 := __EE282499;
   SHARED __ST284059_Layout := RECORD
     KEL.typ.nint Exp1_;
@@ -448,7 +448,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -540,7 +540,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE291679 := JOIN(__EE291581,__EE290620,__JC291587(LEFT,RIGHT),__JT291587(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE291679 := JOIN(__EE291581,__EE290620,__JC291587(LEFT,RIGHT),__JT291587(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __EE290457 := __EE282499;
   SHARED __ST283887_Layout := RECORD
     KEL.typ.nint Exp1_;
@@ -559,7 +559,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -653,7 +653,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE291779 := JOIN(__EE291679,__EE290750,__JC291685(LEFT,RIGHT),__JT291685(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE291779 := JOIN(__EE291679,__EE290750,__JC291685(LEFT,RIGHT),__JT291685(LEFT,RIGHT),LEFT OUTER,HASH);
   SHARED __EE290454 := __EE282499;
   SHARED __ST283629_Layout := RECORD
     KEL.typ.nint Exp1_;
@@ -672,7 +672,7 @@ EXPORT B_Internet_Protocol_1 := MODULE
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;
@@ -768,13 +768,13 @@ EXPORT B_Internet_Protocol_1 := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE291881 := JOIN(__EE291779,__EE290882,__JC291785(LEFT,RIGHT),__JT291785(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __EE291881 := JOIN(__EE291779,__EE290882,__JC291785(LEFT,RIGHT),__JT291785(LEFT,RIGHT),LEFT OUTER,HASH);
   EXPORT __ST19961_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Internet_Protocol.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr Ip_Address_;
-    KEL.typ.nint Otto_Ip_Address_Id_;
+    KEL.typ.nstr Otto_Ip_Address_Id_;
     KEL.typ.nstr _host_;
     KEL.typ.nstr _alias_;
     KEL.typ.nstr _location_;

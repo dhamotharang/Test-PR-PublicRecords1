@@ -2,15 +2,17 @@
 
 ModifyFileName(string ilfn, string rpt) := Std.Str.FindReplace(ilfn, 'ncf2', rpt);
 ExtractFileName(string ilfn) := Std.Str.SplitWords(ilfn, '::')[4];
+/**
+  dataDir			has incoming and ougoing subdirectories
+	maintenance	has spraying, done, error subdirectories
+*/
+EXPORT ProcessContributoryFile(string ip, string dataDir, string lfn, string maintenance, string version) := function
 
-
-EXPORT ProcessContributoryFile(string ip, string rootDir, string lfn, string maintenance, string version) := function
-
-		ready    := rootDir+'incoming/';
+		ready    := dataDir + 'incoming/';
 		done     := maintenance+'done/';
 		err      := maintenance+'error/';
 		spraying := maintenance+'spraying/';
-		outgoing := rootDir+'outgoing/';
+		outgoing := dataDir+'outgoing/';
 		
 		ilfn := '~nac::uber::in::'+lfn;
 

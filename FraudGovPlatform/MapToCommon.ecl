@@ -19,8 +19,6 @@ module
 		self.additional_address.State				:= left.Mailing_State;
 		self.additional_address.Zip					:= left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
-		self.additional_address.address_1		:= left.mailing_address_1;
-		self.additional_address.address_2		:= left.mailing_address_2;
 		self.dt_first_seen	:= left.Process_Date;
 		self.dt_last_seen		:= left.Process_Date;
 		self.dt_vendor_last_reported	:= left.FileDate;
@@ -28,8 +26,10 @@ module
 		self:= left; 
 		self:= [];
 	)); 
+	
+	extra_dedup_KnownFraud := fn_dedup_knownfraud(inKnownFraud); // remove duplicate records with different customer_event_id
  
-	Export KnownFraud := project (inKnownFraud , transform(FraudShared.Layouts.Base.Main , 
+	Export KnownFraud := project (extra_dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
 		self.transaction_id := left.customer_event_id;
 		self.additional_address.Street_1	:= left.Mailing_Street_1; 
@@ -38,8 +38,6 @@ module
 		self.additional_address.State			:= left.Mailing_State;
 		self.additional_address.Zip				:= left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
-		self.additional_address.address_1 := left.mailing_address_1;
-		self.additional_address.address_2 := left.mailing_address_2;	
 		self.dt_first_seen	:= left.Process_Date; 
 		self.dt_last_seen		:= left.Process_Date;
 		self.dt_vendor_last_reported	:= left.FileDate; 
@@ -71,8 +69,6 @@ module
 		self.additional_address.State			:= left.Mailing_State;
 		self.additional_address.Zip				:= left.Mailing_Zip;
 		self.additional_address.Address_Type := 'Mailing';
-		self.additional_address.address_1 := left.mailing_address_1;
-		self.additional_address.address_2 := left.mailing_address_2;
 		self.classification_Activity.Confidence_that_activity_was_deceitful_id	:= (unsigned2)left.deceitful_confidence;
 		self:= left; 
 		self:= [];
@@ -93,8 +89,11 @@ module
 	// Append Clean Address
 	EXPORT NewBaseCleanAddress := Append_CleanAddress(NewBasePreviousValues):independent;
 
+	// Append Clean Additional Address
+	EXPORT Append_CleanAdditionalAddress := Append_CleanAdditionalAddress(NewBaseCleanAddress):independent;
+	
 	// Append Lexid
-	EXPORT NewBaseLexid := Append_Lexid (NewBaseCleanAddress):independent;
+	EXPORT NewBaseLexid := Append_Lexid (Append_CleanAdditionalAddress):independent;
 
 	// Append RinID
 	EXPORT NewBaseRinID := Append_RinID (NewBaseLexid):independent;
