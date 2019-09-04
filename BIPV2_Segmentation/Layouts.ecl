@@ -91,8 +91,13 @@
           string8                     company_sic_code1;
           string6                     company_naics_code1;
           boolean                     has_SOS;
-          dataset(OrgStructureLayout) org_structure;                    	
-          dataset(ContactProxLayout)  contacts;          
+		string1                     best_address_type;
+		string1                     all_address_type;
+		string3                     sourceGroups;
+		unsigned6                   best_contact_did;
+		string50                    best_contact_job_title; 
+          string10                    best_contact_seg_ind;     
+		// dataset(OrgStructureLayout) org_structure;                 //CHANGE   	
      end;
 
      export SlimLayout := record

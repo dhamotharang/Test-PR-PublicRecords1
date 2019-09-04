@@ -785,16 +785,6 @@ rgxApos1 := '[^A-Z0-9_]\'([A-Z0-9_]+)';
 rgxApos2 := '([A-Z0-9_]+)\'( |$)';
 string RemoveApostrophe(string s) :=  REGEXREPLACE(rgxApos2, 
 																					REGEXREPLACE(rgxApos1, s, ' $1'), ' $1 ');
-string Preprocess(string s, string options) := Std.Str.CleanSpaces(CheckMispelledTrust(
-		TrimRightPunct(Address.NameTester.RemoveNonPrintingChars(Unquote(
-			STD.str.SubstituteIncluded(
-			//IF('W' in options OR 'S' in options, 
-			IF(Std.str.Contains(options,'W',true) OR Std.str.Contains(options,'S',true),
-				//REGEXREPLACE('([A-Z]+,[A-Z]+),([A-Z ]+)',
-				//	stringlib.StringFindReplace(s, '3RD', 'III'),'$1 $2'),
-				Address.Persons.SuffixToAlpha(s),
-				s),
-		'\r\n\t\000',' '))))));
 
 rgxChurchTypes := 
 '(AME|BAPTIST|BRETHREN|CATHOLIC|CATH|CHRIST|CHRISTIAN|CME|EPSIC|FAITH|GRACE|LUTHERAN|METH|NAZARENE|PENT|PRESBYTERIAN|PRESB|PRES|REFORMED|TEMPLE|UM|ZION)';
