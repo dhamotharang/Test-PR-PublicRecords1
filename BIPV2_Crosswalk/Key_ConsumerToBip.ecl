@@ -100,6 +100,8 @@ export Key_ConsumerToBip := module
 		normalize_recs       := normalize(inDs(count(normalize_field)>0),
 		                                  left.normalize_field,
 								    transform(newLayout,
+								              newSourceInfo   := dataset([{right.source,right.source_record_id}],Layouts.SourceInfoRec);
+								              self.sourceInfo := left.sourceInfo + newSourceInfo;
 								              self := left, 
 										    self := right));
 										    
@@ -118,15 +120,38 @@ export Key_ConsumerToBip := module
      ) := function
 						
 	      remove_restricted := kfetch(inputs, in_mod, JoinLimit, JoinType, applyMarketingRestrictions);
-		 
-		 normalizeJobTitles     := normalize_mac(remove_restricted, jobTitles, Layouts.ConsumerToBipWorkRec1);
+
+           addSourceRecInfo       := project(remove_restricted, Layouts.ConsumerToBipWorkRec0);		 
+		 normalizeJobTitles     := normalize_mac(addSourceRecInfo, jobTitles, Layouts.ConsumerToBipWorkRec1);
 		 normalizeContactNames  := normalize_mac(normalizeJobTitles, contactNames, Layouts.ConsumerToBipWorkRec2);
 
 		 
 		 filterSourcesAndGroups := normalizeContactNames(source in sourcesToInclude and sourceGroup in sourceGroupsToInclude);
+
+		 normSourceInfoRecs     := normalize(filterSourcesAndGroups, left.sourceInfo,
+		                                     transform(Layouts.SourceInfoWorkRec3,
+									            self := right,
+									            self := left));											 
 		 
+           dedupSourceInfoRecs    := dedup(normSourceInfoRecs, UniqueID, ultid, orgid, seleid, contact_did, source, source_record_id,  all);
+		 createChildDatasets    := project(dedupSourceInfoRecs,
+		                                   transform(Layouts.SourceInfoWorkRec4,
+									          self            := left,
+											self.sourceInfo := dataset([{left.source,left.source_record_id}],Layouts.SourceInfoRec)));
+
+           rollSourceInfo   := rollup(sort(createChildDatasets, uniqueID, ultid, orgid, seleid, contact_did), 
+		                                  left.uniqueID    = right.uniqueID and
+		                                  left.ultid       = right.ultid and
+								    left.orgid       = right.orgid and
+								    left.seleid      = right.seleid and
+								    left.contact_did = right.contact_did, 
+								    transform(Layouts.SourceInfoWorkRec4,
+								              self.sourceInfo := left.sourceInfo + right.sourceInfo,
+										    self            := left));
+											    
 		 changeToFinalForm      := project(filterSourcesAndGroups,
 		                                   transform(Layouts.ConsumerToBipFinalRec,
+									          self.sourceInfo := dedup(left.sourceInfo(source!=''),source,source_record_id);
 									          self            := left,
 											self.job_title1 := left.job_title,
 											self.job_title2 := '',
@@ -153,7 +178,17 @@ export Key_ConsumerToBip := module
 										self            := left));
 										
 
-           adjustDates       := project(rolljobTitle, 
+           addSourceInfo := join(rolljobTitle, rollSourceInfo,
+		                       left.uniqueID    = right.uniqueID and
+		                       left.ultid       = right.ultid and
+						   left.orgid       = right.orgid and
+						   left.seleid      = right.seleid and
+						   left.contact_did = right.contact_did, 		 
+						   transform(Layouts.ConsumerToBipFinalRec,
+							        self.sourceInfo := right.sourceInfo,
+								   self            := left));
+									   
+           adjustDates       := project(addSourceInfo, 
 		                              transform(Layouts.ConsumerToBipFinalRec,
 								          self.dt_first_seen_at_business := map(
 										                                      left.dt_first_seen_at_business > left.dt_last_seen                                          => left.dt_last_seen,
@@ -166,7 +201,7 @@ export Key_ConsumerToBip := module
 																	   left.dt_last_seen_at_business
 																	   );
 						                    self := left));
-		 
+	 
 		 return adjustDates;
      end;
 	
