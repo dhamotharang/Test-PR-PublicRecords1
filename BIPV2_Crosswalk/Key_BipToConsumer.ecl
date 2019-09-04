@@ -91,8 +91,7 @@ export Key_BipToConsumer := module
 		
 		return if(applyMarketingRestrictions, marketingRestrictions, ds_restricted);
      end;
-
-
+	
      shared normalize_mac(inDs, normalize_field, newLayout) := functionmacro
 	     no_recs_to_normalize := project(inDs(count(normalize_field)=0), 
 		                                transform(newLayout,
@@ -102,8 +101,10 @@ export Key_BipToConsumer := module
 		normalize_recs       := normalize(inDs(count(normalize_field)>0),
 		                                  left.normalize_field,
 								    transform(newLayout,
-								              self := left, 
-										    self := right));
+								              newSourceInfo   := dataset([{right.source,right.source_record_id}],Layouts.SourceInfoRec);
+								              self.sourceInfo := left.sourceInfo + newSourceInfo(trim(source)!='');
+								              self            := left, 
+										    self            := right));
 										    
           return normalize_recs + 	no_recs_to_normalize;									    
 	endmacro;
@@ -122,7 +123,8 @@ export Key_BipToConsumer := module
      ) := function
 	      remove_restricted := kfetch(inputs, level, in_mod, JoinLimit, JoinType, applyMarketingRestrictions);
 		 
-		 normalizeContactNames  := normalize_mac(remove_restricted, contactNames, Layouts.BipToConsumerWorkRec1);
+		 addSourceRecInfo       := project(remove_restricted, Layouts.BipToConsumerWorkRec0);
+		 normalizeContactNames  := normalize_mac(addSourceRecInfo, contactNames, Layouts.BipToConsumerWorkRec1);
 		 normalizeSSNs          := normalize_mac(normalizeContactNames, contactSSNs, Layouts.BipToConsumerWorkRec2);
 		 normalizeDOBs          := normalize_mac(normalizeSSNs, contactDOBs, Layouts.BipToConsumerWorkRec3);
 		 normalizeEmails        := normalize_mac(normalizeDOBs, contactEmails, Layouts.BipToConsumerWorkRec4);
@@ -132,8 +134,40 @@ export Key_BipToConsumer := module
 		 
 		 filterSourcesAndGroups := normalizeJobTitles(source in sourcesToInclude and sourceGroup in sourceGroupsToInclude);
 		 
+		 normSourceInfoRecs     := normalize(filterSourcesAndGroups, left.sourceInfo,
+		                                     transform(Layouts.SourceInfoWorkRec1,
+									            self := right,
+									            self := left));											 
+		 
+           dedupSourceInfoRecs    := dedup(normSourceInfoRecs, UniqueID, ultid, orgid, seleid, contact_did, source, source_record_id, all);
+		 createChildDatasets    := project(dedupSourceInfoRecs,
+		                                   transform(Layouts.SourceInfoWorkRec2,
+									          self            := left,
+											self.sourceInfo := dataset([{left.source,left.source_record_id}],Layouts.SourceInfoRec)));
+
+           rollSourceInfoLexId   := rollup(sort(createChildDatasets(contact_did>0), uniqueID, ultid, orgid, seleid, contact_did), 
+		                                       left.uniqueID    = right.uniqueID and
+		                                       left.ultid       = right.ultid and
+								         left.orgid       = right.orgid and
+								         left.seleid      = right.seleid and
+								         left.contact_did = right.contact_did, 
+								         transform(Layouts.SourceInfoWorkRec2,
+								                   self.sourceInfo := left.sourceInfo + right.sourceInfo,
+										         self            := left));
+											    
+           rollSourceInfoEmpId    := rollup(sort(createChildDatasets(contact_did=0 and empId>0), uniqueID, ultid, orgid, seleid, empid), 
+		                                       left.uniqueID    = right.uniqueID and
+		                                       left.ultid       = right.ultid and
+								         left.orgid       = right.orgid and
+								         left.seleid      = right.seleid and
+								         left.empid       = right.empid, 
+								         transform(Layouts.SourceInfoWorkRec2,
+								                   self.sourceInfo := left.sourceInfo + right.sourceInfo,
+										         self            := left));
+		 		 
 		 changeToFinalForm      := project(filterSourcesAndGroups,
 		                                   transform(Layouts.BipToConsumerFinalRec,
+											self.sourceInfo := dedup(left.sourceInfo(source!=''),source,source_record_id);
 									          self            := left,
 											self.job_title1 := left.job_title,
 											self.job_title2 := '',
@@ -178,7 +212,27 @@ export Key_BipToConsumer := module
 										self.job_title3 := if(left.job_title3='' and left.job_title2!='',newJobTitle, left.job_title3),
 										self            := left));
 
-           adjustDates       := project(rolljobTitleLexID + rolljobTitleEmpID + changeToFinalForm(empId = 0 and contact_did=0), 
+           addSourceInfoLexID := join(rolljobTitleLexID, rollSourceInfoLexId,
+		                            left.uniqueID    = right.uniqueID and
+		                            left.ultid       = right.ultid and
+						        left.orgid       = right.orgid and
+						        left.seleid      = right.seleid and
+							   left.contact_did = right.contact_did, 		 
+							   transform(Layouts.BipToConsumerFinalRec,
+							             self.sourceInfo := right.sourceInfo,
+								  	   self            := left));
+									  
+           addSourceInfoEmpID := join(rolljobTitleEmpId, rollSourceInfoEmpId,
+		                            left.uniqueID    = right.uniqueID and
+		                            left.ultid       = right.ultid and
+						        left.orgid       = right.orgid and
+						        left.seleid      = right.seleid and
+							   left.empid       = right.empid, 		 
+							   transform(Layouts.BipToConsumerFinalRec,
+							             self.sourceInfo := right.sourceInfo,
+								        self            := left));
+									  
+           adjustDates       := project(addSourceInfoLexID + addSourceInfoEmpID + changeToFinalForm(empId = 0 and contact_did=0), 
 		                              transform(Layouts.BipToConsumerFinalRec,
 								          self.dt_first_seen_at_business := map(
 										                                      left.dt_first_seen_at_business > left.dt_last_seen                                          => left.dt_last_seen,
@@ -191,7 +245,8 @@ export Key_BipToConsumer := module
 																	   left.dt_last_seen_at_business
 																	   );
 						                    self := left));
-		 
+		 		 
+		                       
 		 return adjustDates;		 
      end;
 end;
