@@ -20,6 +20,11 @@ EXPORT	fn_SuppressedFCRALiensMain	:=	FUNCTION
 	dFCRAMain									:=	LiensV2.file_liens_main(
 																							tmsid[..2]	IN	['HG']
 																						);
+	//DF-25415 - Prevent suppression of released cases.																					
+  dFCRAMain_released := table(dFCRAMain(release_date <> ''),{TMSID},TMSID,few);	
+
+  dFCRAMain_withoutreleased := join(distribute(dFCRAMain_released,HASH(TMSID)),distribute(dFCRAMain,HASH(TMSID)),left.tmsid=right.tmsid, right only ,local);
+
 
 	rFCRAMainWithCourtID	:=	RECORD
 		dFCRAMain,
@@ -27,10 +32,10 @@ EXPORT	fn_SuppressedFCRALiensMain	:=	FUNCTION
 		STRING2	FILETYPEID;
 	END;
 
-	dFCRAMainWithCourtID	:=	PROJECT(dFCRAMain,
+	dFCRAMainWithCourtID	:=	PROJECT(dFCRAMain_withoutreleased,
 															TRANSFORM(
 																rFCRAMainWithCourtID,
-																SELF.CourtID		:=	LEFT.tmsid[LENGTH(TRIM(LEFT.tmsid,LEFT,RIGHT))-6..];
+																SELF.CourtID		:=	LEFT.AgencyID; //LEFT.tmsid[LENGTH(TRIM(LEFT.tmsid,LEFT,RIGHT))-6..];
 																SELF.FILETYPEID	:=	LEFT.rmsid[LENGTH(TRIM(LEFT.rmsid,LEFT,RIGHT))-1..];
 																SELF						:=	LEFT;
 															)
