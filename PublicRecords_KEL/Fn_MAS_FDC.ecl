@@ -1,5 +1,5 @@
-﻿IMPORT BankruptcyV3, BIPV2, Cortera_Tradeline, Doxie, Doxie_Files, FAA, Header, Header_Quick, 
-		MDR, VehicleV2, Watercraft;
+﻿IMPORT BankruptcyV3, BIPV2, Cortera_Tradeline, dx_header, Doxie_Files, FAA, Header, Header_Quick, 
+		MDR, VehicleV2, Watercraft, data_services;
 
 EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input,
 									PublicRecords_KEL.Interface_Options Options,
@@ -16,7 +16,8 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
       -  Business Header
       -  Tradeline (Cortera)
 */
-
+  unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+  
 	Layouts_FDC     := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 	Common          := PublicRecords_KEL.ECL_Functions.Common(Options);
 	CFG_File        := PublicRecords_KEL.CFG_Compile;
@@ -58,8 +59,8 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 
 	************************************************************************** */
 
-	// Doxie.Key_FCRA_Header/Doxie.Key_Header. FCRA/NonFCRA have the same layout.
-	Doxie__Key_Header := IF(Options.IsFCRA, Doxie.Key_FCRA_Header, Doxie.Key_Header);
+	// FCRA/NonFCRA have the same layout.
+	Doxie__Key_Header := dx_header.key_header(iType);
 	Doxie__Key_Header_Records := IF(Common.DoFDCJoin_Doxie__Key_Header,
 		JOIN(Input_FDC_Filtered, Doxie__Key_Header,
 				KEYED(LEFT.LexIDAppend = (UNSIGNED)RIGHT.s_did),

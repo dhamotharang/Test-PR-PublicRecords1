@@ -1,4 +1,4 @@
-﻿IMPORT Address, Std, VehicleV2_Services;
+﻿IMPORT Address, Std, VehicleV2_Services, doxie;
 
 EXPORT fn_getVehicles(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) ds_srch_recs,
 				HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
@@ -29,7 +29,8 @@ EXPORT fn_getVehicles(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) d
 		END;
 
 		// ALWAYS FETCH LOCAL RECORDS
-		veh_did_recs:=VehicleV2_Services.Get_Vehicle_Records(did_mod).sorted_vehs(EXISTS(registrants));
+    veh_did_recs := VehicleV2_Services.SearchRecords.getVehicleRecords(did_mod)(EXISTS(registrants));
+
 		veh_vin_recs:=DEDUP(SORT(veh_did_recs(NOT is_current),vin,-MAX(registrants,Reg_Latest_Expiration_Date)),vin);
 		veh_max_recs:=CHOOSEN(veh_did_recs(is_current)+SORT(veh_vin_recs,-MAX(registrants,Reg_Latest_Expiration_Date)),max_vehicles);
 		veh_slim_did_recs:=PROJECT(veh_max_recs,TRANSFORM(HomesteadExemptionV2_Services.Layouts.vehicleRec,
@@ -45,7 +46,9 @@ EXPORT fn_getVehicles(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) d
 			SELF:=LEFT));
 
 		// CONDITIONALLY FETCH REALTIME RECORDS
-		veh_rtv_recs:=IF(in_mod.IncludeRealtimeVehicles,VehicleV2_Services.Get_Vehicle_Records(rtv_mod).sorted_vehs,DATASET([],VehicleV2_Services.Layout_Report));
+		veh_rtv_recs:=IF(in_mod.IncludeRealtimeVehicles,
+                     VehicleV2_Services.SearchRecords.getVehicleRecords(rtv_mod),
+                     DATASET([],VehicleV2_Services.Layout_Report));
 		veh_slim_rtv_recs:=PROJECT(veh_rtv_recs,TRANSFORM(HomesteadExemptionV2_Services.Layouts.vehicleRec,
 			SELF.acctno:=L.acctno,
 			SELF.isCurrent:=LEFT.is_current,

@@ -1,4 +1,4 @@
-﻿import VehicleV2_Services, MDR;
+﻿import $, VehicleV2_Services, MDR;
 
 export Batch_Transforms := MODULE
 
@@ -615,8 +615,8 @@ export Batch_Transforms := MODULE
 												BOOLEAN currentOnly = FALSE, BOOLEAN penalize_by_party = FALSE) := FUNCTION
 		in_veh_keys_1 := GROUP(SORT(in_veh_keys, Vehicle_Key, Iteration_Key, Sequence_Key),
 													 Vehicle_Key, Iteration_Key, Sequence_Key);
-		in_mod := IParam.getSearchModule();
-		veh_recsTmp := VehicleV2_Services.Functions.Get_VehicleSearch(in_mod, in_veh_keys_1, , penalize_by_party);
+		in_mod := $.IParam.getSearchModule();
+		veh_recsTmp := VehicleV2_Services.Functions.Get_VehicleSearch(in_mod, in_veh_keys_1, penalize_by_party);
 		veh_recs := IF(currentOnly, veh_recsTmp(is_current), veh_recsTmp);
 		rpen := PROJECT(UNGROUP(veh_recs), xfm_Veh_recs(LEFT));
 		rpen_s := SORT(rpen, acctno, Vehicle_Key, Iteration_Key, -is_current, Sequence_Key, -vendor_last_reported_date);

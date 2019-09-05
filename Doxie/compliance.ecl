@@ -104,6 +104,31 @@ EXPORT compliance := MODULE
     EXPORT boolean ignoreFidelity := FALSE;
   ENDMACRO;
 
+  //assign module's fields one-by-one from existing mod_access-compatible module
+  EXPORT MAC_CopyModAccessValues (mod) := MACRO
+      EXPORT unsigned1 unrestricted := mod.unrestricted;
+      EXPORT unsigned1 glb := mod.glb;
+      EXPORT unsigned1 dppa := mod.dppa;
+      EXPORT string DataPermissionMask := mod.DataPermissionMask;
+      EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
+      EXPORT boolean ln_branded := mod.ln_branded;
+      EXPORT boolean probation_override := mod.probation_override;
+      EXPORT string5 industry_class := mod.industry_class;
+      EXPORT string32 application_type := mod.application_type;
+      EXPORT boolean no_scrub := mod.no_scrub;
+      EXPORT unsigned3 date_threshold := mod.date_threshold;
+      EXPORT boolean suppress_dmv := mod.suppress_dmv;
+      EXPORT unsigned1 lexid_source_optout := mod.lexid_source_optout;
+      EXPORT boolean log_record_source := mod.log_record_source;
+      EXPORT boolean show_minors := mod.show_minors;
+      EXPORT string ssn_mask := mod.ssn_mask;
+      EXPORT unsigned1 dl_mask :=  mod.dl_mask;
+      EXPORT unsigned1 dob_mask := mod.dob_mask;
+      EXPORT unsigned1 reseller_type := mod.reseller_type;
+      EXPORT unsigned1 intended_use := mod.intended_use;
+      EXPORT string transaction_id := mod.transaction_id;
+      EXPORT unsigned6 global_company_id :=mod.global_company_id;
+  ENDMACRO;    
 
   shared restrictedSet := ['0',''];
   // ==============================================================================================
@@ -138,6 +163,7 @@ EXPORT compliance := MODULE
   // TCH = Transunion Credit Header data
   EXPORT boolean isTCHRestricted        (string drm) := drm[10] NOT IN restrictedSet;
   EXPORT boolean isTTRestricted         (string drm) := drm[11] NOT IN restrictedSet; //TeleTrack, a.k.a. TT
+  EXPORT boolean isInfutorMVRestricted  (string drm) := drm[17] NOT IN restrictedSet;
   EXPORT boolean isPreGLBRestricted     (string drm) := drm[23] NOT IN restrictedSet; //customer can see GLB protected data prior to June 2001
   EXPORT boolean isFdnInquiry           (string drm) := drm[25] not in restrictedSet;
   EXPORT boolean isJuliRestricted       (string drm) := drm[41] NOT IN restrictedSet;

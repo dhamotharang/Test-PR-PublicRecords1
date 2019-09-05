@@ -11,7 +11,7 @@ MACRO
   //Counts are only performed on first input row.
   udid := (unsigned6)inputs[1].did;
   comp_prop_count := doxie.Fn_comp_prop_count(udid,,,,mod_access.ln_branded,mod_access.probation_override);
-  veh_cnt := doxie.Fn_veh_count(udid,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.ln_branded,mod_access.probation_override,, isCNSMR);
+  veh_cnt := doxie.Fn_veh_count(udid,mod_access);
   dl_cnt := doxie.Fn_dl_count(udid,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.ln_branded,mod_access.probation_override);
   paw_count := paw_services.PAW_Raw.getPAWcount(udid,mod_access.glb,mod_access.dppa,255);
 

@@ -1,6 +1,5 @@
 ﻿EXPORT MAC_Default_SPC(inputFile,outputFile) := MACRO
 #uniquename(bneg)
-%bneg%(STRING S) := IF ((INTEGER)S>0,S,'');
 LOADXML('<xml/>');
 #EXPORTXML(doCleanFieldMetaInfo, recordof(inputFile))
 outputFile := dataset([
@@ -44,18 +43,10 @@ outputFile := dataset([
 			#SET(thisChild,'')
 			#SET(thisRec,'')
 		#ELSE
-			#DECLARE(thisSize)
-			#IF(%@size% > 0 and %'@type'% = 'unicode')
-				#SET(thisSize, (INTEGER)(%@size%/2))
-			#ELSEIF(%@size% > 0 and %'@type'% = 'varunicode')
-				#SET(thisSize, (INTEGER)((%@size%-2)/2))		
-			#ELSE
-				#SET(thisSize,%@size%)
-			#END
 			#IF(%'thisChild'%='')
-				#SET (doCleanFieldText, 'FIELD:' + %'thisRec'% + %'@name'% + ':TYPE(' + Stringlib.StringToUpperCase(%'@type'%) + %bneg%(%'thisSize'%) + '):0,0')
+				#SET (doCleanFieldText, 'FIELD:' + %'thisRec'% + %'@name'% + ':TYPE(' + Stringlib.StringToUpperCase(%'{@ecltype}'%) + '):0,0')
 			#ELSE
-				#SET (doCleanFieldText, 'FIELD:' + %'@name'% + ':MULTIPLE(LIST(' + %'thisChild'% + '),ANY):KEEP(2):TYPE(' + Stringlib.StringToUpperCase(%'@type'%) + %bneg%(%'thisSize'%) + '):0,0')
+				#SET (doCleanFieldText, 'FIELD:' + %'@name'% + ':MULTIPLE(LIST(' + %'thisChild'% + '),ANY):KEEP(2):TYPE(' + Stringlib.StringToUpperCase(%'@ecltype'%) + '):0,0')
 			#END
 			%'doCleanFieldText'%,
 		#END

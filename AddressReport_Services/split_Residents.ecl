@@ -1,8 +1,9 @@
-IMPORT doxie, ut, iesp, Suppress, header, AutoStandardI, DeathV2_Services;
+IMPORT doxie, ut, iesp, Suppress, header, DeathV2_Services, dx_death_master, dx_header, Header;
 
 export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp, 
 	                      DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo,
-												AddressReport_Services.input._addressreport param) := MODULE
+												AddressReport_Services.input._addressreport param,
+												Doxie.IDataAccess mod_access) := MODULE
 	
 	SHARED MatchOnAddressCriteria(DATASET(AddressReport_Services.layouts.residents_final_out) ds_first_cut, 
 																DATASET(AddressReport_Services.layouts.in_address) m_AddrInfo, 
@@ -27,24 +28,24 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
 		
 	//********************************************************************************************************		
   export AddressReport_Services.layouts.residents_final_out add_akas (DATASET(doxie.layout_best) resi_input):=function
-		suppressDMVInfo_value := AutoStandardI.GlobalModule().suppressDMVInfo;
+		
     main_record := record (AddressReport_Services.layouts.resident_best_layout)
       boolean is_best := true;
       boolean legacy_ssn := false; //for potentially randomized SSNs defines if SSN-DID pair was seen before
     end;
-  
-    hrecs_raw := join (resi_input, doxie.Key_Header,
+	
+    hrecs_raw := join (resi_input, dx_header.Key_Header(),
 											 KEYED(LEFT.did = RIGHT.s_did)
 											 and LEFT.prim_name = RIGHT.prim_name
 											 and LEFT.st = RIGHT.st
-											 and ~Doxie.DataRestriction.isHeaderSourceRestricted(right.src),
+											 and ~doxie.compliance.isHeaderSourceRestricted(right.src, mod_access.DataRestrictionMask),
 											 transform(right),
 											 limit(ut.limits.DEFAULT));
-									 
-		hrecs_filt := Header.FilterDMVInfo(hrecs_raw);
-		hrecs0 := if(suppressDMVInfo_value, hrecs_filt, hrecs_raw);
+    glb_ok :=  mod_access.isValidGLB ();
+    dppa_ok := mod_access.isValidDPPA ();
+    Header.MAC_GlbClean_Header(hrecs_raw,hrecs0, , , mod_access);							 
 		
-    main_record get_header_recs(doxie.Key_Header R) := transform
+    main_record get_header_recs(RECORDOF(hrecs0) R) := transform
       self.is_best := false;
       self.name_suffix := if (R.name_suffix ='UNK','',R.name_suffix);
       self.prim_name   := if (R.src in ['DE', 'DS'],'',R.prim_name);
@@ -64,7 +65,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
                       Left.ssn = Right.ssn or (Right.ssn = ''), Left.dob = Right.dob or (Right.dob = 0));
 
     // check if SSN was seen before randomization:
-    ssn_w_legacy_info := join (resi, doxie.key_legacy_ssn,
+    ssn_w_legacy_info := join (resi, dx_header.key_legacy_ssn(),
                                keyed (Left.ssn = Right.ssn) AND
                                (Left.did = Right.did),
                                transform (main_record, Self.legacy_ssn := Right.ssn != '', Self := Left),
@@ -106,31 +107,26 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
                            AddIssuance(left,right),
                            left outer, KEEP (1), limit (0)); //m:1 relation
 
-    AddressReport_Services.layouts.resident_layout GetDead (res_w_issuance L, doxie.key_death_masterV2_ssa_DID R):=transform
+    death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
+    res_w_d_appended := dx_death_master.Append.byDid(res_w_issuance, did, death_params);
+    
+    AddressReport_Services.layouts.resident_layout GetDead (res_w_d_appended L):=transform
       // we prefer DOB from header, if valid for the purpose 
       DOB := L.Identity.DOB;
       left_dob := (string4) DOB.year + intformat (DOB.month, 2, 1) + intformat (DOB.day, 2, 1);
-      d_birth := (unsigned) if (DOB.year != 0 and DOB.month != 0, left_dob, r.dob8);
-      d_death := (unsigned) r.dod8;
-      Self.Identity.DOD := iesp.ECL2ESP.toDatestring8 (r.dod8);
-      Self.Identity.DeathVerificationCode := r.vorp_code; //death_code in header index
+      d_birth := (unsigned) if (DOB.year != 0 and DOB.month != 0, left_dob, L.death.dob8);
+      d_death := (unsigned) L.death.dod8;
+      Self.Identity.DOD := iesp.ECL2ESP.toDatestring8 (L.death.dod8);
+      Self.Identity.DeathVerificationCode := L.death.vorp_code; //death_code in header index
       Self.Identity.AgeAtDeath := if (d_death = 0 or L.Identity.age = 0, 0, ut.Age (d_birth, d_death));
-      Self.Identity.DeathCounty := R.county_name;
-      Self.Identity.DeathState := R.state;
-			self.Identity.Deceased := if (r.l_did != 0  , 'Y','N');
+      Self.Identity.DeathCounty := L.death.county_name;
+      Self.Identity.DeathState := L.death.state;
+      Self.Identity.Deceased := if (L.death.is_deceased, 'Y','N');
       Self.Identity := L.Identity;
       Self.is_best := L.is_best;
       Self := L; //all the other fields which unfortunately has defaults in the layout definition
     END;
-		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-		glb_ok := deathparams.isValidGlb();
-		
-    res_w_d_pre := JOIN (res_w_issuance, doxie.key_death_masterV2_ssa_DID, 
-                         keyed (Left.did = Right.l_did) 
-												  and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-                         GetDead (Left, Right),
-                         left outer, keep (1), limit (0));
-
+		res_w_d_pre := project(res_w_d_appended, GetDead(left));
 
     res_w_d_info_nonmasked := dedup (sort (res_w_d_pre, did, ~is_best, record, if (Identity.DeathVerificationCode<>'',0,1)),
                                     did, record, except Identity.DOD.year, Identity.DOD.month, Identity.DOD.day, Identity.DeathVerificationCode);

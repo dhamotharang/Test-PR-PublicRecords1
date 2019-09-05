@@ -95,7 +95,8 @@ EXPORT Log_Service() := MACRO
 import inquiry_services;
    //page 306 stored: http://cdn.hpccsystems.com/releases/CE-Candidate-4.0.2/docs/ECLLanguageReference-4.0.2-2.pdf
   inputParams := stored(Inquiry_Services.Log_IParam.params);
-  final_out := Inquiry_Services.Log_Records(inputParams);	
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+  final_out := Inquiry_Services.Log_Records(inputParams, mod_access);	
   output(final_out, named ('Results'));
 ENDMACRO;
 //Log_Service()

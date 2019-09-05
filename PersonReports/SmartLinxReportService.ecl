@@ -215,7 +215,7 @@ EXPORT SmartLinxReportService () := MACRO
 
 
   // get search parameters from global #stored variables;
-  globals := AutoStandardI.GlobalModule(); //PersonReports.input.include
+  globals := AutoStandardI.GlobalModule();
   // parameters needed for search only (perhaps, there should be a separate function for reading them)
   search_mod := module (project (globals, PersonReports.IParam._didsearch, opt))
   end;
@@ -293,15 +293,5 @@ EXPORT SmartLinxReportService () := MACRO
   output (results, named ('Results'));
   output (royalties, named ('RoyaltySet'));
 
-/*
-  // debug
-  print_mod := module (project (report_mod, PersonReports.input._compoptions, opt))
-  end;
-  res := PersonReports.functions.GetCRSOptionsDataset (print_mod);
-  output (res, named ('Options'));
-*/
-  // res := PersonReports.SourceCounts_records (dids, project (report_mod, PersonReports.input._sources, opt), IsFCRA);
-  // output (res);
-// return 0;
-// end;
+
 ENDMACRO;

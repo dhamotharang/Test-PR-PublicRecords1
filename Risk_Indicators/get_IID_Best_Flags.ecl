@@ -1,4 +1,4 @@
-﻿import _Control, risk_indicators, riskwise, ut, dx_header, doxie, mdr, drivers, FCRA, gateway;
+﻿import _Control, risk_indicators, riskwise, ut, dx_header, mdr, drivers, FCRA, gateway, data_services;
 onThor := _Control.Environment.OnThor;
 
 export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_input,  
@@ -10,10 +10,12 @@ export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_in
 															integer bsversion,
 															unsigned8 BSOptions) := FUNCTION
 
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+
 // a few of the functions in here need the input in layout_output instead of layout_outx
 // iid_input := project(iid, transform(risk_indicators.layout_output, self := left));
 
-dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
+dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
 header_build_date := (unsigned3) ((string) dk[1].max_date_last_seen)[1..6] : global;
 require2ele := false;
 isUtility := true; // turn off the utility searching in this function, don't need it for the couple counters we need here
@@ -42,7 +44,7 @@ slim_addr_rec := record
 	integer adls_per_addr_created_6months;
 end;
 
-Header_Address_Key := if(isFCRA, Doxie.Key_FCRA_Header_Address, dx_header.key_header_address());
+Header_Address_Key := dx_header.key_header_address(iType);
 
 slim_addr_rec add_header_by_address(risk_indicators.layout_output le, Header_Address_Key rt) := transform
   head_first_seen := ((string) rt.dt_first_seen)[1..6];

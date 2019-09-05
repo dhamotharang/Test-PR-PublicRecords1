@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="eFunds Process">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -20,7 +20,7 @@
  </message>
 */
 /*--INFO-- Migrating ef01 to boca.  */
-import risk_indicators, address, ut, seed_files,gateway;
+IMPORT risk_indicators, ut, seed_files, gateway, STD, Riskwise;
 
 export RiskwiseMainEF1O := macro
 
@@ -46,7 +46,11 @@ export RiskwiseMainEF1O := macro
 	'GLBPurpose', 
 	'HistoryDateYYYYMM',
 	'DataRestrictionMask',
-	'DataPermissionMask'));
+	'DataPermissionMask',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 string4  tribcode_value := '' : stored('tribcode');
 string30 account_value := '' : stored('account');
@@ -68,6 +72,13 @@ unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 boolean isUtility := false;
 boolean ln_branded := false;
 boolean ofac_only := true;
@@ -93,13 +104,13 @@ d := dataset([{0}], input_layout);
 
 input_layout addseq(d l, integer C) := transform
 	self.seq := C;
-	self.tribcode := StringLib.StringToLowerCase(tribCode_value);
+	self.tribcode := STD.Str.ToLowerCase(tribCode_value);
 	self.in_account := account_value;
-	self.in_first := stringlib.stringtouppercase(first_value);
-	self.in_last := stringlib.stringtouppercase(last_value);
-	self.in_addr := stringlib.stringtouppercase(addr_value);
-	self.in_city := stringlib.stringtouppercase(city_value);
-	self.in_state := stringlib.stringtouppercase(state_value);
+	self.in_first := STD.Str.touppercase(first_value);
+	self.in_last := STD.Str.touppercase(last_value);
+	self.in_addr := STD.Str.touppercase(addr_value);
+	self.in_city := STD.Str.touppercase(city_value);
+	self.in_state := STD.Str.touppercase(state_value);
 	self.in_zip := trim(zip_value);
 
 	self.in_socs := RiskWise.cleanSSN( socs_value );
@@ -115,7 +126,7 @@ risk_indicators.layout_input into(indata le) := TRANSFORM
 	self.seq := le.seq;
 	self.ssn := le.in_socs;
 	self.dob := le.in_dob;
-	self.age := if (le.in_dob!='',(STRING3)ut.GetAgeI((integer)le.in_dob), '');
+	self.age := if (le.in_dob!='',(STRING3)ut.Age((integer)le.in_dob), '');
 	self.phone10 := le.in_hphone;
 	self.fname := le.in_first;
 	self.lname := le.in_last;
@@ -150,7 +161,11 @@ END;
 prep := PROJECT(indata,into(LEFT));
 													
 iid_results := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded,  
-			ofac_only, suppressNearDups, require2Ele,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission);
+			ofac_only, suppressNearDups, require2Ele,in_DataRestriction := DataRestriction,in_DataPermission := DataPermission,
+            LexIdSourceOptout := LexIdSourceOptout, 
+            TransactionID := TransactionID, 
+            BatchUID := BatchUID, 
+            GlobalCompanyID := GlobalCompanyID);
 
 xlayout := record
 	string30 account := '';
@@ -172,7 +187,7 @@ end;
 
 ret := join(indata, iid_results, left.seq=right.seq, add_social_level(left,right));
 
-tribcode := StringLib.StringToLowerCase(tribCode_value);
+tribcode := STD.Str.ToLowerCase(tribCode_value);
 seed_files.mac_query_seedfiles(socs_value, 'ef1o', 'ef1i', '001', seed_out);
 
 xlayout format_seed(seed_out le) := transform

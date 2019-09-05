@@ -85,6 +85,11 @@ MODULE
 
 	EXPORT gatewayHistory := RECORD
 		RECORDOF(DeltabaseGateway.Key_Deltabase_Gateway.Historic_Results);
+		//Temporary till product approves logging of these fields
+		integer imsi_Tenure_MinDays;
+		integer imsi_Tenure_MaxDays;
+		integer imei_Tenure_MinDays;
+		integer imei_Tenure_MaxDays;
 	END;
 
 	EXPORT ZumigoIdentity := MODULE
@@ -93,9 +98,9 @@ MODULE
 			STRING40 	nameType;
 			STRING20 	first_name;
 			STRING20 	middle_name;
-			STRING20 	last_name;		
+			STRING20 	last_name;
 		END;
-		
+
 		SHARED business := RECORD
 			UNSIGNED6 busult_id;
 			UNSIGNED6 busorg_id;
@@ -110,8 +115,8 @@ MODULE
 		SHARED email := RECORD
 			STRING40  emailType;
 			STRING50 email_address;
-		END;		
-		
+		END;
+
 		EXPORT address := RECORD
 			STRING40 	addressType;
 			BatchServices.Layouts.layout_batch_common_address;
@@ -134,7 +139,7 @@ MODULE
 			iesp.zumigo_identity.t_ZIdSubjectAddress Address;
 			iesp.zumigo_identity.t_ZIdEmailToVerify Email;
 		END;
-		
+
 		EXPORT zOutEmail := RECORD
 			STRING TransactionId;
 			UNSIGNED6 lexid;
@@ -142,7 +147,7 @@ MODULE
 			STRING LastName;
 			STRING Email;
 			UNSIGNED Email_rec_key ;
-		END;		
+		END;
 		EXPORT zOut := RECORD
 			STRING acctno:='';
 			UNSIGNED1 sequence_number :=0 ;
@@ -163,11 +168,9 @@ MODULE
 		STRING20 lname;
 		STRING listingName;
 		STRING10 phone;
-		UNSIGNED1 privateFlag;
-		UNSIGNED1 availabilityIndicator;
 		STRING error_desc;
 	END;
-	
+
 	EXPORT rec_phoneLayout := RECORD
 	   STRING10 phone;
     END;
@@ -185,7 +188,7 @@ MODULE
 		string60 		carrier_name;
 		string10 		carrier_category;
 		string5 		local_area_transport_area;
-		string10 		point_code; 
+		string10 		point_code;
 		string3			country_code;
 		string1			dial_type;
 		string10 		routing_code;
@@ -234,7 +237,7 @@ MODULE
 		unsigned	count_otp_90;
 		unsigned	count_otp_180;
 		unsigned	count_otp_365;
-		unsigned	count_otp_730;	
+		unsigned	count_otp_730;
 	END;
 
 	EXPORT PhoneAttributes := MODULE
@@ -245,14 +248,14 @@ MODULE
 			BatchShare.Layouts.ShareAcct;
 			BatchShare.Layouts.SharePhone;
 		END;
-  
+
 	 EXPORT Carrier_Reference := RECORD
-			STRING25 ocn_abbr_name;			
+			STRING25 ocn_abbr_name;
 		 STRING4	carrier_route;
 		 STRING1	carrier_route_zonecode;
 		 STRING2	delivery_point_code;
 		 STRING80 affiliated_to;
-		 STRING60 contact_name;	
+		 STRING60 contact_name;
 		 STRING30 contact_address1;
 		 STRING30 contact_address2;
 		 STRING30 contact_city;
@@ -291,8 +294,8 @@ MODULE
 			string30 	carrier_city;
 			string2 	carrier_state;
 		END;
-		
-		
+
+
 		EXPORT Raw := RECORD
 			BatchShare.Layouts.ShareAcct;
 			portedMetadata_Main;

@@ -41,7 +41,7 @@
 */
 /*--INFO-- Migrating pb01 and pb02 to boca.  */
 
-import Gateway, Risk_Indicators, Risk_Reporting, Riskwise, Royalty, Seed_Files;
+import Gateway, Risk_Indicators, Risk_Reporting, Riskwise, Royalty, Seed_Files, STD;
 
 export RiskwiseMainPB1O := MACRO
 
@@ -88,7 +88,11 @@ export RiskwiseMainPB1O := MACRO
 	'DataPermissionMask',
   'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -149,7 +153,13 @@ string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission 
 unsigned1 OFACversion      := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
-tribcode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribcode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribcode in ['pb01'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
@@ -208,7 +218,11 @@ RiskWise.Layout_PB1O format_seed(seed_out le) := transform
 end;
 final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([], riskwise.Layout_PB1O));
 
-ret_pre := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction := DataRestriction, DataPermission := DataPermission, OFACversion := OFACversion);
+ret_pre := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction := DataRestriction, DataPermission := DataPermission, OFACversion := OFACversion,
+                                                                LexIdSourceOptout := LexIdSourceOptout, 
+                                                                TransactionID := TransactionID, 
+                                                                BatchUID := BatchUID, 
+                                                                GlobalCompanyID := GlobalCompanyID);
 
 ret := if(tribcode in ['pb01', 'pb02'], 
 		if(count(final_seed)>0 and runSeed_value, final_seed, PROJECT( ret_pre, TRANSFORM( riskwise.layout_pb1o, SELF := LEFT, SELF := [] ) )), 

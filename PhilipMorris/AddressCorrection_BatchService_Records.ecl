@@ -1,7 +1,7 @@
-IMPORT ut,DayBatchEDA,didville,AddrBest;
+IMPORT doxie, DayBatchEDA, didville, AddrBest;
 
-EXPORT AddressCorrection_BatchService_Records(dataset(Layouts_Batch.InAddrRecord) inputData, 
-																							string32 appType) := FUNCTION
+EXPORT AddressCorrection_BatchService_Records(dataset($.Layouts_Batch.InAddrRecord) inputData, 
+																							doxie.IDataAccess mod_access) := FUNCTION
 
 	preferred := PROJECT(inputData,Transforms.assignPreferred(LEFT));
 	inputNorm := NORMALIZE(preferred,3,Transforms.normalizeInput(LEFT,COUNTER));
@@ -11,8 +11,7 @@ EXPORT AddressCorrection_BatchService_Records(dataset(Layouts_Batch.InAddrRecord
 	gongMatch := gongJoin(MatchType!='N');
 	gongNoHit := gongJoin(AcctNo NOT IN SET(gongMatch,AcctNo));
 	
-	IndustryClass := ut.IndustryClass.Get();
-	didRecs   := didville.did_service_common_function(PROJECT(gongNoHit,Transforms.assignDidVille(LEFT)), '', '', '', TRUE,,,,,,,,,,,,appType,IndustryClass_val := IndustryClass);
+	didRecs   := didville.did_service_common_function(PROJECT(gongNoHit,Transforms.assignDidVille(LEFT)), '', '', '', TRUE,,,,,,,,,,,,mod_access.application_type,IndustryClass_val := mod_access.industry_class);
 
 	bestRecs  := AddrBest.BestAddr_common(PROJECT(UNGROUP(didRecs),Transforms.assignBestAddr(LEFT)),Constants.DEFAULT_YYMM_VALUE, TRUE, 90);
 

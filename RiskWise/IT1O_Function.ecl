@@ -1,9 +1,19 @@
-﻿import risk_indicators, ut, address, codes, daybatchPCNSR, Models, easi, gateway;
+﻿import risk_indicators, ut, daybatchPCNSR, Models, easi, gateway, Suppress, Doxie, STD;
 
 export IT1O_Function(DATASET(Layout_IT1I) inf, dataset(Gateway.Layouts.Config) gateways, unsigned dppa_purpose, unsigned1 glb_purpose, 
 						boolean isUtility=false, boolean ln_branded=false, 
 						string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, string32 appType,
-						string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+						string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                        unsigned1 LexIdSourceOptout = 1,
+                        string TransactionID = '',
+                        string BatchUID = '',
+                        unsigned6 GlobalCompanyId = 0) := function
+                        
+   mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+      EXPORT string transaction_id := TransactionID; // esp transaction id or batch uid
+      EXPORT unsigned6 global_company_id := GlobalCompanyId; // mbs gcid
+    END;
 						
 tribcode := inf[1].tribcode;
 
@@ -12,17 +22,17 @@ risk_indicators.Layout_input into(inf le) := TRANSFORM
 	self.historydate := le.historydate;
 	self.ssn := cleanSSN( le.socs );
 	self.dob := cleanDOB( le.dob );
-	self.age := if (le.dob!='',(STRING3)ut.GetAgeI((integer)le.dob), '');
+	self.age := if (le.dob!='',(STRING3)ut.Age((integer)le.dob), '');
 	self.phone10 := cleanPhone( le.hphone );
 	self.wphone10 := cleanPhone( le.wphone );
 	
-	self.fname := stringlib.stringtouppercase(le.first);
+	self.fname := STD.Str.touppercase(le.first);
 	self.mname := '';
-	self.lname := stringlib.stringtouppercase(le.last);
+	self.lname := STD.Str.touppercase(le.last);
 	self.suffix := '';
-	SELF.in_streetAddress := stringlib.stringtouppercase(le.addr);
-	self.in_city := stringlib.stringtouppercase(le.city);
-	self.in_state := stringlib.stringtouppercase(le.state);
+	SELF.in_streetAddress := STD.Str.touppercase(le.addr);
+	self.in_city := STD.Str.touppercase(le.city);
+	self.in_state := STD.Str.touppercase(le.state);
 	self.in_zipcode := le.zip;	
 	SELF.in_country := '';
 	
@@ -47,7 +57,7 @@ risk_indicators.Layout_input into(inf le) := TRANSFORM
 	self.geo_blk := clean_a[171..177];
 	self.country := '';
 	SELF.dl_number := cleanDL_num( le.drlc );
-	SELF.dl_state := stringlib.stringtouppercase(le.drlcstate);
+	SELF.dl_state := STD.Str.touppercase(le.drlcstate);
 	SELF.email_address := '';
 	SELF.ip_address := '';
 	SELF.employer_name := '';
@@ -129,7 +139,11 @@ iid_prep_all := iideven + iidodd;
 
 iid_results := Risk_Indicators.InstantID_Function(iid_prep_all, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, 
 										ofac_only, suppressNearDups,require2ele, fromBIID, isFCRA, excludeWatchLists, from_IT1O, in_BSversion:=bsVersion,
-										in_DataRestriction := DataRestriction, in_DataPermission := DataPermission);
+										in_DataRestriction := DataRestriction, in_DataPermission := DataPermission,
+                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                        TransactionID := TransactionID, 
+                                        BatchUID := BatchUID, 
+                                        GlobalCompanyID := GlobalCompanyID);
 
 
 
@@ -176,6 +190,12 @@ xlayout := record
 	RiskWise.Layout_IT1O;
 	string3 median_hh_size := '';
 end;
+
+xlayout_CCPA := RECORD
+  unsigned6 did; // CCPA changes
+  unsigned4 global_sid; // CCPA changes
+  xlayout;
+END;
 
 xlayout map_iid_results(inf le, iid_results rt) := transform
 	self.seq := le.seq;
@@ -297,7 +317,9 @@ wIID  := join(inf, iid_results, (LEFT.seq*2) = RIGHT.seq, map_iid_results(left, 
 
 
 // search demographic data
-	xlayout get_household(xlayout le, daybatchPCNSR.Key_PCNSR_DID rt) := transform
+	xlayout_CCPA get_household(xlayout le, daybatchPCNSR.Key_PCNSR_DID rt) := transform
+        self.did := rt.did;
+        self.global_sid := rt.global_sid;
 		self.hownstatusflag := map(rt.own_rent='9' => '4',
 							  rt.own_rent in ['7','8'] => '3',
 							  rt.own_rent in ['1','2','3','4','5','6'] => '2',
@@ -311,12 +333,16 @@ wIID  := join(inf, iid_results, (LEFT.seq*2) = RIGHT.seq, map_iid_results(left, 
 					left.iid.did!=0 and keyed(right.did=left.iid.did), 
 					get_household(left, right), left outer, ATMOST(keyed(right.did=left.iid.did), RiskWise.max_atmost), keep(50));
 	
-
+    hous_recs_suppressed := Suppress.MAC_SuppressSource(hous_recs, mod_access);	
+    
+    hous_recs_formatted := PROJECT(hous_recs_suppressed, TRANSFORM(xlayout,
+                                                  SELF := LEFT));
+                                                  
 	xlayout roll_hous(xlayout le, xlayout rt) := transform
 		self := if(le.refresh_date > rt.refresh_date, le, rt); 
 	end;
 	
-	groupedHouse   := group(sort(ungroup(hous_recs),seq),seq);
+	groupedHouse   := group(sort(ungroup(hous_recs_formatted),seq),seq);
 	wHouseHold   := rollup(groupedHouse, true, roll_hous(left, right));
 // end demographic
 
@@ -671,7 +697,11 @@ includeDerogInfo    := true;
 fullclam := if(tribCode in ['it51','it37','it60','it61','it70','i200'],
 		Risk_Indicators.Boca_Shell_Function(iid_results, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, 
 													includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, bsversion, 
-													DataRestriction := DataRestriction, DataPermission := DataPermission ),
+													DataRestriction := DataRestriction, DataPermission := DataPermission,
+                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                    TransactionID := TransactionID, 
+                                                    BatchUID := BatchUID, 
+                                                    GlobalCompanyID := GlobalCompanyID),
 		group(dataset([],Risk_Indicators.Layout_Boca_Shell),seq));	
 clam     := if( tribcode='it70', fullclam( seq % 2 = 0 ), fullclam );
 skipclam := fullclam( seq % 2 = 1 );

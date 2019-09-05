@@ -288,8 +288,8 @@ MODULE
       EXPORT BOOLEAN IncludeDeviceChangeInfo     :=(TransactionType = $.Constants.TransType.Ultimate OR DeviceChangeInfo) AND ValidDeviceConsentInquiry;
 
       EXPORT BOOLEAN IncludeZumigoOptions        := IncludeNameAddressValidation OR IncludeNameAddressInfo OR
-                                                    IncludeCallHandlingInfo OR IncludeDeviceHistory OR
-                                                    IncludeDeviceInfo OR IncludeDeviceChangeInfo;
+                                                    IncludeCallHandlingInfo OR IncludeDeviceHistory OR 
+                                                    IncludeDeviceInfo OR IncludeDeviceHistory;                                        	
 
       EXPORT BOOLEAN UseZumigoIdentity	         := IncludeZumigoOptions AND BillingId <>'' AND doxie.DataPermission.use_ZumigoIdentity;
 

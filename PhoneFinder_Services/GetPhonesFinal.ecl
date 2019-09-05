@@ -53,6 +53,10 @@ FUNCTION
     SELF.iccid_changedthis_time  := IF(le.iccid_changedthis_time = 0, ri.iccid_changedthis_time, le.iccid_changedthis_time);
     SELF.imsi_changedthis_time   := IF(le.imsi_changedthis_time = 0, ri.imsi_changedthis_time, le.imsi_changedthis_time);
     SELF.imei_changedthis_time   := IF(le.imei_changedthis_time = 0, ri.imei_changedthis_time, le.imei_changedthis_time);
+    SELF.imsi_Tenure_MinDays     := IF(le.imsi_Tenure_MinDays = 0, ri.imsi_Tenure_MinDays, le.imsi_Tenure_MinDays);
+    SELF.imsi_Tenure_MaxDays     := IF(le.imsi_Tenure_MaxDays = 0, ri.imsi_Tenure_MaxDays, le.imsi_Tenure_MaxDays);
+    SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
+    SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
     SELF                 		     := le;
   END;
 
@@ -125,6 +129,10 @@ FUNCTION
     SELF.imei_changedthis_time   := le.imei_changedthis_time;
     SELF.loststolen              := le.loststolen;
     SELF.loststolen_date         := le.loststolen_date;
+    SELF.imsi_Tenure_MinDays     := le.imsi_Tenure_MinDays;
+    SELF.imsi_Tenure_MaxDays     := le.imsi_Tenure_MaxDays;
+    SELF.imei_Tenure_MinDays     := le.imei_Tenure_MinDays;
+    SELF.imei_Tenure_MaxDays     := le.imei_Tenure_MaxDays;
     SELF                         := ri;
   END;
   
