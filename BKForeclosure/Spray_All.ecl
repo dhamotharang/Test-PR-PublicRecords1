@@ -1,10 +1,13 @@
 ﻿IMPORT BKForeclosure, STD;
 
 /**
- * parameter: string: pVersion : The version of the build.
- * parameter: string: pHostname: The hostname on which the source data resides.
- * parameter: string: pSource  : The absolute path to the source data.
- * parameter: string: pGroup   : The name of the node group running the workunit
+ * parameter: string: pVersion       : The version of the build.
+ * parameter: string: pHostname      : The hostname on which the source data resides.
+ * parameter: string: pSource        : The absolute path to the source data.
+ * parameter: string: pGroup         : The name of the node group running the workunit
+ * parameter: set   : setRefreshGlobs: A set of globs that will be used in a wild card spray
+ * parameter: set   : setDeleteGlobs : A set of globs that will be used in a wild card spray
+ * parameter: set   : setUpdateGlobs : A set of globs that will be used in a wild card spray
  */
 EXPORT Spray_All(
 	STRING pVersion,
