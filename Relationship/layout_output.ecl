@@ -1,5 +1,4 @@
-﻿import idl_header;
-export layout_output := MODULE
+﻿export layout_output := MODULE
 
 export iter := RECORD
   unsigned6 did1;
@@ -167,32 +166,6 @@ export key := record
 	/*----CCPA Fields------*/
 	unsigned4 GLOBAL_SID;
 	unsigned8 RECORD_SID;
- end;
- 
- // Stats Layouts
- export stats_DIDSeg := record
-	string iter;
-	string ind;
-	unsigned8 cnt;
- end;
- 
- export stats_Type := record
-	string iter;
-	string type;
-	string confidence;
-	unsigned8 cnt;
- end;
- 
- export stats_Source := record
-	string iter;
-	string source;
-	unsigned8 cnt;
- end;
- 
- export stats_Title := record
-	string iter;
-	unsigned1 title;
-	unsigned8 cnt;
  end;
  
  END;
