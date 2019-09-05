@@ -26,12 +26,12 @@ EXPORT Spray_All(
 	//Clear all superfiles. Input files are large so previous logical input files need to be deleted each build
 	Clear_Supers := SEQUENTIAL(
 		STD.File.StartSuperFileTransaction(),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod'/*, TRUE*/),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod_orphan'/*, TRUE*/),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo_orphan'/*, TRUE*/),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo'/*, TRUE*/),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Nod'/*, TRUE*/),
-		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Reo'/*, TRUE*/),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod_orphan'),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo_orphan'),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_nod'),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::refresh_reo'),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Nod'),
+		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::Update_Reo'),
 		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::delete_nod'),
 		STD.File.ClearSuperFile('~thor_data400::in::BKForeclosure::delete_reo'),
 		STD.File.FinishSuperFileTransaction()
@@ -55,7 +55,7 @@ EXPORT Spray_All(
 			maxRecordSize
 		).SprayFile,
 		BKForeclosure.Spray_RefreshFile(
-			(STRING)pVersion,
+			(STRING)version,
 			pHostname,
 			pSource,
 			setRefreshGlobs,
