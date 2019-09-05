@@ -9,7 +9,7 @@ EXPORT Spray_DeleteFile(
 	INTEGER pMaxRecordSize	
 ) := MODULE //Use folder date
 
-	#WORKUNIT('name','Spray Foreclosure');
+	#WORKUNIT('name','Spray BKForeclosure Delete File');
 
 	//Sprayed input file
 	SHARED dst_Delete_Nod_raw := '~thor_data400::in::BKForeclosure::delete_nod::' +(string)pVersion+ '::raw';
