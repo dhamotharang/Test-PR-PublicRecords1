@@ -9,7 +9,7 @@ EXPORT Spray_refreshFile(
 	INTEGER maxRecordSize
 ) := MODULE
 
-	#workunit('name','Spray Foreclosure Refresh');
+	#workunit('name','Spray Foreclosure Refresh Files');
 
 	//Sprayed input files
 	SHARED dst_nod_orph_raw := '~thor_data400::in::BKForeclosure::refresh_nod_orphan::' +(string)pVersion+ '::raw';
