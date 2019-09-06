@@ -1,4 +1,4 @@
-﻿import address, did_add, didville,ut,header_slimsort,mdr,header, idl_header, PromoteSupers, Scrubs, Scrubs_Targus, _Control, lib_date, tools, std;
+﻿import address, CCPA, did_add, didville,ut,header_slimsort,mdr,header, idl_header, PromoteSupers, Scrubs, Scrubs_Targus, _Control, lib_date, tools, std;
 export proc_build_base(string versionDate, string emailList='') := function
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Pull Input Data Sample
@@ -314,13 +314,15 @@ dNewBase_final := join(distribute(dNewBase_Dedup, hash(phone_number)), 	dDatesFi
 	
 	dNewBase_Dedup_ := dNewBase_Dedup;
 	dFilteredBase		:=	PROJECT(dNewBase_final(Active=TRUE),TRANSFORM(Targus.Layout_Consumer_out,                                                                  
-																																		SELF.global_sid := 23121;  //Added for CCPA-6 - Targus has a single source and sid retrieval function not yet available
+																																		SELF.global_sid := 0;  //Added for CCPA-6 - Targus has a single source and sid retrieval function not yet available
 																																		SELF.record_sid := 0;
 	                                                                  SELF            := LEFT)
 														 );
 	
+	addGSFiltered		:= CCPA.macGetGlobalSID(dFilteredBase,'Targus','','global_sid'); //Add Global_SID
+	
 	PromoteSupers.MAC_SF_BuildProcess(dNewBase_Dedup_,'~thor_data400::base::consumer_targus_unfiltered',buildBase,3,,TRUE); // Compressed
-  PromoteSupers.MAC_SF_BuildProcess(dFilteredBase,'~thor_data400::base::consumer_targus',buildFilteredBase,3,,TRUE);
+  PromoteSupers.MAC_SF_BuildProcess(addGSFiltered,'~thor_data400::base::consumer_targus',buildFilteredBase,3,,TRUE);
 
 	RETURN SEQUENTIAL (
 		// OUTPUT(dScrubsWithExamples, ALL, NAMED('TargusScrubsReportWithExamples')),

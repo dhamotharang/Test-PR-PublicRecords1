@@ -49,8 +49,9 @@ cnt_asl_did2_fcra := OUTPUT(strata.macf_pops(prte2_american_student_list.keys.DI
 is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 doDOPS              := is_running_in_prod AND NOT skipDOPS;
 DOPS_Comment		 		:= OUTPUT('Skipping DOPS process');
-updatedops					:= PRTE.UpdateVersion('AmericanstudentKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-updatedops_fcra			:= PRTE.UpdateVersion('FCRA_AmericanstudentKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+updatedops					:= PRTE.UpdateVersion('AmericanstudentKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean :='N');
+updatedops_fcra			:= PRTE.UpdateVersion('FCRA_AmericanstudentKeys',filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean :='N');
+
 
 // -- Actions
 buildKey	:=	sequential(build_roxie_keys

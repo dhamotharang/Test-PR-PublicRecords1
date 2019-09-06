@@ -1244,6 +1244,15 @@
 				trim(kword, left, right) = 'GIBNATSANC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GIBNATSANC,
 				trim(kword, left, right) = 'OFAC-EO13846' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13846,
 				trim(kword, left, right) = 'TWMPB-DV' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMPB_DV,
+				trim(kword, left, right) = 'ZMACC' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZMACC,
+				trim(kword, left, right) = 'OFAC-EO13876' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13876,
+				trim(kword, left, right) = 'TWTSA' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWTSA,
+				trim(kword, left, right) = 'ARMJH-REPET' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARMJH_REPET,
+				trim(kword, left, right) = 'OFAC-HIFPAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_HIFPAA,
+				trim(kword, left, right) = 'ILSHABAK' =>SubGroup_Constants.numKeywordsID.KEYWORD_ILSHABAK,
+				trim(kword, left, right) = 'FATF-SD' =>SubGroup_Constants.numKeywordsID.KEYWORD_FATF_SD,
+				trim(kword, left, right) = 'USCBW-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCBW_WC,
+				trim(kword, left, right) = 'SEDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_SEDPA,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

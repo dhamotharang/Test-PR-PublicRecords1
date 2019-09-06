@@ -1,4 +1,4 @@
-import VehicleV2, BIPV2, Standard, address_attributes, Vehicle_Wildcard; 
+﻿import VehicleV2, BIPV2, Standard, address_attributes, Vehicle_Wildcard,prte2; 
 
 EXPORT Layouts := module
 
@@ -145,7 +145,18 @@ EXPORT Layouts := module
 		
 		
 //Key Layouts		
-		export Base_Party_BIP := record
+		// export Base_Party_BIP_2 := record
+			// VehicleV2.Layout_Base.Party_bip;
+			// string20 cust_name;
+			// string10 bug_num;
+			// string8	 link_dob;
+			// string9	 link_ssn;
+			// string9  link_fein;
+			// string8  Link_incorp_date;
+			// prte2.layouts.DEFLT_CPA;
+			// end;
+			
+			export Base_Party_BIP := record
 			VehicleV2.Layout_Base.Party_bip;
 			string20 cust_name;
 			string10 bug_num;
@@ -153,7 +164,19 @@ EXPORT Layouts := module
 			string9	 link_ssn;
 			string9  link_fein;
 			string8  Link_incorp_date;
+			prte2.layouts.DEFLT_CPA;
 			end;
+		
+		// export Base_Party_BIP_2 := record
+			// VehicleV2.Layout_Base.Party_bip;
+			// string20 cust_name;
+			// string10 bug_num;
+			// string8	 link_dob;
+			// string9	 link_ssn;
+			// string9  link_fein;
+			// string8  Link_incorp_date;
+		//	prte2.layouts.DEFLT_CPA;
+	//		end;
 		
 		export Party_Building := record
 			VehicleV2.Layout_Base.Party_Base_BIP;
@@ -330,6 +353,7 @@ END;
 		standard.name name;
 		string70	Append_Clean_CName;
 		string1	history;
+		prte2.layouts.DEFLT_CPA;
 		unsigned4 Reg_Latest_Effective_Date;
 		unsigned4 Reg_Latest_Expiration_Date;
 		unsigned4 Ttl_Latest_Issue_Date;

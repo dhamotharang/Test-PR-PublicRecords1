@@ -17,9 +17,6 @@ export IdAppendThorLocal(
 		,BDID_Score_field
 		,keep_count = '1'
 		,score_threshold = '75'
-		// ,pFileVersion = '\'prod\''
-		// ,pUseOtherEnvironment = business_header._Dataset().IsDataland
-		// ,pSetLinkingVersions = BIPV2.IDconstants.xlink_versions_default
 		,pURL = ''
 		,pEmail = ''
 		,pCity = ''
@@ -30,7 +27,11 @@ export IdAppendThorLocal(
 		,pSource = ''
 		,pSource_record_id = ''
 		,src_matching_is_priority = FALSE
-		,bGetAllScores=TRUE
+		,bGetAllScores = TRUE
+		,useFuzzy = false
+		,primForcePost = false
+		,weightThreshold = 0
+		,disableSaltForce = false
 	) := functionmacro
 
 	import BIPV2_Company_Names, BizLinkFull,ut,_Control;
@@ -62,6 +63,7 @@ export IdAppendThorLocal(
 	#uniquename(InfileSmall)
 	#uniquename(ThorForced)
 	#uniquename(useKeyedJoins)
+	#uniquename(company_name_prefix)
 	string4 %force% := '' : stored('did_add_force');
 	boolean %NodesUnder400% := thorlib.nodes() < 400;
 	boolean %InfileSmall% := count(infile) < 10000000;
@@ -69,8 +71,9 @@ export IdAppendThorLocal(
 	%useKeyedJoins% := (%NodesUnder400%) and not %ThorForced%;  //motivated by bug 112406
 
 	local infile_augmented := PROJECT(%infilecnp%,
-		TRANSFORM({RECORDOF(left); STRING input_company_phone_3 := '',
+		TRANSFORM({RECORDOF(left); string %company_name_prefix% := '', STRING input_company_phone_3 := '',
 		           STRING input_company_phone_7 := ''; STRING Input_fname_preferred := '';},
+			self.%company_name_prefix% := if(useFuzzy, BizLinkFull.fn_company_name_prefix(left.cnp_name), '');
 			#if('P' in matchset and #text(phone_field) != '')
 				SELF.phone_field:=TRIM(LEFT.phone_field);
 				SELF.input_company_phone_3:=IF(LENGTH(TRIM(LEFT.phone_field))=10,
@@ -91,6 +94,7 @@ export IdAppendThorLocal(
 		input_source := pSource,
 		Input_source_record_id := pSource_record_id,
 		Input_company_name := company_name_field,
+		Input_company_name_prefix := %company_name_prefix%,
 		Input_cnp_name := cnp_name,
 		Input_cnp_number := cnp_number,
 		Input_cnp_btype := cnp_btype,
@@ -111,22 +115,25 @@ export IdAppendThorLocal(
 			Input_st := state_field,
 			Input_zip := %zipset%,
 		#end
+		Input_company_url := pURL,
 		Input_fname := pContact_fname,
 		Input_fname_preferred := Input_fname_preferred,
 		Input_mname := pContact_mname,
 		Input_lname := pContact_lname,
 		Input_contact_ssn := pContact_ssn,
 		Outfile := %OutFile1%,
-		// AsIndex := %useKeyedJoins%,
-		AsIndex := true, // TODO
+		AsIndex := %useKeyedJoins%,
 		In_bGetAllScores := bGetAllScores
+		,In_disableForce := disableSaltForce
 	);
 
 
   #uniquename(outnorm)
   %outnorm% :=
   normalize(
-		%OutFile1%((results[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold), (results[1].proxid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
+		%OutFile1%((results[1].score >= (integer)score_threshold or results_ultid[1].score >= (integer)score_threshold),
+		           results[1].weight >= weightThreshold,
+		           (results[1].proxid > 0 or results_ultid[1].ultid > 0)), //filter not necessary here, but might save some work
 		(integer)keep_count,
 		transform(
 		  {%OutFile1%.reference, %OutFile1%.results.proxid, %OutFile1%.results.weight, %OutFile1%.results.score, %OutFile1%.results.seleid, %OutFile1%.results.orgid, %OutFile1%.results.ultid, %OutFile1%.results.powid
@@ -137,7 +144,7 @@ export IdAppendThorLocal(
 				,%OutFile1%.results.cnp_nameweight
 				,BIPV2.IdAppendLayouts.parentIds
 		  },
-		  PG := left.results[counter].score >= (integer)score_threshold;
+		  PG := left.results[counter].score >= (integer)score_threshold and left.results[counter].weight >= weightThreshold;
 		  SG := PG or left.results_seleid[counter].score >= (integer)score_threshold;
 		  OG := SG or left.results_orgid[counter].score >= (integer)score_threshold;
 		  UG := OG or left.results_ultid[counter].score >= (integer)score_threshold;
@@ -164,6 +171,10 @@ export IdAppendThorLocal(
 		  self.powscore := if(UG,left.results_powid[counter].score,0);
 		  self.powid := if(UG,IF(left.results_powid[counter].powid=0,LEFT.results[COUNTER].powid,left.results_powid[counter].powid),0);
 
+			// If there is a proxid that meets the threshold, grab the parent info from it.
+			// Otherwise grab the parent info from the matching seleid.
+			// sele_proxid, org_proxid, and ultimate_proxid are the same at any level of BIP ids.
+			// parent_proxid only applies to the given proxid.
 			self.parent_proxid := if(PG, left.results[counter].parent_proxid, 0);
 			self.sele_proxid := map(PG => left.results[counter].sele_proxid,
 			                        SG => left.results_seleid[counter].sele_proxid,
@@ -188,13 +199,13 @@ export IdAppendThorLocal(
 		%outnorm%,
 		left.cntr = right.reference
 			#if('A' in matchset)
-				and( 
+				and (NOT primForcePost OR ( 
 					(left.prange_field <> '' and left.prange_field = right.prim_Range) //exact nonblank pr match
 						or not(                                                            //or just not a complete miss on both pr and pn
 							(left.prange_field <> '' and right.prim_Range <> '' and right.prim_Rangeweight <= 0)
 						OR
 							(left.pname_field <> '' and right.prim_name <> '' and right.prim_nameweight <= 0)
-					)
+					))
 				)
 			#end
         

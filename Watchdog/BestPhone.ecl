@@ -1,13 +1,13 @@
-/*2017-02-28T08:31:04Z (Wendy Ma)
+﻿/*2017-02-28T08:31:04Z (Wendy Ma)
 DF-18485
 */
-import gong, header;
+import gong, header, Gong_Neustar;
 //we'll pull the best phone (by date) from the DIDed gong file.
 //we will then join the watchdog.joined file back to the gong afterward to pick up a few more
 //--by lname/address
 export BestPhone(string build_type = '') := function
-//Gong with DID
-f := Gong.File_Gong_DID(phone10<>'' and did!=0);
+//CCPA-22 - use the updated file definition from Gong_Neustar
+f := Gong_Neustar.File_Gong_DID(phone10<>'' and did!=0);
 
 gng_rec := record
   unsigned6 did := 0;
