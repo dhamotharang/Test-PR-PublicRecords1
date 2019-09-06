@@ -229,10 +229,10 @@ transform
 	self.ace_geo_match			:=	if(isMailCityNotBlank,pInput.Ace1_geo_match,pInput.Ace2_geo_match);
 	self.ace_err_stat				:=	if(isMailCityNotBlank,pInput.Ace1_err_stat,pInput.Ace2_err_stat);
 	//Added for CCPA-103
-	self.global_sid         := 0;
-	self.record_sid         := 0;
+	// self.global_sid         := 0;
+	// self.record_sid         := 0;
 	//Added for DF-25578
-	self.raw_name           := '';
+	// self.raw_name           := '';
 	
 	self										:=	pInput;
 end;

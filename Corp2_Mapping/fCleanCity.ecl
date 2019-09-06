@@ -3,18 +3,21 @@
 			 corp2_raw_ne,corp2_raw_nh,corp2_raw_nm,corp2_raw_oh,corp2_raw_ok,corp2_raw_or,corp2_raw_pa,corp2_raw_ri,corp2_raw_nv,corp2_raw_sc,corp2_raw_sd,corp2_raw_tn,corp2_raw_tx,corp2_raw_ut,
 			 corp2_raw_va,corp2_raw_vt,corp2_raw_wa,corp2_raw_wi,corp2_raw_wv,corp2_raw_wy,ut;
 			 
-export fCleanCity(string pStateOrigin,string pStateOriginDesc,string pState='',string pAddress='',string pCity='',string pZip='') := module
+export fCleanCity(string pStateOrigin,string pStateOriginDesc,string pState='',string pAddress='',string pCity='',string pZip='',string pCountry='') := module
 		//********************************************************************
 		//CleanCity: This routine cleans the input "pCity" if it exists.  If
 		//					 a city doesn't exist, then the pAddress parameter is used
 		//					 by the Address.CleanAddress182 routine to try and derive
 		//					 it. 
 		//********************************************************************
-		export UC_StateOrigin	:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
-		export UC_Address	 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pAddress));
-		export UC_City		 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pCity));
-		export UC_State		 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pState));
-		export UC_Zip			 		:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pZip));
+		shared UC_StateOrigin			:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOrigin));
+		shared UC_StateOriginDesc	:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pStateOriginDesc));
+		shared UC_Address	 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pAddress));
+		shared UC_City		 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pCity));
+		shared UC_State		 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pState));
+		shared UC_Zip			 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pZip));
+		shared UC_Country	 				:= corp2_mapping.fn_RemoveSpecialChars(corp2.t2u(pCountry));
+		shared StandardCountry		:= corp2_Mapping.fCleanCountry(UC_StateOrigin,UC_StateOriginDesc,UC_State,UC_COUNTRY).Country;
 		
 		export CleanChars  		:= Map(UC_StateOrigin = 'AL' => regexreplace(corp2_raw_al.fGetRegExPattern.City.InvalidChars,UC_City,''),
 																 UC_StateOrigin = 'AR' => regexreplace(corp2_raw_ar.fGetRegExPattern.City.InvalidChars,UC_City,''),
@@ -133,7 +136,7 @@ export fCleanCity(string pStateOrigin,string pStateOriginDesc,string pState='',s
 		export TempZip		  			  := if(corp2.t2u(CleanCity) = '' and IsZipInvalid = true,regexfind('[0-9]{5}\\-*[0-9]{0,4}$',corp2.t2u(UC_Address),0),stringlib.stringfilter(UC_Zip,'0123456789'));
 
 		//Try and derive city using CleanAddress182 if pCity is blank or invalid
-		export TempAddress				 	:= if(corp2.t2u(CleanCity) = '' or IsCityInvalid = true
+		export TempAddress				 	:= if((corp2.t2u(CleanCity) = '' or IsCityInvalid = true) and standardCountry = 'US'
 																		  ,Address.CleanAddress182(corp2.t2u(UC_Address),TempZip[1..5])
 																		  ,''
 																		 );			
