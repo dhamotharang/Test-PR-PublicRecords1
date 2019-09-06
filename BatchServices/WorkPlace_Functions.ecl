@@ -15,12 +15,12 @@ shared glb_ok := death_params.isValidGlb();
     // Note: now this call is using input permission values; before, defaults were used (dppa=glb=date_threshold=0, ln_branded=false)
 		relatives_did := Doxie_Raw.relative_raw(dids, mod_access);
 		
-    live_relatives_did := project(dx_death_master.Exclude(relatives_did(depth=1), person2, death_params), 
+    relatives_did_alive := project(dx_death_master.Exclude(relatives_did(depth=1), person2, death_params), 
       transform({doxie.layout_references,unsigned1 titleNo}, 
         self.did := left.person2, self.titleNo := left.TitleNo;
       ));
 														
-		spouses_did := live_relatives_did(titleNo in Header.relative_titles.set_Spouse);		
+		spouses_did := relatives_did_alive(titleNo in Header.relative_titles.set_Spouse);		
 		RETURN spouses_did;
 	END;
 
