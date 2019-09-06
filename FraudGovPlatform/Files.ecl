@@ -79,6 +79,8 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Orig,Layouts.Crim,Crim_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Orig,Layouts.Death,Death_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Advo,Layouts.Advo,Advo,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Advo_Demo,Layouts.Advo,Advo_Demo,,,,,,true);
 		//KEL Files
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_customeraddress_demo,Layouts.CustomerAddress,kel_customeraddress_demo,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.kel_personstats_demo,Layouts.PersonStats, kel_personstats_demo,,,,,,true);
