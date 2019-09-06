@@ -1,4 +1,4 @@
-﻿IMPORT Data_Services, doxie, ut;
+IMPORT Data_Services, doxie, ut;
 
 base := PhonesFeedback.File_PhonesFeedback_base;
 
@@ -32,9 +32,6 @@ layoutPhonesFeedbackDID := RECORD
 	STRING date_time_added := '';
 	STRING loginid := '';
 	STRING customerid := '';
-	//Added for CCPA-355
-	UNSIGNED4 global_sid;
-	UNSIGNED8 record_sid;
 END;
 
 layoutPhonesFeedbackDID cleanKeyBase(key_base le) := TRANSFORM

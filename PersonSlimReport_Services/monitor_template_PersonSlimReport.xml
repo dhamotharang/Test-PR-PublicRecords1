@@ -4872,7 +4872,7 @@
         </Filings>
       </LienJudgment>
     </LiensJudgments>
-    <Properties diff_match="RecordType+Assessment.ParcelId+Deed.ParcelId" diff_monitor="Property">
+    <Properties diff_match="RecordType+ParcelNumber" diff_monitor="Property">
       <Property>
         <BusinessIds diff_monitor="">
           <DotID/>
@@ -5365,11 +5365,11 @@
                   <OrgID/>
                   <UltID/>
                 </BusinessIds>
-                <IdValue diff_monitor=""/>
+                <IdValue/>
                 <UniqueId/>
-                <BusinessId diff_monitor=""/>
-                <AppendedSSN diff_monitor=""/>
-                <LinkingWeight diff_monitor=""/>
+                <BusinessId/>
+                <AppendedSSN/>
+                <LinkingWeight/>
               </Name>
             </Names>
             <OriginalNames>

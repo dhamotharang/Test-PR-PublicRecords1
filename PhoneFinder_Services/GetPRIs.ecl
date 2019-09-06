@@ -44,32 +44,13 @@ FUNCTION
                                     dSearchResultsWCnt,
                                     dSearchResultsWCnt(isPrimaryPhone AND phone_source in [$.Constants.PhoneSource.Waterfall, $.Constants.PhoneSource.QSentGateway]));
 
-  dPrimaryPhoneInfo_pre := $.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
+  dPrimaryPhoneInfo := $.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
 	
-	// ThreatMetrix                  
-  dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrimaryPhoneInfo_pre, phone), phone), Phones.Layouts.PhoneAcctno);
-  
-  dPrimaryThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
-                                
-  $.Layouts.PhoneFinder.PhoneSlim getThreatMetrix($.Layouts.PhoneFinder.PhoneSlim l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
-   SELF.ReasonCodes := r.response.Summary.ReasonCodes;
-   SELF.TmxVariables := r.response._data.TmxVariables;
-   SELF := l;
-  END;
- 
-  dPrepPrimaryThreatMetrix	:= JOIN(dPrimaryPhoneInfo_pre,
-                                    dPrimaryThreatMetrixRecs,
-                                    LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
-                                    getThreatMetrix(LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
-                         
-                         
-  dPrimaryPhoneInfo := IF(inMod.UseThreatMetrixRules, dPrepPrimaryThreatMetrix, dPrimaryPhoneInfo_pre);
-  
-  // Other phones
+	// Other phones
   dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResultsWCnt(~isPrimaryPhone));
   
-  dOtherPhoneInfo := $.GetPhonesFinal(dSearchResultsOtherPhones, inMod, FALSE);
-
+  dOtherPhoneInfo := $.GetPhonesFinal(dSearchResultsOtherPhones, inMod, FALSE);                      
+                         
   // Prep for Risk indicator calculation
   // Format identities to Final layout
   dIdentitiesFormat2Final := PROJECT(dIdentitiesInfo,
@@ -194,19 +175,35 @@ FUNCTION
                                       SELF.prim_name      := LEFT.prim_name, 
                                       SELF.isPrimaryPhone := TRUE, // This will process the RiskIndicators for "no identity and no phone"
                                       SELF                := [])));
+ // ThreatMetrix                  
+  dDupThreatMetrixIn := PROJECT(DEDUP(SORT(dPrepForRIs, phone), phone), Phones.Layouts.PhoneAcctno);
+  
+  dThreatMetrixRecs := Phones.GetThreatMetrixRecords(dDupThreatMetrixIn, inMod.UseThreatMetrixRules, dGateways);
+                                
+  $.Layouts.PhoneFinder.Final getThreatMetrix($.Layouts.PhoneFinder.Final l, ThreatMetrix.gateway_trustdefender.t_TrustDefenderResponseEX r) := TRANSFORM  
+   SELF.ReasonCodes := r.response.Summary.ReasonCodes;
+   SELF.TmxVariables := r.response._data.TmxVariables;
+   SELF := l;
+  END;
+ 
+  dPrepThreatMetrix	:= JOIN(dPrepForRIs, dThreatMetrixRecs,
+                            LEFT.phone = RIGHT.response._Data.AccountTelephone.Content_,
+                            getThreatMetrix(LEFT, RIGHT), LEFT OUTER, LIMIT(0), KEEP(1));
+
+  dPrepAllRIs := IF(inMod.UseThreatMetrixRules, dPrepThreatMetrix, dPrepForRIs);
 
 
-  dRIs := IF(inMod.IncludeRiskIndicators, $.CalculatePRIs(dPrepForRIs, inMod));
+  dRIs := $.CalculatePRIs(dPrepAllRIs, inMod);
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
                 inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,
                 dPrimaryForRIs + dPrepOtherPhonesForRIs + dOtherIdentities);
 
   #IF($.Constants.Debug.Main)
-		OUTPUT(dCntPhoneIdentities, NAMED('dCntPhoneIdentities'));
-		OUTPUT(dPrimaryPhoneHist, NAMED('dPrimaryPhoneHist'));
-		OUTPUT(dPrimaryIdentityRecs, NAMED('dPrimaryIdentityRecs'));
-		OUTPUT(dSearchResultsCombined, NAMED('dSearchResultsCombined'));
+    OUTPUT(dCntPhoneIdentities, NAMED('dCntPhoneIdentities'));
+    OUTPUT(dPrimaryPhoneHist, NAMED('dPrimaryPhoneHist'));
+    OUTPUT(dPrimaryIdentityRecs, NAMED('dPrimaryIdentityRecs'));
+    OUTPUT(dSearchResultsCombined, NAMED('dSearchResultsCombined'));
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'));
     OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone_PRI'));
     IF(inMod.isPrimarySearchPII, OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI')));
@@ -218,6 +215,7 @@ FUNCTION
     OUTPUT(dPrimaryForRIs, NAMED('dPrimaryForRIs_PRI'));
     OUTPUT(dOtherIdentities, NAMED('dOtherIdentities_PRI'));
     IF(inMod.isPrimarySearchPII, OUTPUT(dPrepOtherPhonesForRIs, NAMED('dPrepOtherPhonesForRIs_PRI')));
+    IF(inMod.isPrimarySearchPII, OUTPUT(dPrepAllRIs, NAMED('dPrepAllRIs')));
     IF(inMod.IncludeRiskIndicators, OUTPUT(dPrepForRIs, NAMED('dPrepForRIs_PRI')));
     IF(inMod.IncludeRiskIndicators, OUTPUT(dRIs, NAMED('dRIs_PRI')));
   #END
