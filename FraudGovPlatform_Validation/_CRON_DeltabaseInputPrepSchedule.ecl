@@ -28,7 +28,7 @@ lECL1 :=
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
 +'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyDeltabase(\''+version+'\')\n'
-+'		,Scrubs_FraudGov.MAC_Scrubs_Report(version,\'Scrubs_FraudGov\',\'Deltabase\', Scrubs_FraudGov.Deltabase_In_Deltabase, FraudGovPlatform_Validation.Mailing_List().Alert))\n'
++'		,Scrubs_FraudGov.MAC_Scrubs_Report(\''+version+'\',\'Scrubs_FraudGov\',\'Deltabase\', Scrubs_FraudGov.Deltabase_In_Deltabase, FraudGovPlatform_Validation.Mailing_List().Alert))\n'
 +'	);\n'
 ;
 
