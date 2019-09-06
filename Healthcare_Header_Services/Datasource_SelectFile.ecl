@@ -4,7 +4,7 @@ checkin changes as per RR-12063
 Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sanctions;
 /*Changes for RR11959*/
  EXPORT Datasource_SelectFile := MODULE
- Export get_providers_base (dataset(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input) input):= function
+	Export get_providers_base (dataset(Healthcare_Header_Services.Layouts.searchKeyResults_plus_input) input):= function
 			// rawdataIndividual:= join(dedup(sort(input(lnpid>0),record),record), Enclarity.Keys(,true).individual_lnpid.qa,
 											// keyed(left.lnpid = right.lnpid),
 											// transform(Layouts.selectfile_providers_base_with_input, 
@@ -426,7 +426,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 											// keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
 			// noHits := join(input,rawdataFacilities,left.acctno=right.acctno,transform(Healthcare_Header_Services.layouts.searchKeyResults_plus_input, self:=left),left only);
 			noHits := input;
-			rawdataFacilitiesbyVendorid:= sort(join(dedup(sort(noHits(vendorid<>''),record),record), Enclarity.Keys(,true).facility_group_key.qa,
+			rawdataFacilitiesbyVendorid:= join(dedup(sort(noHits(vendorid<>''),record),record), Enclarity.Keys(,true).facility_group_key.qa,
 											keyed(left.vendorid = right.group_key)  and right.record_type = 'C',
 											transform(Healthcare_Header_Services.layouts.selectfile_facilities_base_with_input,
 																		SELF.clean_prim_range:=right.prim_range;
@@ -438,11 +438,11 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																		SELF.clean_sec_range:=right.sec_range;
 																		SELF.clean_p_city_name:=right.p_city_name;
 																		SELF.clean_st:=right.st;
-																	 SELF.clean_z5:=right.zip;
+																		SELF.clean_z5:=right.zip;
 																		self:=left,
 																		self:=right,
 																		self:=[]),
-											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)),-clean_lic_begin_date,-clean_lic_end_date); 
+											keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0)); 
 			rawdataFacilitieswithAddrScores := join(rawdataFacilitiesbyVendorid, Enclarity.Keys(,true).associate_group_key.qa,
 											keyed(left.vendorid = right.group_key) and right.normed_name_rec_type ='1' and
 											right.record_type='C' and left.addr_key = right.addr_key,

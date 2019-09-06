@@ -1,4 +1,4 @@
-﻿export Layouts_PhonesFeedback := MODULE
+export Layouts_PhonesFeedback := MODULE
 
 	export Layout_PhonesFeedback_in := record   //This maps the Sybase input
 		string login_history_id;
@@ -54,8 +54,6 @@
 		string date_time_added;
 		string loginid;
 		string customerid;
-		//Added for CCPA-355
-		unsigned4 global_sid;
-		unsigned8 record_sid;
-		end;
+		end;		
+		
 	end;
