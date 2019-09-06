@@ -121,8 +121,6 @@ dMassSuppress:=dDeleteMostRecent(active and File_Correction_Indicator in File_Co
 													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
 													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
 													LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
-													LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
-													LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
 													LEFT.process_date											<=	RIGHT.process_date,
 												TRANSFORM(RECORDOF(LEFT),
 													SELF.active						:=	if(Right.File_Correction_Indicator in File_Correction_IndicatorSuppressCode,false,true);
