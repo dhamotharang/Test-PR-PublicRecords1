@@ -165,7 +165,7 @@ EXPORT spray_Foreclosure_Raw(
 	rsForeclosureRawFormattedCoded := JOIN(
 		rsForeclosureRawFormattedCoded4,
 		File_Foreclosure_Codes,
-		RIGHT.code_type	=	'land_use' AND LEFT.use_code = RIGHT.code,
+		RIGHT.code_type = 'land_use' AND LEFT.use_code = RIGHT.code,
 		tForeclosureLookupUseDesc(LEFT, RIGHT),
 		LEFT OUTER,
 		lookup
