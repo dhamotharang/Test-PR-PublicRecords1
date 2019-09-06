@@ -1,6 +1,6 @@
 ﻿import ut, std, Corp2, Corp2_Mapping, Scrubs, Corp2_Raw_ND, Scrubs_Corp2_Mapping_ND_Main, _control, Tools, versioncontrol;  
-
- export ND:= MODULE;   
+ 
+ export ND:= MODULE;      
  
   export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = Tools._Constants.IsDataland) := function
  		
@@ -13,6 +13,7 @@
 		Owner          := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).input.Owner.logical,hash(SOS_CONTROL_ID)),record,local),record,local) : independent; 
 	  Trademark	     := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).input.Trademark.logical,hash(SOS_CONTROL_ID)),record,local),record,local) : independent; 
     TrademarkClass := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).input.TrademarkClass,hash(SOS_CONTROL_ID)),sos_control_id,recPos,local),sos_control_id, keep(6)) : independent; 
+
 
 		//------- Begin CORP Mapping ---------------------------------------------------------------------//	
 	
