@@ -7,7 +7,7 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
 
   //  Prefix
 	EXPORT  IsDataland          :=  tools._Constants.IsDataland;
-	EXPORT  foreign_environment :=  IF(IsDataland,'~',Data_Services.foreign_prod);
+	EXPORT  foreign_environment :=  '~';//IF(IsDataland,'~',Data_Services.foreign_prod);
   EXPORT  cluster_name        :=  'ushc::';
 	EXPORT  prefix              :=  foreign_environment + cluster_name;
 
@@ -118,6 +118,19 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
       Debug_match_candidates_debug.dAll_filenames  +
       Debug_match_candidatesforslice_debug.dAll_filenames  +
       History_Match.dAll_filenames
+    ;
+  END;
+  
+  EXPORT  ExternalKeys  :=  MODULE
+    EXPORT  Meow            :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Meow'  , pVersion);
+    EXPORT  Sup_RID         :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'sup::RID'  , pVersion);
+    EXPORT  Refs            :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Refs'  , pVersion);
+    EXPORT  Refs_NoMatch    :=  versioncontrol.mBuildFilenameVersions(lKeyTemplate + 'Refs::NOMATCH'  , pVersion);
+		EXPORT	dAll_filenames	:=
+      Meow.dAll_filenames  +
+      Sup_RID.dAll_filenames  +
+      Refs.dAll_filenames  +
+      Refs_NoMatch.dAll_filenames
     ;
   END;
 
