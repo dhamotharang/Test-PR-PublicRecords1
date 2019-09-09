@@ -1,4 +1,4 @@
-//#workunit('name','Accutrend Contacts ' + busreg.BusReg_Build_Date);
+﻿//#workunit('name','Accutrend Contacts ' + busreg.BusReg_Build_Date);
 import ut,did_add,header_slimsort,didville;
 
 base := BusReg.File_BusReg_Base;
@@ -81,7 +81,8 @@ busreg.Layout_BusReg_Contact Norm(busreg.layout_busreg_temp L, integer num) := t
 								l.ofc4_geo_match,l.ofc5_geo_match,l.ofc6_geo_match,l.ra_geo_match);
  self.err_stat := choose(num,l.ofc1_err_stat,l.ofc2_err_stat,l.ofc3_err_stat,
 								l.ofc4_err_stat,l.ofc5_err_stat,l.ofc6_err_stat,l.ra_err_stat);
- self := l;
+ self 				 := l;
+ self 				 := [];
 end;
 
 all_contacts := normalize(base,7,norm(left,counter));
