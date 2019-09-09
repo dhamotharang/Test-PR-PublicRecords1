@@ -1,29 +1,76 @@
-﻿IMPORT DNB_DMI, TopBusiness_BIPV2, MDR, ut, _Validate;
+﻿IMPORT DNB_DMI, TopBusiness_BIPV2, MDR, ut, _Validate, data_services;
 
-Base := DNB_DMI.Files().base.qa;
+Base := DNB_DMI.Files().base.companies.qa;
 
 Industry_Layout := TopBusiness_BIPV2.Layouts.rec_industry_combined_layout;
 
-Industry_Layout	MapIndustry (Base L, INTEGER C)	:=	TRANSFORM,
-SKIP((C = 2 AND L.efx_secsic1 = '' AND L.efx_secnaics1 = '') OR
-     (C = 3 AND L.efx_secsic2 = ''AND L.efx_secnaics2 = '') OR
-     (C = 4 AND L.efx_secsic3 = ''AND L.efx_secnaics3 = '') OR
-     (C = 5 AND L.efx_secsic4 = ''AND L.efx_secnaics4 = ''))
-	SELF.bdid 										:=	0;
-	SELF.bdid_score								:=	0;
-	SELF.source       						:=	MDR.sourcetools.src_DNB_DMI;
-	SELF.source_docid  						:=	L.efx_id;
-	SELF.source_rec_id            :=  L.rcid;
-	SELF.siccode       						:=	CHOOSE(C, L.efx_primsic, L.efx_secsic1[1..8], L.efx_secsic2[1..8], L.efx_secsic3[1..8], L.efx_secsic4[1..8]);
-	SELF.naics        						:=	CHOOSE(C, L.efx_primnaicscode, L.efx_secnaics1[1..8], L.efx_secnaics2[1..8], L.efx_secnaics3[1..8], L.efx_secnaics4[1..8]);
-	SELF.industry_description 		:=	CHOOSE(C, L.efx_primsicdesc, L.efx_secsicdesc1, L.efx_secsicdesc2, L.efx_secsicdesc3, L.efx_secsicdesc4);
-	SELF.business_description 		:=	CHOOSE(C, L.efx_primnaicsdesc, L.efx_secnaicsdesc1, L.efx_secnaicsdesc2, L.efx_secnaicsdesc3, L.efx_secnaicsdesc4);
-	SELF.dt_first_seen						:=	IF(_Validate.date.fIsValid((STRING)L.dt_first_seen), L.dt_first_seen, 0);
-	SELF.dt_last_seen							:=	IF(_Validate.date.fIsValid((STRING)L.dt_last_seen), L.dt_last_seen, 0);
-	SELF.dt_vendor_first_reported	:=	IF(_Validate.date.fIsValid((STRING)L.dt_vendor_first_reported), L.dt_vendor_first_reported, 0);
-	SELF.dt_vendor_last_reported	:=	IF(_Validate.date.fIsValid((STRING)L.dt_vendor_last_reported), L.dt_vendor_last_reported, 0);
-	SELF.record_type							:=	L.record_type;
-	SELF.record_date							:=	L.process_date;
+Industry_Layout	MapIndustry(Base L, INTEGER C)	:=	TRANSFORM,
+SKIP(  
+     (C = 2 AND L.rawfields.sic1a = '' AND L.rawfields.sic1adesc = '') OR
+		 (C = 3 AND L.rawfields.sic1b = '' AND L.rawfields.sic1bdesc = '') OR
+     (C = 4 AND L.rawfields.sic1c = '' AND L.rawfields.sic1cdesc = '') OR
+     (C = 5 AND L.rawfields.sic1d = '' AND L.rawfields.sic1ddesc = '') OR
+		 
+		 (C = 6 AND L.rawfields.sic2 = '' AND L.rawfields.sic2desc = '') OR
+     (C = 7 AND L.rawfields.sic2a = '' AND L.rawfields.sic2adesc = '') OR
+     (C = 8 AND L.rawfields.sic2b = '' AND L.rawfields.sic2bdesc = '') OR
+     (C = 9 AND L.rawfields.sic2c = '' AND L.rawfields.sic2cdesc = '') OR		 
+     (C = 10 AND L.rawfields.sic2d = '' AND L.rawfields.sic2ddesc = '') OR 
+		 
+		 (C = 11 AND L.rawfields.sic3 = '' AND L.rawfields.sic3desc = '') OR
+     (C = 12 AND L.rawfields.sic3a = '' AND L.rawfields.sic3adesc = '') OR
+     (C = 13 AND L.rawfields.sic3b = '' AND L.rawfields.sic3bdesc = '') OR
+     (C = 14 AND L.rawfields.sic3c = '' AND L.rawfields.sic3cdesc = '') OR		 
+     (C = 15 AND L.rawfields.sic3d = '' AND L.rawfields.sic3ddesc = '') OR 
+		 
+		 (C = 16 AND L.rawfields.sic4 = '' AND L.rawfields.sic4desc = '') OR
+     (C = 17 AND L.rawfields.sic4a = '' AND L.rawfields.sic4adesc = '') OR
+     (C = 18 AND L.rawfields.sic4b = '' AND L.rawfields.sic4bdesc = '') OR
+     (C = 19 AND L.rawfields.sic4c = '' AND L.rawfields.sic4cdesc = '') OR 		 
+     (C = 20 AND L.rawfields.sic4d = '' AND L.rawfields.sic4ddesc = '') OR 
+		 
+		 (C = 21 AND L.rawfields.sic5 = '' AND L.rawfields.sic5desc = '') OR
+     (C = 22 AND L.rawfields.sic5a = '' AND L.rawfields.sic5adesc = '') OR
+     (C = 23 AND L.rawfields.sic5b = '' AND L.rawfields.sic5bdesc = '') OR
+     (C = 24 AND L.rawfields.sic5c = '' AND L.rawfields.sic5cdesc = '') OR 	 
+     (C = 25 AND L.rawfields.sic5d = '' AND L.rawfields.sic5ddesc = '') OR
+		 
+		 (C = 26 AND L.rawfields.sic6 = '' AND L.rawfields.sic6desc = '') OR
+     (C = 27 AND L.rawfields.sic6a = '' AND L.rawfields.sic6adesc = '') OR
+     (C = 28 AND L.rawfields.sic6b = '' AND L.rawfields.sic6bdesc = '') OR
+     (C = 29 AND L.rawfields.sic6c = '' AND L.rawfields.sic6cdesc = '') OR 
+     (C = 30 AND L.rawfields.sic6d = '' AND L.rawfields.sic6ddesc = '') 
+		 )
+	SELF.bdid 										:=	L.bdid;
+	SELF.bdid_score								:=	L.bdid_score; 
+	SELF.source       						:=	MDR.sourcetools.src_Dunn_Bradstreet;
+	SELF.source_docid  						:=	L.rawfields.duns_number;
+	SELF.source_rec_id            :=  L.rid;
+	SELF.siccode       						:=	CHOOSE(C, 
+	                                         L.rawfields.sic1[1..8], L.rawfields.sic1a[1..8], L.rawfields.sic1b[1..8], L.rawfields.sic1c[1..8], L.rawfields.sic1d[1..8], 
+	                                         L.rawfields.sic2[1..8], L.rawfields.sic2a[1..8], L.rawfields.sic2b[1..8], L.rawfields.sic2c[1..8], L.rawfields.sic2d[1..8], 
+	                                         L.rawfields.sic3[1..8], L.rawfields.sic3a[1..8], L.rawfields.sic3b[1..8], L.rawfields.sic3c[1..8], L.rawfields.sic3d[1..8], 
+	                                         L.rawfields.sic4[1..8], L.rawfields.sic4a[1..8], L.rawfields.sic4b[1..8], L.rawfields.sic4c[1..8], L.rawfields.sic4d[1..8], 
+	                                         L.rawfields.sic5[1..8], L.rawfields.sic5a[1..8], L.rawfields.sic5b[1..8], L.rawfields.sic5c[1..8], L.rawfields.sic5d[1..8], 
+	                                         L.rawfields.sic6[1..8], L.rawfields.sic6a[1..8], L.rawfields.sic6b[1..8], L.rawfields.sic6c[1..8], L.rawfields.sic6d[1..8]
+																					 );
+	SELF.naics        						:=	'';
+	SELF.industry_description 		:=	CHOOSE(C, 
+	                                         L.rawfields.sic1desc, L.rawfields.sic1adesc, L.rawfields.sic1bdesc, L.rawfields.sic1cdesc, L.rawfields.sic1ddesc, 
+	                                         L.rawfields.sic2desc, L.rawfields.sic2adesc, L.rawfields.sic2bdesc, L.rawfields.sic2cdesc, L.rawfields.sic2ddesc, 
+	                                         L.rawfields.sic3desc, L.rawfields.sic3adesc, L.rawfields.sic3bdesc, L.rawfields.sic3cdesc, L.rawfields.sic3ddesc, 
+	                                         L.rawfields.sic4desc, L.rawfields.sic4adesc, L.rawfields.sic4bdesc, L.rawfields.sic4cdesc, L.rawfields.sic4ddesc, 
+	                                         L.rawfields.sic5desc, L.rawfields.sic5adesc, L.rawfields.sic5bdesc, L.rawfields.sic5cdesc, L.rawfields.sic5ddesc, 
+	                                         L.rawfields.sic6desc, L.rawfields.sic6adesc, L.rawfields.sic6bdesc, L.rawfields.sic6cdesc, L.rawfields.sic6ddesc
+	                                         );
+	SELF.business_description 		:=	'';
+	SELF.dt_first_seen						:=	IF(_Validate.date.fIsValid((STRING)L.date_first_seen), L.date_first_seen, 0);
+	SELF.dt_last_seen							:=	IF(_Validate.date.fIsValid((STRING)L.date_last_seen), L.date_last_seen, 0);
+	SELF.dt_vendor_first_reported	:=	IF(_Validate.date.fIsValid((STRING)L.date_vendor_first_reported), L.date_vendor_first_reported, 0);
+	SELF.dt_vendor_last_reported	:=	IF(_Validate.date.fIsValid((STRING)L.date_vendor_last_reported), L.date_vendor_last_reported, 0);
+	// SELF.record_type							:=	''; 
+	SELF.record_type							:=	(STRING)L.record_type; 
+	SELF.record_date							:=	L.date_last_seen; 
 	SELF.UltID										:=	L.UltID;
   SELF.OrgID										:=	L.OrgID;
   SELF.SELEID										:=	L.SELEID;
@@ -49,84 +96,8 @@ SKIP((C = 2 AND L.efx_secsic1 = '' AND L.efx_secnaics1 = '') OR
 	SELF 													:=	[];
 END;
 
-Industry := NORMALIZE(Base,5,MapIndustry(LEFT,COUNTER));
-	
-Industry_sort := SORT(Industry(siccode <> '' OR naics <> '' OR industry_description <> '' OR business_description <> '')
-	,bdid 										
-	,bdid_score								
-	,source       						
-	,source_docid  						
-	,source_rec_id            
-	,siccode       						
-	,naics        						
-	,industry_description 		
-	,business_description 		
-	,dt_first_seen						
-	,dt_last_seen							
-	,dt_vendor_first_reported	
-	,dt_vendor_last_reported	
-	,record_type							
-	,record_date							
-	,UltID										
-  ,OrgID										
-  ,SELEID										
-  ,ProxID										
-  ,POWID										
-  ,EmpID										
-  ,DotID										
-  ,UltScore									
-  ,OrgScore									
-  ,SELEScore								
-  ,ProxScore								
-  ,POWScore									
-  ,EmpScore									
-  ,DotScore									
-  ,UltWeight								
-  ,OrgWeight								
-  ,SELEWeight								
-  ,ProxWeight								
-  ,POWWeight								
-  ,EmpWeight								
-  ,DotWeight										
-	,LOCAL);
+Industry := NORMALIZE(Base,30,MapIndustry(LEFT,COUNTER));
 
-Industry_dedup := DEDUP(Industry_sort
-	,bdid 										
-	,bdid_score								
-	,source       						
-	,source_docid  						
-	,source_rec_id            
-	,siccode       						
-	,naics        						
-	,industry_description 		
-	,business_description 		
-	,dt_first_seen						
-	,dt_last_seen							
-	,dt_vendor_first_reported	
-	,dt_vendor_last_reported	
-	,record_type							
-	,record_date							
-	,UltID										
-  ,OrgID										
-  ,SELEID										
-  ,ProxID										
-  ,POWID										
-  ,EmpID										
-  ,DotID										
-  ,UltScore									
-  ,OrgScore									
-  ,SELEScore								
-  ,ProxScore								
-  ,POWScore									
-  ,EmpScore									
-  ,DotScore									
-  ,UltWeight								
-  ,OrgWeight								
-  ,SELEWeight								
-  ,ProxWeight								
-  ,POWWeight								
-  ,EmpWeight								
-  ,DotWeight								
-	,LOCAL);
+Industry_dedup := DEDUP(SORT(Industry(siccode <> '' OR industry_description <> ''),RECORD),RECORD);
 	
 EXPORT As_Industry := Industry_dedup;
