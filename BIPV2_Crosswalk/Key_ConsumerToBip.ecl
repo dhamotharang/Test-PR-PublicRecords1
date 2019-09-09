@@ -90,8 +90,8 @@ export Key_ConsumerToBip := module
 		
 		return if(applyMarketingRestrictions, marketingRestrictions, ds_restricted);
      end;
-	
-     shared normalize_mac(inDs, normalize_field, newLayout) := functionmacro
+
+     shared normalize_mac(inDs, normalize_field, newLayout, sourcesToInclude, sourcesGroupsToInclude) := functionmacro
 	     no_recs_to_normalize := project(inDs(count(normalize_field)=0), 
 		                                transform(newLayout,
 								            self := left,
@@ -100,14 +100,15 @@ export Key_ConsumerToBip := module
 		normalize_recs       := normalize(inDs(count(normalize_field)>0),
 		                                  left.normalize_field,
 								    transform(newLayout,
+								              skip((right.source not in sourcesToInclude) or (right.sourceGroup not in sourcesGroupsToInclude)),
 								              newSourceInfo   := dataset([{right.source,right.source_record_id}],Layouts.SourceInfoRec);
-								              self.sourceInfo := left.sourceInfo + newSourceInfo;
-								              self := left, 
-										    self := right));
+								              self.sourceInfo := left.sourceInfo + newSourceInfo(trim(source)!='');
+								              self            := left, 
+										    self            := right));
 										    
-          return normalize_recs + 	no_recs_to_normalize;									    
+          return normalize_recs(count(sourceInfo) > 0) + no_recs_to_normalize;									    
 	endmacro;
-	
+		
      export getDataFiltered(
                     dataset(l_lexid_links) inputs,
                     BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
@@ -122,13 +123,10 @@ export Key_ConsumerToBip := module
 	      remove_restricted := kfetch(inputs, in_mod, JoinLimit, JoinType, applyMarketingRestrictions);
 
            addSourceRecInfo       := project(remove_restricted, Layouts.ConsumerToBipWorkRec0);		 
-		 normalizeJobTitles     := normalize_mac(addSourceRecInfo, jobTitles, Layouts.ConsumerToBipWorkRec1);
-		 normalizeContactNames  := normalize_mac(normalizeJobTitles, contactNames, Layouts.ConsumerToBipWorkRec2);
-
+		 normalizeJobTitles     := normalize_mac(addSourceRecInfo, jobTitles, Layouts.ConsumerToBipWorkRec1,sourcesToInclude,sourceGroupsToInclude);
+		 normalizeContactNames  := normalize_mac(normalizeJobTitles, contactNames, Layouts.ConsumerToBipWorkRec2,sourcesToInclude,sourceGroupsToInclude);
 		 
-		 filterSourcesAndGroups := normalizeContactNames(source in sourcesToInclude and sourceGroup in sourceGroupsToInclude);
-
-		 normSourceInfoRecs     := normalize(filterSourcesAndGroups, left.sourceInfo,
+		 normSourceInfoRecs     := normalize(normalizeContactNames, left.sourceInfo,
 		                                     transform(Layouts.SourceInfoWorkRec3,
 									            self := right,
 									            self := left));											 
@@ -149,7 +147,7 @@ export Key_ConsumerToBip := module
 								              self.sourceInfo := left.sourceInfo + right.sourceInfo,
 										    self            := left));
 											    
-		 changeToFinalForm      := project(filterSourcesAndGroups,
+		 changeToFinalForm      := project(normalizeContactNames,
 		                                   transform(Layouts.ConsumerToBipFinalRec,
 									          self.sourceInfo := dedup(left.sourceInfo(source!=''),source,source_record_id);
 									          self            := left,
