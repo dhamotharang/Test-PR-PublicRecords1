@@ -1,4 +1,4 @@
-﻿import header, gong, Risk_Indicators,Data_Services;
+﻿import _control, CCPA, header, gong, Risk_Indicators,Data_Services, Std;
 
 ppCandidate := dataset(Data_Services.foreign_prod + 'thor_data400::in::qsent_clean',Phonesplus.layoutCommonOut,thor);
 
@@ -130,12 +130,12 @@ self.ActiveFlag := if(R.phoneno != '','Y','');
 self.InitScore		:= if(L.InitScoreType = '',5,L.InitScore);
 self.InitScoreType	:= if(L.InitScoreType = '','QSENT OTHER',L.InitScoreType);
 self.ConfidenceScore:= L.InitScore + L.TDSMatch;
-self.global_sid := 22671;
+self.global_sid := 0;
 self.record_sid := 0;
 self := L;
 end;					
 
-ActiveDiffName := join(sort(distribute(ppmatch,hash(CellPhone,prim_range,prim_name,zip5)),CellPhone,prim_range,prim_name,zip5,local)
+ActiveDiffName 	:= join(sort(distribute(ppmatch,hash(CellPhone,prim_range,prim_name,zip5)),CellPhone,prim_range,prim_name,zip5,local)
 				 ,dedup(sort(distribute(f_currgong,hash(phoneno,prim_range,prim_name,z5)),phoneno,prim_range,prim_name,z5,local),phoneno,prim_range,prim_name,z5,local),
 						left.Cellphone = right.phoneno and
 						left.prim_range = right.prim_range and
@@ -143,5 +143,6 @@ ActiveDiffName := join(sort(distribute(ppmatch,hash(CellPhone,prim_range,prim_na
 						left.zip5 = right.z5,
 						t_mrkActive(left,right),left outer,local);
 
+addGlobalSID 		:= CCPA.macGetGlobalSID(ActiveDiffName, 'Qsent', '', 'global_sid'); //DF-25332: Populate Global_SIDs
 		
-export proc_Qsent_asPhonesplus := ActiveDiffName;
+export proc_Qsent_asPhonesplus := addGlobalSID;
