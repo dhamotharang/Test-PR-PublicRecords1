@@ -141,8 +141,6 @@
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
-'ED', // NEW_YORK_DEPARTMENT_OF_CORRECTIONS                                                                  
-'EF', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS                                                                  
 'EM', // UTAH_DEPARTMENT_OF_CORRECTIONS                                                                      
 'EN', // VIRGINIA_DEPARTMENT_OF_CORRECTIONS                                                                  
 'EP', // WASHINGTON_DEPARTMENT_OF_CORRECTIONS                                                                
@@ -205,9 +203,12 @@
 'HX', // MASSACHUSETTS_WRENTHAM_POLICE_ARRESTS                                                               
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
+'I0010', // GA DEKALB COUNTY JUDICIAL SYSTEM_IE                                                                 
+'I0012', // WV CIRCUIT COURTS_IE                                                                                
 'I0024', // OH PORTAGE RAVENNA MUNICIPAL COURT_IE                                                               
 'I0032', // TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE                                                      
 'I0040', // NV CLARK LAS VEGAS JUSTICE COURT_IE                                                                 
+'I0041', // FL SARASOTA CLERK OF COURT_IE                                                                       
 'I0048', // TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE                                                            
 'I0049', // TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE                                                         
 'IC', // IOWA_ADMINISTRATOR_OF_THE_COURTS                                                                    
@@ -220,6 +221,7 @@
 'IO', // MONTANA_MISSOULA_COUNTY_ARRESTS                                                                     
 'IP', // MONTANA_YELLOWSTONE_COUNTY_ARRESTS                                                                  
 'IQ', // NORTH_CAROLINA_CABARRUS_COUNTY_ARRESTS                                                              
+'IR', // NORTH_CAROLINA_CATAWBA_COUNTY_ARRESTS                                                               
 'IS', // NORTH_CAROLINA_DURHAM_COUNTY_ARRESTS                                                                
 'IT', // NORTH_CAROLINA_GUILFORD_COUNTY_ARRESTS                                                              
 'IU', // NORTH_CAROLINA_LINCOLN_COUNTY_ARRESTS                                                               
@@ -450,7 +452,6 @@
 'ZX', // SOUTH_CAROLINA_COLLETON_COUNTY_SUMMARY_COURTS                                                       
 'ZY', // SOUTH_CAROLINA_DARLINGTON_COUNTY_CIRCUIT_COURTS                                                     
 'ZZ', // SOUTH_CAROLINA_DARLINGTON_COUNTY_SUMMARY_COURTS                                                     
-
 
 //CrimWise Sources
 'W0001', // ILLINOIS_ADMINISTRATOR_OF_THE_COURTS_CW                                                             
