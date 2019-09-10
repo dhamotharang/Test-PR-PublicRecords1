@@ -1,10 +1,12 @@
-﻿import bipv2, ut, MDR, BKForeclosure;
+﻿import _control, bipv2, CCPA, ut, MDR, BKForeclosure, Std;
 
-foreclosureIn := property.File_Foreclosure_In;  //contains both new and base file data
-layout_foreclosureIn := recordof(foreclosureIn);
-normalizeDIDLayout := recordof (Property.File_Foreclosure_Normalized);
+foreclosureIn 				:= property.File_Foreclosure_In;  //contains both new and base file data
+addGSForeclosureIn		:= CCPA.macGetGlobalSID(foreclosureIn,'Foreclosure','','global_sid'); //DF-25926: Add Global_SID
 
-layout_foreclosureIn denormalizeRecords(foreclosureIn l, normalizeDIDLayout r) := transform
+layout_foreclosureIn 	:= recordof(addGSForeclosureIn);
+normalizeDIDLayout 		:= recordof(Property.File_Foreclosure_Normalized);
+
+layout_foreclosureIn denormalizeRecords(addGSForeclosureIn l, normalizeDIDLayout r) := transform
 	self.name1_did 				:= if(r.name_indicator=1, intformat(r.did,12,1), l.name1_did);
 	self.name1_did_score 	:= if(r.name_indicator=1, (string)r.did_score, l.name1_did_score);
 	self.name1_ssn 				:= if(r.name_indicator=1, r.ssn, l.name1_ssn);
@@ -226,7 +228,7 @@ layout_foreclosureIn denormalizeRecords(foreclosureIn l, normalizeDIDLayout r) :
 end;
 
 //Distribute the data before denormalize to avoid skewing
-foreclosureInDist					:=	DISTRIBUTE(foreclosureIn, HASH32(sequence));
+foreclosureInDist					:=	DISTRIBUTE(addGSForeclosureIn, HASH32(sequence));
 foreclosureNormalizedDist	:=	DISTRIBUTE(Property.foreclosure_normalized, HASH32(sequence));
 
 foreclosureBase := denormalize(foreclosureInDist, foreclosureNormalizedDist,

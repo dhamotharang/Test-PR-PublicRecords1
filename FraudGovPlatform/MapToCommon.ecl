@@ -26,8 +26,10 @@ module
 		self:= left; 
 		self:= [];
 	)); 
+	
+	extra_dedup_KnownFraud := fn_dedup_knownfraud(inKnownFraud); // remove duplicate records with different customer_event_id
  
-	Export KnownFraud := project (inKnownFraud , transform(FraudShared.Layouts.Base.Main , 
+	Export KnownFraud := project (extra_dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
 		self.transaction_id := left.customer_event_id;
 		self.additional_address.Street_1	:= left.Mailing_Street_1; 
@@ -95,7 +97,10 @@ module
 
 	// Append RinID
 	EXPORT NewBaseRinID := Append_RinID (NewBaseLexid):independent;
+	
+	//Validate Deltabase 
+	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseDelta);
 
 END;
