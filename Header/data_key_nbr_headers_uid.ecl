@@ -2,7 +2,7 @@
 
 import doxie,Data_Services, dx_Header;
 
-export data_key_nbr_headers_uid := PROJECT (doxie.nbr_headers, dx_Header.layouts.i_nbr_uid);
+export data_key_nbr_headers_uid := PROJECT (doxie.nbr_headers, TRANSFORM(dx_Header.layouts.i_nbr_uid,SELF:=LEFT,SELF.global_sid:=0,SELF.record_sid:=0));
 // index(
 // 	doxie.nbr_headers,																												// baserecset
 // 	{zip,prim_name,suffix,predir,postdir,uid},																// keys
