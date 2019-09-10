@@ -262,10 +262,6 @@ MODULE
 			UNSIGNED2                                             identity_count := 0;
 			INTEGER                                               phone_inresponse_count;
 			BOOLEAN                                               isLNameMatch;
-			integer                                               imsi_Tenure_MinDays;
-			integer                                               imsi_Tenure_MaxDays;
-			integer                                               imei_Tenure_MinDays;
-			integer                                               imei_Tenure_MaxDays;
 		END;
 		
 		EXPORT ExcludePhones :=
@@ -372,10 +368,6 @@ MODULE
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.ReasonCodes;
 			ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse.TmxVariables;
       UNSIGNED2  identity_count := 0;
-      integer imsi_Tenure_MinDays;
-      integer imsi_Tenure_MaxDays;
-      integer imei_Tenure_MinDays;
-      integer imei_Tenure_MaxDays;
 		END;
 		
 		EXPORT IdentityIesp :=
