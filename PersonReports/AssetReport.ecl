@@ -78,7 +78,7 @@ EXPORT AssetReport (
                                                    FFD.Constants.DataGroups.PROPERTY_SEARCH]
                                      )).prop_deeds_all, iesp.Constants.BR.MaxDeeds);
                                      
-  p_aircrafts   := choosen (PersonReports.aircraft_records(dids, module (project (param, PersonReports.input.aircrafts)) end, IsFCRA, ds_flags, 
+  p_aircrafts   := choosen (PersonReports.aircraft_records(dids, PROJECT (mod_asset, $.IParam.aircrafts), IsFCRA, ds_flags, 
                           slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Aircraft
                                      )), iesp.Constants.BR.MaxAircrafts);
 

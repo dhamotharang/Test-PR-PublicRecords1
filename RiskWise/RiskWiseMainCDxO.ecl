@@ -58,7 +58,7 @@
 'nd03','nd04','nd05', 'nd06','nd10', 'nd11' */
 
 
-import address, Risk_Indicators, seed_files, gateway, royalty, Inquiry_AccLogs, Risk_Reporting, STD;   
+IMPORT Risk_Indicators, seed_files, gateway, royalty, Inquiry_AccLogs, Risk_Reporting, STD, Riskwise;   
 
 
 export RiskWiseMainCDxO := MACRO
@@ -121,7 +121,11 @@ export RiskWiseMainCDxO := MACRO
 	'runSeed',
   'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -204,10 +208,17 @@ string DataPermission  := Risk_Indicators.iid_constants.default_DataPermission :
 gateways_in := Gateway.Configuration.Get();
 
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 include_ofac := if(ofac_version = 1, false, true);
 global_watchlist_threshold := if(ofac_version in [1, 2, 3], 0.84, 0.85);
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['nd05', 'nd11'];
 
 netAcuitySet := ['nd03', 'nd04', 'nd05', 'nd06', 'nd10', 'nd11'];
@@ -293,14 +304,22 @@ final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([]
 /* PRODUCTION */
 finalAnswer := if(tribCode in productSet,
 			   if(count(final_seed)>0 and runSeed_value, final_seed, if(tribCode in ['nd03','nd04','nd05','nd06'] or (tribCode in ['nd10','nd11'] and ordertype_value<>'0'), 
-															RiskWise.CDxO_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, ofac_version, include_ofac, global_watchlist_threshold, DataRestriction, DataPermission),
-															RiskWise.CDxO_Business_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, ofac_version, include_ofac, global_watchlist_threshold, DataRestriction, DataPermission))),
+															RiskWise.CDxO_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, ofac_version, include_ofac, global_watchlist_threshold, DataRestriction, DataPermission,
+                                                                                                          LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                          TransactionID := TransactionID, 
+                                                                                                          BatchUID := BatchUID, 
+                                                                                                          GlobalCompanyID := GlobalCompanyID),
+															RiskWise.CDxO_Business_Function(f, gateways, GLB_Purpose, DPPA_Purpose, tribCode, ofac_version, include_ofac, global_watchlist_threshold, DataRestriction, DataPermission,
+                                                                                                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                                                            TransactionID := TransactionID, 
+                                                                                                                            BatchUID := BatchUID, 
+                                                                                                                            GlobalCompanyID := GlobalCompanyID))),
 			   dataset([], riskwise.Layout_CDxO));				 
 				 
 output(finalAnswer, named('Results'));
 
 dIPOut := project(finalAnswer, TRANSFORM(Royalty.RoyaltyNetAcuity.IPData, 
-						SELF.Royalty_NAG := LEFT.billing(stringlib.stringtouppercase(name)='NA99')[1].callcount; 
+						SELF.Royalty_NAG := LEFT.billing(STD.Str.touppercase(name)='NA99')[1].callcount; 
 						SELF := [];));
 royalties := IF(tribCode in productSet, Royalty.RoyaltyNetAcuity.GetOnlineRoyalties(gateways, f, dIPOut, TRUE));
 output(royalties,NAMED('RoyaltySet'));

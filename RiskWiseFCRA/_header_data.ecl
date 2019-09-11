@@ -1,4 +1,4 @@
-﻿import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std;
+﻿import doxie, dx_header, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std, data_services;
 
 // call full header, call full override
 // join them together by rid, left outer
@@ -16,6 +16,8 @@ unsigned3 history_date := 999999;	// removed the input history date, this query 
 export _header_data (dataset (doxie.layout_references) bshell_dids, 
                      dataset (fcra.Layout_override_flag) ds_flagfile) := function
 
+//FCRA integral indicator:
+iType := data_services.data_env.iFCRA;
 
 Layout_working := RiskWiseFCRA.layouts.working;
 
@@ -29,16 +31,16 @@ quick_header_suppressions := join(flagged_hdr_suppressions, Header_Quick.key_DID
 												trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
 												trim( (string)right.persistent_record_id ) = trim(left.record_id)   // new way - using persistent_record_id
 											),
-											transform( recordof(doxie.Key_fcra_Header), self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
+											transform(dx_header.layout_key_header, self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
 											LIMIT(ut.limits.HEADER_PER_DID));
 
-header_main_suppressions := join(flagged_hdr_suppressions, doxie.Key_fcra_Header,	
+header_main_suppressions := join(flagged_hdr_suppressions, dx_header.key_header(iType),
 										keyed((unsigned)left.did=right.s_did) and
 										(
 												trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
 												trim( (string)right.persistent_record_id ) = trim(left.record_id)   // new way - using persistent_record_id
 											),
-										transform( recordof(doxie.Key_fcra_Header), 
+										transform(dx_header.layout_key_header, 
 											ssnToUse := IF(right.valid_ssn<>'M', right.ssn, '');	// if manufactured, then blank out
 											dobToUse := IF(right.valid_dob<>'M', right.dob, 0);	// if manufactured, then blank out
 											self.ssn := ssnToUse;
@@ -67,17 +69,17 @@ qheader_main := join(bshell_dids, Header_Quick.key_DID_fcra,
 											~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and 
 											trim((string)right.did) + trim((string)right.rid) not in header_correction_keys // old way - exclude corrected records from prior to 11/13/2012
 											and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id		
-											transform( recordof(doxie.Key_fcra_Header), self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
+											transform(dx_header.layout_key_header, self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
 											LIMIT(ut.limits.HEADER_PER_DID));
 
-header_main := join(bshell_dids, doxie.Key_fcra_Header,	
+header_main := join(bshell_dids, dx_header.key_header(iType),	
 										left.did<>0 and keyed(left.did=right.s_did) and
 										((right.src='BA' and FCRA.bankrupt_is_ok(todaysdate,(string)right.dt_first_seen)) or
 										(right.src='L2' and FCRA.lien_is_ok(todaysdate,(string)right.dt_first_seen)) OR right.src not in ['BA','L2']) and
 										~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and
 										trim((string)right.did) + trim((string)right.rid) not in header_correction_keys// old way - exclude corrected records from prior to 11/13/2012
 										and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id	
-										transform( recordof(doxie.Key_fcra_Header), self := right ),
+										transform(dx_header.layout_key_header, self := right ),
 										LIMIT(ut.limits.HEADER_PER_DID));	
 
 combo_header := qheader_main + header_main;
@@ -85,7 +87,7 @@ combo_header := qheader_main + header_main;
 						
 						
 // search citystatezip for each header record to get the corp/mil flag
-Riskwise.layouts_vru.Layout_Header_Data getZipFlag(recordof(doxie.Key_fcra_Header) le, riskwise.Key_CityStZip ri) := transform
+Riskwise.layouts_vru.Layout_Header_Data getZipFlag(dx_header.layout_key_header le, riskwise.Key_CityStZip ri) := transform
 	self.addr_flags.corpMil := if(ri.zipclass in ['U','M'], '1', '0');
 	self := le;
 	self := [];	// rest of the addr flags
@@ -167,11 +169,12 @@ wAdvo  := join(wHRIRoll, Advo.Key_Addr1_FCRA,
 													getAdvoFlags(left, right), LEFT OUTER,
 													KEEP(1), LIMIT(ut.limits.HEADER_PER_DID));
 
-Riskwise.layouts_vru.Layout_Header_Data addUnitCount(Riskwise.layouts_vru.Layout_Header_Data le, doxie.Key_FCRA_AptBuildings ri) := transform
+index_AptBuildings := dx_header.key_AptBuildings(iType);
+Riskwise.layouts_vru.Layout_Header_Data addUnitCount(Riskwise.layouts_vru.Layout_Header_Data le, index_AptBuildings ri) := transform
 	SELF.addr_flags.unit_count := ri.apt_cnt;
 	SELF := le;
 end;
-wUnitCount := join(wADVO, doxie.Key_FCRA_AptBuildings,	
+wUnitCount := join(wADVO, index_AptBuildings,	
 	left.did<>0 and trim(left.prim_name)<>'' and
 		keyed(left.prim_range=right.prim_range) and 
 		keyed(left.prim_name=right.prim_name) and

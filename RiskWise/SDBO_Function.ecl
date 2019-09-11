@@ -1,4 +1,4 @@
-﻿import ut, address, business_risk, Risk_Indicators, Models, gateway, Royalty, MDR;
+﻿import ut, business_risk, Risk_Indicators, Models, gateway, Royalty, STD;
 
 export SDBO_Function(dataset(Layout_SD5I) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb,  
 				 boolean isUtility=false, 
@@ -8,8 +8,12 @@ export SDBO_Function(dataset(Layout_SD5I) indata, dataset(Gateway.Layouts.Config
          boolean include_ofac = false,
          boolean include_additional_watchlists = false,
          real global_watchlist_threshold = 0.84, 
-				 string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-				 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := FUNCTION
+		 string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
+		 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+         unsigned1 LexIdSourceOptout = 1,
+         string TransactionID = '',
+         string BatchUID = '',
+         unsigned6 GlobalCompanyId = 0) := FUNCTION
 
 
 	
@@ -62,7 +66,7 @@ Business_Risk.Layout_Input into_biid_in(indata le) := TRANSFORM
 	self.bdid	:= 0;  // isn't an input field in our products
 	self.score := 0;  // isn't an input value in our products either
 	cmpy := if(useFirst, le.cmpy, le.cmpy2);
-	self.company_name := stringlib.stringtouppercase(cmpy);
+	self.company_name := STD.Str.touppercase(cmpy);
 	self.alt_company_name := '';  // don't have one
 	self.prim_range := clean_a[1..10]; 
 	self.predir := clean_a[11..12];
@@ -87,9 +91,9 @@ Business_Risk.Layout_Input into_biid_in(indata le) := TRANSFORM
 	self.fein		 := ssn_val;
 	self.phone10    := hphone_val;  // the business and consumer phones will be in the hphone field
 	self.ip_addr	 := le.ipaddr;
-	self.rep_fname	 := '';//stringlib.stringtouppercase(le.first);
+	self.rep_fname	 := '';//STD.Str.touppercase(le.first);
 	self.rep_mname  := ''; // don't have one on input
-	self.rep_lname  := '';//stringlib.stringtouppercase(le.last);
+	self.rep_lname  := '';//STD.Str.touppercase(le.last);
 	self.rep_name_suffix := ''; // don't have one on input
 	self.rep_alt_Lname := ''; // don't have one on input
 	
@@ -127,7 +131,7 @@ Business_Risk.Layout_Input into_biid_in(indata le) := TRANSFORM
 	self.rep_email		:= '';
 	self.rep_country := '';
 
-	self.country := if(le.tribcode in ['b2bz', 'b2b4'], if(useFirst, stringlib.stringtouppercase(le.countrycode), stringlib.stringtouppercase(le.countrycode2)), '');//le.countrycode;
+	self.country := if(le.tribcode in ['b2bz', 'b2b4'], if(useFirst, STD.Str.touppercase(le.countrycode), STD.Str.touppercase(le.countrycode2)), '');//le.countrycode;
 END;
 biid_prep := project(indata,into_biid_in(LEFT));
 
@@ -164,7 +168,11 @@ _global_watchlist_threshold :=
     global_watchlist_threshold);
 
 biid_res := business_risk.InstantID_Function(biid_prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,tribcode,ExcludeWatchLists,ofac_only,
-								_ofac_version,_include_ofac,_include_additional_watchlists, _global_watchlist_threshold, datarestriction:=datarestriction, datapermission:=datapermission);				
+								_ofac_version,_include_ofac,_include_additional_watchlists, _global_watchlist_threshold, datarestriction:=datarestriction, datapermission:=datapermission,
+                                LexIdSourceOptout := LexIdSourceOptout, 
+                                TransactionID := TransactionID, 
+                                BatchUID := BatchUID, 
+                                GlobalCompanyID := GlobalCompanyID);				
 
 dbus_Royalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Bus_Royalties');
 
@@ -231,15 +239,15 @@ risk_indicators.layout_input into_iid_prep(indata le) := TRANSFORM
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;
 	first := if(useFirst, le.first, le.first2);
-	self.fname := stringlib.stringtouppercase(first);
+	self.fname := STD.Str.touppercase(first);
 	last := if(useFirst, le.last, le.last2);
-	self.lname := stringlib.stringtouppercase(last);
+	self.lname := STD.Str.touppercase(last);
 	inAddr := if(useFirst, le.addr, le.addr2);
-	self.in_streetAddress := stringlib.stringtouppercase(inAddr);
+	self.in_streetAddress := STD.Str.touppercase(inAddr);
 	inCity := if(useFirst, le.city, le.city2);
-	self.in_city := stringlib.stringtouppercase(inCity);
+	self.in_city := STD.Str.touppercase(inCity);
 	inState := if(useFirst, le.state, le.state2);
-	self.in_state := stringlib.stringtouppercase(inState);
+	self.in_state := STD.Str.touppercase(inState);
 	inZip := if(useFirst, le.zip, le.zip2);
 	self.in_zipCode := inZip;
 	self.prim_range := clean_a[1..10];
@@ -259,15 +267,15 @@ risk_indicators.layout_input into_iid_prep(indata le) := TRANSFORM
 	self.addr_status := clean_a[179..182];
 	self.county := clean_a[143..145];
 	self.geo_blk := clean_a[171..177];
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
 	drlcstate := if(useFirst, le.drlcstate, le.drlcstate2);
-	self.dl_state := stringlib.stringtouppercase(drlcstate);
-	self.age := if((integer)dob_val != 0, (string3)ut.GetAgeI((integer)dob_val), '');
+	self.dl_state := STD.Str.touppercase(drlcstate);
+	self.age := if((integer)dob_val != 0, (string3)ut.Age((integer)dob_val), '');
 	email := if(useFirst, le.email, le.email2);
 	self.email_address := email;
 	cmpy := if(useFirst, le.cmpy, le.cmpy2);
-	self.employer_name := stringlib.stringtouppercase(cmpy);
-	countrycode := if(useFirst, stringlib.stringtouppercase(le.countrycode), stringlib.stringtouppercase(le.countrycode2));
+	self.employer_name := STD.Str.touppercase(cmpy);
+	countrycode := if(useFirst, STD.Str.touppercase(le.countrycode), STD.Str.touppercase(le.countrycode2));
 	self.country := countrycode;
 	self.in_country := countrycode;
 	self.historydate := le.historydate;
@@ -277,7 +285,11 @@ iid_prep := project(indata, into_iid_prep(left));
 
 iid_res := Risk_Indicators.InstantID_Function(iid_prep, gateways, dppa, glb, isUtility, ln_branded, ofac_only, 
 									suppressNearDups, require2Ele, from_BIID, isFCRA, in_DataRestriction:=DataRestriction,
-									in_DataPermission:=DataPermission);
+									in_DataPermission:=DataPermission,
+                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                    TransactionID := TransactionID, 
+                                    BatchUID := BatchUID, 
+                                    GlobalCompanyID := GlobalCompanyID);
 
 iidRoyalties :=Royalty.RoyaltyTargus.GetOnlineRoyalties(iid_res, src, TargusType, TRUE, FALSE, FALSE, TRUE);
 
@@ -379,8 +391,8 @@ xlayout fill_output(biidIID le, indata ri) := TRANSFORM
 	self.dwelltypeflag := if(isFirstCon, le.iid.dwelltype, le.biid.BAddrType);
 		
 	// for bansflag if it's a consumer app, it's easy, just use rep_bansflag.  for business, some calculating needs to be done
-	bans_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.biid.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
-	lien_current := if(((integer)(ut.GetDate[1..6]) - (integer)(le.biid.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	bans_current := if(((integer)((STRING8)Std.Date.Today())[1..6] - (integer)(le.biid.RecentBkDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
+	lien_current := if(((integer)((STRING8)Std.Date.Today())[1..6] - (integer)(le.biid.RecentLienDate[1..6])) < 1000, true, false);  // make sure the bans is within the last 10 years
 	self.bansflag := if(isFirstCon, le.iid.bansflag, 
 										   map(ri.socs='' or (ri.cmpy='' and ri.addr='') => '3',
 											  le.biid.bkbdidflag and le.biid.lienbdidflag and bans_current and lien_current => '5',
@@ -521,7 +533,11 @@ xlayout fill_output(biidIID le, indata ri) := TRANSFORM
 END;
 mapped_results := join(biidIID, indata, left.iid.seq=right.seq, fill_output(left,right), left outer);
 BSOptions := 0;
-clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, dppa, glb, false, false, true, false, false, true, datarestriction:=datarestriction, BSOptions:=BSOptions, datapermission:=datapermission);
+clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, dppa, glb, false, false, true, false, false, true, datarestriction:=datarestriction, BSOptions:=BSOptions, datapermission:=datapermission,
+                                                                               LexIdSourceOptout := LexIdSourceOptout, 
+                                                                               TransactionID := TransactionID, 
+                                                                               BatchUID := BatchUID, 
+                                                                               GlobalCompanyID := GlobalCompanyID);
 emptyclam := group(dataset([],Risk_Indicators.Layout_Boca_Shell),seq);
 
 origInput := project(mapped_results, TRANSFORM(Layout_BusReasons_Input, self := left));

@@ -12,8 +12,8 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
 
   // here we must make a choice whether to clean the input inside the library
   shared ds_search := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in, AutoHeaderV2.Constants.LibVersion.SALT);  // input requires full cleaning
-		shared ds_search_legacy := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in, AutoHeaderV2.Constants.LibVersion.LEGACY);  
-		shared _row := ds_search_legacy[1];
+	shared ds_search_legacy := AutoheaderV2.LIBCALL_conversions.CleanSearchInputDataset (ds_search_in);  
+	shared _row := ds_search_legacy[1];
   shared _options := ds_search_legacy[1].options;
   shared temp_ssn_value := _row.tssn.ssn;
 

@@ -5,7 +5,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 
   SHARED Ioptions := PersonSlimReport_Services.IParams.PersonSlimReportOptions;
   SHARED d2i(iesp.share.t_Date d) := iesp.ECL2ESP.DateToInteger(d);
-  SHARED pickLatestDate(iesp.share.t_Date l, iesp.share.t_Date r) := if(d2i(l) > d2i(r), l, r);
+  SHARED pickLatestDate (iesp.share.t_Date l, iesp.share.t_Date r) := if(d2i(l) > d2i(r), l, r);
+  SHARED pickNonZeroDate(iesp.share.t_Date l, iesp.share.t_Date r) := if(d2i(l) > 0, l, r);
   SHARED pickLongestStr(string l, string r) := if ( length(trim(l)) > length(trim(r)), l, r );
 
   //get header recs and apply restrictions
@@ -246,7 +247,10 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
 	END;
 	
 	EXPORT acRecsByDid(Ioptions in_mod):= FUNCTION
-      ac_mod  := module (project (in_mod, PersonReports.input.aircrafts, opt)) end;
+      ac_mod  := module (PersonReports.IParam.aircrafts)
+        $.IParams.MAC_copy_old_report_fields(in_mod);
+      end;
+
       ac_raw  := PersonReports.aircraft_records(in_did,ac_mod);
       ac_sorted := sort(ac_raw, aircraftnumber, -d2i(datelastseen));
       ac_duped  := dedup(ac_sorted, aircraftnumber);
@@ -417,7 +421,8 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       prop_clean := project(prop_raw,
                      TRANSFORM(iesp.property.t_PropertyReport2Record,
                         SELF.parcelnumber:= STD.Str.FilterOut(LEFT.parcelnumber, '- '),
-                        SELF := LEFT,));							 
+                        SELF := LEFT,));
+			//field parcelnumber is deprecated in ESP and they use the equivalent Assessment/deed ParcelId
       prop_sorted := sort(prop_clean, recordtype, -parcelnumber,
                          -d2i(assessment.recordingdate),-d2i(deed.recordingdate));							 
       prop_duped := dedup(prop_sorted, recordtype, parcelnumber);
@@ -441,14 +446,21 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
        RETURN dea_final;
 	END;
 	
-	EXPORT voterRecsByDid(Ioptions in_mod):= FUNCTION
+  EXPORT voterRecsByDid(Ioptions in_mod):= FUNCTION
       vote_mod     := module (project (in_mod, PersonReports.input.voters, opt)) end;
       voter_raw    := PersonReports.voter_records(in_did,vote_mod).voters_v2;
-      voter_sorted := sort(voter_raw, voterrecordid, -d2i(LastVoteDate));
-      voter_duped  := dedup(voter_sorted, voterrecordid );
-      voter_duped_sorted := sort(voter_duped,-d2i(LastVoteDate),  voterrecordid); 	 
-      RETURN voter_duped_sorted;
-	END;
+      voter_sorted := sort(voter_raw, RegistrateState, ResidentAddress.county, -d2i(LastVoteDate));
+      voter_rolled := rollup(voter_sorted, //SmartRollup.fn_smart_rollup_voter
+                        LEFT.RegistrateState = RIGHT.RegistrateState and
+                        LEFT.ResidentAddress.county=RIGHT.ResidentAddress.county,
+                          TRANSFORM(iesp.voter.t_VoterReport2Record,
+                             SELF.dob := pickNonZeroDate(LEFT.dob, RIGHT.dob);
+                             SELF     := LEFT));
+      voter_rolled_sorted := sort(voter_rolled, -d2i(LastVoteDate),
+                                 RegistrateState = '', RegistrateState,
+                                 ResidentAddress.county = '', ResidentAddress.county);
+      RETURN voter_rolled_sorted;
+  END;
 	
 	EXPORT pawRecsByDid(string6 ssnmask):= FUNCTION
        // standard restrictions - glb, dppa etc not enforced on PAW data

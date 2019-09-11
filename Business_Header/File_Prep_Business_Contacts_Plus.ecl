@@ -26,7 +26,7 @@ end;
 
 dHeader_withMD5 := project(in_hdr, tHashDIDAddress(left));
 
-Layout_Business_Contact_Plus_orig tSuppress(dHeader_withMD5 l) := transform
+Layout_Business_Contact_Plus tSuppress(dHeader_withMD5 l) := transform
  self := l;
 end;
 
@@ -56,7 +56,7 @@ rFullOut_HashBDID := record
  rHashBDID;
 end;
 
-rFullOut_HashBDID tHashBDID(Business_Header.Layout_Business_Contact_Plus_orig l) := transform                            
+rFullOut_HashBDID tHashBDID(Business_Header.Layout_Business_Contact_Plus l) := transform                            
  self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1));
  self := l;
 end;
@@ -100,7 +100,7 @@ end;
 
 dContactHeader_withMD5 := project(contact_all_full_out_suppress, tHashBDIDDID(left));
 
-Business_Header.Layout_Business_Contact_Plus_orig tContactSuppress(dContactHeader_withMD5 l) := transform
+Business_Header.Layout_Business_Contact_Plus tContactSuppress(dContactHeader_withMD5 l) := transform
  self := l;
 end;
 
@@ -131,14 +131,14 @@ BCbytitle_withHash := RECORD
 	rHashVal;
 end;
 
-BCbytitle_withHash addBCHash(Business_Header.Layout_Business_Contact_Plus_Orig l) := transform                            
+BCbytitle_withHash addBCHash(Business_Header.Layout_Business_Contact_Plus l) := transform                            
  self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), (string35)l.company_title, (string20)l.lname, (string20)l.fname);
  self := l;
 end;
 
 BC_withTitleHash := project(contact_full_out_suppress, addBCHash(left));
 
-Business_Header.Layout_Business_Contact_Plus_orig removeHash(BC_withTitleHash l) := transform
+Business_Header.Layout_Business_Contact_Plus removeHash(BC_withTitleHash l) := transform
  self := l;
 end;
 
@@ -213,7 +213,7 @@ header_services.Supplemental_Data.mac_verify('file_business_contact_inj.txt', Dr
 Base_File_Append_In := attr();
 max_file_pos := max(in_hdr,__filepos) : global;
 
-Layout_Business_Contact_Plus_orig reformat_header(Base_File_Append_In L, integer c) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
+Layout_Business_Contact_Plus reformat_header(Base_File_Append_In L, integer c) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
  transform
 	self.did := (unsigned6) L.did;
 	self.bdid := (unsigned6) L.bdid;

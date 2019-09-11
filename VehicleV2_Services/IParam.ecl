@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, AutoHeaderI, AutoKeyI, iesp, VehicleV2_Services, BatchShare;
+IMPORT AutoStandardI, AutoHeaderI, AutoKeyI, iesp, VehicleV2_Services, BatchShare, doxie;
 
 EXPORT IParam := MODULE
 	
@@ -8,7 +8,7 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN isdeepDive := FALSE;
 	END;
 	
-	SHARED commonVehParams := INTERFACE(AutoStandardI.InterfaceTranslator.application_type_val.params) 
+	SHARED commonVehParams := INTERFACE
 		EXPORT STRING30   vehicleKey := '';
 		EXPORT STRING15		iterationKey := '';
 		EXPORT STRING15 	sequenceKey := '';
@@ -20,32 +20,15 @@ EXPORT IParam := MODULE
 		EXPORT STRING 		previousTitleIssueDate := '';					
 		EXPORT UNSIGNED2 	penalty_threshold := VehicleV2_Services.Constant.VEHICLE_PENALT_THRESHOLD;// required for doxie.MAC_Header_Field_Declare
 		EXPORT UNSIGNED4 	lookupValue;	
-		EXPORT STRING6 		ssnMask := ''; // required for doxie.MAC_Header_Field_Declare
-		EXPORT BOOLEAN  	dl_Mask := false;  // required for doxie.MAC_Header_Field_Declare		
-		EXPORT BOOLEAN 		getMinors := false;
+		EXPORT BOOLEAN 		getMinors := false; //NB: not the same as "include minors"!
 		EXPORT BOOLEAN 		displayMatchedParty := false; // required for doxie.MAC_Header_Field_Declare
 		EXPORT BOOLEAN	  IncludeNonRegulatedSources := false;		
 	END;
 	
-	EXPORT reportParams := INTERFACE (AutoStandardI.PermissionI_Tools.params,
+	EXPORT reportParams := INTERFACE (doxie.IDataAccess,
 																		commonVehParams)
 			EXPORT BOOLEAN  	excludeLessors := false; // required for doxie.MAC_Header_Field_Declare
 	END;
-
-  // Temporary, until this interface is made compatible with doxie/IDataAccess
-  EXPORT MAC_CopyDataAccessParams(mod_access) := MACRO
-    EXPORT boolean allowall := false;
-    EXPORT allowdppa := false;
-    EXPORT allowglb := false;
-    EXPORT string32	applicationtype := mod_access.application_type;
-    EXPORT string	datapermissionmask := mod_access.datapermissionmask;
-    EXPORT unsigned1 dppapurpose := mod_access.dppa;
-    EXPORT unsigned1 glbpurpose := mod_access.glb;
-    EXPORT boolean includeminors := mod_access.show_minors;
-    EXPORT string5 	industryclass := mod_access.industry_class;
-    EXPORT unsigned2 penalty_threshold := mod_access.penalty_threshold;
-    EXPORT boolean restrictpreglb := false; //?
-  ENDMACRO;        
 
 	SHARED baseSearchParams :=  interface(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,
 							AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,AutoKeyIdsParams)					
@@ -59,11 +42,11 @@ EXPORT IParam := MODULE
 		EXPORT UNSIGNED8 	skiprecordsVal := 0;// required for doxie.MAC_Header_Field_Declare
 	END;
 	
-
 	EXPORT searchParams := interface(baseSearchParams, 
 																		AutoStandardI.LIBIN.PenaltyI.base, 
-																		commonVehParams)		
-		
+																		commonVehParams,
+                                    doxie.IDataAccess)		
+		EXPORT string DataPermissionMask := ''; //INTERFACES: different definitions in base modules
 		EXPORT STRING 	RealTimePermissibleUse;		
 		EXPORT STRING 	ModelYear; 
 		EXPORT STRING 	Make; 
@@ -83,7 +66,8 @@ EXPORT IParam := MODULE
 	END;
 	
 	
-	EXPORT polkParams := interface(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full)
+	EXPORT polkParams := interface(AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, doxie.IDataAccess)
+		EXPORT string DataPermissionMask := ''; //INTERFACES: different definitions in base modules
 	 EXPORT string50	ReferenceCode;
 	 EXPORT string20	BillingCode;
 	 EXPORT string50	QueryId;
@@ -321,8 +305,11 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 	
 	EXPORT getSearchModule(Boolean MVRcombinedQuery=FALSE) := FUNCTION
 		input_params := AutoStandardI.GlobalModule();
+		mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 		
-		in_mod:= MODULE(PROJECT(input_params, searchParams,opt))		
+		search_mod:= MODULE(PROJECT (input_params, searchParams, OPT)) //OPT: mostly, FetchI_Hdr_Biz.full fields
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);
+
 			EXPORT string50		ReferenceCode := '' : STORED('ReferenceCode');
 			EXPORT string20		BillingCode := '' : STORED('BillingCode');
 			EXPORT string50		QueryId := '' : STORED('QueryId');
@@ -346,9 +333,8 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 			EXPORT STRING 		titleIssueDate := '' : stored('TitleIssueDate');
 			EXPORT STRING 		previousTitleIssueDate := '' : stored('PreviousTitleIssueDate');		
 			EXPORT unsigned2 	penalty_threshold := VehicleV2_Services.Constant.VEHICLE_PENALT_THRESHOLD : stored('PenaltThreshold');		
-			EXPORT BOOLEAN		dl_Mask	:= AutoStandardI.InterfaceTranslator.dl_mask_value.val(project(input_params,AutoStandardI.InterfaceTranslator.dl_mask_value.params)); ;
 			EXPORT BOOLEAN 		excludeLessors := AutoStandardI.InterfaceTranslator.Exclude_Lessors.val(project(input_params,AutoStandardI.InterfaceTranslator.Exclude_Lessors.params));
-			EXPORT BOOLEAN 		displayMatchedParty := AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.val(project(input_params,AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.params));;
+			EXPORT BOOLEAN 		displayMatchedParty := AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.val(project(input_params,AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.params));
       // translate 4 "standard" library fields here, since we will use them in places other than standard search
 			EXPORT STRING2 		state := AutoStandardI.InterfaceTranslator.state_value.val(project(input_params,AutoStandardI.InterfaceTranslator.state_value.params)); 
 			EXPORT STRING30 	county := AutoStandardI.InterfaceTranslator.county_value.val(PROJECT(input_params,AutoStandardI.InterfaceTranslator.county_value.params));
@@ -375,13 +361,15 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 			EXPORT BOOLEAN multiFamilyDwelling := FALSE : STORED('MultiFamilyDwelling');
 			EXPORT INTEGER registrationType := 0 : STORED('RegistrationType');		
 		END;
-		RETURN in_mod;
+		RETURN search_mod; 
 	END;
 	
 	EXPORT getSearchModule_entity2() := FUNCTION
 		input_params := AutoStandardI.GlobalModule();
+		mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(input_params);
 		
-		in_mod:= MODULE(PROJECT(input_params, searchParams,opt))		
+		in_mod:= MODULE(PROJECT(input_params, searchParams, opt))		
+      doxie.compliance.MAC_CopyModAccessValues(mod_access);
 			EXPORT string50		ReferenceCode := '' : STORED('ReferenceCode');
 			EXPORT string20		BillingCode := '' : STORED('BillingCode');
 			EXPORT string50		QueryId := '' : STORED('QueryId');
@@ -403,9 +391,8 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 			EXPORT STRING 		titleIssueDate := '' : stored('TitleIssueDate');
 			EXPORT STRING 		previousTitleIssueDate := '' : stored('PreviousTitleIssueDate');		
 			EXPORT unsigned2 	penalty_threshold := VehicleV2_Services.Constant.VEHICLE_PENALT_THRESHOLD : stored('PenaltThreshold');		
-			EXPORT BOOLEAN		dl_Mask	:= AutoStandardI.InterfaceTranslator.dl_mask_value.val(project(input_params,AutoStandardI.InterfaceTranslator.dl_mask_value.params)); ;
 			EXPORT BOOLEAN 		excludeLessors := AutoStandardI.InterfaceTranslator.Exclude_Lessors.val(project(input_params,AutoStandardI.InterfaceTranslator.Exclude_Lessors.params));
-			EXPORT BOOLEAN 		displayMatchedParty := AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.val(project(input_params,AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.params));;
+			EXPORT BOOLEAN 		displayMatchedParty := AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.val(project(input_params,AutoStandardI.InterfaceTranslator.DisplayMatchedParty_value.params));
       // translate 3 "standard" library fields here, since we will use them in places other than standard search
 			EXPORT unsigned8 	maxresultsVal := AutoStandardI.InterfaceTranslator.MaxResults_val.val(project(input_params,AutoStandardI.InterfaceTranslator.MaxResults_val.params));
 			EXPORT unsigned8 	maxresultsthistimeVal := AutoStandardI.InterfaceTranslator.MaxResultsThisTime_val.val(project(input_params,AutoStandardI.InterfaceTranslator.MaxResultsThisTime_val.params));
@@ -447,28 +434,29 @@ EXPORT SetInputSearchBy (iesp.motorvehicle.t_MotorVehicleSearch2By searchBy) := 
 	END;
 	
 	EXPORT getReportModule() := FUNCTION
-		input_params := AutoStandardI.GlobalModule();
+		gm := AutoStandardI.GlobalModule();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(gm);
 		
-		in_mod := MODULE(PROJECT(input_params, reportParams, opt))
-			EXPORT STRING 		vin_in := AutoStandardI.InterfaceTranslator.vin_value.val(project(input_params,AutoStandardI.InterfaceTranslator.vin_value.params)); 
+		in_mod := MODULE(PROJECT (mod_access, reportParams, OPT))
+			EXPORT STRING 		vin_in := AutoStandardI.InterfaceTranslator.vin_value.val(project(gm,AutoStandardI.InterfaceTranslator.vin_value.params)); 
 			EXPORT STRING   	DataSource := '' : STORED('DataSource');	
 			EXPORT STRING30 	vehicleKey	 := '' : STORED('VehicleKey');
 			EXPORT STRING15  	iterationKey := ''     : STORED('IterationKey');
 			EXPORT STRING15 	sequenceKey  	:= '' 		: STORED('SequenceKey');
 			EXPORT STRING 		titleIssueDate := '' : stored('TitleIssueDate');
 			EXPORT STRING 		previousTitleIssueDate := '' : stored('PreviousTitleIssueDate');		
-			EXPORT STRING14 	didValue := AutoStandardI.InterfaceTranslator.did_value.val(project(input_params,AutoStandardI.InterfaceTranslator.did_value.params));
-			EXPORT UNSIGNED6 	bdidValue := AutoStandardI.InterfaceTranslator.bdid_value.val(project(input_params,AutoStandardI.InterfaceTranslator.bdid_value.params));
-			EXPORT UNSIGNED4  lookupValue := AutoStandardI.InterfaceTranslator.lookup_value.val(project(input_params,AutoStandardI.InterfaceTranslator.lookup_value.params)); 
-			EXPORT STRING6    ssnmask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(input_params,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));;
-			EXPORT BOOLEAN	  dl_Mask	:= AutoStandardI.InterfaceTranslator.dl_mask_value.val(project(input_params,AutoStandardI.InterfaceTranslator.dl_mask_value.params));	
-			EXPORT STRING32   applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
+			EXPORT STRING14 	didValue := AutoStandardI.InterfaceTranslator.did_value.val(project(gm,AutoStandardI.InterfaceTranslator.did_value.params));
+			EXPORT UNSIGNED6 	bdidValue := AutoStandardI.InterfaceTranslator.bdid_value.val(project(gm,AutoStandardI.InterfaceTranslator.bdid_value.params));
+			EXPORT UNSIGNED4  lookupValue := AutoStandardI.InterfaceTranslator.lookup_value.val(project(gm,AutoStandardI.InterfaceTranslator.lookup_value.params)); 
 			EXPORT BOOLEAN    IncludeNonRegulatedSources := FALSE : STORED('IncludeNonRegulatedVehicleSources');
+  		EXPORT BOOLEAN 		displayMatchedParty := gm.displayMatchedParty;
+      EXPORT UNSIGNED2 	penalty_threshold := gm.penalty_threshold;
+      EXPORT BOOLEAN    excludeLessors := gm.excludelessors;
 		END;
 			
-			RETURN in_mod;
+		RETURN in_mod;
 	END;
-	
+
 	export VehicleBatch_params := interface
 		export boolean penalize_by_party := false;
 		export BOOLEAN Is_UseDate := false;

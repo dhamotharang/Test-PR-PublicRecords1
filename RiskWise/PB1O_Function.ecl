@@ -1,9 +1,13 @@
-﻿import ut, codes, address, business_risk, Risk_Indicators,gateway, Royalty, MDR;
+﻿import ut, business_risk, Risk_Indicators,gateway, STD;
 
 export PB1O_Function(DATASET(Layout_PB1I) indata, dataset(Gateway.Layouts.Config) gateways, 
 						unsigned1 glb, unsigned1 dppa, boolean isUtility=false, boolean ln_branded=false,
 						string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-						string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, OFACversion = 1) := function
+						string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, OFACversion = 1,
+                        unsigned1 LexIdSourceOptout = 1,
+                        string TransactionID = '',
+                        string BatchUID = '',
+                        unsigned6 GlobalCompanyId = 0) := function
 	
 // populate the input values to business instant id with the original input values
 business_risk.Layout_Input into_bus_input(indata le) := transform
@@ -22,8 +26,8 @@ business_risk.Layout_Input into_bus_input(indata le) := transform
 	self.Account := le.account; 
 	self.bdid	:= 0;  
 	self.score := 0;  
-	self.company_name := stringlib.stringtouppercase(le.cmpy);
-	self.alt_company_name := stringlib.stringtouppercase(le.dbaname);
+	self.company_name := STD.Str.touppercase(le.cmpy);
+	self.alt_company_name := STD.Str.touppercase(le.dbaname);
 	self.prim_range := clean_cmpy_addr[1..10];
 	self.predir := clean_cmpy_addr[11..12];
 	self.prim_name := clean_cmpy_addr[13..40];
@@ -46,9 +50,9 @@ business_risk.Layout_Input into_bus_input(indata le) := transform
 	self.fein		 := fein_val;
 	self.phone10    := wphone_val;
 	self.ip_addr	 := le.website;
-	self.rep_fname	 := stringlib.stringtouppercase(le.first);
+	self.rep_fname	 := STD.Str.touppercase(le.first);
 	self.rep_mname  := ''; // don't have one on input
-	self.rep_lname  := stringlib.stringtouppercase(le.last);
+	self.rep_lname  := STD.Str.touppercase(le.last);
 	self.rep_name_suffix := ''; // don't have one on input
 	self.rep_alt_Lname := ''; // don't have one on input
 	self.rep_prim_range := clean_addr[1..10];
@@ -74,10 +78,9 @@ business_risk.Layout_Input into_bus_input(indata le) := transform
 	self.rep_ssn		:= ssn_val;
 	self.rep_dob		:= dob_val;
 	self.rep_phone		:= hphone_val;
-	//self.rep_age 	:= if(le.dob='', '', (STRING3)ut.GetAgeI((integer)le.dob), '');
-	self.rep_age 		:= if((integer)dob_val != 0, (STRING3)(ut.GetAgeI((integer)dob_val)), '');
-	self.rep_dl_num := stringlib.stringtouppercase(dl_num_clean);
-	self.rep_dl_state := stringlib.stringtouppercase(le.drlcstate);
+	self.rep_age 		:= if((integer)dob_val != 0, (STRING3)(ut.Age((integer)dob_val)), '');
+	self.rep_dl_num := STD.Str.touppercase(dl_num_clean);
+	self.rep_dl_state := STD.Str.touppercase(le.drlcstate);
 	self.rep_email		:= le.email;
 end;
 
@@ -90,7 +93,11 @@ boolean OFAC := true; // ofac_only
 Real Global_WatchList_Threshold := if(OFACversion = 4, 0.85, 0.84);
 boolean include_ofac := if(OFACversion >= 2, True, False);
  
-biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, ofac_version := OFACversion, include_ofac := include_ofac, Global_WatchList_Threshold := Global_WatchList_Threshold, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
+biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, ofac_version := OFACversion, include_ofac := include_ofac, Global_WatchList_Threshold := Global_WatchList_Threshold, dataRestriction:=DataRestriction, dataPermission:=dataPermission,
+                                                                                  LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                  TransactionID := TransactionID, 
+                                                                                  BatchUID := BatchUID, 
+                                                                                  GlobalCompanyID := GlobalCompanyID);
 
 min2(integer L, integer R) :=  if (l < r , l, r);								
 // business_risk instant id was designed differently, convert those levels to what riskwise customers are used to on the 0-6 scale for PB1O.									

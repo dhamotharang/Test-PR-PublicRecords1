@@ -1,8 +1,10 @@
-﻿IMPORT BankruptcyV3, BIPV2, Cortera_Tradeline, Doxie, Doxie_Files, FAA, Header_Quick, 
-	PublicRecords_KEL, VehicleV2, Watercraft;
+﻿IMPORT BankruptcyV3, BIPV2, Cortera_Tradeline, dx_header, Doxie_Files, FAA, Header_Quick, 
+	PublicRecords_KEL, VehicleV2, Watercraft, data_services;
 
 EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE 
-	
+
+  SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+
 	SHARED LayoutIDs := RECORD
 		INTEGER InputUIDAppend;
 		INTEGER7 LexIDAppend;
@@ -12,7 +14,7 @@ EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_K
 		INTEGER7 LexIDBusLegalEntityAppend;//SeleID
 	END;
 	
-	SHARED Doxie__Key_Header := IF(Options.IsFCRA, Doxie.Key_FCRA_Header, Doxie.Key_Header);
+	SHARED Doxie__Key_Header := dx_header.key_header(iType);
 	EXPORT Layout_Doxie__Key_Header := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie__Key_Header);

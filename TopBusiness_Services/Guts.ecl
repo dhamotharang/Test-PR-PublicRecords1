@@ -113,7 +113,7 @@ export Guts := MODULE
      AssociateSEction := if (section_associateBus, TopBusiness_Services.AssociateSection.fn_fullView(
 		    ds_input_data,
 				project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-				in_mod)
+				mod_access)
 		 );
      
 		 ContactSection := if (section_contact, TopBusiness_Services.ContactSection.fn_fullView(
@@ -199,7 +199,7 @@ export Guts := MODULE
 				MotorVehicleSection := if (section_motorVehicle,  TopBusiness_Services.MotorVehicleSection.fn_fullView(
 					ds_input_data,
 					project(dataset(in_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-					in_mod)
+					mod_access)
 				);
 				
 				WatercraftSection := if (Section_watercraft,  TopBusiness_Services.WatercraftSection.fn_fullView(

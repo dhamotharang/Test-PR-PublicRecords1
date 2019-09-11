@@ -1,13 +1,15 @@
-import fcra, doxie, risk_indicators, ut, riskwise, avm_v2;
+import fcra, dx_header, risk_indicators, riskwise, avm_v2, data_services, STD;
 
 EXPORT _address_Data(
 	dataset(layouts.layout_addresses_data_input) addresses_in, 
   dataset (fcra.Layout_override_flag) flag_file
 ) := function
 
-dk := choosen(doxie.Key_FCRA_max_dt_last_seen, 1);
-header_build_date := (unsigned3)dk[1].max_date_last_seen[1..6];
-today := ut.GetDate;
+unsigned1 iType := data_services.data_env.iFCRA;
+
+dk := choosen(dx_header.key_max_dt_last_seen(iType), 1);
+header_build_date := (unsigned3) ((string)dk[1].max_date_last_seen)[1..6];
+today := (string)STD.Date.Today();
 DataRestriction := '000000000000000';
 
 temp := record
@@ -25,7 +27,8 @@ temp := record
 	integer avm_5_yrs;
 end;
 
-temp add_header_by_address(addresses_in le, Doxie.Key_FCRA_Header_Address rt) := transform
+key_header_address := dx_header.key_header_address(iType);
+temp add_header_by_address(addresses_in le, key_header_address rt) := transform
 	self.DID_from_addr := rt.did;
 	self.ssn_from_addr := rt.ssn;	
 	
@@ -34,7 +37,7 @@ temp add_header_by_address(addresses_in le, Doxie.Key_FCRA_Header_Address rt) :=
 	self := le;
 	self := [];
 end;									
-header_by_address := join(addresses_in, Doxie.Key_FCRA_Header_Address,
+header_by_address := join(addresses_in,key_header_address,
 		left.prim_name!='' and left.zip!='' and
 		keyed(left.prim_name=right.prim_name) and
 		keyed(left.zip=right.zip) and 

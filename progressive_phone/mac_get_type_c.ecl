@@ -1,11 +1,11 @@
 export mac_get_type_c(f_c_did, f_c_acctno, f_c_out, is_glb_ok=true, use_landlord=false, use_input_only=false, modAccess) := macro
-  import progressive_phone, header, ut, gong, risk_indicators, NID, Std;
+  import progressive_phone, dx_header, ut, gong, risk_indicators, NID, Std;
 	
 #uniquename(gong_addr_key)
 %gong_addr_key% := gong.Key_History_Address;
 
 #uniquename(apt_building_key)
-%apt_building_key% := header.Key_AptBuildings;
+%apt_building_key% := dx_header.Key_AptBuildings();
 
 #uniquename(a2s_key)
 %a2s_key% := risk_indicators.Key_HRI_Address_To_Sic;

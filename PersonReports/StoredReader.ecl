@@ -49,7 +49,7 @@ export StoredReader := MODULE
   end;
 
 // Reads from the SOAP section, to ensure backward compatibility with non-ESDL mode.
-  export global_options := MODULE (PersonReports.input.include, phones_options)
+  export global_options := MODULE (PersonReports.IParam.include, phones_options)
     export select_individually := Select_Indiv;
 
     export boolean include_akas            := Include_AKAs_val;
@@ -119,7 +119,7 @@ export StoredReader := MODULE
     export boolean include_sources := Include_Them_All or ~Exclude_Sources_val;
   end;
 
-  export versions := MODULE (PersonReports.input.versions)
+  export versions := MODULE (PersonReports.IParam.versions)
     export unsigned1 bankruptcy_version     := min (max (bankruptcyversion,     0), 4);
     export unsigned1 crimrecords_version    := min (max (CriminalRecordVersion, 0), 4);
     export unsigned1 dea_version            := min (max (deaversion,            0), 4);

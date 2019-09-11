@@ -1,4 +1,4 @@
-﻿IMPORT Gong, Header, DNB, IRS5500, Corp, Business_Header, Business_Header_SS, ut, riskwise;
+﻿IMPORT Gong, dx_header, DNB, IRS5500, Business_Header, riskwise;
 
 export get_BH_BQI_Stats_hist(dataset(Business_Risk.Layout_Output) biid) := FUNCTION
 
@@ -74,7 +74,7 @@ bh_addr := TABLE(bh_addr_all, layout_full_stat, state, zip, prim_name, prim_rang
 // output(bh_addr, named('bh_addr'));
 
 // no date first seen on this file, can't filter by history date at all
-aparts := join(bh_addr, header.Key_AptBuildings,
+aparts := join(bh_addr, dx_header.Key_AptBuildings(),
 			left.prim_name!='' and
 					keyed((string)left.zip = right.zip)  and
 					keyed(right.prim_name=left.prim_name) and 

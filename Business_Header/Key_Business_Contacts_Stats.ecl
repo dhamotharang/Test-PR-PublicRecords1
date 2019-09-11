@@ -1,4 +1,4 @@
-import business_header_ss, data_services;
+﻿Import Data_Services, business_header_ss;
 stats_base := File_Business_Contacts_Stats_Plus;
 
 layout_contact_stat := RECORD
@@ -14,9 +14,11 @@ layout_contact_stat := RECORD
 	stats_base.sources;
 	stats_base.company_name_score;
 	stats_base.combined_score;
-    stats_base.has_gong_yp;
+  stats_base.has_gong_yp;
 	stats_base.eq_emp_match;
 	stats_base.current_corp;
+	stats_base.global_sid;
+	stats_base.record_sid;
 	stats_base.__thisfilepos;  // This is the filepos in the stats file
 END;
 
@@ -24,4 +26,4 @@ END;
 EXPORT Key_Business_Contacts_Stats := INDEX(
 	stats_base,
 	layout_contact_stat,
-	data_services.data_location.prefix() + 'thor_data400::key::business_contacts_stat_' + business_header_ss.key_version);
+	Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::business_contacts_stat_' + business_header_ss.key_version);

@@ -173,7 +173,7 @@ EXPORT Records := MODULE
 			SELF.HasCorporateAffiliation := COUNT(SELF.CorporateAffiliations)>0;
 			faaCert_mod := module (project(glbMod, PersonReports.input.faacerts, opt)) end;
 			SELF.FAACertifications := project(CHOOSEN(GLOBAL(PersonReports.faaCert_records(dids,FAACert_mod).bps_view),iesp.Constants.BR.MaxFaaCertificates), iesp.bpsreport.t_BpsFAACertification );
-			air_mod := module (project(rptByMod, PersonReports.input.aircrafts)) end;
+			air_mod := project(rptByMod_new, PersonReports.IParam.aircrafts);
 			SELF.Aircrafts := project(CHOOSEN(GLOBAL(PersonReports.aircraft_records(dids,air_mod)),IESP.CONSTANTS.PUBLICPROFILE.MAX_AIRCRAFTS),iesp.faaaircraft.t_AircraftReportRecord);
 			props_mod := module (project(rptByMod_new, PersonReports.IParam.property, opt)) end;
 			SELF.Properties := CHOOSEN(GLOBAL(PersonReports.Property_Records(dids,mod_access,props_mod).property_v2),iesp.Constants.BR.MaxProperties);
@@ -199,7 +199,7 @@ EXPORT Records := MODULE
 			SELF.WaterCrafts := CHOOSEN(GLOBAL(PersonReports.Watercraft_Records(dids, watercrafts_mod).watercrafts_v2),iesp.Constants.BR.MaxWatercrafts);
 			pp_mod := module (project(rptByMod, PersonReports.input.phonesplus, opt)) end;
 			SELF.PhonesPluses := CHOOSEN(GLOBAL(PersonReports.phonesplus_records(dids, pp_mod).phonesplus_v2),iesp.Constants.BR.MaxPhonesPlus);
-			SELF.EmailAddresses := CHOOSEN(GLOBAL(PersonReports.email_records(dids,PROJECT(rptByMod,PersonReports.input.emails))),iesp.Constants.BR.MaxEmails);
+			SELF.EmailAddresses := CHOOSEN(GLOBAL(PersonReports.email_records(dids,PROJECT(rptByMod_new,PersonReports.IParam.emails))),iesp.Constants.BR.MaxEmails);
 		END;
 
 		RETURN ROW(setIndividual());

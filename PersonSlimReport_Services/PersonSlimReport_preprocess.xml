@@ -7341,10 +7341,16 @@
   <EsdlElement max_len="25" name="LicenseType" type="string"/>
  </EsdlStruct>
  <EsdlStruct _used="1" diff_monitor="1" name="AccidentReportIndividualInvolved">
-  <EsdlElement _mon="1"
+  <EsdlElement _nomon="1"
                max_len="12"
                name="UniqueId"
-               type="string"/>
+               type="string">
+   <diff_selectors>
+    <entry path="Accidents/Accident/Vehicles/Item/Driver/Individual/UniqueId">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
   <EsdlElement _mon="1" complex_type="Name" name="Name"/>
   <EsdlElement _mon="1" complex_type="Date" name="DOB"/>
   <EsdlElement _mon="1" complex_type="Address" name="Address"/>
@@ -8057,8 +8063,10 @@
    </diff_selectors>
   </EsdlArray>
   <DiffMatchs>
-   <diff_match name="driver.individual.uniqueid">
-    <part ftype="string" name="Driver.Individual.UniqueId"/>
+   <diff_match name="makemodeltagnumber">
+    <part ftype="string" name="TagNumber"/>
+    <part ftype="string" name="Make"/>
+    <part ftype="string" name="Model"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -8166,8 +8174,10 @@
              name="Vehicles"
              type="AccidentReportVehicle">
    <DiffMatchs>
-    <diff_match name="driver.individual.uniqueid">
-     <part ftype="string" name="Driver.Individual.UniqueId"/>
+    <diff_match name="makemodeltagnumber">
+     <part ftype="string" name="TagNumber"/>
+     <part ftype="string" name="Make"/>
+     <part ftype="string" name="Model"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -10426,28 +10436,52 @@
     </entry>
    </diff_selectors>
   </EsdlElement>
-  <EsdlElement _mon="1"
+  <EsdlElement _nomon="1"
                max_len="100"
                min_ver="1.800000"
                name="IdValue"
-               type="string"/>
+               type="string">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/IdValue">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
   <EsdlElement _mon="1"
                max_len="12"
                name="UniqueId"
                type="string"/>
-  <EsdlElement _mon="1"
+  <EsdlElement _nomon="1"
                max_len="12"
                name="BusinessId"
-               type="string"/>
-  <EsdlElement _mon="1"
+               type="string">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/BusinessId">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
+  <EsdlElement _nomon="1"
                max_len="9"
                name="AppendedSSN"
-               type="string"/>
-  <EsdlElement _mon="1"
+               type="string">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/AppendedSSN">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
+  <EsdlElement _nomon="1"
                min_ver="1.900000"
                name="LinkingWeight"
                optional="internal"
-               type="int"/>
+               type="int">
+   <diff_selectors>
+    <entry path="Properties/Property/Entities/Entity/Names/Name/LinkingWeight">
+     <category>false</category>
+    </entry>
+   </diff_selectors>
+  </EsdlElement>
   <DiffMatchs>
    <diff_match name="uniqueid">
     <part ftype="string" name="UniqueId"/>
@@ -10712,9 +10746,10 @@
    </DiffMatchs>
   </EsdlArray>
   <DiffMatchs>
-   <diff_match name="parcelnumberrecordtype">
-    <part ftype="string" name="ParcelNumber"/>
+   <diff_match name="assessment.parceliddeed.parcelidrecordtype">
     <part ftype="string" name="RecordType"/>
+    <part ftype="string" name="Assessment.ParcelId"/>
+    <part ftype="string" name="Deed.ParcelId"/>
    </diff_match>
   </DiffMatchs>
  </EsdlStruct>
@@ -12498,9 +12533,10 @@
     </entry>
    </diff_selectors>
    <DiffMatchs>
-    <diff_match name="parcelnumberrecordtype">
-     <part ftype="string" name="ParcelNumber"/>
+    <diff_match name="assessment.parceliddeed.parcelidrecordtype">
      <part ftype="string" name="RecordType"/>
+     <part ftype="string" name="Assessment.ParcelId"/>
+     <part ftype="string" name="Deed.ParcelId"/>
     </diff_match>
    </DiffMatchs>
   </EsdlArray>
@@ -16219,7 +16255,7 @@
       <TotalNumberOfPedestrians/>
       <TotalNumberOfPedalcyclists/>
      </Statistics>
-     <Vehicles diff_match="Driver.Individual.UniqueId">
+     <Vehicles diff_match="Item.TagNumber+Item.Make+Item.Model">
       <Item>
        <Vehicle diff_monitor=""/>
        <OwnerDriver diff_monitor=""/>
@@ -16333,7 +16369,7 @@
          <LicenseType/>
         </DriverLicense>
         <Individual>
-         <UniqueId/>
+         <UniqueId diff_monitor=""/>
          <Name>
           <Full diff_monitor=""/>
           <First/>
@@ -17580,7 +17616,7 @@
      </Filings>
     </LienJudgment>
    </LiensJudgments>
-   <Properties diff_match="RecordType+ParcelNumber" diff_monitor="Property">
+   <Properties diff_match="RecordType+Assessment.ParcelId+Deed.ParcelId" diff_monitor="Property">
     <Property>
      <BusinessIds diff_monitor="">
       <DotID/>
@@ -18073,11 +18109,11 @@
           <OrgID/>
           <UltID/>
          </BusinessIds>
-         <IdValue/>
+         <IdValue diff_monitor=""/>
          <UniqueId/>
-         <BusinessId/>
-         <AppendedSSN/>
-         <LinkingWeight/>
+         <BusinessId diff_monitor=""/>
+         <AppendedSSN diff_monitor=""/>
+         <LinkingWeight diff_monitor=""/>
         </Name>
        </Names>
        <OriginalNames>

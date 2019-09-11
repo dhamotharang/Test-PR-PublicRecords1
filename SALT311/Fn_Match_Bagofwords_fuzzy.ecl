@@ -1,15 +1,17 @@
 ﻿EXPORT INTEGER4 fn_match_bagofwords_fuzzy(CONST STRING l, CONST STRING r, UNSIGNED mode=0, UNSIGNED1 score_mode=0) := BEGINC++
 namespace ns_SALT311_Fn_Match_Bagofwords_Fuzzy {
 #define EQUALITY_MATCH_SCALE 100
-#define ACRONYM_MATCH_SCALE  100
 #define HYPHEN1_MATCH_SCALE  100
 #define HYPHEN2_MATCH_SCALE   90
-#define PHONETIC_MATCH_SCALE  90
+#define ACRONYMFIRST_MATCH_SCALE  90
 #define STEM_MATCH_SCALE      90
 #define EDIT1_MATCH_SCALE     90
 #define EDIT2_MATCH_SCALE     80
 #define INITIAL_MATCH_SCALE   70
+#define ACRONYM_MATCH_SCALE   50
 #define ABBR_MATCH_SCALE      50
+ 
+enum Abbr_Type { abbr_legacy, abbr_first, abbr_initial };
 /*
     Porter stemmer in C++, based on the ECL-ML ML/Docs/PorterStemC port. The original paper is in
     Porter, 1980, An algorithm for suffix stripping, Program, Vol. 14, no. 3, pp 130-137,
@@ -296,7 +298,6 @@ class wb
 {
 public: // Need to be fast - privacy a luxury
 #define MAX_WORDS 32
-enum MatchBagOfWordsAbbrType {LEGACY, FIRST, INITIAL};
     const char* words[MAX_WORDS];
     size32_t word_lengths[MAX_WORDS];
 		size32_t wordstem_lengths[MAX_WORDS];
@@ -371,18 +372,19 @@ enum MatchBagOfWordsAbbrType {LEGACY, FIRST, INITIAL};
     }
     return false;
   }
-	bool acronym_equals(unsigned l, wb &r,unsigned rl,unsigned &total, int &matching,unsigned abbrType)
+	bool acronym_equals(unsigned l, wb &r,unsigned rl,unsigned &total, int &matching,unsigned abbrType, bool firstOnly)
   {
        // RHS is the abbreviated form of the LHS
-      if (word_lengths[l]<r.word_lengths[rl])
-          return false;
+      //if (word_lengths[l]<r.word_lengths[rl]) not valid for acronyms
+      //    return false;
       if ( l == nwords-1 || used[l+1] ) // next token has to exist
           return false;
       unsigned count;
-      if (isFirstOnlyAcronym(l, r.word_lengths[rl],r.words[rl],count) ||
-			    isAcronym(l, r.word_lengths[rl],r.words[rl],count,abbrType))
-      {
-            updateMatchState(l,r,rl,total,matching,count,1,ACRONYM_MATCH_SCALE);
+			bool match = firstOnly?isFirstOnlyAcronym(l, r.word_lengths[rl],r.words[rl],count):
+			                       isAcronym(l, r.word_lengths[rl],r.words[rl],count,abbrType);
+      if (match)
+			{
+            updateMatchState(l,r,rl,total,matching,count,1,firstOnly?ACRONYMFIRST_MATCH_SCALE:ACRONYM_MATCH_SCALE);
             return true;
       }
       return false;
@@ -520,7 +522,7 @@ private:
                   break;
               if ( p-acronym >= lenAcronym )
                   break;
-              if ( matchFound && (abbrType&INITIAL) && *p != *(word+index))
+              if ( matchFound && (abbrType&abbr_initial) && *p != *(word+index))
                   break;
               if ( *p == *(word+index) )
               {
@@ -654,7 +656,7 @@ using namespace ns_SALT311_Fn_Match_Bagofwords_Fuzzy;
     bool hyphen1 = (mode & 4) != 0;
     bool abbr = (mode & 2) != 0;
 		bool acronym = (mode & 0x8000) != 0;
-    bool initial = ((mode & 1) != 0) || hyphen2 || (abbr && (abbr_type & 2));
+    bool initial = ((mode & 1) != 0) || hyphen2 || (abbr && (abbr_type & abbr_initial));
 		bool stem = stem_distance>0;
     unsigned maxEdits = edit_max_distance?edit_max_distance:lenL+lenR; // ignore maxEdits if set to 0
 		
@@ -698,8 +700,6 @@ for ( unsigned lo_finger = 0; lo_finger < LO.nwords; lo_finger++ )
 						{
 								if (*LO.words[lo_finger] == *SH.words[sh_finger])
 								{
-										//if (SH.equals(sh_finger,LO,lo_finger,total_weight,matching_weight))
-											//  continue;
 										if (hyphen1 || hyphen2)
 										{
 												// 2. See if we can consume TWO tokens on one side
@@ -713,6 +713,21 @@ for ( unsigned lo_finger = 0; lo_finger < LO.nwords; lo_finger++ )
 												if (SH.stem_equals(sh_finger,LO,lo_finger,total_weight,matching_weight,stem_distance))
 														continue;
 										}
+									  if (acronym && (abbr_type & abbr_first))
+                    {
+											if (SH.acronym_equals(sh_finger,LO,lo_finger,total_weight,matching_weight,abbr_type,true))
+													continue;
+											if (LO.acronym_equals(lo_finger,SH,sh_finger,total_weight,matching_weight,abbr_type,true))
+													continue;
+										}
+								}
+								if (edit_distance)
+								{
+										if (SH.withinEditRadiusAndMaxDistance(sh_finger,LO,lo_finger,total_weight,matching_weight,edit_distance,maxEdits))
+												continue;
+								}
+								if (*LO.words[lo_finger] == *SH.words[sh_finger])
+								{
 										if (initial)
 										{
 												if (SH.initial_equals(sh_finger,LO,lo_finger,total_weight,matching_weight))
@@ -721,23 +736,18 @@ for ( unsigned lo_finger = 0; lo_finger < LO.nwords; lo_finger++ )
 														continue;
 										}
 								}
-								if (edit_distance)
+								if (acronym)
 								{
-										if (SH.withinEditRadiusAndMaxDistance(sh_finger,LO,lo_finger,total_weight,matching_weight,edit_distance,maxEdits))
+										if (SH.acronym_equals(sh_finger,LO,lo_finger,total_weight,matching_weight,abbr_type,false))
 												continue;
-								}
-								if (abbr && (abbr_type != 2)) // ABBR(INITIAL) is equivalent to the initial mode
+										if (LO.acronym_equals(lo_finger,SH,sh_finger,total_weight,matching_weight,abbr_type,false))
+												continue;
+								}								
+								if (abbr && !(abbr_type & abbr_initial)) // ABBR(INITIAL) is equivalent to the initial mode
 								{
 										if (SH.abbr_equals(sh_finger,LO,lo_finger,total_weight,matching_weight,abbr_type,abbr_spc_threshold))
 												continue;
 										if (LO.abbr_equals(lo_finger,SH,sh_finger,total_weight,matching_weight,abbr_type,abbr_spc_threshold))
-												continue;
-								}
-								if (acronym)
-								{
-										if (SH.acronym_equals(sh_finger,LO,lo_finger,total_weight,matching_weight,abbr_type))
-												continue;
-										if (LO.acronym_equals(lo_finger,SH,sh_finger,total_weight,matching_weight,abbr_type))
 												continue;
 								}
 						}
@@ -760,3 +770,4 @@ for ( unsigned lo_finger = 0; lo_finger < LO.nwords; lo_finger++ )
     }
 }
 ENDC++;
+ 

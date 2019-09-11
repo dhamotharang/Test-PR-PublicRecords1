@@ -112,7 +112,7 @@ export ERO_Services.Layouts.Vehicles_out fn_getVehicleRecs( dataset(Layouts.Look
 			in_mod := VehicleV2_Services.IParam.getSearchModule();
 			
 			// 3.  Get Vehicle records.
-			veh_recs_raw := VehicleV2_Services.Functions.Get_VehicleSearch(in_mod, ds_search_input, , false);
+			veh_recs_raw := VehicleV2_Services.Functions.Get_VehicleSearch(in_mod, ds_search_input, false);
 			
 			// 4.  Implement rules per the product requirements.
 			

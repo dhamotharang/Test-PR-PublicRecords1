@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, didville, doxie, iesp, MDR, RelationshipIdentifier_Services,
+﻿IMPORT Address, BIPV2, didville, doxie, dx_header, iesp, MDR, RelationshipIdentifier_Services,
          TopBusiness_Services, STD, Suppress;
 
 EXPORT  Search_Records(                 
@@ -330,11 +330,13 @@ EXPORT  Search_Records(
 																																	)
 																														);		 
 		                                                 
-		ds_personSearchResultsWdateRange := JOIN(ds_personSearchResultsWAcctnoGrouped,
-		                                           doxie.Key_Header,
+		ds_personSearchResultsWdateRange_all := JOIN(ds_personSearchResultsWAcctnoGrouped,
+		                                           dx_header.Key_Header(),
 																							 KEYED(LEFT.did = RIGHT.s_did),
 																							 TRANSFORM(RIGHT), limit(0), KEEP(RelationshipIdentifier_Services.Constants.KEEPLIMIT));
-																							  
+					
+		ds_personSearchResultsWdateRange := Suppress.MAC_SuppressSource(ds_personSearchResultsWdateRange_all, mod_access, s_did);
+		
     	ds_personSearchResultsFirstSeenSorted := SORT(ds_personSearchResultsWdateRange(dt_first_seen <> 0 and
 			                                              (LENGTH((STRING) dt_first_seen) = RelationshipIdentifier_Services.Constants.SIZEOFPERSONHEADERDATE)),
 			                                               s_did, dt_first_seen, RECORD);																										 
@@ -797,13 +799,15 @@ EXPORT  Search_Records(
 			// this is just getting dt_first_seen for header for all dids in the input of acctno's.
 			// so no need to sort by orig_acctno or anything else.
 
-			ds_personSearchResultsBatchWdateRange := SORT(JOIN(ds_personSearchResultsBatchWAcctno_rolesSorted,
-		                                           doxie.Key_Header,
+			ds_personSearchResultsBatchWdateRange_all := SORT(JOIN(ds_personSearchResultsBatchWAcctno_rolesSorted,
+		                                           dx_header.Key_Header(),
 																							 keyed(LEFT.did = RIGHT.s_did),
 																							 TRANSFORM(RIGHT), limit(0), keep(RelationshipIdentifier_Services.Constants.KEEPLIMITBATCH))
 																							   (dt_first_seen <> 0),
 																							   s_did, dt_first_seen, record);
-																							 
+
+			ds_personSearchResultsBatchWdateRange := Suppress.MAC_SuppressSource(ds_personSearchResultsBatchWdateRange_all, mod_access, s_did);
+
     	ds_personSearchResultsBatchWdateRange personRollitBatch(ds_personSearchResultsBatchWdateRange l,
 			                                             ds_personSearchResultsBatchWdateRange r) := TRANSFORM
 																									 SELF := l;

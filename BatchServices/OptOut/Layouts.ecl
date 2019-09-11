@@ -46,13 +46,33 @@ EXPORT Layouts := MODULE
   EXPORT Output_Layout := RECORD
     STRING20          acctno;
     UNSIGNED8         lexid;
-    SET OF UNSIGNED4  global_sids;
     UNSIGNED8         exemptions;
     STRING10          act_id;
     STRING8           date_added;
     BOOLEAN           optout_flag;
     BOOLEAN           test_flag;
-    Input_Base        input_echo;
+    // echo input params
+    UNSIGNED6         input_did;
+    STRING9           input_ssn;
+    STRING8           input_dob;
+    STRING10          input_phone;
+    STRING5           input_title;
+    STRING20          input_fname;
+    STRING20          input_mname;
+    STRING20          input_lname;
+    STRING5           input_suffix;
+    STRING10          input_prim_range;
+    STRING2           input_predir;
+    STRING28          input_prim_name;
+    STRING4           input_addr_suffix;
+    STRING2           input_postdir;
+    STRING10          input_unit_desig;
+    STRING8           input_sec_range;
+    STRING25          input_city_name;
+    STRING2           input_st;
+    STRING5           input_zip;
+    STRING4           input_zip4;
+    //
     Batchshare.Layouts.ShareErrors;
   END;
 

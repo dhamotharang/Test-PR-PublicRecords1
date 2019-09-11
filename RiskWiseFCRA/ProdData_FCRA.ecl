@@ -40,7 +40,7 @@
 import american_student_list, avm_v2, doxie, doxie_files, fcra, liensv2, ln_propertyv2, riskwise, risk_indicators,
        watercraft, bankruptcyv3, bankruptcyv2, gong, impulse_email, infutorcid, email_data, paw,
        advo, inquiry_acclogs,  prof_licenseV2, header_quick, AlloyMedia_student_list,
-       SexOffender, _Control, watchdog;
+       SexOffender, _Control, watchdog, data_services;
 
 export ProdData_FCRA := MACRO
 
@@ -82,7 +82,7 @@ export ProdData_FCRA := MACRO
 	));
 
 boolean	isFCRA := true;
-unsigned1 ENV := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 unsigned6 in_did := 0    : stored('did');
 string9 in_socs := ''	   : stored('socs');
 string120 in_addr := ''	 : stored('addr');
@@ -163,7 +163,7 @@ clean_a2 := project(emptyset, parseAddr(left));
 output(clean_a2, named('cleaned_input'));
 	
 // DID section
-	header_recs := choosen(doxie.Key_FCRA_Header(keyed(s_did=in_did)), 200);
+	header_recs := choosen(dx_header.key_header(iType)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(header_recs, named('header_records'))) ;	
 	
 	qheader_recs := choosen(header_quick.key_DID_fcra(keyed(did=in_did)), 200);
@@ -172,7 +172,7 @@ output(clean_a2, named('cleaned_input'));
 	header_corr := choosen(FCRA.Key_Override_Header_DID(keyed(did=in_did)), 500);
 	if(include_header or Include_All_Files, output(header_corr, named('header_corrections'))) ;
 	
-	address_hierarchy_recs := choosen(dx_header.key_addr_hist(ENV)(keyed(s_did=in_did)), 200);
+	address_hierarchy_recs := choosen(dx_header.key_addr_hist(iType)(keyed(s_did=in_did)), 200);
 	if(include_header or Include_All_Files, output(sort(address_hierarchy_recs,address_history_seq) , named('address_hierarchy_recs'))) ;	
 	
 	deathMaster_Recs := choosen(doxie.key_death_masterV2_ssa_DID_fcra(keyed(l_did=in_did)), 10);

@@ -3511,7 +3511,7 @@
           <TotalNumberOfPedestrians/>
           <TotalNumberOfPedalcyclists/>
         </Statistics>
-        <Vehicles diff_match="Driver.Individual.UniqueId">
+        <Vehicles diff_match="Item.TagNumber+Item.Make+Item.Model">
           <Item>
             <Vehicle diff_monitor=""/>
             <OwnerDriver diff_monitor=""/>
@@ -3625,7 +3625,7 @@
                 <LicenseType/>
               </DriverLicense>
               <Individual>
-                <UniqueId/>
+                <UniqueId diff_monitor=""/>
                 <Name>
                   <Full diff_monitor=""/>
                   <First/>
@@ -4872,7 +4872,7 @@
         </Filings>
       </LienJudgment>
     </LiensJudgments>
-    <Properties diff_match="RecordType+ParcelNumber" diff_monitor="Property">
+    <Properties diff_match="RecordType+Assessment.ParcelId+Deed.ParcelId" diff_monitor="Property">
       <Property>
         <BusinessIds diff_monitor="">
           <DotID/>
@@ -5365,11 +5365,11 @@
                   <OrgID/>
                   <UltID/>
                 </BusinessIds>
-                <IdValue/>
+                <IdValue diff_monitor=""/>
                 <UniqueId/>
-                <BusinessId/>
-                <AppendedSSN/>
-                <LinkingWeight/>
+                <BusinessId diff_monitor=""/>
+                <AppendedSSN diff_monitor=""/>
+                <LinkingWeight diff_monitor=""/>
               </Name>
             </Names>
             <OriginalNames>

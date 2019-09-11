@@ -1,4 +1,4 @@
-//=================================================================================
+﻿//=================================================================================
 // ====== RETURNS MOTORVEHICLE DATA FOR A GIVEN VEHICLE_KEY & ITERATION_KEY  ======
 // ====== IN ESP-COMPLIANT WAY.                                              ======
 // ================================================================================
@@ -47,7 +47,7 @@ EXPORT MotorVehicleSource_Records(
 																																		SELF := []));
 	
 	// *** Key fetch to get vehicle_keys from linkids
-	ds_LinkIDkeys := VehicleV2.Key_Vehicle_linkids.kFetch(in_docs_linkonly,inoptions.fetch_level,,,
+	ds_LinkIDkeys := VehicleV2.Key_Vehicle_linkids.kFetch(in_docs_linkonly,,inoptions.fetch_level,,,
 	                                                    TopBusiness_Services.Constants.SlimKeepLimit);
 	
 	// For records matched on linkids only, only keep Owner(type=1), Registrant(type=4) or Lessee(type=5) records of the vehicle, unless stated to keep all.
@@ -90,8 +90,11 @@ EXPORT MotorVehicleSource_Records(
 	mvr_keys_dedup := DEDUP(mvr_keys,ALL);
 	
 
-	mod_vehicle_report := VehicleV2_Services.IParam.getReportModule();
-	mvr_sourceview := VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(mod_vehicle_report, mvr_keys_dedup, inoptions.ssn_mask);
+	mod_vehicle_report := MODULE(VehicleV2_Services.IParam.getReportModule())
+		EXPORT string ssn_mask := inoptions.ssn_mask;
+		EXPORT string32 application_type := inoptions.app_type;
+	END;
+	mvr_sourceview := VehicleV2_Services.raw.get_vehicle_crs_report_by_Veh_key(mod_vehicle_report, mvr_keys_dedup);
 
 	SHARED mvr_sourceview_wLinkIds := JOIN(mvr_sourceview,mvr_keys_comb,
 																					LEFT.Vehicle_Key = RIGHT.Vehicle_Key AND

@@ -138,8 +138,8 @@ export DataRestrictionI := module
 		export boolean BriteVerifyData := ~allow and (fixed_DRM[46] not in ['0','']);
 		
 		// BlackKnight for Foreclosures 
-		export BLACKKNIGHT := (~allow and fixed_DRM[47]<>'0'); 
-				
+		export BLACKKNIGHT := ~allow and (fixed_DRM[47] not in ['0','']);		
+		
   end;
 
 end;

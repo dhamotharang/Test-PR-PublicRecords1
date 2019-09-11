@@ -1,4 +1,4 @@
-IMPORT VotersV2_Services, doxie, UCCv2_Services,
+﻿IMPORT VotersV2_Services, doxie, UCCv2_Services,
   prof_LicenseV2_Services, VehicleV2_Services,
   bankruptcyv2_Services, LiensV2_Services, marriage_divorce_v2_Services,
   DeathV2_Services, FAB_StateWide, LN_PropertyV2_Services, Statewide_Services,
@@ -434,10 +434,10 @@ EXPORT FAP_raw := MODULE
 										in_mod_E1 := VehicleV2_Services.IParam.getSearchModule();
 										in_mod_E2 := VehicleV2_Services.IParam.getSearchModule_entity2();
 
-										E1 := MODULE(PROJECT(in_mod_E1,VehicleV2_Services.IParam.searchParams,OPT))
+										E1 := MODULE(PROJECT(in_mod_E1,VehicleV2_Services.IParam.searchParams))
 											EXPORT BOOLEAN noFail := TRUE;
 										END;
-										E2 := MODULE(PROJECT(in_mod_E2,VehicleV2_Services.IParam.searchParams,OPT))
+										E2 := MODULE(PROJECT(in_mod_E2,VehicleV2_Services.IParam.searchParams))
 											EXPORT BOOLEAN noFail := TRUE;
 										END;
 
@@ -629,11 +629,12 @@ EXPORT FAP_raw := MODULE
 				//*****  Targus White Pages Search
 				
 				EXPORT FAP_SearchTargusWhitePages() := FUNCTION
-						
+        
 					dids := doxie.Get_Dids(TRUE,TRUE);
 				
 				  // Perform Targus White Pages search. 
-					targus_recs_1 := JOIN(dids, Targus.Key_Targus_DID, LEFT.did = RIGHT.did, LIMIT(2000));
+					targus_recs_1_pre := JOIN(dids, Targus.Key_Targus_DID, LEFT.did = RIGHT.did, LIMIT(2000));
+         targus_recs_1 := Suppress.MAC_SuppressSource(targus_recs_1_pre,mod_access); 
 					
 					targus_recs := PROJECT(targus_recs_1,targus.layout_consumer_out);
 					
