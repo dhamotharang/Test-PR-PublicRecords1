@@ -1,7 +1,7 @@
 
 IMPORT BatchShare, address, iesp, risk_indicators, riskwise, ut, gateway;
 
-EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr_status) ds_batch_in, BatchShare.IParam.BatchParamsV2 in_mod ) :=
+EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr_status) ds_batch_in, BatchShare.IParam.BatchParams in_mod ) :=
 	FUNCTION	
 		// Constants to run CIID process
 		boolean Ofac_Only                 := false;

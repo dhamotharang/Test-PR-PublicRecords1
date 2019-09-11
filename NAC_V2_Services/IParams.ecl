@@ -16,7 +16,7 @@ EXPORT IParams := MODULE
 		RETURN SET(Dynamic_ds(Permission='1' AND Program<>''),Program);
 	END;
 
-	EXPORT CommonParams := INTERFACE(BatchShare.IParam.BatchParamsV2)
+	EXPORT CommonParams := INTERFACE(BatchShare.IParam.BatchParams)
 	  // The following 4 fields are supplied to the query by MBS
 		EXPORT STRING4 NacGroupId      := '';
 		EXPORT STRING2 SourceState     := '';

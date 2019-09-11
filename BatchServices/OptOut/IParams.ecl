@@ -2,14 +2,14 @@
 
   EXPORT IParams := MODULE
 
-    EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2)
+    EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams)
       EXPORT UNSIGNED1 Score_Threshold;
       EXPORT BOOLEAN AllowTestSuppression;
     END;
 
     // Function to initalize the params
     EXPORT getBatchParams() := FUNCTION
-      BaseBatchParams := BatchShare.IParam.getBatchParamsV2();
+      BaseBatchParams := BatchShare.IParam.getBatchParams();
       
       inMod := MODULE(PROJECT(BaseBatchParams, BatchParams, OPT))
         EXPORT UNSIGNED1 Score_Threshold := BatchShare.Constants.Defaults.didScoreThreshold;
