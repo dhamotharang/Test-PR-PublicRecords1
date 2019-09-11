@@ -10,34 +10,41 @@ import AutoStandardI, doxie;
 
 g_mod := AutoStandardI.GlobalModule();
 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(g_mod); // <-- GLB, DDPA, etc.
+// mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
 
 d_in := dataset([
 	 {1, 364866, 23361, 0, true},
-	 {1, 364866, 1000, 0, false}
+	 {2, 364866, 1000, 0, false},
 	 // {1, 218, 12, 0, true},
 	 // {2, 218, 15, 0, false},
 	 // {3, 10597, 22, 0, true},
-	 // {4, 10597, 30, 0, false}
+	 // {4, 10597, 30, 0, false},
+	 {10, 14324, 0, 0, false} // test suppression with no global sid
 	], {integer seq; unsigned6 did; unsigned4 global_sid; unsigned4 record_sid; boolean should_suppress;});
 
-// call macro to suppress records
+// 1. suppress records.
 d_clean := Suppress.MAC_SuppressSource(d_in, mod_access);
 output(d_clean, named('suppressed'));
 
-// or call macro to flag suppressed
+// 2. flag suppressed records.
 d_clean_flagged := Suppress.MAC_FlagSuppressedSource(d_in, mod_access);
 output(d_clean_flagged, named('suppress_flagged'));
 
-l_suppressed := record
-	d_in;
-	boolean is_suppressed := false;
-end;
+// 3. suppress records; ignore global sids.
+suppressed_by_did := Suppress.MAC_SuppressSource(d_in, mod_access, did, NULL);
+output(suppressed_by_did, named('suppressed_by_did'));
 
-d_in_wsup := project(d_in, transform(l_suppressed, self := left;));
+// 4. flag suppressed records; ignore global sids.
+flag_suppressed_by_did := Suppress.MAC_FlagSuppressedSource(d_in, mod_access, did, NULL);
+output(flag_suppressed_by_did, named('flag_suppressed_by_did'));
 
-// or call macro to flag suppressed (2)
-d_clean_flagged_wsupp := Suppress.MAC_FlagSuppressedSource(d_in_wsup, mod_access, did, global_sid);
-output(d_clean_flagged_wsupp, named('d_clean_flagged_wsupp'));
+// 5. suppress records; ignore global sids; use distributed datasets.
+suppressed_by_did_dist := Suppress.MAC_SuppressSource(d_in, mod_access, did, NULL,,TRUE);
+output(suppressed_by_did_dist, named('suppressed_by_did_dist'));
+
+// 6. flag suppressed records; ignore global sids; use distributed datasets.
+flag_suppressed_by_did_dist := Suppress.MAC_FlagSuppressedSource(d_in, mod_access, did, NULL,,TRUE);
+output(flag_suppressed_by_did_dist, named('flag_suppressed_by_did_dist'));
 
 // -----------------------------------------------------------------
 // -- CCPA: Exemption bit test
