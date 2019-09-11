@@ -68,7 +68,6 @@ SKIP(
 	SELF.dt_last_seen							:=	IF(_Validate.date.fIsValid((STRING)L.date_last_seen), L.date_last_seen, 0);
 	SELF.dt_vendor_first_reported	:=	IF(_Validate.date.fIsValid((STRING)L.date_vendor_first_reported), L.date_vendor_first_reported, 0);
 	SELF.dt_vendor_last_reported	:=	IF(_Validate.date.fIsValid((STRING)L.date_vendor_last_reported), L.date_vendor_last_reported, 0);
-	// SELF.record_type							:=	''; 
 	SELF.record_type							:=	(STRING)L.record_type; 
 	SELF.record_date							:=	L.date_last_seen; 
 	SELF.UltID										:=	L.UltID;
