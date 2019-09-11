@@ -47,7 +47,7 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     
     gw_config := Gateway.Configuration.Get();
     // common batch settings, including a gateway to a remote Picklist
-    batch_params := module (BatchShare.IParam.getBatchParamsV2())
+    batch_params := module (BatchShare.IParam.getBatchParams())
       export dataset (Gateway.layouts.config) gateways := gw_config;
       export integer1 non_subject_suppression := nss;
     end;

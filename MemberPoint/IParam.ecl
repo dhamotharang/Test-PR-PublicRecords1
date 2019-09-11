@@ -4,7 +4,7 @@
 
 	export IParam := module
 		
-		export BatchParams := interface (BatchShare.IParam.BatchParamsV2)			
+		export BatchParams := interface (BatchShare.IParam.BatchParams)			
 			export string1 AddressConfidenceThreshold := MPD.AddressConfidenceThreshold ;
 			export string	DeceasedMatchCodes := MPD.DeceasedMatchCodes;
 			export boolean IncludeAddress := MPD.IncludeAddress;
@@ -107,7 +107,7 @@
 		//	 The module parameter should be passed along to the underlying attributes.
 		// **************************************************************************************			
 		export getBatchParams():= FUNCTION
-			base_params := BatchShare.IParam.getBatchParamsV2();
+			base_params := BatchShare.IParam.getBatchParams();
 			// project the base params to read shared parameters from store.
 			in_mod := MODULE(project(base_params, BatchParams, opt))
 				export string1	AddressConfidenceThreshold := MPD.AddressConfidenceThreshold  : stored('AddressConfidenceThreshold');

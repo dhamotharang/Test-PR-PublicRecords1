@@ -27,7 +27,7 @@ EXPORT IParams := MODULE
   
   EXPORT GetBatchParams() := FUNCTION
   
-    base_params := BatchShare.IParam.getBatchParamsV2();
+    base_params := BatchShare.IParam.getBatchParams();
 
     email_batch_params := MODULE(PROJECT(base_params,BatchParams, OPT))
       _MaxResultsPerAcct := $.Constants.Defaults.MaxResultsPerAcct : STORED('Max_Results_Per_Acct');

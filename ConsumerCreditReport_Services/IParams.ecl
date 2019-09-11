@@ -2,7 +2,7 @@
 
 EXPORT IParams := MODULE
 
-	EXPORT Params := INTERFACE(BatchShare.IParam.BatchParamsV2, FCRA.iRules)
+	EXPORT Params := INTERFACE(BatchShare.IParam.BatchParams, FCRA.iRules)
 		EXPORT STRING50 ReferenceCode := '';
 		EXPORT STRING50 BillingCode := '';
 		EXPORT STRING20 CompanyId := '';
@@ -14,7 +14,7 @@ EXPORT IParams := MODULE
 
 	EXPORT getParams() := FUNCTION
 
-		bs_mod := BatchShare.IParam.getBatchParamsV2();
+		bs_mod := BatchShare.IParam.getBatchParams();
 
 		// to decide whether to include Liens & Judgements
     isRestricted := doxie.compliance.isJuliRestricted(bs_mod.DataRestrictionMask);
