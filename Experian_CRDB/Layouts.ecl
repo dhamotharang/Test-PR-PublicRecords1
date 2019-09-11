@@ -335,6 +335,7 @@ export Layouts := module
 		  string20  	mname;
 		  string20  	lname;
 			string2 		source				:='';
+			string50		url						:='';
 			unsigned8   source_rec_id := 0;
 			BIPV2.IDlayouts.l_xlink_ids		;
 	  end;

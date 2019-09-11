@@ -13,7 +13,7 @@ ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_
 ECLThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
 GenerateDashboards := 
- 'import ut,FraudGovPlatform_Analytics;\n'
+ 'import ut,FraudGovPlatform_Analytics,_control;\n'
 +'wuname := \'FraudGov Cert Dashboards Refresh\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'protect\', true);\n'
@@ -23,7 +23,10 @@ GenerateDashboards :=
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'FraudGovPlatform_Analytics.GenerateDashboards(False,True):failure(email(\'Cert dashboards failed\'));\n'
++'IF(_control.ThisEnvironment.Name <> \'Prod_Thor\'\n'
++'	,FraudGovPlatform_Analytics.GenerateDashboards(False,False,,True)\n'
++'	,FraudGovPlatform_Analytics.GenerateDashboards(False,True)\n'
++		'):failure(IF(_control.ThisEnvironment.Name <> \'Prod_Thor\',email(\'Dev dashboards failed\'),email(\'Cert dashboards failed\')));\n'
 ;
 
 BuildStatusReport := 
