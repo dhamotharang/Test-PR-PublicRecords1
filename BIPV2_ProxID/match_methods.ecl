@@ -53,6 +53,12 @@ EXPORT match_company_fein(TYPEOF(h.company_fein) L, TYPEOF(h.company_fein) R, UN
     SALT311.MatchCode.NoMatch),
      MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
 );
+EXPORT match_cnp_name_phonetic(TYPEOF(h.cnp_name_phonetic) L, TYPEOF(h.cnp_name_phonetic) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(L = R => SALT311.MatchCode.ExactMatch,
+	metaphonelib.dmetaphone1(L) = metaphonelib.dmetaphone1(R) => SALT311.MatchCode.PhoneticMatch,
+    SALT311.MatchCode.NoMatch),
+     MAP(L = R => SALT311.MatchCode.ExactMatch, SALT311.MatchCode.NoMatch)
+);
 EXPORT match_cnp_name(TYPEOF(h.cnp_name) L, TYPEOF(h.cnp_name) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(SALT311.WordBagsEqual(L,R) => SALT311.MatchCode.ExactMatch,
 	    SALT311.MatchBagOfWords(L,R,46614,1) <> 0 => SALT311.MatchCode.WordBagMatch,
