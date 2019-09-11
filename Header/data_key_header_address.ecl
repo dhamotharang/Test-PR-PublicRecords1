@@ -28,7 +28,7 @@ geo_blk
 
 slim_dedup  := DEDUP(SORT(slim_f,record),record);
 
-export data_key_header_address := PROJECT (slim_dedup, dx_Header.layouts.i_header_address);
+export data_key_header_address := PROJECT (slim_dedup, TRANSFORM(dx_Header.layouts.i_header_address,SELF:=LEFT,SELF.global_sid:=0,SELF.record_sid:=0));
 
 //export Key_Header_Address := 
 //       index(slim_dedup, {prim_name, zip, prim_range, sec_range},{slim_dedup},

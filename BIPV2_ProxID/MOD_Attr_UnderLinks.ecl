@@ -32,10 +32,15 @@ match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED c
                         le.company_fein = ri.company_fein  => le.company_fein_weight100,
                         Config.WithinEditN(le.company_fein,le.company_fein_len,ri.company_fein,ri.company_fein_len,1,0) =>  SALT311.fn_fuzzy_specificity(le.company_fein_weight100,le.company_fein_cnt, le.company_fein_e1_cnt,ri.company_fein_weight100,ri.company_fein_cnt,ri.company_fein_e1_cnt),
                         SALT311.Fn_Fail_Scale(AVE(le.company_fein_weight100,ri.company_fein_weight100),s.company_fein_switch));
+  INTEGER2 cnp_name_phonetic_score := MAP(
+                        le.cnp_name_phonetic_isnull OR ri.cnp_name_phonetic_isnull => 0,
+                        le.cnp_name_phonetic = ri.cnp_name_phonetic  => le.cnp_name_phonetic_weight100,
+                        metaphonelib.dmetaphone1(le.cnp_name_phonetic) = metaphonelib.dmetaphone1(ri.cnp_name_phonetic) => SALT311.fn_fuzzy_specificity(le.cnp_name_phonetic_weight100,le.cnp_name_phonetic_cnt, le.cnp_name_phonetic_p_cnt,ri.cnp_name_phonetic_weight100,ri.cnp_name_phonetic_cnt,ri.cnp_name_phonetic_p_cnt),
+                        SALT311.Fn_Fail_Scale(AVE(le.cnp_name_phonetic_weight100,ri.cnp_name_phonetic_weight100),s.cnp_name_phonetic_switch));
   INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100, cnp_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_enterprise_number_score := IF ( active_enterprise_number_score_temp >= Config.active_enterprise_number_Force * 100, active_enterprise_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_domestic_corp_key_score := IF ( active_domestic_corp_key_score_temp >= Config.active_domestic_corp_key_Force * 100, active_domestic_corp_key_score_temp, SKIP ); // Enforce FORCE parameter
-  SELF.Conf_Prop := (cnp_number_score + active_enterprise_number_score + active_domestic_corp_key_score + active_duns_number_score + company_fein_score) / 100; // Score based on forced fields
+  SELF.Conf_Prop := (cnp_number_score + active_enterprise_number_score + active_domestic_corp_key_score + active_duns_number_score + company_fein_score + cnp_name_phonetic_score) / 100; // Score based on forced fields
   SELF.support_cnp_name := ri.Basis_weight100/100;
 END;
 Matches0 := DISTRIBUTE(JOIN(Cands,Cands,LEFT.Basis = RIGHT.Basis AND LEFT.Proxid > RIGHT.Proxid,Score(LEFT,RIGHT)),Proxid1+Proxid2);
