@@ -1,9 +1,9 @@
 ﻿ 
 EXPORT MarketAppend_MAC_PopulationStatistics(infile,Ref='',Input_company_id = '',Input_app_type = '',Input_market = '',Input_sub_market = '',Input_vertical = '',Input_main_country_code = '',Input_bill_country_code = '',OutFile) := MACRO
-  IMPORT SALT39,Scrubs_MBS;
+  IMPORT SALT311,Scrubs_MBS;
   #uniquename(of)
   %of% := RECORD
-    SALT39.Str512Type fields;
+    SALT311.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
