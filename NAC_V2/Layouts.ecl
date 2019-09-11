@@ -1,15 +1,28 @@
-﻿import header,address,AID,Tools, STD;
-export Layouts := MODULE
+﻿IMPORT header,address,AID,Tools, STD;
+
+
+EXPORT Layouts := MODULE
  
  
+ 
+
+
+   
+EXPORT	rlExternalEmail:= RECORD
+		STRING10    GroupID;
+		STRING100	 EventType;		
+		STRING      EmailAddress;		
+		STRING1     IsRecipientInactive;
+		STRING8     CreateDate;    
+	 END;   
 
 
 
 EXPORT rlInternalEmailFile := RECORD
 	STRING100   EventType;
-	STRING50   GroupID;
-	STRING     EmailAddress;
-	STRING1    IsRecipientInactive;
+	STRING50    GroupID;
+	STRING      EmailAddress;
+	STRING1     IsRecipientInactive;
 	STRING8     CreateDate
 END;
 
