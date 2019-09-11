@@ -34,7 +34,7 @@
 */
 /*--INFO-- 'npt1' */
 
-import Address, Risk_Indicators, Models, seed_files, gateway;
+IMPORT Risk_Indicators, seed_files, gateway, Riskwise, STD;
 
 export RiskWiseMainNPTO := MACRO
 
@@ -74,7 +74,11 @@ export RiskWiseMainNPTO := MACRO
 	'DataPermissionMask',
   'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -128,7 +132,13 @@ boolean runSeed_value := false 	: stored('runSeed');
 unsigned1 ofac_version      := 2        : stored('OFACVersion'); // set to two as this was the original version
 gateways_in := Gateway.Configuration.Get();
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribcode in ['npt1'];
 
 // JRP 02/12/2008 - Dataset of actioncode settings which are passed to the getactioncodes function.
@@ -175,9 +185,9 @@ risk_indicators.layout_input into(rec l, INTEGER C) := TRANSFORM
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;
 	
-	self.fname := stringlib.stringtouppercase(first_value);
-	self.mname := stringlib.stringtouppercase(middleini_value);
-	self.lname := stringlib.stringtouppercase(last_value);	
+	self.fname := STD.Str.touppercase(first_value);
+	self.mname := STD.Str.touppercase(middleini_value);
+	self.lname := STD.Str.touppercase(last_value);	
 	
 	self.in_streetAddress := addr_value;
 	self.in_city := city_value;
@@ -202,13 +212,13 @@ risk_indicators.layout_input into(rec l, INTEGER C) := TRANSFORM
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 			
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(drlcstate_value);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(drlcstate_value);
 	
 	self.email_address := email_value;
 	
-	self.employer_name := stringlib.stringtouppercase(cmpy_value);
-	self.lname_prev := stringlib.stringtouppercase(formerlast_value);
+	self.employer_name := STD.Str.touppercase(cmpy_value);
+	self.lname_prev := STD.Str.touppercase(formerlast_value);
 	
 	self := [];
 END;
@@ -232,7 +242,11 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
 		in_include_ofac := include_ofac, // include_ofac default value
 		in_global_watchlist_threshold := global_watchlist_threshold, // threshold -- use 0.84 instead of default 0.8
 		in_DataRestriction:=DataRestriction,
-		in_DataPermission:=DataPermission
+		in_DataPermission:=DataPermission,
+        LexIdSourceOptout := LexIdSourceOptout, 
+        TransactionID := TransactionID, 
+        BatchUID := BatchUID, 
+        GlobalCompanyID := GlobalCompanyID
 );
 
 RiskWise.Layout_NPTO format_out(Risk_Indicators.Layout_Output le) := TRANSFORM

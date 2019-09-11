@@ -11,7 +11,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) indata,
 
 	busnKeys := DueDiligence.CommonBusiness.GetLinkIDsForKFetch(indata);
 
-	vehicleRaw := VehicleV2.Key_Vehicle_linkids.kFetch(busnKeys, 
+	vehicleRaw := VehicleV2.Key_Vehicle_linkids.kFetch(busnKeys,, 
                                                       Business_Risk_BIP.Common.SetLinkSearchLevel(options.LinkSearchLevel),
                                                       0,
                                                       linkingOptions);

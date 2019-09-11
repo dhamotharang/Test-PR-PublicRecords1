@@ -14,7 +14,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
   vehicles_are_turned_off := NOT(dppa_ok AND glba_ok);
   
   // --------------- Vehicles Data - Using Business IDs ----------------
-  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),
+  VehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(Business_Risk_BIP.Common.GetLinkIDs(Shell),,
                              Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
                              0, /*ScoreThreshold --> 0 = Give me everything*/
                              linkingOptions,

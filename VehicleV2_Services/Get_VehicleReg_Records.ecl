@@ -1,12 +1,14 @@
 IMPORT Vehiclev2_services, doxie, suppress, vehicle_wildcard, ut,  
        NID, drivers, doxie_Raw, doxie_build, iesp;
 
-EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,                               
-                              BOOLEAN returnIesp = TRUE,
-															BOOLEAN RawRecs = FALSE) := MODULE
+EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
+                              BOOLEAN returnIesp,
+															BOOLEAN RawRecs = FALSE) := MODULE //TODO: make a function
  	
-	SHARED getVehRecs := VehicleV2_Services.Get_Vehicle_Records(aInput,returnIesp);
+	SHARED getVehRecs := VehicleV2_Services.Get_Vehicle_Records(aInput, returnIesp);
 	
+    mod_access := PROJECT(aInput, doxie.IDataAccess);
+    
 		// BEGIN ADDITION OF WILDCARD INPUT ENTRIES 
 		unsigned zipRadius_val            := 1 : STORED('Radius');
 		string30 vin_val                  := '' : STORED('VinWild');
@@ -23,25 +25,17 @@ EXPORT Get_VehicleReg_Records(Vehiclev2_services.IParam.searchParams aInput,
 		unsigned8 maxResultsThisTime_val := if (aInput.MaxResultsVal > 1000,1000,																					
 																					aInput.MaxResultsVal);
 		unsigned8	SkipRecords_val					:= 0			: stored('SkipRecords');		
-		unsigned1	DPPA_Purpose						:=aInput.dppaPurpose;		
 	
-		boolean	ln_branded_value				  := aInput.lnbranded;			
 		BOOLEAN IncludeCriminalIndicators := aInput.includeCriminalIndicators;		
 		BOOLEAN IncludeNonRegulatedVehicleSources := aInput.IncludeNonRegulatedSources;		
-		STRING6 ssn_mask_val := aInput.ssnMask;
-		unsigned1 dl_mask_val := if (aInput.dl_mask, 1, 0); // TODO UNSURE HERE 
 		// TODO ******* DOUBLECHECK MAY NEED SPECIAL CASE HERE TO KEEP DEFAULT SETTING
-		string DataRestrictionMask := '1    0' : STORED('DataRestrictionMask');
      
-		//string TitleNumber := aInput.TitleNumber;
 		vin_value := stringlib.stringtouppercase(vin_val);		
 		tag_value := stringlib.stringtouppercase(tag_val);	
 		city_value := stringlib.stringtouppercase(city_val);		
-		dppa_ok := dppa_purpose > 0 and dppa_purpose < 8;		
-		ssn_mask_value := StringLib.StringToUpperCase(ssn_mask_val);
-		dl_mask_value := dl_mask_val=1;
+		ssn_mask_value := mod_access.ssn_mask;
+		dl_mask_value := mod_access.dl_mask = 1;
 
-		// nameIndex := vehicle_wildcard.Key_NameIndex;
 		modelIndex := vehicle_wildcard.Key_ModelIndex;
 		bodyIndex  := Vehicle_Wildcard.Key_BodyStyle;
 
@@ -317,33 +311,31 @@ modelYearEnd_use,sex_use,tag_value,vin_value) or wild_bad or county_bad;
 // SO THIS 'CHOOSEN (DS, LIMITVALUE +1)' IS TO GET AROUND THAT.
 
 wildfileAttr := CHOOSEN(wildfile (
- keyed(state_use = []		OR		wd_state IN state_use),
- keyed(regState = ''		OR		wd_orig_state = regState_use),
- keyed(_make = []				OR		wd_make_code IN make_use),  
- keyed(zip_use = []			OR		wd_zip IN zip_use),
- keyed(_model = []			OR		wd_model_description IN model_use),
- keyed(_body = []			  OR		wd_body_code IN body_use),
- keyed(majorColor_use = [] 	OR		wd_major_color_code IN majorColor_use),
- agematch,
- yearmatch,
- gendermatch,
- platematch,
- vinmatch,
- WildZipMatch,
- ut.dppa_ok(dppa_purpose),
- TRUE), WILDFILE_READ_LIMIT+1);
+  keyed(state_use = []		OR		wd_state IN state_use),
+  keyed(regState = ''		OR		wd_orig_state = regState_use),
+  keyed(_make = []				OR		wd_make_code IN make_use),  
+  keyed(zip_use = []			OR		wd_zip IN zip_use),
+  keyed(_model = []			OR		wd_model_description IN model_use),
+  keyed(_body = []			  OR		wd_body_code IN body_use),
+  keyed(majorColor_use = [] 	OR		wd_major_color_code IN majorColor_use),
+  agematch,
+  yearmatch,
+  gendermatch,
+  platematch,
+  vinmatch,
+  WildZipMatch,
+  mod_access.isValidDppa(),
+  TRUE), WILDFILE_READ_LIMIT+1);
 // 
 // Combine matches
 pre_filtered := LIMIT (wildfileAttr, WILDFILE_READ_LIMIT, SKIP);
  // THIS WAS THE ORGINAL LINE in QUERY ATTEMPT to make it fail gracefully i..e w pre_filtered hopefully set to 0.
- // wildfile(......,TRUE), WILDFILE_READ_LIMIT, FAIL (11, doxie.ErrorCodes (11)));
-
+ 
  
 // ORIGINAL LINE BUT WE DON"T WANT FAIL QUERY because regular MVR search has to run so just return empty set.
 // the check if count< WILDFILE_READ_LIMIT ensures we don't run a 
 // Fn_Find call if input is over the threshold : WILDFILE_READ_LIMIT
 
-//filtered := if(unacceptable_inputs,Fail(wildfile,11,doxie.ErrorCodes(11)),pre_filtered);
 filtered := if( ((~unacceptable_inputs) and (count(wildfileAttr) < WILDFILE_READ_LIMIT)), pre_filtered);
 badSearch := unacceptable_inputs OR (count(wildfileAttr) > WILDFILE_READ_LIMIT);
 pre_Filtered_wseq := project(filtered,transform(recordof(filtered),
@@ -357,6 +349,7 @@ unsigned2 REAL_LIMIT := ut.Min2(MaxResults_val,UPPER_LIMIT);
 dup_pre_filtered_wseq := dedup(sort(pre_Filtered_wseq,vehicle_key,iteration_key,sequence_key),
 		vehicle_key,iteration_key,sequence_key);
 		
+unsigned1	dppa_purpose := mod_access.dppa;
 Vehiclev2_services.Mac_DppaCheck(dup_pre_filtered_wseq,dup_pre_filtered_wdppa)
 
 no_postfiltering := fname_val='' and mname_val='' and lname_val='' and tline_use=USE_ALL and county_value='';
@@ -416,7 +409,7 @@ end;
 
 toOut := project(FT(
 	NameMatched(FT) and 
-	drivers.state_dppa_ok (orig_state, dppa_purpose,, source_code) and
+	mod_access.isValidDppaState(orig_state, , source_code) and
 	timelineMatch(history) and
 	state_value in [reg_1_state,''] and
 	county_value in [reg_1_county_name,'']
@@ -441,136 +434,13 @@ result_return := results_cleaned;
 outfile := SORT(result_return, make_code, -model_description, LICENSE_PLATE_NUMBERxBG4, VID, own_1_lname, own_1_fname, own_1_mname, pick);
 
 doxie.MAC_Marshall_Results(outfile,outf);
-//**************************************************
-// this is the layout of outf listed here for info.
-//**************************************************
-// PrettyLayout := RECORD
-	// outf.output_seq_no;
-	// outf.source;
-	// outf.vid;
-	// outf.dt_last_seen;
-	// outf.NonDMVSource;
-	// outf.history;
-	// outf.history_name;
-	// outf.make_description;
-	// outf.model_description;
-	// outf.series_description;
-	// outf.body_style_description; 
-	// outf.major_color_code;
-	// outf.major_color_name; 
-	// outf.minor_color_code;
-	// outf.minor_color_name;
-	// outf.year_make;
-	// outf.body_code;
-	// outf.length_feet;
-	// outf.hull_material_type;
-	// outf.vessel_type;
-	// outf.orig_vin;
-	// outf.LICENSE_PLATE_NUMBERxBG4;
-	// outf.VEHICLE_NUMBERxBG1;
-	// outf.orig_state;
-	// outf.orig_state_name;
-  
-	// outf.own_1_title;
-	// outf.own_1_fname;
-	// outf.own_1_mname;
-	// outf.own_1_lname;
-	// outf.own_1_name_suffix;
-	// outf.own_1_did;
-	// outf.own_1_ssn;
-	// outf.own_1_company_name;
-	// outf.OWN_1_STREET_ADDRESS;
-	// outf.OWN_1_CITY;
-	// outf.OWN_1_STATE;
-	// outf.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL;
-	// outf.OWN_1_APARTMENT_NUMBER;
-	// outf.own_1_zip5;
-	// outf.own_1_county;
-	// outf.own_1_county_name;
-	// outf.own_1_dob;
-	// outf.own_1_sex;
-	// outf.OWN_1_DRIVER_LICENSE_NUMBER;
-	// outf.own_1_hasCriminalConviction;
-	// outf.own_1_isSexualOffender;
-	// outf.own_1_src_first_date;
-	// outf.own_1_src_last_date;
-	
-	// outf.own_2_title;
-	// outf.own_2_fname;
-	// outf.own_2_mname;
-	// outf.own_2_lname;
-	// outf.own_2_name_suffix;
-	// outf.own_2_did;
-	// outf.own_2_ssn;
-	// outf.own_2_company_name;
-	// outf.own_2_STREET_ADDRESS;
-	// outf.own_2_CITY;
-	// outf.own_2_STATE;
-	// outf.own_2_ZIP5_ZIP4_FOREIGN_POSTAL;
-	// outf.own_2_APARTMENT_NUMBER;
-	// outf.own_2_zip5;
-	// outf.own_2_county;
-	// outf.own_2_county_name;
-	// outf.own_2_dob;
-	// outf.own_2_sex;
-	// outf.own_2_DRIVER_LICENSE_NUMBER;
-	// outf.own_2_hasCriminalConviction;
-	// outf.own_2_isSexualOffender;
-	// outf.own_2_src_first_date;
-	// outf.own_2_src_last_date;
-	
-	// outf.reg_1_title;
-	// outf.reg_1_fname;
-	// outf.reg_1_mname;
-	// outf.reg_1_lname;
-	// outf.reg_1_name_suffix;
-	// outf.reg_1_did;
-	// outf.reg_1_ssn;
-	// outf.reg_1_company_name;
-	// outf.reg_1_STREET_ADDRESS;
-	// outf.reg_1_CITY;
-	// outf.reg_1_STATE;
-	// outf.reg_1_ZIP5_ZIP4_FOREIGN_POSTAL;
-	// outf.reg_1_APARTMENT_NUMBER;
-	// outf.reg_1_zip5;
-	// outf.reg_1_county;
-	// outf.reg_1_county_name;
-	// outf.reg_1_dob;
-	// outf.reg_1_sex;
-	// outf.reg_1_DRIVER_LICENSE_NUMBER;
-	// outf.reg_1_hasCriminalConviction;
-	// outf.reg_1_isSexualOffender;
-	
-	// outf.reg_2_title;
-	// outf.reg_2_fname;
-	// outf.reg_2_mname;
-	// outf.reg_2_lname;
-	// outf.reg_2_name_suffix;
-	// outf.reg_2_did;
-	// outf.reg_2_ssn;
-	// outf.reg_2_company_name;
-	// outf.reg_2_STREET_ADDRESS;
-	// outf.reg_2_CITY;
-	// outf.reg_2_STATE;
-	// outf.reg_2_ZIP5_ZIP4_FOREIGN_POSTAL;
-	// outf.reg_2_APARTMENT_NUMBER;
-	// outf.reg_2_zip5;
-	// outf.reg_2_county;
-	// outf.reg_2_county_name;
-	// outf.reg_2_dob;
-	// outf.reg_2_sex;
-	// outf.reg_2_DRIVER_LICENSE_NUMBER;
-	// outf.reg_2_hasCriminalConviction;
-	// outf.reg_2_isSexualOffender;
-
-// END;
 
 // NOTE: A lot of the above code in this attr is from the doxie.* files related to the MVR wildcard search
 // There are some additions because VehicleV2_Services.VehicleRegSearchService needed to read
 // in sets of values in some cases e.g. makes/models yet still maintain the input functionality 
 // that is currently working and needed for the MVR search query e.g. just 1 value input for make/model
 // all recs from regular MVR search query 
-// returned using this call: EXPORT getVehRecs := VehicleV2_Services.Get_Vehicle_Records(aInput,returnIesp);
+// returned using this call: EXPORT getVehRecs := VehicleV2_Services/Get_Vehicle_Records
 // which is at top of this attribute.
 // NOTE: regstate input from doxie.wildcard_search  is not used in this query
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -632,24 +502,6 @@ doxie.MAC_Marshall_Results(outfile,outf);
 																																					LEFT.reg_1_title,
 																																					'');
 		 		               // probably don't want to call Address cleaner for every rec from wildcard search
-											 // but if so here is code to do it.
-											// derived_city  :=  stringlib.StringToUpperCase(LEFT.reg_1_city);
-											// derived_state := stringlib.StringToUpperCase(LEFT.reg_1_state);
-											// derived_zip   := stringlib.StringToUpperCase(LEFT.reg_1_zip5);
-	
-											// addr2 := Address.Addr2FromComponents(derived_city, derived_state, derived_zip);
-	
-											// UNSIGNED1 region := address.Components.Country.US; // default
-												
-										  // clean_addr := Address.GetCleanAddress(LEFT.reg_1_STREET_ADDRESS, addr2, region).results;
-	
-										  // prim_range :=  trim(stringlib.StringToUpperCase(clean_addr.prim_range), left, right);
-										  // prim_name :=  trim(stringlib.StringToUpperCase(clean_addr.prim_name), left, right);
-											// predir := trim(stringlib.StringToUpperCase(clean_addr.predir), left, right);
-											// postdir := trim(stringlib.StringToUpperCase(clean_addr.postdir), left, right);
-											// suffix := trim(stringlib.StringToUpperCase(clean_addr.suffix), left, right);
-											// unitdesig := trim(stringlib.StringToUpperCase(clean_addr.unit_desig), left, right);
-										  // sec_range := clean_addr.sec_range;
 				
 											SELF.RegistrantInfo.Address := iesp.ECL2ESP.SetAddress(
 																	//left.prim_name,left.prim_range,left.predir,left.postdir,

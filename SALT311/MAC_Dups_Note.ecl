@@ -49,3 +49,4 @@ export MAC_Dups_Note(infile,outformat,outfile,outdups,uniqueIDField='uniqueid',m
 	outfile := PROJECT(%noted%(uniqueIDField=__shadow_ref),TRANSFORM(outformat,SELF := LEFT)) + PROJECT(%ds_pass%,TRANSFORM(outformat,SELF:=LEFT));
   outdups := TABLE(%noted%(uniqueIDField<>__shadow_ref),{uniqueIDField,__shadow_ref});	
   ENDMACRO;
+ 

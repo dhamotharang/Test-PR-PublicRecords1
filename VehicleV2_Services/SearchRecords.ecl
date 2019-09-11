@@ -74,8 +74,8 @@ export SearchRecords := MODULE
 			EXPORT STRING120 CompanyName := '';
 		END;
 
-		vehIds := SearchServiceIds(aInputData).ids; // specific vehicle
-		addrIds := SearchServiceIds(addrInputData).ids; // vehicles at address
+		vehIds := $.SearchServiceIds(aInputData).ids; // specific vehicle
+		addrIds := $.SearchServiceIds(addrInputData).ids; // vehicles at address
 		
 		// for insurance usage: mimic Experian developed vehicles when 'VIN Standard' or 'VIN Household'
 		addr182 := address.GetCleanAddress(aGatewayInputData.addr,aGatewayInputData.city+' '+aGatewayInputData.state+' '+aGatewayInputData.zip,address.Components.Country.US).str_addr;
@@ -93,11 +93,11 @@ export SearchRecords := MODULE
 
 		deduped_ids := dedup(grouped_ids, Vehicle_key, Iteration_Key, Sequence_key);
 
-		vehicles := Ungroup(Raw.get_vehicle_search( aInputData, 
-						deduped_ids(Vehicle_key = aInputData.vehicleKey or aInputData.vehicleKey =''), aInputData.ssnMask));
+		vehicles := Ungroup($.Raw.get_vehicle_search( aInputData, 
+						deduped_ids(Vehicle_key = aInputData.vehicleKey or aInputData.vehicleKey =''), aInputData.ssn_mask));
 		
-		vehiclesAtAddress := Ungroup(Raw.get_vehicle_search( addrInputData, 
-						deduped_ids(Vehicle_key = aInputData.vehicleKey or aInputData.vehicleKey =''), aInputData.ssnMask));
+		vehiclesAtAddress := Ungroup($.Raw.get_vehicle_search( addrInputData, 
+						deduped_ids(Vehicle_key = aInputData.vehicleKey or aInputData.vehicleKey =''), aInputData.ssn_mask));
 
 		// for insurance usage: set current flag for both registrants and owners
 		currentVehiclesAtAddress := PROJECT(vehiclesAtAddress,TRANSFORM($.Layout_Report,
@@ -146,7 +146,7 @@ export SearchRecords := MODULE
 
 		BOOLEAN useAll := Search_Request = constant.ALL_val;
 		BOOLEAN realTime := Search_Request = constant.realtime_val;
-		BOOLEAN useExperian := ~doxie.DataPermission.use_Polk;
+		BOOLEAN useExperian := ~doxie.compliance.use_Polk(aInputData.DataPermissionMask);
 		STRING2 queryState := aInputData.state;
 
     exp_only_state := LIMIT (Codes.Key_Codes_V3 (keyed (file_name='EXPERIAN_GATEWAY'), keyed (field_name='INSURANCE_USAGE'),
@@ -154,10 +154,10 @@ export SearchRecords := MODULE
     BOOLEAN gatewayONLY := useExperian AND insuranceUsage AND EXISTS (exp_only_state);
 
 
-		aPolkInputMod := MODULE(PROJECT(aGatewayInputData,$.IParam.polkParams,OPT))
+		aPolkInputMod := MODULE(PROJECT(aGatewayInputData,$.IParam.polkParams))
 			EXPORT BOOLEAN noFail := useAll or aGatewayInputData.noFail or useExperian;
 		END;
-		aExperianInputMod := MODULE(PROJECT(aGatewayInputData,IParam.polkParams,OPT))
+		aExperianInputMod := MODULE(PROJECT(aGatewayInputData,IParam.polkParams))
 			EXPORT BOOLEAN noFail := useAll or aGatewayInputData.noFail or ~useExperian;
 			EXPORT STRING clnAddr182 := addr182;
 		END;
@@ -196,9 +196,6 @@ export SearchRecords := MODULE
          //isAllEmpty               => fail(final_result_pre,10,Doxie.ErrorCodes(10)), /* */ 
                                        final_result_pre);
                                                             
- 
-   //Bug 132024 - apply new sorting rules to results (adding comment)
-		//RETURN final_result; 
 		RETURN sort(final_result, -MAX( MAX(owners,(unsigned4)ttl_latest_issue_date), MAX(registrants,(unsigned4)reg_latest_effective_date), 
 																		MAX(owners, if((unsigned4)src_last_date = 0, (unsigned4)src_first_date, (unsigned4)src_last_date))), 
 															nonDMVSource,
@@ -206,22 +203,13 @@ export SearchRecords := MODULE
 															Vehicle_Key);
 	END;
 	
-	SHARED  getCombinedRecords($.IParam.searchParams aInputData) :=FUNCTION			
+	SHARED  getCombinedRecords($.IParam.searchParams aInputData) :=FUNCTION
 
-    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
-      EXPORT unsigned1 glb := aInputData.glbpurpose;
-	    EXPORT unsigned1 dppa := aInputData.dppapurpose;	
-      EXPORT string DataPermissionMask := aInputData.DataPermissionMask;
-      EXPORT boolean ln_branded := aInputData.lnbranded;
-      EXPORT string5 industry_class := aInputData.industryclass; 
-      EXPORT string32 application_type := aInputData.applicationtype;
-      EXPORT string ssn_mask := aInputData.ssnmask; 
-      EXPORT unsigned1 dl_mask :=	IF (aInputData.dl_mask, 1, 0);
-		END;	
+		mod_access := PROJECT (aInputData, doxie.IDataAccess);
 
 		STRING PermissibleUse:=Polk_Code_Translations.RealTimePermissibleUse(aInputData.RealTimePermissibleUse);
 		
-		tempmod:= module(project(aInputData,IParam.polkParams))					
+		tempmod:= module(project(aInputData, $.IParam.polkParams))					
 		end;
 		
 		/* polk search operation based on the search arguments in tempmod and PermissibleUse */
@@ -253,7 +241,7 @@ export SearchRecords := MODULE
 															, IF (uniqueBestRecords, bestRecords, dedupBestRecords)
 															, dataset([], doxie.layout_best));
 		
-		tempmodBestData := module(project(aInputData,IParam.polkParams,opt))			
+		tempmodBestData := module(project(aInputData, $.IParam.polkParams))			
 			export string30 firstname := polkSearchRecords[1].fname;
 			export string30 middlename := polkSearchRecords[1].mname;
 			export string30 lastname := polkSearchRecords[1].lname;	

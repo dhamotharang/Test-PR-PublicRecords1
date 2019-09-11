@@ -1,7 +1,7 @@
 ﻿/* TBD:
    1. Research/resolve open issues, search on "???"
 */
-IMPORT AutoStandardI, BIPV2, Codes, iesp, MDR, VehicleV2;
+IMPORT BIPV2, Codes, doxie, iesp, MDR, suppress, VehicleV2;
 
 EXPORT MotorVehicleSection := MODULE;
 
@@ -9,10 +9,10 @@ EXPORT MotorVehicleSection := MODULE;
  export fn_FullView(
    dataset(TopBusiness_Services.Layouts.rec_input_ids) ds_in_ids
 	 ,TopBusiness_Services.Layouts.rec_input_options in_options
-	 ,AutoStandardI.DataRestrictionI.params in_mod
+	 ,doxie.IDataAccess mod_access
    ,unsigned2 in_sourceDocMaxCount = iesp.Constants.TopBusiness.MAX_COUNT_BIZRPT_SRCDOC_RECORDS
                    ):= function 
-
+   
    FETCH_LEVEL := in_options.BusinessReportFetchLevel;
 
   // Strip off the input acctno from each record, will re-attach them later.
@@ -221,7 +221,13 @@ EXPORT MotorVehicleSection := MODULE;
   // Now join all the linkids key recs to be used (under the max return limit) to the 
 	// vehiclev2 "party" key with linkids to get all the party/title/registration info 
 	// to be output on the report.
-	ds_mvrparty_keyrecs := join(ds_linkids_keyrecs_tobe_used,
+  
+  tmp_layout := record(TopBusiness_Services.MotorVehicleSection_Layouts.rec_child_party)
+                   unsigned4 global_sid;
+                   unsigned8 record_sid;
+                   unsigned6 append_did;
+                end;   
+	ds_mvrparty_keyrecs_pre := join(ds_linkids_keyrecs_tobe_used,
 	                            VehicleV2.Key_Vehicle_Party_Key,
 		                            keyed(left.vehicle_key  = right.vehicle_key   and
 														         left.iteration_key = right.iteration_key and
@@ -233,7 +239,7 @@ EXPORT MotorVehicleSection := MODULE;
 																     left.seleid != right.seleid //the company being reported on???
 																    )
 															 ,
-									           transform(TopBusiness_Services.MotorVehicleSection_Layouts.rec_child_party,
+									           transform(tmp_layout,
 															 // Since linkids for the party were added to the party key layout, 
                                // fill in the "report-by" linkids from the left dataset. 
 															 // Create a new macro for this(---v)??? Something like TopBusiness_Services.IDMacros. mac_IespTransferLinkids
@@ -299,7 +305,9 @@ EXPORT MotorVehicleSection := MODULE;
 		                        //keep(Constants.???), // ???
                             limit(10000,skip) // change to use Constants.???.LIMIT
 									         );
-
+  ds_mvrparty_keyrecs_suppressed := suppress.mac_suppresssource(ds_mvrparty_keyrecs_pre,mod_access,append_did);
+  ds_mvrparty_keyrecs := project(ds_mvrparty_keyrecs_suppressed,
+                                   TopBusiness_Services.MotorVehicleSection_Layouts.rec_child_party);
 	// Might have duplicated parties, so dedup just in case.
 	// Might need some more "tweaking" ---v ???
 	ds_mvrparty_keyrecs_deduped := dedup(sort(ds_mvrparty_keyrecs,

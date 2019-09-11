@@ -1,5 +1,5 @@
 ﻿import _Control, risk_indicators, suppress, doxie, address, riskwise, NID, FCRA, Death_Master, MDR, Relationship, dx_header;
-import STD;
+import STD, data_services;
 onThor := _Control.Environment.OnThor;
 
 export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
@@ -9,6 +9,8 @@ export iid_getSSNFlags(grouped DATASET(risk_indicators.Layout_output) inrec, uns
 							UNSIGNED1 BSversion = 3, 
 							unsigned8 BSOptions=0,
 							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+
+unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, 0);
 
 glb_ok := iid_constants.glb_ok(glb, isFCRA);
 
@@ -316,7 +318,7 @@ got_SSNTable_fcra_roxie := join (inrec_DE_src, risk_indicators.key_ssn_table_v4_
 									 trim((string12)right.ssn) not in left.ssn_correct_record_id, 
                    get_ssnTable_FCRA(left,right,1),left outer, ATMOST(keyed(left.ssn=right.ssn),500));
 
-key_legacy_ssn := if(isFCRA, doxie.Key_FCRA_legacy_ssn, doxie.Key_legacy_ssn);
+key_legacy_ssn := dx_Header.key_legacy_ssn(iType);
 
 legacy_ssn_thor := join (distribute(inrec_DE_src(ssn<>'' and did<>0), hash64(ssn,did)), 
 									 distribute(pull(key_legacy_ssn), hash64(ssn, did)),

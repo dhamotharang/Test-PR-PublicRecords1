@@ -128,7 +128,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	s_neighbors      := IF (mod_smartlinx.include_neighbors, pers.NeighborsSlim, dataset([],iesp.bpsreport.t_NeighborSlim) );
 	s_neighbors_count := count(s_neighbors.NeighborAddresses);  //count children since rows are neighborhoods.
   p_neighbors      := choosen (s_neighbors, iesp.constants.SMART.MaxNeighbors);
-  p_sources        := PersonReports.SourceCounts_records (dids, module (project (old_param, $.input._sources)) end, IsFCRA);
+  p_sources        := PersonReports.SourceCounts_records (dids, mod_access, PROJECT (mod_smartlinx, $.IParam._sources), IsFCRA);
 //****************************************************************************************************
 //     SINGLE SOURCE RECORDS
 //****************************************************************************************************
@@ -217,7 +217,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
 	
 
 	// OTHER PROPERTY SECTION 
-	emails      := IF (mod_smartlinx.include_email,  PersonReports.email_records(dids, module (project (old_param, $.input.emails)) end, IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
+	emails      := IF (mod_smartlinx.include_email,  PersonReports.email_records(dids, PROJECT (mod_smartlinx, $.IParam.emails), IsFCRA), dataset([],iesp.emailsearch.t_EmailSearchRecord));
 	s_emails    := SmartRollup.fn_smart_rollup_email(emails);  //count children since rows are per source
 	s_emails_count := count(s_emails);
 	p_emails      := choosen (s_emails, iesp.Constants.SMART.MaxEmails);	
@@ -251,7 +251,7 @@ EXPORT out_rec SmartLinxReport (dataset (doxie.layout_references) dids,
   p_watercrafts_prior := choosen (if (mod_smartlinx.Smart_rollup,s_watercrafts_prior, 
 	                             project(watercrafts, transform(iesp.smartlinxreport.t_SLRWatercraft, self := left, self := []))),
 													 iesp.Constants.SMART.MaxWatercrafts);													 
-	aircrafts     := IF (mod_smartlinx.include_faaaircrafts, project(PersonReports.aircraft_records(dids, module (project (old_param, $.input.aircrafts)) end, IsFCRA),iesp.faaaircraft.t_aircraftReportRecord),dataset([],iesp.faaaircraft.t_aircraftReportRecord));
+	aircrafts     := IF (mod_smartlinx.include_faaaircrafts, project(PersonReports.aircraft_records(dids, PROJECT (mod_smartlinx, $.IParam.aircrafts), IsFCRA),iesp.faaaircraft.t_aircraftReportRecord),dataset([],iesp.faaaircraft.t_aircraftReportRecord));
 	s_aircrafts   := SmartRollup.fn_smart_rollup_aircraft(aircrafts);
 	s_aircrafts_current := s_aircrafts(CurrentPrior=iesp.Constants.SMART.CURRENT);
 	s_aircrafts_prior := s_aircrafts(CurrentPrior=iesp.Constants.SMART.PRIOR);

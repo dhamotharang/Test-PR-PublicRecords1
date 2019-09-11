@@ -1,5 +1,6 @@
 ﻿import AutoStandardI,VehicleV2_Services,doxie,iesp;
 
+//TODO: change to function
 export Comp_RealTime_Vehicles (dataset(doxie.layout_references) dids,
 	dataset(Layout_Comp_Addresses) ds_addrs = dataset([],Layout_Comp_Addresses),
 	dataset(doxie.layout_NameDID) ds_names = dataset([],doxie.layout_NameDID)) := module
@@ -7,7 +8,7 @@ export Comp_RealTime_Vehicles (dataset(doxie.layout_references) dids,
 shared  input_params := AutoStandardI.GlobalModule();
 
 //TODO: not likely needed, but have to reset few values to be on the safe side:
-mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (input_params))
+shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (input_params))
                 EXPORT unsigned3 date_threshold := 0;
                 EXPORT boolean ln_branded := FALSE;
                 EXPORT boolean probation_override := FALSE;
@@ -22,6 +23,7 @@ export load_module(string10 prim_range,string2 predir,string28 prim_name,string4
 			    		string2 postdir,string8 sec_range,string25 city_name,string2 st,string5 zip) := function
       
  		  tempmod := module(project(input_params,VehicleV2_Services.IParam.polkParams,opt))
+			doxie.compliance.MAC_CopyModAccessValues(mod_access);
 			EXPORT string30 firstname := names[1].fname;
 			EXPORT string30 middlename :='';
 			EXPORT string30 lastname := names[1].lname;

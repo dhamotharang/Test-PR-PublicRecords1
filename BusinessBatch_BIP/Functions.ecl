@@ -1073,7 +1073,7 @@ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWit
   
     // Fetch MVR and filter only 
     // Owner(type=1), Registrant(type=4) or Lessee(type=5) of the vehicle, 
-    dVehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID)
+    dVehiclesRaw := VehicleV2.Key_Vehicle_Linkids.kFetch(dLinkIds,,BIPV2.IDconstants.Fetch_Level_SELEID)
                           (orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_OWNER OR
                             orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_REGISTRANT OR
                             orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_LESSEE);

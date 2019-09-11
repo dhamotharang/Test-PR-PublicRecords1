@@ -28,7 +28,7 @@
 */
 /*--INFO-- Migration to Warmer Climates (IDPO) */
 
-import address, Risk_Indicators, seed_files, models, gateway;
+import Risk_Indicators, seed_files, models, gateway, Riskwise, STD;
 
 export RiskWiseMainIDPO := MACRO
 
@@ -62,7 +62,11 @@ export RiskWiseMainIDPO := MACRO
 	'runSeed',
 	'OFACversion',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -110,7 +114,13 @@ string10 DataPermission := Risk_Indicators.iid_constants.default_DataPermission 
 unsigned1 ofac_version_       := 1        : stored('OFACVersion');
 gateways_in := Gateway.Configuration.Get();
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribcode in ['idp1'];
 
 targusGatewaySet := ['idp1','idp3'];
@@ -150,9 +160,9 @@ risk_indicators.layout_input into(rec l, INTEGER C) := transform
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;
 	
-	self.fname := stringlib.stringtouppercase(first_value);
-	self.mname := stringlib.stringtouppercase(middleini_value);
-	self.lname := stringlib.stringtouppercase(last_value);
+	self.fname := STD.Str.touppercase(first_value);
+	self.mname := STD.Str.touppercase(middleini_value);
+	self.lname := STD.Str.touppercase(last_value);
 	
 	SELF.in_streetAddress := addr_value;
 	SELF.in_city := city_value;
@@ -177,8 +187,8 @@ risk_indicators.layout_input into(rec l, INTEGER C) := transform
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 		
-	SELF.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	SELF.dl_state := stringlib.stringtouppercase(drlcstate_value);
+	SELF.dl_number := STD.Str.touppercase(dl_num_clean);
+	SELF.dl_state := STD.Str.touppercase(drlcstate_value);
 	
 	self := [];
 END;
@@ -211,7 +221,11 @@ if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail
 ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, ln_branded, ofac_only, suppressNearDups, require2Ele,
 																					from_BIID, isFCRA, ExcludeWatchLists, from_IT1O, ofac_version, include_ofac, include_additional_watchlists, global_watchlist_threshold,
 																					dob_radius, BSversion, runSSNCodes, runBestAddrCheck, runChronoPhoneLookup,	runAreaCodeSplitSearch, allowCellphones,
-																					in_DataRestriction := DataRestriction, in_DataPermission := DataPermission);
+																					in_DataRestriction := DataRestriction, in_DataPermission := DataPermission,
+                                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                                    TransactionID := TransactionID, 
+                                                                                    BatchUID := BatchUID, 
+                                                                                    GlobalCompanyID := GlobalCompanyID);
 
 //don't track royalties for testseeds
 dRoyalties := if(runSeed_value, dataset([], Royalty.Layouts.Royalty),
@@ -229,7 +243,11 @@ final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([]
 
 
 clam := risk_indicators.Boca_Shell_Function(group(sort(ret,seq),seq), gateways, dppa_purpose, glb_purpose, isUtility, ln_branded,  
-									false, false, false, false, DataRestriction := DataRestriction, DataPermission := DataPermission);
+									false, false, false, false, DataRestriction := DataRestriction, DataPermission := DataPermission,
+                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                    TransactionID := TransactionID, 
+                                    BatchUID := BatchUID, 
+                                    GlobalCompanyID := GlobalCompanyID);
 
 
 
@@ -292,7 +310,7 @@ RiskWise.Layout_IDPO format_out(Risk_Indicators.Layout_Output le, model rt) := T
 	SELF.reason6 := self.ri[6].hri;
 
 		
-	//SELF.billing := IF(StringLib.StringFind(le.sources,'EQ',1) <> 0, dataset([{'equifax',1}], risk_indicators.Layout_Billing), dataset([],risk_indicators.Layout_Billing));
+	//SELF.billing := IF(STD.Str.Find(le.sources,'EQ',1) <> 0, dataset([{'equifax',1}], risk_indicators.Layout_Billing), dataset([],risk_indicators.Layout_Billing));
 	SELF := [];
 END;
 finalOutput := join(ret, model, left.seq=right.seq, format_out(left,right), left outer);

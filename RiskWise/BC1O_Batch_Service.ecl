@@ -11,7 +11,7 @@
 */
 /*--INFO-- bnk4 and the new cbbl */ //cbbl and bnk4 use relatives V2 for now.....
 //<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
-import gateway;
+IMPORT gateway;
 export BC1O_Batch_Service := MACRO
 
 #onwarning(4207, ignore);
@@ -32,6 +32,13 @@ batchin := dataset([],Riskwise.Layout_BC1O_BatchIn) : stored('batch_in', few);
 tribcode := StringLib.StringToLowerCase(tribcode_value);
 
 gateways := Gateway.Constants.void_gateway;
+
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 
 RiskWise.Layout_BC1I addseq(batchin l, integer C) := transform
 		 self.seq := C;
@@ -68,7 +75,11 @@ RiskWise.Layout_BC1I addseq(batchin l, integer C) := transform
 end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
-ret := if(tribCode in ['bnk4','cbbl'], project(RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction, DataPermission),
+ret := if(tribCode in ['bnk4','cbbl'], project(RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction, DataPermission,
+                                                                      LexIdSourceOptout := LexIdSourceOptout, 
+                                                                      TransactionID := TransactionID, 
+                                                                      BatchUID := BatchUID, 
+                                                                      GlobalCompanyID := GlobalCompanyID),
                                                TRANSFORM(riskwise.Layout_BC1O, SELF := LEFT)), 
 													  dataset([], riskwise.Layout_BC1O));
 

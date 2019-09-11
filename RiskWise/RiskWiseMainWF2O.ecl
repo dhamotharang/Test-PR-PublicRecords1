@@ -52,7 +52,7 @@
 */
 /*--INFO-- 'wfs2', 'wfs3', 'wfs4' */
     
-import address, Risk_Indicators, Models, gateway, Royalty, MDR;
+IMPORT Risk_Indicators, Models, gateway, Royalty, Riskwise, STD;
 
     
 export RiskWiseMainWF2O := MACRO
@@ -108,8 +108,12 @@ export RiskWiseMainWF2O := MACRO
 		'HistoryDateYYYYMM',
 		'runSeed',
 		'gateways',
-		'OutcomeTrackingOptOut'
-	));
+		'OutcomeTrackingOptOut',
+        'LexIdSourceOptout',
+        '_TransactionId',
+        '_BatchUID',
+        '_GCID'
+        ));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -179,7 +183,7 @@ string5  grade_value := ''				: stored('grade');
 string3  score_value := ''				: stored('score');
 boolean  runSeed_value := false 	: stored('runSeed');
 
-grade_val := Stringlib.stringtouppercase(grade_value);
+grade_val := STD.Str.touppercase(grade_value);
 
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
@@ -188,7 +192,13 @@ unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA  		: stored('GLBPurpose
 unsigned3 history_date := 999999  							: stored('HistoryDateYYYYMM');
 gateways_in := Gateway.Configuration.Get();
 
-tribCode := StringLib.StringToLowerCase(tribCode_value);
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
+tribCode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribCode in ['wfs3', 'wfs4'];
 
 productSet := ['wfs2','wfs3', 'wfs4'];
@@ -225,8 +235,8 @@ risk_indicators.layout_input into(rec l) := TRANSFORM
 	self.phone10 := hphone_val;	
 	self.wphone10 := wphone_val;	
 	
-	self.fname := stringlib.stringtouppercase(first_value);
-	self.lname := stringlib.stringtouppercase(last_value);	
+	self.fname := STD.Str.touppercase(first_value);
+	self.lname := STD.Str.touppercase(last_value);	
 	
 	self.in_streetAddress := addr_value;
 	self.in_city := city_value;
@@ -251,13 +261,13 @@ risk_indicators.layout_input into(rec l) := TRANSFORM
 	self.county := clean_a2[143..145];
 	self.geo_blk := clean_a2[171..177];
 			
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(drlcstate_value);
+	self.dl_number := STD.Str.touppercase(dl_num_clean);
+	self.dl_state := STD.Str.touppercase(drlcstate_value);
 	
 	self.email_address := email_value;
 	self.ip_address := ipaddr_value;
 	
-	self.employer_name := stringlib.stringtouppercase(cmpy_value);
+	self.employer_name := STD.Str.touppercase(cmpy_value);
 	
 	self := [];
 END;
@@ -265,7 +275,11 @@ prep := PROJECT(d,into(LEFT));
 
 BSversion := if(tribcode in ['wfs3', 'wfs4'], 2, 1);
 
-ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, false, false, true, true, true, in_bsversion := bsversion, in_DataRestriction:=datarestriction, in_DataPermission:=dataPermission);
+ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, false, false, true, true, true, in_bsversion := bsversion, in_DataRestriction:=datarestriction, in_DataPermission:=dataPermission,
+                                                                    LexIdSourceOptout := LexIdSourceOptout, 
+                                                                    TransactionID := TransactionID, 
+                                                                    BatchUID := BatchUID, 
+                                                                    GlobalCompanyID := GlobalCompanyID);
 
 dRoyalties :=if(runSeed_value and tribcode in testseedSet, dataset([], Royalty.Layouts.Royalty),
 								Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ret), src, TargusType, TRUE, FALSE, FALSE, TRUE));												
@@ -439,7 +453,11 @@ clam := if(tribCode in ['wfs2','wfs3','wfs4'],
 				risk_indicators.Boca_Shell_Function(ret, gateways, DPPA_Purpose, GLB_Purpose, 
 																		false, false, 
 																		includeRelativeInfo, includeDLInfo, includeVehInfo, includeDerogInfo, 
-																		BSversion,datarestriction:=datarestriction,datapermission:=datapermission),
+																		BSversion,datarestriction:=datarestriction,datapermission:=datapermission,
+                                                                        LexIdSourceOptout := LexIdSourceOptout, 
+                                                                        TransactionID := TransactionID, 
+                                                                        BatchUID := BatchUID, 
+                                                                        GlobalCompanyID := GlobalCompanyID),
 				group(dataset([],Risk_Indicators.Layout_Boca_Shell),seq));
 
 getAir := map(tribCode = 'wfs2' => Models.AIN605_2_0(clam, true, grade_val), 

@@ -4,7 +4,8 @@
   * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
   ***********************************************************************************************************
 */
-import $, ConsumerDisclosure, doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std, RiskWiseFCRA, FFD;
+import $, ConsumerDisclosure, doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std, RiskWiseFCRA, FFD,
+       dx_header, data_services;
 // call full header, call full override
 // join them together by rid, left outer
 // override key will only have fields populated that were corrected (recordid is RID), such as SSN, this will also have a bitmap field that stores a 1 for a null corrected value
@@ -14,6 +15,7 @@ import $, ConsumerDisclosure, doxie, fcra, ut, header_quick, Riskwise, risk_indi
 // fcra data layout will be layout_header plus addr flags
 // layout override will be layout header plus string blankout plus addr flags
 
+unsigned1 iType := Data_Services.data_env.iFCRA;
 
 todaysdate := (string) Std.Date.Today(); // for checking derog's fcra-date compliance
 unsigned3 history_date := 999999;	// removed the input history date, this query is not meant to be run in historical mode
@@ -22,6 +24,8 @@ layout_header_internal := record(FCRA.Layout_Override_Header)
   $.Layouts.InternalMetadata;
   boolean isPropagatedCorrection := false;
 end;
+
+key_header := dx_header.key_header(iType);
 
 export RawHeader := module
 
@@ -51,16 +55,16 @@ quick_header_suppressions := join(flagged_hdr_suppressions, Header_Quick.key_DID
                         trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
                         trim( (string)right.persistent_record_id ) = trim(left.record_id)   // new way - using persistent_record_id
                       ),
-                      transform( recordof(doxie.Key_fcra_Header), self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
+                      transform( dx_Header.layout_key_header, self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
                       LIMIT(0),KEEP($.Constants.Limits.MaxHeaderPerDID));
 
-header_main_suppressions := join(flagged_hdr_suppressions, doxie.Key_fcra_Header,	
+header_main_suppressions := join(flagged_hdr_suppressions, key_header,
                     keyed((unsigned)left.did=right.s_did) and
                     (
                         trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
                         trim( (string)right.persistent_record_id ) = trim(left.record_id)   // new way - using persistent_record_id
                       ),
-                    transform( recordof(doxie.Key_fcra_Header), 
+                    transform( dx_Header.layout_key_header, 
                       ssnToUse := IF(right.valid_ssn<>'M', right.ssn, '');	// if manufactured, then blank out
                       dobToUse := IF(right.valid_dob<>'M', right.dob, 0);	// if manufactured, then blank out
                       self.ssn := ssnToUse;
@@ -89,23 +93,23 @@ qheader_main := join(bshell_dids, Header_Quick.key_DID_fcra,
                       ~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and 
                       trim((string)right.did) + trim((string)right.rid) not in header_correction_keys // old way - exclude corrected records from prior to 11/13/2012
                       and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id		
-                      transform( recordof(doxie.Key_fcra_Header), self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
+                      transform( dx_header.layout_key_header, self.src:=if(right.src in ['QH','WH'],'EQ',right.src), self := right,  self := [] ),
                       LIMIT(0),KEEP($.Constants.Limits.MaxHeaderPerDID));
 
-header_main := join(bshell_dids, doxie.Key_fcra_Header,	
+header_main := join(bshell_dids, key_header,	
                     left.did<>0 and keyed(left.did=right.s_did) and
                     ((right.src='BA' and FCRA.bankrupt_is_ok(todaysdate,(string)right.dt_first_seen)) or
                     (right.src='L2' and FCRA.lien_is_ok(todaysdate,(string)right.dt_first_seen)) OR right.src not in ['BA','L2']) and
                     ~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]) and
                     trim((string)right.did) + trim((string)right.rid) not in header_correction_keys// old way - exclude corrected records from prior to 11/13/2012
                     and trim( (string)right.persistent_record_id ) not in header_correction_keys,  // new way - using persistent_record_id	
-                    transform( recordof(doxie.Key_fcra_Header), self := right ),
+                    transform( dx_header.layout_key_header, self := right ),
                     LIMIT(ut.limits.HEADER_PER_DID));	
 
 combo_header := qheader_main + header_main;
             
 // search citystatezip for each header record to get the corp/mil flag
-Riskwise.layouts_vru.Layout_Header_Data getZipFlag(recordof(doxie.Key_fcra_Header) le, riskwise.Key_CityStZip ri) := transform
+Riskwise.layouts_vru.Layout_Header_Data getZipFlag(dx_Header.layout_key_header le, riskwise.Key_CityStZip ri) := transform
   self.addr_flags.corpMil := if(ri.zipclass in ['U','M'], '1', '0');
   self := le;
   self := [];	// rest of the addr flags
@@ -187,11 +191,12 @@ wAdvo  := join(wHRIRoll, Advo.Key_Addr1_FCRA,
                           getAdvoFlags(left, right), LEFT OUTER,
                           KEEP(1), LIMIT(0));
 
-Riskwise.layouts_vru.Layout_Header_Data addUnitCount(Riskwise.layouts_vru.Layout_Header_Data le, doxie.Key_FCRA_AptBuildings ri) := transform
+key_apt_buildings := dx_header.key_AptBuildings(iType);
+Riskwise.layouts_vru.Layout_Header_Data addUnitCount(Riskwise.layouts_vru.Layout_Header_Data le, key_apt_buildings ri) := transform
   SELF.addr_flags.unit_count := ri.apt_cnt;
   SELF := le;
 end;
-wUnitCount := join(wADVO, doxie.Key_FCRA_AptBuildings,	
+wUnitCount := join(wADVO, key_apt_buildings,	
   left.did<>0 and trim(left.prim_name)<>'' and
     keyed(left.prim_range=right.prim_range) and 
     keyed(left.prim_name=right.prim_name) and
@@ -810,7 +815,7 @@ no_correction_needed := project(header_combined_ddp, transform(layout_header_int
 
 header_recs_temp := IF(EXISTS(header_corr), header_recs_with_correction, no_correction_needed);
 
-layout_header_internal xfmarksuppressed (layout_header_internal le, recordof(doxie.Key_fcra_Header) ri) := transform
+layout_header_internal xfmarksuppressed (layout_header_internal le, dx_header.layout_key_header ri) := transform
   is_suppressed_by_propagation	:= ~le.compliance_flags.isOverwritten and le.head.did=ri.did and
             le.head.fname=ri.fname and
             le.head.mname=ri.mname and

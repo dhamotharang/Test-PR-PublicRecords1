@@ -34,7 +34,7 @@
 */
 /*--INFO-- Migrating it21, it37, it51, it60, it61, it70, it90, i200, at00, bkd0, and wst4 to boca.  */
 
-import address, risk_indicators, Models, autoStandardI, seed_files, gateway;
+import risk_indicators, autoStandardI, seed_files, gateway, Riskwise, STD;
 
 export RiskWiseMainIT1O := macro
 
@@ -75,7 +75,11 @@ export RiskWiseMainIT1O := macro
 	'ApplicationType',
 	'runSeed',
 	'gateways',
-	'OutcomeTrackingOptOut'));
+	'OutcomeTrackingOptOut',
+    'LexIdSourceOptout',
+    '_TransactionId',
+    '_BatchUID',
+    '_GCID'));
 
 /* **********************************************
    *  Fields needed for improved Scout Logging  *
@@ -128,15 +132,21 @@ boolean   runSeed_value := false : stored('runSeed');
 gateways_in := Gateway.Configuration.Get();
 appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
+//CCPA fields
+unsigned1 LexIdSourceOptout := 1 : STORED('LexIdSourceOptout');
+string TransactionID := '' : STORED('_TransactionId');
+string BatchUID := '' : STORED('_BatchUID');
+unsigned6 GlobalCompanyId := 0 : STORED('_GCID');
+
 product_set := ['it21','it37','it51','it60','it70','it90','i200','at00','bkd0','wst4','it61'];
 
 d := dataset([{0}],RiskWise.Layout_IT1I);
-tribcode := StringLib.StringToLowerCase(tribCode_value);
+tribcode := STD.Str.ToLowerCase(tribCode_value);
 boolean Log_trib := tribcode in ['at00', 'it61', 'it70'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := if(trim(StringLib.StringToLowerCase(le.servicename)) = 'veris', le.url, ''); // default to no gateway call			 
+	self.url := if(trim(STD.Str.ToLowerCase(le.servicename)) = 'veris', le.url, ''); // default to no gateway call			 
 	self := le;
 end;
 gateways := project(gateways_in, gw_switch(left));
@@ -196,7 +206,11 @@ final_seed := if(runSeed_value, project(it1i_seed_output, format_seed(left)), da
 final := map(
 	tribcode not in product_set             => dataset( [], RiskWise.Layout_IT4O ),
 	count(final_seed) > 0 and runSeed_Value => final_seed,
-	riskwise.IT1O_Function(indata, gateways, dppa_purpose, glb_purpose, DataRestriction:=DataRestriction,appType:=appType, DataPermission:=DataPermission)
+	riskwise.IT1O_Function(indata, gateways, dppa_purpose, glb_purpose, DataRestriction:=DataRestriction,appType:=appType, DataPermission:=DataPermission,
+                                            LexIdSourceOptout := LexIdSourceOptout, 
+                                            TransactionID := TransactionID, 
+                                            BatchUID := BatchUID, 
+                                            GlobalCompanyID := GlobalCompanyID)
 );
 
 map_score1 := map(tribcode in ['it51','it60','it61','it70', 'i200'] => 1,

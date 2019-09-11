@@ -1,9 +1,11 @@
-﻿import doxie, ut, codes, iesp;
+import $, doxie, ut, codes, iesp, std;
 import AutoStandardI, VehicleV2_Services, Autokey_batch, CriminalRecords_Services;
 import VehicleV2, VehicleCodes, suppress, Census_Data, doxie_raw, MDR, Driversv2;
 
 
 export Functions := MODULE;
+
+
 
 	EXPORT STRING getSearchDataSource(VehicleV2_Services.IParam.polkParams in_mod, BOOLEAN doCombined) := FUNCTION
 		/* doCombined = true Rules: if state with in list LOCAL_STATES_SEARCH,
@@ -15,10 +17,6 @@ export Functions := MODULE;
 
 		IsLocalState := state IN Constant.LOCAL_STATES_SEARCH;	
 			
-		/*DataSource := MAP((NOT doCombined) => in_mod.DataSource, 
-											(NOT EXISTS(state)) => Constant.ALL_VAL, 
-											isLocalState => Constant.LOCAL_VAL, 
-											Constant.ALL_VAL);	*/
 		datasource := IF (doCombined AND in_mod.datasource != Constant.Local_val
 												,IF(isLocalState, Constant.LOCAL_VAL, Constant.All_val)
 												,in_mod.datasource);
@@ -204,9 +202,9 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
     model_year := r.best_model_year;
     self.model_year := if(year_make = '' or model_year = year_make, model_year,skip);
 
-    self.make_desc := if( stringlib.StringToUpperCase(make_description) = stringlib.StringToUpperCase(make_desc)[1..length(trim(make_description))] or make_desc='',make_description,skip);
+    self.make_desc := if( std.str.ToUpperCase(make_description) = std.str.ToUpperCase(make_desc)[1..length(trim(make_description))] or make_desc='',make_description,skip);
    
-    self.model_desc := if( stringlib.StringToUpperCase(model_description) = stringlib.StringToUpperCase(model_desc)[1..length(trim(model_description))] or model_desc='',model_description,skip);
+    self.model_desc := if( std.str.ToUpperCase(model_description) = std.str.ToUpperCase(model_desc)[1..length(trim(model_description))] or model_desc='',model_description,skip);
     MAC_Report_Out();
 		self.cnp_entered := aInputData.companyname != '' 
 									OR aInputData.lastname != '' 
@@ -234,6 +232,11 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
 		string8 title_issue_date;
     string17 title_number;
     string30 reported_name;
+  end;
+  
+  shared rec_party_plus := record (rec_party)
+   unsigned4 global_sid;
+   unsigned8 record_sid;
   end;
 
     // Constant
@@ -342,9 +345,9 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
           ut.StringSimilar(a, c) <= ut.StringSimilar(b, c) => a,
           b);
 
-  shared rec_party get_parties_report ( keyVParty r) := TRANSFORM
+  shared rec_party_plus get_parties_report ( keyVParty r, boolean minors_allowed) := TRANSFORM
     UNSIGNED1 age := IF(r.Orig_DOB = BLNK, 0, ut.age((integer) r.Orig_DOB));
-    BOOLEAN ofage := ut.PermissionTools.GLB.minorOK(age);
+    BOOLEAN ofage := doxie.compliance.minor_ok(age, minors_allowed);
     SELF.history_desc := IF(ofage, Codes.VEHICLE_REGISTRATION.HISTORY_FLAG(r.History), BLNK);
     SELF.Append_DID := IF (ofage AND r.Append_DID != 0, INTFORMAT (r.Append_DID, 12, 1), BLNK);
     SELF.Append_BDID := IF(ofage AND r.Append_BDID != 0, INTFORMAT (r.Append_BDID, 12, 1), BLNK);
@@ -362,19 +365,19 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
     SELF.County_Name := '';
     SELF.HasCriminalConviction := FALSE;
     SELF.IsSexualOffender := FALSE;
-		self := r; //business ids
+		self := r; //business ids /global_sid/record_sid 
 		self := [];
   END;
 		
   // same as report but with penalty calculations; implemented as a function to minimize transform content
-  shared rec_party get_parties_search (Layout_VKeysWithInput l, keyVParty r,
+  shared rec_party_plus get_parties_search (Layout_VKeysWithInput l, keyVParty r,
                                        IParam.searchParams aInputData, boolean penalize_by_party_addr = false) := FUNCTION
 
     aInputData_E2 := VehicleV2_Services.IParam.getSearchModule_entity2();
 		
-		rec_party mTransform := TRANSFORM
+		rec_party_plus mTransform := TRANSFORM
       UNSIGNED1 age := IF(r.Orig_DOB = BLNK, 0, ut.age ((integer) r.Orig_DOB));
-      BOOLEAN ofage := ut.PermissionTools.GLB.minorOK(age);
+      BOOLEAN ofage := doxie.compliance.minor_ok(age, aInputData.show_minors);
       
       //company name and its penalty
       STRING company := IF(r.Orig_Party_Type = PARTY_T_INDV, BLNK, TRIM(r.Orig_Name));
@@ -383,14 +386,14 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
       cname_penalty_E1 := penaltyCName(aInputData, company);
 			cname_penalty_E2 := penaltyCName(aInputData_E2, company);
       penaltyCompany_E1 := IF(StringLib.StringFind(company, SP + comp_name_E1 + SP, 1) > 0 OR
-        StringLib.StringFind(company, comp_name_E1 + SP, 1) = 1 OR
-        StringLib.StringReverse(company)[1..length(comp_name_E1)+1] = StringLib.StringReverse(SP + comp_name_E1) OR
+       std.str.Find(company, comp_name_E1 + SP, 1) = 1 OR
+       std.str.Reverse(company)[1..length(comp_name_E1)+1] =std.str.Reverse(SP + comp_name_E1) OR
         ut.StringSimilar(company, aInputData.Company) = 0,
         IF(cname_penalty_E1 > 1, 1, cname_penalty_E1), cname_penalty_E1);
 				
 			penaltyCompany_E2 := IF(StringLib.StringFind(company, SP + comp_name_E2 + SP, 1) > 0 OR
-        StringLib.StringFind(company, comp_name_E2 + SP, 1) = 1 OR
-        StringLib.StringReverse(company)[1..length(comp_name_E2)+1] = StringLib.StringReverse(SP + comp_name_E2) OR
+       std.str.Find(company, comp_name_E2 + SP, 1) = 1 OR
+       std.str.Reverse(company)[1..length(comp_name_E2)+1] = std.str.Reverse(SP + comp_name_E2) OR
         ut.StringSimilar(company, aInputData_E2.Company) = 0,
         IF(cname_penalty_E2 > 1, 1, cname_penalty_E2), cname_penalty_E2);
 
@@ -471,7 +474,7 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
   shared VehicleV2_Services.Layouts.Layout_Report_Batch_New GetRolledView (
     GROUPED dataset (Layout_Report_Out_Veh) pre_veh_recs1,
     dataset (rec_party) pre_party_recs0,
-    IParam.reportParams aInputData,
+    $.IParam.reportParams aInputData,
     boolean report_mode) := FUNCTION
     
     unsigned2 penalty_threshold := aInputData.penalty_threshold;    
@@ -502,15 +505,15 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
       
     Census_Data.MAC_Fips2County_Keyed(party_res, st, fips_county, county_name, pre_party_recs1)
 
-		Suppress.MAC_Suppress(pre_party_recs1,pull_dids,aInputData.applicationType,Suppress.Constants.LinkTypes.DID,append_DID);
-		Suppress.MAC_Suppress(pull_dids,pull_ssns0,aInputData.applicationType,Suppress.Constants.LinkTypes.SSN,append_ssn);
-		Suppress.MAC_Suppress(pull_ssns0,pull_ssns,aInputData.applicationType,Suppress.Constants.LinkTypes.SSN,orig_ssn);
+		Suppress.MAC_Suppress(pre_party_recs1,pull_dids,aInputData.application_type,Suppress.Constants.LinkTypes.DID,append_DID);
+		Suppress.MAC_Suppress(pull_dids,pull_ssns0,aInputData.application_type,Suppress.Constants.LinkTypes.SSN,append_ssn);
+		Suppress.MAC_Suppress(pull_ssns0,pull_ssns,aInputData.application_type,Suppress.Constants.LinkTypes.SSN,orig_ssn);
     doxie.MAC_PruneOldSSNs(pull_ssns, party_recs_pruned0, append_ssn, append_did);
     doxie.MAC_PruneOldSSNs(party_recs_pruned0,party_recs_pruned,orig_ssn,append_did);
     
     
-    ssn_mask_value := aInputData.ssnMask;
-    dl_mask_value := aInputData.dl_Mask;
+    ssn_mask_value := aInputData.ssn_mask;
+    dl_mask_value := aInputData.dl_mask = 1;
     exclude_lessors := aInputData.excludeLessors;
     displayMatchedParty_value := aInputData.displayMatchedParty;
       
@@ -518,8 +521,8 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
     suppress.mac_mask(party_recs0,party_recs1,orig_ssn,blank,true,false)
     suppress.mac_mask(party_recs1,party_recs,blank,Orig_DL_Number,false,true)
 
-		dppa_ok := AutoStandardI.InterfaceTranslator.dppa_ok.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.dppa_ok.params));
-		glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.glb_ok.params));
+		dppa_ok := aInputData.isValidDppa();
+		glb_ok := aInputData.isValidGlb();
 		
 		temp_rec := record
 			party_recs;
@@ -534,13 +537,13 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
 													 dppa_ok,
 													 glb_ok, 
 													 ,
-													 doxie.DataRestriction.fixed_DRM);
+													 aInputData.DataRestrictionMask);
 						
 						
 			// use best file to get DOB and SEX, if missing in the original data.
 		rec_party get_dob_sex(party_recs r, outfile ri) := transform
       age := if(r.orig_dob != '', ut.age((integer)r.orig_dob), if (ri.dob = 0, 0, ut.age(ri.dob)));
-      ofage :=ut.PermissionTools.glb.minorOk(age);
+      ofage :=doxie.compliance.minor_ok(age, aInputData.show_minors);
       best_sex := map (ri.title = 'MS' => 'F', ri.title = 'MR' => 'M','U'); // same as in drivers
 
       self.orig_dob := if( r.orig_dob <> '' and ofage,r.orig_dob,(string8) ri.dob);
@@ -729,12 +732,11 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
 									LEFT OUTER,KEEP(1));
 	ENDMACRO;
 
-  EXPORT GetVehicleReport (VehicleV2_Services.IParam.reportParams aInputData, GROUPED dataset(Layout_Vehicle_Key) in_veh_keys,
-                     STRING in_ssn_mask_type = '') := FUNCTION
+  EXPORT GetVehicleReport (VehicleV2_Services.IParam.reportParams aInputData, 
+                           GROUPED dataset(Layout_Vehicle_Key) in_veh_keys) := FUNCTION
 										 
-		boolean isCNSMR := aInputData.IndustryClass = 'CNSMR';
-    dppa_purpose_x := aInputData.dppapurpose;  // from business_header/doxie_MAC_Field_Declare()
-		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and ~doxie.DataRestriction.InfutorMV;
+		boolean isCNSMR := aInputData.isConsumer();
+		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and doxie.compliance.isInfutorMVRestricted(aInputData.DataRestrictionMask);
 		
 	  pre_veh_recs0_info := join(in_veh_keys, VehicleV2.Key_Vehicle_Main_Key,
                           keyed(left.Vehicle_Key = right.Vehicle_Key) and
@@ -745,19 +747,19 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
 
 			pre_veh_recs0 := if(~isCNSMR, pre_veh_recs0_info);
 
-    _pre_veh_recs1 := pre_veh_recs0(ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose_x,,source_code) or
-																	  (source_code in MDR.sourceTools.set_infutor_all_veh and ut.PermissionTools.dppa.ok(dppa_purpose_x)));
+    _pre_veh_recs1 := pre_veh_recs0(aInputData.isValidDppaState(state_origin,,source_code) or
+																	  (source_code in MDR.sourceTools.set_infutor_all_veh and aInputData.isValidDppa()));
 
-    r_j_vehicleparty := JOIN(in_veh_keys, keyVParty,
+    r_j_vehicleparty_pre := JOIN(in_veh_keys, keyVParty,
                 KEYED(LEFT.Vehicle_key = RIGHT.Vehicle_key) AND
                 KEYED(LEFT.Iteration_key = RIGHT.Iteration_key) AND
                 KEYED(LEFT.Sequence_key = RIGHT.Sequence_key) and
 								(include_non_regulated_data or right.source_code not in MDR.sourceTools.set_infutor_all_veh),
-                get_parties_report (RIGHT),
+                get_parties_report (RIGHT, aInputData.show_minors),
                 KEEP(VehicleV2_Services.Constant.PARTIES_PER_VEHICLE),
 								LIMIT(0));
-													
-  
+	r_j_vehicleparty_1 := suppress.mac_suppresssource(r_j_vehicleparty_pre,aInputData,append_did);												
+  r_j_vehicleparty := project(r_j_vehicleparty_1,rec_party);
  	r_j := if(~isCNSMR, r_j_vehicleparty);
     pre_party_recs0 := UNGROUP(r_j);		
 		MAC_JoinLatestDLAndPrePartyRecs(pre_party_recs0, outputPrePartyRecs);
@@ -765,13 +767,12 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
     return GetRolledView (_pre_veh_recs1, outputPrePartyRecs, aInputData, true);
   END;
 
-  EXPORT Get_VehicleSearch (VehicleV2_Services.IParam.searchParams aInputData, GROUPED dataset(VehicleV2_Services.Layout_VKeysWithInput) in_veh_keys,                      
-                      STRING in_ssn_mask_type = '', BOOLEAN penalize_by_party = FALSE) := FUNCTION
+  EXPORT Get_VehicleSearch (VehicleV2_Services.IParam.searchParams aInputData, GROUPED dataset(VehicleV2_Services.Layout_VKeysWithInput) in_veh_keys,
+                            BOOLEAN penalize_by_party = FALSE) := FUNCTION
 											
-		boolean isCNSMR := aInputData.IndustryClass = 'CNSMR';									
-    dppa_purpose_x := aInputData.dppapurpose;  // from business_header/doxie_MAC_Field_Declare()
+		boolean isCNSMR := aInputData.isConsumer();									
     unsigned2 penalty_threshold := aInputData.penalty_threshold;    
-		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and ~doxie.DataRestriction.InfutorMV;
+		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and ~doxie.compliance.isInfutorMVRestricted(aInputData.DataRestrictionMask);
 		
     pre_veh_recs0_info := join(in_veh_keys, VehicleV2.Key_Vehicle_Main_Key,
                           keyed(left.Vehicle_Key = right.Vehicle_Key) and
@@ -782,10 +783,10 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
 														
 			pre_veh_recs0 := if(~isCNSMR, pre_veh_recs0_info);
 
-    pre_veh_recs1 := pre_veh_recs0(ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose_x,,source_code) or
-																	 (source_code in MDR.sourceTools.set_infutor_all_veh and ut.PermissionTools.dppa.ok(dppa_purpose_x)));
+    pre_veh_recs1 := pre_veh_recs0(aInputData.isValidDppaState(state_origin,,source_code) or
+																	 (source_code in MDR.sourceTools.set_infutor_all_veh and aInputData.isValidDppa()));
 		
-    r_j_vehicleparty := JOIN(in_veh_keys, keyVParty,
+    r_j_vehicleparty_pre := JOIN(in_veh_keys, keyVParty,
                 KEYED(LEFT.Vehicle_key = RIGHT.Vehicle_key) AND
                 KEYED(LEFT.Iteration_key = RIGHT.Iteration_key) AND
                 KEYED(LEFT.Sequence_key = RIGHT.Sequence_key) and
@@ -794,7 +795,9 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
                 KEEP(Constant.PARTIES_PER_VEHICLE),
 								LIMIT(0));
     					
-  
+  r_j_vehicleparty_1 := suppress.mac_suppresssource(r_j_vehicleparty_pre,aInputData,append_did);
+  r_j_vehicleparty := project(r_j_vehicleparty_1, rec_party);
+
  	 r_j := if(~isCNSMR, r_j_vehicleparty);
 
     pre_party_recs := UNGROUP(r_j(party_penalty <= penalty_threshold));
@@ -806,7 +809,7 @@ export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_pa
     CriminalRecords_Services.MAC_Indicators(recsIn,recsOut);
     pre_party_recs1 := IF(aInputData.IncludeCriminalIndicators,PROJECT(recsOut,rec_party),outputPrePartyRecs);
 
-		commonParam := MODULE(PROJECT(aInputData, VehicleV2_Services.IParam.reportParams,opt)) END;
+		commonParam := MODULE(PROJECT(aInputData, VehicleV2_Services.IParam.reportParams)) END;
 		
 		return GetRolledView (pre_veh_recs1, pre_party_recs1, commonParam, false);
   END;
