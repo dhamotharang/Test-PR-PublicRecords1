@@ -1,5 +1,7 @@
 ﻿IMPORT MDR, PhonesInfo, Std;
 
+//DF-26089: Deltabase Gateway History Add Additional Fields
+
 EXPORT Map_Deltabase_Gateway(string8 version) := FUNCTION
 
 inFile 				:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Raw;
