@@ -104,6 +104,11 @@ inFile 				:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Raw;
 		self.loststolen_date							:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.loststolen_date, left, right)), '0123456789')[1..8];
 		self.account_activation_date			:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.account_activation_date, left, right)), '0123456789')[1..8];
 		self.line_activation_date					:= stringlib.stringfilter(DeltabaseGateway._Functions.rmNull(trim(l.line_activation_date, left, right)), '0123456789')[1..8];	
+		//DF-26089: Temp_Fix	
+		self.imsi_tenure_mindays					:= 0;
+		self.imsi_tenure_maxdays					:= 0;
+		self.imei_tenure_mindays					:= 0;
+		self.imei_tenure_maxdays					:= 0;
 		self 															:= l;
 	end;
 	
