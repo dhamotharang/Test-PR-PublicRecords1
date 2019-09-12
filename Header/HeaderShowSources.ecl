@@ -185,14 +185,14 @@ for_rid := IF ('FR' IN sources,
                 join(en_rid,header.Key_Src_for,
                       left.src='FR' and 
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),
-                      transform(rid_rec, self.for_child := project(right.for_child, property.Layout_Fares_Foreclosure), self := left),
+                      transform(rid_rec, self.for_child := project(right.for_child, property.Layout_Fares_Foreclosure_Ex_Sids), self := left),
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 en_rid);
 
 nod_rid := IF ('NT' IN sources,
                 join(for_rid,header.Key_Src_NOD,left.src='NT' and 
                       keyed(left.uid=right.uid) and keyed(left.src=right.src),
-                      transform(rid_rec, self.nod_child := project(right.nod_child, property.Layout_Fares_Foreclosure), self := left),
+                      transform(rid_rec, self.nod_child := project(right.nod_child, property.Layout_Fares_Foreclosure_Ex_Sids), self := left),
                       left outer,LIMIT(ut.limits.CRS_SOURCE_COUNT.DEFAULT,SKIP)),
                 for_rid);
 

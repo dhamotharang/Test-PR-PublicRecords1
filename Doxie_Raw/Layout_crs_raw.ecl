@@ -50,7 +50,7 @@ export Layout_crs_raw := record, maxlength(doxie_crs.maxlength_report)
   dataset(header_quick.layout_records) QuickHeader_child;
   dataset(header.Layout_Eq_src_dates) eq_child; // #138824
   dataset(ExperianCred.Layouts.Layout_SourceDoc) EN_child;
-  dataset(Property.Layout_Fares_Foreclosure) for_child;
+  dataset(Property.Layout_Fares_Foreclosure_Ex_Sids) for_child;
   dataset(iesp.foreclosure.t_ForeclosureReportRecord) nod_child{xpath('NoticesOfDefaults/NoticeOfDefaults')};
   dataset(emerges.Layout_Boats_In) boater_child;
   dataset(LN_TU.Layout_In_Header_All) tu_child;

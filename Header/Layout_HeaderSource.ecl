@@ -28,8 +28,8 @@ export Layout_HeaderSource := record
  dataset(vehiclev2_services.Layout_Report) veh_v2_child;
  dataset(header.Layout_Eq_src_dates) eq_child; //138824 
  dataset(ExperianCred.Layouts.Layout_SourceDoc) en_child;
- dataset(Property.Layout_Fares_Foreclosure) for_child; 
- dataset(Property.Layout_Fares_Foreclosure) nod_child; 
+ dataset(Property.Layout_Fares_Foreclosure_Ex_Sids) for_child; 
+ dataset(Property.Layout_Fares_Foreclosure_Ex_Sids) nod_child; 
  dataset(DEA.layout_DEA_In) dea_child;
  dataset(DEAV2_Services.assorted_layouts.Layout_Output) dea_v2_child;
  dataset(faa.layout_aircraft_registration_out_slim) airc_child;
