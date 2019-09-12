@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Doxie;
 
 EXPORT Layouts := MODULE
@@ -9,8 +9,8 @@ EXPORT Layouts := MODULE
 			STRING8   date          := '';  // For VehicleV2 VIN/LicPlate
 			STRING9   FEIN          := '';
 			STRING120 comp_name     := '';
-			STRING72  sic_code      := '';
-			STRING14  filing_number := '';  // For UCC Liens.
+			STRING72  sic_code      := '';			
+			STRING25  filing_number := '';  // For UCC Liens.
 			STRING45  apn           := '';
 			STRING5   fips_code     := '';
 			UNSIGNED6 bdid			:= 0; 	// For Bankruptcy
