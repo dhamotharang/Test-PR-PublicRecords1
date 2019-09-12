@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT Proc_Iterate(STRING iter,string keyversion/*HACKProcIterate01 -- add keyversion*/,DATASET(Layout_DOT_Base) InFile = BIPV2_ProxID.In_DOT_Base,STRING OutFileNameP = '~temp::Proxid::BIPV2_ProxID::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED MM := BIPV2_ProxID.matches(InFile, MatchThreshold); // Get the matching module
 SHARED S := Specificities(InFile).Specificities[1];
-dsOSR := CHOOSEN(MM.MatchSampleRecords,10000);
+dsOSR := CHOOSEN(MM.MatchSampleRecords,1000);
 dsOSL := CHOOSEN(MM.ToSlice,1000);
 OSL := OUTPUT(dsOSL,NAMED('SliceOutCandidates'));
 OSR := OUTPUT(dsOSR,NAMED('MatchSampleRecords'));
