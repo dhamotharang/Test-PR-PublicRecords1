@@ -1,6 +1,4 @@
-﻿//DF-26089: Deltabase Gateway History Add Additional Fields
-
-EXPORT Layout_Deltabase_Gateway := MODULE
+﻿EXPORT Layout_Deltabase_Gateway := MODULE
 
 	export Historic_Results_Raw := record
 			string transaction_id;
