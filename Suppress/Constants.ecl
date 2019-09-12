@@ -1,7 +1,8 @@
-export Constants := module
+﻿export Constants := module
 	export dateMask := enum(unsigned1,NONE=0,DAY,MONTH,YEAR,ALL);
-	Export NonSubjectSuppression := ENUM(integer1,notSpecified=0,doNothing,returnRestrictedDescription,returnBlank);
-	Export set of integer1 ValidNSS_Set := [NonSubjectSuppression.doNothing,NonSubjectSuppression.returnRestrictedDescription,NonSubjectSuppression.returnBlank];
+	Export NonSubjectSuppression := ENUM(integer1,notSpecified=0,doNothing,returnRestrictedDescription,returnBlank,returnNameOnly);
+	Export set of integer1 ValidNSS_Set := [NonSubjectSuppression.doNothing,NonSubjectSuppression.returnRestrictedDescription,NonSubjectSuppression.returnBlank,NonSubjectSuppression.returnNameOnly];
+	// nss value of 4 currently supported only in Liens & judgements, Property, Watercraft, Marriage & Divorce.
 	
 	/*
 		If you add new application types, you are going to be redeploying all the related services
