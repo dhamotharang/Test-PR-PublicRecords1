@@ -188,8 +188,6 @@ EXPORT Layout_Deltabase_Gateway := MODULE
 			integer5	imsi_change_count;
 			string20	imsi_trackedsince;
 			string20	imsi_activationdate;
-			integer5  imsi_tenure_mindays;
-			integer5  imsi_tenure_maxdays;
 			string100	iccid;
 			string8		iccid_seensince;
 			string6		iccid_seensince_time;
@@ -219,8 +217,6 @@ EXPORT Layout_Deltabase_Gateway := MODULE
 			integer5	imei_change_count;
 			string20	imei_tracked_since;
 			string20	imei_activationdate;
-			integer5	imei_tenure_mindays;
-			integer5  imei_tenure_maxdays;
 			integer5	first_name_score;
 			integer5	last_name_score;
 			integer5	addr_score;
