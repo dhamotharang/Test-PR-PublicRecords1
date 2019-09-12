@@ -1,4 +1,4 @@
-﻿import std;
+﻿IMPORT std;
 
 noTx := row([],Layout_GetRelationship.TransactionalFlags_layout);
 
