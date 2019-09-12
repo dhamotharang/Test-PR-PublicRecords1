@@ -670,9 +670,10 @@ EXPORT ds_config  :=  DATASET([
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Proc_Iterate
 EXPORT ds_ProcIterate  :=  DATASET([
-       {pModule,'Proc_Iterate','STRING iter'                        ,'HACKProcIterate01' ,'STRING iter,string keyversion/*HACKProcIterate01 -- add keyversion*/'            ,'add keyversion to parameters'          }
-      ,{pModule,'Proc_Iterate','Keys[(]InFile[)].BuildAll;'         ,'HACKProcIterate02'                   ,'Keys(InFile,keyversion).BuildAll; // HACKProcIterate02 keys to add keyersion'    ,'add keyversion parameter to keys call' }
-      ,{pModule,'Proc_Iterate','changes_it\'[+]iter;'               ,'HACKProcIterate03'                   ,'changes_it\'+keyversion;/* HACKProcIterate03 use keyversion for changes file*/'  ,'change to keyversion for changes file' }
+       {pModule,'Proc_Iterate','STRING iter'                                ,'HACKProcIterate01' ,'STRING iter,string keyversion/*HACKProcIterate01 -- add keyversion*/'                         ,'add keyversion to parameters'           }
+      ,{pModule,'Proc_Iterate','Keys[(]InFile[)].BuildAll;'                 ,'HACKProcIterate02' ,'Keys(InFile,keyversion).BuildAll; // HACKProcIterate02 keys to add keyersion'                 ,'add keyversion parameter to keys call'  }
+      ,{pModule,'Proc_Iterate','changes_it\'[+]iter;'                       ,'HACKProcIterate03' ,'changes_it\'+keyversion;/* HACKProcIterate03 use keyversion for changes file*/'               ,'change to keyversion for changes file'  }
+      ,{pModule,'Proc_Iterate','CHOOSEN[(]MM[.]MatchSampleRecords,10000[)]' ,'HACKProcIterate04' ,'CHOOSEN(MM.MatchSampleRecords,1000)/*HACKProcIterate04 -- lower MatchSampleRecords to 1000*/' ,'lower MatchSampleRecords to 1000'       }
   ],Tools.layout_attribute_hacks2);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
