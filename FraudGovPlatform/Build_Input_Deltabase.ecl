@@ -89,7 +89,7 @@ firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
 	shared Valid_Recs :=	join (	
 		append_source,
 		f1_bypass_dedup,
-		left.source_rec_id = right.source_rec_id,
+		left.inqlog_id = right.inqlog_id,
 		TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),
 		LEFT ONLY,
 		LOOKUP);
