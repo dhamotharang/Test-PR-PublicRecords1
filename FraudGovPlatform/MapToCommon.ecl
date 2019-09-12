@@ -97,9 +97,8 @@ module
 	EXPORT NewBaseLexid := Append_Lexid (Append_CleanAdditionalAddress):independent;
 
 	// Supress CCPA
-	// dataset([],BatchServices.WorkPlace_Layouts.POE_lookup);
-	mod_access := doxie.IDataAccess; 
-	EXPORT Supress_CCPA := Suppress.MAC_SuppressSource(NewBaseLexid, mod_access , did, NULL, true, data_services.data_env.iNonFCRA);
+	mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
+	EXPORT Supress_CCPA := Suppress.MAC_SuppressSource(NewBaseLexid, mod_access, did, NULL,TRUE);
 	
 	// Append RinID
 	EXPORT NewBaseRinID := Append_RinID (Supress_CCPA):independent;
