@@ -1,11 +1,17 @@
 ﻿import Std;
 
-export Send_Email(string filedate='',string st='',string fn='') := MODULE
+export Send_Email(string filedate='',string fn='', string groupid='') := MODULE
 	
 	
-	shared UpSt:=stringlib.stringtouppercase(st);
+ 
 	//shared nacfilesupport:='nacfilesupport@lexisnexis.com';
-	shared def := 'charles.salvo@lexisnexisrisk.com';
+	
+	
+	
+ 
+	SHARED def := NAC_V2.MOD_InternalEmailsList.fn_GetInternalRecipients('File Processing Completed', groupid);
+	
+	 
 	
 	shared SendMail(string sendto, string subject, string body) := 
 						STD.System.Email.SendEmail(sendto, subject, body);
@@ -76,3 +82,8 @@ export Send_Email(string filedate='',string st='',string fn='') := MODULE
 
 
 end;
+
+
+
+
+

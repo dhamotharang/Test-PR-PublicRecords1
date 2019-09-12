@@ -9,35 +9,28 @@ EXPORT MOD_ExternalEmailsList := MODULE
 
 
 
+ 
 
-
-
-EXPORT rlExternalEmail :=  
-RECORD
-   		STRING10     GroupID;
-   		STRING100    EventType;
-   		STRING       EmailAddress;
-   		STRING1      IsRecipientInactive;
-END; 
-
-
-
-SHARED SuperFileName_External := '~thor_data400::PPA::external_email_distribution';
+  
 SHARED dsGroupConfig := NAC_V2.dNAC2Config;   //  points to "~nac::nac2::groups_config_xx"
 
 
 
 EXPORT fn_GetExternalRecipients 
-(
+( 
 	STRING50    pGroupID,
 	STRING100   pEventType
 )  
 := FUNCTION	
 
 
+
+
+
 	 dsFilteredExternalEmailsList := 
-		DATASET(SuperFileName_External, rlExternalEmail, THOR, OPT) 
+		DATASET(Constants.SuperFileName_External, Layouts.rlExternalEmail, THOR, OPT) 
 					(IsRecipientInactive = 'N', GroupID = pGroupID, EventType = pEventType); 
+
 	
 	
 	dsStaging01 :=  
@@ -84,20 +77,20 @@ END;
 
 
 EXPORT dsExternalAllEmailsList := 
-	DATASET(SuperFileName_External, rlExternalEmail, THOR, OPT); 
+	DATASET(Constants.SuperFileName_External, Layouts.rlExternalEmail, THOR, OPT); 
 	
 	
 	
 	
 EXPORT fn_InsertRecipients
 (   
-	DATASET(rlExternalEmail) dsInsert //= DATASET([],  rlExternalEmailFile)
+	DATASET(Layouts.rlExternalEmail) dsInsert //= DATASET([],  rlExternalEmailFile)
 ):= 
 FUNCTION
 	Layouts.rlEmailValidation dsEmailValidation := PROJECT(dsInsert, {LEFT.EmailAddress}); 
 	fn_IsEmailAddressFormatValid(dsEmailValidation); // for checking email addresses are in correct format
 	dsRecordsToProcess := SORT(DEDUP((dsExternalAllEmailsList + dsInsert)), GroupID, EventType, EmailAddress);  	
-	PromoteSupers.MAC_SF_BuildProcess(dsRecordsToProcess, SuperFileName_External, dsResult,,, true);
+	PromoteSupers.MAC_SF_BuildProcess(dsRecordsToProcess, Constants.SuperFileName_External, dsResult,,, true);
 	OUTPUT(dsInsert, NAMED('to_be_inserted'));	
 	RETURN dsResult;		 
 END;
@@ -107,12 +100,12 @@ END;
 
 EXPORT fn_DeleteRecipients 
 (  
-	DATASET(rlExternalEmail) dsDelete //= DATASET([],  rlExternalEmailFile)
+	DATASET(Layouts.rlExternalEmail) dsDelete //= DATASET([],  rlExternalEmailFile)
 ):= 
 FUNCTION
 	dsRecordsToProcess := SORT(DEDUP((dsExternalAllEmailsList - dsDelete)), GroupID, EventType, EmailAddress); 
 	OUTPUT(dsDelete, NAMED('records_to_be_deleted'));
-	PromoteSupers.MAC_SF_BuildProcess(dsRecordsToProcess, SuperFileName_External, dsResult,,, true);		
+	PromoteSupers.MAC_SF_BuildProcess(dsRecordsToProcess, Constants.SuperFileName_External, dsResult,,, true);		
 	RETURN dsResult;	 
 END; 
  
