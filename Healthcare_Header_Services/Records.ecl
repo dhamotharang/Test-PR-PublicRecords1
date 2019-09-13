@@ -41,7 +41,7 @@ EXPORT Records := module
 		ReEntryGSASanctionRecords := ReEntryRecords(ProviderSrc = Constants.SRC_GSA_SANC);//These are records that are coming back into the code from a result list and are from GSA -  entered sanctionId
 		IndividualRecords := SearchInputRecords+ReEntryHeaderRecords;//The reentry records could be Individual
 		getLNPIDs := Header_Records_SearchKeys(IndividualRecords,cfg).getHdrLNPids;
-		DidNotReturn := project(join(IndividualRecords,getLNPIDs,left.acctno=right.acctno,transform(left),left only),transform(Layouts.searchKeyResults_plus_input,self.isSearchFailed:=true;self:=left));;
+		DidNotReturn := project(join(IndividualRecords,getLNPIDs,left.acctno=right.acctno,transform(left),left only),transform(Layouts.searchKeyResults_plus_input,self.glb_ok:=cfg[1].glb_ok;self.isSearchFailed:=true;self:=left));;
 		//Separate Header good hits and failures 
 		failedSearches := project(getLNPIDs(isSearchFailed=true)+DidNotReturn,buildFailureRecord(left));  // mainly adds 203 to the ProcessingMessage of the record
 		goodSearches := getLNPIDs(isSearchFailed=false);
@@ -62,7 +62,7 @@ EXPORT Records := module
  		NoHitsforIndivDeepDive :=join (IndividualRecords,finalIndividuals+getGSASanctionsHitsHighConf,left.acctno=right.acctno,transform(left),left only);
     
 		//Do Individual DeepDive-  getIndividualsDeepDive is the set result of hits from the Deep Dive.
-		getIndividualsDeepDive := Datasource_Boca_Header.get_boca_header_entity(NoHitsforIndivDeepDive(cfg[1].doDeepDive or cfg[1].IncludeAlsoFound));
+		getIndividualsDeepDive := Datasource_Boca_Header.get_boca_header_entity(NoHitsforIndivDeepDive(cfg[1].doDeepDive or cfg[1].IncludeAlsoFound), cfg);  
 		
 		//Limit GSA to a higher penalty when Header or deep dive records exist
 		getGSASanctionsWithoutMatch:=join(getGSASanctionsHits,finalIndividuals+getIndividualsDeepDive,left.acctno=right.acctno,transform(left),left only);
