@@ -87,10 +87,10 @@ file1 := choosen(out_dat, 60000000/*how many*/, 1/*starting at*/);  // records 1
 file2 := choosen(out_dat, 60000000/*how many*/, 60000001/*starting at*/);	// records 60,000,001 - 120,000,000
 file3 := choosen(out_dat, 60000000/*how many*/, 120000002/*starting at*/);  // records 120,000,001 - 180,000,000
 file4 := choosen(out_dat, therest/*how many*/, 180000003/*starting at*/);
-output(file1, named('file1'));
-output(file2, named('file2'));
-output(file3, named('file3'));
-output(file4, named('file4'));
+output(choosen(file1, 10), named('file1'));
+output(choosen(file2, 10), named('file2'));
+output(choosen(file3, 10), named('file3'));
+output(choosen(file4, 10), named('file4'));
 output(file1,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part1.csv', csv(heading(1), quote('"')), expire(30), overwrite);
 output(file2,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part2.csv', csv(heading(1), quote('"')), expire(30), overwrite);
 output(file3,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part3.csv', csv(heading(1), quote('"')), expire(30), overwrite);
