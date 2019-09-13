@@ -1,9 +1,13 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, MDR, Risk_Reporting, LNSmallBusiness, BusinessInstantID20_Services, iesp, std, Models, Risk_Indicators;
+﻿IMPORT BIPV2, Business_Risk_BIP, Risk_Reporting, LNSmallBusiness, BusinessInstantID20_Services, iesp, std, Models, Risk_Indicators;
 
 EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                              BusinessInstantID20_Services.iOptions Options,
 														 BIPV2.mod_sources.iParams linkingOptions,
-                             Boolean ExcludeWatchlists) := 
+                             Boolean ExcludeWatchlists,
+				unsigned1 LexIdSourceOptout								  = 1,
+			string TransactionID 												= '',
+			string BatchUID														  = '',
+			unsigned6 GlobalCompanyId 									= 0) := 
 	FUNCTION
 
 		AllowedSourcesSet := BusinessInstantID20_Services.set_AllowedSources( Options );
@@ -73,7 +77,11 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 				)
 			);
 			
-		ds_ConsumerInstantIDInfo := BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ds_CleanedInputWithValidAuthReps, Options, ds_GlobalWatchlistInfo );
+		ds_ConsumerInstantIDInfo := BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ds_CleanedInputWithValidAuthReps, Options, ds_GlobalWatchlistInfo,
+		LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID );
 		
 		// 15. Get Person titles within the Business.
 		ds_PersonRoleInfo := BusinessInstantID20_Services.fn_GetPersonRoles(ds_WithLexIDs, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet);
@@ -90,7 +98,10 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
     
    
     
-    ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs);
+    ds_Models_temp := BusinessInstantID20_Services.fn_GetModels(Input,ds_Shell_Results,ds_OriginalInput,LinkSearchLevel,MarketingMode,Options,AppendBestsFromLexIDs,LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID);
    // ds_Models_temp := DATASET([], Layout_ModelOut_Plus);
   
   #if(Models.LIB_BusinessRisk_Models().TurnOnValidation = FALSE)
