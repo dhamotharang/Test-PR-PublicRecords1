@@ -1,7 +1,7 @@
 ﻿/*2018-04-13T23:16:00Z (Peterson, Camryn (RIS-MIN))
 review
 */
-IMPORT Healthcare_Ganga,Healthcare_Shared,Healthcare_Header_Services,Address,STD,BIPV2_Best,DCAV2;
+IMPORT Healthcare_Ganga,Healthcare_Shared,Healthcare_Header_Services,Address,STD,BIPV2_Best,DCAV2,watchdog,DidVille;
 EXPORT Records := Module
 	//reformat data into standard input format
 	reformatInput (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs) := FUNCTION
@@ -41,7 +41,7 @@ EXPORT Records := Module
 	//Record with 'P' entity type
 	byPrinciples (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt);
+		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt, cfg);
 		getRaw := join(refmt, getBocaHeader, left.acctno=right.acctno, transform(recordof(getBocaHeader), 
 																																							self.acctno := left.acctno; 
 																																							self:=right; self:=left;), left outer);
@@ -55,11 +55,29 @@ EXPORT Records := Module
 		refmt := reformatInput(inRecs);
 		getRecordsIndividual := Healthcare_Header_Services.Records.getRecordsIndividual(refmt,cfg);
 		getRaw := join(refmt, getRecordsIndividual, left.acctno=right.acctno, transform(recordof(getRecordsIndividual), 
-																																							self.acctno := left.acctno; 
+																																							self.acctno := left.acctno;
 																																							self:=right; self:=left;), left outer);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
 		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));		
-		return final;
+		didvilleinput := project(final, transform(DidVille.Layout_Did_InBatch, 
+																																							self.seq := (integer)left.acctno;
+																																							self.fname := left.firstname;
+																																							self.mname := left.middlename;
+																																							self.lname := left.lastname;
+																																							SELF := LEFT;
+																																							self := [];));
+		didville := Didville.DID_Batch_Service_Records(didvilleinput);																																				
+		newkey := watchdog.Key_watchdog_glb();
+		
+		didvilleJoin := join(didville, newkey, keyed(left.did=right.did), transform(recordof(didville),
+																								self.dob := (string)right.dob;
+																								self := left), left outer,keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS),limit(0));
+
+		NewKeyJoin := join(final, didvilleJoin, left.acctno=(string)right.seq, transform(recordof(final),
+																						self.dob := (string)right.dob;
+																						self:=left;), left outer);
+																						
+		return NewKeyJoin;
 	END;
 	
 	//Function to fill in byOrgs missing data
