@@ -156,7 +156,7 @@ EXPORT getAllBocaShellData (
 	END;
 
 	prop_common_roxie := Risk_Indicators.Boca_Shell_Property_Common( p_address, ids_only, includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, FALSE);
-	prop_common_thor_pre := distribute(Risk_Indicators.Boca_Shell_Property_Common( p_address, ids_only, includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, FALSE), hash64(seq))	:	PERSIST('~BOCASHELLFCRA::bocashell_property_results');
+	prop_common_thor_pre := distribute(Risk_Indicators.Boca_Shell_Property_Common( p_address, ids_only, includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, FALSE), hash64(seq))	:	PERSIST('~BOCASHELLFCRA::bocashell_property_results', expire(3));
 	prop_common_thor := sort(group(sort(prop_common_thor_pre, seq, local), seq, local),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce);
 
 	#IF(onThor)
