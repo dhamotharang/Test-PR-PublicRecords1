@@ -8,6 +8,7 @@ export Healthcare_SocioEconomic_Batch_Service_V5 := MACRO
 	unsigned1 GLBPurpose_in := 0 : stored('GLBPurpose');
 	string DataRestrictionMask_in := '' : stored('DataRestrictionMask');
 	string50 DataPermissionMask_in := '' : stored('DataPermissionMask');
+	boolean SuppressResultsForOptOuts := TRUE : stored('SuppressResultsForOptOuts');
 	IF(DataRestrictionMask_in='', FAIL('A blank DataRestrictionMask value is supplied.'));
 	IF(DataPermissionMask_in='', FAIL('A blank DataPermissionMask value is supplied.'));
 	String Socio_Core_Option := '1' : stored('Options');
@@ -96,7 +97,7 @@ export Healthcare_SocioEconomic_Batch_Service_V5 := MACRO
 	MotivationScore_Category_1_Low <= MotivationScore_Category_2_High,
 	FAIL('Bad MotivationScore_Category thresholds supplied.'));
 
-	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, 
+	Models.Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, 
 											trim(STD.Str.ToUpperCase(Socio_Core_Option),left,right), ofac_version_in, gateways_in_ds, coreResults,
                                             LexIdSourceOptout := LexIdSourceOptout, 
                                             TransactionID := TransactionID, 
@@ -105,6 +106,7 @@ export Healthcare_SocioEconomic_Batch_Service_V5 := MACRO
 	
 	FinalOutput := Models.Healthcare_SocioEconomic_Transforms_Batch_Service_V5.AddScoreCategories(
 											coreResults,
+											SuppressResultsForOptOuts,
 											ReadmissionScore_Category_5_Low,
 											ReadmissionScore_Category_4_Low,
 											ReadmissionScore_Category_3_Low,
