@@ -46,8 +46,11 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   email_recs_ready := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Records,
                           email_with_best_recs);
     
+  //use TMX ERA policy
+  email_with_tmx_recs := IF(in_mod.UseTMXRules, $.GatewayData.getTMXInsights(email_recs_ready, in_mod), email_recs_ready);
+  
   // sort results to push up best emails before applying maxresults
-  email_recs_srtd := $.Functions.SortResults(email_recs_ready, in_mod);
+  email_recs_srtd := $.Functions.SortResults(email_with_tmx_recs, in_mod);
   
 
   // keep max results requested
@@ -69,6 +72,9 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   email_gw_royalties := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Royalties);
   
   result_row := ROW({ds_results_ready, email_gw_royalties}, $.Layouts.email_combined_rec);
+
+  // temporary output for QA to verify tmx results for core functionality
+  IF($.Constants.SearchType.isEAA(in_mod.SearchType) AND in_mod.UseTMXRules, OUTPUT(email_with_tmx_recs, NAMED('tmx_results'), EXTEND));
 
   RETURN result_row;
 END;
