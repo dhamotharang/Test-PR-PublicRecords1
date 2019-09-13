@@ -18,8 +18,6 @@ import Data_Services, doxie, ut, doxie_files, autokey, cellphone, drivers, phone
 	string20 acctno;
 	Phonesplus.layoutCommonOut;
 	string120 listed_name;
-  unsigned4 global_sid := 0;
-	unsigned8 record_sid := 0;
 end;
 
 #uniquename(makelistedname)
