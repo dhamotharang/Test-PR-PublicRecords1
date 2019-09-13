@@ -1,6 +1,7 @@
 ﻿import BIPV2_Crosswalk;
 import BIPV2;
 import AutoStandardI;
+import doxie;
 
 export Key_BipToConsumer := module
      export Key := BIPV2_Crosswalk.Keys().BipToConsumerKey();
@@ -57,7 +58,9 @@ export Key_BipToConsumer := module
                     BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
                     JoinLimit=25000,
                     unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin,
-				boolean applyMarketingRestrictions = false
+				boolean applyMarketingRestrictions = false,
+				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+
      ) := function
           BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched, Level, JoinLimit, JoinType);
 	     allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
@@ -89,8 +92,11 @@ export Key_BipToConsumer := module
 		
 		marketingRestrictions :=  project(ds_restricted, apply_src_filter(left));
 		
-		return if(applyMarketingRestrictions, marketingRestrictions, ds_restricted);
-     end;
+		BIPV2_Crosswalk.mac_check_access(marketingRestrictions, marketingRestrictions_out, mod_access);
+		BIPV2_Crosswalk.mac_check_access(ds_restricted, ds_restricted_out, mod_access);
+		
+		return if(applyMarketingRestrictions, marketingRestrictions_out, ds_restricted_out);     
+	end;
 	
      shared normalize_mac(inDs, normalize_field, newLayout, sourcesToInclude, sourcesGroupsToInclude) := functionmacro
 	     no_recs_to_normalize := project(inDs(count(normalize_field)=0), 
@@ -120,9 +126,10 @@ export Key_BipToConsumer := module
                     unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin,
 				set of string sourcesToInclude = ALL,
 				set of string sourceGroupsToInclude = ALL,
-				boolean applyMarketingRestrictions = false
+				boolean applyMarketingRestrictions = false,
+				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
      ) := function
-	      remove_restricted := kfetch(inputs, level, in_mod, JoinLimit, JoinType, applyMarketingRestrictions);
+	      remove_restricted := kfetch(inputs, level, in_mod, JoinLimit, JoinType, applyMarketingRestrictions, mod_access);
 		 
 		 addSourceRecInfo       := project(remove_restricted, Layouts.BipToConsumerWorkRec0);
 		 normalizeContactNames  := normalize_mac(addSourceRecInfo, contactNames, Layouts.BipToConsumerWorkRec1,sourcesToInclude,sourceGroupsToInclude);
