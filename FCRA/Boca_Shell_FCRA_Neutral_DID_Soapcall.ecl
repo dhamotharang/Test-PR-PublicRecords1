@@ -235,7 +235,7 @@ risk_indicators.Layout_BocaShell_Neutral add_flags(risk_indicators.Layout_BocaSh
 	SELF := ri;
 	SELF := le;
 END;
-with_flags_thor := JOIN(distribute(outf, hash64(seq, did)), pcr_final, LEFT.seq=RIGHT.seq, add_flags(LEFT,RIGHT), LOOKUP, LEFT OUTER) : PERSIST('~BOCASHELLFCRA::iid_results');
+with_flags_thor := JOIN(distribute(outf, hash64(seq, did)), pcr_final, LEFT.seq=RIGHT.seq, add_flags(LEFT,RIGHT), LOOKUP, LEFT OUTER) : PERSIST('~BOCASHELLFCRA::iid_results', expire(3));
 with_flags_roxie := JOIN(outf, pcr_final, LEFT.seq=RIGHT.seq, add_flags(LEFT,RIGHT), LOOKUP, LEFT OUTER);
 
 #IF(onThor)

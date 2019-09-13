@@ -12,7 +12,7 @@ index(did_ready
 	 );
 
 #IF(_Control.Environment.onVault) // when running on vault cluster, we need to use the file pointer instead of the roxie key in boca
-export Key_Did_FCRA := project(vault.Email_Data.Key_Did_FCRA, transform(recordof(Key_Did_FCRA_original), self := left;) );
+export Key_Did_FCRA := project(vault.Email_Data.Key_Did_FCRA, transform(recordof(Key_Did_FCRA_original), self := left; self := [];) );
 #ELSE
 //enter did and get the did and the rest of the record back	
 export Key_Did_FCRA := Key_Did_FCRA_original;

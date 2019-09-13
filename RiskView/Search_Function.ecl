@@ -88,26 +88,26 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	SELF.in_zipCode := le.Z5;
 	self.in_country := '';
 	//If running on Thor, we will call the AID address cache macro to populate these fields in the next transform to save processing time.
-  #IF(onThor)
-    self.prim_range 	:= '';
-    self.predir 			:= '';
-    self.prim_name 		:= '';
-    self.addr_suffix 	:= '';
-    self.postdir 			:= '';
-    self.unit_desig 	:= '';
-    self.sec_range 		:= '';
-    self.p_city_name 	:= '';
-    self.st 					:= '';
-    self.z5 					:= '';
-    self.zip4 				:= '';
-    self.lat 					:= '';
-    self.long 				:= '';
-    self.addr_type 		:= '';
-    self.addr_status 	:= '';
-    self.county 			:= '';
-    self.geo_blk 			:= '';
-	self.country 			:= '';
-	#ELSE
+  // #IF(onThor)
+    // self.prim_range 	:= '';
+    // self.predir 			:= '';
+    // self.prim_name 		:= '';
+    // self.addr_suffix 	:= '';
+    // self.postdir 			:= '';
+    // self.unit_desig 	:= '';
+    // self.sec_range 		:= '';
+    // self.p_city_name 	:= '';
+    // self.st 					:= '';
+    // self.z5 					:= '';
+    // self.zip4 				:= '';
+    // self.lat 					:= '';
+    // self.long 				:= '';
+    // self.addr_type 		:= '';
+    // self.addr_status 	:= '';
+    // self.county 			:= '';
+    // self.geo_blk 			:= '';
+	// self.country 			:= '';
+	// #ELSE
     self.prim_range   := address.cleanFields(clean_addr).prim_range;
     self.predir 			:= address.cleanFields(clean_addr).predir;
     self.prim_name 		:= address.cleanFields(clean_addr).prim_name;
@@ -126,7 +126,7 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
     self.county 			:= clean_addr[143..145];  // address.cleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
     self.geo_blk 			:= address.cleanFields(clean_addr).geo_blk;
     self.country 			:= '';
-  #END
+  // #END
 	
 	self.dl_number 		:= stringlib.stringtouppercase(dl_num_clean);
 	self.dl_state 		:= stringlib.stringtouppercase(le.dl_state);
@@ -188,7 +188,8 @@ END;
 bsprep_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT)): PERSIST('~BOCASHELLFCRA::cleaned_inputs');
 
 #IF(onThor)
-	bsprep := bsprep_thor;
+	// bsprep := bsprep_thor;
+	bsprep := bsprep_roxie;  // address cache macro causing too many differences in Thor results vs roxie results.  take this out for now and use the roxie prepped version
 #ELSE
 	bsprep := bsprep_roxie;
 #END
