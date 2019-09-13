@@ -99,24 +99,6 @@ export OutputDataXMLFile(string code, string filename,
 			xml('Entity', heading(FROMUNICODE(CreateXMLFileHdr(code, ds, createSearchCriteria), 'utf8')
 						,Footer),trim, OPT), overwrite);
 END;
-/*
-output(Accuity.Reformat.outputs.allofac,,'~thor_data400::accuity::'+filedate+'::source_ofac.xml', 
-			xml('Entity', heading(Accuity.MakeHdr.CreateXMLFileHdr('OGO 1072', Accuity.Reformat.outputs.allofac)
-						,Accuity.MakeHdr.Footer),trim, OPT), overwrite),
 
-
-output(Accuity.Reformat.outputs.source_ACB_1040,,'~thor_data400::accuity::'+filedate+'::source_ACB_1040.xml', 
-							 xml('Entity', heading(hdg_Pt1 
-																	+Accuity.Conversions.SourceCodetoBridgerSourceID('ACB1040')
-																	+hdg_Pt2
-																	+'ACB 1040'
-																	+hdg_Pt3
-																	+trim(Accuity.Conversions.SourceCodetoDescr('ACB1040'),left,right)
-																	+hdg_Pt4
-																	+'2012-06-04T12:00:00.0000000Z'
-																	+hdg_Pt5
-																	+Accuity.Functions.getEntityCount(Accuity.Reformat.outputs.source_ACB_1040)
-																	+hdg_Pt6,ftr_Pt1),trim, OPT), overwrite),
-*/
 						
 END;
