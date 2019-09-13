@@ -897,20 +897,21 @@ end;
 				#BREAK;
 			#ELSE
 				#APPEND(Liens,
-							'string30 Liens' + %'cntLiens'% + '_Seq;' +
-							'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
-       'string2 Liens' + %'cntLiens'% + '_LienTypeID;' + 
-							'string50 Liens' + %'cntLiens'% + '_LienType;' +
-							'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
-							'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
-							'STRING8 Liens' + %'cntLiens'% + '_DateLastSeen;' +
-							'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
-							'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
-							'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
-							'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
-							'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
-							'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
-							'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;');										
+                'string30 Liens' + %'cntLiens'% + '_Seq;' +
+                'STRING8 Liens' + %'cntLiens'% + '_DateFiled;' +
+                'string2 Liens' + %'cntLiens'% + '_LienTypeID;' + 
+                'string50 Liens' + %'cntLiens'% + '_LienType;' +
+                'string15 Liens' + %'cntLiens'% + '_Amount;'+ 
+                'STRING8 Liens' + %'cntLiens'% + '_ReleaseDate;' +
+                'STRING8 Liens' + %'cntLiens'% + '_DateLastSeen;' +
+                'string20 Liens' + %'cntLiens'% + '_FilingNumber;'+ 
+                'string10 Liens' + %'cntLiens'% + '_FilingBook;'+ 
+                'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
+                'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
+                'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
+                'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
+                'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;' +
+                'string10 Liens' + %'cntLiens'% + '_orig_rmsid;');
 								
 				#SET(cntLiens,%cntLiens% + 1)
 			#END
@@ -928,24 +929,26 @@ end;
 				#BREAK;
 			#ELSE
 				#APPEND(Jgmts,
-						'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
-						'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
-      'string2 Jgmts' + %'cntJgmts'% + '_JudgmentTypeID;' +
-						'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
-						'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
-						'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
-						'string16 Jgmts' + %'cntJgmts'% + '_FilingDescription;' +
-						'STRING8 Jgmts' + %'cntJgmts'% + '_DateLastSeen;' +
-						'string120 Jgmts' + %'cntJgmts'% + '_Defendant;' +
-						'string120 Jgmts' + %'cntJgmts'% + '_Plaintiff;' +
-						'string20 Jgmts' + %'cntJgmts'% + '_FilingNumber;'+ 
-						'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
-						'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
-						'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
-						'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
-						'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
-						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' +
-						'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;');											
+                'string30 Jgmts' + %'cntJgmts'% + '_Seq;' +
+                'STRING8 Jgmts' + %'cntJgmts'% + '_DateFiled;' +
+                'string2 Jgmts' + %'cntJgmts'% + '_JudgmentTypeID;' +
+                'string50 Jgmts' + %'cntJgmts'% + '_JudgmentType;' +
+                'string15 Jgmts' + %'cntJgmts'% + '_Amount;'+ 
+                'STRING8 Jgmts' + %'cntJgmts'% + '_ReleaseDate;' +
+                'string16 Jgmts' + %'cntJgmts'% + '_FilingDescription;' +
+                'STRING8 Jgmts' + %'cntJgmts'% + '_DateLastSeen;' +
+                'string120 Jgmts' + %'cntJgmts'% + '_Defendant;' +
+                'string120 Jgmts' + %'cntJgmts'% + '_Plaintiff;' +
+                'string20 Jgmts' + %'cntJgmts'% + '_FilingNumber;'+ 
+                'string10 Jgmts' + %'cntJgmts'% + '_FilingBook;'+ 
+                'STRING10 Jgmts' + %'cntJgmts'% + '_FilingPage;' +
+                'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
+                'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
+                'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
+                'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' + 
+                'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;' +
+                'string10 Jgmts' + %'cntJgmts'% + '_orig_rmsid;');
+
 				#SET(cntJgmts,%cntJgmts% + 1)
 			#END
 		#END
