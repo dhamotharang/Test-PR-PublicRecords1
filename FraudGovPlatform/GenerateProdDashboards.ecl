@@ -13,7 +13,7 @@ CreateSuper := Sequential(IF(~(STD.File.SuperFileExists(Superfilename)), STD.Fil
 														
 fsuperadd	:= STD.File.AddSuperfile(Superfilename, Logicalfilename);
 
-RunDashboards:=  SEQUENTIAL(FraudGovPlatform_Analytics.GenerateDashboards(false,true),
+RunDashboards:=  SEQUENTIAL(FraudGovPlatform_Analytics.GenerateDashboards(true,true),
 														CreateSuper,
 														UpdateRefreshVersion,
 														fsuperadd);
