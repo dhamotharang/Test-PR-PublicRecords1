@@ -1,4 +1,4 @@
-﻿Import BIPV2, tools, AutoStandardI, InsuranceHeader_PostProcess, STD;
+﻿Import BIPV2, tools, AutoStandardI, InsuranceHeader_PostProcess, STD,doxie;
 import BIPV2_Contacts;
 
 EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := module
@@ -35,6 +35,7 @@ EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := m
                ,boolean includeDMI=false
 							        ,JoinLimit=25000
 							        ,unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
+			,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
                ) := function							 
     BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched, Level, JoinLimit, JoinType);								 
     {ds_fetched} apply_restrict(ds_fetched L) := transform
@@ -42,7 +43,8 @@ EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := m
                   	self := L;
 	                end;
 	   ds_restricted := project(ds_fetched, apply_restrict(left));
-    return ds_restricted;
+	   BIPV2_build.mac_check_access(ds_restricted, ds_restricted_out, mod_access,true);
+        return ds_restricted_out;
   END;
-
+  
 END;
