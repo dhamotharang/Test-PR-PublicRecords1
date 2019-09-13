@@ -6,7 +6,7 @@ IMPORT HCSE_LT_18_LUCI_MODEL;
 IMPORT HCSE_SERA_GBM_M0_V1_model_LUCI;
 
 
-export Healthcare_SocioEconomic_Core(isCoreRequestValid ,batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Options_in, ofac_version_in, gateways_in_ds, CoreResults,
+export Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Options_in, ofac_version_in, gateways_in_ds, CoreResults,
                                                                         LexIdSourceOptout,
                                                                         TransactionID,
                                                                         BatchUID,
@@ -525,6 +525,19 @@ export Healthcare_SocioEconomic_Core(isCoreRequestValid ,batch_in, DPPAPurpose_i
 
 	EmptyCoreResults := dataset([], Models.Layouts_Healthcare_Core.Final_Output_Layout);
 
-	CoreResults := IF(isCoreRequest_Valid, validCoreResults, EmptyCoreResults);
+	CoreResultsWithoutFlag := IF(isCoreRequest_Valid, validCoreResults, EmptyCoreResults);
+
+	mod_access := MODULE(Doxie.IDataAccess)
+      EXPORT unsigned1 lexid_source_optout := LexIdSourceOptout;
+	  EXPORT unsigned1 glb := GLBPurpose_in;
+	  EXPORT unsigned1 dppa := DPPAPurpose_in;
+    END;
+	flaggedCoreResults := PROJECT(Suppress.MAC_FlagSuppressedSource(CoreResultsWithoutFlag, mod_access, lexid, NULL), TRANSFORM(Models.Layouts_Healthcare_Core.Final_Output_Layout_W_OptOutFlag, 
+																		SELF.isLexIdInOptOut := LEFT.is_suppressed;
+																		SELF := LEFT));
+	suppression_recs := flaggedCoreResults(isLexidInOptOut);
+    nonsuppression_recs := flaggedCoreResults(~isLexidInOptOut);
+	processed_suppression_recs := PROJECT(suppression_recs, Models.Healthcare_SocioEconomic_Transforms_Core.SuppressResultsDueToOptOut_xForm(LEFT)); 
+	CoreResults := IF(~SuppressResultsForOptOuts, flaggedCoreResults, nonsuppression_recs + processed_suppression_recs);
 
 ENDMACRO;

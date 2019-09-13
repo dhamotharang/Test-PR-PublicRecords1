@@ -1832,6 +1832,12 @@ EXPORT Layouts_Healthcare_Core := module
 		STRING3 CRTRECBKRPTTIMENEWEST;
 		STRING3 HHPPCURROWNEDAUTOCNT;
 	END;
+
+	// Flags for Suppression driven by isLexIdOptoutSupprEnabled
+	EXPORT Final_Output_Layout_W_OptOutFlag := RECORD
+		Final_Output_Layout;
+		boolean isLexIdInOptOut;
+	END;
 	
 //**********Risk Driver Layouts**********//
 //Socio Readmission M0 and M1 related
