@@ -1,4 +1,4 @@
-import Data_Services,doxie, ut;
+﻿import Data_Services,doxie, ut;
 R := record
 	SNA.file_prop_transaction_stats.ln_fares_id;
 	SNA.file_prop_transaction_stats.dt_first_seen;
@@ -75,6 +75,8 @@ R := record
 	SNA.file_prop_transaction_stats.mortgage_foreclosure;
 	SNA.file_prop_transaction_stats.has_mortgage_foreclosure;
 	SNA.file_prop_transaction_stats.ends_in_default_or_foreclosure;
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
 END;
  
 fpts := table( SNA.file_prop_transaction_stats, R );

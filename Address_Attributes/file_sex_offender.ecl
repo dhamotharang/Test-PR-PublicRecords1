@@ -1,4 +1,4 @@
-import Address, Risk_Indicators, SexOffender;
+﻿import Address, Risk_Indicators, SexOffender;
 
 //Layout
 Layout_Out_Main :=  record
@@ -193,6 +193,9 @@ Layout_Out_Main :=  record
    string1      curr_incar_flag := '';
    string1      curr_parole_flag := '';
    string1      curr_probation_flag := '';
+	 //Added for CCPA-758
+	 unsigned4 global_sid;
+	 unsigned8 record_sid;
 end;
 
 
@@ -221,6 +224,9 @@ Layout_Out_Main AddressClean(file_in l) := TRANSFORM
 				self.geo_blk := clean_address[171..177];
 				self.geo_match := clean_address[178];
 				self.geolink := clean_address[115..116]+clean_address[143..145]+clean_address[171..177];
+				//Added for CCPA-758
+				self.global_sid := 0;
+				self.record_sid := 0;
 				self := l;
 				self := [];
 		end;
