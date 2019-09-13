@@ -52,7 +52,7 @@ Build_Kel_Ecl :=
 					FraudShared.Build_AutoKeys(version),
 					FraudGovPlatform.Promote().Clear_DemoData,
 					FraudGovPlatform.Build_Base_Pii(version).All,
-					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ThorName)
+					_Control.fSubmitNewWorkunit(Build_Kel_Ecl,ECLThorName)
 				),
 				FAIL('Unit Test Failed'))
 	): success(FraudGovPlatform.Send_Emails(version).BuildSuccess), failure(FraudGovPlatform.Send_Emails(version).BuildFailure);
