@@ -156,8 +156,11 @@ module
 >>>>>>> ThorProd
 
 	// Append RinID
-	EXPORT NewBaseRinID := Append_RinID (NewBaseRID,pBaseMainFile);
+	EXPORT NewBaseRinID := Append_RinID (NewBaseLexid):independent;
+	
+	//Validate Deltabase 
+	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;
 
-	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
+	EXPORT Build_Main_Base := FraudShared.Build_Base_Main(pversion,NewBaseDelta);
 
 END;

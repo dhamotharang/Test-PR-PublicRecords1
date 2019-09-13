@@ -1,4 +1,4 @@
-import address, globalwatchlists, ut;
+﻿import address, globalwatchlists, ut;
 
 export Proc_Build_BW_Base(string pFileDate) := function
 
@@ -111,6 +111,10 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self.geo_blk										:= '';
 		self.geo_match									:= '';
 		self.err_stat										:= '';
+		//Added for CCPA-393
+		self.global_sid                 :=  0;
+		self.record_sid                 :=  0;
+		self.did                        :=  0;
 		self														:=	pInput;
 	end;
 
@@ -249,6 +253,10 @@ export Proc_Build_BW_Base(string pFileDate) := function
 		self.geo_blk										:= '';
 		self.geo_match									:= '';
 		self.err_stat										:= '';
+		//Added for CCPA-393
+		self.global_sid                 :=  0;
+		self.record_sid                 :=  0;
+		self.did                        :=  0;
 		self														:= r;
 	end;
 	

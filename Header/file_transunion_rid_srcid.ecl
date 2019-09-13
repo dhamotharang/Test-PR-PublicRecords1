@@ -1,4 +1,4 @@
-import ut,ln_tu,Data_Services;
+import ut,ln_tu,Data_Services,dx_header;
 
 r0 := record
   string5 title;
@@ -42,7 +42,9 @@ j1 := join(lt_as_src,hdr_lt_recs,
 		   t_j1(left,right)
 		  );
 		   
-header.Layout_RID_SrcID t_project_to_rid_srcid(j1 le) := transform
+dx_header.layouts.i_rid_src t_project_to_rid_srcid(j1 le) := transform
+ SELF.global_sid:=0;
+ SELF.record_sid:=0;
  self := le;
 end;
 

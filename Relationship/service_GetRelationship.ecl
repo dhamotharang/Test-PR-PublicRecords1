@@ -25,7 +25,7 @@
   </message>
 */
 								
-import Relationship, doxie, Header, watchdog;
+IMPORT Relationship, doxie, Header, watchdog;
 
 EXPORT service_GetRelationship() := FUNCTION
   unsigned6 input_DID   := 0           : stored('DID');
