@@ -1,4 +1,4 @@
-﻿import _Control, doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
+﻿import _Control, FCRA, ut, liensv2, riskwise, Risk_Indicators;
  onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0, 
@@ -265,6 +265,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Filingnumber := ri.Filing_number;
 		SELF.Filingbook := ri.Filing_book;
 		SELF.Filingpage := ri.Filing_page;
+    SELF.orig_rmsid := ri.orig_rmsid;
 		SELF.AgencyID := ri.AgencyID;
 		SELF.Agency := ri.Agency;
 		SELF.Agencycounty := ri.Agency_County;
@@ -454,7 +455,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 
 	liens_filtered_DF_date := liensTmsidDF4_total(FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(historydate),(string) DF4));
 	// make sure date_first_seen is within ReportingPeriod months of the historydate 
- liens_filtered_DF_ := liens_filtered_DF_date(ut.monthsapart((string) date_first_seen[1..6],(string)risk_indicators.iid_constants.myGetDate(historydate)[1..6]) <= ReportingPeriod);
+ liens_filtered_DF_ := liens_filtered_DF_date(ut.monthsapart(((string) date_first_seen)[1..6],(string)risk_indicators.iid_constants.myGetDate(historydate)[1..6]) <= ReportingPeriod);
 
 	//drop off the DF date
 	liens_filtered_DF := project(liens_filtered_DF_, transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
@@ -704,6 +705,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Filingnumber := le.Filingnumber;
 		SELF.Filingbook := le.Filingbook;
 		SELF.Filingpage := le.Filingpage;
+    SELF.orig_rmsid := le.orig_rmsid;
 		SELF.AgencyID := le.AgencyID;
 		SELF.Agency := le.Agency;
 		SELF.Agencycounty := le.Agencycounty;
