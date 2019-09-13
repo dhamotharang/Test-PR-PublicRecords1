@@ -1,30 +1,30 @@
-﻿import _Control, risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,
+﻿import _Control, risk_indicators, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address,
        dx_header, data_services;
 onThor := _Control.Environment.OnThor;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
 							boolean isFCRA=false, boolean ln_branded, 
-							string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
-							string50 DataRestriction=iid_constants.default_DataRestriction,
+							string10 ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel,
+							string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 							string10 CustomDataFilter='', unsigned1 BSversion,
-							dataset(layouts.Layout_DOB_Match_Options) DOBMatchOptions=dataset([], layouts.layout_dob_match_options),
+							dataset(risk_indicators.layouts.Layout_DOB_Match_Options) DOBMatchOptions=dataset([], risk_indicators.layouts.layout_dob_match_options),
 							unsigned2 EverOccupant_PastMonths=0,
-							unsigned4 EverOccupant_StartDate = iid_constants.default_history_date,
-							unsigned3 LastSeenThreshold = iid_constants.oneyear,
+							unsigned4 EverOccupant_StartDate = risk_indicators.iid_constants.default_history_date,
+							unsigned3 LastSeenThreshold = risk_indicators.iid_constants.oneyear,
 							unsigned8 BSOptions=0
 	) := function
 
 unsigned1 iType := IF (isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
 
 
-ExactFirstNameRequired := ExactMatchLevel[iid_constants.posExactFirstNameMatch]=iid_constants.sTrue;
-ExactLastNameRequired := ExactMatchLevel[iid_constants.posExactLastNameMatch]=iid_constants.sTrue;
-ExactSSNRequired := ExactMatchLevel[iid_constants.posExactSSNMatch]=iid_constants.sTrue;
-ExactAddrRequired := ExactMatchLevel[iid_constants.posExactAddrMatch]=iid_constants.sTrue;
-ExactPhoneRequired := ExactMatchLevel[iid_constants.posExactPhoneMatch]=iid_constants.sTrue;
-ExactDOBRequired := ExactMatchLevel[iid_constants.posExactDOBMatch]=iid_constants.sTrue;
-ExactFirstNameRequiredAllowNickname := ExactMatchLevel[iid_constants.posExactFirstNameMatchNicknameAllowed]=iid_constants.sTrue;
-ExactAddrZip5andPrimRange := ExactMatchLevel[iid_constants.posExactAddrZip5andPrimRange]=iid_constants.sTrue;
+ExactFirstNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatch]=risk_indicators.iid_constants.sTrue;
+ExactLastNameRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactLastNameMatch]=risk_indicators.iid_constants.sTrue;
+ExactSSNRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactSSNMatch]=risk_indicators.iid_constants.sTrue;
+ExactAddrRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrMatch]=risk_indicators.iid_constants.sTrue;
+ExactPhoneRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactPhoneMatch]=risk_indicators.iid_constants.sTrue;
+ExactDOBRequired := ExactMatchLevel[risk_indicators.iid_constants.posExactDOBMatch]=risk_indicators.iid_constants.sTrue;
+ExactFirstNameRequiredAllowNickname := ExactMatchLevel[risk_indicators.iid_constants.posExactFirstNameMatchNicknameAllowed]=risk_indicators.iid_constants.sTrue;
+ExactAddrZip5andPrimRange := ExactMatchLevel[risk_indicators.iid_constants.posExactAddrZip5andPrimRange]=risk_indicators.iid_constants.sTrue;
 
 
 // "FuzzyCCYYMMDD","FuzzyCCYYMM","RadiusCCYY","ExactCCYYMMDD","ExactCCYYMM"
@@ -125,10 +125,10 @@ END;
 header_corr_roxie := if(isFCRA, group(JOIN(g_inrec, fcra.Key_Override_Header_DID,	// quick header is included
 																left.did<>0 and keyed (Left.did = Right.did) and
 																// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
-																(right.head.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
-																(right.head.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
-																((right.head.src='BA' and FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR
-																	(right.head.src='L2' and FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR right.head.src not in ['BA','L2']) and
+																(right.head.src in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
+																(right.head.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
+																((right.head.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR
+																	(right.head.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR right.head.src not in ['BA','L2']) and
 																	trim((string)right.did) + trim((string)right.head.rid) not in left.header_correct_record_id	// old way - exclude corrected records from prior to 11/13/2012
 																	and trim( (string)right.head.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id		
 																get_header_corr(LEFT, RIGHT),																
@@ -139,10 +139,10 @@ header_corr_thor := if(isFCRA,group( JOIN(distribute(g_inrec(did<>0), hash64(did
 															 distribute(pull(fcra.Key_Override_Header_DID), hash64(did)),	// quick header is included
 																(Left.did = Right.did) and
 																// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
-																(right.head.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
-																(right.head.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
-																((right.head.src='BA' and FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR
-																	(right.head.src='L2' and FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR right.head.src not in ['BA','L2']) and
+																(right.head.src in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
+																(right.head.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
+																((right.head.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR
+																	(right.head.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.head.dt_first_seen)) OR right.head.src not in ['BA','L2']) and
 																	trim((string)right.did) + trim((string)right.head.rid) not in left.header_correct_record_id	// old way - exclude corrected records from prior to 11/13/2012
 																	and trim( (string)right.head.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id		
 																transform(layout_headerOverridePlusSeq, self.seq:=left.seq, self := right),
@@ -170,12 +170,13 @@ END;
 j_pre_roxie := join (g_inrec, header_key, 
 													 LEFT.did<>0 AND keyed(LEFT.did = RIGHT.s_did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
-														(right.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
-														(right.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
+														(right.src in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
+														(right.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
                             ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and 
-													 right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 RIGHT.dt_first_seen < left.historydate and // check dates
-                           right.dt_vendor_first_reported < left.historydate and // check dates
+													 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
+													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
+													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
+                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -190,8 +191,8 @@ j_pre_roxie := join (g_inrec, header_key,
 													 (ln_branded OR bsversion>=50 or ~(dppa_ok AND (RIGHT.src in mdr.sourcetools.set_Experian_dl or RIGHT.src in mdr.sourcetools.set_Experian_vehicles))) and
 													 (~isFCRA or ~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]))) and
 													 (not isFCRA
-														OR (right.src='BA' and FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
-														OR (right.src='L2' and FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
+														OR (right.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
+														OR (right.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
 														OR right.src not in ['BA','L2']) AND
 														trim((string)right.did) + trim((string)right.rid) not in left.header_correct_record_id	// old way - exclude corrected records from prior to 11/13/2012
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
@@ -202,12 +203,14 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 										distribute(pull(header_key(s_did<>0)), hash64(s_did)), 
 													 (LEFT.did = RIGHT.s_did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
-														(right.src in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
-														(right.src in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
+														(right.src in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
+														(right.src in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
                             ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
-													 right.src not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
-													 RIGHT.dt_first_seen < left.historydate and // check dates
-                           right.dt_vendor_first_reported < left.historydate and // check dates
+													 right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
+													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
+													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
+                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
+
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(RIGHT.src)) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -222,8 +225,8 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 													 (ln_branded OR bsversion>=50 or ~(dppa_ok AND (RIGHT.src in mdr.sourcetools.set_Experian_dl or RIGHT.src in mdr.sourcetools.set_Experian_vehicles))) and
 													 (~isFCRA or ~FCRA.Restricted_Header_Src(right.src, right.vendor_id[1]))) and
 													 (not isFCRA
-														OR (right.src='BA' and FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
-														OR (right.src='L2' and FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
+														OR (right.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
+														OR (right.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
 														OR right.src not in ['BA','L2']) AND
 														trim((string)right.did) + trim((string)right.rid) not in left.header_correct_record_id	// old way - exclude corrected records from prior to 11/13/2012
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
@@ -252,12 +255,13 @@ END;
 j_quickpre_roxie := join (g_inrec, header_quick_key,
 																LEFT.did<>0 AND keyed(LEFT.did = RIGHT.did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
-														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
-														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
-													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
+														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
+														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
+													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
-													 RIGHT.dt_first_seen < left.historydate and // check dates
-                           right.dt_vendor_first_reported < left.historydate and // check dates
+													  // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
+													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
+                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -272,8 +276,8 @@ j_quickpre_roxie := join (g_inrec, header_quick_key,
 													 (ln_branded OR bsversion>=50 or ~(dppa_ok AND (IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in mdr.sourcetools.set_Experian_dl or IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in mdr.sourcetools.set_Experian_vehicles))) and
 													 (~isFCRA or ~FCRA.Restricted_Header_Src(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src), right.vendor_id[1]))) and
 													 (not isFCRA
-														OR (right.src='BA' and FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
-														OR (right.src='L2' and FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
+														OR (right.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
+														OR (right.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
 														OR right.src not in ['BA','L2']) AND
 														trim((string)right.did) + trim((string)right.rid) not in left.header_correct_record_id	// old way - exclude corrected records from prior to 11/13/2012
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
@@ -284,12 +288,14 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 												 distribute(pull(header_quick_key(did<>0)), hash64(did)),
 														(LEFT.did = RIGHT.did) AND
 														// if the customdata filter=PM or EB, make sure the source is on their allowed sources list
-														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>iid_constants.PhillipMorrisFilter) and
-														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>iid_constants.ExperianFCRA_Batch) and
-													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
+														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setPhillipMorrisAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.PhillipMorrisFilter) and
+														(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in risk_indicators.iid_constants.setExperianBatchAllowedHeaderSources or customDataFilter<>risk_indicators.iid_constants.ExperianFCRA_Batch) and
+													 IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
                            ((right.src=MDR.sourcetools.src_Voters_v2 and filterVoter=false) or right.src<>MDR.sourcetools.src_Voters_v2) and
-													 RIGHT.dt_first_seen < left.historydate and // check dates
-                           right.dt_vendor_first_reported < left.historydate and // check dates
+													 // dt_first_seen must be less than history date, and vendor date must also be less than history date (with the exception of EN FCRA source.  EN FCRA always has a recent vendor date)
+													 RIGHT.dt_first_seen < left.historydate and // check dt_first_seen 
+                           (right.dt_vendor_first_reported < left.historydate or (isFCRA and right.src=mdr.sourcetools.src_Experian_Credit_Header)) and // check vendor date (EN vendor dates are always recent because of full refresh, so that source is exception to this rule
+
 													 (
 													 (bsversion>=50 or ~mdr.Source_is_Utility(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src))) AND // rm Utility from NAS.  for shell 5.0, allow utility records into join for everything but NAS fields
 													 (header.IsPreGLB_LIB(right.dt_nonglb_last_seen, 
@@ -304,8 +310,8 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 													 (ln_branded OR bsversion>=50 or ~(dppa_ok AND (IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in mdr.sourcetools.set_Experian_dl or IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src) in mdr.sourcetools.set_Experian_vehicles))) and
 													 (~isFCRA or ~FCRA.Restricted_Header_Src(IF(right.src IN ['QH', 'WH'], MDR.sourceTools.src_Equifax, right.src), right.vendor_id[1]))) and
 													 (not isFCRA
-														OR (right.src='BA' and FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
-														OR (right.src='L2' and FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
+														OR (right.src='BA' and FCRA.bankrupt_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
+														OR (right.src='L2' and FCRA.lien_is_ok(risk_indicators.iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen) and filterLiens=false)
 														OR right.src not in ['BA','L2']) AND
 														trim((string)right.did) + trim((string)right.rid) not in left.header_correct_record_id	// old way - exclude corrected records from prior to 11/13/2012
 														and trim( (string)right.persistent_record_id ) not in left.header_correct_record_id,  // new way - using persistent_record_id	
@@ -323,7 +329,7 @@ real_header_all_roxie := group( sort( ungroup(header_recs_combined), seq ,did), 
 real_header_all_thor := group( sort( distribute( ungroup(header_recs_combined), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
 real_header_all := if(onThor, real_header_all_thor, real_header_all_roxie);
 
-real_header := if(DataRestriction[iid_constants.posEquifaxRestriction]=iid_constants.sTrue, real_header_all (h.src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), real_header_all);
+real_header := if(DataRestriction[risk_indicators.iid_constants.posEquifaxRestriction]=risk_indicators.iid_constants.sTrue, real_header_all (h.src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), real_header_all);
 
 
 
@@ -792,12 +798,12 @@ finalCorr2 := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-
 header_recs := PROJECT(real_header, TRANSFORM(layout_working, self := left, self := [])) + finalCorr2 + corrOnly;
 
 // done correcting, now do the existing transform
-iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM	
+risk_indicators.iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM	
 	self.header_summary.header_build_date := header_build_date;
 
-	myGetDate := iid_constants.myGetDate(le.historydate);	// full history date
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);	// full history date
 	EverOccupantStartDateTemp := (unsigned3)((string)EverOccupant_StartDate)[1..6];
-	ever_start_date   := iid_constants.MyGetDate( EverOccupantStartDateTemp )[1..6];
+	ever_start_date   := risk_indicators.iid_constants.MyGetDate( EverOccupantStartDateTemp )[1..6];
 	ever_start_months := ut.Date_YYYYMM_i2(ever_start_date);
 	ever_past_months  := if(EverOccupant_PastMonths > 0, EverOccupant_PastMonths, ut.Date_YYYYMM_i2(ever_start_date));
 	CURRENT_OCCUPANT_MONTHS := 4; // from today, how many months back we'll consider someone a 'current' resident
@@ -843,15 +849,15 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 								self.dt_last_seen := dt_last, // watchdog.bestaddrfunc uses the .h information, cap the date last in there as well
 								SELF := LEFT));		
 	
-	isrecent := iid_constants.myDaysApart(le.historydate,((STRING6)dt_last + '31'), LastSeenThreshold);
+	isrecent := risk_indicators.iid_constants.myDaysApart(le.historydate,((STRING6)dt_last + '31'), LastSeenThreshold);
 	
 	firstmatch_score := Risk_Indicators.FnameScore(le.fname,le.h.fname);
 	n1 := NID.PreferredFirstNew(le.fname);
 	n2 := NID.PreferredFirstNew(le.h.fname);
-	firstmatch1 := iid_constants.g(firstmatch_score) and if(ExactFirstNameRequired, le.fname=le.h.fname, true) and
+	firstmatch1 := risk_indicators.iid_constants.g(firstmatch_score) and if(ExactFirstNameRequired, le.fname=le.h.fname, true) and
 							  if(ExactFirstNameRequiredAllowNickname, le.fname=le.h.fname or n1=n2, true);
 	lastmatch_score := Risk_Indicators.LnameScore(le.lname, le.h.lname);
-	lastmatch1 := iid_constants.g(lastmatch_score) and if(ExactLastNameRequired, le.lname=le.h.lname, true);
+	lastmatch1 := risk_indicators.iid_constants.g(lastmatch_score) and if(ExactLastNameRequired, le.lname=le.h.lname, true);
 	
 	zip_score1 := Risk_Indicators.AddrScore.zip_score(le.in_zipcode, le.h.zip);
 	cityst_score1 := Risk_Indicators.AddrScore.citystate_score(le.in_city, le.in_state, le.h.city_name, le.h.st, le.cityzipflag);
@@ -866,17 +872,17 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 																																le.h.prim_range, le.h.prim_name, le.h.sec_range,
 																																zip_score1, cityst_score1));
 																						
-	addrmatch1 := iid_constants.ga(addrmatch_score1) and if(ExactAddrRequired, le.prim_range=le.h.prim_range and le.prim_name=le.h.prim_name  and 
+	addrmatch1 := risk_indicators.iid_constants.ga(addrmatch_score1) and if(ExactAddrRequired, le.prim_range=le.h.prim_range and le.prim_name=le.h.prim_name  and 
 							(le.in_zipcode=le.h.zip or le.z5=le.h.zip or 
 								(le.in_city=le.h.city_name and le.in_state=le.h.st) or (le.p_city_name=le.h.city_name and le.st=le.h.st)) and
 							ut.nneq(le.sec_range,le.h.sec_range), true);
 							
 	hphonematchscore := Risk_Indicators.PhoneScore(le.phone10, le.h.phone);
-	hphonematch1 := iid_constants.gn(hphonematchscore) and if(ExactPhoneRequired, le.phone10=le.h.phone, true);
+	hphonematch1 := risk_indicators.iid_constants.gn(hphonematchscore) and if(ExactPhoneRequired, le.phone10=le.h.phone, true);
 	wphonematchscore := Risk_Indicators.PhoneScore(le.wphone10, le.h.phone);
-	wphonematch1 := iid_constants.gn(wphonematchscore) and if(ExactPhoneRequired, le.wphone10=le.h.phone, true);
+	wphonematch1 := risk_indicators.iid_constants.gn(wphonematchscore) and if(ExactPhoneRequired, le.wphone10=le.h.phone, true);
 	socsmatchscore := did_add.ssn_match_score(le.ssn, ssn2use, LENGTH(TRIM(le.ssn))=4);
-	socsmatch1 := iid_constants.gn(socsmatchscore) and if(ExactSSNRequired, le.ssn=ssn2use, true);
+	socsmatch1 := risk_indicators.iid_constants.gn(socsmatchscore) and if(ExactSSNRequired, le.ssn=ssn2use, true);
 	cmpymatch := false;
 	
 	// continue to ignore utility records in the NAS verification.  UtilityRecord can only be set to true in shell versions 50 and higher
@@ -900,19 +906,19 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	CIVaddrmatchscore3 := Risk_Indicators.AddrScore.AddressScore('', '1', '', '', '2', '',
 																						100, 100, StringLib.StringToUpperCase(trim(le.in_streetAddress)), Risk_Indicators.MOD_AddressClean.street_address('', le.h.prim_range, le.h.predir, le.h.prim_name, le.h.suffix, le.h.postdir, '', ''));
 	
-	CIVaddrmatchcap1 := iid_constants.tscore(CIVaddrmatchscore1);
-	CIVaddrmatchcap2 := iid_constants.tscore(CIVaddrmatchscore2);
-	CIVaddrmatchcap3 := iid_constants.tscore(CIVaddrmatchscore3);
+	CIVaddrmatchcap1 := risk_indicators.iid_constants.tscore(CIVaddrmatchscore1);
+	CIVaddrmatchcap2 := risk_indicators.iid_constants.tscore(CIVaddrmatchscore2);
+	CIVaddrmatchcap3 := risk_indicators.iid_constants.tscore(CIVaddrmatchscore3);
 	
-	CIVaddrmatch := iid_constants.ga(max(CIVaddrmatchcap1, CIVaddrmatchcap2, CIVaddrmatchcap3)) and if(ExactAddrRequired, le.prim_range=le.h.prim_range and le.prim_name=le.h.prim_name  and 
+	CIVaddrmatch := risk_indicators.iid_constants.ga(max(CIVaddrmatchcap1, CIVaddrmatchcap2, CIVaddrmatchcap3)) and if(ExactAddrRequired, le.prim_range=le.h.prim_range and le.prim_name=le.h.prim_name  and 
 									ut.nneq(le.sec_range,le.h.sec_range), true);
 	
-	isCurrentOccupant := addrmatch and dt_last >= iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
+	isCurrentOccupant := addrmatch and dt_last >= risk_indicators.iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
 	isEverOccupant    := addrmatch and ever_start_months - ever_past_months <= ut.Date_YYYYMM_i2(((string)dt_last)[1..6])
 											 and ever_start_months >= ut.Date_YYYYMM_i2(((string)dt_first)[1..6]);
 
-	currOccFlag := iid_constants.SetFlag( iid_constants.IIDFlag.CurrentOccupant, isCurrentOccupant );
-	everOccFlag := iid_constants.SetFlag( iid_constants.IIDFlag.EverOccupant, isEverOccupant );
+	currOccFlag := risk_indicators.iid_constants.SetFlag( risk_indicators.iid_constants.IIDFlag.CurrentOccupant, isCurrentOccupant );
+	everOccFlag := risk_indicators.iid_constants.SetFlag( risk_indicators.iid_constants.IIDFlag.EverOccupant, isEverOccupant );
 	self.iid_flags := currOccFlag + everOccFlag;	
 	
 	indobpop := length(trim(le.dob))=8;
@@ -920,10 +926,10 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	founddobpop := trim(le_head_dob[1..8])<>'0';
 	
 	// new dob scoring based on input options
-	dobmatch_score_fuzzy6 := iid_constants.dobmatch_score_fuzzy6(indobpop, founddobpop, le.dob, (string8)le.h.dob);	// score with dobmatchoption set to FuzzyCCYYMM
-	dobmatch_score_radius := iid_constants.dobmatch_score_radius(indobpop, founddobpop, le.dob, (string8)le.h.dob, DOBMatchYearRadius);	// score with dobmatchoption set to RadiusCCYY
-	dobmatch_score_exact8 := iid_constants.dobmatch_score_exact8(indobpop, founddobpop, le.dob, (string8)le.h.dob);	// score with dobmatchoption set to ExactCCYYMMDD
-	dobmatch_score_exact6 := iid_constants.dobmatch_score_exact6(indobpop, founddobpop, le.dob, (string8)le.h.dob);	// score with dobmatchoption set to ExactCCYYMM
+	dobmatch_score_fuzzy6 := risk_indicators.iid_constants.dobmatch_score_fuzzy6(indobpop, founddobpop, le.dob, (string8)le.h.dob);	// score with dobmatchoption set to FuzzyCCYYMM
+	dobmatch_score_radius := risk_indicators.iid_constants.dobmatch_score_radius(indobpop, founddobpop, le.dob, (string8)le.h.dob, DOBMatchYearRadius);	// score with dobmatchoption set to RadiusCCYY
+	dobmatch_score_exact8 := risk_indicators.iid_constants.dobmatch_score_exact8(indobpop, founddobpop, le.dob, (string8)le.h.dob);	// score with dobmatchoption set to ExactCCYYMMDD
+	dobmatch_score_exact6 := risk_indicators.iid_constants.dobmatch_score_exact6(indobpop, founddobpop, le.dob, (string8)le.h.dob);	// score with dobmatchoption set to ExactCCYYMM
 
 	dobmatch_score1 := IF(indobpop and founddobpop,did_add.ssn_match_score(le.dob[1..8],le_head_dob[1..8]),255);	// per GB, if input dob is less than 8 bytes, don't let it pass
 	yyyymm_match := le.dob[1..6]=le_head_dob[1..6];
@@ -939,7 +945,7 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 		dobmatch_score1
 	);
 	
-	dobmatch := iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=le_head_dob[1..8], true);
+	dobmatch := risk_indicators.iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=le_head_dob[1..8], true);
 	
 	
 	trueDID_original := le.h.did<>0;
@@ -978,21 +984,21 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	lsDate31 := ((string) dt_last)[1..6]+'31';
 		
 	// adding adl stuff here for BocaShell version 2
-	self.ssn_from_did := if(le.historydate=iid_constants.default_history_date and bsversion<41, le.ssn_from_did, le.h.ssn);
-	self.ssns_per_adl := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.ssns_per_adl, if(trim(ssn2use) <> '', 1, 0));
-	self.ssns_per_adl_created_6months := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.ssns_per_adl_created_6months, 
-																					if(trim(ssn2use) <> '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.sixmonths, le.historydate), 1, 0));
+	self.ssn_from_did := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<41, le.ssn_from_did, le.h.ssn);
+	self.ssns_per_adl := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.ssns_per_adl, if(trim(ssn2use) <> '', 1, 0));
+	self.ssns_per_adl_created_6months := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.ssns_per_adl_created_6months, 
+																					if(trim(ssn2use) <> '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.sixmonths, le.historydate), 1, 0));
 																					
-	self.ssns_per_adl_seen_18months := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.ssns_per_adl_seen_18months, 
-																					if(trim(ssn2use) <> '' and iid_constants.checkdays(myGetDate,lsDate31,iid_constants.eighteenmonths, le.historydate), 1, 0));
+	self.ssns_per_adl_seen_18months := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.ssns_per_adl_seen_18months, 
+																					if(trim(ssn2use) <> '' and risk_indicators.iid_constants.checkdays(myGetDate,lsDate31,risk_indicators.iid_constants.eighteenmonths, le.historydate), 1, 0));
 	
 	self.dobs_per_adl := if((integer)le.h.dob>0 and le.valid_dob<>'M', 1, 0);
-	self.dobs_per_adl_created_6months := if((integer)le.h.dob>0 and le.valid_dob<>'M' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.sixmonths, le.historydate), 1, 0);
+	self.dobs_per_adl_created_6months := if((integer)le.h.dob>0 and le.valid_dob<>'M' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.sixmonths, le.historydate), 1, 0);
 																					
-	self.addr_from_did := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addr_from_did, trim(le.h.prim_range) + trim(le.h.prim_name));
-	self.addrs_per_adl := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_per_adl, if(trim(self.addr_from_did)!='', 1, 0));
-	self.addrs_per_adl_created_6months := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_per_adl_created_6months, 
-																					if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.sixmonths, le.historydate), 1, 0));
+	self.addr_from_did := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addr_from_did, trim(le.h.prim_range) + trim(le.h.prim_name));
+	self.addrs_per_adl := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_per_adl, if(trim(self.addr_from_did)!='', 1, 0));
+	self.addrs_per_adl_created_6months := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_per_adl_created_6months, 
+																					if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.sixmonths, le.historydate), 1, 0));
 	
 	// adding some boca shell 3 invalid fields
 	self.invalid_ssn_from_did := if(le.historydate=Risk_Indicators.iid_constants.default_history_date and bsversion<50, le.invalid_ssn_from_did, ssn2use);
@@ -1005,25 +1011,25 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	self.invalid_addrs_per_adl_created_6months := if(le.historydate=Risk_Indicators.iid_constants.default_history_date and bsversion<50, le.invalid_addrs_per_adl_created_6months, 
 																					if(trim(self.invalid_addr_from_did) != '' and Risk_Indicators.iid_constants.checkdays(myGetDate,header_dt_first31,Risk_Indicators.iid_constants.sixmonths, le.historydate), 1, 0));
 	
-	self.last_from_did := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.last_from_did, le.h.lname);
-	self.lnames_per_adl := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl, if(trim(le.h.lname)<>'', 1, 0));
-	self.lnames_per_adl30 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl30, if(trim(le.h.lname)<>'' and iid_constants.checkdays(myGetDate,header_dt_first31,30, le.historydate), 1, 0));	
-	self.lnames_per_adl90 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl90, if(trim(le.h.lname)<>'' and iid_constants.checkdays(myGetDate,header_dt_first31,90, le.historydate), 1, 0));
-	self.lnames_per_adl180 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl180, if(trim(le.h.lname)<>'' and iid_constants.checkdays(myGetDate,header_dt_first31,180, le.historydate), 1, 0));
-	self.lnames_per_adl12 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl12, if(trim(le.h.lname)<>'' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.oneyear, le.historydate), 1, 0));
-	self.lnames_per_adl24 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl24, if(trim(le.h.lname)<>'' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.twoyears, le.historydate), 1, 0));
-	self.lnames_per_adl36 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl36, if(trim(le.h.lname)<>'' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.threeyears, le.historydate), 1, 0));
-	self.lnames_per_adl60 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.lnames_per_adl60, if(trim(le.h.lname)<>'' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.fiveyears, le.historydate), 1, 0));
-	self.newest_lname_dt_first_seen := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.newest_lname_dt_first_seen, if(trim(le.h.lname)<>'', dt_last, 0));
+	self.last_from_did := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.last_from_did, le.h.lname);
+	self.lnames_per_adl := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl, if(trim(le.h.lname)<>'', 1, 0));
+	self.lnames_per_adl30 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl30, if(trim(le.h.lname)<>'' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,30, le.historydate), 1, 0));	
+	self.lnames_per_adl90 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl90, if(trim(le.h.lname)<>'' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,90, le.historydate), 1, 0));
+	self.lnames_per_adl180 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl180, if(trim(le.h.lname)<>'' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,180, le.historydate), 1, 0));
+	self.lnames_per_adl12 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl12, if(trim(le.h.lname)<>'' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.oneyear, le.historydate), 1, 0));
+	self.lnames_per_adl24 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl24, if(trim(le.h.lname)<>'' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.twoyears, le.historydate), 1, 0));
+	self.lnames_per_adl36 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl36, if(trim(le.h.lname)<>'' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.threeyears, le.historydate), 1, 0));
+	self.lnames_per_adl60 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.lnames_per_adl60, if(trim(le.h.lname)<>'' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fiveyears, le.historydate), 1, 0));
+	self.newest_lname_dt_first_seen := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.newest_lname_dt_first_seen, if(trim(le.h.lname)<>'', dt_last, 0));
 	
-	self.addrs_last30 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last30, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,30, le.historydate), 1, 0));
-	self.addrs_last90 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last90, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,90, le.historydate), 1, 0));
-	self.addrs_last12 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last12, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.oneyear, le.historydate), 1, 0));
-	self.addrs_last24 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last24, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.twoyears, le.historydate), 1, 0));
-	self.addrs_last36 := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last36, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.threeyears, le.historydate), 1, 0));
-	self.addrs_last_5years := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last_5years, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.fiveyears, le.historydate), 1, 0));
-	self.addrs_last_10years := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last_10years, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.tenyears, le.historydate), 1, 0));
-	self.addrs_last_15years := if(le.historydate=iid_constants.default_history_date and bsversion<50, le.addrs_last_15years, if(trim(self.addr_from_did) != '' and iid_constants.checkdays(myGetDate,header_dt_first31,iid_constants.fifteenyears, le.historydate), 1, 0));
+	self.addrs_last30 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last30, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,30, le.historydate), 1, 0));
+	self.addrs_last90 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last90, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,90, le.historydate), 1, 0));
+	self.addrs_last12 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last12, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.oneyear, le.historydate), 1, 0));
+	self.addrs_last24 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last24, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.twoyears, le.historydate), 1, 0));
+	self.addrs_last36 := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last36, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.threeyears, le.historydate), 1, 0));
+	self.addrs_last_5years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_5years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fiveyears, le.historydate), 1, 0));
+	self.addrs_last_10years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_10years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.tenyears, le.historydate), 1, 0));
+	self.addrs_last_15years := if(le.historydate=risk_indicators.iid_constants.default_history_date and bsversion<50, le.addrs_last_15years, if(trim(self.addr_from_did) != '' and risk_indicators.iid_constants.checkdays(myGetDate,header_dt_first31,risk_indicators.iid_constants.fifteenyears, le.historydate), 1, 0));
 					 
 	self.firstcount := IF(firstmatch,1,0);
 	self.lastcount := IF(lastmatch,1,0);
@@ -1254,7 +1260,7 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	nonderog_source := if(bsversion>=50, nonderog_source_50, nonderog_source_41);	
 	self.num_nonderogs := if(nonderog_source, 1, 0);	
 	
-	realtimeMode := le.historydate=iid_constants.default_history_date or le.historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);
+	realtimeMode := le.historydate=risk_indicators.iid_constants.default_history_date or le.historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);
 	
 	// per bug 156790, cap the history date at the hdrBuildDate
 	nonderogs_mygetdate := if(myGetDate > hdrBuilddate01, hdrBuildDate01, myGetDate);
@@ -1267,30 +1273,30 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	// want to count it, so only need to check if the lsDate31 is in the future of the hdrBuildDate01
 	self.num_nonderogs30 := if(realtimeMode, 
 									if(nonderog_source and non_derog_still_updating, 1, 0),
-									if(nonderog_source and (iid_constants.checkdays(nonderogs_mygetdate,lsDate31,30, le.historydate) or non_derog_still_updating), 1, 0));
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(nonderogs_mygetdate,lsDate31,30, le.historydate) or non_derog_still_updating), 1, 0));
 	self.num_nonderogs90 := if(realtimeMode,
-									if(nonderog_source and (iid_constants.checkdays(hdrBuildDate01,lsDate31,60, le.historydate) or non_derog_still_updating), 1, 0),
-									if(nonderog_source and (iid_constants.checkdays(nonderogs_mygetdate,lsDate31,90, le.historydate) or non_derog_still_updating), 1, 0));
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(hdrBuildDate01,lsDate31,60, le.historydate) or non_derog_still_updating), 1, 0),
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(nonderogs_mygetdate,lsDate31,90, le.historydate) or non_derog_still_updating), 1, 0));
 	self.num_nonderogs180 := if(realtimeMode,
-									if(nonderog_source and (iid_constants.checkdays(hdrBuildDate01,lsDate31,iid_constants.fiveMonths, le.historydate) or non_derog_still_updating), 1, 0),
-									if(nonderog_source and (iid_constants.checkdays(nonderogs_mygetdate,lsDate31,180, le.historydate) or non_derog_still_updating), 1, 0));
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(hdrBuildDate01,lsDate31,risk_indicators.iid_constants.fiveMonths, le.historydate) or non_derog_still_updating), 1, 0),
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(nonderogs_mygetdate,lsDate31,180, le.historydate) or non_derog_still_updating), 1, 0));
 	self.num_nonderogs12 := if(realtimeMode,
-									if(nonderog_source and (iid_constants.checkdays(hdrBuildDate01,lsDate31,iid_constants.elevenMonths, le.historydate) or non_derog_still_updating), 1, 0),
-									if(nonderog_source and (iid_constants.checkdays(nonderogs_mygetdate,lsDate31,iid_constants.oneyear, le.historydate) or non_derog_still_updating), 1, 0));
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(hdrBuildDate01,lsDate31,risk_indicators.iid_constants.elevenMonths, le.historydate) or non_derog_still_updating), 1, 0),
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(nonderogs_mygetdate,lsDate31,risk_indicators.iid_constants.oneyear, le.historydate) or non_derog_still_updating), 1, 0));
 	self.num_nonderogs24 := if(realtimeMode,
-									if(nonderog_source and (iid_constants.checkdays(hdrBuildDate01,lsDate31,iid_constants.twentythreeMonths, le.historydate) or non_derog_still_updating), 1, 0),
-									if(nonderog_source and (iid_constants.checkdays(nonderogs_mygetdate,lsDate31,iid_constants.twoyears, le.historydate) or non_derog_still_updating), 1, 0));
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(hdrBuildDate01,lsDate31,risk_indicators.iid_constants.twentythreeMonths, le.historydate) or non_derog_still_updating), 1, 0),
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(nonderogs_mygetdate,lsDate31,risk_indicators.iid_constants.twoyears, le.historydate) or non_derog_still_updating), 1, 0));
 	self.num_nonderogs36 := if(realtimeMode,
-									if(nonderog_source and (iid_constants.checkdays(hdrBuildDate01,lsDate31,iid_constants.thirtyfiveMonths, le.historydate) or non_derog_still_updating), 1, 0),
-									if(nonderog_source and (iid_constants.checkdays(nonderogs_mygetdate,lsDate31,iid_constants.threeyears, le.historydate) or non_derog_still_updating), 1, 0));
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(hdrBuildDate01,lsDate31,risk_indicators.iid_constants.thirtyfiveMonths, le.historydate) or non_derog_still_updating), 1, 0),
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(nonderogs_mygetdate,lsDate31,risk_indicators.iid_constants.threeyears, le.historydate) or non_derog_still_updating), 1, 0));
 	self.num_nonderogs60 := if(realtimeMode,
-									if(nonderog_source and (iid_constants.checkdays(hdrBuildDate01,lsDate31,iid_constants.fiftynineMonths, le.historydate) or non_derog_still_updating), 1, 0),
-									if(nonderog_source and (iid_constants.checkdays(nonderogs_mygetdate,lsDate31,iid_constants.fiveyears, le.historydate) or non_derog_still_updating), 1, 0));
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(hdrBuildDate01,lsDate31,risk_indicators.iid_constants.fiftynineMonths, le.historydate) or non_derog_still_updating), 1, 0),
+									if(nonderog_source and (risk_indicators.iid_constants.checkdays(nonderogs_mygetdate,lsDate31,risk_indicators.iid_constants.fiveyears, le.historydate) or non_derog_still_updating), 1, 0));
 									
 	// apply the dwelltype correction here since we have that field already
 	correctedDwellType := if(trim(le.newDwellType)<>'', le.newDwellType, le.addr_type);
 	self.addr_type := correctedDwellType;
-	self.dwelltype := iid_constants.dwelltype(correctedDwellType);
+	self.dwelltype := risk_indicators.iid_constants.dwelltype(correctedDwellType);
 	
 	// apply the valid correction here since we have that field already
 	self.addrvalflag := IF(trim(le.in_streetAddress)<>'' and trim(le.newValid)<>'',if(le.newValid in ['Y','1'],'V','N'),le.addrvalflag);	
@@ -1461,17 +1467,17 @@ END;
 fake_header := PROJECT (all_corrections, TransformToHeader (Left));
 
 //create "fake" header recs
-iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le, Layout_Header_seq ri) := TRANSFORM
+risk_indicators.iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le, Layout_Header_seq ri) := TRANSFORM
 	self.header_summary.header_build_date := header_build_date;
 
 	SELF.header_footprint := 1;
 	SELF.h := ri;
 	
-	myGetDate := iid_constants.myGetDate(le.historydate);	// full history date
+	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);	// full history date
 	myDaysApart(string8 d1, string8 d2) := ut.DaysApart(d1,d2) <= LastSeenThreshold OR (unsigned)d2 >= (unsigned)myGetDate;
 
 	EverOccupantStartDateTemp := (unsigned3) ((string)EverOccupant_StartDate)[1..6];
-	ever_start_date   := iid_constants.MyGetDate( EverOccupantStartDateTemp )[1..6];
+	ever_start_date   := risk_indicators.iid_constants.MyGetDate( EverOccupantStartDateTemp )[1..6];
 	ever_start_months := ut.Date_YYYYMM_i2(ever_start_date);
 	ever_past_months  := if(EverOccupant_PastMonths > 0, EverOccupant_PastMonths, ut.Date_YYYYMM_i2(ever_start_date));
 	CURRENT_OCCUPANT_MONTHS := 4; // from today, how many months back we'll consider someone a 'current' resident
@@ -1484,10 +1490,10 @@ iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le
 	firstmatch_score := Risk_Indicators.FnameScore(le.fname,ri.fname);
 	n1 := NID.PreferredFirstNew(le.fname);
 	n2 := NID.PreferredFirstNew(ri.fname);
-	firstmatch := iid_constants.g(firstmatch_score) and if(ExactFirstNameRequired, le.fname=ri.fname, true) and
+	firstmatch := risk_indicators.iid_constants.g(firstmatch_score) and if(ExactFirstNameRequired, le.fname=ri.fname, true) and
 							  if(ExactFirstNameRequiredAllowNickname, le.fname=ri.fname or n1=n2, true);
 	lastmatch_score := Risk_Indicators.LnameScore(le.lname, ri.lname);
-	lastmatch := iid_constants.g(lastmatch_score) and if(ExactLastNameRequired, le.lname=ri.lname, true);
+	lastmatch := risk_indicators.iid_constants.g(lastmatch_score) and if(ExactLastNameRequired, le.lname=ri.lname, true);
 	
 	zip_score2 := Risk_Indicators.AddrScore.zip_score(le.in_zipcode, ri.zip);
 	cityst_score2 := Risk_Indicators.AddrScore.citystate_score(le.in_city, le.in_state, ri.city_name, ri.st, le.cityzipflag);
@@ -1502,29 +1508,29 @@ iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le
 																																ri.prim_range, ri.prim_name, ri.sec_range,
 																																zip_score2, cityst_score2));
 																						
-	addrmatch := iid_constants.ga(addrmatch_score2) and if(ExactAddrRequired, le.prim_range=ri.prim_range and le.prim_name=ri.prim_name  and 
+	addrmatch := risk_indicators.iid_constants.ga(addrmatch_score2) and if(ExactAddrRequired, le.prim_range=ri.prim_range and le.prim_name=ri.prim_name  and 
 																																					(le.in_zipcode=ri.zip or le.z5=ri.zip or 
 																																						(le.in_city=ri.city_name and le.in_state=ri.st) or (le.p_city_name=ri.city_name and le.st=ri.st)) and
 																																					ut.nneq(le.sec_range,ri.sec_range), true);
 
-	isCurrentOccupant := addrmatch and ri.dt_last_seen >= iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
+	isCurrentOccupant := addrmatch and ri.dt_last_seen >= risk_indicators.iid_constants.MonthRollback((string)le.historydate,CURRENT_OCCUPANT_MONTHS);
 	isEverOccupant    := addrmatch and ever_start_months - ever_past_months <= ut.Date_YYYYMM_i2((string6)ri.dt_last_seen)
 		and ever_start_months >= ut.Date_YYYYMM_i2((string6)ri.dt_first_seen);
 
 
-	currOccFlag := iid_constants.SetFlag( iid_constants.IIDFlag.CurrentOccupant, isCurrentOccupant );
-	everOccFlag := iid_constants.SetFlag( iid_constants.IIDFlag.EverOccupant, isEverOccupant );
+	currOccFlag := risk_indicators.iid_constants.SetFlag( risk_indicators.iid_constants.IIDFlag.CurrentOccupant, isCurrentOccupant );
+	everOccFlag := risk_indicators.iid_constants.SetFlag( risk_indicators.iid_constants.IIDFlag.EverOccupant, isEverOccupant );
 	self.iid_flags := currOccFlag + everOccFlag;
 
 
 
 
 	hphonematchscore := Risk_Indicators.PhoneScore(le.phone10, ri.phone);
-	hphonematch := iid_constants.gn(hphonematchscore) and if(ExactPhoneRequired, le.phone10=ri.phone, true);
+	hphonematch := risk_indicators.iid_constants.gn(hphonematchscore) and if(ExactPhoneRequired, le.phone10=ri.phone, true);
 	wphonematchscore := Risk_Indicators.PhoneScore(le.wphone10, ri.phone);
-	wphonematch := iid_constants.gn(wphonematchscore) and if(ExactPhoneRequired, le.wphone10=ri.phone, true);
+	wphonematch := risk_indicators.iid_constants.gn(wphonematchscore) and if(ExactPhoneRequired, le.wphone10=ri.phone, true);
 	socsmatchscore := did_add.ssn_match_score(le.ssn, ssn2use, LENGTH(TRIM(le.ssn))=4);
-	socsmatch := iid_constants.gn(socsmatchscore) and if(ExactSSNRequired, le.ssn=ssn2use, true);
+	socsmatch := risk_indicators.iid_constants.gn(socsmatchscore) and if(ExactSSNRequired, le.ssn=ssn2use, true);
 	cmpymatch := false;
 	
 	
@@ -1533,10 +1539,10 @@ iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le
 	founddobpop := trim(ri_dob)<>'0';
 	
 	// new dob scoring based on input options
-	dobmatch_score_fuzzy6 := iid_constants.dobmatch_score_fuzzy6(indobpop, founddobpop, le.dob, (string8)ri.dob);	// score with dobmatchoption set to FuzzyCCYYMM
-	dobmatch_score_radius := iid_constants.dobmatch_score_radius(indobpop, founddobpop, le.dob, (string8)ri.dob, DOBMatchYearRadius);	// score with dobmatchoption set to RadiusCCYY
-	dobmatch_score_exact8 := iid_constants.dobmatch_score_exact8(indobpop, founddobpop, le.dob, (string8)ri.dob);	// score with dobmatchoption set to ExactCCYYMMDD
-	dobmatch_score_exact6 := iid_constants.dobmatch_score_exact6(indobpop, founddobpop, le.dob, (string8)ri.dob);	// score with dobmatchoption set to ExactCCYYMM
+	dobmatch_score_fuzzy6 := risk_indicators.iid_constants.dobmatch_score_fuzzy6(indobpop, founddobpop, le.dob, (string8)ri.dob);	// score with dobmatchoption set to FuzzyCCYYMM
+	dobmatch_score_radius := risk_indicators.iid_constants.dobmatch_score_radius(indobpop, founddobpop, le.dob, (string8)ri.dob, DOBMatchYearRadius);	// score with dobmatchoption set to RadiusCCYY
+	dobmatch_score_exact8 := risk_indicators.iid_constants.dobmatch_score_exact8(indobpop, founddobpop, le.dob, (string8)ri.dob);	// score with dobmatchoption set to ExactCCYYMMDD
+	dobmatch_score_exact6 := risk_indicators.iid_constants.dobmatch_score_exact6(indobpop, founddobpop, le.dob, (string8)ri.dob);	// score with dobmatchoption set to ExactCCYYMM
 	
 	dobmatch_score1 := IF(indobpop and founddobpop,did_add.ssn_match_score(le.dob[1..8],ri_dob[1..8]),255);	// per GB, if input dob is less than 8 bytes, don't let it pass
 	yyyymm_match := le.dob[1..6]=ri_dob[1..6];
@@ -1552,7 +1558,7 @@ iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le
 		dobmatch_score1
 	);
 
-	dobmatch := iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=ri_dob[1..8], true);
+	dobmatch := risk_indicators.iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=ri_dob[1..8], true);
 		
   trueDID_original := ri.did<>0;
 	    
