@@ -1,10 +1,12 @@
-import TransUnionCred,ut;
+import TransUnionCred,ut,dx_header;
 
 dSrc      := header.Files_SeqdSrc().TN;
 as_source := distribute(dSrc,hash((unsigned)party_id));
 tn_did    := distribute(header.File_TN_did,hash((unsigned)vendor_id));
 
-header.Layout_RID_SrcID t(as_source l, tn_did r) := transform
+dx_header.layouts.i_rid_src t(as_source l, tn_did r) := transform
+ SELF.global_sid:=0;
+ SELF.record_sid:=0;
  self := l;
  self := r;
 end;

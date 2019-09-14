@@ -109,8 +109,8 @@ EXPORT	fn_setRecordStatus(	STRING	pVersion,
 	END;											
 	dDeleteMostRecent	:=	ITERATE(
 													SORT(DISTRIBUTE(dAccountsDeleted(active),
-														HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported)),
-																	Sbfe_Contributor_Number,Original_Contract_Account_Number,Account_Type_Reported,-Cycle_End_Date,-Extracted_Date,-process_date,LOCAL),
+														HASH(	Sbfe_Contributor_Number,Original_Contract_Account_Number)),
+																	Sbfe_Contributor_Number,Original_Contract_Account_Number,-process_date,LOCAL),
 													tDeleteMostRecent(LEFT,RIGHT),LOCAL);
 
 dMassSuppress:=dDeleteMostRecent(active and File_Correction_Indicator in File_Correction_IndicatorSuppressCode);
@@ -120,9 +120,6 @@ dMassSuppress:=dDeleteMostRecent(active and File_Correction_Indicator in File_Co
 												dMassSuppress,
 													LEFT.Sbfe_Contributor_Number					=	RIGHT.Sbfe_Contributor_Number	AND
 													LEFT.Original_Contract_Account_Number	=	RIGHT.Original_Contract_Account_Number	AND
-													LEFT.Account_Type_Reported						=	RIGHT.Account_Type_Reported		AND
-													LEFT.Extracted_Date										=	RIGHT.Extracted_Date					AND
-													LEFT.Cycle_End_Date										=	RIGHT.Cycle_End_Date					AND
 													LEFT.process_date											<=	RIGHT.process_date,
 												TRANSFORM(RECORDOF(LEFT),
 													SELF.active						:=	if(Right.File_Correction_Indicator in File_Correction_IndicatorSuppressCode,false,true);
