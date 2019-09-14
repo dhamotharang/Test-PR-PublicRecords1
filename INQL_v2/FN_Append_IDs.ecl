@@ -13,7 +13,7 @@
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, header_slimsort, watchdog, business_header, INQL_v2;
+import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, header_slimsort, watchdog, business_header, INQL_v2, didville;
 
 export FN_Append_IDs(dataset(INQL_v2.Layouts.Common_layout) pInFile) := function
 
@@ -33,7 +33,7 @@ export FN_Append_IDs(dataset(INQL_v2.Layouts.Common_layout) pInFile) := function
 
 	did_match_set := ['A','D','S','P','4','Z'];
 
-	did_add.MAC_Match_Flex(dedInfile(fname <> '' and lname <> ''), did_match_set,
+	did_add.MAC_Match_Flex_V2(dedInfile(fname <> '' and lname <> ''), did_match_set,
 							ssn, dob, fname, mname, lname, name_suffix,
 							prim_range, prim_name, sec_range, zip5, st, personal_phone,
 							appendadl, recordof(dedInfile),false,'',
