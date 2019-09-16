@@ -63,7 +63,7 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
   // **************************************************************************************
   // Append DID for Input PII
   // **************************************************************************************	  
-	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);
+	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);																		
 
 	// **************************************************************************************
 	// Call Batch Records attribute to fetch records. 
