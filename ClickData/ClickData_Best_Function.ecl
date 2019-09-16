@@ -1,4 +1,4 @@
-﻿import didville, address, ut, gong, Marketing_Best;
+﻿import didville, address, ut, gong, Marketing_Best, dx_header;
 
 Loadxml('<FOO/>');
 
@@ -122,12 +122,13 @@ export ClickData_Best_Function(dataset(clickdata.Layout_ClickData_In) inf, boole
 													,
 													IndustryClass)
 
-	r get_head_cnt(outf1 L, doxie.Key_Did_Lookups R) := transform
+	key_lookups := dx_header.key_did_lookups();
+	r get_head_cnt(outf1 L, key_lookups R) := transform
 		self.head_cnt := R.head_cnt;
 		self := L;
 	end;
 	
-	outf3 := join(outf1, doxie.Key_Did_Lookups,
+	outf3 := join(outf1, key_lookups,
 					left.did != 0 and
 					keyed(left.did = right.did),
 				get_head_cnt(LEFT,RIGHT),

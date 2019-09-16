@@ -2,7 +2,7 @@
 // This library performs person fetches.
 // All logic for performing the fetch should be based here.
 
-IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
+IMPORT dx_header,doxie,_Control,AutoStandardI,AutoheaderV2;
 
 #if(not _Control.LibraryUse.ForceOff_AutoHeaderI__LIB_FetchI_Hdr_Indv)
   export LIB_header_saltplus(dataset (AutoheaderV2.layouts.lib_search) ds_search_in, integer search_code=0) := MODULE, LIBRARY (AutoheaderV2.ILIB.IHeaderSearch)
@@ -105,7 +105,7 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
   hr1 := IF(no_fail, Fetch_nofail, Fetch_fail);
 
   //prune old SSNs; ssn_set contains at least an input ssn
-  hr1_pruned := JOIN(hr1, doxie.Key_DID_SSN_Date (), 
+  hr1_pruned := JOIN(hr1, dx_header.key_DID_SSN_date (), 
                      keyed (LEFT.did = RIGHT.did and RIGHT.ssn in _row.tssn.ssn_set),
                      transform (Left), LEFT ONLY);
                        

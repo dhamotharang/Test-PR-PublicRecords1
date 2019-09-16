@@ -1,4 +1,4 @@
-import doxie,ut,header,suppress;
+import doxie,ut,header,dx_header,suppress;
 
 export Residents_Raw(
 	DATASET(doxie.layout_addressSearch_plus) addrs,
@@ -23,7 +23,7 @@ END;
 //***** FIND THOSE WHO RESIDED AT ADDRS RECENTLY
 
 
-k := header.Key_Nbr_Address;
+k := dx_header.key_nbr_address();
 
 midrec := record
 	integer3 address_seq_no;

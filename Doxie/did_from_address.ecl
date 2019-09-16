@@ -1,3 +1,4 @@
+IMPORT doxie, dx_header;
 
 export did_from_address(DATASET(doxie.Layout_AddressSearch) indata, boolean dodedup, unsigned atmost_limit = 1000) :=
 FUNCTION
@@ -13,7 +14,7 @@ Since ATMOST is not used as widely now, we can replace it with limit, skip.  thi
 This means the join can go back to its original wild() form 
 */
 
-k := key_address;
+k := dx_header.key_address();
 
 r :=
 RECORD

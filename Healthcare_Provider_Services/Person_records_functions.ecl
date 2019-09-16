@@ -1,4 +1,4 @@
-﻿import doxie_crs, ut, header, doxie, doxie_raw, lib_date, PhonesFeedback_Services, PhonesFeedback, Address;
+﻿import doxie_crs, ut, header, dx_header, doxie, doxie_raw, lib_date, PhonesFeedback_Services, PhonesFeedback, Address;
 
 EXPORT Person_records_functions := Module
 
@@ -403,19 +403,14 @@ EXPORT Person_records_functions := Module
 
 		trecs := recs((integer)ssn>1000000 and (integer)ssn not in ut.Set_IntBadSSN);
 		// eliminate old SSN before looking for imposters if prune_old_ssns
-		trecs_pruned := join(trecs, doxie.Key_DID_SSN_Date (), left.did = right.did and
+		trecs_pruned := join(trecs, dx_header.key_DID_SSN_date (), left.did = right.did and
 													left.ssn = right.ssn, TRANSFORM(LEFT),
 													LEFT ONLY);
 												
 		keep_trecs := IF(keepOldSsns, trecs, trecs_pruned);
 		use_trecs := project(keep_trecs, dids_ssns);
 												
-		dids_ssns get_dds(use_trecs le, Doxie.Key_Header_SSN ri) := transform
-			self.ssn := le.ssn;
-			self := ri;
-			end;
-
-		others_pre := join(use_trecs,Doxie.Key_Header_SSN,left.ssn[1]=right.s1 and
+		others_pre := join(use_trecs,dx_header.key_ssn(),left.ssn[1]=right.s1 and
 											 left.ssn[2]=right.s2 and
 											 left.ssn[3]=right.s3 and
 											 left.ssn[4]=right.s4 and
@@ -423,12 +418,14 @@ EXPORT Person_records_functions := Module
 											 left.ssn[6]=right.s6 and
 											 left.ssn[7]=right.s7 and
 											 left.ssn[8]=right.s8 and
-											 left.ssn[9]=right.s9,get_dds(left,right), atmost (5000), keep(ut.limits.DID_PER_SSN + 1));
+											 left.ssn[9]=right.s9,
+                       TRANSFORM(dids_ssns, SELF.ssn := LEFT.ssn, SELF := RIGHT),
+                       atmost (5000), keep(ut.limits.DID_PER_SSN + 1));
 
 		others := choosen (others_pre, ut.limits.DID_PER_SSN);
 
 		// prune others that are old
-		others_pruned := join(others, doxie.Key_DID_SSN_Date (), left.did = right.did and
+		others_pruned := join(others, dx_header.key_DID_SSN_date (), left.did = right.did and
 													left.ssn = right.ssn, TRANSFORM(LEFT),
 													LEFT ONLY);
 
@@ -487,7 +484,8 @@ EXPORT Person_records_functions := Module
       unsigned8 record_sid;
 		end;
 
-		ssn_people_plus get_people(doxie.Key_Header le) := transform
+		key_header := dx_header.key_header();
+		ssn_people_plus get_people(key_header le) := transform
 			self.dead := le.tnt='D';
 			self.name_suffix := IF(ut.is_unk(le.name_suffix),'',le.name_suffix);
 			self.date_ob := le.dob;
@@ -496,7 +494,7 @@ EXPORT Person_records_functions := Module
 			self := le;
 			end;
 			
-		jdirty := join(the_set,doxie.Key_Header,
+		jdirty := join(the_set,key_header,
 									 keyed(left.did=right.s_did) and 
 									 (left.ssn = right.ssn or keepOldSsns),
 									 get_people(right), LIMIT (ut.limits.DID_PER_PERSON, SKIP));
@@ -654,7 +652,7 @@ EXPORT Person_records_functions := Module
 
 		// check if SSN was seen before randomization:
 		// TODO: making it after validation may be more efficient
-		ssn_w_legacy_info := join (find_rels, doxie.key_legacy_ssn,
+		ssn_w_legacy_info := join (find_rels, dx_header.key_legacy_ssn(),
 															 keyed (Left.ssn = Right.ssn) AND
 															 (Left.did = Right.did),
 															 transform (p_sum, Self.legacy_ssn := Right.ssn != '', Self := Left),
@@ -797,7 +795,7 @@ EXPORT Person_records_functions := Module
 
 		// this is still an issue -- DID is not preserved into the lookups,
 		// since the notion of 'legacy' is for the DID/SSN pair.
-		ssn_w_legacy_info := join (ssns, doxie.key_legacy_ssn,
+		ssn_w_legacy_info := join (ssns, dx_header.key_legacy_ssn(),
 															 keyed (Left.ssn_unmasked = Right.ssn) AND
 															 (Left.did = Right.did),
 															 transform (ssn_temp_rec, Self.legacy_ssn := Right.ssn != '', Self := Left),

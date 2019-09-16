@@ -1,6 +1,6 @@
-import ut,autokey, doxie, NID;
+import dx_header, doxie, NID;
 
-i := doxie.Key_Header_Phone;
+i := dx_header.key_phone();
 
 doxie.layout_references xt(i r) := TRANSFORM
                                 SELF := r;

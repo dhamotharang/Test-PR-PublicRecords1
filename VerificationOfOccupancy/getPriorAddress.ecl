@@ -1,4 +1,4 @@
-import Risk_Indicators, ut, LN_PropertyV2, RiskWise, doxie, MDR, drivers, dx_header;
+import Risk_Indicators, RiskWise, MDR, drivers, dx_header;
 
 EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
 													 DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) allHeader, 
@@ -14,7 +14,7 @@ EXPORT getPriorAddress(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) 
 // ******************************************************************************************************************************
 	isFCRA := false;
 	headerKey := dx_header.key_addr_hist();
-	dk := choosen(doxie.key_max_dt_last_seen, 1);
+	dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 	hdrBuildDate01 := ((string)dk[1].max_date_last_seen)[1..6];
 
 //first dedup the allHeader file by seq and address to keep only one record per address for the subject
