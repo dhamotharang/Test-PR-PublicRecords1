@@ -37,15 +37,15 @@ EXPORT Assign_prep_ingest_file := FUNCTION
 		TempBorrower										:= IF(STD.Str.Find(L.BorrowerName,';',1)>0, L.BorrowerName[1..STD.Str.Find(L.BorrowerName,';',1)-1],
 																					BKMortgage.fGetName.CleanName(L.BorrowerName));
 		SELF.ClnBorrowerName						:= STD.Str.CleanSpaces(REGEXREPLACE('( AS)$|(, AND)$|(, AS)$|(, NOT)$|(, ([\\(]*)SOLELY)$|( SOLELY)$|( SOLOELY)$|(, HUSBAND AND WIFE)|WIFE|HUSBAND',TempBorrower,''));
-		SELF.DBAOrigLenderBen						:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z,0-9]',BKMortgage.fGetName.DBAName(L.Origlenderben),''));
-		SELF.DBAAssignor								:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z,0-9]',BKMortgage.fGetName.DBAName(L.AssignorName),''));
-		SELF.DBAAssignee								:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z,0-9]',BKMortgage.fGetName.DBAName(L.Assignee),''));
+		SELF.DBAOrigLenderBen						:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z0-9]',BKMortgage.fGetName.DBAName(L.Origlenderben),''));
+		SELF.DBAAssignor								:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z0-9]',BKMortgage.fGetName.DBAName(L.AssignorName),''));
+		SELF.DBAAssignee								:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z0-9]',BKMortgage.fGetName.DBAName(L.Assignee),''));
 		SELF := L;
 		SELF := [];
  END;
  
   Clean_out := project(ClnRawIn,CleanTrimFields(LEFT));
  
-RETURN Clean_out;
+RETURN Clean_out(TRIM(Origlenderben) <> '' OR TRIM(AssignorName) <> '' OR TRIM(Assignee) <> '' OR TRIM(BorrowerName) <> '');
 
 END;

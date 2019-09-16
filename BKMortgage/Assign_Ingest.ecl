@@ -47,6 +47,20 @@ EXPORT Assign_Ingest(BOOLEAN incremental=FALSE
                      (UNSIGNED)le.ln_filedate < (UNSIGNED)ri.ln_filedate => ri.ln_filedate, // Want the highest value
                      le.ln_filedate);
     SELF.bk_infile_type := ri.bk_infile_type; // Derived(NEW)
+		SELF.mspsvcrloan := ri.mspsvcrloan; // Derived(NEW)
+    SELF.pid := ri.pid; // Derived(NEW)
+    SELF.matchedororphan := ri.matchedororphan; // Derived(NEW)
+    SELF.deed_pid := ri.deed_pid; // Derived(NEW)
+    SELF.sam_pid := ri.sam_pid; // Derived(NEW)
+    SELF.assessorparcelnumber_matched := ri.assessorparcelnumber_matched; // Derived(NEW)
+    SELF.assessorpropertyfulladd := ri.assessorpropertyfulladd; // Derived(NEW)
+    SELF.assessorpropertyunittype := ri.assessorpropertyunittype; // Derived(NEW)
+    SELF.assessorpropertyunit := ri.assessorpropertyunit; // Derived(NEW)
+    SELF.assessorpropertycity := ri.assessorpropertycity; // Derived(NEW)
+    SELF.assessorpropertystate := ri.assessorpropertystate; // Derived(NEW)
+    SELF.assessorpropertyzip := ri.assessorpropertyzip; // Derived(NEW)
+    SELF.assessorpropertyzip4 := ri.assessorpropertyzip4; // Derived(NEW)
+    SELF.assessorpropertyaddrsource := ri.assessorpropertyaddrsource; // Derived(NEW)
     SELF.clnoriglenderben := ri.clnoriglenderben; // Derived(NEW)
     SELF.clnassignorname := ri.clnassignorname; // Derived(NEW)
     SELF.clnassignee := ri.clnassignee; // Derived(NEW)
@@ -68,65 +82,57 @@ EXPORT Assign_Ingest(BOOLEAN incremental=FALSE
   DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource));
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle));
   SortIngest0 := SORT(DistIngest0,rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource, __Tpe, record_id, LOCAL);
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle, __Tpe, record_id, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource, LOCAL, ORDERED, STABLE);
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
   DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource));
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle));
   SortBase0 := SORT(DistBase0,rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource, __Tpe, record_id, LOCAL);
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle, __Tpe, record_id, LOCAL);
   GroupBase0 := GROUP(SortBase0,rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource, LOCAL, ORDERED, STABLE);
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
   Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource, __Tpe,record_id,LOCAL);
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle, __Tpe,record_id,LOCAL);
   Group0 := GROUP(Sort0,rectype
              ,documenttype,fipscode,mersindicator,mainaddendum,assigrecdate,assigeffecdate,assigdoc,assigbk,assigpg,multiplepageimage
              ,bkfsimageid,origdotrecdate,origdotcontractdate,origdotdoc,origdotbk,origdotpg,origlenderben,origloanamnt,assignorname,loannumber
-             ,assignee,mers,mersvalidation,assigneepool,mspsvcrloan,borrowername,apn,multiapncode,taxacctid,propertyfulladd
+             ,assignee,mers,mersvalidation,assigneepool,borrowername,apn,multiapncode,taxacctid,propertyfulladd
              ,propertyunit,propertycity,propertystate,propertyzip,propertyzip4,dataentrydate,dataentryopercode,vendorsourcecode,hids_recordingflag,hids_docnumber
-             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,pid,matchedororphan,deed_pid,sam_pid,assessorparcelnumber_matched
-             ,assessorpropertyfulladd,assessorpropertyunittype,assessorpropertyunit,assessorpropertycity,assessorpropertystate,assessorpropertyzip,assessorpropertyzip4,assessorpropertyaddrsource,LOCAL, ORDERED, STABLE);
+             ,transfercertificateoftitle,hi_condo_cpr_hpr,hi_situs_unit_number,hids_previous_docnumber,prevtransfercertificateoftitle,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records

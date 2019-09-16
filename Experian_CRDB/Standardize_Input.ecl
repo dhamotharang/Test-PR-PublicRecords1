@@ -1,4 +1,4 @@
-﻿import  lib_stringlib, ut, _validate, Address, aid, NID;
+﻿import  _Control, CCPA, lib_stringlib, ut, _validate, Address, aid, NID, Std;
 
 export Standardize_Input :=	module
 
@@ -260,14 +260,17 @@ export Standardize_Input :=	module
 			self.FSR_Score_change	 							         			:=if((integer)l.FSR_Score_change<>0,(string)(integer)l.FSR_Score_change,'0');
 			self.DBA_Name	 											          		:=ut.CleanSpacesAndUpper(l.DBA_Name);
 			self.Clean_DBA_Name	 											        :=if(stringlib.StringCleanSpaces(stringlib.StringFilter(ut.CleanSpacesAndUpper(l.dba_name),'01234567890ABCEDFGHIJKLMNOPQRSTUVWXYZ-.,#$@&*;"?/() ')) <>'',ut.CleanSpacesAndUpper(l.dba_name),'');// cleaning the non-viewable characters 
-			self.global_sid																		:= 23931;					//DF-25380	
 			self 																						  := l;
 			self 																							:= [];
 			
 		end;
 		
-		dPreProcess := project(pRawFileInput, trans_PreProcessor(left));
-	  return dPreProcess;
+		dPreProcess 	:= project(pRawFileInput, trans_PreProcessor(left));
+		
+		//Add Global_SID
+		addGlobalSID	:= CCPA.macGetGlobalSID(dPreProcess, 'ExperianCRDB', '', 'global_sid'); //DF-25404
+		
+	  return addGlobalSID;
 
 end;
 

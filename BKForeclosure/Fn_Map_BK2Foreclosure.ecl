@@ -4,7 +4,7 @@
 EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
 
   dReoBaseFile := BKForeclosure.File_BK_Foreclosure.fReo(Delete_flag <> 'DELETE' and ((seller1_fname <> '' or buyer1_fname <> '') or (prop_full_addr <> '' and prop_addr_city <> '' and prop_addr_state <> '')));
-  dNodBaseFile := BKForeclosure.File_BK_Foreclosure.fNod(Delete_flag <> 'DELETE' and ((contact_lname <> '' or borrower1_lname <> '') or (property_full_addr <> '' and prop_addr_city <> '' and prop_addr_state <> '')));
+  dNodBaseFile := BKForeclosure.File_BK_Foreclosure.fNod(Delete_flag <> 'DELETE' and ((trustee_lname <> '' or borrower1_lname <> '') or (property_full_addr <> '' and prop_addr_city <> '' and prop_addr_state <> '')));
   dEmptyReo := ROW([], BKForeclosure.layout_BK.base_reo );
   dEmptyNod := ROW([], BKForeclosure.layout_BK.base_nod );
 
