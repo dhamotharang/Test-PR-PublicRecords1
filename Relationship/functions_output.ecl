@@ -171,6 +171,7 @@
 																	self.coucc_score 							:= couccRec.score;
 																	self.coucc_cnt 								:= couccRec.cnt;
 																	self := left;
+																	SELF:= []; // Commenting out source related fields(global_sid, record_sid)
 																 ));
 		return relOut;
 	end;
