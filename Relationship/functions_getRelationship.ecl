@@ -88,6 +88,7 @@
 				transform
 					self.rels := project(R, transform(layout_output.relTypeRec, self := left));
 					self := L;
+					self := []; // Commenting out source related fields(global_sid, record_sid)
 				end;
 			dnormDS := denormalize(distribute(rel_in, hash32(did1)), distribute(childRecs, hash32(did1)),
 														 left.did1 = right.did1
