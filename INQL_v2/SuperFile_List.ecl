@@ -49,9 +49,5 @@
 	export accurint_fdn_bldg:= prefix + 'in::' + INQL_v2._Constants.DatasetName + fcra + '::accurint_fdn_bldg';
 	export accurint_hist    := prefix + 'in::' + INQL_v2._Constants.DatasetName + fcra + '::accurint_hist';
 
-	export deconfliction		:= prefix + 'in::mbs::deconfliction';
-	export transaction 			:= prefix + 'in::transaction_desc';
-	
-	
 	
 end;

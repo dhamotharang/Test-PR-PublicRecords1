@@ -1,6 +1,7 @@
-﻿IMPORT SALT39,STD;
+﻿IMPORT SALT39;
 EXPORT Config := MODULE,VIRTUAL
-EXPORT CorrelateSampleSize := 100000000; // Size of sample used in hygiene.corelations
+EXPORT DoSliceouts := TRUE; // If set to false slice-outs do not occur (saves time)
+EXPORT CorrelateSampleSize := 54065743; // Size of sample used in hygiene.corelations (reduced due to large field count)
 EXPORT ByPassCleave := FALSE; // If set to true Cleave process will not run in the next internal linking iteration.
 EXPORT PersistExpire := 30; // PERSIST file expiration time in days.
 EXPORT AttrValueType := SALT39.AttrValueType;

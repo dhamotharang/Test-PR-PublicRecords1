@@ -1,17 +1,15 @@
 ﻿import VersionControl, _control;
 
-export Send_Email(string pversion,  string pBody='') := module
-
+export Send_Email(string pversion, boolean pUseProd = false) := module
 	shared SuccessSubject	:= if(VersionControl.IsValidVersion(pversion)
-															,INQL_V2._Constants.DatasetName + ' Build ' + pversion + ' Completed on ' + _Control.ThisEnvironment.Name
-															,INQL_V2._Constants.DatasetName + ' Build Skipped, No version parameter passed to build on ' +
+															,_Dataset(pUseProd).name + ' Build ' + pversion + ' Completed on ' + _Control.ThisEnvironment.Name
+															,_Dataset(pUseProd).name + ' Build Skipped, No version parameter passed to build on ' +
 																				_Control.ThisEnvironment.Name );
-																				
 	shared SuccessBody 		:= if(VersionControl.IsValidVersion(pversion), 
 															workunit, 
 															workunit + '\nPlease pass in a version date parameter to ' + _Dataset().name +
 															'.Build_All and then resubmit through querybuilder.' +
-                               '\nSee ' + INQL_V2._Constants.DatasetName + '._BWR_Build_Test attribute for more details.' );
+                               '\nSee ' + _Dataset().name + '._BWR_Build_Test attribute for more details.' );
    
 	export BuildSuccess		:= fileservices.sendemail(
 														Email_Notification_Lists.BuildSuccess,
@@ -20,12 +18,6 @@ export Send_Email(string pversion,  string pBody='') := module
 	
 	export BuildFailure		:= fileservices.sendemail(  
 														Email_Notification_Lists.BuildFailure,
-														INQL_V2._Constants.DatasetName + ' Build ' + pversion + ' Failed on '+ _Control.ThisEnvironment.Name,
+														_Dataset(pUseProd).name + ' Build ' + pversion + ' Failed on '+ _Control.ThisEnvironment.Name,
 														workunit + '\n' + failmessage  );
-														
-  export BuildSkipped   := fileservices.sendemail(  
-														Email_Notification_Lists.BuildFailure,
-														INQL_V2._Constants.DatasetName + ' - ' + pversion + ' build skipped', 
-														workunit + ' on '+ _Control.ThisEnvironment.Name + '\n\n' + pBody  );																
-														
 end;
