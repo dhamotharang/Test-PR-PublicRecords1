@@ -1,6 +1,6 @@
-﻿import did_add, risk_indicators, autokeyb2, ut, Data_Services, zz_cemtemp, standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild,doxie,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs,relocations;
+﻿import did_add, risk_indicators, autokeyb2, ut, Data_Services, /*zz_cemtemp,*/ standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild,doxie,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs,relocations;
 
-#WORKUNIT('name','Inquiry Tracking Daily Updates');
+//#WORKUNIT('name','Inquiry Tracking Daily Updates');
 #WORKUNIT('priority','high');
 
 /* 
@@ -84,10 +84,10 @@ processedFiles := nothor(workunitservices.WorkunitFilesRead(workunit)) +
 
 BuildKeys := 
 					sequential(
-					 parallel(bk_addru, bk_trans,bk_didu, bk_phoneu, bk_ssnu, bk_emailu, bk_nameu, bk_IPaddru, bk_LinkIdsu, bk_did_old,bk_industry_veritcal,bk_function_desc,bk_feinu,bk_industry_vertical_login);
-					 parallel(mv_addru, mv_transu, mv_didu, mv_phoneu, mv_ssnu, mv_emailu, mv_nameu, mv_IPaddru, mv_LinkIdsu, mv_didold,mv_industry_vertical,mv_function_desc,mv_feinu,mv_industry_vertical_login);
-					 parallel(mv2qa_addru,mv2qa_transu, mv2qa_didu, mv2qa_phoneu, mv2qa_ssnu, mv2qa_emailu,mv2qa_nameu, mv2qa_IPaddru, mv2qa_LinkIdsu, mv2qa_didold,mv2qa_industry_vertical,mv2qa_function_desc,mv2qa_feinu,mv2qa_industry_vertical_login);			 
-					 RoxieKeybuild.updateversion('InquiryTableUpdateKeys',rundate,'john.freibaum@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N'),
+				 	 parallel(bk_addru, bk_trans ,bk_didu, bk_phoneu, bk_ssnu, bk_emailu, bk_nameu, bk_IPaddru, bk_LinkIdsu , bk_did_old,bk_industry_veritcal,bk_function_desc,bk_feinu,bk_industry_vertical_login);
+					 //parallel(mv_addru, mv_transu, mv_didu, mv_phoneu, mv_ssnu, mv_emailu, mv_nameu, mv_IPaddru, mv_LinkIdsu, mv_didold,mv_industry_vertical,mv_function_desc,mv_feinu,mv_industry_vertical_login);
+					 //parallel(mv2qa_addru,mv2qa_transu, mv2qa_didu, mv2qa_phoneu, mv2qa_ssnu, mv2qa_emailu,mv2qa_nameu, mv2qa_IPaddru, mv2qa_LinkIdsu, mv2qa_didold,mv2qa_industry_vertical,mv2qa_function_desc,mv2qa_feinu,mv2qa_industry_vertical_login);			 
+					 //RoxieKeybuild.updateversion('InquiryTableUpdateKeys',rundate,'john.freibaum@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N'),
 					 output(choosen(sort(choosen(Inquiry_AccLogs.File_Inquiry_Base.Update(person_q.appended_adl > 0 and bus_intel.industry not in ['UNASSIGNED','BLANK','']), 1000000), -search_info.datetime), 100), named('Sample_Update_Records')),
 					 output(choosen(Inquiry_AccLogs.File_Inquiry_Base.Update(person_q.email_address <> ''), 5), named('Sample_Update_Email_Records')),
 					 Inquiry_AccLogs.STRATA_Inquiry_Daily_Tracking(rundate),

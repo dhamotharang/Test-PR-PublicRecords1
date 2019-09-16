@@ -1,4 +1,4 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 import Address;
@@ -146,7 +146,7 @@ Norm_addresses :=
 
 Layout_OSFI_Canada_Entities_of_Concern.layout_clean_norm  tr_clean_norm(Norm_addresses l ) := TRANSFORM
 
-self.entity := StringLib.StringFilter(StringLib.StringFindReplace(l.entity,'â€™','\''),' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890()[]-_/\':;,!@%$^&*+=?<>.Ã€ÃÃ‚ÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃŽÃÃÃ‘Ã’Ã“Ã”Ã•Ã–Ã™ÃšÃ›ÃœÃÃ Ã¡Ã¢Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯Ã°Ã±Ã²Ã³Ã´ÃµÃ¹ÃºÃ»Ã¼Ã½Ã¿');
+self.entity := StringLib.StringFilter(StringLib.StringFindReplace(l.entity,'Ã¢â‚¬â„¢','\''),' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890()[]-_/\':;,!@%$^&*+=?<>.Ãƒâ‚¬ÃƒÂÃƒâ€šÃƒÆ’Ãƒâ€žÃƒâ€¦Ãƒâ€ Ãƒâ€¡ÃƒË†Ãƒâ€°ÃƒÅ Ãƒâ€¹ÃƒÅ’ÃƒÂÃƒÅ½ÃƒÂÃƒÂÃƒâ€˜Ãƒâ€™Ãƒâ€œÃƒâ€Ãƒâ€¢Ãƒâ€“Ãƒâ„¢ÃƒÅ¡Ãƒâ€ºÃƒÅ“ÃƒÂÃƒÂ ÃƒÂ¡ÃƒÂ¢ÃƒÂ£ÃƒÂ¤ÃƒÂ¥ÃƒÂ¦ÃƒÂ§ÃƒÂ¨ÃƒÂ©ÃƒÂªÃƒÂ«ÃƒÂ¬ÃƒÂ­ÃƒÂ®ÃƒÂ¯ÃƒÂ°ÃƒÂ±ÃƒÂ²ÃƒÂ³ÃƒÂ´ÃƒÂµÃƒÂ¹ÃƒÂºÃƒÂ»ÃƒÂ¼ÃƒÂ½ÃƒÂ¿');
 self.last_vend_upd := 'test'; //:: '${OSFI_CANADA_ENTITIES_DATE}'; fix
 self.Address := regexreplace(',$',StringLib.StringFindReplace(
                      if(regexfind('Fiscal Code|See various addresses|other locations within|Other foreign locations|A branch of GIA|Registration number|formerly c/o|Company dissolved|Liquidated and deleted|In liquidation|Email address|E-mail|Regional offices|http://|Closed by Bosnian|Charity number',l.Address) = false,trim(l.Address,left,right),'')

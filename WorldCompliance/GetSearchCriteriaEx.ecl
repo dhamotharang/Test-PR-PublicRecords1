@@ -59,12 +59,14 @@ ConsolidatedCriteria := FUNCTION
 					);
 END;
 
-EXPORT GetSearchCriteriaEx(dataset(Layouts.rEntity) infile) := 
+EXPORT GetSearchCriteriaEx(dataset(Layouts.rEntity) infile, boolean IncludeSanctionsCriteria) := 
 															
 		MakeGroupHeader(SORT(CountryCriteria(infile),name), 1, 'Country')
 		+MakeGroupHeader(dsRegion, 2, 'Regional Level')
 		+MakeGroupHeader(CategoryCriteria(infile), 3, 'Category')
 		+MakeGroupHeader(dsDeceased, 4, 'Deceased State')
 		+MakeGroupHeader(SourceCriteria(infile), 5, 'Source')
-		+MakeGroupHeader(ConsolidatedCriteria, 6, 'Consolidated Sanctions')
+		+IF(IncludeSanctionsCriteria, 
+			MakeGroupHeader(ConsolidatedCriteria, 6, 'Consolidated Sanctions'),
+			'')
 		;
