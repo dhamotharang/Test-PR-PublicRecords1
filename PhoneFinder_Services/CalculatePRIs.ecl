@@ -56,24 +56,23 @@ EXPORT CalculatePRIs( DATASET($.Layouts.PhoneFinder.Final) dIn,
                       $.iParam.SearchParams                inMod) :=
 FUNCTION
   // If PHONERISKASSESSMENT, ONLY check OTP RI
-  dRIs := IF(inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT,	
-              IF(inMod.UseThreatMetrixRules, PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2]), iesp.phonefinder.t_PhoneFinderRiskIndicator),
-                                             PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2] AND OTP),
-                                             TRANSFORM(iesp.phonefinder.t_PhoneFinderRiskIndicator, SELF.Level := 'H', SELF.LevelCount := 1, SELF := LEFT))),
-              inMod.RiskIndicators);
+  dRIs := MAP(inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT AND inMod.UseThreatMetrixRules =>
+                    PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2]), iesp.phonefinder.t_PhoneFinderRiskIndicator),
+              inMod.TransactionType = $.Constants.TransType.PHONERISKASSESSMENT =>
+                     PROJECT(inMod.RiskIndicators(Category = $.Constants.enumCategory[2] AND OTP),
+                     TRANSFORM(iesp.phonefinder.t_PhoneFinderRiskIndicator, SELF.Level := 'H', SELF.LevelCount := 1, SELF := LEFT)),
+               inMod.RiskIndicators);
 
   rRiskInd_Layout :=
   RECORD(iesp.phonefinder.t_PhoneFinderRiskIndicator)
     BOOLEAN OTPRIFailed;
   END;
-  
+
 
   $.Layouts.PhoneFinder.Final tRiskInd(dIn pInput) :=
   TRANSFORM
     rRiskInd_Layout tCheckRIs(iesp.phonefinder.t_PhoneFinderRiskIndicator le) :=
     TRANSFORM
-      sim_change_date := (UNSIGNED)(MAX(pInput.imsi_ChangeDate, pInput.imsi_ActivationDate));
-      device_change_date := (UNSIGNED)(MAX(pInput.imei_ChangeDate, pInput.imei_ActivationDate));
       dt_last_seen    := (UNSIGNED)pInput.dt_last_seen;
       dt_first_seen   := (UNSIGNED)pInput.dt_first_seen;
       currentDate     := STD.Date.Today();
@@ -110,13 +109,15 @@ FUNCTION
                                 32 => dt_first_seen = 0,
                                 33 => dt_last_seen = 0,
                                 34 => dt_first_seen = 0 AND dt_last_seen = 0,
-                                35 => (STD.Date.DaysBetween(sim_change_date, currentDate) <= le.Threshold),
-                                36 => (STD.Date.DaysBetween(device_change_date, currentDate) <= le.Threshold),
+                                35 => (pInput.imsi_Tenure_MinDays != 0 AND pInput.imsi_Tenure_MinDays < le.Threshold) OR
+                                      (pInput.imsi_Tenure_MaxDays != 0 AND pInput.imsi_Tenure_MaxDays <= le.Threshold),
+                                36 => (pInput.imei_Tenure_MinDays != 0 AND pInput.imei_Tenure_MinDays < le.Threshold) OR
+                                      (pInput.imei_Tenure_MaxDays != 0 AND pInput.imei_Tenure_MaxDays <= le.Threshold),
                                 37 => MAP(le.ThresholdB = 'Day' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Day')),
                                           le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Week')),
                                           le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Reject - One Month')),
                                            FALSE),
-                                38 => EXISTS(pInput.ReasonCodes(value = 'Phone Number in Global Blacklist')), 
+                                38 => EXISTS(pInput.ReasonCodes(value = 'Phone Number in Global Blacklist')),
                                 39 => MAP(le.ThresholdB = 'Week' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One Week')),
                                           le.ThresholdB = 'Month' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - One Month')),
                                           le.ThresholdB = 'Three Months' => EXISTS(pInput.ReasonCodes(value = 'Phone Number Fraud - Three Months')),
@@ -137,7 +138,7 @@ FUNCTION
     END;
 
     dIterateRIs := PROJECT(dRIs(Active AND LevelCount > 0), tCheckRIs(LEFT));
-    
+
     // For each Level we would only have ONE LevelCount. The structure of RIs is misleading.
     // For any RI with respective Level, we can look at the LevelCount to get the threshold of PASS/WARN/FAIL
     rLevelCnt_Layout :=
@@ -165,7 +166,7 @@ FUNCTION
     SELF.OTPRIFailed        := EXISTS(dIterateRIs(OTPRIFailed));
     SELF                    := pInput;
   END;
-  
+
   dResultsWithRIs := PROJECT(dIn, tRiskInd(LEFT));
 
   RETURN dResultsWithRIs;
