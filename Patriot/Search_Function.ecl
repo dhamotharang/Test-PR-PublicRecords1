@@ -116,6 +116,7 @@ r get_pat(layout_base_results.layout_keys le, GlobalWatchLists.Key_GlobalWatchLi
 	country_matches := ut.NBEQ(le.country,ri.address_country);
 	SELF.matchscore := IF(name_matches OR co_matches OR country_matches, le.score, 0.000);
 	SELF := ri;
+	SELF := []; // Commenting out Source related fields(global_sid & record_sid)
 END;
 
 patriot.layout_search_out.aka aka_tran(r le) := TRANSFORM
