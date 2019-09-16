@@ -1,10 +1,10 @@
-﻿IMPORT tools;
+﻿IMPORT tools, inql_v2;
 
 EXPORT Files(boolean fcra = false, boolean pDaily = true) := MODULE
 
 	/* Input File pVersions */
 	foreign_fido_prod := '~foreign::10.194.93.1::';
-	EXPORT FIDO_extract_in := dataset(foreign_fido_prod + 'thor::red::extract::inquiry_tracking_extract', INQL_v2.layouts.FIDO_extract_in, flat);
+	FIDO_extract_in := dataset(foreign_fido_prod + 'thor::red::extract::inquiry_tracking_extract', INQL_v2.layouts.FIDO_extract_in, flat);
 
 	FIDO_extract_out := project(FIDO_extract_in,
 												transform(INQL_v2.layouts.FIDO_extract_out

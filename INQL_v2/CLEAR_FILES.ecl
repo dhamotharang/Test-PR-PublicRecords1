@@ -9,19 +9,19 @@
 	
 	export Current := sequential(
 					FS.StartSuperFileTransaction(),
-						nothor(apply(In_SF, FS.ClearSuperFile('~' + name, false))),
+						nothor(apply(In_SF, FS.ClearSuperFile('~' + name, true))),
 					FS.FinishSuperFileTransaction()
 						);
 	
 	export In_Bldg := sequential(
 					FS.StartSuperFileTransaction(),
-						nothor(apply(In_Bldg_SF, FS.ClearSuperFile('~' + name, false))),
+						nothor(apply(In_Bldg_SF, FS.ClearSuperFile('~' + name, true))),
 					FS.FinishSuperFileTransaction()
 						);
 						
 	export Hist := sequential(
 					FS.StartSuperFileTransaction(),
-						nothor(apply(Hist_SF, FS.ClearSuperFile('~' + name, false))),
+						nothor(apply(Hist_SF, FS.ClearSuperFile('~' + name, true))),
 					FS.FinishSuperFileTransaction()
 						);
 end;
