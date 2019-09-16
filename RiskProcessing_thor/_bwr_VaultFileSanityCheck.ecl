@@ -89,12 +89,12 @@ output(choosen(		american_student_list.key_DID_FCRA	, luckynumber), named('vault
 output(choosen(		risk_indicators.Key_FCRA_AreaCode_Change_plus	, luckynumber), named('vault_risk_indicators_Key_FCRA_AreaCode_Change_plus') );
 output(choosen(		Death_Master.key_ssn_ssa(isFCRA := true)	, luckynumber), named('vault_Death_Master_key_ssn_ssa') );
 output(choosen(		doxie.key_death_masterV2_ssa_DID_fcra	, luckynumber), named('vault_doxie_key_death_masterV2_ssa_DID_fcra') );
-output(choosen(		doxie.Key_FCRA_AptBuildings	, luckynumber), named('vault_doxie_Key_FCRA_AptBuildings') );
-output(choosen(		doxie.Key_FCRA_legacy_ssn	, luckynumber), named('vault_doxie_Key_FCRA_legacy_ssn') );
+output(choosen(		dx_Header.Key_AptBuildings(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_key_AptBuildings_FCRA') );
+output(choosen(		dx_Header.Key_legacy_ssn(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_legacy_ssn') );
 output(choosen(		dx_header.key_addr_hist(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_Header_key_addr_hist') );
-output(choosen(		Doxie.Key_FCRA_Header_Address	, luckynumber), named('vault_Doxie_Key_FCRA_Header_Address') );
-output(choosen(		doxie.Key_FCRA_Header	, luckynumber), named('vault_doxie_Key_FCRA_Header') );
-output(choosen(		Doxie.Key_FCRA_max_dt_last_seen	, luckynumber), named('vault_Doxie_Key_FCRA_max_dt_last_seen') );
+output(choosen(		dx_Header.Key_Header_Address(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header_Address') );
+output(choosen(		dx_Header.Key_Header(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_Header') );
+output(choosen(		dx_Header.Key_max_dt_last_seen(data_services.data_env.iFCRA)	, luckynumber), named('vault_dx_header_Key_FCRA_max_dt_last_seen') );
 output(choosen(		fcra_opt_out.key_address	, luckynumber), named('vault_fcra_opt_out_key_address') );
 output(choosen(		fcra_opt_out.key_did	, luckynumber), named('vault_fcra_opt_out_key_did') );
 output(choosen(		fcra_opt_out.key_ssn	, luckynumber), named('vault_fcra_opt_out_key_ssn') );
@@ -136,4 +136,3 @@ output(choosen(		VotersV2.Key_Voters_States(isFCRA := true)	, luckynumber), name
 output(choosen(		Watchdog.Key_Watchdog_FCRA_nonEN	, luckynumber), named('vault_Watchdog_Key_Watchdog_FCRA_nonEN') );
 output(choosen(		Watchdog.Key_Watchdog_FCRA_nonEQ	, luckynumber), named('vault_Watchdog_Key_Watchdog_FCRA_nonEQ') );
 output(choosen(		watercraft.key_watercraft_did(isFCRA := true)	, luckynumber), named('vault_watercraft_key_watercraft_did') );
-

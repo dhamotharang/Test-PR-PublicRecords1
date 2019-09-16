@@ -259,7 +259,7 @@ layout_acctno iidPrep( inds_dist le, INTEGER c ) := TRANSFORM
 	SELF := [];
 END;
 	
-iid_prep_acct_roxie := PROJECT(inds_dist, iidPrep(LEFT,COUNTER)) : INDEPENDENT;
+iid_prep_acct_roxie := PROJECT(inds_dist, iidPrep(LEFT,COUNTER)) : PERSIST('~BOCASHELLFCRA::shell54_batchin_with_seq', expire(3));  // use persist instead of independent
 
 // Now get ready to call AID Address Cache macro, which we will use if running thor version
 r_layout_input_PlusRaw	:= RECORD
