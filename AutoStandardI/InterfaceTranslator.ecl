@@ -1679,4 +1679,16 @@ export InterfaceTranslator := module
 		end;
 		export string20 val(params in_mod) :=  STD.Str.ToUpperCase(in_mod.DemoCustomerName);
 	end;
+	export intended_use_value := module
+		export params := interface
+			export unsigned1 IntendedUse;
+		end;
+		export unsigned1 val(params in_mod) := in_mod.IntendedUse;
+	end;
+	export reseller_type_value := module
+		export params := interface
+			export unsigned1 ResellerType;
+		end;
+		export unsigned1 val(params in_mod) := in_mod.ResellerType;
+	end;
 end;

@@ -1,6 +1,7 @@
 ﻿import BIPV2_Crosswalk;
 import BIPV2;
 import AutoStandardI;
+import doxie;
 
 export Key_BipToConsumer := module
      export Key := BIPV2_Crosswalk.Keys().BipToConsumerKey();
@@ -57,7 +58,9 @@ export Key_BipToConsumer := module
                     BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
                     JoinLimit=25000,
                     unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin,
-				boolean applyMarketingRestrictions = false
+				boolean applyMarketingRestrictions = false,
+				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+
      ) := function
           BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched, Level, JoinLimit, JoinType);
 	     allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
@@ -89,10 +92,13 @@ export Key_BipToConsumer := module
 		
 		marketingRestrictions :=  project(ds_restricted, apply_src_filter(left));
 		
-		return if(applyMarketingRestrictions, marketingRestrictions, ds_restricted);
-     end;
+		BIPV2_Crosswalk.mac_check_access(marketingRestrictions, marketingRestrictions_out, mod_access);
+		BIPV2_Crosswalk.mac_check_access(ds_restricted, ds_restricted_out, mod_access);
+		
+		return if(applyMarketingRestrictions, marketingRestrictions_out, ds_restricted_out);     
+	end;
 	
-     shared normalize_mac(inDs, normalize_field, newLayout) := functionmacro
+     shared normalize_mac(inDs, normalize_field, newLayout, sourcesToInclude, sourcesGroupsToInclude) := functionmacro
 	     no_recs_to_normalize := project(inDs(count(normalize_field)=0), 
 		                                transform(newLayout,
 								            self := left,
@@ -101,12 +107,13 @@ export Key_BipToConsumer := module
 		normalize_recs       := normalize(inDs(count(normalize_field)>0),
 		                                  left.normalize_field,
 								    transform(newLayout,
+								              skip((right.source not in sourcesToInclude) or (right.sourceGroup not in sourcesGroupsToInclude)),
 								              newSourceInfo   := dataset([{right.source,right.source_record_id}],Layouts.SourceInfoRec);
 								              self.sourceInfo := left.sourceInfo + newSourceInfo(trim(source)!='');
 								              self            := left, 
 										    self            := right));
 										    
-          return normalize_recs + 	no_recs_to_normalize;									    
+          return normalize_recs(count(sourceInfo) > 0) + no_recs_to_normalize;									    
 	endmacro;
 	
      export getDataFiltered(
@@ -119,22 +126,21 @@ export Key_BipToConsumer := module
                     unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin,
 				set of string sourcesToInclude = ALL,
 				set of string sourceGroupsToInclude = ALL,
-				boolean applyMarketingRestrictions = false
+				boolean applyMarketingRestrictions = false,
+				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
      ) := function
-	      remove_restricted := kfetch(inputs, level, in_mod, JoinLimit, JoinType, applyMarketingRestrictions);
+	      remove_restricted := kfetch(inputs, level, in_mod, JoinLimit, JoinType, applyMarketingRestrictions, mod_access);
 		 
 		 addSourceRecInfo       := project(remove_restricted, Layouts.BipToConsumerWorkRec0);
-		 normalizeContactNames  := normalize_mac(addSourceRecInfo, contactNames, Layouts.BipToConsumerWorkRec1);
-		 normalizeSSNs          := normalize_mac(normalizeContactNames, contactSSNs, Layouts.BipToConsumerWorkRec2);
-		 normalizeDOBs          := normalize_mac(normalizeSSNs, contactDOBs, Layouts.BipToConsumerWorkRec3);
-		 normalizeEmails        := normalize_mac(normalizeDOBs, contactEmails, Layouts.BipToConsumerWorkRec4);
-		 normalizePhones        := normalize_mac(normalizeEmails, contactPhones, Layouts.BipToConsumerWorkRec5);
-		 normalizeAddresses     := normalize_mac(normalizePhones, contactAddresses, Layouts.BipToConsumerWorkRec6);
-		 normalizeJobTitles     := normalize_mac(normalizeAddresses, jobTitles, Layouts.BipToConsumerWorkRec7);
-		 
-		 filterSourcesAndGroups := normalizeJobTitles(source in sourcesToInclude and sourceGroup in sourceGroupsToInclude);
-		 
-		 normSourceInfoRecs     := normalize(filterSourcesAndGroups, left.sourceInfo,
+		 normalizeContactNames  := normalize_mac(addSourceRecInfo, contactNames, Layouts.BipToConsumerWorkRec1,sourcesToInclude,sourceGroupsToInclude);
+		 normalizeSSNs          := normalize_mac(normalizeContactNames, contactSSNs, Layouts.BipToConsumerWorkRec2,sourcesToInclude,sourceGroupsToInclude);
+		 normalizeDOBs          := normalize_mac(normalizeSSNs, contactDOBs, Layouts.BipToConsumerWorkRec3,sourcesToInclude,sourceGroupsToInclude);
+		 normalizeEmails        := normalize_mac(normalizeDOBs, contactEmails, Layouts.BipToConsumerWorkRec4,sourcesToInclude,sourceGroupsToInclude);
+		 normalizePhones        := normalize_mac(normalizeEmails, contactPhones, Layouts.BipToConsumerWorkRec5,sourcesToInclude,sourceGroupsToInclude);
+		 normalizeAddresses     := normalize_mac(normalizePhones, contactAddresses, Layouts.BipToConsumerWorkRec6,sourcesToInclude,sourceGroupsToInclude);
+		 normalizeJobTitles     := normalize_mac(normalizeAddresses, jobTitles, Layouts.BipToConsumerWorkRec7,sourcesToInclude,sourceGroupsToInclude);
+		 		 
+		 normSourceInfoRecs     := normalize(normalizeJobTitles, left.sourceInfo,
 		                                     transform(Layouts.SourceInfoWorkRec1,
 									            self := right,
 									            self := left));											 
@@ -165,7 +171,7 @@ export Key_BipToConsumer := module
 								                   self.sourceInfo := left.sourceInfo + right.sourceInfo,
 										         self            := left));
 		 		 
-		 changeToFinalForm      := project(filterSourcesAndGroups,
+		 changeToFinalForm      := project(normalizeJobTitles,
 		                                   transform(Layouts.BipToConsumerFinalRec,
 											self.sourceInfo := dedup(left.sourceInfo(source!=''),source,source_record_id);
 									          self            := left,

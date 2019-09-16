@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'DOT_Base';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rcid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_Proxid */,/* MY_lgid3 */,/* MY_orgid */,/* MY_ultid */,active_duns_number,active_enterprise_number,active_domestic_corp_key,hist_enterprise_number,hist_duns_number,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,ebr_file_number,company_fein,company_name,cnp_name,company_name_type_raw,company_name_type_derived,cnp_hasnumber,cnp_number,cnp_btype,cnp_lowv,cnp_translated,cnp_classid,company_foreign_domestic,company_bdid,company_phone,prim_name,prim_name_derived,sec_range,v_city_name,st,zip,prim_range,prim_range_derived,company_csz,company_addr1,company_address,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_Proxid */,/* MY_lgid3 */,/* MY_orgid */,/* MY_ultid */,active_duns_number,active_enterprise_number,active_domestic_corp_key,hist_enterprise_number,hist_duns_number,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,ebr_file_number,company_fein,company_name,cnp_name_phonetic,cnp_name,company_name_type_raw,company_name_type_derived,cnp_hasnumber,cnp_number,cnp_btype,cnp_lowv,cnp_translated,cnp_classid,company_foreign_domestic,company_bdid,company_phone,prim_name,prim_name_derived,sec_range,v_city_name,st,zip,prim_range,prim_range_derived,company_csz,company_addr1,company_address,dt_first_seen,dt_last_seen,/* MY_SALT_Partition */';
   EXPORT spc_HAS_TWOSTEP := TRUE;
   EXPORT spc_HAS_PARTITION := TRUE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -81,7 +81,8 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:ebr_file_number:PROP:20,427\n'
     + 'FIELD:company_fein:PROP:EDIT1:17,227\n'
     + 'FIELD:company_name:CARRY:0,0\n'
-    + 'FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334\n'
+    + 'FIELD:cnp_name_phonetic:PHONETIC:12,334\n'
+    + 'FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein),OR(cnp_name_phonetic)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334\n'
     + '// FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137\n'
     + '//FIELD:source:CARRY:0,0\n'
     + 'FIELD:company_name_type_raw:CARRY:0,0\n'

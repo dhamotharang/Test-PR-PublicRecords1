@@ -25,7 +25,7 @@ FIELDTYPE:invalid_zip:ALLOW(\N-0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,5,9,10)
 FIELDTYPE:invalid_state:ALLOW(\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:LENGTHS(2):ONFAIL(BLANK)
 FIELDTYPE:invalid_ssn:ALLOW(\N0123456789):SPACES( -):LEFTTRIM:LENGTHS(2,9..):ONFAIL(BLANK)
 FIELDTYPE:invalid_phone:ALLOW(\N0123456789):SPACES( +#()-):LEFTTRIM:LENGTHS(2,10..):ONFAIL(BLANK)
-FIELDTYPE:invalid_ip:ALLOW(\N.0123456789):SPACES( .):LEFTTRIM:ONFAIL(BLANK)
+FIELDTYPE:invalid_ip:ALLOW(\N.x0123456789):SPACES( .):LEFTTRIM:ONFAIL(BLANK)
 FIELDTYPE:invalid_name:ALLOW(\NABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):LEFTTRIM:SPACES( '):ONFAIL(BLANK)
 // Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
 // If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
