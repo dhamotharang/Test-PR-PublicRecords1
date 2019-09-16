@@ -1,4 +1,4 @@
-import doxie, mdr, drivers, dx_header, riskwise, Relationship;
+import mdr, drivers, dx_header, riskwise, Relationship;
 
 EXPORT getScore(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) VOO_attr,
 								DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOO_shell, 
@@ -208,7 +208,7 @@ END;
 relatedDIDs :=  join(VOO_shell, rellyids, left.did = right.did1,
                      GetRelatInfo(left, right, 1), left outer);
 
-dk := choosen(doxie.key_max_dt_last_seen, 1);
+dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 hdrBuildDate01 := ((string)dk[1].max_date_last_seen)[1..6];
 
 //get all DIDs associated with our target input address

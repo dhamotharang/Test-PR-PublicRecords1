@@ -1,4 +1,4 @@
-import address, daybatchpcnsr, doxie, header, marital_status_indicator, models, risk_indicators, ut, watchdog;
+import doxie, dx_header, header, marital_status_indicator, models, risk_indicators, ut;
 
 /*
 Here are the current rules:
@@ -96,7 +96,6 @@ layout_relatives := record
 	STRING8			sec_range2;
 	INTEGER4		dob_diff;
 end;
-layout_hed := recordof(doxie.key_header);
 layout_sample_base := record
 		UNSIGNED6		did;
 		QSTRING5    title;
@@ -287,8 +286,8 @@ complete_header := project(names_rolled_dist, inferPersonData(left), local);
 
 complete_header_dist := distribute(complete_header, did);
 
-// get remaining genders from doxie.key_did_lookups
-did_lookup := pull(doxie.key_did_lookups);
+// get remaining genders from key_did_lookups
+did_lookup := pull(dx_header.key_did_lookups());
 did_lookup_dist := distribute(did_lookup, did);
 layout_slim_header addBestGender(complete_header_dist l, did_lookup_dist r) := transform
 	self.gender := if(l.gender ='', r.gender, l.gender);
@@ -373,7 +372,7 @@ relatives_data := join(target_data_dist, best_file_dist,
 
 relatives_data_dist := distribute(relatives_data, person1);
 
-// get remaining gender1 from doxie.key_did_lookups
+// get remaining gender1 from key_did_lookups
 layout_relatives addBestGender1(relatives_data_dist l, did_lookup_dist r) := transform
 	self.gender1 := if(l.gender1 ='', r.gender, l.gender1);
 	self := l;
@@ -386,7 +385,7 @@ header_best_gender1 := join(relatives_data_dist, did_lookup_dist,
 
 header_best_gender1_dist := distribute(header_best_gender1, person2);
 
-// get remaining gender2 from doxie.key_did_lookups
+// get remaining gender2 from key_did_lookups
 layout_relatives addBestRelGender(header_best_gender1_dist l, did_lookup_dist r) := transform
 	self.gender2 := if(l.gender2 ='', r.gender, l.gender2);
 	self := l;

@@ -1,7 +1,7 @@
 // This module contains code involved in counting the number of times the source
 // report results reference various data types: Name, SSN, DOB, FEIN, Address, Phone
 
-import doxie_cbrs, ut, iesp, MDR,doxie;
+import doxie_cbrs, ut, iesp, MDR, dx_header;
 
 export Occurrence := module
 
@@ -547,7 +547,7 @@ export Occurrence := module
 			
 			// Bug #100330: The eq data here is guaranteed to be current by the header build. Changing the last seen date to reflect that.
 			self.dt_last_seen   := if(left.date_last_seen = '' , 
-																ut.NormDate(CHOOSEN (Doxie.key_max_dt_last_seen, 1)[1].max_date_last_seen), 
+																ut.NormDate(CHOOSEN (dx_header.key_max_dt_last_seen(), 1)[1].max_date_last_seen), 
 																ut.NormDate((unsigned)left.date_last_seen));			
 																
 			 // NOTE: The eq data contains two other dates that are about old addresses not shown in the person

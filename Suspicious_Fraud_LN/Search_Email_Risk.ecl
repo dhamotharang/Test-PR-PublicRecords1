@@ -1,4 +1,4 @@
-IMPORT Doxie, Email_Data, Inquiry_AccLogs, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+IMPORT Email_Data, MDR, RiskWise, Suspicious_Fraud_LN, UT, dx_header;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Email_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																				DATASET(Suspicious_Fraud_LN.layouts.Layout_Email_Inquiries) Inquiries,
@@ -12,7 +12,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Email_Risk (DATASET(
 	// For E-Mail data, don't use any Royalty Sources
 	RoyaltyEmailSources := [MDR.SourceTools.src_Acquiredweb, MDR.SourceTools.src_Entiera, MDR.SourceTools.src_MediaOne, MDR.SourceTools.src_OutwardMedia];
 
-	headerBuild := CHOOSEN(Doxie.Key_Max_Dt_Last_Seen, 1);
+	headerBuild := CHOOSEN(dx_header.key_max_dt_last_seen(), 1);
 	headerBuildDate := (((STRING)headerBuild[1].Max_Date_Last_Seen)[1..6]) + '01';
 
 	TempIdentityEmail := RECORD

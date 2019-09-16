@@ -1,8 +1,8 @@
 /*2015-10-22T15:34:41Z (khuls)
 C:\Users\hulske01\AppData\Roaming\HPCC Systems\eclide\khuls\New_Dataland\VerificationOfOccupancy\Search_Function\2015-10-22T15_34_41Z.ecl
 */
-import doxie, doxie_files, doxie_raw, drivers, header, header_quick, iesp, Inquiry_AccLogs, LN_PropertyV2, mdr, 
-Models, Phone_Shell, Riskwise, Risk_Indicators, ut, Gateway, address,Relationship, Std;
+import doxie, dx_header, doxie_files, drivers, header, header_quick, Inquiry_AccLogs, LN_PropertyV2, mdr, 
+Riskwise, Risk_Indicators, ut, Gateway, address, Relationship, Std;
 
 EXPORT Search_Function(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOIn) VOO_In, 
 																						string50 DataRestrictionMask, 
@@ -94,14 +94,16 @@ EXPORT Search_Function(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOIn) VOO
 // Get all header records by DID
 // ********************************************************************
 
-	SHARED dk := choosen(doxie.key_max_dt_last_seen, 1);
+	SHARED dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 	SHARED hdrBuildDate01 := ((string)dk[1].max_date_last_seen)[1..6];
+	
 	
 // ********************************************************************************************************************************
 // This join will include header records outside of the history date so that first/last seen dates can be calculated regardless of
 // the input date (history date)
 // ********************************************************************************************************************************
-	SHARED VerificationOfOccupancy.Layouts.Layout_VOOShell getHeaderDates(Risk_Indicators.Layout_Output l, Doxie.Key_Header r) := transform
+	SHARED key_header := dx_header.key_header();
+	SHARED VerificationOfOccupancy.Layouts.Layout_VOOShell getHeaderDates(Risk_Indicators.Layout_Output l, key_header r) := transform
 		addrmatch							:= trim(l.z5) = trim(r.zip) and
 														 trim(l.prim_range) = trim(r.prim_range) and
 														 ut.NNEQ(trim(l.sec_range), trim(r.sec_range)) and
@@ -139,7 +141,7 @@ EXPORT Search_Function(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOIn) VOO
 		self									:= [];
 	end;
 	
-	SHARED with_HeaderDates := join(with_DID, Doxie.Key_Header,	
+	SHARED with_HeaderDates := join(with_DID, key_header,	
 									LEFT.DID <> 0 AND
 									keyed(left.DID = right.s_DID) and
 									// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -192,7 +194,7 @@ EXPORT Search_Function(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOIn) VOO
 
 
 	// Initialize the full header and quick header transforms
-	SHARED VerificationOfOccupancy.Layouts.Layout_VOOShell getHeader(Risk_Indicators.Layout_Output l, Doxie.Key_Header r) := transform
+	SHARED VerificationOfOccupancy.Layouts.Layout_VOOShell getHeader(Risk_Indicators.Layout_Output l, key_header r) := transform
 		addrmatch							:= trim(l.z5) = trim(r.zip) and
 														 trim(l.prim_range) = trim(r.prim_range) and
 														 ut.NNEQ(trim(l.sec_range), trim(r.sec_range)) and
@@ -352,7 +354,7 @@ EXPORT Search_Function(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOIn) VOO
 		self									:= [];
 	end;
 
-	SHARED with_Header := join(with_DID, Doxie.Key_Header,	
+	SHARED with_Header := join(with_DID, key_header,	
 									LEFT.DID <> 0 AND
 									keyed(left.DID = right.s_DID) and
 									// trim((string)right.dt_last_seen) >= hdrBuildDate01 and
@@ -827,7 +829,7 @@ SHARED with_SIC := join(with_ADVO, risk_indicators.key_HRI_Address_To_SIC,
 											getRelatives(left, right));  //inner join so we save only those who have relatives
 
 	// Initialize the full header and quick header transforms
-	SHARED VerificationOfOccupancy.Layouts.Layout_VOOShell getHeaderRel(VerificationOfOccupancy.Layouts.Layout_VOOShell l, Doxie.Key_Header r) := transform
+	SHARED VerificationOfOccupancy.Layouts.Layout_VOOShell getHeaderRel(VerificationOfOccupancy.Layouts.Layout_VOOShell l, key_header r) := transform
 		addrmatch							:= trim(l.z5) = trim(r.zip) and
 														 trim(l.prim_range) = trim(r.prim_range) and
 														 ut.NNEQ(trim(l.sec_range), trim(r.sec_range)) and
@@ -909,7 +911,7 @@ SHARED with_SIC := join(with_ADVO, risk_indicators.key_HRI_Address_To_SIC,
 		self									:= l;
 	end;
 
-SHARED with_Header_Relatives := join(allRelatives, Doxie.Key_Header,	
+SHARED with_Header_Relatives := join(allRelatives, key_header,	
 									LEFT.DID <> 0 AND
 									keyed(left.relativeDID = right.s_DID) and
 									// trim((string)right.dt_last_seen) >= hdrBuildDate01 and

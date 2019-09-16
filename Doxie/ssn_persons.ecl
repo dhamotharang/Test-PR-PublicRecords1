@@ -1,4 +1,4 @@
-﻿import ut, header;
+﻿import doxie, ut, header, dx_header;
 
 export ssn_persons ( boolean checkRNA = false ) := function
 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
@@ -18,19 +18,14 @@ recs := dedup (sort(csa, did,ssn), did, ssn);
 
 trecs := recs((integer)ssn>1000000 and (integer)ssn not in ut.Set_IntBadSSN);
 // eliminate old SSN before looking for imposters if prune_old_ssns
-trecs_pruned := join(trecs, doxie.Key_DID_SSN_Date (), left.did = right.did and
+trecs_pruned := join(trecs, dx_header.key_DID_SSN_date (), left.did = right.did and
                       left.ssn = right.ssn, TRANSFORM(LEFT),
 											LEFT ONLY);
 										
 keep_trecs := IF(keepOldSsns, trecs, trecs_pruned);
 use_trecs := project(keep_trecs, dids_ssns);
-										
-dids_ssns get_dds(use_trecs le, Doxie.Key_Header_SSN ri) := transform
-  self.ssn := le.ssn;
-  self := ri;
-  end;
 
-others_pre := join(use_trecs,Doxie.Key_Header_SSN,left.ssn[1]=right.s1 and
+others_pre := join(use_trecs,dx_header.key_ssn(),left.ssn[1]=right.s1 and
 								   left.ssn[2]=right.s2 and
 								   left.ssn[3]=right.s3 and
 								   left.ssn[4]=right.s4 and
@@ -38,12 +33,14 @@ others_pre := join(use_trecs,Doxie.Key_Header_SSN,left.ssn[1]=right.s1 and
 								   left.ssn[6]=right.s6 and
 								   left.ssn[7]=right.s7 and
 								   left.ssn[8]=right.s8 and
-								   left.ssn[9]=right.s9,get_dds(left,right), atmost (5000), keep(ut.limits.DID_PER_SSN + 1));
+								   left.ssn[9]=right.s9,
+                   TRANSFORM(dids_ssns, SELF.ssn := LEFT.ssn, SELF := RIGHT),
+                   atmost (5000), keep(ut.limits.DID_PER_SSN + 1));
 
 others := choosen (others_pre, ut.limits.DID_PER_SSN);
 
 // prune others that are old
-others_pruned := join(others, doxie.Key_DID_SSN_Date (), left.did = right.did and
+others_pruned := join(others, dx_header.key_DID_SSN_date (), left.did = right.did and
                       left.ssn = right.ssn, TRANSFORM(LEFT),
 											LEFT ONLY);
 
@@ -103,7 +100,8 @@ ssn_people_plus := record //some extra fields to allow us to use mac_glbclean an
   unsigned8 record_sid;
 end;
 
-ssn_people_plus get_people(doxie.Key_Header le) := transform
+index_header := dx_header.key_header();
+ssn_people_plus get_people(index_header le) := transform
   self.dead := le.tnt='D';
   self.name_suffix := IF(ut.is_unk(le.name_suffix),'',le.name_suffix);
   self.date_ob := le.dob;
@@ -112,7 +110,7 @@ ssn_people_plus get_people(doxie.Key_Header le) := transform
   self := le;
 end;
 	
-jdirty := join(the_set,doxie.Key_Header,
+jdirty := join(the_set,index_header,
 							 keyed(left.did=right.s_did) and 
 							 (left.ssn = right.ssn or keepOldSsns),
 							 get_people(right), LIMIT (ut.limits.DID_PER_PERSON, SKIP));

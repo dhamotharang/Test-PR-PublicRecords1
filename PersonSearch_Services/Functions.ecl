@@ -1,4 +1,4 @@
-import iesp, ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, NID, BankruptcyV3, FCRA, STD,
+import iesp, ut, AutoStandardI, AutoHeaderI, doxie, dx_header, suppress, codes, NID, BankruptcyV3, FCRA, STD,
        BankruptcyV3_Services, PhonesFeedback_Services, PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
 export Functions := MODULE
 	
@@ -355,7 +355,7 @@ export Functions := MODULE
 		end;
 
 		// check if SSN was seen before randomization:
-		ssn_w_legacy_info := join (inrecs, doxie.key_legacy_ssn,
+		ssn_w_legacy_info := join (inrecs, dx_header.key_legacy_ssn(),
 															keyed (Left.ssn = Right.ssn) AND
 															((unsigned6) Left.did = Right.did),
 															transform (ext_rec, Self.legacy_ssn := Right.ssn != '', Self := Left),

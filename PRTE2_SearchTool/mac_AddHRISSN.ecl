@@ -1,5 +1,5 @@
 ﻿export mac_AddHRISSN(infile, outfile, justIssueInfo, max_num='20') := macro
-import ut,codes,suppress, prte2_risktable;
+import ut, codes, suppress, prte2_risktable, doxie, dx_header;
 
 #uniquename(recentRec)
 %recentRec% := RECORD
@@ -12,7 +12,7 @@ import ut,codes,suppress, prte2_risktable;
   string5 code_randomized := ''; // to keep HRI code for potentially randomized SSN
 END;
 
-key_prunning := doxie.Key_DID_SSN_Date ();
+key_prunning := dx_header.key_DID_SSN_date();
 #uniquename(getRecent)
 %recentRec% %getRecent%(infile l, key_prunning r) := TRANSFORM
    SELF.isRecentlyReported := IF(r.did = 0, true, false);
@@ -28,7 +28,7 @@ END;
 // check if SSN was seen before randomization:
 // TODO: making it after validation may be more efficient
 #uniquename(ssn_w_legacy_info)
-%ssn_w_legacy_info% := join (%with_recent%, doxie.key_legacy_ssn,
+%ssn_w_legacy_info% := join (%with_recent%, dx_header.key_legacy_ssn(),
                              keyed (Left.ssn = Right.ssn) AND
                              ((unsigned6) Left.did = Right.did),
                              transform (%recentRec%, Self.legacy_ssn := Right.ssn != '', Self := Left),
