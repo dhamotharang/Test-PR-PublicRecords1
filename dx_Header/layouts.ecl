@@ -20,6 +20,8 @@ EXPORT layouts := MODULE
   EXPORT i_rid_src := RECORD
     unsigned6 rid;
     i_source;
+    head.global_sid;
+    head.record_sid;
   END;
 
   // wild_FnameSmall
@@ -271,6 +273,8 @@ end;
     string18 county_name;
     head.RawAID;
     unsigned6 uid;
+    head.global_sid;
+    head.record_sid;
   END;
 
 
@@ -375,6 +379,8 @@ end;
     head.zip4;
     head.county;
     head.geo_blk;
+    head.global_sid;
+    head.record_sid;
   END;
 
   EXPORT i_dts_address := RECORD //out_rec in key_header_DTS_address.ecl
@@ -520,6 +526,8 @@ end;
     head.dob;
     head.dt_first_seen;
     head.dt_last_seen;
+    head.global_sid;
+    head.record_sid;
   END;
 
   EXPORT i_addr_hist := RECORD //hierarchy_layout in header/proc_address_hist
