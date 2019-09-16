@@ -221,6 +221,8 @@ EXPORT Layout_Deltabase_Gateway := MODULE
 			string20	imei_activationdate;
 			integer5	imei_tenure_mindays;
 			integer5  imei_tenure_maxdays;
+			integer5  sim_tenure_mindays;
+			integer5  sim_tenure_maxdays; 
 			integer5	first_name_score;
 			integer5	last_name_score;
 			integer5	addr_score;
