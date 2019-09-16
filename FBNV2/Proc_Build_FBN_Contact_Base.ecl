@@ -151,11 +151,11 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 dist_dsFBN  := distribute(dPostDIDandBDIDPersist,hash64(tmsid));
 sort_dsFBN := sort(dist_dsFBN,RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local);
 
-dedup_dsFBN := dedup(sort_dsFBN,RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-:persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Contact::Dedup')
-;
+// dedup_dsFBN := dedup(sort_dsFBN,RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
+// :persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Contact::Dedup')
+// ;
 
-dOut    	 :=rollup(dedup_dsFBN,rollupXform(left,right),
+dOut    	 :=rollup(sort_dsFBN,rollupXform(left,right),
 			   		 RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
 					 :persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Contact');	
 
