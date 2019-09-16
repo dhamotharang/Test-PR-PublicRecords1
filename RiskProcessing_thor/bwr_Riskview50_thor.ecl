@@ -216,7 +216,7 @@ RiskView.Layouts.layout_riskview_input getInput(riskview.layouts.Layout_Riskview
 
 	SELF := le;
 END;
-batchin_with_seq := PROJECT(BatchIn, getInput(LEFT, COUNTER)) : INDEPENDENT;
+batchin_with_seq := PROJECT(BatchIn, getInput(LEFT, COUNTER)) : PERSIST('~BOCASHELLFCRA::riskview50_batchin_with_seq', expire(3));  // use persist instead of independent;
 								 
 //error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
 // Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want

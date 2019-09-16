@@ -1,6 +1,4 @@
-﻿#workunit('name','FCRA Bocashell 4.1 Process on thor');
-
-// Reads sample data from input file, makes a SOAP call to service specified and (optionally),
+﻿// Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
 // Before running:
 //   choose (or define) input file name and, if needed, output file name as well;
@@ -11,7 +9,10 @@
 //   eyeball is how many records you want to see on output, similar to record_limit except this is your intermediate result output count
 
 IMPORT _Control, address, AID, AutoStandardI, Gateway, Risk_Indicators, RiskWise, ut;
-onThor := _Control.Environment.OnThor;
+onThor := _Control.Environment.OnThor; // TRUE = use thor (distributed) logic. FALSE = use keyed joins.
+settingsOK := OnThor and _Control.Environment.OnVault and _Control.LibraryUse.ForceOff_AllLibraries;
+
+#WORKUNIT('name', 'FCRA Bocashell 4.1 Process' + 	if(settingsOK,  ' THOR ', ERROR(9,'Toggle OnThor OnVault LibraryUse') ) );  // throw an error here if the controls aren't set correctly
 
 //====================================================
 //=============== Configurable options =============== 
@@ -20,6 +21,7 @@ onThor := _Control.Environment.OnThor;
 unsigned record_limit :=   0;    //number of records to read from input file; 0 means ALL
 unsigned1 eyeball := 10;
 string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
+
 // Commenting out LastSeenThreshhold since it doesn't get passed through the FCRA shell
 // unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 history_date   := 0; // if this is set to 0, use historydateYYYYMM on input file. Use this historydate if it is > 0.
@@ -166,25 +168,25 @@ layout_acctno iidPrep( inds_dist le) := TRANSFORM
 	SELF.in_state         := le.St;
 	SELF.in_zipCode       := le.Z5;
 		//If running on Thor, we will call the AID address cache macro to populate these fields in the next transform to save processing time.
-  #IF(OnThor)  
-    SELF.prim_range    := '';
-    SELF.predir        := '';
-    SELF.prim_name     := '';
-    SELF.addr_suffix   := '';
-    SELF.postdir       := '';
-    SELF.unit_desig    := '';
-    SELF.sec_range     := '';
-    SELF.p_city_name   := '';
-    SELF.st            := '';
-    SELF.z5            := '';
-    SELF.zip4          := '';
-    SELF.lat           := '';
-    SELF.long          := '';
-    SELF.addr_type     := '';
-    SELF.addr_status   := '';
-    SELF.county        := '';
-    SELF.geo_blk       := '';
-  #ELSE
+  // #IF(OnThor)  
+    // SELF.prim_range    := '';
+    // SELF.predir        := '';
+    // SELF.prim_name     := '';
+    // SELF.addr_suffix   := '';
+    // SELF.postdir       := '';
+    // SELF.unit_desig    := '';
+    // SELF.sec_range     := '';
+    // SELF.p_city_name   := '';
+    // SELF.st            := '';
+    // SELF.z5            := '';
+    // SELF.zip4          := '';
+    // SELF.lat           := '';
+    // SELF.long          := '';
+    // SELF.addr_type     := '';
+    // SELF.addr_status   := '';
+    // SELF.county        := '';
+    // SELF.geo_blk       := '';
+  // #ELSE
   	SELF.prim_range    := clean_a2[1..10];
     SELF.predir        := clean_a2[11..12];
     SELF.prim_name     := clean_a2[13..40];
@@ -202,7 +204,7 @@ layout_acctno iidPrep( inds_dist le) := TRANSFORM
     SELF.addr_status   := clean_a2[179..182];
     SELF.county        := clean_a2[143..145];
     SELF.geo_blk       := clean_a2[171..177];
-  #END
+  // #END
   
 	SELF.dl_number := StringLib.StringToUppercase(riskwise.cleanDL_num(le.dl_number));
 	SELF.dl_state  := StringLib.StringToUppercase(le.dl_state);
@@ -216,7 +218,7 @@ layout_acctno iidPrep( inds_dist le) := TRANSFORM
 	SELF := [];
 END;
 	
-iid_prep_acct_roxie := PROJECT(inds_dist, iidPrep(LEFT));
+iid_prep_acct_roxie := PROJECT(inds_dist, iidPrep(LEFT)) : PERSIST('~BOCASHELLFCRA::shell41_batchin_with_seq', expire(3));  // use persist instead of independent;
 
 // Now get ready to call AID Address Cache macro, which we will use if running thor version
 r_layout_input_PlusRaw	:= RECORD
@@ -268,7 +270,8 @@ END;
 iid_prep_acct_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT));
 
 #IF(onThor)
-	iid_prep_acct := iid_prep_acct_thor;
+	// iid_prep_acct := iid_prep_acct_thor;
+	iid_prep_acct := iid_prep_acct_roxie;  // for comparing apples to apples in address results, use the address cleaner roxie uses
 #ELSE
 	iid_prep_acct := iid_prep_acct_roxie;
 #END
