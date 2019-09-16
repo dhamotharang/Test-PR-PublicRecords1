@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 import dnb_dmi,mdr,business_header,ut,_Validate,address,business_headerv2,mdr,lib_stringlib;
 
 export As_Business_Linking (boolean pUseOtherEnviron = _Constants().IsDataland
@@ -185,6 +185,10 @@ export As_Business_Linking (boolean pUseOtherEnviron = _Constants().IsDataland
 		self.match_geo_city							 := ''; //Not available		
 		self.group1_id									 := 0;
 		self.duns_number								 := l.rawfields.duns_number;
+		self.employee_count_org_raw      := l.rawfields.employees_total;
+		self.revenue_org_raw             := l.rawfields.annual_sales_volume;
+		self.employee_count_local_raw    := l.rawfields.employees_here;
+		self.revenue_local_raw           := '';
 		self 														 := l;
 		self 														 := [];
 	end;

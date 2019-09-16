@@ -1,4 +1,4 @@
-﻿IMPORT DNB_DMI, TopBusiness_BIPV2, MDR, ut, _Validate, data_services;
+﻿IMPORT DNB_DMI, TopBusiness_BIPV2, MDR, ut, _Validate, data_services, BIPV2;
 
 Base := DNB_DMI.Files().base.companies.qa;
 
@@ -46,13 +46,13 @@ SKIP(
 	SELF.source       						:=	MDR.sourcetools.src_Dunn_Bradstreet;
 	SELF.source_docid  						:=	L.rawfields.duns_number;
 	SELF.source_rec_id            :=  L.rid;
-	SELF.siccode       						:=	CHOOSE(C, 
-	                                         L.rawfields.sic1[1..8], L.rawfields.sic1a[1..8], L.rawfields.sic1b[1..8], L.rawfields.sic1c[1..8], L.rawfields.sic1d[1..8], 
-	                                         L.rawfields.sic2[1..8], L.rawfields.sic2a[1..8], L.rawfields.sic2b[1..8], L.rawfields.sic2c[1..8], L.rawfields.sic2d[1..8], 
-	                                         L.rawfields.sic3[1..8], L.rawfields.sic3a[1..8], L.rawfields.sic3b[1..8], L.rawfields.sic3c[1..8], L.rawfields.sic3d[1..8], 
-	                                         L.rawfields.sic4[1..8], L.rawfields.sic4a[1..8], L.rawfields.sic4b[1..8], L.rawfields.sic4c[1..8], L.rawfields.sic4d[1..8], 
-	                                         L.rawfields.sic5[1..8], L.rawfields.sic5a[1..8], L.rawfields.sic5b[1..8], L.rawfields.sic5c[1..8], L.rawfields.sic5d[1..8], 
-	                                         L.rawfields.sic6[1..8], L.rawfields.sic6a[1..8], L.rawfields.sic6b[1..8], L.rawfields.sic6c[1..8], L.rawfields.sic6d[1..8]
+	SELF.siccode                  := CHOOSE(C, 
+	                                         L.rawfields.sic1, L.rawfields.sic1a, L.rawfields.sic1b, L.rawfields.sic1c, L.rawfields.sic1d, 
+	                                         L.rawfields.sic2, L.rawfields.sic2a, L.rawfields.sic2b, L.rawfields.sic2c, L.rawfields.sic2d, 
+	                                         L.rawfields.sic3, L.rawfields.sic3a, L.rawfields.sic3b, L.rawfields.sic3c, L.rawfields.sic3d, 
+	                                         L.rawfields.sic4, L.rawfields.sic4a, L.rawfields.sic4b, L.rawfields.sic4c, L.rawfields.sic4d, 
+	                                         L.rawfields.sic5, L.rawfields.sic5a, L.rawfields.sic5b, L.rawfields.sic5c, L.rawfields.sic5d, 
+	                                         L.rawfields.sic6, L.rawfields.sic6a, L.rawfields.sic6b, L.rawfields.sic6c, L.rawfields.sic6d
 																					 );
 	SELF.naics        						:=	'';
 	SELF.industry_description 		:=	CHOOSE(C, 
@@ -68,6 +68,7 @@ SKIP(
 	SELF.dt_last_seen							:=	IF(_Validate.date.fIsValid((STRING)L.date_last_seen), L.date_last_seen, 0);
 	SELF.dt_vendor_first_reported	:=	IF(_Validate.date.fIsValid((STRING)L.date_vendor_first_reported), L.date_vendor_first_reported, 0);
 	SELF.dt_vendor_last_reported	:=	IF(_Validate.date.fIsValid((STRING)L.date_vendor_last_reported), L.date_vendor_last_reported, 0);
+	// SELF.record_type							:=	''; 
 	SELF.record_type							:=	(STRING)L.record_type; 
 	SELF.record_date							:=	L.date_last_seen; 
 	SELF.UltID										:=	L.UltID;
