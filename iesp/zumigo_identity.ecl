@@ -59,7 +59,7 @@ end;
 
 export t_ZIdIdentitySearch := record
 	string MobileDeviceNumber {xpath('MobileDeviceNumber')};
-	zumigo_share.t_ZIdConsent Consent {xpath('Consent')};
+	iesp.zumigo_share.t_ZIdConsent Consent {xpath('Consent')};
 	t_ZIdConsumerData ConsumerData {xpath('ConsumerData')};
 	t_ZIdValidateValues NameAddrValidation {xpath('NameAddrValidation')};
 end;
@@ -76,14 +76,25 @@ end;
 export t_ZIdIccid := record (t_ZIdBaseIdentity)
 end;
 
+export t_ZIdTenure := record
+	integer MinDays {xpath('MinDays')};
+	integer MaxDays {xpath('MaxDays')};
+end;
+
 export t_ZIdImsi := record (t_ZIdBaseIdentity)
 	iesp.share.t_Date2 ActivationDate {xpath('ActivationDate')};
 	iesp.share.t_Date2 ChangeDate {xpath('ChangeDate')};
+	t_ZIdTenure Tenure {xpath('Tenure')};
+end;
+
+export t_ZIdSim := record
+	t_ZIdTenure Tenure {xpath('Tenure')};
 end;
 
 export t_ZIdSubscriberIdentifier := record
 	t_ZIdImsi Imsi {xpath('Imsi')};
 	t_ZIdIccid Iccid {xpath('Iccid')};
+	t_ZIdSim Sim {xpath('Sim')};
 end;
 
 export t_ZIdDeviceIdentifier := record
