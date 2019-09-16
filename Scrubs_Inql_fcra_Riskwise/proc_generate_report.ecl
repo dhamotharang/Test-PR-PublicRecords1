@@ -24,7 +24,7 @@ disp_scrubs_report := sequential(
 
 EXPORT proc_generate_report (boolean submitTheStats = true) := FUNCTION
         orbitStats        := U.OrbitStats() : persist('~persist::_scrubs_rpt::'+o);;
-        disp_orbit_report := output(orbitStats,all,named('OrbitReport'));
+        disp_orbit_report := output(orbitStats,all,named('OrbitReport'),overwrite);
         submitStats       := Scrubs.OrbitProfileStats(o,'ScrubsAlerts',orbitStats,ver,m,CustomTag:='').SubmitStats;
 
         return SEQUENTIAL(
