@@ -1,13 +1,14 @@
-IMPORT Text_Search,Text_FragV1,doxie,DeathV2_Services,AutoStandardI,suppress;
+﻿IMPORT AutoStandardI,DeathV2_Services,doxie,dx_death_master,PowerSearchServices,
+       suppress,Text_FragV1,Text_Search;
 
-EXPORT Records(IParam.searchParams stdSrchArgs) := FUNCTION
+EXPORT Records(PowerSearchServices.IParam.searchParams stdSrchArgs) := FUNCTION
 
-	deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-  glb_ok := deathparams.isValidGlb();
-	STRING stem := Constants.FILE_STEM;
-	STRING sourceType	:= Constants.FILE_SRC_TYPE;
-	STRING qual := Constants.FILE_QUAL;
-	UNSIGNED maxResults := IF(stdSrchArgs.maxResults>0,stdSrchArgs.maxResults,Constants.MAX_RESULTS);
+	death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+  glb_ok := death_params.isValidGlb();
+	STRING stem := PowerSearchServices.Constants.FILE_STEM;
+	STRING sourceType	:= PowerSearchServices.Constants.FILE_SRC_TYPE;
+	STRING qual := PowerSearchServices.Constants.FILE_QUAL;
+	UNSIGNED maxResults := IF(stdSrchArgs.maxResults>0,stdSrchArgs.maxResults,PowerSearchServices.Constants.MAX_RESULTS);
 
 	info := Text_Search.FileName_Info_Instance(stem, sourceType, qual);
 	m := Text_Search.Text_Search_V3(info,stdSrchArgs);
@@ -17,24 +18,27 @@ EXPORT Records(IParam.searchParams stdSrchArgs) := FUNCTION
 
 	answerHits := JOIN(m.answers,ansIndx,
 		KEYED(LEFT.docRef.src=RIGHT.src AND LEFT.docRef.doc=RIGHT.doc),
-		TRANSFORM(Layouts.answerRec,SELF.hitScore:=LEFT.score;SELF:=RIGHT;SELF:=[]),
-		LIMIT(Constants.MAX_JOIN_RECS,SKIP));
+		TRANSFORM(PowerSearchServices.Layouts.answerRec,SELF.hitScore:=LEFT.score;SELF:=RIGHT;SELF:=[]),
+		LIMIT(PowerSearchServices.Constants.MAX_JOIN_RECS,SKIP));
 
-	answerRecs := SORT(Functions.assignScores(answerHits,m.rpn_srch),-argScore,-hitScore,-dt_last_seen);
+	answerRecs := SORT(PowerSearchServices.Functions.assignScores(answerHits,m.rpn_srch),-argScore,-hitScore,-dt_last_seen);
 
-	clnPropAddr := PROJECT(answerRecs,Transforms.clnPropAddr(LEFT));
+	clnPropAddrOrg := PROJECT(answerRecs,PowerSearchServices.Transforms.clnPropAddr(LEFT));
 
-	answerDODs := JOIN(CHOOSEN(clnPropAddr,maxResults,FEW),
-		doxie.key_death_masterV2_ssa_DID,KEYED(LEFT.did=RIGHT.l_did)
-		and not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-		TRANSFORM(Layouts.answerRec,
-		          SELF.dod:=RIGHT.dod8,
-							self.deceased := if ((integer)right.did > 0,'Y','N'),
-							SELF:=LEFT),
-		LEFT OUTER,KEEP(1),LIMIT(0));
+	clnPropAddr := CHOOSEN(clnPropAddrOrg,maxResults,FEW);
 
+	answerDODsAppend := dx_death_master.Append.byDid(clnPropAddr, did, death_params);
+ 
+  answerDODs := 
+    PROJECT(answerDODsAppend,
+      TRANSFORM(PowerSearchServices.Layouts.answerRec,
+		    SELF.dod := LEFT.death.dod8;
+				SELF.deceased := IF(LEFT.death.is_deceased, 'Y', 'N');
+				SELF:=LEFT;
+        ));
+      
   suppress.MAC_Mask(answerDODs,answerMasked,SSN,NULL,TRUE,FALSE,,,,stdSrchArgs.ssnMask);
 
-	RETURN PROJECT(answerMasked,Transforms.pwrSrchRec(LEFT));
+	RETURN PROJECT(answerMasked,PowerSearchServices.Transforms.pwrSrchRec(LEFT));
 
 END;

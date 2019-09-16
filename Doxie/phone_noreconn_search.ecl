@@ -68,7 +68,8 @@ if the permission is set. Try Qsent data if nothing found above.
 <message name="phone_noreconn_search" wuTimeout="300000">
 */
 
-IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, Royalty, STD, Suppress, ut, WSInput, D2C,SSNBest_Services, Phones;
+IMPORT AutoStandardI, BatchServices, D2C, DeathV2_Services, DidVille, Doxie_Raw, dx_death_master, iesp, MDR, 
+       Phones, PhonesFeedback_Services, Royalty, SSNBest_Services, STD, Suppress, ut, WSInput;
 
 EXPORT phone_noreconn_search := MACRO
 	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
@@ -87,7 +88,7 @@ EXPORT phone_noreconn_search := MACRO
 
 	doxie.MAC_Header_Field_Declare();
 	globalmod := AutoStandardI.GlobalModule();
-    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalmod);
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalmod);
 	IsCNSMR := ut.IndustryClass.is_Knowx;
 	srchMod := MODULE(PROJECT(globalmod,doxie.phone_noreconn_param.searchParams,OPT))
 			EXPORT UNSIGNED1 DPPAPurpose := DPPA_Purpose;
@@ -304,29 +305,30 @@ EXPORT phone_noreconn_search := MACRO
 											trans_best(left,right),left outer,keep(1),limit(0));
 
 	/*--- Back to code ---*/
-	deathparams := DeathV2_Services.IParam.GetDeathRestrictions(globalmod);
+	death_params := DeathV2_Services.IParam.GetDeathRestrictions(globalmod);
 
-	filteredResults := join(results_best, Doxie.key_death_masterV2_ssa_DID,
-														keyed((integer)left.did = right.l_did)
-														and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-														transform(out_layout,
-																			self.deceased := 'N',
-																			self := left),left only);
+	filteredResults_supp := dx_death_master.exclude(results_best, did, death_params); 
+  
+  filteredResults := 
+    project(filteredResults_supp, 
+      transform(out_layout,
+        self.deceased := 'N';  
+        self := left));   
 
-out_layout_info := record
-	    recordof(out_layout);
-   		string src := '';
-end;
+  out_layout_info := record
+	  recordof(out_layout);
+    string src := '';
+  end;
 
-	resultsPlusDeath_info := join(results_best, Doxie.key_death_masterV2_ssa_DID,
-														keyed((integer)left.did = right.l_did)
-														and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-														transform(out_layout_info,
-																			self.deceased := if ( right.l_did > 0,'Y','N'),
-																			self.dod := (integer)right.dod8,
-																			self.src := right.src;
-																			self := left),
-														left outer,limit(ut.limits.DEATH_PER_DID, skip));
+	resultsPlusDeath_info_append := dx_death_master.Append.byDid(results_best, did, death_params,,ut.limits.DEATH_PER_DID); 
+
+  resultsPlusDeath_info := 
+    project(resultsPlusDeath_info_append, 
+      transform(out_layout_info,
+        self.deceased := if(left.death.is_deceased, 'Y', 'N'), 
+        self.dod := if(left.death.is_deceased, (unsigned4)left.death.dod8, 0),
+        self.src := if(left.death.is_deceased, left.death.src, ''),
+        self := left));
 
 	Death_source_srt:= Sort(resultsPlusDeath_info,did,dod);
 	Death_source_grp:= Sort(group(Death_source_srt,did,dod), if(src = MDR.sourceTools.src_Death_Restricted, 1,0));
@@ -607,6 +609,7 @@ resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,
 	// output(ds_ported_servtype,named('ds_ported_servtype'));
 	// output(ds_results_ported_checked,named('ds_results_ported_checked'));
 	// output(resultsPreFB,named('resultsPreFB'));
+
 
 	if(~batch_friendly,
 		 if(use_tg or use_qt or call_PVS or use_LR, parallel(disp_cnt, out_royal, out_rslt), parallel(disp_cnt, out_rslt)),out_rslt);

@@ -2,8 +2,8 @@
 This function gets Relatives, Employers, Associates, and Businesses (REAB) for accounts with input for 
 firstname, lastname, and (DID or SSN or full address or DOB).
 */
-IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,EmailService,Header,
-       PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
+IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,dx_death_master,EmailService,
+       Header,PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
 
 EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwnership.IParams.BatchParams inMod) :=FUNCTION //
 
@@ -28,25 +28,23 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 
 	dsUniqueRA := DEDUP(SORT(dsRA,srcdid,person2,-rel_dt_last_seen,rel_dt_first_seen,titleno),srcdid,person2);
   //TODO: death-specific parameters like DeathMasterPurpose are not being read?
-	deathParams := PROJECT(mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT);
-	
-	PhoneOwnership.Layouts.Phone_Relationship updateRelatives(doxie_Raw.Layout_RelativeRawOutput l,Doxie.key_death_masterV2_ssa_DID r) :=TRANSFORM
-		SELF.did := l.person2;
-		SELF.titleno := l.titleno;
-		SELF.isDeceased := (BOOLEAN)(r.l_did != 0);
-		SELF.batch_in.did := l.srcdid;
-		SELF.dt_first_seen:=(STRING)l.rel_dt_first_seen,
-		SELF.dt_last_seen:=(STRING)l.rel_dt_last_seen,
-		SELF := [];
-	END;
-	dsRAwDeceased := JOIN(dsUniqueRA, Doxie.key_death_masterV2_ssa_DID,
-							KEYED(LEFT.person2 = RIGHT.l_did) AND
-							NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, mod_access.isValidGLB(), deathParams),
-							updateRelatives(LEFT,RIGHT),
-							LEFT OUTER,
-							LIMIT(0),KEEP(1));
+	death_params := PROJECT(mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT);
 
-	dsRelatives:= JOIN(needREA,dsRAwDeceased,
+	dsRAwDeceasedAppend := dx_death_master.Append.byDid(dsUniqueRA, person2, death_params);
+ 
+  dsRAwDeceased :=
+    PROJECT(dsRAwDeceasedAppend,
+      TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
+        SELF.isDeceased := LEFT.death.is_deceased;
+        SELF.did := LEFT.person2;
+		    SELF.titleno := LEFT.titleno;
+		    SELF.batch_in.did := LEFT.srcdid;
+		    SELF.dt_first_seen :=(STRING)LEFT.rel_dt_first_seen,
+		    SELF.dt_last_seen :=(STRING)LEFT.rel_dt_last_seen,
+		    SELF := [];
+        ));
+  
+  dsRelatives:= JOIN(needREA,dsRAwDeceased,
 						LEFT.did = RIGHT.batch_in.did,	
 						TRANSFORM(PhoneOwnership.Layouts.Phone_Relationship,
 									SELF.acctno := LEFT.acctno,
