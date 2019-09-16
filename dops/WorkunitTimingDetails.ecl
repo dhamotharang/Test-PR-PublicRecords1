@@ -64,7 +64,7 @@ EXPORT WorkunitTimingDetails(string esp
 	export GetDetails() := function
 	
 		dGetWUList := GetWUList();
-		
+		// DUS-519
 		rWUTimingDetails xConvertToLocalLayout(dGetWUList l) := transform
 			s_time := STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Created' and application = '')[1].time;
 			e_time := STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Finished' and application = '')[1].time;
