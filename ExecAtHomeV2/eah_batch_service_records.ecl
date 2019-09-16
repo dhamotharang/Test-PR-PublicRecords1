@@ -47,7 +47,9 @@ FUNCTION
   dsMrktContactsLinkIdsLayout := PROJECT(dsMrktBest,BIPV2.IDlayouts.l_xlink_ids2);
   dsMarketingContactsAll := BIPV2_Build.key_contact_linkids.kFetchMarketing(dsMrktContactsLinkIdsLayout, 
 	                                                                          BIPV2.IDconstants.Fetch_Level_SELEID,0, 
-                                                	                          marketingInMod);
+                                                	                          marketingInMod,
+																																						ExecAtHomeV2.Constants.MAX_CONTACTS);
+																																						
   // We want to keep the best (executive when applicable) 'current' DID record with the latest 
   // last seen date. For the executive_ind_order field, the lower the number, the 
   // higher up in the company the executive is. 
@@ -56,7 +58,7 @@ FUNCTION
   // then those records will fall to the bottom.
   dsMarketingContactsDedup := 
   DEDUP(SORT(dsMarketingContactsAll(current AND contact_did != 0 AND (executive_ind OR ~inMod.execsOnly)),
-             #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did,contact_job_title_derived = '',
+	              #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did,contact_job_title_derived = '',
                      -dt_last_seen_contact,-executive_ind,executive_ind_order), 
         #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),contact_did);
 
@@ -69,22 +71,24 @@ FUNCTION
   JOIN(dsMrktBest,dsMarketingContacts, 
        BIPV2.IDmacros.mac_JoinTop3Linkids(),
        ExecAtHomeV2.Transforms.xfmAddMktContactFields(LEFT, RIGHT),
+			 KEEP(ExecAtHomeV2.Constants.MAX_EMPLOYEES_PER_COMP),
        LIMIT(0)); 
   
   // get records not in the BipV2_Best.Key_LinkIds.kFetch2Marketing fetch
   dsNoHitMktBest :=
   JOIN(dsSearchIDsBestWeight,dsMarketingContacts, 
        BIPV2.IDmacros.mac_JoinTop3Linkids(), 
-       TRANSFORM(BIPV2.IDlayouts.l_xlink_ids,
+       TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
                  SELF := LEFT),
        LEFT ONLY);
-  
-  dsPawLinkIdsAll := paw.Key_LinkIDs.kFetch(dsNoHitMktBest,,
-                                            BIPV2.IDconstants.Fetch_Level_SELEID);
+	 
+  dsPawLinkIdsAll := paw.Key_LinkIDs.kFetch2(dsNoHitMktBest,,
+                                            BIPV2.IDconstants.Fetch_Level_SELEID,,
+																						ExecAtHomeV2.Constants.MAX_CONTACTS);
   
   dsPawFiltered := dsPawLinkIdsAll(DID != 0 AND
                                    record_type = ExecAtHomeV2.Constants.CURRENT_REC AND
-                                   source NOT IN MDR.sourceTools.SET_Marketing_Restricted);
+                                   source IN MDR.sourceTools.set_Marketing_Sources);
 
   // saving a join by using dsSearchIDsBestWeight (to pick up acctno) instead of dsPawLinkIdsAll 
   // because the later uses dsNoHitMktBest which will only return the desired result set
@@ -92,7 +96,7 @@ FUNCTION
   JOIN(dsSearchIDsBestWeight,dsPawFiltered, 
        BIPV2.IDmacros.mac_JoinTop3Linkids(),
        ExecAtHomeV2.Transforms.xfmGetPawData(LEFT, RIGHT),
-       LIMIT(0));
+       LIMIT(ExecAtHomeV2.Constants.MAX_CONTACTS,SKIP));
 
   dsPawWithDecMkrFlag := 
   JOIN(dsPawContactsEAHLayout,ExecAtHomeV2.ExecutiveTitles,
@@ -125,7 +129,7 @@ FUNCTION
                                                    inMod.DataPermissionMask);
 
   // Previously limited above, there should never be more than 
-  // a thousand executives per company
+  // 25 executives per company
   dsAllRecs := 
   JOIN(batchIn,dsWithContactInfo,
        LEFT.acctno = RIGHT.acctno,
@@ -133,7 +137,8 @@ FUNCTION
                  SELF.acctno := LEFT.acctno,
                  SELF.customer_id := LEFT.customer_id,
                  SELF := RIGHT),
-       LIMIT(ExecAtHomeV2.Constants.MAX_EMPLOYEES_PER_COMP),
+       KEEP(ExecAtHomeV2.Constants.MAX_EMPLOYEES_PER_COMP),
+       LIMIT(0),
        LEFT OUTER); 
   
   dsAllRecsSorted := 
@@ -142,7 +147,7 @@ FUNCTION
   
   dsFinalLayout := 
   PROJECT(dsAllRecsSorted,ExecAtHomeV2.Layouts.layoutEahOutput);
-
+	
   RETURN dsFinalLayout;
   END;
   
