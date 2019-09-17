@@ -23,7 +23,7 @@ ECL :=
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
 +'		,Sequential(FraudGovPlatform.GenerateProdDashboards\n'
-+'		,email(\'RIN Production Dashboards Refresh Started\'))\n'
++'		,email(\'RIN Production Dashboards Refresh Started \'))\n'
 +'	);\n'
 ;
 #WORKUNIT('protect',true);

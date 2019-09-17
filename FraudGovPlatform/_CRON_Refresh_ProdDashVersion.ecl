@@ -24,7 +24,7 @@ ECL :=
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
 +'		,Sequential(FraudGovPlatform.GenerateProdDashVersion\n'
-+'		,if(~RefreshDash,email(\'RIN Production Dashboards Refresh Completed\')))\n'
++'		,if(~RefreshDash,email(\'RIN Production Dashboards Refresh Completed \')))\n'
 +'	);\n'
 ;
 #WORKUNIT('protect',true);
