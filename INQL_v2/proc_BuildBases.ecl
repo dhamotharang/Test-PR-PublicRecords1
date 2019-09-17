@@ -1,41 +1,42 @@
-﻿import std, PromoteSupers;
+﻿import std, PromoteSupers, wk_ut;
 
 export proc_BuildBases(string version = '', boolean isFCRA = false, boolean pDaily = true) := function
 	
-	LastDD := INQL_v2.files(isFCRA, true).LastDeployedDelta;
-  RequireFlush := not LastDD[1].Flushed;
-  
-  f(string v) := stringlib.stringfind(v, '::', 5)+2;
-  DeltaBase := INQL_v2.Filenames(,isFCRA,true).INQL_Base.built;
-  DB_LF := fileservices.superfilecontents(DeltaBase)[1].name;
-  
-  DeployedDelta	:=  if(pDaily
-                       ,dataset([{LastDD[1].version, true}], {string8 version, boolean Flushed})
-                       ,dataset([{DB_LF[f(DB_LF)..], false}], {string8 version, boolean Flushed})
-                      );
-                       
-  PromoteSupers.MAC_SF_BuildProcess(DeployedDelta, INQL_v2.Filenames(,isFCRA,true).DeployedDelta, PostIt,2,,true,WORKUNIT);
+	nonfcra_daily_version 	:= if(version = '', inql_v2._Versions.nonfcra_next_daily_base, version):INDEPENDENT;
+	fcra_daily_version 			:= if(version = '', inql_v2._Versions.fcra_next_daily_base, version):INDEPENDENT;
+	nonfcra_weekly_version 	:= if(version = '', inql_v2._Versions.nonfcra_daily_base, version):INDEPENDENT;
+	fcra_weekly_version 		:= if(version = '', inql_v2._Versions.fcra_daily_base, version):INDEPENDENT;
 	
-  seq := sequential(
-					if(pDaily and INQL_v2.IsLastFullLive(isFCRA) and RequireFlush
-            ,sequential(
-               output('******REQUIRE TO FLUSH DEPLOYED DATA**************')
-              ,INQL_v2.Flush_DeployedData(isFCRA).bld
-              ,PostIt
-            )
-            ,output('******NOT REQUIRE TO FLUSH DEPLOYED DATA**************')
-					)
-					,if(pDaily, MOVE_FILES(isFCRA).Current_To_In_Bldg)  //promote sprayed input files to bldg
-					//start Building Base files
-					,INQL_v2.File_MBS.CreateFile(version)
-					,INQL_v2.Build_Base(version, isFCRA, pDaily).inql_all  						
-					,INQL_v2.Build_Base(version, isFCRA, pDaily).SBA_all		
-					,INQL_v2.Build_Base(version, isFCRA, pDaily).Batch_PIIs_all
-          ,if(not pDaily, PostIt)
-					,if(pDaily, INQL_v2.ConsolidateInputs(isFCRA).do)
-					//,if(pDaily, CLEAR_FILES(isFCRA).In_Bldg)
-					);
-  
-	return seq;
+  notify_post_ecl					:= 'notify(INQL_v2._CRON_ECL(\'BASE POST\',' + isFCRA + ',true).EVENT_NAME, \'*\');';
+	     	
+  nonfcra_daily_build    		:= 		sequential(
+																		 INQL_v2.Build_Base(nonfcra_daily_version, false, true).inql_all  						
+																		,INQL_v2.Build_Base(nonfcra_daily_version, false, true).SBA_all		
+																		,INQL_v2.Build_Base(nonfcra_daily_version, false, true).Batch_PIIs_all
+																		,INQL_v2.MOVE_FILES(false,true,'weekly').Base_To_Building
+																		,wk_ut.CreateWuid(notify_post_ecl, INQL_v2._Constants.NONFCRA_THOR, INQL_v2._Constants.NON_FCRA_ESP)
+																		);
+	
+	nonfcra_history_build 		:= 	sequential(
+																			 INQL_v2.Build_Base(nonfcra_weekly_version, false, false).inql_all
+																			,INQL_v2.Build_Base(nonfcra_weekly_version, false, false).BillGroups_DID_all
+																			);
+	
+	fcra_daily_build 					:= sequential(
+																					INQL_v2.Build_Base(fcra_daily_version, true, true).inql_all
+																				 ,wk_ut.CreateWuid(notify_post_ecl, INQL_v2._Constants.FCRA_THOR, INQL_v2._Constants.FCRA_ESP)
+																			   );
+
+	fcra_history_build		  := sequential(
+																			 INQL_v2.MOVE_FILES(true,true,'weekly').Base_To_Building  // move daily base to building weekly  	
+																			,INQL_v2.Build_Base(fcra_weekly_version, true, false).inql_all
+																			,INQL_v2.Build_Base(fcra_weekly_version, true, false).BillGroups_DID_all
+																			 );	
+	
+	nonfcra_build := 	if(pDaily, nonfcra_daily_build, nonfcra_history_build);
+	
+  fcra_build 		:= 	if(pDaily, fcra_daily_build, fcra_history_build);
+	
+	return if(isFCRA, fcra_build, nonfcra_build); 
 	
 end;

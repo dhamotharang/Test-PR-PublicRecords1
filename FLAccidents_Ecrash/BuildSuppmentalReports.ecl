@@ -1,4 +1,4 @@
-/*2017-05-24T18:45:57Z (Srilatha Katukuri)
+﻿/*2017-05-24T18:45:57Z (Srilatha Katukuri)
 ECH-4987 - Production bug Fix - to account for Suppressed TF reports
 
 */
@@ -12,7 +12,7 @@ DFF-16695 Final Check in
 DFF- 16695 - Coplogic DataIngestion2
 */
 /*2016-03-04T02:36:53Z (Srilatha Katukuri)
-â€“ Bug: 201048  -- fixed the page count issue for supplemetal reports
+Ã¢â‚¬â€œ Bug: 201048  -- fixed the page count issue for supplemetal reports
 */
 /*2015-10-13T00:45:04Z (Srilatha Katukuri)
 #181860 - accesing agency QC file
@@ -35,8 +35,8 @@ Bug# 180852 - PIR 4710 Coplogic Data ingestion
 import ut; 
 export BuildSuppmentalReports := module 
 agency     := FLAccidents_Ecrash.Infiles.agency	  ;																		
-tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all)		;										
-tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all)		;	
+tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all,local)		;										
+tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all,local)		;	
 tIncident := FLAccidents_Ecrash.IncidentsAfterSuppression;
 
 //keep all incidents and flag updated or duplicate version of reports

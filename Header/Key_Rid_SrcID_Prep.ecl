@@ -77,9 +77,11 @@ export Key_Rid_SrcID_Prep(boolean pFastHeader = false, boolean pCombo = true, da
 										,getID(left,right)
 										,local);			
 
-	dFheader:=project(dataset('~thor_data400::persist::qh_seqd',header.Layout_New_Records,flat),Layout_RID_SrcID);
-	get_recs := if(pCombo,pDataset,if(pFastHeader, dFheader, get_recs0 + header.file_transunion_rid_srcid + header.file_tn_rid_srcid));
+	dFheader0:=  dataset('~thor_data400::persist::qh_seqd',header.Layout_New_Records,flat);
+	dFheader1:=  PROJECT(dFheader0,TRANSFORM(dx_header.layouts.i_rid_src,SELF:=LEFT,SELF.global_sid:=0,SELF.record_sid:=0));
+	get_recs1:= PROJECT(get_recs0,TRANSFORM(dx_header.layouts.i_rid_src,SELF:=LEFT,SELF.global_sid:=0,SELF.record_sid:=0));
+	get_recs := if(pCombo,pDataset,if(pFastHeader, dFheader1, get_recs1 + header.file_transunion_rid_srcid + header.file_tn_rid_srcid));
 
-	return PROJECT (get_recs,Layout_RID_SrcID );
+	return PROJECT (get_recs,dx_header.layouts.i_rid_src );
 
 end;
