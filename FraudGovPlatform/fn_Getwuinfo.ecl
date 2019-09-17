@@ -1,4 +1,5 @@
 ﻿// function to capture work unit status from other environment
+Import ut;
 Export fn_GetWUInfo	(string wid
 										,string esp // pass in esp ip or dns, ignore http://
 										,string port = '8010'
@@ -14,7 +15,8 @@ Export fn_GetWUInfo	(string wid
 
 	results := SOAPCALL('http://'+esp+':'+port+'/WsWorkunits', 'WUInfo', 
 										InRecord, dataset(OutRecord),
-										xpath('WUInfoResponse/Workunit')
+										xpath('WUInfoResponse/Workunit'),
+										HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 											);
 	Return results;
 	end;
