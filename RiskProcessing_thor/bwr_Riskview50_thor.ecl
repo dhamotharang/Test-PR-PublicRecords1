@@ -6,7 +6,7 @@
 // 3.  Workunit takes up to 20 minutes to compile before it starts running, be patient
 // *****************************************************************************************************************
 
-IMPORT FFD, Gateway, iesp, Risk_Indicators, RiskView, Ut, _Control;
+IMPORT FFD, Gateway, iesp, Risk_Indicators, RiskView, Ut, _Control, RiskProcessing;
 onThor := _Control.Environment.OnThor;
 settingsOK := OnThor and _Control.Environment.OnVault and _Control.LibraryUse.ForceOff_AllLibraries;
 // settingsOK := true;
@@ -45,7 +45,7 @@ STRING SecurityCode := '';
 string DataRestriction := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
 STRING50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission;
 STRING strFFDOptionsMask_in	 :=  '1';
-BOOLEAN IncludeLnJ := TRUE;
+BOOLEAN IncludeLnJ := false;
 BOOLEAN IncludeRecordsWithSSN := FALSE;
 BOOLEAN IncludeBureauRecs := FALSE; 
 integer2 ReportingPeriod := 84; // 84 is default (acceptable values 1-84 months)
@@ -301,17 +301,12 @@ results_transformed := project(results,
 		));
 
 results_final := results_transformed + insufficient_inputs;
+results_final_no_juli := project(results_final, transform(RiskProcessing.bwr_LayoutsJuli.layout_riskview5_batch_responseNoJuli, self := left));
 
 OUTPUT(CHOOSEN(batchin_with_seq, eyeball_count), NAMED('Sample_batchin_with_seq'));
 OUTPUT(CHOOSEN(insufficient_inputs, eyeball_count), NAMED('Sample_invalid_inputs'));
 OUTPUT(CHOOSEN(Results_Final, eyeball_count), NAMED('Results'));
 
-OUTPUT(batchin_with_seq,, '~dvstemp::out::temp::batch_in_with_seq_' + thorlib.wuid(), thor, expire(5));	
-OUTPUT(Search_Results,, '~dvstemp::out::temp::Search_Results_' + thorlib.wuid(), thor, expire(5));	
-
-OUTPUT(sort(Results_Final, acctno),, '~dvstemp::out::RiskView50_' + IF(onThor, 'thor_', 'roxie_') + thorlib.wuid(), CSV(heading(1), QUOTE('"')));	
-
-
-
-
+if(IncludeLnJ=false, OUTPUT(sort(results_final_no_juli, acctno),, '~dvstemp::out::RiskView50_' + IF(onThor, 'thor_', 'roxie_') + thorlib.wuid(), CSV(heading(single), QUOTE('"'))) );	
+if(IncludeLnJ, OUTPUT(sort(Results_Final, acctno),, '~dvstemp::out::RiskView50_' + IF(onThor, 'thor_', 'roxie_') + thorlib.wuid(), CSV(heading(single), QUOTE('"'))) );	
 
