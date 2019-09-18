@@ -126,6 +126,7 @@ module
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
 		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
+		export Advo					:= tools.mod_FilenamesBuild(Template('Advo'),pversion);
 		
 		
 		//Kel Files
@@ -185,7 +186,8 @@ module
 		export Crim_Demo				:= tools.mod_FilenamesBuild(Template('Crim_Demo'),pversion);
 		export Death_Demo				:= tools.mod_FilenamesBuild(Template('Death_Demo'),pversion);
 		export FraudPoint_Demo	:= tools.mod_FilenamesBuild(Template('FraudPoint_Demo'),pversion);
-		Export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
+		export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
+		export Advo_Demo				:= tools.mod_FilenamesBuild(Template('Advo_Demo'),pversion);
 			
 		export dAll_filenames :=
 			AddressCache.dAll_filenames +
@@ -244,7 +246,9 @@ module
 			CIID_Orig.dAll_filenames +
 			Crim_Orig.dAll_filenames +
 			Death_Orig.dAll_filenames +
-			IPMetaData.dAll_filenames;
+			IPMetaData.dAll_filenames + 
+			Advo.dAll_filenames +
+			Advo_Demo.dAll_filenames;;
 			; 
 	
 	end;
