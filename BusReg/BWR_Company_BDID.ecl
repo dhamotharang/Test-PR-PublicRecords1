@@ -1,4 +1,4 @@
-//#workunit('name','Accutrend Company Build ' + busreg.BusReg_Build_Date);
+﻿//#workunit('name','Accutrend Company Build ' + busreg.BusReg_Build_Date);
 import ut;
 
 base := BusReg.File_BusReg_Base;
@@ -6,6 +6,7 @@ base := BusReg.File_BusReg_Base;
 //Project into Company layout
 busreg.Layout_BusReg_Company co_slim(busreg.layout_busreg_temp L) := transform
  self := l;
+ self := [];
 end;
 
 //******** Create Company File ******************//

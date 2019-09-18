@@ -1,4 +1,6 @@
-﻿	//Base Files by Source
+﻿IMPORT _control, CCPA, Std;
+
+	//Base Files by Source
 	portFile		:= 	PhonesInfo.File_TCPA.Main(vendor_first_reported_dt<=20150308);					//Neustar Ported
 	port2File		:= 	PhonesInfo.File_iConectiv.Main;																					//iConectiv Ported
 	deactFile		:= 	PhonesInfo.File_Deact.Main;																							//Digital Segment Deact
@@ -10,6 +12,9 @@
 									port2File +
 									deactFile +
 									deactGHFile +
-									otpFile; 												
+									otpFile; 
+									
+	//Add Global_SID Field
+	addGlobalSID:= 	CCPA.macGetGlobalSID(concatFiles, 'PhonesMetadata', 'source', 'global_sid');												
 
-EXPORT Map_Phones_Transaction_Main := concatFiles;
+EXPORT Map_Phones_Transaction_Main := addGlobalSID;

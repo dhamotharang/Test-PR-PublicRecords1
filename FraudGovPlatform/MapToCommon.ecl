@@ -1,4 +1,4 @@
-﻿import FraudShared, STD, doxie, Suppress,data_services; 
+﻿import FraudShared, STD; 
 EXPORT MapToCommon  (
 	 string pversion
   ,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(_Flags.FileExists.Base.MainOrigQA, FraudGovPlatform.Files().Base.Main_Orig.QA, DATASET([], FraudShared.Layouts.Base.Main))
@@ -31,7 +31,6 @@ module
  
 	Export KnownFraud := project (extra_dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
-		self.event_date			:= left.reported_date;
 		self.transaction_id := left.customer_event_id;
 		self.additional_address.Street_1	:= left.Mailing_Street_1; 
 		self.additional_address.Street_2	:= left.Mailing_Street_2;
@@ -96,12 +95,8 @@ module
 	// Append Lexid
 	EXPORT NewBaseLexid := Append_Lexid (Append_CleanAdditionalAddress):independent;
 
-	// Supress CCPA
-	mod_access := MODULE(doxie.IDataAccess) END; // default mod_access
-	EXPORT Supress_CCPA := Suppress.MAC_SuppressSource(NewBaseLexid, mod_access, did, NULL,TRUE);
-	
 	// Append RinID
-	EXPORT NewBaseRinID := Append_RinID (Supress_CCPA):independent;
+	EXPORT NewBaseRinID := Append_RinID (NewBaseLexid):independent;
 	
 	//Validate Deltabase 
 	Export NewBaseDelta	:= fn_validate_delta(NewBaseRinID):independent;

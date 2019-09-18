@@ -226,7 +226,7 @@ PTYD_spy := if ( ut.Weekday((integer) ut.GetDate) <> 'SUNDAY' , if (  COUNT(PTYD
 
 
 																 
-return sequential(Agency_sp,Incident_spy,BillingAgency_spy,Vehicle_spy,Person_spy, Document_spy,/*Citation_spy,*/
+return sequential(Agency_sp,Incident_spy,BillingAgency_spy,Vehicle_spy,Person_spy, Document_spy,Citation_spy,
                   Commercial_spy,PTYD_spy);
 																 
 end;

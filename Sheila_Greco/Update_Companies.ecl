@@ -1,4 +1,4 @@
-import ut;
+﻿import _control, CCPA, Std, ut;
 
 export Update_Companies(
 
@@ -38,7 +38,10 @@ function
 	base_file 							:= project(pBaseFile, transform(Layouts.Base.Companies, self.record_type := 'H'; self := left));
 	update_combined					:= map(_Flags.Update.Companies =>	 dStandardizedInputFile + base_file
 																														,dStandardizedInputFile );
-	dStandardizedAddr				:= Standardize_Addr_Companies	(update_combined		);
+																														
+	addGlobalSID						:= CCPA.macGetGlobalSID(update_combined, 'SheilaGrecoCompany', '', 'global_sid'); //DF : Populate Global_SID;	
+	
+	dStandardizedAddr				:= Standardize_Addr_Companies	(addGlobalSID		);
 	 
 	dAppendIds	:= Append_Ids.fAppendBdid	(dStandardizedAddr, Contacts);
 	 

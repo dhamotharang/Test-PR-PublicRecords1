@@ -1,11 +1,11 @@
 ﻿EXPORT Keys(DATASET(layout_DOT_Base) ih = dataset([],layout_DOT_Base),string liter = 'qa' ,boolean pUseOtherEnvironment = false) := MODULE
 SHARED s := Specificities(ih).Specificities;
 SHARED mtch := debug(ih ,s[1]).AnnotateMatches(matches(ih).PossibleMatches,matches(ih).All_Attribute_Matches);
-prop_file := match_candidates(ih).candidates; // Use propogated file
+prop_file := project(match_candidates(ih).candidates,BIPV2_ProxID._Old_layouts.mc); // Use propogated file
 EXPORT Candidates         := INDEX(prop_file,{Proxid},{prop_file},keynames(liter,pUseOtherEnvironment).match_candidates_debug.logical);
-ms_temp := sort(mtch,Conf,Proxid1,Proxid2,SKEW(1.0)); // Some headers have very skewed IDs
+ms_temp := project(sort(mtch,Conf,Proxid1,Proxid2,SKEW(1.0))  ,BIPV2_ProxID._Old_layouts.ms); // Some headers have very skewed IDs
 EXPORT MatchSample        := INDEX(ms_temp,{Conf,Proxid1,Proxid2},{ms_temp},keynames(liter,pUseOtherEnvironment).match_sample_debug.logical,SORT KEYED);
-s_prep := s;
+s_prep := project(s  ,transform(BIPV2_ProxID._Old_layouts.specs,self := left));
 EXPORT Specificities_Key  := INDEX(s_prep,{1},{s_prep},keynames(liter,pUseOtherEnvironment).specificities_debug.logical);
 am := matches(ih).All_Attribute_Matches;
 EXPORT Attribute_Matches  := INDEX(am,{Proxid1,Proxid2},{am},keynames(liter,pUseOtherEnvironment).attribute_matches.logical);

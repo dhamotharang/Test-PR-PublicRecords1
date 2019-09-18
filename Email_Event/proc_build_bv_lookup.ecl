@@ -94,8 +94,8 @@ EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
 										 ,build_table
 										 ,build_key
 										 ,zDoPopulationStats
-										 ,dops_update
-										 ,orbit_update
+										 // ,dops_update
+										 // ,orbit_update
 										);	
 	
 END;

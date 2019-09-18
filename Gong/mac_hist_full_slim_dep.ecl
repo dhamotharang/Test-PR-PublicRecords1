@@ -1,4 +1,4 @@
-export MAC_HIST_FULL_SLIM_DEP(in_file, out_file, usepid = false) := macro
+﻿export MAC_HIST_FULL_SLIM_DEP(in_file, out_file, usepid = false) := macro
 
 #uniquename(in_slim_rec)
 %in_slim_rec% := record
@@ -72,6 +72,10 @@ export MAC_HIST_FULL_SLIM_DEP(in_file, out_file, usepid = false) := macro
 #if(usepid=true)
 			in_file.persistent_record_id;
 #end
+      //CCPA-22
+				in_file.global_sid;
+      in_file.record_sid;
+
 end;
 
 #uniquename(in_slim)

@@ -1,4 +1,4 @@
-import	AID;
+﻿import	AID;
 
 export	Layout_MA	:=
 module
@@ -514,6 +514,9 @@ module
 		STRING1					RAW_VEHT_NEW_USED;
 		STRING1					RAW_VEHT_TITLE_BRAN;
 		STRING55				RAW_BRAN_TABLE_BASE;
+		//Added for CCPA-103
+		UNSIGNED4       global_sid := 0;
+		UNSIGNED8       record_sid := 0;
 	end;
 
 end;

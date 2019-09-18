@@ -1,5 +1,4 @@
-﻿import doxie, Tools, BIPV2, dx_Equifax_Business_Data, RoxieKeyBuild, dops, DOPSGrowthCheck,
-Data_Services;
+﻿import doxie, Tools, BIPV2, dx_Equifax_Business_Data, RoxieKeyBuild, dops, DOPSGrowthCheck;
 
 export Build_Keys(string pversion) :=
 module
@@ -11,14 +10,13 @@ module
 																						 ,dx_Equifax_Business_Data.keynames(pversion,false).LinkIds.New
 																				 		 ,BuildLinkIdsKey);  
 	
-	// Persitence/Growth check
+	// Persistence/Growth check
 	GetDops          := dops.GetDeployedDatasets('P', 'B', 'N');
   OnlyEquifax_Business_Data := GetDops(datasetname='EquifaxBusDataKeys');
-	// Hardcode father_version for testing
-	// father_version   := '20181219'; 
   father_version   := OnlyEquifax_Business_Data[1].buildversion;
-	new_file         := data_services.foreign_prod +'thor_data400::key::Equifax_Business_Data::'+pversion+'::linkids';
-	father_file      := data_services.foreign_prod +'thor_data400::key::Equifax_Business_Data::'+father_version+'::linkids';
+	
+	new_file         := '~thor_data400::key::Equifax_Business_Data::'+pversion+'::linkids';
+	father_file      := '~thor_data400::key::Equifax_Business_Data::'+father_version+'::linkids';
 	
 	DeltaCommands := sequential(
 		DOPSGrowthCheck.CalculateStats(
@@ -266,8 +264,7 @@ module
 				,pversion                                            // Latest version
 				,father_version                                      // Previous version  
 				,true																								 // Flag for Publish Results in Superfile
-				,true)                                               // Flag for Keys (true) 	
-				
+				,true)                                               // Flag for Keys (true) 
       );
 	
 	export full_build :=
@@ -275,7 +272,7 @@ module
 	sequential(
 			 BuildLinkIdsKey
 		  ,Promote(pversion).BuildFiles.New2Built
-			// ,DeltaCommands
+			,DeltaCommands
 	);
 		
 	export All :=

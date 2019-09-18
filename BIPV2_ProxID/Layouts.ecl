@@ -163,6 +163,7 @@ end;
 ,orig_DOT_Base.cnp_hasnumber
 ,orig_DOT_Base.cnp_lowv
 ,orig_DOT_Base.cnp_name
+,string250 cnp_name_phonetic
 ,orig_DOT_Base.cnp_number
 ,orig_DOT_Base.cnp_translated
 ,orig_DOT_Base.company_bdid
@@ -192,7 +193,7 @@ end;
 ,orig_DOT_Base.unk_corp_key
 ,orig_DOT_Base.vl_id  
 ,orig_DOT_Base.deleted_key
-  };
+};
 //	export attfile_duns_entum := {dot_base.proxid,dot_base.duns_number,dot_base.enterprise_number};
 	export attfile_contact 		:= {dot_base.proxid,string73 contact};
 
