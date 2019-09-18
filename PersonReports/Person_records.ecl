@@ -76,10 +76,10 @@ dids_owners := dedup (sort (all_dids_pre, did, ~is_subject), did);
 dear_raw_recs := dx_death_master.Append.byDid(dids_owners, did, death_params,/*skip_GLB_check*/true,ut.limits.DEATH_PER_DID);
 dear_glb_ok := project(dear_raw_recs, TRANSFORM(RECORDOF(dear_raw_recs),
   loc_glb_ok := if(left.is_subject, glb_ok, rna_glb_ok) or left.death.glb_flag <> 'Y';
-  loc_is_deceased := left.death.is_deceased and loc_glb_ok;
-  self.death := if(loc_is_deceased, left.death);
+  self.death := if(loc_glb_ok,left.death);
   self := left;
   ));
+
 dear_recs := PROJECT(dear_glb_ok, TRANSFORM(doxie_crs.layout_deathfile_records,
   SELF.age_at_death := ut.Age((unsigned8)Left.death.dob8,(unsigned8)Left.death.dod8);
   SELF.IsLimitedAccessDMF := Left.death.src = MDR.sourceTools.src_Death_Restricted;
