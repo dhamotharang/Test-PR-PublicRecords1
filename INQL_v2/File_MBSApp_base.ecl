@@ -4,7 +4,7 @@ import ut, INQL_v2;
 export File_MBSApp_base(string version = ut.GetDate) := module
 
 export Append(outfile, in_pversion = '') := macro
-import Inquiry_AccLogs, data_services, std;
+import Inquiry_AccLogs, data_services;
 #uniquename(fnCleanUp)
 #uniquename(instring)
 
@@ -25,12 +25,8 @@ import Inquiry_AccLogs, data_services, std;
 
  // legacy_weekly_base := dataset('~thor100_21::out::inquiry_tracking::weekly_historical', Inquiry_AccLogs.Layout.Common_ThorAdditions, thor);
  // weekly_base 				:= project(legacy_weekly_base, transform(INQL_v2.Layouts.Common_ThorAdditions, self:= left, self:=[]));
-
-prgxVersion 								:= 'thor_data::base::inql::nonfcra::weekly::([a-zA-Z0-9]+::didville)';
-nodidville_weekly_base_name := '~'+STD.File.SuperFileContents(inql_v2.filenames(,false,false).inql_base.qa)(~regexfind(prgxVersion, name))[1].name;
-weekly_base  								:= dataset(nodidville_weekly_base_name, INQL_v2.Layouts.Common_ThorAdditions, thor); 
-// weekly_base  :=   inql_v2.files(false,false).inql_base.qa;
-	
+ 
+  weekly_base  :=   inql_v2.files(false,false).inql_base.qa;
 	daily_base   :=   dataset(data_services.foreign_prod+'uspr::inql::nonfcra::base::daily::building_weekly', INQL_v2.Layouts.Common_ThorAdditions, thor); 
 	
 	%infilepre1% := 	dedup(sort(distribute(

@@ -1,4 +1,4 @@
-import standard, ut, doxie, inquiry_acclogs; 
+﻿import standard, ut, doxie, inquiry_acclogs; 
 
 export file_SearchAutokey := FUNCTION
 
@@ -26,7 +26,7 @@ end;
 jnRec := dedup(join(
 				distribute(base_files, hash(hash_key)), 
 				distribute(tran_files, hash(hash_key)), 
-				left.hash_key = right.hash_key, mftra(left, right), local), record, all)(orig_dateadded[1..8] >= MinDate);
+				left.hash_key = right.hash_key, mftra(left, right), local), record, all, Local)(orig_dateadded[1..8] >= MinDate);
 
 Deconfliction := table(accurint_acclogs.File_Deconfliction.Input, {orig_transaction_id := related_transaction_id, permissions , deconfliction_type},related_transaction_id,permissions , deconfliction_type);
 

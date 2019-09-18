@@ -21,11 +21,10 @@ EXPORT fspray_nonfcra_daily_files := module
 						+ GetFileList(path, INQL_v2._Constants.nonfcra_filters[11]);
 		return pFiles;
 	end;
-	0
+	
 	export _spray := sequential(
 					nothor(apply(GetFiles(INQL_v2._Constants.READYDIR), STD.File.MoveExternalFile(INQL_v2._Constants.LZ, INQL_v2._Constants.READYDIR + name, INQL_v2._Constants.SPRAYINGDIR + name)))
 				 ,INQL_v2.fSpray(GetFiles(INQL_v2._Constants.SPRAYINGDIR), false)
-				 ,INQL_V2.FIDO_change_report.proc_FIDO_chg_report
 				 ,nothor(apply(GetFiles(INQL_v2._Constants.SPRAYINGDIR), STD.File.MoveExternalFile(INQL_v2._Constants.LZ, INQL_v2._Constants.SPRAYINGDIR + name, INQL_v2._Constants.DONEDIR + name)))
 				 ,notify(INQL_v2._CRON_ECL('BUILD PREP', false,true).EVENT_NAME, '*') //Starting the base building process.
 				 ,notify(INQL_v2._CRON_ECL('FILES SCRUB', false,true).EVENT_NAME, '*') //Starting the base building process.

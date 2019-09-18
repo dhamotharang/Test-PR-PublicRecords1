@@ -25,17 +25,13 @@ EXPORT Update_Base (string version, boolean isFCRA = false, boolean pDaily = tru
           ));    
     
 		Clean      := INQL_v2.fn_clean_and_parse(comb_clean);// : persist('~persist::inql::cleaned::daily');
-		
 		Appends    := INQL_v2.FN_Append_IDs(Clean) : persist('~persist::inql::appends::daily'); 
-    // Appends    := dataset('~persist::inql::appends::daily', INQL_v2.Layouts.Common_layout, thor);
-
+				
 		//---------append fraudpoint score by hitting batch service---------//
 		daily_file_fraud_cnt := INQL_v2.score_constants.daily_file_fraud_count;
 		INQL_v2.mac_append_score(Appends, Appends_score, daily_file_fraud_cnt);
-
 		Appends_Filtered := Appends_score : persist('~persist::inql::appends_score::daily');
-   // Appends_Filtered := dataset('~persist::inql::appends_score::daily', INQL_v2.Layouts.Common_layout, thor);
-
+   
     //---------Add Persons and Business Address, etc---------//
     dsNONisFCRA := INQL_v2.AddPerson_Business_Info(Appends_Filtered, false, 1) //Accurint
                    +
