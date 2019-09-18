@@ -1,4 +1,4 @@
-export Persons := MODULE
+﻿export Persons := MODULE
 
 shared rgxBasic := '([A-Z]+)';
 shared rgxBasicX := '([A-Z-]+)';
@@ -181,8 +181,8 @@ shared string155 FormatNameLS(string rgx, string name, integer lnm, integer sfx)
 	(string6)REGEXFIND(rgx, name, sfx);
 
 cleanupsfx(string s) := MAP(
-	REGEXFIND('\\(SENIOR\\)', s) => REGEXREPLACE('(\\(SENIOR\\))', s, 'SR'),
-	REGEXFIND('\\(JUNIOR\\)', s) => REGEXREPLACE('(\\(JUNIOR\\))', s, 'JR'),
+	REGEXFIND('\\(?SENIOR\\)?', s) => REGEXREPLACE('(\\(?SENIOR\\)?)', s, 'SR'),
+	REGEXFIND('\\(?JUNIOR\\)?', s) => REGEXREPLACE('(\\(?JUNIOR\\)?)', s, 'JR'),
 	REGEXFIND('\\(SR\\)', s) => REGEXREPLACE('(\\(SR\\))', s, 'SR'),
 	REGEXFIND('\\(JR\\)', s) => REGEXREPLACE('(\\(JR\\))', s, 'JR'),
 	REGEXFIND('\\(II\\)', s) => REGEXREPLACE('(\\(II\\))', s, 'II'),
