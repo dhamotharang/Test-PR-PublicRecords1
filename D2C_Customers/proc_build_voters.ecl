@@ -18,7 +18,7 @@ EXPORT proc_build_voters(unsigned1 mode, string8 ver, string20 customer_name) :=
             self.Last_Vote_Date   := (unsigned4)left.lastdatevote;
             self.Registration_Date     := (unsigned4)left.regdate;
             self.Political_Party       := left.Political_Party;
-            self.State_of_registration := '';
+            self.State_of_registration := left.res_state;
             self.Status                := left.voter_status;
             ));
    
