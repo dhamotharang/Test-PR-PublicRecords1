@@ -1803,6 +1803,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'Ministry of Economy (Brazil) List of Employers with Slavery-like Working Conditions','1790'},
 {'US Executive Order 13883 CBW Act','1791'},
 {'EC 2019/1375 ISIL (Da\'esh) and Al-Qaida List','1792'},
-{'National Anti-Corruption Directorate (Romania) Final Convictions','1793'}
+{'National Anti-Corruption Directorate (Romania) Final Convictions','1793'},
+{'EC (CFSP) 2019/1405 Ukraine List','1794'},
+{'EC 2019/1403 Ukraine List','1795'}
 ],r);
 
