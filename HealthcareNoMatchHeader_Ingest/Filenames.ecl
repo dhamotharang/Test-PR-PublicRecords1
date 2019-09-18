@@ -6,8 +6,8 @@ EXPORT  Filenames(  STRING	  pSrc        = '',
   EXPORT  pThreshold  :=  HealthcareNoMatchHeader_InternalLinking.Config.MatchThreshold;
 
   //  Prefix
-	EXPORT  IsDataland          :=  tools._Constants.IsDataland;
-	EXPORT  foreign_environment :=  '~';//IF(IsDataland,'~',Data_Services.foreign_prod);
+	EXPORT  IsBocaProd          :=  tools._Constants.IsBocaProd;
+	EXPORT  foreign_environment :=  IF(pUseProd,IF(IsBocaProd,'~',Data_Services.foreign_prod),'~');
   EXPORT  cluster_name        :=  'ushc::';
 	EXPORT  prefix              :=  foreign_environment + cluster_name;
 
