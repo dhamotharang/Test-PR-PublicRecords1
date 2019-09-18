@@ -767,10 +767,6 @@ EXPORT ProcessGlobalWatchlists(string filedate) := FUNCTION
 		self.registrant_terminated_flag	:=			L.orig_registrant_terminated_flag;
 		self.foreign_principal_terminated_flag	:=			L.orig_foreign_principal_terminated_flag;
 		self.short_form_terminated_flag	:=			L.orig_short_form_terminated_flag;
-		//Added for CCPA-94
-		self.global_sid :=			L.global_sid;
-		self.record_sid :=			L.record_sid;
-		self.did        :=      L.did;
 		self := L;
 		self := [];
 	END;
