@@ -3,7 +3,7 @@
 EXPORT Layouts := module
 //Incoming Layouts	
   export In_0010_Header := record
-		EBR.Layout_0010_Header_Base_slim;
+		EBR.Layout_0010_Header_Base_slim - [global_sid, record_sid];
 		string50     cust_name;
 		string10			bug_name;
 		string9       link_FEIN;
@@ -13,7 +13,7 @@ EXPORT Layouts := module
 	
 	
 	export In_5600_Demographic := record
-		EBR.Layout_5600_demographic_data_Base_slim;
+		EBR.Layout_5600_demographic_data_Base_slim - [global_sid, record_sid];
 		string50     cust_name;
 		string10		 bug_name;
 		string9      link_FEIN;
@@ -23,7 +23,7 @@ EXPORT Layouts := module
 
 	export IN_5610_Demographic := record
     string10	FILE_NUMBER;	
-		EBR.Layout_5610_demographic_data_Base_slim - [file_number];
+		EBR.Layout_5610_demographic_data_Base_slim - [file_number, global_sid, record_sid];
 		string50  cust_name;
 		string10	bug_name;
 		string8   link_dob;

@@ -1,4 +1,4 @@
-import std;
+﻿import std;
 	rSearchCriteria mergeValue(rSearchCriteria Lft, rSearchCriteria rght) := TRANSFORM
 			self.id := Lft.id;
 			self.criteria := Lft.criteria + rght.criteria;
@@ -105,8 +105,9 @@ EXPORT ProcessSearchCriteria(DATASET(Layouts.rEntity) infile) := FUNCTION
 	Categories := GetCategories(infile);
 	deceased := GetDeceasedCriteria(infile);
 	sources := GetSourceCriteria(infile);
+	sanctions := $.GetConsolidatedCriteria(infile);
 
-	crit := SORT(DISTRIBUTE(countries & regions & categories & deceased & sources,id), id, criteria, LOCAL);
+	crit := SORT(DISTRIBUTE(countries & regions & categories & deceased & sources & sanctions, id), id, criteria, LOCAL);
 	
 	result := ROLLUP(crit, mergeValue(LEFT, RIGHT), id, LOCAL);
 	

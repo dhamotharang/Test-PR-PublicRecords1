@@ -1,4 +1,4 @@
-﻿import ut;
+﻿import _control, CCPA, Std, ut;
 
 iu_infiles := PROJECT(			
                       dataset(CanadianPhones.thor_cluster +'base::canadianWP',
@@ -53,9 +53,12 @@ dd_infiles:= dedup(sort(distribute(iu_infiles+dd_ax,hash(phonenumber))
 //due to contractual agreement:  infoUSA records must make up less than 50% of the file.
 cmbnd_files := dd_infiles + ax_infiles;
 
+//Add Global_SID
+addGlobalSID:= CCPA.macGetGlobalSID(cmbnd_files,'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
+
 //additional axciom records are added back in and later rolled up.
 
-cmbnd_files tr0(cmbnd_files L) := TRANSFORM
+cmbnd_files tr0(addGlobalSID L) := TRANSFORM
 	self.company_name   := stringlib.StringToUpperCase(l.company_name);
 	self.firstname	 	:= stringlib.StringToUpperCase(l.firstname);
 	self.middlename		:= stringlib.StringToUpperCase(l.middlename);
@@ -68,7 +71,7 @@ cmbnd_files tr0(cmbnd_files L) := TRANSFORM
 SELF := L;
 END;
 
-precs := project(cmbnd_files,tr0(left));
+precs := project(addGlobalSID,tr0(left));
 
 precs tr(precs L, precs R) := TRANSFORM
 self.Date_last_reported := R.Date_last_reported;

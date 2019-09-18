@@ -15,7 +15,7 @@ PRTE2.CleanFields(ds_Alpha_Base, dsCleanAlphaOut);
 PRTE2.CleanFields(ds_Boca_in, dsCleanBocaOut);
 									
 //Boca Base file
-PRTE2_Watercraft.Layouts.Base_new xfrmBoca(PRTE2_Watercraft.Layouts.Base_Boca L) := TRANSFORM
+PRTE2_Watercraft.Layouts.Base_new xfrmBoca(PRTE2_Watercraft.Layouts.Incoming_Boca L) := TRANSFORM
 	tempLienZip1			:= STD.Str.Filter(L.lien_1_zip,'1234567890');
 	self.lien_1_zip		:= IF(trim(tempLienZip1) <> '' AND length(trim(tempLienZip1)) < 5, INTFORMAT((integer)tempLienZip1,5,1), tempLienZip1);
 	tempLienZip2			:= STD.Str.Filter(L.lien_2_zip,'1234567890');
@@ -351,7 +351,7 @@ pAlphaCG	:= PROJECT(pAlphaBase(source_code_CG <> ''),
 																							SELF := LEFT;
 																							SELF := [];));
 
-CoastGuard	:= DEDUP(SORT(pBocaCG + pBocaCG, watercraft_key, sequence_key),RECORD, EXCEPT persistent_record_id);
+CoastGuard	:= DEDUP(SORT(pBocaCG + pAlphaCG, watercraft_key, sequence_key),RECORD, EXCEPT persistent_record_id);
 
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(CoastGuard, PRTE2_Watercraft.Constants.BASE_PREFIX, 'coastguard', fileVersion, build_cg, 3);
 

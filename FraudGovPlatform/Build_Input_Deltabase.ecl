@@ -1,4 +1,4 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut, _Validate,IDLExternalLinking;
 EXPORT Build_Input_Deltabase(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
@@ -6,6 +6,8 @@ EXPORT Build_Input_Deltabase(
 	,dataset(Layouts.Input.Deltabase) ByPassed_Deltabase_Sprayed = files().Input.ByPassed_Deltabase.sprayed	
 ) :=
 module
+
+firstrinid	:= FraudGovPlatform.Constants().FirstRinId;
 
 	deltabaseUpdate :=	if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0,
 		Files(pversion).Sprayed.Deltabase, 
@@ -20,12 +22,11 @@ module
 		self.Process_Date := (unsigned)pversion;
 		self.FileDate := (unsigned)l.fn[sub..sub+7];
 		self.FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
-		self.address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1));
-		self.address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
-		self.mailing_address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Mailing_Street_1));
-		self.mailing_address_2 := tools.AID_Helpers.fRawFixLineLast(  stringlib.stringtouppercase(trim(l.Mailing_City) + if(l.Mailing_State != '', ', ', '') + trim(l.Mailing_State)  + ' ' + trim(l.Mailing_Zip)[1..5]));		
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		self.file_type := 3 ;
+		self.rawlinkid	:= Map(l.rawlinkid>0 and l.rawlinkid <firstrinid => if(exists(IDLExternalLinking.did_getAllRecs(l.rawlinkid)),l.rawlinkid,0)
+												,l.rawlinkid>=firstrinid => if(exists(Fraudshared.key_did('FraudGov')(did=l.rawlinkid)),l.rawlinkid,0)
+												,l.rawlinkid);
 		self:=l;
 		self:=[];
 	end;
@@ -50,7 +51,13 @@ module
 			or (_Validate.Date.fIsValid(STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8]) = false  
 			or (unsigned)STD.Str.FindReplace( STD.Str.FindReplace( reported_date,':',''),'-','')[1..8] > (unsigned)(STRING8)Std.Date.Today())
 			or reported_by = ''
-			or source = '');
+			or source = ''
+			or (rawlinkid=0 and household_id='' and ssn='' and dob='' and raw_full_name='' and raw_first_name ='' and raw_last_name=''
+			  and full_address ='' and street_1='' and city='' and state='' and zip='' and mailing_street_1=''
+				and mailing_city='' and mailing_state='' and mailing_zip='' and phone_number='' and tin=''
+				and email_address='' and appended_provider_id=0 and lnpid=0 and npi='' and ip_address='' and device_id='' 
+				and professional_id='' and bank_routing_number_1='' and bank_account_number_1='' and drivers_license='')
+			);
 
 	EXPORT fn_dedup(inputs):=FUNCTIONMACRO
 
@@ -59,7 +66,6 @@ module
 		{inputs} RollupUpdate({inputs} l, {inputs} r) := 
 		transform
 			SELF.source_rec_id := if(l.source_rec_id < r.source_rec_id,l.source_rec_id, r.source_rec_id); // leave always previous source_rec_id 
-			SELF.process_date := if(l.source_rec_id < r.source_rec_id,l.process_date, r.process_date); // leave always previous Process_Date
 			self := l;
 		end;
 
@@ -83,7 +89,7 @@ module
 	shared Valid_Recs :=	join (	
 		append_source,
 		f1_bypass_dedup,
-		left.source_rec_id = right.source_rec_id,
+		left.inqlog_id = right.inqlog_id,
 		TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),
 		LEFT ONLY,
 		LOOKUP);

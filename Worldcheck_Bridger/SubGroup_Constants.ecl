@@ -1135,6 +1135,24 @@
 		export string KEYWORD_BECA									:= '821';
 		export string KEYWORD_OFAC_NICHRAA					:= '822';
 		export string KEYWORD_CANSEMNIC							:= '823';
+		export string KEYWORD_GHSEC									:= '824';
+		export string KEYWORD_NABON									:= '825';
+		export string KEYWORD_USCME									:= '826';
+		export string KEYWORD_INMSJE_NGO						:= '827';
+		export string KEYWORD_GIBNATSANC						:= '828';
+		export string KEYWORD_OFAC_EO13846					:= '829';
+		export string KEYWORD_TWMPB_DV							:= '830';
+		export string KEYWORD_ZMACC									:= '831';
+		export string KEYWORD_OFAC_EO13876					:= '832';
+		export string KEYWORD_TWTSA									:= '833';
+		export string KEYWORD_ARMJH_REPET						:= '834';
+		export string KEYWORD_OFAC_HIFPAA						:= '835';
+		export string KEYWORD_ILSHABAK							:= '836';
+		export string KEYWORD_FATF_SD								:= '837';
+		export string KEYWORD_USCBW_WC							:= '838';
+		export string KEYWORD_SEDPA									:= '839';
+		export string KEYWORD_LFSA_ALERT						:= '840';
+		export string KEYWORD_ESBDE									:= '841';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

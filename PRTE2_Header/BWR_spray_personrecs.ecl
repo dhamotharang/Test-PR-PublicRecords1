@@ -26,20 +26,24 @@ end;
 
 
 first_spray_new_files := sequential(
-                                    doSprayFile('prte__personrecs__lnpr_*.txt'),
-                                    doSprayFile('prte__personrecs__synchrony_*.txt'),
-                                    doSprayFile('prte__personrecs__santander_*.txt'),
-                                    doSprayFile('prte__personrecs__rbs_*.txt'),
-                                    doSprayFile('prte__personrecs__ge_*.txt'),
-                                    doSprayFile('prte__personrecs__excelon_*.txt'),
-                                    doSprayFile('prte__personrecs__cvs_*.txt'),
-                                    doSprayFile('prte__personrecs__citi_*.txt'),
-                                    doSprayFile('prte__personrecs__captone_*.txt'),
-                                    doSprayFile('prte__personrecs__axcessfin_*.txt'),
-                                    doSprayFile('prte__personrecs__amex_*.txt'),
-                                    doSprayFile('prte__personrecs__ecr_*.txt'),
-																		doSprayFile('prte__personrecs__transunion_*.txt'),
-																		doSprayFile('prte__personrecs__scientificgaming_*.txt')
+                                   doSprayFile('prte__personrecs__amex_*.txt'),
+																	 doSprayFile('prte__personrecs__axcessfin_*.txt'),
+																	 doSprayFile('prte__personrecs__captone_*.txt'),
+																	 doSprayFile('prte__personrecs__citi__*.txt'),
+																	 doSprayFile('prte__personrecs__citi_2__*.txt'),
+																	 doSprayFile('prte__personrecs__cvs_*.txt'),
+																	 doSprayFile('prte__personrecs__ecr_*.txt'),
+																	 doSprayFile('prte__personrecs__eq_*.txt'),
+																	 doSprayFile('prte__personrecs__excelon_*.txt'),                                    
+																	 doSprayFile('prte__personrecs__ge_*.txt'),
+																	 doSprayFile('prte__personrecs__lnpr_*.txt'),
+                                   doSprayFile('prte__personrecs__rbs_*.txt'),
+                                   doSprayFile('prte__personrecs__santander_*.txt'),
+                                   doSprayFile('prte__personrecs__ScientificGaming_*.txt'),
+																	 doSprayFile('prte__personrecs__synchrony_*.txt'),
+																 	 doSprayFile('prte__personrecs__TransUnion_*.txt'),
+																	 doSprayFile('prte__personrecs__USAA_*.txt'),
+																	 doSprayFile('prte__personrecs__tms_*.txt')
 	);
 
 then_move_previous_to_father_before_adding_the_new_sprayed_files := sequential(

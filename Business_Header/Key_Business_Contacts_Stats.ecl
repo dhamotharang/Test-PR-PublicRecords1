@@ -1,4 +1,4 @@
-Import Data_Services, business_header_ss;
+﻿Import Data_Services, business_header_ss;
 stats_base := File_Business_Contacts_Stats_Plus;
 
 layout_contact_stat := RECORD
@@ -14,9 +14,11 @@ layout_contact_stat := RECORD
 	stats_base.sources;
 	stats_base.company_name_score;
 	stats_base.combined_score;
-    stats_base.has_gong_yp;
+  stats_base.has_gong_yp;
 	stats_base.eq_emp_match;
 	stats_base.current_corp;
+	stats_base.global_sid;
+	stats_base.record_sid;
 	stats_base.__thisfilepos;  // This is the filepos in the stats file
 END;
 

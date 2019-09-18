@@ -63,23 +63,17 @@ FUNCTIONMACRO
 		dDidOut_sort			:= sort				(dDidOut_dist,record_id, -did_score	,local);
 		dDidOut_dedup			:= dedup			(dDidOut_sort,record_id ,local);
 		
-		pBaseFile tAssignDIDs(pBaseFile l, FraudGovPlatform.Layouts.Temp.DidSlim r) :=
-		TRANSFORM
-
-			SELF.did				:= if(l.Rawlinkid <> 0,l.Rawlinkid,if(r.did <> 0, r.did,0));
-			SELF.did_score	:= if(l.Rawlinkid <> 0, 100,if(r.did_score <> 0, r.did_score, 0));
-			SELF 						:= l;
-
-		END;
- 
 		dAssignDids := join( without_did
 												,dDidOut_dedup
 												,left.record_id = RIGHT.record_id
-												,tAssignDIDs(left, RIGHT)
+												,Transform(recordof(left)
+												,SELF.did				:= right.did 
+												,SELF.did_score	:= right.did_score
+												,self:=left)
 												,left outer
 												,local
 											 );
-		
+											 
 		RETURN with_did + dAssignDids;
 	
 ENDMACRO;

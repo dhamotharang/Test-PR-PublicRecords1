@@ -234,6 +234,28 @@ EXPORT Layouts := MODULE
 			string30	event_type_1;
 			string30	event_entity_1;
 		END;
+
+		EXPORT RDP := record
+			string Transaction_ID;
+			string75 TransactionDate;
+			string100 FirstName;
+			string100 LastName;
+			string60 MiddleName;
+			string10 Suffix;
+			string10 BirthDate;
+			string10 SSN;
+			unsigned6 Lexid_Input;
+			string100 Street1;
+			string50 Street2;
+			string50 Suite;
+			string100 City;
+			string10 State;
+			string10 Zip5;
+			string12 Phone;
+			unsigned6 Lexid_Discovered;
+			string25 RemoteIPAddress;
+			string25 ConsumerIPAddress;
+		END;
 	
 		EXPORT validate_record := record
 			string	field1	:= '';
@@ -272,10 +294,6 @@ EXPORT Layouts := MODULE
 			string1			Customer_Program;
 			unsigned8		source_rec_id;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string9			clean_SSN;
 			string9			clean_Zip;
@@ -294,10 +312,6 @@ EXPORT Layouts := MODULE
 			string1			customer_program_fn; // use this one
 			unsigned8		source_rec_id ;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';   
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
@@ -312,10 +326,6 @@ EXPORT Layouts := MODULE
 			Sprayed.Deltabase;
 			unsigned8		source_rec_id ;
 			Address.Layout_Clean_Name				cleaned_name;
-			string100		address_1 := '';
-			string50		address_2 := '';
-			string100		mailing_address_1 := '';
-			string50		mailing_address_2 := '';
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
@@ -396,6 +406,10 @@ EXPORT Layouts := MODULE
 		export SkipValidationByGCID	 := RECORD
 			string Gc_ID;
 		end;
+		
+		export RefreshProdDashVersion := Record
+		boolean RefreshVersion;
+		end;
 	end;
 
 export temp := module 
@@ -447,9 +461,13 @@ Export PII	:=RECORD
   string20 mname;
   string20 lname;
   string5 name_suffix;
-  string28 prim_name;
-  string10 prim_range;
-  string8 sec_range;
+	string10 prim_range;
+	string2 predir;
+	string28 prim_name;
+	string4 addr_suffix;
+	string2 postdir;
+	string10 unit_desig;
+	string8 sec_range;
   string2 st;
   string5 zip;
   string10 ssn;
@@ -769,7 +787,7 @@ Export CIID := RECORD
   unsigned1 ___addresspobox__flags;
   boolean _addresscmra_;
   unsigned1 ___addresscmra__flags;
-  integer8 otto_address_id_;
+  string otto_address_id_;
   unsigned1 __otto_address_id__flags;
   string primary_range_;
   unsigned1 __primary_range__flags;
@@ -1278,7 +1296,7 @@ Export CIID := RECORD
    integer8 __recordcount;
   END) event_types_;
   unsigned1 __event_types__flags;
-  integer8 otto_address_id_;
+  string otto_address_id_;
   unsigned1 __otto_address_id__flags;
   unsigned4 date_of_birth_;
   unsigned1 __date_of_birth__flags;
@@ -1854,5 +1872,87 @@ Export CIID := RECORD
   integer8 cl_active7_identity_count_percentile_;
   real8 cl_impact_weight_;
  END;
+ 
+//KEL Dashboards Response Layout
+ rresults := RECORD
+    string name{xpath('name')};
+    string value{xpath('value')};
+    string filename{xpath('filename')};
+    string total{xpath('total')};
+   END;
+
+ rappvalues := RECORD
+    string application{xpath('application')};
+    string name{xpath('name')};
+    string value{xpath('value')};
+   END;
+
+ rworkunit := RECORD
+   string wuid{xpath('wuid')};
+   string owner{xpath('owner')};
+   string cluster{xpath('cluster')};
+   string jobname{xpath('jobname')};
+   string stateid{xpath('stateID')};
+   string state{xpath('state')};
+   string totalthortime{xpath('totalThorTime')};
+   DATASET(rresults) results{xpath('results')};
+   DATASET(rappvalues) appvalues{xpath('applicationValues')};
+   integer8 errorcount{xpath('errorCount')};
+   integer8 warningcount{xpath('warningCount')};
+   integer8 infocount{xpath('infoCount')};
+   integer8 resultcount{xpath('resultCount')};
+  END;
+
+ rresponse	:= RECORD 
+  string uuid{xpath('uuid')};
+  string username{xpath('username')};
+  string workunitid{xpath('workunitId')};
+  rworkunit workunit{xpath('workunit')};
+  string failed{xpath('failed')};
+  string running{xpath('running')};
+  string connectionurl{xpath('connectionURL')};
+  string compositionuuid{xpath('compositionUuid')};
+  string paused{xpath('paused')};
+  string complete{xpath('complete')};
+  string compositionname{xpath('compositionName')};
+ END;
+ 
+ Export DashboardResponse :={ DATASET(rresponse) response{xpath('response')} END;
+ 
+ Export ProdDashboardVersion := Record
+  string version;
+ End; 
+ 
+ Export Advo	:= Record
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
+  string1 advo_hitflag;
+  string1 advo_vacancyindicator;
+  string1 advo_throwbackindicator;
+  string1 advo_seasonaldeliveryindicator;
+  string5 advo_seasonalsuppressionstartdate;
+  string5 advo_seasonalsuppressionenddate;
+  string1 advo_donotdeliverindicator;
+  string1 advo_collegeindicator;
+  string10 advo_collegesuppressionstartdate;
+  string10 advo_collegesuppressionenddate;
+  string1 advo_addressstyle;
+  string5 advo_simplifyaddresscount;
+  string1 advo_dropindicator;
+  string1 advo_residentialorbusinessindicator;
+  string1 advo_onlywaytogetmailindicator;
+  string1 advo_recordtypecode;
+  string1 advo_addresstype;
+  string1 advo_addressusagetype;
+  string8 advo_firstseendate;
+  string8 advo_lastseendate;
+  string8 advo_vendorfirstreporteddate;
+  string8 advo_vendorlastreporteddate;
+  string8 advo_vacationbegindate;
+  string8 advo_vacationenddate;
+  string8 advo_numberofcurrentvacationmonths;
+  string8 advo_maxvacationmonths;
+  string8 advo_vacationperiodscount;
+ End;
  
 END;

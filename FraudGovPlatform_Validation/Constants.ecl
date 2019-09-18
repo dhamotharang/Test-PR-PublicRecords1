@@ -12,6 +12,9 @@ module
 	export	string		DeltaLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/deltabase/prod/';
 	export	string		DeltaLandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/deltabase/prod/';
 
+	export	string		RDPLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/rdp/prod/';
+	export	string		RDPLandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/rdp/prod/';
+
 	export	string		VRulesLandingZonePathBase	:=	'/data/otto/velocityrules/';
 	
 	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dbexport/prod';

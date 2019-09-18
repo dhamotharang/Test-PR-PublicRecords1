@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2;
 
 EXPORT Layouts := MODULE
 
@@ -122,6 +122,8 @@ EXPORT Layouts := MODULE
 	BIPV2.IDlayouts.l_key_ids;
   rec_industry_combined_layout - BIPV2.IDlayouts.l_key_ids industry_fields;
 	BIPV2.Layout_Business_Linking_Full contacts_fields;
+  unsigned4 global_sid;
+  unsigned8 record_sid;
  end;
 
 END;

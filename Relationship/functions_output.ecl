@@ -1,4 +1,4 @@
-﻿EXPORT functions_output := module
+﻿EXPORT functions_output := MODULE
 
 	shared getRelScore(ROW(layout_output.titled) le, string curRel) :=
 		function

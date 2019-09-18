@@ -997,8 +997,8 @@ business_header_ss.MAC_Match_Flex(
 	,							// ,pFileVersion						= '\'prod\''														// default to use prod version of superfiles
 	,							// ,pUseOtherEnvironment		= business_header._Dataset().IsDataland	// default is to hit prod on dataland, and on prod hit prod.
 	,[BIPV2.IDconstants.xlink_version_BIP]							// ,pSetLinkingVersions 		= BIPV2.IDconstants.xlink_versions_default	
-	,company_url							// ,pURL										=	''
-	,conatact_url							// ,pEmail									=	''
+	,//company_url							// ,pURL										=	''
+	,//contact_url							// ,pEmail									=	''
 	,company_address.p_city_name							// ,pCity									= ''	
 	,contact_name.fname							// ,pContact_fname					= ''
 	,contact_name.mname							// ,pContact_mname					= ''

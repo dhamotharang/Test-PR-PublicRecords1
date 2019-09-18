@@ -1,4 +1,4 @@
-IMPORT ut;
+﻿IMPORT ut;
 EXPORT FileNames := MODULE
 	
 	EXPORT rawCluster 	:= 	'~';//ut.foreign_prod;
@@ -46,6 +46,7 @@ EXPORT FileNames := MODULE
 			EXPORT addl_frs_d	:= prepCluster + prefix+ 'addl_frs_deed_mortgage';
 			EXPORT search_prp	:= prepCluster + prefix+ 'search';
 			EXPORT search_hst	:= prepCluster + prefix+ 'hist_search_reclean';
+			EXPORT addl_name_info	:= prepCluster + prefix+ 'addl_name_info';
 	END;
 	EXPORT base := MODULE // These are the QA / latest delta base files. See below "baseFull"
 			EXPORT prefix			:= 'base::property_fast::';
@@ -56,6 +57,7 @@ EXPORT FileNames := MODULE
 			EXPORT addl_frs_a	:= baseCluster + prefix+ 'addl_frs_assessment';
 			EXPORT addl_frs_d	:= baseCluster + prefix+ 'addl_frs_deed_mortgage';
 			EXPORT search_prp	:= baseCluster + prefix+ 'search';
+			EXPORT addl_name_info	:= baseCluster + prefix+ 'addl::name_info';
 	END;
 	  EXPORT baseFull := MODULE
 			SHARED versionSuffix := ''
@@ -69,6 +71,7 @@ EXPORT FileNames := MODULE
 			EXPORT addl_frs_a	:= baseCluster + prefix+ 'addl::fares_tax'+versionSuffix;
 			EXPORT addl_frs_d	:= baseCluster + prefix+ 'addl::fares_deed'+versionSuffix;
 			EXPORT search_prp	:= baseCluster + prefix+ 'search'+versionSuffix;
+			EXPORT addl_name_info	:= baseCluster + prefix+ 'addl::name_info'+versionSuffix;
 			//EXAMPLE '~thor_data400::base::ln_propertyv2::search_20150121'
   END;
 	EXPORT exprt := MODULE

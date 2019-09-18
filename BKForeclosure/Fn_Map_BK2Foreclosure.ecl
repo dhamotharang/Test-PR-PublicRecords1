@@ -1,10 +1,10 @@
-﻿IMPORT Address,BKForeclosure,codes,Property;
+﻿IMPORT Address,BKForeclosure,codes,Property,STD;
 #option('multiplePersistInstances',FALSE);
 
 EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
 
   dReoBaseFile := BKForeclosure.File_BK_Foreclosure.fReo(Delete_flag <> 'DELETE' and ((seller1_fname <> '' or buyer1_fname <> '') or (prop_full_addr <> '' and prop_addr_city <> '' and prop_addr_state <> '')));
-  dNodBaseFile := BKForeclosure.File_BK_Foreclosure.fNod(Delete_flag <> 'DELETE' and ((contact_lname <> '' or borrower1_lname <> '') or (property_full_addr <> '' and prop_addr_city <> '' and prop_addr_state <> '')));
+  dNodBaseFile := BKForeclosure.File_BK_Foreclosure.fNod(Delete_flag <> 'DELETE' and ((trustee_lname <> '' or borrower1_lname <> '') or (property_full_addr <> '' and prop_addr_city <> '' and prop_addr_state <> '')));
   dEmptyReo := ROW([], BKForeclosure.layout_BK.base_reo );
   dEmptyNod := ROW([], BKForeclosure.layout_BK.base_nod );
 
@@ -40,8 +40,8 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.date_of_default := CHOOSE(uReoNod, '', lnod.as_of_dt );
     SELF.amount_of_default := CHOOSE(uReoNod, '', lnod.unpaid_balance );
     SELF.court_case_nbr := CHOOSE(uReoNod, '', lnod.case_number );
-    SELF.plaintiff_1 := CHOOSE(uReoNod, IF( lreo.seller1_fname = '' AND lreo.seller1_lname <> '', lreo.seller1_lname, lreo.seller1_fname +' '+lreo.seller1_lname  ), '' );
-    SELF.plaintiff_2 := CHOOSE(uReoNod, IF( lreo.seller2_fname = '' AND lreo.seller2_lname <> '', lreo.seller2_lname, lreo.seller2_fname +' '+lreo.seller2_lname  ), '' );
+    SELF.plaintiff_1 := CHOOSE(uReoNod, IF( lreo.seller1_fname = '' AND lreo.seller1_lname <> '', lreo.seller1_lname, STD.Str.CleanSpaces(lreo.seller1_fname +' '+lreo.seller1_lname)  ), '' );
+    SELF.plaintiff_2 := CHOOSE(uReoNod, IF( lreo.seller2_fname = '' AND lreo.seller2_lname <> '', lreo.seller2_lname, STD.Str.CleanSpaces(lreo.seller2_fname +' '+lreo.seller2_lname)  ), '' );
     SELF.auction_date := CHOOSE(uReoNod, '', lnod.auction_date );
     SELF.auction_time := CHOOSE(uReoNod, '', lnod.auction_time );
     SELF.street_address_of_auction_call := CHOOSE(uReoNod, '', lnod.auction_location );
@@ -63,7 +63,7 @@ EXPORT Fn_Map_BK2Foreclosure  := FUNCTION
     SELF.lender_beneficiary_first_name := CHOOSE(uReoNod, '', '' ); 
     SELF.lender_beneficiary_last_name := CHOOSE(uReoNod, '', '' ); 
     SELF.lender_beneficiary_company_name := CHOOSE(uReoNod, lreo.concurrent_lender_name, lnod.curr_lender_name );
-    SELF.trustee_name := CHOOSE(uReoNod, '', lnod.trustee_fname+' ' + lnod.trustee_lname );
+    SELF.trustee_name := CHOOSE(uReoNod, '', STD.Str.CleanSpaces(lnod.trustee_fname+' ' + lnod.trustee_lname) );
     SELF.trustee_mailing_address := CHOOSE(uReoNod, '', lnod.trustee_mail_full_addr );
     SELF.trustee_city := CHOOSE(uReoNod, '', lnod.trustee_mail_city );
     SELF.trustee_state := CHOOSE(uReoNod, '', lnod.trustee_mail_state );
