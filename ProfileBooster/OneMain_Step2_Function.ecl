@@ -1,47 +1,46 @@
-﻿IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI,std;
+﻿import risk_indicators, address;
 
-EXPORT Batch_Service() := FUNCTION
-
-  batch_in  := dataset( [], ProfileBooster.Layouts.Layout_PB_In ) : stored('batch_in');
-	string5 	IndustryClassVal 					:= '' : stored('IndustryClass');
-	string50 	DataRestrictionTemp				:= AutoStandardI.GlobalModule().DataRestrictionMask;
-	// Check to see if the default from GlobalModule() is used, if so overwrite it to our default data restriction.  Our default doesn't include spaces.
-	STRING50 	DataRestriction						:= IF(DataRestrictionTemp = '1    0', Risk_Indicators.iid_constants.default_DataRestriction, DataRestrictionTemp);
-	string50 	DataPermission 						:= risk_indicators.iid_constants.default_DataPermission  : stored('DataPermissionMask');
-	string9   AttributesVersionRequest	:= ''  : stored('AttributesVersionRequest'); 
-	string50 	Custom_Model 						  := ''  : stored('Custom_Model');
-
-  BOOLEAN DEBUG := False;
+EXPORT OneMain_Step2_Function(DATASET(ProfileBooster.Layouts.LayoutPBInputThor) ds_in, integer eyeball_count=10) := function
+	
+	dist_ds := distribute(ds_in, random());
+	batch_in := project(dist_ds, transform(ProfileBooster.Layouts.Layout_PB_In, 
+			self.HistoryDate := 999999;  
+			self.AcctNo := left.AcctNo;
+			self.SSN := left.ssn;
+			self.Name_First := left.Name_First;
+			self.Name_Middle := left.Name_Middle;
+			self.Name_Last := left.Name_Last;
+			self.Name_Suffix := left.Name_Suffix;
+			// self.DOB := left.DateOfBirth;
+			self.street_addr := left.streetaddress;
+			self.City_name := left.City_Name;	
+			self.St := left.st;
+			self.Z5 := left.z5;
+			self.phone10 := left.phone10;
+			self.LexID := left.LexID;  // pass in the DID to shorten up the workunit processing time
+			self := [];
+			));
+	
+	// string5 	IndustryClassVal 					:= '';
+	STRING50 	DataRestriction						:= '00000000000001010000000000000000000000000';//Risk_Indicators.iid_constants.default_DataRestriction;
+	string50 	DataPermission 						:= '11000100000000000000001000000000000';//risk_indicators.iid_constants.default_DataPermission;                                        
+	string9   AttributesVersionRequest	:= 'PBATTRV1'; 
 	
 	PB_wseq := project( batch_in, transform( ProfileBooster.Layouts.Layout_PB_In, 
 																	self.seq := counter; 
-                                  
 																	cleaned_name := address.CleanPerson73(left.Name_Full);
 																	boolean valid_cleaned := left.Name_Full <> '';
-																	
 																	self.Name_First  := stringlib.stringtouppercase(if(left.Name_First='' AND valid_cleaned, cleaned_name[6..25], left.Name_First));
 																	self.Name_Last 	 := stringlib.stringtouppercase(if(left.Name_Last='' AND valid_cleaned, cleaned_name[46..65], left.Name_Last));
 																	self.Name_Middle := stringlib.stringtouppercase(if(left.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], left.Name_Middle));
 																	self.Name_Suffix := stringlib.stringtouppercase(if(left.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], left.Name_Suffix));	
 																	self.Name_Title  := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
-                              
 																	street_address := risk_indicators.MOD_AddressClean.street_address(left.street_addr, left.streetnumber, left.streetpredirection, left.streetname, left.streetsuffix, left.streetpostdirection, left.unitdesignation, left.unitnumber);
 																	self.street_addr := street_address;
-                                 
 																	self := left ) );
-  
-  setvalidmodels :=['PBM1803_0','PB1708_1'];
-  custommodel_in := TRIM(std.str.touppercase(Custom_Model),ALL);
-  domodel := custommodel_in IN setvalidmodels;
-  
-  
-  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest,domodel,custommodel_in);  
-
-#IF(DEBUG)
-
-  final := attributes;
-  
-#ELSE
+																		
+	attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest);  
+ 
 	ProfileBooster.Layouts.Layout_PB_BatchOutFlat addAcct(attributes le, PB_wSeq ri) := transform
 		self.AcctNo 																	:= ri.AcctNo;
 		self.seq																			:= le.seq;
@@ -223,75 +222,22 @@ EXPORT Batch_Service() := FUNCTION
 		self.v1_RaAOccProfLicMmbrCnt									:= le.attributes.version1.RaAOccProfLicMmbrCnt;
 		self.v1_RaAOccBusinessAssocMmbrCnt						:= le.attributes.version1.RaAOccBusinessAssocMmbrCnt;
 		self.v1_RaAInterestSportPersonMmbrCnt					:= le.attributes.version1.RaAInterestSportPersonMmbrCnt;
-		
-		self.v1_PPCurrOwnedAutoVIN			             	:= le.attributes.version1.PPCurrOwnedAutoVIN;
-		self.v1_PPCurrOwnedAutoYear			              := le.attributes.version1.PPCurrOwnedAutoYear;
-		self.v1_PPCurrOwnedAutoMake			            	:= le.attributes.version1.PPCurrOwnedAutoMake;
-		self.v1_PPCurrOwnedAutoModel				          := le.attributes.version1.PPCurrOwnedAutoModel;
-		self.v1_PPCurrOwnedAutoSeries				          := le.attributes.version1.PPCurrOwnedAutoSeries;
-		self.v1_PPCurrOwnedAutoType				            := le.attributes.version1.PPCurrOwnedAutoType;
-		self.score1                                   := le.attributes.version1.score1;
-    self.scorename1                               := custommodel_in;
-		self := le;
+    self.v1_PPCurrOwnedAutoVIN                    := le.attributes.version1.PPCurrOwnedAutoVIN;
+    self.v1_PPCurrOwnedAutoYear                   := le.attributes.version1.PPCurrOwnedAutoYear;
+    self.v1_PPCurrOwnedAutoMake                   := le.attributes.version1.PPCurrOwnedAutoMake;
+    self.v1_PPCurrOwnedAutoModel                  := le.attributes.version1.PPCurrOwnedAutoModel;
+    self.v1_PPCurrOwnedAutoSeries                 := le.attributes.version1.PPCurrOwnedAutoSeries;
+    self.v1_PPCurrOwnedAutoType                   := le.attributes.version1.PPCurrOwnedAutoType;
 	end;	
-	
-	final := join(attributes, PB_wSeq, 
+			 
+	search_function_with_acctno := join(attributes, PB_wSeq, 
 								left.seq = right.seq,
-								addAcct(left, right), left outer); 
-#END
-/* ********************
- *  Debugging Section *
- **********************/
+								addAcct(left, right)); 
 
-// OUTPUT(glba, NAMED('glba'));																					 
-// OUTPUT(batch_in, NAMED('batch_in'));																					 
- //OUTPUT(PB_wseq, NAMED('PB_wseq'));																					 
- //OUTPUT(attributes, NAMED('attributes1'));
-																					 
-RETURN OUTPUT(final, NAMED('Results'));																					 
+output(choosen(batch_in, eyeball_count), named('batch_in_sample'));
+output(choosen(pb_wseq, eyeball_count), named('pb_wseq'));																
+output(choosen(attributes, eyeball_count), named('Search_Function_attributes'));
+		
+return search_function_with_acctno;
 
-END;
-
-/*--SOAP--
-<message name="Profile Booster Batch Service">
-	<part name="batch_in"  type="tns:XmlDataSet" cols="80" rows="50"/>
-	<part name="DataRestrictionMask" type="xsd:string"/>
-	<part name="DataPermissionMask" type="xsd:string"/>
-	<part name="AttributesVersionRequest" type="xsd:string"/>
-	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
- </message>
-*/
-/*--INFO-- Profile Booster Batch Service*/
-/*--HELP--
-<pre>
-&lt;dataset&gt;
-   &lt;row&gt;
-      &lt;AcctNo&gt;&lt;/AcctNo&gt;
-      &lt;seq&gt;&lt;/seq&gt;
-      &lt;LexID&gt;&lt;/LexID&gt;
-      &lt;Name_Full&gt;&lt;/Name_Full&gt;
-      &lt;Name_Title&gt;&lt;/Name_Title&gt;
-      &lt;Name_First&gt;&lt;/Name_First&gt;
-      &lt;Name_Middle&gt;&lt;/Name_Middle&gt;
-      &lt;Name_Last&gt;&lt;/Name_Last&gt;
-      &lt;Name_Suffix&gt;&lt;/Name_Suffix&gt;
-      &lt;SSN&gt;&lt;/SSN&gt;
-      &lt;DOB&gt;&lt;/DOB&gt;
-      &lt;Phone10&gt;&lt;/Phone10&gt;
-      &lt;street_addr&gt;&lt;/street_addr&gt;
-      &lt;streetnumber&gt;&lt;/streetnumber&gt;
-      &lt;streetpredirection&gt;&lt;/streetpredirection&gt;
-      &lt;streetname&gt;&lt;/streetname&gt;
-      &lt;streetsuffix&gt;&lt;/streetsuffix&gt;
-      &lt;streetpostdirection&gt;&lt;/streetpostdirection&gt;
-      &lt;unitdesignation&gt;&lt;/unitdesignation&gt;
-      &lt;unitnumber&gt;&lt;/unitnumber&gt;
-      &lt;City_name&gt;&lt;/City_name&gt;
-      &lt;St&gt;&lt;/St&gt;
-      &lt;Z5&gt;&lt;/Z5&gt;
-      &lt;country&gt;&lt;/country&gt;
-      &lt;HistoryDate&gt;&lt;/HistoryDate&gt;
-   &lt;/row&gt;
-&lt;/dataset&gt;
-</pre>
-*/
+end;

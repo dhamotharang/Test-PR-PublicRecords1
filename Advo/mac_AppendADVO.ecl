@@ -1,4 +1,4 @@
-﻿EXPORT mac_AppendADVO(in_dataset, UseIndexThreshold=20000000, in_prim_range, in_prim_name, in_suffix, in_predir, in_postdir, in_sec_range, in_zip, in_prefix='advo_') := FUNCTIONMACRO 
+﻿EXPORT mac_AppendADVO(in_dataset, UseIndexThreshold=20000000, in_prim_range, in_prim_name, in_suffix, in_predir, in_postdir, in_sec_range, in_zip, in_prefix='\'advo_\'') := FUNCTIONMACRO 
   IMPORT hipie_ecl, ADVO;
   LOCAL dDistributed  := DISTRIBUTE(in_dataset((STRING)in_zip <> ''), HASH32(in_zip, in_prim_range, in_prim_name, in_suffix));
   LOCAL rSearch := {RECORDOF(in_dataset) OR {STRING _searchZip,STRING _searchPrimRange,STRING _searchPrimName,STRING _searchSuffix,STRING _searchPredir,STRING _searchPostDir,STRING _searchSecRange}};
