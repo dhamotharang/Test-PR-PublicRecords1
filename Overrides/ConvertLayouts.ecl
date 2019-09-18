@@ -1,4 +1,4 @@
-﻿import FCRA, bankruptcyv2;
+﻿import FCRA, bankruptcyv2,LiensV2;
 EXPORT ConvertLayouts() := module
 	export _default(string varfilename
 													,string xmlfilename
@@ -53,4 +53,42 @@ EXPORT ConvertLayouts() := module
 		return output(dOriginal,,xmlfilename,XML(rowtag,heading('<'+headtag+'>','</'+headtag+'>')),overwrite);
 	end;	
 	
+	export liensv2_main(string varfilename
+													,string xmlfilename
+													,string headtag = 'dataset'
+													,string rowtag = 'row') := function
+		dVar := dataset(varfilename
+																,FCRA.Layout_Override_Liens_Main_In
+																,csv(separator('\t'),quote('\"'),terminator('\r\n'))
+																,opt);
+		dSortVar := sort(distribute(dVar,hash(tmsid)),tmsid,rmsid,-flag_file_id,local);
+		 
+		FCRA.Layout_Override_Liensv2_main xConvertToOriginal(dSortVar L) := transform
+			self.filing_status   := row(L,LiensV2.layout_liens_main_module.layout_filing_status);
+			//self.comments := row(L,bankruptcyV2.Layout_bankruptcy_main_v3.layout_comments);
+			self := L;
+		end;
+
+		dOriginal := project(dSortVar, xConvertToOriginal(left));
+		
+		return output(dOriginal,,xmlfilename,XML(rowtag,heading('<'+headtag+'>','</'+headtag+'>')),overwrite);
+	end;
+	
+	export liensv2_party(string varfilename
+													,string xmlfilename
+													,string headtag = 'dataset'
+													,string rowtag = 'row') := function
+		dVar := dataset(varfilename
+																,FCRA.Layout_Override_Liens_Party_In
+																,csv(separator('\t'),quote('\"'),terminator('\r\n'))
+																,opt);
+		
+		FCRA.Layout_Override_Liensv2_party xConvertToOriginal(dVar L) := transform
+			self := L;
+		end;
+
+		dOriginal := project(dVar, xConvertToOriginal(left));
+		
+		return output(dOriginal,,xmlfilename,XML(rowtag,heading('<'+headtag+'>','</'+headtag+'>')),overwrite);
+	end;	
 end;
