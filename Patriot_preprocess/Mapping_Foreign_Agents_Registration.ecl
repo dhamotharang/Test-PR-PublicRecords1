@@ -1,4 +1,4 @@
-
+﻿
 #OPTION('multiplePersistInstances',false);
 
 afp := DATASET('~thor::in::globalwatchlists::foreign_agents_registration::fp', 
@@ -455,6 +455,7 @@ Patriot_preprocess.layout_patriot_common tr_patriot_common_ar_afp(parse_address_
 				StringLib.StringFind(StringLib.StringToUpperCase(l.Registrant),'FRONT FOR INDEPENDENCE OF OROMIA (FIO)',1) > 0 => 'Y',                                                                                                                                                                                                                                                                                                                        
 
 				'');  
+
 	
  	self := [];
 	end;

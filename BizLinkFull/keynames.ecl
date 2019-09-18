@@ -17,6 +17,7 @@ module
 	export refs                      := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs'          	               ,pversion    );
 	export words                     := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::words'          	             ,pversion    );
 	export refs_l_cnpname            := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_cnpname'          	   ,pversion    );
+	export refs_l_cnpname_slim       := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_cnpname_slim'          ,pversion    );
 	export refs_l_cnpname_zip        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_cnpname_zip'       	   ,pversion    );
 	export refs_l_cnpname_st         := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_cnpname_st'       	   ,pversion    );
 	export refs_l_cnpname_fuzzy      := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_cnpname_fuzzy'       	 ,pversion    );
@@ -66,6 +67,7 @@ module
     // + refs                      .dall_filenames
     // + words                     .dall_filenames
     + refs_l_cnpname            .dall_filenames
+    + refs_l_cnpname_slim       .dall_filenames
     + refs_l_cnpname_zip        .dall_filenames
     + refs_l_cnpname_st         .dall_filenames
     + refs_l_cnpname_fuzzy      .dall_filenames

@@ -30,7 +30,9 @@ Nid.Layout_Repository xform(Nid.Layout_Repository R) := TRANSFORM
 								Address.NameTester.GenderEx(self.cln_fname,self.cln_mname),'');
 		self.nameind := Nid.NameIndicators.fn_setNameIndicator(ntype,0,
 								self.gender,
-								Length(trim(self.cln_fname))=1);
+								false) |
+						(Address.Persons.NameQuality(Address.PrecleanName(nm)) << 3);
+								
 		self.std_biz := CASE(ntype,
 												'B' => Nid.clnBizName(nm),
 												'T' => Nid.clnTrustName(nm),

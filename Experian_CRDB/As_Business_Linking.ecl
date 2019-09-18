@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 import ut, business_header, mdr, lib_stringlib, email_data, _validate;
 
 EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDataland
@@ -44,11 +44,11 @@ EXPORT As_Business_Linking ( boolean pUseOtherEnviron 		= _Constants().IsDatalan
 				self.company_address.geo_lat     := l.geo_lat;
 				self.company_address.geo_long    := l.geo_long;
 				self.company_url								 := trim(l.url,left,right);
-				self.dt_first_seen               := (unsigned4)l.dt_first_seen;
-				self.dt_last_seen                := (unsigned4)l.dt_last_seen;
+				self.dt_first_seen               := (unsigned4)l.Last_Experian_Inquiry_Date;
+				self.dt_last_seen                := (unsigned4)l.Last_Experian_Inquiry_Date;
 				self.dt_vendor_first_reported    := (unsigned4)l.dt_vendor_first_reported;
 				self.dt_vendor_last_reported     := (unsigned4)l.dt_vendor_last_reported;			
-				self.contact_job_title_raw			 := l.Executive_Title; //Raw vendor data or vendorÂ’s field name - Examples: CHIEF EXECUTIVE
+				self.contact_job_title_raw			 := l.Executive_Title; //Raw vendor data or vendorÃ‚â€™s field name - Examples: CHIEF EXECUTIVE
 				self.contact_name.title          := l.title;
 				self.contact_name.fname          := l.fname;
 				self.contact_name.mname          := l.mname;

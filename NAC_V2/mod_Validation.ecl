@@ -27,7 +27,7 @@ EXPORT mod_Validation := MODULE
 										//ROW({errcodes.E102, 'E', 'F', FieldCode('E',errcodes.E102), st}, rErr)); 
 										//ROW({errcodes.E102, 'E', 'F', '5000', st}, rErr)); 
 
-	shared validProgram(string1 program, string2 state, string4 RecordCode) := IF(program not in Mod_Sets.IES_Benefit_Type,
+	shared validProgram(string1 program, string2 state, string4 RecordCode) := IF(program not in Mod_Sets.Benefit_Type,
 										DATASET([{errcodes.E103, 'E', 'F', FieldCode('E',errcodes.E103), program, state, RecordCode}], rErr)); 
 	
 	shared boolean invalidID(string id) := id='' OR NOT REGEXFIND('^[A-Z0-9-]+$', TRIM(id), nocase);
@@ -242,7 +242,7 @@ EXPORT mod_Validation := MODULE
 					self := LEFT;
 					self := []));
 							
-	EXPORT ExceptionFile(Dataset(Layouts2.rException) ds) := 
+	EXPORT ExceptionFile(Dataset(Layouts2.rExceptionEx) ds) := 
 				PROJECT(ds, TRANSFORM(Layouts2.rExceptionEx,
 					self.dsErrs := 
 							validProgramState(left.SourceProgramState, left.SourceProgramState, left.RecordCode)

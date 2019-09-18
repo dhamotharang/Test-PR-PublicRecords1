@@ -48,9 +48,9 @@ EXPORT _config (
                                  
     // v_eq_as_of_date
     
-    EXPORT set_v_eq_as_of_date := if(isNewEquifaxWeeklyFile(sourceIP),
+    EXPORT set_v_eq_as_of_date(STRING overwriteDate='') := if(isNewEquifaxWeeklyFile(sourceIP),
                                     sequential(
-                                         output(dataset([{newEquifaxWeeklyHeaderDate}],{string v_eq_as_of_date}),,v_eq_as_of_date_file_name+'_'+workunit),
+                                         output(dataset([{if(overwriteDate='',newEquifaxWeeklyHeaderDate,overwriteDate)}],{string v_eq_as_of_date}),,v_eq_as_of_date_file_name+'_'+workunit),
                                          std.file.startsuperfiletransaction(),
                                          std.file.createsuperfile(v_eq_as_of_date_file_name,,true),
                                          std.file.clearsuperfile(v_eq_as_of_date_file_name,true),

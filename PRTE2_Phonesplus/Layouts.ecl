@@ -1,4 +1,4 @@
-IMPORT PRTE2_PhonesPlus, Phonesplus_v2, Phonesplus, PRTE2_Common, PRTE_CSV;
+﻿IMPORT PRTE2_PhonesPlus, Phonesplus_v2, Phonesplus, PRTE2_Common, PRTE_CSV;
 
 EXPORT Layouts := MODULE
 
@@ -94,6 +94,7 @@ EXPORT Base_in	:= RECORD
 	STRING8		link_dob;
 	STRING9		cust_ssn;
 	STRING3		append_row_id;
+	string60 orig_carrier_name;
 END;
 
 //Common to both Boca and Alpharetta's input file

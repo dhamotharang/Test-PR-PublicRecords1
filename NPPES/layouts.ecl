@@ -1,4 +1,7 @@
-﻿import AID, address, BIPV2;
+﻿/*2019-07-26T19:05:37Z (Periasamy, Senthilkumar (RIS-ATL))
+
+*/
+import AID, address, BIPV2;
 export Layouts := module	
 	 					
 		export Vendor := record, maxlength(100000)

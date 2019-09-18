@@ -15,7 +15,7 @@ module
  
  // SuspectIP  
  export		SuspectIP                    := project (inBaseSuspectIP, transform(FraudShared.Layouts.Base.Main , 
-
+        
       self.Record_ID                      := 0 ;
       self.Reported_Date                  := left.Reported_Date;
       self.Reported_time                  := left.Reported_time;		
@@ -53,7 +53,9 @@ module
 			self.classification_Entity.role                                         := Mod_MbsContext.SuspectIPRole;
 			self.classification_Entity.Evidence                                     := Mod_MbsContext.SuspectIPEvidence;
 			self.classification_Entity.investigated_count                           := '';
-     self.did                                                                := 0;       
+       self.did                                                                := 0;       
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid;      
 		  self                                                                    := left; 
   	  self                                                                   := [];
 	
@@ -190,7 +192,9 @@ module
 			self.classification_Entity.role                                         := Mod_MbsContext.Glb5Role;
 			self.classification_Entity.Evidence                                     := Mod_MbsContext.Glb5Evidence;
 			self.classification_Entity.investigated_count                           := '';
-		  self.did                                                                := left.did; 
+		  self.did                                                                := left.did;       
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid;
 		  self                                                                    := left; 
   	  self                                                                    := [];
 	
@@ -253,7 +257,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 			self.classification_Entity.role                                         := Mod_MbsContext.TigerRole;
 			self.classification_Entity.Evidence                                     := Mod_MbsContext.TigerEvidence;
 			self.classification_Entity.investigated_count                           := '';
-		  self.did                                                                := left.did; 
+		  self.did                                                                := left.did;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid; 
 		  self                                                                    := left; 
   	  self                                                                    := [];
 	
@@ -321,7 +327,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 			self.classification_Entity.role                                         := Mod_MbsContext.CFNARole;
 			self.classification_Entity.Evidence                                     := Mod_MbsContext.CFNAEvidence;
 			self.classification_Entity.investigated_count                           := '';
-		  self.did                                                                := left.did; 
+		  self.did                                                                := left.did;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid; 
 		  self                                                                    := left; 
   	  self                                                                    := [];
 	
@@ -390,7 +398,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 			self.classification_Entity.role                                         := Mod_MbsContext.TextMinedCrimRole;
 			self.classification_Entity.Evidence                                     := Mod_MbsContext.TextMinedCrimEvidence;
 			self.classification_Entity.investigated_count                           := '';
-		  self.did                                                                := left.did;  
+		  self.did                                                                := left.did;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid;  
 			self                                                                    := left;
   	  self                                                                    := [];
      )); 
@@ -467,7 +477,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
       self.ultscore                                                          := left.ultscore;
       self.ultweight                                                         := left.ultweight;      
       self.lnpid                                                             := left.lnpid;
-		  self.did                                                                := left.did; 
+		  self.did                                                                := left.did;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid; 
 		  self                                                                    := left; 
   	  self                                                                    := [];
 	));
@@ -511,7 +523,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 			self.classification_Entity.role                                         := Mod_MbsContext.ainspectionRole;
 			self.classification_Entity.Evidence                                     := Mod_MbsContext.ainspectionEvidence;
 			self.classification_Entity.investigated_count                           := '';
-     self.did                                                                 := 0;       
+       self.did                                                                := 0;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid;       
 			self                                                                    := left; 
   	  self                                                                    := [];
 	
@@ -627,7 +641,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 			self.classification_Entity.role_id                                      := if(IsErieInsuredMapping, Mod_MbsContext.ErieRole_Susp_id, 0);
 			self.classification_Entity.Evidence                                     := Mod_MbsContext.ErieEvidence;
 			self.classification_Entity.investigated_count                           := '';
-		  self.did                                                                := left.did;  
+		  self.did                                                                := left.did;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid;  
 			self                                                                    := left;
   	  self                                                                    := [];
 	));  
@@ -681,7 +697,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 			self.classification_Entity.Entity_sub_type := Mod_MbsContext.ErieWatchListEntitySubType;
 			self.classification_Entity.role := Mod_MbsContext.ErieWatchListRole;
 			self.classification_Entity.Evidence := Mod_MbsContext.ErieWatchListEvidence;
-		  self.did := left.did;  
+		  self.did := left.did;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid;  
 			self := left;
   	  self := [];
 	));  
@@ -735,7 +753,9 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 			self.classification_Entity.Entity_sub_type := Mod_MbsContext.ErieNICBWatchListEntitySubType;
 			self.classification_Entity.role := Mod_MbsContext.ErieNICBWatchListRole;
 			self.classification_Entity.Evidence :=  Mod_MbsContext.ErieNICBWatchListEvidence;
-		  self.did := left.did;  
+		  self.did := left.did;      
+       self.global_sid                                                         := left.global_sid;
+       self.record_sid                                                         := left.record_sid;  
 			self := left;
   	  self := [];
 	));

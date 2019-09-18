@@ -1,4 +1,4 @@
-//gong key based on some address fields
+﻿//gong key based on some address fields
 import doxie, gong, Data_Services, header_services;
 
 g := Gong.File_Gong_Full_Prepped_For_Keys(trim(prim_name)<>'', trim(z5)<>'');
@@ -53,7 +53,14 @@ header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_in
 
 Base_File_Append_In := attr();
 
-gong.Layout_bscurrent_raw  xTo_bscurrent_raw (Base_File_Append_In L ):= TRANSFORM
+//CCPA-22 CCPA new fields
+layout_bscurrent_ccpa := RECORD
+	gong.Layout_bscurrent_raw;
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid := 0;
+END;
+
+layout_bscurrent_ccpa  xTo_bscurrent_raw (Base_File_Append_In L ):= TRANSFORM
 
 	SELF := L ;
  

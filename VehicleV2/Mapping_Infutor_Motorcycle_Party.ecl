@@ -1,4 +1,4 @@
-//Copied from Mapping_Infutor_Vin_Party
+﻿//Copied from Mapping_Infutor_Vin_Party
 import	header,ut;
 //---------------------------------------------------------------------------
 //-------ROLLUP OH PARTY FILE
@@ -25,7 +25,7 @@ dInfutorMotorcycleTempPartySort	:=	sort(	dInfutorMotorcycleTempPartyDist,
 																		local
 																	);
 
-VehicleV2.Layout_Base.Party_BIP	trollup(dInfutorMotorcycleTempPartySort	le,dInfutorMotorcycleTempPartySort	ri)	:=
+VehicleV2.Layout_Base.Party_CCPA	trollup(dInfutorMotorcycleTempPartySort	le,dInfutorMotorcycleTempPartySort	ri)	:=
 transform
 	self.Reg_Rollup_Count							:=	le.Reg_Rollup_Count	+	1;
 	//Vendor's definition of first and last seen date are not clear. We do not use their dates.
@@ -34,6 +34,11 @@ transform
 	self.date_vendor_First_Reported		:=	(unsigned4)VehicleV2.validate_date.fEarliestNonZeroDate((string)le.date_vendor_First_Reported,(string)ri.date_vendor_First_Reported);
 	self.date_vendor_Last_Reported		:=	(unsigned4)VehicleV2.validate_date.fLatestNonZeroDate((string)le.date_vendor_Last_Reported,(string)ri.date_vendor_Last_Reported);
 	self.source_rec_id								:=  if(le.source_rec_id<>0,if(le.source_rec_id<ri.source_rec_id,le.source_rec_id,ri.source_rec_id),0);
+	//Added for CCPA-103
+	// self.global_sid                   := 0;
+	// self.record_sid                   := 0;
+	//Added for DF-25578
+	// self.raw_name                     := '';
 	self															:=	le;
 
 
@@ -62,7 +67,7 @@ dInfutorMotorcyclePartyRollup		:=	rollup(	dInfutorMotorcycleTempPartySort,
 //-------GENERATE SEQUENCE KEY
 //---------------------------------------------------------------------------
 
-VehicleV2.Layout_Base.Party_BIP	tdate(dInfutorMotorcyclePartyRollup	pInput)	:=
+VehicleV2.Layout_Base.Party_CCPA	tdate(dInfutorMotorcyclePartyRollup	pInput)	:=
 transform
 	self.Ttl_Earliest_Issue_Date			:=	''; //pInput.TITLE_ISSUE_DATE;
 	self.Ttl_Latest_Issue_Date				:=	''; //pInput.TITLE_ISSUE_DATE;

@@ -1,4 +1,4 @@
-﻿import autokey, ut;
+﻿import _Control, Autokey, CCPA, Std, ut;
 
 //populate only updating source for keys
 canadianWP := file_CanadianWhitePagesBase(vendor='AX');
@@ -122,7 +122,9 @@ END;
 
 cProject := PROJECT(canadianWP,xpand_canadianWP(LEFT,COUNTER));
 
-ut.mac_suppress_by_phonetype(cProject,phonenumber,state,ph_out1,false);
+//Add Global_SID
+addGlobalSID	:= CCPA.macGetGlobalSID(cProject, 'CanadianPhones', 'source_file', 'global_sid'); //DF-25404
 
+ut.mac_suppress_by_phonetype(addGlobalSID,phonenumber,state,ph_out1,false);
 
 export file_cwp_with_fdid :=  ph_out1 : PERSIST('per_file_cwp_with_fdid_v2');

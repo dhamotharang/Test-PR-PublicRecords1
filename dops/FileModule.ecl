@@ -1,10 +1,13 @@
-﻿import lib_fileservices,lib_thorlib,ut;
+﻿import lib_fileservices,lib_thorlib,ut,STD;
 EXPORT FileModule(string esp
 									,string port = '8010'
 									) := module
 									
 	shared l_esp := if (~regexfind('http://',esp),'http://'+esp, esp);
 	
+	shared rExceptions := record
+		string errormsg{xpath('Exception/Message')}
+	end;
 	
 	export GetFilesInWorkunit(string wuid = WORKUNIT) := function
 		
@@ -84,7 +87,57 @@ EXPORT FileModule(string esp
 	end;
 	
 	export GetFileDesc(string filename) := fileservices.getfiledescription(if (regexfind('~',filename), filename, '~'+filename));
+	
+	EXPORT fSoapCopy(
+									string pSourceLogical
+									,string pDestGroup
+									,string pDestLogical
+									,string pSourceDali
+									,string pSourceUsername = ''
+									,string pSourcePassword = ''
+									,string pOverwrite = '1'
+									,string pReplicate = '1'
+									,string pNoSplit = '1'
+									,string pNoWrap = '1'
+									,string pTransferBuffersize = '1000000'
+									,string pCompress = '1'
+									
+								):= function
 		
+		
+	
+		rCopyRequest := record
+			string sourceLogicalName{xpath('sourceLogicalName')} := pSourceLogical;
+			string destGroup{xpath('destGroup')} := pDestGroup;
+			string destLogicalName{xpath('destLogicalName')} := pDestLogical;
+			string sourceDali{xpath('sourceDali')} := pSourceDali;
+			string srcusername{xpath('srcusername')} := pSourceUsername;
+			string srcpassword{xpath('srcpassword')} := pSourcePassword;
+			string overwrite{xpath('overwrite')} := pOverwrite;
+			string replicate{xpath('replicate')} := pReplicate;
+			string nosplit{xpath('nosplit')} := pNoSplit;
+			string compress{xpath('compress')} := pCompress;
+			string Wrap{xpath('Wrap')} := pNoWrap;
+			string transferBufferSize{xpath('transferBufferSize')} := pTransferBuffersize;
+		end;
+
+		
+		rCopyResponse := record,maxlength(300000)
+			string20 result{xpath('result')};
+			dataset(rExceptions) exceptions{xpath('Exceptions')};
+		end;
+	
+		dWUInfoResponse := SOAPCALL(l_esp+':'+port+'/FileSpray'
+													,'Copy' 
+													,rCopyRequest
+													,dataset(rCopyResponse)
+													,xpath('CopyResponse')
+													,LITERAL
+													,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
+										 );
+		return dWUInfoResponse;
+	
+	end;
 	
 	
 end;
