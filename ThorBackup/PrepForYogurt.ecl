@@ -367,8 +367,8 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																	);
 																
 	export SendFileListToYogurtThor := sequential(
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess).copyfilecmd),
-																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete).copyfilecmd)
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestoprocess,true).copyfilecmd),
+																					STD.File.DfuPlusExec(thorbackup.constants.yogurt('~'+filestodelete,true).copyfilecmd)
 																					);
 	
 	export ReSubmit() := function
