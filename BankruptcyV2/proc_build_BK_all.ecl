@@ -1,4 +1,4 @@
-﻿export proc_build_BK_all(filedate)
+export proc_build_BK_all(filedate)
  :=
   macro
 
@@ -30,7 +30,7 @@
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//AUTOMATIC DOPS UPDATE PROCESS - DEACTIVATE WHEN RUNNING THE BUILD MANUALLY (i.e. LAYOUT CHANGES)																																//
-		,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,christopher.brodeur@lexisnexis.com,manuel.tarectecan@lexisnexis.com,randy.reyes@lexisnexis.com,BocaRoxiePackageTeam@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y','N',,'Y',,,'N')//
+		,Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,christopher.brodeur@lexisnexis.com,manuel.tarectecan@lexisnexis.com,randy.reyes@lexisnexis.com,BocaRoxiePackageTeam@lexisnexis.com,Michael.Gould@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y','N',,'Y',,,'N')//
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		,if(ut.Weekday((integer)filedate[1..8]) <> 'SATURDAY' and ut.Weekday((integer)filedate[1..8]) <> 'SUNDAY',

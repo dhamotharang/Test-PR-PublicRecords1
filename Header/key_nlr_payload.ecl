@@ -1,4 +1,4 @@
-import doxie,Data_Services;
+import doxie,ut;
 
 d:=Header.Prep_NLR_key;
 
@@ -50,4 +50,4 @@ layout:=record
  END;
 
 export key_NLR_payload := INDEX (d, {did,rid}, layout,
-		Data_Services.Data_Location.Prefix('person_header')+'thor_data400::key::header_nlr::did.rid_'+doxie.version_superkey);
+		ut.Data_Location.Person_header+'thor_data400::key::header_nlr::did.rid_'+doxie.version_superkey);

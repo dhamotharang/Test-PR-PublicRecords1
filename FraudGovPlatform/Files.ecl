@@ -26,7 +26,7 @@ module
 											{string75 fn { virtual(logicalfilename)},NAC.Layouts.MSH},
 											FLAT, OPT);		
 		export InquiryLogs := dataset(Filenames().Sprayed.InquiryLogs,
-											{string75 fn { virtual(logicalfilename)},Inquiry_AccLogs.Layout.Common_ThorAdditions},
+											Inquiry_AccLogs.Layout.Common_ThorAdditions,
 											CSV(separator(['~|~']),quote(''),terminator('~<EOL>~')));												
 		export RDP := dataset(Filenames().Sprayed.RDP,
 											{string75 fn { virtual(logicalfilename)},Layouts.Sprayed.RDP},
@@ -37,14 +37,17 @@ module
 	// -- Input File Versions
 	//////////////////////////////////////////////////////////////////
 	export Input := module
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.IdentityData,Layouts.Input.IdentityData,IdentityData);
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_IdentityData,Layouts.Input.IdentityData,ByPassed_IdentityData);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.IdentityData,Layouts.Input.IdentityData,IdentityData,'CSV',,'~<EOL>~','~|~',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_IdentityData,Layouts.Input.IdentityData,ByPassed_IdentityData,'CSV',,'~<EOL>~','~|~',,,true);
 
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.KnownFraud,Layouts.Input.KnownFraud,KnownFraud);
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_KnownFraud,Layouts.Input.KnownFraud,ByPassed_KnownFraud);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.KnownFraud,Layouts.Input.KnownFraud,KnownFraud,'CSV',,'~<EOL>~','~|~',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_KnownFraud,Layouts.Input.KnownFraud,ByPassed_KnownFraud,'CSV',,'~<EOL>~','~|~',,,true);
 		
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Deltabase,Layouts.Input.Deltabase,Deltabase);
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_Deltabase,Layouts.Input.Deltabase,ByPassed_Deltabase);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Deltabase,Layouts.Input.Deltabase,Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ByPassed_Deltabase,Layouts.Input.Deltabase,ByPassed_Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_IDDT,Layouts.Base.AddressCache,AddressCache_IDDT,'CSV',,'~<EOL>~','~|~',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_KNFD,Layouts.Base.AddressCache,AddressCache_KNFD,'CSV',,'~<EOL>~','~|~',,,true);
+		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_Deltabase,Layouts.Base.AddressCache,AddressCache_Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
 
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
 		
@@ -61,6 +64,9 @@ module
 	// -- Base File Versions
 	//////////////////////////////////////////////////////////////////
 	export Base := module
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IdentityData,Layouts.Base.IdentityData,IdentityData);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.KnownFraud,Layouts.Base.KnownFraud,KnownFraud);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Deltabase,Layouts.Base.Deltabase,Deltabase);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.AddressCache,Layouts.Base.AddressCache,AddressCache);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Pii,Layouts.Pii,Pii);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID,Layouts.CIID,CIID);

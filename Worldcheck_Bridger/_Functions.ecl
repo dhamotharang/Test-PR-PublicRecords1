@@ -1235,11 +1235,16 @@
 				trim(kword, left, right) = 'CARBQ' =>SubGroup_Constants.numKeywordsID.KEYWORD_CARBQ,
 				trim(kword, left, right) = 'AZFMS-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_AZFMS_NAT,
 				trim(kword, left, right) = 'BECA' =>SubGroup_Constants.numKeywordsID.KEYWORD_BECA,
+<<<<<<< HEAD
+=======
 				trim(kword, left, right) = 'OFAC-NICHRAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_NICHRAA,
 				trim(kword, left, right) = 'CANSEMNIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANSEMNIC,
 				trim(kword, left, right) = 'GHSEC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GHSEC,
 				trim(kword, left, right) = 'NABON' =>SubGroup_Constants.numKeywordsID.KEYWORD_NABON,
 				trim(kword, left, right) = 'USCME' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCME,
+<<<<<<< HEAD
+>>>>>>> ThorProd
+=======
 				trim(kword, left, right) = 'INMSJE-NGO' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMSJE_NGO,
 				trim(kword, left, right) = 'GIBNATSANC' =>SubGroup_Constants.numKeywordsID.KEYWORD_GIBNATSANC,
 				trim(kword, left, right) = 'OFAC-EO13846' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_EO13846,

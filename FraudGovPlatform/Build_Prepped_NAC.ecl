@@ -23,8 +23,8 @@ MODULE
 
 			SELF.Customer_Job_ID := '1';
 			SELF.Batch_Record_ID := '1';
-			SELF.Transaction_ID := L.ESPTransactionId;
-			SELF.Reason_Description:= 'Search in National Accuracy Clearinghouse';
+			SELF.Transaction_ID_Number := L.ESPTransactionId;
+			SELF.Reason_for_Transaction_Activity:= 'Search in National Accuracy Clearinghouse';
 
 			SELF.Date_of_Transaction := trim(regexfind('([0-9])+_([0-9])\\w+',FileName, 0)[1..8]);
 
@@ -54,8 +54,10 @@ MODULE
 			SELF.Ethnicity := l.ClientEthnicity;
 			SELF.Race := l.ClientRace;
 
-			SELF.Household_ID := l.SearchCaseId;
-			SELF.Customer_Person_ID := l.SearchClientId;
+			SELF.Case_ID := l.SearchCaseId;
+			SELF.Client_ID := l.SearchClientId;
+
+			SELF.source_input := 'NAC_MSH';
 			SELF := L;
 			SELF := [];
 	END;
@@ -109,8 +111,10 @@ MODULE
 											L.matchcodes in Level_2 => 'Identity associated to NAC level 2 collision',
 											'');
 
-			SELF.Household_id	:= L.CaseID;
-			SELF.Customer_Person_ID	:= L.ClientID;
+			SELF.case_id	:= L.CaseID;
+			SELF.client_id	:= L.ClientID;
+
+			SELF.source_input := 'NAC_MSH';
 			SELF := L;
 			SELF := [];
 	END;
@@ -157,8 +161,10 @@ MODULE
 											L.matchcodes in Level_2 => 'Identity associated to NAC level 2 collision',
 											'');
 
-			SELF.Household_id	:= R.Case_Identifier;
-			SELF.Customer_Person_ID	:= R.Client_Identifier;
+			SELF.case_id	:= R.Case_Identifier;
+			SELF.client_id	:= R.Client_Identifier;
+
+			SELF.source_input := 'NAC_MSH';
 			SELF := L;
 			SELF := [];
 	END;

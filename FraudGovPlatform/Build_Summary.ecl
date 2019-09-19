@@ -54,22 +54,22 @@ EXPORT Build_Summary(string pversion) := MODULE
 																																																																																	 
 
 	identities := join ( Data_Loaded, bid, 
-	left.classification_Permissible_use_access.file_type = 3 and ~regexfind('Delta',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
+	left.classification_Permissible_use_access.file_type = 3 and ~regexfind('Delta',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.unique_id,
 	transform(my_rec, self.Customer_ID := left.Customer_ID; self.source := left.source;  self.FileName := right.FileName)
 	);
 
 	knownrisk := join ( Data_Loaded, bkf, 
-	left.classification_Permissible_use_access.file_type = 1 and ~regexfind('Safe',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
+	left.classification_Permissible_use_access.file_type = 1 and ~regexfind('Safe',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.unique_id,
 	transform(my_rec, self.Customer_ID := left.Customer_ID; self.source := left.source; self.FileName := right.FileName)
 	);
 
 	safelist := join ( Data_Loaded, bkf, 
-	left.classification_Permissible_use_access.file_type = 1 and regexfind('Safe',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
+	left.classification_Permissible_use_access.file_type = 1 and regexfind('Safe',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.unique_id,
 	transform(my_rec, self.Customer_ID := left.Customer_ID; self.source := left.source; self.FileName := right.FileName)
 	);
 
 	deltabase := join ( Data_Loaded, bdb, 
-	left.classification_Permissible_use_access.file_type = 3 and regexfind('Delta',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.source_rec_id,
+	left.classification_Permissible_use_access.file_type = 3 and regexfind('Delta',left.classification_Permissible_use_access.fdn_file_code, nocase) and left.source_rec_id = right.unique_id,
 	transform(my_rec, self.Customer_ID := left.Customer_ID; self.source := left.source; self.FileName := right.FileName)
 	);
 

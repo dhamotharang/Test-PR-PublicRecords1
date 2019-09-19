@@ -30,6 +30,7 @@ EXPORT input_layout := RECORD // project out required fields
   h.fname;
   UNSIGNED1 fname_len := 0;  // Place holder filled in by project
   h.mname;
+  UNSIGNED1 mname_len := 0;  // Place holder filled in by project
   h.lname;
   h.name_suffix;
   h.prim_range;
@@ -63,6 +64,7 @@ h01 := DISTRIBUTE(TABLE(h(did<>0),r),HASH(did)); // group for the specificity_lo
 input_layout do_computes(h01 le) := TRANSFORM
   SELF.phone_len := LENGTH(TRIM((SALT311.StrType)le.phone));
   SELF.fname_len := LENGTH(TRIM((SALT311.StrType)le.fname));
+  SELF.mname_len := LENGTH(TRIM((SALT311.StrType)le.mname));
   SELF.lastname := IF (Fields.InValid_lastname((SALT311.StrType)le.lname,(SALT311.StrType)le.name_ind)>0,0,HASH32((SALT311.StrType)le.lname,(SALT311.StrType)le.name_ind)); // Combine child fields into 1 for specificity counting
   SELF.ssnum := IF (Fields.InValid_ssnum((SALT311.StrType)le.ssn,(SALT311.StrType)le.valid_ssn)>0,0,HASH32((SALT311.StrType)le.ssn,(SALT311.StrType)le.valid_ssn)); // Combine child fields into 1 for specificity counting
   SELF.address := IF (Fields.InValid_address((SALT311.StrType)le.prim_range,(SALT311.StrType)le.predir,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.suffix,(SALT311.StrType)le.postdir,(SALT311.StrType)le.unit_desig,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.tnt,(SALT311.StrType)le.rawaid,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported)>0,0,HASH32((SALT311.StrType)le.prim_range,(SALT311.StrType)le.predir,(SALT311.StrType)le.prim_name,(SALT311.StrType)le.suffix,(SALT311.StrType)le.postdir,(SALT311.StrType)le.unit_desig,(SALT311.StrType)le.sec_range,(SALT311.StrType)le.city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip,(SALT311.StrType)le.zip4,(SALT311.StrType)le.tnt,(SALT311.StrType)le.rawaid,(SALT311.StrType)le.dt_first_seen,(SALT311.StrType)le.dt_last_seen,(SALT311.StrType)le.dt_vendor_first_reported,(SALT311.StrType)le.dt_vendor_last_reported)); // Combine child fields into 1 for specificity counting
@@ -277,7 +279,8 @@ EXPORT  mname_deduped := SALT311.MAC_Field_By_UID(input_file,did,mname) : PERSIS
   with_id := table(counted,r1);
   SALT311.utMAC_Sequence_Records(with_id,id,sequenced)
   SALT311.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT311.MAC_Field_Initial_Specificities(specs_added,mname,initial_specs_added) // add initial char specificities
+  SALT311.mac_edit_distance_pairs(specs_added,mname,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+  SALT311.MAC_Field_Initial_Specificities(distance_computed,mname,initial_specs_added) // add initial char specificities
 EXPORT mname_values_persisted := initial_specs_added : PERSIST('~temp::did::Watchdog_best::values::mname',EXPIRE(Watchdog_best.Config.PersistExpire));
 
 

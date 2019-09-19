@@ -6,10 +6,10 @@ EXPORT Layouts := MODULE
 		EXPORT IdentityData := RECORD
 			string		Customer_Job_ID;
 			string		Batch_Record_ID;
-			string		transaction_id;
-			string		Reason_Description;
+			string		Transaction_ID_Number;
+			string		Reason_for_Transaction_Activity;
 			string8		Date_of_Transaction;
-			unsigned6	Rawlinkid;
+			unsigned6	LexID;
 			string60	raw_Full_Name;
 			string5		raw_Title;
 			string100	raw_First_name;
@@ -36,15 +36,15 @@ EXPORT Layouts := MODULE
 			string8		dob;
 			string256	Email_Address;
 			string2		Drivers_License_State;
-			string25	Drivers_License;
+			string25	Drivers_License_Number;
 			string20	Bank_Routing_Number_1;
 			string20	Bank_Account_Number_1;
 			string20	Bank_Routing_Number_2;
 			string20	Bank_Account_Number_2;
 			string1		Ethnicity;
 			string1		Race;
-			string20	Household_ID;
-			string20	Customer_Person_ID;
+			string20	Case_ID;
+			string20	Client_ID;
 			string1		Head_of_Household_indicator;
 			string20	Relationship_Indicator;
 			string25	IP_Address;
@@ -56,6 +56,7 @@ EXPORT Layouts := MODULE
 			string25	Device_identification_Provider; 
 			string10	geo_lat;
 			string11	geo_long;
+			string100 	source_input := 'Contributory';
 		END;
 		
 		EXPORT KnownFraud := RECORD
@@ -69,11 +70,11 @@ EXPORT Layouts := MODULE
 			string75	event_type_1;
 			string75	event_type_2;
 			string75	event_type_3;
-			string20	Household_ID;
-			string20	Customer_Person_ID;
+			string20	case_id;
+			string20	client_id;
 			string1		head_of_household_indicator;
 			string20	relationship_indicator;
-			unsigned6	Rawlinkid;
+			unsigned6	lexid;
 			string50	raw_Title;
 			string100	raw_First_name;
 			string60	raw_Middle_Name;
@@ -85,7 +86,7 @@ EXPORT Layouts := MODULE
 			string60	ssn_risk_code;
 			string10	dob;
 			string60	dob_risk_code;
-			string25	Drivers_License;
+			string25	Drivers_License_Number;
 			string2		Drivers_License_State;
 			string60	drivers_license_risk_code;
 			string100	street_1;
@@ -154,7 +155,7 @@ EXPORT Layouts := MODULE
 			string1		Customer_Program;
 			string8		start_date;
 			string8		end_date;
-			string10  	amount_paid;
+			string10  amount_paid;
 			string10	region_code;
 			string10	investigator_id;
 			string250	reason_description;
@@ -171,17 +172,18 @@ EXPORT Layouts := MODULE
 			string20	external_referral_or_casenumber;
 			string3		cleared_fraud;
 			string		reason_cleared_code;
+			string100 source_input := 'Contributory';
 		END;
 		EXPORT SafeList	:= RECORD
 			KnownFraud;
 		END;
 		EXPORT Deltabase := RECORD
 			unsigned6	InqLog_ID;
-			string20	customer_id;
-			string		transaction_id;
+			string20	customer_account_number;
+			string		Transaction_ID_Number;
 			string10	Date_of_Transaction;
-			string20	Household_ID;
-			string20	Customer_Person_ID;
+			string20	Case_ID;
+			unsigned6	client_uid;
 			string1		Customer_Program;
 			string		Reason_for_Transaction_Activity;
 			string100	inquiry_source;
@@ -190,12 +192,12 @@ EXPORT Layouts := MODULE
 			string		customer_agency_vertical_type;
 			string10	ssn;
 			string10	dob;
-			unsigned6	Rawlinkid;
+			unsigned6	lexid;
 			string100	raw_full_name;
 			string50	raw_title;
 			string100	raw_first_name;
 			string60	raw_middle_name;
-			string100 raw_last_name;
+			string100 	raw_last_name;
 			string10	raw_Orig_Suffix;
 			string  	full_address;
 			string100	street_1;
@@ -223,16 +225,17 @@ EXPORT Layouts := MODULE
 			string20	bank_routing_number_1;
 			string20	bank_account_number_1;
 			string2		Drivers_License_State;
-			string25	Drivers_License;
+			string25	Drivers_License_Number;
 			string10	geo_lat;
 			string11	geo_long;
 			string75	reported_date;			
 			unsigned3	file_type;
 			string10	deceitful_confidence;
-			string30	reported_by;
+			string30	user_added;
 			string250	reason_description;
 			string30	event_type_1;
 			string30	event_entity_1;
+			string100 	source_input := 'Deltabase';
 		END;
 
 		EXPORT RDP := record
@@ -278,7 +281,7 @@ EXPORT Layouts := MODULE
 
 	EXPORT Provenance := RECORD
 				string75 FileName	:=''
-				,unsigned4 process_date	:=0
+				,unsigned4 ProcessDate	:=0
 				,unsigned4 FileDate	:=0
 				,string6   FileTime	:=''
 				,unsigned6 PrepRecNo	:=0
@@ -288,53 +291,89 @@ EXPORT Layouts := MODULE
 	EXPORT Input := module
 		EXPORT IdentityData := RECORD
 			Sprayed.IdentityData;
-			string20		customer_id;
+			string20		Customer_Account_Number;
 			string2			Customer_State;
 			string			Customer_Agency_Vertical_Type;
 			string1			Customer_Program;
-			unsigned8		source_rec_id;
+			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
+<<<<<<< HEAD
+			unsigned8		address_id;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips			additional_address;	
+=======
+>>>>>>> ThorProd
 			clean_phones	clean_phones;
 			string9			clean_SSN;
 			string9			clean_Zip;
 			string25		clean_IP_Address;
 			string25		clean_dob;
+			unsigned6		did ; 
+			unsigned1		did_score;
 			unsigned3		file_type;
 			unsigned6		ind_type;
-			string100 	source := '';
 			Provenance;			
 		END;
 		EXPORT KnownFraud := RECORD
 			Sprayed.KnownFraud;
-			string20		customer_id;
+			string20		customer_account_number;
 			string2			customer_state;
 			string			customer_agency_vertical_type;
 			string1			customer_program_fn; // use this one
-			unsigned8		source_rec_id ;
+			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
+<<<<<<< HEAD
+			unsigned8		address_id;			
+			string100		address_1 := '';   
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;	
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips			additional_address;
+=======
+>>>>>>> ThorProd
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
 			string25		clean_IP_Address;
 			string10		clean_dob;
+			unsigned6 		did ; 
+			unsigned1		did_score;	
 			unsigned3		file_type;
 			unsigned6		ind_type;
-			string100 	source := '';
 			Provenance;
 		END;
 		EXPORT Deltabase := RECORD
 			Sprayed.Deltabase;
-			unsigned8		source_rec_id ;
+			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
+<<<<<<< HEAD
+			unsigned8		address_id;			
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips			additional_address;
+=======
+>>>>>>> ThorProd
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
 			string25		clean_IP_Address;
 			string10		clean_dob;
+			unsigned6 		did; 
+			unsigned1		did_score;
 			unsigned6		ind_type;
-			string12		cell_phone := '';
-			string100 	source := '';
 			Provenance;
+			string12		cell_phone := '';
 		END;
 		
 		EXPORT ConfigRiskLevel	:= RECORD
@@ -352,15 +391,121 @@ EXPORT Layouts := MODULE
 
 
 	EXPORT Base := MODULE
+		EXPORT IdentityData	:= 
+			record 
+			Sprayed.IdentityData ;
+			string20		Customer_Account_Number;
+			string2			Customer_State;
+			string			Customer_Agency_Vertical_Type;
+			string1			Customer_Program;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name				cleaned_name;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips			clean_address;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips			additional_address;	
+			clean_phones	clean_phones;
+			string9			clean_SSN;
+			string9			clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6		did ; 
+			unsigned1		did_score;
+			string			current ;
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date; 
+			string100		Source; 
+			unsigned8		source_rec_id; 
+			unsigned3		file_type;
+			unsigned6		ind_type;
+		END; 
+		
+		EXPORT KnownFraud	:= 
+			record 
+			Sprayed.KnownFraud ;
+			string20		customer_account_number;
+			string2			customer_state;
+			string			customer_agency_vertical_type;
+			string1			customer_program_fn; // use this one
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name			cleaned_name;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips		clean_address;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips		additional_address;
+			clean_phones	clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6		did ; 
+			unsigned1		did_score;
+			string			current ;
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date;
+			string100		Source;
+			unsigned8		source_rec_id;
+			unsigned3		file_type;
+			unsigned6		ind_type;
+		END;
+		EXPORT Deltabase	:= 
+			record 
+			Sprayed.Deltabase ;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name		cleaned_name;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips	clean_address;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips	additional_address;
+			clean_phones	clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6		did ;
+			unsigned1		did_score;
+			string			current;
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date;
+			string100		Source;
+			unsigned8		source_rec_id;
+			unsigned6		ind_type;
+			string12		cell_phone := '';
+		END;
+
 		EXPORT AddressCache := record
-			Address.Layout_Clean182_fips;
-			unsigned4 address_cleaned;
+			unsigned8			address_id;
+			unsigned4			address_cleaned;
+			string100      address_1 := '';
+			string50       address_2 := '';
+			Address.Layout_Clean182_fips		clean_address;
 		END;
 		
 	END;
 
 	EXPORT CustomerSettings := record 
-		string20 	Customer_Id;
+		string20 	Customer_Account_Number;
 		string2 	Customer_State;
 		string 		Customer_Agency_Vertical_Type;
 		string1 	Customer_Program;
@@ -416,7 +561,7 @@ export temp := module
 	 
 	 export DidSlim := 
 	  record
-			unsigned8		record_id;
+			unsigned8		unique_id;
 			string20 		fname;
 			string20 		mname;
 			string20 		lname;
@@ -435,7 +580,7 @@ export temp := module
 
 	  export BdidSlim := 
 	  record
-			unsigned8		record_id;
+			unsigned8		unique_id;
 			string100		business_name;
 			string10		prim_range;
 			string28		prim_name;

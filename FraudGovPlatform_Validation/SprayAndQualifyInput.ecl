@@ -18,14 +18,14 @@ fname := dsFileListSorted[1].Name:independent;
 
 // https://confluence.rsi.lexisnexis.com/display/GTG/Naming+Conventions
 fn := STD.Str.SplitWords( STD.Str.FindReplace(fname,'.dat',''), '_' );
-Customer_Id := fn[1];
+Customer_Account_Number := fn[1];
 Customer_State := fn[2];
 Customer_Program := fn[4];
 FileType := fn[5];
 
 CustomerSettings := 
 	FraudGovPlatform.Files().CustomerSettings( 
-			Customer_Id= Customer_Id and
+			Customer_Account_Number= Customer_Account_Number and
 			Customer_State = Customer_State and
 			Customer_Program = Customer_Program and
 			FileType = FileType);

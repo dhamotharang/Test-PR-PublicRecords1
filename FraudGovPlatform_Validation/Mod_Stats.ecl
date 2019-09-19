@@ -297,8 +297,8 @@ END;
 					project(DS_IdentityData, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record, 
 					SELF.field1 := LEFT.Customer_Job_ID;
 					SELF.field2 := LEFT.Batch_Record_ID;
-					SELF.field3 := LEFT.Transaction_ID;
-					SELF.field4 := LEFT.Reason_Description;
+					SELF.field3 := LEFT.Transaction_ID_Number;
+					SELF.field4 := LEFT.Reason_for_Transaction_Activity;
 					SELF.field5 := LEFT.Date_of_Transaction;
 					SELF := LEFT;SELF := []))).ValidationResults;
 																			
@@ -324,7 +324,7 @@ END;
 					project(DS_DeltaBase, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record, 
 					SELF.field1 := (STRING)LEFT.InqLog_ID;
 					SELF.field2 := LEFT.reported_date;
-					SELF.field3 := LEFT.reported_by;
+					SELF.field3 := LEFT.user_added;
 					SELF.field4 := '';
 					SELF.field5 := '';
 					SELF := LEFT;SELF := []))).ValidationResults;	
@@ -384,9 +384,10 @@ END;
 		shared DeltabaseMbs 
 			:= join(	p1,
 						MBS(Deltabase = 1),
-						left.Customer_Id =(string)right.gc_id
+						left.Customer_Account_Number =(string)right.gc_id
 						and left.Deltabase = right.Deltabase
-						,transform({string20 Customer_Id,unsigned4 seq}
+						,transform({string20 Customer_Account_Number,unsigned4 seq}
+						,self.Customer_Account_Number:=left.Customer_Account_Number,
 						,self.seq := counter
 						,self:=left),left only);
 	
@@ -423,7 +424,7 @@ END;
 			self.ErrorCount :=mx;
 			self.RecordsRejected :=mx;
 			self.field :='Customer_Account_Number';
-			self.value :=trim(l.Customer_Id,left,right);
+			self.value :=trim(l.Customer_Account_Number,left,right);
 			self:=l;
 		end;
 
@@ -435,7 +436,7 @@ END;
 				,min_seq:=min(group,seq)
 				,err_cnt:=count(group)
 				,withRC
-			},filedate,filetime,field,Customer_Id,few),filedate,filetime,-err_cnt):ONWARNING(2168,ignore);
+			},filedate,filetime,field,Customer_Account_Number,few),filedate,filetime,-err_cnt):ONWARNING(2168,ignore);
 
 		comb tr5(comb l) := transform
 			treshld_ :=	Mod_Sets.threshld;

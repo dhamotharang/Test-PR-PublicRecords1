@@ -26,9 +26,7 @@ buildprocess := sequential(
 							Strata_Pop_Base(filedate),
 							SampleRecs(filedate),
 							getretval,
-							fDOPSGrowthCheck(filedate).GrowthCheck,
-							fSendMail('FBN Build Part 2 of 2 ' + filedate,'Build Complete and Moved to QA. \r\n \r\n ' )
-							);
+							fSendMail('FBN Build Part 2 of 2 ' + filedate,'Build Complete and Moved to QA. \r\n \r\n ' ));
 
  return buildprocess;
  

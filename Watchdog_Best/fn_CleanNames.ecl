@@ -5,7 +5,7 @@ boolean JustLastName(string name) := Address.Persons.IsLastNameOnly(Address.Prec
 
 EXPORT fn_CleanNames(Dataset(header.Layout_Header_v2) file) := FUNCTION
 			cln := Nid.fn_CleanParsedNames(file, useV2 := true, includeInRepository := false, normalizeDualNames:=false)
-											: persist('~thor::watchdog_best::cleaned_names');
+											: persist('~thor::watchdog_best::cln_names');
 
 			result := PROJECT(cln, TRANSFORM(header.Layout_Header_v2,
 							self.title := IF(left.cln_title='', left.title, left.cln_title);

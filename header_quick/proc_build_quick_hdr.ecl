@@ -1,3 +1,19 @@
+<<<<<<< HEAD
+﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck;
+
+export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com',string leMailTargetScoring='jose.bello@lexisnexis.com;gregory.rose@lexisnexisrisk.com;Gabriel.Marcan@lexisnexis.com;Debendra.Kumar@lexisnexisrisk.com;Scoring_QA@risk.lexisnexis.com') := function
+
+	
+	versionCheck := if(filedate[1..6] = ut.GetDate[1..6] and (header.Sourcedata_month.v_version[1..6] = filedate[1..6] or header.Sourcedata_month.v_eq_as_of_date[1..6] = filedate[1..6]),
+											output('The version dates are good'),
+											fail('Either the filedate or the header.Sourcedata_month date or both are not good'));
+											
+  SuccessBody		:= if(VersionControl.IsValidVersion(filedate),
+	                   'Quick Header ' + filedate + ' is ready for CERT deployment, please respond immediately if we can send to cert','');
+										 
+	            		
+//	RoxieKeyBuild.Mac_Daily_Email_Local('QUICK HEADER','SUCC',filedate,send_succ_msg,leMailTarget);
+=======
 ﻿IMPORT Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl,Orbit3,dops,DOPSGrowthCheck,dx_header;
 
 EXPORT proc_build_quick_hdr(
@@ -17,91 +33,92 @@ EXPORT proc_build_quick_hdr(
 		'Quick Header ' + filedate + ' is ready for CERT deployment, please respond immediately if we can send to cert',''
 	);
 
+>>>>>>> ThorProd
 	RoxieKeyBuild.Mac_Daily_Email_Local('QUICK HEADER','FAIL see workunit:'+workunit,filedate,send_fail_msg,leMailTarget);
-
-	dops_FCRA_QH  := roxiekeybuild.updateversion('FCRA_QuickHeaderKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'F');
+	
+	dops_FCRA_QH	:= roxiekeybuild.updateversion('FCRA_QuickHeaderKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'F');
 	dops_QH       := roxiekeybuild.updateversion('QuickHeaderKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'N');
 	dops_SS       := roxiekeybuild.updateversion('QHsourceKeys',filedate,'gregory.rose@lexisnexisrisk.com,jose.bello@lexisnexis.com',,'N');
+	
+// Update Orbit with the correct entries in build in progress mode.
 
-	// Update Orbit with the correct entries in build in progress mode.
-
-	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F', ,true,true);	
-	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true);	
-	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true);	
-
+  oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F', ,true,true);	
+  oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true);	
+  oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true);	
+	
 	EQ_records_in0 := header.fn_preprocess(true);
-
-	ut.MAC_Sequence_Records(EQ_records_in0, rid, seqd);
+	
+  ut.MAC_Sequence_Records(EQ_records_in0, rid, seqd);
 
 	// rid is an unsigned6 which may extend up to 281,474,976,710,655
 	// therefore, if we start sequensing from 999,999,999,999
 	// there is a capacity for 280,474,976,710,656 unique rids
-	header.Layout_New_Records to_form(seqd l) := TRANSFORM
-		self.rid := l.rid + Header.constants.QH_start_rid;
+	header.Layout_New_Records to_form(seqd l) := transform
+		self.rid    := l.rid + Header.constants.QH_start_rid;
 		self := l;
-	END;
+	end;
 
 	// do not remove this persist.  it is used in Header.Key_Rid_SrcID_Prep
 	// if we have to restart with eq_records as a dataset, also look at 
 	// heaer_quick.fn_patch_dids lines 64-73 as this will probably need to be sandboxed as well
 	// if the counts were completed.
+	
+	//eq_records_in := dataset('~thor_data400::persist::qh_seqd',header.Layout_New_Records,flat);
+	eq_records_in := project(seqd,to_form(left)): persist('~thor_data400::persist::qh_seqd');
 
-	//eq_records_in := DATASET('~thor_data400::persist::qh_seqd',header.Layout_New_Records,flat);
-	eq_records_in := PROJECT(seqd,to_form(left)): persist('~thor_data400::persist::qh_seqd');
-
-	dids0 := PROJECT(eq_records_in,header.layout_header);
+  dids0 := project(eq_records_in,header.layout_header);
 
 	dids  := header_quick.fn_patch_dids(dids0);
 
 	//Build roxie keys
-	roxie_keys := header_quick.FN_keyBuild(dids,filedate) :SUCCESS(FileServices.SendEmail(leMailTargetScoring, 'Quick Header Completed',SuccessBody)), FAILURE(send_fail_msg);
+	roxie_keys := header_quick.FN_keyBuild(dids,filedate)  :success(FileServices.SendEmail(leMailTargetScoring, 'Quick Header Completed',SuccessBody)), failure(send_fail_msg);
 
 	a0 := dids(did>0);
-
-	a := PROJECT(a0,header.Layout_Header);
-
+	
+	a := project(a0,header.Layout_Header);
+	
 	Suppression_Layout := header_services.Supplemental_Data.layout_in;
-	header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
-	DL_Suppression_In := dl_supp_ds_func();
-	DLSuppressedIn := PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
+	header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func); 
+	DL_Suppression_In 	:= dl_supp_ds_func();
+	DLSuppressedIn 			:= PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
 
 	HashDLShort := header_services.Supplemental_Data.layout_out;
 
-	shortHashrec := RECORD
-		header.layout_header;
-		HashDLShort;
-	END;
+	shortHashrec := record
+	 header.layout_header;
+	 HashDLShort;
+	end;
 
-	shortHashrec HashDID_DLnumber(header.Layout_Header l) := TRANSFORM
+	shortHashrec HashDID_DLnumber(header.Layout_Header l) := transform                            
 		self.hval := hashmd5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));
 		self := l;
-	END;
+	end;
 
-	hdr_withMD5 := PROJECT(a, HashDID_DLnumber(left));
+	hdr_withMD5 := project(a, HashDID_DLnumber(left));
 
-	header.layout_header shortSuppress(hdr_withMD5 l, DLSuppressedIn r) := TRANSFORM
+	header.layout_header shortSuppress(hdr_withMD5 l, DLSuppressedIn r) := transform
 	 self := l;
-	END;
+	end;
 
-	full_ShortSuppress := JOIN(hdr_withMD5,DLSuppressedIn,left.hval=right.hval,shortSuppress(left,right),left only,lookup);
+	full_ShortSuppress := join(hdr_withMD5,DLSuppressedIn,left.hval=right.hval,shortSuppress(left,right),left only,lookup);
 
 	addr1 := header.File_Headers(header.isPreGLB(header.File_Headers));
 	addr2 := addr1(not mdr.Source_is_DPPA(src));
 	header.MAC_Best_Address(addr2, did, 4, b)
 
-	//note RID sequencing is not necessary for moxie
+    //note RID sequencing is not necessary for moxie
 	header.mac_despray(full_ShortSuppress, b, full_out)
-
+	
 	//***//***//***//*** INSERT SUPPRESSION TEXT CNG 20070417***//***//***//***//
-	header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
+header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
+ 
+Suppression_In := supp_ds_func();
 
-	Suppression_In := supp_ds_func();
+dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
 
-	dSuppressedIn := PROJECT(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 
-	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
-	rFullOut := RECORD // Referenced string_rec layout in header.MAC_Despray
+	rFullOut := record // Referenced string_rec layout in header.MAC_Despray
 		string15 did;
 		string15 rid;
 		string2  src;
@@ -135,35 +152,67 @@ EXPORT proc_build_quick_hdr(
 		string4  msa;
 		string1  tnt;  
 		string1  valid_ssn;
-	END;
+	end;
 
-	rFullOut_HashDIDAddress := RECORD
+	rFullOut_HashDIDAddress := record
 		rFullOut;
 		rHashDIDAddress;
-	END;
+	end;
 
-	rFullOut_HashDIDAddress tHashDIDAddress(full_out l) := TRANSFORM
+	rFullOut_HashDIDAddress tHashDIDAddress(full_out l) := transform                            
 		self.hval := hashmd5(l.did,l.st,l.zip,l.city_name,l.prim_name,l.prim_range,l.predir,l.suffix,l.postdir,l.sec_range);
 		self := l;
-	END;
+	end;
 
-	dHeader_withMD5 := PROJECT(full_out, tHashDIDAddress(left));
+	dHeader_withMD5 := project(full_out, tHashDIDAddress(left));
 
-	rFullOut tSuppress(dHeader_withMD5 l, dSuppressedIn r) := TRANSFORM
+	rFullOut tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
 		self := l;
-	END;
+	end;
 
-	full_out_suppress := JOIN(
-		dHeader_withMD5,dSuppressedIn,
-		left.hval=right.hval,
-		tSuppress(left,right),
-		left only,lookup
-	);
-
-
+	full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
+														left.hval=right.hval,
+														tSuppress(left,right),
+														left only,lookup);
+														
+								
 	//***//***//***//*** END SUPPRESSION TEXT ***//***//***//***//
 
 	fSendMail(string pSubject, string pBody) := fileservices.sendemail(leMailTarget,pSubject,pBody);
+<<<<<<< HEAD
+	
+  weekly_handling := sequential(output(header.file_header_in_weekly.File,,'~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date',__compressed__),
+																fileservices.addsuperfile('~thor400_84::in::eq_weekly_with_as_of_date2','~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date'),
+																fileservices.addsuperfile('~thor400_84::in::eq_weekly_history','~thor400_84::in::eq_weekly',,true),
+				    										fileservices.clearsuperfile('~thor400_84::in::eq_weekly')
+						  									);
+  
+//Persistence and Growth Checks
+GetDops:=dops.GetDeployedDatasets('P','B','F');
+OnlyQuickHeader:=GetDops(datasetname='FCRA_QuickHeaderKeys ');
+father_filedate := OnlyQuickHeader[1].buildversion;
+set of string Key_QuickHeader_InputSet:=['fname','lname','name_suffix','prim_range','prim_name','sec_range','city_name','st','zip','dob','ssn','mname','phone','src'];
+header_quick_index := header_quick.FN_key_DID(dataset([],header.Layout_Header), '~thor_data400::key::headerquick::fcra::'+filedate+'::did');
+DeltaCommands:= sequential(
+	DOPSGrowthCheck.CalculateStats('FCRA_QuickHeaderKeys ','header_quick_index','Key_QuickHeader','~thor_data400::key::headerquick::fcra::'+filedate+'::did','did','persistent_record_ID','','','','',filedate,father_filedate,true,true),
+	DOPSGrowthCheck.DeltaCommand('~thor_data400::key::headerquick::fcra::'+filedate+'::did','~thor_data400::key::headerquick::fcra::'+father_filedate+'::did','FCRA_QuickHeaderKeys ','Key_QuickHeader','header_quick_index','persistent_record_ID',filedate,father_filedate,Key_QuickHeader_InputSet,true,true),
+	DOPSGrowthCheck.ChangesByField('~thor_data400::key::headerquick::fcra::'+filedate+'::did','~thor_data400::key::headerquick::fcra::'+father_filedate+'::did','FCRA_QuickHeaderKeys ','Key_QuickHeader','header_quick_index','persistent_record_ID','',filedate,father_filedate,true,true),
+	DopsGrowthCheck.PersistenceCheck('~thor_data400::key::headerquick::fcra::'+filedate+'::did','~thor_data400::key::headerquick::fcra::'+father_filedate+'::did','FCRA_QuickHeaderKeys ','Key_QuickHeader','header_quick_index','persistent_record_ID',Key_QuickHeader_InputSet,Key_QuickHeader_InputSet,filedate,father_filedate,true,true)
+);
+
+
+	return sequential(
+										 weekly_handling
+										,roxie_keys
+										,Proc_Accept_SRC_toQA(filedate)
+										,proc_build_ssn_suppression(filedate)
+										,proc_build_current_wa_residents_file 
+										,SEQUENTIAL(oQH_fcra,oQH_nonfcra,oQH_qhs)
+	  								//,SEQUENTIAL(/*dops_FCRA_QH,dops_QH,*/dops_SS)
+										,DeltaCommands
+										);										 
+end;
+=======
 
 	weekly_handling := SEQUENTIAL(
 		OUTPUT(header.file_header_in_weekly.File,,'~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date',__compressed__),
@@ -241,3 +290,4 @@ EXPORT proc_build_quick_hdr(
 		DeltaCommands
 	);
 END;
+>>>>>>> ThorProd
