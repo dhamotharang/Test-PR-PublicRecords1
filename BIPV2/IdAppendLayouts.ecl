@@ -47,7 +47,7 @@ export IdAppendLayouts := module
 
 	shared errorRec := {
 		integer error_code := 0,
-		string error_msg := '',
+		string128 error_msg := '',
 	};
 
 	// Error code and message added to capture soapcall errors.
@@ -143,7 +143,7 @@ export IdAppendLayouts := module
 	export AppendWithRecsOutput := {
 		svcAppendRecsOut,
 		integer error_code := 0,
-		string error_msg := '',
+		string128 error_msg := '',
 	};
 
 	shared globalMod := AutoStandardI.GlobalModule();

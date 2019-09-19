@@ -1,1 +1,1 @@
-﻿EXPORT SuccessEMail := 'christopher.brodeur@lexisnexis.com,QualityAssurance@seisint.com,Charles.Salvo@lexisnexis.com,Jason.Trost@lexisnexis.com,intel357@bellsouth.net,Shayne.Santillan@lexisnexis.com,Elvie.bantad@lexisnexis.com';
+﻿EXPORT SuccessEMail := 'christopher.brodeur@lexisnexis.com,QualityAssurance@seisint.com,Charles.Salvo@lexisnexis.com,Jason.Trost@lexisnexis.com,intel357@bellsouth.net,Shayne.Santillan@lexisnexis.com,Elvie.bantad@lexisnexis.com,Abednego.Escobal@lexisnexisrisk.com';

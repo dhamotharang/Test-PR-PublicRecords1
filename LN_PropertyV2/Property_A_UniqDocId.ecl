@@ -7,7 +7,7 @@ EXPORT Property_A_UniqDocId(dataset(LN_PropertyV2.Layout_Property_A_Extract) ds,
 		SELF := l;
 		SELF := [];
 	END;	
-	f0 := DISTRIBUTE(PROJECT(ds(state_code IN st_list), xa(LEFT)),sid);
+	f0 := DISTRIBUTE(PROJECT(ds(state_code IN st_list), xa(LEFT)),HASH(sid));
 	
 	Layout_Property_A_Extract en(Layout_Property_A_Extract l, Layout_Property_A_Extract r):= TRANSFORM
 		SELF.rid := IF(l.rid=0, ThorLib.Node()+1, l.rid+ThorLib.Nodes());
