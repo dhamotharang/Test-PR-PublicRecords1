@@ -1,4 +1,4 @@
-﻿import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression, LocationID_Ingest,LocationID_xLink;
+﻿import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression, LocationID_Ingest,LocationID_xLink,doxie;
 
 EXPORT Key_BH_Linking_Ids := 
 MODULE
@@ -105,9 +105,8 @@ MODULE
 	export KeyPlus  := BIPV2.IDmacros.mac_AddParentAbovSeleField(Key); //with ParentAbovSeleField
   export keyversions(string pversion = 'qa',boolean pUseOtherEnvironment = false) := tools.macf_FilesIndex('Key',BIPV2_Build.keynames(pversion, pUseOtherEnvironment).linkids); //allow easy access to other versions(logical or super) of key
 
-
-  // kfetch including optional marketing suppression
-  export kFetch2(
+  //kfetch for CCPA - calls mac_check_access
+   export kFetch2(
 		 dataset(BIPV2.IDlayouts.l_xlink_ids2)  inputs 
 		,string1                                Level                       = BIPV2.IDconstants.Fetch_Level_ProxID	//The lowest level you'd like to pay attention to.  If U, then all the records for the UltID will be returned.
                                                                                                                 //Values:  D is for Dot.  E is for Emp.  W is for POW.  P is for Prox.  O is for Org.  U is for Ult.
@@ -119,6 +118,7 @@ MODULE
 		,boolean                                bypassContactSuppression    = false // Optionally skip BIPV2_Suppression.mac_contacts - only use this if you are 100% certain you aren't using contact information
 		,unsigned1                              JoinType                    = BIPV2.IDconstants.JoinTypes.KeepJoin
     ,boolean                                pApplyMarketingSuppression  = false                                 // Apply marketing suppression?
+          ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
   ) :=
   function   
 		BIPV2.IDmacros.mac_IndexFetch2     (inputs, Key, ds_fetched , Level, JoinLimit, JoinType);
@@ -140,12 +140,15 @@ MODULE
 			"KeyPlus" was added as a helper
 		*/																				
 
-    // -- Apply Marketing Suppression -- 
+          // -- Apply Marketing Suppression -- 
 		allowCodeBmap       := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 		marketingSuppressed := kFetched(BIPV2.mod_sources.src2bmap(source) & allowCodeBmap <> 0);    
+
+          BIPV2.mac_check_access(kFetched, out, mod_access);
+          BIPV2.mac_check_access(marketingSuppressed, marketingOut, mod_access);
     
-    // return  kFetched;						
-    return  if(pApplyMarketingSuppression = true  ,marketingSuppressed  ,kFetched);						
+         // return  kFetched;						
+         return  if(pApplyMarketingSuppression = true  ,marketingOut  ,out);						
   end;
 
 	//DEPRECATED VERSION OF THE ABOVE KFETCH2
@@ -160,11 +163,12 @@ MODULE
 		,boolean                                dnbFullRemove             = false // optionally clobber all DNB data; by default we apply masking
 		,boolean                                bypassContactSuppression  = false // Optionally skip BIPV2_Suppression.mac_contacts - only use this if you are 100% certain you aren't using contact information
 		,unsigned1                              JoinType                  = BIPV2.IDconstants.JoinTypes.KeepJoin
+          ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
 		) :=
 	FUNCTION
 
 		inputs_for2 := project(inputs, BIPV2.IDlayouts.l_xlink_ids2);
-		f2 := kFetch2(inputs_for2, Level, ScoreThreshold, in_mod, JoinLimit, dnbFullRemove, bypassContactSuppression);		
+		f2 := kFetch2(inputs_for2, Level, ScoreThreshold, in_mod, JoinLimit, dnbFullRemove, bypassContactSuppression, mod_access := mod_access);		
 		return project(f2, {recordof(f2) - UniqueID - Fetch_Error_Code}); // Need to remove the fields that were added to kFetch2 to ensure the output of kFetch remains the same
 
 	END;
@@ -181,6 +185,7 @@ MODULE
     ,boolean                    pApplyMarketingSuppression  = false // Apply Marketing suppression to the key
     ,boolean                    pReturnFullKey              = false // Return the Full Key unrestricted.  Overrides all other suppression parameters
     ,string                     pKeyversion                 = 'qa'  // which version of the key to pull?  makes it easy to test other key versions without sandboxing
+    ,doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END 
   ) :=
   function
     
@@ -201,12 +206,16 @@ MODULE
 		allowCodeBmap       := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
 		marketingSuppressed := kFetched(BIPV2.mod_sources.src2bmap(source) & allowCodeBmap <> 0);    
     
-    ds_fetched_out := project(ds_fetched  ,transform(recordof(kFetched),self := left,self := []));
+          ds_fetched_out := project(ds_fetched  ,transform(recordof(kFetched),self := left,self := []));
+
+          BIPV2.mac_check_access(kFetched, kFetched_out, mod_access);
+          BIPV2.mac_check_access(marketingSuppressed, marketing_Out, mod_access);
+          BIPV2.mac_check_access(ds_fetched_out, ds_fetched_out2, mod_access);
     
-    return  map(   pReturnFullKey             = true  =>  ds_fetched_out           
-                  ,pApplyMarketingSuppression = true  =>  marketingSuppressed 
-                  ,                                       kFetched
-            );						
+          return  map(   pReturnFullKey             = true  =>  ds_fetched_out2           
+                        ,pApplyMarketingSuppression = true  =>  marketing_out  
+                        ,                                       kFetched_out
+                     );	
 
   end;
 

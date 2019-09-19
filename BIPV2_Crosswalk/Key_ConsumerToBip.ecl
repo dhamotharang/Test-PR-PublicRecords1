@@ -1,6 +1,7 @@
 ﻿import BIPV2_Crosswalk;
 import BIPV2;
 import AutoStandardI;
+import doxie;
 
 export Key_ConsumerToBip := module
      export Key := BIPV2_Crosswalk.Keys().ConsumerToBipKey();
@@ -59,7 +60,8 @@ export Key_ConsumerToBip := module
                     BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
                     JoinLimit=25000,
                     unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin,
-				boolean applyMarketingRestrictions = false
+				boolean applyMarketingRestrictions = false,
+				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
      ) := function
 	
 	     FetchedRec := record
@@ -88,10 +90,13 @@ export Key_ConsumerToBip := module
 	     end;		
 		marketingRestrictions :=  project(ds_restricted, apply_src_filter(left));
 		
-		return if(applyMarketingRestrictions, marketingRestrictions, ds_restricted);
-     end;
-	
-     shared normalize_mac(inDs, normalize_field, newLayout) := functionmacro
+		BIPV2_Crosswalk.mac_check_access(marketingRestrictions, marketingRestrictions_out, mod_access);
+		BIPV2_Crosswalk.mac_check_access(ds_restricted, ds_restricted_out, mod_access);
+		
+		return if(applyMarketingRestrictions, marketingRestrictions_out, ds_restricted_out);        
+	end;
+
+     shared normalize_mac(inDs, normalize_field, newLayout, sourcesToInclude, sourcesGroupsToInclude) := functionmacro
 	     no_recs_to_normalize := project(inDs(count(normalize_field)=0), 
 		                                transform(newLayout,
 								            self := left,
@@ -100,12 +105,15 @@ export Key_ConsumerToBip := module
 		normalize_recs       := normalize(inDs(count(normalize_field)>0),
 		                                  left.normalize_field,
 								    transform(newLayout,
-								              self := left, 
-										    self := right));
+								              skip((right.source not in sourcesToInclude) or (right.sourceGroup not in sourcesGroupsToInclude)),
+								              newSourceInfo   := dataset([{right.source,right.source_record_id}],Layouts.SourceInfoRec);
+								              self.sourceInfo := left.sourceInfo + newSourceInfo(trim(source)!='');
+								              self            := left, 
+										    self            := right));
 										    
-          return normalize_recs + 	no_recs_to_normalize;									    
+          return normalize_recs(count(sourceInfo) > 0) + no_recs_to_normalize;									    
 	endmacro;
-	
+		
      export getDataFiltered(
                     dataset(l_lexid_links) inputs,
                     BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
@@ -114,19 +122,40 @@ export Key_ConsumerToBip := module
                     unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin,
 				set of string sourcesToInclude = ALL,
 				set of string sourceGroupsToInclude = ALL,
-				boolean applyMarketingRestrictions = false
+				boolean applyMarketingRestrictions = false,
+				doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
      ) := function
 						
-	      remove_restricted := kfetch(inputs, in_mod, JoinLimit, JoinType, applyMarketingRestrictions);
-		 
-		 normalizeJobTitles     := normalize_mac(remove_restricted, jobTitles, Layouts.ConsumerToBipWorkRec1);
-		 normalizeContactNames  := normalize_mac(normalizeJobTitles, contactNames, Layouts.ConsumerToBipWorkRec2);
+	      remove_restricted := kfetch(inputs, in_mod, JoinLimit, JoinType, applyMarketingRestrictions, mod_access);
 
+           addSourceRecInfo       := project(remove_restricted, Layouts.ConsumerToBipWorkRec0);		 
+		 normalizeJobTitles     := normalize_mac(addSourceRecInfo, jobTitles, Layouts.ConsumerToBipWorkRec1,sourcesToInclude,sourceGroupsToInclude);
+		 normalizeContactNames  := normalize_mac(normalizeJobTitles, contactNames, Layouts.ConsumerToBipWorkRec2,sourcesToInclude,sourceGroupsToInclude);
 		 
-		 filterSourcesAndGroups := normalizeContactNames(source in sourcesToInclude and sourceGroup in sourceGroupsToInclude);
+		 normSourceInfoRecs     := normalize(normalizeContactNames, left.sourceInfo,
+		                                     transform(Layouts.SourceInfoWorkRec3,
+									            self := right,
+									            self := left));											 
 		 
-		 changeToFinalForm      := project(filterSourcesAndGroups,
+           dedupSourceInfoRecs    := dedup(normSourceInfoRecs, UniqueID, ultid, orgid, seleid, contact_did, source, source_record_id,  all);
+		 createChildDatasets    := project(dedupSourceInfoRecs,
+		                                   transform(Layouts.SourceInfoWorkRec4,
+									          self            := left,
+											self.sourceInfo := dataset([{left.source,left.source_record_id}],Layouts.SourceInfoRec)));
+
+           rollSourceInfo   := rollup(sort(createChildDatasets, uniqueID, ultid, orgid, seleid, contact_did), 
+		                                  left.uniqueID    = right.uniqueID and
+		                                  left.ultid       = right.ultid and
+								    left.orgid       = right.orgid and
+								    left.seleid      = right.seleid and
+								    left.contact_did = right.contact_did, 
+								    transform(Layouts.SourceInfoWorkRec4,
+								              self.sourceInfo := left.sourceInfo + right.sourceInfo,
+										    self            := left));
+											    
+		 changeToFinalForm      := project(normalizeContactNames,
 		                                   transform(Layouts.ConsumerToBipFinalRec,
+									          self.sourceInfo := dedup(left.sourceInfo(source!=''),source,source_record_id);
 									          self            := left,
 											self.job_title1 := left.job_title,
 											self.job_title2 := '',
@@ -153,7 +182,17 @@ export Key_ConsumerToBip := module
 										self            := left));
 										
 
-           adjustDates       := project(rolljobTitle, 
+           addSourceInfo := join(rolljobTitle, rollSourceInfo,
+		                       left.uniqueID    = right.uniqueID and
+		                       left.ultid       = right.ultid and
+						   left.orgid       = right.orgid and
+						   left.seleid      = right.seleid and
+						   left.contact_did = right.contact_did, 		 
+						   transform(Layouts.ConsumerToBipFinalRec,
+							        self.sourceInfo := right.sourceInfo,
+								   self            := left));
+									   
+           adjustDates       := project(addSourceInfo, 
 		                              transform(Layouts.ConsumerToBipFinalRec,
 								          self.dt_first_seen_at_business := map(
 										                                      left.dt_first_seen_at_business > left.dt_last_seen                                          => left.dt_last_seen,
@@ -166,7 +205,7 @@ export Key_ConsumerToBip := module
 																	   left.dt_last_seen_at_business
 																	   );
 						                    self := left));
-		 
+	 
 		 return adjustDates;
      end;
 	

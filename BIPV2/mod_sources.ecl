@@ -544,4 +544,50 @@ export mod_sources := module
 	
 	export string1 codeType(string2 code) := srcType(code2src1(code));
 
+
+     // Source Type Functions
+     export isPublicRecordFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsIRS_5500(source) or
+                MDR.sourceTools.SourceIsLiens_v2(source) or
+                MDR.sourceTools.SourceIsDCA(source) or
+                MDR.sourceTools.SourceIsCorpV2(source) or
+                MDR.sourceTools.SourceIsTXBUS(source) or
+                MDR.sourceTools.SourceIsUCCV2(source) or
+                MDR.sourceTools.SourceIsBankruptcy(source) or
+                MDR.sourceTools.SourceIsCredit_Unions(source) or
+                MDR.sourceTools.SourceIsDea(source) or
+                MDR.sourceTools.SourceIsFAA(source) or
+                MDR.sourceTools.SourceIsFDIC(source) or
+                MDR.sourceTools.SourceIsIRS_Non_Profit(source) or
+                MDR.sourceTools.SourceIsVehicle(source) or
+                MDR.sourceTools.SourceIsOSHAIR(source) or
+                MDR.sourceTools.SourceIsLnPropertyV2(source) or
+                MDR.sourceTools.SourceIsCA_Sales_Tax(source) or
+                MDR.sourceTools.SourceIsWC(source) or
+                MDR.sourceTools.SourceIsWorkers_Compensation(source);
+      end;	
+	
+      export isDirectoryFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsFBNV2(source) or
+                source in MDR.sourceTools.set_Business_Registration or
+                MDR.sourceTools.SourceIsFrandx(source) or
+                MDR.sourceTools.SourceIsBBB(source) or
+                MDR.sourceTools.SourceIsCClue(source) or
+                MDR.sourceTools.SourceIsINFOUSA_ABIUS_USABIZ(source) or
+                source in MDR.sourceTools.set_Infutor_NARB;
+      end;	
+ 
+      export isBureauFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsDunn_Bradstreet(source) or
+                MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(source) or
+                MDR.sourceTools.SourceIsEBR(source) or
+                MDR.sourceTools.SourceIsExperian_CRDB(source) or
+                MDR.sourceTools.SourceIsExperian_FEIN(source) or
+                MDR.sourceTools.SourceIsBusiness_Credit(source) or
+                MDR.sourceTools.SourceIsCortera(source);
+      end;
+														
+      export isTelephoneFn(string2 source) := function
+        return MDR.sourceTools.SourceIsYellow_Pages(source);
+      end;
 end;

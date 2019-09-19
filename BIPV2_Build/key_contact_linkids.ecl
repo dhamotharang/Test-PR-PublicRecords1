@@ -376,10 +376,10 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
   export kfetch_layout := BIPV2_Contacts.key_contact_linkids.kfetch_layout;
 	
   //DEFINE THE INDEX ACCESS
-  export kFetch := BIPV2_Contacts.key_contact_linkids.kFetch;
+  export kFetch      := BIPV2_Contacts.key_contact_linkids.kFetch;
 	
 	//DEFINE THE INDEX ACCESS
-  export kFetchMarketing := BIPV2_Contacts.key_contact_linkids.kFetchMarketing;
+  export kFetchMarketing      := BIPV2_Contacts.key_contact_linkids.kFetchMarketing;
 
   
 end;
