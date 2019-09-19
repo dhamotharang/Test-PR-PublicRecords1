@@ -1,7 +1,7 @@
-EXPORT layout_UCCLiens_Batch_out := MODULE
+﻿EXPORT layout_UCCLiens_Batch_out := MODULE
 
 export filing_1_rec := RECORD
-	STRING14 filing_1_filing_number := '';
+	STRING25 filing_1_filing_number := '';
 	STRING40 filing_1_filing_type := '';
 	STRING8  filing_1_filing_date := '';
 	STRING8  filing_1_expiration_date := '';
@@ -10,7 +10,7 @@ export filing_1_rec := RECORD
 END;
 
 export filing_2_rec := RECORD
-	STRING14 filing_2_filing_number := '';
+	STRING25 filing_2_filing_number := '';
 	STRING40 filing_2_filing_type := '';
 	STRING8  filing_2_filing_date := '';
 	STRING8  filing_2_expiration_date := '';
@@ -19,7 +19,7 @@ export filing_2_rec := RECORD
 END;
 
 export filing_3_rec := RECORD
-	STRING14 filing_3_filing_number := '';
+	STRING25 filing_3_filing_number := '';
 	STRING40 filing_3_filing_type := '';
 	STRING8  filing_3_filing_date := '';
 	STRING8  filing_3_expiration_date := '';
@@ -28,7 +28,7 @@ export filing_3_rec := RECORD
 END;		
 
 export filing_4_rec := RECORD
-	STRING14 filing_4_filing_number := '';
+	STRING25 filing_4_filing_number := '';
 	STRING40 filing_4_filing_type := '';
 	STRING8  filing_4_filing_date := '';
 	STRING8  filing_4_expiration_date := '';
@@ -37,7 +37,7 @@ export filing_4_rec := RECORD
 END;		
 
 export filing_5_rec := RECORD
-	STRING14 filing_5_filing_number := '';
+	STRING25 filing_5_filing_number := '';
 	STRING40 filing_5_filing_type := '';
 	STRING8  filing_5_filing_date := '';
 	STRING8  filing_5_expiration_date := '';
@@ -46,7 +46,7 @@ export filing_5_rec := RECORD
 END;			
 
 export filing_6_rec := RECORD
-	STRING14 filing_6_filing_number := '';
+	STRING25 filing_6_filing_number := '';
 	STRING40 filing_6_filing_type := '';
 	STRING8  filing_6_filing_date := '';
 	STRING8  filing_6_expiration_date := '';
@@ -474,7 +474,7 @@ EXPORT final_out := RECORD
 
 	STRING3  filing_jurisdiction := '';
 	STRING25 filing_jurisdiction_name := '';
-	STRING14 orig_filing_number := '';
+	STRING25 orig_filing_number := '';
 	STRING40 orig_filing_type := '';
 	STRING8  orig_filing_date := '';
 	STRING8  filing_status := '';         
@@ -530,7 +530,7 @@ EXPORT final_out := RECORD
 	STRING30  county := '';
 	STRING9   zip := '';
 	
-// A description of the collateralÂ—up to 512 characters
+// A description of the collateralÃ‚â€”up to 512 characters
 	STRING512 collateral_desc := '';
 	STRING9   borough := '';
  

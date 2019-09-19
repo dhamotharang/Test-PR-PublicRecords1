@@ -237,12 +237,18 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
       vehicles_v2  := PersonReports.vehicle_records(in_did,vehicles_mod).vehicles_v2;
       //hit RTV GW - experian
       rtv := if(in_mod.IncludeRealTimeVehicles,getRealTimeVehicles(in_mod, bestRecs));				
-				
+
       //combine all vehicle recs
       vehicle_raw := vehicles_v2 + rtv;
 
       //cleanup and rollup data by - VehicleInfo.vin, VehicleInfo.make, VehicleInfo.model
-      vehicle_final := SmartRollup.fn_smart_rollup_veh(vehicle_raw,in_did[1].did);	 
+      vehicle_duped := SmartRollup.fn_smart_rollup_veh(vehicle_raw,in_did[1].did);
+
+      vehicle_final := project(vehicle_duped,
+                        transform(iesp.motorvehicle.t_MotorVehicleReport2Record,
+                        	self.registrants := dedup(sort(left.registrants, registrantinfo.uniqueid),registrantinfo.uniqueid),
+                        	self.owners      := dedup(sort(left.owners,      ownerinfo.uniqueid),     ownerinfo.uniqueid),
+                        	self := left));
       RETURN vehicle_final;
 	END;
 	
@@ -307,6 +313,20 @@ EXPORT Functions(DATASET(doxie.layout_references_hh) in_did) := MODULE
        ccw_final := project(ccw_duped_sorted,iesp.concealedweapon.t_WeaponRecord);
        RETURN ccw_final;
 	END;
+  
+  EXPORT liensRecsByDid(Ioptions in_mod):= FUNCTION
+      liens_mod := module (project(in_mod, PersonReports.input.liens, opt))
+         export string1 leins_party_type := PersonSlimReport_Services.Constants.DEBTOR;
+      end;
+      liens_raw := project(PersonReports.lienjudgment_records(in_did, liens_mod).liensjudgment_v2,
+                    iesp.lienjudgement.t_LienJudgmentReportRecord);
+      liens_duped := SmartRollup.fn_smart_rollup_liens(liens_raw);
+      liens_final := project(liens_duped,
+                      transform(iesp.lienjudgement.t_LienJudgmentReportRecord,
+                      		self.Debtors := dedup(sort(left.Debtors, ssn, originname),ssn),
+                      		self := left));
+      RETURN liens_final;
+  END;
 	
 	EXPORT huntFishRecsByDid():= FUNCTION
        hfish_raw   := doxie.hunting_records(in_did);

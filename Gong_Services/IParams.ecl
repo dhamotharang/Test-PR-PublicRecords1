@@ -2,12 +2,12 @@ IMPORT BatchShare, FCRA, FFD, Gateway;
 
 EXPORT IParams := MODULE
 
-		EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2,FCRA.iRules)
+		EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams,FCRA.iRules)
 			EXPORT UNSIGNED3 DidScoreThreshold := BatchShare.Constants.Defaults.DidScoreThreshold;
 		END;
 
 		EXPORT getBatchParams() := FUNCTION
-			bs_mod := BatchShare.IParam.getBatchParamsV2();
+			bs_mod := BatchShare.IParam.getBatchParams();
 
 			RETURN MODULE(PROJECT(bs_mod,BatchParams,OPT))
 				EXPORT INTEGER FCRAPurpose := FCRA.FCRAPurpose.Get();

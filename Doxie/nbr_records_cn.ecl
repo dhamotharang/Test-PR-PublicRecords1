@@ -1,4 +1,4 @@
-import doxie, ut, header;
+import doxie, dx_header, ut, header;
 
 // ================================================================== handshake
 
@@ -6,8 +6,8 @@ import doxie, ut, header;
 targetRec := doxie.layout_nbr_targets;
 
 // we'll look for neighbors here...
-key1 := doxie.key_nbr_headers;
-key2 := doxie.key_nbr_headers_uid;
+key1 := dx_header.key_nbr_headers();
+key2 := dx_header.key_nbr_headers_uid();
 
 // output record type
 cnRec := doxie.layout_nbr_records_cn;
@@ -92,13 +92,13 @@ export DATASET(cnRec) nbr_records_cn(
 
 	 cn3 := project(widenedCN,cnRec);
 
- 	 headerNbrForAddr := join(cn3, doxie.Key_Header, keyed(left.did = right.s_did)
+ 	 headerNbrForAddr := join(cn3, dx_header.key_header(), keyed(left.did = right.s_did)
 												and left.prim_name = right.prim_name
 												and left.prim_range = right.prim_range
 												and left.sec_range = right.sec_range
 												and left.zip = right.zip
 												, 
-												transform(recordof(doxie.Key_Header), 
+												transform(dx_header.layout_key_header, 
 													self := right),LIMIT(ut.limits.DID_PER_PERSON, SKIP));
 													// add the other components of the address
     // should we go to the best file to get the best name for the neighbors ?													

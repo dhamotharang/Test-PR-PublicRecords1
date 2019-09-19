@@ -1,4 +1,4 @@
-IMPORT ACA, ADVO, Business_Risk, Drivers, Doxie, dx_header, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, USPIS_HotList, UT, STD;
+IMPORT ACA, ADVO, Business_Risk, Drivers, dx_header, MDR, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, USPIS_HotList, UT, STD;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																					DATASET(Suspicious_Fraud_LN.layouts.Layout_Address_Inquiries) Inquiries,
@@ -16,7 +16,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Address_Risk (DATASE
 	BusinessHeaderKey := Business_Risk.Key_Business_Header_Address;
 	AddressRiskKey := Risk_Indicators.Key_HRI_Address_To_SIC;
 	
-	headerBuild := CHOOSEN(Doxie.Key_Max_Dt_Last_Seen, 1);
+	headerBuild := CHOOSEN(dx_header.key_max_dt_last_seen(), 1);
 	headerBuildDate := (((STRING)headerBuild[1].Max_Date_Last_Seen)[1..6]) + '01';
 	
 	TempAddressRisk := RECORD

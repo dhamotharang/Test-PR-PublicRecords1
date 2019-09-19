@@ -53,13 +53,13 @@ export STR_Functions := MODULE
 	EXPORT fn_get_best_recs(dataset(doxie.layout_references) dids, 
 	                        BatchServices.Interfaces.str_config in_mod) := FUNCTION
 
-    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+    mod_access := PROJECT(in_mod, doxie.IDataAccess);
     glb_ok := mod_access.isValidGLB ();
     dppa_ok := mod_access.isValidDPPA ();
 
 		ds_best_recs_raw := doxie.best_records(dids
 																					 ,doSuppress    := false
-																					 ,include_minors:= in_mod.IncludeMinors
+																					 ,include_minors:= in_mod.show_minors
 																					 ,getSSNBest    := in_mod.GetSSNBest,
 																					 modAccess      := mod_access
 							                            );
@@ -134,8 +134,6 @@ export STR_Functions := MODULE
 	//SkipDeceasedSubjects = TRUE IOW if we don't want to return deceased records
 	  populate_deceasedFlag:= ~in_mod.ReturnDeceased;
 		
-    // TODO: revisit str_config
-		
     death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
     ds_best_recs_with_deceased_flag := project(dx_death_master.Append.byDid(ds_best_recs, did, death_params),
       transform(BatchServices.STR_Layouts.Best_Plus,
@@ -145,8 +143,7 @@ export STR_Functions := MODULE
 		return if(populate_deceasedFlag, ds_best_recs_with_deceased_flag, ds_best_recs);
 	END;
 
-	EXPORT fn_get_residents_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in, 
-															 BatchServices.Interfaces.str_config in_mod) :=	
+	EXPORT fn_get_residents_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in) :=	
 	FUNCTION
 	
 		res_in_mod := module (BatchServices.Interfaces.res_config)
@@ -183,8 +180,7 @@ export STR_Functions := MODULE
 	  return ds_flat_ba;											
 	END;
 
-	EXPORT fn_get_dl_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in, 
-												BatchServices.Interfaces.str_config in_mod) :=	
+	EXPORT fn_get_dl_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in) :=	
 	FUNCTION
 		
 		drivers_in_mod := MODULE(DriversV2_Services.GetDLParams.batch_params)
@@ -230,7 +226,7 @@ export STR_Functions := MODULE
     return dl_flat_dl;														
 	END;
 	
-  EXPORT fn_get_mvr_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in, BatchServices.Interfaces.str_config in_mod) :=
+  EXPORT fn_get_mvr_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in) :=
 	FUNCTION
 	
 		mvr_batch_in := project(ds_flat_in, VehicleV2_Services.Batch_Layout.Vin_BatchIn); 
@@ -304,7 +300,7 @@ export STR_Functions := MODULE
 	END;
 	
 	
-	EXPORT fn_get_voter_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in, BatchServices.Interfaces.str_config in_mod) :=
+	EXPORT fn_get_voter_recs(DATASET(BatchServices.STR_Layouts.Working_Flat) ds_flat_in) :=
 	FUNCTION
 		
 		voter_batch_in := project(ds_flat_in, Autokey_batch.Layouts.rec_inBatchMaster);	

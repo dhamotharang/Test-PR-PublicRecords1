@@ -1,12 +1,13 @@
-﻿import doxie, ut, suppress, death_master, census_data, _validate, codes, AutoStandardI, MDR;
+﻿import AutoStandardI, _validate, census_data, codes, death_master, doxie, dx_death_master,
+       MDR, STD, suppress, ut;
 
 export raw := 
 MODULE
 
 shared rec := deathv2_services.layouts;
-shared deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-shared glb_ok := deathparams.isValidGlb();
-shared appType := deathparams.application_type;
+shared death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+shared glb_ok := death_params.isValidGlb();
+shared appType := death_params.application_type;
 
 //****** GET DEATH IDS
 
@@ -16,15 +17,15 @@ MODULE
 		dataset(doxie.layout_references) dids,
 		boolean checkRNA=false) := 
 	FUNCTION
-	  loc_glb_ok := deathparams.isValidGlb(checkRNA);
-		key := doxie.key_death_masterV2_ssa_DID;
-		res := join(dedup(dids, all),key,
-									keyed(left.did = right.l_did)
-									 and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, loc_glb_ok, deathparams), 	
-									transform(rec.death_id,
-														self := right),
-									keep(ut.limits.DEATH_PER_DID), limit (0))(state_death_id <> '');		
-		return dedup(res, all);
+    loc_glb_ok := death_params.isValidGlb(checkRNA); 
+    death_raw_recs := dx_death_master.Get.byDid(dedup(dids, all), did, death_params, /*skip_glb_check=*/TRUE, ut.limits.DEATH_PER_DID);
+    death_raw_recs_glb_ok := death_raw_recs(loc_glb_ok OR death.glb_flag <> 'Y');
+    res := 
+      PROJECT(death_raw_recs_glb_ok(death.state_death_id <> ''), 
+        TRANSFORM(rec.death_id, 
+        SELF := LEFT.death));
+
+		RETURN DEDUP(res, ALL);
 	END;
 END;
 
@@ -40,7 +41,7 @@ MODULE
 		key := Death_Master.key_death_id_base_ssa;		
 		jnd := join(dedup(ids, all),key,
 									keyed(left.state_death_id = right.state_death_id)
-									and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
+									and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, death_params),
 									transform(rec.base_internal,
 														self.dead_age := ut.Age((unsigned8)right.dob8, (unsigned8)right.dod8),
 														self.dead_age_unit := '',
@@ -74,10 +75,10 @@ FUNCTION
 	return ut.Word(ucd,pos + adjustment,';');
  END;
  
- prim_decode			:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,ut.word(prim_code,1,';')));			
- under_decode1		:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,1)));
- under_decode2 		:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,2)));
- under_decode3 		:= stringlib.StringToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,3)));
+ prim_decode			:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,ut.word(prim_code,1,';')));			
+ under_decode1		:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,1)));
+ under_decode2 		:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,2)));
+ under_decode3 		:= STD.STR.ToUpperCase(Codes.KeyCodes('DEATH_MASTER','INTERNATIONAL_CLASSIFICATION_OF_DISEASES',,underlying_cause(prim_code,under_code,3)));
  
  sep := '; ';
  dec := map(cause = '' and 

@@ -25,8 +25,8 @@ export MAC_BestAppend(infile,
 											GetSSNBest = false
 										) := MACRO
 										
-import didville, suppress, doxie, dx_header, DeathV2_Services, AutoStandardI, SSNBest_Services,
-       did_add, header_slimsort, ut, STD, dx_BestRecords;
+import AutoStandardI, DeathV2_Services, did_add, didville, doxie, dx_BestRecords, dx_death_master, dx_header,
+       header_slimsort, SSNBest_Services, STD, suppress, ut;
 
 	didville.Mac_Common_Field_Declare();
 
@@ -45,8 +45,8 @@ import didville, suppress, doxie, dx_header, DeathV2_Services, AutoStandardI, SS
   END;
 
 os(string i) := if (i='','',trim(i)+' ');
-#uniquename(deathparams)
-%deathparams% := DeathV2_Services.IParam.GetRestrictions(%mod_access%);
+#uniquename(death_params)
+%death_params% := DeathV2_Services.IParam.GetRestrictions(%mod_access%);
 // Bug: 53541. For some of the services we want to use the _nonblank data (so we return the maximum 
 // number of first/last names). At the time of this change, the watchdog marketing data 
 // does not have a nonblank variant.
@@ -71,97 +71,97 @@ os(string i) := if (i='','',trim(i)+' ');
 #uniquename(add_flds_marketing)
 typeof(infile) %add_flds_marketing%(infile le, dx_BestRecords.layout_best ri, string options) := transform
   #if (not clickdata)
-		self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
+		self.best_phone := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
 	#end
-  self.best_ssn := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_SSN',1)=0 or ri.glb_ssn = 'N','', ri.ssn );
-  //self.best_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
-  self.best_title := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.title);
-  self.best_fname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.fname);
-  self.best_mname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.mname);
-  self.best_lname :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.lname);
-  self.best_name_suffix := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.name_suffix);
-  self.best_addr1 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
-  //self.best_addr2 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
-  self.best_city :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.city_name);
-  self.best_state := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.st);
-  self.best_zip := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip);
-  self.best_zip4 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip4);
-  self.best_addr_date := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_last_seen);
+  self.best_ssn := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_SSN',1)=0 or ri.glb_ssn = 'N','', ri.ssn );
+  //self.best_name := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
+  self.best_title := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.title);
+  self.best_fname := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.fname);
+  self.best_mname := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.mname);
+  self.best_lname :=if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.lname);
+  self.best_name_suffix := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.name_suffix);
+  self.best_addr1 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
+  //self.best_addr2 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
+  self.best_city :=if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.city_name);
+  self.best_state := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.st);
+  self.best_zip := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip);
+  self.best_zip4 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip4);
+  self.best_addr_date := if ( STD.STR.Find(options,'BEST_ALL',1)= 0 and STD.STR.Find(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_last_seen);
   #if(clickdata)
-		self.best_prim_range := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range) );
-		self.best_prim_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_name) );
-		self.best_sec_range := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.sec_range) );
-		self.best_addr_date_first_seen := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_first_seen);
+		self.best_prim_range := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range) );
+		self.best_prim_name := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_name) );
+		self.best_sec_range := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.sec_range) );
+		self.best_addr_date_first_seen := if ( STD.STR.Find(options,'BEST_ALL',1)= 0 and STD.STR.Find(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_first_seen);
 	#end
-  self.best_dob := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOB',1)=0 or ri.glb_dob = 'N','',if(ri.dob<0,'',(string8)ri.dob));
-  self.best_dod := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOD',1)=0,'',ri.dod);
-  self.verify_best_phone := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
-  self.verify_best_ssn := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_SSN',1)=0 and stringlib.stringfind(verify,'FUZZY_SSN',1) = 0, 255,
-						if (stringlib.stringfind(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
-  self.verify_best_name := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
-  self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip, le.zip4, ri.zip4) );
-  self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
+  self.best_dob := (string8)if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_DOB',1)=0 or ri.glb_dob = 'N','',if(ri.dob<0,'',(string8)ri.dob));
+  self.best_dod := (string8)if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_DOD',1)=0,'',ri.dod);
+  self.verify_best_phone := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
+  self.verify_best_ssn := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_SSN',1)=0 and STD.STR.Find(verify,'FUZZY_SSN',1) = 0, 255,
+						if (STD.STR.Find(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
+  self.verify_best_name := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
+  self.verify_best_address := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip, le.zip4, ri.zip4) );
+  self.verify_best_dob := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
   self := le;
 end;
   
 #uniquename(add_flds_nonglb)
 typeof(infile) %add_flds_nonglb%(infile le, dx_BestRecords.layout_best ri, string options) := transform
   #if (not clickdata)
-		self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
+		self.best_phone := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
 	#end
-  self.best_ssn := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_SSN',1)=0 or ri.glb_ssn = 'N','', ri.ssn );
-  //self.best_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
-  self.best_title := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.title);
-  self.best_fname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.fname);
-  self.best_mname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.mname);
-  self.best_lname :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.lname);
-  self.best_name_suffix := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.name_suffix);
-  self.best_addr1 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
-  //self.best_addr2 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
-  self.best_city :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.city_name);
-  self.best_state := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.st);
-  self.best_zip := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip);
-  self.best_zip4 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip4);
-  self.best_addr_date := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_last_seen);
+  self.best_ssn := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_SSN',1)=0 or ri.glb_ssn = 'N','', ri.ssn );
+  //self.best_name := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
+  self.best_title := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.title);
+  self.best_fname := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.fname);
+  self.best_mname := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.mname);
+  self.best_lname :=if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.lname);
+  self.best_name_suffix := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.name_suffix);
+  self.best_addr1 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
+  //self.best_addr2 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
+  self.best_city :=if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.city_name);
+  self.best_state := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.st);
+  self.best_zip := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip);
+  self.best_zip4 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip4);
+  self.best_addr_date := if ( STD.STR.Find(options,'BEST_ALL',1)= 0 and STD.STR.Find(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_last_seen);
   #if(clickdata)
-		self.best_addr_date_first_seen := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_first_seen);
+		self.best_addr_date_first_seen := if ( STD.STR.Find(options,'BEST_ALL',1)= 0 and STD.STR.Find(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_first_seen);
 	#end
-  self.best_dob := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOB',1)=0 or ri.glb_dob = 'N','',if(ri.dob<0,'',(string8)ri.dob));
-  self.best_dod := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOD',1)=0,'',ri.dod);
-  self.verify_best_phone := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
-  self.verify_best_ssn := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_SSN',1)=0 and stringlib.stringfind(verify,'FUZZY_SSN',1) = 0, 255,
-						if (stringlib.stringfind(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
-  self.verify_best_name := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
-  self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
-  self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
+  self.best_dob := (string8)if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_DOB',1)=0 or ri.glb_dob = 'N','',if(ri.dob<0,'',(string8)ri.dob));
+  self.best_dod := (string8)if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_DOD',1)=0,'',ri.dod);
+  self.verify_best_phone := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
+  self.verify_best_ssn := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_SSN',1)=0 and STD.STR.Find(verify,'FUZZY_SSN',1) = 0, 255,
+						if (STD.STR.Find(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
+  self.verify_best_name := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
+  self.verify_best_address := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
+  self.verify_best_dob := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
   self := le;
 end;
 
 #uniquename(add_flds_glb)
 typeof(infile) %add_flds_glb%(infile le, dx_BestRecords.layout_best ri, string options) := transform
-	self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0,'', ri.phone );
-	self.best_ssn := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_SSN',1)=0,'', ri.ssn );
-	//self.best_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
-	self.best_title := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.title);
-	self.best_fname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.fname);
-	self.best_mname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.mname);
-	self.best_lname :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.lname);
-	self.best_name_suffix := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.name_suffix);
-	self.best_addr1 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
-	//self.best_addr2 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
-	self.best_city :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.city_name);
-	self.best_state := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.st);
-	self.best_zip := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.zip);
-	self.best_zip4 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.zip4);
-	self.best_addr_date := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0,0,ri.addr_dt_last_seen);
-	self.best_dob := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOB',1)=0,'',if(ri.dob<0,'',(string8)ri.dob));
-	self.best_dod := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOD',1)=0,'',ri.dod);
-	self.verify_best_phone := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
-	self.verify_best_ssn := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_SSN',1)=0 and stringlib.stringfind(verify,'FUZZY_SSN',1) = 0, 255,
-	if (stringlib.stringfind(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
-	self.verify_best_name := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
-	self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
-	self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
+	self.best_phone := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_PHONE',1)=0,'', ri.phone );
+	self.best_ssn := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_SSN',1)=0,'', ri.ssn );
+	//self.best_name := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0,'', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
+	self.best_title := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0,'',ri.title);
+	self.best_fname := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0,'',ri.fname);
+	self.best_mname := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0,'',ri.mname);
+	self.best_lname :=if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0,'',ri.lname);
+	self.best_name_suffix := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_NAME',1)=0,'',ri.name_suffix);
+	self.best_addr1 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0,'', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
+	//self.best_addr2 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0,'', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
+	self.best_city :=if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0,'',ri.city_name);
+	self.best_state := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0,'',ri.st);
+	self.best_zip := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0,'',ri.zip);
+	self.best_zip4 := if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_ADDR',1)=0,'',ri.zip4);
+	self.best_addr_date := if ( STD.STR.Find(options,'BEST_ALL',1)= 0 and STD.STR.Find(options,'BEST_ADDRESS_DATE',1) = 0,0,ri.addr_dt_last_seen);
+	self.best_dob := (string8)if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_DOB',1)=0,'',if(ri.dob<0,'',(string8)ri.dob));
+	self.best_dod := (string8)if ( STD.STR.Find(options,'BEST_ALL',1)=0 and STD.STR.Find(options,'BEST_DOD',1)=0,'',ri.dod);
+	self.verify_best_phone := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
+	self.verify_best_ssn := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_SSN',1)=0 and STD.STR.Find(verify,'FUZZY_SSN',1) = 0, 255,
+	if (STD.STR.Find(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
+	self.verify_best_name := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
+	self.verify_best_address := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
+	self.verify_best_dob := if ( STD.STR.Find(verify,'BEST_ALL',1)=0 and STD.STR.Find(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
 	self := le;
 end;
 
@@ -246,21 +246,24 @@ typeof(infile) strip_minors(infile le, index_minors_hash re) := transform
 		self.best_dod := '';
 		self := l;
 	end;
-	#uniquename(outfile_noDeath)															 
-	%outfile_noDeath% := project(%outfile_watchdog_death%, %clearDOD%(LEFT));
-	// use a DOD value from an un-restricted DeathMaster record
-	#uniquename(fillDOD)			
-	%outfile_noDeath% %fillDOD%(%outfile_noDeath% l, doxie.key_death_masterV2_ssa_DID r) := transform
-		 self.best_dod := r.dod8;
-		 self := L;
-	end;
-	#uniquename(outfile_Death)
-	%outfile_death% := join(%outfile_noDeath%,doxie.key_death_masterV2_ssa_DID,
-																keyed(left.did = right.l_did)  and
-																not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, %deathparams%),
-																%fillDOD%(LEFT,RIGHT),left outer, KEEP(1), LIMIT(0));
+  #uniquename(outfile_noDeath)															 
+  %outfile_noDeath% := project(%outfile_watchdog_death%, %clearDOD%(LEFT));
+
+  #uniquename(death_raw_recs)
+  %death_raw_recs% := dx_death_master.Append.byDid(%outfile_noDeath%, did, %death_params%);
+
+  // use a DOD value from an un-restricted DeathMaster record
+  #uniquename(fillDOD)			
+  %outfile_noDeath% %fillDOD%(RECORDOF(%death_raw_recs%) L) := transform
+    self.best_dod := L.death.dod8;
+    self := L;
+  end;
+
+  #uniquename(outfile_Death)
+  %outfile_death% := PROJECT(%death_raw_recs%, %fillDOD%(LEFT));
+  
   //determine whether we need to join to the deathmaster data for the DOD value
-  include_DOD := if ( stringlib.stringfind(supply,'BEST_ALL',1)=0 and stringlib.stringfind(supply,'BEST_DOD',1)=0, FALSE, TRUE);
+  include_DOD := if ( STD.STR.Find(supply,'BEST_ALL',1)=0 and STD.STR.Find(supply,'BEST_DOD',1)=0, FALSE, TRUE);
 
 	outfile1 := IF (include_dod, %outfile_death%, %outfile_noDeath%); 
 //end of include for DOD from deathmaster
@@ -296,7 +299,7 @@ typeof(infile) strip_minors(infile le, index_minors_hash re) := transform
 
 	mid3 := project(mid2,into_orig(LEFT));
 
-  outfile_ := if (stringlib.stringfind(supply,'MAX_SSN',1) = 0,outfile1,mid3);
+  outfile_ := if (STD.STR.Find(supply,'MAX_SSN',1) = 0,outfile1,mid3);
 	
 	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(%mod_access%
 																														 ,suppress_and_mask_:=FALSE); //since suppression and masking is done below

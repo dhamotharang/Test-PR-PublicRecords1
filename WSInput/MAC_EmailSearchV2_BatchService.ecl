@@ -1,4 +1,4 @@
-EXPORT MAC_EmailSearchV2_BatchService := MACRO
+﻿EXPORT MAC_EmailSearchV2_BatchService := MACRO
 
 #WEBSERVICE(FIELDS('DPPAPurpose', 
                      'GLBPurpose', 
@@ -28,6 +28,8 @@ EXPORT MAC_EmailSearchV2_BatchService := MACRO
                      'BVAPIkey',
                      'SkipTMXcheck',
                      'MaxEmailsForTMXcheck',
+                     'KeepTMXRejectedEmail',
+                     'UseTMXRules',  // temporary option to be used for qa testing core functionality in Cert
                      'Gateways'
                      ));
 ENDMACRO;

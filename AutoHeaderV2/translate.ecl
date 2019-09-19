@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, address, doxie, ut, header, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate;
+﻿IMPORT AutoStandardI, address, doxie, dx_header, ut, header, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate;
 
 isFCRAval := false;
 todays_date := (unsigned8)Stringlib.getDateYYYYMMDD();
@@ -282,12 +282,12 @@ EXPORT translate := MODULE
 		boolean call_range := all_zip_set != [] and (pname_value != '') and (prange_beg_value != 0 or prange_end_value != 0);
 
 		neighbors_range := if (call_range, limit (limit (
-						project (doxie.key_nbr_headers (
+						project (dx_header.key_nbr_headers() (
 							 // keyed ((exists(zip_ds) or exists(city_zip_ds)) and zip IN city_zip_set,
 							 keyed (zip IN all_zip_set),
 							 keyed (prim_name[1..length(pname_value)] = pname_value), 
 							 ((integer)prim_range >= prange_beg_value and (integer)prim_range <= prange_end_value)),
-						{doxie.key_nbr_headers.prim_range}),
+						{dx_header.key_nbr_headers().prim_range}),
 			ut.limits.FETCH_KEYED, skip, keyed), ut.limits.FETCH_UNKEYED, skip));
 
 		ds_prange_set := dedup (sort (neighbors_range, prim_range), prim_range);

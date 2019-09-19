@@ -99,7 +99,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		) := transform
 		self.acctno := le.acctno;
     
-    // don't log the lexid if the person got a noscore
+ // don't log the lexid if the person got a noscore
     self.inquiry_lexid := if(riskview.constants.noScoreAlert in [ri.Alert1,ri.Alert2,ri.Alert3,ri.Alert4,ri.Alert5,ri.Alert6,ri.Alert7,ri.Alert8,ri.Alert9,ri.Alert10], '', ri.LexID);
     
 		self.Liens1_Seq          := ri.LnJliens[1].Seq;
@@ -112,10 +112,11 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens1_FilingNumber := ri.LnJliens[1].FilingNumber;
 		self.Liens1_FilingBook   := ri.LnJliens[1].FilingBook;
 		self.Liens1_FilingPage   := ri.LnJliens[1].FilingPage;
-		self.Liens1_Agency       := ri.LnJliens[1].Agency ;
+		self.Liens1_Agency       := ri.LnJliens[1].Agency;
 		self.Liens1_AgencyCounty := ri.LnJliens[1].AgencyCounty;
 		self.Liens1_AgencyState	:= ri.LnJliens[1].AgencyState;
 		self.Liens1_ConsumerStatementId	:= SetCSID(ri.LnJliens[1].ConsumerStatementId);
+    self.Liens1_orig_rmsid       := ri.LnJliens[1].orig_rmsid;
 		self.Liens2_Seq          := ri.LnJliens[2].Seq;
 		self.Liens2_DateFiled    := ri.LnJliens[2].DateFiled;
   self.Liens2_LienTypeID   := ri.LnJliens[2].LienTypeID;
@@ -130,6 +131,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens2_AgencyCounty := ri.LnJliens[2].AgencyCounty;
 		self.Liens2_AgencyState	:= ri.LnJliens[2].AgencyState;
 		self.Liens2_ConsumerStatementId	:= SetCSID(ri.LnJliens[2].ConsumerStatementId);
+    self.Liens2_orig_rmsid       := ri.LnJliens[2].orig_rmsid;
 		self.Liens3_Seq          := ri.LnJliens[3].Seq;
 		self.Liens3_DateFiled    := ri.LnJliens[3].DateFiled;
   self.Liens3_LienTypeID   := ri.LnJliens[3].LienTypeID;
@@ -139,11 +141,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens3_DateLastSeen := ri.LnJliens[3].DateLastSeen;
 		self.Liens3_FilingNumber := ri.LnJliens[3].FilingNumber;
 		self.Liens3_FilingBook   := ri.LnJliens[3].FilingBook;
-		self.Liens3_FilingPage   := ri.LnJliens[3].FilingPage;
+		self.Liens3_FilingPage   := ri.LnJliens[3].FilingPage; 
 		self.Liens3_Agency       := ri.LnJliens[3].Agency; 
 		self.Liens3_AgencyCounty := ri.LnJliens[3].AgencyCounty;
 		self.Liens3_AgencyState	:= ri.LnJliens[3].AgencyState;
 		self.Liens3_ConsumerStatementId	:= SetCSID(ri.LnJliens[3].ConsumerStatementId);
+    self.Liens3_orig_rmsid       := ri.LnJliens[3].orig_rmsid;
 		self.Liens4_Seq          := ri.LnJliens[4].Seq;
 		self.Liens4_DateFiled    := ri.LnJliens[4].DateFiled;
   self.Liens4_LienTypeID   := ri.LnJliens[4].LienTypeID;
@@ -157,7 +160,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens4_Agency       := ri.LnJliens[4].Agency; 
 		self.Liens4_AgencyCounty := ri.LnJliens[4].AgencyCounty;
 		self.Liens4_AgencyState	:= ri.LnJliens[4].AgencyState;
-		self.Liens4_ConsumerStatementId	:= SetCSID(ri.LnJliens[4].ConsumerStatementId);		
+		self.Liens4_ConsumerStatementId	:= SetCSID(ri.LnJliens[4].ConsumerStatementId);
+		self.Liens4_orig_rmsid       := ri.LnJliens[4].orig_rmsid;
 		self.Liens5_Seq          := ri.LnJliens[5].Seq              ;
 		self.Liens5_DateFiled    := ri.LnJliens[5].DateFiled        ;
   self.Liens5_LienTypeID   := ri.LnJliens[5].LienTypeID;
@@ -171,7 +175,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens5_Agency       := ri.LnJliens[5].Agency           ;
 		self.Liens5_AgencyCounty := ri.LnJliens[5].AgencyCounty     ;
 		self.Liens5_AgencyState  := ri.LnJliens[5].AgencyState      ;
-		self.Liens5_ConsumerStatementId	:= SetCSID(ri.LnJliens[5].ConsumerStatementId);	
+		self.Liens5_ConsumerStatementId	:= SetCSID(ri.LnJliens[5].ConsumerStatementId);
+    self.Liens5_orig_rmsid       := ri.LnJliens[5].orig_rmsid;
 		self.Liens6_Seq          := ri.LnJliens[6].Seq              ;
 		self.Liens6_DateFiled    := ri.LnJliens[6].DateFiled        ;
   self.Liens6_LienTypeID   := ri.LnJliens[6].LienTypeID;
@@ -185,7 +190,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens6_Agency       := ri.LnJliens[6].Agency           ;
 		self.Liens6_AgencyCounty := ri.LnJliens[6].AgencyCounty     ;
 		self.Liens6_AgencyState  := ri.LnJliens[6].AgencyState      ;
-		self.Liens6_ConsumerStatementId	:= SetCSID(ri.LnJliens[6].ConsumerStatementId);	
+		self.Liens6_ConsumerStatementId	:= SetCSID(ri.LnJliens[6].ConsumerStatementId);
+    self.Liens6_orig_rmsid       := ri.LnJliens[6].orig_rmsid;
 		self.Liens7_Seq          := ri.LnJliens[7].Seq              ;
 		self.Liens7_DateFiled    := ri.LnJliens[7].DateFiled        ;
   self.Liens7_LienTypeID   := ri.LnJliens[7].LienTypeID;
@@ -199,7 +205,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens7_Agency       := ri.LnJliens[7].Agency           ;
 		self.Liens7_AgencyCounty := ri.LnJliens[7].AgencyCounty     ;
 		self.Liens7_AgencyState  := ri.LnJliens[7].AgencyState      ;
-		self.Liens7_ConsumerStatementId	:= SetCSID(ri.LnJliens[7].ConsumerStatementId);	
+		self.Liens7_ConsumerStatementId	:= SetCSID(ri.LnJliens[7].ConsumerStatementId);
+    self.Liens7_orig_rmsid       := ri.LnJliens[7].orig_rmsid;
 		self.Liens8_Seq          := ri.LnJliens[8].Seq              ;
 		self.Liens8_DateFiled    := ri.LnJliens[8].DateFiled        ;
   self.Liens8_LienTypeID   := ri.LnJliens[8].LienTypeID;
@@ -213,7 +220,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens8_Agency       := ri.LnJliens[8].Agency           ;
 		self.Liens8_AgencyCounty := ri.LnJliens[8].AgencyCounty     ;
 		self.Liens8_AgencyState  := ri.LnJliens[8].AgencyState      ;
-		self.Liens8_ConsumerStatementId	:= SetCSID(ri.LnJliens[8].ConsumerStatementId);	
+		self.Liens8_ConsumerStatementId	:= SetCSID(ri.LnJliens[8].ConsumerStatementId);
+    self.Liens8_orig_rmsid       := ri.LnJliens[8].orig_rmsid;
 		self.Liens9_Seq          := ri.LnJliens[9].Seq              ;
 		self.Liens9_DateFiled    := ri.LnJliens[9].DateFiled        ;
   self.Liens9_LienTypeID   := ri.LnJliens[9].LienTypeID;
@@ -228,6 +236,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens9_AgencyCounty := ri.LnJliens[9].AgencyCounty     ;
 		self.Liens9_AgencyState  := ri.LnJliens[9].AgencyState      ;
 		self.Liens9_ConsumerStatementId	:= SetCSID(ri.LnJliens[9].ConsumerStatementId);
+    self.Liens9_orig_rmsid       := ri.LnJliens[9].orig_rmsid;
 		self.Liens10_Seq          := ri.LnJliens[10].Seq             ;
 		self.Liens10_DateFiled    := ri.LnJliens[10].DateFiled       ;
   self.Liens10_LienTypeID   := ri.LnJliens[10].LienTypeID;
@@ -242,6 +251,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens10_AgencyCounty := ri.LnJliens[10].AgencyCounty    ;
 		self.Liens10_AgencyState  := ri.LnJliens[10].AgencyState     ;
 		self.Liens10_ConsumerStatementId	:= SetCSID(ri.LnJliens[10].ConsumerStatementId);
+    self.Liens10_orig_rmsid       := ri.LnJliens[10].orig_rmsid;
 		self.Liens11_Seq          := ri.LnJliens[11].Seq;
 		self.Liens11_DateFiled    := ri.LnJliens[11].DateFiled;
   self.Liens11_LienTypeID   := ri.LnJliens[11].LienTypeID;
@@ -256,6 +266,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens11_AgencyCounty := ri.LnJliens[11].AgencyCounty;
 		self.Liens11_AgencyState	:= ri.LnJliens[11].AgencyState;
 		self.Liens11_ConsumerStatementId	:= SetCSID(ri.LnJliens[11].ConsumerStatementId);
+    self.Liens11_orig_rmsid       := ri.LnJliens[11].orig_rmsid;
 		self.Liens12_Seq          := ri.LnJliens[12].Seq;
 		self.Liens12_DateFiled    := ri.LnJliens[12].DateFiled;
   self.Liens12_LienTypeID   := ri.LnJliens[12].LienTypeID;
@@ -270,6 +281,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens12_AgencyCounty := ri.LnJliens[12].AgencyCounty;
 		self.Liens12_AgencyState	:= ri.LnJliens[12].AgencyState;
 		self.Liens12_ConsumerStatementId	:= SetCSID(ri.LnJliens[12].ConsumerStatementId);
+    self.Liens12_orig_rmsid       := ri.LnJliens[12].orig_rmsid;
 		self.Liens13_Seq          := ri.LnJliens[13].Seq;
 		self.Liens13_DateFiled    := ri.LnJliens[13].DateFiled;
   self.Liens13_LienTypeID   := ri.LnJliens[13].LienTypeID;
@@ -284,6 +296,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens13_AgencyCounty := ri.LnJliens[13].AgencyCounty;
 		self.Liens13_AgencyState	:= ri.LnJliens[13].AgencyState;
 		self.Liens13_ConsumerStatementId	:= SetCSID(ri.LnJliens[13].ConsumerStatementId);
+    self.Liens13_orig_rmsid       := ri.LnJliens[13].orig_rmsid;
 		self.Liens14_Seq          := ri.LnJliens[14].Seq;
 		self.Liens14_DateFiled    := ri.LnJliens[14].DateFiled;
   self.Liens14_LienTypeID   := ri.LnJliens[14].LienTypeID;
@@ -297,7 +310,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens14_Agency       := ri.LnJliens[14].Agency; 
 		self.Liens14_AgencyCounty := ri.LnJliens[14].AgencyCounty;
 		self.Liens14_AgencyState	:= ri.LnJliens[14].AgencyState;
-		self.Liens14_ConsumerStatementId	:= SetCSID(ri.LnJliens[14].ConsumerStatementId);		
+		self.Liens14_ConsumerStatementId	:= SetCSID(ri.LnJliens[14].ConsumerStatementId);
+		self.Liens14_orig_rmsid       := ri.LnJliens[14].orig_rmsid;
 		self.Liens15_Seq          := ri.LnJliens[15].Seq              ;
 		self.Liens15_DateFiled    := ri.LnJliens[15].DateFiled        ;
   self.Liens15_LienTypeID   := ri.LnJliens[15].LienTypeID;
@@ -311,7 +325,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens15_Agency       := ri.LnJliens[15].Agency           ;
 		self.Liens15_AgencyCounty := ri.LnJliens[15].AgencyCounty     ;
 		self.Liens15_AgencyState  := ri.LnJliens[15].AgencyState      ;
-		self.Liens15_ConsumerStatementId	:= SetCSID(ri.LnJliens[15].ConsumerStatementId);	
+		self.Liens15_ConsumerStatementId	:= SetCSID(ri.LnJliens[15].ConsumerStatementId);
+    self.Liens15_orig_rmsid       := ri.LnJliens[15].orig_rmsid;
 		self.Liens16_Seq          := ri.LnJliens[16].Seq              ;
 		self.Liens16_DateFiled    := ri.LnJliens[16].DateFiled        ;
   self.Liens16_LienTypeID   := ri.LnJliens[16].LienTypeID;
@@ -325,7 +340,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens16_Agency       := ri.LnJliens[16].Agency           ;
 		self.Liens16_AgencyCounty := ri.LnJliens[16].AgencyCounty     ;
 		self.Liens16_AgencyState  := ri.LnJliens[16].AgencyState      ;
-		self.Liens16_ConsumerStatementId	:= SetCSID(ri.LnJliens[16].ConsumerStatementId);	
+		self.Liens16_ConsumerStatementId	:= SetCSID(ri.LnJliens[16].ConsumerStatementId);
+    self.Liens16_orig_rmsid       := ri.LnJliens[16].orig_rmsid;
 		self.Liens17_Seq          := ri.LnJliens[17].Seq              ;
 		self.Liens17_DateFiled    := ri.LnJliens[17].DateFiled        ;
   self.Liens17_LienTypeID   := ri.LnJliens[17].LienTypeID;
@@ -339,7 +355,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens17_Agency       := ri.LnJliens[17].Agency           ;
 		self.Liens17_AgencyCounty := ri.LnJliens[17].AgencyCounty     ;
 		self.Liens17_AgencyState  := ri.LnJliens[17].AgencyState      ;
-		self.Liens17_ConsumerStatementId	:= SetCSID(ri.LnJliens[17].ConsumerStatementId);	
+		self.Liens17_ConsumerStatementId	:= SetCSID(ri.LnJliens[17].ConsumerStatementId);
+    self.Liens17_orig_rmsid       := ri.LnJliens[17].orig_rmsid;
 		self.Liens18_Seq          := ri.LnJliens[18].Seq              ;
 		self.Liens18_DateFiled    := ri.LnJliens[18].DateFiled        ;
   self.Liens18_LienTypeID   := ri.LnJliens[18].LienTypeID;
@@ -353,7 +370,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens18_Agency       := ri.LnJliens[18].Agency           ;
 		self.Liens18_AgencyCounty := ri.LnJliens[18].AgencyCounty     ;
 		self.Liens18_AgencyState  := ri.LnJliens[18].AgencyState      ;
-		self.Liens18_ConsumerStatementId	:= SetCSID(ri.LnJliens[18].ConsumerStatementId);	
+		self.Liens18_ConsumerStatementId	:= SetCSID(ri.LnJliens[18].ConsumerStatementId);
+    self.Liens18_orig_rmsid       := ri.LnJliens[18].orig_rmsid;
 		self.Liens19_Seq          := ri.LnJliens[19].Seq              ;
 		self.Liens19_DateFiled    := ri.LnJliens[19].DateFiled        ;
   self.Liens19_LienTypeID   := ri.LnJliens[19].LienTypeID;
@@ -368,6 +386,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens19_AgencyCounty := ri.LnJliens[19].AgencyCounty     ;
 		self.Liens19_AgencyState  := ri.LnJliens[19].AgencyState      ;
 		self.Liens19_ConsumerStatementId	:= SetCSID(ri.LnJliens[19].ConsumerStatementId);
+    self.Liens19_orig_rmsid       := ri.LnJliens[19].orig_rmsid;
 		self.Liens20_Seq          := ri.LnJliens[20].Seq             ;
 		self.Liens20_DateFiled    := ri.LnJliens[20].DateFiled       ;
   self.Liens20_LienTypeID   := ri.LnJliens[20].LienTypeID;
@@ -382,6 +401,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens20_AgencyCounty := ri.LnJliens[20].AgencyCounty    ;
 		self.Liens20_AgencyState  := ri.LnJliens[20].AgencyState     ;
 		self.Liens20_ConsumerStatementId	:= SetCSID(ri.LnJliens[20].ConsumerStatementId);
+    self.Liens20_orig_rmsid       := ri.LnJliens[20].orig_rmsid;
 				self.Liens21_Seq          := ri.LnJliens[21].Seq;
 		self.Liens21_DateFiled    := ri.LnJliens[21].DateFiled;
   self.Liens21_LienTypeID   := ri.LnJliens[21].LienTypeID;
@@ -396,6 +416,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens21_AgencyCounty := ri.LnJliens[21].AgencyCounty;
 		self.Liens21_AgencyState	:= ri.LnJliens[21].AgencyState;
 		self.Liens21_ConsumerStatementId	:= SetCSID(ri.LnJliens[21].ConsumerStatementId);
+    self.Liens21_orig_rmsid       := ri.LnJliens[21].orig_rmsid;
 		self.Liens22_Seq          := ri.LnJliens[22].Seq;
 		self.Liens22_DateFiled    := ri.LnJliens[22].DateFiled;
   self.Liens22_LienTypeID   := ri.LnJliens[22].LienTypeID;
@@ -410,6 +431,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens22_AgencyCounty := ri.LnJliens[22].AgencyCounty;
 		self.Liens22_AgencyState	:= ri.LnJliens[22].AgencyState;
 		self.Liens22_ConsumerStatementId	:= SetCSID(ri.LnJliens[22].ConsumerStatementId);
+    self.Liens22_orig_rmsid       := ri.LnJliens[22].orig_rmsid;
 		self.Liens23_Seq          := ri.LnJliens[23].Seq;
 		self.Liens23_DateFiled    := ri.LnJliens[23].DateFiled;
   self.Liens23_LienTypeID   := ri.LnJliens[23].LienTypeID;
@@ -419,11 +441,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens23_DateLastSeen := ri.LnJliens[23].DateLastSeen;
 		self.Liens23_FilingNumber := ri.LnJliens[23].FilingNumber;
 		self.Liens23_FilingBook   := ri.LnJliens[23].FilingBook;
-		self.Liens23_FilingPage   := ri.LnJliens[23].FilingPage;
+		self.Liens23_FilingPage   := ri.LnJliens[23].FilingPage; 
 		self.Liens23_Agency       := ri.LnJliens[23].Agency; 
 		self.Liens23_AgencyCounty := ri.LnJliens[23].AgencyCounty;
 		self.Liens23_AgencyState	:= ri.LnJliens[23].AgencyState;
 		self.Liens23_ConsumerStatementId	:= SetCSID(ri.LnJliens[23].ConsumerStatementId);
+    self.Liens23_orig_rmsid       := ri.LnJliens[23].orig_rmsid;
 		self.Liens24_Seq          := ri.LnJliens[24].Seq;
 		self.Liens24_DateFiled    := ri.LnJliens[24].DateFiled;
   self.Liens24_LienTypeID   := ri.LnJliens[24].LienTypeID;
@@ -437,7 +460,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens24_Agency       := ri.LnJliens[24].Agency; 
 		self.Liens24_AgencyCounty := ri.LnJliens[24].AgencyCounty;
 		self.Liens24_AgencyState	:= ri.LnJliens[24].AgencyState;
-		self.Liens24_ConsumerStatementId	:= SetCSID(ri.LnJliens[24].ConsumerStatementId);		
+		self.Liens24_ConsumerStatementId	:= SetCSID(ri.LnJliens[24].ConsumerStatementId);
+		self.Liens24_orig_rmsid       := ri.LnJliens[24].orig_rmsid;
 		self.Liens25_Seq          := ri.LnJliens[25].Seq              ;
 		self.Liens25_DateFiled    := ri.LnJliens[25].DateFiled        ;
   self.Liens25_LienTypeID   := ri.LnJliens[25].LienTypeID;
@@ -451,7 +475,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens25_Agency       := ri.LnJliens[25].Agency           ;
 		self.Liens25_AgencyCounty := ri.LnJliens[25].AgencyCounty     ;
 		self.Liens25_AgencyState  := ri.LnJliens[25].AgencyState      ;
-		self.Liens25_ConsumerStatementId	:= SetCSID(ri.LnJliens[25].ConsumerStatementId);	
+		self.Liens25_ConsumerStatementId	:= SetCSID(ri.LnJliens[25].ConsumerStatementId);
+    self.Liens25_orig_rmsid       := ri.LnJliens[25].orig_rmsid;
 		self.Liens26_Seq          := ri.LnJliens[26].Seq              ;
 		self.Liens26_DateFiled    := ri.LnJliens[26].DateFiled        ;
   self.Liens26_LienTypeID   := ri.LnJliens[26].LienTypeID;
@@ -465,7 +490,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens26_Agency       := ri.LnJliens[26].Agency           ;
 		self.Liens26_AgencyCounty := ri.LnJliens[26].AgencyCounty     ;
 		self.Liens26_AgencyState  := ri.LnJliens[26].AgencyState      ;
-		self.Liens26_ConsumerStatementId	:= SetCSID(ri.LnJliens[26].ConsumerStatementId);	
+		self.Liens26_ConsumerStatementId	:= SetCSID(ri.LnJliens[26].ConsumerStatementId);
+    self.Liens26_orig_rmsid       := ri.LnJliens[26].orig_rmsid;
 		self.Liens27_Seq          := ri.LnJliens[27].Seq              ;
 		self.Liens27_DateFiled    := ri.LnJliens[27].DateFiled        ;
   self.Liens27_LienTypeID   := ri.LnJliens[27].LienTypeID;
@@ -479,7 +505,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens27_Agency       := ri.LnJliens[27].Agency           ;
 		self.Liens27_AgencyCounty := ri.LnJliens[27].AgencyCounty     ;
 		self.Liens27_AgencyState  := ri.LnJliens[27].AgencyState      ;
-		self.Liens27_ConsumerStatementId	:= SetCSID(ri.LnJliens[27].ConsumerStatementId);	
+		self.Liens27_ConsumerStatementId	:= SetCSID(ri.LnJliens[27].ConsumerStatementId);
+    self.Liens27_orig_rmsid       := ri.LnJliens[27].orig_rmsid;
 		self.Liens28_Seq          := ri.LnJliens[28].Seq              ;
 		self.Liens28_DateFiled    := ri.LnJliens[28].DateFiled        ;
   self.Liens28_LienTypeID   := ri.LnJliens[28].LienTypeID;
@@ -493,7 +520,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens28_Agency       := ri.LnJliens[28].Agency           ;
 		self.Liens28_AgencyCounty := ri.LnJliens[28].AgencyCounty     ;
 		self.Liens28_AgencyState  := ri.LnJliens[28].AgencyState      ;
-		self.Liens28_ConsumerStatementId	:= SetCSID(ri.LnJliens[28].ConsumerStatementId);	
+		self.Liens28_ConsumerStatementId	:= SetCSID(ri.LnJliens[28].ConsumerStatementId);
+    self.Liens28_orig_rmsid       := ri.LnJliens[28].orig_rmsid;
 		self.Liens29_Seq          := ri.LnJliens[29].Seq              ;
 		self.Liens29_DateFiled    := ri.LnJliens[29].DateFiled        ;
   self.Liens29_LienTypeID   := ri.LnJliens[29].LienTypeID;
@@ -508,6 +536,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens29_AgencyCounty := ri.LnJliens[29].AgencyCounty     ;
 		self.Liens29_AgencyState  := ri.LnJliens[29].AgencyState      ;
 		self.Liens29_ConsumerStatementId	:= SetCSID(ri.LnJliens[29].ConsumerStatementId);
+    self.Liens29_orig_rmsid       := ri.LnJliens[29].orig_rmsid;
 		self.Liens30_Seq          := ri.LnJliens[30].Seq             ;
 		self.Liens30_DateFiled    := ri.LnJliens[30].DateFiled       ;
   self.Liens30_LienTypeID   := ri.LnJliens[30].LienTypeID;
@@ -522,6 +551,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens30_AgencyCounty := ri.LnJliens[30].AgencyCounty    ;
 		self.Liens30_AgencyState  := ri.LnJliens[30].AgencyState     ;
 		self.Liens30_ConsumerStatementId	:= SetCSID(ri.LnJliens[30].ConsumerStatementId);
+    self.Liens30_orig_rmsid       := ri.LnJliens[30].orig_rmsid;
 				self.Liens31_Seq          := ri.LnJliens[31].Seq;
 		self.Liens31_DateFiled    := ri.LnJliens[31].DateFiled;
   self.Liens31_LienTypeID   := ri.LnJliens[31].LienTypeID;
@@ -536,6 +566,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens31_AgencyCounty := ri.LnJliens[31].AgencyCounty;
 		self.Liens31_AgencyState	:= ri.LnJliens[31].AgencyState;
 		self.Liens31_ConsumerStatementId	:= SetCSID(ri.LnJliens[31].ConsumerStatementId);
+    self.Liens31_orig_rmsid       := ri.LnJliens[31].orig_rmsid;
 		self.Liens32_Seq          := ri.LnJliens[32].Seq;
 		self.Liens32_DateFiled    := ri.LnJliens[32].DateFiled;
   self.Liens32_LienTypeID   := ri.LnJliens[32].LienTypeID;
@@ -550,6 +581,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens32_AgencyCounty := ri.LnJliens[32].AgencyCounty;
 		self.Liens32_AgencyState	:= ri.LnJliens[32].AgencyState;
 		self.Liens32_ConsumerStatementId	:= SetCSID(ri.LnJliens[32].ConsumerStatementId);
+    self.Liens32_orig_rmsid       := ri.LnJliens[32].orig_rmsid;
 		self.Liens33_Seq          := ri.LnJliens[33].Seq;
 		self.Liens33_DateFiled    := ri.LnJliens[33].DateFiled;
   self.Liens33_LienTypeID   := ri.LnJliens[33].LienTypeID;
@@ -559,11 +591,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens33_DateLastSeen := ri.LnJliens[33].DateLastSeen;
 		self.Liens33_FilingNumber := ri.LnJliens[33].FilingNumber;
 		self.Liens33_FilingBook   := ri.LnJliens[33].FilingBook;
-		self.Liens33_FilingPage   := ri.LnJliens[33].FilingPage;
+		self.Liens33_FilingPage   := ri.LnJliens[33].FilingPage; 
 		self.Liens33_Agency       := ri.LnJliens[33].Agency; 
 		self.Liens33_AgencyCounty := ri.LnJliens[33].AgencyCounty;
 		self.Liens33_AgencyState	:= ri.LnJliens[33].AgencyState;
 		self.Liens33_ConsumerStatementId	:= SetCSID(ri.LnJliens[33].ConsumerStatementId);
+    self.Liens33_orig_rmsid       := ri.LnJliens[33].orig_rmsid;
 		self.Liens34_Seq          := ri.LnJliens[34].Seq;
 		self.Liens34_DateFiled    := ri.LnJliens[34].DateFiled;
   self.Liens34_LienTypeID   := ri.LnJliens[34].LienTypeID;
@@ -573,11 +606,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens34_DateLastSeen := ri.LnJliens[34].DateLastSeen;
 		self.Liens34_FilingNumber := ri.LnJliens[34].FilingNumber;
 		self.Liens34_FilingBook   := ri.LnJliens[34].FilingBook;
-		self.Liens34_FilingPage   := ri.LnJliens[34].FilingPage;
+		self.Liens34_FilingPage   := ri.LnJliens[34].FilingPage; 
 		self.Liens34_Agency       := ri.LnJliens[34].Agency; 
 		self.Liens34_AgencyCounty := ri.LnJliens[34].AgencyCounty;
 		self.Liens34_AgencyState	:= ri.LnJliens[34].AgencyState;
-		self.Liens34_ConsumerStatementId	:= SetCSID(ri.LnJliens[34].ConsumerStatementId);		
+		self.Liens34_ConsumerStatementId	:= SetCSID(ri.LnJliens[34].ConsumerStatementId);
+		self.Liens34_orig_rmsid       := ri.LnJliens[34].orig_rmsid;
 		self.Liens35_Seq          := ri.LnJliens[35].Seq              ;
 		self.Liens35_DateFiled    := ri.LnJliens[35].DateFiled        ;
   self.Liens35_LienTypeID   := ri.LnJliens[35].LienTypeID;
@@ -591,7 +625,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens35_Agency       := ri.LnJliens[35].Agency           ;
 		self.Liens35_AgencyCounty := ri.LnJliens[35].AgencyCounty     ;
 		self.Liens35_AgencyState  := ri.LnJliens[35].AgencyState      ;
-		self.Liens35_ConsumerStatementId	:= SetCSID(ri.LnJliens[35].ConsumerStatementId);	
+		self.Liens35_ConsumerStatementId	:= SetCSID(ri.LnJliens[35].ConsumerStatementId);
+    self.Liens35_orig_rmsid       := ri.LnJliens[35].orig_rmsid;
 		self.Liens36_Seq          := ri.LnJliens[36].Seq              ;
 		self.Liens36_DateFiled    := ri.LnJliens[36].DateFiled        ;
   self.Liens36_LienTypeID   := ri.LnJliens[36].LienTypeID;
@@ -605,7 +640,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens36_Agency       := ri.LnJliens[36].Agency           ;
 		self.Liens36_AgencyCounty := ri.LnJliens[36].AgencyCounty     ;
 		self.Liens36_AgencyState  := ri.LnJliens[36].AgencyState      ;
-		self.Liens36_ConsumerStatementId	:= SetCSID(ri.LnJliens[36].ConsumerStatementId);	
+		self.Liens36_ConsumerStatementId	:= SetCSID(ri.LnJliens[36].ConsumerStatementId);
+    self.Liens36_orig_rmsid       := ri.LnJliens[36].orig_rmsid;
 		self.Liens37_Seq          := ri.LnJliens[37].Seq              ;
 		self.Liens37_DateFiled    := ri.LnJliens[37].DateFiled        ;
   self.Liens37_LienTypeID   := ri.LnJliens[37].LienTypeID;
@@ -619,7 +655,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens37_Agency       := ri.LnJliens[37].Agency           ;
 		self.Liens37_AgencyCounty := ri.LnJliens[37].AgencyCounty     ;
 		self.Liens37_AgencyState  := ri.LnJliens[37].AgencyState      ;
-		self.Liens37_ConsumerStatementId	:= SetCSID(ri.LnJliens[37].ConsumerStatementId);	
+		self.Liens37_ConsumerStatementId	:= SetCSID(ri.LnJliens[37].ConsumerStatementId);
+    self.Liens37_orig_rmsid       := ri.LnJliens[37].orig_rmsid;
 		self.Liens38_Seq          := ri.LnJliens[38].Seq              ;
 		self.Liens38_DateFiled    := ri.LnJliens[38].DateFiled        ;
   self.Liens38_LienTypeID   := ri.LnJliens[38].LienTypeID;
@@ -633,7 +670,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens38_Agency       := ri.LnJliens[38].Agency           ;
 		self.Liens38_AgencyCounty := ri.LnJliens[38].AgencyCounty     ;
 		self.Liens38_AgencyState  := ri.LnJliens[38].AgencyState      ;
-		self.Liens38_ConsumerStatementId	:= SetCSID(ri.LnJliens[38].ConsumerStatementId);	
+		self.Liens38_ConsumerStatementId	:= SetCSID(ri.LnJliens[38].ConsumerStatementId);
+    self.Liens38_orig_rmsid       := ri.LnJliens[38].orig_rmsid;
 		self.Liens39_Seq          := ri.LnJliens[39].Seq              ;
 		self.Liens39_DateFiled    := ri.LnJliens[39].DateFiled        ;
   self.Liens39_LienTypeID   := ri.LnJliens[39].LienTypeID;
@@ -648,6 +686,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens39_AgencyCounty := ri.LnJliens[39].AgencyCounty     ;
 		self.Liens39_AgencyState  := ri.LnJliens[39].AgencyState      ;
 		self.Liens39_ConsumerStatementId	:= SetCSID(ri.LnJliens[39].ConsumerStatementId);
+    self.Liens39_orig_rmsid       := ri.LnJliens[39].orig_rmsid;
 		self.Liens40_Seq          := ri.LnJliens[40].Seq             ;
 		self.Liens40_DateFiled    := ri.LnJliens[40].DateFiled       ;
   self.Liens40_LienTypeID   := ri.LnJliens[40].LienTypeID;
@@ -662,6 +701,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens40_AgencyCounty := ri.LnJliens[40].AgencyCounty    ;
 		self.Liens40_AgencyState  := ri.LnJliens[40].AgencyState     ;
 		self.Liens40_ConsumerStatementId	:= SetCSID(ri.LnJliens[40].ConsumerStatementId);
+    self.Liens40_orig_rmsid       := ri.LnJliens[40].orig_rmsid;
 		self.Liens41_Seq          := ri.LnJliens[41].Seq             ;
 		self.Liens41_DateFiled    := ri.LnJliens[41].DateFiled       ;
   self.Liens41_LienTypeID   := ri.LnJliens[41].LienTypeID;
@@ -675,7 +715,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens41_Agency       := ri.LnJliens[41].Agency          ;
 		self.Liens41_AgencyCounty := ri.LnJliens[41].AgencyCounty    ;
 		self.Liens41_AgencyState  := ri.LnJliens[41].AgencyState     ;
-		self.Liens41_ConsumerStatementId	:= SetCSID(ri.LnJliens[41].ConsumerStatementId);			
+		self.Liens41_ConsumerStatementId	:= SetCSID(ri.LnJliens[41].ConsumerStatementId);
+    self.Liens41_orig_rmsid       := ri.LnJliens[41].orig_rmsid;
 		self.Liens42_Seq          := ri.LnJliens[42].Seq             ;
 		self.Liens42_DateFiled    := ri.LnJliens[42].DateFiled       ;
   self.Liens42_LienTypeID   := ri.LnJliens[42].LienTypeID;
@@ -689,7 +730,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens42_Agency       := ri.LnJliens[42].Agency          ;
 		self.Liens42_AgencyCounty := ri.LnJliens[42].AgencyCounty    ;
 		self.Liens42_AgencyState  := ri.LnJliens[42].AgencyState     ;
-		self.Liens42_ConsumerStatementId	:= SetCSID(ri.LnJliens[42].ConsumerStatementId);		
+		self.Liens42_ConsumerStatementId	:= SetCSID(ri.LnJliens[42].ConsumerStatementId);
+		self.Liens42_orig_rmsid       := ri.LnJliens[42].orig_rmsid;
 		self.Liens43_Seq          := ri.LnJliens[43].Seq             ;
 		self.Liens43_DateFiled    := ri.LnJliens[43].DateFiled       ;
   self.Liens43_LienTypeID   := ri.LnJliens[43].LienTypeID;
@@ -703,7 +745,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens43_Agency       := ri.LnJliens[43].Agency          ;
 		self.Liens43_AgencyCounty := ri.LnJliens[43].AgencyCounty    ;
 		self.Liens43_AgencyState  := ri.LnJliens[43].AgencyState     ;
-		self.Liens43_ConsumerStatementId	:= SetCSID(ri.LnJliens[43].ConsumerStatementId);		
+		self.Liens43_ConsumerStatementId	:= SetCSID(ri.LnJliens[43].ConsumerStatementId);
+		self.Liens43_orig_rmsid       := ri.LnJliens[43].orig_rmsid;
 		self.Liens44_Seq          := ri.LnJliens[44].Seq             ;
 		self.Liens44_DateFiled    := ri.LnJliens[44].DateFiled       ;
   self.Liens44_LienTypeID   := ri.LnJliens[44].LienTypeID;
@@ -717,7 +760,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens44_Agency       := ri.LnJliens[44].Agency          ;
 		self.Liens44_AgencyCounty := ri.LnJliens[44].AgencyCounty    ;
 		self.Liens44_AgencyState  := ri.LnJliens[44].AgencyState     ;
-		self.Liens44_ConsumerStatementId	:= SetCSID(ri.LnJliens[44].ConsumerStatementId);		
+		self.Liens44_ConsumerStatementId	:= SetCSID(ri.LnJliens[44].ConsumerStatementId);
+		self.Liens44_orig_rmsid       := ri.LnJliens[44].orig_rmsid;
 		self.Liens45_Seq          := ri.LnJliens[45].Seq             ;
 		self.Liens45_DateFiled    := ri.LnJliens[45].DateFiled       ;
   self.Liens45_LienTypeID   := ri.LnJliens[45].LienTypeID;
@@ -731,7 +775,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens45_Agency       := ri.LnJliens[45].Agency          ;
 		self.Liens45_AgencyCounty := ri.LnJliens[45].AgencyCounty    ;
 		self.Liens45_AgencyState  := ri.LnJliens[45].AgencyState     ;
-		self.Liens45_ConsumerStatementId	:= SetCSID(ri.LnJliens[45].ConsumerStatementId);		
+		self.Liens45_ConsumerStatementId	:= SetCSID(ri.LnJliens[45].ConsumerStatementId);
+		self.Liens45_orig_rmsid       := ri.LnJliens[45].orig_rmsid;
 		self.Liens46_Seq          := ri.LnJliens[46].Seq             ;
 		self.Liens46_DateFiled    := ri.LnJliens[46].DateFiled       ;
   self.Liens46_LienTypeID   := ri.LnJliens[46].LienTypeID;
@@ -745,7 +790,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens46_Agency       := ri.LnJliens[46].Agency          ;
 		self.Liens46_AgencyCounty := ri.LnJliens[46].AgencyCounty    ;
 		self.Liens46_AgencyState  := ri.LnJliens[46].AgencyState     ;
-		self.Liens46_ConsumerStatementId	:= SetCSID(ri.LnJliens[46].ConsumerStatementId);		
+		self.Liens46_ConsumerStatementId	:= SetCSID(ri.LnJliens[46].ConsumerStatementId);
+    self.Liens46_orig_rmsid       := ri.LnJliens[46].orig_rmsid;		
 		self.Liens47_Seq          := ri.LnJliens[47].Seq             ;
 		self.Liens47_DateFiled    := ri.LnJliens[47].DateFiled       ;
   self.Liens47_LienTypeID   := ri.LnJliens[47].LienTypeID;
@@ -759,7 +805,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens47_Agency       := ri.LnJliens[47].Agency          ;
 		self.Liens47_AgencyCounty := ri.LnJliens[47].AgencyCounty    ;
 		self.Liens47_AgencyState  := ri.LnJliens[47].AgencyState     ;
-		self.Liens47_ConsumerStatementId	:= SetCSID(ri.LnJliens[47].ConsumerStatementId);		
+		self.Liens47_ConsumerStatementId	:= SetCSID(ri.LnJliens[47].ConsumerStatementId);
+		self.Liens47_orig_rmsid       := ri.LnJliens[47].orig_rmsid;
 		self.Liens48_Seq          := ri.LnJliens[48].Seq             ;
 		self.Liens48_DateFiled    := ri.LnJliens[48].DateFiled       ;
   self.Liens48_LienTypeID   := ri.LnJliens[48].LienTypeID;
@@ -773,7 +820,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens48_Agency       := ri.LnJliens[48].Agency          ;
 		self.Liens48_AgencyCounty := ri.LnJliens[48].AgencyCounty    ;
 		self.Liens48_AgencyState  := ri.LnJliens[48].AgencyState     ;
-		self.Liens48_ConsumerStatementId	:= SetCSID(ri.LnJliens[48].ConsumerStatementId);		
+		self.Liens48_ConsumerStatementId	:= SetCSID(ri.LnJliens[48].ConsumerStatementId);
+		self.Liens48_orig_rmsid       := ri.LnJliens[48].orig_rmsid;
 		self.Liens49_Seq          := ri.LnJliens[49].Seq             ;
 		self.Liens49_DateFiled    := ri.LnJliens[49].DateFiled       ;
   self.Liens49_LienTypeID   := ri.LnJliens[49].LienTypeID;
@@ -787,7 +835,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens49_Agency       := ri.LnJliens[49].Agency          ;
 		self.Liens49_AgencyCounty := ri.LnJliens[49].AgencyCounty    ;
 		self.Liens49_AgencyState  := ri.LnJliens[49].AgencyState     ;
-		self.Liens49_ConsumerStatementId	:= SetCSID(ri.LnJliens[49].ConsumerStatementId);		
+		self.Liens49_ConsumerStatementId	:= SetCSID(ri.LnJliens[49].ConsumerStatementId);
+		self.Liens49_orig_rmsid       := ri.LnJliens[49].orig_rmsid;
 		self.Liens50_Seq      := ri.LnJliens[50].Seq         ;
 		self.Liens50_DateFiled    := ri.LnJliens[50].DateFiled       ;
   self.Liens50_LienTypeID   := ri.LnJliens[50].LienTypeID;
@@ -801,7 +850,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens50_Agency       := ri.LnJliens[50].Agency          ;
 		self.Liens50_AgencyCounty := ri.LnJliens[50].AgencyCounty    ;
 		self.Liens50_AgencyState  := ri.LnJliens[50].AgencyState     ;	
-		self.Liens50_ConsumerStatementId	:= SetCSID(ri.LnJliens[50].ConsumerStatementId);	
+		self.Liens50_ConsumerStatementId	:= SetCSID(ri.LnJliens[50].ConsumerStatementId);
+    self.Liens50_orig_rmsid       := ri.LnJliens[50].orig_rmsid;
 		self.Liens51_Seq          := ri.LnJliens[51].Seq;
 		self.Liens51_DateFiled    := ri.LnJliens[51].DateFiled;
   self.Liens51_LienTypeID   := ri.LnJliens[51].LienTypeID;
@@ -816,6 +866,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens51_AgencyCounty := ri.LnJliens[51].AgencyCounty;
 		self.Liens51_AgencyState  := ri.LnJliens[51].AgencyState;
 		self.Liens51_ConsumerStatementId	:= SetCSID(ri.LnJliens[51].ConsumerStatementId);
+    self.Liens51_orig_rmsid       := ri.LnJliens[51].orig_rmsid;
 		self.Liens52_Seq          := ri.LnJliens[52].Seq;
 		self.Liens52_DateFiled    := ri.LnJliens[52].DateFiled;
   self.Liens52_LienTypeID   := ri.LnJliens[52].LienTypeID;
@@ -830,6 +881,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens52_AgencyCounty := ri.LnJliens[52].AgencyCounty;
 		self.Liens52_AgencyState  := ri.LnJliens[52].AgencyState;
 		self.Liens52_ConsumerStatementId	:= SetCSID(ri.LnJliens[52].ConsumerStatementId);
+    self.Liens52_orig_rmsid       := ri.LnJliens[52].orig_rmsid;
 		self.Liens53_Seq          := ri.LnJliens[53].Seq;
 		self.Liens53_DateFiled    := ri.LnJliens[53].DateFiled;
   self.Liens53_LienTypeID   := ri.LnJliens[53].LienTypeID;
@@ -844,6 +896,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens53_AgencyCounty := ri.LnJliens[53].AgencyCounty;
 		self.Liens53_AgencyState  := ri.LnJliens[53].AgencyState;
 		self.Liens53_ConsumerStatementId	:= SetCSID(ri.LnJliens[53].ConsumerStatementId);
+    self.Liens53_orig_rmsid       := ri.LnJliens[53].orig_rmsid;
 		self.Liens54_Seq          := ri.LnJliens[54].Seq;
 		self.Liens54_DateFiled    := ri.LnJliens[54].DateFiled;
   self.Liens54_LienTypeID   := ri.LnJliens[54].LienTypeID;
@@ -857,7 +910,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens54_Agency       := ri.LnJliens[54].Agency; 
 		self.Liens54_AgencyCounty := ri.LnJliens[54].AgencyCounty;
 		self.Liens54_AgencyState  := ri.LnJliens[54].AgencyState;
-		self.Liens54_ConsumerStatementId	:= SetCSID(ri.LnJliens[54].ConsumerStatementId);		
+		self.Liens54_ConsumerStatementId	:= SetCSID(ri.LnJliens[54].ConsumerStatementId);
+		self.Liens54_orig_rmsid       := ri.LnJliens[54].orig_rmsid;
 		self.Liens55_Seq          := ri.LnJliens[55].Seq              ;
 		self.Liens55_DateFiled    := ri.LnJliens[55].DateFiled        ;
   self.Liens55_LienTypeID   := ri.LnJliens[55].LienTypeID;
@@ -871,7 +925,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens55_Agency       := ri.LnJliens[55].Agency           ;
 		self.Liens55_AgencyCounty := ri.LnJliens[55].AgencyCounty     ;
 		self.Liens55_AgencyState  := ri.LnJliens[55].AgencyState      ;
-		self.Liens55_ConsumerStatementId	:= SetCSID(ri.LnJliens[55].ConsumerStatementId);	
+		self.Liens55_ConsumerStatementId	:= SetCSID(ri.LnJliens[55].ConsumerStatementId);
+    self.Liens55_orig_rmsid       := ri.LnJliens[55].orig_rmsid;
 		self.Liens56_Seq          := ri.LnJliens[56].Seq              ;
 		self.Liens56_DateFiled    := ri.LnJliens[56].DateFiled        ;
   self.Liens56_LienTypeID   := ri.LnJliens[56].LienTypeID;
@@ -885,7 +940,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens56_Agency       := ri.LnJliens[56].Agency           ;
 		self.Liens56_AgencyCounty := ri.LnJliens[56].AgencyCounty     ;
 		self.Liens56_AgencyState  := ri.LnJliens[56].AgencyState      ;
-		self.Liens56_ConsumerStatementId	:= SetCSID(ri.LnJliens[56].ConsumerStatementId);	
+		self.Liens56_ConsumerStatementId	:= SetCSID(ri.LnJliens[56].ConsumerStatementId);
+    self.Liens56_orig_rmsid       := ri.LnJliens[56].orig_rmsid;
 		self.Liens57_Seq          := ri.LnJliens[57].Seq              ;
 		self.Liens57_DateFiled    := ri.LnJliens[57].DateFiled        ;
   self.Liens57_LienTypeID   := ri.LnJliens[57].LienTypeID;
@@ -899,7 +955,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens57_Agency       := ri.LnJliens[57].Agency           ;
 		self.Liens57_AgencyCounty := ri.LnJliens[57].AgencyCounty     ;
 		self.Liens57_AgencyState  := ri.LnJliens[57].AgencyState      ;
-		self.Liens57_ConsumerStatementId	:= SetCSID(ri.LnJliens[57].ConsumerStatementId);	
+		self.Liens57_ConsumerStatementId	:= SetCSID(ri.LnJliens[57].ConsumerStatementId);
+    self.Liens57_orig_rmsid       := ri.LnJliens[57].orig_rmsid;
 		self.Liens58_Seq          := ri.LnJliens[58].Seq              ;
 		self.Liens58_DateFiled    := ri.LnJliens[58].DateFiled        ;
   self.Liens58_LienTypeID   := ri.LnJliens[58].LienTypeID;
@@ -913,7 +970,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens58_Agency       := ri.LnJliens[58].Agency           ;
 		self.Liens58_AgencyCounty := ri.LnJliens[58].AgencyCounty     ;
 		self.Liens58_AgencyState  := ri.LnJliens[58].AgencyState      ;
-		self.Liens58_ConsumerStatementId	:= SetCSID(ri.LnJliens[58].ConsumerStatementId);	
+		self.Liens58_ConsumerStatementId	:= SetCSID(ri.LnJliens[58].ConsumerStatementId);
+    self.Liens58_orig_rmsid       := ri.LnJliens[58].orig_rmsid;
 		self.Liens59_Seq          := ri.LnJliens[59].Seq              ;
 		self.Liens59_DateFiled    := ri.LnJliens[59].DateFiled        ;
   self.Liens59_LienTypeID   := ri.LnJliens[59].LienTypeID;
@@ -928,6 +986,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens59_AgencyCounty := ri.LnJliens[59].AgencyCounty     ;
 		self.Liens59_AgencyState  := ri.LnJliens[59].AgencyState      ;
 		self.Liens59_ConsumerStatementId	:= SetCSID(ri.LnJliens[59].ConsumerStatementId);
+    self.Liens59_orig_rmsid       := ri.LnJliens[59].orig_rmsid;
 		self.Liens60_Seq          := ri.LnJliens[60].Seq             ;
 		self.Liens60_DateFiled    := ri.LnJliens[60].DateFiled       ;
   self.Liens60_LienTypeID   := ri.LnJliens[60].LienTypeID;
@@ -942,6 +1001,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens60_AgencyCounty := ri.LnJliens[60].AgencyCounty    ;
 		self.Liens60_AgencyState  := ri.LnJliens[60].AgencyState     ;
 		self.Liens60_ConsumerStatementId	:= SetCSID(ri.LnJliens[60].ConsumerStatementId);
+    self.Liens60_orig_rmsid       := ri.LnJliens[60].orig_rmsid;
 			self.Liens61_Seq          := ri.LnJliens[61].Seq;
 		self.Liens61_DateFiled    := ri.LnJliens[61].DateFiled;
   self.Liens61_LienTypeID   := ri.LnJliens[61].LienTypeID;
@@ -956,6 +1016,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens61_AgencyCounty := ri.LnJliens[61].AgencyCounty;
 		self.Liens61_AgencyState  := ri.LnJliens[61].AgencyState;
 		self.Liens61_ConsumerStatementId	:= SetCSID(ri.LnJliens[61].ConsumerStatementId);
+    self.Liens61_orig_rmsid       := ri.LnJliens[61].orig_rmsid;
 		self.Liens62_Seq          := ri.LnJliens[62].Seq;
 		self.Liens62_DateFiled    := ri.LnJliens[62].DateFiled;
   self.Liens62_LienTypeID   := ri.LnJliens[62].LienTypeID;
@@ -970,6 +1031,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens62_AgencyCounty := ri.LnJliens[62].AgencyCounty;
 		self.Liens62_AgencyState  := ri.LnJliens[62].AgencyState;
 		self.Liens62_ConsumerStatementId	:= SetCSID(ri.LnJliens[62].ConsumerStatementId);
+    self.Liens62_orig_rmsid       := ri.LnJliens[62].orig_rmsid;
 		self.Liens63_Seq          := ri.LnJliens[63].Seq;
 		self.Liens63_DateFiled    := ri.LnJliens[63].DateFiled;
   self.Liens63_LienTypeID   := ri.LnJliens[63].LienTypeID;
@@ -984,6 +1046,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens63_AgencyCounty := ri.LnJliens[63].AgencyCounty;
 		self.Liens63_AgencyState  := ri.LnJliens[63].AgencyState;
 		self.Liens63_ConsumerStatementId	:= SetCSID(ri.LnJliens[63].ConsumerStatementId);
+    self.Liens63_orig_rmsid       := ri.LnJliens[63].orig_rmsid;
 		self.Liens64_Seq          := ri.LnJliens[64].Seq;
 		self.Liens64_DateFiled    := ri.LnJliens[64].DateFiled;
   self.Liens64_LienTypeID   := ri.LnJliens[64].LienTypeID;
@@ -997,7 +1060,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens64_Agency       := ri.LnJliens[64].Agency; 
 		self.Liens64_AgencyCounty := ri.LnJliens[64].AgencyCounty;
 		self.Liens64_AgencyState  := ri.LnJliens[64].AgencyState;
-		self.Liens64_ConsumerStatementId	:= SetCSID(ri.LnJliens[64].ConsumerStatementId);		
+		self.Liens64_ConsumerStatementId	:= SetCSID(ri.LnJliens[64].ConsumerStatementId);
+		self.Liens64_orig_rmsid       := ri.LnJliens[64].orig_rmsid;
 		self.Liens65_Seq          := ri.LnJliens[65].Seq              ;
 		self.Liens65_DateFiled    := ri.LnJliens[65].DateFiled        ;
   self.Liens65_LienTypeID   := ri.LnJliens[65].LienTypeID;
@@ -1011,7 +1075,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens65_Agency       := ri.LnJliens[65].Agency           ;
 		self.Liens65_AgencyCounty := ri.LnJliens[65].AgencyCounty     ;
 		self.Liens65_AgencyState  := ri.LnJliens[65].AgencyState      ;
-		self.Liens65_ConsumerStatementId	:= SetCSID(ri.LnJliens[65].ConsumerStatementId);	
+		self.Liens65_ConsumerStatementId	:= SetCSID(ri.LnJliens[65].ConsumerStatementId);
+    self.Liens65_orig_rmsid       := ri.LnJliens[65].orig_rmsid;
 		self.Liens66_Seq          := ri.LnJliens[66].Seq              ;
 		self.Liens66_DateFiled    := ri.LnJliens[66].DateFiled        ;
   self.Liens66_LienTypeID   := ri.LnJliens[66].LienTypeID;
@@ -1025,7 +1090,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens66_Agency       := ri.LnJliens[66].Agency           ;
 		self.Liens66_AgencyCounty := ri.LnJliens[66].AgencyCounty     ;
 		self.Liens66_AgencyState  := ri.LnJliens[66].AgencyState      ;
-		self.Liens66_ConsumerStatementId	:= SetCSID(ri.LnJliens[66].ConsumerStatementId);	
+		self.Liens66_ConsumerStatementId	:= SetCSID(ri.LnJliens[66].ConsumerStatementId);
+    self.Liens66_orig_rmsid       := ri.LnJliens[66].orig_rmsid;
 		self.Liens67_Seq          := ri.LnJliens[67].Seq              ;
 		self.Liens67_DateFiled    := ri.LnJliens[67].DateFiled        ;
   self.Liens67_LienTypeID   := ri.LnJliens[67].LienTypeID;
@@ -1039,7 +1105,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens67_Agency       := ri.LnJliens[67].Agency           ;
 		self.Liens67_AgencyCounty := ri.LnJliens[67].AgencyCounty     ;
 		self.Liens67_AgencyState  := ri.LnJliens[67].AgencyState      ;
-		self.Liens67_ConsumerStatementId	:= SetCSID(ri.LnJliens[67].ConsumerStatementId);	
+		self.Liens67_ConsumerStatementId	:= SetCSID(ri.LnJliens[67].ConsumerStatementId);
+    self.Liens67_orig_rmsid       := ri.LnJliens[67].orig_rmsid;
 		self.Liens68_Seq          := ri.LnJliens[68].Seq              ;
 		self.Liens68_DateFiled    := ri.LnJliens[68].DateFiled        ;
   self.Liens68_LienTypeID   := ri.LnJliens[68].LienTypeID;
@@ -1053,7 +1120,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens68_Agency       := ri.LnJliens[68].Agency           ;
 		self.Liens68_AgencyCounty := ri.LnJliens[68].AgencyCounty     ;
 		self.Liens68_AgencyState  := ri.LnJliens[68].AgencyState      ;
-		self.Liens68_ConsumerStatementId	:= SetCSID(ri.LnJliens[68].ConsumerStatementId);	
+		self.Liens68_ConsumerStatementId	:= SetCSID(ri.LnJliens[68].ConsumerStatementId);
+    self.Liens68_orig_rmsid       := ri.LnJliens[68].orig_rmsid;
 		self.Liens69_Seq          := ri.LnJliens[69].Seq              ;
 		self.Liens69_DateFiled    := ri.LnJliens[69].DateFiled        ;
   self.Liens69_LienTypeID   := ri.LnJliens[69].LienTypeID;
@@ -1068,6 +1136,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens69_AgencyCounty := ri.LnJliens[69].AgencyCounty     ;
 		self.Liens69_AgencyState  := ri.LnJliens[69].AgencyState      ;
 		self.Liens69_ConsumerStatementId	:= SetCSID(ri.LnJliens[69].ConsumerStatementId);
+    self.Liens69_orig_rmsid       := ri.LnJliens[69].orig_rmsid;
 		self.Liens70_Seq          := ri.LnJliens[70].Seq             ;
 		self.Liens70_DateFiled    := ri.LnJliens[70].DateFiled       ;
   self.Liens70_LienTypeID   := ri.LnJliens[70].LienTypeID;
@@ -1082,6 +1151,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens70_AgencyCounty := ri.LnJliens[70].AgencyCounty    ;
 		self.Liens70_AgencyState  := ri.LnJliens[70].AgencyState     ;
 		self.Liens70_ConsumerStatementId	:= SetCSID(ri.LnJliens[70].ConsumerStatementId);
+    self.Liens70_orig_rmsid       := ri.LnJliens[70].orig_rmsid;
 				self.Liens71_Seq          := ri.LnJliens[71].Seq;
 		self.Liens71_DateFiled    := ri.LnJliens[71].DateFiled;
   self.Liens71_LienTypeID   := ri.LnJliens[71].LienTypeID;
@@ -1096,6 +1166,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens71_AgencyCounty := ri.LnJliens[71].AgencyCounty;
 		self.Liens71_AgencyState  := ri.LnJliens[71].AgencyState;
 		self.Liens71_ConsumerStatementId	:= SetCSID(ri.LnJliens[71].ConsumerStatementId);
+    self.Liens71_orig_rmsid       := ri.LnJliens[71].orig_rmsid;
 		self.Liens72_Seq          := ri.LnJliens[72].Seq;
 		self.Liens72_DateFiled    := ri.LnJliens[72].DateFiled;
   self.Liens72_LienTypeID   := ri.LnJliens[72].LienTypeID;
@@ -1105,11 +1176,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens72_DateLastSeen := ri.LnJliens[72].DateLastSeen;
 		self.Liens72_FilingNumber := ri.LnJliens[72].FilingNumber;
 		self.Liens72_FilingBook   := ri.LnJliens[72].FilingBook;
-		self.Liens72_FilingPage   := ri.LnJliens[72].FilingPage;
+		self.Liens72_FilingPage   := ri.LnJliens[72].FilingPage; 
 		self.Liens72_Agency       := ri.LnJliens[72].Agency; 
 		self.Liens72_AgencyCounty := ri.LnJliens[72].AgencyCounty;
 		self.Liens72_AgencyState  := ri.LnJliens[72].AgencyState;
 		self.Liens72_ConsumerStatementId	:= SetCSID(ri.LnJliens[72].ConsumerStatementId);
+    self.Liens72_orig_rmsid       := ri.LnJliens[72].orig_rmsid;
 		self.Liens73_Seq          := ri.LnJliens[73].Seq;
 		self.Liens73_DateFiled    := ri.LnJliens[73].DateFiled;
   self.Liens73_LienTypeID   := ri.LnJliens[73].LienTypeID;
@@ -1124,6 +1196,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens73_AgencyCounty := ri.LnJliens[73].AgencyCounty;
 		self.Liens73_AgencyState  := ri.LnJliens[73].AgencyState;
 		self.Liens73_ConsumerStatementId	:= SetCSID(ri.LnJliens[73].ConsumerStatementId);
+    self.Liens73_orig_rmsid       := ri.LnJliens[73].orig_rmsid;
 		self.Liens74_Seq          := ri.LnJliens[74].Seq;
 		self.Liens74_DateFiled    := ri.LnJliens[74].DateFiled;
   self.Liens74_LienTypeID   := ri.LnJliens[74].LienTypeID;
@@ -1137,7 +1210,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens74_Agency       := ri.LnJliens[74].Agency; 
 		self.Liens74_AgencyCounty := ri.LnJliens[74].AgencyCounty;
 		self.Liens74_AgencyState  := ri.LnJliens[74].AgencyState;
-		self.Liens74_ConsumerStatementId	:= SetCSID(ri.LnJliens[74].ConsumerStatementId);		
+		self.Liens74_ConsumerStatementId	:= SetCSID(ri.LnJliens[74].ConsumerStatementId);
+		self.Liens74_orig_rmsid       := ri.LnJliens[74].orig_rmsid;
 		self.Liens75_Seq          := ri.LnJliens[75].Seq              ;
 		self.Liens75_DateFiled    := ri.LnJliens[75].DateFiled        ;
   self.Liens75_LienTypeID   := ri.LnJliens[75].LienTypeID;
@@ -1151,7 +1225,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens75_Agency       := ri.LnJliens[75].Agency           ;
 		self.Liens75_AgencyCounty := ri.LnJliens[75].AgencyCounty     ;
 		self.Liens75_AgencyState  := ri.LnJliens[75].AgencyState      ;
-		self.Liens75_ConsumerStatementId	:= SetCSID(ri.LnJliens[75].ConsumerStatementId);	
+		self.Liens75_ConsumerStatementId	:= SetCSID(ri.LnJliens[75].ConsumerStatementId);
+    self.Liens75_orig_rmsid       := ri.LnJliens[75].orig_rmsid;
 		self.Liens76_Seq          := ri.LnJliens[76].Seq              ;
 		self.Liens76_DateFiled    := ri.LnJliens[76].DateFiled        ;
   self.Liens76_LienTypeID   := ri.LnJliens[76].LienTypeID;
@@ -1165,7 +1240,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens76_Agency       := ri.LnJliens[76].Agency           ;
 		self.Liens76_AgencyCounty := ri.LnJliens[76].AgencyCounty     ;
 		self.Liens76_AgencyState  := ri.LnJliens[76].AgencyState      ;
-		self.Liens76_ConsumerStatementId	:= SetCSID(ri.LnJliens[76].ConsumerStatementId);	
+		self.Liens76_ConsumerStatementId	:= SetCSID(ri.LnJliens[76].ConsumerStatementId);
+    self.Liens76_orig_rmsid       := ri.LnJliens[76].orig_rmsid;
 		self.Liens77_Seq          := ri.LnJliens[77].Seq              ;
 		self.Liens77_DateFiled    := ri.LnJliens[77].DateFiled        ;
   self.Liens77_LienTypeID   := ri.LnJliens[77].LienTypeID;
@@ -1179,7 +1255,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens77_Agency       := ri.LnJliens[77].Agency           ;
 		self.Liens77_AgencyCounty := ri.LnJliens[77].AgencyCounty     ;
 		self.Liens77_AgencyState  := ri.LnJliens[77].AgencyState      ;
-		self.Liens77_ConsumerStatementId	:= SetCSID(ri.LnJliens[77].ConsumerStatementId);	
+		self.Liens77_ConsumerStatementId	:= SetCSID(ri.LnJliens[77].ConsumerStatementId);
+    self.Liens77_orig_rmsid       := ri.LnJliens[77].orig_rmsid;
 		self.Liens78_Seq          := ri.LnJliens[78].Seq              ;
 		self.Liens78_DateFiled    := ri.LnJliens[78].DateFiled        ;
   self.Liens78_LienTypeID   := ri.LnJliens[78].LienTypeID;
@@ -1193,7 +1270,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens78_Agency       := ri.LnJliens[78].Agency           ;
 		self.Liens78_AgencyCounty := ri.LnJliens[78].AgencyCounty     ;
 		self.Liens78_AgencyState  := ri.LnJliens[78].AgencyState      ;
-		self.Liens78_ConsumerStatementId	:= SetCSID(ri.LnJliens[78].ConsumerStatementId);	
+		self.Liens78_ConsumerStatementId	:= SetCSID(ri.LnJliens[78].ConsumerStatementId);
+    self.Liens78_orig_rmsid       := ri.LnJliens[78].orig_rmsid;
 		self.Liens79_Seq          := ri.LnJliens[79].Seq              ;
 		self.Liens79_DateFiled    := ri.LnJliens[79].DateFiled        ;
   self.Liens79_LienTypeID   := ri.LnJliens[79].LienTypeID;
@@ -1208,6 +1286,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens79_AgencyCounty := ri.LnJliens[79].AgencyCounty     ;
 		self.Liens79_AgencyState  := ri.LnJliens[79].AgencyState      ;
 		self.Liens79_ConsumerStatementId	:= SetCSID(ri.LnJliens[79].ConsumerStatementId);
+    self.Liens79_orig_rmsid       := ri.LnJliens[79].orig_rmsid;
 		self.Liens80_Seq          := ri.LnJliens[80].Seq             ;
 		self.Liens80_DateFiled    := ri.LnJliens[80].DateFiled       ;
   self.Liens80_LienTypeID   := ri.LnJliens[80].LienTypeID;
@@ -1222,6 +1301,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens80_AgencyCounty := ri.LnJliens[80].AgencyCounty    ;
 		self.Liens80_AgencyState  := ri.LnJliens[80].AgencyState     ;
 		self.Liens80_ConsumerStatementId	:= SetCSID(ri.LnJliens[80].ConsumerStatementId);
+    self.Liens80_orig_rmsid       := ri.LnJliens[80].orig_rmsid;
 				self.Liens81_Seq          := ri.LnJliens[81].Seq;
 		self.Liens81_DateFiled    := ri.LnJliens[81].DateFiled;
   self.Liens81_LienTypeID   := ri.LnJliens[81].LienTypeID;
@@ -1236,6 +1316,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens81_AgencyCounty := ri.LnJliens[81].AgencyCounty;
 		self.Liens81_AgencyState  := ri.LnJliens[81].AgencyState;
 		self.Liens81_ConsumerStatementId	:= SetCSID(ri.LnJliens[81].ConsumerStatementId);
+    self.Liens81_orig_rmsid       := ri.LnJliens[81].orig_rmsid;
 		self.Liens82_Seq          := ri.LnJliens[82].Seq;
 		self.Liens82_DateFiled    := ri.LnJliens[82].DateFiled;
   self.Liens82_LienTypeID   := ri.LnJliens[82].LienTypeID;
@@ -1250,6 +1331,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens82_AgencyCounty := ri.LnJliens[82].AgencyCounty;
 		self.Liens82_AgencyState  := ri.LnJliens[82].AgencyState;
 		self.Liens82_ConsumerStatementId	:= SetCSID(ri.LnJliens[82].ConsumerStatementId);
+    self.Liens82_orig_rmsid       := ri.LnJliens[82].orig_rmsid;
 		self.Liens83_Seq          := ri.LnJliens[83].Seq;
 		self.Liens83_DateFiled    := ri.LnJliens[83].DateFiled;
   self.Liens83_LienTypeID   := ri.LnJliens[83].LienTypeID;
@@ -1264,6 +1346,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens83_AgencyCounty := ri.LnJliens[83].AgencyCounty;
 		self.Liens83_AgencyState  := ri.LnJliens[83].AgencyState;
 		self.Liens83_ConsumerStatementId	:= SetCSID(ri.LnJliens[83].ConsumerStatementId);
+    self.Liens83_orig_rmsid       := ri.LnJliens[83].orig_rmsid;
 		self.Liens84_Seq          := ri.LnJliens[84].Seq;
 		self.Liens84_DateFiled    := ri.LnJliens[84].DateFiled;
   self.Liens84_LienTypeID   := ri.LnJliens[84].LienTypeID;
@@ -1273,11 +1356,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens84_DateLastSeen := ri.LnJliens[84].DateLastSeen;
 		self.Liens84_FilingNumber := ri.LnJliens[84].FilingNumber;
 		self.Liens84_FilingBook   := ri.LnJliens[84].FilingBook;
-		self.Liens84_FilingPage   := ri.LnJliens[84].FilingPage;
+		self.Liens84_FilingPage   := ri.LnJliens[84].FilingPage; 
 		self.Liens84_Agency       := ri.LnJliens[84].Agency; 
 		self.Liens84_AgencyCounty := ri.LnJliens[84].AgencyCounty;
 		self.Liens84_AgencyState  := ri.LnJliens[84].AgencyState;
-		self.Liens84_ConsumerStatementId	:= SetCSID(ri.LnJliens[84].ConsumerStatementId);		
+		self.Liens84_ConsumerStatementId	:= SetCSID(ri.LnJliens[84].ConsumerStatementId);
+		self.Liens84_orig_rmsid       := ri.LnJliens[84].orig_rmsid;
 		self.Liens85_Seq          := ri.LnJliens[85].Seq              ;
 		self.Liens85_DateFiled    := ri.LnJliens[85].DateFiled        ;
   self.Liens85_LienTypeID   := ri.LnJliens[85].LienTypeID;
@@ -1291,7 +1375,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens85_Agency       := ri.LnJliens[85].Agency           ;
 		self.Liens85_AgencyCounty := ri.LnJliens[85].AgencyCounty     ;
 		self.Liens85_AgencyState  := ri.LnJliens[85].AgencyState      ;
-		self.Liens85_ConsumerStatementId	:= SetCSID(ri.LnJliens[85].ConsumerStatementId);	
+		self.Liens85_ConsumerStatementId	:= SetCSID(ri.LnJliens[85].ConsumerStatementId);
+    self.Liens85_orig_rmsid       := ri.LnJliens[85].orig_rmsid;
 		self.Liens86_Seq          := ri.LnJliens[86].Seq              ;
 		self.Liens86_DateFiled    := ri.LnJliens[86].DateFiled        ;
   self.Liens86_LienTypeID   := ri.LnJliens[86].LienTypeID;
@@ -1305,7 +1390,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens86_Agency       := ri.LnJliens[86].Agency           ;
 		self.Liens86_AgencyCounty := ri.LnJliens[86].AgencyCounty     ;
 		self.Liens86_AgencyState  := ri.LnJliens[86].AgencyState      ;
-		self.Liens86_ConsumerStatementId	:= SetCSID(ri.LnJliens[86].ConsumerStatementId);	
+		self.Liens86_ConsumerStatementId	:= SetCSID(ri.LnJliens[86].ConsumerStatementId);
+    self.Liens86_orig_rmsid       := ri.LnJliens[86].orig_rmsid;
 		self.Liens87_Seq          := ri.LnJliens[87].Seq              ;
 		self.Liens87_DateFiled    := ri.LnJliens[87].DateFiled        ;
   self.Liens87_LienTypeID   := ri.LnJliens[87].LienTypeID;
@@ -1319,7 +1405,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens87_Agency       := ri.LnJliens[87].Agency           ;
 		self.Liens87_AgencyCounty := ri.LnJliens[87].AgencyCounty     ;
 		self.Liens87_AgencyState  := ri.LnJliens[87].AgencyState      ;
-		self.Liens87_ConsumerStatementId	:= SetCSID(ri.LnJliens[87].ConsumerStatementId);	
+		self.Liens87_ConsumerStatementId	:= SetCSID(ri.LnJliens[87].ConsumerStatementId);
+    self.Liens87_orig_rmsid       := ri.LnJliens[87].orig_rmsid;
 		self.Liens88_Seq          := ri.LnJliens[88].Seq              ;
 		self.Liens88_DateFiled    := ri.LnJliens[88].DateFiled        ;
   self.Liens88_LienTypeID   := ri.LnJliens[88].LienTypeID;
@@ -1333,7 +1420,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens88_Agency       := ri.LnJliens[88].Agency           ;
 		self.Liens88_AgencyCounty := ri.LnJliens[88].AgencyCounty     ;
 		self.Liens88_AgencyState  := ri.LnJliens[88].AgencyState      ;
-		self.Liens88_ConsumerStatementId	:= SetCSID(ri.LnJliens[88].ConsumerStatementId);	
+		self.Liens88_ConsumerStatementId	:= SetCSID(ri.LnJliens[88].ConsumerStatementId);
+    self.Liens88_orig_rmsid       := ri.LnJliens[88].orig_rmsid;
 		self.Liens89_Seq          := ri.LnJliens[89].Seq              ;
 		self.Liens89_DateFiled    := ri.LnJliens[89].DateFiled        ;
   self.Liens89_LienTypeID   := ri.LnJliens[89].LienTypeID;
@@ -1348,6 +1436,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens89_AgencyCounty := ri.LnJliens[89].AgencyCounty     ;
 		self.Liens89_AgencyState  := ri.LnJliens[89].AgencyState      ;
 		self.Liens89_ConsumerStatementId	:= SetCSID(ri.LnJliens[89].ConsumerStatementId);
+    self.Liens89_orig_rmsid       := ri.LnJliens[89].orig_rmsid;
 		self.Liens90_Seq          := ri.LnJliens[90].Seq             ;
 		self.Liens90_DateFiled    := ri.LnJliens[90].DateFiled       ;
   self.Liens90_LienTypeID   := ri.LnJliens[90].LienTypeID;
@@ -1362,6 +1451,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens90_AgencyCounty := ri.LnJliens[90].AgencyCounty    ;
 		self.Liens90_AgencyState  := ri.LnJliens[90].AgencyState     ;
 		self.Liens90_ConsumerStatementId	:= SetCSID(ri.LnJliens[90].ConsumerStatementId);
+    self.Liens90_orig_rmsid       := ri.LnJliens[90].orig_rmsid;
 				self.Liens91_Seq          := ri.LnJliens[91].Seq;
 		self.Liens91_DateFiled    := ri.LnJliens[91].DateFiled;
   self.Liens91_LienTypeID   := ri.LnJliens[91].LienTypeID;
@@ -1376,6 +1466,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens91_AgencyCounty := ri.LnJliens[91].AgencyCounty;
 		self.Liens91_AgencyState  := ri.LnJliens[91].AgencyState;
 		self.Liens91_ConsumerStatementId	:= SetCSID(ri.LnJliens[91].ConsumerStatementId);
+    self.Liens91_orig_rmsid       := ri.LnJliens[91].orig_rmsid;
 		self.Liens92_Seq          := ri.LnJliens[92].Seq;
 		self.Liens92_DateFiled    := ri.LnJliens[92].DateFiled;
   self.Liens92_LienTypeID   := ri.LnJliens[92].LienTypeID;
@@ -1390,6 +1481,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens92_AgencyCounty := ri.LnJliens[92].AgencyCounty;
 		self.Liens92_AgencyState  := ri.LnJliens[92].AgencyState;
 		self.Liens92_ConsumerStatementId	:= SetCSID(ri.LnJliens[92].ConsumerStatementId);
+    self.Liens92_orig_rmsid       := ri.LnJliens[92].orig_rmsid;
 		self.Liens93_Seq          := ri.LnJliens[93].Seq;
 		self.Liens93_DateFiled    := ri.LnJliens[93].DateFiled;
   self.Liens93_LienTypeID   := ri.LnJliens[93].LienTypeID;
@@ -1399,11 +1491,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens93_DateLastSeen := ri.LnJliens[93].DateLastSeen;
 		self.Liens93_FilingNumber := ri.LnJliens[93].FilingNumber;
 		self.Liens93_FilingBook   := ri.LnJliens[93].FilingBook;
-		self.Liens93_FilingPage   := ri.LnJliens[93].FilingPage;
+		self.Liens93_FilingPage   := ri.LnJliens[93].FilingPage; 
 		self.Liens93_Agency       := ri.LnJliens[93].Agency; 
 		self.Liens93_AgencyCounty := ri.LnJliens[93].AgencyCounty;
 		self.Liens93_AgencyState  := ri.LnJliens[93].AgencyState;
 		self.Liens93_ConsumerStatementId	:= SetCSID(ri.LnJliens[93].ConsumerStatementId);
+    self.Liens93_orig_rmsid       := ri.LnJliens[93].orig_rmsid;
 		self.Liens94_Seq          := ri.LnJliens[94].Seq;
 		self.Liens94_DateFiled    := ri.LnJliens[94].DateFiled;
   self.Liens94_LienTypeID   := ri.LnJliens[94].LienTypeID;
@@ -1413,11 +1506,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens94_DateLastSeen := ri.LnJliens[94].DateLastSeen;
 		self.Liens94_FilingNumber := ri.LnJliens[94].FilingNumber;
 		self.Liens94_FilingBook   := ri.LnJliens[94].FilingBook;
-		self.Liens94_FilingPage   := ri.LnJliens[94].FilingPage;
+		self.Liens94_FilingPage   := ri.LnJliens[94].FilingPage; 
 		self.Liens94_Agency       := ri.LnJliens[94].Agency; 
 		self.Liens94_AgencyCounty := ri.LnJliens[94].AgencyCounty;
 		self.Liens94_AgencyState  := ri.LnJliens[94].AgencyState;
-		self.Liens94_ConsumerStatementId	:= SetCSID(ri.LnJliens[94].ConsumerStatementId);		
+		self.Liens94_ConsumerStatementId	:= SetCSID(ri.LnJliens[94].ConsumerStatementId);
+		self.Liens94_orig_rmsid       := ri.LnJliens[94].orig_rmsid;
 		self.Liens95_Seq          := ri.LnJliens[95].Seq              ;
 		self.Liens95_DateFiled    := ri.LnJliens[95].DateFiled        ;
   self.Liens95_LienTypeID   := ri.LnJliens[95].LienTypeID;
@@ -1431,7 +1525,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens95_Agency       := ri.LnJliens[95].Agency           ;
 		self.Liens95_AgencyCounty := ri.LnJliens[95].AgencyCounty     ;
 		self.Liens95_AgencyState  := ri.LnJliens[95].AgencyState      ;
-		self.Liens95_ConsumerStatementId	:= SetCSID(ri.LnJliens[95].ConsumerStatementId);	
+		self.Liens95_ConsumerStatementId	:= SetCSID(ri.LnJliens[95].ConsumerStatementId);
+    self.Liens95_orig_rmsid       := ri.LnJliens[95].orig_rmsid;
 		self.Liens96_Seq          := ri.LnJliens[96].Seq              ;
 		self.Liens96_DateFiled    := ri.LnJliens[96].DateFiled        ;
   self.Liens96_LienTypeID   := ri.LnJliens[96].LienTypeID;
@@ -1445,7 +1540,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens96_Agency       := ri.LnJliens[96].Agency           ;
 		self.Liens96_AgencyCounty := ri.LnJliens[96].AgencyCounty     ;
 		self.Liens96_AgencyState  := ri.LnJliens[96].AgencyState      ;
-		self.Liens96_ConsumerStatementId	:= SetCSID(ri.LnJliens[96].ConsumerStatementId);	
+		self.Liens96_ConsumerStatementId	:= SetCSID(ri.LnJliens[96].ConsumerStatementId);
+    self.Liens96_orig_rmsid       := ri.LnJliens[96].orig_rmsid;
 		self.Liens97_Seq          := ri.LnJliens[97].Seq              ;
 		self.Liens97_DateFiled    := ri.LnJliens[97].DateFiled        ;
   self.Liens97_LienTypeID   := ri.LnJliens[97].LienTypeID;
@@ -1459,7 +1555,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens97_Agency       := ri.LnJliens[97].Agency           ;
 		self.Liens97_AgencyCounty := ri.LnJliens[97].AgencyCounty     ;
 		self.Liens97_AgencyState  := ri.LnJliens[97].AgencyState      ;
-		self.Liens97_ConsumerStatementId	:= SetCSID(ri.LnJliens[97].ConsumerStatementId);	
+		self.Liens97_ConsumerStatementId	:= SetCSID(ri.LnJliens[97].ConsumerStatementId);
+    self.Liens97_orig_rmsid       := ri.LnJliens[97].orig_rmsid;
 		self.Liens98_Seq          := ri.LnJliens[98].Seq              ;
 		self.Liens98_DateFiled    := ri.LnJliens[98].DateFiled        ;
   self.Liens98_LienTypeID   := ri.LnJliens[98].LienTypeID;
@@ -1473,7 +1570,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens98_Agency       := ri.LnJliens[98].Agency           ;
 		self.Liens98_AgencyCounty := ri.LnJliens[98].AgencyCounty     ;
 		self.Liens98_AgencyState  := ri.LnJliens[98].AgencyState      ;
-		self.Liens98_ConsumerStatementId	:= SetCSID(ri.LnJliens[98].ConsumerStatementId);	
+		self.Liens98_ConsumerStatementId	:= SetCSID(ri.LnJliens[98].ConsumerStatementId);
+    self.Liens98_orig_rmsid       := ri.LnJliens[98].orig_rmsid;
 		self.Liens99_Seq          := ri.LnJliens[99].Seq              ;
 		self.Liens99_DateFiled    := ri.LnJliens[99].DateFiled        ;
   self.Liens99_LienTypeID   := ri.LnJliens[99].LienTypeID;
@@ -1488,6 +1586,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Liens99_AgencyCounty := ri.LnJliens[99].AgencyCounty     ;
 		self.Liens99_AgencyState  := ri.LnJliens[99].AgencyState      ;
 		self.Liens99_ConsumerStatementId	:= SetCSID(ri.LnJliens[99].ConsumerStatementId);
+    self.Liens99_orig_rmsid       := ri.LnJliens[99].orig_rmsid;
 //Jgmts
 		self.Jgmts1_Seq          := ri.LnJJudgments[1].Seq;
 		self.Jgmts1_DateFiled    := ri.LnJJudgments[1].DateFiled;
@@ -1507,6 +1606,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts1_AgencyCounty := ri.LnJJudgments[1].AgencyCounty;
 		self.Jgmts1_AgencyState	:= ri.LnJJudgments[1].AgencyState;
 		self.Jgmts1_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[1].ConsumerStatementId);
+    self.Jgmts1_orig_rmsid       := ri.LnJJudgments[1].orig_rmsid;
 		self.Jgmts2_Seq          := ri.LnJJudgments[2].Seq;
 		self.Jgmts2_DateFiled    := ri.LnJJudgments[2].DateFiled;
   self.Jgmts2_JudgmentTypeID := ri.LnJJudgments[2].JudgmentTypeID;
@@ -1520,11 +1620,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts2_FilingNumber := ri.LnJJudgments[2].FilingNumber;
 		self.Jgmts2_FilingBook   := ri.LnJJudgments[2].FilingBook;
 		self.Jgmts2_FilingPage   := ri.LnJJudgments[2].FilingPage;
-		self.Jgmts2_Eviction     := ri.LnJJudgments[2].Eviction;
+		self.Jgmts2_Eviction     := ri.LnJJudgments[2].Eviction; 
 		self.Jgmts2_Agency       := ri.LnJJudgments[2].Agency; 
 		self.Jgmts2_AgencyCounty := ri.LnJJudgments[2].AgencyCounty;
 		self.Jgmts2_AgencyState	:= ri.LnJJudgments[2].AgencyState;
 		self.Jgmts2_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[2].ConsumerStatementId);
+    self.Jgmts2_orig_rmsid       := ri.LnJJudgments[2].orig_rmsid;
 		self.Jgmts3_Seq          := ri.LnJJudgments[3].Seq;
 		self.Jgmts3_DateFiled    := ri.LnJJudgments[3].DateFiled;
   self.Jgmts3_JudgmentTypeID := ri.LnJJudgments[3].JudgmentTypeID;
@@ -1543,6 +1644,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts3_AgencyCounty := ri.LnJJudgments[3].AgencyCounty;
 		self.Jgmts3_AgencyState	:= ri.LnJJudgments[3].AgencyState;
 		self.Jgmts3_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[3].ConsumerStatementId);
+    self.Jgmts3_orig_rmsid       := ri.LnJJudgments[3].orig_rmsid;
 		self.Jgmts4_Seq          := ri.LnJJudgments[4].Seq;
 		self.Jgmts4_DateFiled    := ri.LnJJudgments[4].DateFiled;
   self.Jgmts4_JudgmentTypeID := ri.LnJJudgments[4].JudgmentTypeID;
@@ -1560,7 +1662,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts4_Agency       := ri.LnJJudgments[4].Agency; 
 		self.Jgmts4_AgencyCounty := ri.LnJJudgments[4].AgencyCounty;
 		self.Jgmts4_AgencyState	:= ri.LnJJudgments[4].AgencyState;
-		self.Jgmts4_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[4].ConsumerStatementId);		
+		self.Jgmts4_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[4].ConsumerStatementId);
+		self.Jgmts4_orig_rmsid       := ri.LnJJudgments[4].orig_rmsid;
 		self.Jgmts5_Seq          := ri.LnJJudgments[5].Seq              ;
 		self.Jgmts5_DateFiled    := ri.LnJJudgments[5].DateFiled        ;
   self.Jgmts5_JudgmentTypeID := ri.LnJJudgments[5].JudgmentTypeID;
@@ -1579,6 +1682,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts5_AgencyCounty := ri.LnJJudgments[5].AgencyCounty     ;
 		self.Jgmts5_AgencyState  := ri.LnJJudgments[5].AgencyState      ;
 		self.Jgmts5_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[5].ConsumerStatementId);
+    self.Jgmts5_orig_rmsid       := ri.LnJJudgments[5].orig_rmsid;
 		self.Jgmts6_Seq          := ri.LnJJudgments[6].Seq              ;
 		self.Jgmts6_DateFiled    := ri.LnJJudgments[6].DateFiled        ;
   self.Jgmts6_JudgmentTypeID := ri.LnJJudgments[6].JudgmentTypeID;
@@ -1597,6 +1701,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts6_AgencyCounty := ri.LnJJudgments[6].AgencyCounty     ;
 		self.Jgmts6_AgencyState  := ri.LnJJudgments[6].AgencyState      ;
 		self.Jgmts6_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[6].ConsumerStatementId);
+    self.Jgmts6_orig_rmsid       := ri.LnJJudgments[6].orig_rmsid;
 		self.Jgmts7_Seq          := ri.LnJJudgments[7].Seq              ;
 		self.Jgmts7_DateFiled    := ri.LnJJudgments[7].DateFiled        ;
   self.Jgmts7_JudgmentTypeID := ri.LnJJudgments[7].JudgmentTypeID;
@@ -1615,6 +1720,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts7_AgencyCounty := ri.LnJJudgments[7].AgencyCounty     ;
 		self.Jgmts7_AgencyState  := ri.LnJJudgments[7].AgencyState      ;
 		self.Jgmts7_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[7].ConsumerStatementId);
+    self.Jgmts7_orig_rmsid       := ri.LnJJudgments[7].orig_rmsid;
 		self.Jgmts8_Seq          := ri.LnJJudgments[8].Seq              ;
 		self.Jgmts8_DateFiled    := ri.LnJJudgments[8].DateFiled        ;
   self.Jgmts8_JudgmentTypeID := ri.LnJJudgments[8].JudgmentTypeID;
@@ -1633,6 +1739,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts8_AgencyCounty := ri.LnJJudgments[8].AgencyCounty     ;
 		self.Jgmts8_AgencyState  := ri.LnJJudgments[8].AgencyState      ;
 		self.Jgmts8_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[8].ConsumerStatementId);
+    self.Jgmts8_orig_rmsid       := ri.LnJJudgments[8].orig_rmsid;
 		self.Jgmts9_Seq          := ri.LnJJudgments[9].Seq              ;
 		self.Jgmts9_DateFiled    := ri.LnJJudgments[9].DateFiled        ;
   self.Jgmts9_JudgmentTypeID := ri.LnJJudgments[9].JudgmentTypeID;
@@ -1651,6 +1758,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts9_AgencyCounty := ri.LnJJudgments[9].AgencyCounty     ;
 		self.Jgmts9_AgencyState  := ri.LnJJudgments[9].AgencyState      ;
 		self.Jgmts9_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[9].ConsumerStatementId);
+    self.Jgmts9_orig_rmsid       := ri.LnJJudgments[9].orig_rmsid;
 		self.Jgmts10_Seq          := ri.LnJJudgments[10].Seq             ;
 		self.Jgmts10_DateFiled    := ri.LnJJudgments[10].DateFiled       ;
   self.Jgmts10_JudgmentTypeID := ri.LnJJudgments[10].JudgmentTypeID;
@@ -1669,6 +1777,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts10_AgencyCounty := ri.LnJJudgments[10].AgencyCounty    ;
 		self.Jgmts10_AgencyState  := ri.LnJJudgments[10].AgencyState     ;
 		self.Jgmts10_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[10].ConsumerStatementId);
+    self.Jgmts10_orig_rmsid       := ri.LnJJudgments[10].orig_rmsid;
 		self.Jgmts11_Seq          := ri.LnJJudgments[11].Seq;
 		self.Jgmts11_DateFiled    := ri.LnJJudgments[11].DateFiled;
   self.Jgmts11_JudgmentTypeID := ri.LnJJudgments[11].JudgmentTypeID;
@@ -1687,6 +1796,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts11_AgencyCounty := ri.LnJJudgments[11].AgencyCounty;
 		self.Jgmts11_AgencyState	 := ri.LnJJudgments[11].AgencyState;
 		self.Jgmts11_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[11].ConsumerStatementId);
+    self.Jgmts11_orig_rmsid       := ri.LnJJudgments[11].orig_rmsid;
 		self.Jgmts12_Seq          := ri.LnJJudgments[12].Seq;
 		self.Jgmts12_DateFiled    := ri.LnJJudgments[12].DateFiled;
   self.Jgmts12_JudgmentTypeID := ri.LnJJudgments[12].JudgmentTypeID;
@@ -1700,11 +1810,12 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts12_FilingNumber := ri.LnJJudgments[12].FilingNumber;
 		self.Jgmts12_FilingBook   := ri.LnJJudgments[12].FilingBook;
 		self.Jgmts12_FilingPage   := ri.LnJJudgments[12].FilingPage;
-		self.Jgmts12_Eviction     := ri.LnJJudgments[12].Eviction;
+		self.Jgmts12_Eviction     := ri.LnJJudgments[12].Eviction; 
 		self.Jgmts12_Agency       := ri.LnJJudgments[12].Agency; 
 		self.Jgmts12_AgencyCounty := ri.LnJJudgments[12].AgencyCounty;
 		self.Jgmts12_AgencyState	 := ri.LnJJudgments[12].AgencyState;
 		self.Jgmts12_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[12].ConsumerStatementId);
+    self.Jgmts12_orig_rmsid       := ri.LnJJudgments[12].orig_rmsid;
 		self.Jgmts13_Seq          := ri.LnJJudgments[13].Seq;
 		self.Jgmts13_DateFiled    := ri.LnJJudgments[13].DateFiled;
   self.Jgmts13_JudgmentTypeID := ri.LnJJudgments[13].JudgmentTypeID;
@@ -1723,6 +1834,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts13_AgencyCounty := ri.LnJJudgments[13].AgencyCounty;
 		self.Jgmts13_AgencyState	 := ri.LnJJudgments[13].AgencyState;
 		self.Jgmts13_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[13].ConsumerStatementId);
+    self.Jgmts13_orig_rmsid       := ri.LnJJudgments[13].orig_rmsid;
 		self.Jgmts14_Seq          := ri.LnJJudgments[14].Seq;
 		self.Jgmts14_DateFiled    := ri.LnJJudgments[14].DateFiled;
   self.Jgmts14_JudgmentTypeID := ri.LnJJudgments[14].JudgmentTypeID;
@@ -1737,10 +1849,11 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts14_FilingBook   := ri.LnJJudgments[14].FilingBook;
 		self.Jgmts14_FilingPage   := ri.LnJJudgments[14].FilingPage;
 		self.Jgmts14_Eviction     := ri.LnJJudgments[14].Eviction;
-		self.Jgmts14_Agency       := ri.LnJJudgments[14].Agency; 
+		self.Jgmts14_Agency       := ri.LnJJudgments[14].Agency;  
 		self.Jgmts14_AgencyCounty := ri.LnJJudgments[14].AgencyCounty;
 		self.Jgmts14_AgencyState	 := ri.LnJJudgments[14].AgencyState;	
 		self.Jgmts14_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[14].ConsumerStatementId);
+    self.Jgmts14_orig_rmsid       := ri.LnJJudgments[14].orig_rmsid;
 		self.Jgmts15_Seq          := ri.LnJJudgments[15].Seq              ;
 		self.Jgmts15_DateFiled    := ri.LnJJudgments[15].DateFiled        ;
   self.Jgmts15_JudgmentTypeID := ri.LnJJudgments[15].JudgmentTypeID;
@@ -1759,6 +1872,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts15_AgencyCounty := ri.LnJJudgments[15].AgencyCounty     ;
 		self.Jgmts15_AgencyState  := ri.LnJJudgments[15].AgencyState      ;
 		self.Jgmts15_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[15].ConsumerStatementId);
+    self.Jgmts15_orig_rmsid       := ri.LnJJudgments[15].orig_rmsid;
 		self.Jgmts16_Seq          := ri.LnJJudgments[16].Seq              ;
 		self.Jgmts16_DateFiled    := ri.LnJJudgments[16].DateFiled        ;
   self.Jgmts16_JudgmentTypeID := ri.LnJJudgments[16].JudgmentTypeID;
@@ -1773,10 +1887,11 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts16_FilingBook   := ri.LnJJudgments[16].FilingBook       ;
 		self.Jgmts16_FilingPage   := ri.LnJJudgments[16].FilingPage;
 		self.Jgmts16_Eviction     := ri.LnJJudgments[16].Eviction;
-		self.Jgmts16_Agency       := ri.LnJJudgments[16].Agency           ;
+    self.Jgmts16_Agency       := ri.LnJJudgments[16].Agency           ;
 		self.Jgmts16_AgencyCounty := ri.LnJJudgments[16].AgencyCounty     ;
 		self.Jgmts16_AgencyState  := ri.LnJJudgments[16].AgencyState      ;
 		self.Jgmts16_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[16].ConsumerStatementId);
+    self.Jgmts16_orig_rmsid       := ri.LnJJudgments[16].orig_rmsid;
 		self.Jgmts17_Seq          := ri.LnJJudgments[17].Seq              ;
 		self.Jgmts17_DateFiled    := ri.LnJJudgments[17].DateFiled        ;
   self.Jgmts17_JudgmentTypeID := ri.LnJJudgments[17].JudgmentTypeID;
@@ -1795,6 +1910,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts17_AgencyCounty := ri.LnJJudgments[17].AgencyCounty     ;
 		self.Jgmts17_AgencyState  := ri.LnJJudgments[17].AgencyState      ;
 		self.Jgmts17_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[17].ConsumerStatementId);
+    self.Jgmts17_orig_rmsid       := ri.LnJJudgments[17].orig_rmsid;
 		self.Jgmts18_Seq          := ri.LnJJudgments[18].Seq              ;
 		self.Jgmts18_DateFiled    := ri.LnJJudgments[18].DateFiled        ;
   self.Jgmts18_JudgmentTypeID := ri.LnJJudgments[18].JudgmentTypeID;
@@ -1813,6 +1929,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts18_AgencyCounty := ri.LnJJudgments[18].AgencyCounty     ;
 		self.Jgmts18_AgencyState  := ri.LnJJudgments[18].AgencyState      ;
 		self.Jgmts18_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[18].ConsumerStatementId);
+    self.Jgmts18_orig_rmsid       := ri.LnJJudgments[18].orig_rmsid;
 		self.Jgmts19_Seq          := ri.LnJJudgments[19].Seq              ;
 		self.Jgmts19_DateFiled    := ri.LnJJudgments[19].DateFiled        ;
   self.Jgmts19_JudgmentTypeID := ri.LnJJudgments[19].JudgmentTypeID;
@@ -1831,6 +1948,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts19_AgencyCounty := ri.LnJJudgments[19].AgencyCounty     ;
 		self.Jgmts19_AgencyState  := ri.LnJJudgments[19].AgencyState      ;
 		self.Jgmts19_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[19].ConsumerStatementId);
+    self.Jgmts19_orig_rmsid       := ri.LnJJudgments[19].orig_rmsid;
 		self.Jgmts20_Seq          := ri.LnJJudgments[20].Seq             ;
 		self.Jgmts20_DateFiled    := ri.LnJJudgments[20].DateFiled       ;
   self.Jgmts20_JudgmentTypeID := ri.LnJJudgments[20].JudgmentTypeID;
@@ -1849,6 +1967,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts20_AgencyCounty := ri.LnJJudgments[20].AgencyCounty    ;
 		self.Jgmts20_AgencyState  := ri.LnJJudgments[20].AgencyState     ;
 		self.Jgmts20_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[20].ConsumerStatementId);
+    self.Jgmts20_orig_rmsid       := ri.LnJJudgments[20].orig_rmsid;
 		self.Jgmts21_Seq          := ri.LnJJudgments[21].Seq             ;
 		self.Jgmts21_DateFiled    := ri.LnJJudgments[21].DateFiled       ;
   self.Jgmts21_JudgmentTypeID := ri.LnJJudgments[21].JudgmentTypeID;
@@ -1867,6 +1986,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts21_AgencyCounty := ri.LnJJudgments[21].AgencyCounty    ;
 		self.Jgmts21_AgencyState  := ri.LnJJudgments[21].AgencyState     ;
 		self.Jgmts21_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[21].ConsumerStatementId);
+    self.Jgmts21_orig_rmsid       := ri.LnJJudgments[21].orig_rmsid;
 		self.Jgmts22_Seq          := ri.LnJJudgments[22].Seq             ;
 		self.Jgmts22_DateFiled    := ri.LnJJudgments[22].DateFiled       ;
   self.Jgmts22_JudgmentTypeID := ri.LnJJudgments[22].JudgmentTypeID;
@@ -1885,6 +2005,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts22_AgencyCounty := ri.LnJJudgments[22].AgencyCounty    ;
 		self.Jgmts22_AgencyState  := ri.LnJJudgments[22].AgencyState     ;
 		self.Jgmts22_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[22].ConsumerStatementId);
+    self.Jgmts22_orig_rmsid       := ri.LnJJudgments[22].orig_rmsid;
 		self.Jgmts23_Seq          := ri.LnJJudgments[23].Seq             ;
 		self.Jgmts23_DateFiled    := ri.LnJJudgments[23].DateFiled       ;
   self.Jgmts23_JudgmentTypeID := ri.LnJJudgments[23].JudgmentTypeID;
@@ -1903,6 +2024,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts23_AgencyCounty := ri.LnJJudgments[23].AgencyCounty    ;
 		self.Jgmts23_AgencyState  := ri.LnJJudgments[23].AgencyState     ;
 		self.Jgmts23_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[23].ConsumerStatementId);
+    self.Jgmts23_orig_rmsid       := ri.LnJJudgments[23].orig_rmsid;
 		self.Jgmts24_Seq          := ri.LnJJudgments[24].Seq             ;
 		self.Jgmts24_DateFiled    := ri.LnJJudgments[24].DateFiled       ;
   self.Jgmts24_JudgmentTypeID := ri.LnJJudgments[24].JudgmentTypeID;
@@ -1921,6 +2043,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts24_AgencyCounty := ri.LnJJudgments[24].AgencyCounty    ;
 		self.Jgmts24_AgencyState  := ri.LnJJudgments[24].AgencyState     ;
 		self.Jgmts24_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[24].ConsumerStatementId);
+    self.Jgmts24_orig_rmsid       := ri.LnJJudgments[24].orig_rmsid;
 		self.Jgmts25_Seq          := ri.LnJJudgments[25].Seq             ;
 		self.Jgmts25_DateFiled    := ri.LnJJudgments[25].DateFiled       ;
   self.Jgmts25_JudgmentTypeID := ri.LnJJudgments[25].JudgmentTypeID;
@@ -1939,6 +2062,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts25_AgencyCounty := ri.LnJJudgments[25].AgencyCounty    ;
 		self.Jgmts25_AgencyState  := ri.LnJJudgments[25].AgencyState     ;
 		self.Jgmts25_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[25].ConsumerStatementId);
+    self.Jgmts25_orig_rmsid       := ri.LnJJudgments[25].orig_rmsid;
 		self.Jgmts26_Seq          := ri.LnJJudgments[26].Seq             ;
 		self.Jgmts26_DateFiled    := ri.LnJJudgments[26].DateFiled       ;
   self.Jgmts26_JudgmentTypeID := ri.LnJJudgments[26].JudgmentTypeID;
@@ -1956,7 +2080,8 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts26_Agency       := ri.LnJJudgments[26].Agency          ;
 		self.Jgmts26_AgencyCounty := ri.LnJJudgments[26].AgencyCounty    ;
 		self.Jgmts26_AgencyState  := ri.LnJJudgments[26].AgencyState     ;
-		self.Jgmts26_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[26].ConsumerStatementId);		
+		self.Jgmts26_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[26].ConsumerStatementId);
+		self.Jgmts26_orig_rmsid       := ri.LnJJudgments[26].orig_rmsid;
 		self.Jgmts27_Seq          := ri.LnJJudgments[27].Seq             ;
 		self.Jgmts27_DateFiled    := ri.LnJJudgments[27].DateFiled       ;
   self.Jgmts27_JudgmentTypeID := ri.LnJJudgments[27].JudgmentTypeID;
@@ -1975,6 +2100,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts27_AgencyCounty := ri.LnJJudgments[27].AgencyCounty    ;
 		self.Jgmts27_AgencyState  := ri.LnJJudgments[27].AgencyState     ;
 		self.Jgmts27_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[27].ConsumerStatementId);
+    self.Jgmts27_orig_rmsid       := ri.LnJJudgments[27].orig_rmsid;
 		self.Jgmts28_Seq          := ri.LnJJudgments[28].Seq             ;
 		self.Jgmts28_DateFiled    := ri.LnJJudgments[28].DateFiled       ;
   self.Jgmts28_JudgmentTypeID := ri.LnJJudgments[28].JudgmentTypeID;
@@ -1993,6 +2119,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts28_AgencyCounty := ri.LnJJudgments[28].AgencyCounty    ;
 		self.Jgmts28_AgencyState  := ri.LnJJudgments[28].AgencyState     ;
 		self.Jgmts28_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[28].ConsumerStatementId);
+    self.Jgmts28_orig_rmsid       := ri.LnJJudgments[28].orig_rmsid;
 		self.Jgmts29_Seq          := ri.LnJJudgments[29].Seq             ;
 		self.Jgmts29_DateFiled    := ri.LnJJudgments[29].DateFiled       ;
   self.Jgmts29_JudgmentTypeID := ri.LnJJudgments[29].JudgmentTypeID;
@@ -2011,6 +2138,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts29_AgencyCounty := ri.LnJJudgments[29].AgencyCounty    ;
 		self.Jgmts29_AgencyState  := ri.LnJJudgments[29].AgencyState     ;
 		self.Jgmts29_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[29].ConsumerStatementId);
+    self.Jgmts29_orig_rmsid       := ri.LnJJudgments[29].orig_rmsid;
 		self.Jgmts30_Seq          := ri.LnJJudgments[30].Seq             ;
 		self.Jgmts30_DateFiled    := ri.LnJJudgments[30].DateFiled       ;
   self.Jgmts30_JudgmentTypeID := ri.LnJJudgments[30].JudgmentTypeID;
@@ -2029,6 +2157,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts30_AgencyCounty := ri.LnJJudgments[30].AgencyCounty    ;
 		self.Jgmts30_AgencyState  := ri.LnJJudgments[30].AgencyState     ;
 		self.Jgmts30_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[30].ConsumerStatementId);
+    self.Jgmts30_orig_rmsid       := ri.LnJJudgments[30].orig_rmsid;
 		self.Jgmts31_Seq          := ri.LnJJudgments[31].Seq             ;
 		self.Jgmts31_DateFiled    := ri.LnJJudgments[31].DateFiled       ;
   self.Jgmts31_JudgmentTypeID := ri.LnJJudgments[31].JudgmentTypeID;
@@ -2047,6 +2176,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts31_AgencyCounty := ri.LnJJudgments[31].AgencyCounty    ;
 		self.Jgmts31_AgencyState  := ri.LnJJudgments[31].AgencyState     ;
 		self.Jgmts31_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[31].ConsumerStatementId);
+    self.Jgmts31_orig_rmsid       := ri.LnJJudgments[31].orig_rmsid;
 		self.Jgmts32_Seq          := ri.LnJJudgments[32].Seq             ;
 		self.Jgmts32_DateFiled    := ri.LnJJudgments[32].DateFiled       ;
   self.Jgmts32_JudgmentTypeID := ri.LnJJudgments[32].JudgmentTypeID;
@@ -2065,6 +2195,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts32_AgencyCounty := ri.LnJJudgments[32].AgencyCounty    ;
 		self.Jgmts32_AgencyState  := ri.LnJJudgments[32].AgencyState     ;
 		self.Jgmts32_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[32].ConsumerStatementId);
+    self.Jgmts32_orig_rmsid       := ri.LnJJudgments[32].orig_rmsid;
 		self.Jgmts33_Seq          := ri.LnJJudgments[33].Seq             ;
 		self.Jgmts33_DateFiled    := ri.LnJJudgments[33].DateFiled       ;
   self.Jgmts33_JudgmentTypeID := ri.LnJJudgments[33].JudgmentTypeID;
@@ -2083,6 +2214,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts33_AgencyCounty := ri.LnJJudgments[33].AgencyCounty    ;
 		self.Jgmts33_AgencyState  := ri.LnJJudgments[33].AgencyState     ;
 		self.Jgmts33_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[33].ConsumerStatementId);
+    self.Jgmts33_orig_rmsid       := ri.LnJJudgments[33].orig_rmsid;
 		self.Jgmts34_Seq          := ri.LnJJudgments[34].Seq             ;
 		self.Jgmts34_DateFiled    := ri.LnJJudgments[34].DateFiled       ;
   self.Jgmts34_JudgmentTypeID := ri.LnJJudgments[34].JudgmentTypeID;
@@ -2101,6 +2233,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts34_AgencyCounty := ri.LnJJudgments[34].AgencyCounty    ;
 		self.Jgmts34_AgencyState  := ri.LnJJudgments[34].AgencyState     ;
 		self.Jgmts34_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[34].ConsumerStatementId);
+    self.Jgmts34_orig_rmsid       := ri.LnJJudgments[34].orig_rmsid;
 		self.Jgmts35_Seq          := ri.LnJJudgments[35].Seq             ;
 		self.Jgmts35_DateFiled    := ri.LnJJudgments[35].DateFiled       ;
   self.Jgmts35_JudgmentTypeID := ri.LnJJudgments[35].JudgmentTypeID;
@@ -2119,6 +2252,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts35_AgencyCounty := ri.LnJJudgments[35].AgencyCounty    ;
 		self.Jgmts35_AgencyState  := ri.LnJJudgments[35].AgencyState     ;
 		self.Jgmts35_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[35].ConsumerStatementId);
+    self.Jgmts35_orig_rmsid       := ri.LnJJudgments[35].orig_rmsid;
 		self.Jgmts36_Seq          := ri.LnJJudgments[36].Seq             ;
 		self.Jgmts36_DateFiled    := ri.LnJJudgments[36].DateFiled       ;
   self.Jgmts36_JudgmentTypeID := ri.LnJJudgments[36].JudgmentTypeID;
@@ -2137,6 +2271,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts36_AgencyCounty := ri.LnJJudgments[36].AgencyCounty    ;
 		self.Jgmts36_AgencyState  := ri.LnJJudgments[36].AgencyState     ;
 		self.Jgmts36_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[36].ConsumerStatementId);
+    self.Jgmts36_orig_rmsid       := ri.LnJJudgments[36].orig_rmsid;
 		self.Jgmts37_Seq          := ri.LnJJudgments[37].Seq             ;
 		self.Jgmts37_DateFiled    := ri.LnJJudgments[37].DateFiled       ;
   self.Jgmts37_JudgmentTypeID := ri.LnJJudgments[37].JudgmentTypeID;
@@ -2155,6 +2290,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts37_AgencyCounty := ri.LnJJudgments[37].AgencyCounty    ;
 		self.Jgmts37_AgencyState  := ri.LnJJudgments[37].AgencyState     ;
 		self.Jgmts37_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[37].ConsumerStatementId);
+    self.Jgmts37_orig_rmsid       := ri.LnJJudgments[37].orig_rmsid;
 		self.Jgmts38_Seq          := ri.LnJJudgments[38].Seq             ;
 		self.Jgmts38_DateFiled    := ri.LnJJudgments[38].DateFiled       ;
   self.Jgmts38_JudgmentTypeID := ri.LnJJudgments[38].JudgmentTypeID;
@@ -2173,6 +2309,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts38_AgencyCounty := ri.LnJJudgments[38].AgencyCounty    ;
 		self.Jgmts38_AgencyState  := ri.LnJJudgments[38].AgencyState     ;
 		self.Jgmts38_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[38].ConsumerStatementId);
+    self.Jgmts38_orig_rmsid       := ri.LnJJudgments[38].orig_rmsid;
 		self.Jgmts39_Seq          := ri.LnJJudgments[39].Seq             ;
 		self.Jgmts39_DateFiled    := ri.LnJJudgments[39].DateFiled       ;
   self.Jgmts39_JudgmentTypeID := ri.LnJJudgments[39].JudgmentTypeID;
@@ -2191,6 +2328,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts39_AgencyCounty := ri.LnJJudgments[39].AgencyCounty    ;
 		self.Jgmts39_AgencyState  := ri.LnJJudgments[39].AgencyState     ;
 		self.Jgmts39_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[39].ConsumerStatementId);
+    self.Jgmts39_orig_rmsid       := ri.LnJJudgments[39].orig_rmsid;
 		self.Jgmts40_Seq          := ri.LnJJudgments[40].Seq             ;
 		self.Jgmts40_DateFiled    := ri.LnJJudgments[40].DateFiled       ;
   self.Jgmts40_JudgmentTypeID := ri.LnJJudgments[40].JudgmentTypeID;
@@ -2209,6 +2347,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts40_AgencyCounty := ri.LnJJudgments[40].AgencyCounty    ;
 		self.Jgmts40_AgencyState  := ri.LnJJudgments[40].AgencyState     ;
 		self.Jgmts40_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[40].ConsumerStatementId);
+    self.Jgmts40_orig_rmsid       := ri.LnJJudgments[40].orig_rmsid;
 		self.Jgmts41_Seq          := ri.LnJJudgments[41].Seq             ;
 		self.Jgmts41_DateFiled    := ri.LnJJudgments[41].DateFiled       ;
   self.Jgmts41_JudgmentTypeID := ri.LnJJudgments[41].JudgmentTypeID;
@@ -2227,6 +2366,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts41_AgencyCounty := ri.LnJJudgments[41].AgencyCounty    ;
 		self.Jgmts41_AgencyState  := ri.LnJJudgments[41].AgencyState     ;
 		self.Jgmts41_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[41].ConsumerStatementId);
+    self.Jgmts41_orig_rmsid       := ri.LnJJudgments[41].orig_rmsid;
 		self.Jgmts42_Seq          := ri.LnJJudgments[42].Seq             ;
 		self.Jgmts42_DateFiled    := ri.LnJJudgments[42].DateFiled       ;
   self.Jgmts42_JudgmentTypeID := ri.LnJJudgments[42].JudgmentTypeID;
@@ -2245,6 +2385,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts42_AgencyCounty := ri.LnJJudgments[42].AgencyCounty    ;
 		self.Jgmts42_AgencyState  := ri.LnJJudgments[42].AgencyState     ;
 		self.Jgmts42_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[42].ConsumerStatementId);
+    self.Jgmts42_orig_rmsid       := ri.LnJJudgments[42].orig_rmsid;
 		self.Jgmts43_Seq          := ri.LnJJudgments[43].Seq             ;
 		self.Jgmts43_DateFiled    := ri.LnJJudgments[43].DateFiled       ;
   self.Jgmts43_JudgmentTypeID := ri.LnJJudgments[43].JudgmentTypeID;
@@ -2263,6 +2404,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts43_AgencyCounty := ri.LnJJudgments[43].AgencyCounty    ;
 		self.Jgmts43_AgencyState  := ri.LnJJudgments[43].AgencyState     ;
 		self.Jgmts43_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[43].ConsumerStatementId);
+    self.Jgmts43_orig_rmsid       := ri.LnJJudgments[43].orig_rmsid;
 		self.Jgmts44_Seq          := ri.LnJJudgments[44].Seq             ;
 		self.Jgmts44_DateFiled    := ri.LnJJudgments[44].DateFiled       ;
   self.Jgmts44_JudgmentTypeID := ri.LnJJudgments[44].JudgmentTypeID;
@@ -2281,6 +2423,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts44_AgencyCounty := ri.LnJJudgments[44].AgencyCounty    ;
 		self.Jgmts44_AgencyState  := ri.LnJJudgments[44].AgencyState     ;
 		self.Jgmts44_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[44].ConsumerStatementId);
+    self.Jgmts44_orig_rmsid       := ri.LnJJudgments[44].orig_rmsid;
 		self.Jgmts45_Seq          := ri.LnJJudgments[45].Seq             ;
 		self.Jgmts45_DateFiled    := ri.LnJJudgments[45].DateFiled       ;
   self.Jgmts45_JudgmentTypeID := ri.LnJJudgments[45].JudgmentTypeID;
@@ -2299,6 +2442,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts45_AgencyCounty := ri.LnJJudgments[45].AgencyCounty    ;
 		self.Jgmts45_AgencyState  := ri.LnJJudgments[45].AgencyState     ;
 		self.Jgmts45_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[45].ConsumerStatementId);
+    self.Jgmts45_orig_rmsid       := ri.LnJJudgments[45].orig_rmsid;
 		self.Jgmts46_Seq          := ri.LnJJudgments[46].Seq             ;
 		self.Jgmts46_DateFiled    := ri.LnJJudgments[46].DateFiled       ;
   self.Jgmts46_JudgmentTypeID := ri.LnJJudgments[46].JudgmentTypeID;
@@ -2317,6 +2461,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts46_AgencyCounty := ri.LnJJudgments[46].AgencyCounty    ;
 		self.Jgmts46_AgencyState  := ri.LnJJudgments[46].AgencyState     ;
 		self.Jgmts46_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[46].ConsumerStatementId);
+    self.Jgmts46_orig_rmsid       := ri.LnJJudgments[46].orig_rmsid;
 		self.Jgmts47_Seq          := ri.LnJJudgments[47].Seq             ;
 		self.Jgmts47_DateFiled    := ri.LnJJudgments[47].DateFiled       ;
   self.Jgmts47_JudgmentTypeID := ri.LnJJudgments[47].JudgmentTypeID;
@@ -2335,6 +2480,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts47_AgencyCounty := ri.LnJJudgments[47].AgencyCounty    ;
 		self.Jgmts47_AgencyState  := ri.LnJJudgments[47].AgencyState     ;
 		self.Jgmts47_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[47].ConsumerStatementId);
+    self.Jgmts47_orig_rmsid       := ri.LnJJudgments[47].orig_rmsid;
 		self.Jgmts48_Seq          := ri.LnJJudgments[48].Seq             ;
 		self.Jgmts48_DateFiled    := ri.LnJJudgments[48].DateFiled       ;
   self.Jgmts48_JudgmentTypeID := ri.LnJJudgments[48].JudgmentTypeID;
@@ -2353,6 +2499,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts48_AgencyCounty := ri.LnJJudgments[48].AgencyCounty    ;
 		self.Jgmts48_AgencyState  := ri.LnJJudgments[48].AgencyState     ;
 		self.Jgmts48_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[48].ConsumerStatementId);
+    self.Jgmts48_orig_rmsid       := ri.LnJJudgments[48].orig_rmsid;
 		self.Jgmts49_Seq          := ri.LnJJudgments[49].Seq             ;
 		self.Jgmts49_DateFiled    := ri.LnJJudgments[49].DateFiled       ;
   self.Jgmts49_JudgmentTypeID := ri.LnJJudgments[49].JudgmentTypeID;
@@ -2371,6 +2518,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts49_AgencyCounty := ri.LnJJudgments[49].AgencyCounty    ;
 		self.Jgmts49_AgencyState  := ri.LnJJudgments[49].AgencyState     ;
 		self.Jgmts49_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[49].ConsumerStatementId);
+    self.Jgmts49_orig_rmsid       := ri.LnJJudgments[49].orig_rmsid;
 		self.Jgmts50_Seq      := ri.LnJJudgments[50].Seq         ;
 		self.Jgmts50_DateFiled    := ri.LnJJudgments[50].DateFiled       ;
   self.Jgmts50_JudgmentTypeID := ri.LnJJudgments[50].JudgmentTypeID;
@@ -2389,6 +2537,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts50_AgencyCounty := ri.LnJJudgments[50].AgencyCounty    ;
 		self.Jgmts50_AgencyState  := ri.LnJJudgments[50].AgencyState     ;
 		self.Jgmts50_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[50].ConsumerStatementId);
+    self.Jgmts50_orig_rmsid       := ri.LnJJudgments[50].orig_rmsid;
 		self.Jgmts51_Seq          := ri.LnJJudgments[51].Seq             ;
 		self.Jgmts51_DateFiled    := ri.LnJJudgments[51].DateFiled       ;
   self.Jgmts51_JudgmentTypeID := ri.LnJJudgments[51].JudgmentTypeID;
@@ -2407,6 +2556,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts51_AgencyCounty := ri.LnJJudgments[51].AgencyCounty    ;
 		self.Jgmts51_AgencyState  := ri.LnJJudgments[51].AgencyState     ;
 		self.Jgmts51_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[51].ConsumerStatementId);
+    self.Jgmts51_orig_rmsid       := ri.LnJJudgments[51].orig_rmsid;
 		self.Jgmts52_Seq          := ri.LnJJudgments[52].Seq             ;
 		self.Jgmts52_DateFiled    := ri.LnJJudgments[52].DateFiled       ;
   self.Jgmts52_JudgmentTypeID := ri.LnJJudgments[52].JudgmentTypeID;
@@ -2425,6 +2575,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts52_AgencyCounty := ri.LnJJudgments[52].AgencyCounty    ;
 		self.Jgmts52_AgencyState  := ri.LnJJudgments[52].AgencyState     ;
 		self.Jgmts52_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[52].ConsumerStatementId);
+    self.Jgmts52_orig_rmsid       := ri.LnJJudgments[52].orig_rmsid;
 		self.Jgmts53_Seq          := ri.LnJJudgments[53].Seq             ;
 		self.Jgmts53_DateFiled    := ri.LnJJudgments[53].DateFiled       ;
   self.Jgmts53_JudgmentTypeID := ri.LnJJudgments[53].JudgmentTypeID;
@@ -2443,6 +2594,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts53_AgencyCounty := ri.LnJJudgments[53].AgencyCounty    ;
 		self.Jgmts53_AgencyState  := ri.LnJJudgments[53].AgencyState     ;
 		self.Jgmts53_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[53].ConsumerStatementId);
+    self.Jgmts53_orig_rmsid       := ri.LnJJudgments[53].orig_rmsid;
 		self.Jgmts54_Seq          := ri.LnJJudgments[54].Seq             ;
 		self.Jgmts54_DateFiled    := ri.LnJJudgments[54].DateFiled       ;
   self.Jgmts54_JudgmentTypeID := ri.LnJJudgments[54].JudgmentTypeID;
@@ -2461,6 +2613,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts54_AgencyCounty := ri.LnJJudgments[54].AgencyCounty    ;
 		self.Jgmts54_AgencyState  := ri.LnJJudgments[54].AgencyState     ;
 		self.Jgmts54_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[54].ConsumerStatementId);
+    self.Jgmts54_orig_rmsid       := ri.LnJJudgments[54].orig_rmsid;
 		self.Jgmts55_Seq          := ri.LnJJudgments[55].Seq             ;
 		self.Jgmts55_DateFiled    := ri.LnJJudgments[55].DateFiled       ;
   self.Jgmts55_JudgmentTypeID := ri.LnJJudgments[55].JudgmentTypeID;
@@ -2479,6 +2632,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts55_AgencyCounty := ri.LnJJudgments[55].AgencyCounty    ;
 		self.Jgmts55_AgencyState  := ri.LnJJudgments[55].AgencyState     ;
 		self.Jgmts55_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[55].ConsumerStatementId);
+    self.Jgmts55_orig_rmsid       := ri.LnJJudgments[55].orig_rmsid;
 		self.Jgmts56_Seq          := ri.LnJJudgments[56].Seq             ;
 		self.Jgmts56_DateFiled    := ri.LnJJudgments[56].DateFiled       ;
   self.Jgmts56_JudgmentTypeID := ri.LnJJudgments[56].JudgmentTypeID;
@@ -2497,6 +2651,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts56_AgencyCounty := ri.LnJJudgments[56].AgencyCounty    ;
 		self.Jgmts56_AgencyState  := ri.LnJJudgments[56].AgencyState     ;
 		self.Jgmts56_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[56].ConsumerStatementId);
+    self.Jgmts56_orig_rmsid       := ri.LnJJudgments[56].orig_rmsid;
 		self.Jgmts57_Seq          := ri.LnJJudgments[57].Seq             ;
 		self.Jgmts57_DateFiled    := ri.LnJJudgments[57].DateFiled       ;
   self.Jgmts57_JudgmentTypeID := ri.LnJJudgments[57].JudgmentTypeID;
@@ -2515,6 +2670,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts57_AgencyCounty := ri.LnJJudgments[57].AgencyCounty    ;
 		self.Jgmts57_AgencyState  := ri.LnJJudgments[57].AgencyState     ;
 		self.Jgmts57_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[57].ConsumerStatementId);
+    self.Jgmts57_orig_rmsid       := ri.LnJJudgments[57].orig_rmsid;
 		self.Jgmts58_Seq          := ri.LnJJudgments[58].Seq             ;
 		self.Jgmts58_DateFiled    := ri.LnJJudgments[58].DateFiled       ;
   self.Jgmts58_JudgmentTypeID := ri.LnJJudgments[58].JudgmentTypeID;
@@ -2533,6 +2689,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts58_AgencyCounty := ri.LnJJudgments[58].AgencyCounty    ;
 		self.Jgmts58_AgencyState  := ri.LnJJudgments[58].AgencyState     ;
 		self.Jgmts58_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[58].ConsumerStatementId);
+    self.Jgmts58_orig_rmsid       := ri.LnJJudgments[58].orig_rmsid;
 		self.Jgmts59_Seq          := ri.LnJJudgments[59].Seq             ;
 		self.Jgmts59_DateFiled    := ri.LnJJudgments[59].DateFiled       ;
   self.Jgmts59_JudgmentTypeID := ri.LnJJudgments[59].JudgmentTypeID;
@@ -2551,6 +2708,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts59_AgencyCounty := ri.LnJJudgments[59].AgencyCounty    ;
 		self.Jgmts59_AgencyState  := ri.LnJJudgments[59].AgencyState     ;
 		self.Jgmts59_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[59].ConsumerStatementId);
+    self.Jgmts59_orig_rmsid       := ri.LnJJudgments[59].orig_rmsid;
 		self.Jgmts60_Seq          := ri.LnJJudgments[60].Seq             ;
 		self.Jgmts60_DateFiled    := ri.LnJJudgments[60].DateFiled       ;
   self.Jgmts60_JudgmentTypeID := ri.LnJJudgments[60].JudgmentTypeID;
@@ -2569,6 +2727,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts60_AgencyCounty := ri.LnJJudgments[60].AgencyCounty    ;
 		self.Jgmts60_AgencyState  := ri.LnJJudgments[60].AgencyState     ;
 		self.Jgmts60_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[60].ConsumerStatementId);
+    self.Jgmts60_orig_rmsid       := ri.LnJJudgments[60].orig_rmsid;
 		self.Jgmts61_Seq          := ri.LnJJudgments[61].Seq             ;
 		self.Jgmts61_DateFiled    := ri.LnJJudgments[61].DateFiled       ;
   self.Jgmts61_JudgmentTypeID := ri.LnJJudgments[61].JudgmentTypeID;
@@ -2587,6 +2746,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts61_AgencyCounty := ri.LnJJudgments[61].AgencyCounty    ;
 		self.Jgmts61_AgencyState  := ri.LnJJudgments[61].AgencyState     ;
 		self.Jgmts61_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[61].ConsumerStatementId);
+    self.Jgmts61_orig_rmsid       := ri.LnJJudgments[61].orig_rmsid;
 		self.Jgmts62_Seq          := ri.LnJJudgments[62].Seq             ;
 		self.Jgmts62_DateFiled    := ri.LnJJudgments[62].DateFiled       ;
   self.Jgmts62_JudgmentTypeID := ri.LnJJudgments[62].JudgmentTypeID;
@@ -2605,6 +2765,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts62_AgencyCounty := ri.LnJJudgments[62].AgencyCounty    ;
 		self.Jgmts62_AgencyState  := ri.LnJJudgments[62].AgencyState     ;
 		self.Jgmts62_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[62].ConsumerStatementId);
+    self.Jgmts62_orig_rmsid       := ri.LnJJudgments[62].orig_rmsid;
 		self.Jgmts63_Seq          := ri.LnJJudgments[63].Seq             ;
 		self.Jgmts63_DateFiled    := ri.LnJJudgments[63].DateFiled       ;
   self.Jgmts63_JudgmentTypeID := ri.LnJJudgments[63].JudgmentTypeID;
@@ -2623,6 +2784,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts63_AgencyCounty := ri.LnJJudgments[63].AgencyCounty    ;
 		self.Jgmts63_AgencyState  := ri.LnJJudgments[63].AgencyState     ;
 		self.Jgmts63_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[63].ConsumerStatementId);
+    self.Jgmts63_orig_rmsid       := ri.LnJJudgments[63].orig_rmsid;
 		self.Jgmts64_Seq          := ri.LnJJudgments[64].Seq             ;
 		self.Jgmts64_DateFiled    := ri.LnJJudgments[64].DateFiled       ;
   self.Jgmts64_JudgmentTypeID := ri.LnJJudgments[64].JudgmentTypeID;
@@ -2641,6 +2803,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts64_AgencyCounty := ri.LnJJudgments[64].AgencyCounty    ;
 		self.Jgmts64_AgencyState  := ri.LnJJudgments[64].AgencyState     ;
 		self.Jgmts64_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[64].ConsumerStatementId);
+    self.Jgmts64_orig_rmsid       := ri.LnJJudgments[64].orig_rmsid;
 		self.Jgmts65_Seq          := ri.LnJJudgments[65].Seq             ;
 		self.Jgmts65_DateFiled    := ri.LnJJudgments[65].DateFiled       ;
   self.Jgmts65_JudgmentTypeID := ri.LnJJudgments[65].JudgmentTypeID;
@@ -2659,6 +2822,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts65_AgencyCounty := ri.LnJJudgments[65].AgencyCounty    ;
 		self.Jgmts65_AgencyState  := ri.LnJJudgments[65].AgencyState     ;
 		self.Jgmts65_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[65].ConsumerStatementId);
+    self.Jgmts65_orig_rmsid       := ri.LnJJudgments[65].orig_rmsid;
 		self.Jgmts66_Seq          := ri.LnJJudgments[66].Seq             ;
 		self.Jgmts66_DateFiled    := ri.LnJJudgments[66].DateFiled       ;
   self.Jgmts66_JudgmentTypeID := ri.LnJJudgments[66].JudgmentTypeID;
@@ -2677,6 +2841,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts66_AgencyCounty := ri.LnJJudgments[66].AgencyCounty    ;
 		self.Jgmts66_AgencyState  := ri.LnJJudgments[66].AgencyState     ;
 		self.Jgmts66_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[66].ConsumerStatementId);
+    self.Jgmts66_orig_rmsid       := ri.LnJJudgments[66].orig_rmsid;
 		self.Jgmts67_Seq          := ri.LnJJudgments[67].Seq             ;
 		self.Jgmts67_DateFiled    := ri.LnJJudgments[67].DateFiled       ;
   self.Jgmts67_JudgmentTypeID := ri.LnJJudgments[67].JudgmentTypeID;
@@ -2695,6 +2860,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts67_AgencyCounty := ri.LnJJudgments[67].AgencyCounty    ;
 		self.Jgmts67_AgencyState  := ri.LnJJudgments[67].AgencyState     ;
 		self.Jgmts67_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[67].ConsumerStatementId);
+    self.Jgmts67_orig_rmsid       := ri.LnJJudgments[67].orig_rmsid;
 		self.Jgmts68_Seq          := ri.LnJJudgments[68].Seq             ;
 		self.Jgmts68_DateFiled    := ri.LnJJudgments[68].DateFiled       ;
   self.Jgmts68_JudgmentTypeID := ri.LnJJudgments[68].JudgmentTypeID;
@@ -2713,6 +2879,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts68_AgencyCounty := ri.LnJJudgments[68].AgencyCounty    ;
 		self.Jgmts68_AgencyState  := ri.LnJJudgments[68].AgencyState     ;
 		self.Jgmts68_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[68].ConsumerStatementId);
+    self.Jgmts68_orig_rmsid       := ri.LnJJudgments[68].orig_rmsid;
 		self.Jgmts69_Seq          := ri.LnJJudgments[69].Seq             ;
 		self.Jgmts69_DateFiled    := ri.LnJJudgments[69].DateFiled       ;
   self.Jgmts69_JudgmentTypeID := ri.LnJJudgments[69].JudgmentTypeID;
@@ -2731,6 +2898,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts69_AgencyCounty := ri.LnJJudgments[69].AgencyCounty    ;
 		self.Jgmts69_AgencyState  := ri.LnJJudgments[69].AgencyState     ;
 		self.Jgmts69_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[69].ConsumerStatementId);
+    self.Jgmts69_orig_rmsid       := ri.LnJJudgments[69].orig_rmsid;
 		self.Jgmts70_Seq         := ri.LnJJudgments[70].Seq            ;
 		self.Jgmts70_DateFiled    := ri.LnJJudgments[70].DateFiled       ;
   self.Jgmts70_JudgmentTypeID := ri.LnJJudgments[70].JudgmentTypeID;
@@ -2749,6 +2917,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts70_AgencyCounty := ri.LnJJudgments[70].AgencyCounty    ;
 		self.Jgmts70_AgencyState  := ri.LnJJudgments[70].AgencyState     ;
 		self.Jgmts70_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[70].ConsumerStatementId);
+    self.Jgmts70_orig_rmsid       := ri.LnJJudgments[70].orig_rmsid;
 		self.Jgmts71_Seq          := ri.LnJJudgments[71].Seq             ;
 		self.Jgmts71_DateFiled    := ri.LnJJudgments[71].DateFiled       ;
   self.Jgmts71_JudgmentTypeID := ri.LnJJudgments[71].JudgmentTypeID;
@@ -2767,6 +2936,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts71_AgencyCounty := ri.LnJJudgments[71].AgencyCounty    ;
 		self.Jgmts71_AgencyState  := ri.LnJJudgments[71].AgencyState     ;
 		self.Jgmts71_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[71].ConsumerStatementId);
+    self.Jgmts71_orig_rmsid       := ri.LnJJudgments[71].orig_rmsid;
 		self.Jgmts72_Seq          := ri.LnJJudgments[72].Seq             ;
 		self.Jgmts72_DateFiled    := ri.LnJJudgments[72].DateFiled       ;
   self.Jgmts72_JudgmentTypeID := ri.LnJJudgments[72].JudgmentTypeID;
@@ -2785,6 +2955,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts72_AgencyCounty := ri.LnJJudgments[72].AgencyCounty    ;
 		self.Jgmts72_AgencyState  := ri.LnJJudgments[72].AgencyState     ;
 		self.Jgmts72_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[72].ConsumerStatementId);
+    self.Jgmts72_orig_rmsid       := ri.LnJJudgments[72].orig_rmsid;
 		self.Jgmts73_Seq          := ri.LnJJudgments[73].Seq             ;
 		self.Jgmts73_DateFiled    := ri.LnJJudgments[73].DateFiled       ;
   self.Jgmts73_JudgmentTypeID := ri.LnJJudgments[73].JudgmentTypeID;
@@ -2803,6 +2974,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts73_AgencyCounty := ri.LnJJudgments[73].AgencyCounty    ;
 		self.Jgmts73_AgencyState  := ri.LnJJudgments[73].AgencyState     ;
 		self.Jgmts73_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[73].ConsumerStatementId);
+    self.Jgmts73_orig_rmsid       := ri.LnJJudgments[73].orig_rmsid;
 		self.Jgmts74_Seq          := ri.LnJJudgments[74].Seq             ;
 		self.Jgmts74_DateFiled    := ri.LnJJudgments[74].DateFiled       ;
   self.Jgmts74_JudgmentTypeID := ri.LnJJudgments[74].JudgmentTypeID;
@@ -2821,6 +2993,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts74_AgencyCounty := ri.LnJJudgments[74].AgencyCounty    ;
 		self.Jgmts74_AgencyState  := ri.LnJJudgments[74].AgencyState     ;
 		self.Jgmts74_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[74].ConsumerStatementId);
+    self.Jgmts74_orig_rmsid       := ri.LnJJudgments[74].orig_rmsid;
 		self.Jgmts75_Seq          := ri.LnJJudgments[75].Seq             ;
 		self.Jgmts75_DateFiled    := ri.LnJJudgments[75].DateFiled       ;
   self.Jgmts75_JudgmentTypeID := ri.LnJJudgments[75].JudgmentTypeID;
@@ -2839,6 +3012,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts75_AgencyCounty := ri.LnJJudgments[75].AgencyCounty    ;
 		self.Jgmts75_AgencyState  := ri.LnJJudgments[75].AgencyState     ;
 		self.Jgmts75_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[75].ConsumerStatementId);
+    self.Jgmts75_orig_rmsid       := ri.LnJJudgments[75].orig_rmsid;
 		self.Jgmts76_Seq          := ri.LnJJudgments[76].Seq             ;
 		self.Jgmts76_DateFiled    := ri.LnJJudgments[76].DateFiled       ;
   self.Jgmts76_JudgmentTypeID := ri.LnJJudgments[76].JudgmentTypeID;
@@ -2857,6 +3031,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts76_AgencyCounty := ri.LnJJudgments[76].AgencyCounty    ;
 		self.Jgmts76_AgencyState  := ri.LnJJudgments[76].AgencyState     ;
 		self.Jgmts76_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[76].ConsumerStatementId);
+    self.Jgmts76_orig_rmsid       := ri.LnJJudgments[76].orig_rmsid;
 		self.Jgmts77_Seq          := ri.LnJJudgments[77].Seq             ;
 		self.Jgmts77_DateFiled    := ri.LnJJudgments[77].DateFiled       ;
   self.Jgmts77_JudgmentTypeID := ri.LnJJudgments[77].JudgmentTypeID;
@@ -2875,6 +3050,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts77_AgencyCounty := ri.LnJJudgments[77].AgencyCounty    ;
 		self.Jgmts77_AgencyState  := ri.LnJJudgments[77].AgencyState     ;
 		self.Jgmts77_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[77].ConsumerStatementId);
+    self.Jgmts77_orig_rmsid       := ri.LnJJudgments[77].orig_rmsid;
 		self.Jgmts78_Seq          := ri.LnJJudgments[78].Seq             ;
 		self.Jgmts78_DateFiled    := ri.LnJJudgments[78].DateFiled       ;
   self.Jgmts78_JudgmentTypeID := ri.LnJJudgments[78].JudgmentTypeID;
@@ -2893,6 +3069,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts78_AgencyCounty := ri.LnJJudgments[78].AgencyCounty    ;
 		self.Jgmts78_AgencyState  := ri.LnJJudgments[78].AgencyState     ;
 		self.Jgmts78_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[78].ConsumerStatementId);
+    self.Jgmts78_orig_rmsid       := ri.LnJJudgments[78].orig_rmsid;
 		self.Jgmts79_Seq          := ri.LnJJudgments[79].Seq             ;
 		self.Jgmts79_DateFiled    := ri.LnJJudgments[79].DateFiled       ;
   self.Jgmts79_JudgmentTypeID := ri.LnJJudgments[79].JudgmentTypeID;
@@ -2911,6 +3088,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts79_AgencyCounty := ri.LnJJudgments[79].AgencyCounty    ;
 		self.Jgmts79_AgencyState  := ri.LnJJudgments[79].AgencyState     ;
 		self.Jgmts79_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[79].ConsumerStatementId);
+    self.Jgmts79_orig_rmsid       := ri.LnJJudgments[79].orig_rmsid;
 		self.Jgmts80_Seq          := ri.LnJJudgments[80].Seq             ;
 		self.Jgmts80_DateFiled    := ri.LnJJudgments[80].DateFiled       ;
   self.Jgmts80_JudgmentTypeID := ri.LnJJudgments[80].JudgmentTypeID;
@@ -2929,6 +3107,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts80_AgencyCounty := ri.LnJJudgments[80].AgencyCounty    ;
 		self.Jgmts80_AgencyState  := ri.LnJJudgments[80].AgencyState     ;
 		self.Jgmts80_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[80].ConsumerStatementId);
+    self.Jgmts80_orig_rmsid       := ri.LnJJudgments[80].orig_rmsid;
 		self.Jgmts81_Seq          := ri.LnJJudgments[81].Seq             ;
 		self.Jgmts81_DateFiled    := ri.LnJJudgments[81].DateFiled       ;
   self.Jgmts81_JudgmentTypeID := ri.LnJJudgments[81].JudgmentTypeID;
@@ -2947,6 +3126,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts81_AgencyCounty := ri.LnJJudgments[81].AgencyCounty    ;
 		self.Jgmts81_AgencyState  := ri.LnJJudgments[81].AgencyState     ;
 		self.Jgmts81_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[81].ConsumerStatementId);
+    self.Jgmts81_orig_rmsid       := ri.LnJJudgments[81].orig_rmsid;
 		self.Jgmts82_Seq          := ri.LnJJudgments[82].Seq             ;
 		self.Jgmts82_DateFiled    := ri.LnJJudgments[82].DateFiled       ;
   self.Jgmts82_JudgmentTypeID := ri.LnJJudgments[82].JudgmentTypeID;
@@ -2965,6 +3145,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts82_AgencyCounty := ri.LnJJudgments[82].AgencyCounty    ;
 		self.Jgmts82_AgencyState  := ri.LnJJudgments[82].AgencyState     ;
 		self.Jgmts82_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[82].ConsumerStatementId);
+    self.Jgmts82_orig_rmsid       := ri.LnJJudgments[82].orig_rmsid;
 		self.Jgmts83_Seq          := ri.LnJJudgments[83].Seq             ;
 		self.Jgmts83_DateFiled    := ri.LnJJudgments[83].DateFiled       ;
   self.Jgmts83_JudgmentTypeID := ri.LnJJudgments[83].JudgmentTypeID;
@@ -2983,6 +3164,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts83_AgencyCounty := ri.LnJJudgments[83].AgencyCounty    ;
 		self.Jgmts83_AgencyState  := ri.LnJJudgments[83].AgencyState     ;
 		self.Jgmts83_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[83].ConsumerStatementId);
+    self.Jgmts83_orig_rmsid       := ri.LnJJudgments[83].orig_rmsid;
 		self.Jgmts84_Seq          := ri.LnJJudgments[84].Seq             ;
 		self.Jgmts84_DateFiled    := ri.LnJJudgments[84].DateFiled       ;
   self.Jgmts84_JudgmentTypeID := ri.LnJJudgments[84].JudgmentTypeID;
@@ -3001,6 +3183,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts84_AgencyCounty := ri.LnJJudgments[84].AgencyCounty    ;
 		self.Jgmts84_AgencyState  := ri.LnJJudgments[84].AgencyState     ;
 		self.Jgmts84_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[84].ConsumerStatementId);
+    self.Jgmts84_orig_rmsid       := ri.LnJJudgments[84].orig_rmsid;
 		self.Jgmts85_Seq          := ri.LnJJudgments[85].Seq             ;
 		self.Jgmts85_DateFiled    := ri.LnJJudgments[85].DateFiled       ;
   self.Jgmts85_JudgmentTypeID := ri.LnJJudgments[85].JudgmentTypeID;
@@ -3019,6 +3202,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts85_AgencyCounty := ri.LnJJudgments[85].AgencyCounty    ;
 		self.Jgmts85_AgencyState  := ri.LnJJudgments[85].AgencyState     ;
 		self.Jgmts85_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[85].ConsumerStatementId);
+    self.Jgmts85_orig_rmsid       := ri.LnJJudgments[85].orig_rmsid;
 		self.Jgmts86_Seq          := ri.LnJJudgments[86].Seq             ;
 		self.Jgmts86_DateFiled    := ri.LnJJudgments[86].DateFiled       ;
   self.Jgmts86_JudgmentTypeID := ri.LnJJudgments[86].JudgmentTypeID;
@@ -3037,6 +3221,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts86_AgencyCounty := ri.LnJJudgments[86].AgencyCounty    ;
 		self.Jgmts86_AgencyState  := ri.LnJJudgments[86].AgencyState     ;
 		self.Jgmts86_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[86].ConsumerStatementId);
+    self.Jgmts86_orig_rmsid       := ri.LnJJudgments[86].orig_rmsid;
 		self.Jgmts87_Seq          := ri.LnJJudgments[87].Seq             ;
 		self.Jgmts87_DateFiled    := ri.LnJJudgments[87].DateFiled       ;
   self.Jgmts87_JudgmentTypeID := ri.LnJJudgments[87].JudgmentTypeID;
@@ -3055,6 +3240,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts87_AgencyCounty := ri.LnJJudgments[87].AgencyCounty    ;
 		self.Jgmts87_AgencyState  := ri.LnJJudgments[87].AgencyState     ;
 		self.Jgmts87_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[87].ConsumerStatementId);
+    self.Jgmts87_orig_rmsid       := ri.LnJJudgments[87].orig_rmsid;
 		self.Jgmts88_Seq          := ri.LnJJudgments[88].Seq             ;
 		self.Jgmts88_DateFiled    := ri.LnJJudgments[88].DateFiled       ;
   self.Jgmts88_JudgmentTypeID := ri.LnJJudgments[88].JudgmentTypeID;
@@ -3073,6 +3259,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts88_AgencyCounty := ri.LnJJudgments[88].AgencyCounty    ;
 		self.Jgmts88_AgencyState  := ri.LnJJudgments[88].AgencyState     ;
 		self.Jgmts88_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[88].ConsumerStatementId);
+    self.Jgmts88_orig_rmsid       := ri.LnJJudgments[88].orig_rmsid;
 		self.Jgmts89_Seq          := ri.LnJJudgments[89].Seq             ;
 		self.Jgmts89_DateFiled    := ri.LnJJudgments[89].DateFiled       ;
   self.Jgmts89_JudgmentTypeID := ri.LnJJudgments[89].JudgmentTypeID;
@@ -3091,6 +3278,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts89_AgencyCounty := ri.LnJJudgments[89].AgencyCounty    ;
 		self.Jgmts89_AgencyState  := ri.LnJJudgments[89].AgencyState     ;
 		self.Jgmts89_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[89].ConsumerStatementId);
+    self.Jgmts89_orig_rmsid       := ri.LnJJudgments[89].orig_rmsid;
 		self.Jgmts90_Seq          := ri.LnJJudgments[90].Seq             ;
 		self.Jgmts90_DateFiled    := ri.LnJJudgments[90].DateFiled       ;
   self.Jgmts90_JudgmentTypeID := ri.LnJJudgments[90].JudgmentTypeID;
@@ -3109,6 +3297,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts90_AgencyCounty := ri.LnJJudgments[90].AgencyCounty    ;
 		self.Jgmts90_AgencyState  := ri.LnJJudgments[90].AgencyState     ;
 		self.Jgmts90_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[90].ConsumerStatementId);
+    self.Jgmts90_orig_rmsid       := ri.LnJJudgments[90].orig_rmsid;
 		self.Jgmts91_Seq          := ri.LnJJudgments[91].Seq             ;
 		self.Jgmts91_DateFiled    := ri.LnJJudgments[91].DateFiled       ;
   self.Jgmts91_JudgmentTypeID := ri.LnJJudgments[91].JudgmentTypeID;
@@ -3127,6 +3316,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts91_AgencyCounty := ri.LnJJudgments[91].AgencyCounty    ;
 		self.Jgmts91_AgencyState  := ri.LnJJudgments[91].AgencyState     ;
 		self.Jgmts91_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[91].ConsumerStatementId);
+    self.Jgmts91_orig_rmsid       := ri.LnJJudgments[91].orig_rmsid;
 		self.Jgmts92_Seq          := ri.LnJJudgments[92].Seq             ;
 		self.Jgmts92_DateFiled    := ri.LnJJudgments[92].DateFiled       ;
   self.Jgmts92_JudgmentTypeID := ri.LnJJudgments[92].JudgmentTypeID;
@@ -3145,6 +3335,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts92_AgencyCounty := ri.LnJJudgments[92].AgencyCounty    ;
 		self.Jgmts92_AgencyState  := ri.LnJJudgments[92].AgencyState     ;
 		self.Jgmts92_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[92].ConsumerStatementId);
+    self.Jgmts92_orig_rmsid       := ri.LnJJudgments[92].orig_rmsid;
 		self.Jgmts93_Seq          := ri.LnJJudgments[93].Seq             ;
 		self.Jgmts93_DateFiled    := ri.LnJJudgments[93].DateFiled       ;
   self.Jgmts93_JudgmentTypeID := ri.LnJJudgments[93].JudgmentTypeID;
@@ -3163,6 +3354,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts93_AgencyCounty := ri.LnJJudgments[93].AgencyCounty    ;
 		self.Jgmts93_AgencyState  := ri.LnJJudgments[93].AgencyState     ;
 		self.Jgmts93_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[93].ConsumerStatementId);
+    self.Jgmts93_orig_rmsid       := ri.LnJJudgments[93].orig_rmsid;
 		self.Jgmts94_Seq          := ri.LnJJudgments[94].Seq             ;
 		self.Jgmts94_DateFiled    := ri.LnJJudgments[94].DateFiled       ;
   self.Jgmts94_JudgmentTypeID := ri.LnJJudgments[94].JudgmentTypeID;
@@ -3181,6 +3373,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts94_AgencyCounty := ri.LnJJudgments[94].AgencyCounty    ;
 		self.Jgmts94_AgencyState  := ri.LnJJudgments[94].AgencyState     ;
 		self.Jgmts94_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[94].ConsumerStatementId);
+    self.Jgmts94_orig_rmsid       := ri.LnJJudgments[94].orig_rmsid;
 		self.Jgmts95_Seq          := ri.LnJJudgments[95].Seq             ;
 		self.Jgmts95_DateFiled    := ri.LnJJudgments[95].DateFiled       ;
   self.Jgmts95_JudgmentTypeID := ri.LnJJudgments[95].JudgmentTypeID;
@@ -3199,6 +3392,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts95_AgencyCounty := ri.LnJJudgments[95].AgencyCounty    ;
 		self.Jgmts95_AgencyState  := ri.LnJJudgments[95].AgencyState     ;
 		self.Jgmts95_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[95].ConsumerStatementId);
+    self.Jgmts95_orig_rmsid       := ri.LnJJudgments[95].orig_rmsid;
 		self.Jgmts96_Seq          := ri.LnJJudgments[96].Seq             ;
 		self.Jgmts96_DateFiled    := ri.LnJJudgments[96].DateFiled       ;
   self.Jgmts96_JudgmentTypeID := ri.LnJJudgments[96].JudgmentTypeID;
@@ -3217,6 +3411,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts96_AgencyCounty := ri.LnJJudgments[96].AgencyCounty    ;
 		self.Jgmts96_AgencyState  := ri.LnJJudgments[96].AgencyState     ;
 		self.Jgmts96_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[96].ConsumerStatementId);
+    self.Jgmts96_orig_rmsid       := ri.LnJJudgments[96].orig_rmsid;
 		self.Jgmts97_Seq          := ri.LnJJudgments[97].Seq             ;
 		self.Jgmts97_DateFiled    := ri.LnJJudgments[97].DateFiled       ;
   self.Jgmts97_JudgmentTypeID := ri.LnJJudgments[97].JudgmentTypeID;
@@ -3235,6 +3430,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts97_AgencyCounty := ri.LnJJudgments[97].AgencyCounty    ;
 		self.Jgmts97_AgencyState  := ri.LnJJudgments[97].AgencyState     ;
 		self.Jgmts97_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[97].ConsumerStatementId);
+    self.Jgmts97_orig_rmsid       := ri.LnJJudgments[97].orig_rmsid;
 		self.Jgmts98_Seq          := ri.LnJJudgments[98].Seq             ;
 		self.Jgmts98_DateFiled    := ri.LnJJudgments[98].DateFiled       ;
   self.Jgmts98_JudgmentTypeID := ri.LnJJudgments[98].JudgmentTypeID;
@@ -3253,6 +3449,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts98_AgencyCounty := ri.LnJJudgments[98].AgencyCounty    ;
 		self.Jgmts98_AgencyState  := ri.LnJJudgments[98].AgencyState     ;
 		self.Jgmts98_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[98].ConsumerStatementId);
+    self.Jgmts98_orig_rmsid       := ri.LnJJudgments[98].orig_rmsid;
 		self.Jgmts99_Seq          := ri.LnJJudgments[99].Seq             ;
 		self.Jgmts99_DateFiled    := ri.LnJJudgments[99].DateFiled       ;
   self.Jgmts99_JudgmentTypeID := ri.LnJJudgments[99].JudgmentTypeID;
@@ -3271,6 +3468,7 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		self.Jgmts99_AgencyCounty := ri.LnJJudgments[99].AgencyCounty    ;
 		self.Jgmts99_AgencyState  := ri.LnJJudgments[99].AgencyState     ;
 		self.Jgmts99_ConsumerStatementId	:= SetCSID(ri.LnJJudgments[99].ConsumerStatementId);
+    self.Jgmts99_orig_rmsid       := ri.LnJJudgments[99].orig_rmsid;
 		
 		self := ri;
 		self := []; 

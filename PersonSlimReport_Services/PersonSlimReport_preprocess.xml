@@ -10483,7 +10483,9 @@
    </diff_selectors>
   </EsdlElement>
   <DiffMatchs>
-   <diff_match name="uniqueid">
+   <diff_match name="firstlastuniqueid">
+    <part ftype="string" name="Last"/>
+    <part ftype="string" name="First"/>
     <part ftype="string" name="UniqueId"/>
    </diff_match>
   </DiffMatchs>
@@ -10526,7 +10528,9 @@
              name="Names"
              type="Property2Name">
    <DiffMatchs>
-    <diff_match name="uniqueid">
+    <diff_match name="firstlastuniqueid">
+     <part ftype="string" name="Last"/>
+     <part ftype="string" name="First"/>
      <part ftype="string" name="UniqueId"/>
     </diff_match>
    </DiffMatchs>
@@ -18091,7 +18095,7 @@
      </Deed>
      <Entities diff_match="EntityTypeCode">
       <Entity>
-       <Names diff_match="UniqueId">
+       <Names diff_match="UniqueId+First+Last">
         <Name>
          <Full diff_monitor=""/>
          <First/>

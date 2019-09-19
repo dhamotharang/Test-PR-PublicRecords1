@@ -1,4 +1,4 @@
-﻿IMPORT DeathV2_Services,Didville,Doxie,Doxie_Raw,Gateway,Suppress;
+﻿IMPORT DeathV2_Services,Didville,Doxie,Doxie_Raw,dx_death_master,Gateway,Suppress;
 
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lCommon        := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -131,24 +131,18 @@ FUNCTION
   Suppress.MAC_Suppress(dAll_wDIDs,dSuppress,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did,'','',TRUE,'',TRUE);
 	
 	// Deceased flag
-  deathParams := DeathV2_Services.IParam.GetRestrictions(mod_access);
+  death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
-	lFinal tDeceasedFlag(lFinal le,RECORDOF(Doxie.key_death_masterV2_ssa_DID) ri) :=
-	TRANSFORM
-		SELF.deceased := IF(ri.l_did != 0,'Y','N');
-		SELF.dod      := (UNSIGNED)ri.dod8;
-		SELF          := le;
-	END;
-	
-	dDeceased := JOIN(dSuppress,
-										Doxie.key_death_masterV2_ssa_DID,
-										KEYED(LEFT.did = RIGHT.l_did) and
-										NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, glb_ok, deathParams),
-										tDeceasedFlag(LEFT,RIGHT),
-										LEFT OUTER,
-										LIMIT(0),KEEP(1));
-
-	// Debug
+	dDeceasedAppend := dx_death_master.Append.ByDid(dSuppress,did,death_params);
+  dDeceased := 
+    PROJECT(dDeceasedAppend, 
+      TRANSFORM(lfinal,
+        SELF.deceased := IF(LEFT.death.is_deceased, 'Y', 'N');
+        SELF.dod      := IF(LEFT.death.is_deceased, (UNSIGNED4)LEFT.death.dod8, 0);
+        SELF          := LEFT;
+        ));
+  
+  // Debug
 	#IF(PhoneFinder_Services.Constants.Debug.PhoneNoSearch)
 		OUTPUT(dIn,NAMED('dPhoneSearchIn'));
 		OUTPUT(dResultsByPhone,NAMED('dResultsByPhone'));

@@ -1,4 +1,4 @@
-IMPORT AutoKey, Data_Services, Doxie, Inquiry_AccLogs, PhonesPlus_V2, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+IMPORT dx_header, AutoKey, Data_Services, PhonesPlus_V2, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
 
 EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Phone_Risk (DATASET(Suspicious_Fraud_LN.layouts.Layout_Batch_Plus) Input,
 																																				DATASET(Suspicious_Fraud_LN.layouts.Layout_Phone_Inquiries) Inquiries,
@@ -11,7 +11,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_Phone_Risk (DATASET(
 	PhonesPlusKey := Phonesplus_v2.key_phonesplus_fdid;
 	RiskTableKey := Risk_Indicators.Key_Phone_Table_V2;
 	
-	headerBuild := CHOOSEN(Doxie.Key_Max_Dt_Last_Seen, 1);
+	headerBuild := CHOOSEN(dx_header.key_max_dt_last_seen(), 1);
 	headerBuildDate := (((STRING)headerBuild[1].Max_Date_Last_Seen)[1..6]) + '01';
 	
 	// Get the Fake DID - used to search the full phones plus payload

@@ -97,7 +97,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	END; // Transaction Log TRANSFORM
 
 	//Since we just have one score now, simple transform is sufficient or else we need to denormalize socres DS
-	Export iesp.healthcare_socio_indicators.t_SocioIndicators BuildSocioIndicators(Models.Layouts_Healthcare_Core.Final_Output_Layout le, dataset(Models.Layouts_Healthcare_RT_Service.common_runtime_config) Config) := TRANSFORM
+	Export iesp.healthcare_socio_indicators.t_SocioIndicators BuildSocioIndicators(Models.Layouts_Healthcare_Core.Final_Output_Layout_W_OptOutFlag le, dataset(Models.Layouts_Healthcare_RT_Service.common_runtime_config) Config) := TRANSFORM
 		SELF.HealthAttributesV3.Accident.AccidentAge := IF(Config[1].SuppressAccident = false, (string)le.AccidentAge , _blank);
 		SELF.HealthAttributesV3.Accident.AccidentCount := IF(Config[1].SuppressAccident = false, (string) le.AccidentCount , _blank); 
 		SELF.HealthAttributesV3.AddressStability.AddrChangeCount01 := IF(Config[1].SuppressAddressStability = false, (string)le.AddrChangeCount01 , _blank);

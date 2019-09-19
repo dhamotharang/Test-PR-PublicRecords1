@@ -1,6 +1,6 @@
-import Doxie,didville, header;
+﻿import Doxie,didville, header;
 EXPORT Datasource_Boca_Header := Module
-	Export get_boca_header_entity (dataset(Layouts.autokeyInput) input):= function
+	Export get_boca_header_entity (dataset(Layouts.autokeyInput) input, dataset(Layouts.common_runtime_config) cfg):= function
       mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
       glb_ok := mod_access.isValidGLB();
       dppa_ok := mod_access.isValidDPPA();
@@ -12,12 +12,12 @@ EXPORT Datasource_Boca_Header := Module
 																									false, false, false, 8,false,,TRUE, '', 0,
 																									IndustryClass_val := mod_access.industry_class);
 			results := join(input,hdrRecs, (integer)left.acctno=right.seq,
-											transform(Layouts.searchKeyResults, self.prov_id:=right.did; self.acctno:=left.acctno;self.src:=Constants.SRC_BOCA_PERSON_HEADER;self.isAutokeysResult:=true),
+											transform(Layouts.searchKeyResults, self.prov_id:=right.did; self.acctno:=left.acctno;self.src:=Constants.SRC_BOCA_PERSON_HEADER;self.isAutokeysResult:=true;self.glb_ok:=cfg[1].glb_ok),
 											keep(Constants.MAX_RECS_ON_JOIN),limit(0)); 
 			
 			dup_res := dedup(sort(results,record),record);
 			base_data0:= join(dup_res, doxie.key_header,
-											keyed((integer)left.prov_id = right.s_did), 
+											keyed((integer)left.prov_id = right.s_did) and right.valid_ssn = 'G' and right.dob <> 0,
 											transform(recordof(doxie.Key_Header), self := right), 
 											keep(Constants.MAX_RECS_ON_JOIN), limit(0)); 
 

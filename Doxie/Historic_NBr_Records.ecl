@@ -1,6 +1,6 @@
 ﻿
 export historic_nbr_records(hr,outrecs,checkRNA=true, modAccess) := macro
-import header,doxie,ut,suppress;
+import header,dx_header,doxie,ut,suppress;
 
 
 #uniquename(no_prim)
@@ -30,7 +30,7 @@ end;
 %inrecs% := %hrf%;
 
 #uniquename(k)
-%k% := header.Key_Nbr_Address;
+%k% := dx_header.key_nbr_address();
 
 unsigned1 NPA := Neighbors_PerAddress;	
 unsigned1 APN := Addresses_PerNeighbor;
@@ -188,19 +188,21 @@ end;
 					left.zip = right.zip and left.prim_range = right.prim_range and
 					left.sec_range = right.sec_range,
 					%get_all_near%(LEFT,RIGHT),local);
-			
+
+
 #uniquename(outrec)			
 %outrec% := record
-	doxie.Key_Header;
+	dx_header.layout_key_header;
 	unsigned2	distance;
 	unsigned2	overlap;
 	unsigned2	base_prim_range;
 	string9		ssn_unmasked := '';
 end;
 
-
+#uniquename(key_header)
+%key_header% := dx_header.key_header();
 #uniquename(into_out)
-%outrec% %into_out%(%outf3% L, doxie.Key_Header R) := transform
+%outrec% %into_out%(%outf3% L, %key_header% R) := transform
 	self.phone := if((unsigned6)R.phone = 0,'',R.phone);
 	self.dt_last_seen := L.dt_last_seen;
 	self.dt_first_seen := L.dt_first_seen;
@@ -209,7 +211,7 @@ end;
 end;
 
 #uniquename(dirty_outf4)	
-%dirty_outf4% := join(%outf3%(overlap >= 1),doxie.Key_Header, keyed(left.did = right.s_did) and
+%dirty_outf4% := join(%outf3%(overlap >= 1),%key_header%, keyed(left.did = right.s_did) and
 				left.prim_range = %clean_field%(right.prim_range) and
 				left.prim_name = right.prim_name and
 				left.sec_range = %clean_field%(right.sec_range) and

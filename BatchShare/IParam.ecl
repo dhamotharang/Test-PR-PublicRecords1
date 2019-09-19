@@ -12,7 +12,7 @@ export IParam := module
 	//   This should work as the base for all batch params.
 	// **************************************************************************************
 
-  EXPORT BatchParamsV2 := INTERFACE (doxie.IDataAccess)
+  EXPORT BatchParams := INTERFACE (doxie.IDataAccess)
     EXPORT unsigned2 PenaltThreshold      := $.Constants.Defaults.PenaltThreshold;
     EXPORT unsigned8 MaxResults           := $.Constants.Defaults.MaxResults;
     EXPORT unsigned8 MaxResultsPerAcct    := $.Constants.Defaults.MaxResultsPerAcctno;
@@ -24,9 +24,9 @@ export IParam := module
   END;
 
   // an (optional) convenience method for initializing most common input criteria
-  EXPORT getBatchParamsV2() := FUNCTION
+  EXPORT getBatchParams() := FUNCTION
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-    in_mod := MODULE(PROJECT (mod_access, BatchParamsV2, OPT))
+    in_mod := MODULE(PROJECT (mod_access, BatchParams, OPT))
       EXPORT unsigned2 PenaltThreshold   := $.Constants.Defaults.PenaltThreshold     : stored('PenaltThreshold');
       EXPORT unsigned8 MaxResults        := $.Constants.Defaults.MaxResults          : stored('MaxResults');
       EXPORT unsigned8 MaxResultsPerAcct := $.Constants.Defaults.MaxResultsPerAcctno : stored('Max_Results_Per_Acct');

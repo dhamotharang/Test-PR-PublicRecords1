@@ -940,6 +940,7 @@ EXPORT Constants := MODULE
     export unsigned1 MaxProfLicenses := 10;
     export unsigned1 MaxDriverLicenses := 10;
 		export unsigned1 MaxAkas := 10;
+		export unsigned1 MaxInternetDomains := 10;
 	end;
 	
 	// Identity Fraud Network Constants

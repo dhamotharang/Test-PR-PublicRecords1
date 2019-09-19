@@ -31,7 +31,7 @@ EXPORT SexOffenderCPS_BatchServiceFCRA(useCannedRecs = false) := MACRO
 		// common batch settings, including a gateway to a remote Picklist
 		gm := AutoStandardI.GlobalModule(isFCRA);	
 		
-    batch_params := module (project (BatchShare.IParam.getBatchParamsV2(), SexOffender_Services.IParam.batch_params, opt))
+    batch_params := module (project (BatchShare.IParam.getBatchParams(), SexOffender_Services.IParam.batch_params, opt))
 			export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
 		  export integer8 FFDOptionsMask := FFD.FFDMask.Get();
 		  export integer  FCRAPurpose := FCRA.FCRAPurpose.Get();

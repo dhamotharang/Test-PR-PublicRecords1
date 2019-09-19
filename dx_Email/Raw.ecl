@@ -17,7 +17,7 @@ EXPORT Raw := MODULE
 
   EXPORT get_byLexidBatch(ds_in, did_field, mod_access, data_env = Data_Services.data_env.iNonFCRA, out_layout='dx_Email.Layouts.i_Payload') := FUNCTIONMACRO
 
-    LOCAL _email_payload := dx_Email.Raw.get_byLexid(ds_in,did_field,data_env);  // returns results in dx_Email.Layouts.i_Payload by default
+    LOCAL _email_payload := dx_Email.Raw.get_byLexid(ds_in,did_field,mod_access,data_env);  // returns results in dx_Email.Layouts.i_Payload by default
     // restore accountNo etc.
     LOCAL _all_recs := JOIN(ds_in, _email_payload, (UNSIGNED) LEFT.did_field = RIGHT.DID,
                            TRANSFORM(out_layout, SELF:=RIGHT, SELF:=LEFT, SELF:=[]));

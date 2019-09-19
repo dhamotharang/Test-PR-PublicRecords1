@@ -1,4 +1,4 @@
-import didville,patriot,doxie;
+import didville, patriot, doxie, dx_header;
 
 export did_service_common_function( 
     dataset(didville.Layout_Did_OutBatch) file_in,
@@ -92,7 +92,8 @@ patriot.MAC_AppendPatriot(file_rslt_eda,did,fname,mname,lname,file_rslt4,ptys,fa
 file_rslt5 := if(patriot_flag, file_rslt4, file_rslt_eda);
 
 //append lookups and living situations information
-file_rslt5 get_lookups(file_rslt5 L, doxie.Key_Did_Lookups R) := transform
+key_lookups := dx_header.key_Did_lookups();
+file_rslt5 get_lookups(file_rslt5 L, key_lookups R) := transform
 	self.veh_cnt := if (lookups_flag,R.veh_cnt,0);
 	self.dl_cnt := if (lookups_flag,R.dl_cnt,0);
 	self.head_cnt := if (lookups_flag,R.head_cnt,0);
@@ -138,7 +139,7 @@ file_rslt5 get_lookups(file_rslt5 L, doxie.Key_Did_Lookups R) := transform
 	self := l;
 end;
 
-file_rslt6 := join(file_rslt5, doxie.Key_did_lookups, 
+file_rslt6 := join(file_rslt5, key_lookups, 
                    left.did = right.did,get_lookups(LEFT,RIGHT),left outer);
 
 file_rslt := if (lookups_flag or livingsits_flag,file_rslt6,file_rslt5);

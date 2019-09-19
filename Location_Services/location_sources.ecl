@@ -332,7 +332,7 @@ TRANSFORM
 	self.util_child := dedup(SORT(L.util_child, RECORD), record);
 	self.eq_child := dedup(SORT(L.eq_child, RECORD), record);
 	self.en_child := dedup(SORT(L.en_child, RECORD), record);
-	self.for_child := dedup(SORT(if(doxie.DataRestriction.Fares,dataset([],Property.Layout_Fares_Foreclosure), L.for_child), RECORD), record);
+	self.for_child := dedup(SORT(if(doxie.DataRestriction.Fares,dataset([],Property.Layout_Fares_Foreclosure_Ex_Sids), L.for_child), RECORD), record);
 	self.nod_child := dedup(SORT(if(doxie.DataRestriction.Fares,dataset([],iesp.foreclosure.t_ForeclosureReportRecord), L.nod_child), RECORD), record);
 	self.boater_child := dedup(SORT(L.boater_child, RECORD), record);
 	self.tu_child := dedup(SORT(L.tu_child, RECORD), record);

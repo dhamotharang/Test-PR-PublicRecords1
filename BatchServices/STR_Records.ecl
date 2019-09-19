@@ -22,8 +22,6 @@ FUNCTION
 	//////////////////////////////////////////////////////////////////////////	
 	*/
 
-	doxie.MAC_Header_Field_Declare();
-	
 	//////////////////////////////////////////////////////////////////////////
 	// cleanup addresses and drop records missing secondary range
 	//////////////////////////////////////////////////////////////////////////	
@@ -81,11 +79,11 @@ FUNCTION
 										 left outer, limit(BatchServices.STR_Constants.Limits.JOIN_LIMIT))
 										 (error_code=BatchServices.STR_Constants.ErrorCodes.NO_ERROR);
 	
-	ds_flat_res  		:= BatchServices.STR_Functions.fn_get_residents_recs(ds_flat_in, in_mod);
+	ds_flat_res  		:= BatchServices.STR_Functions.fn_get_residents_recs(ds_flat_in);
 	// DPPA is applied to both dl and mvr recs. Although not explicitly passing it here, the dppa parameter is read from global module directly (deep down the rabbit hole...).
-  ds_flat_dl 			:= BatchServices.STR_Functions.fn_get_dl_recs(ds_flat_in, in_mod);	
-	ds_flat_mvr 		:= BatchServices.STR_Functions.fn_get_mvr_recs(ds_flat_in, in_mod);
-	ds_flat_voters 	:= BatchServices.STR_Functions.fn_get_voter_recs(ds_flat_in, in_mod);
+  ds_flat_dl 			:= BatchServices.STR_Functions.fn_get_dl_recs(ds_flat_in);	
+	ds_flat_mvr 		:= BatchServices.STR_Functions.fn_get_mvr_recs(ds_flat_in);
+	ds_flat_voters 	:= BatchServices.STR_Functions.fn_get_voter_recs(ds_flat_in);
 	ds_flat_all			:= ds_flat_res + ds_flat_dl + ds_flat_mvr + ds_flat_voters;
 	
 	//////////////////////////////////////////////////////////////////////////
@@ -231,9 +229,9 @@ FUNCTION
 
 	ds_final_pre  		:= project(ds_final_split, BatchServices.STR_Transforms.xform_output(left));
 
-  Suppress.MAC_Suppress(ds_final_pre,ds_final_pre_1,application_type_value,Suppress.Constants.LinkTypes.DID,did);
-	Suppress.MAC_Mask(ds_final_pre_1, ds_final_pre_2, owner1_ssn, '', true, false,,,,ssn_mask_value);	
-	Suppress.MAC_Mask(ds_final_pre_2, ds_final_pre_3, owner2_ssn, '', true, false,,,,ssn_mask_value);		
+  Suppress.MAC_Suppress(ds_final_pre,ds_final_pre_1,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
+	Suppress.MAC_Mask(ds_final_pre_1, ds_final_pre_2, owner1_ssn, '', true, false,,,,in_mod.ssn_mask);	
+	Suppress.MAC_Mask(ds_final_pre_2, ds_final_pre_3, owner2_ssn, '', true, false,,,,in_mod.ssn_mask);		
 
 	ds_final := sort(ds_final_pre_3, acctno, -current_address, -BA_dt_last_seen, -DL_last_expiration_dt_seen, -MVR_last_expiration_dt_seen, -Voter_last_vote_dt, did);
 

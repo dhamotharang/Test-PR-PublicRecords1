@@ -1,5 +1,6 @@
-﻿IMPORT iesp, doxie, phonesplus_v2, progressive_phone, risk_indicators, didville, person_models,
-  ut, MDR, batchservices, NID, DeathV2_Services, Gateway, Phone_Shell, STD, AutoStandardI;
+﻿﻿IMPORT AutoStandardI, batchservices, DeathV2_Services, didville, doxie, dx_death_master, Gateway, iesp, 
+       MDR, NID, person_models, Phone_Shell, phonesplus_v2, progressive_phone, risk_indicators, 
+       STD, Suppress, ut;
   
 
 EXPORT functions := MODULE
@@ -265,9 +266,9 @@ EXPORT functions := MODULE
     progressive_phone.mac_get_type_t(f_with_did, f_in_batch, f_out_type_t, mod_access)
 
     batch_out_with_did := progressive_phone.layout_progressive_batch_out_with_did;
-
+    
     dummy_ds := dataset([], batch_out_with_did);
-
+    
     // append did to type a if needed
     in_batch_rec_x := record
       DidVille.Layout_Did_InBatch.seq;
@@ -333,12 +334,9 @@ EXPORT functions := MODULE
     f_pre_death_check := if(inMod.DedupOutputPhones, dedup(f_out_srt, acctno, subj_phone10), f_out_srt);
 
     //death check														
-    deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
+    death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
-    f_post_death_filter := join(f_pre_death_check,doxie.key_death_masterV2_ssa_DID,
-                              keyed(left.p_did = right.l_did)  and
-                              not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-                              transform(left),left only);
+    f_post_death_filter := dx_death_master.Exclude(f_pre_death_check,p_did,death_params);
 
     f_out_dep_chk  := if (inMod.ExcludeDeadContacts,
                           f_post_death_filter,
@@ -366,7 +364,7 @@ EXPORT functions := MODULE
           ph_type = 'EDACA' => 'AP',
           ph_type = 'EDADID' or ph_type = 'EDAHistory' => 'SE',
           ph_type = 'PPDID' or ph_type = 'PPFLA' or ph_type = 'PPLFA' or ph_type = 'PPFA' or 
-                    ph_type = 'PPLA' or ph_type = 'PPCA'  or ph_type = 'INF' => 'PP',
+          ph_type = 'PPLA' or ph_type = 'PPCA'  or ph_type = 'INF' => 'PP',
           ph_type = 'PPTH' => 'TH',
           ph_type = 'MD' => 'MD',
           ph_type = 'SP' => 'SP',
@@ -455,7 +453,7 @@ EXPORT functions := MODULE
                 SELF.match_zip   := tmpMatchZip;
                 // doesn't really do too much since input for right.ssn is string9 and thus implication is that - are not allowed
                 // but keeping code here in case ssn input is at some point uncleaned on way into roxie service.
-                tmpMatchSSN   := ((LEFT.ssn = stringlib.stringfilterout(RIGHT.ssn, '-')) AND (LEFT.ssn <> ''));
+                tmpMatchSSN   := ((LEFT.ssn = STD.Str.filterout(RIGHT.ssn, '-')) AND (LEFT.ssn <> ''));
                 SELF.match_ssn   := tmpMatchSSN;							
                 tmpMatchDid   :=	LEFT.did = RIGHT.did AND LEFT.did <> 0; 					
                 SELF.match_did   :=	tmpMatchDid;
@@ -571,7 +569,7 @@ EXPORT functions := MODULE
     #else
     f_out := IF(inMod.SkipPhoneScoring = TRUE, f_out_legacy, SORT(f_out_scored, -phone_score));
     #end		
- 		   
+
     RETURN f_out;
 
   END;

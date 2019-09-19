@@ -9969,4 +9969,53 @@ EXPORT getSeMO_RiskDrivers(ds) := FUNCTIONMACRO
    RETURN Risk_Drivers_DS_HI_LO;
 ENDMACRO;
 
+
+EXPORT Models.Layouts_Healthcare_Core.Final_Output_Layout_W_OptOutFlag SuppressResultsDueToOptOut_xForm(Models.Layouts_Healthcare_Core.Final_Output_Layout_W_OptOutFlag L) := TRANSFORM 
+      _OptOutMsg := 'OO';
+      SELF.seq                         := L.seq;
+      SELF.acctno                      := L.acctno;
+      SELF.lexid                       := L.lexid;
+      SELF.ADLScore                    := L.ADLScore;
+      SELF.isLexIdInOptOut             := L.isLexIdInOptOut;
+      SELF.PATIENT_TYPE                := L.PATIENT_TYPE;
+      SELF.FINANCIAL_CLASS             := L.FINANCIAL_CLASS;
+      SELF.RSMemberAge                 := L.RSMemberAge;
+      SELF.AGE_GROUP                   := L.AGE_GROUP;
+      SELF.ADMIT_DIAG                  := L.ADMIT_DIAG;
+      SELF.READMIT_DIAG                := L.READMIT_DIAG;
+      SELF.READMIT_LIFT                := L.READMIT_LIFT;
+      SELF.isSeRsExcludedDiag          := L.isSeRsExcludedDiag;
+      SELF.isSeRsMinor                 := L.isSeRsMinor;
+      SELF.isSeRsInvalidDiag           := L.isSeRsInvalidDiag;
+      SELF.isSeRsInvalidPatientType    := L.isSeRsInvalidPatientType;
+      SELF.isSeRsInvalidFinancialClass := L.isSeRsInvalidFinancialClass;
+      SELF.isSeRsM1ModelUsed           := L.isSeRsM1ModelUsed;
+      SELF.Score                       := _OptOutMsg;
+      SELF.SeRs_Score                  := _OptOutMsg;
+      SELF.SeRs_Raw_Score              := _OptOutMsg;
+      SELF.RAR_Driver_Hi1              := _OptOutMsg;
+      SELF.RAR_Driver_Hi2              := _OptOutMsg;
+      SELF.RAR_Driver_Hi3              := _OptOutMsg;
+      SELF.RAR_Driver_Lo1              := _OptOutMsg;
+      SELF.RAR_Driver_Lo2              := _OptOutMsg;
+      SELF.RAR_Driver_Lo3              := _OptOutMsg;
+      SELF.SeMA_Score                  := _OptOutMsg;
+      SELF.SeMA_Raw_Score              := _OptOutMsg;
+      SELF.MA_Driver_Hi1               := _OptOutMsg;
+      SELF.MA_Driver_Hi2               := _OptOutMsg;
+      SELF.MA_Driver_Hi3               := _OptOutMsg;
+      SELF.MA_Driver_Lo1               := _OptOutMsg;
+      SELF.MA_Driver_Lo2               := _OptOutMsg;
+      SELF.MA_Driver_Lo3               := _OptOutMsg;
+      SELF.SeMO_Score                  := _OptOutMsg;
+      SELF.SeMO_Raw_Score              := _OptOutMsg;
+      SELF.MO_Driver_Hi1               := _OptOutMsg;
+      SELF.MO_Driver_Hi2               := _OptOutMsg;
+      SELF.MO_Driver_Hi3               := _OptOutMsg;
+      SELF.MO_Driver_Lo1               := _OptOutMsg;
+      SELF.MO_Driver_Lo2               := _OptOutMsg;
+      SELF.MO_Driver_Lo3               := _OptOutMsg;
+      SELF := [];
+END;
+
 End;
