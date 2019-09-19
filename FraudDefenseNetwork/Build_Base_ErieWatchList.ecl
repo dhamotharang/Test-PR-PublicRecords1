@@ -67,13 +67,13 @@ export Build_Base_ErieWatchList(
      ErieWLClnLinked := ErieWithBDID:persist(constants().ErieWLClnLinkedPersist);
 
   //Remove Duplicates
-    ErieWL_Indiv_dist := distribute(ErieWLClnLinked(did>0), hash(did));
+    ErieWL_Indiv_dist := distribute(ErieWLClnLinked(did>0), hash32(did));
     ErieWL_Indiv_Unq := dedup(sort(ErieWL_Indiv_dist, did, validstartDate, -ffid, local), did, validstartDate, local);
     ErieWLIndvidual := project(ErieWL_Indiv_Unq, transform(recordof(ErieWL_Indiv_Unq), self.entity :='PERSON', self := left));
-    ErieWL_Business_dist := distribute(ErieWLClnLinked(seleid>0 or orgid>0 or ultid>0), hash(seleid, orgid, ultid ));
+    ErieWL_Business_dist := distribute(ErieWLClnLinked(seleid>0 or orgid>0 or ultid>0), hash32(seleid, orgid, ultid ));
     ErieWL_Business_Unq := dedup(sort(ErieWL_Business_dist, seleid, orgid, ultid, validstartDate, -ffid, local), seleid, orgid, ultid, validstartDate, local);
     ErieWLBusiness := project(ErieWL_Business_Unq, transform(recordof(ErieWL_Business_Unq), self.entity :='BUSINESS', self := left));
-    ErieWL_Unknown_dist := distribute(ErieWLClnLinked(did =0 and seleid=0 and orgid=0 and ultid=0), hash(cleaned_name.fname,
+    ErieWL_Unknown_dist := distribute(ErieWLClnLinked(did =0 and seleid=0 and orgid=0 and ultid=0), hash32(cleaned_name.fname,
                                       cleaned_name.mname, cleaned_name.lname, clean_business_name, tin, ssn, dln, dlstate, dob,
                                       addressline1, addressline2, city, state, phone1, phone2, zip, country, vin, validstartDate));
     ErieWL_Unknown_Unq := dedup(sort(ErieWL_Unknown_dist, cleaned_name.fname, cleaned_name.mname, cleaned_name.lname, clean_business_name, 
@@ -83,9 +83,9 @@ export Build_Base_ErieWatchList(
                                      phone1, phone2, zip, country, vin, validstartDate, local);
     ErieWLUnknown := project (ErieWL_Unknown_Unq, transform(recordof(ErieWL_Unknown_Unq), self.entity :='UNKNOWN', self := left));
     ErieWL_All := ErieWLIndvidual + ErieWLBusiness + ErieWLUnknown;
-    ErieWLUpdate := distribute(ErieWL_All, hash(alertnumber, cleaned_name.fname, cleaned_name.mname, cleaned_name.lname, 
+    ErieWLUpdate := distribute(ErieWL_All, hash32(alertnumber, cleaned_name.fname, cleaned_name.mname, cleaned_name.lname, 
                                clean_business_name, ssn, dob, validstartDate, entity));
-    ErieWLBase := distribute(inBaseErieWL, hash(alertnumber, cleaned_name.fname, cleaned_name.mname, cleaned_name.lname, 
+    ErieWLBase := distribute(inBaseErieWL, hash32(alertnumber, cleaned_name.fname, cleaned_name.mname, cleaned_name.lname, 
                              clean_business_name, ssn, dob, validstartDate, entity));
 
     Layouts.Base.ErieWatchList getSrcRid(ErieWLBase l, ErieWLUpdate r) :=
@@ -116,7 +116,15 @@ export Build_Base_ErieWatchList(
                          );
 
     ut.MAC_Append_Rcid (dBase_with_rids, source_rec_id, pDataset_rollup);
-    tools.mac_WriteFile(Filenames(pversion).Base.ErieWatchList.New, pDataset_rollup, Build_Base_File);
+    
+    dBase_RecordID := Project(pDataset_rollup, transform(recordof(pDataset_rollup),
+                                                          RecordID := if(left.source = 'ERIE_WATCHLIST',  Constants().ErieWatchlistRecIDSeries + left.source_rec_id, 
+                                                                         Constants().ErieNICBWatchlistRecIDSeries + left.source_rec_id);
+                                                          self.record_sid := RecordID;
+                                                          self := left;
+                                                          )); 
+                                                          
+    tools.mac_WriteFile(Filenames(pversion).Base.ErieWatchList.New, dBase_RecordID, Build_Base_File);
 
   //Return
     export full_build := sequential(
