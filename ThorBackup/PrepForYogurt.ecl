@@ -122,12 +122,13 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	export GetYogurtWUIDs := function
 	
 		wulist := lib_workunitservices.WorkunitServices.workunitlist
-														(lowwuid := getMaxWU // get the WU that is 20 days old from now (OR)
+														(lowwuid := trim(getMaxWU) // get the WU that is 20 days old from now (OR)
 																									// if the WU in the list from file is older than 20 days
 																									// whichever is older
 															, highwuid := thorbackup.constants.yogurt().endwu)
 															(regexfind('yogurt',stringlib.StringToLowerCase(job)) and 
 																~( job = 'Prep Yogurt Copy' 
+																	or job = 'Backup Thor Files'
 																	//or wuid = maxWU 
 																	or state in ['running','blocked'] ));
 																	/*and
@@ -139,7 +140,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 	
 	
 		lib_workunitservices.wsworkunitrecord getmodified(wulist l) := transform
-			self.modified := thorbackup.GetWUModified(thorbackup.Constants.esp.bocaprodthor,l.wuid);
+			self.modified := regexreplace('[-:ZT]',STD.System.Workunit.WorkunitTimeStamps(trim(l.wuid,left,right))(trim(id,left,right) = 'Finished' and application = '')[1].time,'');
 			self := l;
 		end;
 		
