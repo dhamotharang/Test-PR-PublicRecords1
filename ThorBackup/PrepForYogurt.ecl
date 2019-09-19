@@ -127,8 +127,8 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																									// whichever is older
 															, highwuid := thorbackup.constants.yogurt().endwu)
 															(regexfind('yogurt',stringlib.StringToLowerCase(job)) and 
-																~( job = 'Prep Yogurt Copy' 
-																	or job = 'Backup Thor Files'
+																~( job = STD.System.Job.Name() 
+																	
 																	//or wuid = maxWU 
 																	or state in ['running','blocked'] ));
 																	/*and
