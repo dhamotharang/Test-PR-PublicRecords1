@@ -73,8 +73,5 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   
   result_row := ROW({ds_results_ready, email_gw_royalties}, $.Layouts.email_combined_rec);
 
-  // temporary output for QA to verify tmx results for core functionality
-  IF($.Constants.SearchType.isEAA(in_mod.SearchType) AND in_mod.UseTMXRules, OUTPUT(email_with_tmx_recs, NAMED('tmx_results'), EXTEND));
-
   RETURN result_row;
 END;

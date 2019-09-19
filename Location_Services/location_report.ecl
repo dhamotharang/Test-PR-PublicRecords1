@@ -331,55 +331,43 @@ allApns := DEDUP(SORT(UNGROUP(apns),apn),apn);
 // and force them into their respective "previous" groups
 death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
-// apparently need a no-op transform for join syntax when join type specified
-Location_Services.Layout_report.Assoc getAssoc(Location_Services.Layout_report.Assoc L) := TRANSFORM
-	SELF := L;
+layout_assoc := RECORD (Location_Services.layout_report.Assoc)
+  boolean is_best := FALSE;
+  boolean is_deceased := FALSE;
 END;
 
-Location_Services.Layout_report.Assoc getOwn(propSrchFields L) := TRANSFORM
-	SELF := L;
-END;
+owners_w_best := JOIN(owners, bestrec,
+                      LEFT.did = RIGHT.did AND LEFT.prim_name = RIGHT.prim_name AND LEFT.prim_range = RIGHT.prim_range,
+                      TRANSFORM(layout_assoc, SELF.is_best := (RIGHT.did != 0), SELF := LEFT),
+                      KEEP(1), LIMIT(0),
+                      LEFT OUTER);
 
-curOwnRes := join(owners, bestrec, left.did<>0 AND left.did = right.did and left.prim_name = right.prim_name
-            and left.prim_range = right.prim_range, getOwn(LEFT));
+owners_w_deceased := dx_death_master.append.byDid(owners_w_best, did, death_params);
 
-curOwnResAlive := dx_death_master.Exclude(curOwnRes,did,death_params);
+all_owners := PROJECT (owners_w_deceased, TRANSFORM(layout_assoc, SELF.is_deceased := LEFT.death.is_deceased, SELF := LEFT));
 
-curOwnResBest := dedup(sort(curOwnResAlive, lname, fname, record), record);
+// partition owners into current/not-current (according to the best file) and alive/deceased
+deadOwnRes       := PROJECT(all_owners ( is_best AND  is_deceased), Location_Services.layout_report.Assoc);
+deadOwn          := PROJECT(all_owners (~is_best AND  is_deceased), Location_Services.layout_report.Assoc);
+curOwnResBestAll := PROJECT(all_owners ( is_best AND ~is_deceased), Location_Services.layout_report.Assoc);
+curOwnResBest    := SORT(curOwnResBestAll, lname, fname, RECORD);
+curOwnBestAll    := PROJECT(all_owners (~is_best AND ~is_deceased), Location_Services.layout_report.Assoc);
+curOwnBest       := DEDUP(SORT(curOwnBestAll, lname, fname, RECORD), RECORD);
 
-deadOwnResRaw := dx_death_master.Get.ByDid(curOwnRes,did,death_params);
-deadOwnRes := 
-  JOIN(curOwnRes,deadOwnResRaw,
-       LEFT.did = RIGHT.did,
-    TRANSFORM(Location_Services.Layout_report.Assoc,
-      SELF := LEFT)); 
+// partition residents into alive/deceased ("is_best" is not needed, just reusing same layout)
+curRes := JOIN(owners, bestAddrs, 
+               LEFT.did<>0 AND LEFT.did = RIGHT.did AND LEFT.prim_name = RIGHT.prim_name AND LEFT.prim_range = RIGHT.prim_range, 
+               TRANSFORM (layout_assoc, SELF.is_best := RIGHT.did != 0, SELF := RIGHT),
+               RIGHT ONLY);
+curRes_w_deceased := dx_death_master.append.byDid(curRes, did, death_params);
 
-curOwn := join(owners, bestRec, left.did<>0 AND left.did = right.did and left.prim_name = right.prim_name
-            and left.prim_range = right.prim_range, getOwn(LEFT), LEFT ONLY);
-curOwnAlive := dx_death_master.Exclude(curOwn,did,death_params);
+all_residents := PROJECT(curRes_w_deceased, TRANSFORM(layout_assoc, SELF.is_deceased := LEFT.death.is_deceased, SELF := LEFT));
 
-curOwnBest := dedup(sort(curOwnAlive, lname, fname, record), record);
+curResBest_alive := PROJECT(all_residents(~is_deceased), Location_Services.layout_report.Assoc);
+curResBest := DEDUP(SORT(curResBest_alive, lname, fname, RECORD), RECORD);
+deadRes    := PROJECT(all_residents(is_deceased), Location_Services.layout_report.Assoc);
 
-deadOwnRaw := dx_death_master.Get.ByDid(curOwn,did,death_params);
-deadOwn := 
-  JOIN(curOwn, deadOwnRaw,
-       LEFT.did = RIGHT.did,
-    TRANSFORM(Location_Services.Layout_report.Assoc,
-      SELF := LEFT));
-      
-curRes := join(owners, bestAddrs, left.did<>0 AND left.did = right.did and left.prim_name = right.prim_name
-            and left.prim_range = right.prim_range, transform (Location_Services.Layout_report.Assoc, Self := RIGHT), RIGHT ONLY);
-curResAlive := dx_death_master.Exclude(curRes,did,death_params);
-
-curResBest := dedup(sort(curResAlive, lname, fname, record), record);
-deadResRaw := dx_death_master.Get.ByDid(curRes,did,death_params);
-deadRes := 
-  JOIN(curRes,deadResRaw,
-       LEFT.did = RIGHT.did,
-    TRANSFORM(Location_Services.Layout_report.Assoc,
-      SELF := LEFT));     
-      
-prevOwn := PROJECT(sellers, getOwn(LEFT));
+prevOwn := PROJECT(sellers, Location_Services.layout_report.Assoc);
 prevOwnCombined := dedup(sort(prevOwn + deadOwnRes + deadOwn, did), did);
 prevOwnBest := sort(prevOwnCombined, lname, fname);
 		
@@ -397,7 +385,7 @@ prevRes := join(headerRecs2, bestAddrs, LEFT.did = RIGHT.did and
 
 prevRes2 := dedup(sort(prevRes, did, lname, fname, mname), did);
 
-prevRes3 := join(prevRes2, bestNamesD, left.did = right.did, getAssoc(LEFT), LEFT ONLY);
+prevRes3 := join(prevRes2, bestNamesD, left.did = right.did, TRANSFORM(Layout_report.Assoc, SELF := LEFT), LEFT ONLY);
 
 Location_Services.Layout_report.Assoc getAssocBest(bestrec R) := TRANSFORM
 	SELF := R;
