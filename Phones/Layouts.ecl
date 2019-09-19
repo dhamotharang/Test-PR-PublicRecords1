@@ -85,11 +85,6 @@ MODULE
 
 	EXPORT gatewayHistory := RECORD
 		RECORDOF(DeltabaseGateway.Key_Deltabase_Gateway.Historic_Results);
-		//Temporary till product approves logging of these fields
-		integer imsi_Tenure_MinDays;
-		integer imsi_Tenure_MaxDays;
-		integer imei_Tenure_MinDays;
-		integer imei_Tenure_MaxDays;
 	END;
 
 	EXPORT ZumigoIdentity := MODULE

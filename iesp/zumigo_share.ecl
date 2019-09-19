@@ -5,7 +5,7 @@
 import iesp;
 
 export zumigo_share := MODULE
-			
+
 export t_ZIdConsent := record
 	string OptInType {xpath('OptInType')};
 	string OptInMethod {xpath('OptInMethod')}; //values['TCO','MA','TCP','IVR','SMS','TCPA','One','Other','']
@@ -14,7 +14,7 @@ export t_ZIdConsent := record
 	string OptInVersionId {xpath('OptInVersionId')};
 	iesp.share.t_TimeStamp OptInTimestamp {xpath('OptInTimestamp')};
 end;
-		
+
 
 end;
 
