@@ -2,7 +2,7 @@
 
 fdn_crim_version := dataset([cert_version],{string version});
 
-ds := distribute(dataset('~thor_data400::fdn::crim_version',{string version},thor,opt),hash(version));
+ds := distribute(dataset('~thor_data400::fdn::crim_version',{string version},thor,opt),hash32(version));
 
 set_fdn_crim := output(dedup(sort(fdn_crim_version+ds,version,local),version,local),,'~thor_data400::fdn::crim_version_'+cert_version);
 
