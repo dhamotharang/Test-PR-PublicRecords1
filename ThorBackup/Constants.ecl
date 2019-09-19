@@ -42,7 +42,7 @@ EXPORT Constants := module
 		export integer nfiles := if (nooffiles > 0, nooffiles, 500);
 	end;
 	
-	export deletethresholdsize := 100000000000;
+	export deletethresholdsize := 10000000000;
 
 	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
 
