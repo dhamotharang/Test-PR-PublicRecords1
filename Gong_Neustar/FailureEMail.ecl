@@ -1,1 +1,1 @@
-EXPORT FailureEMail := 'christopher.brodeur@lexisnexis.com,afterhourssupport@seisint.com,Charles.Salvo@lexisnexis.com,chuck.salvo@gmail.com,intel357@bellsouth.net,John.Freibaum@lexisnexis.com';
+﻿EXPORT FailureEMail := 'christopher.brodeur@lexisnexis.com,afterhourssupport@seisint.com,Charles.Salvo@lexisnexis.com,chuck.salvo@gmail.com,intel357@bellsouth.net,Abednego.Escobal@lexisnexisrisk.com';

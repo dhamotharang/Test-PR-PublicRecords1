@@ -606,9 +606,13 @@ Export PII	:=RECORD
   string20 mname;
   string20 lname;
   string5 name_suffix;
-  string28 prim_name;
-  string10 prim_range;
-  string8 sec_range;
+	string10 prim_range;
+	string2 predir;
+	string28 prim_name;
+	string4 addr_suffix;
+	string2 postdir;
+	string10 unit_desig;
+	string8 sec_range;
   string2 st;
   string5 zip;
   string10 ssn;
@@ -2063,5 +2067,37 @@ Export CIID := RECORD
  Export ProdDashboardVersion := Record
   string version;
  End; 
+ 
+ Export Advo	:= Record
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
+  string1 advo_hitflag;
+  string1 advo_vacancyindicator;
+  string1 advo_throwbackindicator;
+  string1 advo_seasonaldeliveryindicator;
+  string5 advo_seasonalsuppressionstartdate;
+  string5 advo_seasonalsuppressionenddate;
+  string1 advo_donotdeliverindicator;
+  string1 advo_collegeindicator;
+  string10 advo_collegesuppressionstartdate;
+  string10 advo_collegesuppressionenddate;
+  string1 advo_addressstyle;
+  string5 advo_simplifyaddresscount;
+  string1 advo_dropindicator;
+  string1 advo_residentialorbusinessindicator;
+  string1 advo_onlywaytogetmailindicator;
+  string1 advo_recordtypecode;
+  string1 advo_addresstype;
+  string1 advo_addressusagetype;
+  string8 advo_firstseendate;
+  string8 advo_lastseendate;
+  string8 advo_vendorfirstreporteddate;
+  string8 advo_vendorlastreporteddate;
+  string8 advo_vacationbegindate;
+  string8 advo_vacationenddate;
+  string8 advo_numberofcurrentvacationmonths;
+  string8 advo_maxvacationmonths;
+  string8 advo_vacationperiodscount;
+ End;
  
 END;
