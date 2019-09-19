@@ -51,6 +51,7 @@ module
 	end;
 	export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
 	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
+	export rollbackinput := tools.mod_RollbackInput(pInputFilenames,pFilter,pDelete,pIsTesting);
 
 
 	export promote_sprayed_files := sequential(
