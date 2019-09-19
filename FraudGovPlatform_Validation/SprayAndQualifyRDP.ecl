@@ -60,7 +60,7 @@ EXPORT SprayAndQualifyRDP(
 
 	Customer_Settings := FraudGovPlatform.MBS_Mappings(contribution_source = 'RDP' and contribution_gc_id != '');
 
-	billingID_list := SET(RDP_GcIds,contribution_billing_id);
+	billingID_list := SET(Customer_Settings,contribution_billing_id);
 
 		
 	MoveToPass :=
