@@ -37,7 +37,7 @@ EXPORT Build_Base_AInspection (
 
   //Rollup Update and previous base
     Pcombined := If(UpdateAInspection, inBaseAInspection + AInspectionUpdate, AInspectionUpdate);
-    pDataset_Dist := distribute(Pcombined, hash(clean_address.prim_name));
+    pDataset_Dist := distribute(Pcombined, hash32(clean_address.prim_name));
     pDataset_sort := sort(Pcombined, record, -dt_last_seen, -process_date, local);
     
     Layouts.Base.AInspection RollupUpdate(Layouts.Base.AInspection l, Layouts.Base.AInspection r) :=
@@ -56,7 +56,13 @@ EXPORT Build_Base_AInspection (
                                dt_last_seen, dt_vendor_last_reported, dt_vendor_first_reported, source_rec_id, current, local
                              );
 
-    tools.mac_WriteFile(Filenames(pversion).Base.AInspection.New, pDataset_rollup, Build_Base_File);
+    dBase_RecordID := Project(pDataset_rollup(length(trim(state,left,right)) <3), transform(recordof(pDataset_rollup),
+                                                         RecordID := Constants().AInspectionRecIDSeries + left.source_rec_id;
+                                                         self.record_sid := RecordID;
+                                                         self := left;
+                                                        ));     
+
+    tools.mac_WriteFile(Filenames(pversion).Base.AInspection.New, dBase_RecordID, Build_Base_File);
 
   //Return
     export full_build := sequential(
