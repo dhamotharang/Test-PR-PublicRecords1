@@ -1,4 +1,4 @@
-import _Control;
+﻿import _Control,ut;
 export isCompressed(string filename) := function
 	InputRec := record
 		string Name{xpath('Name')} := filename;
@@ -17,6 +17,7 @@ export isCompressed(string filename) := function
 				InputRec,
 				outrec,
 				LITERAL
+				,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 				);
 	
 	return if (soapresults.keysxml = '1', true, false);

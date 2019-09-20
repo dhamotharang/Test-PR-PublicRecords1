@@ -1,4 +1,4 @@
-﻿EXPORT macAppendRelativesAddressMatch(dIn, inLexID, inPrimRange, inPrimName, InZip, appendPrefix = '\'\'',filterStatement = '', UseIndexThreshold=100000000) := FUNCTIONMACRO
+﻿EXPORT macAppendRelativesAddressMatch(dIn, inLexID, inPrimRange, inPrimName, InZip, appendPrefix = '\'\'',filterStatement = '\'\'', UseIndexThreshold=100000000) := FUNCTIONMACRO
 	IMPORT hipie_ecl, Relationship, doxie;
 	LOCAL dDistributed 	:= DISTRIBUTE(dIn((UNSIGNED)inLexID <> 0 #IF(filterStatement != '') AND #EXPAND(filterStatement) #END), HASH32(inLexID));
 	LOCAL dDeduped 			:= SORT(DEDUP(dDistributed, inLexID, LOCAL), inLexID, LOCAL);

@@ -1,6 +1,7 @@
 ﻿EXPORT Layout_PhoneFinder := MODULE
 
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
+	//DF-23827: Update Transaction File
 	
 	///////////////////////////////////
 	//Transactions/////////////////////
@@ -31,6 +32,9 @@
 			string10 	submitted_zip;
 			string15  orig_phonenumber;
 			string15 	phonenumber;
+			string30  data_source;
+			string30  royalty_used;
+			string30  carrier;	
 			string16 	risk_indicator;
 			string32 	phone_type;
 			string32 	phone_status;

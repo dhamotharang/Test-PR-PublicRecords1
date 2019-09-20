@@ -318,13 +318,11 @@ EXPORT Consolidate_In_File (string pVersion, boolean pUseProd):= FUNCTION
 									ouput_language_file,
 									ouput_specialty_file,
 									ouput_disciplinaryact_file,
-									ouput_stliclookup_file					
+									ouput_stliclookup_file
+					
 				);
 					
 		return write;
 				
-		/* 		ut.MAC_SF_BuildProcess(new_con_addr_file,'~thor400_data::in::hms_stl::hms_address::history', build_it,2,,true);
-   		return build_it;
-		*/
 END;
 

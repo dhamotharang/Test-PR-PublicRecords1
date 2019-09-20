@@ -1,15 +1,12 @@
 ﻿EXPORT MAC_RangeFieldYYYYMMDD_By_UID_optimized(infile,ufield,infield,low_infield,high_infield,null_field,outfile) := MACRO
-
 /* The File_Sample data has imperfect dates (some MM , DD parts are 0, or not realistic).
 I used the following function (appplied on (UNSIGNED6)low/high_infield) in the %infile_parse%
 Need to use this function in this macro - atleast for using on File_Sample data. If I dont use this function, 
 then idata_prepped has some seriously messed up df/ls_lo/high_day/month values(eg month = 4294967295),
 which affects the count parameter of Normalize , while counting dates 
-
 We need to decide if this cleaning stays for production, can we blindly assume that the dates already come cleaned? OR
 sperately enforce cleaning on rangefield through hygiene.
 */
-
 UNSIGNED6 clean_yyyymmdd(UNSIGNED6 yyyymmdd) := FUNCTION
 ypart := yyyymmdd  DIV 10000;
 mpart := (yyyymmdd DIV 100)%100;
@@ -18,7 +15,6 @@ mpart_cleaned := IF(mpart <1 OR mpart >12, 6, mpart);
 dpart_cleaned := IF(dpart < 1 OR dpart >31, 28, dpart); //not perfect cleaning - can refine later - shouldnt matter if dates come cleaned
 RETURN ypart * 10000 + mpart_cleaned * 100 + dpart_cleaned;
 END;
-
 #uniquename(infile_parse)
 %infile_parse% := RECORD
   SALT311.UIDType ufield := infile.ufield;
@@ -35,7 +31,6 @@ END;
 // Presently we do not handle open ended ranges (well)
 // We also need to make sure that all dates are in 8 digits (YYYYMMDD)
 %idata_parsed% := TABLE(infile((UNSIGNED6)low_infield<>null_field,(UNSIGNED6)high_infield<>null_field,(UNSIGNED6)low_infield>10000000,(UNSIGNED6)high_infield>10000000, low_infield <= high_infield), %infile_parse%);
-
 /* Function: end_of_month_day - computes the last date of a given YYYYMM
 	@param: month - MM part 
 	@param:year - YYYY part
@@ -54,7 +49,6 @@ END;
  BOOLEAN count_f_month := (%idata_parsed%.dls_year - %idata_parsed%.dfs_year > 0 AND %idata_parsed%.dfs_month <> 12) OR (%idata_parsed%.dls_month - %idata_parsed%.dfs_month >= 2);//year is different OR atleast one month in between
  UNSIGNED4 dfs_month_low := %idata_parsed%.dfs_month + 1;
  UNSIGNED4 dfs_month_high := IF(%idata_parsed%.dls_year - %idata_parsed%.dfs_year > 0 AND %idata_parsed%.dfs_month < 12, 12, %idata_parsed%.dls_month - 1); 
-
  BOOLEAN count_l_month := (%idata_parsed%.dls_year - %idata_parsed%.dfs_year > 0 AND %idata_parsed%.dls_month > 1); // same year case was handled in count_f_month
  UNSIGNED4 dls_month_low := 1;
  UNSIGNED4 dls_month_high := %idata_parsed%.dls_month - 1;
@@ -68,19 +62,16 @@ END;
 END;
 #uniquename(idata_prepped)
 %idata_prepped% := TABLE(%idata_parsed%,%idata_prep%);
-
 #uniquename(idata_prep_days)
 %idata_prep_days% := RECORD
  %idata_prepped%;
  UNSIGNED4 dfs_int_low  := SALT311.fn_YYYYMMDD_to_Int(%idata_prepped%.dfs);
  UNSIGNED4 dfs_int_high := SALT311.fn_YYYYMMDD_to_Int((UNSIGNED8)(%idata_prepped%.dfs_year * 10000 + %idata_prepped%.dfs_month * 100 + %idata_prepped%.dfs_day_high));
-
  UNSIGNED4 dls_int_low  := SALT311.fn_YYYYMMDD_to_Int((UNSIGNED8)(%idata_prepped%.dls_year * 10000 + %idata_prepped%.dls_month * 100 + 1));
  UNSIGNED4 dls_int_high := SALT311.fn_YYYYMMDD_to_Int(%idata_prepped%.dls);
 END;
 #uniquename(idata_prepped_days)
 %idata_prepped_days% := TABLE(%idata_prepped%,%idata_prep_days%);
-
 /*
 If you need to debug, you can encapsulate range_ent_rec to YYYYMM_range_ent_rec := RECORD UNSIGNED6 YYYY; UNSIGNED6 YYYYMM; range_ent_rec; END;
 and use this format to output the normalized table
@@ -93,7 +84,6 @@ and use this format to output the normalized table
 	//UNSIGNED8 YYYYMM; // Uncomment to debug
 	SALT311.UIDType ufield;
 END;
-
 // List entities that span a whole year
 #uniquename(tr_YYYY)
 %range_ent_rec% %tr_YYYY%(%idata_prepped% le,INTEGER c) := TRANSFORM
@@ -105,9 +95,7 @@ END;
   END;
 #uniquename(n_year)
 %n_year% := NORMALIZE(%idata_prepped%(count_year), LEFT.year_high - LEFT.year_low + 1,%tr_YYYY%(LEFT,COUNTER-1+LEFT.year_low)); //Consider only those records where the dfs/ dls years are not same or adjacent. There is atleast one full year between them//No. of years exactly between dfs and dls (excluding dfs & dls years)
-
 // List entities that span a whole month (the month can be before the spanning year/s or after)
-
 #uniquename(tr_YYYYMM_dfs)
 %range_ent_rec% %tr_YYYYMM_dfs%(%idata_prepped% le,INTEGER c) := TRANSFORM
 	SELF.infield_beg := SALT311.fn_YYYYMMDD_to_Int(le.dfs_year * 10000 + c * 100 + 1 ); // 1st of this month
@@ -118,7 +106,6 @@ END;
   END;
 #uniquename(n_month_dfs)
 %n_month_dfs% := NORMALIZE(%idata_prepped%(count_f_month), LEFT.dfs_month_high - LEFT.dfs_month_low + 1,%tr_YYYYMM_dfs%(LEFT,COUNTER-1+LEFT.dfs_month_low)); //Consider only those records where the dfs/ dls years are not same or adjacent. There is atleast one full year between them//No. of years exactly between dfs and dls (excluding dfs & dls years)
-
 #uniquename(tr_YYYYMM_dls)
 %range_ent_rec% %tr_YYYYMM_dls%(%idata_prepped% le,INTEGER c) := TRANSFORM
 	SELF.infield_beg := SALT311.fn_YYYYMMDD_to_Int(le.dls_year * 10000 + c * 100 + 1 ); // 1st of this month
@@ -145,7 +132,6 @@ END;
 %n_dfs% := NORMALIZE(%idata_prepped_days%, LEFT.dfs_int_high - LEFT.dfs_int_low + 1, %tr_days%(LEFT,COUNTER-1+LEFT.dfs_int_low)); //from dfs to one day before beggining of next month
 #uniquename(n_dls)
 %n_dls% := NORMALIZE(%idata_prepped_days%(count_l_day), LEFT.dls_int_high - LEFT.dls_int_low + 1, %tr_days%(LEFT,COUNTER-1 +LEFT.dls_int_low)); //from 1st day of ls month to dls
-
 //Count year, month and day entities
 #uniquename(range_ent_cnt_rec)
 %range_ent_cnt_rec% := RECORD //here cnt is record count
@@ -170,7 +156,6 @@ END;
 	SALT311.UIDType ufield;
   UNSIGNED8 cnt; // this is record count!
 END;
-
 #uniquename(expand_YYYY)
 %infield_ent_cnt_rec% %expand_YYYY%(%outfile_year% le, INTEGER c) := TRANSFORM
 	SELF.infield := c;
@@ -179,7 +164,6 @@ END;
 END;
 #uniquename(outfile_year_infield)
 %outfile_year_infield% := SORT(NORMALIZE(%outfile_year%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYY% (LEFT,COUNTER-1+LEFT.infield_beg)), infield, ufield);
-
 #uniquename(expand_YYYYMM_dfs)
 %infield_ent_cnt_rec% %expand_YYYYMM_dfs%(%outfile_month_dfs% le, INTEGER c) := TRANSFORM
 	SELF.infield := c;
@@ -188,7 +172,6 @@ END;
 END;
 #uniquename(outfile_month_dfs_infield)
 %outfile_month_dfs_infield% := SORT(NORMALIZE(%outfile_month_dfs%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYYMM_dfs% (LEFT,COUNTER-1+LEFT.infield_beg)), infield, ufield);
-
 #uniquename(expand_YYYYMM_dls)
 %infield_ent_cnt_rec% %expand_YYYYMM_dls%(%outfile_month_dls% le, INTEGER c) := TRANSFORM
 	SELF.infield := c;
@@ -197,7 +180,6 @@ END;
 END;
 #uniquename(outfile_month_dls_infield)
 %outfile_month_dls_infield% := SORT(NORMALIZE(%outfile_month_dls%, LEFT.infield_end - LEFT.infield_beg +1, %expand_YYYYMM_dls% (LEFT,COUNTER-1+LEFT.infield_beg)), infield, ufield);
-
 // Combine all outfiles and dedup by infield,did, Cnt := COUNT(GROUP)
 #uniquename(outfile_set)
 %outfile_set% := [SORTED(%outfile_year_infield%) ,SORTED(%outfile_month_dfs_infield%), SORTED(%outfile_month_dls_infield%), SORTED(%outfile_dfs%), SORTED(%outfile_dls%)];

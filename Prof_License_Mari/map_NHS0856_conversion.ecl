@@ -36,7 +36,7 @@ EXPORT map_NHS0856_conversion(STRING pVersion) := FUNCTION
 	ValidNHFile	:= ds_NH_RealEstate(TRIM(LAST_NAME,LEFT,RIGHT)<>'' AND NOT REGEXFIND('INACTIVE',LAST_NAME,NOCASE));
 
 //NH Appraisal layout to Common
-Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS0856 L) := TRANSFORM
+Prof_License_Mari.layout_base_in	transformToCommon(Prof_License_Mari.layout_NHS0856 L) := TRANSFORM
 
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -55,10 +55,10 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 		SELF.TYPE_CD					:= 'MD';
 	
 		//Clean Individual name for name_org field
-		vFirstName 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.FIRST_NAME);
-		vMidName		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.MID_NAME);
-		vLastName		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.LAST_NAME);
-		vNameOffice	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.OfficeName);
+		vFirstName 	:= ut.CleanSpacesAndUpper(L.FIRST_NAME);
+		vMidName		:= ut.CleanSpacesAndUpper(L.MID_NAME);
+		vLastName		:= ut.CleanSpacesAndUpper(L.LAST_NAME);
+		vNameOffice	:= ut.CleanSpacesAndUpper(L.OfficeName);
 		FullName		:= std.str.CleanSpaces(vLastName+' '+vFirstName);
 		
 		SELF.NAME_ORG					:= FullName;
@@ -104,7 +104,7 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 		SELF.NAME_DBA_PREFX		:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(tmpNameDBA); //split corporation prefix from name
 		SELF.NAME_DBA					:= IF(REGEXFIND(IPpattern,tmpNameDBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')),
 															  Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',tmpNameDBA,' CO')));
-		SELF.NAME_DBA_SUFX		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+		SELF.NAME_DBA_SUFX		:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 		SELF.DBA_FLAG					:= IF(TRIM(SELF.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 		
 		tempLicenseNbr				:= MAP(LENGTH(TRIM(L.SLNUM,LEFT,RIGHT)) = 1 => '00000'+TRIM(L.SLNUM,LEFT,RIGHT),
@@ -115,7 +115,7 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 		SELF.LICENSE_NBR			:= IF(tempLicenseNbr = '','NR',tempLicenseNbr);
 		SELF.LICENSE_STATE		:= src_st;
 		
-		tempRawLicType				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.LICTYPE);
+		tempRawLicType				:= ut.CleanSpacesAndUpper(L.LICTYPE);
 		SELF.RAW_LICENSE_TYPE	:= tempRawLicType;
 		tempStdLicType				:= MAP(std.str.find(TRIM(tempRawLicType,LEFT,RIGHT),'ASSOCIATE BROKER',1)= 1 => 'AB',
 																	std.str.find(TRIM(tempRawLicType,LEFT,RIGHT),'MANAGING BROKER',1)= 1 => 'MB',
@@ -125,7 +125,7 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 																	std.str.find(TRIM(tempRawLicType,LEFT,RIGHT),'TEMPORARY PRINCIPAL BROKER',1)= 1 => 'TPB',' ');
 		SELF.STD_LICENSE_TYPE	:= tempStdLicType;
 		
-		SELF.RAW_LICENSE_STATUS	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.LICSTAT);
+		SELF.RAW_LICENSE_STATUS	:= ut.CleanSpacesAndUpper(L.LICSTAT);
 		
 		// Use default date of 17530101 for blank dates.
 		SELF.CURR_ISSUE_DTE		:= '17530101';
@@ -152,13 +152,13 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 																std.str.Cleanspaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(tmpNameDBA)));	
 
 		//Use address cleaner to clean address
-		CoPattern	:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+		CoPattern	:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^INC.$|^.* GROUP$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
 					 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
 					 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
 					 '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$' +
 					 ')';
-		RemovePattern	  := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+		RemovePattern	  := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^INC.$|^.* GROUP$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
 					 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
 					 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
@@ -171,8 +171,8 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 		                             LENGTH(TRIM(L.ZIP))=4 => '0'+TRIM(L.ZIP),
 						                     TRIM(L.Zip));
 		
-		trimAddress1          := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS1);
-	  trimAddress2          := Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS2);
+		trimAddress1          := ut.CleanSpacesAndUpper(L.ADDRESS1);
+	  trimAddress2          := ut.CleanSpacesAndUpper(L.ADDRESS2);
   		
 	  //Extract company name
 		tmpNameContact1				:= Prof_License_Mari.mod_clean_name_addr.extractNameFromAddr(trimAddress1, CoPattern);
@@ -191,8 +191,8 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 		SELF.ADDR_ADDR1_1			:= IF(AddrWithContact != ' ' AND tmpADDR_ADDR2_1 != '',std.str.Cleanspaces(tmpADDR_ADDR2_1),
 																std.str.Cleanspaces(tmpADDR_ADDR1_1));	
 		SELF.ADDR_ADDR2_1			:= IF(AddrWithContact != '','',std.str.Cleanspaces(tmpADDR_ADDR2_1)); 
-		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.CITY));
-		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.STATE));
+		SELF.ADDR_CITY_1		  := IF(TRIM(clnAddrAddr1[65..89])<>'',TRIM(clnAddrAddr1[65..89]),ut.CleanSpacesAndUpper(L.CITY));
+		SELF.ADDR_STATE_1		  := IF(TRIM(clnAddrAddr1[115..116])<>'',TRIM(clnAddrAddr1[115..116]),ut.CleanSpacesAndUpper(L.STATE));
 		SELF.ADDR_ZIP5_1		  := IF(TRIM(clnAddrAddr1[117..121])<>'',TRIM(clnAddrAddr1[117..121]),tmpZip[1..5]);
 		SELF.ADDR_ZIP4_1		  := clnAddrAddr1[122..125];
 
@@ -222,7 +222,7 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 	ds_map := PROJECT(ValidNHFile, transformToCommon(left));
 	
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_map L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_PROF_CD := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -232,7 +232,7 @@ Prof_License_Mari.layouts.base	transformToCommon(Prof_License_Mari.layout_NHS085
 																			trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 																		
 	
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;

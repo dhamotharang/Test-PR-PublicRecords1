@@ -33,12 +33,12 @@ didkey_father := index(dataset([],didrec),{DID , Entity_type_id, Entity_sub_type
 
 didSample     :=  join (didkey_qa,didkey_father,left.did=right.did,transform(recordof(didkey_qa),self := left),left only);
 
-distdid := distribute( didSample,hash( did));
+distdid := distribute( didSample,hash32( did));
 
 
 newbase := FraudShared.Files().Base.Main         .QA;
 
-distmain := distribute ( newbase ( did <> 0 ), hash( did));
+distmain := distribute ( newbase ( did <> 0 ), hash32( did));
 
 
 finaljoinrec := record

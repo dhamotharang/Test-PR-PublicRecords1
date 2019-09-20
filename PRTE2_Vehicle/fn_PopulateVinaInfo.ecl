@@ -1,4 +1,4 @@
-import Vina, std, VehicleCodes; 
+﻿import Vina, std, VehicleCodes; 
 
 //Populating VINA fields 
 EXPORT fn_PopulateVinaInfo(dataset(recordof(layouts.Base_Main)) in_ds) := function
@@ -70,8 +70,10 @@ self.Best_Minor_Color_Code			:=	if(	TRIM(l.Orig_Minor_Color_Code)	=	'',
 SELF := l;
 END;
 
+//Running in dataland
+//j1 := join(in_ds,	files.file_vina_base,
 
-j1 := join(in_ds,	vina.file_vina_base,
+j1 := join(in_ds,	files.file_vina_base,
 						left.orig_vin[1..8] = right.match_vin[1..8] and 
 						left.orig_vin[10] 	= right.match_vin[10]   and
 						left.orig_year      = right.model_year,

@@ -1,4 +1,4 @@
-import Nid, _Control;
+﻿import Nid, _Control;
 
 #WORKUNIT('name', 'Schedule NID Cache Clearance');
 
@@ -8,7 +8,7 @@ import Nid, _Control;
 
 
  _Control.fSubmitNewWorkunit('NID.EmptyCache', ThorName ) : WHEN(CRON(Sun_at_7_AM))
-																								 ,FAILURE(fileservices.sendemail('charles.salvo@lexisnexis.com'
+																								 ,FAILURE(fileservices.sendemail('charles.salvo@lexisnexisrisk.com'
 																																								 ,'Schedule NID Cache Clearance'
 																																								 ,'schedule failure\n'
 																																								 +'See '+workunit+'\n\n'

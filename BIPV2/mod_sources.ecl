@@ -50,6 +50,8 @@ export mod_sources := module
 		MDR.sourceTools.SourceIsDPPA(src)									=> code.DPPA,
 		MDR.sourceTools.SourceIsDunn_Bradstreet(src)			=> code.DNB,
 		MDR.sourceTools.SourceIsEBR(src)									=> code.EBR,
+		MDR.sourceTools.SourceIsExperian_CRDB(src)				=> code.EBR,
+		MDR.sourceTools.SourceIsFBNV2_Experian_Direct(src) => code.EBR,
 		MDR.sourceTools.SourceIsLnPropV2_Fares_Asrs(src)	=> code.PROP_FARES, // a subset of SourceIsProperty
 		MDR.sourceTools.SourceIsLnPropV2_Fares_Deeds(src)	=> code.PROP_FARES, // a subset of SourceIsProperty
 		MDR.sourceTools.SourceIsProperty(src)							=> if(isDayton_vlid(vl_id), code.PROP_DAYTON, code.PROP_FIDELITY),
@@ -59,7 +61,7 @@ export mod_sources := module
 		
 	export unsigned code2bmap(code c) := ut.bit_set(0,(unsigned)c);
 	
- export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Restricted, 0, code2bmap(code.MARKETING_UNRESTRICTED));
+ export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Sources, code2bmap(code.MARKETING_UNRESTRICTED), 0);
               
 	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(exclusiveSrc2code(src,vl_id)) | inclusiveSrc2bmap(src); // called by SALT - becomes *_data_permits
 	
@@ -260,6 +262,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages         
     + MDR.sourceTools.set_Cortera         
+    + MDR.sourceTools.set_DataBridge         
     + MDR.sourceTools.set_Equifax_Business_Data         
     + MDR.sourceTools.set_Infutor_NARB        
   ;
@@ -313,6 +316,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages                  
     + MDR.sourceTools.set_Cortera                 
+    + MDR.sourceTools.set_DataBridge                 
     + MDR.sourceTools.set_Equifax_Business_Data                 
     + MDR.sourceTools.set_Infutor_NARB                 
   ;
@@ -396,6 +400,7 @@ export mod_sources := module
 		MDR.sourceTools.SourceIsCortera               (src) => '39',
 		MDR.sourceTools.SourceIsInfutor_NARB          (src) => '40',
 		MDR.sourceTools.SourceIsEquifax_Business_Data (src) => '41',
+		MDR.sourceTools.SourceIsDataBridge            (src) => '42',
 		nonCode
 	);
 	export boolean srcInBIPV2Header(string2 src) := src2numCode(src) <> nonCode;
@@ -426,6 +431,7 @@ export mod_sources := module
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
     ,MDR.sourceTools.set_Cortera        // S61(BH-501)
+    ,MDR.sourceTools.set_DataBridge     // S70(BH-644)
     ,MDR.sourceTools.set_Equifax_Business_Data   // S65 (BH-584)
     ,MDR.sourceTools.set_Infutor_NARB        // S61(BH-528)
     ,MDR.sourceTools.set_Workers_Compensation // S62a(BH-502)
@@ -525,6 +531,7 @@ export mod_sources := module
 		'39' => MDR.sourceTools.set_Cortera[1],
 		'40' => MDR.sourceTools.set_Infutor_NARB[1],
 		'41' => MDR.sourceTools.set_Equifax_Business_Data[1],
+		'42' => MDR.sourceTools.set_DataBridge[1],
 		nonCode
 	);
 	export TranslateCode(string2 code) := TranslateSource_aggregate(code2src1(code));
@@ -537,4 +544,50 @@ export mod_sources := module
 	
 	export string1 codeType(string2 code) := srcType(code2src1(code));
 
+
+     // Source Type Functions
+     export isPublicRecordFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsIRS_5500(source) or
+                MDR.sourceTools.SourceIsLiens_v2(source) or
+                MDR.sourceTools.SourceIsDCA(source) or
+                MDR.sourceTools.SourceIsCorpV2(source) or
+                MDR.sourceTools.SourceIsTXBUS(source) or
+                MDR.sourceTools.SourceIsUCCV2(source) or
+                MDR.sourceTools.SourceIsBankruptcy(source) or
+                MDR.sourceTools.SourceIsCredit_Unions(source) or
+                MDR.sourceTools.SourceIsDea(source) or
+                MDR.sourceTools.SourceIsFAA(source) or
+                MDR.sourceTools.SourceIsFDIC(source) or
+                MDR.sourceTools.SourceIsIRS_Non_Profit(source) or
+                MDR.sourceTools.SourceIsVehicle(source) or
+                MDR.sourceTools.SourceIsOSHAIR(source) or
+                MDR.sourceTools.SourceIsLnPropertyV2(source) or
+                MDR.sourceTools.SourceIsCA_Sales_Tax(source) or
+                MDR.sourceTools.SourceIsWC(source) or
+                MDR.sourceTools.SourceIsWorkers_Compensation(source);
+      end;	
+	
+      export isDirectoryFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsFBNV2(source) or
+                source in MDR.sourceTools.set_Business_Registration or
+                MDR.sourceTools.SourceIsFrandx(source) or
+                MDR.sourceTools.SourceIsBBB(source) or
+                MDR.sourceTools.SourceIsCClue(source) or
+                MDR.sourceTools.SourceIsINFOUSA_ABIUS_USABIZ(source) or
+                source in MDR.sourceTools.set_Infutor_NARB;
+      end;	
+ 
+      export isBureauFn(string2 source) := function
+        return  MDR.sourceTools.SourceIsDunn_Bradstreet(source) or
+                MDR.sourceTools.SourceIsDunn_Bradstreet_Fein(source) or
+                MDR.sourceTools.SourceIsEBR(source) or
+                MDR.sourceTools.SourceIsExperian_CRDB(source) or
+                MDR.sourceTools.SourceIsExperian_FEIN(source) or
+                MDR.sourceTools.SourceIsBusiness_Credit(source) or
+                MDR.sourceTools.SourceIsCortera(source);
+      end;
+														
+      export isTelephoneFn(string2 source) := function
+        return MDR.sourceTools.SourceIsYellow_Pages(source);
+      end;
 end;

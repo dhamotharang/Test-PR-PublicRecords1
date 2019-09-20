@@ -1,4 +1,4 @@
-export Layout_Base_Main
+﻿export Layout_Base_Main
  :=
   record
 	string30		Vehicle_Key;
@@ -104,5 +104,8 @@ export Layout_Base_Main
   string50 AIRBAG_FRONT_PASS	;
   string50 AIRBAG_FRONT_PASS_SIDE	;
   string50 AIRBAGS	;
+	//Added for CCPA-103 
+	unsigned4 global_sid := 0;
+	unsigned8 record_sid := 0;
   end
  ;

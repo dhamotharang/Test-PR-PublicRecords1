@@ -1,16 +1,24 @@
-﻿import lib_fileservices,_control,lib_stringlib,Versioncontrol;
+﻿import Versioncontrol, header;
+
+config := Header.SprayConfigFileContents('CD_SEED').Read;
 
 export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
- 	{_Control.IPAddress.bctlpedata12                  //SourceIP			 Remote Server's IP address									
- 	,'/hds_180/cd_seed/'+version[..8]+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
- 	,'*.csv'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
- 	,0                                                  //record_size	     record length of files to be sprayed(for fixed length files only)      
- 	,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::@version@'       //Thor_filename_template	-- template filename for files to be sprayed, ex. '~thor_data400::in::corp2::@version@::cont'
- 	,[{_Dataset(pUseProd).thor_cluster_Files+'in::' + _Dataset().Name  }]            //dSuperfilenames			-- dataset of superfiles to add the sprayed files to.
- 	,'thor400_44'                                       //Thor Group name, ex. 'thor_data400' = dataland400, 'thor_dell400' = prod400(default)
-	,version                                                 //FileDate				-- version of all of the sprayed files(overrides the next field, dateregex). Default = ''
- 	,'[0-9]{8}'                                                //date_regex				-- regular expression to get the date from the remote filenames.  Default = '[0-9]{8}'
-	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
+ 	{config.lz_ip   //SourceIP
+ 	,config.lz_dir + 'spraying/'             //SourceDirectory
+ 	,'*.csv'                           //directory_filter
+ 	,0                                 //record_size	     record length of files to be sprayed(for fixed length files only)      
+ 	,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::@version@'
+ 	,[{_Dataset(pUseProd).thor_cluster_Files+'in::' + _Dataset().Name  }]
+ 	,'thor400_44'
+	,version          //FileDate -- version of all of the sprayed files(overrides the next field, dateregex). Default = ''
+ 	,'[0-9]{8}'       //date_regex -- regular expression to get the date from the remote filenames.  Default = '[0-9]{8}'
+	,'VARIABLE'       //Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
+    ,''
+    ,10000000
+    ,'\\,'
+    ,'\\n,\\r\\n'
+    ,'"'
+    ,true //compress
  	}	                                                            
 ], VersionControl.Layout_Sprays.Info);
 

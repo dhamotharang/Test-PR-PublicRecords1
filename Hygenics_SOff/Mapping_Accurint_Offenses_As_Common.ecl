@@ -2612,7 +2612,8 @@ o2 defCategory(o2 l):= transform
 						'SAC; 05CR480|'+
 						'SAC; 2012CR809|'+
             'RCW 9A 44 100 ATTEMPTED INCDECENT LIBERTIES|'+
-						'PRED CRM SX ASSL;|'+
+					          
+						'PRED CRM SX ASSL|'+
 
 						
 						'SAC-ATTEMPT'
@@ -3197,6 +3198,16 @@ o2 defCategory(o2 l):= transform
 						'ATTEMPT;|'+
 						'632-A:2 II|'+
 						'INDICTMENT NUMBER CP870011443;|'+
+						
+						'FRAUD|'+
+						'18USC2252A\\(A\\)\\(5\\)\\(B\\);|'+
+						'130.50 SUB 01;|'+
+						'MAINE|'+
+						'LIFETIME|'+
+						'MANUF/DELIVER AMPHETAMINE \\(<=3G\\)|'+
+						'ATTEMPTED \\(ATTEMPTED\\)|'+
+						
+						
 						
 						'16-6-4-\\(B\\)'						
 						,						

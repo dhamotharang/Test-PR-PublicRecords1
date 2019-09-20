@@ -1,6 +1,97 @@
+﻿import Workman,WsDFU,ut;
 /*
   DFUQuery gets files
 */
+//////////////////////////////////////////////////////////////////////////////////////////////
+export get_DFUQuery(
+
+   string                   pPrefix                   = ''      
+  ,string                   pClusterName              = ''               
+  ,string                   pLogicalName              = ''
+  ,string                   pCompressed               = 'U|C'
+  ,string                   pDescription              = ''
+  ,string                   pOwner                    = ''    
+  ,string                   pStartDate                = ''   //2014-06-24T09:39:29Z
+  ,string                   pEndDate                  = ''   //2014-06-24T09:39:29Z
+  ,string                   pFileType                 = ''
+  ,integer                  pFileSizeFrom             = -1
+  ,integer                  pFileSizeTo               = -1
+  ,integer                  pFirstN                   = -1
+  ,string                   pFirstNType               = ''
+  ,integer                  pPageSize                 = -1  
+  ,integer                  pPageStartFrom            = -1    
+  ,string                   pSortby                   = ''        
+  ,boolean                  pDescending               = false
+  ,boolean                  pOneLevelDirFileReturn    = false
+	,string                   pesp                      = _constants.LocalEsp
+	,integer									pMaxNumberOfFiles					= -1
+  
+) :=
+module
+
+  export DFUQuery             := WsDFU.soapcall_DFUQuery (pLogicalName,pClusterName,pOwner,pFirstN,pesp);
+  export lay_DFULogicalFiles  := recordof(DFUQuery.logical_files.logical_file);
+  export dnorm                := normalize(DFUQuery,left.logical_files[1].logical_file,transform({lay_DFULogicalFiles,integer realsize}
+    ,self.longsize            := if(right.intsize              = -1 ,0                      ,right.intsize            )
+    ,self.CompressedFileSize  := if(right.CompressedFileSize   = -1 ,0                      ,right.CompressedFileSize )
+    ,self.realsize            := if(self.CompressedFileSize   !=  0 ,self.CompressedFileSize,self.longsize            )
+    ,self.IsCompressed        := right.IsCompressed or right.IsKeyFile
+    ,self := right))
+        (
+          (pCompressed = 'U|C' or (pCompressed = 'U' and IsCompressed = false) or (pCompressed = 'C' and IsCompressed = true))
+      and (pLogicalName = '' or regexfind(pLogicalName,name,nocase))
+    
+    ) ;
+  
+  export total_size := sum(dnorm,realsize);
+
+  export largest  := iterate(project(sort(dnorm, -realsize),transform({string name,string sizepretty,real8 percent,unsigned8 running_total_size,string running_total_sizepretty,real8 running_total_percent,recordof(left) - name}
+              ,self.sizepretty := ut.FHumanReadableSpace(left.realsize)
+              ,self := left
+              ,self.percent := self.realsize / total_size * 100.0;
+              ,self.running_total_size := left.realsize
+              ,self.running_total_sizepretty := ''
+              ,self.running_total_percent := 0
+              // ,self := left
+           )) 
+           ,transform(recordof(left),self.running_total_size := left.running_total_size + right.running_total_size,self.running_total_sizepretty := ut.FHumanReadableSpace(self.running_total_size),self.running_total_percent := self.running_total_size / total_size * 100.0,self := right));
+         
+  
+end;
+
+/*
+import Workman,WsDFU;
+// #option('maxLength', 131072); // have to increase for the remote directory child datasets
+//////////////////////////////////////////////////////////////////////////////////////////////
+export get_DFUQuery(
+   string                   pPrefix                   = ''      
+  ,string                   pClusterName              = ''               
+  ,string                   pLogicalName              = ''
+  ,string                   pCompressed               = 'U|C'
+  ,string                   pDescription              = ''
+  ,string                   pOwner                    = ''    
+  ,string                   pStartDate                = ''   //2014-06-24T09:39:29Z
+  ,string                   pEndDate                  = ''   //2014-06-24T09:39:29Z
+  ,string                   pFileType                 = ''
+  ,integer                  pFileSizeFrom             = -1
+  ,integer                  pFileSizeTo               = -1
+  ,integer                  pFirstN                   = -1
+  ,string                   pFirstNType               = ''
+  ,integer                  pPageSize                 = -1  
+  ,integer                  pPageStartFrom            = -1    
+  ,string                   pSortby                   = ''        
+  ,boolean                  pDescending               = false
+  ,boolean                  pOneLevelDirFileReturn    = false
+	,string                   pesp                      = _constants.LocalEsp
+	,integer									pMaxNumberOfFiles					= -1
+) :=                           
+module
+
+  export DFUQuery          := WsDFU.soapcall_DFUQuery (filename,cluster,,,pesp);
+  export DFUInfoOutRecord := recordof(DFUInfo);
+  
+end;
+
 import _control,ut;
 // #option('maxLength', 131072); // have to increase for the remote directory child datasets
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,3 +253,4 @@ export WuidList := project(global(dnorm,few),transform(FsLogicalFileInfoRecord,
 ));
   
 end;
+*/

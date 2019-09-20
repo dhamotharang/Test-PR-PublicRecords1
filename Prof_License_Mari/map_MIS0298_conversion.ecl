@@ -60,7 +60,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	ut.CleanFields(ValidMIFile, ClnMIFile);														 
 
 	//raw to MARIBASE layout
-	Prof_License_Mari.layouts.base	transformToCommon(layout_MIS0298.Raw L) := TRANSFORM
+	Prof_License_Mari.layout_base_in	transformToCommon(layout_MIS0298.Raw L) := TRANSFORM
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
 		SELF.LAST_UPD_DTE			 := pVersion;							//it was set to process_date before
@@ -88,7 +88,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 		
 			SELF.RAW_LICENSE_STATUS := IF(SELF.EXPIRE_DTE >= pVersion,
 																		'ACTIVE',
-																		'LICENSE EXPIRED');		
+																		'LAPSED');		
 		
 		TrimOrgType						:= ut.CleanSpacesAndUpper(L.ORG_TYPE);		
 		TmpOrgTypePerson		:= IF(TrimOrgType = 'N' OR TrimOrgType = 'I' OR TrimOrgType = 'SP',TRUE,FALSE);
@@ -112,7 +112,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 		stripNickName  := Prof_License_Mari.fGetNickname(TrimFullName,'strip_nick');
 		
 		//Remove Suffix
-		SUFFIX_PATTERN  := '( JR.$| JR$| SR.$| SR$| III$| II$| IV$)';	
+		SUFFIX_PATTERN  := '( JR.$| JR$| SR.$| SR$| III$| II$| IV$| VI$)';	
 		rmvSufxLName    := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickLName,''));
 		rmvSufxFName    := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickFName,''));
 		rmvSufxMName    := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickMName,''));
@@ -230,16 +230,16 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	 tmpNAME_OFFICE			:= MAP(preNAME_OFFICE[1..4]='DBA ' => preNAME_OFFICE[5..],
 		                             preNAME_OFFICE[1..4]='AKA ' => preNAME_OFFICE[5..],
 		                             preNAME_OFFICE);
-		clnOfficeName				:= IF(REGEXFIND('(.COM|.NET|.ORG)',tmpNAME_OFFICE),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(tmpNAME_OFFICE),
-		                            tmpNAME_OFFICE);
+ 	 clnOfficeName			:= IF(REGEXFIND('(.COM|.NET|.ORG)',tmpNAME_OFFICE),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(tmpNAME_OFFICE),
+		                             tmpNAME_OFFICE);
 																
 		SELF.NAME_OFFICE	:= MAP(clnOfficeName = 'NA' => '',
-															           clnOfficeName = 'NONE' => '',
-															           TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
-															           TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_MID,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
+														 clnOfficeName = 'NONE' => '',
+														 TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
+														 TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_MID,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
 			                       clnOfficeName);
 														 
-	 SELF.OFFICE_PARSE		:= MAP(SELF.NAME_OFFICE = '' => '',
+	  SELF.OFFICE_PARSE		:= MAP(SELF.NAME_OFFICE = '' => '',
 														 		 SELF.NAME_OFFICE != '' AND StringLib.stringfind(TRIM(SELF.NAME_OFFICE,LEFT,RIGHT),' ',1)<1 => 'GR',
 																  SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE)=> 'GR','MD');
 																
@@ -289,7 +289,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	ds_map := PROJECT(ClnMIFile, transformToCommon(LEFT));
 
 	//Clean up address one final time
-	Prof_License_Mari.layouts.base fix_address(ds_map L) := TRANSFORM
+	Prof_License_Mari.layout_base_in fix_address(ds_map L) := TRANSFORM
 		SELF.ADDR_ADDR1_1 := IF(TRIM(L.ADDR_ADDR2_1) != ' ' AND REGEXFIND('^(SUITE|STE|UNIT|PO |P[.]0[.]|P O )',L.ADDR_ADDR1_1) 
 														AND NOT REGEXFIND('^(SUITE|STE|UNIT|PO |P[.]0[.]|P O )',L.ADDR_ADDR2_1),L.ADDR_ADDR2_1,L.ADDR_ADDR1_1);
 		SELF.ADDR_ADDR2_1	:= IF(TRIM(L.ADDR_ADDR2_1) != ' ' AND REGEXFIND('^(SUITE|STE|UNIT|PO |P[.]0[.]|P O )',L.ADDR_ADDR1_1) 
@@ -304,7 +304,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	ds_ClnAddress	:= PROJECT(ds_map,fix_address(LEFT)); 
 
 	// populate prof code field via translation on license type field
-	Prof_License_Mari.layouts.base trans_lic_type(ds_ClnAddress L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_lic_type(ds_ClnAddress L, ds_Cmvtranslation R) := TRANSFORM
 		//a patch for now
 		SELF.STD_PROF_CD := IF(TRIM(L.STD_LICENSE_TYPE,LEFT,RIGHT) IN ['1205','1206'],'APR',R.DM_VALUE1);
 		SELF := L;
@@ -314,7 +314,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 																LEFT.STD_SOURCE_UPD=RIGHT.source_upd AND RIGHT.fld_name='LIC_TYPE' AND StringLib.StringToUpperCase(TRIM(LEFT.STD_LICENSE_TYPE,LEFT,RIGHT))=TRIM(RIGHT.fld_value,LEFT,RIGHT),
 																			trans_lic_type(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
-	Prof_License_Mari.layouts.base trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
+	Prof_License_Mari.layout_base_in trans_status_trans(ds_map_lic_trans L, ds_Cmvtranslation R) := TRANSFORM
 		SELF.STD_LICENSE_STATUS := R.DM_VALUE1;
 		SELF := L;
 	END;
@@ -327,7 +327,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	company_only_lookup := ds_ClnAddress(affil_type_cd='CO');
 
 	//Perform affiliation lookup for affil_type_cd = 'IN'
-	Prof_License_Mari.layouts.base assign_pcmcslpk(ds_map_status_trans L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk(ds_map_status_trans L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := IF(TRIM(L.affil_type_cd,LEFT,RIGHT) = 'IN',R.cmc_slpk,L.pcmc_slpk);
 		SELF := L;
 	END;
@@ -338,7 +338,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 												assign_pcmcslpk(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 
 	//Perform affiliation lookup for affil_type_cd = 'BR'
-	Prof_License_Mari.layouts.base assign_pcmcslpk2(ds_map_affil L, company_only_lookup R) := TRANSFORM
+	Prof_License_Mari.layout_base_in assign_pcmcslpk2(ds_map_affil L, company_only_lookup R) := TRANSFORM
 		SELF.pcmc_slpk := IF(TRIM(L.affil_type_cd,LEFT,RIGHT) = 'BR',R.cmc_slpk,L.pcmc_slpk);
 		SELF := L;
 	END;
@@ -349,7 +349,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 												assign_pcmcslpk2(LEFT,RIGHT),LEFT OUTER,LOOKUP);
 																									
 
-	Prof_License_Mari.layouts.base xTransPROVNOTE(ds_map_affil2 L) := TRANSFORM
+	Prof_License_Mari.layout_base_in xTransPROVNOTE(ds_map_affil2 L) := TRANSFORM
 		SELF.provnote_1 := MAP(L.provnote_1 != '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
 								TRIM(L.provnote_1,LEFT,RIGHT)+ '|' + 'THIS IS NOT A MAIN OFFICE.  IT IS A BRANCH OFFICE WITHOUT AN ASSOCIATED MAIN OFFICE FROM THIS SOURCE.',
 								 L.provnote_1 = '' AND L.pcmc_slpk = 0 AND L.affil_type_cd = 'BR' => 
@@ -374,7 +374,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
 	
-	RETURN SEQUENTIAL(O_Cmvtranslation, oRE, d_final, add_super, notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(O_Cmvtranslation, oRE, d_final, add_super, move_to_used,notify_missing_codes, notify_invalid_address);
 		
 END;
 

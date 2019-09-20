@@ -3,9 +3,9 @@
 
 EXPORT	proc_Build_All(
 		STRING		pVersion			=	(STRING)STD.Date.Today()
-		,STRING		pServerIP			=	Constants().serverIP
-		,STRING		pDirectory		=	Constants().Directory
-		,STRING		pFilename			=	'*RiskView*'
+		,STRING		pServerIP			=	Constants(pVersion).serverIP
+		,STRING		pDirectory		=	Constants(pVersion).Directory
+		,STRING		pFilename			=	'*RiskView*csv'
 		,STRING		pGroupName		=	_Dataset().groupname
 		,BOOLEAN	pIsTesting		=	FALSE
 		,BOOLEAN	pOverwrite		=	FALSE

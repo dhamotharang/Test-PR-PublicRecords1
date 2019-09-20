@@ -1,4 +1,4 @@
-// Machine-readable versions of the spec file and subsets thereof
+﻿// Machine-readable versions of the spec file and subsets thereof
 EXPORT GenerationMod := MODULE
   EXPORT spcString :=
     'MODULE:Scrubs_Prof_License\n'
@@ -86,7 +86,7 @@ EXPORT GenerationMod := MODULE
     + '// has 6 and 8... for dob, not sure 6 should be valid?\n'
     + 'FIELD:dob:TYPE(STRING8):LIKE(invalid_0468pastdate):0,0\n'
     + '// shows 4, 6, and 8 digit dates in there\n'
-    + 'FIELD:issue_date:TYPE(STRING8):LIKE(invalid_0468pastdate):0,0\n'
+    + 'FIELD:issue_date:TYPE(STRING8):LIKE(invalid_0468date):0,0\n'
     + '// got 4, 6, and 8 digits\n'
     + 'FIELD:expiration_date:TYPE(STRING8):LIKE(invalid_0468date):0,0\n'
     + '// only 8\n'

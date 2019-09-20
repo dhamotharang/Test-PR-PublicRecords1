@@ -1,4 +1,4 @@
-import LN_PropertyV2, business_header_ss, Corp2, bizlinkfull,tools;
+﻿import LN_PropertyV2, business_header_ss, Corp2, bizlinkfull,tools;
 
 EXPORT ShortCycle := 
 MODULE
@@ -997,8 +997,8 @@ business_header_ss.MAC_Match_Flex(
 	,							// ,pFileVersion						= '\'prod\''														// default to use prod version of superfiles
 	,							// ,pUseOtherEnvironment		= business_header._Dataset().IsDataland	// default is to hit prod on dataland, and on prod hit prod.
 	,[BIPV2.IDconstants.xlink_version_BIP]							// ,pSetLinkingVersions 		= BIPV2.IDconstants.xlink_versions_default	
-	,company_url							// ,pURL										=	''
-	,conatact_url							// ,pEmail									=	''
+	,//company_url							// ,pURL										=	''
+	,//contact_url							// ,pEmail									=	''
 	,company_address.p_city_name							// ,pCity									= ''	
 	,contact_name.fname							// ,pContact_fname					= ''
 	,contact_name.mname							// ,pContact_mname					= ''
@@ -1208,10 +1208,12 @@ shared writeToDisk :=
   ) := 
   function
  
+  lStatsPR := project(pStatsPR,transform({string dsname,string dstime,unsigned countgroup,recordof(stats) - pct_amgibigous_match - dsname - dstime, integer4 pct_ambiguous_match},self.countgroup := left.total_answers_given,self.dsname := trim(left.dsname,left,right),self.pct_ambiguous_match := left.pct_amgibigous_match,self := left))
+    : independent;
   
     return parallel(
 
-       Strata.macf_CreateXMLStats(project(pStatsPR,transform({string dsname,string dstime,unsigned countgroup,recordof(stats) - pct_amgibigous_match - dsname - dstime, integer4 pct_ambiguous_match},self.countgroup := left.total_answers_given,self.dsname := trim(left.dsname,left,right),self.pct_ambiguous_match := left.pct_amgibigous_match,self := left))  ,'BIPV2','XlinkSample'	,pversion	,BIPV2_Build.mod_email.emailList	,'Recall' ,'Precision' 	,pIsTesting) //group on src_name
+       Strata.macf_CreateXMLStats(lStatsPR  ,'BIPV2','XlinkSample'	,pversion	,BIPV2_Build.mod_email.emailList	,'Recall' ,'Precision' 	,pIsTesting) //group on src_name
       
     );
   end;

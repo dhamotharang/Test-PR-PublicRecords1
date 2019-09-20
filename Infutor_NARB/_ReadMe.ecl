@@ -43,8 +43,22 @@
 						
 	
 	Notes:
+		Rollback:
+			If there is an issue with the build, you can rollback the build to the previous one.
+			Open 
+				Infutor_NARB._bwr_Rollback_Build
+			in a builder window.  This provides you with a few options to tailor the rollback to your specific situation.
+			Such as, if the input file is bad and needs to be deleted so it is not used again, 
+			set "pDeleteInputFiles" to true.  If the build files are bad(the base and key files created by the build),
+			set "pDeleteBuildFiles" to true.  Also, set the "pversion" to the version of the build you are rolling back, and
+			"pIsTesting" to false to perform the rollback.  
+			It will rollback the input file used in the build from the "used" or "using" to the "sprayed" superfile
+			(which is where they are at the beginning of the build).  It will also rollback the base file and keys from 
+			the father to the qa superfiles.  This will ensure that other builds that use these base file(s) will not 
+			pull in bad data.  Deletion will occur after the rollback.  
+
 		
-		The thor process uses the following attribute's email address to send emails:
+    The thor process uses the following attribute's email address to send emails:
 			_control.MyInfo.EmailAddressNotify
 		
 		Please sandbox this attribute with your email address.  Do not check it in.

@@ -1,4 +1,4 @@
-import AutoKeyB2,Address,autokey,AutoKeyI, ut, codes;
+﻿import _control, AutoKeyB2,Address,autokey,AutoKeyI, CCPA, ut, codes, Std;
 
 export proc_build_autokeys(string filedate) := function
 
@@ -17,6 +17,10 @@ xpnd_sanctn := RECORD
 SANCTN.layout_autokeys;
   INTEGER8 zero := 0;
 	blk  := '';
+	//CCPA-283 Adding CCPA new fields
+	UNSIGNED4 global_sid := 0;
+	UNSIGNED8 record_sid:=0;
+
 END;
 
 xpnd_sanctn xpand_sanctn(pty L, inc R) :=  TRANSFORM
@@ -87,6 +91,8 @@ DS_sanctn_AKA	:= project(ds_CleanParsedAKA,xpand_sanctn_aka(left));
 
 DS_sanctn_combine	:= DS_sanctn + DS_sanctn_AKA;
 
+addGlobalSID := CCPA.macGetGlobalSID(DS_sanctn_combine, 'Sanctn', '', 'global_sid'); //DF-25379: Populate Global_SIDs
+
 // Address.MAC_Multi_City(DS_sanctn,p_city_name,zip5,multiCitysanctn);
 // dist_DSsanctn := distribute(multiCitysanctn,random());
 
@@ -95,7 +101,7 @@ DS_sanctn_combine	:= DS_sanctn + DS_sanctn_AKA;
 /////////////////////////////////////////////////////////////////////////////////
 
 c		:= SANCTN.constants;
-ak_dataset := DS_sanctn_combine;
+ak_dataset := addGlobalSID;
 ak_keyname := c.ak_keyname;
 ak_logical := c.ak_logical(filedate);
 ak_setSkip	:= c.skipSet;

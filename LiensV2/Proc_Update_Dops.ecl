@@ -9,7 +9,7 @@ export Proc_Update_Dops() := function
 								fileservices.createsuperfile('~thor::dops::liensv2')),
 						if(fileservices.getsuperfilesubcount('~thor::dops::liensv2') = 3,
 					sequential(RoxieKeybuild.updateversion('Liensv2Keys',newfiledate,'skasavajjala@seisint.com,michael.gould@lexisnexis.com',,'N|B'),
-					        Orbit3.proc_Orbit3_CreateBuild ( 'Liens & Judgements',newfiledate,'N|B'),
+					        Orbit3.proc_Orbit3_CreateBuild ( 'Liens and Judgements',newfiledate,'N|B'),
 					fileservices.clearsuperfile('~thor::dops::liensv2',true),
 					fileservices.sendemail(
 												'Sudhir.Kasavajjala@lexisnexisrisk.com; Michael.Gould@lexisnexisrisk.com',

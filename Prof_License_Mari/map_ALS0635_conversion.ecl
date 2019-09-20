@@ -1,4 +1,4 @@
-// Alabama Mortgage Professionals 
+﻿// Alabama Mortgage Professionals 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_ALS0635_conversion(STRING pVersion) := FUNCTION
@@ -23,7 +23,7 @@ zippattern1	:= '^(.*)(-)(.*)';
 zippattern2	:= '^(.*)(\\+)(.*)';
 
 maribase_plus_dbas := RECORD, maxsize(5000)
-  Prof_License_Mari.layouts.base;
+  Prof_License_Mari.layout_base_in;
 	STRING60 dba1;
 	STRING60 dba2;
 	STRING60 dba3;
@@ -264,7 +264,7 @@ DBARecs 	:= NormDBAs(TMP_DBA != '');
 AllRecs  := DBARecs + NoDBARecs;
 
 // transform expanded dataset to MARIBASE layout
-Prof_License_Mari.layouts.base 	xTransToBase(AllRecs L) := TRANSFORM
+Prof_License_Mari.layout_base_in 	xTransToBase(AllRecs L) := TRANSFORM
 		SELF.NAME_ORG_SUFX	:= Prof_License_Mari.mod_clean_name_addr.strippunctName(L.NAME_ORG_SUFX);
 		SELF.NAME_DBA_SUFX	:= StringLib.StringFilterOut(L.NAME_DBA_SUFX, '.'); 
 		SELF := L;

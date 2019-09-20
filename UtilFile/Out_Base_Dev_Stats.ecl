@@ -1,4 +1,4 @@
-import strata;
+﻿import strata;
 
 
 export Out_Base_Dev_Stats(string filedate) := function
@@ -76,7 +76,7 @@ tStats := table(ds_util,rPopulationStats_ds_util,util_type,few);
 
 zOrig_Stats := output(choosen(tStats,all));
 
-STRATA.createXMLStats(tStats,'Utility','Data',filedate,'jfreibaum@seisint.com',zPopulation_Stats,'View','Population')
+STRATA.createXMLStats(tStats,'Utility','Data',filedate,',michael.gould@lexisnexis.com;jfreibaum@seisint.com',zPopulation_Stats,'View','Population')
 
 
 return parallel(zOrig_Stats

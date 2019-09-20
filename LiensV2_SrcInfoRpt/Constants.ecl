@@ -12,7 +12,7 @@ MODULE
 	
 	//	Directory to Spray from
 	EXPORT	Directory	:=	IF(	_control.thisenvironment.name='Dataland',
-														'/data/hds_2/liensv2/daily_files/SrcInfoRpt/',
-														'/data/hds_2/liensv2/daily_files/SrcInfoRpt/');
+														'/data/hds_2/liensv2/daily_files/SrcInfoRpt/build/'+pFileDate,
+														'/data/hds_2/liensv2/daily_files/SrcInfoRpt/build/'+pFileDate);
 
 END;

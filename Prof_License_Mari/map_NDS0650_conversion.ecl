@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take ND Dept of Banking & Finance License raw file and convert it to a 
 //  common professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -57,31 +57,31 @@ layout_ND_parsed := RECORD
 END;
 
 layout_ND_parsed map_ND_raw(ValidNDFile L)	:= TRANSFORM
-	self.LICENSE_TYPE	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.LICENSE_TYPE);
-	self.NAME					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.NAME);
-	self.DBA					:= IF(REGEXFIND('^(INC|LLC|LP|L.P.)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA1)),
-													StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA+' '+TRIM(L.DBA1))),
-													Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA));
-	self.DBA1					:= IF(REGEXFIND('^(INC|LLC|LP|L.P.)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA1)),
-													'',Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA1));
-	self.DBA2					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA2);
-	self.DBA3					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA3);
-	self.DBA4					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA4);
-	self.DBA5					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA5);
-	self.DBA6					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.DBA6);
-	self.ADDRESS1			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ADDRESS1);
-	self.ADDRESS2			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.ADDRESS2);
-	ClnCityStZip			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(StringLib.StringFindReplace(L.CITY_STATE_ZIP,'-',''));
+	self.LICENSE_TYPE	:= ut.CleanSpacesAndUpper(L.LICENSE_TYPE);
+	self.NAME					:= ut.CleanSpacesAndUpper(L.NAME);
+	self.DBA					:= IF(REGEXFIND('^(INC|LLC|LP|L.P.)',ut.CleanSpacesAndUpper(L.DBA1)),
+													StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(L.DBA+' '+TRIM(L.DBA1))),
+													ut.CleanSpacesAndUpper(L.DBA));
+	self.DBA1					:= IF(REGEXFIND('^(INC|LLC|LP|L.P.)',ut.CleanSpacesAndUpper(L.DBA1)),
+													'',ut.CleanSpacesAndUpper(L.DBA1));
+	self.DBA2					:= ut.CleanSpacesAndUpper(L.DBA2);
+	self.DBA3					:= ut.CleanSpacesAndUpper(L.DBA3);
+	self.DBA4					:= ut.CleanSpacesAndUpper(L.DBA4);
+	self.DBA5					:= ut.CleanSpacesAndUpper(L.DBA5);
+	self.DBA6					:= ut.CleanSpacesAndUpper(L.DBA6);
+	self.ADDRESS1			:= ut.CleanSpacesAndUpper(L.ADDRESS1);
+	self.ADDRESS2			:= ut.CleanSpacesAndUpper(L.ADDRESS2);
+	ClnCityStZip			:= ut.CleanSpacesAndUpper(StringLib.StringFindReplace(L.CITY_STATE_ZIP,'-',''));
 	self.CITY					:= REGEXFIND('(.*)[,][ ]*(.*)[ ](.*)',ClnCityStZip,1);
 	self.STATE				:= REGEXFIND('(.*)[,][ ]*(.*)[ ](.*)',ClnCityStZip,2);
 	self.ZIP					:= REGEXFIND('(.*)[,][ ]*(.*)[ ](.*)',ClnCityStZip,3);
 	self.CITY_STATE_ZIP	:= ClnCityStZip;
-	self.SLNUM				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.SLNUM);
+	self.SLNUM				:= ut.CleanSpacesAndUpper(L.SLNUM);
 	self.PHONE				:= StringLib.StringFilter(L.PHONE,'0123456789');
 	self.FAX_NO				:= StringLib.StringFilter(L.FAX_NO,'0123456789');
-	self.URL					:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.URL);
+	self.URL					:= ut.CleanSpacesAndUpper(L.URL);
 	self.DATE_ISSUED	:= L.DATE_ISSUED;
-	self.BRANCHES			:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.BRANCHES);
+	self.BRANCHES			:= ut.CleanSpacesAndUpper(L.BRANCHES);
 END;
 
 ds_ND_raw_parsed		:= project(ValidNDFile,map_ND_raw(left));
@@ -120,7 +120,7 @@ maribase_plus_dbas transformToCommon(layout_ND_parsed L) := TRANSFORM
 	self.NAME_ORG_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(getCorpOnly);
 	self.NAME_ORG				:= IF(REGEXFIND(IPpattern,getCorpOnly),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',getCorpOnly,' CO')),
 													Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',getCorpOnly,' CO')));  //Without punct. and Sufx removed
-	self.NAME_ORG_SUFX 	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
+	self.NAME_ORG_SUFX 	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameOrgSufx, ''));
 	
 // Identified DBA names
 	prepDBA				:= IF(REGEXFIND('( DBA | D/B/A )',L.DBA),REGEXREPLACE('( DBA | D/B/A )',L.DBA, ' / '),L.DBA);
@@ -181,7 +181,7 @@ maribase_plus_dbas transformToCommon(layout_ND_parsed L) := TRANSFORM
 	self.NAME_DBA_PREFX	:= Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(temp_dba); //split corporation prefix from name
 	self.NAME_DBA			:= IF(REGEXFIND(IPpattern,temp_dba),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',temp_dba,' CO')),
 													Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',temp_dba,' CO')));
-	self.NAME_DBA_SUFX	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
+	self.NAME_DBA_SUFX	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',tmpNameDBASufx, ''));
 	self.DBA_FLAG			:= IF(trim(self.NAME_DBA) != ' ', 1, 0); // 1: true  0: false
 	
 	tempLicNum					:= StringLib.StringToUpperCase(TRIM(L.SLNUM,LEFT,RIGHT));
@@ -220,7 +220,7 @@ maribase_plus_dbas transformToCommon(layout_ND_parsed L) := TRANSFORM
 	clnURL								:= REGEXREPLACE('(/$)',TRIM(L.URL,LEFT,RIGHT),'');
 	self.URL							:= IF(clnURL != '' AND clnURL[1..3] = 'WWW','HTTP://'+clnURL,
 															IF(clnURL != '' AND clnURL[1..3] != 'WWW','HTTP://WWW.'+clnURL,''));
-	self.PROVNOTE_1				:= IF(TRIM(L.BRANCHES) != ' ','BRANCH(ES): '+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.BRANCHES),'');
+	self.PROVNOTE_1				:= IF(TRIM(L.BRANCHES) != ' ','BRANCH(ES): '+ut.CleanSpacesAndUpper(L.BRANCHES),'');
 	self.PROVNOTE_3 	    := '[LICENSE_STATUS ASSIGNED]';
 	
 /* fields used to create mltreckey key are:
@@ -235,10 +235,10 @@ maribase_plus_dbas transformToCommon(layout_ND_parsed L) := TRANSFORM
 	mltreckeyHash := hash32(trim(tempLicNum,left,right) 
                           +trim(tempStdLicType,left,right)
 													+trim(src_cd,left,right)
-													+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(std_org_name)
-										      +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS1)
-													+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(StdNAME_DBA)
-													+Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS2)); 
+													+ut.CleanSpacesAndUpper(std_org_name)
+										      +ut.CleanSpacesAndUpper(L.ADDRESS1)
+													+ut.CleanSpacesAndUpper(StdNAME_DBA)
+													+ut.CleanSpacesAndUpper(L.ADDRESS2)); 
 			
 	self.mltrec_key := if(self.dba1 != ' ',mltreckeyHash, 0);
 			
@@ -253,9 +253,9 @@ maribase_plus_dbas transformToCommon(layout_ND_parsed L) := TRANSFORM
 	self.cmc_slpk  := hash32(trim(tempLicNum,left,right) 
 		                       +trim(tempStdLicType,left,right)
 										       +trim(src_cd,left,right)
-				                   +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.NAME)
-										       +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS1)
-													 +Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.ADDRESS2));
+				                   +ut.CleanSpacesAndUpper(L.NAME)
+										       +ut.CleanSpacesAndUpper(L.ADDRESS1)
+													 +ut.CleanSpacesAndUpper(L.ADDRESS2));
 										 
 
 	SELF := [];		   		   
@@ -345,7 +345,7 @@ Prof_License_Mari.layouts_reference.MARIBASE xTransToBase(FilteredRecs L) := tra
 	self.NAME_DBA 			:= IF(REGEXFIND(IPpattern,L.TMP_DBA),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(REGEXREPLACE(' COMPANY',StdNAME_DBA,' CO')),
 													Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',StdNAME_DBA,' CO')));
 	self.DBA_FLAG       := IF(trim(self.name_dba,left,right) != '',1,0); // 1: true  0: false
-	self.NAME_DBA_SUFX	:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')); 
+	self.NAME_DBA_SUFX	:= ut.CleanSpacesAndUpper(REGEXREPLACE('[^a-zA-Z0-9_]',DBA_SUFX,'')); 
 	self.NAME_MARI_DBA	:= TRIM(StdNAME_DBA,left,right); 
 	self := L;
 end;

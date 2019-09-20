@@ -5,7 +5,7 @@ string_rec := record
   unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
-ds_hunt	:= dataset('~thor_data400::base::emerges_hunt_building',string_rec,flat);
+ds_hunt := emerges.Prep_Build.hunt_fish('~thor_data400::base::emerges_hunt_building', string_rec);
 
 // Function for zero filling
 string9	fZeroFill(string pString)	:=	function

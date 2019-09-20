@@ -1,4 +1,4 @@
-IMPORT PRTE2_liens,roxiekeybuild,ut,autokey, promotesupers,VersionControl,PRTE,PRTE2_Common,_control;
+﻿IMPORT PRTE2_liens,roxiekeybuild,ut,autokey, promotesupers,VersionControl,PRTE,PRTE2_Common,_control,strata;
 
 EXPORT proc_build_liens_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 		is_running_in_prod 			:= PRTE2_Common.Constants.is_running_in_prod;
@@ -78,47 +78,62 @@ RoxieKeyBuild.Mac_SK_Move_V2(Constants.KEY_PREFIX + 'fcra::' + '@version@::main:
 
 build_keys := sequential(
 														parallel
-														(liens_MID_key,liens_PID_key, liens_DID_key,liens_BDID_key,liens_filing_key,
+														(liens_MID_key, liens_PID_key, liens_DID_key,liens_BDID_key,liens_filing_key,
 															liens_case_number_key,liens_RMSID_key ,liens_IRS_key,liens_cert_nbr,
-															Liens_LinkID_key,liens_PID_linkids_key,liens_SourceRecId_key
+															Liens_LinkID_key,liens_PID_linkids_key, liens_SourceRecId_key
 														 ),
 														 parallel
-														(liens_MID_key_fcra,liens_PID_key_fcra, liens_DID_key_fcra,liens_BDID_key_fcra,liens_filing_key_fcra,
+														(liens_MID_key_fcra, liens_PID_key_fcra, liens_DID_key_fcra,liens_BDID_key_fcra,liens_filing_key_fcra,
 															liens_case_number_key_fcra,liens_RMSID_key_fcra,liens_IRS_key_fcra,liens_cert_nbr_fcra
 														 ),
 														parallel
-														(mv_mid_key,mv_pid_key, mv_DID_key,mv_BDID_key,mv_filing_key,
+														(mv_mid_key, mv_pid_key, mv_DID_key,mv_BDID_key,mv_filing_key,
 															mv_case_number_key, mv_RMSID_key,mv_IRS_key,mv_cert_nbr,
-															mv_LinkID_key,mv_liens_PID_linkids_key,mv_SourceRecId_key
+															mv_LinkID_key, mv_liens_PID_linkids_key,mv_SourceRecId_key
 														 ),
 														 parallel
-														(mv_mid_key_fcra,mv_pid_key_fcra,mv_DID_key_fcra,mv_BDID_key_fcra,mv_filing_key_fcra,
+														(mv_mid_key_fcra,mv_pid_key_fcra, mv_DID_key_fcra,mv_BDID_key_fcra,mv_filing_key_fcra,
 															mv_case_number_key_fcra,mv_RMSID_key_fcra,mv_IRS_key_fcra,mv_cert_nbr_fcra
 														 ),
 														 parallel
 														(mv_mid_QA,mv_pid_QA, mv_DID_QA,mv_BDID_QA,mv_filing_QA,
 															mv_case_number_QA, mv_RMSID_QA,mv_IRS_QA,mv_cert_nbr_QA,
-															mv_LinkID_QA,mv_liens_PID_linkids_QA,mv_SourceRecId_QA
+															mv_LinkID_QA,mv_liens_PID_linkids_QA, mv_SourceRecId_QA
 														 ),
 														  parallel
-														(mv_mid_QA_fcra,mv_pid_QA_fcra,mv_DID_QA_fcra,mv_BDID_QA_fcra,mv_filing_QA_fcra,
+														(mv_mid_QA_fcra, mv_pid_QA_fcra, mv_DID_QA_fcra,mv_BDID_QA_fcra,mv_filing_QA_fcra,
 															mv_case_number_QA_fcra,mv_RMSID_QA_fcra,mv_IRS_QA_fcra,mv_cert_nbr_QA_fcra
 														 ),
-														 //Build Autokeys
+												 // Build Autokeys
 														 PRTE2_liens.Proc_build_autokeys(filedate),
 														 PRTE2_liens.Proc_build_autokeys_fcra(filedate),
 														 notify('LIENS PRTE KEY BUILD COMPLETE','*'),
+
 												 );
-												 
+
+cnt_fcra_main_id := OUTPUT(strata.macf_pops(PRTE2_liens.key_liens_main_ID(true),,,,,,FALSE,
+													['accident_date','accident_date','agency_city','case_title','date_vendor_removed','filing_time',
+													 'judg_vacated_date','judge','lapse_date','legal_block','legal_borough',
+													 'legal_lot','sherrif_indc','tax_code','vendor_entry_date']), named('cnt_fcra_main_id'));
+													 
+cnt_fcra_party_id := OUTPUT(strata.macf_pops(PRTE2_liens.key_liens_party_ID(true),,,,,,FALSE,['phone','tax_id']), named('cnt_fcra_party_id'));
+
+cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(PRTE2_liens.key_autokey_payload_fcra,,,,,,FALSE,['tax_id']), named('cnt_fcra_autokey_payload'));
+
+		
+//		
 		//---------- making DOPS optional and only in PROD build -------------------------------													
-		notifyEmail := IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
-		NoUpdate := OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
-		updatedops   		 := PRTE.UpdateVersion('LiensV2Keys',filedate,notifyEmail,'B','N','N');
-		updatedops_fcra  := PRTE.UpdateVersion('FCRA_LiensV2Keys',filedate,notifyEmail,'B','F','N');
-		PerformUpdateOrNot := IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
+		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 		:= PRTE.UpdateVersion('LiensV2Keys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+		updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_LiensV2Keys',filedate,notifyEmail,l_inloc:='B',l_inenvment:='F',l_includeboolean := 'N');
+		PerformUpdateOrNot 	:= IF(doDOPS,parallel(updatedops,updatedops_fcra),NoUpdate);
 		//--------------------------------------------------------------------------------------
 
-RETURN sequential(build_keys
+
+
+RETURN sequential(build_keys,
+									parallel(cnt_fcra_main_id,cnt_fcra_party_id,cnt_fcra_autokey_payload)
 									,PerformUpdateOrNot
 									);
 

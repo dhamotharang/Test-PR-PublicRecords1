@@ -129,7 +129,7 @@ module
 	end;
 	
 	export fAll(
-		 dataset(Layouts.Base)	pBase
+		 dataset(Layouts.Base_new)	pBase
 		,string									pPersistname 		= persistnames().AppendAID
 	) :=
 	function

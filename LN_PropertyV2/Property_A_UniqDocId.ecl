@@ -1,4 +1,4 @@
-IMPORT MDR;
+﻿IMPORT MDR;
 EXPORT Property_A_UniqDocId(dataset(LN_PropertyV2.Layout_Property_A_Extract) ds, Types.StateList st_list=ALL) := function
 	
 	Layout_Property_A_Extract xa(LN_PropertyV2.Layout_Property_A_Extract l) := TRANSFORM
@@ -7,7 +7,7 @@ EXPORT Property_A_UniqDocId(dataset(LN_PropertyV2.Layout_Property_A_Extract) ds,
 		SELF := l;
 		SELF := [];
 	END;	
-	f0 := PROJECT(ds(state_code IN st_list), xa(LEFT));
+	f0 := DISTRIBUTE(PROJECT(ds(state_code IN st_list), xa(LEFT)),HASH(sid));
 	
 	Layout_Property_A_Extract en(Layout_Property_A_Extract l, Layout_Property_A_Extract r):= TRANSFORM
 		SELF.rid := IF(l.rid=0, ThorLib.Node()+1, l.rid+ThorLib.Nodes());
@@ -49,5 +49,6 @@ EXPORT Property_A_UniqDocId(dataset(LN_PropertyV2.Layout_Property_A_Extract) ds,
 	
 	f3 := JOIN(f1, g8, LEFT.sid=RIGHT.sid AND LEFT.ln_fares_id=RIGHT.ln_fares_id,
 						 updateKey(LEFT,RIGHT), LEFT OUTER, LOCAL, LOOKUP);
+
 	return f3;
 END;

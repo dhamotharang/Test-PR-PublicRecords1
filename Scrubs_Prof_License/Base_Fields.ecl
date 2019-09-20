@@ -1,4 +1,4 @@
-IMPORT SALT37;
+﻿IMPORT SALT37;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Base_Fields := MODULE
  
@@ -375,9 +375,9 @@ EXPORT Make_dob(SALT37.StrType s0) := MakeFT_invalid_0468pastdate(s0);
 EXPORT InValid_dob(SALT37.StrType s) := InValidFT_invalid_0468pastdate(s);
 EXPORT InValidMessage_dob(UNSIGNED1 wh) := InValidMessageFT_invalid_0468pastdate(wh);
  
-EXPORT Make_issue_date(SALT37.StrType s0) := MakeFT_invalid_0468pastdate(s0);
-EXPORT InValid_issue_date(SALT37.StrType s) := InValidFT_invalid_0468pastdate(s);
-EXPORT InValidMessage_issue_date(UNSIGNED1 wh) := InValidMessageFT_invalid_0468pastdate(wh);
+EXPORT Make_issue_date(SALT37.StrType s0) := MakeFT_invalid_0468date(s0);
+EXPORT InValid_issue_date(SALT37.StrType s) := InValidFT_invalid_0468date(s);
+EXPORT InValidMessage_issue_date(UNSIGNED1 wh) := InValidMessageFT_invalid_0468date(wh);
  
 EXPORT Make_expiration_date(SALT37.StrType s0) := MakeFT_invalid_0468date(s0);
 EXPORT InValid_expiration_date(SALT37.StrType s) := InValidFT_invalid_0468date(s);

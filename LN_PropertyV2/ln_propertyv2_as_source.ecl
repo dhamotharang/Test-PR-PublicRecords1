@@ -1,6 +1,6 @@
-import	header,ln_property,ln_mortgage,ut,_control,mdr,data_services,Std;
+﻿import	header,ln_property,ln_mortgage,ut,_control,mdr,data_services,Std;
 
-EXPORT	ln_propertyv2_as_source(boolean pFastHeader = false,boolean pForWatchdog = false)	:=	module
+EXPORT	ln_propertyv2_as_source(boolean pFastHeader = false,boolean pForWatchdog = false, string filedate = '')	:=	module
 						
 //same filter used in v1
 SHARED dLNPropertySearch		:=	if(pFastHeader
@@ -105,8 +105,8 @@ r1	:=	record
 	string1   dummy_seg;
 end;
 
-p1	:=	project(if(pForWatchdog,ln_propertyv2_deed_as_source,header.Files_SeqdSrc(pFastHeader).FAD),r1);
-p2	:=	project(if(pForWatchdog,ln_propertyv2_tax_as_source,header.Files_SeqdSrc(pFastHeader).FAT),r1);
+p1	:=	project(if(pForWatchdog,ln_propertyv2_deed_as_source,header.Files_SeqdSrc(pFastHeader, filedate).FAD),r1);
+p2	:=	project(if(pForWatchdog,ln_propertyv2_tax_as_source,header.Files_SeqdSrc(pFastHeader, filedate).FAT),r1);
 
 concat     	:=	p1+p2;
 concat_dist	:=	distribute(concat,hash(ln_fares_id));

@@ -1,5 +1,6 @@
-﻿import inquiry_acclogs;
-EXPORT In_File := Inquiry_AccLogs.File_Bridger_Logs.preprocess;
+﻿import inquiry_acclogs, inql_v2;
+In_File_ := inql_v2.Files().bridger_input;
+//Inquiry_AccLogs.File_Bridger_Logs.preprocess;
 
 layout := record
    recordof(In_File_) - [id];

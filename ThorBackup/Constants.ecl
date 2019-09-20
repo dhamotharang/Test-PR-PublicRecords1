@@ -1,7 +1,9 @@
-﻿import ut, _Control, dops;
+﻿import ut, _Control, dops,STD;
 EXPORT Constants := module
-
-	export yogurt(string superfilename = '') := module
+	shared dUserCreds := dataset('~hpccinternal::'+STD.System.Job.User()+'::userinfo'
+																,{string username, string password},thor);
+	export yogurt(string superfilename = ''
+								,boolean usecredentials = false) := module
 		//export startdate := '';
 		export enddate := ut.getdate;// : independent;
 		export l_time := ut.gettime();// : independent;
@@ -21,7 +23,7 @@ EXPORT Constants := module
 		export srcname := 'srcname=~'+filename + ' ';
 		export dstname := 'dstname=~'+filename + ' ';
 		export srcdali := 'srcdali=prod_dali.br.seisint.com '; // changing dali ip to dns
-		export copyfilecmd := serv + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + srcdali + transferbuffersize;
+		export copyfilecmd := serv + if (usecredentials,'username='+dUserCreds[1].username+' password='+dUserCreds[1].password+' ','') + over + repl + action + dstcluster + dstname + srcname + nsplit + wrap + srcdali + transferbuffersize;
 		export emailerrors := 'bocaroxiepackageteam@lexisnexis.com';
 		export senderemail := 'charlene.ros@lexisnexis.com';
 		export no_of_files_to_keep := if ( superfilename <> '',thorbackup.SetDeleteFileCount(superfile = superfilename)[1].filecnt,2);
@@ -42,9 +44,9 @@ EXPORT Constants := module
 		export integer nfiles := if (nooffiles > 0, nooffiles, 500);
 	end;
 	
-	export deletethresholdsize := 100000000000;
+	export deletethresholdsize := 10000000000;
 
-	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, tamika.edman@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
+	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
 
 	export allowedclusters(string environment) := module
 		export clusterset := if (dops.constants.ThorEnvironment = 'prod'

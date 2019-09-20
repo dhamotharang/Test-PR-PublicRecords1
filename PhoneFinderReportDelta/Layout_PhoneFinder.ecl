@@ -2,6 +2,7 @@
 
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
 	//DF-23286: Update Keys
+	//DF-23920: Ingest New Transaction Layout 
 	
 	///////////////////////////////////
 	//Transactions/////////////////////
@@ -28,6 +29,9 @@
 			string16 	submitted_state;
 			string10 	submitted_zip;
 			string15 	phonenumber;
+			string30  data_source;  //DF-23920
+   	  string30  royalty_used; //DF-23920 
+   	  string30  carrier;      //DF-23920
 			string16 	risk_indicator;
 			string32 	phone_type;
 			string32 	phone_status;

@@ -1,10 +1,10 @@
-import lib_stringlib,vehicleV2,vehlic,VehicleCodes,codes,ut;
+﻿import lib_stringlib,vehicleV2,vehlic,VehicleCodes,codes,ut;
 
 dVehicleTempMain	:=	VehicleV2.Mapping_TEMP_main;
 
 // dVehicleTempMain	:=	dataset('~thor_data400::persist::vehicleV2::vehicleV1_temp_main',VehicleV2.Layout_temp_module.Layout_temp_main,flat);
 
-VehicleV2.Layout_Base_Main	tMappingMain(VehicleV2.Layout_temp_module.Layout_temp_main	L)	:=
+VehicleV2.Layout_Base_Main tMappingMain(VehicleV2.Layout_temp_module.Layout_temp_main	L)	:=
 transform
 	self.State_Bitmap_Flag				:=	0;//change later
 	
@@ -37,6 +37,9 @@ transform
  	self.vina_body_style_desc			:=	map(trim(L.vina_body_style_desc,left,right)	<>	'' => L.vina_body_style_desc,
 																					trim(L.body_style_description,left,right) <> ''  => l.body_style_description,L.orig_body_desc
 																				    );
+	//Added for CCPA-103
+	// self.global_sid               := 0;
+	// self.record_sid               := 0;
 																						
 	self													:=	L;
 	self := [] ;//blank all experian new fields.

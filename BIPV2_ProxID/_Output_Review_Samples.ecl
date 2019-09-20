@@ -1,7 +1,9 @@
-﻿EXPORT _Output_Review_Samples(
+﻿import BIPV2;
+EXPORT _Output_Review_Samples(
    pMatchThreshold      = '30'
   ,pInfile              = 'BIPV2_ProxID.In_DOT_Base'
-  ,pSetReviewers        = '[\'CM\',\'LB\',\'DW\',\'RP\',\'AL\',\'DS\',\'ZS\',\'JA\',\'AJ\',\'PW\']'
+  ,pSetReviewers        = 'BIPV2._Config.Set_Sample_Reviewers'
+  // ,pSetReviewers        = '[\'KW\',\'LB\',\'RP\',\'JA\',\'ZS\',\'DS\']'
   ,pSamplesPerReviewer  = '15'
   ,pKeyversions         = '\'built\''
   ,pFractionAtThreshold = '.667'    //by default, 2/3 at threshold, 1/3 above
@@ -10,7 +12,7 @@
 ) :=
 functionmacro
 
-  import tools,BIPV2_ProxID;
+  import tools,BIPV2_ProxID,BIPV2;
   
   kmtch                   := BIPV2_ProxID.Keys(pInfile,pKeyversions).MatchSample ;
   kcand                   := BIPV2_ProxID.Keys(pInfile,pKeyversions).Candidates  ;

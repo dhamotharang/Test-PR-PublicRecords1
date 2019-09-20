@@ -16,6 +16,9 @@ export Copy_BIPV2FullKeys(
 	,string		                                      pRegexVersion			= '^(.*?_'+ psuperversions + '|.*?::' + psuperversions + '::.*)$'					
 	,boolean	                                      pDeleteSrcFiles		= false	                            // If true, delete source logical files.  False = Do not
 	,boolean	                                      pIsTesting			  = true	                            // If true, just output dataset of what to do, false actually copy the files
+  ,string                                         pSrcDali          = if(pToDataland	, 'prod_dali.br.seisint.com:7070'              //_Control.IPAddress.prod_thor_dali this didn't work
+                                                                                      , _Control.IPAddress.dataland_dali
+                                                                                      )
 
 ) :=
 
@@ -32,5 +35,6 @@ tools.fun_CopyRename(
   ,pRegexVersion			
   ,pDeleteSrcFiles
   ,
-  ,pIsTesting			  
+  ,pIsTesting	
+  ,pSrcDali
 );

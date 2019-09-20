@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0));
-export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0));
-export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0));
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
 
 
 // generic function to get the FIRST subfie in the super
@@ -42,9 +42,6 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
 END;
 
 EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
-
-// check if we have a local copy already   
-EXPORT ok_to_copy(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::address'));
 
 SHARED fc(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
@@ -143,38 +140,37 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, st
     output(dataset([{'remove',fName8('qa' ,kNm),currLgInc8(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
 
     output(dataset([{'remove',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
-    output(dataset([{'clear ',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
     output(dataset([{'add   ',fName('inc',kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
     output(dataset([{'add   ',fName('inc',kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
 
     output(dataset([{'add   ',fName( 'qa' ,kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
     output(dataset([{'add   ',fName4('qa' ,kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-    output(dataset([{'add   ',fName8( 'qa' ,kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'add   ',fName8('qa' ,kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
                   
     if(~test_copy, sequential(
        std.file.startsuperfiletransaction(),
                           
        // remove the previous incrementals from the monthly regular lab key qa superfiles
-       if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName('qa' ,kNm),currLgInc(kNm))          ),
+       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName('qa' ,kNm)))>0,
+          std.file.RemoveSuperFile          (fName('qa' ,kNm),currLgInc(kNm))          )),
 
-       if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName4('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName4('qa' ,kNm),currLgInc(kNm))          ),
+       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName4('qa' ,kNm)))>0,
+          std.file.RemoveSuperFile          (fName4('qa' ,kNm),currLgInc(kNm))          )),
      
-       if(count(std.file.LogicalFileSuperOwners(currLgInc8(kNm))('~'+name=fName8('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName8('qa' ,kNm),currLgInc8(kNm))          ),
+       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc8(kNm))('~'+name=fName8('qa' ,kNm)))>0,
+          std.file.RemoveSuperFile          (fName8('qa' ,kNm),currLgInc8(kNm))          )),
                   
        // We add both to make sure the monthly
        // std.file.RemoveOwnedSubFiles      (fName('inc',kNm)),
-       if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true)),
-       if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm))),
-       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(filedt,kNml))),
-       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(filedt,kNml))),
+       nothor(if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true))),
+       nothor(if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm)))),
+       nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(filedt,kNml)))),
+       nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(filedt,kNml)))),
                
        // Add the new incrementals to the monthly regular lab keys qa superfiles
-       std.file.AddSuperFile             (fName ('qa',kNm),fName (filedt,kNml)),
-       std.file.AddSuperFile             (fName4('qa',kNm),fName (filedt,kNml)),
-       std.file.AddSuperFile             (fName8('qa',kNm),fName8(filedt,kNml)),
+       nothor(std.file.AddSuperFile             (fName ('qa',kNm),fName (filedt,kNml))),
+       nothor(std.file.AddSuperFile             (fName4('qa',kNm),fName (filedt,kNml))),
+       nothor(std.file.AddSuperFile             (fName8('qa',kNm),fName8(filedt,kNml))),
        std.file.finishsuperfiletransaction()
     ))
   );
@@ -199,7 +195,7 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := fu
     );
 END;
 
-EXPORT update_inc_idl(boolean skipIncSFupdate=false, string filedt) := updateSupers('::header',skipIncSFupdate,'::idl', filedt);
+EXPORT update_inc_idl(boolean skipIncSFupdate=false, string filedt) := nothor(updateSupers('::header',skipIncSFupdate,'::idl', filedt));
 
 SHARED elist:= Header.email_list.BocaDevelopers;
 
@@ -231,99 +227,71 @@ SHARED udops(string3 skipPackage='000') := sequential(
                        ))
 );
 
-SHARED tokenval := orbit3.GetToken();
-SHARED rec_rep := {STRING  Name, STRING  Status, STRING  Message};
-    
-SHARED  update_entry(string buildname, string Buildvs, string Envmt) := FUNCTION
-             
-    submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
-                                                            Orbit3.Constants(Envmt).platform_upd).retcode ;
-    
-    return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-                project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-                );
+SHARED orbit_update_entries(boolean isCreate, string skipPackage='000') := function
+
+    skipcreatebuild := if(isCreate, false, true);
+    skipupdatebuild := if(isCreate, true, false);
+
+    RETURN sequential(
+                        if(skipPackage[1]='0',Orbit3.Proc_Orbit3_CreateBuild('PersonXLAB_Inc', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
+                        if(skipPackage[2]='0',Orbit3.Proc_Orbit3_CreateBuild('FCRA_Header', filedate, 'F', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers)),
+                        if(skipPackage[3]='0',Orbit3.Proc_Orbit3_CreateBuild('Header_IKB', filedate, 'N', skipcreatebuild, skipupdatebuild, true, Header.email_list.BocaDevelopers))
+                      );
+
 END;
 
-SHARED update_bentry(string buildname, string Buildvs, string Envmt) := FUNCTION
-            
-    status := Orbit3.Constants(Envmt).platform_upd(PlatformName='Boolean Roxie Production');
-    submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
-                                                            status).retcode ;
-    
-    return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-                project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-                );
-END;
-
-SHARED create_entry(string buildname, string Buildvs) := FUNCTION
-    
-    submit_change1 := Orbit3.CreateBuild        (buildname, Buildvs, tokenval).retcode;
-    submit_change2 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval).retcode;
-    return if(_Control.ThisEnvironment.Name = 'Prod_Thor', 
-               project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))+
-               project(submit_change2, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
-              );
-END;
-
-SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := function
-
-    RETURN if (createORupdate='create',
-                sequential(
-                        if(skipPackage[1]='0',output(create_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor))),
-                        if(skipPackage[2]='0',output(create_entry('FCRA_Header'    ,lastestFCRAversionOnThor))),
-                        if(skipPackage[3]='0',output(create_entry('Header_IKB'     ,lastestWklyversionOnThor)))
-                ),
-                sequential(
-                        if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor,'N'))),
-                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'N'))),
-                        if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
-                )
-       );
-END;
+// check if we have a local copy already   
+EXPORT ok_to_copy(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl')) and (~std.file.fileexists('~thor400_36::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
+SHARED ok_to_copy_UniqExKeys(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
 
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    nocopy := ~test_copy AND ~ok_to_copy(filedt);
-
-    return if(nocopy
-         ,output('No copy. see outputs')
-         ,sequential(
-           copy_from_alpha(filedt)
-          ,copy_addr_uniq_keys_from_alpha(filedt)
-        ));
+    noLABcopy := ~test_copy AND ~ok_to_copy(filedt);
+    cpLab := if(noLABcopy
+             ,output('No LAB copy. see outputs')
+             ,copy_from_alpha(filedt)
+             );
+             
+    noUniqExcopy := ~test_copy AND ~ok_to_copy_UniqExKeys(filedt);
+    cpUniqEx := if(noUniqExcopy
+             ,output('No Address Unique Expanded copy. see outputs')
+             ,copy_addr_uniq_keys_from_alpha(filedt)
+             );
+             
+    return sequential(cpLab, cpUniqEx);
 END;
+
+copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
 
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
-    update_inc_superfiles(,filedt)
+    update_inc_superfiles(,filedt),
+    copy_to_dataland
     );
-
-copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
         
-EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(               
-    udops(skipPackage),
-    orbit_update_entries('create',skipPackage),
-    orbit_update_entries('update',skipPackage),
-    std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
-         
-         'Hello,\n\nPlease note that the following datasets have been updated for CERT deployment:'
-        +'\n\n'
-        +if(skipPackage[1]='0','PersonXLAB_Inc\n','')
-        +if(skipPackage[2]='0','FCRA_Header\n','')
-        +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
-        +'\n'
-        +if(skipPackage[1]='0','PersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
-        +if(skipPackage[2]='0','FCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
-        +if(skipPackage[3]='0','PersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
-        +'\n'
-        +'Corespondiong Orbit entries have been created and updated.\n'
-        +'\n'
-        +'If you have any question or concerns please contact:\n'
-        +'Debendra.Kumar@lexisnexisrisk.com\n'
-        +'gabriel.marcan@lexisnexisrisk.com\n'
-        +'\nThank you,'),
-    copy_to_dataland;
+EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(  
+
+   std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
+     'Hello,\n\nPlease note that the following datasets have been updated for CERT deployment:'
+    +'\n\n'
+    +if(skipPackage[1]='0','PersonXLAB_Inc\n','')
+    +if(skipPackage[2]='0','FCRA_Header\n','')
+    +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
+    +if(skipPackage[1]='0','\nPersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
+    +if(skipPackage[2]='0','\nFCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
+    +if(skipPackage[3]='0','\nPersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
+    +'\n\n'
+    +'Corespondiong Orbit entries have been created and updated.\n'
+    +'\n'
+    +'If you have any question or concerns please contact:\n'
+    +'Debendra.Kumar@lexisnexisrisk.com\n'
+    +'gabriel.marcan@lexisnexisrisk.com\n'
+    +'\nThank you,'),          
+    
+    orbit_update_entries(true,skipPackage),   //Create
+    orbit_update_entries(false,skipPackage),  //Update
+    udops(skipPackage)
 );
 END;

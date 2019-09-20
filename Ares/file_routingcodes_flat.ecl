@@ -32,8 +32,12 @@ ds_expand := Project(base, xform_expand(left));
 
 codetype_lookup := Files.ds_lookup(lookupname ='Routing Code Type').lookupBody;
 
-recordof(ds_expand) xform_codetypes(ds_expand l, recordof(codetype_lookup) r) := transform
-	self.codetype := if(std.str.splitwords(l.tfpid,'-')[1] = l.codetype, r.tfpid, l.codetype);
+ds_expand xform_codetypes(ds_expand l, recordof(codetype_lookup) r) := transform
+	self.codetype := map(	std.str.splitwords(l.tfpid,'-')[1] = l.codeType and r.tfpid != '' => r.tfpid,  
+												l.codeType != '' => l.codeType, 
+												std.str.splitwords(l.tfpid,'-')[1] != '' => std.str.splitwords(l.tfpid,'-')[1], 
+												l.codeType) ;
+	self.routingnumber_alt := if(self.codetype = 'ABA', l.routing_raw, l.routingnumber_alt);
 	self := l;	
 end;
 xlated_codetypes := join(ds_expand(primaryOfficeID != ''), codetype_lookup, left.codetype = right.id, xform_codetypes(left,right), left outer, keep(1)); 
