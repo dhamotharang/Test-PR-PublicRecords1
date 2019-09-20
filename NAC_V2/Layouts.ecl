@@ -9,6 +9,7 @@ EXPORT Layouts := MODULE
 
    
 EXPORT	rlExternalEmail:= RECORD
+    INTEGER2    RecordID;
 		STRING10    GroupID;
 		STRING100	 EventType;		
 		STRING      EmailAddress;		
@@ -19,6 +20,7 @@ EXPORT	rlExternalEmail:= RECORD
 
 
 EXPORT rlInternalEmailFile := RECORD
+  INTEGER2    RecordID;
 	STRING100   EventType;
 	STRING50    GroupID;
 	STRING      EmailAddress;

@@ -2,16 +2,12 @@
  
  
 
-IMPORT $, PromoteSupers, NAC_V2, STD;
-
-
 EXPORT MOD_ExternalEmailsList := MODULE
 
 
+IMPORT $, PromoteSupers, NAC_V2, STD, ut;
 
- 
 
-  
 SHARED dsGroupConfig := NAC_V2.dNAC2Config;   //  points to "~nac::nac2::groups_config_xx"
 
 
@@ -90,7 +86,12 @@ FUNCTION
 	Layouts.rlEmailValidation dsEmailValidation := PROJECT(dsInsert, {LEFT.EmailAddress}); 
 	fn_IsEmailAddressFormatValid(dsEmailValidation); // for checking email addresses are in correct format
 	dsRecordsToProcess := SORT(DEDUP((dsExternalAllEmailsList + dsInsert)), GroupID, EventType, EmailAddress);  	
-	PromoteSupers.MAC_SF_BuildProcess(dsRecordsToProcess, Constants.SuperFileName_External, dsResult,,, true);
+	
+	 ut.MAC_Sequence_Records(dsRecordsToProcess, RecordID, dsSequencedRecords);
+	
+	
+	 
+	PromoteSupers.MAC_SF_BuildProcess(dsSequencedRecords, Constants.SuperFileName_External, dsResult,,, true);
 	OUTPUT(dsInsert, NAMED('to_be_inserted'));	
 	RETURN dsResult;		 
 END;
