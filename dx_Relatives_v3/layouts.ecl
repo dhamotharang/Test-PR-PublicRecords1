@@ -48,6 +48,9 @@
       boolean   business;
       boolean   other;
       unsigned1 title;
+				/*----CCPA Fields------*/
+			unsigned4 GLOBAL_SID;
+			unsigned8 RECORD_SID;
   END;
 
 END;

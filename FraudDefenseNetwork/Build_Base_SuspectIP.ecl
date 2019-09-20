@@ -34,8 +34,8 @@ EXPORT Build_Base_SuspectIP(
      SuspectIPValidate := dedup(inSuspectIPUpdateUpper(orig_ip <>'' and (length(trim(orig_ip, left, right)) between 7 and 15)), all);
      SuspectIPUpdate := project(SuspectIPValidate, tPrep(left));
 
-     pDataset_Dist := distribute(SuspectIPUpdate, hash(orig_ip));
-     pBase_Dist := distribute(inBaseSuspectIP, hash(orig_ip));
+     pDataset_Dist := distribute(SuspectIPUpdate, hash32(orig_ip));
+     pBase_Dist := distribute(inBaseSuspectIP, hash32(orig_ip));
 
      FraudDefenseNetwork.Layouts.Base.SuspectIP getSrcRid (pDataset_Dist l, pBase_dist r) := 
              transform
@@ -63,7 +63,14 @@ EXPORT Build_Base_SuspectIP(
                        local);
 				
      ut.MAC_Append_Rcid (dBase_with_rids, source_rec_id, pDataset_rollup);
-     tools.mac_WriteFile(Filenames(pversion).Base.SuspectIP.New, pDataset_rollup, Build_Base_File);
+     
+     dBase_RecordID := Project(pDataset_rollup, transform(recordof(pDataset_rollup),
+                                                          RecordID := Constants().SuspectIPRecIDSeries + left.source_rec_id;
+                                                          self.record_sid := RecordID;
+                                                          self := left;
+                                                          )); 
+     
+     tools.mac_WriteFile(Filenames(pversion).Base.SuspectIP.New, dBase_RecordID, Build_Base_File);
  
    //Return
      export full_build := sequential (
