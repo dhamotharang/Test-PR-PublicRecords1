@@ -84,7 +84,7 @@ tnt_gd := map(compare_add.tnt='Y' => 1,
 po_box := if(compare_add.prim_name[1..7] = 'PO BOX ' or compare_add.prim_name[1..3] in ['RR ', 'HC '],1,2);
 
 srt_h := sort(compare_add,did,dt_last_seen,-tnt_gd,-po_box,-dt_first_seen,-dt_vendor_first_reported,-address_flag);
-dup_h := dedup(srt_h,did); 
+dup_h := ungroup(dedup(srt_h,did)); 
 BestAddress_out := dup_h(address_flag != 'Y') : persist('persist::Watchdog_BestAddress');
 
 return BestAddress_out;
