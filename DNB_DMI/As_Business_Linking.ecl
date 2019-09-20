@@ -183,11 +183,14 @@ export As_Business_Linking (boolean pUseOtherEnviron = _Constants().IsDataland
 		self.match_company_name					 := ''; //Not available
 		self.match_branch_city 					 := ''; //Not available
 		self.match_geo_city							 := ''; //Not available		
-		self.group1_id									 := 0;
-		self.duns_number								 := l.rawfields.duns_number;
-		self.employee_count_org_raw      := l.rawfields.employees_total;
-		self.revenue_org_raw             := l.rawfields.annual_sales_volume;
-		self.employee_count_local_raw    := l.rawfields.employees_here;
+		self.group1_id									 := 0;	
+		self.duns_number								 := l.rawfields.duns_number;			
+    temp_employees_total_sign := if(trim(l.rawfields.employees_total_sign) = '-', '-', '');
+    temp_annual_sales_volume_sign := if(trim(l.rawfields.annual_sales_volume_sign) = '-', '-', '');
+    temp_employees_here_sign := if(trim(l.rawfields.employees_here_sign) = '-', '-', '');
+    self.employee_count_org_raw := trim(temp_employees_total_sign) +trim(l.rawfields.employees_total);
+    self.revenue_org_raw := trim(temp_annual_sales_volume_sign) +trim(l.rawfields.annual_sales_volume);
+    self.employee_count_local_raw := trim(temp_employees_here_sign) +trim(l.rawfields.employees_here);
 		self.revenue_local_raw           := '';
 		self 														 := l;
 		self 														 := [];
