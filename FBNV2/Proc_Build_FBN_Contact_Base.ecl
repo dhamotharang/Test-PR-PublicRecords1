@@ -1,4 +1,4 @@
-﻿IMPORT Address, AID, DID_Add, NID, PromoteSupers, lib_stringLib;
+﻿IMPORT _control, Address, AID, CCPA, DID_Add, NID, PromoteSupers, Std, lib_stringLib;
 
 dContactInputs  	:=ungroup(Mapping_FBN_FL_Contact)+
 				                         ungroup(Mapping_FBN_CA_San_Diego_Contact)+
@@ -156,9 +156,26 @@ sort_dsFBN := sort(dist_dsFBN,RECORD,except dt_first_seen,dt_last_seen, dt_vendo
 // ;
 
 dOut    	 :=rollup(sort_dsFBN,rollupXform(left,right),
-			   		 RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-					 :persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Contact');	
+			   		 RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local);
+					 
+///////////////////////////////////////////////////////////////////////////////////////     
+// Apply Global_SIDs     
+///////////////////////////////////////////////////////////////////////////////////////     
+         
+//Apply Global_SID - TMSID[1..3]     
+addGlobalSID 		:= CCPA.macGetGlobalSID(dOut, 'Fbn2', 'tmsid[1..3]', 'global_sid');      
+         
+withGSIDs				:= addGlobalSID(global_sid<>0);	//Global_SIDs Populated     
+remainRec				:= addGlobalSID(global_sid=0);	//No Global_SIDs Populated     
+         
+//Apply Global_SID - TMSID[1..2]     
+addGlobalSID2		:= CCPA.macGetGlobalSID(remainRec, 'Fbn2', 'tmsid[1..2]', 'global_sid');     
 
-PromoteSupers.MAC_SF_BuildProcess(dOut,fbnv2.cluster.cluster_out+'base::FBNv2::Contact',Out, 3,pCompress:=true);
+//Concat All Results     
+concatOut 			:= (withGSIDs + addGlobalSID2) : persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Contact'); 
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+PromoteSupers.MAC_SF_BuildProcess(concatOut,fbnv2.cluster.cluster_out+'base::FBNv2::Contact',Out, 3,pCompress:=true);
 
 export Proc_Build_FBN_Contact_Base := Out;
