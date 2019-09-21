@@ -1255,6 +1255,7 @@
 				trim(kword, left, right) = 'SEDPA' =>SubGroup_Constants.numKeywordsID.KEYWORD_SEDPA,
 				trim(kword, left, right) = 'LFSA-ALERT' =>SubGroup_Constants.numKeywordsID.KEYWORD_LFSA_ALERT,
 				trim(kword, left, right) = 'ESBDE' =>SubGroup_Constants.numKeywordsID.KEYWORD_ESBDE,
+				trim(kword, left, right) = 'CNCBIRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNCBIRC,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

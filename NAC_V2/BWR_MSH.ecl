@@ -1,4 +1,4 @@
-import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
+﻿ import	NAC, lib_FileServices, lib_StringLib, lib_ThorLib, Ut;
 
 #workunit('Name', 'NAC MSH Build');
 #workunit('priority','high');
@@ -14,6 +14,11 @@ string		gThorFilenameBase			:=	'nac::for_msh::';
 string		gCurrentDateTime			:=	ut.GetTimeDate()	: global, independent;
 string8		gCurrentDate					:=	gCurrentDateTime[1..4] + gCurrentDateTime[6..7] + gCurrentDateTime[9..10];
 string6		gCurrentTime					:=	gCurrentDateTime[11..16];
+
+
+STRING AlertRecipients := MOD_InternalEmailsList.fn_GetInternalRecipients('Preprocess Error','');
+
+
 
 // ------------------------------------------------------------------------------------------------
 gMRR	:=
@@ -200,5 +205,5 @@ zGo	:=	sequential(
 									 );
 /////////////////////////////////////////
 
-zGo	: when(cron('0 7 * * *')), failure(lib_FileServices.FileServices.SendEmail('tony.kirk@lexisnexis.com', 'New MSH Failed', 'New MSH Failed'));
-zGo	:	when(event('NAC MSH Go Now', '*')), failure(lib_FileServices.FileServices.SendEmail('tony.kirk@lexisnexis.com', 'New MSH Failed', 'New MSH Failed'));
+zGo	: when(cron('0 7 * * *')), failure(lib_FileServices.FileServices.SendEmail(AlertRecipients, 'New MSH Failed', 'New MSH Failed'));
+zGo	:	when(event('NAC MSH Go Now', '*')), failure(lib_FileServices.FileServices.SendEmail(AlertRecipients, 'New MSH Failed', 'New MSH Failed'));
