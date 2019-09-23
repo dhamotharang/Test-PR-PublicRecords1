@@ -1,5 +1,5 @@
 ﻿#stored('did_add_force', 'thor');
-
+IMPORT NAC,std,ut,dops;
 
 
 export fn_Base2_from_Base1(string version) := FUNCTION

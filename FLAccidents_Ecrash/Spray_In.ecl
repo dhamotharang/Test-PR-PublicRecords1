@@ -171,7 +171,7 @@ Commercial_move := nothor(apply(Commercial_FileListing,FileServices.MoveExternal
 																 
 
 Commercial_spy := if (ut.Weekday((integer) ut.GetDate) <> 'SUNDAY', if (  COUNT(Commercial_FileListing) > 0 , Sequential(Commercial_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForCommercial + Constants.FileSeparator + Constants.CommercialFileMask,,,,'"',
-       Constants.DestinationCluster,Commercial_file,-1,,,true,true,true),Commercial_addsuper),FAIL('Commercial_Files_not_in_unix')),Output('No_Commercial_Files_On_Sunday'));
+       Constants.DestinationCluster,Commercial_file,-1,,,true,true,true),Commercial_addsuper),Output('Commercial_Files_not_in_unix')),Output('No_Commercial_Files_On_Sunday'));
 
 
 //Citation Spray
@@ -220,7 +220,7 @@ PTYD_move := nothor(apply(PTYD_FileListing,FileServices.MoveExternalFile(Constan
 
 
 PTYD_spy := if ( ut.Weekday((integer) ut.GetDate) <> 'SUNDAY' , if (  COUNT(PTYD_FileListing) > 0 , Sequential(PTYD_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForPtyDamage + Constants.FileSeparator + Constants.PtyDamageFileMask,50000,,,'"',
-       Constants.DestinationCluster,PropertyDamage_file,-1,,,true,true,true),PropertyDamage_addsuper),FAIL('PTYDamage_Files_not_in_unix')),Output('No_PTYDFiles_On_Sunday'));
+       Constants.DestinationCluster,PropertyDamage_file,-1,,,true,true,true),PropertyDamage_addsuper),Output('PTYDamage_Files_not_in_unix')),Output('No_PTYDFiles_On_Sunday'));
 
 
 
