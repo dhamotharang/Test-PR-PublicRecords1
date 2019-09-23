@@ -23,7 +23,7 @@
 												+ DATASET([{'1072','OFAC',1}, {'0','UST',1}],
 											recordof(u1));
 	
-	j := JOIN(u, s1, left.list_id=right.list_id, TRANSFORM(rSources,
+	j := JOIN(u, s1, left.list_id=right.list_id and left.source=right.source_code, TRANSFORM(rSources,
 					self.code := (integer)left.list_id;
 					self.source_code := left.source;
 					self.source_name := TRIM(right.source_name);

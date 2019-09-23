@@ -127,7 +127,7 @@ ChangeToOther := ['OtherInformation', 'Organization','AltAddress','LanguagesSpok
 					'GroupBeneficialOwner','Legal_Basis','Manager','Operator',
 					'Org_PID','Organizatin','PlaceofIncorporation','Relationship',
 					'TechnicalManager','Typeofdenial',
-					'SubCategory', 'OwnershipPercent'
+					'SubCategory', 'OwnershipPercent','SourceLink'
 					];
 
 export normAddl(dataset(Accuity.Layouts.input.rEntity) infile) := function

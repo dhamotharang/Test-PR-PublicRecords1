@@ -1,4 +1,4 @@
-﻿IMPORT Worldcheck_Bridger;
+﻿IMPORT Worldcheck_Bridger, Std;
 EXPORT GetGWLFile := FUNCTION
 
 	input := DISTRIBUTE(Accuity.Reformat.outputs.GWL, (integer)id);
@@ -11,6 +11,11 @@ EXPORT GetGWLFile := FUNCTION
 	withCrit := JOIN(input, crit, (integer)left.id=right.id, 
 							TRANSFORM(Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.routp,
 								self.search_criteria := (string)right.criteria;
+								words := Std.Str.WordCount(left.accuitydatasource);
+								code := (integer)Std.Str.GetNthWord(left.accuitydatasource, words);
+								self.comments := TRIM($.dictSources[code].source_name) + 
+																		IF(TRIM(left.comments)='', '',
+																		' | ' + TRIM(left.comments));
 								self := left;), left outer, local);
 
 	return withCrit;
