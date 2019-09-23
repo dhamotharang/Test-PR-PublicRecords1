@@ -1,4 +1,4 @@
-IMPORT GlobalWatchLists, GlobalWatchLists_Preprocess, ut, std;
+﻿IMPORT GlobalWatchLists, GlobalWatchLists_Preprocess, ut, std;
 #option('multiplePersistInstances',FALSE);
 
 	allsrcs := GlobalWatchLists_Preprocess.ProcessBankOfEngland + 
