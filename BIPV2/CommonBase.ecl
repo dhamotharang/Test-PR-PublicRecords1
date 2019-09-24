@@ -31,16 +31,16 @@ EXPORT CommonBase := MODULE
 	// Files and datasets
 	EXPORT filePrefix				:= 'thor_data400::bipv2::internal_linking::';
 	
-	EXPORT FILE_LOCAL_BUILT	      := '~' + filePrefix + 'built'    ;
-	EXPORT FILE_LOCAL				      := '~' + filePrefix + 'base'        ;
+	EXPORT FILE_LOCAL_BUILT	      := '~' + filePrefix + 'built'       ;
+	EXPORT FILE_LOCAL				      := '~' + filePrefix + 'qa'          ;
 	EXPORT FILE_FATHER_LOCAL      := '~' + filePrefix + 'father'      ;
 	EXPORT FILE_GRANDFATHER_LOCAL	:= '~' + filePrefix + 'grandfather' ;
 
-	EXPORT FILE_PROD_BUILT		    := Data_Services.foreign_prod      + filePrefix + 'built'     ;
-	EXPORT FILE_PROD				      := Data_Services.foreign_prod      + filePrefix + 'base'         ;
-	EXPORT FILE_FATHER_PROD	      := Data_Services.foreign_prod      + filePrefix + 'father'       ;
-	EXPORT FILE_GRANDFATHER_PROD	:= Data_Services.foreign_prod      + filePrefix + 'grandfather'  ;
-	EXPORT FILE_DATALAND		      := Data_Services.foreign_dataland  + filePrefix + 'base'         ;
+	EXPORT FILE_PROD_BUILT		    := Data_Services.foreign_prod      + filePrefix + 'built'       ;
+	EXPORT FILE_PROD				      := Data_Services.foreign_prod      + filePrefix + 'qa'          ;
+	EXPORT FILE_FATHER_PROD	      := Data_Services.foreign_prod      + filePrefix + 'father'      ;
+	EXPORT FILE_GRANDFATHER_PROD	:= Data_Services.foreign_prod      + filePrefix + 'grandfather' ;
+	EXPORT FILE_DATALAND		      := Data_Services.foreign_dataland  + filePrefix + 'qa'          ;
   
 	EXPORT FILE_BUILT				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL_BUILT         ,FILE_PROD_BUILT        );
 	EXPORT FILE_BASE				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL               ,FILE_PROD              );
@@ -123,8 +123,8 @@ EXPORT CommonBase := MODULE
 		
 		LOCAL ver := CASE(
 			StringLib.StringToLowerCase(#TEXT(in_ver)),
-			''						=> 'base',
-			'base'				=> 'base',
+			''						=> 'qa',
+			'base'				=> 'qa',
 			'father'			=> 'father',
 			'grandfather'	=> 'grandfather',
 			ERROR('BIPV2.CommonBase.DS_OMNI -- bad version'));
