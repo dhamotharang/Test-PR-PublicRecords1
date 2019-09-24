@@ -1,4 +1,4 @@
-import address, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,watchdog;
+﻿import address, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,watchdog;  
 
 dParty   := File_Dallas_TX_in;
 layout_party
@@ -54,8 +54,8 @@ Layout_UCC_Common.Layout_Party tProjParty(dNormalize   pInput)
 	 self.foreign_indc				    := if(Foreign  <>'','Y','N');
 	 self.dt_first_seen					:=   (unsigned6)(pInput.process_date[1..6]);
      self.dt_last_seen					:=   (unsigned6)(pInput.process_date[1..6]);
-     self.dt_vendor_first_reported		:=   (unsigned6)(pInput.process_date[1..6]);
-     self.dt_vendor_last_reported		:=   (unsigned6)(pInput.process_date[1..6]);
+     self.dt_vendor_first_reported		:=   (unsigned6) pInput.process_date; 
+     self.dt_vendor_last_reported		:=   (unsigned6) pInput.process_date; 
 	 self.title							:=	pInput.clean_name[1..5];
 	 self.fname							:=	pInput.clean_name[6..25];
 	 self.mname							:=	pInput.clean_name[26..45];

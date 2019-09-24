@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut; 
 
 //CA
 layout_party	:=	record
@@ -130,8 +130,8 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID tProjParty(layout_party    pInput)
 	 self.Tmsid											:=	'CA'+pInput.initial_filing_number;	 
 	 self.dt_first_seen							:=	(unsigned6)(pInput.process_date[1..6]);
    self.dt_last_seen							:=	(unsigned6)(pInput.process_date[1..6]);
-   self.dt_vendor_first_reported	:=	(unsigned6)(pInput.process_date[1..6]);
-   self.dt_vendor_last_reported		:=	(unsigned6)(pInput.process_date[1..6]);
+   self.dt_vendor_first_reported	:=	(unsigned6) pInput.process_date;
+   self.dt_vendor_last_reported		:=	(unsigned6) pInput.process_date;
 	 self														:=	pInput;
 	 self														:=	[];
 END;
@@ -238,4 +238,3 @@ OutParty                :=  output(dReassignRmsid ,,uccv2.cluster.cluster_out+'b
 AddSuperfile            :=  FileServices.AddSuperFile(uccv2.cluster.cluster_out+'base::UCC::Party_Name',uccv2.cluster.cluster_out+'base::UCC::Party::CA');
 
 export proc_build_CA_party_base    :=sequential(OutParty,AddSuperfile); 
- 

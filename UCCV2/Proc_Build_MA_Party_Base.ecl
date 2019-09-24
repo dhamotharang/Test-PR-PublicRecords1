@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut; 
 
 Layout_party	:=	Record
 	string8   process_date;
@@ -131,8 +131,8 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID tProjParty(dParty  pInput)
 																			);               //'S' (secured) - per Rosemary Murphy.
 	self.dt_first_seen						:=   (unsigned6)(pInput.process_date[1..6]);
 	self.dt_last_seen							:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_first_reported	:=   (unsigned6)(pInput.process_date[1..6]);
-	self.dt_vendor_last_reported	:=   (unsigned6)(pInput.process_date[1..6]);
+	self.dt_vendor_first_reported	:=   (unsigned6) pInput.process_date;
+	self.dt_vendor_last_reported	:=   (unsigned6) pInput.process_date;
 	self													:=	pInput;
 	self													:=	[];
 END;
