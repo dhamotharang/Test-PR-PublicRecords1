@@ -4,16 +4,17 @@
 #option('defaultSkewError', 1);
 //#option('freezepersists', true);
 
-//output(KELOtto.KelFiles.CustomerAddress,, '~gov::otto::customeraddress', overwrite);
-//output(KELOtto.KelFiles.PersonStats,, '~gov::otto::personstats', overwrite);
+output(KELOtto.KelFiles.CustomerAddress,, '~gov::otto::customeraddress', overwrite);
+output(KELOtto.KelFiles.PersonStats,, '~gov::otto::personstats', overwrite);
 
+/*
 output(KELOtto.KelFiles.PersonEvents,, '~gov::otto::personevents', overwrite);
 output(KELOtto.KelFiles.CustomerStats,, '~gov::otto::customerstats', overwrite);
 output(KELOtto.KelFiles.CustomerStatsPivot,, '~gov::otto::customerstats_pivot', overwrite);
+*/
 
-
-output(KELOtto.KelFiles.FullCluster,,'~gov::otto::fullgraph', overwrite);
-output(KELOtto.KelFiles.EntityStats,, '~gov::otto::entitystats', overwrite);
+//output(KELOtto.KelFiles.FullCluster,,'~gov::otto::fullgraph', overwrite);
+//output(KELOtto.KelFiles.EntityStats,, '~gov::otto::entitystats', overwrite);
 
 
 // Association Details
@@ -27,3 +28,5 @@ output(KELOtto.KelFiles.ScoreBreakdown,,'~gov::otto::entity_scorebreakdown', ove
 
 output(KELOtto.CustomerDash.TopEntityStats,, '~gov::otto::customerdashtopentitystats', overwrite);
 output(KELOtto.CustomerDash.TopClustersAndElements,, '~gov::otto::customerdashtopclusters', overwrite);
+
+output(KELOtto.CustomerDashboard.MainClusters,, '~gov::otto::customerdashboardtopclusters', overwrite);

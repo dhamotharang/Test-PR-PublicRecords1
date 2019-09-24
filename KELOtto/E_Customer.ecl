@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.0
+﻿//HPCC Systems KEL Compiler Version 0.11.6-2
 IMPORT KEL011 AS KEL;
 IMPORT KELOtto;
 IMPORT * FROM KEL011.Null;
@@ -8,22 +8,32 @@ EXPORT E_Customer := MODULE
     KEL.typ.nuid UID;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
+    KEL.typ.nstr State_;
+    KEL.typ.nint State_Count_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'targetcustomerhash(UID),customerid(Customer_Id_:0),industrytype(Industry_Type_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED __Mapping0 := 'targetcustomerhash(UID),inclusion_id(Customer_Id_:0),ind_type(Industry_Type_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'targetcustomerhash(UID),customerid(Customer_Id_:0),industrytype(Industry_Type_:0),state(State_:\'\'),statecount(State_Count_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'targetcustomerhash(UID),inclusion_id(Customer_Id_:0),ind_type(Industry_Type_:0),state(State_:\'\'),statecount(State_Count_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   EXPORT __d0_KELfiltered := KELOtto.SharingRules((UNSIGNED)fdn_ind_type_gc_id_inclusion>0);
   EXPORT KELOtto_SharingRules_Invalid := __d0_KELfiltered((KEL.typ.uid)TargetCustomerHash = 0);
   SHARED __d0_Prefiltered := __d0_KELfiltered((KEL.typ.uid)TargetCustomerHash <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
+  EXPORT States_Layout := RECORD
+    KEL.typ.nstr State_;
+    KEL.typ.nint State_Count_;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
   EXPORT Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Customer_Id_;
     KEL.typ.nint Industry_Type_;
+    KEL.typ.ndataset(States_Layout) States_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
@@ -33,12 +43,14 @@ EXPORT E_Customer := MODULE
   Layout Customer__Rollup(InLayout __r, DATASET(InLayout) __recs) := TRANSFORM
     SELF.Customer_Id_ := KEL.Intake.SingleValue(__recs,Customer_Id_);
     SELF.Industry_Type_ := KEL.Intake.SingleValue(__recs,Industry_Type_);
+    SELF.States_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),State_,State_Count_},State_,State_Count_),States_Layout)(__NN(State_) OR __NN(State_Count_)));
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,TRUE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
     SELF := __r;
   END;
   Layout Customer__Single_Rollup(InLayout __r) := TRANSFORM
+    SELF.States_ := __CN(PROJECT(DATASET(__r),TRANSFORM(States_Layout,SELF.__RecordCount:=1;,SELF:=LEFT))(__NN(State_) OR __NN(State_Count_)));
     SELF.__RecordCount := 1;
     SELF := __r;
   END;
@@ -52,6 +64,8 @@ EXPORT E_Customer := MODULE
     {'Customer','KELOtto.SharingRules','UID',COUNT(KELOtto_SharingRules_Invalid),COUNT(__d0)},
     {'Customer','KELOtto.SharingRules','inclusion_id',COUNT(__d0(__NL(Customer_Id_))),COUNT(__d0(__NN(Customer_Id_)))},
     {'Customer','KELOtto.SharingRules','Ind_type',COUNT(__d0(__NL(Industry_Type_))),COUNT(__d0(__NN(Industry_Type_)))},
+    {'Customer','KELOtto.SharingRules','State',COUNT(__d0(__NL(State_))),COUNT(__d0(__NN(State_)))},
+    {'Customer','KELOtto.SharingRules','StateCount',COUNT(__d0(__NL(State_Count_))),COUNT(__d0(__NN(State_Count_)))},
     {'Customer','KELOtto.SharingRules','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'Customer','KELOtto.SharingRules','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});

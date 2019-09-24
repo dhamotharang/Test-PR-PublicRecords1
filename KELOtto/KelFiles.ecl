@@ -18,14 +18,14 @@
                         'cl_identity_count_decile_,cl_p_r_identity_match_count_,cl_p_r_identity_match_percent_,cl_high_kr_identity_count_,cl_active7_identity_count_,cl_active30_identity_count_,cl_address_count_,cl_identity_event_avg_,cl_high_risk_pattern1_flag_,cl_high_risk_pattern2_flag_,cl_high_risk_pattern3_flag_,cl_high_risk_pattern4_flag_,cl_high_risk_pattern5_flag_,cl_nas9_identity_percent_,cl_nas9_top10_,cl_high_risk_death_prior_to_all_events_identity_percent_,cl_high_risk_death_prior_to_all_events_identity_top10_,cl_ip_high_risk_identity_percent_,cl_ip_high_risk_identity_top10_,cl_high_kr_identity_percent_,cl_high_kr_identity_top10_,cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_high_risk_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_,cl_identity_count_percentile_,cl_event_count_percentile_,cl_active30_identity_count_percentile_,cl_active7_identity_count_percentile_,cl_impact_weight_');
   
  
-
+  EXPORT IPAddressStats := KELOtto.Q__show_Customer_Internet_Protocol.Res0;
 
   // Associations
   EXPORT PersonAssociationsStats := JOIN(KELOtto.AddressPersonAssociations.PersonAddressMatchStats, PersonStats, LEFT.associatedcustomerfileinfo = RIGHT._r_customer_ AND LEFT.ToPersonEntityContextUid=RIGHT.entity_context_uid_, 
             TRANSFORM({RECORDOF(LEFT), STRING ToPersonLabel}, 
             SELF.customer_id_ := RIGHT.customer_id_, // Correct the customer id and industry type for the relationship to be based off the associated customer_id and not the source.
             SELF.industry_type_ := RIGHT.industry_type_,
-            SELF.ToPersonLabel := RIGHT.Label_, SELF := LEFT, SELF := RIGHT), KEEP(1), HASH);
+            SELF.ToPersonLabel := RIGHT.Label_, SELF := LEFT, SELF := RIGHT), KEEP(1), ALL, HASH);
   EXPORT PersonAssociationsDetails := KELOtto.AddressPersonAssociations.PersonAddressMatches;
 
   // Customer ScoreBreakdown
