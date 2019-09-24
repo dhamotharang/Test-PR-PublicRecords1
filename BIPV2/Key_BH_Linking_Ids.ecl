@@ -169,7 +169,7 @@ MODULE
 
 		inputs_for2 := project(inputs, BIPV2.IDlayouts.l_xlink_ids2);
 		f2 := kFetch2(inputs_for2, Level, ScoreThreshold, in_mod, JoinLimit, dnbFullRemove, bypassContactSuppression, mod_access := mod_access);		
-		return project(f2, {recordof(f2) - UniqueID - Fetch_Error_Code}); // Need to remove the fields that were added to kFetch2 to ensure the output of kFetch remains the same
+		return project(f2, {recordof(f2) - UniqueID - Fetch_Error_Code - global_sid - record_sid}); // Need to remove the fields that were added to kFetch2 to ensure the output of kFetch remains the same
 
 	END;
 
@@ -189,9 +189,9 @@ MODULE
   ) :=
   function
     
-    ds_fetched    := keyversions(pKeyversion).logical;
+          ds_fetched    := pull(keyversions(pKeyversion).logical);
 
-		ds_restricted := ds_fetched(BIPV2.mod_sources.isPermitted(in_mod,not dnbFullRemove).bySource(source,vl_id,dt_first_seen));
+          ds_restricted := BIPV2.mod_sources.isPermitted_Thor(in_mod, ds_fetched, not dnbFullRemove);
 		ds_masked     := if(dnbFullRemove, ds_restricted, BIPV2.mod_sources.applyMasking(ds_restricted,in_mod));
     
 		BIPV2_Suppression.mac_contacts(ds_masked, ds_suppressed, ds_dirty,,,fname, lname);
