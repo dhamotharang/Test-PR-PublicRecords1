@@ -1151,6 +1151,9 @@
 		export string KEYWORD_FATF_SD								:= '837';
 		export string KEYWORD_USCBW_WC							:= '838';
 		export string KEYWORD_SEDPA									:= '839';
+		export string KEYWORD_LFSA_ALERT						:= '840';
+		export string KEYWORD_ESBDE									:= '841';
+		export string KEYWORD_CNCBIRC								:= '842';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

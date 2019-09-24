@@ -27,14 +27,14 @@ EXPORT Release_prep_ingest_file := FUNCTION
 		TempBorrower										:= IF(STD.Str.Find(L.BorrowerName,';',1)>0, L.BorrowerName[1..STD.Str.Find(L.BorrowerName,';',1)-1],
 																					BKMortgage.fGetName.CleanName(L.BorrowerName));
 		SELF.ClnBorrowerName						:= STD.Str.CleanSpaces(REGEXREPLACE('( AS)$|(, AND)$|(, AS)$|(, NOT)$|(, ([\\(]*)SOLELY)$|( SOLELY)$|( SOLOELY)$|(, HUSBAND AND WIFE)|WIFE|HUSBAND',TempBorrower,''));
-		SELF.DBALenderBen								:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z,0-9]',BKMortgage.fGetName.DBAName(L.OrigLenderBen),''));
-		SELF.DBACurrentLenderBen				:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z,0-9]',BKMortgage.fGetName.DBAName(L.CurrentLenderBen),''));
+		SELF.DBALenderBen								:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z0-9]',BKMortgage.fGetName.DBAName(L.OrigLenderBen),''));
+		SELF.DBACurrentLenderBen				:= STD.Str.CleanSpaces(REGEXREPLACE('^[^A-Z0-9]',BKMortgage.fGetName.DBAName(L.CurrentLenderBen),''));
 		SELF	:= L;
 		SELF	:= [];
 	END;
 	
 	  Clean_out := project(ClnRawIn,CleanTrimFields(LEFT));
  
-RETURN Clean_out;
+RETURN Clean_out(TRIM(OrigLenderBen) <> '' OR TRIM(CurrentLenderBen) <> '' OR TRIM(BorrowerName) <> '');
 
 END;

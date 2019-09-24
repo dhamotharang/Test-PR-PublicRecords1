@@ -13,6 +13,8 @@ shared FraudPoint_Base		:= fSOAPAppend(UpdatePii).FraudPoint.All;
 
 shared IPMetaData_Base		:= fSOAPAppend(UpdatePii).IPMetaData.All;
 
+shared Advo_Base					:= fSOAPAppend(UpdatePii).Advo.All;
+
 shared Ciid_Orig					:= fSOAPAppend(UpdatePii).Ciid.Orig;
 
 shared Crim_Orig					:= fSOAPAppend(UpdatePii).Crim.Orig;
@@ -25,6 +27,7 @@ tools.mac_WriteFile(Filenames(pversion).Base.Crim.New,Crim_Base,Build_crim_Base)
 tools.mac_WriteFile(Filenames(pversion).Base.Death.New,Death_Base,Build_death_Base);
 tools.mac_WriteFile(Filenames(pversion).Base.FraudPoint.New,FraudPoint_Base,Build_fraudpoint_Base);
 tools.mac_WriteFile(Filenames(pversion).Base.IPMetaData.New,IPMetaData_Base,Build_IPMetaData_Base);
+tools.mac_WriteFile(Filenames(pversion).Base.Advo.New,Advo_Base,Build_Advo_Base);
 
 //
 tools.mac_WriteFile(Filenames(pversion).Base.CIID_Orig.New,Ciid_Orig,Build_ciid_Orig);
@@ -44,6 +47,7 @@ Export All := 	Sequential
 											,Build_death_Base
 											,Build_fraudpoint_Base
 											,Build_IPMetaData_Base
+											,Build_Advo_Base
 											,Promote(pversion).buildfiles.New2Built
 											,Promote(pversion).buildfiles.Built2QA
 											)

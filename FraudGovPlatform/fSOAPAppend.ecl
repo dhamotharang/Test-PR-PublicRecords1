@@ -1,4 +1,4 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std,AppendRelativesAddressMatch,Advo;
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 Shared nodes				:= thorlib.nodes();
@@ -51,6 +51,8 @@ shared fraudpoint_base	:= Files().base.fraudpoint.qa;
 
 shared IpAppend_Base		:= Files().base.IpMetaData.qa;
 
+shared Advo_Base				:= Files().base.Advo.qa;
+
 //original soap output files
 
 shared ciid_orig				:= Files().base.ciid_orig.built;
@@ -69,8 +71,12 @@ Export Pii := Module
 											,self.mname									:=left.cleaned_name.mname
 											,self.lname									:=left.cleaned_name.lname
 											,self.name_suffix						:=left.cleaned_name.name_suffix
-											,self.prim_name							:=left.clean_address.prim_name
 											,self.prim_range						:=left.clean_address.prim_range
+											,self.predir								:=left.clean_address.predir
+											,self.prim_name							:=left.clean_address.prim_name
+											,self.addr_suffix						:=left.clean_address.addr_suffix
+											,self.postdir								:=left.clean_address.postdir
+											,self.unit_desig						:=left.clean_address.unit_desig
 											,self.sec_range							:=left.clean_address.sec_range
 											,self.st										:=left.clean_address.st
 											,self.zip										:=left.clean_address.zip
@@ -561,5 +567,16 @@ pIpAppend	:= Project(IpAppend, Layouts.IPMetaData);
 Export All	:= If(UpdatePii, (pIpAppend + IpAppend_Base) , pIpAppend);
 
 END;
+
+ EXPORT Advo	:= MODULE
+   
+   Advo	:= Advo.mac_AppendADVO(pii_input,,prim_range,prim_name,addr_suffix,predir,postdir,sec_range,zip);
+   
+   pAdvo	:= Project(Advo, Layouts.Advo);
+   
+   Export All	:= If(UpdatePii, (pAdvo + Advo_Base) , pAdvo);
+   
+  END;
+
 
 END;

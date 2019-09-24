@@ -1,4 +1,4 @@
-﻿IMPORT bipv2,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS, Prof_License_Mari,std;
+﻿IMPORT _control, CCPA, bipv2,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS, Prof_License_Mari,std;
 #OPTION('multiplePersistInstances',FALSE);
 
 export party_did(dataset(recordof(layout_SANCTN_party_clean)) j_party_toclean ) := function
@@ -119,9 +119,11 @@ Business_Header_SS.MAC_Match_Flex(
 																	,FALSE
 																	);
 
-out4 := PROJECT(bdid_out, transform(SANCTN.layout_SANCTN_did, self.global_sid := 22811; self := left));
+out4 := PROJECT(bdid_out, transform(SANCTN.layout_SANCTN_did, self := left));
 
-dsSanctn_did := out4  : PERSIST(SANCTN.cluster +'persist::SANCTN::party_did_new2');
+addGlobalSID := CCPA.macGetGlobalSID(out4, 'Sanctn', '', 'global_sid'); //DF-25379: Populate Global_SIDs
+
+dsSanctn_did := addGlobalSID  : PERSIST(SANCTN.cluster +'persist::SANCTN::party_did_new2');
 
 return dsSanctn_did;
 

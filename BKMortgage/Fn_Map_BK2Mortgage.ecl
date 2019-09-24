@@ -29,7 +29,7 @@ EXPORT Fn_Map_BK2Mortgage(DATASET(BKMortgage.Layouts.AssignBase) ds_assign, DATA
 		SELF := [];
 	END;
 	
-	Norm_AssignName	:= DEDUP(NORMALIZE(ds_assign,3,t_norm(LEFT,COUNTER)),ALL,RECORD);
+	Norm_AssignName	:= DEDUP(NORMALIZE(ds_assign(new_record = TRUE),3,t_norm(LEFT,COUNTER)),ALL,RECORD);
 	
 //Normalize Release file to add multiple lenders to a single field
 	NormRLayout := RECORD
@@ -57,7 +57,7 @@ EXPORT Fn_Map_BK2Mortgage(DATASET(BKMortgage.Layouts.AssignBase) ds_assign, DATA
 		SELF := L;
 	END;
 	
-	Norm_ReleaseName	:= DEDUP(NORMALIZE(ds_release,2,t_Rnorm(LEFT,COUNTER)),ALL,RECORD);
+	Norm_ReleaseName	:= DEDUP(NORMALIZE(ds_release(new_record = TRUE),2,t_Rnorm(LEFT,COUNTER)),ALL,RECORD);
 	
 	dEmptyAssign 	:= ROW([], NormALayout);
   dEmptyRelease := ROW([], NormRLayout);
@@ -128,6 +128,7 @@ EXPORT Fn_Map_BK2Mortgage(DATASET(BKMortgage.Layouts.AssignBase) ds_assign, DATA
 		SELF.ClnBorrowerName										:= CHOOSE(uAssignRelease, lAssign.ClnBorrowerName, lRelease.ClnBorrowerName);
 		SELF.DBALenderBen												:= CHOOSE(uAssignRelease, lAssign.DBALenderBen, lRelease.DBALenderBen);
 		SELF.raw_file_name											:= CHOOSE(uAssignRelease, lAssign.raw_file_name, lRelease.raw_file_name);
+		SELF.new_record													:= CHOOSE(uAssignRelease, lAssign.new_record, lRelease.new_record);
 	END;
 	
 	dAssignRawMortgage 	:= PROJECT(Norm_AssignName,tMapCommon(LEFT,dEmptyRelease,1));

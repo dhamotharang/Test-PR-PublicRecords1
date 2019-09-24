@@ -95,6 +95,7 @@ EXPORT Layouts := MODULE
 		STRING	DBAAssignor;
 		STRING	DBAAssignee;
 		STRING100 raw_file_name; //Needed for property build
+		BOOLEAN	new_record; //Used to determine what records to pass to property
 	END;
 	
 		EXPORT Release_Raw_in	:= RECORD
@@ -187,6 +188,7 @@ END;
 		STRING	DBALenderBen;
 		STRING	DBACurrentLenderBen;
 		STRING100 raw_file_name; //Needed for property build
+		BOOLEAN	new_record; //Used to determine what records to pass to property
 	END;
 
 //Combined both Assignment and Release files for easier processing in LN_Property_Fast build
@@ -249,6 +251,7 @@ END;
 		STRING		ClnBorrowerName;
 		STRING		DBALenderBen;
 		STRING100 raw_file_name;
+		BOOLEAN		new_record; //Used to determine what records to pass to property
 	END;
 
 END;

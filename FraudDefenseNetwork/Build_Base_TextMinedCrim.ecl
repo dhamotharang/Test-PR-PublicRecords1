@@ -21,10 +21,10 @@
                                       self.st_start_dt := regexreplace('(Sent Start Date:)([0-9]+)[ ]*', left.stc_desc_2, '$2');
                                       self := left));
     
-      Unq_Public_offenses := dedup(sort(distribute(Public_Offenses_slim, hash(offender_key)), offender_key, off_desc_1, off_desc_2, off_date, convict_dt, 
+      Unq_Public_offenses := dedup(sort(distribute(Public_Offenses_slim, hash32(offender_key)), offender_key, off_desc_1, off_desc_2, off_date, convict_dt, 
                                                    ct_disp_dt, stc_dt, inc_adm_dt, st_start_dt, local), offender_key, off_desc_1, off_desc_2, off_date, 
                                                    convict_dt, ct_disp_dt, stc_dt, inc_adm_dt, st_start_dt, local);
-      Unq_offenders := dedup(sort(distribute(Offenders(pty_typ ='0' and data_type = '1'), hash(offender_key)), offender_key, local), offender_key, local);
+      Unq_offenders := dedup(sort(distribute(Offenders(pty_typ ='0' and data_type = '1'), hash32(offender_key)), offender_key, local), offender_key, local);
                           
       temp_layout1 := {Unq_offenders; string150 off_desc; string75 off_desc_1; string50 off_desc_2; string8 off_date;
                        string8 convict_dt; string8 ct_disp_dt; string8 stc_dt; string8 inc_adm_dt; string8 st_start_dt;
@@ -54,11 +54,11 @@
                         ,transform(recordof(ct_Offenses_slim), self :=left), lookup);  // Conv_lookup_ds will be updated eventually by dataowner
                             
       unq_ct_Offenses := dedup(sort(distribute(
-                                                 jConv_lkp, hash(offender_key)), offender_key, court_off_desc_1, court_off_desc_2, off_date, convict_dt, court_disp_date, sent_date, local),
+                                                 jConv_lkp, hash32(offender_key)), offender_key, court_off_desc_1, court_off_desc_2, off_date, convict_dt, court_disp_date, sent_date, local),
                                                  offender_key, court_off_desc_1, court_off_desc_2, off_date, convict_dt, court_disp_date, sent_date, local
                                               );
                             
-      ct_Offenders := dedup(sort(distribute(Offenders(pty_typ ='0' and data_type = '2'), hash(offender_key)), offender_key, local), offender_key, local); //2-crt n aoc
+      ct_Offenders := dedup(sort(distribute(Offenders(pty_typ ='0' and data_type = '2'), hash32(offender_key)), offender_key, local), offender_key, local); //2-crt n aoc
                             
       JAOC := JOIN(unq_ct_Offenses, ct_Offenders, left.offender_key = right.offender_key, transform(temp_layout1,
                     self := right,
@@ -80,7 +80,7 @@
       IncrimUpdate := JDOC + JAOC;
       IncrimUpdate_did := IncrimUpdate((unsigned)did <>0 and event_date <>'' and off_desc <>'');
       IncrimUpdate_off_desc := IncrimUpdate_did(Event_Date between ut.getDateOffset(-Mod_MbsContext.TextMinedCrimExpdays) and (STRING8)Std.Date.Today());
-      IncrimUpdate_dedup := dedup(sort(distribute(IncrimUpdate_off_desc, hash(offender_key)), 
+      IncrimUpdate_dedup := dedup(sort(distribute(IncrimUpdate_off_desc, hash32(offender_key)), 
                             offender_key, off_desc, event_date, local), offender_key, off_desc, event_date, local);
       temp_layout2 := {IncrimUpdate_dedup, string150 charge, string50 fraud_type};
       ds_proj := project(IncrimUpdate_dedup, transform(temp_layout2, 
@@ -96,7 +96,7 @@
                         );
                             
       ds_frdtype := ds_proj(fraud_type<>'');
-      InCrim := dedup(sort(distribute(ds_frdtype, hash(did)), did, -off_date, -convict_dt, -ct_disp_dt, -stc_dt, -inc_adm_dt,  
+      InCrim := dedup(sort(distribute(ds_frdtype, hash32(did)), did, -off_date, -convict_dt, -ct_disp_dt, -stc_dt, -inc_adm_dt,  
                 -st_start_dt, -event_date, -offender_persistent_id, local), did, local);
       
       Functions.CleanFields(InCrim, InCrimupper);
@@ -152,8 +152,8 @@
       
       Mac_LexidAppend(CrimNameCleaned, CrimUpdatecleaned);
       
-      pDataset_Dist := distribute(CrimUpdatecleaned, hash(did));
-      pBase_dist := distribute(inBaseTextMinedCrim, hash(did));
+      pDataset_Dist := distribute(CrimUpdatecleaned, hash32(did));
+      pBase_dist := distribute(inBaseTextMinedCrim, hash32(did));
       
       Layouts.Base.TextMinedCrim getSrcRid (pDataset_Dist l, pBase_dist r) :=
                              transform
@@ -188,7 +188,14 @@
                              );
     
        ut.MAC_Append_Rcid (dBase_with_rids, source_rec_id, pDataset_rollup);
-       tools.mac_WriteFile(Filenames(pversion).Base.TextMinedCrim.New, pDataset_rollup, Build_Base_File);
+       
+       dBase_RecordID := Project(pDataset_rollup, transform(recordof(pDataset_rollup),
+                                                          RecordID := Constants().TextMinedCrimRecIDSeries + left.source_rec_id;
+                                                          self.record_sid := RecordID;
+                                                          self := left;
+                                                          )); 
+       
+       tools.mac_WriteFile(Filenames(pversion).Base.TextMinedCrim.New, dBase_RecordID, Build_Base_File);
     
     //Return
       export full_build := sequential(

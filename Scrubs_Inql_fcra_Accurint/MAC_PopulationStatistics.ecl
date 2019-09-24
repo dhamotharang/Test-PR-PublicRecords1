@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_orig_end_user_id = '',Input_orig_loginid = '',Input_orig_billing_code = '',Input_orig_transaction_id = '',Input_orig_transaction_type = '',Input_orig_neighbors = '',Input_orig_relatives = '',Input_orig_associates = '',Input_orig_property = '',Input_orig_company_id = '',Input_orig_reference_code = '',Input_orig_fname = '',Input_orig_mname = '',Input_orig_lname = '',Input_orig_address = '',Input_orig_city = '',Input_orig_state = '',Input_orig_zip = '',Input_orig_zip4 = '',Input_orig_phone = '',Input_orig_ssn = '',Input_orig_free = '',Input_orig_record_count = '',Input_orig_price = '',Input_orig_bankruptcy = '',Input_orig_transaction_code = '',Input_orig_dateadded = '',Input_orig_full_name = '',Input_orig_billingdate = '',Input_orig_business_name = '',Input_orig_pricing_error_code = '',Input_orig_dl_purpose = '',Input_orig_result_format = '',Input_orig_dob = '',Input_orig_unique_id = '',Input_orig_dls = '',Input_orig_mvs = '',Input_orig_function_name = '',Input_orig_response_time = '',Input_orig_data_source = '',Input_orig_glb_purpose = '',Input_orig_report_options = '',Input_orig_unused = '',Input_orig_login_history_id = '',Input_orig_aseid = '',Input_orig_years = '',Input_orig_ip_address = '',Input_orig_source_code = '',Input_orig_retail_price = '',Input_inquiry_type = '',Input_lex_id = '',Input_reprice_batch_number = '',Input_user_changed = '',Input_date_changed = '',Input_fcra_purpose = '',Input_orig_address_2 = '',Input_orig_city_2 = '',Input_orig_state_2 = '',Input_orig_zip_2 = '',Input_orig_zip4_2 = '',Input_orig_jobid = '',Input_orig_acctno = '',Input_orig_end_user_name = '',Input_orig_end_user_address_1 = '',Input_orig_end_user_address_2 = '',Input_orig_end_user_city = '',Input_orig_end_user_state = '',Input_orig_end_user_zip = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_orig_end_user_id = '',Input_orig_loginid = '',Input_orig_billing_code = '',Input_orig_transaction_id = '',Input_orig_transaction_type = '',Input_orig_neighbors = '',Input_orig_relatives = '',Input_orig_associates = '',Input_orig_property = '',Input_orig_company_id = '',Input_orig_reference_code = '',Input_orig_fname = '',Input_orig_mname = '',Input_orig_lname = '',Input_orig_address = '',Input_orig_city = '',Input_orig_state = '',Input_orig_zip = '',Input_orig_zip4 = '',Input_orig_phone = '',Input_orig_ssn = '',Input_orig_free = '',Input_orig_record_count = '',Input_orig_price = '',Input_orig_bankruptcy = '',Input_orig_transaction_code = '',Input_orig_dateadded = '',Input_orig_full_name = '',Input_orig_billingdate = '',Input_orig_business_name = '',Input_orig_pricing_error_code = '',Input_orig_dl_purpose = '',Input_orig_result_format = '',Input_orig_dob = '',Input_orig_unique_id = '',Input_orig_dls = '',Input_orig_mvs = '',Input_orig_function_name = '',Input_orig_response_time = '',Input_orig_data_source = '',Input_orig_glb_purpose = '',Input_orig_report_options = '',Input_orig_unused = '',Input_orig_login_history_id = '',Input_orig_aseid = '',Input_orig_years = '',Input_orig_ip_address = '',Input_orig_source_code = '',Input_orig_retail_price = '',OutFile) := MACRO
   IMPORT SALT39,Scrubs_Inql_fcra_Accurint;
   #uniquename(of)
   %of% := RECORD
@@ -300,120 +300,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_orig_end_user_id = '',Input_
       '' 
     #ELSE
         IF( le.Input_orig_retail_price = (TYPEOF(le.Input_orig_retail_price))'','',':orig_retail_price')
-    #END
- 
-+    #IF( #TEXT(Input_inquiry_type)='' )
-      '' 
-    #ELSE
-        IF( le.Input_inquiry_type = (TYPEOF(le.Input_inquiry_type))'','',':inquiry_type')
-    #END
- 
-+    #IF( #TEXT(Input_lex_id)='' )
-      '' 
-    #ELSE
-        IF( le.Input_lex_id = (TYPEOF(le.Input_lex_id))'','',':lex_id')
-    #END
- 
-+    #IF( #TEXT(Input_reprice_batch_number)='' )
-      '' 
-    #ELSE
-        IF( le.Input_reprice_batch_number = (TYPEOF(le.Input_reprice_batch_number))'','',':reprice_batch_number')
-    #END
- 
-+    #IF( #TEXT(Input_user_changed)='' )
-      '' 
-    #ELSE
-        IF( le.Input_user_changed = (TYPEOF(le.Input_user_changed))'','',':user_changed')
-    #END
- 
-+    #IF( #TEXT(Input_date_changed)='' )
-      '' 
-    #ELSE
-        IF( le.Input_date_changed = (TYPEOF(le.Input_date_changed))'','',':date_changed')
-    #END
- 
-+    #IF( #TEXT(Input_fcra_purpose)='' )
-      '' 
-    #ELSE
-        IF( le.Input_fcra_purpose = (TYPEOF(le.Input_fcra_purpose))'','',':fcra_purpose')
-    #END
- 
-+    #IF( #TEXT(Input_orig_address_2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_address_2 = (TYPEOF(le.Input_orig_address_2))'','',':orig_address_2')
-    #END
- 
-+    #IF( #TEXT(Input_orig_city_2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_city_2 = (TYPEOF(le.Input_orig_city_2))'','',':orig_city_2')
-    #END
- 
-+    #IF( #TEXT(Input_orig_state_2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_state_2 = (TYPEOF(le.Input_orig_state_2))'','',':orig_state_2')
-    #END
- 
-+    #IF( #TEXT(Input_orig_zip_2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_zip_2 = (TYPEOF(le.Input_orig_zip_2))'','',':orig_zip_2')
-    #END
- 
-+    #IF( #TEXT(Input_orig_zip4_2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_zip4_2 = (TYPEOF(le.Input_orig_zip4_2))'','',':orig_zip4_2')
-    #END
- 
-+    #IF( #TEXT(Input_orig_jobid)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_jobid = (TYPEOF(le.Input_orig_jobid))'','',':orig_jobid')
-    #END
- 
-+    #IF( #TEXT(Input_orig_acctno)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_acctno = (TYPEOF(le.Input_orig_acctno))'','',':orig_acctno')
-    #END
- 
-+    #IF( #TEXT(Input_orig_end_user_name)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_end_user_name = (TYPEOF(le.Input_orig_end_user_name))'','',':orig_end_user_name')
-    #END
- 
-+    #IF( #TEXT(Input_orig_end_user_address_1)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_end_user_address_1 = (TYPEOF(le.Input_orig_end_user_address_1))'','',':orig_end_user_address_1')
-    #END
- 
-+    #IF( #TEXT(Input_orig_end_user_address_2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_end_user_address_2 = (TYPEOF(le.Input_orig_end_user_address_2))'','',':orig_end_user_address_2')
-    #END
- 
-+    #IF( #TEXT(Input_orig_end_user_city)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_end_user_city = (TYPEOF(le.Input_orig_end_user_city))'','',':orig_end_user_city')
-    #END
- 
-+    #IF( #TEXT(Input_orig_end_user_state)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_end_user_state = (TYPEOF(le.Input_orig_end_user_state))'','',':orig_end_user_state')
-    #END
- 
-+    #IF( #TEXT(Input_orig_end_user_zip)='' )
-      '' 
-    #ELSE
-        IF( le.Input_orig_end_user_zip = (TYPEOF(le.Input_orig_end_user_zip))'','',':orig_end_user_zip')
     #END
 ;
   END;
