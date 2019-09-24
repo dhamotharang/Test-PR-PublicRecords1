@@ -115,8 +115,8 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    Input_LT_Fields.InValid_orig_fname((SALT311.StrType)le.orig_fname),
-    Input_LT_Fields.InValid_orig_lname((SALT311.StrType)le.orig_lname),
+    Input_LT_Fields.InValid_orig_fname((SALT311.StrType)le.orig_fname,(SALT311.StrType)le.orig_fname,(SALT311.StrType)le.orig_lname),
+    Input_LT_Fields.InValid_orig_lname((SALT311.StrType)le.orig_lname,(SALT311.StrType)le.orig_fname,(SALT311.StrType)le.orig_lname),
     Input_LT_Fields.InValid_orig_addr((SALT311.StrType)le.orig_addr),
     Input_LT_Fields.InValid_orig_city((SALT311.StrType)le.orig_city),
     Input_LT_Fields.InValid_orig_zip4((SALT311.StrType)le.orig_zip4),
