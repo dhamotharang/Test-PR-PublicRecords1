@@ -826,7 +826,7 @@ EXPORT B_Event_2 := MODULE
     KEL.typ.int __RecordCount := 0;
   END;
   SHARED __ST49401_Layout __ND311674__Project(__ST309193_Layout __PP311670) := TRANSFORM
-    SELF.Ip_High_Risk_City_ := MAP(__T(__AND(__OP2(__PP311670.Jurisdiction_State_,=,__CN('FL')),__OP2(__FN1(KEL.Routines.ToUpperCase,__PP311670._edgecity_),IN,__CN(['MIAMI']))))=>1,0);
+    SELF.Ip_High_Risk_City_ := MAP(__T(__AND(__OP2(__PP311670.Jurisdiction_State_,<>,__CN('FL')),__OP2(__FN1(KEL.Routines.ToUpperCase,__PP311670._edgecity_),IN,__CN(['MIAMI']))))=>1,0);
     SELF.Kr_High_Risk_Ssn_Flag_ := MAP(__T(__OP2(__CN(__PP311670.C_O_U_N_T___Event_Types_),<>,__CN(0)))=>1,0);
     SELF.Kr_Low_Risk_Bank_Flag_ := MAP(__T(__OP2(__CN(__PP311670.C_O_U_N_T___Event_Types__1_),<>,__CN(0)))=>1,0);
     SELF := __PP311670;

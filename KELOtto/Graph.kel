@@ -1399,7 +1399,7 @@ Event: => IpNotUs := MAP(UPCASE(TRIM(edgecountry)) IN ['USA','','0'] => 0, 1); /
 Event: => IpVpn := MAP(UPCASE(proxydescription) = 'VPN' => 1, 0);
 
 Event: => IpTor := MAP(UPCASE(proxydescription) IN ['TOR EXIT','TOR RELAY'] /*OR UPCASE(proxytype) = 'ANONYMOUS'*/ => 1, 0);
-Event: => IpHighRiskCity := MAP(rCustomer.JurisdictionState = 'FL' AND UPCASE(edgecity) IN ['MIAMI'] => 1, 0);
+Event: => IpHighRiskCity := MAP(rCustomer.JurisdictionState != 'FL' AND UPCASE(edgecity) IN ['MIAMI'] => 1, 0);
 Event: => IpHosted := MAP(UPCASE(proxytype) = 'HOSTING' AND NOT UPCASE(proxydescription) IN ['CLOUD-SECURITY','CLOUD'] => 1, 0);
 
 /* ASSOCIATION LOGIC STATEMENTS */

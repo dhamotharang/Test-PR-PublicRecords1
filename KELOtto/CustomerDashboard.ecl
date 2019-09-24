@@ -135,14 +135,14 @@
 														 SELF.Cl_High_Risk_Pattern2_Flag_ := LEFT.Cl_Nas9_Top10_,
 														 SELF.Cl_High_Risk_Pattern3_Flag_ := LEFT.Cl_Nas3_Top10_,
 														 SELF.Cl_High_Risk_Pattern4_Flag_ := MAP(LEFT.Cl_Ip_High_Risk_Identity_Top10_ = 1 =>1,0),
-														 SELF.Cl_High_Risk_Pattern5_Flag_ := MAP(LEFT.Cl_High_Kr_Identity_Top10_ = 1 AND LEFT.Cl_High_Kr_Identity_Percent_ < 1 AND LEFT.Cl_High_Kr_Identity_Percent_ > 0 => 1, 0), //,
-														 SELF.Cl_High_Risk_Pattern6_Flag_ := MAP(LEFT.kr_high_risk_flag_ = 1 AND LEFT.Cl_Kr_Event_After_Known_Risk_Identity_Count_ > 1 => 1, 0), //Missing know risk transaction percent 
+														 SELF.Cl_High_Risk_Pattern5_Flag_ := LEFT.Cl_High_Kr_Identity_Percent_ < 1 AND LEFT.Cl_High_Kr_Identity_Percent_ > 0 AND LEFT.Cl_Kr_Event_After_Known_Risk_Identity_Count_ > 1 => 1, 0), //,
+														 SELF.Cl_High_Risk_Pattern6_Flag_ := LEFT.Known_Risk_Centroid, 
 														 SELF.Cl_High_Risk_Pattern7_Flag_ := MAP(LEFT.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Count_>0 => 1, 0),
 														 SELF.Cl_High_Risk_Pattern8_Flag_ := LEFT.Cl_Adjacent_No_Safe_Flag_,
 														 SELF.Cl_High_Risk_Pattern9_Flag_ := MAP(LEFT.Cl_Bank_Identity_Count_Gt2_Count_ > 0 OR LEFT.Cl_High_Risk_Routing_Count_ > 0 => 1, 0),
 														 SELF.Cl_High_Risk_Pattern10_Flag_ := MAP(LEFT.Cl_High_Risk_Email_Top10_=1=>1, 0),// measure of the % of high risk identities and elements in the cluster,
 														 SELF.Cl_High_Risk_Pattern11_Flag_ := LEFT.High_Risk_Centroid, 
-														 SELF.Cl_High_Risk_Pattern12_Flag_ := LEFT.Known_Risk_Centroid, 
+														 SELF.Cl_High_Risk_Pattern12_Flag_ := 0, 
 														 SELF := LEFT, SELF := []));
 	
   EXPORT MainClusters := MainClustersPrep6;	
