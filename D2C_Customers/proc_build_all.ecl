@@ -33,33 +33,30 @@ desprayFiles := sequential(
 // mode = 2 -> QUARTERLY(CORE)
 // mode = 3 -> MONTHLY(DEROGATORY)
 // mode <> 1,2,3 -> INVALID MODE
+Derogatory_builds(string8 version, string20 customer_name) := sequential(
+   proc_build_consumers(3, version, customer_name),
+   proc_build_bankruptcy(3, version, customer_name),
+   proc_build_criminals(3, version, customer_name),
+   proc_build_liens(3, version, customer_name),
+   proc_build_sex_offenders(3, version, customer_name)
+);
+
 EXPORT proc_build_all(unsigned1 mode = 1, string8 version = (string8)std.Date.Today(), string20 customer_name = '') := sequential(
-          proc_build_consumers(mode, version, customer_name),
+          Derogatory_builds(version, customer_name),
+          if(mode <> 3, sequential(
           proc_build_addresses(mode, version, customer_name),
           proc_build_akas(mode, version, customer_name),
-          proc_build_bankruptcy(mode, version, customer_name),
-          proc_build_weapons(mode, version, customer_name),
-          proc_build_criminals(mode, version, customer_name),
+          proc_build_weapons(mode, version, customer_name),          
           proc_build_emails(mode, version, customer_name),
           proc_build_aircraft(mode, version, customer_name),
           proc_build_airmen(mode, version, customer_name),
-          proc_build_hunting(mode, version, customer_name),
-          proc_build_liens(mode, version, customer_name),
+          proc_build_hunting(mode, version, customer_name),          
           proc_build_ucc(mode, version, customer_name),
           proc_build_people_at_work(mode, version, customer_name),
           proc_build_phones(mode, version, customer_name),
-          proc_build_professional_licenses(mode, version, customer_name),
-          proc_build_sex_offenders(mode, version, customer_name),
+          proc_build_professional_licenses(mode, version, customer_name),         
           proc_build_voters(mode, version, customer_name), //layout mismatach
           proc_build_deeds(mode, version, customer_name),
           proc_build_tax(mode, version, customer_name),
           proc_build_relatives(mode, version, customer_name)
-          );
-
-
-
-// EXPORT proc_build_all(unsigned1 mode = 1, string8 version = (string8)std.Date.Today(), string20 customer_name = '') := 
-              // sequential(
-                // buildFiles(mode, version, customer_name),
-                // desprayFiles
-                // );
+          )));
