@@ -36,7 +36,13 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 									tokenval,
 									get_buildinst.BuildId) ; //( Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4]);
 									
-		 get_new_build_candidates := project(get_build_candidates,transform( Orbit3.Layouts.OrbitBuildInstancenewLayout , self := left));
+		 
+		 get_build_candidates_ofac :=  get_build_candidates (  Name = 'OFAC*' and version = Buildvs[5..6]+'-'+Buildvs[7..8]+'-'+Buildvs[1..4] );
+		
+		get_build_candidates_final := if (  trim(buildname) = 'Global Watch Lists' and regexfind('o',Buildvs) , get_build_candidates_ofac , get_build_candidates );
+									
+		 get_new_build_candidates := project(get_build_candidates_final,transform( Orbit3.Layouts.OrbitBuildInstancenewLayout , self := left));
+
 									
 	
 											
@@ -127,7 +133,7 @@ export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string
 													if ( skipupdatebuild ,
 																				Sequential(sendemail('UPDATE','SKIP'),Update_build_1.Status)	,
 												
-													              if ( get_build.Status =  'Success' and get_build.BuildInstanceStatus = 'BUILD_IN_PROGRESS', 
+													              if ( get_buildinst.Status =  'Success' and get_buildinst.BuildInstanceStatus = 'BUILD_IN_PROGRESS', 
 																				                                                                                                                                                             if ( Update_build.Status = 'Success', 
 													                                                                                                                                                                                                          sendemail('UPDATE','SUCCESS'),
 																					                                                                                                                                                                 sendemail('UPDATE','FAIL')
