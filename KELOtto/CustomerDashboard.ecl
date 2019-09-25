@@ -135,7 +135,7 @@
 														 SELF.Cl_High_Risk_Pattern2_Flag_ := LEFT.Cl_Nas9_Top10_,
 														 SELF.Cl_High_Risk_Pattern3_Flag_ := LEFT.Cl_Nas3_Top10_,
 														 SELF.Cl_High_Risk_Pattern4_Flag_ := MAP(LEFT.Cl_Ip_High_Risk_Identity_Top10_ = 1 =>1,0),
-														 SELF.Cl_High_Risk_Pattern5_Flag_ := LEFT.Cl_High_Kr_Identity_Percent_ < 1 AND LEFT.Cl_High_Kr_Identity_Percent_ > 0 AND LEFT.Cl_Kr_Event_After_Known_Risk_Identity_Count_ > 1 => 1, 0), //,
+														 SELF.Cl_High_Risk_Pattern5_Flag_ := MAP(LEFT.Cl_High_Kr_Identity_Percent_ < 1 AND LEFT.Cl_High_Kr_Identity_Percent_ > 0 AND LEFT.Cl_Kr_Event_After_Known_Risk_Identity_Count_ > 1 => 1, 0), //,
 														 SELF.Cl_High_Risk_Pattern6_Flag_ := LEFT.Known_Risk_Centroid, 
 														 SELF.Cl_High_Risk_Pattern7_Flag_ := MAP(LEFT.Cl_High_Risk_Death_Prior_To_All_Events_Identity_Count_>0 => 1, 0),
 														 SELF.Cl_High_Risk_Pattern8_Flag_ := LEFT.Cl_Adjacent_No_Safe_Flag_,

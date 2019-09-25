@@ -6,6 +6,10 @@ EXPORT BasicScoring := MODULE
 //	EXPORT WeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 	EXPORT WeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 	EXPORT CustomWeightingChart := DATASET('~foreign::10.173.14.201::fraudgov::in::sprayed::customconfigrisklevel', {STRING customer_id, STRING industry_type, INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+
+// Add a column to tag that have {value} so the str.findreplace is only done for those rows that need it (for speed in the join).
+	EXPORT WeightingChartPrepped := PROJECT(WeightingChart, TRANSFORM({RECORDOF(WeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF := LEFT));
+	EXPORT CustomWeightingChartPrepped := PROJECT(CustomWeightingChart, TRANSFORM({RECORDOF(CustomWeightingChart), BOOLEAN HasValue}, SELF.HasValue := Std.Str.Find(LEFT.UiDescription, '{value}') > 0, SELF := LEFT));
 	
   EXPORT PersonStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'score_,cluster_score_,event_count_,' + 
@@ -169,15 +173,15 @@ EXPORT BasicScoring := MODULE
 												 TRANSFORM({RECORDOF(LEFT), INTEGER1 IsConfigured}, SELF.IsConfigured := MAP(RIGHT.field != '' => 1, 0), SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1)); 
 	
   // This is the final result for entity stats after w
-  EXPORT WeightedResultDefault := JOIN(FullEntityStatsPrep(Value != ''), WeightingChart, 
+  EXPORT WeightedResultDefault := JOIN(FullEntityStatsPrep(Value != ''), WeightingChartPrepped, 
                          LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType AND
                          (
                            (
-                             RIGHT.Value != '' AND LEFT.Value = RIGHT.Value
+                             RIGHT.Value NOT IN ['','0'] AND LEFT.Value = RIGHT.Value
                            )
                            OR
                            (
-                             RIGHT.Value = '' AND (RIGHT.Low = 0 AND RIGHT.High = 0)
+                             RIGHT.Value IN ['','0'] AND (RIGHT.Low = 0 AND RIGHT.High = 0)
                            )                           
                            OR
                            (
@@ -190,7 +194,9 @@ EXPORT BasicScoring := MODULE
                          ), TRANSFORM({RECORDOF(LEFT), RIGHT.Weight}, 
                             SELF.Weight := MAP(RIGHT.Field != '' => RIGHT.Weight, 0),
                             SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, -1), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
-                            SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), LEFT.Label);
+                            SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => 
+														               MAP(RIGHT.HasValue => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), RIGHT.UiDescription), 
+																					 LEFT.Label);
                             SELF.field := LEFT.field;
 														/* commenting this out because if we switch the field value it will MESS UP the custom weighting join.							
                             SELF.field := LEFT.field +
@@ -198,16 +204,16 @@ EXPORT BasicScoring := MODULE
                             */
                             SELF := LEFT), LOOKUP, LEFT OUTER);
 														
-  EXPORT WeightedResult := JOIN(WeightedResultDefault(Value != ''), CustomWeightingChart, 
+  EXPORT WeightedResult := JOIN(WeightedResultDefault(Value != ''), CustomWeightingChartPrepped, 
 	                       (UNSIGNED)LEFT.customer_id_ = (UNSIGNED)RIGHT.customer_id AND (UNSIGNED)LEFT.industry_type_= (UNSIGNED)RIGHT.industry_type AND
                          LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = (INTEGER)RIGHT.EntityType AND
                          (
                            (
-                             RIGHT.Value != '' AND LEFT.Value = RIGHT.Value
+                             RIGHT.Value NOT IN ['','0'] AND LEFT.Value = RIGHT.Value
                            )
                            OR
                            (
-                             RIGHT.Value = '' AND (RIGHT.Low = 0 AND RIGHT.High = 0)
+                             RIGHT.Value IN ['','0'] AND (RIGHT.Low = 0 AND RIGHT.High = 0)
                            )                           
                            OR
                            (
@@ -220,7 +226,9 @@ EXPORT BasicScoring := MODULE
                          ), TRANSFORM(RECORDOF(LEFT),
                             SELF.Weight := MAP(RIGHT.Field != '' => RIGHT.Weight, LEFT.Weight),
                             SELF.RiskLevel := MAP(RIGHT.Field != '' => RIGHT.RiskLevel, LEFT.RiskLevel), // If there is no specific configuration for a field assign the risk level to -1 so it can be hidden.
-                            SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), LEFT.Label);
+                            SELF.Label := MAP(TRIM(RIGHT.UiDescription) != '' => 
+														               MAP(RIGHT.HasValue => Std.Str.FindReplace(RIGHT.UiDescription, '{value}', LEFT.Value), RIGHT.UiDescription), 
+																					 LEFT.Label);
                             SELF.field := LEFT.field,
 														/*
 														              LEFT.field +
