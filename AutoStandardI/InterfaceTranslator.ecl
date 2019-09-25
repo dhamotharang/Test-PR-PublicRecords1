@@ -1,5 +1,5 @@
 ﻿import AutoStandardI;
-import address, doxie, ut, corp2_services, vehiclev2_services, business_header_ss, business_header,
+import address, doxie, dx_header, ut, corp2_services, vehiclev2_services, business_header_ss, business_header,
        header, suppress, STD;
 
 export InterfaceTranslator := module
@@ -1649,11 +1649,11 @@ export InterfaceTranslator := module
 
 		shared neighbors_range(params in_mod) := 
 			limit(limit(
-				project(doxie.key_nbr_headers(keyed((exists(zip_value_ds.val(in_mod)) or exists(city_zip_value_ds.val(in_mod))) 
+				project(dx_header.key_nbr_headers()(keyed((exists(zip_value_ds.val(in_mod)) or exists(city_zip_value_ds.val(in_mod))) 
 																				and zip IN city_zip_set(in_mod)), 
 																			keyed(pname_value.val(in_mod) <> '' and prim_name[1..length(pname_value.val(in_mod))] = pname_value.val(in_mod)), 
 																			((prange_beg_value.val(in_mod) <> 0 or prange_end_value.val(in_mod) <> 0) and (integer)prim_range >= prange_beg_value.val(in_mod) and (integer)prim_range <= prange_end_value.val(in_mod))),
-								{doxie.key_nbr_headers.prim_range}),
+								{dx_header.key_nbr_headers().prim_range}),
 			ut.limits.FETCH_KEYED, skip, keyed),ut.limits.FETCH_UNKEYED, skip);
 		// NB: neighbors' index cannot be used on FCRA side, so address range search is effectivly disabled on FCRA side.
 		export set of string10 val(params in_mod) := 

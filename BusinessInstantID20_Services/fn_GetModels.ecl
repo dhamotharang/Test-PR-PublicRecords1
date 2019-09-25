@@ -1,4 +1,4 @@
-﻿import BusinessInstantID20_Services,ut,iesp,LNSmallBusiness,Business_Risk_BIP,std,BusinessCredit_Services,
+﻿import BusinessInstantID20_Services,ut,LNSmallBusiness,Business_Risk_BIP,std,BusinessCredit_Services,
        Risk_Indicators,Address,riskwise,Gateway,Models,BIPV2,Risk_Reporting;
 
 // The following function obtains Models
@@ -9,7 +9,11 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
 										UNSIGNED1	LinkSearchLevel			  = Business_Risk_BIP.Constants.LinkSearch.Default,
 										UNSIGNED1	MarketingMode				  = Business_Risk_BIP.Constants.Default_MarketingMode,
                     BusinessInstantID20_Services.iOptions Options,
-                    BOOLEAN AppendBestsFromLexIDs = FALSE
+                    BOOLEAN AppendBestsFromLexIDs = FALSE,
+										unsigned1 LexIdSourceOptout = 1,
+										string TransactionID = '',
+										string BatchUID = '',
+										unsigned6 GlobalCompanyId = 0
                    ) := 
 	
   FUNCTION
@@ -316,9 +320,18 @@ EXPORT fn_GetModels(DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
     IID := Risk_Indicators.InstantID_Function(IID_Prep, Options.Gateways,	Options.DPPA_Purpose,	Options.GLBA_Purpose, IsUtility, LN_Branded, OFAC_Only, SuppressNearDups, 
                                               Require2ele, IsFCRA, From_BIID, ExcludeWatchLists, From_IT1O, Options.OFAC_Version, Options.Include_OFAC, 
                                               Addtl_Watchlists, Options.Global_Watchlist_Threshold, DOB_Radius, BSVersion, In_DataRestriction := Options.DataRestrictionMask, 
-    in_runDLverification := include_DL_verification, in_append_best := AppendBest, in_BSOptions := BSOptions, in_LastSeenThreshold := LastSeenThreshold, in_DataPermission := Options.DataPermissionMask);
+    in_runDLverification := include_DL_verification, in_append_best := AppendBest, in_BSOptions := BSOptions, in_LastSeenThreshold := LastSeenThreshold, in_DataPermission := Options.DataPermissionMask,
+		LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID);
     
-    Clam := Risk_Indicators.Boca_Shell_Function(IID, Options.Gateways,	Options.DPPA_Purpose,	Options.GLBA_Purpose, IsUtility, LN_Branded, IncludeRel, IncludeDL, IncludeVeh, IncludeDerog, BSVersion, DoScore, Nugen, DataRestriction := Options.DataRestrictionMask, BSOptions := BSOptions, DataPermission := Options.DataPermissionMask);																							 
+    Clam := Risk_Indicators.Boca_Shell_Function(IID, Options.Gateways,	Options.DPPA_Purpose,	Options.GLBA_Purpose, IsUtility, LN_Branded, IncludeRel, IncludeDL, IncludeVeh, IncludeDerog, BSVersion, DoScore, Nugen,
+		DataRestriction := Options.DataRestrictionMask, BSOptions := BSOptions, DataPermission := Options.DataPermissionMask,
+		LexIdSourceOptout := LexIdSourceOptout, 
+	  TransactionID := TransactionID, 
+	  BatchUID := BatchUID, 
+	  GlobalCompanyID := GlobalCompanyID);																							 
     
     Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
     

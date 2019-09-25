@@ -156,7 +156,7 @@ EXPORT getAllBocaShellData (
 	END;
 
 	prop_common_roxie := Risk_Indicators.Boca_Shell_Property_Common( p_address, ids_only, includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, FALSE);
-	prop_common_thor_pre := distribute(Risk_Indicators.Boca_Shell_Property_Common( p_address, ids_only, includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, FALSE), hash64(seq))	:	PERSIST('~BOCASHELLFCRA::bocashell_property_results');
+	prop_common_thor_pre := distribute(Risk_Indicators.Boca_Shell_Property_Common( p_address, ids_only, includeRelativeInfo, filter_out_fares, IsFCRA, in_mod_property, FALSE), hash64(seq))	:	PERSIST('~BOCASHELLFCRA::bocashell_property_results', expire(3));
 	prop_common_thor := sort(group(sort(prop_common_thor_pre, seq, local), seq, local),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce);
 
 	#IF(onThor)
@@ -1744,7 +1744,7 @@ final := if(~isFCRA and BSversion>=41, group(wFDAttrV2,seq), BSdata);	// only do
 
 // --------------------[ add models ]--------------------
 
-wModels := risk_indicators.getAllBocaShellModels(final, isFCRA, easi_census,adl_based_shell);
+wModels := risk_indicators.getAllBocaShellModels(final, isFCRA, easi_census,adl_based_shell, iid);
 
 // append riskview alerts for bsversion >= 50 and fcra
 isCalifornia_in_person := false;  // for this purpose within the shell, the applicant won't be applying in person in california.  that is a product specific setting
@@ -1846,8 +1846,18 @@ withEquifaxFraudFlags := Risk_Indicators.Boca_Shell_Equifax_FraudFlags(group(wit
 
 final53 := if(bsversion >= 53, group(withEquifaxFraudFlags, seq), finalOffset);
 
+risk_indicators.Layout_Boca_Shell BlankDImodel(risk_indicators.Layout_Boca_Shell le) := TRANSFORM
+  self.fd_scores.digital_insight_score := '';
+  self.fd_scores.digital_insight_reason1 := '';
+  self.fd_scores.digital_insight_reason2 := '';
+  self.fd_scores.digital_insight_reason3 := '';
+  self.fd_scores.digital_insight_reason4 := '';
+  self.fd_scores.digital_insight_reason5 := '';
+  self.fd_scores.digital_insight_reason6 := '';	
+  self := le;
+END;
 
-// final53 := finalOffset;
+final55 := IF(bsversion < 55, project(final53, BlankDImodel(left)), final53);
 
 // output(derogs_added_back, named('derogs_added_back'));
 // output(final, named('final'));
@@ -1875,5 +1885,6 @@ final53 := if(bsversion >= 53, group(withEquifaxFraudFlags, seq), finalOffset);
 // output(Per_Property_Rolled, named('Per_Property_Rolled'));
 // output(per_prop, named('per_prop'));
 
-RETURN final53;
+RETURN final55;
+
 END;

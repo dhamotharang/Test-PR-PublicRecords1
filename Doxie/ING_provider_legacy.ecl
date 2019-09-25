@@ -1,5 +1,5 @@
-import ingenix_natlprof, doxie_files, codes, Prof_LicenseV2_Services, doxie_crs, watchdog,
-       doxie, suppress, dea, AutoStandardI, DeathV2_Services;
+﻿import AutoStandardI, codes, dea, DeathV2_Services, ingenix_natlprof, doxie, doxie_crs, doxie_files, 
+       dx_death_master, Prof_LicenseV2_Services, STD, suppress, watchdog;
 
 // ********************************************************************************
 // #125437: adding this module so we can rollback some of the changes for health care provider.
@@ -58,7 +58,7 @@ EXPORT ING_provider_legacy := module
 
 	// same as doxie.ING_provider_report_records, version 2012-09-19.
 	export report_records(dataset(Prof_LicenseV2_Services.Layout_Search_Ids_Prov) provs, boolean Include_Sanc=false) := FUNCTION
-		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+		death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
 		doxie.MAC_Header_Field_Declare();
 
@@ -105,11 +105,9 @@ EXPORT ING_provider_legacy := module
 
 		// Get Dids
 		boolean checkDeath(dataset(pid_did_rec) l) := FUNCTION
-			deathRecs := join(l,doxie.key_death_masterV2_ssa_DID,
-										keyed((unsigned6)left.did = right.l_did) and right.state_death_id <> ''
-										and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-										keep(1), limit(0));
-			return if(count(deathRecs)>0,true,false);
+    death_recs_raw := dx_death_master.Get.byDid(l, did, death_params);
+    
+		return count(death_recs_raw(death.state_death_id <> '')) > 0;
 		end;
 
 		//get SSN's
@@ -382,12 +380,12 @@ EXPORT ING_provider_legacy := module
 			self.specialtyid := l.specialtyid;
 			self.specialtyGroupID := l.specialtyGroupID;
 			self.specialtyname := l.specialtyname;
-			self.specialtyGroupName := if(exists(f_specialties_dep(stringlib.StringToUpperCase(specialtyname)=stringlib.StringToUpperCase(l.specialtyGroupName))),'',l.specialtyGroupName);
+			self.specialtyGroupName := if(exists(f_specialties_dep(STD.STR.ToUpperCase(specialtyname)=STD.STR.ToUpperCase(l.specialtyGroupName))),'',l.specialtyGroupName);
 			self.specialtyTierTypeID := l.specialtyTierTypeID;
 		END;
 		f_specialties_cleaned:=project(f_specialties_dep,doRemoveBadSpecialties(left));
 		pid_specialty_rec doRemoveSpecialtiesOther(pid_specialty_rec l) := TRANSFORM
-			SELF.specialtyname := if(Stringlib.StringToUpperCase(l.specialtyname)='OTHER' and l.specialtyGroupName='',Skip,l.specialtyname);
+			SELF.specialtyname := if(STD.STR.ToUpperCase(l.specialtyname)='OTHER' and l.specialtyGroupName='',Skip,l.specialtyname);
 			self := l;
 		END;
 		f_specialties_clean:=project(f_specialties_cleaned,doRemoveSpecialtiesOther(left));
@@ -402,7 +400,7 @@ EXPORT ING_provider_legacy := module
 			self.specialtyGroupName := if(l.specialtyGroupName <>'',l.specialtyGroupName,r.specialtyGroupName);
 			self.specialtyTierTypeID := if(l.specialtyTierTypeID<r.specialtyTierTypeID,l.specialtyTierTypeID,r.specialtyTierTypeID);
 		END;
-		f_specialties_rollup := rollup(f_specialties_clean,doRollSpecialties(left,right),stringlib.StringToUpperCase(specialtyname),specialtyid,specialtyGroupID);
+		f_specialties_rollup := rollup(f_specialties_clean,doRollSpecialties(left,right),STD.STR.ToUpperCase(specialtyname),specialtyid,specialtyGroupID);
 
 		//get business address
 		pid_bus_addr_rec := record
@@ -473,8 +471,8 @@ EXPORT ING_provider_legacy := module
 
 		f_phones_srt2 roll_phone_type(f_phones_srt2 l, f_phones_srt2 r) := transform
 			self.PhoneType := trim(l.PhoneType) + ',' + 
-												if(stringlib.StringFind(trim(l.PhoneType),'Office',1)>0,
-									stringlib.StringFindReplace(trim(r.PhoneType),'Office',''),
+												if(STD.STR.Find(trim(l.PhoneType),'Office',1)>0,
+									STD.STR.FindReplace(trim(r.PhoneType),'Office',''),
 							 trim(r.PhoneType));
 			self := l;
 		end;
@@ -537,17 +535,17 @@ EXPORT ING_provider_legacy := module
 				unsigned4 len;
 		end;
 		f_groups_prepclean := project(f_groups_dep,transform(pid_group_rec_clean,
-																													str1:= stringLib.StringFindReplace(stringLib.StringToUpperCase(left.Groupname),'GROUP','');
-																													str2:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str1),'GRP','');
-																													str3:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str2),'INC','');
-																													str4:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str3),'ASSOCIATES','');
-																													str5:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str4),'ASSOC','');
-																													str6:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str5),'CORPORATION','');
-																													str7:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str6),'CORP','');
-																													str8:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str7),'CENTER','');
-																													str9:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str8),'OF','');
-																													str10:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str9),'AND','');
-																													strfinal:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str10),'THE','');
+																													str1:= STD.STR.FindReplace(STD.STR.ToUpperCase(left.Groupname),'GROUP','');
+																													str2:= STD.STR.FindReplace(STD.STR.ToUpperCase(str1),'GRP','');
+																													str3:= STD.STR.FindReplace(STD.STR.ToUpperCase(str2),'INC','');
+																													str4:= STD.STR.FindReplace(STD.STR.ToUpperCase(str3),'ASSOCIATES','');
+																													str5:= STD.STR.FindReplace(STD.STR.ToUpperCase(str4),'ASSOC','');
+																													str6:= STD.STR.FindReplace(STD.STR.ToUpperCase(str5),'CORPORATION','');
+																													str7:= STD.STR.FindReplace(STD.STR.ToUpperCase(str6),'CORP','');
+																													str8:= STD.STR.FindReplace(STD.STR.ToUpperCase(str7),'CENTER','');
+																													str9:= STD.STR.FindReplace(STD.STR.ToUpperCase(str8),'OF','');
+																													str10:= STD.STR.FindReplace(STD.STR.ToUpperCase(str9),'AND','');
+																													strfinal:= STD.STR.FindReplace(STD.STR.ToUpperCase(str10),'THE','');
 																													self.GroupName2:=trim(strfinal,all),
 																													self.len:=length(trim(strfinal,all)),
 																													self := left));
@@ -576,7 +574,7 @@ EXPORT ING_provider_legacy := module
 			self.State := if(l.State <>'',l.State,r.state);
 			self.Zip := if(l.Zip <>'',l.Zip,r.zip);
 		END;
-		f_groups_rollup := rollup(project(f_groups_clean,pid_group_rec),doRollGroups(left,right),stringlib.StringToUpperCase(groupname));
+		f_groups_rollup := rollup(project(f_groups_clean,pid_group_rec),doRollGroups(left,right),STD.STR.ToUpperCase(groupname));
 
 		//get hospital affiliation
 		pid_hospital_rec := record
@@ -603,11 +601,11 @@ EXPORT ING_provider_legacy := module
 				unsigned4 len;
 		end;
 		f_hospitals_prepclean := project(f_hospitals_dep,transform(pid_hospital_rec_clean,
-																			str1:= stringLib.StringFindReplace(stringLib.StringToUpperCase(left.hospitalname),'HOSPITAL','');
-																			str2:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str1),'COMMUNITY','');
-																			str3:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str2),'CENTER','');
-																			str4:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str3),'CLINIC','');
-																			strfinal:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str4),'HEALTH','');
+																			str1:= STD.STR.FindReplace(STD.STR.ToUpperCase(left.hospitalname),'HOSPITAL','');
+																			str2:= STD.STR.FindReplace(STD.STR.ToUpperCase(str1),'COMMUNITY','');
+																			str3:= STD.STR.FindReplace(STD.STR.ToUpperCase(str2),'CENTER','');
+																			str4:= STD.STR.FindReplace(STD.STR.ToUpperCase(str3),'CLINIC','');
+																			strfinal:= STD.STR.FindReplace(STD.STR.ToUpperCase(str4),'HEALTH','');
 																			self.hospitalname2:=trim(strfinal,all),
 																			self.len:=length(trim(strfinal,all)),
 																			self := left));
@@ -664,13 +662,13 @@ EXPORT ING_provider_legacy := module
 				 unsigned4 len;
 		end;
 		f_residencies_prepclean := project(f_residencies_dep,transform(pid_residency_rec_clean,
-																																		str1:= stringLib.StringFindReplace(stringLib.StringToUpperCase(left.Residency),'HOSPITAL','');
-																																		str2:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str1),'UNIVERSITY','');
-																																		str3:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str2),'MEDICAL','');
-																																		str4:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str3),'CLINIC','');
-																																		str5:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str4),'OF','');
-																																		str6:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str5),'AND','');
-																																		strfinal:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str6),'THE','');
+																																		str1:= STD.STR.FindReplace(STD.STR.ToUpperCase(left.Residency),'HOSPITAL','');
+																																		str2:= STD.STR.FindReplace(STD.STR.ToUpperCase(str1),'UNIVERSITY','');
+																																		str3:= STD.STR.FindReplace(STD.STR.ToUpperCase(str2),'MEDICAL','');
+																																		str4:= STD.STR.FindReplace(STD.STR.ToUpperCase(str3),'CLINIC','');
+																																		str5:= STD.STR.FindReplace(STD.STR.ToUpperCase(str4),'OF','');
+																																		str6:= STD.STR.FindReplace(STD.STR.ToUpperCase(str5),'AND','');
+																																		strfinal:= STD.STR.FindReplace(STD.STR.ToUpperCase(str6),'THE','');
 																																		self.Residency2:=trim(strfinal,all),
 																																		self.len:=length(trim(strfinal,all)),
 																																		self := left));
@@ -683,7 +681,7 @@ EXPORT ING_provider_legacy := module
 			self.ResidencyTierTypeID := l.ResidencyTierTypeID;
 		END;
 		f_residencies_clean:=project(f_residencies_prepclean,doRemoveBadResidencies(left));
-		f_residencies_final:=dedup(f_residencies_clean,stringLib.StringToUpperCase(Residency));
+		f_residencies_final:=dedup(f_residencies_clean,STD.STR.ToUpperCase(Residency));
 
 		//get medschool
 		pid_medschool_rec := record
@@ -710,11 +708,11 @@ EXPORT ING_provider_legacy := module
 				unsigned4 len;
 		end;
 		f_medschools_prepclean := project(f_medschools_dep,transform(pid_medschool_rec_clean,
-																			str1:= stringLib.StringFindReplace(stringLib.StringToUpperCase(left.medschoolname),'SCHOOL','');
-																			str2:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str1),'MEDICAL','');
-																			str3:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str2),'OF','');
-																			str4:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str3),'AND','');
-																			strfinal:= stringLib.StringFindReplace(stringLib.StringToUpperCase(str4),'THE','');
+																			str1:= STD.STR.FindReplace(STD.STR.ToUpperCase(left.medschoolname),'SCHOOL','');
+																			str2:= STD.STR.FindReplace(STD.STR.ToUpperCase(str1),'MEDICAL','');
+																			str3:= STD.STR.FindReplace(STD.STR.ToUpperCase(str2),'OF','');
+																			str4:= STD.STR.FindReplace(STD.STR.ToUpperCase(str3),'AND','');
+																			strfinal:= STD.STR.FindReplace(STD.STR.ToUpperCase(str4),'THE','');
 																			self.Medschoolname2:=trim(strfinal,all),
 																			self.len:=length(trim(strfinal,all)),
 																			self := left));
@@ -793,9 +791,9 @@ EXPORT ING_provider_legacy := module
 		string typeGSA2 := 'EXCLUDED/DELETED';
 
 		sanc_rec_full get_sanctions_by_sancid(sanc_rec l, sanctions_sancid_key r) := transform
-			isFederal := stringlib.StringToUpperCase(r.sanc_brdtype) = federalBoard;
-			isOIG := stringlib.StringToUpperCase(r.sanc_type)= typeOIG;
-			isGSA := stringlib.StringToUpperCase(r.sanc_type)= typeGSA1 or stringlib.StringToUpperCase(r.sanc_type)= typeGSA2;
+			isFederal := STD.STR.ToUpperCase(r.sanc_brdtype) = federalBoard;
+			isOIG := STD.STR.ToUpperCase(r.sanc_type)= typeOIG;
+			isGSA := STD.STR.ToUpperCase(r.sanc_type)= typeGSA1 or STD.STR.ToUpperCase(r.sanc_type)= typeGSA2;
 			self.sanc_grouptype := map(isFederal => 'FEDERAL', 
 																 'STATE');
 			self.sanc_subgrouptype := map(isFederal and isGSA => 'GSA', 
@@ -1031,7 +1029,7 @@ EXPORT ING_provider_legacy := module
 		end;						 
 				 
 		out_final := project(out_with_child, sort_child(left));				 
-
+  
 		return out_final;
 
 	END; //report_records

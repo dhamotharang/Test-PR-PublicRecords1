@@ -1,4 +1,4 @@
-IMPORT Autokey_batch, BatchServices, death_master, DeathV2_Services, Suppress, ut, STD;
+﻿IMPORT Autokey_batch, BatchServices, death_master, DeathV2_Services, STD, Suppress, ut;
 
 EXPORT BatchRecords(DATASET(DeathV2_Services.Layouts.BatchIn) dBatchIn, 
 										DeathV2_Services.IParam.BatchParams inMod) := 
@@ -9,7 +9,7 @@ FUNCTION
 	deathRestrictions := DeathV2_Services.IParam.GetRestrictions(inMod);
 	
 	dAKDids 	:= DeathV2_Services.BatchIds(inMod).AutoKeyIds(dBatchInCommon);
-	dDDDids 	:= DeathV2_Services.BatchIds(inMod).DeepDiveIds(dBatchInCommon, IsGLBOk, deathRestrictions);
+	dDDDids 	:= DeathV2_Services.BatchIds(inMod).DeepDiveIds(dBatchInCommon, deathRestrictions);
 	dSDidsAll	:= dAKDids + dDDDids;
 
 	/* sort on -isdeepdive to give higher precedence to isdeepdive=true if a did is included with the search info */
@@ -22,7 +22,7 @@ FUNCTION
 			AND ((ut.DaysApart(RIGHT.filedate, (STRING8) STD.Date.Today()) <= inMod.DaysBack) OR (inMod.DaysBack = 0))
 			AND	NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, IsGLBOk, deathRestrictions) 
 			AND (inMod.IncludeBlankDOD or RIGHT.dod8 <> ''),			
-		TRANSFORM(Layouts.BatchOut,
+		TRANSFORM(DeathV2_Services.Layouts.BatchOut,
 			 //self.did := if((unsigned)right.did > 0, right.did, ''),
 			 SELF := LEFT,
 			 SELF := RIGHT,

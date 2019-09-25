@@ -839,8 +839,8 @@ export Functions := module
                            SELF.clean_email    := IF(temp_email<>'',temp_email, SKIP);
 													 SELF.email_src 		 := IF(temp_email<>'', RIGHT.email_src, ''),
 													 SELF.date_last_seen := IF(temp_email<>'',RIGHT.date_last_seen,''),
-                           SELF.global_sid     := 0; // TODO: when available -> IF(temp_email<>'',RIGHT.global_sid, 0),
-		                       SELF.record_sid     := 0; // TODO: when available -> IF(temp_email<>'',RIGHT.record_sid, 0)
+                           SELF.global_sid     := RIGHT.global_sid;
+                           SELF.record_sid     := RIGHT.record_sid;
                            ),
 												 inner, // only ones in LEFT & RIGHT
 												 LIMIT(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));

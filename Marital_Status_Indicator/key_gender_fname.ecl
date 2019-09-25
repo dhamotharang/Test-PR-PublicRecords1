@@ -1,4 +1,4 @@
-import watchdog, doxie, Data_Services;
+import watchdog, doxie, dx_header, Data_Services;
 
 //layouts
 rInput := record
@@ -18,12 +18,13 @@ rOutput := RECORD
 //
 
 //get gender data from header
-rInput addGender(Watchdog.Key_watchdog_glb l, doxie.key_did_lookups r) := transform
+key_lookups := dx_header.key_did_lookups();
+rInput addGender(Watchdog.Key_watchdog_glb l, key_lookups r) := transform
 	self.gender := r.gender;
 	self := l;
 end;
 
-individuals := join(Watchdog.Key_watchdog_glb, doxie.key_did_lookups, 
+individuals := join(Watchdog.Key_watchdog_glb, key_lookups,
 								keyed(left.did=right.did), 
 								addGender(left,right), keep(1));
 

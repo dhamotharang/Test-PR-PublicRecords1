@@ -3,7 +3,7 @@
 	ppc:= phonesplus_batch.constants;
 	EXPORT options := MODULE
 	
-		EXPORT IOptions:= INTERFACE(BatchShare.IParam.BatchParamsV2)
+		EXPORT IOptions:= INTERFACE(BatchShare.IParam.BatchParams)
 			EXPORT BOOLEAN ExcludeCurrentGong:= ppc.ExcludeCurrentGong;
 			EXPORT BOOLEAN IncludeTargus:= ppc.IncludeTargus;
 			EXPORT BOOLEAN IncludeQsent:= ppc.IncludeQsent;
@@ -11,7 +11,7 @@
 		END;
 
 		EXPORT getOptions():= FUNCTION
-			baseOptions:= BatchShare.IParam.getBatchParamsV2();
+			baseOptions:= BatchShare.IParam.getBatchParams();
 			optionsModule := MODULE(PROJECT(baseOptions, IOptions, OPT))
 				EXPORT BOOLEAN ExcludeCurrentGong:= ppc.ExcludeCurrentGong : STORED('ExcludeCurrentGong');
 				EXPORT BOOLEAN IncludeTargus:= ppc.IncludeTargus : STORED('IncludeTargus');

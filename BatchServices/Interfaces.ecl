@@ -1,4 +1,4 @@
-IMPORT BatchServices;
+IMPORT BatchServices, BatchShare;
 
 EXPORT Interfaces := MODULE
 
@@ -12,13 +12,11 @@ EXPORT Interfaces := MODULE
 	end;
 	
 	//used in BatchServices.STR_BatchService
-	export str_config := interface 
-		export string32 	ApplicationType;
+	export str_config := interface (BatchShare.IParam.BatchParams);
 		export unsigned2 	PenaltThreshold;
 		export unsigned2 	ShortTermThreshold;
 		export boolean 		ExcludeDropIndCheck;
 		export boolean 		ReturnDeceased;
-		export boolean 		IncludeMinors:=false;
 		export boolean 		GetSSNBest:=true;
 		export unsigned8  MaxResultsPerAcct;
 	end;

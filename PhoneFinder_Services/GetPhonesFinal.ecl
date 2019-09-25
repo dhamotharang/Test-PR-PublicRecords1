@@ -3,7 +3,7 @@ IMPORT $, Phones, Std;
 EXPORT GetPhonesFinal(DATASET($.Layouts.PhoneFinder.Final) dSearchResults,
                       $.iParam.SearchParams                inMod,
                       BOOLEAN                              isPrimaryPhone = FALSE) :=
-FUNCTION  
+FUNCTION
   // Primary phones
   dPhoneSlim := PROJECT(dSearchResults(phone != ''),
                         TRANSFORM($.Layouts.PhoneFinder.PhoneSlim,
@@ -19,10 +19,10 @@ FUNCTION
                                   SELF.PortingCode   := LEFT.PortingCode,
                                   SELF             	 := LEFT.RealTimePhone_Ext,
                                   SELF             	 := LEFT));
-  
+
   // creates a more consistent output by matching the logic in GetIdentitiesFinal
-  dPhoneSort := SORT(dPhoneSlim(typeflag != Phones.Constants.TypeFlag.DataSource_PV), 
-                      acctno, phone, -dt_last_seen, dt_first_seen); 
+  dPhoneSort := SORT(dPhoneSlim(typeflag != Phones.Constants.TypeFlag.DataSource_PV),
+                      acctno, phone, -dt_last_seen, dt_first_seen);
 
   $.Layouts.PhoneFinder.PhoneSlim tPhoneRollup($.Layouts.PhoneFinder.PhoneSlim le, $.Layouts.PhoneFinder.PhoneSlim ri) :=
   TRANSFORM
@@ -53,17 +53,21 @@ FUNCTION
     SELF.iccid_changedthis_time  := IF(le.iccid_changedthis_time = 0, ri.iccid_changedthis_time, le.iccid_changedthis_time);
     SELF.imsi_changedthis_time   := IF(le.imsi_changedthis_time = 0, ri.imsi_changedthis_time, le.imsi_changedthis_time);
     SELF.imei_changedthis_time   := IF(le.imei_changedthis_time = 0, ri.imei_changedthis_time, le.imei_changedthis_time);
+    SELF.imsi_Tenure_MinDays     := IF(le.imsi_Tenure_MinDays = 0, ri.imsi_Tenure_MinDays, le.imsi_Tenure_MinDays);
+    SELF.imsi_Tenure_MaxDays     := IF(le.imsi_Tenure_MaxDays = 0, ri.imsi_Tenure_MaxDays, le.imsi_Tenure_MaxDays);
+    SELF.imei_Tenure_MinDays     := IF(le.imei_Tenure_MinDays = 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
+    SELF.imei_Tenure_MaxDays     := IF(le.imei_Tenure_MaxDays = 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
     SELF                 		     := le;
   END;
 
   dPhoneRollup := ROLLUP(dPhoneSort,
                           LEFT.acctno = RIGHT.acctno AND
-                          LEFT.phone  = RIGHT.phone, 
+                          LEFT.phone  = RIGHT.phone,
                           tPhoneRollup(LEFT, RIGHT));
-  
+
   // Overwrite the primary phone details with the phone detail information from TU
   dPrimaryPhoneDetail := dPhoneSlim(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
-  
+
   $.Layouts.PhoneFinder.PhoneSlim tOverwriteWithTU(dPhoneRollup le, dPrimaryPhoneDetail ri) :=
   TRANSFORM
     SELF.acctno                  := le.acctno;
@@ -125,9 +129,13 @@ FUNCTION
     SELF.imei_changedthis_time   := le.imei_changedthis_time;
     SELF.loststolen              := le.loststolen;
     SELF.loststolen_date         := le.loststolen_date;
+    SELF.imsi_Tenure_MinDays     := IF(ri.imsi_Tenure_MinDays != 0, ri.imsi_Tenure_MinDays, le.imsi_Tenure_MinDays);
+    SELF.imsi_Tenure_MaxDays     := IF(ri.imsi_Tenure_MaxDays != 0, ri.imsi_Tenure_MaxDays, le.imsi_Tenure_MaxDays);
+    SELF.imei_Tenure_MinDays     := IF(ri.imei_Tenure_MinDays != 0, ri.imei_Tenure_MinDays, le.imei_Tenure_MinDays);
+    SELF.imei_Tenure_MaxDays     := IF(ri.imei_Tenure_MaxDays != 0, ri.imei_Tenure_MaxDays, le.imei_Tenure_MaxDays);
     SELF                         := ri;
   END;
-  
+
   dPhoneDetail := JOIN( dPhoneRollup,
                         dPrimaryPhoneDetail,
                         LEFT.acctno = RIGHT.acctno AND
@@ -135,21 +143,21 @@ FUNCTION
                         tOverwriteWithTU(LEFT, RIGHT),
                         LEFT OUTER,
                         LIMIT(0), KEEP(1));
-                          
-  // To preserve single records coming from Qsent PVS (type flag P) 
+
+  // To preserve single records coming from Qsent PVS (type flag P)
   dTUPhonesOnly := JOIN(dPrimaryPhoneDetail,
                         dPhoneDetail,
-                        LEFT.acctno = RIGHT.acctno AND 
+                        LEFT.acctno = RIGHT.acctno AND
                         LEFT.phone  = RIGHT.phone,
                         TRANSFORM($.Layouts.PhoneFinder.PhoneSlim,
                                   SELF.coc_description := IF(LEFT.ServiceClass != '', $.Functions.ServiceClassDesc(LEFT.ServiceClass), LEFT.coc_description),
                                   SELF                 := LEFT),
                         LEFT ONLY);
-    
+
   dAllPhonesDetail := IF(isPrimaryPhone,
                           dPhoneDetail + dTUPhonesOnly,
                           UNGROUP(TOPN(GROUP(dPhoneRollup, acctno), PhoneFinder_Services.Constants.WFConstants.MaxSectionLimit, acctno, -phone_score)));
-  
+
   #IF(PhoneFinder_Services.Constants.Debug.Main)
       OUTPUT(dPhoneSlim, NAMED('dPhoneSlim'), EXTEND);
       OUTPUT(dPhoneSort, NAMED('dPhoneSort'), EXTEND);

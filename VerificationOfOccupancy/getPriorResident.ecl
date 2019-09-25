@@ -1,4 +1,4 @@
-import Risk_Indicators, ut, RiskWise, doxie, header_quick, MDR, drivers, dx_header, inquiry_acclogs;
+import Risk_Indicators, ut, RiskWise, header_quick, MDR, drivers, dx_header, inquiry_acclogs;
 
 EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, 
 																		string50 DataRestrictionMask, 
@@ -44,12 +44,13 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 	dedupDIDs := dedup(sort(resDIDs, seq, prior_res_DID, -prior_res_dt_last_seen, -prior_res_dt_first_seen), seq, prior_res_DID);
 
 //apply HouseHold ID (HHID) to each of the header records we found above so we can link household members
-	VerificationOfOccupancy.Layouts.Layout_VOOShell getHHIDs(dedupDIDs le, doxie.Key_Header ri) := TRANSFORM
+	key_header := dx_header.key_header();
+	VerificationOfOccupancy.Layouts.Layout_VOOShell getHHIDs(dedupDIDs le, key_header ri) := TRANSFORM
 		SELF.prior_res_HHID 	:= ri.HHID;
 		SELF 										:= le;
 	END;
 	
-	resHHIDs := join(dedupDIDs, doxie.Key_Header,
+	resHHIDs := join(dedupDIDs, key_header,
 									keyed(left.prior_res_DID = right.s_DID) and 
 									left.prim_name = right.prim_name and
 									left.z5 = right.zip and
@@ -136,7 +137,7 @@ EXPORT getPriorResident(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
   rolled_Property := rollup(sortProperty, rollProperty(left,right), seq, prior_res_DID);
 
 // Join prior resident DIDs to header and determine if any address is being reported for them that is newer than the target address
-	dk := choosen(doxie.key_max_dt_last_seen, 1);
+	dk := choosen(dx_header.key_max_dt_last_seen(), 1);
 	hdrBuildDate01 := dk[1].max_date_last_seen[1..6];
 	
 headerMacro(transformName, keyName) := MACRO
@@ -147,10 +148,10 @@ headerMacro(transformName, keyName) := MACRO
 endmacro;
 
 	// Initialize the full header and quick header transforms
-	headerMacro(getHeader, Doxie.Key_Header);
+	headerMacro(getHeader, key_header);
 	headerMacro(getQHeader, header_quick.key_DID);
 
-	newerHeader := join(rolled_Property, Doxie.Key_Header,	
+	newerHeader := join(rolled_Property, key_header,	
 									LEFT.prior_res_DID <> 0 AND
 									keyed(left.prior_res_DID = right.s_DID) and
 									// trim((string)right.dt_last_seen) >= hdrBuildDate01 and

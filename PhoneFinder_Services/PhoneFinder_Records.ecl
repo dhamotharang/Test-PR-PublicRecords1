@@ -123,7 +123,7 @@ MODULE
 
   // get remaining phone metadata
   SHARED dPhoneMetadataResults := IF(tmpMod.IsGetMetaData,
-                                      PhoneFinder_Services.GetPhonesMetadata(dPorted_Phones, tmpMod, dGateways, dInBestInfo, dSubjectInfo),
+                                      PhoneFinder_Services.GetPhonesMetadata(dPorted_Phones, tmpMod, dGateways, if(tmpMod.IsPrimarySearchPII,dInBestInfo), dSubjectInfo),
                                       dPorted_Phones);
 
   // Phone verfication, calculate PRIs

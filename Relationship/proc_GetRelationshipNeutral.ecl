@@ -242,8 +242,7 @@ shared selected := MAP(AllFlag => rels,
                        IF(txflag.CCFlag, CoCC) +
                        IF(txflag.CLUEFlag, CoCLUE));
 
-shared removeSuppressed := proc_suppressKey(selected).run;
-shared interimResult := sort(dedup(sort(removeSuppressed,did1,did2),did1,did2),did1,-total_score,did2);
+shared interimResult := sort(dedup(sort(selected,did1,did2),did1,did2),did1,-total_score,did2);
 
 export result := IF(TopNCount>0,ungroup(topN(group(sort(interimResult,did1),did1),TopNCount,-total_score)),interimResult);
 

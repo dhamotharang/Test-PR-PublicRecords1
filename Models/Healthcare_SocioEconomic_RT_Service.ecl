@@ -294,8 +294,8 @@ IMPORT iesp;
 	//Passing additional parameters to the core, set them to defaults unless otherwise directed. Set ofac_version_in, gateways_in_ds
 	unsigned1 ofac_version_in := 1; //Set to default
 	gateways_in_ds := dataset([], Gateway.Layouts.Config); //Set to default
-	
-	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, ofac_version_in, gateways_in_ds, coreResults,
+	SuppressResultsForOptOuts := FALSE;
+	Models.Healthcare_SocioEconomic_Core(SuppressResultsForOptOuts, isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, ofac_version_in, gateways_in_ds, coreResults,
                                                                               LexIdSourceOptout := LexIdSourceOptout, 
                                                                               TransactionID := TransactionID, 
                                                                               BatchUID := BatchUID, 
@@ -303,7 +303,7 @@ IMPORT iesp;
 	// Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, coreResults);
   	// OUTPUT(coreResults, NAMED('coreResults'));
 
-  	EmptyCoreResults0 := dataset([], Models.Layouts_Healthcare_Core.Final_Output_Layout);
+  	EmptyCoreResults0 := dataset([], Models.Layouts_Healthcare_Core.Final_Output_Layout_W_OptOutFlag);
   	CoreResultsForAttributes := IF(isAttributesRequested AND isAttributesRequestValid, coreResults,  EmptyCoreResults0);
 
   	// Populating Attributes

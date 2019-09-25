@@ -1,4 +1,4 @@
-﻿import doxie, doxie_crs, suppress, ut;
+﻿import doxie, dx_header, doxie_crs, suppress, ut;
 
 doxie.MAC_Header_Field_Declare()
 
@@ -17,7 +17,7 @@ end;
 
 // this is still an issue -- DID is not preserved into the lookups,
 // since the notion of 'legacy' is for the DID/SSN pair.
-ssn_w_legacy_info := join (ssns, doxie.key_legacy_ssn,
+ssn_w_legacy_info := join (ssns, dx_header.key_legacy_ssn(),
                            keyed (Left.ssn_unmasked = Right.ssn) AND
                            (Left.did = Right.did),
                            transform (ssn_temp_rec, Self.legacy_ssn := Right.ssn != '', Self := Left),

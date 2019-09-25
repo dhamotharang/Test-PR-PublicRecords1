@@ -1,4 +1,4 @@
-﻿IMPORT $, Doxie, Gateway, Royalty, STD;
+﻿IMPORT $, Doxie, Gateway, Royalty, STD, ThreatMetrix;
 
 EXPORT GatewayData := MODULE
 
@@ -218,5 +218,77 @@ EXPORT GatewayData := MODULE
     RETURN combined_resp;
   END;
 
+  EXPORT getTMXInsights (DATASET($.Layouts.email_final_rec) ds_batch_in,
+                         $.IParams.EmailParams in_mod, 
+                         BOOLEAN NoPIIPersistence = TRUE) := FUNCTION
+
+    gateway_cfg  := in_mod.gateways(Gateway.Configuration.IsThreatMetrix(servicename))[1];
+      
+    indata := UNGROUP(TOPN(GROUP($.Functions.SortResults(ds_batch_in(~$.Constants.isUndeliverableEmail(email_status)),in_mod), // emails identified by BV as invalid are not processed through TMX 
+                                 acctno),in_mod.MaxEmailsForTMXCheck, acctno));
+    
+    // dedup email addresses
+    indata_ddpd := DEDUP(SORT(indata, Cleaned.clean_email), Cleaned.clean_email);
+    makeGatewayCall := in_mod.UseTMXRules AND in_mod.MaxEmailsForTMXCheck>0 AND gateway_cfg.url!='' AND COUNT(indata_ddpd)>0;
+
+    ThreatMetrix.gateway_trustdefender.t_TrustDefenderRequest xform_TMX_request($.Layouts.email_final_rec le) := TRANSFORM
+      SELF.User.QueryId := (STRING)le.seq; 
+      SELF.Options.TrustDefenderUserAccount.OrgId := $.Constants.GatewayValues.TMXOrgId;
+      SELF.Options.TrustDefenderUserAccount.ApiKey := $.Constants.GatewayValues.TMXApiKey;
+      SELF.Options.Policy := $.Constants.GatewayValues.TMXPolicy;  
+      SELF.Options.ServiceType := $.Constants.GatewayValues.TMXServiceType;
+      SELF.Options.ApiType := $.Constants.GatewayValues.TMXApiType;
+      SELF.Options.NoPIIPersistence := NoPIIPersistence;   
+
+      self.searchby.Identity.TrustDefenderAccount.AccountEmail := TRIM(le.Cleaned.clean_email);  
+      self := [];
+    END;
+
+    tmx_requests_in := PROJECT(indata_ddpd, xform_TMX_request(LEFT)); 
+
+    tm_gw_results := IF(makeGatewayCall, Gateway.SoapCall_ThreatMetrix(tmx_requests_in, gateway_cfg, makeGatewayCall)); // the SoapCall_ThreatMetrix() is actualy calling TrustDefender ESP method, not to be confused with ThreatMetrix ESP method
+   
+
+    $.Layouts.email_final_rec xform_TMX_result($.Layouts.email_final_rec le, ThreatMetrix.gateway_trustdefender.t_TrustDefenderDetailedResponse ri) := TRANSFORM
+      SELF.TMX_insights.account_email_first_seen := ri.AccountEmailFirstSeen;
+      SELF.TMX_insights.account_email_last_event := ri.AccountEmailLastEvent;
+      SELF.TMX_insights.account_email_last_update := ri.AccountEmailLastUpdate;
+      SELF.TMX_insights.account_email_result := ri.AccountEmailResult;
+      SELF.TMX_insights.account_email_score := ri.AccountEmailScore;
+      SELF.TMX_insights.account_email_worst_score := ri.AccountEmailWorstScore;
+
+      SELF.TMX_insights.digital_id := ri.DigitalId;
+      SELF.TMX_insights.digital_id_confidence := ri.DigitalIdConfidence;
+      
+      SELF.TMX_insights.digital_id_first_seen := ri.DigitalIdFirstSeen;
+      SELF.TMX_insights.digital_id_last_event := ri.DigitalIdLastEvent;
+      SELF.TMX_insights.digital_id_last_update := ri.DigitalIdLastUpdate;
+      SELF.TMX_insights.digital_id_result := ri.DigitalIdResult;
+      
+      SELF.TMX_insights.policy_score := ri.PolicyScore;
+      SELF.TMX_insights.request_result := ri.RequestResult;
+      SELF.TMX_insights.review_status := STD.Str.ToLowerCase(ri.ReviewStatus);
+      SELF.TMX_insights.risk_rating := ri.RiskRating;
+      SELF := le;
+    END;
+
+    tmx_results := JOIN(ds_batch_in, tm_gw_results, 
+                        TRIM(LEFT.Cleaned.clean_email) = STD.Str.ToUpperCase(TRIM(RIGHT.response._Data.AccountEmail.Content_)),   
+                        xform_TMX_result(LEFT, RIGHT.response._Data), 
+                        LEFT OUTER, 
+                        KEEP(1), LIMIT(0)
+                       );
+
+    // check if filtering of review_status = 'reject' is  requested and suppress as needed
+    //tmx_fltrd_results := IF(in_mod.SuppressTMXRejectedEmail,tmx_results(~$.Constants.isRejectedEmail(TMX_insights.review_status)),tmx_results);
+    tmx_fltrd_results := IF(in_mod.SuppressTMXRejectedEmail,tmx_results(~$.Constants.isRejectedEmail(TMX_insights.review_status)),tmx_results);
+    
+    //OUTPUT(indata, NAMED('indata'), EXTEND);
+    //OUTPUT(tmx_requests_in, NAMED('tmx_requests_in'), EXTEND);
+    //OUTPUT(tm_gw_results, NAMED('tm_gw_results'), EXTEND);
+    //OUTPUT(tmx_results, NAMED('tmx_results'), EXTEND);
+    
+    RETURN tmx_fltrd_results;
+  END;
 
 END;

@@ -220,7 +220,7 @@ TRANSFORM
 													
 	self.en_child := dedup(SORT(L.en_child,  -date_last_seen, RECORD), record);
 	self.nod_child := dedup(SORT(if(doxie.DataRestriction.Fares,dataset([],iesp.foreclosure.t_ForeclosureReportRecord),L.nod_child), -FilingDate, RECORD), record);
-	self.for_child := dedup(SORT(if(doxie.DataRestriction.Fares,dataset([],Property.Layout_Fares_Foreclosure),L.for_child), -process_date, RECORD), record);
+	self.for_child := dedup(SORT(if(doxie.DataRestriction.Fares,dataset([],Property.Layout_Fares_Foreclosure_Ex_Sids),L.for_child), -process_date, RECORD), record);
 	self.boater_child := dedup(SORT(L.boater_child, -date_last_seen, RECORD), record);
 	self.tu_child := dedup(SORT(L.tu_child, -file_date, RECORD), record);
 	self.tn_child := dedup(SORT(L.tn_child, -dt_last_seen, RECORD), record);
@@ -267,7 +267,7 @@ deeds_table := normalize(Sections_ddpd, left.deed_child,deeds_child(right));
 
 property_table :=dedup(sort(asses_table + deeds_table,ln_fares_id),ln_fares_id);
 
-doxie_crs.layout_foreclosure_report foreclosure_child(Property.Layout_Fares_Foreclosure l):=transform
+doxie_crs.layout_foreclosure_report foreclosure_child(Property.Layout_Fares_Foreclosure_Ex_Sids l):=transform
 self := l;
 self :=[];
 END;

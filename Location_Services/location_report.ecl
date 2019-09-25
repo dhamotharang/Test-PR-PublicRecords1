@@ -1,14 +1,14 @@
-import location_services, doxie, doxie_ln, doxie_raw, header, ut, Census_Data,
-       LN_PropertyV2, DeathV2_Services, dx_header;
+﻿import Census_Data, DeathV2_Services, doxie, doxie_ln, doxie_raw, dx_death_master, header, 
+       LN_PropertyV2, location_services, STD, ut;
+       
 
 
-export location_report(DATASET(Doxie_Raw.Layout_address_input) addr_in,
+export location_report(DATASET(Doxie_Raw.Layout_address_input) addr_in, 
 											 doxie.IDataAccess mod_access,
 											 boolean royaltyout = FALSE, 
 											 boolean useBusinessIds = FALSE) :=  FUNCTION
 
 doxie.MAC_Selection_Declare();
-
 glb_ok := mod_access.isValidGLB();
 dppa_ok := mod_access.isValidDPPA();
 
@@ -22,7 +22,7 @@ doxie.mac_best_records(didsOnly,did,bestrec,dppa_ok,glb_ok,false, mod_access.Dat
 propk := LN_PropertyV2.key_Property_did();
 
 didsFids := RECORD
-	layout_did_addr;
+	Location_Services.layout_did_addr;
 	string12  fid;
 	string2   src;
 END;
@@ -40,7 +40,7 @@ fids := join(addrDidsWithInputs, propk, keyed(left.did = right.s_did) AND
 propAddrFids := dedup(sort(fids,did,fid), RECORD);
 
 propSrchFields := RECORD
-	layout_did_addr did_addr;
+	Location_Services.layout_did_addr did_addr;
 	LN_PropertyV2.layout_search_building;
 END;
 
@@ -76,7 +76,7 @@ bestNamesD := dedup(sort(bestNames, did, -source_code), did);
 owners := bestNamesD(source_code[1] = 'O');
 sellers := bestNamesD(source_code[1] = 'S');
 
-Layout_Location_slim getJoinedAddrs(addrs2 L) := TRANSFORM
+Location_Services.Layout_Location_slim getJoinedAddrs(addrs2 L) := TRANSFORM
 	SELF := L;
 END;
 
@@ -96,9 +96,9 @@ addrVars := dedup(sort(joinedAddrs, RECORD), EXCEPT zip4);
 
 addrVarsAsInput := PROJECT(addrVars, doxie_raw.Layout_address_input);
 
-busMod := GetByBDID(addr_in, mod_access.application_type);
+busMod := Location_Services.GetByBDID(addr_in, mod_access.application_type);
 
-busFids := IF(useBusinessIds, GetByBusinessIds(addr_in).GetPropFids(), 
+busFids := IF(useBusinessIds, Location_Services.GetByBusinessIds(addr_in).GetPropFids(), 
 													    busMod.GetPropFids());
 
 deed_out := Location_Services.deed_records(addrVarsAsInput,busFids);
@@ -111,7 +111,7 @@ std_property := doxie_ln.make_property_records(asset_out, deed_out, false, bestr
 //std_property := doxie_ln@property_records;
 
 
-Layout_Location_slim takeAddrs(propSrchFields L) := TRANSFORM
+Location_Services.Layout_Location_slim takeAddrs(propSrchFields L) := TRANSFORM
 	SELF.city_name := L.p_city_name;
 	SELF := L;
 END;
@@ -131,7 +131,7 @@ bestaddrs := JOIN(addrVars,bestrec,
 									 LEFT.st = RIGHT.st,
 									 getBestAddrs(RIGHT));
 
-headerRecs := header_records(addrDidsWithInputs, mod_access);
+headerRecs := Location_Services.header_records(addrDidsWithInputs, mod_access);
 
 //only want a single header record for the neighbors call that matches the input
 //data
@@ -167,7 +167,7 @@ neighbors := doxie.nbr_records(
 	mod_access
 );
 
-Layout_report.Location_info getLocInfo(withPropD L, Doxie_Raw.Layout_address_input R) := TRANSFORM
+Location_Services.Layout_report.Location_info getLocInfo(withPropD L, Doxie_Raw.Layout_address_input R) := TRANSFORM
 	SELF.lat := L.geo_lat;
 	SELF.lon := L.geo_long;
 	SELF.msa := L.msa;
@@ -181,7 +181,7 @@ END;
 locInfo := JOIN(withPropD, addr_in, LEFT.prim_name = RIGHT.prim_name, getLocInfo(LEFT,RIGHT),right outer);
 bestLocInfo := TOPN(locInfo, 1, lat, lon);  
  
-Layout_report.Location_info getCountyName(bestLocInfo l, Census_Data.Key_Fips2County r) := TRANSFORM
+Location_Services.Layout_report.Location_info getCountyName(bestLocInfo l, Census_Data.Key_Fips2County r) := TRANSFORM
 		SELF.county := if (l.county <> '', r.county_name, '');
 		SELF := l;
 END;
@@ -194,8 +194,8 @@ bestLocInfoCounty := JOIN(bestLocInfo,Census_Data.Key_Fips2County,
 												
 
 
-propInfowithPopulatedcount :=Record
-	Layout_report.PropertyInfo;
+propInfowithPopulatedcount := Record
+	Location_Services.Layout_report.PropertyInfo;
 	std_property.ln_fares_id;
 	unsigned1 populated :=0;
 END;
@@ -314,9 +314,9 @@ PropInfoNonFares := ROLLUP(DeedInfoNonfares & AssessInfoNonFares, true, getProps
 allPropVend := project(PropInfoFares + PropInfoNonFares, transform(recordof(propInfowithPopulatedcount), self.vendor_source_flag:=if(left.isFares,'A','B'), self:=left));
 allPropinfo := sort(allPropVend,-populated);
 
-Layout_report.ApnRec takeApn(std_property l) := TRANSFORM
+Location_Services.Layout_report.ApnRec takeApn(std_property l) := TRANSFORM
   // need to remove interior spaces as well to prevent 'apparent' dups from slipping through
-  apn := StringLib.StringCleanSpaces(TRIM(l.fapn,LEFT,RIGHT));
+  apn := STD.Str.CleanSpaces(TRIM(l.fapn,LEFT,RIGHT));
 	SELF.apn := IF(apn <> '', apn,SKIP);
 END;
 
@@ -327,59 +327,54 @@ apns := PROJECT(if(EXISTS(std_property(ln_fares_id[1]='R' and fapn <> '')),
 allApns := DEDUP(SORT(UNGROUP(apns),apn),apn);
 
 
-// apparently need a no-op transform for join syntax when join type specified
-Layout_report.Assoc getAssoc(Layout_report.Assoc L) := TRANSFORM
-	SELF := L;
-END;
-
 // need to eliminate deceased entities from any of the "current" groupings
 // and force them into their respective "previous" groups
-death_key := doxie.Key_Death_Masterv2_SSA_Did;
-deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
+death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
-
-Layout_report.Assoc getOwn(propSrchFields L) := TRANSFORM
-	SELF := L;
+layout_assoc := RECORD (Location_Services.layout_report.Assoc)
+  boolean is_best := FALSE;
+  boolean is_deceased := FALSE;
 END;
 
-curOwnRes := join(owners, bestrec, left.did<>0 AND left.did = right.did and left.prim_name = right.prim_name
-            and left.prim_range = right.prim_range, getOwn(LEFT));
-curOwnResAlive := join(curOwnRes, death_key, left.did<>0 AND keyed(left.did = (unsigned6)right.l_did)
-												and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-												getAssoc(LEFT), LEFT ONLY);
-curOwnResBest := dedup(sort(curOwnResAlive, lname, fname, record), record);
-deadOwnRes := join(curOwnRes, death_key, left.did<>0 AND keyed(left.did = (unsigned6)right.l_did)
-										and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-										getAssoc(LEFT), keep (1), limit(0));
-					
-curOwn := join(owners, bestRec, left.did<>0 AND left.did = right.did and left.prim_name = right.prim_name
-            and left.prim_range = right.prim_range, getOwn(LEFT), LEFT ONLY);
-curOwnAlive := join(curOwn, death_key, left.did<>0 AND keyed(left.did = (unsigned6)right.l_did)
-											and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-											getAssoc(LEFT), LEFT ONLY);
-curOwnBest := dedup(sort(curOwnAlive, lname, fname, record), record);
-deadOwn := join(curOwn, death_key, left.did<>0 AND keyed(left.did = (unsigned6)right.l_did)
-											and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-											getAssoc(LEFT), keep (1), limit(0));
+owners_w_best := JOIN(owners, bestrec,
+                      LEFT.did = RIGHT.did AND LEFT.prim_name = RIGHT.prim_name AND LEFT.prim_range = RIGHT.prim_range,
+                      TRANSFORM(layout_assoc, SELF.is_best := (RIGHT.did != 0), SELF := LEFT),
+                      KEEP(1), LIMIT(0),
+                      LEFT OUTER);
 
-curRes := join(owners, bestAddrs, left.did<>0 AND left.did = right.did and left.prim_name = right.prim_name
-            and left.prim_range = right.prim_range, transform (Layout_report.Assoc, Self := RIGHT), RIGHT ONLY);
-curResAlive := join(curRes, death_key, left.did<>0 AND keyed(left.did = (unsigned6)right.l_did)
-											and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-											getAssoc(LEFT), LEFT ONLY);
-curResBest := dedup(sort(curResAlive, lname, fname, record), record);
-deadRes := join(curRes, death_key, left.did<>0 AND keyed(left.did = (unsigned6)right.l_did)
-									and not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-									getAssoc(LEFT), keep (1), limit(0));
+owners_w_deceased := dx_death_master.append.byDid(owners_w_best, did, death_params);
 
-prevOwn := PROJECT(sellers, getOwn(LEFT));
+all_owners := PROJECT (owners_w_deceased, TRANSFORM(layout_assoc, SELF.is_deceased := LEFT.death.is_deceased, SELF := LEFT));
+
+// partition owners into current/not-current (according to the best file) and alive/deceased
+deadOwnRes       := PROJECT(all_owners ( is_best AND  is_deceased), Location_Services.layout_report.Assoc);
+deadOwn          := PROJECT(all_owners (~is_best AND  is_deceased), Location_Services.layout_report.Assoc);
+curOwnResBestAll := PROJECT(all_owners ( is_best AND ~is_deceased), Location_Services.layout_report.Assoc);
+curOwnResBest    := SORT(curOwnResBestAll, lname, fname, RECORD);
+curOwnBestAll    := PROJECT(all_owners (~is_best AND ~is_deceased), Location_Services.layout_report.Assoc);
+curOwnBest       := DEDUP(SORT(curOwnBestAll, lname, fname, RECORD), RECORD);
+
+// partition residents into alive/deceased ("is_best" is not needed, just reusing same layout)
+curRes := JOIN(owners, bestAddrs, 
+               LEFT.did<>0 AND LEFT.did = RIGHT.did AND LEFT.prim_name = RIGHT.prim_name AND LEFT.prim_range = RIGHT.prim_range, 
+               TRANSFORM (layout_assoc, SELF.is_best := RIGHT.did != 0, SELF := RIGHT),
+               RIGHT ONLY);
+curRes_w_deceased := dx_death_master.append.byDid(curRes, did, death_params);
+
+all_residents := PROJECT(curRes_w_deceased, TRANSFORM(layout_assoc, SELF.is_deceased := LEFT.death.is_deceased, SELF := LEFT));
+
+curResBest_alive := PROJECT(all_residents(~is_deceased), Location_Services.layout_report.Assoc);
+curResBest := DEDUP(SORT(curResBest_alive, lname, fname, RECORD), RECORD);
+deadRes    := PROJECT(all_residents(is_deceased), Location_Services.layout_report.Assoc);
+
+prevOwn := PROJECT(sellers, Location_Services.layout_report.Assoc);
 prevOwnCombined := dedup(sort(prevOwn + deadOwnRes + deadOwn, did), did);
 prevOwnBest := sort(prevOwnCombined, lname, fname);
 		
 // eliminate any header records with sensitive DIDs or SSNs
 header.MAC_GlbClean_Header(headerRecs, headerRecs2, , , mod_access);
 		
-Layout_report.Assoc getPrevRes(headerRecs2 R) := TRANSFORM
+Location_Services.Layout_report.Assoc getPrevRes(headerRecs2 R) := TRANSFORM
 	SELF := R;
 END;
 
@@ -390,9 +385,9 @@ prevRes := join(headerRecs2, bestAddrs, LEFT.did = RIGHT.did and
 
 prevRes2 := dedup(sort(prevRes, did, lname, fname, mname), did);
 
-prevRes3 := join(prevRes2, bestNamesD, left.did = right.did, getAssoc(LEFT), LEFT ONLY);
+prevRes3 := join(prevRes2, bestNamesD, left.did = right.did, TRANSFORM(Layout_report.Assoc, SELF := LEFT), LEFT ONLY);
 
-Layout_report.Assoc getAssocBest(bestrec R) := TRANSFORM
+Location_Services.Layout_report.Assoc getAssocBest(bestrec R) := TRANSFORM
 	SELF := R;
 END;
 
@@ -403,27 +398,27 @@ prevResBest := sort(prevResCombined, lname, fname);
 
 best_group := IF(~useBusinessIds, busMod.best_group()); 
 
-Layout_report.BusAssoc getBusAssoc(best_group l) := TRANSFORM
-	SELF.company_name := DATASET([{l.company_name}], Layout_report.CompanyName);
+Location_Services.Layout_report.BusAssoc getBusAssoc(best_group l) := TRANSFORM
+	SELF.company_name := DATASET([{l.company_name}], Location_Services.Layout_report.CompanyName);
 	SELF := l;
 	SELF := [];
 END;
 
 busAssocs := PROJECT(best_group, getBusAssoc(LEFT));
 
-busAssocsWithLinkIds := IF(useBusinessIds, GetByBusinessIds(addr_in).linkIdsInfoOut);
+busAssocsWithLinkIds := IF(useBusinessIds, Location_Services.GetByBusinessIds(addr_in).linkIdsInfoOut);
 
-Layout_report.BusAssoc rollBusNames(busAssocs l, busAssocs R) := TRANSFORM
+Location_Services.Layout_report.BusAssoc rollBusNames(busAssocs l, busAssocs R) := TRANSFORM
 	SELF.group_id := L.group_id;
-	SELF.company_name := choosen(L.company_name + R.company_name, consts.max_assocs);
+	SELF.company_name := choosen(L.company_name + R.company_name, Location_Services.consts.max_assocs);
 	SELF := [];
 END;
 
 busRolled := IF(~useBusinessIds, ROLLUP(sort(busAssocs, group_id),rollBusNames(LEFT,RIGHT),group_id));
 /////////////////////////////////
-assocMax := consts.max_assocs;
+assocMax := Location_Services.consts.max_assocs;
 
-Layout_report.KeyRec getAll(emptyRec l) := TRANSFORM
+Location_Services.Layout_report.KeyRec getAll(emptyRec l) := TRANSFORM
 
 	return_nothing :=count(bestLocInfoCounty)=0 and count(addrVarsCombined)=0 and count(allApns)=0 and
 	count(allPropInfo)=0 and count(neighbors)=0 and count(owners)=0 and count(sellers)=0 and
@@ -432,7 +427,7 @@ Layout_report.KeyRec getAll(emptyRec l) := TRANSFORM
 	SELF.locInfo :=bestLocInfoCounty;
 	SELF.addrs := addrVarsCombined;
 	SELF.apns := allApns;
-  SELF.propInfo := PROJECT(allPropInfo,Layout_report.propertyInfo);
+  SELF.propInfo := PROJECT(allPropInfo,Location_Services.Layout_report.propertyInfo);
 	SELF.neighbors := neighbors;
 	SELF.associates.curOwnRes.totCnt := count(curOwnResBest);
 	SELF.associates.curOwnRes.a := choosen(curOwnResBest,assocMax);

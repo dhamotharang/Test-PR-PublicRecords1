@@ -8,7 +8,7 @@ export Functions := module
   shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (global_mod);
   
 //These are the common batch parameters that may be used to call other batch services. 
-shared mod_batchV2 := BatchShare.IParam.getBatchParamsV2();
+shared mod_batchV2 := BatchShare.IParam.getBatchParams();
 //---------------------------------------------------------------------------------------------------------//	
 	export getBest(dataset(Layouts.BatchIn) BatchIn)  := function
 	

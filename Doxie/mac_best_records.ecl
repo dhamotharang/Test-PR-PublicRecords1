@@ -13,9 +13,11 @@
 												) := macro
 
 
-IMPORT ut, dx_BestRecords, dx_header, DeathV2_Services, AutoStandardI, MDR;
-#uniquename(deathparams)
-%deathparams% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+IMPORT AutoStandardI, DeathV2_Services, Doxie, dx_BestRecords, dx_death_master, dx_header, 
+       MDR, Suppress, ut;
+#uniquename(death_params)
+%death_params% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+ 
 //If no minors_field value is set, use glb permission to determine if minors should be kept in record set.
 #uniquename(minors_ok)
 #if(include_minors != '')
@@ -64,21 +66,23 @@ IMPORT ut, dx_BestRecords, dx_header, DeathV2_Services, AutoStandardI, MDR;
   self.dod := '';
   self := l;
 end;
+
 #uniquename(outfile_noDeath)															 
 %outfile_noDeath% := project(%outfile_watchdog_death%, %clearDOD%(LEFT));
+
+//use a DOD value from an un-restricted DeathMaster record
+#uniquename(death_raw_recs)
+%death_raw_recs% := dx_death_master.Append.byDid(%outfile_watchdog_death%, did, %death_params%);
+
 //use a DOD value from an un-restricted DeathMaster record
 #uniquename(fillDOD)			
-%outfile_noDeath% %fillDOD%(%outfile_noDeath% l, doxie.key_death_masterV2_ssa_DID r) := transform
-   self.dod := r.dod8;
-   self.IsLimitedAccessDMF := (r.src = MDR.sourceTools.src_Death_Restricted);
+%outfile_noDeath% %fillDOD%(%death_raw_recs% l) := transform
+   self.dod := l.death.dod8;
+   self.IsLimitedAccessDMF := (l.death.src = MDR.sourceTools.src_Death_Restricted);
 	 self := L;
 end;
-#uniquename(outfile_Death)
-// since only dod8 is taken
-%outfile_death% := join(%outfile_watchdog_death%,doxie.key_death_masterV2_ssa_DID,
-															keyed(left.did = right.l_did)  and
-															not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_per, %deathparams%),
-															%fillDOD%(LEFT,RIGHT),left outer, KEEP(1), LIMIT (0));
+#uniquename(outfile_death)
+%outfile_death% := PROJECT(%death_raw_recs%,  %fillDOD%(LEFT));
 
 outfile := IF (include_dod, %outfile_death%, %outfile_noDeath%); 
 endmacro;

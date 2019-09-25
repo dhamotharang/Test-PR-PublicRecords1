@@ -19,8 +19,6 @@ import AutoStandardI, doxie, ut, doxie_files, autokey, cellphone, drivers, Suppr
 %prec% := record
 	Phonesplus.layoutCommonOut;
 	string120 listed_name;
-	unsigned4 global_sid := 0;
-	unsigned8 record_sid := 0;
 end;
 
 #uniquename(makelistedname)

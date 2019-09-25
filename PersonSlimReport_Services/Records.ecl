@@ -132,16 +132,13 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
  bankruptcies:= if(in_mod.IncludeBankruptcies,
                   CHOOSEN(SmartRollup.fn_smart_rollup_bankruptcy(PersonReports.bankruptcy_records(did_safe, mod_access, bk_mod).bankruptcy_v2),
                           iesp.Constants.PersonSlim.MaxBankruptcies));
- 	
+
  //***LIEN RECS***\\ // DATASET([],iesp.lienjudgement.t_LienJudgmentReportRecord);
- liens_mod := MODULE (project(in_mod, PersonReports.input.liens, opt))
-                EXPORT string1 leins_party_type := PersonSlimReport_Services.Constants.DEBTOR;
-              END;
  liens := if(in_mod.IncludeLiens,
-            CHOOSEN(SmartRollup.fn_smart_rollup_liens(project(PersonReports.lienjudgment_records(did_safe, liens_mod).liensjudgment_v2,
-                    iesp.lienjudgement.t_LienJudgmentReportRecord)),iesp.Constants.PersonSlim.MaxLiens));
+            CHOOSEN(PersonSlimReport_Services.Functions(did_safe).liensRecsByDid(in_mod),
+                    iesp.Constants.PersonSlim.MaxLiens));
 												 
-  //***PROPERTY RECS***\\ // DATASET([],iesp.property.t_PropertyReport2Record);
+ //***PROPERTY RECS***\\ // DATASET([],iesp.property.t_PropertyReport2Record);
  properties := if(in_mod.IncludeProperties,
                   CHOOSEN(PersonSlimReport_Services.Functions(did_safe).propertyRecsByDid(in_mod, mod_access),
                          iesp.Constants.PersonSlim.MaxProperties));
@@ -200,15 +197,15 @@ iesp.personslimreport.t_PersonSlimReportResponse xformOut() := TRANSFORM
 	SELF.Addresses              := addresses;
 	// SELF.Addresses              := DATASET([],iesp.personslimreport.t_PersonSlimReportAddress);
 	SELF.Phones                 := phones;
-	// SELF.Phones                 := DATASET([],iesp.personslimreport.t_PersonSlimReportPhone;
+	// SELF.Phones                 := DATASET([],iesp.personslimreport.t_PersonSlimReportPhone);
 	SELF.Names                  := names;
 	// SELF.Names                  := DATASET([],iesp.personslimreport.t_PersonSlimReportName);
 	SELF.Deaths                 := deaths;
-	// SELF.Deaths                 := DATASET([],iesp.personslimreport.t_PersonSlimReportDeath;
+	// SELF.Deaths                 := DATASET([],iesp.personslimreport.t_PersonSlimReportDeath);
 	SELF.SSNs                   := ssns;
 	// SELF.SSNs                   := DATASET([],iesp.personslimreport.t_PersonSlimReportSSN);
 	SELF.DOBs                   := dobs;
-	// SELF.Addresses              := DATASET([],iesp.personslimreport.t_PersonSlimReportDOB);
+	// SELF.DOBs                   := DATASET([],iesp.personslimreport.t_PersonSlimReportDOB);
 	SELF.ProfessionalLicenses   := profLics;
 	// SELF.ProfessionalLicenses   := DATASET([],iesp.proflicense.t_ProfessionalLicenseRecord);
 	SELF.PeopleAtWorks          := paws;
