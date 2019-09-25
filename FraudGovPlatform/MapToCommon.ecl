@@ -31,7 +31,7 @@ module
  
 	Export KnownFraud := project (extra_dedup_KnownFraud , transform(FraudShared.Layouts.Base.Main , 
 		self.ln_report_date := left.reported_date;
-		self.event_date			:= left.reported_date;
+		self.event_date			:= if(left.event_date = '', left.reported_date, left.event_date);
 		self.transaction_id := left.customer_event_id;
 		self.additional_address.Street_1	:= left.Mailing_Street_1; 
 		self.additional_address.Street_2	:= left.Mailing_Street_2;
