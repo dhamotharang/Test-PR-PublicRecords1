@@ -1286,6 +1286,10 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 											
   self.sent_addl_prov_code	     := '';                                                                                                                                      
 
+
+  addl_prov_desc_I0101      :=  trim(map(vVendor = 'I0101' and regexfind('COMMUNITY SERVICE',l.casecomments) and l.sentenceadditionalinfo = ''  
+							                                       => regexreplace('ADDITIONAL CASE INFORMATION: ',l.casecomments,''),''));		// added by tp
+
 	self.sent_addl_prov_desc_1 		 := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.sentenceadditionalinfo) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.sentenceadditionalinfo,'$2'),
                                       	trim(l.ln_vendor) IN ['I0001','I0003'] => l.casestatus,
 	                                      l.ln_vendor = 'RB' and Maxsent <> '' and Minsent <> '' => trim(trim(l.sentencetype) + ' Max: '+Maxsent+ ' Min: '+Minsent,left,right),
@@ -1296,12 +1300,14 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																				l.ln_vendor = 'TA' => l.sentencestatus,
 																				trim(l.ln_vendor) ='I0008' =>l.sentenceadditionalinfo,
 
-																				trim(l.ln_vendor) IN ['I0098','I0101','I0107','I0115']=>l.sentenceadditionalinfo, // added by tp 
+                                        vVendor IN ['I0101'] => addl_prov_desc_I0101,   // added by tp
+																				//trim(l.ln_vendor) IN ['I0098','I0101','I0107','I0115']=>l.sentenceadditionalinfo, // added by tp 
 																				
 																				'');
   self.sent_addl_prov_desc_2	    := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.sentenceadditionalinfo) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.sentenceadditionalinfo,'$2')[41..],
   
-                                         trim(l.ln_vendor) IN ['I0098','I0101','I0107','I0115']=>l.sentenceadditionalinfo[41..], // added by tp 	
+	                                   vVendor IN ['I0101'] => addl_prov_desc_I0101[41..],   // added by tp
+                                     //    trim(l.ln_vendor) IN ['I0098','I0101','I0107','I0115']=>l.sentenceadditionalinfo[41..], // added by tp 	
 	
 	                                      '');
   self.sent_consec				        := MAP(trim(l.sentenceadditionalinfo) = 'CONSECUTIVE' => 'CS',
