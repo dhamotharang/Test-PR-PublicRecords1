@@ -66,8 +66,9 @@ L := record
 	dc.cohesivity;
 	dc.p_city_name;
 	//CCPA-767
-	UNSIGNED4 global_sid := 0;
-	UNSIGNED8 record_sid := 0;
+	UNSIGNED4 global_sid		:= 0;
+	UNSIGNED8 record_sid		:= 0;
+	UNSIGNED4 did 						:= 0;
 
 end;
 
