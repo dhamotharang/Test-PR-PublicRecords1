@@ -13,7 +13,9 @@
 #workunit('priority','high'); 
 
 import _Control, Address, Risk_Indicators;
-onThor := _Control.Environment.onThor;
+// onThor := _Control.Environment.onThor;
+
+EXPORT bwr_ProfileBooster_OneMain_Step2_1(string NotifyList, boolean onThor = TRUE ) := FUNCTION
 
 #workunit('name', 'profile booster ' + 	if(onThor, 'thor ', 'roxie ') );
 #stored('did_add_force', if(onThor, 'thor', 'roxi') );  // this option is the stored parameter used inside the DID append macro to determine which version of the macro to use
@@ -28,8 +30,14 @@ search_function_with_acctno := ProfileBooster.OneMain_Step2_Function(ds_in, eyeb
 							
 output(choosen(search_function_with_acctno, eyeball_count), named('search_function_with_acctno'));
 output(search_function_with_acctno,, '~thor400::out::profile_booster_attributes_' + if(onThor, 'thor_', 'roxie_') + 'part1', csv(quote('"')), EXPIRE(30), OVERWRITE);
-	
-	
+
+ EmailList := If(NotifyList = '', ProfileBooster.Constants.ECL_Developers_Slim, ProfileBooster.Constants.ECL_Developers_Slim + ',' + NotifyList);
+
+
 // email results of this bwr
-FileServices.SendEmail(ProfileBooster.Constants.ECL_Developers_Slim, 'OneMain Step2_1 finished ' + WORKUNIT, 'Input count  ' + count(ds_in) + '    Output count ' + count(search_function_with_acctno)):
-FAILURE(FileServices.SendEmail(ProfileBooster.Constants.ECL_Developers_Slim,'OneMain Step2_1 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+FileServices.SendEmail(EmailList, 'OneMain Step2_1 finished ' + WORKUNIT, 'Input count  ' + count(ds_in) + '    Output count ' + count(search_function_with_acctno)):
+FAILURE(FileServices.SendEmail(EmailList,'OneMain Step2_1 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+
+RETURN '';
+
+END;

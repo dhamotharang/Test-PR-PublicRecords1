@@ -8,14 +8,16 @@
 
 IMPORT INFUTOR, WATCHDOG, UT;
 
-base := choosen(Watchdog.Key_Watchdog_marketing_V2(   // Pointing to the Watchdog file
+EXPORT bwr_ProfileBooster_OneMain_Step1(string NotifyList) := FUNCTION
+
+base := Watchdog.Key_Watchdog_marketing_V2(   // Pointing to the Watchdog file
 						adl_ind IN ['CORE', 'NO_SSN'] AND // , 'AMBIG', 'C_MERGE' ADL type should be 'CORE' or 'No_SSN' to filter out deceased
 						fname <> '' AND lname <> '' AND 
 						prim_name <> '' AND
 						city_name <> '' AND st <> '' AND
 						zip <> '' AND // zip4 <> '' AND
 						(dob = 0 OR ut.Age(dob)>18 OR dob = -1) // Age>21 or best DoB missing
-						),18); 
+						); 
 
 output(count(base), named('base_count'));
 
@@ -23,7 +25,8 @@ base3_pre := DISTRIBUTE(base, hash(fname,lname,prim_name,city_name,st,zip,ssn));
 base3 := DEDUP(SORT(base3_pre, 
 										hash(fname,mname,lname,name_suffix,prim_name,city_name,st,zip,ssn), LOCAL), 
 										hash(fname,mname,lname,name_suffix,prim_name,city_name,st,zip,ssn), LOCAL);
-output(count(base3), named('base3_count'));
+										
+
 
 LayoutPBInputThor := RECORD
 	// USING A SUBSET OF ProfileBooster.Layouts.Layout_PB_In HERE, THAT IS WHAT THE FUNCTION TAKES IN
@@ -76,30 +79,58 @@ out_dat := TABLE(base3, LayoutPBInputThor);
 
 countRecs := count(out_dat);
 
-theRest := countRecs - 180000000;	// this is how many records we have left after processing 180,000,000
+theRest := countRecs - 15;	// this is how many records we have left after processing 180,000,000
+output(count(base3), named('base3_count'));
+output(count(base3), named('base3_count'));
 output(theRest, named('theRest'));
 output(countRecs, named('out_dat_count'));
 output(out_dat, named('out_dat'));
 output(out_dat, , '~thor400::profilebooster::SpringLeaf_full_infile.csv', CSV(QUOTE('"')), EXPIRE(30), OVERWRITE);
 
-//Now we have the full input file, lets break it up into 4 seperate smaller files in case we have issues
-file1 := choosen(out_dat, 60000000/*how many*/, 1/*starting at*/);  // records 1-60,000,000
-file2 := choosen(out_dat, 60000000/*how many*/, 60000001/*starting at*/);	// records 60,000,001 - 120,000,000
-file3 := choosen(out_dat, 60000000/*how many*/, 120000002/*starting at*/);  // records 120,000,001 - 180,000,000
-file4 := choosen(out_dat, therest/*how many*/, 180000003/*starting at*/);
-output(choosen(file1, 10), named('file1'));
-output(choosen(file2, 10), named('file2'));
-output(choosen(file3, 10), named('file3'));
-output(choosen(file4, 10), named('file4'));
-output(file1,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part1.csv', csv(heading(1), quote('"')), expire(30), overwrite);
-output(file2,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part2.csv', csv(heading(1), quote('"')), expire(30), overwrite);
-output(file3,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part3.csv', csv(heading(1), quote('"')), expire(30), overwrite);
-output(file4,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_final_part4.csv', csv(heading(1), quote('"')), expire(30), overwrite);
+// Now we have the full input file, lets break it up into 4 seperate smaller files in case we have issues
+file1 := choosen(out_dat, 5/*how many*/, 1/*starting at*/);
+file2 := choosen(out_dat, 5/*how many*/, 6/*starting at*/);	// records 1-60,000,000
+file3 := choosen(out_dat, 5/*how many*/, 11/*starting at*/);
+file4 := choosen(out_dat, therest/*how many*/, 16/*starting at*/);
+output(file1, named('file1'));
+output(file2, named('file2'));
+output(file3, named('file3'));
+output(file4, named('file4'));
+output(file1,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part1.csv', CSV(quote('"')), expire(30), overwrite);
+output(file2,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part2.csv', CSV(quote('"')), expire(30), overwrite);
+output(file3,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part3.csv', CSV(quote('"')), expire(30), overwrite);
+output(file4,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_final_part4.csv', CSV(quote('"')), expire(30), overwrite);
+	
 
+// theRest := countRecs - 180000000;	// this is how many records we have left after processing 180,000,000
+// output(theRest, named('theRest'));
+// output(countRecs, named('out_dat_count'));
+// output(out_dat, named('out_dat'));
+// output(out_dat, , '~thor400::profilebooster::SpringLeaf_full_infile.csv', CSV(QUOTE('"')), EXPIRE(30), OVERWRITE);
+
+//Now we have the full input file, lets break it up into 4 seperate smaller files in case we have issues
+// file1 := choosen(out_dat, 60000000/*how many*/, 1/*starting at*/);  // records 1-60,000,000
+// file2 := choosen(out_dat, 60000000/*how many*/, 60000001/*starting at*/);	// records 60,000,001 - 120,000,000
+// file3 := choosen(out_dat, 60000000/*how many*/, 120000002/*starting at*/);  // records 120,000,001 - 180,000,000
+// file4 := choosen(out_dat, therest/*how many*/, 180000003/*starting at*/);
+// output(choosen(file1, 10), named('file1'));
+// output(choosen(file2, 10), named('file2'));
+// output(choosen(file3, 10), named('file3'));
+// output(choosen(file4, 10), named('file4'));
+// output(file1,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part1.csv', csv(heading(1), quote('"')), expire(30), overwrite);
+// output(file2,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part2.csv', csv(heading(1), quote('"')), expire(30), overwrite);
+// output(file3,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_60mil_part3.csv', csv(heading(1), quote('"')), expire(30), overwrite);
+// output(file4,, '~thor400::profilebooster::springleaf_full_file_pb_in_layout_final_part4.csv', csv(heading(1), quote('"')), expire(30), overwrite);
+
+ EmailList := If(NotifyList = '', ProfileBooster.Constants.ECL_Developers_Slim, ProfileBooster.Constants.ECL_Developers_Slim + ',' + NotifyList);
 	
 	
 // email results of this bwr
-FileServices.SendEmail(ProfileBooster.Constants.ECL_Developers_Slim, 'OneMain Step1 finished ' + WORKUNIT, 
+FileServices.SendEmail(EmailList, 'OneMain Step1 finished ' + WORKUNIT, 
 												'Input count  ' + countRecs + '    File1 count ' + count(File1) + '    File2 count ' + count(File2) +
 												'    File3 count ' + count(File3) + '    File4 count ' + count(File4)):
-FAILURE(FileServices.SendEmail(ProfileBooster.Constants.ECL_Developers_Slim,'OneMain Step1 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+FAILURE(FileServices.SendEmail(EmailList,'OneMain Step1 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+
+RETURN 'SUCCESSFULL';
+
+END;

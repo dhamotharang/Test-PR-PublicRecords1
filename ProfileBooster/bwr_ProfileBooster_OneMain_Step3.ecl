@@ -6,12 +6,15 @@
 
 #workunit('priority','high'); 
 
-import _Control;
-onThor := _Control.Environment.onThor;
+import _Control, STD;
+
+EXPORT bwr_ProfileBooster_OneMain_Step3(string IPaddr, string AbsolutePath, string NotifyList, boolean onThor = TRUE) := function
+
+// onThor := _Control.Environment.onThor;
 
 
 original_input := dataset('~thor400::profilebooster::SpringLeaf_full_infile.csv', ProfileBooster.Layouts.LayoutPBInputThor, csv(quote('"')));
-output(original_input, NAMED('original_input'));
+
 
 
 // copied from ProfileBooster.Layouts.Layout_PB_BatchOutFlat and removed the v1_ so that the field names match batchout, which is what the customer wants
@@ -392,9 +395,6 @@ END;
 // PROJECT THE OUTPUT INTO THE LAYOUT THAT BATCH NEEDS TO RETURN TO CUSTOMER
 project_deduped := project(dedup_original_output, transform(batchout, self := left));
 
-Output(choosen(project_deduped,10), NAMED('dedup_original_output'));
-output(count(project_deduped), NAMED('count_dedup_original_output'));
-output(project_deduped,, '~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', csv(heading(single), quote('"'), terminator('\r\n')), overwrite);
 
 // Join the input to the output and only keep the matching records as output can lose records, need to be the same count
 inlayout_whatCustomerWants := RECORD
@@ -422,6 +422,12 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
 											self.st := left.st;
 											self.zip := left.z5;
 											self.zip4 := left.z4));
+											
+ output(original_input, NAMED('original_input'));
+ Output(choosen(project_deduped,10), NAMED('dedup_original_output'));
+ output(count(project_deduped), NAMED('count_dedup_original_output'));
+ output(project_deduped,, '~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', csv(heading(single), quote('"'), terminator('\r\n')), overwrite);
+											
  output(choosen(reducedInput, 10), NAMED('reduced_input'));
  output(count(reducedInput), NAMED('count_reduced_input'));
  // this has to be the exact name, needs CR/LF
@@ -437,8 +443,16 @@ reducedInput := join(original_input, project_deduped, left.lexid=right.lexid, tr
  t := table(original_output_full, {lexid, lexidcount := count(group)}, lexid); 
  output(t(lexidcount>1), named('count_output_with_lexid'));
  	
+ EmailList := If(NotifyList = '', ProfileBooster.Constants.ECL_Developers_Slim, ProfileBooster.Constants.ECL_Developers_Slim + ',' + NotifyList);
 	
 // email results of this bwr
-FileServices.SendEmail(ProfileBooster.Constants.ECL_Developers_Slim, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +
+FileServices.SendEmail(EmailList, 'OneMain Step3 finished ' + WORKUNIT, 'Original Input count  ' + ded + '    Original Output count ' + ded2 +
 																																			'   Duplicate LexID count ' + count(t(lexidcount>1)) + '  Reduced Input count ' + count(reducedInput) + '   Output count ' + count(project_deduped)):
-FAILURE(FileServices.SendEmail(ProfileBooster.Constants.ECL_Developers_Slim,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+FAILURE(FileServices.SendEmail(EmailList,'OneMain Step3 failed', 'The failed workunit is:' + WORKUNIT + FAILMESSAGE));
+
+STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_ProfBooster.csv', IPaddr, AbsolutePath);
+STD.File.DeSpray('~thor400::profilebooster::LN_Output_springleaf_layout_PII.csv', IPaddr, AbsolutePath);
+
+RETURN 'SUCCESSFUL';
+
+END;
